@@ -18,7 +18,7 @@ class BaseItem :
 	public ControllableContainer
 {
 public :
-	BaseItem(const String &name = "baseItem", bool canBeDisabled = true, bool canHaveScript = false);
+	BaseItem(const String &name = "", bool canBeDisabled = true, bool canHaveScript = false);
 	virtual ~BaseItem();
 
 	BoolParameter * enabled;
@@ -48,6 +48,8 @@ public :
 	void loadJSONDataInternal(var data) override;
 
 	InspectableEditor * getEditor(bool isRoot) override;
+
+	virtual String getTypeString() const { return "BaseItem"; };
 
 	class  Listener
 	{

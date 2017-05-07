@@ -9,7 +9,7 @@
 */
 
 BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts) :
-	ControllableContainer(name),
+	ControllableContainer(name.isEmpty()?getTypeString():name),
 	canBeDisabled(_canBeDisabled),
 	canHaveScripts(_canHaveScripts),
 	userCanRemove(true)

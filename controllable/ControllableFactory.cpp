@@ -26,7 +26,7 @@ ControllableFactory::ControllableFactory() {
 	buildPopupMenu();
 }
 
-inline void ControllableFactory::buildPopupMenu()
+void ControllableFactory::buildPopupMenu()
 {
 	for (int i = 0; i < controllableDefs.size(); i++)
 	{

@@ -16,7 +16,6 @@ ShapeShifterManager::ShapeShifterManager() :
 	currentCandidatePanel(nullptr),
 	defaultFileData(nullptr)
 {
-	lastFile = File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory).getChildFile(appSubFolder + "/_lastSession." + appLayoutExtension);
 }
 
 ShapeShifterManager::~ShapeShifterManager()
@@ -30,6 +29,12 @@ ShapeShifterManager::~ShapeShifterManager()
 void ShapeShifterManager::setDefaultFileData(char * data)
 {
 	defaultFileData = data;
+}
+
+void ShapeShifterManager::setLayoutInformations(const String & _appLayoutExtension, const String & appSubLayoutFolder)
+{
+	appLayoutExtension = _appLayoutExtension;
+	appSubFolder = appSubLayoutFolder;
 }
 
 void ShapeShifterManager::setCurrentCandidatePanel(ShapeShifterPanel * panel)
@@ -268,8 +273,8 @@ void ShapeShifterManager::loadLastSessionLayoutFile()
 		loadLayoutFromFile(lastFile);
 	} else
 	{
-
 		loadDefaultLayoutFile();
+		lastFile = File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory).getChildFile(appSubFolder + "/_lastSession." + appLayoutExtension);
 	}
 }
 
@@ -312,9 +317,14 @@ void ShapeShifterManager::saveCurrentLayoutToFile(const File &toFile)
 		toFile.deleteFile();
 		toFile.create();
 	}
+	;
+	var data = getCurrentLayout();
+	if (data.isUndefined() || data.isVoid()) return;
 
+	if (!toFile.existsAsFile()) toFile.create();
 	ScopedPointer<OutputStream> os(toFile.createOutputStream());
-	JSON::writeToStream(*os, getCurrentLayout());
+	if (os == nullptr) return;
+	JSON::writeToStream(*os, data);
 	os->flush();
 }
 

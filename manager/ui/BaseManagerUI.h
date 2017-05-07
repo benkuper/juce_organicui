@@ -59,12 +59,16 @@ public:
 	BaseManagerUI<M, T, U>(const String &contentName, M * _manager, bool _useViewport = true);
 	virtual ~BaseManagerUI();
 
+	enum Layout { HORIZONTAL, VERTICAL };
+
 	M * manager;
 	OwnedArray<U> itemsUI;
 	BaseManagerItemComparator<T> managerComparator;
 
 	//ui
 	bool useViewport; //TODO, create a BaseManagerViewportUI
+
+	Layout defaultLayout;
 
 	ManagerUIItemContainer<M, T, U> container;
 	Viewport viewport;
@@ -89,6 +93,8 @@ public:
 	//layout
 	bool fixedItemHeight;
 	int gap;
+
+	void setDefaultLayout(Layout l);
 
 	void addExistingItems(bool resizeAfter = true);
 
@@ -149,6 +155,7 @@ BaseManagerUI<M, T, U>::BaseManagerUI(const String & contentName, M * _manager, 
 	manager(_manager),
 	managerComparator(_manager),
 	useViewport(_useViewport),
+	defaultLayout(VERTICAL),
 	container(this),
 	bgColor(BG_COLOR),
 	managerUIName(contentName),
@@ -192,6 +199,18 @@ BaseManagerUI<M, T, U>::~BaseManagerUI()
 {
 	if (!inspectable.wasObjectDeleted()) static_cast<BaseManager<T>*>(manager)->removeBaseManagerListener(this);
 	if (Engine::mainEngine) Engine::mainEngine->removeEngineListener(this);
+}
+
+template<class M, class T, class U>
+void BaseManagerUI<M, T, U>::setDefaultLayout(Layout l)
+{
+	defaultLayout = l;
+	if (useViewport)
+	{
+		if (defaultLayout == VERTICAL) viewport.setScrollBarsShown(true, false);
+		else viewport.setScrollBarsShown(false, true);
+	}
+	
 }
 
 template<class M, class T, class U>
@@ -261,6 +280,14 @@ void BaseManagerUI<M, T, U>::paint(Graphics & g)
 	{
 		if (!transparentBG)	g.fillAll(bgColor);
 	}
+
+	/*
+	if (useViewport)
+	{
+		g.setColour(Colours::orange.withAlpha(.5f));
+		g.drawRect(viewport.getBounds(),2);
+	}
+	*/
 }
 
 template<class M, class T, class U>
@@ -280,23 +307,41 @@ void BaseManagerUI<M, T, U>::resized()
 	if (useViewport)
 	{
 		viewport.setBounds(r);
-		r.removeFromRight(drawContour ? 14 : 10);
-		r.setTop(0);
+		if (defaultLayout == VERTICAL) r.removeFromRight(drawContour ? 14 : 12);
+		else r.removeFromBottom(drawContour ? 14 : 12);
+		
+		r.setY(0);
+
 	}
 
 	for (auto &ui : itemsUI)
 	{
 		BaseItemMinimalUI<T> * bui = static_cast<BaseItemMinimalUI<T>*>(ui);
-		Rectangle<int> tr = r.withHeight(bui->getHeight());
+
+		Rectangle<int> tr;
+		if(defaultLayout == VERTICAL) tr = r.withHeight(bui->getHeight());
+		else tr = r.withWidth(bui->getWidth());
+
 		bui->setBounds(tr);
-		r.translate(0, tr.getHeight() + gap);
+
+		if (defaultLayout == VERTICAL) r.translate(0, tr.getHeight() + gap);
+		else r.translate(tr.getWidth() + gap,0);
 	}
 
 	if (useViewport)
 	{
-		float th = 0;
-		if (itemsUI.size() > 0) th = static_cast<BaseItemMinimalUI<T>*>(itemsUI[itemsUI.size() - 1])->getBottom();
-		container.setBounds(getLocalBounds().withHeight(th));
+		if (defaultLayout == VERTICAL)
+		{
+			float th = 0;
+			if (itemsUI.size() > 0) th = static_cast<BaseItemMinimalUI<T>*>(itemsUI[itemsUI.size() - 1])->getBottom();
+			container.setBounds(getLocalBounds().withHeight(th));
+		} else
+		{
+			float tw = 0;
+			if (itemsUI.size() > 0) tw = static_cast<BaseItemMinimalUI<T>*>(itemsUI[itemsUI.size() - 1])->getRight();
+			container.setBounds(getLocalBounds().withWidth(tw));
+		}
+		
 	}
 }
 

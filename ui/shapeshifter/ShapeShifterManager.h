@@ -29,7 +29,7 @@ public:
 
 	File lastFile;
 	String appLayoutExtension = "layout";
-	String appSubFolder = "Chataigne/layouts";
+	String appSubFolder = "layouts";
 
 	OwnedArray<ShapeShifterPanel> openedPanels;
 	OwnedArray<ShapeShifterWindow> openedWindows;
@@ -39,6 +39,7 @@ public:
 	char * defaultFileData;
 
 	void setDefaultFileData(char *data);
+	void setLayoutInformations(const String &appLayoutExtension, const String &appSubLayoutFolder);
 
 	void setCurrentCandidatePanel(ShapeShifterPanel *);
 
