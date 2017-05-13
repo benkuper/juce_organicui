@@ -29,7 +29,7 @@ public:
 	String scriptTargetName;
 	DynamicObject scriptObject;
 
-	virtual DynamicObject * createScriptObject() {
+	virtual DynamicObject * createScriptObject(DynamicObject * /*parent*/ = nullptr) {
 		DynamicObject * o = new DynamicObject(scriptObject);
 		o->setProperty(scriptPtrIdentifier, thisPtr);
 		return o;

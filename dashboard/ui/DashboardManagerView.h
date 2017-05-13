@@ -17,7 +17,7 @@ class DashboardManagerView :
 	public DashboardManager::Listener
 {
 public:
-	DashboardManagerView(const String &contentName);
+	DashboardManagerView(const String &contentName, DashboardManager * manager);
 	~DashboardManagerView();
 
 	DashboardManagerUI managerUI;
@@ -32,7 +32,7 @@ public:
 
 	void itemRemoved(Dashboard *) override;
 
-	static DashboardManagerView * create(const String &contentName) { return new DashboardManagerView(contentName); }
+	static DashboardManagerView * create(const String &contentName) { return new DashboardManagerView(contentName, DashboardManager::getInstance()); }
 };
 
 

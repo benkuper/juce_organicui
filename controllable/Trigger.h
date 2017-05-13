@@ -54,7 +54,8 @@ public:
 	
 
 	static Trigger * create() { return new Trigger("New Trigger",""); }
-	virtual String getTypeString() const override { return "Trigger"; }
+	virtual String getTypeString() const override { return getTypeStringStatic(); }
+	static String getTypeStringStatic() { return "Trigger"; }
 
 private:
 	WeakReference<Trigger>::Master masterReference;

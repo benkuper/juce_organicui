@@ -36,6 +36,7 @@ public:
 
 	static ShapeShifterContent * createContent(const String &contentName)
 	{
+		DBG("Create content : " << contentName);
 		for (auto &d : getInstance()->defs)
 		{
 			if (d->contentName == contentName) return d->createFunc(contentName);

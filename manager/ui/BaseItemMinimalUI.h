@@ -114,7 +114,7 @@ void BaseItemMinimalUI<T>::setHighlightOnMouseOver(bool highlight)
 template<class T>
 void BaseItemMinimalUI<T>::paint(Graphics &g)
 {
-	Rectangle<float> r = getLocalBounds().toFloat();
+	juce::Rectangle<float> r = getLocalBounds().toFloat();
 	bool isItemEnabled = baseItem->canBeDisabled ? baseItem->enabled->boolValue() : true;
 
 	Colour c = isItemEnabled ? bgColor : bgColor.darker(.3f);

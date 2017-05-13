@@ -13,7 +13,7 @@
 
 #pragma warning( disable : 4505 )
 
-#include "Style.h"//keep
+//keep
 
 namespace LookAndFeelHelpers {
 

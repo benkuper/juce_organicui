@@ -58,6 +58,9 @@ public:
 
     OwnedArray<LogElement> logElements;
     void newMessage(const String & ) override;
+
+	static CustomLoggerUI * create(const String &contentName) { return new CustomLoggerUI(contentName, CustomLogger::getInstance()); }
+
 private:
     int totalLogRow;
     void updateTotalLogRow();
@@ -68,6 +71,8 @@ private:
 
     void handleAsyncUpdate()override;
 
+
+	
 };
 
 

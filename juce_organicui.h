@@ -48,6 +48,9 @@
 
 using namespace juce;
 
+
+#include "manager/Factory.h"
+
 #include "resources/OrganicBinaryData.h"
 
 #include "ui/Style.h"
@@ -152,6 +155,9 @@ using namespace juce;
 #include "manager/ui/BaseManagerViewUI.h"
 #include "manager/ui/BaseManagerShapeShifterUI.h"
 
+#include "manager/GenericControllableItem.h"
+#include "manager/GenericControllableManager.h"
+#include "manager/ui/GenericControllableItemEditor.h"
 
 #include "dashboard/DashboardItem.h"
 #include "dashboard/DashboardItemManager.h"

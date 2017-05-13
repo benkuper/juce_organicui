@@ -129,7 +129,7 @@ void ScriptEditor::buttonClicked(Button * b)
 			}
 		} 
 
-		File f(script->filePath->stringValue());
+		File f(Engine::mainEngine->getFile().getParentDirectory().getChildFile(script->filePath->stringValue()));
 		f.startAsProcess();
 		//editMode = !editMode;
 		//resized();

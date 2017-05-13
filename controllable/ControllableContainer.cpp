@@ -789,23 +789,36 @@ String ControllableContainer::getUniqueNameInContainer(const String & sourceName
 	return resultName;
 }
 
-DynamicObject * ControllableContainer::createScriptObject()
+DynamicObject * ControllableContainer::createScriptObject(DynamicObject * parent) 
 {
-	DynamicObject * o = ScriptTarget::createScriptObject();
-
+	bool transferToParent = parent != nullptr;
+	
+	DynamicObject * o = transferToParent?nullptr:ScriptTarget::createScriptObject();
+	
+	
 	for (auto &cc : controllableContainers)
 	{
 		if (!cc->includeInScriptObject) continue;
-		o->setProperty(cc->shortName, cc->createScriptObject());
+		if (cc->skipControllableNameInAddress) cc->createScriptObject(transferToParent?parent:o);
+		else
+		{
+			if (transferToParent) parent->setProperty(cc->shortName, cc->createScriptObject());
+			else o->setProperty(cc->shortName, cc->createScriptObject());
+		}
 	}
 
 	for (auto &c : controllables)
 	{
-		o->setProperty(c->shortName, c->createScriptObject());
+		if (!c->includeInScriptObject) continue;
+		if(transferToParent) parent->setProperty(c->shortName,c->createScriptObject());
+		else o->setProperty(c->shortName, c->createScriptObject());
 	}
-
-	o->setProperty("name", shortName);
-	o->setProperty("niceName", niceName);
+	
+	if (!(skipControllableNameInAddress && parent != nullptr))
+	{
+		o->setProperty("name", shortName);
+		o->setProperty("niceName", niceName);
+	}
 
 	return o;
 }

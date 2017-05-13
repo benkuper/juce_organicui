@@ -2,34 +2,35 @@
 /*
   ==============================================================================
 
-    Controllable.cpp
-    Created: 8 Mar 2016 1:08:56pm
-    Author:  bkupe
+	Controllable.cpp
+	Created: 8 Mar 2016 1:08:56pm
+	Author:  bkupe
 
   ==============================================================================
 */
 
 
 Controllable::Controllable(const Type &type, const String & niceName, const String &description, bool enabled) :
-	ScriptTarget("",this),
-    type(type),
-description(description),
-hasCustomShortName(false),
-    isControllableExposed(true),
-    isControllableFeedbackOnly(false),
-    hideInEditor(false),
+	ScriptTarget("", this),
+	type(type),
+	description(description),
+	hasCustomShortName(false),
+	isControllableExposed(true),
+	isControllableFeedbackOnly(false),
+	hideInEditor(false),
 	hideInOutliner(false),
-isTargettable(true),
+	includeInScriptObject(true),
+	isTargettable(true),
 	isSavable(true),
 	saveValueOnly(true),
 	isCustomizableByUser(false),
-isRemovableByUser(false),
-replaceSlashesInShortName(true),
-parentContainer(nullptr)
+	isRemovableByUser(false),
+	replaceSlashesInShortName(true),
+	parentContainer(nullptr)
 {
 
-    setEnabled(enabled);
-    setNiceName(niceName);
+	setEnabled(enabled);
+	setNiceName(niceName);
 }
 
 Controllable::~Controllable() {
@@ -79,7 +80,7 @@ void Controllable::setParentContainer(ControllableContainer * container)
 void Controllable::updateControlAddress()
 {
 	this->controlAddress = getControlAddress();
-	listeners.call(&Listener::controllableControlAddressChanged, this); 
+	listeners.call(&Listener::controllableControlAddressChanged, this);
 }
 
 void Controllable::remove()
@@ -88,7 +89,7 @@ void Controllable::remove()
 }
 
 
-DynamicObject * Controllable::createScriptObject()
+DynamicObject * Controllable::createScriptObject(DynamicObject *)
 {
 	DynamicObject * o = ScriptTarget::createScriptObject();
 	o->setProperty("name", shortName);
@@ -102,9 +103,9 @@ var Controllable::getJSONData(ControllableContainer * relativeTo)
 {
 	var data = getJSONDataInternal();
 	data.getDynamicObject()->setProperty("controlAddress", getControlAddress(relativeTo));
-	
-	if(saveValueOnly) return data;
-	
+
+	if (saveValueOnly) return data;
+
 	data.getDynamicObject()->setProperty("type", getTypeString());
 	data.getDynamicObject()->setProperty("niceName", niceName);
 	data.getDynamicObject()->setProperty("customizable", isCustomizableByUser);
@@ -115,7 +116,7 @@ var Controllable::getJSONData(ControllableContainer * relativeTo)
 	return data;
 }
 
-var Controllable::getJSONDataInternal() 
+var Controllable::getJSONDataInternal()
 {
 	return var(new DynamicObject());
 }
@@ -123,27 +124,27 @@ var Controllable::getJSONDataInternal()
 void Controllable::loadJSONData(var data)
 {
 	if (data.getDynamicObject()->hasProperty("niceName")) setNiceName(data.getProperty("niceName", ""));
-	if (data.getDynamicObject()->hasProperty("shortName")) setCustomShortName(data.getProperty("shortName", ""));	
+	if (data.getDynamicObject()->hasProperty("shortName")) setCustomShortName(data.getProperty("shortName", ""));
 	if (data.getDynamicObject()->hasProperty("customizable")) isCustomizableByUser = data.getProperty("customizable", false);
-	if (data.getDynamicObject()->hasProperty("removable")) isRemovableByUser = data.getProperty("removable",false);
+	if (data.getDynamicObject()->hasProperty("removable")) isRemovableByUser = data.getProperty("removable", false);
 
 	loadJSONDataInternal(data);
 }
 
 String Controllable::getControlAddress(ControllableContainer * relativeTo)
 {
-  // we may need empty parentContainer in unit tests
+	// we may need empty parentContainer in unit tests
 #if LGML_UNIT_TESTS
-  return (parentContainer?parentContainer->getControlAddress(relativeTo):"") + "/"+shortName;
+	return (parentContainer ? parentContainer->getControlAddress(relativeTo) : "") + "/" + shortName;
 #else
-  return parentContainer->getControlAddress(relativeTo) + "/"+shortName;
+	return parentContainer->getControlAddress(relativeTo) + "/" + shortName;
 #endif
 }
 
 
 InspectableEditor * Controllable::getEditor(bool isRootEditor) {
 
-	return new ControllableEditor(this,isRootEditor); 
+	return new ControllableEditor(this, isRootEditor);
 }
 
 
@@ -174,8 +175,7 @@ var Controllable::setValueFromScript(const juce::var::NativeFunctionArgs& a) {
 				if (valueIsABool)
 				{
 					if ((bool)value) ((Trigger *)c)->trigger();
-				}
-				else if (valueIsANumber)
+				} else if (valueIsANumber)
 				{
 					if ((float)value >= 1) ((Trigger *)c)->trigger();
 				}

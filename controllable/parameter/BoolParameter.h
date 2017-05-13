@@ -26,7 +26,8 @@ public:
 	ControllableUI * createDefaultUI(Controllable * targetControllable = nullptr) override;
 
 	static BoolParameter * create() { return new BoolParameter("New Bool Parameter", "", false); }
-	virtual String getTypeString() const override { return "Boolean"; }
+	virtual String getTypeString() const override { return getTypeStringStatic(); }
+	static String getTypeStringStatic() { return "Boolean"; }
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BoolParameter)
 };

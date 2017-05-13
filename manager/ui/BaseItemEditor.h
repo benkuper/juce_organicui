@@ -28,6 +28,7 @@ public:
 	ScopedPointer<ImageButton> removeBT;
 
 	ScopedPointer<InspectableEditor> scriptManagerUI;
+	ScopedPointer<InspectableEditor> customParamsUI;
 
 	int headerHeight;
 	bool transparentBG;

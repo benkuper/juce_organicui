@@ -121,7 +121,7 @@ void BaseManagerViewUI<M, T, U>::paint(Graphics & g)
 	int checkerSize = 32;
 	int checkerTX = -checkerSize * 2 + ((this->getWidth() / 2 + viewOffset.x) % (checkerSize * 2));
 	int checkerTY = -checkerSize * 2 + ((this->getHeight() / 2 + viewOffset.y) % (checkerSize * 2));
-	Rectangle<int> checkerBounds(checkerTX, checkerTY, this->getWidth() + checkerSize * 4, this->getHeight() + checkerSize * 4);
+	juce::Rectangle<int> checkerBounds(checkerTX, checkerTY, this->getWidth() + checkerSize * 4, this->getHeight() + checkerSize * 4);
 	g.fillCheckerBoard(checkerBounds, checkerSize, checkerSize, BG_COLOR.darker(.3f), BG_COLOR.darker(.2f));
 
 	g.setColour(BG_COLOR.darker(.05f));
@@ -135,7 +135,7 @@ void BaseManagerViewUI<M, T, U>::paint(Graphics & g)
 template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::resized()
 {
-	Rectangle<int> r = this->getLocalBounds();
+	juce::Rectangle<int> r = this->getLocalBounds();
 	this->addItemBT->setBounds(r.withSize(24, 24).withX(r.getWidth() - 24));
 	for (auto &tui : this->itemsUI)
 	{

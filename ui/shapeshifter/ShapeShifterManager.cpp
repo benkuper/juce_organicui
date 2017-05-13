@@ -21,20 +21,20 @@ ShapeShifterManager::ShapeShifterManager() :
 ShapeShifterManager::~ShapeShifterManager()
 {
 	openedWindows.clear();
-	
 	saveCurrentLayoutToFile(lastFile);
 
 }
 
-void ShapeShifterManager::setDefaultFileData(char * data)
+void ShapeShifterManager::setDefaultFileData(const char * data)
 {
-	defaultFileData = data;
+	defaultFileData = (char *)data;
 }
 
 void ShapeShifterManager::setLayoutInformations(const String & _appLayoutExtension, const String & appSubLayoutFolder)
 {
 	appLayoutExtension = _appLayoutExtension;
 	appSubFolder = appSubLayoutFolder;
+	
 }
 
 void ShapeShifterManager::setCurrentCandidatePanel(ShapeShifterPanel * panel)
@@ -73,7 +73,7 @@ ShapeShifterPanel * ShapeShifterManager::createPanel(ShapeShifterContent * conte
 
 	//if(content != nullptr) panel->setSize(content->getWidth(), content->getHeight());
 
-    DBG("Add shape shifter panel listener from manager");
+    //DBG("Add shape shifter panel listener from manager");
 	panel->addShapeShifterPanelListener(this);
 	openedPanels.add(panel);
 	return panel;
@@ -107,7 +107,7 @@ ShapeShifterWindow * ShapeShifterManager::showPanelWindowForContent(const String
 
 void ShapeShifterManager::showContent(String contentName)
 {
-    DBG("Show content " << contentName);
+    //DBG("Show content " << contentName);
 	ShapeShifterPanel * p = getPanelForContentName(contentName);
 	
 	if (p != nullptr)
@@ -273,8 +273,9 @@ void ShapeShifterManager::loadLastSessionLayoutFile()
 		loadLayoutFromFile(lastFile);
 	} else
 	{
-		loadDefaultLayoutFile();
 		lastFile = File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory).getChildFile(appSubFolder + "/_lastSession." + appLayoutExtension);
+		if (lastFile.exists()) loadLayoutFromFile(lastFile);
+		else loadDefaultLayoutFile();
 	}
 }
 
@@ -392,7 +393,7 @@ PopupMenu ShapeShifterManager::getPanelsMenu()
 
 void ShapeShifterManager::handleMenuPanelCommand(int commandID)
 {
-    DBG("Handle command " << commandID);
+    //DBG("Handle command " << commandID);
     
 	bool isSpecial = ((commandID & 0xff000) == 0x32000);
 

@@ -56,7 +56,9 @@ public:
 
 
 	static StringParameter * create() { return new StringParameter("New TargetParameter", "", ""); }
-	virtual String getTypeString() const override { return "Target"; }
+	virtual String getTypeString() const override { return getTypeStringStatic(); }
+	static String getTypeStringStatic() { return "Target"; }
+
 };
 
 

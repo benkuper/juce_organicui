@@ -88,21 +88,28 @@ void GenericManagerEditor<T>::resized()
 template<class T>
 void GenericManagerEditor<T>::showMenuAndAddItem(bool isFromAddButton)
 {
-	if (isFromAddButton)
+	if (manager->managerFactory != nullptr)
 	{
-		manager->BaseManager<T>::addItem();
-		return;
-	}
-
-	PopupMenu p;
-	p.addItem(1, addItemText);
-
-	int result = p.show();
-	switch (result)
+		T * m = manager->managerFactory->showCreateMenu();
+		if (m != nullptr) manager->addItem(m);
+	} else
 	{
-	case 1:
-		addItemFromMenu(isFromAddButton);
-		break;
+		if (isFromAddButton)
+		{
+			manager->BaseManager<T>::addItem();
+			return;
+		}
+
+		PopupMenu p;
+		p.addItem(1, addItemText);
+
+		int result = p.show();
+		switch (result)
+		{
+		case 1:
+			addItemFromMenu(isFromAddButton);
+			break;
+		}
 	}
 }
 

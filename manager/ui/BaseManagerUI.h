@@ -94,7 +94,7 @@ public:
 	//interaction
 	BaseItemUI<T> * grabbingItem;
 	int grabbingItemDropIndex;
-	Rectangle<int> grabSpaceRect;
+	juce::Rectangle<int> grabSpaceRect;
 
 	//layout
 	bool fixedItemHeight;
@@ -264,7 +264,7 @@ void BaseManagerUI<M, T, U>::mouseDown(const MouseEvent & e)
 template<class M, class T, class U>
 void BaseManagerUI<M, T, U>::paint(Graphics & g)
 {
-	Rectangle<int> r = getLocalBounds();
+	juce::Rectangle<int> r = getLocalBounds();
 
 	if (!transparentBG)
 	{
@@ -281,7 +281,7 @@ void BaseManagerUI<M, T, U>::paint(Graphics & g)
 
 		g.setFont(g.getCurrentFont().withHeight(labelHeight));
 		float textWidth = g.getCurrentFont().getStringWidth(managerUIName);
-		Rectangle<int> tr = r.removeFromTop(labelHeight + 2).reduced((r.getWidth() - textWidth) / 2, 0).expanded(4, 0);
+		juce::Rectangle<int> tr = r.removeFromTop(labelHeight + 2).reduced((r.getWidth() - textWidth) / 2, 0).expanded(4, 0);
 		g.fillRect(tr);
 		Colour textColor = contourColor.withBrightness(contourColor.getBrightness() > .5f ? .1f : .9f).withAlpha(1.f);
 		g.setColour(textColor);
@@ -304,7 +304,7 @@ void BaseManagerUI<M, T, U>::resized()
 {
 	if (getWidth() == 0 || getHeight() == 0) return;
 
-	Rectangle<int> r = getLocalBounds().reduced(2);
+	juce::Rectangle<int> r = getLocalBounds().reduced(2);
 
 	if (addItemBT != nullptr && addItemBT->isVisible() && addItemBT->getParentComponent() == this)
 	{
@@ -345,7 +345,7 @@ void BaseManagerUI<M, T, U>::resized()
 	{
 		BaseItemMinimalUI<T> * bui = static_cast<BaseItemMinimalUI<T>*>(ui);
 
-		Rectangle<int> tr;
+		juce::Rectangle<int> tr;
 		if (defaultLayout == VERTICAL)
 		{
 			if (grabbingItem != nullptr && i == grabbingItemDropIndex)
@@ -421,21 +421,28 @@ void BaseManagerUI<M, T, U>::childBoundsChanged(Component *)
 template<class M, class T, class U>
 void BaseManagerUI<M, T, U>::showMenuAndAddItem(bool isFromAddButton, Point<int> mouseDownPos)
 {
-	if (isFromAddButton)
+	if (manager->managerFactory != nullptr)
 	{
-		manager->BaseManager<T>::addItem();
-		return;
-	}
-
-	PopupMenu p;
-	p.addItem(1, addItemText);
-
-	int result = p.show();
-	switch (result)
+		T * m = manager->managerFactory->showCreateMenu();
+		if (m != nullptr) ((BaseManager<T> *)manager)->addItem(m);
+	} else
 	{
-	case 1:
-		addItemFromMenu(isFromAddButton, mouseDownPos);
-		break;
+		if (isFromAddButton)
+		{
+			manager->BaseManager<T>::addItem();
+			return;
+		}
+
+		PopupMenu p;
+		p.addItem(1, addItemText);
+
+		int result = p.show();
+		switch (result)
+		{
+		case 1:
+			addItemFromMenu(isFromAddButton, mouseDownPos);
+			break;
+		}
 	}
 
 }
@@ -465,7 +472,7 @@ U * BaseManagerUI<M, T, U>::addItemUI(T * item, bool animate)
 
 	if (animate)
 	{
-		Rectangle<int> tb = bui->getBounds();
+		juce::Rectangle<int> tb = bui->getBounds();
 		bui->setSize(10, 10);
 		itemAnimator.animateComponent(bui, tb, 1, 200, false, 1, 0);
 	} else

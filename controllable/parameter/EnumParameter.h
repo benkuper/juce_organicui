@@ -58,7 +58,8 @@ public:
 
 
 	static EnumParameter * create() { return new EnumParameter("new Enum Parameter",""); }
-	virtual String getTypeString() const override { return "Enum"; }
+	virtual String getTypeString() const override { return getTypeStringStatic(); }
+	static String getTypeStringStatic() { return "Enum"; }
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(EnumParameter)
 };

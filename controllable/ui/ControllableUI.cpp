@@ -53,6 +53,8 @@ void ControllableUI::mouseDown(const MouseEvent & e)
 			break;
 		case -2:
 			SystemClipboard::copyTextToClipboard("root" + controllable->controlAddress.replaceCharacter('/', '.'));
+			break;
+
 		case -3:
 			showEditWindow();
 			break;

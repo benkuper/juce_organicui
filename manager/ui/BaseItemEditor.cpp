@@ -38,6 +38,12 @@ BaseItemEditor::BaseItemEditor(BaseItem * bi, bool isRoot) :
 		addAndMakeVisible(scriptManagerUI);
 	}
 
+	if (item->canHaveCustomParameters)
+	{
+		customParamsUI = item->customParams->getEditor(false);
+		addAndMakeVisible(customParamsUI);
+	}
+
 	item->addAsyncContainerListener(this);
 }
 
@@ -83,6 +89,13 @@ void BaseItemEditor::resized()
 		r.setY(r.getBottom() + 2);
 		r.setHeight(scriptManagerUI->getHeight());
 		scriptManagerUI->setBounds(r);
+	}
+
+	if (item->canHaveCustomParameters)
+	{
+		r.setY(r.getBottom() + 2);
+		r.setHeight(customParamsUI->getHeight());
+		customParamsUI->setBounds(r);
 	}
 
 	r.setY(r.getBottom() + 2);

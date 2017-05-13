@@ -62,8 +62,8 @@ public:
 	virtual void updateMiniModeUI();
 
 	virtual void resized() override;
-	virtual void resizedInternalHeader(Rectangle<int> &) {}
-	virtual void resizedInternalContent(Rectangle<int> &) {}
+	virtual void resizedInternalHeader(juce::Rectangle<int> &) {}
+	virtual void resizedInternalContent(juce::Rectangle<int> &) {}
 	void buttonClicked(Button *b) override;
 
 
@@ -256,7 +256,7 @@ void BaseItemUI<T>::resized()
 	}
 
 	//Header
-	Rectangle<int> r = this->getLocalBounds().reduced(margin);
+	juce::Rectangle<int> r = this->getLocalBounds().reduced(margin);
 
 	//Grabber
 	if (canBeDragged)
@@ -266,7 +266,7 @@ void BaseItemUI<T>::resized()
 		grabber->repaint();
 	}
 
-	Rectangle<int> h = r.removeFromTop(headerHeight);
+	juce::Rectangle<int> h = r.removeFromTop(headerHeight);
 
 	if (canBeDragged && resizeMode != ALL)
 	{
@@ -398,7 +398,7 @@ void BaseItemUI<T>::controllableFeedbackUpdateInternal(Controllable * c)
 template<class T>
 void BaseItemUI<T>::Grabber::paint(Graphics & g)
 {
-	Rectangle<int> r = getLocalBounds();
+	juce::Rectangle<int> r = getLocalBounds();
 	g.setColour(BG_COLOR.brighter(.3f));
 	const int numLines = 3;
 	for (int i = 0; i < numLines; i++)

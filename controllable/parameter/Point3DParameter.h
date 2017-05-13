@@ -31,7 +31,8 @@ public:
 	ControllableUI * createDefaultUI(Controllable * targetControllable = nullptr) override;
 
 	static Point3DParameter * create() { return new Point3DParameter("New Point3D Parameter", "", 0); }
-	virtual String getTypeString() const override { return "Point 3D"; }
+	virtual String getTypeString() const override { return getTypeStringStatic(); }
+	static String getTypeStringStatic() { return "Point3D"; }
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Point3DParameter)
 };

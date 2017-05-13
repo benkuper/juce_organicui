@@ -50,6 +50,7 @@ public:
 	bool isControllableFeedbackOnly;
 	bool hideInEditor;
 	bool hideInOutliner;
+	bool includeInScriptObject;
 
 	String controlAddress;
 
@@ -80,7 +81,7 @@ public:
 
 	void remove(); // called from external to make this object ask for remove
 
-	virtual DynamicObject * createScriptObject() override;
+	virtual DynamicObject * createScriptObject(DynamicObject * parent = nullptr) override;
 
 	virtual var getJSONData(ControllableContainer * relativeTo = nullptr);
 	virtual var getJSONDataInternal(); // to be overriden

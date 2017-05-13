@@ -140,7 +140,7 @@ public:
 	String getUniqueNameInContainer(const String &sourceName, int suffix = 0);
 
 	//SCRIPT
-	virtual DynamicObject * createScriptObject() override;
+	virtual DynamicObject * createScriptObject(DynamicObject * parent = nullptr) override;
 
 	static var getChildFromScript(const var::NativeFunctionArgs &a);
 

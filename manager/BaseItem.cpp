@@ -1,3 +1,4 @@
+#include "BaseItem.h"
 /*
   ==============================================================================
 
@@ -8,10 +9,11 @@
   ==============================================================================
 */
 
-BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts) :
+BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts, bool _canHaveCustomParameters) : 
 	ControllableContainer(name.isEmpty()?getTypeString():name),
 	canBeDisabled(_canBeDisabled),
 	canHaveScripts(_canHaveScripts),
+	canHaveCustomParameters(_canHaveCustomParameters),
 	userCanRemove(true)
 {
 	saveAndLoadName = true;
@@ -23,6 +25,7 @@ BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts
 	}
 
 	nameParam = addStringParameter("Name", "Name of the component", niceName);
+	nameParam->includeInScriptObject = false;
 	nameParam->hideInEditor = true;
 	nameParam->hideInOutliner = true;
 	nameParam->isTargettable = false;
@@ -31,6 +34,13 @@ BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts
 	{
 		scriptManager = new ScriptManager(this);
 		addChildControllableContainer(scriptManager);
+	}
+
+	if (canHaveCustomParameters)
+	{
+		customParams = new GenericControllableManager("Custom Parameters");
+		customParams->setCustomShortName("params");
+		addChildControllableContainer(customParams);
 	}
 
 	//For UI
@@ -75,7 +85,28 @@ void BaseItem::onContainerParameterChanged(Parameter * p)
 		setNiceName(nameParam->stringValue());
 	}
 
+	Array<var> args;
+	args.add(p->createScriptObject());
+	if (canHaveScripts) scriptManager->callFunctionOnAllItems("localParamChanged", args);
+
 	onContainerParameterChangedInternal(p);
+}
+
+void BaseItem::onContainerTriggerTriggered(Trigger * t)
+{
+	Array<var> args;
+	args.add(t->createScriptObject());
+	if (canHaveScripts) scriptManager->callFunctionOnAllItems("localParamChanged", args);
+}
+
+void BaseItem::controllableFeedbackUpdate(ControllableContainer * cc, Controllable * c)
+{
+	if (cc->parentContainer == customParams)
+	{
+		Array<var> args;
+		args.add(c->createScriptObject());
+		if (canHaveScripts) scriptManager->callFunctionOnAllItems("cstomParamChanged", args);
+	}
 }
 
 void BaseItem::onContainerNiceNameChanged()

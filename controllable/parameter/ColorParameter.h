@@ -33,8 +33,9 @@ public:
 	ControllableUI * createDefaultUI(Controllable * targetControllable = nullptr) override;
 
 	static ColorParameter * create() { return new ColorParameter("New Color Parameter", ""); }
-	virtual String getTypeString() const override { return "Point 2D"; }
-	
+	virtual String getTypeString() const override { return getTypeStringStatic(); }
+	static String getTypeStringStatic() { return "Color"; }
+
 };
 
 

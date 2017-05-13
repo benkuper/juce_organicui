@@ -38,7 +38,7 @@ public:
 
 	char * defaultFileData;
 
-	void setDefaultFileData(char *data);
+	void setDefaultFileData(const char *data);
 	void setLayoutInformations(const String &appLayoutExtension, const String &appSubLayoutFolder);
 
 	void setCurrentCandidatePanel(ShapeShifterPanel *);

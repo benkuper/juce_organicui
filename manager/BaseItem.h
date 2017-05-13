@@ -13,12 +13,13 @@
 
 
 class ScriptManager;
+class GenericControllableManager;
 
 class BaseItem : 
 	public ControllableContainer
 {
 public :
-	BaseItem(const String &name = "", bool canBeDisabled = true, bool canHaveScript = false);
+	BaseItem(const String &name = "", bool canBeDisabled = true, bool canHaveScript = false, bool canHaveCustomParameters = false);
 	virtual ~BaseItem();
 
 	BoolParameter * enabled;
@@ -27,20 +28,24 @@ public :
 	//UI - should move outside data class ? how to save/load if not there 
 	BoolParameter * miniMode;
 	FloatParameter * listUISize; //width or height in a list
-	Point2DParameter * viewUIPosition; //position in a view
+	Point2DParameter * viewUIPosition; //position in a vieww
 	Point2DParameter * viewUISize; //size in a view
 
 	bool canBeDisabled;
 	bool canHaveScripts;
+	bool canHaveCustomParameters;
 	bool userCanRemove;
 
 	ScopedPointer<ScriptManager> scriptManager;
+	ScopedPointer<GenericControllableManager> customParams;
 
 	void remove();
 	virtual void clear() {}
 
 	void onContainerParameterChanged(Parameter *) override;
+	void onContainerTriggerTriggered(Trigger *) override;
 	virtual void onContainerParameterChangedInternal(Parameter *) {} //child classes override this function
+	virtual void controllableFeedbackUpdate(ControllableContainer * cc, Controllable * c) override;
 
 	void onContainerNiceNameChanged() override;
 

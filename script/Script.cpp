@@ -155,8 +155,7 @@ void Script::controllableFeedbackUpdate(ControllableContainer * cc, Controllable
 	{
 		Array<var> args;
 		args.add(c->createScriptObject());
-		if (c->type == Controllable::TRIGGER) callFunction("scriptValueTriggered", args);
-		else callFunction("scriptParamChanged", args);
+		callFunction("scriptParamChanged", args);
 	}
 }
 

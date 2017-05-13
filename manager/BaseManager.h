@@ -11,6 +11,7 @@
 #ifndef BASEMANAGER_H_INCLUDED
 #define BASEMANAGER_H_INCLUDED
 
+
 template <class T>
 class BaseManager :
 	public ControllableContainer,
@@ -21,6 +22,11 @@ public :
 	virtual ~BaseManager<T>();
 
 	OwnedArray<T> items;
+
+	//Factory
+	Factory<T> * managerFactory;
+
+	bool selectItemWhenCreated;
 
 	virtual T * createItem(); //to override if special constructor to use
 	virtual void addItemFromData(var data, bool fromUndoableAction = false); //to be overriden for specific item creation (from data)
@@ -38,7 +44,6 @@ public :
 	virtual void addItemInternal(T *, var data) {}
 	virtual void removeItemInternal(T *) {}
 
-	bool selectItemWhenCreated;
 
 	T * getItemWithName(const String &itemShortName, bool searchNiceNameToo = false);
 
@@ -48,7 +53,7 @@ public :
 	var getJSONData() override;
 	void loadJSONDataInternal(var data) override;
 
-	DynamicObject * createScriptObject() override;
+	DynamicObject * createScriptObject(DynamicObject * = nullptr) override;
 
 	PopupMenu getItemsMenu(int startID);
 	T * getItemForMenuResultID(int id, int startID);
@@ -203,6 +208,7 @@ public :
 template<class T>
 BaseManager<T>::BaseManager(const String & name) :
 	ControllableContainer(name),
+	managerFactory(nullptr),
 	selectItemWhenCreated(true)
 {
 	setCanHavePresets(false);
@@ -274,7 +280,16 @@ T * BaseManager<T>::addItem(const Point<float> initialPosition)
 template<class T>
 void BaseManager<T>::addItemFromData(var data, bool fromUndoableAction) 
 { 
-	addItem(createItem(), data, fromUndoableAction);
+	if (managerFactory != nullptr)
+	{
+		String type = data.getProperty("type", "none");
+		if (type.isEmpty()) return;
+		T * i = managerFactory->create(type);
+		if (i != nullptr) addItem(i, data, fromUndoableAction);
+	} else
+	{
+		addItem(createItem(), data, fromUndoableAction);
+	}
 }
 
 template<class T>
@@ -374,7 +389,7 @@ void BaseManager<T>::loadJSONDataInternal(var data)
 }
 
 template<class T>
-DynamicObject * BaseManager<T>::createScriptObject()
+DynamicObject * BaseManager<T>::createScriptObject(DynamicObject *)
 {
 	DynamicObject * o = ControllableContainer::createScriptObject();
 	var itemsArray = var();

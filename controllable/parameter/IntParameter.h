@@ -27,7 +27,8 @@ public:
     ControllableUI * createDefaultUI(Controllable * targetControllable = nullptr) override;
 
 	static IntParameter * create() { return new IntParameter("New Int Parameter", "", 0); }
-	virtual String getTypeString() const override { return "Integer"; }
+	virtual String getTypeString() const override { return getTypeStringStatic(); }
+	static String getTypeStringStatic() { return "Integer"; }
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(IntParameter)
 };
