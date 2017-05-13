@@ -39,7 +39,7 @@
  #pragma warning (disable: 4251 4786 4668 4820)
 #endif
 
-/*
+
 
 #include "juce_core/juce_core.h"
 #include "juce_events/juce_events.h"
@@ -47,7 +47,6 @@
 #include "juce_gui_extra/juce_gui_extra.h"
 #include "juce_opengl/juce_opengl.h"
 
- */
 
 using namespace juce;
 

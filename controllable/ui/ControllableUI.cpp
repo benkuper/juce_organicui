@@ -59,7 +59,7 @@ void ControllableUI::mouseDown(const MouseEvent & e)
 			showEditWindow();
 			break;
 		default:
-			DBG("Not handle : " + result);
+			DBG("Not handled : " << result);
 		}
 
 	} else
