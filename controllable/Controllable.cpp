@@ -1,3 +1,4 @@
+#include "Controllable.h"
 /*
   ==============================================================================
 
@@ -85,6 +86,17 @@ void Controllable::remove()
 {
 	listeners.call(&Controllable::Listener::askForRemoveControllable, this);
 }
+
+
+DynamicObject * Controllable::createScriptObject()
+{
+	DynamicObject * o = ScriptTarget::createScriptObject();
+	o->setProperty("name", shortName);
+	o->setProperty("niceName", niceName);
+
+	return o;
+}
+
 
 var Controllable::getJSONData(ControllableContainer * relativeTo)
 {

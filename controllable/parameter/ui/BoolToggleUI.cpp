@@ -71,13 +71,13 @@ void BoolToggleUI::paint(Graphics & g)
 	}
 }
 
-void BoolToggleUI::mouseDown(const MouseEvent &)
+void BoolToggleUI::mouseDownInternal(const MouseEvent &)
 {
 	if (!parameter->isEditable || forceFeedbackOnly) return;
     parameter->setValue(!parameter->boolValue());
 }
 
-void BoolToggleUI::mouseUp(const MouseEvent & e)
+void BoolToggleUI::mouseUpInternal(const MouseEvent & e)
 {
 	if (!parameter->isEditable || forceFeedbackOnly) return;
     if (e.mods.isRightButtonDown()) parameter->setValue(!parameter->boolValue());

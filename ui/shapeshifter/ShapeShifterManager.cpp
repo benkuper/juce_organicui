@@ -286,7 +286,6 @@ void ShapeShifterManager::loadDefaultLayoutFile()
 		loadLayoutFromFile(defaultFile);
 	} else
 	{
-		//MIGRATION
 		if (defaultFileData != nullptr)
 		{
 			String defaultLayoutFileData = String::fromUTF8(defaultFileData);
@@ -323,7 +322,11 @@ void ShapeShifterManager::saveCurrentLayoutToFile(const File &toFile)
 
 	if (!toFile.existsAsFile()) toFile.create();
 	ScopedPointer<OutputStream> os(toFile.createOutputStream());
-	if (os == nullptr) return;
+	if (os == nullptr)
+	{
+		NLOG("Shape Shifter", "Error saving the layout file " + toFile.getFullPathName() + "\nMaybe it is read-only ?");
+		return;
+	}
 	JSON::writeToStream(*os, data);
 	os->flush();
 }

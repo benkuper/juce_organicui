@@ -25,6 +25,10 @@ public:
 
 	bool showValue;
 	void showEditWindow() override;
+
+	virtual void addPopupMenuItems(PopupMenu * p) override;
+	virtual void handleMenuSelectedID(int id) override;
+
 protected:
 
 

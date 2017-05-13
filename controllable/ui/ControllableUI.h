@@ -27,7 +27,16 @@ public:
 	bool showLabel;
 	bool opaqueBackground;
 
-	void mouseDoubleClick(const MouseEvent &e) override;
+	void mouseDown(const MouseEvent &e) override;
+	void mouseUp(const MouseEvent &e) override;
+
+	virtual void mouseDownInternal(const MouseEvent &) {} //avoid right click check in each child class
+	virtual void mouseUpInternal(const MouseEvent &) {} //
+
+	//PopupMenu
+	virtual void addPopupMenuItems(PopupMenu *) {} //for child classes
+	virtual void handleMenuSelectedID(int) {} // to override
+
 
 	virtual void setOpaqueBackground(bool value);
 

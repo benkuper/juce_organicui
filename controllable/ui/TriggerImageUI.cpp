@@ -42,7 +42,7 @@ void TriggerImageUI::triggerTriggered(const Trigger *)
 	startTimer(100);
 }
 
-void TriggerImageUI::mouseDown(const MouseEvent &)
+void TriggerImageUI::mouseDownInternal(const MouseEvent &)
 {
 	trigger->trigger();
 }

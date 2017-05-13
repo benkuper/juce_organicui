@@ -20,7 +20,7 @@ class BaseItemUI :
 public:
 	enum ResizeMode { NONE, VERTICAL, HORIZONTAL, ALL };
 
-	BaseItemUI<T>(T * _item, ResizeMode resizeMode = NONE, bool canBeDragged = false);
+	BaseItemUI<T>(T * _item, ResizeMode resizeMode = NONE, bool canBeDragged = true);
 	virtual ~BaseItemUI<T>();
 
 	
@@ -42,6 +42,10 @@ public:
     int resizerWidth;
     int resizerHeight;
     
+	//list pos
+	Point<int> posAtDown;
+	Point<int> dragOffset; //for list grabbing
+
     ScopedPointer<ResizableCornerComponent> cornerResizer;
     ScopedPointer<ResizableEdgeComponent> edgeResizer;
     Component * resizer;
@@ -65,6 +69,7 @@ public:
 
 	void mouseDown(const MouseEvent &e) override;
 	void mouseDrag(const MouseEvent &e) override;
+	void mouseUp(const MouseEvent &e) override;
 	void mouseDoubleClick(const MouseEvent &e) override;
 
 	void controllableFeedbackUpdateInternal(Controllable *) override;
@@ -72,11 +77,13 @@ public:
 	class Grabber : public Component
 	{
 	public:
-		Grabber() {}
+		enum Direction { VERTICAL, HORIZONTAL };
+		Grabber(Direction d = HORIZONTAL) : dir(d) {}
 		~Grabber() {}
-		void paint(Graphics &g) override;
 
-		JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Grabber)
+		Direction dir;
+
+		void paint(Graphics &g) override;
 	};
 
 	ScopedPointer<Grabber> grabber;
@@ -85,7 +92,9 @@ public:
 	{
 	public:
 		virtual ~ItemUIListener() {}
+		virtual void itemUIGrabStart(BaseItemUI<T> *) {}
 		virtual void itemUIGrabbed(BaseItemUI<T> *) {}
+		virtual void itemUIGrabEnd(BaseItemUI<T> *) {}
 		virtual void itemUIMiniModeChanged(BaseItemUI<T> *) {}
 	};
 
@@ -135,10 +144,10 @@ BaseItemUI<T>::BaseItemUI(T * _item, ResizeMode _resizeMode, bool _canBeDragged)
 
 	if (canBeDragged)
 	{
-		grabber = new Grabber();
+		grabber = new Grabber(_resizeMode == ALL ? Grabber::HORIZONTAL : Grabber::VERTICAL);
 		grabber->setAlwaysOnTop(true);
 		this->addAndMakeVisible(grabber);
-		grabberHeight = 10;
+		if (resizeMode == ALL) grabberHeight = 10;
 	}
 
 	switch (resizeMode)
@@ -259,6 +268,12 @@ void BaseItemUI<T>::resized()
 
 	Rectangle<int> h = r.removeFromTop(headerHeight);
 
+	if (canBeDragged && resizeMode != ALL)
+	{
+		grabber->setBounds(h.removeFromLeft(10));
+		grabber->repaint();
+	}
+
 	if (enabledBT != nullptr)
 	{
 		enabledBT->setBounds(h.removeFromLeft(h.getHeight()));
@@ -319,8 +334,21 @@ void BaseItemUI<T>::mouseDown(const MouseEvent & e)
 
 	if (e.mods.isLeftButtonDown())
 	{
-		if (canBeDragged && e.eventComponent == grabber) posAtMouseDown = this->baseItem->viewUIPosition->getPoint();
+		if (canBeDragged && e.eventComponent == grabber)
+		{
+			if (resizeMode == ALL)
+			{
+				posAtMouseDown = this->baseItem->viewUIPosition->getPoint();
+			} else
+			{
+				posAtDown = getBounds().getPosition();
+				dragOffset = Point<int>();
+				itemUIListeners.call(&ItemUIListener::itemUIGrabStart, this);
+			}
+		}
 	}
+
+
 }
 
 
@@ -331,10 +359,24 @@ void BaseItemUI<T>::mouseDrag(const MouseEvent & e)
 
 	if (canBeDragged && e.mods.isLeftButtonDown() && e.eventComponent == grabber)
 	{
-		Point<float> targetPos = posAtMouseDown + e.getOffsetFromDragStart().toFloat() / Point<float>((float)this->getParentComponent()->getWidth(), (float)this->getParentComponent()->getHeight());
-		this->baseItem->viewUIPosition->setPoint(targetPos);
+
+		if (resizeMode == ALL)
+		{
+			Point<float> targetPos = posAtMouseDown + e.getOffsetFromDragStart().toFloat() / Point<float>((float)this->getParentComponent()->getWidth(), (float)this->getParentComponent()->getHeight());
+			this->baseItem->viewUIPosition->setPoint(targetPos);
+		} else
+		{
+			dragOffset = e.getOffsetFromDragStart();
+			itemUIListeners.call(&ItemUIListener::itemUIGrabbed, this);
+		}
 	}
 
+}
+
+template<class T>
+void BaseItemUI<T>::mouseUp(const MouseEvent &)
+{
+	if (canBeDragged && resizeMode != ALL) itemUIListeners.call(&ItemUIListener::itemUIGrabEnd, this);
 }
 
 template<class T>
@@ -347,6 +389,7 @@ void BaseItemUI<T>::mouseDoubleClick(const MouseEvent & e)
 template<class T>
 void BaseItemUI<T>::controllableFeedbackUpdateInternal(Controllable * c)
 {
+	BaseItemMinimalUI<T>::controllableFeedbackUpdateInternal(c);
 	if (c == this->baseItem->miniMode) updateMiniModeUI();
 	else if (canBeDragged && c == this->baseItem->viewUIPosition) itemUIListeners.call(&ItemUIListener::itemUIGrabbed, this);
 }
@@ -360,10 +403,19 @@ void BaseItemUI<T>::Grabber::paint(Graphics & g)
 	const int numLines = 3;
 	for (int i = 0; i < numLines; i++)
 	{
-		float th = (i + 1)*(float)getHeight() / ((float)numLines + 1);
-		g.drawLine(0, th, (float)getWidth(), th, 1);
+		if (dir == HORIZONTAL)
+		{
+			float th = (i + 1)*(float)getHeight() / ((float)numLines + 1);
+			g.drawLine(0, th, (float)getWidth(), th, 1);
+		} else
+		{
+			float tw = (i + 1)*(float)getWidth() / ((float)numLines + 1);
+			g.drawLine(tw, 0, tw, (float)getHeight(), 1);
+		}
+
 	}
 }
+
 
 
 

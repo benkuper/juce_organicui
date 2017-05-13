@@ -61,6 +61,16 @@ void ParameterUI::showEditWindow()
 	}
 }
 
+void ParameterUI::addPopupMenuItems(PopupMenu * p)
+{
+	p->addItem(1, "Reset value");
+}
+
+void ParameterUI::handleMenuSelectedID(int id)
+{
+	if (id == 1) parameter->resetValue();
+}
+
 
 
 bool ParameterUI::shouldBailOut(){

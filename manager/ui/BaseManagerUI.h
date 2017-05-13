@@ -53,7 +53,8 @@ class BaseManagerUI :
 	public InspectableContentComponent,
 	public BaseManager<T>::Listener,
 	public ButtonListener,
-	public Engine::EngineListener
+	public Engine::EngineListener,
+	public BaseItemUI<T>::ItemUIListener
 {
 public:
 	BaseManagerUI<M, T, U>(const String &contentName, M * _manager, bool _useViewport = true);
@@ -90,6 +91,11 @@ public:
 	bool animateItemOnAdd;
 	ComponentAnimator itemAnimator;
 
+	//interaction
+	BaseItemUI<T> * grabbingItem;
+	int grabbingItemDropIndex;
+	Rectangle<int> grabSpaceRect;
+
 	//layout
 	bool fixedItemHeight;
 	int gap;
@@ -115,6 +121,10 @@ public:
 
 	virtual void removeItemUI(T * item);
 	virtual void removeItemUIInternal(U *) {}
+
+	virtual void itemUIGrabStart(BaseItemUI<T> * se) override;
+	virtual void itemUIGrabbed(BaseItemUI<T> * se) override;
+	virtual void itemUIGrabEnd(BaseItemUI<T> * se) override;
 
 	//menu
 	U * getUIForItem(T * item, bool directIndexAccess = true);
@@ -163,6 +173,7 @@ BaseManagerUI<M, T, U>::BaseManagerUI(const String & contentName, M * _manager, 
 	transparentBG(false),
 	resizeOnChildBoundsChanged(true),
 	animateItemOnAdd(true),
+	grabbingItem(nullptr),
 	fixedItemHeight(true),
 	gap(2)
 {
@@ -281,13 +292,11 @@ void BaseManagerUI<M, T, U>::paint(Graphics & g)
 		if (!transparentBG)	g.fillAll(bgColor);
 	}
 
-	/*
-	if (useViewport)
+	if (grabbingItem != nullptr)
 	{
-		g.setColour(Colours::orange.withAlpha(.5f));
-		g.drawRect(viewport.getBounds(),2);
+		g.setColour(HIGHLIGHT_COLOR.withAlpha(.6f));
+		g.fillRoundedRectangle(grabSpaceRect.translated(0, viewport.getY()).reduced(4).toFloat(), 2);
 	}
-	*/
 }
 
 template<class M, class T, class U>
@@ -311,22 +320,78 @@ void BaseManagerUI<M, T, U>::resized()
 		else r.removeFromBottom(drawContour ? 14 : 12);
 		
 		r.setY(0);
-
 	}
 
+	if (grabbingItem != nullptr)
+	{
+		int rel = defaultLayout == VERTICAL ? grabbingItem->getBottom() - viewport.getY() : grabbingItem->getRight() - viewport.getX();
+
+		int ti = 0;
+		for (auto &ui : itemsUI)
+		{
+			int tPos = defaultLayout == VERTICAL ? ui->getY() : ui->getX();
+			if (tPos > rel)
+			{
+				grabbingItemDropIndex = ti;
+				break;
+			}
+			ti++;
+		}
+		if (ti == itemsUI.size()) grabbingItemDropIndex = ti;
+	}
+
+	int i = 0;
 	for (auto &ui : itemsUI)
 	{
 		BaseItemMinimalUI<T> * bui = static_cast<BaseItemMinimalUI<T>*>(ui);
 
 		Rectangle<int> tr;
-		if(defaultLayout == VERTICAL) tr = r.withHeight(bui->getHeight());
-		else tr = r.withWidth(bui->getWidth());
+		if (defaultLayout == VERTICAL)
+		{
+			if (grabbingItem != nullptr && i == grabbingItemDropIndex)
+			{
+				grabSpaceRect.setY(r.getY());
+				r.translate(0, grabSpaceRect.getHeight() + gap);
+			}
+			tr = r.withHeight(bui->getHeight());
+		}
+		else
+		{
+			if (grabbingItem != nullptr && i == grabbingItemDropIndex)
+			{
+				grabSpaceRect.setX(r.getX());
+				r.translate(grabSpaceRect.getWidth() + gap,0);
+			}
+			tr = r.withWidth(bui->getWidth());
+		}
 
 		bui->setBounds(tr);
 
 		if (defaultLayout == VERTICAL) r.translate(0, tr.getHeight() + gap);
 		else r.translate(tr.getWidth() + gap,0);
+
+		i++;
 	}
+
+	if (grabbingItemDropIndex >= itemsUI.size())
+	{
+		if (defaultLayout == VERTICAL)
+		{
+			grabSpaceRect.setY(r.getY());
+			r.translate(0, grabSpaceRect.getHeight() + gap);
+		} else
+		{
+			grabSpaceRect.setX(r.getX());
+			r.translate(grabSpaceRect.getWidth() + gap, 0);
+		}
+	}
+
+	if (grabbingItem != nullptr)
+	{
+		if (defaultLayout == VERTICAL) grabbingItem->setBounds(grabbingItem->getBounds().withY(grabbingItem->posAtDown.y + grabbingItem->dragOffset.y));
+		else  grabbingItem->setBounds(grabbingItem->getBounds().withX(grabbingItem->posAtDown.x + grabbingItem->dragOffset.x));
+	}
+
 
 	if (useViewport)
 	{
@@ -334,14 +399,16 @@ void BaseManagerUI<M, T, U>::resized()
 		{
 			float th = 0;
 			if (itemsUI.size() > 0) th = static_cast<BaseItemMinimalUI<T>*>(itemsUI[itemsUI.size() - 1])->getBottom();
+			if (grabbingItem != nullptr) th = jmax<int>(th, viewport.getHeight());
+			
 			container.setBounds(getLocalBounds().withHeight(th));
 		} else
 		{
 			float tw = 0;
 			if (itemsUI.size() > 0) tw = static_cast<BaseItemMinimalUI<T>*>(itemsUI[itemsUI.size() - 1])->getRight();
+			if (grabbingItem != nullptr) tw = jmax<int>(tw, viewport.getWidth());
 			container.setBounds(getLocalBounds().withWidth(tw));
-		}
-		
+		}		
 	}
 }
 
@@ -390,6 +457,10 @@ U * BaseManagerUI<M, T, U>::addItemUI(T * item, bool animate)
 	else addAndMakeVisible(bui);
 	itemsUI.add(tui);
 
+	BaseItemUI<T> * biui = dynamic_cast<BaseItemUI<T> *>(tui);
+	if (biui != nullptr) biui->addItemUIListener(this);
+
+
 	addItemUIInternal(tui);
 
 	if (animate)
@@ -421,6 +492,10 @@ void BaseManagerUI<M, T, U>::removeItemUI(T * item)
 
 	if (useViewport) container.removeChildComponent(static_cast<BaseItemMinimalUI<T>*>(tui));
 	else removeChildComponent(static_cast<BaseItemMinimalUI<T>*>(tui));
+
+
+	BaseItemUI<T> * biui = dynamic_cast<BaseItemUI<T> *>(tui);
+	if (biui != nullptr) biui->removeItemUIListener(this);
 
 	itemsUI.removeObject(tui, false);
 	removeItemUIInternal(tui);
@@ -464,6 +539,42 @@ void BaseManagerUI<M, T, U>::itemsReordered()
 {
 	itemsUI.sort(managerComparator);
 }
+
+template<class M, class T, class U>
+void BaseManagerUI<M, T, U>::itemUIGrabStart(BaseItemUI<T>* se)
+{
+
+	grabbingItem = se;
+
+	grabbingItemDropIndex = itemsUI.indexOf((U*)grabbingItem);
+	grabSpaceRect = ((U *)grabbingItem)->getBounds();
+	itemsUI.removeObject((U *)grabbingItem, false);
+	grabbingItem->toFront(false);
+}
+
+template<class M, class T, class U>
+void BaseManagerUI<M, T, U>::itemUIGrabbed(BaseItemUI<T>* se)
+{
+	if (grabbingItem != nullptr) resized();
+}
+
+template<class M, class T, class U>
+void BaseManagerUI<M, T, U>::itemUIGrabEnd(BaseItemUI<T>* se)
+{
+	if (grabbingItem != nullptr)
+	{
+		itemsUI.add((U *)grabbingItem);
+
+		int originalIndex = manager->items.indexOf(grabbingItem->item);
+		manager->items.move(originalIndex, jlimit(0, manager->items.size() - 1, grabbingItemDropIndex));
+		manager->reorderItems();
+
+		grabbingItem = nullptr;
+		grabbingItemDropIndex = -1;
+		resized();
+	}
+}
+
 
 template<class M, class T, class U>
 void BaseManagerUI<M, T, U>::buttonClicked(Button  * b)

@@ -41,9 +41,9 @@ public:
 	void resetFrontColor();
 	
 	void paint(Graphics &g) override;
-    void mouseDown(const MouseEvent &e) override;
+    void mouseDownInternal(const MouseEvent &e) override;
     void mouseDrag(const MouseEvent &e) override;
-    void mouseUp(const MouseEvent &e) override;
+    void mouseUpInternal(const MouseEvent &e) override;
 
     float getValueFromMouse();
     float getValueFromPosition(const Point<int> &pos);

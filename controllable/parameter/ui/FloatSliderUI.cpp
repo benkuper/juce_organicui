@@ -105,7 +105,7 @@ void FloatSliderUI::paint(Graphics & g)
 
 }
 
-void FloatSliderUI::mouseDown(const MouseEvent & e)
+void FloatSliderUI::mouseDownInternal(const MouseEvent & e)
 {
 	if (!parameter->isEditable || forceFeedbackOnly) return;
 
@@ -151,7 +151,7 @@ void FloatSliderUI::mouseDrag(const MouseEvent & e)
     }
 }
 
-void FloatSliderUI::mouseUp(const MouseEvent &)
+void FloatSliderUI::mouseUpInternal(const MouseEvent &)
 {
 	if (!parameter->isEditable || forceFeedbackOnly) return;
 

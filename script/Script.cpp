@@ -1,18 +1,18 @@
 /*
-  ==============================================================================
+==============================================================================
 
-    Script.cpp
-    Created: 20 Feb 2017 5:01:11pm
-    Author:  Ben
+Script.cpp
+Created: 20 Feb 2017 5:01:11pm
+Author:  Ben
 
-  ==============================================================================
+==============================================================================
 */
 
 Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled) :
 	BaseItem("Script", canBeDisabled, false),
-    scriptParamsContainer("params"),
-parentTarget(_parentTarget),
-scriptAsyncNotifier(10)
+	scriptParamsContainer("params"),
+	parentTarget(_parentTarget),
+	scriptAsyncNotifier(10)
 {
 	isSelectable = false;
 
@@ -28,6 +28,9 @@ scriptAsyncNotifier(10)
 	scriptObject.setMethod("addFloatParameter", Script::addFloatParameterFromScript);
 	scriptObject.setMethod("addEnumParameter", Script::addEnumParameterFromScript);
 	scriptObject.setMethod("addTargetParameter", Script::addTargetParameterFromScript);
+	scriptObject.setMethod("addTrigger", Script::addTriggerFromScript);
+
+	addChildControllableContainer(&scriptParamsContainer);
 }
 
 Script::~Script()
@@ -37,13 +40,27 @@ Script::~Script()
 
 void Script::loadScript()
 {
-	if (filePath->stringValue().isEmpty())
+	String path = filePath->stringValue();
+	if (path.isEmpty())
 	{
 		return;
 	}
-	File f = File(filePath->stringValue());
+
+#if JUCE_WINDOWS
+	if (path.startsWithChar('/')) //avoid jassertfalse
+	{
+		NLOG(niceName, "Path " + path + " is not a valid Windows-style path.");
+		setState(SCRIPT_ERROR);
+		return; //OSX / Linux file
+	}
+#endif
+
+
+	File f = Engine::mainEngine->getFile().getParentDirectory().getChildFile(path);
+
 	if (!f.exists())
 	{
+		//check local director
 		NLOG("Script", "File not found : " + f.getFileName());
 		setState(SCRIPT_EMPTY);
 		return;
@@ -92,9 +109,7 @@ void Script::buildEnvironment()
 
 	scriptEngine->registerNativeObject("script", createScriptObject()); //force "script" for this objet
 	if (parentTarget != nullptr) scriptEngine->registerNativeObject("local", parentTarget->createScriptObject()); //force "local" for the related object
-	
 	if (Engine::mainEngine != nullptr) scriptEngine->registerNativeObject(Engine::mainEngine->scriptTargetName, Engine::mainEngine->createScriptObject());
-	
 	if (ScriptUtil::getInstanceWithoutCreating() != nullptr) scriptEngine->registerNativeObject(ScriptUtil::getInstance()->scriptTargetName, ScriptUtil::getInstance()->createScriptObject());
 }
 
@@ -134,6 +149,17 @@ void Script::onContainerTriggerTriggered(Trigger * t)
 	}
 }
 
+void Script::controllableFeedbackUpdate(ControllableContainer * cc, Controllable * c)
+{
+	if (cc == &scriptParamsContainer)
+	{
+		Array<var> args;
+		args.add(c->createScriptObject());
+		if (c->type == Controllable::TRIGGER) callFunction("scriptValueTriggered", args);
+		else callFunction("scriptParamChanged", args);
+	}
+}
+
 void Script::timerCallback()
 {
 	float curTime = (float)Time::getMillisecondCounter() / 1000.f;
@@ -149,7 +175,7 @@ void Script::timerCallback()
 
 InspectableEditor * Script::getEditor(bool isRoot)
 {
-	return new ScriptEditor(this,isRoot);
+	return new ScriptEditor(this, isRoot);
 }
 
 var Script::logFromScript(const var::NativeFunctionArgs & args)
@@ -159,8 +185,8 @@ var Script::logFromScript(const var::NativeFunctionArgs & args)
 
 	for (int i = 0; i < args.numArguments; i++)
 	{
-		if(i == 0) NLOG("Script : " + s->niceName, args.arguments[i].toString());
-		else NLOG("",args.arguments[i].toString());
+		if (i == 0) NLOG("Script : " + s->niceName, args.arguments[i].toString());
+		else NLOG("", args.arguments[i].toString());
 	}
 
 	return var();
@@ -208,11 +234,18 @@ var Script::addTargetParameterFromScript(const var::NativeFunctionArgs & args)
 	return s->scriptParamsContainer.addTargetParameter(args.arguments[0], args.arguments[1])->createScriptObject();
 }
 
+var Script::addTriggerFromScript(const var::NativeFunctionArgs & args)
+{
+	Script * s = getObjectFromJS<Script>(args);
+	if (!checkNumArgs(s->niceName, args, 2)) return var();
+	return s->scriptParamsContainer.addTrigger(args.arguments[0], args.arguments[1])->createScriptObject();
+}
+
 bool Script::checkNumArgs(const String &logName, const var::NativeFunctionArgs & args, int expectedArgs)
 {
 	if (args.numArguments != expectedArgs)
 	{
-		NLOG(logName,"Error addTargetParameter takes " + String(expectedArgs) + " arguments, got " + String(args.numArguments));
+		NLOG(logName, "Error addTargetParameter takes " + String(expectedArgs) + " arguments, got " + String(args.numArguments));
 		if (args.numArguments > 0) NLOG("", "When tying to add : " + args.arguments[0].toString());
 		return false;
 	}

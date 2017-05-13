@@ -29,7 +29,7 @@ public:
     void paint (Graphics&) override;
     void triggerTriggered(const Trigger * p) override ;
 
-	void mouseDown(const MouseEvent &e) override;
+	void mouseDownInternal(const MouseEvent &e) override;
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TriggerButtonUI)

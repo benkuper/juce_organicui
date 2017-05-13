@@ -28,9 +28,49 @@ ControllableUI::~ControllableUI()
     if(controllable.get())controllable->removeControllableListener(this);
 }
 
-void ControllableUI::mouseDoubleClick(const MouseEvent &)
+
+void ControllableUI::mouseDown(const MouseEvent & e)
 {
-	showEditWindow();
+	if (e.mods.isRightButtonDown())
+	{
+		ScopedPointer<PopupMenu> p = new PopupMenu();
+		addPopupMenuItems(p);
+		p->addSeparator();
+		p->addItem(-3, "Show Edit Window");
+		p->addSeparator();
+		p->addItem(-1, "Copy OSC Control Address");
+		p->addItem(-2, "Copy Script Control Address");
+
+		int result = p->show();
+		if (result > 0)
+		{
+			handleMenuSelectedID(result);
+		}
+		switch (result)
+		{
+		case -1:
+			SystemClipboard::copyTextToClipboard(controllable->controlAddress);
+			break;
+		case -2:
+			SystemClipboard::copyTextToClipboard("root" + controllable->controlAddress.replaceCharacter('/', '.'));
+		case -3:
+			showEditWindow();
+			break;
+		default:
+			DBG("Not handle : " + result);
+		}
+
+	} else
+	{
+		mouseDownInternal(e);
+	}
+}
+
+void ControllableUI::mouseUp(const MouseEvent & e)
+{
+	if (e.mods.isRightButtonDown()) return;
+	mouseUpInternal(e);
+
 }
 
 void ControllableUI::setOpaqueBackground(bool value)

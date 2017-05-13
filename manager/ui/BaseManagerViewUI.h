@@ -15,8 +15,7 @@
 template<class M, class T, class U>
 
 class BaseManagerViewUI :
-	public BaseManagerUI<M, T, U>,
-	public BaseItemUI<T>::ItemUIListener
+	public BaseManagerUI<M, T, U>
 {
 public:
 	BaseManagerViewUI<M, T, U>(const String &contentName, M * _manager);
@@ -46,8 +45,7 @@ public:
 	virtual void homeView();
 	virtual void frameView();
 
-	virtual void addItemUIInternal(U * se) override;
-	virtual void removeItemUIInternal(U * se) override;
+	virtual void addItemUIInternal(U * se) override; 
 
 	virtual void itemUIGrabbed(BaseItemUI<T> * se) override;
 };
@@ -210,14 +208,6 @@ template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::addItemUIInternal(U * se)
 {
 	updateViewUIPosition(se);
-	se->addItemUIListener(this);
-}
-
-
-template<class M, class T, class U>
-void BaseManagerViewUI<M, T, U>::removeItemUIInternal(U * se)
-{
-	se->removeItemUIListener(this);
 }
 
 
