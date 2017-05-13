@@ -39,12 +39,15 @@
  #pragma warning (disable: 4251 4786 4668 4820)
 #endif
 
+/*
 
 #include "juce_core/juce_core.h"
 #include "juce_events/juce_events.h"
 #include "juce_gui_basics/juce_gui_basics.h"
 #include "juce_gui_extra/juce_gui_extra.h"
 #include "juce_opengl/juce_opengl.h"
+
+ */
 
 using namespace juce;
 
@@ -145,12 +148,14 @@ using namespace juce;
 #include "undo/UndoMaster.h"
 #include "updater/AppUpdater.h"
 
+
+#include "manager/ui/GenericManagerEditor.h"
+
 #include "manager/BaseItem.h"
 #include "manager/BaseManager.h"
 #include "manager/ui/BaseItemEditor.h"
 #include "manager/ui/BaseItemMinimalUI.h"
 #include "manager/ui/BaseItemUI.h"
-#include "manager/ui/GenericManagerEditor.h"
 #include "manager/ui/BaseManagerUI.h"
 #include "manager/ui/BaseManagerViewUI.h"
 #include "manager/ui/BaseManagerShapeShifterUI.h"

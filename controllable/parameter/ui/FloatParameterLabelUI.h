@@ -9,9 +9,9 @@
 */
 
 #ifndef FLOATPARAMETERLABELUI_H_INCLUDED
-#define FLOATPARAMETERLABELUI_H_IN
+#define FLOATPARAMETERLABELUI_H_INCLUDED
 
-class FloatParameterLabelUI : 
+class FloatParameterLabelUI :
 	public ParameterUI, 
 	public Label::Listener
 {

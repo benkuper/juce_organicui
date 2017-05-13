@@ -341,7 +341,7 @@ void BaseItemUI<T>::mouseDown(const MouseEvent & e)
 				posAtMouseDown = this->baseItem->viewUIPosition->getPoint();
 			} else
 			{
-				posAtDown = getBounds().getPosition();
+				posAtDown = this->getBounds().getPosition();
 				dragOffset = Point<int>();
 				itemUIListeners.call(&ItemUIListener::itemUIGrabStart, this);
 			}
