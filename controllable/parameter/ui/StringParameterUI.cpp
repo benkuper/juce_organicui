@@ -35,7 +35,7 @@ autoSize(false)
     valueLabel.setColour(valueLabel.backgroundWhenEditingColourId, Colours::white);
     nameLabel.setTooltip(p->description);
 
-
+	valueLabel.addMouseListener(this, false);
 
     setSize(200, 20);//default size
 }
@@ -43,7 +43,7 @@ autoSize(false)
 void StringParameterUI::setAutoSize(bool value)
 {
 	autoSize = value;
-	valueChanged(parameter->value);
+	valueChanged(parameter->getValue());
 }
 
 void StringParameterUI::setPrefix(const String & _prefix)
@@ -76,6 +76,7 @@ void StringParameterUI::setOpaqueBackground(bool value)
 
 void StringParameterUI::setForceFeedbackOnlyInternal()
 {
+	ParameterUI::setForceFeedbackOnlyInternal();
 	valueLabel.setEditable(false, parameter->isEditable && !forceFeedbackOnly);
 	setOpaqueBackground(opaqueBackground); //force refresh color
 }

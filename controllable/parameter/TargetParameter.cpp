@@ -18,6 +18,8 @@ TargetParameter::TargetParameter(const String & niceName, const String & descrip
 	rootContainer(rootReference),
 	target(nullptr)
 {
+	lockManualControlMode = true;
+
 	type = TARGET;
 	if (rootContainer == nullptr) rootContainer = Engine::mainEngine;
 	

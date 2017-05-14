@@ -102,7 +102,7 @@ void BaseItemEditor::resized()
 	r.setHeight(0); //if no override, ensure bottom is set
 	resizedInternalFooter(r);
 
-	setBounds(getLocalBounds().withBottom(r.getBottom()));
+	setSize(getWidth(),r.getBottom());
 }
 
 

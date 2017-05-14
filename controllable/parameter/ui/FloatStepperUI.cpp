@@ -19,6 +19,7 @@ FloatStepperUI::FloatStepperUI(Parameter * _parameter) :
     slider->setValue(parameter->floatValue());
     slider->addListener(this);
 	slider->setTextBoxIsEditable(_parameter->isEditable);
+	slider->addMouseListener(this,true);
 }
 
 FloatStepperUI::~FloatStepperUI()

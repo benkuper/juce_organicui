@@ -16,6 +16,7 @@ GenericControllableItemEditor::GenericControllableItemEditor(BaseItem * bi, bool
 	cui = static_cast<ControllableEditor *>(gci->controllable->getEditor(false));
 	cui->setShowLabel(false);
 	addAndMakeVisible(cui);
+	setSize(getWidth(), cui->getHeight());
 }
 
 GenericControllableItemEditor::~GenericControllableItemEditor()
@@ -24,5 +25,16 @@ GenericControllableItemEditor::~GenericControllableItemEditor()
 
 void GenericControllableItemEditor::resizedInternalHeader(Rectangle<int>& r)
 {
-	cui->setBounds(r.removeFromRight(r.getWidth()-100)); 
+	
+}
+
+void GenericControllableItemEditor::resizedInternalContent(Rectangle<int>& r)
+{
+	r.setHeight(cui->getHeight());
+	cui->setBounds(r);
+}
+
+void GenericControllableItemEditor::childBoundsChanged(Component * child)
+{
+	if (child == cui) resized();
 }

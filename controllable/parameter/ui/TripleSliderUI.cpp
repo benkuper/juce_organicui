@@ -55,27 +55,27 @@ void TripleSliderUI::resized()
 
 }
 
-void TripleSliderUI::newMessage(const Parameter::ParamWithValue & p)
+void TripleSliderUI::newMessage(const Parameter::ParameterEvent & e)
 {
-	if (p.parameter == parameter)
+	if (e.parameter == parameter)
 	{
-		xParam.setValue(((Point3DParameter *)p.parameter)->x);
-		yParam.setValue(((Point3DParameter *)p.parameter)->y);
-		zParam.setValue(((Point3DParameter *)p.parameter)->z);
+		xParam.setValue(((Point3DParameter *)e.parameter)->x);
+		yParam.setValue(((Point3DParameter *)e.parameter)->y);
+		zParam.setValue(((Point3DParameter *)e.parameter)->z);
 
-	} else if (p.parameter == &xParam)
+	} else if (e.parameter == &xParam)
 	{
 		if (xParam.floatValue() != p3d->x) p3d->setVector(xParam.floatValue(), yParam.floatValue(),zParam.floatValue());
-	} else if (p.parameter == &yParam)
+	} else if (e.parameter == &yParam)
 	{
 		if (yParam.floatValue() != p3d->y) p3d->setVector(xParam.floatValue(), yParam.floatValue(), zParam.floatValue());
-	}else if (p.parameter == &zParam)
+	}else if (e.parameter == &zParam)
 	{
 		if (zParam.floatValue() != p3d->z) p3d->setVector(xParam.floatValue(), yParam.floatValue(), zParam.floatValue());
-	} else if (p.isRange())
+	} else if (e.type == Parameter::ParameterEvent::BOUNDS_CHANGED)
 	{
-		xParam.setRange(p.parameter->minimumValue[0], p.parameter->maximumValue[0]);
-		yParam.setRange(p.parameter->minimumValue[1], p.parameter->maximumValue[1]);
-		zParam.setRange(p.parameter->minimumValue[2], p.parameter->maximumValue[2]);
+		xParam.setRange(e.parameter->minimumValue[0], e.parameter->maximumValue[0]);
+		yParam.setRange(e.parameter->minimumValue[1], e.parameter->maximumValue[1]);
+		zParam.setRange(e.parameter->minimumValue[2], e.parameter->maximumValue[2]);
 	}
 }

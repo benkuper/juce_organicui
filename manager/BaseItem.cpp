@@ -29,6 +29,7 @@ BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts
 	nameParam->hideInEditor = true;
 	nameParam->hideInOutliner = true;
 	nameParam->isTargettable = false;
+	nameParam->lockManualControlMode = true;
 
 	if (canHaveScripts)
 	{
@@ -61,8 +62,8 @@ BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts
 	viewUIPosition->isTargettable = false;
 
 	viewUISize = addPoint2DParameter("Size", "Size in the view");
-	viewUISize->setBounds(30, 60, 500, 500);
-	viewUISize->setPoint(200, 300);
+	viewUISize->setBounds(30, 60, 1000, 1000);
+	viewUISize->setPoint(200, 200);
 	viewUISize->hideInEditor = true;
 	viewUISize->hideInOutliner = true;
 	viewUISize->isTargettable = false;
@@ -105,7 +106,7 @@ void BaseItem::controllableFeedbackUpdate(ControllableContainer * cc, Controllab
 	{
 		Array<var> args;
 		args.add(c->createScriptObject());
-		if (canHaveScripts) scriptManager->callFunctionOnAllItems("cstomParamChanged", args);
+		if (canHaveScripts) scriptManager->callFunctionOnAllItems("customParamChanged", args);
 	}
 }
 

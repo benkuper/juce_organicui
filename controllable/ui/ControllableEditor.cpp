@@ -1,19 +1,20 @@
 /*
   ==============================================================================
 
-    ControllableEditor.cpp
-    Created: 7 Oct 2016 2:04:37pm
-    Author:  bkupe
+	ControllableEditor.cpp
+	Created: 7 Oct 2016 2:04:37pm
+	Author:  bkupe
 
   ==============================================================================
 */
 
 
 ControllableEditor::ControllableEditor(Controllable * _controllable, bool isRoot, int initHeight) :
-	InspectableEditor(_controllable,isRoot), 
+	InspectableEditor(_controllable, isRoot),
 	controllable(_controllable),
 	label("Label"),
-	showLabel(true)
+	showLabel(true),
+	subContentHeight(0)
 {
 	ui = controllable->createDefaultUI();
 	ui->showLabel = false;
@@ -24,8 +25,8 @@ ControllableEditor::ControllableEditor(Controllable * _controllable, bool isRoot
 	label.setJustificationType(Justification::left);
 	label.setFont(label.getFont().withHeight(12));
 	label.setText(controllable->niceName, dontSendNotification);
-	
-	
+
+
 	if (controllable->isRemovableByUser)
 	{
 		removeBT = AssetManager::getInstance()->getRemoveBT();
@@ -40,25 +41,27 @@ ControllableEditor::ControllableEditor(Controllable * _controllable, bool isRoot
 		addAndMakeVisible(editBT);
 	}
 
-	setSize(100, initHeight);
+	baseHeight = initHeight;
+	setSize(100, baseHeight);
 }
 
-  void ControllableEditor::setShowLabel(bool value)
-  {
-	  if (showLabel == value) return;
-	  showLabel = value;
-	  if (showLabel)
-	  {
-		  addAndMakeVisible(&label);
-	  } else
-	  {
-		  removeChildComponent(&label);
-	  }
-  }
-
-  void ControllableEditor::resized()
+void ControllableEditor::setShowLabel(bool value)
 {
-	Rectangle<int> r = getLocalBounds();// .withHeight(16);
+	if (showLabel == value) return;
+	showLabel = value;
+	if (showLabel)
+	{
+		addAndMakeVisible(&label);
+	} else
+	{
+		removeChildComponent(&label);
+	}
+}
+
+void ControllableEditor::resized()
+{
+	Rectangle<int> r = getLocalBounds();
+	r.removeFromBottom(subContentHeight);// .withHeight(16);
 
 	if (showLabel)
 	{
@@ -77,7 +80,7 @@ ControllableEditor::ControllableEditor(Controllable * _controllable, bool isRoot
 		editBT->setBounds(r.removeFromRight(r.getHeight()));
 		r.removeFromRight(2);
 	}
-	
+
 
 	if (showLabel) r = r.removeFromRight(jmin<int>(getWidth() * 2 / 3 - 10, 150));
 	ui->setBounds(r);

@@ -185,7 +185,7 @@ public:
 
 protected:
     void notifyStructureChanged();
-    void newMessage(const Parameter::ParamWithValue&)override;
+    void newMessage(const Parameter::ParameterEvent &e)override;
 
     WeakReference<ControllableContainer>::Master masterReference;
     friend class WeakReference<ControllableContainer>;

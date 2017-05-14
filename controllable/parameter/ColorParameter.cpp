@@ -13,6 +13,7 @@ ColorParameter::ColorParameter(const String & niceName, const String & descripti
 	Parameter(COLOR,niceName,description,var(),var(),var(),enabled),
 	mode(FLOAT)
 {
+	lockManualControlMode = true;
 	setColor(initialColor);
 }
 

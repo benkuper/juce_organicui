@@ -25,7 +25,7 @@ public:
 
 	
 	//LAYOUT
-    const int margin = 2;
+    const int margin = 3;
     int minContentHeight;
     
 	//grabber

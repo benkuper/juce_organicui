@@ -33,7 +33,7 @@ public:
 		COLOR
 	};
 
-
+	
 	Controllable(const Type &type, const String &niceName, const String &description, bool enabled = true);
 	virtual ~Controllable();
 
@@ -44,6 +44,8 @@ public:
 	String description;
 	String argumentsDescription;
 
+	
+	//
 	bool enabled;
 	bool hasCustomShortName;
 	bool isControllableExposed;
@@ -102,10 +104,10 @@ public:
 	public:
 		/** Destructor. */
 		virtual ~Listener() {}
-		virtual void controllableStateChanged(Controllable *) {};
-		virtual void controllableControlAddressChanged(Controllable *) {};
-		virtual void controllableNameChanged(Controllable *) {};
-		virtual void controllableRemoved(Controllable *) {};
+		virtual void controllableStateChanged(Controllable *) {}
+		virtual void controllableControlAddressChanged(Controllable *) {}
+		virtual void controllableNameChanged(Controllable *) {}
+		virtual void controllableRemoved(Controllable *) {}
 		virtual void askForRemoveControllable(Controllable *) {}
 	};
 

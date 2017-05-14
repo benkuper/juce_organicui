@@ -82,7 +82,7 @@ void GenericManagerEditor<T>::resized()
 	GenericControllableContainerEditor::resized();
 
 	juce::Rectangle<int> r = getLocalBounds().reduced(2);
-	addItemBT->setBounds(r.withSize(24, 24).withX(r.getWidth() - 24));
+	addItemBT->setBounds(r.withSize(headerHeight, headerHeight).withX(r.getWidth() - headerHeight));
 }
 
 template<class T>

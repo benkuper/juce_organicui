@@ -21,6 +21,7 @@ forceFeedbackOnly(controllable->isControllableFeedbackOnly)
 
 	setEnabled(controllable->enabled);
 	setInterceptsMouseClicks(controllable->enabled,controllable->enabled);
+
 }
 
 ControllableUI::~ControllableUI()
@@ -45,22 +46,25 @@ void ControllableUI::mouseDown(const MouseEvent & e)
 		if (result > 0)
 		{
 			handleMenuSelectedID(result);
-		}
-		switch (result)
+		} else if(result < 0)
 		{
-		case -1:
-			SystemClipboard::copyTextToClipboard(controllable->controlAddress);
-			break;
-		case -2:
-			SystemClipboard::copyTextToClipboard("root" + controllable->controlAddress.replaceCharacter('/', '.'));
-			break;
+			switch (result)
+			{
+			case -1:
+				SystemClipboard::copyTextToClipboard(controllable->controlAddress);
+				break;
+			case -2:
+				SystemClipboard::copyTextToClipboard("root" + controllable->controlAddress.replaceCharacter('/', '.'));
+				break;
 
-		case -3:
-			showEditWindow();
-			break;
-		default:
-			DBG("Not handled : " << result);
+			case -3:
+				showEditWindow();
+				break;
+			default:
+				DBG("Not handled : " << result);
+			}
 		}
+		
 
 	} else
 	{
@@ -84,6 +88,7 @@ void ControllableUI::setForceFeedbackOnly(bool value)
 {
 	setRepaintsOnMouseActivity(false);
 	forceFeedbackOnly = value;
+	setForceFeedbackOnlyInternal();
 }
 
 void ControllableUI::controllableStateChanged(Controllable * c)

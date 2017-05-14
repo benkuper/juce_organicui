@@ -20,6 +20,7 @@
 //==============================================================================
 
 #include "resources/OrganicBinaryData.cpp"
+#include "script/ScriptExpression.cpp"
 #include "controllable/Controllable.cpp"
 #include "controllable/ControllableContainer.cpp"
 #include "controllable/ControllableFactory.cpp"
@@ -48,6 +49,7 @@
 #include "controllable/parameter/ui/IntSliderUI.cpp"
 #include "controllable/parameter/ui/IntStepperUI.cpp"
 #include "controllable/parameter/ui/ParameterUI.cpp"
+#include "controllable/parameter/ui/ParameterEditor.cpp"
 #include "controllable/parameter/ui/StringParameterUI.cpp"
 #include "controllable/parameter/ui/TargetParameterUI.cpp"
 #include "controllable/parameter/ui/TripleSliderUI.cpp"

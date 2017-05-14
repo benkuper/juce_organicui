@@ -32,7 +32,7 @@ public:
 
 protected:
 	void setForceFeedbackOnlyInternal() override;
-	virtual void newMessage(const Parameter::ParamWithValue & p) override;
+	virtual void newMessage(const Parameter::ParameterEvent & e) override;
 
 	//void valueChanged(const var &) override;
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DoubleSliderUI)

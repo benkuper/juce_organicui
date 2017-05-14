@@ -26,6 +26,8 @@ public:
 	bool showValue;
 	void showEditWindow() override;
 
+	void paintOverChildren(Graphics &g) override;
+
 	virtual void addPopupMenuItems(PopupMenu * p) override;
 	virtual void handleMenuSelectedID(int id) override;
 
@@ -43,7 +45,7 @@ protected:
 
 protected:
     // see Parameter::AsyncListener
-	virtual void newMessage(const Parameter::ParamWithValue & p) override;;
+	virtual void newMessage(const Parameter::ParameterEvent &e) override;;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ParameterUI)
 };

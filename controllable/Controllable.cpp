@@ -63,6 +63,7 @@ void Controllable::setAutoShortName() {
 	scriptTargetName = shortName;
 }
 
+
 void Controllable::setEnabled(bool value, bool silentSet, bool force)
 {
 	if (!force && value == enabled) return;
@@ -94,7 +95,7 @@ DynamicObject * Controllable::createScriptObject(DynamicObject *)
 	DynamicObject * o = ScriptTarget::createScriptObject();
 	o->setProperty("name", shortName);
 	o->setProperty("niceName", niceName);
-
+	
 	return o;
 }
 
@@ -111,6 +112,7 @@ var Controllable::getJSONData(ControllableContainer * relativeTo)
 	data.getDynamicObject()->setProperty("customizable", isCustomizableByUser);
 	data.getDynamicObject()->setProperty("removable", isRemovableByUser);
 
+	
 	if (hasCustomShortName) data.getDynamicObject()->setProperty("shortName", shortName);
 
 	return data;
@@ -127,6 +129,7 @@ void Controllable::loadJSONData(var data)
 	if (data.getDynamicObject()->hasProperty("shortName")) setCustomShortName(data.getProperty("shortName", ""));
 	if (data.getDynamicObject()->hasProperty("customizable")) isCustomizableByUser = data.getProperty("customizable", false);
 	if (data.getDynamicObject()->hasProperty("removable")) isRemovableByUser = data.getProperty("removable", false);
+
 
 	loadJSONDataInternal(data);
 }

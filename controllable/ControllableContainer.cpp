@@ -196,12 +196,13 @@ void ControllableContainer::notifyStructureChanged() {
 
 }
 
-void ControllableContainer::newMessage(const Parameter::ParamWithValue& pv) {
-	if (pv.parameter == currentPresetName) {
-		loadPresetWithName(pv.parameter->stringValue());
+void ControllableContainer::newMessage(const Parameter::ParameterEvent &e) {
+	if (e.parameter == currentPresetName) {
+		loadPresetWithName(e.parameter->stringValue());
 	}
-	if (!pv.isRange()) {
-		onContainerParameterChangedAsync(pv.parameter, pv.value);
+
+	if (e.type == Parameter::ParameterEvent::VALUE_CHANGED) {
+		onContainerParameterChangedAsync(e.parameter, e.value);
 	}
 }
 void ControllableContainer::setNiceName(const String &_niceName) {
@@ -583,7 +584,7 @@ bool ControllableContainer::saveCurrentPreset()
 	Parameter * p = dynamic_cast<Parameter*> (getControllableForAddress(pv->paramControlAddress));
 	if (p != nullptr && p!=currentPresetName)
 	{
-	  pv->presetValue = var(p->value);
+	  pv->presetValue = var(p->getValue());
 	}
   }
   savePresetInternal(currentPreset);

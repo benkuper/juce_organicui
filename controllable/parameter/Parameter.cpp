@@ -1,3 +1,4 @@
+#include "Parameter.h"
 /*
   ==============================================================================
 
@@ -11,11 +12,13 @@
 
 Parameter::Parameter(const Type &type, const String &niceName, const String &description, var initialValue, var minValue = var(), var maxValue = var(), bool enabled) :
 	Controllable(type, niceName, description, enabled),
+	lockManualControlMode(false),
+	controlMode(MANUAL),
 	isEditable(true),
 	isPresettable(true),
 	isOverriden(false),
-autoAdaptRange(false),
-queuedNotifier(100) 
+	autoAdaptRange(false),
+	queuedNotifier(100)
 {
 	minimumValue = minValue;
 	maximumValue = maxValue;
@@ -30,8 +33,47 @@ queuedNotifier(100)
 	scriptObject.setMethod("set", Controllable::setValueFromScript);
 }
 
-Parameter::~Parameter() { 
-	Parameter::masterReference.clear(); 
+Parameter::~Parameter() {
+	Parameter::masterReference.clear();
+}
+
+
+void Parameter::setControlMode(ControlMode _mode)
+{
+	if (_mode == controlMode) return;
+
+	controlMode = _mode;
+
+	switch (controlMode)
+	{
+	case MANUAL:
+		expression = nullptr;
+		break;
+
+	case REFERENCE:
+		expression = nullptr;
+		break;
+
+	case EXPRESSION:
+		expression = new ScriptExpression();
+		expression->setExpression(controlExpression);
+		expression->addExpressionListener(this);
+		break;
+	}
+
+	listeners.call(&Listener::parameterControlModeChanged, this);
+	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::CONTROLMODE_CHANGED, this));
+}
+
+void Parameter::setControlExpression(const String & e)
+{
+	controlExpression = e;
+	if (expression != nullptr) expression->setExpression(e);
+}
+
+var Parameter::getValue()
+{
+	return value;
 }
 
 void Parameter::resetValue(bool silentSet)
@@ -84,7 +126,7 @@ void Parameter::setRange(var min, var max, bool setDefaultRange) {
 	listeners.call(&Listener::parameterRangeChanged, this);
 	var arr;
 	arr.append(minimumValue); arr.append(maximumValue);
-	queuedNotifier.addMessage(new ParamWithValue(this, arr, ParamWithValue::RANGE));
+	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::BOUNDS_CHANGED, this, arr));
 
 	setValue(value); //if value is outside range, this will change the value
 }
@@ -94,7 +136,7 @@ void Parameter::setValueInternal(var & _value) //to override by child classes
 	value = _value;
 
 #ifdef JUCE_DEBUG
-	checkVarIsConsistentWithType();
+	if (!checkVarIsConsistentWithType()) DBG("Problem with var type");
 #endif
 }
 
@@ -111,11 +153,12 @@ bool Parameter::checkValueIsTheSame(var newValue, var oldValue)
 	return newValue == oldValue;
 }
 
-void Parameter::checkVarIsConsistentWithType() {
-	if (type == Type::STRING)  jassert(value.isString());
-	else if (type == Type::INT)     jassert(value.isInt());
-	else if (type == Type::BOOL)    jassert(value.isBool());
-	else if (type == Type::FLOAT)   jassert(value.isDouble());
+bool Parameter::checkVarIsConsistentWithType() {
+	if (type == Type::STRING)  return value.isString();
+	else if (type == Type::INT)     return value.isInt();
+	else if (type == Type::BOOL)    return value.isBool();
+	else if (type == Type::FLOAT)   return value.isDouble();
+	return true;
 }
 
 void Parameter::setNormalizedValue(const float & normalizedValue, bool silentSet, bool force)
@@ -134,7 +177,22 @@ float Parameter::getNormalizedValue()
 
 void Parameter::notifyValueChanged() {
 	listeners.call(&Listener::parameterValueChanged, this);
-	queuedNotifier.addMessage(new ParamWithValue(this, value, ParamWithValue::VALUE));
+	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::VALUE_CHANGED,this,getValue()));
+}
+
+void Parameter::expressionValueChanged(ScriptExpression *)
+{
+	setValue(expression->currentValue);
+}
+
+void Parameter::expressionStateChanged(ScriptExpression *)
+{
+	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::EXPRESSION_STATE_CHANGED, this));
+}
+
+InspectableEditor * Parameter::getEditor(bool isRoot)
+{
+	return new ParameterEditor(this, isRoot);
 }
 
 var Parameter::getJSONDataInternal()
@@ -144,6 +202,8 @@ var Parameter::getJSONDataInternal()
 	if (saveValueOnly) return data;
 	data.getDynamicObject()->setProperty("minValue", minimumValue);
 	data.getDynamicObject()->setProperty("maxValue", maximumValue);
+	data.getDynamicObject()->setProperty("controlMode", controlMode);
+	data.getDynamicObject()->setProperty("expression", controlExpression);
 	return data;
 }
 
@@ -151,22 +211,19 @@ void Parameter::loadJSONDataInternal(var data)
 {
 	Controllable::loadJSONDataInternal(data);
 
-	if (!saveValueOnly)
-	{
-		setRange(data.getProperty("minValue", minimumValue), data.getProperty("maxValue", maximumValue));
-	}
+	if (!saveValueOnly) setRange(data.getProperty("minValue", minimumValue), data.getProperty("maxValue", maximumValue));
+	if (data.getDynamicObject()->hasProperty("value")) setValue(data.getProperty("value", 0));
 
-	if (data.getDynamicObject()->hasProperty("value"))
-	{
-		setValue(data.getProperty("value", 0));
-	}
+	if (data.getDynamicObject()->hasProperty("controlMode")) controlMode = (ControlMode)(int)data.getProperty("controlMode", MANUAL);
+	if (data.getDynamicObject()->hasProperty("expression")) controlExpression = data.getProperty("expression", "");
+
 }
 
 var Parameter::getValueFromScript(const juce::var::NativeFunctionArgs & a)
 {
 	Parameter * c = getObjectFromJS<Parameter>(a);
 	if (c == nullptr) return var();
-	return c->value;
+	return c->getValue();
 }
 
 

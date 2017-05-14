@@ -75,6 +75,7 @@ using namespace juce;
 #include "inspectable/ui/InspectableSelector.h"
 #include "inspectable/ui/Inspector.h"
 
+#include "script/ScriptExpression.h"
 
 #include "controllable/Controllable.h"
 #include "controllable/ControllableContainerListener.h"
@@ -83,6 +84,7 @@ using namespace juce;
 #include "controllable/ui/ControllableEditor.h"
 
 #include "controllable/parameter/ui/ParameterUI.h"
+#include "controllable/parameter/ui/ParameterEditor.h"
 #include "controllable/parameter/Parameter.h"
 
 #include "controllable/ControllableFactory.h"

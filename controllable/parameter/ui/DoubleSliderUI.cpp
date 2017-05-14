@@ -50,22 +50,22 @@ void DoubleSliderUI::setForceFeedbackOnlyInternal()
 	ySlider.setForceFeedbackOnly(val);
 }
 
-void DoubleSliderUI::newMessage(const Parameter::ParamWithValue & p)
+void DoubleSliderUI::newMessage(const Parameter::ParameterEvent & e)
 {
-	if (p.parameter == parameter)
+	if (e.parameter == parameter)
 	{
-		xParam.setValue(((Point2DParameter *)p.parameter)->x);
-		yParam.setValue(((Point2DParameter *)p.parameter)->y);
+		xParam.setValue(((Point2DParameter *)e.parameter)->x);
+		yParam.setValue(((Point2DParameter *)e.parameter)->y);
 
-	} else if (p.parameter == &xParam)
+	} else if (e.parameter == &xParam)
 	{
 		if(xParam.floatValue() != p2d->x) p2d->setPoint(xParam.floatValue(), yParam.floatValue());
-	} else if (p.parameter == &yParam)
+	} else if (e.parameter == &yParam)
 	{
 		if (yParam.floatValue() != p2d->y) p2d->setPoint(xParam.floatValue(), yParam.floatValue());
-	} else if (p.isRange())
+	} else if (e.type == Parameter::ParameterEvent::BOUNDS_CHANGED)
 	{
-		xParam.setRange(p.parameter->minimumValue[0], p.parameter->maximumValue[0]);
-		yParam.setRange(p.parameter->minimumValue[1], p.parameter->maximumValue[1]);
+		xParam.setRange(e.parameter->minimumValue[0], e.parameter->maximumValue[0]);
+		yParam.setRange(e.parameter->minimumValue[1], e.parameter->maximumValue[1]);
 	}
 }

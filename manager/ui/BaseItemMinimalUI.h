@@ -25,6 +25,7 @@ public:
     
 	//ui
 	Colour bgColor;
+	bool dimAlphaOnDisabled;
 	bool highlightOnMouseOver;
 
 	bool removeOnCtrlDown;
@@ -54,6 +55,7 @@ BaseItemMinimalUI<T>::BaseItemMinimalUI(T * _item) :
 	InspectableContentComponent(_item),
 	item(_item),
 	bgColor(BG_COLOR.brighter(.1f)),
+	dimAlphaOnDisabled(true),
 	highlightOnMouseOver(false),
 	removeOnCtrlDown(false),
 	removeOnDelKey(true)
@@ -65,6 +67,8 @@ BaseItemMinimalUI<T>::BaseItemMinimalUI(T * _item) :
 
 	addMouseListener(this, true);
 	baseItem->addAsyncContainerListener(this);
+	
+	if (dimAlphaOnDisabled) setAlpha(baseItem->enabled ? 1 : .5f);
 
 	setSize(100, 20);
 }
@@ -93,8 +97,6 @@ void BaseItemMinimalUI<T>::mouseExit(const MouseEvent &e)
 template<class T>
 bool BaseItemMinimalUI<T>::keyPressed(const KeyPress & e)
 {
-	DBG("Key pressed here ! " << baseItem->niceName);
-
 	if (removeOnDelKey && (e.getKeyCode() == e.deleteKey || e.getKeyCode() == e.backspaceKey) && inspectable->isSelected)
 	{
 		baseItem->remove();
@@ -128,7 +130,12 @@ void BaseItemMinimalUI<T>::newMessage(const ContainerAsyncEvent & e)
 {
 	if (e.type == ContainerAsyncEvent::ControllableFeedbackUpdate)
 	{
-		if (e.targetControllable == baseItem->enabled) repaint();
+		if (e.targetControllable == baseItem->enabled)
+		{
+			if(dimAlphaOnDisabled) setAlpha(baseItem->enabled ? 1 : .5f);
+			repaint();
+		}
+
 		controllableFeedbackUpdateInternal(e.targetControllable);
 	}
 }

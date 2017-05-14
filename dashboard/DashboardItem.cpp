@@ -21,7 +21,7 @@ DashboardItem::~DashboardItem()
 void DashboardItem::onContainerParameterChangedInternal(Parameter * p)
 {
 	BaseItem::onContainerParameterChangedInternal(p);
-	if (p == target)
+	if (p == target && target->target != nullptr && !target->target.wasObjectDeleted())
 	{
 		nameParam->setValue(target->target->parentContainer->niceName + " : " + target->target->niceName);
 	}

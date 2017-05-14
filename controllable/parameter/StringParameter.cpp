@@ -45,6 +45,7 @@ void StringParameter::setValue(var _value,bool silentSet,bool force )
 };
 
 void  StringParameter::setValueInternal(var & newVal){
+	
     value = newVal.toString();
 };
 

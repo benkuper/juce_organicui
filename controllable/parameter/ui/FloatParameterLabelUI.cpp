@@ -34,14 +34,14 @@ maxFontHeight(12),
 
 	
 	setSize(200, 20);//default size
-	valueChanged(parameter->value);
+	valueChanged(parameter->getValue());
 
 }
 
 void FloatParameterLabelUI::setAutoSize(bool value)
 {
 	autoSize = value;
-	valueChanged(parameter->value);
+	valueChanged(parameter->getValue());
 }
 
 void FloatParameterLabelUI::setPrefix(const String & _prefix)
@@ -124,7 +124,7 @@ void FloatParameterLabelUI::labelTextChanged(Label *)
 TimeLabel::TimeLabel(Parameter * p) :
 	FloatParameterLabelUI(p)
 {
-	valueChanged(parameter->value);
+	valueChanged(parameter->getValue());
 }
 
 TimeLabel::~TimeLabel()

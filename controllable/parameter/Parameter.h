@@ -13,12 +13,18 @@
 
 
 class Parameter : 
-	public Controllable
+	public Controllable,
+	public ScriptExpression::Listener
 {
 public:
+	enum ControlMode {
+		MANUAL,
+		EXPRESSION,
+		REFERENCE
+	};
+
     Parameter(const Type &type, const String & niceName, const String &description, var initialValue, var minValue, var maxValue, bool enabled = true);
 	virtual ~Parameter();
-
 
     var defaultValue;
     var value;
@@ -29,6 +35,13 @@ public:
 	var defaultMinValue;//for autoAdaptRange
 	var defaultMaxValue;
    
+	//Control Mode
+	bool lockManualControlMode;
+	ControlMode controlMode;
+	String controlExpression;
+	ScopedPointer<ScriptExpression> expression;
+	WeakReference<Controllable> controlReference;
+
 	bool isComplex();
 	virtual StringArray getValuesNames();
 
@@ -38,6 +51,11 @@ public:
 	bool isPresettable;
     bool isOverriden;
 	bool autoAdaptRange;
+
+	void setControlMode(ControlMode _mode);
+	void setControlExpression(const String &);
+
+	virtual var getValue(); //may be useful, or testing expression or references (for now, forward update from expression timer)
 
     void resetValue(bool silentSet = false);
     virtual void setValue(var _value, bool silentSet = false, bool force = false);
@@ -50,14 +68,19 @@ public:
     float getNormalizedValue();
 
     //helpers for fast typing
-    virtual float floatValue() { return (float)value; }
-	virtual double doubleValue(){return (double)value;}
-	virtual int intValue() { return (int)value; }
-	virtual bool boolValue() { return (bool)value; }
-	virtual String stringValue() { return value.toString(); }
+    virtual float floatValue() { return (float)getValue(); }
+	virtual double doubleValue(){return (double)getValue();}
+	virtual int intValue() { return (int)getValue(); }
+	virtual bool boolValue() { return (bool)getValue(); }
+	virtual String stringValue() { return getValue().toString(); }
 
     void notifyValueChanged();
 
+	//From Script Expression
+	virtual void expressionValueChanged(ScriptExpression *) override;
+	virtual void expressionStateChanged(ScriptExpression *) override;
+	
+	InspectableEditor * getEditor(bool isRoot) override;
 
 	virtual var getJSONDataInternal() override;
 	virtual void loadJSONDataInternal(var data) override;
@@ -71,8 +94,9 @@ public:
 	public:
 		/** Destructor. */
 		virtual ~Listener() {}
-		virtual void parameterValueChanged(Parameter * p) = 0;
+		virtual void parameterValueChanged(Parameter * ) {};
 		virtual void parameterRangeChanged(Parameter * ) {};
+		virtual void parameterControlModeChanged(Parameter *) {}
     };
 
     ListenerList<Listener> listeners;
@@ -82,20 +106,23 @@ public:
 
 
     // ASYNC
-    class  ParamWithValue{
+    class  ParameterEvent
+	{
     public:
-		enum Type { VALUE, RANGE };
+		enum Type { VALUE_CHANGED, BOUNDS_CHANGED, CONTROLMODE_CHANGED, EXPRESSION_STATE_CHANGED };
 
-		ParamWithValue(Parameter * p,var v,Type t):type(t),parameter(p),value(v){}
+		ParameterEvent(Type t,Parameter * p,var v = var()) :
+			type(t),parameter(p),value(v)
+		{
+		}
+
 		Type type;
-
         Parameter * parameter;
         var value;
-		bool isRange() const { return type == RANGE; }
-
     };
-    QueuedNotifier<ParamWithValue> queuedNotifier;
-    typedef QueuedNotifier<ParamWithValue>::Listener AsyncListener;
+
+    QueuedNotifier<ParameterEvent> queuedNotifier;
+    typedef QueuedNotifier<ParameterEvent>::Listener AsyncListener;
 
 
     void addAsyncParameterListener(AsyncListener* newListener) { queuedNotifier.addListener(newListener); }
@@ -108,7 +135,7 @@ private:
 
 
 
-    void checkVarIsConsistentWithType();
+    bool checkVarIsConsistentWithType();
 
     WeakReference<Parameter>::Master masterReference;
     friend class WeakReference<Parameter>;

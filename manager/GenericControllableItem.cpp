@@ -14,6 +14,8 @@ GenericControllableItem::GenericControllableItem(var params) :
 	BaseItem("Item",false)
 {
 	controllable = ControllableFactory::createControllable(params.getProperty("controllableType",""));
+	controllable->description = "Custom control of type " + controllable->getTypeString();
+
 	jassert(controllable != nullptr);
 
 	isSelectable = false;
