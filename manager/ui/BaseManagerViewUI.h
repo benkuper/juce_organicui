@@ -56,7 +56,7 @@ template<class M, class T, class U>
 BaseManagerViewUI<M, T, U>::BaseManagerViewUI(const String & contentName, M * _manager) :
 	BaseManagerUI<M, T, U>(contentName,_manager,false)
 {
-	resizeOnChildBoundsChanged = false;
+	this->resizeOnChildBoundsChanged = false;
 	this->bgColor = BG_COLOR.darker(.3f);
 }
 
