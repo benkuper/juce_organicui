@@ -104,7 +104,7 @@ public:
 
 	void addExistingItems(bool resizeAfter = true);
 
-	void setCanAddItemsManually(bool value);
+	void setShowAddButton(bool value);
 
 	virtual void mouseDown(const MouseEvent &e) override;
 	virtual void paint(Graphics &g) override;
@@ -236,7 +236,7 @@ void BaseManagerUI<M, T, U>::addExistingItems(bool resizeAfter)
 }
 
 template<class M, class T, class U>
-void BaseManagerUI<M, T, U>::setCanAddItemsManually(bool value)
+void BaseManagerUI<M, T, U>::setShowAddButton(bool value)
 {
 	addItemBT->setVisible(value);
 
@@ -402,10 +402,10 @@ void BaseManagerUI<M, T, U>::resized()
 		{
 			float th = 0;
 			if (itemsUI.size() > 0) th = static_cast<BaseItemMinimalUI<T>*>(itemsUI[itemsUI.size() - 1])->getBottom();
-			if (grabbingItem != nullptr) th = jmax<int>(th, viewport.getHeight());
+			if (grabbingItem != nullptr) th = jmax<int>(th+grabbingItem->getHeight(), viewport.getHeight());
 			
 			if(useViewport) container.setSize(getWidth(),th);
-			else this->setSize(getWidth(), jmax<int>(th,50));
+			else this->setSize(getWidth(), jmax<int>(th+10,50));
 		} else if(defaultLayout == HORIZONTAL)
 		{
 			float tw = 0;
