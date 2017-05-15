@@ -26,7 +26,10 @@ public:
 
 	bool showLabel;
 	bool opaqueBackground;
+	bool showMenuOnRightClick;
 
+	bool forceFeedbackOnly; //if false, will rely on Controllable isEditable property. if true, will be force to no editable
+	
 	void mouseDown(const MouseEvent &e) override;
 	void mouseUp(const MouseEvent &e) override;
 
@@ -40,7 +43,6 @@ public:
 
 	virtual void setOpaqueBackground(bool value);
 
-	bool forceFeedbackOnly; //if false, will rely on Controllable isEditable property. if true, will be force to no editable
 	void setForceFeedbackOnly(bool value);
 	virtual void setForceFeedbackOnlyInternal() {}
 

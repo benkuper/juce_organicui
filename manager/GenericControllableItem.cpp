@@ -24,6 +24,7 @@ GenericControllableItem::GenericControllableItem(var params) :
 	controllable->isCustomizableByUser = true;
 	addControllable(controllable);
 	setNiceName(controllable->niceName);
+
 }
 
 GenericControllableItem::~GenericControllableItem()
@@ -31,10 +32,6 @@ GenericControllableItem::~GenericControllableItem()
 
 }
 
-InspectableEditor * GenericControllableItem::getEditor(bool isRoot)
-{
-	return new GenericControllableItemEditor(this, isRoot);
-}
 
 void GenericControllableItem::onContainerNiceNameChanged()
 {

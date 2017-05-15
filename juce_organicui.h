@@ -163,7 +163,7 @@ using namespace juce;
 
 #include "manager/GenericControllableItem.h"
 #include "manager/GenericControllableManager.h"
-#include "manager/ui/GenericControllableItemEditor.h"
+#include "manager/ui/GenericControllableItemUI.h"
 
 #include "dashboard/DashboardItem.h"
 #include "dashboard/DashboardItemManager.h"
@@ -186,7 +186,7 @@ using namespace juce;
 #include "script/Script.h"
 #include "script/ScriptManager.h"
 #include "script/ScriptUtil.h"
-#include "script/ui/ScriptEditor.h"
+#include "script/ui/ScriptUI.h"
 
 #include "logger/CustomLogger.h"
 #include "logger/ui/CustomLoggerUI.h"

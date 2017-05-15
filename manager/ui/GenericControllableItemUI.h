@@ -11,14 +11,13 @@
 #ifndef GENERICCONTROLLABLEITEMUI_H_INCLUDED
 #define GENERICCONTROLLABLEITEMUI_H_INCLUDED
 
-class GenericControllableItemEditor :
-	public BaseItemEditor
+class GenericControllableItemUI :
+	public BaseItemUI<GenericControllableItem>
 {
 public:
-	GenericControllableItemEditor(BaseItem * bi, bool isRoot);
-	~GenericControllableItemEditor();
+	GenericControllableItemUI(GenericControllableItem * bi);
+	~GenericControllableItemUI();
 
-	GenericControllableItem * gci;
 	ScopedPointer<ControllableEditor> cui;
 
 	void resizedInternalHeader(Rectangle<int> &r) override;

@@ -47,7 +47,6 @@ public:
 
 	virtual void setRange(var,var, bool setDefaultRange = true);
 
-	bool isEditable; 
 	bool isPresettable;
     bool isOverriden;
 	bool autoAdaptRange;

@@ -14,6 +14,8 @@ Controllable::Controllable(const Type &type, const String & niceName, const Stri
 	ScriptTarget("", this),
 	type(type),
 	description(description),
+	isEditable(true),
+	descriptionIsEditable(false),
 	hasCustomShortName(false),
 	isControllableExposed(true),
 	isControllableFeedbackOnly(false),

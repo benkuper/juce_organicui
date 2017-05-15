@@ -28,7 +28,7 @@ public:
 
 	static GenericControllableManagerFactory factory;
 
-	void addItemFromData(var data, bool fromUndoableAction = false) override;
+	virtual InspectableEditor * getEditor(bool isRoot) override;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(GenericControllableManager)
 };

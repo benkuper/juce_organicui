@@ -20,8 +20,6 @@ public:
 
 	Controllable * controllable;
 
-	InspectableEditor * getEditor(bool isRoot) override;
-
 	void onContainerNiceNameChanged() override;
 
 	static GenericControllableItem * create(var params) { return new GenericControllableItem(params); }

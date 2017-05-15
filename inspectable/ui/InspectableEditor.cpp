@@ -1,3 +1,4 @@
+#include "InspectableEditor.h"
 /*
   ==============================================================================
 
@@ -14,10 +15,39 @@ fitToContent(false),
     isRoot(_isRoot),
 inspectable(_inspectable)
 {
-
 }
 
 
 InspectableEditor::~InspectableEditor()
 {
+}
+
+
+
+
+
+
+//GENERIC COMPONENT EDITOR
+
+GenericComponentEditor::GenericComponentEditor(WeakReference<Inspectable> i, Component * c, bool isRoot) :
+	InspectableEditor(i, isRoot),
+	child(c)
+{
+	addAndMakeVisible(c);
+	setSize(getWidth(), c->getHeight());
+}
+
+
+GenericComponentEditor::~GenericComponentEditor()
+{
+}
+
+void GenericComponentEditor::resized()
+{
+	child->setBounds(getLocalBounds());
+}
+
+void GenericComponentEditor::childBoundsChanged(Component * c)
+{
+	setSize(getWidth(), child->getHeight());
 }

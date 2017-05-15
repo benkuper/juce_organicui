@@ -202,6 +202,8 @@ BaseManagerUI<M, T, U>::BaseManagerUI(const String & contentName, M * _manager, 
 	Engine::mainEngine->addEngineListener(this);
 
 	//must call addExistingItems from child class to get overrides
+
+	setSize(100, 50); //default
 }
 
 
@@ -393,23 +395,26 @@ void BaseManagerUI<M, T, U>::resized()
 	}
 
 
-	if (useViewport)
+	if (useViewport || resizeOnChildBoundsChanged)
 	{
+		
 		if (defaultLayout == VERTICAL)
 		{
 			float th = 0;
 			if (itemsUI.size() > 0) th = static_cast<BaseItemMinimalUI<T>*>(itemsUI[itemsUI.size() - 1])->getBottom();
 			if (grabbingItem != nullptr) th = jmax<int>(th, viewport.getHeight());
 			
-			container.setBounds(getLocalBounds().withHeight(th));
-		} else
+			if(useViewport) container.setSize(getWidth(),th);
+			else this->setSize(getWidth(), jmax<int>(th,50));
+		} else if(defaultLayout == HORIZONTAL)
 		{
 			float tw = 0;
 			if (itemsUI.size() > 0) tw = static_cast<BaseItemMinimalUI<T>*>(itemsUI[itemsUI.size() - 1])->getRight();
 			if (grabbingItem != nullptr) tw = jmax<int>(tw, viewport.getWidth());
-			container.setBounds(getLocalBounds().withWidth(tw));
+			if (useViewport) container.setSize(tw,getHeight());
+			else this->setSize(tw, getHeight());
 		}		
-	}
+	} 
 }
 
 template<class M, class T, class U>

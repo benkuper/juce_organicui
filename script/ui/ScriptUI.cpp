@@ -1,15 +1,15 @@
 /*
   ==============================================================================
 
-    ScriptEditor.cpp
+    ScriptUI.cpp
     Created: 20 Feb 2017 5:04:20pm
     Author:  Ben
 
   ==============================================================================
 */
 
-ScriptEditor::ScriptEditor(Script * _script, bool isRoot) :
-	BaseItemEditor(_script,isRoot),
+ScriptUI::ScriptUI(Script * _script) :
+	BaseItemUI<Script>(_script),
 	script(_script),
 	editMode(false)
 {
@@ -33,14 +33,14 @@ ScriptEditor::ScriptEditor(Script * _script, bool isRoot) :
 	addAndMakeVisible(logUI);
 }
 
-ScriptEditor::~ScriptEditor()
+ScriptUI::~ScriptUI()
 {
 	script->removeAsyncScriptListener(this);
 }
 
-void ScriptEditor::paint(Graphics & g)
+void ScriptUI::paint(Graphics & g)
 {
-	BaseItemEditor::paint(g);
+	BaseItemUI::paint(g);
 	Colour c = BG_COLOR;
 	switch (script->state)
 	{
@@ -62,7 +62,7 @@ void ScriptEditor::paint(Graphics & g)
 	g.fillEllipse(statusBounds.reduced(2).toFloat());
 }
 
-void ScriptEditor::resizedInternalHeader(Rectangle<int>& r)
+void ScriptUI::resizedInternalHeader(Rectangle<int>& r)
 {
 	statusBounds = r.removeFromRight(r.getHeight());
 	r.removeFromRight(2);
@@ -76,7 +76,7 @@ void ScriptEditor::resizedInternalHeader(Rectangle<int>& r)
 	r.removeFromRight(2);
 }
 
-void ScriptEditor::resizedInternalContent(Rectangle<int>& r)
+void ScriptUI::resizedInternalContent(Rectangle<int>& r)
 {
 	if (script->state != Script::SCRIPT_CLEAR && paramsEditor->isVisible() )
 	{
@@ -91,7 +91,7 @@ void ScriptEditor::resizedInternalContent(Rectangle<int>& r)
 }
 
 
-void ScriptEditor::newMessage(const Script::ScriptEvent & e)
+void ScriptUI::newMessage(const Script::ScriptEvent & e)
 {
 	switch (e.type)
 	{
@@ -107,9 +107,9 @@ void ScriptEditor::newMessage(const Script::ScriptEvent & e)
 	}
 }
 
-void ScriptEditor::buttonClicked(Button * b)
+void ScriptUI::buttonClicked(Button * b)
 {
-	BaseItemEditor::buttonClicked(b);
+	BaseItemUI::buttonClicked(b);
 	if (b == fileBT)
 	{
 		FileChooser chooser("Load a cacahuete");

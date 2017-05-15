@@ -69,8 +69,6 @@ public:
 	void addAsyncCoalescedScriptListener(AsyncListener* newListener) { scriptAsyncNotifier.addAsyncCoalescedListener(newListener); }
 	void removeAsyncScriptListener(AsyncListener* listener) { scriptAsyncNotifier.removeListener(listener); }
 
-	InspectableEditor * getEditor(bool isRoot) override;
-
 	//Script functions
 	static var logFromScript(const var::NativeFunctionArgs &args);
 

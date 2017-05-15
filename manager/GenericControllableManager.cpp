@@ -1,3 +1,4 @@
+#include "GenericControllableManager.h"
 /*
   ==============================================================================
 
@@ -21,11 +22,13 @@ GenericControllableManager::~GenericControllableManager()
 {
 }
 
-void GenericControllableManager::addItemFromData(var data, bool fromUndoableAction)
+InspectableEditor * GenericControllableManager::getEditor(bool isRoot)
 {
-	
+	BaseManagerUI<GenericControllableManager, GenericControllableItem,GenericControllableItemUI> * ui = new BaseManagerUI<GenericControllableManager, GenericControllableItem, GenericControllableItemUI>(niceName, this, false);
+	ui->drawContour = true;
+	ui->addExistingItems();
+	return new GenericComponentEditor(this, ui, isRoot);
 }
-
 
 GenericControllableManagerFactory::GenericControllableManagerFactory()
 {

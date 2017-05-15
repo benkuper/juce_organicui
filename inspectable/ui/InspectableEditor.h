@@ -29,5 +29,18 @@ public:
 };
 
 
+class GenericComponentEditor :
+	public InspectableEditor
+{
+public:
+	GenericComponentEditor(WeakReference<Inspectable> inspectable, Component * c, bool isRoot);
+	~GenericComponentEditor();
+
+	ScopedPointer<Component> child;
+
+	void resized() override;
+	void childBoundsChanged(Component * c) override;
+};
+
 
 #endif  // INSPECTABLEEDITOR_H_INCLUDED

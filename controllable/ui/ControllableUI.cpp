@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    ControllableUI.cpp
-    Created: 9 Mar 2016 12:02:16pm
-    Author:  bkupe
+	ControllableUI.cpp
+	Created: 9 Mar 2016 12:02:16pm
+	Author:  bkupe
 
   ==============================================================================
 */
@@ -12,21 +12,22 @@ ControllableUI::ControllableUI(Controllable * controllable) :
 	controllable(controllable),
 	showLabel(true),
 	opaqueBackground(false),
-forceFeedbackOnly(controllable->isControllableFeedbackOnly)
+	showMenuOnRightClick(true),
+	forceFeedbackOnly(controllable->isControllableFeedbackOnly)
 {
-    jassert(controllable!=nullptr);
-    updateTooltip();
-    controllable->addControllableListener(this);
+	jassert(controllable != nullptr);
+	updateTooltip();
+	controllable->addControllableListener(this);
 
 
 	setEnabled(controllable->enabled);
-	setInterceptsMouseClicks(controllable->enabled,controllable->enabled);
+	setInterceptsMouseClicks(controllable->enabled, controllable->enabled);
 
 }
 
 ControllableUI::~ControllableUI()
 {
-    if(controllable.get())controllable->removeControllableListener(this);
+	if (controllable.get())controllable->removeControllableListener(this);
 }
 
 
@@ -34,38 +35,49 @@ void ControllableUI::mouseDown(const MouseEvent & e)
 {
 	if (e.mods.isRightButtonDown())
 	{
-		ScopedPointer<PopupMenu> p = new PopupMenu();
-		addPopupMenuItems(p);
-		p->addSeparator();
-		p->addItem(-3, "Show Edit Window");
-		p->addSeparator();
-		p->addItem(-1, "Copy OSC Control Address");
-		p->addItem(-2, "Copy Script Control Address");
+		if (showMenuOnRightClick)
+		{
+			ScopedPointer<PopupMenu> p = new PopupMenu();
+			addPopupMenuItems(p);
 
-		int result = p->show();
-		if (result > 0)
-		{
-			handleMenuSelectedID(result);
-		} else if(result < 0)
-		{
-			switch (result)
+			if (controllable->isEditable && !controllable->isControllableFeedbackOnly)
 			{
-			case -1:
-				SystemClipboard::copyTextToClipboard(controllable->controlAddress);
-				break;
-			case -2:
-				SystemClipboard::copyTextToClipboard("root" + controllable->controlAddress.replaceCharacter('/', '.'));
-				break;
+				p->addSeparator();
+				p->addItem(-3, "Show Edit Window");
+			}
+	
+			if (controllable->includeInScriptObject)
+			{
+				p->addSeparator();
+				p->addItem(-1, "Copy OSC Control Address");
+				p->addItem(-2, "Copy Script Control Address");
+			}
 
-			case -3:
-				showEditWindow();
-				break;
-			default:
-				DBG("Not handled : " << result);
+			if (p->getNumItems() == 0) return;
+
+			int result = p->show();
+			if (result > 0)
+			{
+				handleMenuSelectedID(result);
+			} else if (result < 0)
+			{
+				switch (result)
+				{
+				case -1:
+					SystemClipboard::copyTextToClipboard(controllable->controlAddress);
+					break;
+				case -2:
+					SystemClipboard::copyTextToClipboard("root" + controllable->controlAddress.replaceCharacter('/', '.'));
+					break;
+
+				case -3:
+					showEditWindow();
+					break;
+				default:
+					DBG("Not handled : " << result);
+				}
 			}
 		}
-		
-
 	} else
 	{
 		mouseDownInternal(e);
@@ -94,13 +106,13 @@ void ControllableUI::setForceFeedbackOnly(bool value)
 void ControllableUI::controllableStateChanged(Controllable * c)
 {
 	setEnabled(c->enabled);
-    setAlpha(c->enabled ? 1 : .5f);
+	setAlpha(c->enabled ? 1 : .5f);
 	setInterceptsMouseClicks(controllable->enabled, controllable->enabled);
 }
 
 void ControllableUI::controllableControlAddressChanged(Controllable *)
 {
-    updateTooltip();
+	updateTooltip();
 }
 
 void ControllableUI::updateTooltip()
@@ -111,10 +123,10 @@ void ControllableUI::updateTooltip()
 	{
 		tooltip += " (" + controllable->argumentsDescription + ")";
 		if (((Parameter *)controllable.get())->isEditable == false) readOnly = true;
-		
+
 	}
 	if (controllable->isControllableFeedbackOnly) readOnly = true;
 	if (readOnly) tooltip += " (read only)";
 
-    setTooltip(tooltip);
+	setTooltip(tooltip);
 }

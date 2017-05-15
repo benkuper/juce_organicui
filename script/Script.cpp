@@ -172,11 +172,6 @@ void Script::timerCallback()
 	if (!result) stopTimer();
 }
 
-InspectableEditor * Script::getEditor(bool isRoot)
-{
-	return new ScriptEditor(this, isRoot);
-}
-
 var Script::logFromScript(const var::NativeFunctionArgs & args)
 {
 	Script * s = ScriptTarget::getObjectFromJS<Script>(args);

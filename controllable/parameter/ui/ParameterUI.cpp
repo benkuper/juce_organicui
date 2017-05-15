@@ -79,16 +79,21 @@ void ParameterUI::paintOverChildren(Graphics & g)
 
 void ParameterUI::addPopupMenuItems(PopupMenu * p)
 {
-	p->addItem(1, "Reset value");
-
-	if (!parameter->lockManualControlMode && parameter->isEditable && !parameter->isControllableFeedbackOnly)
+	if (parameter->isEditable && !parameter->isControllableFeedbackOnly)
 	{
-		PopupMenu controlModeMenu;
-		controlModeMenu.addItem(10, "Manual");
-		controlModeMenu.addItem(11, "Expression");
-		//controlModeMenu.addItem(12, "Reference");
-		p->addSubMenu("Control Mode", controlModeMenu);
+		p->addItem(1, "Reset value");
+
+		if (!parameter->lockManualControlMode)
+		{
+			PopupMenu controlModeMenu;
+			controlModeMenu.addItem(10, "Manual");
+			controlModeMenu.addItem(11, "Expression");
+			//controlModeMenu.addItem(12, "Reference");
+			p->addSubMenu("Control Mode", controlModeMenu);
+		}
 	}
+	
+	
 
 }
 

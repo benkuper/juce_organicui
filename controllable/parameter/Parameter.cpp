@@ -14,7 +14,6 @@ Parameter::Parameter(const Type &type, const String &niceName, const String &des
 	Controllable(type, niceName, description, enabled),
 	lockManualControlMode(false),
 	controlMode(MANUAL),
-	isEditable(true),
 	isPresettable(true),
 	isOverriden(false),
 	autoAdaptRange(false),
@@ -203,7 +202,7 @@ var Parameter::getJSONDataInternal()
 	data.getDynamicObject()->setProperty("minValue", minimumValue);
 	data.getDynamicObject()->setProperty("maxValue", maximumValue);
 	data.getDynamicObject()->setProperty("controlMode", controlMode);
-	data.getDynamicObject()->setProperty("expression", controlExpression);
+	if(controlMode == EXPRESSION) data.getDynamicObject()->setProperty("expression", controlExpression);
 	return data;
 }
 

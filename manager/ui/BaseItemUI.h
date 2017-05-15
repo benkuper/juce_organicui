@@ -103,9 +103,6 @@ public:
 	void removeItemUIListener(ItemUIListener* listener) { itemUIListeners.remove(listener); }
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BaseItemUI<T>)
-
-    friend class BaseItemMinimalUI<T>;
-
 };
 
 
