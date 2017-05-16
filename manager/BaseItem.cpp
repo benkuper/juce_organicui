@@ -119,7 +119,7 @@ var BaseItem::getJSONData()
 {
 	var data = ControllableContainer::getJSONData();
 	if (canHaveScripts) data.getDynamicObject()->setProperty("scripts", scriptManager->getJSONData());
-
+	if (canHaveCustomParameters) data.getDynamicObject()->setProperty("params", customParams->getJSONData());
 	return data; 
 }
 
@@ -127,6 +127,7 @@ void BaseItem::loadJSONDataInternal(var data)
 {
 	ControllableContainer::loadJSONDataInternal(data);
 	if (canHaveScripts) scriptManager->loadJSONData(data.getProperty("scripts",var()));
+	if (canHaveCustomParameters) customParams->loadJSONData(data.getProperty("params", var()));
 }
 
 InspectableEditor * BaseItem::getEditor(bool isRoot)
