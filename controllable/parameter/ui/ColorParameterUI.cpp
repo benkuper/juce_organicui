@@ -1,3 +1,4 @@
+#include "ColorParameterUI.h"
 /*
   ==============================================================================
 
@@ -12,7 +13,8 @@
 ColorParameterUI::ColorParameterUI(ColorParameter * parameter) :
 	ParameterUI(parameter),
 	colorParam(parameter),
-	dispatchOnRightClickOnly(true)
+	dispatchOnSingleClick(false),
+	dispatchOnDoubleClick(true)
 {
 
 
@@ -36,10 +38,12 @@ void ColorParameterUI::resized()
 
 void ColorParameterUI::mouseDownInternal(const MouseEvent & e)
 {
-	if (!dispatchOnRightClickOnly)
-	{
-		showEditWindow();
-	}
+	if (dispatchOnSingleClick) showEditWindow();
+}
+
+void ColorParameterUI::mouseDoubleClick(const MouseEvent & e)
+{
+	if (dispatchOnDoubleClick && !dispatchOnSingleClick) showEditWindow();
 }
 
 void ColorParameterUI::showEditWindow()

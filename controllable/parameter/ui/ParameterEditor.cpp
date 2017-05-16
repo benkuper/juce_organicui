@@ -81,7 +81,6 @@ void ParameterEditor::updateUI()
 	}
 
 	setSize(getWidth(), baseHeight + subContentHeight);
-	resized();
 }
 
 void ParameterEditor::parameterControlModeChanged(Parameter *)

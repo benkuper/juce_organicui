@@ -23,11 +23,13 @@ public:
 
 	ColorParameter * colorParam;
 
-	bool dispatchOnRightClickOnly;
+	bool dispatchOnDoubleClick;
+	bool dispatchOnSingleClick;
 
 	void paint(Graphics &g) override;
 	void resized() override;
 	void mouseDownInternal(const MouseEvent &e) override;
+	void mouseDoubleClick(const MouseEvent &e) override;
 
 	void showEditWindow() override;
 

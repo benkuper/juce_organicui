@@ -29,11 +29,18 @@ void GenericControllableItemUI::resizedInternalHeader(Rectangle<int>& r)
 
 void GenericControllableItemUI::resizedInternalContent(Rectangle<int>& r)
 {
+	
 	r.setHeight(cui->getHeight());
 	cui->setBounds(r);
 }
 
 void GenericControllableItemUI::childBoundsChanged(Component * child)
 {
-	if (child == cui) resized();
+	if (child == cui)
+	{
+		int contentHeight = getHeight() - getHeightWithoutContent();
+		if (contentHeight == cui->getHeight()) return;
+
+		setContentSize(getWidth(), cui->getHeight());
+	}
 }
