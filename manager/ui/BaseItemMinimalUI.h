@@ -68,7 +68,7 @@ BaseItemMinimalUI<T>::BaseItemMinimalUI(T * _item) :
 	addMouseListener(this, true);
 	baseItem->addAsyncContainerListener(this);
 	
-	if (dimAlphaOnDisabled) setAlpha(baseItem->enabled ? 1 : .5f);
+	if (dimAlphaOnDisabled) setAlpha(baseItem->enabled->boolValue() ? 1 : .5f);
 
 	setSize(100, 20);
 }
@@ -132,7 +132,7 @@ void BaseItemMinimalUI<T>::newMessage(const ContainerAsyncEvent & e)
 	{
 		if (e.targetControllable == baseItem->enabled)
 		{
-			if(dimAlphaOnDisabled) setAlpha(baseItem->enabled ? 1 : .5f);
+			if(dimAlphaOnDisabled) setAlpha(baseItem->enabled->boolValue() ? 1 : .5f);
 			repaint();
 		}
 
