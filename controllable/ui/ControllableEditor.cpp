@@ -13,8 +13,8 @@ ControllableEditor::ControllableEditor(Controllable * _controllable, bool isRoot
 	InspectableEditor(_controllable, isRoot),
 	controllable(_controllable),
 	label("Label"),
-	showLabel(true),
-	subContentHeight(0)
+    subContentHeight(0),
+    showLabel(true)
 {
 	ui = controllable->createDefaultUI();
 	ui->showLabel = false;

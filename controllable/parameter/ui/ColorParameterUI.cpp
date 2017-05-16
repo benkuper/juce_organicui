@@ -12,9 +12,10 @@
 
 ColorParameterUI::ColorParameterUI(ColorParameter * parameter) :
 	ParameterUI(parameter),
-	colorParam(parameter),
-	dispatchOnSingleClick(false),
-	dispatchOnDoubleClick(true)
+    colorParam(parameter),
+    dispatchOnDoubleClick(true),
+	dispatchOnSingleClick(false)
+
 {
 
 
