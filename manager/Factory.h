@@ -30,6 +30,7 @@ public:
 			createFunc(createFunc)
 		{
 			params = var(new DynamicObject());
+			params.getDynamicObject()->setProperty("type", type);
 		}
 
 		static Definition * createDef(const String &menu, const String &type, std::function<T*(var)> createFunc)

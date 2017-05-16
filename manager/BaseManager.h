@@ -282,7 +282,7 @@ void BaseManager<T>::addItemFromData(var data, bool fromUndoableAction)
 { 
 	if (managerFactory != nullptr)
 	{
-		String type = data.getProperty("type", "none");
+		String type = data.getProperty("type", "");
 		if (type.isEmpty()) return;
 		T * i = managerFactory->create(type);
 		if (i != nullptr) addItem(i, data, fromUndoableAction);

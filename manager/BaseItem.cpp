@@ -118,6 +118,7 @@ void BaseItem::onContainerNiceNameChanged()
 var BaseItem::getJSONData()
 {
 	var data = ControllableContainer::getJSONData();
+	data.getDynamicObject()->setProperty("type", getTypeString());
 	if (canHaveScripts) data.getDynamicObject()->setProperty("scripts", scriptManager->getJSONData());
 	if (canHaveCustomParameters) data.getDynamicObject()->setProperty("params", customParams->getJSONData());
 	return data; 

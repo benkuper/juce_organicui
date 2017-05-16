@@ -22,6 +22,9 @@ public:
 
 	void onContainerNiceNameChanged() override;
 
+	String typeAtCreation;
+	virtual String getTypeString() const override { return typeAtCreation; }
+
 	static GenericControllableItem * create(var params) { return new GenericControllableItem(params); }
 };
 

@@ -13,8 +13,12 @@
 GenericControllableItem::GenericControllableItem(var params) :
 	BaseItem("Item",false)
 {
+	typeAtCreation = params.getProperty("type", "");
+
 	controllable = ControllableFactory::createControllable(params.getProperty("controllableType",""));
 	controllable->description = "Custom control of type " + controllable->getTypeString();
+	controllable->saveValueOnly = false;
+	controllable->isCustomizableByUser = true;
 
 	jassert(controllable != nullptr);
 
