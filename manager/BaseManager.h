@@ -271,8 +271,9 @@ T * BaseManager<T>::addItem(T * item, var data, bool /*fromUndoableAction*/)
 template<class T>
 T * BaseManager<T>::addItem(const Point<float> initialPosition)
 {
-	T * i = addItem();
+	T * i = createItem();
 	i->viewUIPosition->setPoint(initialPosition);
+	addItem(i);
 	return i;
 }
 

@@ -25,9 +25,13 @@ public:
 						   //interaction
 	Point<int> initViewOffset;
 
+	const int defaultCheckerSize = 32;
+	float viewZoom;
+
 	virtual void mouseDown(const MouseEvent &e) override;
 	virtual void mouseDrag(const MouseEvent &e) override;
 	virtual void mouseUp(const MouseEvent &e) override;
+	void mouseWheelMove(const MouseEvent &e, const MouseWheelDetails &d) override;
 	virtual bool keyPressed(const KeyPress &e) override;
 
 	virtual void paint(Graphics &g) override;
@@ -54,7 +58,8 @@ public:
 
 template<class M, class T, class U>
 BaseManagerViewUI<M, T, U>::BaseManagerViewUI(const String & contentName, M * _manager) :
-	BaseManagerUI<M, T, U>(contentName,_manager,false)
+	BaseManagerUI<M, T, U>(contentName, _manager, false),
+	viewZoom(1)
 {
 	this->resizeOnChildBoundsChanged = false;
 	this->bgColor = BG_COLOR.darker(.3f);
@@ -99,6 +104,16 @@ void BaseManagerViewUI<M, T, U>::mouseUp(const MouseEvent & e)
 }
 
 template<class M, class T, class U>
+inline void BaseManagerViewUI<M, T, U>::mouseWheelMove(const MouseEvent & e, const MouseWheelDetails & d)
+{
+	/*
+	viewZoom = jlimit<float>(.1f, 10, viewZoom + d.deltaY);
+	resized();
+	repaint();
+	*/
+}
+
+template<class M, class T, class U>
 bool BaseManagerViewUI<M, T, U>::keyPressed(const KeyPress & e)
 {
 	if (BaseManagerUI<M, T, U>::keyPressed(e)) return true;
@@ -119,7 +134,8 @@ bool BaseManagerViewUI<M, T, U>::keyPressed(const KeyPress & e)
 template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::paint(Graphics & g)
 {
-	int checkerSize = 32;
+	int checkerSize = defaultCheckerSize*viewZoom;
+
 	int checkerTX = -checkerSize * 2 + ((this->getWidth() / 2 + viewOffset.x) % (checkerSize * 2));
 	int checkerTY = -checkerSize * 2 + ((this->getHeight() / 2 + viewOffset.y) % (checkerSize * 2));
 	juce::Rectangle<int> checkerBounds(checkerTX, checkerTY, this->getWidth() + checkerSize * 4, this->getHeight() + checkerSize * 4);
@@ -146,9 +162,10 @@ void BaseManagerViewUI<M, T, U>::resized()
 
 template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::updateViewUIPosition(U * se)
-{
-	Point<int> pe = getSize()*se->item->viewUIPosition->getPoint();
-	pe += getSize() / 2; //position at center of window
+{	
+	Point<int> pe = se->item->viewUIPosition->getPoint().toInt() * viewZoom;
+	
+	pe += getSize()/2; //position at center of window
 	pe += viewOffset;
 	se->setTopLeftPosition(pe.x, pe.y);
 }
@@ -156,7 +173,7 @@ void BaseManagerViewUI<M, T, U>::updateViewUIPosition(U * se)
 template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::addItemFromMenu(bool isFromAddButton, Point<int> mouseDownPos)
 {
-	this->manager->addItem(getViewPos(mouseDownPos).toFloat() / getSize());
+	this->manager->addItem(getViewPos(mouseDownPos).toFloat()/viewZoom);
 }
 
 template<class M, class T, class U>

@@ -16,6 +16,7 @@ ShapeShifterManager::ShapeShifterManager() :
 	currentCandidatePanel(nullptr),
 	defaultFileData(nullptr)
 {
+	
 }
 
 ShapeShifterManager::~ShapeShifterManager()

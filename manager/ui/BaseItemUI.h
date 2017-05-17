@@ -48,6 +48,8 @@ public:
 
     ScopedPointer<ResizableCornerComponent> cornerResizer;
     ScopedPointer<ResizableEdgeComponent> edgeResizer;
+	ComponentBoundsConstrainer constrainer;
+
     Component * resizer;
 
 	ScopedPointer<StringParameterUI> nameUI;
@@ -153,28 +155,31 @@ BaseItemUI<T>::BaseItemUI(T * _item, ResizeMode _resizeMode, bool _canBeDragged)
 		break;
 
 	case VERTICAL:
-		edgeResizer = new ResizableEdgeComponent(this, nullptr, ResizableEdgeComponent::bottomEdge);
+		resizerHeight = 4;
+		constrainer.setMinimumHeight(headerHeight + headerGap + minContentHeight + resizerHeight);
+		edgeResizer = new ResizableEdgeComponent(this, &constrainer, ResizableEdgeComponent::bottomEdge);
 		edgeResizer->setAlwaysOnTop(true);
 		this->addAndMakeVisible(edgeResizer);
-		resizerHeight = 4;
 		//resizer = edgeResizer;
 		//setContentSize(getWidth(),(int)item->listUISize->floatValue());
 		break;
 
 	case HORIZONTAL:
-		edgeResizer = new ResizableEdgeComponent(this, nullptr, ResizableEdgeComponent::rightEdge);
+		resizerWidth = 4;
+		constrainer.setMinimumWidth(20+resizerWidth); // ??
+		edgeResizer = new ResizableEdgeComponent(this, &constrainer, ResizableEdgeComponent::rightEdge);
 		edgeResizer->setAlwaysOnTop(true);
 		this->addAndMakeVisible(edgeResizer);
-		resizerWidth = 4;
 		//resizer = edgeResizer;
 		//setContentSize((int)item->listUISize->floatValue(),getHeight());
 		break;
 
 	case ALL:
-		cornerResizer = new ResizableCornerComponent(this, nullptr);
+		resizerHeight = 10;
+		constrainer.setMinimumSize(resizerWidth + 20, headerHeight + headerGap + minContentHeight + resizerHeight);
+		cornerResizer = new ResizableCornerComponent(this, &constrainer);
 		cornerResizer->setAlwaysOnTop(true);
 		this->addAndMakeVisible(cornerResizer);
-		resizerHeight = 10;
 		//resizer = cornerResizer;
 		//setContentSize((int)item->viewUISize->getPoint().x, (int)item->viewUISize->getPoint().y);
 		break;
@@ -213,7 +218,7 @@ void BaseItemUI<T>::updateMiniModeUI()
 		if (resizer != nullptr) this->removeChildComponent(resizer);
 
 		int targetHeight = getHeightWithoutContent();
-		this->setSize(this->getWidth(), targetHeight);
+		this->setSize((int)this->baseItem->viewUISize->getPoint().x, targetHeight);
 	} else
 	{
 		if (resizer != nullptr) this->addAndMakeVisible(resizer);
@@ -246,11 +251,13 @@ void BaseItemUI<T>::updateMiniModeUI()
 template<class T>
 void BaseItemUI<T>::resized()
 {
+	/*
 	if (this->getHeight() < getHeightWithoutContent() + minContentHeight)
 	{
 		this->setSize(this->getWidth(), getHeightWithoutContent() + minContentHeight);
 		return;
 	}
+	*/
 
 	//Header
 	juce::Rectangle<int> r = this->getLocalBounds().reduced(margin);
@@ -359,7 +366,7 @@ void BaseItemUI<T>::mouseDrag(const MouseEvent & e)
 
 		if (resizeMode == ALL)
 		{
-			Point<float> targetPos = posAtMouseDown + e.getOffsetFromDragStart().toFloat() / Point<float>((float)this->getParentComponent()->getWidth(), (float)this->getParentComponent()->getHeight());
+			Point<float> targetPos = posAtMouseDown + e.getOffsetFromDragStart().toFloat();
 			this->baseItem->viewUIPosition->setPoint(targetPos);
 		} else
 		{

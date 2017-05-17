@@ -37,7 +37,6 @@ void ShapeShifterContainer::insertShifterAt(ShapeShifter * shifter, int index, b
 		gg->addGrabberListener(this);
 	}
 
-	DBG("Insert shifter at : " << shifter->getPreferredWidth());
 	if(resizeAfter) resized();
 }
 
@@ -170,6 +169,8 @@ void ShapeShifterContainer::resized()
 
 	if (parentContainer == nullptr && shifters.size() == 1) //Main container, only one item
 	{
+		setPreferredWidth(getWidth());
+		setPreferredHeight(getHeight());
 		shifters[0]->setBounds(getLocalBounds());
 		return;
 	}
@@ -181,6 +182,8 @@ void ShapeShifterContainer::resized()
 
 	int numFlexibleShifters = 0;
 	int totalSpacePreferred = 0;
+
+	
 	for (auto &p : shifters)
 	{
 		if (p->isFlexible()) numFlexibleShifters++;

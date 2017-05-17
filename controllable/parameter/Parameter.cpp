@@ -213,8 +213,8 @@ void Parameter::loadJSONDataInternal(var data)
 	if (!saveValueOnly) setRange(data.getProperty("minValue", minimumValue), data.getProperty("maxValue", maximumValue));
 	if (data.getDynamicObject()->hasProperty("value")) setValue(data.getProperty("value", 0));
 
-	if (data.getDynamicObject()->hasProperty("controlMode")) controlMode = (ControlMode)(int)data.getProperty("controlMode", MANUAL);
-	if (data.getDynamicObject()->hasProperty("expression")) controlExpression = data.getProperty("expression", "");
+	if (data.getDynamicObject()->hasProperty("controlMode")) setControlMode((ControlMode)(int)data.getProperty("controlMode", MANUAL));
+	if (data.getDynamicObject()->hasProperty("expression")) setControlExpression(data.getProperty("expression", ""));
 
 }
 
