@@ -198,11 +198,12 @@ var Parameter::getJSONDataInternal()
 {
 	var data = Controllable::getJSONDataInternal();
 	data.getDynamicObject()->setProperty("value", value);
+	data.getDynamicObject()->setProperty("controlMode", controlMode);
+	if (controlMode == EXPRESSION) data.getDynamicObject()->setProperty("expression", controlExpression);
+	
 	if (saveValueOnly) return data;
 	data.getDynamicObject()->setProperty("minValue", minimumValue);
 	data.getDynamicObject()->setProperty("maxValue", maximumValue);
-	data.getDynamicObject()->setProperty("controlMode", controlMode);
-	if(controlMode == EXPRESSION) data.getDynamicObject()->setProperty("expression", controlExpression);
 	return data;
 }
 
