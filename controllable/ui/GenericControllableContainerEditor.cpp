@@ -48,6 +48,13 @@ GenericControllableContainerEditor::~GenericControllableContainerEditor()
 void GenericControllableContainerEditor::clear()
 {
 	//
+	for(auto &c : childEditors)
+	{
+		removeChildComponent(c);
+	}
+
+	childEditors.clear();
+		
 }
 
 void GenericControllableContainerEditor::resetAndBuild()
@@ -70,6 +77,7 @@ void GenericControllableContainerEditor::resetAndBuild()
 			if(!cc->hideInEditor) addEditorUI(cc);
 		}
 	}
+
 }
 
 
