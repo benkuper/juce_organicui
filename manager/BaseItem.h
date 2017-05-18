@@ -39,6 +39,10 @@ public :
 	ScopedPointer<ScriptManager> scriptManager;
 	ScopedPointer<GenericControllableManager> customParams;
 
+	void duplicate();
+	void copy();
+	void paste();
+
 	void remove();
 	virtual void clear() {}
 
@@ -62,7 +66,10 @@ public :
 		/** Destructor. */
 		virtual ~Listener() {}
 		virtual void askForRemoveBaseItem(BaseItem *) {}
+		virtual void askForDuplicateItem(BaseItem *) {}
+		virtual void askForPaste() {}
 	};
+
 
 	ListenerList<Listener> baseItemListeners;
 	void addBaseItemListener(Listener* newListener) { baseItemListeners.add(newListener); }

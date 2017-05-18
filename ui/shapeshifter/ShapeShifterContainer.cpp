@@ -171,6 +171,8 @@ void ShapeShifterContainer::resized()
 	{
 		setPreferredWidth(getWidth());
 		setPreferredHeight(getHeight());
+		shifters[0]->setPreferredWidth(getWidth());
+		shifters[0]->setPreferredHeight(getHeight());
 		shifters[0]->setBounds(getLocalBounds());
 		return;
 	}

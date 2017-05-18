@@ -25,11 +25,14 @@ public :
 
 	//Factory
 	Factory<T> * managerFactory;
-
+	
+	bool userCanAddItemsManually;
 	bool selectItemWhenCreated;
 
 	virtual T * createItem(); //to override if special constructor to use
 	virtual void addItemFromData(var data, bool fromUndoableAction = false); //to be overriden for specific item creation (from data)
+	virtual void addItemFromClipboard();
+
 	virtual void loadItemsData(var data);
 
 	T* addItem(T * = nullptr, var data = var(), bool fromUndoableAction = false); //if data is not empty, load data
@@ -49,6 +52,8 @@ public :
 
 	void clear();
 	void askForRemoveBaseItem(BaseItem * item) override;
+	void askForDuplicateItem(BaseItem * item) override;
+	void askForPaste() override;
 
 	var getJSONData() override;
 	void loadJSONDataInternal(var data) override;
@@ -209,7 +214,8 @@ template<class T>
 BaseManager<T>::BaseManager(const String & name) :
 	ControllableContainer(name),
 	managerFactory(nullptr),
-	selectItemWhenCreated(true)
+	selectItemWhenCreated(true),
+	userCanAddItemsManually(true)
 {
 	setCanHavePresets(false);
 	nameCanBeChangedByUser = false;
@@ -249,15 +255,15 @@ T * BaseManager<T>::addItem(T * item, var data, bool /*fromUndoableAction*/)
 	items.add(item);
 	BaseItem * bi = static_cast<BaseItem *>(item);
 	addChildControllableContainer(bi);
-	bi->nameParam->setValue(bi->niceName);
 	bi->addBaseItemListener(this);
 	
 	if (!data.isVoid())
 	{
-		DBG("data non void, loading data"); 
 		bi->loadJSONData(data);
+		bi->nameParam->setValue(getUniqueNameInContainer(bi->niceName)); //force setting a unique name if already taken
 	}
 
+	
 	addItemInternal(item, data);
 	
 	baseManagerListeners.call(&BaseManager::Listener::itemAdded, item);
@@ -291,6 +297,18 @@ void BaseManager<T>::addItemFromData(var data, bool fromUndoableAction)
 	{
 		addItem(createItem(), data, fromUndoableAction);
 	}
+}
+
+template<class T>
+void BaseManager<T>::addItemFromClipboard()
+{
+	if (!userCanAddItemsManually) return;
+	String s = SystemClipboard::getTextFromClipboard();
+	var data = JSON::parse(s);
+	if (data.isVoid()) return;
+
+	if (data.getProperty("itemType", var()).isVoid()) return;
+	addItemFromData(data);
 }
 
 template<class T>
@@ -361,6 +379,19 @@ template<class T>
 void BaseManager<T>::askForRemoveBaseItem(BaseItem * item)
 {
 	removeItem(static_cast<T*>(item));
+}
+
+template<class T>
+void BaseManager<T>::askForDuplicateItem(BaseItem * item)
+{
+	if (!userCanAddItemsManually) return;
+	addItemFromData(item->getJSONData());
+}
+
+template<class T>
+void BaseManager<T>::askForPaste()
+{
+	addItemFromClipboard();
 }
 
 template<class T>

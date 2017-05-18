@@ -17,6 +17,11 @@ class AppUpdater
 public:
 	juce_DeclareSingleton(AppUpdater, true);
 
+	URL updateURL;
+	URL downloadURL;
+
+	void setURLs(URL _updateURL, URL _downloadURL);
+
 	void checkForUpdates();
 };
 

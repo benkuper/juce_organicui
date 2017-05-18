@@ -1,3 +1,4 @@
+#include "AppUpdater.h"
 /*
   ==============================================================================
 
@@ -11,11 +12,17 @@
 
 juce_ImplementSingleton(AppUpdater)
 
+void AppUpdater::setURLs(URL _updateURL, URL _downloadURL)
+{
+	updateURL = _updateURL;  
+	downloadURL = _downloadURL;  
+}
+
 void AppUpdater::checkForUpdates()
 {
-	URL updateURL("http://benjamin.kuperberg.fr/chataigne/releases/update.json");
-	URL downloadURL("http://benjamin.kuperberg.fr/chataigne");
 	
+	if (updateURL.isEmpty() || downloadURL.isEmpty()) return;
+
 	StringPairArray responseHeaders;
 	int statusCode = 0; 
 	ScopedPointer<InputStream> stream(updateURL.createInputStream(false, nullptr, nullptr, String(),

@@ -97,10 +97,26 @@ void BaseItemMinimalUI<T>::mouseExit(const MouseEvent &e)
 template<class T>
 bool BaseItemMinimalUI<T>::keyPressed(const KeyPress & e)
 {
+	DBG("Key press");
 	if (removeOnDelKey && (e.getKeyCode() == e.deleteKey || e.getKeyCode() == e.backspaceKey) && inspectable->isSelected)
 	{
 		baseItem->remove();
 		return true;
+	} else if (e.getModifiers().isCommandDown())
+	{
+		if (e.getKeyCode() == KeyPress::createFromDescription("d").getKeyCode())
+		{	
+			item->duplicate();
+			return true;
+		} else if(e.getKeyCode()  == KeyPress::createFromDescription("c").getKeyCode())
+		{
+			item->copy();
+			return true;
+		} else if (e.getKeyCode() == KeyPress::createFromDescription("v").getKeyCode())
+		{
+			item->paste();
+			return true;
+		}
 	}
 	
 	return false;

@@ -74,6 +74,25 @@ BaseItem::~BaseItem()
 	clear();
 }
 
+void BaseItem::duplicate()
+{
+	baseItemListeners.call(&BaseItem::Listener::askForDuplicateItem, this);
+}
+
+void BaseItem::copy()
+{
+	var data = getJSONData();
+	data.getDynamicObject()->setProperty("itemType", getTypeString());
+	SystemClipboard::copyTextToClipboard(JSON::toString(data));
+	NLOG(niceName, "Copied to clipboard");
+}
+
+void BaseItem::paste()
+{
+	//default behavior can be overriden
+	baseItemListeners.call(&BaseItem::Listener::askForPaste);
+}
+
 void BaseItem::remove()
 {
 	baseItemListeners.call(&BaseItem::Listener::askForRemoveBaseItem, this);

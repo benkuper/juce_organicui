@@ -106,7 +106,7 @@ public:
 
 	void setShowAddButton(bool value);
 
-	virtual void mouseDown(const MouseEvent &e) override;
+	
 	virtual void paint(Graphics &g) override;
 
 	virtual void resized() override;
@@ -117,7 +117,9 @@ public:
 	virtual U * addItemUI(T * item, bool animate = false);
 	virtual U * createUIForItem(T * item);
 	virtual void addItemUIInternal(U *) {}
-
+	
+	virtual void mouseDown(const MouseEvent &e) override;
+	virtual bool keyPressed(const KeyPress &e) override;
 
 	virtual void removeItemUI(T * item);
 	virtual void removeItemUIInternal(U *) {}
@@ -261,6 +263,22 @@ void BaseManagerUI<M, T, U>::mouseDown(const MouseEvent & e)
 	{
 		showMenuAndAddItem(false, e.getEventRelativeTo(this).getMouseDownPosition());
 	}
+}
+
+template<class M, class T, class U>
+bool BaseManagerUI<M, T, U>::keyPressed(const KeyPress & e)
+{
+	if (InspectableContentComponent::keyPressed(e)) return true;
+
+	if (e.getModifiers().isCommandDown())
+	{
+		if(e.getKeyCode() == KeyPress::createFromDescription("v").getKeyCode())
+		{
+			manager->addItemFromClipboard();
+			return true;
+		}
+	}
+	return false;
 }
 
 template<class M, class T, class U>
