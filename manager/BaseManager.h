@@ -214,8 +214,8 @@ template<class T>
 BaseManager<T>::BaseManager(const String & name) :
 	ControllableContainer(name),
 	managerFactory(nullptr),
-	selectItemWhenCreated(true),
-	userCanAddItemsManually(true)
+	userCanAddItemsManually(true),
+    selectItemWhenCreated(true)
 {
 	setCanHavePresets(false);
 	nameCanBeChangedByUser = false;

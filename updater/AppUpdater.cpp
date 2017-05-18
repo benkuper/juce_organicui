@@ -26,11 +26,19 @@ void AppUpdater::checkForUpdates()
 	StringPairArray responseHeaders;
 	int statusCode = 0; 
 	ScopedPointer<InputStream> stream(updateURL.createInputStream(false, nullptr, nullptr, String(),
-		200, // timeout in millisecs
+		2000, // timeout in millisecs
 		&responseHeaders, &statusCode));
-
-	if (statusCode != 200) LOG("Failed to connect, status code = " + String(statusCode)); 
-	else if (stream != nullptr)
+#if JUCE_WINDOWS
+	if (statusCode != 200)
+    {
+        LOG("Failed to connect, status code = " + String(statusCode));
+        return;
+    }
+#endif
+    
+    DBG("AppUpdater:: Status code " << statusCode);
+    
+	if (stream != nullptr)
 	{
 		String content = stream->readEntireStreamAsString();
 		var data = JSON::parse(content);
@@ -59,5 +67,8 @@ void AppUpdater::checkForUpdates()
 			LOG("Error, update file is not valid");
 		}
 		
-	}	
+    }else
+    {
+        LOG("Error while trying to access to the update file");
+    }
 }
