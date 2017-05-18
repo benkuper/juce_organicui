@@ -255,12 +255,12 @@ T * BaseManager<T>::addItem(T * item, var data, bool /*fromUndoableAction*/)
 	items.add(item);
 	BaseItem * bi = static_cast<BaseItem *>(item);
 	addChildControllableContainer(bi);
+	bi->nameParam->setValue(bi->niceName); //force setting a unique name if already taken
 	bi->addBaseItemListener(this);
 	
 	if (!data.isVoid())
 	{
 		bi->loadJSONData(data);
-		bi->nameParam->setValue(getUniqueNameInContainer(bi->niceName)); //force setting a unique name if already taken
 	}
 
 	
