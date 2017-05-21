@@ -36,6 +36,8 @@ public:
 
 	bool checkValueIsTheSame(var oldValue, var newValue) override;
 
+	void loadJSONDataInternal(var data) override;
+
 	static FloatParameter * create() { return new FloatParameter("New Float Parameter", "",0); }
 	virtual String getTypeString() const override { return getTypeStringStatic(); }
 	static String getTypeStringStatic() { return "Float"; }

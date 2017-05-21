@@ -1,3 +1,4 @@
+#include "FloatParameter.h"
 /*
   ==============================================================================
 
@@ -72,5 +73,11 @@ ControllableUI * FloatParameter::createDefaultUI(Controllable * targetControllab
 bool FloatParameter::checkValueIsTheSame(var oldValue, var newValue)
 {
 	return jlimit<float>(minimumValue, maximumValue, newValue) == (float)oldValue;
+}
+
+void FloatParameter::loadJSONDataInternal(var data)
+{
+	Parameter::loadJSONDataInternal(data);
+	if (data.getDynamicObject()->hasProperty("defaultUI")) defaultUI = (UIType)(int)data.getProperty("defaultUI", SLIDER);
 }
 

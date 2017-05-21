@@ -216,7 +216,7 @@ void Parameter::loadJSONDataInternal(var data)
 
 	if (data.getDynamicObject()->hasProperty("controlMode")) setControlMode((ControlMode)(int)data.getProperty("controlMode", MANUAL));
 	if (data.getDynamicObject()->hasProperty("expression")) setControlExpression(data.getProperty("expression", ""));
-
+	if (data.getDynamicObject()->hasProperty("editable")) isEditable = data.getProperty("editable", true);
 }
 
 var Parameter::getValueFromScript(const juce::var::NativeFunctionArgs & a)

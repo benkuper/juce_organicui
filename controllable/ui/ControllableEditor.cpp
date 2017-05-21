@@ -25,7 +25,7 @@ ControllableEditor::ControllableEditor(Controllable * _controllable, bool isRoot
 	label.setJustificationType(Justification::left);
 	label.setFont(label.getFont().withHeight(12));
 	label.setText(controllable->niceName, dontSendNotification);
-
+	label.setTooltip(controllable->niceName+"\n"+controllable->description);
 
 	if (controllable->isRemovableByUser)
 	{
@@ -82,7 +82,7 @@ void ControllableEditor::resized()
 	}
 
 
-	if (showLabel) r = r.removeFromRight(jmin<int>(getWidth() * 2 / 3 - 10, 150));
+	if (showLabel) r = r.removeFromRight(getWidth() * 2 / 3 - 10);
 	ui->setBounds(r);
 
 }

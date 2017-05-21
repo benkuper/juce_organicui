@@ -66,6 +66,10 @@ public:
 };
 
 
-
+class ControllableUtil
+{
+public:
+	static var createDataForParam(const String &type, const String &name, const String &description, var value, var minVal = var(), var maxVal = var(), bool editable = true, bool hiddenInEditor = false);
+};
 
 #endif  // CONTROLLABLEHELPERS_H_INCLUDED
