@@ -16,7 +16,7 @@ class InspectableSelector :
 	public Component
 {
 public:
-	juce_DeclareSingleton(InspectableSelector, true);
+	juce_DeclareSingleton(InspectableSelector, false);
 	InspectableSelector();
 	~InspectableSelector();
 

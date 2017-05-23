@@ -59,6 +59,7 @@ using namespace juce;
 #include "ui/AssetManager.h"
 #include "ui/LookAndFeelOO.h"
 
+#include "engine/EngineListener.h"
 
 #include "helpers/DebugHelpers.h"
 #include "helpers/QueuedNotifier.h"
@@ -130,6 +131,7 @@ using namespace juce;
 #include "progress/ui/ProgressWindow.h"
 
 #include "engine/Engine.h"
+
 
 #include "controllable/preset/PresetChooser.h"
 #include "controllable/preset/PresetManager.h"

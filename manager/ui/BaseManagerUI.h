@@ -53,7 +53,7 @@ class BaseManagerUI :
 	public InspectableContentComponent,
 	public BaseManager<T>::Listener,
 	public ButtonListener,
-	public Engine::EngineListener,
+	public EngineListener,
 	public BaseItemUI<T>::ItemUIListener
 {
 public:

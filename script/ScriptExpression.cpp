@@ -8,6 +8,7 @@ Author:  Ben
 ==============================================================================
 */
 
+
 ScriptExpression::ScriptExpression() :
 	state(EXPRESSION_EMPTY)
 {
@@ -28,6 +29,13 @@ void ScriptExpression::setExpression(const String & newExpression)
 	}
 	
 	expression = newExpression;
+
+	if (Engine::mainEngine->isLoadingFile)
+	{
+		Engine::mainEngine->addEngineListener(this);
+		return;
+	}
+
 	buildEnvironment(); 
 	
 	evaluate();
@@ -77,6 +85,12 @@ void ScriptExpression::setState(ExpressionState newState)
 	state = newState;
 	expressionListeners.call(&Listener::expressionStateChanged, this);
 	//scriptAsyncNotifier.addMessage(new ScriptEvent(ScriptEvent::STATE_CHANGE));
+}
+
+void ScriptExpression::endLoadFile()
+{
+	Engine::mainEngine->removeEngineListener(this);
+	setExpression(expression);
 }
 
 void ScriptExpression::timerCallback()

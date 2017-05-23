@@ -12,7 +12,8 @@ Author:  Ben
 #define EXPRESSION_H_INCLUDED
 
 class ScriptExpression :
-	public Timer
+	public Timer,
+	public EngineListener
 {
 public:
 	ScriptExpression();
@@ -30,6 +31,8 @@ public:
 	void evaluate();
 	void buildEnvironment();
 	void setState(ExpressionState newState);
+
+	void endLoadFile() override;
 
 	class Listener
 	{
