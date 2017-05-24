@@ -806,7 +806,7 @@ void ControllableContainer::updateLiveScriptObjectInternal(DynamicObject * paren
 		if (!cc->includeInScriptObject) continue;
 		if (cc->skipControllableNameInAddress)
 		{
-			cc->updateLiveScriptObject(transferToParent?parent:liveScriptObject);
+			cc->updateLiveScriptObject(transferToParent?parent:(DynamicObject *)liveScriptObject);
 		}else
 		{
 			if (transferToParent) parent->setProperty(cc->shortName, cc->getScriptObject());
