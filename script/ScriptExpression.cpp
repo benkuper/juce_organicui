@@ -16,7 +16,7 @@ ScriptExpression::ScriptExpression() :
 
 ScriptExpression::~ScriptExpression()
 {
-
+	if(Engine::mainEngine != nullptr) Engine::mainEngine->removeEngineListener(this);
 }
 
 void ScriptExpression::setExpression(const String & newExpression)

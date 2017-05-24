@@ -89,9 +89,10 @@ void Engine::loadDocumentAsync(const File & file){
     parseTask->start();
     jsonData = JSON::parse(*is);
     parseTask->end();
-    //loadTask->start();
+
+    loadTask->start();
     loadJSONData(jsonData,loadTask);
-   // loadTask->end();
+	loadTask->end();
 
 
   }// deletes data before launching audio, (data not needed after loaded)
@@ -213,20 +214,19 @@ void Engine::loadJSONData (var data,ProgressTask * loadingTask)
 	if (Outliner::getInstanceWithoutCreating() != nullptr) Outliner::getInstance()->setEnabled(false);
 
 	DynamicObject * d = data.getDynamicObject();
-	/*
-	ProgressTask * presetTask = loadingTask->addTask("presetManager");
-	ProgressTask * moduleManagerTask = loadingTask->addTask("moduleManager");
-	ProgressTask * stateTask = loadingTask->addTask("stateManager");
-	ProgressTask * sequenceTask = loadingTask->addTask("sequenceManager");
-	*/
-
+	
+	ProgressTask * presetTask = loadingTask->addTask("Presets");
+	ProgressTask * dashboardTask = loadingTask->addTask("Dashboard");
 
 	loadJSONDataInternalEngine(data, loadingTask);
 
-	//presetTask->start();
+	presetTask->start();
 	if (d->hasProperty("presetManager")) PresetManager::getInstance()->loadJSONData(d->getProperty("presetManager"));
-	//presetTask->end();
+	presetTask->end();
+	
+	dashboardTask->start();
 	if (d->hasProperty("dashboardManager")) DashboardManager::getInstance()->loadJSONData(d->getProperty("dashboardManager"));
+	dashboardTask->end();
 
 
 	if (InspectableSelectionManager::getInstanceWithoutCreating() != nullptr) InspectableSelectionManager::getInstance()->setEnabled(true); //Re enable editor

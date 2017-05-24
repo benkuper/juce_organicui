@@ -46,13 +46,15 @@ void ProgressWindow::resized()
 	progressUI->setBounds(r.removeFromTop(20));
 }
 void ProgressWindow::startedProgress(ProgressTask * task){
+	DBG("Started progress " << task->getAddress().joinIntoString(" / "));
   titleLabel.setText(task->getAddress().joinIntoString(" / "), NotificationType::dontSendNotification);
 }
 void ProgressWindow::endedProgress(ProgressTask * task) {
-
+	DBG("Ended progress");
 }
 
 void ProgressWindow::newProgress(ProgressTask * task,float advance){
+	DBG("New progress");
   setProgress(task->getNormalizedProgress());
 };
 void ProgressWindow::setProgress(float progress)
