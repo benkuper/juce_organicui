@@ -15,11 +15,13 @@ Engine * Engine::mainEngine = nullptr;
 Engine::Engine(const String & fileName, const String & fileExtension, ApplicationProperties * _appProperties, const String &_appVersion) :
 	ControllableContainer("Root"),
 	FileBasedDocument(fileExtension,
-		"*"+fileExtension,
-		"Load a "+fileName,
-		"Save a "+fileName),
+		"*" + fileExtension,
+		"Load a " + fileName,
+		"Save a " + fileName),
 	appProperties(_appProperties),
-	appVersion(_appVersion)
+	appVersion(_appVersion),
+	isLoadingFile(false),
+	isClearing(false)
 {
 	skipControllableNameInAddress = true;
 
@@ -32,54 +34,72 @@ Engine::Engine(const String & fileName, const String & fileExtension, Applicatio
 	ScriptUtil::getInstance(); //trigger ScriptUtil constructor
 }
 
-Engine::~Engine(){
+Engine::~Engine() {
 
-//delete managers
+	//delete managers
 
-  InspectableSelectionManager::deleteInstance();
- 
-  DashboardManager::deleteInstance();
-  Outliner::deleteInstance();
+	isClearing = true;
 
-  PresetManager::deleteInstance();
-  CustomLogger::deleteInstance();
-  Logger::setCurrentLogger(nullptr);
+	controllableContainerListeners.clear();
+	engineListeners.clear();
 
-  ControllableFactory::deleteInstance();
+	InspectableSelectionManager::deleteInstance();
 
-  ScriptUtil::deleteInstance();
-  ShapeShifterFactory::deleteInstance();
+	DashboardManager::deleteInstance();
+	Outliner::deleteInstance();
 
-  //UndoMaster::deleteInstance();
+	PresetManager::deleteInstance();
+	CustomLogger::deleteInstance();
+	Logger::setCurrentLogger(nullptr);
+
+	ControllableFactory::deleteInstance();
+
+	ScriptUtil::deleteInstance();
+	ShapeShifterFactory::deleteInstance();
+
+	//UndoMaster::deleteInstance();
+
+	Engine::mainEngine = nullptr;
 }
 
-void Engine::parseCommandline(const String & commandLine){
+void Engine::parseCommandline(const String & commandLine) {
 
-  for (auto & c:StringUtil::parseCommandLine(commandLine)){
+	for (auto & c : StringUtil::parseCommandLine(commandLine)) {
 
-    if(c.command== "f"|| c.command==""){
-      if(c.args.size()==0){
-        LOG("no file provided for command : "+c.command);
-        jassertfalse;
-        continue;
-      }
-      String fileArg = c.args[0];
-      if (File::isAbsolutePath(fileArg)) {
-        File f(fileArg);
-        if (f.existsAsFile()) loadDocument(f);
-      }
-      else {
-        NLOG("Engine","File : " << fileArg << " not found.");
-      }
-    }
+		if (c.command == "f" || c.command == "") {
+			if (c.args.size() == 0) {
+				LOG("no file provided for command : " + c.command);
+				jassertfalse;
+				continue;
+			}
+			String fileArg = c.args[0];
+			if (File::isAbsolutePath(fileArg)) {
+				File f(fileArg);
+				if (f.existsAsFile()) loadDocument(f);
+			} else {
+				NLOG("Engine", "File : " << fileArg << " not found.");
+			}
+		}
 
-  }
+	}
 
+}
+
+
+void Engine::childStructureChanged(ControllableContainer * cc)
+{
+	ControllableContainer::childStructureChanged(cc);
+
+	DBG("Engine child structure changed");
+
+	if (isLoadingFile || isClearing) return;
+	DBG("> Engine update live script object");
+	updateLiveScriptObject();
 }
 
 void Engine::clear() {
 
-
+	isClearing = true;
 	if (Outliner::getInstanceWithoutCreating())
 	{
 		Outliner::getInstanceWithoutCreating()->clear();
@@ -94,12 +114,13 @@ void Engine::clear() {
 
 	DashboardManager::getInstance()->clear();
 	PresetManager::getInstance()->clear();
-	
+
 	clearInternal();
 
 	if (Outliner::getInstanceWithoutCreating()) Outliner::getInstanceWithoutCreating()->enabled = true;
 	if (InspectableSelectionManager::getInstanceWithoutCreating()) InspectableSelectionManager::getInstance()->setEnabled(true);
 
+	isClearing = false;
 
-	changed();    //fileDocument
+	changed();    //fileDocument	
 }

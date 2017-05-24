@@ -36,6 +36,7 @@ Controllable::Controllable(const Type &type, const String & niceName, const Stri
 }
 
 Controllable::~Controllable() {
+	DBG("controllable destroy " << niceName);
 	Controllable::masterReference.clear();
 	listeners.call(&Controllable::Listener::controllableRemoved, this);
 }
@@ -52,17 +53,18 @@ void Controllable::setCustomShortName(const String & _shortName)
 {
 	this->shortName = _shortName;
 	hasCustomShortName = true;
+	scriptTargetName = shortName;
 	updateControlAddress();
 	listeners.call(&Listener::controllableNameChanged, this);
-	scriptTargetName = shortName;
+	
 }
 
 void Controllable::setAutoShortName() {
 	hasCustomShortName = false;
 	shortName = StringUtil::toShortName(niceName, replaceSlashesInShortName);
+	scriptTargetName = shortName;
 	updateControlAddress();
 	listeners.call(&Listener::controllableNameChanged, this);
-	scriptTargetName = shortName;
 }
 
 
@@ -83,6 +85,7 @@ void Controllable::setParentContainer(ControllableContainer * container)
 void Controllable::updateControlAddress()
 {
 	this->controlAddress = getControlAddress();
+	this->liveScriptObjectIsDirty = true;
 	listeners.call(&Listener::controllableControlAddressChanged, this);
 }
 
@@ -91,14 +94,10 @@ void Controllable::remove()
 	listeners.call(&Controllable::Listener::askForRemoveControllable, this);
 }
 
-
-DynamicObject * Controllable::createScriptObject(DynamicObject *)
+void Controllable::updateLiveScriptObjectInternal(DynamicObject * parent)
 {
-	DynamicObject * o = ScriptTarget::createScriptObject();
-	o->setProperty("name", shortName);
-	o->setProperty("niceName", niceName);
-	
-	return o;
+	liveScriptObject->setProperty("name", shortName);
+	liveScriptObject->setProperty("niceName", niceName);
 }
 
 
@@ -114,7 +113,6 @@ var Controllable::getJSONData(ControllableContainer * relativeTo)
 	data.getDynamicObject()->setProperty("customizable", isCustomizableByUser);
 	data.getDynamicObject()->setProperty("removable", isRemovableByUser);
 
-	
 	if (hasCustomShortName) data.getDynamicObject()->setProperty("shortName", shortName);
 
 	return data;

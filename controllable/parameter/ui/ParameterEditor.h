@@ -21,7 +21,7 @@ public:
 	ParameterEditor(Parameter * p, bool isRoot, int initHeight = 16);  //Todo : handle full feedback if is root
 	~ParameterEditor();
 
-	Parameter * parameter;
+	WeakReference<Parameter> parameter;
 	ScopedPointer<Label> expressionLabel;
 	ScopedPointer<Label> expressionText;
 

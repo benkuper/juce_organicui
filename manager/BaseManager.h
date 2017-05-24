@@ -58,7 +58,7 @@ public :
 	var getJSONData() override;
 	void loadJSONDataInternal(var data) override;
 
-	DynamicObject * createScriptObject(DynamicObject * = nullptr) override;
+	void updateLiveScriptObjectInternal(DynamicObject * = nullptr) override;
 
 	PopupMenu getItemsMenu(int startID);
 	T * getItemForMenuResultID(int id, int startID);
@@ -421,13 +421,13 @@ void BaseManager<T>::loadJSONDataInternal(var data)
 }
 
 template<class T>
-DynamicObject * BaseManager<T>::createScriptObject(DynamicObject *)
+void BaseManager<T>::updateLiveScriptObjectInternal(DynamicObject *)
 {
-	DynamicObject * o = ControllableContainer::createScriptObject();
+	ControllableContainer::updateLiveScriptObjectInternal();
+
 	var itemsArray = var();
-	for (auto &t : items) itemsArray.append(t->createScriptObject());
-	o->setProperty("items", itemsArray);
-	return o;
+	for (auto &t : items) itemsArray.append(t->getScriptObject());
+	liveScriptObject->setProperty("items", itemsArray);
 }
 
 template<class T>

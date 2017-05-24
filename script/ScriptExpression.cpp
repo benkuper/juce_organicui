@@ -1,3 +1,4 @@
+#include "ScriptExpression.h"
 /*
 ==============================================================================
 
@@ -12,15 +13,26 @@ Author:  Ben
 ScriptExpression::ScriptExpression() :
 	state(EXPRESSION_EMPTY)
 {
+	Engine::mainEngine->addScriptTargetListener(this);
 }
 
 ScriptExpression::~ScriptExpression()
 {
-	if(Engine::mainEngine != nullptr) Engine::mainEngine->removeEngineListener(this);
+	if (Engine::mainEngine != nullptr)
+	{
+		Engine::mainEngine->removeEngineListener(this);
+		Engine::mainEngine->removeScriptTargetListener(this);
+	}
 }
 
 void ScriptExpression::setExpression(const String & newExpression)
 {
+	if (Engine::mainEngine == nullptr)
+	{
+		stopTimer();
+		return;
+	}
+
 	if (newExpression.isEmpty())
 	{
 		stopTimer();
@@ -36,17 +48,19 @@ void ScriptExpression::setExpression(const String & newExpression)
 		return;
 	}
 
-	buildEnvironment(); 
-	
+	buildEnvironment();
 	evaluate();
 
 	if(state != EXPRESSION_ERROR) setState(EXPRESSION_LOADED);
 
 	startTimerHz(30); //30 fps loop time, to do : find a way to loop only when inner value change
+	
 }
 
 void ScriptExpression::evaluate()
 {
+	//DBG("Evaluate, is loading file ? " << (int)Engine::mainEngine->isLoadingFile);
+	
 	Result result = Result::ok();
 	var resultValue = scriptEngine->evaluate(expression,&result);
 
@@ -74,10 +88,10 @@ void ScriptExpression::buildEnvironment()
 	//while (scriptParamsContainer.controllables.size() > 0) scriptParamsContainer.removeControllable(scriptParamsContainer.controllables[0]);
 	//scriptParamsContainer.clear();
 
-	//scriptEngine->registerNativeObject("script", createScriptObject()); //force "script" for this objet
-	//if (parentTarget != nullptr) scriptEngine->registerNativeObject("local", parentTarget->createScriptObject()); //force "local" for the related object
-	if (Engine::mainEngine != nullptr) scriptEngine->registerNativeObject(Engine::mainEngine->scriptTargetName, Engine::mainEngine->createScriptObject());
-	if (ScriptUtil::getInstanceWithoutCreating() != nullptr) scriptEngine->registerNativeObject(ScriptUtil::getInstance()->scriptTargetName, ScriptUtil::getInstance()->createScriptObject());
+	//scriptEngine->registerNativeObject("script", getScriptObject()); //force "script" for this objet
+	//if (parentTarget != nullptr) scriptEngine->registerNativeObject("local", parentTarget->getScriptObject()); //force "local" for the related object
+	if (Engine::mainEngine != nullptr) scriptEngine->registerNativeObject(Engine::mainEngine->scriptTargetName, Engine::mainEngine->getScriptObject());
+	if (ScriptUtil::getInstanceWithoutCreating() != nullptr) scriptEngine->registerNativeObject(ScriptUtil::getInstance()->scriptTargetName, ScriptUtil::getInstance()->getScriptObject());
 }
 
 void ScriptExpression::setState(ExpressionState newState)
@@ -85,6 +99,18 @@ void ScriptExpression::setState(ExpressionState newState)
 	state = newState;
 	expressionListeners.call(&Listener::expressionStateChanged, this);
 	//scriptAsyncNotifier.addMessage(new ScriptEvent(ScriptEvent::STATE_CHANGE));
+}
+
+void ScriptExpression::scriptObjectUpdated(ScriptTarget *)
+{
+	//if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile) return;
+
+	DBG("Script Object updated");
+	buildEnvironment();
+
+	//rebuild and reevaluate
+	//if (state != EXPRESSION_LOADED) return; //should be WAY more optimized than that !
+	//setExpression(expression);
 }
 
 void ScriptExpression::endLoadFile()

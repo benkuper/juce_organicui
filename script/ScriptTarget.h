@@ -17,10 +17,12 @@ const Identifier scriptPtrIdentifier = "_ptr";
 class ScriptTarget
 {
 public:
-	ScriptTarget(const String &name, void * ptr) : 
+	ScriptTarget(const String &name, void * ptr) :
 		thisPtr((int64)ptr),
 		scriptTargetName(name)
 	{
+		scriptObject.setProperty(scriptPtrIdentifier, thisPtr);
+		liveScriptObjectIsDirty = true;
 	}
 
 	virtual ~ScriptTarget() {}
@@ -28,13 +30,45 @@ public:
 	int64 thisPtr;
 	String scriptTargetName;
 	DynamicObject scriptObject;
+	ScopedPointer<DynamicObject> liveScriptObject;
+	bool liveScriptObjectIsDirty;
 
-	virtual DynamicObject * createScriptObject(DynamicObject * /*parent*/ = nullptr) {
-		DynamicObject * o = new DynamicObject(scriptObject);
-		o->setProperty(scriptPtrIdentifier, thisPtr);
-		return o;
+	DynamicObject * getScriptObject()
+	{
+		if (liveScriptObjectIsDirty)
+		{
+			updateLiveScriptObject();
+		}
+
+		return new DynamicObject(*liveScriptObject);
 	}
-	 
+
+	void updateLiveScriptObject(DynamicObject * parent = nullptr)
+	{
+		liveScriptObject = new DynamicObject(scriptObject);
+
+		updateLiveScriptObjectInternal(parent);
+
+		liveScriptObjectIsDirty = false;
+		scriptTargetListeners.call(&ScriptTargetListener::scriptObjectUpdated, this);
+	}
+
+	virtual void updateLiveScriptObjectInternal(DynamicObject * /*parent*/ = nullptr) {}
+
+
+	class ScriptTargetListener
+	{
+	public:
+		virtual ~ScriptTargetListener() {};
+		virtual void scriptObjectUpdated(ScriptTarget *) {};
+	};
+
+	ListenerList<ScriptTargetListener> scriptTargetListeners;
+	void addScriptTargetListener(ScriptTargetListener * l) { scriptTargetListeners.add(l); }
+	void removeScriptTargetListener(ScriptTargetListener * l) { scriptTargetListeners.remove(l); }
+
+
+
 	template<class T>
 	static T* getObjectFromJS(const var::NativeFunctionArgs & a);
 };
@@ -43,7 +77,7 @@ template<class T>
 T * ScriptTarget::getObjectFromJS(const var::NativeFunctionArgs & a) {
 	DynamicObject * d = a.thisObject.getDynamicObject();
 	if (d == nullptr) return nullptr;
-	return reinterpret_cast<T*>((T*)(int64)d->getProperty(scriptPtrIdentifier));
+	return dynamic_cast<T*>((T*)(int64)d->getProperty(scriptPtrIdentifier));
 }
 
 #endif  // SCRIPTTARGET_H_INCLUDED

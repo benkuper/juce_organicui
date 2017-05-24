@@ -13,7 +13,8 @@ Author:  Ben
 
 class ScriptExpression :
 	public Timer,
-	public EngineListener
+	public EngineListener,
+	public ScriptTarget::ScriptTargetListener
 {
 public:
 	ScriptExpression();
@@ -31,6 +32,8 @@ public:
 	void evaluate();
 	void buildEnvironment();
 	void setState(ExpressionState newState);
+
+	void scriptObjectUpdated(ScriptTarget *) override;
 
 	void endLoadFile() override;
 

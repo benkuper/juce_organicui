@@ -76,10 +76,12 @@ using namespace juce;
 #include "inspectable/ui/InspectableSelector.h"
 #include "inspectable/ui/Inspector.h"
 
+
+#include "controllable/ControllableContainerListener.h"
+
 #include "script/ScriptExpression.h"
 
 #include "controllable/Controllable.h"
-#include "controllable/ControllableContainerListener.h"
 
 #include "controllable/ui/ControllableUI.h"
 #include "controllable/ui/ControllableEditor.h"
@@ -195,4 +197,4 @@ using namespace juce;
 
 #include "outliner/Outliner.h"
 
-#endif   // ORGANIC_UI_H_INCLUDED
+#endif   // ORGANIC_UI_H_INCLUDED 

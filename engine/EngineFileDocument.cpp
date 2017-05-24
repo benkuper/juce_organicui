@@ -15,6 +15,7 @@
  */
 
 #include "JuceHeader.h" //for project infos
+#include "Engine.h"
 
 String Engine::getDocumentTitle() {
   if (! getFile().exists())
@@ -53,9 +54,9 @@ Result Engine::loadDocument (const File& file){
   fileLoader->startThread(10);
 #else
   loadDocumentAsync(file);
+  updateLiveScriptObject();
   triggerAsyncUpdate();
 #endif
-
 
   return Result::ok();
 }
@@ -78,8 +79,6 @@ void Engine::loadDocumentAsync(const File & file){
   //    MessageManagerLock ml;
   //  }
   ScopedPointer<InputStream> is( file.createInputStream());
-
-
 
   loadingStartTime =  Time::currentTimeMillis();
   setFile(file);
@@ -111,9 +110,8 @@ void Engine::fileLoaderEnded(){
 }
 
 
-void Engine::handleAsyncUpdate(){
-
-
+void Engine::handleAsyncUpdate()
+{
   isLoadingFile = false;
   if(getFile().exists()){
     setLastDocumentOpened(getFile());
@@ -125,6 +123,7 @@ void Engine::handleAsyncUpdate(){
   engineListeners.call(&EngineListener::endLoadFile);
   NLOG("Engine","Session loaded in " << timeForLoading/1000.0 << "s"); 
 }
+
 
 
 Result Engine::saveDocument (const File& file){

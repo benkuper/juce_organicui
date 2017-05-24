@@ -20,7 +20,7 @@ ParameterEditor::ParameterEditor(Parameter * _parameter, bool isRoot, int initHe
 
 ParameterEditor::~ParameterEditor()
 {
-	parameter->removeParameterListener(this);
+	if(parameter != nullptr && !parameter.wasObjectDeleted()) parameter->removeParameterListener(this);
 }
 
 void ParameterEditor::resized()

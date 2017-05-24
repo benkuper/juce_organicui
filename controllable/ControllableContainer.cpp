@@ -191,6 +191,8 @@ void ControllableContainer::removeControllable(Controllable * c)
 
 void ControllableContainer::notifyStructureChanged() {
 
+	liveScriptObjectIsDirty = true;
+
 	controllableContainerListeners.call(&ControllableContainerListener::childStructureChanged, this);
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ChildStructureChanged, this));
 
@@ -753,7 +755,7 @@ void ControllableContainer::loadJSONData(var data, bool createIfNotThere)
 	loadJSONDataInternal(data);
 }
 
-void ControllableContainer::childStructureChanged(ControllableContainer *)
+void ControllableContainer::childStructureChanged(ControllableContainer * cc)
 {
 	notifyStructureChanged();
 }
@@ -790,38 +792,43 @@ String ControllableContainer::getUniqueNameInContainer(const String & sourceName
 	return resultName;
 }
 
-DynamicObject * ControllableContainer::createScriptObject(DynamicObject * parent) 
-{
+void ControllableContainer::updateLiveScriptObjectInternal(DynamicObject * parent) 
+{	
+	ScriptTarget::updateLiveScriptObjectInternal(parent);
+	
+
 	bool transferToParent = parent != nullptr;
-	
-	DynamicObject * o = transferToParent?nullptr:ScriptTarget::createScriptObject();
-	
 	
 	for (auto &cc : controllableContainers)
 	{
+		if (cc == nullptr || cc.wasObjectDeleted()) continue;
+
 		if (!cc->includeInScriptObject) continue;
-		if (cc->skipControllableNameInAddress) cc->createScriptObject(transferToParent?parent:o);
-		else
+		if (cc->skipControllableNameInAddress)
 		{
-			if (transferToParent) parent->setProperty(cc->shortName, cc->createScriptObject());
-			else o->setProperty(cc->shortName, cc->createScriptObject());
+			cc->updateLiveScriptObject(transferToParent?parent:liveScriptObject);
+		}else
+		{
+			if (transferToParent) parent->setProperty(cc->shortName, cc->getScriptObject());
+			else liveScriptObject->setProperty(cc->shortName, cc->getScriptObject());
 		}
+
+		DBG(">> " << cc->niceName);
+
 	}
 
 	for (auto &c : controllables)
 	{
 		if (!c->includeInScriptObject) continue;
-		if(transferToParent) parent->setProperty(c->shortName,c->createScriptObject());
-		else o->setProperty(c->shortName, c->createScriptObject());
+		if(transferToParent) parent->setProperty(c->shortName,c->getScriptObject());
+		else liveScriptObject->setProperty(c->shortName, c->getScriptObject());
 	}
 	
 	if (!(skipControllableNameInAddress && parent != nullptr))
 	{
-		o->setProperty("name", shortName);
-		o->setProperty("niceName", niceName);
+		liveScriptObject->setProperty("name", shortName);
+		liveScriptObject->setProperty("niceName", niceName);
 	}
-
-	return o;
 }
 
 var ControllableContainer::getChildFromScript(const var::NativeFunctionArgs & a)
@@ -831,7 +838,7 @@ var ControllableContainer::getChildFromScript(const var::NativeFunctionArgs & a)
 	if (m == nullptr) return var();
 	Controllable * c = m->getControllableByName(a.arguments[0].toString());
 	if (c == nullptr) return  var();
-	return c->createScriptObject();
+	return c->getScriptObject();
 }
 
 

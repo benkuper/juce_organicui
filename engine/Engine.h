@@ -107,13 +107,12 @@ public:
 	void removeEngineListener(EngineListener* e) { engineListeners.remove(e); }
 
 	bool isLoadingFile;
+	bool isClearing;
 	var jsonData;
 
 	void handleAsyncUpdate()override;
 
-
-
-	
+	void childStructureChanged(ControllableContainer *) override;
 };
 
 static String lastFileListKey = "recentFiles";

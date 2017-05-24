@@ -85,7 +85,7 @@ public:
 
 	void remove(); // called from external to make this object ask for remove
 
-	virtual DynamicObject * createScriptObject(DynamicObject * parent = nullptr) override;
+	virtual void updateLiveScriptObjectInternal(DynamicObject * parent = nullptr) override;
 
 	virtual var getJSONData(ControllableContainer * relativeTo = nullptr);
 	virtual var getJSONDataInternal(); // to be overriden

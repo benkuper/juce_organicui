@@ -1,4 +1,5 @@
 class ControllableContainer;
+class Controllable;
 
 //Listener
 class  ControllableContainerListener

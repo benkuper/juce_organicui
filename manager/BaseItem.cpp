@@ -106,7 +106,7 @@ void BaseItem::onContainerParameterChanged(Parameter * p)
 	}
 
 	Array<var> args;
-	args.add(p->createScriptObject());
+	args.add(p->getScriptObject());
 	if (canHaveScripts) scriptManager->callFunctionOnAllItems("localParamChanged", args);
 
 	onContainerParameterChangedInternal(p);
@@ -115,7 +115,7 @@ void BaseItem::onContainerParameterChanged(Parameter * p)
 void BaseItem::onContainerTriggerTriggered(Trigger * t)
 {
 	Array<var> args;
-	args.add(t->createScriptObject());
+	args.add(t->getScriptObject());
 	if (canHaveScripts) scriptManager->callFunctionOnAllItems("localParamChanged", args);
 }
 
@@ -124,7 +124,7 @@ void BaseItem::controllableFeedbackUpdate(ControllableContainer * cc, Controllab
 	if (cc->parentContainer == customParams)
 	{
 		Array<var> args;
-		args.add(c->createScriptObject());
+		args.add(c->getScriptObject());
 		if (canHaveScripts) scriptManager->callFunctionOnAllItems("customParamChanged", args);
 	}
 }
