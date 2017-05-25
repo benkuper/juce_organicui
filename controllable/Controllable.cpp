@@ -36,7 +36,6 @@ Controllable::Controllable(const Type &type, const String & niceName, const Stri
 }
 
 Controllable::~Controllable() {
-	DBG("controllable destroy " << niceName);
 	Controllable::masterReference.clear();
 	listeners.call(&Controllable::Listener::controllableRemoved, this);
 }

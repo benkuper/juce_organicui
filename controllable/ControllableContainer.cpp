@@ -813,8 +813,6 @@ void ControllableContainer::updateLiveScriptObjectInternal(DynamicObject * paren
 			else liveScriptObject->setProperty(cc->shortName, cc->getScriptObject());
 		}
 
-		DBG(">> " << cc->niceName);
-
 	}
 
 	for (auto &c : controllables)

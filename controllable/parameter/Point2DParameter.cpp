@@ -51,7 +51,7 @@ void Point2DParameter::setValueInternal(var & _value)
 	if (autoAdaptRange)
 	{
 		bool hasChanged = false;
-		for (int i = 0; i < 3; i++)
+		for (int i = 0; i < 2; i++)
 		{
 			if ((float)_value[i] < (float)minimumValue[i]) {
 				minimumValue[i] = _value[i];

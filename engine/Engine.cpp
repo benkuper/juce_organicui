@@ -90,10 +90,7 @@ void Engine::childStructureChanged(ControllableContainer * cc)
 {
 	ControllableContainer::childStructureChanged(cc);
 
-	DBG("Engine child structure changed");
-
 	if (isLoadingFile || isClearing) return;
-	DBG("> Engine update live script object");
 	updateLiveScriptObject();
 }
 
