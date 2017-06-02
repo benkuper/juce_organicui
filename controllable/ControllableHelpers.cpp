@@ -9,14 +9,16 @@
   ==============================================================================
 */
 
-ControllableChooserPopupMenu::ControllableChooserPopupMenu(ControllableContainer * rootContainer, bool _showParameters, bool _showTriggers) :
+ControllableChooserPopupMenu::ControllableChooserPopupMenu(ControllableContainer * rootContainer, bool _showParameters, bool _showTriggers, int _indexOffset) :
+	indexOffset(_indexOffset),
 	showParameters(_showParameters),
 	showTriggers(_showTriggers)
 {
-	int id = 1;
+	int id = indexOffset + 1;
 	//if (rootContainer == nullptr) rootContainer = NodeManager::getInstance(); //to replace with global app container containing nodes, controllers, rules, etc...
 	populateMenu(this, rootContainer,id);
 }
+
 
 ControllableChooserPopupMenu::~ControllableChooserPopupMenu()
 {
@@ -60,10 +62,13 @@ void ControllableChooserPopupMenu::populateMenu(PopupMenu * subMenu, Controllabl
 Controllable * ControllableChooserPopupMenu::showAndGetControllable()
 {
 	int result = show();
+	return getControllableForResult(result);
+}
 
-	if (result == 0) return nullptr;
-
-	return controllableList[result-1];
+Controllable * ControllableChooserPopupMenu::getControllableForResult(int result)
+{
+	if (result <= indexOffset) return nullptr;
+	return controllableList[result - 1 - indexOffset];
 }
 
 

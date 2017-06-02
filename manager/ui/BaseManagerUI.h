@@ -556,6 +556,7 @@ template<class M, class T, class U>
 void BaseManagerUI<M, T, U>::itemAdded(T * item)
 {
 	addItemUI(item, animateItemOnAdd);
+	if (!animateItemOnAdd) resized();
 }
 
 template<class M, class T, class U>

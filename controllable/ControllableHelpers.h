@@ -16,9 +16,10 @@ class ControllableChooserPopupMenu :
 	public PopupMenu
 {
 public:
-	ControllableChooserPopupMenu(ControllableContainer * rootContainer, bool showParameters = true, bool showTriggers = true);
+	ControllableChooserPopupMenu(ControllableContainer * rootContainer, bool showParameters = true, bool showTriggers = true, int indexOffset = 0);
 	virtual ~ControllableChooserPopupMenu();
 
+	int indexOffset;
 	bool showParameters;
 	bool showTriggers;
 
@@ -26,6 +27,7 @@ public:
 	void populateMenu(PopupMenu *subMenu, ControllableContainer * container, int &currentId);
 
 	Controllable * showAndGetControllable();
+	Controllable * getControllableForResult(int result);
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ControllableChooserPopupMenu)
 };
