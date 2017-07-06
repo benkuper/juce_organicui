@@ -294,29 +294,36 @@ void BaseItemUI<T>::resized()
 
 	if (!this->baseItem->miniMode->boolValue())
 	{
-		switch (resizeMode)
+		if (resizeMode == NONE)
 		{
-		case NONE:
-			break;
+			int top = r.getY();
+			resizedInternalContent(r);
+			setContentSize(r.getWidth(),r.getBottom() - top);
+		} else
+		{
+			switch (resizeMode)
+			{
+			case VERTICAL:
+				edgeResizer->setBounds(r.removeFromBottom(resizerHeight));
+				this->baseItem->listUISize->setValue((float)r.getHeight());
+				break;
 
-		case VERTICAL:
-			edgeResizer->setBounds(r.removeFromBottom(resizerHeight));
-			this->baseItem->listUISize->setValue((float)r.getHeight());
-			break;
+			case HORIZONTAL:
+				edgeResizer->setBounds(r.removeFromRight(resizerWidth));
+				this->baseItem->listUISize->setValue((float)r.getWidth());
+				break;
 
-		case HORIZONTAL:
-			edgeResizer->setBounds(r.removeFromRight(resizerWidth));
-			this->baseItem->listUISize->setValue((float)r.getWidth());
-			break;
+			case ALL:
+				cornerResizer->setBounds(r.removeFromBottom(resizerHeight).withLeft(r.getWidth() - resizerHeight));
+				this->baseItem->viewUISize->setPoint((float)r.getWidth(), (float)r.getHeight());
+				break;
 
-		case ALL:
-			cornerResizer->setBounds(r.removeFromBottom(resizerHeight).withLeft(r.getWidth() - resizerHeight));
-			this->baseItem->viewUISize->setPoint((float)r.getWidth(), (float)r.getHeight());
-			break;
+			default:
+				break;
 
+			}
+			resizedInternalContent(r);
 		}
-
-		resizedInternalContent(r);
 	}
 }
 

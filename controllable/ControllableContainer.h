@@ -128,6 +128,9 @@ public:
 	// Inherited via Trigger::Listener
 	virtual void triggerTriggered(Trigger * p) override;
 
+	void controllableFeedbackUpdate(ControllableContainer * cc, Controllable * c) override;
+	virtual void onControllableFeedbackUpdate(ControllableContainer * , Controllable *) {}
+
 	virtual void askForRemoveControllable(Controllable * c) override;
 
 

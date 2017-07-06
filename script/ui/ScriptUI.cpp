@@ -129,6 +129,10 @@ void ScriptUI::buttonClicked(Button * b)
 			}
 		} 
 
+
+		
+		if (script->filePath->stringValue().isEmpty()) return;
+
 		File f(Engine::mainEngine->getFile().getParentDirectory().getChildFile(script->filePath->stringValue()));
 		f.startAsProcess();
 		//editMode = !editMode;

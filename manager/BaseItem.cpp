@@ -42,6 +42,7 @@ BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts
 		customParams = new GenericControllableManager("Custom Parameters");
 		customParams->setCustomShortName("params");
 		addChildControllableContainer(customParams);
+		DBG("Add listener to custom Params ");
 	}
 
 	//For UI
@@ -119,14 +120,17 @@ void BaseItem::onContainerTriggerTriggered(Trigger * t)
 	if (canHaveScripts) scriptManager->callFunctionOnAllItems("localParamChanged", args);
 }
 
-void BaseItem::controllableFeedbackUpdate(ControllableContainer * cc, Controllable * c)
+void BaseItem::onControllableFeedbackUpdate(ControllableContainer * cc, Controllable * c)
 {
-	if (cc->parentContainer == customParams)
+
+	if (cc == customParams)
 	{
 		Array<var> args;
 		args.add(c->getScriptObject());
 		if (canHaveScripts) scriptManager->callFunctionOnAllItems("customParamChanged", args);
 	}
+
+	onControllableFeedbackUpdateInternal(cc, c);
 }
 
 void BaseItem::onContainerNiceNameChanged()

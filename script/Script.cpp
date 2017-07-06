@@ -149,7 +149,7 @@ void Script::onContainerTriggerTriggered(Trigger * t)
 	}
 }
 
-void Script::controllableFeedbackUpdate(ControllableContainer * cc, Controllable * c)
+void Script::onControllableFeedbackUpdateInternal(ControllableContainer * cc, Controllable * c)
 {
 	if (cc == &scriptParamsContainer)
 	{

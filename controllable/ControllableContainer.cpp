@@ -1,3 +1,4 @@
+#include "ControllableContainer.h"
 /*
  ==============================================================================
 
@@ -673,12 +674,15 @@ void ControllableContainer::triggerTriggered(Trigger * t)
 	if (t->isControllableExposed) dispatchFeedback(t);
 }
 
+void ControllableContainer::controllableFeedbackUpdate(ControllableContainer * cc, Controllable * c)
+{ 
+	onControllableFeedbackUpdate(cc, c); //This is the function to override from child classes
+}
+
 void ControllableContainer::askForRemoveControllable(Controllable * c)
 {
 	removeControllable(c);
 }
-
-
 
 
 var ControllableContainer::getJSONData()

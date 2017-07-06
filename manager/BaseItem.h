@@ -15,15 +15,15 @@
 class ScriptManager;
 class GenericControllableManager;
 
-class BaseItem : 
+class BaseItem :
 	public ControllableContainer
 {
-public :
+public:
 	BaseItem(const String &name = "", bool canBeDisabled = true, bool canHaveScript = false, bool canHaveCustomParameters = false);
 	virtual ~BaseItem();
 
 	BoolParameter * enabled;
-	StringParameter * nameParam; 
+	StringParameter * nameParam;
 
 	//UI - should move outside data class ? how to save/load if not there 
 	BoolParameter * miniMode;
@@ -49,7 +49,8 @@ public :
 	void onContainerParameterChanged(Parameter *) override;
 	void onContainerTriggerTriggered(Trigger *) override;
 	virtual void onContainerParameterChangedInternal(Parameter *) {} //child classes override this function
-	virtual void controllableFeedbackUpdate(ControllableContainer * cc, Controllable * c) override;
+	void onControllableFeedbackUpdate(ControllableContainer * cc, Controllable * c) override;
+	virtual void onControllableFeedbackUpdateInternal(ControllableContainer * cc, Controllable * c) {};
 
 	void onContainerNiceNameChanged() override;
 

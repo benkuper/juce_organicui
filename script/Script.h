@@ -48,7 +48,7 @@ public:
 	void onContainerParameterChangedInternal(Parameter *) override;
 	void onContainerTriggerTriggered(Trigger *) override;
 
-	void controllableFeedbackUpdate(ControllableContainer * cc, Controllable * c) override;
+	void onControllableFeedbackUpdateInternal(ControllableContainer * cc, Controllable * c) override;
 
 	// Inherited via Timer
 	virtual void timerCallback() override;
