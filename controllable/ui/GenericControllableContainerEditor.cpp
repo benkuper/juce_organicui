@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    GenericControllableContainerEditor.cpp
-    Created: 9 May 2016 6:41:59pm
-    Author:  bkupe
+	GenericControllableContainerEditor.cpp
+	Created: 9 May 2016 6:41:59pm
+	Author:  bkupe
 
   ==============================================================================
 */
@@ -14,8 +14,9 @@
 GenericControllableContainerEditor::GenericControllableContainerEditor(WeakReference<Inspectable> inspectable, bool isRoot) :
 	InspectableEditor(inspectable, isRoot),
 	headerHeight(12),
+	contourColor(BG_COLOR.brighter(.3f)),
 	containerLabel("containerLabel", dynamic_cast<ControllableContainer *>(inspectable.get())->niceName),
-container(dynamic_cast<ControllableContainer *>(inspectable.get()))
+	container(dynamic_cast<ControllableContainer *>(inspectable.get()))
 {
 	container->addAsyncContainerListener(this);
 
@@ -39,22 +40,22 @@ GenericControllableContainerEditor::~GenericControllableContainerEditor()
 {
 	if (!inspectable.wasObjectDeleted())
 	{
-		if(container != nullptr) container->removeAsyncContainerListener(this);
+		if (container != nullptr) container->removeAsyncContainerListener(this);
 		clear();
 	}
-	
+
 }
 
 void GenericControllableContainerEditor::clear()
 {
 	//
-	for(auto &c : childEditors)
+	for (auto &c : childEditors)
 	{
 		removeChildComponent(c);
 	}
 
 	childEditors.clear();
-		
+
 }
 
 void GenericControllableContainerEditor::resetAndBuild()
@@ -74,7 +75,7 @@ void GenericControllableContainerEditor::resetAndBuild()
 		for (auto &cc : container->controllableContainers)
 		{
 			//DBG("CC hide ? " << (int)(cc->hideInEditor));
-			if(!cc->hideInEditor) addEditorUI(cc);
+			if (!cc->hideInEditor) addEditorUI(cc);
 		}
 	}
 
@@ -137,21 +138,21 @@ void GenericControllableContainerEditor::newMessage(const ContainerAsyncEvent & 
 	case ContainerAsyncEvent::ControllableAdded:
 		if (p.targetControllable->parentContainer != container) return;
 		if (p.targetControllable->hideInEditor) return;
-		addControllableUI(p.targetControllable,true);
+		addControllableUI(p.targetControllable, true);
 		break;
 
 	case ContainerAsyncEvent::ControllableRemoved:
-		removeControllableUI(p.targetControllable,true);
+		removeControllableUI(p.targetControllable, true);
 		break;
 
 	case ContainerAsyncEvent::ControllableContainerAdded:
 		if (p.targetContainer->parentContainer != container) return;
 
-		if (container->canInspectChildContainers) addEditorUI(p.targetContainer,true);
+		if (container->canInspectChildContainers) addEditorUI(p.targetContainer, true);
 		break;
 
 	case ContainerAsyncEvent::ControllableContainerRemoved:
-		removeEditorUI(p.targetContainer,true);
+		removeEditorUI(p.targetContainer, true);
 		break;
 
 	case ContainerAsyncEvent::ChildStructureChanged:
@@ -166,9 +167,9 @@ void GenericControllableContainerEditor::newMessage(const ContainerAsyncEvent & 
 		controllableFeedbackUpdate(p.targetControllable);
 		break;
 
-    default:
-    //not handled
-    break;
+	default:
+		//not handled
+		break;
 
 	}
 }
@@ -180,14 +181,14 @@ void GenericControllableContainerEditor::childBoundsChanged(Component *)
 
 void GenericControllableContainerEditor::paint(Graphics & g)
 {
-	g.setColour(BG_COLOR.brighter(.3f));
-	g.drawRoundedRectangle(getLocalBounds().toFloat(),4,2);
+	g.setColour(contourColor);
+	g.drawRoundedRectangle(getLocalBounds().toFloat(), 4, 2);
 }
 
 void GenericControllableContainerEditor::resized()
 {
 	containerLabel.setBounds(getLocalBounds().removeFromTop(containerLabel.getHeight()).withSizeKeepingCentre(containerLabel.getWidth(), containerLabel.getHeight()));
-	Rectangle<int> r = getLocalBounds().reduced(5).translated(0,headerHeight);
+	Rectangle<int> r = getLocalBounds().reduced(5).translated(0, headerHeight);
 
 	if (container->canHavePresets)
 	{
@@ -202,5 +203,5 @@ void GenericControllableContainerEditor::resized()
 		r.translate(0, th + 2);
 	}
 
-	setSize(getWidth(),jmax<int>(r.getY()+2,50));
+	setSize(getWidth(), jmax<int>(r.getY() + 2, 50));
 }

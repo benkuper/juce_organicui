@@ -113,7 +113,15 @@ void BaseItemEditor::newMessage(const ContainerAsyncEvent & e)
 	case ContainerAsyncEvent::ControllableFeedbackUpdate:
 		controllableFeedbackAsyncUpdate(e.targetControllable);
 		break;
-            
+    
+	case ContainerAsyncEvent::ControllableAdded:
+		controllableAddedAsync(e.targetControllable);
+		break;
+
+	case ContainerAsyncEvent::ControllableRemoved:
+		controllableRemovedAsync(e.targetControllable);
+		break;
+
         default:
             break;
 	}

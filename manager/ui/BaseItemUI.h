@@ -260,6 +260,7 @@ void BaseItemUI<T>::resized()
 	*/
 
 	//Header
+	if (getWidth() == 0 || getHeight() == 0) return;
 	juce::Rectangle<int> r = this->getLocalBounds().reduced(margin);
 
 	//Grabber
@@ -298,6 +299,7 @@ void BaseItemUI<T>::resized()
 		{
 			int top = r.getY();
 			resizedInternalContent(r);
+			if (r.getWidth() == 0 || r.getHeight() == 0) return;
 			setContentSize(r.getWidth(),r.getBottom() - top);
 		} else
 		{

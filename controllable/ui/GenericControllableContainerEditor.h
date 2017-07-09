@@ -26,7 +26,8 @@ public:
 	virtual ~GenericControllableContainerEditor();
 
 	int headerHeight;
-	 
+	Colour contourColor;
+
 	Label containerLabel;
 
 	WeakReference<ControllableContainer> container;

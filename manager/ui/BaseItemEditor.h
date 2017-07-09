@@ -43,6 +43,9 @@ public:
 	void newMessage(const ContainerAsyncEvent &e) override;
 	virtual void controllableFeedbackAsyncUpdate(Controllable *);
 
+	virtual void controllableAddedAsync(Controllable *) {}
+	virtual void controllableRemovedAsync(Controllable *) {}
+
 	virtual void childBoundsChanged(Component *) override;
 
 	virtual void buttonClicked(Button *b) override;
