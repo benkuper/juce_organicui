@@ -28,6 +28,7 @@ ControllableContainer::ControllableContainer(const String & niceName) :
 	saveAndLoadName(false),
 	includeInScriptObject(true),
 	parentContainer(nullptr),
+	includeTriggersInSaveLoad(false),
 	queuedNotifier(500) //what to put in max size ??
 						//500 seems ok on my computer, but if too low, generates leaks when closing app while heavy use of async (like  parameter update from audio signal)
 {
@@ -691,14 +692,17 @@ var ControllableContainer::getJSONData()
 
 	var paramsData;
 
-	Array<WeakReference<Parameter>> cont = ControllableContainer::getAllParameters(saveAndLoadRecursiveData, true);
+	
+	Array<WeakReference<Controllable>> cont = ControllableContainer::getAllControllables(saveAndLoadRecursiveData, true);
 
 	for (auto &wc : cont) {
+		if (wc->type == Controllable::TRIGGER && !includeTriggersInSaveLoad) continue;
 		if (wc.wasObjectDeleted()) continue;
 		if (!wc->isSavable) continue;
 		if (wc == currentPresetName && !canHavePresets) continue;
 		paramsData.append(wc->getJSONData(this));
 	}
+
 
 	/*
 	 if (currentPreset != nullptr)

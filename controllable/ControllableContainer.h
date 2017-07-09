@@ -54,6 +54,7 @@ public:
 	bool presetSavingIsRecursive;
 	bool saveAndLoadRecursiveData;
 	bool saveAndLoadName;
+	bool includeTriggersInSaveLoad;
 
 	//Script
 	bool includeInScriptObject;
