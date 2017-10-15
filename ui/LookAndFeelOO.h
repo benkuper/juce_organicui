@@ -307,13 +307,10 @@ public:
 
     AttributedString createFileChooserHeaderText (const String& title, const String& instructions) override;
 
-    void drawFileBrowserRow (Graphics&, int width, int height,
-                             const String& filename, Image* icon,
-                             const String& fileSizeDescription, const String& fileTimeDescription,
-                             bool isDirectory, bool isItemSelected, int itemIndex,
-                             DirectoryContentsDisplayComponent&) override;
+	// Inherited via LookAndFeel
+	virtual void drawFileBrowserRow(Graphics &, int width, int height, const File & file, const String & filename, Image * optionalIcon, const String & fileSizeDescription, const String & fileTimeDescription, bool isDirectory, bool isItemSelected, int itemIndex, DirectoryContentsDisplayComponent &) override;
 
-    Button* createFileBrowserGoUpButton() override;
+	Button* createFileBrowserGoUpButton() override;
 
     void layoutFileBrowserComponent (FileBrowserComponent&,
                                      DirectoryContentsDisplayComponent*,
@@ -553,6 +550,10 @@ private:
 
 
 		
+
+
+		
+	virtual bool shouldPopupMenuScaleWithTargetComponent(const PopupMenu::Options & options) override;
 
 };
 

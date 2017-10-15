@@ -35,7 +35,7 @@ public:
 
 	OwnedArray<InspectableEditor> childEditors;
 
-	void resetAndBuild();
+	virtual void resetAndBuild();
 
 	void paint(Graphics &g) override;
 	void resized() override;

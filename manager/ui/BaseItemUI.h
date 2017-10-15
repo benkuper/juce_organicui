@@ -146,7 +146,7 @@ BaseItemUI<T>::BaseItemUI(T * _item, ResizeMode _resizeMode, bool _canBeDragged)
 		grabber = new Grabber(_resizeMode == ALL ? Grabber::HORIZONTAL : Grabber::VERTICAL);
 		grabber->setAlwaysOnTop(true);
 		this->addAndMakeVisible(grabber);
-		if (resizeMode == ALL) grabberHeight = 10;
+		if (resizeMode == ALL) grabberHeight = 15;
 	}
 
 	switch (resizeMode)

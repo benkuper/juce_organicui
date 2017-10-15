@@ -28,7 +28,7 @@ public:
 			type(type),
 			menuPath(menuPath),
 			createFunc(createFunc)
-		{
+		{  
 			params = var(new DynamicObject());
 			params.getDynamicObject()->setProperty("type", type);
 		}
@@ -44,6 +44,8 @@ public:
 			params.getDynamicObject()->setProperty(paramName, value);
 			return this; //daisy-chain
 		}
+
+		JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Definition)
 	};
 
 
@@ -110,6 +112,7 @@ public:
 		}
 		return nullptr;
 	}
+
 };
 
 
