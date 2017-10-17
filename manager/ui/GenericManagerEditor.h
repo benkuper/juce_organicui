@@ -65,18 +65,21 @@ GenericManagerEditor<T>::GenericManagerEditor(BaseManager<T> * _manager, bool is
 	addItemBT = AssetManager::getInstance()->getAddBT();
 	addAndMakeVisible(addItemBT);
 	addItemBT->addListener(this);
+
+	manager->addBaseManagerListener(this);
 }
 
 template<class T>
 GenericManagerEditor<T>::~GenericManagerEditor()
 {
+	manager->removeBaseManagerListener(this);
 }
 
 template<class T>
 void GenericManagerEditor<T>::resetAndBuild()
 {
-	GenericControllableContainerEditor::resetAndBuild();
-	addExistingItems();
+	GenericControllableContainerEditor::resetAndBuild(); 
+	resized();
 }
 
 template<class T>
