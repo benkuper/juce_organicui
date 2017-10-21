@@ -2183,9 +2183,8 @@ void LookAndFeelOO::drawTableHeaderBackground (Graphics& g, TableHeaderComponent
 */
 }
 
-void LookAndFeelOO::drawTableHeaderColumn (Graphics& g, const String& columnName, int /*columnId*/,
-                                            int width, int height, bool isMouseOver, bool isMouseDown,
-                                            int columnFlags)
+
+void LookAndFeelOO::drawTableHeaderColumn(Graphics & g, TableHeaderComponent &, const String & columnName, int columnId, int width, int height, bool isMouseOver, bool isMouseDown, int columnFlags)
 {
 	Rectangle<int> area(width, height);
 
@@ -2679,6 +2678,15 @@ bool LookAndFeelOO::shouldPopupMenuScaleWithTargetComponent(const PopupMenu::Opt
 {
 	return false;
 }
+int LookAndFeelOO::getPopupMenuBorderSize()
+{
+	return 2;
+}
+Font LookAndFeelOO::getTabButtonFont(TabBarButton &, float height)
+{
+	return Font(height);
+}
+
 #endif
 
 //==============================================================================

@@ -463,9 +463,8 @@ public:
     //==============================================================================
     void drawTableHeaderBackground (Graphics&, TableHeaderComponent&) override;
 
-    void drawTableHeaderColumn (Graphics&, const String& columnName, int columnId,
-                                int width, int height, bool isMouseOver, bool isMouseDown,
-                                int columnFlags) override;
+
+	void drawTableHeaderColumn(Graphics &, TableHeaderComponent &, const String & columnName, int columnId, int width, int height, bool isMouseOver, bool isMouseDown, int columnFlags) override;
 
     //==============================================================================
     void paintToolbarBackground (Graphics&, int width, int height, Toolbar&) override;
@@ -554,6 +553,12 @@ private:
 
 		
 	virtual bool shouldPopupMenuScaleWithTargetComponent(const PopupMenu::Options & options) override;
+
+
+	// Inherited via LookAndFeel
+	virtual int getPopupMenuBorderSize() override;
+
+	virtual Font getTabButtonFont(TabBarButton &, float height) override;
 
 };
 
