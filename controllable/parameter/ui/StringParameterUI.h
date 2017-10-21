@@ -32,6 +32,8 @@ public:
 	bool autoSize;
 	void setAutoSize(bool value);
 
+	bool isEditing();
+
 	void setPrefix(const String &_prefix);
 	void setSuffix(const String &_suffix);
 

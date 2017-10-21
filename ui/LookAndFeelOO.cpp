@@ -1,3 +1,4 @@
+#include "LookAndFeelOO.h"
 /*
   ==============================================================================
 
@@ -2347,12 +2348,8 @@ AttributedString LookAndFeelOO::createFileChooserHeaderText (const String& title
     return s;
 }
 
-void LookAndFeelOO::drawFileBrowserRow (Graphics& g, int width, int height,
-                                         const String& filename, Image* icon,
-                                         const String& fileSizeDescription,
-                                         const String& fileTimeDescription,
-                                         const bool isDirectory, const bool isItemSelected,
-                                         const int /*itemIndex*/, DirectoryContentsDisplayComponent& dcc)
+
+void LookAndFeelOO::drawFileBrowserRow(Graphics &g, int width, int height, const File & file, const String & filename, Image * optionalIcon, const String & fileSizeDescription, const String & fileTimeDescription, bool isDirectory, bool isItemSelected, int itemIndex, DirectoryContentsDisplayComponent &dcc)
 {
     Component* const fileListComp = dynamic_cast<Component*> (&dcc);
 
@@ -2363,9 +2360,9 @@ void LookAndFeelOO::drawFileBrowserRow (Graphics& g, int width, int height,
     const int x = 32;
     g.setColour (Colours::black);
 
-    if (icon != nullptr && icon->isValid())
+    if (optionalIcon != nullptr && optionalIcon->isValid())
     {
-        g.drawImageWithin (*icon, 2, 2, x - 4, height - 4,
+        g.drawImageWithin (*optionalIcon, 2, 2, x - 4, height - 4,
                            RectanglePlacement::centred | RectanglePlacement::onlyReduceInSize,
                            false);
     }
@@ -2677,6 +2674,10 @@ void LookAndFeelOO::drawShinyButtonShape (Graphics& g,
 bool LookAndFeelOO::isProgressBarOpaque(ProgressBar &)
 {
 	return true;
+}
+bool LookAndFeelOO::shouldPopupMenuScaleWithTargetComponent(const PopupMenu::Options & options)
+{
+	return false;
 }
 #endif
 

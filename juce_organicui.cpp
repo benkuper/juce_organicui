@@ -19,6 +19,8 @@
 
 //==============================================================================
 
+
+#include "manager/Factory.cpp"
 #include "resources/OrganicBinaryData.cpp"
 #include "script/ScriptExpression.cpp"
 #include "controllable/Controllable.cpp"

@@ -1,3 +1,4 @@
+#include "StringParameterUI.h"
 /*
   ==============================================================================
 
@@ -44,6 +45,11 @@ void StringParameterUI::setAutoSize(bool value)
 {
 	autoSize = value;
 	valueChanged(parameter->getValue());
+}
+
+bool StringParameterUI::isEditing()
+{
+	return valueLabel.isBeingEdited();
 }
 
 void StringParameterUI::setPrefix(const String & _prefix)

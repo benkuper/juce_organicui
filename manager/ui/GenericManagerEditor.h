@@ -17,6 +17,7 @@ class BaseManager;
 template<class T>
 class GenericManagerEditor :
 	public GenericControllableContainerEditor,
+	public BaseManager<T>::Listener,
 	public ButtonListener
 {
 public:
@@ -29,6 +30,7 @@ public:
 	bool fixedItemHeight;
 	int gap = 2;
 
+	void resetAndBuild() override;
 	void addExistingItems();
 	
 	//menu
@@ -37,6 +39,9 @@ public:
 
 
 	void resized() override;
+
+	virtual void itemAdded(T *) override;
+	virtual void itemRemoved(T *) override;
 
 
 	virtual void showMenuAndAddItem(bool isFromAddButton);
@@ -60,11 +65,21 @@ GenericManagerEditor<T>::GenericManagerEditor(BaseManager<T> * _manager, bool is
 	addItemBT = AssetManager::getInstance()->getAddBT();
 	addAndMakeVisible(addItemBT);
 	addItemBT->addListener(this);
+
+	manager->addBaseManagerListener(this);
 }
 
 template<class T>
 GenericManagerEditor<T>::~GenericManagerEditor()
 {
+	manager->removeBaseManagerListener(this);
+}
+
+template<class T>
+void GenericManagerEditor<T>::resetAndBuild()
+{
+	GenericControllableContainerEditor::resetAndBuild(); 
+	resized();
 }
 
 template<class T>
@@ -83,6 +98,18 @@ void GenericManagerEditor<T>::resized()
 
 	juce::Rectangle<int> r = getLocalBounds().reduced(2);
 	addItemBT->setBounds(r.withSize(headerHeight, headerHeight).withX(r.getWidth() - headerHeight));
+}
+
+template<class T>
+void GenericManagerEditor<T>::itemAdded(T *)
+{
+	//to override
+}
+
+template<class T>
+void GenericManagerEditor<T>::itemRemoved(T *)
+{
+	//to override
 }
 
 template<class T>
