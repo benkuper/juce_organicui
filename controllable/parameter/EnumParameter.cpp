@@ -15,13 +15,14 @@ EnumParameter::EnumParameter(const String & niceName, const String &description,
 
 }
 
-void EnumParameter::addOption(String key, var data, bool selectIfFirstOption)
+EnumParameter * EnumParameter::addOption(String key, var data, bool selectIfFirstOption)
 {
 
 	enumValues.set(key, data);
 	if (enumValues.size() == 1 && selectIfFirstOption) setValue(key, true);
 	enumListeners.call(&Listener::enumOptionAdded, this, key);
 	updateArgDescription();
+	return this;
 }
 
 void EnumParameter::removeOption(String key)

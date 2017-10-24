@@ -19,7 +19,7 @@ public:
 	EnumParameter(const String &niceName, const String &description, bool enabled = true);
 	~EnumParameter() {}
 
-	void addOption(String key, var data, bool selectIfFirstOption = true);
+	EnumParameter * addOption(String key, var data, bool selectIfFirstOption = true); //daisy chain
 	void removeOption(String key);
 	void clearOptions();
 
