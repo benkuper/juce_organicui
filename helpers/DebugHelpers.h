@@ -12,12 +12,13 @@
 #define DEBUGHELPERS_H_INCLUDED
 //  header (build and link-time cheap) to include everywhere we need specific debug macros
 
+
 using namespace juce;
 
 // log informing file from where it was outputed
 #define LOG(textToWrite) JUCE_BLOCK_WITH_FORCED_SEMICOLON (juce::String tempDbgBuf;\
 String fullPath = String(__FILE__);\
-tempDbgBuf << fullPath.substring (fullPath.lastIndexOfChar (File::separator) + 1 ,fullPath.lastIndexOfChar('.') ) << "::" <<  textToWrite;\
+tempDbgBuf << fullPath.substring (fullPath.lastIndexOfChar (juce::File::getSeparatorChar()) + 1 ,fullPath.lastIndexOfChar('.') ) << "::" <<  textToWrite;\
 juce::Logger::writeToLog(tempDbgBuf);)
 
 

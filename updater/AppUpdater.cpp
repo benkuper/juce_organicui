@@ -20,24 +20,27 @@ void AppUpdater::setURLs(URL _updateURL, URL _downloadURL)
 
 void AppUpdater::checkForUpdates()
 {
-	
 	if (updateURL.isEmpty() || downloadURL.isEmpty()) return;
+	startThread();
+}
 
+void AppUpdater::run()
+{
 	StringPairArray responseHeaders;
-	int statusCode = 0; 
+	int statusCode = 0;
 	ScopedPointer<InputStream> stream(updateURL.createInputStream(false, nullptr, nullptr, String(),
 		2000, // timeout in millisecs
 		&responseHeaders, &statusCode));
 #if JUCE_WINDOWS
 	if (statusCode != 200)
-    {
-        LOG("Failed to connect, status code = " + String(statusCode));
-        return;
-    }
+	{
+		LOG("Failed to connect, status code = " + String(statusCode));
+		return;
+	}
 #endif
-    
-    DBG("AppUpdater:: Status code " << statusCode);
-    
+
+	DBG("AppUpdater:: Status code " << statusCode);
+
 	if (stream != nullptr)
 	{
 		String content = stream->readEntireStreamAsString();
@@ -50,7 +53,7 @@ void AppUpdater::checkForUpdates()
 				String version = data.getProperty("version", "");
 				bool beta = data.getProperty("beta", false);
 				Array<var> * changelog = data.getProperty("changelog", var()).getArray();
-				
+
 				String msg = "A new " + String(beta ? "beta " : "") + "version of Chataigne is available : " + version + "\n\nChangelog :\n";
 
 				for (auto &c : *changelog) msg += c.toString() + "\n";
@@ -66,9 +69,9 @@ void AppUpdater::checkForUpdates()
 		{
 			LOG("Error, update file is not valid");
 		}
-		
-    }else
-    {
-        LOG("Error while trying to access to the update file");
-    }
+
+	} else
+	{
+		LOG("Error while trying to access to the update file");
+	}
 }

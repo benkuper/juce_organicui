@@ -12,17 +12,22 @@
 #define APPUPDATER_H_INCLUDED
 
 
-class AppUpdater
+class AppUpdater :
+	public Thread
 {
 public:
 	juce_DeclareSingleton(AppUpdater, true);
 
+	AppUpdater() : Thread("appUpdater") {}
 	URL updateURL;
 	URL downloadURL;
 
 	void setURLs(URL _updateURL, URL _downloadURL);
 
 	void checkForUpdates();
+
+	// Inherited via Thread
+	virtual void run() override;
 };
 
 

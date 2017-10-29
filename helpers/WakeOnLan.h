@@ -38,7 +38,7 @@ public:
 		DatagramSocket s;
 		s.write(IPAddress::broadcast().toString(),9,packet,packetSize);
 
-		LOG("Wake ON Lan sent to " + macAddress->toString());
+		//LOG("Wake ON Lan sent to " + macAddress->toString());
 	}
 
 };
