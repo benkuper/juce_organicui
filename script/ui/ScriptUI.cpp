@@ -63,7 +63,8 @@ void ScriptUI::paint(Graphics & g)
 }
 
 void ScriptUI::resizedInternalHeader(Rectangle<int>& r)
-{
+{ 
+	DBG("resize internal header"); 
 	statusBounds = r.removeFromRight(r.getHeight());
 	r.removeFromRight(2);
 	logUI->setBounds(r.removeFromRight(40));
@@ -78,12 +79,13 @@ void ScriptUI::resizedInternalHeader(Rectangle<int>& r)
 
 void ScriptUI::resizedInternalContent(Rectangle<int>& r)
 {
+	DBG("resized internal content " << (int)paramsEditor->isVisible() << "/ " << (int)script->state);
 	if (script->state != Script::SCRIPT_CLEAR && paramsEditor->isVisible() )
 	{
+		DBG("Set editor height : " << paramsEditor->getHeight());
+		paramsEditor->resized();
 		r.setHeight(paramsEditor->getHeight());
 		paramsEditor->setBounds(r);
-		r.setY(r.getBottom() + 2);
-		r.setHeight(0);
 	}
 	
 	if (!editMode) return;

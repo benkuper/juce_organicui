@@ -18,7 +18,7 @@ class ScriptUI :
 	public Script::AsyncListener
 {
 public:
-	ScriptUI(Script * script);
+	ScriptUI(Script * script); 
 	~ScriptUI();
 
 	Script * script;
