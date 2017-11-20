@@ -16,6 +16,7 @@ StringParameterUI::StringParameterUI(Parameter * p) :
 maxFontHeight(12),
 autoSize(false)
 {
+	showEditWindowOnDoubleClick = false;
 
     addChildComponent(nameLabel);
     setNameLabelVisible(false);

@@ -292,7 +292,7 @@ void ShapeShifterManager::loadDefaultLayoutFile()
 		{
 			String defaultLayoutFileData = String::fromUTF8(defaultFileData);
 			loadLayout(JSON::parse(defaultLayoutFileData));
-
+			saveCurrentLayoutToFile(defaultFile);
 		}
 		
     }
@@ -307,7 +307,6 @@ void ShapeShifterManager::saveCurrentLayout()
 	if (fc.browseForFileToSave(true))
 	{
 		saveCurrentLayoutToFile(fc.getResult());
-
 	}
 }
 

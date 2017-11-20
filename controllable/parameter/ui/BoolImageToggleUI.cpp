@@ -13,6 +13,8 @@ BoolImageToggleUI::BoolImageToggleUI(ImageButton * i, BoolParameter *p) :
 	boolParam(p),
 	bt(i)
 {
+	showEditWindowOnDoubleClick = false;
+
 	addAndMakeVisible(bt);
 	bt->addListener(this);
 	bt->setToggleState(boolParam->boolValue(), dontSendNotification);

@@ -21,7 +21,10 @@ public:
     ParameterUI(Parameter * parameter);
     virtual ~ParameterUI();
 
+	
     WeakReference<Parameter> parameter;
+
+	bool showEditWindowOnDoubleClick;
 
 	bool showValue;
 	void showEditWindow() override;
@@ -30,6 +33,8 @@ public:
 
 	virtual void addPopupMenuItems(PopupMenu * p) override;
 	virtual void handleMenuSelectedID(int id) override;
+
+	virtual void mouseDoubleClick(const MouseEvent &e) override;
 
 protected:
 

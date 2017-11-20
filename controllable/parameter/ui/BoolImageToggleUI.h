@@ -30,7 +30,6 @@ public:
 	void valueChanged(const var &) override;
 
 	void buttonClicked(Button *) override;
-	void mouseDoubleClick(const MouseEvent &) override {} //disable double click on toggle
 };
 
 

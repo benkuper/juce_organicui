@@ -56,7 +56,7 @@ BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts
 	listUISize->hideInOutliner = true;
 	listUISize->isTargettable = false;
 
-	viewUIPosition = addPoint2DParameter("Position", "Position the view");
+	viewUIPosition = addPoint2DParameter("ViewUIPosition", "Position the view");
 	viewUIPosition->setBounds(-1000, -1000, 1000, 1000);
 	viewUIPosition->hideInEditor = true;
 	viewUIPosition->hideInOutliner = true;

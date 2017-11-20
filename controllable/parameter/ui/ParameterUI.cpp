@@ -13,7 +13,8 @@
 ParameterUI::ParameterUI(Parameter * parameter) :
 	ControllableUI(parameter),
 	parameter(parameter),
-	showValue(true)
+	showValue(true),
+	showEditWindowOnDoubleClick(true)
 {
 	parameter->addAsyncCoalescedListener(this);
 
@@ -106,6 +107,11 @@ void ParameterUI::handleMenuSelectedID(int id)
 	case 11: parameter->setControlMode(Parameter::EXPRESSION); break;
 	case 12: parameter->setControlMode(Parameter::REFERENCE); break;
 	}
+}
+
+void ParameterUI::mouseDoubleClick(const MouseEvent & e)
+{
+	if (showEditWindowOnDoubleClick) showEditWindow();
 }
 
 

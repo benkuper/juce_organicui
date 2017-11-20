@@ -12,6 +12,8 @@ FloatStepperUI::FloatStepperUI(Parameter * _parameter) :
     ParameterUI(_parameter)
 
 {
+	showEditWindowOnDoubleClick = false;
+
 	slider = new BetterStepper(tooltip);
 	
     addAndMakeVisible(slider);

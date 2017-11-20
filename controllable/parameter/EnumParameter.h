@@ -28,6 +28,8 @@ public:
 	HashMap<String, var> enumValues;
 
 	var getValueData() { return enumValues[value]; };
+	template<class T>
+	T getValueDataAsEnum() { return (T)(int)enumValues[value]; }
 	String getValueKey() { return value.toString(); }
 
 	StringArray getAllKeys();

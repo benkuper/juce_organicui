@@ -29,7 +29,6 @@ public:
 	void paint(Graphics &g) override;
 	void resized() override;
 	void mouseDownInternal(const MouseEvent &e) override;
-	void mouseDoubleClick(const MouseEvent &e) override;
 
 	void showEditWindow() override;
 

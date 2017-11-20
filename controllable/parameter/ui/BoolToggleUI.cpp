@@ -11,6 +11,8 @@
 BoolToggleUI::BoolToggleUI(Parameter * parameter) :
     ParameterUI(parameter), invertVisuals(false)
 {
+	showEditWindowOnDoubleClick = false;
+
 	if (parameter->isEditable && !forceFeedbackOnly)
 	{
 		setImages(ImageCache::getFromMemory(OrganicUIBinaryData::checkbox_on_png, OrganicUIBinaryData::checkbox_on_pngSize), ImageCache::getFromMemory(OrganicUIBinaryData::checkbox_off_png, OrganicUIBinaryData::checkbox_off_pngSize));

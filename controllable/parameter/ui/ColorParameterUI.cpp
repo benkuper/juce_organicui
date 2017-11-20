@@ -42,11 +42,6 @@ void ColorParameterUI::mouseDownInternal(const MouseEvent & e)
 	if (dispatchOnSingleClick) showEditWindow();
 }
 
-void ColorParameterUI::mouseDoubleClick(const MouseEvent & e)
-{
-	if (dispatchOnDoubleClick && !dispatchOnSingleClick) showEditWindow();
-}
-
 void ColorParameterUI::showEditWindow()
 {
 	if (!parameter->isEditable || parameter->isControllableFeedbackOnly) return;

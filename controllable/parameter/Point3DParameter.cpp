@@ -112,9 +112,9 @@ Vector3D<float> Point3DParameter::getVector() {
 
 bool Point3DParameter::checkValueIsTheSame(var newValue, var oldValue)
 {
-	if (!(newValue.isArray() && oldValue.isArray())) return false;
+	if ( !(newValue.isArray() && oldValue.isArray())) return false;
 
-	return newValue[0] == oldValue[0] && newValue[1] == oldValue[1];
+	return newValue[0] == oldValue[0] && newValue[1] == oldValue[1] && newValue[2] == oldValue[2];
 }
 
 ControllableUI * Point3DParameter::createDefaultUI(Controllable * targetControllable)

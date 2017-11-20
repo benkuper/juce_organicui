@@ -110,6 +110,11 @@ public:
 	virtual void paint(Graphics &g) override;
 
 	virtual void resized() override;
+	virtual void resizedInternalHeader(juce::Rectangle<int> &r);
+	virtual void resizedInternalContent(juce::Rectangle<int> &r);
+	virtual void resizedInternalFooter(juce::Rectangle<int> &r);
+
+
 	virtual void childBoundsChanged(Component *) override;
 
 	virtual void showMenuAndAddItem(bool isFromAddButton, Point<int> mouseDownPos);
@@ -325,7 +330,21 @@ void BaseManagerUI<M, T, U>::resized()
 	if (getWidth() == 0 || getHeight() == 0) return;
 
 	juce::Rectangle<int> r = getLocalBounds().reduced(2);
+	resizedInternalHeader(r);
+	resizedInternalFooter(r);
+	resizedInternalContent(r);
+}
 
+template<class M, class T, class U>
+void BaseManagerUI<M, T, U>::resizedInternalHeader(juce::Rectangle<int>& r)
+{
+	
+}
+
+template<class M, class T, class U>
+void BaseManagerUI<M, T, U>::resizedInternalContent(juce::Rectangle<int>& r)
+{
+	
 	if (addItemBT != nullptr && addItemBT->isVisible() && addItemBT->getParentComponent() == this)
 	{
 		addItemBT->setBounds(r.withSize(24, 24).withX(r.getWidth() - 24));
@@ -338,7 +357,7 @@ void BaseManagerUI<M, T, U>::resized()
 		viewport.setBounds(r);
 		if (defaultLayout == VERTICAL) r.removeFromRight(drawContour ? 14 : 12);
 		else r.removeFromBottom(drawContour ? 14 : 12);
-		
+
 		r.setY(0);
 	}
 
@@ -380,7 +399,7 @@ void BaseManagerUI<M, T, U>::resized()
 			if (grabbingItem != nullptr && i == grabbingItemDropIndex)
 			{
 				grabSpaceRect.setX(r.getX());
-				r.translate(grabSpaceRect.getWidth() + gap,0);
+				r.translate(grabSpaceRect.getWidth() + gap, 0);
 			}
 			tr = r.withWidth(bui->getWidth());
 		}
@@ -388,7 +407,7 @@ void BaseManagerUI<M, T, U>::resized()
 		bui->setBounds(tr);
 
 		if (defaultLayout == VERTICAL) r.translate(0, tr.getHeight() + gap);
-		else r.translate(tr.getWidth() + gap,0);
+		else r.translate(tr.getWidth() + gap, 0);
 
 		i++;
 	}
@@ -399,7 +418,8 @@ void BaseManagerUI<M, T, U>::resized()
 		{
 			grabSpaceRect.setY(r.getY());
 			r.translate(0, grabSpaceRect.getHeight() + gap);
-		} else
+		}
+		else
 		{
 			grabSpaceRect.setX(r.getX());
 			r.translate(grabSpaceRect.getWidth() + gap, 0);
@@ -415,24 +435,30 @@ void BaseManagerUI<M, T, U>::resized()
 
 	if (useViewport || resizeOnChildBoundsChanged)
 	{
-		
+
 		if (defaultLayout == VERTICAL)
 		{
 			float th = 0;
 			if (itemsUI.size() > 0) th = static_cast<BaseItemMinimalUI<T>*>(itemsUI[itemsUI.size() - 1])->getBottom();
-			if (grabbingItem != nullptr) th = jmax<int>(th+grabbingItem->getHeight(), viewport.getHeight());
-			
-			if(useViewport) container.setSize(getWidth(),th);
-			else this->setSize(getWidth(), jmax<int>(th+10,50));
-		} else if(defaultLayout == HORIZONTAL)
+			if (grabbingItem != nullptr) th = jmax<int>(th + grabbingItem->getHeight(), viewport.getHeight());
+
+			if (useViewport) container.setSize(getWidth(), th);
+			else this->setSize(getWidth(), jmax<int>(th + 10, 50));
+		}
+		else if (defaultLayout == HORIZONTAL)
 		{
 			float tw = 0;
 			if (itemsUI.size() > 0) tw = static_cast<BaseItemMinimalUI<T>*>(itemsUI[itemsUI.size() - 1])->getRight();
 			if (grabbingItem != nullptr) tw = jmax<int>(tw, viewport.getWidth());
-			if (useViewport) container.setSize(tw,getHeight());
+			if (useViewport) container.setSize(tw, getHeight());
 			else this->setSize(tw, getHeight());
-		}		
-	} 
+		}
+	}
+}
+
+template<class M, class T, class U>
+void BaseManagerUI<M, T, U>::resizedInternalFooter(juce::Rectangle<int>& r)
+{
 }
 
 template<class M, class T, class U>
