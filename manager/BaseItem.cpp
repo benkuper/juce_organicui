@@ -42,7 +42,7 @@ BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts
 		customParams = new GenericControllableManager("Custom Parameters");
 		customParams->setCustomShortName("params");
 		addChildControllableContainer(customParams);
-		DBG("Add listener to custom Params ");
+		DBG(niceName << " Add listener to custom Params ");
 	}
 
 	//For UI

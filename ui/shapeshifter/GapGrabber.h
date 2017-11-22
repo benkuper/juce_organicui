@@ -21,8 +21,6 @@ public:
 	virtual ~GapGrabber();
 
 	void paint(Graphics & g) override;
-	void mouseEnter(const MouseEvent &e) override;
-	void mouseExit(const MouseEvent &e) override;
 	void mouseDrag(const MouseEvent &e) override;
 
 	Direction direction;

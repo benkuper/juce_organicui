@@ -1,3 +1,4 @@
+#include "ControllableUI.h"
 /*
   ==============================================================================
 
@@ -22,7 +23,6 @@ ControllableUI::ControllableUI(Controllable * controllable) :
 
 	setEnabled(controllable->enabled);
 	setInterceptsMouseClicks(controllable->enabled, controllable->enabled);
-
 }
 
 ControllableUI::~ControllableUI()
@@ -30,6 +30,16 @@ ControllableUI::~ControllableUI()
 	if (controllable.get())controllable->removeControllableListener(this);
 }
 
+
+void ControllableUI::mouseEnter(const MouseEvent & e)
+{
+	if (HelpBox::getInstanceWithoutCreating() != nullptr) HelpBox::getInstance()->setOverData(controllable->helpID);
+}
+
+void ControllableUI::mouseExit(const MouseEvent & e)
+{
+	if (HelpBox::getInstanceWithoutCreating() != nullptr && HelpBox::getInstance()->overDataID == controllable->helpID) HelpBox::getInstance()->setOverData("");
+}
 
 void ControllableUI::mouseDown(const MouseEvent & e)
 {

@@ -29,6 +29,7 @@ void Inspectable::selectThis()
 {
 	if (selectionManager == nullptr) return;
 	selectionManager->selectInspectable(this);
+	if (helpID.isNotEmpty() && HelpBox::getInstanceWithoutCreating() != nullptr) HelpBox::getInstance()->setPersistentData(helpID);
 }
 
 void Inspectable::setSelected(bool value)

@@ -12,7 +12,13 @@
 
 juce_ImplementSingleton(AppUpdater)
 
-void AppUpdater::setURLs(URL _updateURL, URL _downloadURL)
+AppUpdater::~AppUpdater()
+{
+	signalThreadShouldExit();
+	waitForThreadToExit(1000);
+}
+
+  void AppUpdater::setURLs(URL _updateURL, URL _downloadURL)
 {
 	updateURL = _updateURL;  
 	downloadURL = _downloadURL;  
@@ -34,7 +40,7 @@ void AppUpdater::run()
 #if JUCE_WINDOWS
 	if (statusCode != 200)
 	{
-		LOG("Failed to connect, status code = " + String(statusCode));
+		LOGWARNING("Failed to connect, status code = " + String(statusCode));
 		return;
 	}
 #endif
@@ -63,15 +69,15 @@ void AppUpdater::run()
 				if (result) downloadURL.launchInDefaultBrowser();
 			} else
 			{
-				LOG("App is up to date.");
+				LOG("App is up to date :) (Latest version online : " << data.getProperty("version","").toString() << ")");
 			}
 		} else
 		{
-			LOG("Error, update file is not valid");
+			LOGERROR("Error while checking updates, update file is not valid");
 		}
 
 	} else
 	{
-		LOG("Error while trying to access to the update file");
+		LOGERROR("Error while trying to access to the update file");
 	}
 }

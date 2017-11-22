@@ -30,6 +30,9 @@ public:
 	//for multiSelection
 	bool isPreselected;
 
+	//Help
+	String helpID;
+
 	virtual void selectThis();
 	virtual void setSelected(bool value);
 

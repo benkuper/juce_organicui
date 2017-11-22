@@ -19,6 +19,8 @@ public:
 	juce_DeclareSingleton(AppUpdater, true);
 
 	AppUpdater() : Thread("appUpdater") {}
+	~AppUpdater();
+
 	URL updateURL;
 	URL downloadURL;
 

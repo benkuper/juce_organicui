@@ -57,6 +57,8 @@ Engine::~Engine() {
 	ScriptUtil::deleteInstance();
 	ShapeShifterFactory::deleteInstance();
 
+	HelpBox::deleteInstance();
+
 	//UndoMaster::deleteInstance();
 
 	Engine::mainEngine = nullptr;

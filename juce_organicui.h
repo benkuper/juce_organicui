@@ -68,6 +68,7 @@ using namespace juce;
 
 #include "script/ScriptTarget.h"
 
+
 #include "inspectable/Inspectable.h"
 #include "inspectable/InspectableContent.h"
 #include "inspectable/InspectableSelectionManager.h"
@@ -76,6 +77,7 @@ using namespace juce;
 #include "inspectable/ui/InspectableSelector.h"
 #include "inspectable/ui/Inspector.h"
 
+#include "help/HelpBox.h"
 
 #include "controllable/ControllableContainerListener.h"
 
@@ -156,6 +158,7 @@ using namespace juce;
 
 #include "manager/ui/GenericManagerEditor.h"
 
+
 #include "manager/BaseItem.h"
 #include "manager/ui/BaseItemMinimalUI.h"
 #include "manager/ui/BaseItemUI.h"
@@ -196,5 +199,7 @@ using namespace juce;
 #include "logger/ui/CustomLoggerUI.h"
 
 #include "outliner/Outliner.h"
+
+#include "help/HelpPanel.h"
 
 #endif   // ORGANIC_UI_H_INCLUDED 

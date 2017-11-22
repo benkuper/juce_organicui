@@ -9,15 +9,15 @@
  */
 
 
-CustomLoggerUI::CustomLoggerUI(const String &contentName, CustomLogger * l) :
+CustomLoggerUI::CustomLoggerUI(const String& contentName, CustomLogger* l) :
+	logger(l), 
 	ShapeShifterContentComponent(contentName),
-logger(l),
-logList(this),
-	maxNumElement(500),
+	logList(this),
+	maxNumElement(1000),
 	totalLogRow(0)
 {
 	logger->addLogListener(this);
-	TableHeaderComponent * thc = new TableHeaderComponent();
+	TableHeaderComponent* thc = new TableHeaderComponent();
 	thc->addColumn("Time", 1, 60);
 	thc->addColumn("Source", 2, 80);
 	thc->addColumn("Content", 3, 400);
@@ -32,141 +32,227 @@ logList(this),
 	logListComponent->setHeader(thc);
 	addAndMakeVisible(logListComponent);
 
-	LOG("Chataigne v" + String(ProjectInfo::versionString));
-
+	LOG("Chataigne v" + String(ProjectInfo::versionString) + " : (" + String(Time::getCompilationDate().formatted("%d/%m/%y (%R)")) + ")");
+#if USE_FILE_LOGGER
 	LOG("please provide logFile for any bug report :\nlogFile in " + l->fileWriter.getFilePath());
-
+#endif
 	clearB.setButtonText("Clear");
 	clearB.addListener(this);
 	addAndMakeVisible(clearB);
 
+	copyB.setButtonText("Copy to Clipboard");
+	copyB.addListener(this);
+	addAndMakeVisible(copyB);
+
 }
 
-
-void CustomLoggerUI::newMessage(const String & s)
+CustomLoggerUI::~CustomLoggerUI()
 {
-    LogElement * el = new LogElement(s);
+	handleAsyncUpdate();
+	//        logListComponent.setModel(nullptr);
+	logger->removeLogListener(this);
+}
 
 
 
-    logElements.add(el);
-    totalLogRow += el->getNumLines();
+void CustomLoggerUI::newMessage(const String& s)
+{
+	LogElement* el = new LogElement(s);
 
 
-    //bool overFlow = false;
 
-    if(totalLogRow > maxNumElement){
-        int curCount = 0;
-        int idxToRemove = -1;
-        for(int i = logElements.size()-1 ; i >=0 ; i--){
-            curCount+=logElements[i]->getNumLines();
-            if(curCount>=maxNumElement){
-                if(curCount!=maxNumElement){
-                    logElements[i]->trimToFit(logElements[i]->getNumLines() -(curCount - maxNumElement));
-                }
-
-                idxToRemove = i-1;
-                break;
-            }
-
-        }
-
-        if(idxToRemove>=0)logElements.removeRange(0, idxToRemove+1);
-        totalLogRow = maxNumElement;
+	logElements.add(el);
+	totalLogRow += el->getNumLines();
 
 
-    }
+	//bool overFlow = false;
 
-    //coalesce messages
-    triggerAsyncUpdate();
+	if (totalLogRow > maxNumElement)
+	{
+		int curCount = 0;
+		int idxToRemove = -1;
+
+		for (int i = logElements.size() - 1; i >= 0; i--)
+		{
+			curCount += logElements[i]->getNumLines();
+
+			if (curCount >= maxNumElement)
+			{
+				if (curCount != maxNumElement)
+				{
+					logElements[i]->trimToFit(logElements[i]->getNumLines() - (curCount - maxNumElement));
+				}
+
+				idxToRemove = i - 1;
+				break;
+			}
+
+		}
+
+		if (idxToRemove >= 0)logElements.removeRange(0, idxToRemove + 1);
+
+		totalLogRow = maxNumElement;
+
+
+	}
+
+	//coalesce messages
+	triggerAsyncUpdate();
 
 };
-void CustomLoggerUI::handleAsyncUpdate(){
-    //DBG("Handle Async Update");
-    logListComponent->updateContent();
-    logListComponent->scrollToEnsureRowIsOnscreen(totalLogRow-1);
-    repaint();
+void CustomLoggerUI::handleAsyncUpdate()
+{
+	//DBG("Handle Async Update");
+	logListComponent->updateContent();
+	logListComponent->scrollToEnsureRowIsOnscreen(totalLogRow - 1);
+	repaint();
+}
+
+void CustomLoggerUI::resized()
+{
+
+	Rectangle<int> area = getLocalBounds();
+	auto footer = area.removeFromBottom(30).reduced(5);
+	clearB.setBounds(footer.removeFromLeft(footer.getWidth() / 2).reduced(2));
+	copyB.setBounds(footer.reduced(2));
+	logListComponent->setBounds(area);
+	bool firstVisible = area.getWidth() > 400;
+	logListComponent->getHeader().setColumnVisible(1, firstVisible);
+	bool secondVisible = area.getWidth() > 300;
+	logListComponent->getHeader().setColumnVisible(2, secondVisible);
+
+	int tw = getWidth();
+
+	if (firstVisible)tw -= logListComponent->getHeader().getColumnWidth(1);
+
+	if (secondVisible)tw -= logListComponent->getHeader().getColumnWidth(2);
+
+	tw -= logListComponent->getViewport()->getScrollBarThickness();
+	tw = jmax(tw, 100);
+	logListComponent->getHeader().setColumnWidth(3, tw);
 }
 
 
-CustomLoggerUI::~CustomLoggerUI() {
 
-    //        logListComponent.setModel(nullptr);
-    logger->removeLogListener(this);
-}
+void CustomLoggerUI::updateTotalLogRow()
+{
+	totalLogRow = 0;
 
-void CustomLoggerUI::resized(){
-
-    Rectangle<int> area = getLocalBounds();
-    clearB.setBounds(area.removeFromBottom(30).reduced(5));
-    logListComponent->setBounds(area);
-
-    int tw = getWidth();
-    tw -= logListComponent->getHeader().getColumnWidth(1);
-    tw -= logListComponent->getHeader().getColumnWidth(2);
-    tw -= logListComponent->getViewport()->getScrollBarThickness();
-    tw = jmax(tw, 100);
-    logListComponent->getHeader().setColumnWidth(3, tw);
-}
-
-
-
-void CustomLoggerUI::updateTotalLogRow(){
-    totalLogRow=0;
-    for(auto & l:logElements){
-        totalLogRow+=l->getNumLines();
-    }
+	for (auto& l : logElements)
+	{
+		totalLogRow += l->getNumLines();
+	}
 
 }
-const String & CustomLoggerUI::getSourceForRow(int r){
-    int count = 0;
-    int idx = 0;
-    while (count<=r ) {
-        if(count==r){
-            return logElements[idx]->source;
-        }
-        count+=logElements[idx]->getNumLines();
-        idx++;
-        if(idx >= logElements.size())return String::empty;
+const String& CustomLoggerUI::getSourceForRow(const int r) const
+{
+	if (auto el = getElementForRow(r)) {
+		return el->source;
+	}
+	return String::empty;
+}
+const bool CustomLoggerUI::isPrimaryRow(const int r) const
+{
+	int count = 0;
+	int idx = 0;
 
-    }
+	while (count <= r && idx < logElements.size())
+	{
+		if (count == r)
+		{
+			return true;
+		}
+		count += logElements.getUnchecked(idx)->getNumLines();
+		idx++;
 
-    return String::empty;
+	}
+
+	return false;
 }
 
-const String &  CustomLoggerUI::getContentForRow(int r){
-    int count = 0;
-    int idx = 0;
+const String&   CustomLoggerUI::getContentForRow(const int r) const
+{
+	int count = 0;
+	int idx = 0;
 
-    while (idx < logElements.size()) {
+	while (idx < logElements.size())
+	{
 
-        int nl = logElements[idx]->getNumLines();
+		int nl = logElements.getUnchecked(idx)->getNumLines();
 
-        if(count+nl>r){
-            return logElements[idx]->getLine(r-count);
-        }
+		if (count + nl > r)
+		{
+			return logElements.getUnchecked(idx)->getLine(r - count);
+		}
 
-        count+=nl;
-        idx++;
-    }
+		count += nl;
+		idx++;
+	}
 
-    return String::empty;
+	return String::empty;
 };
 
-String  CustomLoggerUI::getTimeStringForRow(int r) {
-    int count = 0;
-    int idx = 0;
-    while (count <= r) {
-        if (count == r) {
-            return String(logElements[idx]->time.toString(false, true, true, true));
-        }
-        count += logElements[idx]->getNumLines();
-        idx++;
-        if (idx >= logElements.size()) return String::empty;
+const LogElement* CustomLoggerUI::getElementForRow(const int r) const {
+	int count = 0;
+	int idx = 0;
 
-    }
+	while (idx < logElements.size())
+	{
+		auto el = logElements.getUnchecked(idx);
 
-    return String::empty;
+		int nl = el->getNumLines();
+
+		if (count + nl > r)
+		{
+			return el;
+		}
+
+		count += nl;
+		idx++;
+	}
+
+	return nullptr;
+
+}
+
+const String  CustomLoggerUI::getTimeStringForRow(const int r) const
+{
+	if (auto el = getElementForRow(r)) {
+		return String(el->time.toString(false, true, true, true));
+	}
+
+	return String::empty;
+};
+
+const Colour CustomLoggerUI::getSeverityColourForRow(const int r) const
+{
+
+	if (auto el = getElementForRow(r))
+	{
+		LogElement::Severity s = el->severity;
+
+		switch (s)
+		{
+		case LogElement::LOG_NONE:
+			return BG_COLOR.brighter(.1f);
+
+		case LogElement::LOG_DBG:
+			return BLUE_COLOR.withSaturation(.2f).darker(.3f);
+
+		case LogElement::LOG_WARN:
+			return Colours::orange;
+
+		case LogElement::LOG_ERR:
+			return Colours::red;
+
+		default:
+			return Colours::pink;
+
+		}
+
+	}
+
+	return Colours::pink;
 };
 
 
@@ -174,57 +260,90 @@ String  CustomLoggerUI::getTimeStringForRow(int r) {
 //////////////
 // logList
 
-CustomLoggerUI::LogList::LogList(CustomLoggerUI * o) :owner(o)
+CustomLoggerUI::LogList::LogList(CustomLoggerUI* o) : owner(o)
 {
 }
 
-int CustomLoggerUI::LogList::getNumRows() {
-
-    return owner->totalLogRow;
-};
-
-void CustomLoggerUI::LogList::paintRowBackground (Graphics& g,
-                                                int rowNumber,
-                                                int width, int height,
-                                                bool)
+int CustomLoggerUI::LogList::getNumRows()
 {
-    g.setColour(Colours::transparentBlack.withAlpha((rowNumber%2==0?0.1f:0.f)));
-    g.fillRect(0, 0, width, height);
+
+	return owner->totalLogRow;
 };
 
-void CustomLoggerUI::LogList::paintCell (Graphics& g,
-                                       int rowNumber,
-                                       int columnId,
-                                       int width, int height,
-                                       bool) {
-    g.setFont(12);
-    g.setColour(TEXT_COLOR);
-    String text;
-
-    switch (columnId)
-    {
-        case 1:
-            text = owner->getTimeStringForRow(rowNumber);
-            break;
-        case 2:
-            text = owner->getSourceForRow(rowNumber);
-            break;
-        case 3:
-            text = owner->getContentForRow(rowNumber);
-            break;
-    }
-
-    g.drawFittedText(text, 0, 0, width, height, Justification::left, 1);
-    
+void CustomLoggerUI::LogList::paintRowBackground(Graphics& g,
+	int rowNumber,
+	int width, int height,
+	bool)
+{
+	Colour c = owner->getSeverityColourForRow(rowNumber);
+	if (rowNumber % 2 == 0) c = c.brighter(.1f);
+	g.setColour(c);
+	g.fillRect(0, 0, width, height);
 };
 
-void CustomLoggerUI::buttonClicked (Button* b) {
-    
-    if(b==&clearB)
-    {
-        logElements.clear();
-        totalLogRow = 0;
-        logListComponent->updateContent();
-        LOG("Cleared.");
-    }
+void CustomLoggerUI::LogList::paintCell(Graphics& g,
+	int rowNumber,
+	int columnId,
+	int width, int height,
+	bool)
+{
+	g.setFont(12);
+	g.setColour(owner->findColour(Label::textColourId));
+	String text;
+
+	switch (columnId)
+	{
+	case 1:
+		text = owner->isPrimaryRow(rowNumber) ? owner->getTimeStringForRow(rowNumber) : String::empty;
+		break;
+
+	case 2:
+		text = owner->isPrimaryRow(rowNumber) ? owner->getSourceForRow(rowNumber) : String::empty;
+		break;
+
+	case 3:
+		text = owner->getContentForRow(rowNumber);
+		break;
+	}
+
+	g.drawFittedText(text, 0, 0, width, height, Justification::left, 1);
+
+};
+
+String CustomLoggerUI::LogList::getCellTooltip(int rowNumber, int /*columnId*/)
+{
+	auto el = owner->getElementForRow(rowNumber);
+
+	String sR = el->source;
+	return
+		(sR.isNotEmpty() ?
+			sR + " (" + el->time.toString(false, true, true, true) + ")" + "\n" : String::empty)
+		+ (el->getNumLines()< 10 ? el->content : owner->getSourceForRow(rowNumber));
+
+
+};
+
+void CustomLoggerUI::buttonClicked(Button* b)
+{
+
+	if (b == &clearB)
+	{
+		logElements.clear();
+		totalLogRow = 0;
+		logListComponent->updateContent();
+		LOG("Cleared.");
+	}
+
+	else if (b == &copyB) {
+		String s;
+		for (auto & el : logElements) {
+			int leftS = el->source.length() + 3;
+			s += el->source + " : ";
+			for (int i = 0; i < el->getNumLines(); i++) {
+				if (i != 0)for (int j = 0; j < leftS; j++) s += " ";
+				s += el->getLine(i) + "\n";
+			}
+		}
+		SystemClipboard::copyTextToClipboard(s);
+	}
 }

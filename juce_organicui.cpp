@@ -85,6 +85,7 @@
 #include "inspectable/Inspectable.cpp"
 #include "inspectable/InspectableContent.cpp"
 #include "inspectable/InspectableSelectionManager.cpp"
+#include "help/HelpBox.cpp"
 #include "inspectable/ui/InspectableContentComponent.cpp"
 #include "inspectable/ui/InspectableEditor.cpp"
 #include "inspectable/ui/InspectableSelector.cpp"
@@ -116,6 +117,7 @@
 #include "ui/shapeshifter/ShapeShifterPanelHeader.cpp"
 #include "ui/shapeshifter/ShapeShifterPanelTab.cpp"
 #include "ui/shapeshifter/ShapeShifterWindow.cpp"
+#include "help/HelpPanel.cpp"
 #include "undo/UndoMaster.cpp"
 #include "updater/AppUpdater.cpp"
 

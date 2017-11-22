@@ -32,14 +32,6 @@ void GapGrabber::paint(Graphics & g)
 	g.fillRoundedRectangle(tr.toFloat(), 2);
 }
 
-void GapGrabber::mouseEnter(const MouseEvent &)
-{
-}
-
-void GapGrabber::mouseExit(const MouseEvent &)
-{
-}
-
 void GapGrabber::mouseDrag(const MouseEvent &e)
 {
 	listeners.call(&Listener::grabberGrabUpdate, this, direction == HORIZONTAL?e.getPosition().x:e.getPosition().y);

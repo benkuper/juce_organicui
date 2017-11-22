@@ -30,6 +30,8 @@ public:
 
 	bool forceFeedbackOnly; //if false, will rely on Controllable isEditable property. if true, will be force to no editable
 	
+	void mouseEnter(const MouseEvent &e) override;
+	void mouseExit(const MouseEvent &e) override;
 	void mouseDown(const MouseEvent &e) override;
 	void mouseUp(const MouseEvent &e) override;
 
