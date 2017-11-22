@@ -44,6 +44,7 @@ CustomLoggerUI::CustomLoggerUI(const String& contentName, CustomLogger* l) :
 	copyB.addListener(this);
 	addAndMakeVisible(copyB);
 
+	helpID = "Logger";
 }
 
 CustomLoggerUI::~CustomLoggerUI()

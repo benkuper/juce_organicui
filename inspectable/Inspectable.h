@@ -32,6 +32,7 @@ public:
 
 	//Help
 	String helpID;
+	virtual String getHelpID();
 
 	virtual void selectThis();
 	virtual void setSelected(bool value);

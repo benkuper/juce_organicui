@@ -125,6 +125,8 @@ InspectorUI::InspectorUI(const String &name, InspectableSelectionManager * selec
 	inspector(selectionManager)
 {
 	addAndMakeVisible(&inspector);
+
+	helpID = "Inspector";
 }
 
 InspectorUI::~InspectorUI()

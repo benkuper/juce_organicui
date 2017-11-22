@@ -20,6 +20,7 @@ DashboardManagerView::DashboardManagerView(const String &contentName, DashboardM
 	InspectableSelectionManager::mainSelectionManager->addSelectionListener(this);
 	DashboardManager::getInstance()->addBaseManagerListener(this);
 	
+	helpID = "Dashboard";
 }
 
 DashboardManagerView::~DashboardManagerView()

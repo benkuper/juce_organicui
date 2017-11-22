@@ -1,3 +1,4 @@
+#include "Inspectable.h"
 /*
   ==============================================================================
 
@@ -24,6 +25,11 @@ Inspectable::~Inspectable()
 	masterReference.clear();
 }
 
+
+String Inspectable::getHelpID()
+{
+	return helpID;
+}
 
 void Inspectable::selectThis()
 {

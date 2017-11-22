@@ -33,6 +33,11 @@ class ShapeShifterContentComponent :
 {
 public:
 	ShapeShifterContentComponent(const String &contentName);
+
+	String helpID;
+
+	void mouseEnter(const MouseEvent &e) override;
+	void mouseExit(const MouseEvent &e) override;
 };
 
 #endif  // SHAPESHIFTERCONTENT_H_INCLUDED

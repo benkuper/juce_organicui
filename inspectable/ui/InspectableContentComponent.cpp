@@ -1,3 +1,4 @@
+#include "InspectableContentComponent.h"
 /*
   ==============================================================================
 
@@ -21,6 +22,17 @@ bringToFrontOnSelect(true)
 
 InspectableContentComponent::~InspectableContentComponent()
 {
+}
+
+
+void InspectableContentComponent::mouseEnter(const MouseEvent & e)
+{
+	HelpBox::getInstance()->setOverData(inspectable->helpID);
+}
+
+void InspectableContentComponent::mouseExit(const MouseEvent & e)
+{
+	HelpBox::getInstance()->clearOverData(inspectable->helpID);
 }
 
 void InspectableContentComponent::mouseDown(const MouseEvent & e)

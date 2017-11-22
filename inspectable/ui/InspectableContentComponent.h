@@ -30,6 +30,9 @@ public:
 	bool autoSelectWithChildRespect;
 	bool bringToFrontOnSelect;
 
+	void mouseEnter(const MouseEvent &e) override;
+	void mouseExit(const MouseEvent &e) override;
+
 	void mouseDown(const MouseEvent &e) override;
 
 	virtual void paintOverChildren(Graphics &g) override;

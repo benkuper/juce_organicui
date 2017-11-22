@@ -33,12 +33,12 @@ ControllableUI::~ControllableUI()
 
 void ControllableUI::mouseEnter(const MouseEvent & e)
 {
-	if (HelpBox::getInstanceWithoutCreating() != nullptr) HelpBox::getInstance()->setOverData(controllable->helpID);
+	HelpBox::getInstance()->setOverData(controllable->helpID);
 }
 
 void ControllableUI::mouseExit(const MouseEvent & e)
 {
-	if (HelpBox::getInstanceWithoutCreating() != nullptr && HelpBox::getInstance()->overDataID == controllable->helpID) HelpBox::getInstance()->setOverData("");
+	HelpBox::getInstance()->clearOverData(controllable->helpID);
 }
 
 void ControllableUI::mouseDown(const MouseEvent & e)

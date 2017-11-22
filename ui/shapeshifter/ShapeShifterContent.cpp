@@ -1,3 +1,4 @@
+#include "ShapeShifterContent.h"
 /*
   ==============================================================================
 
@@ -24,4 +25,14 @@ ShapeShifterContentComponent::ShapeShifterContentComponent(const String & conten
 	ShapeShifterContent(this, contentName)
 {
 
+}
+
+void ShapeShifterContentComponent::mouseEnter(const MouseEvent & e)
+{
+	HelpBox::getInstance()->setOverData(helpID);
+}
+
+void ShapeShifterContentComponent::mouseExit(const MouseEvent & e)
+{
+	HelpBox::getInstance()->clearOverData(helpID);
 }

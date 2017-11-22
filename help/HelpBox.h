@@ -18,8 +18,13 @@ public:
 	URL helpURL;
 
 	void loadHelp(URL helpURL);
+	void loadLocalHelp();
+
 	void setOverData(String dataID);
+	void clearOverData(String dataID);
+
 	void setPersistentData(String dataID);
+	void clearPersistentData(String dataID);
 
 	const String getContentForID(String dataID);
 	const String getCurrentData();

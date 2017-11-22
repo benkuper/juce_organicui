@@ -26,6 +26,9 @@ Outliner::Outliner(const String &contentName) :
 	treeView.getViewport()->setScrollBarThickness(10);
 
 	rebuildTree();
+
+	helpID = "Outliner";
+
 }
 
 Outliner::~Outliner()
