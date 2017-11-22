@@ -17,9 +17,11 @@ class InspectableSelectionManager :
 	public Inspectable::InspectableListener
 {
 public:
-	juce_DeclareSingleton(InspectableSelectionManager, true);
-	InspectableSelectionManager();
+	//juce_DeclareSingleton(InspectableSelectionManager, true);
+	InspectableSelectionManager(bool isMainSelectionManager);
 	~InspectableSelectionManager();
+
+	static InspectableSelectionManager * mainSelectionManager;
 
 	bool enabled;
 	Array<Inspectable *> currentInspectables;

@@ -17,7 +17,7 @@ DashboardManagerView::DashboardManagerView(const String &contentName, DashboardM
 	contentIsFlexible = true; 
 	
 	addAndMakeVisible(&managerUI);
-	InspectableSelectionManager::getInstance()->addSelectionListener(this);
+	InspectableSelectionManager::mainSelectionManager->addSelectionListener(this);
 	DashboardManager::getInstance()->addBaseManagerListener(this);
 	
 }
@@ -25,7 +25,7 @@ DashboardManagerView::DashboardManagerView(const String &contentName, DashboardM
 DashboardManagerView::~DashboardManagerView()
 {
 	if(DashboardManager::getInstanceWithoutCreating() != nullptr) DashboardManager::getInstance()->removeBaseManagerListener(this);
-	if (InspectableSelectionManager::getInstanceWithoutCreating() != nullptr) InspectableSelectionManager::getInstance()->removeSelectionListener(this);
+	if (InspectableSelectionManager::mainSelectionManager != nullptr) InspectableSelectionManager::mainSelectionManager->removeSelectionListener(this);
 }
 
 void DashboardManagerView::setCurrentDashboard(Dashboard * d)
@@ -61,8 +61,8 @@ void DashboardManagerView::resized()
 
 void DashboardManagerView::inspectablesSelectionChanged()
 {
-	if (InspectableSelectionManager::getInstance()->isEmpty()) return;
-	Dashboard * cc = dynamic_cast<Dashboard *>(InspectableSelectionManager::getInstance()->currentInspectables[0]);
+	if (InspectableSelectionManager::mainSelectionManager->isEmpty()) return;
+	Dashboard * cc = dynamic_cast<Dashboard *>(InspectableSelectionManager::mainSelectionManager->currentInspectables[0]);
 	if (cc == nullptr) return;
 	setCurrentDashboard(cc);
 }

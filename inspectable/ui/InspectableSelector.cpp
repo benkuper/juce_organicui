@@ -45,7 +45,7 @@ void InspectableSelector::startSelection(Component * parent, Array<Component*> _
 	inspectables = relatedInspectables;
 
 	clearSelectionAtEnd = clearSelection;
-	currentSelectionManager = manager != nullptr ? manager : InspectableSelectionManager::getInstance();
+	currentSelectionManager = manager != nullptr ? manager : InspectableSelectionManager::mainSelectionManager;
 
 	if (clearSelection) currentSelectionManager->clearSelection();
 

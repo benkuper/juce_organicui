@@ -28,6 +28,8 @@ public:
 
 	static Engine * mainEngine;
 
+	ScopedPointer<InspectableSelectionManager> selectionManager;
+
 	ApplicationProperties * appProperties;
 	String appVersion;
 

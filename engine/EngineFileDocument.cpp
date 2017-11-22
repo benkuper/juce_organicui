@@ -47,7 +47,7 @@ Result Engine::loadDocument (const File& file){
   isLoadingFile = true;
   engineListeners.call(&EngineListener::startLoadFile);
 
-  if (InspectableSelectionManager::getInstanceWithoutCreating() != nullptr)  InspectableSelectionManager::getInstance()->setEnabled(false); //avoid creation of inspector editor while recreating all nodes, controllers, rules,etc. from file
+  if (InspectableSelectionManager::mainSelectionManager != nullptr)  InspectableSelectionManager::mainSelectionManager->setEnabled(false); //avoid creation of inspector editor while recreating all nodes, controllers, rules,etc. from file
 
 #ifdef MULTITHREADED_LOADING
   fileLoader = new FileLoader(this,file);
@@ -169,7 +169,6 @@ void Engine::setLastDocumentOpened (const File& file) {
 
 var Engine::getJSONData()
 {
-
   var data(new DynamicObject());
   var metaData(new DynamicObject());
 
@@ -209,7 +208,7 @@ void Engine::loadJSONData (var data,ProgressTask * loadingTask)
 
 	clear();
 
-	if (InspectableSelectionManager::getInstanceWithoutCreating() != nullptr) InspectableSelectionManager::getInstance()->setEnabled(false); //avoid creation of inspector editor while recreating all nodes, controllers, rules,etc. from file
+	//if (InspectableSelectionManager::mainSelectionManager != nullptr) InspectableSelectionManager::mainSelectionManager->setEnabled(false); //avoid creation of inspector editor while recreating all nodes, controllers, rules,etc. from file
 	if (Outliner::getInstanceWithoutCreating() != nullptr) Outliner::getInstance()->setEnabled(false);
 
 	DynamicObject * d = data.getDynamicObject();
@@ -228,7 +227,7 @@ void Engine::loadJSONData (var data,ProgressTask * loadingTask)
 	dashboardTask->end();
 
 
-	if (InspectableSelectionManager::getInstanceWithoutCreating() != nullptr) InspectableSelectionManager::getInstance()->setEnabled(true); //Re enable editor
+	if (InspectableSelectionManager::mainSelectionManager != nullptr) InspectableSelectionManager::mainSelectionManager->setEnabled(true); //Re enable editor
 	if (Outliner::getInstanceWithoutCreating() != nullptr) Outliner::getInstance()->setEnabled(true);
 }
 

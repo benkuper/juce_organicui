@@ -51,9 +51,9 @@ void Inspectable::setSelectionManager(InspectableSelectionManager * _selectionMa
 	if (_selectionManager != nullptr)
 	{
 		selectionManager = _selectionManager;
-	}else if(InspectableSelectionManager::getInstanceWithoutCreating() != nullptr)
+	}else if(InspectableSelectionManager::mainSelectionManager != nullptr)
 	{
-		selectionManager = InspectableSelectionManager::getInstance();
+		selectionManager = InspectableSelectionManager::mainSelectionManager;
 	}
 
 }

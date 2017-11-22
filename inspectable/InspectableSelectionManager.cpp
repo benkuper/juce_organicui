@@ -9,17 +9,22 @@
 */
 
 
-juce_ImplementSingleton(InspectableSelectionManager)
+InspectableSelectionManager * InspectableSelectionManager::mainSelectionManager = nullptr;
 
-InspectableSelectionManager::InspectableSelectionManager()
+InspectableSelectionManager::InspectableSelectionManager(bool isMainSelectionManager)
 {
+	if (isMainSelectionManager) InspectableSelectionManager::mainSelectionManager = this;
     setEnabled(true);
 }
 
 InspectableSelectionManager::~InspectableSelectionManager()
 {
 	clearSelection(false);
-	InspectableSelector::deleteInstance();
+	if (InspectableSelectionManager::mainSelectionManager == this)
+	{
+		InspectableSelector::deleteInstance();
+		InspectableSelectionManager::mainSelectionManager = nullptr;
+	}
 }
 
 void InspectableSelectionManager::setEnabled(bool value)
@@ -30,6 +35,9 @@ void InspectableSelectionManager::setEnabled(bool value)
 
 void InspectableSelectionManager::selectInspectables(Array<Inspectable*> inspectables, bool doClearSelection, bool notify)
 {
+	if (!enabled) return;
+	if (Engine::mainEngine->isLoadingFile) return;
+
 	if (doClearSelection) clearSelection(false);
 	for (auto &i : inspectables) selectInspectable(i, false, false);
 	if (notify) listeners.call(&Listener::inspectablesSelectionChanged);
@@ -38,6 +46,7 @@ void InspectableSelectionManager::selectInspectables(Array<Inspectable*> inspect
 void InspectableSelectionManager::selectInspectable(WeakReference<Inspectable> inspectable, bool doClearSelection, bool notify)
 {
 	if (!enabled) return;
+	if (Engine::mainEngine->isLoadingFile) return;
 
 	if (currentInspectables.contains(inspectable)) return;
 	

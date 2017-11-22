@@ -11,6 +11,7 @@
 GapGrabber::GapGrabber(Direction _direction) : direction(_direction)
 {
 	setRepaintsOnMouseActivity(true);
+	setMouseCursor(direction == HORIZONTAL ? MouseCursor::LeftRightResizeCursor : MouseCursor::UpDownResizeCursor);
 }
 
 GapGrabber::~GapGrabber()
@@ -33,12 +34,10 @@ void GapGrabber::paint(Graphics & g)
 
 void GapGrabber::mouseEnter(const MouseEvent &)
 {
-	setMouseCursor(direction == HORIZONTAL?MouseCursor::LeftRightResizeCursor:MouseCursor::UpDownResizeCursor);
 }
 
 void GapGrabber::mouseExit(const MouseEvent &)
 {
-	setMouseCursor(MouseCursor::NormalCursor);
 }
 
 void GapGrabber::mouseDrag(const MouseEvent &e)

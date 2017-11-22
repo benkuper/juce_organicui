@@ -21,15 +21,15 @@ class Inspector :
 	public InspectableSelectionManager::Listener
 {
 public:
-	Inspector(bool isMainInspector);
+	Inspector(InspectableSelectionManager * selectionManager = nullptr);
 	virtual ~Inspector();
 
-	bool isMainInspector;
-
+	InspectableSelectionManager * selectionManager;
 	WeakReference<Inspectable> currentInspectable;
 	Viewport vp;
 	ScopedPointer<InspectableEditor> currentEditor;
 
+	void setSelectionManager(InspectableSelectionManager * newSM);
 	void resized() override;
 	void setCurrentInspectable(WeakReference<Inspectable> inspectable);
 	void clear();
@@ -59,14 +59,14 @@ class InspectorUI :
 	public ShapeShifterContentComponent
 {
 public:
-	InspectorUI(const String &name, bool isMainInspector);
+	InspectorUI(const String &name, InspectableSelectionManager * selectionManager = nullptr);
 	~InspectorUI();
 
 	Inspector inspector;
 
 	void resized() override;
 
-	static InspectorUI * create(const String &contentName) { return new InspectorUI(contentName,true); }
+	static InspectorUI * create(const String &contentName) { return new InspectorUI(contentName); }
 };
 
 #endif  // INSPECTOR_H_INCLUDED

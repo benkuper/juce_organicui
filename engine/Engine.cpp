@@ -30,7 +30,7 @@ Engine::Engine(const String & fileName, const String & fileExtension, Applicatio
 
 	addChildControllableContainer(DashboardManager::getInstance());
 
-	InspectableSelectionManager::getInstance(); //selectionManager constructor
+	selectionManager = new InspectableSelectionManager(true); //selectionManager constructor
 	ScriptUtil::getInstance(); //trigger ScriptUtil constructor
 }
 
@@ -43,7 +43,7 @@ Engine::~Engine() {
 	controllableContainerListeners.clear();
 	engineListeners.clear();
 
-	InspectableSelectionManager::deleteInstance();
+	selectionManager = nullptr; //delete selection manager
 
 	DashboardManager::deleteInstance();
 	Outliner::deleteInstance();
@@ -103,10 +103,10 @@ void Engine::clear() {
 		Outliner::getInstanceWithoutCreating()->enabled = false;
 	}
 
-	if (InspectableSelectionManager::getInstanceWithoutCreating())
+	if (InspectableSelectionManager::mainSelectionManager != nullptr)
 	{
-		InspectableSelectionManager::getInstance()->clearSelection();
-		InspectableSelectionManager::getInstance()->setEnabled(false);
+		InspectableSelectionManager::mainSelectionManager->clearSelection();
+		InspectableSelectionManager::mainSelectionManager->setEnabled(false);
 	}
 
 	DashboardManager::getInstance()->clear();
@@ -115,7 +115,7 @@ void Engine::clear() {
 	clearInternal();
 
 	if (Outliner::getInstanceWithoutCreating()) Outliner::getInstanceWithoutCreating()->enabled = true;
-	if (InspectableSelectionManager::getInstanceWithoutCreating()) InspectableSelectionManager::getInstance()->setEnabled(true);
+	if (InspectableSelectionManager::mainSelectionManager != nullptr) InspectableSelectionManager::mainSelectionManager->setEnabled(true);
 
 	isClearing = false;
 

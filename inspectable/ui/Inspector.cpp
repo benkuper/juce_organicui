@@ -10,13 +10,14 @@
 */
 
 
-Inspector::Inspector(bool isMain) :
-	isMainInspector(isMain),
+
+Inspector::Inspector(InspectableSelectionManager * _selectionManager) :
+	selectionManager(nullptr),
 	currentInspectable(nullptr),
 	currentEditor(nullptr)
 {
 	
-	if (InspectableSelectionManager::getInstanceWithoutCreating() != nullptr) InspectableSelectionManager::getInstance()->addSelectionListener(this);
+	setSelectionManager(_selectionManager);
 
 	vp.setScrollBarsShown(true, false);
 	vp.setScrollOnDragEnabled(false);
@@ -27,10 +28,21 @@ Inspector::Inspector(bool isMain) :
 }
 
 
+
 Inspector::~Inspector()
 {
-	if (InspectableSelectionManager::getInstanceWithoutCreating() != nullptr) InspectableSelectionManager::getInstance()->removeSelectionListener(this); 
+	if (selectionManager != nullptr) InspectableSelectionManager::mainSelectionManager->removeSelectionListener(this);
 	clear();
+}
+
+void Inspector::setSelectionManager(InspectableSelectionManager * newSM)
+{
+	if (selectionManager != nullptr) selectionManager->removeSelectionListener(this);
+	
+	selectionManager = newSM;
+
+	if (selectionManager == nullptr) selectionManager = InspectableSelectionManager::mainSelectionManager;
+	if (selectionManager != nullptr) selectionManager->addSelectionListener(this);
 }
 
 void Inspector::resized()
@@ -97,20 +109,20 @@ void Inspector::inspectableDestroyed(Inspectable * i)
 
 void Inspector::inspectablesSelectionChanged()
 {
-	if (InspectableSelectionManager::getInstance()->isEmpty())
+	if (selectionManager->isEmpty())
 	{
 		setCurrentInspectable(nullptr);
 		return;
 	}
 
-	Inspectable * newI = InspectableSelectionManager::getInstance()->currentInspectables[0];
+	Inspectable * newI = selectionManager->currentInspectables[0];
 	if (!newI->showInspectorOnSelect) return;
 	setCurrentInspectable(newI);
 }
 
-InspectorUI::InspectorUI(const String &name, bool isMainInspector) :
+InspectorUI::InspectorUI(const String &name, InspectableSelectionManager * selectionManager) :
 	ShapeShifterContentComponent(name),
-	inspector(isMainInspector)
+	inspector(selectionManager)
 {
 	addAndMakeVisible(&inspector);
 }
