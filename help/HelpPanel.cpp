@@ -14,7 +14,8 @@ HelpPanel::HelpPanel(const String &name) :
 	ShapeShifterContentComponent(name),
 	helpLabel("HelpLabel")
 {
-	helpLabel.setJustificationType(Justification::centredTop);
+	helpLabel.setJustificationType(Justification::topLeft);
+	helpLabel.setFont(14);
 	addAndMakeVisible(&helpLabel);
 	HelpBox::getInstance()->addHelpListener(this);
 }

@@ -27,12 +27,14 @@ InspectableContentComponent::~InspectableContentComponent()
 
 void InspectableContentComponent::mouseEnter(const MouseEvent & e)
 {
-	HelpBox::getInstance()->setOverData(inspectable->helpID);
+	//DBG("Mouse Enter : " << inspectable->getHelpID());
+	if(HelpBox::getInstance()->overDataID.isEmpty()) HelpBox::getInstance()->setOverData(inspectable->getHelpID());
 }
 
 void InspectableContentComponent::mouseExit(const MouseEvent & e)
 {
-	HelpBox::getInstance()->clearOverData(inspectable->helpID);
+	//DBG("Mouse Exit : " << inspectable->getHelpID());
+	HelpBox::getInstance()->clearOverData(inspectable->getHelpID());
 }
 
 void InspectableContentComponent::mouseDown(const MouseEvent & e)

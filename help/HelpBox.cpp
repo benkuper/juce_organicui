@@ -21,6 +21,7 @@ void HelpBox::loadHelp(URL _helpURL)
 void HelpBox::loadLocalHelp()
 {
 	File helpFile = File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile("help.json");
+	if (!helpFile.existsAsFile()) return;
 	ScopedPointer<InputStream> is(helpFile.createInputStream());
 	helpData = JSON::parse(*is);
 }
@@ -74,7 +75,7 @@ void HelpBox::run()
 #if JUCE_WINDOWS
 	if (statusCode != 200)
 	{
-		LOGWARNING("Failed to connect to help file, status code = " + String(statusCode));
+		LOGWARNING("Failed to retrieve online help, loading local file");
 		loadLocalHelp();
 		return;
 	}
@@ -94,6 +95,7 @@ void HelpBox::run()
 			helpData = data; 
 
 			File helpFile = File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile("help.json");
+			if (helpFile.existsAsFile()) helpFile.deleteFile();
 			ScopedPointer<OutputStream> os(helpFile.createOutputStream());
 			if (os == nullptr)
 			{
