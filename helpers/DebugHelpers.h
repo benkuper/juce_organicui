@@ -76,8 +76,9 @@ class LogElement
 {
 public:
 	LogElement(const String& log) :
-		source(getLogSource(log)),
-		content(getLogContent(log))
+		content(getLogContent(log)),
+        source(getLogSource(log))
+		
 	{
 		_arr = new StringArray();
 		time = Time::getCurrentTime();
