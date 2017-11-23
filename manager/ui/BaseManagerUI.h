@@ -84,6 +84,10 @@ public:
 
 	ScopedPointer<ImageButton> addItemBT;
 
+	
+	//ui
+	String noItemText;
+
 	//menu
 	String addItemText;
 
@@ -322,6 +326,13 @@ void BaseManagerUI<M, T, U>::paint(Graphics & g)
 		g.setColour(HIGHLIGHT_COLOR.withAlpha(.6f));
 		g.fillRoundedRectangle(grabSpaceRect.translated(0, viewport.getY()).reduced(4).toFloat(), 2);
 	}
+
+	if (manager->items.size() == 0 && noItemText.isNotEmpty())
+	{
+		g.setColour(Colours::white.withAlpha(.4f));
+		g.setFont(16);
+		g.drawFittedText(noItemText, getLocalBounds(), Justification::centred, 6);
+	}
 }
 
 template<class M, class T, class U>
@@ -531,6 +542,9 @@ U * BaseManagerUI<M, T, U>::addItemUI(T * item, bool animate)
 	}
 
 	managerUIListeners.call(&ManagerUIListener::itemUIAdded, tui);
+
+	repaint();
+	
 	return tui;
 }
 
@@ -561,6 +575,7 @@ void BaseManagerUI<M, T, U>::removeItemUI(T * item)
 	delete tui;
 
 	resized();
+	repaint();
 }
 
 template<class M, class T, class U>
