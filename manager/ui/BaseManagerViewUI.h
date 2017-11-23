@@ -146,7 +146,7 @@ void BaseManagerViewUI<M, T, U>::paint(Graphics & g)
 	g.drawLine(center.x, 0, center.x, this->getHeight(), 2);
 	g.drawLine(0, center.y, this->getWidth(), center.y, 2);
 
-	if (manager->items.size() == 0 && noItemText.isNotEmpty())
+	if (this->manager->items.size() == 0 && noItemText.isNotEmpty())
 	{
 		g.setColour(Colours::white.withAlpha(.4f));
 		g.setFont(16);

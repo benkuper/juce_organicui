@@ -327,7 +327,7 @@ void BaseManagerUI<M, T, U>::paint(Graphics & g)
 		g.fillRoundedRectangle(grabSpaceRect.translated(0, viewport.getY()).reduced(4).toFloat(), 2);
 	}
 
-	if (manager->items.size() == 0 && noItemText.isNotEmpty())
+	if (this->manager->items.size() == 0 && noItemText.isNotEmpty())
 	{
 		g.setColour(Colours::white.withAlpha(.4f));
 		g.setFont(16);
