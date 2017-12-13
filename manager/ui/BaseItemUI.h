@@ -411,7 +411,7 @@ void BaseItemUI<T>::setGrabber(Grabber * newGrabber)
 {
 	if (grabber != nullptr)
 	{
-		removeChildComponent(grabber);
+		this->removeChildComponent(grabber);
 	}
 
 	grabber = newGrabber;
@@ -421,7 +421,7 @@ void BaseItemUI<T>::setGrabber(Grabber * newGrabber)
 		grabber->setAlwaysOnTop(true);
 		this->addAndMakeVisible(grabber);
 		if (resizeMode == ALL) grabberHeight = 15;
-		addAndMakeVisible(grabber);
+		this->addAndMakeVisible(grabber);
 	}
 	
 }
