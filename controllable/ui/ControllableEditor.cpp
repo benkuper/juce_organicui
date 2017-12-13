@@ -1,3 +1,4 @@
+#include "ControllableEditor.h"
 /*
   ==============================================================================
 
@@ -43,6 +44,14 @@ ControllableEditor::ControllableEditor(Controllable * _controllable, bool isRoot
 
 	baseHeight = initHeight;
 	setSize(100, baseHeight);
+
+	controllable->addControllableListener(this);
+}
+
+ControllableEditor::~ControllableEditor()
+{
+
+	controllable->removeControllableListener(this);
 }
 
 void ControllableEditor::setShowLabel(bool value)
@@ -56,6 +65,7 @@ void ControllableEditor::setShowLabel(bool value)
 	{
 		removeChildComponent(&label);
 	}
+
 }
 
 void ControllableEditor::resized()
@@ -63,11 +73,8 @@ void ControllableEditor::resized()
 	Rectangle<int> r = getLocalBounds();
 	r.removeFromBottom(subContentHeight);// .withHeight(16);
 
-	if (showLabel)
-	{
-		label.setBounds(r.removeFromLeft(jmin<int>(getWidth() / 3, 100)));
-		r.removeFromLeft(3);
-	}
+	int controlSpace = jmax(getWidth() / 2, 100);
+
 
 	if (controllable->isRemovableByUser && removeBT != nullptr)
 	{
@@ -82,9 +89,19 @@ void ControllableEditor::resized()
 	}
 
 
-	if (showLabel) r = r.removeFromRight(getWidth() * 2 / 3 - 10);
-	ui->setBounds(r);
+	ui->setBounds(r.removeFromRight(controlSpace));
+	
+	if (showLabel)
+	{
+		r.removeFromRight(2); 
+		label.setBounds(r);
+	}
 
+}
+
+void ControllableEditor::controllableNameChanged(Controllable * override)
+{
+	label.setText(controllable->niceName, dontSendNotification);
 }
 
 void ControllableEditor::buttonClicked(Button * b)

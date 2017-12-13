@@ -14,7 +14,7 @@
 #include "../../inspectable/ui/InspectableEditor.h"
 #include "../ControllableContainer.h"
 #include "ControllableUI.h"
-#include "../preset/PresetChooser.h"
+//#include "../preset/PresetChooser.h"
 #include "../ControllableHelpers.h"
 
 class GenericControllableContainerEditor :
@@ -31,7 +31,7 @@ public:
 	Label containerLabel;
 
 	WeakReference<ControllableContainer> container;
-	ScopedPointer<PresetChooser> presetChooser;
+	//ScopedPointer<PresetChooser> presetChooser;
 
 	OwnedArray<InspectableEditor> childEditors;
 

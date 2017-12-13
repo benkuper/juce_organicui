@@ -8,7 +8,7 @@
   ==============================================================================
 */
 
-
+/*
 juce_ImplementSingleton(PresetManager)
 
 
@@ -233,3 +233,4 @@ void PresetManager::Preset::loadJSONData(var data)
 	addPresetValue(pvData.getProperty("controlAddress", var()),pvData.getProperty("value",var()));
   }
 }
+*/

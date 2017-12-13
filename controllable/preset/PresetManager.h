@@ -7,6 +7,7 @@
 
  ==============================================================================
  */
+/*
 
 #ifndef PRESETMANAGER_H_INCLUDED
 #define PRESETMANAGER_H_INCLUDED
@@ -82,3 +83,4 @@ public:
 
 
 #endif  // PRESETMANAGER_H_INCLUDED
+*/

@@ -177,7 +177,7 @@ var Engine::getJSONData()
 
   data.getDynamicObject()->setProperty("metaData", metaData);
 
-  data.getDynamicObject()->setProperty("presetManager", PresetManager::getInstance()->getJSONData());
+  //data.getDynamicObject()->setProperty("presetManager", PresetManager::getInstance()->getJSONData());
   data.getDynamicObject()->setProperty("dashboardManager", DashboardManager::getInstance()->getJSONData());
 
   return data;
@@ -213,15 +213,17 @@ void Engine::loadJSONData (var data,ProgressTask * loadingTask)
 
 	DynamicObject * d = data.getDynamicObject();
 	
-	ProgressTask * presetTask = loadingTask->addTask("Presets");
+	//ProgressTask * presetTask = loadingTask->addTask("Presets");
 	ProgressTask * dashboardTask = loadingTask->addTask("Dashboard");
 
 	loadJSONDataInternalEngine(data, loadingTask);
 
+	/*
 	presetTask->start();
 	if (d->hasProperty("presetManager")) PresetManager::getInstance()->loadJSONData(d->getProperty("presetManager"));
 	presetTask->end();
-	
+	*/
+
 	dashboardTask->start();
 	if (d->hasProperty("dashboardManager")) DashboardManager::getInstance()->loadJSONData(d->getProperty("dashboardManager"));
 	dashboardTask->end();

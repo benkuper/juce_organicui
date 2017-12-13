@@ -37,6 +37,7 @@ Engine::Engine(const String & fileName, const String & fileExtension, Applicatio
 Engine::~Engine() {
 
 	//delete managers
+	DBG("Here !");
 
 	isClearing = true;
 
@@ -48,7 +49,7 @@ Engine::~Engine() {
 	DashboardManager::deleteInstance();
 	Outliner::deleteInstance();
 
-	PresetManager::deleteInstance();
+	//PresetManager::deleteInstance();
 	CustomLogger::deleteInstance();
 	Logger::setCurrentLogger(nullptr);
 
@@ -112,7 +113,7 @@ void Engine::clear() {
 	}
 
 	DashboardManager::getInstance()->clear();
-	PresetManager::getInstance()->clear();
+	//PresetManager::getInstance()->clear();
 
 	clearInternal();
 

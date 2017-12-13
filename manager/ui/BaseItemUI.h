@@ -88,6 +88,7 @@ public:
 		void paint(Graphics &g) override;
 	};
 
+	void setGrabber(Grabber * newGrabber);
 	ScopedPointer<Grabber> grabber;
 
 	class ItemUIListener
@@ -143,10 +144,7 @@ BaseItemUI<T>::BaseItemUI(T * _item, ResizeMode _resizeMode, bool _canBeDragged)
 
 	if (canBeDragged)
 	{
-		grabber = new Grabber(_resizeMode == ALL ? Grabber::HORIZONTAL : Grabber::VERTICAL);
-		grabber->setAlwaysOnTop(true);
-		this->addAndMakeVisible(grabber);
-		if (resizeMode == ALL) grabberHeight = 15;
+		setGrabber(new Grabber(_resizeMode == ALL ? Grabber::HORIZONTAL : Grabber::VERTICAL));
 	}
 
 	switch (resizeMode)
@@ -345,6 +343,7 @@ void BaseItemUI<T>::mouseDown(const MouseEvent & e)
 {
 	BaseItemMinimalUI<T>::mouseDown(e);
 
+
 	if (e.mods.isLeftButtonDown())
 	{
 		if (canBeDragged && e.eventComponent == grabber)
@@ -405,6 +404,26 @@ void BaseItemUI<T>::controllableFeedbackUpdateInternal(Controllable * c)
 	BaseItemMinimalUI<T>::controllableFeedbackUpdateInternal(c);
 	if (c == this->baseItem->miniMode) updateMiniModeUI();
 	else if (canBeDragged && c == this->baseItem->viewUIPosition) itemUIListeners.call(&ItemUIListener::itemUIGrabbed, this);
+}
+
+template<class T>
+void BaseItemUI<T>::setGrabber(Grabber * newGrabber)
+{
+	if (grabber != nullptr)
+	{
+		removeChildComponent(grabber);
+	}
+
+	grabber = newGrabber;
+
+	if (grabber != nullptr)
+	{
+		grabber->setAlwaysOnTop(true);
+		this->addAndMakeVisible(grabber);
+		if (resizeMode == ALL) grabberHeight = 15;
+		addAndMakeVisible(grabber);
+	}
+	
 }
 
 

@@ -16,14 +16,14 @@ ControllableComparator ControllableContainer::comparator;
 ControllableContainer::ControllableContainer(const String & niceName) :
 	ScriptTarget("", this),
 	hasCustomShortName(false),
-	canHavePresets(false),
-	currentPreset(nullptr),
+	//canHavePresets(false),
+	//currentPreset(nullptr),
 	skipControllableNameInAddress(false),
 	nameCanBeChangedByUser(true),
 	isTargettable(true),
 	hideInEditor(false),
 	canInspectChildContainers(true),
-	presetSavingIsRecursive(false),
+	//presetSavingIsRecursive(false),
 	saveAndLoadRecursiveData(false),
 	saveAndLoadName(false),
 	includeInScriptObject(true),
@@ -34,6 +34,7 @@ ControllableContainer::ControllableContainer(const String & niceName) :
 {
 	setNiceName(niceName);
 
+	/*
 	if (canHavePresets)
 	{
 		currentPresetName = addStringParameter("Preset", "Current Preset", "");
@@ -45,6 +46,7 @@ ControllableContainer::ControllableContainer(const String & niceName) :
 		savePresetTrigger->hideInEditor = true;
 		savePresetTrigger->isTargettable = false;
 	}
+	*/
 
 	//script
 	scriptObject.setMethod("getChild", ControllableContainer::getChildFromScript);
@@ -201,9 +203,11 @@ void ControllableContainer::notifyStructureChanged() {
 }
 
 void ControllableContainer::newMessage(const Parameter::ParameterEvent &e) {
+	/*
 	if (e.parameter == currentPresetName) {
 		loadPresetWithName(e.parameter->stringValue());
 	}
+	*/
 
 	if (e.type == Parameter::ParameterEvent::VALUE_CHANGED) {
 		onContainerParameterChangedAsync(e.parameter, e.value);
@@ -237,6 +241,7 @@ void ControllableContainer::setAutoShortName() {
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ChildAddressChanged, this));
 }
 
+/*
 void ControllableContainer::setCanHavePresets(bool value)
 {
 	canHavePresets = value;
@@ -244,6 +249,7 @@ void ControllableContainer::setCanHavePresets(bool value)
 	//TODO, create triggers and string parameter here instead of having them everywhere
 	//currentPresetName->isControllableExposed = value;
 }
+*/
 
 
 
@@ -518,6 +524,7 @@ bool ControllableContainer::containsControllable(Controllable * c, int maxSearch
 }
 
 
+/*
 bool ControllableContainer::loadPresetWithName(const String & name)
 {
 	// TODO weird feedback when loading preset on parameter presetName
@@ -582,20 +589,20 @@ bool ControllableContainer::saveCurrentPreset()
 	NLOG(niceName, "Current preset saved : " + pre->name);
 	loadPreset(pre);
 
-	/*
-  for (auto &pv : currentPreset->presetValues)
-  {
-	Parameter * p = dynamic_cast<Parameter*> (getControllableForAddress(pv->paramControlAddress));
-	if (p != nullptr && p!=currentPresetName)
-	{
-	  pv->presetValue = var(p->getValue());
-	}
-  }
-  savePresetInternal(currentPreset);
-  NLOG(niceName, "Current preset saved : " + currentPreset->name);
+	
+ // for (auto &pv : currentPreset->presetValues)
+ // {
+	//Parameter * p = dynamic_cast<Parameter*> (getControllableForAddress(pv->paramControlAddress));
+	//if (p != nullptr && p!=currentPresetName)
+	//{
+	//  pv->presetValue = var(p->getValue());
+	//}
+ // }
+ // savePresetInternal(currentPreset);
+ // NLOG(niceName, "Current preset saved : " + currentPreset->name);
 
-  return true;
-  */
+ // return true;
+  
 
 	return true;
 }
@@ -634,7 +641,7 @@ String ControllableContainer::getPresetFilter()
 {
 	return shortName;
 }
-
+*/
 
 void ControllableContainer::dispatchFeedback(Controllable * c)
 {
@@ -665,8 +672,9 @@ void ControllableContainer::triggerTriggered(Trigger * t)
 {
 	if (t->parentContainer == this)
 	{
-		if (t == savePresetTrigger) saveCurrentPreset();
-		else onContainerTriggerTriggered(t);
+		/*if (t == savePresetTrigger) saveCurrentPreset();
+		else */ onContainerTriggerTriggered(t);
+
 	} else
 	{
 		onExternalTriggerTriggered(t);
@@ -699,7 +707,7 @@ var ControllableContainer::getJSONData()
 		if (wc->type == Controllable::TRIGGER && !includeTriggersInSaveLoad) continue;
 		if (wc.wasObjectDeleted()) continue;
 		if (!wc->isSavable) continue;
-		if (wc == currentPresetName && !canHavePresets) continue;
+		//if (wc == currentPresetName && !canHavePresets) continue;
 		paramsData.append(wc->getJSONData(this));
 	}
 
@@ -744,7 +752,9 @@ void ControllableContainer::loadJSONData(var data, bool createIfNotThere)
 			{
 				if (Parameter * p = dynamic_cast<Parameter*>(c)) {
 					//                we don't load preset when already loading a state
-					if (p->shortName != "preset" && p->isSavable) p->loadJSONData(pData.getDynamicObject());
+					//if (p->shortName == "preset") continue;
+
+					if (p->isSavable) p->loadJSONData(pData.getDynamicObject());
 
 				}
 			} else if (!saveAndLoadRecursiveData && createIfNotThere)
@@ -764,6 +774,16 @@ void ControllableContainer::loadJSONData(var data, bool createIfNotThere)
 }
 
 void ControllableContainer::childStructureChanged(ControllableContainer * cc)
+{
+	notifyStructureChanged();
+}
+
+void ControllableContainer::childAddressChanged(ControllableContainer * cc)
+{
+	notifyStructureChanged();
+}
+
+void ControllableContainer::parameterRangeChanged(Parameter * p)
 {
 	notifyStructureChanged();
 }

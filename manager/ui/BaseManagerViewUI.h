@@ -20,6 +20,8 @@ public:
 	BaseManagerViewUI<M, T, U>(const String &contentName, M * _manager);
 	virtual ~BaseManagerViewUI();
 
+	bool canNavigate;
+
 	Point<int> viewOffset; //in pixels, viewOffset of 0 means zeroPos is at the center of the window
 						   //interaction
 	Point<int> initViewOffset;
@@ -34,6 +36,8 @@ public:
 	virtual bool keyPressed(const KeyPress &e) override;
 
 	virtual void paint(Graphics &g) override;
+	virtual void paintBackground(Graphics &g);
+
 	virtual void resized() override;
 
 	virtual void updateViewUIPosition(U * se);
@@ -43,6 +47,10 @@ public:
 	Point<int> getSize();
 	Point<int> getViewMousePosition();
 	Point<int> getViewPos(const Point<int> &originalPos);
+	float getUnitSize();
+	Point<int> getViewCenter();
+	Point<float> getPosInView(const Point<float> &viewPos);
+	Rectangle<float> getBoundsInView(const Rectangle<float> &r);
 	Point<float> getItemsCenter();
 
 	virtual void homeView();
@@ -58,7 +66,8 @@ public:
 template<class M, class T, class U>
 BaseManagerViewUI<M, T, U>::BaseManagerViewUI(const String & contentName, M * _manager) :
 	BaseManagerUI<M, T, U>(contentName, _manager, false),
-	viewZoom(1)
+	viewZoom(1),
+	canNavigate(true)
 {
 	this->resizeOnChildBoundsChanged = false;
 	this->bgColor = BG_COLOR.darker(.3f);
@@ -74,7 +83,7 @@ template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::mouseDown(const MouseEvent & e)
 {
 	BaseManagerUI<M, T, U>::mouseDown(e);
-	if ((e.mods.isLeftButtonDown() && e.mods.isAltDown()) || e.mods.isMiddleButtonDown())
+	if (canNavigate && ((e.mods.isLeftButtonDown() && e.mods.isAltDown()) || e.mods.isMiddleButtonDown()))
 	{
 		this->setMouseCursor(MouseCursor::UpDownLeftRightResizeCursor);
 		this->updateMouseCursor();
@@ -86,7 +95,7 @@ template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::mouseDrag(const MouseEvent & e)
 {
 	BaseManagerUI<M, T, U>::mouseDrag(e);
-	if ((e.mods.isLeftButtonDown() && e.mods.isAltDown()) || e.mods.isMiddleButtonDown())
+	if (canNavigate && ((e.mods.isLeftButtonDown() && e.mods.isAltDown()) || e.mods.isMiddleButtonDown()))
 	{
 		viewOffset = initViewOffset + e.getOffsetFromDragStart();
 		this->resized();
@@ -133,7 +142,20 @@ bool BaseManagerViewUI<M, T, U>::keyPressed(const KeyPress & e)
 template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::paint(Graphics & g)
 {
-	int checkerSize = defaultCheckerSize*viewZoom;
+	paintBackground(g);
+
+	if (this->manager->items.size() == 0 && this->noItemText.isNotEmpty())
+	{
+		g.setColour(Colours::white.withAlpha(.4f));
+		g.setFont(16);
+		g.drawFittedText(this->noItemText, this->getLocalBounds(), Justification::centred, 6);
+	}
+}
+
+template<class M, class T, class U>
+void BaseManagerViewUI<M, T, U>::paintBackground(Graphics & g)
+{
+	int checkerSize = getUnitSize();
 
 	int checkerTX = -checkerSize * 2 + ((this->getWidth() / 2 + viewOffset.x) % (checkerSize * 2));
 	int checkerTY = -checkerSize * 2 + ((this->getHeight() / 2 + viewOffset.y) % (checkerSize * 2));
@@ -146,12 +168,6 @@ void BaseManagerViewUI<M, T, U>::paint(Graphics & g)
 	g.drawLine(center.x, 0, center.x, this->getHeight(), 2);
 	g.drawLine(0, center.y, this->getWidth(), center.y, 2);
 
-	if (this->manager->items.size() == 0 && this->noItemText.isNotEmpty())
-	{
-		g.setColour(Colours::white.withAlpha(.4f));
-		g.setFont(16);
-		g.drawFittedText(this->noItemText, this->getLocalBounds(), Justification::centred, 6);
-	}
 }
 
 template<class M, class T, class U>
@@ -197,6 +213,30 @@ template<class M, class T, class U>
 Point<int> BaseManagerViewUI<M, T, U>::getViewPos(const Point<int>& originalPos)
 {
 	return originalPos - getSize() / 2 - viewOffset;
+}
+
+template<class M, class T, class U>
+float BaseManagerViewUI<M, T, U>::getUnitSize()
+{
+	return defaultCheckerSize*viewZoom;
+}
+
+template<class M, class T, class U>
+inline Point<int> BaseManagerViewUI<M, T, U>::getViewCenter()
+{
+	return viewOffset + (getSize() / 2);
+}
+
+template<class M, class T, class U>
+Point<float> BaseManagerViewUI<M, T, U>::getPosInView(const Point<float>& viewPos)
+{
+	return (viewPos*getUnitSize()) + getViewCenter().toFloat();
+}
+
+template<class M, class T, class U>
+Rectangle<float> BaseManagerViewUI<M, T, U>::getBoundsInView(const Rectangle<float>& r)
+{
+	return r.withPosition(getPosInView(r.getPosition())).withSize(r.getWidth()*getUnitSize(),r.getHeight()*getUnitSize());
 }
 
 template<class M, class T, class U>

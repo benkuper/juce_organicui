@@ -8,6 +8,7 @@
   ==============================================================================
 */
 
+/*
 #ifndef PRESETCHOOSER_H_INCLUDED
 #define PRESETCHOOSER_H_INCLUDED
 
@@ -32,3 +33,4 @@ public:
 
 
 #endif  // PRESETCHOOSER_H_INCLUDED
+*/

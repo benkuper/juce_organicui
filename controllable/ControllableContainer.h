@@ -12,7 +12,7 @@
 #define CONTROLLABLECONTAINER_H_INCLUDED
 
 
-#include "preset/PresetManager.h"
+//#include "preset/PresetManager.h"
 
 class ControllableContainer :
 	public Parameter::Listener,
@@ -32,16 +32,16 @@ public:
 	String shortName;
 	bool hasCustomShortName;
 
-	bool canHavePresets;
+	//bool canHavePresets;
 	StringParameter * currentPresetName;
 	Trigger * savePresetTrigger;
-	PresetManager::Preset * currentPreset;
+	//PresetManager::Preset * currentPreset;
 
 	bool skipControllableNameInAddress;
 	void setNiceName(const String &_niceName);
 	void setCustomShortName(const String &_shortName);
 	void setAutoShortName();
-	void setCanHavePresets(bool value);
+	//void setCanHavePresets(bool value);
 
 	bool nameCanBeChangedByUser;
 	bool isTargettable; //for controllableChooser
@@ -51,7 +51,7 @@ public:
 	bool canInspectChildContainers;
 
 	//save / load
-	bool presetSavingIsRecursive;
+	//bool presetSavingIsRecursive;
 	bool saveAndLoadRecursiveData;
 	bool saveAndLoadName;
 	bool includeTriggersInSaveLoad;
@@ -107,6 +107,8 @@ public:
 
 	void orderControllablesAlphabetically();
 
+	//PRESETS
+	/*
 	virtual bool loadPresetWithName(const String &name);
 	virtual bool loadPreset(PresetManager::Preset * preset);
 	virtual PresetManager::Preset* saveNewPreset(const String &name);
@@ -114,6 +116,8 @@ public:
 	virtual int getNumPresets();
 
 	virtual bool resetFromPreset();
+	
+
 
 	//    to be overriden
 	virtual void loadPresetInternal(PresetManager::Preset *) {};
@@ -121,6 +125,8 @@ public:
 
 	virtual String getPresetFilter();
 	virtual var getPresetValueFor(Parameter * p);//Any parameter that is part of a this preset can use this function
+	*/
+
 
 	void dispatchFeedback(Controllable * c);
 
@@ -134,20 +140,19 @@ public:
 
 	virtual void askForRemoveControllable(Controllable * c) override;
 
-
 	virtual var getJSONData();
 	virtual void loadJSONData(var data, bool createIfNotThere = false);
 	virtual void loadJSONDataInternal(var /*data*/) { /* to be overriden by child classes */ }
 
 	virtual void childStructureChanged(ControllableContainer *)override;
+	virtual void childAddressChanged(ControllableContainer *) override;
+	void parameterRangeChanged(Parameter * p) override;
 
 	String getUniqueNameInContainer(const String &sourceName, int suffix = 0);
 
 	//SCRIPT
 	virtual void updateLiveScriptObjectInternal(DynamicObject * parent = nullptr) override;
-
 	static var getChildFromScript(const var::NativeFunctionArgs &a);
-
 
 
 private:
@@ -167,7 +172,7 @@ private:
     virtual void onContainerParameterChangedAsync(Parameter *,const var & /*value*/){};
     
     // anti feedback when loading preset ( see loadPresetWithName)
-    bool isLoadingPreset = false;
+    //bool isLoadingPreset = false;
 
 public:
 
@@ -194,7 +199,7 @@ protected:
     WeakReference<ControllableContainer>::Master masterReference;
     friend class WeakReference<ControllableContainer>;
 
-    friend class PresetManager;
+    //friend class PresetManager;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ControllableContainer)
 

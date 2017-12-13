@@ -14,10 +14,12 @@
 
 class ControllableEditor : 
 	public InspectableEditor,
-	public ButtonListener
+	public ButtonListener,
+	public Controllable::Listener
 {
 public:
 	ControllableEditor(Controllable * controllable, bool isRoot, int initHeight = 16);  //Todo : handle full feedback if is root
+	virtual ~ControllableEditor();
 
 	Controllable * controllable;
 	
@@ -33,7 +35,8 @@ public:
 	void setShowLabel(bool value);
 
 	void resized() override;
-	
+
+	void controllableNameChanged(Controllable * override);
 
     void buttonClicked(Button * b) override;
 };

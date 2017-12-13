@@ -27,11 +27,13 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(WeakRefer
 	containerLabel.setColour(containerLabel.textColourId, TEXTNAME_COLOR);
 	containerLabel.setInterceptsMouseClicks(false, false);
 
+	/*
 	if (container->canHavePresets)
 	{
 		presetChooser = new PresetChooser(container);
 		addAndMakeVisible(presetChooser);
 	}
+	*/
 
 	resetAndBuild();
 }
@@ -189,12 +191,14 @@ void GenericControllableContainerEditor::resized()
 {
 	containerLabel.setBounds(getLocalBounds().removeFromTop(containerLabel.getHeight()).withSizeKeepingCentre(containerLabel.getWidth(), containerLabel.getHeight()));
 	Rectangle<int> r = getLocalBounds().reduced(5).translated(0, headerHeight);
-
+	
+	/*
 	if (container->canHavePresets)
 	{
 		presetChooser->setBounds(r.withHeight(16));
 		r.translate(0, 18);
 	}
+	*/
 
 	for (auto &cui : childEditors)
 	{

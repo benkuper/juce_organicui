@@ -217,7 +217,8 @@ BaseManager<T>::BaseManager(const String & name) :
 	userCanAddItemsManually(true),
     selectItemWhenCreated(true)
 {
-	setCanHavePresets(false);
+	//setCanHavePresets(false);
+	//hideInEditor = true;
 	nameCanBeChangedByUser = false;
 	isSelectable = false;
 }
@@ -453,9 +454,10 @@ inline T * BaseManager<T>::getItemForMenuResultID(int id, int startID)
 template<class T>
 InspectableEditor * BaseManager<T>::getEditor(bool isRoot)
 {
-	BaseManagerUI<BaseManager<T>, T, BaseItemUI<T>> * bui = new  BaseManagerUI<BaseManager<T>, T, BaseItemUI<T>>(niceName, this,false);
-	bui->drawContour = true;
-	return new GenericComponentEditor(this, bui, isRoot);
+	return ControllableContainer::getEditor(true);
+	//BaseManagerUI<BaseManager<T>, T, BaseItemUI<T>> * bui = new  BaseManagerUI<BaseManager<T>, T, BaseItemUI<T>>(niceName, this,false);
+	//bui->drawContour = true;
+	//return new GenericComponentEditor(this, bui, isRoot);
 }
 
 

@@ -31,7 +31,7 @@ Inspector::Inspector(InspectableSelectionManager * _selectionManager) :
 
 Inspector::~Inspector()
 {
-	if (selectionManager != nullptr) InspectableSelectionManager::mainSelectionManager->removeSelectionListener(this);
+	if (selectionManager != nullptr && InspectableSelectionManager::mainSelectionManager != nullptr) InspectableSelectionManager::mainSelectionManager->removeSelectionListener(this);
 	clear();
 }
 
