@@ -1,3 +1,4 @@
+#include "DoubleSliderUI.h"
 /*
   ==============================================================================
 
@@ -24,6 +25,8 @@ p2d(parameter),
 	addAndMakeVisible(&xSlider);
 	addAndMakeVisible(&ySlider);
 
+	setInterceptsMouseClicks(true, true);
+
 	setForceFeedbackOnlyInternal(); //force update
 
 }
@@ -40,6 +43,47 @@ void DoubleSliderUI::resized()
 	Rectangle<int> r = getLocalBounds();
 	xSlider.setBounds(r.removeFromLeft(r.getWidth() / 2 - 5));
 	ySlider.setBounds(r.removeFromRight(r.getWidth() - 10));
+}
+
+void DoubleSliderUI::showEditWindow()
+{
+	AlertWindow nameWindow("Change point 2D params", "Set new values and bounds for this parameter", AlertWindow::AlertIconType::NoIcon, this);
+	
+	for(int i=0;i<2;i++) nameWindow.addTextEditor("val"+String(i), p2d->value[i].toString(), "Value "+String(i));
+
+	if (parameter->isCustomizableByUser)
+	{
+		for (int i = 0; i < 2; i++)
+		{
+			nameWindow.addTextEditor("minVal" + String(i), p2d->minimumValue[i].toString(), "Minimum " + String(i));
+			nameWindow.addTextEditor("maxVal" + String(i), p2d->maximumValue[i].toString(), "Maximum" + String(i));
+		}
+	}
+
+	nameWindow.addButton("OK", 1, KeyPress(KeyPress::returnKey));
+	nameWindow.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
+
+	int result = nameWindow.runModalLoop();
+
+	if (result)
+	{
+		if (parameter->isCustomizableByUser)
+		{
+			float newMins[2];
+			float newMaxs[2];
+			for (int i = 0; i < 2; i++)
+			{
+				newMins[i] = nameWindow.getTextEditorContents("minVal"+String(i)).getFloatValue();
+				newMaxs[i] = nameWindow.getTextEditorContents("maxVal"+String(i)).getFloatValue();
+			}
+			p2d->setBounds(newMins[0], newMins[1], newMaxs[0], newMaxs[1]);
+
+		}
+
+		float newVals[2];
+		for(int i=0;i<2;i++) newVals[i] = nameWindow.getTextEditorContents("val"+String(i)).getFloatValue();
+		p2d->setPoint(newVals[0],newVals[1]);
+	}
 }
 
 

@@ -36,6 +36,8 @@ public:
 	void setForceFeedbackOnlyInternal() override;
 	void resized() override;
 
+	void showEditWindow() override;
+
 protected:
 	virtual void newMessage(const Parameter::ParameterEvent &e) override;
 

@@ -38,4 +38,7 @@ GenericControllableManagerFactory::GenericControllableManagerFactory()
 	defs.add(GenericControllableManagerFactory::Definition::createDef("", "Bool Parameter", &GenericControllableItem::create)->addParam("controllableType", BoolParameter::getTypeStringStatic()));
 	defs.add(GenericControllableManagerFactory::Definition::createDef("", "Color Parameter", &GenericControllableItem::create)->addParam("controllableType", ColorParameter::getTypeStringStatic()));
 	defs.add(GenericControllableManagerFactory::Definition::createDef("", "Target Parameteer", &GenericControllableItem::create)->addParam("controllableType", TargetParameter::getTypeStringStatic()));
+	defs.add(GenericControllableManagerFactory::Definition::createDef("", "Target Parameteer", &GenericControllableItem::create)->addParam("controllableType", TargetParameter::getTypeStringStatic()));
+	defs.add(GenericControllableManagerFactory::Definition::createDef("", "Point2D Parameteer", &GenericControllableItem::create)->addParam("controllableType", Point2DParameter::getTypeStringStatic()));
+	defs.add(GenericControllableManagerFactory::Definition::createDef("", "Point3D Parameteer", &GenericControllableItem::create)->addParam("controllableType", Point3DParameter::getTypeStringStatic()));
 }

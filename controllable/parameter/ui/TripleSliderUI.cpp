@@ -1,3 +1,4 @@
+#include "TripleSliderUI.h"
 /*
   ==============================================================================
 
@@ -28,6 +29,8 @@ p3d(parameter),
 	addAndMakeVisible(&ySlider);
 	addAndMakeVisible(&zSlider);
 
+	setInterceptsMouseClicks(true, true);
+
 	setForceFeedbackOnlyInternal(); //force update
 }
 
@@ -55,6 +58,47 @@ void TripleSliderUI::resized()
 	ySlider.setBounds(r.removeFromLeft(r.getWidth() /2 - 4));
 	zSlider.setBounds(r.removeFromRight(r.getWidth() - 4));
 
+}
+
+void TripleSliderUI::showEditWindow()
+{
+	AlertWindow nameWindow("Change point 2D params", "Set new values and bounds for this parameter", AlertWindow::AlertIconType::NoIcon, this);
+
+	for (int i = 0; i<3; i++) nameWindow.addTextEditor("val" + String(i), p3d->value[i].toString(), "Value " + String(i));
+
+	if (parameter->isCustomizableByUser)
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			nameWindow.addTextEditor("minVal" + String(i), p3d->minimumValue[i].toString(), "Minimum " + String(i));
+			nameWindow.addTextEditor("maxVal" + String(i), p3d->maximumValue[i].toString(), "Maximum" + String(i));
+		}
+	}
+
+	nameWindow.addButton("OK", 1, KeyPress(KeyPress::returnKey));
+	nameWindow.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
+
+	int result = nameWindow.runModalLoop();
+
+	if (result)
+	{
+		if (parameter->isCustomizableByUser)
+		{
+			float newMins[3];
+			float newMaxs[3];
+			for (int i = 0; i < 3; i++)
+			{
+				newMins[i] = nameWindow.getTextEditorContents("minVal" + String(i)).getFloatValue();
+				newMaxs[i] = nameWindow.getTextEditorContents("maxVal" + String(i)).getFloatValue();
+			}
+			p3d->setBounds(newMins[0], newMins[1], newMins[2], newMaxs[0], newMaxs[1], newMaxs[2]);
+
+		}
+
+		float newVals[3];
+		for (int i = 0; i<3; i++) newVals[i] = nameWindow.getTextEditorContents("val" + String(i)).getFloatValue();
+		p3d->setVector(newVals[0], newVals[1],newVals[2]);
+	}
 }
 
 void TripleSliderUI::newMessage(const Parameter::ParameterEvent & e)

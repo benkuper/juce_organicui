@@ -13,8 +13,8 @@
 ParameterUI::ParameterUI(Parameter * parameter) :
 	ControllableUI(parameter),
 	parameter(parameter),
-    showEditWindowOnDoubleClick(true),
-    showValue(true)
+	showValue(true),
+	showEditWindowOnDoubleClick(true)
 {
 	parameter->addAsyncCoalescedListener(this);
 
