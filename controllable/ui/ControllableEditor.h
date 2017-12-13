@@ -36,7 +36,7 @@ public:
 
 	void resized() override;
 
-	void controllableNameChanged(Controllable * override);
+    void controllableNameChanged(Controllable *) override;
 
     void buttonClicked(Button * b) override;
 };
