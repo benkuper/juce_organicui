@@ -275,11 +275,10 @@ void BaseManagerViewUI<M, T, U>::setViewZoom(float value)
 {
 	if (viewZoom == value) return;
 	viewZoom = value;
-	DBG("Set view zoom " << viewZoom);
 	for (auto &tui : this->itemsUI) tui->setViewZoom(value);
 
-	resized();
-	repaint();
+	this->resized();
+	this->repaint();
 }
 
 template<class M, class T, class U>
