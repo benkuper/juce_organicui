@@ -35,6 +35,7 @@ public:
 	bool canHaveScripts;
 	bool canHaveCustomParameters;
 	bool userCanRemove;
+	bool askConfirmationBeforeRemove;
 
 	ScopedPointer<ScriptManager> scriptManager;
 	ScopedPointer<GenericControllableManager> customParams;

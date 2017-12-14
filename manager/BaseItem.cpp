@@ -14,7 +14,7 @@ BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts
 	canBeDisabled(_canBeDisabled),
 	canHaveScripts(_canHaveScripts),
 	canHaveCustomParameters(_canHaveCustomParameters),
-	userCanRemove(true)
+	userCanRemove(true),
 	askConfirmationBeforeRemove(true)
 {
 	saveAndLoadName = true;

@@ -21,6 +21,7 @@ public:
 	virtual ~BaseManagerViewUI();
 
 	bool canNavigate;
+	bool canZoom;
 
 	Point<int> viewOffset; //in pixels, viewOffset of 0 means zeroPos is at the center of the window
 						   //interaction
@@ -56,6 +57,8 @@ public:
 	virtual void homeView();
 	virtual void frameView();
 
+	virtual void setViewZoom(float newZoom);
+
 	virtual void addItemUIInternal(U * se) override; 
 
 	virtual void itemUIGrabbed(BaseItemUI<T> * se) override;
@@ -67,6 +70,7 @@ template<class M, class T, class U>
 BaseManagerViewUI<M, T, U>::BaseManagerViewUI(const String & contentName, M * _manager) :
 	BaseManagerUI<M, T, U>(contentName, _manager, false),
 	canNavigate(true),
+	canZoom(true),
     viewZoom(1)
 {
 	this->resizeOnChildBoundsChanged = false;
@@ -112,13 +116,10 @@ void BaseManagerViewUI<M, T, U>::mouseUp(const MouseEvent & e)
 }
 
 template<class M, class T, class U>
-inline void BaseManagerViewUI<M, T, U>::mouseWheelMove(const MouseEvent & e, const MouseWheelDetails & d)
+ void BaseManagerViewUI<M, T, U>::mouseWheelMove(const MouseEvent & e, const MouseWheelDetails & d)
 {
-	/*
-	viewZoom = jlimit<float>(.1f, 10, viewZoom + d.deltaY);
-	resized();
-	repaint();
-	*/
+	if (canZoom) setViewZoom(jlimit<float>(.1f, 10, viewZoom + d.deltaY));
+	
 }
 
 template<class M, class T, class U>
@@ -184,17 +185,19 @@ void BaseManagerViewUI<M, T, U>::resized()
 template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::updateViewUIPosition(U * se)
 {	
+	if (se == nullptr) return;
 	Point<int> pe = se->item->viewUIPosition->getPoint().toInt() * viewZoom;
 	
 	pe += getSize()/2; //position at center of window
 	pe += viewOffset;
+	pe -= se->getLocalBounds().getCentre();
 	se->setTopLeftPosition(pe.x, pe.y);
 }
 
 template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::addItemFromMenu(bool isFromAddButton, Point<int> mouseDownPos)
 {
-	this->manager->addItem(getViewPos(mouseDownPos).toFloat()/viewZoom);
+	this->manager->addItem(getViewPos(mouseDownPos).toFloat());
 }
 
 template<class M, class T, class U>
@@ -268,8 +271,21 @@ void BaseManagerViewUI<M, T, U>::frameView()
 }
 
 template<class M, class T, class U>
+void BaseManagerViewUI<M, T, U>::setViewZoom(float value)
+{
+	if (viewZoom == value) return;
+	viewZoom = value;
+	DBG("Set view zoom " << viewZoom);
+	for (auto &tui : this->itemsUI) tui->setViewZoom(value);
+
+	resized();
+	repaint();
+}
+
+template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::addItemUIInternal(U * se)
 {
+	se->setViewZoom(viewZoom);
 	updateViewUIPosition(se);
 }
 

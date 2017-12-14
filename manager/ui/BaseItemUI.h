@@ -25,8 +25,10 @@ public:
 
 	
 	//LAYOUT
-    const int margin = 3;
+    int margin;
     int minContentHeight;
+
+	float viewZoom;
     
 	//grabber
 	int grabberHeight;
@@ -63,11 +65,12 @@ public:
 
 	virtual void updateMiniModeUI();
 
+	void setViewZoom(float value);
+
 	virtual void resized() override;
 	virtual void resizedInternalHeader(juce::Rectangle<int> &) {}
 	virtual void resizedInternalContent(juce::Rectangle<int> &) {}
 	void buttonClicked(Button *b) override;
-
 
 	void mouseDown(const MouseEvent &e) override;
 	void mouseDrag(const MouseEvent &e) override;
@@ -112,7 +115,9 @@ public:
 template<class T>
 BaseItemUI<T>::BaseItemUI(T * _item, ResizeMode _resizeMode, bool _canBeDragged) :
 	BaseItemMinimalUI<T>(_item),
+	margin(3),
 	minContentHeight(2),
+	viewZoom(1),
 	grabberHeight(0),
 	canBeDragged(_canBeDragged),
 	headerHeight(16),
@@ -126,20 +131,7 @@ BaseItemUI<T>::BaseItemUI(T * _item, ResizeMode _resizeMode, bool _canBeDragged)
 	nameUI = this->baseItem->nameParam->createStringParameterUI();
 	this->addAndMakeVisible(nameUI);
 
-	if (this->baseItem->canBeDisabled)
-	{
-		enabledBT = this->baseItem->enabled->createImageToggle(AssetManager::getInstance()->getPowerBT());
-		this->addAndMakeVisible(enabledBT);
-	}
-
-	if (this->baseItem->userCanRemove)
-	{
-		removeBT = AssetManager::getInstance()->getRemoveBT();
-		this->addAndMakeVisible(removeBT);
-		removeBT->addListener(this);
-	}
-
-	this->setHighlightOnMouseOver(true);
+	
 
 
 	if (canBeDragged)
@@ -182,6 +174,21 @@ BaseItemUI<T>::BaseItemUI(T * _item, ResizeMode _resizeMode, bool _canBeDragged)
 		//setContentSize((int)item->viewUISize->getPoint().x, (int)item->viewUISize->getPoint().y);
 		break;
 	}
+
+	if (this->baseItem->canBeDisabled)
+	{
+		enabledBT = this->baseItem->enabled->createImageToggle(AssetManager::getInstance()->getPowerBT());
+		this->addAndMakeVisible(enabledBT);
+	}
+
+	if (this->baseItem->userCanRemove)
+	{
+		removeBT = AssetManager::getInstance()->getRemoveBT();
+		this->addAndMakeVisible(removeBT);
+		removeBT->addListener(this);
+	}
+
+	this->setHighlightOnMouseOver(true);
 
 	updateMiniModeUI();
 }
@@ -244,6 +251,13 @@ void BaseItemUI<T>::updateMiniModeUI()
 	}
 
 	itemUIListeners.call(&ItemUIListener::itemUIMiniModeChanged, this);
+}
+
+template<class T>
+void BaseItemUI<T>::setViewZoom(float value)
+{
+	DBG("Set view zoom : " << value);
+	viewZoom = value;
 }
 
 template<class T>
@@ -332,8 +346,11 @@ void BaseItemUI<T>::buttonClicked(Button * b)
 {
 	if (b == removeBT)
 	{
-		this->baseItem->remove();
-		return;
+		if (this->baseItem->askConfirmationBeforeRemove)
+		{ 
+			int result = AlertWindow::showOkCancelBox(AlertWindow::QuestionIcon, "Delete " + this->baseItem->niceName, "Are you sure you want to delete this ?","Delete","Cancel");
+			if (result != 0)this->baseItem->remove();
+		} else this->baseItem->remove();
 	}
 }
 
@@ -374,7 +391,7 @@ void BaseItemUI<T>::mouseDrag(const MouseEvent & e)
 
 		if (resizeMode == ALL)
 		{
-			Point<float> targetPos = posAtMouseDown + e.getOffsetFromDragStart().toFloat();
+			Point<float> targetPos = posAtMouseDown + e.getOffsetFromDragStart().toFloat()/viewZoom;
 			this->baseItem->viewUIPosition->setPoint(targetPos);
 		} else
 		{
@@ -418,7 +435,6 @@ void BaseItemUI<T>::setGrabber(Grabber * newGrabber)
 
 	if (grabber != nullptr)
 	{
-		grabber->setAlwaysOnTop(true);
 		this->addAndMakeVisible(grabber);
 		if (resizeMode == ALL) grabberHeight = 15;
 		this->addAndMakeVisible(grabber);
