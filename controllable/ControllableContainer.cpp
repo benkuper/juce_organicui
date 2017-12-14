@@ -26,8 +26,8 @@ ControllableContainer::ControllableContainer(const String & niceName) :
 	//presetSavingIsRecursive(false),
 	saveAndLoadRecursiveData(false),
 	saveAndLoadName(false),
-	includeInScriptObject(true),
 	includeTriggersInSaveLoad(false),
+    includeInScriptObject(true),
     parentContainer(nullptr),
     queuedNotifier(500) //what to put in max size ??
 						//500 seems ok on my computer, but if too low, generates leaks when closing app while heavy use of async (like  parameter update from audio signal)
