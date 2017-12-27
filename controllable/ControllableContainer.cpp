@@ -408,10 +408,15 @@ Array<WeakReference<Controllable>> ControllableContainer::getAllControllables(bo
 
 	if (recursive)
 	{
-		for (auto &cc : controllableContainers) result.addArray(cc->getAllControllables(true, getNotExposed));
+		for (auto &cc : controllableContainers)
+		{
+			if (cc.wasObjectDeleted() || cc.get() == nullptr) continue;
+			result.addArray(cc->getAllControllables(true, getNotExposed));
+		}
 	}
 
 	return result;
+
 }
 
 Array<WeakReference<Parameter>> ControllableContainer::getAllParameters(bool recursive, bool getNotExposed)

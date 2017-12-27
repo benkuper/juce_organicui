@@ -37,7 +37,6 @@ Engine::Engine(const String & fileName, const String & fileExtension, Applicatio
 Engine::~Engine() {
 
 	//delete managers
-	DBG("Here !");
 
 	isClearing = true;
 
