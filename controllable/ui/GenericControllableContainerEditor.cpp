@@ -185,6 +185,7 @@ void GenericControllableContainerEditor::paint(Graphics & g)
 {
 	g.setColour(contourColor);
 	g.drawRoundedRectangle(getLocalBounds().toFloat(), 4, 2);
+
 }
 
 void GenericControllableContainerEditor::resized()

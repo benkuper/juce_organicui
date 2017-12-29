@@ -332,7 +332,7 @@ void BaseManagerUI<M, T, U>::paint(Graphics & g)
 	{
 		g.setColour(Colours::white.withAlpha(.4f));
 		g.setFont(16);
-		g.drawFittedText(noItemText, getLocalBounds(), Justification::centred, 6);
+		g.drawFittedText(noItemText, getLocalBounds().reduced(5), Justification::centred, 6);
 	}
 }
 

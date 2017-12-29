@@ -26,6 +26,8 @@ public:
 
 	BaseManager<T> * manager;
 
+	String noItemText;
+
 	//layout
 	bool fixedItemHeight;
 	int gap = 2;
@@ -37,7 +39,7 @@ public:
 	ScopedPointer<ImageButton> addItemBT;
 	String addItemText;
 
-
+	void paint(Graphics &g) override;
 	void resized() override;
 
 	virtual void itemAdded(T *) override;
@@ -89,6 +91,18 @@ void GenericManagerEditor<T>::addExistingItems()
 	//add existing items
 	for (auto &t : manager->items) addEditorUI(t, false);
 	resized();
+}
+
+template<class T>
+void GenericManagerEditor<T>::paint(Graphics & g)
+{
+	GenericControllableContainerEditor::paint(g);
+
+	if (this->manager->items.size() == 0 && this->noItemText.isNotEmpty())
+	{
+		g.setColour(PANEL_COLOR.brighter(.1f));
+		g.drawFittedText(this->noItemText, this->getLocalBounds().reduced(10), Justification::centred, 4);
+	}
 }
 
 template<class T>

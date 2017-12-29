@@ -16,6 +16,7 @@ HelpPanel::HelpPanel(const String &name) :
 {
 	helpLabel.setJustificationType(Justification::topLeft);
 	helpLabel.setFont(14);
+	helpLabel.setColour(helpLabel.textColourId, PANEL_COLOR.brighter(.4f));
 	addAndMakeVisible(&helpLabel);
 	HelpBox::getInstance()->addHelpListener(this);
 }
