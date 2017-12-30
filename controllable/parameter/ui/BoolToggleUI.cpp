@@ -21,7 +21,8 @@ BoolToggleUI::BoolToggleUI(Parameter * parameter) :
 		setImages(ImageCache::getFromMemory(OrganicUIBinaryData::checkbox_on_readonly_png, OrganicUIBinaryData::checkbox_on_readonly_pngSize), ImageCache::getFromMemory(OrganicUIBinaryData::checkbox_off_readonly_png, OrganicUIBinaryData::checkbox_off_readonly_pngSize));
 	}
 
-	setRepaintsOnMouseActivity(true);
+	if(parameter->isEditable && !parameter->isControllableFeedbackOnly) setRepaintsOnMouseActivity(true);
+	else setInterceptsMouseClicks(false, false);
     setSize(10,10);
 }
 

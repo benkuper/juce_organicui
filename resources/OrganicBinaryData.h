@@ -4,13 +4,18 @@
 
 */
 
-#ifndef BINARYDATA_H_132634945_INCLUDED
-#define BINARYDATA_H_132634945_INCLUDED
+#pragma once
 
 namespace OrganicUIBinaryData
 {
     extern const char*   add_png;
     const int            add_pngSize = 16103;
+
+    extern const char*   arrowdown_png;
+    const int            arrowdown_pngSize = 1797;
+
+    extern const char*   arrowright_png;
+    const int            arrowright_pngSize = 1781;
 
     extern const char*   cancel_png;
     const int            cancel_pngSize = 14817;
@@ -73,11 +78,9 @@ namespace OrganicUIBinaryData
     extern const char* namedResourceList[];
 
     // Number of elements in the namedResourceList array.
-    const int namedResourceListSize = 20;
+    const int namedResourceListSize = 22;
 
     // If you provide the name of one of the binary resource variables above, this function will
     // return the corresponding data and its size (or a null pointer if the name isn't found).
     const char* getNamedResource (const char* resourceNameUTF8, int& dataSizeInBytes) throw();
 }
-
-#endif

@@ -136,10 +136,6 @@ using namespace juce;
 
 #include "engine/Engine.h"
 
-
-#include "controllable/preset/PresetChooser.h"
-#include "controllable/preset/PresetManager.h"
-
 #include "ui/shapeshifter/GapGrabber.h"
 #include "ui/shapeshifter/ShapeShifter.h"
 #include "ui/shapeshifter/ShapeShifterContainer.h"

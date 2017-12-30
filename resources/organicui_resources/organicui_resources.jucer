@@ -2,10 +2,13 @@
 
 <JUCERPROJECT id="nJCeN1" name="organicui_resources" projectType="guiapp" version="1.0.0"
               bundleIdentifier="com.yourcompany.organicui_resources" includeBinaryInAppConfig="1"
-              jucerVersion="4.3.1">
+              jucerVersion="5.2.0" displaySplashScreen="1" reportAppUsage="1"
+              splashScreenColour="Dark" cppLanguageStandard="11" companyCopyright="">
   <MAINGROUP id="gdPnjI" name="organicui_resources">
     <GROUP id="{471DD8BF-5339-7ED5-BF79-1FCB0A8A6B3D}" name="Resources">
       <FILE id="KphWgp" name="add.png" compile="0" resource="1" file="Resources/add.png"/>
+      <FILE id="aoTRXK" name="arrow-down.png" compile="0" resource="1" file="Resources/arrow-down.png"/>
+      <FILE id="uBzQVv" name="arrow-right.png" compile="0" resource="1" file="Resources/arrow-right.png"/>
       <FILE id="AQujp8" name="cancel.png" compile="0" resource="1" file="Resources/cancel.png"/>
       <FILE id="XHa6p5" name="check.png" compile="0" resource="1" file="Resources/check.png"/>
       <FILE id="RNU7ZU" name="checkbox_off.png" compile="0" resource="1"
@@ -32,12 +35,15 @@
     <GROUP id="{279380FE-558A-8939-19FF-B071B9CB7AF4}" name="Source"/>
   </MAINGROUP>
   <EXPORTFORMATS>
-    <VS2015 targetFolder="Builds/VisualStudio2015">
+    <VS2015 targetFolder="Builds/VisualStudio2015" windowsTargetPlatformVersion="8.1">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
-                       isDebug="1" optimisation="1" targetName="organicui_resources"/>
+                       isDebug="1" optimisation="1" targetName="organicui_resources"
+                       debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"/>
         <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
-                       isDebug="0" optimisation="3" targetName="organicui_resources"/>
+                       isDebug="0" optimisation="3" targetName="organicui_resources"
+                       debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"
+                       linkTimeOptimisation="1"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_core" path="../../../../../../../Softwares/JUCE/modules"/>

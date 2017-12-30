@@ -16,14 +16,12 @@ ControllableComparator ControllableContainer::comparator;
 ControllableContainer::ControllableContainer(const String & niceName) :
 	ScriptTarget("", this),
 	hasCustomShortName(false),
-	//canHavePresets(false),
-	//currentPreset(nullptr),
 	skipControllableNameInAddress(false),
-	nameCanBeChangedByUser(true),
+	nameCanBeChangedByUser(false),
 	isTargettable(true),
 	hideInEditor(false),
 	canInspectChildContainers(true),
-	//presetSavingIsRecursive(false),
+	editorIsCollapsed(true),
 	saveAndLoadRecursiveData(false),
 	saveAndLoadName(false),
 	includeTriggersInSaveLoad(false),
@@ -33,20 +31,6 @@ ControllableContainer::ControllableContainer(const String & niceName) :
 						//500 seems ok on my computer, but if too low, generates leaks when closing app while heavy use of async (like  parameter update from audio signal)
 {
 	setNiceName(niceName);
-
-	/*
-	if (canHavePresets)
-	{
-		currentPresetName = addStringParameter("Preset", "Current Preset", "");
-		currentPresetName->hideInEditor = true;
-		currentPresetName->hideInOutliner = true;
-		currentPresetName->isTargettable = false;
-
-		savePresetTrigger = addTrigger("Save Preset", "Save current preset");
-		savePresetTrigger->hideInEditor = true;
-		savePresetTrigger->isTargettable = false;
-	}
-	*/
 
 	//script
 	scriptObject.setMethod("getChild", ControllableContainer::getChildFromScript);
@@ -203,11 +187,7 @@ void ControllableContainer::notifyStructureChanged() {
 }
 
 void ControllableContainer::newMessage(const Parameter::ParameterEvent &e) {
-	/*
-	if (e.parameter == currentPresetName) {
-		loadPresetWithName(e.parameter->stringValue());
-	}
-	*/
+	
 
 	if (e.type == Parameter::ParameterEvent::VALUE_CHANGED) {
 		onContainerParameterChangedAsync(e.parameter, e.value);
@@ -240,16 +220,6 @@ void ControllableContainer::setAutoShortName() {
 	controllableContainerListeners.call(&ControllableContainerListener::childAddressChanged, this);
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ChildAddressChanged, this));
 }
-
-/*
-void ControllableContainer::setCanHavePresets(bool value)
-{
-	canHavePresets = value;
-
-	//TODO, create triggers and string parameter here instead of having them everywhere
-	//currentPresetName->isControllableExposed = value;
-}
-*/
 
 
 
@@ -529,134 +499,13 @@ bool ControllableContainer::containsControllable(Controllable * c, int maxSearch
 }
 
 
-/*
-bool ControllableContainer::loadPresetWithName(const String & name)
-{
-	// TODO weird feedback when loading preset on parameter presetName
-	if (isLoadingPreset) { return false; }
-	if (name == "") return false;
-	isLoadingPreset = true;
-
-	PresetManager::Preset * preset = PresetManager::getInstance()->getPreset(getPresetFilter(), name);
-	if (preset == nullptr) { isLoadingPreset = false; currentPresetName->setValue("", true); return false; }
-	bool hasLoaded = loadPreset(preset);
-	isLoadingPreset = false;
-	return hasLoaded;
-
-}
-
-bool ControllableContainer::loadPreset(PresetManager::Preset * preset)
-{
-	if (preset == nullptr) {
-		currentPresetName->setValue("", true);
-		return false;
-	}
-
-	loadPresetInternal(preset);
-
-	for (auto &pv : preset->presetValues)
-	{
-
-		Parameter * p = dynamic_cast<Parameter *>(getControllableForAddress(pv->paramControlAddress));
-		//DBG("Load preset, param set container : " << niceName << ", niceName : " << p->niceName << ",pv controlAddress : " << p->controlAddress << "" << pv->presetValue.toString());
-		if (p != nullptr && p != currentPresetName) p->setValue(pv->presetValue);
-	}
-
-	currentPreset = preset;
-	currentPresetName->setValue(currentPreset->name, false);
-
-	controllableContainerListeners.call(&ControllableContainerListener::controllableContainerPresetLoaded, this);
-	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableContainerPresetLoaded, this));
-
-	return true;
-}
-
-PresetManager::Preset* ControllableContainer::saveNewPreset(const String & _name)
-{
-	PresetManager::Preset * pre = PresetManager::getInstance()->addPresetFromControllableContainer(_name, getPresetFilter(), this, presetSavingIsRecursive);
-	savePresetInternal(pre);
-	NLOG(niceName, "New preset saved : " + pre->name);
-	loadPreset(pre);
-	return pre;
-}
-
-
-bool ControllableContainer::saveCurrentPreset()
-{
-	//Same as saveNewPreset because PresetManager now replaces if name is the same
-	if (currentPreset == nullptr) {
-		jassertfalse;
-		return false;
-	}
-
-	PresetManager::Preset * pre = PresetManager::getInstance()->addPresetFromControllableContainer(currentPreset->name, getPresetFilter(), this, presetSavingIsRecursive);
-	savePresetInternal(pre);
-	NLOG(niceName, "Current preset saved : " + pre->name);
-	loadPreset(pre);
-
-	
- // for (auto &pv : currentPreset->presetValues)
- // {
-	//Parameter * p = dynamic_cast<Parameter*> (getControllableForAddress(pv->paramControlAddress));
-	//if (p != nullptr && p!=currentPresetName)
-	//{
-	//  pv->presetValue = var(p->getValue());
-	//}
- // }
- // savePresetInternal(currentPreset);
- // NLOG(niceName, "Current preset saved : " + currentPreset->name);
-
- // return true;
-  
-
-	return true;
-}
-
-int ControllableContainer::getNumPresets()
-{
-	return PresetManager::getInstance()->getNumPresetForFilter(getPresetFilter());
-}
-
-bool ControllableContainer::resetFromPreset()
-{
-	if (currentPreset == nullptr) return false;
-
-
-	for (auto &pv : currentPreset->presetValues)
-	{
-		Parameter * p = (Parameter *)getControllableForAddress(pv->paramControlAddress);
-		if (p != nullptr && p != currentPresetName) p->resetValue();
-	}
-
-
-	currentPreset = nullptr;
-	currentPresetName->setValue("", true);
-
-	return true;
-}
-
-var ControllableContainer::getPresetValueFor(Parameter * p)
-{
-	if (currentPreset == nullptr) return var();
-	return currentPreset->getPresetValue(p->getControlAddress(this));
-}
-
-
-String ControllableContainer::getPresetFilter()
-{
-	return shortName;
-}
-*/
-
 void ControllableContainer::dispatchFeedback(Controllable * c)
 {
 	//    @ben removed else here to enable containerlistener call back of non root (proxies) is it overkill?
 	if (parentContainer != nullptr) { parentContainer->dispatchFeedback(c); }
 	controllableContainerListeners.call(&ControllableContainerListener::controllableFeedbackUpdate, this, c);
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableFeedbackUpdate, this, c));
-
 }
-
 
 
 void ControllableContainer::parameterValueChanged(Parameter * p)
@@ -675,15 +524,9 @@ void ControllableContainer::parameterValueChanged(Parameter * p)
 
 void ControllableContainer::triggerTriggered(Trigger * t)
 {
-	if (t->parentContainer == this)
-	{
-		/*if (t == savePresetTrigger) saveCurrentPreset();
-		else */ onContainerTriggerTriggered(t);
+	if (t->parentContainer == this) onContainerTriggerTriggered(t);
+	else onExternalTriggerTriggered(t);
 
-	} else
-	{
-		onExternalTriggerTriggered(t);
-	}
 
 	if (t->isControllableExposed) dispatchFeedback(t);
 }
@@ -712,17 +555,9 @@ var ControllableContainer::getJSONData()
 		if (wc->type == Controllable::TRIGGER && !includeTriggersInSaveLoad) continue;
 		if (wc.wasObjectDeleted()) continue;
 		if (!wc->isSavable) continue;
-		//if (wc == currentPresetName && !canHavePresets) continue;
 		paramsData.append(wc->getJSONData(this));
 	}
 
-
-	/*
-	 if (currentPreset != nullptr)
-	 {
-	 data.getDynamicObject()->setProperty(presetIdentifier, currentPreset->name);
-	 }
-	 */
 
 	data.getDynamicObject()->setProperty("uid", uid.toString());
 	data.getDynamicObject()->setProperty("parameters", paramsData);
@@ -756,12 +591,9 @@ void ControllableContainer::loadJSONData(var data, bool createIfNotThere)
 			if (c != nullptr)
 			{
 				if (Parameter * p = dynamic_cast<Parameter*>(c)) {
-					//                we don't load preset when already loading a state
-					//if (p->shortName == "preset") continue;
-
 					if (p->isSavable) p->loadJSONData(pData.getDynamicObject());
-
 				}
+
 			} else if (!saveAndLoadRecursiveData && createIfNotThere)
 			{
 				c = ControllableFactory::getInstance()->createControllable(o->getProperty("type"));

@@ -200,8 +200,44 @@ static const unsigned char temp_binary_data_0[] =
 
 const char* add_png = (const char*) temp_binary_data_0;
 
-//================== cancel.png ==================
+//================== arrow-down.png ==================
 static const unsigned char temp_binary_data_1[] =
+"\x89PNG\r\n"
+"\x1a\n"
+"\0\0\0\rIHDR\0\0\0\x10\0\0\0\x10\x08\x06\0\0\0\x1f\xf3\xff""a\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0\x05\xebiTXtXML:com.adobe.xmp\0\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?> <x:xmpmeta xmlns:x=\"adob"
+"e:ns:meta/\" x:xmptk=\"Adobe XMP Core 5.6-c142 79.160924, 2017/07/13-01:06:39        \"> <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"> <rdf:Description rdf:about=\"\" xmlns:xmp=\"http://ns.adobe.com/xap/1.0/\" xmlns:xmpMM=\"http"
+"://ns.adobe.com/xap/1.0/mm/\" xmlns:stEvt=\"http://ns.adobe.com/xap/1.0/sType/ResourceEvent#\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:photoshop=\"http://ns.adobe.com/photoshop/1.0/\" xmp:CreatorTool=\"Adobe Photoshop CC (Windows)\" xmp:C"
+"reateDate=\"2017-12-30T16:29:37+01:00\" xmp:MetadataDate=\"2017-12-30T16:29:37+01:00\" xmp:ModifyDate=\"2017-12-30T16:29:37+01:00\" xmpMM:InstanceID=\"xmp.iid:dc5b25fd-8567-e84a-a592-2879060ffddb\" xmpMM:DocumentID=\"adobe:docid:photoshop:12cc2ec8-53"
+"57-5b43-9bc0-b484bd61a894\" xmpMM:OriginalDocumentID=\"xmp.did:142b57b9-4033-3940-a95a-d761257d692c\" dc:format=\"image/png\" photoshop:ColorMode=\"3\" photoshop:ICCProfile=\"sRGB IEC61966-2.1\"> <xmpMM:History> <rdf:Seq> <rdf:li stEvt:action=\"creat"
+"ed\" stEvt:instanceID=\"xmp.iid:142b57b9-4033-3940-a95a-d761257d692c\" stEvt:when=\"2017-12-30T16:29:37+01:00\" stEvt:softwareAgent=\"Adobe Photoshop CC (Windows)\"/> <rdf:li stEvt:action=\"saved\" stEvt:instanceID=\"xmp.iid:dc5b25fd-8567-e84a-a592-2"
+"879060ffddb\" stEvt:when=\"2017-12-30T16:29:37+01:00\" stEvt:softwareAgent=\"Adobe Photoshop CC (Windows)\" stEvt:changed=\"/\"/> </rdf:Seq> </xmpMM:History> </rdf:Description> </rdf:RDF> </x:xmpmeta> <?xpacket end=\"r\"?>ll\x91(\0\0\0\xc0IDAT8\xcb\xed"
+"\x92K\n"
+"\xc2""0\x14""E\xdfJ\xc4\x81\xa8\xe3\xba\x05""E\x14\\\x80\xcb(\xb8/W!E\xa8U\xa9\x88h\x8b""F\xb4&\xb5\xd6%\xc4\xfb \x8a\"\xc4\x82\xd3\x0e.\xe1}\xceI\x06!\xad""5\xfd\x13*\x05\x9f\x82\xf5Q\xf5\x10\xd7\x8fN\x14\xc4\xe7W\xb8""F\x7f\xb4\x12\xb2""c\x15""DI6\xdb"
+"\xab\\b\xb1\x0f\x80!\n"
+"\x85$\xd4\x03\xf4S\xcc}\xab`\x97""d\x9eH\xef:\xbe\xdc\x14\xe0""6\x0b\0wQ_\xb9\x8f\xf9\xc4*\xc0r\x15KS#\xd9@0\xc4\xad[\x03{xM\xe5\x97\x80S\x07\xb4""8\xa8\x9c%\xda\xc0\x01\xe0\x1a\xcf\x8b\x08""8M@K\x96\xe0\x9c\x03n<gE\x05\x9c\x16^0\xc6\xe9\x84o\xfd\xf2"
+"+\x7f\xe7\x01\xdb""1\x01\x8bx\x18\x15K\0\0\0\0IEND\xae""B`\x82";
+
+const char* arrowdown_png = (const char*) temp_binary_data_1;
+
+//================== arrow-right.png ==================
+static const unsigned char temp_binary_data_2[] =
+"\x89PNG\r\n"
+"\x1a\n"
+"\0\0\0\rIHDR\0\0\0\x10\0\0\0\x10\x08\x06\0\0\0\x1f\xf3\xff""a\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0\x05\xebiTXtXML:com.adobe.xmp\0\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?> <x:xmpmeta xmlns:x=\"adob"
+"e:ns:meta/\" x:xmptk=\"Adobe XMP Core 5.6-c142 79.160924, 2017/07/13-01:06:39        \"> <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"> <rdf:Description rdf:about=\"\" xmlns:xmp=\"http://ns.adobe.com/xap/1.0/\" xmlns:xmpMM=\"http"
+"://ns.adobe.com/xap/1.0/mm/\" xmlns:stEvt=\"http://ns.adobe.com/xap/1.0/sType/ResourceEvent#\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:photoshop=\"http://ns.adobe.com/photoshop/1.0/\" xmp:CreatorTool=\"Adobe Photoshop CC (Windows)\" xmp:C"
+"reateDate=\"2017-12-30T16:29:47+01:00\" xmp:MetadataDate=\"2017-12-30T16:29:47+01:00\" xmp:ModifyDate=\"2017-12-30T16:29:47+01:00\" xmpMM:InstanceID=\"xmp.iid:1f2fe14d-4803-7b49-927d-050a25d474ff\" xmpMM:DocumentID=\"adobe:docid:photoshop:8bbff506-aa"
+"22-ab44-9aa8-39cdf8eb80e4\" xmpMM:OriginalDocumentID=\"xmp.did:40f26836-0d49-2743-b230-d6c7e8ebd362\" dc:format=\"image/png\" photoshop:ColorMode=\"3\" photoshop:ICCProfile=\"sRGB IEC61966-2.1\"> <xmpMM:History> <rdf:Seq> <rdf:li stEvt:action=\"creat"
+"ed\" stEvt:instanceID=\"xmp.iid:40f26836-0d49-2743-b230-d6c7e8ebd362\" stEvt:when=\"2017-12-30T16:29:47+01:00\" stEvt:softwareAgent=\"Adobe Photoshop CC (Windows)\"/> <rdf:li stEvt:action=\"saved\" stEvt:instanceID=\"xmp.iid:1f2fe14d-4803-7b49-927d-0"
+"50a25d474ff\" stEvt:when=\"2017-12-30T16:29:47+01:00\" stEvt:softwareAgent=\"Adobe Photoshop CC (Windows)\" stEvt:changed=\"/\"/> </rdf:Seq> </xmpMM:History> </rdf:Description> </rdf:RDF> </x:xmpmeta> <?xpacket end=\"r\"?>\x9e\x01\xf0S\0\0\0\xb0IDAT8"
+"\x11""c\xf8\xff\xff?\x03%\x98""a\x18\x1ap\xe5\xe1\x0b\xd7;\xcf\xde\x9c\xb9\xfd\xec\xcd\xd1\xcb\x0f_\xc8\x01""1\x03\x0c\x13""e\xc0\xb5G/K\xee\xbf|\xf7\xea\xe1\xab\xf7\xff\x81\x86\x1c\x07jT!\xc9\0\xa0\x0b@\xd8\xf7\xee\xf3\xb7\xaf\xa1\x86\x9c\x03jV'\xd5"
+"\0\x10v\x07z\xe5\x16\xd4\x90\xf3@\xbe\x11\xb1^@\xc6\x91@\x97\xfc\x7f\xf0\xf2\xdd\x7f \xbd\x9eT\x03\\\x80\x9an\x80""4\x03]p\x11\xe8\x02""cR\xbc\xe0\x05\xd4\xfc\x12\xe4|\xa0""7.\0\xf9\x1aWH\x88\x85""B`,\xbc\x80\xfa\xfd$P\xa3\x1a,\\\x88""5\xc0\x13h\xebY"
+"P\x14\x02""5) \x05\xeap\xcd\x0b\0w\xfc\x01\xd8-\xd9\xae\x93\0\0\0\0IEND\xae""B`\x82";
+
+const char* arrowright_png = (const char*) temp_binary_data_2;
+
+//================== cancel.png ==================
+static const unsigned char temp_binary_data_3[] =
 "\x89PNG\r\n"
 "\x1a\n"
 "\0\0\0\rIHDR\0\0\0\x14\0\0\0\x14\x08\x06\0\0\0\x8d\x89\x1d\r\0\0\0\tpHYs\0\0\x10\x9c\0\0\x10\x9c\x01&\xcd:4\0\0""8&iTXtXML:com.adobe.xmp\0\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n"
@@ -371,10 +407,10 @@ static const unsigned char temp_binary_data_1[] =
 "7>\xd7\x98!\xe1\t\xea\xcdS^\x0f|0>\x8b\xc6\xed\xeb\xf1\xb1g)\xaf\x07\x9eGG\xe8V\xbc\xad\xb7\n"
 "\xe2\xa8WMy\xcb\xd1Q\x19[]\x97""64m(\xadn\xdaXZ\xf2\xa3\x9c\x01S\xabw\x12{\xe8\xdaT\x9e\x95\xff\xf2\xa1~\xfc\x9f""0\xd2\xda\xf4\xf5\x15\xa1\x05\\\xff\xe5\xfaZ\xa0\xf4\xefo\xec\xcf\x01\0\xcb\x19""A\xaf!\x89\xd4\xd3\0\0\0\0IEND\xae""B`\x82";
 
-const char* cancel_png = (const char*) temp_binary_data_1;
+const char* cancel_png = (const char*) temp_binary_data_3;
 
 //================== check.png ==================
-static const unsigned char temp_binary_data_2[] =
+static const unsigned char temp_binary_data_4[] =
 "\x89PNG\r\n"
 "\x1a\n"
 "\0\0\0\rIHDR\0\0\0\x18\0\0\0\x18\x08\x06\0\0\0\xe0w=\xf8\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0""9\xeciTXtXML:com.adobe.xmp\0\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n"
@@ -558,10 +594,10 @@ static const unsigned char temp_binary_data_2[] =
 "\xc0""4\xc7\x88\x0b\xb8\xeb+c:5?)\x1d""7\x0e;T\0\r\x92\x87\xf7\x93+\x0b\xb7\xfa\xde\xd6\xd7\xbaw\xb7S\xbd\xbdN9Xl0H\x1c""0\xca\xe0\xd7R\xb2\xeb\xabgU\xea\x8e\x11)\x84\xb0\x03`\xf3\xd9\xaaH\xe3S\x7flc\xa6z\xd9\xaf""e'\x8b\xa5\xc2\0V\xc8%\x83\xe0\tka6\xad"
 "-\x9fRN}\x18\xd9\x18$\xec,\xae\xb7""f\x9d""2\x1a\xe0""3\xbfQ;W_\xac\xbfj#\x0eh%\x92\xe6L\x99\x10\xbf\xa3Z\x99SV\x83\xdf&\x93\xff\xff\x93\xffu\xe0\xcf\x01\0\xa0Mr\xda\xba\xc0\x1f\xb7\0\0\0\0IEND\xae""B`\x82";
 
-const char* check_png = (const char*) temp_binary_data_2;
+const char* check_png = (const char*) temp_binary_data_4;
 
 //================== checkbox_off.png ==================
-static const unsigned char temp_binary_data_3[] =
+static const unsigned char temp_binary_data_5[] =
 "\x89PNG\r\n"
 "\x1a\n"
 "\0\0\0\rIHDR\0\0\0\x18\0\0\0\x18\x08\x06\0\0\0\xe0w=\xf8\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0:\xb1iTXtXML:com.adobe.xmp\0\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n"
@@ -743,10 +779,10 @@ static const unsigned char temp_binary_data_3[] =
 "\x9dN\xa8\xf3_\xcf`<\x1e""3\x9f\xcf\xa9\xd5jH)\xd1""4\x8dV\xab\x85\xaa\xaa\x07\xb1\x04""F\x8e\xe1\xe8\x19L&\x13\x06\x83\xc1\x96 \x91H\xa0(J\xa4X\"w\x91\xeb\xba(\x8a""B\xb1X\xdc\xb6""b\x10\xcb)\xe7\x91\xef\x81\xe3""8\x0c\x87""C\0<\xcf\x8b\x14\xcb\xcf\n"
 "\xc4\xa9M\xa3\xd1\x08\xcf\xf3\x98N\xa7\x91""b\xd9\x81\x88$\x10\xc4\xf5\xd7\xc7\xce\x8d\xf1""5\xfd\x92\x80\x1d\xa3\x80-\x81\x1e\xf0\x1a\x03y\x0f\xe8\x05m\xfa\x02|\x02\xb7\x97\xfe\xb6|\x0f\0J!\x8e\xf5~qjE\0\0\0\0IEND\xae""B`\x82";
 
-const char* checkbox_off_png = (const char*) temp_binary_data_3;
+const char* checkbox_off_png = (const char*) temp_binary_data_5;
 
 //================== checkbox_off_readonly.png ==================
-static const unsigned char temp_binary_data_4[] =
+static const unsigned char temp_binary_data_6[] =
 "\x89PNG\r\n"
 "\x1a\n"
 "\0\0\0\rIHDR\0\0\0\x18\0\0\0\x18\x08\x06\0\0\0\xe0w=\xf8\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0:\xb1iTXtXML:com.adobe.xmp\0\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n"
@@ -925,10 +961,10 @@ static const unsigned char temp_binary_data_4[] =
 "\xb1\xf9\x0b\x96""b\x12\xb0\xc8\x07\xd7\x1d\xdf\x83w\xc5\xbb\xb4\xd9\x1e\x04+\xcc""0B\xf2\x1b\rn\xa8p\xc4\xb3""D\xc6\x1a\x8b\xb8Pk\xc7\x04S\x8c\xb1/\xb1\x0c\xf9#\x02\xda\xf2\x88\x06\xe6\xb8\xe4\xa8\xa5\xe9H\xfeYU\x83Y\x8e\xcek\xddSc\x94[<\xe8""7\xa4\xac"
 "g\x86\x80!`\x08\x18\x02\xfe%\xa0\xe9\xd1_\xe7\xd8\xd0\xa2\x07y\x81{\x8e\x81N\x1d\xef\xc2\xdbW\xe5X\xff\x13\xca""8\xa9\xe5y{\xce""8\x96xb\x87k\x1f\xdf\x96\xd7\0""BA%\xae\xde\xa5\x81\x1b\0\0\0\0IEND\xae""B`\x82";
 
-const char* checkbox_off_readonly_png = (const char*) temp_binary_data_4;
+const char* checkbox_off_readonly_png = (const char*) temp_binary_data_6;
 
 //================== checkbox_on.png ==================
-static const unsigned char temp_binary_data_5[] =
+static const unsigned char temp_binary_data_7[] =
 "\x89PNG\r\n"
 "\x1a\n"
 "\0\0\0\rIHDR\0\0\0\x18\0\0\0\x18\x08\x06\0\0\0\xe0w=\xf8\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0:\xb1iTXtXML:com.adobe.xmp\0\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n"
@@ -1111,10 +1147,10 @@ static const unsigned char temp_binary_data_5[] =
 "\xe4""F[\xf6""4\x9dR\xf5\xde""1\xcau\xbc\x83\xdf\xc5\x12\xbb\x9aN\xb1R\x05`V\xf5""6\xc0\xebm\xe9\x02\xde\xfd\x99\x9e_\x16y\xff%M\xc5h\xbaI:{\xd5\xb5-\x0f\x9a\x83\xb3|\x81\xed\xa3\x14\x86ir\x96/\x90\xd0\xf4\x07\x99\x97\xd4\x0bI\xe6O\x81""7\x87?\xc8]\x97"
 "zjK\xab\0\t\x10z9y~Y\xfco\xb3\xfb\xe6\xa0\x9b&E\xe0\xad\x83\x04[\"\x10\x07""b\x0e\x80\xc7\x81x\xdd*\xa2\xc0'\xeb\xdb\xb2h\xc3\xb7%\x01l\x03\xdc\x0c\0(\xf2\x99\x9a\\q\x8c$\0\0\0\0IEND\xae""B`\x82";
 
-const char* checkbox_on_png = (const char*) temp_binary_data_5;
+const char* checkbox_on_png = (const char*) temp_binary_data_7;
 
 //================== checkbox_on_readonly.png ==================
-static const unsigned char temp_binary_data_6[] =
+static const unsigned char temp_binary_data_8[] =
 "\x89PNG\r\n"
 "\x1a\n"
 "\0\0\0\rIHDR\0\0\0\x18\0\0\0\x18\x08\x06\0\0\0\xe0w=\xf8\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0:\xb1iTXtXML:com.adobe.xmp\0\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n"
@@ -1298,10 +1334,10 @@ static const unsigned char temp_binary_data_6[] =
 "\xaaq\x95/>\xf4\x96""F\xa5""D\xfe\x9a-\xb6\xdb\xf4\xe8\xf8\x9c\xf9\xe5=\xcc\x0e\x1c""f^\xb7\xe5M\xef \xf3'\xcb\xec\xd2\x1e\x05]'\xf3\xf7\x82\xd4\xaa\x86\xfe\x86\xe9%\xd9\x11Ig\xce\x98\x9a\xdf\xe5""4{m\xcb\x16s\x01\x12 \xd8""9yt|\xfe\xee""a\xf7\xdb\xc5"
 "i\xba/\x02\xdf\\\x14\xf8.\x02I`\xc6\x05\xf2$\x90\xbc\x1fv\t`\xdb\xf8\xb6t8\xf0mI\x01\xb3\0w\x03\0\x95\xed\x94+\xa6\x08\xa7\xea\0\0\0\0IEND\xae""B`\x82";
 
-const char* checkbox_on_readonly_png = (const char*) temp_binary_data_6;
+const char* checkbox_on_readonly_png = (const char*) temp_binary_data_8;
 
 //================== edit.png ==================
-static const unsigned char temp_binary_data_7[] =
+static const unsigned char temp_binary_data_9[] =
 "\x89PNG\r\n"
 "\x1a\n"
 "\0\0\0\rIHDR\0\0\0\x14\0\0\0\x14\x08\x06\0\0\0\x8d\x89\x1d\r\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0;\xa6iTXtXML:com.adobe.xmp\0\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n"
@@ -1490,10 +1526,10 @@ static const unsigned char temp_binary_data_7[] =
 "\xc3[-\x91\xb5\xd3\xf3q2\xc5\x08\xf5zU\x87\x02\x84\x06\x08""E\xc9\xbf\x9a\xef""0\xaf\xf6\xfd\xf6\xfd\x97\xf3""B\xea\xdc""cl@H\x83\xbf~=\xbd""d4\xcf\xc4\xf7\x1d""9\xfc\xc9m\xbb\xed\r\xc7\x8f\xb6H-&\x05\x02\x97\reh\xb9|cx\xe5\x9b\xb9\xb3g\xdf]*,!\xa4Yk"
 "\xeb\xff\xfe\xc7\xfew\0\xa1\x0cK'1\x01\x1f\xcd\0\0\0\0IEND\xae""B`\x82";
 
-const char* edit_png = (const char*) temp_binary_data_7;
+const char* edit_png = (const char*) temp_binary_data_9;
 
 //================== file.png ==================
-static const unsigned char temp_binary_data_8[] =
+static const unsigned char temp_binary_data_10[] =
 "\x89PNG\r\n"
 "\x1a\n"
 "\0\0\0\rIHDR\0\0\0\x14\0\0\0\x14\x08\x06\0\0\0\x8d\x89\x1d\r\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0;\xa6iTXtXML:com.adobe.xmp\0\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n"
@@ -1682,10 +1718,10 @@ static const unsigned char temp_binary_data_8[] =
 "\xb2\x89\x19:RJ\xe6\xbe\x15\xf0|\x89""a\xe8\x13V\xa2\xea\x9a\xa8\xd8\xc9\xb0r\xa5\xdd\xbc\x15N?\x0c""5\x0c\x1d]E\xc6\x0c\xf3NU<qJ\x08\x91\xfd\xdbq\xd8\x80\x0e\x94N\xd4\xc5\xd2\xd0\xd6\x97\xa0K\xb6""eOyE\xf7\xbe\xaa\xa8\x93Q\xc7Y\xfc\xf7\x17\xfb\xf7\0"
 "eD\xed\x94\xb5""6r\x9f\0\0\0\0IEND\xae""B`\x82";
 
-const char* file_png = (const char*) temp_binary_data_8;
+const char* file_png = (const char*) temp_binary_data_10;
 
 //================== in.png ==================
-static const unsigned char temp_binary_data_9[] =
+static const unsigned char temp_binary_data_11[] =
 "\x89PNG\r\n"
 "\x1a\n"
 "\0\0\0\rIHDR\0\0\0\x18\0\0\0\x18\x08\x06\0\0\0\xe0w=\xf8\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0\n"
@@ -1943,10 +1979,10 @@ static const unsigned char temp_binary_data_9[] =
 "\xbf\xac\x15\x85 V\xaa\x9c\xe0""a\xe8\xc6g\xdd\x90\xeci\xd7\xd7\xe9^o\xf6""4\x9c\x83\x1eUr\xb2gg?\"NW1\xda\xae\x9b\xe1\x83\xb2\xe5\xc9j\xddT40\x1b\xdb\xc2*\xad""b\xc3R\xa3r\xbbV\xb6\xbc\x85\x18\xc5\xac&\x9d.\x8a\xces\\\xc8\xb7\xa2I:]\x80\x15\x07\x8d\x85"
 "\xa5\xec\xeb\x81\xba\xe9\xee^\xe9\xec""5`N\xf6""8\xa6o\xe7\xa6YZ\x05\x16\x94-?\xff\xadv\xfd\xff\xc9\xfck\x80\x9f\x03\0\x05\xee\xcd\x1a\x1c\xab\xa5@\0\0\0\0IEND\xae""B`\x82";
 
-const char* in_png = (const char*) temp_binary_data_9;
+const char* in_png = (const char*) temp_binary_data_11;
 
 //================== nextcue.png ==================
-static const unsigned char temp_binary_data_10[] =
+static const unsigned char temp_binary_data_12[] =
 "\x89PNG\r\n"
 "\x1a\n"
 "\0\0\0\rIHDR\0\0\0\x18\0\0\0\x18\x08\x06\0\0\0\xe0w=\xf8\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0:\xa9iTXtXML:com.adobe.xmp\0\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n"
@@ -2135,10 +2171,10 @@ static const unsigned char temp_binary_data_10[] =
 ":\xe3\x8b.\x9b\xb7\x99\xb5\xb6\xb8V_\xbdzuZ\xb7Z\xad\xf6\xfb\xd1\xd1Q\x1d \x8a\xa2\xf7N\xfa\xbay\xef\xc9\xf3\x9c^\xaf\xc7\xf8\xf8xK\xd5j\xb5\xebq\x1cow:\x9d\xcf:\x9d\xceP/\xf9\x18\x90\xd1\xd1\xd1\xd6\xea\xea\xea\xf5\x7f\x07\0\xe5Q\xf0\xd5\xc8""A\x9b\x12"
 "\0\0\0\0IEND\xae""B`\x82";
 
-const char* nextcue_png = (const char*) temp_binary_data_10;
+const char* nextcue_png = (const char*) temp_binary_data_12;
 
 //================== out.png ==================
-static const unsigned char temp_binary_data_11[] =
+static const unsigned char temp_binary_data_13[] =
 "\x89PNG\r\n"
 "\x1a\n"
 "\0\0\0\rIHDR\0\0\0\x18\0\0\0\x18\x08\x06\0\0\0\xe0w=\xf8\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0\n"
@@ -2392,10 +2428,10 @@ static const unsigned char temp_binary_data_11[] =
 "\x94""c:\xd8\xcc\x03""3\xc6\x8e\xc9?\xf9\xec\x87\x92\x15\x1f\xccz\x99\x0f\r\x85\x8b\x96H\xefR\x9fy\xc1y}z}\xb1]4\xc9\x87""A\xb6\x18\xb3\xc9\xefq\xbd\xc9=\xf8\x18""dC\xb1&\xdf\xc6N\x13\xe4\xfb\xd5\x9c\xb8s\x1d""dG\xb8|\x9a\x1f\xa7)\xc7`\x90}o\xea\x9a\xd6"
 "\x8c\xeb\x1e\x1e""c\xa8\xe6;/W\x89\x9f\x06\xd9\x8b\x96\xce\xf5\xff_\xe6_+\xf0k\0\xd0\xe4i\x03%\xb1\xbf\x9d\0\0\0\0IEND\xae""B`\x82";
 
-const char* out_png = (const char*) temp_binary_data_11;
+const char* out_png = (const char*) temp_binary_data_13;
 
 //================== playpause.png ==================
-static const unsigned char temp_binary_data_12[] =
+static const unsigned char temp_binary_data_14[] =
 "\x89PNG\r\n"
 "\x1a\n"
 "\0\0\0\rIHDR\0\0\0\x18\0\0\0\x18\x08\x06\0\0\0\xe0w=\xf8\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0:\xa9iTXtXML:com.adobe.xmp\0\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n"
@@ -2585,10 +2621,10 @@ static const unsigned char temp_binary_data_12[] =
 "K;\xce\x15""B\x10\xc7""1;;;\x84""a\x98\xe8\xb3g\xcf\xfe|\xe7\xce\x9d\xcf\xf6\xf6\xf6\xfc""F\xa3""A\xa9TBkM\x14""E\xcfN\xe8\x94\xd5\x1b\x93z\x9e\x87\xd6\x9a""0\x0c""1\xc6Ld\xd9\xdd\xdd""e{{;;~\xfc\xf8--\xa5\xfcr~~^\xe6y\xfei\xbb\xdd.W\xab\xd5\xb0V\xab"
 "\xb9~\xbfO\x18\x86\x08!^ \x19\x13\xd7\xebu|\xdf\xa7\xdb\xed\x12""E\x11Zk\xf2<\x9fK\xd3\xd4""6\x9b\xcd\x1f\xd7\xd7\xd7?\xffo\0\x05\x1a""4\x8d\x01%\xca%\0\0\0\0IEND\xae""B`\x82";
 
-const char* playpause_png = (const char*) temp_binary_data_12;
+const char* playpause_png = (const char*) temp_binary_data_14;
 
 //================== power.png ==================
-static const unsigned char temp_binary_data_13[] =
+static const unsigned char temp_binary_data_15[] =
 "\x89PNG\r\n"
 "\x1a\n"
 "\0\0\0\rIHDR\0\0\0\x14\0\0\0\x14\x08\x06\0\0\0\x8d\x89\x1d\r\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0""8$iTXtXML:com.adobe.xmp\0\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n"
@@ -2764,10 +2800,10 @@ static const unsigned char temp_binary_data_13[] =
 "\x9f\xfe\xd1\xdf\x9fo\xf4\xf5\xbd\x1b\xef\xed\xa5\xd0\xdd\xcd\xfe\xb3g\xfc\xf2\xf8""1\0I\xdf\xa7P,b=\x8f\x86\x08\xa9Z\xed\x1b\xbfZ\x9d\xac\x0c\x0ct\xde\xb2\x8a \x10\xc6\x1a\x8dq\xdb\xdf\x7f[\x9b\xcd\xc9\xd0q\xe8\x1a\x1a\xa2\xe7\xb5-@\x18""E\xb8""A\x80"
 "M\xa7\x17\x9c""0\xbc\xe2X\x1b!\xc2\x81k\xa3\"X\xd7\xb5""b\xcc\x15\x11\xb9-\xf0\x81\r\xc3""1+RxU\xa0[\x8e\xc8\x92\xaa~%\xc6|\xa7\xae\x8b\xfe\x0b\xf6\xd7\x8b\xfb\x9f\x7f\xec?\x07\0""0\xb7\x88""3G\xa9\x97W\0\0\0\0IEND\xae""B`\x82";
 
-const char* power_png = (const char*) temp_binary_data_13;
+const char* power_png = (const char*) temp_binary_data_15;
 
 //================== prevcue.png ==================
-static const unsigned char temp_binary_data_14[] =
+static const unsigned char temp_binary_data_16[] =
 "\x89PNG\r\n"
 "\x1a\n"
 "\0\0\0\rIHDR\0\0\0\x18\0\0\0\x18\x08\x06\0\0\0\xe0w=\xf8\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0:\xa9iTXtXML:com.adobe.xmp\0\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n"
@@ -2959,10 +2995,10 @@ static const unsigned char temp_binary_data_14[] =
 "B\xc8[_B\x88W\xb5\xc9""d2\xfa\xfc\xfc<\xeb\xfb>\x94R\x90R\xde:-Zk\xb4Z-h\xad\xc1\xc7\xc7\xc7\x7fo4\x1aKGGG\xe0\x9c_\xb9On\x92\x9a\xde\x1ek\xb7\xdb(\x95J\xbb|ttt\xed\xf8\xf8\xf8\xe7 \x08>RJ\x11J\xa9\xed\xad\x84""7\x01^aK\xb4\xd6\xd6\xf7\xfd\xbf\xe7\xe7"
 "\xe7\x17\xff\x1d\0\xb6\x15\xf9T\xbf\x8c},\0\0\0\0IEND\xae""B`\x82";
 
-const char* prevcue_png = (const char*) temp_binary_data_14;
+const char* prevcue_png = (const char*) temp_binary_data_16;
 
 //================== reload.png ==================
-static const unsigned char temp_binary_data_15[] =
+static const unsigned char temp_binary_data_17[] =
 "\x89PNG\r\n"
 "\x1a\n"
 "\0\0\0\rIHDR\0\0\0\x14\0\0\0\x14\x08\x06\0\0\0\x8d\x89\x1d\r\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0;\xa6iTXtXML:com.adobe.xmp\0\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n"
@@ -3153,10 +3189,10 @@ static const unsigned char temp_binary_data_15[] =
 "\xa6""FC\xb3n#T\xbcu\xbd\xc0\x85\t\x87\xfd)\x03M\x08""f\x9c\x80\xdb\xc5\x08[\x17(\x05\xf7\xe8~\xa1\xdb\x16\x0f\x07\xd2\xa8""4E\x98\x1a\x03/\xf4\xe5\xf7\xae\xad""f\xbb\"w\xdc\x10`\xeb\x82\x82'\x19Y\xf2\xb9\xbe\xe8\x91+ILM\xa0\x0b\xc1~o\xed\xb7""C\xaat"
 "\xe0\xc9\xc7\xba\x16t\xdd\xac\\_(\x08%\x9c<u07\x9e_\xefn\x18\x99;3'\x8d\x01\xc7\xb2\xda\x8bh\xb6\0l)\xfd\x8c\x08\xa6k|o\xb0\xadw\xdf\xa7\x1d\xe9\x18\x81\xdc\xb9\x0f\xc5\xff~c\xff;\0\xf6i\x88\x92""d\xe7\xe9Z\0\0\0\0IEND\xae""B`\x82";
 
-const char* reload_png = (const char*) temp_binary_data_15;
+const char* reload_png = (const char*) temp_binary_data_17;
 
 //================== settings.png ==================
-static const unsigned char temp_binary_data_16[] =
+static const unsigned char temp_binary_data_18[] =
 "\x89PNG\r\n"
 "\x1a\n"
 "\0\0\0\rIHDR\0\0\0\x18\0\0\0\x18\x08\x06\0\0\0\xe0w=\xf8\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0""9\xeciTXtXML:com.adobe.xmp\0\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n"
@@ -3341,10 +3377,10 @@ static const unsigned char temp_binary_data_16[] =
 "\x90&\xc9\xa4!\x04\xbe""e\xa1\xa7\xe4\x83\xfd\x05\xfc\x1f\t\x94\xd6\xa0\x8c!m\xb5\xf0\xcb\xc6""7p{\x1b\xafR\xad\x1f\xd8\xbc\xb1\xfcP\xa3\xde@\xc2\x8b/\xb7""7\x9b\xe7\xf6\x8c\xed\xc6\x95\x9f~\xc6\xb5\x85\x05\xe4\\\x80y\xfe\xadY\xf4\xff\xcb\xfcW\t\xfe\x18"
 "\0\xf5O\xdd\xa1\xf8\xfc\xde\xfb\0\0\0\0IEND\xae""B`\x82";
 
-const char* settings_png = (const char*) temp_binary_data_16;
+const char* settings_png = (const char*) temp_binary_data_18;
 
 //================== stop.png ==================
-static const unsigned char temp_binary_data_17[] =
+static const unsigned char temp_binary_data_19[] =
 "\x89PNG\r\n"
 "\x1a\n"
 "\0\0\0\rIHDR\0\0\0\x18\0\0\0\x18\x08\x06\0\0\0\xe0w=\xf8\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0:\xa9iTXtXML:com.adobe.xmp\0\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n"
@@ -3534,10 +3570,10 @@ static const unsigned char temp_binary_data_17[] =
 "4%\xcb""2\xa4\x94L\xa7S\xa6\xd3i\xa5\xf7\xe3""3\x99L\x08\x82\0km\xb5\x1d///\xd9\xdd\xdd\xfd\x10\x1c\x1d\x1d\xfd\x16\xc7q\xeb\xe2\xe2\xe2\xc7""4M\xa5\x94\xd2\xcch\x97""eI\x18\x86""4\x1a\r\xac\xb5\xc4q\xfclW\x17""EA\x18\x86,,,0\x1a\x8d\xb0\xd6\xea\xb5\xb5"
 "\xb5z\xb3\xd9\xfc\xab\xd7\xeb}\xff\xcf\0\xf4\xb2\x08\xbc\x83\xc0g5\0\0\0\0IEND\xae""B`\x82";
 
-const char* stop_png = (const char*) temp_binary_data_17;
+const char* stop_png = (const char*) temp_binary_data_19;
 
 //================== target.png ==================
-static const unsigned char temp_binary_data_18[] =
+static const unsigned char temp_binary_data_20[] =
 "\x89PNG\r\n"
 "\x1a\n"
 "\0\0\0\rIHDR\0\0\0\x10\0\0\0\x10\x08\x06\0\0\0\x1f\xf3\xff""a\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0""9\xdeiTXtXML:com.adobe.xmp\0\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n"
@@ -3713,10 +3749,10 @@ static const unsigned char temp_binary_data_18[] =
 "%\xf0""2\x8c\xd0\xecq\x89\x05""0\x91\xc1^\x80\x1b\x01\x93\xd6\xa0\xfe\x8f\xdf\xb8n\x9a\xe9P8\xb6\xc2\\\x1f\xe2\xaaq/\xe3\xa7|g@\xcd\xd5V\x81%\x97o\x18\xe7>\xb7L\r#|\xd8S\rv\x08\xb4->\xef\xb5\x8d\x02\x16\x80+#\xb7m\x95\x01\xaeS\xbb\xf2""7\0v\xa1\x1f\x91"
 "\xeaW\r?\0\0\0\0IEND\xae""B`\x82";
 
-const char* target_png = (const char*) temp_binary_data_18;
+const char* target_png = (const char*) temp_binary_data_20;
 
 //================== uncheck.png ==================
-static const unsigned char temp_binary_data_19[] =
+static const unsigned char temp_binary_data_21[] =
 "\x89PNG\r\n"
 "\x1a\n"
 "\0\0\0\rIHDR\0\0\0\x18\0\0\0\x18\x08\x06\0\0\0\xe0w=\xf8\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0""9\xeciTXtXML:com.adobe.xmp\0\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n"
@@ -3896,7 +3932,7 @@ static const unsigned char temp_binary_data_19[] =
 "\xe3""AU\xed\x0e\x87+\xc6\xf8\xcb\xcc\xa6\xbb\xdd\xce\xbd\xd4\xf4\xde\xa7\xfd\x83Q\xcdn\xd8\x8a\x1fy\x9e/\xc4\x18'\x06\x03\x7f\xc2\xcc\xc6\x13""d\xa1\xd3)\x1e:\xe7^\xa6n\xfa\x11Xn\xba\x1b\xda\0\x15""d\x11\xd8\xa1\xaa\xb3\xddn\xe7\t\xb0!\x85u\x19\xf8\n"
 "|Ja\xfdQ\x0f\xcd\xa8\xfb\x80\xb4\xc9\x80\xd9t\xf4{-\xb7\xd9r\x9b\xf2\xff\xb9\xd1\xfa""C\xb0^m\xcd\xd7\xe3\xddx\x18\xd7\xfb\xb7\xe5\xcf\0\xfbk$DT\xd8\x07\x8a\0\0\0\0IEND\xae""B`\x82";
 
-const char* uncheck_png = (const char*) temp_binary_data_19;
+const char* uncheck_png = (const char*) temp_binary_data_21;
 
 
 const char* getNamedResource (const char*, int&) throw();
@@ -3910,6 +3946,8 @@ const char* getNamedResource (const char* resourceNameUTF8, int& numBytes) throw
     switch (hash)
     {
         case 0xbb8f218b:  numBytes = 16103; return add_png;
+        case 0x47554015:  numBytes = 1797; return arrowdown_png;
+        case 0xf8493b9d:  numBytes = 1781; return arrowright_png;
         case 0x709742e4:  numBytes = 14817; return cancel_png;
         case 0x17c70272:  numBytes = 15786; return check_png;
         case 0xe8ac8edd:  numBytes = 15553; return checkbox_off_png;
@@ -3939,6 +3977,8 @@ const char* getNamedResource (const char* resourceNameUTF8, int& numBytes) throw
 const char* namedResourceList[] =
 {
     "add_png",
+    "arrowdown_png",
+    "arrowright_png",
     "cancel_png",
     "check_png",
     "checkbox_off_png",

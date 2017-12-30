@@ -17,8 +17,7 @@ class BaseManager;
 template<class T>
 class GenericManagerEditor :
 	public GenericControllableContainerEditor,
-	public BaseManager<T>::Listener,
-	public ButtonListener
+	public BaseManager<T>::Listener
 {
 public:
 	GenericManagerEditor(BaseManager<T> * manager, bool isRoot);
@@ -40,11 +39,7 @@ public:
 	String addItemText;
 
 	void paint(Graphics &g) override;
-	void resized() override;
-
-	virtual void itemAdded(T *) override;
-	virtual void itemRemoved(T *) override;
-
+	virtual void resizedInternalHeader(Rectangle<int> &r) override;
 
 	virtual void showMenuAndAddItem(bool isFromAddButton);
 	virtual void addItemFromMenu(bool isFromAddButton);
@@ -101,29 +96,17 @@ void GenericManagerEditor<T>::paint(Graphics & g)
 	if (this->manager->items.size() == 0 && this->noItemText.isNotEmpty())
 	{
 		g.setColour(PANEL_COLOR.brighter(.1f));
-		g.drawFittedText(this->noItemText, this->getLocalBounds().reduced(10), Justification::centred, 4);
+		g.drawFittedText(this->noItemText, this->getContentBounds().reduced(10), Justification::centred, 4);
 	}
 }
 
-template<class T>
-void GenericManagerEditor<T>::resized()
-{
-	GenericControllableContainerEditor::resized();
-
-	juce::Rectangle<int> r = getLocalBounds().reduced(2);
-	addItemBT->setBounds(r.withSize(headerHeight, headerHeight).withX(r.getWidth() - headerHeight));
-}
 
 template<class T>
-void GenericManagerEditor<T>::itemAdded(T *)
+void GenericManagerEditor<T>::resizedInternalHeader(Rectangle<int>& r)
 {
-	//to override
-}
-
-template<class T>
-void GenericManagerEditor<T>::itemRemoved(T *)
-{
-	//to override
+	addItemBT->setBounds(r.removeFromRight(r.getHeight()).reduced(2));
+	r.removeFromRight(2);
+	GenericControllableContainerEditor::resizedInternalHeader(r);
 }
 
 template<class T>
@@ -161,8 +144,10 @@ void GenericManagerEditor<T>::addItemFromMenu(bool /*isFromAddButton*/)
 }
 
 template<class T>
-inline void GenericManagerEditor<T>::buttonClicked(Button * b)
+void GenericManagerEditor<T>::buttonClicked(Button * b)
 {
+	GenericControllableContainerEditor::buttonClicked(b);
+
 	if (b == addItemBT)
 	{
 		showMenuAndAddItem(true);

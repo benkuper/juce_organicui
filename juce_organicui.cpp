@@ -55,8 +55,6 @@
 #include "controllable/parameter/ui/StringParameterUI.cpp"
 #include "controllable/parameter/ui/TargetParameterUI.cpp"
 #include "controllable/parameter/ui/TripleSliderUI.cpp"
-//#include "controllable/preset/PresetChooser.cpp"
-//#include "controllable/preset/PresetManager.cpp"
 #include "controllable/Trigger.cpp"
 #include "controllable/ui/ControllableEditor.cpp"
 #include "controllable/ui/ControllableUI.cpp"

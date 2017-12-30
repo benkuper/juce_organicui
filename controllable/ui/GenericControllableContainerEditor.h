@@ -19,27 +19,46 @@
 
 class GenericControllableContainerEditor :
 	public InspectableEditor,
-	public ControllableContainer::ContainerAsyncListener
+	public ControllableContainer::ContainerAsyncListener,
+	public ButtonListener,
+	public ChangeListener
 {
 public:
 	GenericControllableContainerEditor(WeakReference<Inspectable> _inspectable, bool isRoot);
 	virtual ~GenericControllableContainerEditor();
 
+	
 	int headerHeight;
-	Colour contourColor;
+	const int headerGap = 4;
+	
+	bool prepareToAnimate;
+	ComponentAnimator collapseAnimator;
 
+	Colour contourColor;
 	Label containerLabel;
 
 	WeakReference<ControllableContainer> container;
-	//ScopedPointer<PresetChooser> presetChooser;
-
 	OwnedArray<InspectableEditor> childEditors;
 
+	ScopedPointer<ImageButton> expandBT;
+	ScopedPointer<ImageButton> collapseBT;
+	Component headerSpacer;
+
+	virtual void setCollapsed(bool value, bool force = false);
 	virtual void resetAndBuild();
 
 	void paint(Graphics &g) override;
 	void resized() override;
+	virtual void resizedInternal(Rectangle<int> &r);
+	virtual void resizedInternalHeader(Rectangle<int> &r);
+	virtual void resizedInternalContent(Rectangle<int> &r);
 	void clear();
+
+	void mouseDown(const MouseEvent &e) override;
+
+	Rectangle<int> getHeaderBounds(); 
+	Rectangle<int> getContentBounds();
+	
 
 	void addControllableUI(Controllable * c, bool resize = false);
 	void removeControllableUI(Controllable *c, bool resize = false);
@@ -49,15 +68,14 @@ public:
 	
 	InspectableEditor * getEditorForInspectable(Inspectable * i);
 	
+	virtual void buttonClicked(Button * b) override;
+
 	void newMessage(const ContainerAsyncEvent & p) override;
-
 	virtual void controllableFeedbackUpdate(Controllable *) {};
-
 	void childBoundsChanged(Component *) override;
+
+	// Inherited via ChangeListener
+	virtual void changeListenerCallback(ChangeBroadcaster * source) override;
 };
-
-
-
-
 
 #endif  // GENERICCONTROLLABLECONTAINEREDITOR_H_INCLUDED
