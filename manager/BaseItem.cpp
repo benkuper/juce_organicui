@@ -9,11 +9,10 @@
   ==============================================================================
 */
 
-BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts, bool _canHaveCustomParameters) : 
+BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts) : 
 	ControllableContainer(name.isEmpty()?getTypeString():name),
 	canBeDisabled(_canBeDisabled),
 	canHaveScripts(_canHaveScripts),
-	canHaveCustomParameters(_canHaveCustomParameters),
 	userCanRemove(true),
 	askConfirmationBeforeRemove(true)
 {
@@ -37,14 +36,6 @@ BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts
 	{
 		scriptManager = new ScriptManager(this);
 		addChildControllableContainer(scriptManager);
-	}
-
-	if (canHaveCustomParameters)
-	{
-		customParams = new GenericControllableManager("Custom Parameters");
-		customParams->setCustomShortName("params");
-		addChildControllableContainer(customParams);
-		DBG(niceName << " Add listener to custom Params ");
 	}
 
 	//For UI
@@ -125,13 +116,6 @@ void BaseItem::onContainerTriggerTriggered(Trigger * t)
 void BaseItem::onControllableFeedbackUpdate(ControllableContainer * cc, Controllable * c)
 {
 
-	if (cc == customParams)
-	{
-		Array<var> args;
-		args.add(c->getScriptObject());
-		if (canHaveScripts) scriptManager->callFunctionOnAllItems("customParamChanged", args);
-	}
-
 	onControllableFeedbackUpdateInternal(cc, c);
 }
 
@@ -145,7 +129,6 @@ var BaseItem::getJSONData()
 	var data = ControllableContainer::getJSONData();
 	data.getDynamicObject()->setProperty("type", getTypeString());
 	if (canHaveScripts) data.getDynamicObject()->setProperty("scripts", scriptManager->getJSONData());
-	if (canHaveCustomParameters) data.getDynamicObject()->setProperty("params", customParams->getJSONData());
 	return data; 
 }
 
@@ -153,7 +136,6 @@ void BaseItem::loadJSONDataInternal(var data)
 {
 	ControllableContainer::loadJSONDataInternal(data);
 	if (canHaveScripts) scriptManager->loadJSONData(data.getProperty("scripts",var()));
-	if (canHaveCustomParameters) customParams->loadJSONData(data.getProperty("params", var()));
 }
 
 InspectableEditor * BaseItem::getEditor(bool isRoot)

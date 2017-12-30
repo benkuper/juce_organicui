@@ -10,7 +10,7 @@
 
 #ifndef CONTROLLABLECONTAINER_H_INCLUDED
 #define CONTROLLABLECONTAINER_H_INCLUDED
-
+ 
 
 class ControllableContainer :
 	public Parameter::Listener,

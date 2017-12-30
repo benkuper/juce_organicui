@@ -19,7 +19,7 @@ class BaseItem :
 	public ControllableContainer
 {
 public:
-	BaseItem(const String &name = "", bool canBeDisabled = true, bool canHaveScript = false, bool canHaveCustomParameters = false);
+	BaseItem(const String &name = "", bool canBeDisabled = true, bool canHaveScript = false);
 	virtual ~BaseItem();
 
 	BoolParameter * enabled;
@@ -33,12 +33,10 @@ public:
 
 	bool canBeDisabled;
 	bool canHaveScripts;
-	bool canHaveCustomParameters;
 	bool userCanRemove;
 	bool askConfirmationBeforeRemove;
 
 	ScopedPointer<ScriptManager> scriptManager;
-	ScopedPointer<GenericControllableManager> customParams;
 
 	void duplicate();
 	void copy();

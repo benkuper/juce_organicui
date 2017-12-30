@@ -269,7 +269,16 @@ void GenericControllableContainerEditor::resized()
 void GenericControllableContainerEditor::resizedInternal(Rectangle<int>& r)
 {
 	Rectangle<int> hr = r.removeFromTop(headerHeight);
+
+	if (!isRoot) //draw arrow here to have better control in resizedInternalHeader overrides
+	{
+		Rectangle<int> ar = hr.removeFromLeft(headerHeight).reduced(4);
+		if (container->editorIsCollapsed) expandBT->setBounds(ar);
+		else collapseBT->setBounds(ar);
+		r.removeFromLeft(2);
+	}
 	resizedInternalHeader(hr);
+	
 	r.removeFromTop(headerGap);
 	r.reduce(2, 2);
 	r.removeFromLeft(4);
@@ -278,14 +287,6 @@ void GenericControllableContainerEditor::resizedInternal(Rectangle<int>& r)
 
 void GenericControllableContainerEditor::resizedInternalHeader(Rectangle<int>& r)
 {
-	if (!isRoot)
-	{
-		Rectangle<int> ar = r.removeFromLeft(headerHeight).reduced(4);
-		if (container->editorIsCollapsed) expandBT->setBounds(ar);
-		else collapseBT->setBounds(ar);
-		r.removeFromLeft(2);
-	}
-
 	containerLabel.setBounds(r.removeFromLeft(containerLabel.getFont().getStringWidth(containerLabel.getText())+20));
 	headerSpacer.setBounds(r);
 }
