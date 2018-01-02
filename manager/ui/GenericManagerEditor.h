@@ -120,7 +120,7 @@ void GenericManagerEditor<T>::showMenuAndAddItem(bool isFromAddButton)
 	{
 		if (isFromAddButton)
 		{
-			manager->BaseManager<T>::addItem();
+			addItemFromMenu(true);
 			return;
 		}
 
@@ -141,6 +141,7 @@ template<class T>
 void GenericManagerEditor<T>::addItemFromMenu(bool /*isFromAddButton*/)
 {
 	manager->BaseManager<T>::addItem();
+	setCollapsed(false);
 }
 
 template<class T>

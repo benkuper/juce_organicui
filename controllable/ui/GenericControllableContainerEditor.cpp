@@ -202,19 +202,19 @@ void GenericControllableContainerEditor::newMessage(const ContainerAsyncEvent & 
 	switch (p.type)
 	{
 	case ContainerAsyncEvent::ControllableAdded:
-		if (p.targetControllable->parentContainer != container) return;
-		if (p.targetControllable->hideInEditor) return;
-		addControllableUI(p.targetControllable, true);
+		//if (p.targetControllable->parentContainer != container) return;
+		//if (p.targetControllable->hideInEditor) return;
+		//addControllableUI(p.targetControllable, true);
+		resetAndBuild();
 		break;
 
 	case ContainerAsyncEvent::ControllableRemoved:
-		removeControllableUI(p.targetControllable, true);
+		//removeControllableUI(p.targetControllable, true);
+		resetAndBuild();
 		break;
 
 	case ContainerAsyncEvent::ControllableContainerAdded:
-		if (p.targetContainer->parentContainer != container) return;
-
-		if (container->canInspectChildContainers) addEditorUI(p.targetContainer, true);
+		resetAndBuild();
 		break;
 
 	case ContainerAsyncEvent::ControllableContainerRemoved:
