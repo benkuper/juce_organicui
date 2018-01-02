@@ -211,10 +211,12 @@ BaseManagerUI<M, T, U>::BaseManagerUI(const String & contentName, M * _manager, 
 	addAndMakeVisible(addItemBT);
 	addItemBT->addListener(this);
 
+	setShowAddButton(baseM->userCanAddItemsManually);
+
 	Engine::mainEngine->addEngineListener(this);
 
 	//must call addExistingItems from child class to get overrides
-
+	
 	setSize(100, 50); //default
 }
 
@@ -271,7 +273,7 @@ void BaseManagerUI<M, T, U>::mouseDown(const MouseEvent & e)
 	{
 	} else if (e.mods.isRightButtonDown())
 	{
-		showMenuAndAddItem(false, e.getEventRelativeTo(this).getMouseDownPosition());
+		if(manager->userCanAddItemsManually) showMenuAndAddItem(false, e.getEventRelativeTo(this).getMouseDownPosition());
 	}
 }
 

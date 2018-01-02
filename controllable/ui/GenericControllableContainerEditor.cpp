@@ -1,4 +1,3 @@
-#include "GenericControllableContainerEditor.h"
 /*
   ==============================================================================
 
@@ -48,7 +47,7 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(WeakRefer
 
 		collapseAnimator.addChangeListener(this);
 
-		setCollapsed(container->editorIsCollapsed, true);
+		setCollapsed(container->editorIsCollapsed, true, false);
 	} else
 	{
 		resetAndBuild();
@@ -77,7 +76,7 @@ void GenericControllableContainerEditor::mouseDown(const MouseEvent & e)
 }
 
 
-void GenericControllableContainerEditor::setCollapsed(bool value, bool force)
+void GenericControllableContainerEditor::setCollapsed(bool value, bool force, bool animate)
 {
 	if (isRoot) return;
 	if (container->editorIsCollapsed == value && !force) return;
@@ -86,13 +85,14 @@ void GenericControllableContainerEditor::setCollapsed(bool value, bool force)
 	collapseBT->setVisible(!container->editorIsCollapsed);
 	expandBT->setVisible(container->editorIsCollapsed);
 	
-	prepareToAnimate = true;
+	if(animate) prepareToAnimate = true;
 	int targetHeight = headerHeight;
 	
 	if (!container->editorIsCollapsed)
 	{
 		resetAndBuild();
 		Rectangle<int> r = getLocalBounds();
+		
 		if (!isRoot && !container->editorIsCollapsed)
 		{
 			resizedInternal(r);
@@ -100,8 +100,14 @@ void GenericControllableContainerEditor::setCollapsed(bool value, bool force)
 		}
 	}
 
-	prepareToAnimate = false;
-	if(isVisible()) collapseAnimator.animateComponent(this, getBounds().withHeight(targetHeight),1,200,false,1,0);
+	if (animate)
+	{
+		prepareToAnimate = false;
+		if (isVisible()) collapseAnimator.animateComponent(this, getBounds().withHeight(targetHeight), 1, 200, false, 1, 0);
+	} else
+	{
+		setSize(getWidth(),targetHeight);
+	}
 
 }
 
@@ -309,4 +315,26 @@ Rectangle<int> GenericControllableContainerEditor::getHeaderBounds()
 Rectangle<int> GenericControllableContainerEditor::getContentBounds()
 {
 	return getLocalBounds().withTop(headerHeight + headerGap).reduced(2);
+}
+
+
+
+//EnablingControllableContainerEditor
+
+EnablingControllableContainerEditor::EnablingControllableContainerEditor(EnablingControllableContainer * cc, bool isRoot) :
+	GenericControllableContainerEditor(cc, isRoot),
+	ioContainer(cc)
+{
+	if (cc->canBeDisabled)
+	{
+		enabledUI = ioContainer->enabled->createImageToggle(AssetManager::getInstance()->getPowerBT());
+		addAndMakeVisible(enabledUI);
+	}
+	
+}
+
+void EnablingControllableContainerEditor::resizedInternalHeader(Rectangle<int>& r)
+{
+	if(((EnablingControllableContainer *)container.get())->canBeDisabled) enabledUI->setBounds(r.removeFromLeft(r.getHeight()).reduced(2));
+	GenericControllableContainerEditor::resizedInternalHeader(r);
 }

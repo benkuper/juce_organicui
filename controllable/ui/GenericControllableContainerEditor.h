@@ -44,7 +44,7 @@ public:
 	ScopedPointer<ImageButton> collapseBT;
 	Component headerSpacer;
 
-	virtual void setCollapsed(bool value, bool force = false);
+	virtual void setCollapsed(bool value, bool force = false, bool animate = true);
 	virtual void resetAndBuild();
 
 	void paint(Graphics &g) override;
@@ -76,6 +76,21 @@ public:
 
 	// Inherited via ChangeListener
 	virtual void changeListenerCallback(ChangeBroadcaster * source) override;
+};
+
+
+class EnablingControllableContainerEditor :
+	public GenericControllableContainerEditor
+{
+public:
+	EnablingControllableContainerEditor(EnablingControllableContainer * cc, bool isRoot);
+	~EnablingControllableContainerEditor() {}
+
+	EnablingControllableContainer * ioContainer;
+	ScopedPointer<BoolImageToggleUI> enabledUI;
+
+	void resizedInternalHeader(Rectangle<int> &r) override;
+
 };
 
 #endif  // GENERICCONTROLLABLECONTAINEREDITOR_H_INCLUDED

@@ -12,6 +12,7 @@
 #define CONTROLLABLECONTAINER_H_INCLUDED
  
 
+
 class ControllableContainer :
 	public Parameter::Listener,
 	public Controllable::Listener,
@@ -29,7 +30,6 @@ public:
 	String niceName;
 	String shortName;
 	bool hasCustomShortName;
-
 
 	bool skipControllableNameInAddress;
 	void setNiceName(const String &_niceName);
@@ -172,8 +172,19 @@ protected:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ControllableContainer)
 
-
 };
 
+
+class EnablingControllableContainer :
+	public ControllableContainer
+{
+public:
+	EnablingControllableContainer(const String &n, bool canBeDisabled = true);
+	BoolParameter * enabled;
+
+	bool canBeDisabled;
+
+	virtual InspectableEditor * getEditor(bool isRoot) override;
+};
 
 #endif  // CONTROLLABLECONTAINER_H_INCLUDED

@@ -1,4 +1,5 @@
 #include "ControllableContainer.h"
+
 /*
  ==============================================================================
 
@@ -8,8 +9,6 @@
 
  ==============================================================================
  */
-
-
 
 ControllableComparator ControllableContainer::comparator;
 
@@ -708,4 +707,24 @@ var ControllableContainer::getChildFromScript(const var::NativeFunctionArgs & a)
 InspectableEditor * ControllableContainer::getEditor(bool isRoot)
 {
 	return new GenericControllableContainerEditor(this, isRoot);
+}
+
+
+
+
+EnablingControllableContainer::EnablingControllableContainer(const String & n, bool _canBeDisabled) :
+	ControllableContainer(n),
+	canBeDisabled(canBeDisabled)
+{
+	if (canBeDisabled)
+	{
+		enabled = addBoolParameter("Enabled", "Activate OSC Input for this module", true);
+		enabled->hideInEditor = true;
+	}
+	
+}
+
+InspectableEditor * EnablingControllableContainer::getEditor(bool isRoot)
+{
+	return new EnablingControllableContainerEditor(this, isRoot);
 }

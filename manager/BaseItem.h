@@ -16,13 +16,12 @@ class ScriptManager;
 class GenericControllableManager;
 
 class BaseItem :
-	public ControllableContainer
+	public EnablingControllableContainer
 {
 public:
 	BaseItem(const String &name = "", bool canBeDisabled = true, bool canHaveScript = false);
 	virtual ~BaseItem();
 
-	BoolParameter * enabled;
 	StringParameter * nameParam;
 
 	//UI - should move outside data class ? how to save/load if not there 
@@ -31,7 +30,6 @@ public:
 	Point2DParameter * viewUIPosition; //position in a vieww
 	Point2DParameter * viewUISize; //size in a view
 
-	bool canBeDisabled;
 	bool canHaveScripts;
 	bool userCanRemove;
 	bool askConfirmationBeforeRemove;

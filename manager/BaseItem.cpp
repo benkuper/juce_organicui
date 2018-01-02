@@ -10,8 +10,7 @@
 */
 
 BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts) : 
-	ControllableContainer(name.isEmpty()?getTypeString():name),
-	canBeDisabled(_canBeDisabled),
+	EnablingControllableContainer(name.isEmpty()?getTypeString():name, canBeDisabled),
 	canHaveScripts(_canHaveScripts),
 	userCanRemove(true),
 	askConfirmationBeforeRemove(true)
@@ -19,11 +18,6 @@ BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts
 	saveAndLoadName = true;
 	nameCanBeChangedByUser = true;
 
-	if (canBeDisabled)
-	{
-		enabled = addBoolParameter("Enabled", "Enable / Disable this component", true);
-		enabled->hideInOutliner = true;
-	}
 
 	nameParam = addStringParameter("Name", "Name of the component", niceName);
 	nameParam->includeInScriptObject = false;

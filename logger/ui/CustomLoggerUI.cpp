@@ -235,7 +235,7 @@ const Colour CustomLoggerUI::getSeverityColourForRow(const int r) const
 		switch (s)
 		{
 		case LogElement::LOG_NONE:
-			return BG_COLOR.brighter(.1f);
+			return TEXTNAME_COLOR;
 
 		case LogElement::LOG_DBG:
 			return BLUE_COLOR.withSaturation(.2f).darker(.3f);
@@ -276,7 +276,7 @@ void CustomLoggerUI::LogList::paintRowBackground(Graphics& g,
 	int width, int height,
 	bool)
 {
-	Colour c = owner->getSeverityColourForRow(rowNumber);
+	Colour c = BG_COLOR.brighter(.1f);// (rowNumber);
 	if (rowNumber % 2 == 0) c = c.brighter(.1f);
 	g.setColour(c);
 	g.fillRect(0, 0, width, height);
@@ -289,7 +289,7 @@ void CustomLoggerUI::LogList::paintCell(Graphics& g,
 	bool)
 {
 	g.setFont(12);
-	g.setColour(owner->findColour(Label::textColourId));
+	g.setColour(owner->getSeverityColourForRow(rowNumber));
 	String text;
 
 	switch (columnId)
