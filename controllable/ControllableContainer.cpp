@@ -1,5 +1,3 @@
-#include "ControllableContainer.h"
-
 /*
  ==============================================================================
 
@@ -21,6 +19,7 @@ ControllableContainer::ControllableContainer(const String & niceName) :
 	hideInEditor(false),
 	canInspectChildContainers(true),
 	editorIsCollapsed(true),
+	editorCanBeCollapsed(true),
 	saveAndLoadRecursiveData(false),
 	saveAndLoadName(false),
 	includeTriggersInSaveLoad(false),
@@ -714,7 +713,7 @@ InspectableEditor * ControllableContainer::getEditor(bool isRoot)
 
 EnablingControllableContainer::EnablingControllableContainer(const String & n, bool _canBeDisabled) :
 	ControllableContainer(n),
-	canBeDisabled(canBeDisabled)
+	canBeDisabled(_canBeDisabled)
 {
 	if (canBeDisabled)
 	{

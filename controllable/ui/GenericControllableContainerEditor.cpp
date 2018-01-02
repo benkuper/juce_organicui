@@ -1,3 +1,4 @@
+#include "GenericControllableContainerEditor.h"
 /*
   ==============================================================================
 
@@ -32,7 +33,7 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(WeakRefer
 	containerLabel.setEditable(container->nameCanBeChangedByUser);
 	if(!container->nameCanBeChangedByUser) containerLabel.setInterceptsMouseClicks(false, false);
 
-	if (!isRoot)
+	if (!isRoot && container->editorCanBeCollapsed)
 	{
 		expandBT = AssetManager::getInstance()->getRightArrowBT();
 		collapseBT = AssetManager::getInstance()->getDownArrowImageBT();
@@ -51,6 +52,7 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(WeakRefer
 	} else
 	{
 		resetAndBuild();
+		resized();
 	}
 
 }
@@ -78,9 +80,11 @@ void GenericControllableContainerEditor::mouseDown(const MouseEvent & e)
 
 void GenericControllableContainerEditor::setCollapsed(bool value, bool force, bool animate)
 {
-	if (isRoot) return;
+	if (isRoot || !container->editorCanBeCollapsed) return;
+
 	if (container->editorIsCollapsed == value && !force) return;
 	container->editorIsCollapsed = value;
+	
 	
 	collapseBT->setVisible(!container->editorIsCollapsed);
 	expandBT->setVisible(container->editorIsCollapsed);
@@ -117,7 +121,7 @@ void GenericControllableContainerEditor::resetAndBuild()
 
 	if (container->hideInEditor) return;
 	
-	if (isRoot || !container->editorIsCollapsed)
+	if (isRoot || !container->editorIsCollapsed || !container->editorCanBeCollapsed)
 	{
 		for (auto &c : container->controllables)
 		{
@@ -125,7 +129,7 @@ void GenericControllableContainerEditor::resetAndBuild()
 		}
 	}
 
-	if (isRoot || !container->editorIsCollapsed)
+	if (isRoot || !container->editorIsCollapsed || !container->editorCanBeCollapsed)
 	{
 		
 		if (container->canInspectChildContainers)
@@ -256,13 +260,22 @@ void GenericControllableContainerEditor::paint(Graphics & g)
 	{
 		g.setColour(contourColor.withAlpha(.2f));
 		Rectangle<int> r = getLocalBounds();
-		if (container->editorIsCollapsed) r.setHeight(headerHeight);
+		if (container->editorIsCollapsed && container->editorCanBeCollapsed) r.setHeight(headerHeight);
 		g.fillRoundedRectangle(r.toFloat(), 4);
 	}
-	g.setColour(contourColor.withAlpha(.4f));
-	g.fillRoundedRectangle(getHeaderBounds().toFloat(), 4);
-	g.setColour(contourColor);
-	g.drawRoundedRectangle(getLocalBounds().toFloat(), 4,2);
+
+	if (container->editorCanBeCollapsed)
+	{
+		g.setColour(contourColor.withAlpha(.4f));
+		g.fillRoundedRectangle(getHeaderBounds().toFloat(), 4);
+	}
+	
+	if (!isRoot)
+	{
+		g.setColour(contourColor);
+		g.drawRoundedRectangle(getLocalBounds().toFloat(), 4, 2);
+	}
+	
 }
 
 void GenericControllableContainerEditor::resized()
@@ -276,7 +289,7 @@ void GenericControllableContainerEditor::resizedInternal(Rectangle<int>& r)
 {
 	Rectangle<int> hr = r.removeFromTop(headerHeight);
 
-	if (!isRoot) //draw arrow here to have better control in resizedInternalHeader overrides
+	if (!isRoot && container->editorCanBeCollapsed) //draw arrow here to have better control in resizedInternalHeader overrides
 	{
 		Rectangle<int> ar = hr.removeFromLeft(headerHeight).reduced(4);
 		if (container->editorIsCollapsed) expandBT->setBounds(ar);
@@ -287,8 +300,8 @@ void GenericControllableContainerEditor::resizedInternal(Rectangle<int>& r)
 	
 	r.removeFromTop(headerGap);
 	r.reduce(2, 2);
-	r.removeFromLeft(4);
-	if (isRoot || !container->editorIsCollapsed) resizedInternalContent(r);
+	if(!isRoot) r.removeFromLeft(4);
+	if (isRoot || !container->editorIsCollapsed || !container->editorCanBeCollapsed) resizedInternalContent(r);
 }
 
 void GenericControllableContainerEditor::resizedInternalHeader(Rectangle<int>& r)
@@ -306,6 +319,7 @@ void GenericControllableContainerEditor::resizedInternalContent(Rectangle<int>& 
 		r.translate(0, th + 2);
 	}
 }
+
 
 Rectangle<int> GenericControllableContainerEditor::getHeaderBounds()
 {

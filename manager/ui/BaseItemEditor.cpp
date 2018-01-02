@@ -1,3 +1,4 @@
+#include "BaseItemEditor.h"
 /*
   ==============================================================================
 
@@ -10,36 +11,16 @@
 
 
 BaseItemEditor::BaseItemEditor(BaseItem * bi, bool isRoot) :
-	InspectableEditor(bi, isRoot),
-	item(bi),
-    headerHeight(20),
-    transparentBG(false),   
-	paintHeaderOnly(isRoot)
+	EnablingControllableContainerEditor(bi, isRoot),
+	item(bi)
 {
-	if (item->canBeDisabled)
-	{
-		enabledUI = item->enabled->createImageToggle(AssetManager::getInstance()->getPowerBT());
-		addAndMakeVisible(enabledUI);
-	}
 
-	nameUI = item->nameParam->createStringParameterUI();
-	addAndMakeVisible(nameUI);
-
-	if (!isRoot && item->userCanRemove)
+	if (item->userCanRemove)
 	{
 		removeBT = AssetManager::getInstance()->getRemoveBT();
 		addAndMakeVisible(removeBT);
 		removeBT->addListener(this);
 	}
-
-	if (item->canHaveScripts)
-	{
-		scriptManagerUI = item->scriptManager->getEditor(false);
-		addAndMakeVisible(scriptManagerUI);
-	}
-
-
-	item->addAsyncContainerListener(this);
 }
 
 BaseItemEditor::~BaseItemEditor()
@@ -47,87 +28,23 @@ BaseItemEditor::~BaseItemEditor()
 	if (!inspectable.wasObjectDeleted()) item->removeAsyncContainerListener(this);
 }
 
-void BaseItemEditor::paint(Graphics & g)
+void BaseItemEditor::resizedInternalHeader(Rectangle<int>& r)
 {
-	if (transparentBG) return;
-	Rectangle<int> r = getLocalBounds();
-	if (paintHeaderOnly) r.setHeight((int)headerHeight);
-	Colour c = (item->canBeDisabled && !item->enabled->boolValue()) ? BG_COLOR.darker().withAlpha(.6f): BG_COLOR.brighter().withAlpha(.3f);
-	g.setColour(c);
-	g.fillRoundedRectangle(r.toFloat(), 2);
-
-}
-
-void BaseItemEditor::resized()
-{
-	Rectangle<int> r = getLocalBounds().withHeight((int)headerHeight).reduced(2);
-	Rectangle<int> hr = Rectangle<int>(r);
-
-	if (item->canBeDisabled)
+	if (item->userCanRemove)
 	{
-		enabledUI->setBounds(hr.removeFromLeft(hr.getHeight()));
-	}
-	if (!isRoot && item->userCanRemove)
-	{
-		removeBT->setBounds(hr.removeFromRight(hr.getHeight()));
-		hr.removeFromRight(2);
-	}
-	resizedInternalHeader(hr);
-	nameUI->setBounds(hr);
-
-	r.translate(0, r.getBottom() + 2);
-	r.setHeight(0); //if no override, ensure bottom is set
-	resizedInternalContent(r);
-
-	if (item->canHaveScripts)
-	{
-		r.setY(r.getBottom() + 2);
-		r.setHeight(scriptManagerUI->getHeight());
-		scriptManagerUI->setBounds(r);
+		removeBT->setBounds(r.removeFromRight(r.getHeight()).reduced(2));
+		r.removeFromRight(2);
 	}
 
+	resizedInternalHeaderItemInternal(r);
 
-	r.setY(r.getBottom() + 2);
-	r.setHeight(0); //if no override, ensure bottom is set
-	resizedInternalFooter(r);
-
-	setSize(getWidth(),r.getBottom());
-}
-
-
-void BaseItemEditor::newMessage(const ContainerAsyncEvent & e)
-{
-	switch (e.type)
-	{
-	case ContainerAsyncEvent::ControllableFeedbackUpdate:
-		controllableFeedbackAsyncUpdate(e.targetControllable);
-		break;
-    
-	case ContainerAsyncEvent::ControllableAdded:
-		controllableAddedAsync(e.targetControllable);
-		break;
-
-	case ContainerAsyncEvent::ControllableRemoved:
-		controllableRemovedAsync(e.targetControllable);
-		break;
-
-        default:
-            break;
-	}
-}
-
-void BaseItemEditor::controllableFeedbackAsyncUpdate(Controllable * c)
-{
-	if (c == item->enabled) repaint();
-}
-
-void BaseItemEditor::childBoundsChanged(Component *)
-{
-	resized();
+	EnablingControllableContainerEditor::resizedInternalHeader(r); 
 }
 
 void BaseItemEditor::buttonClicked(Button * b)
 {
+	EnablingControllableContainerEditor::buttonClicked(b);
+
 	if (b == removeBT)
 	{
 		item->remove();

@@ -43,6 +43,7 @@ public:
 	bool hideInEditor;
 	bool canInspectChildContainers;
 	bool editorIsCollapsed;
+	bool editorCanBeCollapsed;
 
 	//save / load
 	bool saveAndLoadRecursiveData;

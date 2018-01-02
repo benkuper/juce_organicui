@@ -10,7 +10,7 @@
 */
 
 BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts) : 
-	EnablingControllableContainer(name.isEmpty()?getTypeString():name, canBeDisabled),
+	EnablingControllableContainer(name.isEmpty()?getTypeString():name, _canBeDisabled),
 	canHaveScripts(_canHaveScripts),
 	userCanRemove(true),
 	askConfirmationBeforeRemove(true)
@@ -134,5 +134,5 @@ void BaseItem::loadJSONDataInternal(var data)
 
 InspectableEditor * BaseItem::getEditor(bool isRoot)
 {
-	return ControllableContainer::getEditor(isRoot);// new BaseItemEditor(this, isRoot);
+	return new BaseItemEditor(this, isRoot);
 }

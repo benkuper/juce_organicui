@@ -73,7 +73,7 @@ void ControllableEditor::resized()
 	Rectangle<int> r = getLocalBounds();
 	r.removeFromBottom(subContentHeight);// .withHeight(16);
 
-	int controlSpace = jmax(getWidth() / 2, 100);
+	int controlSpace = jmax(showLabel?getWidth() / 2:getWidth(), 100);
 
 
 	if (controllable->isRemovableByUser && removeBT != nullptr)
