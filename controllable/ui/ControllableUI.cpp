@@ -22,6 +22,8 @@ ControllableUI::ControllableUI(Controllable * controllable) :
 
 
 	setEnabled(controllable->enabled);
+	setAlpha(controllable->enabled ? 1 : .5f);
+
 	setInterceptsMouseClicks(controllable->enabled, controllable->enabled);
 }
 

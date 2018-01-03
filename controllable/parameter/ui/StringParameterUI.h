@@ -37,16 +37,13 @@ public:
 	void setPrefix(const String &_prefix);
 	void setSuffix(const String &_suffix);
 
-    bool nameLabelIsVisible;
-    void setNameLabelVisible(bool visible);
-
 	void setOpaqueBackground(bool value) override;
 
 	virtual void setForceFeedbackOnlyInternal() override;
 
 	//void paint(Graphics &g) override;
     void resized() override;
-
+	virtual void resizedInternal(Rectangle<int> &r);
 
 protected:
     void valueChanged(const var & v) override;
@@ -57,5 +54,19 @@ protected:
 
 };
 
+
+class StringParameterFileUI :
+	public StringParameterUI,
+	public ButtonListener
+{
+public:
+	StringParameterFileUI(Parameter * p);
+	virtual ~StringParameterFileUI();
+
+	TextButton browseBT;
+	void resizedInternal(Rectangle<int> &r) override;
+
+	void buttonClicked(Button * b) override;
+};
 
 #endif  // STRINGPARAMETERUI_H_INCLUDED

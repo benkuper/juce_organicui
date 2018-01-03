@@ -1,3 +1,4 @@
+#include "Script.h"
 /*
 ==============================================================================
 
@@ -17,10 +18,14 @@ Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled) :
 	isSelectable = false;
 
 	filePath = addStringParameter("File Path", "Path to the script file", "");
+	filePath->defaultUI = StringParameter::FILE;
+
 	logParam = addBoolParameter("Log", "Utility parameter to easily activate/deactivate logging from the script", false);
 	logParam->setCustomShortName("enableLog");
+	logParam->hideInEditor = true;
 
 	reload = addTrigger("Reload", "Reload the script");
+	reload->hideInEditor = true;
 
 	scriptObject.setMethod("log", Script::logFromScript);
 	scriptObject.setMethod("addBoolParameter", Script::addBoolParameterFromScript);
@@ -30,6 +35,7 @@ Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled) :
 	scriptObject.setMethod("addTargetParameter", Script::addTargetParameterFromScript);
 	scriptObject.setMethod("addTrigger", Script::addTriggerFromScript);
 
+	scriptParamsContainer.hideEditorHeader = true;
 	addChildControllableContainer(&scriptParamsContainer);
 }
 
@@ -95,6 +101,7 @@ void Script::loadScript()
 		startTimerHz(30); //should be parametrable
 	}
 
+	scriptParamsContainer.hideInEditor = scriptParamsContainer.controllables.size() == 0;
 
 }
 
@@ -157,6 +164,11 @@ void Script::onControllableFeedbackUpdateInternal(ControllableContainer * cc, Co
 		args.add(c->getScriptObject());
 		callFunction("scriptParamChanged", args);
 	}
+}
+
+InspectableEditor * Script::getEditor(bool isRoot)
+{
+	return new ScriptEditor(this, isRoot);
 }
 
 void Script::timerCallback()

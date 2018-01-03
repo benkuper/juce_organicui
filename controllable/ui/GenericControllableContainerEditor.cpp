@@ -22,18 +22,20 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(WeakRefer
 	headerSpacer("headerSpacer")
 {
 	container->addAsyncContainerListener(this);
-
 	addAndMakeVisible(containerLabel);
 	
 	containerLabel.setFont(containerLabel.getFont().withHeight(headerHeight-6));
-	
+
+	containerLabel.setColour(containerLabel.backgroundWhenEditingColourId, Colours::white);
 	containerLabel.setColour(containerLabel.backgroundColourId, Colours::transparentWhite);
-	containerLabel.setColour(containerLabel.textColourId, contourColor.brighter());
+	containerLabel.setColour(containerLabel.textColourId, contourColor.brighter(1));
 
 	containerLabel.setEditable(container->nameCanBeChangedByUser);
+	containerLabel.addListener(this);
+
 	if(!container->nameCanBeChangedByUser) containerLabel.setInterceptsMouseClicks(false, false);
 
-	if (!isRoot && container->editorCanBeCollapsed)
+	if (canBeCollapsed())
 	{
 		expandBT = AssetManager::getInstance()->getRightArrowBT();
 		collapseBT = AssetManager::getInstance()->getDownArrowImageBT();
@@ -74,17 +76,20 @@ void GenericControllableContainerEditor::clear()
 
 void GenericControllableContainerEditor::mouseDown(const MouseEvent & e)
 {
-	if (e.originalComponent == &headerSpacer) setCollapsed(!container->editorIsCollapsed);
+	if (e.mods.isLeftButtonDown())
+	{
+		if (e.originalComponent == &headerSpacer) setCollapsed(!container->editorIsCollapsed);
+	}
 }
 
 
 void GenericControllableContainerEditor::setCollapsed(bool value, bool force, bool animate)
 {
+	if (container->editorIsCollapsed == value && !force) return;
+	
 	if (isRoot || !container->editorCanBeCollapsed) return;
 
-	if (container->editorIsCollapsed == value && !force) return;
 	container->editorIsCollapsed = value;
-	
 	
 	collapseBT->setVisible(!container->editorIsCollapsed);
 	expandBT->setVisible(container->editorIsCollapsed);
@@ -97,7 +102,7 @@ void GenericControllableContainerEditor::setCollapsed(bool value, bool force, bo
 		resetAndBuild();
 		Rectangle<int> r = getLocalBounds();
 		
-		if (!isRoot && !container->editorIsCollapsed)
+		if (canBeCollapsed())
 		{
 			resizedInternal(r);
 			targetHeight = jmax<int>(r.getY() + 6, headerHeight);
@@ -121,17 +126,13 @@ void GenericControllableContainerEditor::resetAndBuild()
 
 	if (container->hideInEditor) return;
 	
-	if (isRoot || !container->editorIsCollapsed || !container->editorCanBeCollapsed)
+	if (!canBeCollapsed() || !container->editorIsCollapsed)
 	{
 		for (auto &c : container->controllables)
 		{
 			if (!c->hideInEditor) addControllableUI(c);
 		}
-	}
 
-	if (isRoot || !container->editorIsCollapsed || !container->editorCanBeCollapsed)
-	{
-		
 		if (container->canInspectChildContainers)
 		{
 			for (auto &cc : container->controllableContainers)
@@ -176,6 +177,11 @@ void GenericControllableContainerEditor::buttonClicked(Button * b)
 	if (b == collapseBT) setCollapsed(true);
 }
 
+void GenericControllableContainerEditor::labelTextChanged(Label * l)
+{
+	if (l == &containerLabel) container->setNiceName(l->getText());
+}
+
 void GenericControllableContainerEditor::addControllableUI(Controllable * c, bool resize)
 {
 	if (!c->isControllableExposed || c->hideInEditor) return;
@@ -206,15 +212,18 @@ void GenericControllableContainerEditor::newMessage(const ContainerAsyncEvent & 
 		//if (p.targetControllable->hideInEditor) return;
 		//addControllableUI(p.targetControllable, true);
 		resetAndBuild();
+		resized();
 		break;
 
 	case ContainerAsyncEvent::ControllableRemoved:
 		//removeControllableUI(p.targetControllable, true);
 		resetAndBuild();
+		resized();
 		break;
 
 	case ContainerAsyncEvent::ControllableContainerAdded:
 		resetAndBuild();
+		resized();
 		break;
 
 	case ContainerAsyncEvent::ControllableContainerRemoved:
@@ -231,6 +240,10 @@ void GenericControllableContainerEditor::newMessage(const ContainerAsyncEvent & 
 
 	case ContainerAsyncEvent::ControllableFeedbackUpdate:
 		controllableFeedbackUpdate(p.targetControllable);
+		break;
+
+	case ContainerAsyncEvent::ChildAddressChanged:
+		containerLabel.setText(container->niceName, dontSendNotification);
 		break;
 
 	default:
@@ -256,23 +269,23 @@ void GenericControllableContainerEditor::changeListenerCallback(ChangeBroadcaste
 
 void GenericControllableContainerEditor::paint(Graphics & g)
 {
-	if(!isRoot)
+	if(!isRoot && !container->hideEditorHeader)
 	{
-		g.setColour(contourColor.withAlpha(.2f));
+		g.setColour(contourColor.withAlpha(.4f));
 		Rectangle<int> r = getLocalBounds();
 		if (container->editorIsCollapsed && container->editorCanBeCollapsed) r.setHeight(headerHeight);
 		g.fillRoundedRectangle(r.toFloat(), 4);
 	}
 
-	if (container->editorCanBeCollapsed)
+	if (isRoot || canBeCollapsed())
 	{
 		g.setColour(contourColor.withAlpha(.4f));
 		g.fillRoundedRectangle(getHeaderBounds().toFloat(), 4);
 	}
 	
-	if (!isRoot)
+	if (!isRoot && !container->hideEditorHeader)
 	{
-		g.setColour(contourColor);
+		g.setColour(contourColor.brighter(.2f));
 		g.drawRoundedRectangle(getLocalBounds().toFloat(), 4, 2);
 	}
 	
@@ -287,21 +300,24 @@ void GenericControllableContainerEditor::resized()
 
 void GenericControllableContainerEditor::resizedInternal(Rectangle<int>& r)
 {
-	Rectangle<int> hr = r.removeFromTop(headerHeight);
-
-	if (!isRoot && container->editorCanBeCollapsed) //draw arrow here to have better control in resizedInternalHeader overrides
+	if (!container->hideEditorHeader)
 	{
-		Rectangle<int> ar = hr.removeFromLeft(headerHeight).reduced(4);
-		if (container->editorIsCollapsed) expandBT->setBounds(ar);
-		else collapseBT->setBounds(ar);
-		r.removeFromLeft(2);
+		Rectangle<int> hr = r.removeFromTop(headerHeight);
+
+		if (canBeCollapsed()) //draw arrow here to have better control in resizedInternalHeader overrides
+		{
+			Rectangle<int> ar = hr.removeFromLeft(headerHeight).reduced(4);
+			if (container->editorIsCollapsed) expandBT->setBounds(ar);
+			else collapseBT->setBounds(ar);
+			r.removeFromLeft(2);
+		}
+		resizedInternalHeader(hr);
+		r.removeFromTop(headerGap);
 	}
-	resizedInternalHeader(hr);
 	
-	r.removeFromTop(headerGap);
 	r.reduce(2, 2);
-	if(!isRoot) r.removeFromLeft(4);
-	if (isRoot || !container->editorIsCollapsed || !container->editorCanBeCollapsed) resizedInternalContent(r);
+	if(!isRoot && !container->hideEditorHeader) r.removeFromLeft(4);
+	if (!canBeCollapsed() || !container->editorIsCollapsed) resizedInternalContent(r);
 }
 
 void GenericControllableContainerEditor::resizedInternalHeader(Rectangle<int>& r)
@@ -316,7 +332,10 @@ void GenericControllableContainerEditor::resizedInternalContent(Rectangle<int>& 
 	{
 		int th = cui->getHeight();
 		cui->setBounds(r.withHeight(th));
-		r.translate(0, th + 2);
+		
+		float gap = 4;
+		if (isRoot && dynamic_cast<GenericControllableContainerEditor *>(cui) != nullptr) gap = 16;
+		r.translate(0, th + gap);
 	}
 }
 
@@ -329,6 +348,11 @@ Rectangle<int> GenericControllableContainerEditor::getHeaderBounds()
 Rectangle<int> GenericControllableContainerEditor::getContentBounds()
 {
 	return getLocalBounds().withTop(headerHeight + headerGap).reduced(2);
+}
+
+bool GenericControllableContainerEditor::canBeCollapsed()
+{
+	return !isRoot && container->editorCanBeCollapsed && !container->hideEditorHeader;
 }
 
 

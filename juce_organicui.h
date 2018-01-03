@@ -189,7 +189,7 @@ using namespace juce;
 #include "script/Script.h"
 #include "script/ScriptManager.h"
 #include "script/ScriptUtil.h"
-#include "script/ui/ScriptUI.h"
+#include "script/ui/ScriptEditor.h"
 
 #include "logger/CustomLogger.h"
 #include "logger/ui/CustomLoggerUI.h"

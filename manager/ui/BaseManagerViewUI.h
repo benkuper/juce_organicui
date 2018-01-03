@@ -118,7 +118,7 @@ void BaseManagerViewUI<M, T, U>::mouseUp(const MouseEvent & e)
 template<class M, class T, class U>
  void BaseManagerViewUI<M, T, U>::mouseWheelMove(const MouseEvent & e, const MouseWheelDetails & d)
 {
-	if (canZoom) setViewZoom(jlimit<float>(.1f, 10, viewZoom + d.deltaY));
+	if (canZoom && e.originalComponent == this) setViewZoom(jlimit<float>(.1f, 10, viewZoom + d.deltaY));
 	
 }
 

@@ -454,7 +454,7 @@ inline T * BaseManager<T>::getItemForMenuResultID(int id, int startID)
 template<class T>
 InspectableEditor * BaseManager<T>::getEditor(bool isRoot)
 {
-	return ControllableContainer::getEditor(true);
+	return new GenericManagerEditor<T>(this, isRoot);
 	//BaseManagerUI<BaseManager<T>, T, BaseItemUI<T>> * bui = new  BaseManagerUI<BaseManager<T>, T, BaseItemUI<T>>(niceName, this,false);
 	//bui->drawContour = true;
 	//return new GenericComponentEditor(this, bui, isRoot);

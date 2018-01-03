@@ -50,6 +50,8 @@ public:
 
 	void onControllableFeedbackUpdateInternal(ControllableContainer * cc, Controllable * c) override;
 
+	InspectableEditor * getEditor(bool isRoot) override;
+
 	// Inherited via Timer
 	virtual void timerCallback() override;
 

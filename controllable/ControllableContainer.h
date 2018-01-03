@@ -44,6 +44,7 @@ public:
 	bool canInspectChildContainers;
 	bool editorIsCollapsed;
 	bool editorCanBeCollapsed;
+	bool hideEditorHeader;
 
 	//save / load
 	bool saveAndLoadRecursiveData;
@@ -126,7 +127,6 @@ public:
 	//SCRIPT
 	virtual void updateLiveScriptObjectInternal(DynamicObject * parent = nullptr) override;
 	static var getChildFromScript(const var::NativeFunctionArgs &a);
-
 
 private:
 	// internal callback that a controllableContainer can override to react to any of it's parameter change

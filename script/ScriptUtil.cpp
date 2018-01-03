@@ -20,7 +20,6 @@ ScriptUtil::ScriptUtil() :
 	scriptObject.setMethod("atan2", ScriptUtil::atan2FromScript);
 	scriptObject.setMethod("toDegrees", ScriptUtil::toDegrees);
 	scriptObject.setMethod("toRadians", ScriptUtil::toRadians);
-
 }
 
 var ScriptUtil::getTime(const var::NativeFunctionArgs &)

@@ -102,7 +102,7 @@
 #include "script/Script.cpp"
 #include "script/ScriptManager.cpp"
 #include "script/ScriptUtil.cpp"
-#include "script/ui/ScriptUI.cpp"
+#include "script/ui/ScriptEditor.cpp"
 #include "ui/AssetManager.cpp"
 #include "ui/LookAndFeelOO.cpp"
 #include "ui/shapeshifter/GapGrabber.cpp"

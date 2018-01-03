@@ -54,22 +54,25 @@ void AppUpdater::run()
 
 		if (data.isObject())
 		{
-			if (Engine::mainEngine->checkFileVersion(data.getDynamicObject(), true))
+			bool beta = data.getProperty("beta", false);
+
+			if (!beta || checkForBetas)
 			{
-				String version = data.getProperty("version", "");
-				bool beta = data.getProperty("beta", false);
-				Array<var> * changelog = data.getProperty("changelog", var()).getArray();
+				if (Engine::mainEngine->checkFileVersion(data.getDynamicObject(), true))
+				{
+					String version = data.getProperty("version", "");
+					Array<var> * changelog = data.getProperty("changelog", var()).getArray();
+					String msg = "A new " + String(beta ? "beta " : "") + "version of Chataigne is available : " + version + "\n\nChangelog :\n";
 
-				String msg = "A new " + String(beta ? "beta " : "") + "version of Chataigne is available : " + version + "\n\nChangelog :\n";
+					for (auto &c : *changelog) msg += c.toString() + "\n";
+					msg += "\nDo you want to go to the download page ?";
 
-				for (auto &c : *changelog) msg += c.toString() + "\n";
-				msg += "\nDo you want to go to the download page ?";
-
-				int result = AlertWindow::showOkCancelBox(AlertWindow::InfoIcon, "New version available", msg, "Yes", "No");
-				if (result) downloadURL.launchInDefaultBrowser();
-			} else
-			{
-				LOG("App is up to date :) (Latest version online : " << data.getProperty("version","").toString() << ")");
+					int result = AlertWindow::showOkCancelBox(AlertWindow::InfoIcon, "New version available", msg, "Yes", "No");
+					if (result) downloadURL.launchInDefaultBrowser();
+				} else
+				{
+					LOG("App is up to date :) (Latest version online : " << data.getProperty("version", "").toString() << ")");
+				}
 			}
 		} else
 		{

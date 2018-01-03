@@ -21,7 +21,8 @@ class GenericControllableContainerEditor :
 	public InspectableEditor,
 	public ControllableContainer::ContainerAsyncListener,
 	public ButtonListener,
-	public ChangeListener
+	public ChangeListener,
+	public LabelListener
 {
 public:
 	GenericControllableContainerEditor(WeakReference<Inspectable> _inspectable, bool isRoot);
@@ -59,6 +60,7 @@ public:
 	Rectangle<int> getHeaderBounds(); 
 	Rectangle<int> getContentBounds();
 	
+	bool canBeCollapsed();
 
 	void addControllableUI(Controllable * c, bool resize = false);
 	void removeControllableUI(Controllable *c, bool resize = false);
@@ -69,10 +71,13 @@ public:
 	InspectableEditor * getEditorForInspectable(Inspectable * i);
 	
 	virtual void buttonClicked(Button * b) override;
+	virtual void labelTextChanged(Label * l) override;
 
 	void newMessage(const ContainerAsyncEvent & p) override;
 	virtual void controllableFeedbackUpdate(Controllable *) {};
 	void childBoundsChanged(Component *) override;
+
+
 
 	// Inherited via ChangeListener
 	virtual void changeListenerCallback(ChangeBroadcaster * source) override;

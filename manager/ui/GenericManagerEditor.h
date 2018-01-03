@@ -39,7 +39,7 @@ public:
 	String addItemText;
 
 	void paint(Graphics &g) override;
-	virtual void resizedInternalHeader(Rectangle<int> &r) override;
+	virtual void resizedInternalHeader(juce::Rectangle<int> &r) override;
 
 	virtual void showMenuAndAddItem(bool isFromAddButton);
 	virtual void addItemFromMenu(bool isFromAddButton);
@@ -56,7 +56,7 @@ GenericManagerEditor<T>::GenericManagerEditor(BaseManager<T> * _manager, bool is
 	manager(_manager),
 	addItemText("Add item")
 {
-	headerHeight = 24;
+	headerHeight = 20;
 	setInterceptsMouseClicks(true, true);
 
 	addItemBT = AssetManager::getInstance()->getAddBT();
@@ -102,7 +102,7 @@ void GenericManagerEditor<T>::paint(Graphics & g)
 
 
 template<class T>
-void GenericManagerEditor<T>::resizedInternalHeader(Rectangle<int>& r)
+void GenericManagerEditor<T>::resizedInternalHeader(juce::Rectangle<int>& r)
 {
 	addItemBT->setBounds(r.removeFromRight(r.getHeight()).reduced(2));
 	r.removeFromRight(2);

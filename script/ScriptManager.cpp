@@ -28,10 +28,7 @@ Script * ScriptManager::createItem()
 
 InspectableEditor * ScriptManager::getEditor(bool isRoot)
 {
-	BaseManagerUI<ScriptManager, Script, ScriptUI> * ui = new BaseManagerUI<ScriptManager, Script, ScriptUI>(niceName, this, false);
-	ui->drawContour = true; 
-	ui->addExistingItems();
-	return new GenericComponentEditor(this,ui,isRoot);
+	return BaseManager::getEditor(isRoot);
 }
 
 bool ScriptManager::callFunctionOnAllItems(const Identifier & function, var a)

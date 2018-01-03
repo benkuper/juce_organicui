@@ -22,6 +22,7 @@ FloatStepperUI::FloatStepperUI(Parameter * _parameter) :
     slider->addListener(this);
 	slider->setTextBoxIsEditable(_parameter->isEditable);
 	slider->addMouseListener(this,true);
+	slider->setColour(slider->textBoxBackgroundColourId,BG_COLOR.darker(.1f).withAlpha(.8f));
 }
 
 FloatStepperUI::~FloatStepperUI()

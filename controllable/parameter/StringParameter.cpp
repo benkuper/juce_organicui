@@ -10,7 +10,8 @@
 
 
 StringParameter::StringParameter(const String & niceName, const String &description, const String & initialValue, bool enabled) :
-    Parameter(Type::STRING, niceName, description, initialValue, var(), var(), enabled)
+    Parameter(Type::STRING, niceName, description, initialValue, var(), var(), enabled),
+	defaultUI(TEXT)
 {
 	argumentsDescription = "string";
 }
@@ -27,9 +28,22 @@ StringParameterUI * StringParameter::createStringParameterUI(StringParameter * t
     return new StringParameterUI(target);
 }
 
+
+StringParameterUI * StringParameter::createStringParameterFileUI(StringParameter * target)
+{
+	if (target == nullptr) target = this;
+	return new StringParameterFileUI(target);
+}
+
 ControllableUI* StringParameter::createDefaultUI(Controllable * targetControllable){
 
-    return createStringParameterUI(dynamic_cast<StringParameter *>(targetControllable));
+	switch (defaultUI)
+	{
+	case TEXT: return createStringParameterUI(dynamic_cast<StringParameter *>(targetControllable)); break;
+	case  FILE: return createStringParameterFileUI(dynamic_cast<StringParameter *>(targetControllable)); break;
+	}
+
+	return createStringParameterUI(dynamic_cast<StringParameter *>(targetControllable));
 };
 
 

@@ -30,7 +30,7 @@ BaseItemEditor::~BaseItemEditor()
 
 void BaseItemEditor::resizedInternalHeader(Rectangle<int>& r)
 {
-	if (item->userCanRemove)
+	if (item->userCanRemove && removeBT != nullptr)
 	{
 		removeBT->setBounds(r.removeFromRight(r.getHeight()).reduced(2));
 		r.removeFromRight(2);
@@ -46,8 +46,12 @@ void BaseItemEditor::buttonClicked(Button * b)
 	EnablingControllableContainerEditor::buttonClicked(b);
 
 	if (b == removeBT)
-	{
-		item->remove();
+	{ 
+		if (this->item->askConfirmationBeforeRemove)
+		{
+			int result = AlertWindow::showOkCancelBox(AlertWindow::QuestionIcon, "Delete " + this->item->niceName, "Are you sure you want to delete this ?", "Delete", "Cancel");
+			if (result != 0)this->item->remove();
+		} else this->item->remove();
 		return;
 	}
 }

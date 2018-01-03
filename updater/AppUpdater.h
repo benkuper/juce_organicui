@@ -18,8 +18,10 @@ class AppUpdater :
 public:
 	juce_DeclareSingleton(AppUpdater, true);
 
-	AppUpdater() : Thread("appUpdater") {}
+	AppUpdater() : Thread("appUpdater"), checkForBetas(true) {}
 	~AppUpdater();
+
+	bool checkForBetas;
 
 	URL updateURL;
 	URL downloadURL;
