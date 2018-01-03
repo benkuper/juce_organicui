@@ -59,7 +59,7 @@ void TargetParameterUI::updateLabel()
 	String newText;
 	if (targetParameter->targetType == TargetParameter::TargetType::CONTROLLABLE)
 	{
-		if (targetParameter->target != nullptr) newText = targetParameter->target->getControlAddress();
+		if (targetParameter->target != nullptr) newText = targetParameter->showFullAddressInEditor ? targetParameter->target->getControlAddress() : targetParameter->target->parentContainer->niceName + ":" + targetParameter->target->niceName;
 	} else //TargetType::CONTAINER
 	{
 		if (targetParameter->targetContainer != nullptr) newText = targetParameter->targetContainer->getControlAddress();
@@ -80,9 +80,17 @@ void TargetParameterUI::showPopupAndGetTarget()
 
 	if (targetParameter->targetType == TargetParameter::TargetType::CONTROLLABLE)
 	{
-		ControllableChooserPopupMenu p(targetParameter->rootContainer, targetParameter->showParameters, targetParameter->showTriggers);
+		Controllable * c = nullptr;
 
-		Controllable * c = p.showAndGetControllable();
+		if (targetParameter->customGetTargetFunc != nullptr)
+		{
+			c = targetParameter->customGetTargetFunc(targetParameter->showTriggers,targetParameter->showParameters);
+		} else
+		{
+			ControllableChooserPopupMenu p(targetParameter->rootContainer, targetParameter->showParameters, targetParameter->showTriggers);
+			c = p.showAndGetControllable();
+		}
+		
 		if (c != nullptr) targetParameter->setValueFromTarget(c);
 	} else
 	{
@@ -107,17 +115,3 @@ void TargetParameterUI::valueChanged(const var &)
 	updateLabel();
 	repaint();
 }
-
-/*
-void TargetParameterUI::controllableStateChanged(Controllable *)
-{
-	if (parameter->enabled)
-	{
-		setInterceptsMouseClicks(true, true);
-	}
-	else
-	{
-		setInterceptsMouseClicks(false, false);
-	}
-}
-*/

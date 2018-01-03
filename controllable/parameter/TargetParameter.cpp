@@ -15,8 +15,11 @@ TargetParameter::TargetParameter(const String & niceName, const String & descrip
 	useGhosting(true),
 	showParameters(true),
 	showTriggers(true),
+	showFullAddressInEditor(false),
 	rootContainer(rootReference),
-	target(nullptr)
+	target(nullptr),
+	targetContainer(nullptr),
+	customGetTargetFunc(nullptr)
 {
 	lockManualControlMode = true;
 

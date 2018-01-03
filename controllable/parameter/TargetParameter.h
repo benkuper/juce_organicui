@@ -31,12 +31,15 @@ public:
 
 	bool showParameters;
 	bool showTriggers;
+	bool showFullAddressInEditor;
 
 	WeakReference<ControllableContainer> rootContainer;
 	
 	WeakReference<Controllable> target;
 	WeakReference<ControllableContainer> targetContainer;
 	
+	std::function<Controllable*(bool,bool)> customGetTargetFunc;
+
 	void setGhostValue(const String &ghostVal);
 
 	void setValueFromTarget(Controllable *);
