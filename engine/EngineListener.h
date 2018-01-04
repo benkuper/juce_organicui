@@ -6,4 +6,6 @@ public:
 	// TODO implement progression
 	virtual void fileProgress(float /*percent*/, int /*state*/) {};
 	virtual void endLoadFile() {};
+	virtual void fileSaved() {};
+	virtual void engineCleared() {};
 };

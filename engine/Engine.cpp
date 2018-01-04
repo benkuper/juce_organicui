@@ -122,4 +122,5 @@ void Engine::clear() {
 	isClearing = false;
 
 	changed();    //fileDocument	
+	engineListeners.call(&EngineListener::engineCleared);
 }

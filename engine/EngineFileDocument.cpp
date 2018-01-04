@@ -25,15 +25,15 @@ String Engine::getDocumentTitle() {
 }
 
 void Engine::createNewGraph(){
-  engineListeners.call(&EngineListener::startLoadFile);
-  clear();
-  isLoadingFile = true;
+	engineListeners.call(&EngineListener::startLoadFile);
+	clear();
+	isLoadingFile = true;
 
-  //init with default data here
+	//init with default data here
 
-  setFile(File());
-  isLoadingFile = false;
-  handleAsyncUpdate();
+	setFile(File());
+	isLoadingFile = false;
+	handleAsyncUpdate();
 
 }
 
@@ -136,6 +136,7 @@ Result Engine::saveDocument (const File& file){
   os->flush();
 
   setLastDocumentOpened(file);
+  engineListeners.call(&EngineListener::fileSaved);
   return Result::ok();
 }
 
