@@ -28,8 +28,8 @@ TargetParameterUI::TargetParameterUI(TargetParameter * parameter, const String &
 	updateLabel();
 	label.setInterceptsMouseClicks(false, false);
 	addAndMakeVisible(label);
-
 }
+
 
 TargetParameterUI::~TargetParameterUI()
 {
@@ -59,10 +59,10 @@ void TargetParameterUI::updateLabel()
 	String newText;
 	if (targetParameter->targetType == TargetParameter::TargetType::CONTROLLABLE)
 	{
-		if (targetParameter->target != nullptr) newText = targetParameter->showFullAddressInEditor ? targetParameter->target->getControlAddress() : targetParameter->target->parentContainer->niceName + ":" + targetParameter->target->niceName;
+		if (targetParameter->target != nullptr) newText = targetParameter->showFullAddressInEditor ? targetParameter->target->getControlAddress() : (targetParameter->showParentNameInEditor?targetParameter->target->parentContainer->niceName + ":":"") + targetParameter->target->niceName;
 	} else //TargetType::CONTAINER
 	{
-		if (targetParameter->targetContainer != nullptr) newText = targetParameter->targetContainer->getControlAddress();
+		if (targetParameter->targetContainer != nullptr) newText = newText = targetParameter->showFullAddressInEditor ? targetParameter->targetContainer->getControlAddress() : (targetParameter->showParentNameInEditor ? targetParameter->targetContainer->parentContainer->niceName + ":" : "") + targetParameter->targetContainer->niceName;
 	}
 
 	if (newText.isEmpty())
@@ -90,11 +90,16 @@ void TargetParameterUI::showPopupAndGetTarget()
 			ControllableChooserPopupMenu p(targetParameter->rootContainer, targetParameter->showParameters, targetParameter->showTriggers);
 			c = p.showAndGetControllable();
 		}
-		
 		if (c != nullptr) targetParameter->setValueFromTarget(c);
+
 	} else
 	{
-		//No handle for container for now
+		ControllableContainer * cc = nullptr;
+		if (targetParameter->customGetTargetContainerFunc != nullptr)
+		{
+			cc = targetParameter->customGetTargetContainerFunc();
+		}
+		if (cc != nullptr) targetParameter->setValueFromTarget(cc);
 	}
 }
 

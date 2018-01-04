@@ -16,10 +16,12 @@ TargetParameter::TargetParameter(const String & niceName, const String & descrip
 	showParameters(true),
 	showTriggers(true),
 	showFullAddressInEditor(false),
+	showParentNameInEditor(true),
 	rootContainer(rootReference),
 	target(nullptr),
 	targetContainer(nullptr),
-	customGetTargetFunc(nullptr)
+	customGetTargetFunc(nullptr),
+	customGetTargetContainerFunc(nullptr)
 {
 	lockManualControlMode = true;
 
