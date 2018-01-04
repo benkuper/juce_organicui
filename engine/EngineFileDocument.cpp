@@ -19,9 +19,9 @@
 
 String Engine::getDocumentTitle() {
   if (! getFile().exists())
-    return "Unnamed";
+    return "New unsaved session";
 
-  return getFile().getFileNameWithoutExtension();
+  return getFile().getFileName();
 }
 
 void Engine::createNewGraph(){
