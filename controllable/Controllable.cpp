@@ -28,7 +28,8 @@ Controllable::Controllable(const Type &type, const String & niceName, const Stri
 	isCustomizableByUser(false),
 	isRemovableByUser(false),
 	replaceSlashesInShortName(true),
-	parentContainer(nullptr)
+	parentContainer(nullptr),
+	queuedNotifier(10)
 {
 
 	setEnabled(enabled);
@@ -38,6 +39,7 @@ Controllable::Controllable(const Type &type, const String & niceName, const Stri
 Controllable::~Controllable() {
 	Controllable::masterReference.clear();
 	listeners.call(&Controllable::Listener::controllableRemoved, this);
+	queuedNotifier.addMessage(new ControllableEvent(ControllableEvent::CONTROLLABLE_REMOVED, this));
 }
 
 void Controllable::setNiceName(const String & _niceName) {
@@ -45,7 +47,11 @@ void Controllable::setNiceName(const String & _niceName) {
 
 	this->niceName = _niceName;
 	if (!hasCustomShortName) setAutoShortName();
-	else listeners.call(&Listener::controllableNameChanged, this);
+	else
+	{
+		listeners.call(&Listener::controllableNameChanged, this);
+		queuedNotifier.addMessage(new ControllableEvent(ControllableEvent::NAME_CHANGED, this));
+	}
 }
 
 void Controllable::setCustomShortName(const String & _shortName)
@@ -55,6 +61,7 @@ void Controllable::setCustomShortName(const String & _shortName)
 	scriptTargetName = shortName;
 	updateControlAddress();
 	listeners.call(&Listener::controllableNameChanged, this);
+	queuedNotifier.addMessage(new ControllableEvent(ControllableEvent::NAME_CHANGED, this));
 	
 }
 
@@ -64,6 +71,7 @@ void Controllable::setAutoShortName() {
 	scriptTargetName = shortName;
 	updateControlAddress();
 	listeners.call(&Listener::controllableNameChanged, this);
+	queuedNotifier.addMessage(new ControllableEvent(ControllableEvent::NAME_CHANGED, this));
 }
 
 
@@ -72,7 +80,11 @@ void Controllable::setEnabled(bool value, bool silentSet, bool force)
 	if (!force && value == enabled) return;
 
 	enabled = value;
-	if (!silentSet) listeners.call(&Listener::controllableStateChanged, this);
+	if (!silentSet)
+	{
+		listeners.call(&Listener::controllableStateChanged, this);
+		queuedNotifier.addMessage(new ControllableEvent(ControllableEvent::STATE_CHANGED, this));
+	}
 }
 
 void Controllable::setParentContainer(ControllableContainer * container)
@@ -86,6 +98,7 @@ void Controllable::updateControlAddress()
 	this->controlAddress = getControlAddress();
 	this->liveScriptObjectIsDirty = true;
 	listeners.call(&Listener::controllableControlAddressChanged, this);
+	queuedNotifier.addMessage(new ControllableEvent(ControllableEvent::CONTROLADDRESS_CHANGED, this));
 }
 
 void Controllable::remove()

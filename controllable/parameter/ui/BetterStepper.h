@@ -18,6 +18,7 @@ public:
 	BetterStepper(const String &tooltip);
 	virtual ~BetterStepper();
 
+
 	virtual void setTooltip(const String &tooltip) override;
 };
 

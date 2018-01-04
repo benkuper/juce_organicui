@@ -37,6 +37,14 @@ IntStepperUI * IntParameter::createStepper(IntParameter * target)
 	return new IntStepperUI(target);
 }
 
+IntParameterLabelUI * IntParameter::createLabelUI(IntParameter * target)
+{
+	if (target == nullptr) target = this;
+	return new IntParameterLabelUI(target);
+}
+
 ControllableUI * IntParameter::createDefaultUI(Controllable * targetControllable){
-    return createStepper(dynamic_cast<IntParameter *>(targetControllable));
+
+	if (!isEditable || isControllableFeedbackOnly) return createLabelUI(dynamic_cast<IntParameter *>(targetControllable));
+	return createStepper(dynamic_cast<IntParameter *>(targetControllable));
 };

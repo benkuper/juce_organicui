@@ -25,6 +25,7 @@ public:
     WeakReference<Parameter> parameter;
 
 	bool showEditWindowOnDoubleClick;
+	bool showEditWindowOnRightClick;
 
 	bool showValue;
 	void showEditWindow() override;

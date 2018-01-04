@@ -113,6 +113,7 @@ using namespace juce;
 #include "controllable/parameter/ui/ColorParameterUI.h"
 #include "controllable/parameter/ui/EnumParameterUI.h"
 #include "controllable/parameter/ui/FloatParameterLabelUI.h"
+#include "controllable/parameter/ui/IntParameterLabelUI.h"
 #include "controllable/parameter/ui/FloatSliderUI.h"
 #include "controllable/parameter/ui/DoubleSliderUI.h"
 #include "controllable/parameter/ui/FloatStepperUI.h"

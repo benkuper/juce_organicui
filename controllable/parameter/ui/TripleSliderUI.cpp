@@ -21,9 +21,9 @@ p3d(parameter),
 	xParam.defaultValue = 0;
 	yParam.defaultValue = 0;
 	zParam.defaultValue = 0;
-	xParam.addAsyncCoalescedListener(this);
-	yParam.addAsyncCoalescedListener(this);
-	zParam.addAsyncCoalescedListener(this);
+	xParam.addAsyncCoalescedParameterListener(this);
+	yParam.addAsyncCoalescedParameterListener(this);
+	zParam.addAsyncCoalescedParameterListener(this);
 
 	addAndMakeVisible(&xSlider);
 	addAndMakeVisible(&ySlider);

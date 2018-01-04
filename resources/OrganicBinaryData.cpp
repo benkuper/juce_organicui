@@ -1724,260 +1724,25 @@ const char* file_png = (const char*) temp_binary_data_10;
 static const unsigned char temp_binary_data_11[] =
 "\x89PNG\r\n"
 "\x1a\n"
-"\0\0\0\rIHDR\0\0\0\x18\0\0\0\x18\x08\x06\0\0\0\xe0w=\xf8\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0\n"
-"OiCCPPhotoshop ICC profile\0\0x\xda\x9dSgTS\xe9\x16=\xf7\xde\xf4""BK\x88\x80\x94KoR\x15\x08 RB\x8b\x80\x14\x91&*!\t\x10J\x88!\xa1\xd9\x15Q\xc1\x11""EE\x04\x1b\xc8\xa0\x88\x03\x8e\x8e\x80\x8c\x15Q,\x0c\x8a\n"
-"\xd8\x07\xe4!\xa2\x8e\x83\xa3\x88\x8a\xca\xfb\xe1{\xa3k\xd6\xbc\xf7\xe6\xcd\xfe\xb5\xd7>\xe7\xac\xf3\x9d\xb3\xcf\x07\xc0\x08\x0c\x96H3Q5\x80\x0c\xa9""B\x1e\x11\xe0\x83\xc7\xc4\xc6\xe1\xe4.@\x81\n"
-"$p\0\x10\x08\xb3""d!s\xfd#\x01\0\xf8~<<+\"\xc0\x07\xbe\0\x01x\xd3\x0b\x08\0\xc0M\x9b\xc0""0\x1c\x87\xff\x0f\xea""B\x99\\\x01\x80\x84\x01\xc0t\x91""8K\x08\x80\x14\0@z\x8e""B\xa6\0@F\x01\x80\x9d\x98&S\0\xa0\x04\0`\xcb""cb\xe3\0P-\0`'\x7f\xe6\xd3\0\x80\x9d"
-"\xf8\x99{\x01\0[\x94!\x15\x01\xa0\x91\0 \x13""e\x88""D\0h;\0\xac\xcfV\x8a""E\0X0\0\x14""fK\xc4""9\0\xd8-\0""0IWfH\0\xb0\xb7\0\xc0\xce\x10\x0b\xb2\0\x08\x0c\0""0Q\x88\x85)\0\x04{\0`\xc8##x\0\x84\x99\0\x14""F\xf2W<\xf1+\xae\x10\xe7*\0\0x\x99\xb2<\xb9$9"
-"E\x81[\x08-q\x07WW.\x1e(\xceI\x17+\x14""6a\x02""a\x9a@.\xc2y\x99\x19""2\x81""4\x0f\xe0\xf3\xcc\0\0\xa0\x91\x15\x11\xe0\x83\xf3\xfdx\xce\x0e\xae\xce\xce""6\x8e\xb6\x0e_-\xea\xbf\x06\xff\"bb\xe3\xfe\xe5\xcf\xabp@\0\0\xe1t~\xd1\xfe,/\xb3\x1a\x80;\x06\x80"
-"m\xfe\xa2%\xee\x04h^\x0b\xa0u\xf7\x8b""f\xb2\x0f@\xb5\0\xa0\xe9\xdaW\xf3p\xf8~<<E\xa1\x90\xb9\xd9\xd9\xe5\xe4\xe4\xd8J\xc4""B[a\xcaW}\xfeg\xc2_\xc0W\xfdl\xf9~<\xfc\xf7\xf5\xe0\xbe\xe2$\x81""2]\x81G\x04\xf8\xe0\xc2\xcc\xf4L\xa5\x1c\xcf\x92\t\x84""b\xdc"
-"\xe6\x8fG\xfc\xb7\x0b\xff\xfc\x1d\xd3\"\xc4Ib\xb9X*\x14\xe3Q\x12q\x8e""D\x9a\x8c\xf3""2\xa5\"\x89""B\x92)\xc5%\xd2\xff""d\xe2\xdf,\xfb\x03>\xdf""5\0\xb0j>\x01{\x91-\xa8]c\x03\xf6K'\x10Xt\xc0\xe2\xf7\0\0\xf2\xbbo\xc1\xd4(\x08\x03\x80h\x83\xe1\xcfw\xff"
-"\xef?\xfdG\xa0%\0\x80""fI\x92q\0\0^D$.T\xca\xb3?\xc7\x08\0\0""D\xa0\x81*\xb0""A\x1b\xf4\xc1\x18,\xc0\x06\x1c\xc1\x05\xdc\xc1\x0b\xfc`6\x84""B$\xc4\xc2""B\x10""B\n"
-"d\x80\x1cr`)\xac\x82""B(\x86\xcd\xb0\x1d*`/\xd4@\x1d""4\xc0Qh\x86\x93p\x0e.\xc2U\xb8\x0e=p\x0f\xfa""a\x08\x9e\xc1(\xbc\x81\t\x04""A\xc8\x08\x13""a!\xda\x88\x01""b\x8aX#\x8e\x08\x17\x99\x85\xf8!\xc1H\x04\x12\x8b$ \xc9\x88\x14Q\"K\x91""5H1R\x8aT UH\x1d"
-"\xf2=r\x02""9\x87\\F\xba\x91;\xc8\0""2\x82\xfc\x86\xbcG1\x94\x81\xb2Q=\xd4\x0c\xb5""C\xb9\xa8""7\x1a\x84""F\xa2\x0b\xd0""dt1\x9a\x8f\x16\xa0\x9b\xd0r\xb4\x1a=\x8c""6\xa1\xe7\xd0\xabh\x0f\xda\x8f>C\xc7""0\xc0\xe8\x18\x07""3\xc4l0.\xc6\xc3""B\xb1""8,\t"
-"\x93""c\xcb\xb1\"\xac\x0c\xab\xc6\x1a\xb0V\xac\x03\xbb\x89\xf5""c\xcf\xb1w\x04\x12\x81""E\xc0\t6\x04wB a\x1e""AHXLXN\xd8H\xa8 \x1c$4\x11\xda\t7\t\x03\x84Q\xc2'\"\x93\xa8K\xb4&\xba\x11\xf9\xc4\x18""b21\x87XH,#\xd6\x12\x8f\x13/\x10{\x88""C\xc4""7$\x12\x89"
-"C2'\xb9\x90\x02I\xb1\xa4T\xd2\x12\xd2""F\xd2nR#\xe9,\xa9\x9b""4H\x1a#\x93\xc9\xda""dk\xb2\x07""9\x94, +\xc8\x85\xe4\x9d\xe4\xc3\xe4""3\xe4\x1b\xe4!\xf2[\n"
-"\x9d""b@q\xa4\xf8S\xe2(R\xcajJ\x19\xe5\x10\xe5""4\xe5\x06""e\x98""2AU\xa3\x9aR\xdd\xa8\xa1T\x11""5\x8fZB\xad\xa1\xb6R\xafQ\x87\xa8\x13""4u\x9a""9\xcd\x83\x16IK\xa5\xad\xa2\x95\xd3\x1ah\x17h\xf7i\xaf\xe8t\xba\x11\xdd\x95\x1eN\x97\xd0W\xd2\xcb\xe9G\xe8"
-"\x97\xe8\x03\xf4w\x0c\r\x86\x15\x83\xc7\x88g(\x19\x9b\x18\x07\x18g\x19w\x18\xaf\x98L\xa6\x19\xd3\x8b\x19\xc7T071\xeb\x98\xe7\x99\x0f\x99oUX*\xb6*|\x15\x91\xca\n"
-"\x95J\x95&\x95\x1b*/T\xa9\xaa\xa6\xaa\xde\xaa\x0bU\xf3U\xcbT\x8f\xa9^S}\xae""FU3S\xe3\xa9\t\xd4\x96\xabU\xaa\x9dP\xebS\x1bSg\xa9;\xa8\x87\xaag\xa8oT?\xa4~Y\xfd\x89\x06Y\xc3L\xc3OC\xa4Q\xa0\xb1_\xe3\xbc\xc6 \x0b""c\x19\xb3x,!k\r\xab\x86u\x81""5\xc4&\xb1"
-"\xcd\xd9|v*\xbb\x98\xfd\x1d\xbb\x8b=\xaa\xa9\xa1""9C3J3W\xb3R\xf3\x94""f?\x07\xe3\x98q\xf8\x9ctN\t\xe7(\xa7\x97\xf3~\x8a\xde\x14\xef)\xe2)\x1b\xa6""4L\xb9""1e\\k\xaa\x96\x97\x96X\xabH\xabQ\xabG\xeb\xbd""6\xae\xed\xa7\x9d\xa6\xbd""E\xbbY\xfb\x81\x0e""A"
-"\xc7J'\\'Gg\x8f\xce\x05\x9d\xe7S\xd9S\xdd\xa7\n"
-"\xa7\x16M=:\xf5\xae.\xaak\xa5\x1b\xa1\xbb""Dw\xbfn\xa7\xee\x98\x9e\xbe^\x80\x9eLo\xa7\xdey\xbd\xe7\xfa\x1c}/\xfdT\xfdm\xfa\xa7\xf5G\x0cX\x06\xb3\x0c$\x06\xdb\x0c\xce\x18<\xc5""5qo<\x1d/\xc7\xdb\xf1QC]\xc3@C\xa5""a\x95""a\x97\xe1\x84\x91\xb9\xd1<\xa3\xd5"
-"F\x8d""F\x0f\x8ci\xc6\\\xe3$\xe3m\xc6m\xc6\xa3&\x06&!&KM\xeaM\xee\x9aRM\xb9\xa6)\xa6;L;L\xc7\xcd\xcc\xcd\xa2\xcd\xd6\x99""5\x9b=1\xd7""2\xe7\x9b\xe7\x9b\xd7\x9b\xdf\xb7`ZxZ,\xb6\xa8\xb6\xb8""eI\xb2\xe4Z\xa6Y\xee\xb6\xbcn\x85Z9Y\xa5XUZ]\xb3""F\xad\x9d"
-"\xad%\xd6\xbb\xad\xbb\xa7\x11\xa7\xb9N\x93N\xab\x9e\xd6g\xc3\xb0\xf1\xb6\xc9\xb6\xa9\xb7\x19\xb0\xe5\xd8\x06\xdb\xae\xb6m\xb6}agb\x17g\xb7\xc5\xae\xc3\xee\x93\xbd\x93}\xba}\x8d\xfd=\x07\r\x87\xd9\x0e\xab\x1dZ\x1d~s\xb4r\x14:V:\xde\x9a\xce\x9c\xee?}\xc5"
-"\xf4\x96\xe9/gX\xcf\x10\xcf\xd8""3\xe3\xb6\x13\xcb)\xc4i\x9dS\x9b\xd3Gg\x17g\xb9s\x83\xf3\x88\x8b\x89K\x82\xcb.\x97>.\x9b\x1b\xc6\xdd\xc8\xbd\xe4Jt\xf5q]\xe1z\xd2\xf5\x9d\x9b\xb3\x9b\xc2\xed\xa8\xdb\xaf\xee""6\xeei\xee\x87\xdc\x9f\xcc""4\x9f)\x9eY3s\xd0"
-"\xc3\xc8""C\xe0Q\xe5\xd1?\x0b\x9f\x95""0k\xdf\xac~OCO\x81g\xb5\xe7#/c/\x91W\xad\xd7\xb0\xb7\xa5w\xaa\xf7""a\xef\x17>\xf6>r\x9f\xe3>\xe3<7\xde""2\xdeY_\xcc""7\xc0\xb7\xc8\xb7\xcbO\xc3o\x9e_\x85\xdf""C\x7f#\xff""d\xffz\xff\xd1\0\xa7\x80%\x01g\x03\x89\x81"
-"A\x81[\x02\xfb\xf8z|!\xbf\x8e?:\xdb""e\xf6\xb2\xd9\xed""A\x8c\xa0\xb9""A\x15""A\x8f\x82\xad\x82\xe5\xc1\xad!h\xc8\xec\x90\xad!\xf7\xe7\x98\xce\x91\xcei\x0e\x85P~\xe8\xd6\xd0\x07""a\xe6""a\x8b\xc3~\x0c'\x85\x87\x85W\x86?\x8ep\x88X\x1a\xd1""1\x97""5w\xd1"
-"\xdc""Cs\xdf""D\xfa""D\x96""D\xde\x9bg1O9\xaf-J5*>\xaa.j<\xda""7\xba""4\xba?\xc6.fY\xcc\xd5X\x9dXIlK\x1c""9.*\xae""6nl\xbe\xdf\xfc\xed\xf3\x87\xe2\x9d\xe2\x0b\xe3{\x17\x98/\xc8]py\xa1\xce\xc2\xf4\x85\xa7\x16\xa9.\x12,:\x96@L\x88N8\x94\xf0""A\x10*\xa8"
-"\x16\x8c%\xf2\x13w%\x8e\n"
-"y\xc2\x1d\xc2g\"/\xd1""6\xd1\x88\xd8""C\\*\x1eN\xf2H*Mz\x92\xec\x91\xbc""5y$\xc5""3\xa5,\xe5\xb9\x84'\xa9\x90\xbcL\rL\xdd\x9b:\x9e\x16\x9av m2=:\xbd""1\x83\x92\x91\x90qB\xaa!M\x93\xb6g\xeag\xe6""fv\xcb\xac""e\x85\xb2\xfe\xc5n\x8b\xb7/\x1e\x95\x07\xc9"
-"k\xb3\x90\xac\x05Y-\n"
-"\xb6""B\xa6\xe8TZ(\xd7*\x07\xb2geWf\xbf\xcd\x89\xca""9\x96\xab\x9e+\xcd\xed\xcc\xb3\xca\xdb\x90""7\x9c\xef\x9f\xff\xed\x12\xc2\x12\xe1\x92\xb6\xa5\x86KW-\x1dX\xe6\xbd\xacj9\xb2<qy\xdb\n"
-"\xe3\x15\x05+\x86V\x06\xac<\xb8\x8a\xb6*m\xd5O\xab\xedW\x97\xae~\xbd&zMk\x81^\xc1\xca\x82\xc1\xb5\x01k\xeb\x0bU\n"
-"\xe5\x85}\xeb\xdc\xd7\xed]OX/Y\xdf\xb5""a\xfa\x86\x9d\x1b>\x15\x89\x8a\xae\x14\xdb\x17\x97\x15\x7f\xd8(\xdcx\xe5\x1b\x87o\xca\xbf\x99\xdc\x94\xb4\xa9\xab\xc4\xb9""d\xcf""f\xd2""f\xe9\xe6\xde-\x9e[\x0e\x96\xaa\x97\xe6\x97\x0en\r\xd9\xda\xb4\r\xdfV\xb4"
-"\xed\xf5\xf6""E\xdb/\x97\xcd(\xdb\xbb\x83\xb6""C\xb9\xa3\xbf<\xb8\xbc""e\xa7\xc9\xce\xcd;?T\xa4T\xf4T\xfaT6\xee\xd2\xdd\xb5""a\xd7\xf8n\xd1\xee\x1b{\xbc\xf6""4\xec\xd5\xdb[\xbc\xf7\xfd>\xc9\xbe\xdbU\x01UM\xd5""f\xd5""e\xfbI\xfb\xb3\xf7?\xae\x89\xaa\xe9"
-"\xf8\x96\xfbm]\xadNmq\xed\xc7\x03\xd2\x03\xfd\x07#\x0e\xb6\xd7\xb9\xd4\xd5\x1d\xd2=TR\x8f\xd6+\xebG\x0e\xc7\x1f\xbe\xfe\x9d\xefw-\r6\rU\x8d\x9c\xc6\xe2#pDy\xe4\xe9\xf7\t\xdf\xf7\x1e\r:\xdav\x8c{\xac\xe1\x07\xd3\x1fv\x1dg\x1d/jB\x9a\xf2\x9a""F\x9bS\x9a"
-"\xfb[b[\xbaO\xcc>\xd1\xd6\xea\xdez\xfcG\xdb\x1f\x0f\x9c""4<YyJ\xf3T\xc9i\xda\xe9\x82\xd3\x93g\xf2\xcf\x8c\x9d\x95\x9d}~.\xf9\xdc`\xdb\xa2\xb6{\xe7""c\xce\xdfj\x0fo\xef\xba\x10t\xe1\xd2""E\xff\x8b\xe7;\xbc;\xce\\\xf2\xb8t\xf2\xb2\xdb\xe5\x13W\xb8W\x9a"
-"\xaf:_m\xeat\xea<\xfe\x93\xd3O\xc7\xbb\x9c\xbb\x9a\xae\xb9\\k\xb9\xeez\xbd\xb5{f\xf7\xe9\x1b\x9e""7\xce\xdd\xf4\xbdy\xf1\x16\xff\xd6\xd5\x9e""9=\xdd\xbd\xf3zo\xf7\xc5\xf7\xf5\xdf\x16\xdd~r'\xfd\xce\xcb\xbb\xd9w'\xee\xad\xbcO\xbc_\xf4@\xed""A\xd9""C\xdd"
-"\x87\xd5?[\xfe\xdc\xd8\xef\xdc\x7fj\xc0w\xa0\xf3\xd1\xdcG\xf7\x06\x85\x83\xcf\xfe\x91\xf5\x8f\x0f""C\x05\x8f\x99\x8f\xcb\x86\r\x86\xeb\x9e""8>99\xe2?r\xfd\xe9\xfc\xa7""C\xcf""d\xcf&\x9e\x17\xfe\xa2\xfe\xcb\xae\x17\x16/~\xf8\xd5\xeb\xd7\xce\xd1\x98\xd1"
-"\xa1\x97\xf2\x97\x93\xbfm|\xa5\xfd\xea\xc0\xeb\x19\xaf\xdb\xc6\xc2\xc6\x1e\xbe\xc9x31^\xf4V\xfb\xed\xc1w\xdcw\x1d\xef\xa3\xdf\x0fO\xe4| \x7f(\xffh\xf9\xb1\xf5S\xd0\xa7\xfb\x93\x19\x93\x93\xff\x04\x03\x98\xf3\xfc""c3-\xdb\0\0""DHiTXtXML:com.adobe.xmp\0"
-"\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n"
-"<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"Adobe XMP Core 5.6-c138 79.159824, 2016/09/14-01:09:01        \">\n"
-"   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n"
-"      <rdf:Description rdf:about=\"\"\n"
-"            xmlns:xmp=\"http://ns.adobe.com/xap/1.0/\"\n"
-"            xmlns:dc=\"http://purl.org/dc/elements/1.1/\"\n"
-"            xmlns:xmpMM=\"http://ns.adobe.com/xap/1.0/mm/\"\n"
-"            xmlns:stEvt=\"http://ns.adobe.com/xap/1.0/sType/ResourceEvent#\"\n"
-"            xmlns:stRef=\"http://ns.adobe.com/xap/1.0/sType/ResourceRef#\"\n"
-"            xmlns:photoshop=\"http://ns.adobe.com/photoshop/1.0/\"\n"
-"            xmlns:xmpRights=\"http://ns.adobe.com/xap/1.0/rights/\"\n"
-"            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\"\n"
-"            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\">\n"
-"         <xmp:CreatorTool>Adobe Photoshop CC 2017 (Windows)</xmp:CreatorTool>\n"
-"         <xmp:CreateDate>2013-10-04T17:30:37+03:00</xmp:CreateDate>\n"
-"         <xmp:MetadataDate>2017-01-04T14:14:11+01:00</xmp:MetadataDate>\n"
-"         <xmp:ModifyDate>2017-01-04T14:14:11+01:00</xmp:ModifyDate>\n"
-"         <dc:format>image/png</dc:format>\n"
-"         <xmpMM:InstanceID>xmp.iid:3ee87a67-0815-f143-a625-582a76ecfc9a</xmpMM:InstanceID>\n"
-"         <xmpMM:DocumentID>adobe:docid:photoshop:a48f567c-d279-11e6-86fd-f22ea20d4df0</xmpMM:DocumentID>\n"
-"         <xmpMM:OriginalDocumentID>xmp.did:05bd1fa1-dd19-8d49-a673-1ddd603b57d4</xmpMM:OriginalDocumentID>\n"
-"         <xmpMM:History>\n"
-"            <rdf:Seq>\n"
-"               <rdf:li rdf:parseType=\"Resource\">\n"
-"                  <stEvt:action>created</stEvt:action>\n"
-"                  <stEvt:instanceID>xmp.iid:05bd1fa1-dd19-8d49-a673-1ddd603b57d4</stEvt:instanceID>\n"
-"                  <stEvt:when>2013-10-04T17:30:37+03:00</stEvt:when>\n"
-"                  <stEvt:softwareAgent>Adobe Photoshop CC (Windows)</stEvt:softwareAgent>\n"
-"               </rdf:li>\n"
-"               <rdf:li rdf:parseType=\"Resource\">\n"
-"                  <stEvt:action>saved</stEvt:action>\n"
-"                  <stEvt:instanceID>xmp.iid:97feccd1-2f2d-3245-a56f-9f16d415b29e</stEvt:instanceID>\n"
-"                  <stEvt:when>2013-10-04T17:30:44+03:00</stEvt:when>\n"
-"                  <stEvt:softwareAgent>Adobe Photoshop CC (Windows)</stEvt:softwareAgent>\n"
-"                  <stEvt:changed>/</stEvt:changed>\n"
-"               </rdf:li>\n"
-"               <rdf:li rdf:parseType=\"Resource\">\n"
-"                  <stEvt:action>saved</stEvt:action>\n"
-"                  <stEvt:instanceID>xmp.iid:6cde3072-596a-e14c-8870-0dceb1d72895</stEvt:instanceID>\n"
-"                  <stEvt:when>2017-01-04T13:31:15+01:00</stEvt:when>\n"
-"                  <stEvt:softwareAgent>Adobe Photoshop CC 2017 (Windows)</stEvt:softwareAgent>\n"
-"                  <stEvt:changed>/</stEvt:changed>\n"
-"               </rdf:li>\n"
-"               <rdf:li rdf:parseType=\"Resource\">\n"
-"                  <stEvt:action>converted</stEvt:action>\n"
-"                  <stEvt:parameters>from application/vnd.adobe.photoshop to image/png</stEvt:parameters>\n"
-"               </rdf:li>\n"
-"               <rdf:li rdf:parseType=\"Resource\">\n"
-"                  <stEvt:action>derived</stEvt:action>\n"
-"                  <stEvt:parameters>converted from application/vnd.adobe.photoshop to image/png</stEvt:parameters>\n"
-"               </rdf:li>\n"
-"               <rdf:li rdf:parseType=\"Resource\">\n"
-"                  <stEvt:action>saved</stEvt:action>\n"
-"                  <stEvt:instanceID>xmp.iid:50a5e606-ca7d-7649-b066-a796965c3770</stEvt:instanceID>\n"
-"                  <stEvt:when>2017-01-04T13:31:15+01:00</stEvt:when>\n"
-"                  <stEvt:softwareAgent>Adobe Photoshop CC 2017 (Windows)</stEvt:softwareAgent>\n"
-"                  <stEvt:changed>/</stEvt:changed>\n"
-"               </rdf:li>\n"
-"               <rdf:li rdf:parseType=\"Resource\">\n"
-"                  <stEvt:action>saved</stEvt:action>\n"
-"                  <stEvt:instanceID>xmp.iid:3ee87a67-0815-f143-a625-582a76ecfc9a</stEvt:instanceID>\n"
-"                  <stEvt:when>2017-01-04T14:14:11+01:00</stEvt:when>\n"
-"                  <stEvt:softwareAgent>Adobe Photoshop CC 2017 (Windows)</stEvt:softwareAgent>\n"
-"                  <stEvt:changed>/</stEvt:changed>\n"
-"               </rdf:li>\n"
-"            </rdf:Seq>\n"
-"         </xmpMM:History>\n"
-"         <xmpMM:DerivedFrom rdf:parseType=\"Resource\">\n"
-"            <stRef:instanceID>xmp.iid:6cde3072-596a-e14c-8870-0dceb1d72895</stRef:instanceID>\n"
-"            <stRef:documentID>xmp.did:963eb1fc-5696-f44c-bde6-5f8b30db2291</stRef:documentID>\n"
-"            <stRef:originalDocumentID>xmp.did:05bd1fa1-dd19-8d49-a673-1ddd603b57d4</stRef:originalDocumentID>\n"
-"         </xmpMM:DerivedFrom>\n"
-"         <photoshop:ColorMode>3</photoshop:ColorMode>\n"
-"         <photoshop:ICCProfile>sRGB IEC61966-2.1</photoshop:ICCProfile>\n"
-"         <photoshop:DocumentAncestors>\n"
-"            <rdf:Bag>\n"
-"               <rdf:li>adobe:docid:photoshop:80723c03-d279-11e6-86fd-f22ea20d4df0</rdf:li>\n"
-"            </rdf:Bag>\n"
-"         </photoshop:DocumentAncestors>\n"
-"         <xmpRights:Marked>False</xmpRights:Marked>\n"
-"         <tiff:Orientation>1</tiff:Orientation>\n"
-"         <tiff:XResolution>720000/10000</tiff:XResolution>\n"
-"         <tiff:YResolution>720000/10000</tiff:YResolution>\n"
-"         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n"
-"         <exif:ColorSpace>1</exif:ColorSpace>\n"
-"         <exif:PixelXDimension>24</exif:PixelXDimension>\n"
-"         <exif:PixelYDimension>24</exif:PixelYDimension>\n"
-"      </rdf:Description>\n"
-"   </rdf:RDF>\n"
-"</x:xmpmeta>\n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                            \n"
-"<?xpacket end=\"w\"?>\xf0`\xfaJ\0\0\0 cHRM\0\0z%\0\0\x80\x83\0\0\xf9\xff\0\0\x80\xe9\0\0u0\0\0\xea`\0\0:\x98\0\0\x17o\x92_\xc5""F\0\0\x01\xdfIDATx\xda\xec\x95\xbfk\x14""A\x18\x86\x9fwV\x12\x83$\xdd\x95\x17H\xa2(\x01IL!xE4\x85\x88\x85V\x92=,\xb5\xd6R\x8b"
-"h\x94\x88\x7f\x86\xb6\xc9\xa6\x11k\xb5PlE\x94\x04\x04""c\x91\xfa \x10\x08zz\xdc\xbc\x16\x9b\x1f\xbb\x85\xb9\x8d\x12""Ap`\x9b\x99\xef\x9dg\xe7\xfb\xe6\xfd""F\xb6""9\xcc\x11""8\xe4\xf1\xef\x03\x8e\xf4\n"
-"\x88\xcd\xf4\x92\xec\x07\x98I\xd9G\x01,\xb5\x11\xef-\xcd\x87\xa5\xec\xd5~z\xfd\xaa\xc8\xb1\x99\x1e\x93\xfd""F\xd1S\x0e\xc2""AX\xda\x11\xa1\x98\x7f\x0ez\xe7\xa0\x0b""a1\xdb\xaa\x0c\x88\xcdt@\xd1\xeb\x88ZL\xf6\xcf""b\xe8""F0-'\x1a\x0e\x8bY\xbbR\rd\xbf\xad"
-"\xb2""9@L\x02\x88\x9a\xa2_W*rl\xa6\x97\x15=U\xdc\\\x93g`pp_\x88\xa2\xcf\xc6""fz\xb1'@\xf6\xe3\xd2\x9f\xd7j\x84;w\t\xf7\xe6""ah(\x8f\x19\x19!\xdc\xba\r\xdb""5\xd9\x85\xd8\x0bU\0\xe3\xa8""0\xd1j\x11\x9f>A\xf5:a\xee~\x0e\xa9\x0f\xa3s\r4:V\x10\x02""f\xa2"
-"w\rL\xbf\xa5\xf2\xd4\xcb\x17""e\xc8\xc0@\xbe\xd0\xdf\xb7\x17#\xb1s\x8d\x0f\xe4\x83\x12\x04\x08""7n\xa2+W\xff\xc0h\xe2\xbb\xec\xd2)t\xf2\x14\x9a\x99\xc9""Ak\x9f\xd1\xf1\x13\xf9\xc2\x8fN1\xb5Xj\xab\x17\xc0\xe8\x13""f\xa2T\x87\xf6""74}\xbe\x1c\xb8\xb9\x89"
-"\xbf\xac\x15\x85 V\xaa\x9c\xe0""a\xe8\xc6g\xdd\x90\xeci\xd7\xd7\xe9^o\xf6""4\x9c\x83\x1eUr\xb2gg?\"NW1\xda\xae\x9b\xe1\x83\xb2\xe5\xc9j\xddT40\x1b\xdb\xc2*\xad""b\xc3R\xa3r\xbbV\xb6\xbc\x85\x18\xc5\xac&\x9d.\x8a\xces\\\xc8\xb7\xa2I:]\x80\x15\x07\x8d\x85"
-"\xa5\xec\xeb\x81\xba\xe9\xee^\xe9\xec""5`N\xf6""8\xa6o\xe7\xa6YZ\x05\x16\x94-?\xff\xadv\xfd\xff\xc9\xfck\x80\x9f\x03\0\x05\xee\xcd\x1a\x1c\xab\xa5@\0\0\0\0IEND\xae""B`\x82";
+"\0\0\0\rIHDR\0\0\0\x18\0\0\0\x18\x08\x06\0\0\0\xe0w=\xf8\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0\x0c""EiTXtXML:com.adobe.xmp\0\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?> <x:xmpmeta xmlns:x=\"adobe:ns:m"
+"eta/\" x:xmptk=\"Adobe XMP Core 5.6-c142 79.160924, 2017/07/13-01:06:39        \"> <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"> <rdf:Description rdf:about=\"\" xmlns:xmp=\"http://ns.adobe.com/xap/1.0/\" xmlns:dc=\"http://purl.o"
+"rg/dc/elements/1.1/\" xmlns:xmpMM=\"http://ns.adobe.com/xap/1.0/mm/\" xmlns:stEvt=\"http://ns.adobe.com/xap/1.0/sType/ResourceEvent#\" xmlns:stRef=\"http://ns.adobe.com/xap/1.0/sType/ResourceRef#\" xmlns:photoshop=\"http://ns.adobe.com/photoshop/1.0/"
+"\" xmlns:xmpRights=\"http://ns.adobe.com/xap/1.0/rights/\" xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\" xmlns:exif=\"http://ns.adobe.com/exif/1.0/\" xmp:CreatorTool=\"Adobe Photoshop CC 2017 (Windows)\" xmp:CreateDate=\"2013-10-04T17:30:37+03:00\" xm"
+"p:MetadataDate=\"2018-01-04T14:20:26+01:00\" xmp:ModifyDate=\"2018-01-04T14:20:26+01:00\" dc:format=\"image/png\" xmpMM:InstanceID=\"xmp.iid:dd8ec0bc-f071-fd4a-b1e8-5bad7fd80d8a\" xmpMM:DocumentID=\"adobe:docid:photoshop:a48f567c-d279-11e6-86fd-f22ea"
+"20d4df0\" xmpMM:OriginalDocumentID=\"xmp.did:05bd1fa1-dd19-8d49-a673-1ddd603b57d4\" photoshop:ColorMode=\"3\" photoshop:ICCProfile=\"sRGB IEC61966-2.1\" xmpRights:Marked=\"False\" tiff:Orientation=\"1\" tiff:XResolution=\"720000/10000\" tiff:YResolut"
+"ion=\"720000/10000\" tiff:ResolutionUnit=\"2\" exif:ColorSpace=\"1\" exif:PixelXDimension=\"24\" exif:PixelYDimension=\"24\"> <xmpMM:History> <rdf:Seq> <rdf:li stEvt:action=\"created\" stEvt:instanceID=\"xmp.iid:05bd1fa1-dd19-8d49-a673-1ddd603b57d4\""
+" stEvt:when=\"2013-10-04T17:30:37+03:00\" stEvt:softwareAgent=\"Adobe Photoshop CC (Windows)\"/> <rdf:li stEvt:action=\"saved\" stEvt:instanceID=\"xmp.iid:97feccd1-2f2d-3245-a56f-9f16d415b29e\" stEvt:when=\"2013-10-04T17:30:44+03:00\" stEvt:softwareA"
+"gent=\"Adobe Photoshop CC (Windows)\" stEvt:changed=\"/\"/> <rdf:li stEvt:action=\"saved\" stEvt:instanceID=\"xmp.iid:6cde3072-596a-e14c-8870-0dceb1d72895\" stEvt:when=\"2017-01-04T13:31:15+01:00\" stEvt:softwareAgent=\"Adobe Photoshop CC 2017 (Windo"
+"ws)\" stEvt:changed=\"/\"/> <rdf:li stEvt:action=\"converted\" stEvt:parameters=\"from application/vnd.adobe.photoshop to image/png\"/> <rdf:li stEvt:action=\"derived\" stEvt:parameters=\"converted from application/vnd.adobe.photoshop to image/png\"/"
+"> <rdf:li stEvt:action=\"saved\" stEvt:instanceID=\"xmp.iid:50a5e606-ca7d-7649-b066-a796965c3770\" stEvt:when=\"2017-01-04T13:31:15+01:00\" stEvt:softwareAgent=\"Adobe Photoshop CC 2017 (Windows)\" stEvt:changed=\"/\"/> <rdf:li stEvt:action=\"saved\""
+" stEvt:instanceID=\"xmp.iid:dd8ec0bc-f071-fd4a-b1e8-5bad7fd80d8a\" stEvt:when=\"2018-01-04T14:20:26+01:00\" stEvt:softwareAgent=\"Adobe Photoshop CC (Windows)\" stEvt:changed=\"/\"/> </rdf:Seq> </xmpMM:History> <xmpMM:DerivedFrom stRef:instanceID=\"x"
+"mp.iid:6cde3072-596a-e14c-8870-0dceb1d72895\" stRef:documentID=\"xmp.did:963eb1fc-5696-f44c-bde6-5f8b30db2291\" stRef:originalDocumentID=\"xmp.did:05bd1fa1-dd19-8d49-a673-1ddd603b57d4\"/> <photoshop:DocumentAncestors> <rdf:Bag> <rdf:li>adobe:docid:ph"
+"otoshop:80723c03-d279-11e6-86fd-f22ea20d4df0</rdf:li> </rdf:Bag> </photoshop:DocumentAncestors> </rdf:Description> </rdf:RDF> </x:xmpmeta> <?xpacket end=\"r\"?>+j\x1fy\0\0\x01yIDATH\rc\xf8\xff\xff?\x03-1\xc3\xa8\x05$[\x80\x0e\x98V\xactg\\\xb9\xea\x18"
+"\xe3\xaaU\xdf\x18V\xaf\xfe\x07\xc2 6P\xec(P\xce\x19]=\xd1\x16\0""5s\x03\r9\x0b""4\xf0?\x90\xfe\xcf\xb4|\xe5\x7f\xe6""e+\xc0\x18\xc4\x06\x89""A\xe5\xce\0\xf9<$Y\0""4\x9c\x13\xe8\xcaW C`\x86\xe2\xc2 5 \xb5@K8\x88\xb6\0\xe4rb\x0cG\xb1""d\xe5\xaa\x93""DY"
+"\0t\xbd'\xc8\xeb\xc8\x06""0\x95\x95\xffg\x9e""9\x1b\xaf% =@\xbd\xae\x04-\0\xba\xe4\x1cP!B\xf3\xc4\xc9 o\xfdg\x94\x95\xfd\xcf<c\x16\xc4\xc2\xd6\xf6\xff\x8c\x96V\xff\x99\x97.G8b\x05""8^\x8e\x13\x0e\xa2U\xab\x7f G(XsR2\x8a%L\x19\x99`>Ss\x0bj\xc4\x03S\x17"
+"a\x0b\xd0\x82\x07\x9b%L\xf1\t\x10\x0bj\xea\xd0\x83\xe9\x1f\xd9\x16 [\xc2 $D\x81\x05\xd8\x82\xa8\xbe\xe1?\xa3\x9d=\x04\xab\xa8""B,\x01Y\xd0\xd4Lz\x10\x01\x15]@\x89""d\x90\xe6\xf6N\xb8\xa1p\xcc\xcf\x8f-\x92O\x11\x93\x8a\x02\xf0\x05\x13\xbe""d\n"
+"\xd4\xebK\\F[\xb5\xea\x12\x19\x19\xed\x02)9\x99\x07h\xc9[\x12\x8a\x8a\xb7\xc0 \xe2\"\xa9\xb0\x03j\xe4\x07j\xbc\x02\xcd\xa1\xff\x99\x97#\x19\xbc\x1c\x12\xe6\xd0`\xb9\x0c""d\x0b\x90\\\x9a\"Y\x14\x02\xc4\xe7\x81\xa9\xeb'\xc8@0\x06\xa6""4hy\xe5Orq=Ze\xd2"
+"\xdd\x02\0\xc0\xa0\x92\xc2S0-\xb3\0\0\0\0IEND\xae""B`\x82";
 
 const char* in_png = (const char*) temp_binary_data_11;
 
@@ -3751,8 +3516,50 @@ static const unsigned char temp_binary_data_20[] =
 
 const char* target_png = (const char*) temp_binary_data_20;
 
-//================== uncheck.png ==================
+//================== trigger.png ==================
 static const unsigned char temp_binary_data_21[] =
+{ 137,80,78,71,13,10,26,10,0,0,0,13,73,72,68,82,0,0,0,20,0,0,0,20,8,6,0,0,0,141,137,29,13,0,0,0,9,112,72,89,115,0,0,11,19,0,0,11,19,1,0,154,156,24,0,0,5,235,105,84,88,116,88,77,76,58,99,111,109,46,97,100,111,98,101,46,120,109,112,0,0,0,0,0,60,63,120,112,
+97,99,107,101,116,32,98,101,103,105,110,61,34,239,187,191,34,32,105,100,61,34,87,53,77,48,77,112,67,101,104,105,72,122,114,101,83,122,78,84,99,122,107,99,57,100,34,63,62,32,60,120,58,120,109,112,109,101,116,97,32,120,109,108,110,115,58,120,61,34,97,100,
+111,98,101,58,110,115,58,109,101,116,97,47,34,32,120,58,120,109,112,116,107,61,34,65,100,111,98,101,32,88,77,80,32,67,111,114,101,32,53,46,54,45,99,49,52,50,32,55,57,46,49,54,48,57,50,52,44,32,50,48,49,55,47,48,55,47,49,51,45,48,49,58,48,54,58,51,57,
+32,32,32,32,32,32,32,32,34,62,32,60,114,100,102,58,82,68,70,32,120,109,108,110,115,58,114,100,102,61,34,104,116,116,112,58,47,47,119,119,119,46,119,51,46,111,114,103,47,49,57,57,57,47,48,50,47,50,50,45,114,100,102,45,115,121,110,116,97,120,45,110,115,
+35,34,62,32,60,114,100,102,58,68,101,115,99,114,105,112,116,105,111,110,32,114,100,102,58,97,98,111,117,116,61,34,34,32,120,109,108,110,115,58,120,109,112,61,34,104,116,116,112,58,47,47,110,115,46,97,100,111,98,101,46,99,111,109,47,120,97,112,47,49,46,
+48,47,34,32,120,109,108,110,115,58,120,109,112,77,77,61,34,104,116,116,112,58,47,47,110,115,46,97,100,111,98,101,46,99,111,109,47,120,97,112,47,49,46,48,47,109,109,47,34,32,120,109,108,110,115,58,115,116,69,118,116,61,34,104,116,116,112,58,47,47,110,
+115,46,97,100,111,98,101,46,99,111,109,47,120,97,112,47,49,46,48,47,115,84,121,112,101,47,82,101,115,111,117,114,99,101,69,118,101,110,116,35,34,32,120,109,108,110,115,58,100,99,61,34,104,116,116,112,58,47,47,112,117,114,108,46,111,114,103,47,100,99,
+47,101,108,101,109,101,110,116,115,47,49,46,49,47,34,32,120,109,108,110,115,58,112,104,111,116,111,115,104,111,112,61,34,104,116,116,112,58,47,47,110,115,46,97,100,111,98,101,46,99,111,109,47,112,104,111,116,111,115,104,111,112,47,49,46,48,47,34,32,120,
+109,112,58,67,114,101,97,116,111,114,84,111,111,108,61,34,65,100,111,98,101,32,80,104,111,116,111,115,104,111,112,32,67,67,32,40,87,105,110,100,111,119,115,41,34,32,120,109,112,58,67,114,101,97,116,101,68,97,116,101,61,34,50,48,49,56,45,48,49,45,48,52,
+84,49,54,58,52,56,58,53,50,43,48,49,58,48,48,34,32,120,109,112,58,77,101,116,97,100,97,116,97,68,97,116,101,61,34,50,48,49,56,45,48,49,45,48,52,84,49,54,58,52,56,58,53,50,43,48,49,58,48,48,34,32,120,109,112,58,77,111,100,105,102,121,68,97,116,101,61,
+34,50,48,49,56,45,48,49,45,48,52,84,49,54,58,52,56,58,53,50,43,48,49,58,48,48,34,32,120,109,112,77,77,58,73,110,115,116,97,110,99,101,73,68,61,34,120,109,112,46,105,105,100,58,48,49,48,53,100,54,55,48,45,53,51,49,57,45,52,52,52,57,45,56,102,50,48,45,
+49,52,56,51,99,56,57,102,52,52,97,53,34,32,120,109,112,77,77,58,68,111,99,117,109,101,110,116,73,68,61,34,97,100,111,98,101,58,100,111,99,105,100,58,112,104,111,116,111,115,104,111,112,58,98,98,56,52,57,56,99,49,45,100,51,53,50,45,101,51,52,53,45,97,
+97,102,97,45,49,102,48,57,53,100,48,53,51,99,99,102,34,32,120,109,112,77,77,58,79,114,105,103,105,110,97,108,68,111,99,117,109,101,110,116,73,68,61,34,120,109,112,46,100,105,100,58,49,50,55,48,50,56,48,53,45,100,49,50,51,45,97,57,52,49,45,97,55,53,57,
+45,50,99,54,53,54,52,100,100,97,99,56,97,34,32,100,99,58,102,111,114,109,97,116,61,34,105,109,97,103,101,47,112,110,103,34,32,112,104,111,116,111,115,104,111,112,58,67,111,108,111,114,77,111,100,101,61,34,51,34,32,112,104,111,116,111,115,104,111,112,
+58,73,67,67,80,114,111,102,105,108,101,61,34,115,82,71,66,32,73,69,67,54,49,57,54,54,45,50,46,49,34,62,32,60,120,109,112,77,77,58,72,105,115,116,111,114,121,62,32,60,114,100,102,58,83,101,113,62,32,60,114,100,102,58,108,105,32,115,116,69,118,116,58,97,
+99,116,105,111,110,61,34,99,114,101,97,116,101,100,34,32,115,116,69,118,116,58,105,110,115,116,97,110,99,101,73,68,61,34,120,109,112,46,105,105,100,58,49,50,55,48,50,56,48,53,45,100,49,50,51,45,97,57,52,49,45,97,55,53,57,45,50,99,54,53,54,52,100,100,
+97,99,56,97,34,32,115,116,69,118,116,58,119,104,101,110,61,34,50,48,49,56,45,48,49,45,48,52,84,49,54,58,52,56,58,53,50,43,48,49,58,48,48,34,32,115,116,69,118,116,58,115,111,102,116,119,97,114,101,65,103,101,110,116,61,34,65,100,111,98,101,32,80,104,111,
+116,111,115,104,111,112,32,67,67,32,40,87,105,110,100,111,119,115,41,34,47,62,32,60,114,100,102,58,108,105,32,115,116,69,118,116,58,97,99,116,105,111,110,61,34,115,97,118,101,100,34,32,115,116,69,118,116,58,105,110,115,116,97,110,99,101,73,68,61,34,120,
+109,112,46,105,105,100,58,48,49,48,53,100,54,55,48,45,53,51,49,57,45,52,52,52,57,45,56,102,50,48,45,49,52,56,51,99,56,57,102,52,52,97,53,34,32,115,116,69,118,116,58,119,104,101,110,61,34,50,48,49,56,45,48,49,45,48,52,84,49,54,58,52,56,58,53,50,43,48,
+49,58,48,48,34,32,115,116,69,118,116,58,115,111,102,116,119,97,114,101,65,103,101,110,116,61,34,65,100,111,98,101,32,80,104,111,116,111,115,104,111,112,32,67,67,32,40,87,105,110,100,111,119,115,41,34,32,115,116,69,118,116,58,99,104,97,110,103,101,100,
+61,34,47,34,47,62,32,60,47,114,100,102,58,83,101,113,62,32,60,47,120,109,112,77,77,58,72,105,115,116,111,114,121,62,32,60,47,114,100,102,58,68,101,115,99,114,105,112,116,105,111,110,62,32,60,47,114,100,102,58,82,68,70,62,32,60,47,120,58,120,109,112,109,
+101,116,97,62,32,60,63,120,112,97,99,107,101,116,32,101,110,100,61,34,114,34,63,62,193,179,209,101,0,0,4,0,73,68,65,84,56,203,205,148,91,108,20,101,24,134,223,255,159,195,78,119,118,118,118,186,221,45,210,147,221,237,1,72,154,42,70,9,4,80,209,32,86,17,
+162,137,162,241,198,67,82,241,2,73,60,92,24,111,140,87,146,232,141,65,141,6,131,152,34,129,96,34,26,82,168,90,12,88,68,17,81,88,202,161,148,166,8,187,116,183,187,219,221,217,217,153,217,153,255,247,70,33,171,137,87,92,248,94,125,55,223,147,55,249,222,
+239,37,156,115,220,76,81,220,100,137,127,15,67,91,222,5,243,25,244,80,16,201,64,5,148,6,33,39,238,68,173,82,232,141,52,120,94,172,173,227,162,99,89,40,152,85,99,236,200,81,71,13,105,214,130,136,132,252,100,6,102,103,55,26,250,19,88,210,191,228,134,67,
+129,82,136,130,64,192,88,51,167,66,144,123,14,210,195,59,112,126,219,219,157,87,14,142,188,226,230,114,224,217,105,76,237,217,181,217,25,29,213,212,108,26,98,67,16,53,199,77,40,114,32,17,11,27,245,14,239,232,78,130,8,34,183,203,133,120,241,231,239,182,
+128,147,157,106,114,225,129,136,110,84,50,67,159,61,63,17,54,62,112,75,179,183,242,83,199,159,233,91,182,250,45,41,26,17,11,167,79,111,180,178,87,239,90,212,189,246,53,177,65,171,7,82,74,193,184,15,61,30,61,21,234,235,31,158,218,250,254,94,239,242,244,
+183,220,17,195,77,166,41,230,246,108,255,66,129,160,200,204,185,197,157,156,124,167,112,228,66,31,175,56,11,122,54,109,26,152,45,230,210,147,83,151,240,200,99,27,110,0,115,188,4,78,9,164,188,141,112,141,127,30,123,104,109,88,24,254,228,67,153,58,16,91,
+85,52,92,171,36,73,208,5,28,5,246,137,175,55,17,173,137,233,79,12,222,203,130,129,147,223,143,141,65,138,24,245,87,230,224,32,162,0,115,38,47,157,221,185,87,245,194,141,63,148,2,45,87,180,4,65,116,165,131,200,82,27,198,98,2,125,17,131,214,36,161,42,134,
+174,86,29,219,177,203,197,36,7,9,73,146,84,15,244,57,131,239,123,144,66,193,164,222,214,188,181,178,227,227,35,129,153,204,124,207,3,120,216,66,176,215,65,160,203,130,218,103,65,210,40,244,252,116,235,236,208,71,195,233,19,231,94,140,170,122,132,83,90,
+15,84,56,135,107,217,80,116,245,108,251,186,7,223,16,59,186,206,202,212,38,90,11,1,117,25,224,2,148,115,120,166,2,187,192,224,58,138,23,31,124,233,213,158,213,107,94,22,125,255,15,74,200,63,128,101,19,218,133,41,204,147,85,204,252,118,102,129,88,153,
+137,235,45,128,199,41,40,1,136,196,0,59,128,242,37,128,218,1,212,60,75,180,199,83,43,211,169,147,205,189,214,28,146,97,189,30,72,8,129,95,177,146,153,253,95,109,243,247,12,237,83,236,66,188,100,7,157,252,49,192,188,24,66,173,32,163,248,171,4,111,82,68,
+209,228,44,208,179,48,101,30,61,244,64,230,203,221,223,112,223,123,18,140,5,234,98,83,227,124,105,118,226,194,70,165,82,181,140,229,247,63,53,215,213,118,60,92,97,171,10,187,182,127,106,94,174,66,95,40,195,158,17,144,205,87,193,84,181,214,57,248,194,
+227,60,51,57,165,93,43,221,51,147,73,223,230,182,117,244,3,248,233,58,176,100,86,50,104,142,109,86,130,90,158,148,77,180,175,31,128,155,58,151,207,253,152,60,217,184,124,213,123,115,7,119,191,201,34,10,139,63,187,225,245,204,200,161,231,106,37,235,246,
+182,149,247,157,201,142,30,222,175,121,222,254,138,170,209,58,135,132,144,75,240,60,64,20,17,91,247,48,194,173,93,72,159,191,230,68,7,30,125,90,141,27,169,236,177,150,245,66,180,209,10,38,122,134,226,107,212,131,101,195,88,172,235,77,52,178,226,110,230,
+255,114,28,229,90,141,253,171,109,184,231,33,208,222,14,26,107,67,241,247,9,132,84,99,68,150,228,212,220,249,113,248,243,231,141,211,166,216,180,36,203,208,230,197,179,66,68,63,80,44,85,153,27,208,208,180,108,5,152,235,212,191,222,117,168,239,3,204,7,
+17,5,112,206,225,131,129,27,6,136,36,31,43,219,158,86,156,45,64,32,4,132,51,16,2,128,51,48,207,5,254,138,141,248,159,229,198,25,220,120,11,56,37,144,25,14,123,101,83,201,20,93,168,170,10,133,8,32,28,0,169,95,33,255,251,198,254,19,139,182,209,108,58,71,
+243,114,0,0,0,0,73,69,78,68,174,66,96,130,0,0 };
+
+const char* trigger_png = (const char*) temp_binary_data_21;
+
+//================== uncheck.png ==================
+static const unsigned char temp_binary_data_22[] =
 "\x89PNG\r\n"
 "\x1a\n"
 "\0\0\0\rIHDR\0\0\0\x18\0\0\0\x18\x08\x06\0\0\0\xe0w=\xf8\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0""9\xeciTXtXML:com.adobe.xmp\0\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n"
@@ -3932,7 +3739,7 @@ static const unsigned char temp_binary_data_21[] =
 "\xe3""AU\xed\x0e\x87+\xc6\xf8\xcb\xcc\xa6\xbb\xdd\xce\xbd\xd4\xf4\xde\xa7\xfd\x83Q\xcdn\xd8\x8a\x1fy\x9e/\xc4\x18'\x06\x03\x7f\xc2\xcc\xc6\x13""d\xa1\xd3)\x1e:\xe7^\xa6n\xfa\x11Xn\xba\x1b\xda\0\x15""d\x11\xd8\xa1\xaa\xb3\xddn\xe7\t\xb0!\x85u\x19\xf8\n"
 "|Ja\xfdQ\x0f\xcd\xa8\xfb\x80\xb4\xc9\x80\xd9t\xf4{-\xb7\xd9r\x9b\xf2\xff\xb9\xd1\xfa""C\xb0^m\xcd\xd7\xe3\xddx\x18\xd7\xfb\xb7\xe5\xcf\0\xfbk$DT\xd8\x07\x8a\0\0\0\0IEND\xae""B`\x82";
 
-const char* uncheck_png = (const char*) temp_binary_data_21;
+const char* uncheck_png = (const char*) temp_binary_data_22;
 
 
 const char* getNamedResource (const char*, int&) throw();
@@ -3956,7 +3763,7 @@ const char* getNamedResource (const char* resourceNameUTF8, int& numBytes) throw
         case 0x87305890:  numBytes = 15625; return checkbox_on_readonly_png;
         case 0x5f823a74:  numBytes = 16204; return edit_png;
         case 0xd42db8e6:  numBytes = 16030; return file_png;
-        case 0xb967d40f:  numBytes = 20744; return in_png;
+        case 0xb967d40f:  numBytes = 3608; return in_png;
         case 0x2fc6dfca:  numBytes = 16077; return nextcue_png;
         case 0xbe0a39b8:  numBytes = 20427; return out_png;
         case 0xab17ebac:  numBytes = 16163; return playpause_png;
@@ -3966,6 +3773,7 @@ const char* getNamedResource (const char* resourceNameUTF8, int& numBytes) throw
         case 0x1fded40d:  numBytes = 15919; return settings_png;
         case 0x663b186c:  numBytes = 15967; return stop_png;
         case 0x1d06227b:  numBytes = 15244; return target_png;
+        case 0xd76e9b22:  numBytes = 2629; return trigger_png;
         case 0x1bdb4ff9:  numBytes = 15619; return uncheck_png;
         default: break;
     }
@@ -3997,6 +3805,7 @@ const char* namedResourceList[] =
     "settings_png",
     "stop_png",
     "target_png",
+    "trigger_png",
     "uncheck_png"
 };
 

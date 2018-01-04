@@ -19,8 +19,8 @@ p2d(parameter),
 	xParam.defaultValue = 0;
 	yParam.defaultValue = 0;
 
-	xParam.addAsyncCoalescedListener(this);
-	yParam.addAsyncCoalescedListener(this);
+	xParam.addAsyncCoalescedParameterListener(this);
+	yParam.addAsyncCoalescedParameterListener(this);
 
 	addAndMakeVisible(&xSlider);
 	addAndMakeVisible(&ySlider);

@@ -100,7 +100,11 @@ public:
 
 	static var setValueFromScript(const juce::var::NativeFunctionArgs& a);
 
-public:
+	virtual InspectableEditor * getEditor(bool /*isRootEditor*/) override;
+	virtual String getTypeString() const { jassert(false); return ""; } //should be overriden
+
+
+
 	class  Listener
 	{
 	public:
@@ -117,9 +121,26 @@ public:
 	void addControllableListener(Listener* newListener) { listeners.add(newListener); }
 	void removeControllableListener(Listener* listener) { listeners.remove(listener); }
 
-	virtual InspectableEditor * getEditor(bool /*isRootEditor*/) override;
+																		// ASYNC
+	class  ControllableEvent
+	{
+	public:
+		enum Type { STATE_CHANGED, CONTROLADDRESS_CHANGED, NAME_CHANGED, CONTROLLABLE_REMOVED };
 
-	virtual String getTypeString() const { jassert(false); return ""; } //should be overriden
+		ControllableEvent(Type t, Controllable * c) : type(t),controllable(c) {}
+
+		Type type;
+		Controllable * controllable;
+	};
+
+	QueuedNotifier<ControllableEvent> queuedNotifier;
+	typedef QueuedNotifier<ControllableEvent>::Listener AsyncListener;
+
+
+	void addAsyncControllableListener(AsyncListener* newListener) { queuedNotifier.addListener(newListener); }
+	void addAsyncCoalescedControllableListener(AsyncListener* newListener) { queuedNotifier.addAsyncCoalescedListener(newListener); }
+	void removeAsyncControllableListener(AsyncListener* listener) { queuedNotifier.removeListener(listener); }
+
 
 private:
 

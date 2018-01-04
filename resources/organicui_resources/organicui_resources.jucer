@@ -30,6 +30,7 @@
       <FILE id="K6dyge" name="settings.png" compile="0" resource="1" file="Resources/settings.png"/>
       <FILE id="grSnl9" name="stop.png" compile="0" resource="1" file="Resources/stop.png"/>
       <FILE id="ZVsExK" name="target.png" compile="0" resource="1" file="Resources/target.png"/>
+      <FILE id="FixPlj" name="trigger.png" compile="0" resource="1" file="Resources/trigger.png"/>
       <FILE id="utiCOQ" name="uncheck.png" compile="0" resource="1" file="Resources/uncheck.png"/>
     </GROUP>
     <GROUP id="{279380FE-558A-8939-19FF-B071B9CB7AF4}" name="Source"/>

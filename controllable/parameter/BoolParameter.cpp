@@ -9,7 +9,7 @@
 */
 
 BoolParameter::BoolParameter(const String & niceName, const String &description, bool initialValue, bool enabled) :
-    Parameter(Type::BOOL, niceName, description, initialValue, false, true, enabled)
+    Parameter(Type::BOOL, niceName, description, initialValue, 0, 1, enabled)
 {
     setValue(initialValue);
 	argumentsDescription = "0/1";

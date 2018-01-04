@@ -25,7 +25,6 @@ public:
     TriggerButtonUI(Trigger * t);
     ~TriggerButtonUI();
 
-
     void paint (Graphics&) override;
     void triggerTriggered(const Trigger * p) override ;
 

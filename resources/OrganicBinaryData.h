@@ -42,7 +42,7 @@ namespace OrganicUIBinaryData
     const int            file_pngSize = 16030;
 
     extern const char*   in_png;
-    const int            in_pngSize = 20744;
+    const int            in_pngSize = 3608;
 
     extern const char*   nextcue_png;
     const int            nextcue_pngSize = 16077;
@@ -71,6 +71,9 @@ namespace OrganicUIBinaryData
     extern const char*   target_png;
     const int            target_pngSize = 15244;
 
+    extern const char*   trigger_png;
+    const int            trigger_pngSize = 2629;
+
     extern const char*   uncheck_png;
     const int            uncheck_pngSize = 15619;
 
@@ -78,7 +81,7 @@ namespace OrganicUIBinaryData
     extern const char* namedResourceList[];
 
     // Number of elements in the namedResourceList array.
-    const int namedResourceListSize = 22;
+    const int namedResourceListSize = 23;
 
     // If you provide the name of one of the binary resource variables above, this function will
     // return the corresponding data and its size (or a null pointer if the name isn't found).

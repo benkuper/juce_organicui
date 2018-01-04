@@ -44,6 +44,7 @@ void TriggerImageUI::triggerTriggered(const Trigger *)
 
 void TriggerImageUI::mouseDownInternal(const MouseEvent &)
 {
+	if (controllable->isControllableFeedbackOnly) return;
 	trigger->trigger();
 }
 

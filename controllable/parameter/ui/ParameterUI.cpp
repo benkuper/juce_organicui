@@ -16,7 +16,7 @@ ParameterUI::ParameterUI(Parameter * parameter) :
     showEditWindowOnDoubleClick(true),
     showValue(true)
 {
-	parameter->addAsyncCoalescedListener(this);
+	parameter->addAsyncCoalescedParameterListener(this);
 
 }
 
@@ -83,6 +83,12 @@ void ParameterUI::addPopupMenuItems(PopupMenu * p)
 	if (parameter->isEditable && !parameter->isControllableFeedbackOnly)
 	{
 		p->addItem(1, "Reset value");
+
+		if (parameter->isEditable && !parameter->isControllableFeedbackOnly && showEditWindowOnRightClick)
+		{
+			p->addSeparator();
+			p->addItem(-3, "Show Edit Window");
+		}
 
 		if (!parameter->lockManualControlMode)
 		{

@@ -15,7 +15,7 @@
 class ControllableUI :
 	public Component, 
 	public SettableTooltipClient, 
-	public Controllable::Listener
+	public Controllable::AsyncListener
 {
 public:
     ControllableUI(Controllable * controllable);
@@ -51,9 +51,10 @@ public:
 
 	virtual void showEditWindow() {} //to be overriden by children
 
-    // Inherited via Listener
-    virtual void controllableStateChanged(Controllable * c) override;
-    virtual void controllableControlAddressChanged(Controllable * c) override;
+	virtual void newMessage(const Controllable::ControllableEvent &e) override;
+
+    virtual void controllableStateChanged();
+    virtual void controllableControlAddressChanged();
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ControllableUI)

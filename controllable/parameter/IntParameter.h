@@ -13,6 +13,7 @@
 
 class IntSliderUI;
 class IntStepperUI;
+class IntParameterLabelUI;
 
 class IntParameter : public Parameter
 {
@@ -23,7 +24,8 @@ public:
     void setValueInternal(var & _value) override;
 
     IntSliderUI * createSlider(IntParameter * target = nullptr);
-    IntStepperUI * createStepper(IntParameter * target = nullptr);
+	IntStepperUI * createStepper(IntParameter * target = nullptr);
+	IntParameterLabelUI * createLabelUI(IntParameter * target = nullptr);
     ControllableUI * createDefaultUI(Controllable * targetControllable = nullptr) override;
 
 	static IntParameter * create() { return new IntParameter("New Int Parameter", "", 0); }

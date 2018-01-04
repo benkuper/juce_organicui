@@ -11,10 +11,10 @@
 
 //==============================================================================
 TriggerButtonUI::TriggerButtonUI(Trigger *t) :
-    TriggerUI(t)
+	TriggerUI(t)
 {
-    setSize(20, 15);
-	if(!forceFeedbackOnly) setRepaintsOnMouseActivity(true);
+	setSize(20, 15);
+	if (!forceFeedbackOnly) setRepaintsOnMouseActivity(true);
 }
 
 TriggerButtonUI::~TriggerButtonUI()
@@ -29,15 +29,17 @@ void TriggerButtonUI::triggerTriggered(const Trigger *){
 void TriggerButtonUI::mouseDownInternal(const MouseEvent & e)
 {
 	if (forceFeedbackOnly) return;
-
 	trigger->trigger();
 }
 
 void TriggerButtonUI::paint (Graphics& g)
 {
-    Point<int> center = getBounds().getCentre();
+	Rectangle<float> r = getLocalBounds().toFloat();
+	if (!showLabel) r.setWidth(jmin<float>(r.getWidth(), 50));
 
-	Colour c = NORMAL_COLOR;
+    Point<float> center = r.getCentre();
+
+	Colour c = BG_COLOR;
 	if (!forceFeedbackOnly)
 	{
 
@@ -48,10 +50,10 @@ void TriggerButtonUI::paint (Graphics& g)
 		DBG(trigger->niceName << " force feedback");
 	}
 
-    g.setGradientFill(ColourGradient(c,(float)center.x,(float)center.y,c.darker(.2f),2.f,2.f,true));
-    g.fillRoundedRectangle(getLocalBounds().toFloat(), 4.f);
+    g.setGradientFill(ColourGradient(c,center.x,center.y,c.darker(.5f),2.f,2.f,true));
+    g.fillRoundedRectangle(r.toFloat(), 4.f);
     g.setColour(c.darker());
-    g.drawRoundedRectangle(getLocalBounds().toFloat(), 4.f, 2.f);
+    g.drawRoundedRectangle(r.toFloat(), 4.f, 2.f);
 
 	if (showLabel)
 	{

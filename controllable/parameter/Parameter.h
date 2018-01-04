@@ -125,7 +125,7 @@ public:
 
 
     void addAsyncParameterListener(AsyncListener* newListener) { queuedNotifier.addListener(newListener); }
-    void addAsyncCoalescedListener(AsyncListener* newListener) { queuedNotifier.addAsyncCoalescedListener(newListener); }
+    void addAsyncCoalescedParameterListener(AsyncListener* newListener) { queuedNotifier.addAsyncCoalescedListener(newListener); }
     void removeAsyncParameterListener(AsyncListener* listener) { queuedNotifier.removeListener(listener); }
 
 

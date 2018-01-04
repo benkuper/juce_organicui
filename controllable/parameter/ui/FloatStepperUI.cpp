@@ -1,3 +1,4 @@
+#include "FloatStepperUI.h"
 /*
   ==============================================================================
 
@@ -15,6 +16,7 @@ FloatStepperUI::FloatStepperUI(Parameter * _parameter) :
 	showEditWindowOnDoubleClick = false;
 
 	slider = new BetterStepper(tooltip);
+	slider->setEnabled(parameter->enabled && parameter->isEditable && !parameter->isControllableFeedbackOnly);
 	
     addAndMakeVisible(slider);
     slider->setRange((int)parameter->minimumValue-1, (int)parameter->maximumValue+1,1);
@@ -47,6 +49,12 @@ void FloatStepperUI::sliderValueChanged(Slider * _slider)
 {
 	parameter->setValue(_slider->getValue());
 }
+void FloatStepperUI::controllableStateChanged()
+{
+	ParameterUI::controllableStateChanged();
+	slider->setEnabled(parameter->enabled && parameter->isEditable && !parameter->isControllableFeedbackOnly);
+}
+
 void FloatStepperUI::rangeChanged(Parameter *){
 	slider->setRange((int)parameter->minimumValue - 1, (int)parameter->maximumValue + 1, 1);
 

@@ -46,6 +46,7 @@
 #include "controllable/parameter/ui/DoubleSliderUI.cpp"
 #include "controllable/parameter/ui/EnumParameterUI.cpp"
 #include "controllable/parameter/ui/FloatParameterLabelUI.cpp"
+#include "controllable/parameter/ui/IntParameterLabelUI.cpp"
 #include "controllable/parameter/ui/FloatSliderUI.cpp"
 #include "controllable/parameter/ui/FloatStepperUI.cpp"
 #include "controllable/parameter/ui/IntSliderUI.cpp"

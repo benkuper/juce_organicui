@@ -18,7 +18,7 @@ ControllableUI::ControllableUI(Controllable * controllable) :
 {
 	jassert(controllable != nullptr);
 	updateTooltip();
-	controllable->addControllableListener(this);
+	controllable->addAsyncControllableListener(this);
 
 
 	setEnabled(controllable->enabled);
@@ -29,7 +29,7 @@ ControllableUI::ControllableUI(Controllable * controllable) :
 
 ControllableUI::~ControllableUI()
 {
-	if (controllable.get())controllable->removeControllableListener(this);
+	if (controllable.get())controllable->removeAsyncControllableListener(this);
 }
 
 
@@ -52,12 +52,7 @@ void ControllableUI::mouseDown(const MouseEvent & e)
 			ScopedPointer<PopupMenu> p = new PopupMenu();
 			addPopupMenuItems(p);
 
-			if (controllable->isEditable && !controllable->isControllableFeedbackOnly)
-			{
-				p->addSeparator();
-				p->addItem(-3, "Show Edit Window");
-			}
-	
+			
 			if (controllable->includeInScriptObject)
 			{
 				p->addSeparator();
@@ -115,14 +110,39 @@ void ControllableUI::setForceFeedbackOnly(bool value)
 	setForceFeedbackOnlyInternal();
 }
 
-void ControllableUI::controllableStateChanged(Controllable * c)
+void ControllableUI::newMessage(const Controllable::ControllableEvent & e)
 {
-	setEnabled(c->enabled);
-	setAlpha(c->enabled ? 1 : .5f);
+	switch (e.type)
+	{
+	case Controllable::ControllableEvent::CONTROLADDRESS_CHANGED:
+		controllableControlAddressChanged();
+		break;
+
+	case Controllable::ControllableEvent::NAME_CHANGED:
+		break;
+
+	case Controllable::ControllableEvent::STATE_CHANGED:
+		controllableStateChanged();
+		break;
+
+	case Controllable::ControllableEvent::CONTROLLABLE_REMOVED:
+		break;
+
+	default:
+		//NOT HANDLED
+		break;
+
+	}
+}
+
+void ControllableUI::controllableStateChanged()
+{
+	setEnabled(controllable->enabled);
+	setAlpha(controllable->enabled ? 1 : .5f);
 	setInterceptsMouseClicks(controllable->enabled, controllable->enabled);
 }
 
-void ControllableUI::controllableControlAddressChanged(Controllable *)
+void ControllableUI::controllableControlAddressChanged()
 {
 	updateTooltip();
 }

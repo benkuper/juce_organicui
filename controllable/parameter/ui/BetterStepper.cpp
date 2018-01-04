@@ -1,3 +1,4 @@
+#include "BetterStepper.h"
 /*
   ==============================================================================
 
@@ -8,10 +9,11 @@
   ==============================================================================
 */
 
-BetterStepper::BetterStepper(const String &tooltip) : Slider(SliderStyle::IncDecButtons,TextEntryBoxPosition::TextBoxLeft)
+BetterStepper::BetterStepper(const String &tooltip) : 
+	Slider(SliderStyle::IncDecButtons,TextEntryBoxPosition::TextBoxLeft)
 {
 	setTooltip(tooltip);
-	setIncDecButtonsMode(IncDecButtonMode::incDecButtonsDraggable_AutoDirection);
+	setIncDecButtonsMode(IncDecButtonMode::incDecButtonsDraggable_Vertical);
 }
 
 BetterStepper::~BetterStepper()

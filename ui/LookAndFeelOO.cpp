@@ -1601,11 +1601,14 @@ void LookAndFeelOO::drawDocumentWindowTitleBar (DocumentWindow& window, Graphics
 {
     const bool isActive = window.isActiveWindow();
 
-    g.setGradientFill (ColourGradient (window.getBackgroundColour(),
+	g.setColour(BG_COLOR);
+	/*
+	ColourGradient(window.getBackgroundColour(),
                                        0.0f, 0.0f,
                                        window.getBackgroundColour().contrasting (isActive ? 0.15f : 0.05f),
                                        0.0f, (float) h, false));
-    g.fillAll();
+    */
+	g.fillAll();
 
     Font font (h * 0.65f, Font::bold);
     g.setFont (font);

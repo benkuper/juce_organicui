@@ -11,7 +11,9 @@
 #ifndef FLOATSTEPPERUI_H_INCLUDED
 #define FLOATSTEPPERUI_H_INCLUDED
 
-class FloatStepperUI : public ParameterUI, public Slider::Listener
+class FloatStepperUI : 
+	public ParameterUI, 
+	public Slider::Listener
 {
 
 public:
@@ -31,6 +33,7 @@ protected:
     // Inherited via Listener
     virtual void sliderValueChanged(Slider * slider) override;
 
+	virtual void controllableStateChanged() override;
 };
 
 

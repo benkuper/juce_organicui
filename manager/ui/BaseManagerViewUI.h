@@ -265,7 +265,7 @@ void BaseManagerViewUI<M, T, U>::homeView()
 template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::frameView()
 {
-	viewOffset = (-getItemsCenter()*getSize()).toInt();
+	viewOffset = -getItemsCenter().toInt();
 	this->resized();
 	this->repaint();
 }

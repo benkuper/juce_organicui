@@ -167,7 +167,7 @@ void Parameter::setNormalizedValue(const float & normalizedValue, bool silentSet
 
 float Parameter::getNormalizedValue()
 {
-	if (type != FLOAT) return 0;
+	if (type != FLOAT && type != INT && type != BOOL) return 0;
 	if (minimumValue == maximumValue) {
 		return 0.0;
 	} else
