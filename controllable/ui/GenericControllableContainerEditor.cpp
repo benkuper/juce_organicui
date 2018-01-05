@@ -216,9 +216,9 @@ void GenericControllableContainerEditor::newMessage(const ContainerAsyncEvent & 
 		break;
 
 	case ContainerAsyncEvent::ControllableRemoved:
-		//removeControllableUI(p.targetControllable, true);
-		resetAndBuild();
-		resized();
+		removeControllableUI(p.targetControllable, true);
+		//resetAndBuild();
+		//resized();
 		break;
 
 	case ContainerAsyncEvent::ControllableContainerAdded:

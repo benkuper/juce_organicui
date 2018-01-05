@@ -65,6 +65,7 @@ void ParameterUI::showEditWindow()
 
 void ParameterUI::paintOverChildren(Graphics & g)
 {
+
 	ControllableUI::paintOverChildren(g);
 	if (parameter->controlMode == Parameter::EXPRESSION)
 	{
