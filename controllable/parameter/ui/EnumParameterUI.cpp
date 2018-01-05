@@ -21,6 +21,7 @@ EnumParameterUI::EnumParameterUI(Parameter * parameter) :
 
 	ep->addEnumParameterListener(this);
 
+
 	updateComboBox();
 }
 
@@ -47,6 +48,8 @@ void EnumParameterUI::updateComboBox()
 	}
 
 	cb.setSelectedId(keyIdMap[ep->stringValue()], dontSendNotification);
+	cb.setEnabled(parameter->enabled && !forceFeedbackOnly);
+	cb.setInterceptsMouseClicks(parameter->enabled && !forceFeedbackOnly, parameter->enabled && !forceFeedbackOnly);
 }
 
 String EnumParameterUI::getSelectedKey()
@@ -72,6 +75,7 @@ void EnumParameterUI::enumOptionRemoved(EnumParameter *, const String &)
 void EnumParameterUI::setForceFeedbackOnlyInternal()
 {
 	cb.setEnabled(parameter->isEditable && !forceFeedbackOnly);
+	cb.setInterceptsMouseClicks(parameter->enabled && !forceFeedbackOnly, parameter->enabled && !forceFeedbackOnly);
 }
 
 void EnumParameterUI::valueChanged(const var & value)

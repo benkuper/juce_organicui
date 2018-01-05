@@ -25,7 +25,8 @@ StringParameterUI::StringParameterUI(Parameter * p) :
     valueLabel.setText(parameter->value,NotificationType::dontSendNotification);
     valueLabel.setColour(valueLabel.textColourId, parameter->isEditable?TEXT_COLOR:TEXT_COLOR.withAlpha(.6f));
 
-	valueLabel.setEditable(false,parameter->isEditable);
+	valueLabel.setEnabled(parameter->isEditable && !forceFeedbackOnly);
+	valueLabel.setEditable(false,parameter->isEditable && !forceFeedbackOnly);
 	valueLabel.addListener(this);
 
     valueLabel.setColour(valueLabel.backgroundWhenEditingColourId, Colours::white);
@@ -71,6 +72,7 @@ void StringParameterUI::setForceFeedbackOnlyInternal()
 {
 	ParameterUI::setForceFeedbackOnlyInternal();
 	valueLabel.setEditable(false, parameter->isEditable && !forceFeedbackOnly);
+	valueLabel.setEnabled(parameter->isEditable && !forceFeedbackOnly);
 	setOpaqueBackground(opaqueBackground); //force refresh color
 }
 
