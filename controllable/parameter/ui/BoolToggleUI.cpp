@@ -1,3 +1,4 @@
+#include "BoolToggleUI.h"
 /*
   ==============================================================================
 
@@ -59,7 +60,7 @@ void BoolToggleUI::paint(Graphics & g)
 	}
 
 	g.drawImage(m, cr.toFloat());
-	
+	drawRect = cr;
 	
 	/*
     g.setGradientFill(ColourGradient(c.brighter(.2f),(float)getLocalBounds().getCentreX(),(float)getLocalBounds().getCentreY(), c.darker(.2f), 2.f,2.f,true));
@@ -84,6 +85,11 @@ void BoolToggleUI::mouseUpInternal(const MouseEvent & e)
 {
 	if (!parameter->isEditable || forceFeedbackOnly) return;
     if (e.mods.isRightButtonDown()) parameter->setValue(!parameter->boolValue());
+}
+
+bool BoolToggleUI::hitTest(int x, int y)
+{
+	return drawRect.contains(x, y);
 }
 
 void BoolToggleUI::valueChanged(const var & )

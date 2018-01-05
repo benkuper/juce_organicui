@@ -137,6 +137,8 @@ using namespace juce;
 
 #include "engine/Engine.h"
 
+#include "settings/GlobalSettings.h"
+
 #include "ui/shapeshifter/GapGrabber.h"
 #include "ui/shapeshifter/ShapeShifter.h"
 #include "ui/shapeshifter/ShapeShifterContainer.h"

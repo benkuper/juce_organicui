@@ -99,7 +99,12 @@ bool BaseItemMinimalUI<T>::keyPressed(const KeyPress & e)
 {
 	if (removeOnDelKey && (e.getKeyCode() == e.deleteKey || e.getKeyCode() == e.backspaceKey) && inspectable->isSelected)
 	{
-		baseItem->remove();
+		if (this->baseItem->askConfirmationBeforeRemove && GlobalSettings::getInstance()->askBeforeRemovingItems->boolValue())
+		{
+			int result = AlertWindow::showOkCancelBox(AlertWindow::QuestionIcon, "Delete " + this->baseItem->niceName, "Are you sure you want to delete this ?", "Delete", "Cancel");
+			if (result != 0)this->baseItem->remove();
+		} else this->baseItem->remove();
+
 		return true;
 	} else if (e.getModifiers().isCommandDown())
 	{

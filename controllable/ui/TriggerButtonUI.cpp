@@ -1,3 +1,4 @@
+#include "TriggerButtonUI.h"
 /*
   ==============================================================================
 
@@ -32,6 +33,11 @@ void TriggerButtonUI::mouseDownInternal(const MouseEvent & e)
 	trigger->trigger();
 }
 
+bool TriggerButtonUI::hitTest(int x, int y)
+{
+	return drawRect.contains(x, y);
+}
+
 void TriggerButtonUI::paint (Graphics& g)
 {
 	Rectangle<float> r = getLocalBounds().toFloat();
@@ -61,4 +67,6 @@ void TriggerButtonUI::paint (Graphics& g)
 		g.setColour(Colours::white.darker(.1f));
 		g.drawFittedText(trigger->niceName, getLocalBounds().reduced(2), Justification::centred, 1);
 	}
+
+	drawRect = r.toNearestInt();
 }

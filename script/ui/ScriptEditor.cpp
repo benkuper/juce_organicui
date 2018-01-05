@@ -85,6 +85,7 @@ void ScriptEditor::newMessage(const Script::ScriptEvent & e)
 	case Script::ScriptEvent::STATE_CHANGE:
 			resetAndBuild();
 			resized();
+			repaint();
 		break;
 	}
 }

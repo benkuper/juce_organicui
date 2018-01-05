@@ -21,6 +21,8 @@ public:
 	Image offImage;
 	Image onImage;
 
+	Rectangle<int> drawRect;
+
     bool invertVisuals;
 
 	void setImages(Image onImage, Image offImage);
@@ -28,6 +30,9 @@ public:
     void paint(Graphics &g) override;
     void mouseDownInternal(const MouseEvent &e) override;
     void mouseUpInternal(const MouseEvent &e) override;
+
+	bool hitTest(int x, int y) override;
+
 protected:
     void valueChanged(const var & ) override;
 

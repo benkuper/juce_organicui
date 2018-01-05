@@ -47,7 +47,7 @@ void BaseItemEditor::buttonClicked(Button * b)
 
 	if (b == removeBT)
 	{ 
-		if (this->item->askConfirmationBeforeRemove)
+		if (this->item->askConfirmationBeforeRemove && GlobalSettings::getInstance()->askBeforeRemovingItems->boolValue())
 		{
 			int result = AlertWindow::showOkCancelBox(AlertWindow::QuestionIcon, "Delete " + this->item->niceName, "Are you sure you want to delete this ?", "Delete", "Cancel");
 			if (result != 0)this->item->remove();

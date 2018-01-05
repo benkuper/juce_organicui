@@ -40,7 +40,6 @@ public :
 
 	void removeItem(T *, bool fromUndoableAction = false);
 
-
 	virtual void reorderItems(); //to be overriden if needed
 
 	//to override for specific handling like adding custom listeners, etc.
