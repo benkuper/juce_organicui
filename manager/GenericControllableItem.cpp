@@ -11,7 +11,7 @@
 
 
 GenericControllableItem::GenericControllableItem(var params) :
-	BaseItem("Item",false)
+	BaseItem("Item",true)
 {
 	typeAtCreation = params.getProperty("type", "");
 
