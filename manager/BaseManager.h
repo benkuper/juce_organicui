@@ -49,7 +49,7 @@ public :
 
 	T * getItemWithName(const String &itemShortName, bool searchNiceNameToo = false);
 
-	void clear();
+	virtual void clear();
 	void askForRemoveBaseItem(BaseItem * item) override;
 	void askForDuplicateItem(BaseItem * item) override;
 	void askForPaste() override;
