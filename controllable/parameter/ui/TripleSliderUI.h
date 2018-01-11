@@ -38,6 +38,7 @@ public:
 
 	void showEditWindow() override;
 
+	virtual void rangeChanged(Parameter *) override;
 protected:
 	virtual void newMessage(const Parameter::ParameterEvent &e) override;
 

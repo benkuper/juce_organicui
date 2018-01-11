@@ -30,7 +30,7 @@ public:
 
 	ControllableUI * createDefaultUI(Controllable * targetControllable = nullptr) override;
 
-	static Point2DParameter * create() { return new Point2DParameter("New Point2D Parameter", "", 0); }
+	static Point2DParameter * create() { return new Point2DParameter("New Point2D Parameter", ""); }
 	virtual String getTypeString() const override { return getTypeStringStatic(); }
 	static String getTypeStringStatic() { return "Point2D"; }
 

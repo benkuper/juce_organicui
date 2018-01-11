@@ -30,7 +30,7 @@ public:
 
 	ControllableUI * createDefaultUI(Controllable * targetControllable = nullptr) override;
 
-	static Point3DParameter * create() { return new Point3DParameter("New Point3D Parameter", "", 0); }
+	static Point3DParameter * create() { return new Point3DParameter("New Point3D Parameter", ""); }
 	virtual String getTypeString() const override { return getTypeStringStatic(); }
 	static String getTypeStringStatic() { return "Point3D"; }
 

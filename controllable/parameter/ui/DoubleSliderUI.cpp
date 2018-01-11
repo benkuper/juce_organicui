@@ -11,16 +11,16 @@
 
 DoubleSliderUI::DoubleSliderUI(Point2DParameter * parameter) :
 	ParameterUI(parameter),
-p2d(parameter),
+	p2d(parameter),
 	xParam("X","xParam",parameter->x, parameter->minimumValue[0],parameter->maximumValue[0]),
-	yParam("Y", "yParam", parameter->y,parameter->minimumValue[0],parameter->maximumValue[0]),
+	yParam("Y", "yParam", parameter->y, parameter->minimumValue[1],parameter->maximumValue[1]),
 	xSlider(&xParam), ySlider(&yParam)
 {
 	xParam.defaultValue = 0;
 	yParam.defaultValue = 0;
 
-	xParam.addAsyncCoalescedParameterListener(this);
-	yParam.addAsyncCoalescedParameterListener(this);
+	xParam.addAsyncParameterListener(this);
+	yParam.addAsyncParameterListener(this);
 
 	addAndMakeVisible(&xSlider);
 	addAndMakeVisible(&ySlider);
@@ -41,6 +41,7 @@ DoubleSliderUI::~DoubleSliderUI()
 void DoubleSliderUI::resized()
 {
 	Rectangle<int> r = getLocalBounds();
+	DBG("X Slider : " << (int)isEnabled() << "/" << (int)(parameter->enabled));
 	xSlider.setBounds(r.removeFromLeft(r.getWidth() / 2 - 5));
 	ySlider.setBounds(r.removeFromRight(r.getWidth() - 10));
 }
@@ -86,6 +87,13 @@ void DoubleSliderUI::showEditWindow()
 	}
 }
 
+void DoubleSliderUI::rangeChanged(Parameter * p)
+{
+	if (p != parameter) return;
+	xParam.setRange(parameter->minimumValue[0], parameter->maximumValue[0]);
+	yParam.setRange(parameter->minimumValue[1], parameter->maximumValue[1]);
+}
+
 
 void DoubleSliderUI::setForceFeedbackOnlyInternal()
 {
@@ -96,9 +104,10 @@ void DoubleSliderUI::setForceFeedbackOnlyInternal()
 
 void DoubleSliderUI::newMessage(const Parameter::ParameterEvent & e)
 {
+	ParameterUI::newMessage(e);
 	if (e.parameter == parameter)
 	{
-		xParam.setValue(((Point2DParameter *)e.parameter)->x);
+		xParam.setValue(((Point2DParameter *)e.parameter)->x); 
 		yParam.setValue(((Point2DParameter *)e.parameter)->y);
 
 	} else if (e.parameter == &xParam)
@@ -107,9 +116,5 @@ void DoubleSliderUI::newMessage(const Parameter::ParameterEvent & e)
 	} else if (e.parameter == &yParam)
 	{
 		if (yParam.floatValue() != p2d->y) p2d->setPoint(xParam.floatValue(), yParam.floatValue());
-	} else if (e.type == Parameter::ParameterEvent::BOUNDS_CHANGED)
-	{
-		xParam.setRange(e.parameter->minimumValue[0], e.parameter->maximumValue[0]);
-		yParam.setRange(e.parameter->minimumValue[1], e.parameter->maximumValue[1]);
 	}
 }

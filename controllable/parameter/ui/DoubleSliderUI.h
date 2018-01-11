@@ -32,6 +32,8 @@ public:
 
 	void showEditWindow() override;
 
+	virtual void rangeChanged(Parameter * p) override;
+
 protected:
 	void setForceFeedbackOnlyInternal() override;
 	virtual void newMessage(const Parameter::ParameterEvent & e) override;
