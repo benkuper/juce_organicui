@@ -59,10 +59,18 @@ void TargetParameterUI::updateLabel()
 	String newText;
 	if (targetParameter->targetType == TargetParameter::TargetType::CONTROLLABLE)
 	{
-		if (targetParameter->target != nullptr) newText = targetParameter->showFullAddressInEditor ? targetParameter->target->getControlAddress() : (targetParameter->showParentNameInEditor?targetParameter->target->parentContainer->niceName + ":":"") + targetParameter->target->niceName;
+		if (targetParameter->target != nullptr)
+		{
+			if (targetParameter->customGetControllableLabelFunc != nullptr) newText = targetParameter->customGetControllableLabelFunc(targetParameter->target);
+			else newText = targetParameter->showFullAddressInEditor ? targetParameter->target->getControlAddress() : (targetParameter->showParentNameInEditor ? targetParameter->target->parentContainer->niceName + ":" : "") + targetParameter->target->niceName;
+		}
 	} else //TargetType::CONTAINER
 	{
-		if (targetParameter->targetContainer != nullptr) newText = newText = targetParameter->showFullAddressInEditor ? targetParameter->targetContainer->getControlAddress() : (targetParameter->showParentNameInEditor ? targetParameter->targetContainer->parentContainer->niceName + ":" : "") + targetParameter->targetContainer->niceName;
+		if (targetParameter->targetContainer != nullptr)
+		{
+			if (targetParameter->customGetContainerLabelFunc != nullptr) newText = targetParameter->customGetContainerLabelFunc(targetParameter->targetContainer);
+			else newText = newText = targetParameter->showFullAddressInEditor ? targetParameter->targetContainer->getControlAddress() : (targetParameter->showParentNameInEditor ? targetParameter->targetContainer->parentContainer->niceName + ":" : "") + targetParameter->targetContainer->niceName;
+		}
 	}
 
 	if (newText.isEmpty())

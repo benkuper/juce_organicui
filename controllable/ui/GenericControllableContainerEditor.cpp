@@ -57,6 +57,7 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(WeakRefer
 		resized();
 	}
 
+	DBG("Base Item editor " << container->niceName);
 }
 
 GenericControllableContainerEditor::~GenericControllableContainerEditor()
@@ -124,19 +125,36 @@ void GenericControllableContainerEditor::resetAndBuild()
 {
 	clear();
 
+	if (container == nullptr)
+	{
+		LOGWARNING("An error has occured here (container null on ResetAndBuild");
+		return;
+	}
 	if (container->hideInEditor) return;
 	
 	if (!canBeCollapsed() || !container->editorIsCollapsed)
 	{
 		for (auto &c : container->controllables)
 		{
+			if (c == nullptr)
+			{
+				LOGWARNING("An error has occured here (child controllable null on ResetAndBuild");
+				continue;
+
+			}
 			if (!c->hideInEditor) addControllableUI(c);
-		}
+		}	
 
 		if (container->canInspectChildContainers)
 		{
 			for (auto &cc : container->controllableContainers)
 			{
+				if (cc == nullptr)
+				{
+					LOGWARNING("An error has occured here (child container null on ResetAndBuild");
+					continue;
+				}
+
 				if (!cc->hideInEditor) addEditorUI(cc);
 			}
 		}

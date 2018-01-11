@@ -212,7 +212,7 @@ void ControllableContainer::setCustomShortName(const String &_shortName) {
 
 void ControllableContainer::setAutoShortName() {
 	hasCustomShortName = false;
-	shortName = StringUtil::toShortName(niceName);
+	shortName = StringUtil::toShortName(niceName,true);
 	scriptTargetName = shortName;
 	updateChildrenControlAddress();
 	onContainerShortNameChanged();

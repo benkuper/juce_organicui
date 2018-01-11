@@ -21,7 +21,9 @@ TargetParameter::TargetParameter(const String & niceName, const String & descrip
 	target(nullptr),
 	targetContainer(nullptr),
 	customGetTargetFunc(nullptr),
-	customGetTargetContainerFunc(nullptr)
+	customGetTargetContainerFunc(nullptr),
+	customGetControllableLabelFunc(nullptr),
+	customGetContainerLabelFunc(nullptr)
 {
 	lockManualControlMode = true;
 
@@ -51,8 +53,6 @@ void TargetParameter::setGhostValue(const String & ghostVal)
 	{
 		if(!rootContainer.wasObjectDeleted()) rootContainer->removeControllableContainerListener(this);
 	}
-
-	
 }
 
 void TargetParameter::setValueFromTarget(Controllable * c)
@@ -76,7 +76,6 @@ void TargetParameter::setValueInternal(var & newVal)
 		if (targetType == CONTAINER)
 		{
 			WeakReference<ControllableContainer> cc = rootContainer->getControllableContainerForAddress(newVal.toString());
-			DBG("Target type container : " << (int)(cc != nullptr));
 			if (cc != nullptr) setTarget(cc);
 			else setGhostValue(newVal.toString());
 		} else
@@ -85,7 +84,6 @@ void TargetParameter::setValueInternal(var & newVal)
 			if (c != nullptr) setTarget(c);
 			else setGhostValue(newVal.toString());
 		}
-		
 	} else
 	{
 		if(targetType == CONTAINER) setTarget((ControllableContainer *)nullptr);

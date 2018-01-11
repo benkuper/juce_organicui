@@ -84,7 +84,7 @@ template<class T>
 void BaseItemMinimalUI<T>::mouseDown(const MouseEvent & e)
 {
 	InspectableContentComponent::mouseDown(e);
-	if (removeOnCtrlDown && e.mods.isLeftButtonDown() && e.mods.isCtrlDown()) baseItem->remove();
+	if (removeOnCtrlDown && e.mods.isLeftButtonDown() && e.mods.isCommandDown()) baseItem->remove();
 }
 
 template<class T>

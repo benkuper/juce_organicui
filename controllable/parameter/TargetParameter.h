@@ -41,6 +41,8 @@ public:
 	
 	std::function<Controllable*(bool, bool)> customGetTargetFunc;
 	std::function<ControllableContainer*()> customGetTargetContainerFunc;
+	std::function<String(Controllable*)> customGetControllableLabelFunc;
+	std::function<String(ControllableContainer*)> customGetContainerLabelFunc;
 
 	void setGhostValue(const String &ghostVal);
 

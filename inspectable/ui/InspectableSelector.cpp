@@ -1,3 +1,4 @@
+#include "InspectableSelector.h"
 /*
   ==============================================================================
 
@@ -54,6 +55,7 @@ void InspectableSelector::startSelection(Component * parent, Array<Component*> _
 	setBounds(selectablesParent->getLocalBounds());
 	selectionBounds.setSize(0, 0);
 }
+
 
 void InspectableSelector::endSelection(bool confirmSelection)
 {

@@ -15,6 +15,7 @@ BaseItemEditor::BaseItemEditor(BaseItem * bi, bool isRoot) :
 	item(bi)
 {
 
+
 	if (item->userCanRemove)
 	{
 		removeBT = AssetManager::getInstance()->getRemoveBT();
