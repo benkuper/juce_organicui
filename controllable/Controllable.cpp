@@ -124,6 +124,8 @@ var Controllable::getJSONData(ControllableContainer * relativeTo)
 	data.getDynamicObject()->setProperty("niceName", niceName);
 	data.getDynamicObject()->setProperty("customizable", isCustomizableByUser);
 	data.getDynamicObject()->setProperty("removable", isRemovableByUser);
+	data.getDynamicObject()->setProperty("description", description);
+	data.getDynamicObject()->setProperty("hideInEditor", hideInEditor);
 
 	if (hasCustomShortName) data.getDynamicObject()->setProperty("shortName", shortName);
 
@@ -210,7 +212,6 @@ var Controllable::setValueFromScript(const juce::var::NativeFunctionArgs& a) {
 			case Controllable::Type::INT:
 				if (valueIsABool || valueIsANumber) ((IntParameter *)c)->setValue(value);
 				break;
-
 
 			case Controllable::Type::STRING:
 				if (value.isString()) ((StringParameter *)c)->setValue(value);

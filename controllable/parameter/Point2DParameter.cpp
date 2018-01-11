@@ -37,9 +37,16 @@ void Point2DParameter::setPoint(Point<float> _value)
 void Point2DParameter::setPoint(float _x, float _y)
 {
 	var d;
-	d.append(jlimit<float>(minimumValue[0],maximumValue[0],_x));
-	d.append(jlimit<float>(minimumValue[1],maximumValue[1], _y));
-
+	if (autoAdaptRange)
+	{
+		d.append(_x);
+		d.append(_y);
+	} else
+	{
+		d.append(jlimit<float>(minimumValue[0], maximumValue[0], _x));
+		d.append(jlimit<float>(minimumValue[1], maximumValue[1], _y));
+	}
+	
 	if (d[0] == value[0] && d[1] == value[1]) return;
 	setValue(d);
 }

@@ -41,18 +41,18 @@ void Point3DParameter::setVector(Vector3D<float> _value)
 void Point3DParameter::setVector(float _x, float _y, float _z)
 {
 	var d;
-
-	if (_x < (float)minimumValue[0] && autoAdaptRange) minimumValue[0] = _x;
-	if (_x >(float)maximumValue[0] && autoAdaptRange) maximumValue[0] = _x;
-	if (_y < (float)minimumValue[1] && autoAdaptRange) minimumValue[1] = _y;
-	if (_y >(float)maximumValue[1] && autoAdaptRange) maximumValue[1] = _y;
-	if (_z < (float)minimumValue[2] && autoAdaptRange) minimumValue[2] = _z;
-	if (_z >(float)maximumValue[2] && autoAdaptRange) maximumValue[2] = _z;
-
-	d.append(jlimit<float>(minimumValue[0], maximumValue[0], _x));
-	d.append(jlimit<float>(minimumValue[1], maximumValue[1], _y));
-	d.append(jlimit<float>(minimumValue[2], maximumValue[2], _z));
-
+	if (autoAdaptRange)
+	{
+		d.append(_x);
+		d.append(_y);
+		d.append(_z);
+	} else
+	{
+		d.append(jlimit<float>(minimumValue[0], maximumValue[0], _x));
+		d.append(jlimit<float>(minimumValue[1], maximumValue[1], _y));
+		d.append(jlimit<float>(minimumValue[2], maximumValue[2], _z));
+	}
+	
 	if (d[0] == value[0] && d[1] == value[1] && d[2] == value[2]) return;
 	setValue(d);
 }
@@ -80,8 +80,6 @@ void Point3DParameter::setValueInternal(var & _value)
 			setRange(minimumValue, maximumValue, false);
 		}
 	}
-
-
 
 	x = jlimit<float>(minimumValue[0], maximumValue[0], _value[0]);
 	y = jlimit<float>(minimumValue[1], maximumValue[1], _value[1]);

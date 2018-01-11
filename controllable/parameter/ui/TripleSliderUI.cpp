@@ -120,6 +120,7 @@ void TripleSliderUI::newMessage(const Parameter::ParameterEvent & e)
 		if (zParam.floatValue() != p3d->z) p3d->setVector(xParam.floatValue(), yParam.floatValue(), zParam.floatValue());
 	} else if (e.type == Parameter::ParameterEvent::BOUNDS_CHANGED)
 	{
+		DBG("Bounds changed !");
 		xParam.setRange(e.parameter->minimumValue[0], e.parameter->maximumValue[0]);
 		yParam.setRange(e.parameter->minimumValue[1], e.parameter->maximumValue[1]);
 		zParam.setRange(e.parameter->minimumValue[2], e.parameter->maximumValue[2]);
