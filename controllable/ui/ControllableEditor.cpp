@@ -50,7 +50,7 @@ ControllableEditor::ControllableEditor(Controllable * _controllable, bool isRoot
 
 ControllableEditor::~ControllableEditor()
 {
-
+	if (controllable.wasObjectDeleted()) return;
 	controllable->removeControllableListener(this);
 }
 

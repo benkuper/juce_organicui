@@ -109,7 +109,6 @@ void BaseItem::onContainerTriggerTriggered(Trigger * t)
 
 void BaseItem::onControllableFeedbackUpdate(ControllableContainer * cc, Controllable * c)
 {
-
 	onControllableFeedbackUpdateInternal(cc, c);
 }
 

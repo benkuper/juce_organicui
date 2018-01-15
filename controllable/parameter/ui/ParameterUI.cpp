@@ -54,7 +54,7 @@ void ParameterUI::showEditWindow()
 			{
 				float newMin = nameWindow.getTextEditorContents("minVal").getFloatValue();
 				float newMax = nameWindow.getTextEditorContents("maxVal").getFloatValue();
-				parameter->setRange(newMin, newMax);
+				if(newMin < newMax) parameter->setRange(newMin, newMax);
 			}
 		}
 

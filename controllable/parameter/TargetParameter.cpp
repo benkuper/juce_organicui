@@ -26,7 +26,6 @@ TargetParameter::TargetParameter(const String & niceName, const String & descrip
 	customGetContainerLabelFunc(nullptr)
 {
 	lockManualControlMode = true;
-
 	type = TARGET;
 	if (rootContainer == nullptr) rootContainer = Engine::mainEngine;
 	

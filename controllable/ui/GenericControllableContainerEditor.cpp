@@ -56,8 +56,6 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(WeakRefer
 		resetAndBuild();
 		resized();
 	}
-
-	DBG("Base Item editor " << container->niceName);
 }
 
 GenericControllableContainerEditor::~GenericControllableContainerEditor()

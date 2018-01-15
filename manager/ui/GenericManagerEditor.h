@@ -115,7 +115,11 @@ void GenericManagerEditor<T>::showMenuAndAddItem(bool isFromAddButton)
 	if (manager->managerFactory != nullptr)
 	{
 		T * m = manager->managerFactory->showCreateMenu();
-		if (m != nullptr) manager->addItem(m);
+		if (m != nullptr)
+		{
+			manager->addItem(m);
+			setCollapsed(false);
+		}
 	} else
 	{
 		if (isFromAddButton)
@@ -135,6 +139,8 @@ void GenericManagerEditor<T>::showMenuAndAddItem(bool isFromAddButton)
 			break;
 		}
 	}
+
+	
 }
 
 template<class T>
