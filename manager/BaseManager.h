@@ -30,15 +30,15 @@ public :
 	bool selectItemWhenCreated;
 
 	virtual T * createItem(); //to override if special constructor to use
-	virtual void addItemFromData(var data, bool fromUndoableAction = false); //to be overriden for specific item creation (from data)
+	virtual void addItemFromData(var data, bool addToUndo = true); //to be overriden for specific item creation (from data)
 	virtual void addItemFromClipboard();
 
 	virtual void loadItemsData(var data);
 
-	T* addItem(T * = nullptr, var data = var(), bool fromUndoableAction = false); //if data is not empty, load data
+	T* addItem(T * = nullptr, var data = var(), bool addToUnfo = true); //if data is not empty, load data
 	T* addItem(const Point<float> initialPosition);
 
-	void removeItem(T *, bool fromUndoableAction = false);
+	void removeItem(T *, bool addToUndo = true);
 
 	virtual void reorderItems(); //to be overriden if needed
 
@@ -81,7 +81,6 @@ public :
 
 
 	//UNDO MANAGER
-    /*
 	class ManagerBaseAction :
 		public UndoableAction
 	{
@@ -92,6 +91,11 @@ public :
 			data(_data)
 		{}
 
+		virtual ~ManagerBaseAction()
+		{
+
+		}
+
 		String managerControlAddress;
 		var data;
 		BaseManager * managerRef;
@@ -100,10 +104,6 @@ public :
 			if (managerRef != nullptr) return managerRef;
 			else return nullptr;// static_cast<BaseManager<T>>(Engine::mainEngine->getControllableContainerForAddress(managerControlAddress), true);
 		}
-
-
-		
-		
 	};
 
 	class ItemBaseAction :
@@ -119,6 +119,11 @@ public :
 				itemShortName = static_cast<BaseItem *>(itemRef)->shortName;
 				DBG("ItemBase Action :: " << static_cast<BaseItem *>(itemRef)->niceName);
 			}
+		}
+
+		virtual ~ItemBaseAction()
+		{
+			DBG("ItemBaseAction destructor ");
 		}
 
 		T * itemRef;
@@ -144,6 +149,12 @@ public :
 			DBG("new Add Item action");
 		}
 
+		virtual ~AddItemAction()
+		{
+			DBG("AddAction destructor ");
+			itemRef = nullptr;
+		}
+
 		bool perform() override
 		{
 			BaseManager * m = getManager();
@@ -156,11 +167,11 @@ public :
 			T * item = getItem();
 			if (item != nullptr)
 			{
-				m->addItem(item, data, true);
+				m->addItem(item, data, false);
 			}
 			else
 			{
-				m->addItemFromData(data,true);
+				m->addItemFromData(data,false);
 			}
 			return true;
 		}
@@ -170,7 +181,7 @@ public :
 			T * s = getItem();
 			if (s == nullptr) return false;
 			data = s->getJSONData();
-			getManager()->removeItem(s, true);
+			getManager()->removeItem(s, false);
 			itemRef = nullptr;
 			return true;
 		}
@@ -184,13 +195,20 @@ public :
 			DBG("New remove Item action ");
 		}
 
+		virtual ~RemoveItemAction()
+		{
+			DBG("RemoveAction destructor ");
+		}
+
 		bool perform() override
 		{
+			
 			T * s = getItem();
+			
 			if (s == nullptr) return false;
 			
 			data = s->getJSONData();
-			getManager()->removeItem(s, true);
+			getManager()->removeItem(s, false);
 			itemRef = nullptr;
 			return true;
 		}
@@ -199,11 +217,10 @@ public :
 		{
 			BaseManager * m = getManager();
 			if (m == nullptr) return false;
-			m->addItemFromData(data, true);
+			m->addItemFromData(data, false);
 			return true;
 		}
 	};
-     */
     
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BaseManager<T>)
 };
@@ -235,25 +252,25 @@ T * BaseManager<T>::createItem() {
 
 
 template<class T>
-T * BaseManager<T>::addItem(T * item, var data, bool /*fromUndoableAction*/)
+T * BaseManager<T>::addItem(T * item, var data, bool addToUndo)
 {
+	
+	jassert(items.indexOf(item) == -1); //be sure item is no here already
+	if (item == nullptr) item = createItem();
+	BaseItem * bi = static_cast<BaseItem *>(item);
+
 	/*
-	if (!fromUndoableAction && !UndoMaster::getInstance()->isPerforming)
+	if (addToUndo && !UndoMaster::getInstance()->isPerforming)
 	{
 		if (Engine::mainEngine != nullptr && !Engine::mainEngine->isLoadingFile)
 		{
-			UndoMaster::getInstance()->performAction("Add item", new AddItemAction(this, item, data));
+			UndoMaster::getInstance()->performAction("Add "+bi->niceName, new AddItemAction(this, item));
 			return nullptr;
 		}
 	}
-	*/	
-
-	jassert(items.indexOf(item) == -1); //be sure item is no here alread
-	
-	if (item == nullptr) item = createItem();
+	*/
 
 	items.add(item);
-	BaseItem * bi = static_cast<BaseItem *>(item);
 	addChildControllableContainer(bi);
 	bi->nameParam->setValue(bi->niceName); //force setting a unique name if already taken
 	bi->addBaseItemListener(this);
@@ -285,17 +302,17 @@ T * BaseManager<T>::addItem(const Point<float> initialPosition)
 
 //if data is not empty, load data
 template<class T>
-void BaseManager<T>::addItemFromData(var data, bool fromUndoableAction) 
+void BaseManager<T>::addItemFromData(var data, bool addToUndo) 
 { 
 	if (managerFactory != nullptr)
 	{
 		String type = data.getProperty("type", "");
 		if (type.isEmpty()) return;
 		T * i = managerFactory->create(type);
-		if (i != nullptr) addItem(i, data, fromUndoableAction);
+		if (i != nullptr) addItem(i, data, addToUndo);
 	} else
 	{
-		addItem(createItem(), data, fromUndoableAction);
+		addItem(createItem(), data, addToUndo);
 	}
 }
 
@@ -327,10 +344,10 @@ void BaseManager<T>::loadItemsData(var data)
 }
 
 template<class T>
-void BaseManager<T>::removeItem(T * item, bool /*fromUndoableAction*/)
+void BaseManager<T>::removeItem(T * item, bool addToUndo)
 {
 	/*
-	if (!fromUndoableAction && !UndoMaster::getInstance()->isPerforming)
+	if (addToUndo && !UndoMaster::getInstance()->isPerforming)
 	{
 		if (Engine::mainEngine != nullptr && !Engine::mainEngine->isLoadingFile)
 		{
@@ -454,9 +471,7 @@ template<class T>
 InspectableEditor * BaseManager<T>::getEditor(bool isRoot)
 {
 	return new GenericManagerEditor<T>(this, isRoot);
-	//BaseManagerUI<BaseManager<T>, T, BaseItemUI<T>> * bui = new  BaseManagerUI<BaseManager<T>, T, BaseItemUI<T>>(niceName, this,false);
-	//bui->drawContour = true;
-	//return new GenericComponentEditor(this, bui, isRoot);
+
 }
 
 

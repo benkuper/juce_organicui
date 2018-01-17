@@ -24,7 +24,7 @@ class Engine :
 {
 public:
 	Engine(const String &fileName = "File",const String &fileExtension = ".file", ApplicationProperties * appProperties = nullptr, const String &appVersion = "1.0.0");
-	~Engine();
+	virtual ~Engine();
 
 	static Engine * mainEngine;
 

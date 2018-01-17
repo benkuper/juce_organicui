@@ -8,22 +8,23 @@
   ==============================================================================
   */
 
-/*
-
 juce_ImplementSingleton(UndoMaster);
 
 UndoMaster::UndoMaster() :
 	isPerforming(false)
 {
+	DBG("Undomaster constructor");
 }
 
 UndoMaster::~UndoMaster() 
 {
+	DBG("Undo master destructor");
 }
 
 void UndoMaster::performAction(const String & name, UndoableAction * action)
 {
 	if (Engine::mainEngine->isLoadingFile) return;
+	DBG("Perform Action " << name);
 	isPerforming = true;
 	beginNewTransaction(name);
 	perform(action,name);
@@ -33,10 +34,9 @@ void UndoMaster::performAction(const String & name, UndoableAction * action)
 void UndoMaster::performActions(const String & name, Array<UndoableAction*> actions)
 {
 	if (Engine::mainEngine->isLoadingFile) return;
+	DBG("Perform Actions " << name);
 	isPerforming = true;
 	beginNewTransaction(name);
 	for (auto &a : actions) perform(a,name);
 	isPerforming = false;
 }
-
-*/

@@ -37,6 +37,7 @@ Engine::Engine(const String & fileName, const String & fileExtension, Applicatio
 Engine::~Engine() {
 
 	//delete managers
+	DBG("Engine destructor");
 
 	isClearing = true;
 
@@ -59,7 +60,9 @@ Engine::~Engine() {
 
 	HelpBox::deleteInstance();
 
+	DBG("Here before delete undoMaster");
 	//UndoMaster::deleteInstance();
+	DBG("Here after");
 
 	Engine::mainEngine = nullptr;
 }
