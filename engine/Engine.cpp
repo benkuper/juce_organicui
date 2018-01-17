@@ -59,10 +59,10 @@ Engine::~Engine() {
 	ShapeShifterFactory::deleteInstance();
 
 	HelpBox::deleteInstance();
-
-	DBG("Here before delete undoMaster");
-	//UndoMaster::deleteInstance();
-	DBG("Here after");
+	
+	UndoMaster::deleteInstance();
+	
+	GlobalSettings::deleteInstance();
 
 	Engine::mainEngine = nullptr;
 }

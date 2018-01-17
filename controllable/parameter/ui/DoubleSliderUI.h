@@ -28,8 +28,12 @@ public:
 	FloatSliderUI xSlider;
 	FloatSliderUI ySlider;
 
-    void resized() override;
+	var mouseDownValue;
 
+	void mouseDownInternal(const MouseEvent &) override;
+	void mouseUpInternal(const MouseEvent &) override;
+
+    void resized() override;
 	void showEditWindow() override;
 
 	virtual void rangeChanged(Parameter * p) override;

@@ -105,7 +105,7 @@ void StringParameterUI::valueChanged(const var & v)
 void StringParameterUI::labelTextChanged(Label *)
 {
 	//String  originalString = valueLabel.getText().substring(prefix.length(), valueLabel.getText().length() - suffix.length());
-    parameter->setValue(valueLabel.getText());
+	parameter->setUndoableValue(parameter->stringValue(),valueLabel.getText());
 }
 
 StringParameterFileUI::StringParameterFileUI(Parameter * p) :
@@ -131,6 +131,6 @@ void StringParameterFileUI::buttonClicked(Button * b)
 	{
 		FileChooser chooser("Select a file");
 		bool result = chooser.browseForFileToOpen();
-		if (result) parameter->setValue(chooser.getResult().getFullPathName());
+		if (result) parameter->setUndoableValue(parameter->stringValue(),chooser.getResult().getFullPathName());
 	}
 }

@@ -25,6 +25,10 @@ TripleSliderUI::TripleSliderUI(Point3DParameter * parameter) :
 	yParam.addAsyncCoalescedParameterListener(this);
 	zParam.addAsyncCoalescedParameterListener(this);
 
+	xSlider.addToUndoOnMouseUp = false;
+	ySlider.addToUndoOnMouseUp = false;
+	zSlider.addToUndoOnMouseUp = false;
+
 	addAndMakeVisible(&xSlider);
 	addAndMakeVisible(&ySlider);
 	addAndMakeVisible(&zSlider);
@@ -58,6 +62,16 @@ void TripleSliderUI::resized()
 	ySlider.setBounds(r.removeFromLeft(r.getWidth() /2 - 4));
 	zSlider.setBounds(r.removeFromRight(r.getWidth() - 4));
 
+}
+
+void TripleSliderUI::mouseDownInternal(const MouseEvent &)
+{
+	mouseDownValue = parameter->value;
+}
+
+void TripleSliderUI::mouseUpInternal(const MouseEvent &)
+{
+	parameter->setUndoableValue(mouseDownValue, parameter->value);
 }
 
 void TripleSliderUI::showEditWindow()

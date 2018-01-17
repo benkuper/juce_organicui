@@ -81,6 +81,20 @@ void Parameter::resetValue(bool silentSet)
 	setValue(defaultValue, silentSet, true);
 }
 
+void Parameter::setUndoableValue(var oldValue, var newValue)
+{
+	DBG("Set Undoable value");
+	if (Engine::mainEngine != nullptr && !Engine::mainEngine->isLoadingFile)
+	{
+		DBG("Here perform parameter setvalueAction");
+		UndoMaster::getInstance()->performAction("Set " + niceName + " value", new ParameterSetValueAction(this, oldValue, newValue));
+		return;
+	}
+
+	//if Main Engine loading, just set the value without undo history
+	setValue(newValue);
+}
+
 void Parameter::setValue(var _value, bool silentSet, bool force)
 {
 
@@ -160,6 +174,12 @@ bool Parameter::checkVarIsConsistentWithType() {
 	return true;
 }
 
+void Parameter::setUndoableNormalizedValue(const float & oldNormalizedValue, const float & newNormalizedValue)
+{
+	setUndoableValue(jmap<float>(oldNormalizedValue, (float)minimumValue, (float)maximumValue), jmap<float>(newNormalizedValue, (float)minimumValue, (float)maximumValue));
+}
+
+
 void Parameter::setNormalizedValue(const float & normalizedValue, bool silentSet, bool force)
 {
 	setValue(jmap<float>(normalizedValue, (float)minimumValue, (float)maximumValue), silentSet, force);
@@ -227,4 +247,41 @@ var Parameter::getValueFromScript(const juce::var::NativeFunctionArgs & a)
 }
 
 
-//JS Helper
+// UNDO MANAGEMENT
+
+Parameter * Parameter::ParameterAction::getParameter() {
+	if (parameterRef != nullptr && !parameterRef.wasObjectDeleted()) return parameterRef.get();
+	else
+	{
+		Controllable * c = Engine::mainEngine->getControllableForAddress(controlAddress, true);
+		if (c != nullptr) return dynamic_cast<Parameter *>(c);
+	}
+
+	return nullptr;
+}
+
+bool Parameter::ParameterSetValueAction::perform()
+{
+	Parameter * p = getParameter();
+	if (p == nullptr)
+	{
+		DBG("Undo set value : parameter not found " << controlAddress);
+		return false;
+	}
+
+	p->setValue(newValue);
+	return true;
+}
+
+bool Parameter::ParameterSetValueAction::undo()
+{
+	Parameter * p = getParameter();
+	if (p == nullptr)
+	{
+		DBG("Undo set value : parameter not found " << controlAddress);
+		return false;
+	}
+
+	p->setValue(oldValue);
+	return true;
+}

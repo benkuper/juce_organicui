@@ -17,7 +17,6 @@ EnumParameter::EnumParameter(const String & niceName, const String &description,
 
 EnumParameter * EnumParameter::addOption(String key, var data, bool selectIfFirstOption)
 {
-
 	enumValues.set(key, data);
 	if (enumValues.size() == 1 && selectIfFirstOption) setValue(key, true);
 	enumListeners.call(&Listener::enumOptionAdded, this, key);

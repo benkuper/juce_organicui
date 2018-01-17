@@ -25,8 +25,9 @@ public:
 	void updateComboBox();
 	String getSelectedKey();
 
-	void resized() override;
+	var prevValue;
 
+	void resized() override;
 	
 	void enumOptionAdded(EnumParameter *, const String &key) override;
 	void enumOptionRemoved(EnumParameter *, const String &key) override;
