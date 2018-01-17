@@ -380,7 +380,7 @@ inline T * BaseManager<T>::getItemWithName(const String & itemShortName, bool se
 template<class T>
 void BaseManager<T>::clear()
 {
-	while (items.size() > 0) removeItem(items[0]);
+	while (items.size() > 0) removeItem(items[0], false);
 }
 
 template<class T>
@@ -424,7 +424,7 @@ void BaseManager<T>::loadJSONDataInternal(var data)
 	if (itemsData == nullptr) return;
 	for (auto &td : *itemsData)
 	{ 
-		addItemFromData(td);
+		addItemFromData(td,false);
 	}
 }
 

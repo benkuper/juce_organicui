@@ -83,10 +83,8 @@ void Parameter::resetValue(bool silentSet)
 
 void Parameter::setUndoableValue(var oldValue, var newValue)
 {
-	DBG("Set Undoable value");
 	if (Engine::mainEngine != nullptr && !Engine::mainEngine->isLoadingFile)
 	{
-		DBG("Here perform parameter setvalueAction");
 		UndoMaster::getInstance()->performAction("Set " + niceName + " value", new ParameterSetValueAction(this, oldValue, newValue));
 		return;
 	}
@@ -97,7 +95,6 @@ void Parameter::setUndoableValue(var oldValue, var newValue)
 
 void Parameter::setValue(var _value, bool silentSet, bool force)
 {
-
 	if (!force && checkValueIsTheSame(_value, value)) return;
 	lastValue = var(value);
 	setValueInternal(_value);
@@ -105,6 +102,8 @@ void Parameter::setValue(var _value, bool silentSet, bool force)
 	if (_value != defaultValue) isOverriden = true;
 
 	if (!silentSet) notifyValueChanged();
+
+
 }
 
 
@@ -142,6 +141,7 @@ void Parameter::setRange(var min, var max, bool setDefaultRange) {
 	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::BOUNDS_CHANGED, this, arr));
 
 	setValue(value); //if value is outside range, this will change the value
+
 }
 
 void Parameter::setValueInternal(var & _value) //to override by child classes

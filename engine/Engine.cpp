@@ -101,6 +101,8 @@ void Engine::childStructureChanged(ControllableContainer * cc)
 
 void Engine::clear() {
 
+	UndoMaster::getInstance()->clearUndoHistory();
+
 	isClearing = true;
 	if (Outliner::getInstanceWithoutCreating())
 	{
