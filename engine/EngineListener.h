@@ -8,4 +8,5 @@ public:
 	virtual void endLoadFile() {};
 	virtual void fileSaved() {};
 	virtual void engineCleared() {};
+	virtual void fileChanged() {};
 };

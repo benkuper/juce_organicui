@@ -42,16 +42,22 @@ Controllable::~Controllable() {
 	queuedNotifier.addMessage(new ControllableEvent(ControllableEvent::CONTROLLABLE_REMOVED, this));
 }
 
-void Controllable::setUndoableNiceName(const String & newNiceName)
+UndoableAction * Controllable::setUndoableNiceName(const String & newNiceName, bool onlyReturnAction)
 {
-	if (Engine::mainEngine != nullptr && !Engine::mainEngine->isLoadingFile)
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile)
 	{
-		UndoMaster::getInstance()->performAction("Rename " + niceName, new ControllableChangeNameAction(this, niceName, newNiceName));
-		return;
+		setNiceName(newNiceName);
+		return nullptr;
 	}
 
+	UndoableAction * a = new ControllableChangeNameAction(this, niceName, newNiceName);
+	if (onlyReturnAction) return a;
+
+	UndoMaster::getInstance()->performAction("Rename " + niceName, a);
+	return a;
+
 	//if Main Engine loading, just set the value without undo history
-	setNiceName(newNiceName);
+	
 }
 
 void Controllable::setNiceName(const String & _niceName) {

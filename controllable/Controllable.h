@@ -74,7 +74,7 @@ public:
 
 	ControllableContainer * parentContainer;
 
-	void setUndoableNiceName(const String &_niceName);
+	UndoableAction * setUndoableNiceName(const String &_niceName, bool onlyReturnAction = false);
 	void setNiceName(const String &_niceName);
 	void setCustomShortName(const String &_shortName);
 	void setAutoShortName();
@@ -143,6 +143,12 @@ public:
 	void removeAsyncControllableListener(AsyncListener* listener) { queuedNotifier.removeListener(listener); }
 
 
+private:
+	WeakReference<Controllable>::Master masterReference;
+	friend class WeakReference<Controllable>;
+
+
+public:
 	class ControllableAction :
 		public UndoableAction
 	{
@@ -177,10 +183,7 @@ public:
 		bool undo() override;
 	};
 
-private:
 
-	WeakReference<Controllable>::Master masterReference;
-	friend class WeakReference<Controllable>;
 
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Controllable)

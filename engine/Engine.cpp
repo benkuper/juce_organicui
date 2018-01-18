@@ -37,7 +37,6 @@ Engine::Engine(const String & fileName, const String & fileExtension, Applicatio
 Engine::~Engine() {
 
 	//delete managers
-	DBG("Engine destructor");
 
 	isClearing = true;
 
@@ -126,6 +125,7 @@ void Engine::clear() {
 
 	isClearing = false;
 
+	
 	changed();    //fileDocument	
 	engineListeners.call(&EngineListener::engineCleared);
 }

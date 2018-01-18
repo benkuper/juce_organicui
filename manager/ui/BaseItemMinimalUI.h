@@ -28,12 +28,10 @@ public:
 	bool dimAlphaOnDisabled;
 	bool highlightOnMouseOver;
 
-	bool removeOnCtrlDown;
 	bool removeOnDelKey;
 
-	void mouseDown(const MouseEvent &e) override;
-	void mouseExit(const MouseEvent &e) override;
-	bool keyPressed(const KeyPress &e) override;
+	virtual void mouseExit(const MouseEvent &e) override;
+	virtual bool keyPressed(const KeyPress &e) override;
 
 	void setHighlightOnMouseOver(bool highlight);
 
@@ -58,7 +56,6 @@ BaseItemMinimalUI<T>::BaseItemMinimalUI(T * _item) :
 	bgColor(BG_COLOR.brighter(.1f)),
 	dimAlphaOnDisabled(true),
 	highlightOnMouseOver(false),
-	removeOnCtrlDown(false),
 	removeOnDelKey(true)
 {
 
@@ -80,14 +77,6 @@ BaseItemMinimalUI<T>::~BaseItemMinimalUI()
 	baseItem->removeAsyncContainerListener(this);
 }
 
-
-template<class T>
-void BaseItemMinimalUI<T>::mouseDown(const MouseEvent & e)
-{
-	InspectableContentComponent::mouseDown(e);
-	if (removeOnCtrlDown && e.mods.isLeftButtonDown() && e.mods.isCommandDown()) baseItem->remove();
-}
-
 template<class T>
 void BaseItemMinimalUI<T>::mouseExit(const MouseEvent &e)
 {
@@ -98,15 +87,21 @@ void BaseItemMinimalUI<T>::mouseExit(const MouseEvent &e)
 template<class T>
 bool BaseItemMinimalUI<T>::keyPressed(const KeyPress & e)
 {
-	if (removeOnDelKey && (e.getKeyCode() == e.deleteKey || e.getKeyCode() == e.backspaceKey) && inspectable->isSelected)
+	if (e.getKeyCode() == e.deleteKey || e.getKeyCode() == e.backspaceKey)
 	{
-		if (this->baseItem->askConfirmationBeforeRemove && GlobalSettings::getInstance()->askBeforeRemovingItems->boolValue())
+		if (removeOnDelKey && inspectable->isSelected && inspectable->selectionManager == InspectableSelectionManager::activeSelectionManager)
 		{
-			int result = AlertWindow::showOkCancelBox(AlertWindow::QuestionIcon, "Delete " + this->baseItem->niceName, "Are you sure you want to delete this ?", "Delete", "Cancel");
-			if (result != 0)this->baseItem->remove();
-		} else this->baseItem->remove();
+			if (this->baseItem->askConfirmationBeforeRemove && GlobalSettings::getInstance()->askBeforeRemovingItems->boolValue())
+			{
+				int result = AlertWindow::showOkCancelBox(AlertWindow::QuestionIcon, "Delete " + this->baseItem->niceName, "Are you sure you want to delete this ?", "Delete", "Cancel");
+				if (result != 0)this->baseItem->remove();
+			} else
+			{
+				this->baseItem->remove();
+			}
 
-		return true;
+			return true;
+		}
 	} else if (e.getModifiers().isCommandDown())
 	{
 		if (e.getKeyCode() == KeyPress::createFromDescription("d").getKeyCode())

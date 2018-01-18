@@ -29,7 +29,6 @@ public:
 	StringParameter * fileToOpenOnStartup;
 
 	ControllableContainer confirmationsCC;
-	BoolParameter * askForSaveBeforeClosing;
 	BoolParameter * askBeforeRemovingItems;
 
 	void controllableFeedbackUpdate(ControllableContainer *, Controllable * c) override;

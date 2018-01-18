@@ -37,6 +37,7 @@ public:
 	String fileExtension = ".file";
 	String fileWildcard = "*"+fileExtension;
 
+	virtual void changed() override;
 	void createNewGraph();
 	void clear();
 	virtual void clearInternal() {}; //to override to clear specific application classes

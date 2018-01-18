@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    BaseManager.h
-    Created: 28 Oct 2016 8:03:13pm
-    Author:  bkupe
+	BaseManager.h
+	Created: 28 Oct 2016 8:03:13pm
+	Author:  bkupe
 
   ==============================================================================
 */
@@ -17,7 +17,7 @@ class BaseManager :
 	public ControllableContainer,
 	public BaseItem::Listener
 {
-public : 
+public:
 	BaseManager<T>(const String &name);
 	virtual ~BaseManager<T>();
 
@@ -25,7 +25,7 @@ public :
 
 	//Factory
 	Factory<T> * managerFactory;
-	
+
 	bool userCanAddItemsManually;
 	bool selectItemWhenCreated;
 
@@ -35,10 +35,17 @@ public :
 
 	virtual void loadItemsData(var data);
 
-	T* addItem(T * = nullptr, var data = var(), bool addToUnfo = true); //if data is not empty, load data
-	T* addItem(const Point<float> initialPosition);
+	
+	UndoableAction * getAddItemUndoableAction(T * item = nullptr, var data = var());
 
-	void removeItem(T *, bool addToUndo = true);
+	T * addItem(T * item = nullptr, var data = var(), bool addToUndo = true); //if data is not empty, load data
+	T * addItem(const Point<float> initialPosition);
+	Array<UndoableAction *> addItems(Array<T *> items, bool addToUndo = true, bool onlyReturnAction = false);
+	
+
+	UndoableAction * getRemoveItemUndoableAction(T * item);
+	void removeItems(Array<T *> items, bool addToUndo = true);
+	void removeItem(T * item, bool addToUndo = true);
 
 	virtual void reorderItems(); //to be overriden if needed
 
@@ -75,7 +82,7 @@ public :
 	ListenerList<Listener> baseManagerListeners;
 	void addBaseManagerListener(Listener* newListener) { baseManagerListeners.add(newListener); }
 	void removeBaseManagerListener(Listener* listener) { baseManagerListeners.remove(listener); }
-	 
+
 	InspectableEditor * getEditor(bool /*isRoot*/) override;
 
 
@@ -96,7 +103,7 @@ public :
 		var data;
 		WeakReference<Inspectable> managerRef;
 
-		BaseManager<T> * getManager() { 
+		BaseManager<T> * getManager() {
 			if (managerRef != nullptr && !managerRef.wasObjectDeleted()) return dynamic_cast<BaseManager<T> *>(managerRef.get());
 			else
 			{
@@ -143,7 +150,7 @@ public :
 		public ItemBaseAction
 	{
 	public:
-		AddItemAction(BaseManager * m, T * i, var data = var()) : ItemBaseAction(m, i, data) { 
+		AddItemAction(BaseManager * m, T * i, var data = var()) : ItemBaseAction(m, i, data) {
 		}
 
 		bool perform() override
@@ -158,14 +165,13 @@ public :
 			if (item != nullptr)
 			{
 				m->addItem(item, data, false);
-			}
-			else
+			} else
 			{
-				item = m->addItemFromData(data,false);
+				item = m->addItemFromData(data, false);
 			}
 
 			if (item == nullptr) return false;
-			
+
 			itemShortName = item->shortName;
 			return true;
 		}
@@ -191,11 +197,11 @@ public :
 
 		bool perform() override
 		{
-			
+
 			T * s = getItem();
-			
+
 			if (s == nullptr) return false;
-			
+
 			data = s->getJSONData();
 			getManager()->removeItem(s, false);
 			itemRef = nullptr;
@@ -210,7 +216,7 @@ public :
 			return true;
 		}
 	};
-    
+
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BaseManager<T>)
 };
 
@@ -220,7 +226,7 @@ BaseManager<T>::BaseManager(const String & name) :
 	ControllableContainer(name),
 	managerFactory(nullptr),
 	userCanAddItemsManually(true),
-    selectItemWhenCreated(true)
+	selectItemWhenCreated(true)
 {
 	//setCanHavePresets(false);
 	//hideInEditor = true;
@@ -241,37 +247,46 @@ T * BaseManager<T>::createItem() {
 
 
 template<class T>
+UndoableAction * BaseManager<T>::getAddItemUndoableAction(T * item, var data)
+{
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile) return nullptr;
+	jassert(items.indexOf(item) == -1); //be sure item is no here already
+	if (item == nullptr) item = createItem();
+	return new AddItemAction(this, item);
+}
+
+template<class T>
 T * BaseManager<T>::addItem(T * item, var data, bool addToUndo)
 {
-	
+
 	jassert(items.indexOf(item) == -1); //be sure item is no here already
 	if (item == nullptr) item = createItem();
 	BaseItem * bi = static_cast<BaseItem *>(item);
 
-	
+
 	if (addToUndo && !UndoMaster::getInstance()->isPerforming)
 	{
 		if (Engine::mainEngine != nullptr && !Engine::mainEngine->isLoadingFile)
 		{
-			UndoMaster::getInstance()->performAction("Add "+bi->niceName, new AddItemAction(this, item));
+			UndoMaster::getInstance()->performAction("Add " + bi->niceName, new AddItemAction(this, item));
 			return item;
 		}
 	}
-	
+
 
 	items.add(item);
 	addChildControllableContainer(bi);
 	bi->setNiceName(bi->niceName); //force setting a unique name if already taken
 	bi->addBaseItemListener(this);
-	
+
 	if (!data.isVoid())
 	{
 		bi->loadJSONData(data);
 	}
 
-	
+
 	addItemInternal(item, data);
-	
+
 	baseManagerListeners.call(&BaseManager::Listener::itemAdded, item);
 	reorderItems();
 
@@ -289,10 +304,19 @@ T * BaseManager<T>::addItem(const Point<float> initialPosition)
 	return i;
 }
 
+template<class T>
+Array<UndoableAction *> BaseManager<T>::addItems(Array<T*> itemsToAdd, bool addToUndo, bool onlyReturnAction)
+{
+	Array<UndoableAction *> actions;
+	for (T * i : itemsToAdd) actions.add(getAddItemUndoableAction(i));
+	if(!onlyReturnAction) UndoMaster::getInstance()->performActions("Add " + String(actions.size()) + " items", actions);
+	return actions;
+}
+
 //if data is not empty, load data
 template<class T>
-T * BaseManager<T>::addItemFromData(var data, bool addToUndo) 
-{ 
+T * BaseManager<T>::addItemFromData(var data, bool addToUndo)
+{
 	if (managerFactory != nullptr)
 	{
 		String type = data.getProperty("type", "");
@@ -335,9 +359,24 @@ void BaseManager<T>::loadItemsData(var data)
 }
 
 template<class T>
+UndoableAction * BaseManager<T>::getRemoveItemUndoableAction(T * item)
+{
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile) return nullptr;
+	return new RemoveItemAction(this, item);
+}
+
+template<class T>
+void BaseManager<T>::removeItems(Array<T*> itemsToRemove, bool addToUndo)
+{
+	Array<UndoableAction *> actions;
+	for (auto &i : itemsToRemove) actions.add(getRemoveItemUndoableAction(i));
+	UndoMaster::getInstance()->performActions("Remove " + String(actions.size()) + " actions", actions);
+}
+
+template<class T>
 void BaseManager<T>::removeItem(T * item, bool addToUndo)
 {
-	
+
 	if (addToUndo && !UndoMaster::getInstance()->isPerforming)
 	{
 		if (Engine::mainEngine != nullptr && !Engine::mainEngine->isLoadingFile)
@@ -346,7 +385,7 @@ void BaseManager<T>::removeItem(T * item, bool addToUndo)
 			return;
 		}
 	}
-	
+
 
 	items.removeObject(item, false);
 	BaseItem * bi = static_cast<BaseItem *>(item);
@@ -418,13 +457,13 @@ var BaseManager<T>::getJSONData()
 
 template<class T>
 void BaseManager<T>::loadJSONDataInternal(var data)
-{ 
+{
 	clear();
-	Array<var> * itemsData = data.getProperty("items",var()).getArray();
+	Array<var> * itemsData = data.getProperty("items", var()).getArray();
 	if (itemsData == nullptr) return;
 	for (auto &td : *itemsData)
-	{ 
-		addItemFromData(td,false);
+	{
+		addItemFromData(td, false);
 	}
 }
 

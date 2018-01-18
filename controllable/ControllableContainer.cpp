@@ -193,16 +193,20 @@ void ControllableContainer::newMessage(const Parameter::ParameterEvent &e) {
 		onContainerParameterChangedAsync(e.parameter, e.value);
 	}
 }
-void ControllableContainer::setUndoableNiceName(const String & newNiceName)
+UndoableAction * ControllableContainer::setUndoableNiceName(const String & newNiceName, bool onlyReturnAction)
 {
-	if (Engine::mainEngine != nullptr && !Engine::mainEngine->isLoadingFile)
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile)
 	{
-		UndoMaster::getInstance()->performAction("Rename " + niceName, new ControllableContainerChangeNameAction(this, niceName, newNiceName));
-		return;
+		//if Main Engine loading, just set the value without undo history
+		setNiceName(newNiceName);
+		return nullptr;
 	}
 
-	//if Main Engine loading, just set the value without undo history
-	setNiceName(newNiceName);
+	UndoableAction * a = new ControllableContainerChangeNameAction(this, niceName, newNiceName);
+	if (onlyReturnAction) return a;
+
+	UndoMaster::getInstance()->performAction("Rename " + niceName, a);
+	return a;	
 }
 void ControllableContainer::setNiceName(const String &_niceName) {
 	if (niceName == _niceName) return;

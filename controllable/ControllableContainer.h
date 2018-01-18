@@ -57,7 +57,7 @@ public:
 	Array<WeakReference<ControllableContainer>  > controllableContainers;
 	WeakReference<ControllableContainer> parentContainer;
 
-	void setUndoableNiceName(const String &_niceName);
+	UndoableAction * setUndoableNiceName(const String &_niceName, bool onlyReturnAction = false);
 	void setNiceName(const String &_niceName);
 	void setCustomShortName(const String &_shortName);
 	void setAutoShortName();
@@ -105,9 +105,7 @@ public:
 
 	void dispatchFeedback(Controllable * c);
 
-	// Inherited via Parameter::Listener
 	virtual void parameterValueChanged(Parameter * p) override;
-	// Inherited via Trigger::Listener
 	virtual void triggerTriggered(Trigger * p) override;
 
 	void controllableFeedbackUpdate(ControllableContainer * cc, Controllable * c) override;
@@ -147,8 +145,6 @@ private:
     
 
 public:
-
-
     ListenerList<ControllableContainerListener> controllableContainerListeners;
     void addControllableContainerListener(ControllableContainerListener* newListener) { controllableContainerListeners.add(newListener);}
     void removeControllableContainerListener(ControllableContainerListener* listener) { controllableContainerListeners.remove(listener);}
@@ -162,7 +158,14 @@ public:
 	
 	void clear();
 
+protected:
+	void notifyStructureChanged();
+	void newMessage(const Parameter::ParameterEvent &e)override;
 
+	WeakReference<ControllableContainer>::Master masterReference;
+	friend class WeakReference<ControllableContainer>;
+
+public:
 	class ControllableContainerAction :
 		public UndoableAction
 	{
@@ -199,16 +202,7 @@ public:
 
 	virtual InspectableEditor * getEditor(bool /*isRootEditor*/) override;
 
-protected:
-    void notifyStructureChanged();
-    void newMessage(const Parameter::ParameterEvent &e)override;
-
-    WeakReference<ControllableContainer>::Master masterReference;
-    friend class WeakReference<ControllableContainer>;
-
-
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ControllableContainer)
-
 };
 
 

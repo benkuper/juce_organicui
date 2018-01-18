@@ -81,16 +81,20 @@ void Parameter::resetValue(bool silentSet)
 	setValue(defaultValue, silentSet, true);
 }
 
-void Parameter::setUndoableValue(var oldValue, var newValue)
+UndoableAction * Parameter::setUndoableValue(var oldValue, var newValue, bool onlyReturnAction)
 {
-	if (Engine::mainEngine != nullptr && !Engine::mainEngine->isLoadingFile)
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile)
 	{
-		UndoMaster::getInstance()->performAction("Set " + niceName + " value", new ParameterSetValueAction(this, oldValue, newValue));
-		return;
+		//if Main Engine loading, just set the value without undo history
+		setValue(newValue);
+		return nullptr;
 	}
 
-	//if Main Engine loading, just set the value without undo history
-	setValue(newValue);
+	UndoableAction * a = new ParameterSetValueAction(this, oldValue, newValue);
+	if (onlyReturnAction) return a;
+
+	UndoMaster::getInstance()->performAction("Set " + niceName + " value", a);
+	return a;
 }
 
 void Parameter::setValue(var _value, bool silentSet, bool force)

@@ -60,5 +60,4 @@ protected:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FloatSliderUI)
 };
 
-
 #endif  // FLOATSLIDERUI_H_INCLUDED

@@ -1,3 +1,4 @@
+#include "Point3DParameter.h"
 /*
 ==============================================================================
 
@@ -41,20 +42,31 @@ void Point3DParameter::setVector(Vector3D<float> _value)
 void Point3DParameter::setVector(float _x, float _y, float _z)
 {
 	var d;
-	if (autoAdaptRange)
-	{
-		d.append(_x);
-		d.append(_y);
-		d.append(_z);
-	} else
-	{
-		d.append(jlimit<float>(minimumValue[0], maximumValue[0], _x));
-		d.append(jlimit<float>(minimumValue[1], maximumValue[1], _y));
-		d.append(jlimit<float>(minimumValue[2], maximumValue[2], _z));
-	}
-	
-	if (d[0] == value[0] && d[1] == value[1] && d[2] == value[2]) return;
+	d.append(_x);
+	d.append(_y);
+	d.append(_z);
 	setValue(d);
+}
+
+void Point3DParameter::setUndoableVector(Vector3D<float> oldVector, Vector3D<float> newVector)
+{
+	setUndoableVector(oldVector.x, oldVector.y, oldVector.z, newVector.x, newVector.y, newVector.z);
+}
+
+void Point3DParameter::setUndoableVector(float oldX, float oldY, float oldZ, float newX, float newY, float newZ)
+{
+	var od;
+	od.append(oldX);
+	od.append(oldY);
+	od.append(oldZ);
+	var d;
+	d.append(newX);
+	d.append(newY);
+	d.append(newZ);
+
+	if (checkValueIsTheSame(od, d)) return;
+
+	setUndoableValue(od,d);
 }
 
 void Point3DParameter::setValueInternal(var & _value)

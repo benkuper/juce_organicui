@@ -18,8 +18,12 @@ public:
 	~Point2DParameter() {}
 
 	float x, y;
+
 	void setPoint(Point<float> value);
 	void setPoint(float x, float y);
+	void setUndoablePoint(Point<float> oldPoint, Point<float> newPoint);
+	void setUndoablePoint(float oldX, float oldY, float newX, float newY);
+
 	void setValueInternal(var & _value) override;
 	
 	void setBounds(float _minX, float _minY, float _maxX, float _maxY);

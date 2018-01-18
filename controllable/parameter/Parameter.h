@@ -57,7 +57,7 @@ public:
 	virtual var getValue(); //may be useful, or testing expression or references (for now, forward update from expression timer)
 
     void resetValue(bool silentSet = false);
-	virtual void setUndoableValue(var oldValue, var newValue);
+	virtual UndoableAction * setUndoableValue(var oldValue, var newValue, bool onlyReturnAction = false);
     virtual void setValue(var _value, bool silentSet = false, bool force = false);
     virtual void setValueInternal(var & _value);
 
@@ -129,7 +129,16 @@ public:
     void addAsyncParameterListener(AsyncListener* newListener) { queuedNotifier.addListener(newListener); }
     void addAsyncCoalescedParameterListener(AsyncListener* newListener) { queuedNotifier.addAsyncCoalescedListener(newListener); }
     void removeAsyncParameterListener(AsyncListener* listener) { queuedNotifier.removeListener(listener); }
+	 
 
+
+private:
+	bool checkVarIsConsistentWithType();
+	WeakReference<Parameter>::Master masterReference;
+	friend class WeakReference<Parameter>;
+
+
+public:
 	class ParameterAction :
 		public ControllableAction
 	{
@@ -156,7 +165,7 @@ public:
 			oldValue(oldValue), 
 			newValue(newValue)
 		{
-			DBG("New Parameter Set Value Action");
+			//DBG("New Parameter Set Value Action");
 		}
 
 		var oldValue;
@@ -165,13 +174,6 @@ public:
 		bool perform() override;
 		bool undo() override;
 	};
-
-private:
-
-    bool checkVarIsConsistentWithType();
-
-    WeakReference<Parameter>::Master masterReference;
-    friend class WeakReference<Parameter>;
 
 
 

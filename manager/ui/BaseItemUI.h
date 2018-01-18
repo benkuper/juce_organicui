@@ -140,8 +140,6 @@ BaseItemUI<T>::BaseItemUI(T * _item, ResizeMode _resizeMode, bool _canBeDragged)
 	itemLabel.addListener(this);
 	this->addAndMakeVisible(&itemLabel);
 
-	DBG("Item > " << itemLabel.getText());
-
 	if (canBeDragged)
 	{
 		setGrabber(new Grabber(_resizeMode == ALL ? Grabber::HORIZONTAL : Grabber::VERTICAL));
@@ -413,7 +411,16 @@ void BaseItemUI<T>::mouseDrag(const MouseEvent & e)
 template<class T>
 void BaseItemUI<T>::mouseUp(const MouseEvent &)
 {
-	if (canBeDragged && resizeMode != ALL) itemUIListeners.call(&ItemUIListener::itemUIGrabEnd, this);
+	if (canBeDragged)
+	{
+		if (resizeMode == ALL)
+		{
+			this->baseItem->viewUIPosition->setUndoablePoint(posAtMouseDown, this->baseItem->viewUIPosition->getPoint());
+		} else
+		{
+			itemUIListeners.call(&ItemUIListener::itemUIGrabEnd, this);
+		}
+	}
 }
 
 template<class T>

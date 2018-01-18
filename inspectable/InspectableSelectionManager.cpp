@@ -1,3 +1,4 @@
+#include "InspectableSelectionManager.h"
 /*
   ==============================================================================
 
@@ -10,6 +11,7 @@
 
 
 InspectableSelectionManager * InspectableSelectionManager::mainSelectionManager = nullptr;
+InspectableSelectionManager * InspectableSelectionManager::activeSelectionManager = nullptr;
 
 InspectableSelectionManager::InspectableSelectionManager(bool isMainSelectionManager)
 {
@@ -38,9 +40,12 @@ void InspectableSelectionManager::selectInspectables(Array<Inspectable*> inspect
 	if (!enabled) return;
 	if (Engine::mainEngine->isLoadingFile) return;
 
+	activeSelectionManager = this;
+
 	if (doClearSelection) clearSelection(false);
 	for (auto &i : inspectables) selectInspectable(i, false, false);
 	if (notify) listeners.call(&Listener::inspectablesSelectionChanged);
+
 }
 
 void InspectableSelectionManager::selectInspectable(WeakReference<Inspectable> inspectable, bool doClearSelection, bool notify)
@@ -50,6 +55,8 @@ void InspectableSelectionManager::selectInspectable(WeakReference<Inspectable> i
 
 	if (currentInspectables.contains(inspectable)) return;
 	
+	activeSelectionManager = this;
+
 	if (doClearSelection) clearSelection(false);
 	
 	if (inspectable.get() != nullptr)

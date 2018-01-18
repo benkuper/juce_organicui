@@ -36,7 +36,7 @@ public:
 
 	void setValueWithData(var data);
 	void setValueWithKey(String data);
-	void setNext(bool loop = true);
+	void setNext(bool loop = true, bool addToUndo = false);
 
 	int getKeyIndex(String key);
 	

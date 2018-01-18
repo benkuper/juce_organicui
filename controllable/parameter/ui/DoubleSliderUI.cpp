@@ -54,7 +54,6 @@ void DoubleSliderUI::mouseUpInternal(const MouseEvent &)
 void DoubleSliderUI::resized()
 {
 	Rectangle<int> r = getLocalBounds();
-	DBG("X Slider : " << (int)isEnabled() << "/" << (int)(parameter->enabled));
 	xSlider.setBounds(r.removeFromLeft(r.getWidth() / 2 - 5));
 	ySlider.setBounds(r.removeFromRight(r.getWidth() - 10));
 }
