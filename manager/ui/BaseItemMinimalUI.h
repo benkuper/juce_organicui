@@ -163,6 +163,9 @@ void BaseItemMinimalUI<T>::newMessage(const ContainerAsyncEvent & e)
 		containerChildAddressChangedAsync(e.targetContainer);
 	}
 	break;
+            
+        default:
+            break;
 	}
 }
 

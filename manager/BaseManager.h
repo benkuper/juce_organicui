@@ -85,23 +85,20 @@ public:
 
 	InspectableEditor * getEditor(bool /*isRoot*/) override;
 
-
-
 	//UNDO MANAGER
 	class ManagerBaseAction :
 		public UndoableAction
 	{
 	public:
 		ManagerBaseAction(BaseManager * manager, var _data = var()) :
-			managerRef(manager),
-			managerControlAddress(manager->getControlAddress()),
-			data(_data)
+            managerControlAddress(manager->getControlAddress()),
+            data(_data),
+            managerRef(manager)
 		{}
-
 
 		String managerControlAddress;
 		var data;
-		WeakReference<Inspectable> managerRef;
+        WeakReference<Inspectable> managerRef;
 
 		BaseManager<T> * getManager() {
 			if (managerRef != nullptr && !managerRef.wasObjectDeleted()) return dynamic_cast<BaseManager<T> *>(managerRef.get());
@@ -138,7 +135,7 @@ public:
 			if (itemRef != nullptr && !itemRef.wasObjectDeleted()) return dynamic_cast<T *>(itemRef.get());
 			else
 			{
-				BaseManager * m = getManager();
+				BaseManager * m = this->getManager();
 				if (m != nullptr) return m->getItemWithName(itemShortName);
 			}
 
@@ -155,34 +152,34 @@ public:
 
 		bool perform() override
 		{
-			BaseManager * m = getManager();
+			BaseManager * m = this->getManager();
 			if (m == nullptr)
 			{
 				return false;
 			}
 
-			T * item = getItem();
+			T * item = this->getItem();
 			if (item != nullptr)
 			{
-				m->addItem(item, data, false);
+				m->addItem(item, this->data, false);
 			} else
 			{
-				item = m->addItemFromData(data, false);
+				item = m->addItemFromData(this->data, false);
 			}
 
 			if (item == nullptr) return false;
 
-			itemShortName = item->shortName;
+			this->itemShortName = item->shortName;
 			return true;
 		}
 
 		bool undo() override
 		{
-			T * s = getItem();
+			T * s = this->getItem();
 			if (s == nullptr) return false;
-			data = s->getJSONData();
-			getManager()->removeItem(s, false);
-			itemRef = nullptr;
+			this->data = s->getJSONData();
+			this->getManager()->removeItem(s, false);
+			this->itemRef = nullptr;
 			return true;
 		}
 	};
@@ -198,21 +195,21 @@ public:
 		bool perform() override
 		{
 
-			T * s = getItem();
+			T * s = this->getItem();
 
 			if (s == nullptr) return false;
 
-			data = s->getJSONData();
-			getManager()->removeItem(s, false);
-			itemRef = nullptr;
+			this->data = s->getJSONData();
+			this->getManager()->removeItem(s, false);
+			this->itemRef = nullptr;
 			return true;
 		}
 
 		bool undo() override
 		{
-			BaseManager * m = getManager();
+			BaseManager * m = this->getManager();
 			if (m == nullptr) return false;
-			itemRef = m->addItemFromData(data, false);
+			this->itemRef = m->addItemFromData(this->data, false);
 			return true;
 		}
 	};

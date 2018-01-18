@@ -128,7 +128,7 @@ BaseItemUI<T>::BaseItemUI(T * _item, ResizeMode _resizeMode, bool _canBeDragged)
 	resizerWidth(0),
 	resizerHeight(0),
 	resizer(nullptr),
-	itemLabel("itemLabel", dynamic_cast<BaseItem *>(inspectable.get())->niceName)
+	itemLabel("itemLabel", dynamic_cast<BaseItem *>(this->inspectable.get())->niceName)
 {
 	itemLabel.setColour(itemLabel.backgroundWhenEditingColourId, Colours::white);
 	itemLabel.setColour(itemLabel.backgroundColourId, Colours::transparentWhite);
