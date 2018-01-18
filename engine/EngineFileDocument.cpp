@@ -40,8 +40,8 @@ void Engine::createNewGraph(){
 
 	setFile(File());
 	isLoadingFile = false;
-	handleAsyncUpdate();
 	setChangedFlag(false);
+	handleAsyncUpdate();
 
 }
 
@@ -66,7 +66,6 @@ Result Engine::loadDocument (const File& file){
   triggerAsyncUpdate();
 #endif
 
-  setChangedFlag(false);
   return Result::ok();
 }
 
@@ -130,6 +129,7 @@ void Engine::handleAsyncUpdate()
   //  graphPlayer.setProcessor(NodeManager::getInstance()->mainContainer->getAudioGraph());
   //  suspendAudio(false);
   int64 timeForLoading  =  Time::currentTimeMillis()-loadingStartTime;
+  setChangedFlag(false);
   engineListeners.call(&EngineListener::endLoadFile);
   NLOG("Engine","Session loaded in " << timeForLoading/1000.0 << "s"); 
 }

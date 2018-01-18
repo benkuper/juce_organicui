@@ -152,8 +152,8 @@ public:
 
 	//From Engine Listener
 	bool tmpAnimate;
-	void startLoadFile() override;
-	void endLoadFile() override;
+	virtual void startLoadFile() override;
+	virtual void endLoadFile() override;
 
 	class  ManagerUIListener
 	{

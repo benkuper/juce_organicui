@@ -62,6 +62,8 @@ public:
 	virtual void addItemUIInternal(U * se) override; 
 
 	virtual void itemUIGrabbed(BaseItemUI<T> * se) override;
+
+	virtual void endLoadFile() override;
 };
 
 
@@ -245,6 +247,8 @@ Rectangle<float> BaseManagerViewUI<M, T, U>::getBoundsInView(const Rectangle<flo
 template<class M, class T, class U>
 Point<float> BaseManagerViewUI<M, T, U>::getItemsCenter()
 {
+	if (this->itemsUI.size() == 0) return Point<float>(0, 0);
+
 	Point<float> average;
 	for (auto &se : this->itemsUI)
 	{
@@ -293,6 +297,12 @@ template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::itemUIGrabbed(BaseItemUI<T> * se)
 {
 	updateViewUIPosition(static_cast<U *>(se));
+}
+
+template<class M, class T, class U>
+void BaseManagerViewUI<M, T, U>::endLoadFile()
+{
+	frameView();
 }
 
 
