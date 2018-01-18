@@ -22,8 +22,6 @@ public:
 	BaseItem(const String &name = "", bool canBeDisabled = true, bool canHaveScript = false);
 	virtual ~BaseItem();
 
-	StringParameter * nameParam;
-
 	//UI - should move outside data class ? how to save/load if not there 
 	BoolParameter * miniMode;
 	FloatParameter * listUISize; //width or height in a list
@@ -43,13 +41,11 @@ public:
 	void remove();
 	virtual void clear() {}
 
-	void onContainerParameterChanged(Parameter *) override;
-	void onContainerTriggerTriggered(Trigger *) override;
+	virtual void onContainerParameterChanged(Parameter *) override;
+	virtual void onContainerTriggerTriggered(Trigger *) override;
 	virtual void onContainerParameterChangedInternal(Parameter *) {} //child classes override this function
 	void onControllableFeedbackUpdate(ControllableContainer * cc, Controllable * c) override;
 	virtual void onControllableFeedbackUpdateInternal(ControllableContainer * cc, Controllable * c) {};
-
-	void onContainerNiceNameChanged() override;
 
 	var getJSONData() override;
 	void loadJSONDataInternal(var data) override;

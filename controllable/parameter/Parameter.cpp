@@ -250,14 +250,7 @@ var Parameter::getValueFromScript(const juce::var::NativeFunctionArgs & a)
 // UNDO MANAGEMENT
 
 Parameter * Parameter::ParameterAction::getParameter() {
-	if (parameterRef != nullptr && !parameterRef.wasObjectDeleted()) return parameterRef.get();
-	else
-	{
-		Controllable * c = Engine::mainEngine->getControllableForAddress(controlAddress, true);
-		if (c != nullptr) return dynamic_cast<Parameter *>(c);
-	}
-
-	return nullptr;
+	return dynamic_cast<Parameter *>(getControllable());
 }
 
 bool Parameter::ParameterSetValueAction::perform()

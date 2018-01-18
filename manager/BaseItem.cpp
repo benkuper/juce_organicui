@@ -18,14 +18,6 @@ BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts
 	saveAndLoadName = true;
 	nameCanBeChangedByUser = true;
 
-
-	nameParam = addStringParameter("Name", "Name of the component", niceName);
-	nameParam->includeInScriptObject = false;
-	nameParam->hideInEditor = true;
-	nameParam->hideInOutliner = true;
-	nameParam->isTargettable = false;
-	nameParam->lockManualControlMode = true;
-
 	if (canHaveScripts)
 	{
 		scriptManager = new ScriptManager(this);
@@ -86,13 +78,9 @@ void BaseItem::remove()
 	baseItemListeners.call(&BaseItem::Listener::askForRemoveBaseItem, this);
 }
 
+
 void BaseItem::onContainerParameterChanged(Parameter * p)
 {
-	if (p == nameParam)
-	{
-		setNiceName(nameParam->stringValue());
-	}
-
 	Array<var> args;
 	args.add(p->getScriptObject());
 	if (canHaveScripts) scriptManager->callFunctionOnAllItems("localParamChanged", args);
@@ -110,11 +98,6 @@ void BaseItem::onContainerTriggerTriggered(Trigger * t)
 void BaseItem::onControllableFeedbackUpdate(ControllableContainer * cc, Controllable * c)
 {
 	onControllableFeedbackUpdateInternal(cc, c);
-}
-
-void BaseItem::onContainerNiceNameChanged()
-{
-	nameParam->setValue(niceName);
 }
 
 var BaseItem::getJSONData()

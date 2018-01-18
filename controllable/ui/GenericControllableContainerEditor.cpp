@@ -30,7 +30,7 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(WeakRefer
 	containerLabel.setColour(containerLabel.backgroundColourId, Colours::transparentWhite);
 	containerLabel.setColour(containerLabel.textColourId, contourColor.brighter(1));
 
-	containerLabel.setEditable(container->nameCanBeChangedByUser);
+	containerLabel.setEditable(false,container->nameCanBeChangedByUser);
 	containerLabel.addListener(this);
 
 	if(!container->nameCanBeChangedByUser) containerLabel.setInterceptsMouseClicks(false, false);
@@ -195,7 +195,7 @@ void GenericControllableContainerEditor::buttonClicked(Button * b)
 
 void GenericControllableContainerEditor::labelTextChanged(Label * l)
 {
-	if (l == &containerLabel) container->setNiceName(l->getText());
+	if (l == &containerLabel) container->setUndoableNiceName(l->getText());
 }
 
 void GenericControllableContainerEditor::addControllableUI(Controllable * c, bool resize)

@@ -261,7 +261,7 @@ T * BaseManager<T>::addItem(T * item, var data, bool addToUndo)
 
 	items.add(item);
 	addChildControllableContainer(bi);
-	bi->nameParam->setValue(bi->niceName); //force setting a unique name if already taken
+	bi->setNiceName(bi->niceName); //force setting a unique name if already taken
 	bi->addBaseItemListener(this);
 	
 	if (!data.isVoid())

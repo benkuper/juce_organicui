@@ -74,6 +74,7 @@ public:
 
 	ControllableContainer * parentContainer;
 
+	void setUndoableNiceName(const String &_niceName);
 	void setNiceName(const String &_niceName);
 	void setCustomShortName(const String &_shortName);
 	void setAutoShortName();
@@ -141,6 +142,40 @@ public:
 	void addAsyncCoalescedControllableListener(AsyncListener* newListener) { queuedNotifier.addAsyncCoalescedListener(newListener); }
 	void removeAsyncControllableListener(AsyncListener* listener) { queuedNotifier.removeListener(listener); }
 
+
+	class ControllableAction :
+		public UndoableAction
+	{
+	public:
+		ControllableAction(Controllable * c) :
+			controllableRef(c)
+		{
+			controlAddress = c->getControlAddress();
+		}
+
+		WeakReference<Controllable> controllableRef;
+		String controlAddress;
+
+		Controllable * getControllable();
+	};
+
+	class ControllableChangeNameAction :
+		public ControllableAction
+	{
+	public:
+		ControllableChangeNameAction(Controllable * c, String oldName, String newName) :
+			ControllableAction(c),
+			oldName(oldName),
+			newName(newName)
+		{
+		}
+
+		String oldName;
+		String newName;
+
+		bool perform() override;
+		bool undo() override;
+	};
 
 private:
 

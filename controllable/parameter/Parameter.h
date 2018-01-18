@@ -131,10 +131,11 @@ public:
     void removeAsyncParameterListener(AsyncListener* listener) { queuedNotifier.removeListener(listener); }
 
 	class ParameterAction :
-		public UndoableAction
+		public ControllableAction
 	{
 	public:
 		ParameterAction(Parameter * param) :
+			ControllableAction(param),
 			parameterRef(param)
 		{
 			controlAddress = param->getControlAddress();

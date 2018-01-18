@@ -30,10 +30,7 @@ public:
 	bool hasCustomShortName;
 
 	bool skipControllableNameInAddress;
-	void setNiceName(const String &_niceName);
-	void setCustomShortName(const String &_shortName);
-	void setAutoShortName();
-
+	
 	bool nameCanBeChangedByUser;
 	bool isTargettable; //for controllableChooser
 
@@ -59,6 +56,12 @@ public:
 	OwnedArray<Controllable, CriticalSection> controllables;
 	Array<WeakReference<ControllableContainer>  > controllableContainers;
 	WeakReference<ControllableContainer> parentContainer;
+
+	void setUndoableNiceName(const String &_niceName);
+	void setNiceName(const String &_niceName);
+	void setCustomShortName(const String &_shortName);
+	void setAutoShortName();
+
 
 	void addControllable(Controllable * p);
 	void addParameter(Parameter * p);
@@ -158,6 +161,41 @@ public:
 	void removeAsyncContainerListener(ContainerAsyncListener* listener) { queuedNotifier.removeListener(listener); }
 	
 	void clear();
+
+
+	class ControllableContainerAction :
+		public UndoableAction
+	{
+	public:
+		ControllableContainerAction(ControllableContainer * cc) :
+			containerRef(cc)
+		{
+			controlAddress = cc->getControlAddress();
+		}
+
+		WeakReference<ControllableContainer> containerRef;
+		String controlAddress;
+
+		ControllableContainer * getControllableContainer();
+	};
+
+	class ControllableContainerChangeNameAction :
+		public ControllableContainerAction 
+	{
+	public:
+		ControllableContainerChangeNameAction(ControllableContainer * cc, String oldName, String newName) :
+			ControllableContainerAction(cc),
+			oldName(oldName),
+			newName(newName)
+		{
+		}
+
+		String oldName;
+		String newName;
+
+		bool perform() override;
+		bool undo() override;
+	};
 
 	virtual InspectableEditor * getEditor(bool /*isRootEditor*/) override;
 

@@ -38,9 +38,10 @@ public:
 	void setHighlightOnMouseOver(bool highlight);
 
 	void paint(Graphics &g) override;
-	void newMessage(const ContainerAsyncEvent &e) override;
+	virtual void newMessage(const ContainerAsyncEvent &e) override;
 
 	//void controllableFeedbackUpdate(ControllableContainer *, Controllable *) override;
+	virtual void containerChildAddressChangedAsync(ControllableContainer *) {}
 	virtual void controllableFeedbackUpdateInternal(Controllable *) {} //override this in child classes
 	
 
@@ -148,15 +149,25 @@ void BaseItemMinimalUI<T>::paint(Graphics &g)
 template<class T>
 void BaseItemMinimalUI<T>::newMessage(const ContainerAsyncEvent & e)
 {
-	if (e.type == ContainerAsyncEvent::ControllableFeedbackUpdate)
+	switch (e.type)
+	{
+	case ContainerAsyncEvent::ControllableFeedbackUpdate:
 	{
 		if (e.targetControllable == baseItem->enabled)
 		{
-			if(baseItem->canBeDisabled && dimAlphaOnDisabled) setAlpha(baseItem->enabled->boolValue() ? 1 : .5f);
+			if (baseItem->canBeDisabled && dimAlphaOnDisabled) setAlpha(baseItem->enabled->boolValue() ? 1 : .5f);
 			repaint();
 		}
 
 		controllableFeedbackUpdateInternal(e.targetControllable);
+	}
+	break;
+
+	case ContainerAsyncEvent::ChildAddressChanged:
+	{
+		containerChildAddressChangedAsync(e.targetContainer);
+	}
+	break;
 	}
 }
 

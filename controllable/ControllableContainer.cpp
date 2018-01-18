@@ -1,3 +1,4 @@
+#include "ControllableContainer.h"
 /*
  ==============================================================================
 
@@ -191,6 +192,17 @@ void ControllableContainer::newMessage(const Parameter::ParameterEvent &e) {
 	if (e.type == Parameter::ParameterEvent::VALUE_CHANGED) {
 		onContainerParameterChangedAsync(e.parameter, e.value);
 	}
+}
+void ControllableContainer::setUndoableNiceName(const String & newNiceName)
+{
+	if (Engine::mainEngine != nullptr && !Engine::mainEngine->isLoadingFile)
+	{
+		UndoMaster::getInstance()->performAction("Rename " + niceName, new ControllableContainerChangeNameAction(this, niceName, newNiceName));
+		return;
+	}
+
+	//if Main Engine loading, just set the value without undo history
+	setNiceName(newNiceName);
 }
 void ControllableContainer::setNiceName(const String &_niceName) {
 	if (niceName == _niceName) return;
@@ -727,4 +739,37 @@ EnablingControllableContainer::EnablingControllableContainer(const String & n, b
 InspectableEditor * EnablingControllableContainer::getEditor(bool isRoot)
 {
 	return new EnablingControllableContainerEditor(this, isRoot);
+}
+
+ControllableContainer * ControllableContainer::ControllableContainerAction::getControllableContainer()
+{
+	if (containerRef != nullptr && !containerRef.wasObjectDeleted()) return containerRef.get();
+	else
+	{
+		ControllableContainer * cc = Engine::mainEngine->getControllableContainerForAddress(controlAddress, true);
+		return cc;
+	}
+}
+
+
+bool ControllableContainer::ControllableContainerChangeNameAction::perform()
+{
+	ControllableContainer * cc = getControllableContainer();
+	if (cc != nullptr)
+	{
+		cc->setNiceName(newName);
+		return true;
+	}
+	return false;
+}
+
+bool ControllableContainer::ControllableContainerChangeNameAction::undo()
+{
+	ControllableContainer * cc = getControllableContainer();
+	if (cc != nullptr)
+	{
+		cc->setNiceName(oldName);
+		return true;
+	}
+	return false;
 }
