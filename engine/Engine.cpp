@@ -58,8 +58,10 @@ Engine::~Engine() {
 	ShapeShifterFactory::deleteInstance();
 
 	HelpBox::deleteInstance();
-
-	//UndoMaster::deleteInstance();
+	
+	UndoMaster::deleteInstance();
+	
+	GlobalSettings::deleteInstance();
 
 	Engine::mainEngine = nullptr;
 }
@@ -98,6 +100,8 @@ void Engine::childStructureChanged(ControllableContainer * cc)
 
 void Engine::clear() {
 
+	UndoMaster::getInstance()->clearUndoHistory();
+
 	isClearing = true;
 	if (Outliner::getInstanceWithoutCreating())
 	{
@@ -121,6 +125,7 @@ void Engine::clear() {
 
 	isClearing = false;
 
+	
 	changed();    //fileDocument	
 	engineListeners.call(&EngineListener::engineCleared);
 }

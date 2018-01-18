@@ -34,7 +34,7 @@ public:
 	String helpID;
 	virtual String getHelpID();
 
-	virtual void selectThis();
+	virtual void selectThis(bool addToSelection = false);
 	virtual void setSelected(bool value);
 
 

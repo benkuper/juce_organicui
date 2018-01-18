@@ -73,7 +73,7 @@ void Script::loadScript()
 	}
 
 	fileName = f.getFileName();
-	nameParam->setValue(f.getFileNameWithoutExtension());
+	setNiceName(f.getFileNameWithoutExtension());
 
 	String s = f.loadFileAsString();
 

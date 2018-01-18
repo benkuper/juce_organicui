@@ -1,3 +1,4 @@
+#include "FloatSliderUI.h"
 /*
  ==============================================================================
 
@@ -14,7 +15,8 @@ FloatSliderUI::FloatSliderUI(Parameter * parameter) :
 	ParameterUI(parameter),
 	bgColor(BG_COLOR.darker(.1f).withAlpha(.8f)),
 	useCustomColor(false),
-	fixedDecimals(2)
+	fixedDecimals(2),
+	addToUndoOnMouseUp(true)
 {
     assignOnMousePosDirect = false;
     changeParamOnMouseUpOnly = false;
@@ -157,14 +159,15 @@ void FloatSliderUI::mouseUpInternal(const MouseEvent &)
 
 	BailOutChecker checker (this);
 	
-    if (changeParamOnMouseUpOnly)
-    {
-        setParamNormalizedValue(getValueFromMouse());
-    }
-    else
-    {
-        repaint();
-    }
+	if (changeParamOnMouseUpOnly)
+	{
+		setParamNormalizedValueUndoable(initValue, getValueFromMouse());
+	} else
+	{
+		setParamNormalizedValueUndoable(initValue, parameter->getNormalizedValue());
+	}
+	
+    repaint();
 
     if(!checker.shouldBailOut()){
         setMouseCursor(MouseCursor::NormalCursor);
@@ -182,6 +185,11 @@ float FloatSliderUI::getValueFromPosition(const Point<int> &pos)
 {
     if (orientation == HORIZONTAL) return (pos.x*1.0f / getWidth());
     else return 1-(pos.y*1.0f/ getHeight());
+}
+
+void FloatSliderUI::setParamNormalizedValueUndoable(float oldValue, float newValue)
+{
+	parameter->setUndoableNormalizedValue(oldValue, newValue);
 }
 
 void FloatSliderUI::setParamNormalizedValue(float value)

@@ -33,8 +33,13 @@ public:
 	FloatSliderUI ySlider;
 	FloatSliderUI zSlider;
 
+	var mouseDownValue;
+
 	void setForceFeedbackOnlyInternal() override;
 	void resized() override;
+
+	void mouseDownInternal(const MouseEvent &) override;
+	void mouseUpInternal(const MouseEvent &) override;
 
 	void showEditWindow() override;
 

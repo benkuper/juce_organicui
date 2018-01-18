@@ -266,7 +266,7 @@ void OutlinerItem::childAddressChanged(ControllableContainer *)
 void OutlinerItemComponent::labelTextChanged(Label *)
 {
 	if (item.wasObjectDeleted()) return;
-	item->container->setNiceName(label.getText());
+	item->container->setUndoableNiceName(label.getText());
 }
 
 void OutlinerItemComponent::mouseDown(const MouseEvent &e)

@@ -42,6 +42,24 @@ Controllable::~Controllable() {
 	queuedNotifier.addMessage(new ControllableEvent(ControllableEvent::CONTROLLABLE_REMOVED, this));
 }
 
+UndoableAction * Controllable::setUndoableNiceName(const String & newNiceName, bool onlyReturnAction)
+{
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile)
+	{
+		setNiceName(newNiceName);
+		return nullptr;
+	}
+
+	UndoableAction * a = new ControllableChangeNameAction(this, niceName, newNiceName);
+	if (onlyReturnAction) return a;
+
+	UndoMaster::getInstance()->performAction("Rename " + niceName, a);
+	return a;
+
+	//if Main Engine loading, just set the value without undo history
+	
+}
+
 void Controllable::setNiceName(const String & _niceName) {
 	if (niceName == _niceName) return;
 
@@ -226,4 +244,36 @@ var Controllable::setValueFromScript(const juce::var::NativeFunctionArgs& a) {
 	}
 
 	return var();
+}
+
+Controllable * Controllable::ControllableAction::getControllable()
+{
+	if (controllableRef != nullptr && !controllableRef.wasObjectDeleted()) return controllableRef.get();
+	else
+	{
+		Controllable * c = Engine::mainEngine->getControllableForAddress(controlAddress, true);
+		return c;
+	}
+}
+
+bool Controllable::ControllableChangeNameAction::perform()
+{
+	Controllable * c = getControllable();
+	if (c != nullptr)
+	{
+		c->setNiceName(newName);
+		return true;
+	}
+	return false;
+}
+
+bool Controllable::ControllableChangeNameAction::undo()
+{
+	Controllable * c = getControllable();
+	if (c != nullptr)
+	{
+		c->setNiceName(oldName); 
+		return true;
+	}
+	return false;
 }

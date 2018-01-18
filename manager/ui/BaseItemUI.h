@@ -15,7 +15,8 @@
 template<class T>
 class BaseItemUI :
 	public BaseItemMinimalUI<T>,
-	public ButtonListener
+	public ButtonListener,
+	public LabelListener
 {
 public:
 	enum ResizeMode { NONE, VERTICAL, HORIZONTAL, ALL };
@@ -53,7 +54,7 @@ public:
 
     Component * resizer;
 
-	ScopedPointer<StringParameterUI> nameUI;
+	Label itemLabel;
 	ScopedPointer<BoolImageToggleUI> enabledBT;
 	ScopedPointer<ImageButton> removeBT;
 
@@ -75,8 +76,10 @@ public:
 	void mouseDrag(const MouseEvent &e) override;
 	void mouseUp(const MouseEvent &e) override;
 	void mouseDoubleClick(const MouseEvent &e) override;
+	virtual void labelTextChanged(Label * l) override;
 
-	void controllableFeedbackUpdateInternal(Controllable *) override;
+	virtual void containerChildAddressChangedAsync(ControllableContainer *) override;
+	virtual void controllableFeedbackUpdateInternal(Controllable *) override;
 
 	class Grabber : public Component
 	{
@@ -124,14 +127,18 @@ BaseItemUI<T>::BaseItemUI(T * _item, ResizeMode _resizeMode, bool _canBeDragged)
 	resizeMode(_resizeMode),
 	resizerWidth(0),
 	resizerHeight(0),
-	resizer(nullptr)
+	resizer(nullptr),
+	itemLabel("itemLabel", dynamic_cast<BaseItem *>(inspectable.get())->niceName)
 {
-    
-	nameUI = this->baseItem->nameParam->createStringParameterUI();
-	this->addAndMakeVisible(nameUI);
+	itemLabel.setColour(itemLabel.backgroundWhenEditingColourId, Colours::white);
+	itemLabel.setColour(itemLabel.backgroundColourId, Colours::transparentWhite);
+	itemLabel.setColour(itemLabel.textColourId, TEXT_COLOR);
+	itemLabel.setFont((float)(headerHeight - 4));
+	itemLabel.setJustificationType(Justification::centredLeft);
 
-	
-
+	itemLabel.setEditable(false,this->baseItem->nameCanBeChangedByUser);
+	itemLabel.addListener(this);
+	this->addAndMakeVisible(&itemLabel);
 
 	if (canBeDragged)
 	{
@@ -300,7 +307,7 @@ void BaseItemUI<T>::resized()
 	h.removeFromRight(2);
 
 	resizedInternalHeader(h);
-	nameUI->setBounds(h);
+	itemLabel.setBounds(h.reduced(1));
 
 	r.removeFromTop(headerGap);
 
@@ -404,7 +411,16 @@ void BaseItemUI<T>::mouseDrag(const MouseEvent & e)
 template<class T>
 void BaseItemUI<T>::mouseUp(const MouseEvent &)
 {
-	if (canBeDragged && resizeMode != ALL) itemUIListeners.call(&ItemUIListener::itemUIGrabEnd, this);
+	if (canBeDragged)
+	{
+		if (resizeMode == ALL)
+		{
+			this->baseItem->viewUIPosition->setUndoablePoint(posAtMouseDown, this->baseItem->viewUIPosition->getPoint());
+		} else
+		{
+			itemUIListeners.call(&ItemUIListener::itemUIGrabEnd, this);
+		}
+	}
 }
 
 template<class T>
@@ -412,6 +428,20 @@ void BaseItemUI<T>::mouseDoubleClick(const MouseEvent & e)
 {
 	if (e.eventComponent == grabber) this->baseItem->miniMode->setValue(!this->baseItem->miniMode->boolValue());
 
+}
+
+template<class T>
+void BaseItemUI<T>::labelTextChanged(Label * l)
+{
+	if (l == &itemLabel) this->baseItem->setUndoableNiceName(l->getText());
+}
+
+
+template<class T>
+void BaseItemUI<T>::containerChildAddressChangedAsync(ControllableContainer *)
+{
+
+	itemLabel.setText(this->baseItem->niceName, dontSendNotification);
 }
 
 template<class T>

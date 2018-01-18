@@ -289,6 +289,20 @@ bool BaseManagerUI<M, T, U>::keyPressed(const KeyPress & e)
 			manager->addItemFromClipboard();
 			return true;
 		}
+	} else
+	{
+		if((e.getKeyCode() == e.deleteKey || e.getKeyCode() == e.backspaceKey) && manager->selectionManager == InspectableSelectionManager::activeSelectionManager)
+		{
+			Array<T *> itemsToRemove;
+			for (auto & i : manager->selectionManager->currentInspectables)
+			{
+				T * it = dynamic_cast<T *>(i);
+				if (it != nullptr) itemsToRemove.add(it);
+			}
+
+			manager->removeItems(itemsToRemove);
+			return true;
+		}
 	}
 	return false;
 }

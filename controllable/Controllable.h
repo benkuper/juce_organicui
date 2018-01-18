@@ -74,6 +74,7 @@ public:
 
 	ControllableContainer * parentContainer;
 
+	UndoableAction * setUndoableNiceName(const String &_niceName, bool onlyReturnAction = false);
 	void setNiceName(const String &_niceName);
 	void setCustomShortName(const String &_shortName);
 	void setAutoShortName();
@@ -143,9 +144,46 @@ public:
 
 
 private:
-
 	WeakReference<Controllable>::Master masterReference;
 	friend class WeakReference<Controllable>;
+
+
+public:
+	class ControllableAction :
+		public UndoableAction
+	{
+	public:
+		ControllableAction(Controllable * c) :
+			controllableRef(c)
+		{
+			controlAddress = c->getControlAddress();
+		}
+
+		WeakReference<Controllable> controllableRef;
+		String controlAddress;
+
+		Controllable * getControllable();
+	};
+
+	class ControllableChangeNameAction :
+		public ControllableAction
+	{
+	public:
+		ControllableChangeNameAction(Controllable * c, String oldName, String newName) :
+			ControllableAction(c),
+			oldName(oldName),
+			newName(newName)
+		{
+		}
+
+		String oldName;
+		String newName;
+
+		bool perform() override;
+		bool undo() override;
+	};
+
+
 
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Controllable)

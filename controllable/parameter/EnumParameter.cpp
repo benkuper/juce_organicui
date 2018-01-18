@@ -17,7 +17,6 @@ EnumParameter::EnumParameter(const String & niceName, const String &description,
 
 EnumParameter * EnumParameter::addOption(String key, var data, bool selectIfFirstOption)
 {
-
 	enumValues.set(key, data);
 	if (enumValues.size() == 1 && selectIfFirstOption) setValue(key, true);
 	enumListeners.call(&Listener::enumOptionAdded, this, key);
@@ -87,7 +86,7 @@ void EnumParameter::setValueWithKey(String key)
 	setValue(key);
 }
 
-void EnumParameter::setNext(bool loop)
+void EnumParameter::setNext(bool loop, bool addToUndo)
 {
 	HashMap<String, var>::Iterator i(enumValues);
 	int index = 0;
@@ -99,11 +98,13 @@ void EnumParameter::setNext(bool loop)
 		{
 			if (i.next())
 			{
-				setValueWithKey(i.getKey());
+				if (addToUndo) setUndoableValue(value, i.getKey());
+				else setValueWithKey(i.getKey());
 			}
 			else if (loop)
 			{
-				setValueWithKey(firstKey);
+				if (addToUndo) setUndoableValue(value, i.getKey());
+				else setValueWithKey(firstKey);
 				
 			}
 			return;

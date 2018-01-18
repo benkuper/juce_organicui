@@ -2,22 +2,24 @@
 /*
   ==============================================================================
 
-    InspectableContentComponent.cpp
-    Created: 9 May 2016 6:51:16pm
-    Author:  bkupe
+	InspectableContentComponent.cpp
+	Created: 9 May 2016 6:51:16pm
+	Author:  bkupe
 
   ==============================================================================
 */
 
 InspectableContentComponent::InspectableContentComponent(Inspectable * inspectable) :
 	InspectableContent(inspectable),
-repaintOnSelectionChanged(true),
-rounderCornerSize(4),
+	repaintOnSelectionChanged(true),
+	rounderCornerSize(4),
 	autoDrawHighlightWhenSelected(true),
 	highlightColor(HIGHLIGHT_COLOR),
-autoSelectWithChildRespect(true),
-bringToFrontOnSelect(true)
+	autoSelectWithChildRespect(true),
+	bringToFrontOnSelect(true)
 {
+	setWantsKeyboardFocus(true);
+	setMouseClickGrabsKeyboardFocus(true);
 }
 
 InspectableContentComponent::~InspectableContentComponent()
@@ -28,7 +30,7 @@ InspectableContentComponent::~InspectableContentComponent()
 void InspectableContentComponent::mouseEnter(const MouseEvent & e)
 {
 	//DBG("Mouse Enter : " << inspectable->getHelpID());
-	if(HelpBox::getInstance()->overDataID.isEmpty()) HelpBox::getInstance()->setOverData(inspectable->getHelpID());
+	if (HelpBox::getInstance()->overDataID.isEmpty()) HelpBox::getInstance()->setOverData(inspectable->getHelpID());
 }
 
 void InspectableContentComponent::mouseExit(const MouseEvent & e)
@@ -65,7 +67,9 @@ void InspectableContentComponent::mouseDown(const MouseEvent & e)
 
 		if (!foundAChildComponent)
 		{
-			inspectable->selectThis();
+			
+			//grabKeyboardFocus();
+			inspectable->selectThis(e.mods.isCommandDown());
 		}
 	}
 }

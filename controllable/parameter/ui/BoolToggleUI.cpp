@@ -75,10 +75,11 @@ void BoolToggleUI::paint(Graphics & g)
 	}
 }
 
-void BoolToggleUI::mouseDownInternal(const MouseEvent &)
+void BoolToggleUI::mouseDownInternal(const MouseEvent & e)
 {
 	if (!parameter->isEditable || forceFeedbackOnly) return;
-    parameter->setValue(!parameter->boolValue());
+	if (e.mods.isRightButtonDown()) parameter->setValue(parameter->boolValue(), !parameter->boolValue());
+	else parameter->setUndoableValue(parameter->boolValue(), !parameter->boolValue()); //only undoable when from left button, real toggle behaviour
 }
 
 void BoolToggleUI::mouseUpInternal(const MouseEvent & e)

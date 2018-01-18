@@ -27,8 +27,7 @@ GlobalSettings::GlobalSettings() :
 	fileToOpenOnStartup->defaultUI = StringParameter::FILE;
 
 	addChildControllableContainer(&confirmationsCC);
-	askBeforeRemovingItems = confirmationsCC.addBoolParameter("Ask before removing items", "If enabled, you will get a confirmation prompt before removing any item", true);
-	askForSaveBeforeClosing = confirmationsCC.addBoolParameter("Always ask to save before closing", "If enabled, the app will always prompt to save the current file before closing", true);
+	askBeforeRemovingItems = confirmationsCC.addBoolParameter("Ask before removing items", "If enabled, you will get a confirmation prompt before removing any item", false);
 
 }
 

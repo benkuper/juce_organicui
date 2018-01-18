@@ -57,13 +57,15 @@ public:
 	virtual var getValue(); //may be useful, or testing expression or references (for now, forward update from expression timer)
 
     void resetValue(bool silentSet = false);
+	virtual UndoableAction * setUndoableValue(var oldValue, var newValue, bool onlyReturnAction = false);
     virtual void setValue(var _value, bool silentSet = false, bool force = false);
     virtual void setValueInternal(var & _value);
 
 	virtual bool checkValueIsTheSame(var newValue, var oldValue); //can be overriden to modify check behavior
 
     //For Number type parameters
-    void setNormalizedValue(const float &normalizedValue, bool silentSet = false, bool force = false);
+	void setUndoableNormalizedValue(const float &oldNormalizedValue, const float &newNormalizedValue);
+	void setNormalizedValue(const float &normalizedValue, bool silentSet = false, bool force = false);
     float getNormalizedValue();
 
     //helpers for fast typing
@@ -127,17 +129,52 @@ public:
     void addAsyncParameterListener(AsyncListener* newListener) { queuedNotifier.addListener(newListener); }
     void addAsyncCoalescedParameterListener(AsyncListener* newListener) { queuedNotifier.addAsyncCoalescedListener(newListener); }
     void removeAsyncParameterListener(AsyncListener* listener) { queuedNotifier.removeListener(listener); }
+	 
 
 
-	
 private:
+	bool checkVarIsConsistentWithType();
+	WeakReference<Parameter>::Master masterReference;
+	friend class WeakReference<Parameter>;
 
 
+public:
+	class ParameterAction :
+		public ControllableAction
+	{
+	public:
+		ParameterAction(Parameter * param) :
+			ControllableAction(param),
+			parameterRef(param)
+		{
+			controlAddress = param->getControlAddress();
+		}
 
-    bool checkVarIsConsistentWithType();
+		WeakReference<Parameter> parameterRef;
+		String controlAddress;
 
-    WeakReference<Parameter>::Master masterReference;
-    friend class WeakReference<Parameter>;
+		Parameter * getParameter();
+	};
+
+	class ParameterSetValueAction :
+		public ParameterAction
+	{
+	public:
+		ParameterSetValueAction(Parameter * param, var oldValue, var newValue) :
+			ParameterAction(param),
+			oldValue(oldValue), 
+			newValue(newValue)
+		{
+			//DBG("New Parameter Set Value Action");
+		}
+
+		var oldValue;
+		var newValue;
+		
+		bool perform() override;
+		bool undo() override;
+	};
+
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Parameter)

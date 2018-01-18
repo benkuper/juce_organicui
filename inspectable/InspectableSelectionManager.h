@@ -22,6 +22,7 @@ public:
 	~InspectableSelectionManager();
 
 	static InspectableSelectionManager * mainSelectionManager;
+	static InspectableSelectionManager * activeSelectionManager; //The last one having selected something, useful for key events like delete
 
 	bool enabled;
 	Array<Inspectable *> currentInspectables;
@@ -49,6 +50,7 @@ public:
 	ListenerList<Listener> listeners;
 	void addSelectionListener(Listener* newListener) { listeners.add(newListener); }
 	void removeSelectionListener(Listener* listener) { listeners.remove(listener); }
+
 };
 
 

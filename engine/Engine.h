@@ -24,7 +24,7 @@ class Engine :
 {
 public:
 	Engine(const String &fileName = "File",const String &fileExtension = ".file", ApplicationProperties * appProperties = nullptr, const String &appVersion = "1.0.0");
-	~Engine();
+	virtual ~Engine();
 
 	static Engine * mainEngine;
 
@@ -37,6 +37,7 @@ public:
 	String fileExtension = ".file";
 	String fileWildcard = "*"+fileExtension;
 
+	virtual void changed() override;
 	void createNewGraph();
 	void clear();
 	virtual void clearInternal() {}; //to override to clear specific application classes

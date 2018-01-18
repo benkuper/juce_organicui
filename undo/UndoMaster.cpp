@@ -8,8 +8,6 @@
   ==============================================================================
   */
 
-/*
-
 juce_ImplementSingleton(UndoMaster);
 
 UndoMaster::UndoMaster() :
@@ -28,6 +26,7 @@ void UndoMaster::performAction(const String & name, UndoableAction * action)
 	beginNewTransaction(name);
 	perform(action,name);
 	isPerforming = false;
+	if (Engine::mainEngine != nullptr) Engine::mainEngine->changed();
 }
 
 void UndoMaster::performActions(const String & name, Array<UndoableAction*> actions)
@@ -37,6 +36,5 @@ void UndoMaster::performActions(const String & name, Array<UndoableAction*> acti
 	beginNewTransaction(name);
 	for (auto &a : actions) perform(a,name);
 	isPerforming = false;
+	if (Engine::mainEngine != nullptr) Engine::mainEngine->changed();
 }
-
-*/

@@ -24,6 +24,13 @@ String Engine::getDocumentTitle() {
   return getFile().getFileName();
 }
 
+void Engine::changed()
+{
+	FileBasedDocument::changed();
+	DBG("Engine :: changed !");
+	engineListeners.call(&EngineListener::fileChanged);
+}
+
 void Engine::createNewGraph(){
 	engineListeners.call(&EngineListener::startLoadFile);
 	clear();
@@ -34,6 +41,7 @@ void Engine::createNewGraph(){
 	setFile(File());
 	isLoadingFile = false;
 	handleAsyncUpdate();
+	setChangedFlag(false);
 
 }
 
@@ -58,6 +66,7 @@ Result Engine::loadDocument (const File& file){
   triggerAsyncUpdate();
 #endif
 
+  setChangedFlag(false);
   return Result::ok();
 }
 
@@ -97,6 +106,7 @@ void Engine::loadDocumentAsync(const File & file){
   }// deletes data before launching audio, (data not needed after loaded)
 
   jsonData = var();
+  setChangedFlag(false);
 }
 
 bool Engine::allLoadingThreadsAreEnded(){
@@ -136,6 +146,7 @@ Result Engine::saveDocument (const File& file){
   os->flush();
 
   setLastDocumentOpened(file);
+  setChangedFlag(false);
   engineListeners.call(&EngineListener::fileSaved);
   return Result::ok();
 }

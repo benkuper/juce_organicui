@@ -26,7 +26,8 @@ public:
 	Colour bgColor;
 	Colour customColor;
 	bool useCustomColor;
-
+	
+	bool addToUndoOnMouseUp;
 	
 	bool changeParamOnMouseUpOnly;
     bool assignOnMousePosDirect;
@@ -48,6 +49,7 @@ public:
     float getValueFromMouse();
     float getValueFromPosition(const Point<int> &pos);
 
+	virtual void setParamNormalizedValueUndoable(float oldValue, float newValue);
     virtual void setParamNormalizedValue(float value);
     virtual float getParamNormalizedValue();
 	void rangeChanged(Parameter *)override;
@@ -57,6 +59,5 @@ protected:
     void valueChanged(const var &) override ;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FloatSliderUI)
 };
-
 
 #endif  // FLOATSLIDERUI_H_INCLUDED

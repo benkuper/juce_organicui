@@ -81,9 +81,24 @@ void Parameter::resetValue(bool silentSet)
 	setValue(defaultValue, silentSet, true);
 }
 
+UndoableAction * Parameter::setUndoableValue(var oldValue, var newValue, bool onlyReturnAction)
+{
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile)
+	{
+		//if Main Engine loading, just set the value without undo history
+		setValue(newValue);
+		return nullptr;
+	}
+
+	UndoableAction * a = new ParameterSetValueAction(this, oldValue, newValue);
+	if (onlyReturnAction) return a;
+
+	UndoMaster::getInstance()->performAction("Set " + niceName + " value", a);
+	return a;
+}
+
 void Parameter::setValue(var _value, bool silentSet, bool force)
 {
-
 	if (!force && checkValueIsTheSame(_value, value)) return;
 	lastValue = var(value);
 	setValueInternal(_value);
@@ -91,6 +106,8 @@ void Parameter::setValue(var _value, bool silentSet, bool force)
 	if (_value != defaultValue) isOverriden = true;
 
 	if (!silentSet) notifyValueChanged();
+
+
 }
 
 
@@ -128,6 +145,7 @@ void Parameter::setRange(var min, var max, bool setDefaultRange) {
 	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::BOUNDS_CHANGED, this, arr));
 
 	setValue(value); //if value is outside range, this will change the value
+
 }
 
 void Parameter::setValueInternal(var & _value) //to override by child classes
@@ -159,6 +177,12 @@ bool Parameter::checkVarIsConsistentWithType() {
 	else if (type == Type::FLOAT)   return value.isDouble();
 	return true;
 }
+
+void Parameter::setUndoableNormalizedValue(const float & oldNormalizedValue, const float & newNormalizedValue)
+{
+	setUndoableValue(jmap<float>(oldNormalizedValue, (float)minimumValue, (float)maximumValue), jmap<float>(newNormalizedValue, (float)minimumValue, (float)maximumValue));
+}
+
 
 void Parameter::setNormalizedValue(const float & normalizedValue, bool silentSet, bool force)
 {
@@ -227,4 +251,34 @@ var Parameter::getValueFromScript(const juce::var::NativeFunctionArgs & a)
 }
 
 
-//JS Helper
+// UNDO MANAGEMENT
+
+Parameter * Parameter::ParameterAction::getParameter() {
+	return dynamic_cast<Parameter *>(getControllable());
+}
+
+bool Parameter::ParameterSetValueAction::perform()
+{
+	Parameter * p = getParameter();
+	if (p == nullptr)
+	{
+		DBG("Undo set value : parameter not found " << controlAddress);
+		return false;
+	}
+
+	p->setValue(newValue);
+	return true;
+}
+
+bool Parameter::ParameterSetValueAction::undo()
+{
+	Parameter * p = getParameter();
+	if (p == nullptr)
+	{
+		DBG("Undo set value : parameter not found " << controlAddress);
+		return false;
+	}
+
+	p->setValue(oldValue);
+	return true;
+}

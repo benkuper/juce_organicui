@@ -43,5 +43,5 @@ void BoolImageToggleUI::valueChanged(const var &)
 
 void BoolImageToggleUI::buttonClicked(Button *)
 {
-	boolParam->setValue(!boolParam->boolValue());
+	boolParam->setUndoableValue(boolParam->boolValue(),!boolParam->boolValue());
 }
