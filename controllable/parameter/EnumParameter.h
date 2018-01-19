@@ -39,6 +39,8 @@ public:
 	void setNext(bool loop = true, bool addToUndo = false);
 
 	int getKeyIndex(String key);
+
+	bool checkValueIsTheSame(var oldValue, var newValue) override;
 	
 	EnumParameterUI * createUI(EnumParameter * target = nullptr);
 	ControllableUI * createDefaultUI(Controllable * targetControllable = nullptr) override;

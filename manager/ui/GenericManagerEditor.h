@@ -42,7 +42,7 @@ public:
 	virtual void resizedInternalHeader(juce::Rectangle<int> &r) override;
 
 	virtual void showMenuAndAddItem(bool isFromAddButton);
-	virtual void addItemFromMenu(bool isFromAddButton);
+	virtual T * addItemFromMenu(bool isFromAddButton);
 
 	void buttonClicked(Button *) override;
 	void mouseDown(const MouseEvent &e) override;
@@ -118,7 +118,7 @@ void GenericManagerEditor<T>::showMenuAndAddItem(bool isFromAddButton)
 		if (m != nullptr)
 		{
 			manager->addItem(m);
-			setCollapsed(false);
+			setCollapsed(false,true);
 		}
 	} else
 	{
@@ -144,10 +144,11 @@ void GenericManagerEditor<T>::showMenuAndAddItem(bool isFromAddButton)
 }
 
 template<class T>
-void GenericManagerEditor<T>::addItemFromMenu(bool /*isFromAddButton*/)
+T * GenericManagerEditor<T>::addItemFromMenu(bool /*isFromAddButton*/)
 {
-	manager->BaseManager<T>::addItem();
-	setCollapsed(false);
+	T * item = manager->BaseManager<T>::addItem();
+	setCollapsed(false,true);
+	return item;
 }
 
 template<class T>

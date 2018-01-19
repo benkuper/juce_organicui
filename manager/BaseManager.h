@@ -448,7 +448,8 @@ var BaseManager<T>::getJSONData()
 	{
 		itemsData.append(t->getJSONData());
 	}
-	data.getDynamicObject()->setProperty("items", itemsData);
+
+	if(itemsData.size() > 0) data.getDynamicObject()->setProperty("items", itemsData);
 
 	return data;
 }
@@ -459,6 +460,7 @@ void BaseManager<T>::loadJSONDataInternal(var data)
 	clear();
 	Array<var> * itemsData = data.getProperty("items", var()).getArray();
 	if (itemsData == nullptr) return;
+
 	for (auto &td : *itemsData)
 	{
 		addItemFromData(td, false);

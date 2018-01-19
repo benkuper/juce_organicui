@@ -29,6 +29,9 @@ public:
 	void setColor(const uint32 &_color, bool silentSet = false, bool force = false);
 	void setColor(const Colour &_color, bool silentSet = false, bool force = false);
 
+
+	bool checkValueIsTheSame(var oldValue, var newValue) override;
+
 	ColorParameterUI * createColorParamUI();
 	ControllableUI * createDefaultUI(Controllable * targetControllable = nullptr) override;
 

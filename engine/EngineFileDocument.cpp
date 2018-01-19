@@ -27,7 +27,6 @@ String Engine::getDocumentTitle() {
 void Engine::changed()
 {
 	FileBasedDocument::changed();
-	DBG("Engine :: changed !");
 	engineListeners.call(&EngineListener::fileChanged);
 }
 
@@ -189,8 +188,8 @@ var Engine::getJSONData()
 
   data.getDynamicObject()->setProperty("metaData", metaData);
 
-  //data.getDynamicObject()->setProperty("presetManager", PresetManager::getInstance()->getJSONData());
-  data.getDynamicObject()->setProperty("dashboardManager", DashboardManager::getInstance()->getJSONData());
+  var dData = DashboardManager::getInstance()->getJSONData();
+  if(!dData.isVoid() && dData.getDynamicObject()->getProperties().size() > 0) data.getDynamicObject()->setProperty("dashboardManager", dData);
 
   return data;
 }

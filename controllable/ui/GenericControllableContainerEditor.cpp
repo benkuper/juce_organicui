@@ -383,12 +383,23 @@ EnablingControllableContainerEditor::EnablingControllableContainerEditor(Enablin
 	{
 		enabledUI = ioContainer->enabled->createImageToggle(AssetManager::getInstance()->getPowerBT());
 		addAndMakeVisible(enabledUI);
+
+		setCollapsed(!ioContainer->enabled->boolValue(), true, false);
 	}
 	
+
 }
 
 void EnablingControllableContainerEditor::resizedInternalHeader(Rectangle<int>& r)
 {
 	if(((EnablingControllableContainer *)container.get())->canBeDisabled) enabledUI->setBounds(r.removeFromLeft(r.getHeight()).reduced(2));
 	GenericControllableContainerEditor::resizedInternalHeader(r);
+}
+
+void EnablingControllableContainerEditor::controllableFeedbackUpdate(Controllable * c)
+{
+	if (c == ioContainer->enabled)
+	{
+		setCollapsed(!ioContainer->enabled->boolValue(), true);
+	}
 }

@@ -1,3 +1,4 @@
+#include "ColorParameter.h"
 /*
   ==============================================================================
 
@@ -60,6 +61,12 @@ void ColorParameter::setColor(const Colour &_color, bool silentSet, bool force)
 	}
 	
 	setValue(colorVar, silentSet, force);
+}
+
+bool ColorParameter::checkValueIsTheSame(var oldValue, var newValue)
+{
+	if (!(newValue.isArray() && oldValue.isArray())) return false;
+	return newValue[0] == oldValue[0] && newValue[1] == oldValue[1] && newValue[2] == oldValue[2] && oldValue[3] == newValue[3];
 }
 
 ColorParameterUI * ColorParameter::createColorParamUI()

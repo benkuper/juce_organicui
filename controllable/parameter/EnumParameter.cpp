@@ -1,3 +1,4 @@
+#include "EnumParameter.h"
 /*
   ==============================================================================
 
@@ -123,6 +124,11 @@ int EnumParameter::getKeyIndex(String key)
 		index++;
 	}
 	return -1;
+}
+
+bool EnumParameter::checkValueIsTheSame(var oldValue, var newValue)
+{
+	return oldValue.toString() == newValue.toString();
 }
 
 EnumParameterUI * EnumParameter::createUI(EnumParameter * target)

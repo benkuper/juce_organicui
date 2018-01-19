@@ -570,17 +570,22 @@ var ControllableContainer::getJSONData()
 		if (wc->type == Controllable::TRIGGER && !includeTriggersInSaveLoad) continue;
 		if (wc.wasObjectDeleted()) continue;
 		if (!wc->isSavable) continue;
+		Parameter * p = dynamic_cast<Parameter *>(wc.get());
+		if (p == nullptr || !p->isOverriden) continue; //do not save parameters that have not changed. it should light up the file
 		paramsData.append(wc->getJSONData(this));
 	}
 
-
-	data.getDynamicObject()->setProperty("uid", uid.toString());
-	data.getDynamicObject()->setProperty("parameters", paramsData);
+	//data.getDynamicObject()->setProperty("uid", uid.toString());
+	if(paramsData.size() > 0) data.getDynamicObject()->setProperty("parameters", paramsData);
+	
 	if (saveAndLoadName)
 	{
 		data.getDynamicObject()->setProperty("niceName", niceName);
 		if (hasCustomShortName) data.getDynamicObject()->setProperty("shortName", shortName);
 	}
+
+	if (editorIsCollapsed) data.getDynamicObject()->setProperty("editorIsCollapsed", true); //only set if true to avoid too much data
+
 	return data;
 }
 
@@ -588,9 +593,10 @@ void ControllableContainer::loadJSONData(var data, bool createIfNotThere)
 {
 	if (data.isVoid()) return;
 
-	if (data.getDynamicObject()->hasProperty("uid")) uid = data.getDynamicObject()->getProperty("uid");
+	//if (data.getDynamicObject()->hasProperty("uid")) uid = data.getDynamicObject()->getProperty("uid");
 	if (data.getDynamicObject()->hasProperty("niceName")) setNiceName(data.getDynamicObject()->getProperty("niceName"));
 	if (data.getDynamicObject()->hasProperty("shortName")) setCustomShortName(data.getDynamicObject()->getProperty("shortName"));
+	if (data.getDynamicObject()->hasProperty("editorIsCollapsed")) editorIsCollapsed = data.getDynamicObject()->getProperty("editorIsCollapsed");
 
 	Array<var> * paramsData = data.getDynamicObject()->getProperty("parameters").getArray();
 

@@ -94,8 +94,8 @@ public:
 	EnablingControllableContainer * ioContainer;
 	ScopedPointer<BoolImageToggleUI> enabledUI;
 
-	void resizedInternalHeader(Rectangle<int> &r) override;
-
+	virtual void resizedInternalHeader(Rectangle<int> &r) override;
+	virtual void controllableFeedbackUpdate(Controllable *) override;
 };
 
 #endif  // GENERICCONTROLLABLECONTAINEREDITOR_H_INCLUDED

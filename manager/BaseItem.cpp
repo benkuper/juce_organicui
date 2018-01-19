@@ -44,6 +44,7 @@ BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts
 	viewUISize = addPoint2DParameter("Size", "Size in the view");
 	viewUISize->setBounds(30, 60, 1000, 1000);
 	viewUISize->setPoint(200, 200);
+	viewUISize->defaultValue = viewUISize->value;
 	viewUISize->hideInEditor = true;
 	viewUISize->hideInOutliner = true;
 	viewUISize->isTargettable = false;
