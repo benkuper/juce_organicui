@@ -249,7 +249,7 @@ UndoableAction * BaseManager<T>::getAddItemUndoableAction(T * item, var data)
 	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile) return nullptr;
 	jassert(items.indexOf(item) == -1); //be sure item is no here already
 	if (item == nullptr) item = createItem();
-	return new AddItemAction(this, item);
+	return new AddItemAction(this, item, data);
 }
 
 template<class T>
@@ -265,15 +265,13 @@ T * BaseManager<T>::addItem(T * item, var data, bool addToUndo)
 	{
 		if (Engine::mainEngine != nullptr && !Engine::mainEngine->isLoadingFile)
 		{
-			UndoMaster::getInstance()->performAction("Add " + bi->niceName, new AddItemAction(this, item));
+			UndoMaster::getInstance()->performAction("Add " + bi->niceName, new AddItemAction(this, item, data));
 			return item;
 		}
 	}
 
 
 	items.add(item);
-	addChildControllableContainer(bi);
-	bi->setNiceName(bi->niceName); //force setting a unique name if already taken
 	bi->addBaseItemListener(this);
 
 	if (!data.isVoid())
@@ -281,6 +279,9 @@ T * BaseManager<T>::addItem(T * item, var data, bool addToUndo)
 		bi->loadJSONData(data);
 	}
 
+	//bi->setNiceName(bi->niceName); //force setting a unique name if already taken, after load data so if name is the same as another, will change here
+
+	addChildControllableContainer(bi);
 
 	addItemInternal(item, data);
 
