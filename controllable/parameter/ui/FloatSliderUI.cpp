@@ -15,7 +15,7 @@ FloatSliderUI::FloatSliderUI(Parameter * parameter) :
 	ParameterUI(parameter),
 	bgColor(BG_COLOR.darker(.1f).withAlpha(.8f)),
 	useCustomColor(false),
-	fixedDecimals(2),
+	fixedDecimals(3),
 	addToUndoOnMouseUp(true)
 {
     assignOnMousePosDirect = false;
