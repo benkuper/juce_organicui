@@ -23,36 +23,36 @@ public:
 
 	BaseItemUI<T>(T * _item, ResizeMode resizeMode = NONE, bool canBeDragged = true);
 	virtual ~BaseItemUI<T>();
-	
+
 	//LAYOUT
-    int margin;
-    int minContentHeight;
+	int margin;
+	int minContentHeight;
 
 	float viewZoom;
-    
+
 	//grabber
 	int grabberHeight;
 	Point<float> posAtMouseDown;
-    bool canBeDragged;
+	bool canBeDragged;
 
 	//header
 	int headerHeight;
 	int headerGap;
-    
-    //Resize
-    ResizeMode resizeMode;
-    int resizerWidth;
-    int resizerHeight;
-    
+
+	//Resize
+	ResizeMode resizeMode;
+	int resizerWidth;
+	int resizerHeight;
+
 	//list pos
 	Point<int> posAtDown;
 	Point<int> dragOffset; //for list grabbing
 
-    ScopedPointer<ResizableCornerComponent> cornerResizer;
-    ScopedPointer<ResizableEdgeComponent> edgeResizer;
+	ScopedPointer<ResizableCornerComponent> cornerResizer;
+	ScopedPointer<ResizableEdgeComponent> edgeResizer;
 	ComponentBoundsConstrainer constrainer;
 
-    Component * resizer;
+	Component * resizer;
 
 	Label itemLabel;
 	ScopedPointer<BoolImageToggleUI> enabledBT;
@@ -70,6 +70,7 @@ public:
 	virtual void resized() override;
 	virtual void resizedInternalHeader(juce::Rectangle<int> &) {}
 	virtual void resizedInternalContent(juce::Rectangle<int> &) {}
+	virtual void resizedInternalFooter(juce::Rectangle<int> &) {}
 	void buttonClicked(Button *b) override;
 
 	void mouseDown(const MouseEvent &e) override;
@@ -136,7 +137,7 @@ BaseItemUI<T>::BaseItemUI(T * _item, ResizeMode _resizeMode, bool _canBeDragged)
 	itemLabel.setFont((float)(headerHeight - 4));
 	itemLabel.setJustificationType(Justification::centredLeft);
 
-	itemLabel.setEditable(false,this->baseItem->nameCanBeChangedByUser);
+	itemLabel.setEditable(false, this->baseItem->nameCanBeChangedByUser);
 	itemLabel.addListener(this);
 	this->addAndMakeVisible(&itemLabel);
 
@@ -162,7 +163,7 @@ BaseItemUI<T>::BaseItemUI(T * _item, ResizeMode _resizeMode, bool _canBeDragged)
 
 	case HORIZONTAL:
 		resizerWidth = 4;
-		constrainer.setMinimumWidth(20+resizerWidth); // ??
+		constrainer.setMinimumWidth(20 + resizerWidth); // ??
 		edgeResizer = new ResizableEdgeComponent(this, &constrainer, ResizableEdgeComponent::rightEdge);
 		edgeResizer->setAlwaysOnTop(true);
 		this->addAndMakeVisible(edgeResizer);
@@ -202,7 +203,7 @@ BaseItemUI<T>::BaseItemUI(T * _item, ResizeMode _resizeMode, bool _canBeDragged)
 template<class T>
 BaseItemUI<T>::~BaseItemUI()
 {
-	if(removeBT != nullptr) removeBT->removeListener(this);
+	if (removeBT != nullptr) removeBT->removeListener(this);
 }
 
 template<class T>
@@ -269,14 +270,6 @@ void BaseItemUI<T>::setViewZoom(float value)
 template<class T>
 void BaseItemUI<T>::resized()
 {
-	/*
-	if (this->getHeight() < getHeightWithoutContent() + minContentHeight)
-	{
-		this->setSize(this->getWidth(), getHeightWithoutContent() + minContentHeight);
-		return;
-	}
-	*/
-
 	//Header
 	if (this->getWidth() == 0 || this->getHeight() == 0) return;
 	juce::Rectangle<int> r = this->getLocalBounds().reduced(margin);
@@ -303,7 +296,7 @@ void BaseItemUI<T>::resized()
 		h.removeFromLeft(2);
 	}
 
-	if(removeBT != nullptr) removeBT->setBounds(h.removeFromRight(h.getHeight()));
+	if (removeBT != nullptr) removeBT->setBounds(h.removeFromRight(h.getHeight()));
 	h.removeFromRight(2);
 
 	resizedInternalHeader(h);
@@ -318,24 +311,35 @@ void BaseItemUI<T>::resized()
 			int top = r.getY();
 			resizedInternalContent(r);
 			if (r.getWidth() == 0 || r.getHeight() == 0) return;
-			setContentSize(r.getWidth(),r.getBottom() - top);
+			setContentSize(r.getWidth(), r.getBottom() - top);
 		} else
 		{
 			switch (resizeMode)
 			{
 			case VERTICAL:
-				edgeResizer->setBounds(r.removeFromBottom(resizerHeight));
+			{
+				juce::Rectangle<int> fr = r.removeFromBottom(resizerHeight);
+				resizedInternalFooter(fr);
+				edgeResizer->setBounds(fr);
 				this->baseItem->listUISize->setValue((float)r.getHeight());
-				break;
+
+			}
+			break;
 
 			case HORIZONTAL:
+			{
 				edgeResizer->setBounds(r.removeFromRight(resizerWidth));
 				this->baseItem->listUISize->setValue((float)r.getWidth());
+			}
 				break;
 
 			case ALL:
-				cornerResizer->setBounds(r.removeFromBottom(resizerHeight).withLeft(r.getWidth() - resizerHeight));
+			{
+				juce::Rectangle<int> fr = r.removeFromBottom(resizerHeight);
+				resizedInternalFooter(fr);
+				cornerResizer->setBounds(fr.withLeft(r.getWidth() - resizerHeight));
 				this->baseItem->viewUISize->setPoint((float)r.getWidth(), (float)r.getHeight());
+			}
 				break;
 
 			default:
@@ -353,8 +357,8 @@ void BaseItemUI<T>::buttonClicked(Button * b)
 	if (b == removeBT)
 	{
 		if (this->baseItem->askConfirmationBeforeRemove && GlobalSettings::getInstance()->askBeforeRemovingItems->boolValue())
-		{  
-			int result = AlertWindow::showOkCancelBox(AlertWindow::QuestionIcon, "Delete " + this->baseItem->niceName, "Are you sure you want to delete this ?","Delete","Cancel");
+		{
+			int result = AlertWindow::showOkCancelBox(AlertWindow::QuestionIcon, "Delete " + this->baseItem->niceName, "Are you sure you want to delete this ?", "Delete", "Cancel");
 			if (result != 0)this->baseItem->remove();
 		} else this->baseItem->remove();
 	}
@@ -365,25 +369,26 @@ template<class T>
 void BaseItemUI<T>::mouseDown(const MouseEvent & e)
 {
 	BaseItemMinimalUI<T>::mouseDown(e);
-
-
+	
 	if (e.mods.isLeftButtonDown())
 	{
-		if (canBeDragged && e.eventComponent == grabber)
+		if (canBeDragged)
 		{
-			if (resizeMode == ALL)
+			Grabber * g = dynamic_cast<Grabber *>(e.eventComponent);
+			if (g != nullptr)
 			{
-				posAtMouseDown = this->baseItem->viewUIPosition->getPoint();
-			} else
-			{
-				posAtDown = this->getBounds().getPosition();
-				dragOffset = Point<int>();
-				itemUIListeners.call(&ItemUIListener::itemUIGrabStart, this);
+				if (resizeMode == ALL)
+				{
+					posAtMouseDown = this->baseItem->viewUIPosition->getPoint();
+				} else
+				{
+					posAtDown = this->getBounds().getPosition();
+					dragOffset = Point<int>();
+					itemUIListeners.call(&ItemUIListener::itemUIGrabStart, this);
+				}
 			}
 		}
 	}
-
-
 }
 
 
@@ -392,33 +397,47 @@ void BaseItemUI<T>::mouseDrag(const MouseEvent & e)
 {
 	BaseItemMinimalUI<T>::mouseDrag(e);
 
-	if (canBeDragged && e.mods.isLeftButtonDown() && e.eventComponent == grabber)
+	if (e.mods.isLeftButtonDown())
 	{
-
-		if (resizeMode == ALL)
+		if (canBeDragged)
 		{
-			Point<float> targetPos = posAtMouseDown + e.getOffsetFromDragStart().toFloat()/viewZoom;
-			this->baseItem->viewUIPosition->setPoint(targetPos);
-		} else
-		{
-			dragOffset = e.getOffsetFromDragStart();
-			itemUIListeners.call(&ItemUIListener::itemUIGrabbed, this);
+			Grabber * g = dynamic_cast<Grabber *>(e.eventComponent);
+			if (g != nullptr)
+			{
+				if (resizeMode == ALL)
+				{
+					Point<float> targetPos = posAtMouseDown + e.getOffsetFromDragStart().toFloat() / viewZoom;
+					this->baseItem->viewUIPosition->setPoint(targetPos);
+				} else
+				{
+					dragOffset = e.getOffsetFromDragStart();
+					itemUIListeners.call(&ItemUIListener::itemUIGrabbed, this);
+				}
+			}
 		}
+
 	}
 
 }
 
 template<class T>
-void BaseItemUI<T>::mouseUp(const MouseEvent &)
+void BaseItemUI<T>::mouseUp(const MouseEvent & e)
 {
-	if (canBeDragged)
+	if (e.mods.isLeftButtonDown())
 	{
-		if (resizeMode == ALL)
+		if (canBeDragged)
 		{
-			this->baseItem->viewUIPosition->setUndoablePoint(posAtMouseDown, this->baseItem->viewUIPosition->getPoint());
-		} else
-		{
-			itemUIListeners.call(&ItemUIListener::itemUIGrabEnd, this);
+			Grabber * g = dynamic_cast<Grabber *>(e.eventComponent);
+			if (g != nullptr)
+			{
+				if (resizeMode == ALL)
+				{
+					this->baseItem->viewUIPosition->setUndoablePoint(posAtMouseDown, this->baseItem->viewUIPosition->getPoint());
+				} else
+				{
+					itemUIListeners.call(&ItemUIListener::itemUIGrabEnd, this);
+				}
+			}
 		}
 	}
 }
@@ -427,7 +446,6 @@ template<class T>
 void BaseItemUI<T>::mouseDoubleClick(const MouseEvent & e)
 {
 	if (e.eventComponent == grabber) this->baseItem->miniMode->setValue(!this->baseItem->miniMode->boolValue());
-
 }
 
 template<class T>
@@ -468,7 +486,7 @@ void BaseItemUI<T>::setGrabber(Grabber * newGrabber)
 		if (resizeMode == ALL) grabberHeight = 15;
 		this->addAndMakeVisible(grabber);
 	}
-	
+
 }
 
 

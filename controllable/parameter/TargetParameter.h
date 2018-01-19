@@ -34,6 +34,7 @@ public:
 	bool showFullAddressInEditor;
 	bool showParentNameInEditor;
 
+
 	WeakReference<ControllableContainer> rootContainer;
 	
 	WeakReference<Controllable> target;
@@ -43,6 +44,7 @@ public:
 	std::function<ControllableContainer*()> customGetTargetContainerFunc;
 	std::function<String(Controllable*)> customGetControllableLabelFunc;
 	std::function<String(ControllableContainer*)> customGetContainerLabelFunc;
+	std::function<bool(Controllable*)> customCheckAssignOnNextChangeFunc;
 
 	void setGhostValue(const String &ghostVal);
 

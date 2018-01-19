@@ -69,7 +69,7 @@ void InspectableContentComponent::mouseDown(const MouseEvent & e)
 		{
 			
 			//grabKeyboardFocus();
-			inspectable->selectThis(e.mods.isCommandDown());
+			inspectable->selectThis(e.mods.isCommandDown() || e.mods.isShiftDown());
 		}
 	}
 }

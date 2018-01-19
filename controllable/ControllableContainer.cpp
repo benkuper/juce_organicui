@@ -22,6 +22,7 @@ ControllableContainer::ControllableContainer(const String & niceName) :
 	editorIsCollapsed(false),
 	editorCanBeCollapsed(true),
 	hideEditorHeader(false),
+	customGetEditorFunc(nullptr),
 	saveAndLoadRecursiveData(false),
 	saveAndLoadName(false),
 	includeTriggersInSaveLoad(false),
@@ -728,11 +729,9 @@ var ControllableContainer::getChildFromScript(const var::NativeFunctionArgs & a)
 
 InspectableEditor * ControllableContainer::getEditor(bool isRoot)
 {
+	if (customGetEditorFunc != nullptr) return customGetEditorFunc(this, isRoot);
 	return new GenericControllableContainerEditor(this, isRoot);
 }
-
-
-
 
 EnablingControllableContainer::EnablingControllableContainer(const String & n, bool _canBeDisabled) :
 	ControllableContainer(n),
@@ -748,6 +747,7 @@ EnablingControllableContainer::EnablingControllableContainer(const String & n, b
 
 InspectableEditor * EnablingControllableContainer::getEditor(bool isRoot)
 {
+	if (customGetEditorFunc != nullptr) return customGetEditorFunc(this, isRoot);
 	return new EnablingControllableContainerEditor(this, isRoot);
 }
 

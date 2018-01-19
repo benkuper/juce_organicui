@@ -1,3 +1,4 @@
+#include "TargetParameterUI.h"
 /*
   ==============================================================================
 
@@ -21,6 +22,16 @@ TargetParameterUI::TargetParameterUI(TargetParameter * parameter, const String &
 	targetBT = AssetManager::getInstance()->getTargetBT();
 	targetBT->setInterceptsMouseClicks(false, false);
 
+	if (targetParameter->customCheckAssignOnNextChangeFunc != nullptr)
+	{
+		
+		listeningToNextChange = new BoolParameter("Auto Learn", "When this parameter is on, any parameter that changes will be auto assigned to this target", false);
+		listeningToNextChange->addAsyncParameterListener(this);
+		listeningToNextChangeBT = listeningToNextChange->createToggle();
+		addAndMakeVisible(listeningToNextChangeBT);
+	}
+
+
 	addAndMakeVisible(targetBT);
 
 	targetBT->addListener(this);
@@ -35,6 +46,8 @@ TargetParameterUI::TargetParameterUI(TargetParameter * parameter, const String &
 
 TargetParameterUI::~TargetParameterUI()
 {
+	//in case we deleted with the listener still on
+	if(parameter != nullptr && !parameter.wasObjectDeleted()) targetParameter->rootContainer->removeControllableContainerListener(this);
 }
 
 void TargetParameterUI::paint(Graphics & g)
@@ -51,6 +64,12 @@ void TargetParameterUI::paint(Graphics & g)
 void TargetParameterUI::resized()
 {
 	Rectangle<int> r = getLocalBounds();
+	if (listeningToNextChangeBT != nullptr)
+	{
+		listeningToNextChangeBT->setBounds(r.removeFromRight(100));
+		r.removeFromRight(2);
+	}
+
 	targetBT->setBounds(r.removeFromLeft(r.getHeight()).reduced(2));
 	r.removeFromLeft(2);
 	label.setBounds(r.reduced(0, 2));
@@ -127,6 +146,49 @@ void TargetParameterUI::buttonClicked(Button * b)
 
 void TargetParameterUI::valueChanged(const var &)
 {
+	DBG("Value changed ");
+	if (listeningToNextChange != nullptr) listeningToNextChange->setValue(false);
+
 	updateLabel();
 	repaint();
+}
+
+void TargetParameterUI::newMessage(const Parameter::ParameterEvent & e)
+{
+
+	if (e.parameter == listeningToNextChange)
+	{
+		if (e.type == Parameter::ParameterEvent::VALUE_CHANGED)
+		{
+			{
+				if (listeningToNextChange->boolValue())
+				{
+					targetParameter->rootContainer->addControllableContainerListener(this);
+				} else
+				{
+					targetParameter->rootContainer->removeControllableContainerListener(this);
+				}
+			}
+		}
+	} else
+	{
+		ParameterUI::newMessage(e);
+	}
+	
+}
+
+void TargetParameterUI::controllableFeedbackUpdate(ControllableContainer *, Controllable * c)
+{
+	if (c == targetParameter->target) return;
+
+	if (c->type == Controllable::TRIGGER)
+	{
+		if (!targetParameter->showTriggers) return;
+	} else
+	{
+		if (!targetParameter->showParameters) return;
+	}
+
+	bool isControllableValid = targetParameter->customCheckAssignOnNextChangeFunc(c);
+	if (isControllableValid) targetParameter->setValueFromTarget(c);
 }

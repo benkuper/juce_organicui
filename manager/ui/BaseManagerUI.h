@@ -288,6 +288,11 @@ bool BaseManagerUI<M, T, U>::keyPressed(const KeyPress & e)
 		{
 			manager->addItemFromClipboard();
 			return true;
+		} else if (e.getKeyCode() == KeyPress::createFromDescription("a").getKeyCode())
+		{
+			int numItems = manager->items.size();
+			if (numItems > 0) manager->items[0]->selectThis();
+			if (numItems > 1) for (int i = 0; i < numItems; i++) manager->items[i]->selectThis(true);
 		}
 	} else
 	{

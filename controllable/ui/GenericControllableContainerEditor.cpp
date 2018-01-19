@@ -383,11 +383,7 @@ EnablingControllableContainerEditor::EnablingControllableContainerEditor(Enablin
 	{
 		enabledUI = ioContainer->enabled->createImageToggle(AssetManager::getInstance()->getPowerBT());
 		addAndMakeVisible(enabledUI);
-
-		setCollapsed(!ioContainer->enabled->boolValue(), true, false);
 	}
-	
-
 }
 
 void EnablingControllableContainerEditor::resizedInternalHeader(Rectangle<int>& r)

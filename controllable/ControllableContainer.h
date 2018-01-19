@@ -40,6 +40,7 @@ public:
 	bool editorIsCollapsed;
 	bool editorCanBeCollapsed;
 	bool hideEditorHeader;
+	std::function<InspectableEditor *(ControllableContainer *, bool)> customGetEditorFunc;
 
 	//save / load
 	bool saveAndLoadRecursiveData;

@@ -14,7 +14,8 @@
 
 class TargetParameterUI :
 	public ParameterUI,
-	public ButtonListener
+	public ButtonListener,
+	public ControllableContainerListener
 {
 public:
 	TargetParameterUI(TargetParameter * parameter, const String &noTargetText = "[Click to select an element]");
@@ -23,9 +24,12 @@ public:
 	String noTargetText;
 	Label label;
 	ScopedPointer<ImageButton> targetBT;
-
-	TargetParameter * targetParameter;
 	
+	TargetParameter * targetParameter;
+
+	ScopedPointer<BoolParameter> listeningToNextChange;
+	ScopedPointer<BoolToggleUI> listeningToNextChangeBT;
+
 	void paint(Graphics &g) override;
 	void resized() override;
 
@@ -38,7 +42,8 @@ public:
 
 protected:
 	void valueChanged(const var & v) override;
-	//void controllableStateChanged(Controllable *) override;
+	void newMessage(const Parameter::ParameterEvent &e) override;
+	void controllableFeedbackUpdate(ControllableContainer *, Controllable * c) override;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TargetParameterUI)
 };
