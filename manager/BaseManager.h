@@ -31,7 +31,7 @@ public:
 
 	virtual T * createItem(); //to override if special constructor to use
 	virtual T * addItemFromData(var data, bool addToUndo = true); //to be overriden for specific item creation (from data)
-	virtual void addItemFromClipboard();
+	virtual T * addItemFromClipboard();
 
 	virtual void loadItemsData(var data);
 
@@ -330,15 +330,15 @@ T * BaseManager<T>::addItemFromData(var data, bool addToUndo)
 }
 
 template<class T>
-void BaseManager<T>::addItemFromClipboard()
+T * BaseManager<T>::addItemFromClipboard()
 {
-	if (!userCanAddItemsManually) return;
+	if (!userCanAddItemsManually) return nullptr;
 	String s = SystemClipboard::getTextFromClipboard();
 	var data = JSON::parse(s);
-	if (data.isVoid()) return;
+	if (data.isVoid()) return nullptr;
 
-	if (data.getProperty("itemType", var()).isVoid()) return;
-	addItemFromData(data);
+	if (data.getProperty("itemType", var()).isVoid()) return nullptr;
+	return addItemFromData(data);
 }
 
 template<class T>
