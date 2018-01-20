@@ -28,10 +28,12 @@ void Engine::changed()
 {
 	FileBasedDocument::changed();
 	engineListeners.call(&EngineListener::fileChanged);
+	engineNotifier.addMessage(new EngineEvent(EngineEvent::FILE_CHANGED, this));
 }
 
 void Engine::createNewGraph(){
 	engineListeners.call(&EngineListener::startLoadFile);
+	engineNotifier.addMessage(new EngineEvent(EngineEvent::START_LOAD_FILE, this));
 	clear();
 	isLoadingFile = true;
 
@@ -53,6 +55,7 @@ Result Engine::loadDocument (const File& file){
 
   isLoadingFile = true;
   engineListeners.call(&EngineListener::startLoadFile);
+  engineNotifier.addMessage(new EngineEvent(EngineEvent::START_LOAD_FILE, this));
 
   if (InspectableSelectionManager::mainSelectionManager != nullptr)  InspectableSelectionManager::mainSelectionManager->setEnabled(false); //avoid creation of inspector editor while recreating all nodes, controllers, rules,etc. from file
 
@@ -130,6 +133,8 @@ void Engine::handleAsyncUpdate()
   int64 timeForLoading  =  Time::currentTimeMillis()-loadingStartTime;
   setChangedFlag(false);
   engineListeners.call(&EngineListener::endLoadFile);
+  engineNotifier.addMessage(new EngineEvent(EngineEvent::END_LOAD_FILE, this));
+
   NLOG("Engine","Session loaded in " << timeForLoading/1000.0 << "s"); 
 }
 
@@ -147,6 +152,8 @@ Result Engine::saveDocument (const File& file){
   setLastDocumentOpened(file);
   setChangedFlag(false);
   engineListeners.call(&EngineListener::fileSaved);
+  engineNotifier.addMessage(new EngineEvent(EngineEvent::FILE_SAVED, this));
+
   return Result::ok();
 }
 

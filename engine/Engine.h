@@ -109,6 +109,36 @@ public:
 	void addEngineListener(EngineListener* e) { engineListeners.add(e); }
 	void removeEngineListener(EngineListener* e) { engineListeners.remove(e); }
 
+	// ASYNC
+	class  EngineEvent
+	{
+	public:
+		virtual void startLoadFile() {};
+		// TODO implement progression
+		virtual void fileProgress(float /*percent*/, int /*state*/) {};
+		virtual void endLoadFile() {};
+		virtual void fileSaved() {};
+		virtual void engineCleared() {};
+		virtual void fileChanged() {};
+		enum Type { START_LOAD_FILE, FILE_PROGRESS, END_LOAD_FILE, FILE_SAVED, ENGINE_CLEARED , FILE_CHANGED };
+
+		EngineEvent(Type t, Engine * engine) :
+			type(t),
+			engine(engine)
+		{
+		}
+
+		Type type;
+		Engine * engine;
+	};
+
+	QueuedNotifier<EngineEvent> engineNotifier;
+	typedef QueuedNotifier<EngineEvent>::Listener AsyncListener;
+
+	void addAsyncEngineListener(AsyncListener* newListener) { engineNotifier.addListener(newListener); }
+	void addAsyncCoalescedEngineListener(AsyncListener* newListener) { engineNotifier.addAsyncCoalescedListener(newListener); }
+	void removeAsyncEngineListener(AsyncListener* listener) { engineNotifier.removeListener(listener); }
+
 	bool isLoadingFile;
 	bool isClearing;
 	var jsonData;

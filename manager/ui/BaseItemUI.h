@@ -263,7 +263,6 @@ void BaseItemUI<T>::updateMiniModeUI()
 template<class T>
 void BaseItemUI<T>::setViewZoom(float value)
 {
-	DBG("Set view zoom : " << value);
 	viewZoom = value;
 }
 
@@ -368,6 +367,8 @@ void BaseItemUI<T>::buttonClicked(Button * b)
 template<class T>
 void BaseItemUI<T>::mouseDown(const MouseEvent & e)
 {
+	if ((removeBT != nullptr && e.eventComponent == removeBT) || (enabledBT != nullptr && e.eventComponent == enabledBT->bt)) return;
+
 	BaseItemMinimalUI<T>::mouseDown(e);
 	
 	if (e.mods.isLeftButtonDown())

@@ -21,7 +21,8 @@ Engine::Engine(const String & fileName, const String & fileExtension, Applicatio
 	appProperties(_appProperties),
 	appVersion(_appVersion),
 	isLoadingFile(false),
-	isClearing(false)
+	isClearing(false),
+	engineNotifier(10)
 {
 	skipControllableNameInAddress = true;
 
@@ -128,4 +129,5 @@ void Engine::clear() {
 	
 	changed();    //fileDocument	
 	engineListeners.call(&EngineListener::engineCleared);
+	engineNotifier.addMessage(new EngineEvent(EngineEvent::ENGINE_CLEARED, this));
 }

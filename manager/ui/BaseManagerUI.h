@@ -538,6 +538,8 @@ void BaseManagerUI<M, T, U>::addItemFromMenu(bool, Point<int>)
 template<class M, class T, class U>
 U * BaseManagerUI<M, T, U>::addItemUI(T * item, bool animate)
 {
+	MessageManagerLock mmLock; //Ensure this method can be called from another thread than the UI one 
+
 	U * tui = createUIForItem(item);
 
 	BaseItemMinimalUI<T> * bui = static_cast<BaseItemMinimalUI<T>*>(tui);
@@ -579,6 +581,8 @@ inline U * BaseManagerUI<M, T, U>::createUIForItem(T * item)
 template<class M, class T, class U>
 void BaseManagerUI<M, T, U>::removeItemUI(T * item)
 {
+	MessageManagerLock mmLock; //Ensure this method can be called from another thread than the UI one
+
 	U * tui = getUIForItem(item, false);
 	if (tui == nullptr) return;
 
