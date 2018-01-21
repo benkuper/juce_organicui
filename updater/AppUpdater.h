@@ -13,25 +13,53 @@
 
 
 class AppUpdater :
-	public Thread
+	public Thread,
+	public URL::DownloadTask::Listener
 {
 public:
 	juce_DeclareSingleton(AppUpdater, true);
 
-	AppUpdater() : Thread("appUpdater"), checkForBetas(true) {}
+	AppUpdater();
 	~AppUpdater();
 
 	bool checkForBetas;
 
 	URL updateURL;
-	URL downloadURL;
+	String downloadURLBase;
+	String downloadingFileName;
+	String filePrefix;
 
-	void setURLs(URL _updateURL, URL _downloadURL);
+	ScopedPointer<URL::DownloadTask> downloadTask;
 
+	void setURLs(URL _updateURL, String _downloadURLBase, String filePrefix);
+
+	String getDownloadFileName(String version, bool beta); 
 	void checkForUpdates();
 
 	// Inherited via Thread
 	virtual void run() override;
+
+	// Inherited via Listener
+	virtual void finished(URL::DownloadTask * task, bool success) override;
+	virtual void progress(URL::DownloadTask* task, int64 bytesDownloaded, int64 totalLength);
+
+
+	class  UpdateEvent
+	{
+	public:
+		enum Type { DOWNLOAD_STARTED, DOWNLOAD_PROGRESS, DOWNLOAD_ERROR, UPDATE_FINISHED };
+
+		UpdateEvent(Type t) : type(t) {}
+		Type type;
+	};
+
+	QueuedNotifier<UpdateEvent> queuedNotifier;
+	typedef QueuedNotifier<UpdateEvent>::Listener AsyncListener;
+
+
+	void addAsyncUpdateListener(AsyncListener* newListener) { queuedNotifier.addListener(newListener); }
+	void addAsyncCoalescedUpdateListener(AsyncListener* newListener) { queuedNotifier.addAsyncCoalescedListener(newListener); }
+	void removeAsyncUpdateListener(AsyncListener* listener) { queuedNotifier.removeListener(listener); }
 };
 
 

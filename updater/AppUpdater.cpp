@@ -12,21 +12,46 @@
 
 juce_ImplementSingleton(AppUpdater)
 
+AppUpdater::AppUpdater() : 
+	Thread("appUpdater"), 
+	checkForBetas(true),
+	queuedNotifier(30)
+{}
+
 AppUpdater::~AppUpdater()
 {
+	queuedNotifier.cancelPendingUpdate();
 	signalThreadShouldExit();
 	waitForThreadToExit(1000);
 }
 
-  void AppUpdater::setURLs(URL _updateURL, URL _downloadURL)
+  void AppUpdater::setURLs(URL _updateURL, String _downloadURLBase, String _filePrefix)
 {
 	updateURL = _updateURL;  
-	downloadURL = _downloadURL;  
+	filePrefix = _filePrefix;
+	downloadURLBase = _downloadURLBase;  
+	if (!downloadURLBase.endsWithChar('/')) downloadURLBase += "/";
 }
 
-void AppUpdater::checkForUpdates()
+  String AppUpdater::getDownloadFileName(String version, bool beta)
+  {
+	  String fileURL = filePrefix + "-";
+#if JUCE_WINDOWS
+	  fileURL += "win-x64";
+#elif JUCE_MAC
+	  fileURL += "osx";
+#elif JUCE_LINUX
+	  fileURL += "linux";
+#endif
+
+	  fileURL += "-" + version + "-" + (beta ? "beta" : "stable") + ".zip";
+
+	  return fileURL;
+  }
+
+  void AppUpdater::checkForUpdates()
 {
-	if (updateURL.isEmpty() || downloadURL.isEmpty()) return;
+	if (updateURL.isEmpty() || downloadURLBase.isEmpty()) return;
 	startThread();
 }
 
@@ -67,8 +92,35 @@ void AppUpdater::run()
 					for (auto &c : *changelog) msg += c.toString() + "\n";
 					msg += "\nDo you want to go to the download page ?";
 
+					File targetDir = File::getSpecialLocation(File::currentExecutableFile).getParentDirectory().getChildFile("update_temp");
+					if (targetDir.exists()) targetDir.deleteRecursively();
+
+
 					int result = AlertWindow::showOkCancelBox(AlertWindow::InfoIcon, "New version available", msg, "Yes", "No");
-					if (result) downloadURL.launchInDefaultBrowser();
+					if (result)
+					{
+						downloadingFileName = getDownloadFileName(version, beta);
+						URL downloadURL = URL(downloadURLBase + downloadingFileName);
+
+						
+						targetDir.createDirectory();
+						
+						File targetFile = targetDir.getChildFile(downloadingFileName);
+						if (targetFile.existsAsFile()) targetFile.deleteFile();
+
+						downloadingFileName = targetFile.getFileName();
+
+						LOG("Downloading " + downloadURL.toString(false) + "...");
+
+
+						downloadTask = downloadURL.downloadToFile(targetFile, "", this);
+						if (downloadTask == nullptr)
+						{
+							LOGERROR("Error while downloading " + downloadingFileName + ",\ntry downloading it directly from the website.");
+							queuedNotifier.addMessage(new UpdateEvent(UpdateEvent::DOWNLOAD_ERROR));
+						}
+						queuedNotifier.addMessage(new UpdateEvent(UpdateEvent::DOWNLOAD_STARTED));
+					}
 				} else
 				{
 					LOG("App is up to date :) (Latest version online : " << data.getProperty("version", "").toString() << ")");
@@ -83,4 +135,52 @@ void AppUpdater::run()
 	{
 		LOGERROR("Error while trying to access to the update file");
 	}
+}
+
+void AppUpdater::finished(URL::DownloadTask * task, bool success)
+{
+
+	
+	if (!success)
+	{
+		LOGERROR("Error while downloading " + downloadingFileName + ",\ntry downloading it directly from the website.\nError code : " + String(task->statusCode()));
+		queuedNotifier.addMessage(new UpdateEvent(UpdateEvent::DOWNLOAD_ERROR)); return;
+	}
+
+	File f = File::getSpecialLocation(File::currentExecutableFile).getParentDirectory().getChildFile("update_temp/" + downloadingFileName);
+	if (!f.exists())
+	{
+		DBG("File doesn't exist");
+		return;
+	}
+
+	File td = f.getParentDirectory();
+	File appFile = File::getSpecialLocation(File::currentExecutableFile);
+	File appDir = appFile.getParentDirectory();
+
+	{
+		ZipFile zip(f);
+		zip.uncompressTo(td);
+		Array<File> filesToCopy;
+
+		appFile.moveFileTo(td.getNonexistentChildFile("oldApp", appFile.getFileExtension()));
+		
+		DBG("Move to " << appDir.getFullPathName());
+		for (int i = 0; i < zip.getNumEntries(); i++)
+		{
+			File zf = td.getChildFile(zip.getEntry(i)->filename);
+			DBG("File exists : " << (int)f.exists());
+			bool result = zf.copyFileTo(appDir.getChildFile(zip.getEntry(i)->filename));
+			DBG("Move result for " << zf.getFileName() << " = " << (int)result);
+		}
+	}
+
+	queuedNotifier.addMessage(new UpdateEvent(UpdateEvent::UPDATE_FINISHED));
+}
+
+void AppUpdater::progress(URL::DownloadTask * task, int64 bytesDownloaded, int64 totalLength)
+{
+	int percent = (int)(bytesDownloaded*100.0f / totalLength);
+	queuedNotifier.addMessage(new UpdateEvent(UpdateEvent::DOWNLOAD_PROGRESS));
+	LOG("Progress : " << percent);
 }
