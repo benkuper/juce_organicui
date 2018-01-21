@@ -64,7 +64,8 @@ public:
 	void setAutoShortName();
 
 
-	void addControllable(Controllable * p);
+	UndoableAction * addUndoableControllable(Controllable * c, bool onlyReturnAction = false);
+	void addControllable(Controllable * c);
 	void addParameter(Parameter * p);
 	FloatParameter * addFloatParameter(const String &niceName, const String &description, const float &initialValue, const float &minValue = 0, const float &maxValue = 1, const bool &enabled = true);
 	IntParameter * addIntParameter(const String &niceName, const String &description, const int &initialValue, const int &minValue, const int &maxValue, const bool &enabled = true);
@@ -79,7 +80,7 @@ public:
 	void addTriggerInternal(Trigger * t);
 	void addParameterInternal(Parameter * p);
 
-
+	UndoableAction * removeUndoableControllable(Controllable * c, bool onlyReturnAction = false);
 	void removeControllable(Controllable * c);
 	Controllable * getControllableByName(const String &name, bool searchNiceNameToo = false);
 
@@ -112,7 +113,7 @@ public:
 	void controllableFeedbackUpdate(ControllableContainer * cc, Controllable * c) override;
 	virtual void onControllableFeedbackUpdate(ControllableContainer * , Controllable *) {}
 
-	virtual void askForRemoveControllable(Controllable * c) override;
+	virtual void askForRemoveControllable(Controllable * c, bool addToUndo = false) override;
 
 	virtual var getJSONData();
 	virtual void loadJSONData(var data, bool createIfNotThere = false);
@@ -200,6 +201,46 @@ public:
 		bool perform() override;
 		bool undo() override;
 	};
+
+	class ControllableContainerControllableAction :
+		public ControllableContainerAction
+	{
+	public:
+		ControllableContainerControllableAction(ControllableContainer * cc, Controllable * c);
+
+		
+		WeakReference<Inspectable> cRef;
+		String cShortName;
+		var data; 
+		String cType;
+
+		Controllable * getItem();
+	};
+
+	class AddControllableAction :
+		public ControllableContainerControllableAction
+	{
+	public:
+		AddControllableAction(ControllableContainer * cc, Controllable * c) :
+			ControllableContainerControllableAction(cc, c) 
+		{
+		}
+
+		bool perform() override;
+		bool undo() override;
+	};
+
+	class RemoveControllableAction :
+		public ControllableContainerControllableAction
+	{
+	public:
+		RemoveControllableAction(ControllableContainer * cc, Controllable * c);
+
+		bool perform() override;
+		bool undo() override;
+	};
+
+
 
 	virtual InspectableEditor * getEditor(bool /*isRootEditor*/) override;
 

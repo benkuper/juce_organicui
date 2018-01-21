@@ -54,6 +54,22 @@ void ControllableContainer::clear() {
 }
 
 
+UndoableAction * ControllableContainer::addUndoableControllable(Controllable * c, bool onlyReturnAction)
+{
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile)
+	{
+		//if Main Engine loading, just set the value without undo history
+		addControllable(c);
+		return nullptr;
+	}
+
+	UndoableAction * a = new AddControllableAction(this, c);
+	if (onlyReturnAction) return a;
+
+	UndoMaster::getInstance()->performAction("Add " + c->niceName, a);
+	return a;
+}
+
 void ControllableContainer::addControllable(Controllable * c)
 {
 	if (c->type == Controllable::TRIGGER) addTriggerInternal((Trigger *)c);
@@ -159,6 +175,22 @@ void ControllableContainer::addParameterInternal(Parameter * p)
 	controllableContainerListeners.call(&ControllableContainerListener::controllableAdded, p);
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableAdded, this, p));
 	notifyStructureChanged();
+}
+
+UndoableAction * ControllableContainer::removeUndoableControllable(Controllable * c, bool onlyReturnAction)
+{
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile)
+	{
+		//if Main Engine loading, just set the value without undo history
+		addControllable(c);
+		return nullptr;
+	}
+
+	UndoableAction * a = new RemoveControllableAction(this, c);
+	if (onlyReturnAction) return a;
+
+	UndoMaster::getInstance()->performAction("Remove " + c->niceName, a);
+	return a;
 }
 
 void ControllableContainer::removeControllable(Controllable * c)
@@ -552,9 +584,10 @@ void ControllableContainer::controllableFeedbackUpdate(ControllableContainer * c
 	onControllableFeedbackUpdate(cc, c); //This is the function to override from child classes
 }
 
-void ControllableContainer::askForRemoveControllable(Controllable * c)
+void ControllableContainer::askForRemoveControllable(Controllable * c, bool addToUndo)
 {
-	removeControllable(c);
+	if (addToUndo) removeUndoableControllable(c);
+	else removeControllable(c);
 }
 
 
@@ -782,4 +815,94 @@ bool ControllableContainer::ControllableContainerChangeNameAction::undo()
 		return true;
 	}
 	return false;
+}
+
+ControllableContainer::ControllableContainerControllableAction::ControllableContainerControllableAction(ControllableContainer * cc, Controllable * c) :
+	ControllableContainerAction(cc),
+	cRef(c)
+{
+	if (c != nullptr)
+	{
+		cShortName = c->shortName;
+		data = c->getJSONData();
+		cType = c->getTypeString();
+	}
+}
+
+Controllable * ControllableContainer::ControllableContainerControllableAction::getItem()
+{
+	if (cRef != nullptr && !cRef.wasObjectDeleted()) return dynamic_cast<Controllable *>(cRef.get());
+	else
+	{
+		ControllableContainer * cc = this->getControllableContainer();
+		if (cc != nullptr) return cc->getControllableByName(cShortName);
+	}
+
+	return nullptr;
+}
+
+bool ControllableContainer::AddControllableAction::perform()
+{
+	ControllableContainer * cc = this->getControllableContainer();
+	if (cc == nullptr)
+	{
+		return false;
+	}
+
+	Controllable * c = this->getItem();
+	if (c != nullptr)
+	{
+		cc->addControllable(c);
+	} else
+	{
+		c = ControllableFactory::createControllable(cType);
+	}
+
+	if (c == nullptr) return false;
+
+	this->cShortName = c->shortName;
+	return true;
+}
+
+bool ControllableContainer::AddControllableAction::undo()
+{
+	Controllable * c = this->getItem();
+	if (c == nullptr) return false;
+	data = c->getJSONData();
+	ControllableContainer * cc = getControllableContainer();
+	if (cc != nullptr)
+	{
+		cc->removeControllable(c);
+		cRef = nullptr;
+	}
+	return true;
+}
+
+ControllableContainer::RemoveControllableAction::RemoveControllableAction(ControllableContainer * cc, Controllable * c) :
+	ControllableContainerControllableAction(cc, c)
+{
+}
+
+bool ControllableContainer::RemoveControllableAction::perform()
+{
+	Controllable * c = this->getItem();
+
+	if (c == nullptr) return false;
+	getControllableContainer()->removeControllable(c);
+	cRef = nullptr;
+	return true;
+}
+
+bool ControllableContainer::RemoveControllableAction::undo()
+{
+	ControllableContainer * cc = getControllableContainer();
+	if (cc == nullptr) return false;
+	Controllable * c = ControllableFactory::createControllable(cType);
+	if (c != nullptr)
+	{
+		cc->addControllable(c);
+		c->loadJSONData(data);
+		cRef = c;
+	}
+	return true;
 }

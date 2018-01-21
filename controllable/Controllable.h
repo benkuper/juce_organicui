@@ -84,7 +84,7 @@ public:
 	void setParentContainer(ControllableContainer * container);
 	void updateControlAddress();
 
-	void remove(); // called from external to make this object ask for remove
+	void remove(bool addToUndo = false); // called from external to make this object ask for remove
 
 	virtual void updateLiveScriptObjectInternal(DynamicObject * parent = nullptr) override;
 
@@ -115,7 +115,7 @@ public:
 		virtual void controllableControlAddressChanged(Controllable *) {}
 		virtual void controllableNameChanged(Controllable *) {}
 		virtual void controllableRemoved(Controllable *) {}
-		virtual void askForRemoveControllable(Controllable *) {}
+		virtual void askForRemoveControllable(Controllable *, bool /*addToUndo*/ = false) {}
 	};
 
 	ListenerList<Listener> listeners;

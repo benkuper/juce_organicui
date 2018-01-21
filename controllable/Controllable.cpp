@@ -119,9 +119,9 @@ void Controllable::updateControlAddress()
 	queuedNotifier.addMessage(new ControllableEvent(ControllableEvent::CONTROLADDRESS_CHANGED, this));
 }
 
-void Controllable::remove()
+void Controllable::remove(bool addToUndo)
 {
-	listeners.call(&Controllable::Listener::askForRemoveControllable, this);
+	listeners.call(&Controllable::Listener::askForRemoveControllable, this, addToUndo);
 }
 
 void Controllable::updateLiveScriptObjectInternal(DynamicObject * parent)

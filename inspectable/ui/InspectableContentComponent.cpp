@@ -30,13 +30,16 @@ InspectableContentComponent::~InspectableContentComponent()
 void InspectableContentComponent::mouseEnter(const MouseEvent & e)
 {
 	//DBG("Mouse Enter : " << inspectable->getHelpID());
+	if (inspectable.wasObjectDeleted()) return;
 	if (HelpBox::getInstance()->overDataID.isEmpty()) HelpBox::getInstance()->setOverData(inspectable->getHelpID());
 }
 
 void InspectableContentComponent::mouseExit(const MouseEvent & e)
 {
 	//DBG("Mouse Exit : " << inspectable->getHelpID());
-	HelpBox::getInstance()->clearOverData(inspectable->getHelpID());
+	String helpID = "";
+	if (!inspectable.wasObjectDeleted()) helpID = inspectable->getHelpID();
+	HelpBox::getInstance()->clearOverData(helpID);
 }
 
 void InspectableContentComponent::mouseDown(const MouseEvent & e)

@@ -108,7 +108,7 @@ void ControllableEditor::buttonClicked(Button * b)
 {
 	if (b == removeBT)
 	{
-		controllable->remove();
+		controllable->remove(true);
 	} else if (b == editBT)
 	{
 		ui->showEditWindow();

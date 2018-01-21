@@ -171,8 +171,8 @@ void AppUpdater::finished(URL::DownloadTask * task, bool success)
 		{
 			File zf = td.getChildFile(zip.getEntry(i)->filename);
 			DBG("File exists : " << (int)f.exists());
-			bool result = zf.copyFileTo(appDir.getChildFile(zip.getEntry(i)->filename));
-			DBG("Move result for " << zf.getFileName() << " = " << (int)result);
+			zf.copyFileTo(appDir.getChildFile(zip.getEntry(i)->filename));
+			//DBG("Move result for " << zf.getFileName() << " = " << (int)result);
 		}
 	}
 

@@ -35,7 +35,7 @@ void HelpBox::setOverData(String dataID)
 
 void HelpBox::clearOverData(String dataID)
 {
-	if (overDataID == dataID) setOverData("");
+	if (overDataID == dataID || dataID == "") setOverData("");
 }
 
 void HelpBox::setPersistentData(String dataID)
