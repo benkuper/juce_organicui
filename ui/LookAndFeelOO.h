@@ -168,7 +168,7 @@ namespace LookAndFeelHelpers {
 
 
 	
-    static Colour createBaseColour(Colour buttonColour,
+    static inline Colour createBaseColour(Colour buttonColour,
         bool hasKeyboardFocus,
         bool isMouseOverButton,
         bool isButtonDown) noexcept
@@ -182,7 +182,7 @@ namespace LookAndFeelHelpers {
         return baseColour;
     }
 
-    static TextLayout layoutTooltipText(const String& text, Colour colour) noexcept
+    static inline TextLayout layoutTooltipText(const String& text, Colour colour) noexcept
     {
         const float tooltipFontSize = 13.0f;
         const int maxToolTipWidth = 400;
@@ -195,7 +195,7 @@ namespace LookAndFeelHelpers {
         tl.createLayoutWithBalancedLineLengths(s, (float)maxToolTipWidth);
         return tl;
     }
-
+    
 
 };
 

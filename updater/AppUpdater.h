@@ -41,7 +41,7 @@ public:
 
 	// Inherited via Listener
 	virtual void finished(URL::DownloadTask * task, bool success) override;
-	virtual void progress(URL::DownloadTask* task, int64 bytesDownloaded, int64 totalLength);
+	virtual void progress(URL::DownloadTask* task, int64 bytesDownloaded, int64 totalLength) override;
 
 
 	class  UpdateEvent

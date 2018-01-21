@@ -57,6 +57,11 @@ AppUpdater::~AppUpdater()
 
 void AppUpdater::run()
 {
+    //First cleanup update_temp directory
+    File targetDir = File::getSpecialLocation(File::currentApplicationFile).getParentDirectory().getChildFile("update_temp");
+    if (targetDir.exists()) targetDir.deleteRecursively();
+
+    
 	StringPairArray responseHeaders;
 	int statusCode = 0;
 	ScopedPointer<InputStream> stream(updateURL.createInputStream(false, nullptr, nullptr, String(),
@@ -87,14 +92,12 @@ void AppUpdater::run()
 				{
 					String version = data.getProperty("version", "");
 					Array<var> * changelog = data.getProperty("changelog", var()).getArray();
-					String msg = "A new " + String(beta ? "beta " : "") + "version of Chataigne is available : " + version + "\n\nChangelog :\n";
+					String msg = "A new " + String(beta ? "BETA " : "") + "version of Chataigne is available : " + version + "\n\nChangelog :\n";
 
 					for (auto &c : *changelog) msg += c.toString() + "\n";
-					msg += "\nDo you want to go to the download page ?";
+                    msg += "\nDo you want to update the app ?";
 
-					File targetDir = File::getSpecialLocation(File::currentExecutableFile).getParentDirectory().getChildFile("update_temp");
-					if (targetDir.exists()) targetDir.deleteRecursively();
-
+					
 
 					int result = AlertWindow::showOkCancelBox(AlertWindow::InfoIcon, "New version available", msg, "Yes", "No");
 					if (result)
@@ -139,25 +142,23 @@ void AppUpdater::run()
 
 void AppUpdater::finished(URL::DownloadTask * task, bool success)
 {
-
-	
 	if (!success)
 	{
 		LOGERROR("Error while downloading " + downloadingFileName + ",\ntry downloading it directly from the website.\nError code : " + String(task->statusCode()));
 		queuedNotifier.addMessage(new UpdateEvent(UpdateEvent::DOWNLOAD_ERROR)); return;
 	}
 
-	File f = File::getSpecialLocation(File::currentExecutableFile).getParentDirectory().getChildFile("update_temp/" + downloadingFileName);
+    File appFile = File::getSpecialLocation(File::currentApplicationFile);
+    File appDir = appFile.getParentDirectory();
+    
+	File f = appDir.getChildFile("update_temp/" + downloadingFileName);
 	if (!f.exists())
 	{
 		DBG("File doesn't exist");
 		return;
 	}
 
-	File td = f.getParentDirectory();
-	File appFile = File::getSpecialLocation(File::currentExecutableFile);
-	File appDir = appFile.getParentDirectory();
-
+    File td = f.getParentDirectory();
 	{
 		ZipFile zip(f);
 		zip.uncompressTo(td);

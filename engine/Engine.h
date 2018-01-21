@@ -113,6 +113,7 @@ public:
 	class  EngineEvent
 	{
 	public:
+        virtual ~EngineEvent(){};
 		virtual void startLoadFile() {};
 		// TODO implement progression
 		virtual void fileProgress(float /*percent*/, int /*state*/) {};
