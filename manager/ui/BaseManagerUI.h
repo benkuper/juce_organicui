@@ -52,6 +52,7 @@ template<class M, class T, class U>
 class BaseManagerUI :
 	public InspectableContentComponent,
 	public BaseManager<T>::Listener,
+	public BaseManager<T>::AsyncListener,
 	public ButtonListener,
 	public EngineListener,
 	public BaseItemUI<T>::ItemUIListener
@@ -142,9 +143,24 @@ public:
 
 	int getContentHeight();
 
-	void itemAdded(T * item) override;
-	void itemRemoved(T * item) override;
-	void itemsReordered() override;
+	virtual void itemAddedAsync(T * item);
+	virtual void itemRemoved(T * item) override; //must keep this one realtime because the async may cause the target item to already be deleted by the time this function is called
+	virtual void itemsReorderedAsync();
+
+	void newMessage(const typename BaseManager<T>::ManagerEvent &e) override
+	{
+		switch (e.type)
+		{
+
+		case BaseManager<T>::ManagerEvent::ITEM_ADDED:
+			itemAddedAsync(e.getItem());
+			break;
+
+		case BaseManager<T>::ManagerEvent::ITEMS_REORDERED:
+			itemsReorderedAsync();
+			break;
+		}
+	}
 
 	void buttonClicked(Button *) override;
 
@@ -206,6 +222,7 @@ BaseManagerUI<M, T, U>::BaseManagerUI(const String & contentName, M * _manager, 
 
 	BaseManager<T>* baseM = static_cast<BaseManager<T>*>(manager);
 	baseM->addBaseManagerListener(this);
+	baseM->addAsyncManagerListener(this);
 
 	addItemBT = AssetManager::getInstance()->getAddBT();
 	addAndMakeVisible(addItemBT);
@@ -224,7 +241,12 @@ BaseManagerUI<M, T, U>::BaseManagerUI(const String & contentName, M * _manager, 
 template<class M, class T, class U>
 BaseManagerUI<M, T, U>::~BaseManagerUI()
 {
-	if (!inspectable.wasObjectDeleted()) static_cast<BaseManager<T>*>(manager)->removeBaseManagerListener(this);
+	if (!inspectable.wasObjectDeleted())
+	{
+		this->manager->removeBaseManagerListener(this);
+		this->manager->removeAsyncManagerListener(this);
+	}
+
 	if (Engine::mainEngine) Engine::mainEngine->removeEngineListener(this);
 }
 
@@ -538,8 +560,6 @@ void BaseManagerUI<M, T, U>::addItemFromMenu(bool, Point<int>)
 template<class M, class T, class U>
 U * BaseManagerUI<M, T, U>::addItemUI(T * item, bool animate)
 {
-	MessageManagerLock mmLock; //Ensure this method can be called from another thread than the UI one 
-
 	U * tui = createUIForItem(item);
 
 	BaseItemMinimalUI<T> * bui = static_cast<BaseItemMinimalUI<T>*>(tui);
@@ -620,7 +640,7 @@ int BaseManagerUI<M, T, U>::getContentHeight()
 }
 
 template<class M, class T, class U>
-void BaseManagerUI<M, T, U>::itemAdded(T * item)
+void BaseManagerUI<M, T, U>::itemAddedAsync(T * item)
 {
 	addItemUI(item, animateItemOnAdd);
 	if (!animateItemOnAdd) resized();
@@ -633,10 +653,11 @@ void BaseManagerUI<M, T, U>::itemRemoved(T * item)
 }
 
 template<class M, class T, class U>
-void BaseManagerUI<M, T, U>::itemsReordered()
+void BaseManagerUI<M, T, U>::itemsReorderedAsync()
 {
 	itemsUI.sort(managerComparator);
 }
+
 
 template<class M, class T, class U>
 void BaseManagerUI<M, T, U>::itemUIGrabStart(BaseItemUI<T>* se)

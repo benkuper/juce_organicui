@@ -35,17 +35,17 @@ public:
 
 	virtual void loadItemsData(var data);
 
-	
+
 	UndoableAction * getAddItemUndoableAction(T * item = nullptr, var data = var());
 
-	T * addItem(T * item = nullptr, var data = var(), bool addToUndo = true); //if data is not empty, load data
-	T * addItem(const Point<float> initialPosition);
+	T * addItem(T * item = nullptr, var data = var(), bool addToUndo = true, bool notify = true); //if data is not empty, load data
+	T * addItem(const Point<float> initialPosition, bool addToUndo = true, bool notify = true);
 	Array<UndoableAction *> addItems(Array<T *> items, bool addToUndo = true, bool onlyReturnAction = false);
-	
+
 
 	UndoableAction * getRemoveItemUndoableAction(T * item);
 	void removeItems(Array<T *> items, bool addToUndo = true);
-	void removeItem(T * item, bool addToUndo = true);
+	void removeItem(T * item, bool addToUndo = true, bool notify = true);
 
 	virtual void reorderItems(); //to be overriden if needed
 
@@ -75,6 +75,7 @@ public:
 		/** Destructor. */
 		virtual ~Listener() {}
 		virtual void itemAdded(T *) {}
+		virtual void itemsAdded(Array<T *>) {}
 		virtual void itemRemoved(T *) {}
 		virtual void itemsReordered() {}
 	};
@@ -82,6 +83,49 @@ public:
 	ListenerList<Listener> baseManagerListeners;
 	void addBaseManagerListener(Listener* newListener) { baseManagerListeners.add(newListener); }
 	void removeBaseManagerListener(Listener* listener) { baseManagerListeners.remove(listener); }
+
+
+	class ManagerEvent
+	{
+	public:
+		enum Type { ITEM_ADDED, ITEM_REMOVED, ITEMS_REORDERED, ITEMS_ADDED, ITEMS_REMOVED, MANAGER_CLEARED };
+
+		ManagerEvent(Type t, T * i = nullptr) : type(t)
+		{
+			itemsRef.add(i);			
+		}
+
+		ManagerEvent(Type t, Array<T *> i) : type(t), itemsRef(i) {}
+
+		Type type;
+		Array<WeakReference<Inspectable>> itemsRef;
+
+		Array<T *> getItems() const
+		{
+			Array<T *> result;
+			for (auto &i : itemsRef)
+			{
+				if (i != nullptr && !i.wasObjectDeleted()) result.add(i);
+			}
+			return result;
+		}
+
+		T * getItem(int index=0) const
+		{
+			if (itemsRef.size() > index && itemsRef[index] != nullptr && !itemsRef[index].wasObjectDeleted()) return static_cast<T *>(itemsRef[index].get());
+			return nullptr;
+		}
+	};
+
+	using BManagerEvent = typename BaseManager<T>::ManagerEvent;
+	using ManagerNotifier = QueuedNotifier<BManagerEvent>;
+	ManagerNotifier managerNotifier;
+	typedef typename QueuedNotifier<BManagerEvent>::Listener AsyncListener;
+
+	void addAsyncManagerListener(AsyncListener * newListener) { managerNotifier.addListener(newListener); }
+	void addAsyncCoalescedManagerListener(AsyncListener * newListener) { managerNotifier.addAsyncCoalescedListener(newListener); }
+	void removeAsyncManagerListener(AsyncListener * listener) { managerNotifier.removeListener(listener); }
+
 
 	InspectableEditor * getEditor(bool /*isRoot*/) override;
 
@@ -91,14 +135,14 @@ public:
 	{
 	public:
 		ManagerBaseAction(BaseManager * manager, var _data = var()) :
-            managerControlAddress(manager->getControlAddress()),
-            data(_data),
-            managerRef(manager)
+			managerControlAddress(manager->getControlAddress()),
+			data(_data),
+			managerRef(manager)
 		{}
 
 		String managerControlAddress;
 		var data;
-        WeakReference<Inspectable> managerRef;
+		WeakReference<Inspectable> managerRef;
 
 		BaseManager<T> * getManager() {
 			if (managerRef != nullptr && !managerRef.wasObjectDeleted()) return dynamic_cast<BaseManager<T> *>(managerRef.get());
@@ -191,7 +235,6 @@ public:
 		RemoveItemAction(BaseManager * m, T * i, var data = var()) : ItemBaseAction(m, i, data) {
 		}
 
-
 		bool perform() override
 		{
 
@@ -214,6 +257,82 @@ public:
 		}
 	};
 
+	//Multi add/remove items actions
+	class ItemsBaseAction :
+		public ManagerBaseAction
+	{
+	public:
+		ItemsBaseAction(BaseManager * m, Array<T *> iList, var data = var()) :
+			ManagerBaseAction(m, data),
+			itemsRef(iList)
+		{
+			for (auto &i : itemsRef) itemsShortName.add(i != nullptr ? i->shortName : "");
+		}
+
+		Array<WeakReference<Inspectable>> itemsRef;
+		StringArray itemsShortName;
+
+		T * getItems()
+		{
+			Array<T *> items;
+			int index = 0;
+			for (auto &i : itemsRef)
+			{
+				if (i != nullptr && !i.wasObjectDeleted())
+				{
+					T * ti = dynamic_cast<T *>(itemRef.get());
+					if (ti != nullptr) items.add(ti);
+					else
+					{
+						BaseManager * m = this->getManager();
+						if (m != nullptr)
+						{
+							T * ti = m->getItemWithName(itemShortName);
+							if (ti != nullptr) items.add(ti);
+						}
+					}
+				}
+
+				return items;
+			}
+		}
+	};
+
+	class AddItemsAction :
+		public ItemsBaseAction
+	{
+	public:
+		AddItemsAction(BaseManager * m, Array<T *> iList, var data = var()) : ItemsBaseAction(m, iList, data) {
+		}
+
+		bool perform() override
+		{
+			BaseManager * m = this->getManager();
+			if (m == nullptr) return false;
+
+			Array<T *> items = this->getItems();
+			m->addItems(items, false, false);
+
+			this->itemsShortName.clear();
+			for (auto &i : items) this->itemsShortName.add(i != nullptr ? i->shortName : ""); 
+			return true;
+		}
+
+		bool undo() override
+		{
+			Array<T *> items = this->getItems();
+			if (items == nullptr) return false;
+			this->data = var();
+			for (auto & i : items) if (i != nullptr) this->data.append(i->getJSONData());
+			BaseManager * m = this->getManager();
+			if(m != nullptr) m->removeItems(items, false);
+			this->itemsRef.clear();
+			return true;
+		}
+	};
+
+	
+
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BaseManager<T>)
 };
 
@@ -223,7 +342,8 @@ BaseManager<T>::BaseManager(const String & name) :
 	ControllableContainer(name),
 	managerFactory(nullptr),
 	userCanAddItemsManually(true),
-	selectItemWhenCreated(true)
+	selectItemWhenCreated(true),
+	managerNotifier(50)
 {
 	//setCanHavePresets(false);
 	//hideInEditor = true;
@@ -253,13 +373,12 @@ UndoableAction * BaseManager<T>::getAddItemUndoableAction(T * item, var data)
 }
 
 template<class T>
-T * BaseManager<T>::addItem(T * item, var data, bool addToUndo)
+T * BaseManager<T>::addItem(T * item, var data, bool addToUndo, bool notify)
 {
 
 	jassert(items.indexOf(item) == -1); //be sure item is no here already
 	if (item == nullptr) item = createItem();
 	BaseItem * bi = static_cast<BaseItem *>(item);
-
 
 	if (addToUndo && !UndoMaster::getInstance()->isPerforming)
 	{
@@ -285,7 +404,12 @@ T * BaseManager<T>::addItem(T * item, var data, bool addToUndo)
 
 	addItemInternal(item, data);
 
-	baseManagerListeners.call(&BaseManager::Listener::itemAdded, item);
+	if (notify)
+	{
+		baseManagerListeners.call(&BaseManager::Listener::itemAdded, item);
+		managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEM_ADDED, item));
+	}
+
 	reorderItems();
 
 	if (selectItemWhenCreated) bi->selectThis();
@@ -294,11 +418,11 @@ T * BaseManager<T>::addItem(T * item, var data, bool addToUndo)
 }
 
 template<class T>
-T * BaseManager<T>::addItem(const Point<float> initialPosition)
+T * BaseManager<T>::addItem(const Point<float> initialPosition, bool addToUndo, bool notify)
 {
 	T * i = createItem();
 	i->viewUIPosition->setPoint(initialPosition);
-	addItem(i);
+	addItem(i, addToUndo, notify);
 	return i;
 }
 
@@ -306,8 +430,11 @@ template<class T>
 Array<UndoableAction *> BaseManager<T>::addItems(Array<T*> itemsToAdd, bool addToUndo, bool onlyReturnAction)
 {
 	Array<UndoableAction *> actions;
+
+	//TODO replace with AddMultiItemsActions
 	for (T * i : itemsToAdd) actions.add(getAddItemUndoableAction(i));
-	if(!onlyReturnAction) UndoMaster::getInstance()->performActions("Add " + String(actions.size()) + " items", actions);
+	if (!onlyReturnAction) UndoMaster::getInstance()->performActions("Add " + String(actions.size()) + " items", actions);
+
 	return actions;
 }
 
@@ -372,9 +499,8 @@ void BaseManager<T>::removeItems(Array<T*> itemsToRemove, bool addToUndo)
 }
 
 template<class T>
-void BaseManager<T>::removeItem(T * item, bool addToUndo)
+void BaseManager<T>::removeItem(T * item, bool addToUndo, bool notify)
 {
-
 	if (addToUndo && !UndoMaster::getInstance()->isPerforming)
 	{
 		if (Engine::mainEngine != nullptr && !Engine::mainEngine->isLoadingFile)
@@ -391,8 +517,13 @@ void BaseManager<T>::removeItem(T * item, bool addToUndo)
 	removeItemInternal(item);
 	bi->removeBaseItemListener(this);
 
-	baseManagerListeners.call(&BaseManager::Listener::itemRemoved, item);
+	if (notify)
+	{
+		baseManagerListeners.call(&BaseManager::Listener::itemRemoved, item);
+		managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEM_REMOVED, item));
 
+	}
+	
 	delete item;
 }
 
@@ -400,6 +531,8 @@ template<class T>
 void BaseManager<T>::reorderItems()
 {
 	baseManagerListeners.call(&Listener::itemsReordered);
+	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_REORDERED));
+
 }
 
 template<class T>
@@ -449,7 +582,7 @@ var BaseManager<T>::getJSONData()
 		itemsData.append(t->getJSONData());
 	}
 
-	if(itemsData.size() > 0) data.getDynamicObject()->setProperty("items", itemsData);
+	if (itemsData.size() > 0) data.getDynamicObject()->setProperty("items", itemsData);
 
 	return data;
 }
