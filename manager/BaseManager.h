@@ -280,14 +280,14 @@ public:
 			{
 				if (i != nullptr && !i.wasObjectDeleted())
 				{
-					T * ti = dynamic_cast<T *>(itemRef.get());
+					T * ti = dynamic_cast<T *>(this->itemRef.get());
 					if (ti != nullptr) items.add(ti);
 					else
 					{
 						BaseManager * m = this->getManager();
 						if (m != nullptr)
 						{
-							T * ti = m->getItemWithName(itemShortName);
+							T * ti = m->getItemWithName(this->itemShortName);
 							if (ti != nullptr) items.add(ti);
 						}
 					}
