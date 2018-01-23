@@ -105,7 +105,7 @@ void ScriptExpression::scriptObjectUpdated(ScriptTarget *)
 {
 	//if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile) return;
 
-	DBG("Script Object updated");
+	DBG("Script Expression updated");
 	buildEnvironment();
 
 	//rebuild and reevaluate

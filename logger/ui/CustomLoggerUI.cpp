@@ -11,8 +11,8 @@
 
 CustomLoggerUI::CustomLoggerUI(const String& contentName, CustomLogger* l) :
 	ShapeShifterContentComponent(contentName),
-    logger(l),
-    logList(this),
+	logger(l),
+	logList(this),
 	maxNumElement(1000),
 	totalLogRow(0)
 {
@@ -276,8 +276,9 @@ void CustomLoggerUI::LogList::paintRowBackground(Graphics& g,
 	int width, int height,
 	bool)
 {
-	Colour c = BG_COLOR.brighter(.1f);// (rowNumber);
-	if (rowNumber % 2 == 0) c = c.brighter(.1f);
+	Colour c = owner->getSeverityColourForRow(rowNumber).darker(2);// BG_COLOR.brighter(.1f);// (rowNumber);
+	if (rowNumber % 2 == 0) c = c.brighter(.05f);
+
 	g.setColour(c);
 	g.fillRect(0, 0, width, height);
 };
@@ -319,7 +320,7 @@ String CustomLoggerUI::LogList::getCellTooltip(int rowNumber, int /*columnId*/)
 	return
 		(sR.isNotEmpty() ?
 			sR + " (" + el->time.toString(false, true, true, true) + ")" + "\n" : String::empty)
-		+ (el->getNumLines()< 10 ? el->content : owner->getSourceForRow(rowNumber));
+		+ (el->getNumLines() < 10 ? el->content : owner->getSourceForRow(rowNumber));
 
 
 };

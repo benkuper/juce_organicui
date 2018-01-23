@@ -626,6 +626,7 @@ var ControllableContainer::getJSONData()
 void ControllableContainer::loadJSONData(var data, bool createIfNotThere)
 {
 	if (data.isVoid()) return;
+	if (data.getDynamicObject() == nullptr) return;
 
 	//if (data.getDynamicObject()->hasProperty("uid")) uid = data.getDynamicObject()->getProperty("uid");
 	if (data.getDynamicObject()->hasProperty("niceName")) setNiceName(data.getDynamicObject()->getProperty("niceName"));

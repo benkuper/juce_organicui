@@ -13,7 +13,8 @@ Author:  Ben
 
 class Script :
 	public BaseItem,
-	public Timer
+	public Timer,
+	public EngineListener
 {
 public:
 	Script(ScriptTarget * parentTarget = nullptr, bool canBeDisabled = true);
@@ -50,7 +51,11 @@ public:
 
 	void onControllableFeedbackUpdateInternal(ControllableContainer * cc, Controllable * c) override;
 
+	void endLoadFile() override;
+	
 	InspectableEditor * getEditor(bool isRoot) override;
+
+
 
 	// Inherited via Timer
 	virtual void timerCallback() override;

@@ -46,7 +46,16 @@ Script::~Script()
 
 void Script::loadScript()
 {
+	if (Engine::mainEngine->isLoadingFile)
+	{
+		Engine::mainEngine->addEngineListener(this);
+		return;
+	}
+
+
 	String path = filePath->stringValue();
+	DBG("Load script " << path);
+
 	if (path.isEmpty())
 	{
 		return;
@@ -164,6 +173,13 @@ void Script::onControllableFeedbackUpdateInternal(ControllableContainer * cc, Co
 		args.add(c->getScriptObject());
 		callFunction("scriptParamChanged", args);
 	}
+}
+
+void Script::endLoadFile()
+{
+	DBG("File loaded, check script now");
+	Engine::mainEngine->removeEngineListener(this);
+	loadScript();
 }
 
 InspectableEditor * Script::getEditor(bool isRoot)
