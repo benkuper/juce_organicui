@@ -159,6 +159,9 @@ public:
 		case BaseManager<T>::ManagerEvent::ITEMS_REORDERED:
 			itemsReorderedAsync();
 			break;
+                
+            default:
+                break;
 		}
 	}
 

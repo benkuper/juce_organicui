@@ -275,7 +275,7 @@ public:
 		T * getItems()
 		{
 			Array<T *> items;
-			int index = 0;
+			//int index = 0;
 			for (auto &i : itemsRef)
 			{
 				if (i != nullptr && !i.wasObjectDeleted())
