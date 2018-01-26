@@ -13,10 +13,10 @@ TriggerBlinkUI::TriggerBlinkUI(Trigger *t) :
 	TriggerUI(t),
 	intensity(0),
 	animateIntensity(true),
-blinkTime(100),
+	blinkTime(100),
 	offColor(NORMAL_COLOR),
-onColor(FEEDBACK_COLOR),
-refreshPeriod(50)
+	onColor(FEEDBACK_COLOR),
+	refreshPeriod(50)
 {
     setSize(30, 20);
 

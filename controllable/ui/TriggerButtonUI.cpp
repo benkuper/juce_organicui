@@ -12,7 +12,8 @@
 
 //==============================================================================
 TriggerButtonUI::TriggerButtonUI(Trigger *t) :
-	TriggerUI(t)
+	TriggerUI(t),
+	drawTriggering(false)
 {
 	setSize(20, 15);
 	if (!forceFeedbackOnly) setRepaintsOnMouseActivity(true);
@@ -20,11 +21,15 @@ TriggerButtonUI::TriggerButtonUI(Trigger *t) :
 
 TriggerButtonUI::~TriggerButtonUI()
 {
-
+	stopTimer();
 }
 
-void TriggerButtonUI::triggerTriggered(const Trigger *){
-    repaint();
+void TriggerButtonUI::triggerTriggered(const Trigger *)
+{
+	drawTriggering = true;
+	repaint();
+	startTimer(100);
+
 }
 
 void TriggerButtonUI::mouseDownInternal(const MouseEvent & e)
@@ -48,12 +53,13 @@ void TriggerButtonUI::paint (Graphics& g)
 	Colour c = BG_COLOR;
 	if (!forceFeedbackOnly)
 	{
-
-		c = isMouseOverOrDragging(true) ? (isMouseButtonDown() ? HIGHLIGHT_COLOR : NORMAL_COLOR.brighter()) : NORMAL_COLOR;
+		if (drawTriggering) c = HIGHLIGHT_COLOR;
+		else c = isMouseOverOrDragging(true) ? (isMouseButtonDown() ? HIGHLIGHT_COLOR : NORMAL_COLOR.brighter()) : NORMAL_COLOR;
 	}
 	else
 	{
-		DBG(trigger->niceName << " force feedback");
+		if (drawTriggering) c = FEEDBACK_COLOR;
+		//DBG(trigger->niceName << " force feedback");
 	}
 
     g.setGradientFill(ColourGradient(c,center.x,center.y,c.darker(.5f),2.f,2.f,true));
@@ -69,4 +75,12 @@ void TriggerButtonUI::paint (Graphics& g)
 	}
 
 	drawRect = r.toNearestInt();
+}
+
+
+void TriggerButtonUI::timerCallback()
+{
+	drawTriggering = false;
+	repaint();
+	stopTimer();
 }

@@ -19,13 +19,16 @@
 
 
 class TriggerButtonUI : 
-	public TriggerUI
+	public TriggerUI,
+	public Timer
 {
 public:
     TriggerButtonUI(Trigger * t);
     ~TriggerButtonUI();
 
 	Rectangle<int> drawRect;
+
+	bool drawTriggering;
 
     void paint (Graphics&) override;
     void triggerTriggered(const Trigger * p) override ;
@@ -34,6 +37,8 @@ public:
 
 	bool hitTest(int x, int y) override;
 
+	// Inherited via Timer
+	virtual void timerCallback() override;
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TriggerButtonUI)
 };
