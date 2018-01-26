@@ -65,7 +65,6 @@ public:
 	bool isSavable;
 	bool saveValueOnly;
 
-
 	//user control
 	bool isCustomizableByUser;
 	bool isRemovableByUser;
@@ -80,6 +79,7 @@ public:
 	void setAutoShortName();
 
 	virtual void setEnabled(bool value, bool silentSet = false, bool force = false);
+	virtual void setControllableFeedbackOnly(bool value);
 
 	void setParentContainer(ControllableContainer * container);
 	void updateControlAddress();
@@ -105,13 +105,13 @@ public:
 	virtual String getTypeString() const { jassert(false); return ""; } //should be overriden
 
 
-
 	class  Listener
 	{
 	public:
 		/** Destructor. */
 		virtual ~Listener() {}
 		virtual void controllableStateChanged(Controllable *) {}
+		virtual void controllableFeedbackStateChanged(Controllable *) {}
 		virtual void controllableControlAddressChanged(Controllable *) {}
 		virtual void controllableNameChanged(Controllable *) {}
 		virtual void controllableRemoved(Controllable *) {}
@@ -126,7 +126,7 @@ public:
 	class  ControllableEvent
 	{
 	public:
-		enum Type { STATE_CHANGED, CONTROLADDRESS_CHANGED, NAME_CHANGED, CONTROLLABLE_REMOVED };
+		enum Type { STATE_CHANGED, FEEDBACK_STATE_CHANGED, CONTROLADDRESS_CHANGED, NAME_CHANGED, CONTROLLABLE_REMOVED };
 
 		ControllableEvent(Type t, Controllable * c) : type(t),controllable(c) {}
 

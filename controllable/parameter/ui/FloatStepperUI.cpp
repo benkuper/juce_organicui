@@ -16,15 +16,20 @@ FloatStepperUI::FloatStepperUI(Parameter * _parameter) :
 	showEditWindowOnDoubleClick = false;
 
 	slider = new BetterStepper(tooltip);
-	slider->setEnabled(parameter->enabled && parameter->isEditable && !parameter->isControllableFeedbackOnly);
+	slider->setEnabled(parameter->enabled);
 	
-    addAndMakeVisible(slider);
     slider->setRange((int)parameter->minimumValue-1, (int)parameter->maximumValue+1,1);
+
     slider->setValue(parameter->floatValue());
     slider->addListener(this);
-	slider->setTextBoxIsEditable(_parameter->isEditable);
 	slider->addMouseListener(this,true);
 	slider->setColour(slider->textBoxBackgroundColourId,BG_COLOR.darker(.1f).withAlpha(.8f));
+
+	bool active = parameter->isEditable && !forceFeedbackOnly;
+	slider->setTextBoxIsEditable(active);
+	slider->setIncDecButtonsMode(active ? Slider::IncDecButtonMode::incDecButtonsDraggable_Vertical : Slider::IncDecButtonMode::incDecButtonsNotDraggable);
+	
+	addAndMakeVisible(slider);
 }
 
 FloatStepperUI::~FloatStepperUI()
@@ -34,6 +39,8 @@ FloatStepperUI::~FloatStepperUI()
 
 void FloatStepperUI::resized()
 {
+	slider->setTextBoxIsEditable(parameter->isEditable && !forceFeedbackOnly);
+	slider->setIncDecButtonsMode(parameter->isEditable && !forceFeedbackOnly ? Slider::IncDecButtonMode::incDecButtonsDraggable_Vertical : Slider::IncDecButtonMode::incDecButtonsNotDraggable);
     slider->setBounds(getLocalBounds());
 }
 
@@ -52,7 +59,7 @@ void FloatStepperUI::sliderValueChanged(Slider * _slider)
 void FloatStepperUI::controllableStateChanged()
 {
 	ParameterUI::controllableStateChanged();
-	slider->setEnabled(parameter->enabled && parameter->isEditable && !parameter->isControllableFeedbackOnly);
+	slider->setEnabled(parameter->enabled);
 }
 
 void FloatStepperUI::rangeChanged(Parameter *){
@@ -62,5 +69,7 @@ void FloatStepperUI::rangeChanged(Parameter *){
 
 void FloatStepperUI::setForceFeedbackOnlyInternal()
 {
-	slider->setTextBoxIsEditable(parameter->isEditable && !forceFeedbackOnly);
+	bool active = parameter->isEditable && !forceFeedbackOnly;
+	slider->setTextBoxIsEditable(active);
+	slider->setIncDecButtonsMode(active?Slider::IncDecButtonMode::incDecButtonsDraggable_Vertical:Slider::IncDecButtonMode::incDecButtonsNotDraggable);
 }

@@ -17,6 +17,7 @@ Parameter::Parameter(const Type &type, const String &niceName, const String &des
 	isPresettable(true),
 	isOverriden(false),
 	autoAdaptRange(false),
+	forceSaveValue(false),
 	queuedNotifier(100)
 {
 	minimumValue = minValue;

@@ -1,3 +1,4 @@
+#include "TargetParameter.h"
 /*
   ==============================================================================
 
@@ -49,6 +50,7 @@ void TargetParameter::setGhostValue(const String & ghostVal)
 	ghostValue = ghostVal;
 	if (ghostValue.isNotEmpty())
 	{
+		//if (Engine::mainEngine->isLoadingFile) Engine::mainEngine->addEngineListener(this);
 		if(rootContainer != nullptr) rootContainer->addControllableContainerListener(this);
 	} else
 	{
@@ -59,13 +61,13 @@ void TargetParameter::setGhostValue(const String & ghostVal)
 void TargetParameter::setValueFromTarget(Controllable * c)
 {
 	if (c == target) return;
-	setValue(c->getControlAddress(rootContainer));
+	setValue(c->getControlAddress(rootContainer),false,true);
 }
 
 void TargetParameter::setValueFromTarget(ControllableContainer * cc)
 {
-	if (cc == targetContainer) return;
-	setValue(cc->getControlAddress(rootContainer));
+	if (cc == targetContainer) return; 
+	setValue(cc->getControlAddress(rootContainer),false,true);
 }
 
 void TargetParameter::setValueInternal(var & newVal)
@@ -126,12 +128,14 @@ void TargetParameter::setTarget(WeakReference<ControllableContainer> cc)
 	}
 }
 
-void TargetParameter::childStructureChanged(ControllableContainer *)
+void TargetParameter::childStructureChanged(ControllableContainer * cc)
 {
+	
 	if (target == nullptr && ghostValue.isNotEmpty())
 	{
 		WeakReference<Controllable> c = rootContainer->getControllableForAddress(ghostValue);
 		if (c != nullptr) setValueFromTarget(c);
+		
 	}
 }
 
@@ -153,6 +157,19 @@ void TargetParameter::controllableContainerRemoved(ControllableContainer * cc)
 		setValue(String::empty);
 		setGhostValue(oldValue);
 	}
+}
+
+void TargetParameter::endLoadFile()
+{
+	//DBG("End load file, ghost is " << ghostValue << ", try retargeting");
+	/*
+	Engine::mainEngine->removeEngineListener(this);
+	if (target == nullptr && ghostValue.isNotEmpty())
+	{
+		WeakReference<Controllable> c = rootContainer->getControllableForAddress(ghostValue);
+		if (c != nullptr) setValueFromTarget(c);
+	}
+	*/
 }
 
 TargetParameterUI * TargetParameter::createTargetUI(TargetParameter * _target)

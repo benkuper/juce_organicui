@@ -54,7 +54,6 @@ void Script::loadScript()
 
 
 	String path = filePath->stringValue();
-	DBG("Load script " << path);
 
 	if (path.isEmpty())
 	{
@@ -177,7 +176,6 @@ void Script::onControllableFeedbackUpdateInternal(ControllableContainer * cc, Co
 
 void Script::endLoadFile()
 {
-	DBG("File loaded, check script now");
 	Engine::mainEngine->removeEngineListener(this);
 	loadScript();
 }

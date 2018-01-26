@@ -54,6 +54,7 @@ public:
 	virtual void newMessage(const Controllable::ControllableEvent &e) override;
 
     virtual void controllableStateChanged();
+	virtual void feedbackStateChanged();
     virtual void controllableControlAddressChanged();
 
 

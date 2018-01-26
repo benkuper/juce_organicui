@@ -13,10 +13,11 @@
 
 class TargetParameterUI;
 
-class TargetParameter : 
+class TargetParameter :
 	public StringParameter,
 	public ControllableContainerListener,
-	public Controllable::Listener
+	public Controllable::Listener,
+	public EngineListener
 {
 public:
 	
@@ -59,6 +60,8 @@ public:
 	void childStructureChanged(ControllableContainer *) override;
 	void controllableRemoved(Controllable *) override;
 	void controllableContainerRemoved(ControllableContainer *) override;
+
+	void endLoadFile() override;
 
 	TargetParameterUI * createTargetUI(TargetParameter * target = nullptr);
 	ControllableUI* createDefaultUI(Controllable * targetControllable = nullptr) override;

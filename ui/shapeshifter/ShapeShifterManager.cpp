@@ -280,10 +280,10 @@ void ShapeShifterManager::loadLastSessionLayoutFile()
 	}
 }
 
-void ShapeShifterManager::loadDefaultLayoutFile()
+void ShapeShifterManager::loadDefaultLayoutFile(bool forceEmbeddedLayout)
 {
 	File defaultFile = File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory).getChildFile(appSubFolder + "/default." + appLayoutExtension);
-	if (defaultFile.exists())
+	if (defaultFile.exists() && !forceEmbeddedLayout)
 	{
 		loadLayoutFromFile(defaultFile);
 	} else

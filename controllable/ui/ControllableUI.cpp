@@ -108,6 +108,7 @@ void ControllableUI::setForceFeedbackOnly(bool value)
 	setRepaintsOnMouseActivity(false);
 	forceFeedbackOnly = value;
 	setForceFeedbackOnlyInternal();
+	repaint();
 }
 
 void ControllableUI::newMessage(const Controllable::ControllableEvent & e)
@@ -128,6 +129,10 @@ void ControllableUI::newMessage(const Controllable::ControllableEvent & e)
 	case Controllable::ControllableEvent::CONTROLLABLE_REMOVED:
 		break;
 
+	case Controllable::ControllableEvent::FEEDBACK_STATE_CHANGED:
+		feedbackStateChanged();
+		break;
+
 	default:
 		//NOT HANDLED
 		break;
@@ -140,6 +145,11 @@ void ControllableUI::controllableStateChanged()
 	setEnabled(controllable->enabled);
 	setAlpha(controllable->enabled ? 1 : .5f);
 	setInterceptsMouseClicks(controllable->enabled, controllable->enabled);
+}
+
+void ControllableUI::feedbackStateChanged()
+{
+	setForceFeedbackOnly(controllable->isControllableFeedbackOnly);
 }
 
 void ControllableUI::controllableControlAddressChanged()

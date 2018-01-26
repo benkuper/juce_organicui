@@ -68,7 +68,7 @@ public:
 	void loadLayoutFromFile(int fileIndexInLayoutFolder =-1);
 	void loadLayoutFromFile(const File &fromFile);
 	void loadLastSessionLayoutFile();
-	void loadDefaultLayoutFile();
+	void loadDefaultLayoutFile(bool forceEmbeddedLayout = false);
 	void saveCurrentLayout();
 	void saveCurrentLayoutToFile(const File &toFile);
 	Array<File> getLayoutFiles();

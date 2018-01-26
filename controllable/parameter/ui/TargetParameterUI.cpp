@@ -146,7 +146,6 @@ void TargetParameterUI::buttonClicked(Button * b)
 
 void TargetParameterUI::valueChanged(const var &)
 {
-	DBG("Value changed ");
 	if (listeningToNextChange != nullptr) listeningToNextChange->setValue(false);
 
 	updateLabel();

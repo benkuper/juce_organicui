@@ -41,7 +41,7 @@ void ParameterEditor::updateUI()
 {
 	subContentHeight = parameter->controlMode != Parameter::MANUAL ? 18 : 0;
 
-	ui->setForceFeedbackOnly(parameter->controlMode != Parameter::MANUAL);
+	ui->setForceFeedbackOnly(parameter->isControllableFeedbackOnly || parameter->controlMode != Parameter::MANUAL);
 
 	if (parameter->controlMode == Parameter::EXPRESSION)
 	{

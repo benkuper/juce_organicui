@@ -1324,9 +1324,13 @@ void LookAndFeelOO::drawRotarySlider (Graphics& g, int x, int y, int width, int 
     }
 }
 
-Button* LookAndFeelOO::createSliderButton (Slider&, const bool isIncrement)
+Button* LookAndFeelOO::createSliderButton (Slider& s, const bool isIncrement)
 {
-    return new TextButton (isIncrement ? "+" : "-", String::empty);
+	DBG("Create slider BT : " << (int)s.isTextBoxEditable());
+    TextButton * bt = new TextButton (isIncrement ? "+" : "-", String::empty);
+	bt->setEnabled(s.isTextBoxEditable());
+	bt->setVisible(s.isTextBoxEditable());
+	return bt;
 }
 
 class LookAndFeelOO::SliderLabelComp  : public Label

@@ -105,6 +105,14 @@ void Controllable::setEnabled(bool value, bool silentSet, bool force)
 	}
 }
 
+void Controllable::setControllableFeedbackOnly(bool value)
+{
+	if (isControllableFeedbackOnly == value) return;
+	isControllableFeedbackOnly = value;
+	listeners.call(&Listener::controllableFeedbackStateChanged, this);
+	queuedNotifier.addMessage(new ControllableEvent(ControllableEvent::FEEDBACK_STATE_CHANGED, this));
+}
+
 void Controllable::setParentContainer(ControllableContainer * container)
 {
 	this->parentContainer = container;
@@ -157,6 +165,8 @@ var Controllable::getJSONDataInternal()
 
 void Controllable::loadJSONData(var data)
 {
+	if (data.getDynamicObject()->hasProperty("type")) saveValueOnly = false;
+
 	if (data.getDynamicObject()->hasProperty("niceName")) setNiceName(data.getProperty("niceName", ""));
 	if (data.getDynamicObject()->hasProperty("shortName")) setCustomShortName(data.getProperty("shortName", ""));
 	if (data.getDynamicObject()->hasProperty("customizable")) isCustomizableByUser = data.getProperty("customizable", false);

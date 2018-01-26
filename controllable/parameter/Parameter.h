@@ -50,6 +50,8 @@ public:
 	bool isPresettable;
     bool isOverriden;
 	bool autoAdaptRange;
+	bool forceSaveValue; //if true, will save value even if not overriden
+
 
 	void setControlMode(ControlMode _mode);
 	void setControlExpression(const String &);
