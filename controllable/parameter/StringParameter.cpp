@@ -20,8 +20,6 @@ StringParameter::~StringParameter()
 {
 }
 
-
-
 StringParameterUI * StringParameter::createStringParameterUI(StringParameter * target)
 {
 	if (target == nullptr) target = this;
@@ -60,6 +58,12 @@ void StringParameter::setValue(var _value,bool silentSet,bool force )
 
 void  StringParameter::setValueInternal(var & newVal){
 	
-    value = newVal.toString();
+	if (newVal.isArray())
+	{
+		for (int i = 0; i < newVal.size(); i++) value = (i > 0 ? " " : "") + newVal[i].toString();
+	} else
+	{
+		value = newVal.toString();
+	}    
 };
 
