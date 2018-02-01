@@ -14,7 +14,9 @@ Author:  Ben
 class ScriptExpression :
 	public Timer,
 	public EngineListener,
-	public ScriptTarget::ScriptTargetListener
+	public ScriptTarget::ScriptTargetListener,
+	public Inspectable::InspectableListener,
+	public Parameter::Listener
 {
 public:
 	ScriptExpression();
@@ -28,8 +30,10 @@ public:
 	String expression;
 	var currentValue;
 
+	Array<WeakReference<Parameter>> linkedParameters;
+
 	void setExpression(const String &expression);
-	void evaluate();
+	void evaluate(bool resetListeners = false);
 	void buildEnvironment();
 	void setState(ExpressionState newState);
 
@@ -37,17 +41,14 @@ public:
 
 	void endLoadFile() override;
 
-	class Listener
-	{
-	public:
-		virtual ~Listener() {}
-		virtual void expressionValueChanged(ScriptExpression *) {}
-		virtual void expressionStateChanged(ScriptExpression *) {}
-	};
+	Array<Parameter *> getParameterReferencesInExpression();
 
-	ListenerList<Listener> expressionListeners;
-	void addExpressionListener(Listener* newListener) { expressionListeners.add(newListener); }
-	void removeExpressionListener(Listener* listener) { expressionListeners.remove(listener); }
+	void inspectableDestroyed(Inspectable * i) override;
+	void parameterValueChanged(Parameter * p) override;
+
+	ListenerList<ExpressionListener> expressionListeners;
+	void addExpressionListener(ExpressionListener* newListener) { expressionListeners.add(newListener); }
+	void removeExpressionListener(ExpressionListener* listener) { expressionListeners.remove(listener); }
 
 
 	// Inherited via Timer

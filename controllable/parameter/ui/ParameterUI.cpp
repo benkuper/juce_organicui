@@ -17,7 +17,11 @@ ParameterUI::ParameterUI(Parameter * parameter) :
     showValue(true)
 {
 	parameter->addAsyncCoalescedParameterListener(this);
-
+	if (parameter->controlMode == Parameter::EXPRESSION)
+	{
+		
+		DBG(parameter->niceName << " expression state : " << parameter->expression->state);
+	}
 }
 
 ParameterUI::~ParameterUI()

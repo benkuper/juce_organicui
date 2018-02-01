@@ -14,7 +14,7 @@
 
 class Parameter : 
 	public Controllable,
-	public ScriptExpression::Listener
+	public ExpressionListener
 {
 public:
 	enum ControlMode {

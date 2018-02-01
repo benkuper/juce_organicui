@@ -23,6 +23,13 @@ ScriptExpression::~ScriptExpression()
 		Engine::mainEngine->removeEngineListener(this);
 		Engine::mainEngine->removeScriptTargetListener(this);
 	}
+
+	for (auto &p : linkedParameters)
+	{
+		p->removeInspectableListener(this);
+		p->removeParameterListener(this);
+	}
+	linkedParameters.clear();
 }
 
 void ScriptExpression::setExpression(const String & newExpression)
@@ -49,19 +56,36 @@ void ScriptExpression::setExpression(const String & newExpression)
 	}
 
 	buildEnvironment();
-	evaluate();
+	evaluate(true);
 
-	if(state != EXPRESSION_ERROR) setState(EXPRESSION_LOADED);
+	if (state != EXPRESSION_ERROR)
+	{
+		setState(EXPRESSION_LOADED);
 
-	startTimerHz(30); //30 fps loop time, to do : find a way to loop only when inner value change
-	
+		if (expression.contains("getTime()"))
+		{
+			DBG("Start expression timer because expression uses getTime()");
+			startTimerHz(30); //loop at 30fps only if expression is using time, otherwise relies on parameter value changed
+		}
+
+	}
 }
 
-void ScriptExpression::evaluate()
+void ScriptExpression::evaluate(bool resetListeners)
 {
-	//DBG("Evaluate, is loading file ? " << (int)Engine::mainEngine->isLoadingFile);
-	
 	Result result = Result::ok();
+
+	if (resetListeners)
+	{
+		for (auto &p : linkedParameters)
+		{
+			if (p.wasObjectDeleted()) continue;
+			p->removeInspectableListener(this);
+			p->removeParameterListener(this);
+		}
+		linkedParameters.clear();
+	}
+
 	var resultValue = scriptEngine->evaluate(expression,&result);
 
 	if (result.getErrorMessage().isEmpty())
@@ -69,7 +93,19 @@ void ScriptExpression::evaluate()
 		if (currentValue != resultValue)
 		{
 			currentValue = resultValue;
-			expressionListeners.call(&Listener::expressionValueChanged, this);
+
+			if (resetListeners)
+			{
+				Array<Parameter *> pList = getParameterReferencesInExpression();
+				for (auto &p : pList)
+				{
+					p->addParameterListener(this);
+					p->addInspectableListener(this);
+					linkedParameters.add(p);
+				}
+			}
+			
+			expressionListeners.call(&ExpressionListener::expressionValueChanged, this);
  		}
 	} else
 	{
@@ -78,6 +114,8 @@ void ScriptExpression::evaluate()
 		stopTimer();
 		return;
 	}
+
+
 }
 
 void ScriptExpression::buildEnvironment()
@@ -97,7 +135,7 @@ void ScriptExpression::buildEnvironment()
 void ScriptExpression::setState(ExpressionState newState)
 {
 	state = newState;
-	expressionListeners.call(&Listener::expressionStateChanged, this);
+	expressionListeners.call(&ExpressionListener::expressionStateChanged, this);
 	//scriptAsyncNotifier.addMessage(new ScriptEvent(ScriptEvent::STATE_CHANGE));
 }
 
@@ -116,6 +154,34 @@ void ScriptExpression::endLoadFile()
 {
 	Engine::mainEngine->removeEngineListener(this);
 	setExpression(expression);
+}
+
+Array<Parameter*> ScriptExpression::getParameterReferencesInExpression()
+{
+	Array<Parameter*> result;
+	
+	String remainingText = expression;
+	Array<StringArray> matches = RegexFunctions::findSubstringsThatMatchWildcard("(?:root|local)\\.([0-9a-zA-Z\\.]+)\\.get\\(\\)", expression); 
+	
+	for (int i = 0; i < matches.size(); i++)
+	{
+		String scriptToAddress = "/"+matches[i][1].replaceCharacter('.', '/');
+		Controllable * c = Engine::mainEngine->getControllableForAddress(scriptToAddress);
+		Parameter * p = dynamic_cast<Parameter *>(c);
+		if (p != nullptr) result.add(p);
+	}
+
+	return result;
+}
+
+void ScriptExpression::inspectableDestroyed(Inspectable * i)
+{
+	evaluate(true);
+}
+
+void ScriptExpression::parameterValueChanged(Parameter * p)
+{
+	evaluate();
 }
 
 void ScriptExpression::timerCallback()

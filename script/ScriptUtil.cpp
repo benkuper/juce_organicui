@@ -18,6 +18,8 @@ ScriptUtil::ScriptUtil() :
 	scriptObject.setMethod("getFloatFromBytes", ScriptUtil::getFloatFromBytes);
 	scriptObject.setMethod("getInt32FromBytes", ScriptUtil::getInt32FromBytes);
 	scriptObject.setMethod("atan2", ScriptUtil::atan2FromScript);
+	scriptObject.setMethod("cos", ScriptUtil::cosFromScript);
+	scriptObject.setMethod("sin", ScriptUtil::sinFromScript);
 	scriptObject.setMethod("toDegrees", ScriptUtil::toDegrees);
 	scriptObject.setMethod("toRadians", ScriptUtil::toRadians);
 }
@@ -46,6 +48,20 @@ var ScriptUtil::getInt32FromBytes(const var::NativeFunctionArgs & a)
 	memcpy(&result, &bytes, 4);
 	return result;
 }
+
+var ScriptUtil::cosFromScript(const var::NativeFunctionArgs & a)
+{
+	if (a.numArguments < 1) return 0;
+	return cosf((float)a.arguments[0]);
+}
+
+
+var ScriptUtil::sinFromScript(const var::NativeFunctionArgs & a)
+{
+	if (a.numArguments < 1) return 0;
+	return sinf((float)a.arguments[0]);
+}
+
 
 var ScriptUtil::atan2FromScript(const var::NativeFunctionArgs & a)
 {

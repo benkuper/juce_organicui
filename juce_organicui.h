@@ -58,7 +58,7 @@ using namespace juce;
 #include "ui/Style.h"
 #include "ui/AssetManager.h"
 #include "ui/LookAndFeelOO.h"
-
+#include "helpers/RegexFunctions.h"
 #include "engine/EngineListener.h"
 
 #include "helpers/DebugHelpers.h"
@@ -81,7 +81,7 @@ using namespace juce;
 
 #include "controllable/ControllableContainerListener.h"
 
-#include "script/ScriptExpression.h"
+#include "script/ExpressionListener.h"
 
 #include "controllable/Controllable.h"
 
@@ -91,6 +91,8 @@ using namespace juce;
 #include "controllable/parameter/ui/ParameterUI.h"
 #include "controllable/parameter/ui/ParameterEditor.h"
 #include "controllable/parameter/Parameter.h"
+
+#include "script/ScriptExpression.h"
 
 #include "controllable/ControllableFactory.h"
 #include "controllable/ControllableHelpers.h"
