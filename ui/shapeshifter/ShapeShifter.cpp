@@ -59,6 +59,11 @@ bool ShapeShifter::isFlexible()
 var ShapeShifter::getCurrentLayout()
 {
 	var layout(new DynamicObject());
+	
+	//set to actual values before saving so when loading, will get exactly the same
+	preferredWidth = getWidth();
+	preferredHeight = getHeight();
+
 	layout.getDynamicObject()->setProperty("type", (int)shifterType);
 	layout.getDynamicObject()->setProperty("width", preferredWidth);
 	layout.getDynamicObject()->setProperty("height", preferredHeight);

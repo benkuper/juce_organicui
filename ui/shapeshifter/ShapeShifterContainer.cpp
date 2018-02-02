@@ -146,10 +146,10 @@ void ShapeShifterContainer::movePanelsInContainer(ShapeShifterPanel * newPanel, 
 	
 	newContainer->setPreferredWidth(containedPanel->getPreferredWidth());
 	newContainer->setPreferredHeight(containedPanel->getPreferredHeight());
-	DBG("MovePanels " << containedPanel->contents[0]->contentName << "/" << containedPanel->getPreferredWidth() << " / " << newContainer->getPreferredWidth());
+	//DBG("MovePanels " << containedPanel->contents[0]->contentName << "/" << containedPanel->getPreferredWidth() << " / " << newContainer->getPreferredWidth());
 	
 	insertContainerAt(newContainer, targetIndex);
-	DBG("After insertContainerAt" << containedPanel->contents[0]->contentName << "/" << containedPanel->getPreferredWidth() << " / " << newContainer->getPreferredWidth());	
+	//DBG("After insertContainerAt" << containedPanel->contents[0]->contentName << "/" << containedPanel->getPreferredWidth() << " / " << newContainer->getPreferredWidth());	
 
 }
 
@@ -177,6 +177,9 @@ void ShapeShifterContainer::resized()
 		return;
 	}
 
+	if (parentContainer == nullptr) return; //Avoid resizing of non-main containers before it's fully loaded
+
+
 	int totalSpace = (direction == HORIZONTAL) ? getWidth() : getHeight();
 	
 	int numShifters = shifters.size();
@@ -193,6 +196,7 @@ void ShapeShifterContainer::resized()
 	}
 
 	int spaceDiff = totalSpaceWithoutGap - totalSpacePreferred;
+	
 	if (numFlexibleShifters > 0)
 	{
 		int spaceDiffPerShifter = spaceDiff / numFlexibleShifters;
@@ -213,6 +217,8 @@ void ShapeShifterContainer::resized()
 			else p->setPreferredHeight(p->getPreferredHeight() + spaceDiffPerShifter);
 		}
 	}
+
+
 
 	Rectangle<int> r = getLocalBounds();
 	int index = 0;
@@ -274,8 +280,9 @@ void ShapeShifterContainer::loadLayoutInternal(var layout)
 			{
 				Direction dir = (Direction)(int)sData.getDynamicObject()->getProperty("direction");
 				ShapeShifterContainer * sc = new ShapeShifterContainer(dir);
+				sc->loadLayout(sData); 
 				insertContainerAt(sc, -1, false);
-				sc->loadLayout(sData);
+				
 			}
 		}
 	}
