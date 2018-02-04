@@ -160,12 +160,15 @@ public:
 	
 	void clear();
 
+
+
+	WeakReference<ControllableContainer>::Master masterReference;
+	friend class WeakReference<ControllableContainer>;
+
 protected:
 	void notifyStructureChanged();
 	void newMessage(const Parameter::ParameterEvent &e)override;
 
-	WeakReference<ControllableContainer>::Master masterReference;
-	friend class WeakReference<ControllableContainer>;
 
 public:
 	class ControllableContainerAction :

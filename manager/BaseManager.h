@@ -40,7 +40,7 @@ public:
 
 	T * addItem(T * item = nullptr, var data = var(), bool addToUndo = true, bool notify = true); //if data is not empty, load data
 	T * addItem(const Point<float> initialPosition, bool addToUndo = true, bool notify = true);
-	Array<UndoableAction *> addItems(Array<T *> items, bool addToUndo = true, bool onlyReturnAction = false);
+	Array<T *> addItems(Array<T *> items, var data = var(), bool addToUndo = true);
 
 
 	UndoableAction * getRemoveItemUndoableAction(T * item);
@@ -74,9 +74,10 @@ public:
 	public:
 		/** Destructor. */
 		virtual ~Listener() {}
-		virtual void itemAdded(T *) {}
+		virtual void itemAdded(T *) {} 
 		virtual void itemsAdded(Array<T *>) {}
 		virtual void itemRemoved(T *) {}
+		virtual void itemsRemoved(Array<T *>) {}  
 		virtual void itemsReordered() {}
 	};
 
@@ -95,7 +96,13 @@ public:
 			itemsRef.add(i);			
 		}
 
-		ManagerEvent(Type t, Array<T *> i) : type(t), itemsRef(i) {}
+		ManagerEvent(Type t, Array<T *> iList) : type(t)
+		{
+			for (auto &i : iList)
+			{
+				itemsRef.add(dynamic_cast<Inspectable *>(i));
+			}
+		}
 
 		Type type;
 		Array<WeakReference<Inspectable>> itemsRef;
@@ -105,7 +112,7 @@ public:
 			Array<T *> result;
 			for (auto &i : itemsRef)
 			{
-				if (i != nullptr && !i.wasObjectDeleted()) result.add(i);
+				if (i != nullptr && !i.wasObjectDeleted()) result.add(dynamic_cast<T *>(i.get()));
 			}
 			return result;
 		}
@@ -263,38 +270,44 @@ public:
 	{
 	public:
 		ItemsBaseAction(BaseManager * m, Array<T *> iList, var data = var()) :
-			ManagerBaseAction(m, data),
-			itemsRef(iList)
+			ManagerBaseAction(m, data)
 		{
-			for (auto &i : itemsRef) itemsShortName.add(i != nullptr ? i->shortName : "");
+			
+			for (auto &i : iList)
+			{
+				BaseItem * bi = dynamic_cast<BaseItem *>(i);
+				itemsRef.add(bi);
+				itemsShortName.add(bi != nullptr ? bi->shortName : "");
+			}
 		}
 
 		Array<WeakReference<Inspectable>> itemsRef;
 		StringArray itemsShortName;
 
-		T * getItems()
+		Array<T *> getItems()
 		{
-			Array<T *> items;
-			//int index = 0;
+			Array<T *> iList;
+			int index = 0;
 			for (auto &i : itemsRef)
 			{
 				if (i != nullptr && !i.wasObjectDeleted())
 				{
-					T * ti = dynamic_cast<T *>(this->itemRef.get());
-					if (ti != nullptr) items.add(ti);
+					T * ti = dynamic_cast<T *>(i.get());
+					if (ti != nullptr) iList.add(ti);
 					else
 					{
 						BaseManager * m = this->getManager();
 						if (m != nullptr)
 						{
-							T * ti = m->getItemWithName(this->itemShortName);
-							if (ti != nullptr) items.add(ti);
+							ti = m->getItemWithName(this->itemsShortName[index]);
+							if (ti != nullptr) iList.add(ti);
 						}
 					}
 				}
-
-				return items;
+				index++;
 			}
+
+			return iList;
 		}
 	};
 
@@ -310,27 +323,58 @@ public:
 			BaseManager * m = this->getManager();
 			if (m == nullptr) return false;
 
-			Array<T *> items = this->getItems();
-			m->addItems(items, false, false);
+			Array<T *> iList = this->getItems();
+			m->addItems(iList, data, false);
 
 			this->itemsShortName.clear();
-			for (auto &i : items) this->itemsShortName.add(i != nullptr ? i->shortName : ""); 
+			for (auto &i : iList) this->itemsShortName.add(i != nullptr ? i->shortName : "");
 			return true;
 		}
 
 		bool undo() override
 		{
-			Array<T *> items = this->getItems();
-			if (items == nullptr) return false;
+			Array<T *> iList = this->getItems();
 			this->data = var();
-			for (auto & i : items) if (i != nullptr) this->data.append(i->getJSONData());
+			for (auto & i : iList) if (i != nullptr) this->data.append(i->getJSONData());
 			BaseManager * m = this->getManager();
-			if(m != nullptr) m->removeItems(items, false);
+			if(m != nullptr) m->removeItems(iList, false);
 			this->itemsRef.clear();
 			return true;
 		}
 	};
 
+
+	class RemoveItemsAction :
+		public ItemsBaseAction
+	{
+	public:
+		RemoveItemsAction(BaseManager * m, Array<T *> iList) : ItemsBaseAction(m, iList) {
+		}
+
+		bool perform() override
+		{
+			Array<T *> iList = this->getItems();
+			this->data = var();
+			for (auto & i : iList) if (i != nullptr) this->data.append(i->getJSONData());
+			BaseManager * m = this->getManager();
+			if (m != nullptr) m->removeItems(iList, false);
+			this->itemsRef.clear();
+			return true;
+		}
+
+		bool undo() override
+		{
+			BaseManager * m = this->getManager();
+			if (m == nullptr) return false;
+
+			Array<T *> iList = this->getItems();
+			m->addItems(iList, data, false);
+
+			this->itemsShortName.clear();
+			for (auto &i : iList) this->itemsShortName.add(i != nullptr ? i->shortName : "");
+			return true;
+		}
+	};
 	
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BaseManager<T>)
@@ -408,10 +452,11 @@ T * BaseManager<T>::addItem(T * item, var data, bool addToUndo, bool notify)
 	{
 		baseManagerListeners.call(&BaseManager::Listener::itemAdded, item);
 		managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEM_ADDED, item));
+
+		reorderItems();
 	}
 
-	reorderItems();
-
+	
 	if (selectItemWhenCreated) bi->selectThis();
 
 	return item;
@@ -427,15 +472,27 @@ T * BaseManager<T>::addItem(const Point<float> initialPosition, bool addToUndo, 
 }
 
 template<class T>
-Array<UndoableAction *> BaseManager<T>::addItems(Array<T*> itemsToAdd, bool addToUndo, bool onlyReturnAction)
+Array<T *> BaseManager<T>::addItems(Array<T *> itemsToAdd, var data, bool addToUndo)
 {
-	Array<UndoableAction *> actions;
+	
+	if (addToUndo && !UndoMaster::getInstance()->isPerforming)
+	{
+		AddItemsAction * a = new AddItemsAction(this, itemsToAdd, data);
+		UndoMaster::getInstance()->performAction("Add " + String(itemsToAdd.size()) + " items", a);
+		return itemsToAdd;
+	}
 
-	//TODO replace with AddMultiItemsActions
-	for (T * i : itemsToAdd) actions.add(getAddItemUndoableAction(i));
-	if (!onlyReturnAction) UndoMaster::getInstance()->performActions("Add " + String(actions.size()) + " items", actions);
+	for (int i=0;i<itemsToAdd.size();i++)
+	{
+		addItem(itemsToAdd[i], data.isArray()?data[i]:var(),false,false);
+	}
+	
+	baseManagerListeners.call(&Listener::itemsAdded, itemsToAdd);
+	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_ADDED, itemsToAdd));
 
-	return actions;
+	reorderItems();
+
+	return itemsToAdd;
 }
 
 //if data is not empty, load data
@@ -491,11 +548,21 @@ UndoableAction * BaseManager<T>::getRemoveItemUndoableAction(T * item)
 }
 
 template<class T>
-void BaseManager<T>::removeItems(Array<T*> itemsToRemove, bool addToUndo)
+void BaseManager<T>::removeItems(Array<T *> itemsToRemove, bool addToUndo)
 {
-	Array<UndoableAction *> actions;
-	for (auto &i : itemsToRemove) actions.add(getRemoveItemUndoableAction(i));
-	UndoMaster::getInstance()->performActions("Remove " + String(actions.size()) + " actions", actions);
+	if (addToUndo)
+	{
+		RemoveItemsAction * a = new RemoveItemsAction(this,itemsToRemove);
+		UndoMaster::getInstance()->performAction("Remove " + String(itemsToRemove.size()) + " actions", a);
+		return;
+	}
+
+	DBG("Remove items for real here " << itemsToRemove.size());
+
+	baseManagerListeners.call(&Listener::itemsRemoved, itemsToRemove);
+	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_REMOVED));
+
+	for (auto &i : itemsToRemove) removeItem(i, false, false);
 }
 
 template<class T>

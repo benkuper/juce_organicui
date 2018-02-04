@@ -85,7 +85,7 @@ public:
 
 	ScopedPointer<ImageButton> addItemBT;
 
-	
+
 	//ui
 	String noItemText;
 
@@ -111,7 +111,7 @@ public:
 
 	void setShowAddButton(bool value);
 
-	
+
 	virtual void paint(Graphics &g) override;
 
 	virtual void resized() override;
@@ -124,14 +124,14 @@ public:
 
 	virtual void showMenuAndAddItem(bool isFromAddButton, Point<int> mouseDownPos);
 	virtual void addItemFromMenu(bool isFromAddButton, Point<int> mouseDownPos);
-	virtual U * addItemUI(T * item, bool animate = false);
+	virtual U * addItemUI(T * item, bool animate = false, bool resizeAndRepaint = true);
 	virtual U * createUIForItem(T * item);
 	virtual void addItemUIInternal(U *) {}
-	
+
 	virtual void mouseDown(const MouseEvent &e) override;
 	virtual bool keyPressed(const KeyPress &e) override;
 
-	virtual void removeItemUI(T * item);
+	virtual void removeItemUI(T * item, bool resizeAndRepaint = true);
 	virtual void removeItemUIInternal(U *) {}
 
 	virtual void itemUIGrabStart(BaseItemUI<T> * se) override;
@@ -144,7 +144,10 @@ public:
 	int getContentHeight();
 
 	virtual void itemAddedAsync(T * item);
+	virtual void itemsAddedAsync(Array<T *> items);
+
 	virtual void itemRemoved(T * item) override; //must keep this one realtime because the async may cause the target item to already be deleted by the time this function is called
+	virtual void itemsRemoved(Array<T *> items) override;
 	virtual void itemsReorderedAsync();
 
 	void newMessage(const typename BaseManager<T>::ManagerEvent &e) override
@@ -159,9 +162,13 @@ public:
 		case BaseManager<T>::ManagerEvent::ITEMS_REORDERED:
 			itemsReorderedAsync();
 			break;
-                
-            default:
-                break;
+
+		case BaseManager<T>::ManagerEvent::ITEMS_ADDED:
+			itemsAddedAsync(e.getItems());
+			break;
+
+		default:
+			break;
 		}
 	}
 
@@ -208,7 +215,7 @@ BaseManagerUI<M, T, U>::BaseManagerUI(const String & contentName, M * _manager, 
 	gap(2)
 {
 
-	
+
 	//setWantsKeyboardFocus(true);
 
 	highlightColor = LIGHTCONTOUR_COLOR;
@@ -236,7 +243,7 @@ BaseManagerUI<M, T, U>::BaseManagerUI(const String & contentName, M * _manager, 
 	Engine::mainEngine->addEngineListener(this);
 
 	//must call addExistingItems from child class to get overrides
-	
+
 	setSize(100, 50); //default
 }
 
@@ -262,7 +269,7 @@ void BaseManagerUI<M, T, U>::setDefaultLayout(Layout l)
 		if (defaultLayout == VERTICAL) viewport.setScrollBarsShown(true, false);
 		else viewport.setScrollBarsShown(false, true);
 	}
-	
+
 }
 
 template<class M, class T, class U>
@@ -298,7 +305,7 @@ void BaseManagerUI<M, T, U>::mouseDown(const MouseEvent & e)
 	{
 	} else if (e.mods.isRightButtonDown())
 	{
-		if(manager->userCanAddItemsManually) showMenuAndAddItem(false, e.getEventRelativeTo(this).getMouseDownPosition());
+		if (manager->userCanAddItemsManually) showMenuAndAddItem(false, e.getEventRelativeTo(this).getMouseDownPosition());
 	}
 }
 
@@ -309,7 +316,7 @@ bool BaseManagerUI<M, T, U>::keyPressed(const KeyPress & e)
 
 	if (e.getModifiers().isCommandDown())
 	{
-		if(e.getKeyCode() == KeyPress::createFromDescription("v").getKeyCode())
+		if (e.getKeyCode() == KeyPress::createFromDescription("v").getKeyCode())
 		{
 			manager->addItemFromClipboard();
 			return true;
@@ -321,7 +328,7 @@ bool BaseManagerUI<M, T, U>::keyPressed(const KeyPress & e)
 		}
 	} else
 	{
-		if((e.getKeyCode() == e.deleteKey || e.getKeyCode() == e.backspaceKey) && manager->selectionManager == InspectableSelectionManager::activeSelectionManager)
+		if ((e.getKeyCode() == e.deleteKey || e.getKeyCode() == e.backspaceKey) && manager->selectionManager == InspectableSelectionManager::activeSelectionManager)
 		{
 			Array<T *> itemsToRemove;
 			for (auto & i : manager->selectionManager->currentInspectables)
@@ -396,13 +403,13 @@ void BaseManagerUI<M, T, U>::resized()
 template<class M, class T, class U>
 void BaseManagerUI<M, T, U>::resizedInternalHeader(juce::Rectangle<int>& r)
 {
-	
+
 }
 
 template<class M, class T, class U>
 void BaseManagerUI<M, T, U>::resizedInternalContent(juce::Rectangle<int>& r)
 {
-	
+
 	if (addItemBT != nullptr && addItemBT->isVisible() && addItemBT->getParentComponent() == this)
 	{
 		addItemBT->setBounds(r.withSize(24, 24).withX(r.getWidth() - 24));
@@ -451,8 +458,7 @@ void BaseManagerUI<M, T, U>::resizedInternalContent(juce::Rectangle<int>& r)
 				r.translate(0, grabSpaceRect.getHeight() + gap);
 			}
 			tr = r.withHeight(bui->getHeight());
-		}
-		else
+		} else
 		{
 			if (grabbingItem != nullptr && i == grabbingItemDropIndex)
 			{
@@ -476,8 +482,7 @@ void BaseManagerUI<M, T, U>::resizedInternalContent(juce::Rectangle<int>& r)
 		{
 			grabSpaceRect.setY(r.getY());
 			r.translate(0, grabSpaceRect.getHeight() + gap);
-		}
-		else
+		} else
 		{
 			grabSpaceRect.setX(r.getX());
 			r.translate(grabSpaceRect.getWidth() + gap, 0);
@@ -502,8 +507,7 @@ void BaseManagerUI<M, T, U>::resizedInternalContent(juce::Rectangle<int>& r)
 
 			if (useViewport) container.setSize(getWidth(), th);
 			else this->setSize(getWidth(), jmax<int>(th + 10, 50));
-		}
-		else if (defaultLayout == HORIZONTAL)
+		} else if (defaultLayout == HORIZONTAL)
 		{
 			float tw = 0;
 			if (itemsUI.size() > 0) tw = static_cast<BaseItemMinimalUI<T>*>(itemsUI[itemsUI.size() - 1])->getRight();
@@ -561,7 +565,7 @@ void BaseManagerUI<M, T, U>::addItemFromMenu(bool, Point<int>)
 }
 
 template<class M, class T, class U>
-U * BaseManagerUI<M, T, U>::addItemUI(T * item, bool animate)
+U * BaseManagerUI<M, T, U>::addItemUI(T * item, bool animate, bool resizeAndRepaint)
 {
 	U * tui = createUIForItem(item);
 
@@ -591,7 +595,7 @@ U * BaseManagerUI<M, T, U>::addItemUI(T * item, bool animate)
 	managerUIListeners.call(&ManagerUIListener::itemUIAdded, tui);
 
 	repaint();
-	
+
 	return tui;
 }
 
@@ -602,7 +606,7 @@ inline U * BaseManagerUI<M, T, U>::createUIForItem(T * item)
 }
 
 template<class M, class T, class U>
-void BaseManagerUI<M, T, U>::removeItemUI(T * item)
+void BaseManagerUI<M, T, U>::removeItemUI(T * item, bool resizeAndRepaint)
 {
 	MessageManagerLock mmLock; //Ensure this method can be called from another thread than the UI one
 
@@ -623,8 +627,11 @@ void BaseManagerUI<M, T, U>::removeItemUI(T * item)
 
 	delete tui;
 
-	resized();
-	repaint();
+	if (resizeAndRepaint)
+	{
+		resized();
+		repaint();
+	}
 }
 
 template<class M, class T, class U>
@@ -650,9 +657,25 @@ void BaseManagerUI<M, T, U>::itemAddedAsync(T * item)
 }
 
 template<class M, class T, class U>
+void BaseManagerUI<M, T, U>::itemsAddedAsync(Array<T*> items)
+{
+	for (auto &i : items) addItemUI(i, false, false);
+	resized();
+	repaint();
+}
+
+template<class M, class T, class U>
 void BaseManagerUI<M, T, U>::itemRemoved(T * item)
 {
 	removeItemUI(item);
+}
+
+template<class M, class T, class U>
+void BaseManagerUI<M, T, U>::itemsRemoved(Array<T*> items)
+{
+	for (auto &i : items) removeItemUI(i,false);
+	resized();
+	repaint();
 }
 
 template<class M, class T, class U>
