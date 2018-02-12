@@ -201,7 +201,7 @@ namespace LookAndFeelHelpers {
 
 
 class LookAndFeelOO:
-	public LookAndFeel
+	public LookAndFeel_V4
 {
 public:
 //  juce_DeclareSingleton(LookAndFeelOO, true);
@@ -301,9 +301,6 @@ public:
     void drawTextEditorOutline (Graphics&, int width, int height, TextEditor&) override;
     CaretComponent* createCaretComponent (Component* keyFocusOwner) override;
 
-    //==============================================================================
-    const Drawable* getDefaultFolderImage() override;
-    const Drawable* getDefaultDocumentFileImage() override;
 
     AttributedString createFileChooserHeaderText (const String& title, const String& instructions) override;
 
