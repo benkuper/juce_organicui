@@ -324,7 +324,7 @@ public:
 			if (m == nullptr) return false;
 
 			Array<T *> iList = this->getItems();
-			m->addItems(iList, data, false);
+			m->addItems(iList, this->data, false);
 
 			this->itemsShortName.clear();
 			for (auto &i : iList) this->itemsShortName.add(i != nullptr ? i->shortName : "");
@@ -368,7 +368,7 @@ public:
 			if (m == nullptr) return false;
 
 			Array<T *> iList = this->getItems();
-			m->addItems(iList, data, false);
+			m->addItems(iList, this->data, false);
 
 			this->itemsShortName.clear();
 			for (auto &i : iList) this->itemsShortName.add(i != nullptr ? i->shortName : "");
