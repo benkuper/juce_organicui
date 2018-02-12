@@ -14,7 +14,7 @@
 #include "ShapeShifterContent.h"//keep
 class ShapeShifterPanelTab :
 	public Component,
-	public ButtonListener
+	public Button::Listener
 {
 public:
 	ShapeShifterPanelTab(ShapeShifterContent * _content);

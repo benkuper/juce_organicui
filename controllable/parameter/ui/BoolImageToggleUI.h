@@ -14,7 +14,7 @@
 
 class BoolImageToggleUI :
 	public ParameterUI,
-	public ButtonListener
+	public Button::Listener
 {
 public:
 	BoolImageToggleUI(ImageButton *, BoolParameter *);

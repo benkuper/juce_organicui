@@ -14,7 +14,7 @@
 
 class ControllableEditor : 
 	public InspectableEditor,
-	public ButtonListener,
+	public Button::Listener,
 	public Controllable::Listener
 {
 public:

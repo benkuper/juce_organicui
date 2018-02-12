@@ -15,8 +15,8 @@
 template<class T>
 class BaseItemUI :
 	public BaseItemMinimalUI<T>,
-	public ButtonListener,
-	public LabelListener
+	public Button::Listener,
+	public Label::Listener
 {
 public:
 	enum ResizeMode { NONE, VERTICAL, HORIZONTAL, ALL };

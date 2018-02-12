@@ -33,7 +33,7 @@ public:
 };
 
 /*
-class ControllableChooser : public Component, public ButtonListener
+class ControllableChooser : public Component, public Button::Listener
 {
 public :
 	ControllableChooser(ControllableContainer * rootContainer = nullptr);

@@ -14,7 +14,7 @@
 
 class TargetParameterUI :
 	public ParameterUI,
-	public ButtonListener,
+	public Button::Listener,
 	public ControllableContainerListener
 {
 public:

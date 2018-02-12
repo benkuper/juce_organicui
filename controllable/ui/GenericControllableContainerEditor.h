@@ -20,9 +20,9 @@
 class GenericControllableContainerEditor :
 	public InspectableEditor,
 	public ControllableContainer::ContainerAsyncListener,
-	public ButtonListener,
+	public Button::Listener,
 	public ChangeListener,
-	public LabelListener
+	public Label::Listener
 {
 public:
 	GenericControllableContainerEditor(WeakReference<Inspectable> _inspectable, bool isRoot);
