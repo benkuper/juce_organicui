@@ -163,7 +163,7 @@ void BaseManagerViewUI<M, T, U>::paintBackground(Graphics & g)
 	int checkerTX = -checkerSize * 2 + ((this->getWidth() / 2 + viewOffset.x) % (checkerSize * 2));
 	int checkerTY = -checkerSize * 2 + ((this->getHeight() / 2 + viewOffset.y) % (checkerSize * 2));
 	juce::Rectangle<int> checkerBounds(checkerTX, checkerTY, this->getWidth() + checkerSize * 4, this->getHeight() + checkerSize * 4);
-	g.fillCheckerBoard(checkerBounds, checkerSize, checkerSize, BG_COLOR.darker(.3f), BG_COLOR.darker(.2f));
+	g.fillCheckerBoard(checkerBounds.toFloat(), checkerSize, checkerSize, BG_COLOR.darker(.3f), BG_COLOR.darker(.2f));
 
 	g.setColour(BG_COLOR.darker(.05f));
 	Point<int> center = getSize() / 2;
