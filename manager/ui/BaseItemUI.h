@@ -33,6 +33,7 @@ public:
 	//grabber
 	int grabberHeight;
 	Point<float> posAtMouseDown;
+	Point<float> sizeAtMouseDown;
 	bool canBeDragged;
 
 	//header
@@ -101,10 +102,10 @@ public:
 	{
 	public:
 		virtual ~ItemUIListener() {}
+		virtual void itemUIMiniModeChanged(BaseItemUI<T> *) {}
 		virtual void itemUIGrabStart(BaseItemUI<T> *) {}
 		virtual void itemUIGrabbed(BaseItemUI<T> *) {}
 		virtual void itemUIGrabEnd(BaseItemUI<T> *) {}
-		virtual void itemUIMiniModeChanged(BaseItemUI<T> *) {}
 	};
 
 	ListenerList<ItemUIListener> itemUIListeners;
@@ -387,6 +388,9 @@ void BaseItemUI<T>::mouseDown(const MouseEvent & e)
 					dragOffset = Point<int>();
 					itemUIListeners.call(&ItemUIListener::itemUIGrabStart, this);
 				}
+			} else if (e.eventComponent == cornerResizer.get())
+			{
+				sizeAtMouseDown = this->baseItem->viewUISize->getPoint();
 			}
 		}
 	}
@@ -438,6 +442,11 @@ void BaseItemUI<T>::mouseUp(const MouseEvent & e)
 				{
 					itemUIListeners.call(&ItemUIListener::itemUIGrabEnd, this);
 				}
+			} else if(e.eventComponent == cornerResizer.get())
+			{
+				Point<float> sizeDiffDemi = ((this->baseItem->viewUISize->getPoint() - sizeAtMouseDown) / 2).toFloat();
+				this->baseItem->viewUIPosition->setPoint(this->baseItem->viewUIPosition->getPoint()+sizeDiffDemi);
+				this->baseItem->viewUISize->setPoint(sizeAtMouseDown, this->baseItem->viewUISize->getPoint());
 			}
 		}
 	}
