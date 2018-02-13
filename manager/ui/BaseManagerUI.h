@@ -137,6 +137,7 @@ public:
 	virtual void itemUIGrabStart(BaseItemUI<T> * se) override;
 	virtual void itemUIGrabbed(BaseItemUI<T> * se) override;
 	virtual void itemUIGrabEnd(BaseItemUI<T> * se) override;
+	virtual void itemUIMiniModeChanged(BaseItemUI<T> * se) override {}
 
 	//menu
 	U * getUIForItem(T * item, bool directIndexAccess = true);

@@ -62,6 +62,7 @@ public:
 	virtual void addItemUIInternal(U * se) override; 
 
 	virtual void itemUIGrabbed(BaseItemUI<T> * se) override;
+	virtual void itemUIMiniModeChanged(BaseItemUI<T> * se) override;
 
 	virtual void endLoadFile() override;
 };
@@ -289,12 +290,18 @@ template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::addItemUIInternal(U * se)
 {
 	se->setViewZoom(viewZoom);
-	updateViewUIPosition(se);
+	updateViewUIPosition(se); 
 }
 
 
 template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::itemUIGrabbed(BaseItemUI<T> * se)
+{
+	updateViewUIPosition(static_cast<U *>(se));
+}
+
+template<class M, class T, class U>
+inline void BaseManagerViewUI<M, T, U>::itemUIMiniModeChanged(BaseItemUI<T>* se)
 {
 	updateViewUIPosition(static_cast<U *>(se));
 }
