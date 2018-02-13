@@ -446,7 +446,7 @@ void BaseItemUI<T>::mouseUp(const MouseEvent & e)
 			{
 				Point<float> sizeDiffDemi = ((this->baseItem->viewUISize->getPoint() - sizeAtMouseDown) / 2).toFloat();
 				this->baseItem->viewUIPosition->setPoint(this->baseItem->viewUIPosition->getPoint()+sizeDiffDemi);
-				this->baseItem->viewUISize->setPoint(sizeAtMouseDown, this->baseItem->viewUISize->getPoint());
+				this->baseItem->viewUISize->setPoint(this->baseItem->viewUISize->getPoint());
 			}
 		}
 	}
