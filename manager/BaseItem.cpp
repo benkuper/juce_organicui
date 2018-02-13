@@ -36,13 +36,13 @@ BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts
 	listUISize->isTargettable = false;
 
 	viewUIPosition = addPoint2DParameter("ViewUIPosition", "Position the view");
-	viewUIPosition->setBounds(-10000, -10000, 10000, 10000);
+	viewUIPosition->setBounds(-100000, -100000, 100000, 100000);
 	viewUIPosition->hideInEditor = true;
 	viewUIPosition->hideInOutliner = true;
 	viewUIPosition->isTargettable = false;
 
 	viewUISize = addPoint2DParameter("Size", "Size in the view");
-	viewUISize->setBounds(30, 60, 1000, 1000);
+	viewUISize->setBounds(30, 60, 10000, 10000);
 	viewUISize->setPoint(200, 200);
 	viewUISize->defaultValue = viewUISize->value;
 	viewUISize->hideInEditor = true;
