@@ -22,7 +22,7 @@ public:
 
 	enum ScriptState { SCRIPT_LOADED, SCRIPT_ERROR, SCRIPT_EMPTY, SCRIPT_CLEAR };
 
-	StringParameter * filePath;
+	FileParameter * filePath;
 	BoolParameter * logParam;
 	Trigger * reload;
 

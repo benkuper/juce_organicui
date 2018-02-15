@@ -17,8 +17,8 @@ Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled) :
 {
 	isSelectable = false;
 
-	filePath = addStringParameter("File Path", "Path to the script file", "");
-	filePath->defaultUI = StringParameter::FILE;
+	filePath = new FileParameter("File Path", "Path to the script file", "");
+	addParameter(filePath);
 
 	logParam = addBoolParameter("Log", "Utility parameter to easily activate/deactivate logging from the script", false);
 	logParam->setCustomShortName("enableLog");
@@ -53,7 +53,7 @@ void Script::loadScript()
 	}
 
 
-	String path = filePath->stringValue();
+	String path = filePath->getAbsolutePath();
 
 	if (path.isEmpty())
 	{
@@ -69,8 +69,7 @@ void Script::loadScript()
 	}
 #endif
 
-
-	File f = Engine::mainEngine->getFile().getParentDirectory().getChildFile(path);
+	File f = filePath->getFile();
 
 	if (!f.exists())
 	{

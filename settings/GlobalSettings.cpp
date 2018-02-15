@@ -23,8 +23,9 @@ GlobalSettings::GlobalSettings() :
 	updateHelpOnStartup = startupCC.addBoolParameter("Update help on startup", "If enabled, app will try and download the last help file locally", true);
 	openLastDocumentOnStartup = startupCC.addBoolParameter("Load last noisette on startup", "If enabled, app will load the last noisette on startup", false);
 	openSpecificFileOnStartup = startupCC.addBoolParameter("Load specific noisette on startup", "If enabled, app will load the noisette specified below on startup", false,false);
-	fileToOpenOnStartup = startupCC.addStringParameter("File to load on startup", "File to load when start, if the option above is checked", "", false);
-	fileToOpenOnStartup->defaultUI = StringParameter::FILE;
+	
+	fileToOpenOnStartup = new FileParameter("File to load on startup", "File to load when start, if the option above is checked", "", false);
+	startupCC.addParameter(fileToOpenOnStartup);
 
 	addChildControllableContainer(&confirmationsCC);
 	askBeforeRemovingItems = confirmationsCC.addBoolParameter("Ask before removing items", "If enabled, you will get a confirmation prompt before removing any item", false);
