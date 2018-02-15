@@ -107,6 +107,7 @@ using namespace juce;
 #include "controllable/parameter/Point2DParameter.h"
 #include "controllable/parameter/Point3DParameter.h"
 #include "controllable/parameter/StringParameter.h"
+#include "controllable/parameter/FileParameter.h"
 #include "controllable/parameter/TargetParameter.h"
 
 #include "controllable/parameter/ui/BetterStepper.h"

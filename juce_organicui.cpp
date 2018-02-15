@@ -38,6 +38,7 @@
 #include "controllable/parameter/Point2DParameter.cpp"
 #include "controllable/parameter/Point3DParameter.cpp"
 #include "controllable/parameter/StringParameter.cpp"
+#include "controllable/parameter/FileParameter.cpp"
 #include "controllable/parameter/TargetParameter.cpp"
 #include "controllable/parameter/ui/BetterStepper.cpp"
 #include "controllable/parameter/ui/BoolImageToggleUI.cpp"
