@@ -251,7 +251,8 @@ void GenericControllableContainerEditor::newMessage(const ContainerAsyncEvent & 
 		break;
 
 	case ContainerAsyncEvent::ControllableContainerReordered:
-		//resized();
+		resetAndBuild();
+		resized();
 		break;
 
 	case ContainerAsyncEvent::ControllableFeedbackUpdate:
