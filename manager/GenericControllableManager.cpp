@@ -9,17 +9,31 @@
   ==============================================================================
 */
 
-GenericControllableManagerFactory GenericControllableManager::factory;
-
-GenericControllableManager::GenericControllableManager(const String & name) :
-	BaseManager(name)
+GenericControllableManager::GenericControllableManager(const String & name, bool itemsCanBeDisabled, bool canAddTriggers, bool canAddTargets) :
+	BaseManager(name),
+	itemsCanBeDisabled(itemsCanBeDisabled)
 {
-	managerFactory = &GenericControllableManager::factory;
 	selectItemWhenCreated = false;
+
+	managerFactory = &factory;
+
+	if(canAddTriggers) factory.defs.add(Factory<GenericControllableItem>::Definition::createDef("", "Trigger", &GenericControllableItem::create)->addParam("controllableType", Trigger::getTypeStringStatic()));
+	factory.defs.add(Factory<GenericControllableItem>::Definition::createDef("", "Float Parameter", &GenericControllableItem::create)->addParam("controllableType", FloatParameter::getTypeStringStatic()));
+	factory.defs.add(Factory<GenericControllableItem>::Definition::createDef("", "Int Parameter", &GenericControllableItem::create)->addParam("controllableType", IntParameter::getTypeStringStatic()));
+	factory.defs.add(Factory<GenericControllableItem>::Definition::createDef("", "Bool Parameter", &GenericControllableItem::create)->addParam("controllableType", BoolParameter::getTypeStringStatic()));
+	factory.defs.add(Factory<GenericControllableItem>::Definition::createDef("", "Color Parameter", &GenericControllableItem::create)->addParam("controllableType", ColorParameter::getTypeStringStatic()));
+	factory.defs.add(Factory<GenericControllableItem>::Definition::createDef("", "Point2D Parameteer", &GenericControllableItem::create)->addParam("controllableType", Point2DParameter::getTypeStringStatic()));
+	factory.defs.add(Factory<GenericControllableItem>::Definition::createDef("", "Point3D Parameteer", &GenericControllableItem::create)->addParam("controllableType", Point3DParameter::getTypeStringStatic()));
+	if(canAddTargets) factory.defs.add(Factory<GenericControllableItem>::Definition::createDef("", "Target Parameteer", &GenericControllableItem::create)->addParam("controllableType", TargetParameter::getTypeStringStatic()));
 }
 
 GenericControllableManager::~GenericControllableManager()
 {
+}
+
+void GenericControllableManager::addItemInternal(GenericControllableItem * item, var)
+{
+	item->canBeDisabled = itemsCanBeDisabled;
 }
 
 InspectableEditor * GenericControllableManager::getEditor(bool isRoot)
@@ -28,17 +42,4 @@ InspectableEditor * GenericControllableManager::getEditor(bool isRoot)
 	ui->drawContour = true;
 	ui->addExistingItems();
 	return new GenericComponentEditor(this, ui, isRoot);
-}
-
-GenericControllableManagerFactory::GenericControllableManagerFactory()
-{
-	defs.add(GenericControllableManagerFactory::Definition::createDef("", "Trigger", &GenericControllableItem::create)->addParam("controllableType", Trigger::getTypeStringStatic()));
-	defs.add(GenericControllableManagerFactory::Definition::createDef("", "Float Parameter", &GenericControllableItem::create)->addParam("controllableType", FloatParameter::getTypeStringStatic()));
-	defs.add(GenericControllableManagerFactory::Definition::createDef("", "Int Parameter", &GenericControllableItem::create)->addParam("controllableType", IntParameter::getTypeStringStatic()));
-	defs.add(GenericControllableManagerFactory::Definition::createDef("", "Bool Parameter", &GenericControllableItem::create)->addParam("controllableType", BoolParameter::getTypeStringStatic()));
-	defs.add(GenericControllableManagerFactory::Definition::createDef("", "Color Parameter", &GenericControllableItem::create)->addParam("controllableType", ColorParameter::getTypeStringStatic()));
-	defs.add(GenericControllableManagerFactory::Definition::createDef("", "Target Parameteer", &GenericControllableItem::create)->addParam("controllableType", TargetParameter::getTypeStringStatic()));
-	defs.add(GenericControllableManagerFactory::Definition::createDef("", "Target Parameteer", &GenericControllableItem::create)->addParam("controllableType", TargetParameter::getTypeStringStatic()));
-	defs.add(GenericControllableManagerFactory::Definition::createDef("", "Point2D Parameteer", &GenericControllableItem::create)->addParam("controllableType", Point2DParameter::getTypeStringStatic()));
-	defs.add(GenericControllableManagerFactory::Definition::createDef("", "Point3D Parameteer", &GenericControllableItem::create)->addParam("controllableType", Point3DParameter::getTypeStringStatic()));
 }

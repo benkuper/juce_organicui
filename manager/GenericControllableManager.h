@@ -12,22 +12,18 @@
 #define GENERICCONTROLLABLEMANAGER_H_INCLUDED
 
 
-class GenericControllableManagerFactory :
-	public Factory<GenericControllableItem>
-{
-public:
-	GenericControllableManagerFactory();
-};
 
 class GenericControllableManager :
 	public BaseManager<GenericControllableItem>
 {
 public:
-	GenericControllableManager(const String &name);
+	GenericControllableManager(const String &name, bool itemsCanBeDisabled = true, bool canAddTriggers = true, bool canAddTargets = true);
 	~GenericControllableManager();
 
-	static GenericControllableManagerFactory factory;
+	bool itemsCanBeDisabled;
 
+	Factory<GenericControllableItem> factory;
+	void addItemInternal(GenericControllableItem * item, var data) override;
 	virtual InspectableEditor * getEditor(bool isRoot) override;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(GenericControllableManager)
