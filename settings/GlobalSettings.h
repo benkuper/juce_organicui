@@ -23,6 +23,7 @@ public:
 	ControllableContainer startupCC;
 	BoolParameter * checkUpdatesOnStartup;
 	BoolParameter * checkBetaUpdates;
+	BoolParameter * onlyCheckBetaFromBeta;
 	BoolParameter * updateHelpOnStartup;
 	BoolParameter * openLastDocumentOnStartup;
 	BoolParameter * openSpecificFileOnStartup;
