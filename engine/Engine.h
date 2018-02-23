@@ -33,6 +33,8 @@ public:
 	ApplicationProperties * appProperties;
 	String appVersion;
 
+	bool isBetaVersion;
+
 	String fileName = "File";
 	String fileExtension = ".file";
 	String fileWildcard = "*"+fileExtension;

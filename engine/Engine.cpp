@@ -26,6 +26,8 @@ Engine::Engine(const String & fileName, const String & fileExtension, Applicatio
 {
 	skipControllableNameInAddress = true;
 
+	isBetaVersion = appVersion.endsWith("b");
+
 	//to move into engine
 	Logger::setCurrentLogger(CustomLogger::getInstance());
 
