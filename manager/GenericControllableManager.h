@@ -21,6 +21,9 @@ public:
 	~GenericControllableManager();
 
 	bool itemsCanBeDisabled;
+	bool forceItemsFeedbackOnly;
+
+	void setForceItemsFeedbackOnly(bool value);
 
 	Factory<GenericControllableItem> factory;
 	void addItemInternal(GenericControllableItem * item, var data) override;

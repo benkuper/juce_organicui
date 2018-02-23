@@ -11,7 +11,8 @@
 
 GenericControllableManager::GenericControllableManager(const String & name, bool itemsCanBeDisabled, bool canAddTriggers, bool canAddTargets) :
 	BaseManager(name),
-	itemsCanBeDisabled(itemsCanBeDisabled)
+	itemsCanBeDisabled(itemsCanBeDisabled),
+	forceItemsFeedbackOnly(false)
 {
 	selectItemWhenCreated = false;
 
@@ -31,9 +32,16 @@ GenericControllableManager::~GenericControllableManager()
 {
 }
 
+void GenericControllableManager::setForceItemsFeedbackOnly(bool value)
+{
+	forceItemsFeedbackOnly = value;
+	for (auto &i : items) i->controllable->isControllableFeedbackOnly = forceItemsFeedbackOnly;
+}
+
 void GenericControllableManager::addItemInternal(GenericControllableItem * item, var)
 {
 	item->canBeDisabled = itemsCanBeDisabled;
+	item->controllable->isControllableFeedbackOnly = forceItemsFeedbackOnly;
 }
 
 InspectableEditor * GenericControllableManager::getEditor(bool isRoot)
