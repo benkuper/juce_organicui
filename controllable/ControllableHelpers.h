@@ -16,46 +16,50 @@ class ControllableChooserPopupMenu :
 	public PopupMenu
 {
 public:
-	ControllableChooserPopupMenu(ControllableContainer * rootContainer, bool showParameters = true, bool showTriggers = true, int indexOffset = 0);
+	ControllableChooserPopupMenu(ControllableContainer * rootContainer, bool showParameters = true, bool showTriggers = true, int indexOffset = 0, int maxSearchLevel = -1);
 	virtual ~ControllableChooserPopupMenu();
 
 	int indexOffset;
+	int maxDefaultSearchLevel;
 	bool showParameters;
 	bool showTriggers;
 
 	Array<Controllable *> controllableList;
-	void populateMenu(PopupMenu *subMenu, ControllableContainer * container, int &currentId);
+	void populateMenu(PopupMenu *subMenu, ControllableContainer * container, int &currentId, int currentLevel = 0);
 
 	Controllable * showAndGetControllable();
 	Controllable * getControllableForResult(int result);
-
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ControllableChooserPopupMenu)
 };
 
-/*
-class ControllableChooser : public Component, public Button::Listener
+
+class ContainerTypeChecker
 {
-public :
-	ControllableChooser(ControllableContainer * rootContainer = nullptr);
-	virtual ~ControllableChooser();
-
-	ControllableContainer * rootContainer;
-
-	Controllable * currentControllable;
-	void setCurrentControllale(Controllable * c);
-
-	class  Listener
+public:
+	template<class T>
+	static bool checkType(ControllableContainer * cc)
 	{
-	public:
-		virtual ~Listener() {}
-		virtual void choosedControllableChanged(Controllable *) {};
-	};
-
-	ListenerList<Listener> listeners;
-	void addControllableChooserListener(Listener* newListener) { listeners.add(newListener); }
-	void removeControllableChooserListener(Listener* listener) { listeners.remove(listener); }
+		return dynamic_cast<T *>(cc) != nullptr;
+	}
 };
-*/
+
+class ContainerChooserPopupMenu :
+	public PopupMenu
+{
+public:
+	ContainerChooserPopupMenu(ControllableContainer * rootContainer, int indexOffset = 0, int maxSearchLevel = -1, std::function<bool(ControllableContainer *)> typeCheckFunc = nullptr);
+	virtual ~ContainerChooserPopupMenu();
+
+	int indexOffset;
+	int maxDefaultSearchLevel;
+	std::function<bool(ControllableContainer *)> typeCheckFunc;
+
+	Array<ControllableContainer *> containerList;
+	void populateMenu(PopupMenu *subMenu, ControllableContainer * container, int &currentId, int currentLevel = 0);
+
+	ControllableContainer * showAndGetContainer();
+	ControllableContainer * getContainerForResult(int result);
+};
+
 
 //Comparator class to sort controllable array by name
 class ControllableComparator
@@ -63,8 +67,6 @@ class ControllableComparator
 public:
 	ControllableComparator() {}
 	int compareElements(Controllable* c1, Controllable* c2);
-
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ControllableComparator)
 };
 
 
