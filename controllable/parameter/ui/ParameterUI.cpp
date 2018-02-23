@@ -34,7 +34,8 @@ ParameterUI::~ParameterUI()
 void ParameterUI::showEditWindow()
 {
 	AlertWindow nameWindow("Set a value", "Set a new value for this parameter", AlertWindow::AlertIconType::NoIcon, this);
-	nameWindow.addTextEditor("val", parameter->stringValue(), "Value");
+	
+	if(!parameter->isControllableFeedbackOnly) nameWindow.addTextEditor("val", parameter->stringValue(), "Value");
 
 	if (parameter->isCustomizableByUser)
 	{
@@ -62,8 +63,11 @@ void ParameterUI::showEditWindow()
 			}
 		}
 
-		float newValue = nameWindow.getTextEditorContents("val").getFloatValue();
-		parameter->setValue(newValue);
+		if (!parameter->isControllableFeedbackOnly)
+		{
+			float newValue = nameWindow.getTextEditorContents("val").getFloatValue();
+			parameter->setValue(newValue);
+		}
 	}
 }
 

@@ -83,14 +83,52 @@ void TargetParameterUI::updateLabel()
 		if (targetParameter->target != nullptr)
 		{
 			if (targetParameter->customGetControllableLabelFunc != nullptr) newText = targetParameter->customGetControllableLabelFunc(targetParameter->target);
-			else newText = targetParameter->showFullAddressInEditor ? targetParameter->target->getControlAddress() : (targetParameter->showParentNameInEditor ? targetParameter->target->parentContainer->niceName + ":" : "") + targetParameter->target->niceName;
+			else
+			{
+				if (targetParameter->showFullAddressInEditor) targetParameter->target->getControlAddress();
+				else
+				{
+					if (targetParameter->showParentNameInEditor)
+					{
+						int curPLevel = 1;
+						ControllableContainer * cc = targetParameter->target->parentContainer;
+						while (curPLevel < targetParameter->defaultParentLabelLevel)
+						{
+							cc = cc->parentContainer;
+							curPLevel++;
+						}
+						newText = cc->niceName + ":";
+					}
+
+					newText += targetParameter->target->niceName;
+				}
+			}
 		}
 	} else //TargetType::CONTAINER
 	{
 		if (targetParameter->targetContainer != nullptr)
 		{
 			if (targetParameter->customGetContainerLabelFunc != nullptr) newText = targetParameter->customGetContainerLabelFunc(targetParameter->targetContainer);
-			else newText = newText = targetParameter->showFullAddressInEditor ? targetParameter->targetContainer->getControlAddress() : (targetParameter->showParentNameInEditor ? targetParameter->targetContainer->parentContainer->niceName + ":" : "") + targetParameter->targetContainer->niceName;
+			else
+			{
+				if (targetParameter->showFullAddressInEditor) targetParameter->target->getControlAddress();
+				else
+				{
+					if (targetParameter->showParentNameInEditor)
+					{
+						int curPLevel = 1;
+						ControllableContainer * cc = targetParameter->targetContainer->parentContainer;
+						while (curPLevel < targetParameter->defaultParentLabelLevel)
+						{
+							cc = cc->parentContainer;
+							curPLevel++;
+						}
+						newText = cc->niceName + ":";
+					}
+
+					newText += targetParameter->targetContainer->niceName;
+				}
+			}
 		}
 	}
 
@@ -116,7 +154,7 @@ void TargetParameterUI::showPopupAndGetTarget()
 			c = targetParameter->customGetTargetFunc(targetParameter->showTriggers,targetParameter->showParameters);
 		} else
 		{
-			ControllableChooserPopupMenu p(targetParameter->rootContainer, targetParameter->showParameters, targetParameter->showTriggers);
+			ControllableChooserPopupMenu p(targetParameter->rootContainer, targetParameter->showParameters, targetParameter->showTriggers,0,targetParameter->maxDefaultSearchLevel);
 			c = p.showAndGetControllable();
 		}
 		if (c != nullptr) targetParameter->setValueFromTarget(c);
@@ -127,6 +165,10 @@ void TargetParameterUI::showPopupAndGetTarget()
 		if (targetParameter->customGetTargetContainerFunc != nullptr)
 		{
 			cc = targetParameter->customGetTargetContainerFunc();
+		} else
+		{
+			ContainerChooserPopupMenu p(targetParameter->rootContainer, 0, targetParameter->maxDefaultSearchLevel, targetParameter->defaultContainerTypeCheckFunc);
+			cc = p.showAndGetContainer();
 		}
 		if (cc != nullptr) targetParameter->setValueFromTarget(cc);
 	}
