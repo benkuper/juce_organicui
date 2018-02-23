@@ -17,11 +17,6 @@ ScriptUtil::ScriptUtil() :
 	scriptObject.setMethod("getTime", ScriptUtil::getTime);
 	scriptObject.setMethod("getFloatFromBytes", ScriptUtil::getFloatFromBytes);
 	scriptObject.setMethod("getInt32FromBytes", ScriptUtil::getInt32FromBytes);
-	scriptObject.setMethod("atan2", ScriptUtil::atan2FromScript);
-	scriptObject.setMethod("cos", ScriptUtil::cosFromScript);
-	scriptObject.setMethod("sin", ScriptUtil::sinFromScript);
-	scriptObject.setMethod("toDegrees", ScriptUtil::toDegrees);
-	scriptObject.setMethod("toRadians", ScriptUtil::toRadians);
 }
 
 var ScriptUtil::getTime(const var::NativeFunctionArgs &)
