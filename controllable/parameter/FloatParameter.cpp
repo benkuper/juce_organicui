@@ -1,3 +1,4 @@
+#include "FloatParameter.h"
 /*
   ==============================================================================
 
@@ -22,6 +23,11 @@ void FloatParameter::setValueInternal(var & _value)
 	
 	if ((float)minimumValue > (float)maximumValue) return;
 	value = jlimit<float>(minimumValue, maximumValue, _value);
+}
+
+var FloatParameter::getLerpValueTo(var targetValue, float weight)
+{
+	return jmap(weight,floatValue(), (float)targetValue);
 }
 
 FloatSliderUI * FloatParameter::createSlider(FloatParameter * target)

@@ -69,6 +69,17 @@ bool ColorParameter::checkValueIsTheSame(var oldValue, var newValue)
 	return newValue[0] == oldValue[0] && newValue[1] == oldValue[1] && newValue[2] == oldValue[2] && oldValue[3] == newValue[3];
 }
 
+var ColorParameter::getLerpValueTo(var targetValue, float weight)
+{
+	if (!targetValue.isArray()) return value;
+	var result;
+	result.append(jmap(weight, (float)value[0], (float)targetValue[0]));
+	result.append(jmap(weight, (float)value[1], (float)targetValue[1]));
+	result.append(jmap(weight, (float)value[2], (float)targetValue[2]));
+	result.append(jmap(weight, (float)value[3], (float)targetValue[3]));
+	return result;
+}
+
 ColorParameterUI * ColorParameter::createColorParamUI()
 {
 	return new ColorParameterUI(this);

@@ -76,6 +76,11 @@ var Parameter::getValue()
 	return value;
 }
 
+var Parameter::getLerpValueTo(var targetValue, float weight)
+{
+	return value; //to be overriden
+}
+
 void Parameter::resetValue(bool silentSet)
 {
 	isOverriden = false;

@@ -34,7 +34,8 @@ public:
 	bool showTriggers;
 	bool showFullAddressInEditor;
 	bool showParentNameInEditor;
-
+	int maxDefaultSearchLevel;
+	int defaultParentLabelLevel;
 
 	WeakReference<ControllableContainer> rootContainer;
 	
@@ -42,10 +43,12 @@ public:
 	WeakReference<ControllableContainer> targetContainer;
 	
 	std::function<Controllable*(bool, bool)> customGetTargetFunc;
-	std::function<ControllableContainer*()> customGetTargetContainerFunc;
 	std::function<String(Controllable*)> customGetControllableLabelFunc;
-	std::function<String(ControllableContainer*)> customGetContainerLabelFunc;
 	std::function<bool(Controllable*)> customCheckAssignOnNextChangeFunc;
+
+	std::function<bool(ControllableContainer *)> defaultContainerTypeCheckFunc;
+	std::function<String(ControllableContainer*)> customGetContainerLabelFunc;
+	std::function<ControllableContainer*()> customGetTargetContainerFunc;
 
 	void setGhostValue(const String &ghostVal);
 

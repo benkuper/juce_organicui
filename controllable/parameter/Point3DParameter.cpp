@@ -120,6 +120,17 @@ Vector3D<float> Point3DParameter::getVector() {
 	return Vector3D<float>(x, y,z);
 }
 
+var Point3DParameter::getLerpValueTo(var targetValue, float weight)
+{
+	if (!targetValue.isArray()) return value;
+	var result;
+	result.append(jmap(weight, x, (float)targetValue[0]));
+	result.append(jmap(weight, y, (float)targetValue[1]));
+	result.append(jmap(weight, z, (float)targetValue[2]));
+	return result;
+}
+
+
 bool Point3DParameter::checkValueIsTheSame(var newValue, var oldValue)
 {
 	if ( !(newValue.isArray() && oldValue.isArray())) return false;

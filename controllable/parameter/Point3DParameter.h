@@ -28,6 +28,7 @@ public:
 	void setBounds(float _minX, float _minY, float _minZ, float _maxX, float _maxY, float _maxZ);
 
 	Vector3D<float> getVector();
+	virtual var getLerpValueTo(var targetValue, float weight) override;
 
 	bool checkValueIsTheSame(var newValue, var oldValue) override;
 

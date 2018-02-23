@@ -24,6 +24,8 @@ public:
 
     void setValueInternal(var & _value) override;
 
+	virtual var getLerpValueTo(var targetValue, float weight) override;
+
 	enum UIType { SLIDER, STEPPER, LABEL, TIME };
 	UIType defaultUI;
 

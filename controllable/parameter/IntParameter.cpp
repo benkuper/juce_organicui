@@ -1,3 +1,4 @@
+#include "IntParameter.h"
 /*
   ==============================================================================
 
@@ -23,6 +24,11 @@ void IntParameter::setValueInternal(var & _value)
 
 	if ((int)minimumValue > (int)maximumValue) return;
 	this->value = jlimit<int>(minimumValue, maximumValue, _value);
+}
+
+var IntParameter::getLerpValueTo(var targetValue, float weight)
+{
+	return (int)jmap(weight, floatValue(), (float)targetValue);
 }
 
 IntSliderUI * IntParameter::createSlider(IntParameter * target)

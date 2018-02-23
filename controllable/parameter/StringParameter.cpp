@@ -1,3 +1,4 @@
+#include "StringParameter.h"
 /*
   ==============================================================================
 
@@ -44,6 +45,12 @@ ControllableUI* StringParameter::createDefaultUI(Controllable * targetControllab
 	return createStringParameterUI(dynamic_cast<StringParameter *>(targetControllable));
 };
 
+
+var StringParameter::getLerpValueTo(var targetValue, float weight)
+{
+	//TODO implement levestein mes couilles plus courte distance entre 2 mots 
+	return Parameter::getLerpValueTo(targetValue, weight);
+}
 
 void StringParameter::setValue(var _value,bool silentSet,bool force )
 {

@@ -23,6 +23,9 @@ public:
 	UIType defaultUI;
 
 
+	virtual var getLerpValueTo(var targetValue, float weight) override;
+
+
     // need to override this function because var Strings comparison  is based on pointer (we need full string comp)
     void setValue(var v,bool silentSet=false,bool force=false)override;
     virtual  void setValueInternal(var&)override;

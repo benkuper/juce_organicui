@@ -108,6 +108,15 @@ Point<float> Point2DParameter::getPoint() {
 	return Point<float>(x, y); 
 }
 
+var Point2DParameter::getLerpValueTo(var targetValue, float weight)
+{
+	if (!targetValue.isArray()) return value;
+	var result;
+	result.append(jmap(weight, x, (float)targetValue[0]));
+	result.append(jmap(weight, y, (float)targetValue[1]));
+	return result;
+}
+
 bool Point2DParameter::checkValueIsTheSame(var newValue, var oldValue)
 {
 	if (!(newValue.isArray() && oldValue.isArray())) return false;

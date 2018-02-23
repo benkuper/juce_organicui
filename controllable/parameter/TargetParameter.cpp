@@ -18,14 +18,17 @@ TargetParameter::TargetParameter(const String & niceName, const String & descrip
 	showTriggers(true),
 	showFullAddressInEditor(false),
 	showParentNameInEditor(true),
+	maxDefaultSearchLevel(-1),
+	defaultParentLabelLevel(1),
 	rootContainer(rootReference),
 	target(nullptr),
 	targetContainer(nullptr),
 	customGetTargetFunc(nullptr),
-	customGetTargetContainerFunc(nullptr),
 	customGetControllableLabelFunc(nullptr),
-	customGetContainerLabelFunc(nullptr),
-	customCheckAssignOnNextChangeFunc(nullptr)
+	customCheckAssignOnNextChangeFunc(nullptr),
+	defaultContainerTypeCheckFunc(nullptr),
+	customGetTargetContainerFunc(nullptr),
+	customGetContainerLabelFunc(nullptr)
 
 {
 	lockManualControlMode = true;

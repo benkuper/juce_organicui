@@ -22,6 +22,7 @@ public:
     ~IntParameter() {}
 
     void setValueInternal(var & _value) override;
+	virtual var getLerpValueTo(var targetValue, float weight) override;
 
     IntSliderUI * createSlider(IntParameter * target = nullptr);
 	IntStepperUI * createStepper(IntParameter * target = nullptr);
