@@ -33,6 +33,7 @@ public:
 	bool checkValueIsTheSame(var oldValue, var newValue) override;
 
 	virtual var getLerpValueTo(var targetValue, float weight) override;
+	virtual void setWeightedValue(Array<var> values, Array<float> weights) override;
 
 	ColorParameterUI * createColorParamUI();
 	ControllableUI * createDefaultUI(Controllable * targetControllable = nullptr) override;

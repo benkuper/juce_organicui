@@ -58,6 +58,7 @@ public:
 
 	virtual var getValue(); //may be useful, or testing expression or references (for now, forward update from expression timer)
 	virtual var getLerpValueTo(var targetValue, float weight);
+	virtual void setWeightedValue(Array<var> values, Array<float> weights) {} // to be overriden
 
     void resetValue(bool silentSet = false);
 	virtual UndoableAction * setUndoableValue(var oldValue, var newValue, bool onlyReturnAction = false);

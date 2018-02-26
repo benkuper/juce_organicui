@@ -80,6 +80,25 @@ var ColorParameter::getLerpValueTo(var targetValue, float weight)
 	return result;
 }
 
+void ColorParameter::setWeightedValue(Array<var> values, Array<float> weights)
+{
+	jassert(values.size() == weights.size());
+
+	float tValues[4];
+	tValues[0] = tValues[1] = tValues[2] = tValues[3] = 0;
+
+	for (int i = 0; i < values.size(); i++)
+	{
+		jassert(values[i].size() == 4);
+		for (int j = 0; j < 4; j++)
+		{
+			tValues[j] += (float)values[i][j] * weights[i];
+		}
+	}
+
+	setFloatRGBA(tValues[0], tValues[1], tValues[2], tValues[3]);
+}
+
 ColorParameterUI * ColorParameter::createColorParamUI()
 {
 	return new ColorParameterUI(this);

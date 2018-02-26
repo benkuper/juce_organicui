@@ -30,7 +30,8 @@ public:
 	
 	Point<float> getPoint();
 	virtual var getLerpValueTo(var targetValue, float weight) override;
-	
+	virtual void setWeightedValue(Array<var> values, Array<float> weights) override;
+
 	bool checkValueIsTheSame(var newValue, var oldValue) override;
 
 	ControllableUI * createDefaultUI(Controllable * targetControllable = nullptr) override;

@@ -81,6 +81,7 @@ var Parameter::getLerpValueTo(var targetValue, float weight)
 	return value; //to be overriden
 }
 
+
 void Parameter::resetValue(bool silentSet)
 {
 	isOverriden = false;
@@ -231,6 +232,8 @@ var Parameter::getJSONDataInternal()
 	data.getDynamicObject()->setProperty("controlMode", controlMode);
 	if (controlMode == EXPRESSION) data.getDynamicObject()->setProperty("expression", controlExpression);
 	
+	DBG("Parameter save " << getControlAddress() << " : " << (int)saveValueOnly);
+
 	if (saveValueOnly) return data;
 	data.getDynamicObject()->setProperty("minValue", minimumValue);
 	data.getDynamicObject()->setProperty("maxValue", maximumValue);

@@ -117,6 +117,25 @@ var Point2DParameter::getLerpValueTo(var targetValue, float weight)
 	return result;
 }
 
+void Point2DParameter::setWeightedValue(Array<var> values, Array<float> weights)
+{
+	jassert(values.size() == weights.size());
+
+	float tValues[2];
+	tValues[0] = tValues[1] = 0;
+
+	for (int i = 0; i < values.size(); i++)
+	{
+		jassert(values[i].size() == 2);
+		for (int j = 0; j < 2; j++)
+		{
+			tValues[j] += (float)values[i][j] * weights[i];
+		}
+	}
+
+	setPoint(tValues[0], tValues[1]);
+}
+
 bool Point2DParameter::checkValueIsTheSame(var newValue, var oldValue)
 {
 	if (!(newValue.isArray() && oldValue.isArray())) return false;

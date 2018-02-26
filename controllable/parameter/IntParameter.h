@@ -23,6 +23,7 @@ public:
 
     void setValueInternal(var & _value) override;
 	virtual var getLerpValueTo(var targetValue, float weight) override;
+	virtual void setWeightedValue(Array<var> values, Array<float> weights) override;
 
     IntSliderUI * createSlider(IntParameter * target = nullptr);
 	IntStepperUI * createStepper(IntParameter * target = nullptr);

@@ -31,6 +31,20 @@ var IntParameter::getLerpValueTo(var targetValue, float weight)
 	return (int)jmap(weight, floatValue(), (float)targetValue);
 }
 
+void IntParameter::setWeightedValue(Array<var> values, Array<float> weights)
+{
+	jassert(values.size() == weights.size());
+
+	float tValue = 0;
+
+	for (int i = 0; i < values.size(); i++)
+	{
+		tValue += (float)values[i] * weights[i];
+	}
+
+	setValue((int)tValue);
+}
+
 IntSliderUI * IntParameter::createSlider(IntParameter * target)
 {
 	if (target == nullptr) target = this;

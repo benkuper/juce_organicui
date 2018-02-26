@@ -30,6 +30,20 @@ var FloatParameter::getLerpValueTo(var targetValue, float weight)
 	return jmap(weight,floatValue(), (float)targetValue);
 }
 
+void FloatParameter::setWeightedValue(Array<var> values, Array<float> weights)
+{
+	jassert(values.size() == weights.size());
+
+	float tValue = 0;
+
+	for (int i = 0; i < values.size(); i++)
+	{
+		tValue += (float)values[i] * weights[i];
+	}
+
+	setValue(tValue);
+}
+
 FloatSliderUI * FloatParameter::createSlider(FloatParameter * target)
 {
 	if (target == nullptr) target = this;

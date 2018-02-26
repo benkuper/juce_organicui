@@ -130,6 +130,25 @@ var Point3DParameter::getLerpValueTo(var targetValue, float weight)
 	return result;
 }
 
+void Point3DParameter::setWeightedValue(Array<var> values, Array<float> weights)
+{
+	jassert(values.size() == weights.size());
+
+	float tValues[3];
+	tValues[0] = tValues[1] = tValues[2] = 0;
+
+	for (int i = 0; i < values.size(); i++)
+	{
+		jassert(values[i].size() == 3);
+		for (int j = 0; j < 3; j++)
+		{
+			tValues[j] += (float)values[i][j] * weights[i];
+		}
+	}
+
+	setVector(tValues[0], tValues[1],tValues[2]);
+}
+
 
 bool Point3DParameter::checkValueIsTheSame(var newValue, var oldValue)
 {
