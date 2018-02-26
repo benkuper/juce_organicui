@@ -25,7 +25,6 @@ GenericControllableItem::GenericControllableItem(var params) :
 	isSelectable = false;
 
 	skipControllableNameInAddress = true;
-	controllable->isCustomizableByUser = true;
 	addControllable(controllable);
 	setNiceName(controllable->niceName);
 

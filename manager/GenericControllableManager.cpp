@@ -35,13 +35,13 @@ GenericControllableManager::~GenericControllableManager()
 void GenericControllableManager::setForceItemsFeedbackOnly(bool value)
 {
 	forceItemsFeedbackOnly = value;
-	for (auto &i : items) i->controllable->isControllableFeedbackOnly = forceItemsFeedbackOnly;
+	for (auto &i : items) i->controllable->setControllableFeedbackOnly(forceItemsFeedbackOnly);
 }
 
 void GenericControllableManager::addItemInternal(GenericControllableItem * item, var)
 {
 	item->canBeDisabled = itemsCanBeDisabled;
-	item->controllable->isControllableFeedbackOnly = forceItemsFeedbackOnly;
+	item->controllable->setControllableFeedbackOnly(forceItemsFeedbackOnly);
 }
 
 InspectableEditor * GenericControllableManager::getEditor(bool isRoot)
