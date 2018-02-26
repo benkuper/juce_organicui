@@ -257,6 +257,13 @@ bool Engine::checkFileVersion(DynamicObject * metaData, bool checkForNewerVersio
   String versionToCheck = checkForNewerVersion ? appVersion : getMinimumRequiredFileVersion();
   DBG(metaData->getProperty("version").toString() << " / " << versionToCheck);
 
+  bool versionToCheckIsBeta = false;
+  if (versionToCheck.endsWith("b"))
+  {
+	  versionToCheck = versionToCheck.substring(0, versionToCheck.length() - 1);
+	  versionToCheckIsBeta = true;
+  }
+
   String fVersion = metaData->getProperty("version").toString();
   bool fileIsBeta = false;
   if (fVersion.endsWith("b"))
@@ -284,7 +291,7 @@ bool Engine::checkFileVersion(DynamicObject * metaData, bool checkForNewerVersio
   }
 
   //equals
-  if (fileIsBeta) return true;
+  if (fileIsBeta) return false;
 
   return checkForNewerVersion ? false : true;
 }
