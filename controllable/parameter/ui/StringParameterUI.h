@@ -57,13 +57,17 @@ protected:
 
 class StringParameterFileUI :
 	public StringParameterUI,
-	public Button::Listener
+	public Button::Listener,
+	public Parameter::Listener
 {
 public:
 	StringParameterFileUI(Parameter * p);
 	virtual ~StringParameterFileUI();
 
+	FileParameter * fp;
 	TextButton browseBT;
+	ScopedPointer<ImageButton> relativeBT;
+
 	void resizedInternal(Rectangle<int> &r) override;
 
 	void buttonClicked(Button * b) override;

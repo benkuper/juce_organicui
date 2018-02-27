@@ -2,7 +2,7 @@
 
 <JUCERPROJECT id="nJCeN1" name="organicui_resources" projectType="guiapp" version="1.0.0"
               bundleIdentifier="com.yourcompany.organicui_resources" includeBinaryInAppConfig="1"
-              jucerVersion="5.2.0" displaySplashScreen="1" reportAppUsage="1"
+              jucerVersion="5.2.1" displaySplashScreen="1" reportAppUsage="1"
               splashScreenColour="Dark" cppLanguageStandard="11" companyCopyright="">
   <MAINGROUP id="gdPnjI" name="organicui_resources">
     <GROUP id="{471DD8BF-5339-7ED5-BF79-1FCB0A8A6B3D}" name="Resources">
@@ -26,6 +26,7 @@
       <FILE id="YFOd2O" name="playpause.png" compile="0" resource="1" file="Resources/playpause.png"/>
       <FILE id="C97VIu" name="power.png" compile="0" resource="1" file="Resources/power.png"/>
       <FILE id="IA3Rrz" name="prevcue.png" compile="0" resource="1" file="Resources/prevcue.png"/>
+      <FILE id="avHafs" name="relative.png" compile="0" resource="1" file="Resources/relative.png"/>
       <FILE id="OR6cVw" name="reload.png" compile="0" resource="1" file="Resources/reload.png"/>
       <FILE id="K6dyge" name="settings.png" compile="0" resource="1" file="Resources/settings.png"/>
       <FILE id="grSnl9" name="stop.png" compile="0" resource="1" file="Resources/stop.png"/>

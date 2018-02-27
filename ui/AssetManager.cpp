@@ -30,6 +30,7 @@ Image AssetManager::getStopImage() { return ImageCache::getFromMemory(OrganicUIB
 Image AssetManager::getPrevCueImage() { return ImageCache::getFromMemory(OrganicUIBinaryData::prevcue_png, OrganicUIBinaryData::prevcue_pngSize); }
 Image AssetManager::getNextCueImage() { return ImageCache::getFromMemory(OrganicUIBinaryData::nextcue_png, OrganicUIBinaryData::nextcue_pngSize); }
 Image AssetManager::getTriggerImage() { return ImageCache::getFromMemory(OrganicUIBinaryData::trigger_png, OrganicUIBinaryData::trigger_pngSize); }
+Image AssetManager::getRelativeImage() { return ImageCache::getFromMemory(OrganicUIBinaryData::relative_png, OrganicUIBinaryData::relative_pngSize); }
 
 
 ImageButton * AssetManager::getSetupBTImage(const Image & image)

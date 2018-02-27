@@ -37,6 +37,7 @@ public:
 	Image getPrevCueImage();
 	Image getNextCueImage();
 	Image getTriggerImage();
+	Image getRelativeImage();
 
 	ImageButton * getSetupBTImage(const Image & image);
 	ImageButton * getToggleBTImage(const Image &image);

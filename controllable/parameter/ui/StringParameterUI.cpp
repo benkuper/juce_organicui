@@ -110,10 +110,17 @@ void StringParameterUI::labelTextChanged(Label *)
 
 StringParameterFileUI::StringParameterFileUI(Parameter * p) :
 	StringParameterUI(p),
+	fp((FileParameter *)p),
 	browseBT("Browse...")
 {
+	relativeBT = AssetManager::getInstance()->getToggleBTImage(AssetManager::getInstance()->getRelativeImage());
+	relativeBT->setToggleState(fp->forceRelativePath, dontSendNotification);
 	browseBT.addListener(this);
+	
+	relativeBT->addListener(this); 
+	
 	addAndMakeVisible(&browseBT);
+	addAndMakeVisible(relativeBT);
 }
 
 StringParameterFileUI::~StringParameterFileUI()
@@ -122,6 +129,8 @@ StringParameterFileUI::~StringParameterFileUI()
 
 void StringParameterFileUI::resizedInternal(Rectangle<int> &r)
 {
+	relativeBT->setBounds(r.removeFromRight(r.getHeight()));
+	r.removeFromRight(2);
 	browseBT.setBounds(r.removeFromRight(60));
 }
 
@@ -132,5 +141,8 @@ void StringParameterFileUI::buttonClicked(Button * b)
 		FileChooser chooser("Select a file");
 		bool result = chooser.browseForFileToOpen();
 		if (result) parameter->setUndoableValue(parameter->stringValue(),chooser.getResult().getFullPathName());
+	} else if (b == relativeBT)
+	{
+		fp->setForceRelativePath(!fp->forceRelativePath);
 	}
 }
