@@ -11,7 +11,7 @@ Author:  bkupe
 
 Point3DParameter::Point3DParameter(const String & niceName, const String & description, bool enabled) :
 	Parameter(POINT3D, niceName, description, 0, 0, 1, enabled),
-    x(0), y(0),z(0)
+	x(0), y(0), z(0)
 {
 
 	value = var();
@@ -36,7 +36,7 @@ Point3DParameter::Point3DParameter(const String & niceName, const String & descr
 
 void Point3DParameter::setVector(Vector3D<float> _value)
 {
-	setVector(_value.x, _value.y,_value.z);
+	setVector(_value.x, _value.y, _value.z);
 }
 
 void Point3DParameter::setVector(float _x, float _y, float _z)
@@ -66,7 +66,7 @@ void Point3DParameter::setUndoableVector(float oldX, float oldY, float oldZ, flo
 
 	if (checkValueIsTheSame(od, d)) return;
 
-	setUndoableValue(od,d);
+	setUndoableValue(od, d);
 }
 
 void Point3DParameter::setValueInternal(var & _value)
@@ -93,9 +93,9 @@ void Point3DParameter::setValueInternal(var & _value)
 		}
 	}
 
-	x = jlimit<float>(minimumValue[0], maximumValue[0], _value[0]);
-	y = jlimit<float>(minimumValue[1], maximumValue[1], _value[1]);
-	z = jlimit<float>(minimumValue[2], maximumValue[2], _value[2]);
+	x = isnan((float)_value[0]) ? 0 : jlimit<float>(minimumValue[0], maximumValue[0], _value[0]);
+	y = isnan((float)_value[1]) ? 0 : jlimit<float>(minimumValue[1], maximumValue[1], _value[1]);
+	z = isnan((float)_value[2]) ? 0 : jlimit<float>(minimumValue[2], maximumValue[2], _value[2]);
 
 	value = var();
 	value.append(x);
@@ -117,7 +117,7 @@ void Point3DParameter::setBounds(float _minX, float _minY, float _minZ, float _m
 }
 
 Vector3D<float> Point3DParameter::getVector() {
-	return Vector3D<float>(x, y,z);
+	return Vector3D<float>(x, y, z);
 }
 
 var Point3DParameter::getLerpValueTo(var targetValue, float weight)
@@ -146,13 +146,13 @@ void Point3DParameter::setWeightedValue(Array<var> values, Array<float> weights)
 		}
 	}
 
-	setVector(tValues[0], tValues[1],tValues[2]);
+	setVector(tValues[0], tValues[1], tValues[2]);
 }
 
 
 bool Point3DParameter::checkValueIsTheSame(var newValue, var oldValue)
 {
-	if ( !(newValue.isArray() && oldValue.isArray())) return false;
+	if (!(newValue.isArray() && oldValue.isArray())) return false;
 
 	return newValue[0] == oldValue[0] && newValue[1] == oldValue[1] && newValue[2] == oldValue[2];
 }

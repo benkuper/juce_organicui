@@ -2,9 +2,9 @@
 /*
   ==============================================================================
 
-    Point2DParameter.cpp
-    Created: 30 Sep 2016 9:37:36am
-    Author:  bkupe
+	Point2DParameter.cpp
+	Created: 30 Sep 2016 9:37:36am
+	Author:  bkupe
 
   ==============================================================================
 */
@@ -82,11 +82,11 @@ void Point2DParameter::setValueInternal(var & _value)
 			}
 		}
 
-		if(hasChanged) setRange(minimumValue, maximumValue);
+		if (hasChanged) setRange(minimumValue, maximumValue);
 	}
 
-	x = jlimit<float>(minimumValue[0], maximumValue[0], _value[0]);
-	y = jlimit<float>(minimumValue[1], maximumValue[1],_value[1]);
+	x = isnan((float)value[0]) ? 0 : jlimit<float>(minimumValue[0], maximumValue[0], _value[0]);
+	y = isnan((float)value[1]) ? 0 : jlimit<float>(minimumValue[1], maximumValue[1], _value[1]);
 
 	value = var();
 	value.append(x);
@@ -105,7 +105,7 @@ void Point2DParameter::setBounds(float _minX, float _minY, float _maxX, float _m
 }
 
 Point<float> Point2DParameter::getPoint() {
-	return Point<float>(x, y); 
+	return Point<float>(x, y);
 }
 
 var Point2DParameter::getLerpValueTo(var targetValue, float weight)
@@ -143,7 +143,7 @@ bool Point2DParameter::checkValueIsTheSame(var newValue, var oldValue)
 	return newValue[0] == oldValue[0] && newValue[1] == oldValue[1];
 }
 
-ControllableUI * Point2DParameter::createDefaultUI(Controllable * targetControllable) 
-{ 
-	return new DoubleSliderUI(targetControllable != nullptr?(Point2DParameter *)targetControllable:this);  
+ControllableUI * Point2DParameter::createDefaultUI(Controllable * targetControllable)
+{
+	return new DoubleSliderUI(targetControllable != nullptr ? (Point2DParameter *)targetControllable : this);
 }
