@@ -27,9 +27,10 @@ maxFontHeight(12),
 	valueLabel.setEditable(false, parameter->isEditable);
 	valueLabel.addListener(this);
 
-	//valueLabel.setColour(valueLabel.textWhenEditingColourId, TEXTNAME_COLOR);
+	
 	valueLabel.setColour(valueLabel.backgroundColourId, BG_COLOR);
-	valueLabel.setColour(valueLabel.backgroundWhenEditingColourId, Colours::white);
+	valueLabel.setColour(valueLabel.backgroundWhenEditingColourId, Colours::black);
+	valueLabel.setColour(valueLabel.textWhenEditingColourId, Colours::white);
 	nameLabel.setTooltip(p->description);
 
 	

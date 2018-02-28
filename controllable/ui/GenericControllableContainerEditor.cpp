@@ -26,8 +26,8 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(WeakRefer
 	
 	containerLabel.setFont(containerLabel.getFont().withHeight(headerHeight-6));
 
-	containerLabel.setColour(containerLabel.backgroundWhenEditingColourId, Colours::white);
-	containerLabel.setColour(containerLabel.backgroundColourId, Colours::transparentWhite);
+	containerLabel.setColour(containerLabel.backgroundWhenEditingColourId, Colours::black);
+	containerLabel.setColour(containerLabel.textWhenEditingColourId, Colours::white);
 	containerLabel.setColour(containerLabel.textColourId, contourColor.brighter(1));
 
 	containerLabel.setEditable(false,container->nameCanBeChangedByUser);

@@ -132,10 +132,11 @@ BaseItemUI<T>::BaseItemUI(T * _item, ResizeMode _resizeMode, bool _canBeDragged)
 	resizer(nullptr),
 	itemLabel("itemLabel", dynamic_cast<BaseItem *>(this->inspectable.get())->niceName)
 {
-	itemLabel.setColour(itemLabel.backgroundWhenEditingColourId, Colours::white);
 	itemLabel.setColour(itemLabel.backgroundColourId, Colours::transparentWhite);
-	itemLabel.setColour(itemLabel.textWhenEditingColourId, Colours::black);
 	itemLabel.setColour(itemLabel.textColourId, TEXT_COLOR);
+
+	itemLabel.setColour(itemLabel.backgroundWhenEditingColourId, Colours::black);
+	itemLabel.setColour(itemLabel.textWhenEditingColourId, Colours::white);
 	itemLabel.setFont((float)(headerHeight - 4));
 	itemLabel.setJustificationType(Justification::centredLeft);
 

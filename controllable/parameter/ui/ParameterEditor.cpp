@@ -63,9 +63,10 @@ void ParameterEditor::updateUI()
 
 			expressionText->setJustificationType(Justification::topLeft);
 			expressionText->setColour(expressionText->textColourId, HIGHLIGHT_COLOR);
-			expressionText->setColour(expressionText->textWhenEditingColourId, Colours::black);
 			expressionText->setColour(expressionText->backgroundColourId, BG_COLOR.brighter(.3f));
-			expressionText->setColour(expressionText->backgroundWhenEditingColourId, Colours::white.darker(.1f));
+			expressionText->setColour(expressionText->backgroundWhenEditingColourId, Colours::black);
+			expressionText->setColour(expressionText->textWhenEditingColourId, Colours::white);
+
 		}
 	} else
 	{

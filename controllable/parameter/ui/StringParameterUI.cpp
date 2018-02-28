@@ -29,7 +29,8 @@ StringParameterUI::StringParameterUI(Parameter * p) :
 	valueLabel.setEditable(false,parameter->isEditable && !forceFeedbackOnly);
 	valueLabel.addListener(this);
 
-    valueLabel.setColour(valueLabel.backgroundWhenEditingColourId, Colours::white);
+	valueLabel.setColour(valueLabel.backgroundWhenEditingColourId, Colours::black);
+	valueLabel.setColour(valueLabel.textWhenEditingColourId, Colours::white);
 	valueLabel.addMouseListener(this, false);
 
     setSize(200, 20);//default size
@@ -66,6 +67,7 @@ void StringParameterUI::setOpaqueBackground(bool value)
 	ParameterUI::setOpaqueBackground(value);
 	valueLabel.setColour(valueLabel.backgroundColourId, opaqueBackground ? (parameter->isEditable ? BG_COLOR.darker(.1f).withAlpha(.7f):BG_COLOR.brighter(.2f)) : Colours::transparentBlack);
 	valueLabel.setColour(valueLabel.outlineColourId, opaqueBackground ? BG_COLOR.brighter(.1f):Colours::transparentWhite);
+	
 }
 
 void StringParameterUI::setForceFeedbackOnlyInternal()
