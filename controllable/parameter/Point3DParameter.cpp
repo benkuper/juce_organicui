@@ -93,9 +93,9 @@ void Point3DParameter::setValueInternal(var & _value)
 		}
 	}
 
-	x = isnan((float)_value[0]) ? 0 : jlimit<float>(minimumValue[0], maximumValue[0], _value[0]);
-	y = isnan((float)_value[1]) ? 0 : jlimit<float>(minimumValue[1], maximumValue[1], _value[1]);
-	z = isnan((float)_value[2]) ? 0 : jlimit<float>(minimumValue[2], maximumValue[2], _value[2]);
+	x = std::isnan((float)_value[0]) ? 0 : jlimit<float>(minimumValue[0], maximumValue[0], _value[0]);
+	y = std::isnan((float)_value[1]) ? 0 : jlimit<float>(minimumValue[1], maximumValue[1], _value[1]);
+	z = std::isnan((float)_value[2]) ? 0 : jlimit<float>(minimumValue[2], maximumValue[2], _value[2]);
 
 	value = var();
 	value.append(x);
