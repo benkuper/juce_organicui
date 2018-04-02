@@ -65,7 +65,7 @@ void ScriptExpression::setExpression(const String & newExpression)
 		if (expression.contains("getTime()"))
 		{
 			DBG("Start expression timer because expression uses getTime()");
-			startTimerHz(30); //loop at 30fps only if expression is using time, otherwise relies on parameter value changed
+			startTimerHz(50); //loop at 50fps only if expression is using time, otherwise relies on parameter value changed
 		}
 
 	}
