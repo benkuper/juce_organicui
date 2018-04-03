@@ -66,7 +66,7 @@ void ParameterEditor::updateUI()
 			expressionText->setColour(expressionText->backgroundColourId, BG_COLOR.brighter(.3f));
 			expressionText->setColour(expressionText->backgroundWhenEditingColourId, Colours::black);
 			expressionText->setColour(expressionText->textWhenEditingColourId, Colours::white);
-			expressionText->setColour(CaretComponent::caretColourId, Colours::white);
+			expressionText->setColour(CaretComponent::caretColourId, Colours::orange);
 
 		}
 	} else

@@ -30,7 +30,7 @@ StringParameterUI::StringParameterUI(Parameter * p) :
 	valueLabel.setColour(valueLabel.backgroundWhenEditingColourId, Colours::black);
 	valueLabel.setColour(valueLabel.textWhenEditingColourId, Colours::white);
 	valueLabel.setColour(valueLabel.textColourId, parameter->isEditable ? TEXT_COLOR : TEXT_COLOR.withAlpha(.6f));
-	valueLabel.setColour(CaretComponent::caretColourId, Colours::white);
+	valueLabel.setColour(CaretComponent::caretColourId, Colours::orange);
 	
 	valueLabel.addMouseListener(this, false);
 

@@ -29,7 +29,7 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(WeakRefer
 	containerLabel.setColour(containerLabel.backgroundWhenEditingColourId, Colours::black);
 	containerLabel.setColour(containerLabel.textWhenEditingColourId, Colours::white);
 	containerLabel.setColour(containerLabel.textColourId, contourColor.brighter(1));
-	containerLabel.setColour(CaretComponent::caretColourId, Colours::white);
+	containerLabel.setColour(CaretComponent::caretColourId, Colours::orange);
 
 	containerLabel.setEditable(false,container->nameCanBeChangedByUser);
 	containerLabel.addListener(this);
