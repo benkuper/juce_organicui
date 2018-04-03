@@ -467,7 +467,11 @@ void BaseItemUI<T>::mouseDoubleClick(const MouseEvent & e)
 template<class T>
 void BaseItemUI<T>::labelTextChanged(Label * l)
 {
-	if (l == &itemLabel) this->baseItem->setUndoableNiceName(l->getText());
+	if (l == &itemLabel)
+	{
+		if (l->getText().isEmpty()) itemLabel.setText(this->baseItem->niceName, dontSendNotification); //avoid setting empty names
+		else this->baseItem->setUndoableNiceName(l->getText());
+	}
 }
 
 
