@@ -394,7 +394,6 @@ BaseManager<T>::BaseManager(const String & name) :
 	//setCanHavePresets(false);
 	//hideInEditor = true;
 	nameCanBeChangedByUser = false;
-	isSelectable = false;
 }
 
 template<class T>
@@ -434,7 +433,6 @@ T * BaseManager<T>::addItem(T * item, var data, bool addToUndo, bool notify)
 			return item;
 		}
 	}
-
 
 	items.add(item);
 	bi->addBaseItemListener(this);

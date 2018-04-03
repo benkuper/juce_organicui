@@ -27,6 +27,11 @@ public:
 	bool enabled;
 	Array<Inspectable *> currentInspectables;
 	
+	template<class T>
+	T * getInspectableAs();
+	template<class T>
+	Array<T *> getInspectablesAs();
+
 	void setEnabled(bool value);
 
 	void selectInspectables(Array<Inspectable *> inspectables, bool clearSelection = true, bool notify = true);
@@ -39,6 +44,8 @@ public:
 
 	//From InspectableListener
 	void inspectableDestroyed(Inspectable * inspectable);
+
+	
 
 	class  Listener
 	{
@@ -53,6 +60,21 @@ public:
 
 };
 
+
+template<class T>
+T * InspectableSelectionManager::getInspectableAs()
+{
+	if (currentInspectables.size() == 0) return nullptr;
+	return dynamic_cast<T *>(currentInspectables[0]);
+}
+
+template<class T>
+Array<T*> InspectableSelectionManager::getInspectablesAs()
+{
+	Array<T *> result;
+	for (auto &i : currentInspectables) result.add(dynamic_cast<T *>(i));
+	return result;
+}
 
 
 #endif  // INSPECTABLESELECTIONMANAGER_H_INCLUDED

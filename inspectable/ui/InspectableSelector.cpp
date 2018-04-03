@@ -54,14 +54,18 @@ void InspectableSelector::startSelection(Component * parent, Array<Component*> _
 	selectablesParent->addMouseListener(this, false);
 	setBounds(selectablesParent->getLocalBounds());
 	selectionBounds.setSize(0, 0);
+
 }
 
 
 void InspectableSelector::endSelection(bool confirmSelection)
 {
+	
 	selectablesParent->removeChildComponent(this);
 	selectablesParent->removeMouseListener(this);
 
+	if (selectionBounds.getWidth() == 0 || selectionBounds.getHeight() == 0) return; //No selection attempt, just click.
+	
 	Array<Inspectable *> selection;
 
 	Array<Component *> selectedComponents;
@@ -82,7 +86,7 @@ void InspectableSelector::endSelection(bool confirmSelection)
 	
 	if(confirmSelection) currentSelectionManager->selectInspectables(selection,clearSelectionAtEnd);
 
-	if (selectedComponents.size() > 0) listeners.call(&SelectorListener::selectionEnded, selectedComponents);
+	listeners.call(&SelectorListener::selectionEnded, selectedComponents);
 	
 }
 
