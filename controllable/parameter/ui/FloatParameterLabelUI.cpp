@@ -30,6 +30,7 @@ maxFontHeight(12),
 	
 	valueLabel.setColour(valueLabel.backgroundColourId, BG_COLOR);
 	valueLabel.setColour(valueLabel.backgroundWhenEditingColourId, Colours::black);
+	valueLabel.setColour(CaretComponent::caretColourId, Colours::white);
 	valueLabel.setColour(valueLabel.textWhenEditingColourId, Colours::white);
 	nameLabel.setTooltip(p->description);
 

@@ -60,12 +60,13 @@ void ParameterEditor::updateUI()
 
 			expressionLabel->setJustificationType(Justification::topLeft);
 			expressionLabel->setColour(expressionLabel->textColourId, TEXTNAME_COLOR);
-
+			
 			expressionText->setJustificationType(Justification::topLeft);
 			expressionText->setColour(expressionText->textColourId, HIGHLIGHT_COLOR);
 			expressionText->setColour(expressionText->backgroundColourId, BG_COLOR.brighter(.3f));
 			expressionText->setColour(expressionText->backgroundWhenEditingColourId, Colours::black);
 			expressionText->setColour(expressionText->textWhenEditingColourId, Colours::white);
+			expressionText->setColour(CaretComponent::caretColourId, Colours::white);
 
 		}
 	} else

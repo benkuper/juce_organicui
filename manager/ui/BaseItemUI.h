@@ -137,6 +137,8 @@ BaseItemUI<T>::BaseItemUI(T * _item, ResizeMode _resizeMode, bool _canBeDragged)
 
 	itemLabel.setColour(itemLabel.backgroundWhenEditingColourId, Colours::black);
 	itemLabel.setColour(itemLabel.textWhenEditingColourId, Colours::white);
+	itemLabel.setColour(CaretComponent::caretColourId, Colours::white);
+
 	itemLabel.setFont((float)(headerHeight - 4));
 	itemLabel.setJustificationType(Justification::centredLeft);
 
