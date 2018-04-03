@@ -9,11 +9,12 @@
   ==============================================================================
 */
 
-BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts) : 
-	EnablingControllableContainer(name.isEmpty()?getTypeString():name, _canBeDisabled),
+BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts) :
+	EnablingControllableContainer(name.isEmpty() ? getTypeString() : name, _canBeDisabled),
 	canHaveScripts(_canHaveScripts),
 	userCanRemove(true),
-	askConfirmationBeforeRemove(true)
+	askConfirmationBeforeRemove(true),
+	itemDataType("")
 {
 	saveAndLoadName = true;
 	nameCanBeChangedByUser = true;
@@ -63,15 +64,16 @@ void BaseItem::duplicate()
 void BaseItem::copy()
 {
 	var data = getJSONData();
-	data.getDynamicObject()->setProperty("itemType", getTypeString());
+	data.getDynamicObject()->setProperty("itemType", itemDataType);
 	SystemClipboard::copyTextToClipboard(JSON::toString(data));
 	NLOG(niceName, "Copied to clipboard");
 }
 
-void BaseItem::paste()
+bool BaseItem::paste()
 {
 	//default behavior can be overriden
 	baseItemListeners.call(&BaseItem::Listener::askForPaste);
+	return true;
 }
 
 void BaseItem::remove()

@@ -34,9 +34,11 @@ public:
 
 	ScopedPointer<ScriptManager> scriptManager;
 
-	void duplicate();
-	void copy();
-	void paste();
+	String itemDataType;
+
+	virtual void duplicate();
+	virtual void copy();
+	virtual bool paste();
 
 	void remove();
 	virtual void clear() {}

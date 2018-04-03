@@ -25,13 +25,14 @@ public:
 
 	//Factory
 	Factory<T> * managerFactory;
+	String itemDataType;
 
 	bool userCanAddItemsManually;
 	bool selectItemWhenCreated;
 
 	virtual T * createItem(); //to override if special constructor to use
 	virtual T * addItemFromData(var data, bool addToUndo = true); //to be overriden for specific item creation (from data)
-	virtual T * addItemFromClipboard();
+	virtual T * addItemFromClipboard(bool showWarning = true);
 
 	virtual void loadItemsData(var data);
 
@@ -385,6 +386,7 @@ template<class T>
 BaseManager<T>::BaseManager(const String & name) :
 	ControllableContainer(name),
 	managerFactory(nullptr),
+	itemDataType(""),
 	userCanAddItemsManually(true),
 	selectItemWhenCreated(true),
 	managerNotifier(50)
@@ -514,14 +516,26 @@ T * BaseManager<T>::addItemFromData(var data, bool addToUndo)
 }
 
 template<class T>
-T * BaseManager<T>::addItemFromClipboard()
+T * BaseManager<T>::addItemFromClipboard(bool showWarning)
 {
 	if (!userCanAddItemsManually) return nullptr;
 	String s = SystemClipboard::getTextFromClipboard();
 	var data = JSON::parse(s);
 	if (data.isVoid()) return nullptr;
 
-	if (data.getProperty("itemType", var()).isVoid()) return nullptr;
+	String t = data.getProperty("itemType", "");
+	if (t.isEmpty())
+	{
+		if(showWarning) NLOGWARNING(niceName, "Can't paste data from clipboard : data has no type.");
+		return nullptr;
+	}
+
+	if(t != itemDataType)
+	{
+		if(showWarning) NLOGWARNING(niceName, "Can't paste data from clipboard : data is of wrong type.\nGot type \"" + t +"\" where \"" + itemDataType + "\" is expected.");
+		return nullptr;
+	}
+
 	return addItemFromData(data);
 }
 

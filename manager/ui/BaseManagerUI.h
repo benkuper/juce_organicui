@@ -313,6 +313,7 @@ void BaseManagerUI<M, T, U>::mouseDown(const MouseEvent & e)
 template<class M, class T, class U>
 bool BaseManagerUI<M, T, U>::keyPressed(const KeyPress & e)
 {
+	DBG("Key pressed on ManagerUI");
 	if (InspectableContentComponent::keyPressed(e)) return true;
 
 	if (e.getModifiers().isCommandDown())

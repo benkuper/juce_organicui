@@ -112,6 +112,12 @@ bool BaseItemMinimalUI<T>::keyPressed(const KeyPress & e)
 		{
 			item->copy();
 			return true;
+		} else if (e.getKeyCode() == KeyPress::createFromDescription("x").getKeyCode())
+		{
+			item->copy();
+			this->baseItem->remove();
+			return true;
+
 		} else if (e.getKeyCode() == KeyPress::createFromDescription("v").getKeyCode())
 		{
 			item->paste();
