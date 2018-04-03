@@ -102,7 +102,7 @@ bool BaseItemMinimalUI<T>::keyPressed(const KeyPress & e)
 
 			return true;
 		}
-	} else if (e.getModifiers().isCommandDown())
+	}/* else if (e.getModifiers().isCommandDown())
 	{
 		if (e.getKeyCode() == KeyPress::createFromDescription("d").getKeyCode())
 		{	
@@ -124,7 +124,8 @@ bool BaseItemMinimalUI<T>::keyPressed(const KeyPress & e)
 			return true;
 		}
 	}
-	
+	*/
+
 	return false;
 }
 

@@ -79,7 +79,6 @@ public:
 	int labelHeight = 10;
 	String managerUIName;
 	bool drawContour;
-	bool drawHighlightWhenSelected;
 	bool transparentBG;
 	bool resizeOnChildBoundsChanged;
 
@@ -151,27 +150,7 @@ public:
 	virtual void itemsRemoved(Array<T *> items) override;
 	virtual void itemsReorderedAsync();
 
-	void newMessage(const typename BaseManager<T>::ManagerEvent &e) override
-	{
-		switch (e.type)
-		{
-
-		case BaseManager<T>::ManagerEvent::ITEM_ADDED:
-			itemAddedAsync(e.getItem());
-			break;
-
-		case BaseManager<T>::ManagerEvent::ITEMS_REORDERED:
-			itemsReorderedAsync();
-			break;
-
-		case BaseManager<T>::ManagerEvent::ITEMS_ADDED:
-			itemsAddedAsync(e.getItems());
-			break;
-
-		default:
-			break;
-		}
-	}
+	void newMessage(const typename BaseManager<T>::ManagerEvent &e) override;
 
 	void buttonClicked(Button *) override;
 
@@ -313,16 +292,17 @@ void BaseManagerUI<M, T, U>::mouseDown(const MouseEvent & e)
 template<class M, class T, class U>
 bool BaseManagerUI<M, T, U>::keyPressed(const KeyPress & e)
 {
-	DBG("Key pressed on ManagerUI");
 	if (InspectableContentComponent::keyPressed(e)) return true;
 
 	if (e.getModifiers().isCommandDown())
 	{
+		/*
 		if (e.getKeyCode() == KeyPress::createFromDescription("v").getKeyCode())
 		{
 			manager->addItemFromClipboard();
 			return true;
-		} else if (e.getKeyCode() == KeyPress::createFromDescription("a").getKeyCode())
+		} else*/ 
+		if (e.getKeyCode() == KeyPress::createFromDescription("a").getKeyCode())
 		{
 			int numItems = manager->items.size();
 			if (numItems > 0) manager->items[0]->selectThis();
@@ -690,6 +670,29 @@ void BaseManagerUI<M, T, U>::itemsReorderedAsync()
 {
 	itemsUI.sort(managerComparator);
 	resized();
+}
+
+template<class M, class T, class U>
+void BaseManagerUI<M, T, U>::newMessage(const typename BaseManager<T>::ManagerEvent & e)
+{
+	switch (e.type)
+	{
+
+	case BaseManager<T>::ManagerEvent::ITEM_ADDED:
+		itemAddedAsync(e.getItem());
+		break;
+
+	case BaseManager<T>::ManagerEvent::ITEMS_REORDERED:
+		itemsReorderedAsync();
+		break;
+
+	case BaseManager<T>::ManagerEvent::ITEMS_ADDED:
+		itemsAddedAsync(e.getItems());
+		break;
+
+	default:
+		break;
+	}
 }
 
 
