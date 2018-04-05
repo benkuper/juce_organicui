@@ -15,6 +15,7 @@
 class ParameterEditor : 
 	public ControllableEditor,
 	public Parameter::Listener,
+	public Parameter::AsyncListener,
 	public Label::Listener
 {
 public:
@@ -27,6 +28,8 @@ public:
 
 	virtual void resized() override;
 	virtual void updateUI();
+
+	void newMessage(const Parameter::ParameterEvent &e) override;
 
 	void parameterControlModeChanged(Parameter *) override;
 

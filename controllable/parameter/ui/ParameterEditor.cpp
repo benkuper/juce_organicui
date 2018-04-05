@@ -14,13 +14,21 @@ ParameterEditor::ParameterEditor(Parameter * _parameter, bool isRoot, int initHe
 	ControllableEditor(_parameter, isRoot, initHeight),
 	parameter(_parameter)
 {
+	if (parameter->isOverriden) label.setFont(label.getFont().withStyle(Font::FontStyleFlags::bold));
+	
 	parameter->addParameterListener(this);
+	parameter->addAsyncParameterListener(this);
+
 	updateUI();
 }
 
 ParameterEditor::~ParameterEditor()
 {
-	if(parameter != nullptr && !parameter.wasObjectDeleted()) parameter->removeParameterListener(this);
+	if (parameter != nullptr && !parameter.wasObjectDeleted())
+	{
+		parameter->removeParameterListener(this);
+		parameter->removeAsyncParameterListener(this);
+	}
 }
 
 void ParameterEditor::resized()
@@ -84,6 +92,11 @@ void ParameterEditor::updateUI()
 	}
 
 	setSize(getWidth(), baseHeight + subContentHeight);
+}
+
+void ParameterEditor::newMessage(const Parameter::ParameterEvent & e)
+{
+	label.setFont(label.getFont().withStyle(parameter->isOverriden?Font::FontStyleFlags::bold:Font::FontStyleFlags::plain));
 }
 
 void ParameterEditor::parameterControlModeChanged(Parameter *)
