@@ -376,15 +376,15 @@ void BaseManagerUI<M, T, U>::resized()
 {
 	if (getWidth() == 0 || getHeight() == 0) return;
 
-	bool resizeOnChange = resizeOnChildBoundsChanged;
-	resizeOnChildBoundsChanged = false; //avoir infinite loop if resize actually resizes inner components
+	//bool resizeOnChange = resizeOnChildBoundsChanged;
+	//resizeOnChildBoundsChanged = false; //avoir infinite loop if resize actually resizes inner components
 
 	juce::Rectangle<int> r = getLocalBounds().reduced(2);
 	resizedInternalHeader(r);
 	resizedInternalFooter(r);
 	resizedInternalContent(r);
 
-	resizeOnChildBoundsChanged = resizeOnChange;
+	//resizeOnChildBoundsChanged = resizeOnChange;
 }
 
 template<class M, class T, class U>
