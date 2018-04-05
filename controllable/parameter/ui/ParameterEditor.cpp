@@ -14,7 +14,7 @@ ParameterEditor::ParameterEditor(Parameter * _parameter, bool isRoot, int initHe
 	ControllableEditor(_parameter, isRoot, initHeight),
 	parameter(_parameter)
 {
-	if (parameter->isOverriden) label.setFont(label.getFont().withStyle(Font::FontStyleFlags::bold));
+	if (parameter->isOverriden && parameter->isEditable && !parameter->isControllableFeedbackOnly) label.setFont(label.getFont().withStyle(Font::FontStyleFlags::bold));
 	
 	parameter->addParameterListener(this);
 	parameter->addAsyncParameterListener(this);
@@ -96,6 +96,7 @@ void ParameterEditor::updateUI()
 
 void ParameterEditor::newMessage(const Parameter::ParameterEvent & e)
 {
+	if (!parameter->isEditable || parameter->isControllableFeedbackOnly) return;
 	label.setFont(label.getFont().withStyle(parameter->isOverriden?Font::FontStyleFlags::bold:Font::FontStyleFlags::plain));
 }
 
