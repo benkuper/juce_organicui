@@ -18,7 +18,7 @@ class IntParameterLabelUI;
 class IntParameter : public Parameter
 {
 public:
-    IntParameter(const String &niceName, const String &description, const int &initialValue, const int &minimumValue = 0, const int &maximumValue = 1, bool enabled = true);
+    IntParameter(const String &niceName, const String &description, const int &initialValue, const int &minimumValue = -10, const int &maximumValue = 10, bool enabled = true);
     ~IntParameter() {}
 
     void setValueInternal(var & _value) override;
