@@ -44,6 +44,7 @@ void InspectableContentComponent::mouseExit(const MouseEvent & e)
 
 void InspectableContentComponent::mouseDown(const MouseEvent & e)
 {
+
 	if (inspectable.wasObjectDeleted())
 	{
 		DBG("Object deleted on inspectable content, should never be there !");
@@ -51,6 +52,7 @@ void InspectableContentComponent::mouseDown(const MouseEvent & e)
 	}
 
 	if (!inspectable->isSelectable) return;
+	if (!e.mods.isLeftButtonDown()) return;
 
 	if (autoSelectWithChildRespect)
 	{
