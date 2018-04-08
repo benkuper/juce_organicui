@@ -19,7 +19,12 @@ EnumParameter::EnumParameter(const String & niceName, const String &description,
 EnumParameter * EnumParameter::addOption(String key, var data, bool selectIfFirstOption)
 {
 	enumValues.set(key, data);
-	if (enumValues.size() == 1 && selectIfFirstOption) setValue(key, true);
+	if (enumValues.size() == 1 && selectIfFirstOption)
+	{
+		defaultValue = key;
+		setValue(key, true, false,false);
+	}
+
 	enumListeners.call(&Listener::enumOptionAdded, this, key);
 	updateArgDescription();
 	return this;

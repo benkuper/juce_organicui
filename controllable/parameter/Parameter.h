@@ -62,7 +62,7 @@ public:
 
     void resetValue(bool silentSet = false);
 	virtual UndoableAction * setUndoableValue(var oldValue, var newValue, bool onlyReturnAction = false);
-    virtual void setValue(var _value, bool silentSet = false, bool force = false);
+    virtual void setValue(var _value, bool silentSet = false, bool force = false, bool forceOverride = true);
     virtual void setValueInternal(var & _value);
 
 	virtual bool checkValueIsTheSame(var newValue, var oldValue); //can be overriden to modify check behavior

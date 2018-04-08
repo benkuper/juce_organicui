@@ -27,7 +27,7 @@ public:
 
 
     // need to override this function because var Strings comparison  is based on pointer (we need full string comp)
-    void setValue(var v,bool silentSet=false,bool force=false)override;
+    void setValue(var v,bool silentSet=false,bool force=false, bool forceOverride = true)override;
     virtual  void setValueInternal(var&)override;
 	StringParameterUI * createStringParameterUI(StringParameter * target = nullptr);
 	StringParameterUI * createStringParameterFileUI(StringParameter * target = nullptr);

@@ -52,13 +52,13 @@ var StringParameter::getLerpValueTo(var targetValue, float weight)
 	return Parameter::getLerpValueTo(targetValue, weight);
 }
 
-void StringParameter::setValue(var _value,bool silentSet,bool force )
+void StringParameter::setValue(var _value,bool silentSet,bool force, bool forceOverride)
 {
     if (!force && value.toString() == _value.toString()) return;
     
     setValueInternal(_value);
     
-    if(_value != defaultValue) isOverriden = true;
+    if(_value != defaultValue || forceOverride) isOverriden = true;
     
     if (!silentSet) notifyValueChanged();
 };

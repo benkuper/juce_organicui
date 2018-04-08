@@ -34,7 +34,7 @@ TargetParameter::TargetParameter(const String & niceName, const String & descrip
 	lockManualControlMode = true;
 	type = TARGET; 
 	if (rootContainer == nullptr) rootContainer = Engine::mainEngine;
-	
+	rootContainer->addControllableContainerListener(this);
 	argumentsDescription = "target";
 }
 
@@ -51,26 +51,28 @@ void TargetParameter::setGhostValue(const String & ghostVal)
 	if (ghostVal == ghostValue) return;
 
 	ghostValue = ghostVal;
-	if (ghostValue.isNotEmpty())
-	{
-		//if (Engine::mainEngine->isLoadingFile) Engine::mainEngine->addEngineListener(this);
-		if(rootContainer != nullptr) rootContainer->addControllableContainerListener(this);
-	} else
-	{
-		if(!rootContainer.wasObjectDeleted()) rootContainer->removeControllableContainerListener(this);
-	}
+	
 }
 
 void TargetParameter::setValueFromTarget(Controllable * c)
 {
-	if (c == target) return;
+	if (target != nullptr && c == target)
+	{
+		String ca = target->getControlAddress();
+		if (stringValue() == ca) return;
+	}
+	
 	setValue(c->getControlAddress(rootContainer),false,true);
 }
 
 void TargetParameter::setValueFromTarget(ControllableContainer * cc)
 {
-	if (cc == targetContainer) return; 
-	setValue(cc->getControlAddress(rootContainer),false,true);
+	if(targetContainer == nullptr && cc == targetContainer)
+	{
+		String ca = targetContainer->getControlAddress();
+		if (stringValue() == ca) return;
+	}
+	setValue(cc->getControlAddress(rootContainer), false, true);
 }
 
 void TargetParameter::setValueInternal(var & newVal)
@@ -134,11 +136,33 @@ void TargetParameter::setTarget(WeakReference<ControllableContainer> cc)
 void TargetParameter::childStructureChanged(ControllableContainer * cc)
 {
 	
-	if (target == nullptr && ghostValue.isNotEmpty())
+	if (targetType == CONTROLLABLE)
 	{
-		WeakReference<Controllable> c = rootContainer->getControllableForAddress(ghostValue);
-		if (c != nullptr) setValueFromTarget(c);
-		
+		if (target == nullptr)
+		{
+			if (ghostValue.isNotEmpty())
+			{
+				WeakReference<Controllable> c = rootContainer->getControllableForAddress(ghostValue);
+				if (c != nullptr) setValueFromTarget(c);
+			}
+		} else
+		{
+			DBG("Child structure changed ! " << target->getControlAddress());
+			setValueFromTarget(target);
+		}
+	} else if (targetType == CONTAINER)
+	{
+		if (targetContainer == nullptr)
+		{
+			if (ghostValue.isNotEmpty())
+			{
+				WeakReference<ControllableContainer> tcc = rootContainer->getControllableContainerForAddress(ghostValue);
+				if (tcc != nullptr) setValueFromTarget(tcc);
+			}
+		} else
+		{
+			setValueFromTarget(targetContainer);
+		}
 	}
 }
 

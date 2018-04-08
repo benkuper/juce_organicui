@@ -11,11 +11,10 @@
 #ifndef TARGETPARAMETERUI_H_INCLUDED
 #define TARGETPARAMETERUI_H_INCLUDED
 
-
 class TargetParameterUI :
 	public ParameterUI,
 	public Button::Listener,
-	public ControllableContainerListener
+	public ContainerAsyncListener
 {
 public:
 	TargetParameterUI(TargetParameter * parameter, const String &noTargetText = "[Click to select an element]");
@@ -43,7 +42,7 @@ public:
 protected:
 	void valueChanged(const var & v) override;
 	void newMessage(const Parameter::ParameterEvent &e) override;
-	void controllableFeedbackUpdate(ControllableContainer *, Controllable * c) override;
+	void newMessage(const ContainerAsyncEvent &e) override;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TargetParameterUI)
 };

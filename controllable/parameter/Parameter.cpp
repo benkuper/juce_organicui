@@ -85,7 +85,7 @@ var Parameter::getLerpValueTo(var targetValue, float weight)
 void Parameter::resetValue(bool silentSet)
 {
 	isOverriden = false;
-	setValue(defaultValue, silentSet, true);
+	setValue(defaultValue, silentSet, true, false);
 }
 
 UndoableAction * Parameter::setUndoableValue(var oldValue, var newValue, bool onlyReturnAction)
@@ -104,13 +104,13 @@ UndoableAction * Parameter::setUndoableValue(var oldValue, var newValue, bool on
 	return a;
 }
 
-void Parameter::setValue(var _value, bool silentSet, bool force)
+void Parameter::setValue(var _value, bool silentSet, bool force, bool forceOverride)
 {
 	if (!force && checkValueIsTheSame(_value, value)) return;
 	lastValue = var(value);
 	setValueInternal(_value);
 
-	isOverriden = _value != defaultValue;
+	isOverriden =  _value != defaultValue || forceOverride;
 
 	if (!silentSet) notifyValueChanged();
 
@@ -243,7 +243,7 @@ void Parameter::loadJSONDataInternal(var data)
 	Controllable::loadJSONDataInternal(data);
 
 	if (!saveValueOnly) setRange(data.getProperty("minValue", minimumValue), data.getProperty("maxValue", maximumValue));
-	if (data.getDynamicObject()->hasProperty("value")) setValue(data.getProperty("value", 0));
+	if (data.getDynamicObject()->hasProperty("value")) setValue(data.getProperty("value", 0),false, true, true);
 
 	if (data.getDynamicObject()->hasProperty("controlMode")) setControlMode((ControlMode)(int)data.getProperty("controlMode", MANUAL));
 	if (data.getDynamicObject()->hasProperty("expression")) setControlExpression(data.getProperty("expression", ""));

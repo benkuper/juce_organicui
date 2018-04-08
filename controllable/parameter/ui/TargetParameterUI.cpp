@@ -1,4 +1,3 @@
-#include "TargetParameterUI.h"
 /*
   ==============================================================================
 
@@ -9,6 +8,7 @@
   ==============================================================================
 */
 
+#include "TargetParameterUI.h"
 
 TargetParameterUI::TargetParameterUI(TargetParameter * parameter, const String &_noTargetText) :
 	ParameterUI(parameter),
@@ -47,7 +47,7 @@ TargetParameterUI::TargetParameterUI(TargetParameter * parameter, const String &
 TargetParameterUI::~TargetParameterUI()
 {
 	//in case we deleted with the listener still on
-	if(parameter != nullptr && !parameter.wasObjectDeleted()) targetParameter->rootContainer->removeControllableContainerListener(this);
+	if(parameter != nullptr && !parameter.wasObjectDeleted()) targetParameter->rootContainer->removeAsyncContainerListener(this);
 }
 
 void TargetParameterUI::paint(Graphics & g)
@@ -204,10 +204,10 @@ void TargetParameterUI::newMessage(const Parameter::ParameterEvent & e)
 			{
 				if (listeningToNextChange->boolValue())
 				{
-					targetParameter->rootContainer->addControllableContainerListener(this);
-				} else
+					targetParameter->rootContainer->addAsyncContainerListener(this);
+				} else 
 				{
-					targetParameter->rootContainer->removeControllableContainerListener(this);
+					targetParameter->rootContainer->removeAsyncContainerListener(this);
 				}
 			}
 		}
@@ -218,18 +218,23 @@ void TargetParameterUI::newMessage(const Parameter::ParameterEvent & e)
 	
 }
 
-void TargetParameterUI::controllableFeedbackUpdate(ControllableContainer *, Controllable * c)
+void TargetParameterUI::newMessage(const ContainerAsyncEvent & e)
 {
-	if (c == targetParameter->target) return;
+	if (e.type == ContainerAsyncEvent::ControllableFeedbackUpdate)
+	{
+		Controllable * c = e.targetControllable;
+		if (c == targetParameter->target) return;
 
-	if (c->type == Controllable::TRIGGER)
-	{
-		if (!targetParameter->showTriggers) return;
-	} else
-	{
-		if (!targetParameter->showParameters) return;
+		if (c->type == Controllable::TRIGGER)
+		{
+			if (!targetParameter->showTriggers) return;
+		} else
+		{
+			if (!targetParameter->showParameters) return;
+		}
+
+		bool isControllableValid = targetParameter->customCheckAssignOnNextChangeFunc(c);
+		if (isControllableValid) targetParameter->setValueFromTarget(c);
 	}
-
-	bool isControllableValid = targetParameter->customCheckAssignOnNextChangeFunc(c);
-	if (isControllableValid) targetParameter->setValueFromTarget(c);
+	
 }
