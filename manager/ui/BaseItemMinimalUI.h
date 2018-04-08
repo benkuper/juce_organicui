@@ -14,7 +14,7 @@
 template<class T>
 class BaseItemMinimalUI :
 	public InspectableContentComponent,
-	public ControllableContainer::ContainerAsyncListener
+	public ContainerAsyncListener
 {
 public:
 	BaseItemMinimalUI<T>(T * _item);
