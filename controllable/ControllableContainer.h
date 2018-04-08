@@ -108,6 +108,7 @@ public:
 	void dispatchFeedback(Controllable * c);
 
 	virtual void parameterValueChanged(Parameter * p) override;
+	virtual void parameterRangeChanged(Parameter * p) override;
 	virtual void triggerTriggered(Trigger * p) override;
 
 	void controllableFeedbackUpdate(ControllableContainer * cc, Controllable * c) override;
@@ -121,8 +122,7 @@ public:
 
 	virtual void childStructureChanged(ControllableContainer *)override;
 	virtual void childAddressChanged(ControllableContainer *) override;
-	void parameterRangeChanged(Parameter * p) override;
-
+	
 	String getUniqueNameInContainer(const String &sourceName, int suffix = 0);
 
 	//SCRIPT
@@ -152,8 +152,7 @@ public:
     void removeControllableContainerListener(ControllableContainerListener* listener) { controllableContainerListeners.remove(listener);}
     
 	QueuedNotifier<ContainerAsyncEvent> queuedNotifier;
-	typedef QueuedNotifier<ContainerAsyncEvent>::Listener ContainerAsyncListener;
-
+	
 	void addAsyncContainerListener(ContainerAsyncListener* newListener) { queuedNotifier.addListener(newListener); }
 	void addAsyncCoalescedContainerListener(ContainerAsyncListener * newListener) {queuedNotifier.addAsyncCoalescedListener(newListener); }
 	void removeAsyncContainerListener(ContainerAsyncListener* listener) { queuedNotifier.removeListener(listener); }
@@ -259,6 +258,7 @@ public:
 	BoolParameter * enabled;
 
 	bool canBeDisabled;
+	void setCanBeDisabled(bool value);
 
 	virtual InspectableEditor * getEditor(bool isRoot) override;
 };

@@ -550,6 +550,8 @@ void ControllableContainer::dispatchFeedback(Controllable * c)
 {
 	//    @ben removed else here to enable containerlistener call back of non root (proxies) is it overkill?
 	if (parentContainer != nullptr) { parentContainer->dispatchFeedback(c); }
+	if (!c->isControllableExposed) return;
+
 	controllableContainerListeners.call(&ControllableContainerListener::controllableFeedbackUpdate, this, c);
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableFeedbackUpdate, this, c));
 }
@@ -560,12 +562,21 @@ void ControllableContainer::parameterValueChanged(Parameter * p)
 	if (p->parentContainer == this)
 	{
 		onContainerParameterChanged(p);
-		if (p->isControllableExposed) dispatchFeedback(p);
+		dispatchFeedback(p);
 	} else
 	{
 		onExternalParameterChanged(p);
 	}
 
+}
+
+
+void ControllableContainer::parameterRangeChanged(Parameter * p)
+{
+	if (p->parentContainer == this)
+	{
+		dispatchFeedback(p);
+	}
 }
 
 
@@ -675,10 +686,6 @@ void ControllableContainer::childAddressChanged(ControllableContainer * cc)
 	notifyStructureChanged();
 }
 
-void ControllableContainer::parameterRangeChanged(Parameter * p)
-{
-	notifyStructureChanged();
-}
 
 String ControllableContainer::getUniqueNameInContainer(const String & sourceName, int suffix)
 {
@@ -768,14 +775,28 @@ InspectableEditor * ControllableContainer::getEditor(bool isRoot)
 
 EnablingControllableContainer::EnablingControllableContainer(const String & n, bool _canBeDisabled) :
 	ControllableContainer(n),
-	canBeDisabled(_canBeDisabled)
+	enabled(nullptr),
+	canBeDisabled(false) 
 {
+	setCanBeDisabled(_canBeDisabled);
+	
+}
+
+void EnablingControllableContainer::setCanBeDisabled(bool value)
+{
+	if (canBeDisabled == value) return;
+
+	canBeDisabled = value;
+
 	if (canBeDisabled)
 	{
 		enabled = addBoolParameter("Enabled", "Activate OSC Input for this module", true);
 		enabled->hideInEditor = true;
+	} else
+	{
+		removeControllable(enabled);
+		enabled = nullptr;
 	}
-	
 }
 
 InspectableEditor * EnablingControllableContainer::getEditor(bool isRoot)

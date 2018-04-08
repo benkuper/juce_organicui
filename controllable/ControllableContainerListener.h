@@ -47,3 +47,5 @@ public:
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ContainerAsyncEvent)
 };
+
+typedef QueuedNotifier<ContainerAsyncEvent>::Listener ContainerAsyncListener;
