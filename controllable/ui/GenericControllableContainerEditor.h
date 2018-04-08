@@ -19,7 +19,7 @@
 
 class GenericControllableContainerEditor :
 	public InspectableEditor,
-	public ControllableContainer::ContainerAsyncListener,
+	public ContainerAsyncListener,
 	public Button::Listener,
 	public ChangeListener,
 	public Label::Listener
