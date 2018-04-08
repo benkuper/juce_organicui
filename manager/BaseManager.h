@@ -14,7 +14,7 @@
 
 template <class T>
 class BaseManager :
-	public ControllableContainer,
+	public EnablingControllableContainer,
 	public BaseItem::Listener
 {
 public:
@@ -384,7 +384,7 @@ public:
 
 template<class T>
 BaseManager<T>::BaseManager(const String & name) :
-	ControllableContainer(name),
+	EnablingControllableContainer(name,false),
 	managerFactory(nullptr),
 	itemDataType(""),
 	userCanAddItemsManually(true),

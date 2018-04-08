@@ -16,7 +16,7 @@ class BaseManager;
 
 template<class T>
 class GenericManagerEditor :
-	public GenericControllableContainerEditor,
+	public EnablingControllableContainerEditor,
 	public BaseManager<T>::Listener
 {
 public:
@@ -52,7 +52,7 @@ public:
 
 template<class T>
 GenericManagerEditor<T>::GenericManagerEditor(BaseManager<T> * _manager, bool isRoot) :
-	GenericControllableContainerEditor(_manager, isRoot),
+	EnablingControllableContainerEditor(_manager, isRoot),
 	manager(_manager),
 	addItemText("Add item")
 {
@@ -106,7 +106,7 @@ void GenericManagerEditor<T>::resizedInternalHeader(juce::Rectangle<int>& r)
 {
 	addItemBT->setBounds(r.removeFromRight(r.getHeight()).reduced(2));
 	r.removeFromRight(2);
-	GenericControllableContainerEditor::resizedInternalHeader(r);
+	EnablingControllableContainerEditor::resizedInternalHeader(r);
 }
 
 template<class T>
