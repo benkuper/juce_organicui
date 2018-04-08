@@ -34,6 +34,8 @@ String Inspectable::getHelpID()
 void Inspectable::selectThis(bool addToSelection)
 {
 	if (selectionManager == nullptr) return;
+	if (!isSelectable) return;
+	
 	selectionManager->selectInspectable(this,!addToSelection);
 	//if (helpID.isNotEmpty() && HelpBox::getInstanceWithoutCreating() != nullptr) HelpBox::getInstance()->setPersistentData(helpID);
 }
