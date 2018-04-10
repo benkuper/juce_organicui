@@ -455,7 +455,7 @@ void BaseManagerUI<M, T, U>::resizedInternalContent(juce::Rectangle<int>& r)
 			tr = r.withWidth(bui->getWidth());
 		}
 
-		bui->setBounds(tr);
+		if(tr != bui->getBounds()) bui->setBounds(tr);
 
 		if (defaultLayout == VERTICAL) r.translate(0, tr.getHeight() + gap);
 		else r.translate(tr.getWidth() + gap, 0);
@@ -723,10 +723,13 @@ void BaseManagerUI<M, T, U>::itemUIGrabEnd(BaseItemUI<T>* se)
 
 		int originalIndex = manager->items.indexOf(grabbingItem->item);
 		manager->items.move(originalIndex, jlimit(0, manager->items.size() - 1, grabbingItemDropIndex));
+		
+		grabbingItem = nullptr;
+		grabbingItemDropIndex = -1; 
+		
 		manager->reorderItems();
 
-		grabbingItem = nullptr;
-		grabbingItemDropIndex = -1;
+		
 		resized();
 	}
 }
