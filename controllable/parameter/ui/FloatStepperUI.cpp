@@ -18,7 +18,7 @@ FloatStepperUI::FloatStepperUI(Parameter * _parameter) :
 	slider = new BetterStepper(tooltip);
 	slider->setEnabled(parameter->enabled);
 	
-    slider->setRange((int)parameter->minimumValue-1, (int)parameter->maximumValue+1,1);
+    slider->setRange((int)parameter->minimumValue, (int)parameter->maximumValue,1);
 
     slider->setValue(parameter->floatValue());
     slider->addListener(this);
