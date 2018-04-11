@@ -45,7 +45,7 @@ bool TriggerButtonUI::hitTest(int x, int y)
 
 void TriggerButtonUI::paint (Graphics& g)
 {
-	Rectangle<float> r = getLocalBounds().toFloat();
+ juce::Rectangle<float> r = getLocalBounds().toFloat();
 	if (!showLabel) r.setWidth(jmin<float>(r.getWidth(), 50));
 
     Point<float> center = r.getCentre();

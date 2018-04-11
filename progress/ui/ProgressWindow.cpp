@@ -31,7 +31,7 @@ void ProgressWindow::paint(Graphics & g)
 {
 	g.fillAll(Colours::black.withAlpha(.5f));
 	
-	Rectangle<int> r = getLocalBounds().withSizeKeepingCentre(windowWidth, windowHeight);
+ juce::Rectangle<int> r = getLocalBounds().withSizeKeepingCentre(windowWidth, windowHeight);
 	g.setColour(PANEL_COLOR);
 	g.fillRoundedRectangle(r.toFloat(), 2);
 	g.setColour(PANEL_COLOR.brighter(.2f));
@@ -40,7 +40,7 @@ void ProgressWindow::paint(Graphics & g)
 
 void ProgressWindow::resized()
 {
-	Rectangle<int> r = getLocalBounds().withSizeKeepingCentre(windowWidth, windowHeight).reduced(5);
+ juce::Rectangle<int> r = getLocalBounds().withSizeKeepingCentre(windowWidth, windowHeight).reduced(5);
 	titleLabel.setBounds(r.removeFromTop(15));
 	r.removeFromTop(20);
 	progressUI->setBounds(r.removeFromTop(20));

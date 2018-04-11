@@ -33,10 +33,10 @@ public:
 
 	ScopedPointer<InspectableEditor> paramsEditor;
 
-	Rectangle<int> statusBounds;
+ juce::Rectangle<int> statusBounds;
 
 	void paint(Graphics &g) override;
-	void resizedInternalHeaderItemInternal(Rectangle<int> &r) override;
+	void resizedInternalHeaderItemInternal(juce::Rectangle<int> &r) override;
 	void newMessage(const Script::ScriptEvent &e) override;
 
 	void buttonClicked(Button * b) override;

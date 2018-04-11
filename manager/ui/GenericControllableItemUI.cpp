@@ -22,12 +22,12 @@ GenericControllableItemUI::~GenericControllableItemUI()
 {
 }
 
-void GenericControllableItemUI::resizedInternalHeader(Rectangle<int>& r)
+void GenericControllableItemUI::resizedInternalHeader(juce::Rectangle<int>& r)
 {
 	
 }
 
-void GenericControllableItemUI::resizedInternalContent(Rectangle<int>& r)
+void GenericControllableItemUI::resizedInternalContent(juce::Rectangle<int>& r)
 {
 	
 	r.setHeight(cui->getHeight());

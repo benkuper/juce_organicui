@@ -23,7 +23,7 @@ DashboardPanelUI::~DashboardPanelUI()
 }
 
 
-void DashboardPanelUI::resizedInternalContent(Rectangle<int>& r)
+void DashboardPanelUI::resizedInternalContent(juce::Rectangle<int>& r)
 {
 	managerUI.setBounds(r);
 }

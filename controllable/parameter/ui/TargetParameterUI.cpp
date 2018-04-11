@@ -63,7 +63,7 @@ void TargetParameterUI::paint(Graphics & g)
 
 void TargetParameterUI::resized()
 {
-	Rectangle<int> r = getLocalBounds();
+ juce::Rectangle<int> r = getLocalBounds();
 	if (listeningToNextChangeBT != nullptr)
 	{
 		listeningToNextChangeBT->setBounds(r.removeFromRight(100));

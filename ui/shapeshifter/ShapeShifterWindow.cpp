@@ -8,7 +8,7 @@
   ==============================================================================
 */
 
-ShapeShifterWindow::ShapeShifterWindow(ShapeShifterPanel * _panel, Rectangle<int> bounds) :
+ShapeShifterWindow::ShapeShifterWindow(ShapeShifterPanel * _panel, juce::Rectangle<int> bounds) :
 	ResizableWindow(_panel->currentContent->contentName, true),
 panel(_panel),
 checking(false),

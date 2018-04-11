@@ -14,6 +14,7 @@
 #pragma warning( disable : 4505 )
 
 //keep
+using namespace juce;
 
 namespace LookAndFeelHelpers {
 
@@ -168,13 +169,13 @@ namespace LookAndFeelHelpers {
 
 
 	
-    static inline Colour createBaseColour(Colour buttonColour,
+    static inline juce::Colour createBaseColour(juce::Colour buttonColour,
         bool hasKeyboardFocus,
         bool isMouseOverButton,
         bool isButtonDown) noexcept
     {
         const float sat = hasKeyboardFocus ? 1.3f : 0.9f;
-        const Colour baseColour(buttonColour.withMultipliedSaturation(sat));
+        const juce::Colour baseColour(buttonColour.withMultipliedSaturation(sat));
 
         if (isButtonDown)      return baseColour.contrasting(0.2f);
         if (isMouseOverButton) return baseColour.contrasting(0.1f);
@@ -182,7 +183,7 @@ namespace LookAndFeelHelpers {
         return baseColour;
     }
 
-    static inline TextLayout layoutTooltipText(const String& text, Colour colour) noexcept
+    static inline TextLayout layoutTooltipText(const String& text, juce::Colour colour) noexcept
     {
         const float tooltipFontSize = 13.0f;
         const int maxToolTipWidth = 400;
@@ -233,7 +234,7 @@ public:
                                     AlertWindow::AlertIconType iconType,
                                     int numButtons, Component* associatedComponent) override;
 
-    void drawAlertBox (Graphics&, AlertWindow&, const Rectangle<int>& textArea, TextLayout&) override;
+    void drawAlertBox (Graphics&, AlertWindow&, const juce::Rectangle<int>& textArea, TextLayout&) override;
     int getAlertBoxWindowFlags() override;
 
 
@@ -291,7 +292,7 @@ public:
     Path getCrossShape (float height) override;
 
     //==============================================================================
-    void drawTreeviewPlusMinusBox (Graphics&, const Rectangle<float>& area,
+    void drawTreeviewPlusMinusBox (Graphics&, const juce::Rectangle<float>& area,
                                    Colour backgroundColour, bool isOpen, bool isMouseOver) override;
     bool areLinesDrawnForTreeView (TreeView&) override;
     int getTreeViewIndentSize (TreeView&) override;
@@ -317,7 +318,7 @@ public:
                                      Button* goUpButton) override;
 
     //==============================================================================
-    void drawBubble (Graphics&, BubbleComponent&, const Point<float>& tip, const Rectangle<float>& body) override;
+    void drawBubble (Graphics&, BubbleComponent&, const Point<float>& tip, const juce::Rectangle<float>& body) override;
 
     void drawLasso (Graphics&, Component&) override;
 
@@ -326,12 +327,12 @@ public:
 	void preparePopupMenuWindow (Component& newWindow) override ;
     void drawPopupMenuBackground (Graphics&, int width, int height) override;
 
-    void drawPopupMenuItem (Graphics&, const Rectangle<int>& area,
+    void drawPopupMenuItem (Graphics&, const juce::Rectangle<int>& area,
                             bool isSeparator, bool isActive, bool isHighlighted, bool isTicked, bool hasSubMenu,
                             const String& text, const String& shortcutKeyText,
                             const Drawable* icon, const Colour* textColour) override;
 
-    void drawPopupMenuSectionHeader (Graphics&, const Rectangle<int>& area,
+    void drawPopupMenuSectionHeader (Graphics&, const juce::Rectangle<int>& area,
                                      const String& sectionName) override;
 
     Font getPopupMenuFont() override;
@@ -391,7 +392,7 @@ public:
     Slider::SliderLayout getSliderLayout (Slider&) override;
 
     //==============================================================================
-    Rectangle<int> getTooltipBounds (const String& tipText, Point<int> screenPos, Rectangle<int> parentArea) override;
+    juce::Rectangle<int> getTooltipBounds (const String& tipText, Point<int> screenPos, juce::Rectangle<int> parentArea) override;
     void drawTooltip (Graphics&, const String& text, int width, int height) override;
 
     //==============================================================================
@@ -399,7 +400,7 @@ public:
     void layoutFilenameComponent (FilenameComponent&, ComboBox* filenameBox, Button* browseButton) override;
 
     //==============================================================================
-    void drawConcertinaPanelHeader (Graphics&, const Rectangle<int>& area,
+    void drawConcertinaPanelHeader (Graphics&, const juce::Rectangle<int>& area,
                                     bool isMouseOver, bool isMouseDown,
                                     ConcertinaPanel&, Component& panel) override;
 
@@ -440,7 +441,7 @@ public:
     int getTabButtonSpaceAroundImage() override;
     int getTabButtonOverlap (int tabDepth) override;
     int getTabButtonBestWidth (TabBarButton&, int tabDepth) override;
-    Rectangle<int> getTabButtonExtraComponentBounds (const TabBarButton&, Rectangle<int>& textArea, Component& extraComp) override;
+    juce::Rectangle<int> getTabButtonExtraComponentBounds (const TabBarButton&, juce::Rectangle<int>& textArea, Component& extraComp) override;
 
     void drawTabButton (TabBarButton&, Graphics&, bool isMouseOver, bool isMouseDown) override;
     void drawTabButtonText (TabBarButton&, Graphics&, bool isMouseOver, bool isMouseDown) override;
@@ -479,7 +480,7 @@ public:
     void drawPropertyPanelSectionHeader (Graphics&, const String& name, bool isOpen, int width, int height) override;
     void drawPropertyComponentBackground (Graphics&, int width, int height, PropertyComponent&) override;
     void drawPropertyComponentLabel (Graphics&, int width, int height, PropertyComponent&) override;
-    Rectangle<int> getPropertyComponentContentPosition (PropertyComponent&) override;
+    juce::Rectangle<int> getPropertyComponentContentPosition (PropertyComponent&) override;
 
     //==============================================================================
     void drawCallOutBoxBackground (CallOutBox&, Graphics&, const Path& path, Image& cachedImage) override;

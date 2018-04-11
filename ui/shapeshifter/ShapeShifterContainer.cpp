@@ -220,7 +220,7 @@ void ShapeShifterContainer::resized()
 
 
 
-	Rectangle<int> r = getLocalBounds();
+ juce::Rectangle<int> r = getLocalBounds();
 	int index = 0;
 	for (auto &p : shifters)
 	{
@@ -231,7 +231,7 @@ void ShapeShifterContainer::resized()
 
 		if (!isLastShifter)
 		{
-			Rectangle<int> gr = (direction == HORIZONTAL) ? r.removeFromLeft(gap) : r.removeFromTop(gap);
+		 juce::Rectangle<int> gr = (direction == HORIZONTAL) ? r.removeFromLeft(gap) : r.removeFromTop(gap);
 			grabbers[index]->setBounds(gr);
 		}
 
@@ -322,7 +322,7 @@ void ShapeShifterContainer::grabberGrabUpdate(GapGrabber * gg, int dist)
 
 void ShapeShifterContainer::panelDetach(ShapeShifterPanel * panel)
 {
-	Rectangle<int> panelBounds = panel->getScreenBounds();
+ juce::Rectangle<int> panelBounds = panel->getScreenBounds();
 	removeShifter(panel, false);
 	ShapeShifterManager::getInstance()->showPanelWindow(panel, panelBounds);
 }

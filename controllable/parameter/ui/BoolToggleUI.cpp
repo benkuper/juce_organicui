@@ -46,10 +46,10 @@ void BoolToggleUI::paint(Graphics & g)
 	bool valCheck = invertVisuals ? !parameter->boolValue():parameter->boolValue();
 	Image m = valCheck ? onImage : offImage;
 	
-	Rectangle<int> r = getLocalBounds();
+ juce::Rectangle<int> r = getLocalBounds();
 	g.setColour(Colours::white.withAlpha(isMouseOver() ? 1 : .8f));
 
-	Rectangle<int> cr;
+ juce::Rectangle<int> cr;
 	if (showLabel)
 	{
 		cr = r.removeFromRight(r.getHeight());

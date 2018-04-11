@@ -21,7 +21,7 @@ public:
 	Image offImage;
 	Image onImage;
 
-	Rectangle<int> drawRect;
+ juce::Rectangle<int> drawRect;
 
     bool invertVisuals;
 

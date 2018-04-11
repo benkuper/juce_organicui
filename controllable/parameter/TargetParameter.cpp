@@ -135,7 +135,8 @@ void TargetParameter::setTarget(WeakReference<ControllableContainer> cc)
 
 void TargetParameter::childStructureChanged(ControllableContainer * cc)
 {
-	
+	if (Engine::mainEngine->isClearing) return;
+
 	if (targetType == CONTROLLABLE)
 	{
 		if (target == nullptr)
@@ -147,7 +148,6 @@ void TargetParameter::childStructureChanged(ControllableContainer * cc)
 			}
 		} else
 		{
-			DBG("Child structure changed ! " << target->getControlAddress());
 			setValueFromTarget(target);
 		}
 	} else if (targetType == CONTAINER)

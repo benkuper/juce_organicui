@@ -70,7 +70,7 @@ void ControllableEditor::setShowLabel(bool value)
 
 void ControllableEditor::resized()
 {
-	Rectangle<int> r = getLocalBounds();
+ juce::Rectangle<int> r = getLocalBounds();
 	r.removeFromBottom(subContentHeight);// .withHeight(16);
 
 	int controlSpace = jmax<int>(showLabel?getWidth()*.6f:getWidth(), 100);

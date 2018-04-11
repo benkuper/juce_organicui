@@ -18,7 +18,7 @@ class ShapeShifterWindow :
 	public ShapeShifterPanel::Listener
 {
 public:
-	ShapeShifterWindow(ShapeShifterPanel * _panel, Rectangle<int> bounds);
+	ShapeShifterWindow(ShapeShifterPanel * _panel, juce::Rectangle<int> bounds);
 	~ShapeShifterWindow();
 
 	enum DragMode {NONE, TAB, PANEL};

@@ -52,7 +52,7 @@ void FloatSliderUI::paint(Graphics & g)
 	Colour baseColour = useCustomColor ? customColor : ((parameter->isEditable && !parameter->isControllableFeedbackOnly && !forceFeedbackOnly)? PARAMETER_FRONT_COLOR : FEEDBACK_COLOR);
     Colour c = (isMouseButtonDown() && changeParamOnMouseUpOnly) ? HIGHLIGHT_COLOR : baseColour;
 
-    Rectangle<int> sliderBounds = getLocalBounds();
+    juce::Rectangle<int> sliderBounds = getLocalBounds();
 
 
     float normalizedValue = getParamNormalizedValue();
@@ -78,15 +78,15 @@ void FloatSliderUI::paint(Graphics & g)
 		g.setColour(Colours::grey);
 
         sliderBounds = getLocalBounds();
-        Rectangle<int> destRect;
+		juce::Rectangle<int> destRect;
 
         if(orientation == VERTICAL){
-            //destRect = Rectangle<int>(0, 0, 100, 100);
+            //destRect = juce::Rectangle<int>(0, 0, 100, 100);
             juce::AffineTransform at;
             at = at.rotated((float)(-double_Pi / 2.0f));// , sliderBounds.getCentreX(), sliderBounds.getCentreY());
             at = at.translated(0.f,(float)sliderBounds.getHeight());
             g.addTransform(at);
-            destRect = Rectangle<int>(0, 0, sliderBounds.getHeight(), sliderBounds.getWidth()).withSizeKeepingCentre(sliderBounds.getHeight(), 10);
+            destRect = juce::Rectangle<int>(0, 0, sliderBounds.getHeight(), sliderBounds.getWidth()).withSizeKeepingCentre(sliderBounds.getHeight(), 10);
         }else
         {
             destRect = sliderBounds.withSizeKeepingCentre(sliderBounds.getWidth(), getHeight());

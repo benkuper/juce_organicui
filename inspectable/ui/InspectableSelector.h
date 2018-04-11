@@ -25,7 +25,7 @@ public:
 	Array<Component *> selectables;
 	Array<Inspectable * > inspectables;
 
-	Rectangle<int> selectionBounds;
+ juce::Rectangle<int> selectionBounds;
 
 	//memory of current Selection
 	InspectableSelectionManager * currentSelectionManager;

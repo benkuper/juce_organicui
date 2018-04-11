@@ -21,8 +21,8 @@ GapGrabber::~GapGrabber()
 void GapGrabber::paint(Graphics & g)
 {
 	int grabberSize = 100;
-	Rectangle<int> r = getLocalBounds().reduced(2);
-	Rectangle<int> tr = (direction == Direction::HORIZONTAL) ? r.withHeight(grabberSize) : r.withWidth(grabberSize);
+ juce::Rectangle<int> r = getLocalBounds().reduced(2);
+ juce::Rectangle<int> tr = (direction == Direction::HORIZONTAL) ? r.withHeight(grabberSize) : r.withWidth(grabberSize);
 	tr.setCentre(r.getCentre());
 	Colour c = BG_COLOR.brighter(.1f);
 	if (isMouseOver()) c = HIGHLIGHT_COLOR;

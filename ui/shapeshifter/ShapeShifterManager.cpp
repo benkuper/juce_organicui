@@ -35,7 +35,6 @@ void ShapeShifterManager::setLayoutInformations(const String & _appLayoutExtensi
 {
 	appLayoutExtension = _appLayoutExtension;
 	appSubFolder = appSubLayoutFolder;
-	
 }
 
 void ShapeShifterManager::setCurrentCandidatePanel(ShapeShifterPanel * panel)
@@ -86,7 +85,7 @@ void ShapeShifterManager::removePanel(ShapeShifterPanel * panel)
 	openedPanels.removeObject(panel, true);
 }
 
-ShapeShifterWindow * ShapeShifterManager::showPanelWindow(ShapeShifterPanel * _panel, Rectangle<int> bounds)
+ShapeShifterWindow * ShapeShifterManager::showPanelWindow(ShapeShifterPanel * _panel, juce::Rectangle<int> bounds)
 {
 	ShapeShifterWindow * w = new ShapeShifterWindow(_panel,bounds);
 	openedWindows.add(w);
@@ -101,7 +100,7 @@ ShapeShifterWindow * ShapeShifterManager::showPanelWindowForContent(const String
 	if (c == nullptr) return nullptr;
 
 	ShapeShifterPanel * newP = createPanel(c);
-	Rectangle<int> r(100,100,300, 500);
+ juce::Rectangle<int> r(100,100,300, 500);
 	ShapeShifterWindow * w = showPanelWindow(newP, r);
 	return w;
 }
@@ -129,7 +128,7 @@ void ShapeShifterManager::showContent(String contentName)
 			mainContainer.insertPanelAt(newP, 0);
 		} else
 		{
-			Rectangle<int> r(100,100,300, 500);
+		 juce::Rectangle<int> r(100,100,300, 500);
 			showPanelWindow(newP, r);
 		}
 	}
@@ -215,7 +214,7 @@ void ShapeShifterManager::loadLayout(var layout)
 			ScopedPointer<DynamicObject> d = wd.getDynamicObject();
 			ShapeShifterPanel * p = createPanel(nullptr);
 			p->loadLayout(d->getProperty("panel"));
-			Rectangle<int> bounds(d->getProperty("x"),d->getProperty("y"),d->getProperty("width"),d->getProperty("height"));
+		 juce::Rectangle<int> bounds(d->getProperty("x"),d->getProperty("y"),d->getProperty("width"),d->getProperty("height"));
 			showPanelWindow(p,bounds);
 		}
 	}

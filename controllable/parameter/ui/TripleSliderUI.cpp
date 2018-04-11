@@ -57,7 +57,7 @@ void TripleSliderUI::setForceFeedbackOnlyInternal()
 
 void TripleSliderUI::resized()
 {
-	Rectangle<int> r = getLocalBounds();
+ juce::Rectangle<int> r = getLocalBounds();
 	xSlider.setBounds(r.removeFromLeft(r.getWidth() / 3 - 2));
 	ySlider.setBounds(r.removeFromLeft(r.getWidth() /2 - 4));
 	zSlider.setBounds(r.removeFromRight(r.getWidth() - 4));

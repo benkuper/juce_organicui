@@ -81,13 +81,13 @@ void StringParameterUI::setForceFeedbackOnlyInternal()
 
 void StringParameterUI::resized()
 {
-    Rectangle<int> r = getLocalBounds();
+	juce::Rectangle<int> r = getLocalBounds();
 	resizedInternal(r);
 	valueLabel.setBounds(r);
 	valueLabel.setFont(valueLabel.getFont().withHeight(jmin<float>((float)r.getHeight(), maxFontHeight)));
 }
 
-void StringParameterUI::resizedInternal(Rectangle<int>& r)
+void StringParameterUI::resizedInternal(juce::Rectangle<int>& r)
 {
 	//to be overriden
 }
@@ -130,7 +130,7 @@ StringParameterFileUI::~StringParameterFileUI()
 {
 }
 
-void StringParameterFileUI::resizedInternal(Rectangle<int> &r)
+void StringParameterFileUI::resizedInternal(juce::Rectangle<int> &r)
 {
 	relativeBT->setBounds(r.removeFromRight(r.getHeight()));
 	r.removeFromRight(2);

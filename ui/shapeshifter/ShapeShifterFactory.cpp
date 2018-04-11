@@ -16,4 +16,5 @@ ShapeShifterFactory::ShapeShifterFactory()
 	defs.add(new ShapeShifterDefinition("Outliner", &Outliner::create));
 	defs.add(new ShapeShifterDefinition("Dashboard", &DashboardManagerView::create));
 	defs.add(new ShapeShifterDefinition("Logger", &CustomLoggerUI::create));
+	defs.add(new ShapeShifterDefinition("Help", &HelpPanel::create));
 }

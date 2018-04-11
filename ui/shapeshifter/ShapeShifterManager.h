@@ -49,7 +49,7 @@ public:
 	ShapeShifterPanel * createPanel(ShapeShifterContent * content, ShapeShifterPanelTab * sourceTab = nullptr);
 	void removePanel(ShapeShifterPanel * panel);
 
-	ShapeShifterWindow * showPanelWindow(ShapeShifterPanel * _panel, Rectangle<int> bounds);
+	ShapeShifterWindow * showPanelWindow(ShapeShifterPanel * _panel, juce::Rectangle<int> bounds);
 	ShapeShifterWindow * showPanelWindowForContent(const String &panelName);
 	void showContent(String contentName);
 	

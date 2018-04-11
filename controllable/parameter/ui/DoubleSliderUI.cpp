@@ -53,7 +53,7 @@ void DoubleSliderUI::mouseUpInternal(const MouseEvent &)
 
 void DoubleSliderUI::resized()
 {
-	Rectangle<int> r = getLocalBounds();
+ juce::Rectangle<int> r = getLocalBounds();
 	xSlider.setBounds(r.removeFromLeft(r.getWidth() / 2 - 5));
 	ySlider.setBounds(r.removeFromRight(r.getWidth() - 10));
 }

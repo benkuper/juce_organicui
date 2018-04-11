@@ -249,7 +249,7 @@ AlertWindow* LookAndFeelOO::createAlertWindow (const String& title, const String
 }
 
 void LookAndFeelOO::drawAlertBox (Graphics& g, AlertWindow& alert,
-                                   const Rectangle<int>& textArea, TextLayout& textLayout)
+                                   const juce::Rectangle<int>& textArea, TextLayout& textLayout)
 {
     g.fillAll (alert.findColour (AlertWindow::backgroundColourId));
 
@@ -261,7 +261,7 @@ void LookAndFeelOO::drawAlertBox (Graphics& g, AlertWindow& alert,
     if (alert.containsAnyExtraComponents() || alert.getNumButtons() > 2)
         iconSize = jmin (iconSize, textArea.getHeight() + 50);
 
-    const Rectangle<int> iconRect (iconSize / -10, iconSize / -10,
+    const juce::Rectangle<int> iconRect (iconSize / -10, iconSize / -10,
                                    iconSize, iconSize);
 
     if (alert.getAlertType() != AlertWindow::NoIcon)
@@ -306,7 +306,7 @@ void LookAndFeelOO::drawAlertBox (Graphics& g, AlertWindow& alert,
 
     g.setColour (alert.findColour (AlertWindow::textColourId));
 
-    textLayout.draw (g, Rectangle<int> (textArea.getX() + iconSpaceUsed,
+    textLayout.draw (g, juce::Rectangle<int> (textArea.getX() + iconSpaceUsed,
                                         textArea.getY(),
                                         textArea.getWidth() - iconSpaceUsed,
                                         textArea.getHeight()).toFloat());
@@ -483,7 +483,7 @@ void LookAndFeelOO::drawScrollbar (Graphics& g,
 
 	float roundFactor = isScrollbarVertical ? width / 2.f : height / 2.f;
 
-	Rectangle<int> r = Rectangle<int>(x, y, width, height).reduced(2);
+	juce::Rectangle<int> r = juce::Rectangle<int>(x, y, width, height).reduced(2);
 
 	g.setColour(bgColour);
 	g.fillRoundedRectangle(r.toFloat(), roundFactor);
@@ -663,7 +663,7 @@ Path LookAndFeelOO::getCrossShape (const float height)
 }
 
 //==============================================================================
-void LookAndFeelOO::drawTreeviewPlusMinusBox (Graphics& g, const Rectangle<float>& area,
+void LookAndFeelOO::drawTreeviewPlusMinusBox (Graphics& g, const juce::Rectangle<float>& area,
                                                Colour /*backgroundColour*/, bool isOpen, bool /*isMouseOver*/)
 {
     const int boxSize = roundToInt (jmin (16.0f, area.getWidth(), area.getHeight()) * 0.7f) | 1;
@@ -700,10 +700,10 @@ int LookAndFeelOO::getTreeViewIndentSize (TreeView&)
 
 //==============================================================================
 void LookAndFeelOO::drawBubble (Graphics& g, BubbleComponent& comp,
-                                 const Point<float>& tip, const Rectangle<float>& body)
+                                 const Point<float>& tip, const juce::Rectangle<float>& body)
 {
     Path p;
-    p.addBubble (body.reduced (0.5f), body.getUnion (Rectangle<float> (tip.x, tip.y, 1.0f, 1.0f)),
+    p.addBubble (body.reduced (0.5f), body.getUnion(juce::Rectangle<float> (tip.x, tip.y, 1.0f, 1.0f)),
                  tip, 5.0f, jmin (15.0f, body.getWidth() * 0.2f, body.getHeight() * 0.2f));
 
     g.setColour (comp.findColour (BubbleComponent::backgroundColourId));
@@ -786,16 +786,16 @@ void LookAndFeelOO::drawPopupMenuUpDownArrow (Graphics& g, int width, int height
     g.fillPath (p);
 }
 
-void LookAndFeelOO::drawPopupMenuItem (Graphics& g, const Rectangle<int>& area,
+void LookAndFeelOO::drawPopupMenuItem (Graphics& g, const juce::Rectangle<int>& area,
                                         const bool isSeparator, const bool isActive,
                                         const bool isHighlighted, const bool isTicked,
                                         const bool hasSubMenu, const String& text,
                                         const String& shortcutKeyText,
-                                        const Drawable* icon, const Colour* const textColourToUse)
+                                        const  juce::Drawable* icon, const Colour* const textColourToUse)
 {
     if (isSeparator)
     {
-        Rectangle<int> r (area.reduced (5, 0));
+		juce::Rectangle<int> r (area.reduced (5, 0));
         r.removeFromTop (r.getHeight() / 2 - 1);
 
         g.setColour (Colour (0x33000000));
@@ -806,12 +806,12 @@ void LookAndFeelOO::drawPopupMenuItem (Graphics& g, const Rectangle<int>& area,
     }
     else
     {
-        Colour textColour (findColour (PopupMenu::textColourId));
+         juce::Colour textColour (findColour (PopupMenu::textColourId));
 
         if (textColourToUse != nullptr)
             textColour = *textColourToUse;
 
-        Rectangle<int> r (area.reduced (1));
+		juce::Rectangle<int> r (area.reduced (1));
 
         if (isHighlighted)
         {
@@ -837,7 +837,7 @@ void LookAndFeelOO::drawPopupMenuItem (Graphics& g, const Rectangle<int>& area,
 
         g.setFont (font);
 
-        Rectangle<float> iconArea (r.removeFromLeft ((r.getHeight() * 5) / 4).reduced (3).toFloat());
+        juce::Rectangle<float> iconArea (r.removeFromLeft ((r.getHeight() * 5) / 4).reduced (3).toFloat());
 
         if (icon != nullptr)
         {
@@ -879,7 +879,7 @@ void LookAndFeelOO::drawPopupMenuItem (Graphics& g, const Rectangle<int>& area,
     }
 }
 
-void LookAndFeelOO::drawPopupMenuSectionHeader (Graphics& g, const Rectangle<int>& area, const String& sectionName)
+void LookAndFeelOO::drawPopupMenuSectionHeader (Graphics& g, const juce::Rectangle<int>& area, const String& sectionName)
 {
     g.setFont (getPopupMenuFont().boldened());
     g.setColour (findColour (PopupMenu::headerTextColourId));
@@ -1078,7 +1078,7 @@ void LookAndFeelOO::drawLabel (Graphics& g, Label& label)
         g.setColour (label.findColour (Label::textColourId).withMultipliedAlpha (alpha));
         g.setFont (font);
 
-        Rectangle<int> textArea (label.getBorderSize().subtractedFrom (label.getLocalBounds()));
+		juce::Rectangle<int> textArea (label.getBorderSize().subtractedFrom (label.getLocalBounds()));
 
         g.drawFittedText (label.getText(), textArea, label.getJustificationType(),
                           jmax (1, (int) (textArea.getHeight() / font.getHeight())),
@@ -1396,7 +1396,7 @@ Slider::SliderLayout LookAndFeelOO::getSliderLayout (Slider& slider)
     else
         minYSpace = 15;
 
-    Rectangle<int> localBounds = slider.getLocalBounds();
+	juce::Rectangle<int> localBounds = slider.getLocalBounds();
 
     const int textBoxWidth = jmax (0, jmin (slider.getTextBoxWidth(),  localBounds.getWidth() - minXSpace));
     const int textBoxHeight = jmax (0, jmin (slider.getTextBoxHeight(), localBounds.getHeight() - minYSpace));
@@ -1451,14 +1451,14 @@ Slider::SliderLayout LookAndFeelOO::getSliderLayout (Slider& slider)
 }
 
 //==============================================================================
-Rectangle<int> LookAndFeelOO::getTooltipBounds (const String& tipText, Point<int> screenPos, Rectangle<int> parentArea)
+juce::Rectangle<int> LookAndFeelOO::getTooltipBounds (const String& tipText, Point<int> screenPos, juce::Rectangle<int> parentArea)
 {
     const TextLayout tl (LookAndFeelHelpers::layoutTooltipText (tipText, Colours::black));
 
     const int w = (int) (tl.getWidth() + 14.0f);
     const int h = (int) (tl.getHeight() + 6.0f);
 
-    return Rectangle<int> (screenPos.x > parentArea.getCentreX() ? screenPos.x - (w + 12) : screenPos.x + 24,
+    return juce::Rectangle<int> (screenPos.x > parentArea.getCentreX() ? screenPos.x - (w + 12) : screenPos.x + 24,
                            screenPos.y > parentArea.getCentreY() ? screenPos.y - (h + 6)  : screenPos.y + 6,
                            w, h)
     .constrainedWithin (parentArea);
@@ -1474,7 +1474,7 @@ void LookAndFeelOO::drawTooltip (Graphics& g, const String& text, int width, int
 #endif
 
     LookAndFeelHelpers::layoutTooltipText (text, findColour (TooltipWindow::textColourId))
-    .draw (g, Rectangle<float> ((float) width, (float) height));
+    .draw (g, juce::Rectangle<float> ((float) width, (float) height));
 }
 
 //==============================================================================
@@ -1497,7 +1497,7 @@ void LookAndFeelOO::layoutFilenameComponent (FilenameComponent& filenameComp,
 }
 
 //==============================================================================
-void LookAndFeelOO::drawConcertinaPanelHeader (Graphics& g, const Rectangle<int>& area,
+void LookAndFeelOO::drawConcertinaPanelHeader (Graphics& g, const juce::Rectangle<int>& area,
                                                 bool isMouseOver, bool /*isMouseDown*/,
                                                 ConcertinaPanel&, Component& panel)
 {
@@ -1522,7 +1522,7 @@ void LookAndFeelOO::drawImageButton (Graphics& g, Image* image,
 
     AffineTransform t = RectanglePlacement (RectanglePlacement::stretchToFit)
     .getTransformToFit (image->getBounds().toFloat(),
-                        Rectangle<int> (imageX, imageY, imageW, imageH).toFloat());
+		juce::Rectangle<int> (imageX, imageY, imageW, imageH).toFloat());
 
     if (! overlayColour.isOpaque())
     {
@@ -1569,8 +1569,8 @@ void LookAndFeelOO::drawResizableFrame (Graphics& g, int w, int h, const BorderS
 {
     if (! border.isEmpty())
     {
-        const Rectangle<int> fullSize (0, 0, w, h);
-        const Rectangle<int> centreArea (border.subtractedFrom (fullSize));
+        const juce::Rectangle<int> fullSize (0, 0, w, h);
+        const juce::Rectangle<int> centreArea (border.subtractedFrom (fullSize));
 
         g.saveState();
 
@@ -1906,10 +1906,9 @@ int LookAndFeelOO::getTabButtonBestWidth (TabBarButton& button, int tabDepth)
 
     return jlimit (tabDepth * 2, tabDepth * 8, width);
 }
-
-Rectangle<int> LookAndFeelOO::getTabButtonExtraComponentBounds (const TabBarButton& button, Rectangle<int>& textArea, Component& comp)
+ juce::Rectangle<int> LookAndFeelOO::getTabButtonExtraComponentBounds (const TabBarButton& button, juce::Rectangle<int>& textArea, Component& comp)
 {
-    Rectangle<int> extraComp;
+	juce::Rectangle<int> extraComp;
 
     const TabbedButtonBar::Orientation orientation = button.getTabbedButtonBar().getOrientation();
 
@@ -1941,7 +1940,7 @@ Rectangle<int> LookAndFeelOO::getTabButtonExtraComponentBounds (const TabBarButt
 
 void LookAndFeelOO::createTabButtonShape (TabBarButton& button, Path& p, bool /*isMouseOver*/, bool /*isMouseDown*/)
 {
-    const Rectangle<int> activeArea (button.getActiveArea());
+    const juce::Rectangle<int> activeArea (button.getActiveArea());
     const float w = (float) activeArea.getWidth();
     const float h = (float) activeArea.getHeight();
 
@@ -2018,7 +2017,7 @@ void LookAndFeelOO::fillTabButtonShape (TabBarButton& button, Graphics& g, const
 
 void LookAndFeelOO::drawTabButtonText (TabBarButton& button, Graphics& g, bool isMouseOver, bool isMouseDown)
 {
-    const Rectangle<float> area (button.getTextArea().toFloat());
+    const juce::Rectangle<float> area (button.getTextArea().toFloat());
 
     float length = area.getWidth();
     float depth  = area.getHeight();
@@ -2068,7 +2067,7 @@ void LookAndFeelOO::drawTabButton (TabBarButton& button, Graphics& g, bool isMou
     Path tabShape;
     createTabButtonShape (button, tabShape, isMouseOver, isMouseDown);
 
-    const Rectangle<int> activeArea (button.getActiveArea());
+    const juce::Rectangle<int> activeArea (button.getActiveArea());
     tabShape.applyTransform (AffineTransform::translation ((float) activeArea.getX(),
                                                            (float) activeArea.getY()));
 
@@ -2084,7 +2083,7 @@ void LookAndFeelOO::drawTabAreaBehindFrontButton (TabbedButtonBar& bar, Graphics
 {
     const float shadowSize = 0.2f;
 
-    Rectangle<int> shadowRect, line;
+	juce::Rectangle<int> shadowRect, line;
     ColourGradient gradient (Colours::black.withAlpha (bar.isEnabled() ? 0.25f : 0.15f), 0, 0,
                              Colours::transparentBlack, 0, 0, false);
 
@@ -2170,7 +2169,7 @@ void LookAndFeelOO::drawTableHeaderBackground (Graphics& g, TableHeaderComponent
 {
     g.fillAll (Colours::white);
 
-    Rectangle<int> area (header.getLocalBounds());
+	juce::Rectangle<int> area (header.getLocalBounds());
     area.removeFromTop (area.getHeight() / 2);
 
 	g.fillAll(BG_COLOR);
@@ -2192,7 +2191,7 @@ void LookAndFeelOO::drawTableHeaderBackground (Graphics& g, TableHeaderComponent
 
 void LookAndFeelOO::drawTableHeaderColumn(Graphics & g, TableHeaderComponent &, const String & columnName, int columnId, int width, int height, bool isMouseOver, bool isMouseDown, int columnFlags)
 {
-	Rectangle<int> area(width, height);
+ juce::Rectangle<int> area(width, height);
 
 	Colour c = BG_COLOR.brighter(isMouseDown?.8f:(isMouseOver ? .6f : .3f));
 	g.setColour(c);
@@ -2277,7 +2276,7 @@ void LookAndFeelOO::drawPropertyPanelSectionHeader (Graphics& g, const String& n
     const float buttonSize = height * 0.75f;
     const float buttonIndent = (height - buttonSize) * 0.5f;
 
-    drawTreeviewPlusMinusBox (g, Rectangle<float> (buttonIndent, buttonIndent, buttonSize, buttonSize), Colours::white, isOpen, false);
+    drawTreeviewPlusMinusBox (g, juce::Rectangle<float> (buttonIndent, buttonIndent, buttonSize, buttonSize), Colours::white, isOpen, false);
 
     const int textX = (int) (buttonIndent * 2.0f + buttonSize + 2.0f);
 
@@ -2299,17 +2298,16 @@ void LookAndFeelOO::drawPropertyComponentLabel (Graphics& g, int, int height, Pr
 
     g.setFont (jmin (height, 24) * 0.65f);
 
-    const Rectangle<int> r (getPropertyComponentContentPosition (component));
+    const juce::Rectangle<int> r (getPropertyComponentContentPosition (component));
 
     g.drawFittedText (component.getName(),
                       3, r.getY(), r.getX() - 5, r.getHeight(),
                       Justification::centredLeft, 2);
 }
-
-Rectangle<int> LookAndFeelOO::getPropertyComponentContentPosition (PropertyComponent& component)
+ juce::Rectangle<int> LookAndFeelOO::getPropertyComponentContentPosition (PropertyComponent& component)
 {
     const int textW = jmin (200, component.getWidth() / 3);
-    return Rectangle<int> (textW, 1, component.getWidth() - textW - 1, component.getHeight() - 3);
+    return juce::Rectangle<int> (textW, 1, component.getWidth() - textW - 1, component.getHeight() - 3);
 }
 
 //==============================================================================
@@ -2375,7 +2373,7 @@ void LookAndFeelOO::drawFileBrowserRow(Graphics &g, int width, int height, const
     {
         if (const Drawable* d = isDirectory ? getDefaultFolderImage()
             : getDefaultDocumentFileImage())
-            d->drawWithin (g, Rectangle<float> (2.0f, 2.0f, x - 4.0f, height - 4.0f),
+            d->drawWithin (g, juce::Rectangle<float> (2.0f, 2.0f, x - 4.0f, height - 4.0f),
                            RectanglePlacement::centred | RectanglePlacement::onlyReduceInSize, 1.0f);
     }
 
@@ -2544,7 +2542,7 @@ void LookAndFeelOO::drawBevel (Graphics& g, const int x, const int y, const int 
                                 const int bevelThickness, const Colour& topLeftColour, const Colour& bottomRightColour,
                                 const bool useGradient, const bool sharpEdgeOnOutside)
 {
-    if (g.clipRegionIntersects (Rectangle<int> (x, y, width, height)))
+    if (g.clipRegionIntersects(juce::Rectangle<int> (x, y, width, height)))
     {
         LowLevelGraphicsContext& context = g.getInternalContext();
         context.saveState();
@@ -2555,13 +2553,13 @@ void LookAndFeelOO::drawBevel (Graphics& g, const int x, const int y, const int 
             : 1.0f;
 
             context.setFill (topLeftColour.withMultipliedAlpha (op));
-            context.fillRect (Rectangle<int> (x + i, y + i, width - i * 2, 1), false);
+            context.fillRect(juce::Rectangle<int> (x + i, y + i, width - i * 2, 1), false);
             context.setFill (topLeftColour.withMultipliedAlpha (op * 0.75f));
-            context.fillRect (Rectangle<int> (x + i, y + i + 1, 1, height - i * 2 - 2), false);
+            context.fillRect(juce::Rectangle<int> (x + i, y + i + 1, 1, height - i * 2 - 2), false);
             context.setFill (bottomRightColour.withMultipliedAlpha (op));
-            context.fillRect (Rectangle<int> (x + i, y + height - i - 1, width - i * 2, 1), false);
+            context.fillRect(juce::Rectangle<int> (x + i, y + height - i - 1, width - i * 2, 1), false);
             context.setFill (bottomRightColour.withMultipliedAlpha (op  * 0.75f));
-            context.fillRect (Rectangle<int> (x + width - i - 1, y + i + 1, 1, height - i * 2 - 2), false);
+            context.fillRect(juce::Rectangle<int> (x + width - i - 1, y + i + 1, 1, height - i * 2 - 2), false);
         }
 
         context.restoreState();

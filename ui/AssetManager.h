@@ -11,6 +11,7 @@
 #ifndef ASSETMANAGER_H_INCLUDED
 #define ASSETMANAGER_H_INCLUDED
 
+using namespace juce;
 
 class AssetManager
 {

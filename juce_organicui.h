@@ -47,8 +47,8 @@
 #include "juce_gui_extra/juce_gui_extra.h"
 #include "juce_opengl/juce_opengl.h"
 
-
 using namespace juce;
+
 
 
 #include "manager/Factory.h"
@@ -203,5 +203,8 @@ using namespace juce;
 #include "outliner/Outliner.h"
 
 #include "help/HelpPanel.h"
+
+#include "app/OrganicMainComponent.h"
+#include "app/OrganicApplication.h"
 
 #endif   // ORGANIC_UI_H_INCLUDED 

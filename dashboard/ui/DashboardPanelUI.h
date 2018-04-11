@@ -21,7 +21,7 @@ public:
 
 	DashboardItemManagerUI managerUI;
 
-	void resizedInternalContent(Rectangle<int> &r) override;
+	void resizedInternalContent(juce::Rectangle<int> &r) override;
 };
 
 

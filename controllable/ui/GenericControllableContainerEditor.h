@@ -50,15 +50,15 @@ public:
 
 	void paint(Graphics &g) override;
 	void resized() override;
-	virtual void resizedInternal(Rectangle<int> &r);
-	virtual void resizedInternalHeader(Rectangle<int> &r);
-	virtual void resizedInternalContent(Rectangle<int> &r);
+	virtual void resizedInternal(juce::Rectangle<int> &r);
+	virtual void resizedInternalHeader(juce::Rectangle<int> &r);
+	virtual void resizedInternalContent(juce::Rectangle<int> &r);
 	void clear();
 
 	void mouseDown(const MouseEvent &e) override;
 
-	Rectangle<int> getHeaderBounds(); 
-	Rectangle<int> getContentBounds();
+ juce::Rectangle<int> getHeaderBounds(); 
+ juce::Rectangle<int> getContentBounds();
 	
 	bool canBeCollapsed();
 
@@ -94,7 +94,7 @@ public:
 	EnablingControllableContainer * ioContainer;
 	ScopedPointer<BoolImageToggleUI> enabledUI;
 
-	virtual void resizedInternalHeader(Rectangle<int> &r) override;
+	virtual void resizedInternalHeader(juce::Rectangle<int> &r) override;
 	virtual void controllableFeedbackUpdate(Controllable *) override;
 };
 

@@ -23,7 +23,7 @@ public:
 	Controllable * currentControllable;
 	void setControllableUI(Controllable * c);
 
-	void resizedInternalContent(Rectangle<int> &r) override;
+	void resizedInternalContent(juce::Rectangle<int> &r) override;
 
 	void inspectableDestroyed(Inspectable * i) override;
 	void controllableFeedbackUpdateInternal(Controllable * c) override;

@@ -44,7 +44,7 @@ void DashboardItemUI::setControllableUI(Controllable * c)
 	resized();
 }
 
-void DashboardItemUI::resizedInternalContent(Rectangle<int>& r)
+void DashboardItemUI::resizedInternalContent(juce::Rectangle<int>& r)
 {
 	if (targetUI != nullptr) targetUI->setBounds(r);
 }

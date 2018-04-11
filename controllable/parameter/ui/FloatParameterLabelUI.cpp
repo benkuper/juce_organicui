@@ -82,7 +82,7 @@ g.fillAll(Colours::purple.withAlpha(.2f));
 
 void FloatParameterLabelUI::resized()
 {
-	Rectangle<int> r = getLocalBounds();
+ juce::Rectangle<int> r = getLocalBounds();
 	int nameLabelWidth = 100;// nameLabel.getFont().getStringWidth(nameLabel.getText());
 	if (nameLabelIsVisible)
 	{

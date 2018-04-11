@@ -29,7 +29,7 @@ BaseItemEditor::~BaseItemEditor()
 	if (!inspectable.wasObjectDeleted()) item->removeAsyncContainerListener(this);
 }
 
-void BaseItemEditor::resizedInternalHeader(Rectangle<int>& r)
+void BaseItemEditor::resizedInternalHeader(juce::Rectangle<int>& r)
 {
 	if (item->userCanRemove && removeBT != nullptr)
 	{

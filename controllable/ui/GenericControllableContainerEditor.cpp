@@ -100,7 +100,7 @@ void GenericControllableContainerEditor::setCollapsed(bool value, bool force, bo
 	if (!container->editorIsCollapsed)
 	{
 		resetAndBuild();
-		Rectangle<int> r = getLocalBounds();
+	 juce::Rectangle<int> r = getLocalBounds();
 		
 		if (canBeCollapsed())
 		{
@@ -290,7 +290,7 @@ void GenericControllableContainerEditor::paint(Graphics & g)
 	if(!isRoot && !container->hideEditorHeader)
 	{
 		g.setColour(contourColor.withAlpha(.4f));
-		Rectangle<int> r = getLocalBounds();
+	 juce::Rectangle<int> r = getLocalBounds();
 		if (container->editorIsCollapsed && container->editorCanBeCollapsed) r.setHeight(headerHeight);
 		g.fillRoundedRectangle(r.toFloat(), 4);
 	}
@@ -311,20 +311,20 @@ void GenericControllableContainerEditor::paint(Graphics & g)
 
 void GenericControllableContainerEditor::resized()
 {
-	Rectangle<int> r = getLocalBounds();
+ juce::Rectangle<int> r = getLocalBounds();
 	resizedInternal(r);
 	if(!collapseAnimator.isAnimating() && !prepareToAnimate) setSize(getWidth(), (!isRoot && container->editorIsCollapsed)?headerHeight:jmax<int>(r.getY()+2, headerHeight));
 }
 
-void GenericControllableContainerEditor::resizedInternal(Rectangle<int>& r)
+void GenericControllableContainerEditor::resizedInternal(juce::Rectangle<int>& r)
 {
 	if (!container->hideEditorHeader)
 	{
-		Rectangle<int> hr = r.removeFromTop(headerHeight);
+	 juce::Rectangle<int> hr = r.removeFromTop(headerHeight);
 
 		if (canBeCollapsed()) //draw arrow here to have better control in resizedInternalHeader overrides
 		{
-			Rectangle<int> ar = hr.removeFromLeft(headerHeight).reduced(4);
+		 juce::Rectangle<int> ar = hr.removeFromLeft(headerHeight).reduced(4);
 			if (container->editorIsCollapsed) expandBT->setBounds(ar);
 			else collapseBT->setBounds(ar);
 			r.removeFromLeft(2);
@@ -338,13 +338,13 @@ void GenericControllableContainerEditor::resizedInternal(Rectangle<int>& r)
 	if (!canBeCollapsed() || !container->editorIsCollapsed) resizedInternalContent(r);
 }
 
-void GenericControllableContainerEditor::resizedInternalHeader(Rectangle<int>& r)
+void GenericControllableContainerEditor::resizedInternalHeader(juce::Rectangle<int>& r)
 {
 	containerLabel.setBounds(r.removeFromLeft(containerLabel.getFont().getStringWidth(containerLabel.getText())+20));
 	headerSpacer.setBounds(r);
 }
 
-void GenericControllableContainerEditor::resizedInternalContent(Rectangle<int>& r)
+void GenericControllableContainerEditor::resizedInternalContent(juce::Rectangle<int>& r)
 {
 	for (auto &cui : childEditors)
 	{
@@ -358,12 +358,12 @@ void GenericControllableContainerEditor::resizedInternalContent(Rectangle<int>& 
 }
 
 
-Rectangle<int> GenericControllableContainerEditor::getHeaderBounds()
+juce::Rectangle<int> GenericControllableContainerEditor::getHeaderBounds()
 {
 	return getLocalBounds().withHeight(headerHeight);
 }
 
-Rectangle<int> GenericControllableContainerEditor::getContentBounds()
+juce::Rectangle<int> GenericControllableContainerEditor::getContentBounds()
 {
 	return getLocalBounds().withTop(headerHeight + headerGap).reduced(2);
 }
@@ -388,7 +388,7 @@ EnablingControllableContainerEditor::EnablingControllableContainerEditor(Enablin
 	}
 }
 
-void EnablingControllableContainerEditor::resizedInternalHeader(Rectangle<int>& r)
+void EnablingControllableContainerEditor::resizedInternalHeader(juce::Rectangle<int>& r)
 {
 	if(((EnablingControllableContainer *)container.get())->canBeDisabled) enabledUI->setBounds(r.removeFromLeft(r.getHeight()).reduced(2));
 	GenericControllableContainerEditor::resizedInternalHeader(r);

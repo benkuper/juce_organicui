@@ -92,7 +92,7 @@ void ShapeShifterPanel::paint(Graphics & g)
 void ShapeShifterPanel::paintOverChildren(Graphics & g)
 {
 	if (!targetMode) return;
-	Rectangle<int> r = getLocalBounds();
+ juce::Rectangle<int> r = getLocalBounds();
 
 	Colour hc = HIGHLIGHT_COLOR.withAlpha(.5f);
 	Colour nc = NORMAL_COLOR.withAlpha(.3f);
@@ -119,7 +119,7 @@ void ShapeShifterPanel::paintOverChildren(Graphics & g)
 
 void ShapeShifterPanel::resized()
 {
-	Rectangle<int> r = getLocalBounds();
+ juce::Rectangle<int> r = getLocalBounds();
 	header.setBounds(r.removeFromTop(headerHeight));
 	if (currentContent != nullptr)
 	{
@@ -153,7 +153,7 @@ void ShapeShifterPanel::detachTab(ShapeShifterPanelTab * tab, bool createNewPane
 
 	if (createNewPanel)
 	{
-		Rectangle<int> r = getScreenBounds();
+	 juce::Rectangle<int> r = getScreenBounds();
 		ShapeShifterPanel * newPanel = ShapeShifterManager::getInstance()->createPanel(content, tab);
 		ShapeShifterManager::getInstance()->showPanelWindow(newPanel, r);
 	}

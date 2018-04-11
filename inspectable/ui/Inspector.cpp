@@ -49,7 +49,7 @@ void Inspector::setSelectionManager(InspectableSelectionManager * newSM)
 
 void Inspector::resized()
 {
-	Rectangle<int> r = getLocalBounds().reduced(3);
+ juce::Rectangle<int> r = getLocalBounds().reduced(3);
 	vp.setBounds(r);
 	r.removeFromRight(10);
 

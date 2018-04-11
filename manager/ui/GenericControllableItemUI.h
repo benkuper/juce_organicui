@@ -20,8 +20,8 @@ public:
 
 	ScopedPointer<ControllableEditor> cui;
 
-	void resizedInternalHeader(Rectangle<int> &r) override;
-	void resizedInternalContent(Rectangle<int> &r) override;
+	void resizedInternalHeader(juce::Rectangle<int> &r) override;
+	void resizedInternalContent(juce::Rectangle<int> &r) override;
 	void childBoundsChanged(Component * child) override;
 };
 

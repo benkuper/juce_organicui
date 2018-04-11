@@ -112,7 +112,7 @@ void CustomLoggerUI::handleAsyncUpdate()
 void CustomLoggerUI::resized()
 {
 
-	Rectangle<int> area = getLocalBounds();
+ juce::Rectangle<int> area = getLocalBounds();
 	auto footer = area.removeFromBottom(30).reduced(5);
 	clearB.setBounds(footer.removeFromLeft(footer.getWidth() / 2).reduced(2));
 	copyB.setBounds(footer.reduced(2));

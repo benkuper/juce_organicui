@@ -63,7 +63,7 @@ void ScriptEditor::paint(Graphics & g)
 	g.fillEllipse(statusBounds.reduced(2).toFloat());
 }
 
-void ScriptEditor::resizedInternalHeaderItemInternal(Rectangle<int>& r)
+void ScriptEditor::resizedInternalHeaderItemInternal(juce::Rectangle<int>& r)
 { 
 	statusBounds = r.removeFromRight(r.getHeight()); 
 	r.removeFromRight(2);

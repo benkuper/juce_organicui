@@ -60,7 +60,7 @@ void Outliner::setEnabled(bool value)
 
 void Outliner::resized()
 {
-	Rectangle<int> r = getLocalBounds();
+ juce::Rectangle<int> r = getLocalBounds();
 	r.removeFromTop(20);
 	treeView.setBounds(r);
 }
@@ -235,7 +235,7 @@ OutlinerItemComponent::~OutlinerItemComponent()
 
 void OutlinerItemComponent::paint(Graphics & g)
 {
-	Rectangle<int> r = getLocalBounds();
+ juce::Rectangle<int> r = getLocalBounds();
 	
 	Colour c = BLUE_COLOR;
 	if (item->isContainer) c = item->container->nameCanBeChangedByUser ? HIGHLIGHT_COLOR : TEXT_COLOR;

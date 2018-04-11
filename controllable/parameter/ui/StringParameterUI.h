@@ -43,7 +43,7 @@ public:
 
 	//void paint(Graphics &g) override;
     void resized() override;
-	virtual void resizedInternal(Rectangle<int> &r);
+	virtual void resizedInternal(juce::Rectangle<int> &r);
 
 protected:
     void valueChanged(const var & v) override;
@@ -68,7 +68,7 @@ public:
 	TextButton browseBT;
 	ScopedPointer<ImageButton> relativeBT;
 
-	void resizedInternal(Rectangle<int> &r) override;
+	void resizedInternal(juce::Rectangle<int> &r) override;
 
 	void buttonClicked(Button * b) override;
 };

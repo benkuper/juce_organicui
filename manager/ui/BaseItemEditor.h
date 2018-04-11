@@ -23,8 +23,8 @@ public:
 
 	ScopedPointer<ImageButton> removeBT;
 
-	virtual void resizedInternalHeader(Rectangle<int> &) override;
-	virtual void resizedInternalHeaderItemInternal(Rectangle<int> &r) {}
+	virtual void resizedInternalHeader(juce::Rectangle<int> & r) override;
+	virtual void resizedInternalHeaderItemInternal(juce::Rectangle<int> &) {}
 	virtual void buttonClicked(Button *b) override;
 };
 
