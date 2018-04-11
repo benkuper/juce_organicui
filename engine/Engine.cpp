@@ -22,7 +22,8 @@ Engine::Engine(const String & fileName, const String & fileExtension, Applicatio
 	appVersion(_appVersion),
 	engineNotifier(10),
 	isLoadingFile(false),
-    isClearing(false)
+	isClearing(false),
+	lastFileAbsolutePath("")
 {
 	skipControllableNameInAddress = true;
 
@@ -131,8 +132,11 @@ void Engine::clear() {
 
 	isClearing = false;
 
-	
+	lastFileAbsolutePath = "";
+
 	changed();    //fileDocument	
 	engineListeners.call(&EngineListener::engineCleared);
 	engineNotifier.addMessage(new EngineEvent(EngineEvent::ENGINE_CLEARED, this));
+
+
 }

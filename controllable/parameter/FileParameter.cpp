@@ -81,7 +81,7 @@ void FileParameter::loadJSONDataInternal(var data)
 	setForceRelativePath(data.getProperty("relative", false));
 }
 
-void FileParameter::fileSaved()
+void FileParameter::fileSaved(bool savedAs)
 {
-	setValue(absolutePath, false, true); //force re-evaluate relative path if changed
+	if(savedAs) setValue(absolutePath, false, true); //force re-evaluate relative path if changed
 }

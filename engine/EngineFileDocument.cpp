@@ -10,18 +10,18 @@
 
 
 
-/*================================
- this file implements all methods that are related to saving/loading : basicly iherited from FileBasedDocument
- */
+ /*================================
+  this file implements all methods that are related to saving/loading : basicly iherited from FileBasedDocument
+  */
 
 #include "JuceHeader.h" //for project infos
 #include "Engine.h"
 
 String Engine::getDocumentTitle() {
-  if (! getFile().exists())
-    return "New unsaved session";
+	if (!getFile().exists())
+		return "New unsaved session";
 
-  return getFile().getFileName();
+	return getFile().getFileName();
 }
 
 void Engine::changed()
@@ -31,7 +31,7 @@ void Engine::changed()
 	engineNotifier.addMessage(new EngineEvent(EngineEvent::FILE_CHANGED, this));
 }
 
-void Engine::createNewGraph(){
+void Engine::createNewGraph() {
 	engineListeners.call(&EngineListener::startLoadFile);
 	engineNotifier.addMessage(new EngineEvent(EngineEvent::START_LOAD_FILE, this));
 	clear();
@@ -46,115 +46,119 @@ void Engine::createNewGraph(){
 
 }
 
-Result Engine::loadDocument (const File& file){
-  
-	if(isLoadingFile){
-    // TODO handle quick reloading of file
-    return Result::fail("engine already loading");
-  }
+Result Engine::loadDocument(const File& file) {
 
-  isLoadingFile = true;
-  engineListeners.call(&EngineListener::startLoadFile);
-  engineNotifier.addMessage(new EngineEvent(EngineEvent::START_LOAD_FILE, this));
+	if (isLoadingFile) {
+		// TODO handle quick reloading of file
+		return Result::fail("engine already loading");
+	}
 
-  if (InspectableSelectionManager::mainSelectionManager != nullptr)  InspectableSelectionManager::mainSelectionManager->setEnabled(false); //avoid creation of inspector editor while recreating all nodes, controllers, rules,etc. from file
+	isLoadingFile = true;
+	engineListeners.call(&EngineListener::startLoadFile);
+	engineNotifier.addMessage(new EngineEvent(EngineEvent::START_LOAD_FILE, this));
+
+	if (InspectableSelectionManager::mainSelectionManager != nullptr)  InspectableSelectionManager::mainSelectionManager->setEnabled(false); //avoid creation of inspector editor while recreating all nodes, controllers, rules,etc. from file
 
 #ifdef MULTITHREADED_LOADING
-  fileLoader = new FileLoader(this,file);
-  fileLoader->startThread(10);
+	fileLoader = new FileLoader(this, file);
+	fileLoader->startThread(10);
 #else
-  loadDocumentAsync(file);
-  updateLiveScriptObject();
-  triggerAsyncUpdate();
+	loadDocumentAsync(file);
+	updateLiveScriptObject();
+	triggerAsyncUpdate();
 #endif
 
-  return Result::ok();
+	lastFileAbsolutePath = getFile().getFullPathName();
+	return Result::ok();
 }
 
 //Called from fileLoader
-void Engine::loadDocumentAsync(const File & file){
+void Engine::loadDocumentAsync(const File & file) {
 
-  clearTasks();
-  taskName = "Loading File";
-  
-  ProgressTask * clearTask = addTask("clearing");
-  ProgressTask * parseTask = addTask("parsing");
-  ProgressTask * loadTask = addTask("loading");
+	clearTasks();
+	taskName = "Loading File";
 
-  clearTask->start();
-  clear();
-  clearTask->end();
+	ProgressTask * clearTask = addTask("clearing");
+	ProgressTask * parseTask = addTask("parsing");
+	ProgressTask * loadTask = addTask("loading");
 
-  //  {
-  //    MessageManagerLock ml;
-  //  }
-  ScopedPointer<InputStream> is( file.createInputStream());
+	clearTask->start();
+	clear();
+	clearTask->end();
 
-  loadingStartTime =  Time::currentTimeMillis();
-  setFile(file);
-  file.getParentDirectory().setAsCurrentWorkingDirectory();
+	//  {
+	//    MessageManagerLock ml;
+	//  }
+	ScopedPointer<InputStream> is(file.createInputStream());
 
-  {
-    parseTask->start();
-    jsonData = JSON::parse(*is);
-    parseTask->end();
+	loadingStartTime = Time::currentTimeMillis();
+	setFile(file);
+	file.getParentDirectory().setAsCurrentWorkingDirectory();
 
-    loadTask->start();
-    loadJSONData(jsonData,loadTask);
-	loadTask->end();
+	{
+		parseTask->start();
+		jsonData = JSON::parse(*is);
+		parseTask->end();
+
+		loadTask->start();
+		loadJSONData(jsonData, loadTask);
+		loadTask->end();
 
 
-  }// deletes data before launching audio, (data not needed after loaded)
+	}// deletes data before launching audio, (data not needed after loaded)
 
-  jsonData = var();
-  setChangedFlag(false);
+	jsonData = var();
+	setChangedFlag(false);
 }
 
-bool Engine::allLoadingThreadsAreEnded(){
+bool Engine::allLoadingThreadsAreEnded() {
 	return true;//NodeManager::getInstance()->getNumJobs()== 0 && (fileLoader && fileLoader->isEnded);
 }
 
-void Engine::fileLoaderEnded(){
-  if(allLoadingThreadsAreEnded()){
-    triggerAsyncUpdate();
-  }
+void Engine::fileLoaderEnded() {
+	if (allLoadingThreadsAreEnded()) {
+		triggerAsyncUpdate();
+	}
 }
 
 
 void Engine::handleAsyncUpdate()
 {
-  isLoadingFile = false;
-  if(getFile().exists()){
-    setLastDocumentOpened(getFile());
-  }
+	isLoadingFile = false;
+	if (getFile().exists()) {
+		setLastDocumentOpened(getFile());
+	}
 
-  //  graphPlayer.setProcessor(NodeManager::getInstance()->mainContainer->getAudioGraph());
-  //  suspendAudio(false);
-  int64 timeForLoading  =  Time::currentTimeMillis()-loadingStartTime;
-  setChangedFlag(false);
-  engineListeners.call(&EngineListener::endLoadFile);
-  engineNotifier.addMessage(new EngineEvent(EngineEvent::END_LOAD_FILE, this));
+	//  graphPlayer.setProcessor(NodeManager::getInstance()->mainContainer->getAudioGraph());
+	//  suspendAudio(false);
+	int64 timeForLoading = Time::currentTimeMillis() - loadingStartTime;
+	setChangedFlag(false);
+	engineListeners.call(&EngineListener::endLoadFile);
+	engineNotifier.addMessage(new EngineEvent(EngineEvent::END_LOAD_FILE, this));
 
-  NLOG("Engine","Session loaded in " << timeForLoading/1000.0 << "s"); 
+	NLOG("Engine", "Session loaded in " << timeForLoading / 1000.0 << "s");
 }
 
 
 
-Result Engine::saveDocument (const File& file){
+Result Engine::saveDocument(const File& file) {
 
-  var data = getJSONData();
+	bool sameFile = lastFileAbsolutePath == file.getFullPathName();
+	var data = getJSONData();
 
-  if (file.exists()) file.deleteFile();
-  ScopedPointer<OutputStream> os( file.createOutputStream());
-  JSON::writeToStream(*os, data);
-  os->flush();
+	if (file.exists()) file.deleteFile();
+	ScopedPointer<OutputStream> os(file.createOutputStream());
+	JSON::writeToStream(*os, data);
+	os->flush();
 
-  setLastDocumentOpened(file);
-  setChangedFlag(false);
-  engineListeners.call(&EngineListener::fileSaved);
-  engineNotifier.addMessage(new EngineEvent(EngineEvent::FILE_SAVED, this));
+	setLastDocumentOpened(file);
+	setChangedFlag(false);
+	engineListeners.call(&EngineListener::fileSaved, !sameFile);
+	engineNotifier.addMessage(new EngineEvent(EngineEvent::FILE_SAVED, this));
 
-  return Result::ok();
+	lastFileAbsolutePath = getFile().getFullPathName();
+
+	return Result::ok();
 }
 
 
@@ -162,49 +166,49 @@ Result Engine::saveDocument (const File& file){
 File Engine::getLastDocumentOpened() {
 
 	if (appProperties == nullptr) return File();
-  RecentlyOpenedFilesList recentFiles;
-  recentFiles.restoreFromString (appProperties->getUserSettings()
-                                 ->getValue (lastFileListKey));
+	RecentlyOpenedFilesList recentFiles;
+	recentFiles.restoreFromString(appProperties->getUserSettings()
+		->getValue(lastFileListKey));
 
-  return recentFiles.getFile (0);
+	return recentFiles.getFile(0);
 }
 
 
 
 
-void Engine::setLastDocumentOpened (const File& file) {
+void Engine::setLastDocumentOpened(const File& file) {
 
 	if (appProperties == nullptr) return;
-  RecentlyOpenedFilesList recentFiles;
-  recentFiles.restoreFromString (appProperties->getUserSettings()
-                                 ->getValue (lastFileListKey));
+	RecentlyOpenedFilesList recentFiles;
+	recentFiles.restoreFromString(appProperties->getUserSettings()
+		->getValue(lastFileListKey));
 
-  recentFiles.addFile (file);
+	recentFiles.addFile(file);
 
-  appProperties->getUserSettings()->setValue (lastFileListKey, recentFiles.toString());
+	appProperties->getUserSettings()->setValue(lastFileListKey, recentFiles.toString());
 
 }
 
 var Engine::getJSONData()
 {
-  var data(new DynamicObject());
-  var metaData(new DynamicObject());
+	var data(new DynamicObject());
+	var metaData(new DynamicObject());
 
-  metaData.getDynamicObject()->setProperty("version",ProjectInfo::versionString);
-  metaData.getDynamicObject()->setProperty("versionNumber", ProjectInfo::versionNumber);
+	metaData.getDynamicObject()->setProperty("version", ProjectInfo::versionString);
+	metaData.getDynamicObject()->setProperty("versionNumber", ProjectInfo::versionNumber);
 
-  data.getDynamicObject()->setProperty("metaData", metaData);
+	data.getDynamicObject()->setProperty("metaData", metaData);
 
-  var dData = DashboardManager::getInstance()->getJSONData();
-  if(!dData.isVoid() && dData.getDynamicObject()->getProperties().size() > 0) data.getDynamicObject()->setProperty("dashboardManager", dData);
+	var dData = DashboardManager::getInstance()->getJSONData();
+	if (!dData.isVoid() && dData.getDynamicObject()->getProperties().size() > 0) data.getDynamicObject()->setProperty("dashboardManager", dData);
 
-  return data;
+	return data;
 }
 
 /// ===================
 // loading
 
-void Engine::loadJSONData (var data,ProgressTask * loadingTask) 
+void Engine::loadJSONData(var data, ProgressTask * loadingTask)
 {
 	DynamicObject * dObject = data.getDynamicObject();
 	if (dObject == nullptr)
@@ -230,7 +234,7 @@ void Engine::loadJSONData (var data,ProgressTask * loadingTask)
 	if (Outliner::getInstanceWithoutCreating() != nullptr) Outliner::getInstance()->setEnabled(false);
 
 	DynamicObject * d = data.getDynamicObject();
-	
+
 	//ProgressTask * presetTask = loadingTask->addTask("Presets");
 	ProgressTask * dashboardTask = loadingTask->addTask("Dashboard");
 
@@ -253,52 +257,52 @@ void Engine::loadJSONData (var data,ProgressTask * loadingTask)
 
 bool Engine::checkFileVersion(DynamicObject * metaData, bool checkForNewerVersion)
 {
-  if (!metaData->hasProperty("version")) return false;
-  String versionToCheck = checkForNewerVersion ? appVersion : getMinimumRequiredFileVersion();
-  DBG(metaData->getProperty("version").toString() << " / " << versionToCheck);
+	if (!metaData->hasProperty("version")) return false;
+	String versionToCheck = checkForNewerVersion ? appVersion : getMinimumRequiredFileVersion();
+	DBG(metaData->getProperty("version").toString() << " / " << versionToCheck);
 
-  bool versionToCheckIsBeta = false;
-  if (versionToCheck.endsWith("b"))
-  {
-	  versionToCheck = versionToCheck.substring(0, versionToCheck.length() - 1);
-	  versionToCheckIsBeta = true;
-  }
+	bool versionToCheckIsBeta = false;
+	if (versionToCheck.endsWith("b"))
+	{
+		versionToCheck = versionToCheck.substring(0, versionToCheck.length() - 1);
+		versionToCheckIsBeta = true;
+	}
 
-  String fVersion = metaData->getProperty("version").toString();
-  bool fileIsBeta = false;
-  if (fVersion.endsWith("b"))
-  {
-	  fVersion = fVersion.substring(0, fVersion.length() - 1);
-	  fileIsBeta = true;
-  }
+	String fVersion = metaData->getProperty("version").toString();
+	bool fileIsBeta = false;
+	if (fVersion.endsWith("b"))
+	{
+		fVersion = fVersion.substring(0, fVersion.length() - 1);
+		fileIsBeta = true;
+	}
 
-  StringArray fileVersionSplit;
-  fileVersionSplit.addTokens(fVersion, juce::StringRef("."), juce::StringRef("\""));
+	StringArray fileVersionSplit;
+	fileVersionSplit.addTokens(fVersion, juce::StringRef("."), juce::StringRef("\""));
 
-  StringArray minVersionSplit;
-  minVersionSplit.addTokens(versionToCheck, juce::StringRef("."), juce::StringRef("\""));
+	StringArray minVersionSplit;
+	minVersionSplit.addTokens(versionToCheck, juce::StringRef("."), juce::StringRef("\""));
 
-  int maxVersionNumbers = jmax<int>(fileVersionSplit.size(), minVersionSplit.size());
-  while (fileVersionSplit.size() < maxVersionNumbers) fileVersionSplit.add("0");
-  while (minVersionSplit.size() < maxVersionNumbers) minVersionSplit.add("0");
+	int maxVersionNumbers = jmax<int>(fileVersionSplit.size(), minVersionSplit.size());
+	while (fileVersionSplit.size() < maxVersionNumbers) fileVersionSplit.add("0");
+	while (minVersionSplit.size() < maxVersionNumbers) minVersionSplit.add("0");
 
-  for (int i = 0;i < maxVersionNumbers; i++)
-  {
-    int fV = fileVersionSplit[i].getIntValue();
-    int minV = minVersionSplit[i].getIntValue();
-	if (fV > minV) return true;
-	else if (fV < minV) return false;   
-  }
+	for (int i = 0; i < maxVersionNumbers; i++)
+	{
+		int fV = fileVersionSplit[i].getIntValue();
+		int minV = minVersionSplit[i].getIntValue();
+		if (fV > minV) return true;
+		else if (fV < minV) return false;
+	}
 
-  //equals
-  if (fileIsBeta) return false;
+	//equals
+	if (fileIsBeta) return false;
 
-  return checkForNewerVersion ? false : true;
+	return checkForNewerVersion ? false : true;
 }
 
 String Engine::getMinimumRequiredFileVersion()
 {
-  return "1.0.0";
+	return "1.0.0";
 }
 
 //#if JUCE_MODAL_LOOPS_PERMITTED

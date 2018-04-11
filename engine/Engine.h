@@ -39,6 +39,8 @@ public:
 	String fileExtension = ".file";
 	String fileWildcard = "*"+fileExtension;
 
+	String lastFileAbsolutePath; //Used for checking in saveDocument if new file is different
+
 	virtual void changed() override;
 	void createNewGraph();
 	void clear();
@@ -53,6 +55,7 @@ public:
 	String getDocumentTitle()override;
 	Result loadDocument(const File& file)override;
 	Result saveDocument(const File& file)override;
+
 	File getLastDocumentOpened() override;
 	void setLastDocumentOpened(const File& file) override;
 
@@ -115,14 +118,6 @@ public:
 	class  EngineEvent
 	{
 	public:
-        virtual ~EngineEvent(){};
-		virtual void startLoadFile() {};
-		// TODO implement progression
-		virtual void fileProgress(float /*percent*/, int /*state*/) {};
-		virtual void endLoadFile() {};
-		virtual void fileSaved() {};
-		virtual void engineCleared() {};
-		virtual void fileChanged() {};
 		enum Type { START_LOAD_FILE, FILE_PROGRESS, END_LOAD_FILE, FILE_SAVED, ENGINE_CLEARED , FILE_CHANGED };
 
 		EngineEvent(Type t, Engine * engine) :

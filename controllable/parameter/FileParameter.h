@@ -34,7 +34,7 @@ public:
 	var getJSONDataInternal() override;
 	void loadJSONDataInternal(var data) override;
 
-	void fileSaved() override;
+	void fileSaved(bool savedAs) override;
 
 
 	static StringParameter * create() { return new FileParameter("New FileParameter", "",""); }
