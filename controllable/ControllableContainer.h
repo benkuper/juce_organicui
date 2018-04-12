@@ -74,6 +74,7 @@ public:
 	EnumParameter * addEnumParameter(const String &niceName, const String &description, const bool &enabled = true);
 	Point2DParameter * addPoint2DParameter(const String &niceName, const String &description, const bool &enabled = true);
 	Point3DParameter * addPoint3DParameter(const String &niceName, const String &description, const bool &enabled = true);
+	ColorParameter * addColorParameter(const String &niceName, const String &description, const Colour &initialColor, const bool &enabled = true);
 	TargetParameter * addTargetParameter(const String &niceName, const String &description, WeakReference<ControllableContainer> rootReference = nullptr, const bool &enabled = true);
 	Trigger * addTrigger(const String &niceName, const String &description, const bool &enabled = true);
 
@@ -83,6 +84,7 @@ public:
 	UndoableAction * removeUndoableControllable(Controllable * c, bool onlyReturnAction = false);
 	void removeControllable(Controllable * c);
 	Controllable * getControllableByName(const String &name, bool searchNiceNameToo = false);
+	Parameter * getParameterByName(const String &name, bool searchNiceNameToo = false);
 
 	void addChildControllableContainer(ControllableContainer * container);
 	void removeChildControllableContainer(ControllableContainer *container);

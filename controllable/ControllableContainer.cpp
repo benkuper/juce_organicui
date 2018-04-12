@@ -138,6 +138,14 @@ Point3DParameter * ControllableContainer::addPoint3DParameter(const String & _ni
 	return p;
 }
 
+ColorParameter * ControllableContainer::addColorParameter(const String & _niceName, const String & _description, const Colour &initialColor, const bool & enabled)
+{
+	String targetName = getUniqueNameInContainer(_niceName);
+	ColorParameter * p = new ColorParameter(targetName, _description, initialColor, enabled);
+	addControllable(p);
+	return p;
+}
+
 TargetParameter * ControllableContainer::addTargetParameter(const String & _niceName, const String & _description, WeakReference<ControllableContainer> rootReference, const bool & enabled)
 {
 	String targetName = getUniqueNameInContainer(_niceName);
@@ -278,6 +286,11 @@ Controllable * ControllableContainer::getControllableByName(const String & name,
 	}
 
 	return nullptr;
+}
+
+Parameter * ControllableContainer::getParameterByName(const String & name, bool searchNiceNameToo)
+{
+	return dynamic_cast<Parameter *>(getControllableByName(name, searchNiceNameToo));;
 }
 
 void ControllableContainer::addChildControllableContainer(ControllableContainer * container)
