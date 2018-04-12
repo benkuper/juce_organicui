@@ -16,6 +16,8 @@ ColorParameter::ColorParameter(const String & niceName, const String & descripti
 {
 	lockManualControlMode = true;
 	setColor(initialColor);
+	defaultValue = value;
+	resetValue();
 }
 
 ColorParameter::~ColorParameter() {}
