@@ -67,7 +67,8 @@ void TargetParameter::setValueFromTarget(Controllable * c)
 
 void TargetParameter::setValueFromTarget(ControllableContainer * cc)
 {
-	if(targetContainer == nullptr && cc == targetContainer)
+	DBG(cc->getControlAddress() << " : " << (targetContainer != nullptr ? targetContainer->getControlAddress() : "null"));
+	if(targetContainer != nullptr && cc == targetContainer.get())
 	{
 		String ca = targetContainer->getControlAddress();
 		if (stringValue() == ca) return;
