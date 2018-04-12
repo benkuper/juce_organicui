@@ -511,9 +511,9 @@ void BaseManagerUI<M, T, U>::resizedInternalFooter(juce::Rectangle<int>& r)
 }
 
 template<class M, class T, class U>
-void BaseManagerUI<M, T, U>::childBoundsChanged(Component *)
+void BaseManagerUI<M, T, U>::childBoundsChanged(Component * c)
 {
-	if (resizeOnChildBoundsChanged) resized();
+	if (resizeOnChildBoundsChanged && c != &viewport) resized();
 }
 
 template<class M, class T, class U>

@@ -32,19 +32,22 @@ public:
 
 	virtual T * createItem(); //to override if special constructor to use
 	virtual T * addItemFromData(var data, bool addToUndo = true); //to be overriden for specific item creation (from data)
+	virtual Array<T *> addItemsFromData(var data, bool addToUndo = true); //to be overriden for specific item creation (from data)
 	virtual T * addItemFromClipboard(bool showWarning = true);
 
 	virtual void loadItemsData(var data);
 
 
-	UndoableAction * getAddItemUndoableAction(T * item = nullptr, var data = var());
+	virtual UndoableAction * getAddItemUndoableAction(T * item = nullptr, var data = var());
 
 	T * addItem(T * item = nullptr, var data = var(), bool addToUndo = true, bool notify = true); //if data is not empty, load data
 	T * addItem(const Point<float> initialPosition, bool addToUndo = true, bool notify = true);
 	Array<T *> addItems(Array<T *> items, var data = var(), bool addToUndo = true);
 
 
-	UndoableAction * getRemoveItemUndoableAction(T * item);
+	virtual Array<UndoableAction *> getRemoveItemUndoableAction(T * item);
+	virtual Array<UndoableAction *> getRemoveItemsUndoableAction(Array<T *> items);
+
 	void removeItems(Array<T *> items, bool addToUndo = true);
 	void removeItem(T * item, bool addToUndo = true, bool notify = true);
 
@@ -75,10 +78,10 @@ public:
 	public:
 		/** Destructor. */
 		virtual ~Listener() {}
-		virtual void itemAdded(T *) {} 
+		virtual void itemAdded(T *) {}
 		virtual void itemsAdded(Array<T *>) {}
 		virtual void itemRemoved(T *) {}
-		virtual void itemsRemoved(Array<T *>) {}  
+		virtual void itemsRemoved(Array<T *>) {}
 		virtual void itemsReordered() {}
 	};
 
@@ -94,7 +97,7 @@ public:
 
 		ManagerEvent(Type t, T * i = nullptr) : type(t)
 		{
-			itemsRef.add(i);			
+			itemsRef.add(i);
 		}
 
 		ManagerEvent(Type t, Array<T *> iList) : type(t)
@@ -118,7 +121,7 @@ public:
 			return result;
 		}
 
-		T * getItem(int index=0) const
+		T * getItem(int index = 0) const
 		{
 			if (itemsRef.size() > index && itemsRef[index] != nullptr && !itemsRef[index].wasObjectDeleted()) return static_cast<T *>(itemsRef[index].get());
 			return nullptr;
@@ -273,7 +276,7 @@ public:
 		ItemsBaseAction(BaseManager * m, Array<T *> iList, var data = var()) :
 			ManagerBaseAction(m, data)
 		{
-			
+
 			for (auto &i : iList)
 			{
 				BaseItem * bi = dynamic_cast<BaseItem *>(i);
@@ -338,7 +341,7 @@ public:
 			this->data = var();
 			for (auto & i : iList) if (i != nullptr) this->data.append(i->getJSONData());
 			BaseManager * m = this->getManager();
-			if(m != nullptr) m->removeItems(iList, false);
+			if (m != nullptr) m->removeItems(iList, false);
 			this->itemsRef.clear();
 			return true;
 		}
@@ -368,15 +371,14 @@ public:
 			BaseManager * m = this->getManager();
 			if (m == nullptr) return false;
 
-			Array<T *> iList = this->getItems();
-			m->addItems(iList, this->data, false);
+			Array<T *> iList = m->addItemsFromData(this->data, false);
 
 			this->itemsShortName.clear();
 			for (auto &i : iList) this->itemsShortName.add(i != nullptr ? i->shortName : "");
 			return true;
 		}
 	};
-	
+
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BaseManager<T>)
 };
@@ -384,7 +386,7 @@ public:
 
 template<class T>
 BaseManager<T>::BaseManager(const String & name) :
-	EnablingControllableContainer(name,false),
+	EnablingControllableContainer(name, false),
 	managerFactory(nullptr),
 	itemDataType(""),
 	userCanAddItemsManually(true),
@@ -456,7 +458,7 @@ T * BaseManager<T>::addItem(T * item, var data, bool addToUndo, bool notify)
 		reorderItems();
 	}
 
-	
+
 	if (selectItemWhenCreated) bi->selectThis();
 
 	return item;
@@ -474,7 +476,7 @@ T * BaseManager<T>::addItem(const Point<float> initialPosition, bool addToUndo, 
 template<class T>
 Array<T *> BaseManager<T>::addItems(Array<T *> itemsToAdd, var data, bool addToUndo)
 {
-	
+
 	if (addToUndo && !UndoMaster::getInstance()->isPerforming)
 	{
 		AddItemsAction * a = new AddItemsAction(this, itemsToAdd, data);
@@ -482,11 +484,11 @@ Array<T *> BaseManager<T>::addItems(Array<T *> itemsToAdd, var data, bool addToU
 		return itemsToAdd;
 	}
 
-	for (int i=0;i<itemsToAdd.size();i++)
+	for (int i = 0; i < itemsToAdd.size(); i++)
 	{
-		addItem(itemsToAdd[i], data.isArray()?data[i]:var(),false,false);
+		addItem(itemsToAdd[i], data.isArray() ? data[i] : var(), false, false);
 	}
-	
+
 	baseManagerListeners.call(&Listener::itemsAdded, itemsToAdd);
 	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_ADDED, itemsToAdd));
 
@@ -514,6 +516,27 @@ T * BaseManager<T>::addItemFromData(var data, bool addToUndo)
 }
 
 template<class T>
+Array<T*> BaseManager<T>::addItemsFromData(var data, bool addToUndo)
+{
+	Array<T *> itemsToAdd;
+	if (managerFactory != nullptr)
+	{
+		for (int i = 0; i < data.size(); i++)
+		{
+			String type = data[i].getProperty("type", "");
+			if (type.isEmpty()) return nullptr;
+			T * it = managerFactory->create(type);
+			if(it != nullptr) itemsToAdd.add(it);
+		}
+	} else
+	{
+		for (int i = 0; i < data.size(); i++)  itemsToAdd.add(createItem());
+	}
+
+	return addItems(itemsToAdd, data, addToUndo);
+}
+
+template<class T>
 T * BaseManager<T>::addItemFromClipboard(bool showWarning)
 {
 	if (!userCanAddItemsManually) return nullptr;
@@ -524,13 +547,13 @@ T * BaseManager<T>::addItemFromClipboard(bool showWarning)
 	String t = data.getProperty("itemType", "");
 	if (t.isEmpty())
 	{
-		if(showWarning) NLOGWARNING(niceName, "Can't paste data from clipboard : data has no type.");
+		if (showWarning) NLOGWARNING(niceName, "Can't paste data from clipboard : data has no type.");
 		return nullptr;
 	}
 
-	if(t != itemDataType)
+	if (t != itemDataType)
 	{
-		if(showWarning) NLOGWARNING(niceName, "Can't paste data from clipboard : data is of wrong type.\nGot type \"" + t +"\" where \"" + itemDataType + "\" is expected.");
+		if (showWarning) NLOGWARNING(niceName, "Can't paste data from clipboard : data is of wrong type.\nGot type \"" + t + "\" where \"" + itemDataType + "\" is expected.");
 		return nullptr;
 	}
 
@@ -553,10 +576,22 @@ void BaseManager<T>::loadItemsData(var data)
 }
 
 template<class T>
-UndoableAction * BaseManager<T>::getRemoveItemUndoableAction(T * item)
+Array<UndoableAction *> BaseManager<T>::getRemoveItemUndoableAction(T * item)
 {
 	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile) return nullptr;
-	return new RemoveItemAction(this, item);
+	Array<UndoableAction *> a;
+	a.add(new RemoveItemAction(this, item));
+	return a;
+}
+
+template<class T>
+Array<UndoableAction*> BaseManager<T>::getRemoveItemsUndoableAction(Array<T*> itemsToRemove)
+{
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile) return nullptr;
+
+	Array<UndoableAction *> a;
+	a.add(new RemoveItemsAction(this, itemsToRemove));
+	return a;
 }
 
 template<class T>
@@ -564,12 +599,10 @@ void BaseManager<T>::removeItems(Array<T *> itemsToRemove, bool addToUndo)
 {
 	if (addToUndo)
 	{
-		RemoveItemsAction * a = new RemoveItemsAction(this,itemsToRemove);
-		UndoMaster::getInstance()->performAction("Remove " + String(itemsToRemove.size()) + " actions", a);
+		Array<UndoableAction *> a = getRemoveItemsUndoableAction(itemsToRemove);
+		UndoMaster::getInstance()->performActions("Remove " + String(itemsToRemove.size()) + " items", a);
 		return;
 	}
-
-	DBG("Remove items for real here " << itemsToRemove.size());
 
 	baseManagerListeners.call(&Listener::itemsRemoved, itemsToRemove);
 	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_REMOVED));
@@ -584,7 +617,8 @@ void BaseManager<T>::removeItem(T * item, bool addToUndo, bool notify)
 	{
 		if (Engine::mainEngine != nullptr && !Engine::mainEngine->isLoadingFile)
 		{
-			UndoMaster::getInstance()->performAction("Remove item", new RemoveItemAction(this, item));
+			BaseItem * bi = static_cast<BaseItem *>(item);
+			UndoMaster::getInstance()->performActions("Remove " + bi->getTypeString(), getRemoveItemUndoableAction(item));
 			return;
 		}
 	}
@@ -602,7 +636,7 @@ void BaseManager<T>::removeItem(T * item, bool addToUndo, bool notify)
 		managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEM_REMOVED, item));
 
 	}
-	
+
 	delete item;
 }
 
