@@ -41,6 +41,7 @@ OrganicMainContentComponent::~OrganicMainContentComponent()
 
 	if (Engine::mainEngine != nullptr) Engine::mainEngine->removeEngineListener(this);
 	ShapeShifterManager::deleteInstance();
+	clear();
 
 }
 

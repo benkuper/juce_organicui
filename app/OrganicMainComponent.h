@@ -26,6 +26,7 @@ public:
     virtual ~OrganicMainContentComponent();
 
 	virtual void init();
+	virtual void clear() {}
 
 	TooltipWindow tooltipWindow; // to add tooltips to an application, you
 								 // just need to create one of these and leave it
