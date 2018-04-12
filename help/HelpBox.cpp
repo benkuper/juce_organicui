@@ -9,6 +9,8 @@ HelpBox::HelpBox() :
 
 HelpBox::~HelpBox()
 {
+	signalThreadShouldExit();
+	waitForThreadToExit(1000);
 }
 
 void HelpBox::loadHelp(URL _helpURL)
