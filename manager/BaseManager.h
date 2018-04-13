@@ -34,6 +34,7 @@ public:
 	virtual T * addItemFromData(var data, bool addToUndo = true); //to be overriden for specific item creation (from data)
 	virtual Array<T *> addItemsFromData(var data, bool addToUndo = true); //to be overriden for specific item creation (from data)
 	virtual T * addItemFromClipboard(bool showWarning = true);
+	virtual bool canAddItemOfType(const String &typeToCheck);
 
 	virtual void loadItemsData(var data);
 
@@ -545,19 +546,19 @@ T * BaseManager<T>::addItemFromClipboard(bool showWarning)
 	if (data.isVoid()) return nullptr;
 
 	String t = data.getProperty("itemType", "");
-	if (t.isEmpty())
+	if (!canAddItemOfType(t))
 	{
-		if (showWarning) NLOGWARNING(niceName, "Can't paste data from clipboard : data has no type.");
-		return nullptr;
-	}
-
-	if (t != itemDataType)
-	{
-		if (showWarning) NLOGWARNING(niceName, "Can't paste data from clipboard : data is of wrong type.\nGot type \"" + t + "\" where \"" + itemDataType + "\" is expected.");
+		if (showWarning) NLOGWARNING(niceName, "Can't paste data from clipboard : data is of wrong type (\"" + t + "\").");
 		return nullptr;
 	}
 
 	return addItemFromData(data);
+}
+
+template<class T>
+bool BaseManager<T>::canAddItemOfType(const String & typeToCheck)
+{
+	return typeToCheck == itemDataType;
 }
 
 template<class T>
