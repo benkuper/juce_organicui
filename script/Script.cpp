@@ -140,20 +140,22 @@ void Script::setState(ScriptState newState)
 	scriptAsyncNotifier.addMessage(new ScriptEvent(ScriptEvent::STATE_CHANGE));
 }
 
-bool Script::callFunction(const Identifier & function, const Array<var> args)
+var Script::callFunction(const Identifier & function, const Array<var> args, Result  * result)
 {
 	if (canBeDisabled && !enabled->boolValue()) return false;
 
 	if (scriptEngine == nullptr) return false;
-	Result callResult = Result::ok();
-	scriptEngine->callFunction(function, var::NativeFunctionArgs(var::undefined(), (const var *)args.begin(), args.size()), &callResult);
-	if (callResult.getErrorMessage().isNotEmpty())
+
+	Result tmpResult = Result::ok();
+	if (result == nullptr) result = &tmpResult;
+	var returnData = scriptEngine->callFunction(function, var::NativeFunctionArgs(var::undefined(), (const var *)args.begin(), args.size()), result);
+	if (result->getErrorMessage().isNotEmpty())
 	{
-		NLOG(niceName, "Script Error :\n" + callResult.getErrorMessage());
-		return false;
+		NLOG(niceName, "Script Error :\n" + result->getErrorMessage());
+		return var();
 	}
 
-	return true;
+	return returnData;
 }
 
 
@@ -176,6 +178,7 @@ void Script::onControllableFeedbackUpdateInternal(ControllableContainer * cc, Co
 	{
 		Array<var> args;
 		args.add(c->getScriptObject());
+
 		callFunction("scriptParamChanged", args);
 	}
 }
@@ -218,8 +221,9 @@ void Script::timerCallback(int timerID)
 		Array<var> args;
 		args.add(deltaTime);
 
-		bool result = callFunction(updateIdentifier, args);
-		if (!result) stopTimer(0);
+		Result r = Result::ok();
+		callFunction(updateIdentifier, args, &r);
+		if (r != Result::ok()) stopTimer(0);
 	}
 	break;
 

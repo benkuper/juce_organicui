@@ -41,6 +41,12 @@ bool ScriptManager::callFunctionOnAllItems(const Identifier & function, var a)
 bool ScriptManager::callFunctionOnAllItems(const Identifier & function, Array<var> args)
 {
 	bool result = true;
-	for (auto &i : items) result &= i->callFunction(function, args);
+	for (auto &i : items)
+	{
+		Result r = Result::ok();
+		i->callFunction(function, args, &r);
+		if (r != Result::ok()) result = false;
+	}
+
 	return result;
 }

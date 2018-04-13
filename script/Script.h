@@ -46,7 +46,7 @@ public:
 
 	void setState(ScriptState newState);
 
-	bool callFunction(const Identifier &function, const Array<var> args);
+	var callFunction(const Identifier &function, const Array<var> args, Result * result = (Result *)nullptr);
 
 	void onContainerParameterChangedInternal(Parameter *) override;
 	void onContainerTriggerTriggered(Trigger *) override;
