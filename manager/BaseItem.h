@@ -41,7 +41,6 @@ public:
 	virtual bool paste();
 
 	void remove();
-	virtual void clear() {}
 
 	virtual void onContainerParameterChanged(Parameter *) override;
 	virtual void onContainerTriggerTriggered(Trigger *) override;

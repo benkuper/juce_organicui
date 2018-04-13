@@ -53,7 +53,6 @@ BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts
 
 BaseItem::~BaseItem()
 {
-	clear();
 }
 
 void BaseItem::duplicate()
