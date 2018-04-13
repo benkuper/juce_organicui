@@ -105,7 +105,7 @@ public:
 
 	T * createFromMenuResult(int result)
 	{
-		if (result <= 0 || result >= defs.size()) return nullptr;
+		if (result <= 0 || result > defs.size()) return nullptr;
 		else
 		{
 			Definition * d = defs[result - 1];//result 0 is no result
