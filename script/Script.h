@@ -13,7 +13,7 @@ Author:  Ben
 
 class Script :
 	public BaseItem,
-	public Timer,
+	public MultiTimer,
 	public EngineListener
 {
 public:
@@ -28,6 +28,8 @@ public:
 
 	ScriptState state;
 	String fileName;
+	Time fileLastModTime;
+	var paramsContainerData; //for keeping overriden values
 
 	bool updateEnabled; //When loading the script, checks if the update function is present
 	float lastUpdateTime;
@@ -51,6 +53,9 @@ public:
 
 	void onControllableFeedbackUpdateInternal(ControllableContainer * cc, Controllable * c) override;
 
+	var getJSONData() override;
+	void loadJSONDataInternal(var data) override;
+
 	void endLoadFile() override;
 	
 	InspectableEditor * getEditor(bool isRoot) override;
@@ -58,7 +63,7 @@ public:
 
 
 	// Inherited via Timer
-	virtual void timerCallback() override;
+	virtual void timerCallback(int timerID) override;
 
 	class ScriptEvent
 	{
@@ -85,6 +90,7 @@ public:
 	static var addStringParameterFromScript(const var::NativeFunctionArgs &args);
 	static var addEnumParameterFromScript(const var::NativeFunctionArgs &args);
 	static var addTargetParameterFromScript(const var::NativeFunctionArgs &args);
+	static var addColorParameterFromScript(const var::NativeFunctionArgs &args);
 	static var addTriggerFromScript(const var::NativeFunctionArgs &args);
 
 	static bool checkNumArgs(const String &logName, const var::NativeFunctionArgs &args, int expectedArgs);

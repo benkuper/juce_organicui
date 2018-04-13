@@ -37,6 +37,8 @@ Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled) :
 
 	scriptParamsContainer.hideEditorHeader = true;
 	addChildControllableContainer(&scriptParamsContainer);
+
+	startTimer(1, 1000);
 }
 
 Script::~Script()
@@ -49,7 +51,7 @@ void Script::loadScript()
 	if (Engine::mainEngine->isLoadingFile)
 	{
 		Engine::mainEngine->addEngineListener(this);
-		return;
+		//return;
 	}
 
 
@@ -81,17 +83,22 @@ void Script::loadScript()
 
 	fileName = f.getFileName();
 	setNiceName(f.getFileNameWithoutExtension());
-
+	fileLastModTime = f.getLastModificationTime();
 	String s = f.loadFileAsString();
 
-	stopTimer();
+	stopTimer(0);
+
+	if(paramsContainerData.isVoid()) paramsContainerData = scriptParamsContainer.getJSONData();
 
 	buildEnvironment();
 	Result result = scriptEngine->execute(s);
 
+
 	if (result.getErrorMessage().isEmpty())
 	{
 		NLOG("Script : " + niceName, "Script loaded succesfully");
+		scriptParamsContainer.loadJSONData(paramsContainerData); //keep overriden values
+		paramsContainerData = var();
 		setState(SCRIPT_LOADED);
 	} else
 	{
@@ -105,7 +112,7 @@ void Script::loadScript()
 	if (updateEnabled)
 	{
 		lastUpdateTime = (float)Time::getMillisecondCounter() / 1000.f;
-		startTimerHz(30); //should be parametrable
+		startTimer(0, 20); //50fps, should be parametrable
 	}
 
 	scriptParamsContainer.hideInEditor = scriptParamsContainer.controllables.size() == 0;
@@ -138,11 +145,11 @@ bool Script::callFunction(const Identifier & function, const Array<var> args)
 	if (canBeDisabled && !enabled->boolValue()) return false;
 
 	if (scriptEngine == nullptr) return false;
-	Result result = Result::ok();
-	scriptEngine->callFunction(function, var::NativeFunctionArgs(var::undefined(), (const var *)args.begin(), args.size()), &result);
-	if (result.getErrorMessage().isNotEmpty())
+	Result callResult = Result::ok();
+	scriptEngine->callFunction(function, var::NativeFunctionArgs(var::undefined(), (const var *)args.begin(), args.size()), &callResult);
+	if (callResult.getErrorMessage().isNotEmpty())
 	{
-		NLOG(niceName, "Script Error :\n" + result.getErrorMessage());
+		NLOG(niceName, "Script Error :\n" + callResult.getErrorMessage());
 		return false;
 	}
 
@@ -173,6 +180,20 @@ void Script::onControllableFeedbackUpdateInternal(ControllableContainer * cc, Co
 	}
 }
 
+var Script::getJSONData()
+{
+	var data = BaseItem::getJSONData();
+	var pData = scriptParamsContainer.getJSONData();
+	if (!pData.isVoid()) data.getDynamicObject()->setProperty("scriptParams", pData);
+	return data;
+}
+
+void Script::loadJSONDataInternal(var data)
+{
+	BaseItem::loadJSONDataInternal(data);
+	paramsContainerData = data.getProperty("scriptParams", var());
+}
+
 void Script::endLoadFile()
 {
 	Engine::mainEngine->removeEngineListener(this);
@@ -184,17 +205,34 @@ InspectableEditor * Script::getEditor(bool isRoot)
 	return new ScriptEditor(this, isRoot);
 }
 
-void Script::timerCallback()
+void Script::timerCallback(int timerID)
 {
-	float curTime = (float)Time::getMillisecondCounter() / 1000.f;
-	float deltaTime = curTime - lastUpdateTime;
-	lastUpdateTime = curTime;
+	switch (timerID) // update timer
+	{
+	case 0:
+	{
+		float curTime = (float)Time::getMillisecondCounter() / 1000.f;
+		float deltaTime = curTime - lastUpdateTime;
+		lastUpdateTime = curTime;
 
-	Array<var> args;
-	args.add(deltaTime);
+		Array<var> args;
+		args.add(deltaTime);
 
-	bool result = callFunction(updateIdentifier, args);
-	if (!result) stopTimer();
+		bool result = callFunction(updateIdentifier, args);
+		if (!result) stopTimer(0);
+	}
+	break;
+
+	case 1:
+	{
+		File f = filePath->getFile();
+		if (f.getLastModificationTime() != fileLastModTime)
+		{
+			loadScript();
+		}
+	}
+	break;
+	}
 }
 
 var Script::logFromScript(const var::NativeFunctionArgs & args)
@@ -253,6 +291,13 @@ var Script::addTargetParameterFromScript(const var::NativeFunctionArgs & args)
 	return s->scriptParamsContainer.addTargetParameter(args.arguments[0], args.arguments[1])->getScriptObject();
 }
 
+var Script::addColorParameterFromScript(const var::NativeFunctionArgs & args)
+{
+	Script * s = getObjectFromJS<Script>(args);
+	if (!checkNumArgs(s->niceName, args, 2)) return var();
+	return s->scriptParamsContainer.addColorParameter(args.arguments[0], args.arguments[1], Colour((int)(args.arguments[2])))->getScriptObject();
+}
+
 var Script::addTriggerFromScript(const var::NativeFunctionArgs & args)
 {
 	Script * s = getObjectFromJS<Script>(args);
@@ -264,7 +309,7 @@ bool Script::checkNumArgs(const String &logName, const var::NativeFunctionArgs &
 {
 	if (args.numArguments != expectedArgs)
 	{
-		NLOG(logName, "Error addTargetParameter takes " + String(expectedArgs) + " arguments, got " + String(args.numArguments));
+		NLOG(logName, "Error, function takes " + String(expectedArgs) + " arguments, got " + String(args.numArguments));
 		if (args.numArguments > 0) NLOG("", "When tying to add : " + args.arguments[0].toString());
 		return false;
 	}
