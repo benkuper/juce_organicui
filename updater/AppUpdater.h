@@ -22,8 +22,6 @@ public:
 	AppUpdater();
 	~AppUpdater();
 
-	bool checkForBetas;
-
 	URL updateURL;
 	String downloadURLBase;
 	String downloadingFileName;

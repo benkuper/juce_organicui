@@ -45,8 +45,6 @@ void OrganicApplication::initialise(const String & commandLine)
 	
 	updateAppTitle();
 
-	bool isBeta = getAppVersion().endsWith("b");
-	AppUpdater::getInstance()->checkForBetas = GlobalSettings::getInstance()->checkBetaUpdates->boolValue() && (isBeta || !GlobalSettings::getInstance()->onlyCheckBetaFromBeta->boolValue());
 	AppUpdater::getInstance()->addAsyncUpdateListener(this);
 
 	if (GlobalSettings::getInstance()->checkUpdatesOnStartup->boolValue()) AppUpdater::getInstance()->checkForUpdates();

@@ -12,9 +12,11 @@
 
 juce_ImplementSingleton(AppUpdater)
 
+String getAppVersion();
+
+
 AppUpdater::AppUpdater() : 
 	Thread("appUpdater"), 
-	checkForBetas(true),
 	queuedNotifier(30)
 {}
 
@@ -84,9 +86,17 @@ void AppUpdater::run()
 
 		if (data.isObject())
 		{
+			bool thisIsBeta = getAppVersion().endsWith("b");
 			bool beta = data.getProperty("beta", false);
 
-			if (!beta || checkForBetas)
+			bool shouldCheck = true;
+			if (beta)
+			{
+				if (!GlobalSettings::getInstance()->checkBetaUpdates->boolValue()) shouldCheck = false;
+				else if (!thisIsBeta && GlobalSettings::getInstance()->onlyCheckBetaFromBeta->boolValue()) shouldCheck = false;
+			}
+
+			if (shouldCheck)
 			{
 				if (Engine::mainEngine->checkFileVersion(data.getDynamicObject(), true))
 				{
