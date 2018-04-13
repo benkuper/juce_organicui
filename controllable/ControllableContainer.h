@@ -159,7 +159,7 @@ public:
 	void addAsyncCoalescedContainerListener(ContainerAsyncListener * newListener) {queuedNotifier.addAsyncCoalescedListener(newListener); }
 	void removeAsyncContainerListener(ContainerAsyncListener* listener) { queuedNotifier.removeListener(listener); }
 	
-	void clear();
+	virtual void clear();
 
 
 
