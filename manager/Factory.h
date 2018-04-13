@@ -93,16 +93,26 @@ public:
 
 	T * showCreateMenu()
 	{
-		if(menu.getNumItems() == 0) buildPopupMenu();
+		int result = getMenu().show();
+		return createFromMenuResult(result);
+	}
 
-		int result = menu.show();
-		if (result == 0) return nullptr;
+	PopupMenu getMenu()
+	{
+		if (menu.getNumItems() == 0) buildPopupMenu();
+		return menu;
+	}
+
+	T * createFromMenuResult(int result)
+	{
+		if (result <= 0 || result >= defs.size()) return nullptr;
 		else
 		{
 			Definition * d = defs[result - 1];//result 0 is no result
 			return create(d->type);
 		}
 	}
+
 
 	T * create(const String &type)
 	{
