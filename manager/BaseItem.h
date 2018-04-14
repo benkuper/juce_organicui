@@ -36,6 +36,8 @@ public:
 
 	String itemDataType;
 
+	virtual void clearItem() {}
+
 	virtual void duplicate();
 	virtual void copy();
 	virtual bool paste();

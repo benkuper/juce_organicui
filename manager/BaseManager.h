@@ -638,6 +638,7 @@ void BaseManager<T>::removeItem(T * item, bool addToUndo, bool notify)
 
 	}
 
+	bi->clearItem();
 	delete item;
 }
 
