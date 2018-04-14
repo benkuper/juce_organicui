@@ -33,6 +33,7 @@ Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled) :
 	scriptObject.setMethod("addFloatParameter", Script::addFloatParameterFromScript);
 	scriptObject.setMethod("addEnumParameter", Script::addEnumParameterFromScript);
 	scriptObject.setMethod("addTargetParameter", Script::addTargetParameterFromScript);
+	scriptObject.setMethod("addColorParameter", Script::addColorParameterFromScript);
 	scriptObject.setMethod("addTrigger", Script::addTriggerFromScript);
 
 	scriptParamsContainer.hideEditorHeader = true;
@@ -298,7 +299,7 @@ var Script::addTargetParameterFromScript(const var::NativeFunctionArgs & args)
 var Script::addColorParameterFromScript(const var::NativeFunctionArgs & args)
 {
 	Script * s = getObjectFromJS<Script>(args);
-	if (!checkNumArgs(s->niceName, args, 2)) return var();
+	if (!checkNumArgs(s->niceName, args, 3)) return var();
 	return s->scriptParamsContainer.addColorParameter(args.arguments[0], args.arguments[1], Colour((int)(args.arguments[2])))->getScriptObject();
 }
 

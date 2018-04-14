@@ -75,6 +75,7 @@ void ParameterUI::paintOverChildren(Graphics & g)
 {
 
 	ControllableUI::paintOverChildren(g);
+	if (parameter == nullptr) return;
 	if (parameter->controlMode == Parameter::EXPRESSION)
 	{
 		Colour c = LIGHTCONTOUR_COLOR;

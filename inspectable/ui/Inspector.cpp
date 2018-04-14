@@ -31,20 +31,20 @@ Inspector::Inspector(InspectableSelectionManager * _selectionManager) :
 
 Inspector::~Inspector()
 {
-	if (selectionManager != nullptr) selectionManager->removeSelectionListener(this);
-	else if(InspectableSelectionManager::mainSelectionManager != nullptr) InspectableSelectionManager::mainSelectionManager->removeSelectionListener(this);
+	if (selectionManager != nullptr) selectionManager->removeAsyncSelectionManagerListener(this);
+	else if(InspectableSelectionManager::mainSelectionManager != nullptr) InspectableSelectionManager::mainSelectionManager->removeAsyncSelectionManagerListener(this);
 
 	clear();
 }
 
 void Inspector::setSelectionManager(InspectableSelectionManager * newSM)
 {
-	if (selectionManager != nullptr) selectionManager->removeSelectionListener(this);
+	if (selectionManager != nullptr) selectionManager->removeAsyncSelectionManagerListener(this);
 	
 	selectionManager = newSM;
 
 	if (selectionManager == nullptr) selectionManager = InspectableSelectionManager::mainSelectionManager;
-	if (selectionManager != nullptr) selectionManager->addSelectionListener(this);
+	if (selectionManager != nullptr) selectionManager->addAsyncSelectionManagerListener(this);
 }
 
 void Inspector::resized()
@@ -109,17 +109,20 @@ void Inspector::inspectableDestroyed(Inspectable * i)
 	if (currentInspectable == i) setCurrentInspectable(nullptr);
 }
 
-void Inspector::inspectablesSelectionChanged()
+void Inspector::newMessage(const InspectableSelectionManager::SelectionEvent & e)
 {
-	if (selectionManager->isEmpty())
+	if (e.type == InspectableSelectionManager::SelectionEvent::SELECTION_CHANGED)
 	{
-		setCurrentInspectable(nullptr);
-		return;
-	}
+		if (selectionManager->isEmpty())
+		{
+			setCurrentInspectable(nullptr);
+			return;
+		}
 
-	Inspectable * newI = selectionManager->currentInspectables[0];
-	if (!newI->showInspectorOnSelect) return;
-	setCurrentInspectable(newI);
+		Inspectable * newI = selectionManager->currentInspectables[0];
+		if (!newI->showInspectorOnSelect) return;
+		setCurrentInspectable(newI);
+	}	
 }
 
 InspectorUI::InspectorUI(const String &name, InspectableSelectionManager * selectionManager) :

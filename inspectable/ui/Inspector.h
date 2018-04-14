@@ -18,7 +18,7 @@
 class Inspector :
 	public Component,
 	public Inspectable::InspectableListener,
-	public InspectableSelectionManager::Listener
+	public InspectableSelectionManager::AsyncListener
 {
 public:
 	Inspector(InspectableSelectionManager * selectionManager = nullptr);
@@ -37,7 +37,7 @@ public:
     void inspectableDestroyed(Inspectable * inspectable) override;
 
 	//From InspectableSelectionManager
-	void inspectablesSelectionChanged() override;
+	void newMessage(const InspectableSelectionManager::SelectionEvent &e) override;
 
 	class  InspectorListener
 	{

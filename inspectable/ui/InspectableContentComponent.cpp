@@ -20,10 +20,12 @@ InspectableContentComponent::InspectableContentComponent(Inspectable * inspectab
 {
 	setWantsKeyboardFocus(true);
 	setMouseClickGrabsKeyboardFocus(true);
+	inspectable->addAsyncInspectableListener(this);
 }
 
 InspectableContentComponent::~InspectableContentComponent()
 {
+	if (!inspectable.wasObjectDeleted()) inspectable->removeAsyncInspectableListener(this);
 }
 
 
@@ -89,8 +91,12 @@ void InspectableContentComponent::paintOverChildren(Graphics & g)
 	}
 }
 
-void InspectableContentComponent::inspectableSelectionChanged(Inspectable *)
+void InspectableContentComponent::newMessage(const Inspectable::InspectableEvent & e)
 {
-	if (bringToFrontOnSelect) toFront(true);
-	if (repaintOnSelectionChanged) repaint();
+	if (e.type == Inspectable::InspectableEvent::SELECTION_CHANGED || e.type == Inspectable::InspectableEvent::PRESELECTION_CHANGED)
+	{
+		if (bringToFrontOnSelect) toFront(true);
+		if (repaintOnSelectionChanged) repaint();
+	}
 }
+	

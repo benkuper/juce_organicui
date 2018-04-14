@@ -58,6 +58,24 @@ public:
 	void addSelectionListener(Listener* newListener) { listeners.add(newListener); }
 	void removeSelectionListener(Listener* listener) { listeners.remove(listener); }
 
+	class  SelectionEvent
+	{
+	public:
+		enum Type { SELECTION_CHANGED };
+
+		SelectionEvent(Type t, InspectableSelectionManager * ism) :
+			type(t), selectionManager(ism) {}
+
+		Type type;
+		InspectableSelectionManager * selectionManager;
+	};
+
+	QueuedNotifier<SelectionEvent> selectionNotifier;
+	typedef QueuedNotifier<SelectionEvent>::Listener AsyncListener;
+
+	void addAsyncSelectionManagerListener(AsyncListener* newListener) { selectionNotifier.addListener(newListener); }
+	void addAsyncCoalescedSelectionManagerListener(AsyncListener* newListener) { selectionNotifier.addAsyncCoalescedListener(newListener); }
+	void removeAsyncSelectionManagerListener(AsyncListener* listener) { selectionNotifier.removeListener(listener); }
 };
 
 

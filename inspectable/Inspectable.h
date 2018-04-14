@@ -61,6 +61,25 @@ public:
 	void addInspectableListener(InspectableListener* newListener) { listeners.add(newListener); }
 	void removeInspectableListener(InspectableListener* listener) { listeners.remove(listener); }
 
+	// ASYNC
+	class  InspectableEvent
+	{
+	public:
+		enum Type { SELECTION_CHANGED, PRESELECTION_CHANGED, DESTROYED};
+
+		InspectableEvent(Type t, Inspectable * inspectable) :
+			type(t), inspectable(inspectable) {}
+
+		Type type;
+		Inspectable * inspectable;
+	};
+
+	QueuedNotifier<InspectableEvent> inspectableNotifier;
+	typedef QueuedNotifier<InspectableEvent>::Listener AsyncListener;
+
+	void addAsyncInspectableListener(AsyncListener* newListener) { inspectableNotifier.addListener(newListener); }
+	void addAsyncCoalescedInspectableListener(AsyncListener* newListener) { inspectableNotifier.addAsyncCoalescedListener(newListener); }
+	void removeAsyncInspectableListener(AsyncListener* listener) { inspectableNotifier.removeListener(listener); }
 
 	WeakReference<Inspectable>::Master masterReference;
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Inspectable)

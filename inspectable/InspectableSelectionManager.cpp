@@ -13,7 +13,8 @@
 InspectableSelectionManager * InspectableSelectionManager::mainSelectionManager = nullptr;
 InspectableSelectionManager * InspectableSelectionManager::activeSelectionManager = nullptr;
 
-InspectableSelectionManager::InspectableSelectionManager(bool isMainSelectionManager)
+InspectableSelectionManager::InspectableSelectionManager(bool isMainSelectionManager) :
+	selectionNotifier(100)
 {
 	if (isMainSelectionManager) InspectableSelectionManager::mainSelectionManager = this;
     setEnabled(true);
@@ -44,7 +45,11 @@ void InspectableSelectionManager::selectInspectables(Array<Inspectable*> inspect
 
 	if (doClearSelection) clearSelection(false);
 	for (auto &i : inspectables) selectInspectable(i, false, false);
-	if (notify) listeners.call(&Listener::inspectablesSelectionChanged);
+	if (notify)
+	{
+		listeners.call(&Listener::inspectablesSelectionChanged);
+		selectionNotifier.addMessage(new SelectionEvent(SelectionEvent::SELECTION_CHANGED, this));
+	}
 
 }
 
@@ -66,7 +71,11 @@ void InspectableSelectionManager::selectInspectable(WeakReference<Inspectable> i
 		currentInspectables.add(inspectable);
 	}
 
-	if(notify) listeners.call(&Listener::inspectablesSelectionChanged);
+	if (notify)
+	{
+		listeners.call(&Listener::inspectablesSelectionChanged);
+		selectionNotifier.addMessage(new SelectionEvent(SelectionEvent::SELECTION_CHANGED, this));
+	}
 }
 
 void InspectableSelectionManager::deselectInspectable(WeakReference<Inspectable> inspectable, bool notify)
@@ -78,7 +87,11 @@ void InspectableSelectionManager::deselectInspectable(WeakReference<Inspectable>
 		currentInspectables.removeAllInstancesOf(inspectable.get());
 	}
 	
-	if (notify) listeners.call(&Listener::inspectablesSelectionChanged);
+	if(notify)
+	{
+		listeners.call(&Listener::inspectablesSelectionChanged);
+		selectionNotifier.addMessage(new SelectionEvent(SelectionEvent::SELECTION_CHANGED, this));
+	}
 }
 
 void InspectableSelectionManager::clearSelection(bool notify)
@@ -89,7 +102,11 @@ void InspectableSelectionManager::clearSelection(bool notify)
 	}
 
 	currentInspectables.clear();
-	if(notify) listeners.call(&Listener::inspectablesSelectionChanged);
+	if (notify)
+	{
+		listeners.call(&Listener::inspectablesSelectionChanged);
+		selectionNotifier.addMessage(new SelectionEvent(SelectionEvent::SELECTION_CHANGED, this));
+	}
 }
 
 bool InspectableSelectionManager::isEmpty()
