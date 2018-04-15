@@ -66,8 +66,9 @@ public:
 	void askForDuplicateItem(BaseItem * item) override;
 	void askForPaste() override;
 
-	var getJSONData() override;
-	void loadJSONDataInternal(var data) override;
+	virtual var getJSONData() override;
+	virtual void loadJSONDataInternal(var data) override;
+	virtual void loadJSONDataManagerInternal(var data);
 
 	void updateLiveScriptObjectInternal(DynamicObject * = nullptr) override;
 
@@ -694,7 +695,7 @@ var BaseManager<T>::getJSONData()
 	var itemsData = var();
 	for (auto &t : items)
 	{
-		itemsData.append(t->getJSONData());
+		if(t->isSavable) itemsData.append(t->getJSONData());
 	}
 
 	if (itemsData.size() > 0) data.getDynamicObject()->setProperty("items", itemsData);
@@ -706,6 +707,12 @@ template<class T>
 void BaseManager<T>::loadJSONDataInternal(var data)
 {
 	clear();
+	loadJSONDataManagerInternal(data);
+}
+
+template<class T>
+void BaseManager<T>::loadJSONDataManagerInternal(var data)
+{
 	Array<var> * itemsData = data.getProperty("items", var()).getArray();
 	if (itemsData == nullptr) return;
 

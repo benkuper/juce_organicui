@@ -36,6 +36,8 @@ public:
 	void setHighlightOnMouseOver(bool highlight);
 
 	void paint(Graphics &g) override;
+
+
 	virtual void newMessage(const ContainerAsyncEvent &e) override;
 
 	//void controllableFeedbackUpdate(ControllableContainer *, Controllable *) override;
@@ -139,7 +141,7 @@ void BaseItemMinimalUI<T>::setHighlightOnMouseOver(bool highlight)
 template<class T>
 void BaseItemMinimalUI<T>::paint(Graphics &g)
 {
-	juce::Rectangle<float> r = getLocalBounds().toFloat();
+	juce::Rectangle<float> r = getMainBounds().toFloat();
 	bool isItemEnabled = baseItem->canBeDisabled ? baseItem->enabled->boolValue() : true;
 
 	Colour c = isItemEnabled ? bgColor : bgColor.darker(.3f);
@@ -147,6 +149,7 @@ void BaseItemMinimalUI<T>::paint(Graphics &g)
 	g.setColour(c);
 	g.fillRoundedRectangle(r, 4);
 }
+
 
 template<class T>
 void BaseItemMinimalUI<T>::newMessage(const ContainerAsyncEvent & e)

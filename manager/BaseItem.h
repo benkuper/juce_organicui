@@ -31,6 +31,8 @@ public:
 	bool canHaveScripts;
 	bool userCanRemove;
 	bool askConfirmationBeforeRemove;
+	bool isSavable;
+	bool saveType;
 
 	ScopedPointer<ScriptManager> scriptManager;
 

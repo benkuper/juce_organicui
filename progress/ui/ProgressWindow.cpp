@@ -14,7 +14,6 @@ ProgressListener(notifier),
 titleLabel("title",""),
 progressParam("Progress", "Progression", 0, 0, 1)
 {
-	DBG("progressParam " << progressParam.floatValue());
 
 	progressUI = progressParam.createSlider();
 	addAndMakeVisible(progressUI);

@@ -14,6 +14,8 @@ BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts
 	canHaveScripts(_canHaveScripts),
 	userCanRemove(true),
 	askConfirmationBeforeRemove(true),
+	isSavable(true),
+	saveType(true),
 	itemDataType("")
 {
 	saveAndLoadName = true;
@@ -26,12 +28,12 @@ BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts
 	}
 
 	//For UI
-	miniMode = addBoolParameter("Mini Mode", "Set the mini mode", false);
+	miniMode = addBoolParameter("MiniMode", "Set the mini mode", false);
 	miniMode->hideInOutliner = true;
 	miniMode->hideInEditor = true;
 	miniMode->isTargettable = false;
 
-	listUISize = addFloatParameter("List Size", "Size in list", 0, 0, 500);
+	listUISize = addFloatParameter("ListSize", "Size in list", 0, 0, 500);
 	listUISize->hideInEditor = true;
 	listUISize->hideInOutliner = true;
 	listUISize->isTargettable = false;
@@ -42,7 +44,7 @@ BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts
 	viewUIPosition->hideInOutliner = true;
 	viewUIPosition->isTargettable = false;
 
-	viewUISize = addPoint2DParameter("Size", "Size in the view");
+	viewUISize = addPoint2DParameter("ViewUISize", "Size in the view");
 	viewUISize->setBounds(30, 60, 10000, 10000);
 	viewUISize->setPoint(200, 200);
 	viewUISize->defaultValue = viewUISize->value;
@@ -77,7 +79,7 @@ bool BaseItem::paste()
 
 void BaseItem::remove()
 {
-	baseItemListeners.call(&BaseItem::Listener::askForRemoveBaseItem, this);
+	if(userCanRemove) baseItemListeners.call(&BaseItem::Listener::askForRemoveBaseItem, this);
 }
 
 
@@ -105,7 +107,7 @@ void BaseItem::onControllableFeedbackUpdate(ControllableContainer * cc, Controll
 var BaseItem::getJSONData()
 {
 	var data = ControllableContainer::getJSONData();
-	data.getDynamicObject()->setProperty("type", getTypeString());
+	if(saveType) data.getDynamicObject()->setProperty("type", getTypeString());
 	if (canHaveScripts) data.getDynamicObject()->setProperty("scripts", scriptManager->getJSONData());
 	return data; 
 }

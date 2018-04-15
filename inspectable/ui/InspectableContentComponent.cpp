@@ -87,10 +87,15 @@ void InspectableContentComponent::paintOverChildren(Graphics & g)
 	if (autoDrawHighlightWhenSelected && inspectable->isSelected)
 	{
 		g.setColour(highlightColor);
-		g.drawRoundedRectangle(getLocalBounds().toFloat(), rounderCornerSize, 2);
+		g.drawRoundedRectangle(getMainBounds().toFloat(), rounderCornerSize, 2);
 	}
 }
 
+Rectangle<int> InspectableContentComponent::getMainBounds()
+{
+	return getLocalBounds();
+
+}
 void InspectableContentComponent::newMessage(const Inspectable::InspectableEvent & e)
 {
 	if (e.type == Inspectable::InspectableEvent::SELECTION_CHANGED || e.type == Inspectable::InspectableEvent::PRESELECTION_CHANGED)
