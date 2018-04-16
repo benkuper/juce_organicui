@@ -29,9 +29,9 @@ public:
 	FloatParameter yParam;
 	FloatParameter zParam;
 
-	FloatSliderUI xSlider;
-	FloatSliderUI ySlider;
-	FloatSliderUI zSlider;
+	ScopedPointer<ControllableUI> xSlider;
+	ScopedPointer<ControllableUI> ySlider;
+	ScopedPointer<ControllableUI> zSlider;
 
 	var mouseDownValue;
 

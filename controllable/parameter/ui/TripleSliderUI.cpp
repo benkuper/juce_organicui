@@ -14,24 +14,30 @@ TripleSliderUI::TripleSliderUI(Point3DParameter * parameter) :
 	p3d(parameter),
 	xParam("X", "xParam", parameter->x, parameter->minimumValue[0], parameter->maximumValue[0]),
 	yParam("Y", "yParam", parameter->y, parameter->minimumValue[1], parameter->maximumValue[1]),
-	zParam("Z", "zParam", parameter->z, parameter->minimumValue[2], parameter->maximumValue[2]),
-	xSlider(&xParam), ySlider(&yParam), zSlider(&zParam)
+	zParam("Z", "zParam", parameter->z, parameter->minimumValue[2], parameter->maximumValue[2])
 {
 
 	xParam.defaultValue = 0;
 	yParam.defaultValue = 0;
 	zParam.defaultValue = 0;
+	xParam.defaultUI = parameter->defaultUI;
+	yParam.defaultUI = parameter->defaultUI;
+	zParam.defaultUI = parameter->defaultUI;
 	xParam.addAsyncCoalescedParameterListener(this);
 	yParam.addAsyncCoalescedParameterListener(this);
 	zParam.addAsyncCoalescedParameterListener(this);
 
-	xSlider.addToUndoOnMouseUp = false;
-	ySlider.addToUndoOnMouseUp = false;
-	zSlider.addToUndoOnMouseUp = false;
+	xSlider = xParam.createDefaultUI();
+	ySlider = yParam.createDefaultUI();
+	zSlider = zParam.createDefaultUI();
 
-	addAndMakeVisible(&xSlider);
-	addAndMakeVisible(&ySlider);
-	addAndMakeVisible(&zSlider);
+	//xSlider->addToUndoOnMouseUp = false;
+	//ySlider->addToUndoOnMouseUp = false;
+	//zSlider->addToUndoOnMouseUp = false;
+
+	addAndMakeVisible(xSlider);
+	addAndMakeVisible(ySlider);
+	addAndMakeVisible(zSlider);
 
 	setInterceptsMouseClicks(true, true);
 
@@ -49,18 +55,20 @@ TripleSliderUI::~TripleSliderUI()
 void TripleSliderUI::setForceFeedbackOnlyInternal()
 {
 	bool val = parameter->isControllableFeedbackOnly || !parameter->isEditable || forceFeedbackOnly;
-	xSlider.setForceFeedbackOnly(val);
-	ySlider.setForceFeedbackOnly(val);
-	zSlider.setForceFeedbackOnly(val);
+	xSlider->setForceFeedbackOnly(val);
+	ySlider->setForceFeedbackOnly(val);
+	zSlider->setForceFeedbackOnly(val);
 
 }
 
 void TripleSliderUI::resized()
 {
  juce::Rectangle<int> r = getLocalBounds();
-	xSlider.setBounds(r.removeFromLeft(r.getWidth() / 3 - 2));
-	ySlider.setBounds(r.removeFromLeft(r.getWidth() /2 - 4));
-	zSlider.setBounds(r.removeFromRight(r.getWidth() - 4));
+	xSlider->setBounds(r.removeFromLeft(r.getWidth() / 3 - 2));
+	r.removeFromLeft(2);
+	ySlider->setBounds(r.removeFromLeft(r.getWidth() /2 - 4));
+	r.removeFromLeft(2);
+	zSlider->setBounds(r.removeFromRight(r.getWidth() - 4));
 
 }
 

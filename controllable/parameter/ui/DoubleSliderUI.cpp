@@ -18,6 +18,8 @@ DoubleSliderUI::DoubleSliderUI(Point2DParameter * parameter) :
 {
 	xParam.defaultValue = 0;
 	yParam.defaultValue = 0;
+	xParam.defaultUI = parameter->defaultUI;
+	yParam.defaultUI = parameter->defaultUI;
 
 	xParam.addAsyncParameterListener(this);
 	yParam.addAsyncParameterListener(this);

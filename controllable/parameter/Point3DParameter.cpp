@@ -11,7 +11,8 @@ Author:  bkupe
 
 Point3DParameter::Point3DParameter(const String & niceName, const String & description, bool enabled) :
 	Parameter(POINT3D, niceName, description, 0, 0, 1, enabled),
-	x(0), y(0), z(0)
+	x(0), y(0), z(0),
+	defaultUI(FloatParameter::SLIDER)
 {
 
 	value = var();
@@ -19,7 +20,7 @@ Point3DParameter::Point3DParameter(const String & niceName, const String & descr
 	value.append(0);
 	value.append(0);
 
-
+	 
 	minimumValue = var();
 	minimumValue.append(0);
 	minimumValue.append(0);

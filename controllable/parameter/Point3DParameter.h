@@ -18,6 +18,9 @@ public:
 	~Point3DParameter() {}
 
 	float x, y, z;
+	FloatParameter::UIType defaultUI;
+
+
 	void setVector(Vector3D<float> value);
 	void setVector(float x, float y, float z);
 	void setUndoableVector(Vector3D<float> oldVector, Vector3D<float> newVector);

@@ -11,7 +11,8 @@
 
 Point2DParameter::Point2DParameter(const String & niceName, const String & description, bool _enabled) :
 	Parameter(POINT2D, niceName, description, 0, 0, 1, _enabled),
-	x(0), y(0)
+	x(0), y(0),
+	defaultUI(FloatParameter::SLIDER)
 {
 
 	value = var();

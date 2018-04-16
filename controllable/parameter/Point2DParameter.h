@@ -18,6 +18,7 @@ public:
 	~Point2DParameter() {}
 
 	float x, y;
+	FloatParameter::UIType defaultUI;
 
 	void setPoint(Point<float> value);
 	void setPoint(float x, float y);
