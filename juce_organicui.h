@@ -22,14 +22,14 @@
   website:          https://github.com/benkuper/juce_organicui
   license:          GPLv3
 
-  dependencies:     juce_core, juce_gui_basics, juce_gui_extra
+  dependencies:     juce_core, juce_gui_basics, juce_gui_extra, juce_opengl
 
  END_JUCE_MODULE_DECLARATION
 
 *******************************************************************************/
 
 
-#ifndef ORGANIC_UI_H_INCLUDED
+#pragma once
 #define ORGANIC_UI_H_INCLUDED
 
 //==============================================================================
@@ -48,8 +48,6 @@
 #include "juce_opengl/juce_opengl.h"
 
 using namespace juce;
-
-
 
 #include "manager/Factory.h"
 
@@ -207,4 +205,3 @@ using namespace juce;
 #include "app/OrganicMainComponent.h"
 #include "app/OrganicApplication.h"
 
-#endif   // ORGANIC_UI_H_INCLUDED 

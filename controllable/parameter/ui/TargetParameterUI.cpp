@@ -25,7 +25,7 @@ TargetParameterUI::TargetParameterUI(TargetParameter * parameter, const String &
 	if (targetParameter->customCheckAssignOnNextChangeFunc != nullptr)
 	{
 		
-		listeningToNextChange = new BoolParameter("Auto Learn", "When this parameter is on, any parameter that changes will be auto assigned to this target", false);
+		listeningToNextChange = new BoolParameter("Learn", "When this parameter is on, any parameter that changes will be auto assigned to this target", false);
 		listeningToNextChange->addAsyncParameterListener(this);
 		listeningToNextChangeBT = listeningToNextChange->createToggle();
 		addAndMakeVisible(listeningToNextChangeBT);
@@ -66,7 +66,7 @@ void TargetParameterUI::resized()
  juce::Rectangle<int> r = getLocalBounds();
 	if (listeningToNextChangeBT != nullptr)
 	{
-		listeningToNextChangeBT->setBounds(r.removeFromRight(100));
+		listeningToNextChangeBT->setBounds(r.removeFromRight(50));
 		r.removeFromRight(2);
 	}
 

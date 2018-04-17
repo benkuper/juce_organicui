@@ -2,7 +2,6 @@
 #if JUCE_MAC //for chmod
 #include <sys/types.h>
 #include <sys/stat.h>
-#include "OrganicApplication.h"
 #endif
 
 
