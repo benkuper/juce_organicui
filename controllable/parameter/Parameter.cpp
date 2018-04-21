@@ -10,7 +10,7 @@
 */
 
 
-Parameter::Parameter(const Type &type, const String &niceName, const String &description, var initialValue, var minValue = var(), var maxValue = var(), bool enabled) :
+Parameter::Parameter(const Type &type, const String &niceName, const String &description, var initialValue, var minValue, var maxValue, bool enabled) :
 	Controllable(type, niceName, description, enabled),
 	lockManualControlMode(false),
 	controlMode(MANUAL),
@@ -18,15 +18,13 @@ Parameter::Parameter(const Type &type, const String &niceName, const String &des
 	isOverriden(false),
 	autoAdaptRange(false),
 	forceSaveValue(false),
+	minimumValue(minValue),
+	maximumValue(maxValue),
+	defaultMinValue(minValue),
+	defaultMaxValue(maxValue),
+	defaultValue(initialValue),
 	queuedNotifier(100)
 {
-	minimumValue = minValue;
-	maximumValue = maxValue;
-	defaultMinValue = minValue;
-	defaultMaxValue = maxValue;
-
-	defaultValue = initialValue;
-
 	resetValue(true);
 
 	scriptObject.setMethod("get", Parameter::getValueFromScript);
@@ -199,7 +197,7 @@ void Parameter::setNormalizedValue(const float & normalizedValue, bool silentSet
 float Parameter::getNormalizedValue()
 {
 	if (type != FLOAT && type != INT && type != BOOL) return 0;
-	if (minimumValue == maximumValue) {
+	if ((float)minimumValue == (float)maximumValue) {
 		return 0.0;
 	} else
 		return jmap<float>((float)value, (float)minimumValue, (float)maximumValue, 0.f, 1.f);
