@@ -87,57 +87,69 @@ void AppUpdater::run()
 		if (data.isObject())
 		{
 			bool thisIsBeta = getAppVersion().endsWith("b");
-			bool beta = data.getProperty("beta", false);
+			bool shouldCheckForBeta = true;
+			if (!GlobalSettings::getInstance()->checkBetaUpdates->boolValue()) shouldCheckForBeta = false;
+			else if (!thisIsBeta && GlobalSettings::getInstance()->onlyCheckBetaFromBeta->boolValue()) shouldCheckForBeta = false;
+			
 
-			bool shouldCheck = true;
-			if (beta)
+			var betaData = data.getProperty("betaversion", var());
+			var stableData = data.getProperty("stableversion", var());
+
+			String betaVersion = betaData.getProperty("version", "");
+			String stableVersion = stableData.getProperty("version", "");
+
+			var dataToCheck;
+			bool dataIsBeta;
+			if (shouldCheckForBeta && Engine::mainEngine->versionIsNewerThan(betaVersion, stableVersion))
 			{
-				if (!GlobalSettings::getInstance()->checkBetaUpdates->boolValue()) shouldCheck = false;
-				else if (!thisIsBeta && GlobalSettings::getInstance()->onlyCheckBetaFromBeta->boolValue()) shouldCheck = false;
-			}
-
-			if (shouldCheck)
+				DBG("Beta is newer : " << betaVersion);
+				dataIsBeta = true;
+				dataToCheck = betaData;
+			} else
 			{
-				if (Engine::mainEngine->checkFileVersion(data.getDynamicObject(), true))
-				{
-					String version = data.getProperty("version", "");
-					Array<var> * changelog = data.getProperty("changelog", var()).getArray();
-					String msg = "A new " + String(beta ? "BETA " : "") + "version of Chataigne is available : " + version + "\n\nChangelog :\n";
+				DBG("Stable is newer or not checking for beta " << stableVersion);
+				dataIsBeta = false;
+				dataToCheck = stableData;
+			} 
 
-					for (auto &c : *changelog) msg += c.toString() + "\n";
-                    msg += "\nDo you want to update the app ?";
+			if (Engine::mainEngine->checkFileVersion(dataToCheck.getDynamicObject(), true))
+			{
+				String version = dataToCheck.getProperty("version", "");
+				Array<var> * changelog = dataToCheck.getProperty("changelog", var()).getArray();
+				String msg = "A new " + String(dataIsBeta ? "BETA " : "") + "version of Chataigne is available : " + version + "\n\nChangelog :\n";
 
+				for (auto &c : *changelog) msg += c.toString() + "\n";
+                msg += "\nDo you want to update the app ?";
 					
 
-					int result = AlertWindow::showOkCancelBox(AlertWindow::InfoIcon, "New version available", msg, "Yes", "No");
-					if (result)
-					{
-						downloadingFileName = getDownloadFileName(version, beta);
-						URL downloadURL = URL(downloadURLBase + downloadingFileName);
-
-						
-						targetDir.createDirectory();
-						
-						File targetFile = targetDir.getChildFile(downloadingFileName);
-						if (targetFile.existsAsFile()) targetFile.deleteFile();
-
-						downloadingFileName = targetFile.getFileName();
-
-						LOG("Downloading " + downloadURL.toString(false) + "...");
-
-
-						downloadTask = downloadURL.downloadToFile(targetFile, "", this);
-						if (downloadTask == nullptr)
-						{
-							LOGERROR("Error while downloading " + downloadingFileName + ",\ntry downloading it directly from the website.");
-							queuedNotifier.addMessage(new UpdateEvent(UpdateEvent::DOWNLOAD_ERROR));
-						}
-						queuedNotifier.addMessage(new UpdateEvent(UpdateEvent::DOWNLOAD_STARTED));
-					}
-				} else
+				int result = AlertWindow::showOkCancelBox(AlertWindow::InfoIcon, dataIsBeta?"New BETA version available":"New version available", msg, "Yes", "No");
+				if (result)
 				{
-					LOG("App is up to date :) (Latest version online : " << data.getProperty("version", "").toString() << ")");
+					downloadingFileName = getDownloadFileName(version, dataIsBeta);
+					URL downloadURL = URL(downloadURLBase + downloadingFileName);
+
+						
+					targetDir.createDirectory();
+						
+					File targetFile = targetDir.getChildFile(downloadingFileName);
+					if (targetFile.existsAsFile()) targetFile.deleteFile();
+
+					downloadingFileName = targetFile.getFileName();
+
+					LOG("Downloading " + downloadURL.toString(false) + "...");
+
+
+					downloadTask = downloadURL.downloadToFile(targetFile, "", this);
+					if (downloadTask == nullptr)
+					{
+						LOGERROR("Error while downloading " + downloadingFileName + ",\ntry downloading it directly from the website.");
+						queuedNotifier.addMessage(new UpdateEvent(UpdateEvent::DOWNLOAD_ERROR));
+					}
+					queuedNotifier.addMessage(new UpdateEvent(UpdateEvent::DOWNLOAD_STARTED));
 				}
+			} else
+			{
+				LOG("App is up to date :) (Latest version online : " << dataToCheck.getProperty("version", "").toString() << ")");
 			}
 		} else
 		{
