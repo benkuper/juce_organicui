@@ -69,6 +69,7 @@ public:
 	virtual void loadJSONDataInternalEngine(var data, ProgressTask * loadingTask) {}
 
 	bool checkFileVersion(DynamicObject * metaData, bool checkForNewerVersion = false);
+	bool versionIsNewerThan(String versionToCheck, String referenceVersion);
 	virtual String getMinimumRequiredFileVersion();
 
 	int64 loadingStartTime;

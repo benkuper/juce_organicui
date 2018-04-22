@@ -259,7 +259,23 @@ bool Engine::checkFileVersion(DynamicObject * metaData, bool checkForNewerVersio
 {
 	if (!metaData->hasProperty("version")) return false;
 	String versionToCheck = checkForNewerVersion ? appVersion : getMinimumRequiredFileVersion();
-	DBG(metaData->getProperty("version").toString() << " / " << versionToCheck);
+	//DBG(metaData->getProperty("version").toString() << " / " << versionToCheck);
+
+	String fVersion = metaData->getProperty("version").toString();
+	
+	if (versionToCheck == fVersion && !checkForNewerVersion) return true;
+
+	return versionIsNewerThan(fVersion, versionToCheck);
+}
+
+bool Engine::versionIsNewerThan(String versionToCheck, String referenceVersion)
+{
+	bool referenceVersionIsBeta = false;
+	if (referenceVersion.endsWith("b"))
+	{
+		referenceVersion = referenceVersion.substring(0, referenceVersion.length() - 1);
+		referenceVersionIsBeta = true;
+	}
 
 	bool versionToCheckIsBeta = false;
 	if (versionToCheck.endsWith("b"))
@@ -268,19 +284,11 @@ bool Engine::checkFileVersion(DynamicObject * metaData, bool checkForNewerVersio
 		versionToCheckIsBeta = true;
 	}
 
-	String fVersion = metaData->getProperty("version").toString();
-	bool fileIsBeta = false;
-	if (fVersion.endsWith("b"))
-	{
-		fVersion = fVersion.substring(0, fVersion.length() - 1);
-		fileIsBeta = true;
-	}
-
 	StringArray fileVersionSplit;
-	fileVersionSplit.addTokens(fVersion, juce::StringRef("."), juce::StringRef("\""));
+	fileVersionSplit.addTokens(versionToCheck, juce::StringRef("."), juce::StringRef("\""));
 
 	StringArray minVersionSplit;
-	minVersionSplit.addTokens(versionToCheck, juce::StringRef("."), juce::StringRef("\""));
+	minVersionSplit.addTokens(referenceVersion, juce::StringRef("."), juce::StringRef("\""));
 
 	int maxVersionNumbers = jmax<int>(fileVersionSplit.size(), minVersionSplit.size());
 	while (fileVersionSplit.size() < maxVersionNumbers) fileVersionSplit.add("0");
@@ -294,10 +302,8 @@ bool Engine::checkFileVersion(DynamicObject * metaData, bool checkForNewerVersio
 		else if (fV < minV) return false;
 	}
 
-	//equals
-	if (fileIsBeta) return false;
-
-	return checkForNewerVersion ? false : true;
+	//if equals return false
+	return false;
 }
 
 String Engine::getMinimumRequiredFileVersion()
