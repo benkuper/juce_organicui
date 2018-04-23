@@ -224,7 +224,7 @@ BaseManagerUI<M, T, U>::BaseManagerUI(const String & contentName, M * _manager, 
 
 	//must call addExistingItems from child class to get overrides
 
-	setSize(100, 50); //default
+	//setSize(100, 50); //default
 }
 
 

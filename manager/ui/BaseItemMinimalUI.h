@@ -70,7 +70,7 @@ BaseItemMinimalUI<T>::BaseItemMinimalUI(T * _item) :
 	
 	if (baseItem->canBeDisabled && dimAlphaOnDisabled) setAlpha(baseItem->enabled->boolValue() ? 1 : .5f);
 
-	setSize(100, 20);
+	//setSize(100, 20);
 }
 
 template<class T>
