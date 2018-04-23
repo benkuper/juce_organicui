@@ -43,7 +43,7 @@ public:
 
 	virtual void changed() override;
 	void createNewGraph();
-	void clear();
+    void clear() override;
 	virtual void clearInternal() {}; //to override to clear specific application classes
 
 	void parseCommandline(const String &);

@@ -8,12 +8,7 @@
   ==============================================================================
 */
 
-#ifndef UNDOMASTER_H_INCLUDED
-#define UNDOMASTER_H_INCLUDED
-
-
-#include "JuceHeader.h"
-
+#pragma once
 
 class UndoMaster :
 	public UndoManager
@@ -28,7 +23,3 @@ public:
 	void performAction(const String &name, UndoableAction *action);
 	void performActions(const String &name, Array<UndoableAction *> actions);
 };
-
-
-
-#endif  // UNDOMASTER_H_INCLUDED
