@@ -31,6 +31,7 @@ GlobalSettings::GlobalSettings() :
 	addChildControllableContainer(&confirmationsCC);
 	askBeforeRemovingItems = confirmationsCC.addBoolParameter("Ask before removing items", "If enabled, you will get a confirmation prompt before removing any item", false);
 
+	addChildControllableContainer(OSCRemoteControl::getInstance());
 }
 
 GlobalSettings::~GlobalSettings()

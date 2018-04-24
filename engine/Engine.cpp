@@ -68,6 +68,8 @@ Engine::~Engine() {
 	
 	GlobalSettings::deleteInstance();
 
+	OSCRemoteControl::deleteInstance();
+
 	AssetManager::deleteInstance();
 
 	Engine::mainEngine = nullptr;

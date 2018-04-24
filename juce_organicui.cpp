@@ -128,3 +128,4 @@
 #include "app/OrganicMainComponentCommands.cpp"
 #include "app/OrganicApplication.cpp"
 
+#include "remotecontrol/OSCRemoteControl.cpp"

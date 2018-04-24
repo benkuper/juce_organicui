@@ -68,7 +68,11 @@ public:
 				Parameter * p = dynamic_cast<Parameter *>(d->createFunc());
 				if (copyName) p->setNiceName(source->niceName);
 				p->setRange(sourceP->minimumValue, sourceP->maximumValue);
-				if (copyValue) p->setValue(sourceP->value);
+				if (copyValue)
+				{
+					p->defaultValue = sourceP->value;
+					p->resetValue();
+				}
 
 				return p;
 			}

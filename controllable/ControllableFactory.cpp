@@ -19,6 +19,7 @@ ControllableFactory::ControllableFactory() {
 	controllableDefs.add(new ControllableDefinition("Integer", &IntParameter::create));
 	controllableDefs.add(new ControllableDefinition("Enum", &EnumParameter::create));
 	controllableDefs.add(new ControllableDefinition("String", &StringParameter::create));
+	controllableDefs.add(new ControllableDefinition("File", &FileParameter::create));
 	controllableDefs.add(new ControllableDefinition("Point2D", &Point2DParameter::create));
 	controllableDefs.add(new ControllableDefinition("Point3D", &Point3DParameter::create));
 	controllableDefs.add(new ControllableDefinition("Target", &TargetParameter::create));

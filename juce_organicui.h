@@ -22,7 +22,7 @@
   website:          https://github.com/benkuper/juce_organicui
   license:          GPLv3
 
-  dependencies:     juce_core, juce_gui_basics, juce_gui_extra, juce_opengl
+  dependencies:     juce_core, juce_gui_basics, juce_gui_extra, juce_opengl, juce_osc
 
  END_JUCE_MODULE_DECLARATION
 
@@ -41,11 +41,12 @@
 
 
 
-#include "juce_core/juce_core.h"
-#include "juce_events/juce_events.h"
-#include "juce_gui_basics/juce_gui_basics.h"
-#include "juce_gui_extra/juce_gui_extra.h"
-#include "juce_opengl/juce_opengl.h"
+#include <juce_core/juce_core.h>
+#include <juce_events/juce_events.h>
+#include <juce_gui_basics/juce_gui_basics.h>
+#include <juce_gui_extra/juce_gui_extra.h>
+#include <juce_opengl/juce_opengl.h>
+#include <juce_osc/juce_osc.h>
 
 using namespace juce;
 
@@ -63,6 +64,7 @@ using namespace juce;
 #include "helpers/QueuedNotifier.h"
 #include "helpers/StringUtil.h"
 #include "helpers/WakeOnLan.h"
+#include "helpers/OSCHelpers.h"
 
 #include "script/ScriptTarget.h"
 
@@ -205,3 +207,4 @@ using namespace juce;
 #include "app/OrganicMainComponent.h"
 #include "app/OrganicApplication.h"
 
+#include "remotecontrol/OSCRemoteControl.h"
