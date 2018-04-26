@@ -239,7 +239,8 @@ Point<float> BaseManagerViewUI<M, T, U>::getPosInView(const Point<float>& viewPo
 	return (viewPos*getUnitSize()) + getViewCenter().toFloat();
 }
 
-template<class M, class T, class U> juce::Rectangle<float> BaseManagerViewUI<M, T, U>::getBoundsInView(const juce::Rectangle<float>& r)
+template<class M, class T, class U>
+ juce::Rectangle<float> BaseManagerViewUI<M, T, U>::getBoundsInView(const juce::Rectangle<float>& r)
 {
 	return r.withPosition(getPosInView(r.getPosition())).withSize(r.getWidth()*getUnitSize(),r.getHeight()*getUnitSize());
 }

@@ -1,3 +1,4 @@
+#include "OrganicMainComponent.h"
 /*
   ==============================================================================
 
@@ -28,7 +29,14 @@ OrganicMainContentComponent::OrganicMainContentComponent()
 #if JUCE_MAC
 	setMacMainMenu(this, nullptr, "");
 #else
-	//setMenu (this); //done in Main.cpp as it's a method of DocumentWindow
+	//done in Main.cpp as it's a method of DocumentWindow
+#endif
+
+
+
+#if JUCE_OPENGL
+	openGLContext.setComponentPaintingEnabled(true);
+	openGLContext.attachTo(*this);
 #endif
 
 }
@@ -41,8 +49,6 @@ OrganicMainContentComponent::~OrganicMainContentComponent()
 
 	if (Engine::mainEngine != nullptr) Engine::mainEngine->removeEngineListener(this);
 	ShapeShifterManager::deleteInstance();
-	clear();
-
 }
 
 void OrganicMainContentComponent::init()
@@ -59,6 +65,15 @@ void OrganicMainContentComponent::init()
 
 	addAndMakeVisible(&ShapeShifterManager::getInstance()->mainContainer);
 	grabKeyboardFocus();
+}
+
+void OrganicMainContentComponent::clear()
+{
+
+#if JUCE_OPENGL
+	openGLContext.detach();
+	openGLContext.setRenderer(nullptr);
+#endif
 }
 
 

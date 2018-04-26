@@ -18,23 +18,31 @@ ApplicationCommandManager& getCommandManager();
     This component lives inside our window, and this is where you should put all
     your controls and content.
 */
-class OrganicMainContentComponent   : public Component, public ApplicationCommandTarget, public MenuBarModel, public EngineListener
+class OrganicMainContentComponent   : 
+	public Component, 
+	public ApplicationCommandTarget, 
+	public MenuBarModel, 
+	public EngineListener
 {
 public:
     //==============================================================================
    	OrganicMainContentComponent();
     virtual ~OrganicMainContentComponent();
 
-	virtual void init();
-	virtual void clear() {}
 
-	TooltipWindow tooltipWindow; // to add tooltips to an application, you
-								 // just need to create one of these and leave it
-								 // there to do its work..
+	TooltipWindow tooltipWindow; //just declare one here
+
+#if JUCE_OPENGL
+	OpenGLContext openGLContext;
+#endif
 
 	ScopedPointer<LookAndFeelOO> lookAndFeelOO;
 	ScopedPointer<ProgressWindow> fileProgressWindow;
 
+
+	virtual void init();
+
+	virtual void clear();
 
     virtual void paint (Graphics&) override;
     virtual void resized() override;
@@ -53,6 +61,9 @@ public:
 	virtual StringArray getMenuBarNames() override;
 	virtual PopupMenu getMenuForIndex(int topLevelMenuIndex, const String& menuName) override;
 	virtual void menuItemSelected(int /*menuItemID*/, int /*topLevelMenuIndex*/) override;
+
+
+
 
 private:
     //==============================================================================

@@ -76,9 +76,6 @@ public:
 		OrganicMainContentComponent * mainComponent;
 		void visibilityChanged() override;
 
-#if JUCE_OPENGL
-		OpenGLContext openGLContext;
-#endif
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainWindow)
 	};

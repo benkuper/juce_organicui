@@ -86,6 +86,7 @@ void OrganicApplication::shutdown()
 	getAppProperties().getUserSettings()->saveIfNeeded();
 
 	// Add your application's shutdown code here..
+	mainComponent->clear();
 	mainWindow = nullptr; // (deletes our window)
 
 	AppUpdater::deleteInstance();
@@ -188,21 +189,12 @@ inline OrganicApplication::MainWindow::MainWindow(String name, OrganicMainConten
 
 	setVisible(true);
 
-    
-#if JUCE_OPENGL
-	openGLContext.setComponentPaintingEnabled(true);
-	openGLContext.attachTo(*this);
-#endif
 	mainComponent->init();
 	
 }
 
 void OrganicApplication::MainWindow::closeButtonPressed() 
 {
-#if JUCE_OPENGL
-	openGLContext.detach();
-#endif
-
 	JUCEApplication::getInstance()->systemRequestedQuit();
 }
 
