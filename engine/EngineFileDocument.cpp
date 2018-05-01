@@ -199,9 +199,13 @@ var Engine::getJSONData()
 
 	data.getDynamicObject()->setProperty("metaData", metaData);
 
+	var pData = ProjectSettings::getInstance()->getJSONData();
+	if (!pData.isVoid() && pData.getDynamicObject()->getProperties().size() > 0) data.getDynamicObject()->setProperty("projectSettings", pData);
+	
 	var dData = DashboardManager::getInstance()->getJSONData();
 	if (!dData.isVoid() && dData.getDynamicObject()->getProperties().size() > 0) data.getDynamicObject()->setProperty("dashboardManager", dData);
 
+	
 	return data;
 }
 
@@ -235,16 +239,14 @@ void Engine::loadJSONData(var data, ProgressTask * loadingTask)
 
 	DynamicObject * d = data.getDynamicObject();
 
-	//ProgressTask * presetTask = loadingTask->addTask("Presets");
+	ProgressTask * projectTask = loadingTask->addTask("Project Settings");
 	ProgressTask * dashboardTask = loadingTask->addTask("Dashboard");
 
 	loadJSONDataInternalEngine(data, loadingTask);
 
-	/*
-	presetTask->start();
-	if (d->hasProperty("presetManager")) PresetManager::getInstance()->loadJSONData(d->getProperty("presetManager"));
-	presetTask->end();
-	*/
+	projectTask->start();
+	if (d->hasProperty("projectSettings")) ProjectSettings::getInstance()->loadJSONData(d->getProperty("projectSettings"));
+	projectTask->end();
 
 	dashboardTask->start();
 	if (d->hasProperty("dashboardManager")) DashboardManager::getInstance()->loadJSONData(d->getProperty("dashboardManager"));

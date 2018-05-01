@@ -33,5 +33,16 @@ public:
 	
 	void oscMessageReceived(const OSCMessage &m) override;
 	void oscBundleReceived(const OSCBundle &b) override;
+
+	class RemoteControlListener
+	{
+	public:
+		virtual void processMessage(const OSCMessage &m) {}
+	};
+
+	ListenerList<RemoteControlListener> remoteControlListeners;
+	void addRemoteControlListener(RemoteControlListener* e) { remoteControlListeners.add(e); }
+	void removeRemoteControlListener(RemoteControlListener* e) { remoteControlListeners.remove(e); }
+
 };
 

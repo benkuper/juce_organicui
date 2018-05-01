@@ -18,7 +18,6 @@ namespace CommandIDs
 	static const int openLastDocument = 0x30004;
 	static const int checkForUpdates = 0x30005;
 
-
 	static const int editProjectSettings = 0x50001;
 	static const int editGlobalSettings = 0x50002;
 
@@ -348,11 +347,9 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 	}
 	break;
 
-	/*
 	case CommandIDs::editProjectSettings:
 		ProjectSettings::getInstance()->selectThis();
 		break;
-		*/
 
 	case CommandIDs::editGlobalSettings:
 		GlobalSettings::getInstance()->selectThis();

@@ -29,12 +29,15 @@ Engine::Engine(const String & fileName, const String & fileExtension, Applicatio
 
 	isBetaVersion = appVersion.endsWith("b");
 
+	selectionManager = new InspectableSelectionManager(true); //selectionManager constructor
+
 	//to move into engine
 	Logger::setCurrentLogger(CustomLogger::getInstance());
 
 	addChildControllableContainer(DashboardManager::getInstance());
 
-	selectionManager = new InspectableSelectionManager(true); //selectionManager constructor
+	addChildControllableContainer(ProjectSettings::getInstance());
+
 	ScriptUtil::getInstance(); //trigger ScriptUtil constructor
 }
 
@@ -58,19 +61,14 @@ Engine::~Engine() {
 	Logger::setCurrentLogger(nullptr);
 
 	ControllableFactory::deleteInstance();
-
 	ScriptUtil::deleteInstance();
 	ShapeShifterFactory::deleteInstance();
-
 	HelpBox::deleteInstance();
-	
 	UndoMaster::deleteInstance();
-	
 	GlobalSettings::deleteInstance();
-
 	OSCRemoteControl::deleteInstance();
-
 	AssetManager::deleteInstance();
+	ProjectSettings::deleteInstance();
 
 	Engine::mainEngine = nullptr;
 }
@@ -93,9 +91,7 @@ void Engine::parseCommandline(const String & commandLine) {
 				NLOG("Engine", "File : " << fileArg << " not found.");
 			}
 		}
-
 	}
-
 }
 
 

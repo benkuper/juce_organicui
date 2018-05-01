@@ -83,6 +83,7 @@
 #include "engine/Engine.cpp"
 #include "engine/EngineFileDocument.cpp"
 #include "settings/GlobalSettings.cpp"
+#include "settings/ProjectSettings.cpp"
 #include "inspectable/Inspectable.cpp"
 #include "inspectable/InspectableContent.cpp"
 #include "inspectable/InspectableSelectionManager.cpp"

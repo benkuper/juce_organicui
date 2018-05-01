@@ -115,7 +115,11 @@ void Outliner::buildTree(OutlinerItem * parentItem, ControllableContainer * pare
 
 void Outliner::childStructureChanged(ControllableContainer *)
 {
-	if(enabled) rebuildTree();
+	if (enabled)
+	{
+		MessageManagerLock mmLock;
+		if(mmLock.lockWasGained()) rebuildTree();
+	}
 }
 
 
@@ -171,6 +175,9 @@ String OutlinerItem::getUniqueName() const
 void OutlinerItem::inspectableSelectionChanged(Inspectable * i)
 {
 	InspectableContent::inspectableSelectionChanged(i);
+
+	MessageManagerLock mmLock;
+	if (!mmLock.lockWasGained()) return;
 
 	setSelected(inspectable->isSelected, true);
 
