@@ -27,8 +27,8 @@ TargetParameter::TargetParameter(const String & niceName, const String & descrip
 	customGetControllableLabelFunc(nullptr),
 	customCheckAssignOnNextChangeFunc(nullptr),
 	defaultContainerTypeCheckFunc(nullptr),
-	customGetTargetContainerFunc(nullptr),
-	customGetContainerLabelFunc(nullptr)
+	customGetContainerLabelFunc(nullptr),
+    customGetTargetContainerFunc(nullptr)
 
 {
 	lockManualControlMode = true;

@@ -20,10 +20,10 @@ Engine::Engine(const String & fileName, const String & fileExtension, Applicatio
 		"Save a " + fileName),
 	appProperties(_appProperties),
 	appVersion(_appVersion),
-	engineNotifier(10),
-	isLoadingFile(false),
-	isClearing(false),
-	lastFileAbsolutePath("")
+	lastFileAbsolutePath(""),
+    engineNotifier(10),
+    isLoadingFile(false),
+    isClearing(false)
 {
 	skipControllableNameInAddress = true;
 

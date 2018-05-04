@@ -12,17 +12,17 @@
 
 Parameter::Parameter(const Type &type, const String &niceName, const String &description, var initialValue, var minValue, var maxValue, bool enabled) :
 	Controllable(type, niceName, description, enabled),
-	lockManualControlMode(false),
-	controlMode(MANUAL),
-	isPresettable(true),
-	isOverriden(false),
-	autoAdaptRange(false),
-	forceSaveValue(false),
+	defaultValue(initialValue),
 	minimumValue(minValue),
 	maximumValue(maxValue),
 	defaultMinValue(minValue),
 	defaultMaxValue(maxValue),
-	defaultValue(initialValue),
+    lockManualControlMode(false),
+    controlMode(MANUAL),
+    isPresettable(true),
+    isOverriden(false),
+    autoAdaptRange(false),
+    forceSaveValue(false),
 	queuedNotifier(100)
 {
 	resetValue(true);
