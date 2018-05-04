@@ -66,6 +66,9 @@ using namespace juce;
 #include "helpers/WakeOnLan.h"
 #include "helpers/OSCHelpers.h"
 
+#include "undo/UndoMaster.h"
+#include "updater/AppUpdater.h"
+
 #include "script/ScriptTarget.h"
 
 
@@ -154,9 +157,6 @@ using namespace juce;
 #include "ui/shapeshifter/ShapeShifterPanelTab.h"
 #include "ui/shapeshifter/ShapeShifterWindow.h"
 
-
-#include "undo/UndoMaster.h"
-#include "updater/AppUpdater.h"
 
 
 #include "manager/ui/GenericManagerEditor.h"

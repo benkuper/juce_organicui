@@ -53,9 +53,12 @@ void ScriptEditor::paint(Graphics & g)
 		break;
 
 	case Script::SCRIPT_EMPTY:
-	 case Script::SCRIPT_CLEAR:
-            c = BG_COLOR.brighter().withAlpha(.4f);
+    case Script::SCRIPT_CLEAR:
+        c = BG_COLOR.brighter().withAlpha(.4f);
 		break;
+            
+    default:
+        break;
 
 	}
 

@@ -37,6 +37,7 @@ public:
 	class RemoteControlListener
 	{
 	public:
+        virtual ~RemoteControlListener(){}
 		virtual void processMessage(const OSCMessage &m) {}
 	};
 
