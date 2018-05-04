@@ -136,7 +136,8 @@ void AppUpdater::run()
 					downloadingFileName = getDownloadFileName(version, dataIsBeta,extension);
 					URL downloadURL = URL(downloadURLBase + downloadingFileName);
 
-						
+					DBG("Download file name " << downloadingFileName);
+
 					targetDir.createDirectory();
 						
 					File targetFile = targetDir.getChildFile(downloadingFileName);
@@ -188,23 +189,36 @@ void AppUpdater::finished(URL::DownloadTask * task, bool success)
 		return;
 	}
 
-    File td = f.getParentDirectory();
+	if (f.getSize() < 1000000) //if file is less than 1Mo, got a problem
 	{
-		ZipFile zip(f);
-		zip.uncompressTo(td);
-		Array<File> filesToCopy;
-
-		appFile.moveFileTo(td.getNonexistentChildFile("oldApp", appFile.getFileExtension()));
-		
-		DBG("Move to " << appDir.getFullPathName());
-		for (int i = 0; i < zip.getNumEntries(); i++)
-		{
-			File zf = td.getChildFile(zip.getEntry(i)->filename);
-			DBG("File exists : " << (int)f.exists());
-			zf.copyFileTo(appDir.getChildFile(zip.getEntry(i)->filename));
-			//DBG("Move result for " << zf.getFileName() << " = " << (int)result);
-		}
+		LOGERROR("Wrong file size, try downloading it directly from the website");
+		return;
 	}
+
+	if (f.getFileExtension() == ".zip")
+	{
+		File td = f.getParentDirectory();
+		{
+			ZipFile zip(f);
+			zip.uncompressTo(td);
+			Array<File> filesToCopy;
+
+			appFile.moveFileTo(td.getNonexistentChildFile("oldApp", appFile.getFileExtension()));
+
+			DBG("Move to " << appDir.getFullPathName());
+			for (int i = 0; i < zip.getNumEntries(); i++)
+			{
+				File zf = td.getChildFile(zip.getEntry(i)->filename);
+				DBG("File exists : " << (int)f.exists());
+				zf.copyFileTo(appDir.getChildFile(zip.getEntry(i)->filename));
+				//DBG("Move result for " << zf.getFileName() << " = " << (int)result);
+			}
+		}
+	} else
+	{
+		f.startAsProcess();
+	}
+    
 
 	queuedNotifier.addMessage(new UpdateEvent(UpdateEvent::UPDATE_FINISHED));
 }
