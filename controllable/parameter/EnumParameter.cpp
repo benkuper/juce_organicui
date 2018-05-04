@@ -109,7 +109,7 @@ void EnumParameter::setNext(bool loop, bool addToUndo)
 			}
 			else if (loop)
 			{
-				if (addToUndo) setUndoableValue(value, i.getKey());
+				if (addToUndo) setUndoableValue(value, firstKey);
 				else setValueWithKey(firstKey);
 				
 			}
