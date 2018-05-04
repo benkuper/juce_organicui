@@ -366,7 +366,8 @@ ControllableContainer * ControllableContainer::getControllableContainerForAddres
 	{
 		for (auto &cc : controllableContainers)
 		{
-
+			if (cc == nullptr || cc.wasObjectDeleted()) continue;
+			
 			if (!cc->skipControllableNameInAddress)
 			{
 				if (cc->shortName == addressSplit[0])

@@ -66,7 +66,8 @@ void OSCRemoteControl::processMessage(const OSCMessage & m)
 
 	if (c == nullptr)
 	{
-		NLOG(niceName, "No target found for " << add);
+		//NLOG(niceName, "No target found for " << add);
+		remoteControlListeners.call(&RemoteControlListener::processMessage, m); 
 		return;
 	}
 

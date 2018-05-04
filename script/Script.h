@@ -20,7 +20,7 @@ public:
 	Script(ScriptTarget * parentTarget = nullptr, bool canBeDisabled = true);
 	~Script();
 
-	enum ScriptState { SCRIPT_LOADED, SCRIPT_ERROR, SCRIPT_EMPTY, SCRIPT_CLEAR };
+	enum ScriptState {SCRIPT_LOADING, SCRIPT_LOADED, SCRIPT_ERROR, SCRIPT_EMPTY, SCRIPT_CLEAR };
 
 	FileParameter * filePath;
 	BoolParameter * logParam;

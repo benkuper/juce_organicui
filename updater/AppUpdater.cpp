@@ -35,7 +35,7 @@ AppUpdater::~AppUpdater()
 	if (!downloadURLBase.endsWithChar('/')) downloadURLBase += "/";
 }
 
-  String AppUpdater::getDownloadFileName(String version, bool beta)
+  String AppUpdater::getDownloadFileName(String version, bool beta, String extension)
   {
 	  String fileURL = filePrefix + "-";
 #if JUCE_WINDOWS
@@ -46,7 +46,7 @@ AppUpdater::~AppUpdater()
 	  fileURL += "linux";
 #endif
 
-	  fileURL += "-" + version + "-" + (beta ? "beta" : "stable") + ".zip";
+	  fileURL += "-" + version + "-" + (beta ? "beta" : "stable") + "." + extension;
 
 	  return fileURL;
   }
@@ -125,7 +125,15 @@ void AppUpdater::run()
 				int result = AlertWindow::showOkCancelBox(AlertWindow::InfoIcon, dataIsBeta?"New BETA version available":"New version available", msg, "Yes", "No");
 				if (result)
 				{
-					downloadingFileName = getDownloadFileName(version, dataIsBeta);
+					String extension = "zip";
+#if JUCE_WINDOWS
+					extension = data.getProperty("winExtension","zip");
+#elif JUCE_MAC
+					extension = data.getProperty("osxExtension","zip");
+#elif JUCE_LINUX
+					extension = data.getProperty("linuxExtension","zip");
+#endif
+					downloadingFileName = getDownloadFileName(version, dataIsBeta,extension);
 					URL downloadURL = URL(downloadURLBase + downloadingFileName);
 
 						

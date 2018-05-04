@@ -31,7 +31,7 @@ public:
 
 	void setURLs(URL _updateURL, String _downloadURLBase, String filePrefix);
 
-	String getDownloadFileName(String version, bool beta); 
+	String getDownloadFileName(String version, bool beta, String extension); 
 	void checkForUpdates();
 
 	// Inherited via Thread

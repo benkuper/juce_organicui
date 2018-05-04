@@ -56,6 +56,8 @@ void Script::loadScript()
 	}
 
 
+	setState(SCRIPT_LOADING);
+
 	String path = filePath->getAbsolutePath();
 
 	if (path.isEmpty())
