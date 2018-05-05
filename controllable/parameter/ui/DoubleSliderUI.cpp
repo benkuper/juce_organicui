@@ -64,14 +64,15 @@ void DoubleSliderUI::showEditWindow()
 {
 	AlertWindow nameWindow("Change point 2D params", "Set new values and bounds for this parameter", AlertWindow::AlertIconType::NoIcon, this);
 	
-	for(int i=0;i<2;i++) nameWindow.addTextEditor("val"+String(i), p2d->value[i].toString(), "Value "+String(i));
+	const String coordNames[3]{ "X","Y","Z" };
+	for(int i=0;i<2;i++) nameWindow.addTextEditor("val"+String(i), p2d->value[i].toString(), "Value "+ coordNames[i]);
 
 	if (parameter->isCustomizableByUser)
 	{
 		for (int i = 0; i < 2; i++)
 		{
-			nameWindow.addTextEditor("minVal" + String(i), p2d->minimumValue[i].toString(), "Minimum " + String(i));
-			nameWindow.addTextEditor("maxVal" + String(i), p2d->maximumValue[i].toString(), "Maximum" + String(i));
+			nameWindow.addTextEditor("minVal" + String(i), p2d->minimumValue[i].toString(), "Minimum " + coordNames[i]);
+			nameWindow.addTextEditor("maxVal" + String(i), p2d->maximumValue[i].toString(), "Maximum " + coordNames[i]);
 		}
 	}
 
