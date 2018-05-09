@@ -11,16 +11,32 @@
 #ifndef PARAMETER_H_INCLUDED
 #define PARAMETER_H_INCLUDED
 
+ //Listener
+class Parameter;
+class TargetParameter;
+class PlayableParameterAutomation;
+
+class ParameterListener
+{
+public:
+	/** Destructor. */
+	virtual ~ParameterListener() {}
+	virtual void parameterValueChanged(Parameter *) {};
+	virtual void parameterRangeChanged(Parameter *) {};
+	virtual void parameterControlModeChanged(Parameter *) {}
+};
 
 class Parameter : 
 	public Controllable,
-	public ExpressionListener
+	public ExpressionListener,
+	public ParameterListener
 {
 public:
 	enum ControlMode {
 		MANUAL,
 		EXPRESSION,
-		REFERENCE
+		REFERENCE,
+		AUTOMATION
 	};
 
     Parameter(const Type &type, const String & niceName, const String &description, var initialValue, var minValue, var maxValue, bool enabled = true);
@@ -38,9 +54,18 @@ public:
 	//Control Mode
 	bool lockManualControlMode;
 	ControlMode controlMode;
+
+	//Expression
 	String controlExpression;
 	ScopedPointer<ScriptExpression> expression;
 	WeakReference<Controllable> controlReference;
+
+	//Reference
+	ScopedPointer<TargetParameter> referenceTarget;
+	Parameter * referenceParameter;
+
+	//Automation
+	ScopedPointer<PlayableParameterAutomation> automation;
 
 	bool isComplex();
 	virtual StringArray getValuesNames();
@@ -55,6 +80,7 @@ public:
 
 	void setControlMode(ControlMode _mode);
 	void setControlExpression(const String &);
+	void setReferenceParameter(Parameter * tp);
 
 	virtual var getValue(); //may be useful, or testing expression or references (for now, forward update from expression timer)
 	virtual var getLerpValueTo(var targetValue, float weight);
@@ -85,6 +111,11 @@ public:
 	virtual void expressionValueChanged(ScriptExpression *) override;
 	virtual void expressionStateChanged(ScriptExpression *) override;
 	
+
+	//Reference
+	virtual void parameterValueChanged(Parameter * p) override;
+
+
 	InspectableEditor * getEditor(bool isRoot) override;
 
 	virtual var getJSONDataInternal() override;
@@ -92,23 +123,9 @@ public:
 	
 	static var getValueFromScript(const juce::var::NativeFunctionArgs &a);
 
-
-    //Listener
-	class  Listener
-	{
-	public:
-		/** Destructor. */
-		virtual ~Listener() {}
-		virtual void parameterValueChanged(Parameter * ) {};
-		virtual void parameterRangeChanged(Parameter * ) {};
-		virtual void parameterControlModeChanged(Parameter *) {}
-    };
-
-    ListenerList<Listener> listeners;
-    void addParameterListener(Listener* newListener) { listeners.add(newListener); }
-    void removeParameterListener(Listener* listener) { listeners.remove(listener); }
-	
-
+    ListenerList<ParameterListener> listeners;
+    void addParameterListener(ParameterListener* newListener) { listeners.add(newListener); }
+    void removeParameterListener(ParameterListener* listener) { listeners.remove(listener); }
 
     // ASYNC
     class  ParameterEvent

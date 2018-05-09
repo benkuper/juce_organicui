@@ -16,7 +16,7 @@ class ScriptExpression :
 	public EngineListener,
 	public ScriptTarget::ScriptTargetListener,
 	public Inspectable::InspectableListener,
-	public Parameter::Listener
+	public ParameterListener
 {
 public:
 	ScriptExpression();

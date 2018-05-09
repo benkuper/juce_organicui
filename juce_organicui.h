@@ -16,7 +16,7 @@
 
   ID:               juce_organicui
   vendor:           benkuper
-  version:          1.0.0
+  version:          5.3.2
   name:             Organic UI
   description:      A sub-framework that adds multiple functionalities such as moving panels, full controllable hierarchy, managers, editors...
   website:          https://github.com/benkuper/juce_organicui
@@ -175,6 +175,19 @@ using namespace juce;
 #include "manager/GenericControllableManager.h"
 #include "manager/ui/GenericControllableItemUI.h"
 
+#include "automation/recorder/AutomationRecorder.h"
+#include "automation/easing/Easing.h"
+#include "automation/AutomationKey.h"
+#include "automation/Automation.h"
+#include "automation/parameter/ParameterAutomation.h"
+#include "automation/parameter/ParameterAutomationManager.h"
+#include "automation/easing/ui/EasingUI.h"
+#include "automation/ui/AutomationKeyUI.h"
+#include "automation/ui/AutomationMultiKeyTransformer.h"
+#include "automation/ui/AutomationUI.h"
+#include "automation/ui/AutomationEditor.h"
+#include "automation/parameter/ui/PlayableParameterAutomationEditor.h"
+
 #include "dashboard/DashboardItem.h"
 #include "dashboard/DashboardItemManager.h"
 #include "dashboard/DashboardScriptItem.h"
@@ -198,6 +211,7 @@ using namespace juce;
 #include "script/ScriptUtil.h"
 #include "script/ui/ScriptEditor.h"
 
+
 #include "logger/CustomLogger.h"
 #include "logger/ui/CustomLoggerUI.h"
 
@@ -209,3 +223,4 @@ using namespace juce;
 #include "app/OrganicApplication.h"
 
 #include "remotecontrol/OSCRemoteControl.h"
+

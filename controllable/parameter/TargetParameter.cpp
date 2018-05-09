@@ -97,7 +97,7 @@ void TargetParameter::setValueInternal(var & newVal)
 		if(targetType == CONTAINER) setTarget((ControllableContainer *)nullptr);
 		else setTarget((ControllableContainer *)nullptr);
 
-		setGhostValue(String::empty);
+		setGhostValue("");
 	}
 }
 
@@ -113,7 +113,7 @@ void TargetParameter::setTarget(WeakReference<Controllable> c)
 	if (target != nullptr)
 	{
 		target->addControllableListener(this);
-		setGhostValue(String::empty);
+		setGhostValue("");
 	}
 }
 
@@ -129,7 +129,7 @@ void TargetParameter::setTarget(WeakReference<ControllableContainer> cc)
 	if (targetContainer != nullptr)
 	{
 		targetContainer->addControllableContainerListener(this);
-		setGhostValue(String::empty);
+		setGhostValue("");
 	}
 }
 
@@ -171,7 +171,7 @@ void TargetParameter::controllableRemoved(Controllable * c)
 	if (c == target || target.wasObjectDeleted())
 	{
 		String oldValue = stringValue();
-		setValue(String::empty);
+		setValue("");
 		setGhostValue(oldValue);
 	}
 }
@@ -181,7 +181,7 @@ void TargetParameter::controllableContainerRemoved(ControllableContainer * cc)
 	if (cc == targetContainer || targetContainer.wasObjectDeleted())
 	{
 		String oldValue = stringValue();
-		setValue(String::empty);
+		setValue("");
 		setGhostValue(oldValue);
 	}
 }

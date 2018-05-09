@@ -381,7 +381,6 @@ public:
 		}
 	};
 
-
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BaseManager<T>)
 };
 
@@ -403,6 +402,7 @@ BaseManager<T>::BaseManager(const String & name) :
 template<class T>
 BaseManager<T>::~BaseManager()
 {
+
 	clear();
 }
 
@@ -565,7 +565,7 @@ bool BaseManager<T>::canAddItemOfType(const String & typeToCheck)
 template<class T>
 void BaseManager<T>::loadItemsData(var data)
 {
-	if (data == var::null) return;
+	if (data == var()) return;
 	Array<var> * itemsData = data.getProperty("items", var()).getArray();
 	if (itemsData == nullptr) return;
 

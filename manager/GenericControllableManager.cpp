@@ -15,6 +15,7 @@ GenericControllableManager::GenericControllableManager(const String & name, bool
 	forceItemsFeedbackOnly(false)
 {
 	selectItemWhenCreated = false;
+	isSelectable = false;
 
 	managerFactory = &factory;
 
@@ -49,5 +50,6 @@ InspectableEditor * GenericControllableManager::getEditor(bool isRoot)
 	BaseManagerUI<GenericControllableManager, GenericControllableItem,GenericControllableItemUI> * ui = new BaseManagerUI<GenericControllableManager, GenericControllableItem, GenericControllableItemUI>(niceName, this, false);
 	ui->drawContour = true;
 	ui->addExistingItems();
+	ui->setSize(100, 100);
 	return new GenericComponentEditor(this, ui, isRoot);
 }

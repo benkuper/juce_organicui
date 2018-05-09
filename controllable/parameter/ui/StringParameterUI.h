@@ -58,7 +58,7 @@ protected:
 class StringParameterFileUI :
 	public StringParameterUI,
 	public Button::Listener,
-	public Parameter::Listener
+	public ParameterListener
 {
 public:
 	StringParameterFileUI(Parameter * p);

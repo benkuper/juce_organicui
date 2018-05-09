@@ -1,4 +1,3 @@
-#include "Parameter.h"
 /*
   ==============================================================================
 
@@ -8,7 +7,6 @@
 
   ==============================================================================
 */
-
 
 Parameter::Parameter(const Type &type, const String &niceName, const String &description, var initialValue, var minValue, var maxValue, bool enabled) :
 	Controllable(type, niceName, description, enabled),
@@ -23,6 +21,7 @@ Parameter::Parameter(const Type &type, const String &niceName, const String &des
     isOverriden(false),
     autoAdaptRange(false),
     forceSaveValue(false),
+	referenceParameter(nullptr),
 	queuedNotifier(100)
 {
 	resetValue(true);
@@ -33,8 +32,8 @@ Parameter::Parameter(const Type &type, const String &niceName, const String &des
 
 Parameter::~Parameter() {
 	Parameter::masterReference.clear();
+	setReferenceParameter(nullptr);
 }
-
 
 void Parameter::setControlMode(ControlMode _mode)
 {
@@ -42,14 +41,23 @@ void Parameter::setControlMode(ControlMode _mode)
 
 	controlMode = _mode;
 
+	expression = nullptr;
+	if (referenceTarget != nullptr)
+	{
+		referenceTarget->removeParameterListener(this);
+		setReferenceParameter(nullptr);
+	}
+	referenceTarget = nullptr;
+	automation = nullptr;
+
 	switch (controlMode)
 	{
 	case MANUAL:
-		expression = nullptr;
 		break;
 
 	case REFERENCE:
-		expression = nullptr;
+		referenceTarget = new TargetParameter("Reference", "Reference for parameter " + niceName,"");
+		referenceTarget->addParameterListener(this);
 		break;
 
 	case EXPRESSION:
@@ -57,9 +65,14 @@ void Parameter::setControlMode(ControlMode _mode)
 		expression->setExpression(controlExpression);
 		expression->addExpressionListener(this);
 		break;
+
+	case AUTOMATION:
+		automation = new PlayableParameterAutomation(this);
+		break;
+
 	}
 
-	listeners.call(&Listener::parameterControlModeChanged, this);
+	listeners.call(&ParameterListener::parameterControlModeChanged, this);
 	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::CONTROLMODE_CHANGED, this));
 }
 
@@ -67,6 +80,23 @@ void Parameter::setControlExpression(const String & e)
 {
 	controlExpression = e;
 	if (expression != nullptr) expression->setExpression(e);
+}
+
+void Parameter::setReferenceParameter(Parameter * tp)
+{
+	if (tp == referenceParameter) return;
+	
+	if(referenceParameter != nullptr)
+	{
+		referenceParameter->removeParameterListener(this);
+	}
+
+	referenceParameter = tp;
+
+	if (referenceParameter != nullptr)
+	{
+		referenceParameter->addParameterListener(this);
+	}
 }
 
 var Parameter::getValue()
@@ -78,7 +108,6 @@ var Parameter::getLerpValueTo(var targetValue, float weight)
 {
 	return value; //to be overriden
 }
-
 
 void Parameter::resetValue(bool silentSet)
 {
@@ -111,8 +140,6 @@ void Parameter::setValue(var _value, bool silentSet, bool force, bool forceOverr
 	isOverriden =  _value != defaultValue || forceOverride;
 
 	if (!silentSet) notifyValueChanged();
-
-
 }
 
 
@@ -144,7 +171,7 @@ void Parameter::setRange(var min, var max, bool setDefaultRange) {
 	maximumValue = max;
 
 
-	listeners.call(&Listener::parameterRangeChanged, this);
+	listeners.call(&ParameterListener::parameterRangeChanged, this);
 	var arr;
 	arr.append(minimumValue); arr.append(maximumValue);
 	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::BOUNDS_CHANGED, this, arr));
@@ -204,7 +231,7 @@ float Parameter::getNormalizedValue()
 }
 
 void Parameter::notifyValueChanged() {
-	listeners.call(&Listener::parameterValueChanged, this);
+	listeners.call(&ParameterListener::parameterValueChanged, this);
 	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::VALUE_CHANGED,this,getValue()));
 }
 
@@ -218,6 +245,17 @@ void Parameter::expressionStateChanged(ScriptExpression *)
 	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::EXPRESSION_STATE_CHANGED, this));
 }
 
+void Parameter::parameterValueChanged(Parameter * p)
+{
+	if (p == referenceTarget)
+	{
+		setReferenceParameter(dynamic_cast<Parameter *>(referenceTarget->target.get()));
+	} else if (p == referenceParameter)
+	{
+		setValue(referenceParameter->value);
+	}
+}
+
 InspectableEditor * Parameter::getEditor(bool isRoot)
 {
 	return new ParameterEditor(this, isRoot);
@@ -228,8 +266,11 @@ var Parameter::getJSONDataInternal()
 	var data = Controllable::getJSONDataInternal();
 	data.getDynamicObject()->setProperty("value", value);
 	data.getDynamicObject()->setProperty("controlMode", controlMode);
+
 	if (controlMode == EXPRESSION) data.getDynamicObject()->setProperty("expression", controlExpression);
-	
+	else if (controlMode == AUTOMATION && automation != nullptr) data.getDynamicObject()->setProperty("paramAutomation", automation->getJSONData());
+	else if (controlMode == REFERENCE && referenceTarget != nullptr) data.getDynamicObject()->setProperty("reference", referenceTarget->getJSONData());
+
 	if (saveValueOnly) return data;
 	data.getDynamicObject()->setProperty("minValue", minimumValue);
 	data.getDynamicObject()->setProperty("maxValue", maximumValue);
@@ -244,8 +285,12 @@ void Parameter::loadJSONDataInternal(var data)
 	if (data.getDynamicObject()->hasProperty("value")) setValue(data.getProperty("value", 0),false, true, true);
 
 	if (data.getDynamicObject()->hasProperty("controlMode")) setControlMode((ControlMode)(int)data.getProperty("controlMode", MANUAL));
+	
 	if (data.getDynamicObject()->hasProperty("expression")) setControlExpression(data.getProperty("expression", ""));
-	if (data.getDynamicObject()->hasProperty("editable")) isEditable = data.getProperty("editable", true);
+	else if (data.getDynamicObject()->hasProperty("paramAutomation") && automation != nullptr) automation->loadJSONData(data.getProperty("paramAutomation", var()));
+	else if (data.getDynamicObject()->hasProperty("reference") && referenceTarget != nullptr) referenceTarget->loadJSONData(data.getProperty("reference", var()));
+
+ 	if (data.getDynamicObject()->hasProperty("editable")) isEditable = data.getProperty("editable", true);
 }
 
 var Parameter::getValueFromScript(const juce::var::NativeFunctionArgs & a)

@@ -12,7 +12,7 @@
 #define CONTROLLABLECONTAINER_H_INCLUDED
 
 class ControllableContainer :
-	public Parameter::Listener,
+	public ParameterListener,
 	public Controllable::Listener,
 	public Parameter::AsyncListener,
 	public Trigger::Listener,

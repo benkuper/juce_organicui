@@ -12,7 +12,10 @@
 #define ENUMPARAMETERUI_H_INCLUDED
 
 
-class EnumParameterUI : public ParameterUI, public EnumParameter::Listener, public ComboBox::Listener
+class EnumParameterUI : 
+	public ParameterUI, 
+	public EnumParameter::Listener, 
+	public ComboBox::Listener
 {
 public:
     EnumParameterUI(Parameter * parameter = nullptr);

@@ -154,7 +154,7 @@ public:
 
 	void buttonClicked(Button *) override;
 
-	void inspectableDestroyed(Inspectable *) override;
+	virtual void inspectableDestroyed(Inspectable *) override;
 
 	//From Engine Listener
 	bool tmpAnimate;

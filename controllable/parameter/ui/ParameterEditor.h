@@ -11,10 +11,13 @@
 #ifndef PARAMETEREDITOR_H_INCLUDED
 #define PARAMETEREDITOR_H_INCLUDED
 
+class PlayableParameterAutomationEditor;
+
+class TargetParameterUI;
 
 class ParameterEditor : 
 	public ControllableEditor,
-	public Parameter::Listener,
+	public ParameterListener,
 	public Parameter::AsyncListener,
 	public Label::Listener
 {
@@ -23,8 +26,18 @@ public:
 	~ParameterEditor();
 
 	WeakReference<Parameter> parameter;
+
+	//Expression
 	ScopedPointer<Label> expressionLabel;
 	ScopedPointer<Label> expressionText;
+
+
+	//Target
+	ScopedPointer<TargetParameterUI> referenceUI;
+
+	//Automation
+	ScopedPointer<PlayableParameterAutomationEditor> automationUI;
+
 
 	virtual void resized() override;
 	virtual void updateUI();

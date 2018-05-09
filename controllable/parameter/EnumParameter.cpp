@@ -11,7 +11,7 @@
 
 
 EnumParameter::EnumParameter(const String & niceName, const String &description, bool enabled) :
-	Parameter(Type::ENUM, niceName, description,String::empty,var(),var(), enabled)
+	Parameter(Type::ENUM, niceName, description, "" ,var(),var(), enabled)
 {
 
 }

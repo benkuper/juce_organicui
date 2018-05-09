@@ -17,11 +17,6 @@ ParameterUI::ParameterUI(Parameter * parameter) :
     showValue(true)
 {
 	parameter->addAsyncCoalescedParameterListener(this);
-	if (parameter->controlMode == Parameter::EXPRESSION)
-	{
-		
-		DBG(parameter->niceName << " expression state : " << parameter->expression->state);
-	}
 }
 
 ParameterUI::~ParameterUI()
@@ -76,7 +71,10 @@ void ParameterUI::paintOverChildren(Graphics & g)
 
 	ControllableUI::paintOverChildren(g);
 	if (parameter == nullptr) return;
-	if (parameter->controlMode == Parameter::EXPRESSION)
+
+	switch (parameter->controlMode)
+	{
+	case Parameter::EXPRESSION:
 	{
 		Colour c = LIGHTCONTOUR_COLOR;
 		ScriptExpression::ExpressionState s = parameter->expression->state;
@@ -84,7 +82,25 @@ void ParameterUI::paintOverChildren(Graphics & g)
 		else if (s == ScriptExpression::EXPRESSION_LOADED) c = Colours::limegreen;
 
 		g.setColour(c.withAlpha(.2f));
-		g.fillRoundedRectangle(getLocalBounds().toFloat(),1);
+		g.fillRoundedRectangle(getLocalBounds().toFloat(), 1);
+	}
+	break;
+
+	case Parameter::REFERENCE:
+	{
+		Colour c = Colours::purple.brighter();
+		g.setColour(c.withAlpha(.2f));
+		g.fillRoundedRectangle(getLocalBounds().toFloat(), 1);
+	}
+		break;
+
+	case Parameter::AUTOMATION:
+	{
+		Colour c = BLUE_COLOR;
+		g.setColour(c.withAlpha(.2f));
+		g.fillRoundedRectangle(getLocalBounds().toFloat(), 1);
+	}
+		break;
 	}
 }
 
@@ -105,7 +121,8 @@ void ParameterUI::addPopupMenuItems(PopupMenu * p)
 			PopupMenu controlModeMenu;
 			controlModeMenu.addItem(10, "Manual");
 			controlModeMenu.addItem(11, "Expression");
-			//controlModeMenu.addItem(12, "Reference");
+			controlModeMenu.addItem(12, "Reference");
+			controlModeMenu.addItem(13, "Automation");
 			p->addSubMenu("Control Mode", controlModeMenu);
 		}
 	}
@@ -122,6 +139,7 @@ void ParameterUI::handleMenuSelectedID(int id)
 	case 10: parameter->setControlMode(Parameter::MANUAL); break;
 	case 11: parameter->setControlMode(Parameter::EXPRESSION); break;
 	case 12: parameter->setControlMode(Parameter::REFERENCE); break;
+	case 13: parameter->setControlMode(Parameter::AUTOMATION); break;
 	}
 }
 
