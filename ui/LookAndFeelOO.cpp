@@ -1048,7 +1048,7 @@ Font LookAndFeelOO::getComboBoxFont (ComboBox& box)
 
 Label* LookAndFeelOO::createComboBoxTextBox (ComboBox&)
 {
-    return new Label (String::empty, String::empty);
+    return new Label ("", "");
 }
 
 void LookAndFeelOO::positionComboBoxText (ComboBox& box, Label& label)
@@ -1326,7 +1326,7 @@ void LookAndFeelOO::drawRotarySlider (Graphics& g, int x, int y, int width, int 
 
 Button* LookAndFeelOO::createSliderButton (Slider& s, const bool isIncrement)
 {
-    TextButton * bt = new TextButton (isIncrement ? "+" : "-", String::empty);
+    TextButton * bt = new TextButton (isIncrement ? "+" : "-", "");
 	bt->setEnabled(s.isTextBoxEditable());
 	bt->setVisible(s.isTextBoxEditable());
 	return bt;
@@ -1335,7 +1335,7 @@ Button* LookAndFeelOO::createSliderButton (Slider& s, const bool isIncrement)
 class LookAndFeelOO::SliderLabelComp  : public Label
 {
 public:
-    SliderLabelComp() : Label (String::empty, String::empty) {}
+    SliderLabelComp() : Label ("", "") {}
 
     void mouseWheelMove (const MouseEvent&, const MouseWheelDetails&) {}
 };
@@ -1906,7 +1906,8 @@ int LookAndFeelOO::getTabButtonBestWidth (TabBarButton& button, int tabDepth)
 
     return jlimit (tabDepth * 2, tabDepth * 8, width);
 }
- juce::Rectangle<int> LookAndFeelOO::getTabButtonExtraComponentBounds (const TabBarButton& button, juce::Rectangle<int>& textArea, Component& comp)
+
+ juce::Rectangle<int> LookAndFeelOO::getTabButtonExtraComponentBounds (const TabBarButton& button, juce::Rectangle<int>& textArea, Component& comp)
 {
 	juce::Rectangle<int> extraComp;
 
@@ -2304,7 +2305,8 @@ void LookAndFeelOO::drawPropertyComponentLabel (Graphics& g, int, int height, Pr
                       3, r.getY(), r.getX() - 5, r.getHeight(),
                       Justification::centredLeft, 2);
 }
- juce::Rectangle<int> LookAndFeelOO::getPropertyComponentContentPosition (PropertyComponent& component)
+
+ juce::Rectangle<int> LookAndFeelOO::getPropertyComponentContentPosition (PropertyComponent& component)
 {
     const int textW = jmin (200, component.getWidth() / 3);
     return juce::Rectangle<int> (textW, 1, component.getWidth() - textW - 1, component.getHeight() - 3);

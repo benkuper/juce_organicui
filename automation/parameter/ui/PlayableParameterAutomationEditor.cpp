@@ -1,6 +1,3 @@
-#include "PlayableParameterAutomationEditor.h"
-#include "../parameter/ParameterAutomation.h"
-
 PlayableParameterAutomationEditor::PlayableParameterAutomationEditor(PlayableParameterAutomation * ppa) :
 	ppa(ppa)
 {

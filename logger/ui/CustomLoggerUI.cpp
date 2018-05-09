@@ -145,12 +145,12 @@ void CustomLoggerUI::updateTotalLogRow()
 	}
 
 }
-const String& CustomLoggerUI::getSourceForRow(const int r) const
+const String CustomLoggerUI::getSourceForRow(const int r) const
 {
 	if (auto el = getElementForRow(r)) {
 		return el->source;
 	}
-	return String::empty;
+	return String();
 }
 const bool CustomLoggerUI::isPrimaryRow(const int r) const
 {
@@ -171,7 +171,7 @@ const bool CustomLoggerUI::isPrimaryRow(const int r) const
 	return false;
 }
 
-const String&   CustomLoggerUI::getContentForRow(const int r) const
+const String   CustomLoggerUI::getContentForRow(const int r) const
 {
 	int count = 0;
 	int idx = 0;
@@ -190,7 +190,7 @@ const String&   CustomLoggerUI::getContentForRow(const int r) const
 		idx++;
 	}
 
-	return String::empty;
+	return String();
 };
 
 const LogElement* CustomLoggerUI::getElementForRow(const int r) const {
@@ -222,7 +222,7 @@ const String  CustomLoggerUI::getTimeStringForRow(const int r) const
 		return String(el->time.toString(false, true, true, true));
 	}
 
-	return String::empty;
+	return "";
 };
 
 const Colour CustomLoggerUI::getSeverityColourForRow(const int r) const
@@ -296,11 +296,11 @@ void CustomLoggerUI::LogList::paintCell(Graphics& g,
 	switch (columnId)
 	{
 	case 1:
-		text = owner->isPrimaryRow(rowNumber) ? owner->getTimeStringForRow(rowNumber) : String::empty;
+		text = owner->isPrimaryRow(rowNumber) ? owner->getTimeStringForRow(rowNumber) : "";
 		break;
 
 	case 2:
-		text = owner->isPrimaryRow(rowNumber) ? owner->getSourceForRow(rowNumber) : String::empty;
+		text = owner->isPrimaryRow(rowNumber) ? owner->getSourceForRow(rowNumber) : "";
 		break;
 
 	case 3:
@@ -319,7 +319,7 @@ String CustomLoggerUI::LogList::getCellTooltip(int rowNumber, int /*columnId*/)
 	String sR = el->source;
 	return
 		(sR.isNotEmpty() ?
-			sR + " (" + el->time.toString(false, true, true, true) + ")" + "\n" : String::empty)
+			sR + " (" + el->time.toString(false, true, true, true) + ")" + "\n" : "")
 		+ (el->getNumLines() < 10 ? el->content : owner->getSourceForRow(rowNumber));
 
 

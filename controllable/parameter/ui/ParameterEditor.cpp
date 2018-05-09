@@ -1,6 +1,3 @@
-#include "juce_automation/juce_automation.h" //to integrate in OrganicUI
-
-
 ParameterEditor::ParameterEditor(Parameter * _parameter, bool isRoot, int initHeight) :
 	ControllableEditor(_parameter, isRoot, initHeight),
 	parameter(_parameter)

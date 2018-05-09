@@ -116,6 +116,7 @@ public:
 	void controllableFeedbackUpdate(ControllableContainer * cc, Controllable * c) override;
 	virtual void onControllableFeedbackUpdate(ControllableContainer * , Controllable *) {}
 
+	virtual void controllableNameChanged(Controllable * c) override;
 	virtual void askForRemoveControllable(Controllable * c, bool addToUndo = false) override;
 
 	virtual var getJSONData();
@@ -132,12 +133,6 @@ public:
 	static var getChildFromScript(const var::NativeFunctionArgs &a);
 
 private:
-	// internal callback that a controllableContainer can override to react to any of it's parameter change
-	//@ ben this is to avoid either:
-	//      adding controllableContainerListener for each implementation
-	//      or overriding parameterValueChanged and needing to call ControllableContainer::parameterValueChanged in implementation (it should stay independent as a different mechanism)
-	//      or using dispatch feedback that triggers only exposedParams
-
 	virtual void onContainerNiceNameChanged() {};
 	virtual void onContainerShortNameChanged() {};
 	virtual void onContainerParameterChanged(Parameter *) {};

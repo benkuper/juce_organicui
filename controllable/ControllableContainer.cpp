@@ -608,6 +608,11 @@ void ControllableContainer::controllableFeedbackUpdate(ControllableContainer * c
 	onControllableFeedbackUpdate(cc, c); //This is the function to override from child classes
 }
 
+void ControllableContainer::controllableNameChanged(Controllable * c)
+{
+	notifyStructureChanged();
+}
+
 void ControllableContainer::askForRemoveControllable(Controllable * c, bool addToUndo)
 {
 	if (addToUndo) removeUndoableControllable(c);

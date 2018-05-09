@@ -163,7 +163,7 @@ Component * OutlinerItem::createItemComponent()
 
 String OutlinerItem::getUniqueName() const
 {
-	if ((isContainer && container.wasObjectDeleted()) || (!isContainer && controllable.wasObjectDeleted())) return String::empty;
+	if ((isContainer && container.wasObjectDeleted()) || (!isContainer && controllable.wasObjectDeleted())) return "";
 
 	String n = isContainer ? container.get()->getControlAddress() : controllable.get()->getControlAddress();
 	if (n.isEmpty()) n = isContainer ? container->shortName : controllable->shortName;
