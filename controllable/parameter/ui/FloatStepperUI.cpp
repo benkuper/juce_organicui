@@ -25,7 +25,7 @@ FloatStepperUI::FloatStepperUI(Parameter * _parameter) :
 	slider->addMouseListener(this,true);
 	slider->setColour(slider->textBoxBackgroundColourId,BG_COLOR.darker(.1f).withAlpha(.8f));
 	slider->setColour(CaretComponent::caretColourId, Colours::orange);
-
+	slider->setScrollWheelEnabled(false);
 
 	bool active = parameter->isEditable && !forceFeedbackOnly;
 	slider->setTextBoxIsEditable(active);
