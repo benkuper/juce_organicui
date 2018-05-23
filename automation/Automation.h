@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef AUTOMATION_H_INCLUDED
-#define AUTOMATION_H_INCLUDED
+#pragma once
 
 class InspectableSelectionManager;
 
@@ -75,7 +74,3 @@ public:
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Automation)
 };
-
-
-
-#endif  // AUTOMATION_H_INCLUDED

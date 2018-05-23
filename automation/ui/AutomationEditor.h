@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef AUTOMATIONEDITOR_H_INCLUDED
-#define AUTOMATIONEDITOR_H_INCLUDED
+#pragma once
 
 class AutomationEditor :
 	public GenericControllableContainerEditor
@@ -28,4 +27,4 @@ public:
 
 
 
-#endif  // AUTOMATIONEDITOR_H_INCLUDED
+#pragma once

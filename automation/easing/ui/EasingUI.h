@@ -8,10 +8,7 @@
   ==============================================================================
 */
 
-#ifndef EASINGUI_H_INCLUDED
-#define EASINGUI_H_INCLUDED
-
-#include "../Easing.h"
+#pragma once
 
 class EasingUI :
 	public InspectableContentComponent,
@@ -22,6 +19,8 @@ public:
 	virtual ~EasingUI();
 
 	WeakReference<Easing> easing;
+
+	Colour color;
 
 	int y1;
 	int y2;
@@ -125,5 +124,3 @@ public:
 
 	void mouseDrag(const MouseEvent &e) override;
 };
-
-#endif  // EASINGUI_H_INCLUDED

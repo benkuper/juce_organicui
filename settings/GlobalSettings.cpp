@@ -13,6 +13,7 @@ juce_ImplementSingleton(GlobalSettings)
 GlobalSettings::GlobalSettings() :
 	ControllableContainer("Global Settings"),
 	startupCC("Startup and Update"),
+	saveLoadCC("Save and Load"),
 	confirmationsCC("Confirmation messages")
 {
 	saveAndLoadRecursiveData = true;
@@ -27,6 +28,10 @@ GlobalSettings::GlobalSettings() :
 	
 	fileToOpenOnStartup = new FileParameter("File to load on startup", "File to load when start, if the option above is checked", "", false);
 	startupCC.addParameter(fileToOpenOnStartup);
+
+	addChildControllableContainer(&saveLoadCC);
+	enableAutoSave = saveLoadCC.addBoolParameter("Enable auto-save", "When enabled, a backup file will be saved every 5 min", false, true);
+	autoSaveCount = saveLoadCC.addIntParameter("Auto-save count", "The number of different files to auto-save", 10, 1, 100);
 
 	addChildControllableContainer(&confirmationsCC);
 	askBeforeRemovingItems = confirmationsCC.addBoolParameter("Ask before removing items", "If enabled, you will get a confirmation prompt before removing any item", false);
@@ -44,13 +49,15 @@ void GlobalSettings::controllableFeedbackUpdate(ControllableContainer *, Control
 	{
 		if (openLastDocumentOnStartup->boolValue()) openSpecificFileOnStartup->setValue(false);
 		openSpecificFileOnStartup->setEnabled(!openLastDocumentOnStartup->boolValue());
-	}
-	if (c == openLastDocumentOnStartup || c == openSpecificFileOnStartup)
+	}else if (c == openLastDocumentOnStartup || c == openSpecificFileOnStartup)
 	{
 		fileToOpenOnStartup->setEnabled(openSpecificFileOnStartup->boolValue());
-	}if (c == checkBetaUpdates)
+	}else if (c == checkBetaUpdates)
 	{
 		onlyCheckBetaFromBeta->setEnabled(checkBetaUpdates->boolValue());
+	} else if (c == enableAutoSave)
+	{
+		autoSaveCount->setEnabled(enableAutoSave->boolValue());
 	}
 }
 

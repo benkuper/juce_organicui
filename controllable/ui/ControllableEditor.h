@@ -11,11 +11,10 @@
 #ifndef CONTROLLABLEEDITOR_H_INCLUDED
 #define CONTROLLABLEEDITOR_H_INCLUDED
 
-
 class ControllableEditor : 
 	public InspectableEditor,
 	public Button::Listener,
-	public Controllable::Listener
+	public Controllable::AsyncListener
 {
 public:
 	ControllableEditor(Controllable * controllable, bool isRoot, int initHeight = 16);  //Todo : handle full feedback if is root
@@ -36,7 +35,8 @@ public:
 
 	void resized() override;
 
-    void controllableNameChanged(Controllable *) override;
+	void newMessage(const Controllable::ControllableEvent &e) override;
+	//void newMessage(const Parameter::ParameterEvent &e) override; 
 
     void buttonClicked(Button * b) override;
 };

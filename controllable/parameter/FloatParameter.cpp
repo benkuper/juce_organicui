@@ -11,8 +11,12 @@
 
 FloatParameter::FloatParameter(const String & niceName, const String &description, const float & initialValue, const float & minValue, const float & maxValue, bool enabled) :
 	Parameter(Type::FLOAT, niceName, description, (float)initialValue, (float)minValue, (float)maxValue, enabled),
-	defaultUI(SLIDER)
+	defaultUI(SLIDER),
+	customUI(NONE)
 {
+	canHaveRange = true;
+	
+	if ((float)minimumValue == INT32_MIN && (float)maximumValue == INT32_MAX) defaultUI = UIType::LABEL;
 	argumentsDescription = "float";
 }
 
@@ -69,8 +73,10 @@ TimeLabel * FloatParameter::createTimeLabelParameter(FloatParameter * target)
 }
 
 ControllableUI * FloatParameter::createDefaultUI(Controllable * targetControllable) {
-	switch (defaultUI)
+	UIType t = customUI != NONE ? customUI : defaultUI;
+	switch (t)
 	{
+
 	case SLIDER:
 		return createSlider(dynamic_cast<FloatParameter *>(targetControllable));
 		break;
@@ -94,9 +100,23 @@ bool FloatParameter::checkValueIsTheSame(var oldValue, var newValue)
 	return jlimit<float>(minimumValue, maximumValue, newValue) == (float)oldValue;
 }
 
+void FloatParameter::setRange(var minVal, var maxVal, bool setDefaultRange)
+{
+	Parameter::setRange(minVal, maxVal, setDefaultRange);
+	if ((float)minimumValue == INT32_MIN && (float)maximumValue == INT32_MAX) defaultUI = UIType::LABEL;
+}
+
+var FloatParameter::getJSONDataInternal()
+{
+	var data = Parameter::getJSONDataInternal();
+	if (customUI != NONE) data.getDynamicObject()->setProperty("customUI", customUI);
+	return data;
+}
+
 void FloatParameter::loadJSONDataInternal(var data)
 {
 	Parameter::loadJSONDataInternal(data);
 	if (data.getDynamicObject()->hasProperty("defaultUI")) defaultUI = (UIType)(int)data.getProperty("defaultUI", SLIDER);
+	customUI = (UIType)(int)data.getProperty("customUI", NONE);
 }
 

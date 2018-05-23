@@ -29,6 +29,10 @@ public:
 	BoolParameter * openSpecificFileOnStartup;
 	StringParameter * fileToOpenOnStartup;
 
+	ControllableContainer saveLoadCC;
+	BoolParameter * enableAutoSave;
+	IntParameter * autoSaveCount;
+
 	ControllableContainer confirmationsCC;
 	BoolParameter * askBeforeRemovingItems;
 

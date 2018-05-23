@@ -15,6 +15,7 @@ StringParameter::StringParameter(const String & niceName, const String &descript
 	defaultUI(TEXT)
 {
 	argumentsDescription = "string";
+	isCustomizableByUser = false; //avoid having the param wheel 
 }
 
 StringParameter::~StringParameter()

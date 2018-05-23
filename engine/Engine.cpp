@@ -20,25 +20,26 @@ Engine::Engine(const String & fileName, const String & fileExtension, Applicatio
 		"Save a " + fileName),
 	appProperties(_appProperties),
 	appVersion(_appVersion),
+	fileName(fileName),
+	fileExtension(fileExtension),
 	lastFileAbsolutePath(""),
+	autoSaveIndex(0),
     engineNotifier(10),
     isLoadingFile(false),
     isClearing(false)
 {
 	skipControllableNameInAddress = true;
-
 	isBetaVersion = appVersion.endsWith("b");
 
 	selectionManager = new InspectableSelectionManager(true); //selectionManager constructor
 
-	//to move into engine
 	Logger::setCurrentLogger(CustomLogger::getInstance());
 
 	addChildControllableContainer(DashboardManager::getInstance());
-
 	addChildControllableContainer(ProjectSettings::getInstance());
-
 	ScriptUtil::getInstance(); //trigger ScriptUtil constructor
+
+	startTimer(60000*5); //auto-save every 5 minutes
 }
 
 Engine::~Engine() {
@@ -137,4 +138,16 @@ void Engine::clear() {
 	engineNotifier.addMessage(new EngineEvent(EngineEvent::ENGINE_CLEARED, this));
 
 
+}
+
+
+void Engine::timerCallback()
+{
+	if (isClearing || isLoadingFile) return;
+
+	if (GlobalSettings::getInstance()->enableAutoSave->boolValue())
+	{
+		saveBackupDocument(autoSaveIndex);
+		autoSaveIndex = (autoSaveIndex + 1) % GlobalSettings::getInstance()->autoSaveCount->intValue();
+	}
 }

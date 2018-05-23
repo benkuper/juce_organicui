@@ -19,7 +19,7 @@ class TimeLabel;
 class FloatParameter : public Parameter
 {
 public:
-    FloatParameter(const String &niceName, const String &description, const float &initialValue, const float &minValue = 0.f, const float &maxValue = 1.f, bool enabled = true);
+    FloatParameter(const String &niceName, const String &description, const float &initialValue, const float &minValue = (float)INT32_MIN, const float &maxValue = (float)INT32_MAX, bool enabled = true);
     ~FloatParameter() {}
 
     void setValueInternal(var & _value) override;
@@ -27,8 +27,9 @@ public:
 	virtual var getLerpValueTo(var targetValue, float weight) override;
 	virtual void setWeightedValue(Array<var> values, Array<float> weights) override;
 
-	enum UIType { SLIDER, STEPPER, LABEL, TIME };
+	enum UIType {NONE, SLIDER, STEPPER, LABEL, TIME };
 	UIType defaultUI;
+	UIType customUI;
 
     FloatSliderUI * createSlider(FloatParameter * target = nullptr);
     FloatStepperUI * createStepper(FloatParameter * target = nullptr);
@@ -39,6 +40,9 @@ public:
 
 	bool checkValueIsTheSame(var oldValue, var newValue) override;
 
+	virtual void setRange(var minVal, var maxVal, bool setDefaultRange = true) override;
+
+	var getJSONDataInternal() override;
 	void loadJSONDataInternal(var data) override;
 
 	static FloatParameter * create() { return new FloatParameter("New Float Parameter", "",0); }

@@ -8,10 +8,7 @@
   ==============================================================================
 */
 
-#ifndef EASING_H_INCLUDED
-#define EASING_H_INCLUDED
-
-#include "JuceHeader.h"
+#pragma once
 
 class EasingUI;
 
@@ -110,4 +107,3 @@ public:
 	EasingUI * createUI() override;
 };
 
-#endif  // EASING_H_INCLUDED

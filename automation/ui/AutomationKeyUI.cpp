@@ -9,10 +9,12 @@
 */
 
 
-AutomationKeyUI::AutomationKeyUI(AutomationKey * key) :
+AutomationKeyUI::AutomationKeyUI(AutomationKey * key, Colour c) :
 	BaseItemMinimalUI(key),
     keyYPos1(-1),
-    keyYPos2(-1)
+    keyYPos2(-1),
+	color(c),
+	handle(c)
 {
 	addAndMakeVisible(&handle);
 	//removeMouseListener(this);
@@ -39,6 +41,7 @@ void AutomationKeyUI::setEasingUI(EasingUI * eui)
 	{
 
 		addAndMakeVisible(easingUI);
+		easingUI->color = color;
 		easingUI->toBack();
 		resized();
 		if(keyYPos1 > -1 && keyYPos2 > -1) easingUI->setKeyPositions(keyYPos1, keyYPos2);
@@ -163,19 +166,19 @@ void AutomationKeyUI::inspectableSelectionChanged(Inspectable * i)
 {
 	BaseItemMinimalUI::inspectableSelectionChanged(i);
 	handle.highlight = item->isSelected;
-	handle.color = item->isSelected ? HIGHLIGHT_COLOR : item->isPreselected ? PRESELECT_COLOR : FRONT_COLOR;
+	handle.color = item->isSelected ? HIGHLIGHT_COLOR : item->isPreselected ? PRESELECT_COLOR : color;
 }
 
 void AutomationKeyUI::inspectablePreselectionChanged(Inspectable * i)
 {
 	BaseItemMinimalUI::inspectablePreselectionChanged(i);
 	handle.highlight = false;
-	handle.color = item->isPreselected ? PRESELECT_COLOR : FRONT_COLOR;
+	handle.color = item->isPreselected ? PRESELECT_COLOR : color;
 }
 
-AutomationKeyUI::Handle::Handle() :
+AutomationKeyUI::Handle::Handle(Colour c) :
 	highlight(false),
-	color(FRONT_COLOR)
+	color(c)
 {
 	setRepaintsOnMouseActivity(true);
 }

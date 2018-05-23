@@ -45,6 +45,10 @@ public:
     var defaultValue;
     var value;
     var lastValue;
+
+
+	//Range
+	bool canHaveRange;
     var minimumValue;
     var maximumValue;
 

@@ -8,8 +8,6 @@
   ==============================================================================
 */
 
-#include "EasingUI.h"
-
 #pragma warning(disable:4244)
 
 EasingUI::EasingUI(Easing * e) :
@@ -38,7 +36,7 @@ void EasingUI::setKeyPositions(const int &k1, const int &k2)
 
 void EasingUI::paint(Graphics &g)
 {
-	Colour c = FRONT_COLOR;
+	Colour c = color;
 	if (easing.wasObjectDeleted()) return;
 	if (easing->isSelected) c = HIGHLIGHT_COLOR;
 	if (isMouseOver()) c = c.brighter();

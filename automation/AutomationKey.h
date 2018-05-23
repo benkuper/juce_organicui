@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef AUTOMATIONKEY_H_INCLUDED
-#define AUTOMATIONKEY_H_INCLUDED
+#pragma once
 
 class AutomationKey :
 	public BaseItem
@@ -40,6 +39,3 @@ public:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AutomationKey)
 };
 
-
-
-#endif  // AUTOMATIONKEY_H_INCLUDED

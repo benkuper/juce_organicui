@@ -18,6 +18,8 @@ LookAndFeelOO::LookAndFeelOO(){
 
     for (int i = 0; i < numElementsInArray (LookAndFeelHelpers::standardColours); i += 2)
         setColour ((int) LookAndFeelHelpers::standardColours [i], Colour ((uint32) LookAndFeelHelpers::standardColours [i + 1]));
+
+	//setUsingNativeAlertWindows(true);
 }
 
 LookAndFeelOO::~LookAndFeelOO()  {}
@@ -64,7 +66,7 @@ void LookAndFeelOO::drawButtonBackground (Graphics& g,
 
     if (width > 0 && height > 0)
     {
-        const float cornerSize = 4.0f;
+        const float cornerSize = 2.0f;
 
         Path outline;
         outline.addRoundedRectangle (0.5f, 0.5f, width, height, cornerSize, cornerSize,

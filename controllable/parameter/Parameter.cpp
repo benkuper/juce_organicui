@@ -11,6 +11,7 @@
 Parameter::Parameter(const Type &type, const String &niceName, const String &description, var initialValue, var minValue, var maxValue, bool enabled) :
 	Controllable(type, niceName, description, enabled),
 	defaultValue(initialValue),
+	canHaveRange(false),
 	minimumValue(minValue),
 	maximumValue(maxValue),
 	defaultMinValue(minValue),
@@ -215,7 +216,6 @@ void Parameter::setUndoableNormalizedValue(const float & oldNormalizedValue, con
 	setUndoableValue(jmap<float>(oldNormalizedValue, (float)minimumValue, (float)maximumValue), jmap<float>(newNormalizedValue, (float)minimumValue, (float)maximumValue));
 }
 
-
 void Parameter::setNormalizedValue(const float & normalizedValue, bool silentSet, bool force)
 {
 	setValue(jmap<float>(normalizedValue, (float)minimumValue, (float)maximumValue), silentSet, force);
@@ -223,7 +223,10 @@ void Parameter::setNormalizedValue(const float & normalizedValue, bool silentSet
 
 float Parameter::getNormalizedValue()
 {
-	if (type != FLOAT && type != INT && type != BOOL) return 0;
+	if (type == BOOL) return (float)value;
+
+	if (!canHaveRange) return 0;
+
 	if ((float)minimumValue == (float)maximumValue) {
 		return 0.0;
 	} else
@@ -312,7 +315,7 @@ bool Parameter::ParameterSetValueAction::perform()
 	Parameter * p = getParameter();
 	if (p == nullptr)
 	{
-		DBG("Undo set value : parameter not found " << controlAddress);
+		LOGWARNING("Undo set value : parameter not found " << controlAddress);
 		return false;
 	}
 
@@ -325,7 +328,7 @@ bool Parameter::ParameterSetValueAction::undo()
 	Parameter * p = getParameter();
 	if (p == nullptr)
 	{
-		DBG("Undo set value : parameter not found " << controlAddress);
+		LOGWARNING("Undo set value : parameter not found " << controlAddress);
 		return false;
 	}
 

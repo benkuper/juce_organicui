@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef AUTOMATIONUI_H_INCLUDED
-#define AUTOMATIONUI_H_INCLUDED
+#pragma once
 
 class AutomationUI :
 	public BaseManagerUI<Automation,AutomationKey,AutomationKeyUI>,
@@ -17,7 +16,7 @@ class AutomationUI :
 	public InspectableSelectionManager::Listener
 {
 public:
-	AutomationUI(Automation * _automation);
+	AutomationUI(Automation * _automation, Colour c = Colours::white);
 	virtual ~AutomationUI();
 
 	float viewStartPos;
@@ -33,7 +32,7 @@ public:
 
 	bool fixedPosOrValueEnabled; //When using shift key and moving handles, keep either position or value
 
-	Colour valueBGColor;
+	Colour color;
 
 	AutomationKeyUI * currentUI;
 	ScopedPointer<AutomationMultiKeyTransformer> transformer;
@@ -63,6 +62,8 @@ public:
 	void itemAddedAsync(AutomationKey *) override;
 	void itemsReorderedAsync() override;
 
+	AutomationKeyUI * createUIForItem(AutomationKey * item) override;
+	
 	void addItemUIInternal(AutomationKeyUI *) override;
 	void removeItemUIInternal(AutomationKeyUI *) override;
 
@@ -81,7 +82,3 @@ public:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AutomationUI)
 
 };
-
-
-
-#endif  // AUTOMATIONUI_H_INCLUDED

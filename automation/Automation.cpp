@@ -1,6 +1,4 @@
-#include "Automation.h"
-/*
-  ==============================================================================
+/*  ==============================================================================
 
 	Automation.cpp
 	Created: 11 Dec 2016 1:21:37pm
@@ -35,6 +33,7 @@ Automation::Automation(AutomationRecorder * _recorder) :
 
 	//selectItemWhenCreated = false;
 	selectionManager = new InspectableSelectionManager(false);
+	showInspectorOnSelect = false;
 
 	helpID = "Automation";
 }

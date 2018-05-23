@@ -45,13 +45,13 @@ ControllableEditor::ControllableEditor(Controllable * _controllable, bool isRoot
 	baseHeight = initHeight;
 	setSize(100, baseHeight);
 
-	controllable->addControllableListener(this);
+	controllable->addAsyncControllableListener(this);
 }
 
 ControllableEditor::~ControllableEditor()
 {
 	if (controllable.wasObjectDeleted()) return;
-	controllable->removeControllableListener(this);
+	controllable->removeAsyncControllableListener(this);
 }
 
 void ControllableEditor::setShowLabel(bool value)
@@ -98,10 +98,12 @@ void ControllableEditor::resized()
 	}
 
 }
-
-void ControllableEditor::controllableNameChanged(Controllable * override)
+void ControllableEditor::newMessage(const Controllable::ControllableEvent & e)
 {
-	label.setText(controllable->niceName, dontSendNotification);
+	if (e.type == Controllable::ControllableEvent::NAME_CHANGED)
+	{
+		label.setText(controllable->niceName, dontSendNotification);
+	}
 }
 
 void ControllableEditor::buttonClicked(Button * b)

@@ -33,6 +33,7 @@ public:
 	void paintOverChildren(Graphics &g) override;
 
 	virtual void addPopupMenuItems(PopupMenu * p) override;
+	virtual void addPopupMenuItemsInternal(PopupMenu *) {}
 	virtual void handleMenuSelectedID(int id) override;
 
 	virtual void mouseDoubleClick(const MouseEvent &e) override;

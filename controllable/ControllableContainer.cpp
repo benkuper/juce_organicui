@@ -154,6 +154,14 @@ TargetParameter * ControllableContainer::addTargetParameter(const String & _nice
 	return p;
 }
 
+FileParameter * ControllableContainer::addFileParameter(const String & _niceName, const String & _description, const String & _initialValue)
+{
+	String targetName = getUniqueNameInContainer(_niceName);
+	FileParameter * p = new FileParameter(targetName, _description, _initialValue);
+	addControllable(p);
+	return p;
+}
+
 Trigger * ControllableContainer::addTrigger(const String & _niceName, const String & _description, const bool & enabled)
 {
 	String targetName = getUniqueNameInContainer(_niceName);

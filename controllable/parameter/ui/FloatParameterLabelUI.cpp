@@ -28,7 +28,7 @@ maxFontHeight(12),
 	valueLabel.addListener(this);
 
 	
-	valueLabel.setColour(valueLabel.backgroundColourId, BG_COLOR);
+	valueLabel.setColour(valueLabel.backgroundColourId, BG_COLOR.darker(.3f));
 	valueLabel.setColour(valueLabel.backgroundWhenEditingColourId, Colours::black);
 	valueLabel.setColour(CaretComponent::caretColourId, Colours::orange);
 	valueLabel.setColour(valueLabel.textWhenEditingColourId, Colours::orange);

@@ -8,16 +8,17 @@
   ==============================================================================
 */
 
-#ifndef AUTOMATIONKEYUI_H_INCLUDED
-#define AUTOMATIONKEYUI_H_INCLUDED
+#pragma once
 
 class AutomationKeyUI :
 	public BaseItemMinimalUI<AutomationKey>
 {
 public:
-	AutomationKeyUI(AutomationKey *);
+	AutomationKeyUI(AutomationKey *, Colour c = Colours::white);
 	virtual ~AutomationKeyUI();
     
+	Colour color;
+
     int keyYPos1;
     int keyYPos2;
 
@@ -35,7 +36,7 @@ public:
 		public Component
 	{
 	public:
-		Handle();
+		Handle(Colour c);
 		bool highlight;
 		Colour color;
 		void paint(Graphics &g) override;
@@ -64,6 +65,3 @@ public:
 	void inspectableSelectionChanged(Inspectable *) override;
 	void inspectablePreselectionChanged(Inspectable *) override;
 };
-
-
-#endif  // AUTOMATIONKEYUI_H_INCLUDED

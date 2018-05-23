@@ -8,9 +8,6 @@
   ==============================================================================
 */
 
-#include "Easing.h"
-#include "ui/EasingUI.h"
-
 Easing::Easing(Type _type) :
 ControllableContainer("ease"),
 type(_type)

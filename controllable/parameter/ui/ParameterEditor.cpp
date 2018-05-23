@@ -131,7 +131,21 @@ void ParameterEditor::updateUI()
 void ParameterEditor::newMessage(const Parameter::ParameterEvent & e)
 {
 	if (!parameter->isEditable || parameter->isControllableFeedbackOnly) return;
-	label.setFont(label.getFont().withStyle(parameter->isOverriden?Font::FontStyleFlags::bold:Font::FontStyleFlags::plain));
+
+	label.setFont(label.getFont().withStyle(parameter->isOverriden ? Font::FontStyleFlags::bold : Font::FontStyleFlags::plain));
+
+	if (e.type == Parameter::ParameterEvent::BOUNDS_CHANGED)
+	{
+		/*
+		removeChildComponent(ui);
+
+		ui = controllable->createDefaultUI();
+		ui->showLabel = false;
+		ui->setOpaqueBackground(true);
+		addAndMakeVisible(ui);
+		updateUI();
+		*/
+	}
 }
 
 void ParameterEditor::parameterControlModeChanged(Parameter *)

@@ -61,7 +61,7 @@ void ParameterUI::showEditWindow()
 		if (!parameter->isControllableFeedbackOnly)
 		{
 			float newValue = nameWindow.getTextEditorContents("val").getFloatValue();
-			parameter->setValue(newValue);
+			parameter->setUndoableValue(parameter->value, newValue);
 		}
 	}
 }
@@ -106,7 +106,7 @@ void ParameterUI::paintOverChildren(Graphics & g)
 
 void ParameterUI::addPopupMenuItems(PopupMenu * p)
 {
-	if (parameter->isEditable && !parameter->isControllableFeedbackOnly)
+	if (parameter->isEditable && (!parameter->isControllableFeedbackOnly || parameter->controlMode != Parameter::MANUAL))
 	{
 		p->addItem(1, "Reset value");
 
@@ -114,21 +114,27 @@ void ParameterUI::addPopupMenuItems(PopupMenu * p)
 		{
 			p->addSeparator();
 			p->addItem(-3, "Show Edit Window");
+			/*
+			if (parameter->canHaveRange)
+			{
+				p->addItem(-4, "Set Range...");
+				if((int)parameter->minimumValue > INT32_MIN || (int)parameter->maximumValue < INT32_MAX) p->addItem(-5, "Clear Range");
+			}
+			*/
+			addPopupMenuItemsInternal(p);
 		}
 
+		p->addSeparator();
 		if (!parameter->lockManualControlMode)
-		{
+		{ 
 			PopupMenu controlModeMenu;
 			controlModeMenu.addItem(10, "Manual");
 			controlModeMenu.addItem(11, "Expression");
 			controlModeMenu.addItem(12, "Reference");
-			controlModeMenu.addItem(13, "Automation");
+			controlModeMenu.addItem(13, "Animation");
 			p->addSubMenu("Control Mode", controlModeMenu);
 		}
 	}
-	
-	
-
 }
 
 void ParameterUI::handleMenuSelectedID(int id)

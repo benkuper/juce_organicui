@@ -1,5 +1,4 @@
-/*
-  ==============================================================================
+/*  ==============================================================================
 
 	AutomationUI.cpp
 	Created: 11 Dec 2016 1:22:02pm
@@ -8,14 +7,16 @@
   ==============================================================================
 */
 
-AutomationUI::AutomationUI(Automation * _automation) :
+
+AutomationUI::AutomationUI(Automation * _automation, Colour c) :
 	BaseManagerUI("Automation", _automation, false),
 	firstROIKey(0),
 	lastROIKey(0),
 	autoResetViewRangeOnLengthUpdate(false),
 	currentPosition(0),
-	valueBGColor(Colours::white.withAlpha(.1f)),
-	currentUI(nullptr)
+	color(c),
+	currentUI(nullptr),
+	transformer(nullptr)
 {
 	manager->selectionManager->addSelectionListener(this);
 
@@ -107,7 +108,7 @@ void AutomationUI::paint(Graphics & g)
 	{
 		int ty = getYForValue(currentValue);
 		Rectangle<int> vr = getLocalBounds().withTop(ty);
-		g.setColour(valueBGColor);
+		g.setColour(color.withAlpha(.1f));
 		g.fillRect(vr);
 
 		//pos-value feedback
@@ -266,6 +267,11 @@ void AutomationUI::itemsReorderedAsync()
 {
 	BaseManagerUI::itemsReorderedAsync();
 	updateROI();
+}
+
+AutomationKeyUI * AutomationUI::createUIForItem(AutomationKey * item)
+{
+	return new AutomationKeyUI(item, color);
 }
 
 void AutomationUI::addItemUIInternal(AutomationKeyUI * kui)
@@ -489,4 +495,3 @@ void AutomationUI::inspectablesSelectionChanged()
 		transformer->grabKeyboardFocus(); // so no specific key has the focus for deleting
 	}
 }
-

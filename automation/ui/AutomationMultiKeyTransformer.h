@@ -8,9 +8,7 @@
   ==============================================================================
 */
 
-#ifndef AUTOMATIONMULTIKEYTRANSFORMER_H_INCLUDED
-#define AUTOMATIONMULTIKEYTRANSFORMER_H_INCLUDED
-
+#pragma once  
 class AutomationUI;
 
 class AutomationMultiKeyTransformer :
@@ -43,5 +41,3 @@ public:
 	void mouseUp(const MouseEvent &e) override;
 };
 
-
-#endif  // AUTOMATIONMULTIKEYTRANSFORMER_H_INCLUDED

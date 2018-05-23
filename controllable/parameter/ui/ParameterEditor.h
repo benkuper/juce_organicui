@@ -46,6 +46,7 @@ public:
 
 	void parameterControlModeChanged(Parameter *) override;
 
+
 	// Inherited via Listener
 	virtual void labelTextChanged(Label * labelThatHasChanged) override;
 };

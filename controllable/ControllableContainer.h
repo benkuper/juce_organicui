@@ -67,8 +67,8 @@ public:
 	UndoableAction * addUndoableControllable(Controllable * c, bool onlyReturnAction = false);
 	void addControllable(Controllable * c);
 	void addParameter(Parameter * p);
-	FloatParameter * addFloatParameter(const String &niceName, const String &description, const float &initialValue, const float &minValue = 0, const float &maxValue = 1, const bool &enabled = true);
-	IntParameter * addIntParameter(const String &niceName, const String &description, const int &initialValue, const int &minValue, const int &maxValue, const bool &enabled = true);
+	FloatParameter * addFloatParameter(const String &niceName, const String &description, const float &initialValue, const float &minValue = INT32_MIN, const float &maxValue = INT32_MAX, const bool &enabled = true);
+	IntParameter * addIntParameter(const String &niceName, const String &description, const int &initialValue, const int &minValue = INT32_MIN, const int &maxValue = INT32_MAX, const bool &enabled = true);
 	BoolParameter * addBoolParameter(const String &niceName, const String &description, const bool &value, const bool &enabled = true);
 	StringParameter * addStringParameter(const String &niceName, const String &description, const String &value, const bool &enabled = true);
 	EnumParameter * addEnumParameter(const String &niceName, const String &description, const bool &enabled = true);
@@ -76,6 +76,8 @@ public:
 	Point3DParameter * addPoint3DParameter(const String &niceName, const String &description, const bool &enabled = true);
 	ColorParameter * addColorParameter(const String &niceName, const String &description, const Colour &initialColor, const bool &enabled = true);
 	TargetParameter * addTargetParameter(const String &niceName, const String &description, WeakReference<ControllableContainer> rootReference = nullptr, const bool &enabled = true);
+	FileParameter * addFileParameter(const String &niceName, const String &description, const String &initialValue = "");
+
 	Trigger * addTrigger(const String &niceName, const String &description, const bool &enabled = true);
 
 	void addTriggerInternal(Trigger * t);

@@ -20,7 +20,8 @@ class Engine :
 	public ControllableContainer,
 	public FileBasedDocument,
 	public AsyncUpdater,
-	public ProgressNotifier
+	public ProgressNotifier,
+	public Timer //for auto save
 {
 public:
 	Engine(const String &fileName = "File",const String &fileExtension = ".file", ApplicationProperties * appProperties = nullptr, const String &appVersion = "1.0.0");
@@ -35,11 +36,15 @@ public:
 
 	bool isBetaVersion;
 
+	String convertURL = ""; //for file conversion
+
 	String fileName = "File";
 	String fileExtension = ".file";
 	String fileWildcard = "*"+fileExtension;
 
 	String lastFileAbsolutePath; //Used for checking in saveDocument if new file is different
+
+	int autoSaveIndex;
 
 	virtual void changed() override;
 	void createNewGraph();
@@ -53,8 +58,9 @@ public:
 
 	//  inherited from FileBasedDocument
 	String getDocumentTitle()override;
-	Result loadDocument(const File& file)override;
-	Result saveDocument(const File& file)override;
+	Result loadDocument(const File& file) override;
+	Result saveDocument(const File& file) override;
+	Result saveBackupDocument(int index);
 
 	File getLastDocumentOpened() override;
 	void setLastDocumentOpened(const File& file) override;
@@ -77,6 +83,9 @@ public:
 	void fileLoaderEnded();
 	bool allLoadingThreadsAreEnded();
 	void loadDocumentAsync(const File & file);
+
+	virtual void timerCallback() override;
+
 
 	class FileLoader : public Thread, public Timer {
 	public:
@@ -142,7 +151,7 @@ public:
 	bool isClearing;
 	var jsonData;
 
-	void handleAsyncUpdate()override;
+	virtual void handleAsyncUpdate()override;
 
 	void childStructureChanged(ControllableContainer *) override;
 };
