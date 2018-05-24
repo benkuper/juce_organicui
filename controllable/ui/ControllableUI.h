@@ -39,6 +39,7 @@ public:
 	virtual void mouseUpInternal(const MouseEvent &) {} //
 
 	//PopupMenu
+	virtual void showContextMenu();
 	virtual void addPopupMenuItems(PopupMenu *) {} //for child classes
 	virtual void handleMenuSelectedID(int) {} // to override
 

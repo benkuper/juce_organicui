@@ -98,6 +98,14 @@ void ControllableEditor::resized()
 	}
 
 }
+void ControllableEditor::mouseDown(const MouseEvent & e)
+{
+	if (e.eventComponent == &label)
+	{
+		if (ui->showMenuOnRightClick) ui->showContextMenu();
+	}
+}
+
 void ControllableEditor::newMessage(const Controllable::ControllableEvent & e)
 {
 	if (e.type == Controllable::ControllableEvent::NAME_CHANGED)

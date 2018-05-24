@@ -35,6 +35,8 @@ public:
 
 	void resized() override;
 
+	void mouseDown(const MouseEvent &e) override;
+
 	void newMessage(const Controllable::ControllableEvent &e) override;
 	//void newMessage(const Parameter::ParameterEvent &e) override; 
 

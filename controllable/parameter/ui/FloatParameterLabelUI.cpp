@@ -1,3 +1,4 @@
+#include "FloatParameterLabelUI.h"
 /*
   ==============================================================================
 
@@ -96,6 +97,11 @@ void FloatParameterLabelUI::resized()
 	
 }
 
+void FloatParameterLabelUI::mouseDown(const MouseEvent & e)
+{
+	if (e.eventComponent == &valueLabel) ParameterUI::mouseDown(e.getEventRelativeTo(this));
+	else ParameterUI::mouseDown(e);
+}
 
 void FloatParameterLabelUI::valueChanged(const var & v)
 {

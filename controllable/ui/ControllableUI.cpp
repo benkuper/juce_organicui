@@ -49,41 +49,7 @@ void ControllableUI::mouseDown(const MouseEvent & e)
 	{
 		if (showMenuOnRightClick)
 		{
-			ScopedPointer<PopupMenu> p = new PopupMenu();
-			addPopupMenuItems(p);
-
-			
-			if (controllable->includeInScriptObject)
-			{
-				p->addSeparator();
-				p->addItem(-1, "Copy OSC Control Address");
-				p->addItem(-2, "Copy Script Control Address");
-			}
-
-			if (p->getNumItems() == 0) return;
-
-			int result = p->show();
-			if (result > 0)
-			{
-				handleMenuSelectedID(result);
-			} else if (result < 0)
-			{
-				switch (result)
-				{
-				case -1:
-					SystemClipboard::copyTextToClipboard(controllable->controlAddress);
-					break;
-				case -2:
-					SystemClipboard::copyTextToClipboard("root" + controllable->controlAddress.replaceCharacter('/', '.'));
-					break;
-
-				case -3:
-					showEditWindow();
-					break;
-				default:
-					DBG("Not handled : " << result);
-				}
-			}
+			showContextMenu();
 		}
 	} else
 	{
@@ -96,6 +62,45 @@ void ControllableUI::mouseUp(const MouseEvent & e)
 	if (e.mods.isRightButtonDown()) return;
 	mouseUpInternal(e);
 
+}
+
+void ControllableUI::showContextMenu()
+{
+	ScopedPointer<PopupMenu> p = new PopupMenu();
+	addPopupMenuItems(p);
+
+
+	if (controllable->includeInScriptObject)
+	{
+		p->addSeparator();
+		p->addItem(-1, "Copy OSC Control Address");
+		p->addItem(-2, "Copy Script Control Address");
+	}
+
+	if (p->getNumItems() == 0) return;
+
+	int result = p->show();
+	if (result > 0)
+	{
+		handleMenuSelectedID(result);
+	} else if (result < 0)
+	{
+		switch (result)
+		{
+		case -1:
+			SystemClipboard::copyTextToClipboard(controllable->controlAddress);
+			break;
+		case -2:
+			SystemClipboard::copyTextToClipboard("root" + controllable->controlAddress.replaceCharacter('/', '.'));
+			break;
+
+		case -3:
+			showEditWindow();
+			break;
+		default:
+			DBG("Not handled : " << result);
+		}
+	}
 }
 
 void ControllableUI::setOpaqueBackground(bool value)

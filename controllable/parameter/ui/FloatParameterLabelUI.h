@@ -41,6 +41,8 @@ public:
 	//void paint(Graphics &g) override;
 	void resized() override;
 
+	void mouseDown(const MouseEvent &e) override;
+
 
 protected:
 	void valueChanged(const var & v) override;
