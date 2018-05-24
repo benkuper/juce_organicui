@@ -1,15 +1,8 @@
 #include "OrganicMainComponent.h"
-/*
-  ==============================================================================
 
-    This file was auto-generated!
+ApplicationProperties& getAppProperties();
+ApplicationCommandManager& getCommandManager();
 
-  ==============================================================================
-*/
-
-String getAppVersion();
-
-//==============================================================================
 OrganicMainContentComponent::OrganicMainContentComponent()
 {
 	setSize(800, 600);

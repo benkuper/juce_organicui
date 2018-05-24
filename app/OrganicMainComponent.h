@@ -1,23 +1,6 @@
-/*
-  ==============================================================================
-
-    This file was auto-generated!
-
-  ==============================================================================
-*/
-
-#ifndef ORGANICMAINCOMPONENT_H_INCLUDED
-#define ORGANICMAINCOMPONENT_H_INCLUDED
+#pragma once
 
 
-ApplicationProperties& getAppProperties();
-ApplicationCommandManager& getCommandManager();
-
-//==============================================================================
-/*
-    This component lives inside our window, and this is where you should put all
-    your controls and content.
-*/
 class OrganicMainContentComponent   : 
 	public Component, 
 	public ApplicationCommandTarget, 
@@ -25,7 +8,6 @@ class OrganicMainContentComponent   :
 	public EngineListener
 {
 public:
-    //==============================================================================
    	OrganicMainContentComponent();
     virtual ~OrganicMainContentComponent();
 
@@ -70,7 +52,3 @@ private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(OrganicMainContentComponent)
 
 };
-
-
-
-#endif  // ORGANICMAINCOMPONENT_H_INCLUDED

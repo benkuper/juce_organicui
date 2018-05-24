@@ -8,6 +8,8 @@
  ==============================================================================
  */
 
+ApplicationProperties& getAppProperties();
+
 
 namespace CommandIDs
 {

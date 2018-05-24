@@ -8,9 +8,7 @@
   ==============================================================================
 */
 
-#ifndef ORGANICAPPLICATION_H_INCLUDED
-#define ORGANICAPPLICATION_H_INCLUDED
-
+#pragma once
 
 /*
 ==============================================================================
@@ -84,4 +82,4 @@ public:
 };
 
 
-#endif  // ORGANICAPPLICATION_H_INCLUDED
+

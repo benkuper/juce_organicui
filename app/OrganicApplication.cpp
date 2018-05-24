@@ -5,7 +5,18 @@
 #endif
 
 
-//==============================================================================
+#ifndef DECLARE_MAIN_FUNCTIONS
+
+static OrganicApplication& getApp() { return *dynamic_cast<OrganicApplication*>(JUCEApplication::getInstance()); }
+String getAppVersion() { return getApp().getApplicationVersion(); }
+ApplicationProperties& getAppProperties() { return *getApp().appProperties; }
+
+OpenGLContext * getOpenGLContext() { return &getApp().mainComponent->openGLContext; }
+
+ApplicationCommandManager& getCommandManager() { return getApp().commandManager; }
+OrganicApplication::MainWindow * getMainWindow() { return getApp().mainWindow; }
+
+#endif
 
 OrganicApplication::OrganicApplication(const String &appName) :
 	appSettings("Other Settings"),
