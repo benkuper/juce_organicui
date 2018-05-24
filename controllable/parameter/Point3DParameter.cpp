@@ -12,7 +12,7 @@ Author:  bkupe
 Point3DParameter::Point3DParameter(const String & niceName, const String & description, bool enabled) :
 	Parameter(POINT3D, niceName, description, 0, 0, 1, enabled),
 	x(0), y(0), z(0),
-	defaultUI(FloatParameter::SLIDER)
+	defaultUI(FloatParameter::NONE)
 {
 
 	value = var();
@@ -22,14 +22,14 @@ Point3DParameter::Point3DParameter(const String & niceName, const String & descr
 
 	 
 	minimumValue = var();
-	minimumValue.append(0);
-	minimumValue.append(0);
-	minimumValue.append(0);
+	minimumValue.append(INT32_MIN);
+	minimumValue.append(INT32_MIN);
+	minimumValue.append(INT32_MIN);
 
 	maximumValue = var();
-	maximumValue.append(1);
-	maximumValue.append(1);
-	maximumValue.append(1);
+	maximumValue.append(INT32_MAX);
+	maximumValue.append(INT32_MAX);
+	maximumValue.append(INT32_MAX);
 
 	//hideInEditor = true;
 	argumentsDescription = "float, float, float";

@@ -11,12 +11,10 @@
 
 FloatParameter::FloatParameter(const String & niceName, const String &description, const float & initialValue, const float & minValue, const float & maxValue, bool enabled) :
 	Parameter(Type::FLOAT, niceName, description, (float)initialValue, (float)minValue, (float)maxValue, enabled),
-	defaultUI(SLIDER),
+	defaultUI(NONE),
 	customUI(NONE)
 {
 	canHaveRange = true;
-	
-	if ((float)minimumValue == INT32_MIN && (float)maximumValue == INT32_MAX) defaultUI = UIType::LABEL;
 	argumentsDescription = "float";
 }
 
@@ -74,6 +72,9 @@ TimeLabel * FloatParameter::createTimeLabelParameter(FloatParameter * target)
 
 ControllableUI * FloatParameter::createDefaultUI(Controllable * targetControllable) {
 	UIType t = customUI != NONE ? customUI : defaultUI;
+
+	if (t == NONE) t = (float)minimumValue == INT32_MIN && (float)maximumValue == INT32_MAX?LABEL:SLIDER;
+
 	switch (t)
 	{
 
@@ -103,7 +104,6 @@ bool FloatParameter::checkValueIsTheSame(var oldValue, var newValue)
 void FloatParameter::setRange(var minVal, var maxVal, bool setDefaultRange)
 {
 	Parameter::setRange(minVal, maxVal, setDefaultRange);
-	if ((float)minimumValue == INT32_MIN && (float)maximumValue == INT32_MAX) defaultUI = UIType::LABEL;
 }
 
 var FloatParameter::getJSONDataInternal()

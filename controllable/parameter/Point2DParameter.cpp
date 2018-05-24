@@ -12,20 +12,19 @@
 Point2DParameter::Point2DParameter(const String & niceName, const String & description, bool _enabled) :
 	Parameter(POINT2D, niceName, description, 0, 0, 1, _enabled),
 	x(0), y(0),
-	defaultUI(FloatParameter::SLIDER)
+	defaultUI(FloatParameter::NONE)
 {
-
 	value = var();
 	value.append(0);
 	value.append(0);
 
 	minimumValue = var();
-	minimumValue.append(0);
-	minimumValue.append(0);
+	minimumValue.append((float)INT32_MIN);
+	minimumValue.append((float)INT32_MIN);
 
 	maximumValue = var();
-	maximumValue.append(1);
-	maximumValue.append(1);
+	maximumValue.append((float)INT32_MAX);
+	maximumValue.append((float)INT32_MAX);
 
 	//hideInEditor = true;
 	argumentsDescription = "float, float";

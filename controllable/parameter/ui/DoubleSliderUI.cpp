@@ -13,8 +13,7 @@ DoubleSliderUI::DoubleSliderUI(Point2DParameter * parameter) :
 	ParameterUI(parameter),
 	p2d(parameter),
 	xParam("X","xParam",parameter->x, parameter->minimumValue[0],parameter->maximumValue[0]),
-	yParam("Y", "yParam", parameter->y, parameter->minimumValue[1],parameter->maximumValue[1]),
-	xSlider(&xParam), ySlider(&yParam)
+	yParam("Y", "yParam", parameter->y, parameter->minimumValue[1],parameter->maximumValue[1])
 {
 	xParam.defaultValue = 0;
 	yParam.defaultValue = 0;
@@ -24,11 +23,11 @@ DoubleSliderUI::DoubleSliderUI(Point2DParameter * parameter) :
 	xParam.addAsyncParameterListener(this);
 	yParam.addAsyncParameterListener(this);
 
-	xSlider.addToUndoOnMouseUp = false;
-	ySlider.addToUndoOnMouseUp = false;
+	xSlider = (ParameterUI *)xParam.createDefaultUI();
+	ySlider = (ParameterUI *)yParam.createDefaultUI();
 
-	addAndMakeVisible(&xSlider);
-	addAndMakeVisible(&ySlider);
+	addAndMakeVisible(xSlider);
+	addAndMakeVisible(ySlider);
 
 	setInterceptsMouseClicks(true, true);
 
@@ -56,8 +55,8 @@ void DoubleSliderUI::mouseUpInternal(const MouseEvent &)
 void DoubleSliderUI::resized()
 {
  juce::Rectangle<int> r = getLocalBounds();
-	xSlider.setBounds(r.removeFromLeft(r.getWidth() / 2 - 5));
-	ySlider.setBounds(r.removeFromRight(r.getWidth() - 10));
+	xSlider->setBounds(r.removeFromLeft(r.getWidth() / 2 - 5));
+	ySlider->setBounds(r.removeFromRight(r.getWidth() - 10));
 }
 
 void DoubleSliderUI::showEditWindow()
@@ -113,8 +112,8 @@ void DoubleSliderUI::rangeChanged(Parameter * p)
 void DoubleSliderUI::setForceFeedbackOnlyInternal()
 {
 	bool val = parameter->isControllableFeedbackOnly || !parameter->isEditable || forceFeedbackOnly;
-	xSlider.setForceFeedbackOnly(val);
-	ySlider.setForceFeedbackOnly(val);
+	xSlider->setForceFeedbackOnly(val);
+	ySlider->setForceFeedbackOnly(val);
 }
 
 void DoubleSliderUI::newMessage(const Parameter::ParameterEvent & e)

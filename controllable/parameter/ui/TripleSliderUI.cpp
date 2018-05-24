@@ -31,10 +31,6 @@ TripleSliderUI::TripleSliderUI(Point3DParameter * parameter) :
 	ySlider = yParam.createDefaultUI();
 	zSlider = zParam.createDefaultUI();
 
-	//xSlider->addToUndoOnMouseUp = false;
-	//ySlider->addToUndoOnMouseUp = false;
-	//zSlider->addToUndoOnMouseUp = false;
-
 	addAndMakeVisible(xSlider);
 	addAndMakeVisible(ySlider);
 	addAndMakeVisible(zSlider);
@@ -49,7 +45,6 @@ TripleSliderUI::~TripleSliderUI()
 	xParam.removeAsyncParameterListener(this);
 	yParam.removeAsyncParameterListener(this);
 	zParam.removeAsyncParameterListener(this);
-
 }
 
 void TripleSliderUI::setForceFeedbackOnlyInternal()
