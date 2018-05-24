@@ -5,7 +5,7 @@
 #endif
 
 
-#ifndef DECLARE_MAIN_FUNCTIONS
+#if defined DECLARE_MAIN_FUNCTIONS
 
 static OrganicApplication& getApp() { return *dynamic_cast<OrganicApplication*>(JUCEApplication::getInstance()); }
 String getAppVersion() { return getApp().getApplicationVersion(); }
