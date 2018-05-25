@@ -26,7 +26,8 @@ ControllableEditor::ControllableEditor(Controllable * _controllable, bool isRoot
 	label.setJustificationType(Justification::left);
 	label.setFont(label.getFont().withHeight(12));
 	label.setText(controllable->niceName, dontSendNotification);
-	label.setTooltip(controllable->niceName+"\n"+controllable->description);
+	label.setTooltip(ui->tooltip);
+	label.addMouseListener(this, false);
 
 	if (controllable->isRemovableByUser)
 	{
@@ -100,10 +101,16 @@ void ControllableEditor::resized()
 }
 void ControllableEditor::mouseDown(const MouseEvent & e)
 {
-	if (e.eventComponent == &label)
+	InspectableEditor::mouseDown(e);
+
+	if (e.mods.isRightButtonDown())
 	{
-		if (ui->showMenuOnRightClick) ui->showContextMenu();
+		if (e.eventComponent == &label)
+		{
+			if (ui->showMenuOnRightClick) ui->showContextMenu();
+		}
 	}
+	
 }
 
 void ControllableEditor::newMessage(const Controllable::ControllableEvent & e)

@@ -38,7 +38,8 @@ maxFontHeight(12),
 	
 	setSize(200, 20);//default size
 	valueChanged(parameter->getValue());
-
+	
+	addMouseListener(this, true);
 }
 
 void FloatParameterLabelUI::setAutoSize(bool value)
