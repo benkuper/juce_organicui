@@ -13,7 +13,7 @@
 EnumParameter::EnumParameter(const String & niceName, const String &description, bool enabled) :
 	Parameter(Type::ENUM, niceName, description, "" ,var(),var(), enabled)
 {
-
+	scriptObject.setMethod("getData", EnumParameter::getValueDataFromScript);
 }
 
 EnumParameter * EnumParameter::addOption(String key, var data, bool selectIfFirstOption)
@@ -134,6 +134,14 @@ int EnumParameter::getKeyIndex(String key)
 bool EnumParameter::checkValueIsTheSame(var oldValue, var newValue)
 {
 	return oldValue.toString() == newValue.toString();
+}
+
+var EnumParameter::getValueDataFromScript(const juce::var::NativeFunctionArgs & a)
+{
+	WeakReference<Parameter> c = getObjectFromJS<Parameter>(a);
+	if (c == nullptr || c.wasObjectDeleted()) return var();
+	EnumParameter * ep = dynamic_cast<EnumParameter *>(c.get());
+	return ep->getValueData();
 }
 
 EnumParameterUI * EnumParameter::createUI(EnumParameter * target)

@@ -159,7 +159,6 @@ public:
 	 
 
 
-private:
 	bool checkVarIsConsistentWithType();
 	WeakReference<Parameter>::Master masterReference;
 	friend class WeakReference<Parameter>;
