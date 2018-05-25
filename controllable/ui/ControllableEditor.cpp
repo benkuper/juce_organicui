@@ -17,10 +17,7 @@ ControllableEditor::ControllableEditor(Controllable * _controllable, bool isRoot
     subContentHeight(0),
     showLabel(true)
 {
-	ui = controllable->createDefaultUI();
-	ui->showLabel = false;
-	ui->setOpaqueBackground(true);
-	addAndMakeVisible(ui);
+	buildControllableUI();
 
 	addAndMakeVisible(&label);
 	label.setJustificationType(Justification::left);
@@ -36,12 +33,14 @@ ControllableEditor::ControllableEditor(Controllable * _controllable, bool isRoot
 		addAndMakeVisible(removeBT);
 	}
 
+	/*
 	if (controllable->isCustomizableByUser)
 	{
 		editBT = AssetManager::getInstance()->getConfigBT();
 		editBT->addListener(this);
 		addAndMakeVisible(editBT);
 	}
+	*/
 
 	baseHeight = initHeight;
 	setSize(100, baseHeight);
@@ -69,6 +68,17 @@ void ControllableEditor::setShowLabel(bool value)
 
 }
 
+void ControllableEditor::buildControllableUI(bool resizeAfter)
+{
+	if (ui != nullptr) removeChildComponent(ui);
+	ui = controllable->createDefaultUI();
+	ui->showLabel = false;
+	ui->setOpaqueBackground(true);
+	addAndMakeVisible(ui);
+
+	if (resizeAfter) resized();
+}
+
 void ControllableEditor::resized()
 {
  juce::Rectangle<int> r = getLocalBounds();
@@ -83,12 +93,13 @@ void ControllableEditor::resized()
 		r.removeFromRight(2);
 	}
 
+	/*
 	if (controllable->isCustomizableByUser && editBT != nullptr)
 	{
 		editBT->setBounds(r.removeFromRight(r.getHeight()));
 		r.removeFromRight(2);
 	}
-
+	*/
 
 	ui->setBounds(r.removeFromRight(controlSpace));
 	

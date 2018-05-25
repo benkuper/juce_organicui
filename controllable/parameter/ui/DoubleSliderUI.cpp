@@ -15,6 +15,10 @@ DoubleSliderUI::DoubleSliderUI(Point2DParameter * parameter) :
 	xParam("X","xParam",parameter->x, parameter->minimumValue[0],parameter->maximumValue[0]),
 	yParam("Y", "yParam", parameter->y, parameter->minimumValue[1],parameter->maximumValue[1])
 {
+	xParam.canHaveRange = parameter->canHaveRange;
+	yParam.canHaveRange = parameter->canHaveRange;
+	xParam.isCustomizableByUser = parameter->isCustomizableByUser;
+	yParam.isCustomizableByUser = parameter->isCustomizableByUser;
 	xParam.defaultValue = 0;
 	yParam.defaultValue = 0;
 	xParam.defaultUI = parameter->defaultUI;
@@ -62,17 +66,36 @@ void DoubleSliderUI::resized()
 void DoubleSliderUI::showEditWindow()
 {
 	AlertWindow nameWindow("Change point 2D params", "Set new values and bounds for this parameter", AlertWindow::AlertIconType::NoIcon, this);
-	
-	const String coordNames[3]{ "X","Y","Z" };
-	for(int i=0;i<2;i++) nameWindow.addTextEditor("val"+String(i), p2d->value[i].toString(), "Value "+ coordNames[i]);
 
-	if (parameter->isCustomizableByUser)
+	const String coordNames[2]{ "X","Y" };
+
+	for (int i = 0; i<2; i++) nameWindow.addTextEditor("val" + String(i), p2d->value[i].toString(), "Value " + coordNames[i]);
+
+	nameWindow.addButton("OK", 1, KeyPress(KeyPress::returnKey));
+	nameWindow.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
+
+	int result = nameWindow.runModalLoop();
+
+	if (result)
 	{
-		for (int i = 0; i < 2; i++)
-		{
-			nameWindow.addTextEditor("minVal" + String(i), p2d->minimumValue[i].toString(), "Minimum " + coordNames[i]);
-			nameWindow.addTextEditor("maxVal" + String(i), p2d->maximumValue[i].toString(), "Maximum " + coordNames[i]);
-		}
+		float newVals[2];
+		for (int i = 0; i<2; i++) newVals[i] = nameWindow.getTextEditorContents("val" + String(i)).getFloatValue();
+		p2d->setPoint(newVals[0], newVals[1]);
+	}
+}
+
+void DoubleSliderUI::showEditRangeWindow()
+{
+	if (!parameter->isCustomizableByUser) return;
+
+	AlertWindow nameWindow("Change point 2D params", "Set new values and bounds for this parameter", AlertWindow::AlertIconType::NoIcon, this);
+
+	const String coordNames[2]{ "X","Y" };
+
+	for (int i = 0; i < 2; i++)
+	{
+		nameWindow.addTextEditor("minVal" + String(i), p2d->minimumValue[i].toString(), "Minimum " + coordNames[i]);
+		nameWindow.addTextEditor("maxVal" + String(i), p2d->maximumValue[i].toString(), "Maximum " + coordNames[i]);
 	}
 
 	nameWindow.addButton("OK", 1, KeyPress(KeyPress::returnKey));
@@ -82,24 +105,17 @@ void DoubleSliderUI::showEditWindow()
 
 	if (result)
 	{
-		if (parameter->isCustomizableByUser)
+		float newMins[2];
+		float newMaxs[2];
+		for (int i = 0; i < 2; i++)
 		{
-			float newMins[2];
-			float newMaxs[2];
-			for (int i = 0; i < 2; i++)
-			{
-				newMins[i] = nameWindow.getTextEditorContents("minVal"+String(i)).getFloatValue();
-				newMaxs[i] = nameWindow.getTextEditorContents("maxVal"+String(i)).getFloatValue();
-			}
-			p2d->setBounds(newMins[0], newMins[1], newMaxs[0], newMaxs[1]);
-
+			newMins[i] = nameWindow.getTextEditorContents("minVal" + String(i)).getFloatValue();
+			newMaxs[i] = nameWindow.getTextEditorContents("maxVal" + String(i)).getFloatValue();
 		}
-
-		float newVals[2];
-		for(int i=0;i<2;i++) newVals[i] = nameWindow.getTextEditorContents("val"+String(i)).getFloatValue();
-		p2d->setPoint(newVals[0],newVals[1]);
+		p2d->setBounds(newMins[0], newMins[1], jmax(newMins[0], newMaxs[0]), jmax(newMins[1], newMaxs[1]));
 	}
 }
+
 
 void DoubleSliderUI::rangeChanged(Parameter * p)
 {

@@ -88,12 +88,13 @@ using namespace juce;
 
 #include "controllable/Controllable.h"
 
+#include "controllable/parameter/Parameter.h"
+
 #include "controllable/ui/ControllableUI.h"
 #include "controllable/ui/ControllableEditor.h"
-
 #include "controllable/parameter/ui/ParameterUI.h"
 #include "controllable/parameter/ui/ParameterEditor.h"
-#include "controllable/parameter/Parameter.h"
+
 
 #include "script/ScriptExpression.h"
 

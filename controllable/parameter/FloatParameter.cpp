@@ -73,7 +73,7 @@ TimeLabel * FloatParameter::createTimeLabelParameter(FloatParameter * target)
 ControllableUI * FloatParameter::createDefaultUI(Controllable * targetControllable) {
 	UIType t = customUI != NONE ? customUI : defaultUI;
 
-	if (t == NONE) t = (float)minimumValue == INT32_MIN && (float)maximumValue == INT32_MAX?LABEL:SLIDER;
+	if (t == NONE) t = hasRange()?SLIDER:LABEL;
 
 	switch (t)
 	{
@@ -101,9 +101,10 @@ bool FloatParameter::checkValueIsTheSame(var oldValue, var newValue)
 	return jlimit<float>(minimumValue, maximumValue, newValue) == (float)oldValue;
 }
 
-void FloatParameter::setRange(var minVal, var maxVal, bool setDefaultRange)
+
+bool FloatParameter::hasRange()
 {
-	Parameter::setRange(minVal, maxVal, setDefaultRange);
+	return (float)minimumValue != INT32_MIN || (float)maximumValue != INT32_MAX;
 }
 
 var FloatParameter::getJSONDataInternal()

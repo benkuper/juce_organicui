@@ -80,10 +80,8 @@ void ControllableUI::showContextMenu()
 	if (p->getNumItems() == 0) return;
 
 	int result = p->show();
-	if (result > 0)
-	{
-		handleMenuSelectedID(result);
-	} else if (result < 0)
+
+	if (result != 0)
 	{
 		switch (result)
 		{
@@ -98,7 +96,7 @@ void ControllableUI::showContextMenu()
 			showEditWindow();
 			break;
 		default:
-			DBG("Not handled : " << result);
+			handleMenuSelectedID(result);
 		}
 	}
 }

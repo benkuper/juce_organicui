@@ -14,6 +14,8 @@ Point2DParameter::Point2DParameter(const String & niceName, const String & descr
 	x(0), y(0),
 	defaultUI(FloatParameter::NONE)
 {
+	canHaveRange = true;
+
 	value = var();
 	value.append(0);
 	value.append(0);
@@ -102,6 +104,11 @@ void Point2DParameter::setBounds(float _minX, float _minY, float _maxX, float _m
 	maxRange.append(_maxX);
 	maxRange.append(_maxY);
 	setRange(minRange, maxRange, true);
+}
+
+void Point2DParameter::clearRange()
+{
+	setBounds(INT32_MIN, INT32_MIN, INT32_MAX, INT32_MAX);
 }
 
 Point<float> Point2DParameter::getPoint() {

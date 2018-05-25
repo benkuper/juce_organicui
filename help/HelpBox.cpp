@@ -13,11 +13,11 @@ HelpBox::~HelpBox()
 	waitForThreadToExit(1000);
 }
 
-void HelpBox::loadHelp(URL _helpURL)
+void HelpBox::loadHelp()
 {
 	//load from internet if possible
-	helpURL = _helpURL;
-	startThread();
+	if (!helpURL.isEmpty() && GlobalSettings::getInstance()->updateHelpOnStartup->boolValue()) startThread();
+	else loadLocalHelp();
 }
 
 void HelpBox::loadLocalHelp()

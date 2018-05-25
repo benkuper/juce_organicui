@@ -75,6 +75,8 @@ public:
 	virtual StringArray getValuesNames();
 
 	virtual void setRange(var,var, bool setDefaultRange = true);
+	virtual void clearRange();
+	virtual bool hasRange();
 
 	bool isPresettable;
     bool isOverriden;

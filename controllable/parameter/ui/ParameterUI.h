@@ -8,10 +8,7 @@
   ==============================================================================
 */
 
-#ifndef PARAMETERUI_H_INCLUDED
-#define PARAMETERUI_H_INCLUDED
-
-#include "../Parameter.h"
+#pragma once
 
 class ParameterUI :
 	public ControllableUI,
@@ -28,7 +25,8 @@ public:
 	bool showEditWindowOnRightClick;
 
 	bool showValue;
-	void showEditWindow() override;
+	virtual void showEditWindow() override;
+	virtual void showEditRangeWindow();
 
 	void paintOverChildren(Graphics &g) override;
 
@@ -53,9 +51,5 @@ protected:
 protected:
     // see Parameter::AsyncListener
 	virtual void newMessage(const Parameter::ParameterEvent &e) override;;
-
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ParameterUI)
 };
 
-
-#endif  // PARAMETERUI_H_INCLUDED

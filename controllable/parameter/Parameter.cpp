@@ -1,3 +1,4 @@
+#include "Parameter.h"
 /*
   ==============================================================================
 
@@ -178,7 +179,16 @@ void Parameter::setRange(var min, var max, bool setDefaultRange) {
 	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::BOUNDS_CHANGED, this, arr));
 
 	setValue(value); //if value is outside range, this will change the value
+}
 
+void Parameter::clearRange()
+{
+	setRange(INT32_MIN, INT32_MAX);
+}
+
+bool Parameter::hasRange()
+{
+	return canHaveRange;
 }
 
 void Parameter::setValueInternal(var & _value) //to override by child classes

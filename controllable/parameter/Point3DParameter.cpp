@@ -14,6 +14,7 @@ Point3DParameter::Point3DParameter(const String & niceName, const String & descr
 	x(0), y(0), z(0),
 	defaultUI(FloatParameter::NONE)
 {
+	canHaveRange = true;
 
 	value = var();
 	value.append(0);
@@ -115,6 +116,11 @@ void Point3DParameter::setBounds(float _minX, float _minY, float _minZ, float _m
 	maxRange.append(_maxY);
 	maxRange.append(_maxZ);
 	setRange(minRange, maxRange, true);
+}
+
+void Point3DParameter::clearRange()
+{
+	setBounds(INT32_MIN, INT32_MIN, INT32_MIN, INT32_MAX, INT32_MAX, INT32_MAX);
 }
 
 Vector3D<float> Point3DParameter::getVector() {

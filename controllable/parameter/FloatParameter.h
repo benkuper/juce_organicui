@@ -40,7 +40,7 @@ public:
 
 	bool checkValueIsTheSame(var oldValue, var newValue) override;
 
-	virtual void setRange(var minVal, var maxVal, bool setDefaultRange = true) override;
+	virtual bool hasRange() override;
 
 	var getJSONDataInternal() override;
 	void loadJSONDataInternal(var data) override;

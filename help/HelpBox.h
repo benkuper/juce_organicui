@@ -17,7 +17,7 @@ public:
 
 	URL helpURL;
 
-	void loadHelp(URL helpURL);
+	void loadHelp();
 	void loadLocalHelp();
 
 	void setOverData(String dataID);

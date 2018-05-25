@@ -19,6 +19,8 @@ public:
 	FloatParameterLabelUI(Parameter * p);
 	virtual ~FloatParameterLabelUI() {};
 
+
+	
 	Label nameLabel;
 	Label valueLabel;
 
@@ -26,6 +28,9 @@ public:
 	String suffix;
 
 	float maxFontHeight;
+
+	const float pixelsPerUnit = 10; //1 = 10pixel
+	float valueAtMouseDown;
 
 	bool autoSize;
 	void setAutoSize(bool value);
@@ -38,11 +43,13 @@ public:
 
 	virtual void setForceFeedbackOnlyInternal() override;
 
+
 	//void paint(Graphics &g) override;
 	void resized() override;
 
 	void mouseDown(const MouseEvent &e) override;
-
+	void mouseDrag(const MouseEvent &e) override;
+	void mouseUp(const MouseEvent &e) override;
 
 protected:
 	void valueChanged(const var & v) override;

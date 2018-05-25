@@ -8,9 +8,7 @@
   ==============================================================================
 */
 
-#ifndef CONTROLLABLEUI_H_INCLUDED
-#define CONTROLLABLEUI_H_INCLUDED
-
+#pragma once
 
 class ControllableUI :
 	public Component, 
@@ -65,5 +63,3 @@ protected :
     void updateTooltip();
 };
 
-
-#endif  // CONTROLLABLEUI_H_INCLUDED

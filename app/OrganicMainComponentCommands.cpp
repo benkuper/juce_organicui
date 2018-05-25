@@ -130,7 +130,7 @@ void OrganicMainContentComponent::getCommandInfo(CommandID commandID, Applicatio
 	case StandardApplicationCommandIDs::paste:
 	{
 		bool canPaste = SystemClipboard::getTextFromClipboard().isNotEmpty();
-		result.setInfo(canPaste? "Paste":"Nothing to paste","Paste whatever is in the clipboard", category, 0);
+		result.setInfo(canPaste ? "Paste" : "Nothing to paste", "Paste whatever is in the clipboard", category, 0);
 		result.defaultKeypresses.add(KeyPress('v', ModifierKeys::commandModifier, 0));
 		result.setActive(canPaste);
 	}
@@ -169,9 +169,6 @@ void OrganicMainContentComponent::getAllCommands(Array<CommandID>& commands) {
 	  CommandIDs::duplicate,
 	  CommandIDs::editGlobalSettings,
 	  CommandIDs::editProjectSettings,
-	  CommandIDs::showAbout,
-	  CommandIDs::gotoWebsite,
-	  CommandIDs::gotoForum,
 	  CommandIDs::undo,
 	  CommandIDs::redo
 	};
@@ -223,14 +220,7 @@ PopupMenu OrganicMainContentComponent::getMenuForIndex(int /*topLevelMenuIndex*/
 	{
 		return ShapeShifterManager::getInstance()->getPanelsMenu();
 
-	} else if (menuName == "Help")
-	{
-		menu.addCommandItem(&getCommandManager(), CommandIDs::showAbout);
-		menu.addSeparator();
-		menu.addCommandItem(&getCommandManager(), CommandIDs::gotoWebsite);
-		menu.addCommandItem(&getCommandManager(), CommandIDs::gotoForum);
-
-	}
+	} 
 
 	return menu;
 }
@@ -289,18 +279,22 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 	break;
 
 	case CommandIDs::save:
-	{
-		FileBasedDocument::SaveResult result = Engine::mainEngine->save(true, true);
-		if (result == FileBasedDocument::savedOk) LOG("File saved !");
-		else LOGERROR("Error saving file");
-	}
-	break;
-
 	case CommandIDs::saveAs:
 	{
-		FileBasedDocument::SaveResult result = Engine::mainEngine->saveAs(File(), true, true, true);
-		if (result == FileBasedDocument::savedOk) LOG("File saved !");
-		else LOGERROR("Error saving file");
+		FileBasedDocument::SaveResult result = FileBasedDocument::SaveResult::savedOk;
+		if (info.commandID == CommandIDs::save) result = Engine::mainEngine->save(true, true);
+		else result = Engine::mainEngine->saveAs(File(), true, true, true);
+
+		if (result == FileBasedDocument::SaveResult::userCancelledSave)
+		{
+
+		} else if (result == FileBasedDocument::SaveResult::failedToWriteToFile)
+		{
+			LOGERROR("Could not save the document (Failed to write to file)\nCancelled loading of the new document");
+		} else if (result == FileBasedDocument::SaveResult::savedOk)
+		{
+			LOG("File saved.");
+		}
 	}
 	break;
 
@@ -357,37 +351,16 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 		GlobalSettings::getInstance()->selectThis();
 		break;
 
-		/*
-	case CommandIDs::showAbout:
-	{
-		AboutWindow w;
-		DialogWindow::showModalDialog("About", &w, getTopLevelComponent(), Colours::transparentBlack, true);
-	}
-	break;
-	
-
-	case CommandIDs::gotoWebsite:
-		URL("http://benjamin.kuperberg.fr/chataigne").launchInDefaultBrowser();
-		break;
-
-	case CommandIDs::gotoForum:
-		URL("http://benjamin.kuperberg.fr/chataigne/forum").launchInDefaultBrowser();
-		break;
-
-		*/
-
 	default:
 		DBG("no command found");
 		return JUCEApplication::getInstance()->perform(info);
-	}
+}
 
-	return true;
+return true;
 }
 
 void OrganicMainContentComponent::menuItemSelected(int menuItemID, int topLevelMenuIndex)
 {
-	DBG("Menu item selected " << menuItemID << ", " << topLevelMenuIndex);
-
 	String menuName = getMenuBarNames()[topLevelMenuIndex];
 
 	if (menuName == "Panels")
@@ -404,6 +377,6 @@ void OrganicMainContentComponent::menuItemSelected(int menuItemID, int topLevelM
 
 
 StringArray OrganicMainContentComponent::getMenuBarNames() {
-	const char* const names[] = { "File","Edit","Panels", "Help",nullptr };
-	return StringArray(names);
+	String names[3]{ "File", "Edit", "Panels" };
+	return StringArray(names,numElementsInArray(names));
 }

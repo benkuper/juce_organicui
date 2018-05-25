@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef CONTROLLABLEEDITOR_H_INCLUDED
-#define CONTROLLABLEEDITOR_H_INCLUDED
+#pragma once
 
 class ControllableEditor : 
 	public InspectableEditor,
@@ -33,16 +32,15 @@ public:
 	bool showLabel;
 	void setShowLabel(bool value);
 
+	void buildControllableUI(bool resizeAfter = false);
+
 	void resized() override;
 
 	void mouseDown(const MouseEvent &e) override;
 
 	void newMessage(const Controllable::ControllableEvent &e) override;
-	//void newMessage(const Parameter::ParameterEvent &e) override; 
 
     void buttonClicked(Button * b) override;
 };
 
 
-
-#endif  // CONTROLLABLEEDITOR_H_INCLUDED

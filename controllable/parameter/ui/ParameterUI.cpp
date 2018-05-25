@@ -13,8 +13,8 @@
 ParameterUI::ParameterUI(Parameter * parameter) :
 	ControllableUI(parameter),
 	parameter(parameter),
-    showEditWindowOnDoubleClick(true),
-    showValue(true)
+	showEditWindowOnDoubleClick(true),
+	showValue(true)
 {
 	parameter->addAsyncCoalescedParameterListener(this);
 }
@@ -28,18 +28,11 @@ ParameterUI::~ParameterUI()
 
 void ParameterUI::showEditWindow()
 {
-	AlertWindow nameWindow("Set a value", "Set a new value for this parameter", AlertWindow::AlertIconType::NoIcon, this);
-	
-	if(!parameter->isControllableFeedbackOnly) nameWindow.addTextEditor("val", parameter->stringValue(), "Value");
+	if (parameter->isControllableFeedbackOnly) return;
 
-	if (parameter->isCustomizableByUser)
-	{
-		if (parameter->type == Parameter::FLOAT || parameter->type == Parameter::INT)
-		{
-			nameWindow.addTextEditor("minVal", parameter->minimumValue.toString(), "Minimum");
-			nameWindow.addTextEditor("maxVal", parameter->maximumValue.toString(), "Maximum");
-		}
-	}
+	AlertWindow nameWindow("Set a value", "Set a new value for this parameter", AlertWindow::AlertIconType::NoIcon, this);
+
+	nameWindow.addTextEditor("val", parameter->stringValue(), "Value");
 
 	nameWindow.addButton("OK", 1, KeyPress(KeyPress::returnKey));
 	nameWindow.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
@@ -48,21 +41,36 @@ void ParameterUI::showEditWindow()
 
 	if (result)
 	{
-		if (parameter->isCustomizableByUser)
-		{
-			if (parameter->type == Parameter::FLOAT || parameter->type == Parameter::INT)
-			{
-				float newMin = nameWindow.getTextEditorContents("minVal").getFloatValue();
-				float newMax = nameWindow.getTextEditorContents("maxVal").getFloatValue();
-				if(newMin < newMax) parameter->setRange(newMin, newMax);
-			}
-		}
+		String valString = nameWindow.getTextEditorContents("val");
+		if (parameter->type == Parameter::STRING) parameter->setUndoableValue(parameter->value, valString);
+		else parameter->setUndoableValue(parameter->value, valString.getFloatValue());
+	}
+}
 
-		if (!parameter->isControllableFeedbackOnly)
+void ParameterUI::showEditRangeWindow()
+{
+	if (!parameter->canHaveRange || !parameter->isCustomizableByUser) return;
+
+	AlertWindow nameWindow("Set the range", "Set a new range for this parameter", AlertWindow::AlertIconType::NoIcon, this);
+
+	nameWindow.addTextEditor("minVal", parameter->hasRange()?parameter->minimumValue.toString():"", "Minimum");
+	nameWindow.addTextEditor("maxVal", parameter->hasRange()?parameter->maximumValue.toString():"", "Maximum");
+
+	nameWindow.addButton("OK", 1, KeyPress(KeyPress::returnKey));
+	nameWindow.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
+
+	int result = nameWindow.runModalLoop();
+
+	if (result)
+	{
+		if (parameter->type == Parameter::FLOAT || parameter->type == Parameter::INT)
 		{
-			float newValue = nameWindow.getTextEditorContents("val").getFloatValue();
-			parameter->setUndoableValue(parameter->value, newValue);
-		}
+			String minRangeString = nameWindow.getTextEditorContents("minVal");
+			String maxRangeString = nameWindow.getTextEditorContents("maxVal");
+			float newMin = minRangeString.isNotEmpty() ? minRangeString.getFloatValue() : INT32_MIN;
+			float newMax = maxRangeString.isNotEmpty() ? maxRangeString.getFloatValue() : INT32_MAX;
+			parameter->setRange(newMin, jmax(newMin,newMax));
+		}	
 	}
 }
 
@@ -92,7 +100,7 @@ void ParameterUI::paintOverChildren(Graphics & g)
 		g.setColour(c.withAlpha(.2f));
 		g.fillRoundedRectangle(getLocalBounds().toFloat(), 1);
 	}
-		break;
+	break;
 
 	case Parameter::AUTOMATION:
 	{
@@ -100,7 +108,7 @@ void ParameterUI::paintOverChildren(Graphics & g)
 		g.setColour(c.withAlpha(.2f));
 		g.fillRoundedRectangle(getLocalBounds().toFloat(), 1);
 	}
-		break;
+	break;
 	}
 }
 
@@ -114,19 +122,19 @@ void ParameterUI::addPopupMenuItems(PopupMenu * p)
 		{
 			p->addSeparator();
 			p->addItem(-3, "Show Edit Window");
-			/*
-			if (parameter->canHaveRange)
+
+			if (parameter->canHaveRange && parameter->isCustomizableByUser)
 			{
 				p->addItem(-4, "Set Range...");
-				if((int)parameter->minimumValue > INT32_MIN || (int)parameter->maximumValue < INT32_MAX) p->addItem(-5, "Clear Range");
+				if (parameter->hasRange()) p->addItem(-5, "Clear Range");
 			}
-			*/
+
 			addPopupMenuItemsInternal(p);
 		}
 
 		p->addSeparator();
 		if (!parameter->lockManualControlMode)
-		{ 
+		{
 			PopupMenu controlModeMenu;
 			controlModeMenu.addItem(10, "Manual");
 			controlModeMenu.addItem(11, "Expression");
@@ -146,6 +154,8 @@ void ParameterUI::handleMenuSelectedID(int id)
 	case 11: parameter->setControlMode(Parameter::EXPRESSION); break;
 	case 12: parameter->setControlMode(Parameter::REFERENCE); break;
 	case 13: parameter->setControlMode(Parameter::AUTOMATION); break;
+	case -4: showEditRangeWindow(); break;
+	case -5: parameter->clearRange(); break;
 	}
 }
 
@@ -167,7 +177,7 @@ bool ParameterUI::shouldBailOut() {
 // see Parameter::AsyncListener
 
 void ParameterUI::newMessage(const Parameter::ParameterEvent &e) {
-	switch(e.type)
+	switch (e.type)
 	{
 	case Parameter::ParameterEvent::BOUNDS_CHANGED:
 		rangeChanged(e.parameter);

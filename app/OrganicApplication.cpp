@@ -5,18 +5,13 @@
 #endif
 
 
-#if defined DECLARE_MAIN_FUNCTIONS
-
 static OrganicApplication& getApp() { return *dynamic_cast<OrganicApplication*>(JUCEApplication::getInstance()); }
 String getAppVersion() { return getApp().getApplicationVersion(); }
 ApplicationProperties& getAppProperties() { return *getApp().appProperties; }
-
 OpenGLContext * getOpenGLContext() { return &getApp().mainComponent->openGLContext; }
-
 ApplicationCommandManager& getCommandManager() { return getApp().commandManager; }
 OrganicApplication::MainWindow * getMainWindow() { return getApp().mainWindow; }
 
-#endif
 
 OrganicApplication::OrganicApplication(const String &appName) :
 	appSettings("Other Settings"),
@@ -58,9 +53,7 @@ void OrganicApplication::initialise(const String & commandLine)
 	AppUpdater::getInstance()->addAsyncUpdateListener(this);
 
 	if (GlobalSettings::getInstance()->checkUpdatesOnStartup->boolValue()) AppUpdater::getInstance()->checkForUpdates();
-	if (GlobalSettings::getInstance()->updateHelpOnStartup->boolValue()) HelpBox::getInstance()->loadHelp(URL("http://benjamin.kuperberg.fr/chataigne/docs/help.json"));
-	else HelpBox::getInstance()->loadLocalHelp();
-
+	HelpBox::getInstance()->loadHelp();
 	
 	//Crash handler
 #if JUCE_WINDOWS_

@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef PARAMETEREDITOR_H_INCLUDED
-#define PARAMETEREDITOR_H_INCLUDED
+#pragma once
 
 class PlayableParameterAutomationEditor;
 
@@ -18,8 +17,8 @@ class TargetParameterUI;
 class ParameterEditor : 
 	public ControllableEditor,
 	public ParameterListener,
-	public Parameter::AsyncListener,
-	public Label::Listener
+	public Label::Listener,
+	public Parameter::AsyncListener
 {
 public:
 	ParameterEditor(Parameter * p, bool isRoot, int initHeight = 16);  //Todo : handle full feedback if is root
@@ -38,7 +37,6 @@ public:
 	//Automation
 	ScopedPointer<PlayableParameterAutomationEditor> automationUI;
 
-
 	virtual void resized() override;
 	virtual void updateUI();
 
@@ -50,7 +48,3 @@ public:
 	// Inherited via Listener
 	virtual void labelTextChanged(Label * labelThatHasChanged) override;
 };
-
-
-
-#endif  // PARAMETEREDITOR_H_INCLUDED

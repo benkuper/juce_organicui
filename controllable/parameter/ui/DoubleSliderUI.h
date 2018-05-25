@@ -35,6 +35,7 @@ public:
 
     void resized() override;
 	void showEditWindow() override;
+	void showEditRangeWindow() override;
 
 	virtual void rangeChanged(Parameter * p) override;
 

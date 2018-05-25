@@ -35,7 +35,8 @@ maxFontHeight(12),
 	valueLabel.setColour(valueLabel.textWhenEditingColourId, Colours::orange);
 	nameLabel.setTooltip(p->description);
 
-	
+	showEditWindowOnDoubleClick = false;
+
 	setSize(200, 20);//default size
 	valueChanged(parameter->getValue());
 	
@@ -100,8 +101,31 @@ void FloatParameterLabelUI::resized()
 
 void FloatParameterLabelUI::mouseDown(const MouseEvent & e)
 {
-	if (e.eventComponent == &valueLabel) ParameterUI::mouseDown(e.getEventRelativeTo(this));
-	else ParameterUI::mouseDown(e);
+	if (e.eventComponent == &valueLabel)
+	{
+		if (e.mods.isLeftButtonDown()) valueAtMouseDown = parameter->floatValue();
+		ParameterUI::mouseDown(e.getEventRelativeTo(this));
+	} else
+	{
+		ParameterUI::mouseDown(e);
+	}
+}
+
+void FloatParameterLabelUI::mouseDrag(const MouseEvent & e)
+{
+	if (valueLabel.getMouseCursor() != MouseCursor::LeftRightResizeCursor)
+	{
+		valueLabel.setMouseCursor(MouseCursor::LeftRightResizeCursor);
+		valueLabel.updateMouseCursor();
+	}
+
+	parameter->setValue(valueAtMouseDown + e.getOffsetFromDragStart().x *1.0f / pixelsPerUnit);
+}
+
+void FloatParameterLabelUI::mouseUp(const MouseEvent & e)
+{
+	valueLabel.setMouseCursor(MouseCursor::NormalCursor);
+	valueLabel.updateMouseCursor();
 }
 
 void FloatParameterLabelUI::valueChanged(const var & v)
