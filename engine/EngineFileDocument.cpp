@@ -168,7 +168,7 @@ Result Engine::saveBackupDocument(int index)
 
 	String curFileName = getFile().getFileNameWithoutExtension();
 	File autoSaveDir = getFile().getParentDirectory().getChildFile(curFileName + "_autosave");
-	autoSaveDir.createDirectory(); 
+	autoSaveDir.createDirectory();
 	File backupFile = autoSaveDir.getChildFile(curFileName + "_autosave_" + String(index) + fileExtension);
 	DBG(backupFile.getFullPathName() << " : " << (int)backupFile.exists());
 	var data = getJSONData();
@@ -247,9 +247,9 @@ void Engine::loadJSONData(var data, ProgressTask * loadingTask)
 	DynamicObject * md = data.getDynamicObject()->getProperty("metaData").getDynamicObject();
 	bool versionChecked = checkFileVersion(md);
 
+	String versionString = md->hasProperty("version") ? md->getProperty("version").toString() : "?";
 	if (!versionChecked)
 	{
-		String versionString = md->hasProperty("version") ? md->getProperty("version").toString() : "?";
 		AlertWindow::showMessageBox(AlertWindow::AlertIconType::WarningIcon, "You're old, dude !", "File version (" + versionString + ") is not supported anymore.\n(Minimum supported version : " + getMinimumRequiredFileVersion() + ")");
 		setFile(File());
 		return;
@@ -258,10 +258,10 @@ void Engine::loadJSONData(var data, ProgressTask * loadingTask)
 
 	if (convertURL.isNotEmpty())
 	{
-		bool appVersionIsNewerThanFileVersion = versionIsNewerThan(appVersion, md->getProperty("version"));
+		bool appVersionIsNewerThanFileVersion = versionIsNewerThan(appVersion, versionString);
 		if (appVersionIsNewerThanFileVersion)
 		{
-			int result = AlertWindow::showYesNoCancelBox(AlertWindow::QuestionIcon, "File compatibility check", "Your file has been save with an older version of Chataigne, some data may be lost if you load it directly. You can choose to update the file online, load it directly or cancel the operation", "Update", "Load directly", "Cancel");
+			int result = AlertWindow::showYesNoCancelBox(AlertWindow::QuestionIcon, "File compatibility check", "Your file has been save with an older version of Chataigne (" + versionString + "), some data may be lost if you load it directly. You can choose to update the file online, load it directly or cancel the operation", "Update", "Load directly", "Cancel");
 			if (result == 0)
 			{
 				setFile(File());
@@ -274,7 +274,7 @@ void Engine::loadJSONData(var data, ProgressTask * loadingTask)
 			{
 				//var postData = new DynamicObject();
 				//postData.getDynamicObject()->setProperty("file", );
-				URL url = URL(convertURL).withPOSTData(JSON::toString(data,true)); 
+				URL url = URL(convertURL).withPOSTData(JSON::toString(data, true));
 				WebInputStream stream(url, true);
 
 				String convertedData = stream.withExtraHeaders("Content-Type: Text/plain").readEntireStreamAsString();
@@ -306,7 +306,7 @@ void Engine::loadJSONData(var data, ProgressTask * loadingTask)
 			}
 		}
 	}
-	
+
 
 
 	//if (InspectableSelectionManager::mainSelectionManager != nullptr) InspectableSelectionManager::mainSelectionManager->setEnabled(false); //avoid creation of inspector editor while recreating all nodes, controllers, rules,etc. from file
@@ -380,7 +380,8 @@ bool Engine::versionIsNewerThan(String versionToCheck, String referenceVersion)
 	}
 
 	//if equals return false
-	return false;
+	if (versionToCheckIsBeta == referenceVersionIsBeta) return false;
+	return referenceVersionIsBeta;
 }
 
 String Engine::getMinimumRequiredFileVersion()
