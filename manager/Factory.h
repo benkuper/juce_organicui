@@ -55,6 +55,7 @@ public:
 
 	void buildPopupMenu()
 	{
+		menu.clear();
 		OwnedArray<PopupMenu> subMenus;
 		Array<String> subMenuNames;
 

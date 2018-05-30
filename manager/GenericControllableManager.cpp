@@ -28,6 +28,7 @@ GenericControllableManager::GenericControllableManager(const String & name, bool
 	factory.defs.add(Factory<GenericControllableItem>::Definition::createDef("", "Point2D Parameteer", &GenericControllableItem::create)->addParam("controllableType", Point2DParameter::getTypeStringStatic()));
 	factory.defs.add(Factory<GenericControllableItem>::Definition::createDef("", "Point3D Parameteer", &GenericControllableItem::create)->addParam("controllableType", Point3DParameter::getTypeStringStatic()));
 	if(canAddTargets) factory.defs.add(Factory<GenericControllableItem>::Definition::createDef("", "Target Parameteer", &GenericControllableItem::create)->addParam("controllableType", TargetParameter::getTypeStringStatic()));
+
 }
 
 GenericControllableManager::~GenericControllableManager()
