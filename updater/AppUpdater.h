@@ -47,8 +47,9 @@ public:
 	public:
 		enum Type { DOWNLOAD_STARTED, DOWNLOAD_PROGRESS, DOWNLOAD_ERROR, UPDATE_FINISHED };
 
-		UpdateEvent(Type t) : type(t) {}
+		UpdateEvent(Type t, File f = File()) : type(t), file(f) {}
 		Type type;
+		File file;
 	};
 
 	QueuedNotifier<UpdateEvent> queuedNotifier;

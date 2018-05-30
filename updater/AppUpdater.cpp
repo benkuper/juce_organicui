@@ -13,7 +13,8 @@
 juce_ImplementSingleton(AppUpdater)
 
 String getAppVersion();
-
+ 
+#define FORCE_UPDATE 0 //to test
 
 AppUpdater::AppUpdater() : 
 	Thread("appUpdater"), 
@@ -111,9 +112,10 @@ void AppUpdater::run()
 				dataIsBeta = false;
 				dataToCheck = stableData;
 			} 
-
+#if !FORCE_UPDATE
 			if (Engine::mainEngine->checkFileVersion(dataToCheck.getDynamicObject(), true))
 			{
+#endif
 				String version = dataToCheck.getProperty("version", "");
 				Array<var> * changelog = dataToCheck.getProperty("changelog", var()).getArray();
 				String msg = "A new " + String(dataIsBeta ? "BETA " : "") + "version of Chataigne is available : " + version + "\n\nChangelog :\n";
@@ -133,15 +135,20 @@ void AppUpdater::run()
 #elif JUCE_LINUX
 					extension = data.getProperty("linuxExtension","zip");
 #endif
+
 					downloadingFileName = getDownloadFileName(version, dataIsBeta,extension);
 					URL downloadURL = URL(downloadURLBase + downloadingFileName);
 
 					DBG("Download file name " << downloadingFileName);
 
 					targetDir.createDirectory();
-						
+
+#if JUCE_WINDOWS
+					File targetFile = File::getSpecialLocation(File::tempDirectory).getChildFile(downloadingFileName);
+#else	
 					File targetFile = targetDir.getChildFile(downloadingFileName);
 					if (targetFile.existsAsFile()) targetFile.deleteFile();
+#endif
 
 					downloadingFileName = targetFile.getFileName();
 
@@ -156,10 +163,12 @@ void AppUpdater::run()
 					}
 					queuedNotifier.addMessage(new UpdateEvent(UpdateEvent::DOWNLOAD_STARTED));
 				}
+#if !FORCE_UPDATE
 			} else
 			{
 				LOG("App is up to date :) (Latest version online : " << dataToCheck.getProperty("version", "").toString() << ")");
 			}
+#endif
 		} else
 		{
 			LOGERROR("Error while checking updates, update file is not valid");
@@ -179,10 +188,15 @@ void AppUpdater::finished(URL::DownloadTask * task, bool success)
 		queuedNotifier.addMessage(new UpdateEvent(UpdateEvent::DOWNLOAD_ERROR)); return;
 	}
 
+
+#if JUCE_WINDOWS
+	File f = File::getSpecialLocation(File::tempDirectory).getChildFile(downloadingFileName);
+#else
     File appFile = File::getSpecialLocation(File::currentApplicationFile);
     File appDir = appFile.getParentDirectory();
     
 	File f = appDir.getChildFile("update_temp/" + downloadingFileName);
+#endif
 	if (!f.exists())
 	{
 		DBG("File doesn't exist");
@@ -195,32 +209,31 @@ void AppUpdater::finished(URL::DownloadTask * task, bool success)
 		return;
 	}
 
-	if (f.getFileExtension() == ".zip")
+#if JUCE_WINDOWS
+
+
+#else
+	File td = f.getParentDirectory();
 	{
-		File td = f.getParentDirectory();
+		ZipFile zip(f);
+		zip.uncompressTo(td);
+		Array<File> filesToCopy;
+
+		appFile.moveFileTo(td.getNonexistentChildFile("oldApp", appFile.getFileExtension()));
+
+		DBG("Move to " << appDir.getFullPathName());
+		for (int i = 0; i < zip.getNumEntries(); i++)
 		{
-			ZipFile zip(f);
-			zip.uncompressTo(td);
-			Array<File> filesToCopy;
-
-			appFile.moveFileTo(td.getNonexistentChildFile("oldApp", appFile.getFileExtension()));
-
-			DBG("Move to " << appDir.getFullPathName());
-			for (int i = 0; i < zip.getNumEntries(); i++)
-			{
-				File zf = td.getChildFile(zip.getEntry(i)->filename);
-				DBG("File exists : " << (int)f.exists());
-				zf.copyFileTo(appDir.getChildFile(zip.getEntry(i)->filename));
-				//DBG("Move result for " << zf.getFileName() << " = " << (int)result);
-			}
+			File zf = td.getChildFile(zip.getEntry(i)->filename);
+			DBG("File exists : " << (int)f.exists());
+			zf.copyFileTo(appDir.getChildFile(zip.getEntry(i)->filename));
+			//DBG("Move result for " << zf.getFileName() << " = " << (int)result);
 		}
-	} else
-	{
-		f.startAsProcess();
 	}
+#endif
     
 
-	queuedNotifier.addMessage(new UpdateEvent(UpdateEvent::UPDATE_FINISHED));
+	queuedNotifier.addMessage(new UpdateEvent(UpdateEvent::UPDATE_FINISHED, f));
 }
 
 void AppUpdater::progress(URL::DownloadTask * task, int64 bytesDownloaded, int64 totalLength)

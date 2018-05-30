@@ -130,7 +130,7 @@ void FloatParameterLabelUI::mouseUp(const MouseEvent & e)
 
 void FloatParameterLabelUI::valueChanged(const var & v)
 {
-	valueLabel.setText(prefix + parameter->stringValue() + suffix, NotificationType::dontSendNotification);
+	valueLabel.setText(prefix + (v.isString()?v.toString():parameter->stringValue()) + suffix, NotificationType::dontSendNotification);
 	
 	if (autoSize)
 	{

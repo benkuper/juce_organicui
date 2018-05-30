@@ -146,6 +146,12 @@ void OrganicApplication::newMessage(const AppUpdater::UpdateEvent & e)
             
 	case AppUpdater::UpdateEvent::UPDATE_FINISHED:
 	{
+
+#if JUCE_WINDOWS
+		File appFile = File::getSpecialLocation(File::tempDirectory).getChildFile(getApplicationName()+String("_install.exe"));
+		e.file.copyFileTo(appFile);
+		appFile.startAsProcess();
+#else
 		File appFile = File::getSpecialLocation(File::currentApplicationFile);
 		File appDir = appFile.getParentDirectory();
 		File tempDir = appDir.getChildFile("temp");
@@ -153,9 +159,12 @@ void OrganicApplication::newMessage(const AppUpdater::UpdateEvent & e)
 #if JUCE_MAC
         chmod (File::getSpecialLocation(File::currentExecutableFile).getFullPathName().toUTF8(), S_IRWXO | S_IRWXU | S_IRWXG);
 #endif
-		appFile.startAsProcess();
+		 
 		JUCEApplication::getInstance()->systemRequestedQuit();
+		appFile.startAsProcess();
+#endif
 	}
+#
 		break;
         default:
             break;
