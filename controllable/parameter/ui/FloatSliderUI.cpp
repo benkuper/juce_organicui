@@ -47,7 +47,7 @@ void FloatSliderUI::resetFrontColor()
 void FloatSliderUI::paint(Graphics & g)
 {
 
-	if (shouldBailOut())return;
+	if (shouldBailOut()) return;
 	
 	Colour baseColour = useCustomColor ? customColor : ((parameter->isEditable && !parameter->isControllableFeedbackOnly && !forceFeedbackOnly)? PARAMETER_FRONT_COLOR : FEEDBACK_COLOR);
     Colour c = (isMouseButtonDown() && changeParamOnMouseUpOnly) ? HIGHLIGHT_COLOR : baseColour;
