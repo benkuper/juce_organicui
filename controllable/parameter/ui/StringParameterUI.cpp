@@ -94,7 +94,7 @@ void StringParameterUI::resizedInternal(juce::Rectangle<int>& r)
 
 void StringParameterUI::valueChanged(const var & v)
 {
-    valueLabel.setText(prefix+v.toString()+suffix,NotificationType::dontSendNotification);
+    valueLabel.setText(prefix+parameter->stringValue()+suffix,NotificationType::dontSendNotification);
 
 	if (autoSize)
 	{

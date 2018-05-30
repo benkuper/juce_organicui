@@ -69,7 +69,7 @@ void DoubleSliderUI::showEditWindow()
 
 	const String coordNames[2]{ "X","Y" };
 
-	for (int i = 0; i<2; i++) nameWindow.addTextEditor("val" + String(i), p2d->value[i].toString(), "Value " + coordNames[i]);
+	for (int i = 0; i<2; i++) nameWindow.addTextEditor("val" + String(i), String((float)p2d->value[i]), "Value " + coordNames[i]);
 
 	nameWindow.addButton("OK", 1, KeyPress(KeyPress::returnKey));
 	nameWindow.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
@@ -94,8 +94,8 @@ void DoubleSliderUI::showEditRangeWindow()
 
 	for (int i = 0; i < 2; i++)
 	{
-		nameWindow.addTextEditor("minVal" + String(i), p2d->minimumValue[i].toString(), "Minimum " + coordNames[i]);
-		nameWindow.addTextEditor("maxVal" + String(i), p2d->maximumValue[i].toString(), "Maximum " + coordNames[i]);
+		nameWindow.addTextEditor("minVal" + String(i), String((float)p2d->minimumValue[i]), "Minimum " + coordNames[i]);
+		nameWindow.addTextEditor("maxVal" + String(i), String((float)p2d->maximumValue[i]), "Maximum " + coordNames[i]);
 	}
 
 	nameWindow.addButton("OK", 1, KeyPress(KeyPress::returnKey));

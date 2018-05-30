@@ -53,8 +53,8 @@ void ParameterUI::showEditRangeWindow()
 
 	AlertWindow nameWindow("Set the range", "Set a new range for this parameter", AlertWindow::AlertIconType::NoIcon, this);
 
-	nameWindow.addTextEditor("minVal", parameter->hasRange()?parameter->minimumValue.toString():"", "Minimum");
-	nameWindow.addTextEditor("maxVal", parameter->hasRange()?parameter->maximumValue.toString():"", "Maximum");
+	nameWindow.addTextEditor("minVal", parameter->hasRange()?String((float)parameter->minimumValue):"", "Minimum");
+	nameWindow.addTextEditor("maxVal", parameter->hasRange()?String((float)parameter->maximumValue):"", "Maximum");
 
 	nameWindow.addButton("OK", 1, KeyPress(KeyPress::returnKey));
 	nameWindow.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));

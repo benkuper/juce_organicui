@@ -89,7 +89,7 @@ void TripleSliderUI::showEditWindow()
 	
 	const String coordNames[3]{ "X","Y","Z" };
 
-	for (int i = 0; i<3; i++) nameWindow.addTextEditor("val" + String(i), p3d->value[i].toString(), "Value " + coordNames[i]);
+	for (int i = 0; i<3; i++) nameWindow.addTextEditor("val" + String(i), String((float)p3d->value[i]), "Value " + coordNames[i]);
 
 	nameWindow.addButton("OK", 1, KeyPress(KeyPress::returnKey));
 	nameWindow.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
@@ -114,8 +114,8 @@ void TripleSliderUI::showEditRangeWindow()
 
 	for (int i = 0; i < 3; i++)
 	{
-		nameWindow.addTextEditor("minVal" + String(i), p3d->minimumValue[i].toString(), "Minimum " + coordNames[i]);
-		nameWindow.addTextEditor("maxVal" + String(i), p3d->maximumValue[i].toString(), "Maximum " + coordNames[i]);
+		nameWindow.addTextEditor("minVal" + String(i), String((float)p3d->minimumValue), "Minimum " + coordNames[i]);
+		nameWindow.addTextEditor("maxVal" + String(i), String((float)p3d->maximumValue), "Maximum " + coordNames[i]);
 	}
 
 	nameWindow.addButton("OK", 1, KeyPress(KeyPress::returnKey));

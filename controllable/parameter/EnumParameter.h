@@ -30,7 +30,7 @@ public:
 	var getValueData() { return enumValues[value]; };
 	template<class T>
 	T getValueDataAsEnum() { return (T)(int)enumValues[value]; }
-	String getValueKey() { return value.toString(); }
+	String getValueKey() { return stringValue(); }
 
 	StringArray getAllKeys();
 

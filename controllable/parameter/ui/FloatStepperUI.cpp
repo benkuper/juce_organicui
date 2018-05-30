@@ -27,7 +27,7 @@ FloatStepperUI::FloatStepperUI(Parameter * _parameter) :
 	slider->setColour(CaretComponent::caretColourId, Colours::orange);
 	slider->setScrollWheelEnabled(false);
 
-	bool active = parameter->isEditable && !forceFeedbackOnly;
+	bool active = parameter->isEditable && !forceFeedbackOnly && !parameter->isControllableFeedbackOnly;
 	slider->setTextBoxIsEditable(active);
 	slider->setIncDecButtonsMode(active ? Slider::IncDecButtonMode::incDecButtonsDraggable_Vertical : Slider::IncDecButtonMode::incDecButtonsNotDraggable);
 	

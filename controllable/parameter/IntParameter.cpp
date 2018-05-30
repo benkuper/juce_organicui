@@ -1,4 +1,3 @@
-#include "IntParameter.h"
 /*
   ==============================================================================
 
@@ -66,5 +65,10 @@ IntParameterLabelUI * IntParameter::createLabelUI(IntParameter * target)
 
 ControllableUI * IntParameter::createDefaultUI(Controllable * targetControllable){
 
-	return createStepper(dynamic_cast<IntParameter *>(targetControllable));
+	IntParameter * p = dynamic_cast<IntParameter *>(targetControllable);
+	ParameterUI * pui = nullptr;
+	if (isControllableFeedbackOnly || !isEditable) pui = createLabelUI(p);
+	else pui = createStepper(p);
+
+	return pui;
 };
