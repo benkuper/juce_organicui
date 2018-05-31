@@ -64,10 +64,13 @@ GenericManagerEditor<T>::GenericManagerEditor(BaseManager<T> * _manager, bool is
 	headerHeight = 20;
 	setInterceptsMouseClicks(true, true);
 
-	addItemBT = AssetManager::getInstance()->getAddBT();
-	addAndMakeVisible(addItemBT);
-	addItemBT->addListener(this);
-
+	if (manager->userCanAddItemsManually)
+	{
+		addItemBT = AssetManager::getInstance()->getAddBT();
+		addAndMakeVisible(addItemBT);
+		addItemBT->addListener(this);
+	}
+	
 	manager->addAsyncManagerListener(this);
 }
 
@@ -109,8 +112,12 @@ void GenericManagerEditor<T>::paint(Graphics & g)
 template<class T>
 void GenericManagerEditor<T>::resizedInternalHeader(juce::Rectangle<int>& r)
 {
-	addItemBT->setBounds(r.removeFromRight(r.getHeight()).reduced(2));
-	r.removeFromRight(2);
+	if (addItemBT != nullptr)
+	{
+		addItemBT->setBounds(r.removeFromRight(r.getHeight()).reduced(2));
+		r.removeFromRight(2);
+	}
+
 	EnablingControllableContainerEditor::resizedInternalHeader(r);
 }
 
