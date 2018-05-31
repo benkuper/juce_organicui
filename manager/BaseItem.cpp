@@ -46,7 +46,11 @@ BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts
 
 	viewUISize = addPoint2DParameter("ViewUISize", "Size in the view");
 	viewUISize->setBounds(30, 60, 10000, 10000);
-	viewUISize->setPoint(200, 200);
+	var defaultSize;
+	defaultSize.append(200);
+	defaultSize.append(200);
+	viewUISize->defaultValue = defaultSize;
+	viewUISize->resetValue();
 	viewUISize->defaultValue = viewUISize->value;
 	viewUISize->hideInEditor = true;
 	viewUISize->hideInOutliner = true;
