@@ -11,6 +11,9 @@
 BoolParameter::BoolParameter(const String & niceName, const String &description, bool initialValue, bool enabled) :
     Parameter(Type::BOOL, niceName, description, initialValue, 0, 1, enabled)
 {
+	minimumValue = 0;
+	maximumValue = 1;
+	canHaveRange = true;
     setValue(initialValue);
 	argumentsDescription = "0/1";
 }
