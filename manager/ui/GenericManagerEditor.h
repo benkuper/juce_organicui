@@ -117,8 +117,8 @@ void GenericManagerEditor<T>::showMenuAndAddItem(bool isFromAddButton)
 		T * m = manager->managerFactory->showCreateMenu();
 		if (m != nullptr)
 		{
+			setCollapsed(false, true);
 			manager->addItem(m);
-			setCollapsed(false,true);
 		}
 	} else
 	{
