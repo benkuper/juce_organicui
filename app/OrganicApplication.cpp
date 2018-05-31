@@ -32,15 +32,17 @@ const String OrganicApplication::getApplicationVersion() { return ProjectInfo::v
 
 void OrganicApplication::initialise(const String & commandLine)
 {
-	initialiseInternal(commandLine);
-
-	jassert(engine != nullptr);
-	if (mainComponent == nullptr) mainComponent = new OrganicMainContentComponent();
 
 	GlobalSettings::getInstance()->addChildControllableContainer(&appSettings);
 
 	var gs = JSON::fromString(getAppProperties().getUserSettings()->getValue("globalSettings", ""));
 	GlobalSettings::getInstance()->loadJSONData(gs);
+
+	initialiseInternal(commandLine);
+
+	jassert(engine != nullptr);
+	if (mainComponent == nullptr) mainComponent = new OrganicMainContentComponent();
+
 
 	engine->addAsyncEngineListener(this);
 

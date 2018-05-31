@@ -30,7 +30,7 @@ GlobalSettings::GlobalSettings() :
 	startupCC.addParameter(fileToOpenOnStartup);
 
 	addChildControllableContainer(&saveLoadCC);
-	enableAutoSave = saveLoadCC.addBoolParameter("Enable auto-save", "When enabled, a backup file will be saved every 5 min", false, true);
+	enableAutoSave = saveLoadCC.addBoolParameter("Enable auto-save", "When enabled, a backup file will be saved every 5 min", true);
 	autoSaveCount = saveLoadCC.addIntParameter("Auto-save count", "The number of different files to auto-save", 10, 1, 100);
 
 	addChildControllableContainer(&confirmationsCC);
