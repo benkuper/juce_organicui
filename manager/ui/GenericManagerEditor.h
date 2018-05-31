@@ -17,7 +17,7 @@ class BaseManager;
 template<class T>
 class GenericManagerEditor :
 	public EnablingControllableContainerEditor,
-	public BaseManager<T>::Listener
+	public BaseManager<T>::AsyncListener
 {
 public:
 	GenericManagerEditor(BaseManager<T> * manager, bool isRoot);
@@ -46,6 +46,11 @@ public:
 
 	void buttonClicked(Button *) override;
 	void mouseDown(const MouseEvent &e) override;
+
+	void newMessage(const typename BaseManager<T>::ManagerEvent &e) override;
+
+	virtual void itemAddedAsync(T * item) {}
+	virtual void itemRemovedAsync(T * item) {}
 };
 
 
@@ -63,13 +68,13 @@ GenericManagerEditor<T>::GenericManagerEditor(BaseManager<T> * _manager, bool is
 	addAndMakeVisible(addItemBT);
 	addItemBT->addListener(this);
 
-	manager->addBaseManagerListener(this);
+	manager->addAsyncManagerListener(this);
 }
 
 template<class T>
 GenericManagerEditor<T>::~GenericManagerEditor()
 {
-	manager->removeBaseManagerListener(this);
+	if(!inspectable.wasObjectDeleted()) manager->removeAsyncManagerListener(this);
 }
 
 template<class T>
@@ -117,7 +122,6 @@ void GenericManagerEditor<T>::showMenuAndAddItem(bool isFromAddButton)
 		T * m = manager->managerFactory->showCreateMenu();
 		if (m != nullptr)
 		{
-			setCollapsed(false, true);
 			manager->addItem(m);
 		}
 	} else
@@ -147,7 +151,6 @@ template<class T>
 T * GenericManagerEditor<T>::addItemFromMenu(bool /*isFromAddButton*/)
 {
 	T * item = manager->BaseManager<T>::addItem();
-	setCollapsed(false,true);
 	return item;
 }
 
@@ -172,6 +175,25 @@ void GenericManagerEditor<T>::mouseDown(const MouseEvent & e)
 	} else if (e.mods.isRightButtonDown())
 	{
 		showMenuAndAddItem(false);
+	}
+}
+
+template<class T>
+void GenericManagerEditor<T>::newMessage(const typename BaseManager<T>::ManagerEvent & e)
+{
+	switch (e.type)
+	{
+	case BaseManager<T>::ManagerEvent::ITEM_ADDED:
+		setCollapsed(false, true);
+		itemAddedAsync(e.getItem());
+		break;
+
+	case BaseManager<T>::ManagerEvent::ITEM_REMOVED:
+		itemRemovedAsync(e.getItem());
+		break;
+
+	default:
+		break;
 	}
 }
 
