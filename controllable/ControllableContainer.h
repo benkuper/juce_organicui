@@ -134,7 +134,7 @@ public:
 	virtual void updateLiveScriptObjectInternal(DynamicObject * parent = nullptr) override;
 	static var getChildFromScript(const var::NativeFunctionArgs &a);
 
-private:
+protected:
 	virtual void onContainerNiceNameChanged() {};
 	virtual void onContainerShortNameChanged() {};
 	virtual void onContainerParameterChanged(Parameter *) {};
