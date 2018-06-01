@@ -242,7 +242,7 @@ public:
 			T * s = this->getItem();
 			if (s == nullptr) return false;
 			this->data = s->getJSONData();
-			data.getDynamicObject()->setProperty("index", this->itemIndex);
+			this->data.getDynamicObject()->setProperty("index", this->itemIndex);
 
 			this->getManager()->removeItem(s, false);
 			this->itemRef = nullptr;
@@ -265,7 +265,7 @@ public:
 			if (s == nullptr) return false;
 
 			this->data = s->getJSONData();
-			data.getDynamicObject()->setProperty("index", this->itemIndex);
+			this->data.getDynamicObject()->setProperty("index", this->itemIndex);
 
 			this->getManager()->removeItem(s, false);
 			this->itemRef = nullptr;
