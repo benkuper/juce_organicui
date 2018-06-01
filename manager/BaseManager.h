@@ -184,8 +184,8 @@ public:
 			T * s = getItem();
 			if (s != nullptr)
 			{
-				itemShortName = dynamic_cast<BaseItem *>(s)->shortName;
-				itemIndex = m->items.indexOf(s);
+				this->itemShortName = dynamic_cast<BaseItem *>(s)->shortName;
+				this->itemIndex = m->items.indexOf(s);
 
 			}
 		}
@@ -242,7 +242,7 @@ public:
 			T * s = this->getItem();
 			if (s == nullptr) return false;
 			this->data = s->getJSONData();
-			data.getDynamicObject()->setProperty("index", itemIndex);
+			data.getDynamicObject()->setProperty("index", this->itemIndex);
 
 			this->getManager()->removeItem(s, false);
 			this->itemRef = nullptr;
@@ -265,7 +265,7 @@ public:
 			if (s == nullptr) return false;
 
 			this->data = s->getJSONData();
-			data.getDynamicObject()->setProperty("index", itemIndex);
+			data.getDynamicObject()->setProperty("index", this->itemIndex);
 
 			this->getManager()->removeItem(s, false);
 			this->itemRef = nullptr;
