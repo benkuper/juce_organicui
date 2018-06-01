@@ -165,8 +165,8 @@ using namespace juce;
 #include "manager/ui/BaseItemUI.h"
 #include "manager/ui/BaseItemEditor.h"
 
-#include "manager/BaseManager.h"
 #include "manager/ui/GenericManagerEditor.h"
+#include "manager/BaseManager.h"
 
 #include "manager/ui/BaseManagerUI.h"
 #include "manager/ui/BaseManagerViewUI.h"
