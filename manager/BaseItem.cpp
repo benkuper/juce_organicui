@@ -16,6 +16,7 @@ BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts
 	askConfirmationBeforeRemove(true),
 	isSavable(true),
 	saveType(true),
+	canBeReorderedInEditor(true),
 	itemDataType("")
 {
 	saveAndLoadName = true;
@@ -79,6 +80,16 @@ bool BaseItem::paste()
 	//default behavior can be overriden
 	baseItemListeners.call(&BaseItem::Listener::askForPaste);
 	return true;
+}
+
+void BaseItem::moveBefore()
+{
+	baseItemListeners.call(&BaseItem::Listener::askForMoveBefore, this);
+}
+
+void BaseItem::moveAfter()
+{
+	baseItemListeners.call(&BaseItem::Listener::askForMoveAfter, this);
 }
 
 void BaseItem::remove()

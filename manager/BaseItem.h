@@ -33,6 +33,7 @@ public:
 	bool askConfirmationBeforeRemove;
 	bool isSavable;
 	bool saveType;
+	bool canBeReorderedInEditor;
 
 	ScopedPointer<ScriptManager> scriptManager;
 
@@ -43,6 +44,9 @@ public:
 	virtual void duplicate();
 	virtual void copy();
 	virtual bool paste();
+
+	virtual void moveBefore();
+	virtual void moveAfter();
 
 	void remove();
 
@@ -67,6 +71,8 @@ public:
 		virtual void askForRemoveBaseItem(BaseItem *) {}
 		virtual void askForDuplicateItem(BaseItem *) {}
 		virtual void askForPaste() {}
+		virtual void askForMoveBefore(BaseItem *) {}
+		virtual void askForMoveAfter(BaseItem *) {}
 	};
 
 

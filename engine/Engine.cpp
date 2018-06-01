@@ -12,14 +12,16 @@
 
 Engine * Engine::mainEngine = nullptr;
 
-Engine::Engine(const String & fileName, const String & fileExtension, ApplicationProperties * _appProperties, const String &_appVersion) :
+static OrganicApplication& getApp();
+String getAppVersion();
+ApplicationProperties& getAppProperties();
+
+Engine::Engine(const String & fileName, const String & fileExtension) :
 	ControllableContainer("Root"),
 	FileBasedDocument(fileExtension,
 		"*" + fileExtension,
 		"Load a " + fileName,
 		"Save a " + fileName),
-	appProperties(_appProperties),
-	appVersion(_appVersion),
 	fileName(fileName),
 	fileExtension(fileExtension),
 	lastFileAbsolutePath(""),
@@ -29,7 +31,7 @@ Engine::Engine(const String & fileName, const String & fileExtension, Applicatio
     isClearing(false)
 {
 	skipControllableNameInAddress = true;
-	isBetaVersion = appVersion.endsWith("b");
+	isBetaVersion = getAppVersion().endsWith("b");
 
 	selectionManager = new InspectableSelectionManager(true); //selectionManager constructor
 

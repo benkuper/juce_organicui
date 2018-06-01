@@ -2,7 +2,7 @@
 
 <JUCERPROJECT id="nJCeN1" name="organicui_resources" projectType="guiapp" version="1.0.0"
               bundleIdentifier="com.yourcompany.organicui_resources" includeBinaryInAppConfig="1"
-              jucerVersion="5.2.1" displaySplashScreen="1" reportAppUsage="1"
+              jucerVersion="5.3.2" displaySplashScreen="1" reportAppUsage="1"
               splashScreenColour="Dark" cppLanguageStandard="11" companyCopyright="">
   <MAINGROUP id="gdPnjI" name="organicui_resources">
     <GROUP id="{471DD8BF-5339-7ED5-BF79-1FCB0A8A6B3D}" name="Resources">
@@ -18,6 +18,7 @@
       <FILE id="dYEB6a" name="checkbox_on.png" compile="0" resource="1" file="Resources/checkbox_on.png"/>
       <FILE id="lFWTK3" name="checkbox_on_readonly.png" compile="0" resource="1"
             file="Resources/checkbox_on_readonly.png"/>
+      <FILE id="yRr25C" name="down.png" compile="0" resource="1" file="Resources/down.png"/>
       <FILE id="JhfeGX" name="edit.png" compile="0" resource="1" file="Resources/edit.png"/>
       <FILE id="bcK2wO" name="file.png" compile="0" resource="1" file="Resources/file.png"/>
       <FILE id="Lih37O" name="in.png" compile="0" resource="1" file="Resources/in.png"/>
@@ -33,6 +34,7 @@
       <FILE id="ZVsExK" name="target.png" compile="0" resource="1" file="Resources/target.png"/>
       <FILE id="FixPlj" name="trigger.png" compile="0" resource="1" file="Resources/trigger.png"/>
       <FILE id="utiCOQ" name="uncheck.png" compile="0" resource="1" file="Resources/uncheck.png"/>
+      <FILE id="MobXh0" name="up.png" compile="0" resource="1" file="Resources/up.png"/>
     </GROUP>
     <GROUP id="{279380FE-558A-8939-19FF-B071B9CB7AF4}" name="Source"/>
   </MAINGROUP>
@@ -80,4 +82,7 @@
     <MODULE id="juce_video" showAllCode="1" useLocalCopy="0"/>
   </MODULES>
   <JUCEOPTIONS/>
+  <LIVE_SETTINGS>
+    <WINDOWS/>
+  </LIVE_SETTINGS>
 </JUCERPROJECT>

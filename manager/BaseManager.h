@@ -12,6 +12,8 @@
 #define BASEMANAGER_H_INCLUDED
 
 
+
+
 template <class T>
 class BaseManager :
 	public EnablingControllableContainer,
@@ -26,6 +28,7 @@ public:
 	//Factory
 	Factory<T> * managerFactory;
 	String itemDataType;
+
 
 	bool userCanAddItemsManually;
 	bool selectItemWhenCreated;
@@ -65,6 +68,8 @@ public:
 	void askForRemoveBaseItem(BaseItem * item) override;
 	void askForDuplicateItem(BaseItem * item) override;
 	void askForPaste() override;
+	void askForMoveBefore(BaseItem *) override;
+	void askForMoveAfter(BaseItem *) override;
 
 	virtual var getJSONData() override;
 	virtual void loadJSONDataInternal(var data) override;
@@ -90,7 +95,6 @@ public:
 	ListenerList<Listener> baseManagerListeners;
 	void addBaseManagerListener(Listener* newListener) { baseManagerListeners.add(newListener); }
 	void removeBaseManagerListener(Listener* listener) { baseManagerListeners.remove(listener); }
-
 
 	class ManagerEvent
 	{
@@ -181,11 +185,14 @@ public:
 			if (s != nullptr)
 			{
 				itemShortName = dynamic_cast<BaseItem *>(s)->shortName;
+				itemIndex = m->items.indexOf(s);
+
 			}
 		}
 
 		WeakReference<Inspectable> itemRef;
 		String itemShortName;
+		int itemIndex;
 
 		T * getItem()
 		{
@@ -235,6 +242,8 @@ public:
 			T * s = this->getItem();
 			if (s == nullptr) return false;
 			this->data = s->getJSONData();
+			data.getDynamicObject()->setProperty("index", itemIndex);
+
 			this->getManager()->removeItem(s, false);
 			this->itemRef = nullptr;
 			return true;
@@ -256,6 +265,8 @@ public:
 			if (s == nullptr) return false;
 
 			this->data = s->getJSONData();
+			data.getDynamicObject()->setProperty("index", itemIndex);
+
 			this->getManager()->removeItem(s, false);
 			this->itemRef = nullptr;
 			return true;
@@ -381,6 +392,23 @@ public:
 		}
 	};
 
+
+	class ManagerItemComparator
+	{
+	public:
+		ManagerItemComparator(BaseManager * manager) : m(manager) {}
+
+		BaseManager * m;
+
+		int compareElements(ControllableContainer * i1, ControllableContainer * i2)
+		{
+			return m->items.indexOf(static_cast<T *>(i1)) > m->items.indexOf(static_cast<T *>(i2))? 1 : -1;
+		}
+	};
+	
+	ManagerItemComparator comparator;
+
+
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BaseManager<T>)
 };
 
@@ -390,6 +418,7 @@ BaseManager<T>::BaseManager(const String & name) :
 	EnablingControllableContainer(name, false),
 	managerFactory(nullptr),
 	itemDataType(""),
+	comparator(this),
 	userCanAddItemsManually(true),
 	selectItemWhenCreated(true),
 	managerNotifier(50)
@@ -438,7 +467,7 @@ T * BaseManager<T>::addItem(T * item, var data, bool addToUndo, bool notify)
 		}
 	}
 
-	items.add(item);
+	items.insert(data.getProperty("index",-1),item);
 	bi->addBaseItemListener(this);
 
 	if (!data.isVoid())
@@ -553,6 +582,8 @@ T * BaseManager<T>::addItemFromClipboard(bool showWarning)
 		return nullptr;
 	}
 
+	int sIndex = items.indexOf(InspectableSelectionManager::mainSelectionManager->getInspectableAs<T>());
+	if(sIndex >= 0) data.getDynamicObject()->setProperty("index", sIndex+1);
 	return addItemFromData(data);
 }
 
@@ -646,9 +677,9 @@ void BaseManager<T>::removeItem(T * item, bool addToUndo, bool notify)
 template<class T>
 void BaseManager<T>::reorderItems()
 {
+	controllableContainers.sort(comparator);
 	baseManagerListeners.call(&Listener::itemsReordered);
 	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_REORDERED));
-
 }
 
 template<class T>
@@ -679,13 +710,33 @@ template<class T>
 void BaseManager<T>::askForDuplicateItem(BaseItem * item)
 {
 	if (!userCanAddItemsManually) return;
-	addItemFromData(item->getJSONData());
+	var data = item->getJSONData();
+	data.getDynamicObject()->setProperty("index", items.indexOf(static_cast<T *>(item))+1);
+	addItemFromData(data);
 }
 
 template<class T>
 void BaseManager<T>::askForPaste()
 {
 	addItemFromClipboard();
+}
+
+template<class T>
+void BaseManager<T>::askForMoveBefore(BaseItem * i)
+{
+	int index = items.indexOf(static_cast<T *>(i));
+	if (index == 0) return;
+	items.swap(index, index - 1);
+	reorderItems();
+}
+
+template<class T>
+void BaseManager<T>::askForMoveAfter(BaseItem * i)
+{
+	int index = items.indexOf(static_cast<T *>(i));
+	if (index == items.size() -1) return;
+	items.swap(index, index + 1);
+	reorderItems();
 }
 
 template<class T>

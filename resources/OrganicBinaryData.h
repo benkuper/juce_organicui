@@ -35,6 +35,9 @@ namespace OrganicUIBinaryData
     extern const char*   checkbox_on_readonly_png;
     const int            checkbox_on_readonly_pngSize = 15625;
 
+    extern const char*   down_png;
+    const int            down_pngSize = 543;
+
     extern const char*   edit_png;
     const int            edit_pngSize = 16204;
 
@@ -80,13 +83,23 @@ namespace OrganicUIBinaryData
     extern const char*   uncheck_png;
     const int            uncheck_pngSize = 15619;
 
+    extern const char*   up_png;
+    const int            up_pngSize = 462;
+
+    // Number of elements in the namedResourceList and originalFileNames arrays.
+    const int namedResourceListSize = 26;
+
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];
 
-    // Number of elements in the namedResourceList array.
-    const int namedResourceListSize = 24;
+    // Points to the start of a list of resource filenames.
+    extern const char* originalFilenames[];
 
     // If you provide the name of one of the binary resource variables above, this function will
     // return the corresponding data and its size (or a null pointer if the name isn't found).
-    const char* getNamedResource (const char* resourceNameUTF8, int& dataSizeInBytes) throw();
+    const char* getNamedResource (const char* resourceNameUTF8, int& dataSizeInBytes);
+
+    // If you provide the name of one of the binary resource variables above, this function will
+    // return the corresponding original, non-mangled filename (or a null pointer if the name isn't found).
+    const char* getNamedResourceOriginalFilename (const char* resourceNameUTF8);
 }

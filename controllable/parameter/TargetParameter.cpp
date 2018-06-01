@@ -59,7 +59,6 @@ void TargetParameter::setValueFromTarget(Controllable * c)
 	if (target != nullptr && c == target)
 	{
 		String ca = target->getControlAddress();
-		DBG(niceName << ", target controlAddress : " << ca);
 		if (stringValue() == ca) return;
 	}
 	
@@ -136,8 +135,6 @@ void TargetParameter::setTarget(WeakReference<ControllableContainer> cc)
 
 void TargetParameter::childStructureChanged(ControllableContainer * cc)
 {
-	DBG("Child structure changed : " << cc->niceName);
-
 	if (Engine::mainEngine->isClearing) return;
 
 	if (targetType == CONTROLLABLE)

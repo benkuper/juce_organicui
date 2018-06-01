@@ -25,7 +25,7 @@ class GenericControllableContainerEditor :
 	public Label::Listener
 {
 public:
-	GenericControllableContainerEditor(WeakReference<Inspectable> _inspectable, bool isRoot);
+	GenericControllableContainerEditor(WeakReference<Inspectable> _inspectable, bool isRoot, bool buildAtCreation = true);
 	virtual ~GenericControllableContainerEditor();
 
 	
@@ -45,7 +45,7 @@ public:
 	ScopedPointer<ImageButton> collapseBT;
 	Component headerSpacer;
 
-	virtual void setCollapsed(bool value, bool force = false, bool animate = true);
+	virtual void setCollapsed(bool value, bool force = false, bool animate = true, bool doNotRebuild = false);
 	virtual void resetAndBuild();
 
 	void paint(Graphics &g) override;
@@ -65,8 +65,8 @@ public:
 	void addControllableUI(Controllable * c, bool resize = false);
 	void removeControllableUI(Controllable *c, bool resize = false);
 
-	void addEditorUI(ControllableContainer * cc, bool resize = false);
-	void removeEditorUI(ControllableContainer * cc, bool resize = false);
+	virtual InspectableEditor * addEditorUI(ControllableContainer * cc, bool resize = false);
+	virtual void removeEditorUI(ControllableContainer * cc, bool resize = false);
 	
 	InspectableEditor * getEditorForInspectable(Inspectable * i);
 	
@@ -88,7 +88,7 @@ class EnablingControllableContainerEditor :
 	public GenericControllableContainerEditor
 {
 public:
-	EnablingControllableContainerEditor(EnablingControllableContainer * cc, bool isRoot);
+	EnablingControllableContainerEditor(EnablingControllableContainer * cc, bool isRoot, bool buildAtCreation = true);
 	~EnablingControllableContainerEditor() {}
 
 	EnablingControllableContainer * ioContainer;

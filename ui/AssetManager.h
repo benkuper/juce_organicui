@@ -29,6 +29,8 @@ public:
 	ImageButton * getEditBT();
 	ImageButton * getRightArrowBT();
 	ImageButton * getDownArrowImageBT();
+	ImageButton * getUpBT();
+	ImageButton * getDownBT();
 
 	Image getInImage();
 	Image getOutImage();

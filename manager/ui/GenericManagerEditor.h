@@ -33,6 +33,7 @@ public:
 
 	void resetAndBuild() override;
 	void addExistingItems();
+
 	
 	//menu
 	ScopedPointer<ImageButton> addItemBT;
@@ -57,7 +58,7 @@ public:
 
 template<class T>
 GenericManagerEditor<T>::GenericManagerEditor(BaseManager<T> * _manager, bool isRoot) :
-	EnablingControllableContainerEditor(_manager, isRoot),
+	EnablingControllableContainerEditor(_manager, isRoot, false),
 	manager(_manager),
 	addItemText("Add item")
 {
@@ -72,6 +73,8 @@ GenericManagerEditor<T>::GenericManagerEditor(BaseManager<T> * _manager, bool is
 	}
 	
 	manager->addAsyncManagerListener(this);
+
+	resetAndBuild();
 }
 
 template<class T>
@@ -85,15 +88,22 @@ void GenericManagerEditor<T>::resetAndBuild()
 {
 	GenericControllableContainerEditor::resetAndBuild(); 
 	resized();
+
+	for (auto &e : childEditors)
+	{
+		BaseItemEditor * be = dynamic_cast<BaseItemEditor *>(e);
+		if (be == nullptr) continue;
+		
+		int index = manager->items.indexOf(static_cast<T *>(be->item));
+		be->setIsFirst(index == 0);
+		be->setIsLast(index == manager->items.size() - 1);
+	}
 }
 
 template<class T>
 void GenericManagerEditor<T>::addExistingItems()
 {
-
-	//add existing items
-	for (auto &t : manager->items) addEditorUI(t, false);
-	resized();
+	resetAndBuild();
 }
 
 template<class T>
@@ -197,6 +207,10 @@ void GenericManagerEditor<T>::newMessage(const typename BaseManager<T>::ManagerE
 
 	case BaseManager<T>::ManagerEvent::ITEM_REMOVED:
 		itemRemovedAsync(e.getItem());
+		break;
+
+	case BaseManager<T>::ManagerEvent::ITEMS_REORDERED:
+		resetAndBuild();
 		break;
 
 	default:

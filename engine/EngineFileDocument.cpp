@@ -9,13 +9,12 @@
  */
 
 
-
- /*================================
-  this file implements all methods that are related to saving/loading : basicly iherited from FileBasedDocument
-  */
-
 #include "JuceHeader.h" //for project infos
 #include "Engine.h"
+
+static OrganicApplication& getApp();
+String getAppVersion();
+ApplicationProperties& getAppProperties();
 
 String Engine::getDocumentTitle() {
 	if (!getFile().exists())
@@ -184,9 +183,8 @@ Result Engine::saveBackupDocument(int index)
 
 File Engine::getLastDocumentOpened() {
 
-	if (appProperties == nullptr) return File();
 	RecentlyOpenedFilesList recentFiles;
-	recentFiles.restoreFromString(appProperties->getUserSettings()
+	recentFiles.restoreFromString(getAppProperties().getUserSettings()
 		->getValue(lastFileListKey));
 
 	return recentFiles.getFile(0);
@@ -197,14 +195,13 @@ File Engine::getLastDocumentOpened() {
 
 void Engine::setLastDocumentOpened(const File& file) {
 
-	if (appProperties == nullptr) return;
 	RecentlyOpenedFilesList recentFiles;
-	recentFiles.restoreFromString(appProperties->getUserSettings()
+	recentFiles.restoreFromString(getAppProperties().getUserSettings()
 		->getValue(lastFileListKey));
 
 	recentFiles.addFile(file);
 
-	appProperties->getUserSettings()->setValue(lastFileListKey, recentFiles.toString());
+	getAppProperties().getUserSettings()->setValue(lastFileListKey, recentFiles.toString());
 
 }
 
@@ -258,7 +255,7 @@ void Engine::loadJSONData(var data, ProgressTask * loadingTask)
 
 	if (convertURL.isNotEmpty())
 	{
-		bool appVersionIsNewerThanFileVersion = versionIsNewerThan(appVersion, versionString);
+		bool appVersionIsNewerThanFileVersion = versionIsNewerThan(getAppVersion(), versionString);
 		if (appVersionIsNewerThanFileVersion)
 		{
 			int result = AlertWindow::showYesNoCancelBox(AlertWindow::QuestionIcon, "File compatibility check", "Your file has been save with an older version of Chataigne (" + versionString + "), some data may be lost if you load it directly. You can choose to update the file online, load it directly or cancel the operation", "Update", "Load directly", "Cancel");
@@ -335,7 +332,7 @@ void Engine::loadJSONData(var data, ProgressTask * loadingTask)
 bool Engine::checkFileVersion(DynamicObject * metaData, bool checkForNewerVersion)
 {
 	if (!metaData->hasProperty("version")) return false;
-	String versionToCheck = checkForNewerVersion ? appVersion : getMinimumRequiredFileVersion();
+	String versionToCheck = checkForNewerVersion ? getAppVersion() : getMinimumRequiredFileVersion();
 	//DBG(metaData->getProperty("version").toString() << " / " << versionToCheck);
 
 	String fVersion = metaData->getProperty("version").toString();

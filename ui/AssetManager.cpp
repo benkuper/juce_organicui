@@ -20,6 +20,8 @@ ImageButton * AssetManager::getFileBT() { return getSetupBTImage(ImageCache::get
 ImageButton * AssetManager::getEditBT() { return getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::edit_png, OrganicUIBinaryData::edit_pngSize)); }
 ImageButton * AssetManager::getRightArrowBT() { return getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::arrowright_png, OrganicUIBinaryData::arrowright_pngSize)); }
 ImageButton * AssetManager::getDownArrowImageBT() { return getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::arrowdown_png, OrganicUIBinaryData::arrowdown_pngSize)); }
+ImageButton * AssetManager::getUpBT() { return getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::up_png, OrganicUIBinaryData::up_pngSize)); }
+ImageButton * AssetManager::getDownBT() { return getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::down_png, OrganicUIBinaryData::down_pngSize)); }
 
 
 Image AssetManager::getInImage() { return ImageCache::getFromMemory(OrganicUIBinaryData::in_png, OrganicUIBinaryData::in_pngSize); }

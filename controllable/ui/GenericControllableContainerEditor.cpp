@@ -12,7 +12,7 @@
 
 //ControllableUIComparator CCInnerContainer::comparator;
 
-GenericControllableContainerEditor::GenericControllableContainerEditor(WeakReference<Inspectable> inspectable, bool isRoot) :
+GenericControllableContainerEditor::GenericControllableContainerEditor(WeakReference<Inspectable> inspectable, bool isRoot, bool buildAtCreation) :
 	InspectableEditor(inspectable, isRoot),
 	headerHeight(18),
 	prepareToAnimate(false),
@@ -51,10 +51,10 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(WeakRefer
 
 		collapseAnimator.addChangeListener(this);
 
-		setCollapsed(container->editorIsCollapsed, true, false);
+		setCollapsed(container->editorIsCollapsed, true, false, !buildAtCreation);
 	} else
 	{
-		resetAndBuild();
+		if(buildAtCreation) resetAndBuild();
 		resized();
 	}
 }
@@ -83,7 +83,7 @@ void GenericControllableContainerEditor::mouseDown(const MouseEvent & e)
 }
 
 
-void GenericControllableContainerEditor::setCollapsed(bool value, bool force, bool animate)
+void GenericControllableContainerEditor::setCollapsed(bool value, bool force, bool animate, bool doNotRebuild)
 {
 	if (container->editorIsCollapsed == value && !force) return;
 	
@@ -99,8 +99,8 @@ void GenericControllableContainerEditor::setCollapsed(bool value, bool force, bo
 	
 	if (!container->editorIsCollapsed)
 	{
-		resetAndBuild();
-	 juce::Rectangle<int> r = getLocalBounds();
+		if(!doNotRebuild) resetAndBuild();
+		juce::Rectangle<int> r = getLocalBounds();
 		
 		if (canBeCollapsed())
 		{
@@ -160,12 +160,13 @@ void GenericControllableContainerEditor::resetAndBuild()
 	}
 }
 
-void GenericControllableContainerEditor::addEditorUI(ControllableContainer * cc, bool resize)
+InspectableEditor * GenericControllableContainerEditor::addEditorUI(ControllableContainer * cc, bool resize)
 {
 	InspectableEditor * ccui = cc->getEditor(false);
 	childEditors.add(ccui);
 	addAndMakeVisible(ccui);
 	if (resize) resized();
+	return ccui;
 }
 
 void GenericControllableContainerEditor::removeEditorUI(ControllableContainer * cc, bool resize)
@@ -377,8 +378,8 @@ bool GenericControllableContainerEditor::canBeCollapsed()
 
 //EnablingControllableContainerEditor
 
-EnablingControllableContainerEditor::EnablingControllableContainerEditor(EnablingControllableContainer * cc, bool isRoot) :
-	GenericControllableContainerEditor(cc, isRoot),
+EnablingControllableContainerEditor::EnablingControllableContainerEditor(EnablingControllableContainer * cc, bool isRoot, bool buildAtCreation) :
+	GenericControllableContainerEditor(cc, isRoot, buildAtCreation),
 	ioContainer(cc)
 {
 	if (cc->canBeDisabled)

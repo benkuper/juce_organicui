@@ -24,15 +24,13 @@ class Engine :
 	public Timer //for auto save
 {
 public:
-	Engine(const String &fileName = "File",const String &fileExtension = ".file", ApplicationProperties * appProperties = nullptr, const String &appVersion = "1.0.0");
+	Engine(const String &fileName = "File",const String &fileExtension = ".file");
 	virtual ~Engine();
 
 	static Engine * mainEngine;
 
 	ScopedPointer<InspectableSelectionManager> selectionManager;
 
-	ApplicationProperties * appProperties;
-	String appVersion;
 
 	bool isBetaVersion;
 
