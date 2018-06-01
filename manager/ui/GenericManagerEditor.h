@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef GENERICMANAGEREDITOR_H_INCLUDED
-#define GENERICMANAGEREDITOR_H_INCLUDED
+#pragma once
 
 template<class T>
 class BaseManager;
@@ -217,5 +216,3 @@ void GenericManagerEditor<T>::newMessage(const typename BaseManager<T>::ManagerE
 		break;
 	}
 }
-
-#endif  // GENERICMANAGEREDITOR_H_INCLUDED

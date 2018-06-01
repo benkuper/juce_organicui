@@ -160,17 +160,16 @@ using namespace juce;
 #include "ui/shapeshifter/ShapeShifterWindow.h"
 
 
-
-#include "manager/ui/GenericManagerEditor.h"
-
-
 #include "manager/BaseItem.h"
 #include "manager/ui/BaseItemMinimalUI.h"
 #include "manager/ui/BaseItemUI.h"
+#include "manager/ui/BaseItemEditor.h"
+
+#include "manager/BaseManager.h"
+#include "manager/ui/GenericManagerEditor.h"
+
 #include "manager/ui/BaseManagerUI.h"
 #include "manager/ui/BaseManagerViewUI.h"
-#include "manager/BaseManager.h"
-#include "manager/ui/BaseItemEditor.h"
 #include "manager/ui/BaseManagerShapeShifterUI.h"
 
 #include "manager/GenericControllableItem.h"

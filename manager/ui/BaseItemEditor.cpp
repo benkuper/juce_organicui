@@ -1,15 +1,3 @@
-#include "BaseItemEditor.h"
-/*
-  ==============================================================================
-
-	BaseItemEditor.cpp
-	Created: 18 Jan 2017 2:23:31pm
-	Author:  Ben
-
-  ==============================================================================
-*/
-
-
 BaseItemEditor::BaseItemEditor(BaseItem * bi, bool isRoot) :
 	EnablingControllableContainerEditor(bi, isRoot),
 	item(bi)
