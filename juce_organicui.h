@@ -67,7 +67,6 @@ using namespace juce;
 #include "helpers/OSCHelpers.h"
 
 #include "undo/UndoMaster.h"
-#include "updater/AppUpdater.h"
 
 #include "script/ScriptTarget.h"
 
@@ -138,6 +137,8 @@ using namespace juce;
 
 #include "controllable/ControllableContainer.h"
 #include "controllable/ui/GenericControllableContainerEditor.h"
+
+#include "updater/AppUpdater.h"
 
 #include "progress/ProgressNotifier.h"
 #include "progress/ui/ProgressWindow.h"

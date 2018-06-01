@@ -138,15 +138,15 @@ void OrganicApplication::newMessage(const Engine::EngineEvent & e)
 	}
 }
 
-void OrganicApplication::newMessage(const AppUpdater::UpdateEvent & e)
+void OrganicApplication::newMessage(const AppUpdateEvent & e)
 {
 	switch (e.type)
 	{
-        case AppUpdater::UpdateEvent::DOWNLOAD_STARTED:
-            ShapeShifterManager::getInstance()->showContent("Logger");
-            break;
+    case AppUpdateEvent::DOWNLOAD_STARTED:
+        ShapeShifterManager::getInstance()->showContent("Logger");
+        break;
             
-	case AppUpdater::UpdateEvent::UPDATE_FINISHED:
+	case AppUpdateEvent::UPDATE_FINISHED:
 	{
 
 #if JUCE_WINDOWS
