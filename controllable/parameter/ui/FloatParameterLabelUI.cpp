@@ -25,7 +25,7 @@ maxFontHeight(12),
 
 	valueLabel.setJustificationType(Justification::centred);
 	valueLabel.setColour(Label::ColourIds::textColourId, TEXT_COLOR);
-	valueLabel.setEditable(false, parameter->isEditable);
+	valueLabel.setEditable(false, parameter->isEditable && !forceFeedbackOnly);
 	valueLabel.addListener(this);
 
 	
@@ -41,6 +41,7 @@ maxFontHeight(12),
 	valueChanged(parameter->getValue());
 	
 	addMouseListener(this, true);
+
 }
 
 void FloatParameterLabelUI::setAutoSize(bool value)
@@ -74,6 +75,8 @@ void FloatParameterLabelUI::setNameLabelVisible(bool visible)
 void FloatParameterLabelUI::setForceFeedbackOnlyInternal()
 {
 	valueLabel.setEditable(false, parameter->isEditable && !forceFeedbackOnly);
+	valueLabel.setEnabled(parameter->isEditable && !forceFeedbackOnly);
+	setOpaqueBackground(opaqueBackground); //force refresh color
 }
 
 /*
@@ -101,6 +104,8 @@ void FloatParameterLabelUI::resized()
 
 void FloatParameterLabelUI::mouseDown(const MouseEvent & e)
 {
+	if (!parameter->isEditable || forceFeedbackOnly) return;
+	initValue = parameter->floatValue();
 	if (e.eventComponent == &valueLabel)
 	{
 		if (e.mods.isLeftButtonDown()) valueAtMouseDown = parameter->floatValue();
@@ -113,6 +118,7 @@ void FloatParameterLabelUI::mouseDown(const MouseEvent & e)
 
 void FloatParameterLabelUI::mouseDrag(const MouseEvent & e)
 {
+	if (!parameter->isEditable || forceFeedbackOnly) return;
 	if (valueLabel.getMouseCursor() != MouseCursor::LeftRightResizeCursor)
 	{
 		valueLabel.setMouseCursor(MouseCursor::LeftRightResizeCursor);
@@ -124,13 +130,16 @@ void FloatParameterLabelUI::mouseDrag(const MouseEvent & e)
 
 void FloatParameterLabelUI::mouseUp(const MouseEvent & e)
 {
+	if (!parameter->isEditable || forceFeedbackOnly) return;
 	valueLabel.setMouseCursor(MouseCursor::NormalCursor);
 	valueLabel.updateMouseCursor();
+
+	if (initValue != parameter->floatValue()) parameter->setUndoableValue(initValue, parameter->floatValue());
 }
 
 void FloatParameterLabelUI::valueChanged(const var & v)
 {
-	valueLabel.setText(prefix + (v.isString()?v.toString():String(parameter->floatValue(),3)) + suffix, NotificationType::dontSendNotification);
+	valueLabel.setText(prefix + (v.isDouble()?String(parameter->floatValue(),3): v.toString()) + suffix, NotificationType::dontSendNotification);
 	
 	if (autoSize)
 	{

@@ -24,12 +24,12 @@ StringParameterUI::StringParameterUI(Parameter * p) :
     valueLabel.setJustificationType(Justification::topLeft);
     valueLabel.setText(parameter->value,NotificationType::dontSendNotification);
     valueLabel.setEnabled(parameter->isEditable && !forceFeedbackOnly);
-	valueLabel.setEditable(false,parameter->isEditable && !forceFeedbackOnly);
+	valueLabel.setEditable(false, parameter->isEditable && !forceFeedbackOnly);
 	valueLabel.addListener(this);
 
 	valueLabel.setColour(valueLabel.backgroundWhenEditingColourId, Colours::black);
 	valueLabel.setColour(valueLabel.textWhenEditingColourId, Colours::white);
-	valueLabel.setColour(valueLabel.textColourId, parameter->isEditable ? TEXT_COLOR : TEXT_COLOR.withAlpha(.6f));
+	valueLabel.setColour(valueLabel.textColourId, parameter->isEditable && !forceFeedbackOnly ? TEXT_COLOR : TEXT_COLOR.withAlpha(.6f));
 	valueLabel.setColour(CaretComponent::caretColourId, Colours::orange);
 	
 	valueLabel.addMouseListener(this, false);

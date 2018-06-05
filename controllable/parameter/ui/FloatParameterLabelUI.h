@@ -27,6 +27,8 @@ public:
 	String prefix;
 	String suffix;
 
+	float initValue;
+
 	float maxFontHeight;
 
 	const float pixelsPerUnit = 10; //1 = 10pixel
@@ -40,6 +42,8 @@ public:
 
 	bool nameLabelIsVisible;
 	void setNameLabelVisible(bool visible);
+
+	
 
 	virtual void setForceFeedbackOnlyInternal() override;
 
