@@ -1,6 +1,6 @@
 class EngineListener {
 public:
-	virtual ~EngineListener() {};
+	virtual ~EngineListener();
 
 	virtual void startLoadFile() {};
 	// TODO implement progression

@@ -153,3 +153,10 @@ void Engine::timerCallback()
 		autoSaveIndex = (autoSaveIndex + 1) % GlobalSettings::getInstance()->autoSaveCount->intValue();
 	}
 }
+
+//Engine Listener here
+
+EngineListener::~EngineListener()
+{
+	if (Engine::mainEngine != nullptr) Engine::mainEngine->removeEngineListener(this);
+}
