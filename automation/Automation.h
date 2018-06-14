@@ -27,7 +27,7 @@ class Automation :
 	public BaseManager<AutomationKey>
 {
 public:
-	Automation(AutomationRecorder * recorder = nullptr);
+	Automation(const String &name = "Automation", AutomationRecorder * recorder = nullptr);
 	virtual ~Automation();
 
 

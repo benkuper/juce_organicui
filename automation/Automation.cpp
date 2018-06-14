@@ -9,12 +9,13 @@
 
 AutomationKeyComparator Automation::comparator;
 
-Automation::Automation(AutomationRecorder * _recorder) :
-	BaseManager("Automation"),
+Automation::Automation(const String &name, AutomationRecorder * _recorder) :
+	BaseManager(name),
 	recorder(_recorder),
 	showUIInEditor(false)
 {
-	itemDataType = "AutomationKey";
+	itemDataType = "AutomationKey"; 
+	editorCanBeCollapsed = false;
 
 	length = addFloatParameter("Length", "Length of the automation", 1, .1f, INT32_MAX);
 	length->defaultUI = FloatParameter::TIME;
@@ -26,8 +27,8 @@ Automation::Automation(AutomationRecorder * _recorder) :
 	value->hideInEditor = true;
 	value->isControllableFeedbackOnly = true;
 
-	enableSnap = addBoolParameter("Enable Snap", "If enabled, moving keys will be automatically adjusted to interesting positions such as automation position", true);
-	snapSensitivity = addFloatParameter("Snap Sensitivity", "Controls the sensitivity of the snapping, if enabled.\nThe greater the value, the more likely a position will be snapped.", .5f, 0, 3);
+	enableSnap = addBoolParameter("Enable Snap", "If enabled, moving keys will be automatically adjusted to interesting positions such as automation position", false);
+	snapSensitivity = addFloatParameter("Snap Sensitivity", "Controls the sensitivity of the snapping, if enabled.\nThe greater the value, the more likely a position will be snapped.", .5f, 0, 3, false);
 	enableSnap->hideInEditor = true;
 	snapSensitivity->hideInEditor = true; 
 

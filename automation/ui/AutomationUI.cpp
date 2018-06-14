@@ -33,6 +33,8 @@ AutomationUI::AutomationUI(Automation * _automation, Colour c) :
 	noItemText = "Add keys by double-clicking here";
 
 	setSize(100, 100);
+
+	updateROI();
 }
 
 AutomationUI::~AutomationUI()
