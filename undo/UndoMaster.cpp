@@ -21,7 +21,7 @@ UndoMaster::~UndoMaster()
 
 void UndoMaster::performAction(const String & name, UndoableAction * action)
 {
-	if (Engine::mainEngine->isLoadingFile) return;
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile) return;
 	isPerforming = true;
 	beginNewTransaction(name);
 	perform(action,name);
@@ -31,7 +31,7 @@ void UndoMaster::performAction(const String & name, UndoableAction * action)
 
 void UndoMaster::performActions(const String & name, Array<UndoableAction*> actions)
 {
-	if (Engine::mainEngine->isLoadingFile) return;
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile) return;
 	isPerforming = true;
 	beginNewTransaction(name);
 	for (auto &a : actions) perform(a,name);

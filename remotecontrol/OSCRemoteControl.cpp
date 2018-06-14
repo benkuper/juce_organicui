@@ -106,6 +106,16 @@ void OSCRemoteControl::processMessage(const OSCMessage & m)
 			else static_cast<ColorParameter *>(p)->setColor(Colour::fromFloatRGBA(OSCHelpers::getFloatArg(m[0]), OSCHelpers::getFloatArg(m[1]), OSCHelpers::getFloatArg(m[2]), m.size() >= 4 ? OSCHelpers::getFloatArg(m[0]) : 1));
 			break;
 
+		case Controllable::POINT2D:
+			if (m.size() < 2) NLOG(niceName, "Parameter " << p->niceName << " requires at least 2 argument");
+			else static_cast<Point2DParameter *>(p)->setPoint(OSCHelpers::getFloatArg(m[0]), OSCHelpers::getFloatArg(m[1]));
+			break;
+
+		case Controllable::POINT3D: 
+			if (m.size() < 3) NLOG(niceName, "Parameter " << p->niceName << " requires at least 3 argument");
+			else static_cast<Point3DParameter *>(p)->setVector(OSCHelpers::getFloatArg(m[0]), OSCHelpers::getFloatArg(m[1]), OSCHelpers::getFloatArg(m[2]));
+			break;
+
 		default:
 			NLOG(niceName, "Type not handled : " << c->getTypeString());
 			break;

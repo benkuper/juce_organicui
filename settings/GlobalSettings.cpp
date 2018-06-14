@@ -23,9 +23,9 @@ GlobalSettings::GlobalSettings() :
 	checkBetaUpdates = startupCC.addBoolParameter("Check for beta updates", "If enabled the app will also check for beta versions of the software", true);
 	onlyCheckBetaFromBeta = startupCC.addBoolParameter("Only Check beta from beta versions", "If enabled the app will only check beta version when running a beta version itself", true);
 	updateHelpOnStartup = startupCC.addBoolParameter("Update help on startup", "If enabled, app will try and download the last help file locally", true);
-	openLastDocumentOnStartup = startupCC.addBoolParameter("Load last noisette on startup", "If enabled, app will load the last noisette on startup", false);
-	openSpecificFileOnStartup = startupCC.addBoolParameter("Load specific noisette on startup", "If enabled, app will load the noisette specified below on startup", false,false);
-	
+	openLastDocumentOnStartup = startupCC.addBoolParameter("Load last "+Engine::mainEngine->fileExtension+" on startup", "If enabled, app will load the last " + Engine::mainEngine->fileExtension + " on startup", false);
+	openSpecificFileOnStartup = startupCC.addBoolParameter("Load specific "+Engine::mainEngine->fileExtension+" on startup", "If enabled, app will load the " + Engine::mainEngine->fileExtension + " specified below on startup", false,false);
+	 
 	fileToOpenOnStartup = new FileParameter("File to load on startup", "File to load when start, if the option above is checked", "", false);
 	startupCC.addParameter(fileToOpenOnStartup);
 
