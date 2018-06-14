@@ -635,7 +635,7 @@ var ControllableContainer::getJSONData()
 	var paramsData;
 
 	
-	Array<WeakReference<Controllable>> cont = ControllableContainer::getAllControllables(saveAndLoadRecursiveData, true);
+	Array<WeakReference<Controllable>> cont = getAllControllables(false, true);
 
 	for (auto &wc : cont) {
 		if (wc->type == Controllable::TRIGGER && !includeTriggersInSaveLoad) continue;
@@ -656,6 +656,18 @@ var ControllableContainer::getJSONData()
 	}
 
 	if (editorIsCollapsed) data.getDynamicObject()->setProperty("editorIsCollapsed", true); //only set if true to avoid too much data
+
+
+	if (saveAndLoadRecursiveData)
+	{
+		var ccData = new DynamicObject();
+		for (auto &cc : controllableContainers)
+		{
+			ccData.getDynamicObject()->setProperty(cc->shortName, cc->getJSONData());
+		}
+
+		if(ccData.getDynamicObject()->getProperties().size() > 0) data.getDynamicObject()->setProperty("containers", ccData);
+	}
 
 	return data;
 }
@@ -679,7 +691,7 @@ void ControllableContainer::loadJSONData(var data, bool createIfNotThere)
 			DynamicObject * o = pData.getDynamicObject();
 			String pControlAddress = o->getProperty("controlAddress");
 
-			Controllable * c = getControllableForAddress(pControlAddress, saveAndLoadRecursiveData, true);
+			Controllable * c = getControllableByName(pControlAddress, true);
 
 			if (c != nullptr)
 			{
@@ -696,6 +708,16 @@ void ControllableContainer::loadJSONData(var data, bool createIfNotThere)
 					c->loadJSONData(pData);
 					addControllable(c);
 				}
+			}
+		}
+
+		if (saveAndLoadRecursiveData && data.hasProperty("containers"))
+		{
+			NamedValueSet ccData = data.getDynamicObject()->getProperties();
+			for (auto &nv : ccData)
+			{
+				ControllableContainer * cc = getControllableContainerByName(nv.name.toString());
+				if (cc != nullptr) cc->loadJSONData(nv.value);
 			}
 		}
 	}
@@ -835,11 +857,13 @@ InspectableEditor * EnablingControllableContainer::getEditor(bool isRoot)
 ControllableContainer * ControllableContainer::ControllableContainerAction::getControllableContainer()
 {
 	if (containerRef != nullptr && !containerRef.wasObjectDeleted()) return containerRef.get();
-	else
+	else if(Engine::mainEngine != nullptr)
 	{
 		ControllableContainer * cc = Engine::mainEngine->getControllableContainerForAddress(controlAddress, true);
 		return cc;
 	}
+
+	return nullptr;
 }
 
 
