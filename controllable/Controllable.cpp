@@ -256,11 +256,13 @@ var Controllable::setValueFromScript(const juce::var::NativeFunctionArgs& a) {
 Controllable * Controllable::ControllableAction::getControllable()
 {
 	if (controllableRef != nullptr && !controllableRef.wasObjectDeleted()) return controllableRef.get();
-	else
+	else if(Engine::mainEngine != nullptr)
 	{
 		Controllable * c = Engine::mainEngine->getControllableForAddress(controlAddress, true);
 		return c;
 	}
+
+	return nullptr;
 }
 
 bool Controllable::ControllableChangeNameAction::perform()

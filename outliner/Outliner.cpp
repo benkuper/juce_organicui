@@ -15,7 +15,8 @@ Outliner::Outliner(const String &contentName) :
 	ShapeShifterContentComponent(contentName),
 	enabled(true)
 {
-	Engine::mainEngine->addControllableContainerListener(this);
+
+	if(Engine::mainEngine != nullptr) Engine::mainEngine->addControllableContainerListener(this);
 
 	showHiddenContainers = false;
 	
@@ -34,8 +35,7 @@ Outliner::Outliner(const String &contentName) :
 Outliner::~Outliner()
 {
 	//DBG("Outliner destroy, engine ?" << (int)Engine::mainEngine);
-	if (Engine::mainEngine != nullptr) 
-		Engine::mainEngine->removeControllableContainerListener(this);
+	if (Engine::mainEngine != nullptr) Engine::mainEngine->removeControllableContainerListener(this);
 
 }
 

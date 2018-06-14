@@ -107,6 +107,8 @@ void AppUpdater::downloadUpdate()
 
 void AppUpdater::run()
 {
+	if (Engine::mainEngine == nullptr) return;
+
     //First cleanup update_temp directory
     targetDir = File::getSpecialLocation(File::currentApplicationFile).getParentDirectory().getChildFile("update_temp");
     if (targetDir.exists()) targetDir.deleteRecursively();

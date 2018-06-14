@@ -49,7 +49,7 @@ Script::~Script()
 
 void Script::loadScript()
 {
-	if (Engine::mainEngine->isLoadingFile)
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile)
 	{
 		Engine::mainEngine->addEngineListener(this);
 		//return;
@@ -202,7 +202,7 @@ void Script::loadJSONDataInternal(var data)
 
 void Script::endLoadFile()
 {
-	Engine::mainEngine->removeEngineListener(this);
+	if(Engine::mainEngine != nullptr) Engine::mainEngine->removeEngineListener(this);
 	loadScript();
 }
 

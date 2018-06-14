@@ -163,7 +163,7 @@ public:
 
 		BaseManager<T> * getManager() {
 			if (managerRef != nullptr && !managerRef.wasObjectDeleted()) return dynamic_cast<BaseManager<T> *>(managerRef.get());
-			else
+			else if(Engine::mainEngine != nullptr)
 			{
 				ControllableContainer * cc = Engine::mainEngine->getControllableContainerForAddress(managerControlAddress, true);
 				if (cc != nullptr) return dynamic_cast<BaseManager<T> *>(cc);

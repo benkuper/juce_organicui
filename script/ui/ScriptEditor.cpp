@@ -117,8 +117,12 @@ void ScriptEditor::buttonClicked(Button * b)
 		
 		if (script->filePath->stringValue().isEmpty()) return;
 
-		File f(Engine::mainEngine->getFile().getParentDirectory().getChildFile(script->filePath->stringValue()));
-		f.startAsProcess();
+		File f = File();
+		if (Engine::mainEngine != nullptr) f = Engine::mainEngine->getFile().getParentDirectory().getChildFile(script->filePath->stringValue());
+		else f = File(script->filePath->getAbsolutePath());
+
+		if(f.existsAsFile()) f.startAsProcess();
+		
 		//editMode = !editMode;
 		//resized();
 	}

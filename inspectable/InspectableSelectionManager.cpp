@@ -39,7 +39,7 @@ void InspectableSelectionManager::setEnabled(bool value)
 void InspectableSelectionManager::selectInspectables(Array<Inspectable*> inspectables, bool doClearSelection, bool notify)
 {
 	if (!enabled) return;
-	if (Engine::mainEngine->isLoadingFile) return;
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile) return;
 
 	activeSelectionManager = this;
 
@@ -56,7 +56,7 @@ void InspectableSelectionManager::selectInspectables(Array<Inspectable*> inspect
 void InspectableSelectionManager::selectInspectable(WeakReference<Inspectable> inspectable, bool doClearSelection, bool notify)
 {
 	if (!enabled) return;
-	if (Engine::mainEngine->isLoadingFile) return;
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile) return;
 
 	if (currentInspectables.contains(inspectable)) return;
 	

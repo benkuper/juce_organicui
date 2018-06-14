@@ -220,7 +220,7 @@ BaseManagerUI<M, T, U>::BaseManagerUI(const String & contentName, M * _manager, 
 
 	setShowAddButton(baseM->userCanAddItemsManually);
 
-	Engine::mainEngine->addEngineListener(this);
+	if(Engine::mainEngine != nullptr) Engine::mainEngine->addEngineListener(this);
 
 	//must call addExistingItems from child class to get overrides
 
@@ -237,7 +237,7 @@ BaseManagerUI<M, T, U>::~BaseManagerUI()
 		this->manager->removeAsyncManagerListener(this);
 	}
 
-	if (Engine::mainEngine) Engine::mainEngine->removeEngineListener(this);
+	if (Engine::mainEngine != nullptr) Engine::mainEngine->removeEngineListener(this);
 }
 
 template<class M, class T, class U>

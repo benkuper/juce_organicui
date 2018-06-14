@@ -62,7 +62,7 @@ void OSCRemoteControl::processMessage(const OSCMessage & m)
 {
 	String add = m.getAddressPattern().toString();
 
-	Controllable * c = Engine::mainEngine->getControllableForAddress(add);
+	Controllable * c = Engine::mainEngine != nullptr ? Engine::mainEngine->getControllableForAddress(add) : nullptr;
 
 	if (c == nullptr)
 	{

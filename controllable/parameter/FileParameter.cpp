@@ -49,6 +49,7 @@ void FileParameter::setForceRelativePath(bool force)
 bool FileParameter::isRelativePath(const String & p)
 {
 	if (p.isEmpty()) return false;
+	if (Engine::mainEngine == nullptr) return false;
 	if (File::isAbsolutePath(p)) return !File(p).getRelativePathFrom(Engine::mainEngine->getFile().getParentDirectory()).contains("..");
 	return Engine::mainEngine->getFile().getParentDirectory().getChildFile(p).exists();
 }
@@ -57,6 +58,7 @@ String FileParameter::getAbsolutePath() const
 {
 	if (value.toString().isEmpty()) return "";
 	if (File::isAbsolutePath(value.toString())) return value.toString();
+	if (Engine::mainEngine == nullptr) return value.toString();
 	return Engine::mainEngine->getFile().getParentDirectory().getChildFile(value.toString()).getFullPathName();
 }
 

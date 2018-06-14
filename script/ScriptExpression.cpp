@@ -13,7 +13,7 @@ Author:  Ben
 ScriptExpression::ScriptExpression() :
 	state(EXPRESSION_EMPTY)
 {
-	Engine::mainEngine->addScriptTargetListener(this);
+	if(Engine::mainEngine != nullptr) Engine::mainEngine->addScriptTargetListener(this);
 }
 
 ScriptExpression::~ScriptExpression()
@@ -49,7 +49,7 @@ void ScriptExpression::setExpression(const String & newExpression)
 	
 	expression = newExpression;
 
-	if (Engine::mainEngine->isLoadingFile)
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile)
 	{
 		Engine::mainEngine->addEngineListener(this);
 		return;
@@ -152,7 +152,7 @@ void ScriptExpression::scriptObjectUpdated(ScriptTarget *)
 
 void ScriptExpression::endLoadFile()
 {
-	Engine::mainEngine->removeEngineListener(this);
+	if (Engine::mainEngine != nullptr) Engine::mainEngine->removeEngineListener(this);
 	setExpression(expression);
 }
 
@@ -166,7 +166,7 @@ Array<Parameter*> ScriptExpression::getParameterReferencesInExpression()
 	for (int i = 0; i < matches.size(); i++)
 	{
 		String scriptToAddress = "/"+matches[i][1].replaceCharacter('.', '/');
-		Controllable * c = Engine::mainEngine->getControllableForAddress(scriptToAddress);
+		Controllable * c = Engine::mainEngine != nullptr ? Engine::mainEngine->getControllableForAddress(scriptToAddress) : nullptr;
 		Parameter * p = dynamic_cast<Parameter *>(c);
 		if (p != nullptr) result.add(p);
 	}

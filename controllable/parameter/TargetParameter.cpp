@@ -135,7 +135,7 @@ void TargetParameter::setTarget(WeakReference<ControllableContainer> cc)
 
 void TargetParameter::childStructureChanged(ControllableContainer * cc)
 {
-	if (Engine::mainEngine->isClearing) return;
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->isClearing) return;
 
 	if (targetType == CONTROLLABLE)
 	{
@@ -188,15 +188,6 @@ void TargetParameter::controllableContainerRemoved(ControllableContainer * cc)
 
 void TargetParameter::endLoadFile()
 {
-	//DBG("End load file, ghost is " << ghostValue << ", try retargeting");
-	/*
-	Engine::mainEngine->removeEngineListener(this);
-	if (target == nullptr && ghostValue.isNotEmpty())
-	{
-		WeakReference<Controllable> c = rootContainer->getControllableForAddress(ghostValue);
-		if (c != nullptr) setValueFromTarget(c);
-	}
-	*/
 }
 
 TargetParameterUI * TargetParameter::createTargetUI(TargetParameter * _target)
