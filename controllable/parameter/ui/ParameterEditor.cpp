@@ -125,7 +125,9 @@ void ParameterEditor::updateUI()
 	break;
 	}
 
-	setSize(getWidth(), baseHeight + subContentHeight);
+	int targetHeight = baseHeight + subContentHeight;
+	if (targetHeight == getHeight()) resized();
+	else setSize(getWidth(), targetHeight);
 }
 
 void ParameterEditor::newMessage(const Parameter::ParameterEvent & e)
