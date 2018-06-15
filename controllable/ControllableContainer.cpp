@@ -691,7 +691,7 @@ void ControllableContainer::loadJSONData(var data, bool createIfNotThere)
 			DynamicObject * o = pData.getDynamicObject();
 			String pControlAddress = o->getProperty("controlAddress");
 
-			Controllable * c = getControllableByName(pControlAddress, true);
+			Controllable * c = getControllableForAddress(pControlAddress, false);
 
 			if (c != nullptr)
 			{
@@ -710,15 +710,15 @@ void ControllableContainer::loadJSONData(var data, bool createIfNotThere)
 				}
 			}
 		}
+	}
 
-		if (saveAndLoadRecursiveData && data.hasProperty("containers"))
+	if (saveAndLoadRecursiveData && data.hasProperty("containers"))
+	{
+		NamedValueSet ccData = data.getProperty("containers",var()).getDynamicObject()->getProperties();
+		for (auto &nv : ccData)
 		{
-			NamedValueSet ccData = data.getDynamicObject()->getProperties();
-			for (auto &nv : ccData)
-			{
-				ControllableContainer * cc = getControllableContainerByName(nv.name.toString());
-				if (cc != nullptr) cc->loadJSONData(nv.value);
-			}
+			ControllableContainer * cc = getControllableContainerByName(nv.name.toString());
+			if (cc != nullptr) cc->loadJSONData(nv.value);
 		}
 	}
 
