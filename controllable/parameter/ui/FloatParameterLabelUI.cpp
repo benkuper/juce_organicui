@@ -104,16 +104,15 @@ void FloatParameterLabelUI::resized()
 
 void FloatParameterLabelUI::mouseDown(const MouseEvent & e)
 {
-	if (!parameter->isEditable || forceFeedbackOnly) return;
-	initValue = parameter->floatValue();
-	if (e.eventComponent == &valueLabel)
-	{
-		if (e.mods.isLeftButtonDown()) valueAtMouseDown = parameter->floatValue();
-		ParameterUI::mouseDown(e.getEventRelativeTo(this));
-	} else
+	if (!parameter->isEditable || forceFeedbackOnly || e.eventComponent != &valueLabel)
 	{
 		ParameterUI::mouseDown(e);
+		return;
 	}
+
+	if (e.mods.isLeftButtonDown()) valueAtMouseDown = parameter->floatValue();
+	ParameterUI::mouseDown(e.getEventRelativeTo(this));
+	
 }
 
 void FloatParameterLabelUI::mouseDrag(const MouseEvent & e)
