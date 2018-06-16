@@ -25,7 +25,7 @@ maxFontHeight(12),
 
 	valueLabel.setJustificationType(Justification::centred);
 	valueLabel.setColour(Label::ColourIds::textColourId, TEXT_COLOR);
-	valueLabel.setEditable(false, parameter->isEditable && !forceFeedbackOnly);
+	
 	valueLabel.addListener(this);
 
 	
@@ -38,8 +38,10 @@ maxFontHeight(12),
 	showEditWindowOnDoubleClick = false;
 
 	setSize(200, 20);//default size
-	valueChanged(parameter->getValue());
-	
+
+	valueChanged(parameter->getValue());	
+	feedbackStateChanged();
+
 	addMouseListener(this, true);
 
 }
@@ -72,10 +74,10 @@ void FloatParameterLabelUI::setNameLabelVisible(bool visible)
 }
 
 
-void FloatParameterLabelUI::setForceFeedbackOnlyInternal()
+void FloatParameterLabelUI::feedbackStateChanged()
 {
-	valueLabel.setEditable(false, parameter->isEditable && !forceFeedbackOnly);
-	valueLabel.setEnabled(parameter->isEditable && !forceFeedbackOnly);
+	valueLabel.setEditable(false, isInteractable());
+	valueLabel.setEnabled(isInteractable());
 	setOpaqueBackground(opaqueBackground); //force refresh color
 }
 
@@ -104,7 +106,7 @@ void FloatParameterLabelUI::resized()
 
 void FloatParameterLabelUI::mouseDown(const MouseEvent & e)
 {
-	if (!parameter->isEditable || forceFeedbackOnly || e.eventComponent != &valueLabel)
+	if (!isInteractable() || e.eventComponent != &valueLabel)
 	{
 		ParameterUI::mouseDown(e);
 		return;
@@ -117,7 +119,7 @@ void FloatParameterLabelUI::mouseDown(const MouseEvent & e)
 
 void FloatParameterLabelUI::mouseDrag(const MouseEvent & e)
 {
-	if (!parameter->isEditable || forceFeedbackOnly) return;
+	if (!isInteractable()) return;
 	if (valueLabel.getMouseCursor() != MouseCursor::LeftRightResizeCursor)
 	{
 		valueLabel.setMouseCursor(MouseCursor::LeftRightResizeCursor);
@@ -129,7 +131,7 @@ void FloatParameterLabelUI::mouseDrag(const MouseEvent & e)
 
 void FloatParameterLabelUI::mouseUp(const MouseEvent & e)
 {
-	if (!parameter->isEditable || forceFeedbackOnly) return;
+	if (!isInteractable()) return;
 	valueLabel.setMouseCursor(MouseCursor::NormalCursor);
 	valueLabel.updateMouseCursor();
 

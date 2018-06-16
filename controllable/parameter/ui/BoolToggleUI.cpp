@@ -14,16 +14,15 @@ BoolToggleUI::BoolToggleUI(Parameter * parameter) :
 {
 	showEditWindowOnDoubleClick = false;
 
-	if (parameter->isEditable && !forceFeedbackOnly)
+	if (isInteractable())
 	{
 		setImages(ImageCache::getFromMemory(OrganicUIBinaryData::checkbox_on_png, OrganicUIBinaryData::checkbox_on_pngSize), ImageCache::getFromMemory(OrganicUIBinaryData::checkbox_off_png, OrganicUIBinaryData::checkbox_off_pngSize));
+		setRepaintsOnMouseActivity(true);
 	} else
 	{
 		setImages(ImageCache::getFromMemory(OrganicUIBinaryData::checkbox_on_readonly_png, OrganicUIBinaryData::checkbox_on_readonly_pngSize), ImageCache::getFromMemory(OrganicUIBinaryData::checkbox_off_readonly_png, OrganicUIBinaryData::checkbox_off_readonly_pngSize));
 	}
 
-	if(parameter->isEditable && !parameter->isControllableFeedbackOnly) setRepaintsOnMouseActivity(true);
-	else setInterceptsMouseClicks(false, false);
     setSize(10,10);
 }
 
@@ -77,14 +76,14 @@ void BoolToggleUI::paint(Graphics & g)
 
 void BoolToggleUI::mouseDownInternal(const MouseEvent & e)
 {
-	if (!parameter->isEditable || forceFeedbackOnly) return;
+	if (!isInteractable()) return;
 	if (e.mods.isRightButtonDown()) parameter->setValue(parameter->boolValue(), !parameter->boolValue());
 	else parameter->setUndoableValue(parameter->boolValue(), !parameter->boolValue()); //only undoable when from left button, real toggle behaviour
 }
 
 void BoolToggleUI::mouseUpInternal(const MouseEvent & e)
 {
-	if (!parameter->isEditable || forceFeedbackOnly) return;
+	if (isInteractable()) return;
     if (e.mods.isRightButtonDown()) parameter->setValue(!parameter->boolValue());
 }
 

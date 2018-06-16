@@ -45,7 +45,7 @@ public:
 
 	
 
-	virtual void setForceFeedbackOnlyInternal() override;
+	virtual void feedbackStateChanged() override;
 
 
 	//void paint(Graphics &g) override;

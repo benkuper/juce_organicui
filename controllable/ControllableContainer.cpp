@@ -642,7 +642,7 @@ var ControllableContainer::getJSONData()
 		if (wc.wasObjectDeleted()) continue;
 		if (!wc->isSavable) continue;
 		Parameter * p = dynamic_cast<Parameter *>(wc.get());
-		if (p != nullptr && p->saveValueOnly && !p->isOverriden && !p->forceSaveValue && p->controlMode == Parameter::ControlMode::MANUAL) continue; //do not save parameters that have not changed. it should light up the file. But save custom-made parameters even if there not overriden !
+		if (p != nullptr && p->saveValueOnly && !p->isControllableFeedbackOnly && !p->isOverriden && !p->forceSaveValue && p->controlMode == Parameter::ControlMode::MANUAL) continue; //do not save parameters that have not changed. it should light up the file. But save custom-made parameters even if there not overriden !
 		paramsData.append(wc->getJSONData(this));
 	}
 

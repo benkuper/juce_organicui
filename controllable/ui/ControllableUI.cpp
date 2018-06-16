@@ -13,8 +13,7 @@ ControllableUI::ControllableUI(Controllable * controllable) :
 	controllable(controllable),
 	showLabel(true),
 	opaqueBackground(false),
-	showMenuOnRightClick(true),
-	forceFeedbackOnly(controllable->isControllableFeedbackOnly)
+	showMenuOnRightClick(true)
 {
 	jassert(controllable != nullptr);
 	updateTooltip();
@@ -53,15 +52,20 @@ void ControllableUI::mouseDown(const MouseEvent & e)
 		}
 	} else
 	{
-		mouseDownInternal(e);
+		if(isInteractable()) mouseDownInternal(e);
 	}
 }
 
 void ControllableUI::mouseUp(const MouseEvent & e)
 {
 	if (e.mods.isRightButtonDown()) return;
-	mouseUpInternal(e);
+	if(isInteractable()) mouseUpInternal(e);
 
+}
+
+bool ControllableUI::isInteractable()
+{
+	return controllable->enabled && !controllable->isControllableFeedbackOnly;
 }
 
 void ControllableUI::showContextMenu()
@@ -106,34 +110,38 @@ void ControllableUI::setOpaqueBackground(bool value)
 	opaqueBackground = value;
 }
 
-void ControllableUI::setForceFeedbackOnly(bool value)
-{
-	setRepaintsOnMouseActivity(false);
-	forceFeedbackOnly = value;
-	setForceFeedbackOnlyInternal();
-	repaint();
-}
-
 void ControllableUI::newMessage(const Controllable::ControllableEvent & e)
 {
 	switch (e.type)
 	{
 	case Controllable::ControllableEvent::CONTROLADDRESS_CHANGED:
+	{
+		updateTooltip();
 		controllableControlAddressChanged();
+
+	}
 		break;
 
 	case Controllable::ControllableEvent::NAME_CHANGED:
 		break;
 
 	case Controllable::ControllableEvent::STATE_CHANGED:
+	{
+		setEnabled(controllable->enabled);
+		setAlpha(controllable->enabled ? 1 : .5f);
+		setInterceptsMouseClicks(isInteractable(), isInteractable());
 		controllableStateChanged();
+	}
 		break;
 
 	case Controllable::ControllableEvent::CONTROLLABLE_REMOVED:
 		break;
 
 	case Controllable::ControllableEvent::FEEDBACK_STATE_CHANGED:
+	{
+		setInterceptsMouseClicks(isInteractable(), isInteractable());
 		feedbackStateChanged();
+	}
 		break;
 
 	default:
@@ -143,23 +151,6 @@ void ControllableUI::newMessage(const Controllable::ControllableEvent & e)
 	}
 }
 
-void ControllableUI::controllableStateChanged()
-{
-	setEnabled(controllable->enabled);
-	setAlpha(controllable->enabled ? 1 : .5f);
-	setInterceptsMouseClicks(controllable->enabled, controllable->enabled);
-}
-
-void ControllableUI::feedbackStateChanged()
-{
-	setForceFeedbackOnly(controllable->isControllableFeedbackOnly);
-}
-
-void ControllableUI::controllableControlAddressChanged()
-{
-	updateTooltip();
-}
-
 void ControllableUI::updateTooltip()
 {
 	tooltip = controllable->description + "\nControl Address : " + controllable->controlAddress;
@@ -167,7 +158,7 @@ void ControllableUI::updateTooltip()
 	if (controllable->type != Controllable::Type::TRIGGER)
 	{
 		tooltip += " (" + controllable->argumentsDescription + ")";
-		if (((Parameter *)controllable.get())->isEditable == false) readOnly = true;
+		if (((Parameter *)controllable.get())->isControllableFeedbackOnly == false) readOnly = true;
 
 	}
 	if (controllable->isControllableFeedbackOnly) readOnly = true;

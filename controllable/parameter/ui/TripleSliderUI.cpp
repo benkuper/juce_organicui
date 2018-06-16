@@ -43,7 +43,7 @@ TripleSliderUI::TripleSliderUI(Point3DParameter * parameter) :
 
 	setInterceptsMouseClicks(true, true);
 
-	setForceFeedbackOnlyInternal(); //force update
+	feedbackStateChanged(); //force update
 }
 
 TripleSliderUI::~TripleSliderUI()
@@ -53,12 +53,11 @@ TripleSliderUI::~TripleSliderUI()
 	zParam.removeAsyncParameterListener(this);
 }
 
-void TripleSliderUI::setForceFeedbackOnlyInternal()
+void TripleSliderUI::feedbackStateChanged()
 {
-	bool val = parameter->isControllableFeedbackOnly || !parameter->isEditable || forceFeedbackOnly;
-	xSlider->setForceFeedbackOnly(val);
-	ySlider->setForceFeedbackOnly(val);
-	zSlider->setForceFeedbackOnly(val);
+	xParam.setControllableFeedbackOnly(isInteractable());
+	yParam.setControllableFeedbackOnly(isInteractable());
+	zParam.setControllableFeedbackOnly(isInteractable());
 
 }
 

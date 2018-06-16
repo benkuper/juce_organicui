@@ -44,7 +44,7 @@ void ColorParameterUI::mouseDownInternal(const MouseEvent & e)
 
 void ColorParameterUI::showEditWindow()
 {
-	if (!parameter->isEditable || parameter->isControllableFeedbackOnly) return;
+	if (!isInteractable()) return;
 
 	ColourSelector * selector = new ColourSelector();
 	selector->addChangeListener(this);

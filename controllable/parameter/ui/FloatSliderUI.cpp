@@ -49,7 +49,7 @@ void FloatSliderUI::paint(Graphics & g)
 
 	if (shouldBailOut()) return;
 	
-	Colour baseColour = useCustomColor ? customColor : ((parameter->isEditable && !parameter->isControllableFeedbackOnly && !forceFeedbackOnly)? PARAMETER_FRONT_COLOR : FEEDBACK_COLOR);
+	Colour baseColour = useCustomColor ? customColor : (isInteractable()? PARAMETER_FRONT_COLOR : FEEDBACK_COLOR);
     Colour c = (isMouseButtonDown() && changeParamOnMouseUpOnly) ? HIGHLIGHT_COLOR : baseColour;
 
     juce::Rectangle<int> sliderBounds = getLocalBounds();
@@ -111,8 +111,6 @@ void FloatSliderUI::paint(Graphics & g)
 
 void FloatSliderUI::mouseDownInternal(const MouseEvent & e)
 {
-	if (!parameter->isEditable || parameter->isControllableFeedbackOnly || forceFeedbackOnly) return;
-
     initValue = getParamNormalizedValue();
     setMouseCursor(MouseCursor::NoCursor);
 
@@ -134,7 +132,7 @@ void FloatSliderUI::mouseDownInternal(const MouseEvent & e)
 
 void FloatSliderUI::mouseDrag(const MouseEvent & e)
 {
-	if (!parameter->isEditable || parameter->isControllableFeedbackOnly || forceFeedbackOnly) return;
+	if (!isInteractable()) return;
 
 	if(changeParamOnMouseUpOnly) repaint();
     else
@@ -157,8 +155,6 @@ void FloatSliderUI::mouseDrag(const MouseEvent & e)
 
 void FloatSliderUI::mouseUpInternal(const MouseEvent &)
 {
-	if (!parameter->isEditable || parameter->isControllableFeedbackOnly || forceFeedbackOnly) return;
-
 	BailOutChecker checker (this);
 	
 	if (changeParamOnMouseUpOnly)

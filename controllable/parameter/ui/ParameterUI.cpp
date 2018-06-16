@@ -114,11 +114,11 @@ void ParameterUI::paintOverChildren(Graphics & g)
 
 void ParameterUI::addPopupMenuItems(PopupMenu * p)
 {
-	if (parameter->isEditable && (!parameter->isControllableFeedbackOnly || parameter->controlMode != Parameter::MANUAL))
+	if (isInteractable() || parameter->controlMode != Parameter::MANUAL)
 	{
 		p->addItem(1, "Reset value");
 
-		if (parameter->isEditable && !parameter->isControllableFeedbackOnly && showEditWindowOnRightClick)
+		if (isInteractable() && showEditWindowOnRightClick)
 		{
 			p->addSeparator();
 			p->addItem(-3, "Show Edit Window");
@@ -162,6 +162,11 @@ void ParameterUI::handleMenuSelectedID(int id)
 void ParameterUI::mouseDoubleClick(const MouseEvent & e)
 {
 	if (showEditWindowOnDoubleClick) showEditWindow();
+}
+
+bool ParameterUI::isInteractable()
+{
+	return ControllableUI::isInteractable() && parameter->controlMode == Parameter::ControlMode::MANUAL;
 }
 
 

@@ -1,4 +1,3 @@
-#include "Parameter.h"
 /*
   ==============================================================================
 
@@ -303,7 +302,7 @@ void Parameter::loadJSONDataInternal(var data)
 	else if (data.getDynamicObject()->hasProperty("paramAutomation") && automation != nullptr) automation->loadJSONData(data.getProperty("paramAutomation", var()));
 	else if (data.getDynamicObject()->hasProperty("reference") && referenceTarget != nullptr) referenceTarget->loadJSONData(data.getProperty("reference", var()));
 
- 	if (data.getDynamicObject()->hasProperty("editable")) isEditable = data.getProperty("editable", true);
+ 	if (data.getDynamicObject()->hasProperty("editable")) setControllableFeedbackOnly(!data.getProperty("editable", true));
 }
 
 var Parameter::getValueFromScript(const juce::var::NativeFunctionArgs & a)

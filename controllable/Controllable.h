@@ -47,7 +47,6 @@ public:
 	
 	//
 	bool enabled;
-	bool isEditable;
 	bool descriptionIsEditable;
 	bool hasCustomShortName;
 	bool isControllableExposed;

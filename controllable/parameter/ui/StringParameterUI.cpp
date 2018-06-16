@@ -23,16 +23,15 @@ StringParameterUI::StringParameterUI(Parameter * p) :
 
     valueLabel.setJustificationType(Justification::topLeft);
     valueLabel.setText(parameter->value,NotificationType::dontSendNotification);
-    valueLabel.setEnabled(parameter->isEditable && !forceFeedbackOnly);
-	valueLabel.setEditable(false, parameter->isEditable && !forceFeedbackOnly);
 	valueLabel.addListener(this);
 
 	valueLabel.setColour(valueLabel.backgroundWhenEditingColourId, Colours::black);
 	valueLabel.setColour(valueLabel.textWhenEditingColourId, Colours::white);
-	valueLabel.setColour(valueLabel.textColourId, parameter->isEditable && !forceFeedbackOnly ? TEXT_COLOR : TEXT_COLOR.withAlpha(.6f));
 	valueLabel.setColour(CaretComponent::caretColourId, Colours::orange);
 	
 	valueLabel.addMouseListener(this, false);
+
+	feedbackStateChanged();
 
     setSize(200, 20);//default size
 }
@@ -66,16 +65,15 @@ void StringParameterUI::setSuffix(const String & _suffix)
 void StringParameterUI::setOpaqueBackground(bool value)
 {
 	ParameterUI::setOpaqueBackground(value);
-	valueLabel.setColour(valueLabel.backgroundColourId, opaqueBackground ? (parameter->isEditable ? BG_COLOR.darker(.1f).withAlpha(.7f):BG_COLOR.brighter(.2f)) : Colours::transparentBlack);
+	valueLabel.setColour(valueLabel.backgroundColourId, opaqueBackground ? (isInteractable() ? BG_COLOR.darker(.1f).withAlpha(.7f):BG_COLOR.brighter(.2f)) : Colours::transparentBlack);
 	valueLabel.setColour(valueLabel.outlineColourId, opaqueBackground ? BG_COLOR.brighter(.1f):Colours::transparentWhite);
-	
+	valueLabel.setColour(valueLabel.textColourId, isInteractable() ? TEXT_COLOR : TEXT_COLOR.withAlpha(.6f));
 }
 
-void StringParameterUI::setForceFeedbackOnlyInternal()
+void StringParameterUI::feedbackStateChanged()
 {
-	ParameterUI::setForceFeedbackOnlyInternal();
-	valueLabel.setEditable(false, parameter->isEditable && !forceFeedbackOnly);
-	valueLabel.setEnabled(parameter->isEditable && !forceFeedbackOnly);
+	valueLabel.setEditable(isInteractable());
+	valueLabel.setEnabled(isInteractable());
 	setOpaqueBackground(opaqueBackground); //force refresh color
 }
 

@@ -39,7 +39,7 @@ public:
 
 	void setOpaqueBackground(bool value) override;
 
-	virtual void setForceFeedbackOnlyInternal() override;
+	virtual void feedbackStateChanged() override; 
 
 	//void paint(Graphics &g) override;
     void resized() override;

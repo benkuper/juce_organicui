@@ -49,8 +49,8 @@ void EnumParameterUI::updateComboBox()
 	}
 
 	cb.setSelectedId(keyIdMap[ep->stringValue()], dontSendNotification);
-	cb.setEnabled(parameter->enabled && !forceFeedbackOnly);
-	cb.setInterceptsMouseClicks(parameter->enabled && !forceFeedbackOnly, parameter->enabled && !forceFeedbackOnly);
+	cb.setEnabled(isInteractable());
+	cb.setInterceptsMouseClicks(isInteractable(), isInteractable());
 }
 
 String EnumParameterUI::getSelectedKey()
@@ -73,10 +73,9 @@ void EnumParameterUI::enumOptionRemoved(EnumParameter *, const String &)
 	updateComboBox();
 }
 
-void EnumParameterUI::setForceFeedbackOnlyInternal()
+void EnumParameterUI::feedbackStateChanged()
 {
-	cb.setEnabled(parameter->isEditable && !forceFeedbackOnly);
-	cb.setInterceptsMouseClicks(parameter->enabled && !forceFeedbackOnly, parameter->enabled && !forceFeedbackOnly);
+	updateComboBox();
 }
 
 void EnumParameterUI::valueChanged(const var & value)

@@ -12,8 +12,8 @@
 DoubleSliderUI::DoubleSliderUI(Point2DParameter * parameter) :
 	ParameterUI(parameter),
 	p2d(parameter),
-	xParam("X","xParam",parameter->x, parameter->minimumValue[0],parameter->maximumValue[0]),
-	yParam("Y", "yParam", parameter->y, parameter->minimumValue[1],parameter->maximumValue[1])
+	xParam("X","xParam",parameter->x, parameter->minimumValue[0],parameter->maximumValue[0],parameter->enabled),
+	yParam("Y", "yParam", parameter->y, parameter->minimumValue[1],parameter->maximumValue[1], parameter->enabled)
 {
 	xParam.canHaveRange = parameter->canHaveRange;
 	yParam.canHaveRange = parameter->canHaveRange;
@@ -35,7 +35,7 @@ DoubleSliderUI::DoubleSliderUI(Point2DParameter * parameter) :
 
 	setInterceptsMouseClicks(true, true);
 
-	setForceFeedbackOnlyInternal(); //force update
+	feedbackStateChanged(); //force update
 
 }
 
@@ -125,16 +125,16 @@ void DoubleSliderUI::rangeChanged(Parameter * p)
 }
 
 
-void DoubleSliderUI::setForceFeedbackOnlyInternal()
+void DoubleSliderUI::feedbackStateChanged()
 {
-	bool val = parameter->isControllableFeedbackOnly || !parameter->isEditable || forceFeedbackOnly;
-	xSlider->setForceFeedbackOnly(val);
-	ySlider->setForceFeedbackOnly(val);
+	xParam.setControllableFeedbackOnly(parameter->isControllableFeedbackOnly);
+	yParam.setControllableFeedbackOnly(parameter->isControllableFeedbackOnly);
 }
 
 void DoubleSliderUI::newMessage(const Parameter::ParameterEvent & e)
 {
 	ParameterUI::newMessage(e);
+
 	if (e.parameter == parameter)
 	{
 		xParam.setValue(((Point2DParameter *)e.parameter)->x); 

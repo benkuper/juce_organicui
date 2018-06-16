@@ -43,7 +43,7 @@ private:
 	HashMap<String,int> keyIdMap;
 
 protected:
-	void setForceFeedbackOnlyInternal() override;
+	void feedbackStateChanged() override;
     void valueChanged(const var &) override ;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EnumParameterUI)
 

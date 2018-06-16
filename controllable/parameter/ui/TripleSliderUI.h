@@ -35,7 +35,7 @@ public:
 
 	var mouseDownValue;
 
-	void setForceFeedbackOnlyInternal() override;
+	void feedbackStateChanged() override;
 	void resized() override;
 
 	void mouseDownInternal(const MouseEvent &) override;

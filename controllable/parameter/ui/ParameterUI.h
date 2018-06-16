@@ -36,6 +36,8 @@ public:
 
 	virtual void mouseDoubleClick(const MouseEvent &e) override;
 
+	virtual bool isInteractable() override;
+
 protected:
 
 

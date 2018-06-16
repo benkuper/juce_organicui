@@ -27,10 +27,8 @@ FloatStepperUI::FloatStepperUI(Parameter * _parameter) :
 	slider->setColour(CaretComponent::caretColourId, Colours::orange);
 	slider->setScrollWheelEnabled(false);
 
-	bool active = parameter->isEditable && !forceFeedbackOnly && !parameter->isControllableFeedbackOnly;
-	slider->setTextBoxIsEditable(active);
-	slider->setIncDecButtonsMode(active ? Slider::IncDecButtonMode::incDecButtonsDraggable_Vertical : Slider::IncDecButtonMode::incDecButtonsNotDraggable);
-	
+	feedbackStateChanged();
+
 	addAndMakeVisible(slider);
 }
 
@@ -41,8 +39,6 @@ FloatStepperUI::~FloatStepperUI()
 
 void FloatStepperUI::resized()
 {
-	slider->setTextBoxIsEditable(parameter->isEditable && !forceFeedbackOnly);
-	slider->setIncDecButtonsMode(parameter->isEditable && !forceFeedbackOnly ? Slider::IncDecButtonMode::incDecButtonsDraggable_Vertical : Slider::IncDecButtonMode::incDecButtonsNotDraggable);
     slider->setBounds(getLocalBounds());
 }
 
@@ -69,9 +65,8 @@ void FloatStepperUI::rangeChanged(Parameter *){
 
 }
 
-void FloatStepperUI::setForceFeedbackOnlyInternal()
+void FloatStepperUI::feedbackStateChanged()
 {
-	bool active = parameter->isEditable && !forceFeedbackOnly;
-	slider->setTextBoxIsEditable(active);
-	slider->setIncDecButtonsMode(active?Slider::IncDecButtonMode::incDecButtonsDraggable_Vertical:Slider::IncDecButtonMode::incDecButtonsNotDraggable);
+	slider->setTextBoxIsEditable(isInteractable());
+	slider->setIncDecButtonsMode(isInteractable()?Slider::IncDecButtonMode::incDecButtonsDraggable_Vertical:Slider::IncDecButtonMode::incDecButtonsNotDraggable);
 }

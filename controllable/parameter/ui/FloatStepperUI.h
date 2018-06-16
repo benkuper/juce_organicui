@@ -28,7 +28,7 @@ protected:
     void valueChanged(const var &) override;
     void rangeChanged(Parameter * p) override;
 
-	void setForceFeedbackOnlyInternal() override;
+	void feedbackStateChanged() override;
 
     // Inherited via Listener
     virtual void sliderValueChanged(Slider * slider) override;

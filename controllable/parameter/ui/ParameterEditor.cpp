@@ -2,7 +2,7 @@ ParameterEditor::ParameterEditor(Parameter * _parameter, bool isRoot, int initHe
 	ControllableEditor(_parameter, isRoot, initHeight),
 	parameter(_parameter)
 {
-	if (parameter->isOverriden && parameter->isEditable && !parameter->isControllableFeedbackOnly) label.setFont(label.getFont().withStyle(Font::FontStyleFlags::bold));
+	if (parameter->isOverriden && ui->isInteractable()) label.setFont(label.getFont().withStyle(Font::FontStyleFlags::bold));
 	
 	parameter->addParameterListener(this);
 	parameter->addAsyncParameterListener(this);
@@ -50,8 +50,6 @@ void ParameterEditor::resized()
 void ParameterEditor::updateUI()
 {
 	subContentHeight = 0;
-
-	ui->setForceFeedbackOnly(parameter->isControllableFeedbackOnly || parameter->controlMode != Parameter::MANUAL);
 
 	//cleanup
 	if (expressionLabel != nullptr)
@@ -132,7 +130,7 @@ void ParameterEditor::updateUI()
 
 void ParameterEditor::newMessage(const Parameter::ParameterEvent & e)
 {
-	if (parameter->isEditable && !parameter->isControllableFeedbackOnly) label.setFont(label.getFont().withStyle(parameter->isOverriden ? Font::FontStyleFlags::bold : Font::FontStyleFlags::plain));
+	if (ui->isInteractable()) label.setFont(label.getFont().withStyle(parameter->isOverriden ? Font::FontStyleFlags::bold : Font::FontStyleFlags::plain));
 	if (e.type == Parameter::ParameterEvent::BOUNDS_CHANGED) buildControllableUI(true);
 }
 

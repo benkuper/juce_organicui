@@ -40,7 +40,7 @@ public:
 	virtual void rangeChanged(Parameter * p) override;
 
 protected:
-	void setForceFeedbackOnlyInternal() override;
+	void feedbackStateChanged() override;
 	virtual void newMessage(const Parameter::ParameterEvent & e) override;
 
 	//void valueChanged(const var &) override;

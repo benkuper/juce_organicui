@@ -16,7 +16,7 @@ TriggerButtonUI::TriggerButtonUI(Trigger *t) :
 	drawTriggering(false)
 {
 	setSize(20, 15);
-	if (!forceFeedbackOnly) setRepaintsOnMouseActivity(true);
+	setRepaintsOnMouseActivity(isInteractable());
 }
 
 TriggerButtonUI::~TriggerButtonUI()
@@ -34,7 +34,6 @@ void TriggerButtonUI::triggerTriggered(const Trigger *)
 
 void TriggerButtonUI::mouseDownInternal(const MouseEvent & e)
 {
-	if (forceFeedbackOnly) return;
 	trigger->trigger();
 }
 
@@ -51,7 +50,8 @@ void TriggerButtonUI::paint (Graphics& g)
     Point<float> center = r.getCentre();
 
 	Colour c = BG_COLOR;
-	if (!forceFeedbackOnly)
+
+	if (isInteractable())
 	{
 		if (drawTriggering) c = HIGHLIGHT_COLOR;
 		else c = isMouseOverOrDragging(true) ? (isMouseButtonDown() ? HIGHLIGHT_COLOR : NORMAL_COLOR.brighter()) : NORMAL_COLOR;
