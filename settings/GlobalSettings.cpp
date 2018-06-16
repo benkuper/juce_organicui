@@ -14,7 +14,7 @@ GlobalSettings::GlobalSettings() :
 	ControllableContainer("Global Settings"),
 	startupCC("Startup and Update"),
 	saveLoadCC("Save and Load"),
-	confirmationsCC("Confirmation messages")
+	editingCC("Editing")
 {
 	saveAndLoadRecursiveData = true;
 
@@ -34,8 +34,9 @@ GlobalSettings::GlobalSettings() :
 	enableAutoSave = saveLoadCC.addBoolParameter("Enable auto-save", "When enabled, a backup file will be saved every 5 min", true);
 	autoSaveCount = saveLoadCC.addIntParameter("Auto-save count", "The number of different files to auto-save", 10, 1, 100);
 
-	addChildControllableContainer(&confirmationsCC);
-	askBeforeRemovingItems = confirmationsCC.addBoolParameter("Ask before removing items", "If enabled, you will get a confirmation prompt before removing any item", false);
+	addChildControllableContainer(&editingCC);
+	askBeforeRemovingItems = editingCC.addBoolParameter("Ask before removing items", "If enabled, you will get a confirmation prompt before removing any item", false);
+	constrainKeysToNeighbours = editingCC.addBoolParameter("Constrain curve keys editing", "If enabled, keys won't be able to be moved past their neighbours when editing a curve", true);
 
 	addChildControllableContainer(OSCRemoteControl::getInstance());
 }

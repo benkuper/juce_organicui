@@ -33,8 +33,9 @@ public:
 	BoolParameter * enableAutoSave;
 	IntParameter * autoSaveCount;
 
-	ControllableContainer confirmationsCC;
+	ControllableContainer editingCC;
 	BoolParameter * askBeforeRemovingItems;
+	BoolParameter * constrainKeysToNeighbours;
 
 	void controllableFeedbackUpdate(ControllableContainer *, Controllable * c) override;
 	void loadJSONDataInternal(var data) override;

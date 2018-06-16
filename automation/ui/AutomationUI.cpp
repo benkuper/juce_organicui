@@ -396,6 +396,14 @@ void AutomationUI::mouseDrag(const MouseEvent & e)
 					kui->handle.setMouseCursor(MouseCursor::NormalCursor);
 				}
 
+				
+				if (GlobalSettings::getInstance()->constrainKeysToNeighbours->boolValue())
+				{
+					int index = manager->items.indexOf(kui->item);
+					if (index > 0) pos = jmax(pos, manager->items[index - 1]->position->floatValue() + .01f);
+					if (index < manager->items.size() - 1)  pos = jmin(pos, manager->items[index + 1]->position->floatValue() - .01f);
+				}
+
 				kui->item->position->setValue(pos);
 				kui->item->value->setValue(val);
 
