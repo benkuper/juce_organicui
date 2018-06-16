@@ -296,9 +296,9 @@ void GenericControllableContainerEditor::paint(Graphics & g)
 		g.fillRoundedRectangle(r.toFloat(), 4);
 	}
 
-	if (isRoot || canBeCollapsed())
+	if ((isRoot || canBeCollapsed()) && !container->hideEditorHeader)
 	{
-		g.setColour(contourColor.withAlpha(.4f));
+		g.setColour(contourColor.withAlpha(isRoot?.8f:.4f));
 		g.fillRoundedRectangle(getHeaderBounds().toFloat(), 4);
 	}
 	
