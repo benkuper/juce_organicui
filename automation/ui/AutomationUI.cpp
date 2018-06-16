@@ -108,10 +108,12 @@ void AutomationUI::paint(Graphics & g)
 	//int count = 0;
 	if (itemsUI.size() >= 2)
 	{
+		
 		int ty = getYForValue(currentValue);
 		Rectangle<int> vr = getLocalBounds().withTop(ty);
 		g.setColour(color.withAlpha(.1f));
-		g.fillRect(vr);
+		if(vr.getHeight() > 0) g.fillRect(vr);
+		
 
 		//pos-value feedback
 		g.setColour(Colours::orange);
@@ -146,8 +148,6 @@ void AutomationUI::paint(Graphics & g)
 			}
 		}
 	}
-
-
 }
 
 
@@ -167,6 +167,8 @@ void AutomationUI::resized()
 	}
 
 	if (transformer != nullptr) transformer->updateBoundsFromKeys();
+
+	repaint(); //overkill? needed to have proper value feedback when creating ui and resizing for the first time
 }
 
 void AutomationUI::placeKeyUI(AutomationKeyUI * kui, bool placePrevKUI)
