@@ -18,11 +18,11 @@ Parameter::Parameter(const Type &type, const String &niceName, const String &des
 	defaultMaxValue(maxValue),
     lockManualControlMode(false),
     controlMode(MANUAL),
+    referenceParameter(nullptr),
     isPresettable(true),
     isOverriden(false),
     autoAdaptRange(false),
     forceSaveValue(false),
-	referenceParameter(nullptr),
 	queuedNotifier(100)
 {
 	resetValue(true);

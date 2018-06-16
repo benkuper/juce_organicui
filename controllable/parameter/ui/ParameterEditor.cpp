@@ -28,6 +28,9 @@ void ParameterEditor::resized()
 	
 	switch (parameter->controlMode)
 	{
+        case Parameter::MANUAL:
+            break;
+            
 	case Parameter::EXPRESSION:
 		if (expressionText != nullptr)
 		{
@@ -76,6 +79,9 @@ void ParameterEditor::updateUI()
 
 	switch (parameter->controlMode)
 	{
+        case Parameter::MANUAL:
+            break;
+            
 	case Parameter::EXPRESSION:
 	{
 		if (expressionText == nullptr)

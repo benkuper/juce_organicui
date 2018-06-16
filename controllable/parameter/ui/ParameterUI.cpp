@@ -82,6 +82,9 @@ void ParameterUI::paintOverChildren(Graphics & g)
 
 	switch (parameter->controlMode)
 	{
+        case Parameter::MANUAL:
+            break;
+            
 	case Parameter::EXPRESSION:
 	{
 		Colour c = LIGHTCONTOUR_COLOR;

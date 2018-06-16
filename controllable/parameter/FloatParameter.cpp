@@ -77,7 +77,9 @@ ControllableUI * FloatParameter::createDefaultUI(Controllable * targetControllab
 
 	switch (t)
 	{
-
+        case NONE:
+            break;
+            
 	case SLIDER:
 		return createSlider(dynamic_cast<FloatParameter *>(targetControllable));
 		break;
