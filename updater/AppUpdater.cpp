@@ -303,6 +303,9 @@ void AppUpdater::newMessage(const AppUpdateEvent & e)
 	case AppUpdateEvent::UPDATE_FINISHED:
 		updateWindow->getTopLevelComponent()->exitModalState(0);
 		break;
+            
+        default:
+            break;
 	}
 }
 

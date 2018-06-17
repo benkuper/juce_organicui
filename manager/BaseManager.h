@@ -418,10 +418,10 @@ BaseManager<T>::BaseManager(const String & name) :
 	EnablingControllableContainer(name, false),
 	managerFactory(nullptr),
 	itemDataType(""),
-	comparator(this),
 	userCanAddItemsManually(true),
 	selectItemWhenCreated(true),
-	managerNotifier(50)
+	managerNotifier(50),
+    comparator(this)
 {
 	//setCanHavePresets(false);
 	//hideInEditor = true;
