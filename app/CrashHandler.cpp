@@ -50,7 +50,16 @@ void CrashDumpUploader::uploadDump()
 	}
 
 	File f = File::getSpecialLocation(File::currentApplicationFile).getParentDirectory().getChildFile("crash.dmp");
-	URL url = remoteURL.withParameter("username", SystemStats::getFullUserName()).withParameter("os", SystemStats::getOperatingSystemName()).withFileToUpload("dumpfile", f, "application/octet-stream");
+	URL url = remoteURL.withParameter("username", SystemStats::getFullUserName())
+		.withParameter("os", SystemStats::getOperatingSystemName())
+		.withParameter("version", getAppVersion())
+#if DEBUG
+		.withParameter("branch", "debug")
+#else
+		.withParameter("branch", getAppVersion().endsWith("b") ? "beta" : "stable")
+#endif
+		.withFileToUpload("dumpfile", f, "application/octet-stream");
+
 	WebInputStream stream(url, true);
 
 	String convertedData = stream.readEntireStreamAsString();
