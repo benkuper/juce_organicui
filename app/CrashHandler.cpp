@@ -9,11 +9,13 @@
 */
 
 
+#if JUCE_WINDOWS
 #include <windows.h> 
 #include <DbgHelp.h>
 #include <tchar.h>
 
 LONG WINAPI createMiniDump(LPEXCEPTION_POINTERS exceptionPointers);
+#endif
 
 juce_ImplementSingleton(CrashDumpUploader)
 
@@ -29,8 +31,11 @@ CrashDumpUploader::~CrashDumpUploader()
 
 void CrashDumpUploader::init()
 {
+
+#if JUCE_WINDOWS
 	SystemStats::setApplicationCrashHandler((SystemStats::CrashHandlerFunction)createMiniDump);
-	
+#endif
+
 	File f = File::getSpecialLocation(File::currentApplicationFile).getParentDirectory().getChildFile("crash.dmp");
 	DBG("Check for crash dump file : "+f.getFullPathName());
 
@@ -87,7 +92,7 @@ void CrashDumpUploader::run()
 }
 
 
-#if JUCE_WINDOWS
+#if JUCE_WINDOWS 
 
 LONG WINAPI createMiniDump(LPEXCEPTION_POINTERS exceptionPointers)
 {
