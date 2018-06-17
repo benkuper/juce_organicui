@@ -9,11 +9,13 @@
 */
 
 
+#if JUCE_WINDOWS
 #include <windows.h> 
 #include <DbgHelp.h>
 #include <tchar.h>
 
 LONG WINAPI createMiniDump(LPEXCEPTION_POINTERS exceptionPointers);
+#endif
 
 juce_ImplementSingleton(CrashDumpUploader)
 
@@ -87,7 +89,7 @@ void CrashDumpUploader::run()
 }
 
 
-#if JUCE_WINDOWS
+#if JUCE_WINDOWS 
 
 LONG WINAPI createMiniDump(LPEXCEPTION_POINTERS exceptionPointers)
 {
