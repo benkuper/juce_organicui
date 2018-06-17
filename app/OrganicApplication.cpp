@@ -3,7 +3,10 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #endif
-
+//
+//#if JUCE_WINDOWS_
+//LONG WINAPI createMiniDump(LPEXCEPTION_POINTERS exceptionPointers);
+//#endif
 
 static OrganicApplication& getApp() { return *dynamic_cast<OrganicApplication*>(JUCEApplication::getInstance()); }
 String getAppVersion() { return getApp().getApplicationVersion(); }
@@ -55,10 +58,7 @@ void OrganicApplication::initialise(const String & commandLine)
 	if (GlobalSettings::getInstance()->checkUpdatesOnStartup->boolValue()) AppUpdater::getInstance()->checkForUpdates();
 	HelpBox::getInstance()->loadHelp();
 	
-	//Crash handler
-#if JUCE_WINDOWS_
-	SystemStats::setApplicationCrashHandler((SystemStats::CrashHandlerFunction)createMiniDump);
-#endif
+
 
 	engine->parseCommandline(commandLine);
 
@@ -71,6 +71,13 @@ void OrganicApplication::initialise(const String & commandLine)
 			engine->setChangedFlag(false);
 		}
 	}
+
+	//Crash handler
+#if JUCE_WINDOWS
+	CrashDumpUploader::getInstance()->init();
+#endif
+
+	afterInit();
 }
 
 void OrganicApplication::shutdown()
@@ -94,6 +101,7 @@ void OrganicApplication::shutdown()
 	mainWindow = nullptr; // (deletes our window)
 
 	AppUpdater::deleteInstance();
+	CrashDumpUploader::deleteInstance();
 }
 
 

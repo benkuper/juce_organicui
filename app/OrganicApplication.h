@@ -52,6 +52,7 @@ public:
 
 	void initialise(const String& /*commandLine*/) override;
 	virtual void initialiseInternal(const String &) = 0;
+	virtual void afterInit() {}
 
 	virtual void shutdown() override;
 	virtual void systemRequestedQuit() override;

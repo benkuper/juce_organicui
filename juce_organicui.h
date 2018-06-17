@@ -220,6 +220,7 @@ using namespace juce;
 
 #include "help/HelpPanel.h"
 
+#include "app/CrashHandler.h"
 #include "app/OrganicMainComponent.h"
 #include "app/OrganicApplication.h"
 
