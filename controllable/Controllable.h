@@ -72,6 +72,9 @@ public:
 
 	ControllableContainer * parentContainer;
 
+	template<class T>
+	T * findParentAs(int maxLevel = -1);
+
 	UndoableAction * setUndoableNiceName(const String &_niceName, bool onlyReturnAction = false);
 	void setNiceName(const String &_niceName);
 	void setCustomShortName(const String &_shortName);
@@ -189,4 +192,26 @@ public:
 };
 
 
+//Helpers
+template<class T>
+T * Controllable::findParentAs(int maxLevel)
+{
+	int curLevel = 0;
+	if (parentContainer == nullptr) return nullptr;
+
+	ControllableContainer * cc = parentContainer;
+	T * result = dynamic_cast<T *>(cc);
+
+	while (result == nullptr && cc != nullptr)
+	{
+		cc = cc->parentContainer;
+		result = dynamic_cast<T *>(cc);
+		curLevel++;
+		if (maxLevel != -1 && curLevel > maxLevel) return nullptr;
+	}
+
+	return result;
+}
+
 #endif  // CONTROLLABLE_H_INCLUDED
+

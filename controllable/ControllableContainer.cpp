@@ -484,8 +484,9 @@ Array<WeakReference<Parameter>> ControllableContainer::getAllParameters(bool rec
 
 Controllable * ControllableContainer::getControllableForAddress(const String &address, bool recursive, bool getNotExposed)
 {
+	
 	StringArray addrArray;
-	addrArray.addTokens(address, juce::StringRef("/"), juce::StringRef("\""));
+	addrArray.addTokens(address.startsWith("/")?address:"/"+address, juce::StringRef("/"), juce::StringRef("\""));
 	addrArray.remove(0);
 
 	return getControllableForAddress(addrArray, recursive, getNotExposed);
