@@ -96,6 +96,7 @@ void Parameter::setReferenceParameter(Parameter * tp)
 
 	if (referenceParameter != nullptr)
 	{
+		parameterValueChanged(referenceParameter);
 		referenceParameter->addParameterListener(this);
 	}
 }

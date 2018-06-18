@@ -305,7 +305,7 @@ void ShapeShifterManager::saveCurrentLayout()
 	FileChooser fc("Save layout", destDir, "*."+appLayoutExtension);
 	if (fc.browseForFileToSave(true))
 	{
-		saveCurrentLayoutToFile(fc.getResult().withFileExtension("appLayoutExtension"));
+		saveCurrentLayoutToFile(fc.getResult().withFileExtension(appLayoutExtension));
 	}
 }
 
