@@ -1,4 +1,3 @@
-#include "Controllable.h"
 /*
   ==============================================================================
 
@@ -8,6 +7,8 @@
 
   ==============================================================================
 */
+
+#include "ControllableContainer.h"
 
 
 Controllable::Controllable(const Type &type, const String & niceName, const String &description, bool enabled) :
@@ -284,4 +285,25 @@ bool Controllable::ControllableChangeNameAction::undo()
 		return true;
 	}
 	return false;
+}
+
+//Helpers
+template<class T>
+T * Controllable::findParentAs(int maxLevel)
+{
+    int curLevel = 0;
+    if (parentContainer == nullptr) return nullptr;
+    
+    ControllableContainer * cc = this->parentContainer;
+    T * result = dynamic_cast<T *>(cc);
+    
+    while (result == nullptr && cc != nullptr)
+    {
+        cc = cc->parentContainer;
+        result = dynamic_cast<T *>(cc);
+        curLevel++;
+        if (maxLevel != -1 && curLevel > maxLevel) return nullptr;
+    }
+    
+    return result;
 }
