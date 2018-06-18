@@ -172,7 +172,11 @@ InspectableEditor * GenericControllableContainerEditor::addEditorUI(Controllable
 void GenericControllableContainerEditor::removeEditorUI(ControllableContainer * cc, bool resize)
 {
 	InspectableEditor * ccui = getEditorForInspectable(cc);
-	if (ccui == nullptr) return;
+	if (ccui == nullptr)
+	{
+		resetAndBuild();
+		return;
+	}
 
 	removeChildComponent(ccui);
 	childEditors.removeObject(ccui);
@@ -288,6 +292,13 @@ void GenericControllableContainerEditor::changeListenerCallback(ChangeBroadcaste
 
 void GenericControllableContainerEditor::paint(Graphics & g)
 {
+	if (container == nullptr)
+	{
+		DBG("Container is null !");
+		resetAndBuild();
+		return;
+	}
+
 	if(!isRoot && !container->hideEditorHeader)
 	{
 		g.setColour(contourColor.withAlpha(.4f));
@@ -312,6 +323,7 @@ void GenericControllableContainerEditor::paint(Graphics & g)
 
 void GenericControllableContainerEditor::resized()
 {
+
  juce::Rectangle<int> r = getLocalBounds();
 	resizedInternal(r);
 	if(!collapseAnimator.isAnimating() && !prepareToAnimate) setSize(getWidth(), (!isRoot && container->editorIsCollapsed)?headerHeight:jmax<int>(r.getY()+2, headerHeight));
@@ -319,6 +331,13 @@ void GenericControllableContainerEditor::resized()
 
 void GenericControllableContainerEditor::resizedInternal(juce::Rectangle<int>& r)
 {
+	if (container == nullptr)
+	{
+		DBG("Container is null !");
+		resetAndBuild();
+		return;
+	}
+
 	if (!container->hideEditorHeader)
 	{
 	 juce::Rectangle<int> hr = r.removeFromTop(headerHeight);
