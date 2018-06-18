@@ -127,8 +127,8 @@ void DoubleSliderUI::rangeChanged(Parameter * p)
 
 void DoubleSliderUI::feedbackStateChanged()
 {
-	xParam.setControllableFeedbackOnly(parameter->isControllableFeedbackOnly);
-	yParam.setControllableFeedbackOnly(parameter->isControllableFeedbackOnly);
+	xParam.setControllableFeedbackOnly(!isInteractable());
+	yParam.setControllableFeedbackOnly(!isInteractable());
 }
 
 void DoubleSliderUI::newMessage(const Parameter::ParameterEvent & e)

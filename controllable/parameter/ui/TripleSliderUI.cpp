@@ -55,9 +55,9 @@ TripleSliderUI::~TripleSliderUI()
 
 void TripleSliderUI::feedbackStateChanged()
 {
-	xParam.setControllableFeedbackOnly(isInteractable());
-	yParam.setControllableFeedbackOnly(isInteractable());
-	zParam.setControllableFeedbackOnly(isInteractable());
+	xParam.setControllableFeedbackOnly(!isInteractable());
+	yParam.setControllableFeedbackOnly(!isInteractable());
+	zParam.setControllableFeedbackOnly(!isInteractable());
 
 }
 
