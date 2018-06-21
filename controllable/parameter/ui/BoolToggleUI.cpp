@@ -14,13 +14,13 @@ BoolToggleUI::BoolToggleUI(Parameter * parameter) :
 {
 	showEditWindowOnDoubleClick = false;
 
-	if (isInteractable())
+	if (!isInteractable() && (parameter->enabled || parameter->isControllableFeedbackOnly)) 
+	{
+		setImages(ImageCache::getFromMemory(OrganicUIBinaryData::checkbox_on_readonly_png, OrganicUIBinaryData::checkbox_on_readonly_pngSize), ImageCache::getFromMemory(OrganicUIBinaryData::checkbox_off_readonly_png, OrganicUIBinaryData::checkbox_off_readonly_pngSize));
+	}else
 	{
 		setImages(ImageCache::getFromMemory(OrganicUIBinaryData::checkbox_on_png, OrganicUIBinaryData::checkbox_on_pngSize), ImageCache::getFromMemory(OrganicUIBinaryData::checkbox_off_png, OrganicUIBinaryData::checkbox_off_pngSize));
 		setRepaintsOnMouseActivity(true);
-	} else
-	{
-		setImages(ImageCache::getFromMemory(OrganicUIBinaryData::checkbox_on_readonly_png, OrganicUIBinaryData::checkbox_on_readonly_pngSize), ImageCache::getFromMemory(OrganicUIBinaryData::checkbox_off_readonly_png, OrganicUIBinaryData::checkbox_off_readonly_pngSize));
 	}
 
     setSize(10,10);

@@ -648,15 +648,20 @@ static const unsigned char temp_binary_data_7[] =
 "\0\0\0\rIHDR\0\0\0\x18\0\0\0\x18\x08\x06\0\0\0\xe0w=\xf8\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0\x08`iTXtXML:com.adobe.xmp\0\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?> <x:xmpmeta xmlns:x=\"adobe:ns:met"
 "a/\" x:xmptk=\"Adobe XMP Core 5.6-c142 79.160924, 2017/07/13-01:06:39        \"> <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"> <rdf:Description rdf:about=\"\" xmlns:xmp=\"http://ns.adobe.com/xap/1.0/\" xmlns:xmpMM=\"http://ns.ad"
 "obe.com/xap/1.0/mm/\" xmlns:stEvt=\"http://ns.adobe.com/xap/1.0/sType/ResourceEvent#\" xmlns:photoshop=\"http://ns.adobe.com/photoshop/1.0/\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\" xmlns:exif=\"http"
-"://ns.adobe.com/exif/1.0/\" xmp:CreatorTool=\"Adobe Photoshop CC 2017 (Windows)\" xmp:CreateDate=\"2017-04-23T20:20:19+02:00\" xmp:MetadataDate=\"2018-06-16T12:06:33+02:00\" xmp:ModifyDate=\"2018-06-16T12:06:33+02:00\" xmpMM:InstanceID=\"xmp.iid:8787"
-"804d-0f1a-4040-8bfd-fedf2de74c04\" xmpMM:DocumentID=\"adobe:docid:photoshop:6f692247-2851-11e7-9712-974bf39bb726\" xmpMM:OriginalDocumentID=\"xmp.did:dd0b09a8-f730-744f-93a3-8cab72275fe2\" photoshop:ColorMode=\"3\" photoshop:ICCProfile=\"sRGB IEC6196"
+"://ns.adobe.com/exif/1.0/\" xmp:CreatorTool=\"Adobe Photoshop CC 2017 (Windows)\" xmp:CreateDate=\"2017-04-23T20:20:19+02:00\" xmp:MetadataDate=\"2018-06-21T17:43:17+02:00\" xmp:ModifyDate=\"2018-06-21T17:43:17+02:00\" xmpMM:InstanceID=\"xmp.iid:ce1f"
+"c26a-8209-8b47-bf3f-0e8210d5ba7a\" xmpMM:DocumentID=\"adobe:docid:photoshop:6f692247-2851-11e7-9712-974bf39bb726\" xmpMM:OriginalDocumentID=\"xmp.did:dd0b09a8-f730-744f-93a3-8cab72275fe2\" photoshop:ColorMode=\"3\" photoshop:ICCProfile=\"sRGB IEC6196"
 "6-2.1\" dc:format=\"image/png\" tiff:Orientation=\"1\" tiff:XResolution=\"720000/10000\" tiff:YResolution=\"720000/10000\" tiff:ResolutionUnit=\"2\" exif:ColorSpace=\"65535\" exif:PixelXDimension=\"24\" exif:PixelYDimension=\"24\"> <xmpMM:History> <r"
 "df:Seq> <rdf:li stEvt:action=\"created\" stEvt:instanceID=\"xmp.iid:dd0b09a8-f730-744f-93a3-8cab72275fe2\" stEvt:when=\"2017-04-23T20:20:19+02:00\" stEvt:softwareAgent=\"Adobe Photoshop CC 2017 (Windows)\"/> <rdf:li stEvt:action=\"saved\" stEvt:insta"
-"nceID=\"xmp.iid:416152ec-470a-0843-b683-062a52c2b640\" stEvt:when=\"2017-04-23T20:20:19+02:00\" stEvt:softwareAgent=\"Adobe Photoshop CC 2017 (Windows)\" stEvt:changed=\"/\"/> <rdf:li stEvt:action=\"saved\" stEvt:instanceID=\"xmp.iid:8787804d-0f1a-40"
-"40-8bfd-fedf2de74c04\" stEvt:when=\"2018-06-16T12:06:33+02:00\" stEvt:softwareAgent=\"Adobe Photoshop CC (Windows)\" stEvt:changed=\"/\"/> </rdf:Seq> </xmpMM:History> <photoshop:DocumentAncestors> <rdf:Bag> <rdf:li>xmp.did:B96355186E7B11E2A52AF72B2E3"
-"DBE55</rdf:li> </rdf:Bag> </photoshop:DocumentAncestors> </rdf:Description> </rdf:RDF> </x:xmpmeta> <?xpacket end=\"r\"?>\xd4\xcf\x91 \0\0\0\xa1IDATH\x89\xed\xd6?\x8a\xc2`\x10@\xf1_\x06O\xe1\x11,\xf4\x02\x82GY\"+\xeb\x95\xd6?\x1b\xd0kX\xd9lm#\x9e&\xd9"
-"\xc2\x04\xb6\x13\x8c\xd3H\x1e|\xcd\xf0\xf1\xde\x94S\x8cO;-%>0\xd3\x8f\x0b\x0e\xf8\x81Q;\xdc\xe2\xb3\xa7\xb8""c\xd1\xbe""9\x96#\xf7\xcd_%\xffO\x89s\xe0+A\xde\xb1\x0eL\x12\x03\x93@\x93\x18h\x02ub\xa0\x8e""D9\x18\x02""C`\x08\xbcK 3\x12\x81\"1P\x07\xae\x89"
-"\x81[\xe0;1\xb0\tT\xd8=\xfa\xf9\x04\x15\xaa\xee\xaaX\xe1\xd7\xfdl\x99\xf6\x14_p\xc4\x1e\xfe\0\xcax\x17\xef\x16-\xaf\x8f\0\0\0\0IEND\xae""B`\x82";
+"nceID=\"xmp.iid:416152ec-470a-0843-b683-062a52c2b640\" stEvt:when=\"2017-04-23T20:20:19+02:00\" stEvt:softwareAgent=\"Adobe Photoshop CC 2017 (Windows)\" stEvt:changed=\"/\"/> <rdf:li stEvt:action=\"saved\" stEvt:instanceID=\"xmp.iid:ce1fc26a-8209-8b"
+"47-bf3f-0e8210d5ba7a\" stEvt:when=\"2018-06-21T17:43:17+02:00\" stEvt:softwareAgent=\"Adobe Photoshop CC (Windows)\" stEvt:changed=\"/\"/> </rdf:Seq> </xmpMM:History> <photoshop:DocumentAncestors> <rdf:Bag> <rdf:li>xmp.did:B96355186E7B11E2A52AF72B2E3"
+"DBE55</rdf:li> </rdf:Bag> </photoshop:DocumentAncestors> </rdf:Description> </rdf:RDF> </x:xmpmeta> <?xpacket end=\"r\"?>\x1al\x17""1\0\0\x01\x99IDATH\x89\xb5\x96\xcbJ\xc3@\x14\x86\xbf\x8cUi\x93""4\xda\x86Z\x8b\n"
+"\xa2h)\xa2.\\\n"
+">\x8a(\x8a\xbe\x92\xd7\x82\xbe\x86+7nu\xe1\x05\x05%R\xad""bo\x89\xd6\xd6[\xe3\xc2\x16\\\xa4i\xb4\xcd\x0f\xb3\x99s\xe6\xfb\xe7\x87""30R\xe2`\x9b\xba\x96\x80""E`\x86\xf6t\x02\xec\x01\xbb\0\x81\xfa\xe6\x16\xb0\xd2&\xb8\xa1\x85\xfa\x9a\x07\x96\x03\xfc\xdc"
+"\xbcS\xf0\xdfZ\x02\x0e\x05\xb0\xe6\x03\xbc\xa1u\x01\xa4|4H\t\xc0\xf6\xd1\xc0\x16@\xcdG\x83\x9a\xe8\x04%\xaeTQ{>\x1ckm\x1b\x0c\x85\xcb$\xf5<\xb3\xf1|\xe7\r\x12\xea+\xe3\x11\x13l\t\xc3R\x1c{\x02\x8e\xbb\x1e\x14W\xcaLDM\0nJ\x1a\xb7\xa6\xec\xd8\xd7""4A\xaf"
+"\x9c""e$\xe8\\\x8e)\x15\x92z\x03\xae`4\x81\x83K\x82""9\xdd\xa6\x9b\x0c\x9f\xc5""0\xf7\xbf\xe2\xeb\xa1*)\xbd\x08\x80""a\xa9\x18%\xb5)\xdc""5A\xa6\xd4\x8f-\xd5\x98\x8cZ\xc4""B\x15\0\"\xc1""7\xa6""b\x05\0nM\x99\x9b\x82;\xdc""5\x81""a\x06\xe9\xb5\x87\x18"
+"\xd5^I\x0e\xe4PM\x8d\x84R\x06\xe0\xce\x92\xb9.j-\xe1\xae\t\0.-8\xad""f\xe9\xf9\x92\x19\xd6^\xe8\x12""6\x8f/!\xae\n"
+"\xde\xe0-\r\0""2Oc\xe4\xde\xfa\x90\xde\x05\xf9J\x90\xf3\\\x9fg8x\x1c\xd3\xe3G\xc1`X\xe5\xe1\xb9\xf9\xb4\xb8\x19xzlY\xeb\xefp@\x08@\xfa\xcfI\x8f\xaa\t\xe0\xccG\x83\x0b\x01l\xf8h\xb0)\x80""4\xb0\xdd\xaa\xf3\x1fJ\x03\xe9\xc6\x14\xad\x02G\xfc|[\xa6\xdb\x04"
+"\x9f\0\xfb\xc0\x0e\xc0""7O\xe0m\x14\x97\t,\xa8\0\0\0\0IEND\xae""B`\x82";
 
 const char* checkbox_on_png = (const char*) temp_binary_data_7;
 
@@ -3162,7 +3167,7 @@ const char* getNamedResource (const char* resourceNameUTF8, int& numBytes)
         case 0x17c70272:  numBytes = 15786; return check_png;
         case 0xe8ac8edd:  numBytes = 2517; return checkbox_off_png;
         case 0x4206dc78:  numBytes = 2593; return checkbox_off_readonly_png;
-        case 0xb55a97c5:  numBytes = 2395; return checkbox_on_png;
+        case 0xb55a97c5:  numBytes = 2643; return checkbox_on_png;
         case 0x87305890:  numBytes = 2389; return checkbox_on_readonly_png;
         case 0x5514e50c:  numBytes = 543; return down_png;
         case 0x5f823a74:  numBytes = 16204; return edit_png;

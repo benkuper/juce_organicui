@@ -30,7 +30,7 @@ namespace OrganicUIBinaryData
     const int            checkbox_off_readonly_pngSize = 2593;
 
     extern const char*   checkbox_on_png;
-    const int            checkbox_on_pngSize = 2395;
+    const int            checkbox_on_pngSize = 2643;
 
     extern const char*   checkbox_on_readonly_png;
     const int            checkbox_on_readonly_pngSize = 2389;
