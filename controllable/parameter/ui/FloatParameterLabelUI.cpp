@@ -10,8 +10,8 @@
 */
 
 FloatParameterLabelUI::FloatParameterLabelUI(Parameter * p) :
-ParameterUI(p),
-maxFontHeight(12),
+	ParameterUI(p),
+	maxFontHeight(12),
 	autoSize(false)
 {
 
@@ -104,18 +104,12 @@ void FloatParameterLabelUI::resized()
 	
 }
 
-void FloatParameterLabelUI::mouseDown(const MouseEvent & e)
-{
-	if (!isInteractable() || e.eventComponent != &valueLabel)
-	{
-		ParameterUI::mouseDown(e);
-		return;
-	}
 
-	if (e.mods.isLeftButtonDown()) valueAtMouseDown = parameter->floatValue();
-	ParameterUI::mouseDown(e.getEventRelativeTo(this));
-	
+void FloatParameterLabelUI::mouseDownInternal(const MouseEvent & e)
+{
+	valueAtMouseDown = parameter->floatValue();
 }
+
 
 void FloatParameterLabelUI::mouseDrag(const MouseEvent & e)
 {
@@ -129,13 +123,12 @@ void FloatParameterLabelUI::mouseDrag(const MouseEvent & e)
 	parameter->setValue(valueAtMouseDown + e.getOffsetFromDragStart().x *1.0f / pixelsPerUnit);
 }
 
-void FloatParameterLabelUI::mouseUp(const MouseEvent & e)
+void FloatParameterLabelUI::mouseUpInternal(const MouseEvent & e)
 {
-	if (!isInteractable()) return;
 	valueLabel.setMouseCursor(MouseCursor::NormalCursor);
 	valueLabel.updateMouseCursor();
 
-	if (initValue != parameter->floatValue()) parameter->setUndoableValue(initValue, parameter->floatValue());
+	if (valueAtMouseDown != parameter->floatValue()) parameter->setUndoableValue(valueAtMouseDown, parameter->floatValue());
 }
 
 void FloatParameterLabelUI::valueChanged(const var & v)

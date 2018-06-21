@@ -27,8 +27,6 @@ public:
 	String prefix;
 	String suffix;
 
-	float initValue;
-
 	float maxFontHeight;
 
 	const float pixelsPerUnit = 10; //1 = 10pixel
@@ -43,17 +41,15 @@ public:
 	bool nameLabelIsVisible;
 	void setNameLabelVisible(bool visible);
 
-	
-
 	virtual void feedbackStateChanged() override;
 
 
 	//void paint(Graphics &g) override;
 	void resized() override;
 
-	void mouseDown(const MouseEvent &e) override;
+	void mouseDownInternal(const MouseEvent &e) override;
 	void mouseDrag(const MouseEvent &e) override;
-	void mouseUp(const MouseEvent &e) override;
+	void mouseUpInternal(const MouseEvent &e) override;
 
 protected:
 	void valueChanged(const var & v) override;
