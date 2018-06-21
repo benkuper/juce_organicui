@@ -27,7 +27,6 @@ OrganicApplication::OrganicApplication(const String &appName) :
 	options.osxLibrarySubFolder = "Preferences";
 	appProperties = new ApplicationProperties();
 	appProperties->setStorageParameters(options);
-
 }
 
 const String OrganicApplication::getApplicationName() { return ProjectInfo::projectName; }

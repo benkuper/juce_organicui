@@ -67,6 +67,8 @@ void OrganicMainContentComponent::clear()
 	openGLContext.detach();
 	openGLContext.setRenderer(nullptr);
 #endif
+
+	tooltipWindow.setMillisecondsBeforeTipAppears(300);
 }
 
 
