@@ -13,6 +13,10 @@
 #include <windows.h> 
 #include <DbgHelp.h>
 #include <tchar.h>
+#include "CrashHandler.h"
+
+String dumpFileString;
+char * dumpFileName = "crash.dmp";
 
 LONG WINAPI createMiniDump(LPEXCEPTION_POINTERS exceptionPointers);
 #endif
@@ -33,6 +37,8 @@ void CrashDumpUploader::init()
 {
 
 #if JUCE_WINDOWS
+	dumpFileString = File::getSpecialLocation(File::currentApplicationFile).getParentDirectory().getChildFile("crash.dmp").getFullPathName();
+	dumpFileName = dumpFileString.getCharPointer().getAddress();
 	SystemStats::setApplicationCrashHandler((SystemStats::CrashHandlerFunction)createMiniDump);
 #endif
 
@@ -55,8 +61,8 @@ void CrashDumpUploader::uploadDump()
 	}
 
 	File f = File::getSpecialLocation(File::currentApplicationFile).getParentDirectory().getChildFile("crash.dmp");
-	URL url = remoteURL.withParameter("username", SystemStats::getFullUserName())
-		.withParameter("os", SystemStats::getOperatingSystemName())
+	URL url = remoteURL.withParameter("username", SystemStats::getFullUserName().replace(" ","-"))
+		.withParameter("os", SystemStats::getOperatingSystemName().replace(" ","-"))
 		.withParameter("version", getAppVersion())
 #if DEBUG
 		.withParameter("branch", "debug")
@@ -96,7 +102,6 @@ void CrashDumpUploader::run()
 
 LONG WINAPI createMiniDump(LPEXCEPTION_POINTERS exceptionPointers)
 {
-	auto dumpFileName = "crash.dmp";
 
 	HANDLE hFile = CreateFile(dumpFileName, GENERIC_READ | GENERIC_WRITE,
 		0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);

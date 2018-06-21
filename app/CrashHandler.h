@@ -1,3 +1,6 @@
+#pragma once
+
+
 class CrashDumpUploader : public Thread
 {
 public:
@@ -7,8 +10,8 @@ public:
 	~CrashDumpUploader();
 
 	URL remoteURL;
-
 	void init();
+
 	void uploadDump();
 	void run();
 

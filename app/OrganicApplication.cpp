@@ -57,8 +57,6 @@ void OrganicApplication::initialise(const String & commandLine)
 
 	if (GlobalSettings::getInstance()->checkUpdatesOnStartup->boolValue()) AppUpdater::getInstance()->checkForUpdates();
 	HelpBox::getInstance()->loadHelp();
-	
-
 
 	engine->parseCommandline(commandLine);
 
