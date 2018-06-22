@@ -185,11 +185,30 @@ public:
 		bool undo() override;
 	};
 
-
-
-
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Controllable)
 };
+
+
+//Helpers
+template<class T>
+T * Controllable::findParentAs(int maxLevel)
+{
+	int curLevel = 0;
+	if (parentContainer == nullptr) return nullptr;
+
+	auto * cc = this->parentContainer;
+	T * result = dynamic_cast<T *>(cc);
+
+	while (result == nullptr && cc != nullptr)
+	{
+		cc = cc->parentContainer;
+		result = dynamic_cast<T *>(cc);
+		curLevel++;
+		if (maxLevel != -1 && curLevel > maxLevel) return nullptr;
+	}
+
+	return result;
+}
 
 
 
