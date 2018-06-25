@@ -133,9 +133,9 @@ LONG WINAPI createMiniDump(LPEXCEPTION_POINTERS exceptionPointers)
 	{
 		_tprintf(_T("CreateFile failed. Error: %u \n"), GetLastError());
 	}
-
+	 
 	int selectedButtonId = MessageBox(nullptr,
-		_T("Oh, no ! Chataigne got very sad and died alone. Would you help find find out why ? If you click Yes, the file will automatically be uploaded at the next launch of Chataigne. If not, nothing will be done and this sad event will be forever forgotten. The debug file will be located at : %s",dumpFileName),
+		_T("Oh, no ! Chataigne got very sad and died alone. Would you help find find out why ? If you click Yes, the file will automatically be uploaded at the next launch of Chataigne. If not, nothing will be done and this sad event will be forever forgotten."),
 		_T("Sacré Hubert, toujours le mot pour rire !"),
 		MB_ICONWARNING | MB_YESNO | MB_DEFBUTTON1
 	);
