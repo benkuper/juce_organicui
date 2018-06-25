@@ -16,7 +16,7 @@
 #include "CrashHandler.h"
 
 String dumpFileString;
-char * dumpFileName = "crash.dmp";
+char * dumpFileName = "chataigne_notset.dmp";
 
 LONG WINAPI createMiniDump(LPEXCEPTION_POINTERS exceptionPointers);
 #endif
@@ -37,19 +37,19 @@ void CrashDumpUploader::init()
 {
 
 #if JUCE_WINDOWS
-	dumpFileString = File::getSpecialLocation(File::currentApplicationFile).getParentDirectory().getChildFile("crash.dmp").getFullPathName();
+
+	crashFile = File::getSpecialLocation(File::tempDirectory).getParentDirectory().getChildFile("chataigne_crash.dmp");
+	dumpFileString = crashFile.getFullPathName();
 	dumpFileName = dumpFileString.getCharPointer().getAddress();
 	SystemStats::setApplicationCrashHandler((SystemStats::CrashHandlerFunction)createMiniDump);
-#endif
 
-	File f = File::getSpecialLocation(File::currentApplicationFile).getParentDirectory().getChildFile("crash.dmp");
-	DBG("Check for crash dump file : "+f.getFullPathName());
-
-	if (f.existsAsFile())
+	if (crashFile.existsAsFile())
 	{
 		LOGWARNING("Crash log found, sending to Houston...");
 		startThread();
 	}
+#endif
+	
 }
 
 void CrashDumpUploader::uploadDump()
@@ -60,7 +60,6 @@ void CrashDumpUploader::uploadDump()
 		return;
 	}
 
-	File f = File::getSpecialLocation(File::currentApplicationFile).getParentDirectory().getChildFile("crash.dmp");
 	URL url = remoteURL.withParameter("username", SystemStats::getFullUserName().replace(" ","-"))
 		.withParameter("os", SystemStats::getOperatingSystemName().replace(" ","-"))
 		.withParameter("version", getAppVersion())
@@ -69,7 +68,7 @@ void CrashDumpUploader::uploadDump()
 #else
 		.withParameter("branch", getAppVersion().endsWith("b") ? "beta" : "stable")
 #endif
-		.withFileToUpload("dumpfile", f, "application/octet-stream");
+		.withFileToUpload("dumpfile", crashFile, "application/octet-stream");
 
 	WebInputStream stream(url, true);
 
@@ -85,7 +84,7 @@ void CrashDumpUploader::uploadDump()
 	} else if(convertedData.contains("ok"))
 	{
 		LOG("Crash log uploaded succesfully");
-		f.deleteFile();
+		crashFile.deleteFile();
 	} else
 	{
 		LOGWARNING("Unknown message from crash log server");
@@ -136,7 +135,7 @@ LONG WINAPI createMiniDump(LPEXCEPTION_POINTERS exceptionPointers)
 	}
 
 	int selectedButtonId = MessageBox(nullptr,
-		_T("Oh, no ! Chataigne got very sad and died alone. Would you help find find out why ?"),
+		_T("Oh, no ! Chataigne got very sad and died alone. Would you help find find out why ? If you click Yes, the file will automatically be uploaded at the next launch of Chataigne. If not, nothing will be done and this sad event will be forever forgotten. The debug file will be located at : %s",dumpFileName),
 		_T("Sacré Hubert, toujours le mot pour rire !"),
 		MB_ICONWARNING | MB_YESNO | MB_DEFBUTTON1
 	);
@@ -145,7 +144,7 @@ LONG WINAPI createMiniDump(LPEXCEPTION_POINTERS exceptionPointers)
 
 	if (selectedButtonId == IDNO)
 		DeleteFile(dumpFileName);
-
+	
 	return EXCEPTION_EXECUTE_HANDLER;
 }
 

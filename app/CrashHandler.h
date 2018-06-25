@@ -9,7 +9,9 @@ public:
 	CrashDumpUploader();
 	~CrashDumpUploader();
 
+	File crashFile;
 	URL remoteURL;
+
 	void init();
 
 	void uploadDump();
