@@ -3,7 +3,7 @@
 class ControllableUtil
 {
 public:
-	static var  createDataForParam(const String & type, const String & name, const String & description, var value, var minVal, var maxVal, bool editable = true, bool hiddenInEditor = false)
+	static var  createDataForParam(const String & type, const String & name, const String & description, var value, var minVal = INT32_MIN, var maxVal = INT32_MAX, bool editable = true, bool hiddenInEditor = false)
 	{
 		var v = var(new DynamicObject());
 		v.getDynamicObject()->setProperty("type", type);

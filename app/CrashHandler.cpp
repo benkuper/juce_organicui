@@ -63,7 +63,7 @@ void CrashDumpUploader::uploadDump()
 	URL url = remoteURL.withParameter("username", SystemStats::getFullUserName().replace(" ","-"))
 		.withParameter("os", SystemStats::getOperatingSystemName().replace(" ","-"))
 		.withParameter("version", getAppVersion())
-#if DEBUG
+#if JUCE_DEBUG
 		.withParameter("branch", "debug")
 #else
 		.withParameter("branch", getAppVersion().endsWith("b") ? "beta" : "stable")
@@ -74,7 +74,7 @@ void CrashDumpUploader::uploadDump()
 
 	String convertedData = stream.readEntireStreamAsString();
 
-#if DEBUG
+#if JUCE_DEBUG
 	LOG("Received : " << convertedData);
 #endif
 
