@@ -208,12 +208,19 @@ UndoableAction * ControllableContainer::removeUndoableControllable(Controllable 
 	return a;
 }
 
-void ControllableContainer::removeControllable(Controllable * c)
+void ControllableContainer::removeControllable(WeakReference<Controllable> c)
 {
+	if (c.wasObjectDeleted())
+	{
+		DBG("Remove controllable but ref was deleted");
+		return;
+	}
+
 	controllableContainerListeners.call(&ControllableContainerListener::controllableRemoved, c);
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableRemoved, this, c));
 
-	if (Parameter * p = dynamic_cast<Parameter*>(c)) {
+	Parameter * p = dynamic_cast<Parameter*>(c.get());
+	if (p != nullptr) {
 		p->removeParameterListener(this);
 		p->removeAsyncParameterListener(this);
 	}
