@@ -138,6 +138,8 @@ using namespace juce;
 #include "controllable/ControllableContainer.h"
 #include "controllable/ui/GenericControllableContainerEditor.h"
 
+#include "controllable/ControllableUtil.h"
+
 #include "updater/AppUpdater.h"
 
 #include "progress/ProgressNotifier.h"

@@ -67,33 +67,3 @@ public:
 	ControllableComparator() {}
 	int compareElements(Controllable* c1, Controllable* c2);
 };
-
-
-class ControllableUtil
-{
-public:
-	static var createDataForParam(const String &type, const String &name, const String &description, var value, var minVal = var(), var maxVal = var(), bool editable = true, bool hiddenInEditor = false);
-
-	//Helpers
-	template<class T>
-	static T * findParentAs(int maxLevel = -1)
-	{
-		int curLevel = 0;
-		if (parentContainer == nullptr) return nullptr;
-
-		auto * cc = this->parentContainer;
-		T * result = dynamic_cast<T *>(cc);
-
-		while (result == nullptr && cc != nullptr)
-		{
-			cc = cc->parentContainer;
-			result = dynamic_cast<T *>(cc);
-			curLevel++;
-			if (maxLevel != -1 && curLevel > maxLevel) return nullptr;
-		}
-
-		return result;
-	}
-
-
-};
