@@ -28,13 +28,17 @@ void ColorParameterUI::paint(Graphics & g)
 {
 	Colour c = colorParam->getColor();
 	int size = jmin(getWidth(), getHeight()) / 2;
-	if (!c.isOpaque()) g.fillCheckerBoard(getLocalBounds().toFloat(), size, size, Colours::white, Colours::white.darker(.2f));
+	if (!c.isOpaque()) g.fillCheckerBoard(getLocalBounds().reduced(1).toFloat(), size, size, Colours::white, Colours::white.darker(.2f));
 	
 	g.setColour(c);
 	g.fillRoundedRectangle(getLocalBounds().toFloat(), 2);
 
-	g.setColour(c.brighter(.5f).withAlpha(1.0f));
-	g.drawRoundedRectangle(getLocalBounds().toFloat(), 2, 1);
+	if (isInteractable())
+	{
+		g.setColour(c.brighter(.5f));
+		g.drawRoundedRectangle(getLocalBounds().reduced(1).toFloat(), 2, 2);
+	}
+	
 }
 
 void ColorParameterUI::resized()
