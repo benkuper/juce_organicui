@@ -18,8 +18,6 @@ ColorParameterUI::ColorParameterUI(ColorParameter * parameter) :
 
 {
 
-
-
 }
 
 ColorParameterUI::~ColorParameterUI()
@@ -28,8 +26,15 @@ ColorParameterUI::~ColorParameterUI()
 
 void ColorParameterUI::paint(Graphics & g)
 {
-	g.setColour(colorParam->getColor());
+	Colour c = colorParam->getColor();
+	int size = jmin(getWidth(), getHeight()) / 2;
+	if (!c.isOpaque()) g.fillCheckerBoard(getLocalBounds().toFloat(), size, size, Colours::white, Colours::white.darker(.2f));
+	
+	g.setColour(c);
 	g.fillRoundedRectangle(getLocalBounds().toFloat(), 2);
+
+	g.setColour(c.brighter(.5f).withAlpha(1.0f));
+	g.drawRoundedRectangle(getLocalBounds().toFloat(), 2, 1);
 }
 
 void ColorParameterUI::resized()

@@ -25,7 +25,7 @@
 #define TEXTNAME_COLOR  Colour(0xff999999)
 
 #define ACTION_COLOR     Colours::cadetblue
-#define MAPPING_COLOR    Colours::pink
+#define MAPPING_COLOR    Colour(0xff7C343B)
 #define AUDIO_COLOR		 Colours::green
 
 

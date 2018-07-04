@@ -131,6 +131,7 @@ void ControllableUI::newMessage(const Controllable::ControllableEvent & e)
 		setAlpha(controllable->enabled ? 1 : .5f);
 		setInterceptsMouseClicks(isInteractable(), isInteractable());
 		controllableStateChanged();
+		repaint();
 	}
 		break;
 
@@ -141,6 +142,7 @@ void ControllableUI::newMessage(const Controllable::ControllableEvent & e)
 	{
 		setInterceptsMouseClicks(isInteractable(), isInteractable());
 		feedbackStateChanged();
+		repaint();
 	}
 		break;
 

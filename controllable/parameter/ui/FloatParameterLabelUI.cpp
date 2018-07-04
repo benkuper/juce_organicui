@@ -114,6 +114,8 @@ void FloatParameterLabelUI::mouseDownInternal(const MouseEvent & e)
 void FloatParameterLabelUI::mouseDrag(const MouseEvent & e)
 {
 	if (!isInteractable()) return;
+	if (valueLabel.isBeingEdited()) return;
+
 	if (valueLabel.getMouseCursor() != MouseCursor::LeftRightResizeCursor)
 	{
 		valueLabel.setMouseCursor(MouseCursor::LeftRightResizeCursor);
@@ -125,6 +127,9 @@ void FloatParameterLabelUI::mouseDrag(const MouseEvent & e)
 
 void FloatParameterLabelUI::mouseUpInternal(const MouseEvent & e)
 {
+	if (!isInteractable()) return;
+	if (valueLabel.isBeingEdited()) return;  
+	
 	valueLabel.setMouseCursor(MouseCursor::NormalCursor);
 	valueLabel.updateMouseCursor();
 

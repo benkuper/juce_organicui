@@ -65,15 +65,15 @@ void StringParameterUI::setSuffix(const String & _suffix)
 void StringParameterUI::setOpaqueBackground(bool value)
 {
 	ParameterUI::setOpaqueBackground(value);
-	valueLabel.setColour(valueLabel.backgroundColourId, opaqueBackground ? (isInteractable() ? BG_COLOR.darker(.1f).withAlpha(.7f):BG_COLOR.brighter(.2f)) : Colours::transparentBlack);
+	valueLabel.setColour(valueLabel.backgroundColourId, opaqueBackground ? (!controllable->isControllableFeedbackOnly ? BG_COLOR.darker(.1f).withAlpha(.7f):BG_COLOR.brighter(.2f)) : Colours::transparentBlack);
 	valueLabel.setColour(valueLabel.outlineColourId, opaqueBackground ? BG_COLOR.brighter(.1f):Colours::transparentWhite);
-	valueLabel.setColour(valueLabel.textColourId, isInteractable() ? TEXT_COLOR : TEXT_COLOR.withAlpha(.6f));
+	valueLabel.setColour(valueLabel.textColourId, !controllable->isControllableFeedbackOnly ? TEXT_COLOR : TEXT_COLOR.withAlpha(.6f));
 }
 
 void StringParameterUI::feedbackStateChanged()
 {
-	valueLabel.setEditable(isInteractable());
-	valueLabel.setEnabled(isInteractable());
+	valueLabel.setEditable(!controllable->isControllableFeedbackOnly);
+	valueLabel.setEnabled(!controllable->isControllableFeedbackOnly);
 	setOpaqueBackground(opaqueBackground); //force refresh color
 }
 
