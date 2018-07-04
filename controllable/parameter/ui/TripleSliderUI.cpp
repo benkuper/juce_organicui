@@ -152,14 +152,17 @@ void TripleSliderUI::newMessage(const Parameter::ParameterEvent & e)
 		yParam.setValue(((Point3DParameter *)e.parameter)->y);
 		zParam.setValue(((Point3DParameter *)e.parameter)->z);
 
-	} else if (e.parameter == &xParam)
+	} else if (isInteractable())
 	{
-		if (xParam.floatValue() != p3d->x) p3d->setVector(xParam.floatValue(), yParam.floatValue(),zParam.floatValue());
-	} else if (e.parameter == &yParam)
-	{
-		if (yParam.floatValue() != p3d->y) p3d->setVector(xParam.floatValue(), yParam.floatValue(), zParam.floatValue());
-	}else if (e.parameter == &zParam)
-	{
-		if (zParam.floatValue() != p3d->z) p3d->setVector(xParam.floatValue(), yParam.floatValue(), zParam.floatValue());
-	} 
+		if (e.parameter == &xParam)
+		{
+			if (xParam.floatValue() != p3d->x) p3d->setVector(xParam.floatValue(), yParam.floatValue(), zParam.floatValue());
+		} else if (e.parameter == &yParam)
+		{
+			if (yParam.floatValue() != p3d->y) p3d->setVector(xParam.floatValue(), yParam.floatValue(), zParam.floatValue());
+		} else if (e.parameter == &zParam)
+		{
+			if (zParam.floatValue() != p3d->z) p3d->setVector(xParam.floatValue(), yParam.floatValue(), zParam.floatValue());
+		}
+	}
 }
