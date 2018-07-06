@@ -486,7 +486,7 @@ T * BaseManager<T>::addItem(T * item, var data, bool addToUndo, bool notify)
 		baseManagerListeners.call(&BaseManager::Listener::itemAdded, item);
 		managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEM_ADDED, item));
 
-		reorderItems();
+		//reorderItems();
 	}
 
 
