@@ -27,7 +27,7 @@ OrganicMainContentComponent::OrganicMainContentComponent()
 
 
 
-#if JUCE_OPENGL
+#if JUCE_OPENGL && JUCE_WINDOWS
 	openGLContext.setComponentPaintingEnabled(true);
 	openGLContext.attachTo(*this);
 #endif
@@ -63,7 +63,7 @@ void OrganicMainContentComponent::init()
 void OrganicMainContentComponent::clear()
 {
 
-#if JUCE_OPENGL
+#if JUCE_OPENGL && JUCE_WINDOWS
 	openGLContext.detach();
 	openGLContext.setRenderer(nullptr);
 #endif
