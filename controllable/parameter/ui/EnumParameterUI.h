@@ -45,7 +45,9 @@ private:
 protected:
 	void feedbackStateChanged() override;
     void valueChanged(const var &) override ;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EnumParameterUI)
+
+private:
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EnumParameterUI)
 
 		
 };

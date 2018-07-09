@@ -103,6 +103,7 @@ public:
 
 	static Outliner * create(const String &contentName) { return new Outliner(contentName); }
 
+private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Outliner)
 };
 

@@ -16,10 +16,11 @@ ApplicationCommandManager& getCommandManager() { return getApp().commandManager;
 OrganicApplication::MainWindow * getMainWindow() { return getApp().mainWindow; }
 
 
-OrganicApplication::OrganicApplication(const String &appName) :
+OrganicApplication::OrganicApplication(const String &appName, bool useWindow) :
 	appSettings("Other Settings"),
 	engine(nullptr),
-	mainComponent(nullptr)
+	mainComponent(nullptr),
+	useWindow(useWindow)
 {
 	PropertiesFile::Options options;
 	options.applicationName = appName;
@@ -48,9 +49,12 @@ void OrganicApplication::initialise(const String & commandLine)
 
 	GlobalSettings::getInstance()->selectionManager = InspectableSelectionManager::mainSelectionManager;
 
-	mainWindow = new MainWindow(getApplicationName(), mainComponent);
+	if (useWindow)
+	{
+		mainWindow = new MainWindow(getApplicationName(), mainComponent);
+		updateAppTitle();
+	}
 	
-	updateAppTitle();
 
 	AppUpdater::getInstance()->addAsyncUpdateListener(this);
 
@@ -79,20 +83,22 @@ void OrganicApplication::initialise(const String & commandLine)
 
 void OrganicApplication::shutdown()
 {   
-	var boundsVar = var(new DynamicObject());
-	juce::Rectangle<int> r = mainWindow->getScreenBounds();
+	if (useWindow)
+	{
+		var boundsVar = var(new DynamicObject());
+		juce::Rectangle<int> r = mainWindow->getScreenBounds();
 
-	getAppProperties().getCommonSettings(true)->setValue("windowX", r.getPosition().x);
-	getAppProperties().getCommonSettings(true)->setValue("windowY", r.getPosition().y);
-	getAppProperties().getCommonSettings(true)->setValue("windowWidth", r.getWidth());
-	getAppProperties().getCommonSettings(true)->setValue("windowHeight", r.getHeight());
-	getAppProperties().getCommonSettings(true)->setValue("fullscreen", mainWindow->isFullScreen());
-	getAppProperties().getCommonSettings(true)->setValue("lastVersion", getApplicationVersion());
-	getAppProperties().getCommonSettings(true)->saveIfNeeded();
+		getAppProperties().getCommonSettings(true)->setValue("windowX", r.getPosition().x);
+		getAppProperties().getCommonSettings(true)->setValue("windowY", r.getPosition().y);
+		getAppProperties().getCommonSettings(true)->setValue("windowWidth", r.getWidth());
+		getAppProperties().getCommonSettings(true)->setValue("windowHeight", r.getHeight());
+		getAppProperties().getCommonSettings(true)->setValue("fullscreen", mainWindow->isFullScreen());
+		getAppProperties().getCommonSettings(true)->setValue("lastVersion", getApplicationVersion());
+	}
 
 	getAppProperties().getUserSettings()->setValue("globalSettings", JSON::toString(GlobalSettings::getInstance()->getJSONData()));
 	getAppProperties().getUserSettings()->saveIfNeeded();
-
+	
 	// Add your application's shutdown code here..
 	mainComponent->clear();
 	mainWindow = nullptr; // (deletes our window)
@@ -178,7 +184,7 @@ void OrganicApplication::newMessage(const AppUpdateEvent & e)
 
 void OrganicApplication::updateAppTitle()
 {
-	if(mainWindow != nullptr) mainWindow->setName(getApplicationName() + " " + getApplicationVersion() + " - " + Engine::mainEngine->getDocumentTitle()+(Engine::mainEngine->hasChangedSinceSaved()?" *":"")); 
+	if(useWindow && mainWindow != nullptr) mainWindow->setName(getApplicationName() + " " + getApplicationVersion() + " - " + Engine::mainEngine->getDocumentTitle()+(Engine::mainEngine->hasChangedSinceSaved()?" *":"")); 
 }
 
 inline OrganicApplication::MainWindow::MainWindow(String name, OrganicMainContentComponent * mainComponent) :
@@ -189,7 +195,7 @@ inline OrganicApplication::MainWindow::MainWindow(String name, OrganicMainConten
 {
 	setResizable(true, true);
 	setUsingNativeTitleBar(true);
-	setContentOwned(mainComponent, true);
+	setContentNonOwned(mainComponent, true);
 	setOpaque(true);
 
 	int tx = getAppProperties().getCommonSettings(true)->getIntValue("windowX");

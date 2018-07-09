@@ -36,7 +36,7 @@ class OrganicApplication :
 {
 public:
 	//==============================================================================
-	OrganicApplication(const String & appName);
+	OrganicApplication(const String & appName, bool useWindow = true);
 
 	ControllableContainer appSettings;
 
@@ -44,7 +44,9 @@ public:
 	ScopedPointer<ApplicationProperties> appProperties;
 
 	ScopedPointer<Engine> engine;
-	OrganicMainContentComponent * mainComponent;
+	ScopedPointer<OrganicMainContentComponent> mainComponent;
+
+	bool useWindow;
 
 	const String getApplicationName() override;
 	const String getApplicationVersion() override;
@@ -76,7 +78,8 @@ public:
 		void visibilityChanged() override;
 
 
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainWindow)
+	private:
+		JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainWindow)
 	};
 
 	ScopedPointer<MainWindow> mainWindow;

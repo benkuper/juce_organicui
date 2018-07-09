@@ -28,7 +28,8 @@ public :
 	// should be inherited
     virtual void triggerTriggered(const Trigger * p) =0;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TriggerUI)
+private:
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TriggerUI)
 
 
 };

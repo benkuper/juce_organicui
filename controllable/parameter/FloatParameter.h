@@ -52,7 +52,8 @@ public:
 	static String getTypeStringStatic() { return "Float"; }
 
 
-   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(FloatParameter)
+private:
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(FloatParameter)
 };
 
 

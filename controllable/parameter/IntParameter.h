@@ -34,7 +34,8 @@ public:
 	virtual String getTypeString() const override { return getTypeStringStatic(); }
 	static String getTypeStringStatic() { return "Integer"; }
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(IntParameter)
+private:
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(IntParameter)
 };
 
 

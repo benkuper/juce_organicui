@@ -245,7 +245,8 @@ public:
 
 	virtual InspectableEditor * getEditor(bool /*isRootEditor*/) override;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ControllableContainer)
+	private:
+		JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ControllableContainer)
 };
 
 

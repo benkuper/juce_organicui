@@ -23,7 +23,8 @@ public:
 protected:
     void valueChanged(const var&) override { repaint(); };
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(IntSliderUI)
+private:
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(IntSliderUI)
 };
 
 

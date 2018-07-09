@@ -47,6 +47,7 @@ public:
 	void removeShapeShifterTabListener(TabListener* listener) { tabListeners.remove(listener); }
 
 
+private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ShapeShifterPanelTab)
 };
 

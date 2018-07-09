@@ -22,6 +22,7 @@ public:
 
 	void resizedInternalContent(Rectangle<int> &r) override;
 
+private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AutomationEditor)
 };
 

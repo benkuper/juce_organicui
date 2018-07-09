@@ -80,6 +80,7 @@ public:
 	void addBaseItemListener(Listener* newListener) { baseItemListeners.add(newListener); }
 	void removeBaseItemListener(Listener* listener) { baseItemListeners.remove(listener); }
 
+private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BaseItem)
 };
 

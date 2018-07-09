@@ -44,6 +44,7 @@ protected:
 	void newMessage(const Parameter::ParameterEvent &e) override;
 	void newMessage(const ContainerAsyncEvent &e) override;
 
+private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TargetParameterUI)
 };
 

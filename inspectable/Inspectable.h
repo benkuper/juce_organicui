@@ -82,6 +82,7 @@ public:
 	void removeAsyncInspectableListener(AsyncListener* listener) { inspectableNotifier.removeListener(listener); }
 
 	WeakReference<Inspectable>::Master masterReference;
+private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Inspectable)
 };
 

@@ -10,9 +10,9 @@
 
 ShapeShifterWindow::ShapeShifterWindow(ShapeShifterPanel * _panel, juce::Rectangle<int> bounds) :
 	ResizableWindow(_panel->currentContent->contentName, true),
-panel(_panel),
-checking(false),
-dragMode(PANEL)
+	panel(_panel),
+	checking(false),
+	dragMode(PANEL)
 {
 	setTopLeftPosition(bounds.getTopLeft());
 	_panel->setBounds(bounds);

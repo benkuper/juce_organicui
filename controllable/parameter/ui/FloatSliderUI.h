@@ -56,8 +56,10 @@ public:
 
 
 protected:
-    void valueChanged(const var &) override ;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FloatSliderUI)
+    void valueChanged(const var &) override;
+
+private:
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FloatSliderUI)
 };
 
 #endif  // FLOATSLIDERUI_H_INCLUDED

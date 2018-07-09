@@ -37,6 +37,7 @@ public:
 	void addGrabberListener(Listener* newListener) { listeners.add(newListener); }
 	void removeGrabberListener(Listener* listener) { listeners.remove(listener); }
 
+private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(GapGrabber)
 };
 

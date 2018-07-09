@@ -112,6 +112,7 @@ public:
 	void addItemUIListener(ItemUIListener* newListener) { itemUIListeners.add(newListener); }
 	void removeItemUIListener(ItemUIListener* listener) { itemUIListeners.remove(listener); }
 
+private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BaseItemUI<T>)
 };
 

@@ -44,6 +44,8 @@ protected:
 	virtual void newMessage(const Parameter::ParameterEvent & e) override;
 
 	//void valueChanged(const var &) override;
+
+private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DoubleSliderUI)
 };
 

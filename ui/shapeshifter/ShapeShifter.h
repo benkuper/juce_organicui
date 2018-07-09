@@ -43,6 +43,7 @@ public :
 	virtual void loadLayout(var layout);
 	virtual void loadLayoutInternal(var /*layout*/) {}
 
+private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ShapeShifter)
 };
 

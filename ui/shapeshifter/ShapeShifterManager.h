@@ -81,6 +81,7 @@ public:
 
 	void handleMenuPanelCommand(int commandID);
 
+private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ShapeShifterManager)
 };
 
