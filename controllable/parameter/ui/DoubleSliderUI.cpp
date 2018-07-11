@@ -12,8 +12,8 @@
 DoubleSliderUI::DoubleSliderUI(Point2DParameter * parameter) :
 	ParameterUI(parameter),
 	p2d(parameter),
-	xParam("X","xParam",parameter->x, parameter->minimumValue[0],parameter->maximumValue[0],parameter->enabled),
-	yParam("Y", "yParam", parameter->y, parameter->minimumValue[1],parameter->maximumValue[1], parameter->enabled)
+	xParam("X","xParam",parameter->x, parameter->minimumValue[0],parameter->maximumValue[0]),
+	yParam("Y", "yParam", parameter->y, parameter->minimumValue[1],parameter->maximumValue[1])
 {
 	xParam.canHaveRange = parameter->canHaveRange;
 	yParam.canHaveRange = parameter->canHaveRange;
@@ -127,8 +127,8 @@ void DoubleSliderUI::rangeChanged(Parameter * p)
 
 void DoubleSliderUI::feedbackStateChanged()
 {
-	xParam.setControllableFeedbackOnly(!isInteractable());
-	yParam.setControllableFeedbackOnly(!isInteractable());
+	xParam.setControllableFeedbackOnly(parameter->isControllableFeedbackOnly);
+	yParam.setControllableFeedbackOnly(parameter->isControllableFeedbackOnly);
 }
 
 void DoubleSliderUI::newMessage(const Parameter::ParameterEvent & e)
