@@ -424,8 +424,11 @@ BaseManager<T>::BaseManager(const String & name) :
 	managerNotifier(50),
     comparator(this)
 {
+
 	//setCanHavePresets(false);
 	//hideInEditor = true;
+
+	skipLabelInTarget = true; //by default manager label in targetParameter UI are not interesting
 	nameCanBeChangedByUser = false;
 }
 

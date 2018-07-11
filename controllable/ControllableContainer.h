@@ -40,6 +40,7 @@ public:
 	bool editorIsCollapsed;
 	bool editorCanBeCollapsed;
 	bool hideEditorHeader;
+	bool skipLabelInTarget;
 	std::function<InspectableEditor *(ControllableContainer *, bool)> customGetEditorFunc;
 
 	//save / load

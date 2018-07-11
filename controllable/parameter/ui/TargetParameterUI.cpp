@@ -90,14 +90,14 @@ void TargetParameterUI::updateLabel()
 				{
 					if (targetParameter->showParentNameInEditor)
 					{
-						int curPLevel = 1;
+						int curPLevel = 0;
 						ControllableContainer * cc = targetParameter->target->parentContainer;
-						while (curPLevel < targetParameter->defaultParentLabelLevel)
+						while (curPLevel < targetParameter->defaultParentLabelLevel ||  (cc != nullptr && cc->skipLabelInTarget))
 						{
-							cc = cc->parentContainer;
+							if(curPLevel > 0) cc = cc->parentContainer;
 							curPLevel++;
 						}
-						newText = cc->niceName + ":";
+						if(cc != nullptr) newText = cc->niceName + ":";
 					}
 
 					newText += targetParameter->target->niceName;
@@ -116,14 +116,14 @@ void TargetParameterUI::updateLabel()
 				{
 					if (targetParameter->showParentNameInEditor)
 					{
-						int curPLevel = 1;
-						ControllableContainer * cc = targetParameter->targetContainer->parentContainer;
-						while (curPLevel < targetParameter->defaultParentLabelLevel)
+						int curPLevel = 0;
+						ControllableContainer * cc = targetParameter->targetContainer;
+						while (curPLevel < targetParameter->defaultParentLabelLevel || (cc != nullptr && cc->skipLabelInTarget))
 						{
 							cc = cc->parentContainer;
 							curPLevel++;
 						}
-						newText = cc->niceName + ":";
+						if(cc != nullptr) newText = cc->niceName + ":";
 					}
 
 					newText += targetParameter->targetContainer->niceName;
