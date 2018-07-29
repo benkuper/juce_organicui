@@ -17,8 +17,8 @@ ParameterAutomation::ParameterAutomation(ControllableContainer * rootContainer) 
 	ParameterAutomation((Parameter *)nullptr);
 }
 
-ParameterAutomation::ParameterAutomation(Parameter * _parameter) :
-	BaseItem(_parameter->niceName),
+ParameterAutomation::ParameterAutomation(Parameter * _parameter) : 
+	BaseItem(_parameter != nullptr?_parameter->niceName:"New Parameter Automation"),
 	target(nullptr)
 {
 	setParameter(_parameter);
@@ -26,11 +26,12 @@ ParameterAutomation::ParameterAutomation(Parameter * _parameter) :
 	automation.isSelectable = false;
 	isSelectable = false;
 
-	addChildControllableContainer(&automation);
 	automation.enableSnap->setValue(false);
 	automation.editorCanBeCollapsed = false;
 	automation.editorIsCollapsed = false;
 	automation.showUIInEditor = true;
+	addChildControllableContainer(&automation);
+
 }
 
 ParameterAutomation::~ParameterAutomation()
@@ -93,7 +94,6 @@ void ParameterAutomation::loadJSONDataInternal(var data)
 	BaseItem::loadJSONDataInternal(data);
 	automation.loadJSONData(data.getProperty("automation", var()));
 }
-
 
 
 //Playable
