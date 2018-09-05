@@ -141,6 +141,7 @@ void GenericControllableContainerEditor::resetAndBuild()
 				continue;
 
 			}
+			
 			if (!c->hideInEditor) addControllableUI(c);
 		}	
 

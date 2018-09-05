@@ -27,7 +27,7 @@ FloatParameterLabelUI::FloatParameterLabelUI(Parameter * p) :
 	valueLabel.setColour(Label::ColourIds::textColourId, TEXT_COLOR);
 	
 	valueLabel.addListener(this);
-
+	ParameterUI::setNextFocusOrder(&valueLabel);
 	
 	valueLabel.setColour(valueLabel.backgroundColourId, BG_COLOR.darker(.3f));
 	valueLabel.setColour(valueLabel.backgroundWhenEditingColourId, Colours::black);

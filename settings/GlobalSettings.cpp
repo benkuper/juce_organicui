@@ -36,7 +36,7 @@ GlobalSettings::GlobalSettings() :
 
 	addChildControllableContainer(&editingCC);
 	askBeforeRemovingItems = editingCC.addBoolParameter("Ask before removing items", "If enabled, you will get a confirmation prompt before removing any item", false);
-	constrainKeysToNeighbours = editingCC.addBoolParameter("Constrain curve keys editing", "If enabled, keys won't be able to be moved past their neighbours when editing a curve", true);
+	constrainKeysToNeighbours = editingCC.addBoolParameter("Constrain curve keys editing", "If enabled, keys won't be able to be moved past their neighbours when editing a curve", false);
 
 	addChildControllableContainer(OSCRemoteControl::getInstance());
 }

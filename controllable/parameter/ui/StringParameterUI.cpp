@@ -30,6 +30,7 @@ StringParameterUI::StringParameterUI(Parameter * p) :
 	valueLabel.setColour(CaretComponent::caretColourId, Colours::orange);
 	
 	valueLabel.addMouseListener(this, false);
+	ParameterUI::setNextFocusOrder(&valueLabel);
 
 	feedbackStateChanged();
 

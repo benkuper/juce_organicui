@@ -48,4 +48,14 @@ public:
 		return "";
 	}
 
+	static OSCColour getOSCColour(Colour c)
+	{
+		return OSCColour::fromInt32((int32)(c.getRed() << 24 | c.getGreen() << 16 | c.getBlue() << 8 | c.getAlpha()));
+	}
+
+	static Colour getColourFromOSC(OSCColour c)
+	{
+		return Colour(c.red, c.green, c.blue, c.alpha);
+	}
+
 };

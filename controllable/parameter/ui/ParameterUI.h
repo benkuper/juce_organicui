@@ -17,7 +17,6 @@ class ParameterUI :
 public:
     ParameterUI(Parameter * parameter);
     virtual ~ParameterUI();
-
 	
     WeakReference<Parameter> parameter;
 
@@ -37,6 +36,10 @@ public:
 	virtual void mouseDoubleClick(const MouseEvent &e) override;
 
 	virtual bool isInteractable() override;
+
+	//focus
+	static int currentFocusOrderIndex;
+	static void setNextFocusOrder(Component * focusComponent);
 
 protected:
 

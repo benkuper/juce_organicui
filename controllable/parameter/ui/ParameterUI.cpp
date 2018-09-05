@@ -9,7 +9,9 @@
   ==============================================================================
 */
 
-//==============================================================================
+
+int ParameterUI::currentFocusOrderIndex = 0;
+
 ParameterUI::ParameterUI(Parameter * parameter) :
 	ControllableUI(parameter),
 	parameter(parameter),
@@ -76,7 +78,6 @@ void ParameterUI::showEditRangeWindow()
 
 void ParameterUI::paintOverChildren(Graphics & g)
 {
-
 	ControllableUI::paintOverChildren(g);
 	if (parameter == nullptr) return;
 
@@ -171,6 +172,12 @@ bool ParameterUI::isInteractable()
 {
 	return ControllableUI::isInteractable() && parameter->controlMode == Parameter::ControlMode::MANUAL;
 }
+
+void ParameterUI::setNextFocusOrder(Component * focusComponent)
+{
+	focusComponent->setExplicitFocusOrder(ParameterUI::currentFocusOrderIndex++);
+}
+
 
 
 
