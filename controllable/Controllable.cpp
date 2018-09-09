@@ -163,6 +163,7 @@ var Controllable::getJSONDataInternal()
 
 void Controllable::loadJSONData(var data)
 {
+	if (data.isVoid() || !data.isObject()) return;
 	if (data.getDynamicObject()->hasProperty("type")) saveValueOnly = false;
 
 	if (data.getDynamicObject()->hasProperty("niceName")) setNiceName(data.getProperty("niceName", ""));
