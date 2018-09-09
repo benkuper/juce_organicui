@@ -25,6 +25,8 @@ public:
 	virtual var getLerpValueTo(var targetValue, float weight) override;
 	virtual void setWeightedValue(Array<var> values, Array<float> weights) override;
 
+	virtual bool hasRange() override;
+
     IntSliderUI * createSlider(IntParameter * target = nullptr);
 	IntStepperUI * createStepper(IntParameter * target = nullptr);
 	IntParameterLabelUI * createLabelUI(IntParameter * target = nullptr);
