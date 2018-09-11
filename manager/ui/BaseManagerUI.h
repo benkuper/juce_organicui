@@ -560,7 +560,7 @@ U * BaseManagerUI<M, T, U>::addItemUI(T * item, bool animate, bool resizeAndRepa
 
 	if (useViewport) container.addAndMakeVisible(bui);
 	else addAndMakeVisible(bui);
-	itemsUI.add(tui);
+	itemsUI.insert(manager->items.indexOf(item), tui);
 
 	BaseItemUI<T> * biui = dynamic_cast<BaseItemUI<T> *>(tui);
 	if (biui != nullptr) biui->addItemUIListener(this);

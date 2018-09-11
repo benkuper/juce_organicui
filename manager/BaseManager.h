@@ -32,6 +32,7 @@ public:
 
 	bool userCanAddItemsManually;
 	bool selectItemWhenCreated;
+	//bool autoReorderOnAdd;
 
 	virtual T * createItem(); //to override if special constructor to use
 	virtual T * addItemFromData(var data, bool addToUndo = true); //to be overriden for specific item creation (from data)
@@ -483,6 +484,8 @@ T * BaseManager<T>::addItem(T * item, var data, bool addToUndo, bool notify)
 
 	addChildControllableContainer(bi);
 
+	//if(autoReorderOnAdd) reorderItems();
+
 	addItemInternal(item, data);
 
 	if (notify)
@@ -490,9 +493,7 @@ T * BaseManager<T>::addItem(T * item, var data, bool addToUndo, bool notify)
 		baseManagerListeners.call(&BaseManager::Listener::itemAdded, item);
 		managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEM_ADDED, item));
 
-		//reorderItems();
 	}
-
 
 	if (selectItemWhenCreated) bi->selectThis();
 
