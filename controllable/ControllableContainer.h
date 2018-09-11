@@ -89,7 +89,7 @@ public:
 	Controllable * getControllableByName(const String &name, bool searchNiceNameToo = false);
 	Parameter * getParameterByName(const String &name, bool searchNiceNameToo = false);
 
-	void addChildControllableContainer(ControllableContainer * container);
+	void addChildControllableContainer(ControllableContainer * container, int index = -1);
 	void removeChildControllableContainer(ControllableContainer *container);
 	
 

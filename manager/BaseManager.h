@@ -482,7 +482,7 @@ T * BaseManager<T>::addItem(T * item, var data, bool addToUndo, bool notify)
 
 	//bi->setNiceName(bi->niceName); //force setting a unique name if already taken, after load data so if name is the same as another, will change here
 
-	addChildControllableContainer(bi);
+	addChildControllableContainer(bi, items.indexOf(item));
 
 	//if(autoReorderOnAdd) reorderItems();
 

@@ -308,13 +308,13 @@ Parameter * ControllableContainer::getParameterByName(const String & name, bool 
 	return dynamic_cast<Parameter *>(getControllableByName(name, searchNiceNameToo));;
 }
 
-void ControllableContainer::addChildControllableContainer(ControllableContainer * container)
+void ControllableContainer::addChildControllableContainer(ControllableContainer * container, int index)
 {
 
 	String targetName = getUniqueNameInContainer(container->niceName);
 	container->setNiceName(targetName);
 
-	controllableContainers.add(container);
+	controllableContainers.insert(index, container);
 	container->addControllableContainerListener(this);
 	container->setParentContainer(this);
 	controllableContainerListeners.call(&ControllableContainerListener::controllableContainerAdded, container);

@@ -164,7 +164,8 @@ void GenericControllableContainerEditor::resetAndBuild()
 InspectableEditor * GenericControllableContainerEditor::addEditorUI(ControllableContainer * cc, bool resize)
 {
 	InspectableEditor * ccui = cc->getEditor(false);
-	childEditors.insert(container->controllableContainers.indexOf(cc), ccui);
+	int index = container->controllableContainers.indexOf(cc);
+	childEditors.insert(index, ccui);
 	addAndMakeVisible(ccui);
 	if (resize) resized();
 	return ccui;
