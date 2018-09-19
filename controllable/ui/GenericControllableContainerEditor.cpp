@@ -133,6 +133,7 @@ void GenericControllableContainerEditor::resetAndBuild()
 	
 	if (!canBeCollapsed() || !container->editorIsCollapsed)
 	{
+		
 		for (auto &c : container->controllables)
 		{
 			if (c == nullptr)
@@ -141,10 +142,10 @@ void GenericControllableContainerEditor::resetAndBuild()
 				continue;
 
 			}
-			
-			if (!c->hideInEditor) addControllableUI(c);
-		}	
 
+			if (!c->hideInEditor) addControllableUI(c);
+		}
+		
 		if (container->canInspectChildContainers)
 		{
 			for (auto &cc : container->controllableContainers)
@@ -158,6 +159,7 @@ void GenericControllableContainerEditor::resetAndBuild()
 				if (!cc->hideInEditor) addEditorUI(cc);
 			}
 		}
+
 	}
 }
 
@@ -165,7 +167,7 @@ InspectableEditor * GenericControllableContainerEditor::addEditorUI(Controllable
 {
 	InspectableEditor * ccui = cc->getEditor(false);
 	int index = container->controllableContainers.indexOf(cc);
-	childEditors.insert(index, ccui);
+	childEditors.insert(container->controllables.size()+index, ccui);
 	addAndMakeVisible(ccui);
 	if (resize) resized();
 	return ccui;
@@ -211,7 +213,8 @@ void GenericControllableContainerEditor::addControllableUI(Controllable * c, boo
 	if (!c->isControllableExposed || c->hideInEditor) return;
 
 	InspectableEditor * cui = c->getEditor(false);
-	childEditors.add(cui);
+	int index = container->controllables.indexOf(c);
+	childEditors.insert(index, cui);
 	addAndMakeVisible(cui);
 	if (resize) resized();
 }
