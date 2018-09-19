@@ -39,7 +39,7 @@ AutomationUI::AutomationUI(Automation * _automation, Colour c) :
 
 AutomationUI::~AutomationUI()
 {
-	if (!inspectable.wasObjectDeleted())
+	if (!inspectable.wasObjectDeleted() && manager->selectionManager != nullptr)
 	{
 		manager->selectionManager->removeSelectionListener(this);
 		manager->removeAsyncContainerListener(this);
