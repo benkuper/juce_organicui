@@ -304,6 +304,7 @@ void AutomationUI::mouseDown(const MouseEvent & e)
 		if (e.mods.isLeftButtonDown() && e.mods.isAltDown())
 		{
 			manager->addItem(getPosForX(e.getPosition().x), getValueForY(e.getPosition().y));
+			manager->reorderItems();
 		} else
 		{
 			Array<Component *> selectables;
@@ -354,7 +355,11 @@ void AutomationUI::mouseDown(const MouseEvent & e)
 
 void AutomationUI::mouseDoubleClick(const MouseEvent & e)
 {
-	if (e.eventComponent == this) manager->addItem(getPosForX(e.getPosition().x), getValueForY(e.getPosition().y));
+	if (e.eventComponent == this)
+	{
+		manager->addItem(getPosForX(e.getPosition().x), getValueForY(e.getPosition().y));
+		manager->reorderItems();
+	}
 }
 
 void AutomationUI::mouseDrag(const MouseEvent & e)
