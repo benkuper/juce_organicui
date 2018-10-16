@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    ScriptUtil.cpp
-    Created: 21 Feb 2017 9:17:23am
-    Author:  Ben
+	ScriptUtil.cpp
+	Created: 21 Feb 2017 9:17:23am
+	Author:  Ben
 
   ==============================================================================
 */
@@ -17,18 +17,19 @@ ScriptUtil::ScriptUtil() :
 	scriptObject.setMethod("getTime", ScriptUtil::getTime);
 	scriptObject.setMethod("getFloatFromBytes", ScriptUtil::getFloatFromBytes);
 	scriptObject.setMethod("getInt32FromBytes", ScriptUtil::getInt32FromBytes);
+	scriptObject.setMethod("getInt64FromBytes", ScriptUtil::getInt32FromBytes);
 }
 
 var ScriptUtil::getTime(const var::NativeFunctionArgs &)
 {
-	return (float)Time::getMillisecondCounter() / 1000.;
+	return (float)(Time::getMillisecondCounter() / 1000.);
 }
 
 var ScriptUtil::getFloatFromBytes(const var::NativeFunctionArgs & a)
 {
 	if (a.numArguments < 4) return 0;
 	uint8_t bytes[4];
-	for(int i=0;i<4;i++) bytes[i] = (uint8_t)(int)a.arguments[i];
+	for (int i = 0; i < 4; i++) bytes[i] = (uint8_t)(int)a.arguments[i];
 	float result;
 	memcpy(&result, &bytes, 4);
 	return result;
@@ -38,9 +39,20 @@ var ScriptUtil::getInt32FromBytes(const var::NativeFunctionArgs & a)
 {
 	if (a.numArguments < 4) return 0;
 	uint8_t bytes[4];
-	for (int i = 0; i<4; i++) bytes[i] = (uint8_t)(int)a.arguments[i];
+	for (int i = 0; i < 4; i++) bytes[i] = (uint8_t)(int)a.arguments[i];
 	int result;
 	memcpy(&result, &bytes, 4);
+	return result;
+}
+
+
+var ScriptUtil::getInt64FromBytes(const var::NativeFunctionArgs & a)
+{
+	if (a.numArguments < 8) return 0;
+	uint8_t bytes[8];
+	for (int i = 0; i < 8; i++) bytes[i] = (uint8_t)(int)a.arguments[i];
+	int64 result;
+	memcpy(&result, &bytes, 8);
 	return result;
 }
 
