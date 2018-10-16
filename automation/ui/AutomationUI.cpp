@@ -95,7 +95,7 @@ void AutomationUI::updateROI()
 
 	for (int i = firstROIKey; i <= lastROIKey; i++)
 	{
-		itemsUI[i]->setVisible(true);
+		if(itemsUI != nullptr) itemsUI[i]->setVisible(true);
 	}
 	resized();
 }
