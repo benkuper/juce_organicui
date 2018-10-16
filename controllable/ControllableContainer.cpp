@@ -818,9 +818,15 @@ var ControllableContainer::getChildFromScript(const var::NativeFunctionArgs & a)
 	if (a.numArguments == 0) return var();
 	ControllableContainer * m = getObjectFromJS<ControllableContainer>(a);
 	if (m == nullptr) return var();
-	Controllable * c = m->getControllableByName(a.arguments[0].toString());
-	if (c == nullptr) return  var();
-	return c->getScriptObject();
+	String nameToFind = a.arguments[0].toString();
+	ControllableContainer * cc = m->getControllableContainerByName(nameToFind);
+	if (cc != nullptr) return cc->getScriptObject();
+
+	Controllable * c = m->getControllableByName(nameToFind);
+	if (c != nullptr) return c->getScriptObject();
+
+	LOG("Child not found from script " + a.arguments[0].toString());
+	return var();
 }
 
 
