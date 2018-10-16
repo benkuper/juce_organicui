@@ -250,6 +250,14 @@ var Controllable::setValueFromScript(const juce::var::NativeFunctionArgs& a) {
 						value.size() > 3 ? (float)(value[3]) : 1));
 					
 				}
+				
+			case Controllable::Type::POINT2D:
+				if (value.isArray() && value.size() >= 2) ((Point2DParameter *)c)->setPoint((float)value[0], (float)value[1]);
+				break;
+
+			case Controllable::Type::POINT3D:
+				if (value.isArray() && value.size() >= 3) ((Point3DParameter *)c)->setVector((float)value[0], (float)value[1], (float)value[2]);
+				break;
 
 			default:
 				success = false;
