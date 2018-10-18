@@ -48,7 +48,11 @@ ControllableContainer::~ControllableContainer()
 
 void ControllableContainer::clear() {
 
-	controllables.clear();
+	{
+		ScopedLock lock(controllables.getLock());
+		controllables.clear();
+	}
+
 	controllableContainers.clear();
 	queuedNotifier.cancelPendingUpdate();
 }
@@ -173,7 +177,11 @@ Trigger * ControllableContainer::addTrigger(const String & _niceName, const Stri
 
 void ControllableContainer::addTriggerInternal(Trigger * t)
 {
-	controllables.add(t);
+	{
+		ScopedLock lock(controllables.getLock());
+		controllables.add(t);
+	}
+	
 	t->setParentContainer(this);
 	t->addTriggerListener(this);
 
@@ -185,7 +193,11 @@ void ControllableContainer::addTriggerInternal(Trigger * t)
 void ControllableContainer::addParameterInternal(Parameter * p)
 {
 	p->setParentContainer(this);
-	controllables.add(p);
+
+	{
+		ScopedLock lock(controllables.getLock());
+		controllables.add(p);
+	}
 	p->addParameterListener(this);
 	p->addAsyncParameterListener(this);
 	controllableContainerListeners.call(&ControllableContainerListener::controllableAdded, p);
@@ -228,7 +240,11 @@ void ControllableContainer::removeControllable(WeakReference<Controllable> c)
 
 	c->removeControllableListener(this);
 
-	controllables.removeObject(c);
+	{
+		ScopedLock lock(controllables.getLock());
+		controllables.removeObject(c);
+	}
+
 	notifyStructureChanged();
 }
 
@@ -422,7 +438,11 @@ String ControllableContainer::getControlAddress(ControllableContainer * relative
 
 void ControllableContainer::orderControllablesAlphabetically()
 {
-	controllables.sort(ControllableContainer::comparator, true);
+	{
+		ScopedLock lock(controllables.getLock());
+		controllables.sort(ControllableContainer::comparator, true);
+	}
+
 	controllableContainerListeners.call(&ControllableContainerListener::controllableContainerReordered, this);
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableContainerReordered, this));
 
