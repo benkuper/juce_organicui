@@ -285,8 +285,11 @@ var Parameter::getJSONDataInternal()
 	else if (controlMode == REFERENCE && referenceTarget != nullptr) data.getDynamicObject()->setProperty("reference", referenceTarget->getJSONData());
 
 	if (saveValueOnly) return data;
-	data.getDynamicObject()->setProperty("minValue", minimumValue);
-	data.getDynamicObject()->setProperty("maxValue", maximumValue);
+	if (hasRange())
+	{
+		if((int)minimumValue != INT32_MIN) data.getDynamicObject()->setProperty("minValue", minimumValue);
+		if((int)maximumValue != INT32_MAX) data.getDynamicObject()->setProperty("maxValue", maximumValue);
+	}
 	return data;
 }
 
