@@ -1,3 +1,4 @@
+#include "AutomationKeyUI.h"
 /*
   ==============================================================================
 
@@ -12,6 +13,7 @@
 AutomationKeyUI::AutomationKeyUI(AutomationKey * key, Colour c) :
 	BaseItemMinimalUI(key),
     color(c),
+	showHandle(true),
     keyYPos1(-1),
     keyYPos2(-1),
 	handle(c)
@@ -25,6 +27,19 @@ AutomationKeyUI::AutomationKeyUI(AutomationKey * key, Colour c) :
 
 AutomationKeyUI::~AutomationKeyUI()
 {
+}
+
+void AutomationKeyUI::setShowHandle(bool value)
+{
+	if (showHandle == value) return;
+	showHandle = value;
+	if (showHandle)
+	{
+		if(handle.getParentComponent() == nullptr) addChildComponent(&handle);
+	} else
+	{
+		if (handle.getParentComponent() == this) removeChildComponent(&handle);
+	}
 }
 
 

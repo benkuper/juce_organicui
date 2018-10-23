@@ -1,3 +1,4 @@
+#include "AutomationUI.h"
 /*  ==============================================================================
 
 	AutomationUI.cpp
@@ -15,6 +16,7 @@ AutomationUI::AutomationUI(Automation * _automation, Colour c) :
 	autoResetViewRangeOnLengthUpdate(false),
 	currentPosition(0),
 	color(c),
+	showHandles(true),
 	currentUI(nullptr),
 	transformer(nullptr)
 {
@@ -58,6 +60,13 @@ void AutomationUI::setCurrentValue(const float &val)
 {
 	currentValue = val;
 	repaint(); //to specify ?d
+}
+
+void AutomationUI::setShowKeyHandles(bool value)
+{
+	if (showHandles == value) return;
+	showHandles = value;
+	for (auto &kui : itemsUI) kui->setShowHandle(showHandles);
 }
 
 void AutomationUI::setViewRange(float start, float end)

@@ -22,6 +22,9 @@ public:
     int keyYPos1;
     int keyYPos2;
 
+	bool showHandle;
+	void setShowHandle(bool value);
+
 	ScopedPointer<EasingUI> easingUI;
 
 	const static int handleSize = 6;

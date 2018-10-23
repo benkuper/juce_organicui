@@ -155,13 +155,17 @@ void Automation::addItems(Array<Point<float>> keys, bool removeExistingOverlappi
 
 	Array<AutomationKey *> newKeys;
 
+	int autoIndex = items.size();
 	for (auto &k : keys)
 	{
 		AutomationKey * ak = createItem();
+		ak->setNiceName("Key " + String(autoIndex));
 		ak->position->setValue(k.x);
 		ak->value->setValue(k.y);
 		if (autoSmoothCurve) ak->setEasing(Easing::BEZIER);
 		newKeys.add(ak);
+
+		autoIndex++;
 	}
 
 	DBG("Here add items " << newKeys.size() << " items");

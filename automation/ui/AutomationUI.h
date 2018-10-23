@@ -32,6 +32,8 @@ public:
 
 	bool fixedPosOrValueEnabled; //When using shift key and moving handles, keep either position or value
 
+	bool showHandles;
+
 	Colour color;
 
 	AutomationKeyUI * currentUI;
@@ -40,6 +42,8 @@ public:
 
 	void setCurrentPosition(const float &pos);
 	void setCurrentValue(const float &val);
+
+	void setShowKeyHandles(bool value);
 
 	void setViewRange(float start, float end);
 	void updateROI();
