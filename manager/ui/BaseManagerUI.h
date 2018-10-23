@@ -647,8 +647,10 @@ template<class M, class T, class U>
 void BaseManagerUI<M, T, U>::itemsAddedAsync(Array<T*> items)
 {
 	for (auto &i : items) addItemUI(i, false, false);
+	
 	resized();
 	repaint();
+	
 }
 
 template<class M, class T, class U>
@@ -660,9 +662,16 @@ void BaseManagerUI<M, T, U>::itemRemoved(T * item)
 template<class M, class T, class U>
 void BaseManagerUI<M, T, U>::itemsRemoved(Array<T*> items)
 {
+	if (items.size() == 0) return;
+
 	for (auto &i : items) removeItemUI(i,false);
-	resized();
-	repaint();
+
+	MessageManagerLock mmLock;
+	if (mmLock.lockWasGained())
+	{
+		resized();
+		repaint();
+	}
 }
 
 template<class M, class T, class U>
