@@ -88,7 +88,7 @@ void ControllableContainer::addParameter(Parameter * p)
 
 FloatParameter * ControllableContainer::addFloatParameter(const String & _niceName, const String & description, const float & initialValue, const float & minValue, const float & maxValue, const bool & enabled)
 {
-	String targetName = getUniqueNameInContainer(_niceName);
+	String targetName = (Engine::mainEngine == nullptr || Engine::mainEngine->isLoadingFile)?_niceName:getUniqueNameInContainer(_niceName);
 	FloatParameter * p = new FloatParameter(targetName, description, initialValue, minValue, maxValue, enabled);
 	addControllable(p);
 	return p;
@@ -96,7 +96,7 @@ FloatParameter * ControllableContainer::addFloatParameter(const String & _niceNa
 
 IntParameter * ControllableContainer::addIntParameter(const String & _niceName, const String & _description, const int & initialValue, const int & minValue, const int & maxValue, const bool & enabled)
 {
-	String targetName = getUniqueNameInContainer(_niceName);
+	String targetName = (Engine::mainEngine == nullptr || Engine::mainEngine->isLoadingFile) ? _niceName : getUniqueNameInContainer(_niceName);
 	IntParameter * p = new IntParameter(targetName, _description, initialValue, minValue, maxValue, enabled);
 	addControllable(p);
 	return p;
@@ -104,7 +104,7 @@ IntParameter * ControllableContainer::addIntParameter(const String & _niceName, 
 
 BoolParameter * ControllableContainer::addBoolParameter(const String & _niceName, const String & _description, const bool & value, const bool & enabled)
 {
-	String targetName = getUniqueNameInContainer(_niceName);
+	String targetName = (Engine::mainEngine == nullptr || Engine::mainEngine->isLoadingFile) ? _niceName : getUniqueNameInContainer(_niceName);
 	BoolParameter * p = new BoolParameter(targetName, _description, value, enabled);
 	addControllable(p);
 	return p;
@@ -112,7 +112,7 @@ BoolParameter * ControllableContainer::addBoolParameter(const String & _niceName
 
 StringParameter * ControllableContainer::addStringParameter(const String & _niceName, const String & _description, const String &value, const bool & enabled)
 {
-	String targetName = getUniqueNameInContainer(_niceName);
+	String targetName = (Engine::mainEngine == nullptr || Engine::mainEngine->isLoadingFile) ? _niceName : getUniqueNameInContainer(_niceName);
 	StringParameter * p = new StringParameter(targetName, _description, value, enabled);
 	addControllable(p);
 	return p;
@@ -120,7 +120,7 @@ StringParameter * ControllableContainer::addStringParameter(const String & _nice
 
 EnumParameter * ControllableContainer::addEnumParameter(const String & _niceName, const String & _description, const bool & enabled)
 {
-	String targetName = getUniqueNameInContainer(_niceName);
+	String targetName = (Engine::mainEngine == nullptr || Engine::mainEngine->isLoadingFile) ? _niceName : getUniqueNameInContainer(_niceName);
 	EnumParameter * p = new EnumParameter(targetName, _description, enabled);
 	addControllable(p);
 	return p;
@@ -128,7 +128,7 @@ EnumParameter * ControllableContainer::addEnumParameter(const String & _niceName
 
 Point2DParameter * ControllableContainer::addPoint2DParameter(const String & _niceName, const String & _description, const bool & enabled)
 {
-	String targetName = getUniqueNameInContainer(_niceName);
+	String targetName = (Engine::mainEngine == nullptr || Engine::mainEngine->isLoadingFile) ? _niceName : getUniqueNameInContainer(_niceName);
 	Point2DParameter * p = new Point2DParameter(targetName, _description, enabled);
 	addControllable(p);
 	return p;
@@ -136,7 +136,7 @@ Point2DParameter * ControllableContainer::addPoint2DParameter(const String & _ni
 
 Point3DParameter * ControllableContainer::addPoint3DParameter(const String & _niceName, const String & _description, const bool & enabled)
 {
-	String targetName = getUniqueNameInContainer(_niceName);
+	String targetName = (Engine::mainEngine == nullptr || Engine::mainEngine->isLoadingFile) ? _niceName : getUniqueNameInContainer(_niceName);
 	Point3DParameter * p = new Point3DParameter(targetName, _description, enabled);
 	addControllable(p);
 	return p;
@@ -144,7 +144,7 @@ Point3DParameter * ControllableContainer::addPoint3DParameter(const String & _ni
 
 ColorParameter * ControllableContainer::addColorParameter(const String & _niceName, const String & _description, const Colour &initialColor, const bool & enabled)
 {
-	String targetName = getUniqueNameInContainer(_niceName);
+	String targetName = (Engine::mainEngine == nullptr || Engine::mainEngine->isLoadingFile) ? _niceName : getUniqueNameInContainer(_niceName);
 	ColorParameter * p = new ColorParameter(targetName, _description, initialColor, enabled);
 	addControllable(p);
 	return p;
@@ -152,7 +152,7 @@ ColorParameter * ControllableContainer::addColorParameter(const String & _niceNa
 
 TargetParameter * ControllableContainer::addTargetParameter(const String & _niceName, const String & _description, WeakReference<ControllableContainer> rootReference, const bool & enabled)
 {
-	String targetName = getUniqueNameInContainer(_niceName);
+	String targetName = (Engine::mainEngine == nullptr || Engine::mainEngine->isLoadingFile) ? _niceName : getUniqueNameInContainer(_niceName);
 	TargetParameter * p = new TargetParameter(targetName, _description, "", rootReference, enabled);
 	addControllable(p);
 	return p;
@@ -160,7 +160,7 @@ TargetParameter * ControllableContainer::addTargetParameter(const String & _nice
 
 FileParameter * ControllableContainer::addFileParameter(const String & _niceName, const String & _description, const String & _initialValue)
 {
-	String targetName = getUniqueNameInContainer(_niceName);
+	String targetName = (Engine::mainEngine == nullptr || Engine::mainEngine->isLoadingFile) ? _niceName : getUniqueNameInContainer(_niceName);
 	FileParameter * p = new FileParameter(targetName, _description, _initialValue);
 	addControllable(p);
 	return p;
@@ -168,7 +168,7 @@ FileParameter * ControllableContainer::addFileParameter(const String & _niceName
 
 Trigger * ControllableContainer::addTrigger(const String & _niceName, const String & _description, const bool & enabled)
 {
-	String targetName = getUniqueNameInContainer(_niceName);
+	String targetName = (Engine::mainEngine == nullptr || Engine::mainEngine->isLoadingFile) ? _niceName : getUniqueNameInContainer(_niceName);
 	Trigger * t = new Trigger(targetName, _description, enabled);
 	addControllable(t);
 	return t;
@@ -327,7 +327,7 @@ Parameter * ControllableContainer::getParameterByName(const String & name, bool 
 void ControllableContainer::addChildControllableContainer(ControllableContainer * container, int index)
 {
 
-	String targetName = getUniqueNameInContainer(container->niceName);
+	String targetName = (Engine::mainEngine == nullptr || Engine::mainEngine->isLoadingFile) ? container->niceName : getUniqueNameInContainer(container->niceName);
 	container->setNiceName(targetName);
 
 	controllableContainers.insert(index, container);
