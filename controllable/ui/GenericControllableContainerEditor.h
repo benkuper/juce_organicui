@@ -31,6 +31,8 @@ public:
 	
 	int headerHeight;
 	const int headerGap = 4;
+
+	bool isRebuilding; //to avoid constant resizing when rebuilding/adding items
 	
 	bool prepareToAnimate;
 	ComponentAnimator collapseAnimator;

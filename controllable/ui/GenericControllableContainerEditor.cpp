@@ -15,6 +15,7 @@
 GenericControllableContainerEditor::GenericControllableContainerEditor(WeakReference<Inspectable> inspectable, bool isRoot, bool buildAtCreation) :
 	InspectableEditor(inspectable, isRoot),
 	headerHeight(18),
+	isRebuilding(false),
 	prepareToAnimate(false),
 	contourColor(BG_COLOR.brighter(.3f)),
 	containerLabel("containerLabel", dynamic_cast<ControllableContainer *>(inspectable.get())->niceName),
@@ -55,7 +56,6 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(WeakRefer
 	} else
 	{
 		if(buildAtCreation) resetAndBuild();
-		resized();
 	}
 }
 
@@ -122,6 +122,8 @@ void GenericControllableContainerEditor::setCollapsed(bool value, bool force, bo
 
 void GenericControllableContainerEditor::resetAndBuild()
 {
+	isRebuilding = true;
+
 	clear();
 
 	if (container == nullptr)
@@ -159,8 +161,10 @@ void GenericControllableContainerEditor::resetAndBuild()
 				if (!cc->hideInEditor) addEditorUI(cc);
 			}
 		}
-
 	}
+
+	isRebuilding = false;
+	resized();
 }
 
 InspectableEditor * GenericControllableContainerEditor::addEditorUI(ControllableContainer * cc, bool resize)
@@ -281,9 +285,13 @@ void GenericControllableContainerEditor::newMessage(const ContainerAsyncEvent & 
 	}
 }
 
-void GenericControllableContainerEditor::childBoundsChanged(Component *)
+void GenericControllableContainerEditor::childBoundsChanged(Component * c)
 {
+	if (isRebuilding) return;
+	if (getWidth() == 0 || getHeight() == 0) return;
+
 	resized();
+
 }
 
 void GenericControllableContainerEditor::changeListenerCallback(ChangeBroadcaster * source)
@@ -304,10 +312,19 @@ void GenericControllableContainerEditor::paint(Graphics & g)
 		return;
 	}
 
+	/*
+	if (!isRoot && parentInspector != nullptr)
+	{
+		juce::Rectangle<int> r = getLocalBounds().getIntersection(getLocalArea(parentInspector, parentInspector->getLocalBounds()));
+		g.setColour(Colours::orange.withAlpha(.2f));
+		g.fillRect(r.reduced(10));
+	}
+	*/
+
 	if(!isRoot && !container->hideEditorHeader)
 	{
 		g.setColour(contourColor.withAlpha(.4f));
-	 juce::Rectangle<int> r = getLocalBounds();
+		juce::Rectangle<int> r = getLocalBounds();
 		if (container->editorIsCollapsed && container->editorCanBeCollapsed) r.setHeight(headerHeight);
 		g.fillRoundedRectangle(r.toFloat(), 4);
 	}
@@ -328,9 +345,10 @@ void GenericControllableContainerEditor::paint(Graphics & g)
 
 void GenericControllableContainerEditor::resized()
 {
-
- juce::Rectangle<int> r = getLocalBounds();
+	juce::Rectangle<int> r = getLocalBounds();
+	isRebuilding = true;
 	resizedInternal(r);
+	isRebuilding = false;
 	if(!collapseAnimator.isAnimating() && !prepareToAnimate) setSize(getWidth(), (!isRoot && container->editorIsCollapsed)?headerHeight:jmax<int>(r.getY()+2, headerHeight));
 }
 
@@ -349,11 +367,12 @@ void GenericControllableContainerEditor::resizedInternal(juce::Rectangle<int>& r
 
 		if (canBeCollapsed()) //draw arrow here to have better control in resizedInternalHeader overrides
 		{
-		 juce::Rectangle<int> ar = hr.removeFromLeft(headerHeight).reduced(4);
+			juce::Rectangle<int> ar = hr.removeFromLeft(headerHeight).reduced(4);
 			if (container->editorIsCollapsed) expandBT->setBounds(ar);
 			else collapseBT->setBounds(ar);
 			r.removeFromLeft(2);
 		}
+
 		resizedInternalHeader(hr);
 		r.removeFromTop(headerGap);
 	}
@@ -373,11 +392,13 @@ void GenericControllableContainerEditor::resizedInternalContent(juce::Rectangle<
 {
 	for (auto &cui : childEditors)
 	{
+		
 		int th = cui->getHeight();
 		cui->setBounds(r.withHeight(th));
 		
 		float gap = 4;
 		if (isRoot && dynamic_cast<GenericControllableContainerEditor *>(cui) != nullptr) gap = 16;
+		
 		r.translate(0, th + gap);
 	}
 }
