@@ -55,7 +55,8 @@ class BaseManagerUI :
 	public BaseManager<T>::AsyncListener,
 	public Button::Listener,
 	public EngineListener,
-	public BaseItemUI<T>::ItemUIListener
+	public BaseItemUI<T>::ItemUIListener,
+	public ComponentListener
 {
 public:
 	BaseManagerUI<M, T, U>(const String &contentName, M * _manager, bool _useViewport = true);
@@ -120,6 +121,10 @@ public:
 
 
 	virtual void childBoundsChanged(Component *) override;
+
+	//For container check
+	virtual void componentMovedOrResized(Component &c, bool wasMoved, bool wasResized);
+
 
 	virtual void showMenuAndAddItem(bool isFromAddButton, Point<int> mouseDownPos);
 	virtual void addItemFromMenu(bool isFromAddButton, Point<int> mouseDownPos);
@@ -203,6 +208,8 @@ BaseManagerUI<M, T, U>::BaseManagerUI(const String & contentName, M * _manager, 
 
 	if (useViewport)
 	{
+		container.addComponentListener(this);
+
 		viewport.setViewedComponent(&container, false);
 		viewport.setScrollBarsShown(true, false);
 		viewport.setScrollOnDragEnabled(false);
@@ -455,7 +462,16 @@ void BaseManagerUI<M, T, U>::resizedInternalContent(juce::Rectangle<int>& r)
 			tr = r.withWidth(bui->getWidth());
 		}
 
-		if(tr != bui->getBounds()) bui->setBounds(tr);
+		/*juce::Rectangle<int> vr = this->getLocalArea(&container, tr);
+		if (defaultLayout == VERTICAL && (vr.getY() > viewport.getBounds().getBottom() - 20 || vr.getBottom() < viewport.getY() + 20))
+		{
+			bui->setVisible(false);
+		} else
+		{
+			bui->setVisible(true);
+		}*/
+
+		if (bui->isVisible() && tr != bui->getBounds()) bui->setBounds(tr);
 
 		if (defaultLayout == VERTICAL) r.translate(0, tr.getHeight() + gap);
 		else r.translate(tr.getWidth() + gap, 0);
@@ -514,6 +530,20 @@ template<class M, class T, class U>
 void BaseManagerUI<M, T, U>::childBoundsChanged(Component * c)
 {
 	if (resizeOnChildBoundsChanged && c != &viewport) resized();
+}
+
+template<class M, class T, class U>
+inline void BaseManagerUI<M, T, U>::componentMovedOrResized(Component & c, bool wasMoved, bool wasResized)
+{
+	if (&c == &container && !itemAnimator.isAnimating())
+	{
+		for (auto &bui : itemsUI)
+		{
+			juce::Rectangle<int> vr = this->getLocalArea(bui, bui->getLocalBounds());
+			if (defaultLayout == VERTICAL && (vr.getY() > viewport.getBounds().getBottom() || vr.getBottom() < viewport.getY())) bui->setVisible(false);
+			else bui->setVisible(true);
+		}
+	}
 }
 
 template<class M, class T, class U>

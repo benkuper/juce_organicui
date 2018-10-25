@@ -64,6 +64,7 @@ public:
 	virtual void itemUIGrabbed(BaseItemUI<T> * se) override;
 	virtual void itemUIMiniModeChanged(BaseItemUI<T> * se) override;
 
+
 	virtual void endLoadFile() override;
 };
 
