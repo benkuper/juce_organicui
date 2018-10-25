@@ -18,8 +18,13 @@ AutomationKeyUI::AutomationKeyUI(AutomationKey * key, Colour c) :
     keyYPos2(-1),
 	handle(c)
 {
+
 	addAndMakeVisible(&handle);
 	//removeMouseListener(this);
+
+	bringToFrontOnSelect = false;
+	setWantsKeyboardFocus(false);
+	setMouseClickGrabsKeyboardFocus(false);
 
 	autoDrawHighlightWhenSelected = false;
 	setEasingUI(item->easing != nullptr ? item->easing->createUI() : nullptr);
@@ -31,6 +36,7 @@ AutomationKeyUI::~AutomationKeyUI()
 
 void AutomationKeyUI::setShowHandle(bool value)
 {
+
 	if (showHandle == value) return;
 	showHandle = value;
 	if (showHandle)
@@ -69,7 +75,7 @@ void AutomationKeyUI::setKeyPositions(const int &k1, const int &k2)
 	keyYPos2 = k2;
 	if (easingUI != nullptr) easingUI->setKeyPositions(keyYPos1, keyYPos2);
 
-	Rectangle<int> hr = getLocalBounds().withSize(AutomationKeyUI::handleClickZone, AutomationKeyUI::handleClickZone)
+	juce::Rectangle<int> hr = getLocalBounds().withSize(AutomationKeyUI::handleClickZone, AutomationKeyUI::handleClickZone)
 		.withCentre(Point<int>(AutomationKeyUI::handleClickZone / 2, (int)((1 - item->value->floatValue())*getHeight())));
 
 	handle.setBounds(hr);
@@ -101,12 +107,12 @@ void AutomationKeyUI::showKeyEditorWindow()
 
 void AutomationKeyUI::resized()
 {
-	Rectangle<int> hr = getLocalBounds().withSize(AutomationKeyUI::handleClickZone, AutomationKeyUI::handleClickZone)
+	juce::Rectangle<int> hr = getLocalBounds().withSize(AutomationKeyUI::handleClickZone, AutomationKeyUI::handleClickZone)
 		.withCentre(Point<int>(AutomationKeyUI::handleClickZone / 2, (int)((1 - item->value->floatValue())*getHeight())));
 
 	handle.setBounds(hr);
 
-	Rectangle<int> r = getLocalBounds().reduced(AutomationKeyUI::handleClickZone / 2, 0);
+	juce::Rectangle<int> r = getLocalBounds().reduced(AutomationKeyUI::handleClickZone / 2, 0);
 	if (easingUI != nullptr)
 	{
 		easingUI->setBounds(r);
@@ -141,7 +147,7 @@ void AutomationKeyUI::mouseDown(const MouseEvent & e)
 		{
 			PopupMenu p;
 			PopupMenu ep;
-			StringArray keys = item->easingType->getAllKeys();
+			juce::StringArray keys = item->easingType->getAllKeys();
 			int kid = 1;
 			for (auto &i : keys)
 			{
@@ -196,6 +202,8 @@ AutomationKeyUI::Handle::Handle(Colour c) :
 	color(c)
 {
 	setRepaintsOnMouseActivity(true);
+	setWantsKeyboardFocus(false);
+	setMouseClickGrabsKeyboardFocus(false);
 }
 
 void AutomationKeyUI::Handle::paint(Graphics & g)
@@ -204,7 +212,7 @@ void AutomationKeyUI::Handle::paint(Graphics & g)
 	int rad = AutomationKeyUI::handleSize;
 	if (isMouseOver() || highlight) rad += 4;
 
-	Rectangle<float> er = getLocalBounds().withSizeKeepingCentre(rad, rad).toFloat();
+	juce::Rectangle<float> er = getLocalBounds().withSizeKeepingCentre(rad, rad).toFloat();
 
 	Colour cc = isMouseOver() ? color.brighter() : color.darker(.3f);
 	g.setColour(color);

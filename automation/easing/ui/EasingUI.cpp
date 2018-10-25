@@ -16,7 +16,11 @@ EasingUI::EasingUI(Easing * e) :
 	y1(0),y2(0)
 {
 	autoDrawHighlightWhenSelected = false;
+	
 	bringToFrontOnSelect = false; 
+	setWantsKeyboardFocus(false);
+	setMouseClickGrabsKeyboardFocus(false);
+
 	setRepaintsOnMouseActivity(true);
 	easing->addAsyncContainerListener(this);
 }
@@ -31,11 +35,11 @@ void EasingUI::setKeyPositions(const int &k1, const int &k2)
 	y1 = k1;
 	y2 = k2;
 	generatePath();
-	repaint();
 }
 
 void EasingUI::paint(Graphics &g)
 {
+	
 	Colour c = color;
 	if (easing.wasObjectDeleted()) return;
 	if (easing->isSelected) c = HIGHLIGHT_COLOR;
@@ -48,6 +52,7 @@ void EasingUI::paint(Graphics &g)
 	//g.strokePath(hitPath, PathStrokeType(2));
 
 	paintInternal(g);
+	
 }
 
 void EasingUI::resized()
@@ -57,13 +62,13 @@ void EasingUI::resized()
 
 void EasingUI::generatePath()
 {
+	
 	drawPath.clear();
 	drawPath.startNewSubPath(0, y1); 
 	generatePathInternal();
 
 	if(drawPath.getLength()) buildHitPath();
-
-	repaint();
+	
 }
 
 void EasingUI::generatePathInternal()
@@ -228,6 +233,7 @@ bool CubicEasingUI::hitTest(int tx, int ty)
 
 void CubicEasingUI::resized()
 {
+	
 	Point<int> p1 = Point<int>(0, y1);
 	Point<int> p2 = Point<int>(getWidth(), y2);
 
@@ -236,8 +242,10 @@ void CubicEasingUI::resized()
 	Point<float> a = Point<float>(jmap<float>(ce->anchor1->getPoint().x, p1.x, p2.x), jmap<float>(ce->anchor1->getPoint().y, p1.y, p2.y));
 	Point<float> b = Point<float>(jmap<float>(ce->anchor2->getPoint().x, p1.x, p2.x), jmap<float>(ce->anchor2->getPoint().y, p1.y, p2.y));
 	 
-	h1.setBounds(Rectangle<int>(0, 0, 16,16).withCentre(a.toInt()));
-	h2.setBounds(Rectangle<int>(0, 0, 16,16).withCentre(b.toInt()));
+	h1.setBounds(juce::Rectangle<int>(0, 0, 16,16).withCentre(a.toInt()));
+	h2.setBounds(juce::Rectangle<int>(0, 0, 16,16).withCentre(b.toInt()));
+
+	EasingUI::resized();
 }
 
 void CubicEasingUI::generatePathInternal()
@@ -283,8 +291,8 @@ void CubicEasingUI::easingControllableFeedbackUpdate(Controllable * c)
 	CubicEasing * ce = static_cast<CubicEasing *>(easing.get());
 	if (c == ce->anchor1 || c == ce->anchor2)
 	{
-		generatePath();
 		resized();
+		repaint();
 	}
 }
 
@@ -373,6 +381,7 @@ bool SineEasingUI::hitTest(int tx, int ty)
 
 void SineEasingUI::resized()
 {
+
 	Point<int> p1 = Point<int>(0, y1);
 	Point<int> p2 = Point<int>(getWidth(), y2);
 
@@ -380,7 +389,10 @@ void SineEasingUI::resized()
 
 	Point<float> a = Point<float>(jmap<float>(ce->freqAmp->getPoint().x, p1.x, p2.x), jmap<float>(ce->freqAmp->getPoint().y, p1.y, p2.y));
 
-	h1.setBounds(Rectangle<int>(0, 0, 16, 16).withCentre(a.toInt()));
+	h1.setBounds(juce::Rectangle<int>(0, 0, 16, 16).withCentre(a.toInt()));
+
+	EasingUI::resized();
+
 }
 
 void SineEasingUI::paintInternal(Graphics & g)
@@ -410,8 +422,8 @@ void SineEasingUI::easingControllableFeedbackUpdate(Controllable  * c)
 	if (c == ce->freqAmp)
 	{
 		hitPathPrecision = jmin<float>(10 / ce->freqAmp->floatValue(),100);
-		generatePath();
 		resized();
+		repaint();
 	}
 }
 

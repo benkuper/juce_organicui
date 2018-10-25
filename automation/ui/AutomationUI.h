@@ -10,14 +10,24 @@
 
 #pragma once
 
+
 class AutomationUI :
 	public BaseManagerUI<Automation,AutomationKey,AutomationKeyUI>,
 	public ContainerAsyncListener,
-	public InspectableSelectionManager::Listener
+	public InspectableSelectionManager::Listener,
+	public Thread
 {
 public:
 	AutomationUI(Automation * _automation, Colour c = Colours::white);
 	virtual ~AutomationUI();
+	
+	//View optimisation, generate in thread a preview of the image
+	enum ViewMode { EDIT, VIEW };
+	ViewMode viewMode;
+
+	Image viewImage;
+	bool shouldUpdateImage;
+	SpinLock imageLock;
 
 	float viewStartPos;
 	float viewEndPos;
@@ -32,18 +42,17 @@ public:
 
 	bool fixedPosOrValueEnabled; //When using shift key and moving handles, keep either position or value
 
-	bool showHandles;
-
 	Colour color;
 
 	AutomationKeyUI * currentUI;
 	ScopedPointer<AutomationMultiKeyTransformer> transformer;
 
+	
 
 	void setCurrentPosition(const float &pos);
 	void setCurrentValue(const float &val);
 
-	void setShowKeyHandles(bool value);
+	void setViewMode(ViewMode mode);
 
 	void setViewRange(float start, float end);
 	void updateROI();
@@ -82,6 +91,12 @@ public:
 	void newMessage(const ContainerAsyncEvent &e) override;
 
 	void inspectablesSelectionChanged() override;
+
+	void focusGained(FocusChangeType cause) override;
+	void focusLost(FocusChangeType cause) override;
+
+	//Generate image thread
+	void run() override;
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AutomationUI)

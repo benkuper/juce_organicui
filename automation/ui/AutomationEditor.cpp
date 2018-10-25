@@ -30,7 +30,7 @@ AutomationEditor::~AutomationEditor()
 {
 }
 
-void AutomationEditor::resizedInternalContent(Rectangle<int> &r)
+void AutomationEditor::resizedInternalContent(juce::Rectangle<int> &r)
 {
 	if (automationUI != nullptr)
 	{

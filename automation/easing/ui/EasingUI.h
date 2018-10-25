@@ -43,7 +43,6 @@ public:
 
 	void buildHitPath();
 
-
     bool hitTest(int tx, int ty) override;
 
 	virtual void newMessage(const ContainerAsyncEvent &e) override;

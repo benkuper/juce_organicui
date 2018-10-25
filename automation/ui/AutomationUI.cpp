@@ -11,17 +11,19 @@
 
 AutomationUI::AutomationUI(Automation * _automation, Colour c) :
 	BaseManagerUI("Automation", _automation, false),
+	Thread("AutomationViewGenerator"),
 	firstROIKey(0),
 	lastROIKey(0),
 	autoResetViewRangeOnLengthUpdate(false),
 	currentPosition(0),
 	color(c),
-	showHandles(true),
 	currentUI(nullptr),
 	transformer(nullptr)
 {
+
 	manager->selectionManager->addSelectionListener(this);
 
+	
 	setShowAddButton(false);
 	animateItemOnAdd = false;
 
@@ -34,9 +36,10 @@ AutomationUI::AutomationUI(Automation * _automation, Colour c) :
 
 	noItemText = "Add keys by double-clicking here";
 
-	setSize(100, 100);
+	setViewMode(VIEW);
+	//updateROI();
 
-	updateROI();
+	setSize(100, 100);
 }
 
 AutomationUI::~AutomationUI()
@@ -47,6 +50,8 @@ AutomationUI::~AutomationUI()
 		manager->removeAsyncContainerListener(this);
 	}
 
+	signalThreadShouldExit();
+	stopThread(1000);
 }
 
 void AutomationUI::setCurrentPosition(const float &pos)
@@ -62,11 +67,30 @@ void AutomationUI::setCurrentValue(const float &val)
 	repaint(); //to specify ?d
 }
 
-void AutomationUI::setShowKeyHandles(bool value)
+void AutomationUI::setViewMode(ViewMode mode)
 {
-	if (showHandles == value) return;
-	showHandles = value;
-	for (auto &kui : itemsUI) kui->setShowHandle(showHandles);
+	if (viewMode == mode) return;
+	viewMode = mode;
+
+	switch (viewMode)
+	{
+	case EDIT:
+		signalThreadShouldExit();
+		waitForThreadToExit(500);
+
+		updateROI();
+		break;
+
+	case VIEW:
+	{
+		for (auto &i : itemsUI) i->setVisible(false);
+		shouldUpdateImage = true;
+		startThread();
+	}
+	break;
+	}
+
+	repaint();
 }
 
 void AutomationUI::setViewRange(float start, float end)
@@ -79,6 +103,8 @@ void AutomationUI::setViewRange(float start, float end)
 
 void AutomationUI::updateROI()
 {
+	if (viewMode != EDIT) return;
+
 	if (itemsUI.size() == 0) return;
 
 	int len = itemsUI.size() - 1;
@@ -113,20 +139,31 @@ void AutomationUI::paint(Graphics & g)
 {
 	BaseManagerUI::paint(g);
 
+	if (viewMode == VIEW)
+	{
+		if (imageLock.tryEnter())
+		{
+			g.setColour(Colours::white);
+			g.drawImage(viewImage, getLocalBounds().toFloat());
+			imageLock.exit();
+		}
+		
+	}
+	
 
 	//int count = 0;
 	if (itemsUI.size() >= 2)
 	{
 		
 		int ty = getYForValue(currentValue);
-		Rectangle<int> vr = getLocalBounds().withTop(ty);
+		juce::Rectangle<int> vr = getLocalBounds().withTop(ty);
 		g.setColour(color.withAlpha(.1f));
 		if(vr.getHeight() > 0) g.fillRect(vr);
 		
 
 		//pos-value feedback
 		g.setColour(Colours::orange);
-		g.drawEllipse(Rectangle<int>(0, 0, 3, 3).withCentre(Point<int>(getXForPos(currentPosition), ty)).toFloat(), 1);
+		g.drawEllipse(juce::Rectangle<int>(0, 0, 3, 3).withCentre(Point<int>(getXForPos(currentPosition), ty)).toFloat(), 1);
 	}
 
 	//recorder
@@ -162,6 +199,11 @@ void AutomationUI::paint(Graphics & g)
 
 void AutomationUI::resized()
 {
+	if (viewMode == VIEW)
+	{
+		shouldUpdateImage = true;
+		return;
+	}
 
 	MessageManagerLock mm;
 
@@ -172,7 +214,7 @@ void AutomationUI::resized()
 	for (int i = lastROIKey; i >= firstROIKey; i--)
 	{
 		placeKeyUI(itemsUI[i], true);
-		itemsUI[i]->toBack(); // place each ui in front of its right
+		itemsUI[i]->toBack(); // place each ui in front of its right : to be better
 	}
 
 	if (transformer != nullptr) transformer->updateBoundsFromKeys();
@@ -188,7 +230,7 @@ void AutomationUI::placeKeyUI(AutomationKeyUI * kui, bool placePrevKUI)
 
 	int tx = getXForPos(kui->item->position->floatValue());
 	int ty = getYForValue(kui->item->value->floatValue());
-	Rectangle<int> kr;
+	juce::Rectangle<int> kr;
 
 	if (index < itemsUI.size() - 1)
 	{
@@ -197,11 +239,11 @@ void AutomationUI::placeKeyUI(AutomationKeyUI * kui, bool placePrevKUI)
 		int ty2 = getYForValue(nextKey->item->value->floatValue());
 
 		//Rectangle<int> kr2 = Rectangle<int>(0, 0, AutomationKeyUI::handleClickZone, AutomationKeyUI::handleClickZone).withCentre(Point<int>(tx2, ty2));
-		kr = Rectangle<int>(tx, 0, tx2 - tx, getHeight()).expanded(AutomationKeyUI::handleClickZone / 2, 0);
+		kr = juce::Rectangle<int>(tx, 0, tx2 - tx, getHeight()).expanded(AutomationKeyUI::handleClickZone / 2, 0);
 		kui->setKeyPositions(ty, ty2);
 	} else
 	{
-		kr = Rectangle<int>(0, 0, AutomationKeyUI::handleClickZone, getHeight()).withPosition(tx - AutomationKeyUI::handleClickZone / 2, 0);
+		kr = juce::Rectangle<int>(0, 0, AutomationKeyUI::handleClickZone, getHeight()).withPosition(tx - AutomationKeyUI::handleClickZone / 2, 0);
 		kui->setKeyPositions(ty, 0);
 	}
 
@@ -221,8 +263,11 @@ int AutomationUI::getXForPos(float time)
 
 float AutomationUI::getPosForX(int tx, bool offsetStart)
 {
+
 	float viewRange = viewEndPos - viewStartPos;
 	float mapStart = offsetStart ? viewStartPos : 0;
+
+	if (getWidth() == 0) return mapStart;
 	return jmap<float>((float)tx, 0, (float)getWidth(), mapStart, mapStart + viewRange);
 }
 
@@ -520,4 +565,59 @@ void AutomationUI::inspectablesSelectionChanged()
 		addAndMakeVisible(transformer);
 		transformer->grabKeyboardFocus(); // so no specific key has the focus for deleting
 	}
+}
+
+void AutomationUI::focusGained(FocusChangeType cause)
+{
+	//DBG("AUI Focus gained " << cause);
+	setViewMode(EDIT);
+}
+
+void AutomationUI::focusLost(FocusChangeType cause)
+{
+	//DBG("AUI Focus lost " << cause);
+	setViewMode(VIEW);
+}
+
+
+void AutomationUI::run()
+{
+	while (!threadShouldExit())
+	{
+		sleep(50); //20ms is plenty enough
+		
+		if (Engine::mainEngine->isLoadingFile || Engine::mainEngine->isClearing) continue;
+		if (!shouldUpdateImage) continue;
+
+		shouldUpdateImage = false;
+
+		imageLock.enter();
+
+		const int resX = getWidth();
+		const int resY = getHeight();
+
+		if (resX == 0) return;
+		if(resX != viewImage.getWidth() || resY != viewImage.getHeight()) viewImage = Image(Image::ARGB, resX, resY, true);
+		else viewImage.clear(viewImage.getBounds());
+
+
+		for (int tx = 0; tx < resX; tx++)
+		{
+			if (threadShouldExit())
+			{
+				imageLock.exit();
+				return;
+			}
+
+			float ty = getYForValue(manager->getValueForPosition(getPosForX(tx)));
+			viewImage.setPixelAt(tx, ty, Colours::white);
+		}
+
+		imageLock.exit();
+
+		//MessageManagerLock mmLock;
+		//repaint();
+	}
+
+	DBG("Exit AutomationUI Thread");
 }
