@@ -28,7 +28,7 @@ AppUpdater::~AppUpdater()
 {
 	queuedNotifier.cancelPendingUpdate();
 	signalThreadShouldExit();
-	waitForThreadToExit(1000);
+	waitForThreadToExit(5000);
 }
 
   void AppUpdater::setURLs(URL _updateURL, String _downloadURLBase, String _filePrefix)
