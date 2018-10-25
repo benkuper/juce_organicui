@@ -363,7 +363,7 @@ void GenericControllableContainerEditor::resizedInternal(juce::Rectangle<int>& r
 
 	if (!container->hideEditorHeader)
 	{
-	 juce::Rectangle<int> hr = r.removeFromTop(headerHeight);
+		juce::Rectangle<int> hr = r.removeFromTop(headerHeight);
 
 		if (canBeCollapsed()) //draw arrow here to have better control in resizedInternalHeader overrides
 		{
