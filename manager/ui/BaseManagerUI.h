@@ -535,7 +535,7 @@ void BaseManagerUI<M, T, U>::childBoundsChanged(Component * c)
 template<class M, class T, class U>
 inline void BaseManagerUI<M, T, U>::componentMovedOrResized(Component & c, bool wasMoved, bool wasResized)
 {
-	if (&c == &container && !itemAnimator.isAnimating())
+	if (&c == &container && useViewport && !itemAnimator.isAnimating())
 	{
 		for (auto &bui : itemsUI)
 		{
@@ -543,6 +543,8 @@ inline void BaseManagerUI<M, T, U>::componentMovedOrResized(Component & c, bool 
 			if (defaultLayout == VERTICAL && (vr.getY() > viewport.getBounds().getBottom() || vr.getBottom() < viewport.getY())) bui->setVisible(false);
 			else bui->setVisible(true);
 		}
+
+		resized();
 	}
 }
 
