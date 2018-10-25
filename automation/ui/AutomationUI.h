@@ -24,6 +24,7 @@ public:
 	//View optimisation, generate in thread a preview of the image
 	enum ViewMode { EDIT, VIEW };
 	ViewMode viewMode;
+	bool autoSwitchMode;
 
 	Image viewImage;
 	bool shouldUpdateImage;

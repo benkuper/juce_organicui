@@ -16,6 +16,7 @@ AutomationEditor::AutomationEditor(Automation * automation, bool isRoot) :
 	if (automation->showUIInEditor)
 	{
 		automationUI = new AutomationUI(automation);
+
 		automationUI->bgColor = BG_COLOR;
 		automationUI->transparentBG = false;
 		automationUI->autoResetViewRangeOnLengthUpdate = true;

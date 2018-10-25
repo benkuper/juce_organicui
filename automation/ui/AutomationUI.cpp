@@ -12,6 +12,7 @@
 AutomationUI::AutomationUI(Automation * _automation, Colour c) :
 	BaseManagerUI("Automation", _automation, false),
 	Thread("AutomationViewGenerator"),
+	autoSwitchMode(false),
 	firstROIKey(0),
 	lastROIKey(0),
 	autoResetViewRangeOnLengthUpdate(false),
@@ -36,7 +37,9 @@ AutomationUI::AutomationUI(Automation * _automation, Colour c) :
 
 	noItemText = "Add keys by double-clicking here";
 
-	setViewMode(VIEW);
+	viewMode = autoSwitchMode ? EDIT : VIEW; //force trigger change on setViewMode
+	setViewMode(autoSwitchMode ? VIEW : EDIT);
+
 	//updateROI();
 
 	setSize(100, 100);
@@ -569,19 +572,20 @@ void AutomationUI::inspectablesSelectionChanged()
 
 void AutomationUI::focusGained(FocusChangeType cause)
 {
-	//DBG("AUI Focus gained " << cause);
-	setViewMode(EDIT);
+	if(autoSwitchMode) setViewMode(EDIT);
 }
 
 void AutomationUI::focusLost(FocusChangeType cause)
 {
 	//DBG("AUI Focus lost " << cause);
-	setViewMode(VIEW);
+	if(autoSwitchMode) setViewMode(VIEW);
 }
 
 
 void AutomationUI::run()
 {
+	bool firstRun = true;
+
 	while (!threadShouldExit())
 	{
 		sleep(50); //20ms is plenty enough
@@ -615,9 +619,17 @@ void AutomationUI::run()
 
 		imageLock.exit();
 
-		//MessageManagerLock mmLock;
-		//repaint();
+		if (firstRun)
+		{
+			firstRun = false;
+			MessageManagerLock mmLock;
+			repaint();
+		}
 	}
 
-	DBG("Exit AutomationUI Thread");
+	imageLock.enter();
+	viewImage.clear(viewImage.getBounds());
+	imageLock.exit();
+
+	//DBG("Exit AutomationUI Thread");
 }
