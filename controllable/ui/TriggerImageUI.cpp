@@ -37,8 +37,12 @@ void TriggerImageUI::paint(Graphics & g)
 
 void TriggerImageUI::triggerTriggered(const Trigger *)
 {
-	drawTriggering = true;
-	repaint();
+	if (!drawTriggering)
+	{
+		drawTriggering = true;
+		repaint();
+	}
+
 	startTimer(100);
 }
 
