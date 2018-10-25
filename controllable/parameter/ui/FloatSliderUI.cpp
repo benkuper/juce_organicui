@@ -16,7 +16,8 @@ FloatSliderUI::FloatSliderUI(Parameter * parameter) :
 	bgColor(BG_COLOR.darker(.1f).withAlpha(.8f)),
 	useCustomColor(false),
 	addToUndoOnMouseUp(true),
-    fixedDecimals(3)
+	fixedDecimals(3),
+	shouldRepaint(true)
 {
     assignOnMousePosDirect = false;
     changeParamOnMouseUpOnly = false;
@@ -134,7 +135,7 @@ void FloatSliderUI::mouseDrag(const MouseEvent & e)
 {
 	if (!isInteractable()) return;
 
-	if(changeParamOnMouseUpOnly) repaint();
+	if(changeParamOnMouseUpOnly) shouldRepaint = true;
     else
     {
 		if (e.mods.isLeftButtonDown())
@@ -172,8 +173,6 @@ void FloatSliderUI::mouseUpInternal(const MouseEvent &)
     }
 }
 
-
-
 float FloatSliderUI::getValueFromMouse()
 {
     return getValueFromPosition(getMouseXYRelative());
@@ -200,10 +199,33 @@ float FloatSliderUI::getParamNormalizedValue()
     return parameter->getNormalizedValue();
 }
 
+
+void FloatSliderUI::valueChanged(const var &) {
+	shouldRepaint = true;
+};
+
+
 void FloatSliderUI::rangeChanged(Parameter *) {
 	repaint();
 }
 
-void FloatSliderUI::valueChanged(const var &) {
-    repaint();
-};
+void FloatSliderUI::visibilityChanged()
+{
+	if (isVisible())
+	{
+		//DBG(parameter->niceName << " start Timer");
+		startTimerHz(30); //30 fps for slider
+	} else
+	{
+		//DBG(parameter->niceName << " stop Timer");
+		stopTimer();
+	}
+}
+
+void FloatSliderUI::timerCallback()
+{
+	if (!shouldRepaint) return;
+	shouldRepaint = false;
+	repaint();
+
+}

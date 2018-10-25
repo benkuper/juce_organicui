@@ -12,7 +12,9 @@
 #define FLOATSLIDERUI_H_INCLUDED
 
 
-class FloatSliderUI    : public ParameterUI
+class FloatSliderUI :
+	public ParameterUI,
+	public Timer
 {
 
 public:
@@ -22,6 +24,7 @@ public:
     enum Direction { HORIZONTAL, VERTICAL };
 
     //settings
+
     Direction orientation;
 	Colour bgColor;
 	Colour customColor;
@@ -37,6 +40,9 @@ public:
 
     //interaction
     float initValue;
+
+	//drawing checks
+	float shouldRepaint;
 
 	void setFrontColor(Colour c);
 	void resetFrontColor();
@@ -54,6 +60,9 @@ public:
     virtual float getParamNormalizedValue();
 	void rangeChanged(Parameter *)override;
 
+	void visibilityChanged() override;
+
+	void timerCallback() override;
 
 protected:
     void valueChanged(const var &) override;
