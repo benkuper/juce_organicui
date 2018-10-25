@@ -1,4 +1,3 @@
-#include "InspectableEditor.h"
 /*
   ==============================================================================
 
@@ -9,12 +8,17 @@
   ==============================================================================
 */
 
+#include "InspectableEditor.h"
+#include "Inspector.h"
 
 InspectableEditor::InspectableEditor(WeakReference<Inspectable> _inspectable, bool _isRoot) :
-fitToContent(false),
+	parentInspector(nullptr),
+	isInsideInspectorBounds(false),
+	fitToContent(false),
     isRoot(_isRoot),
-inspectable(_inspectable)
+	inspectable(_inspectable)
 {
+	addComponentListener(this);
 }
 
 
@@ -22,9 +26,35 @@ InspectableEditor::~InspectableEditor()
 {
 }
 
+void InspectableEditor::componentMovedOrResized(Component & c, bool wasMoved, bool wasResized)
+{
+	if(&c == this) updateVisibility();
+}
 
+void InspectableEditor::updateVisibility()
+{
+	if (parentInspector == nullptr) return;
 
+	juce::Rectangle<int> r = parentInspector->getLocalArea(this, getLocalBounds()); //getLocalArea(parentInspector, parentInspector->getLocalBounds());
+	juce::Rectangle<int> ir = parentInspector->getLocalBounds().getIntersection(r);
+	
+	isInsideInspectorBounds = !ir.isEmpty();
+	setVisible(isInsideInspectorBounds);
 
+	Array<Component *> children = getChildren();
+	for (auto &c : children)
+	{
+		InspectableEditor * ed = dynamic_cast<InspectableEditor *>(c);
+		if (ed != nullptr) ed->updateVisibility();
+	}
+}
+
+void InspectableEditor::parentHierarchyChanged()
+{
+	parentInspector = findParentComponentOfClass<Inspector>();
+	updateVisibility();
+
+}
 
 
 //GENERIC COMPONENT EDITOR

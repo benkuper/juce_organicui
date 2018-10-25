@@ -12,16 +12,27 @@
 #define INSPECTABLEEDITOR_H_INCLUDED
 
 class Inspectable;
+class Inspector;
 
 class InspectableEditor : 
-	public Component
+	public Component,
+	public ComponentListener
 {
 public:
 	InspectableEditor(WeakReference<Inspectable> inspectable, bool isRoot);
 	virtual ~InspectableEditor();
 
+	Inspector * parentInspector;
+
 	bool fitToContent; 
 	bool isRoot;
+	bool isInsideInspectorBounds;
+
+	void componentMovedOrResized(Component & c, bool wasMoved, bool wasResized) override;
+	
+	void updateVisibility();
+
+	virtual void parentHierarchyChanged() override;
 
 	WeakReference<Inspectable> inspectable;
 
