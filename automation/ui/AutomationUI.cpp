@@ -98,6 +98,8 @@ void AutomationUI::setViewMode(ViewMode mode)
 
 void AutomationUI::setViewRange(float start, float end)
 {
+	if (viewStartPos == start && viewEndPos == end) return;
+
 	viewStartPos = start;
 	viewEndPos = end;
 	updateROI();
@@ -144,12 +146,12 @@ void AutomationUI::paint(Graphics & g)
 
 	if (viewMode == VIEW)
 	{
-		if (imageLock.tryEnter())
-		{
+		imageLock.enter();
+		//{
 			g.setColour(Colours::white);
 			g.drawImage(viewImage, getLocalBounds().toFloat());
 			imageLock.exit();
-		}
+		//}
 		
 	}
 	
@@ -592,7 +594,7 @@ void AutomationUI::run()
 		
 		if (Engine::mainEngine->isLoadingFile || Engine::mainEngine->isClearing) continue;
 		if (!shouldUpdateImage) continue;
-
+		
 		shouldUpdateImage = false;
 
 		imageLock.enter();
@@ -613,8 +615,19 @@ void AutomationUI::run()
 				return;
 			}
 
-			float ty = getYForValue(manager->getValueForPosition(getPosForX(tx)));
-			viewImage.setPixelAt(tx, ty, Colours::white);
+			float val = manager->getValueForPosition(getPosForX(tx));
+			float y = (1 - val)*getHeight();
+			int ty = (int)y;
+			int maxDist = 1;
+			for (int i = ty - maxDist; i <= ty + maxDist; i++)
+			{
+				if (i < 0 || i > viewImage.getHeight()) continue;
+				float alpha = jlimit<float>(0, 1, 1 - (abs(y - i) / maxDist));
+				viewImage.setPixelAt(tx, i, Colours::white.withAlpha(alpha));
+			}
+
+			//if(ty < viewImage.getHeight()) viewImage.setPixelAt(tx, ty+1, Colours::white.withAlpha(.2f));
+			//if(ty > 0) viewImage.setPixelAt(tx, ty-1, Colours::white.withAlpha(.2f));
 		}
 
 		imageLock.exit();
