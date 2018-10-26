@@ -144,6 +144,8 @@ void AutomationUI::paint(Graphics & g)
 {
 	BaseManagerUI::paint(g);
 
+	if (getWidth() == 0 || getHeight() == 0) return;
+
 	if (viewMode == VIEW)
 	{
 		imageLock.enter();
@@ -152,7 +154,6 @@ void AutomationUI::paint(Graphics & g)
 			g.drawImage(viewImage, getLocalBounds().toFloat());
 			imageLock.exit();
 		//}
-		
 	}
 	
 
@@ -602,7 +603,12 @@ void AutomationUI::run()
 		const int resX = getWidth();
 		const int resY = getHeight();
 
-		if (resX == 0) return;
+		if (resX == 0 || resY == 0)
+		{
+			imageLock.exit();
+			return;
+		}
+
 		if(resX != viewImage.getWidth() || resY != viewImage.getHeight()) viewImage = Image(Image::ARGB, resX, resY, true);
 		else viewImage.clear(viewImage.getBounds());
 
