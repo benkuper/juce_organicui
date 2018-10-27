@@ -125,7 +125,8 @@ void GenericControllableContainerEditor::resetAndBuild()
 	isRebuilding = true;
 
 	clear();
-
+	
+	
 	if (container == nullptr)
 	{
 		LOGWARNING("An error has occured here (container null on ResetAndBuild");
@@ -136,30 +137,41 @@ void GenericControllableContainerEditor::resetAndBuild()
 	if (!canBeCollapsed() || !container->editorIsCollapsed)
 	{
 		
-		for (auto &c : container->controllables)
+		if (container->controllables.getLock().tryEnter())
 		{
-			if (c == nullptr)
+			for (auto &c : container->controllables)
 			{
-				LOGWARNING("An error has occured here (child controllable null on ResetAndBuild");
-				continue;
+				if (c == nullptr)
+				{
+					LOGWARNING("An error has occured here (child controllable null on ResetAndBuild");
+					continue;
 
+				}
+
+				if (!c->hideInEditor) addControllableUI(c);
 			}
-
-			if (!c->hideInEditor) addControllableUI(c);
+			container->controllables.getLock().exit();
 		}
+		
 		
 		if (container->canInspectChildContainers)
 		{
-			for (auto &cc : container->controllableContainers)
+			if (container->controllableContainers.getLock().tryEnter())
 			{
-				if (cc == nullptr)
+				for (auto &cc : container->controllableContainers)
 				{
-					LOGWARNING("An error has occured here (child container null on ResetAndBuild");
-					continue;
+					if (cc == nullptr)
+					{
+						LOGWARNING("An error has occured here (child container null on ResetAndBuild");
+						continue;
+					}
+
+					if (!cc->hideInEditor) addEditorUI(cc);
 				}
 
-				if (!cc->hideInEditor) addEditorUI(cc);
+				container->controllableContainers.getLock().exit();
 			}
+			
 		}
 	}
 
