@@ -15,19 +15,16 @@ ScriptEditor::ScriptEditor(Script * _script, bool isRoot) :
 {
 	script->addAsyncScriptListener(this);
 
-	fileBT = AssetManager::getInstance()->getFileBT();
 	reloadBT = script->reload->createImageUI(AssetManager::getInstance()->getReloadImage());
 	editBT = AssetManager::getInstance()->getEditBT();
 	logUI = script->logParam->createToggle();
 
-	fileBT->addListener(this);
 	editBT->addListener(this);
 
 	paramsEditor = script->scriptParamsContainer.getEditor(false);
 	addChildComponent(paramsEditor);
 	paramsEditor->setVisible(script->scriptParamsContainer.controllables.size() > 0);
 
-	addAndMakeVisible(fileBT);
 	addAndMakeVisible(reloadBT);
 	addAndMakeVisible(editBT);
 	addAndMakeVisible(logUI);
@@ -72,11 +69,9 @@ void ScriptEditor::resizedInternalHeaderItemInternal(juce::Rectangle<int>& r)
 	r.removeFromRight(2);
 	logUI->setBounds(r.removeFromRight(40).reduced(2));
 	r.removeFromRight(2);
-	editBT->setBounds(r.removeFromRight(r.getHeight()).reduced(2));
-	r.removeFromRight(2);
 	reloadBT->setBounds(r.removeFromRight(r.getHeight()).reduced(2));
 	r.removeFromRight(2);
-	fileBT->setBounds(r.removeFromRight(r.getHeight()).reduced(2));
+	editBT->setBounds(r.removeFromRight(r.getHeight()).reduced(2));
 	r.removeFromRight(2);
 }
 
@@ -96,13 +91,8 @@ void ScriptEditor::newMessage(const Script::ScriptEvent & e)
 void ScriptEditor::buttonClicked(Button * b)
 {
 	BaseItemEditor::buttonClicked(b);
-	if (b == fileBT)
-	{
-		FileChooser chooser("Load a cacahuete");
-		bool result = chooser.browseForFileToOpen();
-		if (result) script->filePath->setValue(chooser.getResult().getFullPathName());
-
-	} else if (b == editBT)
+	
+	if (b == editBT)
 	{
 		if (script->filePath->stringValue().isEmpty())
 		{
@@ -110,7 +100,28 @@ void ScriptEditor::buttonClicked(Button * b)
 			bool result = chooser.browseForFileToSave(true);
 			if (result)
 			{
-				chooser.getResult().create();
+				File f = chooser.getResult();
+				if (!f.exists())
+				{
+					f.create();
+
+					if (script->scriptTemplate.isNotEmpty())
+					{
+						int templateDataSize = 0;
+						const char * templateData = BinaryData::getNamedResource((script->scriptTemplate + "ScriptTemplate_js").getCharPointer(), templateDataSize);
+						String st = String(templateData);
+						if (st.isNotEmpty())
+						{
+							FileOutputStream fos(f);
+							if (fos.openedOk())
+							{
+								fos.writeText(st,false,false,"\n");
+								fos.flush();
+							}
+						}
+					}
+				}
+
 				script->filePath->setValue(chooser.getResult().getFullPathName());
 			}
 		} 

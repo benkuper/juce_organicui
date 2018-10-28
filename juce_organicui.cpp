@@ -117,6 +117,7 @@
 #include "outliner/Outliner.cpp"
 #include "progress/ProgressNotifier.cpp"
 #include "progress/ui/ProgressWindow.cpp"
+#include "script/ScriptTarget.cpp"
 #include "script/Script.cpp"
 #include "script/ScriptManager.cpp"
 #include "script/ScriptUtil.cpp"

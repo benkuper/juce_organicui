@@ -22,6 +22,7 @@ public:
 
 	enum ScriptState {SCRIPT_LOADING, SCRIPT_LOADED, SCRIPT_ERROR, SCRIPT_EMPTY, SCRIPT_CLEAR };
 
+	String scriptTemplate;
 	FileParameter * filePath;
 	BoolParameter * logParam;
 	Trigger * reload;
@@ -84,6 +85,7 @@ public:
 	//Script functions
 	static var logFromScript(const var::NativeFunctionArgs &args);
 
+	static var addTriggerFromScript(const var::NativeFunctionArgs &args);
 	static var addBoolParameterFromScript(const var::NativeFunctionArgs &args);
 	static var addIntParameterFromScript(const var::NativeFunctionArgs &args);
 	static var addFloatParameterFromScript(const var::NativeFunctionArgs &args);
@@ -91,7 +93,8 @@ public:
 	static var addEnumParameterFromScript(const var::NativeFunctionArgs &args);
 	static var addTargetParameterFromScript(const var::NativeFunctionArgs &args);
 	static var addColorParameterFromScript(const var::NativeFunctionArgs &args);
-	static var addTriggerFromScript(const var::NativeFunctionArgs &args);
+	static var addPoint2DParameterFromScript(const var::NativeFunctionArgs &args);
+	static var addPoint3DParameterFromScript(const var::NativeFunctionArgs &args);
 
 	static bool checkNumArgs(const String &logName, const var::NativeFunctionArgs &args, int expectedArgs);
 

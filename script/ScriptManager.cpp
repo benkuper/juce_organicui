@@ -11,7 +11,8 @@
 
 ScriptManager::ScriptManager(ScriptTarget * _parentTarget):
 	BaseManager("Scripts"),
-	parentTarget(_parentTarget)
+	parentTarget(_parentTarget),
+	scriptTemplate("generic")
 {
 	selectItemWhenCreated = false;
 }
@@ -23,7 +24,9 @@ ScriptManager::~ScriptManager()
 
 Script * ScriptManager::createItem()
 {
-	return new Script(parentTarget);
+	Script * s = new Script(parentTarget);
+	s->scriptTemplate = scriptTemplate;
+	return s;
 }
 
 InspectableEditor * ScriptManager::getEditor(bool isRoot)

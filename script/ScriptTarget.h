@@ -13,47 +13,26 @@
 
 
 const Identifier scriptPtrIdentifier = "_ptr";
+const Identifier ptrCompareIdentifier = "is";
 
 class ScriptTarget
 {
 public:
-	ScriptTarget(const String &name, void * ptr) :
-		thisPtr((int64)ptr),
-		scriptTargetName(name)
-	{
-		scriptObject.setProperty(scriptPtrIdentifier, thisPtr);
-		liveScriptObjectIsDirty = true;
-	}
-
-	virtual ~ScriptTarget() {}
+	ScriptTarget(const String &name, void * ptr);
+	virtual ~ScriptTarget();
 
 	int64 thisPtr;
 	String scriptTargetName;
-	DynamicObject scriptObject;
-	ScopedPointer<DynamicObject> liveScriptObject;
+	juce::DynamicObject scriptObject;
+	ScopedPointer<juce::DynamicObject> liveScriptObject;
 	bool liveScriptObjectIsDirty;
 
-	DynamicObject * getScriptObject()
-	{
-		if (liveScriptObjectIsDirty)
-		{
-			updateLiveScriptObject();
-		}
+	juce::DynamicObject * getScriptObject();
+	void updateLiveScriptObject(juce::DynamicObject * parent = nullptr);
 
-		return new DynamicObject(*liveScriptObject);
-	}
+	virtual void updateLiveScriptObjectInternal(juce::DynamicObject * /*parent*/ = nullptr) {}
 
-	void updateLiveScriptObject(DynamicObject * parent = nullptr)
-	{
-		liveScriptObject = new DynamicObject(scriptObject);
-
-		updateLiveScriptObjectInternal(parent);
-
-		liveScriptObjectIsDirty = false;
-		scriptTargetListeners.call(&ScriptTargetListener::scriptObjectUpdated, this);
-	}
-
-	virtual void updateLiveScriptObjectInternal(DynamicObject * /*parent*/ = nullptr) {}
+	static var checkTargetsAreTheSameFromScript(const var::NativeFunctionArgs &args);
 
 
 	class ScriptTargetListener

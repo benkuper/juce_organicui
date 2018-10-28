@@ -28,13 +28,16 @@ Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled) :
 	reload->hideInEditor = true;
 
 	scriptObject.setMethod("log", Script::logFromScript);
+	scriptObject.setMethod("addTrigger", Script::addTriggerFromScript);
 	scriptObject.setMethod("addBoolParameter", Script::addBoolParameterFromScript);
 	scriptObject.setMethod("addIntParameter", Script::addIntParameterFromScript);
 	scriptObject.setMethod("addFloatParameter", Script::addFloatParameterFromScript);
+	scriptObject.setMethod("addStringParameter", Script::addStringParameterFromScript);
 	scriptObject.setMethod("addEnumParameter", Script::addEnumParameterFromScript);
 	scriptObject.setMethod("addTargetParameter", Script::addTargetParameterFromScript);
+	scriptObject.setMethod("addPoint2DParameter", Script::addPoint2DParameterFromScript);
+	scriptObject.setMethod("addPoint3DParameter", Script::addPoint2DParameterFromScript);
 	scriptObject.setMethod("addColorParameter", Script::addColorParameterFromScript);
-	scriptObject.setMethod("addTrigger", Script::addTriggerFromScript);
 
 	scriptParamsContainer.hideEditorHeader = true;
 	addChildControllableContainer(&scriptParamsContainer);
@@ -102,6 +105,8 @@ void Script::loadScript()
 		NLOG("Script : " + niceName, "Script loaded succesfully");
 		scriptParamsContainer.loadJSONData(paramsContainerData); //keep overriden values
 		paramsContainerData = var();
+		callFunction("init", Array<var>());
+
 		setState(SCRIPT_LOADED);
 	} else
 	{
@@ -182,7 +187,7 @@ void Script::onControllableFeedbackUpdateInternal(ControllableContainer * cc, Co
 		Array<var> args;
 		args.add(c->getScriptObject());
 
-		callFunction("scriptParamChanged", args);
+		callFunction("scriptParameterChanged", args);
 	}
 }
 
@@ -256,6 +261,13 @@ var Script::logFromScript(const var::NativeFunctionArgs & args)
 	return var();
 }
 
+var Script::addTriggerFromScript(const var::NativeFunctionArgs & args)
+{
+	Script * s = getObjectFromJS<Script>(args);
+	if (!checkNumArgs(s->niceName, args, 2)) return var();
+	return s->scriptParamsContainer.addTrigger(args.arguments[0], args.arguments[1])->getScriptObject();
+}
+
 var Script::addBoolParameterFromScript(const var::NativeFunctionArgs & args)
 {
 	Script * s = getObjectFromJS<Script>(args);
@@ -288,7 +300,15 @@ var Script::addEnumParameterFromScript(const var::NativeFunctionArgs & args)
 {
 	Script * s = getObjectFromJS<Script>(args);
 	if (!checkNumArgs(s->niceName, args, 2)) return var();
-	return s->scriptParamsContainer.addEnumParameter(args.arguments[0], args.arguments[1])->getScriptObject();
+	EnumParameter * p = s->scriptParamsContainer.addEnumParameter(args.arguments[0], args.arguments[1]);
+	int numOptions = (int)floor((args.numArguments-2) / 2.0f);
+	for (int i = 0; i < numOptions; i++)
+	{
+		int optionIndex = 2 + i * 2;
+		p->addOption(args.arguments[optionIndex].toString(), args.arguments[optionIndex + 1]);
+	}
+	
+	return p->getScriptObject();
 }
 
 var Script::addTargetParameterFromScript(const var::NativeFunctionArgs & args)
@@ -305,18 +325,26 @@ var Script::addColorParameterFromScript(const var::NativeFunctionArgs & args)
 	return s->scriptParamsContainer.addColorParameter(args.arguments[0], args.arguments[1], Colour((int)(args.arguments[2])))->getScriptObject();
 }
 
-var Script::addTriggerFromScript(const var::NativeFunctionArgs & args)
+var Script::addPoint2DParameterFromScript(const var::NativeFunctionArgs & args)
 {
 	Script * s = getObjectFromJS<Script>(args);
 	if (!checkNumArgs(s->niceName, args, 2)) return var();
-	return s->scriptParamsContainer.addTrigger(args.arguments[0], args.arguments[1])->getScriptObject();
+	return s->scriptParamsContainer.addPoint2DParameter(args.arguments[0], args.arguments[1])->getScriptObject();
 }
+
+var Script::addPoint3DParameterFromScript(const var::NativeFunctionArgs & args)
+{
+	Script * s = getObjectFromJS<Script>(args);
+	if (!checkNumArgs(s->niceName, args, 2)) return var();
+	return s->scriptParamsContainer.addPoint3DParameter(args.arguments[0], args.arguments[1])->getScriptObject();
+}
+
 
 bool Script::checkNumArgs(const String &logName, const var::NativeFunctionArgs & args, int expectedArgs)
 {
-	if (args.numArguments != expectedArgs)
+	if (args.numArguments < expectedArgs)
 	{
-		NLOG(logName, "Error, function takes " + String(expectedArgs) + " arguments, got " + String(args.numArguments));
+		NLOG(logName, "Error, function takes at least" + String(expectedArgs) + " arguments, got " + String(args.numArguments));
 		if (args.numArguments > 0) NLOG("", "When tying to add : " + args.arguments[0].toString());
 		return false;
 	}

@@ -249,8 +249,8 @@ void ControllableContainer::removeControllable(WeakReference<Controllable> c)
 }
 
 
-void ControllableContainer::notifyStructureChanged() {
-
+void ControllableContainer::notifyStructureChanged() 
+{
 	liveScriptObjectIsDirty = true;
 
 	controllableContainerListeners.call(&ControllableContainerListener::childStructureChanged, this);

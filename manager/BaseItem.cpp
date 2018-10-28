@@ -100,18 +100,24 @@ void BaseItem::remove()
 
 void BaseItem::onContainerParameterChanged(Parameter * p)
 {
-	Array<var> args;
-	args.add(p->getScriptObject());
-	if (canHaveScripts) scriptManager->callFunctionOnAllItems("localParamChanged", args);
+	if (canHaveScripts)
+	{
+		Array<var> args;
+		args.add(p->getScriptObject());
+		scriptManager->callFunctionOnAllItems("localParamChanged", args);
+	}
 
 	onContainerParameterChangedInternal(p);
 }
 
 void BaseItem::onContainerTriggerTriggered(Trigger * t)
 {
-	Array<var> args;
-	args.add(t->getScriptObject());
-	if (canHaveScripts) scriptManager->callFunctionOnAllItems("localParamChanged", args);
+	if (canHaveScripts)
+	{
+		Array<var> args;
+		args.add(t->getScriptObject());
+		scriptManager->callFunctionOnAllItems("localParamChanged", args);
+	}
 }
 
 void BaseItem::onControllableFeedbackUpdate(ControllableContainer * cc, Controllable * c)

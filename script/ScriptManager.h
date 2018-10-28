@@ -19,6 +19,7 @@ public:
 	~ScriptManager();
 
 	ScriptTarget * parentTarget;
+	String scriptTemplate;
 
 	Script * createItem() override;
 

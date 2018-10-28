@@ -243,14 +243,14 @@ var Controllable::setValueFromScript(const juce::var::NativeFunctionArgs& a) {
 			case Controllable::Type::COLOR:
 				if (value.isArray() && value.size() >= 3)
 				{
-					DBG(value[0].toString());
 					((ColorParameter *)c)->setColor(Colour::fromFloatRGBA((float)(value[0]), 
 						(float)(value[1]),
 						(float)(value[2]),
 						value.size() > 3 ? (float)(value[3]) : 1));
 					
 				}
-				
+				break;
+
 			case Controllable::Type::POINT2D:
 				if (value.isArray() && value.size() >= 2) ((Point2DParameter *)c)->setPoint((float)value[0], (float)value[1]);
 				break;
