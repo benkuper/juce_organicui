@@ -202,9 +202,16 @@ inline OrganicApplication::MainWindow::MainWindow(String name, OrganicMainConten
 	int ty = getAppProperties().getCommonSettings(true)->getIntValue("windowY");
 	int tw = getAppProperties().getCommonSettings(true)->getIntValue("windowWidth");
 	int th = getAppProperties().getCommonSettings(true)->getIntValue("windowHeight");
-	bool fs = getAppProperties().getCommonSettings(true)->getBoolValue("fullscreen", true);
+
+#if JUCE_WINDOWS
+	bool fullScreenIsDefault = true;
+#else
+	bool fullScreenIsDefault = false;
+#endif
+
+	bool fs = getAppProperties().getCommonSettings(true)->getBoolValue("fullscreen", fullScreenIsDefault);
 	
-	setBounds(jmax<int>(tx, 20), jmax<int>(ty, 20), jmax<int>(tw, 100), jmax<int>(th, 100));
+	setBounds(jmax<int>(tx, 20), jmax<int>(ty, 20), jmax<int>(tw, 600), jmax<int>(th, 400));
 	setFullScreen(fs);
 
 #if ! JUCE_MAC
