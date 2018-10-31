@@ -15,7 +15,8 @@ class AutomationUI :
 	public BaseManagerUI<Automation,AutomationKey,AutomationKeyUI>,
 	public ContainerAsyncListener,
 	public InspectableSelectionManager::Listener,
-	public Thread
+	public Thread,
+	public Timer
 {
 public:
 	AutomationUI(Automation * _automation, Colour c = Colours::white);
@@ -48,7 +49,7 @@ public:
 	AutomationKeyUI * currentUI;
 	ScopedPointer<AutomationMultiKeyTransformer> transformer;
 
-	
+	bool shouldRepaint;
 
 	void setCurrentPosition(const float &pos);
 	void setCurrentValue(const float &val);
@@ -98,6 +99,8 @@ public:
 
 	//Generate image thread
 	void run() override;
+
+	void timerCallback() override;
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AutomationUI)

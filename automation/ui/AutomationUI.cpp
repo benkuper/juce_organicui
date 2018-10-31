@@ -43,6 +43,8 @@ AutomationUI::AutomationUI(Automation * _automation, Colour c) :
 	//updateROI();
 
 	setSize(100, 100);
+
+	startTimerHz(20);
 }
 
 AutomationUI::~AutomationUI()
@@ -61,13 +63,13 @@ void AutomationUI::setCurrentPosition(const float &pos)
 {
 	currentPosition = pos;
 	currentUI = getClosestKeyUIForPos(currentPosition);
-
+	shouldRepaint = true;
 }
 
 void AutomationUI::setCurrentValue(const float &val)
 {
 	currentValue = val;
-	repaint(); //to specify ?d
+	shouldRepaint = true;
 }
 
 void AutomationUI::setViewMode(ViewMode mode)
@@ -225,7 +227,7 @@ void AutomationUI::resized()
 
 	if (transformer != nullptr) transformer->updateBoundsFromKeys();
 
-	repaint(); //overkill? needed to have proper value feedback when creating ui and resizing for the first time
+	shouldRepaint = true;//overkill? needed to have proper value feedback when creating ui and resizing for the first time
 }
 
 void AutomationUI::placeKeyUI(AutomationKeyUI * kui, bool placePrevKUI)
@@ -514,11 +516,9 @@ void AutomationUI::newMessage(const ContainerAsyncEvent & e)
 		if (e.targetControllable == manager->position)
 		{
 			setCurrentPosition(manager->position->floatValue());
-			repaint();
 		} else if (e.targetControllable == manager->value)
 		{
 			setCurrentValue(manager->value->floatValue());
-			repaint();
 		} else if (e.targetControllable == manager->length)
 		{
 			if (autoResetViewRangeOnLengthUpdate) setViewRange(0, manager->length->floatValue());
@@ -642,7 +642,7 @@ void AutomationUI::run()
 		{
 			firstRun = false;
 			MessageManagerLock mmLock;
-			repaint();
+			shouldRepaint = true;
 		}
 	}
 
@@ -651,4 +651,13 @@ void AutomationUI::run()
 	imageLock.exit();
 
 	//DBG("Exit AutomationUI Thread");
+}
+
+void AutomationUI::timerCallback()
+{
+	if (shouldRepaint)
+	{
+		repaint();
+		shouldRepaint = false;
+	}
 }
