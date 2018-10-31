@@ -102,6 +102,7 @@ void ScriptExpression::evaluate(bool resetListeners)
 					p->addParameterListener(this);
 					p->addInspectableListener(this);
 					linkedParameters.add(p);
+					LOG("Detected reference in expression to parameter : " << p->niceName);
 				}
 			}
 			
@@ -165,6 +166,7 @@ Array<Parameter*> ScriptExpression::getParameterReferencesInExpression()
 	
 	for (int i = 0; i < matches.size(); i++)
 	{
+		
 		String scriptToAddress = "/"+matches[i][1].replaceCharacter('.', '/');
 		Controllable * c = Engine::mainEngine != nullptr ? Engine::mainEngine->getControllableForAddress(scriptToAddress) : nullptr;
 		Parameter * p = dynamic_cast<Parameter *>(c);
