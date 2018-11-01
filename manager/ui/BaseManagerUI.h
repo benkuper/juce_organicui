@@ -123,7 +123,7 @@ public:
 	virtual void childBoundsChanged(Component *) override;
 
 	//For container check
-	virtual void componentMovedOrResized(Component &c, bool wasMoved, bool wasResized);
+    virtual void componentMovedOrResized(Component &c, bool wasMoved, bool wasResized) override;
 
 
 	virtual void showMenuAndAddItem(bool isFromAddButton, Point<int> mouseDownPos);

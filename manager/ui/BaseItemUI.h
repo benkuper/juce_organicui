@@ -514,7 +514,7 @@ void BaseItemUI<T>::setGrabber(Grabber * newGrabber)
 template<class T>
 void BaseItemUI<T>::Grabber::paint(Graphics & g)
 {
-	juce::Rectangle<int> r = getLocalBounds();
+	//juce::Rectangle<int> r = getLocalBounds();
 	g.setColour(BG_COLOR.brighter(.3f));
 	const int numLines = 3;
 	for (int i = 0; i < numLines; i++)
