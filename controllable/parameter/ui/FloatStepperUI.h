@@ -13,7 +13,8 @@
 
 class FloatStepperUI : 
 	public ParameterUI, 
-	public Slider::Listener
+	public Slider::Listener,
+    public Timer
 {
 
 public:
@@ -22,8 +23,12 @@ public:
 
     ScopedPointer<BetterStepper> slider;
 
+    bool shouldUpdateStepper;
+    
     void resized() override;
-
+    
+    void timerCallback() override;
+    
 protected:
     void valueChanged(const var &) override;
     void rangeChanged(Parameter * p) override;

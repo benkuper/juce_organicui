@@ -11,7 +11,6 @@
 
 FloatStepperUI::FloatStepperUI(Parameter * _parameter) :
     ParameterUI(_parameter)
-
 {
 	showEditWindowOnDoubleClick = false;
 
@@ -30,6 +29,8 @@ FloatStepperUI::FloatStepperUI(Parameter * _parameter) :
 	feedbackStateChanged();
 
 	addAndMakeVisible(slider);
+    
+    startTimerHz(20);
 }
 
 FloatStepperUI::~FloatStepperUI()
@@ -46,8 +47,7 @@ void FloatStepperUI::resized()
 void FloatStepperUI::valueChanged(const var & value)
 {
     if ((float)value == slider->getValue()) return;
-
-    slider->setValue(value,NotificationType::dontSendNotification);
+    shouldUpdateStepper = true;
 }
 
 void FloatStepperUI::sliderValueChanged(Slider * _slider)
@@ -70,3 +70,12 @@ void FloatStepperUI::feedbackStateChanged()
 	slider->setTextBoxIsEditable(isInteractable());
 	slider->setIncDecButtonsMode(isInteractable()?Slider::IncDecButtonMode::incDecButtonsDraggable_Vertical:Slider::IncDecButtonMode::incDecButtonsNotDraggable);
 }
+
+void FloatStepperUI::timerCallback()
+{
+    if (!shouldUpdateStepper) return;
+    shouldUpdateStepper = false;
+
+    slider->setValue(parameter->floatValue(), NotificationType::dontSendNotification);
+}
+

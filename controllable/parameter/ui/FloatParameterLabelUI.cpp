@@ -43,7 +43,13 @@ FloatParameterLabelUI::FloatParameterLabelUI(Parameter * p) :
 	feedbackStateChanged();
 
 	addMouseListener(this, true);
-
+    
+#if JUCE_MAC
+    startTimerHz(10);
+#else
+    startTimerHz(20);
+#endif
+    
 }
 
 void FloatParameterLabelUI::setAutoSize(bool value)
@@ -138,16 +144,8 @@ void FloatParameterLabelUI::mouseUpInternal(const MouseEvent & e)
 
 void FloatParameterLabelUI::valueChanged(const var & v)
 {
-	valueLabel.setText(prefix + (v.isDouble()?String(parameter->floatValue(),3): v.toString()) + suffix, NotificationType::dontSendNotification);
-	
-	if (autoSize)
-	{
-		int nameLabelWidth = nameLabel.getFont().getStringWidth(nameLabel.getText());
-		int valueLabelWidth = valueLabel.getFont().getStringWidth(valueLabel.getText());
-		int tw = valueLabelWidth;
-		if (nameLabelIsVisible) tw += 5 + nameLabelWidth;
-		setSize(tw + 10, (int)valueLabel.getFont().getHeight());
-	}
+    valueString = v.isDouble()?String(parameter->floatValue(),3):v.toString();
+    shouldUpdateLabel = true;
 }
 
 void FloatParameterLabelUI::labelTextChanged(Label *)
@@ -156,6 +154,25 @@ void FloatParameterLabelUI::labelTextChanged(Label *)
 	parameter->setValue(valueLabel.getText().getFloatValue());
 }
 
+
+void FloatParameterLabelUI::timerCallback()
+{
+    if (!shouldUpdateLabel) return;
+    shouldUpdateLabel = false;
+    
+    
+    valueLabel.setText(prefix + valueString + suffix, NotificationType::dontSendNotification);
+    
+    if (autoSize)
+    {
+        int nameLabelWidth = nameLabel.getFont().getStringWidth(nameLabel.getText());
+        int valueLabelWidth = valueLabel.getFont().getStringWidth(valueLabel.getText());
+        int tw = valueLabelWidth;
+        if (nameLabelIsVisible) tw += 5 + nameLabelWidth;
+        setSize(tw + 10, (int)valueLabel.getFont().getHeight());
+    }
+    
+}
 
 
 
@@ -216,3 +233,5 @@ float TimeLabel::timeStringToValue(String str) const
 
 	return value;
 }
+
+

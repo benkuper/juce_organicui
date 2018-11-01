@@ -13,21 +13,23 @@
 
 class FloatParameterLabelUI :
 	public ParameterUI, 
-	public Label::Listener
+	public Label::Listener,
+    public Timer
 {
 public:
 	FloatParameterLabelUI(Parameter * p);
 	virtual ~FloatParameterLabelUI() {};
 
-
-	
 	Label nameLabel;
 	Label valueLabel;
 
 	String prefix;
 	String suffix;
+    String valueString;
 
 	float maxFontHeight;
+    
+    bool shouldUpdateLabel;
 
 	const float pixelsPerUnit = 10; //1 = 10pixel
 	float valueAtMouseDown;
@@ -55,6 +57,7 @@ protected:
 	void valueChanged(const var & v) override;
 	virtual void labelTextChanged(Label * labelThatHasChanged) override;
 
+    void timerCallback() override;
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(FloatParameterLabelUI)

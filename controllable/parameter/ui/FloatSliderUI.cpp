@@ -214,7 +214,11 @@ void FloatSliderUI::visibilityChanged()
 	if (isVisible())
 	{
 		//DBG(parameter->niceName << " start Timer");
-		startTimerHz(30); //30 fps for slider
+#if JUCE_MAC
+		startTimerHz(20); //20 fps for slider on mac because of bad UI handling
+#else
+        startTimerHz(30); //30 fps for slider
+#endif
 	} else
 	{
 		//DBG(parameter->niceName << " stop Timer");

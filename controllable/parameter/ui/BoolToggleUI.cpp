@@ -24,6 +24,13 @@ BoolToggleUI::BoolToggleUI(Parameter * parameter) :
 	}
 
     setSize(10,10);
+    
+#if JUCE_MAC
+    startTimerHz(20); //20 fps for slider on mac because of bad UI handling
+#else
+    startTimerHz(30); //30 fps for slider
+#endif
+    
 }
 
 BoolToggleUI::~BoolToggleUI()
@@ -92,7 +99,18 @@ bool BoolToggleUI::hitTest(int x, int y)
 	return drawRect.contains(x, y);
 }
 
+
+
 void BoolToggleUI::valueChanged(const var & )
 {
-    repaint();
+    shouldRepaint = true;
 }
+
+void BoolToggleUI::timerCallback()
+{
+    if (!shouldRepaint) return;
+    shouldRepaint = false;
+    repaint();
+    
+}
+

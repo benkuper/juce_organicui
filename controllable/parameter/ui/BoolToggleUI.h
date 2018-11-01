@@ -12,7 +12,8 @@
 #define BOOLTOGGLEUI_H_INCLUDED
 
 class BoolToggleUI :
-	public ParameterUI
+	public ParameterUI,
+    public Timer
 {
 public:
     BoolToggleUI(Parameter * parameter);
@@ -21,9 +22,11 @@ public:
 	Image offImage;
 	Image onImage;
 
- juce::Rectangle<int> drawRect;
+    juce::Rectangle<int> drawRect;
 
     bool invertVisuals;
+    
+    bool shouldRepaint;
 
 	void setImages(Image onImage, Image offImage);
 
@@ -32,6 +35,8 @@ public:
     void mouseUpInternal(const MouseEvent &e) override;
 
 	bool hitTest(int x, int y) override;
+    
+    void timerCallback() override;
 
 protected:
     void valueChanged(const var & ) override;
