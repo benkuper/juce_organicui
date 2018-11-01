@@ -10,6 +10,9 @@
 
 juce_ImplementSingleton(GlobalSettings)
 
+#include "ui/GlobalSettingsEditor.h"
+
+
 GlobalSettings::GlobalSettings() :
 	ControllableContainer("Global Settings"),
 	startupCC("Startup and Update"),
@@ -39,6 +42,8 @@ GlobalSettings::GlobalSettings() :
 	constrainKeysToNeighbours = editingCC.addBoolParameter("Constrain curve keys editing", "If enabled, keys won't be able to be moved past their neighbours when editing a curve", false);
 
 	addChildControllableContainer(OSCRemoteControl::getInstance());
+
+	addChildControllableContainer(&keyMappingsCC);
 }
 
 GlobalSettings::~GlobalSettings()
@@ -67,4 +72,21 @@ void GlobalSettings::loadJSONDataInternal(var data)
 {
 	openSpecificFileOnStartup->setEnabled(!openLastDocumentOnStartup->boolValue());
 	fileToOpenOnStartup->setEnabled(openSpecificFileOnStartup->boolValue());
+}
+
+
+KeyMappingsContainer::KeyMappingsContainer() :
+	ControllableContainer("Key Mappings")
+{
+
+}
+
+KeyMappingsContainer::~KeyMappingsContainer()
+{
+
+}
+
+InspectableEditor * KeyMappingsContainer::getEditor(bool isRoot)
+{
+	return new KeyMappingsContainerEditor(this, isRoot);
 }

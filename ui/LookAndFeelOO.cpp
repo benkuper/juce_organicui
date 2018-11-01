@@ -28,19 +28,27 @@ LookAndFeelOO::~LookAndFeelOO()  {}
 
 static void drawButtonShape (Graphics& g, const Path& outline, Colour baseColour, float height)
 {
+	/*
     const float mainBrightness = baseColour.getBrightness();
     const float mainAlpha = baseColour.getFloatAlpha();
 
     g.setGradientFill (ColourGradient (baseColour.brighter (0.2f), 0.0f, 0.0f,
                                        baseColour.darker (0.25f), 0.0f, height, false));
-    g.fillPath (outline);
+    */
+	
+	g.setColour(baseColour);
+	g.fillPath (outline);
+	g.setColour(baseColour.darker(.2f));
+	g.strokePath(outline, PathStrokeType(1));
 
+	/*
     g.setColour (Colours::white.withAlpha (0.4f * mainAlpha * mainBrightness * mainBrightness));
     g.strokePath (outline, PathStrokeType (1.0f), AffineTransform::translation (0.0f, 1.0f)
                   .scaled (1.0f, (height - 1.6f) / height));
 
     g.setColour (Colours::black.withAlpha (0.4f * mainAlpha));
     g.strokePath (outline, PathStrokeType (1.0f));
+	*/
 }
 
 
@@ -219,7 +227,7 @@ AlertWindow* LookAndFeelOO::createAlertWindow (const String& title, const String
                                                 AlertWindow::AlertIconType iconType,
                                                 int numButtons, Component* associatedComponent)
 {
-    AlertWindow* aw = new AlertWindow (title, message, iconType, associatedComponent);
+    AlertWindow* aw = new AlertWindow (title, message, iconType, associatedComponent); 
 
     if (numButtons == 1)
     {
@@ -618,7 +626,7 @@ int LookAndFeelOO::getMinimumScrollbarThumbSize (ScrollBar& scrollbar)
 
 int LookAndFeelOO::getDefaultScrollbarWidth()
 {
-    return 18;
+    return 8;
 }
 
 int LookAndFeelOO::getScrollbarButtonSize (ScrollBar& scrollbar)
@@ -2499,46 +2507,18 @@ void LookAndFeelOO::drawLevelMeter (Graphics& g, int width, int height, float le
 //==============================================================================
 void LookAndFeelOO::drawKeymapChangeButton (Graphics& g, int width, int height, Button& button, const String& keyDescription)
 {
-    const Colour textColour (button.findColour (0x100ad01 /*KeyMappingEditorComponent::textColourId*/, true));
+	Colour c = BG_COLOR;
+	g.setColour(c);
+	g.fillRoundedRectangle(0, 0, width, height, 4);
+	g.setColour(c.darker(.2f));
+	g.drawRoundedRectangle(0, 0, width, height, 4, 1);
 
-    if (keyDescription.isNotEmpty())
-    {
-        if (button.isEnabled())
-        {
-            const float alpha = button.isDown() ? 0.3f : (button.isOver() ? 0.15f : 0.08f);
-            g.fillAll (textColour.withAlpha (alpha));
+    g.setColour (TEXT_COLOR);
+    g.setFont (height * 0.6f);
+    g.drawFittedText (keyDescription.isNotEmpty() ? keyDescription : "+",
+                        3, 0, width - 6, height,
+                        Justification::centred, 1);
 
-            g.setOpacity (0.3f);
-            drawBevel (g, 0, 0, width, height, 2);
-        }
-
-        g.setColour (textColour);
-        g.setFont (height * 0.6f);
-        g.drawFittedText (keyDescription,
-                          3, 0, width - 6, height,
-                          Justification::centred, 1);
-    }
-    else
-    {
-        const float thickness = 7.0f;
-        const float indent = 22.0f;
-
-        Path p;
-        p.addEllipse (0.0f, 0.0f, 100.0f, 100.0f);
-        p.addRectangle (indent, 50.0f - thickness, 100.0f - indent * 2.0f, thickness * 2.0f);
-        p.addRectangle (50.0f - thickness, indent, thickness * 2.0f, 50.0f - indent - thickness);
-        p.addRectangle (50.0f - thickness, 50.0f + thickness, thickness * 2.0f, 50.0f - indent - thickness);
-        p.setUsingNonZeroWinding (false);
-
-        g.setColour (textColour.withAlpha (button.isDown() ? 0.7f : (button.isOver() ? 0.5f : 0.3f)));
-        g.fillPath (p, p.getTransformToScaleToFit (2.0f, 2.0f, width - 4.0f, height - 4.0f, true));
-    }
-
-    if (button.hasKeyboardFocus (false))
-    {
-        g.setColour (textColour.withAlpha (0.4f));
-        g.drawRect (0, 0, width, height);
-    }
 }
 
 //==============================================================================

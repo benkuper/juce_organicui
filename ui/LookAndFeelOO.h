@@ -94,7 +94,7 @@ namespace LookAndFeelHelpers {
 		Slider::textBoxHighlightColourId,           textHighlightColour,
 		Slider::textBoxOutlineColourId,             BG_COLOR.brighter(.1f).getARGB() ,
 
-        ResizableWindow::backgroundColourId,        0xff777777,
+        ResizableWindow::backgroundColourId,        BG_COLOR.brighter(.1f).getARGB(),
         //DocumentWindow::textColourId,               0xff000000, // (this is deliberately not set)
 
         AlertWindow::backgroundColourId,            0xffededed,

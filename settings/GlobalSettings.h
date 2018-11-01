@@ -10,6 +10,15 @@
 
 #pragma once
 
+class KeyMappingsContainer :
+	public ControllableContainer
+{
+public:
+	KeyMappingsContainer();
+	~KeyMappingsContainer();
+	InspectableEditor * getEditor(bool isRoot) override;
+};
+
 class GlobalSettings :
 	public ControllableContainer
 {
@@ -37,6 +46,9 @@ public:
 	BoolParameter * askBeforeRemovingItems;
 	BoolParameter * constrainKeysToNeighbours;
 
+	KeyMappingsContainer keyMappingsCC;
+
 	void controllableFeedbackUpdate(ControllableContainer *, Controllable * c) override;
 	void loadJSONDataInternal(var data) override;
+
 };

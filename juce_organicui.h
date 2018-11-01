@@ -149,6 +149,7 @@ using namespace juce;
 
 #include "settings/GlobalSettings.h"
 #include "settings/ProjectSettings.h"
+#include "settings/ui/GlobalSettingsEditor.h"
 
 #include "ui/shapeshifter/GapGrabber.h"
 #include "ui/shapeshifter/ShapeShifter.h"
