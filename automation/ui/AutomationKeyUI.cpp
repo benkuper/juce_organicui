@@ -13,10 +13,10 @@
 AutomationKeyUI::AutomationKeyUI(AutomationKey * key, Colour c) :
 	BaseItemMinimalUI(key),
     color(c),
-	showHandle(true),
-    keyYPos1(-1),
+	keyYPos1(-1),
     keyYPos2(-1),
-	handle(c)
+    showHandle(true),
+    handle(c)
 {
 
 	addAndMakeVisible(&handle);

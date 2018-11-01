@@ -22,7 +22,9 @@ public:
 	InspectableEditor(WeakReference<Inspectable> inspectable, bool isRoot);
 	virtual ~InspectableEditor();
 
-	Inspector * parentInspector;
+	WeakReference<Inspectable> inspectable;
+    
+    Inspector * parentInspector;
 
 	bool fitToContent; 
 	bool isRoot;
@@ -34,7 +36,7 @@ public:
 
 	virtual void parentHierarchyChanged() override;
 
-	WeakReference<Inspectable> inspectable;
+	
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(InspectableEditor)

@@ -18,22 +18,22 @@ public:
 	virtual ~AutomationKeyUI();
     
 	Colour color;
+    
+    ScopedPointer<EasingUI> easingUI;
 
     int keyYPos1;
     int keyYPos2;
+    
+    float posAtMouseDown;
+    float valueAtMouseDown;
 
 	bool showHandle;
-	void setShowHandle(bool value);
-
-	ScopedPointer<EasingUI> easingUI;
-
+	
 	const static int handleSize = 6;
 	const static int handleClickZone = 10;
 
-
-	float posAtMouseDown;
-	float valueAtMouseDown;
-
+	
+    void setShowHandle(bool value);
 
 	class Handle :
 		public Component

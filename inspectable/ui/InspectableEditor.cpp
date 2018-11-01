@@ -12,11 +12,12 @@
 #include "Inspector.h"
 
 InspectableEditor::InspectableEditor(WeakReference<Inspectable> _inspectable, bool _isRoot) :
-	parentInspector(nullptr),
-	isInsideInspectorBounds(false),
-	fitToContent(false),
+    inspectable(_inspectable),
+    parentInspector(nullptr),
+    fitToContent(false),
     isRoot(_isRoot),
-	inspectable(_inspectable)
+    isInsideInspectorBounds(false)
+
 {
 	addComponentListener(this);
 }
