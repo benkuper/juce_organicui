@@ -88,16 +88,17 @@ void OrganicApplication::shutdown()
 		var boundsVar = var(new DynamicObject());
 		juce::Rectangle<int> r = mainWindow->getScreenBounds();
 
-		getAppProperties().getCommonSettings(true)->setValue("windowX", r.getPosition().x);
-		getAppProperties().getCommonSettings(true)->setValue("windowY", r.getPosition().y);
-		getAppProperties().getCommonSettings(true)->setValue("windowWidth", r.getWidth());
-		getAppProperties().getCommonSettings(true)->setValue("windowHeight", r.getHeight());
-		getAppProperties().getCommonSettings(true)->setValue("fullscreen", mainWindow->isFullScreen());
-		getAppProperties().getCommonSettings(true)->setValue("lastVersion", getApplicationVersion());
+		getAppProperties().getUserSettings()->setValue("windowX", r.getPosition().x);
+		getAppProperties().getUserSettings()->setValue("windowY", r.getPosition().y);
+		getAppProperties().getUserSettings()->setValue("windowWidth", r.getWidth());
+		getAppProperties().getUserSettings()->setValue("windowHeight", r.getHeight());
+		getAppProperties().getUserSettings()->setValue("fullscreen", mainWindow->isFullScreen());
+		getAppProperties().getUserSettings()->setValue("lastVersion", getApplicationVersion());
 	}
 
 	getAppProperties().getUserSettings()->setValue("globalSettings", JSON::toString(GlobalSettings::getInstance()->getJSONData()));
 	getAppProperties().getUserSettings()->saveIfNeeded();
+
 	
 	// Add your application's shutdown code here..
 	mainComponent->clear();
@@ -198,10 +199,10 @@ inline OrganicApplication::MainWindow::MainWindow(String name, OrganicMainConten
 	setContentNonOwned(mainComponent, true);
 	setOpaque(true);
 
-	int tx = getAppProperties().getCommonSettings(true)->getIntValue("windowX");
-	int ty = getAppProperties().getCommonSettings(true)->getIntValue("windowY");
-	int tw = getAppProperties().getCommonSettings(true)->getIntValue("windowWidth");
-	int th = getAppProperties().getCommonSettings(true)->getIntValue("windowHeight");
+	int tx = getAppProperties().getUserSettings()->getIntValue("windowX");
+	int ty = getAppProperties().getUserSettings()->getIntValue("windowY");
+	int tw = getAppProperties().getUserSettings()->getIntValue("windowWidth");
+	int th = getAppProperties().getUserSettings()->getIntValue("windowHeight");
 
 #if JUCE_WINDOWS
 	bool fullScreenIsDefault = true;
@@ -209,7 +210,7 @@ inline OrganicApplication::MainWindow::MainWindow(String name, OrganicMainConten
 	bool fullScreenIsDefault = false;
 #endif
 
-	bool fs = getAppProperties().getCommonSettings(true)->getBoolValue("fullscreen", fullScreenIsDefault);
+	bool fs = getAppProperties().getUserSettings()->getBoolValue("fullscreen", fullScreenIsDefault);
 	
 	setBounds(jmax<int>(tx, 20), jmax<int>(ty, 20), jmax<int>(tw, 600), jmax<int>(th, 400));
 	setFullScreen(fs);

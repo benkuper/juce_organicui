@@ -10,8 +10,7 @@
 
 juce_ImplementSingleton(GlobalSettings)
 
-#include "ui/GlobalSettingsEditor.h"
-
+ApplicationCommandManager& getCommandManager();
 
 GlobalSettings::GlobalSettings() :
 	ControllableContainer("Global Settings"),
@@ -84,6 +83,25 @@ KeyMappingsContainer::KeyMappingsContainer() :
 KeyMappingsContainer::~KeyMappingsContainer()
 {
 
+}
+
+var KeyMappingsContainer::getJSONData()
+{
+	var data = ControllableContainer::getJSONData();
+	KeyPressMappingSet * kms = getCommandManager().getKeyMappings();
+	ScopedPointer<XmlElement> xmlElement = kms->createXml(true);
+	String xmlData = xmlElement->createDocument("", true);
+	data.getDynamicObject()->setProperty("keyMappings", xmlData);
+	return data;
+}
+
+void KeyMappingsContainer::loadJSONDataInternal(var data)
+{
+	ControllableContainer::loadJSONDataInternal(data);
+	
+	KeyPressMappingSet * kms = getCommandManager().getKeyMappings();
+	ScopedPointer<XmlElement> element = XmlDocument::parse(data.getProperty("keyMappings", "").toString());
+	if (element != nullptr) kms->restoreFromXml(*element);
 }
 
 InspectableEditor * KeyMappingsContainer::getEditor(bool isRoot)
