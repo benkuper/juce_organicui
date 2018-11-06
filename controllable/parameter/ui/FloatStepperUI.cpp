@@ -25,6 +25,7 @@ FloatStepperUI::FloatStepperUI(Parameter * _parameter) :
 	slider->setColour(slider->textBoxBackgroundColourId,BG_COLOR.darker(.1f).withAlpha(.8f));
 	slider->setColour(CaretComponent::caretColourId, Colours::orange);
 	slider->setScrollWheelEnabled(false);
+	slider->setColour(slider->textBoxTextColourId, isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f));
 
 	feedbackStateChanged();
 
@@ -54,10 +55,12 @@ void FloatStepperUI::sliderValueChanged(Slider * _slider)
 {
 	parameter->setValue(_slider->getValue());
 }
+
 void FloatStepperUI::controllableStateChanged()
 {
 	ParameterUI::controllableStateChanged();
 	slider->setEnabled(parameter->enabled);
+	slider->setColour(slider->textBoxTextColourId, isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f));
 }
 
 void FloatStepperUI::rangeChanged(Parameter *){

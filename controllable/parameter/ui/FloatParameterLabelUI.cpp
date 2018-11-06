@@ -24,7 +24,7 @@ FloatParameterLabelUI::FloatParameterLabelUI(Parameter * p) :
 	nameLabel.setColour(Label::ColourIds::textColourId, TEXTNAME_COLOR);
 
 	valueLabel.setJustificationType(Justification::centred);
-	valueLabel.setColour(Label::ColourIds::textColourId, TEXT_COLOR);
+	valueLabel.setColour(Label::ColourIds::textColourId, isInteractable()?TEXT_COLOR:BLUE_COLOR.brighter(.2f));
 	
 	valueLabel.addListener(this);
 	ParameterUI::setNextFocusOrder(&valueLabel);
@@ -84,6 +84,8 @@ void FloatParameterLabelUI::feedbackStateChanged()
 {
 	valueLabel.setEditable(false, isInteractable());
 	valueLabel.setEnabled(isInteractable());
+	valueLabel.setColour(Label::ColourIds::textColourId, isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f));
+	
 	setOpaqueBackground(opaqueBackground); //force refresh color
 }
 
