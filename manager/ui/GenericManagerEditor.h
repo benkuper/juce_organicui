@@ -90,6 +90,12 @@ void GenericManagerEditor<T>::resetAndBuild()
 
 	for (auto &e : childEditors)
 	{
+		if (e == nullptr)
+		{
+			DBG("Item editor is null ???");
+			continue;
+		}
+
 		BaseItemEditor * be = dynamic_cast<BaseItemEditor *>(e);
 		if (be == nullptr) continue;
 		
