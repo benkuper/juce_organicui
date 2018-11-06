@@ -119,6 +119,7 @@ public:
 	virtual void resizedInternalContent(juce::Rectangle<int> &r);
 	virtual void resizedInternalFooter(juce::Rectangle<int> &r);
 
+	virtual void updateItemsVisibility();
 
 	virtual void childBoundsChanged(Component *) override;
 
@@ -527,6 +528,18 @@ void BaseManagerUI<M, T, U>::resizedInternalFooter(juce::Rectangle<int>& r)
 }
 
 template<class M, class T, class U>
+void BaseManagerUI<M, T, U>::updateItemsVisibility()
+{
+	for (auto &bui : itemsUI)
+	{
+		juce::Rectangle<int> vr = this->getLocalArea(bui, bui->getLocalBounds());
+		if (defaultLayout == VERTICAL && (vr.getY() > viewport.getBounds().getBottom() || vr.getBottom() < viewport.getY())) bui->setVisible(false);
+		else bui->setVisible(true);
+	}
+
+}
+
+template<class M, class T, class U>
 void BaseManagerUI<M, T, U>::childBoundsChanged(Component * c)
 {
 	if (resizeOnChildBoundsChanged && c != &viewport) resized();
@@ -537,13 +550,7 @@ inline void BaseManagerUI<M, T, U>::componentMovedOrResized(Component & c, bool 
 {
 	if (&c == &container && useViewport && !itemAnimator.isAnimating())
 	{
-		for (auto &bui : itemsUI)
-		{
-			juce::Rectangle<int> vr = this->getLocalArea(bui, bui->getLocalBounds());
-			if (defaultLayout == VERTICAL && (vr.getY() > viewport.getBounds().getBottom() || vr.getBottom() < viewport.getY())) bui->setVisible(false);
-			else bui->setVisible(true);
-		}
-
+		updateItemsVisibility();
 		resized();
 	}
 }
@@ -649,6 +656,7 @@ void BaseManagerUI<M, T, U>::removeItemUI(T * item, bool resizeAndRepaint)
 	if (resizeAndRepaint)
 	{
 		resized();
+		updateItemsVisibility();
 		repaint();
 	}
 }
