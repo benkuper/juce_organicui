@@ -26,6 +26,8 @@ public:
 	virtual String getTypeString() const override { return typeAtCreation; }
 
 	static GenericControllableItem * create(var params) { return new GenericControllableItem(params); }
+
+	InspectableEditor * getEditor(bool isRoot) override;
 };
 
 

@@ -9,6 +9,8 @@
   ==============================================================================
 */
 
+#include "../manager/ui/GenericManagerEditor.h"
+
 GenericControllableManager::GenericControllableManager(const String & name, bool itemsCanBeDisabled, bool canAddTriggers, bool canAddTargets) :
 	BaseManager(name),
 	itemsCanBeDisabled(itemsCanBeDisabled),
@@ -49,9 +51,12 @@ void GenericControllableManager::addItemInternal(GenericControllableItem * item,
 
 InspectableEditor * GenericControllableManager::getEditor(bool isRoot)
 {
+	return new GenericManagerEditor<GenericControllableItem>(this, isRoot);
+	/*
 	BaseManagerUI<GenericControllableManager, GenericControllableItem,GenericControllableItemUI> * ui = new BaseManagerUI<GenericControllableManager, GenericControllableItem, GenericControllableItemUI>(niceName, this, false);
 	ui->drawContour = true;
 	ui->addExistingItems();
 	ui->setSize(100, 100);
 	return new GenericComponentEditor(this, ui, isRoot);
+	*/
 }

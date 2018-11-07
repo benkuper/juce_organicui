@@ -177,7 +177,7 @@ using namespace juce;
 
 #include "manager/GenericControllableItem.h"
 #include "manager/GenericControllableManager.h"
-#include "manager/ui/GenericControllableItemUI.h"
+#include "manager/ui/GenericControllableItemEditor.h"
 
 #include "automation/recorder/AutomationRecorder.h"
 #include "automation/easing/Easing.h"

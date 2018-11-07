@@ -20,6 +20,9 @@ GenericControllableItem::GenericControllableItem(var params) :
 	controllable->saveValueOnly = false;
 	controllable->isCustomizableByUser = controllable->type != Controllable::STRING;
 
+	editorCanBeCollapsed = false;
+	editorIsCollapsed = false;
+
 	jassert(controllable != nullptr);
 
 	isSelectable = false;
@@ -39,4 +42,9 @@ GenericControllableItem::~GenericControllableItem()
 void GenericControllableItem::onContainerNiceNameChanged()
 {
 	controllable->setNiceName(niceName);
+}
+
+InspectableEditor * GenericControllableItem::getEditor(bool isRoot)
+{
+	return new GenericControllableItemEditor(this, isRoot);
 }

@@ -113,7 +113,7 @@
 #include "manager/BaseItem.cpp"
 #include "manager/GenericControllableManager.cpp"
 #include "manager/GenericControllableItem.cpp"
-#include "manager/ui/GenericControllableItemUI.cpp" 
+#include "manager/ui/GenericControllableItemEditor.cpp" 
 #include "manager/ui/BaseItemEditor.cpp"
 #include "outliner/Outliner.cpp"
 #include "progress/ProgressNotifier.cpp"

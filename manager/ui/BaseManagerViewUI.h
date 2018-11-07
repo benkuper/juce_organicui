@@ -43,6 +43,8 @@ public:
 
 	virtual void updateViewUIPosition(U * se);
 
+	virtual void updateItemsVisibility() override;
+
 	virtual void addItemFromMenu(bool isFromAddButton, Point<int> mouseDownPos) override;
 
 	Point<int> getSize();
@@ -196,6 +198,19 @@ void BaseManagerViewUI<M, T, U>::updateViewUIPosition(U * se)
 	pe += viewOffset;
 	pe -= se->getLocalBounds().getCentre();
 	se->setTopLeftPosition(pe.x, pe.y);
+}
+
+template<class M, class T, class U>
+void BaseManagerViewUI<M, T, U>::updateItemsVisibility()
+{
+	//BaseManagerUI::updateItemsVisibility();
+	juce::Rectangle<int> r = getLocalBounds();
+	for (auto &iui : itemsUI)
+	{
+		juce::Rectangle<int> ir = iui->getBounds().getIntersection(r);
+		bool isInsideInspectorBounds = !ir.isEmpty();
+		iui->setVisible(isInsideInspectorBounds);
+	}
 }
 
 template<class M, class T, class U>
