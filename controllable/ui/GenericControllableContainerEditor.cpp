@@ -177,6 +177,8 @@ void GenericControllableContainerEditor::resetAndBuild()
 
 	isRebuilding = false;
 	resized();
+
+	containerEditorListeners.call(&ContainerEditorListener::containerRebuilt, this);
 }
 
 InspectableEditor * GenericControllableContainerEditor::addEditorUI(ControllableContainer * cc, bool resize)

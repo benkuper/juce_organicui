@@ -83,6 +83,18 @@ public:
 
 	// Inherited via ChangeListener
 	virtual void changeListenerCallback(ChangeBroadcaster * source) override;
+
+	class  ContainerEditorListener
+	{
+	public:
+		/** Destructor. */
+		virtual ~ContainerEditorListener() {}
+		virtual void containerRebuilt(GenericControllableContainerEditor *) {}
+	};
+
+	ListenerList<ContainerEditorListener> containerEditorListeners;
+	void addContainerEditorListener(ContainerEditorListener* newListener) { containerEditorListeners.add(newListener); }
+	void removeContainerEditorListener(ContainerEditorListener* listener) { containerEditorListeners.remove(listener); }
 };
 
 
