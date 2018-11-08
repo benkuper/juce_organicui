@@ -10,11 +10,6 @@
 
 #pragma once
 
-#ifndef SCRIPTEDITOR_H_INCLUDED
-#define SCRIPTEDITOR_H_INCLUDED
-
-
-
 class ScriptEditor :
 	public BaseItemEditor,
 	public Script::AsyncListener
@@ -33,7 +28,7 @@ public:
 
 	ScopedPointer<InspectableEditor> paramsEditor;
 
- juce::Rectangle<int> statusBounds;
+	 juce::Rectangle<int> statusBounds;
 
 	void paint(Graphics &g) override;
 	void resizedInternalHeaderItemInternal(juce::Rectangle<int> &r) override;
@@ -41,7 +36,3 @@ public:
 
 	void buttonClicked(Button * b) override;
 };
-
-
-
-#endif  // SCRIPTEDITOR_H_INCLUDED

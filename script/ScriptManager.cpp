@@ -25,7 +25,7 @@ ScriptManager::~ScriptManager()
 Script * ScriptManager::createItem()
 {
 	Script * s = new Script(parentTarget);
-	s->scriptTemplate = scriptTemplate;
+	s->scriptTemplate = &scriptTemplate;
 	return s;
 }
 

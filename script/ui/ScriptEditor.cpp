@@ -105,19 +105,13 @@ void ScriptEditor::buttonClicked(Button * b)
 				{
 					f.create();
 
-					if (script->scriptTemplate.isNotEmpty())
+					if (script->scriptTemplate->isNotEmpty())
 					{
-						int templateDataSize = 0;
-						const char * templateData = BinaryData::getNamedResource((script->scriptTemplate + "ScriptTemplate_js").getCharPointer(), templateDataSize);
-						String st = String(templateData);
-						if (st.isNotEmpty())
+						FileOutputStream fos(f);
+						if (fos.openedOk())
 						{
-							FileOutputStream fos(f);
-							if (fos.openedOk())
-							{
-								fos.writeText(st,false,false,"\n");
-								fos.flush();
-							}
+							fos.writeText(*script->scriptTemplate,false,false,"\n");
+							fos.flush();
 						}
 					}
 				}
