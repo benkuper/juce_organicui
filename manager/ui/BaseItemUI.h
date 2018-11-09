@@ -158,7 +158,7 @@ BaseItemUI<T>::BaseItemUI(T * _item, ResizeMode _resizeMode, bool _canBeDragged)
 		break;
 
 	case VERTICAL:
-		resizerHeight = 4;
+		resizerHeight = 8;
 		constrainer.setMinimumHeight(headerHeight + headerGap + minContentHeight + resizerHeight);
 		edgeResizer = new ResizableEdgeComponent(this, &constrainer, ResizableEdgeComponent::bottomEdge);
 		edgeResizer->setAlwaysOnTop(true);

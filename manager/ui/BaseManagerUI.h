@@ -77,7 +77,8 @@ public:
 	Viewport viewport;
 
 	Colour bgColor;
-	int labelHeight = 10;
+	int labelHeight;
+	int minHeight;
 	String managerUIName;
 	bool drawContour;
 	bool transparentBG;
@@ -191,6 +192,8 @@ BaseManagerUI<M, T, U>::BaseManagerUI(const String & contentName, M * _manager, 
 	defaultLayout(VERTICAL),
 	container(this),
 	bgColor(BG_COLOR),
+	labelHeight(10),
+	minHeight(50),
 	managerUIName(contentName),
 	drawContour(false),
 	transparentBG(false),
@@ -510,7 +513,7 @@ void BaseManagerUI<M, T, U>::resizedInternalContent(juce::Rectangle<int>& r)
 			if (grabbingItem != nullptr) th = jmax<int>(th + grabbingItem->getHeight(), viewport.getHeight());
 
 			if (useViewport) container.setSize(getWidth(), th);
-			else this->setSize(getWidth(), jmax<int>(th + 10, 50));
+			else this->setSize(getWidth(), jmax<int>(th + 10, minHeight));
 		} else if (defaultLayout == HORIZONTAL)
 		{
 			float tw = 0;

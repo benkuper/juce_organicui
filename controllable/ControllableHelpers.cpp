@@ -18,6 +18,9 @@ ControllableChooserPopupMenu::ControllableChooserPopupMenu(ControllableContainer
 	showTriggers(_showTriggers)
 {
 	int id = indexOffset + 1;
+
+	if (rootContainer == nullptr) rootContainer = Engine::mainEngine;
+	jassert(rootContainer != nullptr);
 	populateMenu(this, rootContainer,id);
 }
 
@@ -83,6 +86,9 @@ ContainerChooserPopupMenu::ContainerChooserPopupMenu(ControllableContainer * roo
 	typeCheckFunc(typeCheckFunc)
 {
 	int id = indexOffset + 1;
+	
+	if (rootContainer == nullptr) rootContainer = Engine::mainEngine;
+	jassert(rootContainer != nullptr); 
 	populateMenu(this, rootContainer, id);
 }
 
@@ -97,7 +103,10 @@ void ContainerChooserPopupMenu::populateMenu(PopupMenu * subMenu, ControllableCo
 	{
 		if (!cc->isTargettable) continue;
 
-		bool isATarget = (typeCheckFunc != nullptr)?isATarget = typeCheckFunc(cc):currentLevel == maxDefaultSearchLevel;
+		bool isATarget = currentLevel == maxDefaultSearchLevel;
+		if (typeCheckFunc != nullptr) isATarget |= typeCheckFunc(cc);
+		else if (cc->controllableContainers.size() == 0) isATarget = true;
+
 		if (isATarget)
 		{
 			containerList.add(cc);
