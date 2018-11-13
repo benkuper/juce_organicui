@@ -34,7 +34,7 @@ BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts
 	miniMode->hideInEditor = true;
 	miniMode->isTargettable = false;
 
-	listUISize = addFloatParameter("ListSize", "Size in list", 0, 0, 500);
+	listUISize = addFloatParameter("ListSize", "Size in list", 0, 0, 5000);
 	listUISize->hideInEditor = true;
 	listUISize->hideInOutliner = true;
 	listUISize->isTargettable = false;
