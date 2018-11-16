@@ -10,6 +10,7 @@
 
 static OrganicApplication& getApp() { return *dynamic_cast<OrganicApplication*>(JUCEApplication::getInstance()); }
 String getAppVersion() { return getApp().getApplicationVersion(); }
+ControllableContainer * getAppSettings() { return &(getApp().appSettings); }
 ApplicationProperties& getAppProperties() { return *getApp().appProperties; }
 OpenGLContext * getOpenGLContext() { return &getApp().mainComponent->openGLContext; }
 ApplicationCommandManager& getCommandManager() { return getApp().commandManager; }
