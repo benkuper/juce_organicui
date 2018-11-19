@@ -104,8 +104,10 @@ void AutomationUI::setViewRange(float start, float end)
 
 	viewStartPos = start;
 	viewEndPos = end;
+
 	updateROI();
-	resized();
+	shouldUpdateImage = true;
+	shouldRepaint = true;
 }
 
 void AutomationUI::updateROI()
@@ -139,6 +141,7 @@ void AutomationUI::updateROI()
 	{
 		if(itemsUI[i] != nullptr) itemsUI[i]->setVisible(true);
 	}
+
 	resized();
 }
 
