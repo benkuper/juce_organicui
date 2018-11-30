@@ -66,7 +66,7 @@ void CrashDumpUploader::uploadDump()
 #if JUCE_DEBUG
 		.withParameter("branch", "debug")
 #else
-		.withParameter("branch", getAppVersion().endsWith("b") ? "beta" : "stable")
+		.withParameter("branch", getAppVersion().contains('b') ? "beta" : "stable")
 #endif
 		.withFileToUpload("dumpfile", crashFile, "application/octet-stream");
 
