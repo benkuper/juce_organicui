@@ -345,17 +345,23 @@ bool Engine::checkFileVersion(DynamicObject * metaData, bool checkForNewerVersio
 bool Engine::versionIsNewerThan(String versionToCheck, String referenceVersion)
 {
 	bool referenceVersionIsBeta = false;
-	if (referenceVersion.endsWith("b"))
+	int referenceBetaVersion = 0;
+	if (referenceVersion.containsChar('b'))
 	{
 		referenceVersion = referenceVersion.substring(0, referenceVersion.length() - 1);
 		referenceVersionIsBeta = true;
+		referenceBetaVersion = getBetaVersion(referenceVersion);
+
 	}
 
 	bool versionToCheckIsBeta = false;
-	if (versionToCheck.endsWith("b"))
+	int versionToCheckBetaVersion = 0;
+	if (versionToCheck.containsChar('b'))
 	{
+
 		versionToCheck = versionToCheck.substring(0, versionToCheck.length() - 1);
 		versionToCheckIsBeta = true;
+		versionToCheckBetaVersion = getBetaVersion(versionToCheck);
 	}
 
 	StringArray fileVersionSplit;
@@ -377,8 +383,13 @@ bool Engine::versionIsNewerThan(String versionToCheck, String referenceVersion)
 	}
 
 	//if equals return false
-	if (versionToCheckIsBeta == referenceVersionIsBeta) return false;
+	if (versionToCheckIsBeta == referenceVersionIsBeta) return versionToCheckBetaVersion > referenceBetaVersion;
 	return referenceVersionIsBeta;
+}
+
+int Engine::getBetaVersion(String version)
+{
+	return version.containsChar('b') ? version.substring(version.indexOfChar('b')).getIntValue() : 0;
 }
 
 String Engine::getMinimumRequiredFileVersion()

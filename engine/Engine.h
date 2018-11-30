@@ -33,6 +33,7 @@ public:
 
 
 	bool isBetaVersion;
+	int betaVersion;
 
 	String convertURL = ""; //for file conversion
 
@@ -74,6 +75,7 @@ public:
 
 	bool checkFileVersion(DynamicObject * metaData, bool checkForNewerVersion = false);
 	bool versionIsNewerThan(String versionToCheck, String referenceVersion);
+	int getBetaVersion(String version);
 	virtual String getMinimumRequiredFileVersion();
 
 	int64 loadingStartTime;

@@ -50,16 +50,15 @@ AppUpdater::~AppUpdater()
 	  fileURL += "linux";
 #endif
 
-	  fileURL += "-" + version + "-" + (beta ? "beta" : "stable") + "." + extension;
-
+	  fileURL += "-" + version + "." + extension;
 	  return fileURL;
   }
 
   void AppUpdater::checkForUpdates()
-{
-	if (updateURL.isEmpty() || downloadURLBase.isEmpty()) return;
-	startThread();
-}
+	{
+		if (updateURL.isEmpty() || downloadURLBase.isEmpty()) return;
+		startThread();
+	}
 
 void AppUpdater::showDialog(bool beta, String title, String msg, String changelog)
 {
@@ -141,7 +140,9 @@ void AppUpdater::run()
 			if (data.getProperty("testing", false)) return;
 #endif
 
-			bool thisIsBeta = getAppVersion().endsWith("b");
+			bool thisIsBeta = Engine::mainEngine->isBetaVersion;
+			int thisBetaVersion = Engine::mainEngine->betaVersion;
+
 			bool shouldCheckForBeta = true;
 			if (!GlobalSettings::getInstance()->checkBetaUpdates->boolValue()) shouldCheckForBeta = false;
 			else if (!thisIsBeta && GlobalSettings::getInstance()->onlyCheckBetaFromBeta->boolValue()) shouldCheckForBeta = false;
@@ -155,18 +156,21 @@ void AppUpdater::run()
 			String stableVersion = stableData.getProperty("version", "");
 
 			var dataToCheck;
-			bool dataIsBeta;
+			bool dataIsBeta = false;
+			int dataBetaVersion = 0;
 			if (shouldCheckForBeta && Engine::mainEngine->versionIsNewerThan(betaVersion, stableVersion))
 			{
 				DBG("Beta is newer : " << betaVersion);
 				dataIsBeta = true;
 				dataToCheck = betaData;
+				dataBetaVersion = Engine::mainEngine->getBetaVersion(betaVersion);
 			} else
 			{
 				DBG("Stable is newer or not checking for beta " << stableVersion);
 				dataIsBeta = false;
 				dataToCheck = stableData;
 			} 
+
 #if !FORCE_UPDATE
 			if (Engine::mainEngine->checkFileVersion(dataToCheck.getDynamicObject(), true))
 			{
@@ -233,7 +237,6 @@ void AppUpdater::finished(URL::DownloadTask * task, bool success)
 		LOGERROR("Error while downloading " + downloadingFileName + ",\ntry downloading it directly from the website.\nError code : " + String(task->statusCode()));
 		queuedNotifier.addMessage(new AppUpdateEvent(AppUpdateEvent::DOWNLOAD_ERROR)); return;
 	}
-
 
 #if JUCE_WINDOWS
 	File f = File::getSpecialLocation(File::tempDirectory).getChildFile(downloadingFileName);

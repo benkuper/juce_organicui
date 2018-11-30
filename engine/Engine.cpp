@@ -26,12 +26,13 @@ Engine::Engine(const String & fileName, const String & fileExtension) :
 	fileExtension(fileExtension),
 	lastFileAbsolutePath(""),
 	autoSaveIndex(0),
-    engineNotifier(10),
-    isLoadingFile(false),
-    isClearing(false)
+	engineNotifier(10),
+	isLoadingFile(false),
+	isClearing(false)
 {
 	skipControllableNameInAddress = true;
 	isBetaVersion = getAppVersion().endsWith("b");
+	betaVersion = getBetaVersion(getAppVersion());
 
 	selectionManager = new InspectableSelectionManager(true); //selectionManager constructor
 
