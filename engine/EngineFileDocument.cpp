@@ -348,20 +348,20 @@ bool Engine::versionIsNewerThan(String versionToCheck, String referenceVersion)
 	int referenceBetaVersion = 0;
 	if (referenceVersion.containsChar('b'))
 	{
-		referenceVersion = referenceVersion.substring(0, referenceVersion.length() - 1);
 		referenceVersionIsBeta = true;
 		referenceBetaVersion = getBetaVersion(referenceVersion);
 
+		referenceVersion = referenceVersion.substring(0, referenceVersion.length() - 1);
 	}
 
 	bool versionToCheckIsBeta = false;
 	int versionToCheckBetaVersion = 0;
 	if (versionToCheck.containsChar('b'))
 	{
-
-		versionToCheck = versionToCheck.substring(0, versionToCheck.length() - 1);
 		versionToCheckIsBeta = true;
 		versionToCheckBetaVersion = getBetaVersion(versionToCheck);
+
+		versionToCheck = versionToCheck.substring(0, versionToCheck.length() - 1);
 	}
 
 	StringArray fileVersionSplit;
@@ -389,7 +389,10 @@ bool Engine::versionIsNewerThan(String versionToCheck, String referenceVersion)
 
 int Engine::getBetaVersion(String version)
 {
-	return version.containsChar('b') ? version.substring(version.indexOfChar('b')).getIntValue() : 0;
+	if (!version.containsChar('b')) return 0;
+	int indexOfB = version.indexOfChar('b');
+	String vString = version.substring(indexOfB+1);
+	return vString.getIntValue();
 }
 
 String Engine::getMinimumRequiredFileVersion()
