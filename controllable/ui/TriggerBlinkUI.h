@@ -8,15 +8,7 @@ Author:  bkupe
 ==============================================================================
 */
 
-#ifndef TRIGGERBLINKUI_H_INCLUDED
-#define TRIGGERBLINKUI_H_INCLUDED
-
-
-
-//==============================================================================
-/*
-*/
-
+#pragma once
 
 class TriggerBlinkUI : public TriggerUI, public Timer
 {
@@ -40,6 +32,3 @@ private:
     int refreshPeriod;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TriggerBlinkUI)
 };
-
-
-#endif  // TRIGGERBLINKUI_H_INCLUDED

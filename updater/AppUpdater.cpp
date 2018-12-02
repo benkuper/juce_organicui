@@ -141,13 +141,10 @@ void AppUpdater::run()
 #endif
 
 			bool thisIsBeta = Engine::mainEngine->isBetaVersion;
-			int thisBetaVersion = Engine::mainEngine->betaVersion;
 
 			bool shouldCheckForBeta = true;
 			if (!GlobalSettings::getInstance()->checkBetaUpdates->boolValue()) shouldCheckForBeta = false;
 			else if (!thisIsBeta && GlobalSettings::getInstance()->onlyCheckBetaFromBeta->boolValue()) shouldCheckForBeta = false;
-			
-
 
 			var betaData = data.getProperty("betaversion", var());
 			var stableData = data.getProperty("stableversion", var());
@@ -345,8 +342,8 @@ UpdateDialogWindow::UpdateDialogWindow(const String & msg, const String & change
 
 void UpdateDialogWindow::resized()
 {
-	Rectangle<int> r = getLocalBounds().reduced(10);
-	Rectangle<int> br = r.removeFromBottom(20);
+	juce::Rectangle<int> r = getLocalBounds().reduced(10);
+	juce::Rectangle<int> br = r.removeFromBottom(20);
 	r.removeFromBottom(10);
 
 	progressionUI->setBounds(r.removeFromBottom(8));

@@ -8,9 +8,7 @@
   ==============================================================================
 */
 
-#ifndef TRIGGERIMAGEUI_H_INCLUDED
-#define TRIGGERIMAGEUI_H_INCLUDED
-
+#pragma once
 
 class TriggerImageUI :
 	public TriggerUI,
@@ -35,5 +33,3 @@ public:
 	virtual void timerCallback() override;
 };
 
-
-#endif  // TRIGGERIMAGEUI_H_INCLUDED

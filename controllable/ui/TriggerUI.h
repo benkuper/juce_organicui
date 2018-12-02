@@ -8,9 +8,7 @@
   ==============================================================================
 */
 
-#ifndef TRIGGERUI_H_INCLUDED
-#define TRIGGERUI_H_INCLUDED
-
+#pragma once
 
 class TriggerUI : 
 	public ControllableUI, 
@@ -33,6 +31,3 @@ private:
 
 
 };
-
-
-#endif  // TRIGGERUI_H_INCLUDED

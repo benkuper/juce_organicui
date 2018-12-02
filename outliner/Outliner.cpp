@@ -35,6 +35,7 @@ Outliner::Outliner(const String &contentName) :
 Outliner::~Outliner()
 {
 	//DBG("Outliner destroy, engine ?" << (int)Engine::mainEngine);
+	treeView.setRootItem(nullptr);
 	if (Engine::mainEngine != nullptr) Engine::mainEngine->removeControllableContainerListener(this);
 
 }

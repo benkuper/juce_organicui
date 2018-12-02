@@ -8,15 +8,7 @@
   ==============================================================================
 */
 
-#ifndef TRIGGERBUTTONUI_H_INCLUDED
-#define TRIGGERBUTTONUI_H_INCLUDED
-
-
-
-//==============================================================================
-/*
-*/
-
+#pragma once
 
 class TriggerButtonUI : 
 	public TriggerUI,
@@ -44,5 +36,3 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TriggerButtonUI)
 };
 
-
-#endif  // TRIGGERBUTTONUI_H_INCLUDED
