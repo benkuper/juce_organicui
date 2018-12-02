@@ -403,7 +403,7 @@ void GenericControllableContainerEditor::resizedInternal(juce::Rectangle<int>& r
 
 			if (addBT != nullptr)
 			{
-				addBT->setBounds(hr.removeFromRight(headerHeight).reduced(2));
+				addBT->setBounds(hr.removeFromRight(headerHeight).reduced(1));
 				hr.removeFromRight(2);
 			}
 		}
