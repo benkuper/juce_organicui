@@ -10,7 +10,6 @@
 
 #pragma once
 
-
 class ControllableChooserPopupMenu : 
 	public PopupMenu
 {

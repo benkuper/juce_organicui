@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef CONTROLLABLECONTAINER_H_INCLUDED
-#define CONTROLLABLECONTAINER_H_INCLUDED
+#pragma once
 
 class ControllableContainer :
 	public ParameterListener,
@@ -41,6 +40,11 @@ public:
 	bool editorCanBeCollapsed;
 	bool hideEditorHeader;
 	bool skipLabelInTarget;
+	bool userCanAddControllables;
+	std::function<void(ControllableContainer *)> customUserCreateControllableFunc; 
+	StringArray userAddControllablesFilters;
+	
+
 	std::function<InspectableEditor *(ControllableContainer *, bool)> customGetEditorFunc;
 
 	//save / load
@@ -263,5 +267,3 @@ public:
 
 	virtual InspectableEditor * getEditor(bool isRoot) override;
 };
-
-#endif  // CONTROLLABLECONTAINER_H_INCLUDED

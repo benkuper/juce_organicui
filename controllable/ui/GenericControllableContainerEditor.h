@@ -8,14 +8,8 @@
   ==============================================================================
 */
 
-#ifndef GENERICCONTROLLABLECONTAINEREDITOR_H_INCLUDED
-#define GENERICCONTROLLABLECONTAINEREDITOR_H_INCLUDED
+#pragma once
 
-#include "../../inspectable/ui/InspectableEditor.h"
-#include "../ControllableContainer.h"
-#include "ControllableUI.h"
-//#include "../preset/PresetChooser.h"
-#include "../ControllableHelpers.h"
 
 class GenericControllableContainerEditor :
 	public InspectableEditor,
@@ -45,6 +39,7 @@ public:
 
 	ScopedPointer<ImageButton> expandBT;
 	ScopedPointer<ImageButton> collapseBT;
+	ScopedPointer<ImageButton> addBT;
 	Component headerSpacer;
 
 	virtual void setCollapsed(bool value, bool force = false, bool animate = true, bool doNotRebuild = false);
@@ -59,8 +54,8 @@ public:
 
 	void mouseDown(const MouseEvent &e) override;
 
- juce::Rectangle<int> getHeaderBounds(); 
- juce::Rectangle<int> getContentBounds();
+	juce::Rectangle<int> getHeaderBounds(); 
+	juce::Rectangle<int> getContentBounds();
 	
 	bool canBeCollapsed();
 
@@ -70,6 +65,8 @@ public:
 	virtual InspectableEditor * addEditorUI(ControllableContainer * cc, bool resize = false);
 	virtual void removeEditorUI(ControllableContainer * cc, bool resize = false);
 	
+	virtual void showMenuAndAddControllable();
+
 	InspectableEditor * getEditorForInspectable(Inspectable * i);
 	
 	virtual void buttonClicked(Button * b) override;
@@ -111,5 +108,3 @@ public:
 	virtual void resizedInternalHeader(juce::Rectangle<int> &r) override;
 	virtual void controllableFeedbackUpdate(Controllable *) override;
 };
-
-#endif  // GENERICCONTROLLABLECONTAINEREDITOR_H_INCLUDED

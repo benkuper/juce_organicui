@@ -22,6 +22,8 @@ ControllableContainer::ControllableContainer(const String & niceName) :
 	editorCanBeCollapsed(true),
 	hideEditorHeader(false),
 	skipLabelInTarget(false),
+	userCanAddControllables(false),
+	customUserCreateControllableFunc(nullptr),
 	customGetEditorFunc(nullptr),
 	saveAndLoadRecursiveData(false),
 	saveAndLoadName(false),

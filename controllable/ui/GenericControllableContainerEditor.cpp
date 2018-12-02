@@ -1,4 +1,3 @@
-#include "GenericControllableContainerEditor.h"
 /*
   ==============================================================================
 
@@ -9,8 +8,6 @@
   ==============================================================================
 */
 
-
-//ControllableUIComparator CCInnerContainer::comparator;
 
 GenericControllableContainerEditor::GenericControllableContainerEditor(WeakReference<Inspectable> inspectable, bool isRoot, bool buildAtCreation) :
 	InspectableEditor(inspectable, isRoot),
@@ -49,6 +46,13 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(WeakRefer
 
 		addAndMakeVisible(headerSpacer);
 		headerSpacer.addMouseListener(this, false);
+
+		if (container->userCanAddControllables)
+		{
+			addBT = AssetManager::getInstance()->getAddBT();
+			addBT->addListener(this);
+			addAndMakeVisible(addBT);
+		}
 
 		collapseAnimator.addChangeListener(this);
 
@@ -93,7 +97,7 @@ void GenericControllableContainerEditor::setCollapsed(bool value, bool force, bo
 	
 	collapseBT->setVisible(!container->editorIsCollapsed);
 	expandBT->setVisible(container->editorIsCollapsed);
-	
+
 	if(animate) prepareToAnimate = true;
 	int targetHeight = headerHeight;
 	
@@ -205,6 +209,12 @@ void GenericControllableContainerEditor::removeEditorUI(ControllableContainer * 
 	if (resize) resized();
 }
 
+void GenericControllableContainerEditor::showMenuAndAddControllable()
+{
+	Controllable * c = ControllableFactory::showFilteredCreateMenu(container->userAddControllablesFilters);
+	if (c != nullptr) container->addControllable(c);
+}
+
 InspectableEditor * GenericControllableContainerEditor::getEditorForInspectable(Inspectable * i)
 {
 	for (auto &cui : childEditors)
@@ -218,7 +228,12 @@ InspectableEditor * GenericControllableContainerEditor::getEditorForInspectable(
 void GenericControllableContainerEditor::buttonClicked(Button * b)
 {
 	if (b == expandBT) setCollapsed(false);
-	if (b == collapseBT) setCollapsed(true);
+	else if (b == collapseBT) setCollapsed(true);
+	else if (b == addBT)
+	{
+		if (container->customUserCreateControllableFunc != nullptr) container->customUserCreateControllableFunc(container);
+		else showMenuAndAddControllable();
+	}
 }
 
 void GenericControllableContainerEditor::labelTextChanged(Label * l)
@@ -385,6 +400,12 @@ void GenericControllableContainerEditor::resizedInternal(juce::Rectangle<int>& r
 			if (container->editorIsCollapsed) expandBT->setBounds(ar);
 			else collapseBT->setBounds(ar);
 			r.removeFromLeft(2);
+
+			if (addBT != nullptr)
+			{
+				addBT->setBounds(hr.removeFromRight(headerHeight).reduced(2));
+				hr.removeFromRight(2);
+			}
 		}
 
 		resizedInternalHeader(hr);

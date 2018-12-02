@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef CONTROLLABLEFACTORY_H_INCLUDED
-#define CONTROLLABLEFACTORY_H_INCLUDED
+#pragma once
 
 class ControllableDefinition
 {
@@ -35,50 +34,16 @@ public:
 	~ControllableFactory() {}
 
 	void buildPopupMenu();
+	PopupMenu getFilteredPopupMenu(StringArray typeFilters);
 
-	static Controllable * showCreateMenu()
-	{
-		int result = getInstance()->menu.show();
-		if (result == 0) return nullptr;
-		else
-		{
-			ControllableDefinition * d = getInstance()->controllableDefs[result - 1];//result 0 is no result
-			return d->createFunc();
-		}
-	}
+	static StringArray getTypesWithout(StringArray typesToExclude);
 
-	static Controllable * createControllable(const String &controllableType)
-	{
-		for (auto &d : getInstance()->controllableDefs)
-		{
-			if (d->controllableType == controllableType) return d->createFunc();
-		}
-		return nullptr;
-	}
+	static Controllable * showCreateMenu();
+	static Controllable * showFilteredCreateMenu(StringArray typeFilters);
 
-	static Parameter * createParameterFrom(Controllable * source, bool copyName = false, bool copyValue = false)
-	{
-		Parameter * sourceP = dynamic_cast<Parameter *>(source);
-		if (sourceP == nullptr) return nullptr;
+	static Controllable * createControllable(const String &controllableType);
 
-		for (auto &d : getInstance()->controllableDefs)
-		{
-			if (d->controllableType == sourceP->getTypeString())
-			{
-				Parameter * p = dynamic_cast<Parameter *>(d->createFunc());
-				if (copyName) p->setNiceName(source->niceName);
-				p->setRange(sourceP->minimumValue, sourceP->maximumValue);
-				if (copyValue)
-				{
-					p->defaultValue = sourceP->value;
-					p->resetValue();
-				}
-
-				return p;
-			}
-		}
-		return nullptr;
-	}
+	static Parameter * createParameterFrom(Controllable * source, bool copyName = false, bool copyValue = false);
 
 
 
@@ -86,5 +51,3 @@ public:
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ControllableFactory)
 };
-
-#endif  // CONTROLLABLEFACTORY_H_INCLUDED
