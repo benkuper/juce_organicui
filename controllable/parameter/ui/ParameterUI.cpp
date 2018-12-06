@@ -122,7 +122,7 @@ void ParameterUI::addPopupMenuItems(PopupMenu * p)
 	{
 		p->addItem(1, "Reset value");
 
-		if (isInteractable() && showEditWindowOnRightClick)
+		if (isInteractable())
 		{
 			p->addSeparator();
 			p->addItem(-3, "Show Edit Window");

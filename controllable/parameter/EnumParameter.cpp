@@ -13,6 +13,8 @@
 EnumParameter::EnumParameter(const String & niceName, const String &description, bool enabled) :
 	Parameter(Type::ENUM, niceName, description, "" ,var(),var(), enabled)
 {
+	lockManualControlMode = true;
+
 	scriptObject.setMethod("getData", EnumParameter::getValueDataFromScript);
 }
 

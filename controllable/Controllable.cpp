@@ -168,7 +168,7 @@ void Controllable::loadJSONData(var data)
 
 	if (data.getDynamicObject()->hasProperty("niceName")) setNiceName(data.getProperty("niceName", ""));
 	if (data.getDynamicObject()->hasProperty("shortName")) setCustomShortName(data.getProperty("shortName", ""));
-	if (data.getDynamicObject()->hasProperty("customizable")) isCustomizableByUser = data.getProperty("customizable", false);
+	//if (data.getDynamicObject()->hasProperty("customizable")) isCustomizableByUser = data.getProperty("customizable", false); //Should not be dynamic, but set by code
 	if (data.getDynamicObject()->hasProperty("removable")) isRemovableByUser = data.getProperty("removable", false);
 	if (data.getDynamicObject()->hasProperty("description")) description = data.getProperty("description", description);
 	if (data.getDynamicObject()->hasProperty("hideInEditor")) hideInEditor = data.getProperty("hideInEditor", false);

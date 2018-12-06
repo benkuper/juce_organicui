@@ -17,7 +17,6 @@ StringParameterUI::StringParameterUI(Parameter * p) :
 	autoSize(false)
 {
 	showEditWindowOnDoubleClick = false;
-	showEditWindowOnRightClick = false;
 
     addAndMakeVisible(valueLabel);
 

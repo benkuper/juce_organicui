@@ -18,7 +18,7 @@ GenericControllableItem::GenericControllableItem(var params) :
 	controllable = ControllableFactory::createControllable(params.getProperty("controllableType",""));
 	controllable->description = "Custom control of type " + controllable->getTypeString();
 	controllable->saveValueOnly = false;
-	controllable->isCustomizableByUser = controllable->type != Controllable::STRING;
+	controllable->isCustomizableByUser = true;// controllable->type != Controllable::STRING;
 
 	editorCanBeCollapsed = false;
 	editorIsCollapsed = false;

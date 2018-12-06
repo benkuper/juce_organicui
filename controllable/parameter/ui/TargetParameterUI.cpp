@@ -17,7 +17,6 @@ TargetParameterUI::TargetParameterUI(TargetParameter * parameter, const String &
 {
 	setInterceptsMouseClicks(true, true);
 	showEditWindowOnDoubleClick = false;
-	showEditWindowOnRightClick = false;
 
 	targetBT = AssetManager::getInstance()->getTargetBT();
 	targetBT->setInterceptsMouseClicks(false, false);
