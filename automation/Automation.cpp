@@ -1,3 +1,4 @@
+#include "Automation.h"
 /*  ==============================================================================
 
 	Automation.cpp
@@ -9,10 +10,11 @@
 
 AutomationKeyComparator Automation::comparator;
 
-Automation::Automation(const String &name, AutomationRecorder * _recorder) :
+Automation::Automation(const String &name, AutomationRecorder * _recorder, bool freeRange, bool dedicatedSelectionManager) :
 	BaseManager(name),
 	recorder(_recorder),
-	showUIInEditor(false)
+	showUIInEditor(false),
+	freeRange(freeRange)
 {
 	itemDataType = "AutomationKey"; 
 	editorCanBeCollapsed = false;
@@ -23,7 +25,8 @@ Automation::Automation(const String &name, AutomationRecorder * _recorder) :
 
 	position = addFloatParameter("Position", "The current position in the automation. Used for automatic retrieve value and feedback.", 0, 0, length->floatValue());
 	position->hideInEditor = true;
-	value = addFloatParameter("Value", "The current value, depending on the position", 0, 0, 1);
+
+	value = addFloatParameter("Value", "The current value, depending on the position", 0, freeRange?INT32_MIN:0,freeRange?INT32_MAX:1);
 	value->hideInEditor = true;
 	value->isControllableFeedbackOnly = true;
 
@@ -33,8 +36,12 @@ Automation::Automation(const String &name, AutomationRecorder * _recorder) :
 	snapSensitivity->hideInEditor = true; 
 
 	//selectItemWhenCreated = false;
-	selectionManager = new InspectableSelectionManager(false);
-	showInspectorOnSelect = false;
+	if (dedicatedSelectionManager)
+	{
+		customSelectionManager = new InspectableSelectionManager(false);
+		showInspectorOnSelect = false;
+		selectionManager = customSelectionManager;
+	}
 
 	helpID = "Automation";
 }
@@ -98,6 +105,18 @@ float Automation::getClosestSnapForPos(float pos, int start, int end)
 	}
 }
 
+void Automation::clearRange()
+{
+	value->clearRange();
+	freeRange = true;
+}
+
+void Automation::setRange(float minValue, float maxValue)
+{
+	value->setRange(minValue, maxValue);
+	freeRange = !value->hasRange();
+}
+
 AutomationKey * Automation::getClosestKeyForPos(float pos, int start, int end)
 {
 	if (items.size() == 0) return nullptr;
@@ -135,17 +154,22 @@ float Automation::getValueForPosition(float pos)
 	return k->getValue(items[items.indexOf(k) + 1], pos);
 }
 
+float Automation::getNormalizedValueForPosition(float pos)
+{
+	return jmap<float>(getValueForPosition(pos), value->minimumValue, value->maximumValue,0 ,1);
+}
+
 AutomationKey * Automation::createItem()
 {
 	AutomationKey * k = new AutomationKey();
-	k->setSelectionManager(selectionManager);
+	if(selectionManager != nullptr) k->setSelectionManager(selectionManager);
 	k->position->setRange(0, length->floatValue());
 	return k;
 }
 
 void Automation::addItems(Array<Point<float>> keys, bool removeExistingOverlappingKeys, bool addToUndo, bool autoSmoothCurve)
 {
-	selectionManager->setEnabled(false);
+	if(selectionManager != nullptr) selectionManager->setEnabled(false);
 
 	//Array<UndoableAction *> actions;
 	//if(removeExistingOverlappingKeys) actions.addArray(getRemoveKeysBetweenAction(keys[0].x, keys[keys.size() - 1].x));
@@ -171,7 +195,7 @@ void Automation::addItems(Array<Point<float>> keys, bool removeExistingOverlappi
 	DBG("Here add items " << newKeys.size() << " items");
 	BaseManager::addItems(newKeys);
 
-	selectionManager->setEnabled(true);
+	if(selectionManager != nullptr) selectionManager->setEnabled(true);
 }
 
 void Automation::addItem(const float _position, const float _value, bool addToUndo)

@@ -27,7 +27,7 @@ class Automation :
 	public BaseManager<AutomationKey>
 {
 public:
-	Automation(const String &name = "Automation", AutomationRecorder * recorder = nullptr);
+	Automation(const String &name = "Automation", AutomationRecorder * recorder = nullptr, bool freeRange = false, bool dedicatedSelectionManager = true);
 	virtual ~Automation();
 
 
@@ -38,6 +38,7 @@ public:
 	bool showUIInEditor;
 
 	//Position and value
+	bool freeRange;
 	FloatParameter * position;
 	FloatParameter * value;
 	FloatParameter * length;
@@ -47,9 +48,10 @@ public:
 	BoolParameter * enableSnap;
 	FloatParameter * snapSensitivity;
 
-	ScopedPointer<InspectableSelectionManager> selectionManager;
+	ScopedPointer<InspectableSelectionManager> customSelectionManager;
 
 	float getValueForPosition(float pos);
+	float getNormalizedValueForPosition(float pos);
 
 	static AutomationKeyComparator comparator;
 	
@@ -64,6 +66,9 @@ public:
 	void setSnapPositions(Array<float> positions);
 
 	float getClosestSnapForPos(float pos, int start = -1, int end = -1);
+
+	void clearRange();
+	void setRange(float minValue, float maxValue);
 
 	AutomationKey * getClosestKeyForPos(float pos, int start = -1, int end = -1);
 
