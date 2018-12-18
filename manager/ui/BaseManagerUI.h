@@ -536,8 +536,14 @@ void BaseManagerUI<M, T, U>::updateItemsVisibility()
 	for (auto &bui : itemsUI)
 	{
 		juce::Rectangle<int> vr = this->getLocalArea(bui, bui->getLocalBounds());
-		if (defaultLayout == VERTICAL && (vr.getY() > viewport.getBounds().getBottom() || vr.getBottom() < viewport.getY())) bui->setVisible(false);
-		else bui->setVisible(true);
+		if (defaultLayout == VERTICAL)
+		{
+			if (viewport.getHeight() > 0 && (vr.getY() > viewport.getBounds().getBottom() || vr.getBottom() < viewport.getY())) bui->setVisible(false);
+		}
+		else
+		{
+			bui->setVisible(true);
+		}
 	}
 
 }
@@ -553,8 +559,8 @@ inline void BaseManagerUI<M, T, U>::componentMovedOrResized(Component & c, bool 
 {
 	if (&c == &container && useViewport && !itemAnimator.isAnimating())
 	{
-		updateItemsVisibility();
 		resized();
+		updateItemsVisibility();
 	}
 }
 
