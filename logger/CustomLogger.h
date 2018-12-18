@@ -8,8 +8,9 @@
  ==============================================================================
  */
 
-#ifndef CUSTOMLOGGER_H_INCLUDED
-#define CUSTOMLOGGER_H_INCLUDED
+#pragma once
+
+
 
 class CustomLogger :
 	public Logger
@@ -34,7 +35,7 @@ public :
 
     class FileWriter : public Listener{
     public:
-        FileWriter(){fileLog = FileLogger::createDefaultAppLogger("Chataigne", "log", "");}
+		FileWriter();
 
         void newMessage(const String& s) override{if (fileLog) {fileLog->logMessage(s);}}
         String getFilePath(){return fileLog->getLogFile().getFullPathName();}
@@ -47,7 +48,3 @@ public :
 	//SCRIPT
 	static var logFromScript(const var::NativeFunctionArgs &args);
 };
-
-
-
-#endif  // CUSTOMLOGGER_H_INCLUDED

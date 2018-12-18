@@ -32,7 +32,7 @@ CustomLoggerUI::CustomLoggerUI(const String& contentName, CustomLogger* l) :
 	logListComponent->setHeader(thc);
 	addAndMakeVisible(logListComponent);
 
-	LOG("Chataigne v" + String(ProjectInfo::versionString) + " : (" + String(Time::getCompilationDate().formatted("%d/%m/%y (%R)")) + ")");
+	LOG(getApp().getApplicationName()+" v" + String(ProjectInfo::versionString) + " : (" + String(Time::getCompilationDate().formatted("%d/%m/%y (%R)")) + ")");
 #if USE_FILE_LOGGER
 	LOG("please provide logFile for any bug report :\nlogFile in " + l->fileWriter.getFilePath());
 #endif

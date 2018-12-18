@@ -1,3 +1,4 @@
+#include "CustomLogger.h"
 /*
   ==============================================================================
 
@@ -10,7 +11,7 @@
 
 juce_ImplementSingleton(CustomLogger);
 
-
+static OrganicApplication& getApp();
 
  CustomLogger::CustomLogger() :
 	  notifier(100)
@@ -23,3 +24,6 @@ void CustomLogger::logMessage(const String & message)
 	notifier.addMessage(new String(message));
 }
 
+CustomLogger::FileWriter::FileWriter() { 
+	fileLog = FileLogger::createDefaultAppLogger(getApp().getApplicationName(), "log", ""); 
+}
