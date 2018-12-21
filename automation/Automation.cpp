@@ -115,6 +115,11 @@ void Automation::setRange(float minValue, float maxValue)
 {
 	value->setRange(minValue, maxValue);
 	freeRange = !value->hasRange();
+	for (auto &k : items)
+	{
+		if (freeRange) k->value->clearRange();
+		else k->value->setRange(value->minimumValue, value->maximumValue);
+	}
 }
 
 AutomationKey * Automation::getClosestKeyForPos(float pos, int start, int end)
@@ -143,6 +148,15 @@ AutomationKey * Automation::getClosestKeyForPos(float pos, int start, int end)
 	}
 }
 
+AutomationKey * Automation::getKeyAtPos(float pos)
+{
+	AutomationKey * k = getClosestKeyForPos(pos);
+	if (k == nullptr) return nullptr;
+
+	if (k->position->floatValue() == pos) return k;
+	return nullptr;
+}
+
 float Automation::getValueForPosition(float pos)
 {
 	if (items.size() == 0) return 0;
@@ -161,7 +175,7 @@ float Automation::getNormalizedValueForPosition(float pos)
 
 AutomationKey * Automation::createItem()
 {
-	AutomationKey * k = new AutomationKey();
+	AutomationKey * k = new AutomationKey(value->minimumValue, value->maximumValue);
 	if(selectionManager != nullptr) k->setSelectionManager(selectionManager);
 	k->position->setRange(0, length->floatValue());
 	return k;
@@ -198,12 +212,14 @@ void Automation::addItems(Array<Point<float>> keys, bool removeExistingOverlappi
 	if(selectionManager != nullptr) selectionManager->setEnabled(true);
 }
 
-void Automation::addItem(const float _position, const float _value, bool addToUndo)
+void Automation::addItem(const float _position, const float _value, bool addToUndo, bool reorder)
 {
 	AutomationKey * k = createItem();
 	k->position->setValue(_position);
 	k->value->setValue(_value);
-	BaseManager::addItem(k,var(), addToUndo); 
+	BaseManager::addItem(k,var(), addToUndo);
+	if (reorder) reorderItems();
+
 }
 
 void Automation::onControllableFeedbackUpdate(ControllableContainer * cc, Controllable * c)

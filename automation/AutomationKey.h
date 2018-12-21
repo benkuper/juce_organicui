@@ -14,7 +14,7 @@ class AutomationKey :
 	public BaseItem
 {
 public:
-	AutomationKey();
+	AutomationKey(float minimumValue = 0, float maximumValue = 1);
 	virtual ~AutomationKey();
 
 	FloatParameter * position; //depends on parent automation

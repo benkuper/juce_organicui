@@ -57,7 +57,7 @@ public:
 	
 	AutomationKey * createItem() override;
 	void addItems(Array<Point<float>> keys, bool removeExistingOverlappingKeys = true, bool addToUndo = true, bool autoSmoothCurve = false);
-	void addItem(const float position, const float value, bool addToUndo = true);
+	void addItem(const float position, const float value, bool addToUndo = true, bool reorder = false);
 	void reorderItems() override;
 
 	void removeKeysBetween(float start, float end);
@@ -71,6 +71,7 @@ public:
 	void setRange(float minValue, float maxValue);
 
 	AutomationKey * getClosestKeyForPos(float pos, int start = -1, int end = -1);
+	AutomationKey * getKeyAtPos(float pos);
 
 	virtual void onControllableFeedbackUpdate(ControllableContainer * cc, Controllable *c) override;
 	virtual void onContainerParameterChanged(Parameter *) override;

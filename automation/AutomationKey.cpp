@@ -8,7 +8,7 @@
   ==============================================================================
 */
 
-AutomationKey::AutomationKey() :
+AutomationKey::AutomationKey(float minimumValue, float maximumValue) :
 	BaseItem("Key",false)
 {
 	itemDataType = "AutomationKey";
@@ -16,7 +16,7 @@ AutomationKey::AutomationKey() :
 
 	position = addFloatParameter("Position", "Position of the key", 0, 0, 5);
 	position->defaultUI = FloatParameter::TIME;
-	value = addFloatParameter("Value", "Value of the key", 0, 0, 1);
+	value = addFloatParameter("Value", "Value of the key", 0, minimumValue, maximumValue);
 
 	easingType = addEnumParameter("EasingType", "Type of transition to the next key");
 
