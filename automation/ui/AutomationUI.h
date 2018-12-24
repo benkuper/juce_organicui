@@ -93,6 +93,7 @@ public:
 	void newMessage(const ContainerAsyncEvent &e) override;
 
 	void inspectablesSelectionChanged() override;
+	void inspectableDestroyed(Inspectable *) override;
 
 	void focusGained(FocusChangeType cause) override;
 	void focusLost(FocusChangeType cause) override;

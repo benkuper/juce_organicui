@@ -576,6 +576,15 @@ void AutomationUI::inspectablesSelectionChanged()
 	}
 }
 
+void AutomationUI::inspectableDestroyed(Inspectable *)
+{
+	if (!inspectable.wasObjectDeleted() && manager->selectionManager != nullptr)
+	{
+		manager->selectionManager->removeSelectionListener(this);
+		manager->removeAsyncContainerListener(this);
+	}
+}
+
 void AutomationUI::focusGained(FocusChangeType cause)
 {
 	if(autoSwitchMode) setViewMode(EDIT);

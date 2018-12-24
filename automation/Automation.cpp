@@ -48,7 +48,6 @@ Automation::Automation(const String &name, AutomationRecorder * _recorder, bool 
 
 Automation::~Automation()
 {
-
 }
 
 void Automation::reorderItems()
