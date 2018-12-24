@@ -59,6 +59,8 @@ public:
 	ScopedPointer<BoolImageToggleUI> enabledBT;
 	ScopedPointer<ImageButton> removeBT;
 
+	Array<Component *> contentComponents;
+
 	void setContentSize(int contentWidth, int contentHeight);
 
 	//minimode
@@ -231,6 +233,9 @@ int BaseItemUI<T>::getHeightWithoutContent()
 template<class T>
 void BaseItemUI<T>::updateMiniModeUI()
 {
+	//auto hide/show component in content section
+	for (auto &c : contentComponents) c->setVisible(!this->baseItem->miniMode->boolValue());
+
 	if (this->baseItem->miniMode->boolValue())
 	{
 		if (resizer != nullptr) this->removeChildComponent(resizer);
