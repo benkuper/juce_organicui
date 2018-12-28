@@ -10,11 +10,12 @@
 
 AutomationKeyComparator Automation::comparator;
 
-Automation::Automation(const String &name, AutomationRecorder * _recorder, bool freeRange, bool dedicatedSelectionManager) :
+Automation::Automation(const String &name, AutomationRecorder * _recorder, bool freeRange, bool allowKeysOutside, bool dedicatedSelectionManager) :
 	BaseManager(name),
 	recorder(_recorder),
 	showUIInEditor(false),
-	freeRange(freeRange)
+	freeRange(freeRange),
+	allowKeysOutside(allowKeysOutside)
 {
 	itemDataType = "AutomationKey"; 
 	editorCanBeCollapsed = false;
@@ -151,8 +152,7 @@ AutomationKey * Automation::getKeyAtPos(float pos)
 {
 	AutomationKey * k = getClosestKeyForPos(pos);
 	if (k == nullptr) return nullptr;
-
-	if (k->position->floatValue() == pos) return k;
+	if(k->position->floatValue() == pos) return k;
 	return nullptr;
 }
 
@@ -176,7 +176,7 @@ AutomationKey * Automation::createItem()
 {
 	AutomationKey * k = new AutomationKey(value->minimumValue, value->maximumValue);
 	if(selectionManager != nullptr) k->setSelectionManager(selectionManager);
-	k->position->setRange(0, length->floatValue());
+	if(!allowKeysOutside) k->position->setRange(0, length->floatValue());
 	return k;
 }
 
@@ -277,7 +277,7 @@ void Automation::onContainerParameterChanged(Parameter * p)
 	} else if (p == length)
 	{
 		position->setRange(0, length->floatValue());
-		for (auto &k : items) k->position->setRange(0, length->floatValue());
+		if(!allowKeysOutside) for (auto &k : items) k->position->setRange(0, length->floatValue());
 	}
 }
 

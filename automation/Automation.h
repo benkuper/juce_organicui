@@ -27,7 +27,7 @@ class Automation :
 	public BaseManager<AutomationKey>
 {
 public:
-	Automation(const String &name = "Automation", AutomationRecorder * recorder = nullptr, bool freeRange = false, bool dedicatedSelectionManager = true);
+	Automation(const String &name = "Automation", AutomationRecorder * recorder = nullptr, bool freeRange = false, bool allowKeysOutside = false, bool dedicatedSelectionManager = true);
 	virtual ~Automation();
 
 
@@ -39,6 +39,7 @@ public:
 
 	//Position and value
 	bool freeRange;
+	bool allowKeysOutside; //allow keys positions to be outside automation timing
 	FloatParameter * position;
 	FloatParameter * value;
 	FloatParameter * length;

@@ -14,7 +14,7 @@ AutomationKey::AutomationKey(float minimumValue, float maximumValue) :
 	itemDataType = "AutomationKey";
 	hideEditorHeader = true;
 
-	position = addFloatParameter("Position", "Position of the key", 0, 0, 5);
+	position = addFloatParameter("Position", "Position of the key", 0);
 	position->defaultUI = FloatParameter::TIME;
 	value = addFloatParameter("Value", "Value of the key", 0, minimumValue, maximumValue);
 
