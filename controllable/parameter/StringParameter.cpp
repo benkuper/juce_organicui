@@ -1,4 +1,3 @@
-#include "StringParameter.h"
 /*
   ==============================================================================
 
@@ -12,7 +11,8 @@
 
 StringParameter::StringParameter(const String & niceName, const String &description, const String & initialValue, bool enabled) :
     Parameter(Type::STRING, niceName, description, initialValue, var(), var(), enabled),
-	defaultUI(TEXT)
+	defaultUI(TEXT),
+	multiline(false)
 {
 	argumentsDescription = "string";
 	isCustomizableByUser = false; //avoid having the param wheel 
@@ -35,17 +35,28 @@ StringParameterUI * StringParameter::createStringParameterFileUI(StringParameter
 	return new StringParameterFileUI(target);
 }
 
+StringParameterTextUI * StringParameter::createStringParameterTextUI(StringParameter * target)
+{
+	if (target == nullptr) target = this;
+	return new StringParameterTextUI(target);
+}
+
 ControllableUI* StringParameter::createDefaultUI(Controllable * targetControllable){
 
 	switch (defaultUI)
 	{
-	case TEXT: return createStringParameterUI(dynamic_cast<StringParameter *>(targetControllable)); break;
+	case TEXT: 
+	{
+		if (!multiline) return createStringParameterUI(dynamic_cast<StringParameter *>(targetControllable)); 
+		else return createStringParameterTextUI(dynamic_cast<StringParameter *>(targetControllable));
+	}
+	break;
+
 	case  FILE: return createStringParameterFileUI(dynamic_cast<StringParameter *>(targetControllable)); break;
 	}
 
 	return createStringParameterUI(dynamic_cast<StringParameter *>(targetControllable));
-};
-
+}
 
 var StringParameter::getLerpValueTo(var targetValue, float weight)
 {

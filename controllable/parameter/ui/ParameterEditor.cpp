@@ -1,5 +1,5 @@
-ParameterEditor::ParameterEditor(Parameter * _parameter, bool isRoot, int initHeight) :
-	ControllableEditor(_parameter, isRoot, initHeight),
+ParameterEditor::ParameterEditor(Parameter * _parameter, bool isRoot) :
+	ControllableEditor(_parameter, isRoot),
 	parameter(_parameter)
 {
 	if (parameter->isOverriden && ui->isInteractable()) label.setFont(label.getFont().withStyle(Font::FontStyleFlags::bold));

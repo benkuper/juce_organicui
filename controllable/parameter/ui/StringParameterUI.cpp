@@ -13,6 +13,7 @@
 
 StringParameterUI::StringParameterUI(Parameter * p) :
     ParameterUI(p),
+	stringParam((StringParameter *)p),
 	maxFontHeight(12),
 	autoSize(false)
 {
@@ -48,21 +49,6 @@ bool StringParameterUI::isEditing()
 	return valueLabel.isBeingEdited();
 }
 
-void StringParameterUI::setPrefix(const String & _prefix)
-{
-	if (prefix == _prefix) return;
-	prefix = _prefix;
-	valueChanged(parameter->stringValue());
-}
-
-void StringParameterUI::setSuffix(const String & _suffix)
-{
-	if (suffix == _suffix) return;
-	suffix = _suffix;
-	valueChanged(parameter->stringValue());
-}
-
-
 void StringParameterUI::setOpaqueBackground(bool value)
 {
 	ParameterUI::setOpaqueBackground(value);
@@ -88,14 +74,9 @@ void StringParameterUI::resized()
 	valueLabel.setFont(valueLabel.getFont().withHeight(jmin<float>((float)r.getHeight(), maxFontHeight)));
 }
 
-void StringParameterUI::resizedInternal(juce::Rectangle<int>& r)
-{
-	//to be overriden
-}
-
 void StringParameterUI::valueChanged(const var & v)
 {
-    valueLabel.setText(prefix+parameter->stringValue()+suffix,NotificationType::dontSendNotification);
+    valueLabel.setText(stringParam->prefix+parameter->stringValue()+stringParam->suffix,NotificationType::dontSendNotification);
 
 	if (autoSize)
 	{
@@ -149,4 +130,44 @@ void StringParameterFileUI::buttonClicked(Button * b)
 	{
 		fp->setForceRelativePath(!fp->forceRelativePath);
 	}
+}
+
+StringParameterTextUI::StringParameterTextUI(Parameter * p) :
+	ParameterUI(p),
+	stringParam((StringParameter *)p)
+{
+	editor.setColour(editor.textColourId, isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f));
+	addAndMakeVisible(&editor);
+
+	
+	editor.setColour(editor.backgroundColourId, Colours::black);
+	editor.setColour(CaretComponent::caretColourId, Colours::orange);
+	editor.setColour(editor.textColourId, isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f));
+	editor.setMultiLine(stringParam->multiline);
+	editor.setText(stringParam->stringValue(), false);
+	editor.setReturnKeyStartsNewLine(stringParam->multiline);
+	editor.addListener(this);
+	
+	setSize(100, stringParam->multiline?60:20);
+}
+
+void StringParameterTextUI::feedbackStateChanged()
+{
+	editor.setColour(editor.textColourId, isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f));
+	editor.setEnabled(isInteractable());
+}
+
+void StringParameterTextUI::resized()
+{
+	editor.setBounds(getLocalBounds());
+}
+
+void StringParameterTextUI::valueChanged(const var & v)
+{
+	editor.setText(stringParam->stringValue(), false);
+}
+
+void StringParameterTextUI::textEditorTextChanged(TextEditor &)
+{
+	stringParam->setValue(editor.getText());
 }

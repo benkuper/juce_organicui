@@ -8,9 +8,12 @@
   ==============================================================================
 */
 
-#pragma once
+#ifndef STRINGPARAMETERUI_H_INCLUDED
+#define STRINGPARAMETERUI_H_INCLUDED
 
-class StringParameterUI : 
+
+
+class StringParameterTextUI : 
 	public ParameterUI, 
 	public Label::Listener
 {
@@ -20,6 +23,7 @@ public:
 
 	StringParameter * stringParam; 
 	
+	Label nameLabel;
     Label valueLabel;
 
 	float maxFontHeight;
@@ -35,7 +39,7 @@ public:
 
 	//void paint(Graphics &g) override;
     void resized() override;
-	virtual void resizedInternal(juce::Rectangle<int> &) {} //to be overriden
+	virtual void resizedInternal(juce::Rectangle<int> &r);
 
 protected:
     void valueChanged(const var & v) override;
@@ -43,7 +47,7 @@ protected:
 
 
 private:
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(StringParameterUI)
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(StringParameterTextUI)
 
 };
 
@@ -66,28 +70,11 @@ public:
 	void buttonClicked(Button * b) override;
 };
 
-
-
 class StringParameterTextUI :
-	public ParameterUI,
-	public TextEditor::Listener
+	public StringParameterUI
 {
 public:
-	StringParameterTextUI(Parameter * p);
-	virtual ~StringParameterTextUI() {};
-
-	StringParameter * stringParam;
-
-	TextEditor editor;
-	virtual void feedbackStateChanged() override;
-
-	//void paint(Graphics &g) override;
-	void resized() override;
-
-protected:
-	void valueChanged(const var & v) override;
-	virtual void textEditorTextChanged(TextEditor &) override;
-
-private:
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(StringParameterTextUI)
+	StringParameterTextUI;
 };
+
+#endif  // STRINGPARAMETERUI_H_INCLUDED

@@ -9,7 +9,7 @@
 */
 
 
-ControllableEditor::ControllableEditor(Controllable * _controllable, bool isRoot, int initHeight) :
+ControllableEditor::ControllableEditor(Controllable * _controllable, bool isRoot) :
 	InspectableEditor(_controllable, isRoot),
 	controllable(_controllable),
 	label("Label"),
@@ -41,7 +41,7 @@ ControllableEditor::ControllableEditor(Controllable * _controllable, bool isRoot
 	}
 	*/
 
-	baseHeight = initHeight;
+	baseHeight = jmax(ui->getHeight(), 16);
 	setSize(100, baseHeight);
 
 	controllable->addAsyncControllableListener(this);

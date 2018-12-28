@@ -21,7 +21,7 @@ class ParameterEditor :
 	public Parameter::AsyncListener
 {
 public:
-	ParameterEditor(Parameter * p, bool isRoot, int initHeight = 16);  //Todo : handle full feedback if is root
+	ParameterEditor(Parameter * p, bool isRoot);  //Todo : handle full feedback if is root
 	~ParameterEditor();
 
 	WeakReference<Parameter> parameter;

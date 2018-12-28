@@ -16,7 +16,7 @@ class ControllableEditor :
 	public Controllable::AsyncListener
 {
 public:
-	ControllableEditor(Controllable * controllable, bool isRoot, int initHeight = 16);  //Todo : handle full feedback if is root
+	ControllableEditor(Controllable * controllable, bool isRoot);  //Todo : handle full feedback if is root
 	virtual ~ControllableEditor();
 
 	WeakReference<Controllable> controllable;
