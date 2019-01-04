@@ -282,6 +282,8 @@ void BaseItemUI<T>::setViewZoom(float value)
 template<class T>
 void BaseItemUI<T>::resized()
 {
+	if (!isShowing()) return;
+
 	//Header
 	if (this->getWidth() == 0 || this->getHeight() == 0) return;
 	juce::Rectangle<int> r = this->getMainBounds().reduced(margin); 

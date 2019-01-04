@@ -475,7 +475,7 @@ void BaseManagerUI<M, T, U>::resizedInternalContent(juce::Rectangle<int>& r)
 			bui->setVisible(true);
 		}*/
 
-		if (bui->isVisible() && tr != bui->getBounds()) bui->setBounds(tr);
+		if (/*bui->isVisible() && */tr != bui->getBounds()) bui->setBounds(tr);
 
 		if (defaultLayout == VERTICAL) r.translate(0, tr.getHeight() + gap);
 		else r.translate(tr.getWidth() + gap, 0);
@@ -532,15 +532,15 @@ void BaseManagerUI<M, T, U>::resizedInternalFooter(juce::Rectangle<int>& r)
 
 template<class M, class T, class U>
 void BaseManagerUI<M, T, U>::updateItemsVisibility()
-{
+{ 
 	for (auto &bui : itemsUI)
 	{
 		juce::Rectangle<int> vr = this->getLocalArea(bui, bui->getLocalBounds());
 		if (defaultLayout == VERTICAL)
 		{
 			if (viewport.getHeight() > 0 && (vr.getY() > viewport.getBounds().getBottom() || vr.getBottom() < viewport.getY())) bui->setVisible(false);
-		}
-		else
+			else bui->setVisible(true);
+		}else
 		{
 			bui->setVisible(true);
 		}
