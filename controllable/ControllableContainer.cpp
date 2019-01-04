@@ -1,3 +1,4 @@
+#include "ControllableContainer.h"
 /*
  ==============================================================================
 
@@ -326,7 +327,7 @@ Parameter * ControllableContainer::getParameterByName(const String & name, bool 
 	return dynamic_cast<Parameter *>(getControllableByName(name, searchNiceNameToo));;
 }
 
-void ControllableContainer::addChildControllableContainer(ControllableContainer * container, int index)
+void ControllableContainer::addChildControllableContainer(ControllableContainer * container, int index, bool notify)
 {
 
 	String targetName = (Engine::mainEngine == nullptr || Engine::mainEngine->isLoadingFile) ? container->niceName : getUniqueNameInContainer(container->niceName);
@@ -338,6 +339,12 @@ void ControllableContainer::addChildControllableContainer(ControllableContainer 
 	controllableContainerListeners.call(&ControllableContainerListener::controllableContainerAdded, container);
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableContainerAdded, this, container));
 
+	if(notify) notifyStructureChanged();
+}
+
+void ControllableContainer::addChildControllableContainers(Array<ControllableContainer*> containers, int index)
+{
+	for (auto &c : containers) addChildControllableContainer(c, -1, false);
 	notifyStructureChanged();
 }
 

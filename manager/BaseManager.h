@@ -482,7 +482,7 @@ T * BaseManager<T>::addItem(T * item, var data, bool addToUndo, bool notify)
 
 	//bi->setNiceName(bi->niceName); //force setting a unique name if already taken, after load data so if name is the same as another, will change here
 
-	addChildControllableContainer(bi, items.indexOf(item));
+	addChildControllableContainer(bi, items.indexOf(item), notify);
 
 	//if(autoReorderOnAdd) reorderItems();
 
@@ -524,6 +524,8 @@ Array<T *> BaseManager<T>::addItems(Array<T *> itemsToAdd, var data, bool addToU
 	{
 		addItem(itemsToAdd[i], data.isArray() ? data[i] : var(), false, false);
 	}
+
+	notifyStructureChanged();
 
 	baseManagerListeners.call(&Listener::itemsAdded, itemsToAdd);
 	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_ADDED, itemsToAdd));
