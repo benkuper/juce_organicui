@@ -22,6 +22,8 @@ public:
 	String tooltip;
 	WeakReference<Controllable>  controllable;
 
+	static std::function<void(ControllableUI *, PopupMenu *)> customContextMenuFunc;
+	static std::function<bool(ControllableUI *, int)> handleCustomContextMenuResultFunc;
 
 	bool showLabel;
 	bool opaqueBackground;

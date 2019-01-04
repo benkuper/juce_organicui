@@ -7,6 +7,10 @@
 
   ==============================================================================
 */
+
+std::function<void(ControllableUI *, PopupMenu *)> ControllableUI::customContextMenuFunc = nullptr;
+std::function<bool(ControllableUI *, int)> ControllableUI::handleCustomContextMenuResultFunc = nullptr;
+
 ControllableUI::ControllableUI(Controllable * controllable) :
 	Component(controllable->niceName),
 	controllable(controllable),
@@ -17,7 +21,6 @@ ControllableUI::ControllableUI(Controllable * controllable) :
 	jassert(controllable != nullptr);
 	updateTooltip();
 	controllable->addAsyncControllableListener(this);
-
 
 	setEnabled(controllable->enabled);
 	setAlpha(controllable->enabled ? 1 : .5f);
@@ -72,6 +75,11 @@ void ControllableUI::showContextMenu()
 	ScopedPointer<PopupMenu> p = new PopupMenu();
 	addPopupMenuItems(p);
 
+	if (ControllableUI::customContextMenuFunc != nullptr)
+	{
+		p->addSeparator();
+		ControllableUI::customContextMenuFunc(this, p);
+	}
 
 	if (controllable->includeInScriptObject)
 	{
@@ -79,6 +87,7 @@ void ControllableUI::showContextMenu()
 		p->addItem(-1, "Copy OSC Control Address");
 		p->addItem(-2, "Copy Script Control Address");
 	}
+
 
 	if (p->getNumItems() == 0) return;
 
@@ -98,8 +107,14 @@ void ControllableUI::showContextMenu()
 		case -3:
 			showEditWindow();
 			break;
+
 		default:
-			handleMenuSelectedID(result);
+			if (ControllableUI::handleCustomContextMenuResultFunc != nullptr)
+			{
+				bool handled = ControllableUI::handleCustomContextMenuResultFunc(this, result);
+				if(!handled) handleMenuSelectedID(result);
+			}
+
 		}
 	}
 }
