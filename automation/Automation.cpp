@@ -211,13 +211,15 @@ void Automation::addItems(Array<Point<float>> keys, bool removeExistingOverlappi
 	if(selectionManager != nullptr) selectionManager->setEnabled(true);
 }
 
-void Automation::addItem(const float _position, const float _value, bool addToUndo, bool reorder)
+AutomationKey * Automation::addItem(const float _position, const float _value, bool addToUndo, bool reorder)
 {
 	AutomationKey * k = createItem();
 	k->position->setValue(_position);
 	k->value->setValue(_value);
 	BaseManager::addItem(k,var(), addToUndo);
 	if (reorder) reorderItems();
+
+	return k;
 
 }
 

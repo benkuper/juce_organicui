@@ -58,7 +58,7 @@ public:
 	
 	AutomationKey * createItem() override;
 	void addItems(Array<Point<float>> keys, bool removeExistingOverlappingKeys = true, bool addToUndo = true, bool autoSmoothCurve = false);
-	void addItem(const float position, const float value, bool addToUndo = true, bool reorder = false);
+	AutomationKey * addItem(const float position, const float value, bool addToUndo = true, bool reorder = false);
 	void reorderItems() override;
 
 	void removeKeysBetween(float start, float end);
