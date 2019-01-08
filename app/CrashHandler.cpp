@@ -57,6 +57,7 @@ void CrashDumpUploader::uploadDump()
 	if (remoteURL.isEmpty())
 	{
 		LOGWARNING("Crash dump upload url has not been assigned");
+		crashFile.deleteFile();
 		return;
 	}
 
