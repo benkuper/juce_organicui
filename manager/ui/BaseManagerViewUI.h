@@ -306,7 +306,8 @@ template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::addItemUIInternal(U * se)
 {
 	se->setViewZoom(viewZoom);
-	updateViewUIPosition(se); 
+	se->resized();
+	updateViewUIPosition(se);
 }
 
 
