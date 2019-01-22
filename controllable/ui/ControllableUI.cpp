@@ -114,6 +114,10 @@ void ControllableUI::showContextMenu()
 				bool handled = ControllableUI::handleCustomContextMenuResultFunc(this, result);
 				if(!handled) handleMenuSelectedID(result);
 			}
+			else
+			{
+				handleMenuSelectedID(result);
+			}
 
 		}
 	}
