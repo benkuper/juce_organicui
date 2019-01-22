@@ -99,6 +99,7 @@ public:
 
 
 	static var setValueFromScript(const juce::var::NativeFunctionArgs& a);
+	static var checkIsParameterFromScript(const juce::var::NativeFunctionArgs& a);
 
 	virtual InspectableEditor * getEditor(bool /*isRootEditor*/) override;
 	virtual String getTypeString() const { jassert(false); return ""; } //should be overriden
