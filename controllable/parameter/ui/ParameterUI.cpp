@@ -19,6 +19,8 @@ ParameterUI::ParameterUI(Parameter * parameter) :
 	showValue(true)
 {
 	parameter->addAsyncCoalescedParameterListener(this);
+
+	//setSize(100, 16);
 }
 
 ParameterUI::~ParameterUI()

@@ -37,7 +37,7 @@ FloatParameterLabelUI::FloatParameterLabelUI(Parameter * p) :
 
 	showEditWindowOnDoubleClick = false;
 
-	setSize(200, 20);//default size
+	setSize(200, 16);//default size
 
 	valueChanged(parameter->getValue());	
 	feedbackStateChanged();

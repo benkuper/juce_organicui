@@ -23,7 +23,7 @@ BoolToggleUI::BoolToggleUI(Parameter * parameter) :
 		setRepaintsOnMouseActivity(true);
 	}
 
-    setSize(10,10);
+    setSize(16,16);
     
 #if JUCE_MAC
     startTimerHz(20); //20 fps for slider on mac because of bad UI handling

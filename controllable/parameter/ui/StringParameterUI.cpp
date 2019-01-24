@@ -35,7 +35,7 @@ StringParameterUI::StringParameterUI(Parameter * p) :
 
 	feedbackStateChanged();
 
-    setSize(200, 20);//default size
+    setSize(200, 16);//default size
 }
 
 void StringParameterUI::setAutoSize(bool value)
@@ -148,7 +148,7 @@ StringParameterTextUI::StringParameterTextUI(Parameter * p) :
 	editor.setReturnKeyStartsNewLine(stringParam->multiline);
 	editor.addListener(this);
 	
-	setSize(100, stringParam->multiline?60:20);
+	setSize(100, stringParam->multiline?60:16);
 }
 
 void StringParameterTextUI::feedbackStateChanged()

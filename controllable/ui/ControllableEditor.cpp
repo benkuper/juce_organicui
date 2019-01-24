@@ -41,7 +41,8 @@ ControllableEditor::ControllableEditor(Controllable * _controllable, bool isRoot
 	}
 	*/
 
-	baseHeight = jmax(ui->getHeight(), 16);
+	baseHeight = ui->getHeight();
+	if (baseHeight == 0) baseHeight = 16;
 	setSize(100, baseHeight);
 
 	controllable->addAsyncControllableListener(this);
