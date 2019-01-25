@@ -213,8 +213,11 @@ inline OrganicApplication::MainWindow::MainWindow(String name, OrganicMainConten
 
 	bool fs = getAppProperties().getUserSettings()->getBoolValue("fullscreen", fullScreenIsDefault);
 	
-	setBounds(jmax<int>(tx, 20), jmax<int>(ty, 20), jmax<int>(tw, 600), jmax<int>(th, 400));
+	setBounds(jmax<int>(tx, 100), jmax<int>(ty, 100), jmax<int>(tw, 600), jmax<int>(th, 400));
+
+#if !JUCE_LINUX
 	setFullScreen(fs);
+#endif
 
 #if ! JUCE_MAC
 	setMenuBar(mainComponent);
