@@ -76,6 +76,7 @@ public:
 	virtual void resizedInternalFooter(juce::Rectangle<int> &) {}
 	void buttonClicked(Button *b) override;
 
+
 	void mouseDown(const MouseEvent &e) override;
 	void mouseDrag(const MouseEvent &e) override;
 	void mouseUp(const MouseEvent &e) override;
@@ -84,6 +85,8 @@ public:
 
 	virtual void containerChildAddressChangedAsync(ControllableContainer *) override;
 	virtual void controllableFeedbackUpdateInternal(Controllable *) override;
+
+	virtual void visibilityChanged() override;
 
 	class Grabber : public Component
 	{
@@ -282,7 +285,7 @@ void BaseItemUI<T>::setViewZoom(float value)
 template<class T>
 void BaseItemUI<T>::resized()
 {
-	if (!this->isShowing()) return;
+	if (!this->isVisible()) return;
 
 	//Header
 	if (this->getWidth() == 0 || this->getHeight() == 0) return;
@@ -496,6 +499,12 @@ void BaseItemUI<T>::controllableFeedbackUpdateInternal(Controllable * c)
 	BaseItemMinimalUI<T>::controllableFeedbackUpdateInternal(c);
 	if (c == this->baseItem->miniMode) updateMiniModeUI();
 	else if (canBeDragged && c == this->baseItem->viewUIPosition) itemUIListeners.call(&ItemUIListener::itemUIGrabbed, this);
+}
+
+template<class T>
+void BaseItemUI<T>::visibilityChanged()
+{
+	resized();
 }
 
 template<class T>
