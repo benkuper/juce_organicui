@@ -16,7 +16,7 @@
 #include "CrashHandler.h"
 
 String dumpFileString;
-char * dumpFileName = "chataigne_notset.dmp";
+char * dumpFileName = "notset.dmp";
 
 LONG WINAPI createMiniDump(LPEXCEPTION_POINTERS exceptionPointers);
 #endif
@@ -38,7 +38,7 @@ void CrashDumpUploader::init()
 
 #if JUCE_WINDOWS
 
-	crashFile = File::getSpecialLocation(File::tempDirectory).getParentDirectory().getChildFile("chataigne_crash.dmp");
+	crashFile = File::getSpecialLocation(File::tempDirectory).getParentDirectory().getChildFile(getApp().getApplicationName()+"_crash.dmp");
 	dumpFileString = crashFile.getFullPathName();
 	dumpFileName = dumpFileString.getCharPointer().getAddress();
 	SystemStats::setApplicationCrashHandler((SystemStats::CrashHandlerFunction)createMiniDump);
