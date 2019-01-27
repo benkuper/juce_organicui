@@ -60,7 +60,7 @@ void ScriptEditor::paint(Graphics & g)
 	}
 
 	g.setColour(c);
-	g.fillEllipse(statusBounds.reduced(2).toFloat());
+	g.fillEllipse(statusBounds.reduced(4).toFloat());
 }
 
 void ScriptEditor::resizedInternalHeaderItemInternal(juce::Rectangle<int>& r)
