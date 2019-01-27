@@ -13,9 +13,11 @@
 
 class EnumParameterUI;
 
+
 class EnumParameter : public Parameter
 {
 public:
+
 	EnumParameter(const String &niceName, const String &description, bool enabled = true);
 	~EnumParameter() {}
 
@@ -25,20 +27,29 @@ public:
 
 	void updateArgDescription();
 
-	HashMap<String, var> enumValues;
+	struct EnumValue
+	{
+		EnumValue(String key, var value) : key(key), value(value) {}
+		String key;
+		var value;
+	};
 
-	var getValueData() { return enumValues[value]; };
+	OwnedArray<EnumValue> enumValues;
+
+	var getValueData();
+
 	template<class T>
-	T getValueDataAsEnum() { return (T)(int)enumValues[value]; }
+	T getValueDataAsEnum() { return (T)(int)enumValues[value]->value; }
 	String getValueKey() { return stringValue(); }
+
+	int getIndexForKey(StringRef key);
+	EnumValue * getEntryForKey(StringRef key);
 
 	StringArray getAllKeys();
 
 	void setValueWithData(var data);
 	void setValueWithKey(String data);
 	void setNext(bool loop = true, bool addToUndo = false);
-
-	int getKeyIndex(String key);
 
 	bool checkValueIsTheSame(var oldValue, var newValue) override;
 	

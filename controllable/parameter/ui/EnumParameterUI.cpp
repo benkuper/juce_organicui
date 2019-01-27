@@ -36,15 +36,14 @@ EnumParameterUI::~EnumParameterUI()
 void EnumParameterUI::updateComboBox()
 {	
 	cb.clear(dontSendNotification);
-	HashMap<String, var>::Iterator i(ep->enumValues);
 	idKeyMap.clear();
-	int id = 1;
 
-	while (i.next())
+	int id = 1;
+	for(auto &ev : ep->enumValues)
 	{
-		cb.addItem(i.getKey(), id);
-		idKeyMap.set(id, i.getKey());
-		keyIdMap.set(i.getKey(), id);
+		cb.addItem(ev->key, id);
+		idKeyMap.set(id, ev->key);
+		keyIdMap.set(ev->key, id);
 		id++;
 	}
 

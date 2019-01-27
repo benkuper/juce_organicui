@@ -20,7 +20,7 @@ EnumParameter::EnumParameter(const String & niceName, const String &description,
 
 EnumParameter * EnumParameter::addOption(String key, var data, bool selectIfFirstOption)
 {
-	enumValues.set(key, data);
+	enumValues.add(new EnumValue(key, data));
 	if (enumValues.size() == 1 && selectIfFirstOption)
 	{
 		defaultValue = key;
@@ -34,58 +34,60 @@ EnumParameter * EnumParameter::addOption(String key, var data, bool selectIfFirs
 
 void EnumParameter::removeOption(String key)
 {
-	enumValues.remove(key);
+	enumValues.remove(getIndexForKey(key));
 	enumListeners.call(&Listener::enumOptionRemoved, this, key);
 	updateArgDescription();
 }
 
 void EnumParameter::clearOptions()
 {
-	HashMap<String, var>::Iterator i(enumValues);
 	StringArray keysToRemove;
-	while (i.next())
-	{
-		keysToRemove.add(i.getKey());
-	}
-
-	for (auto &k : keysToRemove)
-	{
-		removeOption(k);
-	}
+	for (auto &ev : enumValues) keysToRemove.add(ev->key);
+	for (auto &k : keysToRemove) removeOption(k);
 }
 
 void EnumParameter::updateArgDescription()
 {
 	argumentsDescription = "";
-	HashMap<String, var>::Iterator i(enumValues);
-	int index = 1;
-	while (i.next())
+	for (int i = 0; i < enumValues.size(); i++)
 	{
-		argumentsDescription += i.getKey();
-		if(index < enumValues.size()-1) argumentsDescription += " | ";
-		index++;
+		argumentsDescription += enumValues[i]->key;
+		if(i < enumValues.size()-1) argumentsDescription += " | ";
 	}
+}
 
+var EnumParameter::getValueData() {
+	EnumValue * ev = getEntryForKey(value.toString());
+	if (ev == nullptr) return var();
+	return ev->value;
+}
+
+int EnumParameter::getIndexForKey(StringRef key)
+{
+	int numValues = enumValues.size();
+	for (int i = 0; i < numValues; i++) if (enumValues[i]->key == key) return i;
+	return -1;
+}
+
+EnumParameter::EnumValue * EnumParameter::getEntryForKey(StringRef key)
+{
+	int index = getIndexForKey(key);
+	if (index == -1) return nullptr;
+	return enumValues[index];
 }
 
 StringArray EnumParameter::getAllKeys()
 {
 	StringArray result;
-	HashMap<String, var>::Iterator i(enumValues);
-	while (i.next()) result.add(i.getKey());
+	for(auto &ev: enumValues) result.add(ev->key);
 	return result;
 }
 
 void EnumParameter::setValueWithData(var data)
 {
-	HashMap<String, var>::Iterator i(enumValues);
-	while (i.next())
+	for (auto &ev : enumValues)
 	{
-		if (i.getValue() == data)
-		{
-			setValueWithKey(i.getKey());
-			return;
-		}
+		if (ev->value == data) setValueWithKey(ev->key);
 	}
 }
 
@@ -96,41 +98,18 @@ void EnumParameter::setValueWithKey(String key)
 
 void EnumParameter::setNext(bool loop, bool addToUndo)
 {
-	HashMap<String, var>::Iterator i(enumValues);
-	int index = 0;
-	String firstKey;
-	while (i.next())
-	{
-		if (index == 0) firstKey = i.getKey(); 
-		if (i.getKey() == getValueKey())
-		{
-			if (i.next())
-			{
-				if (addToUndo) setUndoableValue(value, i.getKey());
-				else setValueWithKey(i.getKey());
-			}
-			else if (loop)
-			{
-				if (addToUndo) setUndoableValue(value, firstKey);
-				else setValueWithKey(firstKey);
-				
-			}
-			return;
-		}
-		index++;
-	}
-}
 
-int EnumParameter::getKeyIndex(String key)
-{
-	HashMap<String, var>::Iterator i(enumValues);
-	int index = 0;
-	while (i.next())
+	int targetIndex = getIndexForKey(value.toString()) + 1;
+	if (targetIndex >= enumValues.size())
 	{
-		if (i.getKey() == key) return index;
-		index++;
+		if (loop) targetIndex = 0;
+		else return;
 	}
-	return -1;
+
+	String newValue = enumValues[targetIndex]->key;
+
+	if (addToUndo) setUndoableValue(value, newValue);
+	else setValueWithKey(newValue);
 }
 
 bool EnumParameter::checkValueIsTheSame(var oldValue, var newValue)
