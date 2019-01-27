@@ -39,8 +39,13 @@ public:
 	var getValueData();
 
 	template<class T>
-	T getValueDataAsEnum() { return (T)(int)enumValues[value]->value; }
-	String getValueKey() { return stringValue(); }
+	T getValueDataAsEnum() {
+		EnumValue * ev = getEntryForKey(value.toString());
+		if (ev == nullptr) return (T)0;
+		return (T)(int)ev->value; 
+	}
+
+	String getValueKey();
 
 	int getIndexForKey(StringRef key);
 	EnumValue * getEntryForKey(StringRef key);

@@ -62,6 +62,10 @@ var EnumParameter::getValueData() {
 	return ev->value;
 }
 
+inline String EnumParameter::getValueKey() {
+	return stringValue(); 
+}
+
 int EnumParameter::getIndexForKey(StringRef key)
 {
 	int numValues = enumValues.size();
