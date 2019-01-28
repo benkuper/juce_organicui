@@ -30,7 +30,8 @@ public:
 		ChildStructureChanged,
 		ChildAddressChanged,
 		ControllableContainerPresetLoaded,
-		ControllableContainerReordered
+		ControllableContainerReordered,
+		ControllableContainerNeedsRebuild
 	};
 
 	ContainerAsyncEvent(EventType _type, ControllableContainer* _source) : type(_type), source(_source), targetContainer(nullptr), targetControllable(nullptr) {}

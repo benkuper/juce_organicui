@@ -272,7 +272,7 @@ void GenericControllableContainerEditor::newMessage(const ContainerAsyncEvent & 
 		//if (p.targetControllable->hideInEditor) return;
 		//addControllableUI(p.targetControllable, true);
 		resetAndBuild();
-		resized();
+		//resized();
 		break;
 
 	case ContainerAsyncEvent::ControllableRemoved:
@@ -283,7 +283,7 @@ void GenericControllableContainerEditor::newMessage(const ContainerAsyncEvent & 
 
 	case ContainerAsyncEvent::ControllableContainerAdded:
 		resetAndBuild();
-		resized();
+		//resized();
 		break;
 
 	case ContainerAsyncEvent::ControllableContainerRemoved:
@@ -296,7 +296,7 @@ void GenericControllableContainerEditor::newMessage(const ContainerAsyncEvent & 
 
 	case ContainerAsyncEvent::ControllableContainerReordered:
 		resetAndBuild();
-		resized();
+		//resized();
 		break;
 
 	case ContainerAsyncEvent::ControllableFeedbackUpdate:
@@ -305,6 +305,11 @@ void GenericControllableContainerEditor::newMessage(const ContainerAsyncEvent & 
 
 	case ContainerAsyncEvent::ChildAddressChanged:
 		containerLabel.setText(container->niceName, dontSendNotification);
+		break;
+
+	case ContainerAsyncEvent::ControllableContainerNeedsRebuild:
+		resetAndBuild();
+		//resized();
 		break;
 
 	default:
