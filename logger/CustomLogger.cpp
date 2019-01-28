@@ -1,29 +1,23 @@
-#include "CustomLogger.h"
-/*
-  ==============================================================================
-
-    Logger.cpp
-    Created: 6 May 2016 1:37:41pm
-    Author:  Martin Hermant
-
-  ==============================================================================
-*/
-
 juce_ImplementSingleton(CustomLogger);
 
-static OrganicApplication& getApp();
-
- CustomLogger::CustomLogger() :
-	  notifier(100)
-{
+CustomLogger::CustomLogger() :
+	notifier(5000),
+	welcomeMessage(getApp().getApplicationName() + " v" + String(ProjectInfo::versionString) + " : (" + String(Time::getCompilationDate().formatted("%d/%m/%y (%R)")) + ")")
+ {
+	
+#if USE_FILE_LOGGER
 	addLogListener(&fileWriter);
+#endif
+
 }
 
-void CustomLogger::logMessage(const String & message)
+const String & CustomLogger::getWelcomeMessage() {
+	return welcomeMessage;
+}
+
+
+void CustomLogger::logMessage(const String& message)
 {
 	notifier.addMessage(new String(message));
-}
-
-CustomLogger::FileWriter::FileWriter() { 
-	fileLog = FileLogger::createDefaultAppLogger(getApp().getApplicationName(), "log", ""); 
+	DBG(message);
 }
