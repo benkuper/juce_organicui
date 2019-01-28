@@ -130,7 +130,6 @@ void GenericControllableContainerEditor::resetAndBuild()
 
 	clear();
 	
-	
 	if (container == nullptr)
 	{
 		LOGWARNING("An error has occured here (container null on ResetAndBuild");
@@ -185,9 +184,14 @@ void GenericControllableContainerEditor::resetAndBuild()
 	containerEditorListeners.call(&ContainerEditorListener::containerRebuilt, this);
 }
 
+InspectableEditor * GenericControllableContainerEditor::getEditorUIForContainer(ControllableContainer * cc)
+{
+	return cc->getEditor(false);
+}
+
 InspectableEditor * GenericControllableContainerEditor::addEditorUI(ControllableContainer * cc, bool resize)
 {
-	InspectableEditor * ccui = cc->getEditor(false);
+	InspectableEditor * ccui = getEditorUIForContainer(cc);
 	int index = container->controllableContainers.indexOf(cc);
 	childEditors.insert(container->controllables.size()+index, ccui);
 	addAndMakeVisible(ccui);
@@ -195,9 +199,8 @@ InspectableEditor * GenericControllableContainerEditor::addEditorUI(Controllable
 	return ccui;
 }
 
-void GenericControllableContainerEditor::removeEditorUI(ControllableContainer * cc, bool resize)
+void GenericControllableContainerEditor::removeEditorUI(InspectableEditor * ccui, bool resize)
 {
-	InspectableEditor * ccui = getEditorForInspectable(cc);
 	if (ccui == nullptr)
 	{
 		resetAndBuild();
@@ -241,15 +244,21 @@ void GenericControllableContainerEditor::labelTextChanged(Label * l)
 	if (l == &containerLabel) container->setUndoableNiceName(l->getText());
 }
 
-void GenericControllableContainerEditor::addControllableUI(Controllable * c, bool resize)
+InspectableEditor * GenericControllableContainerEditor::getEditorUIForControllable(Controllable * c)
 {
-	if (!c->isControllableExposed || c->hideInEditor) return;
+	return c->getEditor(false);
+}
 
-	InspectableEditor * cui = c->getEditor(false);
+InspectableEditor * GenericControllableContainerEditor::addControllableUI(Controllable * c, bool resize)
+{
+	if (!c->isControllableExposed || c->hideInEditor) return nullptr;
+
+	InspectableEditor * cui = getEditorUIForControllable(c);
 	int index = container->controllables.indexOf(c);
 	childEditors.insert(index, cui);
 	addAndMakeVisible(cui);
 	if (resize) resized();
+	return nullptr;// cui;
 }
 
 void GenericControllableContainerEditor::removeControllableUI(Controllable * c, bool resize)
@@ -287,7 +296,7 @@ void GenericControllableContainerEditor::newMessage(const ContainerAsyncEvent & 
 		break;
 
 	case ContainerAsyncEvent::ControllableContainerRemoved:
-		removeEditorUI(p.targetContainer, true);
+		removeEditorUI(getEditorForInspectable(p.targetContainer), true);
 		break;
 
 	case ContainerAsyncEvent::ChildStructureChanged:

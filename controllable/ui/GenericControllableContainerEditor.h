@@ -50,7 +50,8 @@ public:
 	virtual void resizedInternal(juce::Rectangle<int> &r);
 	virtual void resizedInternalHeader(juce::Rectangle<int> &r);
 	virtual void resizedInternalContent(juce::Rectangle<int> &r);
-	void clear();
+
+	virtual void clear();
 
 	void mouseDown(const MouseEvent &e) override;
 
@@ -59,11 +60,13 @@ public:
 	
 	bool canBeCollapsed();
 
-	void addControllableUI(Controllable * c, bool resize = false);
-	void removeControllableUI(Controllable *c, bool resize = false);
+	virtual InspectableEditor * getEditorUIForControllable(Controllable *c);
+	virtual InspectableEditor * addControllableUI(Controllable * c, bool resize = false);
+	virtual void removeControllableUI(Controllable *c, bool resize = false);
 
+	virtual InspectableEditor * getEditorUIForContainer(ControllableContainer *cc);
 	virtual InspectableEditor * addEditorUI(ControllableContainer * cc, bool resize = false);
-	virtual void removeEditorUI(ControllableContainer * cc, bool resize = false);
+	virtual void removeEditorUI(InspectableEditor * i, bool resize = false);
 	
 	virtual void showMenuAndAddControllable();
 
