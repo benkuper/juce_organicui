@@ -93,6 +93,9 @@ private:
 	void mouseDown(const MouseEvent&) override;
 	void mouseDrag(const MouseEvent&) override;
 
+	const Colour logNoneColor = TEXTNAME_COLOR;
+	const Colour logDbgColor = BLUE_COLOR.withSaturation(.2f).darker(.3f);
+
 	Atomic<int> totalLogRow;
 	void updateTotalLogRow();
 	const LogElement * getElementForRow(const int r) const;

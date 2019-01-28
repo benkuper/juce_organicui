@@ -248,10 +248,10 @@ const Colour& CustomLoggerUI::getSeverityColourForRow(const int r) const
 		switch (s)
 		{
 		case LogElement::LOG_NONE:
-			return TEXTNAME_COLOR;
+			return logNoneColor;
 
 		case LogElement::LOG_DBG:
-			return BLUE_COLOR.withSaturation(.2f).darker(.3f);
+			return logDbgColor;
 
 		case LogElement::LOG_WARN:
 			return Colours::orange;
