@@ -36,7 +36,7 @@ FloatStepperUI::FloatStepperUI(Parameter * _parameter) :
 
 FloatStepperUI::~FloatStepperUI()
 {
-
+	stopTimer();
 }
 
 void FloatStepperUI::resized()
@@ -53,6 +53,7 @@ void FloatStepperUI::valueChanged(const var & value)
 
 void FloatStepperUI::sliderValueChanged(Slider * _slider)
 {
+	if (parameter.wasObjectDeleted()) return;
 	parameter->setValue(_slider->getValue());
 }
 
@@ -78,6 +79,8 @@ void FloatStepperUI::timerCallback()
 {
     if (!shouldUpdateStepper) return;
     shouldUpdateStepper = false;
+	
+	if (parameter.wasObjectDeleted()) return;
 
     slider->setValue(parameter->floatValue(), NotificationType::dontSendNotification);
 }
