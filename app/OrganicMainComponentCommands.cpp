@@ -200,6 +200,9 @@ PopupMenu OrganicMainContentComponent::getMenuForIndex(int /*topLevelMenuIndex*/
 		menu.addSeparator();
 		menu.addCommandItem(&getCommandManager(), CommandIDs::editProjectSettings);
 		menu.addCommandItem(&getCommandManager(), CommandIDs::editGlobalSettings);
+
+		fillFileMenuInternal(menu);
+
 		menu.addSeparator();
 		menu.addCommandItem(&getCommandManager(), CommandIDs::checkForUpdates);
 		menu.addSeparator();

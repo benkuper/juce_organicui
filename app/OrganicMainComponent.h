@@ -42,6 +42,7 @@ public:
 	virtual bool perform(const InvocationInfo& info) override;
 	virtual StringArray getMenuBarNames() override;
 	virtual PopupMenu getMenuForIndex(int topLevelMenuIndex, const String& menuName) override;
+	virtual void fillFileMenuInternal(PopupMenu &p) {}
 	virtual void menuItemSelected(int /*menuItemID*/, int /*topLevelMenuIndex*/) override;
 
 
