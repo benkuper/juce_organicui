@@ -31,6 +31,8 @@ public:
 	
 	void clearRange() override;
 
+	virtual StringArray getValuesNames() override;
+
 	Point<float> getPoint();
 	virtual var getLerpValueTo(var targetValue, float weight) override;
 	virtual void setWeightedValue(Array<var> values, Array<float> weights) override;

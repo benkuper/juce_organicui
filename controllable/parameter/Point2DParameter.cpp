@@ -111,6 +111,11 @@ void Point2DParameter::clearRange()
 	setBounds(INT32_MIN, INT32_MIN, INT32_MAX, INT32_MAX);
 }
 
+StringArray Point2DParameter::getValuesNames()
+{
+	return StringArray("X","Y");
+}
+
 Point<float> Point2DParameter::getPoint() {
 	return Point<float>(x, y);
 }

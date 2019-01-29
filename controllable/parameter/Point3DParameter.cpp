@@ -95,10 +95,13 @@ void Point3DParameter::setValueInternal(var & _value)
 		}
 	}
 
+	jassert(minimumValue.isArray() && maximumValue.isArray());
+	
 	x = std::isnan((float)_value[0]) ? 0 : jlimit<float>(minimumValue[0], maximumValue[0], _value[0]);
 	y = std::isnan((float)_value[1]) ? 0 : jlimit<float>(minimumValue[1], maximumValue[1], _value[1]);
 	z = std::isnan((float)_value[2]) ? 0 : jlimit<float>(minimumValue[2], maximumValue[2], _value[2]);
-
+	
+	
 	value = var();
 	value.append(x);
 	value.append(y);
@@ -162,6 +165,11 @@ bool Point3DParameter::checkValueIsTheSame(var newValue, var oldValue)
 	if (!(newValue.isArray() && oldValue.isArray())) return false;
 
 	return newValue[0] == oldValue[0] && newValue[1] == oldValue[1] && newValue[2] == oldValue[2];
+}
+
+StringArray Point3DParameter::getValuesNames()
+{
+	return StringArray("X","Y","Z");
 }
 
 ControllableUI * Point3DParameter::createDefaultUI(Controllable * targetControllable)

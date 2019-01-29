@@ -163,6 +163,8 @@ StringArray Parameter::getValuesNames()
 
 void Parameter::setRange(var min, var max, bool setDefaultRange) {
 
+	if(isComplex() && (!(min.isArray() && min.size() == value.size()) || !(max.isArray() && max.size() == value.size()))) return;
+
 	if (setDefaultRange)
 	{
 		defaultMinValue = min;

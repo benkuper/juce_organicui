@@ -37,6 +37,8 @@ public:
 
 	bool checkValueIsTheSame(var newValue, var oldValue) override;
 
+	virtual StringArray getValuesNames() override;
+
 	ControllableUI * createDefaultUI(Controllable * targetControllable = nullptr) override;
 
 	static Point3DParameter * create() { return new Point3DParameter("New Point3D Parameter", ""); }

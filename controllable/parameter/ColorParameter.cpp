@@ -65,6 +65,11 @@ void ColorParameter::setColor(const Colour &_color, bool silentSet, bool force)
 	setValue(colorVar, silentSet, force);
 }
 
+StringArray ColorParameter::getValuesNames()
+{
+	return StringArray("Red", "Green", "Blue", "Alpha");
+}
+
 bool ColorParameter::checkValueIsTheSame(var oldValue, var newValue)
 {
 	if (!(newValue.isArray() && oldValue.isArray())) return false;
