@@ -138,6 +138,8 @@ void TripleSliderUI::showEditRangeWindow()
 void TripleSliderUI::rangeChanged(Parameter * p)
 {
 	if (p != parameter) return;
+	if (!parameter->minimumValue.isArray() || !parameter->maximumValue.isArray()) return;
+
 	xParam.setRange(parameter->minimumValue[0], parameter->maximumValue[0]);
 	yParam.setRange(parameter->minimumValue[1], parameter->maximumValue[1]);
 	zParam.setRange(parameter->minimumValue[2], parameter->maximumValue[2]);
