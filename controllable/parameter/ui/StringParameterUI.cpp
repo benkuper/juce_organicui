@@ -136,10 +136,6 @@ StringParameterTextUI::StringParameterTextUI(Parameter * p) :
 	ParameterUI(p),
 	stringParam((StringParameter *)p)
 {
-	editor.setColour(editor.textColourId, isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f));
-	addAndMakeVisible(&editor);
-
-	
 	editor.setColour(editor.backgroundColourId, Colours::black);
 	editor.setColour(CaretComponent::caretColourId, Colours::orange);
 	editor.setColour(editor.textColourId, isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f));
@@ -148,6 +144,8 @@ StringParameterTextUI::StringParameterTextUI(Parameter * p) :
 	editor.setReturnKeyStartsNewLine(stringParam->multiline);
 	editor.addListener(this);
 	
+	addAndMakeVisible(&editor);
+
 	setSize(100, stringParam->multiline?60:16);
 }
 
