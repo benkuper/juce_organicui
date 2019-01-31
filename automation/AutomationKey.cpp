@@ -21,8 +21,8 @@ AutomationKey::AutomationKey(float minimumValue, float maximumValue) :
 	easingType = addEnumParameter("EasingType", "Type of transition to the next key");
 
 	easingType->addOption("Linear", Easing::LINEAR);
-	easingType->addOption("Hold", Easing::HOLD);
 	easingType->addOption("Bezier", Easing::BEZIER);
+	easingType->addOption("Hold", Easing::HOLD);
 	easingType->addOption("Sine", Easing::SINE);
 
 	easingType->setValueWithKey("Linear");
