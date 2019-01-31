@@ -38,6 +38,7 @@ ControllableContainer::ControllableContainer(const String & niceName) :
 
 	//script
 	scriptObject.setMethod("getChild", ControllableContainer::getChildFromScript);
+	scriptObject.setMethod("getParent", ControllableContainer::getParentFromScript);
 }
 
 ControllableContainer::~ControllableContainer()
@@ -811,7 +812,7 @@ void ControllableContainer::updateLiveScriptObjectInternal(DynamicObject * paren
 	
 
 	bool transferToParent = parent != nullptr;
-	
+
 	for (auto &cc : controllableContainers)
 	{
 		if (cc == nullptr || cc.wasObjectDeleted()) continue;
@@ -840,6 +841,8 @@ void ControllableContainer::updateLiveScriptObjectInternal(DynamicObject * paren
 		liveScriptObject->setProperty("name", shortName);
 		liveScriptObject->setProperty("niceName", niceName);
 	}
+
+	
 }
 
 var ControllableContainer::getChildFromScript(const var::NativeFunctionArgs & a)
@@ -857,6 +860,14 @@ var ControllableContainer::getChildFromScript(const var::NativeFunctionArgs & a)
 	LOG("Child not found from script " + a.arguments[0].toString());
 	return var();
 }
+
+var ControllableContainer::getParentFromScript(const juce::var::NativeFunctionArgs & a)
+{
+	ControllableContainer * m = getObjectFromJS<ControllableContainer>(a);
+	if (m->parentContainer == nullptr) return var();
+	return m->parentContainer->getScriptObject();
+}
+
 
 
 InspectableEditor * ControllableContainer::getEditor(bool isRoot)

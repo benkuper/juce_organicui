@@ -139,6 +139,8 @@ public:
 	//SCRIPT
 	virtual void updateLiveScriptObjectInternal(DynamicObject * parent = nullptr) override;
 	static var getChildFromScript(const var::NativeFunctionArgs &a);
+	static var getParentFromScript(const juce::var::NativeFunctionArgs& a);
+
 
 protected:
 	virtual void onContainerNiceNameChanged() {};

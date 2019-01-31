@@ -1,3 +1,4 @@
+#include "Controllable.h"
 /*
   ==============================================================================
 
@@ -29,6 +30,7 @@ Controllable::Controllable(const Type &type, const String & niceName, const Stri
 	queuedNotifier(10)
 {
 	scriptObject.setMethod("isParameter", Controllable::checkIsParameterFromScript);
+	scriptObject.setMethod("getParent", Controllable::getParentFromScript);
 
 	setEnabled(enabled);
 	setNiceName(niceName);
@@ -276,6 +278,14 @@ var Controllable::checkIsParameterFromScript(const juce::var::NativeFunctionArgs
 
 	Controllable * c = getObjectFromJS<Controllable>(a);
 	return c->type != TRIGGER;
+}
+
+var Controllable::getParentFromScript(const juce::var::NativeFunctionArgs & a)
+{
+	Controllable * c = getObjectFromJS<Controllable>(a);
+	if (c->parentContainer == nullptr) return var();
+	else return c->parentContainer->getScriptObject();
+
 }
 
 Controllable * Controllable::ControllableAction::getControllable()
