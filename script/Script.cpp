@@ -13,6 +13,7 @@ Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled) :
 	BaseItem("Script", canBeDisabled, false),
 	scriptParamsContainer("params"),
 	parentTarget(_parentTarget),
+	lockedThreadId(0),
 	scriptAsyncNotifier(10)
 {
 	isSelectable = false;
@@ -94,11 +95,13 @@ void Script::loadScript()
 
 	stopTimer(0);
 
-	if(paramsContainerData.isVoid()) paramsContainerData = scriptParamsContainer.getJSONData();
+	if (paramsContainerData.isVoid()) paramsContainerData = scriptParamsContainer.getJSONData();
 
 	buildEnvironment();
-	Result result = scriptEngine->execute(s);
 
+	//	engineLock.enter();
+	Result result = scriptEngine->execute(s);
+	//	engineLock.exit();
 
 	if (result.getErrorMessage().isEmpty())
 	{
@@ -108,7 +111,8 @@ void Script::loadScript()
 		callFunction("init", Array<var>());
 
 		setState(SCRIPT_LOADED);
-	} else
+	}
+	else
 	{
 		NLOG("Script : " + niceName, "Script error : " + result.getErrorMessage());
 		setState(SCRIPT_ERROR);
@@ -156,7 +160,29 @@ var Script::callFunction(const Identifier & function, const Array<var> args, Res
 
 	Result tmpResult = Result::ok();
 	if (result == nullptr) result = &tmpResult;
+
+	Thread::ThreadID curThreadId = Thread::getCurrentThreadId();
+	bool needsToEnterLock = lockedThreadId != curThreadId;
+
+	if(needsToEnterLock)
+	{
+		engineLock.enter();
+		//DBG("Lock Enterded " << (int)curThreadId << "(locked " << (int)lockedThreadId << ")");
+		lockedThreadId = curThreadId;
+	}
+	else
+	{
+		//DBG("Already locked from this thread");
+	}
+
 	var returnData = scriptEngine->callFunction(function, var::NativeFunctionArgs(var::undefined(), (const var *)args.begin(), args.size()), result);
+	
+	if (needsToEnterLock)
+	{
+		//DBG("Lock Exit " << (int)curThreadId << "(locked " << (int)lockedThreadId << ")");
+		engineLock.exit();
+	}
+
 	if (result->getErrorMessage().isNotEmpty())
 	{
 		NLOG(niceName, "Script Error :\n" + result->getErrorMessage());
@@ -207,7 +233,7 @@ void Script::loadJSONDataInternal(var data)
 
 void Script::endLoadFile()
 {
-	if(Engine::mainEngine != nullptr) Engine::mainEngine->removeEngineListener(this);
+	if (Engine::mainEngine != nullptr) Engine::mainEngine->removeEngineListener(this);
 	loadScript();
 }
 
@@ -301,13 +327,13 @@ var Script::addEnumParameterFromScript(const var::NativeFunctionArgs & args)
 	Script * s = getObjectFromJS<Script>(args);
 	if (!checkNumArgs(s->niceName, args, 2)) return var();
 	EnumParameter * p = s->scriptParamsContainer.addEnumParameter(args.arguments[0], args.arguments[1]);
-	int numOptions = (int)floor((args.numArguments-2) / 2.0f);
+	int numOptions = (int)floor((args.numArguments - 2) / 2.0f);
 	for (int i = 0; i < numOptions; i++)
 	{
 		int optionIndex = 2 + i * 2;
 		p->addOption(args.arguments[optionIndex].toString(), args.arguments[optionIndex + 1]);
 	}
-	
+
 	return p->getScriptObject();
 }
 

@@ -41,6 +41,8 @@ public:
 	ScriptTarget * parentTarget;
 
 	ScopedPointer<JavascriptEngine> scriptEngine;
+	SpinLock engineLock;
+	Thread::ThreadID lockedThreadId;
 
 	void loadScript();
 	void buildEnvironment();
