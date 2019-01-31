@@ -21,9 +21,8 @@ ShapeShifterManager::ShapeShifterManager() :
 
 ShapeShifterManager::~ShapeShifterManager()
 {
+	saveCurrentLayoutToFile(File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory).getChildFile(appSubFolder + "/_lastSession." + appLayoutExtension));
 	openedWindows.clear();
-	saveCurrentLayoutToFile(lastFile);
-
 }
 
 void ShapeShifterManager::setDefaultFileData(const char * data)
@@ -268,14 +267,13 @@ void ShapeShifterManager::loadLayoutFromFile(const File & fromFile)
 
 void ShapeShifterManager::loadLastSessionLayoutFile()
 {
+	lastFile = File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory).getChildFile(appSubFolder + "/_lastSession." + appLayoutExtension);
 	if (lastFile.exists())
 	{
 		loadLayoutFromFile(lastFile);
 	} else
 	{
-		lastFile = File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory).getChildFile(appSubFolder + "/_lastSession." + appLayoutExtension);
-		if (lastFile.exists()) loadLayoutFromFile(lastFile);
-		else loadDefaultLayoutFile();
+		loadDefaultLayoutFile();
 	}
 }
 
@@ -320,7 +318,8 @@ void ShapeShifterManager::saveCurrentLayoutToFile(const File &toFile)
 	var data = getCurrentLayout();
 	if (data.isUndefined() || data.isVoid()) return;
 
-	if (!toFile.existsAsFile()) toFile.create();
+	DBG("Save layout to file : " << toFile.getFullPathName());
+	if (toFile.existsAsFile()) toFile.deleteFile();
 	ScopedPointer<OutputStream> os(toFile.createOutputStream());
 	if (os == nullptr)
 	{

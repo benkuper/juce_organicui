@@ -46,7 +46,7 @@ OrganicMainContentComponent::~OrganicMainContentComponent()
 
 void OrganicMainContentComponent::init()
 {
-	String lastVersion = getAppProperties().getCommonSettings(true)->getValue("lastVersion", "0");
+	String lastVersion = getAppProperties().getUserSettings()->getValue("lastVersion", "0");
 	if (lastVersion != getAppVersion())
 	{
 		ShapeShifterManager::getInstance()->loadDefaultLayoutFile(true);
