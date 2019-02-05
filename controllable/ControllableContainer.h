@@ -149,6 +149,8 @@ protected:
 	virtual void onExternalParameterChanged(Parameter *) {}; //When listening to other child controllable then this container's children
 	virtual void onContainerTriggerTriggered(Trigger *) {};
 	virtual void onExternalTriggerTriggered(Trigger *) {}; //When listening to other child controllable then this container's children
+	virtual void onControllableAdded(Controllable *) {}; 
+	virtual void onControllableRemoved(Controllable *) {};
 
     virtual void onContainerParameterChangedAsync(Parameter *,const var & /*value*/){};
     

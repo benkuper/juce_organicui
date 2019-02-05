@@ -83,6 +83,7 @@ void ControllableContainer::addControllable(Controllable * c)
 	if (c->type == Controllable::TRIGGER) addTriggerInternal((Trigger *)c);
 	else addParameterInternal((Parameter *)c);
 	c->addControllableListener(this);
+	
 }
 
 void ControllableContainer::addParameter(Parameter * p)
@@ -188,7 +189,7 @@ void ControllableContainer::addTriggerInternal(Trigger * t)
 	
 	t->setParentContainer(this);
 	t->addTriggerListener(this);
-
+	onControllableAdded(t);
 	controllableContainerListeners.call(&ControllableContainerListener::controllableAdded, t);
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableAdded, this, t));
 	notifyStructureChanged();
@@ -204,6 +205,7 @@ void ControllableContainer::addParameterInternal(Parameter * p)
 	}
 	p->addParameterListener(this);
 	p->addAsyncParameterListener(this);
+	onControllableAdded(p);
 	controllableContainerListeners.call(&ControllableContainerListener::controllableAdded, p);
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableAdded, this, p));
 	notifyStructureChanged();
@@ -243,6 +245,8 @@ void ControllableContainer::removeControllable(WeakReference<Controllable> c)
 	}
 
 	c->removeControllableListener(this);
+
+	onControllableRemoved(c);
 
 	{
 		ScopedLock lock(controllables.getLock());
