@@ -102,18 +102,23 @@ void OSCRemoteControl::processMessage(const OSCMessage & m)
 			break;
 
 		case Controllable::COLOR:
-			if (m.size() < 3) NLOG(niceName, "Parameter " << p->niceName << " requires at least 3 argument");
+			if (m.size() < 3) NLOG(niceName, "Parameter " << p->niceName << " requires at least 3 arguments");
 			else static_cast<ColorParameter *>(p)->setColor(Colour::fromFloatRGBA(OSCHelpers::getFloatArg(m[0]), OSCHelpers::getFloatArg(m[1]), OSCHelpers::getFloatArg(m[2]), m.size() >= 4 ? OSCHelpers::getFloatArg(m[3]) : 1));
 			break;
 
 		case Controllable::POINT2D:
-			if (m.size() < 2) NLOG(niceName, "Parameter " << p->niceName << " requires at least 2 argument");
+			if (m.size() < 2) NLOG(niceName, "Parameter " << p->niceName << " requires at least 2 arguments");
 			else static_cast<Point2DParameter *>(p)->setPoint(OSCHelpers::getFloatArg(m[0]), OSCHelpers::getFloatArg(m[1]));
 			break;
 
 		case Controllable::POINT3D: 
-			if (m.size() < 3) NLOG(niceName, "Parameter " << p->niceName << " requires at least 3 argument");
+			if (m.size() < 3) NLOG(niceName, "Parameter " << p->niceName << " requires at least 3 arguments");
 			else static_cast<Point3DParameter *>(p)->setVector(OSCHelpers::getFloatArg(m[0]), OSCHelpers::getFloatArg(m[1]), OSCHelpers::getFloatArg(m[2]));
+			break;
+
+		case Controllable::ENUM:
+			if(m.size() < 1) NLOG(niceName, "Parameter " << p->niceName << " requires at least 1 argument");
+			else static_cast<EnumParameter *>(p)->setValueWithKey(OSCHelpers::getStringArg(m[0]));
 			break;
 
 		default:

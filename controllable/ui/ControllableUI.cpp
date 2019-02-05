@@ -174,15 +174,8 @@ void ControllableUI::newMessage(const Controllable::ControllableEvent & e)
 void ControllableUI::updateTooltip()
 {
 	tooltip = controllable->description + "\nControl Address : " + controllable->controlAddress;
-	bool readOnly = false;
-	if (controllable->type != Controllable::Type::TRIGGER)
-	{
-		tooltip += " (" + controllable->argumentsDescription + ")";
-		if (((Parameter *)controllable.get())->isControllableFeedbackOnly == false) readOnly = true;
-
-	}
-	if (controllable->isControllableFeedbackOnly) readOnly = true;
-	if (readOnly) tooltip += " (read only)";
+	if (controllable->type != Controllable::Type::TRIGGER) tooltip += " (" + controllable->argumentsDescription + ")";
+	if (controllable->isControllableFeedbackOnly) tooltip += " (read only)";
 
 	setTooltip(tooltip);
 }

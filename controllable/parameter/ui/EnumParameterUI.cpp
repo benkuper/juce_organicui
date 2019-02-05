@@ -50,6 +50,8 @@ void EnumParameterUI::updateComboBox()
 	cb.setSelectedId(keyIdMap[ep->stringValue()], dontSendNotification);
 	cb.setEnabled(isInteractable());
 	cb.setInterceptsMouseClicks(isInteractable(), isInteractable());
+
+	updateTooltip();
 }
 
 String EnumParameterUI::getSelectedKey()
