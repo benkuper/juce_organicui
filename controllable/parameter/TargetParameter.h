@@ -60,6 +60,8 @@ public:
 	void setTarget(WeakReference<Controllable>);
 	void setTarget(WeakReference<ControllableContainer>);
 
+	void setRootContainer(WeakReference<ControllableContainer> newRootContainer);
+
 	void childStructureChanged(ControllableContainer *) override;
 	void controllableRemoved(Controllable *) override;
 	void controllableContainerRemoved(ControllableContainer *) override;

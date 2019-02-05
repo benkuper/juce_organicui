@@ -33,14 +33,16 @@ TargetParameter::TargetParameter(const String & niceName, const String & descrip
 {
 	lockManualControlMode = true;
 	type = TARGET; 
-	if (rootContainer == nullptr) rootContainer = Engine::mainEngine;
-	rootContainer->addControllableContainerListener(this);
+
+	setRootContainer(rootContainer != nullptr?rootContainer:Engine::mainEngine);
+	
 	argumentsDescription = "target";
 }
 
 TargetParameter::~TargetParameter()
 {
-	if (rootContainer != nullptr) rootContainer->removeControllableContainerListener(this);
+	setRootContainer(nullptr);
+
 	setTarget((ControllableContainer *)nullptr);
 	setTarget((Controllable *)nullptr);
 	setValue("");
@@ -131,6 +133,19 @@ void TargetParameter::setTarget(WeakReference<ControllableContainer> cc)
 		targetContainer->addControllableContainerListener(this);
 		setGhostValue("");
 	}
+}
+
+void TargetParameter::setRootContainer(WeakReference<ControllableContainer> newRootContainer)
+{
+	if (rootContainer == newRootContainer) return;
+
+	if (rootContainer != nullptr && !rootContainer.wasObjectDeleted()) rootContainer->removeControllableContainerListener(this);
+
+	rootContainer = newRootContainer;
+
+	if(rootContainer != nullptr && !rootContainer.wasObjectDeleted()) rootContainer->addControllableContainerListener(this);
+
+	setValue("");
 }
 
 void TargetParameter::childStructureChanged(ControllableContainer * cc)
