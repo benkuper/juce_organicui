@@ -85,12 +85,12 @@ void TargetParameter::setValueInternal(var & newVal)
 	{
 		if (targetType == CONTAINER)
 		{
-			WeakReference<ControllableContainer> cc = rootContainer->getControllableContainerForAddress(newVal.toString());
+			WeakReference<ControllableContainer> cc = rootContainer->getControllableContainerForAddress(newVal.toString(),true);
 			if (cc != nullptr) setTarget(cc);
 			else setGhostValue(newVal.toString());
 		} else
 		{
-			WeakReference<Controllable> c = rootContainer->getControllableForAddress(newVal.toString());
+			WeakReference<Controllable> c = rootContainer->getControllableForAddress(newVal.toString(),true);
 			if (c != nullptr) setTarget(c);
 			else setGhostValue(newVal.toString());
 		}
