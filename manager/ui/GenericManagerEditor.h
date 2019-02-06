@@ -129,7 +129,7 @@ void GenericManagerEditor<T>::resizedInternalHeader(juce::Rectangle<int>& r)
 {
 	if (addItemBT != nullptr)
 	{
-		addItemBT->setBounds(r.removeFromRight(r.getHeight()).reduced(2));
+		addItemBT->setBounds(r.removeFromRight(r.getHeight()));
 		r.removeFromRight(2);
 	}
 
