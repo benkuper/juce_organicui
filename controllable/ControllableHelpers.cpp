@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    ControllableHelpers.cpp
-    Created: 12 May 2016 4:21:18pm
-    Author:  bkupe
+	ControllableHelpers.cpp
+	Created: 12 May 2016 4:21:18pm
+	Author:  bkupe
 
   ==============================================================================
 */
@@ -21,7 +21,7 @@ ControllableChooserPopupMenu::ControllableChooserPopupMenu(ControllableContainer
 
 	if (rootContainer == nullptr) rootContainer = Engine::mainEngine;
 	jassert(rootContainer != nullptr);
-	populateMenu(this, rootContainer,id);
+	populateMenu(this, rootContainer, id);
 }
 
 ControllableChooserPopupMenu::~ControllableChooserPopupMenu()
@@ -35,9 +35,17 @@ void ControllableChooserPopupMenu::populateMenu(PopupMenu * subMenu, Controllabl
 		for (auto &cc : container->controllableContainers)
 		{
 			if (!cc->isTargettable) continue;
-			PopupMenu p;
-			populateMenu(&p, cc, currentId,currentLevel+1);
-			subMenu->addSubMenu(cc->niceName, p);
+			if (cc->skipControllableNameInAddress)
+			{
+				populateMenu(subMenu, cc, currentId, currentLevel + 1);
+			}
+			else
+			{
+				PopupMenu p;
+				populateMenu(&p, cc, currentId, currentLevel + 1);
+				subMenu->addSubMenu(cc->niceName, p);
+			}
+
 		}
 
 		subMenu->addSeparator();
@@ -52,7 +60,8 @@ void ControllableChooserPopupMenu::populateMenu(PopupMenu * subMenu, Controllabl
 		if (c->type == Controllable::TRIGGER)
 		{
 			if (!showTriggers) continue;
-		} else
+		}
+		else
 		{
 			if (!showParameters) continue;
 		}
@@ -73,7 +82,7 @@ Controllable * ControllableChooserPopupMenu::showAndGetControllable()
 
 Controllable * ControllableChooserPopupMenu::getControllableForResult(int result)
 {
-	if (result <= indexOffset || (result-1-indexOffset) >= controllableList.size()) return nullptr;
+	if (result <= indexOffset || (result - 1 - indexOffset) >= controllableList.size()) return nullptr;
 	return controllableList[result - 1 - indexOffset];
 }
 
@@ -86,15 +95,15 @@ ContainerChooserPopupMenu::ContainerChooserPopupMenu(ControllableContainer * roo
 	typeCheckFunc(typeCheckFunc)
 {
 	int id = indexOffset + 1;
-	
+
 	if (rootContainer == nullptr) rootContainer = Engine::mainEngine;
-	jassert(rootContainer != nullptr); 
+	jassert(rootContainer != nullptr);
 	populateMenu(this, rootContainer, id);
 }
 
 ContainerChooserPopupMenu::~ContainerChooserPopupMenu()
 {
-	
+
 }
 
 void ContainerChooserPopupMenu::populateMenu(PopupMenu * subMenu, ControllableContainer * container, int & currentId, int currentLevel)
@@ -112,11 +121,20 @@ void ContainerChooserPopupMenu::populateMenu(PopupMenu * subMenu, ControllableCo
 			containerList.add(cc);
 			subMenu->addItem(currentId, cc->niceName);
 			currentId++;
-		} else if (maxDefaultSearchLevel == -1 || currentLevel < maxDefaultSearchLevel)
+		}
+		else if (maxDefaultSearchLevel == -1 || currentLevel < maxDefaultSearchLevel)
 		{
-			PopupMenu p;
-			populateMenu(&p, cc, currentId, currentLevel + 1);
-			if(typeCheckFunc == nullptr || p.containsAnyActiveItems()) subMenu->addSubMenu(cc->niceName, p);
+			if (cc->skipControllableNameInAddress)
+			{
+				populateMenu(subMenu, cc, currentId, currentLevel + 1);
+			}
+			else
+			{
+				PopupMenu p;
+				populateMenu(&p, cc, currentId, currentLevel + 1);
+				if (typeCheckFunc == nullptr || p.containsAnyActiveItems()) subMenu->addSubMenu(cc->niceName, p);
+			}
+
 		}
 	}
 }
