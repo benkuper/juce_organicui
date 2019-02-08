@@ -87,7 +87,8 @@ public:
 protected:
 	void valueChanged(const var & v) override;
 	virtual void textEditorTextChanged(TextEditor &) override;
-
+	virtual void textEditorFocusLost(TextEditor &) override;
+	virtual void textEditorReturnKeyPressed(TextEditor &) override;
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(StringParameterTextUI)
 };

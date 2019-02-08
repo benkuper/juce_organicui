@@ -145,7 +145,6 @@ StringParameterTextUI::StringParameterTextUI(Parameter * p) :
 	editor.addListener(this);
 	
 	addAndMakeVisible(&editor);
-
 	setSize(100, stringParam->multiline?60:16);
 }
 
@@ -168,4 +167,13 @@ void StringParameterTextUI::valueChanged(const var & v)
 void StringParameterTextUI::textEditorTextChanged(TextEditor &)
 {
 	stringParam->setValue(editor.getText());
+}
+
+void StringParameterTextUI::textEditorFocusLost(TextEditor &)
+{
+	
+}
+
+void StringParameterTextUI::textEditorReturnKeyPressed(TextEditor &)
+{
 }
