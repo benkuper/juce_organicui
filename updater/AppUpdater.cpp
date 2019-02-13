@@ -39,7 +39,7 @@ AppUpdater::~AppUpdater()
 	if (!downloadURLBase.endsWithChar('/')) downloadURLBase += "/";
 }
 
-  String AppUpdater::getDownloadFileName(String version, bool beta, String extension)
+  String AppUpdater::getDownloadFileName(String version, bool beta, String _extension)
   {
 	  String fileURL = filePrefix + "-";
 #if JUCE_WINDOWS
@@ -50,7 +50,7 @@ AppUpdater::~AppUpdater()
 	  fileURL += "linux";
 #endif
 
-	  fileURL += "-" + version + "." + extension;
+	  fileURL += "-" + version + "." + _extension;
 	  return fileURL;
   }
 
