@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    Outliner.cpp
-    Created: 7 Oct 2016 10:31:23am
-    Author:  bkupe
+	Outliner.cpp
+	Created: 7 Oct 2016 10:31:23am
+	Author:  bkupe
 
   ==============================================================================
 */
@@ -11,15 +11,15 @@
 
 juce_ImplementSingleton(Outliner)
 
-Outliner::Outliner(const String &contentName) : 
+Outliner::Outliner(const String &contentName) :
 	ShapeShifterContentComponent(contentName),
 	enabled(true)
 {
 
-	if(Engine::mainEngine != nullptr) Engine::mainEngine->addControllableContainerListener(this);
+	if (Engine::mainEngine != nullptr) Engine::mainEngine->addControllableContainerListener(this);
 
 	showHiddenContainers = false;
-	
+
 	rootItem = new OutlinerItem(Engine::mainEngine);
 	treeView.setRootItem(rootItem);
 	treeView.setRootItemVisible(false);
@@ -52,7 +52,8 @@ void Outliner::setEnabled(bool value)
 	{
 		Engine::mainEngine->addControllableContainerListener(this);
 		rebuildTree();
-	} else
+	}
+	else
 	{
 		clear();
 		Engine::mainEngine->removeControllableContainerListener(this);
@@ -61,7 +62,7 @@ void Outliner::setEnabled(bool value)
 
 void Outliner::resized()
 {
- juce::Rectangle<int> r = getLocalBounds();
+	juce::Rectangle<int> r = getLocalBounds();
 	r.removeFromTop(20);
 	treeView.setBounds(r);
 }
@@ -93,16 +94,17 @@ void Outliner::buildTree(OutlinerItem * parentItem, ControllableContainer * pare
 		if (cc->skipControllableNameInAddress && !showHiddenContainers)
 		{
 			buildTree(parentItem, cc);
-		} else
+		}
+		else
 		{
 			OutlinerItem * ccItem = new OutlinerItem(cc);
 			parentItem->addSubItem(ccItem);
 
 			buildTree(ccItem, cc);
 		}
-		
+
 	}
-	
+
 	Array<WeakReference<Controllable>> childControllables = parentContainer->getAllControllables(false);
 
 	for (auto &c : childControllables)
@@ -119,7 +121,7 @@ void Outliner::childStructureChanged(ControllableContainer *)
 	if (enabled)
 	{
 		MessageManagerLock mmLock;
-		if(mmLock.lockWasGained()) rebuildTree();
+		if (mmLock.lockWasGained()) rebuildTree();
 	}
 }
 
@@ -128,10 +130,10 @@ void Outliner::childStructureChanged(ControllableContainer *)
 
 OutlinerItem::OutlinerItem(WeakReference<ControllableContainer> _container) :
 	InspectableContent(_container),
-isContainer(true),
-itemName(_container->niceName),
-	 container(_container),
-    controllable(nullptr)
+	isContainer(true),
+	itemName(_container->niceName),
+	container(_container),
+	controllable(nullptr)
 {
 	container->addControllableContainerListener(this);
 }
@@ -139,15 +141,15 @@ itemName(_container->niceName),
 OutlinerItem::OutlinerItem(WeakReference<Controllable> _controllable) :
 	InspectableContent(_controllable),
 	isContainer(false),
-itemName(_controllable->niceName),
-container(nullptr),
-    controllable(_controllable)
+	itemName(_controllable->niceName),
+	container(nullptr),
+	controllable(_controllable)
 {
 }
 
 OutlinerItem::~OutlinerItem()
 {
-	if(isContainer) container->removeControllableContainerListener(this);
+	if (isContainer) container->removeControllableContainerListener(this);
 	masterReference.clear();
 }
 
@@ -210,10 +212,10 @@ void OutlinerItemComponent::itemNameChanged()
 
 // OutlinerItemComponent
 
-OutlinerItemComponent::OutlinerItemComponent(OutlinerItem * _item) : 
+OutlinerItemComponent::OutlinerItemComponent(OutlinerItem * _item) :
 	InspectableContentComponent(_item->inspectable),
 	item(_item),
-	label("label",_item->itemName)	
+	label("label", _item->itemName)
 {
 	item->addItemListener(this);
 	autoDrawHighlightWhenSelected = false;
@@ -223,14 +225,15 @@ OutlinerItemComponent::OutlinerItemComponent(OutlinerItem * _item) :
 
 	label.setFont(label.getFont().withHeight(12));
 	label.setColour(label.backgroundWhenEditingColourId, Colours::white);
-	
-	
+
+
 	if (item->isContainer && item->container->nameCanBeChangedByUser)
 	{
 		label.addListener(this);
 		label.setEditable(false, true);
-		label.addMouseListener(this,true);
-	} else
+		label.addMouseListener(this, true);
+	}
+	else
 	{
 		label.setInterceptsMouseClicks(false, false);
 	}
@@ -238,19 +241,19 @@ OutlinerItemComponent::OutlinerItemComponent(OutlinerItem * _item) :
 
 OutlinerItemComponent::~OutlinerItemComponent()
 {
-	if(!item.wasObjectDeleted()) item->removeItemListener(this);
+	if (!item.wasObjectDeleted()) item->removeItemListener(this);
 }
 
 void OutlinerItemComponent::paint(Graphics & g)
 {
- juce::Rectangle<int> r = getLocalBounds();
-	
+	juce::Rectangle<int> r = getLocalBounds();
+
 	Colour c = BLUE_COLOR;
 	if (item->isContainer) c = item->container->nameCanBeChangedByUser ? HIGHLIGHT_COLOR : TEXT_COLOR;
-	
+
 
 	int labelWidth = label.getFont().getStringWidth(label.getText());
-	
+
 	if (item->isSelected())
 	{
 		g.setColour(c);
@@ -259,7 +262,7 @@ void OutlinerItemComponent::paint(Graphics & g)
 
 	r.removeFromLeft(3);
 	label.setBounds(r);
-	label.setColour(Label::textColourId, item->isSelected() ? Colours::grey.darker() : c);	
+	label.setColour(Label::textColourId, item->isSelected() ? Colours::grey.darker() : c);
 }
 
 
