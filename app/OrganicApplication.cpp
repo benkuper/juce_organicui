@@ -159,28 +159,30 @@ void OrganicApplication::newMessage(const AppUpdateEvent & e)
             
 	case AppUpdateEvent::UPDATE_FINISHED:
 	{
+        if(e.file.getFileExtension() == "zip")
+        {
+            File appFile = File::getSpecialLocation(File::currentApplicationFile);
+            File appDir = appFile.getParentDirectory();
+            File tempDir = appDir.getChildFile("temp");
+            tempDir.deleteRecursively();
+            
+            #if JUCE_MAC
+                chmod (File::getSpecialLocation(File::currentExecutableFile).getFullPathName().toUTF8(), S_IRWXO | S_IRWXU | S_IRWXG);
+            #endif
+        }else
+        {
+            File appFile = File::getSpecialLocation(File::tempDirectory).getChildFile(getApplicationName()+String("_install"+e.file.getFileExtension()));
+            e.file.copyFileTo(appFile);
+            appFile.startAsProcess();
 
-#if JUCE_WINDOWS
-		File appFile = File::getSpecialLocation(File::tempDirectory).getChildFile(getApplicationName()+String("_install.exe"));
-		e.file.copyFileTo(appFile);
-		appFile.startAsProcess();
-#else
-		File appFile = File::getSpecialLocation(File::currentApplicationFile);
-		File appDir = appFile.getParentDirectory();
-		File tempDir = appDir.getChildFile("temp");
-		tempDir.deleteRecursively();
-#if JUCE_MAC
-        chmod (File::getSpecialLocation(File::currentExecutableFile).getFullPathName().toUTF8(), S_IRWXO | S_IRWXU | S_IRWXG);
-#endif
-		 
-		JUCEApplication::getInstance()->systemRequestedQuit();
-		appFile.startAsProcess();
-#endif
-	}
-#
-		break;
-        default:
-            break;
+            
+            JUCEApplication::getInstance()->systemRequestedQuit();
+            appFile.startAsProcess();
+        }
+    }
+    break;
+    
+    default: break;
 	}
 }
 

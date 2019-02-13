@@ -66,6 +66,7 @@ public:
 	URL updateURL;
 	String downloadURLBase;
 	String downloadingFileName;
+    String extension;
 	String filePrefix;
 	File targetDir;
 

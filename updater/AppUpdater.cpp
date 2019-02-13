@@ -81,13 +81,16 @@ void AppUpdater::downloadUpdate()
 	DBG("Download file name " << downloadingFileName);
 
 	targetDir.createDirectory();
-
-#if JUCE_WINDOWS
-	File targetFile = File::getSpecialLocation(File::tempDirectory).getChildFile(downloadingFileName);
-#else	
-	File targetFile = targetDir.getChildFile(downloadingFileName);
-	if (targetFile.existsAsFile()) targetFile.deleteFile();
-#endif
+    
+    File targetFile;
+    if(extension == "zip")
+    {
+        targetFile = targetDir.getChildFile(downloadingFileName);
+        if (targetFile.existsAsFile()) targetFile.deleteFile();
+    }else
+    {
+        targetFile = File::getSpecialLocation(File::tempDirectory).getChildFile(downloadingFileName);
+    }
 
 	downloadingFileName = targetFile.getFileName();
 
@@ -118,6 +121,7 @@ void AppUpdater::run()
 	ScopedPointer<InputStream> stream(updateURL.createInputStream(false, nullptr, nullptr, String(),
 		2000, // timeout in millisecs
 		&responseHeaders, &statusCode));
+    
 #if JUCE_WINDOWS
 	if (statusCode != 200)
 	{
@@ -197,7 +201,8 @@ void AppUpdater::run()
 
 				String title = dataIsBeta ? "New BETA version available" : "New version available";
 
-				String extension = "zip";
+				extension = "zip";
+                
 				#if JUCE_WINDOWS
 								extension = data.getProperty("winExtension", "zip");
 				#elif JUCE_MAC
@@ -235,49 +240,54 @@ void AppUpdater::finished(URL::DownloadTask * task, bool success)
 		queuedNotifier.addMessage(new AppUpdateEvent(AppUpdateEvent::DOWNLOAD_ERROR)); return;
 	}
 
-#if JUCE_WINDOWS
-	File f = File::getSpecialLocation(File::tempDirectory).getChildFile(downloadingFileName);
-#else
-    File appFile = File::getSpecialLocation(File::currentApplicationFile);
-    File appDir = appFile.getParentDirectory();
+    File f;
     
-	File f = appDir.getChildFile("update_temp/" + downloadingFileName);
-#endif
-	if (!f.exists())
-	{
-		DBG("File doesn't exist");
-		return;
-	}
-
-	if (f.getSize() < 1000000) //if file is less than 1Mo, got a problem
-	{
-		LOGERROR("Wrong file size, try downloading it directly from the website");
-		return;
-	}
-
-#if JUCE_WINDOWS
-
-
-#else
-	File td = f.getParentDirectory();
-	{
-		ZipFile zip(f);
-		zip.uncompressTo(td);
-		Array<File> filesToCopy;
-
-		appFile.moveFileTo(td.getNonexistentChildFile("oldApp", appFile.getFileExtension()));
-
-		DBG("Move to " << appDir.getFullPathName());
-		for (int i = 0; i < zip.getNumEntries(); i++)
-		{
-			File zf = td.getChildFile(zip.getEntry(i)->filename);
-			DBG("File exists : " << (int)f.exists());
-			zf.copyFileTo(appDir.getChildFile(zip.getEntry(i)->filename));
-			//DBG("Move result for " << zf.getFileName() << " = " << (int)result);
-		}
-	}
-#endif
+    File appFile;
+    File appDir;
     
+    if(extension == "zip")
+    {
+        appFile = File::getSpecialLocation(File::currentApplicationFile);
+        appDir = appFile.getParentDirectory();
+        
+        f = appDir.getChildFile("update_temp/" + downloadingFileName);
+    }else
+    {
+        f = File::getSpecialLocation(File::tempDirectory).getChildFile(downloadingFileName);
+    }
+	
+    if (!f.exists())
+    {
+        DBG("File doesn't exist");
+        return;
+    }
+    
+    if (f.getSize() < 1000000) //if file is less than 1Mo, got a problem
+    {
+        LOGERROR("Wrong file size, try downloading it directly from the website");
+        return;
+    }
+
+    if(extension == "zip")
+    {
+        File td = f.getParentDirectory();
+        {
+            ZipFile zip(f);
+            zip.uncompressTo(td);
+            Array<File> filesToCopy;
+
+            appFile.moveFileTo(td.getNonexistentChildFile("oldApp", appFile.getFileExtension()));
+
+            DBG("Move to " << appDir.getFullPathName());
+            for (int i = 0; i < zip.getNumEntries(); i++)
+            {
+                File zf = td.getChildFile(zip.getEntry(i)->filename);
+                DBG("File exists : " << (int)f.exists());
+                zf.copyFileTo(appDir.getChildFile(zip.getEntry(i)->filename));
+                //DBG("Move result for " << zf.getFileName() << " = " << (int)result);
+            }
+        }
+    }
 
 	queuedNotifier.addMessage(new AppUpdateEvent(AppUpdateEvent::UPDATE_FINISHED, f));
 }

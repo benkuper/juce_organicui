@@ -318,7 +318,7 @@ MouseCursor  CustomLoggerUI::getMouseCursor() {
 //////////////
 // logList
 
-CustomLoggerUI::LogList::LogList(CustomLoggerUI* o) : owner(o), minRow(0), maxRow(0)
+CustomLoggerUI::LogList::LogList(CustomLoggerUI* o) :  minRow(0), maxRow(0),owner(o)
 {
 }
 
