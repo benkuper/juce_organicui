@@ -113,6 +113,15 @@ Parameter * ControllableFactory::createParameterFrom(Controllable * source, bool
 			Parameter * p = dynamic_cast<Parameter *>(d->createFunc());
 			if (copyName) p->setNiceName(source->niceName);
 			p->setRange(sourceP->minimumValue, sourceP->maximumValue);
+
+			if (source->type == Controllable::ENUM)
+			{
+				EnumParameter * sourceEP = (EnumParameter *)source;
+				EnumParameter * ep = (EnumParameter *)p;
+				ep->clearOptions();
+				for (auto &ev : sourceEP->enumValues) ep->addOption(ev->key, ev->value);
+			}
+
 			if (copyValue)
 			{
 				p->defaultValue = sourceP->value;
