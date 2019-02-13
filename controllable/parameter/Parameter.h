@@ -105,11 +105,11 @@ public:
     float getNormalizedValue();
 
     //helpers for fast typing
-    virtual float floatValue() { return (float)getValue(); }
-	virtual double doubleValue(){return (double)getValue();}
-	virtual int intValue() { return (int)getValue(); }
-	virtual bool boolValue() { return (bool)getValue(); }
-	virtual String stringValue() { return getValue().toString(); }
+	virtual float floatValue();
+	virtual double doubleValue();
+	virtual int intValue();
+	virtual bool boolValue();
+	virtual String stringValue();
 
     void notifyValueChanged();
 

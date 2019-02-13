@@ -1,3 +1,4 @@
+#include "Parameter.h"
 /*
   ==============================================================================
 
@@ -243,6 +244,28 @@ float Parameter::getNormalizedValue()
 		return 0.0;
 	} else
 		return jmap<float>((float)value, (float)minimumValue, (float)maximumValue, 0.f, 1.f);
+}
+
+
+//helpers for fast typing
+
+float Parameter::floatValue() { return (float)getValue(); }
+
+double Parameter::doubleValue() { return (double)getValue(); }
+
+int Parameter::intValue() { return (int)getValue(); }
+
+bool Parameter::boolValue() { return (bool)getValue(); }
+
+String Parameter::stringValue() {
+	
+	var val = getValue();
+
+	if (!isComplex()) return val.toString();
+
+	String s = val[0];
+	for (int i = 1; i < val.size(); i++) s += "," + val[i].toString();
+	return "[" + s + "]";
 }
 
 void Parameter::notifyValueChanged() {
