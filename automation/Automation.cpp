@@ -156,6 +156,23 @@ AutomationKey * Automation::getKeyAtPos(float pos)
 	return nullptr;
 }
 
+void Automation::setLength(float newLength, bool stretch)
+{
+	if (length->floatValue() == newLength) return;
+
+	if (stretch)
+	{
+		float stretchFactor = newLength / length->floatValue();
+		if (stretchFactor > 1) length->setValue(newLength); //if stretching, we have first to expand the length in case keys are not allowed outside
+		for (auto &k : items) k->position->setValue(k->position->floatValue()*stretchFactor);
+		if (stretchFactor < 1) length->setValue(newLength); //if reducing, we have to first reduce keys and then we can reduce the length, in case keys are not allowed outside
+	}
+	else
+	{
+		length->setValue(newLength); // just change the value, nothing unusual
+	}
+}
+
 float Automation::getValueForPosition(float pos)
 {
 	if (items.size() == 0) return 0;
