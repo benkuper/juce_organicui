@@ -377,7 +377,7 @@ void BaseManagerUI<M, T, U>::paint(Graphics & g)
 	if (this->manager->items.size() == 0 && noItemText.isNotEmpty())
 	{
 		g.setColour(Colours::white.withAlpha(.4f));
-		g.setFont(16);
+		g.setFont(jmin(getHeight()-2,14));
 		g.drawFittedText(noItemText, getLocalBounds().reduced(5), Justification::centred, 6);
 	}
 }
