@@ -47,7 +47,7 @@ void ParameterUI::showEditWindow()
 	{
 		String valString = nameWindow.getTextEditorContents("val");
 		if (parameter->type == Parameter::STRING) parameter->setUndoableValue(parameter->value, valString);
-		else parameter->setUndoableValue(parameter->value, valString.getFloatValue());
+		else parameter->setUndoableValue(parameter->value, valString.replace(",", ".").getFloatValue());
 	}
 }
 

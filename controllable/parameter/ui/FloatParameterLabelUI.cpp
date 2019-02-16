@@ -153,7 +153,7 @@ void FloatParameterLabelUI::valueChanged(const var & v)
 void FloatParameterLabelUI::labelTextChanged(Label *)
 {
 	//String  originalString = valueLabel.getText().substring(prefix.length(), valueLabel.getText().length() - suffix.length());
-	parameter->setValue(valueLabel.getText().getFloatValue());
+	parameter->setValue(valueLabel.getText().replace(",", ".").getFloatValue());
 }
 
 
@@ -216,7 +216,7 @@ float TimeLabel::timeStringToValue(String str) const
 {
 	StringArray sa;
 	if (str.endsWithChar(':')) str += "0";
-	sa.addTokens(str, ":", "");
+	sa.addTokens(str.replace(",","."), ":", "");
 
 	float value = 0;
 
