@@ -156,9 +156,10 @@ AutomationKey * Automation::getKeyAtPos(float pos)
 	return nullptr;
 }
 
-void Automation::setLength(float newLength, bool stretch)
+void Automation::setLength(float newLength, bool stretch, bool stickToEnd)
 {
 	if (length->floatValue() == newLength) return;
+
 
 	if (stretch)
 	{
@@ -169,8 +170,14 @@ void Automation::setLength(float newLength, bool stretch)
 	}
 	else
 	{
+		float lengthDiff = newLength - length->floatValue();
+		
 		length->setValue(newLength); // just change the value, nothing unusual
+
+		if (stickToEnd) for (auto &k : items) k->position->setValue(k->position->floatValue() + lengthDiff);
 	}
+
+	
 }
 
 float Automation::getValueForPosition(float pos)

@@ -51,7 +51,7 @@ public:
 
 	ScopedPointer<InspectableSelectionManager> customSelectionManager;
 
-	void setLength(float value, bool stretch = false);
+	void setLength(float value, bool stretch = false, bool stickToEnd = false);
 
 	float getValueForPosition(float pos);
 	float getNormalizedValueForPosition(float pos);
