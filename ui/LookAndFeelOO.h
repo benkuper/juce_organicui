@@ -60,7 +60,7 @@ namespace LookAndFeelHelpers {
 
 		PopupMenu::backgroundColourId,              BG_COLOR.getARGB(),
 		PopupMenu::textColourId,                    TEXT_COLOR.getARGB(),
-		PopupMenu::headerTextColourId,              0xff000000,
+		PopupMenu::headerTextColourId,              TEXT_COLOR.darker().getARGB(),
 		PopupMenu::highlightedTextColourId,         BG_COLOR.getARGB(),
 		PopupMenu::highlightedBackgroundColourId,   HIGHLIGHT_COLOR.getARGB(),
 
