@@ -758,7 +758,6 @@ void BaseManagerUI<M, T, U>::newMessage(const typename BaseManager<T>::ManagerEv
 template<class M, class T, class U>
 void BaseManagerUI<M, T, U>::itemUIGrabStart(BaseItemUI<T>* se)
 {
-
 	grabbingItem = se;
 
 	grabbingItemDropIndex = itemsUI.indexOf((U*)grabbingItem);

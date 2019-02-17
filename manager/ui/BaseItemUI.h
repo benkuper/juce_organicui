@@ -35,6 +35,7 @@ public:
 	Point<float> posAtMouseDown;
 	Point<float> sizeAtMouseDown;
 	bool canBeDragged;
+	bool customDragBehavior;
 
 	//header
 	int headerHeight;
@@ -132,6 +133,7 @@ BaseItemUI<T>::BaseItemUI(T * _item, ResizeMode _resizeMode, bool _canBeDragged)
 	viewZoom(1),
 	grabberHeight(0),
 	canBeDragged(_canBeDragged),
+	customDragBehavior(false),
 	headerHeight(16),
 	headerGap(2),
 	showEnableBT(true),
@@ -395,7 +397,7 @@ void BaseItemUI<T>::mouseDown(const MouseEvent & e)
 	
 	if (e.mods.isLeftButtonDown())
 	{
-		if (canBeDragged)
+		if (canBeDragged && !customDragBehavior)
 		{
 			Grabber * g = dynamic_cast<Grabber *>(e.eventComponent);
 			if (g != nullptr)
@@ -425,7 +427,7 @@ void BaseItemUI<T>::mouseDrag(const MouseEvent & e)
 
 	if (e.mods.isLeftButtonDown())
 	{
-		if (canBeDragged)
+		if (canBeDragged && !customDragBehavior)
 		{
 			Grabber * g = dynamic_cast<Grabber *>(e.eventComponent);
 			if (g != nullptr)
@@ -451,7 +453,7 @@ void BaseItemUI<T>::mouseUp(const MouseEvent & e)
 {
 	if (e.mods.isLeftButtonDown())
 	{
-		if (canBeDragged)
+		if (canBeDragged && !customDragBehavior)
 		{
 			Grabber * g = dynamic_cast<Grabber *>(e.eventComponent);
 			if (g != nullptr)

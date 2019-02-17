@@ -145,7 +145,7 @@ void BaseItemMinimalUI<T>::paint(Graphics &g)
 	bool isItemEnabled = baseItem->canBeDisabled ? baseItem->enabled->boolValue() : true;
 
 	Colour c = isItemEnabled ? bgColor : bgColor.darker(.3f);
-	if (highlightOnMouseOver && isMouseOver(true)) c = c.brighter(.03f);
+	if (highlightOnMouseOver && isMouseOverOrDragging(true)) c = c.brighter(.03f);
 	g.setColour(c);
 	g.fillRoundedRectangle(r, 4);
 }
