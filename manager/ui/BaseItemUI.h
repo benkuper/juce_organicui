@@ -39,6 +39,8 @@ public:
 	//header
 	int headerHeight;
 	int headerGap;
+	bool showEnableBT;
+	bool showRemoveBT;
 
 	//Resize
 	ResizeMode resizeMode;
@@ -132,6 +134,8 @@ BaseItemUI<T>::BaseItemUI(T * _item, ResizeMode _resizeMode, bool _canBeDragged)
 	canBeDragged(_canBeDragged),
 	headerHeight(16),
 	headerGap(2),
+	showEnableBT(true),
+	showRemoveBT(true),
 	resizeMode(_resizeMode),
 	resizerWidth(0),
 	resizerHeight(0),
@@ -307,13 +311,13 @@ void BaseItemUI<T>::resized()
 		grabber->repaint();
 	}
 
-	if (enabledBT != nullptr)
+	if (enabledBT != nullptr && showEnableBT) 
 	{
 		enabledBT->setBounds(h.removeFromLeft(h.getHeight()));
 		h.removeFromLeft(2);
 	}
 
-	if (removeBT != nullptr) removeBT->setBounds(h.removeFromRight(h.getHeight()));
+	if (removeBT != nullptr && showRemoveBT) removeBT->setBounds(h.removeFromRight(h.getHeight()));
 	h.removeFromRight(2);
 
 	resizedInternalHeader(h);
