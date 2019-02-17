@@ -8,9 +8,7 @@
   ==============================================================================
 */
 
-#ifndef LOOKANDFEELOO_H_INCLUDED
-#define LOOKANDFEELOO_H_INCLUDED
-
+#pragma once
 #pragma warning( disable : 4505 )
 
 //keep
@@ -97,9 +95,9 @@ namespace LookAndFeelHelpers {
         ResizableWindow::backgroundColourId,        BG_COLOR.brighter(.1f).getARGB(),
         //DocumentWindow::textColourId,               0xff000000, // (this is deliberately not set)
 
-        AlertWindow::backgroundColourId,            0xffededed,
-        AlertWindow::textColourId,                  0xff000000,
-        AlertWindow::outlineColourId,               0xff666666,
+        AlertWindow::backgroundColourId,            BG_COLOR.getARGB(),
+        AlertWindow::textColourId,                  TEXT_COLOR.getARGB(),
+        AlertWindow::outlineColourId,               BG_COLOR.brighter(.2f).getARGB(),
 
         ProgressBar::backgroundColourId,            0xffeeeeee,
         ProgressBar::foregroundColourId,            0xffaaaaee,
@@ -559,5 +557,3 @@ private:
 	virtual Font getTabButtonFont(TabBarButton &, float height) override;
 
 };
-
-#endif  // LOOKANDFEELOO_H_INCLUDED
