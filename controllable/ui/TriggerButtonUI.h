@@ -18,7 +18,9 @@ public:
     TriggerButtonUI(Trigger * t);
     ~TriggerButtonUI();
 
- juce::Rectangle<int> drawRect;
+	juce::Rectangle<int> drawRect;
+
+	String customText;
 
 	bool drawTriggering;
 

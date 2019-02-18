@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    TriggerButtonUI.cpp
-    Created: 8 Mar 2016 3:45:53pm
-    Author:  bkupe
+	TriggerButtonUI.cpp
+	Created: 8 Mar 2016 3:45:53pm
+	Author:  bkupe
 
   ==============================================================================
 */
@@ -12,7 +12,8 @@
 //==============================================================================
 TriggerButtonUI::TriggerButtonUI(Trigger *t) :
 	TriggerUI(t),
-	drawTriggering(false)
+	drawTriggering(false),
+	customText("")
 {
 	setSize(20, 15);
 	setRepaintsOnMouseActivity(isInteractable());
@@ -41,12 +42,12 @@ bool TriggerButtonUI::hitTest(int x, int y)
 	return drawRect.contains(x, y);
 }
 
-void TriggerButtonUI::paint (Graphics& g)
+void TriggerButtonUI::paint(Graphics& g)
 {
- juce::Rectangle<float> r = getLocalBounds().toFloat();
+	juce::Rectangle<float> r = getLocalBounds().toFloat();
 	if (!showLabel) r.setWidth(jmin<float>(r.getWidth(), 50));
 
-    Point<float> center = r.getCentre();
+	Point<float> center = r.getCentre();
 
 	Colour c = BG_COLOR;
 
@@ -61,16 +62,16 @@ void TriggerButtonUI::paint (Graphics& g)
 		//DBG(trigger->niceName << " force feedback");
 	}
 
-    g.setGradientFill(ColourGradient(c,center.x,center.y,c.darker(.5f),2.f,2.f,true));
-    g.fillRoundedRectangle(r.toFloat(), 4.f);
-    g.setColour(c.darker());
-    g.drawRoundedRectangle(r.toFloat(), 4.f, 2.f);
+	g.setGradientFill(ColourGradient(c, center.x, center.y, c.darker(.5f), 2.f, 2.f, true));
+	g.fillRoundedRectangle(r.toFloat(), 4.f);
+	g.setColour(c.darker());
+	g.drawRoundedRectangle(r.toFloat(), 4.f, 2.f);
 
 	if (showLabel)
 	{
 		g.setFont(10);
 		g.setColour(Colours::white.darker(.1f));
-		g.drawFittedText(trigger->niceName, getLocalBounds().reduced(2), Justification::centred, 1);
+		g.drawFittedText(customText.isNotEmpty() ? customText : trigger->niceName, getLocalBounds().reduced(2), Justification::centred, 1);
 	}
 
 	drawRect = r.toNearestInt();
