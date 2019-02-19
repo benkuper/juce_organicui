@@ -174,10 +174,8 @@ void OrganicApplication::newMessage(const AppUpdateEvent & e)
             File appFile = File::getSpecialLocation(File::tempDirectory).getChildFile(getApplicationName()+String("_install"+e.file.getFileExtension()));
             e.file.copyFileTo(appFile);
             appFile.startAsProcess();
-
             
             JUCEApplication::getInstance()->systemRequestedQuit();
-            appFile.startAsProcess();
         }
     }
     break;
