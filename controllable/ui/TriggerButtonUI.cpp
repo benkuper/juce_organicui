@@ -11,9 +11,9 @@
 
 //==============================================================================
 TriggerButtonUI::TriggerButtonUI(Trigger *t) :
-	TriggerUI(t),
-	drawTriggering(false),
-	customText("")
+    TriggerUI(t),
+    customText(""),
+	drawTriggering(false)
 {
 	setSize(20, 15);
 	setRepaintsOnMouseActivity(isInteractable());
