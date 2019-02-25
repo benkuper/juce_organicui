@@ -129,8 +129,8 @@ AutomationKey * Automation::getClosestKeyForPos(float pos, int start, int end)
 	if (start == -1) start = 0;
 	if (end == -1) end = items.size() - 1;
 
-	if (pos < items[0]->position->floatValue()) return items[0];
-	if (pos > items[items.size() - 1]->position->floatValue()) return items[items.size() - 1];
+	if (pos <= items[0]->position->floatValue()) return items[0];
+	if (pos >= items[items.size() - 1]->position->floatValue()) return items[items.size() - 1];
 
 	if (end - start <= 1) return items[start];
 
