@@ -149,6 +149,8 @@ void AutomationUI::paint(Graphics & g)
 {
 	BaseManagerUI::paint(g);
 
+	if (inspectable.wasObjectDeleted()) return;
+
 	if (getWidth() == 0 || getHeight() == 0) return;
 
 	if (viewMode == VIEW)
@@ -210,6 +212,8 @@ void AutomationUI::paint(Graphics & g)
 
 void AutomationUI::resized()
 {
+	if (inspectable.wasObjectDeleted()) return;
+
 	if (viewMode == VIEW)
 	{
 		shouldUpdateImage = true;
@@ -225,7 +229,7 @@ void AutomationUI::resized()
 	for (int i = lastROIKey; i >= firstROIKey; i--)
 	{
 		placeKeyUI(itemsUI[i], true);
-		itemsUI[i]->toBack(); // place each ui in front of its right : to be better
+		//itemsUI[i]->toBack(); // place each ui in front of its right : to be better
 	}
 
 	if (transformer != nullptr) transformer->updateBoundsFromKeys();
@@ -294,7 +298,7 @@ float AutomationUI::getValueForY(int ty)
 
 bool AutomationUI::isInView(AutomationKeyUI * kui)
 {
-	return kui->item->position->floatValue() >= viewStartPos && kui->item->position->floatValue() <= viewEndPos && kui->isOnDesktop();
+	return kui->item->position->floatValue() >= viewStartPos && kui->item->position->floatValue() <= viewEndPos;
 }
 
 AutomationKeyUI * AutomationUI::getClosestKeyUIForPos(float pos, int start, int end)
