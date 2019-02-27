@@ -294,7 +294,7 @@ float AutomationUI::getValueForY(int ty)
 
 bool AutomationUI::isInView(AutomationKeyUI * kui)
 {
-	return kui->item->position->floatValue() >= viewStartPos && kui->item->position->floatValue() <= viewEndPos;
+	return kui->item->position->floatValue() >= viewStartPos && kui->item->position->floatValue() <= viewEndPos && kui->isOnDesktop();
 }
 
 AutomationKeyUI * AutomationUI::getClosestKeyUIForPos(float pos, int start, int end)

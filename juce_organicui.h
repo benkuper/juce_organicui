@@ -54,9 +54,13 @@ using namespace juce;
 
 #include "resources/OrganicBinaryData.h"
 
+
+
 #include "ui/Style.h"
 #include "ui/AssetManager.h"
 #include "ui/LookAndFeelOO.h"
+#include "ui/Grabber.h"
+
 #include "helpers/RegexFunctions.h"
 #include "engine/EngineListener.h"
 

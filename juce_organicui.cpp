@@ -125,6 +125,7 @@
 #include "script/ui/ScriptEditor.cpp"
 #include "ui/AssetManager.cpp"
 #include "ui/LookAndFeelOO.cpp"
+#include "ui/Grabber.cpp"
 #include "ui/shapeshifter/GapGrabber.cpp"
 #include "ui/shapeshifter/ShapeShifter.cpp"
 #include "ui/shapeshifter/ShapeShifterContainer.cpp"

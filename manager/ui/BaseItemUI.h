@@ -8,9 +8,7 @@
   ==============================================================================
 */
 
-#ifndef BASEITEMUI_H_INCLUDED
-#define BASEITEMUI_H_INCLUDED
-
+#pragma once
 
 template<class T>
 class BaseItemUI :
@@ -61,6 +59,8 @@ public:
 	Label itemLabel;
 	ScopedPointer<BoolImageToggleUI> enabledBT;
 	ScopedPointer<ImageButton> removeBT;
+	
+	ScopedPointer<Grabber> grabber;
 
 	Array<Component *> contentComponents;
 
@@ -72,6 +72,7 @@ public:
 	virtual void updateMiniModeUI();
 
 	void setViewZoom(float value);
+	void setGrabber(Grabber * newGrabber);
 
 	virtual void resized() override;
 	virtual void resizedInternalHeader(juce::Rectangle<int> &) {}
@@ -91,20 +92,7 @@ public:
 
 	virtual void visibilityChanged() override;
 
-	class Grabber : public Component
-	{
-	public:
-		enum Direction { VERTICAL, HORIZONTAL };
-		Grabber(Direction d = HORIZONTAL) : dir(d) {}
-		~Grabber() {}
-
-		Direction dir;
-
-		void paint(Graphics &g) override;
-	};
-
-	void setGrabber(Grabber * newGrabber);
-	ScopedPointer<Grabber> grabber;
+	
 
 	class ItemUIListener
 	{
@@ -531,31 +519,3 @@ void BaseItemUI<T>::setGrabber(Grabber * newGrabber)
 	}
 
 }
-
-
-template<class T>
-void BaseItemUI<T>::Grabber::paint(Graphics & g)
-{
-	//juce::Rectangle<int> r = getLocalBounds();
-	g.setColour(BG_COLOR.brighter(.3f));
-	const int numLines = 3;
-	for (int i = 0; i < numLines; i++)
-	{
-		if (dir == HORIZONTAL)
-		{
-			float th = (i + 1)*(float)getHeight() / ((float)numLines + 1);
-			g.drawLine(0, th, (float)getWidth(), th, 1);
-		} else
-		{
-			float tw = (i + 1)*(float)getWidth() / ((float)numLines + 1);
-			g.drawLine(tw, 0, tw, (float)getHeight(), 1);
-		}
-
-	}
-}
-
-
-
-
-
-#endif  // BASEITEMUI_H_INCLUDED
