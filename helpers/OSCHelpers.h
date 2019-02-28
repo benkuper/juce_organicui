@@ -17,8 +17,16 @@ public:
 		else if (v.isInt64()) return OSCArgument((int)v);
 		else if (v.isDouble()) return OSCArgument((float)v);
 		else if (v.isString()) return OSCArgument(v.toString());
+		else if (v.isArray() && v.size() == 4)
+		{
+			int col = 0;
+			for (int i = 0; i < v.size(); i++) col += (int)((float)v[i] * 255) << ((3-i) * 8);
+
+			return OSCArgument(OSCColour::fromInt32(col));
+		}
 
 		jassert(false);
+
 		return OSCArgument("error");
 	}
 
