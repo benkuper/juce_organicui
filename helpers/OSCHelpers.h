@@ -1,8 +1,15 @@
 #pragma once
 
+
 class OSCHelpers
 {
 public:
+	 
+	static void logOSCFormatError(const char * message, int length)
+	{
+		LOGERROR("OSC Error : " << String(message, length));
+	}
+
 	static OSCArgument varToArgument(const var & v)
 	{
 		if (v.isBool()) return OSCArgument(((bool)v) ? 1 : 0);
