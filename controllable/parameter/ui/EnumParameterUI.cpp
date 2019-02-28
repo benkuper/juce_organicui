@@ -28,8 +28,7 @@ EnumParameterUI::EnumParameterUI(Parameter * parameter) :
 
 EnumParameterUI::~EnumParameterUI()
 {
-	ep->removeEnumParameterListener(this);
-
+	if(!parameter.wasObjectDeleted()) ep->removeEnumParameterListener(this);
 	cb.removeListener(this);
 }
 
