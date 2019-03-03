@@ -38,7 +38,7 @@ static void drawButtonShape (Graphics& g, const Path& outline, Colour baseColour
 	
 	g.setColour(baseColour);
 	g.fillPath (outline);
-	g.setColour(baseColour.darker(.2f));
+	g.setColour(baseColour.darker(.3f));
 	g.strokePath(outline, PathStrokeType(1));
 
 	/*
