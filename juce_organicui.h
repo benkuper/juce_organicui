@@ -69,6 +69,7 @@ using namespace juce;
 #include "helpers/StringUtil.h"
 #include "helpers/WakeOnLan.h"
 #include "helpers/OSCHelpers.h"
+#include "helpers/NetworkHelpers.h"
 
 #include "undo/UndoMaster.h"
 
