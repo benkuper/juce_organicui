@@ -348,7 +348,7 @@ void BaseItemUI<T>::resized()
 				juce::Rectangle<int> fr = r.removeFromBottom(resizerHeight);
 				resizedInternalFooter(fr);
 				cornerResizer->setBounds(fr.withLeft(r.getWidth() - resizerHeight));
-				this->baseItem->viewUISize->setPoint((float)r.getWidth(), (float)r.getHeight());
+				this->baseItem->viewUISize->setPoint((float)r.getWidth()+getExtraWidth(), (float)r.getHeight()+getExtraHeight());
 			}
 				break;
 
