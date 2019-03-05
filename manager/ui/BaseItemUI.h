@@ -59,7 +59,7 @@ public:
 	Label itemLabel;
 	ScopedPointer<BoolImageToggleUI> enabledBT;
 	ScopedPointer<ImageButton> removeBT;
-	
+
 	ScopedPointer<Grabber> grabber;
 
 	Array<Component *> contentComponents;
@@ -92,7 +92,7 @@ public:
 
 	virtual void visibilityChanged() override;
 
-	
+
 
 	class ItemUIListener
 	{
@@ -214,8 +214,8 @@ BaseItemUI<T>::~BaseItemUI()
 template<class T>
 void BaseItemUI<T>::setContentSize(int contentWidth, int contentHeight)
 {
-	int targetHeight = getHeightWithoutContent() + contentHeight + getExtraHeight();
-	int targetWidth = contentWidth + margin * 2 + resizerWidth + getExtraWidth();
+	int targetHeight = getHeightWithoutContent() + contentHeight + this->getExtraHeight();
+	int targetWidth = contentWidth + margin * 2 + resizerWidth + this->getExtraWidth();
 
 	this->setSize(targetWidth, targetHeight);
 }
@@ -238,7 +238,8 @@ void BaseItemUI<T>::updateMiniModeUI()
 
 		int targetHeight = getHeightWithoutContent();
 		this->setSize((int)this->baseItem->viewUISize->getPoint().x, targetHeight);
-	} else
+	}
+	else
 	{
 		if (resizer != nullptr) this->addAndMakeVisible(resizer);
 
@@ -282,7 +283,7 @@ void BaseItemUI<T>::resized()
 
 	//Header
 	if (this->getWidth() == 0 || this->getHeight() == 0) return;
-	juce::Rectangle<int> r = this->getMainBounds().reduced(margin); 
+	juce::Rectangle<int> r = this->getMainBounds().reduced(margin);
 
 	//Grabber
 	if (canBeDragged)
@@ -300,7 +301,7 @@ void BaseItemUI<T>::resized()
 		grabber->repaint();
 	}
 
-	if (enabledBT != nullptr && showEnableBT) 
+	if (enabledBT != nullptr && showEnableBT)
 	{
 		enabledBT->setBounds(h.removeFromLeft(h.getHeight()));
 		h.removeFromLeft(2);
@@ -322,7 +323,8 @@ void BaseItemUI<T>::resized()
 			resizedInternalContent(r);
 			if (r.getWidth() == 0 || r.getHeight() == 0) return;
 			setContentSize(r.getWidth(), r.getBottom() - top);
-		} else
+		}
+		else
 		{
 			switch (resizeMode)
 			{
@@ -341,16 +343,16 @@ void BaseItemUI<T>::resized()
 				edgeResizer->setBounds(r.removeFromRight(resizerWidth));
 				this->baseItem->listUISize->setValue((float)r.getWidth());
 			}
-				break;
+			break;
 
 			case ALL:
 			{
 				juce::Rectangle<int> fr = r.removeFromBottom(resizerHeight);
 				resizedInternalFooter(fr);
 				cornerResizer->setBounds(fr.withLeft(r.getWidth() - resizerHeight));
-				this->baseItem->viewUISize->setPoint((float)r.getWidth()+getExtraWidth(), (float)r.getHeight()+getExtraHeight());
+				this->baseItem->viewUISize->setPoint((float)r.getWidth() + this->getExtraWidth(), (float)r.getHeight() + this->getExtraHeight());
 			}
-				break;
+			break;
 
 			default:
 				break;
@@ -370,7 +372,8 @@ void BaseItemUI<T>::buttonClicked(Button * b)
 		{
 			int result = AlertWindow::showOkCancelBox(AlertWindow::QuestionIcon, "Delete " + this->baseItem->niceName, "Are you sure you want to delete this ?", "Delete", "Cancel");
 			if (result != 0)this->baseItem->remove();
-		} else this->baseItem->remove();
+		}
+		else this->baseItem->remove();
 	}
 }
 
@@ -381,7 +384,7 @@ void BaseItemUI<T>::mouseDown(const MouseEvent & e)
 	if ((removeBT != nullptr && e.eventComponent == removeBT) || (enabledBT != nullptr && e.eventComponent == enabledBT->bt)) return;
 
 	BaseItemMinimalUI<T>::mouseDown(e);
-	
+
 	if (e.mods.isLeftButtonDown())
 	{
 		if (canBeDragged && !customDragBehavior)
@@ -392,13 +395,15 @@ void BaseItemUI<T>::mouseDown(const MouseEvent & e)
 				if (resizeMode == ALL || resizeMode == NONE)
 				{
 					posAtMouseDown = this->baseItem->viewUIPosition->getPoint();
-				} else
+				}
+				else
 				{
 					posAtDown = this->getBounds().getPosition();
 					dragOffset = Point<int>();
 					itemUIListeners.call(&ItemUIListener::itemUIGrabStart, this);
 				}
-			} else if (e.eventComponent == cornerResizer.get())
+			}
+			else if (e.eventComponent == cornerResizer.get())
 			{
 				sizeAtMouseDown = this->baseItem->viewUISize->getPoint();
 			}
@@ -423,7 +428,8 @@ void BaseItemUI<T>::mouseDrag(const MouseEvent & e)
 				{
 					Point<float> targetPos = posAtMouseDown + e.getOffsetFromDragStart().toFloat() / viewZoom;
 					this->baseItem->viewUIPosition->setPoint(targetPos);
-				} else
+				}
+				else
 				{
 					dragOffset = e.getOffsetFromDragStart();
 					itemUIListeners.call(&ItemUIListener::itemUIGrabbed, this);
@@ -448,14 +454,16 @@ void BaseItemUI<T>::mouseUp(const MouseEvent & e)
 				if (resizeMode == ALL || resizeMode == NONE)
 				{
 					this->baseItem->viewUIPosition->setUndoablePoint(posAtMouseDown, this->baseItem->viewUIPosition->getPoint());
-				} else
+				}
+				else
 				{
 					itemUIListeners.call(&ItemUIListener::itemUIGrabEnd, this);
 				}
-			} else if(e.eventComponent == cornerResizer.get())
+			}
+			else if (e.eventComponent == cornerResizer.get())
 			{
 				Point<float> sizeDiffDemi = ((this->baseItem->viewUISize->getPoint() - sizeAtMouseDown) / 2).toFloat();
-				this->baseItem->viewUIPosition->setPoint(this->baseItem->viewUIPosition->getPoint()+sizeDiffDemi);
+				this->baseItem->viewUIPosition->setPoint(this->baseItem->viewUIPosition->getPoint() + sizeDiffDemi);
 				this->baseItem->viewUISize->setPoint(this->baseItem->viewUISize->getPoint());
 			}
 		}
