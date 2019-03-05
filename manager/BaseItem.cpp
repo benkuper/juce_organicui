@@ -52,7 +52,7 @@ BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts
 	defaultSize.append(200);
 	viewUISize->defaultValue = defaultSize;
 	viewUISize->resetValue();
-	viewUISize->defaultValue = viewUISize->value;
+	viewUISize->defaultValue = viewUISize->getValue();
 	viewUISize->hideInEditor = true;
 	viewUISize->hideInOutliner = true;
 	viewUISize->isTargettable = false;

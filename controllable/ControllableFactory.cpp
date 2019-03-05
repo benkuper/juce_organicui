@@ -124,7 +124,7 @@ Parameter * ControllableFactory::createParameterFrom(Controllable * source, bool
 
 			if (copyValue)
 			{
-				p->defaultValue = sourceP->value;
+				p->defaultValue = sourceP->getValue();
 				p->resetValue();
 			}
 

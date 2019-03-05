@@ -48,12 +48,12 @@ DoubleSliderUI::~DoubleSliderUI()
 
 void DoubleSliderUI::mouseDownInternal(const MouseEvent &)
 {
-	mouseDownValue = parameter->value;
+	mouseDownValue = parameter->getValue();
 }
 
 void DoubleSliderUI::mouseUpInternal(const MouseEvent &)
 {
-	parameter->setUndoableValue(mouseDownValue, parameter->value);
+	parameter->setUndoableValue(mouseDownValue, parameter->getValue());
 }
 
 void DoubleSliderUI::resized()

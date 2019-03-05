@@ -30,7 +30,7 @@ FloatStepperUI::FloatStepperUI(Parameter * _parameter) :
 	feedbackStateChanged();
 
 	addAndMakeVisible(slider);
-    
+
     startTimerHz(20);
 }
 

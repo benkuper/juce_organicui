@@ -629,7 +629,7 @@ void ControllableContainer::parameterValueChanged(Parameter * p)
 		dispatchFeedback(p);
 	} else
 	{
-		onExternalParameterChanged(p);
+		onExternalParameterValueChanged(p);
 	}
 
 }
@@ -640,6 +640,10 @@ void ControllableContainer::parameterRangeChanged(Parameter * p)
 	if (p->parentContainer == this)
 	{
 		dispatchFeedback(p);
+	}
+	else
+	{
+		onExternalParameterRangeChanged(p);
 	}
 }
 

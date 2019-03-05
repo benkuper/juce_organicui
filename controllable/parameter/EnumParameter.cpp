@@ -56,6 +56,11 @@ void EnumParameter::updateArgDescription()
 	}
 }
 
+var EnumParameter::getValue()
+{
+	return getValueData();
+}
+
 var EnumParameter::getValueData() {
 	EnumValue * ev = getEntryForKey(value.toString());
 	if (ev == nullptr) return var();
