@@ -11,6 +11,8 @@ public:
 			if (ip.startsWith("192.168.0.") || ip.startsWith("192.168.1.") || ip.startsWith("192.168.2.")) return ip;
 			if (ip.startsWith("192.168.4.") || ip.startsWith("192.168.43.")) return ip;
 		}
+        
+        return "";	
 	}
 
 	static StringArray getLocalIPs()
