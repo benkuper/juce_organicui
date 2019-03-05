@@ -21,7 +21,7 @@ EnumParameterUI::EnumParameterUI(Parameter * parameter) :
 
 	ep->addEnumParameterListener(this);
 
-	prevValue = parameter->getValue();
+	prevValue = ep->getValueKey();
 
 	updateComboBox();
 }
@@ -46,7 +46,7 @@ void EnumParameterUI::updateComboBox()
 		id++;
 	}
 
-	cb.setSelectedId(keyIdMap[ep->stringValue()], dontSendNotification);
+	cb.setSelectedId(keyIdMap[ep->getValueKey()], dontSendNotification);
 	cb.setEnabled(isInteractable());
 	cb.setInterceptsMouseClicks(isInteractable(), isInteractable());
 
@@ -80,8 +80,8 @@ void EnumParameterUI::feedbackStateChanged()
 
 void EnumParameterUI::valueChanged(const var & value)
 {
-	cb.setSelectedId(keyIdMap[value], dontSendNotification);
-	prevValue = parameter->getValue();
+	cb.setSelectedId(keyIdMap[ep->getValueKey()], dontSendNotification);
+	prevValue = ep->getValueKey();
 }
 
 void EnumParameterUI::comboBoxChanged(ComboBox *)

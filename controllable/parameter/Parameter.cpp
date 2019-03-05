@@ -272,7 +272,7 @@ String Parameter::stringValue() {
 
 void Parameter::notifyValueChanged() {
 	listeners.call(&ParameterListener::parameterValueChanged, this);
-	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::VALUE_CHANGED,this,getValue()));
+	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::VALUE_CHANGED,this, getValue()));
 }
 
 void Parameter::expressionValueChanged(ScriptExpression *)

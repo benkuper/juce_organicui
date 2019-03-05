@@ -68,7 +68,7 @@ var EnumParameter::getValueData() {
 }
 
 inline String EnumParameter::getValueKey() {
-	return stringValue(); 
+	return value.toString();
 }
 
 int EnumParameter::getIndexForKey(StringRef key)
