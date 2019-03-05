@@ -146,9 +146,10 @@ protected:
 	virtual void onContainerNiceNameChanged() {};
 	virtual void onContainerShortNameChanged() {};
 	virtual void onContainerParameterChanged(Parameter *) {};
-	virtual void onExternalParameterChanged(Parameter *) {}; //When listening to other child controllable then this container's children
+	virtual void onExternalParameterValueChanged(Parameter *) {}; //When listening to other child controllable than this container's children
+	virtual void onExternalParameterRangeChanged(Parameter *) {};
 	virtual void onContainerTriggerTriggered(Trigger *) {};
-	virtual void onExternalTriggerTriggered(Trigger *) {}; //When listening to other child controllable then this container's children
+	virtual void onExternalTriggerTriggered(Trigger *) {}; //When listening to other child controllable than this container's children
 	virtual void onControllableAdded(Controllable *) {}; 
 	virtual void onControllableRemoved(Controllable *) {};
 

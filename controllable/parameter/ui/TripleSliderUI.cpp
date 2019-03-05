@@ -74,12 +74,12 @@ void TripleSliderUI::resized()
 
 void TripleSliderUI::mouseDownInternal(const MouseEvent &)
 {
-	mouseDownValue = parameter->value;
+	mouseDownValue = parameter->getValue();
 }
 
 void TripleSliderUI::mouseUpInternal(const MouseEvent &)
 {
-	parameter->setUndoableValue(mouseDownValue, parameter->value);
+	parameter->setUndoableValue(mouseDownValue, parameter->getValue());
 }
 
 void TripleSliderUI::showEditWindow()

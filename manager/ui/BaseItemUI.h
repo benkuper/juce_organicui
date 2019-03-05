@@ -148,7 +148,7 @@ BaseItemUI<T>::BaseItemUI(T * _item, ResizeMode _resizeMode, bool _canBeDragged)
 
 	if (canBeDragged)
 	{
-		setGrabber(new Grabber(_resizeMode == ALL ? Grabber::HORIZONTAL : Grabber::VERTICAL));
+		setGrabber(new Grabber(_resizeMode == VERTICAL ? Grabber::VERTICAL : Grabber::HORIZONTAL));
 	}
 
 	switch (resizeMode)
@@ -214,9 +214,8 @@ BaseItemUI<T>::~BaseItemUI()
 template<class T>
 void BaseItemUI<T>::setContentSize(int contentWidth, int contentHeight)
 {
-	int targetHeight = getHeightWithoutContent() + contentHeight;
-
-	int targetWidth = contentWidth + margin * 2 + resizerWidth;
+	int targetHeight = getHeightWithoutContent() + contentHeight + getExtraHeight();
+	int targetWidth = contentWidth + margin * 2 + resizerWidth + getExtraWidth();
 
 	this->setSize(targetWidth, targetHeight);
 }
@@ -295,7 +294,7 @@ void BaseItemUI<T>::resized()
 
 	juce::Rectangle<int> h = r.removeFromTop(headerHeight);
 
-	if (canBeDragged && resizeMode != ALL)
+	if (canBeDragged && resizeMode != ALL && resizeMode != NONE)
 	{
 		grabber->setBounds(h.removeFromLeft(10));
 		grabber->repaint();
@@ -390,7 +389,7 @@ void BaseItemUI<T>::mouseDown(const MouseEvent & e)
 			Grabber * g = dynamic_cast<Grabber *>(e.eventComponent);
 			if (g != nullptr)
 			{
-				if (resizeMode == ALL)
+				if (resizeMode == ALL || resizeMode == NONE)
 				{
 					posAtMouseDown = this->baseItem->viewUIPosition->getPoint();
 				} else
@@ -420,7 +419,7 @@ void BaseItemUI<T>::mouseDrag(const MouseEvent & e)
 			Grabber * g = dynamic_cast<Grabber *>(e.eventComponent);
 			if (g != nullptr)
 			{
-				if (resizeMode == ALL)
+				if (resizeMode == ALL || resizeMode == NONE)
 				{
 					Point<float> targetPos = posAtMouseDown + e.getOffsetFromDragStart().toFloat() / viewZoom;
 					this->baseItem->viewUIPosition->setPoint(targetPos);
@@ -446,7 +445,7 @@ void BaseItemUI<T>::mouseUp(const MouseEvent & e)
 			Grabber * g = dynamic_cast<Grabber *>(e.eventComponent);
 			if (g != nullptr)
 			{
-				if (resizeMode == ALL)
+				if (resizeMode == ALL || resizeMode == NONE)
 				{
 					this->baseItem->viewUIPosition->setUndoablePoint(posAtMouseDown, this->baseItem->viewUIPosition->getPoint());
 				} else
@@ -514,7 +513,7 @@ void BaseItemUI<T>::setGrabber(Grabber * newGrabber)
 	if (grabber != nullptr)
 	{
 		this->addAndMakeVisible(grabber);
-		if (resizeMode == ALL) grabberHeight = 15;
+		if (resizeMode == ALL || resizeMode == NONE) grabberHeight = 15;
 		this->addAndMakeVisible(grabber);
 	}
 

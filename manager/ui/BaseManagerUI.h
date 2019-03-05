@@ -475,7 +475,7 @@ void BaseManagerUI<M, T, U>::resizedInternalContent(juce::Rectangle<int>& r)
 			bui->setVisible(true);
 		}*/
 
-		if (/*bui->isVisible() && */tr != bui->getBounds()) bui->setBounds(tr);
+		if (tr != bui->getBounds()) bui->setBounds(tr);
 
 		if (defaultLayout == VERTICAL) r.translate(0, tr.getHeight() + gap);
 		else r.translate(tr.getWidth() + gap, 0);

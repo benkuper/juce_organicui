@@ -21,7 +21,7 @@ EnumParameterUI::EnumParameterUI(Parameter * parameter) :
 
 	ep->addEnumParameterListener(this);
 
-	prevValue = parameter->value;
+	prevValue = parameter->getValue();
 
 	updateComboBox();
 }
@@ -81,7 +81,7 @@ void EnumParameterUI::feedbackStateChanged()
 void EnumParameterUI::valueChanged(const var & value)
 {
 	cb.setSelectedId(keyIdMap[value], dontSendNotification);
-	prevValue = parameter->value;
+	prevValue = parameter->getValue();
 }
 
 void EnumParameterUI::comboBoxChanged(ComboBox *)

@@ -172,6 +172,8 @@ void Parameter::setRange(var min, var max, bool setDefaultRange) {
 		defaultMaxValue = max;
 	}
 
+	if (minimumValue == min && maximumValue == max) return;
+
 	minimumValue = min;
 	maximumValue = max;
 
@@ -290,7 +292,7 @@ void Parameter::parameterValueChanged(Parameter * p)
 		setReferenceParameter(dynamic_cast<Parameter *>(referenceTarget->target.get()));
 	} else if (p == referenceParameter)
 	{
-		setValue(referenceParameter->value);
+		setValue(referenceParameter->getValue());
 	}
 }
 

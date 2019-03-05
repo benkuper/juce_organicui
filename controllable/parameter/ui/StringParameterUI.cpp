@@ -22,7 +22,7 @@ StringParameterUI::StringParameterUI(Parameter * p) :
     addAndMakeVisible(valueLabel);
 
     valueLabel.setJustificationType(Justification::topLeft);
-    valueLabel.setText(parameter->value,NotificationType::dontSendNotification);
+    valueLabel.setText(parameter->getValue(),NotificationType::dontSendNotification);
 	valueLabel.addListener(this);
 
 	valueLabel.setColour(valueLabel.backgroundWhenEditingColourId, Colours::black);

@@ -53,13 +53,16 @@ void InspectableContentComponent::mouseExit(const MouseEvent & e)
 {
 	//DBG("Mouse Exit : " << inspectable->getHelpID());
 	String helpID = "";
-	if (!inspectable.wasObjectDeleted()) helpID = inspectable->getHelpID();
-	HelpBox::getInstance()->clearOverData(helpID);
-
-	for (auto & i : inspectable->linkedInspectables)
+	if (!inspectable.wasObjectDeleted())
 	{
-		if(!i.wasObjectDeleted()) i->setHighlighted(false);
+		helpID = inspectable->getHelpID();
+		for (auto & i : inspectable->linkedInspectables)
+		{
+			if (!i.wasObjectDeleted()) i->setHighlighted(false);
+		}
 	}
+
+	HelpBox::getInstance()->clearOverData(helpID);
 }
 
 void InspectableContentComponent::mouseDown(const MouseEvent & e)
@@ -120,6 +123,14 @@ Rectangle<int> InspectableContentComponent::getMainBounds()
 {
 	return getLocalBounds();
 
+}
+int InspectableContentComponent::getExtraWidth()
+{
+	return getWidth() - getMainBounds().getWidth();
+}
+int InspectableContentComponent::getExtraHeight()
+{
+	return getHeight() - getMainBounds().getHeight();
 }
 void InspectableContentComponent::newMessage(const Inspectable::InspectableEvent & e)
 {

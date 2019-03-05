@@ -43,7 +43,8 @@ public:
 	virtual void paintOverChildren(Graphics &g) override;
 
 	virtual Rectangle<int> getMainBounds();
-
+	virtual int getExtraWidth();
+	virtual int getExtraHeight();
 
 	void newMessage(const Inspectable::InspectableEvent &e) override;
 	

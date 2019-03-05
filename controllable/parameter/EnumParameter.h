@@ -36,6 +36,7 @@ public:
 
 	OwnedArray<EnumValue> enumValues;
 
+	var getValue() override;
 	var getValueData();
 
 	template<class T>
