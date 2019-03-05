@@ -40,7 +40,6 @@ public:
 
 	virtual void newMessage(const ContainerAsyncEvent &e) override;
 
-	//void controllableFeedbackUpdate(ControllableContainer *, Controllable *) override;
 	virtual void containerChildAddressChangedAsync(ControllableContainer *) {}
 	virtual void controllableFeedbackUpdateInternal(Controllable *) {} //override this in child classes
 	

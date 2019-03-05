@@ -52,7 +52,7 @@ public:
 
 	KeyMappingsContainer keyMappingsCC;
 
-	void controllableFeedbackUpdate(ControllableContainer *, Controllable * c) override;
+	void onControllableFeedbackUpdate(ControllableContainer *, Controllable * c) override;
 	void loadJSONDataInternal(var data) override;
 
 };

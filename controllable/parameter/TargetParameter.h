@@ -52,8 +52,8 @@ public:
 
 	void setGhostValue(const String &ghostVal);
 
-	void setValueFromTarget(Controllable *);
-	void setValueFromTarget(ControllableContainer *);
+	void setValueFromTarget(Controllable *, bool addToUndo = false);
+	void setValueFromTarget(ControllableContainer *, bool addToUndo = false);
 
 	void setValueInternal(var &) override;
 

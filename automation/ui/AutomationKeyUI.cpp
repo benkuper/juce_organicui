@@ -26,7 +26,7 @@ AutomationKeyUI::AutomationKeyUI(AutomationKey * key, Colour c) :
 	setWantsKeyboardFocus(false);
 	setMouseClickGrabsKeyboardFocus(false);
 
-	autoDrawHighlightWhenSelected = false;
+	autoDrawContourWhenSelected = false;
 	setEasingUI(item->easing != nullptr ? item->easing->createUI() : nullptr);
 }
 

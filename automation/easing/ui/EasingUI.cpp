@@ -15,7 +15,7 @@ EasingUI::EasingUI(Easing * e) :
 	easing(e),
 	y1(0),y2(0)
 {
-	autoDrawHighlightWhenSelected = false;
+	autoDrawContourWhenSelected = false;
 	
 	bringToFrontOnSelect = false; 
 	setWantsKeyboardFocus(false);

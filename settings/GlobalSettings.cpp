@@ -49,8 +49,10 @@ GlobalSettings::~GlobalSettings()
 {
 }
 
-void GlobalSettings::controllableFeedbackUpdate(ControllableContainer *, Controllable * c)
+void GlobalSettings::onControllableFeedbackUpdate(ControllableContainer * cc, Controllable * c)
 {
+	ControllableContainer::onControllableFeedbackUpdate(cc, c);
+
 	if (c == openLastDocumentOnStartup)
 	{
 		if (openLastDocumentOnStartup->boolValue()) openSpecificFileOnStartup->setValue(false);

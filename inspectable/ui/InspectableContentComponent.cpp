@@ -13,8 +13,9 @@ InspectableContentComponent::InspectableContentComponent(Inspectable * inspectab
 	InspectableContent(inspectable),
 	repaintOnSelectionChanged(true),
 	rounderCornerSize(4),
-	autoDrawHighlightWhenSelected(true),
-	highlightColor(HIGHLIGHT_COLOR),
+	autoDrawContourWhenSelected(true),
+	selectionContourColor(HIGHLIGHT_COLOR),
+	highlightColor(Colours::purple),
 	autoSelectWithChildRespect(true),
 	bringToFrontOnSelect(true)
 {
@@ -25,7 +26,14 @@ InspectableContentComponent::InspectableContentComponent(Inspectable * inspectab
 
 InspectableContentComponent::~InspectableContentComponent()
 {
-	if (!inspectable.wasObjectDeleted()) inspectable->removeAsyncInspectableListener(this);
+	if (!inspectable.wasObjectDeleted())
+	{
+		inspectable->removeAsyncInspectableListener(this);
+		for (auto & i : inspectable->linkedInspectables)
+		{
+			if (!i.wasObjectDeleted()) i->setHighlighted(true);
+		}
+	}
 }
 
 
@@ -34,6 +42,11 @@ void InspectableContentComponent::mouseEnter(const MouseEvent & e)
 	//DBG("Mouse Enter : " << inspectable->getHelpID());
 	if (inspectable.wasObjectDeleted()) return;
 	if (HelpBox::getInstance()->overDataID.isEmpty()) HelpBox::getInstance()->setOverData(inspectable->getHelpID());
+
+	for (auto & i : inspectable->linkedInspectables)
+	{
+		if (!i.wasObjectDeleted()) i->setHighlighted(true);
+	}
 }
 
 void InspectableContentComponent::mouseExit(const MouseEvent & e)
@@ -42,6 +55,11 @@ void InspectableContentComponent::mouseExit(const MouseEvent & e)
 	String helpID = "";
 	if (!inspectable.wasObjectDeleted()) helpID = inspectable->getHelpID();
 	HelpBox::getInstance()->clearOverData(helpID);
+
+	for (auto & i : inspectable->linkedInspectables)
+	{
+		if(!i.wasObjectDeleted()) i->setHighlighted(false);
+	}
 }
 
 void InspectableContentComponent::mouseDown(const MouseEvent & e)
@@ -84,9 +102,16 @@ void InspectableContentComponent::mouseDown(const MouseEvent & e)
 void InspectableContentComponent::paintOverChildren(Graphics & g)
 {
 	if (inspectable.wasObjectDeleted()) return;
-	if (autoDrawHighlightWhenSelected && inspectable->isSelected)
+	
+	if (inspectable->isHighlighted)
 	{
 		g.setColour(highlightColor);
+		g.drawRoundedRectangle(getMainBounds().toFloat(), rounderCornerSize, 4);
+	}
+
+	if (autoDrawContourWhenSelected && inspectable->isSelected)
+	{
+		g.setColour(selectionContourColor);
 		g.drawRoundedRectangle(getMainBounds().toFloat(), rounderCornerSize, 2);
 	}
 }
@@ -102,6 +127,10 @@ void InspectableContentComponent::newMessage(const Inspectable::InspectableEvent
 	{
 		if (bringToFrontOnSelect) toFront(true);
 		if (repaintOnSelectionChanged) repaint();
+	}
+	else if (e.type == Inspectable::InspectableEvent::HIGHLIGHT_CHANGED)
+	{
+		repaint();
 	}
 }
 	

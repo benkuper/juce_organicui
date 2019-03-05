@@ -11,7 +11,7 @@
 IntSliderUI::IntSliderUI(Parameter * parameter) :
     FloatSliderUI(parameter)
 {
-
+	fixedDecimals = 0;
 }
 
 IntSliderUI::~IntSliderUI()

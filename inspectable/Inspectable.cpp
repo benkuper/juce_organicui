@@ -14,6 +14,7 @@ Inspectable::Inspectable() :
 	selectionManager(nullptr), //default nullptr will target main selectionManager
 	isSelected(false),
 	isSelectable(true),
+	isHighlighted(false),
 	showInspectorOnSelect(true),
 	inspectableNotifier(10)
 {
@@ -25,6 +26,11 @@ Inspectable::~Inspectable()
 	listeners.call(&InspectableListener::inspectableDestroyed, this);
 	inspectableNotifier.addMessage(new InspectableEvent(InspectableEvent::DESTROYED, this));
 	masterReference.clear();
+
+	for (auto & i : linkedInspectables)
+	{
+		if (!i.wasObjectDeleted()) i->setHighlighted(true);
+	}
 }
 
 
@@ -54,6 +60,14 @@ void Inspectable::setSelected(bool value)
 
 	listeners.call(&InspectableListener::inspectableSelectionChanged, this);
 	inspectableNotifier.addMessage(new InspectableEvent(InspectableEvent::SELECTION_CHANGED, this));
+}
+
+void Inspectable::setHighlighted(bool value)
+{
+	if (value == isHighlighted) return;
+	isHighlighted = value;
+	listeners.call(&InspectableListener::inspectableHighlightChanged, this);
+	inspectableNotifier.addMessage(new InspectableEvent(InspectableEvent::HIGHLIGHT_CHANGED, this));
 }
 
 void Inspectable::setSelectionManager(InspectableSelectionManager * _selectionManager)

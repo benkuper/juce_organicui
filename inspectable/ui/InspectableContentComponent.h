@@ -25,10 +25,14 @@ public:
 	bool repaintOnSelectionChanged;
 
 	float rounderCornerSize;
-	bool autoDrawHighlightWhenSelected;
-	Colour highlightColor;
+	bool autoDrawContourWhenSelected;
+
+	Colour selectionContourColor;
+
 
 	bool autoSelectWithChildRespect;
+	Colour highlightColor;
+
 	bool bringToFrontOnSelect;
 
 	void mouseEnter(const MouseEvent &e) override;

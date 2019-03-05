@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    Inspectable.h
-    Created: 30 Oct 2016 9:02:24am
-    Author:  bkupe
+	Inspectable.h
+	Created: 30 Oct 2016 9:02:24am
+	Author:  bkupe
 
   ==============================================================================
 */
@@ -27,8 +27,12 @@ public:
 	bool isSelectable;
 	bool showInspectorOnSelect;
 
+	bool isHighlighted;
+
 	//for multiSelection
 	bool isPreselected;
+
+	Array<WeakReference<Inspectable>> linkedInspectables;
 
 	//Help
 	String helpID;
@@ -37,6 +41,7 @@ public:
 	virtual void selectThis(bool addToSelection = false);
 	virtual void setSelected(bool value);
 
+	virtual void setHighlighted(bool value);
 
 	virtual void setSelectionManager(InspectableSelectionManager * selectionManager);
 
@@ -54,6 +59,8 @@ public:
 		virtual ~InspectableListener() {}
 		virtual void inspectableSelectionChanged(Inspectable *) {};
 		virtual void inspectablePreselectionChanged(Inspectable *) {};
+		virtual void inspectableHighlightChanged(Inspectable *) {};
+
 		virtual void inspectableDestroyed(Inspectable *) {};
 	};
 
@@ -65,7 +72,7 @@ public:
 	class  InspectableEvent
 	{
 	public:
-		enum Type { SELECTION_CHANGED, PRESELECTION_CHANGED, DESTROYED};
+		enum Type { SELECTION_CHANGED, PRESELECTION_CHANGED, HIGHLIGHT_CHANGED, DESTROYED };
 
 		InspectableEvent(Type t, Inspectable * inspectable) :
 			type(t), inspectable(inspectable) {}

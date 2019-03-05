@@ -56,7 +56,7 @@ void TargetParameter::setGhostValue(const String & ghostVal)
 	
 }
 
-void TargetParameter::setValueFromTarget(Controllable * c)
+void TargetParameter::setValueFromTarget(Controllable * c, bool addToUndo)
 {
 	if (target != nullptr && c == target)
 	{
@@ -64,17 +64,20 @@ void TargetParameter::setValueFromTarget(Controllable * c)
 		if (stringValue() == ca) return;
 	}
 	
-	setValue(c->getControlAddress(rootContainer),false,true);
+	if(addToUndo) setUndoableValue(stringValue(), c->getControlAddress(rootContainer));
+	else setValue(c->getControlAddress(rootContainer), false, true);
 }
 
-void TargetParameter::setValueFromTarget(ControllableContainer * cc)
+void TargetParameter::setValueFromTarget(ControllableContainer * cc, bool addToUndo)
 {
-	if(targetContainer != nullptr && cc == targetContainer.get())
+	if (targetContainer != nullptr && cc == targetContainer.get())
 	{
 		String ca = targetContainer->getControlAddress();
 		if (stringValue() == ca) return;
 	}
-	setValue(cc->getControlAddress(rootContainer), false, true);
+
+	if (addToUndo) setUndoableValue(stringValue(), cc->getControlAddress(rootContainer));
+	else setValue(cc->getControlAddress(rootContainer), false, true);
 }
 
 void TargetParameter::setValueInternal(var & newVal)

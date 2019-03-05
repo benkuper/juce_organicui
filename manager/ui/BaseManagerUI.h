@@ -207,7 +207,7 @@ BaseManagerUI<M, T, U>::BaseManagerUI(const String & contentName, M * _manager, 
 
 	//setWantsKeyboardFocus(true);
 
-	highlightColor = LIGHTCONTOUR_COLOR;
+	selectionContourColor = LIGHTCONTOUR_COLOR;
 	addItemText = "Add Item";
 
 	if (useViewport)

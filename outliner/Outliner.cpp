@@ -218,7 +218,7 @@ OutlinerItemComponent::OutlinerItemComponent(OutlinerItem * _item) :
 	label("label", _item->itemName)
 {
 	item->addItemListener(this);
-	autoDrawHighlightWhenSelected = false;
+	autoDrawContourWhenSelected = false;
 	setTooltip(item->isContainer ? item->container->getControlAddress() : item->controllable->description + "\nControl Address : " + item->controllable->controlAddress);
 	addAndMakeVisible(&label);
 
