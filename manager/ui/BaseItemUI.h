@@ -286,7 +286,7 @@ void BaseItemUI<T>::resized()
 	juce::Rectangle<int> r = this->getMainBounds().reduced(margin);
 
 	//Grabber
-	if (dragDirection == HORIZONTAL)
+	if (dragDirection == HORIZONTAL || dragDirection == ALL)
 	{
 		//Grabber
 		grabber->setBounds(r.removeFromTop(grabberHeight));
@@ -521,7 +521,7 @@ void BaseItemUI<T>::setGrabber(Grabber * newGrabber)
 	if (grabber != nullptr)
 	{
 		this->addAndMakeVisible(grabber);
-		if (dragDirection == HORIZONTAL) grabberHeight = 15;
+		if (dragDirection == HORIZONTAL ||dragDirection == ALL) grabberHeight = 15;
 		this->addAndMakeVisible(grabber);
 	}
 
