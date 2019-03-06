@@ -10,7 +10,7 @@
 
 
 DashboardPanelUI::DashboardPanelUI(DashboardPanel * item) :
-	BaseItemUI(item,ResizeMode::ALL,true),
+	BaseItemUI(item, Direction::ALL, Direction::ALL),
 	managerUI(&item->itemManager)
 {
 	addAndMakeVisible(&managerUI);

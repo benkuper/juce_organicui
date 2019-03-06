@@ -17,9 +17,9 @@ class BaseItemUI :
 	public Label::Listener
 {
 public:
-	enum ResizeMode { NONE, VERTICAL, HORIZONTAL, ALL };
+	enum Direction { NONE, VERTICAL, HORIZONTAL, ALL };
 
-	BaseItemUI<T>(T * _item, ResizeMode resizeMode = NONE, bool canBeDragged = true);
+	BaseItemUI<T>(T * _item, Direction resizeDirection = NONE, Direction dragDirection = VERTICAL);
 	virtual ~BaseItemUI<T>();
 
 	//LAYOUT
@@ -32,7 +32,7 @@ public:
 	int grabberHeight;
 	Point<float> posAtMouseDown;
 	Point<float> sizeAtMouseDown;
-	bool canBeDragged;
+	Direction dragDirection;
 	bool customDragBehavior;
 
 	//header
@@ -42,7 +42,7 @@ public:
 	bool showRemoveBT;
 
 	//Resize
-	ResizeMode resizeMode;
+	Direction resizeDirection;
 	int resizerWidth;
 	int resizerHeight;
 
@@ -114,19 +114,19 @@ private:
 
 
 template<class T>
-BaseItemUI<T>::BaseItemUI(T * _item, ResizeMode _resizeMode, bool _canBeDragged) :
+BaseItemUI<T>::BaseItemUI(T * _item, Direction _resizeDirection, Direction _dragDirection) :
 	BaseItemMinimalUI<T>(_item),
 	margin(3),
 	minContentHeight(2),
 	viewZoom(1),
 	grabberHeight(0),
-	canBeDragged(_canBeDragged),
+	dragDirection (_dragDirection),
 	customDragBehavior(false),
 	headerHeight(16),
 	headerGap(2),
 	showEnableBT(true),
 	showRemoveBT(true),
-	resizeMode(_resizeMode),
+	resizeDirection(_resizeDirection),
 	resizerWidth(0),
 	resizerHeight(0),
 	resizer(nullptr),
@@ -146,12 +146,12 @@ BaseItemUI<T>::BaseItemUI(T * _item, ResizeMode _resizeMode, bool _canBeDragged)
 	itemLabel.addListener(this);
 	this->addAndMakeVisible(&itemLabel);
 
-	if (canBeDragged)
+	if (dragDirection != NONE)
 	{
-		setGrabber(new Grabber(_resizeMode == VERTICAL ? Grabber::VERTICAL : Grabber::HORIZONTAL));
+		setGrabber(new Grabber(dragDirection == VERTICAL ? Grabber::VERTICAL : Grabber::HORIZONTAL));
 	}
 
-	switch (resizeMode)
+	switch (resizeDirection)
 	{
 	case NONE:
 		break;
@@ -246,7 +246,7 @@ void BaseItemUI<T>::updateMiniModeUI()
 		int targetHeight = 0;
 		int targetWidth = this->getWidth();
 
-		switch (resizeMode)
+		switch (resizeDirection)
 		{
 		case ALL:
 			targetWidth = (int)this->baseItem->viewUISize->getPoint().x;
@@ -286,7 +286,7 @@ void BaseItemUI<T>::resized()
 	juce::Rectangle<int> r = this->getMainBounds().reduced(margin);
 
 	//Grabber
-	if (canBeDragged)
+	if (dragDirection == HORIZONTAL)
 	{
 		//Grabber
 		grabber->setBounds(r.removeFromTop(grabberHeight));
@@ -295,7 +295,7 @@ void BaseItemUI<T>::resized()
 
 	juce::Rectangle<int> h = r.removeFromTop(headerHeight);
 
-	if (canBeDragged && resizeMode != ALL && resizeMode != NONE)
+	if (dragDirection == VERTICAL)
 	{
 		grabber->setBounds(h.removeFromLeft(10));
 		grabber->repaint();
@@ -317,7 +317,7 @@ void BaseItemUI<T>::resized()
 
 	if (!this->baseItem->miniMode->boolValue())
 	{
-		if (resizeMode == NONE)
+		if (resizeDirection == NONE)
 		{
 			int top = r.getY();
 			resizedInternalContent(r);
@@ -326,7 +326,7 @@ void BaseItemUI<T>::resized()
 		}
 		else
 		{
-			switch (resizeMode)
+			switch (resizeDirection)
 			{
 			case VERTICAL:
 			{
@@ -387,12 +387,15 @@ void BaseItemUI<T>::mouseDown(const MouseEvent & e)
 
 	if (e.mods.isLeftButtonDown())
 	{
-		if (canBeDragged && !customDragBehavior)
+		if (e.eventComponent == cornerResizer.get())
+		{
+			sizeAtMouseDown = this->baseItem->viewUISize->getPoint();
+		}else if (dragDirection != NONE && !customDragBehavior)
 		{
 			Grabber * g = dynamic_cast<Grabber *>(e.eventComponent);
 			if (g != nullptr)
 			{
-				if (resizeMode == ALL || resizeMode == NONE)
+				if (dragDirection  == ALL || dragDirection == NONE)
 				{
 					posAtMouseDown = this->baseItem->viewUIPosition->getPoint();
 				}
@@ -402,10 +405,6 @@ void BaseItemUI<T>::mouseDown(const MouseEvent & e)
 					dragOffset = Point<int>();
 					itemUIListeners.call(&ItemUIListener::itemUIGrabStart, this);
 				}
-			}
-			else if (e.eventComponent == cornerResizer.get())
-			{
-				sizeAtMouseDown = this->baseItem->viewUISize->getPoint();
 			}
 		}
 	}
@@ -419,12 +418,12 @@ void BaseItemUI<T>::mouseDrag(const MouseEvent & e)
 
 	if (e.mods.isLeftButtonDown())
 	{
-		if (canBeDragged && !customDragBehavior)
+		if (dragDirection != NONE && !customDragBehavior)
 		{
 			Grabber * g = dynamic_cast<Grabber *>(e.eventComponent);
 			if (g != nullptr)
 			{
-				if (resizeMode == ALL || resizeMode == NONE)
+				if (dragDirection == ALL || dragDirection == NONE)
 				{
 					Point<float> targetPos = posAtMouseDown + e.getOffsetFromDragStart().toFloat() / viewZoom;
 					this->baseItem->viewUIPosition->setPoint(targetPos);
@@ -446,12 +445,18 @@ void BaseItemUI<T>::mouseUp(const MouseEvent & e)
 {
 	if (e.mods.isLeftButtonDown())
 	{
-		if (canBeDragged && !customDragBehavior)
+		if (e.eventComponent == cornerResizer.get())
+		{
+			Point<float> sizeDiffDemi = ((this->baseItem->viewUISize->getPoint() - sizeAtMouseDown) / 2).toFloat();
+			this->baseItem->viewUIPosition->setPoint(this->baseItem->viewUIPosition->getPoint() + sizeDiffDemi);
+			this->baseItem->viewUISize->setPoint(this->baseItem->viewUISize->getPoint());
+
+		}else if (dragDirection != NONE && !customDragBehavior)
 		{
 			Grabber * g = dynamic_cast<Grabber *>(e.eventComponent);
 			if (g != nullptr)
 			{
-				if (resizeMode == ALL || resizeMode == NONE)
+				if (dragDirection == ALL || dragDirection == NONE)
 				{
 					this->baseItem->viewUIPosition->setUndoablePoint(posAtMouseDown, this->baseItem->viewUIPosition->getPoint());
 				}
@@ -460,13 +465,8 @@ void BaseItemUI<T>::mouseUp(const MouseEvent & e)
 					itemUIListeners.call(&ItemUIListener::itemUIGrabEnd, this);
 				}
 			}
-			else if (e.eventComponent == cornerResizer.get())
-			{
-				Point<float> sizeDiffDemi = ((this->baseItem->viewUISize->getPoint() - sizeAtMouseDown) / 2).toFloat();
-				this->baseItem->viewUIPosition->setPoint(this->baseItem->viewUIPosition->getPoint() + sizeDiffDemi);
-				this->baseItem->viewUISize->setPoint(this->baseItem->viewUISize->getPoint());
-			}
 		}
+
 	}
 }
 
@@ -499,7 +499,7 @@ void BaseItemUI<T>::controllableFeedbackUpdateInternal(Controllable * c)
 {
 	BaseItemMinimalUI<T>::controllableFeedbackUpdateInternal(c);
 	if (c == this->baseItem->miniMode) updateMiniModeUI();
-	else if (canBeDragged && c == this->baseItem->viewUIPosition) itemUIListeners.call(&ItemUIListener::itemUIGrabbed, this);
+	else if (dragDirection != NONE && c == this->baseItem->viewUIPosition) itemUIListeners.call(&ItemUIListener::itemUIGrabbed, this);
 }
 
 template<class T>
@@ -521,7 +521,7 @@ void BaseItemUI<T>::setGrabber(Grabber * newGrabber)
 	if (grabber != nullptr)
 	{
 		this->addAndMakeVisible(grabber);
-		if (resizeMode == ALL || resizeMode == NONE) grabberHeight = 15;
+		if (dragDirection == HORIZONTAL) grabberHeight = 15;
 		this->addAndMakeVisible(grabber);
 	}
 
