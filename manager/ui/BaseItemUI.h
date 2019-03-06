@@ -390,7 +390,8 @@ void BaseItemUI<T>::mouseDown(const MouseEvent & e)
 		if (e.eventComponent == cornerResizer.get())
 		{
 			sizeAtMouseDown = this->baseItem->viewUISize->getPoint();
-		}else if (dragDirection != NONE && !customDragBehavior)
+
+		}else if (dragDirection != NONE && !customDragBehavior  && e.eventComponent->getParentComponent() == this)
 		{
 			Grabber * g = dynamic_cast<Grabber *>(e.eventComponent);
 			if (g != nullptr)
@@ -418,7 +419,7 @@ void BaseItemUI<T>::mouseDrag(const MouseEvent & e)
 
 	if (e.mods.isLeftButtonDown())
 	{
-		if (dragDirection != NONE && !customDragBehavior)
+		if (dragDirection != NONE && !customDragBehavior && e.eventComponent->getParentComponent() == this)
 		{
 			Grabber * g = dynamic_cast<Grabber *>(e.eventComponent);
 			if (g != nullptr)
@@ -451,7 +452,7 @@ void BaseItemUI<T>::mouseUp(const MouseEvent & e)
 			this->baseItem->viewUIPosition->setPoint(this->baseItem->viewUIPosition->getPoint() + sizeDiffDemi);
 			this->baseItem->viewUISize->setPoint(this->baseItem->viewUISize->getPoint());
 
-		}else if (dragDirection != NONE && !customDragBehavior)
+		}else if (dragDirection != NONE && !customDragBehavior  && e.eventComponent->getParentComponent() == this)
 		{
 			Grabber * g = dynamic_cast<Grabber *>(e.eventComponent);
 			if (g != nullptr)
