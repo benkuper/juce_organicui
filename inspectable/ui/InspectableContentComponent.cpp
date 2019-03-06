@@ -15,9 +15,9 @@ InspectableContentComponent::InspectableContentComponent(Inspectable * inspectab
 	rounderCornerSize(4),
 	autoDrawContourWhenSelected(true),
 	selectionContourColor(HIGHLIGHT_COLOR),
-	highlightColor(Colours::purple),
 	autoSelectWithChildRespect(true),
-	bringToFrontOnSelect(true)
+    highlightColor(Colours::purple),
+    bringToFrontOnSelect(true)
 {
 	setWantsKeyboardFocus(true);
 	setMouseClickGrabsKeyboardFocus(true);

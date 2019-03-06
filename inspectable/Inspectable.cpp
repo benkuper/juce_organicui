@@ -14,9 +14,9 @@ Inspectable::Inspectable() :
 	selectionManager(nullptr), //default nullptr will target main selectionManager
 	isSelected(false),
 	isSelectable(true),
-	isHighlighted(false),
 	showInspectorOnSelect(true),
-	inspectableNotifier(10)
+    isHighlighted(false),
+    inspectableNotifier(10)
 {
 	setSelectionManager(nullptr);
 }
