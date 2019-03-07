@@ -27,10 +27,6 @@ ImageButton * AssetManager::getDownBT() { return getSetupBTImage(ImageCache::get
 Image AssetManager::getInImage() { return ImageCache::getFromMemory(OrganicUIBinaryData::in_png, OrganicUIBinaryData::in_pngSize); }
 Image AssetManager::getOutImage() { return ImageCache::getFromMemory(OrganicUIBinaryData::out_png, OrganicUIBinaryData::out_pngSize); }
 Image AssetManager::getReloadImage() { return ImageCache::getFromMemory(OrganicUIBinaryData::reload_png, OrganicUIBinaryData::reload_pngSize); }
-Image AssetManager::getPlayImage() { return ImageCache::getFromMemory(OrganicUIBinaryData::playpause_png, OrganicUIBinaryData::playpause_pngSize); }
-Image AssetManager::getStopImage() { return ImageCache::getFromMemory(OrganicUIBinaryData::stop_png, OrganicUIBinaryData::stop_pngSize); }
-Image AssetManager::getPrevCueImage() { return ImageCache::getFromMemory(OrganicUIBinaryData::prevcue_png, OrganicUIBinaryData::prevcue_pngSize); }
-Image AssetManager::getNextCueImage() { return ImageCache::getFromMemory(OrganicUIBinaryData::nextcue_png, OrganicUIBinaryData::nextcue_pngSize); }
 Image AssetManager::getTriggerImage() { return ImageCache::getFromMemory(OrganicUIBinaryData::trigger_png, OrganicUIBinaryData::trigger_pngSize); }
 Image AssetManager::getRelativeImage() { return ImageCache::getFromMemory(OrganicUIBinaryData::relative_png, OrganicUIBinaryData::relative_pngSize); }
 

@@ -47,20 +47,11 @@ namespace OrganicUIBinaryData
     extern const char*   in_png;
     const int            in_pngSize = 3608;
 
-    extern const char*   nextcue_png;
-    const int            nextcue_pngSize = 16077;
-
     extern const char*   out_png;
     const int            out_pngSize = 20427;
 
-    extern const char*   playpause_png;
-    const int            playpause_pngSize = 16163;
-
     extern const char*   power_png;
     const int            power_pngSize = 15366;
-
-    extern const char*   prevcue_png;
-    const int            prevcue_pngSize = 16089;
 
     extern const char*   relative_png;
     const int            relative_pngSize = 2344;
@@ -70,9 +61,6 @@ namespace OrganicUIBinaryData
 
     extern const char*   settings_png;
     const int            settings_pngSize = 15919;
-
-    extern const char*   stop_png;
-    const int            stop_pngSize = 15967;
 
     extern const char*   target_png;
     const int            target_pngSize = 15244;
@@ -87,7 +75,7 @@ namespace OrganicUIBinaryData
     const int            up_pngSize = 462;
 
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 26;
+    const int namedResourceListSize = 22;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];

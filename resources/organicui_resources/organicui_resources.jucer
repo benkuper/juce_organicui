@@ -2,8 +2,9 @@
 
 <JUCERPROJECT id="nJCeN1" name="organicui_resources" projectType="guiapp" version="1.0.0"
               bundleIdentifier="com.yourcompany.organicui_resources" includeBinaryInAppConfig="1"
-              jucerVersion="5.3.2" displaySplashScreen="1" reportAppUsage="1"
-              splashScreenColour="Dark" cppLanguageStandard="11" companyCopyright="">
+              jucerVersion="5.4.3" displaySplashScreen="1" reportAppUsage="1"
+              splashScreenColour="Dark" cppLanguageStandard="11" companyCopyright=""
+              binaryDataNamespace="OrganicUIBinaryData">
   <MAINGROUP id="gdPnjI" name="organicui_resources">
     <GROUP id="{471DD8BF-5339-7ED5-BF79-1FCB0A8A6B3D}" name="Resources">
       <FILE id="KphWgp" name="add.png" compile="0" resource="1" file="Resources/add.png"/>
@@ -22,15 +23,11 @@
       <FILE id="JhfeGX" name="edit.png" compile="0" resource="1" file="Resources/edit.png"/>
       <FILE id="bcK2wO" name="file.png" compile="0" resource="1" file="Resources/file.png"/>
       <FILE id="Lih37O" name="in.png" compile="0" resource="1" file="Resources/in.png"/>
-      <FILE id="ymvdhk" name="nextcue.png" compile="0" resource="1" file="Resources/nextcue.png"/>
       <FILE id="QKRm2O" name="out.png" compile="0" resource="1" file="Resources/out.png"/>
-      <FILE id="YFOd2O" name="playpause.png" compile="0" resource="1" file="Resources/playpause.png"/>
       <FILE id="C97VIu" name="power.png" compile="0" resource="1" file="Resources/power.png"/>
-      <FILE id="IA3Rrz" name="prevcue.png" compile="0" resource="1" file="Resources/prevcue.png"/>
       <FILE id="avHafs" name="relative.png" compile="0" resource="1" file="Resources/relative.png"/>
       <FILE id="OR6cVw" name="reload.png" compile="0" resource="1" file="Resources/reload.png"/>
       <FILE id="K6dyge" name="settings.png" compile="0" resource="1" file="Resources/settings.png"/>
-      <FILE id="grSnl9" name="stop.png" compile="0" resource="1" file="Resources/stop.png"/>
       <FILE id="ZVsExK" name="target.png" compile="0" resource="1" file="Resources/target.png"/>
       <FILE id="FixPlj" name="trigger.png" compile="0" resource="1" file="Resources/trigger.png"/>
       <FILE id="utiCOQ" name="uncheck.png" compile="0" resource="1" file="Resources/uncheck.png"/>
