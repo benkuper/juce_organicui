@@ -288,12 +288,12 @@ float AutomationUI::getPosForX(int tx, bool offsetStart)
 
 int AutomationUI::getYForValue(float value)
 {
-	return (int)((1 - value)*getHeight());
+	return (int)((1 - value)*(getHeight()-1));
 }
 
 float AutomationUI::getValueForY(int ty)
 {
-	return (1 - ty * 1.f / getHeight());
+	return (1 - ty * 1.f / (getHeight()-1));
 }
 
 bool AutomationUI::isInView(AutomationKeyUI * kui)
@@ -638,12 +638,12 @@ void AutomationUI::run()
 			}
 
 			float val = manager->getValueForPosition(getPosForX(tx));
-			float y = (1 - val)*getHeight();
+			float y = (1 - val)*(getHeight() - 1);
 			int ty = (int)y;
 			int maxDist = 1;
 			for (int i = ty - maxDist; i <= ty + maxDist; i++)
 			{
-				if (i < 0 || i > viewImage.getHeight()) continue;
+				if (i < 0 || i >= viewImage.getHeight()) continue;
 				float alpha = jlimit<float>(0, 1, 1 - (abs(y - i) / maxDist));
 				viewImage.setPixelAt(tx, i, Colours::white.withAlpha(alpha));
 			}
