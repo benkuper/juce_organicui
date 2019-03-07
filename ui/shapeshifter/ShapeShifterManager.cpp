@@ -210,7 +210,7 @@ void ShapeShifterManager::loadLayout(var layout)
 	{
 		for (auto &wd : *wData)
 		{
-			ScopedPointer<DynamicObject> d = wd.getDynamicObject();
+			DynamicObject * d = wd.getDynamicObject();
 			ShapeShifterPanel * p = createPanel(nullptr);
 			p->loadLayout(d->getProperty("panel"));
 		 juce::Rectangle<int> bounds(d->getProperty("x"),d->getProperty("y"),d->getProperty("width"),d->getProperty("height"));
