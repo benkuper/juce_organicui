@@ -58,7 +58,7 @@ void DashboardItemUI::inspectableDestroyed(Inspectable * i)
 void DashboardItemUI::controllableFeedbackUpdateInternal(Controllable * c)
 {
 	BaseItemUI::controllableFeedbackUpdateInternal(c);
-	if (c == item->target)
+	if (c == item->target && item->target->target != nullptr)
 	{
 		setControllableUI(item->target->target);
 	}
