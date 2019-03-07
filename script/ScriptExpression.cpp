@@ -26,6 +26,7 @@ ScriptExpression::~ScriptExpression()
 
 	for (auto &p : linkedParameters)
 	{
+		if (p.wasObjectDeleted()) continue;
 		p->removeInspectableListener(this);
 		p->removeParameterListener(this);
 	}
@@ -178,7 +179,8 @@ Array<Parameter*> ScriptExpression::getParameterReferencesInExpression()
 
 void ScriptExpression::inspectableDestroyed(Inspectable * i)
 {
-	evaluate(true);
+	buildEnvironment();
+	//evaluate(true);
 }
 
 void ScriptExpression::parameterValueChanged(Parameter * p)
