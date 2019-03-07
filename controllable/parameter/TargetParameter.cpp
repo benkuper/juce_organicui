@@ -58,7 +58,7 @@ void TargetParameter::setGhostValue(const String & ghostVal)
 
 void TargetParameter::setValueFromTarget(Controllable * c, bool addToUndo)
 {
-	if (target != nullptr && c == target)
+	if (target != nullptr && c == target.get())
 	{
 		String ca = target->getControlAddress();
 		if (stringValue() == ca) return;
@@ -90,12 +90,20 @@ void TargetParameter::setValueInternal(var & newVal)
 		{
 			WeakReference<ControllableContainer> cc = rootContainer->getControllableContainerForAddress(newVal.toString(),true);
 			if (cc != nullptr) setTarget(cc);
-			else setGhostValue(newVal.toString());
+			else
+			{
+				setTarget((ControllableContainer *)nullptr);
+				setGhostValue(newVal.toString());
+			}
 		} else
 		{
 			WeakReference<Controllable> c = rootContainer->getControllableForAddress(newVal.toString(),true);
-			if (c != nullptr) setTarget(c);
-			else setGhostValue(newVal.toString());
+			if (c != nullptr && !c.wasObjectDeleted()) setTarget(c);
+			else
+			{
+				setTarget((Controllable *)nullptr);
+				setGhostValue(newVal.toString());
+			}
 		}
 	} else
 	{
