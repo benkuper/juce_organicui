@@ -229,7 +229,6 @@ void Automation::addItems(Array<Point<float>> keys, bool removeExistingOverlappi
 		autoIndex++;
 	}
 
-	DBG("Here add items " << newKeys.size() << " items");
 	BaseManager::addItems(newKeys);
 
 	if(selectionManager != nullptr) selectionManager->setEnabled(true);
