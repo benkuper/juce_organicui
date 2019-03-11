@@ -105,7 +105,7 @@ void ScriptEditor::buttonClicked(Button * b)
 				{
 					f.create();
 
-					if (script->scriptTemplate->isNotEmpty())
+					if (script->scriptTemplate != nullptr && script->scriptTemplate->isNotEmpty())
 					{
 						FileOutputStream fos(f);
 						if (fos.openedOk())

@@ -11,6 +11,7 @@ Author:  Ben
 
 Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled) :
 	BaseItem("Script", canBeDisabled, false),
+	scriptTemplate(nullptr),
 	scriptParamsContainer("params"),
 	parentTarget(_parentTarget),
 	lockedThreadId(0),
