@@ -33,6 +33,8 @@ public:
 
 	const float pixelsPerUnit = 10; //1 = 10pixel
 	float valueAtMouseDown;
+	float valueOffsetSinceMouseDown;
+	int lastMouseX;
 
 	bool autoSize;
 	void setAutoSize(bool value);

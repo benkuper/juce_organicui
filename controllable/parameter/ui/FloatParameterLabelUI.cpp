@@ -116,6 +116,8 @@ void FloatParameterLabelUI::resized()
 void FloatParameterLabelUI::mouseDownInternal(const MouseEvent & e)
 {
 	valueAtMouseDown = parameter->floatValue();
+	valueOffsetSinceMouseDown = 0;
+	lastMouseX = e.getMouseDownX();
 }
 
 
@@ -130,7 +132,12 @@ void FloatParameterLabelUI::mouseDrag(const MouseEvent & e)
 		valueLabel.updateMouseCursor();
 	}
 
-	parameter->setValue(valueAtMouseDown + e.getOffsetFromDragStart().x *1.0f / pixelsPerUnit);
+	float sensitivity = e.mods.isShiftDown() ? 10 : (e.mods.isAltDown() ? .1f : 1);
+	
+	valueOffsetSinceMouseDown += (e.getPosition().x - lastMouseX) * sensitivity / pixelsPerUnit;
+	lastMouseX = e.getPosition().x;
+
+	parameter->setValue(valueAtMouseDown + valueOffsetSinceMouseDown);
 }
 
 void FloatParameterLabelUI::mouseUpInternal(const MouseEvent & e)
