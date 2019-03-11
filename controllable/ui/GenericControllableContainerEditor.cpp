@@ -34,6 +34,13 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(WeakRefer
 
 	if(!container->nameCanBeChangedByUser) containerLabel.setInterceptsMouseClicks(false, false);
 
+	if (container->userCanAddControllables)
+	{
+		addBT = AssetManager::getInstance()->getAddBT();
+		addBT->addListener(this);
+		addAndMakeVisible(addBT);
+	}
+
 	if (canBeCollapsed())
 	{
 		expandBT = AssetManager::getInstance()->getRightArrowBT();
@@ -47,12 +54,7 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(WeakRefer
 		addAndMakeVisible(headerSpacer);
 		headerSpacer.addMouseListener(this, false);
 
-		if (container->userCanAddControllables)
-		{
-			addBT = AssetManager::getInstance()->getAddBT();
-			addBT->addListener(this);
-			addAndMakeVisible(addBT);
-		}
+		
 
 		collapseAnimator.addChangeListener(this);
 
@@ -414,12 +416,12 @@ void GenericControllableContainerEditor::resizedInternal(juce::Rectangle<int>& r
 			if (container->editorIsCollapsed) expandBT->setBounds(ar);
 			else collapseBT->setBounds(ar);
 			r.removeFromLeft(2);
+		}
 
-			if (addBT != nullptr)
-			{
-				addBT->setBounds(hr.removeFromRight(headerHeight));
-				hr.removeFromRight(2);
-			}
+		if (addBT != nullptr)
+		{
+			addBT->setBounds(hr.removeFromRight(headerHeight));
+			hr.removeFromRight(2);
 		}
 
 		resizedInternalHeader(hr);
