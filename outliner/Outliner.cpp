@@ -249,6 +249,7 @@ void OutlinerItemComponent::paint(Graphics & g)
 	juce::Rectangle<int> r = getLocalBounds();
 
 	Colour c = BLUE_COLOR;
+	if (inspectable.wasObjectDeleted()) return;
 	if (item->isContainer) c = item->container->nameCanBeChangedByUser ? HIGHLIGHT_COLOR : TEXT_COLOR;
 
 
