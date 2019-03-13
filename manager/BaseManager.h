@@ -32,7 +32,7 @@ public:
 
 	bool userCanAddItemsManually;
 	bool selectItemWhenCreated;
-	//bool autoReorderOnAdd;
+	bool autoReorderOnAdd;
 
 	virtual T * createItem(); //to override if special constructor to use
 	virtual T * addItemFromData(var data, bool addToUndo = true); //to be overriden for specific item creation (from data)
@@ -397,14 +397,20 @@ public:
 	class ManagerItemComparator
 	{
 	public:
-		ManagerItemComparator(BaseManager * manager) : m(manager) {}
+		ManagerItemComparator(BaseManager * manager) : m(manager), compareFunc(nullptr)
+		{
+			compareFunc = nullptr;
+		}
 
 		BaseManager * m;
 
+		std::function<int(T *, T*)> compareFunc;
 		int compareElements(ControllableContainer * i1, ControllableContainer * i2)
 		{
-			return m->items.indexOf(static_cast<T *>(i1)) > m->items.indexOf(static_cast<T *>(i2))? 1 : -1;
+			jassert(compareFunc != nullptr);
+			return compareFunc(static_cast<T *>(i1), static_cast<T *>(i2));
 		}
+
 	};
 	
 	ManagerItemComparator comparator;
@@ -422,6 +428,7 @@ BaseManager<T>::BaseManager(const String & name) :
 	itemDataType(""),
 	userCanAddItemsManually(true),
 	selectItemWhenCreated(true),
+	autoReorderOnAdd(true),
 	managerNotifier(50),
     comparator(this)
 {
@@ -472,7 +479,14 @@ T * BaseManager<T>::addItem(T * item, var data, bool addToUndo, bool notify)
 		}
 	}
 
-	items.insert(data.getProperty("index",-1),item);
+	int targetIndex = data.getProperty("index", -1);
+	if(targetIndex != -1) items.insert(targetIndex, item);
+	else
+	{
+		if (autoReorderOnAdd && comparator.compareFunc != nullptr) items.addSorted(comparator, item);
+		else items.add(item);
+	}
+
 	bi->addBaseItemListener(this);
 
 	if (!data.isVoid())
@@ -684,6 +698,7 @@ void BaseManager<T>::removeItem(T * item, bool addToUndo, bool notify)
 template<class T>
 void BaseManager<T>::reorderItems()
 {
+	if (comparator.compareFunc == nullptr) return;
 	controllableContainers.sort(comparator);
 	baseManagerListeners.call(&Listener::itemsReordered);
 	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_REORDERED));
