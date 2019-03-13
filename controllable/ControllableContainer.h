@@ -51,6 +51,7 @@ public:
 	bool saveAndLoadRecursiveData;
 	bool saveAndLoadName;
 	bool includeTriggersInSaveLoad;
+	bool isCurrentlyLoadingData;
 
 	//Script
 	bool includeInScriptObject;

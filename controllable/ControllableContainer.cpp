@@ -29,6 +29,7 @@ ControllableContainer::ControllableContainer(const String & niceName) :
 	saveAndLoadRecursiveData(false),
 	saveAndLoadName(false),
 	includeTriggersInSaveLoad(false),
+	isCurrentlyLoadingData(false),
     includeInScriptObject(true),
     parentContainer(nullptr),
     queuedNotifier(500) //what to put in max size ??
@@ -720,9 +721,11 @@ var ControllableContainer::getJSONData()
 
 void ControllableContainer::loadJSONData(var data, bool createIfNotThere)
 {
+
 	if (data.isVoid()) return;
 	if (data.getDynamicObject() == nullptr) return;
 
+	isCurrentlyLoadingData = true;
 	//if (data.getDynamicObject()->hasProperty("uid")) uid = data.getDynamicObject()->getProperty("uid");
 	if (data.getDynamicObject()->hasProperty("niceName")) setNiceName(data.getDynamicObject()->getProperty("niceName"));
 	if (data.getDynamicObject()->hasProperty("shortName")) setCustomShortName(data.getDynamicObject()->getProperty("shortName"));
@@ -769,6 +772,8 @@ void ControllableContainer::loadJSONData(var data, bool createIfNotThere)
 	}
 
 	loadJSONDataInternal(data);
+
+	isCurrentlyLoadingData = false;
 }
 
 void ControllableContainer::childStructureChanged(ControllableContainer * cc)
