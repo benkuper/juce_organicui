@@ -83,6 +83,8 @@ public:
 	bool drawContour;
 	bool transparentBG;
 	bool resizeOnChildBoundsChanged;
+	bool autoFilterHitTestOnItems;
+	bool validateHitTestOnNoItem;
 
 	ScopedPointer<ImageButton> addItemBT;
 
@@ -123,6 +125,8 @@ public:
 	virtual void updateItemsVisibility();
 
 	virtual void childBoundsChanged(Component *) override;
+
+	virtual bool hitTest(int x, int y) override;
 
 	//For container check
     virtual void componentMovedOrResized(Component &c, bool wasMoved, bool wasResized) override;
@@ -198,6 +202,8 @@ BaseManagerUI<M, T, U>::BaseManagerUI(const String & contentName, M * _manager, 
 	drawContour(false),
 	transparentBG(false),
 	resizeOnChildBoundsChanged(true),
+	autoFilterHitTestOnItems(false),
+	validateHitTestOnNoItem(true),
 	animateItemOnAdd(true),
 	grabbingItem(nullptr),
 	fixedItemHeight(true),
@@ -552,6 +558,25 @@ template<class M, class T, class U>
 void BaseManagerUI<M, T, U>::childBoundsChanged(Component * c)
 {
 	if (resizeOnChildBoundsChanged && c != &viewport) resized();
+}
+
+template<class M, class T, class U>
+bool BaseManagerUI<M, T, U>::hitTest(int x, int y)
+{
+	if (!autoFilterHitTestOnItems) return InspectableContentComponent::hitTest(x, y);
+	if (itemsUI.size() == 0) return validateHitTestOnNoItem;
+
+	for (auto &i : itemsUI)
+	{
+		Point<int> p(x, y);
+		if (i->getBounds().contains(p))
+		{
+			Point<int> localP = i->getLocalPoint(this, p);
+			if (i->hitTest(localP.x, localP.y)) return true;
+		}
+	}
+			
+	return false;
 }
 
 template<class M, class T, class U>
