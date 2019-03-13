@@ -483,7 +483,7 @@ T * BaseManager<T>::addItem(T * item, var data, bool addToUndo, bool notify)
 	if(targetIndex != -1) items.insert(targetIndex, item);
 	else
 	{
-		if (autoReorderOnAdd && comparator.compareFunc != nullptr) items.addSorted(comparator, item);
+		if (autoReorderOnAdd && !isCurrentlyLoadingData && comparator.compareFunc != nullptr) items.addSorted(comparator, item);
 		else items.add(item);
 	}
 
@@ -793,6 +793,7 @@ void BaseManager<T>::loadJSONDataManagerInternal(var data)
 	{
 		addItemFromData(td, false);
 	}
+
 }
 
 template<class T>
