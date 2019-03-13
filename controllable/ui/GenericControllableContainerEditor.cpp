@@ -97,8 +97,8 @@ void GenericControllableContainerEditor::setCollapsed(bool value, bool force, bo
 
 	container->editorIsCollapsed = value;
 	
-	collapseBT->setVisible(!container->editorIsCollapsed);
-	expandBT->setVisible(container->editorIsCollapsed);
+	if(collapseBT != nullptr) collapseBT->setVisible(!container->editorIsCollapsed);
+	if(expandBT != nullptr) expandBT->setVisible(container->editorIsCollapsed);
 
 	if(animate) prepareToAnimate = true;
 	int targetHeight = headerHeight;
