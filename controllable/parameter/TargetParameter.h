@@ -17,7 +17,8 @@ class TargetParameter :
 	public StringParameter,
 	public ControllableContainerListener,
 	public Controllable::Listener,
-	public EngineListener
+	public EngineListener,
+	public Inspectable::InspectableListener
 {
 public:
 	
@@ -63,8 +64,8 @@ public:
 	void setRootContainer(WeakReference<ControllableContainer> newRootContainer);
 
 	void childStructureChanged(ControllableContainer *) override;
-	void controllableRemoved(Controllable *) override;
-	void controllableContainerRemoved(ControllableContainer *) override;
+
+	void inspectableDestroyed(Inspectable * i) override;
 
 	void endLoadFile() override;
 

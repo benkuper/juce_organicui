@@ -118,13 +118,18 @@ void TargetParameter::setTarget(WeakReference<Controllable> c)
 {
 	if (target != nullptr)
 	{
-		if (!target.wasObjectDeleted()) target->removeControllableListener(this);
+		if (!target.wasObjectDeleted())
+		{
+			target->removeInspectableListener(this);
+			target->removeControllableListener(this);
+		}
 	}
 	
 	target = c;
 
 	if (target != nullptr)
 	{
+		target->addInspectableListener(this);
 		target->addControllableListener(this);
 		setGhostValue("");
 	}
@@ -134,7 +139,11 @@ void TargetParameter::setTarget(WeakReference<ControllableContainer> cc)
 {
 	if (targetContainer != nullptr)
 	{
-		if (!targetContainer.wasObjectDeleted()) targetContainer->removeControllableContainerListener(this);
+		if (!targetContainer.wasObjectDeleted())
+		{
+			targetContainer->removeInspectableListener(this);
+			targetContainer->removeControllableContainerListener(this);
+		}
 	}
 
 	targetContainer = cc;
@@ -142,6 +151,8 @@ void TargetParameter::setTarget(WeakReference<ControllableContainer> cc)
 	if (targetContainer != nullptr)
 	{
 		targetContainer->addControllableContainerListener(this);
+		targetContainer->addInspectableListener(this);
+
 		setGhostValue("");
 	}
 }
@@ -192,25 +203,13 @@ void TargetParameter::childStructureChanged(ControllableContainer * cc)
 	}
 }
 
-void TargetParameter::controllableRemoved(Controllable * c)
+void TargetParameter::inspectableDestroyed(Inspectable * i)
 {
-	if (c == target || target.wasObjectDeleted())
-	{
-		String oldValue = stringValue();
-		setValue("");
-		setGhostValue(oldValue);
-	}
+	String oldValue = stringValue();
+	setValue("");
+	setGhostValue(oldValue);
 }
 
-void TargetParameter::controllableContainerRemoved(ControllableContainer * cc)
-{
-	if (cc == targetContainer || targetContainer.wasObjectDeleted())
-	{
-		String oldValue = stringValue();
-		setValue("");
-		setGhostValue(oldValue);
-	}
-}
 
 void TargetParameter::endLoadFile()
 {
