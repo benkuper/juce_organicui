@@ -25,8 +25,11 @@ public:
     
 	//ui
 	Colour bgColor;
+	Colour selectedColor;
+
 	bool dimAlphaOnDisabled;
 	bool highlightOnMouseOver;
+	bool fillColorOnSelected;
 
 	bool removeOnDelKey;
 
@@ -55,8 +58,10 @@ BaseItemMinimalUI<T>::BaseItemMinimalUI(T * _item) :
 	InspectableContentComponent(_item),
 	item(_item),
 	bgColor(BG_COLOR.brighter(.1f)),
+	selectedColor(HIGHLIGHT_COLOR),
 	dimAlphaOnDisabled(true),
 	highlightOnMouseOver(false),
+	fillColorOnSelected(false),
 	removeOnDelKey(true)
 {
 
@@ -143,8 +148,9 @@ void BaseItemMinimalUI<T>::paint(Graphics &g)
 	juce::Rectangle<float> r = this->getMainBounds().toFloat();
 	bool isItemEnabled = baseItem->canBeDisabled ? baseItem->enabled->boolValue() : true;
 
-	Colour c = isItemEnabled ? bgColor : bgColor.darker(.3f);
-	if (highlightOnMouseOver && isMouseOverOrDragging(true)) c = c.brighter(.03f);
+	Colour c  = (fillColorOnSelected && baseItem->isSelected) ? selectedColor : bgColor;
+	if(isItemEnabled) c = c.darker(.3f);
+	if (highlightOnMouseOver && isMouseOverOrDragging(true)) c = c.brighter(.1f);
 	g.setColour(c);
 	g.fillRoundedRectangle(r, 4);
 }
