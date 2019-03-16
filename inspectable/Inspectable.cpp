@@ -27,11 +27,15 @@ Inspectable::~Inspectable()
 	inspectableNotifier.addMessage(new InspectableEvent(InspectableEvent::DESTROYED, this));
 	masterReference.clear();
 
-	for (auto & i : linkedInspectables)
+	for (auto &i : linkedInspectables)
 	{
-		if (!i.wasObjectDeleted()) i->setHighlighted(true);
+		if (!i.wasObjectDeleted())
+		{
+			if (isHighlighted) i->setHighlighted(false);
+			i->unregisterLinkedInspectable(this);
+		}
 	}
-}
+} 
 
 
 String Inspectable::getHelpID()
@@ -68,6 +72,31 @@ void Inspectable::setHighlighted(bool value)
 	isHighlighted = value;
 	listeners.call(&InspectableListener::inspectableHighlightChanged, this);
 	inspectableNotifier.addMessage(new InspectableEvent(InspectableEvent::HIGHLIGHT_CHANGED, this));
+}
+
+void Inspectable::highlightLinkedInspectables(bool value)
+{
+	for (auto &i : linkedInspectables)
+	{
+		if (!i.wasObjectDeleted()) i->setHighlighted(value);
+	}
+}
+
+void Inspectable::registerLinkedInspectable(WeakReference<Inspectable> i, bool setAlsoInOtherInspectable)
+{
+	if (i.wasObjectDeleted()) return;
+	linkedInspectables.add(i);
+	if (setAlsoInOtherInspectable) i->registerLinkedInspectable(this, false);
+}
+
+void Inspectable::unregisterLinkedInspectable(WeakReference<Inspectable> i)
+{
+	linkedInspectables.removeAllInstancesOf(i);
+}
+
+void Inspectable::cleanLinkedInspectables()
+{
+	linkedInspectables.removeAllInstancesOf(nullptr);
 }
 
 void Inspectable::setSelectionManager(InspectableSelectionManager * _selectionManager)

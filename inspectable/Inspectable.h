@@ -42,6 +42,11 @@ public:
 	virtual void setSelected(bool value);
 
 	virtual void setHighlighted(bool value);
+	virtual void highlightLinkedInspectables(bool value);
+
+	virtual void registerLinkedInspectable(WeakReference<Inspectable> i, bool setAlsoInOtherInspectable = true);
+	virtual void unregisterLinkedInspectable(WeakReference<Inspectable> i);
+	virtual void cleanLinkedInspectables();
 
 	virtual void setSelectionManager(InspectableSelectionManager * selectionManager);
 
