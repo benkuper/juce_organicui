@@ -145,7 +145,6 @@ void AutomationKeyUI::mouseDown(const MouseEvent & e)
 	{
 		if (e.mods.isRightButtonDown())
 		{
-			PopupMenu p;
 			PopupMenu ep;
 			juce::StringArray keys = item->easingType->getAllKeys();
 			int kid = 1;
@@ -154,9 +153,8 @@ void AutomationKeyUI::mouseDown(const MouseEvent & e)
 				ep.addItem(kid, i, true, i == item->easingType->getValueKey());
 				kid++;
 			}
-			p.addSubMenu("Easing", ep);
 
-			int result = p.show();
+			int result = ep.show();
 			if (result >= 1 && result <= keys.size())
 			{
 				item->easingType->setUndoableValue(item->easingType->value,keys[result - 1]);
