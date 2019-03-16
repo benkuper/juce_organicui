@@ -12,16 +12,6 @@
 
 class InspectableSelectionManager;
 
-class AutomationKeyComparator
-{
-public:
-	int compareElements(AutomationKey * t1, AutomationKey * t2)
-	{
-		if (t1->position->floatValue() < t2->position->floatValue()) return -1;
-		else if (t1->position->floatValue() > t2->position->floatValue()) return 1;
-		return 0;
-	}
-};
 
 class Automation :
 	public BaseManager<AutomationKey>
@@ -56,12 +46,9 @@ public:
 	float getValueForPosition(float pos);
 	float getNormalizedValueForPosition(float pos);
 
-	static AutomationKeyComparator comparator;
-	
 	AutomationKey * createItem() override;
 	void addItems(Array<Point<float>> keys, bool removeExistingOverlappingKeys = true, bool addToUndo = true, bool autoSmoothCurve = false);
 	AutomationKey * addItem(const float position, const float value, bool addToUndo = true, bool reorder = false);
-	void reorderItems() override;
 
 	void removeKeysBetween(float start, float end);
 	void removeAllSelectedKeys();
@@ -79,7 +66,11 @@ public:
 	virtual void onControllableFeedbackUpdate(ControllableContainer * cc, Controllable *c) override;
 	virtual void onContainerParameterChanged(Parameter *) override;
 
+	static int compareTime(AutomationKey * t1, AutomationKey * t2);
+
 	InspectableEditor * getEditor(bool isRoot) override;
+
+
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Automation)

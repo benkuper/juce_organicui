@@ -56,6 +56,7 @@ public:
 	void removeItems(Array<T *> items, bool addToUndo = true);
 	void removeItem(T * item, bool addToUndo = true, bool notify = true);
 
+	virtual void setItemIndex(T * item, int newIndex);
 	virtual void reorderItems(); //to be overriden if needed
 
 	//to override for specific handling like adding custom listeners, etc.
@@ -693,6 +694,19 @@ void BaseManager<T>::removeItem(T * item, bool addToUndo, bool notify)
 
 	bi->clearItem();
 	delete item;
+}
+
+template<class T>
+void BaseManager<T>::setItemIndex(T * item, int newIndex)
+{
+	newIndex = jlimit(0, items.size() - 1, newIndex);
+	int index = items.indexOf(item);
+	if (index == -1 || index == newIndex) return;
+
+	items.move(index, newIndex);
+
+	baseManagerListeners.call(&Listener::itemsReordered);
+	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_REORDERED));
 }
 
 template<class T>

@@ -8,8 +8,6 @@
   ==============================================================================
 */
 
-AutomationKeyComparator Automation::comparator;
-
 Automation::Automation(const String &name, AutomationRecorder * _recorder, bool freeRange, bool allowKeysOutside, bool dedicatedSelectionManager) :
 	BaseManager(name),
 	recorder(_recorder),
@@ -17,6 +15,9 @@ Automation::Automation(const String &name, AutomationRecorder * _recorder, bool 
 	freeRange(freeRange),
 	allowKeysOutside(allowKeysOutside)
 {
+
+	comparator.compareFunc = &Automation::compareTime;
+
 	itemDataType = "AutomationKey"; 
 	editorCanBeCollapsed = false;
 
@@ -50,13 +51,6 @@ Automation::Automation(const String &name, AutomationRecorder * _recorder, bool 
 Automation::~Automation()
 {
 }
-
-void Automation::reorderItems()
-{
-	items.sort(Automation::comparator, true);
-	BaseManager::reorderItems();
-}
-
 
 void Automation::removeKeysBetween(float start, float end)
 {
@@ -304,6 +298,13 @@ void Automation::onContainerParameterChanged(Parameter * p)
 		position->setRange(0, length->floatValue());
 		if(!allowKeysOutside) for (auto &k : items) k->position->setRange(0, length->floatValue());
 	}
+}
+
+int Automation::compareTime(AutomationKey * t1, AutomationKey * t2)
+{
+	if (t1->position->floatValue() < t2->position->floatValue()) return -1;
+	else if (t1->position->floatValue() > t2->position->floatValue()) return 1;
+	return 0;
 }
 
 InspectableEditor * Automation::getEditor(bool isRoot)

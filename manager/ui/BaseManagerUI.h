@@ -804,15 +804,12 @@ void BaseManagerUI<M, T, U>::itemUIGrabEnd(BaseItemUI<T>* se)
 	{
 		itemsUI.add((U *)grabbingItem);
 
-		int originalIndex = manager->items.indexOf(grabbingItem->item);
-		manager->items.move(originalIndex, jlimit(0, manager->items.size() - 1, grabbingItemDropIndex));
-		
-		grabbingItem = nullptr;
-		grabbingItemDropIndex = -1; 
-		
-		manager->reorderItems();
+		int targetIndex = grabbingItemDropIndex;
 
-		
+		grabbingItem = nullptr;
+		grabbingItemDropIndex = -1;
+
+		manager->setItemIndex(se->item, targetIndex);
 		resized();
 	}
 }
