@@ -89,9 +89,16 @@ void Inspectable::registerLinkedInspectable(WeakReference<Inspectable> i, bool s
 	if (setAlsoInOtherInspectable) i->registerLinkedInspectable(this, false);
 }
 
-void Inspectable::unregisterLinkedInspectable(WeakReference<Inspectable> i)
+void Inspectable::unregisterLinkedInspectable(WeakReference<Inspectable> i, bool setAlsoInOtherInspectable)
 {
+	if (i.wasObjectDeleted())
+	{
+		cleanLinkedInspectables();
+		return;
+	}
+
 	linkedInspectables.removeAllInstancesOf(i);
+	if (setAlsoInOtherInspectable && !i.wasObjectDeleted()) i->unregisterLinkedInspectable(this, false);
 }
 
 void Inspectable::cleanLinkedInspectables()

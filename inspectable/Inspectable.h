@@ -45,8 +45,11 @@ public:
 	virtual void highlightLinkedInspectables(bool value);
 
 	virtual void registerLinkedInspectable(WeakReference<Inspectable> i, bool setAlsoInOtherInspectable = true);
-	virtual void unregisterLinkedInspectable(WeakReference<Inspectable> i);
+	virtual void unregisterLinkedInspectable(WeakReference<Inspectable> i, bool setAlsoInOtherInspectable = true);
 	virtual void cleanLinkedInspectables();
+
+	template<class T>
+	void unregisterLinkedInspectablesOfType();
 
 	virtual void setSelectionManager(InspectableSelectionManager * selectionManager);
 
@@ -99,5 +102,17 @@ private:
 };
 
 
+template<class T>
+void Inspectable::unregisterLinkedInspectablesOfType()
+{
+	Array<Inspectable *> unregisterList;
+	for (auto &i : linkedInspectables)
+	{
+		if (dynamic_cast<T *>(i) != nullptr) unregisterList(i);
+	}
+
+	for (auto &i : unregisterList) unregisterLinkedInspectable(i);
+	cleanLinkedInspectables();
+}
 
 #endif  // INSPECTABLE_H_INCLUDED
