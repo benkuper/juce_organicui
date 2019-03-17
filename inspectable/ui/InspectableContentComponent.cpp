@@ -15,6 +15,7 @@ InspectableContentComponent::InspectableContentComponent(Inspectable * inspectab
 	rounderCornerSize(4),
 	autoDrawContourWhenSelected(true),
 	selectionContourColor(HIGHLIGHT_COLOR),
+	highlightLinkedInspectablesOnOver(true),
 	autoSelectWithChildRespect(true),
     highlightColor(Colours::purple),
     bringToFrontOnSelect(true)
@@ -46,10 +47,7 @@ void InspectableContentComponent::mouseEnter(const MouseEvent & e)
 	if (inspectable.wasObjectDeleted()) return;
 	if (HelpBox::getInstance()->overDataID.isEmpty()) HelpBox::getInstance()->setOverData(inspectable->getHelpID());
 
-	for (auto & i : inspectable->linkedInspectables)
-	{
-		if (!i.wasObjectDeleted()) i->setHighlighted(true);
-	}
+	if (highlightLinkedInspectablesOnOver) inspectable->highlightLinkedInspectables(true);
 }
 
 void InspectableContentComponent::mouseExit(const MouseEvent & e)
@@ -59,10 +57,8 @@ void InspectableContentComponent::mouseExit(const MouseEvent & e)
 	if (!inspectable.wasObjectDeleted())
 	{
 		helpID = inspectable->getHelpID();
-		for (auto & i : inspectable->linkedInspectables)
-		{
-			if (!i.wasObjectDeleted()) i->setHighlighted(false);
-		}
+		if (highlightLinkedInspectablesOnOver) inspectable->highlightLinkedInspectables(false);
+
 	}
 
 	HelpBox::getInstance()->clearOverData(helpID);
@@ -122,7 +118,7 @@ void InspectableContentComponent::paintOverChildren(Graphics & g)
 	}
 }
 
-Rectangle<int> InspectableContentComponent::getMainBounds()
+juce::Rectangle<int> InspectableContentComponent::getMainBounds()
 {
 	return getLocalBounds();
 

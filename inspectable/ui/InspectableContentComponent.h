@@ -26,6 +26,7 @@ public:
 
 	float rounderCornerSize;
 	bool autoDrawContourWhenSelected;
+	bool highlightLinkedInspectablesOnOver;
 
 	Colour selectionContourColor;
 
@@ -42,7 +43,7 @@ public:
 
 	virtual void paintOverChildren(Graphics &g) override;
 
-	virtual Rectangle<int> getMainBounds();
+	virtual juce::Rectangle<int> getMainBounds();
 	virtual int getExtraWidth();
 	virtual int getExtraHeight();
 

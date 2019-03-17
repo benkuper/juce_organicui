@@ -16,6 +16,7 @@ Inspectable::Inspectable() :
 	isSelectable(true),
 	showInspectorOnSelect(true),
     isHighlighted(false),
+	highlightLinkedInspectableOnSelect(true),
     inspectableNotifier(10)
 {
 	setSelectionManager(nullptr);
@@ -29,11 +30,9 @@ Inspectable::~Inspectable()
 
 	for (auto &i : linkedInspectables)
 	{
-		if (!i.wasObjectDeleted())
-		{
-			if (isHighlighted) i->setHighlighted(false);
-			i->unregisterLinkedInspectable(this);
-		}
+		if (i.wasObjectDeleted()) continue;
+		if (isHighlighted) i->setHighlighted(false);
+		i->unregisterLinkedInspectable(this);
 	}
 } 
 
@@ -59,6 +58,8 @@ void Inspectable::setSelected(bool value)
 
 	isSelected = value;
 	isPreselected = false;
+
+	if (highlightLinkedInspectableOnSelect) highlightLinkedInspectables(isSelected);
 
 	setSelectedInternal(value);
 
@@ -89,9 +90,16 @@ void Inspectable::registerLinkedInspectable(WeakReference<Inspectable> i, bool s
 	if (setAlsoInOtherInspectable) i->registerLinkedInspectable(this, false);
 }
 
-void Inspectable::unregisterLinkedInspectable(WeakReference<Inspectable> i)
+void Inspectable::unregisterLinkedInspectable(WeakReference<Inspectable> i, bool setAlsoInOtherInspectable)
 {
+	if (i.wasObjectDeleted())
+	{
+		cleanLinkedInspectables();
+		return;
+	}
+
 	linkedInspectables.removeAllInstancesOf(i);
+	if (setAlsoInOtherInspectable && !i.wasObjectDeleted()) i->unregisterLinkedInspectable(this, false);
 }
 
 void Inspectable::cleanLinkedInspectables()
