@@ -30,13 +30,7 @@ InspectableContentComponent::~InspectableContentComponent()
 	if (!inspectable.wasObjectDeleted())
 	{
 		inspectable->removeAsyncInspectableListener(this);
-
 		inspectable->setSelected(false);
-
-		for (auto & i : inspectable->linkedInspectables)
-		{
-			if (!i.wasObjectDeleted()) i->setHighlighted(false);
-		}
 	}
 }
 

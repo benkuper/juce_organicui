@@ -26,7 +26,6 @@ Inspectable::~Inspectable()
 {
 	listeners.call(&InspectableListener::inspectableDestroyed, this);
 	inspectableNotifier.addMessage(new InspectableEvent(InspectableEvent::DESTROYED, this));
-	masterReference.clear();
 
 	for (auto &i : linkedInspectables)
 	{
@@ -34,6 +33,8 @@ Inspectable::~Inspectable()
 		if (isHighlighted) i->setHighlighted(false);
 		i->unregisterLinkedInspectable(this);
 	}
+
+	masterReference.clear();
 } 
 
 
