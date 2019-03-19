@@ -19,18 +19,23 @@ public:
 
 	//Helpers
 	template<class T>
-	static T * findParentAs(Controllable * c, int maxLevel = -1)
+	static T * findParentAs(WeakReference<Controllable> c, int maxLevel = -1)
 	{
 		int curLevel = 0;
-		if (c->parentContainer == nullptr) return nullptr;
+		if (c == nullptr || c.wasObjectDeleted()) return nullptr;
 
-		auto * cc = c->parentContainer;
-		T * result = dynamic_cast<T *>(cc);
+		WeakReference<ControllableContainer> cc = c->parentContainer;
+
+		if (cc == nullptr || cc.wasObjectDeleted()) return nullptr;
+		T * result = dynamic_cast<T *>(cc.get());
 
 		while (result == nullptr && cc != nullptr)
 		{
 			cc = cc->parentContainer;
-			result = dynamic_cast<T *>(cc);
+			
+			if (cc == nullptr || cc.wasObjectDeleted()) return nullptr;
+
+			result = dynamic_cast<T *>(cc.get());
 			curLevel++;
 			if (maxLevel != -1 && curLevel > maxLevel) return nullptr;
 		}

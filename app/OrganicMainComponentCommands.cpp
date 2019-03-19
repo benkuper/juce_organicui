@@ -111,7 +111,7 @@ void OrganicMainContentComponent::getCommandInfo(CommandID commandID, Applicatio
 
 	case StandardApplicationCommandIDs::copy:
 	{
-		BaseItem * item = InspectableSelectionManager::mainSelectionManager->getInspectableAs<BaseItem>();
+		BaseItem * item = InspectableSelectionManager::activeSelectionManager == nullptr?nullptr:InspectableSelectionManager::activeSelectionManager->getInspectableAs<BaseItem>();
 		result.setInfo(item != nullptr ? "Copy " + item->niceName : "Nothing to copy", "Copy the selected item", category, 0);
 		result.defaultKeypresses.add(KeyPress('c', ModifierKeys::commandModifier, 0));
 		result.setActive(item != nullptr);
@@ -120,7 +120,7 @@ void OrganicMainContentComponent::getCommandInfo(CommandID commandID, Applicatio
 
 	case StandardApplicationCommandIDs::cut:
 	{
-		BaseItem * item = InspectableSelectionManager::mainSelectionManager->getInspectableAs<BaseItem>();
+		BaseItem * item = InspectableSelectionManager::activeSelectionManager == nullptr ? nullptr : InspectableSelectionManager::activeSelectionManager->getInspectableAs<BaseItem>();
 		result.setInfo(item != nullptr ? "Cut " + item->niceName : "Nothing to cut", "Cut the selected item", category, 0);
 		result.defaultKeypresses.add(KeyPress('x', ModifierKeys::commandModifier, 0));
 		result.setActive(item != nullptr);
@@ -138,7 +138,7 @@ void OrganicMainContentComponent::getCommandInfo(CommandID commandID, Applicatio
 
 	case CommandIDs::duplicate:
 	{
-		BaseItem * item = InspectableSelectionManager::mainSelectionManager->getInspectableAs<BaseItem>();
+		BaseItem * item = InspectableSelectionManager::activeSelectionManager == nullptr ? nullptr : InspectableSelectionManager::activeSelectionManager->getInspectableAs<BaseItem>();
 		result.setInfo(item != nullptr ? "Duplicate " + item->niceName : "Nothing to duplicate", "Duplicate the selected item", category, 0);
 		result.defaultKeypresses.add(KeyPress('d', ModifierKeys::commandModifier, 0));
 		result.setActive(item != nullptr);
@@ -317,7 +317,7 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 	case StandardApplicationCommandIDs::copy:
 	case StandardApplicationCommandIDs::cut:
 	{
-		BaseItem * item = InspectableSelectionManager::mainSelectionManager->getInspectableAs<BaseItem>();
+		BaseItem * item = InspectableSelectionManager::activeSelectionManager->getInspectableAs<BaseItem>();
 		if (item != nullptr)
 		{
 			item->copy();
@@ -329,20 +329,26 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 
 	case StandardApplicationCommandIDs::paste:
 	{
-		BaseItem * item = InspectableSelectionManager::mainSelectionManager->getInspectableAs<BaseItem>();
-		if (item != nullptr) item->paste();
-		else
+		if (InspectableSelectionManager::activeSelectionManager != nullptr)
 		{
-			BaseItem::Listener * m = InspectableSelectionManager::mainSelectionManager->getInspectableAs<BaseItem::Listener>();
-			if (m != nullptr) m->askForPaste();
+			BaseItem * item = InspectableSelectionManager::activeSelectionManager->getInspectableAs<BaseItem>();
+			if (item != nullptr) item->paste();
+			else
+			{
+				BaseItem::Listener * m = InspectableSelectionManager::activeSelectionManager->getInspectableAs<BaseItem::Listener>();
+				if (m != nullptr) m->askForPaste();
+			}
 		}
 	}
 	break;
 
 	case CommandIDs::duplicate:
 	{
-		BaseItem * item = InspectableSelectionManager::mainSelectionManager->getInspectableAs<BaseItem>();
-		if (item != nullptr) item->duplicate();
+		if (InspectableSelectionManager::activeSelectionManager != nullptr)
+		{
+			BaseItem * item = InspectableSelectionManager::activeSelectionManager->getInspectableAs<BaseItem>();
+			if (item != nullptr) item->duplicate();
+		}
 	}
 	break;
 

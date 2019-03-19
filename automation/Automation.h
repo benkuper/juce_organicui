@@ -53,6 +53,7 @@ public:
 	void removeKeysBetween(float start, float end);
 	void removeAllSelectedKeys();
 
+
 	void setSnapPositions(Array<float> positions);
 
 	float getClosestSnapForPos(float pos, int start = -1, int end = -1);

@@ -77,6 +77,12 @@ void AutomationUI::setViewMode(ViewMode mode)
 	if (viewMode == mode) return;
 	viewMode = mode;
 
+	if (transformer != nullptr)
+	{
+		removeChildComponent(transformer);
+		transformer = nullptr;
+	}
+
 	switch (viewMode)
 	{
 	case EDIT:
@@ -95,6 +101,7 @@ void AutomationUI::setViewMode(ViewMode mode)
 	break;
 	}
 
+	
 	repaint();
 }
 
@@ -531,7 +538,7 @@ void AutomationUI::newMessage(const ContainerAsyncEvent & e)
 			if (autoResetViewRangeOnLengthUpdate) setViewRange(0, manager->length->floatValue());
 		}else if (e.targetControllable != nullptr)
 		{
-			AutomationKey * k = dynamic_cast<AutomationKey *>(e.targetControllable->parentContainer);
+			AutomationKey * k = e.targetControllable->getParentAs<AutomationKey>();
 			if (k != nullptr)
 			{
 				if (e.targetControllable == k->easingType)

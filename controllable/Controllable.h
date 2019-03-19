@@ -70,7 +70,7 @@ public:
 
 	bool replaceSlashesInShortName;
 
-	ControllableContainer * parentContainer;
+	WeakReference<ControllableContainer> parentContainer;
 
 	UndoableAction * setUndoableNiceName(const String &_niceName, bool onlyReturnAction = false);
 	void setNiceName(const String &_niceName);
@@ -81,6 +81,12 @@ public:
 	virtual void setControllableFeedbackOnly(bool value);
 
 	void setParentContainer(ControllableContainer * container);
+
+	template<class T>
+	T * getParentAs() { 
+		if (parentContainer == nullptr || parentContainer.wasObjectDeleted()) return nullptr;
+		return dynamic_cast<T *>(parentContainer.get());
+	}
 	void updateControlAddress();
 
 	void remove(bool addToUndo = false); // called from external to make this object ask for remove
