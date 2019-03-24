@@ -25,8 +25,9 @@ AutomationKey::AutomationKey(float minimumValue, float maximumValue) :
 	easingType->addOption("Hold", Easing::HOLD);
 	easingType->addOption("Sine", Easing::SINE);
 
-	easingType->setValueWithKey("Linear");
+	easingType->setValueWithData(Easing::LINEAR);
 	easingType->hideInEditor = true;
+	easingType->forceSaveValue = true;
 
 	canInspectChildContainers = false;
 

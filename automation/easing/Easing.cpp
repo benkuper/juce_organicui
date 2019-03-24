@@ -67,8 +67,8 @@ CubicEasing::CubicEasing() :
 	anchor2 = addPoint2DParameter("Anchor 2", "Anchor 2 of the quadratic curve");
 	anchor2->setBounds(.01f, -1, 1, 2);
 	
-	anchor1->setPoint(.6f, 0);
-	anchor2->setPoint(.7f, 1);
+	anchor1->setPoint(.5f, 0);
+	anchor2->setPoint(.5f, 1);
 
 	bezier.setup(anchor1->getPoint(), anchor2->getPoint());
 }
