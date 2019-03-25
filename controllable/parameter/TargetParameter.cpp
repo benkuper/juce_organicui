@@ -20,7 +20,7 @@ TargetParameter::TargetParameter(const String & niceName, const String & descrip
 	showParentNameInEditor(true),
 	maxDefaultSearchLevel(-1),
 	defaultParentLabelLevel(1),
-	rootContainer(rootReference),
+	rootContainer(nullptr),
 	target(nullptr),
 	targetContainer(nullptr),
 	customGetTargetFunc(nullptr),
@@ -34,7 +34,7 @@ TargetParameter::TargetParameter(const String & niceName, const String & descrip
 	lockManualControlMode = true;
 	type = TARGET; 
 
-	setRootContainer(rootContainer != nullptr?rootContainer:Engine::mainEngine);
+	setRootContainer(rootReference != nullptr?rootReference:Engine::mainEngine);
 	
 	argumentsDescription = "target";
 }
