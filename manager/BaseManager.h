@@ -704,6 +704,7 @@ void BaseManager<T>::setItemIndex(T * item, int newIndex)
 	if (index == -1 || index == newIndex) return;
 
 	items.move(index, newIndex);
+	controllableContainers.move(index, newIndex);
 
 	baseManagerListeners.call(&Listener::itemsReordered);
 	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_REORDERED));
@@ -712,8 +713,13 @@ void BaseManager<T>::setItemIndex(T * item, int newIndex)
 template<class T>
 void BaseManager<T>::reorderItems()
 {
-	if (comparator.compareFunc == nullptr) return;
-	controllableContainers.sort(comparator);
+	if (comparator.compareFunc != nullptr)
+	{
+		items.sort(comparator);
+		controllableContainers.clear();
+		controllableContainers.addArray(items);
+	}
+
 	baseManagerListeners.call(&Listener::itemsReordered);
 	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_REORDERED));
 }
@@ -763,7 +769,10 @@ void BaseManager<T>::askForMoveBefore(BaseItem * i)
 	int index = items.indexOf(static_cast<T *>(i));
 	if (index == 0) return;
 	items.swap(index, index - 1);
-	reorderItems();
+	controllableContainers.swap(index, index - 1);
+
+	baseManagerListeners.call(&Listener::itemsReordered);
+	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_REORDERED));
 }
 
 template<class T>
@@ -772,7 +781,10 @@ void BaseManager<T>::askForMoveAfter(BaseItem * i)
 	int index = items.indexOf(static_cast<T *>(i));
 	if (index == items.size() -1) return;
 	items.swap(index, index + 1);
-	reorderItems();
+	controllableContainers.swap(index, index+1);
+
+	baseManagerListeners.call(&Listener::itemsReordered);
+	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_REORDERED));
 }
 
 template<class T>

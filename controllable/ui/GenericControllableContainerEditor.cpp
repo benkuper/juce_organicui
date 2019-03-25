@@ -171,6 +171,7 @@ void GenericControllableContainerEditor::resetAndBuild()
 						continue;
 					}
 
+					DBG("["<< container->niceName <<"] Add editor ui : " << cc->niceName);
 					if (!cc->hideInEditor) addEditorUI(cc);
 				}
 
