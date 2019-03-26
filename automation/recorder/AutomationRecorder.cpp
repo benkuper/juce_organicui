@@ -57,7 +57,10 @@ void AutomationRecorder::clearKeys()
 
 void AutomationRecorder::addKeyAt(float time)
 {
-	if(isRecording->boolValue() && currentInput != nullptr) keys.add(Point<float>(time,currentInput->getNormalizedValue()));
+	if (isRecording->boolValue() && currentInput != nullptr)
+	{
+		keys.add(Point<float>(time, currentInput->hasRange()?currentInput->getNormalizedValue():jlimit<float>(0,1,currentInput->getValue())));
+	}
 }
 
 void AutomationRecorder::startRecording()
