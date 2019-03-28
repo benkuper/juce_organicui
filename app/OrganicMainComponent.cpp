@@ -29,6 +29,7 @@ OrganicMainContentComponent::OrganicMainContentComponent()
 
 #if JUCE_OPENGL && JUCE_WINDOWS
 	openGLContext.setComponentPaintingEnabled(true);
+	openGLContext.setContinuousRepainting(false);
 	openGLContext.attachTo(*this);
 #endif
 
