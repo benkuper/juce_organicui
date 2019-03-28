@@ -52,6 +52,8 @@ public:
 	bool saveAndLoadName;
 	bool includeTriggersInSaveLoad;
 	bool isCurrentlyLoadingData;
+	bool notifyStructureChangeWhenLoadingData;
+
 
 	//Script
 	bool includeInScriptObject;
@@ -153,7 +155,6 @@ protected:
 	virtual void onExternalTriggerTriggered(Trigger *) {}; //When listening to other child controllable than this container's children
 	virtual void onControllableAdded(Controllable *) {}; 
 	virtual void onControllableRemoved(Controllable *) {};
-
     virtual void onContainerParameterChangedAsync(Parameter *,const var & /*value*/){};
     
 
@@ -176,7 +177,7 @@ public:
 	friend class WeakReference<ControllableContainer>;
 
 protected:
-	void notifyStructureChanged();
+	virtual void notifyStructureChanged();
 	void newMessage(const Parameter::ParameterEvent &e)override;
 
 

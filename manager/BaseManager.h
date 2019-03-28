@@ -528,12 +528,16 @@ template<class T>
 Array<T *> BaseManager<T>::addItems(Array<T *> itemsToAdd, var data, bool addToUndo)
 {
 
+	isCurrentlyLoadingData = true;
+
 	if (addToUndo && !UndoMaster::getInstance()->isPerforming)
 	{
 		AddItemsAction * a = new AddItemsAction(this, itemsToAdd, data);
 		UndoMaster::getInstance()->performAction("Add " + String(itemsToAdd.size()) + " items", a);
+		isCurrentlyLoadingData = false;
 		return itemsToAdd;
 	}
+
 
 	for (int i = 0; i < itemsToAdd.size(); i++)
 	{
@@ -546,6 +550,7 @@ Array<T *> BaseManager<T>::addItems(Array<T *> itemsToAdd, var data, bool addToU
 	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_ADDED, itemsToAdd));
 
 	reorderItems();
+	isCurrentlyLoadingData = false;
 
 	return itemsToAdd;
 }

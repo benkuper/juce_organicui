@@ -30,6 +30,7 @@ ControllableContainer::ControllableContainer(const String & niceName) :
 	saveAndLoadName(false),
 	includeTriggersInSaveLoad(false),
 	isCurrentlyLoadingData(false),
+	notifyStructureChangeWhenLoadingData(true),
     includeInScriptObject(true),
     parentContainer(nullptr),
     queuedNotifier(500) //what to put in max size ??
@@ -260,6 +261,8 @@ void ControllableContainer::removeControllable(WeakReference<Controllable> c)
 
 void ControllableContainer::notifyStructureChanged() 
 {
+	if (isCurrentlyLoadingData && !notifyStructureChangeWhenLoadingData) return;
+	
 	liveScriptObjectIsDirty = true;
 
 	controllableContainerListeners.call(&ControllableContainerListener::childStructureChanged, this);
@@ -774,6 +777,8 @@ void ControllableContainer::loadJSONData(var data, bool createIfNotThere)
 	loadJSONDataInternal(data);
 
 	isCurrentlyLoadingData = false;
+	controllableContainerListeners.call(&ControllableContainerListener::controllableContainerFinishedLoading, this);
+	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableContainerFinishedLoading, this));
 }
 
 void ControllableContainer::childStructureChanged(ControllableContainer * cc)

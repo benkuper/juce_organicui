@@ -16,6 +16,8 @@ public:
 	virtual void childAddressChanged(ControllableContainer *) {};
 	//virtual void controllableContainerPresetLoaded(ControllableContainer *) {}
 	virtual void controllableContainerReordered(ControllableContainer *) {}
+	virtual void controllableContainerFinishedLoading(ControllableContainer *) {};
+
 };
 
 // ASYNC
@@ -31,7 +33,8 @@ public:
 		ChildAddressChanged,
 		ControllableContainerPresetLoaded,
 		ControllableContainerReordered,
-		ControllableContainerNeedsRebuild
+		ControllableContainerNeedsRebuild,
+		ControllableContainerFinishedLoading
 	};
 
 	ContainerAsyncEvent(EventType _type, ControllableContainer* _source) : type(_type), source(_source), targetContainer(nullptr), targetControllable(nullptr) {}

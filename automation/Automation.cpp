@@ -16,6 +16,8 @@ Automation::Automation(const String &name, AutomationRecorder * _recorder, bool 
 	allowKeysOutside(allowKeysOutside)
 {
 
+	notifyStructureChangeWhenLoadingData = false;
+		
 	comparator.compareFunc = &Automation::compareTime;
 
 	itemDataType = "AutomationKey"; 
@@ -226,6 +228,8 @@ void Automation::addItems(Array<Point<float>> keys, bool removeExistingOverlappi
 	BaseManager::addItems(newKeys);
 
 	if(selectionManager != nullptr) selectionManager->setEnabled(true);
+
+
 }
 
 AutomationKey * Automation::addItem(const float _position, const float _value, bool addToUndo, bool reorder)
