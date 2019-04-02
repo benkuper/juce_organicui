@@ -317,11 +317,22 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 	case StandardApplicationCommandIDs::copy:
 	case StandardApplicationCommandIDs::cut:
 	{
-		BaseItem * item = InspectableSelectionManager::activeSelectionManager->getInspectableAs<BaseItem>();
-		if (item != nullptr)
+		Array<BaseItem *> items = InspectableSelectionManager::activeSelectionManager->getInspectablesAs<BaseItem>();
+		if (!items.isEmpty())
 		{
-			item->copy();
-			if (info.commandID == StandardApplicationCommandIDs::cut) item->remove();
+			var data = new DynamicObject();
+			data.getDynamicObject()->setProperty("itemType", items[0]->itemDataType);
+
+			var itemsData = var();
+			for (auto &i : items)
+			{
+				itemsData.append(i->getJSONData());
+				if (info.commandID == StandardApplicationCommandIDs::cut) i->remove();
+			}
+
+			data.getDynamicObject()->setProperty("items", itemsData);
+			SystemClipboard::copyTextToClipboard(JSON::toString(data));
+			LOG(items.size() << "items copied to clipboard");
 		}
 	}
 

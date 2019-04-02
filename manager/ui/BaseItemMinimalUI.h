@@ -45,7 +45,6 @@ public:
 
 	virtual void containerChildAddressChangedAsync(ControllableContainer *) {}
 	virtual void controllableFeedbackUpdateInternal(Controllable *) {} //override this in child classes
-	
 
 };
 
@@ -178,7 +177,7 @@ void BaseItemMinimalUI<T>::newMessage(const ContainerAsyncEvent & e)
 		containerChildAddressChangedAsync(e.targetContainer);
 	}
 	break;
-            
+
         default:
             break;
 	}

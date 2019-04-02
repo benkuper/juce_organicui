@@ -244,6 +244,37 @@ AutomationKey * Automation::addItem(const float _position, const float _value, b
 
 }
 
+Array<AutomationKey*> Automation::addItemsFromClipboard(bool showWarning)
+{
+	Array<AutomationKey *> keys = BaseManager::addItemsFromClipboard(showWarning);
+	if (keys.isEmpty()) return nullptr;
+	
+	float minTime = keys[0]->position->floatValue();
+	float maxTime = keys[0]->position->floatValue();
+	for (auto &k : keys)
+	{
+		minTime = jmin(minTime, k->position->floatValue());
+		maxTime = jmax(maxTime, k->position->floatValue());
+	}
+
+	float diffTime = position->floatValue() - minTime;
+	
+	//Remove all keys in paste range
+	Array<AutomationKey *> keysToRemove;
+	for (auto &k : items)
+	{
+		if (keys.contains(k)) continue;
+		if(k->position->floatValue() >= minTime+diffTime && k->position->floatValue() <= maxTime+diffTime) keysToRemove.add(k);
+	}
+	removeItems(keysToRemove);
+
+
+	for (auto & k : keys) k->position->setValue(k->position->floatValue() + diffTime);
+	reorderItems();
+
+	return  keys;
+}
+
 void Automation::onControllableFeedbackUpdate(ControllableContainer * cc, Controllable * c)
 {
 	AutomationKey * t = dynamic_cast<AutomationKey *>(cc);

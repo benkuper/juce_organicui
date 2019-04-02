@@ -35,7 +35,7 @@ AutomationUI::AutomationUI(Automation * _automation, Colour c) :
 	resizeOnChildBoundsChanged = false;
 	addExistingItems();
 
-	noItemText = "Add keys by double-clicking here";
+	noItemText = "Add keys by double-clicking or alt+click here";
 
 	viewMode = autoSwitchMode ? EDIT : VIEW; //force trigger change on setViewMode
 	setViewMode(autoSwitchMode ? VIEW : EDIT);

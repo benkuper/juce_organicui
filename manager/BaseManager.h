@@ -8,11 +8,7 @@
   ==============================================================================
 */
 
-#ifndef BASEMANAGER_H_INCLUDED
-#define BASEMANAGER_H_INCLUDED
-
-
-
+#pragma once
 
 template <class T>
 class BaseManager :
@@ -37,7 +33,7 @@ public:
 	virtual T * createItem(); //to override if special constructor to use
 	virtual T * addItemFromData(var data, bool addToUndo = true); //to be overriden for specific item creation (from data)
 	virtual Array<T *> addItemsFromData(var data, bool addToUndo = true); //to be overriden for specific item creation (from data)
-	virtual T * addItemFromClipboard(bool showWarning = true);
+	virtual Array<T *> addItemsFromClipboard(bool showWarning = true);
 	virtual bool canAddItemOfType(const String &typeToCheck);
 
 	virtual void loadItemsData(var data);
@@ -595,7 +591,7 @@ Array<T*> BaseManager<T>::addItemsFromData(var data, bool addToUndo)
 }
 
 template<class T>
-T * BaseManager<T>::addItemFromClipboard(bool showWarning)
+Array<T *> BaseManager<T>::addItemsFromClipboard(bool showWarning)
 {
 	if (!userCanAddItemsManually) return nullptr;
 	String s = SystemClipboard::getTextFromClipboard();
@@ -609,9 +605,16 @@ T * BaseManager<T>::addItemFromClipboard(bool showWarning)
 		return nullptr;
 	}
 
-	int sIndex = items.indexOf(InspectableSelectionManager::mainSelectionManager->getInspectableAs<T>());
+	int sIndex = items.indexOf(InspectableSelectionManager::activeSelectionManager->getInspectableAs<T>());
 	if(sIndex >= 0) data.getDynamicObject()->setProperty("index", sIndex+1);
-	return addItemFromData(data);
+	Array<T *> copiedItems = addItemsFromData(data.getProperty("items",var()));
+
+	for (auto &i : copiedItems)
+	{
+		((BaseItem *)i)->viewUIPosition->setPoint(((BaseItem *)i)->viewUIPosition->getPoint() + Point<float>(20, 20));
+	}
+
+	return copiedItems;
 }
 
 template<class T>
@@ -765,7 +768,7 @@ void BaseManager<T>::askForDuplicateItem(BaseItem * item)
 template<class T>
 void BaseManager<T>::askForPaste()
 {
-	addItemFromClipboard();
+	addItemsFromClipboard();
 }
 
 template<class T>
@@ -863,8 +866,3 @@ InspectableEditor * BaseManager<T>::getEditor(bool isRoot)
 	return new GenericManagerEditor<T>(this, isRoot);
 
 }
-
-
-#endif  // BASEMANAGER_H_INCLUDED
-
-

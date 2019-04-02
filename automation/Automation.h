@@ -49,10 +49,10 @@ public:
 	AutomationKey * createItem() override;
 	void addItems(Array<Point<float>> keys, bool removeExistingOverlappingKeys = true, bool addToUndo = true, bool autoSmoothCurve = false);
 	AutomationKey * addItem(const float position, const float value, bool addToUndo = true, bool reorder = false);
+	Array<AutomationKey *> addItemsFromClipboard(bool showWarning = false);
 
 	void removeKeysBetween(float start, float end);
 	void removeAllSelectedKeys();
-
 
 	void setSnapPositions(Array<float> positions);
 
@@ -70,8 +70,6 @@ public:
 	static int compareTime(AutomationKey * t1, AutomationKey * t2);
 
 	InspectableEditor * getEditor(bool isRoot) override;
-
-
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Automation)
