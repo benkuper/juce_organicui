@@ -123,7 +123,7 @@ void StringParameterFileUI::buttonClicked(Button * b)
 {
 	if (b == &browseBT)
 	{
-		FileChooser chooser("Select a file", File(fp->getAbsolutePath()));
+		FileChooser chooser("Select a file", File(fp->getAbsolutePath()), fp->fileTypeFilter);
 		bool result = chooser.browseForFileToOpen();
 		if (result && !parameter.wasObjectDeleted()) parameter->setUndoableValue(parameter->stringValue(),chooser.getResult().getFullPathName());
 	} else if (b == relativeBT)

@@ -21,6 +21,8 @@ public:
 
 	String absolutePath;
 
+	String fileTypeFilter;
+
     // need to override this function because var Strings comparison  is based on pointer (we need full string comp)
     virtual void setValueInternal(var&) override;
 	bool forceRelativePath;
