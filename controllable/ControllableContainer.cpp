@@ -17,7 +17,6 @@ ControllableContainer::ControllableContainer(const String & niceName) :
 	skipControllableNameInAddress(false),
 	nameCanBeChangedByUser(false),
 	isTargettable(true),
-	hideInEditor(false),
 	canInspectChildContainers(true),
 	editorIsCollapsed(false),
 	editorCanBeCollapsed(true),

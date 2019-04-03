@@ -35,6 +35,7 @@ void InspectableEditor::componentMovedOrResized(Component & c, bool wasMoved, bo
 void InspectableEditor::updateVisibility()
 {
 	if (parentInspector == nullptr) return;
+	if (inspectable.wasObjectDeleted()) return;
 
 	juce::Rectangle<int> r = parentInspector->getLocalArea(this, getLocalBounds()); //getLocalArea(parentInspector, parentInspector->getLocalBounds());
 	juce::Rectangle<int> ir = parentInspector->getLocalBounds().getIntersection(r);

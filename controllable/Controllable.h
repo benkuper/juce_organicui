@@ -51,7 +51,6 @@ public:
 	bool hasCustomShortName;
 	bool isControllableExposed;
 	bool isControllableFeedbackOnly;
-	bool hideInEditor;
 	bool hideInOutliner;
 	bool includeInScriptObject;
 

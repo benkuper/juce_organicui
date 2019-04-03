@@ -34,7 +34,6 @@ public:
 	bool isTargettable; //for controllableChooser
 
 	//Editor
-	bool hideInEditor;
 	bool canInspectChildContainers;
 	bool editorIsCollapsed;
 	bool editorCanBeCollapsed;

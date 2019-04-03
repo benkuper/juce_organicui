@@ -17,7 +17,6 @@ Controllable::Controllable(const Type &type, const String & niceName, const Stri
 	hasCustomShortName(false),
 	isControllableExposed(true),
 	isControllableFeedbackOnly(false),
-	hideInEditor(false),
 	hideInOutliner(false),
 	includeInScriptObject(true),
 	isTargettable(true),

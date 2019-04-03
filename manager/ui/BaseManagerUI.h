@@ -311,6 +311,8 @@ bool BaseManagerUI<M, T, U>::keyPressed(const KeyPress & e)
 {
 	if (InspectableContentComponent::keyPressed(e)) return true;
 
+	if (manager->selectionManager != InspectableSelectionManager::activeSelectionManager) return false;
+
 	if (e.getModifiers().isCommandDown())
 	{
 		/*
@@ -327,7 +329,8 @@ bool BaseManagerUI<M, T, U>::keyPressed(const KeyPress & e)
 		}
 	} else
 	{
-		if ((e.getKeyCode() == e.deleteKey || e.getKeyCode() == e.backspaceKey) && manager->selectionManager == InspectableSelectionManager::activeSelectionManager)
+		/*
+		if (e.getKeyCode() == e.deleteKey || e.getKeyCode() == e.backspaceKey)
 		{
 			Array<T *> itemsToRemove;
 			for (auto & i : manager->selectionManager->currentInspectables)
@@ -339,6 +342,7 @@ bool BaseManagerUI<M, T, U>::keyPressed(const KeyPress & e)
 			manager->removeItems(itemsToRemove);
 			return true;
 		}
+		*/
 	}
 	return false;
 }

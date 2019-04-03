@@ -11,192 +11,25 @@ namespace OrganicUIBinaryData
 static const unsigned char temp_binary_data_0[] =
 "\x89PNG\r\n"
 "\x1a\n"
-"\0\0\0\rIHDR\0\0\0\x18\0\0\0\x18\x08\x06\0\0\0\xe0w=\xf8\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0;\xa6iTXtXML:com.adobe.xmp\0\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n"
-"<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"Adobe XMP Core 5.6-c138 79.159824, 2016/09/14-01:09:01        \">\n"
-"   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n"
-"      <rdf:Description rdf:about=\"\"\n"
-"            xmlns:xmp=\"http://ns.adobe.com/xap/1.0/\"\n"
-"            xmlns:dc=\"http://purl.org/dc/elements/1.1/\"\n"
-"            xmlns:photoshop=\"http://ns.adobe.com/photoshop/1.0/\"\n"
-"            xmlns:xmpMM=\"http://ns.adobe.com/xap/1.0/mm/\"\n"
-"            xmlns:stEvt=\"http://ns.adobe.com/xap/1.0/sType/ResourceEvent#\"\n"
-"            xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\"\n"
-"            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\">\n"
-"         <xmp:CreatorTool>Adobe Photoshop CC 2017 (Windows)</xmp:CreatorTool>\n"
-"         <xmp:CreateDate>2017-01-04T13:04:31+01:00</xmp:CreateDate>\n"
-"         <xmp:ModifyDate>2017-01-04T13:10:03+01:00</xmp:ModifyDate>\n"
-"         <xmp:MetadataDate>2017-01-04T13:10:03+01:00</xmp:MetadataDate>\n"
-"         <dc:format>image/png</dc:format>\n"
-"         <photoshop:ColorMode>3</photoshop:ColorMode>\n"
-"         <xmpMM:InstanceID>xmp.iid:885bffc4-07da-a748-86df-41c7a2b9dc65</xmpMM:InstanceID>\n"
-"         <xmpMM:DocumentID>adobe:docid:photoshop:b57f0b78-d276-11e6-86fd-f22ea20d4df0</xmpMM:DocumentID>\n"
-"         <xmpMM:OriginalDocumentID>xmp.did:c47ec9ce-5036-1546-8ca3-36273bed87f6</xmpMM:OriginalDocumentID>\n"
-"         <xmpMM:History>\n"
-"            <rdf:Seq>\n"
-"               <rdf:li rdf:parseType=\"Resource\">\n"
-"                  <stEvt:action>created</stEvt:action>\n"
-"                  <stEvt:instanceID>xmp.iid:c47ec9ce-5036-1546-8ca3-36273bed87f6</stEvt:instanceID>\n"
-"                  <stEvt:when>2017-01-04T13:04:31+01:00</stEvt:when>\n"
-"                  <stEvt:softwareAgent>Adobe Photoshop CC 2017 (Windows)</stEvt:softwareAgent>\n"
-"               </rdf:li>\n"
-"               <rdf:li rdf:parseType=\"Resource\">\n"
-"                  <stEvt:action>saved</stEvt:action>\n"
-"                  <stEvt:instanceID>xmp.iid:6286ab82-7d72-974d-b733-8603bb425782</stEvt:instanceID>\n"
-"                  <stEvt:when>2017-01-04T13:10:03+01:00</stEvt:when>\n"
-"                  <stEvt:softwareAgent>Adobe Photoshop CC 2017 (Windows)</stEvt:softwareAgent>\n"
-"                  <stEvt:changed>/</stEvt:changed>\n"
-"               </rdf:li>\n"
-"               <rdf:li rdf:parseType=\"Resource\">\n"
-"                  <stEvt:action>saved</stEvt:action>\n"
-"                  <stEvt:instanceID>xmp.iid:885bffc4-07da-a748-86df-41c7a2b9dc65</stEvt:instanceID>\n"
-"                  <stEvt:when>2017-01-04T13:10:03+01:00</stEvt:when>\n"
-"                  <stEvt:softwareAgent>Adobe Photoshop CC 2017 (Windows)</stEvt:softwareAgent>\n"
-"                  <stEvt:changed>/</stEvt:changed>\n"
-"               </rdf:li>\n"
-"            </rdf:Seq>\n"
-"         </xmpMM:History>\n"
-"         <tiff:Orientation>1</tiff:Orientation>\n"
-"         <tiff:XResolution>720000/10000</tiff:XResolution>\n"
-"         <tiff:YResolution>720000/10000</tiff:YResolution>\n"
-"         <tiff:ResolutionUnit>2</tiff:ResolutionUnit>\n"
-"         <exif:ColorSpace>65535</exif:ColorSpace>\n"
-"         <exif:PixelXDimension>24</exif:PixelXDimension>\n"
-"         <exif:PixelYDimension>24</exif:PixelYDimension>\n"
-"      </rdf:Description>\n"
-"   </rdf:RDF>\n"
-"</x:xmpmeta>\n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                                                                                                    \n"
-"                            \n"
-"<?xpacket end=\"w\"?>\xf3\x9f""E8\0\0\0 cHRM\0\0z%\0\0\x80\x83\0\0\xf9\xff\0\0\x80\xe9\0\0u0\0\0\xea`\0\0:\x98\0\0\x17o\x92_\xc5""F\0\0\x02\xbbIDATx\xda\xec\x95\xbd\x8fTe\x14\xc6\x7f\xe7}\xef\xc7\xcc\xec\xec\xb0\xb3\xab\x92""e\xfd Y!\x8b\x0c\x9d\xc6h"
-"\xc5\x1f\x80""Bc\xa1""f\xad\xacH\x8c\x18!Tv\x80%\x95@l\xd4""BL,61\xd4\x16Zh\xa1\x05\x89\n"
-"q\x83H\\\x8c""a\xbf\x86\xd9\xf9\xba\xf7\xbd\xf7}\x8f\x05\xd0m\xf4n\x01\x15Oy\x9a_\x9es\x9e<GT\x95\x87)\xc3""C\xd6""c\xc0\xff*\xdan(\x08\xa2\x11\x07\xaf\xbe\x8b\xf1\x96\"\n"
-"\x0b\x91O\x8f\tr\x08\x10\x95\xf0+\x94\xdf\x80\xfc\xa6\x16\xaew>\xc5[\x87\xa2\xd5\0\0*%*\x01\xeb[_ \xc5;\x06\xc3Xs\x14h\x90\x12""0gM\x88.\x97v\xb8\xe8\xad\x0b;r\xb0\xe7\x9f\xfd\x94V@k\xbf\xa8\xa1\x03\xe0\xf1""4L\n"
-"@\xa9\x1e""A\0y\xcb\x16\xc9\x8bS\xdd""C\x07""B\xa4\x81\xc9\x8a\x80\xb9\x95W\xb1n\xf6\xf2\xa8\xe6;\xde:P\xe1\xef\xa2\xcb\xd2\xdeS\xd4L\xcc\x91\x9b\x1f""3\x1bO\x11\x8c""C\xd4\xec\x9f\xff\xfd\x8d%\x95\xfc\x18/W<\xf2""F\x8b\xe7\x87\x8d\xfcM\xa1\x04\x15\xf4"
-"\xbe\x83v4A\xdbN\xe0\t(\xa0\x08*PF\x9bG\x8bh\xadS9E\xcd""a{1\n"
-"\x96 \x81\xdbn\x9d[n\x95^\xbeJ\xcf\x8f\xd8\xf2""c\xba\xf9\x1dn\xb9UV\xdc:\x01\x8f\x18\x8b\xf5\xcd\xb7+\xdf\0""1\x0b\x83""0\xa4""e\x1a,\xed;M;j\xd2\x0b#\xe6\xcdS\x18\x84\xef:\xe7\x99\xb4u\x86>\xe7\xe4_\x9f\xb1^\xf6i\xdat\xbe""2@\x83O0\x82(\xc4=O,\x05q"
-"Y 3\x80@\xb2Y\x90\xd8\x18\xa7\x05(\x88\x80""B\\\x19\xe0\x07Y\xbf""9\xd3\"\xcf\x1dG\xfe""8G\x19<\x83|\x8d\xef_\xfa\x84\xbaIx\xe5\xda\xfb""4\xd3'\xb0\xc6\xf0L{\x96\xc9z\x13\xb7""1\x18U\x07\x8c\xb3\x1f\xb4l-\x8a\x11\x9e\xdd\xfd""4*\xb0\xe2&h\xa5\x13\xd4"
-"$fzn/s\xc9""4\xa2\x02>\xa0\xc1Sle?W\xaf\x8a|\xf0\xa5\xdeu\x98""8\x81\xd2""C\x11""0\x1e\xfa\xd9\x90~6\xc4x\xa0\x08PzLj\xd1\r%\xdb\xe4\xf3\xca\x0e\xfa\xbb\x86\xfd,[9>\xbd""5\x7f""A\xa6\"\xc8<s\xe9\x0c\xef-_B\x14""f\xdbm$\x80\xd4,\xa6gY\x1f\xdc\xfe""0{\xb2"
-"\xe8n\x9b\x97\xed\x1e\x8e \x10\xe0\xb9o_;\xdf\xd6\x17N\xb0\xdb#F\x18\xa9\x03\xa0!)!\x04""d\xcd\xd0\x0b\xcb\x17\xff<|\xe5""8\x89\xdfY\x17""a`\xdc\xea~\xd0\xb8~\xf7G-\x8a\x8fl\xbd\xd6\x89\x93{\x1bu\xc5\0?p\xd7\xcc\xa6=3>x\xe7+\x12\xbf\xb3""6} \xab\tZ\xf7"
-"_\xe7\xe3\xd1O6\xcb_\x8fL\xbc\x80\n"
-"\xa5""d\xcb\xa1\x94+i<y\xc3n\x9f\xce\xff^\xd1\xe3\x8f\xf6H\x01\xff\x0e\0\x1c';\xdb\x9d\xa1\xf8\xfb\0\0\0\0IEND\xae""B`\x82";
+"\0\0\0\rIHDR\0\0\0\x14\0\0\0\x14\x08\x06\0\0\0\x8d\x89\x1d\r\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0\x07\xd9iTXtXML:com.adobe.xmp\0\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?> <x:xmpmeta xmlns:x=\"adobe"
+":ns:meta/\" x:xmptk=\"Adobe XMP Core 5.6-c145 79.163499, 2018/08/13-16:40:22        \"> <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"> <rdf:Description rdf:about=\"\" xmlns:xmp=\"http://ns.adobe.com/xap/1.0/\" xmlns:dc=\"http://p"
+"url.org/dc/elements/1.1/\" xmlns:photoshop=\"http://ns.adobe.com/photoshop/1.0/\" xmlns:xmpMM=\"http://ns.adobe.com/xap/1.0/mm/\" xmlns:stEvt=\"http://ns.adobe.com/xap/1.0/sType/ResourceEvent#\" xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\" xmlns:exif"
+"=\"http://ns.adobe.com/exif/1.0/\" xmp:CreatorTool=\"Adobe Photoshop CC 2017 (Windows)\" xmp:CreateDate=\"2017-01-04T13:04:31+01:00\" xmp:ModifyDate=\"2019-04-02T15:28:58-07:00\" xmp:MetadataDate=\"2019-04-02T15:28:58-07:00\" dc:format=\"image/png\" "
+"photoshop:ColorMode=\"3\" photoshop:ICCProfile=\"sRGB IEC61966-2.1\" xmpMM:InstanceID=\"xmp.iid:b1f47d48-a1d5-614b-828b-02c318b82d7d\" xmpMM:DocumentID=\"adobe:docid:photoshop:b57f0b78-d276-11e6-86fd-f22ea20d4df0\" xmpMM:OriginalDocumentID=\"xmp.did:"
+"c47ec9ce-5036-1546-8ca3-36273bed87f6\" tiff:Orientation=\"1\" tiff:XResolution=\"720000/10000\" tiff:YResolution=\"720000/10000\" tiff:ResolutionUnit=\"2\" exif:ColorSpace=\"65535\" exif:PixelXDimension=\"24\" exif:PixelYDimension=\"24\"> <xmpMM:Hist"
+"ory> <rdf:Seq> <rdf:li stEvt:action=\"created\" stEvt:instanceID=\"xmp.iid:c47ec9ce-5036-1546-8ca3-36273bed87f6\" stEvt:when=\"2017-01-04T13:04:31+01:00\" stEvt:softwareAgent=\"Adobe Photoshop CC 2017 (Windows)\"/> <rdf:li stEvt:action=\"saved\" stEv"
+"t:instanceID=\"xmp.iid:6286ab82-7d72-974d-b733-8603bb425782\" stEvt:when=\"2017-01-04T13:10:03+01:00\" stEvt:softwareAgent=\"Adobe Photoshop CC 2017 (Windows)\" stEvt:changed=\"/\"/> <rdf:li stEvt:action=\"saved\" stEvt:instanceID=\"xmp.iid:b1f47d48-"
+"a1d5-614b-828b-02c318b82d7d\" stEvt:when=\"2019-04-02T15:28:58-07:00\" stEvt:softwareAgent=\"Adobe Photoshop CC 2019 (Windows)\" stEvt:changed=\"/\"/> </rdf:Seq> </xmpMM:History> </rdf:Description> </rdf:RDF> </x:xmpmeta> <?xpacket end=\"r\"?>\x13""1"
+"\0\x9b\0\0\x02\xbcIDAT8\x8d\xb5\xd4\xbb\x8f\xd4U\x14\xc0\xf1\xef\xb9\xf7\xf7\x98\x99\x9d\x1dwv\x11\xb2\xac\"\xc9\"Ya\xe8 F*\xff\0\x14\x1a\n"
+"4keEB\xc4(\xa1\xa2\xf3QR\xf9\x08\x8dZ\x08\t\xc5&\x84\xda""B\x0b-\xa0""0Q!n\x14\x08\x8b""1\xeck\x98\x9d\xd7\xefw\x7f\xbf{\x0f\x85&\xee\x06\x86j=\xdd-\xee'\xe7\x9es\xee\x11Ue;\xc3l\xab\xf6\x7f\x80\xd1\xe6\x83 \x88""F\x1c\xfc\xf9]\x8c\xb7\x14Q\x98\x8b|z"
+"B\x90""C\x80\xa8\x84_\xa1\xbc\x06\xf2\x9bZ\xb8\xdd\xba\x84\xb7\x0e""E\x9f\x0e\x02\xa8\x94\xa8\x04\xaco|\x83\x14\xef\x18\x0c""C\xcdQ\xa0""FJ\xc0|lBt\xb9\xb4\xfdyo]xf\x86\xbb\xff\xdeOi\x05\xb4\xf2\x8b\x1aZ\0\x1eO\xcd\xa4\0\x94\xea\x11\x04\x90\xb7l\x91\x1c"
+"\x9eh\x1fz%D\x1a\x18\x1f\x01\xce,\x1d\xc5\xba\xe9\xcb\x83\x8aoy\xeb@\x85\xbf\x8a""6\x0b{\xcfQ11\xc7\xee|\xcat<A0\x0eQ\xb3\x7f\xf6\xf7\x93\x0b*\xf9\t^\xfd\xcf\xd8\xd2\x94\xb5\x06\xfb\xfa\xb5\xfc\x94P\x82\n"
+"\xfao\x86\xcdh\x8c\xa6\x1d\xc3\x13P@\x11T\xa0\x8c\xd6\x8f\x17\xd1Jk\xb3\xb1\x05\xac\xf7\x9b\xf3Q\xb0\x04\t<p\xab\xdcs\xcbt\xf2""e:~\xc0\x86\x1f\xd2\xce\x1fr\xcf-\xb3\xe4V\tx\xc4X\xac\xaf\xbf=\xb2\x86\x88\x99\xeb\x85>\rSc\xe1\xe5\xf3""4\xa3:\x9d""0`\xd6"
+"\xec\xc4 |\xdf\xba\xc8\xb8\xad\xd2\xf7""9\x1f\xde\xff\x8a\xd5\xb2K\xdd\xa6\xb3#A\r>\xc1\x08\xa2\x10w<\xb1\x14\xc4""e\x81L\x01\x02\xc9zAbc\x9c\x16\xa0 \x02\n"
+"\xf1H\xd0\xf7\xb2n}\xaa""A\x9e;\x8e\xfd\xf9\te\xf0\xf4\xf2\x15~8\xf2\x19U\x93\xf0\xda\xad\xf7\xa8\xa7;\xb0\xc6\xf0""bs\x9a\xf1j\x1d\xb7\xd6\x1b\x8c\x06\x87\xd9\x8fZ6\xe6\xc5\x08{v\xbd\x80\n"
+",\xb9""1\x1a\xe9\x18\x15\x89\x99\x9c\xd9\xcbL2\x89\xa8\x80\x0fh\xf0\x14\x1b\xd9\xcd\x91M!\xef}\xab\x8f\x1c&N\xa0\xf4P\x04\x8c\x87n\xd6\xa7\x9b\xf5""1\x1e(\x02\x94\x1e\x93ZtM\xc9\xd6\xf9zd\x86\xdd\xe7\xfa\xdd,[:=\xb9""1\xfb\xb9LD\x90yf\xd2)\xce,~\x89("
+"L7\x9bH\0\xa9XL\xc7\xb2\xda{\xf0""A\xf6|\xd1\xde\xd2\xd7\xcd\xebK\x10\x08\xf0\xd2wo\\l\xea\x81\xb3\xec\xf2\x88\x11\x06\xea\0\xa8IJ\x08\x01Y1t\xc2\xe2\x17w_\xbf~\x9a\xc4?\xfb/c`\xd8h\xbf_\xbb\xfd\xe8'-\x8a\x0b\xb6Zi\xc5\xc9?\x95qE\x0f\xdfs\xb7\xcc\xba"
+"\xfdhx\xf0\xe1\x15\x12\xff\xc4\xf5'A\xc0j\x82V\xfd\xd5|8\xb8""a\xb3\xfc\xcd\xc8\xc4s\xa8PJ\xb6\x18J\xb9\x9e\xc6\xe3\x7f\xd8\xad\xd3\xf2\xf4'oGl\xfb\x82}\x0c\xca\xf5;\xd3\x01\xd8\x8b\xdc\0\0\0\0IEND\xae""B`\x82";
 
 const char* add_png = (const char*) temp_binary_data_0;
 
@@ -696,8 +529,35 @@ static const unsigned char temp_binary_data_9[] =
 
 const char* down_png = (const char*) temp_binary_data_9;
 
-//================== edit.png ==================
+//================== duplicate.png ==================
 static const unsigned char temp_binary_data_10[] =
+"\x89PNG\r\n"
+"\x1a\n"
+"\0\0\0\rIHDR\0\0\0\x10\0\0\0\x10\x08\x06\0\0\0\x1f\xf3\xff""a\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0\x07\xd9iTXtXML:com.adobe.xmp\0\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?> <x:xmpmeta xmlns:x=\"adob"
+"e:ns:meta/\" x:xmptk=\"Adobe XMP Core 5.6-c145 79.163499, 2018/08/13-16:40:22        \"> <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"> <rdf:Description rdf:about=\"\" xmlns:xmp=\"http://ns.adobe.com/xap/1.0/\" xmlns:dc=\"http://"
+"purl.org/dc/elements/1.1/\" xmlns:photoshop=\"http://ns.adobe.com/photoshop/1.0/\" xmlns:xmpMM=\"http://ns.adobe.com/xap/1.0/mm/\" xmlns:stEvt=\"http://ns.adobe.com/xap/1.0/sType/ResourceEvent#\" xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\" xmlns:exi"
+"f=\"http://ns.adobe.com/exif/1.0/\" xmp:CreatorTool=\"Adobe Photoshop CC 2017 (Windows)\" xmp:CreateDate=\"2017-01-04T13:04:31+01:00\" xmp:ModifyDate=\"2019-04-02T15:20:36-07:00\" xmp:MetadataDate=\"2019-04-02T15:20:36-07:00\" dc:format=\"image/png\""
+" photoshop:ColorMode=\"3\" photoshop:ICCProfile=\"sRGB IEC61966-2.1\" xmpMM:InstanceID=\"xmp.iid:643c014c-0927-ab40-8918-3175456971c3\" xmpMM:DocumentID=\"adobe:docid:photoshop:5f61a1d6-200e-2d49-8f48-e810aef5fe1f\" xmpMM:OriginalDocumentID=\"xmp.did"
+":c47ec9ce-5036-1546-8ca3-36273bed87f6\" tiff:Orientation=\"1\" tiff:XResolution=\"720000/10000\" tiff:YResolution=\"720000/10000\" tiff:ResolutionUnit=\"2\" exif:ColorSpace=\"65535\" exif:PixelXDimension=\"24\" exif:PixelYDimension=\"24\"> <xmpMM:His"
+"tory> <rdf:Seq> <rdf:li stEvt:action=\"created\" stEvt:instanceID=\"xmp.iid:c47ec9ce-5036-1546-8ca3-36273bed87f6\" stEvt:when=\"2017-01-04T13:04:31+01:00\" stEvt:softwareAgent=\"Adobe Photoshop CC 2017 (Windows)\"/> <rdf:li stEvt:action=\"saved\" stE"
+"vt:instanceID=\"xmp.iid:6286ab82-7d72-974d-b733-8603bb425782\" stEvt:when=\"2017-01-04T13:10:03+01:00\" stEvt:softwareAgent=\"Adobe Photoshop CC 2017 (Windows)\" stEvt:changed=\"/\"/> <rdf:li stEvt:action=\"saved\" stEvt:instanceID=\"xmp.iid:643c014c"
+"-0927-ab40-8918-3175456971c3\" stEvt:when=\"2019-04-02T15:20:36-07:00\" stEvt:softwareAgent=\"Adobe Photoshop CC 2019 (Windows)\" stEvt:changed=\"/\"/> </rdf:Seq> </xmpMM:History> </rdf:Description> </rdf:RDF> </x:xmpmeta> <?xpacket end=\"r\"?>U\x97\xe1"
+"d\0\0\x02\x9fIDAT8\x8d\xa5\xd3\xbf\x8b\\e\x14\xc6\xf1\xef""9\xef\xbdw\xee\x8c\xbb\xb3;;JX\x97HdcX\xc9X\x19\t)\xad\x04\t\x9a\xc2""Fe\xfd\x03\x04""A\xd1\xc2\xc6.\x82\x95\xa5i\xb5""0\x81\x14\x0b""bcca\n"
+"E\xd6""B\xfc\x91HPYw\xd5U\xc8\xce\xec\xec\xcc\xdc\x99{\xef\xfb\xbe\xc7\"\xd9\x81\xad=\xfd\xf9\xf0\xf0p\x8e\x98\x19\xffg\x12\0\xde\x15\xcc\t\xdf_:O\x10%\xd1z#\xb8\xe4\n"
+"\"O\x01\"f?\xe1\xf9\x0c\xe1g\xa7""F\xef\xd6\x1d\\\x08\xf0\x81=\0\0\t\x86\x98\x11\x9a\xee\x13\x89\xbc\x86*\xe6\xa7\x80""A\xd2\x02\x89\xefG\xd5\xeb\xae\xf2\x9b.\x84x\"\xc1~\xfbQ\\\xe2\xb1\x9c\x1fU\xac\x07@\x08\xa8k\x01`\xc1\x83\x08\x08\xaf\xd4\xea.\x0c"
+"N/?\x99h\x8c\x8b\xc7\xc0\xde\x99""5\xaa\x87\xdd\xf5<-z\xae\x0e\x98@=\xfb\x8b""3\x17\xb6P\xcd\xf9}\xfb""2i\xb6\x8a\xfa\x88""99\xf7\xcb\xd3\xeb[Z\xda\x95\x8b\x80\x02\xb4\x97\x0e\xce\xb6\xdc\xe4""e\xbc`\xc2\xfd\xd8\x16H\xd2\x0e\x9at\xc0\x02\x88\x81\x1a\x82"
+"\x91\x0e\xfd\x8b\xc9\xa0\xeeq\x0cL\xb2\x85\xcd(\t\x12#U\xf1'U\xb1""C\xd9\x1f\x12\xfc\x90\x18\x8e(\xfb\x03\xaa""b\x87\xaa\xd8\x83\x18\xd1""D\x08-\xf7\xea\xbc\x03ql\xc4j\x8c\xa6m\x9e\xb8\xb8""E\x92u\x88~\x08\xe9:\xa0\xf4\x9e\xff\n"
+"\x97,\x12\xc2\x84\xdd\x1f\xde\xc1W\xf7pna}\x0e""Do\x99\n"
+"X\x14\x86\xe3\x14\x93\x94\xe0S:]A\x04\x0e\x0f""3\xc4""e\x88U\x18 \x08`\xe9\x1c\x18\x8f\xc3\xa8\xdb]\xa0,K~\xfb\xf6""21z\xca\x83""1\xcf\xbct\x0buMn\x7fq\x89""Fg\x01UG\xa7{\x9a""fk\x91\x83~U\xcc\x81\xe9$|\xedWlSE8\xb5\xfa\x18\"F\xd5\xdd\xa3\x91\xb7""Ar"
+"\xd6\xce\xae\x90\xe5k\x18""B\xf0\x10\x83q4\xae\xbf\x9b\x97X\x0e\xf9\xf4pd\xa4\xb9\xe2k\xa8=\x84\xa0\xcc\xa6#\xca\xd9\x88\x10\x95\xba\x06_C#S\x0e\n"
+"\xa3_\xcf>\x9e'X\xd2\xd1h\xb6?{\xfd(_\xf9h9\x17""f%4Zk\xdc\xdd~\x03""3\xa1\xb3\xb4J\x8c""B\xde\x10\x86\x95""2\xfe\xf7\xde\xdb\x8f""0\x1b\xcc\x81gw\xff&\x1a\xd7\xbe\xf4\x9c\x9b<\xdey\xf3T.\xa8\n"
+"\xdd\xe5\xe2\xfe\x99k\x8b\x18#\xfb\x13!\xfe""1\xb8\xf6\xdc\xce\xee\x87\xd9\x89g\x02T\xa0]N\xdf\xba\xf3O\xeb\x9b:\xb5\xf7\x9a\x0f\xb9^\x96\xa4\0\xd4\xbe""b\\\x84\xdb\xfdJ\xaf\x9e\x9fLo\x1c/\x9f\0\0,u4\xc5nN'\xe5\xf6l\xea^\xd0$\xd9""0@j\x7f\xd7\x13?O\xf3"
+"\xc6\xaf$\xee\xc4;\xff\x07\x82q2\xe8\xd6\xf7\xda\x95\0\0\0\0IEND\xae""B`\x82";
+
+const char* duplicate_png = (const char*) temp_binary_data_10;
+
+//================== edit.png ==================
+static const unsigned char temp_binary_data_11[] =
 "\x89PNG\r\n"
 "\x1a\n"
 "\0\0\0\rIHDR\0\0\0\x14\0\0\0\x14\x08\x06\0\0\0\x8d\x89\x1d\r\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0;\xa6iTXtXML:com.adobe.xmp\0\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n"
@@ -886,10 +746,10 @@ static const unsigned char temp_binary_data_10[] =
 "\xc3[-\x91\xb5\xd3\xf3q2\xc5\x08\xf5zU\x87\x02\x84\x06\x08""E\xc9\xbf\x9a\xef""0\xaf\xf6\xfd\xf6\xfd\x97\xf3""B\xea\xdc""cl@H\x83\xbf~=\xbd""d4\xcf\xc4\xf7\x1d""9\xfc\xc9m\xbb\xed\r\xc7\x8f\xb6H-&\x05\x02\x97\reh\xb9|cx\xe5\x9b\xb9\xb3g\xdf]*,!\xa4Yk"
 "\xeb\xff\xfe\xc7\xfew\0\xa1\x0cK'1\x01\x1f\xcd\0\0\0\0IEND\xae""B`\x82";
 
-const char* edit_png = (const char*) temp_binary_data_10;
+const char* edit_png = (const char*) temp_binary_data_11;
 
 //================== file.png ==================
-static const unsigned char temp_binary_data_11[] =
+static const unsigned char temp_binary_data_12[] =
 "\x89PNG\r\n"
 "\x1a\n"
 "\0\0\0\rIHDR\0\0\0\x14\0\0\0\x14\x08\x06\0\0\0\x8d\x89\x1d\r\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0;\xa6iTXtXML:com.adobe.xmp\0\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n"
@@ -1078,10 +938,10 @@ static const unsigned char temp_binary_data_11[] =
 "\xb2\x89\x19:RJ\xe6\xbe\x15\xf0|\x89""a\xe8\x13V\xa2\xea\x9a\xa8\xd8\xc9\xb0r\xa5\xdd\xbc\x15N?\x0c""5\x0c\x1d]E\xc6\x0c\xf3NU<qJ\x08\x91\xfd\xdbq\xd8\x80\x0e\x94N\xd4\xc5\xd2\xd0\xd6\x97\xa0K\xb6""eOyE\xf7\xbe\xaa\xa8\x93Q\xc7Y\xfc\xf7\x17\xfb\xf7\0"
 "eD\xed\x94\xb5""6r\x9f\0\0\0\0IEND\xae""B`\x82";
 
-const char* file_png = (const char*) temp_binary_data_11;
+const char* file_png = (const char*) temp_binary_data_12;
 
 //================== in.png ==================
-static const unsigned char temp_binary_data_12[] =
+static const unsigned char temp_binary_data_13[] =
 "\x89PNG\r\n"
 "\x1a\n"
 "\0\0\0\rIHDR\0\0\0\x18\0\0\0\x18\x08\x06\0\0\0\xe0w=\xf8\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0\x0c""EiTXtXML:com.adobe.xmp\0\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?> <x:xmpmeta xmlns:x=\"adobe:ns:m"
@@ -1104,10 +964,10 @@ static const unsigned char temp_binary_data_12[] =
 "\xd4\xebK\\F[\xb5\xea\x12\x19\x19\xed\x02)9\x99\x07h\xc9[\x12\x8a\x8a\xb7\xc0 \xe2\"\xa9\xb0\x03j\xe4\x07j\xbc\x02\xcd\xa1\xff\x99\x97#\x19\xbc\x1c\x12\xe6\xd0`\xb9\x0c""d\x0b\x90\\\x9a\"Y\x14\x02\xc4\xe7\x81\xa9\xeb'\xc8@0\x06\xa6""4hy\xe5Orq=Ze\xd2"
 "\xdd\x02\0\xc0\xa0\x92\xc2S0-\xb3\0\0\0\0IEND\xae""B`\x82";
 
-const char* in_png = (const char*) temp_binary_data_12;
+const char* in_png = (const char*) temp_binary_data_13;
 
 //================== out.png ==================
-static const unsigned char temp_binary_data_13[] =
+static const unsigned char temp_binary_data_14[] =
 "\x89PNG\r\n"
 "\x1a\n"
 "\0\0\0\rIHDR\0\0\0\x18\0\0\0\x18\x08\x06\0\0\0\xe0w=\xf8\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0\n"
@@ -1361,10 +1221,10 @@ static const unsigned char temp_binary_data_13[] =
 "\x94""c:\xd8\xcc\x03""3\xc6\x8e\xc9?\xf9\xec\x87\x92\x15\x1f\xccz\x99\x0f\r\x85\x8b\x96H\xefR\x9fy\xc1y}z}\xb1]4\xc9\x87""A\xb6\x18\xb3\xc9\xefq\xbd\xc9=\xf8\x18""dC\xb1&\xdf\xc6N\x13\xe4\xfb\xd5\x9c\xb8s\x1d""dG\xb8|\x9a\x1f\xa7)\xc7`\x90}o\xea\x9a\xd6"
 "\x8c\xeb\x1e\x1e""c\xa8\xe6;/W\x89\x9f\x06\xd9\x8b\x96\xce\xf5\xff_\xe6_+\xf0k\0\xd0\xe4i\x03%\xb1\xbf\x9d\0\0\0\0IEND\xae""B`\x82";
 
-const char* out_png = (const char*) temp_binary_data_13;
+const char* out_png = (const char*) temp_binary_data_14;
 
 //================== power.png ==================
-static const unsigned char temp_binary_data_14[] =
+static const unsigned char temp_binary_data_15[] =
 "\x89PNG\r\n"
 "\x1a\n"
 "\0\0\0\rIHDR\0\0\0\x14\0\0\0\x14\x08\x06\0\0\0\x8d\x89\x1d\r\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0""8$iTXtXML:com.adobe.xmp\0\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n"
@@ -1540,10 +1400,10 @@ static const unsigned char temp_binary_data_14[] =
 "\x9f\xfe\xd1\xdf\x9fo\xf4\xf5\xbd\x1b\xef\xed\xa5\xd0\xdd\xcd\xfe\xb3g\xfc\xf2\xf8""1\0I\xdf\xa7P,b=\x8f\x86\x08\xa9Z\xed\x1b\xbfZ\x9d\xac\x0c\x0ct\xde\xb2\x8a \x10\xc6\x1a\x8dq\xdb\xdf\x7f[\x9b\xcd\xc9\xd0q\xe8\x1a\x1a\xa2\xe7\xb5-@\x18""E\xb8""A\x80"
 "M\xa7\x17\x9c""0\xbc\xe2X\x1b!\xc2\x81k\xa3\"X\xd7\xb5""b\xcc\x15\x11\xb9-\xf0\x81\r\xc3""1+RxU\xa0[\x8e\xc8\x92\xaa~%\xc6|\xa7\xae\x8b\xfe\x0b\xf6\xd7\x8b\xfb\x9f\x7f\xec?\x07\0""0\xb7\x88""3G\xa9\x97W\0\0\0\0IEND\xae""B`\x82";
 
-const char* power_png = (const char*) temp_binary_data_14;
+const char* power_png = (const char*) temp_binary_data_15;
 
 //================== relative.png ==================
-static const unsigned char temp_binary_data_15[] =
+static const unsigned char temp_binary_data_16[] =
 { 137,80,78,71,13,10,26,10,0,0,0,13,73,72,68,82,0,0,0,20,0,0,0,20,8,6,0,0,0,141,137,29,13,0,0,0,9,112,72,89,115,0,0,11,19,0,0,11,19,1,0,154,156,24,0,0,5,18,105,84,88,116,88,77,76,58,99,111,109,46,97,100,111,98,101,46,120,109,112,0,0,0,0,0,60,63,120,112,
 97,99,107,101,116,32,98,101,103,105,110,61,34,239,187,191,34,32,105,100,61,34,87,53,77,48,77,112,67,101,104,105,72,122,114,101,83,122,78,84,99,122,107,99,57,100,34,63,62,32,60,120,58,120,109,112,109,101,116,97,32,120,109,108,110,115,58,120,61,34,97,100,
 111,98,101,58,110,115,58,109,101,116,97,47,34,32,120,58,120,109,112,116,107,61,34,65,100,111,98,101,32,88,77,80,32,67,111,114,101,32,53,46,54,45,99,49,52,50,32,55,57,46,49,54,48,57,50,52,44,32,50,48,49,55,47,48,55,47,49,51,45,48,49,58,48,54,58,51,57,
@@ -1578,10 +1438,10 @@ static const unsigned char temp_binary_data_15[] =
 13,138,9,118,126,243,117,119,203,240,152,233,219,49,65,58,123,143,96,109,99,4,232,221,17,208,57,136,86,111,185,241,181,179,7,236,63,211,187,245,190,17,32,126,199,34,217,190,75,166,123,235,105,231,233,215,38,37,157,13,109,97,6,201,110,88,29,1,255,2,155,
 195,170,249,74,62,245,188,0,0,0,0,73,69,78,68,174,66,96,130,0,0 };
 
-const char* relative_png = (const char*) temp_binary_data_15;
+const char* relative_png = (const char*) temp_binary_data_16;
 
 //================== reload.png ==================
-static const unsigned char temp_binary_data_16[] =
+static const unsigned char temp_binary_data_17[] =
 "\x89PNG\r\n"
 "\x1a\n"
 "\0\0\0\rIHDR\0\0\0\x14\0\0\0\x14\x08\x06\0\0\0\x8d\x89\x1d\r\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0;\xa6iTXtXML:com.adobe.xmp\0\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n"
@@ -1772,10 +1632,10 @@ static const unsigned char temp_binary_data_16[] =
 "\xa6""FC\xb3n#T\xbcu\xbd\xc0\x85\t\x87\xfd)\x03M\x08""f\x9c\x80\xdb\xc5\x08[\x17(\x05\xf7\xe8~\xa1\xdb\x16\x0f\x07\xd2\xa8""4E\x98\x1a\x03/\xf4\xe5\xf7\xae\xad""f\xbb\"w\xdc\x10`\xeb\x82\x82'\x19Y\xf2\xb9\xbe\xe8\x91+ILM\xa0\x0b\xc1~o\xed\xb7""C\xaat"
 "\xe0\xc9\xc7\xba\x16t\xdd\xac\\_(\x08%\x9c<u07\x9e_\xefn\x18\x99;3'\x8d\x01\xc7\xb2\xda\x8bh\xb6\0l)\xfd\x8c\x08\xa6k|o\xb0\xadw\xdf\xa7\x1d\xe9\x18\x81\xdc\xb9\x0f\xc5\xff~c\xff;\0\xf6i\x88\x92""d\xe7\xe9Z\0\0\0\0IEND\xae""B`\x82";
 
-const char* reload_png = (const char*) temp_binary_data_16;
+const char* reload_png = (const char*) temp_binary_data_17;
 
 //================== settings.png ==================
-static const unsigned char temp_binary_data_17[] =
+static const unsigned char temp_binary_data_18[] =
 "\x89PNG\r\n"
 "\x1a\n"
 "\0\0\0\rIHDR\0\0\0\x18\0\0\0\x18\x08\x06\0\0\0\xe0w=\xf8\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0""9\xeciTXtXML:com.adobe.xmp\0\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n"
@@ -1960,10 +1820,10 @@ static const unsigned char temp_binary_data_17[] =
 "\x90&\xc9\xa4!\x04\xbe""e\xa1\xa7\xe4\x83\xfd\x05\xfc\x1f\t\x94\xd6\xa0\x8c!m\xb5\xf0\xcb\xc6""7p{\x1b\xafR\xad\x1f\xd8\xbc\xb1\xfcP\xa3\xde@\xc2\x8b/\xb7""7\x9b\xe7\xf6\x8c\xed\xc6\x95\x9f~\xc6\xb5\x85\x05\xe4\\\x80y\xfe\xadY\xf4\xff\xcb\xfcW\t\xfe\x18"
 "\0\xf5O\xdd\xa1\xf8\xfc\xde\xfb\0\0\0\0IEND\xae""B`\x82";
 
-const char* settings_png = (const char*) temp_binary_data_17;
+const char* settings_png = (const char*) temp_binary_data_18;
 
 //================== target.png ==================
-static const unsigned char temp_binary_data_18[] =
+static const unsigned char temp_binary_data_19[] =
 "\x89PNG\r\n"
 "\x1a\n"
 "\0\0\0\rIHDR\0\0\0\x10\0\0\0\x10\x08\x06\0\0\0\x1f\xf3\xff""a\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0""9\xdeiTXtXML:com.adobe.xmp\0\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n"
@@ -2139,10 +1999,10 @@ static const unsigned char temp_binary_data_18[] =
 "%\xf0""2\x8c\xd0\xecq\x89\x05""0\x91\xc1^\x80\x1b\x01\x93\xd6\xa0\xfe\x8f\xdf\xb8n\x9a\xe9P8\xb6\xc2\\\x1f\xe2\xaaq/\xe3\xa7|g@\xcd\xd5V\x81%\x97o\x18\xe7>\xb7L\r#|\xd8S\rv\x08\xb4->\xef\xb5\x8d\x02\x16\x80+#\xb7m\x95\x01\xaeS\xbb\xf2""7\0v\xa1\x1f\x91"
 "\xeaW\r?\0\0\0\0IEND\xae""B`\x82";
 
-const char* target_png = (const char*) temp_binary_data_18;
+const char* target_png = (const char*) temp_binary_data_19;
 
 //================== trigger.png ==================
-static const unsigned char temp_binary_data_19[] =
+static const unsigned char temp_binary_data_20[] =
 { 137,80,78,71,13,10,26,10,0,0,0,13,73,72,68,82,0,0,0,20,0,0,0,20,8,6,0,0,0,141,137,29,13,0,0,0,9,112,72,89,115,0,0,11,19,0,0,11,19,1,0,154,156,24,0,0,5,235,105,84,88,116,88,77,76,58,99,111,109,46,97,100,111,98,101,46,120,109,112,0,0,0,0,0,60,63,120,112,
 97,99,107,101,116,32,98,101,103,105,110,61,34,239,187,191,34,32,105,100,61,34,87,53,77,48,77,112,67,101,104,105,72,122,114,101,83,122,78,84,99,122,107,99,57,100,34,63,62,32,60,120,58,120,109,112,109,101,116,97,32,120,109,108,110,115,58,120,61,34,97,100,
 111,98,101,58,110,115,58,109,101,116,97,47,34,32,120,58,120,109,112,116,107,61,34,65,100,111,98,101,32,88,77,80,32,67,111,114,101,32,53,46,54,45,99,49,52,50,32,55,57,46,49,54,48,57,50,52,44,32,50,48,49,55,47,48,55,47,49,51,45,48,49,58,48,54,58,51,57,
@@ -2181,10 +2041,10 @@ static const unsigned char temp_binary_data_19[] =
 17,5,112,206,225,131,129,27,6,136,36,31,43,219,158,86,156,45,64,32,4,132,51,16,2,128,51,48,207,5,254,138,141,248,159,229,198,25,220,120,11,56,37,144,25,14,123,101,83,201,20,93,168,170,10,133,8,32,28,0,169,95,33,255,251,198,254,19,139,182,209,108,58,71,
 243,114,0,0,0,0,73,69,78,68,174,66,96,130,0,0 };
 
-const char* trigger_png = (const char*) temp_binary_data_19;
+const char* trigger_png = (const char*) temp_binary_data_20;
 
 //================== uncheck.png ==================
-static const unsigned char temp_binary_data_20[] =
+static const unsigned char temp_binary_data_21[] =
 "\x89PNG\r\n"
 "\x1a\n"
 "\0\0\0\rIHDR\0\0\0\x18\0\0\0\x18\x08\x06\0\0\0\xe0w=\xf8\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0""9\xeciTXtXML:com.adobe.xmp\0\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n"
@@ -2364,10 +2224,10 @@ static const unsigned char temp_binary_data_20[] =
 "\xe3""AU\xed\x0e\x87+\xc6\xf8\xcb\xcc\xa6\xbb\xdd\xce\xbd\xd4\xf4\xde\xa7\xfd\x83Q\xcdn\xd8\x8a\x1fy\x9e/\xc4\x18'\x06\x03\x7f\xc2\xcc\xc6\x13""d\xa1\xd3)\x1e:\xe7^\xa6n\xfa\x11Xn\xba\x1b\xda\0\x15""d\x11\xd8\xa1\xaa\xb3\xddn\xe7\t\xb0!\x85u\x19\xf8\n"
 "|Ja\xfdQ\x0f\xcd\xa8\xfb\x80\xb4\xc9\x80\xd9t\xf4{-\xb7\xd9r\x9b\xf2\xff\xb9\xd1\xfa""C\xb0^m\xcd\xd7\xe3\xddx\x18\xd7\xfb\xb7\xe5\xcf\0\xfbk$DT\xd8\x07\x8a\0\0\0\0IEND\xae""B`\x82";
 
-const char* uncheck_png = (const char*) temp_binary_data_20;
+const char* uncheck_png = (const char*) temp_binary_data_21;
 
 //================== up.png ==================
-static const unsigned char temp_binary_data_21[] =
+static const unsigned char temp_binary_data_22[] =
 { 137,80,78,71,13,10,26,10,0,0,0,13,73,72,68,82,0,0,0,16,0,0,0,16,8,4,0,0,0,181,250,55,234,0,0,0,4,103,65,77,65,0,0,177,143,11,252,97,5,0,0,0,32,99,72,82,77,0,0,122,38,0,0,128,132,0,0,250,0,0,0,128,232,0,0,117,48,0,0,234,96,0,0,58,152,0,0,23,112,156,186,
 81,60,0,0,0,2,98,75,71,68,0,0,170,141,35,50,0,0,0,9,112,72,89,115,0,0,13,215,0,0,13,215,1,66,40,155,120,0,0,0,7,116,73,77,69,7,226,6,1,13,27,34,212,42,155,193,0,0,0,156,73,68,65,84,40,207,141,145,193,13,194,48,16,4,87,136,191,171,64,46,33,29,165,26,252,
 72,57,81,26,136,34,255,253,75,9,150,43,96,120,36,49,231,128,128,125,238,142,79,231,61,105,23,55,2,145,76,38,18,240,178,226,202,157,7,173,6,174,175,120,226,147,166,29,97,48,102,34,217,41,146,240,198,152,113,56,102,227,120,17,108,44,73,13,18,68,108,227,
@@ -2375,7 +2235,7 @@ static const unsigned char temp_binary_data_21[] =
 88,116,100,97,116,101,58,99,114,101,97,116,101,0,50,48,49,56,45,48,54,45,48,49,84,49,51,58,50,55,58,51,52,43,48,50,58,48,48,186,50,39,54,0,0,0,37,116,69,88,116,100,97,116,101,58,109,111,100,105,102,121,0,50,48,49,56,45,48,54,45,48,49,84,49,51,58,50,55,
 58,51,52,43,48,50,58,48,48,203,111,159,138,0,0,0,25,116,69,88,116,83,111,102,116,119,97,114,101,0,119,119,119,46,105,110,107,115,99,97,112,101,46,111,114,103,155,238,60,26,0,0,0,0,73,69,78,68,174,66,96,130,0,0 };
 
-const char* up_png = (const char*) temp_binary_data_21;
+const char* up_png = (const char*) temp_binary_data_22;
 
 
 const char* getNamedResource (const char* resourceNameUTF8, int& numBytes)
@@ -2388,7 +2248,7 @@ const char* getNamedResource (const char* resourceNameUTF8, int& numBytes)
 
     switch (hash)
     {
-        case 0xbb8f218b:  numBytes = 16103; return add_png;
+        case 0xbb8f218b:  numBytes = 2799; return add_png;
         case 0x47554015:  numBytes = 1797; return arrowdown_png;
         case 0xf8493b9d:  numBytes = 1781; return arrowright_png;
         case 0x709742e4:  numBytes = 14817; return cancel_png;
@@ -2398,6 +2258,7 @@ const char* getNamedResource (const char* resourceNameUTF8, int& numBytes)
         case 0xb55a97c5:  numBytes = 2643; return checkbox_on_png;
         case 0x87305890:  numBytes = 2389; return checkbox_on_readonly_png;
         case 0x5514e50c:  numBytes = 543; return down_png;
+        case 0xb579b0f5:  numBytes = 2770; return duplicate_png;
         case 0x5f823a74:  numBytes = 16204; return edit_png;
         case 0xd42db8e6:  numBytes = 16030; return file_png;
         case 0xb967d40f:  numBytes = 3608; return in_png;
@@ -2429,6 +2290,7 @@ const char* namedResourceList[] =
     "checkbox_on_png",
     "checkbox_on_readonly_png",
     "down_png",
+    "duplicate_png",
     "edit_png",
     "file_png",
     "in_png",
@@ -2455,6 +2317,7 @@ const char* originalFilenames[] =
     "checkbox_on.png",
     "checkbox_on_readonly.png",
     "down.png",
+    "duplicate.png",
     "edit.png",
     "file.png",
     "in.png",

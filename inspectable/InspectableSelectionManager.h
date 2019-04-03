@@ -25,7 +25,7 @@ public:
 	static InspectableSelectionManager * activeSelectionManager; //The last one having selected something, useful for key events like delete
 
 	bool enabled;
-	Array<Inspectable *> currentInspectables;
+	Array<WeakReference<Inspectable>> currentInspectables;
 	
 	template<class T>
 	T * getInspectableAs();
@@ -82,15 +82,19 @@ public:
 template<class T>
 T * InspectableSelectionManager::getInspectableAs()
 {
-	if (currentInspectables.size() == 0) return nullptr;
-	return dynamic_cast<T *>(currentInspectables[0]);
+	if (currentInspectables.size() == 0 || currentInspectables[0].wasObjectDeleted()) return nullptr;
+	return dynamic_cast<T *>(currentInspectables[0].get());
 }
 
 template<class T>
 Array<T*> InspectableSelectionManager::getInspectablesAs()
 {
 	Array<T *> result;
-	for (auto &i : currentInspectables) result.add(dynamic_cast<T *>(i));
+	for (auto &i : currentInspectables)
+	{
+		if (i.wasObjectDeleted()) continue;
+		result.add(dynamic_cast<T *>(i.get()));
+	}
 	return result;
 }
 

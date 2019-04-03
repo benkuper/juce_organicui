@@ -25,6 +25,7 @@ public:
 	ImageButton * getTargetBT();
 	ImageButton * getPowerBT();  
 	ImageButton * getAddBT();
+	ImageButton * getDuplicateBT();
 	ImageButton * getFileBT();
 	ImageButton * getEditBT();
 	ImageButton * getRightArrowBT();

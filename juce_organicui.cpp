@@ -21,7 +21,7 @@
 
 
 #include "manager/Factory.cpp"
-#include "resources/OrganicBinaryData.cpp"
+#include "resources/BinaryData.cpp"
 #include "script/ScriptExpression.cpp"
 #include "controllable/Controllable.cpp"
 #include "controllable/ControllableContainer.cpp"

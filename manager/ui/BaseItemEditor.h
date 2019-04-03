@@ -25,6 +25,7 @@ public:
 	bool isLast;
 
 	ScopedPointer<ImageButton> removeBT;
+	ScopedPointer<ImageButton> duplicateBT;
 	ScopedPointer<ImageButton> upBT;
 	ScopedPointer<ImageButton> downBT;
 

@@ -34,7 +34,6 @@ public:
 	bool removeOnDelKey;
 
 	virtual void mouseExit(const MouseEvent &e) override;
-	virtual bool keyPressed(const KeyPress &e) override;
 
 	void setHighlightOnMouseOver(bool highlight);
 
@@ -87,51 +86,6 @@ void BaseItemMinimalUI<T>::mouseExit(const MouseEvent &e)
 {
 	InspectableContentComponent::mouseExit(e);
 	repaint();
-}
-
-template<class T>
-bool BaseItemMinimalUI<T>::keyPressed(const KeyPress & e)
-{
-	if (e.getKeyCode() == e.deleteKey || e.getKeyCode() == e.backspaceKey)
-	{
-		if (removeOnDelKey && inspectable->isSelected && inspectable->selectionManager == InspectableSelectionManager::activeSelectionManager)
-		{
-			if (this->baseItem->askConfirmationBeforeRemove && GlobalSettings::getInstance()->askBeforeRemovingItems->boolValue())
-			{
-				int result = AlertWindow::showOkCancelBox(AlertWindow::QuestionIcon, "Delete " + this->baseItem->niceName, "Are you sure you want to delete this ?", "Delete", "Cancel");
-				if (result != 0)this->baseItem->remove();
-			} else
-			{
-				this->baseItem->remove();
-			}
-
-			return true;
-		}
-	}/* else if (e.getModifiers().isCommandDown())
-	{
-		if (e.getKeyCode() == KeyPress::createFromDescription("d").getKeyCode())
-		{	
-			item->duplicate();
-			return true;
-		} else if(e.getKeyCode()  == KeyPress::createFromDescription("c").getKeyCode())
-		{
-			item->copy();
-			return true;
-		} else if (e.getKeyCode() == KeyPress::createFromDescription("x").getKeyCode())
-		{
-			item->copy();
-			this->baseItem->remove();
-			return true;
-
-		} else if (e.getKeyCode() == KeyPress::createFromDescription("v").getKeyCode())
-		{
-			item->paste();
-			return true;
-		}
-	}
-	*/
-
-	return false;
 }
 
 template<class T>

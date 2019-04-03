@@ -208,10 +208,12 @@ void GenericManagerEditor<T>::newMessage(const typename BaseManager<T>::ManagerE
 	case BaseManager<T>::ManagerEvent::ITEM_ADDED:
 		setCollapsed(false, true);
 		itemAddedAsync(e.getItem());
+		resized();
 		break;
 
 	case BaseManager<T>::ManagerEvent::ITEM_REMOVED:
 		itemRemovedAsync(e.getItem());
+		resized();
 		break;
 
 	case BaseManager<T>::ManagerEvent::ITEMS_REORDERED:

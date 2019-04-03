@@ -30,7 +30,8 @@ namespace CommandIDs
 	//undo
 	static const int undo = 0x40001;
 	static const int redo = 0x40002;
-	static const int duplicate = 0x40003;
+	static const int duplicateItems = 0x40003;
+	static const int deleteItems = 0x40004;
 
 
 	// range ids
@@ -111,19 +112,21 @@ void OrganicMainContentComponent::getCommandInfo(CommandID commandID, Applicatio
 
 	case StandardApplicationCommandIDs::copy:
 	{
-		BaseItem * item = InspectableSelectionManager::activeSelectionManager == nullptr?nullptr:InspectableSelectionManager::activeSelectionManager->getInspectableAs<BaseItem>();
-		result.setInfo(item != nullptr ? "Copy " + item->niceName : "Nothing to copy", "Copy the selected item", category, 0);
+		Array<BaseItem *> items = InspectableSelectionManager::activeSelectionManager == nullptr ? Array<BaseItem *>() : InspectableSelectionManager::activeSelectionManager->getInspectablesAs<BaseItem>();
+		String s = items.size() > 0 && items[0] != nullptr ? "Copy " + (items.size() > 1 ? String(items.size()) + " items" : items[0]->niceName) : "Nothing to duplicate";
+		result.setInfo(s, "Copy the selected items", category, 0);  
 		result.defaultKeypresses.add(KeyPress('c', ModifierKeys::commandModifier, 0));
-		result.setActive(item != nullptr);
+		result.setActive(items.size() > 0 && items[0] != nullptr);
 	}
 	break;
 
 	case StandardApplicationCommandIDs::cut:
 	{
-		BaseItem * item = InspectableSelectionManager::activeSelectionManager == nullptr ? nullptr : InspectableSelectionManager::activeSelectionManager->getInspectableAs<BaseItem>();
-		result.setInfo(item != nullptr ? "Cut " + item->niceName : "Nothing to cut", "Cut the selected item", category, 0);
+		Array<BaseItem *> items = InspectableSelectionManager::activeSelectionManager == nullptr ? Array<BaseItem *>() : InspectableSelectionManager::activeSelectionManager->getInspectablesAs<BaseItem>();
+		String s = items.size() > 0 && items[0] != nullptr ? "Cut " + (items.size() > 1 ? String(items.size()) + " items" : items[0]->niceName) : "Nothing to duplicate";
+		result.setInfo(s, "Cut the selected items", category, 0);
 		result.defaultKeypresses.add(KeyPress('x', ModifierKeys::commandModifier, 0));
-		result.setActive(item != nullptr);
+		result.setActive(items.size() > 0 && items[0] != nullptr);
 	}
 	break;
 
@@ -136,12 +139,23 @@ void OrganicMainContentComponent::getCommandInfo(CommandID commandID, Applicatio
 	}
 	break;
 
-	case CommandIDs::duplicate:
+	case CommandIDs::duplicateItems:
 	{
-		BaseItem * item = InspectableSelectionManager::activeSelectionManager == nullptr ? nullptr : InspectableSelectionManager::activeSelectionManager->getInspectableAs<BaseItem>();
-		result.setInfo(item != nullptr ? "Duplicate " + item->niceName : "Nothing to duplicate", "Duplicate the selected item", category, 0);
+		Array<BaseItem *> items = InspectableSelectionManager::activeSelectionManager == nullptr ? Array<BaseItem *>() : InspectableSelectionManager::activeSelectionManager->getInspectablesAs<BaseItem>();
+		String s = items.size() > 0 && items[0] != nullptr ? "Duplicate " + (items.size() > 1?String(items.size())+" items":items[0]->niceName): "Nothing to duplicate";
+		result.setInfo(s, "Duplicate the selected items", category, 0);
 		result.defaultKeypresses.add(KeyPress('d', ModifierKeys::commandModifier, 0));
-		result.setActive(item != nullptr);
+		result.setActive(items.size() > 0 && items[0] != nullptr);
+	}
+	break;
+
+	case CommandIDs::deleteItems:
+	{
+		Array<BaseItem *> items = InspectableSelectionManager::activeSelectionManager == nullptr ? Array<BaseItem *>() : InspectableSelectionManager::activeSelectionManager->getInspectablesAs<BaseItem>();
+		String s = items.size() > 0  && items[0] != nullptr? "Delete " + (items.size() > 1 ? String(items.size()) + " items" : items[0]->niceName) : "Nothing to delete";
+		result.setInfo(s, "Delete the selected items", category, 0);
+		result.defaultKeypresses.add(KeyPress(KeyPress::deleteKey), KeyPress(KeyPress::backspaceKey));
+		result.setActive(items.size() > 0 && items[0] != nullptr);
 	}
 	break;
 
@@ -166,7 +180,8 @@ void OrganicMainContentComponent::getAllCommands(Array<CommandID>& commands) {
 	  StandardApplicationCommandIDs::copy,
 	  StandardApplicationCommandIDs::cut,
 	  StandardApplicationCommandIDs::paste,
-	  CommandIDs::duplicate,
+	  CommandIDs::duplicateItems,
+	  CommandIDs::deleteItems,
 	  CommandIDs::editGlobalSettings,
 	  CommandIDs::editProjectSettings,
 	  CommandIDs::undo,
@@ -217,7 +232,7 @@ PopupMenu OrganicMainContentComponent::getMenuForIndex(int /*topLevelMenuIndex*/
 		menu.addCommandItem(&getCommandManager(), StandardApplicationCommandIDs::copy);
 		menu.addCommandItem(&getCommandManager(), StandardApplicationCommandIDs::cut);
 		menu.addCommandItem(&getCommandManager(), StandardApplicationCommandIDs::paste);
-		menu.addCommandItem(&getCommandManager(), CommandIDs::duplicate);
+		menu.addCommandItem(&getCommandManager(), CommandIDs::deleteItems);
 
 	} else if (menuName == "Panels")
 	{
@@ -353,16 +368,28 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 	}
 	break;
 
-	case CommandIDs::duplicate:
+	case CommandIDs::duplicateItems:
 	{
 		if (InspectableSelectionManager::activeSelectionManager != nullptr)
 		{
-			BaseItem * item = InspectableSelectionManager::activeSelectionManager->getInspectableAs<BaseItem>();
-			if (item != nullptr) item->duplicate();
+			Array<BaseItem *> items = InspectableSelectionManager::activeSelectionManager->getInspectablesAs<BaseItem>();
+			for(auto &i : items) i->duplicate();
 		}
 	}
 	break;
 
+	case CommandIDs::deleteItems:
+	{
+		if (InspectableSelectionManager::activeSelectionManager != nullptr)
+		{
+			Array<WeakReference<Inspectable>> items = InspectableSelectionManager::activeSelectionManager->currentInspectables;
+			for (auto &i : items)
+			{
+				if(!i.wasObjectDeleted()) ((BaseItem *)i.get())->remove();
+			}
+		}
+	}
+	break;
 	case CommandIDs::editProjectSettings:
 		ProjectSettings::getInstance()->selectThis();
 		break;

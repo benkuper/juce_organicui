@@ -26,6 +26,7 @@ public:
 	bool isSelected;
 	bool isSelectable;
 	bool showInspectorOnSelect;
+	bool hideInEditor;
 
 	bool isHighlighted;
 

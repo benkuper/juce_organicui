@@ -63,7 +63,7 @@ void DashboardManagerView::resized()
 void DashboardManagerView::inspectablesSelectionChanged()
 {
 	if (InspectableSelectionManager::mainSelectionManager->isEmpty()) return;
-	Dashboard * cc = dynamic_cast<Dashboard *>(InspectableSelectionManager::mainSelectionManager->currentInspectables[0]);
+	Dashboard * cc = InspectableSelectionManager::mainSelectionManager->getInspectableAs<Dashboard>();
 	if (cc == nullptr) return;
 	setCurrentDashboard(cc);
 }

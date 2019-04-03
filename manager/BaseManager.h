@@ -688,16 +688,18 @@ void BaseManager<T>::removeItem(T * item, bool addToUndo, bool notify)
 
 
 	items.removeObject(item, false);
-	BaseItem * bi = static_cast<BaseItem *>(item);
-	removeChildControllableContainer(bi);
+	
+	
 	removeItemInternal(item);
+	
+	BaseItem * bi = static_cast<BaseItem *>(item);
 	bi->removeBaseItemListener(this);
+	removeChildControllableContainer(bi);
 
 	if (notify)
 	{
 		baseManagerListeners.call(&BaseManager::Listener::itemRemoved, item);
 		managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEM_REMOVED, item));
-
 	}
 
 	bi->clearItem();
@@ -762,7 +764,8 @@ void BaseManager<T>::askForDuplicateItem(BaseItem * item)
 	if (!userCanAddItemsManually) return;
 	var data = item->getJSONData();
 	data.getDynamicObject()->setProperty("index", items.indexOf(static_cast<T *>(item))+1);
-	addItemFromData(data);
+	T * i = addItemFromData(data);
+	((BaseItem *)i)->viewUIPosition->setPoint(((BaseItem *)i)->viewUIPosition->getPoint() + Point<float>(20, 20));
 }
 
 template<class T>

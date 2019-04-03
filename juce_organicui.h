@@ -52,8 +52,7 @@ using namespace juce;
 
 #include "manager/Factory.h"
 
-#include "resources/OrganicBinaryData.h"
-
+#include "resources/BinaryData.h"
 
 
 #include "ui/Style.h"

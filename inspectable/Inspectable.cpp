@@ -15,7 +15,8 @@ Inspectable::Inspectable() :
 	isSelected(false),
 	isSelectable(true),
 	showInspectorOnSelect(true),
-    isHighlighted(false),
+	hideInEditor(false),
+	isHighlighted(false),
 	highlightLinkedInspectableOnSelect(true),
     inspectableNotifier(10)
 {

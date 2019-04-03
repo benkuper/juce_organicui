@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="nJCeN1" name="organicui_resources" projectType="guiapp" version="1.0.0"
-              bundleIdentifier="com.yourcompany.organicui_resources" includeBinaryInAppConfig="1"
+              bundleIdentifier="com.benkuper.organicui_resources" includeBinaryInAppConfig="1"
               jucerVersion="5.4.3" displaySplashScreen="1" reportAppUsage="1"
               splashScreenColour="Dark" cppLanguageStandard="11" companyCopyright=""
               binaryDataNamespace="OrganicUIBinaryData">
   <MAINGROUP id="gdPnjI" name="organicui_resources">
     <GROUP id="{471DD8BF-5339-7ED5-BF79-1FCB0A8A6B3D}" name="Resources">
-      <FILE id="KphWgp" name="add.png" compile="0" resource="1" file="Resources/add.png"/>
+      <FILE id="zCaAEj" name="add.png" compile="0" resource="1" file="Resources/add.png"/>
       <FILE id="aoTRXK" name="arrow-down.png" compile="0" resource="1" file="Resources/arrow-down.png"/>
       <FILE id="uBzQVv" name="arrow-right.png" compile="0" resource="1" file="Resources/arrow-right.png"/>
       <FILE id="AQujp8" name="cancel.png" compile="0" resource="1" file="Resources/cancel.png"/>
@@ -20,6 +20,7 @@
       <FILE id="lFWTK3" name="checkbox_on_readonly.png" compile="0" resource="1"
             file="Resources/checkbox_on_readonly.png"/>
       <FILE id="yRr25C" name="down.png" compile="0" resource="1" file="Resources/down.png"/>
+      <FILE id="UEC663" name="duplicate.png" compile="0" resource="1" file="Resources/duplicate.png"/>
       <FILE id="JhfeGX" name="edit.png" compile="0" resource="1" file="Resources/edit.png"/>
       <FILE id="bcK2wO" name="file.png" compile="0" resource="1" file="Resources/file.png"/>
       <FILE id="Lih37O" name="in.png" compile="0" resource="1" file="Resources/in.png"/>

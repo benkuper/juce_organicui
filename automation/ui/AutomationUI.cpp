@@ -408,7 +408,7 @@ void AutomationUI::mouseDown(const MouseEvent & e)
 			{
 				if (manager->selectionManager->currentInspectables.size() > 0)
 				{
-					AutomationKey * lastSelectedKey = (AutomationKey *)manager->selectionManager->currentInspectables[manager->selectionManager->currentInspectables.size() - 1];
+					AutomationKey * lastSelectedKey = dynamic_cast<AutomationKey *>(manager->selectionManager->currentInspectables[manager->selectionManager->currentInspectables.size() - 1].get());
 					AutomationKey * sKey = ((AutomationKeyUI *)kHandle->getParentComponent())->item;
 
 					int i1 = manager->items.indexOf(lastSelectedKey);
@@ -519,8 +519,8 @@ void AutomationUI::mouseUp(const MouseEvent & e)
 
 bool AutomationUI::keyPressed(const KeyPress & e)
 {
-	BaseManagerUI::keyPressed(e);
-	return false;
+	return BaseManagerUI::keyPressed(e);
+	//return false;
 }
 
 void AutomationUI::newMessage(const ContainerAsyncEvent & e)
@@ -569,10 +569,10 @@ void AutomationUI::inspectablesSelectionChanged()
 	{
 
 	}
-	for (auto &i : manager->selectionManager->currentInspectables)
+
+	Array<AutomationKey *> keys = manager->selectionManager->getInspectablesAs<AutomationKey>();
+	for (auto &k: keys)
 	{
-		AutomationKey * k = static_cast<AutomationKey *>(i);
-		if (k == nullptr) continue;
 		AutomationKeyUI * kui = getUIForItem(k);
 		if (kui == nullptr) return;
 
