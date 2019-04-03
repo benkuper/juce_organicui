@@ -49,7 +49,7 @@ public:
 	AutomationKey * createItem() override;
 	void addItems(Array<Point<float>> keys, bool removeExistingOverlappingKeys = true, bool addToUndo = true, bool autoSmoothCurve = false);
 	AutomationKey * addItem(const float position, const float value, bool addToUndo = true, bool reorder = false);
-	Array<AutomationKey *> addItemsFromClipboard(bool showWarning = false);
+    Array<AutomationKey *> addItemsFromClipboard(bool showWarning = false) override;
 
 	void removeKeysBetween(float start, float end);
 	void removeAllSelectedKeys();
