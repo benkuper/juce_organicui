@@ -139,7 +139,6 @@ public:
 	virtual void addItemUIInternal(U *) {}
 
 	virtual void mouseDown(const MouseEvent &e) override;
-	virtual bool keyPressed(const KeyPress &e) override;
 
 	virtual void removeItemUI(T * item, bool resizeAndRepaint = true);
 	virtual void removeItemUIInternal(U *) {}
@@ -306,46 +305,6 @@ void BaseManagerUI<M, T, U>::mouseDown(const MouseEvent & e)
 	}
 }
 
-template<class M, class T, class U>
-bool BaseManagerUI<M, T, U>::keyPressed(const KeyPress & e)
-{
-	if (InspectableContentComponent::keyPressed(e)) return true;
-
-	if (manager->selectionManager != InspectableSelectionManager::activeSelectionManager) return false;
-
-	if (e.getModifiers().isCommandDown())
-	{
-		/*
-		if (e.getKeyCode() == KeyPress::createFromDescription("v").getKeyCode())
-		{
-			manager->addItemFromClipboard();
-			return true;
-		} else*/ 
-		if (e.getKeyCode() == KeyPress::createFromDescription("a").getKeyCode())
-		{
-			int numItems = manager->items.size();
-			if (numItems > 0) manager->items[0]->selectThis();
-			if (numItems > 1) for (int i = 0; i < numItems; i++) manager->items[i]->selectThis(true);
-		}
-	} else
-	{
-		/*
-		if (e.getKeyCode() == e.deleteKey || e.getKeyCode() == e.backspaceKey)
-		{
-			Array<T *> itemsToRemove;
-			for (auto & i : manager->selectionManager->currentInspectables)
-			{
-				T * it = dynamic_cast<T *>(i);
-				if (it != nullptr) itemsToRemove.add(it);
-			}
-
-			manager->removeItems(itemsToRemove);
-			return true;
-		}
-		*/
-	}
-	return false;
-}
 
 template<class M, class T, class U>
 void BaseManagerUI<M, T, U>::paint(Graphics & g)

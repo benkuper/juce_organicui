@@ -82,6 +82,11 @@ bool BaseItem::paste()
 	return true;
 }
 
+void BaseItem::selectAll()
+{
+	baseItemListeners.call(&BaseItem::Listener::askForSelectAllItems);
+}
+
 void BaseItem::moveBefore()
 {
 	baseItemListeners.call(&BaseItem::Listener::askForMoveBefore, this);

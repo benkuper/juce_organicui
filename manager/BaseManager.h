@@ -55,6 +55,7 @@ public:
 	virtual void setItemIndex(T * item, int newIndex);
 	virtual void reorderItems(); //to be overriden if needed
 
+
 	//to override for specific handling like adding custom listeners, etc.
 	virtual void addItemInternal(T *, var data) {}
 	virtual void removeItemInternal(T *) {}
@@ -68,6 +69,7 @@ public:
 	void askForPaste() override;
 	void askForMoveBefore(BaseItem *) override;
 	void askForMoveAfter(BaseItem *) override;
+	void askForSelectAllItems() override;
 
 	virtual var getJSONData() override;
 	virtual void loadJSONDataInternal(var data) override;
@@ -796,6 +798,14 @@ void BaseManager<T>::askForMoveAfter(BaseItem * i)
 
 	baseManagerListeners.call(&Listener::itemsReordered);
 	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_REORDERED));
+}
+
+template<class T>
+void BaseManager<T>::askForSelectAllItems()
+{
+	int numItems = items.size();
+	if (numItems > 0) items[0]->selectThis();
+	if (numItems > 1) for (int i = 0; i < numItems; i++) items[i]->selectThis(true);
 }
 
 template<class T>

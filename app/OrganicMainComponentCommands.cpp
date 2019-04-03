@@ -32,6 +32,7 @@ namespace CommandIDs
 	static const int redo = 0x40002;
 	static const int duplicateItems = 0x40003;
 	static const int deleteItems = 0x40004;
+	static const int selectAll = 0x40005;
 
 
 	// range ids
@@ -159,6 +160,15 @@ void OrganicMainContentComponent::getCommandInfo(CommandID commandID, Applicatio
 	}
 	break;
 
+	case CommandIDs::selectAll:
+	{
+		result.setInfo("Select all", "Select all the containing items or siblings", category, 0);
+		result.defaultKeypresses.add(KeyPress('a', ModifierKeys::commandModifier, 0));
+		result.setActive(true);
+	}
+	break;
+
+
 
 	default:
 		JUCEApplication::getInstance()->getCommandInfo(commandID, result);
@@ -177,7 +187,8 @@ void OrganicMainContentComponent::getAllCommands(Array<CommandID>& commands) {
 	  CommandIDs::saveAs,
 	  CommandIDs::checkForUpdates,
 	  StandardApplicationCommandIDs::quit,
-	  StandardApplicationCommandIDs::copy,
+	   CommandIDs::selectAll,
+	   StandardApplicationCommandIDs::copy,
 	  StandardApplicationCommandIDs::cut,
 	  StandardApplicationCommandIDs::paste,
 	  CommandIDs::duplicateItems,
@@ -229,6 +240,7 @@ PopupMenu OrganicMainContentComponent::getMenuForIndex(int /*topLevelMenuIndex*/
 		menu.addCommandItem(&getCommandManager(), CommandIDs::undo);
 		menu.addCommandItem(&getCommandManager(), CommandIDs::redo);
 		menu.addSeparator();
+		menu.addCommandItem(&getCommandManager(), CommandIDs::selectAll);
 		menu.addCommandItem(&getCommandManager(), StandardApplicationCommandIDs::copy);
 		menu.addCommandItem(&getCommandManager(), StandardApplicationCommandIDs::cut);
 		menu.addCommandItem(&getCommandManager(), StandardApplicationCommandIDs::paste);
@@ -390,6 +402,19 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 		}
 	}
 	break;
+
+	case CommandIDs::selectAll:
+	{
+		BaseItem * item = InspectableSelectionManager::activeSelectionManager->getInspectableAs<BaseItem>();
+		if (item != nullptr) item->selectAll();
+		else
+		{
+			BaseItem::Listener * m = InspectableSelectionManager::activeSelectionManager->getInspectableAs<BaseItem::Listener>();
+			if (m != nullptr) m->askForSelectAllItems();
+		}
+	}
+	break;
+
 	case CommandIDs::editProjectSettings:
 		ProjectSettings::getInstance()->selectThis();
 		break;
