@@ -8,18 +8,20 @@
   ==============================================================================
 */
 
+#include "CrashHandler.h"
 
 #if JUCE_WINDOWS
 #include <windows.h> 
 #include <DbgHelp.h>
 #include <tchar.h>
-#include "CrashHandler.h"
+LONG WINAPI createMiniDump(LPEXCEPTION_POINTERS exceptionPointers);
+#else
+void createStackTrace(int signum);
+#endif
 
 String dumpFileString;
-char * dumpFileName = "notset.dmp";
+char * dumpFileName = (char *)"notset.dmp";
 
-LONG WINAPI createMiniDump(LPEXCEPTION_POINTERS exceptionPointers);
-#endif
 
 juce_ImplementSingleton(CrashDumpUploader)
 
@@ -37,18 +39,22 @@ void CrashDumpUploader::init()
 {
 
 #if JUCE_WINDOWS
-
 	crashFile = File::getSpecialLocation(File::tempDirectory).getParentDirectory().getChildFile(getApp().getApplicationName()+"_crash.dmp");
-	dumpFileString = crashFile.getFullPathName();
-	dumpFileName = dumpFileString.getCharPointer().getAddress();
-	SystemStats::setApplicationCrashHandler((SystemStats::CrashHandlerFunction)createMiniDump);
-
-	if (crashFile.existsAsFile())
-	{
-		LOGWARNING("Crash log found, sending to Houston...");
-		startThread();
-	}
+    SystemStats::setApplicationCrashHandler((SystemStats::CrashHandlerFunction)createMiniDump);
+#else
+    crashFile = File::getSpecialLocation(File::tempDirectory).getParentDirectory().getChildFile(getApp().getApplicationName()+"_crash.txt");
+    SystemStats::setApplicationCrashHandler((SystemStats::CrashHandlerFunction)createStackTrace);
 #endif
+
+    dumpFileString = crashFile.getFullPathName();
+    dumpFileName = dumpFileString.getCharPointer().getAddress();
+   
+    if (crashFile.existsAsFile())
+    {
+        LOGWARNING("Crash log found, sending to Houston...");
+        startThread();
+    }
+
 	
 }
 
@@ -149,5 +155,25 @@ LONG WINAPI createMiniDump(LPEXCEPTION_POINTERS exceptionPointers)
 	return EXCEPTION_EXECUTE_HANDLER;
 }
 
+
+#else
+
+void createStackTrace(int signum)
+{
+    DBG("Create Stack trace here !");
+    String stackTrace = SystemStats::getStackBacktrace();
+    
+    DBG("Stack trace : " << stackTrace);
+    
+    File f(dumpFileString);
+    FileOutputStream fos(f);
+    if (fos.openedOk())
+    {
+        fos.writeText(stackTrace,false,false,"\n");
+        fos.flush();
+    }
+    
+    DBG("Written to file : " << f.getFullPathName());
+}
 
 #endif

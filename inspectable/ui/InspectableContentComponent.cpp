@@ -14,9 +14,9 @@ InspectableContentComponent::InspectableContentComponent(Inspectable * inspectab
 	repaintOnSelectionChanged(true),
 	rounderCornerSize(4),
 	autoDrawContourWhenSelected(true),
-	selectionContourColor(HIGHLIGHT_COLOR),
 	highlightLinkedInspectablesOnOver(true),
-	autoSelectWithChildRespect(true),
+    selectionContourColor(HIGHLIGHT_COLOR),
+    autoSelectWithChildRespect(true),
     highlightColor(Colours::purple),
     bringToFrontOnSelect(true)
 {

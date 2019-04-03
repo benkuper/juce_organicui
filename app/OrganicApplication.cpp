@@ -75,9 +75,9 @@ void OrganicApplication::initialise(const String & commandLine)
 	}
 
 	//Crash handler
-#if JUCE_WINDOWS
+//#if JUCE_WINDOWS
 	CrashDumpUploader::getInstance()->init();
-#endif
+//#endif
 
 	afterInit();
 }
