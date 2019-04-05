@@ -743,7 +743,7 @@ void BaseManagerUI<M, T, U>::newMessage(const typename BaseManager<T>::ManagerEv
 template<class M, class T, class U>
 bool BaseManagerUI<M, T, U>::isInterestedInDragSource(const SourceDetails & dragSourceDetails)
 {
-	if (acceptedDropTypes.contains(dragSourceDetails.description.getProperty("type", "").toString())) return true;
+	if (acceptedDropTypes.contains(dragSourceDetails.description.getProperty("dataType", "").toString())) return true;
 
 	U * itemUI = dynamic_cast<U *>(dragSourceDetails.sourceComponent.get());
 	if (itemsUI.contains(itemUI)) return true;

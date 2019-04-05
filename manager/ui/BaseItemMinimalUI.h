@@ -69,7 +69,7 @@ public:
 	
 	virtual void itemDragEnter(const SourceDetails& ) override;
 	virtual void itemDragExit(const SourceDetails& ) override;
-	virtual void itemDropped(const SourceDetails & dragSourceDetails) override {} //to be overriden
+	virtual void itemDropped(const SourceDetails & dragSourceDetails) override; //to be overriden
 
 
 	class ItemMinimalUIListener
@@ -123,6 +123,7 @@ void BaseItemMinimalUI<T>::mouseDrag(const MouseEvent & e)
 
 	var desc = var(new DynamicObject());
 	desc.getDynamicObject()->setProperty("type", baseItem->getTypeString());
+	desc.getDynamicObject()->setProperty("dataType", baseItem->itemDataType);
 	desc.getDynamicObject()->setProperty("offsetX", getMouseXYRelative().x);
 	desc.getDynamicObject()->setProperty("offsetY", getMouseXYRelative().y);
 
@@ -230,7 +231,7 @@ void BaseItemMinimalUI<T>::dragOperationEnded(const DragAndDropTarget::SourceDet
 template<class T>
 bool BaseItemMinimalUI<T>::isInterestedInDragSource(const SourceDetails & dragSourceDetails)
 {
-	return acceptedDropTypes.contains(dragSourceDetails.description.getProperty("type", "").toString());
+	return acceptedDropTypes.contains(dragSourceDetails.description.getProperty("dataType", "").toString());
 }
 
 
@@ -246,4 +247,11 @@ void BaseItemMinimalUI<T>::itemDragExit(const SourceDetails&)
 {
 	isDraggingOver = false;
 	if (highlightOnDragOver) repaint();
+}
+
+template<class T>
+void BaseItemMinimalUI<T>::itemDropped(const SourceDetails & dragSourceDetails)
+{
+	isDraggingOver = false;
+	if(highlightOnDragOver) repaint();
 }
