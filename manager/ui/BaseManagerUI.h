@@ -798,6 +798,7 @@ void BaseManagerUI<M, T, U>::itemDropped(const SourceDetails & dragSourceDetails
 				T * newItem = manager->addItemFromData(data);
 				if (newItem != nullptr)
 				{
+					if (droppingIndex == -1) droppingIndex = itemsUI.size() - 1;
 					this->manager->setItemIndex(newItem, droppingIndex);
 					bui->item->remove();
 				}
