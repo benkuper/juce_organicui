@@ -8,47 +8,81 @@
   ==============================================================================
 */
 
-#ifndef BASEITEMMINIMALUI_H_INCLUDED
-#define BASEITEMMINIMALUI_H_INCLUDED
+#pragma once
 
 template<class T>
 class BaseItemMinimalUI :
 	public InspectableContentComponent,
-	public ContainerAsyncListener
+	public ContainerAsyncListener,
+	public DragAndDropContainer,
+	public DragAndDropTarget
 {
 public:
 	BaseItemMinimalUI<T>(T * _item);
 	virtual ~BaseItemMinimalUI<T>();
 
 	T * item;
-    BaseItem * baseItem;
-    
+	BaseItem * baseItem;
+
 	//ui
 	Colour bgColor;
 	Colour selectedColor;
+
+	float viewZoom;
 
 	bool dimAlphaOnDisabled;
 	bool highlightOnMouseOver;
 	bool fillColorOnSelected;
 
-	bool removeOnDelKey;
+	//Dragging
+	bool dragAndDropEnabled; //tmp, waiting to implement full drag&drop system
+	const int dragStartDistance = 10;
+	bool autoHideWhenDragging;
 
+	//dropping
+	StringArray acceptedDropTypes;
+	bool isDraggingOver;
+	bool highlightOnDragOver;
+
+	virtual void mouseDrag(const MouseEvent &e) override;
 	virtual void mouseExit(const MouseEvent &e) override;
+
 
 	void setHighlightOnMouseOver(bool highlight);
 
 	void paint(Graphics &g) override;
 
+	void setViewZoom(float value);
 
 	virtual void newMessage(const ContainerAsyncEvent &e) override;
 
 	virtual void containerChildAddressChangedAsync(ControllableContainer *) {}
-	virtual void controllableFeedbackUpdateInternal(Controllable *) {} //override this in child classes
+	virtual void controllableFeedbackUpdateInternal(Controllable *);
 
+	//Drag drop container
+	virtual bool canStartDrag(const MouseEvent &e);
+	virtual void dragOperationStarted(const DragAndDropTarget::SourceDetails&) override;
+	virtual void dragOperationEnded(const DragAndDropTarget::SourceDetails&) override;
+
+	//Drag drop target
+	virtual bool isInterestedInDragSource(const SourceDetails & dragSourceDetails) override;
+	
+	virtual void itemDragEnter(const SourceDetails& ) override;
+	virtual void itemDragExit(const SourceDetails& ) override;
+	virtual void itemDropped(const SourceDetails & dragSourceDetails) override {} //to be overriden
+
+
+	class ItemMinimalUIListener
+	{
+	public:
+		virtual ~ItemMinimalUIListener() {}
+		virtual void itemUIViewPositionChanged(BaseItemMinimalUI<T> *) {}
+	};
+
+	ListenerList<ItemMinimalUIListener> itemMinimalUIListeners;
+	void addItemMinimalUIListener(ItemMinimalUIListener* newListener) { itemMinimalUIListeners.add(newListener); }
+	void removeItemMinimalUIListener(ItemMinimalUIListener* listener) { itemMinimalUIListeners.remove(listener); }
 };
-
-
-
 
 
 template<class T>
@@ -57,22 +91,22 @@ BaseItemMinimalUI<T>::BaseItemMinimalUI(T * _item) :
 	item(_item),
 	bgColor(BG_COLOR.brighter(.1f)),
 	selectedColor(HIGHLIGHT_COLOR),
+	viewZoom(1),
 	dimAlphaOnDisabled(true),
 	highlightOnMouseOver(false),
 	fillColorOnSelected(false),
-	removeOnDelKey(true)
+	dragAndDropEnabled(true),
+	autoHideWhenDragging(true),
+	isDraggingOver(false),
+	highlightOnDragOver(true)
 {
-
     baseItem = static_cast<BaseItem *>(item);
-    
-	//setWantsKeyboardFocus(true);
 
 	addMouseListener(this, true);
 	baseItem->addAsyncContainerListener(this);
 	
 	if (baseItem->canBeDisabled && dimAlphaOnDisabled) setAlpha(baseItem->enabled->boolValue() ? 1 : .5f);
 
-	//setSize(100, 20);
 }
 
 template<class T>
@@ -80,6 +114,21 @@ BaseItemMinimalUI<T>::~BaseItemMinimalUI()
 {
 	baseItem->removeAsyncContainerListener(this);
 }
+
+template<class T>
+void BaseItemMinimalUI<T>::mouseDrag(const MouseEvent & e)
+{
+	InspectableContentComponent::mouseDrag(e);
+	if (!dragAndDropEnabled || isDragAndDropActive() || !canStartDrag(e)) return;
+
+	var desc = var(new DynamicObject());
+	desc.getDynamicObject()->setProperty("type", baseItem->getTypeString());
+	desc.getDynamicObject()->setProperty("offsetX", getMouseXYRelative().x);
+	desc.getDynamicObject()->setProperty("offsetY", getMouseXYRelative().y);
+
+	if (e.getDistanceFromDragStart() > dragStartDistance) startDragging(desc, this, Image(), true);
+}
+
 
 template<class T>
 void BaseItemMinimalUI<T>::mouseExit(const MouseEvent &e)
@@ -106,6 +155,18 @@ void BaseItemMinimalUI<T>::paint(Graphics &g)
 	if (highlightOnMouseOver && isMouseOverOrDragging(true)) c = c.brighter(.1f);
 	g.setColour(c);
 	g.fillRoundedRectangle(r, 4);
+
+	if (isDraggingOver && highlightOnDragOver)
+	{
+		g.setColour(BLUE_COLOR);
+		g.drawRoundedRectangle(r, 4, 2);
+	}
+}
+
+template<class T>
+void BaseItemMinimalUI<T>::setViewZoom(float value)
+{
+	viewZoom = value;
 }
 
 
@@ -132,10 +193,57 @@ void BaseItemMinimalUI<T>::newMessage(const ContainerAsyncEvent & e)
 	}
 	break;
 
-        default:
-            break;
+    default:
+        break;
 	}
 }
 
+template<class T>
+void BaseItemMinimalUI<T>::controllableFeedbackUpdateInternal(Controllable * c)
+{
+	if (c == item->viewUIPosition)
+	{
+		itemMinimalUIListeners.call(&ItemMinimalUIListener::itemUIViewPositionChanged, this);
+	}
+}
 
-#endif  // BASEITEMMINIMALUI_H_INCLUDED
+template<class T>
+bool BaseItemMinimalUI<T>::canStartDrag(const MouseEvent & e)
+{
+	return e.eventComponent == this;
+}
+
+template<class T>
+void BaseItemMinimalUI<T>::dragOperationStarted(const DragAndDropTarget::SourceDetails&)
+{
+	if (autoHideWhenDragging) setVisible(false);
+}
+
+template<class T>
+void BaseItemMinimalUI<T>::dragOperationEnded(const DragAndDropTarget::SourceDetails&)
+{
+	if (autoHideWhenDragging) setVisible(true);
+}
+
+
+// Inherited via DragAndDropTarget
+template<class T>
+bool BaseItemMinimalUI<T>::isInterestedInDragSource(const SourceDetails & dragSourceDetails)
+{
+	return acceptedDropTypes.contains(dragSourceDetails.description.getProperty("type", "").toString());
+}
+
+
+template<class T>
+void BaseItemMinimalUI<T>::itemDragEnter(const SourceDetails&)
+{
+	isDraggingOver = true;
+	if (highlightOnDragOver) repaint();
+}
+
+template<class T>
+void BaseItemMinimalUI<T>::itemDragExit(const SourceDetails&)
+{
+	isDraggingOver = false;
+	if (highlightOnDragOver) repaint();
+}

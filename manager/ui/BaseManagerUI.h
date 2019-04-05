@@ -8,10 +8,7 @@
   ==============================================================================
 */
 
-#ifndef BASEMANAGERUI_H_INCLUDED
-#define BASEMANAGERUI_H_INCLUDED
-
-
+#pragma once
 #pragma warning(disable:4244)
 
 
@@ -56,13 +53,15 @@ class BaseManagerUI :
 	public Button::Listener,
 	public EngineListener,
 	public BaseItemUI<T>::ItemUIListener,
-	public ComponentListener
+	public BaseItemMinimalUI<T>::ItemMinimalUIListener,
+	public ComponentListener,
+	public DragAndDropTarget
 {
 public:
 	BaseManagerUI<M, T, U>(const String &contentName, M * _manager, bool _useViewport = true);
 	virtual ~BaseManagerUI();
 
-	enum Layout { HORIZONTAL, VERTICAL };
+	enum Layout { HORIZONTAL, VERTICAL, FREE };
 
 	M * manager;
 	OwnedArray<U> itemsUI;
@@ -88,7 +87,6 @@ public:
 
 	ScopedPointer<ImageButton> addItemBT;
 
-
 	//ui
 	String noItemText;
 
@@ -100,20 +98,26 @@ public:
 	ComponentAnimator itemAnimator;
 
 	//interaction
-	BaseItemUI<T> * grabbingItem;
+	/*
+	BaseItemMinimalUI<T> * grabbingItem;
 	int grabbingItemDropIndex;
 	juce::Rectangle<int> grabSpaceRect;
+	*/
+
+	//drag and drop
+	StringArray acceptedDropTypes;
+	bool isDraggingOver;
+	bool highlightOnDragOver;
+	int currentDropIndex;
 
 	//layout
 	bool fixedItemHeight;
 	int gap;
 
 	void setDefaultLayout(Layout l);
-
 	void addExistingItems(bool resizeAfter = true);
 
 	void setShowAddButton(bool value);
-
 
 	virtual void paint(Graphics &g) override;
 
@@ -143,9 +147,16 @@ public:
 	virtual void removeItemUI(T * item, bool resizeAndRepaint = true);
 	virtual void removeItemUIInternal(U *) {}
 
-	virtual void itemUIGrabStart(BaseItemUI<T> * se) override;
-	virtual void itemUIGrabbed(BaseItemUI<T> * se) override;
-	virtual void itemUIGrabEnd(BaseItemUI<T> * se) override;
+	 
+	//Drag drop target
+	virtual bool isInterestedInDragSource(const SourceDetails & dragSourceDetails) override;
+
+	virtual void itemDragEnter(const SourceDetails&) override;
+	virtual void itemDragMove(const SourceDetails& dragSourceDetails) override;
+	virtual void itemDragExit(const SourceDetails&) override;
+	virtual void itemDropped(const SourceDetails & dragSourceDetails) override;
+
+	virtual int getDropIndexForPosition(Point<int> localPosition);
 	virtual void itemUIMiniModeChanged(BaseItemUI<T> * se) override {}
 
 	//menu
@@ -204,14 +215,12 @@ BaseManagerUI<M, T, U>::BaseManagerUI(const String & contentName, M * _manager, 
 	autoFilterHitTestOnItems(false),
 	validateHitTestOnNoItem(true),
 	animateItemOnAdd(true),
-	grabbingItem(nullptr),
+	isDraggingOver(false),
+	highlightOnDragOver(true),
 	fixedItemHeight(true),
 	gap(2)
 {
-
-
-	//setWantsKeyboardFocus(true);
-
+	
 	selectionContourColor = LIGHTCONTOUR_COLOR;
 	addItemText = "Add Item";
 
@@ -237,10 +246,10 @@ BaseManagerUI<M, T, U>::BaseManagerUI(const String & contentName, M * _manager, 
 	setShowAddButton(baseM->userCanAddItemsManually);
 
 	if(Engine::mainEngine != nullptr) Engine::mainEngine->addEngineListener(this);
+	
+	acceptedDropTypes.add(baseM->itemDataType);
 
 	//must call addExistingItems from child class to get overrides
-
-	//setSize(100, 50); //default
 }
 
 
@@ -319,7 +328,6 @@ void BaseManagerUI<M, T, U>::paint(Graphics & g)
 
 	if (drawContour)
 	{
-
 		Colour contourColor = bgColor.brighter(.2f);
 		g.setColour(contourColor);
 		g.drawRoundedRectangle(r.toFloat(), 4, 2);
@@ -337,11 +345,42 @@ void BaseManagerUI<M, T, U>::paint(Graphics & g)
 		if (!transparentBG)	g.fillAll(bgColor);
 	}
 
-	if (grabbingItem != nullptr)
+	if (isDraggingOver && highlightOnDragOver)
 	{
-		g.setColour(HIGHLIGHT_COLOR.withAlpha(.6f));
-		g.fillRoundedRectangle(grabSpaceRect.translated(0, viewport.getY()).reduced(4).toFloat(), 2);
+		g.setColour(BLUE_COLOR);
+		
+		switch (defaultLayout)
+		{
+		case HORIZONTAL:
+		case VERTICAL:
+		{
+			if (itemsUI.size() > 0)
+			{
+				BaseItemMinimalUI<T> * bui = dynamic_cast<BaseItemMinimalUI<T> *>(itemsUI[currentDropIndex >= 0 ? currentDropIndex : itemsUI.size() - 1]);
+				if (bui != nullptr)
+				{
+					juce::Rectangle<int> buiBounds = getLocalArea(bui, bui->getLocalBounds());
+					if (defaultLayout == HORIZONTAL)
+					{
+						int tx = currentDropIndex >= 0 ? buiBounds.getX() - 1 : buiBounds.getRight() + 1;
+						g.drawLine(tx, 0, tx, getHeight(), 2);
+					}
+					else if (defaultLayout == VERTICAL)
+					{
+						int ty = currentDropIndex >= 0 ? buiBounds.getY() - 1 : buiBounds.getBottom() + 1;
+						g.drawLine(0,ty , getWidth(), ty, 2);
+					}
+				}
+			}
+		}
+		break;
+
+		case FREE:
+			g.drawRoundedRectangle(r.toFloat(), 4, 2);
+			break;
+		}
 	}
+
 
 	if (this->manager->items.size() == 0 && noItemText.isNotEmpty())
 	{
@@ -393,24 +432,6 @@ void BaseManagerUI<M, T, U>::resizedInternalContent(juce::Rectangle<int>& r)
 		r.setY(0);
 	}
 
-	if (grabbingItem != nullptr)
-	{
-		int rel = defaultLayout == VERTICAL ? grabbingItem->getBottom() - viewport.getY() : grabbingItem->getRight() - viewport.getX();
-
-		int ti = 0;
-		for (auto &ui : itemsUI)
-		{
-			int tPos = defaultLayout == VERTICAL ? ui->getY() : ui->getX();
-			if (tPos > rel)
-			{
-				grabbingItemDropIndex = ti;
-				break;
-			}
-			ti++;
-		}
-		if (ti == itemsUI.size()) grabbingItemDropIndex = ti;
-	}
-
 	int i = 0;
 	for (auto &ui : itemsUI)
 	{
@@ -419,19 +440,11 @@ void BaseManagerUI<M, T, U>::resizedInternalContent(juce::Rectangle<int>& r)
 		juce::Rectangle<int> tr;
 		if (defaultLayout == VERTICAL)
 		{
-			if (grabbingItem != nullptr && i == grabbingItemDropIndex)
-			{
-				grabSpaceRect.setY(r.getY());
-				r.translate(0, grabSpaceRect.getHeight() + gap);
-			}
 			tr = r.withHeight(bui->getHeight());
 		} else
 		{
-			if (grabbingItem != nullptr && i == grabbingItemDropIndex)
-			{
-				grabSpaceRect.setX(r.getX());
-				r.translate(grabSpaceRect.getWidth() + gap, 0);
-			}
+
+
 			tr = r.withWidth(bui->getWidth());
 		}
 
@@ -452,26 +465,6 @@ void BaseManagerUI<M, T, U>::resizedInternalContent(juce::Rectangle<int>& r)
 		i++;
 	}
 
-	if (grabbingItemDropIndex >= itemsUI.size())
-	{
-		if (defaultLayout == VERTICAL)
-		{
-			grabSpaceRect.setY(r.getY());
-			r.translate(0, grabSpaceRect.getHeight() + gap);
-		} else
-		{
-			grabSpaceRect.setX(r.getX());
-			r.translate(grabSpaceRect.getWidth() + gap, 0);
-		}
-	}
-
-	if (grabbingItem != nullptr)
-	{
-		if (defaultLayout == VERTICAL) grabbingItem->setBounds(grabbingItem->getBounds().withY(grabbingItem->posAtDown.y + grabbingItem->dragOffset.y));
-		else  grabbingItem->setBounds(grabbingItem->getBounds().withX(grabbingItem->posAtDown.x + grabbingItem->dragOffset.x));
-	}
-
-
 	if (useViewport || resizeOnChildBoundsChanged)
 	{
 
@@ -479,7 +472,7 @@ void BaseManagerUI<M, T, U>::resizedInternalContent(juce::Rectangle<int>& r)
 		{
 			float th = 0;
 			if (itemsUI.size() > 0) th = static_cast<BaseItemMinimalUI<T>*>(itemsUI[itemsUI.size() - 1])->getBottom();
-			if (grabbingItem != nullptr) th = jmax<int>(th + grabbingItem->getHeight(), viewport.getHeight());
+			//if (grabbingItem != nullptr) th = jmax<int>(th + grabbingItem->getHeight(), viewport.getHeight());
 
 			if (useViewport) container.setSize(getWidth(), th);
 			else this->setSize(getWidth(), jmax<int>(th + 10, minHeight));
@@ -487,7 +480,7 @@ void BaseManagerUI<M, T, U>::resizedInternalContent(juce::Rectangle<int>& r)
 		{
 			float tw = 0;
 			if (itemsUI.size() > 0) tw = static_cast<BaseItemMinimalUI<T>*>(itemsUI[itemsUI.size() - 1])->getRight();
-			if (grabbingItem != nullptr) tw = jmax<int>(tw, viewport.getWidth());
+			//if (grabbingItem != nullptr) tw = jmax<int>(tw, viewport.getWidth());
 			if (useViewport) container.setSize(tw, getHeight());
 			else this->setSize(tw, getHeight());
 		}
@@ -598,6 +591,8 @@ U * BaseManagerUI<M, T, U>::addItemUI(T * item, bool animate, bool resizeAndRepa
 	else addAndMakeVisible(bui);
 
 	itemsUI.insert(manager->items.indexOf(item), tui);
+	
+	bui->addItemMinimalUIListener(this);
 
 	BaseItemUI<T> * biui = dynamic_cast<BaseItemUI<T> *>(tui);
 	if (biui != nullptr) biui->addItemUIListener(this);
@@ -637,9 +632,12 @@ void BaseManagerUI<M, T, U>::removeItemUI(T * item, bool resizeAndRepaint)
 	U * tui = getUIForItem(item, false);
 	if (tui == nullptr) return;
 
-	if (useViewport) container.removeChildComponent(static_cast<BaseItemMinimalUI<T>*>(tui));
-	else removeChildComponent(static_cast<BaseItemMinimalUI<T>*>(tui));
+	BaseItemMinimalUI<T> * bui = static_cast<BaseItemMinimalUI<T>*>(tui);
 
+	if (useViewport) container.removeChildComponent(bui);
+	else removeChildComponent(bui);
+
+	bui->removeItemMinimalUIListener(this);
 
 	BaseItemUI<T> * biui = dynamic_cast<BaseItemUI<T> *>(tui);
 	if (biui != nullptr) biui->removeItemUIListener(this);
@@ -742,39 +740,88 @@ void BaseManagerUI<M, T, U>::newMessage(const typename BaseManager<T>::ManagerEv
 	}
 }
 
-
 template<class M, class T, class U>
-void BaseManagerUI<M, T, U>::itemUIGrabStart(BaseItemUI<T>* se)
+bool BaseManagerUI<M, T, U>::isInterestedInDragSource(const SourceDetails & dragSourceDetails)
 {
-	grabbingItem = se;
+	if (acceptedDropTypes.contains(dragSourceDetails.description.getProperty("type", "").toString())) return true;
 
-	grabbingItemDropIndex = itemsUI.indexOf((U*)grabbingItem);
-	grabSpaceRect = ((U *)grabbingItem)->getBounds();
-	itemsUI.removeObject((U *)grabbingItem, false);
-	grabbingItem->toFront(false);
+	U * itemUI = dynamic_cast<U *>(dragSourceDetails.sourceComponent.get());
+	if (itemsUI.contains(itemUI)) return true;
+
+	return false;
 }
 
 template<class M, class T, class U>
-void BaseManagerUI<M, T, U>::itemUIGrabbed(BaseItemUI<T>* se)
+void BaseManagerUI<M, T, U>::itemDragEnter(const SourceDetails&)
 {
-	if (grabbingItem != nullptr) resized();
+	isDraggingOver = true;
+	if (highlightOnDragOver) repaint();
 }
 
 template<class M, class T, class U>
-void BaseManagerUI<M, T, U>::itemUIGrabEnd(BaseItemUI<T>* se)
+void BaseManagerUI<M, T, U>::itemDragMove(const SourceDetails &dragSourceDetails)
 {
-	if (grabbingItem != nullptr)
+	if (defaultLayout == HORIZONTAL || defaultLayout == VERTICAL)
 	{
-
-		int targetIndex = grabbingItemDropIndex;
-		itemsUI.insert(targetIndex,(U *)grabbingItem);
-
-		grabbingItem = nullptr;
-		grabbingItemDropIndex = -1;
-
-		manager->setItemIndex(se->item, targetIndex);
-		resized();
+		currentDropIndex = getDropIndexForPosition(dragSourceDetails.localPosition);
+		repaint();
 	}
+}
+
+
+template<class M, class T, class U>
+void BaseManagerUI<M, T, U>::itemDragExit(const SourceDetails&)
+{
+	isDraggingOver = false;
+	if (highlightOnDragOver) repaint();
+}
+
+template<class M, class T, class U>
+void BaseManagerUI<M, T, U>::itemDropped(const SourceDetails & dragSourceDetails)
+{
+	
+	if (defaultLayout == HORIZONTAL || defaultLayout == VERTICAL)
+	{
+		BaseItemMinimalUI<T> * bui = dynamic_cast<BaseItemMinimalUI<T> *>(dragSourceDetails.sourceComponent.get());
+		if (bui != nullptr)
+		{
+			int droppingIndex = getDropIndexForPosition(dragSourceDetails.localPosition);
+			if (itemsUI.contains((U *)bui))
+			{
+				if (itemsUI.indexOf((U*)bui) < droppingIndex) droppingIndex--;
+				if (droppingIndex == -1) droppingIndex = itemsUI.size() - 1;
+				manager->setItemIndex(bui->item, droppingIndex);
+			}
+			else
+			{
+				var data = bui->item->getJSONData();
+				T * newItem = manager->addItemFromData(data);
+				if (newItem != nullptr)
+				{
+					manager->setItemIndex(newItem, droppingIndex);
+					bui->item->remove();
+				}
+			}
+		}
+	}
+
+	isDraggingOver = false;
+	if (highlightOnDragOver) repaint();
+}
+
+template<class M, class T, class U>
+int BaseManagerUI<M, T, U>::getDropIndexForPosition(Point<int> localPosition)
+{
+	for (int i = 0; i < itemsUI.size(); i++)
+	{
+		BaseItemMinimalUI<T> * iui = dynamic_cast<BaseItemMinimalUI<T> *>(itemsUI[i]);
+		Point<int> p = getLocalArea(iui, iui->getLocalBounds()).getCentre();
+
+		if (defaultLayout == HORIZONTAL && localPosition.x < p.x) return i;
+		else if (defaultLayout == VERTICAL && localPosition.y < p.y) return i;
+	}
+
+	return -1;
 }
 
 
@@ -806,6 +853,3 @@ inline void BaseManagerUI<M, T, U>::endLoadFile()
 	animateItemOnAdd = tmpAnimate;
 	resized();
 }
-
-
-#endif  // BASEMANAGERUI_H_INCLUDED

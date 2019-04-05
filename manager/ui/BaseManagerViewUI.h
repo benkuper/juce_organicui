@@ -8,9 +8,7 @@
   ==============================================================================
 */
 
-#ifndef BASEMANAGERVIEWUI_H_INCLUDED
-#define BASEMANAGERVIEWUI_H_INCLUDED
-
+#pragma once
 
 template<class M, class T, class U>
 class BaseManagerViewUI :
@@ -50,7 +48,6 @@ public:
 	Point<int> getSize();
 	Point<int> getViewMousePosition();
 	Point<int> getViewPos(const Point<int> &originalPos);
-	float getUnitSize();
 	Point<int> getViewCenter();
 	Point<float> getPosInView(const Point<float> &viewPos);
  juce::Rectangle<float> getBoundsInView(const juce::Rectangle<float> &r);
@@ -63,8 +60,12 @@ public:
 
 	virtual void addItemUIInternal(U * se) override; 
 
-	virtual void itemUIGrabbed(BaseItemUI<T> * se) override;
-	virtual void itemUIMiniModeChanged(BaseItemUI<T> * se) override;
+	//virtual void itemUIGrabbed(BaseItemMinimalUI<T> * se) override;
+
+	void itemDropped(const SourceDetails &dragSourceDetails) override;
+
+	virtual void itemUIMiniModeChanged(BaseItemUI<T> * itemUI) override;
+	virtual void itemUIViewPositionChanged(BaseItemMinimalUI<T> * itemUI) override;
 
 
 	virtual void endLoadFile() override;
@@ -79,6 +80,8 @@ BaseManagerViewUI<M, T, U>::BaseManagerViewUI(const String & contentName, M * _m
 	canZoom(true),
     viewZoom(1)
 {
+	defaultLayout = FREE;
+
 	this->resizeOnChildBoundsChanged = false;
 	this->bgColor = BG_COLOR.darker(.3f);
 }
@@ -149,7 +152,7 @@ bool BaseManagerViewUI<M, T, U>::keyPressed(const KeyPress & e)
 template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::paint(Graphics & g)
 {
-	paintBackground(g);
+	if(!transparentBG) paintBackground(g);
 
 	if (this->manager->items.size() == 0 && this->noItemText.isNotEmpty())
 	{
@@ -162,7 +165,7 @@ void BaseManagerViewUI<M, T, U>::paint(Graphics & g)
 template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::paintBackground(Graphics & g)
 {
-	int checkerSize = getUnitSize();
+	int checkerSize = defaultCheckerSize * viewZoom;
 
 	int checkerTX = -checkerSize * 2 + ((this->getWidth() / 2 + viewOffset.x) % (checkerSize * 2));
 	int checkerTY = -checkerSize * 2 + ((this->getHeight() / 2 + viewOffset.y) % (checkerSize * 2));
@@ -189,15 +192,11 @@ void BaseManagerViewUI<M, T, U>::resized()
 }
 
 template<class M, class T, class U>
-void BaseManagerViewUI<M, T, U>::updateViewUIPosition(U * se)
+void BaseManagerViewUI<M, T, U>::updateViewUIPosition(U * itemUI)
 {	
-	if (se == nullptr) return;
-	Point<int> pe = se->item->viewUIPosition->getPoint().toInt() * viewZoom;
-	
-	pe += getSize()/2; //position at center of window
-	pe += viewOffset;
-	pe -= se->getLocalBounds().getCentre();
-	se->setTopLeftPosition(pe.x, pe.y);
+	if (itemUI == nullptr) return;
+	Point<int> p = getPosInView(itemUI->item->viewUIPosition->getPoint()).toInt();
+	itemUI->setTopLeftPosition(p.x, p.y);
 }
 
 template<class M, class T, class U>
@@ -238,13 +237,7 @@ Point<int> BaseManagerViewUI<M, T, U>::getViewPos(const Point<int>& originalPos)
 }
 
 template<class M, class T, class U>
-float BaseManagerViewUI<M, T, U>::getUnitSize()
-{
-	return defaultCheckerSize*viewZoom;
-}
-
-template<class M, class T, class U>
-inline Point<int> BaseManagerViewUI<M, T, U>::getViewCenter()
+ Point<int> BaseManagerViewUI<M, T, U>::getViewCenter()
 {
 	return viewOffset + (getSize() / 2);
 }
@@ -252,7 +245,7 @@ inline Point<int> BaseManagerViewUI<M, T, U>::getViewCenter()
 template<class M, class T, class U>
 Point<float> BaseManagerViewUI<M, T, U>::getPosInView(const Point<float>& viewPos)
 {
-	return (viewPos*getUnitSize()) + getViewCenter().toFloat();
+	return viewPos * viewZoom + getViewCenter().toFloat();
 }
 
 template<class M, class T, class U>
@@ -310,26 +303,37 @@ void BaseManagerViewUI<M, T, U>::addItemUIInternal(U * se)
 	updateViewUIPosition(se);
 }
 
-
 template<class M, class T, class U>
-void BaseManagerViewUI<M, T, U>::itemUIGrabbed(BaseItemUI<T> * se)
+void BaseManagerViewUI<M, T, U>::itemDropped(const SourceDetails & dragSourceDetails)
 {
-	updateViewUIPosition(static_cast<U *>(se));
+	BaseManagerUI::itemDropped(dragSourceDetails);
+	
+	BaseItemMinimalUI<T> * bui = dynamic_cast<BaseItemMinimalUI<T> *>(dragSourceDetails.sourceComponent.get());
+
+	if (bui != nullptr)
+	{
+		if (itemsUI.contains((U *)bui))
+		{
+			Point<int> p = getViewMousePosition() - Point<int>((int)dragSourceDetails.description.getProperty("offsetX", 0), (int)dragSourceDetails.description.getProperty("offsetY", 0));
+			bui->item->viewUIPosition->setUndoablePoint(bui->item->viewUIPosition->getPoint(), p.toFloat());
+		}
+	}
 }
 
 template<class M, class T, class U>
-inline void BaseManagerViewUI<M, T, U>::itemUIMiniModeChanged(BaseItemUI<T>* se)
+ void BaseManagerViewUI<M, T, U>::itemUIMiniModeChanged(BaseItemUI<T>* itemUI)
 {
-	updateViewUIPosition(static_cast<U *>(se));
+	updateViewUIPosition(dynamic_cast<U *>(itemUI));
 }
+
+ template<class M, class T, class U>
+ void BaseManagerViewUI<M, T, U>::itemUIViewPositionChanged(BaseItemMinimalUI<T>* itemUI)
+ {
+	 updateViewUIPosition(dynamic_cast<U *>(itemUI));
+ }
 
 template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::endLoadFile()
 {
 	frameView();
 }
-
-
-
-
-#endif  // BASEMANAGERVIEWUI_H_INCLUDED
