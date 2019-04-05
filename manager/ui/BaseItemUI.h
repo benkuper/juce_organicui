@@ -13,27 +13,24 @@
 template<class T>
 class BaseItemUI :
 	public BaseItemMinimalUI<T>,
-	public Button::Listener,
+	public Button::Listener, 
 	public Label::Listener
 {
 public:
 	enum Direction { NONE, VERTICAL, HORIZONTAL, ALL };
 
-	BaseItemUI<T>(T * _item, Direction resizeDirection = NONE, Direction dragDirection = VERTICAL);
+	BaseItemUI<T>(T * _item, Direction resizeDirection = NONE);
 	virtual ~BaseItemUI<T>();
 
 	//LAYOUT
 	int margin;
 	int minContentHeight;
 
-	float viewZoom;
 
 	//grabber
-	int grabberHeight;
-	Point<float> posAtMouseDown;
+	//int grabberHeight;
+	//Point<float> posAtMouseDown;
 	Point<float> sizeAtMouseDown;
-	Direction dragDirection;
-	bool customDragBehavior;
 
 	//header
 	int headerHeight;
@@ -46,10 +43,6 @@ public:
 	int resizerWidth;
 	int resizerHeight;
 
-	//list pos
-	Point<int> posAtDown;
-	Point<int> dragOffset; //for list grabbing
-
 	ScopedPointer<ResizableCornerComponent> cornerResizer;
 	ScopedPointer<ResizableEdgeComponent> edgeResizer;
 	ComponentBoundsConstrainer constrainer;
@@ -60,7 +53,7 @@ public:
 	ScopedPointer<BoolImageToggleUI> enabledBT;
 	ScopedPointer<ImageButton> removeBT;
 
-	ScopedPointer<Grabber> grabber;
+	//ScopedPointer<Grabber> grabber;
 
 	Array<Component *> contentComponents;
 
@@ -71,42 +64,39 @@ public:
 
 	virtual void updateMiniModeUI();
 
-	void setViewZoom(float value);
-	void setGrabber(Grabber * newGrabber);
+	//void setGrabber(Grabber * newGrabber);
 
 	virtual void resized() override;
 	virtual void resizedInternalHeader(juce::Rectangle<int> &) {}
 	virtual void resizedInternalContent(juce::Rectangle<int> &) {}
 	virtual void resizedInternalFooter(juce::Rectangle<int> &) {}
-	void buttonClicked(Button *b) override;
+	virtual void buttonClicked(Button *b) override;
 
 
-	void mouseDown(const MouseEvent &e) override;
-	void mouseDrag(const MouseEvent &e) override;
-	void mouseUp(const MouseEvent &e) override;
-	void mouseDoubleClick(const MouseEvent &e) override;
+	virtual void mouseDown(const MouseEvent &e) override;
+	virtual void mouseDrag(const MouseEvent &e) override;
+	virtual void mouseUp(const MouseEvent &e) override;
+	virtual void mouseDoubleClick(const MouseEvent &e) override;
 	virtual void labelTextChanged(Label * l) override;
+
+	virtual bool canStartDrag(const MouseEvent &e) override;
 
 	virtual void containerChildAddressChangedAsync(ControllableContainer *) override;
 	virtual void controllableFeedbackUpdateInternal(Controllable *) override;
 
 	virtual void visibilityChanged() override;
 
-
-
 	class ItemUIListener
 	{
 	public:
 		virtual ~ItemUIListener() {}
 		virtual void itemUIMiniModeChanged(BaseItemUI<T> *) {}
-		virtual void itemUIGrabStart(BaseItemUI<T> *) {}
-		virtual void itemUIGrabbed(BaseItemUI<T> *) {}
-		virtual void itemUIGrabEnd(BaseItemUI<T> *) {}
 	};
 
 	ListenerList<ItemUIListener> itemUIListeners;
 	void addItemUIListener(ItemUIListener* newListener) { itemUIListeners.add(newListener); }
 	void removeItemUIListener(ItemUIListener* listener) { itemUIListeners.remove(listener); }
+
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BaseItemUI<T>)
@@ -114,14 +104,12 @@ private:
 
 
 template<class T>
-BaseItemUI<T>::BaseItemUI(T * _item, Direction _resizeDirection, Direction _dragDirection) :
+BaseItemUI<T>::BaseItemUI(T * _item, Direction _resizeDirection) :
 	BaseItemMinimalUI<T>(_item),
 	margin(3),
 	minContentHeight(2),
-	viewZoom(1),
-	grabberHeight(0),
-	dragDirection (_dragDirection),
-	customDragBehavior(false),
+//	grabberHeight(0),
+//	customDragBehavior(false),
 	headerHeight(16),
 	headerGap(2),
 	showEnableBT(true),
@@ -132,6 +120,7 @@ BaseItemUI<T>::BaseItemUI(T * _item, Direction _resizeDirection, Direction _drag
 	resizer(nullptr),
 	itemLabel("itemLabel", dynamic_cast<BaseItem *>(this->inspectable.get())->niceName)
 {
+
 	itemLabel.setColour(itemLabel.backgroundColourId, Colours::transparentWhite);
 	itemLabel.setColour(itemLabel.textColourId, TEXT_COLOR);
 
@@ -146,10 +135,13 @@ BaseItemUI<T>::BaseItemUI(T * _item, Direction _resizeDirection, Direction _drag
 	itemLabel.addListener(this);
 	this->addAndMakeVisible(&itemLabel);
 
+	/*
+	dragAndDropEnabeld = dragDirection != NONE;
 	if (dragDirection != NONE)
 	{
 		setGrabber(new Grabber(dragDirection == VERTICAL ? Grabber::VERTICAL : Grabber::HORIZONTAL));
 	}
+	*/
 
 	switch (resizeDirection)
 	{
@@ -223,7 +215,7 @@ void BaseItemUI<T>::setContentSize(int contentWidth, int contentHeight)
 template<class T>
 int BaseItemUI<T>::getHeightWithoutContent()
 {
-	return grabberHeight + headerHeight + margin * 2 + (this->baseItem->miniMode->boolValue() ? 0 : headerGap + resizerHeight);
+	return headerHeight + margin * 2 + (this->baseItem->miniMode->boolValue() ? 0 : headerGap + resizerHeight);
 }
 
 template<class T>
@@ -268,12 +260,6 @@ void BaseItemUI<T>::updateMiniModeUI()
 	itemUIListeners.call(&ItemUIListener::itemUIMiniModeChanged, this);
 }
 
-template<class T>
-void BaseItemUI<T>::setViewZoom(float value)
-{
-	viewZoom = value;
-}
-
 
 
 template<class T>
@@ -286,20 +272,23 @@ void BaseItemUI<T>::resized()
 	juce::Rectangle<int> r = this->getMainBounds().reduced(margin);
 
 	//Grabber
+	/*
 	if (dragDirection == HORIZONTAL || dragDirection == ALL)
 	{
 		//Grabber
 		grabber->setBounds(r.removeFromTop(grabberHeight));
 		grabber->repaint();
-	}
+	}*/
 
 	juce::Rectangle<int> h = r.removeFromTop(headerHeight);
 
+	/*
 	if (dragDirection == VERTICAL)
 	{
 		grabber->setBounds(h.removeFromLeft(10));
 		grabber->repaint();
 	}
+	*/
 
 	if (enabledBT != nullptr && showEnableBT)
 	{
@@ -382,9 +371,11 @@ template<class T>
 void BaseItemUI<T>::mouseDown(const MouseEvent & e)
 {
 	if ((removeBT != nullptr && e.eventComponent == removeBT) || (enabledBT != nullptr && e.eventComponent == enabledBT->bt)) return;
-
 	BaseItemMinimalUI<T>::mouseDown(e);
 
+	/*
+	
+	
 	if (e.mods.isLeftButtonDown())
 	{
 		if (e.eventComponent == cornerResizer.get())
@@ -404,11 +395,12 @@ void BaseItemUI<T>::mouseDown(const MouseEvent & e)
 				{
 					posAtDown = this->getBounds().getPosition();
 					dragOffset = Point<int>();
-					itemUIListeners.call(&ItemUIListener::itemUIGrabStart, this);
+					itemMinimalUIListeners.call(&ItemMinimalUIListener::itemUIGrabStart, this);
 				}
 			}
 		}
 	}
+	*/
 }
 
 
@@ -416,7 +408,7 @@ template<class T>
 void BaseItemUI<T>::mouseDrag(const MouseEvent & e)
 {
 	BaseItemMinimalUI<T>::mouseDrag(e);
-
+	/*
 	if (e.mods.isLeftButtonDown())
 	{
 		if (dragDirection != NONE && !customDragBehavior && e.eventComponent->getParentComponent() == this)
@@ -432,18 +424,20 @@ void BaseItemUI<T>::mouseDrag(const MouseEvent & e)
 				else
 				{
 					dragOffset = e.getOffsetFromDragStart();
-					itemUIListeners.call(&ItemUIListener::itemUIGrabbed, this);
+					itemMinimalUIListeners.call(&ItemMinimalUIListener::itemUIGrabbed, this);
 				}
 			}
 		}
-
 	}
-
+	*/
 }
 
 template<class T>
 void BaseItemUI<T>::mouseUp(const MouseEvent & e)
 {
+	BaseItemMinimalUI<T>::mouseUp(e);
+
+	/*
 	if (e.mods.isLeftButtonDown())
 	{
 		if (e.eventComponent == cornerResizer.get())
@@ -463,18 +457,21 @@ void BaseItemUI<T>::mouseUp(const MouseEvent & e)
 				}
 				else
 				{
-					itemUIListeners.call(&ItemUIListener::itemUIGrabEnd, this);
+					itemMinimalUIListeners.call(&ItemMinimalUIListener::itemUIGrabEnd, this);
 				}
 			}
 		}
-
 	}
+	*/
 }
 
 template<class T>
 void BaseItemUI<T>::mouseDoubleClick(const MouseEvent & e)
 {
-	if (e.eventComponent == grabber) this->baseItem->miniMode->setValue(!this->baseItem->miniMode->boolValue());
+	BaseItemMinimalUI<T>::mouseDoubleClick(e);
+	
+	//To find how to put minimode
+	//if (e.eventComponent == grabber) this->baseItem->miniMode->setValue(!this->baseItem->miniMode->boolValue());
 }
 
 template<class T>
@@ -485,6 +482,12 @@ void BaseItemUI<T>::labelTextChanged(Label * l)
 		if (l->getText().isEmpty()) itemLabel.setText(this->baseItem->niceName, dontSendNotification); //avoid setting empty names
 		else this->baseItem->setUndoableNiceName(l->getText());
 	}
+}
+
+template<class T>
+bool BaseItemUI<T>::canStartDrag(const MouseEvent & e)
+{
+	return e.eventComponent == this || (e.eventComponent == &itemLabel && !itemLabel.isBeingEdited());
 }
 
 
@@ -500,7 +503,7 @@ void BaseItemUI<T>::controllableFeedbackUpdateInternal(Controllable * c)
 {
 	BaseItemMinimalUI<T>::controllableFeedbackUpdateInternal(c);
 	if (c == this->baseItem->miniMode) updateMiniModeUI();
-	else if (dragDirection != NONE && c == this->baseItem->viewUIPosition) itemUIListeners.call(&ItemUIListener::itemUIGrabbed, this);
+	//else if (dragDirection != NONE && c == this->baseItem->viewUIPosition) itemMinimalUIListeners.call(&ItemMinimalUIListener::itemUIGrabbed, this);
 }
 
 template<class T>
@@ -509,6 +512,7 @@ void BaseItemUI<T>::visibilityChanged()
 	resized();
 }
 
+/*
 template<class T>
 void BaseItemUI<T>::setGrabber(Grabber * newGrabber)
 {
@@ -524,6 +528,9 @@ void BaseItemUI<T>::setGrabber(Grabber * newGrabber)
 		this->addAndMakeVisible(grabber);
 		if (dragDirection == HORIZONTAL ||dragDirection == ALL) grabberHeight = 15;
 		this->addAndMakeVisible(grabber);
+
+		defaultDragComponent = grabber;
 	}
 
 }
+*/

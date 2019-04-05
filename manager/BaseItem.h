@@ -61,7 +61,7 @@ public:
 	void loadJSONDataInternal(var data) override;
 
 	InspectableEditor * getEditor(bool isRoot) override;
-
+	
 	virtual String getTypeString() const { return "BaseItem"; };
 
 	class  Listener
