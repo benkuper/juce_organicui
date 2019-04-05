@@ -62,7 +62,7 @@ public:
 
 	//virtual void itemUIGrabbed(BaseItemMinimalUI<T> * se) override;
 
-	void itemDropped(const SourceDetails &dragSourceDetails) override;
+    void itemDropped(const DragAndDropTarget::SourceDetails &dragSourceDetails) override;
 
 	virtual void itemUIMiniModeChanged(BaseItemUI<T> * itemUI) override;
 	virtual void itemUIViewPositionChanged(BaseItemMinimalUI<T> * itemUI) override;
@@ -80,7 +80,7 @@ BaseManagerViewUI<M, T, U>::BaseManagerViewUI(const String & contentName, M * _m
 	canZoom(true),
     viewZoom(1)
 {
-	defaultLayout = FREE;
+    this->defaultLayout = this->FREE;
 
 	this->resizeOnChildBoundsChanged = false;
 	this->bgColor = BG_COLOR.darker(.3f);
@@ -152,7 +152,7 @@ bool BaseManagerViewUI<M, T, U>::keyPressed(const KeyPress & e)
 template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::paint(Graphics & g)
 {
-	if(!transparentBG) paintBackground(g);
+	if(!this->transparentBG) paintBackground(g);
 
 	if (this->manager->items.size() == 0 && this->noItemText.isNotEmpty())
 	{
@@ -304,15 +304,15 @@ void BaseManagerViewUI<M, T, U>::addItemUIInternal(U * se)
 }
 
 template<class M, class T, class U>
-void BaseManagerViewUI<M, T, U>::itemDropped(const SourceDetails & dragSourceDetails)
+void BaseManagerViewUI<M, T, U>::itemDropped(const DragAndDropTarget::SourceDetails & dragSourceDetails)
 {
-	BaseManagerUI::itemDropped(dragSourceDetails);
+	BaseManagerUI<M, T, U>::itemDropped(dragSourceDetails);
 	
 	BaseItemMinimalUI<T> * bui = dynamic_cast<BaseItemMinimalUI<T> *>(dragSourceDetails.sourceComponent.get());
 
 	if (bui != nullptr)
 	{
-		if (itemsUI.contains((U *)bui))
+		if (this->itemsUI.contains((U *)bui))
 		{
 			Point<int> p = getViewMousePosition() - Point<int>((int)dragSourceDetails.description.getProperty("offsetX", 0), (int)dragSourceDetails.description.getProperty("offsetY", 0));
 			bui->item->viewUIPosition->setUndoablePoint(bui->item->viewUIPosition->getPoint(), p.toFloat());
