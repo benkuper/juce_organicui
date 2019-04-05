@@ -360,11 +360,11 @@ void BaseItemUI<T>::labelTextChanged(Label * l)
 template<class T>
 bool BaseItemUI<T>::keyPressed(const KeyPress & e)
 {
-	if (!inspectable.wasObjectDeleted() && item->isSelected)
+	if (!this->inspectable.wasObjectDeleted() && this->item->isSelected)
 	{
 		if (e.getKeyCode() == KeyPress::F2Key)
 		{
-			itemLabel.showEditor();
+			this->itemLabel.showEditor();
 			return true;
 		}
 	}
