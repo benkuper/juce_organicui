@@ -251,7 +251,7 @@ Point<float> BaseManagerViewUI<M, T, U>::getPosInView(const Point<float>& viewPo
 template<class M, class T, class U>
  juce::Rectangle<float> BaseManagerViewUI<M, T, U>::getBoundsInView(const juce::Rectangle<float>& r)
 {
-	return r.withPosition(getPosInView(r.getPosition())).withSize(r.getWidth()*getUnitSize(),r.getHeight()*getUnitSize());
+	 return r.withPosition(getPosInView(r.getPosition())).withSize(r.getWidth()*viewZoom, r.getHeight()*viewZoom);
 }
 
 template<class M, class T, class U>

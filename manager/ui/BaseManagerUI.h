@@ -790,7 +790,7 @@ void BaseManagerUI<M, T, U>::itemDropped(const SourceDetails & dragSourceDetails
 			{
 				if (itemsUI.indexOf((U*)bui) < droppingIndex) droppingIndex--;
 				if (droppingIndex == -1) droppingIndex = itemsUI.size() - 1;
-				manager->setItemIndex(bui->item, droppingIndex);
+				this->manager->setItemIndex(bui->item, droppingIndex);
 			}
 			else
 			{
@@ -798,14 +798,14 @@ void BaseManagerUI<M, T, U>::itemDropped(const SourceDetails & dragSourceDetails
 				T * newItem = manager->addItemFromData(data);
 				if (newItem != nullptr)
 				{
-					manager->setItemIndex(newItem, droppingIndex);
+					this->manager->setItemIndex(newItem, droppingIndex);
 					bui->item->remove();
 				}
 			}
 		}
 	}
 
-	isDraggingOver = false;
+	this->isDraggingOver = false;
 	if (highlightOnDragOver) repaint();
 }
 
