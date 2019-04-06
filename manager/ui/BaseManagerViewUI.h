@@ -19,15 +19,19 @@ public:
 	virtual ~BaseManagerViewUI();
 
 	bool canNavigate;
+
+	//Zoom
 	bool canZoom;
 	bool zoomAffectsItemSize;
+	float viewZoom;
+	float minZoom;
+	float maxZoom;
 
 	Point<int> viewOffset; //in pixels, viewOffset of 0 means zeroPos is at the center of the window
 						   //interaction
 	Point<int> initViewOffset;
 
 	const int defaultCheckerSize = 32;
-	float viewZoom;
 
 	virtual void mouseDown(const MouseEvent &e) override;
 	virtual void mouseDrag(const MouseEvent &e) override;
@@ -80,7 +84,10 @@ BaseManagerViewUI<M, T, U>::BaseManagerViewUI(const String & contentName, M * _m
 	canNavigate(true),
 	canZoom(true),
 	zoomAffectsItemSize(true),
-    viewZoom(1)
+	viewZoom(1),
+	minZoom(.4f),
+	maxZoom(1)
+
 {
     this->defaultLayout = this->FREE;
 
@@ -298,7 +305,7 @@ template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::setViewZoom(float value)
 {
 	if (viewZoom == value) return;
-	viewZoom = jlimit<float>(.4f, 10, value);
+	viewZoom = jlimit<float>(minZoom, maxZoom, value);
 	for (auto &tui : this->itemsUI) tui->setViewZoom(viewZoom);
 
 	this->resized();
