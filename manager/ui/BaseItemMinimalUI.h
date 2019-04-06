@@ -124,10 +124,13 @@ void BaseItemMinimalUI<T>::mouseDrag(const MouseEvent & e)
 	var desc = var(new DynamicObject());
 	desc.getDynamicObject()->setProperty("type", baseItem->getTypeString());
 	desc.getDynamicObject()->setProperty("dataType", baseItem->itemDataType);
-	desc.getDynamicObject()->setProperty("offsetX", getMouseXYRelative().x);
-	desc.getDynamicObject()->setProperty("offsetY", getMouseXYRelative().y);
+	desc.getDynamicObject()->setProperty("offsetX", getMouseXYRelative().x * viewZoom);
+	desc.getDynamicObject()->setProperty("offsetY", getMouseXYRelative().y * viewZoom);
 
-	if (e.getDistanceFromDragStart() > dragStartDistance) startDragging(desc, this, Image(), true);
+	Image dragImage = this->createComponentSnapshot(this->getLocalBounds()).convertedToFormat(Image::ARGB).rescaled(this->getWidth()*this->viewZoom, this->getHeight()*this->viewZoom);
+	if (!autoHideWhenDragging) dragImage.multiplyAllAlphas(.5f);
+	Point<int> offset = -getMouseXYRelative()*viewZoom;
+	if (e.getDistanceFromDragStart() > dragStartDistance) startDragging(desc, this, dragImage, true, &offset);
 }
 
 

@@ -20,6 +20,7 @@ public:
 
 	bool canNavigate;
 	bool canZoom;
+	bool zoomAffectsItemSize;
 
 	Point<int> viewOffset; //in pixels, viewOffset of 0 means zeroPos is at the center of the window
 						   //interaction
@@ -78,6 +79,7 @@ BaseManagerViewUI<M, T, U>::BaseManagerViewUI(const String & contentName, M * _m
 	BaseManagerUI<M, T, U>(contentName, _manager, false),
 	canNavigate(true),
 	canZoom(true),
+	zoomAffectsItemSize(true),
     viewZoom(1)
 {
     this->defaultLayout = this->FREE;
@@ -108,6 +110,7 @@ template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::mouseDrag(const MouseEvent & e)
 {
 	BaseManagerUI<M, T, U>::mouseDrag(e);
+
 	if (canNavigate && ((e.mods.isLeftButtonDown() && e.mods.isAltDown()) || e.mods.isMiddleButtonDown()))
 	{
 		viewOffset = initViewOffset + e.getOffsetFromDragStart();
@@ -127,7 +130,7 @@ void BaseManagerViewUI<M, T, U>::mouseUp(const MouseEvent & e)
 template<class M, class T, class U>
  void BaseManagerViewUI<M, T, U>::mouseWheelMove(const MouseEvent & e, const MouseWheelDetails & d)
 {
-	if (canZoom && e.originalComponent == this) setViewZoom(jlimit<float>(.1f, 10, viewZoom + d.deltaY));
+	if (canZoom && e.originalComponent == this) setViewZoom(viewZoom + d.deltaY);
 	
 }
 
@@ -197,6 +200,13 @@ void BaseManagerViewUI<M, T, U>::updateViewUIPosition(U * itemUI)
 	if (itemUI == nullptr) return;
 	Point<int> p = getPosInView(itemUI->item->viewUIPosition->getPoint()).toInt();
 	itemUI->setTopLeftPosition(p.x, p.y);
+	
+	AffineTransform t = AffineTransform().scaled(viewZoom, viewZoom, p.x, p.y);
+	
+	if (zoomAffectsItemSize)
+	{
+		((Component *)itemUI)->setTransform(t);
+	}
 }
 
 template<class M, class T, class U>
@@ -233,7 +243,7 @@ Point<int> BaseManagerViewUI<M, T, U>::getViewMousePosition()
 template<class M, class T, class U>
 Point<int> BaseManagerViewUI<M, T, U>::getViewPos(const Point<int>& originalPos)
 {
-	return originalPos - getSize() / 2 - viewOffset;
+	return (originalPos - getViewCenter()) / viewZoom;
 }
 
 template<class M, class T, class U>
@@ -251,7 +261,7 @@ Point<float> BaseManagerViewUI<M, T, U>::getPosInView(const Point<float>& viewPo
 template<class M, class T, class U>
  juce::Rectangle<float> BaseManagerViewUI<M, T, U>::getBoundsInView(const juce::Rectangle<float>& r)
 {
-	 return r.withPosition(getPosInView(r.getPosition())).withSize(r.getWidth()*viewZoom, r.getHeight()*viewZoom);
+	 return juce:: Rectangle<float>().withPosition(getPosInView(r.getPosition())).withSize(r.getWidth()*viewZoom, r.getHeight()*viewZoom);
 }
 
 template<class M, class T, class U>
@@ -288,8 +298,8 @@ template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::setViewZoom(float value)
 {
 	if (viewZoom == value) return;
-	viewZoom = value;
-	for (auto &tui : this->itemsUI) tui->setViewZoom(value);
+	viewZoom = jlimit<float>(.4f, 10, value);
+	for (auto &tui : this->itemsUI) tui->setViewZoom(viewZoom);
 
 	this->resized();
 	this->repaint();
@@ -314,8 +324,9 @@ void BaseManagerViewUI<M, T, U>::itemDropped(const DragAndDropTarget::SourceDeta
 	{
 		if (this->itemsUI.contains((U *)bui))
 		{
-			Point<int> p = getViewMousePosition() - Point<int>((int)dragSourceDetails.description.getProperty("offsetX", 0), (int)dragSourceDetails.description.getProperty("offsetY", 0));
-			bui->item->viewUIPosition->setUndoablePoint(bui->item->viewUIPosition->getPoint(), p.toFloat());
+			Point<int> realP = this->getMouseXYRelative() - Point<int>((int)dragSourceDetails.description.getProperty("offsetX", 0), (int)dragSourceDetails.description.getProperty("offsetY", 0));
+			Point<int> targetP = this->getViewPos(realP);
+			bui->item->viewUIPosition->setUndoablePoint(bui->item->viewUIPosition->getPoint(), targetP.toFloat());
 		}
 	}
 }
