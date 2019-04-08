@@ -13,6 +13,8 @@ Controllable::Controllable(const Type &type, const String & niceName, const Stri
 	ScriptTarget("", this),
 	type(type),
 	description(description),
+	customData(var()),
+	saveCustomData(false),
 	descriptionIsEditable(false),
 	hasCustomShortName(false),
 	isControllableExposed(true),
@@ -160,7 +162,9 @@ var Controllable::getJSONData(ControllableContainer * relativeTo)
 
 var Controllable::getJSONDataInternal()
 {
-	return var(new DynamicObject());
+	var data = var(new DynamicObject());
+	if (saveCustomData && !customData.isVoid()) data.getDynamicObject()->setProperty("customData", customData);
+	return data;
 }
 
 void Controllable::loadJSONData(var data)
@@ -175,6 +179,7 @@ void Controllable::loadJSONData(var data)
 	if (data.getDynamicObject()->hasProperty("description")) description = data.getProperty("description", description);
 	if (data.getDynamicObject()->hasProperty("hideInEditor")) hideInEditor = data.getProperty("hideInEditor", false);
 	if (data.getDynamicObject()->hasProperty("feedbackOnly")) setControllableFeedbackOnly(data.getProperty("feedbackOnly",false));
+	if (data.getDynamicObject()->hasProperty("customData")) customData = data.getProperty("customData", customData);
 
 	loadJSONDataInternal(data);
 }

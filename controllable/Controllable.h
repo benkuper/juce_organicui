@@ -44,6 +44,9 @@ public:
 	String description;
 	String argumentsDescription;
 
+	//For storing arbitraty data
+	var customData;
+	bool saveCustomData;
 	
 	//
 	bool enabled;
