@@ -151,7 +151,7 @@ void ControllableUI::newMessage(const Controllable::ControllableEvent & e)
 		controllableStateChanged();
 		repaint();
 	}
-		break;
+	break;
 
 	case Controllable::ControllableEvent::CONTROLLABLE_REMOVED:
 		break;

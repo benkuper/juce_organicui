@@ -15,6 +15,7 @@ Controllable::Controllable(const Type &type, const String & niceName, const Stri
 	description(description),
 	customData(var()),
 	saveCustomData(false),
+	canBeDisabledByUser(false),
 	descriptionIsEditable(false),
 	hasCustomShortName(false),
 	isControllableExposed(true),

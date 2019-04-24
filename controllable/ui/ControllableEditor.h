@@ -25,6 +25,7 @@ public:
 	ScopedPointer<ControllableUI> ui;
 	ScopedPointer<ImageButton> editBT;
 	ScopedPointer<ImageButton> removeBT;
+	ScopedPointer<ImageButton> enableBT;
 	
 	int baseHeight; //height at init
 	int subContentHeight; //for additional content

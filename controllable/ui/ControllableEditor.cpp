@@ -32,6 +32,14 @@ ControllableEditor::ControllableEditor(Controllable * _controllable, bool isRoot
 		addAndMakeVisible(removeBT);
 	}
 
+	if (controllable->canBeDisabledByUser)
+	{
+		enableBT = AssetManager::getInstance()->getPowerBT();
+		enableBT->addListener(this);
+		enableBT->setToggleState(controllable->enabled, dontSendNotification);
+		addAndMakeVisible(enableBT);
+	}
+
 	/*
 	if (controllable->isCustomizableByUser)
 	{
@@ -81,7 +89,7 @@ void ControllableEditor::buildControllableUI(bool resizeAfter)
 
 void ControllableEditor::resized()
 {
- juce::Rectangle<int> r = getLocalBounds();
+	juce::Rectangle<int> r = getLocalBounds();
 	r.removeFromBottom(subContentHeight);// .withHeight(16);
 
 	int controlSpace = jmax<int>(showLabel?getWidth()*.6f:getWidth(), 100);
@@ -100,6 +108,12 @@ void ControllableEditor::resized()
 		r.removeFromRight(2);
 	}
 	*/
+
+	if (controllable->canBeDisabledByUser && enableBT != nullptr)
+	{
+		enableBT->setBounds(r.removeFromLeft(r.getHeight()));
+		r.removeFromLeft(2);
+	}
 
 	ui->setBounds(r.removeFromRight(controlSpace));
 	
@@ -126,9 +140,12 @@ void ControllableEditor::mouseDown(const MouseEvent & e)
 
 void ControllableEditor::newMessage(const Controllable::ControllableEvent & e)
 {
-	if (e.type == Controllable::ControllableEvent::NAME_CHANGED)
+	switch (e.type)
 	{
+	case Controllable::ControllableEvent::NAME_CHANGED:
 		label.setText(controllable->niceName, dontSendNotification);
+		break;
+
 	}
 }
 
@@ -140,5 +157,10 @@ void ControllableEditor::buttonClicked(Button * b)
 	} else if (b == editBT)
 	{
 		ui->showEditWindow();
+	}
+	else if (b == enableBT)
+	{
+		controllable->setEnabled(!controllable->enabled);
+		enableBT->setToggleState(controllable->enabled, dontSendNotification);
 	}
 }

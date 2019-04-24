@@ -50,6 +50,7 @@ public:
 	
 	//
 	bool enabled;
+	bool canBeDisabledByUser;
 	bool descriptionIsEditable;
 	bool hasCustomShortName;
 	bool isControllableExposed;

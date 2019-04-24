@@ -95,7 +95,7 @@ public:
 
 	T * showCreateMenu()
 	{
-		int result = getMenu().show();
+		int result = getMenu().getNumItems() == 1 ? 1 : getMenu().show();
 		return createFromMenuResult(result);
 	}
 
