@@ -367,15 +367,14 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 
 	case StandardApplicationCommandIDs::paste:
 	{
-		if (InspectableSelectionManager::activeSelectionManager != nullptr)
+		InspectableSelectionManager * selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
+
+		BaseItem * item = selectionManager->getInspectableAs<BaseItem>();
+		if (item != nullptr) item->paste();
+		else
 		{
-			BaseItem * item = InspectableSelectionManager::activeSelectionManager->getInspectableAs<BaseItem>();
-			if (item != nullptr) item->paste();
-			else
-			{
-				BaseItem::Listener * m = InspectableSelectionManager::activeSelectionManager->getInspectableAs<BaseItem::Listener>();
-				if (m != nullptr) m->askForPaste();
-			}
+			BaseItem::Listener * m = selectionManager->getInspectableAs<BaseItem::Listener>();
+			if (m != nullptr) m->askForPaste();
 		}
 	}
 	break;
@@ -405,11 +404,12 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 
 	case CommandIDs::selectAll:
 	{
-		BaseItem * item = InspectableSelectionManager::activeSelectionManager->getInspectableAs<BaseItem>();
+		InspectableSelectionManager * selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
+		BaseItem * item = selectionManager->getInspectableAs<BaseItem>();
 		if (item != nullptr) item->selectAll();
 		else
 		{
-			BaseItem::Listener * m = InspectableSelectionManager::activeSelectionManager->getInspectableAs<BaseItem::Listener>();
+			BaseItem::Listener * m = selectionManager->getInspectableAs<BaseItem::Listener>();
 			if (m != nullptr) m->askForSelectAllItems();
 		}
 	}
