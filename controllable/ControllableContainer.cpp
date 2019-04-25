@@ -405,6 +405,7 @@ ControllableContainer * ControllableContainer::getControllableContainerForAddres
 		//no found in direct children Container, maybe in a skip container ?
 		for (auto &cc : controllableContainers)
 		{
+			if (cc == nullptr || cc.wasObjectDeleted()) continue;
 			if (cc->skipControllableNameInAddress)
 			{
 				if (ControllableContainer * res = cc->getControllableContainerForAddress(addressSplit, recursive, getNotExposed)) return res;
