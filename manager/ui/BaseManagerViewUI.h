@@ -276,13 +276,14 @@ Point<float> BaseManagerViewUI<M, T, U>::getItemsCenter()
 {
 	if (this->itemsUI.size() == 0) return Point<float>(0, 0);
 
-	Point<float> average;
+	juce::Rectangle<float> bounds;
 	for (auto &se : this->itemsUI)
 	{
-		average += se->item->viewUIPosition->getPoint();
+		Point<float> p1 = se->item->viewUIPosition->getPoint();
+		Point<float> p2 = p1+se->item->viewUISize->getPoint();
+		bounds = juce::Rectangle<float>(Point<float>(jmin(bounds.getX(), p1.x), jmin(bounds.getY(), p1.y)), Point<float>(jmax<float>(bounds.getRight(), p2.x), jmax<float>(bounds.getBottom(), p2.y)));
 	}
-	average /= this->itemsUI.size();
-	return average;
+	return bounds.getCentre();
 }
 
 template<class M, class T, class U>
