@@ -8,14 +8,11 @@
   ==============================================================================
 */
 
-#ifndef SHAPESHIFTERMANAGER_H_INCLUDED
-#define SHAPESHIFTERMANAGER_H_INCLUDED
+#pragma once
 
 #include "ShapeShifterContainer.h"
 #include "ShapeShifterWindow.h"
 #include "ShapeShifterFactory.h"
-
-
 
 class ShapeShifterManager :
 	public ShapeShifterPanel::Listener
@@ -58,6 +55,9 @@ public:
 
 	ShapeShifterContent * getContentForName(const String &contentName);
 
+	template<class T>
+	T * getContentForType();
+
 	ShapeShifterPanel * checkCandidateTargetForPanel(ShapeShifterPanel * panel);
 	bool checkDropOnCandidateTarget(WeakReference<ShapeShifterPanel> panel);
 
@@ -85,4 +85,17 @@ private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ShapeShifterManager)
 };
 
-#endif  // SHAPESHIFTERMANAGER_H_INCLUDED
+template<class T>
+T * ShapeShifterManager::getContentForType()
+{
+	for (auto &p : openedPanels)
+	{
+		for (auto & c : p->contents)
+		{
+			T * d = dynamic_cast<T *>(c);
+			if (d != nullptr) return d;
+		}
+	}
+
+	return nullptr;
+}
