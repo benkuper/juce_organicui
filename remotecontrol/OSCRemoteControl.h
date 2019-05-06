@@ -9,7 +9,11 @@
 */
 
 #pragma once
-#include "JuceHeader.h"
+
+
+#if ORGANICUI_USE_SERVUS
+#include "servus/servus.h"
+#endif
 
 class OSCRemoteControl :
 	public EnablingControllableContainer,
@@ -27,7 +31,13 @@ public:
 
 	void setupReceiver();
 
+#if ORGANICUI_USE_SERVUS
+	servus::Servus servus;
+	void setupZeroconf();
+#endif
+
 	void processMessage(const OSCMessage &m);
+
 
 	void onContainerParameterChanged(Parameter * p) override;
 	

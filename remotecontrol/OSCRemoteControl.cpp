@@ -12,6 +12,9 @@ juce_ImplementSingleton(OSCRemoteControl)
 
 OSCRemoteControl::OSCRemoteControl() :
 	EnablingControllableContainer("OSC Remote Control")
+#if ORGANICUI_USE_SERVUS
+	,servus("_osc._udp")
+#endif
 {
 	localPort = addIntParameter("Local Port", "Local port to connect to for global control over the application", 42000, 1024, 65535);
 
@@ -41,6 +44,7 @@ void OSCRemoteControl::setupReceiver()
 	{
 		NLOG(niceName, "Now receiving on port : " + localPort->stringValue());
 		//if (!isThreadRunning()) startThread();
+		setupZeroconf();
 	} else
 	{
 		NLOGERROR(niceName, "Error binding port " + localPort->stringValue());
@@ -58,6 +62,29 @@ void OSCRemoteControl::setupReceiver()
 
 	NLOG(niceName, s);
 }
+
+#if ORGANICUI_USE_SERVUS
+void OSCRemoteControl::setupZeroconf()
+{
+	if (Engine::mainEngine->isClearing || localPort == nullptr) return;
+
+	String nameToAdvertise = "Chataigne - Remote Control";
+	int portToAdvertise = 0;
+	while (portToAdvertise != localPort->intValue())
+	{
+		portToAdvertise = localPort->intValue();
+		servus.withdraw();
+		servus.announce(portToAdvertise, nameToAdvertise.toStdString());
+
+		if (localPort->intValue() != portToAdvertise)
+		{
+			DBG("Name or port changed during advertise, readvertising");
+		}
+	}
+
+	NLOG(niceName, "Zeroconf service created : " << nameToAdvertise << ":" << portToAdvertise);
+}
+#endif
 
 void OSCRemoteControl::processMessage(const OSCMessage & m)
 {
@@ -128,6 +155,7 @@ void OSCRemoteControl::processMessage(const OSCMessage & m)
 		};
 	}
 }
+
 
 
 void OSCRemoteControl::onContainerParameterChanged(Parameter * p)

@@ -40,6 +40,16 @@
 #endif
 
 
+/** Config: ORGANICUI_USE_SERVUS
+	Enables the use of Zeroconf / DNS-SD / Bonjour for advertising the remote control OSC port and dashboard.
+
+	You will need to link the Servus libraries in the exporters in order to compile with this option.
+*/
+#ifndef ORGANICUI_USE_SERVUS
+#define ORGANICUI_USE_SERVUS 0
+#endif
+
+
 
 #include <juce_core/juce_core.h>
 #include <juce_events/juce_events.h>
