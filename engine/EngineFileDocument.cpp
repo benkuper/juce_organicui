@@ -258,7 +258,7 @@ void Engine::loadJSONData(var data, ProgressTask * loadingTask)
 		bool appVersionIsNewerThanFileVersion = versionIsNewerThan(getAppVersion(), versionString);
 		if (appVersionIsNewerThanFileVersion)
 		{
-			bool needsOnlineUpdate = md->hasProperty("needsOnlineUpdate") ? md->getProperty("needsOnlineUpdate") : false;
+			bool needsOnlineUpdate = md->hasProperty("needsOnlineUpdate") ? (bool)md->getProperty("needsOnlineUpdate") : false;
 
 			int result = 2; //load directly by default
 
