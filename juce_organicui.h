@@ -194,6 +194,7 @@ using namespace juce;
 #include "automation/ui/AutomationMultiKeyTransformer.h"
 #include "automation/ui/AutomationUI.h"
 #include "automation/ui/AutomationEditor.h"
+#include "automation/recorder/ui/AutomationRecorderEditor.h"
 #include "automation/parameter/ui/PlayableParameterAutomationEditor.h"
 
 #include "dashboard/DashboardItem.h"

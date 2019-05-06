@@ -77,6 +77,7 @@
 #include "automation/ui/AutomationMultiKeyTransformer.cpp"
 #include "automation/ui/AutomationUI.cpp"
 #include "automation/ui/AutomationEditor.cpp"
+#include "automation/recorder/ui/AutomationRecorderEditor.cpp"
 #include "automation/parameter/ui/PlayableParameterAutomationEditor.cpp"
 
 #include "dashboard/Dashboard.cpp"
