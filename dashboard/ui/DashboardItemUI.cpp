@@ -10,7 +10,7 @@
 
 
 DashboardItemUI::DashboardItemUI(DashboardItem * item) :
-	BaseItemUI(item),
+	BaseItemUI(item, Direction::VERTICAL),
 	currentControllable(nullptr)
 {
 	setControllableUI(item->target->target);
