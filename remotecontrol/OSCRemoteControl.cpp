@@ -44,7 +44,9 @@ void OSCRemoteControl::setupReceiver()
 	{
 		NLOG(niceName, "Now receiving on port : " + localPort->stringValue());
 		//if (!isThreadRunning()) startThread();
+#if ORGANICUI_USE_SERVUS
 		setupZeroconf();
+#endif
 	} else
 	{
 		NLOGERROR(niceName, "Error binding port " + localPort->stringValue());
