@@ -8,8 +8,8 @@
   ==============================================================================
 */
 
-#ifndef SHAPESHIFTERCONTENT_H_INCLUDED
-#define SHAPESHIFTERCONTENT_H_INCLUDED
+#pragma once
+
 class ShapeShifterContent
 {
 public:
@@ -40,5 +40,3 @@ public:
 	void mouseEnter(const MouseEvent &e) override;
 	void mouseExit(const MouseEvent &e) override;
 };
-
-#endif  // SHAPESHIFTERCONTENT_H_INCLUDED

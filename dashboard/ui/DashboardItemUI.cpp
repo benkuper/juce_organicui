@@ -1,3 +1,4 @@
+#include "DashboardItemUI.h"
 /*
   ==============================================================================
 
@@ -10,56 +11,23 @@
 
 
 DashboardItemUI::DashboardItemUI(DashboardItem * item) :
-	BaseItemUI(item, Direction::VERTICAL),
-	currentControllable(nullptr)
+	BaseItemUI(item, Direction::ALL)
 {
-	setControllableUI(item->target->target);
+	item->addAsyncDashboardItemListener(this);
 	setSize(100, 100);
 }
 
 DashboardItemUI::~DashboardItemUI()
 {
-	setControllableUI(nullptr);
+	if (!inspectable.wasObjectDeleted()) item->removeAsyncDashboardItemListener(this);
 }
 
-void DashboardItemUI::setControllableUI(Controllable * c)
+void DashboardItemUI::newMessage(const DashboardItem::DashboardItemEvent & e)
 {
-	if (c == currentControllable) return;
-
-	if (currentControllable != nullptr)
+	switch (e.type)
 	{
-		currentControllable->removeInspectableListener(this);
-		removeChildComponent(targetUI);
-		targetUI = nullptr;
-	}
-
-	currentControllable = c;
-
-	if (currentControllable != nullptr)
-	{
-		currentControllable->addInspectableListener(this);
-		targetUI = currentControllable->createDefaultUI();
-		addAndMakeVisible(targetUI);
-	}
-	resized();
-}
-
-void DashboardItemUI::resizedInternalContent(juce::Rectangle<int>& r)
-{
-	if (targetUI != nullptr) targetUI->setBounds(r);
-}
-
-void DashboardItemUI::inspectableDestroyed(Inspectable * i)
-{
-	BaseItemUI::inspectableDestroyed(i);
-	if (i == currentControllable) setControllableUI(nullptr);
-}
-
-void DashboardItemUI::controllableFeedbackUpdateInternal(Controllable * c)
-{
-	BaseItemUI::controllableFeedbackUpdateInternal(c);
-	if (c == item->target && item->target->target != nullptr)
-	{
-		setControllableUI(item->target->target);
+	case DashboardItem::DashboardItemEvent::TARGET_CHANGED:
+		updateTargetUI();
+		break;
 	}
 }

@@ -8,8 +8,8 @@
   ==============================================================================
 */
 
-#ifndef DEBUGHELPERS_H_INCLUDED
-#define DEBUGHELPERS_H_INCLUDED
+#pragma once
+
 //  header (build and link-time cheap) to include everywhere we need specific debug macros
 
 
@@ -124,8 +124,3 @@ private:
 	ScopedPointer<StringArray> _arr;
 
 };
-
-
-
-
-#endif  // DEBUGHELPERS_H_INCLUDED

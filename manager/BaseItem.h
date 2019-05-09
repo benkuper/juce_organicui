@@ -8,9 +8,7 @@
   ==============================================================================
 */
 
-#ifndef BASEITEM_H_INCLUDED
-#define BASEITEM_H_INCLUDED
-
+#pragma once
 
 class ScriptManager;
 class GenericControllableManager;
@@ -85,7 +83,3 @@ public:
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BaseItem)
 };
-
-
-
-#endif  // BASEITEM_H_INCLUDED

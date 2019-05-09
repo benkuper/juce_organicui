@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef INTPARAMETERLABELUI_H_INCLUDED
-#define INTPARAMETERLABELUI_H_INCLUDED
+#pragma once
 
 class IntParameterLabelUI :
 	public FloatParameterLabelUI 
@@ -25,5 +24,3 @@ private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(IntParameterLabelUI)
 
 };
-
-#endif  // INTPARAMETERLABELUI_H_INCLUDED

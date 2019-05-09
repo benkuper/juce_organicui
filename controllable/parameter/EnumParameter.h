@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef ENUMPARAMETER_H_INCLUDED
-#define ENUMPARAMETER_H_INCLUDED
+#pragma once
 
 class EnumParameterUI;
 
@@ -88,6 +87,3 @@ public:
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(EnumParameter)
 };
-
-
-#endif  // ENUMPARAMETER_H_INCLUDED

@@ -8,9 +8,7 @@
   ==============================================================================
 */
 
-#ifndef OUTLINER_H_INCLUDED
-#define OUTLINER_H_INCLUDED
-
+#pragma once
 
 class OutlinerItem;
 class  OutlinerItemListener
@@ -106,5 +104,3 @@ public:
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Outliner)
 };
-
-#endif  // OUTLINER_H_INCLUDED

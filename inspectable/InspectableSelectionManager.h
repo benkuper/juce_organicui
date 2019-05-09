@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef INSPECTABLESELECTIONMANAGER_H_INCLUDED
-#define INSPECTABLESELECTIONMANAGER_H_INCLUDED
+#pragma once
 
 #include "Inspectable.h"
 
@@ -97,6 +96,3 @@ Array<T*> InspectableSelectionManager::getInspectablesAs()
 	}
 	return result;
 }
-
-
-#endif  // INSPECTABLESELECTIONMANAGER_H_INCLUDED

@@ -8,8 +8,7 @@
  ==============================================================================
  */
 
-#ifndef PROGRESSNOTIFIER_H_INCLUDED
-#define PROGRESSNOTIFIER_H_INCLUDED
+#pragma once
 
 class FakeProgress;
 class StartCallbackMessage;
@@ -108,13 +107,4 @@ public:
 
   ScopedPointer<FakeProgress> fakeProgress;
 
-
-
-
-
 };
-
-
-
-
-#endif  // PROGRESSNOTIFIER_H_INCLUDED

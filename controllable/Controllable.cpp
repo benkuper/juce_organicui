@@ -199,6 +199,11 @@ InspectableEditor * Controllable::getEditor(bool isRootEditor) {
 
 //SCRIPT
 
+DashboardItem * Controllable::createDashboardItem()
+{
+	return new DashboardControllableItem(this);
+}
+
 var Controllable::setValueFromScript(const juce::var::NativeFunctionArgs& a) {
 
 	Controllable * c = getObjectFromJS<Controllable>(a);

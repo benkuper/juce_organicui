@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef INTPARAMETER_H_INCLUDED
-#define INTPARAMETER_H_INCLUDED
+#pragma once
 
 class IntSliderUI;
 class IntStepperUI;
@@ -39,6 +38,3 @@ public:
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(IntParameter)
 };
-
-
-#endif  // INTPARAMETER_H_INCLUDED

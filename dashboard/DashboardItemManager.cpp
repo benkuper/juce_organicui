@@ -11,6 +11,7 @@
 DashboardItemManager::DashboardItemManager() :
 	BaseManager("Dashboard")
 {
+	managerFactory = DashboardItemFactory::getInstance();
 }
 
 DashboardItemManager::~DashboardItemManager()

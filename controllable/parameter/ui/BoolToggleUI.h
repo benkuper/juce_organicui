@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef BOOLTOGGLEUI_H_INCLUDED
-#define BOOLTOGGLEUI_H_INCLUDED
+#pragma once
 
 class BoolToggleUI :
 	public ParameterUI,
@@ -44,6 +43,3 @@ protected:
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BoolToggleUI)
 };
-
-
-#endif  // BOOLTOGGLEUI_H_INCLUDED

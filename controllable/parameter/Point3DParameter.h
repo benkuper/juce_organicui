@@ -8,8 +8,7 @@ Author:  bkupe
 ==============================================================================
 */
 
-#ifndef POINT3DPARAMETER_H_INCLUDED
-#define POINT3DPARAMETER_H_INCLUDED
+#pragma once
 
 class Point3DParameter : public Parameter
 {
@@ -48,6 +47,3 @@ public:
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Point3DParameter)
 };
-
-
-#endif  // Point3DPARAMETER_H_INCLUDED

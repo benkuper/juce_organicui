@@ -7,9 +7,7 @@
 
  ==============================================================================
  */
-
-#ifndef ENGINE_H_INCLUDED
-#define ENGINE_H_INCLUDED
+#pragma once
 
 //#define MULTITHREADED_LOADING
 
@@ -21,6 +19,7 @@ class Engine :
 	public FileBasedDocument,
 	public AsyncUpdater,
 	public ProgressNotifier,
+	public DashboardItemProvider,
 	public Timer //for auto save
 {
 public:
@@ -154,8 +153,13 @@ public:
 	virtual void handleAsyncUpdate()override;
 
 	void childStructureChanged(ControllableContainer *) override;
+
+
+
+	// Inherited via DashboardItemProvider
+	virtual PopupMenu getDashboardCreateMenu(int idOffset) override;
+	virtual DashboardItem * getDashboardItemFromMenuResult(int result) override;
+
 };
 
 static String lastFileListKey = "recentFiles";
-
-#endif  // ENGINE_H_INCLUDED

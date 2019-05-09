@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef DASHBOARDITEMMANAGER_H_INCLUDED
-#define DASHBOARDITEMMANAGER_H_INCLUDED
+#pragma once
 
 class DashboardItemManager :
 	public BaseManager<DashboardItem>
@@ -17,9 +16,4 @@ class DashboardItemManager :
 public:
 	DashboardItemManager();
 	~DashboardItemManager();
-
 };
-
-
-
-#endif  // DASHBOARDITEMMANAGER_H_INCLUDED

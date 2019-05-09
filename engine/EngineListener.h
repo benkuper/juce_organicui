@@ -1,3 +1,5 @@
+#pragma once 
+
 class EngineListener {
 public:
 	virtual ~EngineListener();

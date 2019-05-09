@@ -1,3 +1,4 @@
+#include "DashboardItemManagerUI.h"
 /*
   ==============================================================================
 
@@ -9,18 +10,19 @@
 */
 
 DashboardItemManagerUI::DashboardItemManagerUI(DashboardItemManager * manager) :
-	BaseManagerUI("Dashboard", manager)
+	BaseManagerViewUI("Dashboard", manager)
 {
 	//bgColor = Colours::purple;
-	addItemText = "Add Item";
 	//setWantsKeyboardFocus(true);
 
 	addExistingItems(false);
-	
-	setSize(100, 100);
-	resized();
 }
 
 DashboardItemManagerUI::~DashboardItemManagerUI()
 {
+}
+
+DashboardItemUI * DashboardItemManagerUI::createUIForItem(DashboardItem * item)
+{
+	return item->createUI();
 }

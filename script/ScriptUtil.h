@@ -8,9 +8,7 @@
   ==============================================================================
 */
 
-#ifndef SCRIPTUTIL_H_INCLUDED
-#define SCRIPTUTIL_H_INCLUDED
-
+#pragma once
 
 class ScriptUtil :
 	public ScriptTarget
@@ -33,6 +31,3 @@ public:
 	static var toDegrees(const var::NativeFunctionArgs &a);
 	static var toRadians(const var::NativeFunctionArgs &a);
 };
-
-
-#endif  // SCRIPTUTIL_H_INCLUDED

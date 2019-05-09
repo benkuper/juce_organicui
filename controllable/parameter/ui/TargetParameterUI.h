@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef TARGETPARAMETERUI_H_INCLUDED
-#define TARGETPARAMETERUI_H_INCLUDED
+#pragma once
 
 class TargetParameterUI :
 	public ParameterUI,
@@ -47,7 +46,3 @@ protected:
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TargetParameterUI)
 };
-
-
-
-#endif  // TARGETPARAMETERUI_H_INCLUDED

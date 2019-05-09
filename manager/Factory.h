@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef FACTORY_H_INCLUDED
-#define FACTORY_H_INCLUDED
+#pragma once
 
 template<class T>
 class Factory
@@ -54,7 +53,7 @@ public:
 	OwnedArray<Definition> defs;
 	PopupMenu menu;
 
-	void buildPopupMenu()
+	virtual void buildPopupMenu()
 	{
 		menu.clear();
 		OwnedArray<PopupMenu> subMenus;
@@ -93,19 +92,19 @@ public:
 		for (int i = 0; i < subMenus.size(); i++) menu.addSubMenu(subMenuNames[i], *subMenus[i]);
 	}
 
-	T * showCreateMenu()
+	virtual T * showCreateMenu()
 	{
 		int result = getMenu().getNumItems() == 1 ? 1 : getMenu().show();
 		return createFromMenuResult(result);
 	}
 
-	PopupMenu getMenu()
+	virtual PopupMenu getMenu()
 	{
 		if (menu.getNumItems() == 0) buildPopupMenu();
 		return menu;
 	}
 
-	T * createFromMenuResult(int result)
+	virtual T * createFromMenuResult(int result)
 	{
 		if (result <= 0 || result > defs.size()) return nullptr;
 		else
@@ -116,7 +115,7 @@ public:
 	}
 
 
-	T * create(const String &type)
+	virtual T * create(const String &type)
 	{
 		for (auto &d : defs)
 		{
@@ -124,8 +123,4 @@ public:
 		}
 		return nullptr;
 	}
-
 };
-
-
-#endif  // FACTORY_H_INCLUDED

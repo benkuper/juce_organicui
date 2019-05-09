@@ -8,9 +8,7 @@
   ==============================================================================
 */
 
-#ifndef INSPECTABLE_H_INCLUDED
-#define INSPECTABLE_H_INCLUDED
-
+#pragma once
 
 class InspectableEditor;
 class InspectableSelectionManager;
@@ -116,5 +114,3 @@ void Inspectable::unregisterLinkedInspectablesOfType()
 	for (auto &i : unregisterList) unregisterLinkedInspectable(i);
 	cleanLinkedInspectables();
 }
-
-#endif  // INSPECTABLE_H_INCLUDED

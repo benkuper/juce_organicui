@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef SHAPESHIFTERWINDOW_H_INCLUDED
-#define SHAPESHIFTERWINDOW_H_INCLUDED
+#pragma once
 
 #include "ShapeShifterPanel.h"
 
@@ -48,6 +47,3 @@ public:
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ShapeShifterWindow)
 };
-
-
-#endif  // SHAPESHIFTERWINDOW_H_INCLUDED

@@ -8,27 +8,17 @@
   ==============================================================================
 */
 
-#ifndef DASHBOARDITEMUI_H_INCLUDED
-#define DASHBOARDITEMUI_H_INCLUDED
+#pragma once
 
 class DashboardItemUI :
-	public BaseItemUI<DashboardItem>
+	public BaseItemUI<DashboardItem>,
+	public DashboardItem::AsyncListener
 {
 public:
 	DashboardItemUI(DashboardItem * item);
 	~DashboardItemUI();
 
-	ScopedPointer<ControllableUI> targetUI;
+	virtual void updateTargetUI() {}
 
-	Controllable * currentControllable;
-	void setControllableUI(Controllable * c);
-
-	void resizedInternalContent(juce::Rectangle<int> &r) override;
-
-	void inspectableDestroyed(Inspectable * i) override;
-	void controllableFeedbackUpdateInternal(Controllable * c) override;
+	void newMessage(const DashboardItem::DashboardItemEvent &e) override;
 };
-
-
-
-#endif  // DASHBOARDITEMUI_H_INCLUDED

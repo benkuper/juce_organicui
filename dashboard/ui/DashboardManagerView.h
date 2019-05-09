@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef DASHBOARDMANAGERVIEW_H_INCLUDED
-#define DASHBOARDMANAGERVIEW_H_INCLUDED
+#pragma once
 
 class DashboardManagerView :
 	public ShapeShifterContentComponent,
@@ -21,7 +20,7 @@ public:
 	~DashboardManagerView();
 
 	DashboardManagerUI managerUI;
-	ScopedPointer<DashboardView> view;
+	ScopedPointer<DashboardItemManagerUI> currentItemManagerUI;
 
 	Dashboard * currentDashboard;
 	void setCurrentDashboard(Dashboard *);
@@ -34,6 +33,3 @@ public:
 
 	static DashboardManagerView * create(const String &contentName) { return new DashboardManagerView(contentName, DashboardManager::getInstance()); }
 };
-
-
-#endif  // DASHBOARDMANAGERVIEW_H_INCLUDED

@@ -8,8 +8,8 @@
  ==============================================================================
  */
 
-#ifndef PARAMETER_H_INCLUDED
-#define PARAMETER_H_INCLUDED
+#pragma once
+
 
  //Listener
 class Parameter;
@@ -206,6 +206,3 @@ public:
 		JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Parameter)
 
 };
-
-
-#endif  // PARAMETER_H_INCLUDED

@@ -8,9 +8,7 @@
   ==============================================================================
 */
 
-#ifndef WAKEONLAN_H_INCLUDED
-#define WAKEONLAN_H_INCLUDED
-
+#pragma once
 
 class WakeOnLan
 {
@@ -42,5 +40,3 @@ public:
 	}
 
 };
-
-#endif  // WAKEONLAN_H_INCLUDED

@@ -8,18 +8,14 @@
   ==============================================================================
 */
 
-#ifndef DASHBOARDITEMMANAGERUI_H_INCLUDED
-#define DASHBOARDITEMMANAGERUI_H_INCLUDED
-
+#pragma once
 
 class DashboardItemManagerUI :
-	public BaseManagerUI<DashboardItemManager, DashboardItem, DashboardItemUI>
+	public BaseManagerViewUI<DashboardItemManager, DashboardItem, DashboardItemUI>
 {
 public:
 	DashboardItemManagerUI(DashboardItemManager * manager);
 	~DashboardItemManagerUI();
+
+	DashboardItemUI * createUIForItem(DashboardItem *) override;
 };
-
-
-
-#endif  // DASHBOARDITEMMANAGERUI_H_INCLUDED

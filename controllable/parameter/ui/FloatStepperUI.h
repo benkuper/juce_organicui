@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef FLOATSTEPPERUI_H_INCLUDED
-#define FLOATSTEPPERUI_H_INCLUDED
+#pragma once
 
 class FloatStepperUI : 
 	public ParameterUI, 
@@ -40,6 +39,3 @@ protected:
 
 	virtual void controllableStateChanged() override;
 };
-
-
-#endif  // FLOATSTEPPERUI_H_INCLUDED

@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef FLOATPARAMETERLABELUI_H_INCLUDED
-#define FLOATPARAMETERLABELUI_H_INCLUDED
+#pragma once
 
 class FloatParameterLabelUI :
 	public ParameterUI, 
@@ -84,6 +83,3 @@ protected:
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TimeLabel)
 };
-
-
-#endif  // FLOATPARAMETERLABELUI_H_INCLUDED

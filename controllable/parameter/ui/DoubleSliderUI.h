@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef DOUBLESLIDERUI_H_INCLUDED
-#define DOUBLESLIDERUI_H_INCLUDED
+#pragma once
 
 class DoubleSliderUI : public ParameterUI
 {
@@ -48,7 +47,3 @@ protected:
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DoubleSliderUI)
 };
-
-
-
-#endif  // DOUBLESLIDERUI_H_INCLUDED

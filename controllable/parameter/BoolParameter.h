@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef BOOLPARAMETER_H_INCLUDED
-#define BOOLPARAMETER_H_INCLUDED
+#pragma once
 
 class BoolToggleUI;
 class BoolImageToggleUI;
@@ -32,7 +31,3 @@ public:
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BoolParameter)
 };
-
-
-
-#endif  // BOOLPARAMETER_H_INCLUDED

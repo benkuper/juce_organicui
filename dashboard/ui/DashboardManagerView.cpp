@@ -12,7 +12,8 @@
 DashboardManagerView::DashboardManagerView(const String &contentName, DashboardManager * manager) :
 	ShapeShifterContentComponent(contentName),
 	managerUI(manager),
-	currentDashboard(nullptr)
+	currentDashboard(nullptr),
+	currentItemManagerUI(nullptr)
 {
 	contentIsFlexible = true; 
 	
@@ -33,18 +34,18 @@ void DashboardManagerView::setCurrentDashboard(Dashboard * d)
 {
 	if (currentDashboard == d) return;
 
-	if (view != nullptr)
+	if (currentItemManagerUI != nullptr)
 	{
-		removeChildComponent(view);
-		view = nullptr;
+		removeChildComponent(currentItemManagerUI);
+		currentItemManagerUI = nullptr;
 	}
 
 	currentDashboard = d;
 
 	if (currentDashboard != nullptr)
 	{
-		view = new DashboardView(&currentDashboard->panelManager);
-		addAndMakeVisible(view);
+		currentItemManagerUI = new DashboardItemManagerUI(&currentDashboard->itemManager);
+		addAndMakeVisible(currentItemManagerUI);
 	}
 
 	resized();
@@ -52,11 +53,11 @@ void DashboardManagerView::setCurrentDashboard(Dashboard * d)
 
 void DashboardManagerView::resized()
 {
- juce::Rectangle<int> r = getLocalBounds();
-	managerUI.setBounds(r.removeFromLeft(100));
-	if (view != nullptr)
+	juce::Rectangle<int> r = getLocalBounds();
+	managerUI.setBounds(r.removeFromLeft(150));
+	if (currentItemManagerUI != nullptr)
 	{
-		view->setBounds(r);
+		currentItemManagerUI->setBounds(r);
 	}
 }
 

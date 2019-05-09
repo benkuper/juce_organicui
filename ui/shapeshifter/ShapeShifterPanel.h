@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef MOVABLEPANEL_H_INCLUDED
-#define MOVABLEPANEL_H_INCLUDED
+#pragma once
 
 #include "ShapeShifter.h"
 class ShapeShifterPanelTab;
@@ -109,6 +108,3 @@ private:
 	friend class WeakReference<ShapeShifterPanel>;
 
 };
-
-
-#endif  // MOVABLEPANEL_H_INCLUDED

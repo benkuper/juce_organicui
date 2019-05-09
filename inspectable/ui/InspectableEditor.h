@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef INSPECTABLEEDITOR_H_INCLUDED
-#define INSPECTABLEEDITOR_H_INCLUDED
+#pragma once
 
 class Inspectable;
 class Inspector;
@@ -55,6 +54,3 @@ public:
 	void resized() override;
 	void childBoundsChanged(Component * c) override;
 };
-
-
-#endif  // INSPECTABLEEDITOR_H_INCLUDED

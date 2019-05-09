@@ -1,3 +1,5 @@
+#pragma once
+
 class ScriptExpression;
 
 class ExpressionListener

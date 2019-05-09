@@ -8,9 +8,7 @@
   ==============================================================================
 */
 
-#ifndef BETTERINTSTEPPER_H_INCLUDED
-#define BETTERINTSTEPPER_H_INCLUDED
-
+#pragma once
 
 class BetterStepper : public Slider
 {
@@ -21,8 +19,3 @@ public:
 
 	virtual void setTooltip(const String &tooltip) override;
 };
-
-
-
-
-#endif  // BETTERINTSTEPPER_H_INCLUDED

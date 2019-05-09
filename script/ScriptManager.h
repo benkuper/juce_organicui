@@ -8,8 +8,8 @@
   ==============================================================================
 */
 
-#ifndef SCRIPTMANAGER_H_INCLUDED
-#define SCRIPTMANAGER_H_INCLUDED
+#pragma once
+
 
 class ScriptManager :
 	public BaseManager<Script>
@@ -28,6 +28,3 @@ public:
 	bool callFunctionOnAllItems(const Identifier &function, var a = var());
 	bool callFunctionOnAllItems(const Identifier &function, Array<var> args);
 };
-
-
-#endif  // SCRIPTMANAGER_H_INCLUDED
