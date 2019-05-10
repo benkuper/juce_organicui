@@ -198,7 +198,9 @@ InspectableEditor * Controllable::getEditor(bool isRootEditor) {
 
 Component * Controllable::createDashboardContent()
 {
-	return createDefaultUI();
+	ControllableUI * cui = createDefaultUI();
+	cui->showLabel = false;
+	return cui;
 }
 
 

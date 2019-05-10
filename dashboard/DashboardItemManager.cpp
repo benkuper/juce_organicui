@@ -12,6 +12,7 @@ DashboardItemManager::DashboardItemManager() :
 	BaseManager("Dashboard")
 {
 	managerFactory = DashboardItemFactory::getInstance();
+	selectItemWhenCreated = false;
 }
 
 DashboardItemManager::~DashboardItemManager()
