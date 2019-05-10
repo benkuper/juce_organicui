@@ -8,7 +8,6 @@
   ==============================================================================
 */
 
-class DashboardItemUI;
 
 #pragma once
 
@@ -20,16 +19,9 @@ public:
 	DashboardItem(Inspectable * _target = nullptr);
 	virtual ~DashboardItem();
 
-	WeakReference<Inspectable> target;
-	virtual void setTarget(Inspectable * target);
+	virtual BaseItemMinimalUI<DashboardItem> * createUI() { jassertfalse; return nullptr; }
 
-	virtual void inspectableDestroyed(Inspectable * i);
-
-	var getJSONData() override;
-	void loadJSONDataInternal(var data) override;
-
-	virtual DashboardItemUI * createUI();
-
+	/*
 	class DashboardItemEvent
 	{
 	public:
@@ -44,4 +36,5 @@ public:
 	void addAsyncDashboardItemListener(AsyncListener* newListener) { dashboardItemNotifier.addListener(newListener); }
 	void addAsyncCoalescedDashboardItemListener(AsyncListener* newListener) { dashboardItemNotifier.addAsyncCoalescedListener(newListener); }
 	void removeAsyncDashboardItemListener(AsyncListener* listener) { dashboardItemNotifier.removeListener(listener); }
+	*/
 };

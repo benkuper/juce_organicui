@@ -86,14 +86,13 @@
 
 #include "dashboard/Dashboard.cpp"
 #include "dashboard/DashboardItem.cpp"
+#include "dashboard/DashboardTargetItem.cpp"
+#include "dashboard/DashboardGroupItem.cpp"
 #include "dashboard/DashboardItemFactory.cpp" 
 #include "dashboard/DashboardItemManager.cpp"
 #include "dashboard/DashboardManager.cpp"
-#include "dashboard/ui/DashboardItemUI.cpp"
+#include "dashboard/ui/DashboardTargetItemUI.cpp"
 #include "dashboard/ui/DashboardItemManagerUI.cpp"
 #include "dashboard/ui/DashboardManagerUI.cpp"
 #include "dashboard/ui/DashboardManagerView.cpp"
 #include "dashboard/ui/DashboardUI.cpp"
-
-#include "controllable/DashboardControllableItem.cpp"
-#include "controllable/ui/DashboardControllableUI.cpp"

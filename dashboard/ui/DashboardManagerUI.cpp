@@ -14,6 +14,7 @@ DashboardManagerUI::DashboardManagerUI(DashboardManager * manager) :
 {
 	bgColor = bgColor.darker();
 	addExistingItems(false);
+	
 }
 
 DashboardManagerUI::~DashboardManagerUI()

@@ -1,5 +1,4 @@
 class DashboardItem;
-class DashboardItemUI;
 
 class DashboardItemProvider
 {
@@ -22,5 +21,5 @@ public:
 	DashboardItemTarget() {}
 	~DashboardItemTarget() {}
 
-	virtual DashboardItem * createDashboardItem() = 0;
+	virtual Component * createDashboardContent() = 0;
 };

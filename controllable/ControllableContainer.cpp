@@ -14,8 +14,8 @@ ControllableComparator ControllableContainer::comparator;
 ControllableContainer::ControllableContainer(const String & niceName) :
 	ScriptTarget("", this),
 	hasCustomShortName(false),
-	skipControllableNameInAddress(false),
 	nameCanBeChangedByUser(false),
+	//skipControllableNameInAddress(false),
 	isTargettable(true),
 	canInspectChildContainers(true),
 	editorIsCollapsed(false),
@@ -406,10 +406,10 @@ ControllableContainer * ControllableContainer::getControllableContainerForAddres
 		for (auto &cc : controllableContainers)
 		{
 			if (cc == nullptr || cc.wasObjectDeleted()) continue;
-			if (cc->skipControllableNameInAddress)
+			/*if (cc->skipControllableNameInAddress)
 			{
 				if (ControllableContainer * res = cc->getControllableContainerForAddress(addressSplit, recursive, getNotExposed)) return res;
-			}
+			}*/
 		}
 	} else //if recursive here ?
 	{
@@ -417,14 +417,15 @@ ControllableContainer * ControllableContainer::getControllableContainerForAddres
 		{
 			if (cc == nullptr || cc.wasObjectDeleted()) continue;
 			
-			if (!cc->skipControllableNameInAddress)
+			/*if (!cc->skipControllableNameInAddress)
 			{
+			*/
 				if (cc->shortName == addressSplit[0])
 				{
 					addressSplit.remove(0);
 					return cc->getControllableContainerForAddress(addressSplit, recursive, getNotExposed);
 				}
-			} else
+			/*} else
 			{
 				ControllableContainer * tc = cc->getControllableContainerByName(addressSplit[0]);
 				if (tc != nullptr)
@@ -433,7 +434,7 @@ ControllableContainer * ControllableContainer::getControllableContainerForAddres
 					return tc->getControllableContainerForAddress(addressSplit, recursive, getNotExposed);
 				}
 
-			}
+			}*/
 		}
 	}
 
@@ -445,9 +446,9 @@ String ControllableContainer::getControlAddress(ControllableContainer * relative
 
 	StringArray addressArray;
 	ControllableContainer * pc = this;
-	while (pc != relativeTo && pc != nullptr)
+	while (pc != relativeTo && pc != nullptr && pc != Engine::mainEngine)
 	{
-		if (!pc->skipControllableNameInAddress) addressArray.insert(0, pc->shortName);
+		/*if (!pc->skipControllableNameInAddress)*/ addressArray.insert(0, pc->shortName);
 		pc = pc->parentContainer;
 	}
 	if (addressArray.size() == 0)return "";
@@ -529,7 +530,6 @@ Array<WeakReference<Parameter>> ControllableContainer::getAllParameters(bool rec
 
 Controllable * ControllableContainer::getControllableForAddress(const String &address, bool recursive, bool getNotExposed)
 {
-	
 	StringArray addrArray;
 	addrArray.addTokens(address.startsWith("/")?address:"/"+address, juce::StringRef("/"), juce::StringRef("\""));
 	addrArray.remove(0);
@@ -560,25 +560,26 @@ Controllable * ControllableContainer::getControllableForAddress(StringArray addr
 		for (auto &cc : controllableContainers)
 		{
 			if (cc.wasObjectDeleted()) continue;
-			if (cc->skipControllableNameInAddress)
+			/*if (cc->skipControllableNameInAddress)
 			{
 				Controllable * tc = cc->getControllableByName(addressSplit[0]);  //get not exposed here here
 				if (tc != nullptr) return tc;
-			}
+			}*/
 		}
 	} else  //if recursive here ?
 	{
 		for (auto &cc : controllableContainers)
 		{
 			if (cc.wasObjectDeleted()) continue;
-			if (!cc->skipControllableNameInAddress)
+			/*if (!cc->skipControllableNameInAddress)
 			{
-				if (cc->shortName == addressSplit[0])
+			*/
+			if (cc->shortName == addressSplit[0])
 				{
 					addressSplit.remove(0);
 					return cc->getControllableForAddress(addressSplit, recursive, getNotExposed);
 				}
-			} else
+			/*} else
 			{
 				ControllableContainer * tc = cc->getControllableContainerByName(addressSplit[0]);
 				if (tc != nullptr)
@@ -587,7 +588,7 @@ Controllable * ControllableContainer::getControllableForAddress(StringArray addr
 					return tc->getControllableForAddress(addressSplit, recursive, getNotExposed);
 				}
 
-			}
+			}*/
 		}
 	}
 
@@ -836,14 +837,14 @@ void ControllableContainer::updateLiveScriptObjectInternal(DynamicObject * paren
 		if (cc == nullptr || cc.wasObjectDeleted()) continue;
 
 		if (!cc->includeInScriptObject) continue;
-		if (cc->skipControllableNameInAddress)
+		/*if (cc->skipControllableNameInAddress)
 		{
 			cc->updateLiveScriptObject(transferToParent?parent:(DynamicObject *)liveScriptObject);
 		}else
-		{
+		{*/
 			if (transferToParent) parent->setProperty(cc->shortName, cc->getScriptObject());
 			else liveScriptObject->setProperty(cc->shortName, cc->getScriptObject());
-		}
+		//}
 
 	}
 
@@ -854,11 +855,11 @@ void ControllableContainer::updateLiveScriptObjectInternal(DynamicObject * paren
 		else liveScriptObject->setProperty(c->shortName, c->getScriptObject());
 	}
 	
-	if (!(skipControllableNameInAddress && parent != nullptr))
-	{
+	/*if (!(skipControllableNameInAddress && parent != nullptr))
+	{*/
 		liveScriptObject->setProperty("name", shortName);
 		liveScriptObject->setProperty("niceName", niceName);
-	}
+	//}
 
 	
 }
@@ -892,6 +893,11 @@ InspectableEditor * ControllableContainer::getEditor(bool isRoot)
 {
 	if (customGetEditorFunc != nullptr) return customGetEditorFunc(this, isRoot);
 	return new GenericControllableContainerEditor(this, isRoot);
+}
+
+Component * ControllableContainer::createDashboardContent()
+{
+	return getEditor(true);
 }
 
 EnablingControllableContainer::EnablingControllableContainer(const String & n, bool _canBeDisabled) :

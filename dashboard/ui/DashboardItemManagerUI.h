@@ -11,11 +11,15 @@
 #pragma once
 
 class DashboardItemManagerUI :
-	public BaseManagerViewUI<DashboardItemManager, DashboardItem, DashboardItemUI>
+	public BaseManagerViewUI<DashboardItemManager, DashboardItem, BaseItemMinimalUI<DashboardItem>>
 {
 public:
 	DashboardItemManagerUI(DashboardItemManager * manager);
 	~DashboardItemManagerUI();
 
-	DashboardItemUI * createUIForItem(DashboardItem *) override;
+
+	bool isInterestedInDragSource(const SourceDetails & dragSourceDetails) override;
+	void itemDropped(const SourceDetails &details) override;
+
+	BaseItemMinimalUI<DashboardItem> * createUIForItem(DashboardItem *) override;
 };

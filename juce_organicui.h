@@ -217,18 +217,18 @@ using namespace juce;
 #include "comment/ui/CommentManagerViewUI.h"
 
 #include "dashboard/DashboardItem.h"
+#include "dashboard/DashboardTargetItem.h"
+#include "dashboard/DashboardGroupItem.h"
 #include "dashboard/DashboardItemFactory.h"
 #include "dashboard/DashboardItemManager.h"
 #include "dashboard/Dashboard.h"
 #include "dashboard/DashboardManager.h"
-#include "dashboard/ui/DashboardItemUI.h"
+#include "dashboard/ui/DashboardTargetItemUI.h"
 #include "dashboard/ui/DashboardItemManagerUI.h"
 #include "dashboard/ui/DashboardUI.h"
 #include "dashboard/ui/DashboardManagerUI.h"
 #include "dashboard/ui/DashboardManagerView.h"
 
-#include "controllable/DashboardControllableItem.h"
-#include "controllable/ui/DashboardControllableUI.h"
 //#include "controllable/ui/DashboardControllableContainerUI.h"
 
 #include "script/Script.h"

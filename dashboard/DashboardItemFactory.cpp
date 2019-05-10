@@ -2,7 +2,8 @@ juce_ImplementSingleton(DashboardItemFactory)
 
 DashboardItemFactory::DashboardItemFactory()
 {
-	defs.add(Definition::createDef("", DashboardControllableItem::getTypeStringStatic(), &DashboardControllableItem::create));
+	defs.add(Definition::createDef("", "DashboardControllable", &DashboardTargetItem::create)->addParam("targetType",TargetParameter::CONTROLLABLE));
+	defs.add(Definition::createDef("", "DashboardControllableContainer", &DashboardTargetItem::create)->addParam("targetType", TargetParameter::CONTAINER));
 }
 
 void DashboardItemFactory::buildPopupMenu()

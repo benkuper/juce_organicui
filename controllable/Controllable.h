@@ -107,7 +107,7 @@ public:
 	// used for generating editor
 	virtual ControllableUI * createDefaultUI(Controllable * targetControllable = nullptr) = 0;
 
-	virtual DashboardItem * createDashboardItem() override;
+	virtual Component * createDashboardContent() override;
 
 
 	static var setValueFromScript(const juce::var::NativeFunctionArgs& a);

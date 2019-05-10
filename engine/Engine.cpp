@@ -32,7 +32,7 @@ Engine::Engine(const String & fileName, const String & fileExtension) :
 	isLoadingFile(false),
 	isClearing(false)
 {
-	skipControllableNameInAddress = true;
+	//skipControllableNameInAddress = true;
 	isBetaVersion = getAppVersion().endsWith("b");
 	betaVersion = getBetaVersion(getAppVersion());
 
@@ -121,7 +121,7 @@ DashboardItem * Engine::getDashboardItemFromMenuResult(int result)
 	ControllableChooserPopupMenu chooser(this, true, true, 0);
 	Controllable * c = chooser.getControllableForResult(result);
 	if (c == nullptr) return nullptr;
-	return c->createDashboardItem();
+	return new DashboardTargetItem(c);
 }
 
 void Engine::clear() {

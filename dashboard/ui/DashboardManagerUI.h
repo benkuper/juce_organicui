@@ -16,4 +16,6 @@ class DashboardManagerUI :
 public:
 	DashboardManagerUI(DashboardManager * manager);
 	~DashboardManagerUI();
+
+
 };

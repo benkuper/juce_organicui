@@ -91,17 +91,17 @@ void Outliner::buildTree(OutlinerItem * parentItem, ControllableContainer * pare
 	Array<WeakReference<ControllableContainer>> childContainers = parentContainer->controllableContainers;
 	for (auto &cc : childContainers)
 	{
-		if (cc->skipControllableNameInAddress && !showHiddenContainers)
+		/*if (cc->skipControllableNameInAddress && !showHiddenContainers)
 		{
 			buildTree(parentItem, cc);
 		}
 		else
-		{
+		{*/
 			OutlinerItem * ccItem = new OutlinerItem(cc);
 			parentItem->addSubItem(ccItem);
 
 			buildTree(ccItem, cc);
-		}
+		//}
 
 	}
 

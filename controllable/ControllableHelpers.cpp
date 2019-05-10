@@ -35,16 +35,16 @@ void ControllableChooserPopupMenu::populateMenu(PopupMenu * subMenu, Controllabl
 		for (auto &cc : container->controllableContainers)
 		{
 			if (!cc->isTargettable) continue;
-			if (cc->skipControllableNameInAddress)
+			/*if (cc->skipControllableNameInAddress)
 			{
 				populateMenu(subMenu, cc, currentId, currentLevel + 1);
 			}
 			else
-			{
+			{*/
 				PopupMenu p;
 				populateMenu(&p, cc, currentId, currentLevel + 1);
 				subMenu->addSubMenu(cc->niceName, p);
-			}
+			//}
 
 		}
 
@@ -124,16 +124,16 @@ void ContainerChooserPopupMenu::populateMenu(PopupMenu * subMenu, ControllableCo
 		}
 		else if (maxDefaultSearchLevel == -1 || currentLevel < maxDefaultSearchLevel)
 		{
-			if (cc->skipControllableNameInAddress)
+			/*if (cc->skipControllableNameInAddress)
 			{
 				populateMenu(subMenu, cc, currentId, currentLevel + 1);
 			}
 			else
-			{
+			{*/
 				PopupMenu p;
 				populateMenu(&p, cc, currentId, currentLevel + 1);
 				if (typeCheckFunc == nullptr || p.containsAnyActiveItems()) subMenu->addSubMenu(cc->niceName, p);
-			}
+			//}
 
 		}
 	}

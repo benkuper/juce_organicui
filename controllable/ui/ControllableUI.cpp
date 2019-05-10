@@ -41,7 +41,7 @@ void ControllableUI::mouseEnter(const MouseEvent & e)
 
 void ControllableUI::mouseExit(const MouseEvent & e)
 {
-	if(controllable != nullptr) HelpBox::getInstance()->clearOverData(controllable->helpID);
+	if (controllable != nullptr) HelpBox::getInstance()->clearOverData(controllable->helpID);
 }
 
 void ControllableUI::mouseDown(const MouseEvent & e)
@@ -52,16 +52,17 @@ void ControllableUI::mouseDown(const MouseEvent & e)
 		{
 			showContextMenu();
 		}
-	} else
+	}
+	else
 	{
-		if(isInteractable()) mouseDownInternal(e);
+		if (isInteractable()) mouseDownInternal(e);
 	}
 }
 
 void ControllableUI::mouseUp(const MouseEvent & e)
 {
 	if (e.mods.isRightButtonDown()) return;
-	if(isInteractable()) mouseUpInternal(e);
+	if (isInteractable()) mouseUpInternal(e);
 
 }
 
@@ -88,6 +89,19 @@ void ControllableUI::showContextMenu()
 		p->addItem(-2, "Copy Script Control Address");
 	}
 
+	if (controllable->isTargettable)
+	{
+		p->addSeparator();
+		PopupMenu dashboardMenu;
+		int index = 0;
+		for (auto &di : DashboardManager::getInstance()->items)
+		{
+			dashboardMenu.addItem(index + 10000, di->niceName);
+			index++;
+		}
+		p->addSubMenu("Send to Dashboard", dashboardMenu);
+	}
+
 
 	if (p->getNumItems() == 0) return;
 
@@ -95,6 +109,7 @@ void ControllableUI::showContextMenu()
 
 	if (result != 0)
 	{
+		
 		switch (result)
 		{
 		case -1:
@@ -109,16 +124,19 @@ void ControllableUI::showContextMenu()
 			break;
 
 		default:
-			if (ControllableUI::handleCustomContextMenuResultFunc != nullptr)
+			if (result >= 10000)
+			{
+				DashboardManager::getInstance()->items[result - 10000]->itemManager.addItem(new DashboardTargetItem(controllable));
+			}
+			else if (ControllableUI::handleCustomContextMenuResultFunc != nullptr)
 			{
 				bool handled = ControllableUI::handleCustomContextMenuResultFunc(this, result);
-				if(!handled) handleMenuSelectedID(result);
+				if (!handled) handleMenuSelectedID(result);
 			}
 			else
 			{
 				handleMenuSelectedID(result);
 			}
-
 		}
 	}
 }
@@ -138,7 +156,7 @@ void ControllableUI::newMessage(const Controllable::ControllableEvent & e)
 		controllableControlAddressChanged();
 
 	}
-		break;
+	break;
 
 	case Controllable::ControllableEvent::NAME_CHANGED:
 		break;
@@ -162,7 +180,7 @@ void ControllableUI::newMessage(const Controllable::ControllableEvent & e)
 		feedbackStateChanged();
 		repaint();
 	}
-		break;
+	break;
 
 	default:
 		//NOT HANDLED
