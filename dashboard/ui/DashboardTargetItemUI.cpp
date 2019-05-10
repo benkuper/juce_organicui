@@ -38,7 +38,7 @@ void DashboardTargetItemUI::updateTargetUI()
 		if (getWidth() == 0 || getHeight() == 0)
 		{
 			if (targetUI->getWidth() > 0) setContentSize(targetUI->getWidth(), targetUI->getHeight());
-			else setSize(200, targetUI->getHeight());
+			else setContentSize(200, targetUI->getHeight());
 		}
 	}
 }
