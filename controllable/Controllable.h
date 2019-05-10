@@ -61,9 +61,6 @@ public:
 
 	String controlAddress;
 
-	//ControllableChooser
-	bool isTargettable;
-
 	//save & load
 	bool isSavable;
 	bool saveValueOnly;

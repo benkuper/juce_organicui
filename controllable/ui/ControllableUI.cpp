@@ -89,18 +89,15 @@ void ControllableUI::showContextMenu()
 		p->addItem(-2, "Copy Script Control Address");
 	}
 
-	if (controllable->isTargettable)
+	p->addSeparator();
+	PopupMenu dashboardMenu;
+	int index = 0;
+	for (auto &di : DashboardManager::getInstance()->items)
 	{
-		p->addSeparator();
-		PopupMenu dashboardMenu;
-		int index = 0;
-		for (auto &di : DashboardManager::getInstance()->items)
-		{
-			dashboardMenu.addItem(index + 10000, di->niceName);
-			index++;
-		}
-		p->addSubMenu("Send to Dashboard", dashboardMenu);
+		dashboardMenu.addItem(index + 10000, di->niceName);
+		index++;
 	}
+	p->addSubMenu("Send to Dashboard", dashboardMenu);
 
 
 	if (p->getNumItems() == 0) return;

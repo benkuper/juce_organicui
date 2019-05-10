@@ -22,7 +22,6 @@ Controllable::Controllable(const Type &type, const String & niceName, const Stri
 	isControllableFeedbackOnly(false),
 	hideInOutliner(false),
 	includeInScriptObject(true),
-	isTargettable(true),
 	isSavable(true),
 	saveValueOnly(true),
 	isCustomizableByUser(false),

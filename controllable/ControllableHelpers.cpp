@@ -34,28 +34,18 @@ void ControllableChooserPopupMenu::populateMenu(PopupMenu * subMenu, Controllabl
 	{
 		for (auto &cc : container->controllableContainers)
 		{
-			if (!cc->isTargettable) continue;
-			/*if (cc->skipControllableNameInAddress)
-			{
-				populateMenu(subMenu, cc, currentId, currentLevel + 1);
-			}
-			else
-			{*/
-				PopupMenu p;
-				populateMenu(&p, cc, currentId, currentLevel + 1);
-				subMenu->addSubMenu(cc->niceName, p);
-			//}
+			PopupMenu p;
+			populateMenu(&p, cc, currentId, currentLevel + 1);
+			subMenu->addSubMenu(cc->niceName, p);
 
 		}
 
 		subMenu->addSeparator();
 	}
 
-	//if (subMenu != this)
-	//{
 	for (auto &c : container->controllables)
 	{
-		if (!c->isTargettable || !c->isControllableExposed) continue;
+		if (!c->isControllableExposed) continue;
 
 		if (c->type == Controllable::TRIGGER)
 		{
@@ -70,7 +60,6 @@ void ControllableChooserPopupMenu::populateMenu(PopupMenu * subMenu, Controllabl
 		controllableList.add(c);
 		currentId++;
 	}
-	//}
 
 }
 
@@ -110,8 +99,6 @@ void ContainerChooserPopupMenu::populateMenu(PopupMenu * subMenu, ControllableCo
 {
 	for (auto &cc : container->controllableContainers)
 	{
-		if (!cc->isTargettable) continue;
-
 		bool isATarget = currentLevel == maxDefaultSearchLevel;
 		if (typeCheckFunc != nullptr) isATarget |= typeCheckFunc(cc);
 		else if (cc->controllableContainers.size() == 0) isATarget = true;

@@ -15,8 +15,6 @@ ControllableContainer::ControllableContainer(const String & niceName) :
 	ScriptTarget("", this),
 	hasCustomShortName(false),
 	nameCanBeChangedByUser(false),
-	//skipControllableNameInAddress(false),
-	isTargettable(true),
 	canInspectChildContainers(true),
 	editorIsCollapsed(false),
 	editorCanBeCollapsed(true),

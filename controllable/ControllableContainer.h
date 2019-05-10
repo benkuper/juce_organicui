@@ -29,10 +29,7 @@ public:
 	String shortName;
 	bool hasCustomShortName;
 
-	//bool skipControllableNameInAddress;
-	
 	bool nameCanBeChangedByUser;
-	bool isTargettable; //for controllableChooser
 
 	//Editor
 	bool canInspectChildContainers;
