@@ -28,6 +28,7 @@ public:
 
 	bool canHaveScripts;
 	bool userCanRemove;
+	bool userCanDuplicate;
 	bool askConfirmationBeforeRemove;
 	bool isSavable;
 	bool saveType;

@@ -13,6 +13,7 @@ BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts
 	EnablingControllableContainer(name.isEmpty() ? getTypeString() : name, _canBeDisabled),
 	canHaveScripts(_canHaveScripts),
 	userCanRemove(true),
+	userCanDuplicate(true),
 	askConfirmationBeforeRemove(true),
 	isSavable(true),
 	saveType(true),
@@ -95,7 +96,7 @@ void BaseItem::moveAfter()
 
 void BaseItem::remove()
 {
-	if(userCanRemove) baseItemListeners.call(&BaseItem::Listener::askForRemoveBaseItem, this);
+	baseItemListeners.call(&BaseItem::Listener::askForRemoveBaseItem, this);
 }
 
 
