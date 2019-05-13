@@ -77,7 +77,7 @@ void Outliner::rebuildTree()
 {
 	if (Engine::mainEngine == nullptr) return;
 
-	ScopedPointer<XmlElement> os = treeView.getOpennessState(true);
+	std::unique_ptr<XmlElement> os = treeView.getOpennessState(true);
 	clear();
 	buildTree(rootItem, Engine::mainEngine);
 	rootItem->setOpen(true);
