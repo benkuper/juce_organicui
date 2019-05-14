@@ -17,6 +17,8 @@ InspectableSelectionManager::InspectableSelectionManager(bool isMainSelectionMan
 	selectionNotifier(100)
 {
 	if (isMainSelectionManager) InspectableSelectionManager::mainSelectionManager = this;
+	if (InspectableSelectionManager::activeSelectionManager == nullptr) InspectableSelectionManager::activeSelectionManager = this;
+
     setEnabled(true);
 }
 

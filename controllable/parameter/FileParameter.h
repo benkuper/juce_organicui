@@ -7,9 +7,7 @@
 
   ==============================================================================
 */
-
-#ifndef FILEPARAMETER_H_INCLUDED
-#define FILEPARAMETER_H_INCLUDED
+#pragma once
 
 class FileParameter : 
 	public StringParameter,
@@ -46,7 +44,3 @@ public:
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(FileParameter)
 };
-
-
-
-#endif  // STRINGPARAMETER_H_INCLUDED

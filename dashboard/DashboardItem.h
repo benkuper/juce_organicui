@@ -8,25 +8,33 @@
   ==============================================================================
 */
 
-#ifndef DASHBOARDITEM_H_INCLUDED
-#define DASHBOARDITEM_H_INCLUDED
 
-
-class DashboardItemUI;
+#pragma once
 
 class DashboardItem :
-	public BaseItem
+	public BaseItem,
+	public Inspectable::InspectableListener
 {
 public:
-	DashboardItem(bool canHaveScripts = false);
-	~DashboardItem();
+	DashboardItem(Inspectable * _target = nullptr);
+	virtual ~DashboardItem();
 
-	TargetParameter * target;
+	virtual BaseItemMinimalUI<DashboardItem> * createUI() { jassertfalse; return nullptr; }
 
-	void onContainerParameterChangedInternal(Parameter * p) override;
+	/*
+	class DashboardItemEvent
+	{
+	public:
+		enum Type { TARGET_CHANGED };
+		DashboardItemEvent(Type t) : type(t) {}
+		Type type;
+	};
+
+	QueuedNotifier<DashboardItemEvent> dashboardItemNotifier;
+	typedef QueuedNotifier<DashboardItemEvent>::Listener AsyncListener;
+
+	void addAsyncDashboardItemListener(AsyncListener* newListener) { dashboardItemNotifier.addListener(newListener); }
+	void addAsyncCoalescedDashboardItemListener(AsyncListener* newListener) { dashboardItemNotifier.addAsyncCoalescedListener(newListener); }
+	void removeAsyncDashboardItemListener(AsyncListener* listener) { dashboardItemNotifier.removeListener(listener); }
+	*/
 };
-
-
-
-
-#endif  // DASHBOARDITEM_H_INCLUDED

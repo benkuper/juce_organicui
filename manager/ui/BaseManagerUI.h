@@ -138,6 +138,8 @@ public:
 
 	virtual void showMenuAndAddItem(bool isFromAddButton, Point<int> mouseDownPos);
 	virtual void addItemFromMenu(bool isFromAddButton, Point<int> mouseDownPos);
+	virtual void addItemFromMenu(T * item, bool isFromAddButton, Point<int> mouseDownPos);
+
 	virtual U * addItemUI(T * item, bool animate = false, bool resizeAndRepaint = true);
 	virtual U * createUIForItem(T * item);
 	virtual void addItemUIInternal(U *) {}
@@ -550,8 +552,8 @@ void BaseManagerUI<M, T, U>::showMenuAndAddItem(bool isFromAddButton, Point<int>
 {
 	if (manager->managerFactory != nullptr)
 	{
-		T * m = manager->managerFactory->showCreateMenu();
-		if (m != nullptr) ((BaseManager<T> *)manager)->addItem(m);
+		T * item = manager->managerFactory->showCreateMenu();
+		if (item != nullptr) addItemFromMenu(item, isFromAddButton, mouseDownPos);
 	} else
 	{
 		if (isFromAddButton)
@@ -578,6 +580,12 @@ template<class M, class T, class U>
 void BaseManagerUI<M, T, U>::addItemFromMenu(bool, Point<int>)
 {
 	manager->BaseManager<T>::addItem();
+}
+
+template<class M, class T, class U>
+void BaseManagerUI<M, T, U>::addItemFromMenu(T * item, bool, Point<int>)
+{
+	manager->BaseManager<T>::addItem(item);
 }
 
 template<class M, class T, class U>

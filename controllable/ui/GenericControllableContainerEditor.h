@@ -55,6 +55,11 @@ public:
 
 	void mouseDown(const MouseEvent &e) override;
 
+	virtual void showContextMenu();
+	virtual void addPopupMenuItems(PopupMenu *) {} //for child classes
+	virtual void handleMenuSelectedID(int) {} // to override
+
+
 	juce::Rectangle<int> getHeaderBounds(); 
 	juce::Rectangle<int> getContentBounds();
 	

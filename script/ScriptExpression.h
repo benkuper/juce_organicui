@@ -8,8 +8,7 @@ Author:  Ben
 ==============================================================================
 */
 
-#ifndef EXPRESSION_H_INCLUDED
-#define EXPRESSION_H_INCLUDED
+#pragma once
 
 class ScriptExpression :
 	public Timer,
@@ -54,5 +53,3 @@ public:
 	// Inherited via Timer
 	virtual void timerCallback() override;
 };
-
-#endif  // EXPRESSION_H_INCLUDED

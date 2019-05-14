@@ -1,3 +1,4 @@
+#include "GenericControllableContainerEditor.h"
 /*
   ==============================================================================
 
@@ -85,6 +86,46 @@ void GenericControllableContainerEditor::mouseDown(const MouseEvent & e)
 	if (e.mods.isLeftButtonDown())
 	{
 		if (e.originalComponent == &headerSpacer) setCollapsed(!container->editorIsCollapsed);
+	}
+	else if (e.mods.isRightButtonDown())
+	{
+		showContextMenu();
+	}
+}
+
+void GenericControllableContainerEditor::showContextMenu()
+{
+	PopupMenu p;
+	addPopupMenuItems(&p);
+
+	p.addSeparator();
+	PopupMenu dashboardMenu;
+	int index = 0;
+	for (auto &di : DashboardManager::getInstance()->items)
+	{
+		dashboardMenu.addItem(index + 10000, di->niceName);
+		index++;
+	}
+
+	p.addSubMenu("Send to Dashboard", dashboardMenu);
+
+	int result = p.show();
+
+	if (result != 0)
+	{
+		/*switch (result)
+		{
+		default:*/
+			if (result >= 10000)
+			{
+				DashboardManager::getInstance()->items[result - 10000]->itemManager.addItem(new DashboardTargetItem(container));
+			}
+			else
+			{
+				handleMenuSelectedID(result);
+			}
+		/*	break;
+		}*/
 	}
 }
 

@@ -8,8 +8,8 @@ Author:  Ben
 ==============================================================================
 */
 
-#ifndef SCRIPT_H_INCLUDED
-#define SCRIPT_H_INCLUDED
+#pragma once
+
 
 class Script :
 	public BaseItem,
@@ -102,5 +102,3 @@ public:
 
 
 };
-
-#endif  // SCRIPT_H_INCLUDED

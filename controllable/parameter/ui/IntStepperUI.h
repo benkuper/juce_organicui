@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef INTSTEPPERUI_H_INCLUDED
-#define INTSTEPPERUI_H_INCLUDED
+#pragma once
 
 class IntStepperUI : public FloatStepperUI 
 {
@@ -22,6 +21,3 @@ public:
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(IntStepperUI)
 };
-
-
-#endif  // INTSTEPPERUI_H_INCLUDED

@@ -8,9 +8,7 @@
   ==============================================================================
 */
 
-#ifndef BASEITEMEDITOR_H_INCLUDED
-#define BASEITEMEDITOR_H_INCLUDED
-
+#pragma once
 
 class BaseItemEditor :
 	public EnablingControllableContainerEditor
@@ -37,8 +35,3 @@ public:
 	virtual void buttonClicked(Button *b) override;
 
 };
-
-
-
-
-#endif  // BASEITEMEDITOR_H_INCLUDED

@@ -8,9 +8,7 @@
   ==============================================================================
 */
 
-#ifndef COLORPARAMETERUI_H_INCLUDED
-#define COLORPARAMETERUI_H_INCLUDED
-
+#pragma once
 
 class ColorParameterUI :
 	public ParameterUI,
@@ -40,7 +38,4 @@ protected:
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ColorParameterUI)
 
-		
 };
-
-#endif  // COLORPARAMETERUI_H_INCLUDED

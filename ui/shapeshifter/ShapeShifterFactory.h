@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef SHAPESHIFTERFACTORY_H_INCLUDED
-#define SHAPESHIFTERFACTORY_H_INCLUDED
+#pragma once
 
 
 class ShapeShifterDefinition
@@ -46,7 +45,3 @@ public:
 	}
 
 };
-
-
-
-#endif  // SHAPESHIFTERFACTORY_H_INCLUDED

@@ -8,9 +8,8 @@
   ==============================================================================
 */
 
-#ifndef ENUMPARAMETERUI_H_INCLUDED
-#define ENUMPARAMETERUI_H_INCLUDED
 
+#pragma once
 
 class EnumParameterUI : 
 	public ParameterUI, 
@@ -51,5 +50,3 @@ private:
 
 		
 };
-
-#endif  // ENUMPARAMETERUI_H_INCLUDED

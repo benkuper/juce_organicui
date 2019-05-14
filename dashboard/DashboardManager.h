@@ -8,9 +8,7 @@
   ==============================================================================
 */
 
-#ifndef DASHBOARDMANAGER_H_INCLUDED
-#define DASHBOARDMANAGER_H_INCLUDED
-
+#pragma once
 
 class DashboardManager :
 	public BaseManager<Dashboard>
@@ -21,7 +19,3 @@ public:
 	DashboardManager();
 	~DashboardManager();
 };
-
-
-
-#endif  // DASHBOARDMANAGER_H_INCLUDED

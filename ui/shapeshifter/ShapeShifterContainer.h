@@ -7,9 +7,7 @@
 
   ==============================================================================
 */
-
-#ifndef SHAPESHIFTERCONTAINER_H_INCLUDED
-#define SHAPESHIFTERCONTAINER_H_INCLUDED
+#pragma once
 
 #include "ShapeShifterPanel.h"
 #include "GapGrabber.h"
@@ -89,7 +87,3 @@ public:
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ShapeShifterContainer)
 };
-
-
-
-#endif  // SHAPESHIFTERCONTAINER_H_INCLUDED

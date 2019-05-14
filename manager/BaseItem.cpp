@@ -1,4 +1,3 @@
-#include "BaseItem.h"
 /*
   ==============================================================================
 
@@ -13,6 +12,7 @@ BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts
 	EnablingControllableContainer(name.isEmpty() ? getTypeString() : name, _canBeDisabled),
 	canHaveScripts(_canHaveScripts),
 	userCanRemove(true),
+	userCanDuplicate(true),
 	askConfirmationBeforeRemove(true),
 	isSavable(true),
 	saveType(true),
@@ -32,18 +32,15 @@ BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts
 	miniMode = addBoolParameter("MiniMode", "Set the mini mode", false);
 	miniMode->hideInOutliner = true;
 	miniMode->hideInEditor = true;
-	miniMode->isTargettable = false;
 
 	listUISize = addFloatParameter("ListSize", "Size in list", 0, 0, 5000);
 	listUISize->hideInEditor = true;
 	listUISize->hideInOutliner = true;
-	listUISize->isTargettable = false;
 
 	viewUIPosition = addPoint2DParameter("ViewUIPosition", "Position the view");
 	viewUIPosition->setBounds(-100000, -100000, 100000, 100000);
 	viewUIPosition->hideInEditor = true;
 	viewUIPosition->hideInOutliner = true;
-	viewUIPosition->isTargettable = false;
 
 	viewUISize = addPoint2DParameter("ViewUISize", "Size in the view");
 	viewUISize->setBounds(30, 60, 10000, 10000);
@@ -55,7 +52,6 @@ BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts
 	viewUISize->defaultValue = viewUISize->getValue();
 	viewUISize->hideInEditor = true;
 	viewUISize->hideInOutliner = true;
-	viewUISize->isTargettable = false;
 }
 
 BaseItem::~BaseItem()
@@ -99,7 +95,7 @@ void BaseItem::moveAfter()
 
 void BaseItem::remove()
 {
-	if(userCanRemove) baseItemListeners.call(&BaseItem::Listener::askForRemoveBaseItem, this);
+	baseItemListeners.call(&BaseItem::Listener::askForRemoveBaseItem, this);
 }
 
 

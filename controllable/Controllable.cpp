@@ -22,7 +22,6 @@ Controllable::Controllable(const Type &type, const String & niceName, const Stri
 	isControllableFeedbackOnly(false),
 	hideInOutliner(false),
 	includeInScriptObject(true),
-	isTargettable(true),
 	isSavable(true),
 	saveValueOnly(true),
 	isCustomizableByUser(false),
@@ -197,8 +196,15 @@ InspectableEditor * Controllable::getEditor(bool isRootEditor) {
 }
 
 
-//SCRIPT
+Component * Controllable::createDashboardContent()
+{
+	ControllableUI * cui = createDefaultUI();
+	cui->showLabel = false;
+	return cui;
+}
 
+
+//SCRIPT
 var Controllable::setValueFromScript(const juce::var::NativeFunctionArgs& a) {
 
 	Controllable * c = getObjectFromJS<Controllable>(a);

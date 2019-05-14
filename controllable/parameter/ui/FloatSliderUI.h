@@ -8,9 +8,7 @@
   ==============================================================================
 */
 
-#ifndef FLOATSLIDERUI_H_INCLUDED
-#define FLOATSLIDERUI_H_INCLUDED
-
+#pragma once
 
 class FloatSliderUI :
 	public ParameterUI,
@@ -41,34 +39,31 @@ public:
     //interaction
     float initValue;
 
-	//drawing checks
-	float shouldRepaint;
+    //drawing checks
+    float shouldRepaint;
 
-	void setFrontColor(Colour c);
-	void resetFrontColor();
+    virtual void setFrontColor(Colour c);
+    virtual void resetFrontColor();
 	
-	void paint(Graphics &g) override;
-    void mouseDownInternal(const MouseEvent &e) override;
-    void mouseDrag(const MouseEvent &e) override;
-    void mouseUpInternal(const MouseEvent &e) override;
+    virtual void paint(Graphics &g) override;
+    virtual void mouseDownInternal(const MouseEvent &e) override;
+    virtual void mouseDrag(const MouseEvent &e) override;
+    virtual void mouseUpInternal(const MouseEvent &e) override;
 
-    float getValueFromMouse();
-    float getValueFromPosition(const Point<int> &pos);
+    virtual float getValueFromMouse();
+    virtual float getValueFromPosition(const Point<int> &pos);
 
-	virtual void setParamNormalizedValueUndoable(float oldValue, float newValue);
+    virtual void setParamNormalizedValueUndoable(float oldValue, float newValue);
     virtual void setParamNormalizedValue(float value);
     virtual float getParamNormalizedValue();
-	void rangeChanged(Parameter *)override;
+    virtual void rangeChanged(Parameter *)override;
 
-	void visibilityChanged() override;
-
-	void timerCallback() override;
+    virtual void visibilityChanged() override;
+    virtual void timerCallback() override;
 
 protected:
-    void valueChanged(const var &) override;
+    virtual void valueChanged(const var &) override;
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FloatSliderUI)
 };
-
-#endif  // FLOATSLIDERUI_H_INCLUDED

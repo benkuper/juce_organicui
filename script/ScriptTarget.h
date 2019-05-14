@@ -8,9 +8,8 @@
   ==============================================================================
 */
 
-#ifndef SCRIPTTARGET_H_INCLUDED
-#define SCRIPTTARGET_H_INCLUDED
 
+#pragma once
 
 const Identifier scriptPtrIdentifier = "_ptr";
 const Identifier ptrCompareIdentifier = "is";
@@ -58,5 +57,3 @@ T * ScriptTarget::getObjectFromJS(const var::NativeFunctionArgs & a) {
 	if (d == nullptr) return nullptr;
 	return dynamic_cast<T*>((T*)(int64)d->getProperty(scriptPtrIdentifier));
 }
-
-#endif  // SCRIPTTARGET_H_INCLUDED

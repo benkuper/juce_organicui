@@ -7,10 +7,6 @@
 
   ==============================================================================
 */
-
-#ifndef QUEUEDNOTIFIER_H_INCLUDED
-#define QUEUEDNOTIFIER_H_INCLUDED
-
 #pragma once
 
 template<typename MessageClass,class CriticalSectionToUse = CriticalSection>
@@ -137,8 +133,3 @@ private:
     ListenerList<Listener > lastListeners;
 
 };
-
-
-
-
-#endif  // QUEUEDNOTIFIER_H_INCLUDED

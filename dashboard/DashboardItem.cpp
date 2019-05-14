@@ -8,21 +8,11 @@
   ==============================================================================
 */
 
-DashboardItem::DashboardItem(bool canHaveScripts) :
-	BaseItem("Dashboard Item",false,canHaveScripts)
+DashboardItem::DashboardItem(Inspectable * _target) :
+	BaseItem("Dashboard Item",false)
 {
-	target = addTargetParameter("Target", "Target Item to show", nullptr);
 }
 
 DashboardItem::~DashboardItem()
 {
-}
-
-void DashboardItem::onContainerParameterChangedInternal(Parameter * p)
-{
-	BaseItem::onContainerParameterChangedInternal(p);
-	if (p == target && target->target != nullptr && !target->target.wasObjectDeleted())
-	{
-		setNiceName(target->target->parentContainer->niceName + " : " + target->target->niceName);
-	}
 }

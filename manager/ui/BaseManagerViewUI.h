@@ -49,6 +49,7 @@ public:
 	virtual void updateItemsVisibility() override;
 
 	virtual void addItemFromMenu(bool isFromAddButton, Point<int> mouseDownPos) override;
+	virtual void addItemFromMenu(T * item, bool isFromAddButton, Point<int> mouseDownPos) override;
 
 	Point<int> getSize();
 	Point<int> getViewMousePosition();
@@ -233,6 +234,12 @@ template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::addItemFromMenu(bool isFromAddButton, Point<int> mouseDownPos)
 {
 	this->manager->addItem(getViewPos(mouseDownPos).toFloat());
+}
+
+template<class M, class T, class U>
+void BaseManagerViewUI<M, T, U>::addItemFromMenu(T * item, bool isFromAddButton, Point<int> mouseDownPos)
+{
+	this->manager->addItem(item, getViewPos(mouseDownPos).toFloat());
 }
 
 template<class M, class T, class U>

@@ -16,7 +16,9 @@ BoolImageToggleUI::BoolImageToggleUI(ImageButton * i, BoolParameter *p) :
 	showEditWindowOnDoubleClick = false;
 
 	addAndMakeVisible(bt);
-	bt->addListener(this);
+	if (!boolParam->isControllableFeedbackOnly) bt->addListener(this);
+	else bt->setInterceptsMouseClicks(false, false);
+	setInterceptsMouseClicks(true, true); 
 	bt->setToggleState(boolParam->boolValue(), dontSendNotification);
 	bt->setTooltip(tooltip);
 }

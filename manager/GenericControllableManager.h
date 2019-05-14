@@ -7,11 +7,7 @@
 
   ==============================================================================
 */
-
-#ifndef GENERICCONTROLLABLEMANAGER_H_INCLUDED
-#define GENERICCONTROLLABLEMANAGER_H_INCLUDED
-
-
+#pragma once
 
 class GenericControllableManager :
 	public BaseManager<GenericControllableItem>
@@ -32,7 +28,3 @@ public:
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(GenericControllableManager)
 };
-
-
-
-#endif  // GENERICCONTROLLABLEMANAGER_H_INCLUDED

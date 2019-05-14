@@ -7,9 +7,8 @@
  
  ==============================================================================
  */
+#pragma once
 
-#ifndef TRIGGER_H_INCLUDED
-#define TRIGGER_H_INCLUDED
 
 class TriggerButtonUI;
 class TriggerImageUI;
@@ -63,7 +62,3 @@ private:
 	
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Trigger)
 };
-
-
-
-#endif  // TRIGGER_H_INCLUDED

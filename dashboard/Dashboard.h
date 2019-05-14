@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef DASHBOARD_H_INCLUDED
-#define DASHBOARD_H_INCLUDED
+#pragma once
 
 class Dashboard :
 	public BaseItem
@@ -18,13 +17,10 @@ public:
 	Dashboard();
 	~Dashboard();
 
-	DashboardPanelManager panelManager;
+	DashboardItemManager itemManager;
+	//CommentManager commentManager;
 
 	var getJSONData() override;
 	void loadJSONDataInternal(var data) override;
 
 };
-
-
-
-#endif  // DASHBOARD_H_INCLUDED

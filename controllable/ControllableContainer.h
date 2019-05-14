@@ -17,7 +17,8 @@ class ControllableContainer :
 	public Trigger::Listener,
 	public ControllableContainerListener,
 	public Inspectable,
-	public ScriptTarget
+	public ScriptTarget,
+	public DashboardItemTarget
 
 {
 public:
@@ -28,10 +29,7 @@ public:
 	String shortName;
 	bool hasCustomShortName;
 
-	bool skipControllableNameInAddress;
-	
 	bool nameCanBeChangedByUser;
-	bool isTargettable; //for controllableChooser
 
 	//Editor
 	bool canInspectChildContainers;
@@ -143,6 +141,8 @@ public:
 	static var getChildFromScript(const var::NativeFunctionArgs &a);
 	static var getParentFromScript(const juce::var::NativeFunctionArgs& a);
 
+
+	// Inherited via DashboardItemTarget
 
 protected:
 	virtual void onContainerNiceNameChanged() {};
@@ -256,9 +256,12 @@ public:
 
 
 	virtual InspectableEditor * getEditor(bool /*isRootEditor*/) override;
+	virtual Component * createDashboardContent() override;
 
 	private:
 		JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ControllableContainer)
+
+			
 };
 
 

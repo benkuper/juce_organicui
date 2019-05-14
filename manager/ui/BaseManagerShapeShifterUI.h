@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef BASEMANAGERSHAPESHIFTERUI_H_INCLUDED
-#define BASEMANAGERSHAPESHIFTERUI_H_INCLUDED
+#pragma once
 
 template<class M, class T, class U>
 class BaseManagerShapeShifterUI :
@@ -38,7 +37,3 @@ public:
 
 	}
 };
-
-
-
-#endif  // BASEMANAGERSHAPESHIFTERUI_H_INCLUDED

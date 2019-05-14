@@ -664,7 +664,7 @@ void AutomationUI::run()
 		if (firstRun)
 		{
 			firstRun = false;
-			MessageManagerLock mmLock;
+			//MessageManagerLock mmLock;
 			shouldRepaint = true;
 		}
 	}

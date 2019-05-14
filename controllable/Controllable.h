@@ -8,15 +8,16 @@
  ==============================================================================
  */
 
-#ifndef CONTROLLABLE_H_INCLUDED
-#define CONTROLLABLE_H_INCLUDED
+#pragma once
 
 class ControllableUI;
 class ControllableContainer;
+class DashboardItem;
 
 class Controllable :
 	public Inspectable,
-	public ScriptTarget
+	public ScriptTarget,
+	public DashboardItemTarget
 {
 public:
 	enum Type { //Add type here if creating new type of Controllable
@@ -60,9 +61,6 @@ public:
 
 	String controlAddress;
 
-	//ControllableChooser
-	bool isTargettable;
-
 	//save & load
 	bool isSavable;
 	bool saveValueOnly;
@@ -105,6 +103,8 @@ public:
 
 	// used for generating editor
 	virtual ControllableUI * createDefaultUI(Controllable * targetControllable = nullptr) = 0;
+
+	virtual Component * createDashboardContent() override;
 
 
 	static var setValueFromScript(const juce::var::NativeFunctionArgs& a);
@@ -196,9 +196,3 @@ public:
 	private:
 		JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Controllable)
 };
-
-
-
-
-#endif  // CONTROLLABLE_H_INCLUDED
-

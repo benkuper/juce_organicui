@@ -8,10 +8,7 @@
   ==============================================================================
 */
 
-#ifndef TRIPLESLIDERUI_H_INCLUDED
-#define TRIPLESLIDERUI_H_INCLUDED
-
-
+#pragma once
 
 class TripleSliderUI : 
 	public ParameterUI
@@ -52,8 +49,3 @@ protected:
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TripleSliderUI)
 };
-
-
-
-
-#endif  // TRIPLESLIDERUI_H_INCLUDED

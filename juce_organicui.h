@@ -40,6 +40,16 @@
 #endif
 
 
+/** Config: ORGANICUI_USE_SERVUS
+	Enables the use of Zeroconf / DNS-SD / Bonjour for advertising the remote control OSC port and dashboard.
+
+	You will need to link the Servus libraries in the exporters in order to compile with this option.
+*/
+#ifndef ORGANICUI_USE_SERVUS
+#define ORGANICUI_USE_SERVUS 0
+#endif
+
+
 
 #include <juce_core/juce_core.h>
 #include <juce_events/juce_events.h>
@@ -88,6 +98,8 @@ using namespace juce;
 #include "controllable/ControllableContainerListener.h"
 
 #include "script/ExpressionListener.h"
+
+#include "dashboard/DashboardItemProvider.h"
 
 #include "controllable/Controllable.h"
 
@@ -149,6 +161,7 @@ using namespace juce;
 #include "progress/ProgressNotifier.h"
 #include "progress/ui/ProgressWindow.h"
 
+
 #include "engine/Engine.h"
 
 #include "settings/GlobalSettings.h"
@@ -183,6 +196,7 @@ using namespace juce;
 #include "manager/GenericControllableManager.h"
 #include "manager/ui/GenericControllableItemEditor.h"
 
+
 #include "automation/recorder/AutomationRecorder.h"
 #include "automation/easing/Easing.h"
 #include "automation/AutomationKey.h"
@@ -194,25 +208,28 @@ using namespace juce;
 #include "automation/ui/AutomationMultiKeyTransformer.h"
 #include "automation/ui/AutomationUI.h"
 #include "automation/ui/AutomationEditor.h"
+#include "automation/recorder/ui/AutomationRecorderEditor.h"
 #include "automation/parameter/ui/PlayableParameterAutomationEditor.h"
 
+#include "comment/Comment.h"
+#include "comment/CommentManager.h"
+#include "comment/ui/CommentUI.h"
+#include "comment/ui/CommentManagerViewUI.h"
+
 #include "dashboard/DashboardItem.h"
+#include "dashboard/DashboardTargetItem.h"
+#include "dashboard/DashboardGroupItem.h"
+#include "dashboard/DashboardItemFactory.h"
 #include "dashboard/DashboardItemManager.h"
-#include "dashboard/DashboardScriptItem.h"
-#include "dashboard/DashboardPanel.h"
-#include "dashboard/DashboardPanelManager.h"
 #include "dashboard/Dashboard.h"
 #include "dashboard/DashboardManager.h"
-
-
-#include "dashboard/ui/DashboardItemUI.h"
-#include "dashboard/ui/DashboardScriptItemUI.h"
+#include "dashboard/ui/DashboardTargetItemUI.h"
 #include "dashboard/ui/DashboardItemManagerUI.h"
-#include "dashboard/ui/DashboardPanelUI.h"
 #include "dashboard/ui/DashboardUI.h"
 #include "dashboard/ui/DashboardManagerUI.h"
-#include "dashboard/ui/DashboardView.h"
 #include "dashboard/ui/DashboardManagerView.h"
+
+//#include "controllable/ui/DashboardControllableContainerUI.h"
 
 #include "script/Script.h"
 #include "script/ScriptManager.h"

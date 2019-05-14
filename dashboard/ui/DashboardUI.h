@@ -8,9 +8,7 @@
   ==============================================================================
 */
 
-#ifndef DASHBOARDUI_H_INCLUDED
-#define DASHBOARDUI_H_INCLUDED
-
+#pragma once
 
 class DashboardUI :
 	public BaseItemUI<Dashboard>
@@ -19,7 +17,3 @@ public:
 	DashboardUI(Dashboard * item);
 	~DashboardUI();
 };
-
-
-
-#endif  // DASHBOARDUI_H_INCLUDED

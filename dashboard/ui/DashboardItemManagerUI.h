@@ -8,18 +8,18 @@
   ==============================================================================
 */
 
-#ifndef DASHBOARDITEMMANAGERUI_H_INCLUDED
-#define DASHBOARDITEMMANAGERUI_H_INCLUDED
-
+#pragma once
 
 class DashboardItemManagerUI :
-	public BaseManagerUI<DashboardItemManager, DashboardItem, DashboardItemUI>
+	public BaseManagerViewUI<DashboardItemManager, DashboardItem, BaseItemMinimalUI<DashboardItem>>
 {
 public:
 	DashboardItemManagerUI(DashboardItemManager * manager);
 	~DashboardItemManagerUI();
+
+
+	bool isInterestedInDragSource(const SourceDetails & dragSourceDetails) override;
+	void itemDropped(const SourceDetails &details) override;
+
+	BaseItemMinimalUI<DashboardItem> * createUIForItem(DashboardItem *) override;
 };
-
-
-
-#endif  // DASHBOARDITEMMANAGERUI_H_INCLUDED

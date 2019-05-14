@@ -8,9 +8,7 @@
   ==============================================================================
 */
 
-#ifndef PROGRESSWINDOW_H_INCLUDED
-#define PROGRESSWINDOW_H_INCLUDED
-
+#pragma once
 
 class ProgressWindow : public Component,public ProgressNotifier::ProgressListener
 {
@@ -36,7 +34,3 @@ public:
 
 	void setProgress(float progress);
 };
-
-
-
-#endif  // PROGRESSWINDOW_H_INCLUDED

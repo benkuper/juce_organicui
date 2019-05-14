@@ -12,8 +12,9 @@
 DashboardManagerUI::DashboardManagerUI(DashboardManager * manager) :
 	BaseManagerUI("Dashboards", manager)
 {
-	bgColor = bgColor.brighter();
+	bgColor = bgColor.darker();
 	addExistingItems(false);
+	
 }
 
 DashboardManagerUI::~DashboardManagerUI()

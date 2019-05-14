@@ -8,9 +8,7 @@
   ==============================================================================
 */
 
-#ifndef BOOLIMAGETOGGLEUI_H_INCLUDED
-#define BOOLIMAGETOGGLEUI_H_INCLUDED
-
+#pragma once
 
 class BoolImageToggleUI :
 	public ParameterUI,
@@ -31,7 +29,3 @@ public:
 
 	void buttonClicked(Button *) override;
 };
-
-
-
-#endif  // BOOLIMAGETOGGLEUI_H_INCLUDED

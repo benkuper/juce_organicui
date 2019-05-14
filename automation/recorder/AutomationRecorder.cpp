@@ -59,7 +59,7 @@ void AutomationRecorder::addKeyAt(float time)
 {
 	if (isRecording->boolValue() && currentInput != nullptr)
 	{
-		keys.add(Point<float>(time, currentInput->hasRange()?currentInput->getNormalizedValue():jlimit<float>(0,1,currentInput->getValue())));
+		keys.add(Point<float>(time, currentInput->hasRange() ? currentInput->getNormalizedValue() : jlimit<float>(0, 1, currentInput->getValue())));
 	}
 }
 
@@ -76,7 +76,7 @@ void AutomationRecorder::startRecording()
 		DBG("Already recording, cancel before start again");
 		cancelRecording();
 	}
-	
+
 
 	isRecording->setValue(true);
 }
@@ -89,7 +89,7 @@ void AutomationRecorder::cancelRecording()
 
 Array<Point<float>> AutomationRecorder::stopRecordingAndGetKeys()
 {
-	Array<Point<float>> simplifiedKeys = getSimplifiedKeys(keys,simplificationFactor->floatValue()/10); //fine tune with simplification factor
+	Array<Point<float>> simplifiedKeys = getSimplifiedKeys(keys, simplificationFactor->floatValue() / 10); //fine tune with simplification factor
 	isRecording->setValue(false);
 
 	clearKeys();
@@ -110,6 +110,11 @@ void AutomationRecorder::onContainerParameterChanged(Parameter * p)
 void AutomationRecorder::inspectableDestroyed(Inspectable * i)
 {
 	if (!currentInput.wasObjectDeleted() && i == currentInput) setCurrentInput(nullptr);
+}
+
+InspectableEditor * AutomationRecorder::getEditor(bool isRoot)
+{
+	return new AutomationRecorderEditor(this, isRoot);
 }
 
 Array<Point<float>> AutomationRecorder::getSimplifiedKeys(Array<Point<float>> arr, float epsilon)
@@ -134,7 +139,8 @@ Array<Point<float>> AutomationRecorder::getSimplifiedKeys(Array<Point<float>> ar
 		rs.removeLast();
 		rs.addArray(r2);
 		return rs;
-	} else { //base case 2, all points between are to be removed.
+	}
+	else { //base case 2, all points between are to be removed.
 		Array<Point<float>> r;
 		r.add(arr[0]);
 		r.add(arr[arr.size() - 1]);
@@ -154,11 +160,11 @@ const std::pair<int, float> AutomationRecorder::findMaximumDistance(Array<Point<
 
 					   //distance calculation
 	Line<float> line(firstpoint, lastpoint);
-	
+
 	//Point<float> p = lastpoint - firstpoint;
 	Point<float> lp;
 	for (int i = 1; i < numKeys - 1; i++) { //traverse through second point to second last point
-		float Dist = line.getDistanceFromPoint(arr[i],lp);
+		float Dist = line.getDistanceFromPoint(arr[i], lp);
 		if (Dist > Mdist) {
 			Mdist = Dist;
 			index = i;

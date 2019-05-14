@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef TARGETPARAMETER_H_INCLUDED
-#define TARGETPARAMETER_H_INCLUDED
+#pragma once
 
 class TargetParameterUI;
 
@@ -78,7 +77,3 @@ public:
 	static String getTypeStringStatic() { return "Target"; }
 
 };
-
-
-
-#endif  // TARGETPARAMETER_H_INCLUDED

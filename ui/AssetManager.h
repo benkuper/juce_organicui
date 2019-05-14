@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef ASSETMANAGER_H_INCLUDED
-#define ASSETMANAGER_H_INCLUDED
+#pragma once
 
 using namespace juce;
 
@@ -46,7 +45,3 @@ public:
 	ImageButton * getSetupBTImage(const Image & image);
 	ImageButton * getToggleBTImage(const Image &image);
 };
-
-
-
-#endif  // ASSETMANAGER_H_INCLUDED

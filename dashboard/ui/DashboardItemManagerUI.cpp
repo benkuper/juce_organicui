@@ -1,3 +1,4 @@
+#include "DashboardItemManagerUI.h"
 /*
   ==============================================================================
 
@@ -9,18 +10,41 @@
 */
 
 DashboardItemManagerUI::DashboardItemManagerUI(DashboardItemManager * manager) :
-	BaseManagerUI("Dashboard", manager)
+	BaseManagerViewUI("Dashboard", manager)
 {
 	//bgColor = Colours::purple;
-	addItemText = "Add Item";
 	//setWantsKeyboardFocus(true);
 
 	addExistingItems(false);
-	
-	setSize(100, 100);
-	resized();
 }
 
 DashboardItemManagerUI::~DashboardItemManagerUI()
 {
+}
+
+bool DashboardItemManagerUI::isInterestedInDragSource(const SourceDetails & dragSourceDetails)
+{
+	return true;
+}
+
+void DashboardItemManagerUI::itemDropped(const SourceDetails & details)
+{
+	BaseManagerViewUI::itemDropped(details);
+
+	if (details.sourceComponent->getParentComponent() == this) return;
+
+	InspectableContentComponent * icc = dynamic_cast<InspectableContentComponent *>(details.sourceComponent.get());
+	if (icc != nullptr && icc->inspectable != nullptr)
+	{
+		BaseItem * bi = dynamic_cast<BaseItem *>(icc->inspectable.get());
+		if (bi != nullptr)
+		{
+			manager->addItem(new DashboardTargetItem(bi), getViewMousePosition().toFloat());
+		}
+	}
+}
+
+BaseItemMinimalUI<DashboardItem> * DashboardItemManagerUI::createUIForItem(DashboardItem * item)
+{
+	return item->createUI();
 }

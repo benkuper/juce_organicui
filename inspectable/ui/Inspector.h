@@ -8,8 +8,8 @@
   ==============================================================================
 */
 
-#ifndef INSPECTOR_H_INCLUDED
-#define INSPECTOR_H_INCLUDED
+#pragma once
+
 
 #include "../../ui/shapeshifter/ShapeShifterContent.h"
 #include "InspectableEditor.h"
@@ -69,5 +69,3 @@ public:
 
 	static InspectorUI * create(const String &contentName) { return new InspectorUI(contentName); }
 };
-
-#endif  // INSPECTOR_H_INCLUDED

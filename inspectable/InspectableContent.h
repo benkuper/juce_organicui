@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef INSPECTABLECONTENT_H_INCLUDED
-#define INSPECTABLECONTENT_H_INCLUDED
+#pragma once
 
 #include "Inspectable.h"
 
@@ -28,7 +27,3 @@ public:
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(InspectableContent)
 };
-
-
-
-#endif  // INSPECTABLECONTENT_H_INCLUDED

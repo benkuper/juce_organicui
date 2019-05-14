@@ -21,12 +21,12 @@ Dashboard::~Dashboard()
 var Dashboard::getJSONData()
 {
 	var data = BaseItem::getJSONData();
-	data.getDynamicObject()->setProperty("panelManager", panelManager.getJSONData());
+	data.getDynamicObject()->setProperty("itemManager", itemManager.getJSONData());
 	return data;
 }
 
 void Dashboard::loadJSONDataInternal(var data)
 {
 	BaseItem::loadJSONDataInternal(data);
-	panelManager.loadJSONData(data.getProperty("panelManager", var()));
+	itemManager.loadJSONData(data.getProperty("itemManager", var()));
 }

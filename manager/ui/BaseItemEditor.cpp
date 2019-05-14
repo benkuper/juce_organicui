@@ -9,7 +9,10 @@ BaseItemEditor::BaseItemEditor(BaseItem * bi, bool isRoot) :
 			removeBT = AssetManager::getInstance()->getRemoveBT();
 			addAndMakeVisible(removeBT);
 			removeBT->addListener(this);
+		}
 
+		if(item->userCanDuplicate)
+		{
 			duplicateBT = AssetManager::getInstance()->getDuplicateBT();
 			addAndMakeVisible(duplicateBT);
 			duplicateBT->addListener(this);
@@ -54,11 +57,12 @@ void BaseItemEditor::resizedInternalHeader(juce::Rectangle<int>& r)
 		removeBT->setBounds(r.removeFromRight(targetHeight).reduced(3));
 		r.removeFromRight(2);
 
-		if (duplicateBT != nullptr)
-		{
-			duplicateBT->setBounds(r.removeFromRight(targetHeight).reduced(3));
-			r.removeFromRight(2);
-		}
+	}
+
+	if (item->userCanDuplicate && duplicateBT != nullptr)
+	{
+		duplicateBT->setBounds(r.removeFromRight(targetHeight).reduced(3));
+		r.removeFromRight(2);
 	}
 
 	if (upBT != nullptr)

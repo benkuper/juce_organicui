@@ -43,6 +43,7 @@ public:
 
 	T * addItem(T * item = nullptr, var data = var(), bool addToUndo = true, bool notify = true); //if data is not empty, load data
 	T * addItem(const Point<float> initialPosition, bool addToUndo = true, bool notify = true);
+	T * addItem(T * item, const Point<float> initialPosition, bool addToUndo = true, bool notify = true);
 	Array<T *> addItems(Array<T *> items, var data = var(), bool addToUndo = true);
 
 
@@ -520,6 +521,14 @@ T * BaseManager<T>::addItem(const Point<float> initialPosition, bool addToUndo, 
 	i->viewUIPosition->setPoint(initialPosition);
 	addItem(i, addToUndo, notify);
 	return i;
+}
+
+template<class T>
+T * BaseManager<T>::addItem(T * item, const Point<float> initialPosition, bool addToUndo, bool notify)
+{
+	item->viewUIPosition->setPoint(initialPosition);
+	addItem(item, addToUndo, notify);
+	return item;
 }
 
 template<class T>

@@ -1,5 +1,7 @@
 /** A Helper class that encapsulates the regex operations */
 
+#pragma once
+
 #include <regex>
 
 class RegexFunctions

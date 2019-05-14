@@ -41,11 +41,13 @@ public:
 	void paint(Graphics &g) override;
 	virtual void resizedInternalHeader(juce::Rectangle<int> &r) override;
 
+	virtual void addPopupMenuItems(PopupMenu * p) override;
+	virtual void handleMenuSelectedID(int id) override;
+
 	virtual void showMenuAndAddItem(bool isFromAddButton);
 	virtual T * addItemFromMenu(bool isFromAddButton);
 
 	void buttonClicked(Button *) override;
-	void mouseDown(const MouseEvent &e) override;
 
 	void newMessage(const typename BaseManager<T>::ManagerEvent &e) override;
 
@@ -137,14 +139,35 @@ void GenericManagerEditor<T>::resizedInternalHeader(juce::Rectangle<int>& r)
 }
 
 template<class T>
+void GenericManagerEditor<T>::addPopupMenuItems(PopupMenu * p)
+{
+	if (manager->managerFactory != nullptr) p->addSubMenu("Add...",manager->managerFactory->getMenu());
+	else p->addItem(1, addItemText);
+}
+
+template<class T>
+void GenericManagerEditor<T>::handleMenuSelectedID(int id)
+{
+	if (manager->managerFactory != nullptr)
+	{
+		T * item = manager->managerFactory->createFromMenuResult(id);
+		if (item != nullptr) manager->addItem(item);
+	}
+	else
+	{
+		if(id == 1) addItemFromMenu(true);
+	}
+}
+
+template<class T>
 void GenericManagerEditor<T>::showMenuAndAddItem(bool isFromAddButton)
 {
 	if (manager->managerFactory != nullptr)
 	{
-		T * m = manager->managerFactory->showCreateMenu();
-		if (m != nullptr)
+		T * item = manager->managerFactory->showCreateMenu();
+		if (item != nullptr)
 		{
-			manager->addItem(m);
+			manager->addItem(item);
 		}
 	} else
 	{
@@ -187,18 +210,6 @@ void GenericManagerEditor<T>::buttonClicked(Button * b)
 	}
 } 
 
-template<class T>
-void GenericManagerEditor<T>::mouseDown(const MouseEvent & e)
-{
-	GenericControllableContainerEditor::mouseDown(e);
-
-	if (e.mods.isLeftButtonDown())
-	{
-	} else if (e.mods.isRightButtonDown())
-	{
-		showMenuAndAddItem(false);
-	}
-}
 
 template<class T>
 void GenericManagerEditor<T>::newMessage(const typename BaseManager<T>::ManagerEvent & e)

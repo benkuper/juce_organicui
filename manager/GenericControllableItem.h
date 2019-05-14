@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef GENERICCONTROLLABLEITEM_H_INCLUDED
-#define GENERICCONTROLLABLEITEM_H_INCLUDED
+#pragma once
 
 class GenericControllableItem :
 	public BaseItem
@@ -29,7 +28,3 @@ public:
 
 	InspectableEditor * getEditor(bool isRoot) override;
 };
-
-
-
-#endif  // GENERICCONTROLLABLEITEM_H_INCLUDED

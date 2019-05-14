@@ -8,9 +8,7 @@
   ==============================================================================
 */
 
-#ifndef APPUPDATER_H_INCLUDED
-#define APPUPDATER_H_INCLUDED
-
+#pragma once
 
 class UpdateDialogWindow :
 	public Component,
@@ -98,6 +96,3 @@ public:
 	void addAsyncCoalescedUpdateListener(AppUpdaterAsyncListener* newListener) { queuedNotifier.addAsyncCoalescedListener(newListener); }
 	void removeAsyncUpdateListener(AppUpdaterAsyncListener* listener) { queuedNotifier.removeListener(listener); }
 };
-
-
-#endif  // APPUPDATER_H_INCLUDED

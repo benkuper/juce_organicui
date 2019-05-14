@@ -8,9 +8,7 @@
   ==============================================================================
 */
 
-#ifndef DASHBOARDMANAGERUI_H_INCLUDED
-#define DASHBOARDMANAGERUI_H_INCLUDED
-
+#pragma once
 
 class DashboardManagerUI :
 	public BaseManagerUI<DashboardManager, Dashboard, DashboardUI>
@@ -21,6 +19,3 @@ public:
 
 
 };
-
-
-#endif  // DASHBOARDMANAGERUI_H_INCLUDED

@@ -343,7 +343,13 @@ void BaseItemUI<T>::buttonClicked(Button * b)
 template<class T>
 void BaseItemUI<T>::mouseDown(const MouseEvent & e)
 {
-	if ((removeBT != nullptr && e.eventComponent == removeBT) || (enabledBT != nullptr && e.eventComponent == enabledBT->bt)) return;
+	//if ((removeBT != nullptr && e.eventComponent == removeBT) || (enabledBT != nullptr && e.eventComponent == enabledBT->bt)) return;
+	Button * b = dynamic_cast<Button *>(e.eventComponent);
+	if (b != nullptr) return;
+
+	TriggerUI * tui = dynamic_cast<TriggerUI *>(e.eventComponent);
+	if (tui != nullptr) return;
+
 	BaseItemMinimalUI<T>::mouseDown(e);
 }
 

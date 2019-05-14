@@ -17,4 +17,5 @@ DashboardManager::DashboardManager() :
 
 DashboardManager::~DashboardManager()
 {
+	DashboardItemFactory::deleteInstance();
 }

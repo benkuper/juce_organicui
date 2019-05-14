@@ -7,9 +7,7 @@
 
   ==============================================================================
 */
-
-#ifndef POINT2DPARAMETER_H_INCLUDED
-#define POINT2DPARAMETER_H_INCLUDED
+#pragma once
 
 class Point2DParameter : public Parameter
 {
@@ -48,6 +46,3 @@ public:
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Point2DParameter)
 };
-
-
-#endif  // POINT2DPARAMETER_H_INCLUDED

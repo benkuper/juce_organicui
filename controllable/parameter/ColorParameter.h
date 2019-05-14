@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef COLORPARAMETER_H_INCLUDED
-#define COLORPARAMETER_H_INCLUDED
+#pragma once
 
 class ColorParameterUI;
 
@@ -44,6 +43,3 @@ public:
 	static String getTypeStringStatic() { return "Color"; }
 
 };
-
-
-#endif  // COLORPARAMETER_H_INCLUDED

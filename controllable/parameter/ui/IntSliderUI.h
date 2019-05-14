@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef INTSLIDERUI_H_INCLUDED
-#define INTSLIDERUI_H_INCLUDED
+#pragma once
 
 class IntSliderUI : public FloatSliderUI
 {
@@ -26,7 +25,3 @@ protected:
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(IntSliderUI)
 };
-
-
-
-#endif  // INTSLIDERUI_H_INCLUDED

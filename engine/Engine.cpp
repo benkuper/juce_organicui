@@ -1,3 +1,4 @@
+#include "Engine.h"
 
 /*
  ==============================================================================
@@ -22,6 +23,7 @@ Engine::Engine(const String & fileName, const String & fileExtension) :
 		"*" + fileExtension,
 		"Load a " + fileName,
 		"Save a " + fileName),
+	DashboardItemProvider("Generic"),
 	fileName(fileName),
 	fileExtension(fileExtension),
 	lastFileAbsolutePath(""),
@@ -30,13 +32,15 @@ Engine::Engine(const String & fileName, const String & fileExtension) :
 	isLoadingFile(false),
 	isClearing(false)
 {
-	skipControllableNameInAddress = true;
+	//skipControllableNameInAddress = true;
 	isBetaVersion = getAppVersion().endsWith("b");
 	betaVersion = getBetaVersion(getAppVersion());
 
 	selectionManager = new InspectableSelectionManager(true); //selectionManager constructor
 
 	Logger::setCurrentLogger(CustomLogger::getInstance());
+
+	DashboardItemFactory::getInstance()->providers.add(this);
 
 	addChildControllableContainer(DashboardManager::getInstance());
 	addChildControllableContainer(ProjectSettings::getInstance());
@@ -105,6 +109,19 @@ void Engine::childStructureChanged(ControllableContainer * cc)
 
 	if (isLoadingFile || isClearing) return;
 	updateLiveScriptObject();
+}
+
+PopupMenu Engine::getDashboardCreateMenu(int idOffset)
+{
+	return ControllableChooserPopupMenu(this, true, true, idOffset);
+}
+
+DashboardItem * Engine::getDashboardItemFromMenuResult(int result)
+{
+	ControllableChooserPopupMenu chooser(this, true, true, 0);
+	Controllable * c = chooser.getControllableForResult(result);
+	if (c == nullptr) return nullptr;
+	return new DashboardTargetItem(c);
 }
 
 void Engine::clear() {

@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef SHAPESHIFTER_H_INCLUDED
-#define SHAPESHIFTER_H_INCLUDED
+#pragma once
 
 
 class ShapeShifterContainer;
@@ -46,6 +45,3 @@ public :
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ShapeShifter)
 };
-
-
-#endif  // SHAPESHIFTER_H_INCLUDED

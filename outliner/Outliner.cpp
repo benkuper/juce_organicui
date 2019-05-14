@@ -77,7 +77,7 @@ void Outliner::rebuildTree()
 {
 	if (Engine::mainEngine == nullptr) return;
 
-	ScopedPointer<XmlElement> os = treeView.getOpennessState(true);
+	std::unique_ptr<XmlElement> os = treeView.getOpennessState(true);
 	clear();
 	buildTree(rootItem, Engine::mainEngine);
 	rootItem->setOpen(true);
@@ -91,17 +91,17 @@ void Outliner::buildTree(OutlinerItem * parentItem, ControllableContainer * pare
 	Array<WeakReference<ControllableContainer>> childContainers = parentContainer->controllableContainers;
 	for (auto &cc : childContainers)
 	{
-		if (cc->skipControllableNameInAddress && !showHiddenContainers)
+		/*if (cc->skipControllableNameInAddress && !showHiddenContainers)
 		{
 			buildTree(parentItem, cc);
 		}
 		else
-		{
+		{*/
 			OutlinerItem * ccItem = new OutlinerItem(cc);
 			parentItem->addSubItem(ccItem);
 
 			buildTree(ccItem, cc);
-		}
+		//}
 
 	}
 

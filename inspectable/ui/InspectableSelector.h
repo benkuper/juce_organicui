@@ -8,9 +8,7 @@
   ==============================================================================
 */
 
-#ifndef INSPECTABLESELECTOR_H_INCLUDED
-#define INSPECTABLESELECTOR_H_INCLUDED
-
+#pragma once
 
 class InspectableSelector : 
 	public Component
@@ -53,7 +51,3 @@ public:
 	void removeSelectorListener(SelectorListener* listener) { listeners.remove(listener); }
 	
 };
-
-
-
-#endif  // INSPECTABLESELECTOR_H_INCLUDED
