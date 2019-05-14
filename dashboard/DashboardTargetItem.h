@@ -24,7 +24,7 @@ public:
 
 	virtual void updateName();
 
-	virtual void onContainerParameterChangedInternal(Parameter * p);
+	virtual void onContainerParameterChangedInternal(Parameter * p) override;
 
 	virtual BaseItemMinimalUI<DashboardItem> * createUI() override;
 

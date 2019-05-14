@@ -17,7 +17,7 @@ public:
 	juce_DeclareSingleton(DashboardItemFactory, true)
 
 	DashboardItemFactory();
-	~DashboardItemFactory() {}
+	virtual ~DashboardItemFactory() {}
 
 	Array<DashboardItemProvider *> providers;
 	Array<DashboardItemProvider *> specialProviders;

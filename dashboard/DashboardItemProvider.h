@@ -19,7 +19,7 @@ class DashboardItemTarget
 {
 public:
 	DashboardItemTarget() {}
-	~DashboardItemTarget() {}
+	virtual ~DashboardItemTarget() {}
 
 	virtual Component * createDashboardContent() = 0;
 };

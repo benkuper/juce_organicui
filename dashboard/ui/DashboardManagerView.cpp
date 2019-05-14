@@ -12,8 +12,8 @@
 DashboardManagerView::DashboardManagerView(const String &contentName, DashboardManager * manager) :
 	ShapeShifterContentComponent(contentName),
 	managerUI(manager),
-	currentDashboard(nullptr),
-	currentItemManagerUI(nullptr)
+	currentItemManagerUI(nullptr),
+    currentDashboard(nullptr)
 {
 	contentIsFlexible = true; 
 	
