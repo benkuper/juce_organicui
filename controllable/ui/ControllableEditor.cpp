@@ -145,6 +145,9 @@ void ControllableEditor::newMessage(const Controllable::ControllableEvent & e)
 	case Controllable::ControllableEvent::NAME_CHANGED:
 		label.setText(controllable->niceName, dontSendNotification);
 		break;
+            
+        default:
+            break;
 
 	}
 }
