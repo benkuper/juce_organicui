@@ -180,7 +180,8 @@ public:
 	public:
 		ItemBaseAction(BaseManager * m, T * i, var data = var()) :
 			ManagerBaseAction(m, data),
-			itemRef(i)
+			itemRef(i),
+			itemIndex(0)
 		{
 			T * s = getItem();
 			if (s != nullptr)
