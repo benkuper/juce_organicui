@@ -350,6 +350,9 @@ void BaseItemUI<T>::mouseDown(const MouseEvent & e)
 	TriggerUI * tui = dynamic_cast<TriggerUI *>(e.eventComponent);
 	if (tui != nullptr) return;
 
+	ParameterUI * pui = dynamic_cast<ParameterUI *>(e.eventComponent);
+	if (pui != nullptr) return;
+
 	BaseItemMinimalUI<T>::mouseDown(e);
 }
 
