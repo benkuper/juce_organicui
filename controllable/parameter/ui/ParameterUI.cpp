@@ -142,10 +142,10 @@ void ParameterUI::addPopupMenuItems(PopupMenu * p)
 		if (!parameter->lockManualControlMode)
 		{
 			PopupMenu controlModeMenu;
-			controlModeMenu.addItem(10, "Manual");
-			controlModeMenu.addItem(11, "Expression");
-			controlModeMenu.addItem(12, "Reference");
-			controlModeMenu.addItem(13, "Animation");
+			controlModeMenu.addItem(10, "Manual", true, parameter->controlMode == Parameter::MANUAL);
+			controlModeMenu.addItem(11, "Expression", true, parameter->controlMode == Parameter::EXPRESSION);
+			controlModeMenu.addItem(12, "Reference", true, parameter->controlMode == Parameter::REFERENCE);
+			controlModeMenu.addItem(13, "Animation", true, parameter->controlMode == Parameter::AUTOMATION);
 			p->addSubMenu("Control Mode", controlModeMenu);
 		}
 	}
