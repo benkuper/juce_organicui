@@ -81,7 +81,7 @@ public:
 	~Outliner();
 
 	TreeView treeView;
-	ScopedPointer<OutlinerItem> rootItem;
+	std::unique_ptr<OutlinerItem> rootItem;
 
 	bool showHiddenContainers; //include or exclude in treeview the "skipInAddress" containers (may be later exposed to user as an option)
 	bool enabled; //update or not

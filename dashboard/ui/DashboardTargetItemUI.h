@@ -19,7 +19,7 @@ public:
 
 	DashboardTargetItem * targetItem;
 
-	ScopedPointer<Component> targetUI;
+	std::unique_ptr<Component> targetUI;
 	virtual void updateTargetUI();
 
 	virtual void resizedInternalContent(juce::Rectangle<int> &r) override;

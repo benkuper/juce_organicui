@@ -14,7 +14,7 @@ ControllableContainer * getAppSettings() { return &(getApp().appSettings); }
 ApplicationProperties& getAppProperties() { return *getApp().appProperties; }
 OpenGLContext * getOpenGLContext() { return &getApp().mainComponent->openGLContext; }
 ApplicationCommandManager& getCommandManager() { return getApp().commandManager; }
-OrganicApplication::MainWindow * getMainWindow() { return getApp().mainWindow; }
+OrganicApplication::MainWindow * getMainWindow() { return getApp().mainWindow.get(); }
 
 
 OrganicApplication::OrganicApplication(const String &appName, bool useWindow) :
@@ -27,7 +27,7 @@ OrganicApplication::OrganicApplication(const String &appName, bool useWindow) :
 	options.applicationName = appName;
 	options.filenameSuffix = "settings";
 	options.osxLibrarySubFolder = "Preferences";
-	appProperties = new ApplicationProperties();
+	appProperties = std::make_unique<ApplicationProperties>();
 	appProperties->setStorageParameters(options);
 }
 
@@ -43,7 +43,7 @@ void OrganicApplication::initialise(const String & commandLine)
 	GlobalSettings::getInstance()->loadJSONData(gs);
 
 	jassert(engine != nullptr);
-	if (mainComponent == nullptr) mainComponent = new OrganicMainContentComponent();
+	if (mainComponent == nullptr) mainComponent = std::make_unique<OrganicMainContentComponent>();
 
 
 	engine->addAsyncEngineListener(this);
@@ -52,7 +52,7 @@ void OrganicApplication::initialise(const String & commandLine)
 
 	if (useWindow)
 	{
-		mainWindow = new MainWindow(getApplicationName(), mainComponent);
+		mainWindow.reset(new MainWindow(getApplicationName(), mainComponent.get()));
 		updateAppTitle();
 	}
 	

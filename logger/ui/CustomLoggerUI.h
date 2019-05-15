@@ -74,7 +74,7 @@ public:
 	void resized()override;
 	LogList logList;
 	TextButton clearB, copyB;
-	ScopedPointer<TableListBox> logListComponent;
+	std::unique_ptr<TableListBox> logListComponent;
 	int maxNumElement;
 
 	void buttonClicked(Button*) override;

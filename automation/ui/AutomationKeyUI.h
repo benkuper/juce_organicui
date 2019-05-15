@@ -19,7 +19,7 @@ public:
     
 	Colour color;
     
-    ScopedPointer<EasingUI> easingUI;
+    std::unique_ptr<EasingUI> easingUI;
 
     int keyYPos1;
     int keyYPos2;

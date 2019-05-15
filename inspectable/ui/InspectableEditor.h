@@ -49,7 +49,7 @@ public:
 	GenericComponentEditor(WeakReference<Inspectable> inspectable, Component * c, bool isRoot);
 	~GenericComponentEditor();
 
-	ScopedPointer<Component> child;
+	std::unique_ptr<Component> child;
 
 	void resized() override;
 	void childBoundsChanged(Component * c) override;

@@ -18,8 +18,8 @@ public:
 	OpenGLContext openGLContext;
 #endif
 
-	ScopedPointer<LookAndFeelOO> lookAndFeelOO;
-	ScopedPointer<ProgressWindow> fileProgressWindow;
+	std::unique_ptr<LookAndFeelOO> lookAndFeelOO;
+	std::unique_ptr<ProgressWindow> fileProgressWindow;
 
 
 	virtual void init();

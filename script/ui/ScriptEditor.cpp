@@ -15,19 +15,19 @@ ScriptEditor::ScriptEditor(Script * _script, bool isRoot) :
 {
 	script->addAsyncScriptListener(this);
 
-	reloadBT = script->reload->createImageUI(AssetManager::getInstance()->getReloadImage());
-	editBT = AssetManager::getInstance()->getEditBT();
-	logUI = script->logParam->createToggle();
+	reloadBT.reset(script->reload->createImageUI(AssetManager::getInstance()->getReloadImage()));
+	editBT.reset(AssetManager::getInstance()->getEditBT());
+	logUI.reset(script->logParam->createToggle());
 
 	editBT->addListener(this);
 
-	paramsEditor = script->scriptParamsContainer.getEditor(false);
-	addChildComponent(paramsEditor);
+	paramsEditor.reset(script->scriptParamsContainer.getEditor(false));
+	addChildComponent(paramsEditor.get());
 	paramsEditor->setVisible(script->scriptParamsContainer.controllables.size() > 0);
 
-	addAndMakeVisible(reloadBT);
-	addAndMakeVisible(editBT);
-	addAndMakeVisible(logUI);
+	addAndMakeVisible(reloadBT.get());
+	addAndMakeVisible(editBT.get());
+	addAndMakeVisible(logUI.get());
 }
 
 ScriptEditor::~ScriptEditor()
@@ -92,7 +92,7 @@ void ScriptEditor::buttonClicked(Button * b)
 {
 	BaseItemEditor::buttonClicked(b);
 	
-	if (b == editBT)
+	if (b == editBT.get())
 	{
 		if (script->filePath->stringValue().isEmpty())
 		{

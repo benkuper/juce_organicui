@@ -91,7 +91,7 @@ var KeyMappingsContainer::getJSONData()
 {
 	var data = ControllableContainer::getJSONData();
 	KeyPressMappingSet * kms = getCommandManager().getKeyMappings();
-	ScopedPointer<XmlElement> xmlElement = kms->createXml(true);
+	std::unique_ptr<XmlElement> xmlElement = kms->createXml(true);
 	String xmlData = xmlElement->toString();
 	data.getDynamicObject()->setProperty("keyMappings", xmlData);
 	return data;

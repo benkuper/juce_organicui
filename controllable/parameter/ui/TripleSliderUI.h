@@ -26,9 +26,9 @@ public:
 	FloatParameter yParam;
 	FloatParameter zParam;
 
-	ScopedPointer<ControllableUI> xSlider;
-	ScopedPointer<ControllableUI> ySlider;
-	ScopedPointer<ControllableUI> zSlider;
+	std::unique_ptr<ControllableUI> xSlider;
+	std::unique_ptr<ControllableUI> ySlider;
+	std::unique_ptr<ControllableUI> zSlider;
 
 	var mouseDownValue;
 

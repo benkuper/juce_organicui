@@ -24,7 +24,7 @@ public:
 	enum ExpressionState { EXPRESSION_LOADED, EXPRESSION_ERROR, EXPRESSION_EMPTY, EXPRESSION_CLEAR };
 
 	ExpressionState state;
-	ScopedPointer<JavascriptEngine> scriptEngine;
+	std::unique_ptr<JavascriptEngine> scriptEngine;
 
 	String expression;
 	var currentValue;

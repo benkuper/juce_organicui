@@ -79,7 +79,7 @@ void AutomationUI::setViewMode(ViewMode mode)
 
 	if (transformer != nullptr)
 	{
-		removeChildComponent(transformer);
+		removeChildComponent(transformer.get());
 		transformer = nullptr;
 	}
 
@@ -363,7 +363,7 @@ void AutomationUI::removeItemUIInternal(AutomationKeyUI * kui)
 {
 	if (transformer != nullptr)
 	{
-		removeChildComponent(transformer);
+		removeChildComponent(transformer.get());
 		transformer = nullptr;
 	}
 
@@ -393,7 +393,7 @@ void AutomationUI::mouseDown(const MouseEvent & e)
 
 			if (transformer != nullptr)
 			{
-				removeChildComponent(transformer);
+				removeChildComponent(transformer.get());
 				transformer = nullptr;
 			}
 
@@ -560,7 +560,7 @@ void AutomationUI::inspectablesSelectionChanged()
 {
 	if (transformer != nullptr)
 	{
-		removeChildComponent(transformer);
+		removeChildComponent(transformer.get());
 		transformer = nullptr;
 	}
 
@@ -581,8 +581,8 @@ void AutomationUI::inspectablesSelectionChanged()
 
 	if (uiSelection.size() >= 2)
 	{
-		transformer = new AutomationMultiKeyTransformer(this, uiSelection);
-		addAndMakeVisible(transformer);
+		transformer.reset(new AutomationMultiKeyTransformer(this, uiSelection));
+		addAndMakeVisible(transformer.get());
 		transformer->grabKeyboardFocus(); // so no specific key has the focus for deleting
 	}
 }

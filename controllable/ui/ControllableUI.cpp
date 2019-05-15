@@ -73,13 +73,13 @@ bool ControllableUI::isInteractable()
 
 void ControllableUI::showContextMenu()
 {
-	ScopedPointer<PopupMenu> p = new PopupMenu();
-	addPopupMenuItems(p);
+	std::unique_ptr<PopupMenu> p(new PopupMenu());
+	addPopupMenuItems(p.get());
 
 	if (ControllableUI::customContextMenuFunc != nullptr)
 	{
 		p->addSeparator();
-		ControllableUI::customContextMenuFunc(this, p);
+		ControllableUI::customContextMenuFunc(this, p.get());
 	}
 
 	if (controllable->includeInScriptObject)

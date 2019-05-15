@@ -14,7 +14,7 @@ FloatStepperUI::FloatStepperUI(Parameter * _parameter) :
 {
 	showEditWindowOnDoubleClick = false;
 
-	slider = new BetterStepper(tooltip);
+	slider.reset(new BetterStepper(tooltip));
 	slider->setEnabled(parameter->enabled);
 	
 	if(parameter->hasRange() && parameter->minimumValue != parameter->maximumValue) slider->setRange((int)parameter->minimumValue, (int)parameter->maximumValue,1);
@@ -29,7 +29,7 @@ FloatStepperUI::FloatStepperUI(Parameter * _parameter) :
 
 	feedbackStateChanged();
 
-	addAndMakeVisible(slider);
+	addAndMakeVisible(slider.get());
 
     startTimerHz(20);
 }

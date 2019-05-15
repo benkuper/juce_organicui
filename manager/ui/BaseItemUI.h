@@ -40,17 +40,17 @@ public:
 	int resizerWidth;
 	int resizerHeight;
 
-	ScopedPointer<ResizableCornerComponent> cornerResizer;
-	ScopedPointer<ResizableEdgeComponent> edgeResizer;
+	std::unique_ptr<ResizableCornerComponent> cornerResizer;
+	std::unique_ptr<ResizableEdgeComponent> edgeResizer;
 	ComponentBoundsConstrainer constrainer;
 
 	Component * resizer;
 
 	Label itemLabel;
-	ScopedPointer<BoolImageToggleUI> enabledBT;
-	ScopedPointer<ImageButton> removeBT;
+	std::unique_ptr<BoolImageToggleUI> enabledBT;
+	std::unique_ptr<ImageButton> removeBT;
 
-	//ScopedPointer<Grabber> grabber;
+	//std::unique_ptr<Grabber> grabber;
 
 	Array<Component *> contentComponents;
 
@@ -144,38 +144,38 @@ BaseItemUI<T>::BaseItemUI(T * _item, Direction _resizeDirection) :
 	case VERTICAL:
 		resizerHeight = 8;
 		constrainer.setMinimumHeight(headerHeight + headerGap + minContentHeight + resizerHeight);
-		edgeResizer = new ResizableEdgeComponent(this, &constrainer, ResizableEdgeComponent::bottomEdge);
+		edgeResizer.reset(new ResizableEdgeComponent(this, &constrainer, ResizableEdgeComponent::bottomEdge));
 		edgeResizer->setAlwaysOnTop(true);
-		this->addAndMakeVisible(edgeResizer);
+		this->addAndMakeVisible(edgeResizer.get());
 		break;
 
 	case HORIZONTAL:
 		resizerWidth = 4;
 		constrainer.setMinimumWidth(20 + resizerWidth); // ??
-		edgeResizer = new ResizableEdgeComponent(this, &constrainer, ResizableEdgeComponent::rightEdge);
+		edgeResizer.reset(new ResizableEdgeComponent(this, &constrainer, ResizableEdgeComponent::rightEdge));
 		edgeResizer->setAlwaysOnTop(true);
-		this->addAndMakeVisible(edgeResizer);
+		this->addAndMakeVisible(edgeResizer.get());
 		break;
 
 	case ALL:
 		resizerHeight = 10;
 		constrainer.setMinimumSize(resizerWidth + 20, headerHeight + headerGap + minContentHeight + resizerHeight);
-		cornerResizer = new ResizableCornerComponent(this, &constrainer);
+		cornerResizer.reset(new ResizableCornerComponent(this, &constrainer));
 		cornerResizer->setAlwaysOnTop(true);
-		this->addAndMakeVisible(cornerResizer);
+		this->addAndMakeVisible(cornerResizer.get());
 		break;
 	}
 
 	if (this->baseItem->canBeDisabled)
 	{
-		enabledBT = this->baseItem->enabled->createImageToggle(AssetManager::getInstance()->getPowerBT());
-		this->addAndMakeVisible(enabledBT);
+		enabledBT.reset(this->baseItem->enabled->createImageToggle(AssetManager::getInstance()->getPowerBT()));
+		this->addAndMakeVisible(enabledBT.get());
 	}
 
 	if (this->baseItem->userCanRemove)
 	{
-		removeBT = AssetManager::getInstance()->getRemoveBT();
-		this->addAndMakeVisible(removeBT);
+		removeBT.reset(AssetManager::getInstance()->getRemoveBT());
+		this->addAndMakeVisible(removeBT.get());
 		removeBT->addListener(this);
 	}
 
@@ -328,7 +328,7 @@ void BaseItemUI<T>::resized()
 template<class T>
 void BaseItemUI<T>::buttonClicked(Button * b)
 {
-	if (b == removeBT)
+	if (b == removeBT.get())
 	{
 		if (this->baseItem->askConfirmationBeforeRemove && GlobalSettings::getInstance()->askBeforeRemovingItems->boolValue())
 		{

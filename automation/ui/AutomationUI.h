@@ -47,7 +47,7 @@ public:
 	Colour color;
 
 	AutomationKeyUI * currentUI;
-	ScopedPointer<AutomationMultiKeyTransformer> transformer;
+	std::unique_ptr<AutomationMultiKeyTransformer> transformer;
 
 	bool shouldRepaint;
 

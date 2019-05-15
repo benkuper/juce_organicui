@@ -20,9 +20,9 @@ ShapeShifterPanelTab::ShapeShifterPanelTab(ShapeShifterContent * _content) : con
 
 	addAndMakeVisible(&panelLabel);
 
-	closePanelBT = AssetManager::getInstance()->getRemoveBT();
+	closePanelBT.reset(AssetManager::getInstance()->getRemoveBT());
 	closePanelBT->addListener(this);
-	addAndMakeVisible(closePanelBT);
+	addAndMakeVisible(closePanelBT.get());
 
 	setSize(getLabelWidth(), 20);
 }
@@ -60,5 +60,5 @@ int ShapeShifterPanelTab::getLabelWidth()
 
 void ShapeShifterPanelTab::buttonClicked(Button * b)
 {
-	if(b == closePanelBT) tabListeners.call(&TabListener::askForRemoveTab, this);
+	if(b == closePanelBT.get()) tabListeners.call(&TabListener::askForRemoveTab, this);
 }

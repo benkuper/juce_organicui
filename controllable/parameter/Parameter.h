@@ -61,15 +61,15 @@ public:
 
 	//Expression
 	String controlExpression;
-	ScopedPointer<ScriptExpression> expression;
+	std::unique_ptr<ScriptExpression> expression;
 	WeakReference<Controllable> controlReference;
 
 	//Reference
-	ScopedPointer<TargetParameter> referenceTarget;
+	std::unique_ptr<TargetParameter> referenceTarget;
 	Parameter * referenceParameter;
 
 	//Automation
-	ScopedPointer<PlayableParameterAutomation> automation;
+	std::unique_ptr<PlayableParameterAutomation> automation;
 
 	bool isComplex();
 	virtual StringArray getValuesNames();

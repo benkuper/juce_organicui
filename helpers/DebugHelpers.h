@@ -80,7 +80,7 @@ public:
         source(getLogSource(log))
 		
 	{
-		_arr = new StringArray();
+		_arr.reset(new StringArray());
 		time = Time::getCurrentTime();
 		_arr->addTokens(content, StringRef("\r\n"), StringRef("\""));
 
@@ -121,6 +121,6 @@ public:
 
 
 private:
-	ScopedPointer<StringArray> _arr;
+	std::unique_ptr<StringArray> _arr;
 
 };

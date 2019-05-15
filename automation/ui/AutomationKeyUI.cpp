@@ -53,15 +53,15 @@ void AutomationKeyUI::setEasingUI(EasingUI * eui)
 {
 	if (easingUI != nullptr)
 	{
-		removeChildComponent(easingUI);
+		removeChildComponent(easingUI.get());
 	}
 
-	easingUI = eui;
+	easingUI.reset(eui);
 
 	if (easingUI != nullptr)
 	{
 
-		addAndMakeVisible(easingUI);
+		addAndMakeVisible(easingUI.get());
 		easingUI->color = color;
 		easingUI->toBack();
 		resized();
@@ -141,7 +141,7 @@ void AutomationKeyUI::mouseDown(const MouseEvent & e)
 				valueAtMouseDown = item->value->floatValue();
 			}
 		}
-	} else if (e.eventComponent == easingUI)
+	} else if (e.eventComponent == easingUI.get())
 	{
 		if (e.mods.isRightButtonDown())
 		{

@@ -2,18 +2,18 @@
 /*
   ==============================================================================
 
-    DoubleSliderUI.cpp
-    Created: 25 Oct 2016 11:46:46am
-    Author:  bkupe
+	DoubleSliderUI.cpp
+	Created: 25 Oct 2016 11:46:46am
+	Author:  bkupe
 
   ==============================================================================
 */
 
-DoubleSliderUI::DoubleSliderUI(Point2DParameter * parameter) :
+DoubleSliderUI::DoubleSliderUI(Point2DParameter* parameter) :
 	ParameterUI(parameter),
 	p2d(parameter),
-	xParam("X","xParam",parameter->x, parameter->minimumValue[0],parameter->maximumValue[0]),
-	yParam("Y", "yParam", parameter->y, parameter->minimumValue[1],parameter->maximumValue[1])
+	xParam("X", "xParam", parameter->x, parameter->minimumValue[0], parameter->maximumValue[0]),
+	yParam("Y", "yParam", parameter->y, parameter->minimumValue[1], parameter->maximumValue[1])
 {
 	xParam.canHaveRange = parameter->canHaveRange;
 	yParam.canHaveRange = parameter->canHaveRange;
@@ -27,11 +27,11 @@ DoubleSliderUI::DoubleSliderUI(Point2DParameter * parameter) :
 	xParam.addAsyncParameterListener(this);
 	yParam.addAsyncParameterListener(this);
 
-	xSlider = (ParameterUI *)xParam.createDefaultUI();
-	ySlider = (ParameterUI *)yParam.createDefaultUI();
+	xSlider.reset((ParameterUI*)xParam.createDefaultUI());
+	ySlider.reset((ParameterUI*)yParam.createDefaultUI());
 
-	addAndMakeVisible(xSlider);
-	addAndMakeVisible(ySlider);
+	addAndMakeVisible(xSlider.get());
+	addAndMakeVisible(ySlider.get());
 
 	setInterceptsMouseClicks(true, true);
 
@@ -46,19 +46,19 @@ DoubleSliderUI::~DoubleSliderUI()
 
 }
 
-void DoubleSliderUI::mouseDownInternal(const MouseEvent &)
+void DoubleSliderUI::mouseDownInternal(const MouseEvent&)
 {
 	mouseDownValue = parameter->getValue();
 }
 
-void DoubleSliderUI::mouseUpInternal(const MouseEvent &)
+void DoubleSliderUI::mouseUpInternal(const MouseEvent&)
 {
 	parameter->setUndoableValue(mouseDownValue, parameter->getValue());
 }
 
 void DoubleSliderUI::resized()
 {
- juce::Rectangle<int> r = getLocalBounds();
+	juce::Rectangle<int> r = getLocalBounds();
 	xSlider->setBounds(r.removeFromLeft(r.getWidth() / 2 - 5));
 	ySlider->setBounds(r.removeFromRight(r.getWidth() - 10));
 }
@@ -69,7 +69,7 @@ void DoubleSliderUI::showEditWindow()
 
 	const String coordNames[2]{ "X","Y" };
 
-	for (int i = 0; i<2; i++) nameWindow.addTextEditor("val" + String(i), String((float)p2d->value[i]), "Value " + coordNames[i]);
+	for (int i = 0; i < 2; i++) nameWindow.addTextEditor("val" + String(i), String((float)p2d->value[i]), "Value " + coordNames[i]);
 
 	nameWindow.addButton("OK", 1, KeyPress(KeyPress::returnKey));
 	nameWindow.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
@@ -79,7 +79,7 @@ void DoubleSliderUI::showEditWindow()
 	if (result)
 	{
 		float newVals[2];
-		for (int i = 0; i<2; i++) newVals[i] = nameWindow.getTextEditorContents("val" + String(i)).getFloatValue();
+		for (int i = 0; i < 2; i++) newVals[i] = nameWindow.getTextEditorContents("val" + String(i)).getFloatValue();
 		p2d->setPoint(newVals[0], newVals[1]);
 	}
 }
@@ -137,14 +137,16 @@ void DoubleSliderUI::newMessage(const Parameter::ParameterEvent & e)
 
 	if (e.parameter == parameter)
 	{
-		xParam.setValue(((Point2DParameter *)e.parameter)->x);
-		yParam.setValue(((Point2DParameter *)e.parameter)->y);
-	} else if (isInteractable())
+		xParam.setValue(((Point2DParameter*)e.parameter)->x);
+		yParam.setValue(((Point2DParameter*)e.parameter)->y);
+	}
+	else if (isInteractable())
 	{
 		if (e.parameter == &xParam)
 		{
 			if (xParam.floatValue() != p2d->x) p2d->setPoint(xParam.floatValue(), yParam.floatValue());
-		} else if (e.parameter == &yParam)
+		}
+		else if (e.parameter == &yParam)
 		{
 			if (yParam.floatValue() != p2d->y) p2d->setPoint(xParam.floatValue(), yParam.floatValue());
 		}

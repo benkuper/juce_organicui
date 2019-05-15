@@ -36,7 +36,7 @@ void DashboardManagerView::setCurrentDashboard(Dashboard * d)
 
 	if (currentItemManagerUI != nullptr)
 	{
-		removeChildComponent(currentItemManagerUI);
+		removeChildComponent(currentItemManagerUI.get());
 		currentItemManagerUI = nullptr;
 	}
 
@@ -44,8 +44,8 @@ void DashboardManagerView::setCurrentDashboard(Dashboard * d)
 
 	if (currentDashboard != nullptr)
 	{
-		currentItemManagerUI = new DashboardItemManagerUI(&currentDashboard->itemManager);
-		addAndMakeVisible(currentItemManagerUI);
+		currentItemManagerUI.reset(new DashboardItemManagerUI(&currentDashboard->itemManager));
+		addAndMakeVisible(currentItemManagerUI.get());
 	}
 
 	resized();

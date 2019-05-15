@@ -22,7 +22,7 @@ public:
 
 	EnumParameter * easingType;
 
-	ScopedPointer<Easing> easing;
+	std::unique_ptr<Easing> easing;
 
 	void setEasing(Easing::Type t);
 

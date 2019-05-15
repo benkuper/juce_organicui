@@ -22,10 +22,10 @@ public:
 	bool isFirst;
 	bool isLast;
 
-	ScopedPointer<ImageButton> removeBT;
-	ScopedPointer<ImageButton> duplicateBT;
-	ScopedPointer<ImageButton> upBT;
-	ScopedPointer<ImageButton> downBT;
+	std::unique_ptr<ImageButton> removeBT;
+	std::unique_ptr<ImageButton> duplicateBT;
+	std::unique_ptr<ImageButton> upBT;
+	std::unique_ptr<ImageButton> downBT;
 
 	void setIsFirst(bool value);
 	void setIsLast(bool value);

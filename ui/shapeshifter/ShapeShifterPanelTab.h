@@ -21,7 +21,7 @@ public:
 
 	ShapeShifterContent * content;
 	Label panelLabel;
-	ScopedPointer<ImageButton> closePanelBT;
+	std::unique_ptr<ImageButton> closePanelBT;
 
 	bool selected;
 	void setSelected(bool value);

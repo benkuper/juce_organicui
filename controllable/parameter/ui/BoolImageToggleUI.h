@@ -19,7 +19,7 @@ public:
 	~BoolImageToggleUI();
 	
 	BoolParameter * boolParam;
-	ScopedPointer<ImageButton> bt;
+	std::unique_ptr<ImageButton> bt;
 
 	void setTooltip(const String &value) override;
 

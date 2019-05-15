@@ -21,12 +21,12 @@ public:
 
 	String noTargetText;
 	Label label;
-	ScopedPointer<ImageButton> targetBT;
+	std::unique_ptr<ImageButton> targetBT;
 	
 	TargetParameter * targetParameter;
 
-	ScopedPointer<BoolParameter> listeningToNextChange;
-	ScopedPointer<BoolToggleUI> listeningToNextChangeBT;
+	std::unique_ptr<BoolParameter> listeningToNextChange;
+	std::unique_ptr<BoolToggleUI> listeningToNextChangeBT;
 
 	void paint(Graphics &g) override;
 	void resized() override;

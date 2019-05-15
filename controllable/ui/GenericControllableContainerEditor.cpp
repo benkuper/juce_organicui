@@ -37,20 +37,20 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(WeakRefer
 
 	if (container->userCanAddControllables)
 	{
-		addBT = AssetManager::getInstance()->getAddBT();
+		addBT.reset(AssetManager::getInstance()->getAddBT());
 		addBT->addListener(this);
-		addAndMakeVisible(addBT);
+		addAndMakeVisible(addBT.get());
 	}
 
 	if (canBeCollapsed())
 	{
-		expandBT = AssetManager::getInstance()->getRightArrowBT();
-		collapseBT = AssetManager::getInstance()->getDownArrowImageBT();
+		expandBT.reset(AssetManager::getInstance()->getRightArrowBT());
+		collapseBT.reset(AssetManager::getInstance()->getDownArrowImageBT());
 		expandBT->addListener(this);
 		collapseBT->addListener(this);
 
-		addChildComponent(expandBT);
-		addChildComponent(collapseBT);
+		addChildComponent(expandBT.get());
+		addChildComponent(collapseBT.get());
 
 		addAndMakeVisible(headerSpacer);
 		headerSpacer.addMouseListener(this, false);
@@ -273,9 +273,9 @@ InspectableEditor * GenericControllableContainerEditor::getEditorForInspectable(
 
 void GenericControllableContainerEditor::buttonClicked(Button * b)
 {
-	if (b == expandBT) setCollapsed(false);
-	else if (b == collapseBT) setCollapsed(true);
-	else if (b == addBT)
+	if (b == expandBT.get()) setCollapsed(false);
+	else if (b == collapseBT.get()) setCollapsed(true);
+	else if (b == addBT.get())
 	{
 		if (container->customUserCreateControllableFunc != nullptr) container->customUserCreateControllableFunc(container);
 		else showMenuAndAddControllable();
@@ -524,8 +524,8 @@ EnablingControllableContainerEditor::EnablingControllableContainerEditor(Enablin
 {
 	if (cc->canBeDisabled)
 	{
-		enabledUI = ioContainer->enabled->createImageToggle(AssetManager::getInstance()->getPowerBT());
-		addAndMakeVisible(enabledUI);
+		enabledUI.reset(ioContainer->enabled->createImageToggle(AssetManager::getInstance()->getPowerBT()));
+		addAndMakeVisible(enabledUI.get());
 	}
 }
 

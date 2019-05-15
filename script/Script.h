@@ -40,7 +40,7 @@ public:
 
 	ScriptTarget * parentTarget;
 
-	ScopedPointer<JavascriptEngine> scriptEngine;
+	std::unique_ptr<JavascriptEngine> scriptEngine;
 	SpinLock engineLock;
 	Thread::ThreadID lockedThreadId;
 

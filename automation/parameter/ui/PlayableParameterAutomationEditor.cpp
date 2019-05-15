@@ -1,13 +1,13 @@
 PlayableParameterAutomationEditor::PlayableParameterAutomationEditor(PlayableParameterAutomation * ppa) :
 	ppa(ppa)
 {
-	automationEditor = ppa->automation.getEditor(false);
-	modeUI = ppa->mode->createDefaultUI(); 
-	lengthUI = ppa->automation.length->createDefaultUI();
+	automationEditor.reset(ppa->automation.getEditor(false));
+	modeUI.reset(ppa->mode->createDefaultUI());
+	lengthUI.reset(ppa->automation.length->createDefaultUI());
 
-	addAndMakeVisible(automationEditor);
-	addAndMakeVisible(modeUI);
-	addAndMakeVisible(lengthUI);
+	addAndMakeVisible(automationEditor.get());
+	addAndMakeVisible(modeUI.get());
+	addAndMakeVisible(lengthUI.get());
 
 	setSize(100, 150);
 }

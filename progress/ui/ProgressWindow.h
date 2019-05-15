@@ -23,7 +23,7 @@ public:
 
 	Label titleLabel;
 	FloatParameter progressParam;
-	ScopedPointer<FloatSliderUI> progressUI;
+	std::unique_ptr<FloatSliderUI> progressUI;
 	
 	void paint(Graphics & g) override;
 	void resized() override;

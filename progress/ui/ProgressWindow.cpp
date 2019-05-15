@@ -15,8 +15,8 @@ titleLabel("title",""),
 progressParam("Progress", "Progression", 0, 0, 1)
 {
 
-	progressUI = progressParam.createSlider();
-	addAndMakeVisible(progressUI);
+	progressUI.reset(progressParam.createSlider());
+	addAndMakeVisible(progressUI.get());
 	addAndMakeVisible(titleLabel);
 	titleLabel.setColour(Label::ColourIds::textColourId, TEXTNAME_COLOR);
 	titleLabel.setText(_title, dontSendNotification);

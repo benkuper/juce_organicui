@@ -27,17 +27,17 @@ ControllableEditor::ControllableEditor(Controllable * _controllable, bool isRoot
 
 	if (controllable->isRemovableByUser)
 	{
-		removeBT = AssetManager::getInstance()->getRemoveBT();
+		removeBT.reset(AssetManager::getInstance()->getRemoveBT());
 		removeBT->addListener(this);
-		addAndMakeVisible(removeBT);
+		addAndMakeVisible(removeBT.get());
 	}
 
 	if (controllable->canBeDisabledByUser)
 	{
-		enableBT = AssetManager::getInstance()->getPowerBT();
+		enableBT.reset(AssetManager::getInstance()->getPowerBT());
 		enableBT->addListener(this);
 		enableBT->setToggleState(controllable->enabled, dontSendNotification);
-		addAndMakeVisible(enableBT);
+		addAndMakeVisible(enableBT.get());
 	}
 
 	/*
@@ -78,11 +78,11 @@ void ControllableEditor::setShowLabel(bool value)
 
 void ControllableEditor::buildControllableUI(bool resizeAfter)
 {
-	if (ui != nullptr) removeChildComponent(ui);
-	ui = controllable->createDefaultUI();
+	if (ui != nullptr) removeChildComponent(ui.get());
+	ui.reset(controllable->createDefaultUI());
 	ui->showLabel = false;
 	ui->setOpaqueBackground(true);
-	addAndMakeVisible(ui);
+	addAndMakeVisible(ui.get());
 
 	if (resizeAfter) resized();
 }
@@ -154,14 +154,14 @@ void ControllableEditor::newMessage(const Controllable::ControllableEvent & e)
 
 void ControllableEditor::buttonClicked(Button * b)
 {
-	if (b == removeBT)
+	if (b == removeBT.get())
 	{
 		controllable->remove(true);
-	} else if (b == editBT)
+	} else if (b == editBT.get())
 	{
 		ui->showEditWindow();
 	}
-	else if (b == enableBT)
+	else if (b == enableBT.get())
 	{
 		controllable->setEnabled(!controllable->enabled);
 		enableBT->setToggleState(controllable->enabled, dontSendNotification);

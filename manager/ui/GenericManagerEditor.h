@@ -35,7 +35,7 @@ public:
 
 	
 	//menu
-	ScopedPointer<ImageButton> addItemBT;
+	std::unique_ptr<ImageButton> addItemBT;
 	String addItemText;
 
 	void paint(Graphics &g) override;
@@ -68,8 +68,8 @@ GenericManagerEditor<T>::GenericManagerEditor(BaseManager<T> * _manager, bool is
 
 	if (manager->userCanAddItemsManually)
 	{
-		addItemBT = AssetManager::getInstance()->getAddBT();
-		addAndMakeVisible(addItemBT);
+		addItemBT.reset(AssetManager::getInstance()->getAddBT());
+		addAndMakeVisible(addItemBT.get());
 		addItemBT->addListener(this);
 	}
 	
@@ -204,7 +204,7 @@ void GenericManagerEditor<T>::buttonClicked(Button * b)
 {
 	GenericControllableContainerEditor::buttonClicked(b);
 
-	if (b == addItemBT)
+	if (b == addItemBT.get())
 	{
 		showMenuAndAddItem(true);
 	}

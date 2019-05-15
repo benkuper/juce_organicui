@@ -88,7 +88,7 @@ void Engine::loadDocumentAsync(const File & file) {
 	//  {
 	//    MessageManagerLock ml;
 	//  }
-	ScopedPointer<InputStream> is(file.createInputStream());
+	std::unique_ptr<InputStream> is(file.createInputStream());
 
 	loadingStartTime = Time::currentTimeMillis();
 	setFile(file);
@@ -146,7 +146,7 @@ Result Engine::saveDocument(const File& file) {
 	var data = getJSONData();
 
 	if (file.exists()) file.deleteFile();
-	ScopedPointer<OutputStream> os(file.createOutputStream());
+	std::unique_ptr<OutputStream> os(file.createOutputStream());
 	JSON::writeToStream(*os, data);
 	os->flush();
 
@@ -173,7 +173,7 @@ Result Engine::saveBackupDocument(int index)
 	var data = getJSONData();
 
 	if (backupFile.exists()) backupFile.deleteFile();
-	ScopedPointer<OutputStream> os(backupFile.createOutputStream());
+	std::unique_ptr<OutputStream> os(backupFile.createOutputStream());
 	JSON::writeToStream(*os, data);
 	os->flush();
 

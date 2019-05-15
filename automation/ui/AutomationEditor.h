@@ -18,7 +18,7 @@ public:
 	~AutomationEditor();
 
 	Automation * automation;
-	ScopedPointer<AutomationUI> automationUI;
+	std::unique_ptr<AutomationUI> automationUI;
 
 	void resizedInternalContent(juce::Rectangle<int> &r) override;
 

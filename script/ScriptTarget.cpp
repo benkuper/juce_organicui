@@ -25,7 +25,7 @@ DynamicObject * ScriptTarget::getScriptObject()
 
 void ScriptTarget::updateLiveScriptObject(DynamicObject * parent)
 {
-	liveScriptObject = new DynamicObject(scriptObject); //is there a bettery way to deal with updating without recreating an object each time ?
+	liveScriptObject.reset(new DynamicObject(scriptObject)); //is there a bettery way to deal with updating without recreating an object each time ?
 	
 	updateLiveScriptObjectInternal(parent);
 

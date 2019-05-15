@@ -124,7 +124,7 @@ void ScriptExpression::buildEnvironment()
 {
 	//clear phase
 	setState(EXPRESSION_CLEAR);
-	scriptEngine = new JavascriptEngine();
+	scriptEngine.reset(new JavascriptEngine());
 	//while (scriptParamsContainer.controllables.size() > 0) scriptParamsContainer.removeControllable(scriptParamsContainer.controllables[0]);
 	//scriptParamsContainer.clear();
 

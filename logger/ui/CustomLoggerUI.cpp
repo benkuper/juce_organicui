@@ -84,7 +84,7 @@ CustomLoggerUI::CustomLoggerUI(const String& contentName, CustomLogger * l) :
 	thc->addColumn(juce::translate("Content"), 3, 400);
 
 
-	logListComponent = new TableListBox("CustomLogger", &logList);
+	logListComponent.reset(new TableListBox("CustomLogger", &logList));
 	logListComponent->setOpaque(true);
 	logListComponent->setRowHeight(13);
 	logListComponent->setHeaderHeight(20);
@@ -92,7 +92,7 @@ CustomLoggerUI::CustomLoggerUI(const String& contentName, CustomLogger * l) :
 
 	logListComponent->setColour(TableListBox::backgroundColourId, findColour(ResizableWindow::backgroundColourId));
 	logListComponent->setHeader(thc);
-	addAndMakeVisible(logListComponent);
+	addAndMakeVisible(logListComponent.get());
 
 	LOG(l->getWelcomeMessage());
 #if USE_FILE_LOGGER
@@ -295,7 +295,7 @@ bool CustomLoggerUI::keyPressed(const KeyPress& k) {
 }
 
 void CustomLoggerUI::mouseDown(const MouseEvent& me) {
-	auto pos = me.getEventRelativeTo(logListComponent);
+	auto pos = me.getEventRelativeTo(logListComponent.get());
 	auto rowUnderMouse = logListComponent->getRowContainingPosition(pos.x, pos.y);
 	logListComponent->selectRow(rowUnderMouse);
 	grabKeyboardFocus();
@@ -303,7 +303,7 @@ void CustomLoggerUI::mouseDown(const MouseEvent& me) {
 };
 
 void CustomLoggerUI::mouseDrag(const MouseEvent& me) {
-	auto pos = me.getEventRelativeTo(logListComponent);
+	auto pos = me.getEventRelativeTo(logListComponent.get());
 	auto rowUnderMouse = logListComponent->getRowContainingPosition(pos.x, pos.y);
 	auto rowStart = logListComponent->getRowContainingPosition(pos.getMouseDownX(), pos.getMouseDownY());
 	logListComponent->selectRangeOfRows(rowStart, rowUnderMouse);

@@ -89,10 +89,10 @@ void Inspector::setCurrentInspectable(WeakReference<Inspectable> inspectable)
 	{
 		currentInspectable->setSelected(true);
 		currentInspectable->addInspectableListener(this);
-		currentEditor = currentInspectable->getEditor(true);
+		currentEditor.reset(currentInspectable->getEditor(true));
 	}
 
-	vp.setViewedComponent(currentEditor, false);
+	vp.setViewedComponent(currentEditor.get(), false);
 	resized();
 
 	listeners.call(&InspectorListener::currentInspectableChanged, this);

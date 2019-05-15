@@ -6,24 +6,24 @@ BaseItemEditor::BaseItemEditor(BaseItem * bi, bool isRoot) :
 	{
 		if (item->userCanRemove)
 		{
-			removeBT = AssetManager::getInstance()->getRemoveBT();
-			addAndMakeVisible(removeBT);
+			removeBT.reset(AssetManager::getInstance()->getRemoveBT());
+			addAndMakeVisible(removeBT.get());
 			removeBT->addListener(this);
 		}
 
 		if(item->userCanDuplicate)
 		{
-			duplicateBT = AssetManager::getInstance()->getDuplicateBT();
-			addAndMakeVisible(duplicateBT);
+			duplicateBT.reset(AssetManager::getInstance()->getDuplicateBT());
+			addAndMakeVisible(duplicateBT.get());
 			duplicateBT->addListener(this);
 		}
 
 		if (item->canBeReorderedInEditor)
 		{
-			upBT = AssetManager::getInstance()->getUpBT();
-			downBT = AssetManager::getInstance()->getDownBT();
-			addAndMakeVisible(upBT);
-			addAndMakeVisible(downBT);
+			upBT.reset(AssetManager::getInstance()->getUpBT());
+			downBT.reset(AssetManager::getInstance()->getDownBT());
+			addAndMakeVisible(upBT.get());
+			addAndMakeVisible(downBT.get());
 			upBT->addListener(this);
 			downBT->addListener(this);
 		}
@@ -84,7 +84,7 @@ void BaseItemEditor::buttonClicked(Button * b)
 {
 	EnablingControllableContainerEditor::buttonClicked(b);
 
-	if (b == removeBT)
+	if (b == removeBT.get())
 	{
 		if (this->item->askConfirmationBeforeRemove && GlobalSettings::getInstance()->askBeforeRemovingItems->boolValue())
 		{
@@ -93,13 +93,13 @@ void BaseItemEditor::buttonClicked(Button * b)
 		}
 		else this->item->remove();
 		return;
-	}else if(b == duplicateBT)
+	}else if(b == duplicateBT.get())
 	{
 		item->duplicate();
-	} else if (b == upBT)
+	} else if (b == upBT.get())
 	{
 		item->moveBefore();
-	} else if (b == downBT)
+	} else if (b == downBT.get())
 	{
 		item->moveAfter();
 	}

@@ -20,7 +20,7 @@ public:
 	~DashboardManagerView();
 
 	DashboardManagerUI managerUI;
-	ScopedPointer<DashboardItemManagerUI> currentItemManagerUI;
+	std::unique_ptr<DashboardItemManagerUI> currentItemManagerUI;
 
 	Dashboard * currentDashboard;
 	void setCurrentDashboard(Dashboard *);

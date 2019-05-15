@@ -20,8 +20,8 @@ Outliner::Outliner(const String &contentName) :
 
 	showHiddenContainers = false;
 
-	rootItem = new OutlinerItem(Engine::mainEngine);
-	treeView.setRootItem(rootItem);
+	rootItem.reset(new OutlinerItem(Engine::mainEngine));
+	treeView.setRootItem(rootItem.get());
 	treeView.setRootItemVisible(false);
 	addAndMakeVisible(treeView);
 	treeView.getViewport()->setScrollBarThickness(10);
@@ -79,7 +79,7 @@ void Outliner::rebuildTree()
 
 	std::unique_ptr<XmlElement> os = treeView.getOpennessState(true);
 	clear();
-	buildTree(rootItem, Engine::mainEngine);
+	buildTree(rootItem.get(), Engine::mainEngine);
 	rootItem->setOpen(true);
 
 	treeView.restoreOpennessState(*os, true);

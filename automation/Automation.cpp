@@ -42,9 +42,9 @@ Automation::Automation(const String &name, AutomationRecorder * _recorder, bool 
 	//selectItemWhenCreated = false;
 	if (dedicatedSelectionManager)
 	{
-		customSelectionManager = new InspectableSelectionManager(false);
+		customSelectionManager.reset(new InspectableSelectionManager(false));
 		showInspectorOnSelect = false;
-		selectionManager = customSelectionManager;
+		selectionManager = customSelectionManager.get();
 	}
 
 	helpID = "Automation";

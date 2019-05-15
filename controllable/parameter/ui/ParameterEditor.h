@@ -27,15 +27,15 @@ public:
 	WeakReference<Parameter> parameter;
 
 	//Expression
-	ScopedPointer<Label> expressionLabel;
-	ScopedPointer<Label> expressionText;
+	std::unique_ptr<Label> expressionLabel;
+	std::unique_ptr<Label> expressionText;
 
 
 	//Target
-	ScopedPointer<TargetParameterUI> referenceUI;
+	std::unique_ptr<TargetParameterUI> referenceUI;
 
 	//Automation
-	ScopedPointer<PlayableParameterAutomationEditor> automationUI;
+	std::unique_ptr<PlayableParameterAutomationEditor> automationUI;
 
 	virtual void resized() override;
 	virtual void updateUI();

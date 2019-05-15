@@ -33,13 +33,13 @@ TripleSliderUI::TripleSliderUI(Point3DParameter * parameter) :
 	yParam.addAsyncCoalescedParameterListener(this);
 	zParam.addAsyncCoalescedParameterListener(this);
 
-	xSlider = xParam.createDefaultUI();
-	ySlider = yParam.createDefaultUI();
-	zSlider = zParam.createDefaultUI();
+	xSlider.reset(xParam.createDefaultUI());
+	ySlider.reset(yParam.createDefaultUI());
+	zSlider.reset(zParam.createDefaultUI());
 
-	addAndMakeVisible(xSlider);
-	addAndMakeVisible(ySlider);
-	addAndMakeVisible(zSlider);
+	addAndMakeVisible(xSlider.get());
+	addAndMakeVisible(ySlider.get());
+	addAndMakeVisible(zSlider.get());
 
 	setInterceptsMouseClicks(true, true);
 

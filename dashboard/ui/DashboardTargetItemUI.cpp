@@ -25,15 +25,15 @@ void DashboardTargetItemUI::updateTargetUI()
 {
 	if (targetUI != nullptr)
 	{
-		removeChildComponent(targetUI);
+		removeChildComponent(targetUI.get());
 	}
 
 	DashboardItemTarget * t = targetItem->getDashboardTarget();
-	if (t != nullptr) targetUI = t->createDashboardContent();
+	if (t != nullptr) targetUI.reset(t->createDashboardContent());
 
 	if (targetUI != nullptr)
 	{
-		addAndMakeVisible(targetUI);
+		addAndMakeVisible(targetUI.get());
 
 		if (getWidth() == 0 || getHeight() == 0)
 		{

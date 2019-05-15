@@ -37,9 +37,9 @@ public:
 	WeakReference<ControllableContainer> container;
 	OwnedArray<InspectableEditor> childEditors;
 
-	ScopedPointer<ImageButton> expandBT;
-	ScopedPointer<ImageButton> collapseBT;
-	ScopedPointer<ImageButton> addBT;
+	std::unique_ptr<ImageButton> expandBT;
+	std::unique_ptr<ImageButton> collapseBT;
+	std::unique_ptr<ImageButton> addBT;
 	Component headerSpacer;
 
 	virtual void setCollapsed(bool value, bool force = false, bool animate = true, bool doNotRebuild = false);
@@ -111,7 +111,7 @@ public:
 	~EnablingControllableContainerEditor() {}
 
 	EnablingControllableContainer * ioContainer;
-	ScopedPointer<BoolImageToggleUI> enabledUI;
+	std::unique_ptr<BoolImageToggleUI> enabledUI;
 
 	virtual void resizedInternalHeader(juce::Rectangle<int> &r) override;
 	virtual void controllableFeedbackUpdate(Controllable *) override;

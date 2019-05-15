@@ -34,7 +34,7 @@ public:
 	bool saveType;
 	bool canBeReorderedInEditor;
 
-	ScopedPointer<ScriptManager> scriptManager;
+	std::unique_ptr<ScriptManager> scriptManager;
 
 	String itemDataType;
 

@@ -20,7 +20,7 @@ public:
     FloatStepperUI(Parameter * _parameter);
     virtual ~FloatStepperUI();
 
-    ScopedPointer<BetterStepper> slider;
+    std::unique_ptr<BetterStepper> slider;
 
     bool shouldUpdateStepper;
     

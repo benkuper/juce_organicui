@@ -58,18 +58,18 @@ void Parameter::setControlMode(ControlMode _mode)
 		break;
 
 	case REFERENCE:
-		referenceTarget = new TargetParameter("Reference", "Reference for parameter " + niceName,"");
+		referenceTarget.reset(new TargetParameter("Reference", "Reference for parameter " + niceName, ""));
 		referenceTarget->addParameterListener(this);
 		break;
 
 	case EXPRESSION:
-		expression = new ScriptExpression();
+		expression.reset(new ScriptExpression());
 		expression->setExpression(controlExpression);
 		expression->addExpressionListener(this);
 		break;
 
 	case AUTOMATION:
-		automation = new PlayableParameterAutomation(this);
+		automation.reset(new PlayableParameterAutomation(this));
 		break;
 
 	}
@@ -287,7 +287,7 @@ void Parameter::expressionStateChanged(ScriptExpression *)
 
 void Parameter::parameterValueChanged(Parameter * p)
 {
-	if (p == referenceTarget)
+	if (p == referenceTarget.get())
 	{
 		setReferenceParameter(dynamic_cast<Parameter *>(referenceTarget->target.get()));
 	} else if (p == referenceParameter)

@@ -39,7 +39,7 @@ public:
 	BoolParameter * enableSnap;
 	FloatParameter * snapSensitivity;
 
-	ScopedPointer<InspectableSelectionManager> customSelectionManager;
+	std::unique_ptr<InspectableSelectionManager> customSelectionManager;
 
 	void setLength(float value, bool stretch = false, bool stickToEnd = false);
 

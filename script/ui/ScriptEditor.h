@@ -21,12 +21,12 @@ public:
 	Script * script;
 	bool editMode;
 
-	ScopedPointer<ImageButton> fileBT;
-	ScopedPointer<TriggerImageUI> reloadBT;
-	ScopedPointer<ImageButton> editBT;
-	ScopedPointer<BoolToggleUI> logUI;
+	std::unique_ptr<ImageButton> fileBT;
+	std::unique_ptr<TriggerImageUI> reloadBT;
+	std::unique_ptr<ImageButton> editBT;
+	std::unique_ptr<BoolToggleUI> logUI;
 
-	ScopedPointer<InspectableEditor> paramsEditor;
+	std::unique_ptr<InspectableEditor> paramsEditor;
 
 	 juce::Rectangle<int> statusBounds;
 

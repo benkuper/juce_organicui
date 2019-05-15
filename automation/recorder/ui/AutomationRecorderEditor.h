@@ -17,7 +17,7 @@ public:
 
 	AutomationRecorder * recorder;
 
-	ScopedPointer<ControllableUI> sourceFeedbackUI;
+	std::unique_ptr<ControllableUI> sourceFeedbackUI;
 
 	void updateSourceUI();
 	void resizedInternalHeader(juce::Rectangle<int> &r) override;

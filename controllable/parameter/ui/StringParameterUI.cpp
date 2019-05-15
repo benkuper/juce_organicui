@@ -98,14 +98,14 @@ StringParameterFileUI::StringParameterFileUI(Parameter * p) :
 	fp((FileParameter *)p),
 	browseBT("Browse...")
 {
-	relativeBT = AssetManager::getInstance()->getToggleBTImage(AssetManager::getInstance()->getRelativeImage());
+	relativeBT.reset(AssetManager::getInstance()->getToggleBTImage(AssetManager::getInstance()->getRelativeImage()));
 	relativeBT->setToggleState(fp->forceRelativePath, dontSendNotification);
 	browseBT.addListener(this);
 	
 	relativeBT->addListener(this); 
 	
 	addAndMakeVisible(&browseBT);
-	addAndMakeVisible(relativeBT);
+	addAndMakeVisible(relativeBT.get());
 }
 
 StringParameterFileUI::~StringParameterFileUI()
@@ -126,7 +126,7 @@ void StringParameterFileUI::buttonClicked(Button * b)
 		FileChooser chooser("Select a file", File(fp->getAbsolutePath()), fp->fileTypeFilter);
 		bool result = chooser.browseForFileToOpen();
 		if (result && !parameter.wasObjectDeleted()) parameter->setUndoableValue(parameter->stringValue(),chooser.getResult().getFullPathName());
-	} else if (b == relativeBT)
+	} else if (b == relativeBT.get())
 	{
 		fp->setForceRelativePath(!fp->forceRelativePath);
 	}

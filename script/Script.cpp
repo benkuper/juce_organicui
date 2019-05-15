@@ -137,7 +137,7 @@ void Script::buildEnvironment()
 	//clear phase
 	setState(SCRIPT_CLEAR);
 
-	scriptEngine = new JavascriptEngine();
+	scriptEngine.reset(new JavascriptEngine());
 	while (scriptParamsContainer.controllables.size() > 0) scriptParamsContainer.removeControllable(scriptParamsContainer.controllables[0]);
 	scriptParamsContainer.clear();
 

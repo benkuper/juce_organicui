@@ -59,7 +59,7 @@ public:
 
 	FileParameter * fp;
 	TextButton browseBT;
-	ScopedPointer<ImageButton> relativeBT;
+	std::unique_ptr<ImageButton> relativeBT;
 
 	void resizedInternal(juce::Rectangle<int> &r) override;
 

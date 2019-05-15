@@ -9,8 +9,8 @@ OrganicMainContentComponent::OrganicMainContentComponent()
 
 	Engine::mainEngine->addEngineListener(this);
 	
-	lookAndFeelOO = new LookAndFeelOO();
-	LookAndFeel::setDefaultLookAndFeel(lookAndFeelOO);
+	lookAndFeelOO.reset(new LookAndFeelOO());
+	LookAndFeel::setDefaultLookAndFeel(lookAndFeelOO.get());
 	
 	(&getCommandManager())->registerAllCommandsForTarget(this);
 	(&getCommandManager())->setFirstCommandTarget(this);
@@ -90,12 +90,12 @@ void OrganicMainContentComponent::startLoadFile()
 
 	if (fileProgressWindow != nullptr)
 	{
-		removeChildComponent(fileProgressWindow);
+		removeChildComponent(fileProgressWindow.get());
 		fileProgressWindow = nullptr;
 	}
 
-	fileProgressWindow = new ProgressWindow("Loading File...", Engine::mainEngine);
-	addAndMakeVisible(fileProgressWindow);
+	fileProgressWindow.reset(new ProgressWindow("Loading File...", Engine::mainEngine));
+	addAndMakeVisible(fileProgressWindow.get());
 	fileProgressWindow->setSize(getWidth(), getHeight());
 }
 
@@ -114,7 +114,7 @@ void OrganicMainContentComponent::endLoadFile()
 {
 	if (fileProgressWindow != nullptr)
 	{
-		removeChildComponent(fileProgressWindow);
+		removeChildComponent(fileProgressWindow.get());
 		fileProgressWindow = nullptr;
 	}
 }

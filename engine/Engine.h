@@ -28,7 +28,7 @@ public:
 
 	static Engine * mainEngine;
 
-	ScopedPointer<InspectableSelectionManager> selectionManager;
+	std::unique_ptr<InspectableSelectionManager> selectionManager;
 
 
 	bool isBetaVersion;
@@ -117,7 +117,7 @@ public:
 
 	};
 
-	ScopedPointer<FileLoader> fileLoader;
+	std::unique_ptr<FileLoader> fileLoader;
 
 	ListenerList<EngineListener> engineListeners;
 	void addEngineListener(EngineListener* e) { engineListeners.add(e); }

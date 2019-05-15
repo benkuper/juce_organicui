@@ -22,10 +22,10 @@ public:
 	WeakReference<Controllable> controllable;
 	
 	Label label;
-	ScopedPointer<ControllableUI> ui;
-	ScopedPointer<ImageButton> editBT;
-	ScopedPointer<ImageButton> removeBT;
-	ScopedPointer<ImageButton> enableBT;
+	std::unique_ptr<ControllableUI> ui;
+	std::unique_ptr<ImageButton> editBT;
+	std::unique_ptr<ImageButton> removeBT;
+	std::unique_ptr<ImageButton> enableBT;
 	
 	int baseHeight; //height at init
 	int subContentHeight; //for additional content

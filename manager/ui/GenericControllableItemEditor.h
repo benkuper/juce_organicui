@@ -18,7 +18,7 @@ public:
 	GenericControllableItemEditor(GenericControllableItem * gci, bool isRoot);
 	~GenericControllableItemEditor();
 
-	ScopedPointer<ControllableEditor> controllableEditor;
+	std::unique_ptr<ControllableEditor> controllableEditor;
 
 	void resetAndBuild() override;
 };

@@ -23,7 +23,7 @@ public:
 	int64 thisPtr;
 	String scriptTargetName;
 	juce::DynamicObject scriptObject;
-	ScopedPointer<juce::DynamicObject> liveScriptObject;
+	std::unique_ptr<juce::DynamicObject> liveScriptObject;
 	bool liveScriptObjectIsDirty;
 
 	juce::DynamicObject * getScriptObject();

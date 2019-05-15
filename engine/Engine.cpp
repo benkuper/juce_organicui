@@ -36,7 +36,7 @@ Engine::Engine(const String & fileName, const String & fileExtension) :
 	isBetaVersion = getAppVersion().endsWith("b");
 	betaVersion = getBetaVersion(getAppVersion());
 
-	selectionManager = new InspectableSelectionManager(true); //selectionManager constructor
+	selectionManager.reset(new InspectableSelectionManager(true)); //selectionManager constructor
 
 	Logger::setCurrentLogger(CustomLogger::getInstance());
 

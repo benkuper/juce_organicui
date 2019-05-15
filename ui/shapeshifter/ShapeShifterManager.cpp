@@ -260,7 +260,7 @@ void ShapeShifterManager::loadLayoutFromFile(int fileIndexInLayoutFolder)
 
 void ShapeShifterManager::loadLayoutFromFile(const File & fromFile)
 {
-	ScopedPointer<InputStream> is(fromFile.createInputStream());
+	std::unique_ptr<InputStream> is(fromFile.createInputStream());
 	var data = JSON::parse(*is);
 	loadLayout(data);
 }
@@ -320,7 +320,7 @@ void ShapeShifterManager::saveCurrentLayoutToFile(const File &toFile)
 
 	DBG("Save layout to file : " << toFile.getFullPathName());
 	if (toFile.existsAsFile()) toFile.deleteFile();
-	ScopedPointer<OutputStream> os(toFile.createOutputStream());
+	std::unique_ptr<OutputStream> os(toFile.createOutputStream());
 	if (os == nullptr)
 	{
 		NLOG("Shape Shifter", "Error saving the layout file " + toFile.getFullPathName() + "\nMaybe it is read-only ?");

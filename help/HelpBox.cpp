@@ -24,7 +24,7 @@ void HelpBox::loadLocalHelp()
 {
 	File helpFile = File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile("help.json");
 	if (!helpFile.existsAsFile()) return;
-	ScopedPointer<InputStream> is(helpFile.createInputStream());
+	std::unique_ptr<InputStream> is(helpFile.createInputStream());
 	helpData = JSON::parse(*is);
 }
 
@@ -71,7 +71,7 @@ void HelpBox::run()
 	//Load async
 	StringPairArray responseHeaders;
 	int statusCode = 0;
-	ScopedPointer<InputStream> stream(helpURL.createInputStream(false, nullptr, nullptr, String(),
+	std::unique_ptr<InputStream> stream(helpURL.createInputStream(false, nullptr, nullptr, String(),
 		2000, // timeout in millisecs
 		&responseHeaders, &statusCode));
 #if JUCE_WINDOWS
@@ -98,7 +98,7 @@ void HelpBox::run()
 
 			File helpFile = File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile("help.json");
 			if (helpFile.existsAsFile()) helpFile.deleteFile();
-			ScopedPointer<OutputStream> os(helpFile.createOutputStream());
+			std::unique_ptr<OutputStream> os(helpFile.createOutputStream());
 			if (os == nullptr)
 			{
 				NLOG("Help", "Error saving the help file " + helpFile.getFullPathName() + "\nMaybe it is read-only ?");

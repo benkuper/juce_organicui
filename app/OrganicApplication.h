@@ -41,10 +41,10 @@ public:
 	ControllableContainer appSettings;
 
 	ApplicationCommandManager commandManager;
-	ScopedPointer<ApplicationProperties> appProperties;
+	std::unique_ptr<ApplicationProperties> appProperties;
 
-	ScopedPointer<Engine> engine;
-	ScopedPointer<OrganicMainContentComponent> mainComponent;
+	std::unique_ptr<Engine> engine;
+	std::unique_ptr<OrganicMainContentComponent> mainComponent;
 
 	bool useWindow;
 
@@ -82,7 +82,7 @@ public:
 		JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainWindow)
 	};
 
-	ScopedPointer<MainWindow> mainWindow;
+	std::unique_ptr<MainWindow> mainWindow;
 };
 
 

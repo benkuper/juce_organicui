@@ -21,12 +21,12 @@ AutomationRecorderEditor::~AutomationRecorderEditor()
 
 void AutomationRecorderEditor::updateSourceUI()
 {
-	if (sourceFeedbackUI != nullptr) removeChildComponent(sourceFeedbackUI);
+	if (sourceFeedbackUI != nullptr) removeChildComponent(sourceFeedbackUI.get());
 	if (recorder->currentInput != nullptr)
 	{
-		sourceFeedbackUI = recorder->currentInput->createDefaultUI();
+		sourceFeedbackUI.reset(recorder->currentInput->createDefaultUI());
 		//sourceFeedbackUI->setForceFeedbackOnly(true);
-		addAndMakeVisible(sourceFeedbackUI);
+		addAndMakeVisible(sourceFeedbackUI.get());
 	}
 
 	resized();

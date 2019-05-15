@@ -27,7 +27,7 @@ public:
 	InspectableSelectionManager * selectionManager;
 	WeakReference<Inspectable> currentInspectable;
 	Viewport vp;
-	ScopedPointer<InspectableEditor> currentEditor;
+	std::unique_ptr<InspectableEditor> currentEditor;
 
 	void setSelectionManager(InspectableSelectionManager * newSM);
 	void resized() override;

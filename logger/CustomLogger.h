@@ -33,7 +33,7 @@ public:
 
 		void newMessage(const String& s) override { if (fileLog && !s.isEmpty()) { fileLog->logMessage(s); } }
 		String getFilePath() { return fileLog->getLogFile().getFullPathName(); }
-		ScopedPointer<FileLogger> fileLog;
+		std::unique_ptr<FileLogger> fileLog;
 	};
 
 	FileWriter fileWriter;

@@ -19,9 +19,9 @@ public:
 
 	PlayableParameterAutomation * ppa;
 
-	ScopedPointer<InspectableEditor> automationEditor;
-	ScopedPointer<ControllableUI> modeUI;
-	ScopedPointer<ControllableUI> lengthUI;
+	std::unique_ptr<InspectableEditor> automationEditor;
+	std::unique_ptr<ControllableUI> modeUI;
+	std::unique_ptr<ControllableUI> lengthUI;
 
 	void resized() override;
 };

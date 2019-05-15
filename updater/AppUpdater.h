@@ -23,7 +23,7 @@ public:
 	TextButton okButton;
 	TextButton cancelButton;
 
-	ScopedPointer<FloatSliderUI> progressionUI;
+	std::unique_ptr<FloatSliderUI> progressionUI;
 
 	void resized() override;
 
@@ -68,10 +68,10 @@ public:
 	String filePrefix;
 	File targetDir;
 
-	ScopedPointer<UpdateDialogWindow> updateWindow;
-	ScopedPointer<FloatParameter> progression;
+	std::unique_ptr<UpdateDialogWindow> updateWindow;
+	std::unique_ptr<FloatParameter> progression;
 
-	ScopedPointer<URL::DownloadTask> downloadTask;
+	std::unique_ptr<URL::DownloadTask> downloadTask;
 
 	void setURLs(URL _updateURL, String _downloadURLBase, String filePrefix);
 

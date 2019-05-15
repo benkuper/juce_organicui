@@ -47,32 +47,35 @@ void AutomationKey::setEasing(Easing::Type t)
 	if (easing != nullptr)
 	{
 		if (easing->type == t) return;
-		removeChildControllableContainer(easing);
+		removeChildControllableContainer(easing.get());
 	}
 
+	Easing* e = nullptr;
 	switch (t)
 	{
 	case Easing::LINEAR:
-		easing = new LinearEasing();
+		e = new LinearEasing();
 		break;
 
 	case Easing::HOLD:
-		easing = new HoldEasing();
+		e = new HoldEasing();
 		break;
 
 	case Easing::BEZIER:
-		easing = new CubicEasing();
+		e = new CubicEasing();
 		break;
 
 	case Easing::SINE:
-		easing = new SineEasing();
+		e = new  SineEasing();
 		break;
 	}
+
+	easing.reset(e);
 
 	if (easing != nullptr)
 	{
         easing->setSelectionManager(selectionManager);
-		addChildControllableContainer(easing);
+		addChildControllableContainer(easing.get());
 	}
 }
 

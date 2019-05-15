@@ -21,7 +21,7 @@ AppUpdater::AppUpdater() :
 	queuedNotifier(30)
 {
 	addAsyncUpdateListener(this);
-	progression = new FloatParameter("Progression", "The progression of the download", 0, 0, 1);
+	progression.reset(new FloatParameter("Progression", "The progression of the download", 0, 0, 1));
 }
 
 AppUpdater::~AppUpdater()
@@ -65,9 +65,9 @@ void AppUpdater::showDialog(bool beta, String title, String msg, String changelo
 	
 	progression->setValue(0);
 
-	updateWindow = new UpdateDialogWindow(msg, changelog, progression);
+	updateWindow.reset(new UpdateDialogWindow(msg, changelog, progression.get()));
 	DialogWindow::LaunchOptions dw;
-	dw.content.set(updateWindow, false);
+	dw.content.set(updateWindow.get(), false);
 	dw.dialogTitle = title;
 	dw.escapeKeyTriggersCloseButton = true;
 	dw.dialogBackgroundColour = BG_COLOR;
@@ -97,7 +97,7 @@ void AppUpdater::downloadUpdate()
 	URL downloadURL = URL(downloadURLBase + downloadingFileName);
 
 	LOG("Downloading " + downloadURL.toString(false) + "...");
-	downloadTask = downloadURL.downloadToFile(targetFile, "", this);
+	downloadTask.reset(downloadURL.downloadToFile(targetFile, "", this));
 
 	if (downloadTask == nullptr)
 	{
@@ -118,7 +118,7 @@ void AppUpdater::run()
     
 	StringPairArray responseHeaders;
 	int statusCode = 0;
-	ScopedPointer<InputStream> stream(updateURL.createInputStream(false, nullptr, nullptr, String(),
+	std::unique_ptr<InputStream> stream(updateURL.createInputStream(false, nullptr, nullptr, String(),
 		2000, // timeout in millisecs
 		&responseHeaders, &statusCode));
     
@@ -342,10 +342,10 @@ UpdateDialogWindow::UpdateDialogWindow(const String & msg, const String & change
 	okButton.addListener(this);
 	cancelButton.addListener(this);
 
-	progressionUI = progression->createSlider();
+	progressionUI.reset(progression->createSlider());
 	progressionUI->showLabel = false;
 	progressionUI->showValue = false;
-	addAndMakeVisible(progressionUI);
+	addAndMakeVisible(progressionUI.get());
 
 	setSize(600, 600);
 }

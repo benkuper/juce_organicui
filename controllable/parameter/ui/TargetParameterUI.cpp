@@ -18,20 +18,20 @@ TargetParameterUI::TargetParameterUI(TargetParameter * parameter, const String &
 	setInterceptsMouseClicks(true, true);
 	showEditWindowOnDoubleClick = false;
 
-	targetBT = AssetManager::getInstance()->getTargetBT();
+	targetBT.reset(AssetManager::getInstance()->getTargetBT());
 	targetBT->setInterceptsMouseClicks(false, false);
 
 	if (targetParameter->customCheckAssignOnNextChangeFunc != nullptr)
 	{
 		
-		listeningToNextChange = new BoolParameter("Learn", "When this parameter is on, any parameter that changes will be auto assigned to this target", false);
+		listeningToNextChange.reset(new BoolParameter("Learn", "When this parameter is on, any parameter that changes will be auto assigned to this target", false));
 		listeningToNextChange->addAsyncParameterListener(this);
-		listeningToNextChangeBT = listeningToNextChange->createToggle();
-		addAndMakeVisible(listeningToNextChangeBT);
+		listeningToNextChangeBT.reset(listeningToNextChange->createToggle());
+		addAndMakeVisible(listeningToNextChangeBT.get());
 	}
 
 
-	addAndMakeVisible(targetBT);
+	addAndMakeVisible(targetBT.get());
 
 	targetBT->addListener(this);
 	setRepaintsOnMouseActivity(true);
@@ -180,7 +180,7 @@ void TargetParameterUI::mouseDownInternal(const MouseEvent &)
 
 void TargetParameterUI::buttonClicked(Button * b)
 {
-	if (b == targetBT) {} // move code here ?
+	if (b == targetBT.get()) {} // move code here ?
 }
 
 void TargetParameterUI::valueChanged(const var &)
@@ -194,7 +194,7 @@ void TargetParameterUI::valueChanged(const var &)
 void TargetParameterUI::newMessage(const Parameter::ParameterEvent & e)
 {
 
-	if (e.parameter == listeningToNextChange)
+	if (e.parameter == listeningToNextChange.get())
 	{
 		if (e.type == Parameter::ParameterEvent::VALUE_CHANGED)
 		{

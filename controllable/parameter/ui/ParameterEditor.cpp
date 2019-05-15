@@ -57,23 +57,23 @@ void ParameterEditor::updateUI()
 	//cleanup
 	if (expressionLabel != nullptr)
 	{
-		removeChildComponent(expressionLabel);
+		removeChildComponent(expressionLabel.get());
 		expressionLabel = nullptr;
 
-		removeChildComponent(expressionText);
+		removeChildComponent(expressionText.get());
 		expressionText->removeListener(this);
 		expressionText = nullptr;
 	}
 
 	if (automationUI != nullptr)
 	{
-		removeChildComponent(automationUI);
+		removeChildComponent(automationUI.get());
 		automationUI = nullptr;
 	}
 
 	if (referenceUI != nullptr)
 	{
-		removeChildComponent(referenceUI);
+		removeChildComponent(referenceUI.get());
 		referenceUI = nullptr;
 	}
 
@@ -86,16 +86,16 @@ void ParameterEditor::updateUI()
 	{
 		if (expressionText == nullptr)
 		{
-			expressionLabel = new Label();
+			expressionLabel.reset(new Label());
 			expressionLabel->setEditable(false);
 			expressionLabel->setText("=", dontSendNotification);
-			addAndMakeVisible(expressionLabel);
+			addAndMakeVisible(expressionLabel.get());
 
-			expressionText = new Label();
+			expressionText.reset(new Label());
 			expressionText->setText(parameter->controlExpression, dontSendNotification);
 			expressionText->addListener(this);
 			expressionText->setEditable(true);
-			addAndMakeVisible(expressionText);
+			addAndMakeVisible(expressionText.get());
 
 			expressionLabel->setJustificationType(Justification::topLeft);
 			expressionLabel->setColour(expressionLabel->textColourId, TEXTNAME_COLOR);
@@ -114,16 +114,16 @@ void ParameterEditor::updateUI()
 
 	case Parameter::REFERENCE:
 	{
-		referenceUI = parameter->referenceTarget->createTargetUI();
-		addAndMakeVisible(referenceUI);
+		referenceUI.reset(parameter->referenceTarget->createTargetUI());
+		addAndMakeVisible(referenceUI.get());
 		subContentHeight = 18;
 	}
 	break;
 
 	case Parameter::AUTOMATION:
 	{
-		automationUI = new PlayableParameterAutomationEditor(parameter->automation);
-		addAndMakeVisible(automationUI);
+		automationUI.reset(new PlayableParameterAutomationEditor(parameter->automation.get()));
+		addAndMakeVisible(automationUI.get());
 		subContentHeight = 100;
 	}
 	break;

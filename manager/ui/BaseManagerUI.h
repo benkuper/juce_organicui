@@ -85,7 +85,7 @@ public:
 	bool autoFilterHitTestOnItems;
 	bool validateHitTestOnNoItem;
 
-	ScopedPointer<ImageButton> addItemBT;
+	std::unique_ptr<ImageButton> addItemBT;
 
 	//ui
 	String noItemText;
@@ -241,8 +241,8 @@ BaseManagerUI<M, T, U>::BaseManagerUI(const String & contentName, M * _manager, 
 	baseM->addBaseManagerListener(this);
 	baseM->addAsyncManagerListener(this);
 
-	addItemBT = AssetManager::getInstance()->getAddBT();
-	addAndMakeVisible(addItemBT);
+	addItemBT.reset(AssetManager::getInstance()->getAddBT());
+	addAndMakeVisible(addItemBT.get());
 	addItemBT->addListener(this);
 
 	setShowAddButton(baseM->userCanAddItemsManually);
@@ -295,10 +295,10 @@ void BaseManagerUI<M, T, U>::setShowAddButton(bool value)
 
 	if (value)
 	{
-		addAndMakeVisible(addItemBT);
+		addAndMakeVisible(addItemBT.get());
 	} else
 	{
-		removeChildComponent(addItemBT);
+		removeChildComponent(addItemBT.get());
 	}
 
 }
@@ -837,7 +837,7 @@ int BaseManagerUI<M, T, U>::getDropIndexForPosition(Point<int> localPosition)
 template<class M, class T, class U>
 void BaseManagerUI<M, T, U>::buttonClicked(Button  * b)
 {
-	if (b == addItemBT)
+	if (b == addItemBT.get())
 	{
 		showMenuAndAddItem(true, Point<int>());
 	}
