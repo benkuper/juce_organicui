@@ -106,7 +106,7 @@ bool FloatParameter::checkValueIsTheSame(var oldValue, var newValue)
 
 bool FloatParameter::hasRange()
 {
-	return (float)minimumValue != INT32_MIN || (float)maximumValue != INT32_MAX;
+	return (float)minimumValue != INT32_MIN && (float)maximumValue != INT32_MAX;
 }
 
 var FloatParameter::getJSONDataInternal()
