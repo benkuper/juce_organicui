@@ -17,7 +17,11 @@
 
 class OSCRemoteControl :
 	public EnablingControllableContainer,
+#if ORGANICUI_USE_SERVUS
+	public Thread,
+#endif
 	public OSCReceiver::Listener<OSCReceiver::RealtimeCallback>
+
 {
 public: 
 	juce_DeclareSingleton(OSCRemoteControl, true);
@@ -43,6 +47,10 @@ public:
 	
 	void oscMessageReceived(const OSCMessage &m) override;
 	void oscBundleReceived(const OSCBundle &b) override;
+
+#if ORGANICUI_USE_SERVUS
+	void run() override;
+#endif
 
 	class RemoteControlListener
 	{

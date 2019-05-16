@@ -1,3 +1,4 @@
+#include "OSCRemoteControl.h"
 /*
   ==============================================================================
 
@@ -13,6 +14,7 @@ juce_ImplementSingleton(OSCRemoteControl)
 OSCRemoteControl::OSCRemoteControl() :
 	EnablingControllableContainer("OSC Remote Control")
 #if ORGANICUI_USE_SERVUS
+	,Thread("Global Zeroconf")
 	,servus("_osc._udp")
 #endif
 {
@@ -26,6 +28,8 @@ OSCRemoteControl::OSCRemoteControl() :
 
 OSCRemoteControl::~OSCRemoteControl()
 {
+	signalThreadShouldExit();
+	waitForThreadToExit(1000);
 }
 
 void OSCRemoteControl::setupReceiver()
@@ -43,7 +47,6 @@ void OSCRemoteControl::setupReceiver()
 	if (result)
 	{
 		NLOG(niceName, "Now receiving on port : " + localPort->stringValue());
-		//if (!isThreadRunning()) startThread();
 #if ORGANICUI_USE_SERVUS
 		setupZeroconf();
 #endif
@@ -69,22 +72,7 @@ void OSCRemoteControl::setupReceiver()
 void OSCRemoteControl::setupZeroconf()
 {
 	if (Engine::mainEngine->isClearing || localPort == nullptr) return;
-
-	String nameToAdvertise = "Chataigne - Remote Control";
-	int portToAdvertise = 0;
-	while (portToAdvertise != localPort->intValue())
-	{
-		portToAdvertise = localPort->intValue();
-		servus.withdraw();
-		servus.announce(portToAdvertise, nameToAdvertise.toStdString());
-
-		if (localPort->intValue() != portToAdvertise)
-		{
-			DBG("Name or port changed during advertise, readvertising");
-		}
-	}
-
-	NLOG(niceName, "Zeroconf service created : " << nameToAdvertise << ":" << portToAdvertise);
+	if(!isThreadRunning()) startThread();
 }
 #endif
 
@@ -199,9 +187,6 @@ void OSCRemoteControl::processMessage(const OSCMessage& m)
 		}
 	}
 }
-	
-
-
 
 void OSCRemoteControl::onContainerParameterChanged(Parameter * p)
 {
@@ -222,3 +207,24 @@ void OSCRemoteControl::oscBundleReceived(const OSCBundle & b)
 		processMessage(m.getMessage());
 	}
 }
+
+#if ORGANICUI_USE_SERVUS
+void OSCRemoteControl::run()
+{
+	String nameToAdvertise = "Chataigne - Remote Control";
+	int portToAdvertise = 0;
+	while (portToAdvertise != localPort->intValue() && !threadShouldExit())
+	{
+		portToAdvertise = localPort->intValue();
+		servus.withdraw();
+		servus.announce(portToAdvertise, nameToAdvertise.toStdString());
+
+		if (localPort->intValue() != portToAdvertise)
+		{
+			DBG("Name or port changed during advertise, readvertising");
+		}
+	}
+
+	NLOG(niceName, "Zeroconf service created : " << nameToAdvertise << ":" << portToAdvertise);
+}
+#endif
