@@ -371,7 +371,11 @@ void UpdateDialogWindow::resized()
 
 void UpdateDialogWindow::buttonClicked(Button * b)
 {
-	if (b == &okButton) AppUpdater::getInstance()->downloadUpdate();
+	if (b == &okButton)
+	{
+		AppUpdater::getInstance()->downloadUpdate();
+		okButton.setEnabled(false);
+	}
 	else if (b == &cancelButton)
 	{
 		getTopLevelComponent()->exitModalState(0);
