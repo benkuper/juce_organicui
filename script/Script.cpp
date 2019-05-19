@@ -13,6 +13,8 @@ Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled) :
 	BaseItem("Script", canBeDisabled, false),
 	scriptTemplate(nullptr),
 	scriptParamsContainer("params"),
+	updateEnabled(false),
+	updateRate(50),
 	parentTarget(_parentTarget),
 	lockedThreadId(0),
 	scriptAsyncNotifier(10)
@@ -30,6 +32,8 @@ Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled) :
 	reload->hideInEditor = true;
 
 	scriptObject.setMethod("log", Script::logFromScript);
+	scriptObject.setMethod("setUpdateRate", Script::setUpdateRateFromScript);
+
 	scriptObject.setMethod("addTrigger", Script::addTriggerFromScript);
 	scriptObject.setMethod("addBoolParameter", Script::addBoolParameterFromScript);
 	scriptObject.setMethod("addIntParameter", Script::addIntParameterFromScript);
@@ -125,7 +129,7 @@ void Script::loadScript()
 	if (updateEnabled)
 	{
 		lastUpdateTime = (float)Time::getMillisecondCounter() / 1000.f;
-		startTimer(0, 20); //50fps, should be parametrable
+		startTimer(0, 1000/updateRate); //50fps, should be parametrable
 	}
 
 	scriptParamsContainer.hideInEditor = scriptParamsContainer.controllables.size() == 0;
@@ -364,6 +368,19 @@ var Script::addPoint3DParameterFromScript(const var::NativeFunctionArgs & args)
 	Script * s = getObjectFromJS<Script>(args);
 	if (!checkNumArgs(s->niceName, args, 2)) return var();
 	return s->scriptParamsContainer.addPoint3DParameter(args.arguments[0], args.arguments[1])->getScriptObject();
+}
+
+var Script::setUpdateRateFromScript(const var::NativeFunctionArgs& args)
+{
+	Script* s = getObjectFromJS<Script>(args);
+	if (!checkNumArgs(s->niceName, args, 1)) return var();
+	if (s->updateEnabled)
+	{
+		s->updateRate = args.arguments[0];
+		s->startTimer(0, 1000 / s->updateRate);
+	}
+
+	return var();
 }
 
 
