@@ -227,7 +227,7 @@ inline OrganicApplication::MainWindow::MainWindow(String name, OrganicMainConten
 
 	mainComponent->init();
 	
-	if (GlobalSettings::getInstance()->launchMinimized->boolValue()) setMinimised(true);
+	if (GlobalSettings::getInstance()->launchMinimised->boolValue()) setMinimised(true);
 }
 
 void OrganicApplication::MainWindow::closeButtonPressed() 
