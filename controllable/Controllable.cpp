@@ -32,6 +32,7 @@ Controllable::Controllable(const Type &type, const String & niceName, const Stri
 {
 	scriptObject.setMethod("isParameter", Controllable::checkIsParameterFromScript);
 	scriptObject.setMethod("getParent", Controllable::getParentFromScript);
+	scriptObject.setMethod("setName", Controllable::setNameFromScript);
 
 	setEnabled(enabled);
 	setNiceName(niceName);
@@ -297,6 +298,17 @@ var Controllable::getParentFromScript(const juce::var::NativeFunctionArgs & a)
 	if (c->parentContainer == nullptr) return var();
 	else return c->parentContainer->getScriptObject();
 
+}
+
+var Controllable::setNameFromScript(const juce::var::NativeFunctionArgs& a)
+{
+	if (a.numArguments == 0) return var();
+	Controllable * c = getObjectFromJS<Controllable>(a);
+	c->setNiceName(a.arguments[0].toString());
+	if (a.numArguments >= 2) c->setCustomShortName(a.arguments[1].toString());
+	else c->setAutoShortName();
+	
+	return var(); 
 }
 
 Controllable * Controllable::ControllableAction::getControllable()

@@ -38,6 +38,7 @@ ControllableContainer::ControllableContainer(const String & niceName) :
 	//script
 	scriptObject.setMethod("getChild", ControllableContainer::getChildFromScript);
 	scriptObject.setMethod("getParent", ControllableContainer::getParentFromScript);
+	scriptObject.setMethod("setName", ControllableContainer::setNameFromScript);
 }
 
 ControllableContainer::~ControllableContainer()
@@ -885,6 +886,16 @@ var ControllableContainer::getParentFromScript(const juce::var::NativeFunctionAr
 	return m->parentContainer->getScriptObject();
 }
 
+var ControllableContainer::setNameFromScript(const juce::var::NativeFunctionArgs& a)
+{
+	if (a.numArguments == 0) return var();
+	ControllableContainer * cc = getObjectFromJS<ControllableContainer>(a);
+	cc->setNiceName(a.arguments[0].toString());
+	if (a.numArguments >= 2) cc->setCustomShortName(a.arguments[1].toString());
+	else cc->setAutoShortName();
+
+	return var(); 
+}
 
 
 InspectableEditor * ControllableContainer::getEditor(bool isRoot)
