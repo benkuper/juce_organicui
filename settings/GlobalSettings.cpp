@@ -20,7 +20,11 @@ GlobalSettings::GlobalSettings() :
 {
 	saveAndLoadRecursiveData = true;
 
-	addChildControllableContainer(&startupCC);
+#if JUCE_WINDOWS
+	launchOnStartup = startupCC.addBoolParameter("Launch on system startup", "If checked, this app will automatically launch on system startup", false);
+	launchMinimized = startupCC.addBoolParameter("Launch minimized", "If checked, this app will automatically minimized it self when launched", false);
+#endif
+
 	checkUpdatesOnStartup = startupCC.addBoolParameter("Check updates on startup", "If enabled, app will check if any updates are available",true);
 	checkBetaUpdates = startupCC.addBoolParameter("Check for beta updates", "If enabled the app will also check for beta versions of the software", true);
 	onlyCheckBetaFromBeta = startupCC.addBoolParameter("Only Check beta from beta versions", "If enabled the app will only check beta version when running a beta version itself", true);
@@ -31,14 +35,19 @@ GlobalSettings::GlobalSettings() :
 	 
 	fileToOpenOnStartup = new FileParameter("File to load on startup", "File to load when start, if the option above is checked", "", false);
 	startupCC.addParameter(fileToOpenOnStartup);
+	
+	addChildControllableContainer(&startupCC);
 
-	addChildControllableContainer(&saveLoadCC);
+
 	enableAutoSave = saveLoadCC.addBoolParameter("Enable auto-save", "When enabled, a backup file will be saved every 5 min", true);
 	autoSaveCount = saveLoadCC.addIntParameter("Auto-save count", "The number of different files to auto-save", 10, 1, 100);
 
-	addChildControllableContainer(&editingCC);
+	addChildControllableContainer(&saveLoadCC);
+
 	askBeforeRemovingItems = editingCC.addBoolParameter("Ask before removing items", "If enabled, you will get a confirmation prompt before removing any item", false);
 	constrainKeysToNeighbours = editingCC.addBoolParameter("Constrain curve keys editing", "If enabled, keys won't be able to be moved past their neighbours when editing a curve", false);
+
+	addChildControllableContainer(&editingCC);
 
 	addChildControllableContainer(OSCRemoteControl::getInstance());
 
@@ -52,6 +61,17 @@ GlobalSettings::~GlobalSettings()
 void GlobalSettings::onControllableFeedbackUpdate(ControllableContainer * cc, Controllable * c)
 {
 	ControllableContainer::onControllableFeedbackUpdate(cc, c);
+
+#if JUCE_WINDOWS	
+	if (c == launchOnStartup)
+	{
+
+		String regKey = "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\" + OrganicApplication::getInstance()->getApplicationName();
+		String regValue = "\"" + File::getSpecialLocation(File::SpecialLocationType::currentApplicationFile).getFullPathName() + "\"";
+		if (launchOnStartup->boolValue()) WindowsRegistry::setValue(regKey, regValue);
+		else WindowsRegistry::deleteValue(regKey);
+	}
+#endif
 
 	if (c == openLastDocumentOnStartup)
 	{

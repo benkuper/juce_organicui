@@ -45,7 +45,6 @@ void OrganicApplication::initialise(const String & commandLine)
 	jassert(engine != nullptr);
 	if (mainComponent == nullptr) mainComponent = std::make_unique<OrganicMainContentComponent>();
 
-
 	engine->addAsyncEngineListener(this);
 
 	GlobalSettings::getInstance()->selectionManager = InspectableSelectionManager::mainSelectionManager;
@@ -60,6 +59,7 @@ void OrganicApplication::initialise(const String & commandLine)
 	AppUpdater::getInstance()->addAsyncUpdateListener(this);
 
 	if (GlobalSettings::getInstance()->checkUpdatesOnStartup->boolValue()) AppUpdater::getInstance()->checkForUpdates();
+
 	HelpBox::getInstance()->loadHelp();
 
 	engine->parseCommandline(commandLine);
@@ -227,6 +227,7 @@ inline OrganicApplication::MainWindow::MainWindow(String name, OrganicMainConten
 
 	mainComponent->init();
 	
+	if (GlobalSettings::getInstance()->launchMinimized->boolValue()) setMinimised(true);
 }
 
 void OrganicApplication::MainWindow::closeButtonPressed() 

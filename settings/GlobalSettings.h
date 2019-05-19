@@ -34,6 +34,11 @@ public:
 
 	//Startup
 	ControllableContainer startupCC;
+
+#if JUCE_WINDOWS
+	BoolParameter * launchOnStartup;
+	BoolParameter * launchMinimized;
+#endif
 	BoolParameter * checkUpdatesOnStartup;
 	BoolParameter * checkBetaUpdates;
 	BoolParameter * onlyCheckBetaFromBeta;
