@@ -124,6 +124,8 @@ public:
 		{
 			if (d->type == type) return d->createFunc(d->params);
 		}
+
+		LOGERROR("Type " << type << " does not exist for this manager.");
 		return nullptr;
 	}
 };

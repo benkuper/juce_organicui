@@ -60,7 +60,6 @@
 
 using namespace juce;
 
-#include "manager/Factory.h"
 
 #include "resources/BinaryData.h"
 
@@ -80,7 +79,9 @@ using namespace juce;
 #include "helpers/OSCHelpers.h"
 #include "helpers/NetworkHelpers.h"
 
+
 #include "undo/UndoMaster.h"
+#include "manager/Factory.h"
 
 #include "script/ScriptTarget.h"
 
