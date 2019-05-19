@@ -102,37 +102,13 @@ public:
 	public:
 		enum Type { ITEM_ADDED, ITEM_REMOVED, ITEMS_REORDERED, ITEMS_ADDED, ITEMS_REMOVED, MANAGER_CLEARED };
 
-		ManagerEvent(Type t, T * i = nullptr) : type(t)
-		{
-			itemsRef.add(i);
-		}
-
-		ManagerEvent(Type t, Array<T *> iList) : type(t)
-		{
-			for (auto &i : iList)
-			{
-				itemsRef.add(dynamic_cast<Inspectable *>(i));
-			}
-		}
+		ManagerEvent(Type t, T* i = nullptr);
+		ManagerEvent(Type t, Array<T*> iList);
 
 		Type type;
 		Array<WeakReference<Inspectable>> itemsRef;
-
-		Array<T *> getItems() const
-		{
-			Array<T *> result;
-			for (auto &i : itemsRef)
-			{
-				if (i != nullptr && !i.wasObjectDeleted()) result.add(dynamic_cast<T *>(i.get()));
-			}
-			return result;
-		}
-
-		T * getItem(int index = 0) const
-		{
-			if (itemsRef.size() > index && itemsRef[index] != nullptr && !itemsRef[index].wasObjectDeleted()) return static_cast<T *>(itemsRef[index].get());
-			return nullptr;
-		}
+		Array<T*> getItems() const;
+		T* getItem(int index = 0) const;
 	};
 
 	using BManagerEvent = typename BaseManager<T>::ManagerEvent;
@@ -152,135 +128,46 @@ public:
 		public UndoableAction
 	{
 	public:
-		ManagerBaseAction(BaseManager * manager, var _data = var()) :
-			managerControlAddress(manager->getControlAddress()),
-			data(_data),
-			managerRef(manager)
-		{}
+		ManagerBaseAction(BaseManager* manager, var _data = var());
 
 		String managerControlAddress;
 		var data;
 		WeakReference<Inspectable> managerRef;
 
-		BaseManager<T> * getManager() {
-			if (managerRef != nullptr && !managerRef.wasObjectDeleted()) return dynamic_cast<BaseManager<T> *>(managerRef.get());
-			else if(Engine::mainEngine != nullptr)
-			{
-				ControllableContainer * cc = Engine::mainEngine->getControllableContainerForAddress(managerControlAddress, true);
-				if (cc != nullptr) return dynamic_cast<BaseManager<T> *>(cc);
-			}
-
-			return nullptr;
-		}
+		BaseManager<T>* getManager();
 	};
 
 	class ItemBaseAction :
 		public ManagerBaseAction
 	{
 	public:
-		ItemBaseAction(BaseManager * m, T * i, var data = var()) :
-			ManagerBaseAction(m, data),
-			itemRef(i),
-			itemIndex(0)
-		{
-			T * s = getItem();
-			if (s != nullptr)
-			{
-				this->itemShortName = dynamic_cast<BaseItem *>(s)->shortName;
-				this->itemIndex = m->items.indexOf(s);
-
-			}
-		}
+		ItemBaseAction(BaseManager* m, T* i, var data = var());
 
 		WeakReference<Inspectable> itemRef;
 		String itemShortName;
 		int itemIndex;
 
-		T * getItem()
-		{
-			if (itemRef != nullptr && !itemRef.wasObjectDeleted()) return dynamic_cast<T *>(itemRef.get());
-			else
-			{
-				BaseManager * m = this->getManager();
-				if (m != nullptr) return m->getItemWithName(itemShortName);
-			}
-
-			return nullptr;
-		}
+		T* getItem();
 	};
 
 	class AddItemAction :
 		public ItemBaseAction
 	{
 	public:
-		AddItemAction(BaseManager * m, T * i, var data = var()) : ItemBaseAction(m, i, data) {
-		}
+		AddItemAction(BaseManager* m, T* i, var data = var());
 
-		bool perform() override
-		{
-			BaseManager * m = this->getManager();
-			if (m == nullptr)
-			{
-				return false;
-			}
-
-			T * item = this->getItem();
-			if (item != nullptr)
-			{
-				m->addItem(item, this->data, false);
-			} else
-			{
-				item = m->addItemFromData(this->data, false);
-			}
-
-			if (item == nullptr) return false;
-
-			this->itemShortName = item->shortName;
-			return true;
-		}
-
-		bool undo() override
-		{
-			T * s = this->getItem();
-			if (s == nullptr) return false;
-			this->data = s->getJSONData();
-			this->data.getDynamicObject()->setProperty("index", this->itemIndex);
-
-			this->getManager()->removeItem(s, false);
-			this->itemRef = nullptr;
-			return true;
-		}
+		bool perform() override;
+		bool undo() override;
 	};
 
 	class RemoveItemAction :
 		public ItemBaseAction
 	{
 	public:
-		RemoveItemAction(BaseManager * m, T * i, var data = var()) : ItemBaseAction(m, i, data) {
-		}
+		RemoveItemAction(BaseManager* m, T* i, var data = var());
 
-		bool perform() override
-		{
-
-			T * s = this->getItem();
-
-			if (s == nullptr) return false;
-
-			this->data = s->getJSONData();
-			this->data.getDynamicObject()->setProperty("index", this->itemIndex);
-
-			this->getManager()->removeItem(s, false);
-			this->itemRef = nullptr;
-			return true;
-		}
-
-		bool undo() override
-		{
-			BaseManager * m = this->getManager();
-			if (m == nullptr) return false;
-			this->itemRef = m->addItemFromData(this->data, false);
-			return true;
-		}
+		bool perform() override;
+		bool undo() override;
 	};
 
 	//Multi add/remove items actions
@@ -288,78 +175,22 @@ public:
 		public ManagerBaseAction
 	{
 	public:
-		ItemsBaseAction(BaseManager * m, Array<T *> iList, var data = var()) :
-			ManagerBaseAction(m, data)
-		{
-
-			for (auto &i : iList)
-			{
-				BaseItem * bi = dynamic_cast<BaseItem *>(i);
-				itemsRef.add(bi);
-				itemsShortName.add(bi != nullptr ? bi->shortName : "");
-			}
-		}
+		ItemsBaseAction(BaseManager* m, Array<T*> iList, var data = var());
 
 		Array<WeakReference<Inspectable>> itemsRef;
 		StringArray itemsShortName;
 
-		Array<T *> getItems()
-		{
-			Array<T *> iList;
-			int index = 0;
-			for (auto &i : itemsRef)
-			{
-				if (i != nullptr && !i.wasObjectDeleted())
-				{
-					T * ti = dynamic_cast<T *>(i.get());
-					if (ti != nullptr) iList.add(ti);
-					else
-					{
-						BaseManager * m = this->getManager();
-						if (m != nullptr)
-						{
-							ti = m->getItemWithName(this->itemsShortName[index]);
-							if (ti != nullptr) iList.add(ti);
-						}
-					}
-				}
-				index++;
-			}
-
-			return iList;
-		}
+		Array<T*> getItems();
 	};
 
 	class AddItemsAction :
 		public ItemsBaseAction
 	{
 	public:
-		AddItemsAction(BaseManager * m, Array<T *> iList, var data = var()) : ItemsBaseAction(m, iList, data) {
-		}
+		AddItemsAction(BaseManager* m, Array<T*> iList, var data = var());
 
-		bool perform() override
-		{
-			BaseManager * m = this->getManager();
-			if (m == nullptr) return false;
-
-			Array<T *> iList = this->getItems();
-			m->addItems(iList, this->data, false);
-
-			this->itemsShortName.clear();
-			for (auto &i : iList) this->itemsShortName.add(i != nullptr ? i->shortName : "");
-			return true;
-		}
-
-		bool undo() override
-		{
-			Array<T *> iList = this->getItems();
-			this->data = var();
-			for (auto & i : iList) if (i != nullptr) this->data.append(i->getJSONData());
-			BaseManager * m = this->getManager();
-			if (m != nullptr) m->removeItems(iList, false);
-			this->itemsRef.clear();
-			return true;
-		}
+		bool perform() override;
+		bool undo() override;
 	};
 
 
@@ -367,55 +198,30 @@ public:
 		public ItemsBaseAction
 	{
 	public:
-		RemoveItemsAction(BaseManager * m, Array<T *> iList) : ItemsBaseAction(m, iList) {
-		}
+		RemoveItemsAction(BaseManager* m, Array<T*> iList);
 
-		bool perform() override
-		{
-			Array<T *> iList = this->getItems();
-			this->data = var();
-			for (auto & i : iList) if (i != nullptr) this->data.append(i->getJSONData());
-			BaseManager * m = this->getManager();
-			if (m != nullptr) m->removeItems(iList, false);
-			this->itemsRef.clear();
-			return true;
-		}
-
-		bool undo() override
-		{
-			BaseManager * m = this->getManager();
-			if (m == nullptr) return false;
-
-			Array<T *> iList = m->addItemsFromData(this->data, false);
-
-			this->itemsShortName.clear();
-			for (auto &i : iList) this->itemsShortName.add(i != nullptr ? i->shortName : "");
-			return true;
-		}
+		bool perform() override;
+		bool undo() override;
 	};
 
 
 	class ManagerItemComparator
 	{
 	public:
-		ManagerItemComparator(BaseManager * manager) : m(manager), compareFunc(nullptr)
-		{
-			compareFunc = nullptr;
-		}
+		ManagerItemComparator(BaseManager* manager);
 
 		BaseManager * m;
 
 		std::function<int(T *, T*)> compareFunc;
-		int compareElements(ControllableContainer * i1, ControllableContainer * i2)
-		{
-			jassert(compareFunc != nullptr);
-			return compareFunc(static_cast<T *>(i1), static_cast<T *>(i2));
-		}
+		int compareElements(ControllableContainer* i1, ControllableContainer* i2);
 
 	};
 	
 	ManagerItemComparator comparator;
 
+
+	static var addItemFromScript(const var::NativeFunctionArgs& args);
+	static var removeItemFromScript(const var::NativeFunctionArgs& args);
 
 	private:
 		JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BaseManager<T>)
@@ -436,6 +242,9 @@ BaseManager<T>::BaseManager(const String & name) :
 
 	//setCanHavePresets(false);
 	//hideInEditor = true;
+
+	scriptObject.setMethod("addItem", &BaseManager<T>::addItemFromScript);
+	scriptObject.setMethod("removeItem", &BaseManager<T>::removeItemFromScript);
 
 	skipLabelInTarget = true; //by default manager label in targetParameter UI are not interesting
 	nameCanBeChangedByUser = false;
@@ -888,4 +697,350 @@ InspectableEditor * BaseManager<T>::getEditor(bool isRoot)
 {
 	return new GenericManagerEditor<T>(this, isRoot);
 
+}
+
+
+// SCRIPT
+
+template<class T>
+inline var BaseManager<T>::addItemFromScript(const var::NativeFunctionArgs& args)
+{
+	BaseManager<T>* m = getObjectFromJS<BaseManager<T>>(args);
+	
+	//if (args.numArguments) return var(); 
+	if (m->managerFactory == nullptr || m->managerFactory->defs.size() == 1)
+	{
+		T* item = m->addItem();
+		return item->getScriptObject();
+	}
+	else
+	{
+		if (args.numArguments < 1)
+		{
+			String s = "Add item needs at least one parameter for this manager.\nValid options are :";
+			for (auto& d : m->managerFactory->defs)
+			{
+				s += "\n" + d->type;
+			}
+			NLOGWARNING(m->niceName, "Error");// s);
+			return var();
+		}
+		else
+		{
+			T* item = m->managerFactory->create(args.arguments[0].toString());
+			if (item != nullptr) return item->getScriptObject();
+		}
+		
+		return var();
+	}
+}
+
+
+template<class T>
+var BaseManager<T>::removeItemFromScript(const var::NativeFunctionArgs& args)
+{
+	BaseManager<T>* m = getObjectFromJS<BaseManager<T>>(args);
+	
+	if (args.numArguments < 1)
+	{
+		NLOGWARNING(m->niceName, "Needs at least one argument to remove an item from this manager");
+		return var();
+	}
+
+	if (args.arguments[0].isObject())
+	{
+		T* item = dynamic_cast<T*>((T *)(int64)(args.arguments[0].getDynamicObject()->getProperty(scriptPtrIdentifier)));
+		if (item == nullptr)
+		{
+			m->removeItem(item);
+			return var();
+		}
+	}
+	else if (args.arguments[0].isString())
+	{
+		T* item = m->getItemWithName(args.arguments[0].toString(), true);
+		if (item != nullptr)
+		{
+			m->removeItem(item);
+			return var();
+		}
+	}
+
+	NLOGWARNING(m->niceName, "Remove item : item not found in manager");
+	return var();
+}
+
+
+
+//MANAGER EVENT
+
+template<class T>
+inline BaseManager<T>::ManagerEvent::ManagerEvent(Type t, T* i) : type(t)
+{
+	itemsRef.add(i);
+}
+
+template<class T>
+inline BaseManager<T>::ManagerEvent::ManagerEvent(Type t, Array<T*> iList) : type(t)
+{
+	for (auto& i : iList)
+	{
+		itemsRef.add(dynamic_cast<Inspectable*>(i));
+	}
+}
+
+template<class T>
+inline Array<T*> BaseManager<T>::ManagerEvent::getItems() const
+{
+	Array<T*> result;
+	for (auto& i : itemsRef)
+	{
+		if (i != nullptr && !i.wasObjectDeleted()) result.add(dynamic_cast<T*>(i.get()));
+	}
+	return result;
+}
+
+template<class T>
+inline T* BaseManager<T>::ManagerEvent::getItem(int index) const
+{
+	if (itemsRef.size() > index && itemsRef[index] != nullptr && !itemsRef[index].wasObjectDeleted()) return static_cast<T*>(itemsRef[index].get());
+	return nullptr;
+}
+
+
+
+
+
+
+
+//ACTIONS
+
+template<class T>
+inline BaseManager<T>::ManagerBaseAction::ManagerBaseAction(BaseManager* manager, var _data) :
+	managerControlAddress(manager->getControlAddress()),
+	data(_data),
+	managerRef(manager)
+{}
+
+template<class T>
+inline BaseManager<T>* BaseManager<T>::ManagerBaseAction::getManager() {
+	if (managerRef != nullptr && !managerRef.wasObjectDeleted()) return dynamic_cast<BaseManager<T>*>(managerRef.get());
+	else if (Engine::mainEngine != nullptr)
+	{
+		ControllableContainer* cc = Engine::mainEngine->getControllableContainerForAddress(managerControlAddress, true);
+		if (cc != nullptr) return dynamic_cast<BaseManager<T>*>(cc);
+	}
+
+	return nullptr;
+}
+
+template<class T>
+inline BaseManager<T>::ItemBaseAction::ItemBaseAction(BaseManager* m, T* i, var data) :
+	ManagerBaseAction(m, data),
+	itemRef(i),
+	itemIndex(0)
+{
+	T* s = getItem();
+	if (s != nullptr)
+	{
+		this->itemShortName = dynamic_cast<BaseItem*>(s)->shortName;
+		this->itemIndex = m->items.indexOf(s);
+
+	}
+}
+
+template<class T>
+inline T* BaseManager<T>::ItemBaseAction::getItem()
+{
+	if (itemRef != nullptr && !itemRef.wasObjectDeleted()) return dynamic_cast<T*>(itemRef.get());
+	else
+	{
+		BaseManager* m = this->getManager();
+		if (m != nullptr) return m->getItemWithName(itemShortName);
+	}
+
+	return nullptr;
+}
+
+template<class T>
+inline BaseManager<T>::AddItemAction::AddItemAction(BaseManager* m, T* i, var data) : ItemBaseAction(m, i, data) {
+}
+
+template<class T>
+inline bool BaseManager<T>::AddItemAction::perform()
+{
+	BaseManager* m = this->getManager();
+	if (m == nullptr)
+	{
+		return false;
+	}
+
+	T* item = this->getItem();
+	if (item != nullptr)
+	{
+		m->addItem(item, this->data, false);
+	}
+	else
+	{
+		item = m->addItemFromData(this->data, false);
+	}
+
+	if (item == nullptr) return false;
+
+	this->itemShortName = item->shortName;
+	return true;
+}
+
+template<class T>
+inline bool BaseManager<T>::AddItemAction::undo()
+{
+	T* s = this->getItem();
+	if (s == nullptr) return false;
+	this->data = s->getJSONData();
+	this->data.getDynamicObject()->setProperty("index", this->itemIndex);
+
+	this->getManager()->removeItem(s, false);
+	this->itemRef = nullptr;
+	return true;
+}
+
+template<class T>
+inline BaseManager<T>::RemoveItemAction::RemoveItemAction(BaseManager* m, T* i, var data) : ItemBaseAction(m, i, data) {
+}
+
+template<class T>
+inline bool BaseManager<T>::RemoveItemAction::perform()
+{
+
+	T* s = this->getItem();
+
+	if (s == nullptr) return false;
+
+	this->data = s->getJSONData();
+	this->data.getDynamicObject()->setProperty("index", this->itemIndex);
+
+	this->getManager()->removeItem(s, false);
+	this->itemRef = nullptr;
+	return true;
+}
+
+template<class T>
+inline bool BaseManager<T>::RemoveItemAction::undo()
+{
+	BaseManager* m = this->getManager();
+	if (m == nullptr) return false;
+	this->itemRef = m->addItemFromData(this->data, false);
+	return true;
+}
+
+template<class T>
+inline BaseManager<T>::ItemsBaseAction::ItemsBaseAction(BaseManager* m, Array<T*> iList, var data) :
+	ManagerBaseAction(m, data)
+{
+
+	for (auto& i : iList)
+	{
+		BaseItem* bi = dynamic_cast<BaseItem*>(i);
+		itemsRef.add(bi);
+		itemsShortName.add(bi != nullptr ? bi->shortName : "");
+	}
+}
+
+template<class T>
+inline Array<T*> BaseManager<T>::ItemsBaseAction::getItems()
+{
+	Array<T*> iList;
+	int index = 0;
+	for (auto& i : itemsRef)
+	{
+		if (i != nullptr && !i.wasObjectDeleted())
+		{
+			T* ti = dynamic_cast<T*>(i.get());
+			if (ti != nullptr) iList.add(ti);
+			else
+			{
+				BaseManager* m = this->getManager();
+				if (m != nullptr)
+				{
+					ti = m->getItemWithName(this->itemsShortName[index]);
+					if (ti != nullptr) iList.add(ti);
+				}
+			}
+		}
+		index++;
+	}
+
+	return iList;
+}
+
+template<class T>
+inline BaseManager<T>::AddItemsAction::AddItemsAction(BaseManager* m, Array<T*> iList, var data) : ItemsBaseAction(m, iList, data) {
+}
+
+template<class T>
+inline bool BaseManager<T>::AddItemsAction::perform()
+{
+	BaseManager* m = this->getManager();
+	if (m == nullptr) return false;
+
+	Array<T*> iList = this->getItems();
+	m->addItems(iList, this->data, false);
+
+	this->itemsShortName.clear();
+	for (auto& i : iList) this->itemsShortName.add(i != nullptr ? i->shortName : "");
+	return true;
+}
+
+template<class T>
+inline bool BaseManager<T>::AddItemsAction::undo()
+{
+	Array<T*> iList = this->getItems();
+	this->data = var();
+	for (auto& i : iList) if (i != nullptr) this->data.append(i->getJSONData());
+	BaseManager * m = this->getManager();
+	if (m != nullptr) m->removeItems(iList, false);
+	this->itemsRef.clear();
+	return true;
+}
+
+template<class T>
+inline BaseManager<T>::RemoveItemsAction::RemoveItemsAction(BaseManager* m, Array<T*> iList) : ItemsBaseAction(m, iList) {
+}
+
+template<class T>
+inline bool BaseManager<T>::RemoveItemsAction::perform()
+{
+	Array<T*> iList = this->getItems();
+	this->data = var();
+	for (auto& i : iList) if (i != nullptr) this->data.append(i->getJSONData());
+	BaseManager * m = this->getManager();
+	if (m != nullptr) m->removeItems(iList, false);
+	this->itemsRef.clear();
+	return true;
+}
+
+template<class T>
+inline bool BaseManager<T>::RemoveItemsAction::undo()
+{
+	BaseManager* m = this->getManager();
+	if (m == nullptr) return false;
+
+	Array<T*> iList = m->addItemsFromData(this->data, false);
+
+	this->itemsShortName.clear();
+	for (auto& i : iList) this->itemsShortName.add(i != nullptr ? i->shortName : "");
+	return true;
+}
+
+template<class T>
+inline BaseManager<T>::ManagerItemComparator::ManagerItemComparator(BaseManager* manager) : m(manager), compareFunc(nullptr)
+{
+	compareFunc = nullptr;
+}
+
+template<class T>
+inline int BaseManager<T>::ManagerItemComparator::compareElements(ControllableContainer* i1, ControllableContainer* i2)
+{
+	jassert(compareFunc != nullptr);
+	return compareFunc(static_cast<T*>(i1), static_cast<T*>(i2));
 }
