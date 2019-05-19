@@ -37,8 +37,8 @@ public:
 
 #if JUCE_WINDOWS
 	BoolParameter * launchOnStartup;
-	BoolParameter * launchMinimized;
 #endif
+	BoolParameter * launchMinimized;
 	BoolParameter * checkUpdatesOnStartup;
 	BoolParameter * checkBetaUpdates;
 	BoolParameter * onlyCheckBetaFromBeta;

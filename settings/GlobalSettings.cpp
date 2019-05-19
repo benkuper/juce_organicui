@@ -22,8 +22,8 @@ GlobalSettings::GlobalSettings() :
 
 #if JUCE_WINDOWS
 	launchOnStartup = startupCC.addBoolParameter("Launch on system startup", "If checked, this app will automatically launch on system startup", false);
-	launchMinimized = startupCC.addBoolParameter("Launch minimized", "If checked, this app will automatically minimized it self when launched", false);
 #endif
+	launchMinimized = startupCC.addBoolParameter("Launch minimized", "If checked, this app will automatically minimized it self when launched", false);
 
 	checkUpdatesOnStartup = startupCC.addBoolParameter("Check updates on startup", "If enabled, app will check if any updates are available",true);
 	checkBetaUpdates = startupCC.addBoolParameter("Check for beta updates", "If enabled the app will also check for beta versions of the software", true);
