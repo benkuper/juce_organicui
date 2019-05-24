@@ -216,11 +216,15 @@ var Controllable::setValueFromScript(const juce::var::NativeFunctionArgs& a) {
 
 		success = true;
 
-		if (a.numArguments == 0 && c->type == Controllable::Type::TRIGGER) {
-			((Trigger *)c)->trigger();
+		if (a.numArguments == 0) {
+			if (c->type == Controllable::Type::TRIGGER) ((Trigger*)c)->trigger();
+			else
+			{
+				LOGWARNING("setValue needs 1 argument for parameters");
+			}
 		}
-
-		else {
+		else
+		{
 			var value = a.arguments[0];
 			bool valueIsABool = value.isBool();
 			bool valueIsANumber = value.isDouble() || value.isInt() || value.isInt64();
