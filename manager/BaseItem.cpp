@@ -83,6 +83,16 @@ void BaseItem::selectAll()
 	baseItemListeners.call(&BaseItem::Listener::askForSelectAllItems);
 }
 
+void BaseItem::selectPrevious(bool addToSelection)
+{
+	baseItemListeners.call(&BaseItem::Listener::askForSelectPreviousItem, this, addToSelection);
+}
+
+void BaseItem::selectNext(bool addToSelection)
+{
+	baseItemListeners.call(&BaseItem::Listener::askForSelectNextItem, this, addToSelection);
+}
+
 void BaseItem::moveBefore()
 {
 	baseItemListeners.call(&BaseItem::Listener::askForMoveBefore, this);

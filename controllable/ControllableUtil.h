@@ -43,5 +43,28 @@ public:
 		return result;
 	}
 
+	template<class T>
+	static T* findParentAs(WeakReference<ControllableContainer> _cc, int maxLevel = -1)
+	{
+		int curLevel = 0;
+		if (c == nullptr || c.wasObjectDeleted()) return nullptr;
 
+		WeakReference<ControllableContainer> cc = _cc->parentContainer;
+
+		if (cc == nullptr || cc.wasObjectDeleted()) return nullptr;
+		T* result = dynamic_cast<T*>(cc.get());
+
+		while (result == nullptr && cc != nullptr)
+		{
+			cc = cc->parentContainer;
+
+			if (cc == nullptr || cc.wasObjectDeleted()) return nullptr;
+
+			result = dynamic_cast<T*>(cc.get());
+			curLevel++;
+			if (maxLevel != -1 && curLevel > maxLevel) return nullptr;
+		}
+
+		return result;
+	}
 };

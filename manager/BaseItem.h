@@ -44,6 +44,8 @@ public:
 	virtual void copy();
 	virtual bool paste();
 	virtual void selectAll();
+	virtual void selectPrevious(bool addToSelection = false);
+	virtual void selectNext(bool addToSelection = false);
 
 	virtual void moveBefore();
 	virtual void moveAfter();
@@ -74,6 +76,8 @@ public:
 		virtual void askForMoveBefore(BaseItem *) {}
 		virtual void askForMoveAfter(BaseItem *) {}
 		virtual void askForSelectAllItems() {}
+		virtual void askForSelectPreviousItem(BaseItem *, bool addToSelection = false) {}
+		virtual void askForSelectNextItem(BaseItem *, bool addToSelection = false) {}
 	};
 
 

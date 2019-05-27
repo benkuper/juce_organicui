@@ -71,6 +71,8 @@ public:
 	void askForMoveBefore(BaseItem *) override;
 	void askForMoveAfter(BaseItem *) override;
 	void askForSelectAllItems() override;
+	void askForSelectPreviousItem(BaseItem * item, bool addToSelection = false) override;
+	void askForSelectNextItem(BaseItem* item, bool addToSelection = false) override;
 
 	virtual var getJSONData() override;
 	virtual void loadJSONDataInternal(var data) override;
@@ -625,6 +627,22 @@ void BaseManager<T>::askForSelectAllItems()
 	int numItems = items.size();
 	if (numItems > 0) items[0]->selectThis();
 	if (numItems > 1) for (int i = 0; i < numItems; i++) items[i]->selectThis(true);
+}
+
+template<class T>
+void BaseManager<T>::askForSelectPreviousItem(BaseItem* item, bool addToSelection)
+{
+	int index = items.indexOf(dynamic_cast<T*>(item));
+	if (index <= 0) return;
+	items[index - 1]->selectThis(addToSelection);
+}
+
+template<class T>
+void BaseManager<T>::askForSelectNextItem(BaseItem* item, bool addToSelection)
+{
+	int index = items.indexOf(dynamic_cast<T*>(item));
+	if (index == -1 || index >= items.size() - 1) return;
+	items[index + 1]->selectThis(addToSelection);
 }
 
 template<class T>

@@ -20,13 +20,6 @@ namespace CommandIDs
 	static const int openLastDocument = 0x30004;
 	static const int checkForUpdates = 0x30005;
 
-	static const int editProjectSettings = 0x50001;
-	static const int editGlobalSettings = 0x50002;
-
-	static const int showAbout = 0x60000;
-	static const int gotoWebsite = 0x60001;
-	static const int gotoForum = 0x60002;
-
 	//undo
 	static const int undo = 0x40001;
 	static const int redo = 0x40002;
@@ -34,6 +27,18 @@ namespace CommandIDs
 	static const int deleteItems = 0x40004;
 	static const int selectAll = 0x40005;
 
+
+	static const int editProjectSettings = 0x50001;
+	static const int editGlobalSettings = 0x50002;
+
+	static const int showAbout = 0x60000;
+	static const int gotoWebsite = 0x60001;
+	static const int gotoForum = 0x60002;
+
+	
+	//navigation
+	static const int selectPreviousItem = 0x70001;
+	static const int selectNextItem = 0x70002;
 
 	// range ids
 	static const int lastFileStartID = 100; // 100 to 200 max
@@ -172,7 +177,30 @@ void OrganicMainContentComponent::getCommandInfo(CommandID commandID, Applicatio
 	}
 	break;
 
+	case CommandIDs::selectPreviousItem:
+	{
+		result.setInfo("Select Previous Item", "Select previous item in the list", category, 0);
+		result.defaultKeypresses.add(KeyPress(KeyPress::upKey), KeyPress(KeyPress::upKey, ModifierKeys::shiftModifier, 0));
+		
+		InspectableSelectionManager* selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
+		Array<BaseItem*> items = selectionManager == nullptr ? Array<BaseItem*>() : selectionManager->getInspectablesAs<BaseItem>();
+		
 
+		result.setActive(items.size() > 0);
+	}
+	break;
+
+	case CommandIDs::selectNextItem:
+	{
+		result.setInfo("Select Next Item", "Select next item in the list", category, 0);
+		result.defaultKeypresses.add(KeyPress(KeyPress::downKey),KeyPress(KeyPress::downKey, ModifierKeys::shiftModifier, 0));
+		
+		InspectableSelectionManager* selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
+		Array<BaseItem*> items = selectionManager == nullptr ? Array<BaseItem*>() : selectionManager->getInspectablesAs<BaseItem>();
+		
+		result.setActive(items.size() > 0);
+	}
+	break;
 
 	default:
 		JUCEApplication::getInstance()->getCommandInfo(commandID, result);
@@ -199,6 +227,8 @@ void OrganicMainContentComponent::getAllCommands(Array<CommandID>& commands) {
 	  CommandIDs::deleteItems,
 	  CommandIDs::editGlobalSettings,
 	  CommandIDs::editProjectSettings,
+	  CommandIDs::selectPreviousItem,
+	  CommandIDs::selectNextItem,
 	  CommandIDs::undo,
 	  CommandIDs::redo
 	};
@@ -245,6 +275,8 @@ PopupMenu OrganicMainContentComponent::getMenuForIndex(int /*topLevelMenuIndex*/
 		menu.addCommandItem(&getCommandManager(), CommandIDs::redo);
 		menu.addSeparator();
 		menu.addCommandItem(&getCommandManager(), CommandIDs::selectAll);
+		menu.addCommandItem(&getCommandManager(), CommandIDs::selectPreviousItem);
+		menu.addCommandItem(&getCommandManager(), CommandIDs::selectNextItem);
 		menu.addCommandItem(&getCommandManager(), StandardApplicationCommandIDs::copy);
 		menu.addCommandItem(&getCommandManager(), StandardApplicationCommandIDs::cut);
 		menu.addCommandItem(&getCommandManager(), StandardApplicationCommandIDs::paste);
@@ -423,6 +455,23 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 		}
 	}
 	break;
+
+	case CommandIDs::selectPreviousItem:
+	{
+		InspectableSelectionManager* selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
+		Array<BaseItem *> items = selectionManager->getInspectablesAs<BaseItem>();
+		for(auto &i : items) i->selectPrevious(info.keyPress.getModifiers().isShiftDown());
+	}
+	break; 
+	
+	case CommandIDs::selectNextItem:
+	{
+		InspectableSelectionManager* selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
+		Array<BaseItem*> items = selectionManager->getInspectablesAs<BaseItem>();
+		for (auto& i : items) i->selectNext(info.keyPress.getModifiers().isShiftDown());
+	}
+	break;
+
 
 	case CommandIDs::editProjectSettings:
 		ProjectSettings::getInstance()->selectThis();
