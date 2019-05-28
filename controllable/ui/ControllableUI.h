@@ -22,12 +22,15 @@ public:
 	String tooltip;
 	WeakReference<Controllable>  controllable;
 
-	static std::function<void(ControllableUI *, PopupMenu *)> customContextMenuFunc;
+	static std::function<void(ControllableUI*)> customShowContextMenuFunc;
+	static std::function<void(ControllableUI *, PopupMenu *)> customAddToContextMenuFunc;
 	static std::function<bool(ControllableUI *, int)> handleCustomContextMenuResultFunc;
 
 	bool showLabel;
 	bool opaqueBackground;
 	bool showMenuOnRightClick;
+
+	static std::function<void(ControllableUI*)> customShowEditWindowFunction;
 
 	void mouseEnter(const MouseEvent &e) override;
 	void mouseExit(const MouseEvent &e) override;
@@ -47,13 +50,15 @@ public:
 
 	virtual void setOpaqueBackground(bool value);
 
-	virtual void showEditWindow() {} //to be overriden by children
+	void showEditWindow();
+	virtual void showEditWindowInternal() {} //to be overriden by children
 
 	virtual void newMessage(const Controllable::ControllableEvent &e) override;
 
 	virtual void controllableStateChanged() {}
 	virtual void feedbackStateChanged() {}
 	virtual void controllableControlAddressChanged() {}
+
 
 
 private:

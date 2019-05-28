@@ -11,6 +11,7 @@
 
 
 int ParameterUI::currentFocusOrderIndex = 0;
+std::function<void(ParameterUI*)> ParameterUI::customShowEditRangeWindowFunction = nullptr;
 
 ParameterUI::ParameterUI(Parameter * parameter) :
 	ControllableUI(parameter),
@@ -30,7 +31,7 @@ ParameterUI::~ParameterUI()
 	}
 }
 
-void ParameterUI::showEditWindow()
+void ParameterUI::showEditWindowInternal()
 {
 	if (parameter->isControllableFeedbackOnly) return;
 
@@ -52,6 +53,12 @@ void ParameterUI::showEditWindow()
 }
 
 void ParameterUI::showEditRangeWindow()
+{
+	if (customShowEditRangeWindowFunction != nullptr) customShowEditRangeWindowFunction(this);
+	else showEditRangeWindowInternal();
+}
+
+void ParameterUI::showEditRangeWindowInternal()
 {
 	if (!parameter->canHaveRange || !parameter->isCustomizableByUser) return;
 

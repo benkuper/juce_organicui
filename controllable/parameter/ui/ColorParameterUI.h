@@ -28,7 +28,7 @@ public:
 	void resized() override;
 	void mouseDownInternal(const MouseEvent &e) override;
 
-	void showEditWindow() override;
+	void showEditWindowInternal() override;
 
 protected:
 	// Inherited via ChangeListener

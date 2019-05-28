@@ -38,8 +38,8 @@ public:
 	void mouseDownInternal(const MouseEvent &) override;
 	void mouseUpInternal(const MouseEvent &) override;
 
-	void showEditWindow() override;
-	void showEditRangeWindow() override;
+	void showEditWindowInternal() override;
+	void showEditRangeWindowInternal() override;
 
 	virtual void rangeChanged(Parameter *) override;
 protected:

@@ -63,7 +63,7 @@ void DoubleSliderUI::resized()
 	ySlider->setBounds(r.removeFromRight(r.getWidth() - 10));
 }
 
-void DoubleSliderUI::showEditWindow()
+void DoubleSliderUI::showEditWindowInternal()
 {
 	AlertWindow nameWindow("Change point 2D params", "Set new values and bounds for this parameter", AlertWindow::AlertIconType::NoIcon, this);
 
@@ -84,7 +84,7 @@ void DoubleSliderUI::showEditWindow()
 	}
 }
 
-void DoubleSliderUI::showEditRangeWindow()
+void DoubleSliderUI::showEditRangeWindowInternal()
 {
 	if (!parameter->isCustomizableByUser) return;
 

@@ -51,7 +51,7 @@ void ColorParameterUI::mouseDownInternal(const MouseEvent & e)
 	if (dispatchOnSingleClick) showEditWindow();
 }
 
-void ColorParameterUI::showEditWindow()
+void ColorParameterUI::showEditWindowInternal()
 {
 	if (!isInteractable()) return;
 

@@ -21,10 +21,14 @@ public:
     WeakReference<Parameter> parameter;
 
 	bool showEditWindowOnDoubleClick;
-
 	bool showValue;
-	virtual void showEditWindow() override;
-	virtual void showEditRangeWindow();
+
+	static std::function<void(ParameterUI*)> customShowEditRangeWindowFunction;
+
+
+	virtual void showEditWindowInternal() override;
+	void showEditRangeWindow();
+	virtual void showEditRangeWindowInternal();
 
 	void paintOverChildren(Graphics &g) override;
 

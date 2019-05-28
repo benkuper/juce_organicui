@@ -82,7 +82,7 @@ void TripleSliderUI::mouseUpInternal(const MouseEvent &)
 	parameter->setUndoableValue(mouseDownValue, parameter->getValue());
 }
 
-void TripleSliderUI::showEditWindow()
+void TripleSliderUI::showEditWindowInternal()
 {
 	AlertWindow nameWindow("Change point3D params", "Set new values and bounds for this parameter", AlertWindow::AlertIconType::NoIcon, this);
 	
@@ -103,7 +103,7 @@ void TripleSliderUI::showEditWindow()
 	}
 }
 
-void TripleSliderUI::showEditRangeWindow()
+void TripleSliderUI::showEditRangeWindowInternal()
 {
 	if (!parameter->isCustomizableByUser) return;
 

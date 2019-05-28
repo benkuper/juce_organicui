@@ -1,3 +1,4 @@
+#include "ControllableUI.h"
 /*
   ==============================================================================
 
@@ -8,8 +9,10 @@
   ==============================================================================
 */
 
-std::function<void(ControllableUI *, PopupMenu *)> ControllableUI::customContextMenuFunc = nullptr;
+std::function<void(ControllableUI*)> ControllableUI::customShowContextMenuFunc = nullptr;
+std::function<void(ControllableUI *, PopupMenu *)> ControllableUI::customAddToContextMenuFunc = nullptr;
 std::function<bool(ControllableUI *, int)> ControllableUI::handleCustomContextMenuResultFunc = nullptr;
+std::function<void(ControllableUI*)> ControllableUI::customShowEditWindowFunction = nullptr;
 
 ControllableUI::ControllableUI(Controllable * controllable) :
 	Component(controllable->niceName),
@@ -73,13 +76,23 @@ bool ControllableUI::isInteractable()
 
 void ControllableUI::showContextMenu()
 {
+	if (customShowContextMenuFunc != nullptr)
+	{
+		customShowContextMenuFunc(this); //full override
+		return;
+	}
+	
+	
 	std::unique_ptr<PopupMenu> p(new PopupMenu());
+	
+	
 	addPopupMenuItems(p.get());
 
-	if (ControllableUI::customContextMenuFunc != nullptr)
+	
+	if (ControllableUI::customAddToContextMenuFunc != nullptr)
 	{
 		p->addSeparator();
-		ControllableUI::customContextMenuFunc(this, p.get());
+		ControllableUI::customAddToContextMenuFunc(this, p.get());
 	}
 
 	if (controllable->includeInScriptObject)
@@ -141,6 +154,12 @@ void ControllableUI::showContextMenu()
 void ControllableUI::setOpaqueBackground(bool value)
 {
 	opaqueBackground = value;
+}
+
+void ControllableUI::showEditWindow()
+{
+	if (customShowEditWindowFunction != nullptr) customShowEditWindowFunction(this);
+	else showEditWindowInternal();
 }
 
 void ControllableUI::newMessage(const Controllable::ControllableEvent & e)
