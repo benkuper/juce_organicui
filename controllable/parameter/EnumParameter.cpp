@@ -67,7 +67,7 @@ var EnumParameter::getValueData() {
 	return ev->value;
 }
 
-inline String EnumParameter::getValueKey() {
+String EnumParameter::getValueKey() {
 	return value.toString();
 }
 
