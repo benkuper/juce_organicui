@@ -47,7 +47,7 @@ public:
 	static T* findParentAs(WeakReference<ControllableContainer> _cc, int maxLevel = -1)
 	{
 		int curLevel = 0;
-		if (c == nullptr || c.wasObjectDeleted()) return nullptr;
+		if (_cc == nullptr || _cc.wasObjectDeleted()) return nullptr;
 
 		WeakReference<ControllableContainer> cc = _cc->parentContainer;
 
