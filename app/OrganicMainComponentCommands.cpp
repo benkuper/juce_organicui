@@ -460,7 +460,11 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 	{
 		InspectableSelectionManager* selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
 		Array<BaseItem *> items = selectionManager->getInspectablesAs<BaseItem>();
-		for(auto &i : items) i->selectPrevious(info.keyPress.getModifiers().isShiftDown());
+		for (auto& i : items)
+		{
+			if (i == nullptr) continue;
+			i->selectPrevious(info.keyPress.getModifiers().isShiftDown());
+		}
 	}
 	break; 
 	
@@ -468,7 +472,11 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 	{
 		InspectableSelectionManager* selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
 		Array<BaseItem*> items = selectionManager->getInspectablesAs<BaseItem>();
-		for (auto& i : items) i->selectNext(info.keyPress.getModifiers().isShiftDown());
+		for (auto& i : items) 
+		{
+			if (i == nullptr) continue;
+			i->selectNext(info.keyPress.getModifiers().isShiftDown());
+		}
 	}
 	break;
 
