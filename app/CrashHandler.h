@@ -12,7 +12,7 @@ public:
 	File crashFile;
 	URL remoteURL;
 
-	void init();
+	bool init(); //returns true if a crashlog is found
 
 	void uploadDump();
 	void run();

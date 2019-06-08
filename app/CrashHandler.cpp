@@ -35,7 +35,7 @@ CrashDumpUploader::~CrashDumpUploader()
 {
 }
 
-void CrashDumpUploader::init()
+bool CrashDumpUploader::init()
 {
 
 #if JUCE_WINDOWS
@@ -53,8 +53,10 @@ void CrashDumpUploader::init()
     {
         LOGWARNING("Crash log found, sending to Houston...");
         startThread();
+		return true;
     }
 
+	return false;
 	
 }
 
