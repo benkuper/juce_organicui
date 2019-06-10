@@ -79,7 +79,9 @@ void  StringParameter::setValueInternal(var & newVal){
 	
 	if (newVal.isArray())
 	{
-		for (int i = 0; i < newVal.size(); i++) value = (i > 0 ? " " : "") + newVal[i].toString();
+		String v = "";
+		for (int i = 0; i < newVal.size(); i++) v += (i > 0 ? " " : "") + newVal[i].toString();
+		value = v;
 	} else
 	{
 		value = newVal.toString();
