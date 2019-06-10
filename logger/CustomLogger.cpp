@@ -1,7 +1,7 @@
 juce_ImplementSingleton(CustomLogger);
 
 CustomLogger::CustomLogger() :
-	notifier(5000),
+	notifier(2000, false),
 	welcomeMessage(getApp().getApplicationName() + " v" + String(ProjectInfo::versionString) + " : (" + String(Time::getCompilationDate().formatted("%d/%m/%y (%R)")) + ")")
  {
 	

@@ -72,7 +72,7 @@ CustomLoggerUI::CustomLoggerUI(const String& contentName, CustomLogger * l) :
 	ShapeShifterContentComponent(contentName),
 	logger(l),
 	logList(this),
-	maxNumElement(100),
+	maxNumElement(2000),
 	totalLogRow(0),
 	lastUpdateTime(0)
 {
@@ -232,7 +232,7 @@ const LogElement* CustomLoggerUI::getElementForRow(const int r) const {
 const String  CustomLoggerUI::getTimeStringForRow(const int r) const
 {
 	if (auto el = getElementForRow(r)) {
-		return String(el->time.toString(false, true, true, true));
+		return String(el->time.toString(false, true, true, true)+"."+String(el->time.getMilliseconds()));
 	}
 
 	return "";
