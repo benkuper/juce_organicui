@@ -20,6 +20,10 @@ public:
 
 	bool canNavigate;
 
+	//
+	bool centerUIAroundPosition;
+	bool updatePositionOnDragMove;
+
 	//Zoom
 	bool canZoom;
 	bool zoomAffectsItemSize;
@@ -45,6 +49,7 @@ public:
 	virtual void resized() override;
 
 	virtual void updateViewUIPosition(U * se);
+	virtual void updateComponentViewPosition(Component* c, Point<float> position);
 
 	virtual void updateItemsVisibility() override;
 
@@ -56,7 +61,7 @@ public:
 	Point<int> getViewPos(const Point<int> &originalPos);
 	Point<int> getViewCenter();
 	Point<float> getPosInView(const Point<float> &viewPos);
- juce::Rectangle<float> getBoundsInView(const juce::Rectangle<float> &r);
+	juce::Rectangle<float> getBoundsInView(const juce::Rectangle<float> &r);
 	Point<float> getItemsCenter();
 
 	virtual void homeView();
@@ -68,7 +73,10 @@ public:
 
 	//virtual void itemUIGrabbed(BaseItemMinimalUI<T> * se) override;
 
+	void itemDragMove(const DragAndDropTarget::SourceDetails& dragSourceDetails) override;
     void itemDropped(const DragAndDropTarget::SourceDetails &dragSourceDetails) override;
+
+	virtual Point<int> getPositionFromDrag(Component * c, const DragAndDropTarget::SourceDetails& dragSourceDetails);
 
 	virtual void itemUIMiniModeChanged(BaseItemUI<T> * itemUI) override;
 	virtual void itemUIViewPositionChanged(BaseItemMinimalUI<T> * itemUI) override;
@@ -83,6 +91,8 @@ template<class M, class T, class U>
 BaseManagerViewUI<M, T, U>::BaseManagerViewUI(const String & contentName, M * _manager) :
 	BaseManagerUI<M, T, U>(contentName, _manager, false),
 	canNavigate(true),
+	centerUIAroundPosition(false),
+	updatePositionOnDragMove(false),
 	canZoom(true),
 	zoomAffectsItemSize(true),
 	viewZoom(1),
@@ -206,14 +216,24 @@ template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::updateViewUIPosition(U * itemUI)
 {	
 	if (itemUI == nullptr) return;
-	Point<int> p = getPosInView(itemUI->item->viewUIPosition->getPoint()).toInt();
-	itemUI->setTopLeftPosition(p.x, p.y);
+	updateComponentViewPosition((Component *)itemUI, itemUI->item->viewUIPosition->getPoint());
 	
-	AffineTransform t = AffineTransform().scaled(viewZoom, viewZoom, p.x, p.y);
-	
+}
+
+template<class M, class T, class U>
+void BaseManagerViewUI<M, T, U>::updateComponentViewPosition(Component* c, Point<float> position)
+{
+	if (c == nullptr) return;
+
+	Point<int> p = getPosInView(position).toInt();
+
+	if (centerUIAroundPosition) p -= (Point<int>(c->getWidth(), c->getHeight()) * viewZoom) / 2;
+	c->setTopLeftPosition(p.x, p.y);
+
 	if (zoomAffectsItemSize)
 	{
-		((Component *)itemUI)->setTransform(t);
+		AffineTransform t = AffineTransform().scaled(viewZoom, viewZoom, p.x, p.y);
+		c->setTransform(t);
 	}
 }
 
@@ -329,21 +349,42 @@ void BaseManagerViewUI<M, T, U>::addItemUIInternal(U * se)
 }
 
 template<class M, class T, class U>
+void BaseManagerViewUI<M, T, U>::itemDragMove(const DragAndDropTarget::SourceDetails& dragSourceDetails)
+{
+	BaseManagerUI<M, T, U>::itemDragMove(dragSourceDetails);
+
+	if (updatePositionOnDragMove)
+	{
+		BaseItemMinimalUI<T>* bui = dynamic_cast<BaseItemMinimalUI<T>*>(dragSourceDetails.sourceComponent.get());
+
+		if (bui != nullptr)
+		{
+			Point<int> p = this->getPositionFromDrag(bui, dragSourceDetails);
+			bui->item->viewUIPosition->setUndoablePoint(bui->item->viewUIPosition->getPoint(), p.toFloat());
+		}
+	}
+}
+
+template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::itemDropped(const DragAndDropTarget::SourceDetails & dragSourceDetails)
 {
 	BaseManagerUI<M, T, U>::itemDropped(dragSourceDetails);
 	
 	BaseItemMinimalUI<T> * bui = dynamic_cast<BaseItemMinimalUI<T> *>(dragSourceDetails.sourceComponent.get());
 
-	if (bui != nullptr)
+	if (bui != nullptr &&  this->itemsUI.contains((U*)bui))
 	{
-		if (this->itemsUI.contains((U *)bui))
-		{
-			Point<int> realP = this->getMouseXYRelative() - Point<int>((int)dragSourceDetails.description.getProperty("offsetX", 0), (int)dragSourceDetails.description.getProperty("offsetY", 0));
-			Point<int> targetP = this->getViewPos(realP);
-			bui->item->viewUIPosition->setUndoablePoint(bui->item->viewUIPosition->getPoint(), targetP.toFloat());
-		}
+		Point<int> p = this->getPositionFromDrag(bui, dragSourceDetails);
+		bui->item->viewUIPosition->setUndoablePoint(bui->item->viewUIPosition->getPoint(), p.toFloat());
 	}
+}
+
+template<class M, class T, class U>
+Point<int> BaseManagerViewUI<M, T, U>::getPositionFromDrag(Component * c, const DragAndDropTarget::SourceDetails& dragSourceDetails)
+{
+	Point<int> realP = this->getMouseXYRelative() - Point<int>((int)dragSourceDetails.description.getProperty("offsetX", 0), (int)dragSourceDetails.description.getProperty("offsetY", 0));
+	if (c != nullptr && centerUIAroundPosition) realP += (Point<int>(c->getWidth(), c->getHeight()) * viewZoom) / 2;
+	return this->getViewPos(realP);
 }
 
 template<class M, class T, class U>
