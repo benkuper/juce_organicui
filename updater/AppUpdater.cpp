@@ -148,7 +148,6 @@ void AppUpdater::run()
 
 			bool shouldCheckForBeta = true;
 			if (!GlobalSettings::getInstance()->checkBetaUpdates->boolValue()) shouldCheckForBeta = false;
-			else if (!thisIsBeta && GlobalSettings::getInstance()->onlyCheckBetaFromBeta->boolValue()) shouldCheckForBeta = false;
 
 			var betaData = data.getProperty("betaversion", var());
 			var stableData = data.getProperty("stableversion", var());

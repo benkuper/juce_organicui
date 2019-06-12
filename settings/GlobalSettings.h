@@ -41,7 +41,6 @@ public:
 	BoolParameter * launchMinimised;
 	BoolParameter * checkUpdatesOnStartup;
 	BoolParameter * checkBetaUpdates;
-	BoolParameter * onlyCheckBetaFromBeta;
 	BoolParameter * updateHelpOnStartup;
 	BoolParameter * openLastDocumentOnStartup;
 	BoolParameter * openSpecificFileOnStartup;

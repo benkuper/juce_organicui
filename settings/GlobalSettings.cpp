@@ -26,8 +26,7 @@ GlobalSettings::GlobalSettings() :
 	launchMinimised = startupCC.addBoolParameter("Launch minimised", "If checked, this app will automatically minimized it self when launched", false);
 
 	checkUpdatesOnStartup = startupCC.addBoolParameter("Check updates on startup", "If enabled, app will check if any updates are available",true);
-	checkBetaUpdates = startupCC.addBoolParameter("Check for beta updates", "If enabled the app will also check for beta versions of the software", true);
-	onlyCheckBetaFromBeta = startupCC.addBoolParameter("Only Check beta from beta versions", "If enabled the app will only check beta version when running a beta version itself", true);
+	checkBetaUpdates = startupCC.addBoolParameter("Check for beta updates", "If enabled the app will also check for beta versions of the software", false);
 	updateHelpOnStartup = startupCC.addBoolParameter("Update help on startup", "If enabled, app will try and download the last help file locally", true);
 	
 	openLastDocumentOnStartup = startupCC.addBoolParameter("Load last "+(Engine::mainEngine != nullptr?Engine::mainEngine->fileExtension:"")+" on startup", "If enabled, app will load the last " + Engine::mainEngine->fileExtension + " on startup", false);
@@ -80,9 +79,6 @@ void GlobalSettings::onControllableFeedbackUpdate(ControllableContainer * cc, Co
 	}else if (c == openLastDocumentOnStartup || c == openSpecificFileOnStartup)
 	{
 		fileToOpenOnStartup->setEnabled(openSpecificFileOnStartup->boolValue());
-	}else if (c == checkBetaUpdates)
-	{
-		onlyCheckBetaFromBeta->setEnabled(checkBetaUpdates->boolValue());
 	} else if (c == enableAutoSave)
 	{
 		autoSaveCount->setEnabled(enableAutoSave->boolValue());
