@@ -144,7 +144,7 @@ void AppUpdater::run()
 			if (data.getProperty("testing", false)) return;
 #endif
 
-			bool thisIsBeta = Engine::mainEngine->isBetaVersion;
+			//bool thisIsBeta = Engine::mainEngine->isBetaVersion;
 
 			bool shouldCheckForBeta = true;
 			if (!GlobalSettings::getInstance()->checkBetaUpdates->boolValue()) shouldCheckForBeta = false;
