@@ -74,9 +74,13 @@ void Point3DParameter::setUndoableVector(float oldX, float oldY, float oldZ, flo
 void Point3DParameter::setValueInternal(var & _value)
 {
 	if (!_value.isArray()) return;
+
+	valueSetLock.enter();
+
+	bool hasChanged = false;
+
 	if (autoAdaptRange)
 	{
-		bool hasChanged = false;
 		for (int i = 0; i < 3; i++)
 		{
 			if ((float)_value[i] < (float)minimumValue[i]) {
@@ -89,10 +93,6 @@ void Point3DParameter::setValueInternal(var & _value)
 			}
 		}
 
-		if (hasChanged)
-		{
-			setRange(minimumValue, maximumValue, false);
-		}
 	}
 
 	jassert(minimumValue.isArray() && maximumValue.isArray());
@@ -106,6 +106,10 @@ void Point3DParameter::setValueInternal(var & _value)
 	value.append(x);
 	value.append(y);
 	value.append(z);
+
+	valueSetLock.exit();
+
+	if (hasChanged) setRange(minimumValue, maximumValue, false);
 }
 
 void Point3DParameter::setBounds(float _minX, float _minY, float _minZ, float _maxX, float _maxY, float _maxZ)
@@ -163,8 +167,12 @@ void Point3DParameter::setWeightedValue(Array<var> values, Array<float> weights)
 bool Point3DParameter::checkValueIsTheSame(var newValue, var oldValue)
 {
 	if (!(newValue.isArray() && oldValue.isArray())) return false;
+	
+	valueSetLock.enter();
+	bool result = newValue[0] == oldValue[0] && newValue[1] == oldValue[1] && newValue[2] == oldValue[2];
+	valueSetLock.exit();
 
-	return newValue[0] == oldValue[0] && newValue[1] == oldValue[1] && newValue[2] == oldValue[2];
+	return result;
 }
 
 StringArray Point3DParameter::getValuesNames()

@@ -137,7 +137,11 @@ UndoableAction * Parameter::setUndoableValue(var oldValue, var newValue, bool on
 void Parameter::setValue(var _value, bool silentSet, bool force, bool forceOverride)
 {
 	if (!force && checkValueIsTheSame(_value, value)) return;
+	
+	valueSetLock.enter();
 	lastValue = var(value);
+	valueSetLock.exit();
+
 	setValueInternal(_value);
 
 	isOverriden =  _value != defaultValue || forceOverride;

@@ -46,6 +46,7 @@ public:
     var value;
     var lastValue;
 
+	SpinLock valueSetLock;
 
 	//Range
 	bool canHaveRange;

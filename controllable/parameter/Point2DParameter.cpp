@@ -69,9 +69,11 @@ void Point2DParameter::setValueInternal(var & _value)
 {
 	if (!_value.isArray()) return;
 
+	valueSetLock.enter();
+
+	bool hasChanged = false;
 	if (autoAdaptRange)
 	{
-		bool hasChanged = false;
 		for (int i = 0; i < 2; i++)
 		{
 			if ((float)_value[i] < (float)minimumValue[i]) {
@@ -84,7 +86,6 @@ void Point2DParameter::setValueInternal(var & _value)
 			}
 		}
 
-		if (hasChanged) setRange(minimumValue, maximumValue);
 	}
 
 	x = std::isnan((float)value[0]) ? 0 : jlimit<float>(minimumValue[0], maximumValue[0], _value[0]);
@@ -93,6 +94,11 @@ void Point2DParameter::setValueInternal(var & _value)
 	value = var();
 	value.append(x);
 	value.append(y);
+
+	valueSetLock.exit();
+
+	if (hasChanged) setRange(minimumValue, maximumValue);
+
 }
 
 void Point2DParameter::setBounds(float _minX, float _minY, float _maxX, float _maxY)
@@ -151,8 +157,13 @@ void Point2DParameter::setWeightedValue(Array<var> values, Array<float> weights)
 bool Point2DParameter::checkValueIsTheSame(var newValue, var oldValue)
 {
 	if (!(newValue.isArray() && oldValue.isArray())) return false;
+	if (newValue.size() == 0 || oldValue.size() == 0) return false;
 
-	return newValue[0] == oldValue[0] && newValue[1] == oldValue[1];
+	valueSetLock.enter();
+	bool result = newValue[0] == oldValue[0] && newValue[1] == oldValue[1];
+	valueSetLock.exit();
+
+	return result;
 }
 
 ControllableUI * Point2DParameter::createDefaultUI(Controllable * targetControllable)

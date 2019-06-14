@@ -73,7 +73,12 @@ StringArray ColorParameter::getValuesNames()
 bool ColorParameter::checkValueIsTheSame(var oldValue, var newValue)
 {
 	if (!(newValue.isArray() && oldValue.isArray())) return false;
-	return newValue[0] == oldValue[0] && newValue[1] == oldValue[1] && newValue[2] == oldValue[2] && oldValue[3] == newValue[3];
+
+	valueSetLock.enter();
+	bool result = newValue[0] == oldValue[0] && newValue[1] == oldValue[1] && newValue[2] == oldValue[2] && oldValue[3] == newValue[3];
+	valueSetLock.exit();
+
+	return result;
 }
 
 var ColorParameter::getLerpValueTo(var targetValue, float weight)
