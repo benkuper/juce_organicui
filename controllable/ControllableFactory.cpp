@@ -112,7 +112,7 @@ Parameter * ControllableFactory::createParameterFrom(Controllable * source, bool
 		{
 			Parameter * p = dynamic_cast<Parameter *>(d->createFunc());
 			if (copyName) p->setNiceName(source->niceName);
-			p->setRange(sourceP->minimumValue, sourceP->maximumValue);
+			if(sourceP->hasRange()) p->setRange(sourceP->minimumValue, sourceP->maximumValue);
 
 			if (source->type == Controllable::ENUM)
 			{
@@ -120,6 +120,12 @@ Parameter * ControllableFactory::createParameterFrom(Controllable * source, bool
 				EnumParameter * ep = (EnumParameter *)p;
 				ep->clearOptions();
 				for (auto &ev : sourceEP->enumValues) ep->addOption(ev->key, ev->value);
+			}
+			else if (source->type == Controllable::TARGET)
+			{
+				TargetParameter* sourceEP = (TargetParameter*)source;
+				TargetParameter* tp = (TargetParameter*)p;
+				tp->targetType = sourceEP->targetType;
 			}
 
 			if (copyValue)
