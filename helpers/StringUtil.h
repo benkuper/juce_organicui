@@ -55,6 +55,8 @@ public:
 
 };
 
+#pragma warning(push)
+#pragma warning(disable:4245)
 
 class StringUtil
 {
@@ -64,13 +66,16 @@ public:
 
 
     String res = niceName;
-    if(replaceSlashes) res = res.replaceCharacter('/','_');
-    res=res.replaceCharacter('#','_');
-    res=res.replaceCharacter('(','_');
-    res=res.replaceCharacter(')','_');
-    res=res.replaceCharacter('>','_');
-    res=res.replaceCharacter('<','_');
+	if (replaceSlashes) res = res.replaceCharacter('/', '_');
 
+	res = res.replaceCharacter('#', '_').replaceCharacter('(', '_').replaceCharacter(')', '_')
+		.replaceCharacter('[', '_').replaceCharacter(']', '_').replaceCharacter('{', '_').replaceCharacter('}', '_')
+		.replaceCharacter('>', '_').replaceCharacter('<', '_').replaceCharacter(':', '_').replaceCharacter(',', '_').replaceCharacter(';', '_')
+		.replaceCharacter('é', 'e').replaceCharacter('è', 'e').replaceCharacter('ê', 'e')
+		.replaceCharacter('à', 'a').replaceCharacter('â', 'a').replaceCharacter('@','a')
+		.replaceCharacter('ô', 'o')
+		;
+	
     StringArray sa;
     sa.addTokens(res, false);
     int index = 0;
@@ -96,7 +101,7 @@ public:
   }
 
 
-
+#pragma warning(pop)
 
   static CommandLineElements parseCommandLine(const String & commandLine){
     CommandLineElements res;
