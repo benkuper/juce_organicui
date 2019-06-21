@@ -246,14 +246,14 @@ ControllableUI * TargetParameter::createDefaultUI(Controllable * targetControlla
 
 var TargetParameter::getTargetFromScript(const juce::var::NativeFunctionArgs& a)
 {
-	WeakReference<TargetParameter> p = getObjectFromJS<TargetParameter>(a);
-	if (p == nullptr || p.wasObjectDeleted()) return var();
-	if (p->type == CONTROLLABLE)
+	TargetParameter * p = getObjectFromJS<TargetParameter>(a);
+	if (p == nullptr) return var();
+	if (p->targetType == CONTROLLABLE)
 	{
 		Controllable* c = p->target;
 		if (c != nullptr) return c->getScriptObject();
 	}
-	else if (p->type == CONTAINER)
+	else if (p->targetType == CONTAINER)
 	{
 		ControllableContainer* cc = p->targetContainer;
 		if (cc != nullptr) return cc->getScriptObject();
