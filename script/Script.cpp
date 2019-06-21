@@ -346,7 +346,15 @@ var Script::addTargetParameterFromScript(const var::NativeFunctionArgs & args)
 {
 	Script * s = getObjectFromJS<Script>(args);
 	if (!checkNumArgs(s->niceName, args, 2)) return var();
-	return s->scriptParamsContainer.addTargetParameter(args.arguments[0], args.arguments[1])->getScriptObject();
+
+	TargetParameter * tp = s->scriptParamsContainer.addTargetParameter(args.arguments[0], args.arguments[1]);
+	if (args.numArguments >= 3)
+	{
+		bool isContainer = (int)args.arguments[2] > 0;
+		if (isContainer) tp->targetType = TargetParameter::CONTAINER;
+	}
+
+	return tp->getScriptObject();
 }
 
 var Script::addColorParameterFromScript(const var::NativeFunctionArgs & args)

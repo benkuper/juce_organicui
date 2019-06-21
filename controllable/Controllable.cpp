@@ -278,6 +278,30 @@ var Controllable::setValueFromScript(const juce::var::NativeFunctionArgs& a) {
 				if (value.isArray() && value.size() >= 3) ((Point3DParameter *)c)->setVector((float)value[0], (float)value[1], (float)value[2]);
 				break;
 
+			case Controllable::Type::ENUM:
+				((EnumParameter*)c)->setValueWithKey(value.toString());
+				break;
+
+			case Controllable::Type::TARGET:
+				if (value.isObject())
+				{
+					TargetParameter* tp = (TargetParameter*)c;
+					if (tp->targetType == TargetParameter::CONTROLLABLE)
+					{
+						Controllable * target = static_cast<Controllable *>((Controllable*)(int64)value.getDynamicObject()->getProperty(scriptPtrIdentifier));
+						if (target != nullptr) tp->setValueFromTarget((Controllable *)target);
+					}else
+					{
+						ControllableContainer * target = static_cast<ControllableContainer*>((ControllableContainer*)(int64)value.getDynamicObject()->getProperty(scriptPtrIdentifier));
+						if (target != nullptr) tp->setValueFromTarget(target);
+					}
+				}
+				else
+				{
+					LOGWARNING("Set target from script, value is not an object");
+				}
+				break;
+
 			default:
 				success = false;
 				break;

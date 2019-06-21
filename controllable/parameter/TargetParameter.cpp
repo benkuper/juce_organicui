@@ -36,6 +36,8 @@ TargetParameter::TargetParameter(const String & niceName, const String & descrip
 
 	setRootContainer(rootReference != nullptr?rootReference:Engine::mainEngine);
 	
+	scriptObject.setMethod("getTarget", TargetParameter::getTargetFromScript);
+
 	argumentsDescription = "target";
 }
 
@@ -58,14 +60,31 @@ void TargetParameter::setGhostValue(const String & ghostVal)
 
 void TargetParameter::setValueFromTarget(Controllable * c, bool addToUndo)
 {
-	if (target != nullptr && c == target.get())
+	String newValue;
+
+	if (target != nullptr)
 	{
-		String ca = target->getControlAddress();
-		if (stringValue() == ca) return;
+
+		if (c == target.get())
+		{
+			String ca = target->getControlAddress();
+			if (stringValue() == ca)
+			{
+				return;
+			}
+		}
+
+		if (target->type < 0)
+		{
+			DBG("Target is not good !");
+			return;
+		}
+
+		newValue = c->getControlAddress(rootContainer);
 	}
 	
-	if(addToUndo) setUndoableValue(stringValue(), c->getControlAddress(rootContainer));
-	else setValue(c->getControlAddress(rootContainer), false, true);
+	if(addToUndo) setUndoableValue(stringValue(), newValue);
+	else setValue(newValue, false, true);
 }
 
 void TargetParameter::setValueFromTarget(ControllableContainer * cc, bool addToUndo)
@@ -223,4 +242,22 @@ TargetParameterUI * TargetParameter::createTargetUI(TargetParameter * _target)
 ControllableUI * TargetParameter::createDefaultUI(Controllable * targetControllable)
 {
 	return createTargetUI((TargetParameter*)targetControllable);
+}
+
+var TargetParameter::getTargetFromScript(const juce::var::NativeFunctionArgs& a)
+{
+	WeakReference<TargetParameter> p = getObjectFromJS<TargetParameter>(a);
+	if (p == nullptr || p.wasObjectDeleted()) return var();
+	if (p->type == CONTROLLABLE)
+	{
+		Controllable* c = p->target;
+		if (c != nullptr) return c->getScriptObject();
+	}
+	else if (p->type == CONTAINER)
+	{
+		ControllableContainer* cc = p->targetContainer;
+		if (cc != nullptr) return cc->getScriptObject();
+	}
+
+	return var();
 }
