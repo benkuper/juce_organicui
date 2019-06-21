@@ -213,6 +213,8 @@ void Script::onContainerTriggerTriggered(Trigger * t)
 
 void Script::onControllableFeedbackUpdateInternal(ControllableContainer * cc, Controllable * c)
 {
+	if (Engine::mainEngine->isClearing) return;
+
 	if (cc == &scriptParamsContainer)
 	{
 		Array<var> args;
