@@ -62,10 +62,10 @@ void TargetParameter::setValueFromTarget(Controllable * c, bool addToUndo)
 {
 	String newValue;
 
-	if (target != nullptr)
+	if (c != nullptr)
 	{
 
-		if (c == target.get())
+		if (target != nullptr && c == target.get())
 		{
 			String ca = target->getControlAddress();
 			if (stringValue() == ca)
@@ -74,7 +74,7 @@ void TargetParameter::setValueFromTarget(Controllable * c, bool addToUndo)
 			}
 		}
 
-		if (target->type < 0)
+		if (c->type < 0)
 		{
 			DBG("Target is not good !");
 			return;
