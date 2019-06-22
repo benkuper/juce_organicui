@@ -15,13 +15,16 @@ class UpdateDialogWindow :
 	public Button::Listener
 {
 public:
-	UpdateDialogWindow(const String &msg, const String &changelog, FloatParameter * progression);
+	UpdateDialogWindow(const String &msg, const String &version, const String &changelog, FloatParameter * progression);
 	~UpdateDialogWindow() {}
+
+	String version;
 	Label msgLabel;
 	TextEditor changelogLabel;
 
 	TextButton okButton;
 	TextButton cancelButton;
+	TextButton skipThisVersionButton;
 
 	std::unique_ptr<FloatSliderUI> progressionUI;
 
@@ -37,10 +40,12 @@ public:
 	enum Type { UPDATE_AVAILABLE, DOWNLOAD_STARTED, DOWNLOAD_PROGRESS, DOWNLOAD_ERROR, UPDATE_FINISHED };
 
 	AppUpdateEvent(Type t, File f = File()) : type(t), file(f) {}
-	AppUpdateEvent(Type t, bool beta, String title, String msg, String changelog) : type(t), beta(beta), title(title), msg(msg), changelog(changelog) {}
+	AppUpdateEvent(Type t, String version, bool beta, String title, String msg, String changelog) : version(version), type(t), beta(beta), title(title), msg(msg), changelog(changelog) {}
+	
 	Type type;
 	File file;
 
+	String version;
 	bool beta;
 	String title;
 	String msg;
@@ -73,12 +78,14 @@ public:
 
 	std::unique_ptr<URL::DownloadTask> downloadTask;
 
-	void setURLs(URL _updateURL, String _downloadURLBase, String filePrefix);
+	void setURLs(URL _updateURL, StringRef _downloadURLBase, StringRef filePrefix);
 
-	String getDownloadFileName(String version, bool beta, String extension); 
+	String getDownloadFileName(StringRef version, bool beta, StringRef extension); 
 	void checkForUpdates();
 
-	void showDialog(bool beta, String title, String msg, String changelog);
+	void setSkipThisVersion(String version);
+
+	void showDialog(StringRef version, bool beta, StringRef title, StringRef msg, StringRef changelog);
 	void downloadUpdate();
 
 
