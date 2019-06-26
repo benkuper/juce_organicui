@@ -147,6 +147,13 @@ Result Engine::saveDocument(const File& file) {
 
 	if (file.exists()) file.deleteFile();
 	std::unique_ptr<OutputStream> os(file.createOutputStream());
+	if (os == nullptr)
+	{
+		LOGERROR("Error saving document, please try again");
+		AlertWindow::showMessageBox(AlertWindow::AlertIconType::WarningIcon, "Session save error", "Damned ! Something went wrong when saving the file, you should definitely try to save it again.", "Gotcha");
+		return Result::fail("Could not save the file : output stream is null");
+	}
+
 	JSON::writeToStream(*os, data);
 	os->flush();
 
