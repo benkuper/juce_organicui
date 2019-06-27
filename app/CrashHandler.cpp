@@ -26,7 +26,8 @@ char * dumpFileName = (char *)"notset.dmp";
 juce_ImplementSingleton(CrashDumpUploader)
 
 CrashDumpUploader::CrashDumpUploader() :
-	Thread("Crashdump")
+	Thread("Crashdump"),
+	 crashFound(false)
 {
 
 }
@@ -53,9 +54,11 @@ bool CrashDumpUploader::init()
     {
         LOGWARNING("Crash log found, sending to Houston...");
         startThread();
+		crashFound = true;
 		return true;
     }
 
+	crashFound = false;
 	return false;
 	
 }
