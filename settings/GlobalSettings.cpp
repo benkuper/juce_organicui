@@ -35,6 +35,8 @@ GlobalSettings::GlobalSettings() :
 	fileToOpenOnStartup = new FileParameter("File to load on startup", "File to load when start, if the option above is checked", "", false);
 	startupCC.addParameter(fileToOpenOnStartup);
 	
+	enableCrashUpload = startupCC.addBoolParameter("Enable Crash Upload", "If checked and a crashlog is found at startup, it will automatically upload it.\nThis crash log is a very small file but is immensely helpful for me, so please leave this option enabled unless you strongly feel like not helping me :)", true);
+
 	addChildControllableContainer(&startupCC);
 
 

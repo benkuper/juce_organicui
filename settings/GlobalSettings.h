@@ -42,9 +42,11 @@ public:
 	BoolParameter * checkUpdatesOnStartup;
 	BoolParameter * checkBetaUpdates;
 	BoolParameter * updateHelpOnStartup;
+	
 	BoolParameter * openLastDocumentOnStartup;
 	BoolParameter * openSpecificFileOnStartup;
 	StringParameter * fileToOpenOnStartup;
+	BoolParameter * enableCrashUpload;
 
 	ControllableContainer saveLoadCC;
 	BoolParameter * enableAutoSave;

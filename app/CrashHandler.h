@@ -11,6 +11,8 @@ public:
 
 	File crashFile;
 	URL remoteURL;
+
+	bool uploadEnabled;
 	bool crashFound;
 
 	bool init(); //returns true if a crashlog is found

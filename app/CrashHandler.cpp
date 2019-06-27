@@ -27,7 +27,8 @@ juce_ImplementSingleton(CrashDumpUploader)
 
 CrashDumpUploader::CrashDumpUploader() :
 	Thread("Crashdump"),
-	 crashFound(false)
+	crashFound(false),
+	uploadEnabled(true)
 {
 
 }
@@ -65,6 +66,13 @@ bool CrashDumpUploader::init()
 
 void CrashDumpUploader::uploadDump()
 {
+	if (!uploadEnabled)
+	{
+		LOGWARNING("Crash dump upload has been disabled");
+		crashFile.deleteFile();
+		return;
+	}
+
 	if (remoteURL.isEmpty())
 	{
 		LOGWARNING("Crash dump upload url has not been assigned");
@@ -146,16 +154,16 @@ LONG WINAPI createMiniDump(LPEXCEPTION_POINTERS exceptionPointers)
 		_tprintf(_T("CreateFile failed. Error: %u \n"), GetLastError());
 	}
 	 
-	int selectedButtonId = MessageBox(nullptr,
-		_T("Oh, no ! Chataigne got very sad and died alone. Would you help find find out why ? If you click Yes, the file will automatically be uploaded at the next launch of Chataigne. If not, nothing will be done and this sad event will be forever forgotten."),
+	MessageBox(nullptr,
+		_T("Oh, no ! Chataigne got very sad and died alone. The autospy report will be send to the headquarters for further investigation. You can disable this procedure in your preferences, but please remember that the forensics team needs sample to keep healing our little Chataigne ! Otherwise nothing will be done and this sad event will be forever forgotten."),
 		_T("Sacré Hubert, toujours le mot pour rire !"),
-		MB_ICONWARNING | MB_YESNO | MB_DEFBUTTON1
+		MB_ICONWARNING | MB_OK
 	);
 
-	_tprintf(_T("User pushed : %d \n"), selectedButtonId);
+	//_tprintf(_T("User pushed : %d \n"), selectedButtonId);
 
-	if (selectedButtonId == IDNO)
-		DeleteFile(dumpFileName);
+	//if (selectedButtonId == IDNO)
+	//	DeleteFile(dumpFileName);
 	
 	return EXCEPTION_EXECUTE_HANDLER;
 }

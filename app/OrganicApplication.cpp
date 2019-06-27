@@ -16,6 +16,7 @@ OpenGLContext * getOpenGLContext() { return &getApp().mainComponent->openGLConte
 ApplicationCommandManager& getCommandManager() { return getApp().commandManager; }
 OrganicApplication::MainWindow * getMainWindow() { return getApp().mainWindow.get(); }
 
+#define TEST_CRASH 0
 
 OrganicApplication::OrganicApplication(const String &appName, bool useWindow) :
 	appSettings("Other Settings"),
@@ -76,10 +77,16 @@ void OrganicApplication::initialise(const String & commandLine)
 
 	//Crash handler
 //#if JUCE_WINDOWS
+	CrashDumpUploader::getInstance()->uploadEnabled = GlobalSettings::getInstance()->enableCrashUpload->boolValue();
 	CrashDumpUploader::getInstance()->init();
 //#endif
 
 	afterInit();
+
+#if TEST_CRASH
+	Engine* n = nullptr;
+	n->getJSONData();
+#endif
 }
 
 void OrganicApplication::shutdown()
