@@ -50,7 +50,7 @@ void FloatSliderUI::paint(Graphics & g)
 
 	if (shouldBailOut()) return;
 
-	Colour baseColour = useCustomColor ? customColor : (isInteractable()? PARAMETER_FRONT_COLOR : FEEDBACK_COLOR);
+	Colour baseColour = useCustomColor ? customColor : (isInteractable()? PARAMETER_FRONT_COLOR.darker() : FEEDBACK_COLOR);
     Colour c = (isMouseButtonDown() && changeParamOnMouseUpOnly) ? HIGHLIGHT_COLOR : baseColour;
 
     juce::Rectangle<int> sliderBounds = getLocalBounds();
@@ -83,9 +83,8 @@ void FloatSliderUI::paint(Graphics & g)
 
 
     if(showLabel || showValue){
-        //Colour textColor = normalizedValue > .5f?Colours::darkgrey : Colours::grey;
 
-		g.setColour(Colours::grey);
+		g.setColour(Colours::lightgrey);
 
         sliderBounds = getLocalBounds();
 		juce::Rectangle<int> destRect;
