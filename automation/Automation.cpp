@@ -313,7 +313,7 @@ void Automation::onControllableFeedbackUpdate(ControllableContainer * cc, Contro
 
 			if (swapped)
 			{
-				baseManagerListeners.call(&Listener::itemsReordered);
+				baseManagerListeners.call(&ManagerListener::itemsReordered);
 				managerNotifier.addMessage(new BaseManager::ManagerEvent(BaseManager::ManagerEvent::ITEMS_REORDERED));
 			}
 		}

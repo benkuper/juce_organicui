@@ -410,7 +410,7 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 		if (item != nullptr) item->paste();
 		else
 		{
-			BaseItem::Listener * m = selectionManager->getInspectableAs<BaseItem::Listener>();
+			BaseItemListener * m = selectionManager->getInspectableAs<BaseItemListener>();
 			if (m != nullptr) m->askForPaste();
 		}
 	}
@@ -450,7 +450,7 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 		if (item != nullptr) item->selectAll();
 		else
 		{
-			BaseItem::Listener * m = selectionManager->getInspectableAs<BaseItem::Listener>();
+			BaseItemListener * m = selectionManager->getInspectableAs<BaseItemListener>();
 			if (m != nullptr) m->askForSelectAllItems();
 		}
 	}

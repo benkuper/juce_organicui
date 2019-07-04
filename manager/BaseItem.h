@@ -10,11 +10,13 @@
 
 #pragma once
 
-class ScriptManager;
 class GenericControllableManager;
+class ScriptManager;
+class Script;
 
 class BaseItem :
-	public EnablingControllableContainer
+	public EnablingControllableContainer,
+	public BaseManager<Script>::ManagerListener
 {
 public:
 	BaseItem(const String &name = "", bool canBeDisabled = true, bool canHaveScript = false);
@@ -58,6 +60,8 @@ public:
 	void onControllableFeedbackUpdate(ControllableContainer * cc, Controllable * c) override;
 	virtual void onControllableFeedbackUpdateInternal(ControllableContainer * cc, Controllable * c) {};
 
+	void itemAdded(Script* script) override;
+
 	var getJSONData() override;
 	void loadJSONDataInternal(var data) override;
 
@@ -65,25 +69,10 @@ public:
 	
 	virtual String getTypeString() const { return "BaseItem"; };
 
-	class  Listener
-	{
-	public:
-		/** Destructor. */
-		virtual ~Listener() {}
-		virtual void askForRemoveBaseItem(BaseItem *) {}
-		virtual void askForDuplicateItem(BaseItem *) {}
-		virtual void askForPaste() {}
-		virtual void askForMoveBefore(BaseItem *) {}
-		virtual void askForMoveAfter(BaseItem *) {}
-		virtual void askForSelectAllItems() {}
-		virtual void askForSelectPreviousItem(BaseItem *, bool addToSelection = false) {}
-		virtual void askForSelectNextItem(BaseItem *, bool addToSelection = false) {}
-	};
 
-
-	ListenerList<Listener> baseItemListeners;
-	void addBaseItemListener(Listener* newListener) { baseItemListeners.add(newListener); }
-	void removeBaseItemListener(Listener* listener) { baseItemListeners.remove(listener); }
+	ListenerList<BaseItemListener> baseItemListeners;
+	void addBaseItemListener(BaseItemListener* newListener) { baseItemListeners.add(newListener); }
+	void removeBaseItemListener(BaseItemListener* listener) { baseItemListeners.remove(listener); }
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BaseItem)

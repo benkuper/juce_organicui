@@ -355,6 +355,7 @@ void ControllableContainer::addChildControllableContainer(ControllableContainer 
 
 	controllableContainers.insert(index, container);
 	container->addControllableContainerListener(this);
+	container->addAsyncWarningTargetListener(this);
 	container->setParentContainer(this);
 	controllableContainerListeners.call(&ControllableContainerListener::controllableContainerAdded, container);
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableContainerAdded, this, container));
@@ -373,6 +374,7 @@ void ControllableContainer::removeChildControllableContainer(ControllableContain
 	
 	this->controllableContainers.removeAllInstancesOf(container);
 	container->removeControllableContainerListener(this);
+	container->removeAsyncWarningTargetListener(this);
 	controllableContainerListeners.call(&ControllableContainerListener::controllableContainerRemoved, container);
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableContainerRemoved, this, container));
 

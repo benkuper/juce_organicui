@@ -13,7 +13,7 @@
 class DashboardManagerView :
 	public ShapeShifterContentComponent,
 	public InspectableSelectionManager::Listener,
-	public DashboardManager::Listener
+	public DashboardManager::ManagerListener
 {
 public:
 	DashboardManagerView(const String &contentName, DashboardManager * manager);

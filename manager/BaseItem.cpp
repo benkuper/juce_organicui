@@ -25,6 +25,7 @@ BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts
 	if (canHaveScripts)
 	{
 		scriptManager.reset(new ScriptManager(this));
+		scriptManager->addBaseManagerListener(this);
 		addChildControllableContainer(scriptManager.get());
 	}
 
@@ -60,7 +61,7 @@ BaseItem::~BaseItem()
 
 void BaseItem::duplicate()
 {
-	baseItemListeners.call(&BaseItem::Listener::askForDuplicateItem, this);
+	baseItemListeners.call(&BaseItemListener::askForDuplicateItem, this);
 }
 
 void BaseItem::copy()
@@ -74,38 +75,38 @@ void BaseItem::copy()
 bool BaseItem::paste()
 {
 	//default behavior can be overriden
-	baseItemListeners.call(&BaseItem::Listener::askForPaste);
+	baseItemListeners.call(&BaseItemListener::askForPaste);
 	return true;
 }
 
 void BaseItem::selectAll()
 {
-	baseItemListeners.call(&BaseItem::Listener::askForSelectAllItems);
+	baseItemListeners.call(&BaseItemListener::askForSelectAllItems);
 }
 
 void BaseItem::selectPrevious(bool addToSelection)
 {
-	baseItemListeners.call(&BaseItem::Listener::askForSelectPreviousItem, this, addToSelection);
+	baseItemListeners.call(&BaseItemListener::askForSelectPreviousItem, this, addToSelection);
 }
 
 void BaseItem::selectNext(bool addToSelection)
 {
-	baseItemListeners.call(&BaseItem::Listener::askForSelectNextItem, this, addToSelection);
+	baseItemListeners.call(&BaseItemListener::askForSelectNextItem, this, addToSelection);
 }
 
 void BaseItem::moveBefore()
 {
-	baseItemListeners.call(&BaseItem::Listener::askForMoveBefore, this);
+	baseItemListeners.call(&BaseItemListener::askForMoveBefore, this);
 }
 
 void BaseItem::moveAfter()
 {
-	baseItemListeners.call(&BaseItem::Listener::askForMoveAfter, this);
+	baseItemListeners.call(&BaseItemListener::askForMoveAfter, this);
 }
 
 void BaseItem::remove()
 {
-	baseItemListeners.call(&BaseItem::Listener::askForRemoveBaseItem, this);
+	baseItemListeners.call(&BaseItemListener::askForRemoveBaseItem, this);
 }
 
 
@@ -134,6 +135,11 @@ void BaseItem::onContainerTriggerTriggered(Trigger * t)
 void BaseItem::onControllableFeedbackUpdate(ControllableContainer * cc, Controllable * c)
 {
 	onControllableFeedbackUpdateInternal(cc, c);
+}
+
+void BaseItem::itemAdded(Script* script)
+{
+	script->warningResolveInspectable = this;
 }
 
 var BaseItem::getJSONData()

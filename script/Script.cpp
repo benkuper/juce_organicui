@@ -79,6 +79,7 @@ void Script::loadScript()
 	{
 		NLOG(niceName, "Path " + path + " is not a valid Windows-style path.");
 		setState(SCRIPT_ERROR);
+		setWarningMessage("Path " + path + " is not a valid Windows-style path.");
 		return; //OSX / Linux file
 	}
 #endif
@@ -88,8 +89,9 @@ void Script::loadScript()
 	if (!f.exists())
 	{
 		//check local director
-		NLOG("Script", "File not found : " + f.getFileName());
+		NLOG(niceName, "File not found : " + f.getFileName());
 		setState(SCRIPT_EMPTY);
+		setWarningMessage("File not found : " + f.getFileName());
 		return;
 	}
 
@@ -116,11 +118,13 @@ void Script::loadScript()
 		callFunction("init", Array<var>());
 
 		setState(SCRIPT_LOADED);
+		clearWarning();
 	}
 	else
 	{
 		NLOG("Script : " + niceName, "Script error : " + result.getErrorMessage());
 		setState(SCRIPT_ERROR);
+		setWarningMessage("Script error : " + result.getErrorMessage());
 		return;
 	}
 

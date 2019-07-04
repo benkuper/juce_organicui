@@ -48,7 +48,7 @@ public:
 template<class M, class T, class U>
 class BaseManagerUI :
 	public InspectableContentComponent,
-	public BaseManager<T>::Listener,
+	public BaseManager<T>::ManagerListener,
 	public BaseManager<T>::AsyncListener,
 	public Button::Listener,
 	public EngineListener,

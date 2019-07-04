@@ -1,10 +1,9 @@
 WarningTargetUI::WarningTargetUI(WarningTarget* target) :
 	target(target)
 {
-	String s = target->getWarningMessage();
-
 	target->addAsyncWarningTargetListener(this);
-
+	
+	String s = target->getWarningMessage();
 	setVisible(s.isNotEmpty());
 	setTooltip(s);
 }
