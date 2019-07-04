@@ -23,9 +23,9 @@ public:
 	
 	Label label;
 	std::unique_ptr<ControllableUI> ui;
-	std::unique_ptr<ImageButton> editBT;
 	std::unique_ptr<ImageButton> removeBT;
 	std::unique_ptr<ImageButton> enableBT;
+	std::unique_ptr<WarningTargetUI> warningUI;
 	
 	int baseHeight; //height at init
 	int subContentHeight; //for additional content
@@ -40,6 +40,8 @@ public:
 	void mouseDown(const MouseEvent &e) override;
 
 	void newMessage(const Controllable::ControllableEvent &e) override;
+
+	void componentVisibilityChanged(Component& c) override;
 
     void buttonClicked(Button * b) override;
 };

@@ -82,8 +82,10 @@ void ControllableContainer::addControllable(Controllable * c)
 {
 	if (c->type == Controllable::TRIGGER) addTriggerInternal((Trigger *)c);
 	else addParameterInternal((Parameter *)c);
+
 	c->addControllableListener(this);
-	
+	c->addAsyncWarningTargetListener(this);
+	c->warningResolveInspectable = this;
 }
 
 void ControllableContainer::addParameter(Parameter * p)
@@ -244,6 +246,7 @@ void ControllableContainer::removeControllable(WeakReference<Controllable> c)
 		p->removeAsyncParameterListener(this);
 	}
 
+	c->removeAsyncWarningTargetListener(this);
 	c->removeControllableListener(this);
 
 	onControllableRemoved(c);
@@ -274,6 +277,16 @@ void ControllableContainer::newMessage(const Parameter::ParameterEvent &e)
 		onContainerParameterChangedAsync(e.parameter, e.value);
 	}
 }
+void ControllableContainer::newMessage(const WarningTarget::WarningTargetEvent& e)
+{
+	switch (e.type)
+	{
+	case WarningTarget::WarningTargetEvent::WARNING_CHANGED:
+		warningChanged(e.target);
+		break;
+	}
+}
+
 UndoableAction * ControllableContainer::setUndoableNiceName(const String & newNiceName, bool onlyReturnAction)
 {
 	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile)
@@ -677,6 +690,38 @@ void ControllableContainer::askForRemoveControllable(Controllable * c, bool addT
 	else removeControllable(c);
 }
 
+void ControllableContainer::warningChanged(WarningTarget *target)
+{
+	setWarningMessage(getWarningMessage());
+	onWarningChanged(target);
+	if (parentContainer != nullptr) parentContainer->warningChanged(target);
+}
+
+String ControllableContainer::getWarningMessage() const
+{
+	StringArray s;
+	s.add(WarningTarget::getWarningMessage());
+
+	for (auto& c : controllables)
+	{
+		String cs = c->getWarningMessage();
+		if (cs.isNotEmpty())
+		{
+			s.add(c->niceName + " : " + cs);
+		}
+	}
+
+	for (auto& cc : controllableContainers)
+	{
+		String cs = cc->getWarningMessage();
+		if (cs.isNotEmpty())
+		{
+			s.add(cc->niceName + " : " + cs);
+		}
+	}
+
+	return s.joinIntoString("\n");
+}
 
 var ControllableContainer::getJSONData()
 {

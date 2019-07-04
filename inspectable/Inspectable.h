@@ -13,7 +13,8 @@
 class InspectableEditor;
 class InspectableSelectionManager;
 
-class Inspectable
+class Inspectable :
+	public WarningTarget
 {
 public:
 	Inspectable();
@@ -24,6 +25,7 @@ public:
 	bool isSelected;
 	bool isSelectable;
 	bool showInspectorOnSelect;
+
 	bool hideInEditor;
 
 	bool isHighlighted;
@@ -56,6 +58,7 @@ public:
 	void setPreselected(bool value);
 
 	virtual void setSelectedInternal(bool value); //to be overriden
+
 
 	virtual InspectableEditor * getEditor(bool /*isRoot*/) { jassert(false);  return nullptr; } //to override !
 

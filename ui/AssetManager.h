@@ -19,6 +19,8 @@ public:
 	AssetManager();
 	virtual ~AssetManager();
 
+	Image warningImage;
+
 	ImageButton * getRemoveBT();
 	ImageButton * getConfigBT();
 	ImageButton * getTargetBT();

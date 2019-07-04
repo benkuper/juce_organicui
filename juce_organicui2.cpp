@@ -78,3 +78,8 @@
 #include "app/OrganicApplication.cpp"
 
 #include "remotecontrol/OSCRemoteControl.cpp"
+
+#include "warning/WarningTarget.cpp"
+#include "warning/WarningReporter.cpp"
+#include "warning/ui/WarningTargetUI.cpp"
+#include "warning/ui/WarningReporterPanel.cpp"

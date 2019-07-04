@@ -33,6 +33,7 @@
       <FILE id="FixPlj" name="trigger.png" compile="0" resource="1" file="Resources/trigger.png"/>
       <FILE id="utiCOQ" name="uncheck.png" compile="0" resource="1" file="Resources/uncheck.png"/>
       <FILE id="MobXh0" name="up.png" compile="0" resource="1" file="Resources/up.png"/>
+      <FILE id="BzkqMx" name="warning.png" compile="0" resource="1" file="Resources/warning.png"/>
     </GROUP>
     <GROUP id="{279380FE-558A-8939-19FF-B071B9CB7AF4}" name="Source"/>
   </MAINGROUP>

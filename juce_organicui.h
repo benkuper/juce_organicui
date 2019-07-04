@@ -86,6 +86,10 @@ using namespace juce;
 #include "script/ScriptTarget.h"
 
 
+#include "warning/WarningTarget.h"
+#include "warning/WarningReporter.h"
+#include "warning/ui/WarningTargetUI.h"
+
 #include "inspectable/Inspectable.h"
 #include "inspectable/InspectableContent.h"
 #include "inspectable/InspectableSelectionManager.h"
@@ -93,6 +97,7 @@ using namespace juce;
 #include "inspectable/ui/InspectableEditor.h"
 #include "inspectable/ui/InspectableSelector.h"
 #include "inspectable/ui/Inspector.h"
+
 
 #include "help/HelpBox.h"
 
@@ -162,6 +167,7 @@ using namespace juce;
 #include "progress/ProgressNotifier.h"
 #include "progress/ui/ProgressWindow.h"
 
+#include "warning/ui/WarningReporterPanel.h"
 
 #include "engine/Engine.h"
 

@@ -1481,9 +1481,6 @@
     <ClCompile Include="..\..\..\..\..\..\..\..\..\Softwares\JUCE\modules\juce_gui_basics\layout\juce_GridItem.cpp">
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\..\..\Softwares\JUCE\modules\juce_gui_basics\layout\juce_GridUnitTests.cpp">
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\..\..\..\..\..\Softwares\JUCE\modules\juce_gui_basics\layout\juce_GroupComponent.cpp">
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClCompile>
@@ -2234,6 +2231,7 @@
     <ClInclude Include="..\..\..\..\..\..\..\..\..\Softwares\JUCE\modules\juce_core\time\juce_RelativeTime.h"/>
     <ClInclude Include="..\..\..\..\..\..\..\..\..\Softwares\JUCE\modules\juce_core\time\juce_Time.h"/>
     <ClInclude Include="..\..\..\..\..\..\..\..\..\Softwares\JUCE\modules\juce_core\unit_tests\juce_UnitTest.h"/>
+    <ClInclude Include="..\..\..\..\..\..\..\..\..\Softwares\JUCE\modules\juce_core\unit_tests\juce_UnitTestCategories.h"/>
     <ClInclude Include="..\..\..\..\..\..\..\..\..\Softwares\JUCE\modules\juce_core\xml\juce_XmlDocument.h"/>
     <ClInclude Include="..\..\..\..\..\..\..\..\..\Softwares\JUCE\modules\juce_core\xml\juce_XmlElement.h"/>
     <ClInclude Include="..\..\..\..\..\..\..\..\..\Softwares\JUCE\modules\juce_core\zip\zlib\crc32.h"/>
@@ -2579,6 +2577,7 @@
     <None Include="..\..\Resources\trigger.png"/>
     <None Include="..\..\Resources\uncheck.png"/>
     <None Include="..\..\Resources\up.png"/>
+    <None Include="..\..\Resources\warning.png"/>
     <None Include="..\..\..\..\..\..\..\..\..\Softwares\JUCE\modules\juce_audio_formats\codecs\flac\Flac Licence.txt"/>
     <None Include="..\..\..\..\..\..\..\..\..\Softwares\JUCE\modules\juce_audio_formats\codecs\oggvorbis\Ogg Vorbis Licence.txt"/>
     <None Include="..\..\..\..\..\..\..\..\..\Softwares\JUCE\modules\juce_audio_processors\format_types\VST3_SDK\base\LICENSE.txt"/>

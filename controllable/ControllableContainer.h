@@ -18,7 +18,8 @@ class ControllableContainer :
 	public ControllableContainerListener,
 	public Inspectable,
 	public ScriptTarget,
-	public DashboardItemTarget
+	public DashboardItemTarget,
+	public WarningTarget::AsyncListener
 
 {
 public:
@@ -38,6 +39,7 @@ public:
 	bool hideEditorHeader;
 	bool skipLabelInTarget;
 	bool userCanAddControllables;
+
 	std::function<void(ControllableContainer *)> customUserCreateControllableFunc; 
 	StringArray userAddControllablesFilters;
 	
@@ -122,10 +124,12 @@ public:
 	virtual void triggerTriggered(Trigger * p) override;
 
 	void controllableFeedbackUpdate(ControllableContainer * cc, Controllable * c) override;
-	virtual void onControllableFeedbackUpdate(ControllableContainer * , Controllable *) {}
 
 	virtual void controllableNameChanged(Controllable * c) override;
 	virtual void askForRemoveControllable(Controllable * c, bool addToUndo = false) override;
+
+	void warningChanged(WarningTarget*);
+	virtual String getWarningMessage() const override;
 
 	virtual var getJSONData();
 	virtual void loadJSONData(var data, bool createIfNotThere = false);
@@ -151,12 +155,13 @@ protected:
 	virtual void onContainerParameterChanged(Parameter *) {};
 	virtual void onExternalParameterValueChanged(Parameter *) {}; //When listening to other child controllable than this container's children
 	virtual void onExternalParameterRangeChanged(Parameter *) {};
+	virtual void onControllableFeedbackUpdate(ControllableContainer*, Controllable*) {}
 	virtual void onContainerTriggerTriggered(Trigger *) {};
 	virtual void onExternalTriggerTriggered(Trigger *) {}; //When listening to other child controllable than this container's children
 	virtual void onControllableAdded(Controllable *) {}; 
 	virtual void onControllableRemoved(Controllable *) {};
     virtual void onContainerParameterChangedAsync(Parameter *,const var & /*value*/){};
-    
+	virtual void onWarningChanged(WarningTarget*) {}
 
 public:
     ListenerList<ControllableContainerListener> controllableContainerListeners;
@@ -179,6 +184,7 @@ public:
 protected:
 	virtual void notifyStructureChanged();
 	void newMessage(const Parameter::ParameterEvent &e)override;
+	void newMessage(const WarningTarget::WarningTargetEvent& e) override;
 
 
 public:

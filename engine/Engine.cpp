@@ -46,6 +46,8 @@ Engine::Engine(const String & fileName, const String & fileExtension) :
 	addChildControllableContainer(ProjectSettings::getInstance());
 	ScriptUtil::getInstance(); //trigger ScriptUtil constructor
 
+	WarningReporter::getInstance(); //trigger constructor
+
 	startTimer(60000*5); //auto-save every 5 minutes
 }
 
@@ -77,6 +79,8 @@ Engine::~Engine() {
 	OSCRemoteControl::deleteInstance();
 	AssetManager::deleteInstance();
 	ProjectSettings::deleteInstance();
+
+	WarningReporter::deleteInstance();
 
 	Engine::mainEngine = nullptr;
 }

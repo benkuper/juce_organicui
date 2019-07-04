@@ -31,6 +31,8 @@ TargetParameter::TargetParameter(const String & niceName, const String & descrip
     customGetTargetContainerFunc(nullptr)
 
 {
+	showWarningInUI = true;
+
 	lockManualControlMode = true;
 	type = TARGET;
 
@@ -53,8 +55,8 @@ TargetParameter::~TargetParameter()
 void TargetParameter::setGhostValue(const String & ghostVal)
 {
 	if (ghostVal == ghostValue) return;
-
 	ghostValue = ghostVal;
+	if (ghostValue.isNotEmpty() && target == nullptr && targetContainer == nullptr) setWarningMessage("Link is broken !");
 	
 }
 
@@ -151,6 +153,12 @@ void TargetParameter::setTarget(WeakReference<Controllable> c)
 		target->addInspectableListener(this);
 		target->addControllableListener(this);
 		setGhostValue("");
+		clearWarning();
+	}
+	else
+	{
+		if (ghostValue.isNotEmpty()) setWarningMessage("Link is broken");
+		else clearWarning();
 	}
 }
 
@@ -173,6 +181,12 @@ void TargetParameter::setTarget(WeakReference<ControllableContainer> cc)
 		targetContainer->addInspectableListener(this);
 
 		setGhostValue("");
+		clearWarning();
+	}
+	else
+	{
+		if (ghostValue.isNotEmpty()) setWarningMessage("Link is broken");
+		else clearWarning();
 	}
 }
 

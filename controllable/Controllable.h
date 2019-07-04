@@ -38,12 +38,13 @@ public:
 	Controllable(const Type &type, const String &niceName, const String &description, bool enabled = true);
 	virtual ~Controllable();
 
-
 	Type type;
 	String niceName;
 	String shortName;
 	String description;
 	String argumentsDescription;
+
+	String warningMessage;
 
 	//For storing arbitraty data
 	var customData;
