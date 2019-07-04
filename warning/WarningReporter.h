@@ -10,7 +10,8 @@
 
 #pragma once
 
-class WarningReporter
+class WarningReporter :
+	public EngineListener
 {
 public:
 	juce_DeclareSingleton(WarningReporter, true);
@@ -20,8 +21,12 @@ public:
 	WarningReporter();
 	~WarningReporter();
 
+	void clear();
+
 	void registerWarning(WarningTarget*);
 	void unregisterWarning(WarningTarget*);
+
+	void endLoadFile() override;
 
 	// ASYNC
 	class  WarningReporterEvent

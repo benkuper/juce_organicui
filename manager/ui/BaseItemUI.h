@@ -14,7 +14,8 @@ template<class T>
 class BaseItemUI :
 	public BaseItemMinimalUI<T>,
 	public Button::Listener, 
-	public Label::Listener
+	public Label::Listener,
+	public ComponentListener
 {
 public:
 	enum Direction { NONE, VERTICAL, HORIZONTAL, ALL };
@@ -49,6 +50,7 @@ public:
 	Label itemLabel;
 	std::unique_ptr<BoolImageToggleUI> enabledBT;
 	std::unique_ptr<ImageButton> removeBT;
+	std::unique_ptr<WarningTargetUI> warningUI;
 
 	//std::unique_ptr<Grabber> grabber;
 
@@ -80,6 +82,8 @@ public:
 	virtual void controllableFeedbackUpdateInternal(Controllable *) override;
 
 	virtual void visibilityChanged() override;
+
+	virtual void componentVisibilityChanged(Component &c) override;
 
 	class ItemUIListener
 	{
@@ -179,6 +183,13 @@ BaseItemUI<T>::BaseItemUI(T * _item, Direction _resizeDirection) :
 		removeBT->addListener(this);
 	}
 
+	if (this->baseItem->showWarningInUI)
+	{
+		warningUI.reset(new WarningTargetUI(this->baseItem));
+		warningUI->addComponentListener(this);
+		addChildComponent(warningUI.get());
+	}
+
 	this->setHighlightOnMouseOver(true);
 
 	updateMiniModeUI();
@@ -266,6 +277,12 @@ void BaseItemUI<T>::resized()
 	if (enabledBT != nullptr && showEnableBT)
 	{
 		enabledBT->setBounds(h.removeFromLeft(h.getHeight()));
+		h.removeFromLeft(2);
+	}
+
+	if (warningUI != nullptr && warningUI->isVisible())
+	{
+		warningUI->setBounds(h.removeFromLeft(h.getHeight())); //warning
 		h.removeFromLeft(2);
 	}
 
@@ -407,4 +424,10 @@ template<class T>
 void BaseItemUI<T>::visibilityChanged()
 {
 	resized();
+}
+
+template<class T>
+void BaseItemUI<T>::componentVisibilityChanged(Component& c)
+{
+	if (&c == warningUI.get()) resized();
 }

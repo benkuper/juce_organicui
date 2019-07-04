@@ -1,3 +1,4 @@
+#include "WarningTarget.h"
 
 WarningTarget::WarningTarget() :
 	warningResolveInspectable(nullptr),
@@ -30,9 +31,19 @@ void WarningTarget::notifyWarningChanged()
 void WarningTarget::resolveWarning()
 {
 	if (warningResolveInspectable != nullptr) warningResolveInspectable->selectThis();
+	else
+	{
+		Inspectable* i = dynamic_cast<Inspectable*>(this);
+		if (i != nullptr) i->selectThis();
+	}
 }
 
 String WarningTarget::getWarningMessage() const
 {
 	return warningMessage;
+}
+
+String WarningTarget::getWarningTargetName() const 
+{ 
+	return "Unknown";
 }

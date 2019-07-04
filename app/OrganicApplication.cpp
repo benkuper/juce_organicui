@@ -48,6 +48,8 @@ void OrganicApplication::initialise(const String & commandLine)
 
 	engine->addAsyncEngineListener(this);
 
+	WarningReporter::getInstance(); //force creation after engine creation
+
 	GlobalSettings::getInstance()->selectionManager = InspectableSelectionManager::mainSelectionManager;
 
 	if (useWindow)

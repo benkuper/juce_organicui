@@ -68,6 +68,10 @@ public:
 
 	void endLoadFile() override;
 
+
+	var getJSONDataInternal() override;
+	void loadJSONDataInternal(var data) override;
+
 	TargetParameterUI * createTargetUI(TargetParameter * target = nullptr);
 	ControllableUI* createDefaultUI(Controllable * targetControllable = nullptr) override;
 

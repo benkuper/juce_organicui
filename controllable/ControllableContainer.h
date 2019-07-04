@@ -130,6 +130,7 @@ public:
 
 	void warningChanged(WarningTarget*);
 	virtual String getWarningMessage() const override;
+	virtual String getWarningTargetName() const;
 
 	virtual var getJSONData();
 	virtual void loadJSONData(var data, bool createIfNotThere = false);

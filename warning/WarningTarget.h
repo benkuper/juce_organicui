@@ -28,6 +28,7 @@ public:
 
 	virtual void resolveWarning();
 	virtual String getWarningMessage() const;
+	virtual String getWarningTargetName() const;
 
 private:
 	String warningMessage;

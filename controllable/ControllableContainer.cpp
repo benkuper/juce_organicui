@@ -692,7 +692,7 @@ void ControllableContainer::askForRemoveControllable(Controllable * c, bool addT
 
 void ControllableContainer::warningChanged(WarningTarget *target)
 {
-	setWarningMessage(getWarningMessage());
+	notifyWarningChanged();
 	onWarningChanged(target);
 	if (parentContainer != nullptr) parentContainer->warningChanged(target);
 }
@@ -700,8 +700,9 @@ void ControllableContainer::warningChanged(WarningTarget *target)
 String ControllableContainer::getWarningMessage() const
 {
 	StringArray s;
-	s.add(WarningTarget::getWarningMessage());
+	if(WarningTarget::getWarningMessage().isNotEmpty()) s.add(WarningTarget::getWarningMessage());
 
+	
 	for (auto& c : controllables)
 	{
 		String cs = c->getWarningMessage();
@@ -716,11 +717,16 @@ String ControllableContainer::getWarningMessage() const
 		String cs = cc->getWarningMessage();
 		if (cs.isNotEmpty())
 		{
-			s.add(cc->niceName + " : " + cs);
+			s.add(cs);
 		}
 	}
 
 	return s.joinIntoString("\n");
+}
+
+String ControllableContainer::getWarningTargetName() const 
+{ 
+	return niceName;
 }
 
 var ControllableContainer::getJSONData()

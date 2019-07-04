@@ -248,6 +248,19 @@ void TargetParameter::endLoadFile()
 {
 }
 
+var TargetParameter::getJSONDataInternal()
+{
+	var data = StringParameter::getJSONDataInternal();
+	if (value.toString().isEmpty() && ghostValue.isNotEmpty()) data.getDynamicObject()->setProperty("ghostValue", ghostValue);
+	return data;
+}
+
+void TargetParameter::loadJSONDataInternal(var data)
+{
+	StringParameter::loadJSONDataInternal(data);
+	setGhostValue(data.getProperty("ghostValue", ""));
+}
+
 TargetParameterUI * TargetParameter::createTargetUI(TargetParameter * _target)
 {
 	return new TargetParameterUI(_target == nullptr ?this:_target);

@@ -44,8 +44,6 @@ public:
 	String description;
 	String argumentsDescription;
 
-	String warningMessage;
-
 	//For storing arbitraty data
 	var customData;
 	bool saveCustomData;
@@ -113,6 +111,8 @@ public:
 	static var getParentFromScript(const juce::var::NativeFunctionArgs& a);
 	static var setNameFromScript(const juce::var::NativeFunctionArgs& a);
 
+	virtual String getWarningTargetName() const;
+	
 	virtual InspectableEditor * getEditor(bool /*isRootEditor*/) override;
 	virtual String getTypeString() const { jassert(false); return ""; } //should be overriden
 

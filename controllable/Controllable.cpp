@@ -339,6 +339,18 @@ var Controllable::setNameFromScript(const juce::var::NativeFunctionArgs& a)
 	return var(); 
 }
 
+String Controllable::getWarningTargetName() const 
+{ 
+	if (warningResolveInspectable != nullptr)
+	{
+		ControllableContainer* cc = dynamic_cast<ControllableContainer*>(warningResolveInspectable);
+		if (cc != nullptr) return cc->niceName + " > " + niceName;
+		else return niceName;
+	}
+
+	return niceName;
+}
+
 Controllable * Controllable::ControllableAction::getControllable()
 {
 	if (controllableRef != nullptr && !controllableRef.wasObjectDeleted()) return controllableRef.get();
