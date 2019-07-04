@@ -187,7 +187,7 @@ BaseItemUI<T>::BaseItemUI(T * _item, Direction _resizeDirection) :
 	{
 		warningUI.reset(new WarningTargetUI(this->baseItem));
 		warningUI->addComponentListener(this);
-		addChildComponent(warningUI.get());
+		this->addChildComponent(warningUI.get());
 	}
 
 	this->setHighlightOnMouseOver(true);
