@@ -68,14 +68,10 @@ public:
     String res = niceName;
 	if (replaceSlashes) res = res.replaceCharacter('/', '_');
 
-	res = res.replaceCharacter('#', '_').replaceCharacter('(', '_').replaceCharacter(')', '_')
-		.replaceCharacter('[', '_').replaceCharacter(']', '_').replaceCharacter('{', '_').replaceCharacter('}', '_')
-		.replaceCharacter('>', '_').replaceCharacter('<', '_').replaceCharacter(':', '_').replaceCharacter(',', '_').replaceCharacter(';', '_')
-		.replaceCharacter('é', 'e').replaceCharacter('è', 'e').replaceCharacter('Ž','e').replaceCharacter('','e').replaceCharacter('','e')
-		.replaceCharacter('à', '_').replaceCharacter('â', '_').replaceCharacter('@','a')
-        .replaceCharacter('ˆ','a').replaceCharacter('‰','a')
-        .replaceCharacter('ô', 'u').replaceCharacter('ê', 'i').replaceCharacter('”','i');
-		;
+	res = res.replaceCharacter('\"', '_');
+	res = res.replaceCharacters("ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ*-#()[]{}<>:;,%^'@",
+								"AAAAAAECEEEEIIIIDNOOOOOx0UUUUYPsaaaaaaeceeeeiiiiOnooooo_0uuuuypy_________________a");
+
 	
     StringArray sa;
     sa.addTokens(res, false);
