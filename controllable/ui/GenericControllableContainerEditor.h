@@ -40,6 +40,8 @@ public:
 	std::unique_ptr<ImageButton> expandBT;
 	std::unique_ptr<ImageButton> collapseBT;
 	std::unique_ptr<ImageButton> addBT;
+	std::unique_ptr<WarningTargetUI> warningUI;
+
 	Component headerSpacer;
 
 	virtual void setCollapsed(bool value, bool force = false, bool animate = true, bool doNotRebuild = false);
@@ -79,6 +81,8 @@ public:
 	
 	virtual void buttonClicked(Button * b) override;
 	virtual void labelTextChanged(Label * l) override;
+
+	virtual void componentVisibilityChanged(Component &c) override;
 
 	void newMessage(const ContainerAsyncEvent & p) override;
 	virtual void controllableFeedbackUpdate(Controllable *) {};

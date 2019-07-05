@@ -42,6 +42,13 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(WeakRefer
 		addAndMakeVisible(addBT.get());
 	}
 
+	if (container->showWarningInUI)
+	{
+		warningUI.reset(new WarningTargetUI(container));
+		addChildComponent(warningUI.get());
+		warningUI->addComponentListener(this);
+	}
+
 	if (canBeCollapsed())
 	{
 		expandBT.reset(AssetManager::getInstance()->getRightArrowBT());
@@ -64,6 +71,7 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(WeakRefer
 	{
 		if(buildAtCreation) resetAndBuild();
 	}
+
 }
 
 GenericControllableContainerEditor::~GenericControllableContainerEditor()
@@ -287,6 +295,11 @@ void GenericControllableContainerEditor::labelTextChanged(Label * l)
 	if (l == &containerLabel) container->setUndoableNiceName(l->getText());
 }
 
+void GenericControllableContainerEditor::componentVisibilityChanged(Component& c)
+{
+	if (&c == warningUI.get()) resized();
+}
+
 InspectableEditor * GenericControllableContainerEditor::getEditorUIForControllable(Controllable * c)
 {
 	return c->getEditor(false);
@@ -476,6 +489,12 @@ void GenericControllableContainerEditor::resizedInternal(juce::Rectangle<int>& r
 
 void GenericControllableContainerEditor::resizedInternalHeader(juce::Rectangle<int>& r)
 {
+	if (warningUI != nullptr && warningUI->isVisible())
+	{
+		warningUI->setBounds(r.removeFromLeft(r.getHeight()));
+		r.removeFromLeft(2);
+	}
+
 	containerLabel.setBounds(r.removeFromLeft(containerLabel.getFont().getStringWidth(containerLabel.getText())+20));
 	headerSpacer.setBounds(r);
 }

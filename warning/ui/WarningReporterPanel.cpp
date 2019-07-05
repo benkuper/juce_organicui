@@ -100,8 +100,8 @@ WarningReporterItem::WarningReporterItem(WarningTarget* target) :
 	resolveBT("Resolve"),
 	target(target)
 {
-	itemLabel.setFont(10);
-	warningLabel.setFont(10);
+	itemLabel.setFont(12);
+	warningLabel.setFont(12);
 
 	addAndMakeVisible(&itemLabel);
 	addAndMakeVisible(&warningLabel);
