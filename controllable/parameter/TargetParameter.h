@@ -16,7 +16,6 @@ class TargetParameter :
 	public StringParameter,
 	public ControllableContainerListener,
 	public Controllable::Listener,
-	public EngineListener,
 	public Inspectable::InspectableListener
 {
 public:
@@ -65,8 +64,6 @@ public:
 	void childStructureChanged(ControllableContainer *) override;
 
 	void inspectableDestroyed(Inspectable * i) override;
-
-	void endLoadFile() override;
 
 
 	var getJSONDataInternal() override;

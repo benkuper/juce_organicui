@@ -244,10 +244,6 @@ void TargetParameter::inspectableDestroyed(Inspectable * i)
 }
 
 
-void TargetParameter::endLoadFile()
-{
-}
-
 var TargetParameter::getJSONDataInternal()
 {
 	var data = StringParameter::getJSONDataInternal();
@@ -258,7 +254,8 @@ var TargetParameter::getJSONDataInternal()
 void TargetParameter::loadJSONDataInternal(var data)
 {
 	StringParameter::loadJSONDataInternal(data);
-	setGhostValue(data.getProperty("ghostValue", ""));
+	if(data.hasProperty("ghostValue")) setGhostValue(data.getProperty("ghostValue", ""));
+
 }
 
 TargetParameterUI * TargetParameter::createTargetUI(TargetParameter * _target)
