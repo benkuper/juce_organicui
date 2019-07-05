@@ -357,6 +357,12 @@ void ControllableContainer::addChildControllableContainer(ControllableContainer 
 	container->addControllableContainerListener(this);
 	container->addAsyncWarningTargetListener(this);
 	container->setParentContainer(this);
+
+	if (Engine::mainEngine != nullptr && !Engine::mainEngine->isLoadingFile)
+	{
+		if (container->getWarningMessage().isNotEmpty()) warningChanged(container);
+	}
+
 	controllableContainerListeners.call(&ControllableContainerListener::controllableContainerAdded, container);
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableContainerAdded, this, container));
 
@@ -375,6 +381,12 @@ void ControllableContainer::removeChildControllableContainer(ControllableContain
 	this->controllableContainers.removeAllInstancesOf(container);
 	container->removeControllableContainerListener(this);
 	container->removeAsyncWarningTargetListener(this);
+
+	if (Engine::mainEngine != nullptr && !Engine::mainEngine->isClearing)
+	{
+		warningChanged(container);
+	}
+
 	controllableContainerListeners.call(&ControllableContainerListener::controllableContainerRemoved, container);
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableContainerRemoved, this, container));
 
