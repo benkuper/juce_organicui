@@ -83,8 +83,11 @@ public:
 	PopupMenu getItemsMenu(int startID);
 	T * getItemForMenuResultID(int id, int startID);
 
-	typedef typename BaseManagerListener<T> ManagerListener;
-
+    //using BManagerListener = typename BaseManagerListener<T>;
+    //friend class BaseManagerListener<T>;
+    
+    typedef BaseManagerListener<T> ManagerListener;
+    
 	ListenerList<ManagerListener> baseManagerListeners;
 	void addBaseManagerListener(ManagerListener* newListener) { baseManagerListeners.add(newListener); }
 	void removeBaseManagerListener(ManagerListener* listener) { baseManagerListeners.remove(listener); }
@@ -306,7 +309,7 @@ T * BaseManager<T>::addItem(T * item, var data, bool addToUndo, bool notify)
 
 	if (notify)
 	{
-		baseManagerListeners.call(&ManagerListener::itemAdded, item);
+        baseManagerListeners.call(&BaseManagerListener<T>::itemAdded, item);
 		managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEM_ADDED, item));
 
 	}
@@ -355,7 +358,7 @@ Array<T *> BaseManager<T>::addItems(Array<T *> itemsToAdd, var data, bool addToU
 
 	notifyStructureChanged();
 
-	baseManagerListeners.call(&ManagerListener::itemsAdded, itemsToAdd);
+	baseManagerListeners.call(&BaseManagerListener<T>::itemsAdded, itemsToAdd);
 	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_ADDED, itemsToAdd));
 
 	reorderItems();
@@ -480,7 +483,7 @@ void BaseManager<T>::removeItems(Array<T *> itemsToRemove, bool addToUndo)
 		return;
 	}
 
-	baseManagerListeners.call(&ManagerListener::itemsRemoved, itemsToRemove);
+	baseManagerListeners.call(&BaseManagerListener<T>::itemsRemoved, itemsToRemove);
 	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_REMOVED));
 
 	for (auto &i : itemsToRemove) removeItem(i, false, false);
@@ -511,7 +514,7 @@ void BaseManager<T>::removeItem(T * item, bool addToUndo, bool notify)
 
 	if (notify)
 	{
-		baseManagerListeners.call(&ManagerListener::itemRemoved, item);
+		baseManagerListeners.call(&BaseManagerListener<T>::itemRemoved, item);
 		managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEM_REMOVED, item));
 	}
 
@@ -529,7 +532,7 @@ void BaseManager<T>::setItemIndex(T * item, int newIndex)
 	items.move(index, newIndex);
 	controllableContainers.move(index, newIndex);
 
-	baseManagerListeners.call(&ManagerListener::itemsReordered);
+	baseManagerListeners.call(&BaseManagerListener<T>::itemsReordered);
 	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_REORDERED));
 }
 
@@ -543,7 +546,7 @@ void BaseManager<T>::reorderItems()
 		controllableContainers.addArray(items);
 	}
 
-	baseManagerListeners.call(&ManagerListener::itemsReordered);
+	baseManagerListeners.call(&BaseManagerListener<T>::itemsReordered);
 	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_REORDERED));
 }
 

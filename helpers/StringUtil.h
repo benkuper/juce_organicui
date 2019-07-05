@@ -71,9 +71,10 @@ public:
 	res = res.replaceCharacter('#', '_').replaceCharacter('(', '_').replaceCharacter(')', '_')
 		.replaceCharacter('[', '_').replaceCharacter(']', '_').replaceCharacter('{', '_').replaceCharacter('}', '_')
 		.replaceCharacter('>', '_').replaceCharacter('<', '_').replaceCharacter(':', '_').replaceCharacter(',', '_').replaceCharacter(';', '_')
-		.replaceCharacter('é', 'e').replaceCharacter('è', 'e').replaceCharacter('ê', 'e')
-		.replaceCharacter('à', 'a').replaceCharacter('â', 'a').replaceCharacter('@','a')
-		.replaceCharacter('ô', 'o')
+		.replaceCharacter('é', 'e').replaceCharacter('è', 'e').replaceCharacter('Ž','e').replaceCharacter('','e').replaceCharacter('','e')
+		.replaceCharacter('à', '_').replaceCharacter('â', '_').replaceCharacter('@','a')
+        .replaceCharacter('ˆ','a').replaceCharacter('‰','a')
+        .replaceCharacter('ô', 'u').replaceCharacter('ê', 'i').replaceCharacter('”','i');
 		;
 	
     StringArray sa;

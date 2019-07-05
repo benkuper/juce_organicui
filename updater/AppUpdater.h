@@ -40,7 +40,7 @@ public:
 	enum Type { UPDATE_AVAILABLE, DOWNLOAD_STARTED, DOWNLOAD_PROGRESS, DOWNLOAD_ERROR, UPDATE_FINISHED };
 
 	AppUpdateEvent(Type t, File f = File()) : type(t), file(f) {}
-	AppUpdateEvent(Type t, String version, bool beta, String title, String msg, String changelog) : version(version), type(t), beta(beta), title(title), msg(msg), changelog(changelog) {}
+	AppUpdateEvent(Type t, String version, bool beta, String title, String msg, String changelog) : type(t), version(version), beta(beta), title(title), msg(msg), changelog(changelog) {}
 	
 	Type type;
 	File file;

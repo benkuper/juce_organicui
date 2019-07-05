@@ -111,7 +111,7 @@ public:
 	static var getParentFromScript(const juce::var::NativeFunctionArgs& a);
 	static var setNameFromScript(const juce::var::NativeFunctionArgs& a);
 
-	virtual String getWarningTargetName() const;
+	virtual String getWarningTargetName() const override;
 	
 	virtual InspectableEditor * getEditor(bool /*isRootEditor*/) override;
 	virtual String getTypeString() const { jassert(false); return ""; } //should be overriden
