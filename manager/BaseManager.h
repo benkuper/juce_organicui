@@ -83,17 +83,7 @@ public:
 	PopupMenu getItemsMenu(int startID);
 	T * getItemForMenuResultID(int id, int startID);
 
-	class  ManagerListener
-	{
-	public:
-		/** Destructor. */
-		virtual ~ManagerListener() {}
-		virtual void itemAdded(T *) {}
-		virtual void itemsAdded(Array<T *>) {}
-		virtual void itemRemoved(T *) {}
-		virtual void itemsRemoved(Array<T *>) {}
-		virtual void itemsReordered() {}
-	};
+	typedef typename BaseManagerListener<T> ManagerListener;
 
 	ListenerList<ManagerListener> baseManagerListeners;
 	void addBaseManagerListener(ManagerListener* newListener) { baseManagerListeners.add(newListener); }

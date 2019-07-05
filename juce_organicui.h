@@ -188,10 +188,10 @@ using namespace juce;
 
 
 #include "manager/BaseItemListener.h"
+#include "manager/BaseManagerListener.h"
+#include "manager/BaseItem.h"
 #include "manager/BaseManager.h"
 
-#include "manager/BaseItem.h"
-#include "script/Script.h"
 
 
 #include "manager/ui/BaseItemMinimalUI.h"
@@ -243,6 +243,7 @@ using namespace juce;
 
 //#include "controllable/ui/DashboardControllableContainerUI.h"
 
+#include "script/Script.h"
 #include "script/ScriptManager.h"
 #include "script/ScriptUtil.h"
 #include "script/ui/ScriptEditor.h"

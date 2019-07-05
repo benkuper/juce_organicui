@@ -16,7 +16,7 @@ class Script;
 
 class BaseItem :
 	public EnablingControllableContainer,
-	public BaseManager<Script>::ManagerListener
+	public BaseManagerListener<Script>
 {
 public:
 	BaseItem(const String &name = "", bool canBeDisabled = true, bool canHaveScript = false);
