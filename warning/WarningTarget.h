@@ -30,6 +30,9 @@ public:
 	virtual String getWarningMessage() const;
 	virtual String getWarningTargetName() const;
 
+
+	WeakReference<WarningTarget>::Master masterReference;
+
 private:
 	String warningMessage;
 

@@ -58,6 +58,7 @@ void ControllableContainer::clear() {
 	}
 
 	controllableContainers.clear();
+
 	queuedNotifier.cancelPendingUpdate();
 }
 
@@ -719,6 +720,7 @@ String ControllableContainer::getWarningMessage() const
 	
 	for (auto& c : controllables)
 	{
+		if (c == nullptr) continue;
 		String cs = c->getWarningMessage();
 		if (cs.isNotEmpty())
 		{
@@ -728,6 +730,7 @@ String ControllableContainer::getWarningMessage() const
 
 	for (auto& cc : controllableContainers)
 	{
+		if (cc.wasObjectDeleted()) continue;
 		String cs = cc->getWarningMessage();
 		if (cs.isNotEmpty())
 		{

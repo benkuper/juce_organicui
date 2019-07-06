@@ -10,6 +10,7 @@ WarningTarget::WarningTarget() :
 WarningTarget::~WarningTarget()
 {
 	clearWarning();
+	masterReference.clear();
 }
 
 void WarningTarget::setWarningMessage(StringRef message)

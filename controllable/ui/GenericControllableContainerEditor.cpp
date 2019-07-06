@@ -297,6 +297,7 @@ void GenericControllableContainerEditor::labelTextChanged(Label * l)
 
 void GenericControllableContainerEditor::componentVisibilityChanged(Component& c)
 {
+	if (container.wasObjectDeleted()) return;
 	if (&c == warningUI.get()) resized();
 }
 
@@ -448,7 +449,7 @@ void GenericControllableContainerEditor::resized()
 	isRebuilding = true;
 	resizedInternal(r);
 	isRebuilding = false;
-	if(!collapseAnimator.isAnimating() && !prepareToAnimate) setSize(getWidth(), (!isRoot && container->editorIsCollapsed)?headerHeight:jmax<int>(r.getY()+2, headerHeight));
+	if(!container.wasObjectDeleted() && !collapseAnimator.isAnimating() && !prepareToAnimate) setSize(getWidth(), (!isRoot && container->editorIsCollapsed)?headerHeight:jmax<int>(r.getY()+2, headerHeight));
 }
 
 void GenericControllableContainerEditor::resizedInternal(juce::Rectangle<int>& r)

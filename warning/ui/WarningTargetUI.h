@@ -9,8 +9,9 @@ public:
 	WarningTargetUI(WarningTarget* target);
 	~WarningTargetUI();
 
-	WarningTarget* target;
+	WeakReference<WarningTarget> target;
 	void paint(Graphics& g) override;
+
 
 	void newMessage(const WarningTarget::WarningTargetEvent& e) override;
 };
