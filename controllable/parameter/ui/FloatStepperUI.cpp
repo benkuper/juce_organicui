@@ -17,6 +17,7 @@ FloatStepperUI::FloatStepperUI(Parameter * _parameter) :
 	slider.reset(new BetterStepper(tooltip));
 	slider->setEnabled(parameter->enabled);
 	
+	if (parameter->hasRange() && parameter->minimumValue != parameter->maximumValue) slider->setRange((int)parameter->minimumValue, (int)parameter->maximumValue, 0);
 
     slider->setValue(parameter->floatValue());
     slider->addListener(this);
@@ -27,7 +28,6 @@ FloatStepperUI::FloatStepperUI(Parameter * _parameter) :
 	slider->setColour(slider->textBoxTextColourId, isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f));
 	feedbackStateChanged();
 
-	if (parameter->hasRange() && parameter->minimumValue != parameter->maximumValue) slider->setRange((int)parameter->minimumValue, (int)parameter->maximumValue, 0);
 
 	addAndMakeVisible(slider.get());
 
