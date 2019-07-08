@@ -11,8 +11,9 @@
 
 
 
-IntParameter::IntParameter(const String & niceName, const String &description, const int & initialValue, const int & minValue, const int & maxValue, bool enabled) :
-	Parameter(Type::INT, niceName, description, initialValue, minValue, maxValue, enabled)
+IntParameter::IntParameter(const String& niceName, const String& description, const int& initialValue, const int& minValue, const int& maxValue, bool enabled) :
+	Parameter(Type::INT, niceName, description, initialValue, minValue, maxValue, enabled),
+	hexMode(false)
 {
 	canHaveRange = true;
 	argumentsDescription = "int";
@@ -44,12 +45,26 @@ void IntParameter::setWeightedValue(Array<var> values, Array<float> weights)
 	}
 
 	setValue((int)tValue);
-}
+} 
+
 
 bool IntParameter::hasRange()
 {
 	return (float)minimumValue != INT32_MIN && (float)maximumValue != INT32_MAX;
 
+}
+
+var IntParameter::getJSONDataInternal()
+{
+	var data = Parameter::getJSONDataInternal();
+	data.getDynamicObject()->setProperty("hexMode", hexMode);
+	return data;
+}
+
+void IntParameter::loadJSONDataInternal(var data)
+{
+	Parameter::loadJSONDataInternal(data);
+	hexMode = data.getProperty("hexMode", false);
 }
 
 IntSliderUI * IntParameter::createSlider(IntParameter * target)

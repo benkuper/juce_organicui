@@ -20,11 +20,16 @@ public:
     IntParameter(const String &niceName, const String &description, const int &initialValue, const int &minimumValue = INT32_MIN, const int &maximumValue = INT32_MAX, bool enabled = true);
     ~IntParameter() {}
 
+	bool hexMode;
+
     void setValueInternal(var & _value) override;
 	virtual var getLerpValueTo(var targetValue, float weight) override;
 	virtual void setWeightedValue(Array<var> values, Array<float> weights) override;
 
 	virtual bool hasRange() override;
+
+	var getJSONDataInternal() override;
+	void loadJSONDataInternal(var data) override;
 
     IntSliderUI * createSlider(IntParameter * target = nullptr);
 	IntStepperUI * createStepper(IntParameter * target = nullptr);

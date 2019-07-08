@@ -16,7 +16,16 @@ public:
     IntStepperUI(Parameter * parameter);
     virtual ~IntStepperUI();
 
+	IntParameter* intParam;
 
+	static String hexValueToText(double v);
+	static double textToHexValue(String t);
+
+	void addPopupMenuItemsInternal(PopupMenu* p) override;
+	void handleMenuSelectedID(int result) override;
+
+protected:
+	void feedbackStateChanged() override;
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(IntStepperUI)
