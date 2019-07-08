@@ -73,6 +73,7 @@ void FloatStepperUI::feedbackStateChanged()
 {
 	slider->setTextBoxIsEditable(isInteractable());
 	slider->setIncDecButtonsMode(isInteractable()?Slider::IncDecButtonMode::incDecButtonsDraggable_Vertical:Slider::IncDecButtonMode::incDecButtonsNotDraggable);
+	slider->setColour(slider->textBoxTextColourId, isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f));
 }
 
 void FloatStepperUI::timerCallback()

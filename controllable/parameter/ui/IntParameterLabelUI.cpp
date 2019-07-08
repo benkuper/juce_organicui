@@ -1,3 +1,4 @@
+#include "IntParameterLabelUI.h"
 /*
   ==============================================================================
 
@@ -9,12 +10,26 @@
 */
 
 IntParameterLabelUI::IntParameterLabelUI(Parameter * p) :
-	FloatParameterLabelUI(p)
+	FloatParameterLabelUI(p),
+	intParam(dynamic_cast<IntParameter *>(p))
 {
-
+	valueChanged(parameter->getValue());
 }
 void IntParameterLabelUI::labelTextChanged(Label *)
 {
 	//String  originalString = valueLabel.getText().substring(prefix.length(), valueLabel.getText().length() - suffix.length());
-	parameter->setValue((int)(valueLabel.getText().getFloatValue()));
+	parameter->setValue(intParam->hexMode? valueLabel.getText().getHexValue32():(int)(valueLabel.getText().getFloatValue()));
+}
+
+void IntParameterLabelUI::valueChanged(const var& v)
+{
+	if (intParam->hexMode)
+	{
+		valueString = "0x" + String::toHexString(intParam->intValue()).toUpperCase();
+		shouldUpdateLabel = true;
+	}
+	else
+	{
+		FloatParameterLabelUI::valueChanged(v);
+	}
 }

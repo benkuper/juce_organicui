@@ -55,7 +55,7 @@ public:
 	void mouseUpInternal(const MouseEvent &e) override;
 
 protected:
-	void valueChanged(const var & v) override;
+	virtual void valueChanged(const var & v) override;
 	virtual void labelTextChanged(Label * labelThatHasChanged) override;
 
     void timerCallback() override;

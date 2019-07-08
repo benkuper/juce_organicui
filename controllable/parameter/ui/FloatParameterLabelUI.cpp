@@ -49,6 +49,8 @@ FloatParameterLabelUI::FloatParameterLabelUI(Parameter * p) :
 #else
     startTimerHz(20);
 #endif
+
+	timerCallback();
     
 }
 
