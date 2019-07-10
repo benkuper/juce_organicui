@@ -32,6 +32,7 @@ public:
 	GlobalSettings();
 	~GlobalSettings();
 
+
 	//Startup
 	ControllableContainer startupCC;
 
@@ -42,7 +43,8 @@ public:
 	BoolParameter * checkUpdatesOnStartup;
 	BoolParameter * checkBetaUpdates;
 	BoolParameter * updateHelpOnStartup;
-	
+	EnumParameter* helpLanguage;
+
 	BoolParameter * openLastDocumentOnStartup;
 	BoolParameter * openSpecificFileOnStartup;
 	StringParameter * fileToOpenOnStartup;

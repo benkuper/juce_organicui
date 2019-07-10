@@ -18,6 +18,9 @@ GlobalSettings::GlobalSettings() :
 	saveLoadCC("Save and Load"),
 	editingCC("Editing")
 {
+
+	jassert(Engine::mainEngine != nullptr); //Must not call GlobalSettings::getInstance() before creating the engine !
+
 	saveAndLoadRecursiveData = true;
 
 #if JUCE_WINDOWS
@@ -28,7 +31,9 @@ GlobalSettings::GlobalSettings() :
 	checkUpdatesOnStartup = startupCC.addBoolParameter("Check updates on startup", "If enabled, app will check if any updates are available",true);
 	checkBetaUpdates = startupCC.addBoolParameter("Check for beta updates", "If enabled the app will also check for beta versions of the software", false);
 	updateHelpOnStartup = startupCC.addBoolParameter("Update help on startup", "If enabled, app will try and download the last help file locally", true);
-	
+	helpLanguage = startupCC.addEnumParameter("Help language", "What language to download ? You will need to restart Chataigne to see changes");
+	helpLanguage->addOption("English", "en")->addOption("French", "fr")->addOption("Chinese", "cn");
+
 	openLastDocumentOnStartup = startupCC.addBoolParameter("Load last "+(Engine::mainEngine != nullptr?Engine::mainEngine->fileExtension:"")+" on startup", "If enabled, app will load the last " + Engine::mainEngine->fileExtension + " on startup", false);
 	openSpecificFileOnStartup = startupCC.addBoolParameter("Load specific "+(Engine::mainEngine != nullptr?Engine::mainEngine->fileExtension:"")+" on startup", "If enabled, app will load the " + Engine::mainEngine->fileExtension + " specified below on startup", false,false);
 	 
@@ -84,6 +89,10 @@ void GlobalSettings::onControllableFeedbackUpdate(ControllableContainer * cc, Co
 	} else if (c == enableAutoSave)
 	{
 		autoSaveCount->setEnabled(enableAutoSave->boolValue());
+	}
+	else if (c == helpLanguage)
+	{
+		HelpBox::getInstance()->loadHelp();
 	}
 }
 

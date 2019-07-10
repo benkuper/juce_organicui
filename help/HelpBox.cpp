@@ -71,19 +71,20 @@ void HelpBox::run()
 	//Load async
 	StringPairArray responseHeaders;
 	int statusCode = 0;
-	std::unique_ptr<InputStream> stream(helpURL.createInputStream(false, nullptr, nullptr, String(),
+	URL languageHelpURL = URL(helpURL.toString(false) + "help_"+ GlobalSettings::getInstance()->helpLanguage->getValueData().toString() + ".json");
+	std::unique_ptr<InputStream> stream(languageHelpURL.createInputStream(false, nullptr, nullptr, String(),
 		2000, // timeout in millisecs
 		&responseHeaders, &statusCode));
 #if JUCE_WINDOWS
 	if (statusCode != 200)
 	{
-		LOGWARNING("Failed to retrieve online help, loading local file");
+		LOGWARNING("Failed to retrieve online help : " << helpURL.toString(false) << ", loading local file");
 		loadLocalHelp();
 		return;
 	}
 #endif
 
-	DBG("Loading help online.. " << statusCode);
+	DBG("Loading help online :  " << helpURL.toString(false) << ", status code : " << statusCode);
 
 	
 	if (stream != nullptr)

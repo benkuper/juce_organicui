@@ -16,6 +16,26 @@ HelpPanel::HelpPanel(const String &name) :
 {
 	helpLabel.setJustificationType(Justification::topLeft);
 	helpLabel.setFont(14);
+
+	if (GlobalSettings::getInstance()->helpLanguage->getValueData().toString() == "cn")
+	{
+		helpLabel.setFont(16);
+
+		Font font = helpLabel.getFont();
+		String fontName;
+#if JUCE_WINDOWS
+		fontName = "Microsoft YaHei";
+#elif JUCE_MAC
+		fontName = "PingFang SC";
+#else
+		fontName = "WenQuanYi Zen Hei";
+#endif
+		if (fontName.isNotEmpty()) font.setTypefaceName(fontName);
+
+		helpLabel.setFont(font);
+	}
+
+
 	helpLabel.setColour(helpLabel.textColourId, PANEL_COLOR.brighter(.4f));
 	addAndMakeVisible(&helpLabel);
 	HelpBox::getInstance()->addHelpListener(this);
