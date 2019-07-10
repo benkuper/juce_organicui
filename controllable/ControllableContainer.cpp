@@ -56,10 +56,11 @@ void ControllableContainer::clear() {
 		ScopedLock lock(controllables.getLock());
 		controllables.clear();
 	}
+	
+	queuedNotifier.cancelPendingUpdate();
 
 	controllableContainers.clear();
-
-	queuedNotifier.cancelPendingUpdate();
+	ownedContainers.clear();
 }
 
 
@@ -348,13 +349,15 @@ Parameter * ControllableContainer::getParameterByName(const String & name, bool 
 	return dynamic_cast<Parameter *>(getControllableByName(name, searchNiceNameToo));;
 }
 
-void ControllableContainer::addChildControllableContainer(ControllableContainer * container, int index, bool notify)
+void ControllableContainer::addChildControllableContainer(ControllableContainer * container, bool owned, int index, bool notify)
 {
 
 	String targetName = (Engine::mainEngine == nullptr || Engine::mainEngine->isLoadingFile) ? container->niceName : getUniqueNameInContainer(container->niceName);
 	container->setNiceName(targetName);
 
 	controllableContainers.insert(index, container);
+	if (owned) ownedContainers.add(container);
+
 	container->addControllableContainerListener(this);
 	container->addAsyncWarningTargetListener(this);
 	container->setParentContainer(this);
@@ -370,10 +373,11 @@ void ControllableContainer::addChildControllableContainer(ControllableContainer 
 	if(notify) notifyStructureChanged();
 }
 
-void ControllableContainer::addChildControllableContainers(Array<ControllableContainer*> containers, int index)
+void ControllableContainer::addChildControllableContainers(Array<ControllableContainer*> containers, bool owned, int index, bool notify)
 {
-	for (auto &c : containers) addChildControllableContainer(c, -1, false);
-	notifyStructureChanged();
+	int i = index;
+	for (auto &c : containers) addChildControllableContainer(c, owned, i++, false);
+	if(notify) notifyStructureChanged();
 }
 
 void ControllableContainer::removeChildControllableContainer(ControllableContainer * container)
@@ -393,6 +397,7 @@ void ControllableContainer::removeChildControllableContainer(ControllableContain
 
 	notifyStructureChanged();
 	container->setParentContainer(nullptr);
+	if (ownedContainers.contains(container)) ownedContainers.removeObject(container);
 }
 
 
@@ -548,6 +553,19 @@ Array<WeakReference<Parameter>> ControllableContainer::getAllParameters(bool rec
 	if (recursive)
 	{
 		for (auto &cc : controllableContainers) result.addArray(cc->getAllParameters(true, getNotExposed));
+	}
+
+	return result;
+}
+
+Array<WeakReference<ControllableContainer>> ControllableContainer::getAllContainers(bool recursive)
+{
+	Array<WeakReference<ControllableContainer>> result;
+	for (auto& cc : controllableContainers) 
+	{
+		if (cc.wasObjectDeleted() || cc.get() == nullptr) continue; 
+		result.add(cc);
+		if (recursive) result.addArray(cc->getAllContainers(true));
 	}
 
 	return result;
@@ -778,13 +796,20 @@ var ControllableContainer::getJSONData()
 
 	if (saveAndLoadRecursiveData)
 	{
-		var ccData = new DynamicObject();
+		var containersData = new DynamicObject();
 		for (auto &cc : controllableContainers)
 		{
-			ccData.getDynamicObject()->setProperty(cc->shortName, cc->getJSONData());
+			var ccData = cc->getJSONData();
+			if (ownedContainers.contains(cc))
+			{
+				ccData.getDynamicObject()->setProperty("owned", true);
+				if(!saveAndLoadName) ccData.getDynamicObject()->setProperty("niceName", cc->niceName);
+			}
+
+			containersData.getDynamicObject()->setProperty(cc->shortName, ccData);
 		}
 
-		if(ccData.getDynamicObject()->getProperties().size() > 0) data.getDynamicObject()->setProperty("containers", ccData);
+		if(containersData.getDynamicObject()->getProperties().size() > 0) data.getDynamicObject()->setProperty("containers", containersData);
 	}
 
 	return data;
@@ -819,7 +844,7 @@ void ControllableContainer::loadJSONData(var data, bool createIfNotThere)
 					if (p->isSavable) p->loadJSONData(pData.getDynamicObject());
 				}
 
-			} else if (!saveAndLoadRecursiveData && createIfNotThere)
+			} else if (createIfNotThere)
 			{
 				c = ControllableFactory::getInstance()->createControllable(o->getProperty("type"));
 				if (c != nullptr)
@@ -838,7 +863,14 @@ void ControllableContainer::loadJSONData(var data, bool createIfNotThere)
 		for (auto &nv : ccData)
 		{
 			ControllableContainer * cc = getControllableContainerByName(nv.name.toString());
-			if (cc != nullptr) cc->loadJSONData(nv.value);
+			if (cc == nullptr && createIfNotThere)
+			{
+				bool owned = nv.value.getProperty("owned", false);
+				cc = new ControllableContainer(nv.value.getProperty("niceName", nv.name.toString()));
+				addChildControllableContainer(cc, owned);
+			}
+
+			if (cc != nullptr) cc->loadJSONData(nv.value, true);
 		}
 	}
 

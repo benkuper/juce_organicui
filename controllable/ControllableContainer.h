@@ -62,7 +62,8 @@ public:
 	Uuid uid;
 
 	OwnedArray<Controllable, CriticalSection> controllables;
-	Array<WeakReference<ControllableContainer>  > controllableContainers;
+	Array<WeakReference<ControllableContainer>> controllableContainers;
+	OwnedArray<ControllableContainer> ownedContainers;
 	WeakReference<ControllableContainer> parentContainer;
 
 	UndoableAction * setUndoableNiceName(const String &_niceName, bool onlyReturnAction = false);
@@ -95,8 +96,8 @@ public:
 	Controllable * getControllableByName(const String &name, bool searchNiceNameToo = false);
 	Parameter * getParameterByName(const String &name, bool searchNiceNameToo = false);
 
-	void addChildControllableContainer(ControllableContainer * container, int index = -1, bool notify = true);
-	void addChildControllableContainers(Array<ControllableContainer *> containers, int index = -1);
+	void addChildControllableContainer(ControllableContainer* container, bool owned = false, int index = -1, bool notify = true);
+	void addChildControllableContainers(Array<ControllableContainer *> containers, bool owned = false, int index = -1, bool notify = true);
 	void removeChildControllableContainer(ControllableContainer *container);
 	
 
@@ -110,6 +111,7 @@ public:
 
 	virtual Array<WeakReference<Controllable>> getAllControllables(bool recursive = false, bool getNotExposed = false);
 	virtual Array<WeakReference<Parameter>> getAllParameters(bool recursive = false, bool getNotExposed = false);
+	virtual Array<WeakReference<ControllableContainer>> getAllContainers(bool recursive = false);
 	virtual Controllable * getControllableForAddress(const String &address, bool recursive = true, bool getNotExposed = false);
 	virtual Controllable * getControllableForAddress(StringArray addressSplit, bool recursive = true, bool getNotExposed = false);
 	bool containsControllable(Controllable * c, int maxSearchLevels = -1);
