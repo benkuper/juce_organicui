@@ -21,7 +21,6 @@
 
 #include "helpers/StringUtil.cpp"
 
-#include "manager/Factory.cpp"
 #include "resources/BinaryData.cpp"
 #include "script/ScriptExpression.cpp"
 #include "controllable/Controllable.cpp"
