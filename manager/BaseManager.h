@@ -62,7 +62,7 @@ public:
 	virtual void removeItemInternal(T *) {}
 
 
-	T * getItemWithName(const String &itemShortName, bool searchNiceNameToo = false);
+	T * getItemWithName(const String &itemShortName, bool searchNiceNameToo = false, bool searchWithLowerCaseIfNotFound = true);
 
     virtual void clear() override;
 	void askForRemoveBaseItem(BaseItem * item) override;
@@ -551,12 +551,20 @@ void BaseManager<T>::reorderItems()
 }
 
 template<class T>
-inline T * BaseManager<T>::getItemWithName(const String & itemShortName, bool searchItemWithNiceNameToo)
+ T * BaseManager<T>::getItemWithName(const String & itemShortName, bool searchItemWithNiceNameToo, bool searchWithLowerCaseIfNotFound)
 {
 	for (auto &t : items)
 	{
 		if (((BaseItem *)t)->shortName == itemShortName) return t;
 		else if (searchItemWithNiceNameToo && ((BaseItem *)t)->niceName == itemShortName) return t;
+	}
+
+	if (searchWithLowerCaseIfNotFound)
+	{
+		for (auto& t : items)
+		{
+			if (((BaseItem*)t)->shortName.toLowerCase() == itemShortName.toLowerCase()) return t;
+		}
 	}
 
 	return nullptr;

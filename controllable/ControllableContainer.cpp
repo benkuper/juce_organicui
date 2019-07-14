@@ -334,19 +334,19 @@ void ControllableContainer::setAutoShortName() {
 
 
 
-Controllable * ControllableContainer::getControllableByName(const String & name, bool searchNiceNameToo)
+Controllable * ControllableContainer::getControllableByName(const String & name, bool searchNiceNameToo, bool searchLowerCaseToo)
 {
 	for (auto &c : controllables)
 	{
-		if (c->shortName == name || (searchNiceNameToo && c->niceName == name)) return c;
+		if (c->shortName == name || (searchNiceNameToo && c->niceName == name) || (searchLowerCaseToo && c->shortName.toLowerCase() == name.toLowerCase())) return c;
 	}
 
 	return nullptr;
 }
 
-Parameter * ControllableContainer::getParameterByName(const String & name, bool searchNiceNameToo)
+Parameter * ControllableContainer::getParameterByName(const String & name, bool searchNiceNameToo, bool searchLowerCaseToo)
 {
-	return dynamic_cast<Parameter *>(getControllableByName(name, searchNiceNameToo));;
+	return dynamic_cast<Parameter *>(getControllableByName(name, searchNiceNameToo, searchLowerCaseToo));
 }
 
 void ControllableContainer::addChildControllableContainer(ControllableContainer * container, bool owned, int index, bool notify)
@@ -401,13 +401,19 @@ void ControllableContainer::removeChildControllableContainer(ControllableContain
 }
 
 
-ControllableContainer * ControllableContainer::getControllableContainerByName(const String & name, bool searchNiceNameToo)
+ControllableContainer * ControllableContainer::getControllableContainerByName(const String & name, bool searchNiceNameToo, bool searchLowerCaseToo)
 {
 	for (auto &cc : controllableContainers)
 	{
-		if (cc.get() && (cc->shortName == name || (searchNiceNameToo && cc->niceName == name))) return cc;
+		if (!cc.wasObjectDeleted() && cc != nullptr && (
+			cc->shortName == name || 
+			(searchNiceNameToo && cc->niceName == name) || 
+			(searchLowerCaseToo && cc->shortName.toLowerCase() == name.toLowerCase())
+			))
+			return cc;
 	}
 
+	
 	return nullptr;
 
 }
@@ -590,53 +596,24 @@ Controllable * ControllableContainer::getControllableForAddress(StringArray addr
 
 	if (isTargetAControllable)
 	{
-		//DBG("Check controllable Address : " + shortName);
-		for (auto &c : controllables)
+		Controllable* c = getControllableByName(addressSplit[0], false, true);
+		if (c != nullptr)
 		{
-			if (c->shortName == addressSplit[0])
-			{
-				//DBG(c->shortName);
-				if (c->isControllableExposed || getNotExposed) return c;
-				else return nullptr;
-			}
+			if (c->isControllableExposed || getNotExposed) return c;
+			else return nullptr;
+			
 		}
 
-		//no found in direct children controllables, maybe in a skip container ?
-		for (auto &cc : controllableContainers)
-		{
-			if (cc.wasObjectDeleted()) continue;
-			/*if (cc->skipControllableNameInAddress)
-			{
-				Controllable * tc = cc->getControllableByName(addressSplit[0]);  //get not exposed here here
-				if (tc != nullptr) return tc;
-			}*/
-		}
 	} else  //if recursive here ?
 	{
-		for (auto &cc : controllableContainers)
+		ControllableContainer* cc = getControllableContainerByName(addressSplit[0], false, true);
+		if (cc != nullptr)
 		{
-			if (cc.wasObjectDeleted()) continue;
-			/*if (!cc->skipControllableNameInAddress)
-			{
-			*/
-			if (cc->shortName == addressSplit[0])
-				{
-					addressSplit.remove(0);
-					return cc->getControllableForAddress(addressSplit, recursive, getNotExposed);
-				}
-			/*} else
-			{
-				ControllableContainer * tc = cc->getControllableContainerByName(addressSplit[0]);
-				if (tc != nullptr)
-				{
-					addressSplit.remove(0);
-					return tc->getControllableForAddress(addressSplit, recursive, getNotExposed);
-				}
-
-			}*/
+			addressSplit.remove(0);
+			return cc->getControllableForAddress(addressSplit, recursive, getNotExposed);
 		}
-	}
 
+	}
 	return nullptr;
 }
 

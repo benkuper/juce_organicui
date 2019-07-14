@@ -96,7 +96,11 @@ void EnumParameter::setValueWithData(var data)
 {
 	for (auto &ev : enumValues)
 	{
-		if (ev->value == data) setValueWithKey(ev->key);
+		if (ev->value == data)
+		{
+			setValueWithKey(ev->key);
+			break;
+		}
 	}
 }
 

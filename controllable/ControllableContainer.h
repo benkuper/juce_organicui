@@ -93,15 +93,15 @@ public:
 
 	UndoableAction * removeUndoableControllable(Controllable * c, bool onlyReturnAction = false);
 	void removeControllable(WeakReference<Controllable> c);
-	Controllable * getControllableByName(const String &name, bool searchNiceNameToo = false);
-	Parameter * getParameterByName(const String &name, bool searchNiceNameToo = false);
+	Controllable * getControllableByName(const String &name, bool searchNiceNameToo = false, bool searchLowerCaseToo = true);
+	Parameter * getParameterByName(const String &name, bool searchNiceNameToo = false, bool searchLowerCaseToo = true);
 
 	void addChildControllableContainer(ControllableContainer* container, bool owned = false, int index = -1, bool notify = true);
 	void addChildControllableContainers(Array<ControllableContainer *> containers, bool owned = false, int index = -1, bool notify = true);
 	void removeChildControllableContainer(ControllableContainer *container);
 	
 
-	ControllableContainer * getControllableContainerByName(const String &name, bool searchNiceNameToo = false);
+	ControllableContainer * getControllableContainerByName(const String &name, bool searchNiceNameToo = false, bool searchLowerCaseToo = true);
 	ControllableContainer * getControllableContainerForAddress(const String &address, bool recursive = false, bool getNotExposed = false);
 	ControllableContainer * getControllableContainerForAddress(StringArray  addressSplit, bool recursive = false, bool getNotExposed = false);
 
