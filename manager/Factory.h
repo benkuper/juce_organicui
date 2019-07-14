@@ -34,7 +34,7 @@ class FactoryDefinition :
 {
 public:
 	FactoryDefinition(StringRef menuPath, StringRef type, CreateFunc createFunc) :
-		BaseFactoryDefinition(menuPath, type),
+		BaseFactoryDefinition<T>(menuPath, type),
 		createFunc(createFunc)
 	{}
 
@@ -55,7 +55,7 @@ class FactoryParametricDefinition :
 {
 public:
 	FactoryParametricDefinition(StringRef menuPath, StringRef type, CreateFunc createFunc, var params = new DynamicObject()) :
-		FactoryDefinition(menuPath, type, createFunc),
+		FactoryDefinition<T, CreateFunc>(menuPath, type, createFunc),
 		params(params)
 	{
 		this->params.getDynamicObject()->setProperty("type", String(type));
@@ -78,14 +78,14 @@ class FactorySimpleParametricDefinition :
 {
 public:
 	FactorySimpleParametricDefinition(StringRef menuPath, StringRef type, std::function<T *(var)> createFunc, var params = new DynamicObject()) :
-		FactoryParametricDefinition(menuPath, type, createFunc,params)
+		FactoryParametricDefinition<T, std::function<T *(var)>>(menuPath, type, createFunc, params)
 	{
 	}
 
 	virtual ~FactorySimpleParametricDefinition() {}
 
 	virtual T* create() override {
-		return createFunc(params);
+		return this->createFunc(this->params);
 	}
 
 	static FactorySimpleParametricDefinition* createDef(StringRef menu, StringRef type, std::function<T* (var)> createFunc, var params = new DynamicObject())
