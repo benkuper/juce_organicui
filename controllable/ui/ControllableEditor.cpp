@@ -97,7 +97,7 @@ void ControllableEditor::resized()
 		r.removeFromLeft(2);
 	}
 
-	if (controllable->isRemovableByUser && removeBT != nullptr)
+	if (!controllable.wasObjectDeleted() && controllable->isRemovableByUser && removeBT != nullptr)
 	{
 		removeBT->setBounds(r.removeFromRight(r.getHeight()));
 		r.removeFromRight(2);
