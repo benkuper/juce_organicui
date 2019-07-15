@@ -309,13 +309,17 @@ var Parameter::getJSONDataInternal()
 {
 	var data = Controllable::getJSONDataInternal();
 	data.getDynamicObject()->setProperty("value", value);
-	data.getDynamicObject()->setProperty("controlMode", controlMode);
-
-	if (controlMode == EXPRESSION) data.getDynamicObject()->setProperty("expression", controlExpression);
-	else if (controlMode == AUTOMATION && automation != nullptr) data.getDynamicObject()->setProperty("paramAutomation", automation->getJSONData());
-	else if (controlMode == REFERENCE && referenceTarget != nullptr) data.getDynamicObject()->setProperty("reference", referenceTarget->getJSONData());
+	
+	if (controlMode != MANUAL)
+	{
+		data.getDynamicObject()->setProperty("controlMode", controlMode);
+		if (controlMode == EXPRESSION) data.getDynamicObject()->setProperty("expression", controlExpression);
+		else if (controlMode == AUTOMATION && automation != nullptr) data.getDynamicObject()->setProperty("paramAutomation", automation->getJSONData());
+		else if (controlMode == REFERENCE && referenceTarget != nullptr) data.getDynamicObject()->setProperty("reference", referenceTarget->getJSONData());
+	}
 
 	if (saveValueOnly) return data;
+
 	if (hasRange())
 	{
 		if((int)minimumValue != INT32_MIN) data.getDynamicObject()->setProperty("minValue", minimumValue);
