@@ -88,7 +88,12 @@ void Inspectable::highlightLinkedInspectables(bool value)
 void Inspectable::registerLinkedInspectable(WeakReference<Inspectable> i, bool setAlsoInOtherInspectable)
 {
 	if (i.wasObjectDeleted()) return;
-	linkedInspectables.add(i);
+	if (dynamic_cast<SequenceLayer*>(this) != nullptr)
+	{
+		DBG("Register inspectable ");
+	}
+
+	linkedInspectables.addIfNotAlreadyThere(i);
 	if (setAlsoInOtherInspectable) i->registerLinkedInspectable(this, false);
 }
 

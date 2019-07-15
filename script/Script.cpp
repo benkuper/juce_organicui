@@ -204,7 +204,10 @@ var Script::callFunction(const Identifier & function, const Array<var> args, Res
 
 void Script::onContainerParameterChangedInternal(Parameter * p)
 {
-	if (p == filePath) loadScript();
+	if (p == filePath)
+	{
+		if (!isCurrentlyLoadingData) loadScript();
+	}
 }
 
 void Script::onContainerTriggerTriggered(Trigger * t)
@@ -240,12 +243,13 @@ void Script::loadJSONDataInternal(var data)
 {
 	BaseItem::loadJSONDataInternal(data);
 	paramsContainerData = data.getProperty("scriptParams", var());
+	loadScript();
 }
 
 void Script::endLoadFile()
 {
 	if (Engine::mainEngine != nullptr) Engine::mainEngine->removeEngineListener(this);
-	loadScript();
+	if(state != SCRIPT_LOADED) loadScript();
 }
 
 InspectableEditor * Script::getEditor(bool isRoot)
