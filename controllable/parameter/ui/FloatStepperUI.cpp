@@ -17,8 +17,11 @@ FloatStepperUI::FloatStepperUI(Parameter * _parameter) :
 	slider.reset(new BetterStepper(tooltip));
 	slider->setEnabled(parameter->enabled);
 	
-	if (parameter->hasRange() && parameter->minimumValue != parameter->maximumValue) slider->setRange((int)parameter->minimumValue, (int)parameter->maximumValue, 1);
-
+	if (parameter->minimumValue != parameter->maximumValue)
+	{
+		slider->setRange((int)parameter->minimumValue, (int)parameter->maximumValue, 1);
+		slider->setMouseDragSensitivity(abs((int)parameter->maximumValue - (int)parameter->minimumValue));
+	}
     slider->setValue(parameter->floatValue());
     slider->addListener(this);
 	slider->addMouseListener(this,true);
