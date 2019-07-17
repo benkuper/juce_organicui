@@ -49,6 +49,14 @@
 #define ORGANICUI_USE_SERVUS 0
 #endif
 
+/** Config: ORGANICUI_DEFAULT_REMOTECONTROL_PORT
+	Sets the default port for OSC Remote Control
+*/
+/*
+#ifndef ORGANICUI_DEFAULT_REMOTECONTROL_PORT
+#define ORGANICUI_DEFAULT_REMOTECONTROL_PORT 42000
+#endif
+*/
 
 
 #include <juce_core/juce_core.h>
