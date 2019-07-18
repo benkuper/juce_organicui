@@ -456,21 +456,22 @@ const char* checkbox_off_png = (const char*) temp_binary_data_5;
 static const unsigned char temp_binary_data_6[] =
 "\x89PNG\r\n"
 "\x1a\n"
-"\0\0\0\rIHDR\0\0\0\x18\0\0\0\x18\x08\x06\0\0\0\xe0w=\xf8\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0\x08`iTXtXML:com.adobe.xmp\0\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?> <x:xmpmeta xmlns:x=\"adobe:ns:met"
-"a/\" x:xmptk=\"Adobe XMP Core 5.6-c142 79.160924, 2017/07/13-01:06:39        \"> <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"> <rdf:Description rdf:about=\"\" xmlns:xmp=\"http://ns.adobe.com/xap/1.0/\" xmlns:xmpMM=\"http://ns.ad"
-"obe.com/xap/1.0/mm/\" xmlns:stEvt=\"http://ns.adobe.com/xap/1.0/sType/ResourceEvent#\" xmlns:photoshop=\"http://ns.adobe.com/photoshop/1.0/\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\" xmlns:exif=\"http"
-"://ns.adobe.com/exif/1.0/\" xmp:CreatorTool=\"Adobe Photoshop CC 2017 (Windows)\" xmp:CreateDate=\"2017-04-23T20:22:43+02:00\" xmp:MetadataDate=\"2018-06-16T12:03:31+02:00\" xmp:ModifyDate=\"2018-06-16T12:03:31+02:00\" xmpMM:InstanceID=\"xmp.iid:95be"
-"0ecc-841b-bd42-a5f7-694ff9bfb5a6\" xmpMM:DocumentID=\"adobe:docid:photoshop:d487c985-2851-11e7-9712-974bf39bb726\" xmpMM:OriginalDocumentID=\"xmp.did:efc8ad2f-d91d-db4f-9d06-cba5b485ffa8\" photoshop:ColorMode=\"3\" photoshop:ICCProfile=\"sRGB IEC6196"
-"6-2.1\" dc:format=\"image/png\" tiff:Orientation=\"1\" tiff:XResolution=\"720000/10000\" tiff:YResolution=\"720000/10000\" tiff:ResolutionUnit=\"2\" exif:ColorSpace=\"65535\" exif:PixelXDimension=\"24\" exif:PixelYDimension=\"24\"> <xmpMM:History> <r"
-"df:Seq> <rdf:li stEvt:action=\"created\" stEvt:instanceID=\"xmp.iid:efc8ad2f-d91d-db4f-9d06-cba5b485ffa8\" stEvt:when=\"2017-04-23T20:22:43+02:00\" stEvt:softwareAgent=\"Adobe Photoshop CC 2017 (Windows)\"/> <rdf:li stEvt:action=\"saved\" stEvt:insta"
-"nceID=\"xmp.iid:b483799c-0771-9346-a455-c4a8f6d62a90\" stEvt:when=\"2017-04-23T20:22:43+02:00\" stEvt:softwareAgent=\"Adobe Photoshop CC 2017 (Windows)\" stEvt:changed=\"/\"/> <rdf:li stEvt:action=\"saved\" stEvt:instanceID=\"xmp.iid:95be0ecc-841b-bd"
-"42-a5f7-694ff9bfb5a6\" stEvt:when=\"2018-06-16T12:03:31+02:00\" stEvt:softwareAgent=\"Adobe Photoshop CC (Windows)\" stEvt:changed=\"/\"/> </rdf:Seq> </xmpMM:History> <photoshop:DocumentAncestors> <rdf:Bag> <rdf:li>xmp.did:B96355186E7B11E2A52AF72B2E3"
-"DBE55</rdf:li> </rdf:Bag> </photoshop:DocumentAncestors> </rdf:Description> </rdf:RDF> </x:xmpmeta> <?xpacket end=\"r\"?>\xce\xc3s\xbc\0\0\x01gIDATH\x89\xb5\xd5?HWQ\x18\xc6\xf1\x8fo73\x10\x89,hk\x8d\xa8\xc1I\t\x82""D\x88""6\x87@\x90\x06\xa7\x86\x1a\n"
-"!\xc8\xd1M\xf8\xe1\xe2\x10\x04\x91\x83\xba;\xb8HMm:85\xb4\x84\x18\x11\xfd\xa1r0\xf2\x97\xe9\xc5\xe1\x1c\xfc\x87\xe3=_8\x1c\x9e{/\xcfs9\x7f\xde\xb7""c|\xf6\x9d\xcc=\xfc\xc7G<\xcb\xcf\xe6p\x06\x0f\xb2\x9e""F\x1f\x86\xf2\xb7\x93\x18\xc5\r|F\x0b\x8f\xb1\x81"
-"e\xd4\x1d""9\xa0\x1f?\xf1\t5\xba\xb2\xe1N\x9e;\xf3\xdc""F\x95\xc7I]g\xdd\x85\xde\xac\xbfV\xb8\x8e""5\xec:\xe4\xaf\xe3\x1c}\xb7s$\xf8""4\xdd\xc6\x97\xfcS\x83\x81\xfb\xb8\xacyv1\x10\x08\xec\x15\x08\x80\x95\n"
-"S\x8e/AS\xd4X\x0f<\xc4\x85\x02\x01\x81G\x81k8W \xe0 e\x1d\xff\n"
-"\xf9/Tx\xa1\xcc\x1e\xc0\xf9\x90n\xed\xc5""B\x01#\x81+8[(\xa0\x1d\xd2-\xde.`^c\xa6\xc2\"\xfe\x14\x08\x08\xf4\x07&p\xa9@\0\x0c\x05\xba\xa5\x92\\\x82o!\xd5\xed\xad\x02\xe6""5Z\x15\xdeK%\xb6i\x02""c\x81\xa7R\x83(\xc1\xcdPn\xfd\xe1""C\xe0""56\x0b\x98\xd7x"
-"\x15\xf8\xe5\xb0\x07""7I'n\x05\xbe""cX:\xaeMrG\xeeh5\xe6\xd1\x83\xbb\xb8-\x95\xef\x16\xc6p\x15?\xf0\x12O\xa4\xe6\xb4\x8a\xb7x.\xd5\xb1%\xe9\xa8\x8f\xe2w\xf6{\x03\xfb\x9d%Q\xa3""3\xb9\x1f\xf3\0\0\0\0IEND\xae""B`\x82";
+"\0\0\0\rIHDR\0\0\0\x18\0\0\0\x18\x08\x06\0\0\0\xe0w=\xf8\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0\x08\xb1iTXtXML:com.adobe.xmp\0\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?> <x:xmpmeta xmlns:x=\"adobe:ns:"
+"meta/\" x:xmptk=\"Adobe XMP Core 5.6-c145 79.163499, 2018/08/13-16:40:22        \"> <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"> <rdf:Description rdf:about=\"\" xmlns:xmp=\"http://ns.adobe.com/xap/1.0/\" xmlns:xmpMM=\"http://ns"
+".adobe.com/xap/1.0/mm/\" xmlns:stEvt=\"http://ns.adobe.com/xap/1.0/sType/ResourceEvent#\" xmlns:photoshop=\"http://ns.adobe.com/photoshop/1.0/\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:tiff=\"http://ns.adobe.com/tiff/1.0/\" xmlns:exif=\"h"
+"ttp://ns.adobe.com/exif/1.0/\" xmp:CreatorTool=\"Adobe Photoshop CC 2017 (Windows)\" xmp:CreateDate=\"2017-04-23T20:20:19+02:00\" xmp:MetadataDate=\"2019-07-18T02:52:07+02:00\" xmp:ModifyDate=\"2019-07-18T02:52:07+02:00\" xmpMM:InstanceID=\"xmp.iid:1"
+"06475a2-7727-074a-a984-15bbff36b40a\" xmpMM:DocumentID=\"adobe:docid:photoshop:daf098a0-9641-a743-91cd-7431201438cb\" xmpMM:OriginalDocumentID=\"xmp.did:dd0b09a8-f730-744f-93a3-8cab72275fe2\" photoshop:ColorMode=\"3\" photoshop:ICCProfile=\"sRGB IEC6"
+"1966-2.1\" dc:format=\"image/png\" tiff:Orientation=\"1\" tiff:XResolution=\"720000/10000\" tiff:YResolution=\"720000/10000\" tiff:ResolutionUnit=\"2\" exif:ColorSpace=\"65535\" exif:PixelXDimension=\"24\" exif:PixelYDimension=\"24\"> <xmpMM:History>"
+" <rdf:Seq> <rdf:li stEvt:action=\"created\" stEvt:instanceID=\"xmp.iid:dd0b09a8-f730-744f-93a3-8cab72275fe2\" stEvt:when=\"2017-04-23T20:20:19+02:00\" stEvt:softwareAgent=\"Adobe Photoshop CC 2017 (Windows)\"/> <rdf:li stEvt:action=\"saved\" stEvt:in"
+"stanceID=\"xmp.iid:416152ec-470a-0843-b683-062a52c2b640\" stEvt:when=\"2017-04-23T20:20:19+02:00\" stEvt:softwareAgent=\"Adobe Photoshop CC 2017 (Windows)\" stEvt:changed=\"/\"/> <rdf:li stEvt:action=\"saved\" stEvt:instanceID=\"xmp.iid:106475a2-7727"
+"-074a-a984-15bbff36b40a\" stEvt:when=\"2019-07-18T02:52:07+02:00\" stEvt:softwareAgent=\"Adobe Photoshop CC 2019 (Windows)\" stEvt:changed=\"/\"/> </rdf:Seq> </xmpMM:History> <photoshop:DocumentAncestors> <rdf:Bag> <rdf:li>adobe:docid:photoshop:d487c"
+"985-2851-11e7-9712-974bf39bb726</rdf:li> <rdf:li>xmp.did:B96355186E7B11E2A52AF72B2E3DBE55</rdf:li> </rdf:Bag> </photoshop:DocumentAncestors> </rdf:Description> </rdf:RDF> </x:xmpmeta> <?xpacket end=\"r\"?>\xd2\xf7""B\xc3\0\0\x01`IDATH\xc7\xb5\xd5?H\x96"
+"Q\x14\x06\xf0\x9f\xc7""73\x88\x88Thk\x8d\xc8\xc1\xc9\x10\x02""E\x10\xb7\x06""A\xf8hpr\xb0\xa1\x08\x04\x1b\xdb\x84\x8f\x96\x86 \x88\x1a\xac\xdd\xc1""Etr\xb3\xa1\xa9\xa1""E\xa4\x88H\xa5?C\xa1_j/.'\xfa\x92\xc6\xef>\xf0ry\xde{9\xcf\xe5\x9cs\x9f\xd3u\xff\xc5"
+"\x86\xc4$\x8e\xb0\x85\xf9\xfc\xb7\x84n\xdcN\xfe\x08""C\x18\xcf\xb3\x0f\xd1\xc0u|D\x13w\xf0\x1e\xab\xa8\xbbR`\x18_\xf0\x01""5z3\xe0""a\xae=\xb9\xb6P\xe5w\x9a\xd7\xc9{\xd1\x97\xfcs\x85kx\x83""c\x7f\xb1\xef_\xb4\xef\x1d\xb6\t\xff\x8f\xb7\xf0)/5\x16\x98\xc2"
+"\x80\xce\xe3\x18""7\x02\x81\xdf\xca`\xb3\xc2\xe2\xa9\x14t\n"
+"5\xb6\x03\xb3\xb8X@ 0\x17\xb8\x8a\xb3\x85R$\xb0\x8d_\x85\xe2\xbf\xaa\xf0\xa4P\r\xe0\\\xe4\xab\xbdTH`:p\x19g\n"
+"\t\xb4\"_\xf1""A\xa1""6}\\a\x19?\x0b""5\xd0p\xe0\x01\xfa\x0b\xa5h<p>-\xb9\x04v\"}\xfbG\xa1\x1a""4+\xbcM\x8b-Q\x83\x99\xc0\xbd\x1c\x10%0\x18\x05\xf3\x0f\xef\x02\xcf\xf1\xbdP\r\x9e\x05\xbe\xb6\xcd\xe0N\xa2\x07#\x81]\xdc\xcav\xed$F\xffL\xb4\x1a/q\x01\x13"
+"\xb8\x99\xf6\xdd\xc4\x0c\xae`\x0fOq7\x87\xd3k\xac""c!}l%[\xbd\x81o\x19o\rN\0\x9d%Q\xa3 \xab%\x19\0\0\0\0IEND\xae""B`\x82";
 
 const char* checkbox_off_readonly_png = (const char*) temp_binary_data_6;
 
@@ -2275,7 +2276,7 @@ const char* getNamedResource (const char* resourceNameUTF8, int& numBytes)
         case 0x709742e4:  numBytes = 14817; return cancel_png;
         case 0x17c70272:  numBytes = 15786; return check_png;
         case 0xe8ac8edd:  numBytes = 2517; return checkbox_off_png;
-        case 0x4206dc78:  numBytes = 2593; return checkbox_off_readonly_png;
+        case 0x4206dc78:  numBytes = 2667; return checkbox_off_readonly_png;
         case 0xb55a97c5:  numBytes = 2643; return checkbox_on_png;
         case 0x87305890:  numBytes = 2389; return checkbox_on_readonly_png;
         case 0x5514e50c:  numBytes = 543; return down_png;
