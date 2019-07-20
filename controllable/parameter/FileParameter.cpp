@@ -35,9 +35,11 @@ void FileParameter::setValueInternal(var &newVal)
 		File f = File::createFileWithoutCheckingPath(absolutePath);
 		if (f.existsAsFile() && (isRelativePath(newVal.toString()) || forceRelativePath))
 		{
-			value = File(absolutePath).getRelativePathFrom(Engine::mainEngine->getFile().getParentDirectory());
+			value = File(absolutePath).getRelativePathFrom(Engine::mainEngine->getFile().getParentDirectory()).replace("\\", "/");
 		}
 	}
+	
+	value = value.toString().replace("\\", "/");
 }
 
 void FileParameter::setForceRelativePath(bool force)
