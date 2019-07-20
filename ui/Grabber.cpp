@@ -1,3 +1,7 @@
+Grabber::Grabber(Direction d) : dir(d)
+{
+	setMouseCursor(dir == VERTICAL ? MouseCursor::LeftRightResizeCursor : MouseCursor::UpDownResizeCursor);
+}
 
 void Grabber::paint(Graphics & g)
 {

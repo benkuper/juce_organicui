@@ -12,7 +12,7 @@ public:
 	virtual void askForPaste() {}
 	virtual void askForMoveBefore(BaseItem*) {}
 	virtual void askForMoveAfter(BaseItem*) {}
-	virtual void askForSelectAllItems() {}
+	virtual void askForSelectAllItems(bool addToSelection = false) {}
 	virtual void askForSelectPreviousItem(BaseItem*, bool addToSelection = false) {}
 	virtual void askForSelectNextItem(BaseItem*, bool addToSelection = false) {}
 };

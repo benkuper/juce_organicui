@@ -446,12 +446,15 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 	case CommandIDs::selectAll:
 	{
 		InspectableSelectionManager * selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
-		BaseItem * item = selectionManager->getInspectableAs<BaseItem>();
-		if (item != nullptr) item->selectAll();
+		Array<BaseItemListener *> itemListeners = selectionManager->getInspectablesAs<BaseItemListener>();
+		if (itemListeners.size() > 0)
+		{
+			for (auto& m : itemListeners) m->askForSelectAllItems(true);
+		}
 		else
 		{
-			BaseItemListener * m = selectionManager->getInspectableAs<BaseItemListener>();
-			if (m != nullptr) m->askForSelectAllItems();
+			Array<BaseItem*> items = selectionManager->getInspectablesAs<BaseItem>();
+			for(auto &item : items) item->selectAll(true);
 		}
 	}
 	break;

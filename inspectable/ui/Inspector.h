@@ -29,9 +29,13 @@ public:
 	Viewport vp;
 	std::unique_ptr<InspectableEditor> currentEditor;
 
-	void setSelectionManager(InspectableSelectionManager * newSM);
+	void setSelectionManager(InspectableSelectionManager* newSM);
+	void setCurrentInspectable(WeakReference<Inspectable> inspectable, bool setInspectableSelection = true);
+	
+	bool showTextOnEmptyOrMulti;
+	
+	void paint(Graphics& g) override;
 	void resized() override;
-	void setCurrentInspectable(WeakReference<Inspectable> inspectable);
 	void clear();
 
     void inspectableDestroyed(Inspectable * inspectable) override;

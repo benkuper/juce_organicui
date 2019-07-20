@@ -102,7 +102,8 @@ BaseItemMinimalUI<T>::BaseItemMinimalUI(T * _item) :
 {
     baseItem = static_cast<BaseItem *>(item);
 
-	addMouseListener(this, true);
+	setDisableDefaultMouseEvents(true);
+	addMouseListener(this, true); //needs fixing, this is called twice on the component
 	baseItem->addAsyncContainerListener(this);
 	
 	if (baseItem->canBeDisabled && dimAlphaOnDisabled) setAlpha(baseItem->enabled->boolValue() ? 1 : .5f);

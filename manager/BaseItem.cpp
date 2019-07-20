@@ -79,9 +79,9 @@ bool BaseItem::paste()
 	return true;
 }
 
-void BaseItem::selectAll()
+void BaseItem::selectAll(bool addToSelection)
 {
-	baseItemListeners.call(&BaseItemListener::askForSelectAllItems);
+	baseItemListeners.call(&BaseItemListener::askForSelectAllItems, addToSelection);
 }
 
 void BaseItem::selectPrevious(bool addToSelection)

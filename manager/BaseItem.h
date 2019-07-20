@@ -45,7 +45,7 @@ public:
 	virtual void duplicate();
 	virtual void copy();
 	virtual bool paste();
-	virtual void selectAll();
+	virtual void selectAll(bool addToSelection = false);
 	virtual void selectPrevious(bool addToSelection = false);
 	virtual void selectNext(bool addToSelection = false);
 

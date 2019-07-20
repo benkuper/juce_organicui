@@ -70,7 +70,7 @@ public:
 	void askForPaste() override;
 	void askForMoveBefore(BaseItem *) override;
 	void askForMoveAfter(BaseItem *) override;
-	void askForSelectAllItems() override;
+	void askForSelectAllItems(bool addToSelection = false) override;
 	void askForSelectPreviousItem(BaseItem * item, bool addToSelection = false) override;
 	void askForSelectNextItem(BaseItem* item, bool addToSelection = false) override;
 
@@ -623,11 +623,14 @@ void BaseManager<T>::askForMoveAfter(BaseItem * i)
 }
 
 template<class T>
-void BaseManager<T>::askForSelectAllItems()
+void BaseManager<T>::askForSelectAllItems(bool addToSelection)
 {
 	int numItems = items.size();
-	if (numItems > 0) items[0]->selectThis();
-	if (numItems > 1) for (int i = 0; i < numItems; i++) items[i]->selectThis(true);
+	if (!addToSelection) selectionManager->clearSelection(numItems == 0);
+	else deselectThis(numItems == 0);
+
+	if (numItems > 1) for (int i = 0; i < numItems; i++) items[i]->selectThis(true, i == numItems-1); //only notify on last
+	else if (numItems > 0) items[0]->selectThis(addToSelection, true);
 }
 
 template<class T>

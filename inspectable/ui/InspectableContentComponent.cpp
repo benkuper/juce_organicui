@@ -88,9 +88,15 @@ void InspectableContentComponent::mouseDown(const MouseEvent & e)
 
 		if (!foundAChildComponent)
 		{
+			DBG("Mouse down " << ((ControllableContainer *)inspectable.get())->niceName);
 			
 			//grabKeyboardFocus();
-			inspectable->selectThis(e.mods.isCommandDown() || e.mods.isShiftDown());
+			if (e.mods.isShiftDown()) inspectable->selectThis(true);
+			else
+			{
+				if (!inspectable->isSelected) inspectable->selectThis(e.mods.isCommandDown());
+				else if(e.mods.isCommandDown()) inspectable->deselectThis();
+			}
 		}
 	}
 }

@@ -60,12 +60,12 @@ void InspectableSelectionManager::selectInspectable(WeakReference<Inspectable> i
 	if (!enabled) return;
 	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile) return;
 
-	if (currentInspectables.contains(inspectable)) return;
-	
 	activeSelectionManager = this;
 
 	if (doClearSelection) clearSelection(false);
-	
+
+	if (currentInspectables.contains(inspectable)) return;
+
 	if (inspectable.get() != nullptr)
 	{
 		inspectable->setSelected(true);
