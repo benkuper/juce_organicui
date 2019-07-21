@@ -41,6 +41,8 @@ public:
 
 	virtual bool hasRange() override;
 
+	void setControlAutomation() override;
+
 	virtual String stringValue() override { return String(floatValue()); }
 
 	var getJSONDataInternal() override;

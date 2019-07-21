@@ -122,7 +122,7 @@ void ParameterEditor::updateUI()
 
 	case Parameter::AUTOMATION:
 	{
-		automationUI.reset(new PlayableParameterAutomationEditor(parameter->automation.get()));
+		automationUI.reset(new ParameterAutomationEditor(parameter->automation.get()));
 		addAndMakeVisible(automationUI.get());
 		subContentHeight = 100;
 	}

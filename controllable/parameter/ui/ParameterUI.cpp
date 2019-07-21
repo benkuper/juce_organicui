@@ -152,7 +152,7 @@ void ParameterUI::addPopupMenuItems(PopupMenu * p)
 			controlModeMenu.addItem(10, "Manual", true, parameter->controlMode == Parameter::MANUAL);
 			controlModeMenu.addItem(11, "Expression", true, parameter->controlMode == Parameter::EXPRESSION);
 			controlModeMenu.addItem(12, "Reference", true, parameter->controlMode == Parameter::REFERENCE);
-			controlModeMenu.addItem(13, "Animation", true, parameter->controlMode == Parameter::AUTOMATION);
+			if(parameter->canBeAutomated) controlModeMenu.addItem(13, "Animation", true, parameter->controlMode == Parameter::AUTOMATION);
 			p->addSubMenu("Control Mode", controlModeMenu);
 		}
 	}
@@ -166,7 +166,13 @@ void ParameterUI::handleMenuSelectedID(int id)
 	case 10: parameter->setControlMode(Parameter::MANUAL); break;
 	case 11: parameter->setControlMode(Parameter::EXPRESSION); break;
 	case 12: parameter->setControlMode(Parameter::REFERENCE); break;
-	case 13: parameter->setControlMode(Parameter::AUTOMATION); break;
+	case 13: 
+	{
+		parameter->setControlMode(Parameter::AUTOMATION);
+		parameter->automation->setManualMode(false); //created from user menu, not manual
+	}
+	break;
+
 	case -4: showEditRangeWindow(); break;
 	case -5: parameter->clearRange(); break;
 	}

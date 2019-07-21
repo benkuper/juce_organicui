@@ -28,6 +28,8 @@ public:
 
 	virtual bool hasRange() override;
 
+	void setControlAutomation() override;
+
 	var getJSONDataInternal() override;
 	void loadJSONDataInternal(var data) override;
 

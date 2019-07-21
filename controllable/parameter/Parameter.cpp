@@ -1,4 +1,3 @@
-#include "Parameter.h"
 /*
   ==============================================================================
 
@@ -19,6 +18,7 @@ Parameter::Parameter(const Type &type, const String &niceName, const String &des
 	defaultMaxValue(maxValue),
     lockManualControlMode(false),
     controlMode(MANUAL),
+	canBeAutomated(false),
     referenceParameter(nullptr),
     isPresettable(true),
     isOverriden(false),
@@ -69,7 +69,7 @@ void Parameter::setControlMode(ControlMode _mode)
 		break;
 
 	case AUTOMATION:
-		automation.reset(new PlayableParameterAutomation(this));
+		setControlAutomation();
 		break;
 
 	}
@@ -100,6 +100,11 @@ void Parameter::setReferenceParameter(Parameter * tp)
 		parameterValueChanged(referenceParameter);
 		referenceParameter->addParameterListener(this);
 	}
+}
+
+void Parameter::setControlAutomation()
+{
+	jassertfalse;
 }
 
 var Parameter::getValue()
@@ -180,7 +185,6 @@ void Parameter::setRange(var min, var max, bool setDefaultRange) {
 
 	minimumValue = min;
 	maximumValue = max;
-
 
 	listeners.call(&ParameterListener::parameterRangeChanged, this);
 	var arr;

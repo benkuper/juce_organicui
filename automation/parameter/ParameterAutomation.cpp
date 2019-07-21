@@ -9,158 +9,188 @@
   ==============================================================================
 */
 
-ParameterAutomation::ParameterAutomation(ControllableContainer * rootContainer) :
-	BaseItem("ParamAutomation"),
-	parameter(nullptr)
-{
-	target = addTargetParameter("Target", "The parameter to automate", rootContainer);
-	ParameterAutomation((Parameter *)nullptr);
-}
 
-ParameterAutomation::ParameterAutomation(Parameter * _parameter) : 
-	BaseItem(_parameter != nullptr?_parameter->niceName:"New Parameter Automation"),
-	target(nullptr)
+ParameterAutomation::ParameterAutomation(Parameter* _parameter) :
+	BaseItem(_parameter->niceName +" automation", false),
+	parameter(_parameter),
+	automationContainer(automationContainer),
+	timeParamRef(timeParamRef),
+	lengthParamRef(lengthParamRef),
+	mode(nullptr),
+	manualMode(true)
 {
-	setParameter(_parameter);
-
-	automation.isSelectable = false;
 	isSelectable = false;
-
-	automation.enableSnap->setValue(false);
-	automation.editorCanBeCollapsed = false;
-	automation.editorIsCollapsed = false;
-	automation.showUIInEditor = true;
-	addChildControllableContainer(&automation);
-
+	parameter->setControllableFeedbackOnly(true);
 }
 
 ParameterAutomation::~ParameterAutomation()
 {
-	setParameter(nullptr);
+	if (!parameter.wasObjectDeleted() && parameter != nullptr) parameter->setControllableFeedbackOnly(false);
 }
 
-void ParameterAutomation::setParameter(Parameter * p)
+void ParameterAutomation::setup()
 {
-	if (parameter == p) return;
-	if (parameter != nullptr && !parameter.wasObjectDeleted())
-	{
-		parameter->setControllableFeedbackOnly(false);
-	}
+	automationContainer->editorCanBeCollapsed = false;
+	automationContainer->editorIsCollapsed = false;
+	automationContainer->isSelectable = false;
+	addChildControllableContainer(automationContainer);
+}
 
-	parameter = p;
+void ParameterAutomation::setManualMode(bool value)
+{
+	if (value == manualMode) return;
 
-	if (parameter != nullptr)
+	manualMode = value;
+
+	if (manualMode)
 	{
-		setNiceName(parameter->niceName);
-		automation.setNiceName("Automation for " + parameter->niceName);
-		parameter->setControllableFeedbackOnly(enabled->boolValue());
-		if (automation.items.size() == 0)
+		stopTimer();
+
+		if (mode != nullptr)
 		{
-			automation.addItem(0, parameter->getNormalizedValue(), false);
-			automation.items[0]->setEasing(Easing::BEZIER);
-			automation.addItem(automation.length->floatValue(), parameter->getNormalizedValue(), false);
-
+			removeControllable(mode);
+			mode = nullptr;
 		}
 	}
+	else
+	{
+		if (mode == nullptr)
+		{
+			//Must call setup from child classes
+			mode = addEnumParameter("Play Mode", "Play mode");
+			mode->addOption("Loop", LOOP)->addOption("Ping Pong", PING_PONG);
+		}
+
+		startTimerHz(50);
+		
+	}
 }
 
-void ParameterAutomation::onContainerParameterChangedInternal(Parameter * p)
+InspectableEditor* ParameterAutomation::getContentEditor(bool isRoot)
+{
+	return automationContainer->getEditor(isRoot);
+}
+
+void ParameterAutomation::onContainerParameterChangedInternal(Parameter* p)
 {
 	BaseItem::onContainerParameterChangedInternal(p);
 	if (p == enabled)
 	{
 		if (parameter != nullptr && !parameter.wasObjectDeleted()) parameter->setControllableFeedbackOnly(enabled->boolValue());
-	} else if (p == target)
-	{
-		setParameter(dynamic_cast<Parameter *>(target->target.get()));
 	}
 }
 
-void ParameterAutomation::onControllableFeedbackUpdateInternal(ControllableContainer * cc, Controllable * c)
+void ParameterAutomation::onControllableFeedbackUpdateInternal(ControllableContainer* cc, Controllable* c)
 {
 	BaseItem::onControllableFeedbackUpdateInternal(cc, c);
-	if (c == automation.value && parameter != nullptr) parameter->setNormalizedValue(automation.value->floatValue());
+	if (c == lengthParamRef)
+	{
+		timeParamRef->setRange(0, lengthParamRef->floatValue());
+	}
+	else if (c == valueParamRef)
+	{
+		parameter->setValue(valueParamRef->value);
+	}
+}
+
+
+void ParameterAutomation::timerCallback()
+{
+	if (mode == nullptr)
+	{
+		stopTimer();
+		return;
+	}
+
+	float t = Time::getMillisecondCounter() / 1000.0f;
+	float delta = t - lastUpdateTime;
+
+	Mode m = mode->getValueDataAsEnum<Mode>();
+	if (m == LOOP) timeParamRef->setValue(fmodf(timeParamRef->floatValue() + delta, lengthParamRef->floatValue()));
+	else if (m == PING_PONG)
+	{
+		float ft = timeParamRef->floatValue() + delta * (reversePlay ? -1 : 1);
+		if (ft < 0 || ft > lengthParamRef->floatValue())
+		{
+			reversePlay = !reversePlay;
+			ft = timeParamRef->floatValue() + delta * (reversePlay ? -1 : 1);
+		}
+
+		timeParamRef->setValue(ft);
+	}
+
+	lastUpdateTime = t;
 }
 
 var ParameterAutomation::getJSONData()
 {
 	var data = BaseItem::getJSONData();
-	data.getDynamicObject()->setProperty("automation", automation.getJSONData());
+	data.getDynamicObject()->setProperty("content", automationContainer->getJSONData());
 	return data;
 }
 
 void ParameterAutomation::loadJSONDataInternal(var data)
 {
 	BaseItem::loadJSONDataInternal(data);
-	automation.loadJSONData(data.getProperty("automation", var()));
+	automationContainer->loadJSONData(data.getProperty("content", var()));
 }
 
+// NUMBER
 
-//Playable
 
-PlayableParameterAutomation::PlayableParameterAutomation(Parameter * parameter) :
+ParameterNumberAutomation::ParameterNumberAutomation(Parameter* parameter, bool addDefaultItems) :
 	ParameterAutomation(parameter)
 {
-	mode = addEnumParameter("Play Mode", "Play mode");
+	timeParamRef = automation.position;
+	lengthParamRef = automation.length;
+	valueParamRef = automation.value;
+	automationContainer = &automation;
+	
+	setup();
 
-	currentTime = addFloatParameter("Time", "Current time if manual", 0, 0, automation.length->floatValue());
+	automation.enableSnap->setValue(false);
+	automation.showUIInEditor = true;
 
-	mode->addOption("Loop", LOOP)->addOption("Ping Pong", PING_PONG)->addOption("Manual", MANUAL);
-	startTimerHz(50);
-
-	mode->hideInEditor = mode->getValueDataAsEnum<Mode>() == MANUAL;
-}
-
-PlayableParameterAutomation::PlayableParameterAutomation()
-{
-}
-
-void PlayableParameterAutomation::onContainerParameterChangedInternal(Parameter * p)
-{
-	ParameterAutomation::onContainerParameterChangedInternal(p);
-
-	if (p == mode)
+	if (addDefaultItems)
 	{
-		Mode m = mode->getValueDataAsEnum<Mode>();
-		mode->hideInEditor = m == MANUAL;
-		if (m == MANUAL) stopTimer();
-		else startTimerHz(50);
-
-		lastUpdateTime = Time::getMillisecondCounter() / 1000.0f;
-	} else if (p == currentTime)
-	{
-		automation.position->setValue(currentTime->floatValue());
-	}
-}
-
-void PlayableParameterAutomation::onControllableFeedbackUpdateInternal(ControllableContainer * cc, Controllable * c)
-{
-	ParameterAutomation::onControllableFeedbackUpdateInternal(cc, c);
-	if (c == automation.length)
-	{
-		currentTime->setRange(0, automation.length->floatValue());
-	}
-}
-
-
-void PlayableParameterAutomation::timerCallback()
-{
-	float t = Time::getMillisecondCounter() / 1000.0f;
-	float delta = t - lastUpdateTime;
-
-	Mode m = mode->getValueDataAsEnum<Mode>();
-	if (m == LOOP) currentTime->setValue(fmodf(currentTime->floatValue() + delta, automation.length->floatValue()));
-	else if (m == PING_PONG)
-	{
-		float ft = currentTime->floatValue() + delta * (reversePlay ? -1 : 1);
-		if (ft < 0 || ft > automation.length->floatValue())
-		{
-			reversePlay = !reversePlay;
-			ft = currentTime->floatValue() + delta * (reversePlay ? -1 : 1);
-		}
-
-		currentTime->setValue(ft);
+		automation.addItem(0, parameter->getNormalizedValue(), false);
+		automation.items[0]->setEasing(Easing::BEZIER);
+		automation.addItem(automation.length->floatValue(), parameter->getNormalizedValue(), false);
 	}
 
-	lastUpdateTime = t;
+}
+
+void ParameterNumberAutomation::setLength(float value, bool stretch, bool stickToEnd)
+{
+	automation.setLength(value, stretch, stickToEnd);
+}
+
+void ParameterNumberAutomation::setAllowKeysOutside(bool value)
+{
+	automation.allowKeysOutside = true;
+}
+
+
+
+ParameterColorAutomation::ParameterColorAutomation(ColorParameter* colorParam, bool addDefaultItems) :
+	ParameterAutomation(colorParam),
+	colorParam(colorParam),
+	colorManager(1,addDefaultItems)
+{
+	timeParamRef = colorManager.position;
+	lengthParamRef = colorManager.length;
+	valueParamRef = colorManager.currentColor;
+	automationContainer = &colorManager;
+
+	setup();
+}
+
+void ParameterColorAutomation::setLength(float value, bool stretch, bool stickToEnd) 
+{
+	colorManager.setLength(value, stretch, stickToEnd);
+}
+
+void ParameterColorAutomation::setAllowKeysOutside(bool value)
+{
+	colorManager.allowKeysOutside = true;
 }

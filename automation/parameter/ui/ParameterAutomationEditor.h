@@ -10,14 +10,14 @@
 
 #pragma once
 
-class PlayableParameterAutomationEditor :
+class ParameterAutomationEditor :
 	public Component
 {
 public:
-	PlayableParameterAutomationEditor(PlayableParameterAutomation * ppa);
-	~PlayableParameterAutomationEditor();
+	ParameterAutomationEditor(ParameterAutomation * ppa);
+	~ParameterAutomationEditor();
 
-	PlayableParameterAutomation * ppa;
+	ParameterAutomation * ppa;
 
 	std::unique_ptr<InspectableEditor> automationEditor;
 	std::unique_ptr<ControllableUI> modeUI;

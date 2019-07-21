@@ -10,8 +10,7 @@
 
 #pragma once
 
-class PlayableParameterAutomationEditor;
-
+class ParameterAutomationEditor;
 class TargetParameterUI;
 
 class ParameterEditor : 
@@ -35,7 +34,7 @@ public:
 	std::unique_ptr<TargetParameterUI> referenceUI;
 
 	//Automation
-	std::unique_ptr<PlayableParameterAutomationEditor> automationUI;
+	std::unique_ptr<ParameterAutomationEditor> automationUI;
 
 	virtual void resized() override;
 	virtual void updateUI();

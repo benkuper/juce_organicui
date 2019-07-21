@@ -24,6 +24,7 @@ Controllable::Controllable(const Type &type, const String & niceName, const Stri
 	includeInScriptObject(true),
 	isSavable(true),
 	saveValueOnly(true),
+	isLoadingData(false),
 	isCustomizableByUser(false),
 	isRemovableByUser(false),
 	replaceSlashesInShortName(true),
@@ -157,25 +158,21 @@ var Controllable::getJSONData(ControllableContainer * relativeTo)
 	data.getDynamicObject()->setProperty("feedbackOnly", isControllableFeedbackOnly);
 
 	if (hasCustomShortName) data.getDynamicObject()->setProperty("shortName", shortName);
-
-	return data;
-}
-
-var Controllable::getJSONDataInternal()
-{
-	var data = var(new DynamicObject());
 	if (saveCustomData && !customData.isVoid()) data.getDynamicObject()->setProperty("customData", customData);
+
 	return data;
 }
 
 void Controllable::loadJSONData(var data)
 {
 	if (data.isVoid() || !data.isObject()) return;
+	
+	isLoadingData = true;
+	
 	if (data.getDynamicObject()->hasProperty("type")) saveValueOnly = false;
 
 	if (data.getDynamicObject()->hasProperty("niceName")) setNiceName(data.getProperty("niceName", ""));
 	if (data.getDynamicObject()->hasProperty("shortName")) setCustomShortName(data.getProperty("shortName", ""));
-	//if (data.getDynamicObject()->hasProperty("customizable")) isCustomizableByUser = data.getProperty("customizable", false); //Should not be dynamic, but set by code
 	if (data.getDynamicObject()->hasProperty("removable")) isRemovableByUser = data.getProperty("removable", false);
 	if (data.getDynamicObject()->hasProperty("description")) description = data.getProperty("description", description);
 	if (data.getDynamicObject()->hasProperty("hideInEditor")) hideInEditor = data.getProperty("hideInEditor", false);
@@ -183,6 +180,8 @@ void Controllable::loadJSONData(var data)
 	if (data.getDynamicObject()->hasProperty("customData")) customData = data.getProperty("customData", customData);
 
 	loadJSONDataInternal(data);
+
+	isLoadingData = false;
 }
 
 String Controllable::getControlAddress(ControllableContainer * relativeTo)

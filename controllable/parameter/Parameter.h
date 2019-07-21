@@ -14,7 +14,7 @@
  //Listener
 class Parameter;
 class TargetParameter;
-class PlayableParameterAutomation;
+class ParameterAutomation;
 
 class ParameterListener
 {
@@ -70,7 +70,8 @@ public:
 	Parameter * referenceParameter;
 
 	//Automation
-	std::unique_ptr<PlayableParameterAutomation> automation;
+	std::unique_ptr<ParameterAutomation> automation;
+	bool canBeAutomated;
 
 	bool isComplex();
 	virtual StringArray getValuesNames();
@@ -88,6 +89,7 @@ public:
 	void setControlMode(ControlMode _mode);
 	void setControlExpression(const String &);
 	void setReferenceParameter(Parameter * tp);
+	virtual void setControlAutomation();
 
 	virtual var getValue(); //may be useful, or testing expression or references (for now, forward update from expression timer)
 	virtual var getLerpValueTo(var targetValue, float weight);

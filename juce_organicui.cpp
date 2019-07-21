@@ -57,6 +57,13 @@
 #include "controllable/parameter/ui/StringParameterUI.cpp"
 #include "controllable/parameter/ui/TargetParameterUI.cpp"
 #include "controllable/parameter/ui/TripleSliderUI.cpp"
+
+#include "controllable/parameter/gradient/GradientColor.cpp"
+#include "controllable/parameter/gradient/GradientColorManager.cpp"
+#include "controllable/parameter/gradient/ui/GradientColorUI.cpp"
+#include "controllable/parameter/gradient/ui/GradientColorManagerUI.cpp"
+#include "controllable/parameter/gradient/ui/GradientColorManagerEditor.cpp"
+
 #include "controllable/Trigger.cpp"
 #include "controllable/ui/ControllableEditor.cpp"
 #include "controllable/ui/ControllableUI.cpp"
@@ -66,19 +73,22 @@
 #include "controllable/ui/TriggerImageUI.cpp"
 #include "controllable/ui/TriggerUI.cpp"
 
+
+
 #include "automation/recorder/AutomationRecorder.cpp"
 #include "automation/easing/Easing.cpp"
 #include "automation/AutomationKey.cpp"
 #include "automation/Automation.cpp"
 #include "automation/parameter/ParameterAutomation.cpp"
-#include "automation/parameter/ParameterAutomationManager.cpp"
 #include "automation/easing/ui/EasingUI.cpp"
 #include "automation/ui/AutomationKeyUI.cpp"
 #include "automation/ui/AutomationMultiKeyTransformer.cpp"
 #include "automation/ui/AutomationUI.cpp"
 #include "automation/ui/AutomationEditor.cpp"
 #include "automation/recorder/ui/AutomationRecorderEditor.cpp"
-#include "automation/parameter/ui/PlayableParameterAutomationEditor.cpp"
+#include "automation/parameter/ui/ParameterAutomationEditor.cpp"
+
+
 
 #include "comment/Comment.cpp"
 #include "comment/CommentManager.cpp"

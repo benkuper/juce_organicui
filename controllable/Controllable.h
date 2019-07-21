@@ -63,6 +63,7 @@ public:
 	//save & load
 	bool isSavable;
 	bool saveValueOnly;
+	bool isLoadingData;
 
 	//user control
 	bool isCustomizableByUser;
@@ -94,7 +95,7 @@ public:
 	virtual void updateLiveScriptObjectInternal(DynamicObject * parent = nullptr) override;
 
 	virtual var getJSONData(ControllableContainer * relativeTo = nullptr);
-	virtual var getJSONDataInternal(); // to be overriden
+	virtual var getJSONDataInternal() { return var(new DynamicObject()); } // to be overriden
 	virtual void loadJSONData(var data);
 	virtual void loadJSONDataInternal(var data) {} //to be overriden
 

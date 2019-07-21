@@ -16,6 +16,7 @@ IntParameter::IntParameter(const String& niceName, const String& description, co
 	hexMode(false)
 {
 	canHaveRange = true;
+	canBeAutomated = true;
 	argumentsDescription = "int";
 }
 
@@ -52,6 +53,11 @@ bool IntParameter::hasRange()
 {
 	return (float)minimumValue != INT32_MIN && (float)maximumValue != INT32_MAX;
 
+}
+
+void IntParameter::setControlAutomation()
+{
+	automation.reset(new ParameterNumberAutomation(this, !isLoadingData));
 }
 
 var IntParameter::getJSONDataInternal()

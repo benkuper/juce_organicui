@@ -15,6 +15,7 @@ FloatParameter::FloatParameter(const String & niceName, const String &descriptio
 	customUI(NONE)
 {
 	canHaveRange = true;
+	canBeAutomated = true;
 	argumentsDescription = "float";
 }
 
@@ -77,8 +78,8 @@ ControllableUI * FloatParameter::createDefaultUI(Controllable * targetControllab
 
 	switch (t)
 	{
-        case NONE:
-            break;
+    case NONE:
+        break;
             
 	case SLIDER:
 		return createSlider(dynamic_cast<FloatParameter *>(targetControllable));
@@ -107,6 +108,11 @@ bool FloatParameter::checkValueIsTheSame(var oldValue, var newValue)
 bool FloatParameter::hasRange()
 {
 	return (float)minimumValue != INT32_MIN && (float)maximumValue != INT32_MAX;
+}
+
+void FloatParameter::setControlAutomation()
+{
+	automation.reset(new ParameterNumberAutomation(this, !isLoadingData));
 }
 
 var FloatParameter::getJSONDataInternal()

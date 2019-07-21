@@ -10,46 +10,73 @@
 
 #pragma once
 
+
+
 class ParameterAutomation :
-	public BaseItem
-{
-public:
-	ParameterAutomation(ControllableContainer * rootContainer = nullptr);
-	ParameterAutomation(Parameter * parameter);
-	virtual ~ParameterAutomation();
-
-	Automation automation;
-	TargetParameter * target;
-	
-	WeakReference<Parameter> parameter;
-	void setParameter(Parameter * p);
-
-	virtual void onContainerParameterChangedInternal(Parameter *) override;
-	virtual void onControllableFeedbackUpdateInternal(ControllableContainer * cc, Controllable * c) override;
-
-	virtual var getJSONData() override;
-	virtual void loadJSONDataInternal(var data) override;
-};
-
-
-class PlayableParameterAutomation :
-	public ParameterAutomation,
+	public BaseItem,
 	public Timer
 {
 public:
-	PlayableParameterAutomation(Parameter * parameter);
-	PlayableParameterAutomation();
+	enum Mode { LOOP, PING_PONG };
+	
+	ParameterAutomation(Parameter * parameter);
+	virtual ~ParameterAutomation();
 
-	enum Mode {LOOP, PING_PONG, MANUAL };
+	Parameter* timeParamRef;
+	Parameter* lengthParamRef;
+	Parameter* valueParamRef;
+	ControllableContainer* automationContainer;
 
-	EnumParameter * mode;
-	FloatParameter * currentTime;
+	bool manualMode;
+
+	void setup();
+
+	WeakReference<Parameter> parameter;
+
+	EnumParameter* mode;
+
+	void setManualMode(bool manualMode);
+
+	virtual void setLength(float value, bool stretch = false, bool stickToEnd = false) {}
+	virtual void setAllowKeysOutside(bool value) {}
 
 	float lastUpdateTime;
 	bool reversePlay; //pingPong
 
+	virtual InspectableEditor* getContentEditor(bool isRoot);
+
 	virtual void onContainerParameterChangedInternal(Parameter *) override;
-	virtual void onControllableFeedbackUpdateInternal(ControllableContainer * cc, Controllable * c) override;
+	virtual void onControllableFeedbackUpdateInternal(ControllableContainer* cc, Controllable* c) override;
 
 	void timerCallback() override;
+
+	var getJSONData() override;
+	void loadJSONDataInternal(var data) override;
+};
+
+class ParameterNumberAutomation :
+	public ParameterAutomation
+{
+public:
+	ParameterNumberAutomation(Parameter* parameter, bool addDefaultItems = true);
+	~ParameterNumberAutomation() {}
+
+	Automation automation;
+
+	void setLength(float value, bool stretch = false, bool stickToEnd = false);
+	void setAllowKeysOutside(bool value);
+};
+
+class ParameterColorAutomation :
+	public ParameterAutomation
+{
+public:
+	ParameterColorAutomation(ColorParameter* colorParam, bool addDefaultItems = true);
+	~ParameterColorAutomation() {}
+
+	void setLength(float value, bool stretch = false, bool stickToEnd = false);
+	void setAllowKeysOutside(bool value);
+
+	GradientColorManager colorManager;
+	ColorParameter* colorParam;
 };

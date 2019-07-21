@@ -215,19 +215,25 @@ using namespace juce;
 #include "manager/ui/GenericControllableItemEditor.h"
 
 
+#include "controllable/parameter/gradient/GradientColor.h"
+#include "controllable/parameter/gradient/GradientColorManager.h"
+#include "controllable/parameter/gradient/ui/GradientColorUI.h"
+#include "controllable/parameter/gradient/ui/GradientColorManagerUI.h"
+#include "controllable/parameter/gradient/ui/GradientColorManagerEditor.h"
+
+
 #include "automation/recorder/AutomationRecorder.h"
 #include "automation/easing/Easing.h"
 #include "automation/AutomationKey.h"
 #include "automation/Automation.h"
 #include "automation/parameter/ParameterAutomation.h"
-#include "automation/parameter/ParameterAutomationManager.h"
 #include "automation/easing/ui/EasingUI.h"
 #include "automation/ui/AutomationKeyUI.h"
 #include "automation/ui/AutomationMultiKeyTransformer.h"
 #include "automation/ui/AutomationUI.h"
 #include "automation/ui/AutomationEditor.h"
 #include "automation/recorder/ui/AutomationRecorderEditor.h"
-#include "automation/parameter/ui/PlayableParameterAutomationEditor.h"
+#include "automation/parameter/ui/ParameterAutomationEditor.h"
 
 #include "comment/Comment.h"
 #include "comment/CommentManager.h"

@@ -15,6 +15,8 @@ ColorParameter::ColorParameter(const String & niceName, const String & descripti
 	mode(FLOAT)
 {
 	//lockManualControlMode = true;
+	canBeAutomated = true;
+
 	setColor(initialColor);
 	defaultValue = value;
 	resetValue();
@@ -109,6 +111,11 @@ void ColorParameter::setWeightedValue(Array<var> values, Array<float> weights)
 	}
 
 	setFloatRGBA(tValues[0], tValues[1], tValues[2], tValues[3]);
+}
+
+void ColorParameter::setControlAutomation()
+{
+	automation.reset(new ParameterColorAutomation(this, !isLoadingData));
 }
 
 ColorParameterUI * ColorParameter::createColorParamUI()
