@@ -125,14 +125,14 @@ void ParameterAutomation::timerCallback()
 var ParameterAutomation::getJSONData()
 {
 	var data = BaseItem::getJSONData();
-	data.getDynamicObject()->setProperty("content", automationContainer->getJSONData());
+	data.getDynamicObject()->setProperty("automation", automationContainer->getJSONData());
 	return data;
 }
 
 void ParameterAutomation::loadJSONDataInternal(var data)
 {
 	BaseItem::loadJSONDataInternal(data);
-	automationContainer->loadJSONData(data.getProperty("content", var()));
+	automationContainer->loadJSONData(data.getProperty("automation", var()));
 }
 
 // NUMBER
