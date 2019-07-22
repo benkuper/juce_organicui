@@ -146,6 +146,8 @@ var Controllable::getJSONData(ControllableContainer * relativeTo)
 {
 	var data = getJSONDataInternal();
 	data.getDynamicObject()->setProperty("controlAddress", getControlAddress(relativeTo));
+	
+	if (canBeDisabledByUser) data.getDynamicObject()->setProperty("enabled", enabled);
 
 	if (saveValueOnly) return data;
 
@@ -170,9 +172,10 @@ void Controllable::loadJSONData(var data)
 	isLoadingData = true;
 	
 	if (data.getDynamicObject()->hasProperty("type")) saveValueOnly = false;
-
 	if (data.getDynamicObject()->hasProperty("niceName")) setNiceName(data.getProperty("niceName", ""));
 	if (data.getDynamicObject()->hasProperty("shortName")) setCustomShortName(data.getProperty("shortName", ""));
+	if (data.getDynamicObject()->hasProperty("enabled")) setEnabled(data.getProperty("enabled", enabled));
+	if (data.getDynamicObject()->hasProperty("customizable")) isCustomizableByUser = data.getProperty("customizable", isCustomizableByUser);
 	if (data.getDynamicObject()->hasProperty("removable")) isRemovableByUser = data.getProperty("removable", false);
 	if (data.getDynamicObject()->hasProperty("description")) description = data.getProperty("description", description);
 	if (data.getDynamicObject()->hasProperty("hideInEditor")) hideInEditor = data.getProperty("hideInEditor", false);
