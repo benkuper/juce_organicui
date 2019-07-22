@@ -151,6 +151,7 @@ var Controllable::getJSONData(ControllableContainer * relativeTo)
 
 	data.getDynamicObject()->setProperty("type", getTypeString());
 	data.getDynamicObject()->setProperty("niceName", niceName);
+	if (canBeDisabledByUser) data.getDynamicObject()->setProperty("enabled", enabled);
 	data.getDynamicObject()->setProperty("customizable", isCustomizableByUser);
 	data.getDynamicObject()->setProperty("removable", isRemovableByUser);
 	data.getDynamicObject()->setProperty("description", description);
@@ -170,9 +171,10 @@ void Controllable::loadJSONData(var data)
 	isLoadingData = true;
 	
 	if (data.getDynamicObject()->hasProperty("type")) saveValueOnly = false;
-
 	if (data.getDynamicObject()->hasProperty("niceName")) setNiceName(data.getProperty("niceName", ""));
 	if (data.getDynamicObject()->hasProperty("shortName")) setCustomShortName(data.getProperty("shortName", ""));
+	if (data.getDynamicObject()->hasProperty("enabled")) setEnabled(data.getProperty("enabled", enabled));
+	if (data.getDynamicObject()->hasProperty("customizable")) isCustomizableByUser = data.getProperty("customizable", isCustomizableByUser);
 	if (data.getDynamicObject()->hasProperty("removable")) isRemovableByUser = data.getProperty("removable", false);
 	if (data.getDynamicObject()->hasProperty("description")) description = data.getProperty("description", description);
 	if (data.getDynamicObject()->hasProperty("hideInEditor")) hideInEditor = data.getProperty("hideInEditor", false);
