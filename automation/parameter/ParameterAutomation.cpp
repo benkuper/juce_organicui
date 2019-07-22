@@ -17,7 +17,8 @@ ParameterAutomation::ParameterAutomation(Parameter* _parameter) :
 	timeParamRef(timeParamRef),
 	lengthParamRef(lengthParamRef),
 	mode(nullptr),
-	manualMode(true)
+	manualMode(true),
+	valueIsNormalized(false)
 {
 	isSelectable = false;
 	parameter->setControllableFeedbackOnly(true);
@@ -89,7 +90,8 @@ void ParameterAutomation::onControllableFeedbackUpdateInternal(ControllableConta
 	}
 	else if (c == valueParamRef)
 	{
-		parameter->setValue(valueParamRef->value);
+		if (valueIsNormalized) parameter->setNormalizedValue(valueParamRef->value);
+		else parameter->setValue(valueParamRef->value);
 	}
 }
 
@@ -146,6 +148,8 @@ ParameterNumberAutomation::ParameterNumberAutomation(Parameter* parameter, bool 
 	valueParamRef = automation.value;
 	automationContainer = &automation;
 	
+	valueIsNormalized = true;
+
 	setup();
 
 	automation.enableSnap->setValue(false);

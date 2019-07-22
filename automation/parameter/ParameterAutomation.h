@@ -29,6 +29,8 @@ public:
 
 	bool manualMode;
 
+	bool valueIsNormalized; //for automations
+
 	void setup();
 
 	WeakReference<Parameter> parameter;
