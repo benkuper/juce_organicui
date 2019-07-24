@@ -234,6 +234,7 @@ BaseManagerUI<M, T, U>::BaseManagerUI(const String & contentName, M * _manager, 
 		viewport.setScrollBarsShown(true, false);
 		viewport.setScrollOnDragEnabled(false);
 		viewport.setScrollBarThickness(10);
+		viewport.setEnableKeyPressEvents(false);
 		this->addAndMakeVisible(viewport);
 	}
 
