@@ -12,6 +12,7 @@
 GradientColorManagerUI::GradientColorManagerUI(GradientColorManager * manager) :
 	BaseManagerUI(manager->niceName,manager,false),
 	Thread("Colors "+String(manager->niceName)),
+	autoResetViewRangeOnLengthUpdate(false),
 	shouldRepaint(true),
 	shouldUpdateImage(true)
 {
@@ -177,8 +178,14 @@ void GradientColorManagerUI::newMessage(const ContainerAsyncEvent & e)
 	{
 		//if (ControllableUtil::findParentAs<GradientColorManager>(e.targetControllable) != nullptr)
 		//{
+
+		if (e.targetControllable == manager->length)
+		{
+			if (autoResetViewRangeOnLengthUpdate) setViewRange(0, manager->length->floatValue());
+		}
 			shouldUpdateImage = true;
 			shouldRepaint = true;
+		
 		//}
 	}
 }

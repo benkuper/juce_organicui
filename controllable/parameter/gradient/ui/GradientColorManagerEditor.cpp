@@ -5,6 +5,7 @@ GradientColorManagerEditor::GradientColorManagerEditor(GradientColorManager* man
 	InspectableEditor(manager, isRoot),
 	managerUI(manager)
 {
+	managerUI.autoResetViewRangeOnLengthUpdate = true;
 	addAndMakeVisible(&managerUI);
 	setSize(100, 60);
 }

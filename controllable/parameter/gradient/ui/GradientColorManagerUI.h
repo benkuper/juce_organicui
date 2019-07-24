@@ -26,6 +26,7 @@ public:
 
 	float viewStartPos;
 	float viewEndPos;
+	bool autoResetViewRangeOnLengthUpdate;
 
 	Image viewImage;
 	SpinLock imageLock;
