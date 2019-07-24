@@ -153,6 +153,7 @@ var Controllable::getJSONData(ControllableContainer * relativeTo)
 
 	data.getDynamicObject()->setProperty("type", getTypeString());
 	data.getDynamicObject()->setProperty("niceName", niceName);
+	if (canBeDisabledByUser) data.getDynamicObject()->setProperty("enabled", enabled);
 	data.getDynamicObject()->setProperty("customizable", isCustomizableByUser);
 	data.getDynamicObject()->setProperty("removable", isRemovableByUser);
 	data.getDynamicObject()->setProperty("description", description);
