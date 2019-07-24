@@ -206,6 +206,11 @@ void OrganicMainContentComponent::getCommandInfo(CommandID commandID, Applicatio
 		JUCEApplication::getInstance()->getCommandInfo(commandID, result);
 		break;
 	}
+
+#if TIMELINE_ADD_MENU_ITEMS
+	TimelineAppCommands::getCommandInfo(commandID, result);
+#endif
+
 }
 
 
@@ -219,8 +224,8 @@ void OrganicMainContentComponent::getAllCommands(Array<CommandID>& commands) {
 	  CommandIDs::saveAs,
 	  CommandIDs::checkForUpdates,
 	  StandardApplicationCommandIDs::quit,
-	   CommandIDs::selectAll,
-	   StandardApplicationCommandIDs::copy,
+	  CommandIDs::selectAll,
+	  StandardApplicationCommandIDs::copy,
 	  StandardApplicationCommandIDs::cut,
 	  StandardApplicationCommandIDs::paste,
 	  CommandIDs::duplicateItems,
@@ -234,10 +239,15 @@ void OrganicMainContentComponent::getAllCommands(Array<CommandID>& commands) {
 	};
 
 	commands.addArray(ids, numElementsInArray(ids));
+
+#if TIMELINE_ADD_MENU_ITEMS
+	TimelineAppCommands::getAllCommands(commands);
+#endif
 }
 
 
 PopupMenu OrganicMainContentComponent::getMenuForIndex(int /*topLevelMenuIndex*/, const String& menuName) {
+
 	PopupMenu menu;
 
 	if (menuName == "File")
@@ -282,16 +292,24 @@ PopupMenu OrganicMainContentComponent::getMenuForIndex(int /*topLevelMenuIndex*/
 		menu.addCommandItem(&getCommandManager(), StandardApplicationCommandIDs::paste);
 		menu.addCommandItem(&getCommandManager(), CommandIDs::deleteItems);
 
-	} else if (menuName == "Panels")
+	}
+	else if (menuName == "Panels")
 	{
 		return ShapeShifterManager::getInstance()->getPanelsMenu();
+	}
 
-	} 
+#if TIMELINE_ADD_MENU_ITEMS
+	TimelineAppCommands::fillMenu(&getCommandManager(), &menu, menuName);
+#endif
 
 	return menu;
 }
 
 bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
+
+#if TIMELINE_ADD_MENU_ITEMS
+	if(info.commandID >= 0x80000 && info.commandID < 0x81000) return TimelineAppCommands::perform(info);
+#endif
 
 	switch (info.commandID)
 	{
@@ -493,9 +511,11 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 		break;
 
 	default:
-		DBG("no command found");
 		return JUCEApplication::getInstance()->perform(info);
 }
+
+
+
 
 return true;
 }
@@ -518,6 +538,12 @@ void OrganicMainContentComponent::menuItemSelected(int menuItemID, int topLevelM
 
 
 StringArray OrganicMainContentComponent::getMenuBarNames() {
-	String names[3]{ "File", "Edit", "Panels" };
-	return StringArray(names,numElementsInArray(names));
+	StringArray names;
+	names.addArray({ "File", "Edit" });
+
+#if TIMELINE_ADD_MENU_ITEMS
+	names.addArray(TimelineAppCommands::getMenuBarNames());
+#endif
+	names.add("Panels");
+	return names;
 }

@@ -39,7 +39,7 @@ void OrganicApplication::initialise(const String & commandLine)
 {
 	initialiseInternal(commandLine);
 	
-	GlobalSettings::getInstance()->addChildControllableContainer(&appSettings);
+	GlobalSettings::getInstance()->addChildControllableContainer(&appSettings,false, GlobalSettings::getInstance()->controllableContainers.size()-1);
 	var gs = JSON::fromString(getAppProperties().getUserSettings()->getValue("globalSettings", ""));
 	GlobalSettings::getInstance()->loadJSONData(gs);
 
@@ -82,6 +82,10 @@ void OrganicApplication::initialise(const String & commandLine)
 	CrashDumpUploader::getInstance()->uploadEnabled = GlobalSettings::getInstance()->enableCrashUpload->boolValue();
 	CrashDumpUploader::getInstance()->init();
 //#endif
+
+#if TIMELINE_ADD_MENU_ITEMS
+	TimelineAppCommands::init();
+#endif
 
 	afterInit();
 

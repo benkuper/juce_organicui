@@ -1,3 +1,4 @@
+#include "GlobalSettings.h"
 /*
   ==============================================================================
 
@@ -44,7 +45,6 @@ GlobalSettings::GlobalSettings() :
 
 	addChildControllableContainer(&startupCC);
 
-
 	enableAutoSave = saveLoadCC.addBoolParameter("Enable auto-save", "When enabled, a backup file will be saved every 5 min", true);
 	autoSaveCount = saveLoadCC.addIntParameter("Auto-save count", "The number of different files to auto-save", 10, 1, 100);
 
@@ -63,6 +63,7 @@ GlobalSettings::GlobalSettings() :
 GlobalSettings::~GlobalSettings()
 {
 }
+
 
 void GlobalSettings::onControllableFeedbackUpdate(ControllableContainer * cc, Controllable * c)
 {
