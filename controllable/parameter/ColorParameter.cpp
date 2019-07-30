@@ -15,6 +15,17 @@ ColorParameter::ColorParameter(const String & niceName, const String & descripti
 	mode(FLOAT)
 {
 	//lockManualControlMode = true;
+	
+	var minVal;
+	var maxVal;
+
+	for (int i = 0; i < 4; i++)
+	{
+		minVal.append(0);
+		maxVal.append(mode == FLOAT ? 1.0f : 255);
+	}
+	setRange(minVal, maxVal);
+
 	canBeAutomated = true;
 
 	setColor(initialColor);
@@ -26,11 +37,8 @@ ColorParameter::~ColorParameter() {}
 
 const Colour ColorParameter::getColor()
 {
-	if (value.size() < 4)
-	{
-		DBG("Error, color value size is " << value.size());
-		return Colours::black;
-	}
+	if (!value.isArray()) return Colours::black;
+	while (value.size() < 4) value.append(0);
 
 	if (mode == FLOAT) return Colour((uint8)((float)value[0]*255), (uint8)((float)value[1]*255), (uint8)((float)value[2]*255), (uint8)((float)value[3]*255));
 	else return Colour((uint8)(int)value[0], (uint8)(int)value[1], (uint8)(int)value[2], (uint8)(int)value[3]);
@@ -75,6 +83,7 @@ StringArray ColorParameter::getValuesNames()
 bool ColorParameter::checkValueIsTheSame(var oldValue, var newValue)
 {
 	if (!(newValue.isArray() && oldValue.isArray())) return false;
+	if (newValue.size() != 4 || oldValue.size() != 4) return false;
 
 	valueSetLock.enter();
 	bool result = newValue[0] == oldValue[0] && newValue[1] == oldValue[1] && newValue[2] == oldValue[2] && oldValue[3] == newValue[3];
