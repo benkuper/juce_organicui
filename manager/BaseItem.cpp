@@ -153,6 +153,7 @@ var BaseItem::getJSONData()
 void BaseItem::loadJSONDataInternal(var data)
 {
 	ControllableContainer::loadJSONDataInternal(data);
+	loadJSONDataItemInternal(data);
 	if (canHaveScripts) scriptManager->loadJSONData(data.getProperty("scripts",var()));
 }
 

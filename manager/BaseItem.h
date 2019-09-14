@@ -64,6 +64,7 @@ public:
 
 	var getJSONData() override;
 	void loadJSONDataInternal(var data) override;
+	virtual void loadJSONDataItemInternal(var data) {} //happens before loading scripts
 
 	InspectableEditor * getEditor(bool isRoot) override;
 	
