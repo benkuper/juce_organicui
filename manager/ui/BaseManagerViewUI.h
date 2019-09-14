@@ -40,7 +40,8 @@ public:
 	virtual void mouseDown(const MouseEvent &e) override;
 	virtual void mouseDrag(const MouseEvent &e) override;
 	virtual void mouseUp(const MouseEvent &e) override;
-	void mouseWheelMove(const MouseEvent &e, const MouseWheelDetails &d) override;
+	void mouseWheelMove(const MouseEvent& e, const MouseWheelDetails& d) override;
+	void mouseMagnify(const MouseEvent &e, float scaleFactor) override;
 	virtual bool keyPressed(const KeyPress &e) override;
 
 	virtual void paint(Graphics &g) override;
@@ -132,6 +133,7 @@ void BaseManagerViewUI<M, T, U>::mouseDrag(const MouseEvent & e)
 	if (canNavigate && ((e.mods.isLeftButtonDown() && e.mods.isAltDown()) || e.mods.isMiddleButtonDown()))
 	{
 		viewOffset = initViewOffset + e.getOffsetFromDragStart();
+		updateItemsVisibility();
 		this->resized();
 		this->repaint();
 	}
@@ -148,9 +150,44 @@ void BaseManagerViewUI<M, T, U>::mouseUp(const MouseEvent & e)
 template<class M, class T, class U>
  void BaseManagerViewUI<M, T, U>::mouseWheelMove(const MouseEvent & e, const MouseWheelDetails & d)
 {
-	if (canZoom && e.originalComponent == this) setViewZoom(viewZoom + d.deltaY);
+	 if (e.mods.isShiftDown())
+	 {
+		 if (canZoom)
+		 {
+			 Point<int> curMousePos = getViewMousePosition();
+			 
+			 setViewZoom(viewZoom + d.deltaY);
+			 
+			 Point<int> newMousePos = getViewMousePosition();
+			 viewOffset += (newMousePos - curMousePos) * viewZoom;
+			 this->resized();
+		 }
+	 }
+	 else
+	 {
+		 float sensitivity = 500;
+		 viewOffset += Point<int>(d.deltaX*sensitivity, d.deltaY*sensitivity);
+		 updateItemsVisibility(); 
+		 this->resized();
+		 this->repaint();
+	 }
 	
 }
+
+ template<class M, class T, class U>
+ void BaseManagerViewUI<M, T, U>::mouseMagnify(const MouseEvent& e, float scaleFactor)
+ {
+	 if (canZoom)
+	 {
+		 Point<int> curMousePos = getViewMousePosition();
+
+		 setViewZoom(viewZoom + scaleFactor);
+
+		 Point<int> newMousePos = getViewMousePosition();
+		 viewOffset += (newMousePos - curMousePos) * viewZoom;
+		 this->resized();
+	 }
+ }
 
 template<class M, class T, class U>
 bool BaseManagerViewUI<M, T, U>::keyPressed(const KeyPress & e)
