@@ -601,25 +601,29 @@ void BaseManager<T>::askForPaste()
 template<class T>
 void BaseManager<T>::askForMoveBefore(BaseItem * i)
 {
-	int index = items.indexOf(static_cast<T *>(i));
-	if (index == 0) return;
-	items.swap(index, index - 1);
-	controllableContainers.swap(index, index - 1);
-
-	baseManagerListeners.call(&ManagerListener::itemsReordered);
-	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_REORDERED));
+	T* item = static_cast<T*>(i);
+	setItemIndex(item, jmax(items.indexOf(item) - 1, 0));
+//	int index = items.indexOf(static_cast<T *>(i));
+//	if (index == 0) return;
+//	items.swap(index, index - 1);
+//	controllableContainers.swap(index, index - 1);
+//
+//	baseManagerListeners.call(&ManagerListener::itemsReordered);
+//	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_REORDERED));
 }
 
 template<class T>
 void BaseManager<T>::askForMoveAfter(BaseItem * i)
 {
-	int index = items.indexOf(static_cast<T *>(i));
-	if (index == items.size() -1) return;
-	items.swap(index, index + 1);
-	controllableContainers.swap(index, index+1);
+	T* item = static_cast<T*>(i);
+	setItemIndex(item, jmin(items.indexOf(item) + 1, items.size()-1));
+	//int index = items.indexOf(static_cast<T *>(i));
+	//if (index == items.size() -1) return;
+	//items.swap(index, index + 1);
+	//controllableContainers.swap(index, index+1);
 
-	baseManagerListeners.call(&ManagerListener::itemsReordered);
-	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_REORDERED));
+	//baseManagerListeners.call(&ManagerListener::itemsReordered);
+	//managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_REORDERED));
 }
 
 template<class T>
