@@ -160,6 +160,7 @@ template<class M, class T, class U>
 			 
 			 Point<int> newMousePos = getViewMousePosition();
 			 viewOffset += (newMousePos - curMousePos) * viewZoom;
+			 updateItemsVisibility();
 			 this->resized();
 		 }
 	 }
