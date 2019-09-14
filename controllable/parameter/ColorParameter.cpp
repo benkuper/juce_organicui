@@ -1,4 +1,3 @@
-#include "ColorParameter.h"
 /*
   ==============================================================================
 
@@ -15,7 +14,13 @@ ColorParameter::ColorParameter(const String & niceName, const String & descripti
 	mode(FLOAT)
 {
 	//lockManualControlMode = true;
-	
+
+	canBeAutomated = true;
+
+	setColor(initialColor, false, true);
+	defaultValue = value;
+	resetValue();
+
 	var minVal;
 	var maxVal;
 
@@ -24,13 +29,10 @@ ColorParameter::ColorParameter(const String & niceName, const String & descripti
 		minVal.append(0);
 		maxVal.append(mode == FLOAT ? 1.0f : 255);
 	}
+
+	minimumValue = minVal;
+	maximumValue = maxVal;
 	setRange(minVal, maxVal);
-
-	canBeAutomated = true;
-
-	setColor(initialColor);
-	defaultValue = value;
-	resetValue();
 }
 
 ColorParameter::~ColorParameter() {}
