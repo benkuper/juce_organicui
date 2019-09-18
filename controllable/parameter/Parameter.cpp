@@ -191,7 +191,8 @@ void Parameter::setRange(var min, var max, bool setDefaultRange) {
 	arr.append(minimumValue); arr.append(maximumValue);
 	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::BOUNDS_CHANGED, this, arr));
 
-	setValue(value); //if value is outside range, this will change the value
+	if (isOverriden) setValue(value); //if value is outside range, this will change the value
+	else resetValue();
 }
 
 void Parameter::clearRange()
