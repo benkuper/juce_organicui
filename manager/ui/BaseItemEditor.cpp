@@ -50,7 +50,7 @@ void BaseItemEditor::setIsLast(bool value)
 
 void BaseItemEditor::resizedInternalHeader(juce::Rectangle<int>& r)
 {
-	int targetHeight = jmax<int>(r.getHeight(), 18);
+	int targetHeight = r.getHeight();// jmax<int>(r.getHeight(), 18);
 
 	if (item->userCanRemove && removeBT != nullptr)
 	{

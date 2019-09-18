@@ -36,7 +36,7 @@ TargetParameterUI::TargetParameterUI(TargetParameter * parameter, const String &
 	targetBT->addListener(this);
 	setRepaintsOnMouseActivity(true);
 
-	label.setFont(label.getFont().withHeight(12));
+	label.setFont(label.getFont().withHeight(14));
 	updateLabel();
 	label.setInterceptsMouseClicks(false, false);
 	addAndMakeVisible(label);

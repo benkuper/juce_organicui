@@ -24,7 +24,7 @@ public:
 	ShapeShifterPanel(ShapeShifterContent *innerComponent = nullptr, ShapeShifterPanelTab * sourceTab = nullptr);
 	virtual ~ShapeShifterPanel();
 
-	const int headerHeight = 20;
+	const int headerHeight = 24;
 	ShapeShifterPanelHeader header;
 
 	OwnedArray<ShapeShifterContent> contents;

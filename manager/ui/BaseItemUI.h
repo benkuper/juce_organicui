@@ -125,7 +125,7 @@ BaseItemUI<T>::BaseItemUI(T * _item, Direction _resizeDirection) :
 	itemLabel.setColour(itemLabel.textWhenEditingColourId, Colours::white);
 	itemLabel.setColour(CaretComponent::caretColourId, Colours::orange);
 
-	itemLabel.setFont((float)(headerHeight - 4));
+	itemLabel.setFont((float)(headerHeight - 2));
 	itemLabel.setJustificationType(Justification::centredLeft);
 
 	itemLabel.setEditable(false, this->baseItem->nameCanBeChangedByUser);

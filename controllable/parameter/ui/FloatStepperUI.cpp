@@ -35,6 +35,8 @@ FloatStepperUI::FloatStepperUI(Parameter * _parameter) :
 
 	addAndMakeVisible(slider.get());
 
+	setSize(100, 18);
+
     startTimerHz(20);
 }
 

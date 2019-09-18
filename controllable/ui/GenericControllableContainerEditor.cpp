@@ -12,7 +12,7 @@
 
 GenericControllableContainerEditor::GenericControllableContainerEditor(WeakReference<Inspectable> inspectable, bool isRoot, bool buildAtCreation) :
 	InspectableEditor(inspectable, isRoot),
-	headerHeight(18),
+	headerHeight(22),
 	isRebuilding(false),
 	prepareToAnimate(false),
 	contourColor(BG_COLOR.brighter(.3f)),
@@ -23,7 +23,7 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(WeakRefer
 	container->addAsyncContainerListener(this);
 	addAndMakeVisible(containerLabel);
 	
-	containerLabel.setFont(containerLabel.getFont().withHeight(headerHeight-6));
+	containerLabel.setFont(containerLabel.getFont().withHeight(headerHeight-8));
 
 	containerLabel.setColour(containerLabel.backgroundWhenEditingColourId, Colours::black);
 	containerLabel.setColour(containerLabel.textWhenEditingColourId, Colours::white);
@@ -429,7 +429,7 @@ void GenericControllableContainerEditor::paint(Graphics & g)
 
 	if(!isRoot && !container->hideEditorHeader)
 	{
-		g.setColour(contourColor.withAlpha(.4f));
+		g.setColour(contourColor.withAlpha(.3f));
 		juce::Rectangle<int> r = getLocalBounds();
 		if (container->editorIsCollapsed && container->editorCanBeCollapsed) r.setHeight(headerHeight);
 		g.fillRoundedRectangle(r.toFloat(), 4);

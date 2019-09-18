@@ -43,7 +43,8 @@ void Inspector::paint(Graphics& g)
 {
 	if (showTextOnEmptyOrMulti && currentInspectable == nullptr && selectionManager != nullptr)
 	{
-		g.setColour(TEXT_COLOR);
+		g.setColour(Colours::white.withAlpha(.4f));
+		g.setFont(jmin(getHeight() - 2, 14));
 		String text = selectionManager->currentInspectables.size() == 0 ? "Select an object to edit its parameters here" : "Multi Editing is not supported right now, but keep trying :)";
 		if(text.isNotEmpty()) g.drawFittedText(text, getLocalBounds(), Justification::centred, 3);
 	}

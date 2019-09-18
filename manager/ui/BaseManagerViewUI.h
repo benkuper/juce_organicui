@@ -35,7 +35,7 @@ public:
 						   //interaction
 	Point<int> initViewOffset;
 
-	const int defaultCheckerSize = 32;
+	const int defaultCheckerSize = 64;
 
 	virtual void mouseDown(const MouseEvent &e) override;
 	virtual void mouseDrag(const MouseEvent &e) override;

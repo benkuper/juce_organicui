@@ -24,6 +24,13 @@ public:
 
 	String type;
 	String menuPath;
+	Image icon;
+
+	BaseFactoryDefinition* addIcon(Image icon)
+	{
+		this->icon = icon;
+		return this;
+	}
 
 	virtual T* create() { jassertfalse; return new T(); }
 };
@@ -117,7 +124,7 @@ public:
 
 			if (d->menuPath.isEmpty())
 			{
-				menu.addItem(itemID, d->type);
+				menu.addItem(itemID, d->type, true, false, d->icon);
 				continue;
 			}
 

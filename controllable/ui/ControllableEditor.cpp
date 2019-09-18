@@ -21,7 +21,7 @@ ControllableEditor::ControllableEditor(Controllable * _controllable, bool isRoot
 
 	addAndMakeVisible(&label);
 	label.setJustificationType(Justification::left);
-	label.setFont(label.getFont().withHeight(12));
+	label.setFont(label.getFont().withHeight(14));
 	label.setText(controllable->niceName, dontSendNotification);
 	label.setTooltip(ui->tooltip);
 	label.addMouseListener(this, false);
@@ -49,7 +49,7 @@ ControllableEditor::ControllableEditor(Controllable * _controllable, bool isRoot
 	}
 
 	baseHeight = ui->getHeight();
-	if (baseHeight == 0) baseHeight = 16;
+	if (baseHeight == 0) baseHeight = 18;
 	setSize(100, baseHeight);
 
 	controllable->addAsyncControllableListener(this);

@@ -729,7 +729,7 @@ void LookAndFeelOO::drawBubble (Graphics& g, BubbleComponent& comp,
 void LookAndFeelOO::preparePopupMenuWindow (Component& /*newWindow*/) {};
 Font LookAndFeelOO::getPopupMenuFont()
 {
-    return Font (14.0f);
+    return Font (16.0f);
 }
 
 void LookAndFeelOO::getIdealPopupMenuItemSize (const String& text, const bool isSeparator,

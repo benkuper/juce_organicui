@@ -12,7 +12,7 @@ ShapeShifterPanelTab::ShapeShifterPanelTab(ShapeShifterContent * _content) : con
 {
 	panelLabel.setInterceptsMouseClicks(false, false);
 
-	panelLabel.setFont(12);
+	panelLabel.setFont(14);
 	panelLabel.setColour(panelLabel.textColourId, TEXT_COLOR);
 	panelLabel.setJustificationType(Justification::centred);
 	jassert(content != nullptr);

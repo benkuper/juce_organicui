@@ -12,9 +12,9 @@ ShapeShifterPanel::ShapeShifterPanel(ShapeShifterContent *_content, ShapeShifter
 	ShapeShifter(ShapeShifter::PANEL),
 	transparentBackground(false),
 	targetMode(false),
-candidateTargetPoint(Point<float>()),
-candidateZone(NONE),
-currentContent(nullptr)
+	candidateTargetPoint(Point<float>()),
+	candidateZone(NONE),
+	currentContent(nullptr)
 {
 	addAndMakeVisible(header);
 	header.addHeaderListener(this);

@@ -14,7 +14,7 @@
 StringParameterUI::StringParameterUI(Parameter * p) :
     ParameterUI(p),
 	stringParam((StringParameter *)p),
-	maxFontHeight(12),
+	maxFontHeight(14),
 	autoSize(false)
 {
 	showEditWindowOnDoubleClick = false;
@@ -35,7 +35,7 @@ StringParameterUI::StringParameterUI(Parameter * p) :
 
 	feedbackStateChanged();
 
-    setSize(200, 16);//default size
+    setSize(200, 18);//default size
 }
 
 void StringParameterUI::setAutoSize(bool value)

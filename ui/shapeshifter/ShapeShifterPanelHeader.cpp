@@ -82,12 +82,12 @@ void ShapeShifterPanelHeader::paint(Graphics & g)
 void ShapeShifterPanelHeader::resized()
 {
 	//re arrange tabs
- juce::Rectangle<int> r = getLocalBounds();
+	juce::Rectangle<int> r = getLocalBounds();
 	if (r.getWidth() == 0 || r.getHeight() == 0) return;
 
 	for (auto &t : tabs)
 	{
-		t->setBounds(r.removeFromLeft(jmin<int>(getWidth(),t->getLabelWidth())));
+		t->setBounds(r.removeFromLeft(jmin<int>(getWidth(),t->getLabelWidth()+6)));
 	}
 }
 
