@@ -109,7 +109,8 @@ void FloatSliderUI::paint(Graphics & g)
 
 
 		if (showValue) text += fixedDecimals == 0 ? parameter->stringValue():String::formatted("%." + String(fixedDecimals + 1) + "f", parameter->floatValue()).dropLastCharacters(1);
-		g.setFont((float)jmin<int>(getHeight() - 4,16));
+		g.setFont((float)jmin<int>(getHeight() - 4, 16));
+		if (parameter->isOverriden) g.setFont(g.getCurrentFont().boldened());
         g.drawFittedText(text, destRect, Justification::centred,1);
     }
 
