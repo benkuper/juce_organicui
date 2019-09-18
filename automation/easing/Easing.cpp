@@ -62,9 +62,9 @@ CubicEasing::CubicEasing() :
 	Easing(BEZIER)
 {
 	anchor1 = addPoint2DParameter("Anchor 1", "Anchor 1 of the quadratic curve");
-	anchor1->setBounds(0, -1, .99f, 2);
-
 	anchor2 = addPoint2DParameter("Anchor 2", "Anchor 2 of the quadratic curve");
+
+	anchor1->setBounds(0, -1, .99f, 2);
 	anchor2->setBounds(.01f, -1, 1, 2);
 	
 	anchor1->setPoint(.5f, 0);

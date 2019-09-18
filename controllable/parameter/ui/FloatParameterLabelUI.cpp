@@ -156,7 +156,8 @@ void FloatParameterLabelUI::mouseUpInternal(const MouseEvent & e)
 void FloatParameterLabelUI::valueChanged(const var & v)
 {
     valueString = v.isDouble()?String(parameter->floatValue(),3):v.toString();
-    shouldUpdateLabel = true;
+	
+	shouldUpdateLabel = true;
 }
 
 void FloatParameterLabelUI::labelTextChanged(Label *)
@@ -171,7 +172,9 @@ void FloatParameterLabelUI::timerCallback()
     if (!shouldUpdateLabel) return;
     shouldUpdateLabel = false;
     
-    
+	int newStyle = parameter->isOverriden ? Font::bold : Font::plain;
+	if (valueLabel.getFont().getStyleFlags() != newStyle) valueLabel.setFont(valueLabel.getFont().withStyle(newStyle));
+
     valueLabel.setText(prefix + valueString + suffix, NotificationType::dontSendNotification);
     
     if (autoSize)
