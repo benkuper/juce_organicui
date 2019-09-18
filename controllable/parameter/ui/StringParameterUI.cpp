@@ -35,7 +35,7 @@ StringParameterUI::StringParameterUI(Parameter * p) :
 
 	feedbackStateChanged();
 
-    setSize(200, 18);//default size
+    setSize(200, 20);//default size
 }
 
 void StringParameterUI::setAutoSize(bool value)
