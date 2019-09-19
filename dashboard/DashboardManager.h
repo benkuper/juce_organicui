@@ -18,4 +18,6 @@ public:
 
 	DashboardManager();
 	~DashboardManager();
+
+	BoolParameter* editMode;
 };

@@ -1,11 +1,14 @@
-ParameterEditor::ParameterEditor(Parameter * _parameter, bool isRoot) :
+#include "ParameterEditor.h"
+ParameterEditor::ParameterEditor(Parameter* _parameter, bool isRoot) :
 	ControllableEditor(_parameter, isRoot),
-	parameter(_parameter)
+	parameter(_parameter),
+	currentUIHasRange(_parameter->hasRange())
 {
 	if (parameter->isOverriden && ui->isInteractable()) label.setFont(label.getFont().withStyle(Font::FontStyleFlags::bold));
 	
 	parameter->addParameterListener(this);
 	parameter->addAsyncParameterListener(this);
+	
 
 	updateUI();
 }
@@ -134,10 +137,18 @@ void ParameterEditor::updateUI()
 	else setSize(getWidth(), targetHeight);
 }
 
+
 void ParameterEditor::newMessage(const Parameter::ParameterEvent & e)
 {
 	if (ui->isInteractable()) label.setFont(label.getFont().withStyle(parameter->isOverriden ? Font::FontStyleFlags::bold : Font::FontStyleFlags::plain));
-	if (e.type == Parameter::ParameterEvent::BOUNDS_CHANGED) buildControllableUI(true);
+	if (e.type == Parameter::ParameterEvent::BOUNDS_CHANGED)
+	{
+		if (currentUIHasRange != parameter->hasRange())
+		{
+			buildControllableUI(true);
+			currentUIHasRange = parameter->hasRange();
+		}
+	}
 }
 
 void ParameterEditor::parameterControlModeChanged(Parameter *)

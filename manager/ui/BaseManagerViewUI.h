@@ -81,7 +81,7 @@ public:
 
 	virtual void itemUIMiniModeChanged(BaseItemUI<T> * itemUI) override;
 	virtual void itemUIViewPositionChanged(BaseItemMinimalUI<T> * itemUI) override;
-
+	virtual void askForSyncPosAndSize(BaseItemMinimalUI<T>* itemUI) override;
 
 	virtual void endLoadFile() override;
 };
@@ -435,6 +435,15 @@ template<class M, class T, class U>
  void BaseManagerViewUI<M, T, U>::itemUIViewPositionChanged(BaseItemMinimalUI<T>* itemUI)
  {
 	 updateViewUIPosition(dynamic_cast<U *>(itemUI));
+ }
+
+ template<class M, class T, class U>
+ void BaseManagerViewUI<M, T, U>::askForSyncPosAndSize(BaseItemMinimalUI<T>* itemUI)
+ {
+	 Array<UndoableAction*> actions;
+	 actions.add(itemUI->baseItem->viewUIPosition->setUndoablePoint(itemUI->baseItem->viewUIPosition->getPoint(), getViewPos(itemUI->getPosition()).toFloat(),true));
+	 actions.add(itemUI->baseItem->viewUISize->setUndoablePoint(itemUI->baseItem->viewUISize->getPoint(), Point<float>	(itemUI->getWidth(), itemUI->getHeight()),true));
+	 UndoMaster::getInstance()->performActions("Move / Resize "+itemUI->baseItem->niceName, actions);
  }
 
 template<class M, class T, class U>

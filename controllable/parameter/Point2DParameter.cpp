@@ -46,12 +46,12 @@ void Point2DParameter::setPoint(float _x, float _y)
 	setValue(d);
 }
 
-void Point2DParameter::setUndoablePoint(Point<float> oldPoint, Point<float> newPoint)
+UndoableAction * Point2DParameter::setUndoablePoint(Point<float> oldPoint, Point<float> newPoint, bool onlyReturnAction)
 {
-	setUndoablePoint(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
+	return setUndoablePoint(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y, onlyReturnAction);
 }
 
-void Point2DParameter::setUndoablePoint(float oldX, float oldY, float newX, float newY)
+UndoableAction* Point2DParameter::setUndoablePoint(float oldX, float oldY, float newX, float newY, bool onlyReturnAction)
 {
 	var od;
 	od.append(oldX);
@@ -60,9 +60,9 @@ void Point2DParameter::setUndoablePoint(float oldX, float oldY, float newX, floa
 	d.append(newX);
 	d.append(newY);
 
-	if (checkValueIsTheSame(od, d)) return;
+	if (checkValueIsTheSame(od, d)) return nullptr;
 
-	setUndoableValue(od, d);
+	return setUndoableValue(od, d, onlyReturnAction);
 }
 
 void Point2DParameter::setValueInternal(var & _value)

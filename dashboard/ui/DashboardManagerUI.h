@@ -17,5 +17,7 @@ public:
 	DashboardManagerUI(DashboardManager * manager);
 	~DashboardManagerUI();
 
+	std::unique_ptr<BoolToggleUI> editModeUI;
 
+	void resizedInternalContent(Rectangle<int>& r) override;
 };

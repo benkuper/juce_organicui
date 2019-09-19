@@ -16,6 +16,8 @@ DashboardItemManagerUI::DashboardItemManagerUI(DashboardItemManager * manager) :
 	//setWantsKeyboardFocus(true);
 
 	addExistingItems(false);
+	acceptedDropTypes.add("Controllable");
+	acceptedDropTypes.add("Container");
 }
 
 DashboardItemManagerUI::~DashboardItemManagerUI()
@@ -39,8 +41,23 @@ void DashboardItemManagerUI::itemDropped(const SourceDetails & details)
 		BaseItem * bi = dynamic_cast<BaseItem *>(icc->inspectable.get());
 		if (bi != nullptr)
 		{
-			manager->addItem(new DashboardTargetItem(bi), getViewMousePosition().toFloat());
+			manager->addItem(bi->createDashboardItem(), getViewMousePosition().toFloat());
 		}
+		return;
+	}
+	
+	ControllableEditor* e = dynamic_cast<ControllableEditor*>(details.sourceComponent.get());
+	if (e != nullptr)
+	{
+		manager->addItem(e->controllable->createDashboardItem(), getViewMousePosition().toFloat());
+		return;
+	}
+
+	GenericControllableContainerEditor* ge = dynamic_cast<GenericControllableContainerEditor*>(details.sourceComponent.get());
+	if (ge != nullptr)
+	{
+		manager->addItem(ge->container->createDashboardItem(), getViewMousePosition().toFloat());
+		return;
 	}
 }
 

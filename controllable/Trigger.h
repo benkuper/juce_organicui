@@ -28,6 +28,8 @@ public:
 	
 	virtual void trigger();
 	
+	virtual DashboardItem* createDashboardItem() override;
+
 	// avoid feedback loop in listeners
 	bool isTriggering;
 public:

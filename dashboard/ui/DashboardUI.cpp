@@ -11,6 +11,7 @@
 DashboardUI::DashboardUI(Dashboard * item) :
 	BaseItemUI(item)
 {
+	setSize(100, 20);
 }
 
 DashboardUI::~DashboardUI()

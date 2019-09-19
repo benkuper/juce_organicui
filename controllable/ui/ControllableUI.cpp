@@ -135,7 +135,7 @@ void ControllableUI::showContextMenu()
 		default:
 			if (result >= 10000)
 			{
-				DashboardManager::getInstance()->items[result - 10000]->itemManager.addItem(new DashboardTargetItem(controllable));
+				DashboardManager::getInstance()->items[result - 10000]->itemManager.addItem(controllable->createDashboardItem());
 			}
 			else if (ControllableUI::handleCustomContextMenuResultFunc != nullptr)
 			{

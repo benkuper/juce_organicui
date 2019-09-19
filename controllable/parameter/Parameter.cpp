@@ -1,3 +1,4 @@
+#include "Parameter.h"
 /*
   ==============================================================================
 
@@ -308,6 +309,11 @@ void Parameter::parameterValueChanged(Parameter * p)
 InspectableEditor * Parameter::getEditor(bool isRoot)
 {
 	return new ParameterEditor(this, isRoot);
+}
+
+DashboardItem* Parameter::createDashboardItem()
+{
+	return new DashboardParameterItem(this);
 }
 
 var Parameter::getJSONDataInternal()

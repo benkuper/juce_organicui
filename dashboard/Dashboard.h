@@ -18,7 +18,6 @@ public:
 	~Dashboard();
 
 	DashboardItemManager itemManager;
-	//CommentManager commentManager;
 
 	var getJSONData() override;
 	void loadJSONDataInternal(var data) override;

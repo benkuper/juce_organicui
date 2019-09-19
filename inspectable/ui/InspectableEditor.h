@@ -29,6 +29,7 @@ public:
 	bool isRoot;
 	bool isInsideInspectorBounds;
 
+
 	void componentMovedOrResized(Component & c, bool wasMoved, bool wasResized) override;
 	
 	void updateVisibility();

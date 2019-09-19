@@ -1,3 +1,4 @@
+#include "Trigger.h"
 /*
  ==============================================================================
 
@@ -50,4 +51,9 @@ void Trigger::trigger()
 		queuedNotifier.addMessage(new WeakReference<Trigger>(this));
 		isTriggering = false;
 	}
+}
+
+DashboardItem* Trigger::createDashboardItem()
+{
+	return new DashboardTriggerItem(this);
 }

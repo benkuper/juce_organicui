@@ -1,3 +1,4 @@
+#include "DashboardManagerUI.h"
 /*
   ==============================================================================
 
@@ -9,15 +10,27 @@
 */
 
 
-DashboardManagerUI::DashboardManagerUI(DashboardManager * manager) :
+DashboardManagerUI::DashboardManagerUI(DashboardManager* manager) :
 	BaseManagerUI("Dashboards", manager)
 {
+	setDefaultLayout(Layout::HORIZONTAL);
+
 	bgColor = bgColor.darker();
 	addExistingItems(false);
-	
+
+	editModeUI.reset(manager->editMode->createToggle());
+	addAndMakeVisible(editModeUI.get());
+	editModeUI->showLabel = true;
 }
+
 
 DashboardManagerUI::~DashboardManagerUI()
 {
 
+}
+
+void DashboardManagerUI::resizedInternalContent(Rectangle<int>& r)
+{
+	editModeUI->setBounds(r.removeFromRight(100).reduced(10));
+	BaseManagerUI::resizedInternalContent(r);
 }

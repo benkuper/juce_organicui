@@ -200,11 +200,9 @@ InspectableEditor * Controllable::getEditor(bool isRootEditor) {
 }
 
 
-Component * Controllable::createDashboardContent()
+DashboardItem * Controllable::createDashboardItem()
 {
-	ControllableUI * cui = createDefaultUI();
-	cui->showLabel = false;
-	return cui;
+	return new DashboardControllableItem(this);
 }
 
 

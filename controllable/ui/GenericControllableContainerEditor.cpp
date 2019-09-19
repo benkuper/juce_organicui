@@ -16,9 +16,10 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(WeakRefer
 	isRebuilding(false),
 	prepareToAnimate(false),
 	contourColor(BG_COLOR.brighter(.3f)),
-	containerLabel("containerLabel", dynamic_cast<ControllableContainer *>(inspectable.get())->niceName),
-	container(dynamic_cast<ControllableContainer *>(inspectable.get())),
-	headerSpacer("headerSpacer")
+	containerLabel("containerLabel", dynamic_cast<ControllableContainer*>(inspectable.get())->niceName),
+	container(dynamic_cast<ControllableContainer*>(inspectable.get())),
+	headerSpacer("headerSpacer"),
+	dragAndDropEnabled(true)
 {
 	container->addAsyncContainerListener(this);
 	addAndMakeVisible(containerLabel);
@@ -101,6 +102,38 @@ void GenericControllableContainerEditor::mouseDown(const MouseEvent & e)
 	}
 }
 
+void GenericControllableContainerEditor::mouseDrag(const MouseEvent& e)
+{
+	InspectableEditor::mouseDrag(e);
+
+	if (dragAndDropEnabled && e.eventComponent->getY() < headerHeight)
+	{
+		var desc = var(new DynamicObject());
+		desc.getDynamicObject()->setProperty("type", "ControllableContainer");
+		desc.getDynamicObject()->setProperty("dataType", "Container");
+		//Image dragImage = this->createComponentSnapshot(this->getLocalBounds()).convertedToFormat(Image::ARGB);
+		//dragImage.multiplyAllAlphas(.5f);
+		Point<int> offset = -getMouseXYRelative();
+		if (e.getDistanceFromDragStart() > 30) startDragging(desc, this, Image(), true, &offset);
+	}
+}
+
+void GenericControllableContainerEditor::setDragAndDropEnabled(bool value)
+{
+	if (dragAndDropEnabled == value) return;
+
+	dragAndDropEnabled = value;
+
+	for (auto& e : childEditors)
+	{
+		GenericControllableContainerEditor* gce = dynamic_cast<GenericControllableContainerEditor*>(e);
+		if (gce != nullptr) setDragAndDropEnabled(value);
+		
+		ControllableEditor* ce = dynamic_cast<ControllableEditor*>(e);
+		if (ce != nullptr) ce->dragAndDropEnabled = value;
+	}
+}
+
 void GenericControllableContainerEditor::showContextMenu()
 {
 	PopupMenu p;
@@ -126,7 +159,7 @@ void GenericControllableContainerEditor::showContextMenu()
 		default:*/
 			if (result >= 10000)
 			{
-				DashboardManager::getInstance()->items[result - 10000]->itemManager.addItem(new DashboardTargetItem(container));
+				DashboardManager::getInstance()->items[result - 10000]->itemManager.addItem(container->createDashboardItem());
 			}
 			else
 			{
@@ -243,6 +276,10 @@ InspectableEditor * GenericControllableContainerEditor::getEditorUIForContainer(
 InspectableEditor * GenericControllableContainerEditor::addEditorUI(ControllableContainer * cc, bool resize)
 {
 	InspectableEditor * ccui = getEditorUIForContainer(cc);
+	
+	GenericControllableContainerEditor* gce = dynamic_cast<GenericControllableContainerEditor*>(ccui);
+	if (gce != nullptr) gce->setDragAndDropEnabled(dragAndDropEnabled);
+	
 	int index = container->controllableContainers.indexOf(cc);
 	childEditors.insert(container->controllables.size()+index, ccui);
 	addAndMakeVisible(ccui);
@@ -317,6 +354,10 @@ InspectableEditor * GenericControllableContainerEditor::addControllableUI(Contro
 	if (!c->isControllableExposed || c->hideInEditor) return nullptr;
 
 	InspectableEditor * cui = getEditorUIForControllable(c);
+	
+	ControllableEditor* ce = dynamic_cast<ControllableEditor*>(cui);
+	if (ce != nullptr) ce->dragAndDropEnabled = dragAndDropEnabled;
+
 	int index = container->controllables.indexOf(c);
 	childEditors.insert(index, cui);
 	addAndMakeVisible(cui);

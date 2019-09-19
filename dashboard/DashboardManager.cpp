@@ -13,6 +13,7 @@ juce_ImplementSingleton(DashboardManager)
 DashboardManager::DashboardManager() :
 	BaseManager("Dashboard")
 {
+	editMode = addBoolParameter("Edit Mode", "If checked, items are editable. If not, items are normally usable", true);
 }
 
 DashboardManager::~DashboardManager()

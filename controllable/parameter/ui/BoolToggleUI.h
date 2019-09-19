@@ -21,7 +21,6 @@ public:
 	Image offImage;
 	Image onImage;
 
-    juce::Rectangle<int> drawRect;
 
     bool invertVisuals;
     
@@ -33,8 +32,6 @@ public:
     void mouseDownInternal(const MouseEvent &e) override;
     void mouseUpInternal(const MouseEvent &e) override;
 
-	bool hitTest(int x, int y) override;
-    
     void timerCallback() override;
 
 protected:

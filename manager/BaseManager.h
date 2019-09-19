@@ -943,6 +943,8 @@ inline bool BaseManager<T>::RemoveItemAction::perform()
 	if (s == nullptr) return false;
 
 	this->data = s->getJSONData();
+	if (this->data.getDynamicObject() == nullptr) return false;
+
 	this->data.getDynamicObject()->setProperty("index", this->itemIndex);
 
 	this->getManager()->removeItem(s, false);

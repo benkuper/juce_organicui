@@ -1,3 +1,4 @@
+#include "ShapeShifterPanelHeader.h"
 /*
   ==============================================================================
 
@@ -61,7 +62,7 @@ void ShapeShifterPanelHeader::mouseDown(const MouseEvent & e)
 
 void ShapeShifterPanelHeader::mouseDrag(const MouseEvent & e)
 {
-	int minDetachDistanceY = 10;
+	int minDetachDistanceY = 20;
 
 	if (e.eventComponent == this)
 	{

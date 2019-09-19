@@ -14,7 +14,8 @@ juce_ImplementSingleton(ShapeShifterManager);
 ShapeShifterManager::ShapeShifterManager() :
 	mainContainer(ShapeShifterContainer::Direction::VERTICAL),
 	currentCandidatePanel(nullptr),
-	defaultFileData(nullptr)
+	defaultFileData(nullptr),
+	temporaryFullContent(nullptr)
 {
 	
 }
@@ -104,7 +105,7 @@ ShapeShifterWindow * ShapeShifterManager::showPanelWindowForContent(const String
 	return w;
 }
 
-void ShapeShifterManager::showContent(String contentName)
+ShapeShifterContent * ShapeShifterManager::showContent(String contentName)
 {
     //DBG("Show content " << contentName);
 	ShapeShifterPanel * p = getPanelForContentName(contentName);
@@ -114,11 +115,13 @@ void ShapeShifterManager::showContent(String contentName)
 		p->setCurrentContent(contentName);
 		ShapeShifterWindow * w = getWindowForPanel(p);
 		if (w != nullptr) w->toFront(true);
+
+		return p->currentContent;
 	} else
 	{
 		ShapeShifterContent * c = ShapeShifterFactory::createContent(contentName);
 
-		if (c == nullptr) return;
+		if (c == nullptr) return nullptr;
 
 		ShapeShifterPanel * newP = createPanel(c);
 
@@ -130,7 +133,11 @@ void ShapeShifterManager::showContent(String contentName)
 		 juce::Rectangle<int> r(100,100,300, 500);
 			showPanelWindow(newP, r);
 		}
+
+		return c;
 	}
+
+	return nullptr;
 }
 
 void ShapeShifterManager::closePanelWindow(ShapeShifterWindow * window, bool doRemovePanel)
@@ -342,6 +349,26 @@ Array<File> ShapeShifterManager::getLayoutFiles()
 	layoutFolder.findChildFiles(layoutFiles, File::findFiles, false, "*."+appLayoutExtension);
 
 	return layoutFiles;
+}
+
+void ShapeShifterManager::toggleTemporaryFullContent(ShapeShifterContent* content)
+{
+	if (content == temporaryFullContent) content = nullptr;
+	
+	if (content == nullptr)
+	{
+		loadLayout(ghostLayout);
+		temporaryFullContent = nullptr;
+	}
+	else
+	{
+		ghostLayout = getCurrentLayout();
+		String contentName = content->contentName;
+		clearAllPanelsAndWindows();
+		ShapeShifterContent * c = showContent(contentName);
+		temporaryFullContent = c;
+
+	}
 }
 
 void ShapeShifterManager::clearAllPanelsAndWindows()

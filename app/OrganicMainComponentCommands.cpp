@@ -9,7 +9,7 @@
  */
 
 ApplicationProperties& getAppProperties();
-
+OrganicApplication::MainWindow* getMainWindow();
 
 namespace CommandIDs
 {
@@ -30,6 +30,7 @@ namespace CommandIDs
 
 	static const int editProjectSettings = 0x50001;
 	static const int editGlobalSettings = 0x50002;
+	static const int toggleKioskMode = 0x50003;
 
 	static const int showAbout = 0x60000;
 	static const int gotoWebsite = 0x60001;
@@ -90,6 +91,11 @@ void OrganicMainContentComponent::getCommandInfo(CommandID commandID, Applicatio
 	case CommandIDs::editGlobalSettings:
 		result.setInfo("Preferences", "Edit the general settings related to this application", category, 0);
 		result.defaultKeypresses.add(KeyPress(',', ModifierKeys::commandModifier, 0));
+		break;
+
+	case CommandIDs::toggleKioskMode:
+		result.setInfo("Toggle Fullscreen", "Toggle between window mode and kiosk mode", category, 0);
+		result.defaultKeypresses.add(KeyPress(KeyPress::F11Key));
 		break;
 
 	case CommandIDs::showAbout:
@@ -232,6 +238,7 @@ void OrganicMainContentComponent::getAllCommands(Array<CommandID>& commands) {
 	  CommandIDs::deleteItems,
 	  CommandIDs::editGlobalSettings,
 	  CommandIDs::editProjectSettings,
+	  CommandIDs::toggleKioskMode,
 	  CommandIDs::selectPreviousItem,
 	  CommandIDs::selectNextItem,
 	  CommandIDs::undo,
@@ -293,9 +300,11 @@ PopupMenu OrganicMainContentComponent::getMenuForIndex(int /*topLevelMenuIndex*/
 		menu.addCommandItem(&getCommandManager(), CommandIDs::deleteItems);
 
 	}
-	else if (menuName == "Panels")
+	else if (menuName == "View")
 	{
-		return ShapeShifterManager::getInstance()->getPanelsMenu();
+		menu = ShapeShifterManager::getInstance()->getPanelsMenu();
+		menu.addSeparator();
+		menu.addCommandItem(&getCommandManager(), CommandIDs::toggleKioskMode);
 	}
 
 #if TIMELINE_ADD_MENU_ITEMS
@@ -510,6 +519,10 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 		GlobalSettings::getInstance()->selectThis();
 		break;
 
+	case CommandIDs::toggleKioskMode:
+		Desktop::getInstance().setKioskModeComponent(Desktop::getInstance().getKioskModeComponent() == getMainWindow()?nullptr:getMainWindow());
+		break;
+
 	default:
 		return JUCEApplication::getInstance()->perform(info);
 }
@@ -524,7 +537,7 @@ void OrganicMainContentComponent::menuItemSelected(int menuItemID, int topLevelM
 {
 	String menuName = getMenuBarNames()[topLevelMenuIndex];
 
-	if (menuName == "Panels")
+	if (menuName == "View" && menuItemID != CommandIDs::toggleKioskMode)
 	{
 		ShapeShifterManager::getInstance()->handleMenuPanelCommand(menuItemID);
 
@@ -544,6 +557,6 @@ StringArray OrganicMainContentComponent::getMenuBarNames() {
 #if TIMELINE_ADD_MENU_ITEMS
 	names.addArray(TimelineAppCommands::getMenuBarNames());
 #endif
-	names.add("Panels");
+	names.add("View");
 	return names;
 }

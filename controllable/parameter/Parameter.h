@@ -127,6 +127,9 @@ public:
 
 	InspectableEditor * getEditor(bool isRoot) override;
 
+	virtual DashboardItem* createDashboardItem() override;
+
+
 	virtual var getJSONDataInternal() override;
 	virtual void loadJSONDataInternal(var data) override;
 	

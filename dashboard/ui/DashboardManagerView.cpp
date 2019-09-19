@@ -54,7 +54,7 @@ void DashboardManagerView::setCurrentDashboard(Dashboard * d)
 void DashboardManagerView::resized()
 {
 	juce::Rectangle<int> r = getLocalBounds();
-	managerUI.setBounds(r.removeFromLeft(150));
+	managerUI.setBounds(r.removeFromTop(40));
 	if (currentItemManagerUI != nullptr)
 	{
 		currentItemManagerUI->setBounds(r);

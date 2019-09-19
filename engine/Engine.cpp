@@ -123,7 +123,7 @@ DashboardItem * Engine::getDashboardItemFromMenuResult(int result)
 	ControllableChooserPopupMenu chooser(this, true, true, 0);
 	Controllable * c = chooser.getControllableForResult(result);
 	if (c == nullptr) return nullptr;
-	return new DashboardTargetItem(c);
+	return c->createDashboardItem();
 }
 
 void Engine::clear() {

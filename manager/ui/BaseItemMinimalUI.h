@@ -76,7 +76,8 @@ public:
 	{
 	public:
 		virtual ~ItemMinimalUIListener() {}
-		virtual void itemUIViewPositionChanged(BaseItemMinimalUI<T> *) {}
+		virtual void itemUIViewPositionChanged(BaseItemMinimalUI<T>*) {}
+		virtual void askForSyncPosAndSize(BaseItemMinimalUI<T>*) {}
 	};
 
 	ListenerList<ItemMinimalUIListener> itemMinimalUIListeners;

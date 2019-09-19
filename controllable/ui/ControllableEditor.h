@@ -13,7 +13,8 @@
 class ControllableEditor : 
 	public InspectableEditor,
 	public Button::Listener,
-	public Controllable::AsyncListener
+	public Controllable::AsyncListener,
+	public DragAndDropContainer
 {
 public:
 	ControllableEditor(Controllable * controllable, bool isRoot);  //Todo : handle full feedback if is root
@@ -30,14 +31,17 @@ public:
 	int baseHeight; //height at init
 	int subContentHeight; //for additional content
 
+	bool dragAndDropEnabled;
+
 	bool showLabel;
 	void setShowLabel(bool value);
 
-	void buildControllableUI(bool resizeAfter = false);
+	virtual void buildControllableUI(bool resizeAfter = false);
 
 	void resized() override;
 
 	void mouseDown(const MouseEvent &e) override;
+	void mouseDrag(const MouseEvent& e) override;
 
 	void newMessage(const Controllable::ControllableEvent &e) override;
 

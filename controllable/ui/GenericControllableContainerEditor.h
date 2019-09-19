@@ -16,7 +16,8 @@ class GenericControllableContainerEditor :
 	public ContainerAsyncListener,
 	public Button::Listener,
 	public ChangeListener,
-	public Label::Listener
+	public Label::Listener,
+	public DragAndDropContainer
 {
 public:
 	GenericControllableContainerEditor(WeakReference<Inspectable> _inspectable, bool isRoot, bool buildAtCreation = true);
@@ -44,8 +45,11 @@ public:
 
 	Component headerSpacer;
 
+	bool dragAndDropEnabled;
+
 	virtual void setCollapsed(bool value, bool force = false, bool animate = true, bool doNotRebuild = false);
 	virtual void resetAndBuild();
+
 
 	void paint(Graphics &g) override;
 	void resized() override;
@@ -56,6 +60,10 @@ public:
 	virtual void clear();
 
 	void mouseDown(const MouseEvent &e) override;
+	void mouseDrag(const MouseEvent& e) override;
+
+	virtual void setDragAndDropEnabled(bool value);
+
 
 	virtual void showContextMenu();
 	virtual void addPopupMenuItems(PopupMenu *) {} //for child classes

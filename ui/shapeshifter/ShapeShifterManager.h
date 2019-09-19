@@ -35,6 +35,10 @@ public:
 
 	char * defaultFileData;
 
+	var ghostLayout; //for temporary full panels
+	ShapeShifterContent* temporaryFullContent;
+
+
 	void setDefaultFileData(const char *data);
 	void setLayoutInformations(const String &appLayoutExtension, const String &appSubLayoutFolder);
 
@@ -48,7 +52,7 @@ public:
 
 	ShapeShifterWindow * showPanelWindow(ShapeShifterPanel * _panel, juce::Rectangle<int> bounds);
 	ShapeShifterWindow * showPanelWindowForContent(const String &panelName);
-	void showContent(String contentName);
+	ShapeShifterContent * showContent(String contentName);
 	
 
 	void closePanelWindow(ShapeShifterWindow * window, bool doRemovePanel);
@@ -72,6 +76,8 @@ public:
 	void saveCurrentLayout();
 	void saveCurrentLayoutToFile(const File &toFile);
 	Array<File> getLayoutFiles();
+
+	void toggleTemporaryFullContent(ShapeShifterContent* content);
 
 	void clearAllPanelsAndWindows();
 

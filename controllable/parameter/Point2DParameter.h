@@ -20,8 +20,8 @@ public:
 
 	void setPoint(Point<float> value);
 	void setPoint(float x, float y);
-	void setUndoablePoint(Point<float> oldPoint, Point<float> newPoint);
-	void setUndoablePoint(float oldX, float oldY, float newX, float newY);
+	UndoableAction * setUndoablePoint(Point<float> oldPoint, Point<float> newPoint, bool onlyReturnAction = false);
+	UndoableAction* setUndoablePoint(float oldX, float oldY, float newX, float newY, bool onlyReturnAction = false);
 
 	void setValueInternal(var & _value) override;
 	

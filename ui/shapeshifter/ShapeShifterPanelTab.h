@@ -33,6 +33,9 @@ public:
 
 	void buttonClicked(Button * b) override;
 
+	void mouseDoubleClick(const MouseEvent& e) override;
+
+
 	//Listener
 	class TabListener
 	{

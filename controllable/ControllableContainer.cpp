@@ -981,9 +981,9 @@ InspectableEditor * ControllableContainer::getEditor(bool isRoot)
 	return new GenericControllableContainerEditor(this, isRoot);
 }
 
-Component * ControllableContainer::createDashboardContent()
+DashboardItem * ControllableContainer::createDashboardItem()
 {
-	return getEditor(true);
+	return new DashboardCCItem(this);
 }
 
 EnablingControllableContainer::EnablingControllableContainer(const String & n, bool _canBeDisabled) :

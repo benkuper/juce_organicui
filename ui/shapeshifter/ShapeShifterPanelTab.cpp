@@ -1,3 +1,4 @@
+#include "ShapeShifterPanelTab.h"
 /*
   ==============================================================================
 
@@ -61,4 +62,9 @@ int ShapeShifterPanelTab::getLabelWidth()
 void ShapeShifterPanelTab::buttonClicked(Button * b)
 {
 	if(b == closePanelBT.get()) tabListeners.call(&TabListener::askForRemoveTab, this);
+}
+
+void ShapeShifterPanelTab::mouseDoubleClick(const MouseEvent& e)
+{
+	ShapeShifterManager::getInstance()->toggleTemporaryFullContent(content);
 }

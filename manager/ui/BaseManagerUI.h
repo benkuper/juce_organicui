@@ -421,8 +421,15 @@ void BaseManagerUI<M, T, U>::resizedInternalContent(juce::Rectangle<int>& r)
 
 	if (addItemBT != nullptr && addItemBT->isVisible() && addItemBT->getParentComponent() == this)
 	{
-		addItemBT->setBounds(r.withSize(24, 24).withX(r.getWidth() - 24));
-		r.removeFromTop(24);
+		if (defaultLayout == VERTICAL)
+		{
+			addItemBT->setBounds(r.withSize(24, 24).withX(r.getWidth() - 24));
+			r.removeFromTop(24);
+		}else
+		{
+			addItemBT->setBounds(r.withSize(24, 24).withX(r.getWidth() - 24));
+			r.removeFromRight(24);
+		}
 	}
 
 

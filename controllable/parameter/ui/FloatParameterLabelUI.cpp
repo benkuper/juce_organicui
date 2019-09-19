@@ -15,14 +15,6 @@ FloatParameterLabelUI::FloatParameterLabelUI(Parameter * p) :
 	autoSize(false)
 {
 
-	addChildComponent(nameLabel);
-	setNameLabelVisible(false);
-	addAndMakeVisible(valueLabel);
-
-	nameLabel.setJustificationType(Justification::left);
-	nameLabel.setText(prefix + parameter->niceName + suffix, NotificationType::dontSendNotification);
-	nameLabel.setColour(Label::ColourIds::textColourId, TEXTNAME_COLOR);
-
 	valueLabel.setJustificationType(Justification::centred);
 	valueLabel.setColour(Label::ColourIds::textColourId, isInteractable()?TEXT_COLOR:BLUE_COLOR.brighter(.2f));
 	
@@ -33,7 +25,10 @@ FloatParameterLabelUI::FloatParameterLabelUI(Parameter * p) :
 	valueLabel.setColour(valueLabel.backgroundWhenEditingColourId, Colours::black);
 	valueLabel.setColour(CaretComponent::caretColourId, Colours::orange);
 	valueLabel.setColour(valueLabel.textWhenEditingColourId, Colours::orange);
-	nameLabel.setTooltip(p->description);
+	
+	valueLabel.setTooltip(tooltip);
+
+	addAndMakeVisible(&valueLabel);
 
 	showEditWindowOnDoubleClick = false;
 
@@ -74,12 +69,6 @@ void FloatParameterLabelUI::setSuffix(const String & _suffix)
 	valueChanged(parameter->stringValue());
 }
 
-void FloatParameterLabelUI::setNameLabelVisible(bool visible)
-{
-	//    if (nameLabelIsVisible == visible) return;
-	nameLabelIsVisible = visible;
-	nameLabel.setVisible(visible);
-}
 
 
 void FloatParameterLabelUI::feedbackStateChanged()
@@ -91,6 +80,12 @@ void FloatParameterLabelUI::feedbackStateChanged()
 	setOpaqueBackground(opaqueBackground); //force refresh color
 }
 
+void FloatParameterLabelUI::updateTooltip()
+{
+	ParameterUI::updateTooltip();
+	valueLabel.setTooltip(tooltip);
+}
+
 /*
 void FloatParameterLabelUI::paint(Graphics & g)
 {
@@ -100,15 +95,7 @@ g.fillAll(Colours::purple.withAlpha(.2f));
 
 void FloatParameterLabelUI::resized()
 {
- juce::Rectangle<int> r = getLocalBounds();
-	int nameLabelWidth = 100;// nameLabel.getFont().getStringWidth(nameLabel.getText());
-	if (nameLabelIsVisible)
-	{
-		nameLabel.setBounds(r.removeFromLeft(nameLabelWidth));
-		nameLabel.setFont(nameLabel.getFont().withHeight(jmin<float>((float)r.getHeight(), maxFontHeight)));
-
-	}
-
+	 juce::Rectangle<int> r = getLocalBounds();
 	valueLabel.setFont(valueLabel.getFont().withHeight(jmin<float>((float)r.getHeight(), maxFontHeight)));
 	valueLabel.setBounds(r);
 	
@@ -156,7 +143,6 @@ void FloatParameterLabelUI::mouseUpInternal(const MouseEvent & e)
 void FloatParameterLabelUI::valueChanged(const var & v)
 {
     valueString = v.isDouble()?String(parameter->floatValue(),3):v.toString();
-	
 	shouldUpdateLabel = true;
 }
 
@@ -175,14 +161,13 @@ void FloatParameterLabelUI::timerCallback()
 	int newStyle = parameter->isOverriden ? Font::bold : Font::plain;
 	if (valueLabel.getFont().getStyleFlags() != newStyle) valueLabel.setFont(valueLabel.getFont().withStyle(newStyle));
 
-    valueLabel.setText(prefix + valueString + suffix, NotificationType::dontSendNotification);
+
+	valueLabel.setText(/*(showLabel ? parameter->niceName + " : " : "") + */prefix + valueString + suffix, NotificationType::dontSendNotification);
     
     if (autoSize)
     {
-        int nameLabelWidth = nameLabel.getFont().getStringWidth(nameLabel.getText());
         int valueLabelWidth = valueLabel.getFont().getStringWidth(valueLabel.getText());
         int tw = valueLabelWidth;
-        if (nameLabelIsVisible) tw += 5 + nameLabelWidth;
         setSize(tw + 10, (int)valueLabel.getFont().getHeight());
     }
     
@@ -207,6 +192,7 @@ void TimeLabel::valueChanged(const var & v)
 {
 	String timeString = valueToTimeString(v);
 	FloatParameterLabelUI::valueChanged(timeString);
+
 }
 
 void TimeLabel::labelTextChanged(Label *)

@@ -15,6 +15,7 @@ ControllableEditor::ControllableEditor(Controllable * _controllable, bool isRoot
 	controllable(_controllable),
 	label("Label"),
     subContentHeight(0),
+	dragAndDropEnabled(true),
     showLabel(true)
 {
 	buildControllableUI();
@@ -132,6 +133,23 @@ void ControllableEditor::mouseDown(const MouseEvent & e)
 			if (ui->showMenuOnRightClick) ui->showContextMenu();
 		}
 	}
+}
+
+void ControllableEditor::mouseDrag(const MouseEvent& e)
+{
+	InspectableEditor::mouseDrag(e);
+
+	if (dragAndDropEnabled && e.eventComponent == &label)
+	{
+		var desc = var(new DynamicObject());
+		desc.getDynamicObject()->setProperty("type", controllable->getTypeString());
+		desc.getDynamicObject()->setProperty("dataType", "Controllable");
+		//Image dragImage = this->createComponentSnapshot(this->getLocalBounds()).convertedToFormat(Image::ARGB);
+		//dragImage.multiplyAllAlphas(.5f);
+		Point<int> offset = -getMouseXYRelative();
+		if (e.getDistanceFromDragStart() > 30) startDragging(desc, this, Image(), true, &offset);
+	}
+	
 }
 
 void ControllableEditor::newMessage(const Controllable::ControllableEvent & e)

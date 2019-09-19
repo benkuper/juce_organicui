@@ -18,8 +18,6 @@ public:
     TriggerButtonUI(Trigger * t);
     ~TriggerButtonUI();
 
-	juce::Rectangle<int> drawRect;
-
 	String customText;
 
 	bool drawTriggering;
@@ -28,8 +26,6 @@ public:
     void triggerTriggered(const Trigger * p) override ;
 
 	void mouseDownInternal(const MouseEvent &e) override;
-
-	bool hitTest(int x, int y) override;
 
 	// Inherited via Timer
 	virtual void timerCallback() override;

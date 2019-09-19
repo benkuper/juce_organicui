@@ -8,8 +8,8 @@
   ==============================================================================
 */
 
-DashboardGroupItem::DashboardGroupItem(Inspectable * _target) :
-	BaseItem("Dashboard Group Item",false)
+DashboardGroupItem::DashboardGroupItem() :
+	DashboardItem()
 {
 }
 
@@ -17,7 +17,7 @@ DashboardGroupItem::~DashboardGroupItem()
 {
 }
 
-BaseItemMinimalUI<DashboardItem> * DashboardGroupItem::createUI()
+DashboardItemUI * DashboardGroupItem::createUI()
 {
-	return nullptr;// new DashboardItemUI(this);
+	return new DashboardGroupItemUI(this);
 }

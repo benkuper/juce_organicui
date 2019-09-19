@@ -24,6 +24,7 @@ public:
 	~ParameterEditor();
 
 	WeakReference<Parameter> parameter;
+	bool currentUIHasRange;
 
 	//Expression
 	std::unique_ptr<Label> expressionLabel;
@@ -40,6 +41,7 @@ public:
 	virtual void updateUI();
 
 	void newMessage(const Parameter::ParameterEvent &e) override;
+
 
 	void parameterControlModeChanged(Parameter *) override;
 

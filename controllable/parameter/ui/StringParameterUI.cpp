@@ -66,6 +66,12 @@ void StringParameterUI::feedbackStateChanged()
 	setOpaqueBackground(opaqueBackground); //force refresh color
 }
 
+void StringParameterUI::updateTooltip()
+{
+	ParameterUI::updateTooltip();
+	valueLabel.setTooltip(tooltip);
+}
+
 void StringParameterUI::resized()
 {
 	juce::Rectangle<int> r = getLocalBounds();

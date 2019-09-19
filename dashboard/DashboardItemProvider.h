@@ -21,5 +21,5 @@ public:
 	DashboardItemTarget() {}
 	virtual ~DashboardItemTarget() {}
 
-	virtual Component * createDashboardContent() = 0;
+	virtual DashboardItem * createDashboardItem() = 0;
 };

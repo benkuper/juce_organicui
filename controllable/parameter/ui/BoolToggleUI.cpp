@@ -1,4 +1,3 @@
-#include "BoolToggleUI.h"
 /*
   ==============================================================================
 
@@ -49,29 +48,34 @@ void BoolToggleUI::paint(Graphics & g)
     // we are on component deletion
     if(shouldBailOut())return;
 
+
 	bool valCheck = invertVisuals ? !parameter->boolValue():parameter->boolValue();
 	Image m = valCheck ? onImage : offImage;
 	
- juce::Rectangle<int> r = getLocalBounds();
+	juce::Rectangle<int> r = getLocalBounds();
 	g.setColour(Colours::white.withAlpha(isMouseOver() ? 1 : .8f));
 
- juce::Rectangle<int> cr;
+	 juce::Rectangle<int> cr;
+	 float labelWidth = 0;
+
 	if (showLabel)
 	{
-		cr = r.removeFromRight(r.getHeight());
+		labelWidth = g.getCurrentFont().getStringWidth(parameter->niceName);
+		if (r.getHeight() > r.getWidth())
+		{
+			cr = r.removeFromRight(jmin<float>(r.getHeight(), r.getWidth() - labelWidth));
+			cr = cr.withSizeKeepingCentre(cr.getWidth(), cr.getWidth());
+		}
+		else
+		{
+			cr = r.removeFromRight(getHeight());
+		}
+
 		r.removeFromRight(2);
 	}else
 	{
 		cr = r.removeFromLeft(r.getHeight());
 	}
-
-	g.drawImage(m, cr.toFloat());
-	drawRect = cr;
-	
-	/*
-    g.setGradientFill(ColourGradient(c.brighter(.2f),(float)getLocalBounds().getCentreX(),(float)getLocalBounds().getCentreY(), c.darker(.2f), 2.f,2.f,true));
-    g.fillRoundedRectangle(getLocalBounds().toFloat(),2);
-	*/
 
 	if (showLabel)
 	{
@@ -79,6 +83,15 @@ void BoolToggleUI::paint(Graphics & g)
 		g.setColour(Colours::white);
 		g.drawFittedText(parameter->niceName, r, Justification::left,1);
 	}
+
+	g.drawImage(m, cr.toFloat());
+	
+	/*
+    g.setGradientFill(ColourGradient(c.brighter(.2f),(float)getLocalBounds().getCentreX(),(float)getLocalBounds().getCentreY(), c.darker(.2f), 2.f,2.f,true));
+    g.fillRoundedRectangle(getLocalBounds().toFloat(),2);
+	*/
+
+	
 }
 
 void BoolToggleUI::mouseDownInternal(const MouseEvent & e)
@@ -92,11 +105,6 @@ void BoolToggleUI::mouseUpInternal(const MouseEvent & e)
 {
 	if (isInteractable()) return;
     if (e.mods.isRightButtonDown()) parameter->setValue(!parameter->boolValue());
-}
-
-bool BoolToggleUI::hitTest(int x, int y)
-{
-	return drawRect.contains(x, y);
 }
 
 

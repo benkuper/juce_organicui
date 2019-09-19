@@ -17,7 +17,6 @@ InspectableEditor::InspectableEditor(WeakReference<Inspectable> _inspectable, bo
     fitToContent(false),
     isRoot(_isRoot),
     isInsideInspectorBounds(false)
-
 {
 	addComponentListener(this);
 }

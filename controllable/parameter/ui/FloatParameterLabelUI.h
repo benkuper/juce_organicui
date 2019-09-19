@@ -41,11 +41,9 @@ public:
 	void setPrefix(const String &_prefix);
 	void setSuffix(const String &_suffix);
 
-	bool nameLabelIsVisible;
-	void setNameLabelVisible(bool visible);
-
 	virtual void feedbackStateChanged() override;
 
+	virtual void updateTooltip() override;
 
 	//void paint(Graphics &g) override;
 	void resized() override;

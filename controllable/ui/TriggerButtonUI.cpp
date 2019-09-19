@@ -37,11 +37,6 @@ void TriggerButtonUI::mouseDownInternal(const MouseEvent & e)
 	trigger->trigger();
 }
 
-bool TriggerButtonUI::hitTest(int x, int y)
-{
-	return drawRect.contains(x, y);
-}
-
 void TriggerButtonUI::paint(Graphics& g)
 {
 	juce::Rectangle<float> r = getLocalBounds().toFloat();
@@ -69,12 +64,11 @@ void TriggerButtonUI::paint(Graphics& g)
 
 	if (showLabel)
 	{
-		g.setFont(10);
+		Rectangle<int> tr = getLocalBounds().reduced(2);
+		g.setFont(jlimit(12, 40, jmin(tr.getHeight(),tr.getWidth()) - 16));
 		g.setColour(Colours::white.darker(.1f));
-		g.drawFittedText(customText.isNotEmpty() ? customText : trigger->niceName, getLocalBounds().reduced(2), Justification::centred, 1);
+		g.drawFittedText(customText.isNotEmpty() ? customText : trigger->niceName, tr, Justification::centred, 1);
 	}
-
-	drawRect = r.toNearestInt();
 }
 
 
