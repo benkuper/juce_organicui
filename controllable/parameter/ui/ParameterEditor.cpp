@@ -25,6 +25,9 @@ ParameterEditor::~ParameterEditor()
 void ParameterEditor::resized()
 {
 	ControllableEditor::resized();
+
+	if (parameter.wasObjectDeleted()) return;
+
 	if (parameter->controlMode == Parameter::MANUAL) return;
 
 	juce::Rectangle<int> r = getLocalBounds().removeFromBottom(subContentHeight - 2);

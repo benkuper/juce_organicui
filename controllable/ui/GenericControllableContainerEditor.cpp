@@ -247,7 +247,7 @@ void GenericControllableContainerEditor::resetAndBuild()
 			{
 				for (auto &cc : container->controllableContainers)
 				{
-					if (cc == nullptr)
+					if (cc.wasObjectDeleted() || cc == nullptr)
 					{
 						LOGWARNING("An error has occured here (child container null on ResetAndBuild");
 						continue;
