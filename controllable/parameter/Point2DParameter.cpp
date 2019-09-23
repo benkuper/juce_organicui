@@ -60,7 +60,7 @@ UndoableAction* Point2DParameter::setUndoablePoint(float oldX, float oldY, float
 	d.append(newX);
 	d.append(newY);
 
-	if (checkValueIsTheSame(od, d)) return nullptr;
+	if (checkValueIsTheSame(od, d) && !alwaysNotify) return nullptr;
 
 	return setUndoableValue(od, d, onlyReturnAction);
 }

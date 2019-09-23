@@ -19,6 +19,7 @@ Parameter::Parameter(const Type &type, const String &niceName, const String &des
 	defaultMaxValue(maxValue),
     lockManualControlMode(false),
     controlMode(MANUAL),
+	alwaysNotify(false),
 	canBeAutomated(false),
     referenceParameter(nullptr),
     isPresettable(true),
@@ -142,7 +143,7 @@ UndoableAction * Parameter::setUndoableValue(var oldValue, var newValue, bool on
 
 void Parameter::setValue(var _value, bool silentSet, bool force, bool forceOverride)
 {
-	if (!force && checkValueIsTheSame(_value, value)) return;
+	if (!alwaysNotify && !force && checkValueIsTheSame(_value, value)) return;
 	
 	valueSetLock.enter();
 	lastValue = var(value);
@@ -329,6 +330,8 @@ var Parameter::getJSONDataInternal()
 		else if (controlMode == REFERENCE && referenceTarget != nullptr) data.getDynamicObject()->setProperty("reference", referenceTarget->getJSONData());
 	}
 
+	if (alwaysNotify) data.getDynamicObject()->setProperty("alwaysNotify", true);
+
 	if (saveValueOnly) return data;
 
 	if (hasRange())
@@ -336,6 +339,7 @@ var Parameter::getJSONDataInternal()
 		if((int)minimumValue != INT32_MIN) data.getDynamicObject()->setProperty("minValue", minimumValue);
 		if((int)maximumValue != INT32_MAX) data.getDynamicObject()->setProperty("maxValue", maximumValue);
 	}
+
 	return data;
 }
 
@@ -353,6 +357,8 @@ void Parameter::loadJSONDataInternal(var data)
 	else if (data.getDynamicObject()->hasProperty("reference") && referenceTarget != nullptr) referenceTarget->loadJSONData(data.getProperty("reference", var()));
 
  	if (data.getDynamicObject()->hasProperty("editable")) setControllableFeedbackOnly(!data.getProperty("editable", true));
+
+	alwaysNotify = data.getProperty("alwaysNotify", false);
 }
 
 var Parameter::getValueFromScript(const juce::var::NativeFunctionArgs & a)

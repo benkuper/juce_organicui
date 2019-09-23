@@ -66,7 +66,7 @@ void Point3DParameter::setUndoableVector(float oldX, float oldY, float oldZ, flo
 	d.append(newY);
 	d.append(newZ);
 
-	if (checkValueIsTheSame(od, d)) return;
+	if (checkValueIsTheSame(od, d) && !alwaysNotify) return;
 
 	setUndoableValue(od, d);
 }

@@ -142,6 +142,8 @@ void ParameterUI::addPopupMenuItems(PopupMenu * p)
 				if (parameter->hasRange()) p->addItem(-5, "Clear Range");
 			}
 
+			p->addItem(-6, "Always Notify changes", true, parameter->alwaysNotify);
+
 			addPopupMenuItemsInternal(p);
 		}
 
@@ -175,6 +177,7 @@ void ParameterUI::handleMenuSelectedID(int id)
 
 	case -4: showEditRangeWindow(); break;
 	case -5: parameter->clearRange(); break;
+	case -6: parameter->alwaysNotify = !parameter->alwaysNotify; break;
 	}
 }
 
@@ -192,8 +195,6 @@ void ParameterUI::setNextFocusOrder(Component * focusComponent)
 {
 	focusComponent->setExplicitFocusOrder(ParameterUI::currentFocusOrderIndex++);
 }
-
-
 
 
 bool ParameterUI::shouldBailOut() {

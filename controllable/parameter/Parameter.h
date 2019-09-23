@@ -60,6 +60,9 @@ public:
 	bool lockManualControlMode;
 	ControlMode controlMode;
 
+	//Same value set behaviour
+	bool alwaysNotify; //if true, will always notify of value change even if value is the same
+
 	//Expression
 	String controlExpression;
 	std::unique_ptr<ScriptExpression> expression;
