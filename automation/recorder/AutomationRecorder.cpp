@@ -18,7 +18,8 @@ AutomationRecorder::AutomationRecorder() :
 	//input->customCheckAssignOnNextChangeFunc = &ModuleManager::checkControllableIsAValue;
 
 	arm = addBoolParameter("Arm", "If set, when a sequence will play, this will start recording. In any case, when a sequence is stopped or seeked, the recording stops as well", false);
-	arm->setEnabled(input->target != nullptr);
+	//arm->setEnabled(input->target != nullptr);
+	//arm->enabled = input->target != nullptr;
 	autoDisarm = addBoolParameter("Auto Disarm", "If set, the arm parameter will be automatically set to off when a record has been saved", false);
 
 	simplificationFactor = addFloatParameter("Simplification", "Level of simplification after recording", .5f, 0, 1);
@@ -46,7 +47,7 @@ void AutomationRecorder::setCurrentInput(Parameter * newInput)
 	{
 		//currentInput->addParameterListener(this);
 		currentInput->addInspectableListener(this);
-		arm->setEnabled(input->target != nullptr);
+		//arm->setEnabled(input->target != nullptr);
 	}
 }
 
