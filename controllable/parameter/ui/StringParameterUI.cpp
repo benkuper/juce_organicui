@@ -38,6 +38,10 @@ StringParameterUI::StringParameterUI(Parameter * p) :
     setSize(200, 20);//default size
 }
 
+StringParameterUI::~StringParameterUI()
+{
+}
+
 void StringParameterUI::setAutoSize(bool value)
 {
 	autoSize = value;
@@ -129,9 +133,13 @@ void StringParameterFileUI::buttonClicked(Button * b)
 {
 	if (b == &browseBT)
 	{
+		Component::BailOutChecker checker(this); 
 		FileChooser chooser("Select a file", File(fp->getAbsolutePath()), fp->fileTypeFilter);
 		bool result = chooser.browseForFileToOpen();
-		if (result && parameter != nullptr && !parameter.wasObjectDeleted())
+		if (checker.shouldBailOut()) return;
+
+		if (parameter.wasObjectDeleted()) return;
+		if (result && parameter != nullptr)
 		{
 			parameter->setUndoableValue(parameter->stringValue(), chooser.getResult().getFullPathName());
 		}

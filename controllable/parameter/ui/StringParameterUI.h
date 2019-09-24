@@ -16,7 +16,7 @@ class StringParameterUI :
 {
 public:
     StringParameterUI(Parameter * p);
-    virtual ~StringParameterUI(){};
+    virtual ~StringParameterUI();
 
 	StringParameter * stringParam; 
 	

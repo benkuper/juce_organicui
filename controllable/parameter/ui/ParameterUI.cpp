@@ -26,8 +26,9 @@ ParameterUI::ParameterUI(Parameter * parameter) :
 
 ParameterUI::~ParameterUI()
 {
-	if (!parameter.wasObjectDeleted()) {
+	if (!parameter.wasObjectDeleted() && parameter != nullptr) {
 		parameter->removeAsyncParameterListener(this);
+		parameter = nullptr;
 	}
 }
 
