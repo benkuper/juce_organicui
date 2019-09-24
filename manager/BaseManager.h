@@ -409,16 +409,16 @@ Array<T*> BaseManager<T>::addItemsFromData(var data, bool addToUndo)
 template<class T>
 Array<T *> BaseManager<T>::addItemsFromClipboard(bool showWarning)
 {
-	if (!userCanAddItemsManually) return nullptr;
+	if (!userCanAddItemsManually) return Array<T*>();
 	String s = SystemClipboard::getTextFromClipboard();
 	var data = JSON::parse(s);
-	if (data.isVoid()) return nullptr;
+	if (data.isVoid()) return Array<T*>();
 
 	String t = data.getProperty("itemType", "");
 	if (!canAddItemOfType(t))
 	{
 		if (showWarning) NLOGWARNING(niceName, "Can't paste data from clipboard : data is of wrong type (\"" + t + "\").");
-		return nullptr;
+		return Array<T *>();
 	}
 
 	int sIndex = items.indexOf(InspectableSelectionManager::activeSelectionManager->getInspectableAs<T>());
