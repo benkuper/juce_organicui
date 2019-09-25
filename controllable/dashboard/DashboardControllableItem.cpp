@@ -4,6 +4,7 @@ DashboardControllableItem::DashboardControllableItem(Controllable* item) :
 {
 	showLabel = addBoolParameter("Show Label", "If checked, label is shown on controller", true);
 	textColor = addColorParameter("Text Color", "Color of the text", TEXT_COLOR, false);
+	opaqueBackground = addBoolParameter("Opaque Background", "If checked, background is opaque", true);
 	customLabel = addStringParameter("Custom text", "If not empty, will override the label of this control", "", false);
 	customDescription = addStringParameter("Custom description", "If not empty, will override the description of this control","", false);
 

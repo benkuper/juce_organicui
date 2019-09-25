@@ -80,8 +80,8 @@ void BoolToggleUI::paint(Graphics & g)
 	if (showLabel)
 	{
 		g.setFont((float)jmin<int>(getHeight(),12));
-		g.setColour(Colours::white);
-		g.drawFittedText(parameter->niceName, r, Justification::left,1);
+		g.setColour(useCustomTextColor?customTextColor:TEXT_COLOR);
+		g.drawFittedText(customLabel.isNotEmpty()?customLabel:parameter->niceName, r, Justification::left,1);
 	}
 
 	g.drawImage(m, cr.toFloat());

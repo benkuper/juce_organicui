@@ -12,6 +12,7 @@ public:
 
 	BoolParameter * showLabel;
 	ColorParameter* textColor;
+	BoolParameter * opaqueBackground;
 	StringParameter* customLabel;
 	StringParameter* customDescription;
 

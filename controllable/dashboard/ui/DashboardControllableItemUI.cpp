@@ -56,6 +56,8 @@ void DashboardControllableItemUI::updateUIParameters()
 	itemUI->customLabel = controllableItem->customLabel->enabled ? controllableItem->customLabel->stringValue() : "";
 	itemUI->customDescription = controllableItem->customDescription->enabled ? controllableItem->customDescription->stringValue() : "";
 
+	itemUI->setOpaqueBackground(controllableItem->opaqueBackground->boolValue());
+
 	itemUI->updateTooltip();
 	itemUI->repaint();
 }
@@ -79,7 +81,8 @@ void DashboardControllableItemUI::controllableFeedbackUpdateInternal(Controllabl
 	if (c == controllableItem->showLabel 
 		|| c == controllableItem->textColor 
 		|| c == controllableItem->customLabel 
-		|| c == controllableItem->customDescription)
+		|| c == controllableItem->customDescription
+		|| c == controllableItem->opaqueBackground)
 	{
 		updateUIParameters();
 	}
