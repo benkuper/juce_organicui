@@ -120,24 +120,37 @@ void OrganicMainContentComponent::endLoadFile()
 		removeChildComponent(fileProgressWindow.get());
 		fileProgressWindow = nullptr;
 	}
-
-	Desktop::getInstance().setKioskModeComponent(ProjectSettings::getInstance()->fullScreenOnStartup->boolValue() ? getMainWindow() : nullptr);
+	
+	Component* fullScreenComponent = getMainWindow();
 	
 	if (ProjectSettings::getInstance()->showDashboardOnStartup->enabled)
 	{
 		Dashboard* d = dynamic_cast<Dashboard*>(ProjectSettings::getInstance()->showDashboardOnStartup->targetContainer.get());
+		
 		if (d != nullptr)
 		{
+			/*
+			fullScreenComponent = new DashboardItemManagerUI(&d->itemManager); 
+			fullScreenComponent->setVisible(true);
+			fullScreenComponent->toFront(true);
+			fullScreenComponent->addToDesktop(0);
+			*/
+
 			ShapeShifterContent* dContent = ShapeShifterManager::getInstance()->getContentForType<DashboardManagerView>();
+			
 			if (dContent != nullptr && dContent != ShapeShifterManager::getInstance()->temporaryFullContent)
 			{
 				ShapeShifterManager::getInstance()->toggleTemporaryFullContent(dContent);
 			}
+			
 			d->selectThis();
+
 		}
 		else
 		{
 			ShapeShifterManager::getInstance()->toggleTemporaryFullContent(nullptr);
 		}
 	}
+	
+	Desktop::getInstance().setKioskModeComponent(ProjectSettings::getInstance()->fullScreenOnStartup->boolValue() ? fullScreenComponent : nullptr);
 }
