@@ -31,6 +31,8 @@ public:
 	float minZoom;
 	float maxZoom;
 
+	double timeSinceLastWheel;
+
 	Point<int> viewOffset; //in pixels, viewOffset of 0 means zeroPos is at the center of the window
 						   //interaction
 	Point<int> initViewOffset;
@@ -98,7 +100,8 @@ BaseManagerViewUI<M, T, U>::BaseManagerViewUI(const String & contentName, M * _m
 	zoomAffectsItemSize(true),
 	viewZoom(1),
 	minZoom(.4f),
-	maxZoom(1)
+	maxZoom(1),
+	timeSinceLastWheel(0)
 
 {
     this->defaultLayout = this->FREE;
@@ -150,6 +153,7 @@ void BaseManagerViewUI<M, T, U>::mouseUp(const MouseEvent & e)
 template<class M, class T, class U>
  void BaseManagerViewUI<M, T, U>::mouseWheelMove(const MouseEvent & e, const MouseWheelDetails & d)
 {
+	 
 	 if (e.mods.isShiftDown())
 	 {
 		 if (canZoom)
@@ -166,13 +170,21 @@ template<class M, class T, class U>
 	 }
 	 else
 	 {
+		 double curTime = Time::getApproximateMillisecondCounter() / 1000.0;
+		 bool newCheck = curTime - timeSinceLastWheel > .5;
+
+		 if (newCheck && e.originalComponent != this) return;
+		 
 		 float sensitivity = 500;
 		 viewOffset += Point<int>(d.deltaX*sensitivity, d.deltaY*sensitivity);
 		 updateItemsVisibility(); 
 		 this->resized();
 		 this->repaint();
+
+		 timeSinceLastWheel = curTime;
 	 }
 	
+
 }
 
  template<class M, class T, class U>
