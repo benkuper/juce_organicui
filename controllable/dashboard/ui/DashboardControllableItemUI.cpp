@@ -47,7 +47,7 @@ void DashboardControllableItemUI::rebuildUI()
 
 void DashboardControllableItemUI::updateUIParameters()
 {
-	if (inspectable.wasObjectDeleted() || controllableItem == nullptr) return;
+	if (inspectable.wasObjectDeleted() || controllableItem->inspectable == nullptr || controllableItem->inspectable.wasObjectDeleted()) return;
 
 	itemUI->showLabel = controllableItem->showLabel->boolValue();
 	itemUI->useCustomTextColor = controllableItem->textColor->enabled; 

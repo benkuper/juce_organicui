@@ -4,7 +4,7 @@ DashboardParameterItemUI::DashboardParameterItemUI(DashboardParameterItem* item)
 	parameterItem(item)
 {
 	rebuildUI();
-	if (itemUI != nullptr) setSize(item->viewUISize->x, item->viewUISize->y);
+	if (itemUI != nullptr) setSize(200,40);
 }
 
 DashboardParameterItemUI::~DashboardParameterItemUI()
