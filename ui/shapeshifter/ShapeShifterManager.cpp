@@ -322,7 +322,7 @@ void ShapeShifterManager::saveCurrentLayoutToFile(const File &toFile)
 		toFile.create();
 	}
 	;
-	var data = getCurrentLayout();
+	var data = temporaryFullContent == nullptr?getCurrentLayout():ghostLayout;
 	if (data.isUndefined() || data.isVoid()) return;
 
 	DBG("Save layout to file : " << toFile.getFullPathName());
@@ -353,7 +353,7 @@ Array<File> ShapeShifterManager::getLayoutFiles()
 
 void ShapeShifterManager::toggleTemporaryFullContent(ShapeShifterContent* content)
 {
-	if (content == temporaryFullContent) content = nullptr;
+	if (content == temporaryFullContent && temporaryFullContent != nullptr) content = nullptr;
 	
 	if (content == nullptr)
 	{

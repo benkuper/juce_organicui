@@ -9,4 +9,9 @@ public:
 	~DashboardTriggerItemUI();
 
 	DashboardTriggerItem* triggerItem;
+
+	virtual ControllableUI* createControllableUI();
+
+	virtual void controllableFeedbackUpdateInternal(Controllable* c) override;
+
 };

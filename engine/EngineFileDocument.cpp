@@ -41,6 +41,11 @@ void Engine::createNewGraph() {
 	setFile(File());
 	isLoadingFile = false;
 	setChangedFlag(false);
+
+	engineListeners.call(&EngineListener::endLoadFile);
+	engineNotifier.addMessage(new EngineEvent(EngineEvent::END_LOAD_FILE, this));
+
+
 	handleAsyncUpdate();
 
 }
@@ -132,6 +137,7 @@ void Engine::handleAsyncUpdate()
 	//  suspendAudio(false);
 	int64 timeForLoading = Time::currentTimeMillis() - loadingStartTime;
 	setChangedFlag(false);
+
 	engineListeners.call(&EngineListener::endLoadFile);
 	engineNotifier.addMessage(new EngineEvent(EngineEvent::END_LOAD_FILE, this));
 

@@ -28,7 +28,7 @@ StringParameterUI::StringParameterUI(Parameter * p) :
 	valueLabel.setColour(valueLabel.backgroundWhenEditingColourId, Colours::black);
 	valueLabel.setColour(valueLabel.textWhenEditingColourId, Colours::white);
 	valueLabel.setColour(CaretComponent::caretColourId, Colours::orange);
-	valueLabel.setColour(valueLabel.textColourId, isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f));
+	valueLabel.setColour(valueLabel.textColourId, useCustomTextColor ? customTextColor : (isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f)));
 
 	valueLabel.addMouseListener(this, false);
 	ParameterUI::setNextFocusOrder(&valueLabel);
@@ -56,9 +56,9 @@ bool StringParameterUI::isEditing()
 void StringParameterUI::setOpaqueBackground(bool value)
 {
 	ParameterUI::setOpaqueBackground(value);
-	valueLabel.setColour(valueLabel.backgroundColourId, opaqueBackground ? (!controllable->isControllableFeedbackOnly ? BG_COLOR.darker(.1f).withAlpha(.7f):BG_COLOR.brighter(.2f)) : Colours::transparentBlack);
-	valueLabel.setColour(valueLabel.outlineColourId, opaqueBackground ? BG_COLOR.brighter(.1f):Colours::transparentWhite);
-	valueLabel.setColour(valueLabel.textColourId, isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f));
+	valueLabel.setColour(valueLabel.backgroundColourId, useCustomBGColor?customBGColor:(opaqueBackground ? (!controllable->isControllableFeedbackOnly ? BG_COLOR.darker(.1f).withAlpha(.7f):BG_COLOR.brighter(.2f)) : Colours::transparentBlack));
+	valueLabel.setColour(valueLabel.outlineColourId, useCustomBGColor ? customBGColor.brighter():(opaqueBackground ? BG_COLOR.brighter(.1f):Colours::transparentWhite));
+	valueLabel.setColour(valueLabel.textColourId, useCustomTextColor ? customTextColor : (isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f)));
 	//valueLabel.setColour(valueLabel.textColourId, !controllable->isControllableFeedbackOnly ? TEXT_COLOR : TEXT_COLOR.withAlpha(.6f));
 }
 
@@ -66,7 +66,7 @@ void StringParameterUI::feedbackStateChanged()
 {
 	valueLabel.setEditable(!controllable->isControllableFeedbackOnly);
 	valueLabel.setEnabled(!controllable->isControllableFeedbackOnly);
-	valueLabel.setColour(valueLabel.textColourId, isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f));
+	valueLabel.setColour(valueLabel.textColourId, useCustomTextColor ? customTextColor : (isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f)));
 	setOpaqueBackground(opaqueBackground); //force refresh color
 }
 

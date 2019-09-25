@@ -24,10 +24,7 @@ public:
     //settings
 
     Direction orientation;
-	Colour bgColor;
-	Colour customColor;
-	bool useCustomColor;
-	
+
 	bool addToUndoOnMouseUp;
 	
 	bool changeParamOnMouseUpOnly;
@@ -41,9 +38,6 @@ public:
 
     //drawing checks
     float shouldRepaint;
-
-    virtual void setFrontColor(Colour c);
-    virtual void resetFrontColor();
 	
     virtual void paint(Graphics &g) override;
     virtual void mouseDownInternal(const MouseEvent &e) override;

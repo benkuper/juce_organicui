@@ -30,6 +30,11 @@ public:
 	bool opaqueBackground;
 	bool showMenuOnRightClick;
 
+	bool useCustomTextColor;
+	Colour customTextColor;
+	String customLabel;
+	String customDescription;
+
 	static std::function<void(ControllableUI*)> customShowEditWindowFunction;
 
 	void mouseEnter(const MouseEvent &e) override;
@@ -59,12 +64,9 @@ public:
 	virtual void feedbackStateChanged() {}
 	virtual void controllableControlAddressChanged() {}
 
+	virtual void updateTooltip();
 
-
-private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ControllableUI)
 
-protected :
-    virtual void updateTooltip();
 };
 

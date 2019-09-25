@@ -143,6 +143,8 @@ void Engine::clear() {
 		InspectableSelectionManager::mainSelectionManager->setEnabled(false);
 	}
 
+	ProjectSettings::getInstance()->reset();
+
 	DashboardManager::getInstance()->clear();
 	//PresetManager::getInstance()->clear();
 

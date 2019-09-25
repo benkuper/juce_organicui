@@ -18,7 +18,8 @@ ControllableUI::ControllableUI(Controllable * controllable) :
 	controllable(controllable),
 	showLabel(true),
 	opaqueBackground(false),
-	showMenuOnRightClick(true)
+	showMenuOnRightClick(true),
+	useCustomTextColor(false)
 {
 	jassert(controllable != nullptr);
 	updateTooltip();
@@ -206,9 +207,16 @@ void ControllableUI::newMessage(const Controllable::ControllableEvent & e)
 
 void ControllableUI::updateTooltip()
 {
-	tooltip = controllable->description + "\nControl Address : " + controllable->controlAddress;
-	if (controllable->type != Controllable::Type::TRIGGER) tooltip += " (" + controllable->argumentsDescription + ")";
-	if (controllable->isControllableFeedbackOnly) tooltip += " (read only)";
-
+	if (customDescription.isNotEmpty())
+	{
+		tooltip = customDescription;
+	}
+	else
+	{
+		tooltip = controllable->description + "\nControl Address : " + controllable->controlAddress;
+		if (controllable->type != Controllable::Type::TRIGGER) tooltip += " (" + controllable->argumentsDescription + ")";
+		if (controllable->isControllableFeedbackOnly) tooltip += " (read only)";
+	}
+	
 	setTooltip(tooltip);
 }

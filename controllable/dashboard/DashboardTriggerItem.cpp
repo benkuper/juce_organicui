@@ -1,8 +1,10 @@
+#include "DashboardTriggerItem.h"
 DashboardTriggerItem::DashboardTriggerItem(Trigger * item) :
 	DashboardControllableItem(item),
 	trigger(item)
 {
-
+	customImagePath = addFileParameter("Custom Image", "Choose a custom image instead of the default button");
+	customImagePath->fileTypeFilter = "*.png;*.jpg;*.jpeg;*.gif";
 }
 
 DashboardTriggerItem::~DashboardTriggerItem()

@@ -16,4 +16,9 @@ class DashboardItemManager :
 public:
 	DashboardItemManager();
 	~DashboardItemManager();
+
+
+	FileParameter* bgImage;
+	FloatParameter* bgImageScale;
+	FloatParameter* bgImageAlpha;
 };

@@ -180,8 +180,8 @@ using namespace juce;
 #include "engine/Engine.h"
 
 #include "settings/GlobalSettings.h"
-#include "settings/ProjectSettings.h"
 #include "settings/ui/GlobalSettingsEditor.h"
+#include "settings/ProjectSettings.h"
 
 #include "ui/shapeshifter/GapGrabber.h"
 #include "ui/shapeshifter/ShapeShifter.h"
@@ -253,6 +253,7 @@ using namespace juce;
 #include "dashboard/ui/DashboardGroupItemUI.h"
 #include "dashboard/ui/DashboardManagerUI.h"
 #include "dashboard/ui/DashboardManagerView.h"
+
 
 #include "inspectable/dashboard/DashboardInspectableItem.h"
 #include "controllable/dashboard/DashboardControllableItem.h"

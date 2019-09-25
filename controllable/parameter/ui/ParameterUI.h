@@ -23,6 +23,11 @@ public:
 	bool showEditWindowOnDoubleClick;
 	bool showValue;
 
+	bool useCustomBGColor;
+	Colour customBGColor;
+	bool useCustomFGColor;
+	Colour customFGColor;
+
 	static std::function<void(ParameterUI*)> customShowEditRangeWindowFunction;
 
 

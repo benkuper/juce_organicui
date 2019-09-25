@@ -18,8 +18,6 @@ public:
     TriggerButtonUI(Trigger * t);
     ~TriggerButtonUI();
 
-	String customText;
-
 	bool drawTriggering;
 
     void paint (Graphics&) override;

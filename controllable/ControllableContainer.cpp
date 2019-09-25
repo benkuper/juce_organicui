@@ -648,6 +648,11 @@ void ControllableContainer::dispatchFeedback(Controllable * c)
 }
 
 
+void ControllableContainer::controllableStateChanged(Controllable* c)
+{
+	if (c->parentContainer == this) dispatchFeedback(c);
+}
+
 void ControllableContainer::parameterValueChanged(Parameter * p)
 {
 	if (p->parentContainer == this)

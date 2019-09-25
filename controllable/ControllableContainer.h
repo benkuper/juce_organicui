@@ -121,6 +121,7 @@ public:
 
 	void dispatchFeedback(Controllable * c);
 
+	virtual void controllableStateChanged(Controllable* c) override;
 	virtual void parameterValueChanged(Parameter * p) override;
 	virtual void parameterRangeChanged(Parameter * p) override;
 	virtual void triggerTriggered(Trigger * p) override;

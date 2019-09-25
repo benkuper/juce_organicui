@@ -17,7 +17,9 @@ ParameterUI::ParameterUI(Parameter * parameter) :
 	ControllableUI(parameter),
 	parameter(parameter),
 	showEditWindowOnDoubleClick(true),
-	showValue(true)
+	showValue(true),
+	useCustomBGColor(false),
+	useCustomFGColor(false)
 {
 	parameter->addAsyncCoalescedParameterListener(this);
 

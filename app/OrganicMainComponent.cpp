@@ -2,6 +2,7 @@
 
 ApplicationProperties& getAppProperties();
 ApplicationCommandManager& getCommandManager();
+OrganicApplication::MainWindow* getMainWindow();
 
 OrganicMainContentComponent::OrganicMainContentComponent()
 {
@@ -42,6 +43,8 @@ OrganicMainContentComponent::~OrganicMainContentComponent()
 #endif
 
 	if (Engine::mainEngine != nullptr) Engine::mainEngine->removeEngineListener(this);
+
+	//ShapeShifterManager::getInstance()->toggleTemporaryFullContent(nullptr);
 	ShapeShifterManager::deleteInstance();
 }
 
@@ -116,5 +119,25 @@ void OrganicMainContentComponent::endLoadFile()
 	{
 		removeChildComponent(fileProgressWindow.get());
 		fileProgressWindow = nullptr;
+	}
+
+	Desktop::getInstance().setKioskModeComponent(ProjectSettings::getInstance()->fullScreenOnStartup->boolValue() ? getMainWindow() : nullptr);
+	
+	if (ProjectSettings::getInstance()->showDashboardOnStartup->enabled)
+	{
+		Dashboard* d = dynamic_cast<Dashboard*>(ProjectSettings::getInstance()->showDashboardOnStartup->targetContainer.get());
+		if (d != nullptr)
+		{
+			ShapeShifterContent* dContent = ShapeShifterManager::getInstance()->getContentForType<DashboardManagerView>();
+			if (dContent != nullptr && dContent != ShapeShifterManager::getInstance()->temporaryFullContent)
+			{
+				ShapeShifterManager::getInstance()->toggleTemporaryFullContent(dContent);
+			}
+			d->selectThis();
+		}
+		else
+		{
+			ShapeShifterManager::getInstance()->toggleTemporaryFullContent(nullptr);
+		}
 	}
 }

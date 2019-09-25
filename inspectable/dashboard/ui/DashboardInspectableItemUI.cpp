@@ -27,5 +27,6 @@ void DashboardInspectableItemUI::newMessage(const DashboardInspectableItem::Insp
 	{
 	case DashboardInspectableItem::InspectableItemEvent::INSPECTABLE_CHANGED:
 		inspectableChanged();
+
 	}
 }

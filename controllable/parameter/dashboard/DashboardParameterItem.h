@@ -8,7 +8,12 @@ public:
 	DashboardParameterItem(Parameter* parameter = nullptr);
 	~DashboardParameterItem();
 
-	Parameter* parameter;
+	Parameter * parameter;
+	
+	BoolParameter* showValue;
+	ColorParameter* bgColor;
+	ColorParameter* fgColor;
+	FileParameter* btImage;
 
 	virtual DashboardItemUI* createUI() override;
 

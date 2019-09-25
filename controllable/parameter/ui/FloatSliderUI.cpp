@@ -13,8 +13,6 @@
 //==============================================================================
 FloatSliderUI::FloatSliderUI(Parameter * parameter) :
 	ParameterUI(parameter),
-	bgColor(BG_COLOR.darker(.1f).withAlpha(.8f)),
-	useCustomColor(false),
 	addToUndoOnMouseUp(true),
 	fixedDecimals(3),
 	shouldRepaint(true)
@@ -31,33 +29,21 @@ FloatSliderUI::~FloatSliderUI()
 {
 }
 
-void FloatSliderUI::setFrontColor(Colour c)
-{
-	customColor = c;
-	useCustomColor = true;
-	repaint();
-}
-
-void FloatSliderUI::resetFrontColor()
-{
-	useCustomColor = false;
-	repaint();
-}
-
-
 void FloatSliderUI::paint(Graphics & g)
 {
 
 	if (shouldBailOut()) return;
 
-	Colour baseColour = useCustomColor ? customColor : (isInteractable()? PARAMETER_FRONT_COLOR.darker() : FEEDBACK_COLOR);
+	Colour baseColour = useCustomFGColor ? customFGColor : (isInteractable()? PARAMETER_FRONT_COLOR.darker() : FEEDBACK_COLOR);
     Colour c = (isMouseButtonDown() && changeParamOnMouseUpOnly) ? HIGHLIGHT_COLOR : baseColour;
 
-    juce::Rectangle<int> sliderBounds = getLocalBounds();
+	Colour bgColor = useCustomBGColor ? customBGColor : BG_COLOR.darker(.1f).withAlpha(.8f);
+	g.setColour(bgColor);
 
+    
+	float normalizedValue = getParamNormalizedValue();
 
-    float normalizedValue = getParamNormalizedValue();
-    g.setColour(bgColor);
+	juce::Rectangle<int> sliderBounds = getLocalBounds();
     g.fillRoundedRectangle(sliderBounds.toFloat(), 2);
 	
     g.setColour(c);
@@ -84,7 +70,7 @@ void FloatSliderUI::paint(Graphics & g)
 
     if(showLabel || showValue){
 
-		g.setColour(Colours::lightgrey);
+		g.setColour(useCustomTextColor ? customTextColor : TEXT_COLOR);
 
         sliderBounds = getLocalBounds();
 		juce::Rectangle<int> destRect;
@@ -103,7 +89,7 @@ void FloatSliderUI::paint(Graphics & g)
 		String text = "";
 		if (showLabel)
 		{
-			text += parameter->niceName;
+			text += customLabel.isNotEmpty()?customLabel:parameter->niceName;
 			if (showValue) text += " : ";
 		}
 

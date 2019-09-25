@@ -15,13 +15,38 @@ DashboardItemManagerUI::DashboardItemManagerUI(DashboardItemManager * manager) :
 	//bgColor = Colours::purple;
 	//setWantsKeyboardFocus(true);
 
+	setShowAddButton(false);
+
+	manager->addAsyncCoalescedContainerListener(this);
+
+	File f = manager->bgImage->getFile();
+	if (f.existsAsFile()) bgImage = ImageCache::getFromFile(f);
+
 	addExistingItems(false);
+
 	acceptedDropTypes.add("Controllable");
 	acceptedDropTypes.add("Container");
 }
 
 DashboardItemManagerUI::~DashboardItemManagerUI()
 {
+	if(!inspectable.wasObjectDeleted()) manager->removeAsyncContainerListener(this);
+}
+
+void DashboardItemManagerUI::paint(Graphics& g)
+{
+	BaseManagerViewUI::paint(g);
+
+	if (manager == nullptr || inspectable.wasObjectDeleted()) return;
+	float alpha = manager->bgImageAlpha->floatValue();
+
+	if (bgImage.isNull() || alpha == 0) return;
+
+	g.setColour(Colours::white.withAlpha(alpha));
+	float scale = manager->bgImageScale->floatValue();
+	Rectangle<float> r = getBoundsInView(Rectangle<float>().withSizeKeepingCentre(bgImage.getWidth()*scale, bgImage.getHeight()*scale));
+	g.drawImage(bgImage, r, RectanglePlacement::stretchToFit, false);
+	
 }
 
 bool DashboardItemManagerUI::isInterestedInDragSource(const SourceDetails & dragSourceDetails)
@@ -64,4 +89,24 @@ void DashboardItemManagerUI::itemDropped(const SourceDetails & details)
 BaseItemMinimalUI<DashboardItem> * DashboardItemManagerUI::createUIForItem(DashboardItem * item)
 {
 	return item->createUI();
+}
+
+void DashboardItemManagerUI::newMessage(const ContainerAsyncEvent& e)
+{
+	switch (e.type)
+	{
+	case ContainerAsyncEvent::ControllableFeedbackUpdate:
+		if (e.targetControllable == manager->bgImage)
+		{
+			File f = manager->bgImage->getFile();
+			if (f.existsAsFile()) bgImage = ImageCache::getFromFile(f);
+			else bgImage = Image();
+			repaint();
+		}
+		else if (e.targetControllable == manager->bgImageAlpha || manager->bgImageScale)
+		{
+			repaint();
+		}
+		break;
+	}
 }

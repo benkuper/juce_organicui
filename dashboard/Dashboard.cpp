@@ -12,6 +12,7 @@
 Dashboard::Dashboard() :
 	BaseItem("Dashboard", false)
 {
+	addChildControllableContainer(&itemManager);
 }
 
 Dashboard::~Dashboard()
