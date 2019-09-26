@@ -515,9 +515,25 @@ void ControllableContainer::setParentContainer(ControllableContainer * container
 
 void ControllableContainer::updateChildrenControlAddress()
 {
-	for (auto &c : controllables) c->updateControlAddress();
-	for (auto &cc : controllableContainers) cc->updateChildrenControlAddress();
+	for (auto& c : controllables)
+	{
+		if (c == nullptr)
+		{
+			jassertfalse; //should not be here
+			continue;
+		}
+		c->updateControlAddress();
+	}
 
+	for (auto& cc : controllableContainers)
+	{
+		if (cc == nullptr)
+		{
+			jassertfalse; //should not be here
+			continue;
+		}
+		cc->updateChildrenControlAddress();
+	}
 
 }
 
