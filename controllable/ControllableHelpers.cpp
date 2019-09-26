@@ -30,10 +30,22 @@ ControllableChooserPopupMenu::~ControllableChooserPopupMenu()
 
 void ControllableChooserPopupMenu::populateMenu(PopupMenu * subMenu, ControllableContainer * container, int &currentId, int currentLevel)
 {
+	if (container == nullptr)
+	{
+		jassertfalse;//should not be here
+		return;
+	}
+
 	if (maxDefaultSearchLevel == -1 || currentLevel < maxDefaultSearchLevel)
 	{
 		for (auto &cc : container->controllableContainers)
 		{
+			if (cc.wasObjectDeleted() || cc == nullptr)
+			{
+				jassertfalse;
+				continue;
+			}
+
 			PopupMenu p;
 			populateMenu(&p, cc, currentId, currentLevel + 1);
 			subMenu->addSubMenu(cc->niceName, p);
@@ -45,6 +57,8 @@ void ControllableChooserPopupMenu::populateMenu(PopupMenu * subMenu, Controllabl
 
 	for (auto &c : container->controllables)
 	{
+		if (c == nullptr) continue;
+
 		if (!c->isControllableExposed) continue;
 
 		if (c->type == Controllable::TRIGGER)
