@@ -32,7 +32,6 @@ FloatStepperUI::FloatStepperUI(Parameter * _parameter) :
 	slider->setColour(slider->textBoxTextColourId, useCustomTextColor ? customTextColor : (isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f)));
 	feedbackStateChanged();
 
-
 	addAndMakeVisible(slider.get());
 
 	setSize(100, 18);
@@ -45,9 +44,35 @@ FloatStepperUI::~FloatStepperUI()
 	stopTimer();
 }
 
+void FloatStepperUI::paint(Graphics& g)
+{
+	ParameterUI::paint(g);
+
+	if (showLabel)
+	{
+		Rectangle<int> r = getLocalBounds();
+		r = r.removeFromLeft(jmin(g.getCurrentFont().getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName), r.getWidth() - 60));
+		g.setFont(jlimit(12, 40, jmin(r.getHeight(), r.getWidth()) - 16));
+		g.setColour(useCustomTextColor ? customTextColor : TEXT_COLOR);
+		g.drawFittedText(customLabel.isNotEmpty() ? customLabel : parameter->niceName, r, Justification::centred, 1);
+	}
+}
+
 void FloatStepperUI::resized()
 {
-    slider->setBounds(getLocalBounds());
+	Rectangle<int> r = getLocalBounds();
+	
+	if (showLabel)
+	{
+		Font font(jlimit(12, 40, jmin(r.getHeight(), r.getWidth()) - 16));
+
+		r.removeFromLeft(jmin(font.getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName), r.getWidth()-60));
+		slider->setBounds(r.removeFromRight(jmin(r.getWidth(),120)));
+	}
+	else
+	{
+		slider->setBounds(r);
+	}
 }
 
 

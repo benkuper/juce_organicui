@@ -15,7 +15,6 @@ ColorParameterUI::ColorParameterUI(ColorParameter * parameter) :
     colorParam(parameter),
     dispatchOnDoubleClick(true),
 	dispatchOnSingleClick(false)
-
 {
 
 }
@@ -37,6 +36,14 @@ void ColorParameterUI::paint(Graphics & g)
 	{
 		g.setColour(c.brighter(.5f));
 		g.drawRoundedRectangle(getLocalBounds().reduced(1).toFloat(), 2, 2);
+	}
+
+	if (showLabel)
+	{
+		Rectangle<int> tr = getLocalBounds().reduced(2);
+		g.setFont(jlimit(12, 40, jmin(tr.getHeight(), tr.getWidth()) - 16));
+		g.setColour(useCustomTextColor ? customTextColor : TEXT_COLOR);
+		g.drawFittedText(customLabel.isNotEmpty() ? customLabel : colorParam->niceName, tr, Justification::centred, 1);
 	}
 	
 }

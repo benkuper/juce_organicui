@@ -76,10 +76,33 @@ void StringParameterUI::updateTooltip()
 	valueLabel.setTooltip(tooltip);
 }
 
+void StringParameterUI::paint(Graphics& g)
+{
+	ParameterUI::paint(g);
+
+	if (showLabel)
+	{
+		Rectangle<int> r = getLocalBounds();
+		r = r.removeFromLeft(jmin(g.getCurrentFont().getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName), r.getWidth() - 60));
+		g.setFont(jlimit(12, 40, jmin(r.getHeight(), r.getWidth()) - 16));
+		g.setColour(useCustomTextColor ? customTextColor : TEXT_COLOR);
+		g.drawFittedText(customLabel.isNotEmpty() ? customLabel : parameter->niceName, r, Justification::centred, 1);
+	}
+}
+
 void StringParameterUI::resized()
 {
 	juce::Rectangle<int> r = getLocalBounds();
+
+	if (showLabel)
+	{
+		Font font(jlimit(12, 40, jmin(r.getHeight(), r.getWidth()) - 16));
+		r.removeFromLeft(jmin(font.getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName), r.getWidth() - 60));
+		r = r.removeFromRight(jmin(r.getWidth(), 120));
+	}
+
 	resizedInternal(r);
+
 	valueLabel.setBounds(r);
 	valueLabel.setFont(valueLabel.getFont().withHeight(jmin<float>((float)r.getHeight(), maxFontHeight)));
 }

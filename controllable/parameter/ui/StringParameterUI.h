@@ -35,7 +35,7 @@ public:
 
 	virtual void updateTooltip() override;
 
-	//void paint(Graphics &g) override;
+	void paint(Graphics &g) override;
     void resized() override;
 	virtual void resizedInternal(juce::Rectangle<int> &) {} //to be overriden
 
