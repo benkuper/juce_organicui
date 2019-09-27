@@ -363,9 +363,11 @@ void Parameter::loadJSONDataInternal(var data)
 
 var Parameter::getValueFromScript(const juce::var::NativeFunctionArgs & a)
 {
-	WeakReference<Parameter> c = getObjectFromJS<Parameter>(a);
-	if (c == nullptr || c.wasObjectDeleted()) return var();
-	return c->getValue();
+	Parameter * p = getObjectFromJS<Parameter>(a);
+	if (p == nullptr) return var();
+	WeakReference<Parameter> pRef(p); 
+	if (pRef == nullptr || pRef.wasObjectDeleted()) return var();
+	return p->getValue();
 }
 
 
