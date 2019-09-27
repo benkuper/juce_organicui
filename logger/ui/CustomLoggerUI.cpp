@@ -300,6 +300,25 @@ void CustomLoggerUI::mouseDown(const MouseEvent& me) {
 	logListComponent->selectRow(rowUnderMouse);
 	grabKeyboardFocus();
 
+	if (me.mods.isRightButtonDown())
+	{
+		PopupMenu p;
+		p.addItem(1, "Copy this line (Content only)");
+		p.addItem(2, "Copy this line (All)");
+
+		int result = p.show();
+
+		switch (result)
+		{
+		case 1:
+			SystemClipboard::copyTextToClipboard(logList.getTextAt(rowUnderMouse, 3));
+		break; 
+		
+		case 2:
+			SystemClipboard::copyTextToClipboard(logList.getTextAt(rowUnderMouse, 1) + "\t" + logList.getTextAt(rowUnderMouse, 2) + "\t" + logList.getTextAt(rowUnderMouse, 3));
+			break;
+		}
+	}
 };
 
 void CustomLoggerUI::mouseDrag(const MouseEvent& me) {
