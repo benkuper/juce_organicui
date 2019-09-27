@@ -86,7 +86,9 @@ public:
 	void removeAsyncScriptListener(AsyncListener* listener) { scriptAsyncNotifier.removeListener(listener); }
 
 	//Script functions
-	static var logFromScript(const var::NativeFunctionArgs &args);
+	static var logFromScript(const var::NativeFunctionArgs& args);
+	static var logWarningFromScript(const var::NativeFunctionArgs& args);
+	static var logErrorFromScript(const var::NativeFunctionArgs &args);
 
 	static var addTriggerFromScript(const var::NativeFunctionArgs &args);
 	static var addBoolParameterFromScript(const var::NativeFunctionArgs &args);

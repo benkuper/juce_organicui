@@ -32,6 +32,8 @@ Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled) :
 	reload->hideInEditor = true;
 
 	scriptObject.setMethod("log", Script::logFromScript);
+	scriptObject.setMethod("logWarning", Script::logWarningFromScript);
+	scriptObject.setMethod("logError", Script::logErrorFromScript);
 	scriptObject.setMethod("setUpdateRate", Script::setUpdateRateFromScript);
 
 	scriptObject.setMethod("addTrigger", Script::addTriggerFromScript);
@@ -297,6 +299,34 @@ var Script::logFromScript(const var::NativeFunctionArgs & args)
 	{
 		if (i == 0) NLOG("Script : " + s->niceName, args.arguments[i].toString());
 		else NLOG("", args.arguments[i].toString());
+	}
+
+	return var();
+}
+
+var Script::logWarningFromScript(const var::NativeFunctionArgs& args)
+{
+	Script* s = ScriptTarget::getObjectFromJS<Script>(args);
+	if (!s->logParam->boolValue()) return var();
+
+	for (int i = 0; i < args.numArguments; i++)
+	{
+		if (i == 0) NLOGWARNING("Script : " + s->niceName, args.arguments[i].toString());
+		else NLOGWARNING("", args.arguments[i].toString());
+	}
+
+	return var();
+}
+
+var Script::logErrorFromScript(const var::NativeFunctionArgs& args)
+{
+	Script* s = ScriptTarget::getObjectFromJS<Script>(args);
+	if (!s->logParam->boolValue()) return var();
+
+	for (int i = 0; i < args.numArguments; i++)
+	{
+		if (i == 0) NLOGERROR("Script : " + s->niceName, args.arguments[i].toString());
+		else NLOGERROR("", args.arguments[i].toString());
 	}
 
 	return var();
