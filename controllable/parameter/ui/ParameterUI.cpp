@@ -223,6 +223,7 @@ void ParameterUI::newMessage(const Parameter::ParameterEvent &e) {
 
 	case Parameter::ParameterEvent::EXPRESSION_STATE_CHANGED:
 	case Parameter::ParameterEvent::CONTROLMODE_CHANGED:
+		controlModeChanged(e.parameter);
 		repaint();
 		break;
 	}

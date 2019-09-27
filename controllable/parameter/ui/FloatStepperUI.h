@@ -37,5 +37,7 @@ protected:
     // Inherited via Listener
     virtual void sliderValueChanged(Slider * slider) override;
 
+	virtual void controlModeChanged(Parameter *) override;
+
 	virtual void controllableStateChanged() override;
 };

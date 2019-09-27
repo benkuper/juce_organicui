@@ -63,6 +63,14 @@ void FloatStepperUI::sliderValueChanged(Slider * _slider)
 	parameter->setValue(_slider->getValue());
 }
 
+void FloatStepperUI::controlModeChanged(Parameter* p)
+{
+	slider->setEnabled(parameter->enabled);
+	slider->setColour(slider->textBoxTextColourId, useCustomTextColor ? customTextColor : (isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f)));
+
+	ParameterUI::controlModeChanged(p);
+}
+
 void FloatStepperUI::controllableStateChanged()
 {
 	ParameterUI::controllableStateChanged();

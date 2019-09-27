@@ -59,10 +59,8 @@ protected:
     // for general behaviour see AsyncListener
     virtual void valueChanged(const var & ){};
 	virtual void rangeChanged(Parameter * ){};
+	virtual void controlModeChanged(Parameter*) {};
 
-
-protected:
-    // see Parameter::AsyncListener
 	virtual void newMessage(const Parameter::ParameterEvent &e) override;;
 };
 
