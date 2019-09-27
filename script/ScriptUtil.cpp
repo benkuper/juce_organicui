@@ -1,3 +1,4 @@
+#include "ScriptUtil.h"
 /*
   ==============================================================================
 
@@ -15,14 +16,22 @@ ScriptUtil::ScriptUtil() :
 	ScriptTarget("util", this)
 {
 	scriptObject.setMethod("getTime", ScriptUtil::getTime);
+	scriptObject.setMethod("getTimestamp", ScriptUtil::getTimestamp);
 	scriptObject.setMethod("getFloatFromBytes", ScriptUtil::getFloatFromBytes);
 	scriptObject.setMethod("getInt32FromBytes", ScriptUtil::getInt32FromBytes);
 	scriptObject.setMethod("getInt64FromBytes", ScriptUtil::getInt32FromBytes);
+	scriptObject.setMethod("encodeHMAC_SHA1", ScriptUtil::encodeHMAC_SHA1);
+	scriptObject.setMethod("toBase64", ScriptUtil::toBase64);
 }
 
 var ScriptUtil::getTime(const var::NativeFunctionArgs &)
 {
 	return (float)(Time::getMillisecondCounter() / 1000.);
+}
+
+var ScriptUtil::getTimestamp(const var::NativeFunctionArgs&)
+{
+	return Time::currentTimeMillis()/1000;
 }
 
 var ScriptUtil::getFloatFromBytes(const var::NativeFunctionArgs & a)
@@ -86,4 +95,28 @@ var ScriptUtil::toRadians(const var::NativeFunctionArgs & a)
 {
 	if (a.numArguments < 1) return 0;
 	return degreesToRadians((double)a.arguments[0]);
+}
+
+var ScriptUtil::encodeHMAC_SHA1(const var::NativeFunctionArgs& a)
+{
+	if (a.numArguments < 2) return 0;
+
+	MemoryBlock b = HMAC_SHA1::encode(a.arguments[0].toString(), a.arguments[1].toString());
+
+	DBG("Encoding...\n" + a.arguments[0].toString() + "\n" + a.arguments[1].toString());
+
+	uint8_t * data = (uint8_t *)b.getData();
+	String dbgHex = "";
+	for (int i = 0; i < b.getSize(); i++)
+	{
+		dbgHex += String::toHexString(data[i]) + " ";
+	}
+	DBG("DBG HEX : " << dbgHex);
+	return Base64::toBase64(b.getData(), b.getSize());
+}
+
+var ScriptUtil::toBase64(const var::NativeFunctionArgs& a)
+{
+	if (a.numArguments < 1) return 0;
+	return Base64::toBase64(a.arguments[0].toString());
 }

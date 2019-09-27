@@ -83,6 +83,9 @@ using namespace juce;
 #include "helpers/DebugHelpers.h"
 #include "helpers/QueuedNotifier.h"
 #include "helpers/StringUtil.h"
+#include "helpers/crypto/hmac/SHA1.h"
+#include "helpers/crypto/hmac/HMAC_SHA1.h"
+
 #include "helpers/WakeOnLan.h"
 #include "helpers/OSCHelpers.h"
 #include "helpers/NetworkHelpers.h"
