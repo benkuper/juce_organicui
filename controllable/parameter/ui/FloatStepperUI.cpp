@@ -51,8 +51,8 @@ void FloatStepperUI::paint(Graphics& g)
 	if (showLabel)
 	{
 		Rectangle<int> r = getLocalBounds();
-		r = r.removeFromLeft(jmin(g.getCurrentFont().getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName), r.getWidth() - 60));
-		g.setFont(jlimit(12, 40, jmin(r.getHeight(), r.getWidth()) - 16));
+		g.setFont(jlimit(12, 40, jmin(r.getHeight(), r.getWidth()) - 16)); 
+		r = r.removeFromLeft(jmin(g.getCurrentFont().getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, r.getWidth() - 60));
 		g.setColour(useCustomTextColor ? customTextColor : TEXT_COLOR);
 		g.drawFittedText(customLabel.isNotEmpty() ? customLabel : parameter->niceName, r, Justification::centred, 1);
 	}

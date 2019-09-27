@@ -33,6 +33,8 @@ public:
 	var mouseDownValue;
 
 	void feedbackStateChanged() override;
+
+	void paint(Graphics& g) override;
 	void resized() override;
 
 	void mouseDownInternal(const MouseEvent &) override;

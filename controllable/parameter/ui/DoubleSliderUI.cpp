@@ -56,9 +56,31 @@ void DoubleSliderUI::mouseUpInternal(const MouseEvent&)
 	parameter->setUndoableValue(mouseDownValue, parameter->getValue());
 }
 
+void DoubleSliderUI::paint(Graphics& g)
+{
+	ParameterUI::paint(g);
+
+	if (showLabel)
+	{
+		Rectangle<int> r = getLocalBounds();
+		g.setFont(jlimit(12, 40, jmin(r.getHeight(), r.getWidth()) - 16));
+		r = r.removeFromLeft(jmin(g.getCurrentFont().getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, r.getWidth() - 60));
+		g.setColour(useCustomTextColor ? customTextColor : TEXT_COLOR);
+		g.drawFittedText(customLabel.isNotEmpty() ? customLabel : parameter->niceName, r, Justification::centred, 1);
+	}
+}
+
 void DoubleSliderUI::resized()
 {
 	juce::Rectangle<int> r = getLocalBounds();
+
+	if (showLabel)
+	{
+		Font font(jlimit(12, 40, jmin(r.getHeight(), r.getWidth()) - 16));
+		r.removeFromLeft(jmin(font.getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, r.getWidth() - 60));
+		r.removeFromLeft(2);
+	}
+	
 	xSlider->setBounds(r.removeFromLeft(r.getWidth() / 2 - 5));
 	ySlider->setBounds(r.removeFromRight(r.getWidth() - 10));
 }

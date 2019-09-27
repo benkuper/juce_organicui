@@ -1,3 +1,4 @@
+#include "BoolImageToggleUI.h"
 /*
   ==============================================================================
 
@@ -32,6 +33,18 @@ void BoolImageToggleUI::setTooltip(const String & value)
 {
 	ParameterUI::setTooltip(value);
 	bt->setTooltip(value);
+}
+
+void BoolImageToggleUI::paintOverChildren(Graphics& g)
+{
+	ParameterUI::paintOverChildren(g);
+	if (showLabel)
+	{
+		Rectangle<int> tr = getLocalBounds().reduced(2);
+		g.setFont(jlimit(12, 40, jmin(tr.getHeight(), tr.getWidth()) - 16));
+		g.setColour(useCustomTextColor ? customTextColor : TEXT_COLOR);
+		g.drawFittedText(customLabel.isNotEmpty() ? customLabel : parameter->niceName, tr, Justification::centred, 1);
+	}
 }
 
 void BoolImageToggleUI::resized()

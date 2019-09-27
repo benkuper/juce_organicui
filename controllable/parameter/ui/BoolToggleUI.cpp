@@ -58,9 +58,11 @@ void BoolToggleUI::paint(Graphics & g)
 	 juce::Rectangle<int> cr;
 	 float labelWidth = 0;
 
+
 	if (showLabel)
 	{
-		labelWidth = g.getCurrentFont().getStringWidth(parameter->niceName);
+		g.setFont(jlimit(12, 40, jmin(r.getHeight(), r.getWidth()) - 16));
+		labelWidth = g.getCurrentFont().getStringWidth(parameter->niceName) + 10;
 		if (r.getHeight() > r.getWidth())
 		{
 			cr = r.removeFromRight(jmin<float>(r.getHeight(), r.getWidth() - labelWidth));
@@ -79,7 +81,7 @@ void BoolToggleUI::paint(Graphics & g)
 
 	if (showLabel)
 	{
-		g.setFont((float)jmin<int>(getHeight(),12));
+		//g.setFont((float)jmin<int>(getHeight(),12));
 		g.setColour(useCustomTextColor?customTextColor:TEXT_COLOR);
 		g.drawFittedText(customLabel.isNotEmpty()?customLabel:parameter->niceName, r, Justification::left,1);
 	}

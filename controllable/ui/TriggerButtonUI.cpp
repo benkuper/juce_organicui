@@ -39,7 +39,7 @@ void TriggerButtonUI::mouseDownInternal(const MouseEvent & e)
 void TriggerButtonUI::paint(Graphics& g)
 {
 	juce::Rectangle<float> r = getLocalBounds().toFloat();
-	if (!showLabel) r.setWidth(jmin<float>(r.getWidth(), 50));
+	if (!showLabel) r.setWidth(jmin<float>(r.getWidth(), r.getHeight()*3));
 
 	Point<float> center = r.getCentre();
 

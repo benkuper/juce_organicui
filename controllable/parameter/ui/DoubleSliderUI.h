@@ -32,6 +32,7 @@ public:
 	void mouseDownInternal(const MouseEvent &) override;
 	void mouseUpInternal(const MouseEvent &) override;
 
+	void paint(Graphics& g) override;
     void resized() override;
 	void showEditWindowInternal() override;
 	void showEditRangeWindowInternal() override;

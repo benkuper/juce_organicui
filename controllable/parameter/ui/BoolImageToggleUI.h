@@ -23,6 +23,7 @@ public:
 
 	void setTooltip(const String &value) override;
 
+	void paintOverChildren(Graphics& g) override;
 	void resized() override;
 
 	void valueChanged(const var &) override;

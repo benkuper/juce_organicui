@@ -4,6 +4,8 @@ DashboardItemUI::DashboardItemUI(DashboardItem* item) :
 	BaseItemMinimalUI(item),
 	resizer(this, nullptr)
 {
+	bgColor = Colours::transparentBlack;
+
 	autoHideWhenDragging = true;
 	setRepaintsOnMouseActivity(true);
 	autoDrawContourWhenSelected = false;

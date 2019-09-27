@@ -37,5 +37,6 @@ void DashboardTriggerItemUI::controllableFeedbackUpdateInternal(Controllable* c)
 	DashboardControllableItemUI::controllableFeedbackUpdateInternal(c);
 
 	if (c == triggerItem->customImagePath) rebuildUI();
+	else if (c == triggerItem->bgColor) updateUIParameters();
 }
 

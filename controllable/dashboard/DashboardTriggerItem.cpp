@@ -3,7 +3,7 @@ DashboardTriggerItem::DashboardTriggerItem(Trigger * item) :
 	DashboardControllableItem(item),
 	trigger(item)
 {
-	bgColor = addColorParameter("Background Color", "Color of the background", BG_COLOR.brighter());
+	bgColor = addColorParameter("Background Color", "Color of the background", BG_COLOR.brighter(), false);
 	bgColor->canBeDisabledByUser = true;
 	customImagePath = addFileParameter("Custom Image", "Choose a custom image instead of the default button");
 	customImagePath->fileTypeFilter = "*.png;*.jpg;*.jpeg;*.gif";

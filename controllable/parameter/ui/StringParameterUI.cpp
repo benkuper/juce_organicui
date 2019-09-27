@@ -14,7 +14,7 @@
 StringParameterUI::StringParameterUI(Parameter * p) :
     ParameterUI(p),
 	stringParam((StringParameter *)p),
-	maxFontHeight(14),
+	maxFontHeight(16),
 	autoSize(false)
 {
 	showEditWindowOnDoubleClick = false;
@@ -83,8 +83,8 @@ void StringParameterUI::paint(Graphics& g)
 	if (showLabel)
 	{
 		Rectangle<int> r = getLocalBounds();
-		r = r.removeFromLeft(jmin(g.getCurrentFont().getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName), r.getWidth() - 60));
 		g.setFont(jlimit(12, 40, jmin(r.getHeight(), r.getWidth()) - 16));
+		r = r.removeFromLeft(jmin(g.getCurrentFont().getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName)+10, r.getWidth() - 60));
 		g.setColour(useCustomTextColor ? customTextColor : TEXT_COLOR);
 		g.drawFittedText(customLabel.isNotEmpty() ? customLabel : parameter->niceName, r, Justification::centred, 1);
 	}
@@ -97,8 +97,9 @@ void StringParameterUI::resized()
 	if (showLabel)
 	{
 		Font font(jlimit(12, 40, jmin(r.getHeight(), r.getWidth()) - 16));
-		r.removeFromLeft(jmin(font.getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName), r.getWidth() - 60));
-		r = r.removeFromRight(jmin(r.getWidth(), 120));
+		r.removeFromLeft(jmin(font.getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName)+10, r.getWidth() - 60));
+		r.removeFromLeft(2);
+		valueLabel.setJustificationType(Justification::centred);
 	}
 
 	resizedInternal(r);
