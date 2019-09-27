@@ -58,7 +58,8 @@ public:
 
 	bool checkValueIsTheSame(var oldValue, var newValue) override;
 	
-	static var getValueDataFromScript(const juce::var::NativeFunctionArgs &a);
+	static var getValueDataFromScript(const juce::var::NativeFunctionArgs& a);
+	static var addOptionFromScript(const juce::var::NativeFunctionArgs &a);
 
 
 	EnumParameterUI * createUI(EnumParameter * target = nullptr);

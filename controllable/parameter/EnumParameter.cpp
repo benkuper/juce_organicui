@@ -16,6 +16,7 @@ EnumParameter::EnumParameter(const String & niceName, const String &description,
 	lockManualControlMode = true;
 
 	scriptObject.setMethod("getData", EnumParameter::getValueDataFromScript);
+	scriptObject.setMethod("addOption", EnumParameter::addOptionFromScript);
 }
 
 EnumParameter * EnumParameter::addOption(String key, var data, bool selectIfFirstOption)
@@ -136,6 +137,23 @@ var EnumParameter::getValueDataFromScript(const juce::var::NativeFunctionArgs & 
 	if (c == nullptr || c.wasObjectDeleted()) return var();
 	EnumParameter * ep = dynamic_cast<EnumParameter *>(c.get());
 	return ep->getValueData();
+}
+
+var EnumParameter::addOptionFromScript(const juce::var::NativeFunctionArgs& a)
+{
+	WeakReference<Parameter> c = getObjectFromJS<Parameter>(a);
+	if (c == nullptr || c.wasObjectDeleted()) return var();
+	EnumParameter* ep = dynamic_cast<EnumParameter*>(c.get());
+	
+	if (a.numArguments < 2)
+	{
+		NLOGWARNING("Script", "EnumParameter addOption should at least have 2 arguments");
+		return var();
+	}
+
+	ep->addOption(a.arguments[0].toString(), a.arguments[1]);
+
+	return var();
 }
 
 EnumParameterUI * EnumParameter::createUI(EnumParameter * target)
