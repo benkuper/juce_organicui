@@ -1,3 +1,4 @@
+#include "StringParameter.h"
 /*
   ==============================================================================
 
@@ -64,18 +65,8 @@ var StringParameter::getLerpValueTo(var targetValue, float weight)
 	return Parameter::getLerpValueTo(targetValue, weight);
 }
 
-void StringParameter::setValue(var _value,bool silentSet,bool force, bool forceOverride)
+void  StringParameter::setValueInternal(var & newVal)
 {
-    if (!force && value.toString() == _value.toString()) return;
-    
-    setValueInternal(_value);
-    
-    if(_value != defaultValue || forceOverride) isOverriden = true;
-    
-    if (!silentSet) notifyValueChanged();
-};
-
-void  StringParameter::setValueInternal(var & newVal){
 	
 	if (newVal.isArray())
 	{
@@ -86,5 +77,10 @@ void  StringParameter::setValueInternal(var & newVal){
 	{
 		value = newVal.toString();
 	}    
-};
+}
+bool StringParameter::checkValueIsTheSame(var oldValue, var newValue)
+{
+	return oldValue.toString() == newValue.toString();
+}
+;
 
