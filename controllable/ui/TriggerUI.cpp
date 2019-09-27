@@ -10,7 +10,8 @@
 
 TriggerUI::TriggerUI(Trigger * trigger) :
     ControllableUI(trigger),
-    trigger(trigger)
+    trigger(trigger),
+	useCustomBGColor(false)
 {
     trigger->addAsyncTriggerListener(this);
 }

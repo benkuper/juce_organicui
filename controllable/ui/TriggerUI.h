@@ -20,6 +20,9 @@ public :
 
     WeakReference<Trigger>  trigger;
 
+	bool useCustomBGColor;
+	Colour customBGColor;
+
     // Inherited via AsyncListener
 	void newMessage(const WeakReference<Trigger> &) override;
 	

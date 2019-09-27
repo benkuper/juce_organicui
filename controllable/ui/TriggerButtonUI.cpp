@@ -43,12 +43,13 @@ void TriggerButtonUI::paint(Graphics& g)
 
 	Point<float> center = r.getCentre();
 
-	Colour c = BG_COLOR;
+	Colour bgColor = useCustomBGColor ? customBGColor : NORMAL_COLOR;
+	Colour c = bgColor.darker();
 
 	if (isInteractable())
 	{
 		if (drawTriggering) c = HIGHLIGHT_COLOR;
-		else c = isMouseOverOrDragging(true) ? (isMouseButtonDown() ? HIGHLIGHT_COLOR : NORMAL_COLOR.brighter()) : NORMAL_COLOR;
+		else c = isMouseOverOrDragging(true) ? (isMouseButtonDown() ? HIGHLIGHT_COLOR : bgColor.brighter()) : bgColor;
 	}
 	else
 	{

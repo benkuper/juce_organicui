@@ -43,7 +43,10 @@ void TriggerBlinkUI::triggerTriggered(const Trigger*) {
 void TriggerBlinkUI::paint(Graphics& g)
 {
 	if (!trigger.get())return;
-	g.setColour(offColor.interpolatedWith(onColor, intensity));
+
+	Colour curOffColor = useCustomBGColor ? customBGColor : offColor;
+
+	g.setColour(curOffColor.interpolatedWith(onColor, intensity));
 	g.fillRoundedRectangle(getLocalBounds().toFloat(), 2);
 	if (showLabel)
 	{

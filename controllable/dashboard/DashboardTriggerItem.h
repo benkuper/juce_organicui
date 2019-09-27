@@ -10,6 +10,7 @@ public:
 
 	Trigger* trigger;
 
+	ColorParameter * bgColor;
 	FileParameter * customImagePath;
 
 	virtual DashboardItemUI* createUI() override;

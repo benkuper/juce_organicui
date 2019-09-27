@@ -33,6 +33,14 @@ void TriggerImageUI::paint(Graphics & g)
 		g.setColour(HIGHLIGHT_COLOR.withAlpha(.2f));
 		g.fillEllipse(getLocalBounds().reduced(2).toFloat());
 	}
+	
+	if (showLabel)
+	{
+		Rectangle<int> tr = getLocalBounds().reduced(2);
+		g.setFont(jlimit(12, 40, jmin(tr.getHeight(), tr.getWidth()) - 16));
+		g.setColour(useCustomTextColor ? customTextColor : TEXT_COLOR);
+		g.drawFittedText(customLabel.isNotEmpty() ? customLabel : trigger->niceName, tr, Justification::centred, 1);
+	}
 }
 
 void TriggerImageUI::triggerTriggered(const Trigger *)
