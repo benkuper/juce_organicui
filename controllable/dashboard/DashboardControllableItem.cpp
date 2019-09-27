@@ -2,6 +2,8 @@ DashboardControllableItem::DashboardControllableItem(Controllable* item) :
 	DashboardInspectableItem(item),
 	controllable(item)
 {
+	viewUISize->setPoint(200, 50);
+	
 	showLabel = addBoolParameter("Show Label", "If checked, label is shown on controller", true);
 	textColor = addColorParameter("Text Color", "Color of the text", TEXT_COLOR, false);
 	opaqueBackground = addBoolParameter("Opaque Background", "If checked, background is opaque", true);

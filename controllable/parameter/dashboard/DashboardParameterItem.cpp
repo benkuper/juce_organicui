@@ -5,6 +5,7 @@ DashboardParameterItem::DashboardParameterItem(Parameter* parameter) :
 	parameter(parameter),
 	bgColor(nullptr), fgColor(nullptr), btImage(nullptr)
 {
+	
 	showValue = addBoolParameter("Show Value", "If checked, the value will be shown on the control", true);
 
 	bgColor = addColorParameter("Background Color", "The color of the background", BG_COLOR, false);

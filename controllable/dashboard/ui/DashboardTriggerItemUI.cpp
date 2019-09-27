@@ -5,7 +5,7 @@ DashboardTriggerItemUI::DashboardTriggerItemUI(DashboardTriggerItem* triggerItem
 	triggerItem(triggerItem)
 {
 	rebuildUI();
-	if (itemUI != nullptr) setSize(50,50);
+	if (itemUI != nullptr) setSize(item->viewUISize->x, item->viewUISize->y);
 }
 
 
@@ -25,8 +25,17 @@ ControllableUI* DashboardTriggerItemUI::createControllableUI()
 	return DashboardControllableItemUI::createControllableUI();
 }
 
+void DashboardTriggerItemUI::updateUIParameters()
+{
+	DashboardControllableItemUI::updateUIParameters();
+	((TriggerUI*)itemUI.get())->useCustomBGColor = triggerItem->bgColor->enabled;
+	if (triggerItem->bgColor->enabled) ((TriggerUI*)itemUI.get())->customBGColor = triggerItem->bgColor->getColor();
+}
+
 void DashboardTriggerItemUI::controllableFeedbackUpdateInternal(Controllable* c)
 {
+	DashboardControllableItemUI::controllableFeedbackUpdateInternal(c);
+
 	if (c == triggerItem->customImagePath) rebuildUI();
 }
 
