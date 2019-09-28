@@ -23,10 +23,12 @@ String StringUtil::toShortName(const String& niceName, bool replaceSlashes) {
 
 	res = res.replaceCharacter('\"', '_');
 	
-	String specials = "+-()[]{}<>^'@#*$~"; //ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏĞÑÒÓÔÕÖ×ÙÚÛÜİßàáâãäåæçèéêëìíîïğñòóôõöùúûüıÿ
-	String replaces = "_________________"; //AAAAAAECEEEEIIIIDNOOOOOxUUUUYsaaaaaaeceeeeiiiiOnooooouuuuyy
+	String specials = "+-()[]{}<>^'@#*$~";// ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏĞÑÒÓÔÕÖ×ÙÚÛÜİßàáâãäåæçèéêëìíîïğñòóôõöùúûüıÿ";
+	String replaces = "_________________";//AAAAAAECEEEEIIIIDNOOOOOxUUUUYsaaaaaaeceeeeiiiiOnooooouuuuyy";
 	res = res.replaceCharacters(specials, replaces);
-	res = res.replaceCharacter('é', 'e').replaceCharacter('è', 'e').replaceCharacter('ê','e').replaceCharacter('à', 'a');
+	res = res.replaceCharacter('é', 'e').replaceCharacter('è', 'e').replaceCharacter('ê', 'e')
+		.replaceCharacter('à', 'a').replaceCharacter('â', 'a').replaceCharacter('ô', 'o')
+		.replaceCharacter('ü', 'u').replaceCharacter('ç', 'c');
 
 	//for (int i = 0; i < specials.length(); i++) res = res.replaceCharacter(specials[i], replaces[i]);
 
