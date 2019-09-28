@@ -34,6 +34,7 @@ Controllable::Controllable(const Type &type, const String & niceName, const Stri
 	scriptObject.setMethod("isParameter", Controllable::checkIsParameterFromScript);
 	scriptObject.setMethod("getParent", Controllable::getParentFromScript);
 	scriptObject.setMethod("setName", Controllable::setNameFromScript);
+	scriptObject.setMethod("setParam", Controllable::setParamFromScript);
 
 	setEnabled(enabled);
 	setNiceName(niceName);
@@ -205,6 +206,12 @@ DashboardItem * Controllable::createDashboardItem()
 	return new DashboardControllableItem(this);
 }
 
+void Controllable::setParamAndValueFromScript(String param, var value)
+{
+	if (param == "description") description = value;
+	else if (param == "readonly") setControllableFeedbackOnly(value);
+}
+
 
 //SCRIPT
 var Controllable::setValueFromScript(const juce::var::NativeFunctionArgs& a) {
@@ -338,6 +345,15 @@ var Controllable::setNameFromScript(const juce::var::NativeFunctionArgs& a)
 	else c->setAutoShortName();
 	
 	return var(); 
+}
+
+var Controllable::setParamFromScript(const juce::var::NativeFunctionArgs& a)
+{
+	if (a.numArguments < 2) return var();
+	Controllable* c = getObjectFromJS<Controllable>(a);
+	if (c == nullptr) return var();
+	c->setParamAndValueFromScript(a.arguments[0].toString(), a.arguments[1].toString());
+	return var();
 }
 
 String Controllable::getWarningTargetName() const 

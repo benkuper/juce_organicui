@@ -106,11 +106,13 @@ public:
 
 	virtual DashboardItem * createDashboardItem() override;
 
+	virtual void setParamAndValueFromScript(String param, var value);
 
 	static var setValueFromScript(const juce::var::NativeFunctionArgs& a);
 	static var checkIsParameterFromScript(const juce::var::NativeFunctionArgs& a);
 	static var getParentFromScript(const juce::var::NativeFunctionArgs& a);
 	static var setNameFromScript(const juce::var::NativeFunctionArgs& a);
+	static var setParamFromScript(const juce::var::NativeFunctionArgs& a);
 
 	virtual String getWarningTargetName() const override;
 	

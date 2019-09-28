@@ -349,15 +349,15 @@ var Script::addBoolParameterFromScript(const var::NativeFunctionArgs & args)
 var Script::addIntParameterFromScript(const var::NativeFunctionArgs & args)
 {
 	Script * s = getObjectFromJS<Script>(args);
-	if (!checkNumArgs(s->niceName, args, 5)) return var();
-	return s->scriptParamsContainer.addIntParameter(args.arguments[0], args.arguments[1], (int)args.arguments[2], (int)args.arguments[3], (int)args.arguments[4])->getScriptObject();
+	if (!checkNumArgs(s->niceName, args, 3)) return var();
+	return s->scriptParamsContainer.addIntParameter(args.arguments[0], args.arguments[1], (int)args.arguments[2], args.numArguments >= 4?(int)args.arguments[3]:INT32_MIN, args.numArguments >= 5?(int)args.arguments[4]:INT32_MAX)->getScriptObject();
 }
 
 var Script::addFloatParameterFromScript(const var::NativeFunctionArgs & args)
 {
 	Script * s = getObjectFromJS<Script>(args);
-	if (!checkNumArgs(s->niceName, args, 5)) return var();
-	return s->scriptParamsContainer.addFloatParameter(args.arguments[0], args.arguments[1], (float)args.arguments[2], (float)args.arguments[3], (float)args.arguments[4])->getScriptObject();
+	if (!checkNumArgs(s->niceName, args, 3)) return var();
+	return s->scriptParamsContainer.addFloatParameter(args.arguments[0], args.arguments[1], (float)args.arguments[2], args.numArguments >= 4 ? (int)args.arguments[3] : INT32_MIN, args.numArguments >= 5 ? (int)args.arguments[4] : INT32_MAX)->getScriptObject();
 }
 
 var Script::addStringParameterFromScript(const var::NativeFunctionArgs & args)
