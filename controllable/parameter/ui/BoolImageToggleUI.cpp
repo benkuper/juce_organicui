@@ -15,6 +15,7 @@ BoolImageToggleUI::BoolImageToggleUI(ImageButton * i, BoolParameter *p) :
 	bt(i)
 {
 	showEditWindowOnDoubleClick = false;
+	showLabel = false; //remove label by default
 
 	addAndMakeVisible(bt.get());
 	if (!boolParam->isControllableFeedbackOnly) bt->addListener(this);
