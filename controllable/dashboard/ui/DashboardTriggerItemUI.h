@@ -10,7 +10,7 @@ public:
 
 	DashboardTriggerItem* triggerItem;
 
-	virtual ControllableUI* createControllableUI();
+	virtual ControllableUI* createControllableUI() override;
 	virtual void updateUIParameters() override;
 
 	virtual void controllableFeedbackUpdateInternal(Controllable* c) override;

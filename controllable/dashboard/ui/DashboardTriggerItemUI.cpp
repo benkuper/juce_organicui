@@ -5,7 +5,6 @@ DashboardTriggerItemUI::DashboardTriggerItemUI(DashboardTriggerItem* triggerItem
 	triggerItem(triggerItem)
 {
 	rebuildUI();
-	if (itemUI != nullptr) setSize(item->viewUISize->x, item->viewUISize->y);
 }
 
 

@@ -1,4 +1,3 @@
-#include "DashboardInspectableItem.h"
 DashboardInspectableItem::DashboardInspectableItem(Inspectable* item) :
 	DashboardItem(item),
 	inspectable(nullptr),
@@ -9,12 +8,12 @@ DashboardInspectableItem::DashboardInspectableItem(Inspectable* item) :
 
 DashboardInspectableItem::~DashboardInspectableItem()
 {
-	
 }
 
 void DashboardInspectableItem::clearItem()
 {
 	setInspectable(nullptr);
+	Engine::mainEngine->removeControllableContainerListener(this);
 }
 
 void DashboardInspectableItem::setInspectable(Inspectable* i)
@@ -30,7 +29,9 @@ void DashboardInspectableItem::setInspectable(Inspectable* i)
 
 	if (inspectable != nullptr)
 	{
+		ghostInspectable();
 		inspectable->addInspectableListener(this);
+		Engine::mainEngine->removeControllableContainerListener(this);
 	}
 
 	setInspectableInternal(inspectable);
@@ -40,12 +41,44 @@ void DashboardInspectableItem::setInspectable(Inspectable* i)
 
 void DashboardInspectableItem::inspectableDestroyed(Inspectable* i)
 {
+	DashboardItem::inspectableDestroyed(i);
+
 	if (!Engine::mainEngine->isClearing && i == inspectable)
 	{
-		//TEMP simple solution
-		NLOGWARNING("Dashboard", "Lost item reference, removing item");
-		remove();
+		Engine::mainEngine->addControllableContainerListener(this);
+		setInspectable(nullptr);
+	}
+}
+
+void DashboardInspectableItem::childStructureChanged(ControllableContainer* cc)
+{
+	if (cc == Engine::mainEngine)
+	{
+		if (inspectable.wasObjectDeleted() || inspectable == nullptr)
+		{
+			checkGhost();
+		}
+
 		return;
-		//setInspectable(nullptr);
+	}
+	
+	DashboardItem::childStructureChanged(cc);
+}
+
+var DashboardInspectableItem::getJSONData()
+{
+	var data = DashboardItem::getJSONData();
+	if (inspectableGhostAddress.isNotEmpty()) data.getDynamicObject()->setProperty("ghostAddress", inspectableGhostAddress);
+	return data;
+}
+
+void DashboardInspectableItem::loadJSONDataItemInternal(var data)
+{
+	DashboardItem::loadJSONDataItemInternal(data);
+
+	inspectableGhostAddress = data.getProperty("ghostAddress", inspectableGhostAddress);
+	if (inspectable.wasObjectDeleted() || inspectable == nullptr)
+	{
+		Engine::mainEngine->addControllableContainerListener(this);
 	}
 }

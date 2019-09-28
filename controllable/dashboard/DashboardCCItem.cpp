@@ -3,7 +3,7 @@ DashboardCCItem::DashboardCCItem(ControllableContainer* container) :
 	DashboardInspectableItem(container),
 	container(container)
 {
-	
+	ghostInspectable();
 }
 
 DashboardCCItem::~DashboardCCItem()
@@ -15,30 +15,32 @@ DashboardItemUI* DashboardCCItem::createUI()
 {
 	return new DashboardCCItemUI(this);
 }
+void DashboardCCItem::ghostInspectable()
+{
+	if (!inspectable.wasObjectDeleted() && inspectable != nullptr) inspectableGhostAddress = dynamic_cast<ControllableContainer *>(inspectable.get())->getControlAddress();
+}
+
+void DashboardCCItem::checkGhost()
+{
+	setInspectable(Engine::mainEngine->getControllableContainerForAddress(inspectableGhostAddress));
+}
 
 var DashboardCCItem::getJSONData()
 {
-	if (container == nullptr) return var(); //not saving for the moment
-
-	var data = DashboardItem::getJSONData();
-	data.getDynamicObject()->setProperty("container", container->getControlAddress());
+	var data = DashboardInspectableItem::getJSONData();
+	if(container != nullptr) data.getDynamicObject()->setProperty("container", container->getControlAddress());
 	return data;
 }
 
 void DashboardCCItem::loadJSONDataItemInternal(var data)
 {
-	DashboardItem::loadJSONDataItemInternal(data);
 
-	String address = data.getProperty("container", "");
-
+	String address = data.getProperty("container", inspectableGhostAddress);
 	setInspectable(Engine::mainEngine->getControllableContainerForAddress(address));
-	if (container == nullptr)
-	{
-		inspectableGhostAddress = address;
-		NLOGWARNING("Dashboard", "Item not found when loading : " << address << ", will not be saved");
-	}
 
+	DashboardInspectableItem::loadJSONDataItemInternal(data);
 }
+
 void DashboardCCItem::setInspectableInternal(Inspectable* i)
 {
 	container = dynamic_cast<ControllableContainer*>(i);

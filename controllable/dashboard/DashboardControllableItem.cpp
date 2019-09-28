@@ -1,3 +1,4 @@
+#include "DashboardControllableItem.h"
 DashboardControllableItem::DashboardControllableItem(Controllable* item) :
 	DashboardInspectableItem(item),
 	controllable(item)
@@ -13,6 +14,8 @@ DashboardControllableItem::DashboardControllableItem(Controllable* item) :
 	textColor->canBeDisabledByUser = true;
 	customLabel->canBeDisabledByUser = true;
 	customDescription->canBeDisabledByUser = true;
+
+	ghostInspectable();
 }
 
 DashboardControllableItem::~DashboardControllableItem()
@@ -22,25 +25,17 @@ DashboardControllableItem::~DashboardControllableItem()
 
 var DashboardControllableItem::getJSONData()
 {
-	if (controllable == nullptr) return var(); //not saving for the moment
-
-	var data = DashboardItem::getJSONData();
-	data.getDynamicObject()->setProperty("controllable", controllable->getControlAddress());
+	var data = DashboardInspectableItem::getJSONData();
+	if (controllable != nullptr) data.getDynamicObject()->setProperty("controllable", controllable->getControlAddress());
 	return data;
 }
 
 void DashboardControllableItem::loadJSONDataItemInternal(var data)
 {
-	DashboardItem::loadJSONDataItemInternal(data);
-
-	String address = data.getProperty("controllable", "");
-
+	String address = data.getProperty("controllable", inspectableGhostAddress);
 	setInspectable(Engine::mainEngine->getControllableForAddress(address));
-	if (controllable == nullptr)
-	{
-		inspectableGhostAddress = address;
-		NLOGWARNING("Dashboard", "Item not found when loading : " << address << ", will not be saved");
-	}
+
+	DashboardInspectableItem::loadJSONDataItemInternal(data);
 
 }
 
@@ -48,4 +43,14 @@ void DashboardControllableItem::loadJSONDataItemInternal(var data)
 void DashboardControllableItem::setInspectableInternal(Inspectable * i)
 {
 	controllable = dynamic_cast<Controllable*>(i);
+}
+
+void DashboardControllableItem::ghostInspectable()
+{
+	if(!inspectable.wasObjectDeleted() && inspectable != nullptr) inspectableGhostAddress = dynamic_cast<Controllable *>(inspectable.get())->getControlAddress();
+}
+
+void DashboardControllableItem::checkGhost()
+{
+	setInspectable(Engine::mainEngine->getControllableForAddress(inspectableGhostAddress));
 }

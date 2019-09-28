@@ -21,6 +21,8 @@ public:
 
 	virtual void setInspectableInternal(Inspectable * i) override;
 
+	virtual void ghostInspectable() override;
+	virtual void checkGhost() override;
 
 	virtual String getTypeString() const override { return "DashboardControllableItem"; }
 };

@@ -14,10 +14,13 @@ DashboardInspectableItemUI::~DashboardInspectableItemUI()
 void DashboardInspectableItemUI::paint(Graphics& g)
 {
 	DashboardItemUI::paint(g);
-	if (inspectableItem->inspectable == nullptr && inspectableItem->inspectableGhostAddress.isNotEmpty())
+
+	if (inspectableItem != nullptr && (inspectableItem->inspectable.wasObjectDeleted() || inspectableItem->inspectable == nullptr))
 	{
-		g.setColour(TEXT_COLOR);
-		g.drawFittedText("Missing : " + inspectableItem->inspectableGhostAddress, getLocalBounds(), Justification::centred, 2);
+		g.fillAll(Colours::white.withAlpha(.1f));
+		g.setColour(RED_COLOR);
+		g.setFont(14);
+		g.drawFittedText("#Missing : " + inspectableItem->inspectableGhostAddress, getLocalBounds(), Justification::centred, 3);
 	}
 }
 

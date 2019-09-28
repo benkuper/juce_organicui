@@ -5,6 +5,7 @@ DashboardControllableItemUI::DashboardControllableItemUI(DashboardControllableIt
 	controllableItem(controllableItem),
 	itemUI(nullptr)
 {
+	setSize(item->viewUISize->x, item->viewUISize->y);
 }
 
 DashboardControllableItemUI::~DashboardControllableItemUI()

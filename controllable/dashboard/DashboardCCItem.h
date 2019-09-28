@@ -17,6 +17,9 @@ public:
 
 	virtual DashboardItemUI* createUI() override;
 
+	virtual void ghostInspectable() override;
+	virtual void checkGhost() override;
+
 	static DashboardCCItem* create(var) { return new DashboardCCItem(); }
 	virtual String getTypeString() const override { return "DashboardCCItem"; }
 };

@@ -17,6 +17,13 @@ public:
 	virtual void setInspectableInternal(Inspectable* i) {}
 
 	virtual void inspectableDestroyed(Inspectable* i) override;
+	virtual void childStructureChanged(ControllableContainer* cc);
+
+	virtual void ghostInspectable() {}
+	virtual void checkGhost() {}
+
+	virtual var getJSONData() override;
+	virtual void loadJSONDataItemInternal(var data) override;
 
 	virtual String getTypeString() const override { return "DashboardControllableItem"; }
 
@@ -30,6 +37,8 @@ public:
 		Type type;
 		WeakReference<Inspectable> inspectable;
 	};
+
+
 
 	QueuedNotifier<InspectableItemEvent> inspectableItemNotifier;
 	typedef QueuedNotifier<InspectableItemEvent>::Listener ItemAsyncListener;

@@ -38,6 +38,9 @@ void BoolImageToggleUI::setTooltip(const String & value)
 void BoolImageToggleUI::paintOverChildren(Graphics& g)
 {
 	ParameterUI::paintOverChildren(g);
+
+	if (parameter.wasObjectDeleted() || parameter == nullptr) return;
+
 	if (showLabel)
 	{
 		Rectangle<int> tr = getLocalBounds().reduced(2);

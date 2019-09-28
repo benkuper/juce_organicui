@@ -57,7 +57,6 @@ void DashboardItemUI::resized()
 {
 	if (resizer.isVisible())
 	{
-		DBG("Resizer is visible ");
 		resizer.setBounds(getLocalBounds());
 	}
 
@@ -75,7 +74,6 @@ void DashboardItemUI::mouseUp(const MouseEvent& e)
 	BaseItemMinimalUI::mouseUp(e);
 	if (e.originalComponent == &resizer)
 	{
-		DBG("Resizer changed here");
 		itemMinimalUIListeners.call(&ItemMinimalUIListener::askForSyncPosAndSize, this);
 	}
 }

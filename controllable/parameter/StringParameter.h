@@ -35,6 +35,8 @@ public:
 
 	virtual bool checkValueIsTheSame(var oldValue, var newValue) override;
 
+	virtual void setParamAndValueFromScript(String param, var paramVal) override;
+
 	StringParameterUI * createStringParameterUI(StringParameter * target = nullptr);
 	StringParameterUI * createStringParameterFileUI(StringParameter * target = nullptr);
 	StringParameterTextUI * createStringParameterTextUI(StringParameter * target = nullptr);

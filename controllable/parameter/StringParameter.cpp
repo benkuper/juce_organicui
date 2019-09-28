@@ -82,5 +82,12 @@ bool StringParameter::checkValueIsTheSame(var oldValue, var newValue)
 {
 	return oldValue.toString() == newValue.toString();
 }
-;
+void StringParameter::setParamAndValueFromScript(String param, var paramVal)
+{
+	Parameter::setParamAndValueFromScript(param, paramVal);
+
+	if (param == "multiline") multiline = paramVal;
+	else if (param == "prefix") prefix = paramVal;
+	else if (param == "suffix") suffix = paramVal;
+}
 
