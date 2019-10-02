@@ -17,6 +17,8 @@ DashboardItemUI::DashboardItemUI(DashboardItem* item) :
 	updateEditMode();
 
 	DashboardManager::getInstance()->editMode->addAsyncParameterListener(this);
+
+	item->viewUISize->addAsyncParameterListener(this);
 }
 
 DashboardItemUI::~DashboardItemUI()
@@ -99,5 +101,9 @@ void DashboardItemUI::newMessage(const Parameter::ParameterEvent& e)
 	if (e.parameter == DashboardManager::getInstance()->editMode)
 	{
 		updateEditMode();
+	}
+	else if (e.parameter == item->viewUISize)
+	{
+		setSize(item->viewUISize->x, item->viewUISize->y);
 	}
 }

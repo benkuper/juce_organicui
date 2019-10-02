@@ -26,7 +26,7 @@ namespace CommandIDs
 	static const int duplicateItems = 0x40003;
 	static const int deleteItems = 0x40004;
 	static const int selectAll = 0x40005;
-
+	static const int switchDashboardEditMode = 0x40006;
 
 	static const int editProjectSettings = 0x50001;
 	static const int editGlobalSettings = 0x50002;
@@ -208,6 +208,14 @@ void OrganicMainContentComponent::getCommandInfo(CommandID commandID, Applicatio
 	}
 	break;
 
+
+	case CommandIDs::switchDashboardEditMode:
+	{
+		result.setInfo("Toggle Dashboard Edit Mode", "Toggle between edit and play mode for the dashboard", category, 0);
+		result.defaultKeypresses.add(KeyPress('e', ModifierKeys::commandModifier, 0));
+	}
+	break;
+
 	default:
 		JUCEApplication::getInstance()->getCommandInfo(commandID, result);
 		break;
@@ -236,6 +244,7 @@ void OrganicMainContentComponent::getAllCommands(Array<CommandID>& commands) {
 	  StandardApplicationCommandIDs::paste,
 	  CommandIDs::duplicateItems,
 	  CommandIDs::deleteItems,
+	  CommandIDs::switchDashboardEditMode,
 	  CommandIDs::editGlobalSettings,
 	  CommandIDs::editProjectSettings,
 	  CommandIDs::toggleKioskMode,
@@ -298,6 +307,8 @@ PopupMenu OrganicMainContentComponent::getMenuForIndex(int /*topLevelMenuIndex*/
 		menu.addCommandItem(&getCommandManager(), StandardApplicationCommandIDs::cut);
 		menu.addCommandItem(&getCommandManager(), StandardApplicationCommandIDs::paste);
 		menu.addCommandItem(&getCommandManager(), CommandIDs::deleteItems);
+		menu.addSeparator();
+		menu.addCommandItem(&getCommandManager(), CommandIDs::switchDashboardEditMode);
 
 	}
 	else if (menuName == "View")
@@ -507,6 +518,12 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 			if (i == nullptr) continue;
 			i->selectNext(info.keyPress.getModifiers().isShiftDown());
 		}
+	}
+	break;
+
+	case CommandIDs::switchDashboardEditMode:
+	{
+		if (DashboardManager::getInstanceWithoutCreating() != nullptr) DashboardManager::getInstance()->editMode->setValue(!DashboardManager::getInstance()->editMode->boolValue());
 	}
 	break;
 

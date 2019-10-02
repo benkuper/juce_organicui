@@ -39,12 +39,12 @@ BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts
 	listUISize->hideInOutliner = true;
 
 	viewUIPosition = addPoint2DParameter("ViewUIPosition", "Position the view");
-	viewUIPosition->setBounds(-100000, -100000, 100000, 100000);
+	//viewUIPosition->setBounds(-100000, -100000, 100000, 100000);
 	viewUIPosition->hideInEditor = true;
 	viewUIPosition->hideInOutliner = true;
 
 	viewUISize = addPoint2DParameter("ViewUISize", "Size in the view");
-	viewUISize->setBounds(30, 60, 10000, 10000);
+	//viewUISize->setBounds(30, 60, 10000, 10000);
 	var defaultSize;
 	defaultSize.append(200);
 	defaultSize.append(200);

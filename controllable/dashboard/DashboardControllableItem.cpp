@@ -7,7 +7,7 @@ DashboardControllableItem::DashboardControllableItem(Controllable* item) :
 	
 	showLabel = addBoolParameter("Show Label", "If checked, label is shown on controller", true);
 	textColor = addColorParameter("Text Color", "Color of the text", TEXT_COLOR, false);
-	contourColor = addColorParameter("Contour Color", "Color of the contour", TEXT_COLOR, false);
+	contourColor = addColorParameter("Contour Color", "Color of the contour", BG_COLOR.brighter(), false);
 	contourThickness = addFloatParameter("Contour Thickness", "Thickness of the contour", 2, 1);
 	opaqueBackground = addBoolParameter("Opaque Background", "If checked, background is opaque", true);
 	customLabel = addStringParameter("Custom text", "If not empty, will override the label of this control", "", false);
