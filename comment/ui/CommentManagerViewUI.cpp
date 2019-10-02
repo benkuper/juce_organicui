@@ -1,3 +1,4 @@
+#include "CommentManagerViewUI.h"
 /*
   ==============================================================================
 
@@ -18,4 +19,11 @@ CommentManagerViewUI::CommentManagerViewUI(CommentManager * manager) :
 
 CommentManagerViewUI::~CommentManagerViewUI()
 {
+}
+
+void CommentManagerViewUI::mouseWheelMove(const MouseEvent& e, const MouseWheelDetails& d)
+{
+	//skip manager handling
+
+	Component::mouseWheelMove(e, d);
 }

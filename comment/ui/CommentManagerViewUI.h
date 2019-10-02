@@ -16,4 +16,6 @@ class CommentManagerViewUI :
 public:
 	CommentManagerViewUI(CommentManager * manager);
 	~CommentManagerViewUI();
+
+	void mouseWheelMove(const MouseEvent& e, const MouseWheelDetails& d) override;
 };
