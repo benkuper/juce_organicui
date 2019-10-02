@@ -37,7 +37,7 @@ public:
 						   //interaction
 	Point<int> initViewOffset;
 
-	const int defaultCheckerSize = 64;
+	const int defaultCheckerSize = 128;
 
 	virtual void mouseDown(const MouseEvent &e) override;
 	virtual void mouseDrag(const MouseEvent &e) override;
@@ -68,7 +68,7 @@ public:
 	Point<float> getItemsCenter();
 
 	virtual void homeView();
-	virtual void frameView();
+	virtual void frameView(U * item = nullptr);
 
 	virtual void setViewZoom(float newZoom);
 
@@ -171,7 +171,7 @@ template<class M, class T, class U>
 	 else
 	 {
 		 double curTime = Time::getApproximateMillisecondCounter() / 1000.0;
-		 bool newCheck = curTime - timeSinceLastWheel > .5;
+		 bool newCheck = curTime - timeSinceLastWheel > 1;
 
 		 if (newCheck && e.originalComponent != this) return;
 		 
@@ -372,9 +372,12 @@ void BaseManagerViewUI<M, T, U>::homeView()
 }
 
 template<class M, class T, class U>
-void BaseManagerViewUI<M, T, U>::frameView()
+void BaseManagerViewUI<M, T, U>::frameView(U* se)
 {
-	viewOffset = -getItemsCenter().toInt();
+	if (se == nullptr) viewOffset = -getItemsCenter().toInt() * viewZoom;
+	else viewOffset = -(se->item->viewUIPosition->getPoint() + se->item->viewUISize->getPoint() / 2).toInt() * viewZoom;
+
+	updateItemsVisibility();
 	this->resized();
 	this->repaint();
 }
@@ -386,6 +389,7 @@ void BaseManagerViewUI<M, T, U>::setViewZoom(float value)
 	viewZoom = jlimit<float>(minZoom, maxZoom, value);
 	for (auto &tui : this->itemsUI) tui->setViewZoom(viewZoom);
 
+	updateItemsVisibility();
 	this->resized();
 	this->repaint();
 }
