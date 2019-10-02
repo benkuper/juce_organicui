@@ -21,6 +21,7 @@ Parameter::Parameter(const Type &type, const String &niceName, const String &des
     controlMode(MANUAL),
 	alwaysNotify(false),
 	canBeAutomated(false),
+	referenceTarget(nullptr),
     referenceParameter(nullptr),
     isPresettable(true),
     isOverriden(false),
@@ -35,8 +36,9 @@ Parameter::Parameter(const Type &type, const String &niceName, const String &des
 }
 
 Parameter::~Parameter() {
-	Parameter::masterReference.clear();
+	if(referenceTarget != nullptr) referenceTarget->removeParameterListener(this); //avoid reassigning on deletion
 	setReferenceParameter(nullptr);
+	Parameter::masterReference.clear();
 }
 
 void Parameter::setControlMode(ControlMode _mode)
