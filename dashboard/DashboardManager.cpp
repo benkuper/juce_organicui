@@ -11,8 +11,9 @@
 juce_ImplementSingleton(DashboardManager)
 
 DashboardManager::DashboardManager() :
-	BaseManager("Dashboard")
+	BaseManager("Dashboards")
 {
+	skipLabelInTarget = false;
 	editMode = addBoolParameter("Edit Mode", "If checked, items are editable. If not, items are normally usable", true);
 }
 

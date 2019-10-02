@@ -19,7 +19,7 @@ TargetParameter::TargetParameter(const String & niceName, const String & descrip
 	showFullAddressInEditor(false),
 	showParentNameInEditor(true),
 	maxDefaultSearchLevel(-1),
-	defaultParentLabelLevel(1),
+	defaultParentLabelLevel(3),
 	rootContainer(nullptr),
 	target(nullptr),
 	targetContainer(nullptr),
