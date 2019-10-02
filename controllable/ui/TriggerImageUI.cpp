@@ -14,6 +14,8 @@ TriggerImageUI::TriggerImageUI(Trigger * t, const Image &i) :
 	offImage(i.createCopy()),
 	drawTriggering(false)
 {
+	showLabel = false;
+
 	offImage.desaturate();
 	if(trigger->isControllableFeedbackOnly) offImage.multiplyAllAlphas(.5f);
 	setRepaintsOnMouseActivity(true);

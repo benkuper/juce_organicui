@@ -25,6 +25,8 @@ public:
 	bool isInterestedInDragSource(const SourceDetails & dragSourceDetails) override;
 	void itemDropped(const SourceDetails &details) override;
 
+	void showMenuAndAddItem(bool fromAddButton, Point<int> mousePos) override;
+
 	BaseItemMinimalUI<DashboardItem> * createUIForItem(DashboardItem *) override;
 
 	void newMessage(const ContainerAsyncEvent& e) override;

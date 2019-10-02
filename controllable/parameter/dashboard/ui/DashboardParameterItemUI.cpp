@@ -12,14 +12,41 @@ DashboardParameterItemUI::~DashboardParameterItemUI()
 
 ControllableUI* DashboardParameterItemUI::createControllableUI()
 {
-	if (parameterItem->parameter->type == Controllable::BOOL)
+	switch (parameterItem->parameter->type)
+	{
+	case Controllable::BOOL:
 	{
 		File f = parameterItem->btImage->getFile();
 		if (f.existsAsFile())
 		{
-			ImageButton * b = AssetManager::getInstance()->getToggleBTImage(ImageCache::getFromFile(f));
+			ImageButton* b = AssetManager::getInstance()->getToggleBTImage(ImageCache::getFromFile(f));
 			return ((BoolParameter*)parameterItem->parameter)->createImageToggle(b);
 		}
+	}
+	break;
+
+	case Controllable::FLOAT:
+	{
+		switch ((int)parameterItem->style->getValueData())
+		{
+		case 0:
+		case 1:
+		{
+			FloatSliderUI* sliderUI = ((FloatParameter*)parameterItem->parameter)->createSlider();
+			sliderUI->orientation = (int)parameterItem->style->getValueData() == 0 ? FloatSliderUI::HORIZONTAL : FloatSliderUI::VERTICAL;
+			return sliderUI;
+		}
+			break;
+
+		case 2:
+			return ((FloatParameter*)parameterItem->parameter)->createLabelParameter();
+			break;
+
+		case 3:
+			return ((FloatParameter*)parameterItem->parameter)->createTimeLabelParameter();
+			break;
+		}
+	}
 	}
 
 	return DashboardControllableItemUI::createControllableUI();
@@ -55,5 +82,5 @@ void DashboardParameterItemUI::controllableFeedbackUpdateInternal(Controllable* 
 	DashboardControllableItemUI::controllableFeedbackUpdateInternal(c);
 
 	if (c == parameterItem->showValue || c == parameterItem->bgColor || c == parameterItem->fgColor) updateUIParameters();
-	else if (c == parameterItem->btImage) rebuildUI();
+	else if (c == parameterItem->btImage || c == parameterItem->style) rebuildUI();
 }

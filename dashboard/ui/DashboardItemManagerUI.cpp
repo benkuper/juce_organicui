@@ -86,6 +86,12 @@ void DashboardItemManagerUI::itemDropped(const SourceDetails & details)
 	}
 }
 
+void DashboardItemManagerUI::showMenuAndAddItem(bool fromAddButton, Point<int> mousePos)
+{
+	if (!DashboardManager::getInstance()->editMode->boolValue()) return;
+	BaseManagerViewUI::showMenuAndAddItem(fromAddButton, mousePos);
+}
+
 BaseItemMinimalUI<DashboardItem> * DashboardItemManagerUI::createUIForItem(DashboardItem * item)
 {
 	return item->createUI();

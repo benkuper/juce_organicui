@@ -13,6 +13,9 @@ DashboardItem::DashboardItem(Inspectable * _target) :
 {
 	viewUISize->setBounds(20, 20,2000,2000);
 	viewUISize->setValue(100, 20);
+	
+	viewUIPosition->hideInEditor = false;
+	viewUISize->hideInEditor = false;
 }
 
 DashboardItem::~DashboardItem()

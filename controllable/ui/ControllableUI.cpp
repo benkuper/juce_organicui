@@ -1,3 +1,4 @@
+#include "ControllableUI.h"
 /*
   ==============================================================================
 
@@ -37,6 +38,12 @@ ControllableUI::~ControllableUI()
 }
 
 
+void ControllableUI::paintOverChildren(Graphics& g)
+{
+	if (useCustomContour) drawContour(g);
+
+}
+
 void ControllableUI::mouseEnter(const MouseEvent & e)
 {
 	if (controllable != nullptr) HelpBox::getInstance()->setOverData(controllable->helpID);
@@ -67,6 +74,12 @@ void ControllableUI::mouseUp(const MouseEvent & e)
 	if (e.mods.isRightButtonDown()) return;
 	if (isInteractable()) mouseUpInternal(e);
 
+}
+
+void ControllableUI::drawContour(Graphics &g)
+{
+	g.setColour(customContourColor);
+	g.drawRoundedRectangle(getLocalBounds().toFloat(), 2, customContourThickness);
 }
 
 bool ControllableUI::isInteractable()

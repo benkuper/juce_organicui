@@ -101,7 +101,7 @@ void FloatSliderUI::paint(Graphics & g)
     }
 
 	g.setColour(bgColor.brighter(.1f));
-	g.drawRoundedRectangle(sliderBounds.toFloat(), 2, 1);
+	//g.drawRoundedRectangle(getLocalBounds().toFloat(), 2, 1);
 
 }
 

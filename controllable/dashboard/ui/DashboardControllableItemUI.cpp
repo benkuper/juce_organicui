@@ -54,6 +54,10 @@ void DashboardControllableItemUI::updateUIParameters()
 	itemUI->useCustomTextColor = controllableItem->textColor->enabled; 
 	itemUI->customTextColor = controllableItem->textColor->getColor();
 
+	itemUI->useCustomContour = controllableItem->contourColor->enabled;
+	itemUI->customContourColor = controllableItem->contourColor->getColor();
+	itemUI->customContourThickness = controllableItem->contourThickness->floatValue();
+
 	itemUI->customLabel = controllableItem->customLabel->enabled ? controllableItem->customLabel->stringValue() : "";
 	itemUI->customDescription = controllableItem->customDescription->enabled ? controllableItem->customDescription->stringValue() : "";
 
@@ -83,7 +87,10 @@ void DashboardControllableItemUI::controllableFeedbackUpdateInternal(Controllabl
 		|| c == controllableItem->textColor 
 		|| c == controllableItem->customLabel 
 		|| c == controllableItem->customDescription
-		|| c == controllableItem->opaqueBackground)
+		|| c == controllableItem->opaqueBackground
+		|| c == controllableItem->contourColor
+		|| c == controllableItem->contourThickness
+		)
 	{
 		updateUIParameters();
 	}

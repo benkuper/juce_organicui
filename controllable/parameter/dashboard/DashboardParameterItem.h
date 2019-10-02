@@ -15,6 +15,8 @@ public:
 	ColorParameter* fgColor;
 	FileParameter* btImage;
 
+	EnumParameter* style;
+
 	virtual DashboardItemUI* createUI() override;
 
 	virtual void setInspectableInternal(Inspectable* i) override;

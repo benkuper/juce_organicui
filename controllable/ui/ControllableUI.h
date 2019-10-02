@@ -32,15 +32,24 @@ public:
 
 	bool useCustomTextColor;
 	Colour customTextColor;
+
+	bool useCustomContour;
+	Colour customContourColor;
+	float customContourThickness;
+
 	String customLabel;
 	String customDescription;
 
 	static std::function<void(ControllableUI*)> customShowEditWindowFunction;
 
+	virtual void paintOverChildren(Graphics &g) override;
+
 	void mouseEnter(const MouseEvent &e) override;
 	void mouseExit(const MouseEvent &e) override;
 	void mouseDown(const MouseEvent &e) override;
 	void mouseUp(const MouseEvent &e) override;
+
+	virtual void drawContour(Graphics &g);
 
 	virtual void mouseDownInternal(const MouseEvent &) {} //avoid right click check in each child class
 	virtual void mouseUpInternal(const MouseEvent &) {} //

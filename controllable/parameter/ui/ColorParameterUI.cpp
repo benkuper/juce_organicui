@@ -16,7 +16,7 @@ ColorParameterUI::ColorParameterUI(ColorParameter * parameter) :
     dispatchOnDoubleClick(true),
 	dispatchOnSingleClick(false)
 {
-
+	showLabel = false;
 }
 
 ColorParameterUI::~ColorParameterUI()
@@ -62,11 +62,12 @@ void ColorParameterUI::showEditWindowInternal()
 {
 	if (!isInteractable()) return;
 
-	ColourSelector * selector = new ColourSelector();
+	ColourSelector * selector = new ColourSelector(ColourSelector::showAlphaChannel | ColourSelector::showSliders | ColourSelector::showHexColorValue | ColourSelector::showColourspace);
 	selector->addChangeListener(this);
 	selector->setName("Color for " + parameter->niceName);
 	selector->setCurrentColour(colorParam->getColor());
 	selector->setColour(ColourSelector::backgroundColourId, Colours::transparentBlack);
+	selector->setColour(ColourSelector::labelTextColourId, TEXT_COLOR);
 	selector->setSize(300, 400);
 	selector->addChangeListener(this);
 	CallOutBox::launchAsynchronously(selector, getScreenBounds(), nullptr);
