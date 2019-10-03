@@ -367,8 +367,11 @@ template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::homeView()
 {
 	viewOffset = Point<int>();
+
 	this->resized();
 	this->repaint();
+
+	updateItemsVisibility();
 }
 
 template<class M, class T, class U>
@@ -377,9 +380,11 @@ void BaseManagerViewUI<M, T, U>::frameView(U* se)
 	if (se == nullptr) viewOffset = -getItemsCenter().toInt() * viewZoom;
 	else viewOffset = -(se->item->viewUIPosition->getPoint() + se->item->viewUISize->getPoint() / 2).toInt() * viewZoom;
 
-	updateItemsVisibility();
 	this->resized();
 	this->repaint();
+
+	updateItemsVisibility();
+
 }
 
 template<class M, class T, class U>
@@ -414,7 +419,7 @@ void BaseManagerViewUI<M, T, U>::itemDragMove(const DragAndDropTarget::SourceDet
 		if (bui != nullptr)
 		{
 			Point<int> p = this->getPositionFromDrag(bui, dragSourceDetails);
-			bui->item->viewUIPosition->setUndoablePoint(bui->item->viewUIPosition->getPoint(), p.toFloat());
+			bui->item->viewUIPosition->setPoint(p.toFloat());
 		}
 	}
 }
