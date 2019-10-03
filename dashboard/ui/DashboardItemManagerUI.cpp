@@ -128,6 +128,6 @@ void DashboardItemManagerUI::newMessage(const Parameter::ParameterEvent& e)
 {
 	if (e.parameter == DashboardManager::getInstance()->snapping)
 	{
-		enableSnapping == DashboardManager::getInstance()->snapping->boolValue();
+		enableSnapping = DashboardManager::getInstance()->snapping->boolValue();
 	}
 }

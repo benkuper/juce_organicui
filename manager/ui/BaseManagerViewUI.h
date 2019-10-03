@@ -273,7 +273,6 @@ inline void BaseManagerViewUI<M, T, U>::paintOverChildren(Graphics& g)
 		g.setColour(HIGHLIGHT_COLOR);
 		float dl[] = { 4,2 };
 		g.drawDashedLine(snapLineX.toFloat(), dl, 2, 1);
-		DBG("snap lineX " << snapLineX.getStart().toString() << " / " << snapLineX.getEnd().toString());
 	}
 
 	if (snapLineY.getLength() > 0)
@@ -523,7 +522,7 @@ void BaseManagerViewUI<M, T, U>::itemDragMove(const DragAndDropTarget::SourceDet
 		snapLineY = Line<int>();
 		if (targetUIY != nullptr)
 		{
-			snapLineY.setStart(Point<int>(jmin<int>(sb.getX(), targetUIY->getBounds().getRight()) - 20, targetY));
+			snapLineY.setStart(Point<int>(jmin<int>(sb.getX(), targetUIY->getBounds().getX()) - 20, targetY));
 			snapLineY.setEnd(Point<int>(jmax<int>(sb.getRight(), targetUIY->getBounds().getRight()) + 20, targetY));
 
 			snapPosition.setY(snapIsTop ? targetY : targetY - bui->getHeight());
@@ -551,7 +550,8 @@ void BaseManagerViewUI<M, T, U>::itemDropped(const DragAndDropTarget::SourceDeta
 
 	if (bui != nullptr &&  this->itemsUI.contains((U*)bui))
 	{
-		Point<float> initP = Point<float>((float)dragSourceDetails.description.getProperty("initX", initP.x), (float)dragSourceDetails.description.getProperty("initY", initP.y));
+		Point<float> initP = bui->item->viewUIPosition->getPoint();
+		initP = Point<float>((float)dragSourceDetails.description.getProperty("initX", initP.x), (float)dragSourceDetails.description.getProperty("initY", initP.y));
 		Point<float> p = enableSnapping ? targetSnapViewPosition : this->getPositionFromDrag(bui, dragSourceDetails).toFloat();
 		bui->item->viewUIPosition->setUndoablePoint(initP, p);
 	}

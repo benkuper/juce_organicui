@@ -19,8 +19,11 @@ DashboardManagerUI::DashboardManagerUI(DashboardManager* manager) :
 	addExistingItems(false);
 
 	editModeUI.reset(manager->editMode->createToggle());
+	snappingUI.reset(manager->snapping->createToggle());
 	addAndMakeVisible(editModeUI.get());
+	addAndMakeVisible(snappingUI.get());
 	editModeUI->showLabel = true;
+	snappingUI->showLabel = true;
 }
 
 
@@ -31,6 +34,8 @@ DashboardManagerUI::~DashboardManagerUI()
 
 void DashboardManagerUI::resizedInternalContent(Rectangle<int>& r)
 {
-	editModeUI->setBounds(r.removeFromRight(100).reduced(10));
+	Rectangle<int> br = r.removeFromRight(100).reduced(4);
+	editModeUI->setBounds(br.removeFromTop(br.getHeight() / 2).reduced(1));
+	snappingUI->setBounds(br.reduced(1));
 	BaseManagerUI::resizedInternalContent(r);
 }

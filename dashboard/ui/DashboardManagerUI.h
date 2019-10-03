@@ -18,6 +18,7 @@ public:
 	~DashboardManagerUI();
 
 	std::unique_ptr<BoolToggleUI> editModeUI;
+	std::unique_ptr<BoolToggleUI> snappingUI;
 
 	void resizedInternalContent(Rectangle<int>& r) override;
 };
