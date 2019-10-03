@@ -6,7 +6,9 @@ DashboardItemUI::DashboardItemUI(DashboardItem* item) :
 {
 	bgColor = Colours::transparentBlack;
 
-	autoHideWhenDragging = true;
+	autoHideWhenDragging = false;
+	drawEmptyDragIcon = true;
+
 	setRepaintsOnMouseActivity(true);
 	autoDrawContourWhenSelected = false;
 

@@ -38,6 +38,7 @@ public:
 	bool dragAndDropEnabled; //tmp, waiting to implement full drag&drop system
 	const int dragStartDistance = 10;
 	bool autoHideWhenDragging;
+	bool drawEmptyDragIcon;
 
 	//dropping
 	StringArray acceptedDropTypes;
@@ -87,7 +88,7 @@ public:
 
 
 template<class T>
-BaseItemMinimalUI<T>::BaseItemMinimalUI(T * _item) :
+BaseItemMinimalUI<T>::BaseItemMinimalUI(T* _item) :
 	InspectableContentComponent(_item),
 	item(_item),
 	bgColor(BG_COLOR.brighter(.1f)),
@@ -98,6 +99,7 @@ BaseItemMinimalUI<T>::BaseItemMinimalUI(T * _item) :
 	fillColorOnSelected(false),
 	dragAndDropEnabled(true),
 	autoHideWhenDragging(true),
+	drawEmptyDragIcon(false),
 	isDraggingOver(false),
 	highlightOnDragOver(true)
 {
@@ -132,9 +134,10 @@ void BaseItemMinimalUI<T>::mouseDrag(const MouseEvent & e)
 	desc.getDynamicObject()->setProperty("offsetY", (int)(getMouseXYRelative().y * viewZoom));
 	
 	Image dragImage = this->createComponentSnapshot(this->getLocalBounds()).convertedToFormat(Image::ARGB).rescaled(this->getWidth()*this->viewZoom, this->getHeight()*this->viewZoom);
-	dragImage.multiplyAllAlphas(.5f);
+	dragImage.multiplyAllAlphas(drawEmptyDragIcon?0:.5f);
+
 	Point<int> offset = -getMouseXYRelative()*viewZoom;
-	if (e.getDistanceFromDragStart() > dragStartDistance) startDragging(desc, this, dragImage, true, &offset);
+	if (e.getDistanceFromDragStart() > dragStartDistance) startDragging(desc, this,dragImage, true, &offset);
 }
 
 

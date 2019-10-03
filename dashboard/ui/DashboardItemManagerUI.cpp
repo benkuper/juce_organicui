@@ -15,6 +15,7 @@ DashboardItemManagerUI::DashboardItemManagerUI(DashboardItemManager * manager) :
 	//bgColor = Colours::purple;
 	//setWantsKeyboardFocus(true);
 
+	enableSnapping = true;
 	setShowAddButton(false);
 
 	manager->addAsyncCoalescedContainerListener(this);

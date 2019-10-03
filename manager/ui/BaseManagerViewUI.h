@@ -23,6 +23,12 @@ public:
 	//
 	bool centerUIAroundPosition;
 	bool updatePositionOnDragMove;
+	bool enableSnapping;
+	const int snappingThreshold = 10;
+	const int snappingSpacing = 10;
+	Line<int> snapLineX;
+	Line<int> snapLineY;
+	Point<float> targetSnapViewPosition;
 
 	//Zoom
 	bool canZoom;
@@ -48,6 +54,7 @@ public:
 
 	virtual void paint(Graphics &g) override;
 	virtual void paintBackground(Graphics &g);
+	virtual void paintOverChildren(Graphics& g) override;
 
 	virtual void resized() override;
 
@@ -96,6 +103,7 @@ BaseManagerViewUI<M, T, U>::BaseManagerViewUI(const String & contentName, M * _m
 	canNavigate(true),
 	centerUIAroundPosition(false),
 	updatePositionOnDragMove(false),
+	enableSnapping(false),
 	canZoom(true),
 	zoomAffectsItemSize(true),
 	viewZoom(1),
@@ -249,6 +257,27 @@ void BaseManagerViewUI<M, T, U>::paintBackground(Graphics & g)
 	g.drawLine(center.x, 0, center.x, this->getHeight(), 2);
 	g.drawLine(0, center.y, this->getWidth(), center.y, 2);
 
+}
+
+template<class M, class T, class U>
+inline void BaseManagerViewUI<M, T, U>::paintOverChildren(Graphics& g)
+{
+	BaseManagerUI<M, T, U>::paintOverChildren(g);
+
+	if (snapLineX.getLength() > 0)
+	{
+		g.setColour(HIGHLIGHT_COLOR);
+		float dl[] = { 4,2 };
+		g.drawDashedLine(snapLineX.toFloat(), dl, 2, 1);
+		DBG("snap lineX " << snapLineX.getStart().toString() << " / " << snapLineX.getEnd().toString());
+	}
+
+	if (snapLineY.getLength() > 0)
+	{
+		g.setColour(HIGHLIGHT_COLOR);
+		float dl[] = { 4,2 };
+		g.drawDashedLine(snapLineY.toFloat(), dl, 2, 1);
+	}
 }
 
 template<class M, class T, class U>
@@ -412,15 +441,100 @@ void BaseManagerViewUI<M, T, U>::itemDragMove(const DragAndDropTarget::SourceDet
 {
 	BaseManagerUI<M, T, U>::itemDragMove(dragSourceDetails);
 
+	BaseItemMinimalUI<T>* bui = dynamic_cast<BaseItemMinimalUI<T>*>(dragSourceDetails.sourceComponent.get());
+	Point<int> realP = this->getMouseXYRelative() - Point<int>((int)dragSourceDetails.description.getProperty("offsetX", 0), (int)dragSourceDetails.description.getProperty("offsetY", 0));
+
+	if (bui == nullptr) return;
+
+	Point<int> snapPosition = realP;
+
+	if (enableSnapping)
+	{
+		
+		int distX = snappingThreshold;
+		int distY = snappingThreshold;
+
+		int targetX = 0;
+		int targetY = 0;
+		
+		juce::Rectangle<int> sb = bui->getBounds().withPosition(realP);
+
+		BaseItemMinimalUI<T> * targetUIX = nullptr;
+		BaseItemMinimalUI<T> * targetUIY = nullptr;
+
+		bool snapIsLeft = false;
+		bool snapIsTop = false;
+
+		for (auto& ui : this->itemsUI)
+		{
+			if (ui == bui) continue;
+			juce::Rectangle<int> ib = ui->getBounds();
+			
+			int curDistX = distX;
+			int curDistY = distY;
+
+			int leftLeft = abs(sb.getX() - ib.getX());
+			int leftRightSpaced = abs(sb.getX() - (ib.getRight() + snappingSpacing));
+			int rightRight = abs(sb.getRight() - ib.getRight());
+			int rightLeftSpaced = abs(sb.getRight() - (ib.getX() - snappingSpacing));
+
+			if (leftLeft < curDistX) { curDistX = leftLeft; targetX = ib.getX(); snapIsLeft = true; }
+			if (leftRightSpaced < curDistX) { curDistX = leftRightSpaced; targetX = ib.getRight() + snappingSpacing; snapIsLeft = true; }
+			if (rightRight < curDistX) { curDistX = rightRight; targetX = ib.getRight();}
+			if (rightLeftSpaced < curDistX) { curDistX = rightLeftSpaced; targetX = ib.getX() - snappingSpacing;}
+
+
+			int topTop = abs(sb.getY() - ib.getY());
+			int topBottomSpaced = abs(sb.getY() - (ib.getBottom() + snappingSpacing));
+			int bottomBottom = abs(sb.getBottom() - ib.getBottom());
+			int bottomTopSpaced = abs(sb.getBottom() - (ib.getY() - snappingSpacing));
+
+			if (topTop < curDistY) { curDistY = topTop; targetY = ib.getY(); snapIsTop = true; }
+			if (topBottomSpaced < curDistY) { curDistY = topBottomSpaced; targetY = ib.getBottom() + snappingSpacing; snapIsTop = true; }
+			if (bottomBottom < curDistY) { curDistY = bottomBottom; targetY = ib.getBottom(); }
+			if (bottomTopSpaced < curDistY) { curDistY = bottomTopSpaced; targetY = ib.getY() - snappingSpacing; }
+
+			if (curDistX < distX)
+			{
+				targetUIX = dynamic_cast<BaseItemMinimalUI<T>*>(ui);
+				distX = curDistX;
+			}
+
+			if (curDistY < distY)
+			{
+				targetUIY = dynamic_cast<BaseItemMinimalUI<T>*>(ui);
+				distY = curDistY;
+			}
+		}
+
+		snapLineX = Line<int>(); 
+		if (targetUIX != nullptr)
+		{
+			snapLineX.setStart(Point<int>(targetX, jmin<int>(sb.getY(), targetUIX->getBounds().getY() - 20)));
+			snapLineX.setEnd(Point<int>(targetX, jmax<int>(sb.getBottom(), targetUIX->getBounds().getBottom() + 20)));
+
+			snapPosition.setX(snapIsLeft?targetX:targetX - bui->getWidth());
+		}
+
+		snapLineY = Line<int>();
+		if (targetUIY != nullptr)
+		{
+			snapLineY.setStart(Point<int>(jmin<int>(sb.getX(), targetUIY->getBounds().getRight() - 20), targetY));
+			snapLineY.setEnd(Point<int>(jmax<int>(sb.getRight(), targetUIY->getBounds().getRight() + 20), targetY));
+
+			snapPosition.setY(snapIsTop ? targetY : targetY - bui->getHeight());
+
+		}
+
+		targetSnapViewPosition = this->getViewPos(snapPosition).toFloat();
+
+		repaint();
+	}
+
 	if (updatePositionOnDragMove)
 	{
-		BaseItemMinimalUI<T>* bui = dynamic_cast<BaseItemMinimalUI<T>*>(dragSourceDetails.sourceComponent.get());
-
-		if (bui != nullptr)
-		{
-			Point<float> p = this->getPositionFromDrag(bui, dragSourceDetails).toFloat();
-			bui->item->viewUIPosition->setPoint(p);
-		}
+		Point<float> targetPosition = (snapPosition != realP) ? targetSnapViewPosition : this->getPositionFromDrag(bui, dragSourceDetails).toFloat();
+		bui->item->viewUIPosition->setPoint(targetPosition);
 	}
 }
 
@@ -433,13 +547,13 @@ void BaseManagerViewUI<M, T, U>::itemDropped(const DragAndDropTarget::SourceDeta
 
 	if (bui != nullptr &&  this->itemsUI.contains((U*)bui))
 	{
-		Point<float> p = this->getPositionFromDrag(bui, dragSourceDetails).toFloat();
-		
-		Point<float> initP = bui->item->viewUIPosition->getPoint();
-		if(updatePositionOnDragMove) initP = Point<float>((float)dragSourceDetails.description.getProperty("initX", initP.x), (float)dragSourceDetails.description.getProperty("initY", initP.y));
-		
+		Point<float> initP = Point<float>((float)dragSourceDetails.description.getProperty("initX", initP.x), (float)dragSourceDetails.description.getProperty("initY", initP.y));
+		Point<float> p = enableSnapping ? targetSnapViewPosition : this->getPositionFromDrag(bui, dragSourceDetails).toFloat();
 		bui->item->viewUIPosition->setUndoablePoint(initP, p);
 	}
+
+	snapLineX = Line<int>();
+	snapLineY = Line<int>();
 }
 
 template<class M, class T, class U>
