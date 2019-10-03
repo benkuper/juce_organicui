@@ -15,10 +15,13 @@ DashboardItemManagerUI::DashboardItemManagerUI(DashboardItemManager * manager) :
 	//bgColor = Colours::purple;
 	//setWantsKeyboardFocus(true);
 
-	enableSnapping = true;
+	enableSnapping = DashboardManager::getInstance()->snapping->boolValue();
+	updatePositionOnDragMove = true;
+
 	setShowAddButton(false);
 
 	manager->addAsyncCoalescedContainerListener(this);
+	DashboardManager::getInstance()->snapping->addAsyncParameterListener(this);
 
 	File f = manager->bgImage->getFile();
 	if (f.existsAsFile()) bgImage = ImageCache::getFromFile(f);
@@ -32,6 +35,7 @@ DashboardItemManagerUI::DashboardItemManagerUI(DashboardItemManager * manager) :
 DashboardItemManagerUI::~DashboardItemManagerUI()
 {
 	if(!inspectable.wasObjectDeleted()) manager->removeAsyncContainerListener(this);
+	if(DashboardManager::getInstanceWithoutCreating() != nullptr) DashboardManager::getInstance()->snapping->removeAsyncParameterListener(this);
 }
 
 void DashboardItemManagerUI::paint(Graphics& g)
@@ -91,6 +95,7 @@ void DashboardItemManagerUI::showMenuAndAddItem(bool fromAddButton, Point<int> m
 {
 	if (!DashboardManager::getInstance()->editMode->boolValue()) return;
 	BaseManagerViewUI::showMenuAndAddItem(fromAddButton, mousePos);
+
 }
 
 BaseItemMinimalUI<DashboardItem> * DashboardItemManagerUI::createUIForItem(DashboardItem * item)
@@ -114,6 +119,15 @@ void DashboardItemManagerUI::newMessage(const ContainerAsyncEvent& e)
 		{
 			repaint();
 		}
+
 		break;
+	}
+}
+
+void DashboardItemManagerUI::newMessage(const Parameter::ParameterEvent& e)
+{
+	if (e.parameter == DashboardManager::getInstance()->snapping)
+	{
+		enableSnapping == DashboardManager::getInstance()->snapping->boolValue();
 	}
 }

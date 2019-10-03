@@ -20,4 +20,5 @@ public:
 	~DashboardManager();
 
 	BoolParameter* editMode;
+	BoolParameter* snapping;
 };

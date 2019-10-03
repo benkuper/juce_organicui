@@ -12,7 +12,8 @@
 
 class DashboardItemManagerUI :
 	public BaseManagerViewUI<DashboardItemManager, DashboardItem, BaseItemMinimalUI<DashboardItem>>,
-	public ContainerAsyncListener
+	public ContainerAsyncListener,
+	public Parameter::AsyncListener
 {
 public:
 	DashboardItemManagerUI(DashboardItemManager * manager);
@@ -30,4 +31,5 @@ public:
 	BaseItemMinimalUI<DashboardItem> * createUIForItem(DashboardItem *) override;
 
 	void newMessage(const ContainerAsyncEvent& e) override;
+	void newMessage(const Parameter::ParameterEvent& e) override;
 };

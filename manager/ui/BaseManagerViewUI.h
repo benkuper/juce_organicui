@@ -154,6 +154,10 @@ template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::mouseUp(const MouseEvent & e)
 {
 	BaseManagerUI<M, T, U>::mouseUp(e);
+	
+	snapLineX = Line<int>();
+	snapLineY = Line<int>();
+
 	this->setMouseCursor(MouseCursor::NormalCursor);
 	this->updateMouseCursor();
 }
@@ -510,8 +514,8 @@ void BaseManagerViewUI<M, T, U>::itemDragMove(const DragAndDropTarget::SourceDet
 		snapLineX = Line<int>(); 
 		if (targetUIX != nullptr)
 		{
-			snapLineX.setStart(Point<int>(targetX, jmin<int>(sb.getY(), targetUIX->getBounds().getY() - 20)));
-			snapLineX.setEnd(Point<int>(targetX, jmax<int>(sb.getBottom(), targetUIX->getBounds().getBottom() + 20)));
+			snapLineX.setStart(Point<int>(targetX, jmin<int>(sb.getY(), targetUIX->getBounds().getY()) - 20));
+			snapLineX.setEnd(Point<int>(targetX, jmax<int>(sb.getBottom(), targetUIX->getBounds().getBottom()) + 20));
 
 			snapPosition.setX(snapIsLeft?targetX:targetX - bui->getWidth());
 		}
@@ -519,8 +523,8 @@ void BaseManagerViewUI<M, T, U>::itemDragMove(const DragAndDropTarget::SourceDet
 		snapLineY = Line<int>();
 		if (targetUIY != nullptr)
 		{
-			snapLineY.setStart(Point<int>(jmin<int>(sb.getX(), targetUIY->getBounds().getRight() - 20), targetY));
-			snapLineY.setEnd(Point<int>(jmax<int>(sb.getRight(), targetUIY->getBounds().getRight() + 20), targetY));
+			snapLineY.setStart(Point<int>(jmin<int>(sb.getX(), targetUIY->getBounds().getRight()) - 20, targetY));
+			snapLineY.setEnd(Point<int>(jmax<int>(sb.getRight(), targetUIY->getBounds().getRight()) + 20, targetY));
 
 			snapPosition.setY(snapIsTop ? targetY : targetY - bui->getHeight());
 
