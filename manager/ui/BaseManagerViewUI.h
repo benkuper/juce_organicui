@@ -531,7 +531,7 @@ void BaseManagerViewUI<M, T, U>::itemDragMove(const DragAndDropTarget::SourceDet
 
 		targetSnapViewPosition = this->getViewPos(snapPosition).toFloat();
 
-		repaint();
+		this->repaint();
 	}
 
 	if (updatePositionOnDragMove)
