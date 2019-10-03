@@ -418,8 +418,8 @@ void BaseManagerViewUI<M, T, U>::itemDragMove(const DragAndDropTarget::SourceDet
 
 		if (bui != nullptr)
 		{
-			Point<int> p = this->getPositionFromDrag(bui, dragSourceDetails);
-			bui->item->viewUIPosition->setPoint(p.toFloat());
+			Point<float> p = this->getPositionFromDrag(bui, dragSourceDetails).toFloat();
+			bui->item->viewUIPosition->setPoint(p);
 		}
 	}
 }
@@ -433,8 +433,12 @@ void BaseManagerViewUI<M, T, U>::itemDropped(const DragAndDropTarget::SourceDeta
 
 	if (bui != nullptr &&  this->itemsUI.contains((U*)bui))
 	{
-		Point<int> p = this->getPositionFromDrag(bui, dragSourceDetails);
-		bui->item->viewUIPosition->setUndoablePoint(bui->item->viewUIPosition->getPoint(), p.toFloat());
+		Point<float> p = this->getPositionFromDrag(bui, dragSourceDetails).toFloat();
+		
+		Point<float> initP = bui->item->viewUIPosition->getPoint();
+		if(updatePositionOnDragMove) initP = Point<float>((float)dragSourceDetails.description.getProperty("initX", initP.x), (float)dragSourceDetails.description.getProperty("initY", initP.y));
+		
+		bui->item->viewUIPosition->setUndoablePoint(initP, p);
 	}
 }
 
