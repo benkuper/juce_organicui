@@ -38,8 +38,15 @@ const String OrganicApplication::getApplicationVersion() { return ProjectInfo::v
 void OrganicApplication::initialise(const String & commandLine)
 {
 	initialiseInternal(commandLine);
-	
+
+	CommandLineElements commands = StringUtil::parseCommandLine(commandLine);
+	for (auto& c : commands)
+	{
+		if (c.command == "r") getAppProperties().getUserSettings()->getFile().deleteFile();
+	}
+
 	GlobalSettings::getInstance()->addChildControllableContainer(&appSettings,false, GlobalSettings::getInstance()->controllableContainers.size()-1);
+	
 	var gs = JSON::fromString(getAppProperties().getUserSettings()->getValue("globalSettings", ""));
 	GlobalSettings::getInstance()->loadJSONData(gs);
 
@@ -57,7 +64,6 @@ void OrganicApplication::initialise(const String & commandLine)
 		mainWindow.reset(new MainWindow(getApplicationName(), mainComponent.get()));
 		updateAppTitle();
 	}
-	
 
 	AppUpdater::getInstance()->addAsyncUpdateListener(this);
 
