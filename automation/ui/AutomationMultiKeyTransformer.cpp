@@ -113,7 +113,10 @@ void AutomationMultiKeyTransformer::mouseDown(const MouseEvent & e)
 
 void AutomationMultiKeyTransformer::mouseDrag(const MouseEvent & e)
 {
-	setTopLeftPosition(posAtMouseDown + e.getOffsetFromDragStart());
+	bool lockX = e.mods.isShiftDown();
+	bool lockY = !e.mods.isCommandDown();
+	Point<int> offset(lockX ? 0 : e.getOffsetFromDragStart().x, lockY ? 0 : e.getOffsetFromDragStart().y);
+	setTopLeftPosition(posAtMouseDown + offset);
 	updateKeysFromBounds();
 }
 
