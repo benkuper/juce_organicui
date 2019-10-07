@@ -483,8 +483,8 @@ void BaseManagerViewUI<M, T, U>::itemDragMove(const DragAndDropTarget::SourceDet
 
 			if (leftLeft < curDistX) { curDistX = leftLeft; targetX = ib.getX(); snapIsLeft = true; }
 			if (leftRightSpaced < curDistX) { curDistX = leftRightSpaced; targetX = ib.getRight() + snappingSpacing; snapIsLeft = true; }
-			if (rightRight < curDistX) { curDistX = rightRight; targetX = ib.getRight();}
-			if (rightLeftSpaced < curDistX) { curDistX = rightLeftSpaced; targetX = ib.getX() - snappingSpacing;}
+			if (rightRight < curDistX) { curDistX = rightRight; targetX = ib.getRight(); snapIsLeft = false;  }
+			if (rightLeftSpaced < curDistX) { curDistX = rightLeftSpaced; targetX = ib.getX() - snappingSpacing; snapIsLeft = false; }
 
 
 			int topTop = abs(sb.getY() - ib.getY());
@@ -494,8 +494,8 @@ void BaseManagerViewUI<M, T, U>::itemDragMove(const DragAndDropTarget::SourceDet
 
 			if (topTop < curDistY) { curDistY = topTop; targetY = ib.getY(); snapIsTop = true; }
 			if (topBottomSpaced < curDistY) { curDistY = topBottomSpaced; targetY = ib.getBottom() + snappingSpacing; snapIsTop = true; }
-			if (bottomBottom < curDistY) { curDistY = bottomBottom; targetY = ib.getBottom(); }
-			if (bottomTopSpaced < curDistY) { curDistY = bottomTopSpaced; targetY = ib.getY() - snappingSpacing; }
+			if (bottomBottom < curDistY) { curDistY = bottomBottom; targetY = ib.getBottom(); snapIsTop = false; }
+			if (bottomTopSpaced < curDistY) { curDistY = bottomTopSpaced; targetY = ib.getY() - snappingSpacing; snapIsTop = false; }
 
 			if (curDistX < distX)
 			{
@@ -510,12 +510,12 @@ void BaseManagerViewUI<M, T, U>::itemDragMove(const DragAndDropTarget::SourceDet
 			}
 		}
 
+
 		snapLineX = Line<int>(); 
 		if (targetUIX != nullptr)
 		{
 			snapLineX.setStart(Point<int>(targetX, jmin<int>(sb.getY(), targetUIX->getBounds().getY()) - 20));
 			snapLineX.setEnd(Point<int>(targetX, jmax<int>(sb.getBottom(), targetUIX->getBounds().getBottom()) + 20));
-
 			snapPosition.setX(snapIsLeft?targetX:targetX - bui->getWidth());
 		}
 
@@ -524,9 +524,7 @@ void BaseManagerViewUI<M, T, U>::itemDragMove(const DragAndDropTarget::SourceDet
 		{
 			snapLineY.setStart(Point<int>(jmin<int>(sb.getX(), targetUIY->getBounds().getX()) - 20, targetY));
 			snapLineY.setEnd(Point<int>(jmax<int>(sb.getRight(), targetUIY->getBounds().getRight()) + 20, targetY));
-
 			snapPosition.setY(snapIsTop ? targetY : targetY - bui->getHeight());
-
 		}
 
 		targetSnapViewPosition = this->getViewPos(snapPosition).toFloat();
