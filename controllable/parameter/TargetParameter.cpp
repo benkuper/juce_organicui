@@ -104,7 +104,7 @@ void TargetParameter::setValueFromTarget(ControllableContainer * cc, bool addToU
 void TargetParameter::setValueInternal(var & newVal)
 {
 	StringParameter::setValueInternal(newVal);
-	
+	DBG("Set value  internal " << niceName << " ghost = " << ghostValue);
 	if (newVal.toString().isNotEmpty())
 	{
 		if (targetType == CONTAINER)
@@ -260,8 +260,7 @@ var TargetParameter::getJSONDataInternal()
 void TargetParameter::loadJSONDataInternal(var data)
 {
 	StringParameter::loadJSONDataInternal(data);
-	if(data.hasProperty("ghostValue")) setGhostValue(data.getProperty("ghostValue", ""));
-
+	setGhostValue(data.getProperty("ghostValue", stringValue()));
 }
 
 TargetParameterUI * TargetParameter::createTargetUI(TargetParameter * _target)
