@@ -23,6 +23,7 @@ ShapeShifterWindow::ShapeShifterWindow(ShapeShifterPanel * _panel, juce::Rectang
     //DBG("window -> addShapeShifterListener " << panel->header.tabs[0]->content->contentName);
 	panel->addShapeShifterPanelListener(this); //is it necessary ?
 
+	setAlwaysOnTop(true);
 	setContentNonOwned(_panel,true);
 
 	setBackgroundColour(BG_COLOR.darker(.1f).withAlpha(.3f));

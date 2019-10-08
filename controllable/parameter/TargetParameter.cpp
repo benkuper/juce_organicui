@@ -104,7 +104,7 @@ void TargetParameter::setValueFromTarget(ControllableContainer * cc, bool addToU
 void TargetParameter::setValueInternal(var & newVal)
 {
 	StringParameter::setValueInternal(newVal);
-
+	
 	if (newVal.toString().isNotEmpty())
 	{
 		if (targetType == CONTAINER)
@@ -114,7 +114,7 @@ void TargetParameter::setValueInternal(var & newVal)
 			else
 			{
 				setTarget((ControllableContainer *)nullptr);
-				setGhostValue(newVal.toString());
+				//setGhostValue(newVal.toString());
 			}
 		} else
 		{
@@ -123,7 +123,7 @@ void TargetParameter::setValueInternal(var & newVal)
 			else
 			{
 				setTarget((Controllable *)nullptr);
-				setGhostValue(newVal.toString());
+				//setGhostValue(newVal.toString());
 			}
 		}
 	} else
@@ -131,8 +131,10 @@ void TargetParameter::setValueInternal(var & newVal)
 		if(targetType == CONTAINER) setTarget((ControllableContainer *)nullptr);
 		else setTarget((ControllableContainer *)nullptr);
 
-		setGhostValue("");
+		//setGhostValue("");
 	}
+
+
 }
 
 void TargetParameter::setTarget(WeakReference<Controllable> c)
@@ -152,12 +154,12 @@ void TargetParameter::setTarget(WeakReference<Controllable> c)
 	{
 		target->addInspectableListener(this);
 		target->addControllableListener(this);
-		setGhostValue("");
+		setGhostValue(target->getControlAddress(rootContainer.get()));
 		clearWarning();
 	}
 	else
 	{
-		if (ghostValue.isNotEmpty()) setWarningMessage("Link is broken");
+		if (ghostValue.isNotEmpty()) setWarningMessage("Link is broken : " + ghostValue);
 		else clearWarning();
 	}
 }
@@ -180,12 +182,12 @@ void TargetParameter::setTarget(WeakReference<ControllableContainer> cc)
 		targetContainer->addControllableContainerListener(this);
 		targetContainer->addInspectableListener(this);
 
-		setGhostValue("");
+		setGhostValue(targetContainer->getControlAddress(rootContainer.get()));
 		clearWarning();
 	}
 	else
 	{
-		if (ghostValue.isNotEmpty()) setWarningMessage("Link is broken");
+		if (ghostValue.isNotEmpty()) setWarningMessage("Link is broken : " + ghostValue);
 		else clearWarning();
 	}
 }
@@ -238,9 +240,13 @@ void TargetParameter::childStructureChanged(ControllableContainer * cc)
 
 void TargetParameter::inspectableDestroyed(Inspectable * i)
 {
-	String oldValue = stringValue();
-	setValue("");
-	setGhostValue(oldValue);
+	if ((targetType == CONTAINER && targetContainer == nullptr) || (targetType == CONTROLLABLE && target == nullptr))
+	{
+		DBG("Inspectable destroyed, ghost value : " << ghostValue);
+		//String oldValue = stringValue();
+		setValue("");
+		//setGhostValue(oldValue);
+	}
 }
 
 

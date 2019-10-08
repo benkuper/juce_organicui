@@ -740,7 +740,7 @@ String ControllableContainer::getWarningMessage() const
 		String cs = c->getWarningMessage();
 		if (cs.isNotEmpty())
 		{
-			s.add(c->niceName + " : " + cs);
+			s.add(c->parentContainer->niceName+" > "+c->niceName + " : " + cs);
 		}
 	}
 
