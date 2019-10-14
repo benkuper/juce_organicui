@@ -18,7 +18,7 @@ public:
 	StringParameter* customLabel;
 	StringParameter* customDescription;
 
-	virtual var getJSONData();
+    virtual var getJSONData() override;
 	virtual void loadJSONDataItemInternal(var data) override;
 
 	virtual void setInspectableInternal(Inspectable * i) override;

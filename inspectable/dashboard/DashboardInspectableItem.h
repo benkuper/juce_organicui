@@ -17,7 +17,7 @@ public:
 	virtual void setInspectableInternal(Inspectable* i) {}
 
 	virtual void inspectableDestroyed(Inspectable* i) override;
-	virtual void childStructureChanged(ControllableContainer* cc);
+    virtual void childStructureChanged(ControllableContainer* cc) override;
 
 	virtual void ghostInspectable() {}
 	virtual void checkGhost() {}
