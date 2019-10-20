@@ -15,20 +15,12 @@ FloatParameterLabelUI::FloatParameterLabelUI(Parameter * p) :
 	autoSize(false)
 {
 
-	valueLabel.setJustificationType(Justification::centred);
-	valueLabel.setColour(Label::ColourIds::textColourId, isInteractable()?TEXT_COLOR:BLUE_COLOR.brighter(.2f));
-	
-	valueLabel.addListener(this);
 	ParameterUI::setNextFocusOrder(&valueLabel);
 	
-	valueLabel.setColour(valueLabel.backgroundColourId, BG_COLOR.darker(.3f));
-	valueLabel.setColour(valueLabel.backgroundWhenEditingColourId, Colours::black);
-	valueLabel.setColour(CaretComponent::caretColourId, Colours::orange);
-	valueLabel.setColour(valueLabel.textWhenEditingColourId, Colours::orange);
-	
-	valueLabel.setTooltip(tooltip);
+	updateUIParams();
 
 	addAndMakeVisible(&valueLabel);
+	valueLabel.addListener(this);
 
 	showEditWindowOnDoubleClick = false;
 
@@ -73,11 +65,7 @@ void FloatParameterLabelUI::setSuffix(const String & _suffix)
 
 void FloatParameterLabelUI::feedbackStateChanged()
 {
-	valueLabel.setEditable(false, isInteractable());
-	valueLabel.setEnabled(isInteractable());
-	valueLabel.setColour(Label::ColourIds::textColourId, isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f));
-	
-	setOpaqueBackground(opaqueBackground); //force refresh color
+	updateUIParams();
 }
 
 void FloatParameterLabelUI::updateTooltip()
@@ -138,6 +126,23 @@ void FloatParameterLabelUI::mouseUpInternal(const MouseEvent & e)
 	valueLabel.updateMouseCursor();
 
 	if (valueAtMouseDown != parameter->floatValue()) parameter->setUndoableValue(valueAtMouseDown, parameter->floatValue());
+}
+
+void FloatParameterLabelUI::updateUIParams()
+{
+	valueLabel.setEditable(false, isInteractable());
+	valueLabel.setEnabled(isInteractable());
+	
+	valueLabel.setJustificationType(Justification::centred);
+	valueLabel.setColour(Label::ColourIds::textColourId, useCustomTextColor ? customTextColor : (isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f)));
+
+	valueLabel.setColour(valueLabel.backgroundColourId, useCustomBGColor?customBGColor:BG_COLOR.darker(.3f));
+	valueLabel.setColour(valueLabel.backgroundWhenEditingColourId, Colours::black);
+	valueLabel.setColour(CaretComponent::caretColourId, Colours::orange);
+	valueLabel.setColour(valueLabel.textWhenEditingColourId, Colours::orange);
+	valueLabel.setTooltip(tooltip);
+	
+	setOpaqueBackground(opaqueBackground); //force refresh color
 }
 
 void FloatParameterLabelUI::valueChanged(const var & v)

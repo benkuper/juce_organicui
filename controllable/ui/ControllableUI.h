@@ -61,6 +61,7 @@ public:
 	virtual void addPopupMenuItems(PopupMenu *) {} //for child classes
 	virtual void handleMenuSelectedID(int) {} // to override
 
+	virtual void updateUIParams() {} //to override to update colors and stuff depending on custom flags
 
 	virtual void setOpaqueBackground(bool value);
 
