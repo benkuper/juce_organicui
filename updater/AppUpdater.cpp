@@ -54,9 +54,10 @@ String AppUpdater::getDownloadFileName(StringRef version, bool beta, StringRef _
 	return fileURL;
 }
 
-void AppUpdater::checkForUpdates()
+void AppUpdater::checkForUpdates(bool includeSkippedVersion)
 {
 	if (updateURL.isEmpty() || downloadURLBase.isEmpty()) return;
+	if (includeSkippedVersion) setSkipThisVersion("");
 	startThread();
 }
 

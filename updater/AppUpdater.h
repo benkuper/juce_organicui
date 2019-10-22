@@ -81,7 +81,7 @@ public:
 	void setURLs(URL _updateURL, StringRef _downloadURLBase, StringRef filePrefix);
 
 	String getDownloadFileName(StringRef version, bool beta, StringRef extension); 
-	void checkForUpdates();
+	void checkForUpdates(bool includeSkippedVersion = false);
 
 	void setSkipThisVersion(String version);
 

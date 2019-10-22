@@ -403,7 +403,7 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 	break;
 
 	case CommandIDs::checkForUpdates:
-		AppUpdater::getInstance()->checkForUpdates();
+		AppUpdater::getInstance()->checkForUpdates(true);
 		break;
 
 	case CommandIDs::undo:
