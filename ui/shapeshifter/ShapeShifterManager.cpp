@@ -354,7 +354,7 @@ Array<File> ShapeShifterManager::getLayoutFiles()
 
 void ShapeShifterManager::toggleTemporaryFullContent(ShapeShifterContent* content)
 {
-	if (content == temporaryFullContent && temporaryFullContent != nullptr) content = nullptr;
+	if (temporaryFullContent != nullptr) content = nullptr;
 	
 	if (content == nullptr)
 	{
@@ -365,9 +365,23 @@ void ShapeShifterManager::toggleTemporaryFullContent(ShapeShifterContent* conten
 	{
 		ghostLayout = getCurrentLayout();
 		String contentName = content->contentName;
-		clearAllPanelsAndWindows();
-		ShapeShifterContent * c = showContent(contentName);
-		temporaryFullContent = c;
+
+		StringArray otherContents;
+
+		HashMap<ShapeShifterPanelTab*, ShapeShifterPanel*> panelTabRemoveMap;
+
+		for (auto& p : openedPanels)
+		{
+			for (auto& t : p->header.tabs)
+			{
+				if (t->content->contentName != contentName && t->content->contentName != "Inspector") panelTabRemoveMap.set(t, p);
+			}
+		}
+
+		HashMap<ShapeShifterPanelTab*, ShapeShifterPanel*>::Iterator i(panelTabRemoveMap);
+		while (i.next()) i.getValue()->removeTab(i.getKey());
+
+		temporaryFullContent = content;
 
 	}
 }
