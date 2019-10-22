@@ -160,7 +160,7 @@ Result Engine::saveDocument(const File& file) {
 		return Result::fail("Could not save the file : output stream is null");
 	}
 
-	JSON::writeToStream(*os, data);
+	JSON::writeToStream(*os, data, GlobalSettings::getInstance()->compressOnSave->boolValue());
 	os->flush();
 
 	setLastDocumentOpened(file);
