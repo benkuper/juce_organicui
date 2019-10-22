@@ -52,6 +52,8 @@ public:
 	void mouseDrag(const MouseEvent &e) override;
 	void mouseUpInternal(const MouseEvent &e) override;
 
+	void updateUIParams() override;
+
 protected:
 	virtual void valueChanged(const var & v) override;
 	virtual void labelTextChanged(Label * labelThatHasChanged) override;
