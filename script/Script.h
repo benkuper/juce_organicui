@@ -35,7 +35,6 @@ public:
 	var paramsContainerData; //for keeping overriden values
 
 	bool updateEnabled; //When loading the script, checks if the update function is present
-	float lastUpdateTime;
 	const Identifier updateIdentifier = "update";
 
 	ControllableContainer scriptParamsContainer;

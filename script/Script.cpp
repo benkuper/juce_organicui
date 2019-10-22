@@ -140,7 +140,6 @@ void Script::loadScript()
 
 	if (updateEnabled)
 	{
-		lastUpdateTime = (float)Time::getMillisecondCounter() / 1000.f;
 		startThread();
 	}
 	else
