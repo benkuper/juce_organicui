@@ -35,7 +35,8 @@ GradientColorManagerUI::~GradientColorManagerUI()
 {
 	manager->removeAsyncContainerListener(this);
 	signalThreadShouldExit();
-	stopThread(1000);
+	waitForThreadToExit(10000);
+	//stopThread(100);
 }
 
 void GradientColorManagerUI::setViewRange(float start, float end)
@@ -182,11 +183,13 @@ void GradientColorManagerUI::newMessage(const ContainerAsyncEvent & e)
 		if (e.targetControllable == manager->length)
 		{
 			if (autoResetViewRangeOnLengthUpdate) setViewRange(0, manager->length->floatValue());
-		}
 			shouldUpdateImage = true;
 			shouldRepaint = true;
-		
-		//}
+		}
+		else if (e.targetControllable == manager->currentColor)
+		{
+			shouldRepaint = true;
+		}
 	}
 }
 
@@ -214,12 +217,19 @@ void GradientColorManagerUI::run()
 		if (resX != viewImage.getWidth() || resY != viewImage.getHeight()) viewImage = Image(Image::ARGB, resX, resY, true);
 		else viewImage.clear(viewImage.getBounds());
 
-		manager->gradientLock.enter();
+
+		if (threadShouldExit())
+		{
+			imageLock.exit();
+			return;
+		}
+
+		//manager->gradientLock.enter();
 		for (int tx = 0; tx < resX; tx++)
 		{
 			if (threadShouldExit())
 			{
-				manager->gradientLock.exit(); 
+				//manager->gradientLock.exit();
 				imageLock.exit();
 				return;
 			}
@@ -227,10 +237,10 @@ void GradientColorManagerUI::run()
 			Colour col = manager->getColorForPosition(getPosForX(tx));
 			viewImage.setPixelAt(tx, 0, col);
 		}
-		manager->gradientLock.exit();
 
+		//manager->gradientLock.exit();
 		imageLock.exit();
-		
+
 		shouldUpdateImage = false;
 		shouldRepaint = true;
 	}
