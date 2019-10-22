@@ -121,6 +121,8 @@ void DashboardItemManagerUI::newMessage(const ContainerAsyncEvent& e)
 		}
 
 		break;
+        default:
+            break;
 	}
 }
 

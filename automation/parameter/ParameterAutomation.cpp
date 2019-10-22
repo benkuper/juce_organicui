@@ -14,8 +14,8 @@ ParameterAutomation::ParameterAutomation(Parameter* _parameter) :
 	BaseItem(_parameter->niceName +" automation", false),
 	parameter(_parameter),
 	automationContainer(automationContainer),
-	timeParamRef(timeParamRef),
-	lengthParamRef(lengthParamRef),
+	timeParamRef(nullptr),
+	lengthParamRef(nullptr),
 	mode(nullptr),
 	manualMode(true),
 	valueIsNormalized(false)
