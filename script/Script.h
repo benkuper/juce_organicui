@@ -13,7 +13,8 @@ Author:  Ben
 
 class Script :
 	public BaseItem,
-	public MultiTimer,
+	public Timer,
+	public Thread,
 	public EngineListener
 {
 public:
@@ -65,10 +66,11 @@ public:
 	InspectableEditor * getEditor(bool isRoot) override;
 
 
-
 	// Inherited via Timer
-	virtual void timerCallback(int timerID) override;
+	virtual void timerCallback() override;
 
+	virtual void run() override;
+	
 	class ScriptEvent
 	{
 	public:

@@ -11,6 +11,7 @@ Author:  Ben
 
 Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled) :
 	BaseItem("Script", canBeDisabled, false),
+	Thread("Script"),
 	scriptTemplate(nullptr),
 	scriptParamsContainer("params"),
 	updateEnabled(false),
@@ -53,12 +54,13 @@ Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled) :
 	scriptParamsContainer.hideEditorHeader = true;
 	addChildControllableContainer(&scriptParamsContainer);
 
-	startTimer(1, 1000);
+	startTimer(1000); //modification check timer
 }
 
 Script::~Script()
 {
-
+	signalThreadShouldExit();
+	waitForThreadToExit(100);
 }
 
 void Script::loadScript()
@@ -105,7 +107,6 @@ void Script::loadScript()
 	fileLastModTime = f.getLastModificationTime();
 	String s = f.loadFileAsString();
 
-	stopTimer(0);
 
 	if (paramsContainerData.isVoid()) paramsContainerData = scriptParamsContainer.getJSONData();
 
@@ -140,7 +141,12 @@ void Script::loadScript()
 	if (updateEnabled)
 	{
 		lastUpdateTime = (float)Time::getMillisecondCounter() / 1000.f;
-		startTimer(0, 1000/updateRate->intValue()); //50fps, should be parametrable
+		startThread();
+	}
+	else
+	{
+		signalThreadShouldExit();
+		waitForThreadToExit(100);
 	}
 
 	scriptParamsContainer.hideInEditor = scriptParamsContainer.controllables.size() == 0;
@@ -191,7 +197,7 @@ var Script::callFunction(const Identifier & function, const Array<var> args, Res
 		//DBG("Already locked from this thread");
 	}
 
-	var returnData = scriptEngine->callFunction(function, var::NativeFunctionArgs(var::undefined(), (const var *)args.begin(), args.size()), result);
+	var returnData = scriptEngine->callFunction(function, var::NativeFunctionArgs(var::undefined(), (const var*)args.begin(), args.size()), result);
 	
 	if (needsToEnterLock)
 	{
@@ -214,10 +220,6 @@ void Script::onContainerParameterChangedInternal(Parameter * p)
 	if (p == filePath)
 	{
 		if (!isCurrentlyLoadingData) loadScript();
-	}
-	else if (p == updateRate)
-	{
-		if(updateEnabled) startTimer(0, 1000 / updateRate->intValue());
 	}
 }
 
@@ -268,12 +270,25 @@ InspectableEditor * Script::getEditor(bool isRoot)
 	return new ScriptEditor(this, isRoot);
 }
 
-void Script::timerCallback(int timerID)
+void Script::timerCallback()
 {
-	switch (timerID) // update timer
+	//check for modifications
+
+	File f = filePath->getFile();
+	if (f.getLastModificationTime() != fileLastModTime)
 	{
-	case 0:
+		loadScript();
+	}
+}
+
+void Script::run()
+{
+	float lastUpdateTime = (float)Time::getMillisecondCounter() / 1000.f;
+	
+	while (!threadShouldExit() && state == ScriptState::SCRIPT_LOADED && updateEnabled)
 	{
+		sleep(1000 / updateRate->floatValue());
+
 		float curTime = (float)Time::getMillisecondCounter() / 1000.f;
 		float deltaTime = curTime - lastUpdateTime;
 		lastUpdateTime = curTime;
@@ -283,19 +298,7 @@ void Script::timerCallback(int timerID)
 
 		Result r = Result::ok();
 		callFunction(updateIdentifier, args, &r);
-		if (r != Result::ok()) stopTimer(0);
-	}
-	break;
-
-	case 1:
-	{
-		File f = filePath->getFile();
-		if (f.getLastModificationTime() != fileLastModTime)
-		{
-			loadScript();
-		}
-	}
-	break;
+		if (r != Result::ok()) return;
 	}
 }
 
@@ -434,7 +437,6 @@ var Script::setUpdateRateFromScript(const var::NativeFunctionArgs& args)
 	if (s->updateEnabled)
 	{
 		s->updateRate->setValue(args.arguments[0]);
-		s->startTimer(0, 1000 / s->updateRate->intValue());
 	}
 
 	return var();
