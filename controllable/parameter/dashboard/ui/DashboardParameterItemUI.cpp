@@ -47,6 +47,10 @@ ControllableUI* DashboardParameterItemUI::createControllableUI()
 			break;
 		}
 	}
+    
+        default:
+            break;
+            
 	}
 
 	return DashboardControllableItemUI::createControllableUI();

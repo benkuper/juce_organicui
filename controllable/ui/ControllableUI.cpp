@@ -19,7 +19,8 @@ ControllableUI::ControllableUI(Controllable * controllable) :
 	showLabel(true),
 	opaqueBackground(false),
 	showMenuOnRightClick(true),
-	useCustomTextColor(false)
+	useCustomTextColor(false),
+    customContourThickness(1)
 {
 	jassert(controllable != nullptr);
 	updateTooltip();
