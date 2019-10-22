@@ -11,6 +11,7 @@
 CommentManager::CommentManager() :
 	BaseManager("Comments")
 {
+	hideInEditor = true;
 }
 
 CommentManager::~CommentManager()
