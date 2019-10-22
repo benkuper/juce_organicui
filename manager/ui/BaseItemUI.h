@@ -15,7 +15,8 @@ class BaseItemUI :
 	public BaseItemMinimalUI<T>,
 	public Button::Listener, 
 	public Label::Listener,
-	public ComponentListener
+	public ComponentListener,
+	public Parameter::AsyncListener
 {
 public:
 	enum Direction { NONE, VERTICAL, HORIZONTAL, ALL };
@@ -81,6 +82,8 @@ public:
 	virtual void containerChildAddressChangedAsync(ControllableContainer *) override;
 	virtual void controllableFeedbackUpdateInternal(Controllable *) override;
 
+	virtual void newMessage(const Parameter::ParameterEvent& e) override;
+	
 	virtual void visibilityChanged() override;
 
 	virtual void componentVisibilityChanged(Component &c) override;
@@ -107,7 +110,7 @@ BaseItemUI<T>::BaseItemUI(T * _item, Direction _resizeDirection) :
 	BaseItemMinimalUI<T>(_item),
 	margin(3),
 	minContentHeight(2),
-	headerHeight(16),
+	headerHeight(GlobalSettings::getInstance()->fontSize->floatValue()+2),
 	headerGap(2),
 	showEnableBT(true),
 	showRemoveBT(true),
@@ -125,20 +128,12 @@ BaseItemUI<T>::BaseItemUI(T * _item, Direction _resizeDirection) :
 	itemLabel.setColour(itemLabel.textWhenEditingColourId, Colours::white);
 	itemLabel.setColour(CaretComponent::caretColourId, Colours::orange);
 
-	itemLabel.setFont((float)(headerHeight - 2));
+	itemLabel.setFont(GlobalSettings::getInstance()->fontSize->floatValue());
 	itemLabel.setJustificationType(Justification::centredLeft);
 
 	itemLabel.setEditable(false, this->baseItem->nameCanBeChangedByUser);
 	itemLabel.addListener(this);
 	this->addAndMakeVisible(&itemLabel);
-
-	/*
-	dragAndDropEnabeld = dragDirection != NONE;
-	if (dragDirection != NONE)
-	{
-		setGrabber(new Grabber(dragDirection == VERTICAL ? Grabber::VERTICAL : Grabber::HORIZONTAL));
-	}
-	*/
 
 	switch (resizeDirection)
 	{
@@ -192,6 +187,8 @@ BaseItemUI<T>::BaseItemUI(T * _item, Direction _resizeDirection) :
 
 	this->setHighlightOnMouseOver(true);
 
+	GlobalSettings::getInstance()->fontSize->addAsyncParameterListener(this);
+
 	updateMiniModeUI();
 }
 
@@ -199,6 +196,7 @@ template<class T>
 BaseItemUI<T>::~BaseItemUI()
 {
 	if (removeBT != nullptr) removeBT->removeListener(this);
+	if(GlobalSettings::getInstanceWithoutCreating() != nullptr) GlobalSettings::getInstance()->fontSize->removeAsyncParameterListener(this);
 }
 
 template<class T>
@@ -418,6 +416,20 @@ void BaseItemUI<T>::controllableFeedbackUpdateInternal(Controllable * c)
 {
 	BaseItemMinimalUI<T>::controllableFeedbackUpdateInternal(c);
 	if (c == this->baseItem->miniMode) updateMiniModeUI();
+}
+
+template<class T>
+void BaseItemUI<T>::newMessage(const Parameter::ParameterEvent& e)
+{
+	if (e.type == e.VALUE_CHANGED && e.parameter == GlobalSettings::getInstance()->fontSize)
+	{
+		if (Engine::mainEngine->isLoadingFile || Engine::mainEngine->isClearing) return;
+
+		bool isDefaultHeight = headerHeight == itemLabel.getFont().getHeight() + 2;
+		itemLabel.setFont(GlobalSettings::getInstance()->fontSize->floatValue());
+		if (isDefaultHeight) headerHeight = GlobalSettings::getInstance()->fontSize->floatValue() + 2;
+		resized();
+	}
 }
 
 template<class T>

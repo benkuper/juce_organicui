@@ -16,6 +16,7 @@ ApplicationCommandManager& getCommandManager();
 GlobalSettings::GlobalSettings() :
 	ControllableContainer("Global Settings"),
 	startupCC("Startup and Update"),
+	interfaceCC("Interface"),
 	saveLoadCC("Save and Load"),
 	editingCC("Editing")
 {
@@ -32,18 +33,22 @@ GlobalSettings::GlobalSettings() :
 	checkUpdatesOnStartup = startupCC.addBoolParameter("Check updates on startup", "If enabled, app will check if any updates are available",true);
 	checkBetaUpdates = startupCC.addBoolParameter("Check for beta updates", "If enabled the app will also check for beta versions of the software", false);
 	updateHelpOnStartup = startupCC.addBoolParameter("Update help on startup", "If enabled, app will try and download the last help file locally", true);
-	helpLanguage = startupCC.addEnumParameter("Help language", "What language to download ? You will need to restart Chataigne to see changes");
-	helpLanguage->addOption("English", "en")->addOption("French", "fr")->addOption("Chinese", "cn");
-
+	
 	openLastDocumentOnStartup = startupCC.addBoolParameter("Load last "+(Engine::mainEngine != nullptr?Engine::mainEngine->fileExtension:"")+" on startup", "If enabled, app will load the last " + Engine::mainEngine->fileExtension + " on startup", false);
 	openSpecificFileOnStartup = startupCC.addBoolParameter("Load specific "+(Engine::mainEngine != nullptr?Engine::mainEngine->fileExtension:"")+" on startup", "If enabled, app will load the " + Engine::mainEngine->fileExtension + " specified below on startup", false,false);
 	 
 	fileToOpenOnStartup = new FileParameter("File to load on startup", "File to load when start, if the option above is checked", "", false);
 	startupCC.addParameter(fileToOpenOnStartup);
 	
-	enableCrashUpload = startupCC.addBoolParameter("Enable Crash Upload", "If checked and a crashlog is found at startup, it will automatically upload it.\nThis crash log is a very small file but is immensely helpful for me, so please leave this option enabled unless you strongly feel like not helping me :)", true);
 
 	addChildControllableContainer(&startupCC);
+
+	fontSize = interfaceCC.addIntParameter("Font size", "Global font size, may be altered in some cases but this is used as a reference", 14, 0, 30);
+	helpLanguage = interfaceCC.addEnumParameter("Help language", "What language to download ? You will need to restart Chataigne to see changes");
+	helpLanguage->addOption("English", "en")->addOption("French", "fr")->addOption("Chinese", "cn");
+
+	addChildControllableContainer(&interfaceCC);
+
 
 	enableAutoSave = saveLoadCC.addBoolParameter("Enable auto-save", "When enabled, a backup file will be saved every 5 min", true);
 	autoSaveCount = saveLoadCC.addIntParameter("Auto-save count", "The number of different files to auto-save", 10, 1, 100);
@@ -52,6 +57,7 @@ GlobalSettings::GlobalSettings() :
 
 	askBeforeRemovingItems = editingCC.addBoolParameter("Ask before removing items", "If enabled, you will get a confirmation prompt before removing any item", false);
 	constrainKeysToNeighbours = editingCC.addBoolParameter("Constrain curve keys editing", "If enabled, keys won't be able to be moved past their neighbours when editing a curve", false);
+	enableCrashUpload = editingCC.addBoolParameter("Enable Crash Upload", "If checked and a crashlog is found at startup, it will automatically upload it.\nThis crash log is a very small file but is immensely helpful for me, so please leave this option enabled unless you strongly feel like not helping me :)", true);
 
 	addChildControllableContainer(&editingCC);
 

@@ -17,13 +17,14 @@ ShapeShifterManager::ShapeShifterManager() :
 	defaultFileData(nullptr),
 	temporaryFullContent(nullptr)
 {
-	
+	GlobalSettings::getInstance()->fontSize->addAsyncParameterListener(this);
 }
 
 ShapeShifterManager::~ShapeShifterManager()
 {
 	saveCurrentLayoutToFile(File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory).getChildFile(appSubFolder + "/_lastSession." + appLayoutExtension));
 	openedWindows.clear();
+	if(GlobalSettings::getInstanceWithoutCreating() != nullptr) GlobalSettings::getInstance()->fontSize->removeAsyncParameterListener(this);
 }
 
 void ShapeShifterManager::setDefaultFileData(const char * data)
@@ -450,4 +451,21 @@ void ShapeShifterManager::handleMenuPanelCommand(int commandID)
 
 	String contentName = ShapeShifterFactory::getInstance()->defs[relCommandID]->contentName;
 	showContent(contentName);
+}
+
+void ShapeShifterManager::newMessage(const Parameter::ParameterEvent& e)
+{
+	if (e.type == e.VALUE_CHANGED && e.parameter == GlobalSettings::getInstance()->fontSize)
+	{
+		if (Engine::mainEngine->isLoadingFile || Engine::mainEngine->isClearing) return;
+		for (auto& p : openedPanels)
+		{
+			for (auto& t : p->header.tabs)
+			{
+				t->panelLabel.setFont(GlobalSettings::getInstance()->fontSize->floatValue());
+			}
+			p->header.resized();
+		}
+		
+	}
 }

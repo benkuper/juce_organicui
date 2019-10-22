@@ -12,7 +12,7 @@
 
 GenericControllableContainerEditor::GenericControllableContainerEditor(WeakReference<Inspectable> inspectable, bool isRoot, bool buildAtCreation) :
 	InspectableEditor(inspectable, isRoot),
-	headerHeight(22),
+	headerHeight(GlobalSettings::getInstance()->fontSize->floatValue()+8),
 	isRebuilding(false),
 	prepareToAnimate(false),
 	contourColor(BG_COLOR.brighter(.3f)),
@@ -24,7 +24,7 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(WeakRefer
 	container->addAsyncContainerListener(this);
 	addAndMakeVisible(containerLabel);
 	
-	containerLabel.setFont(containerLabel.getFont().withHeight(headerHeight-8));
+	containerLabel.setFont(containerLabel.getFont().withHeight(GlobalSettings::getInstance()->fontSize->floatValue()));
 
 	containerLabel.setColour(containerLabel.backgroundWhenEditingColourId, Colours::black);
 	containerLabel.setColour(containerLabel.textWhenEditingColourId, Colours::white);

@@ -15,7 +15,8 @@
 #include "ShapeShifterFactory.h"
 
 class ShapeShifterManager :
-	public ShapeShifterPanel::Listener
+	public ShapeShifterPanel::Listener,
+	public Parameter::AsyncListener
 {
 public:
 	juce_DeclareSingleton(ShapeShifterManager,true);
@@ -86,6 +87,8 @@ public:
 	PopupMenu getPanelsMenu();
 
 	void handleMenuPanelCommand(int commandID);
+
+	void newMessage(const Parameter::ParameterEvent& e) override;
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ShapeShifterManager)

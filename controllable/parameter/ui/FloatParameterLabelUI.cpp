@@ -11,7 +11,7 @@
 
 FloatParameterLabelUI::FloatParameterLabelUI(Parameter * p) :
 	ParameterUI(p),
-	maxFontHeight(14),
+	maxFontHeight(GlobalSettings::getInstance()->fontSize->floatValue()),
 	autoSize(false)
 {
 
@@ -24,7 +24,7 @@ FloatParameterLabelUI::FloatParameterLabelUI(Parameter * p) :
 
 	showEditWindowOnDoubleClick = false;
 
-	setSize(200, 18);//default size
+	setSize(200, GlobalSettings::getInstance()->fontSize->floatValue()+4);//default size
 
 	valueChanged(parameter->getValue());	
 	feedbackStateChanged();

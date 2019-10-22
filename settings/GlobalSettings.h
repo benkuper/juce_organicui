@@ -43,16 +43,20 @@ public:
 	BoolParameter * checkUpdatesOnStartup;
 	BoolParameter * checkBetaUpdates;
 	BoolParameter * updateHelpOnStartup;
-	EnumParameter* helpLanguage;
-
 	BoolParameter * openLastDocumentOnStartup;
 	BoolParameter * openSpecificFileOnStartup;
 	StringParameter * fileToOpenOnStartup;
-	BoolParameter * enableCrashUpload;
+
+
+	ControllableContainer interfaceCC;
+	IntParameter* fontSize;
+	EnumParameter* helpLanguage;
+
 
 	ControllableContainer saveLoadCC;
 	BoolParameter * enableAutoSave;
 	IntParameter * autoSaveCount;
+	BoolParameter* enableCrashUpload;
 
 	ControllableContainer editingCC;
 	BoolParameter * askBeforeRemovingItems;
