@@ -26,6 +26,7 @@ public:
 	FileParameter * filePath;
 	BoolParameter * logParam;
 	Trigger * reload;
+	IntParameter * updateRate;
 
 	ScriptState state;
 	String fileName;
@@ -33,7 +34,6 @@ public:
 	var paramsContainerData; //for keeping overriden values
 
 	bool updateEnabled; //When loading the script, checks if the update function is present
-	int updateRate;
 	float lastUpdateTime;
 	const Identifier updateIdentifier = "update";
 

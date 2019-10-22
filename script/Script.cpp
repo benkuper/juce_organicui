@@ -14,7 +14,6 @@ Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled) :
 	scriptTemplate(nullptr),
 	scriptParamsContainer("params"),
 	updateEnabled(false),
-	updateRate(50),
 	parentTarget(_parentTarget),
 	lockedThreadId(0),
 	scriptAsyncNotifier(10)
@@ -23,6 +22,9 @@ Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled) :
 
 	filePath = new FileParameter("File Path", "Path to the script file", "");
 	addParameter(filePath);
+	
+	updateRate = addIntParameter("Update Rate", "The Rate at which the \"update()\" function is called", 50, 1, 1000);
+	updateRate->hideInEditor = true;
 
 	logParam = addBoolParameter("Log", "Utility parameter to easily activate/deactivate logging from the script", false);
 	logParam->setCustomShortName("enableLog");
@@ -30,6 +32,7 @@ Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled) :
 
 	reload = addTrigger("Reload", "Reload the script");
 	reload->hideInEditor = true;
+
 
 	scriptObject.setMethod("log", Script::logFromScript);
 	scriptObject.setMethod("logWarning", Script::logWarningFromScript);
@@ -132,10 +135,12 @@ void Script::loadScript()
 
 	const NamedValueSet props = scriptEngine->getRootObjectProperties();
 	updateEnabled = props.contains(updateIdentifier);
+	updateRate->hideInEditor = !updateEnabled;
+
 	if (updateEnabled)
 	{
 		lastUpdateTime = (float)Time::getMillisecondCounter() / 1000.f;
-		startTimer(0, 1000/updateRate); //50fps, should be parametrable
+		startTimer(0, 1000/updateRate->intValue()); //50fps, should be parametrable
 	}
 
 	scriptParamsContainer.hideInEditor = scriptParamsContainer.controllables.size() == 0;
@@ -209,6 +214,10 @@ void Script::onContainerParameterChangedInternal(Parameter * p)
 	if (p == filePath)
 	{
 		if (!isCurrentlyLoadingData) loadScript();
+	}
+	else if (p == updateRate)
+	{
+		if(updateEnabled) startTimer(0, 1000 / updateRate->intValue());
 	}
 }
 
@@ -424,8 +433,8 @@ var Script::setUpdateRateFromScript(const var::NativeFunctionArgs& args)
 	if (!checkNumArgs(s->niceName, args, 1)) return var();
 	if (s->updateEnabled)
 	{
-		s->updateRate = args.arguments[0];
-		s->startTimer(0, 1000 / s->updateRate);
+		s->updateRate->setValue(args.arguments[0]);
+		s->startTimer(0, 1000 / s->updateRate->intValue());
 	}
 
 	return var();
