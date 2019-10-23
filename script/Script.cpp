@@ -158,6 +158,7 @@ void Script::buildEnvironment()
 	setState(SCRIPT_CLEAR);
 
 	scriptEngine.reset(new JavascriptEngine());
+	scriptEngine->maximumExecutionTime = RelativeTime::seconds(2);
 	while (scriptParamsContainer.controllables.size() > 0) scriptParamsContainer.removeControllable(scriptParamsContainer.controllables[0]);
 	scriptParamsContainer.clear();
 
