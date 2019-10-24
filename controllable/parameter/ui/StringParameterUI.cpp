@@ -124,6 +124,7 @@ void StringParameterUI::valueChanged(const var & v)
 void StringParameterUI::labelTextChanged(Label *)
 {
 	//String  originalString = valueLabel.getText().substring(prefix.length(), valueLabel.getText().length() - suffix.length());
+	if (stringParam->autoTrim) valueLabel.setText(valueLabel.getText().trim(), dontSendNotification);
 	parameter->setUndoableValue(parameter->stringValue(),valueLabel.getText());
 }
 

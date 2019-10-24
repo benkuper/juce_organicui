@@ -13,7 +13,8 @@
 StringParameter::StringParameter(const String & niceName, const String &description, const String & initialValue, bool enabled) :
     Parameter(Type::STRING, niceName, description, initialValue, var(), var(), enabled),
 	defaultUI(TEXT),
-	multiline(false)
+	multiline(false),
+	autoTrim(false)
 {
 	argumentsDescription = "string";
 	isCustomizableByUser = false; //avoid having the param wheel 

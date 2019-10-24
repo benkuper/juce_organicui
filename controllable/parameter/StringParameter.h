@@ -25,7 +25,7 @@ public:
 	bool multiline;
 	String prefix;
 	String suffix;
-
+	bool autoTrim; //auto remove start and end whitespaces after edit
 
 	virtual var getLerpValueTo(var targetValue, float weight) override;
 
