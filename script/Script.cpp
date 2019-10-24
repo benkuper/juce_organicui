@@ -61,6 +61,7 @@ Script::~Script()
 {
 	signalThreadShouldExit();
 	waitForThreadToExit(100);
+	stopThread(100);
 }
 
 void Script::loadScript()
