@@ -1,3 +1,4 @@
+#include "BaseItem.h"
 /*
   ==============================================================================
 
@@ -17,7 +18,8 @@ BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts
 	isSavable(true),
 	saveType(true),
 	canBeReorderedInEditor(true),
-	itemDataType("")
+	itemDataType(""),
+	isClearing(false)
 {
 	saveAndLoadName = true;
 	nameCanBeChangedByUser = true;
@@ -57,6 +59,12 @@ BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts
 
 BaseItem::~BaseItem()
 {
+}
+
+void BaseItem::clearItem() 
+{
+	isClearing = true;
+	if(canHaveScripts && scriptManager != nullptr) scriptManager->clear();
 }
 
 void BaseItem::duplicate()

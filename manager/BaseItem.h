@@ -40,7 +40,9 @@ public:
 
 	String itemDataType;
 
-	virtual void clearItem() {}
+	bool isClearing;
+
+	virtual void clearItem();
 
 	virtual void duplicate();
 	virtual void copy();

@@ -12,6 +12,8 @@ DashboardInspectableItem::~DashboardInspectableItem()
 
 void DashboardInspectableItem::clearItem()
 {
+	BaseItem::clearItem();
+
 	setInspectable(nullptr);
 	Engine::mainEngine->removeControllableContainerListener(this);
 }

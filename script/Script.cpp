@@ -296,6 +296,7 @@ void Script::timerCallback()
 
 void Script::run()
 {
+	sleep(100); //safety
 	float lastUpdateTime = (float)Time::getMillisecondCounter() / 1000.f;
 	
 	while (!threadShouldExit() && state == ScriptState::SCRIPT_LOADED && updateEnabled)
