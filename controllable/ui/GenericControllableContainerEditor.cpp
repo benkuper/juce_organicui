@@ -539,7 +539,7 @@ void GenericControllableContainerEditor::resizedInternalHeader(juce::Rectangle<i
 {
 	if (warningUI != nullptr && warningUI->isVisible())
 	{
-		warningUI->setBounds(r.removeFromLeft(r.getHeight()));
+		warningUI->setBounds(r.removeFromLeft(r.getHeight()).reduced(2));
 		r.removeFromLeft(2);
 	}
 
