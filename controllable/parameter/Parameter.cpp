@@ -41,9 +41,9 @@ Parameter::~Parameter() {
 	Parameter::masterReference.clear();
 }
 
-void Parameter::setEnabled(bool value, bool silentSet, bool force)
+void Parameter::setEnabled(bool _value, bool silentSet, bool force)
 {
-	Controllable::setEnabled(value, silentSet, force);
+	Controllable::setEnabled(_value, silentSet, force);
 	isOverriden = true;
 }
 
