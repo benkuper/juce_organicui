@@ -190,6 +190,14 @@ void GradientColorManagerUI::newMessage(const ContainerAsyncEvent & e)
 		{
 			shouldRepaint = true;
 		}
+		else
+		{
+			GradientColor * gc = e.targetControllable->getParentAs<GradientColor>();
+			if (gc != nullptr && (e.targetControllable == gc->position || e.targetControllable == gc->color))
+			{
+				shouldUpdateImage = true;
+			}
+		}
 	}
 }
 
