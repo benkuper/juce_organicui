@@ -12,7 +12,8 @@
 
 FileParameter::FileParameter(const String & niceName, const String &description, const String & initialValue, bool enabled) :
     StringParameter(niceName, description, initialValue, enabled),
-	forceRelativePath(false)
+	forceRelativePath(false),
+	customBasePath("")
 {
 	defaultUI = FILE; 
 	if(Engine::mainEngine != nullptr) Engine::mainEngine->addEngineListener(this);
@@ -30,12 +31,12 @@ void FileParameter::setValueInternal(var &newVal)
 	if (newVal.toString().isNotEmpty())
 	{
 		if(File::isAbsolutePath(newVal.toString())) absolutePath = newVal.toString();
-		else absolutePath = Engine::mainEngine->getFile().getParentDirectory().getChildFile(value.toString()).getFullPathName();
+		else absolutePath = getBasePath().getChildFile(value.toString()).getFullPathName();
 
 		File f = File::createFileWithoutCheckingPath(absolutePath);
 		if (f.existsAsFile() && (isRelativePath(newVal.toString()) || forceRelativePath))
 		{
-			value = File(absolutePath).getRelativePathFrom(Engine::mainEngine->getFile().getParentDirectory()).replace("\\", "/");
+			value = File(absolutePath).getRelativePathFrom(getBasePath()).replace("\\", "/");
 		}
 	}
 	
@@ -52,8 +53,8 @@ bool FileParameter::isRelativePath(const String & p)
 {
 	if (p.isEmpty()) return false;
 	if (Engine::mainEngine == nullptr) return false;
-	if (File::isAbsolutePath(p)) return !File(p).getRelativePathFrom(Engine::mainEngine->getFile().getParentDirectory()).contains("..");
-	return Engine::mainEngine->getFile().getParentDirectory().getChildFile(p).exists();
+	if (File::isAbsolutePath(p)) return !File(p).getRelativePathFrom(getBasePath()).contains("..");
+	return getBasePath().getChildFile(p).exists();
 }
 
 String FileParameter::getAbsolutePath() const
@@ -61,7 +62,12 @@ String FileParameter::getAbsolutePath() const
 	if (value.toString().isEmpty()) return "";
 	if (File::isAbsolutePath(value.toString())) return value.toString();
 	if (Engine::mainEngine == nullptr) return value.toString();
-	return Engine::mainEngine->getFile().getParentDirectory().getChildFile(value.toString()).getFullPathName();
+	return getBasePath().getChildFile(value.toString()).getFullPathName();
+}
+
+File FileParameter::getBasePath() const
+{
+	return File(customBasePath).exists()? File(customBasePath):Engine::mainEngine->getFile().getParentDirectory();
 }
 
 File FileParameter::getFile()

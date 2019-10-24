@@ -136,8 +136,9 @@ StringParameterFileUI::StringParameterFileUI(Parameter * p) :
 	relativeBT.reset(AssetManager::getInstance()->getToggleBTImage(AssetManager::getInstance()->getRelativeImage()));
 	relativeBT->setToggleState(fp->forceRelativePath, dontSendNotification);
 	browseBT.addListener(this);
-	
+	browseBT.setEnabled(isInteractable());
 	relativeBT->addListener(this); 
+	relativeBT->setEnabled(isInteractable());
 	
 	addAndMakeVisible(&browseBT);
 	addAndMakeVisible(relativeBT.get());

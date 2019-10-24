@@ -17,8 +17,9 @@ public:
     FileParameter(const String &niceName, const String &description, const String &initialValue, bool enabled=true);
 	virtual ~FileParameter();
 
-	String absolutePath;
+	String customBasePath;
 
+	String absolutePath;
 	String fileTypeFilter;
 
     // need to override this function because var Strings comparison  is based on pointer (we need full string comp)
@@ -29,6 +30,7 @@ public:
 
 	bool isRelativePath(const String &p);
 	String getAbsolutePath() const;
+	File getBasePath() const;
 	File getFile();
 
 	var getJSONDataInternal() override;
