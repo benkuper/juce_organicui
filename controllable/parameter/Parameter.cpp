@@ -41,6 +41,12 @@ Parameter::~Parameter() {
 	Parameter::masterReference.clear();
 }
 
+void Parameter::setEnabled(bool value, bool silentSet, bool force)
+{
+	Controllable::setEnabled(value, silentSet, force);
+	isOverriden = true;
+}
+
 void Parameter::setControlMode(ControlMode _mode)
 {
 	if (_mode == controlMode) return;

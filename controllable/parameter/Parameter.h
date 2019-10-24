@@ -88,6 +88,7 @@ public:
 	bool autoAdaptRange;
 	bool forceSaveValue; //if true, will save value even if not overriden
 
+	virtual void setEnabled(bool value, bool silentSet = false, bool force = false) override;
 
 	void setControlMode(ControlMode _mode);
 	void setControlExpression(const String &);
