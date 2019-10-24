@@ -776,7 +776,7 @@ var BaseManager<T>::removeItemFromScript(const var::NativeFunctionArgs& args)
 	if (args.arguments[0].isObject())
 	{
 		T* item = dynamic_cast<T*>((T *)(int64)(args.arguments[0].getDynamicObject()->getProperty(scriptPtrIdentifier)));
-		if (item == nullptr)
+		if (item != nullptr)
 		{
 			m->removeItem(item);
 			return var();
