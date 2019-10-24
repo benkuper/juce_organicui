@@ -46,7 +46,7 @@ public:
 
 	const int defaultCheckerSize = 128;
 
-	BaseManagerViewMiniPane<M, T, U> viewPane;
+	std::unique_ptr<BaseManagerViewMiniPane<M, T, U>> viewPane;
 
 	virtual void mouseDown(const MouseEvent &e) override;
 	virtual void mouseDrag(const MouseEvent &e) override;
@@ -81,6 +81,7 @@ public:
 	virtual void frameView(U * item = nullptr);
 
 	virtual void setViewZoom(float newZoom);
+	virtual void setShowPane(bool val);
 
 	virtual void addItemUIInternal(U * se) override; 
 
@@ -114,15 +115,12 @@ BaseManagerViewUI<M, T, U>::BaseManagerViewUI(const String& contentName, M* _man
 	viewZoom(1),
 	minZoom(.4f),
 	maxZoom(1),
-	timeSinceLastWheel(0),
-	viewPane(this)
+	timeSinceLastWheel(0)
 {
     this->defaultLayout = this->FREE;
 
 	this->resizeOnChildBoundsChanged = false;
 	this->bgColor = BG_COLOR.darker(.3f);
-
-	this->addAndMakeVisible(&viewPane);
 }
 
 
@@ -300,8 +298,12 @@ void BaseManagerViewUI<M, T, U>::resized()
 		updateViewUIPosition(tui);
 	}
 
-	int size = jmin(200, jmin(r.getWidth(), r.getHeight()) - 20);
-	viewPane.setBounds(r.translated(-10, -10).removeFromRight(size).removeFromBottom(size));
+	if (viewPane != nullptr)
+	{
+		int size = jmin(200, jmin(r.getWidth(), r.getHeight()) - 20);
+		viewPane->setBounds(r.translated(-10, -10).removeFromRight(size).removeFromBottom(size));
+	}
+	
 }
 
 template<class M, class T, class U>
@@ -334,15 +336,18 @@ void BaseManagerViewUI<M, T, U>::updateItemsVisibility()
 {
 	//BaseManagerUI::updateItemsVisibility();
 	juce::Rectangle<int> r = this->getLocalBounds();
-	for (auto &iui : this->itemsUI)
+	for (auto& iui : this->itemsUI)
 	{
 		juce::Rectangle<int> ir = iui->getBounds().getIntersection(r);
 		bool isInsideInspectorBounds = !ir.isEmpty();
 		iui->setVisible(isInsideInspectorBounds);
 	}
 
-	viewPane.updateContent();
-	viewPane.toFront(false);
+	if (viewPane != nullptr)
+	{
+		viewPane->updateContent();
+		viewPane->toFront(false);
+	}
 }
 
 template<class M, class T, class U>
@@ -442,6 +447,23 @@ void BaseManagerViewUI<M, T, U>::setViewZoom(float value)
 	updateItemsVisibility();
 	this->resized();
 	this->repaint();
+}
+
+template<class M, class T, class U>
+void BaseManagerViewUI<M, T, U>::setShowPane(bool val)
+{
+	bool showingPane = viewPane != nullptr;
+	if (val == showingPane) return;
+	if(val)
+	{
+		viewPane.reset(new BaseManagerViewMiniPane<M,T,U>(this));
+		this->addAndMakeVisible(viewPane.get());
+	}
+	else
+	{
+		this->removeChildComponent(viewPane.get());
+		viewPane.reset(nullptr);
+	}
 }
 
 template<class M, class T, class U>

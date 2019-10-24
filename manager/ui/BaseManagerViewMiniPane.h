@@ -51,41 +51,44 @@ void BaseManagerViewMiniPane<M, T, U>::paint(juce::Graphics& g)
 	focusRect.setSize(vs.x, vs.y);
 
 
-	juce::Rectangle<float> itemsRealBounds(focusRect);
+	juce::Rectangle<float> itemViewBounds(focusRect);
 	for (auto& ui : managerUI->itemsUI)
 	{
-		itemsRealBounds.setLeft(jmin<float>(ui->item->viewUIPosition->x, itemsRealBounds.getX()));
-		itemsRealBounds.setTop(jmin<float>(ui->item->viewUIPosition->y, itemsRealBounds.getY()));
-		itemsRealBounds.setRight(jmax<float>(ui->item->viewUIPosition->x + ui->item->viewUISize->x, itemsRealBounds.getRight()));
-		itemsRealBounds.setBottom(jmax<float>(ui->item->viewUIPosition->y + ui->item->viewUISize->y, itemsRealBounds.getBottom()));
+		itemViewBounds.setLeft(jmin<float>(ui->item->viewUIPosition->x, itemViewBounds.getX()));
+		itemViewBounds.setTop(jmin<float>(ui->item->viewUIPosition->y, itemViewBounds.getY()));
+		itemViewBounds.setRight(jmax<float>(ui->item->viewUIPosition->x + ui->item->viewUISize->x, itemViewBounds.getRight()));
+		itemViewBounds.setBottom(jmax<float>(ui->item->viewUIPosition->y + ui->item->viewUISize->y, itemViewBounds.getBottom()));
 	}
 
 
-	DBG("Real bounds : " << itemsRealBounds.toString());
 	juce::Rectangle<int> r = getLocalBounds();
 
-	float itemsRatio = itemsRealBounds.getWidth()*1.0f / itemsRealBounds.getHeight();
+	float itemsRatio = itemViewBounds.getWidth()*1.0f / itemViewBounds.getHeight();
 	float ratio = r.getWidth()*1.0f / r.getHeight();
 
 	if (itemsRatio > ratio)
 	{
-		float targetHeight = itemsRealBounds.getWidth() / ratio;
-		itemsRealBounds.expand(0, (targetHeight - itemsRealBounds.getHeight()) / 2);
+		float targetHeight = itemViewBounds.getWidth() / ratio;
+		itemViewBounds.expand(0, (targetHeight - itemViewBounds.getHeight()) / 2);
 	}
 	else
 	{
-		float targetWidth = itemsRealBounds.getHeight() * ratio;
-		itemsRealBounds.expand((targetWidth - itemsRealBounds.getWidth()) / 2, 0);
+		float targetWidth = itemViewBounds.getHeight() * ratio;
+		itemViewBounds.expand((targetWidth - itemViewBounds.getWidth()) / 2, 0);
 	}
+
+	juce::Rectangle<float> itemRealBounds = managerUI->getBoundsInView(itemViewBounds);
 
 	for (auto& ui : managerUI->itemsUI)
 	{
-		juce::Rectangle<float> b(ui->item->viewUIPosition->x - itemsRealBounds.getX(), ui->item->viewUIPosition->y - itemsRealBounds.getY(), ui->item->viewUISize->x, ui->item->viewUISize->y);
+		juce::Rectangle<int> b = ui->getBoundsInParent();
 		
-		juce::Rectangle<int> uiPaneBounds(	b.getX() * r.getWidth() / itemsRealBounds.getWidth(), 
-											b.getY() * r.getHeight() / itemsRealBounds.getHeight(),
-											b.getWidth() * r.getWidth() / itemsRealBounds.getWidth(),
-											b.getHeight() * r.getHeight() / itemsRealBounds.getHeight());
+		float bx = jmap<float>(b.getX(), itemRealBounds.getX(), itemRealBounds.getRight(), r.getX(), r.getRight());
+		float by = jmap<float>(b.getY(), itemRealBounds.getY(), itemRealBounds.getBottom(), r.getY(), r.getBottom());
+		float bw = b.getWidth() * r.getWidth() / itemRealBounds.getWidth();
+		float bh = b.getHeight() * r.getHeight() / itemRealBounds.getHeight();
+
+		juce::Rectangle<int> uiPaneBounds(bx, by, bw, bh);
 		
 		g.setColour(Colours::white.withAlpha(.3f));
 		g.fillRect(uiPaneBounds);
@@ -93,10 +96,10 @@ void BaseManagerViewMiniPane<M, T, U>::paint(juce::Graphics& g)
 
 	
 
-	float fx = jmap<float>(focusRect.getX(), itemsRealBounds.getX(), itemsRealBounds.getRight(), r.getX(), r.getRight());
-	float fy = jmap<float>(focusRect.getY(), itemsRealBounds.getY(), itemsRealBounds.getBottom(), r.getY(), r.getBottom());
-	float fw = focusRect.getWidth() * r.getWidth() / itemsRealBounds.getWidth();
-	float fh = focusRect.getHeight() * r.getHeight() / itemsRealBounds.getHeight();
+	float fx = jmap<float>(focusRect.getX(), itemViewBounds.getX(), itemViewBounds.getRight(), r.getX(), r.getRight());
+	float fy = jmap<float>(focusRect.getY(), itemViewBounds.getY(), itemViewBounds.getBottom(), r.getY(), r.getBottom());
+	float fw = focusRect.getWidth() * r.getWidth() / itemViewBounds.getWidth();
+	float fh = focusRect.getHeight() * r.getHeight() / itemViewBounds.getHeight();
 	juce::Rectangle<int> focusPaneRect(fx, fy, fw, fh);
 
 	g.setColour(BLUE_COLOR.withAlpha(.2f));
