@@ -22,7 +22,8 @@ BoolToggleUI::BoolToggleUI(Parameter * parameter) :
 		setRepaintsOnMouseActivity(true);
 	}
 
-    setSize(16,16);
+	setSize(200, GlobalSettings::getInstance()->fontSize->floatValue() + 4);//default size
+
     
 #if JUCE_MAC
     startTimerHz(20); //20 fps for slider on mac because of bad UI handling

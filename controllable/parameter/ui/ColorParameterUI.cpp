@@ -16,6 +16,7 @@ ColorParameterUI::ColorParameterUI(ColorParameter * parameter) :
     dispatchOnDoubleClick(true),
 	dispatchOnSingleClick(false)
 {
+	setSize(200, GlobalSettings::getInstance()->fontSize->floatValue() + 4);//default size
 	showLabel = false;
 }
 

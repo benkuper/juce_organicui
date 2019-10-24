@@ -34,8 +34,7 @@ FloatStepperUI::FloatStepperUI(Parameter * _parameter) :
 
 	addAndMakeVisible(slider.get());
 
-	setSize(100, 18);
-
+	setSize(200, GlobalSettings::getInstance()->fontSize->floatValue() + 4);
     startTimerHz(20);
 }
 
@@ -51,7 +50,7 @@ void FloatStepperUI::paint(Graphics& g)
 	if (showLabel)
 	{
 		Rectangle<int> r = getLocalBounds();
-		g.setFont(jlimit(12, 40, jmin(r.getHeight(), r.getWidth()) - 16)); 
+		g.setFont(jlimit(12, 40, jmin(r.getHeight()-4, r.getWidth()) - 16)); 
 		r = r.removeFromLeft(jmin(g.getCurrentFont().getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, r.getWidth() - 60));
 		g.setColour(useCustomTextColor ? customTextColor : TEXT_COLOR);
 		g.drawFittedText(customLabel.isNotEmpty() ? customLabel : parameter->niceName, r, Justification::centred, 1);
@@ -64,7 +63,7 @@ void FloatStepperUI::resized()
 	
 	if (showLabel)
 	{
-		Font font(jlimit(12, 40, jmin(r.getHeight(), r.getWidth()) - 16));
+		Font font(jlimit(12, 40, jmin(r.getHeight() - 4, r.getWidth()) - 16));
 
 		r.removeFromLeft(jmin(font.getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName), r.getWidth()-60));
 		slider->setBounds(r.removeFromRight(jmin(r.getWidth(),120)));

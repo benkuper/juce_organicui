@@ -14,7 +14,7 @@ TriggerButtonUI::TriggerButtonUI(Trigger *t) :
     TriggerUI(t),
 	drawTriggering(false)
 {
-	setSize(20, 15);
+	setSize(200, GlobalSettings::getInstance()->fontSize->floatValue() + 4);
 	setRepaintsOnMouseActivity(isInteractable());
 }
 
@@ -65,7 +65,7 @@ void TriggerButtonUI::paint(Graphics& g)
 	if (showLabel)
 	{
 		Rectangle<int> tr = getLocalBounds().reduced(2);
-		g.setFont(jlimit(12, 40, jmin(tr.getHeight(),tr.getWidth()) - 16));
+		g.setFont(jlimit(10, 40, jmin(tr.getHeight()-4,tr.getWidth()) - 16));
 		g.setColour(useCustomTextColor ? customTextColor : TEXT_COLOR);
 		g.drawFittedText(customLabel.isNotEmpty() ? customLabel : trigger->niceName, tr, Justification::centred, 1);
 	}

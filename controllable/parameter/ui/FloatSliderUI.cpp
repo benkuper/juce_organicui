@@ -22,7 +22,7 @@ FloatSliderUI::FloatSliderUI(Parameter * parameter) :
     orientation = HORIZONTAL;
     scaleFactor = 1;
 
-	setSize(100, 18);
+	setSize(200, GlobalSettings::getInstance()->fontSize->floatValue() + 4);//default size
 }
 
 FloatSliderUI::~FloatSliderUI()
@@ -95,7 +95,7 @@ void FloatSliderUI::paint(Graphics & g)
 
 
 		if (showValue) text += fixedDecimals == 0 ? parameter->stringValue():String::formatted("%." + String(fixedDecimals + 1) + "f", parameter->floatValue()).dropLastCharacters(1);
-		g.setFont((float)jmin<int>(getHeight() - 4, 16));
+		g.setFont((float)jmin<int>(getHeight() - 6, 16));
 		if (parameter->isOverriden) g.setFont(g.getCurrentFont().boldened());
         g.drawFittedText(text, destRect, Justification::centred,1);
     }

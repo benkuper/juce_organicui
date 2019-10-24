@@ -1,4 +1,3 @@
-#include "BoolImageToggleUI.h"
 /*
   ==============================================================================
 
@@ -24,6 +23,9 @@ BoolImageToggleUI::BoolImageToggleUI(ImageButton * i, BoolParameter *p) :
 	bt->setOpaque(false);
 	bt->setToggleState(boolParam->boolValue(), dontSendNotification);
 	bt->setTooltip(tooltip);
+
+	setSize(200, GlobalSettings::getInstance()->fontSize->floatValue() + 4);//default size
+
 }
 
 BoolImageToggleUI::~BoolImageToggleUI()
