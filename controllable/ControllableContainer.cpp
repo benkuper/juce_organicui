@@ -257,7 +257,7 @@ void ControllableContainer::removeControllable(WeakReference<Controllable> c)
 		ScopedLock lock(controllables.getLock());
 		controllables.removeObject(c);
 	}
-
+	 
 	notifyStructureChanged();
 }
 
@@ -308,6 +308,7 @@ void ControllableContainer::setNiceName(const String &_niceName) {
 	if (niceName == _niceName) return;
 	niceName = _niceName;
 	if (!hasCustomShortName) setAutoShortName();
+	liveScriptObjectIsDirty = true;
 	onContainerNiceNameChanged();
 }
 
@@ -315,6 +316,7 @@ void ControllableContainer::setCustomShortName(const String &_shortName) {
 	shortName = _shortName;
 	hasCustomShortName = true;
 	scriptTargetName = shortName;
+	liveScriptObjectIsDirty = true;
 	updateChildrenControlAddress();
 	onContainerShortNameChanged();
 	controllableContainerListeners.call(&ControllableContainerListener::childAddressChanged, this);
@@ -326,6 +328,7 @@ void ControllableContainer::setAutoShortName() {
 	hasCustomShortName = false;
 	shortName = StringUtil::toShortName(niceName,true);
 	scriptTargetName = shortName;
+	liveScriptObjectIsDirty = true;
 	updateChildrenControlAddress();
 	onContainerShortNameChanged();
 	controllableContainerListeners.call(&ControllableContainerListener::childAddressChanged, this);

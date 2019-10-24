@@ -56,6 +56,7 @@ public:
 	void onContainerTriggerTriggered(Trigger *) override;
 
 	void onControllableFeedbackUpdateInternal(ControllableContainer * cc, Controllable * c) override;
+	void childStructureChanged(ControllableContainer* cc) override;
 
 	var getJSONData() override;
 	void loadJSONDataInternal(var data) override;

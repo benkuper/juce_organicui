@@ -54,14 +54,18 @@ Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled) :
 	scriptParamsContainer.hideEditorHeader = true;
 	addChildControllableContainer(&scriptParamsContainer);
 
+	Engine::mainEngine->addControllableContainerListener(this);
+
 	startTimer(1000); //modification check timer
 }
 
 Script::~Script()
 {
+	if(Engine::mainEngine != nullptr) Engine::mainEngine->removeControllableContainerListener(this);
+
 	signalThreadShouldExit();
-	waitForThreadToExit(100);
-	stopThread(100);
+	waitForThreadToExit(1000);
+	stopThread(1000);
 }
 
 void Script::loadScript()
@@ -242,6 +246,14 @@ void Script::onControllableFeedbackUpdateInternal(ControllableContainer * cc, Co
 		args.add(c->getScriptObject());
 
 		callFunction("scriptParameterChanged", args);
+	}
+}
+
+void Script::childStructureChanged(ControllableContainer* cc)
+{
+	if (state == ScriptState::SCRIPT_LOADED && Engine::mainEngine != nullptr && cc == Engine::mainEngine)
+	{
+		if(!Engine::mainEngine->isLoadingFile && !Engine::mainEngine->isClearing) scriptEngine->registerNativeObject(Engine::mainEngine->scriptTargetName, Engine::mainEngine->getScriptObject());
 	}
 }
 
