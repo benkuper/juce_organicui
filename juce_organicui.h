@@ -210,6 +210,7 @@ using namespace juce;
 #include "manager/BaseManager.h"
 
 #include "manager/ui/BaseManagerUI.h"
+#include "manager/ui/BaseManagerViewMiniPane.h"
 #include "manager/ui/BaseManagerViewUI.h"
 #include "manager/ui/BaseManagerShapeShifterUI.h"
 

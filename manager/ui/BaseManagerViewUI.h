@@ -10,6 +10,7 @@
 
 #pragma once
 
+
 template<class M, class T, class U>
 class BaseManagerViewUI :
 	public BaseManagerUI<M, T, U>
@@ -44,6 +45,8 @@ public:
 	Point<int> initViewOffset;
 
 	const int defaultCheckerSize = 128;
+
+	BaseManagerViewMiniPane<M, T, U> viewPane;
 
 	virtual void mouseDown(const MouseEvent &e) override;
 	virtual void mouseDrag(const MouseEvent &e) override;
@@ -93,12 +96,14 @@ public:
 	virtual void askForSyncPosAndSize(BaseItemMinimalUI<T>* itemUI) override;
 
 	virtual void endLoadFile() override;
+
+
 };
 
 
 
 template<class M, class T, class U>
-BaseManagerViewUI<M, T, U>::BaseManagerViewUI(const String & contentName, M * _manager) :
+BaseManagerViewUI<M, T, U>::BaseManagerViewUI(const String& contentName, M* _manager) :
 	BaseManagerUI<M, T, U>(contentName, _manager, false),
 	canNavigate(true),
 	centerUIAroundPosition(false),
@@ -109,13 +114,15 @@ BaseManagerViewUI<M, T, U>::BaseManagerViewUI(const String & contentName, M * _m
 	viewZoom(1),
 	minZoom(.4f),
 	maxZoom(1),
-	timeSinceLastWheel(0)
-
+	timeSinceLastWheel(0),
+	viewPane(this)
 {
     this->defaultLayout = this->FREE;
 
 	this->resizeOnChildBoundsChanged = false;
 	this->bgColor = BG_COLOR.darker(.3f);
+
+	this->addAndMakeVisible(&viewPane);
 }
 
 
@@ -292,6 +299,9 @@ void BaseManagerViewUI<M, T, U>::resized()
 	{
 		updateViewUIPosition(tui);
 	}
+
+	int size = jmin(200, jmin(r.getWidth(), r.getHeight()) - 20);
+	viewPane.setBounds(r.translated(-10, -10).removeFromRight(size).removeFromBottom(size));
 }
 
 template<class M, class T, class U>
@@ -330,6 +340,9 @@ void BaseManagerViewUI<M, T, U>::updateItemsVisibility()
 		bool isInsideInspectorBounds = !ir.isEmpty();
 		iui->setVisible(isInsideInspectorBounds);
 	}
+
+	viewPane.updateContent();
+	viewPane.toFront(false);
 }
 
 template<class M, class T, class U>
