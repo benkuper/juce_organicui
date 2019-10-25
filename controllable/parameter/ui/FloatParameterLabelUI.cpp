@@ -203,6 +203,7 @@ void TimeLabel::valueChanged(const var & v)
 void TimeLabel::labelTextChanged(Label *)
 {
 	parameter->setValue(timeStringToValue(valueLabel.getText()));
+	valueLabel.setText(valueToTimeString(parameter->value), dontSendNotification);
 }
 
 #pragma warning (push)
@@ -218,6 +219,7 @@ String TimeLabel::valueToTimeString(float timeVal) const
 float TimeLabel::timeStringToValue(String str) const
 {
 	StringArray sa;
+	str = str.retainCharacters("0123456789.:;,");
 	if (str.endsWithChar(':')) str += "0";
 	sa.addTokens(str.replace(",","."), ":", "");
 
