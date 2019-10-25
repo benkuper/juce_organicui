@@ -104,7 +104,6 @@ void TargetParameter::setValueFromTarget(ControllableContainer * cc, bool addToU
 void TargetParameter::setValueInternal(var & newVal)
 {
 	StringParameter::setValueInternal(newVal);
-	DBG("Set value  internal " << niceName << " ghost = " << ghostValue);
 	if (newVal.toString().isNotEmpty())
 	{
 		if (targetType == CONTAINER)

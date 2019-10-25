@@ -113,7 +113,6 @@ void BaseManagerViewMiniPane<M, T, U>::resized()
 template<class M, class T, class U>
 void BaseManagerViewMiniPane<M, T, U>::updateContent()
 {
-	DBG("getAlpha : " << getAlpha() << " / " << (int)ca.isAnimating() << " / " << (int)isVisible());
 	if ((!isVisible() || getAlpha() < 1) && !ca.isAnimating())
 	{
 		ca.fadeIn(this, 200);

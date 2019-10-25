@@ -21,8 +21,6 @@ FloatStepperUI::FloatStepperUI(Parameter * _parameter) :
 	{
 		slider->setRange((float)parameter->minimumValue, (float)parameter->maximumValue, 1);
 		int val = juce::jmin<int>(abs((int)parameter->maximumValue - (int)parameter->minimumValue), INT32_MAX);
-		
-		DBG(parameter->niceName << "Sensitivity : " << val << " / " <<  abs((int)parameter->maximumValue - (int)parameter->minimumValue));
 		slider->setMouseDragSensitivity(val);
 	}
     slider->setValue(parameter->floatValue());
