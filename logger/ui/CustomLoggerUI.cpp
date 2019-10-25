@@ -450,6 +450,7 @@ String CustomLoggerUI::LogList::getCellTooltip(int rowNumber, int /*columnId*/)
 {
 	auto el = owner->getElementForRow(rowNumber);
 
+	if (el == nullptr) return "[Error]";
 	String sR = el->source;
 	return
 		(sR.isNotEmpty() ?
