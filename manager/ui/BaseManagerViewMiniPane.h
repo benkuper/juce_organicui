@@ -3,36 +3,32 @@ class BaseManagerViewUI;
 	
 template<class M, class T, class U>
 class BaseManagerViewMiniPane :
-		public Component
+		public Component,
+		public Timer
 {
 public:
 	BaseManagerViewMiniPane(BaseManagerViewUI<M,T,U> * managerUI);
 	~BaseManagerViewMiniPane() {}
 
 	BaseManagerViewUI<M, T, U> * managerUI;
+	ComponentAnimator ca;
 
 	void paint(juce::Graphics& g) override;
 	void resized() override;
 
 	void updateContent();
-	void updateHandle();
 
-	class PanHandle :
-		public Component
-	{
-	public:
-		PanHandle() {}
-		~PanHandle() {}
+	void timerCallback() override;
 
-		void paint(Graphics& g) override;
-	};
 };
 
 template<class M, class T, class U>
 BaseManagerViewMiniPane<M, T, U>::BaseManagerViewMiniPane(BaseManagerViewUI<M, T, U> * managerUI) :
 	managerUI(managerUI)
 {
-
+	setAlpha(0);
+	setOpaque(false);
+	setInterceptsMouseClicks(true, true);
 }
 
 template<class M, class T, class U>
@@ -114,22 +110,24 @@ void BaseManagerViewMiniPane<M, T, U>::resized()
 	updateContent();
 }
 
-
 template<class M, class T, class U>
 void BaseManagerViewMiniPane<M, T, U>::updateContent()
 {
+	DBG("getAlpha : " << getAlpha() << " / " << (int)ca.isAnimating() << " / " << (int)isVisible());
+	if ((!isVisible() || getAlpha() < 1) && !ca.isAnimating())
+	{
+		ca.fadeIn(this, 200);
+	}
+
+	stopTimer();
+	startTimerHz(1);
+
 	updateHandle();
 	repaint();
 }
-
 template<class M, class T, class U>
-void BaseManagerViewMiniPane<M, T, U>::updateHandle()
+void BaseManagerViewMiniPane<M, T, U>::timerCallback()
 {
-	
-}
-
-template<class M, class T, class U>
-void BaseManagerViewMiniPane<M, T, U>::PanHandle::paint(Graphics& g)
-{
-
+	ca.fadeOut(this, 200);
+	stopTimer();
 }
