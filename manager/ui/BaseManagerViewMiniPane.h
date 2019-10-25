@@ -47,7 +47,7 @@ void BaseManagerViewMiniPane<M, T, U>::paint(juce::Graphics& g)
 	juce::Rectangle<int> mr = managerUI->getLocalBounds();
 	juce::Rectangle<float> focusRect;
 	focusRect.setPosition(managerUI->getViewPos(mr.getPosition()).toFloat());
-	juce::Point<float> vs(mr.getWidth() * managerUI->viewZoom, mr.getHeight() * managerUI->viewZoom);
+	juce::Point<float> vs(mr.getWidth() / managerUI->viewZoom, mr.getHeight() / managerUI->viewZoom);
 	focusRect.setSize(vs.x, vs.y);
 
 
