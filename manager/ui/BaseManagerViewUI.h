@@ -300,7 +300,7 @@ void BaseManagerViewUI<M, T, U>::resized()
 
 	if (viewPane != nullptr)
 	{
-		int size = jmin(200, jmin(r.getWidth(), r.getHeight()) - 20);
+		int size = jlimit(50,200, jmin(r.getWidth()/5, r.getHeight()/5) - 20);
 		viewPane->setBounds(r.translated(-10, -10).removeFromRight(size).removeFromBottom(size));
 	}
 	

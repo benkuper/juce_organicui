@@ -122,7 +122,6 @@ void BaseManagerViewMiniPane<M, T, U>::updateContent()
 	stopTimer();
 	startTimerHz(1);
 
-	updateHandle();
 	repaint();
 }
 template<class M, class T, class U>
