@@ -55,6 +55,8 @@ public:
     virtual void visibilityChanged() override;
     virtual void timerCallback() override;
 
+	virtual void focusGained(FocusChangeType cause) override;
+
 protected:
     virtual void valueChanged(const var &) override;
 

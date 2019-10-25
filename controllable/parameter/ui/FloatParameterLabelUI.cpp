@@ -11,12 +11,10 @@
 
 FloatParameterLabelUI::FloatParameterLabelUI(Parameter * p) :
 	ParameterUI(p),
+	valueLabel(p->niceName + "_ValueLabel"),
 	maxFontHeight(GlobalSettings::getInstance()->fontSize->floatValue()),
 	autoSize(false)
 {
-
-	ParameterUI::setNextFocusOrder(&valueLabel);
-	
 	updateUIParams();
 
 	addAndMakeVisible(&valueLabel);
@@ -28,6 +26,8 @@ FloatParameterLabelUI::FloatParameterLabelUI(Parameter * p) :
 
 	valueChanged(parameter->getValue());	
 	feedbackStateChanged();
+
+	ParameterUI::setNextFocusOrder(&valueLabel);
 
 	addMouseListener(this, true);
     
@@ -130,7 +130,7 @@ void FloatParameterLabelUI::mouseUpInternal(const MouseEvent & e)
 
 void FloatParameterLabelUI::updateUIParams()
 {
-	valueLabel.setEditable(false, isInteractable());
+	valueLabel.setEditable(false, isInteractable(), false, true);
 	valueLabel.setEnabled(isInteractable());
 	
 	valueLabel.setJustificationType(Justification::centred);

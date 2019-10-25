@@ -38,21 +38,14 @@ void ParameterUI::showEditWindowInternal()
 {
 	if (parameter->isControllableFeedbackOnly) return;
 
-	AlertWindow nameWindow("Set a value", "Set a new value for this parameter", AlertWindow::AlertIconType::NoIcon, this);
+	Component * editComponent(getEditValueComponent());
+	CallOutBox * box = &CallOutBox::launchAsynchronously(editComponent, localAreaToGlobal(getLocalBounds()), nullptr);
+	box->setArrowSize(8);
+}
 
-	nameWindow.addTextEditor("val", parameter->stringValue(), "Value");
-
-	nameWindow.addButton("OK", 1, KeyPress(KeyPress::returnKey));
-	nameWindow.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
-
-	int result = nameWindow.runModalLoop();
-
-	if (result)
-	{
-		String valString = nameWindow.getTextEditorContents("val");
-		if (parameter->type == Parameter::STRING) parameter->setUndoableValue(parameter->getValue(), valString);
-		else parameter->setUndoableValue(parameter->getValue(), valString.replace(",", ".").getFloatValue());
-	}
+Component* ParameterUI::getEditValueComponent()
+{
+	return new ValueEditCalloutComponent(parameter);
 }
 
 void ParameterUI::showEditRangeWindow()
@@ -226,5 +219,57 @@ void ParameterUI::newMessage(const Parameter::ParameterEvent &e) {
 		controlModeChanged(e.parameter);
 		repaint();
 		break;
+	}
+}
+
+ParameterUI::ValueEditCalloutComponent::ValueEditCalloutComponent(WeakReference<Parameter> p) :
+	p(p),
+	label("ValueEditorLabel")
+{
+	label.addListener(this);
+	label.setText(p->stringValue(), dontSendNotification);
+	label.setEditable(true);
+	addAndMakeVisible(&label);
+	setSize(100, 20);
+
+}
+
+ParameterUI::ValueEditCalloutComponent::~ValueEditCalloutComponent()
+{
+}
+
+void ParameterUI::ValueEditCalloutComponent::resized()
+{
+	label.setBounds(getLocalBounds());
+}
+
+void ParameterUI::ValueEditCalloutComponent::paint(Graphics& g)
+{
+}
+
+void ParameterUI::ValueEditCalloutComponent::labelTextChanged(Label* l)
+{
+	if (!p.wasObjectDeleted() && p != nullptr)
+	{
+		if (p->type == Parameter::STRING) p->setUndoableValue(p->getValue(), label.getText());
+		else p->setUndoableValue(p->getValue(), label.getText().replace(",", ".").getFloatValue());
+	}
+}
+
+void ParameterUI::ValueEditCalloutComponent::editorHidden(Label* l, TextEditor&)
+{
+	CallOutBox* b = dynamic_cast<CallOutBox*>(getParentComponent());
+	if (b != nullptr)
+	{
+		b->dismiss();
+	}
+}
+
+void ParameterUI::ValueEditCalloutComponent::parentHierarchyChanged()
+{
+	if (label.isShowing())
+	{
+		label.grabKeyboardFocus();
+		label.showEditor();
 	}
 }

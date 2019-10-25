@@ -14,12 +14,13 @@
 StringParameterUI::StringParameterUI(Parameter * p) :
     ParameterUI(p),
 	stringParam((StringParameter *)p),
+	valueLabel(p->niceName+"_ValueLabel"),
 	maxFontHeight(16),
 	autoSize(false)
 {
 	showEditWindowOnDoubleClick = false;
 
-    addAndMakeVisible(valueLabel);
+    addAndMakeVisible(&valueLabel);
 
     valueLabel.setJustificationType(Justification::topLeft);
     valueLabel.setText(parameter->getValue(),NotificationType::dontSendNotification);
@@ -29,8 +30,8 @@ StringParameterUI::StringParameterUI(Parameter * p) :
 	valueLabel.setColour(valueLabel.textWhenEditingColourId, Colours::white);
 	valueLabel.setColour(CaretComponent::caretColourId, Colours::orange);
 	valueLabel.setColour(valueLabel.textColourId, useCustomTextColor ? customTextColor : (isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f)));
-
 	valueLabel.addMouseListener(this, false);
+
 	ParameterUI::setNextFocusOrder(&valueLabel);
 
 	feedbackStateChanged();

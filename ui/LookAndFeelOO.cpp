@@ -1338,6 +1338,7 @@ void LookAndFeelOO::drawRotarySlider (Graphics& g, int x, int y, int width, int 
 Button* LookAndFeelOO::createSliderButton (Slider& s, const bool isIncrement)
 {
     TextButton * bt = new TextButton (isIncrement ? "+" : "-", "");
+	bt->setWantsKeyboardFocus(false);
 	bt->setEnabled(s.isTextBoxEditable());
 	bt->setVisible(s.isTextBoxEditable());
 	return bt;
@@ -2341,13 +2342,13 @@ void LookAndFeelOO::drawCallOutBoxBackground (CallOutBox& box, Graphics& g,
     g.setColour (Colour::greyLevel (0.23f).withAlpha (0.9f));
     g.fillPath (path);
 
-    g.setColour (Colours::white.withAlpha (0.8f));
-    g.strokePath (path, PathStrokeType (2.0f));
+    g.setColour (Colours::white.withAlpha (0.4f));
+    g.strokePath (path, PathStrokeType (1.0f));
 }
 
 int LookAndFeelOO::getCallOutBoxBorderSize (const CallOutBox&)
 {
-    return 20;
+	return 4;
 }
 
 //==============================================================================

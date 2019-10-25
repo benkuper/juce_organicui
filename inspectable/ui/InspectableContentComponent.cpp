@@ -20,7 +20,7 @@ InspectableContentComponent::InspectableContentComponent(Inspectable * inspectab
     highlightColor(Colours::purple),
     bringToFrontOnSelect(true)
 {
-	setWantsKeyboardFocus(true);
+	//setWantsKeyboardFocus(true);
 	setMouseClickGrabsKeyboardFocus(true);
 	inspectable->addAsyncInspectableListener(this);
 }

@@ -15,10 +15,10 @@ class ParameterUI :
 	public Parameter::AsyncListener
 {
 public:
-    ParameterUI(Parameter * parameter);
-    virtual ~ParameterUI();
-	
-    WeakReference<Parameter> parameter;
+	ParameterUI(Parameter* parameter);
+	virtual ~ParameterUI();
+
+	WeakReference<Parameter> parameter;
 
 	bool showEditWindowOnDoubleClick;
 	bool showValue;
@@ -30,8 +30,9 @@ public:
 
 	static std::function<void(ParameterUI*)> customShowEditRangeWindowFunction;
 
-
 	virtual void showEditWindowInternal() override;
+	virtual Component* getEditValueComponent();
+
 	void showEditRangeWindow();
 	virtual void showEditRangeWindowInternal();
 
@@ -49,8 +50,25 @@ public:
 	static int currentFocusOrderIndex;
 	static void setNextFocusOrder(Component * focusComponent);
 
-protected:
+	class ValueEditCalloutComponent :
+		public Component,
+		public Label::Listener
+	{
+	public:
+		ValueEditCalloutComponent(WeakReference<Parameter> pui);
+		~ValueEditCalloutComponent();
+		
+		WeakReference<Parameter> p;
+		Label label;
 
+		void resized() override;
+		void paint(Graphics& g) override;
+		void labelTextChanged(Label* l) override;
+		void editorHidden(Label* l, TextEditor&) override;
+		void parentHierarchyChanged() override;
+	};
+
+protected:
 
     // helper to spot wrong deletion order
     bool shouldBailOut();

@@ -22,6 +22,9 @@ FloatSliderUI::FloatSliderUI(Parameter * parameter) :
     orientation = HORIZONTAL;
     scaleFactor = 1;
 
+	setWantsKeyboardFocus(true);
+	ParameterUI::setNextFocusOrder(this);
+
 	setSize(200, GlobalSettings::getInstance()->fontSize->floatValue() + 4);//default size
 }
 
@@ -227,4 +230,13 @@ void FloatSliderUI::timerCallback()
 	shouldRepaint = false;
 	repaint();
 
+}
+
+void FloatSliderUI::focusGained(FocusChangeType cause)
+{
+	ParameterUI::focusGained(cause);
+	if (cause == FocusChangeType::focusChangedByTabKey)
+	{
+		showEditWindow();
+	}
 }
