@@ -20,7 +20,9 @@ FloatStepperUI::FloatStepperUI(Parameter * _parameter) :
 	if ((int)parameter->minimumValue != (int)parameter->maximumValue)
 	{
 		slider->setRange((float)parameter->minimumValue, (float)parameter->maximumValue, 1);
-		int val = jmax<int>(abs((float)parameter->maximumValue - (float)parameter->minimumValue), 1);
+		int val = juce::jmin<int>(abs((int)parameter->maximumValue - (int)parameter->minimumValue), INT32_MAX);
+		
+		DBG(parameter->niceName << "Sensitivity : " << val << " / " <<  abs((int)parameter->maximumValue - (int)parameter->minimumValue));
 		slider->setMouseDragSensitivity(val);
 	}
     slider->setValue(parameter->floatValue());
