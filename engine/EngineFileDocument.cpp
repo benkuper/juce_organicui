@@ -314,8 +314,6 @@ void Engine::loadJSONData(var data, ProgressTask * loadingTask)
 
 				data = JSON::parse(convertedData);
 
-				LOG("Converted data raw : " << convertedData);
-
 				if (data.isVoid())
 				{
 					AlertWindow::showMessageBox(AlertWindow::AlertIconType::WarningIcon, "Update error", "There is an error with the converted file, the data is badly formatted. I mean, real bad. You can still reload your file and not update it.", "Well, shit happens");
