@@ -145,7 +145,7 @@ void Script::loadScript()
 
 	if (updateEnabled)
 	{
-		startThread();
+		if(!Engine::mainEngine->isLoadingFile) startThread();
 	}
 	else
 	{
@@ -276,6 +276,10 @@ void Script::endLoadFile()
 {
 	if (Engine::mainEngine != nullptr) Engine::mainEngine->removeEngineListener(this);
 	if(state != SCRIPT_LOADED) loadScript();
+	else if (updateEnabled)
+	{
+		startThread();
+	}
 }
 
 InspectableEditor * Script::getEditor(bool isRoot)
@@ -296,10 +300,9 @@ void Script::timerCallback()
 
 void Script::run()
 {
-	sleep(100); //safety
 	float lastUpdateTime = (float)Time::getMillisecondCounter() / 1000.f;
 	
-	while (!threadShouldExit() && state == ScriptState::SCRIPT_LOADED && updateEnabled)
+	while (!Engine::mainEngine->isClearing && !threadShouldExit() && state == ScriptState::SCRIPT_LOADED && updateEnabled)
 	{
 		sleep(1000 / updateRate->floatValue());
 
