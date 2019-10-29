@@ -12,13 +12,14 @@
 
 ParameterAutomation::ParameterAutomation(Parameter* _parameter) :
 	BaseItem(_parameter->niceName +" automation", false),
-	parameter(_parameter),
-	automationContainer(automationContainer),
 	timeParamRef(nullptr),
 	lengthParamRef(nullptr),
-	mode(nullptr),
-	manualMode(true),
-	valueIsNormalized(false)
+    valueParamRef(nullptr),
+    automationContainer(automationContainer),
+    manualMode(true),
+    valueIsNormalized(false),
+    parameter(_parameter),
+    mode(nullptr)
 {
 	isSelectable = false;
 	parameter->setControllableFeedbackOnly(true);
@@ -178,8 +179,8 @@ void ParameterNumberAutomation::setAllowKeysOutside(bool value)
 
 ParameterColorAutomation::ParameterColorAutomation(ColorParameter* colorParam, bool addDefaultItems) :
 	ParameterAutomation(colorParam),
-	colorParam(colorParam),
-	colorManager(1,addDefaultItems)
+	colorManager(1,addDefaultItems),
+    colorParam(colorParam)
 {
 	timeParamRef = colorManager.position;
 	lengthParamRef = colorManager.length;

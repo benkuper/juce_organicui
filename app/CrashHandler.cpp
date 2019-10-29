@@ -27,8 +27,8 @@ juce_ImplementSingleton(CrashDumpUploader)
 
 CrashDumpUploader::CrashDumpUploader() :
 	Thread("Crashdump"),
-	crashFound(false),
-	uploadEnabled(true)
+	uploadEnabled(true),
+    crashFound(false)
 {
 
 }

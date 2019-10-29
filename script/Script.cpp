@@ -13,8 +13,8 @@ Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled) :
 	BaseItem("Script", canBeDisabled, false),
 	Thread("Script"),
 	scriptTemplate(nullptr),
-	scriptParamsContainer("params"),
-	updateEnabled(false),
+    updateEnabled(false),
+    scriptParamsContainer("params"),
 	parentTarget(_parentTarget),
 	lockedThreadId(0),
 	scriptAsyncNotifier(10)
