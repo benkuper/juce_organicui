@@ -18,12 +18,14 @@ OSCRemoteControl::OSCRemoteControl() :
 	,servus("_osc._udp")
 #endif
 {
+	enabled->setValue(false);
+
 	localPort = addIntParameter("Local Port", "Local port to connect to for global control over the application", 42000, 1024, 65535);
 
 	receiver.addListener(this);
 	receiver.registerFormatErrorHandler(&OSCHelpers::logOSCFormatError);
 
-	setupReceiver();
+	//setupReceiver();
 }
 
 OSCRemoteControl::~OSCRemoteControl()
