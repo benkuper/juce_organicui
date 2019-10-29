@@ -23,6 +23,8 @@ ShapeShifterPanelTab::ShapeShifterPanelTab(ShapeShifterContent * _content) : con
 
 	closePanelBT.reset(AssetManager::getInstance()->getRemoveBT());
 	closePanelBT->addListener(this);
+	closePanelBT->setWantsKeyboardFocus(false);
+
 	addAndMakeVisible(closePanelBT.get());
 
 	setSize(getLabelWidth(), 20);

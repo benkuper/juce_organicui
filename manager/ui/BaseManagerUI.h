@@ -243,6 +243,8 @@ BaseManagerUI<M, T, U>::BaseManagerUI(const String & contentName, M * _manager, 
 	baseM->addAsyncManagerListener(this);
 
 	addItemBT.reset(AssetManager::getInstance()->getAddBT());
+	addItemBT->setWantsKeyboardFocus(false);
+
 	addAndMakeVisible(addItemBT.get());
 	addItemBT->addListener(this);
 

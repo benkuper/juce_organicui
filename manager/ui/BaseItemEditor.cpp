@@ -7,6 +7,7 @@ BaseItemEditor::BaseItemEditor(BaseItem * bi, bool isRoot) :
 		if (item->userCanRemove)
 		{
 			removeBT.reset(AssetManager::getInstance()->getRemoveBT());
+			removeBT->setWantsKeyboardFocus(false);
 			addAndMakeVisible(removeBT.get());
 			removeBT->addListener(this);
 		}
@@ -14,6 +15,7 @@ BaseItemEditor::BaseItemEditor(BaseItem * bi, bool isRoot) :
 		if(item->userCanDuplicate)
 		{
 			duplicateBT.reset(AssetManager::getInstance()->getDuplicateBT());
+			duplicateBT->setWantsKeyboardFocus(false);
 			addAndMakeVisible(duplicateBT.get());
 			duplicateBT->addListener(this);
 		}
@@ -22,6 +24,9 @@ BaseItemEditor::BaseItemEditor(BaseItem * bi, bool isRoot) :
 		{
 			upBT.reset(AssetManager::getInstance()->getUpBT());
 			downBT.reset(AssetManager::getInstance()->getDownBT());
+			upBT->setWantsKeyboardFocus(false);
+			downBT->setWantsKeyboardFocus(false);
+
 			addAndMakeVisible(upBT.get());
 			addAndMakeVisible(downBT.get());
 			upBT->addListener(this);

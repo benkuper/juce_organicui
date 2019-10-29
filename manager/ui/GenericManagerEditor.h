@@ -69,6 +69,7 @@ GenericManagerEditor<T>::GenericManagerEditor(BaseManager<T> * _manager, bool is
 	if (manager->userCanAddItemsManually)
 	{
 		addItemBT.reset(AssetManager::getInstance()->getAddBT());
+		addItemBT->setWantsKeyboardFocus(false);
 		addAndMakeVisible(addItemBT.get());
 		addItemBT->addListener(this);
 	}
