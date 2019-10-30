@@ -12,8 +12,9 @@
 
 FileParameter::FileParameter(const String & niceName, const String &description, const String & initialValue, bool enabled) :
     StringParameter(niceName, description, initialValue, enabled),
-	forceRelativePath(false),
-	customBasePath("")
+	customBasePath(""),
+    forceRelativePath(false)
+
 {
 	defaultUI = FILE; 
 	if(Engine::mainEngine != nullptr) Engine::mainEngine->addEngineListener(this);

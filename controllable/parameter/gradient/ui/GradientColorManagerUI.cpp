@@ -12,9 +12,9 @@
 GradientColorManagerUI::GradientColorManagerUI(GradientColorManager * manager) :
 	BaseManagerUI(manager->niceName,manager,false),
 	Thread("Colors "+String(manager->niceName)),
-	autoResetViewRangeOnLengthUpdate(false),
 	shouldRepaint(true),
-	shouldUpdateImage(true)
+	shouldUpdateImage(true),
+    autoResetViewRangeOnLengthUpdate(false)
 {
 	setShowAddButton(false);
 	animateItemOnAdd = false;

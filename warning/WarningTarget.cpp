@@ -2,8 +2,9 @@
 
 WarningTarget::WarningTarget() :
 	warningResolveInspectable(nullptr),
-	warningTargetNotifier(10),
-	showWarningInUI(false)
+	showWarningInUI(false),
+    warningTargetNotifier(10)
+
 {
 }
 
