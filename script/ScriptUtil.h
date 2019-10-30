@@ -32,6 +32,7 @@ public:
 	static var toDegrees(const var::NativeFunctionArgs &a);
 	static var toRadians(const var::NativeFunctionArgs &a);
 
+	static var getIPs(const var::NativeFunctionArgs& a);
 
 	static var encodeHMAC_SHA1(const var::NativeFunctionArgs& a);
 

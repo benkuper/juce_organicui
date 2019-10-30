@@ -20,6 +20,7 @@ ScriptUtil::ScriptUtil() :
 	scriptObject.setMethod("getFloatFromBytes", ScriptUtil::getFloatFromBytes);
 	scriptObject.setMethod("getInt32FromBytes", ScriptUtil::getInt32FromBytes);
 	scriptObject.setMethod("getInt64FromBytes", ScriptUtil::getInt32FromBytes);
+	scriptObject.setMethod("getIPs", ScriptUtil::getIPs);
 	scriptObject.setMethod("encodeHMAC_SHA1", ScriptUtil::encodeHMAC_SHA1);
 	scriptObject.setMethod("toBase64", ScriptUtil::toBase64);
 }
@@ -95,6 +96,20 @@ var ScriptUtil::toRadians(const var::NativeFunctionArgs & a)
 {
 	if (a.numArguments < 1) return 0;
 	return degreesToRadians((double)a.arguments[0]);
+}
+
+var ScriptUtil::getIPs(const var::NativeFunctionArgs& a)
+{
+	var result;
+
+	Array<IPAddress> ad;
+	IPAddress::findAllAddresses(ad);
+	Array<String> ips;
+	for (auto& a : ad) ips.add(a.toString());
+	ips.sort();
+	for (auto& ip : ips) result.append(ip);
+
+	return result;
 }
 
 var ScriptUtil::encodeHMAC_SHA1(const var::NativeFunctionArgs& a)
