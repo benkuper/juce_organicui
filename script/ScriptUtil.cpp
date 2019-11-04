@@ -105,7 +105,7 @@ var ScriptUtil::getIPs(const var::NativeFunctionArgs& a)
 	Array<IPAddress> ad;
 	IPAddress::findAllAddresses(ad);
 	Array<String> ips;
-	for (auto& a : ad) ips.add(a.toString());
+	for (auto& add : ad) ips.add(add.toString());
 	ips.sort();
 	for (auto& ip : ips) result.append(ip);
 
