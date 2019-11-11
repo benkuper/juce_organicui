@@ -92,11 +92,14 @@ void Engine::parseCommandline(const String & commandLine) {
 				LOG("no file provided for command : " + c.command);
 				jassertfalse;
 				continue;
-			}
+			} 
 			String fileArg = c.args[0];
 			if (File::isAbsolutePath(fileArg)) {
 				File f(fileArg);
-				if (f.existsAsFile()) loadDocument(f);
+				if (f.existsAsFile())
+				{
+					loadDocument(f);
+				}
 			} else {
 				NLOG("Engine", "File : " << fileArg << " not found.");
 			}

@@ -71,17 +71,7 @@ void OrganicApplication::initialise(const String & commandLine)
 
 	HelpBox::getInstance()->loadHelp();
 
-	engine->parseCommandline(commandLine);
-
-	if (!engine->getFile().existsAsFile()) {
-		if (GlobalSettings::getInstance()->openLastDocumentOnStartup->boolValue())  Engine::mainEngine->loadFrom(Engine::mainEngine->getLastDocumentOpened(), true);
-		else if (GlobalSettings::getInstance()->openSpecificFileOnStartup->boolValue() && GlobalSettings::getInstance()->fileToOpenOnStartup->stringValue().isNotEmpty())  Engine::mainEngine->loadFrom(File(GlobalSettings::getInstance()->fileToOpenOnStartup->stringValue()), true);
-		else
-		{
-			engine->createNewGraph();
-			engine->setChangedFlag(false);
-		}
-	}
+	
 
 	//Crash handler
 //#if JUCE_WINDOWS
@@ -94,6 +84,18 @@ void OrganicApplication::initialise(const String & commandLine)
 #endif
 
 	afterInit();
+
+	engine->parseCommandline(commandLine);
+
+	if (!engine->getFile().existsAsFile()) {
+		if (GlobalSettings::getInstance()->openLastDocumentOnStartup->boolValue())  Engine::mainEngine->loadFrom(Engine::mainEngine->getLastDocumentOpened(), true);
+		else if (GlobalSettings::getInstance()->openSpecificFileOnStartup->boolValue() && GlobalSettings::getInstance()->fileToOpenOnStartup->stringValue().isNotEmpty())  Engine::mainEngine->loadFrom(File(GlobalSettings::getInstance()->fileToOpenOnStartup->stringValue()), true);
+		else
+		{
+			engine->createNewGraph();
+			engine->setChangedFlag(false);
+		}
+	}
 
 #if TEST_CRASH
 	Engine* n = nullptr;
