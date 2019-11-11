@@ -36,8 +36,9 @@ GlobalSettings::GlobalSettings() :
 	
 	openLastDocumentOnStartup = startupCC.addBoolParameter("Load last "+(Engine::mainEngine != nullptr?Engine::mainEngine->fileExtension:"")+" on startup", "If enabled, app will load the last " + Engine::mainEngine->fileExtension + " on startup", false);
 	openSpecificFileOnStartup = startupCC.addBoolParameter("Load specific "+(Engine::mainEngine != nullptr?Engine::mainEngine->fileExtension:"")+" on startup", "If enabled, app will load the " + Engine::mainEngine->fileExtension + " specified below on startup", false,false);
-	 
 	fileToOpenOnStartup = new FileParameter("File to load on startup", "File to load when start, if the option above is checked", "", false);
+	fileToOpenOnStartup->forceAbsolutePath = true;
+
 	startupCC.addParameter(fileToOpenOnStartup);
 	
 

@@ -45,7 +45,7 @@ public:
 	BoolParameter * updateHelpOnStartup;
 	BoolParameter * openLastDocumentOnStartup;
 	BoolParameter * openSpecificFileOnStartup;
-	StringParameter * fileToOpenOnStartup;
+	FileParameter * fileToOpenOnStartup;
 
 
 	ControllableContainer interfaceCC;
