@@ -166,6 +166,7 @@ void StringParameterFileUI::resizedInternal(juce::Rectangle<int> &r)
 
 void StringParameterFileUI::feedbackStateChanged()
 {
+	StringParameterUI::feedbackStateChanged();
 	browseBT.setEnabled(isInteractable());
 	if (relativeBT != nullptr) relativeBT->setEnabled(isInteractable());
 }
@@ -208,6 +209,7 @@ StringParameterTextUI::StringParameterTextUI(Parameter * p) :
 
 void StringParameterTextUI::feedbackStateChanged()
 {
+	ParameterUI::feedbackStateChanged();
 	editor.setColour(editor.textColourId, isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f));
 	editor.setEnabled(isInteractable());
 }
