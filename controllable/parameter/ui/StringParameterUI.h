@@ -64,6 +64,7 @@ public:
 	std::unique_ptr<ImageButton> relativeBT;
 
 	void resizedInternal(juce::Rectangle<int> &r) override;
+	virtual void feedbackStateChanged() override;
 
 	void buttonClicked(Button * b) override;
 };

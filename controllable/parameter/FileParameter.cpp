@@ -13,7 +13,8 @@
 FileParameter::FileParameter(const String & niceName, const String &description, const String & initialValue, bool enabled) :
     StringParameter(niceName, description, initialValue, enabled),
 	customBasePath(""),
-    forceRelativePath(false)
+    forceRelativePath(false),
+	forceAbsolutePath(false)
 
 {
 	defaultUI = FILE; 
@@ -35,7 +36,7 @@ void FileParameter::setValueInternal(var &newVal)
 		else absolutePath = getBasePath().getChildFile(value.toString()).getFullPathName();
 
 		File f = File::createFileWithoutCheckingPath(absolutePath);
-		if (f.existsAsFile() && (isRelativePath(newVal.toString()) || forceRelativePath))
+		if (f.existsAsFile() && !forceAbsolutePath && (isRelativePath(newVal.toString()) || forceRelativePath))
 		{
 			value = File(absolutePath).getRelativePathFrom(getBasePath()).replace("\\", "/");
 		}

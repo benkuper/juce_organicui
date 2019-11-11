@@ -134,15 +134,19 @@ StringParameterFileUI::StringParameterFileUI(Parameter * p) :
 	fp((FileParameter *)p),
 	browseBT("Browse...")
 {
-	relativeBT.reset(AssetManager::getInstance()->getToggleBTImage(AssetManager::getInstance()->getRelativeImage()));
-	relativeBT->setToggleState(fp->forceRelativePath, dontSendNotification);
 	browseBT.addListener(this);
 	browseBT.setEnabled(isInteractable());
-	relativeBT->addListener(this); 
-	relativeBT->setEnabled(isInteractable());
-	
 	addAndMakeVisible(&browseBT);
-	addAndMakeVisible(relativeBT.get());
+
+	if (!fp->forceRelativePath)
+	{
+		relativeBT.reset(AssetManager::getInstance()->getToggleBTImage(AssetManager::getInstance()->getRelativeImage()));
+		relativeBT->addListener(this);
+		relativeBT->setToggleState(fp->forceRelativePath, dontSendNotification);
+		relativeBT->setEnabled(isInteractable());
+		addAndMakeVisible(relativeBT.get());
+	}
+
 }
 
 StringParameterFileUI::~StringParameterFileUI()
@@ -151,9 +155,19 @@ StringParameterFileUI::~StringParameterFileUI()
 
 void StringParameterFileUI::resizedInternal(juce::Rectangle<int> &r)
 {
-	relativeBT->setBounds(r.removeFromRight(r.getHeight()));
-	r.removeFromRight(2);
+	if (relativeBT != nullptr)
+	{
+		relativeBT->setBounds(r.removeFromRight(r.getHeight()));
+		r.removeFromRight(2);
+	}
+
 	browseBT.setBounds(r.removeFromRight(60));
+}
+
+void StringParameterFileUI::feedbackStateChanged()
+{
+	browseBT.setEnabled(isInteractable());
+	if (relativeBT != nullptr) relativeBT->setEnabled(isInteractable());
 }
 
 void StringParameterFileUI::buttonClicked(Button * b)
@@ -170,7 +184,7 @@ void StringParameterFileUI::buttonClicked(Button * b)
 		{
 			parameter->setUndoableValue(parameter->stringValue(), chooser.getResult().getFullPathName());
 		}
-	} else if (b == relativeBT.get())
+	} else if (relativeBT != nullptr && b == relativeBT.get())
 	{
 		fp->setForceRelativePath(!fp->forceRelativePath);
 	}
