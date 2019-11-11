@@ -16,17 +16,22 @@ ScriptEditor::ScriptEditor(Script * _script, bool isRoot) :
 	script->addAsyncScriptListener(this);
 
 	reloadBT.reset(script->reload->createImageUI(AssetManager::getInstance()->getReloadImage()));
-	editBT.reset(AssetManager::getInstance()->getEditBT());
+	
+	if (!script->filePath->isControllableFeedbackOnly)
+	{
+		editBT.reset(AssetManager::getInstance()->getEditBT());
+		editBT->addListener(this);
+		addAndMakeVisible(editBT.get());
+	}
+
 	logUI.reset(script->logParam->createToggle());
 
-	editBT->addListener(this);
 
 	paramsEditor.reset(script->scriptParamsContainer.getEditor(false));
 	addChildComponent(paramsEditor.get());
 	paramsEditor->setVisible(script->scriptParamsContainer.controllables.size() > 0);
 
 	addAndMakeVisible(reloadBT.get());
-	addAndMakeVisible(editBT.get());
 	addAndMakeVisible(logUI.get());
 }
 
@@ -71,7 +76,8 @@ void ScriptEditor::resizedInternalHeaderItemInternal(juce::Rectangle<int>& r)
 	r.removeFromRight(2);
 	reloadBT->setBounds(r.removeFromRight(r.getHeight()).reduced(2));
 	r.removeFromRight(2);
-	editBT->setBounds(r.removeFromRight(r.getHeight()).reduced(2));
+
+	if (editBT != nullptr) editBT->setBounds(r.removeFromRight(r.getHeight()).reduced(2));
 	r.removeFromRight(2);
 }
 
