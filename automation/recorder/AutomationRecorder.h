@@ -46,7 +46,6 @@ public:
 
 	InspectableEditor * getEditor(bool isRoot) override;
 
-private:
-	Array<Point<float>> getSimplifiedKeys(Array<Point<float>> arr, float epsilon);
-	const std::pair<int, float> findMaximumDistance(Array<Point<float>> arr);
+	static Array<Point<float>> getSimplifiedKeys(Array<Point<float>> arr, float epsilon);
+	static const std::pair<int, float> findMaximumDistance(Array<Point<float>> arr);
 };
