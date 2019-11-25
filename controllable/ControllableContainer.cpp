@@ -666,10 +666,19 @@ void ControllableContainer::dispatchFeedback(Controllable * c)
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableFeedbackUpdate, this, c));
 }
 
+void ControllableContainer::dispatchState(Controllable* c)
+{
+	if (parentContainer != nullptr) { parentContainer->dispatchState(c); }
+	if (!c->isControllableExposed) return;
+
+	controllableContainerListeners.call(&ControllableContainerListener::controllableStateUpdate, this, c);
+	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableStateUpdate, this, c));
+}
+
 
 void ControllableContainer::controllableStateChanged(Controllable* c)
 {
-	if (c->parentContainer == this) dispatchFeedback(c);
+	if (c->parentContainer == this) dispatchState(c);
 }
 
 void ControllableContainer::parameterValueChanged(Parameter * p)

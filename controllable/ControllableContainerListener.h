@@ -13,7 +13,8 @@ public:
 	virtual void controllableRemoved(Controllable *) {}
 	virtual void controllableContainerAdded(ControllableContainer *) {}
 	virtual void controllableContainerRemoved(ControllableContainer *) {}
-	virtual void controllableFeedbackUpdate(ControllableContainer *, Controllable *) {}
+	virtual void controllableFeedbackUpdate(ControllableContainer*, Controllable*) {}
+	virtual void controllableStateUpdate(ControllableContainer *, Controllable *) {}
 	virtual void childStructureChanged(ControllableContainer *) {}
 	virtual void childAddressChanged(ControllableContainer *) {};
 	//virtual void controllableContainerPresetLoaded(ControllableContainer *) {}
@@ -31,6 +32,7 @@ public:
 		ControllableContainerAdded,
 		ControllableContainerRemoved,
 		ControllableFeedbackUpdate,
+		ControllableStateUpdate,
 		ChildStructureChanged,
 		ChildAddressChanged,
 		ControllableContainerPresetLoaded,

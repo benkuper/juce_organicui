@@ -14,4 +14,5 @@ public:
 	virtual void updateUIParameters() override;
 	
 	virtual void controllableFeedbackUpdateInternal(Controllable* c) override;
+	virtual void controllableStateUpdateInternal(Controllable* c) override;
 };

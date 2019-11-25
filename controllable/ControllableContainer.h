@@ -119,7 +119,8 @@ public:
 
 	void orderControllablesAlphabetically();
 
-	void dispatchFeedback(Controllable * c);
+	void dispatchFeedback(Controllable* c);
+	void dispatchState(Controllable * c);
 
 	virtual void controllableStateChanged(Controllable* c) override;
 	virtual void parameterValueChanged(Parameter * p) override;

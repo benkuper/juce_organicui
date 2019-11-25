@@ -95,3 +95,18 @@ void DashboardControllableItemUI::controllableFeedbackUpdateInternal(Controllabl
 		updateUIParameters();
 	}
 }
+
+void DashboardControllableItemUI::controllableStateUpdateInternal(Controllable* c)
+{
+	if (c == controllableItem->showLabel
+		|| c == controllableItem->textColor
+		|| c == controllableItem->customLabel
+		|| c == controllableItem->customDescription
+		|| c == controllableItem->opaqueBackground
+		|| c == controllableItem->contourColor
+		|| c == controllableItem->contourThickness
+		)
+	{
+		updateUIParameters();
+	}
+}

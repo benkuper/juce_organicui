@@ -58,7 +58,8 @@ public:
 	virtual void newMessage(const ContainerAsyncEvent &e) override;
 
 	virtual void containerChildAddressChangedAsync(ControllableContainer *) {}
-	virtual void controllableFeedbackUpdateInternal(Controllable *);
+	virtual void controllableFeedbackUpdateInternal(Controllable*);
+	virtual void controllableStateUpdateInternal(Controllable*) {}
 
 	//Drag drop container
 	virtual bool canStartDrag(const MouseEvent &e);
@@ -195,6 +196,12 @@ void BaseItemMinimalUI<T>::newMessage(const ContainerAsyncEvent & e)
 		}
 
 		controllableFeedbackUpdateInternal(e.targetControllable);
+	}
+	break;
+
+	case ContainerAsyncEvent::ControllableStateUpdate:
+	{
+		controllableStateUpdateInternal(e.targetControllable);
 	}
 	break;
 
