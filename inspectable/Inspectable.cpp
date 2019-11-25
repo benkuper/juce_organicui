@@ -1,14 +1,4 @@
 #include "Inspectable.h"
-/*
-  ==============================================================================
-
-	Inspectable.cpp
-	Created: 30 Oct 2016 9:02:24am
-	Author:  bkupe
-
-  ==============================================================================
-*/
-
 
 Inspectable::Inspectable() :
 	selectionManager(nullptr), //default nullptr will target main selectionManager
@@ -98,10 +88,6 @@ void Inspectable::highlightLinkedInspectables(bool value)
 void Inspectable::registerLinkedInspectable(WeakReference<Inspectable> i, bool setAlsoInOtherInspectable)
 {
 	if (i.wasObjectDeleted()) return;
-	if (dynamic_cast<SequenceLayer*>(this) != nullptr)
-	{
-		DBG("Register inspectable ");
-	}
 
 	linkedInspectables.addIfNotAlreadyThere(i);
 	if (setAlsoInOtherInspectable) i->registerLinkedInspectable(this, false);
