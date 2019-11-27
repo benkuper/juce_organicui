@@ -193,6 +193,9 @@ void BaseItemMinimalUI<T>::newMessage(const ContainerAsyncEvent & e)
 		{
 			if (baseItem->canBeDisabled && dimAlphaOnDisabled) setAlpha(baseItem->enabled->boolValue() ? 1 : .5f);
 			repaint();
+		}else if(e.targetControllable  == baseItem->viewUIPosition)
+		{
+			itemMinimalUIListeners.call(&ItemMinimalUIListener::itemUIViewPositionChanged, this);
 		}
 
 		controllableFeedbackUpdateInternal(e.targetControllable);
@@ -219,10 +222,7 @@ void BaseItemMinimalUI<T>::newMessage(const ContainerAsyncEvent & e)
 template<class T>
 void BaseItemMinimalUI<T>::controllableFeedbackUpdateInternal(Controllable * c)
 {
-	if (c == item->viewUIPosition)
-	{
-		itemMinimalUIListeners.call(&ItemMinimalUIListener::itemUIViewPositionChanged, this);
-	}
+	
 }
 
 template<class T>

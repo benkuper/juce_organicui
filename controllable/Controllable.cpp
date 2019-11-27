@@ -90,6 +90,7 @@ void Controllable::setCustomShortName(const String & _shortName)
 void Controllable::setAutoShortName() {
 	hasCustomShortName = false;
 	shortName = StringUtil::toShortName(niceName, replaceSlashesInShortName);
+	if (shortName.isEmpty()) shortName = "***";
 	scriptTargetName = shortName;
 	updateControlAddress();
 	listeners.call(&Listener::controllableNameChanged, this);

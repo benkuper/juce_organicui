@@ -124,6 +124,7 @@ public:
 	virtual void resized() override;
 	virtual void resizedInternalHeader(juce::Rectangle<int> &r);
 	virtual void resizedInternalContent(juce::Rectangle<int> &r);
+	virtual void placeItems(juce::Rectangle<int>& r);
 	virtual void resizedInternalFooter(juce::Rectangle<int> &r);
 
 	virtual void updateItemsVisibility();
@@ -420,7 +421,6 @@ void BaseManagerUI<M, T, U>::resizedInternalHeader(juce::Rectangle<int>& r)
 template<class M, class T, class U>
 void BaseManagerUI<M, T, U>::resizedInternalContent(juce::Rectangle<int>& r)
 {
-
 	if (addItemBT != nullptr && addItemBT->isVisible() && addItemBT->getParentComponent() == this)
 	{
 		if (defaultLayout == VERTICAL)
@@ -444,42 +444,10 @@ void BaseManagerUI<M, T, U>::resizedInternalContent(juce::Rectangle<int>& r)
 		r.setY(0);
 	}
 
-	int i = 0;
-	for (auto &ui : itemsUI)
-	{
-		BaseItemMinimalUI<T> * bui = static_cast<BaseItemMinimalUI<T>*>(ui);
-
-		juce::Rectangle<int> tr;
-		if (defaultLayout == VERTICAL)
-		{
-			tr = r.withHeight(bui->getHeight());
-		} else
-		{
-
-
-			tr = r.withWidth(bui->getWidth());
-		}
-
-		/*juce::Rectangle<int> vr = this->getLocalArea(&container, tr);
-		if (defaultLayout == VERTICAL && (vr.getY() > viewport.getBounds().getBottom() - 20 || vr.getBottom() < viewport.getY() + 20))
-		{
-			bui->setVisible(false);
-		} else
-		{
-			bui->setVisible(true);
-		}*/
-
-		if (tr != bui->getBounds()) bui->setBounds(tr);
-
-		if (defaultLayout == VERTICAL) r.translate(0, tr.getHeight() + gap);
-		else r.translate(tr.getWidth() + gap, 0);
-
-		i++;
-	}
+	placeItems(r);
 
 	if (useViewport || resizeOnChildBoundsChanged)
 	{
-
 		if (defaultLayout == VERTICAL)
 		{
 			float th = 0;
@@ -496,6 +464,27 @@ void BaseManagerUI<M, T, U>::resizedInternalContent(juce::Rectangle<int>& r)
 			if (useViewport) container.setSize(tw, getHeight());
 			else this->setSize(tw, getHeight());
 		}
+	}
+}
+
+template<class M, class T, class U>
+void BaseManagerUI<M, T, U>::placeItems(juce::Rectangle<int>& r)
+{
+	int i = 0;
+	for (auto& ui : itemsUI)
+	{
+		BaseItemMinimalUI<T>* bui = static_cast<BaseItemMinimalUI<T>*>(ui);
+
+		juce::Rectangle<int> tr;
+		if (defaultLayout == VERTICAL) tr = r.withHeight(bui->getHeight());
+		else tr = r.withWidth(bui->getWidth());
+
+		if (tr != bui->getBounds()) bui->setBounds(tr);
+
+		if (defaultLayout == VERTICAL) r.translate(0, tr.getHeight() + gap);
+		else r.translate(tr.getWidth() + gap, 0);
+
+		i++;
 	}
 }
 
