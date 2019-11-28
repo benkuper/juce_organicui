@@ -124,22 +124,27 @@ template<class T>
 void BaseItemMinimalUI<T>::mouseDrag(const MouseEvent & e)
 {
 	InspectableContentComponent::mouseDrag(e);
-	if (!dragAndDropEnabled || isDragAndDropActive() || !canStartDrag(e)) return;
 
-	var desc = var(new DynamicObject());
-	desc.getDynamicObject()->setProperty("type", baseItem->getTypeString());
-	desc.getDynamicObject()->setProperty("dataType", baseItem->itemDataType);
-	desc.getDynamicObject()->setProperty("initX", baseItem->viewUIPosition->x);
-	desc.getDynamicObject()->setProperty("initY", baseItem->viewUIPosition->y);
-	desc.getDynamicObject()->setProperty("offsetX", (int)(getMouseXYRelative().x * viewZoom));
-	desc.getDynamicObject()->setProperty("offsetY", (int)(getMouseXYRelative().y * viewZoom));
-	
-	Image dragImage = this->createComponentSnapshot(this->getLocalBounds()).convertedToFormat(Image::ARGB).rescaled(this->getWidth()*this->viewZoom, this->getHeight()*this->viewZoom);
-	dragImage.multiplyAllAlphas(drawEmptyDragIcon?0:.5f);
+	if (e.mods.isLeftButtonDown())
+	{
+		if (!dragAndDropEnabled || isDragAndDropActive() || !canStartDrag(e)) return;
 
-	Point<int> offset = -getMouseXYRelative()*viewZoom;
-	if (e.getDistanceFromDragStart() > dragStartDistance) startDragging(desc, this,dragImage, true, &offset);
+		var desc = var(new DynamicObject());
+		desc.getDynamicObject()->setProperty("type", baseItem->getTypeString());
+		desc.getDynamicObject()->setProperty("dataType", baseItem->itemDataType);
+		desc.getDynamicObject()->setProperty("initX", baseItem->viewUIPosition->x);
+		desc.getDynamicObject()->setProperty("initY", baseItem->viewUIPosition->y);
+		desc.getDynamicObject()->setProperty("offsetX", (int)(getMouseXYRelative().x * viewZoom));
+		desc.getDynamicObject()->setProperty("offsetY", (int)(getMouseXYRelative().y * viewZoom));
+
+		Image dragImage = this->createComponentSnapshot(this->getLocalBounds()).convertedToFormat(Image::ARGB).rescaled(this->getWidth() * this->viewZoom, this->getHeight() * this->viewZoom);
+		dragImage.multiplyAllAlphas(drawEmptyDragIcon ? 0 : .5f);
+
+		Point<int> offset = -getMouseXYRelative() * viewZoom;
+		if (e.getDistanceFromDragStart() > dragStartDistance) startDragging(desc, this, dragImage, true, &offset);
+	}
 }
+	
 
 
 template<class T>
