@@ -11,6 +11,22 @@ WarningTarget::WarningTarget() :
 WarningTarget::~WarningTarget()
 {
 	clearWarning();
+	
+	if (warningTargetNotifier.isUpdatePending())
+	{
+		warningTargetNotifier.triggerAsyncUpdate();
+		uint32 t = Time::getApproximateMillisecondCounter();
+		while (warningTargetNotifier.isUpdatePending())
+		{
+			if (Time::getApproximateMillisecondCounter() - t > 1000)
+			{
+				jassertfalse;
+				break;
+			}
+		}
+		warningTargetNotifier.cancelPendingUpdate();
+	}
+
 	masterReference.clear();
 }
 
