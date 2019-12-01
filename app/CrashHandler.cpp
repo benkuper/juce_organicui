@@ -25,6 +25,9 @@ char * dumpFileName = (char *)"notset.dmp";
 
 juce_ImplementSingleton(CrashDumpUploader)
 
+OrganicApplication::MainWindow* getMainWindow();
+
+
 CrashDumpUploader::CrashDumpUploader() :
 	Thread("Crashdump"),
 	uploadEnabled(true),
@@ -37,7 +40,7 @@ CrashDumpUploader::~CrashDumpUploader()
 {
 }
 
-bool CrashDumpUploader::init()
+bool CrashDumpUploader::init(bool autoUpload, bool showWindow)
 {
 
 #if JUCE_WINDOWS
@@ -54,7 +57,15 @@ bool CrashDumpUploader::init()
     if (crashFile.existsAsFile())
     {
         LOGWARNING("Crash log found, sending to Houston...");
-        startThread();
+		if (autoUpload)
+		{
+			if (showWindow)
+			{
+				UploadWindow w;
+				DialogWindow::showModalDialog("Crash found !", &w, getMainWindow(), Colours::black, true);
+			}
+			startThread();
+		}
 		crashFound = true;
 		return true;
     }
@@ -83,6 +94,7 @@ void CrashDumpUploader::uploadDump()
 	URL url = remoteURL.withParameter("username", SystemStats::getFullUserName().replace(" ","-"))
 		.withParameter("os", SystemStats::getOperatingSystemName().replace(" ","-"))
 		.withParameter("version", getAppVersion())
+		.withParameter("message", crashMessage.isNotEmpty()?crashMessage:"No message")
 #if JUCE_DEBUG
 		.withParameter("branch", "debug")
 #else
@@ -190,3 +202,48 @@ void createStackTrace(int signum)
 }
 
 #endif
+
+CrashDumpUploader::UploadWindow::UploadWindow() :
+	okBT("OK")
+{
+	okBT.addListener(this);
+
+	addAndMakeVisible(&editor);
+	editor.setColour(editor.backgroundColourId, BG_COLOR.brighter(.3f));
+	editor.setColour(editor.textColourId, TEXT_COLOR);
+	editor.setColour(editor.outlineColourId, BG_COLOR.brighter(.6f));
+	editor.setTextToShowWhenEmpty("Your super comprehensive yet fun explanation here. You can write love messages as well, but only if you mean it.", BG_COLOR.brighter(.6f));
+	editor.setMultiLine(true);
+	editor.setReturnKeyStartsNewLine(true);
+
+	addAndMakeVisible(&okBT);
+	setSize(800, 600);
+
+}
+
+CrashDumpUploader::UploadWindow::~UploadWindow()
+{
+
+}
+
+void CrashDumpUploader::UploadWindow::paint(Graphics& g)
+{
+	g.drawImage(CrashDumpUploader::getInstance()->crashImage,getLocalBounds().toFloat());
+}
+
+void CrashDumpUploader::UploadWindow::resized()
+{
+	juce::Rectangle<int> r = getLocalBounds().removeFromBottom(getHeight() / 2);
+	okBT.setBounds(r.removeFromBottom(30).withSizeKeepingCentre(100, 20));
+	editor.setBounds(r.reduced(20));
+}
+
+void CrashDumpUploader::UploadWindow::buttonClicked(Button* bt)
+{
+	if (bt == &okBT)
+	{
+		CrashDumpUploader::getInstance()->crashMessage = editor.getText();
+		if(DialogWindow * dw = findParentComponentOfClass<DialogWindow>())
+			dw->exitModalState(0);
+	}
+}
