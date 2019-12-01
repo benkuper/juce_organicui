@@ -342,11 +342,12 @@ void Engine::loadJSONData(var data, ProgressTask * loadingTask)
 	ProgressTask * projectTask = loadingTask->addTask("Project Settings");
 	ProgressTask * dashboardTask = loadingTask->addTask("Dashboard");
 
-	loadJSONDataInternalEngine(data, loadingTask);
 
 	projectTask->start();
 	if (d->hasProperty("projectSettings")) ProjectSettings::getInstance()->loadJSONData(d->getProperty("projectSettings"));
 	projectTask->end();
+
+	loadJSONDataInternalEngine(data, loadingTask);
 
 	dashboardTask->start();
 	if (d->hasProperty("dashboardManager")) DashboardManager::getInstance()->loadJSONData(d->getProperty("dashboardManager"));
