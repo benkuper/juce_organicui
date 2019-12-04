@@ -126,7 +126,6 @@ void Script::loadScript()
 		NLOG("Script : " + niceName, "Script loaded succesfully");
 		scriptParamsContainer.loadJSONData(paramsContainerData); //keep overriden values
 		paramsContainerData = var();
-		callFunction("init", Array<var>());
 
 		setState(SCRIPT_LOADED);
 		clearWarning();
@@ -142,6 +141,8 @@ void Script::loadScript()
 	const NamedValueSet props = scriptEngine->getRootObjectProperties();
 	updateEnabled = props.contains(updateIdentifier);
 	updateRate->hideInEditor = !updateEnabled;
+
+	callFunction("init", Array<var>());
 
 	if (updateEnabled)
 	{
