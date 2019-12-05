@@ -64,8 +64,8 @@ void GradientColorUI::mouseDown(const MouseEvent & e)
 		GradientColor::Interpolation i = item->interpolation->getValueDataAsEnum<GradientColor::Interpolation>();
 		PopupMenu p;
 		PopupMenu ip;
-		ip.addItem(1, "Linear", i == GradientColor::LINEAR);
-		ip.addItem(2, "None", i == GradientColor::NONE);
+		ip.addItem(1, "Linear",true, i == GradientColor::LINEAR);
+		ip.addItem(2, "None", true, i == GradientColor::NONE);
 		p.addSubMenu("Interpolation", ip);
 		int result = p.show();
 		switch (result)
