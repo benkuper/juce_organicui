@@ -18,6 +18,7 @@ GradientColorUI::GradientColorUI(GradientColor * item) :
 	colorUI.reset(item->color->createColorParamUI());
 	addAndMakeVisible(colorUI.get());
 	//colorUI->addMouseListener(this, false); //why ??
+	colorUI->showMenuOnRightClick = false;
 }
 
 GradientColorUI::~GradientColorUI()
@@ -49,11 +50,29 @@ void GradientColorUI::resized()
 
 void GradientColorUI::mouseDown(const MouseEvent & e)
 {
-	BaseItemMinimalUI::mouseDown(e);
 	posAtMouseDown = item->position->floatValue();
+	BaseItemMinimalUI::mouseDown(e);
+	
 	if (e.mods.isCommandDown())
 	{
 		item->interpolation->setNext(true, true);
+	}
+	else if (e.mods.isRightButtonDown())
+	{
+		//Need to fix multi level
+		
+		GradientColor::Interpolation i = item->interpolation->getValueDataAsEnum<GradientColor::Interpolation>();
+		PopupMenu p;
+		PopupMenu ip;
+		ip.addItem(1, "Linear", i == GradientColor::LINEAR);
+		ip.addItem(2, "None", i == GradientColor::NONE);
+		p.addSubMenu("Interpolation", ip);
+		int result = p.show();
+		switch (result)
+		{
+		case 1: item->interpolation->setValueWithData(GradientColor::LINEAR); break;
+		case 2: item->interpolation->setValueWithData(GradientColor::NONE); break;
+		}
 	}
 }
 
