@@ -179,7 +179,7 @@ void ParameterUI::handleMenuSelectedID(int id)
 
 void ParameterUI::mouseDoubleClick(const MouseEvent & e)
 {
-	if (showEditWindowOnDoubleClick) showEditWindow();
+	if (showEditWindowOnDoubleClick && !e.mods.isAnyModifierKeyDown()) showEditWindow();
 }
 
 bool ParameterUI::isInteractable()
