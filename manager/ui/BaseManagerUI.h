@@ -314,7 +314,7 @@ void BaseManagerUI<M, T, U>::mouseDown(const MouseEvent & e)
 
 	if (e.mods.isLeftButtonDown())
 	{
-	} else if (e.mods.isRightButtonDown())
+	} else if (e.mods.isRightButtonDown() && e.eventComponent == this)
 	{
 		if (manager->userCanAddItemsManually) showMenuAndAddItem(false, e.getEventRelativeTo(this).getMouseDownPosition());
 	}
