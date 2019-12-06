@@ -8,7 +8,7 @@
   ==============================================================================
 */
 
-AutomationEditor::AutomationEditor(Automation * automation, bool isRoot) :
+AutomationEditor::AutomationEditor(AutomationBase * automation, bool isRoot) :
 	GenericControllableContainerEditor(automation, isRoot),
 	automation(automation),
 	automationUI(nullptr)
@@ -18,7 +18,7 @@ AutomationEditor::AutomationEditor(Automation * automation, bool isRoot) :
 		automationUI.reset(new AutomationUI(automation));
 
 		automationUI->bgColor = BG_COLOR;
-		automationUI->transparentBG = false;
+		automationUI->transparentBG = false;AutomationKeyBase
 		automationUI->autoResetViewRangeOnLengthUpdate = true;
 
 		addAndMakeVisible(automationUI.get());

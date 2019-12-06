@@ -10,8 +10,6 @@
 
 #pragma once
 
-
-
 class ParameterAutomation :
 	public BaseItem,
 	public Timer
@@ -56,6 +54,7 @@ public:
 	void loadJSONDataInternal(var data) override;
 };
 
+template<class T>
 class ParameterNumberAutomation :
 	public ParameterAutomation
 {
@@ -63,7 +62,7 @@ public:
 	ParameterNumberAutomation(Parameter* parameter, bool addDefaultItems = true);
 	~ParameterNumberAutomation() {}
 
-	Automation automation;
+	Automation<T> automation;
 
 	void setLength(float value, bool stretch = false, bool stickToEnd = false);
 	void setAllowKeysOutside(bool value);

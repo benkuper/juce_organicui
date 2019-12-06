@@ -10,17 +10,16 @@
 
 #pragma once
 
-
-class AutomationUI :
-	public BaseManagerUI<Automation,AutomationKey,AutomationKeyUI>,
+class AutomationTimelineUIBase :
+	public BaseManagerUI<AutomationBase,AutomationKeyBase,AutomationKeyTimelineUIBase>,
 	public ContainerAsyncListener,
 	public InspectableSelectionManager::Listener,
 	public Thread,
 	public Timer
 {
 public:
-	AutomationUI(Automation * _automation, Colour c = Colours::white);
-	virtual ~AutomationUI();
+	AutomationTimelineUIBase(AutomationBase * _automation);
+	virtual ~AutomationTimelineUIBase();
 	
 	//View optimisation, generate in thread a preview of the image
 	enum ViewMode { EDIT, VIEW };
@@ -44,10 +43,8 @@ public:
 
 	bool fixedPosOrValueEnabled; //When using shift key and moving handles, keep either position or value
 
-	Colour color;
-
-	AutomationKeyUI * currentUI;
-	std::unique_ptr<AutomationMultiKeyTransformer> transformer;
+	AutomationKeyTimelineUIBase * currentUI;
+	//std::unique_ptr<AutomationMultiKeyTransformer> transformer;
 
 	bool shouldRepaint;
 
@@ -62,7 +59,7 @@ public:
 	void paint(Graphics &g) override;
 	
 	void resized() override;
-	void placeKeyUI(AutomationKeyUI * kui, bool placePrevKUI = true);
+	void placeKeyUI(AutomationKeyTimelineUIBase * kui, bool placePrevKUI = true);
 
 	int getXForPos(float time);
 	float getPosForX(int tx, bool offsetStart = true);
@@ -70,17 +67,20 @@ public:
 	int getYForValue(float value);
 	float getValueForY(int ty);
 
-	bool isInView(AutomationKeyUI * kui);
+	bool isInView(AutomationKeyTimelineUIBase * kui);
 
-	AutomationKeyUI * getClosestKeyUIForPos(float pos, int start = - 1, int end = -1);
 
-	void itemAddedAsync(AutomationKey *) override;
+	AutomationKeyTimelineUIBase * getClosestKeyUIForPos(float pos, int start = - 1, int end = -1);
+
+	void itemAddedAsync(AutomationKeyBase *) override;
 	void itemsReorderedAsync() override;
 
-	AutomationKeyUI * createUIForItem(AutomationKey * item) override;
+	AutomationKeyTimelineUIBase * createUIForItem(AutomationKeyBase * item) override;
 	
-	void addItemUIInternal(AutomationKeyUI *) override;
-	void removeItemUIInternal(AutomationKeyUI *) override;
+	virtual void addItemFromMouse(const MouseEvent& e) = 0;
+
+	void addItemUIInternal(AutomationKeyTimelineUIBase *) override;
+	void removeItemUIInternal(AutomationKeyTimelineUIBase *) override;
 
 	void showMenuAndAddItem(bool, Point<int>) override {}; //no menu
 
@@ -100,10 +100,48 @@ public:
 
 	//Generate image thread
 	void run() override;
-
 	void timerCallback() override;
 
 private:
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AutomationUI)
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AutomationTimelineUIBase)
 
 };
+
+
+template<class T>
+class AutomationTimelineUI :
+	public AutomationTimelineUIBase
+{
+public:
+	AutomationTimelineUI(Automation<T> * automation);
+	~AutomationTimelineUI() {}
+
+	Automation<T> * typedManager;
+
+	virtual void addItemFromMouse(const MouseEvent &e) override;
+};
+
+template<class T>
+AutomationTimelineUI<T>::AutomationTimelineUI(Automation<T> * automation) :
+	AutomationTimelineUIBase(automation)
+{
+	typedManager = (Automation<T> *)manager;
+}
+
+template<>
+void AutomationTimelineUI<float>::addItemFromMouse(const MouseEvent& e)
+{
+	typedManager->addItem(getPosForX(e.getPosition().x), getValueForY(e.getPosition().y));
+}
+
+template<>
+void AutomationTimelineUI<Point<float>>::addItemFromMouse(const MouseEvent& e)
+{
+	typedManager->addItem(getPosForX(e.getPosition().x), Point<float>(getValueForY(e.getPosition().y),0));
+}
+
+template<>
+void AutomationTimelineUI<Vector3D<float>>::addItemFromMouse(const MouseEvent& e)
+{
+	typedManager->addItem(getPosForX(e.getPosition().x), Vector3D<float>(getValueForY(e.getPosition().y),0,0));
+}

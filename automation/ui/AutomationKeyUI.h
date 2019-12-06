@@ -10,12 +10,12 @@
 
 #pragma once
 
-class AutomationKeyUI :
-	public BaseItemMinimalUI<AutomationKey>
+class AutomationKeyTimelineUIBase :
+	public BaseItemMinimalUI<AutomationKeyBase>
 {
 public:
-	AutomationKeyUI(AutomationKey *, Colour c = Colours::white);
-	virtual ~AutomationKeyUI();
+	AutomationKeyTimelineUIBase(AutomationKeyBase *, Colour c = Colours::white);
+	virtual ~AutomationKeyTimelineUIBase();
     
 	Colour color;
     
@@ -32,7 +32,6 @@ public:
 	const static int handleSize = 6;
 	const static int handleClickZone = 10;
 
-	
     void setShowHandle(bool value);
 
 	class Handle :

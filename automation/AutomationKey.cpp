@@ -1,119 +1,75 @@
 /*
   ==============================================================================
 
-	AutomationKey.cpp
+	AutomationKeyBase.cpp
 	Created: 11 Dec 2016 1:22:20pm
 	Author:  Ben
 
   ==============================================================================
 */
 
-AutomationKey::AutomationKey(float minimumValue, float maximumValue) :
+AutomationKeyBase::AutomationKeyBase() :
 	BaseItem("Key",false)
 {
-	itemDataType = "AutomationKey";
+	itemDataType = "AutomationKeyBase";
 	hideEditorHeader = true;
 
 	position = addFloatParameter("Position", "Position of the key", 0);
 	position->defaultUI = FloatParameter::TIME;
-	value = addFloatParameter("Value", "Value of the key", 0, minimumValue, maximumValue);
 
 	easingType = addEnumParameter("EasingType", "Type of transition to the next key");
 
-	easingType->addOption("Linear", Easing::LINEAR);
-	easingType->addOption("Bezier", Easing::BEZIER);
-	easingType->addOption("Hold", Easing::HOLD);
-	easingType->addOption("Sine", Easing::SINE);
+	easingType->addOption("Linear", EasingBase::LINEAR);
+	easingType->addOption("Bezier", EasingBase::BEZIER);
+	easingType->addOption("Hold", EasingBase::HOLD);
+	easingType->addOption("Sine", EasingBase::SINE);
 
-	easingType->setValueWithData(Easing::LINEAR);
+	easingType->setValueWithData(EasingBase::LINEAR);
 	easingType->hideInEditor = true;
 	easingType->forceSaveValue = true;
 
 	canInspectChildContainers = false;
 
-	setEasing(Easing::LINEAR);
+	setEasing(EasingBase::LINEAR);
 
-	helpID = "AutomationKey";
+	helpID = "AutomationKeyBase";
 }
 
 
-AutomationKey::~AutomationKey()
+AutomationKeyBase::~AutomationKeyBase()
 {
 }
 
-void AutomationKey::setEasing(Easing::Type t)
+
+float AutomationKeyBase::getRelativePosition(float pos1, float pos2, float weight) const
 {
-
-	if (easing != nullptr)
-	{
-		if (easing->type == t) return;
-		removeChildControllableContainer(easing.get());
-	}
-
-	Easing* e = nullptr;
-	switch (t)
-	{
-	case Easing::LINEAR:
-		e = new LinearEasing();
-		break;
-
-	case Easing::HOLD:
-		e = new HoldEasing();
-		break;
-
-	case Easing::BEZIER:
-		e = new CubicEasing();
-		break;
-
-	case Easing::SINE:
-		e = new  SineEasing();
-		break;
-	}
-
-	easing.reset(e);
-
-	if (easing != nullptr)
-	{
-        easing->setSelectionManager(selectionManager);
-		addChildControllableContainer(easing.get());
-	}
+	return juce::jlimit<float>(jmap<float>(jmin(pos1, pos2), jmax(pos1, pos2), weight), 0, 1);
 }
 
-float AutomationKey::getValue(AutomationKey * nextKey, const float & _pos)
-{
 
-	float relPos = 0;
-	if(position->floatValue() < nextKey->position->floatValue()) relPos = jmap<float>(_pos, position->floatValue(), nextKey->position->floatValue(), 0, 1); 
-
-	if (relPos < 0) relPos = 0;
-	if (relPos > 1) relPos = 1;
-
-	return easing->getValue(value->floatValue(), nextKey->value->floatValue(), relPos);
-}
-
-void AutomationKey::setSelectionManager(InspectableSelectionManager * ism)
+void AutomationKeyBase::setSelectionManager(InspectableSelectionManager * ism)
 {
 	BaseItem::setSelectionManager(ism);
-	if (easing != nullptr) easing->setSelectionManager(ism);
+	if (easingBase != nullptr) easingBase->setSelectionManager(ism);
 }
 
-void AutomationKey::onContainerParameterChangedInternal(Parameter * p)
+void AutomationKeyBase::onContainerParameterChangedInternal(Parameter * p)
 {
 	if (p == easingType)
 	{
-		setEasing((Easing::Type)(int)easingType->getValueData());
+		setEasing((EasingBase::Type)(int)easingType->getValueData());
 	}
 }
 
-var AutomationKey::getJSONData()
+var AutomationKeyBase::getJSONData()
 {
 	var data = BaseItem::getJSONData();
-	if (easing != nullptr) data.getDynamicObject()->setProperty("easing", easing->getJSONData());
+	if (easingBase != nullptr) data.getDynamicObject()->setProperty("easing", easingBase->getJSONData());
 	return data;
 }
 
-void AutomationKey::loadJSONDataInternal(var data)
+void AutomationKeyBase::loadJSONDataInternal(var data)
 {
 	BaseItem::loadJSONDataInternal(data);
-	if (easing != nullptr) easing->loadJSONData(data.getProperty("easing", var()));
+	if (easingBase != nullptr) easingBase->loadJSONData(data.getProperty("easing", var()));
 }

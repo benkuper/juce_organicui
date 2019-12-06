@@ -1,3 +1,4 @@
+#include "EasingUI.h"
 /*
   ==============================================================================
 
@@ -10,10 +11,9 @@
 
 #pragma warning(disable:4244)
 
-EasingUI::EasingUI(Easing * e) :
+EasingTimelineUIBase::EasingTimelineUIBase(EasingBase * e) :
 	InspectableContentComponent(e),
-	easing(e),
-	y1(0),y2(0)
+	easingBase(e)
 {
 	autoDrawContourWhenSelected = false;
 	
@@ -22,78 +22,74 @@ EasingUI::EasingUI(Easing * e) :
 	setMouseClickGrabsKeyboardFocus(false);
 
 	setRepaintsOnMouseActivity(true);
-	easing->addAsyncContainerListener(this);
+	easingBase->addAsyncContainerListener(this);
 }
 
-EasingUI::~EasingUI()
+EasingTimelineUIBase::~EasingTimelineUIBase()
 {
-	if(!easing.wasObjectDeleted()) easing->removeAsyncContainerListener(this);
+	if(!easingBase.wasObjectDeleted()) easingBase->removeAsyncContainerListener(this);
 }
 
-void EasingUI::setKeyPositions(const int &k1, const int &k2)
+void EasingTimelineUIBase::setupDimensions(int num)
 {
-	y1 = k1;
-	y2 = k2;
-	generatePath();
-}
-
-void EasingUI::paint(Graphics &g)
-{
-	
-	Colour c = color;
-	if (easing.wasObjectDeleted()) return;
-	if (easing->isSelected) c = HIGHLIGHT_COLOR;
-	if (isMouseOver()) c = c.brighter();
-
-	g.setColour(c);
-	g.strokePath(drawPath, PathStrokeType(isMouseOver()?2:1));
-
-	//g.setColour(Colours::purple);
-	//g.strokePath(hitPath, PathStrokeType(2));
-
-	paintInternal(g);
-	
-}
-
-void EasingUI::resized()
-{
-	generatePath();
-}
-
-void EasingUI::generatePath()
-{
-	
-	drawPath.clear();
-	drawPath.startNewSubPath(0, y1); 
-	generatePathInternal();
-
-	if(drawPath.getLength()) buildHitPath();
-	
-}
-
-void EasingUI::generatePathInternal()
-{
-	autoGeneratePathWithPrecision();
-}
-
-void EasingUI::autoGeneratePathWithPrecision(int precision)
-{
-	if (getHeight() == 0) return;
-	if (precision == 0) precision = getWidth();
-	else precision = jmin(getWidth(), precision);
-
-	for (int i = 1; i <= precision; i++)
+	numDimensions = num;
+	drawPaths.clear();
+	hitPaths.clear();
+	y1.clear();
+	y2.clear();
+	for (int i = 0; i < numDimensions; i++)
 	{
-		float t = i*1.f / precision;
-		float v1 = 1 - (y1*1.f / getHeight());
-		float v2 = 1 - (y2*1.f / getHeight());
-		float v = easing->getValue(v1,v2, t);
-		drawPath.lineTo(t*getWidth(), (1-v)*getHeight());
-		
+		drawPaths.add(new Path());
+		hitPaths.add(new Path());
+		y1.add(0);
+		y2.add(0);
 	}
 }
 
-void EasingUI::buildHitPath()
+void EasingTimelineUIBase::paint(Graphics &g)
+{
+	
+	Colour c = color;
+	if (easingBase.wasObjectDeleted()) return;
+	if (easingBase->isSelected) c = HIGHLIGHT_COLOR;
+	if (isMouseOver()) c = c.brighter();
+
+	g.setColour(c);
+	for (auto& dp : drawPaths)
+	{
+		g.strokePath(*dp, PathStrokeType(isMouseOver() ? 2 : 1));
+	}
+		//g.setColour(Colours::purple);
+		//g.strokePath(hitPath, PathStrokeType(2));
+	paintInternal(g);
+}
+
+void EasingTimelineUIBase::resized()
+{
+	generatePaths();
+}
+
+void EasingTimelineUIBase::generatePaths()
+{
+	int index = 0;
+	for (auto& dp : drawPaths)
+	{
+		dp->clear();
+		dp->startNewSubPath(0, y1);
+		index++;
+	}
+
+	generatePathInternal(index);
+	buildHitPath(index);
+}
+
+void EasingTimelineUIBase::generatePathInternal(int index)
+{
+	autoGeneratePathWithPrecision(index);
+}
+
+
+void EasingTimelineUIBase::buildHitPath()
 {
 	Array<Point<float>> hitPoints;
 	
@@ -104,7 +100,10 @@ void EasingUI::buildHitPath()
 
 	const float margin = 5;
 
-	hitPath.clear();
+	for (auto& hp : hitPaths)
+	{
+
+	hp.clear();
 	Array<Point<float>> firstPoints;
 	Array<Point<float>> secondPoints;
 	for (int i = 0; i < hitPathPrecision; i++)
@@ -165,13 +164,13 @@ bool EasingUI::hitTest(int tx, int ty)
 }
 
 /*
-void EasingUI::resized()
+void EasingTimelineUIBase::resized()
 {
 	//
 }
 */
 
-void EasingUI::newMessage(const ContainerAsyncEvent & e)
+void EasingTimelineUIBase::newMessage(const ContainerAsyncEvent & e)
 {
 	if (e.type == ContainerAsyncEvent::ControllableFeedbackUpdate)
 	{
@@ -343,12 +342,12 @@ void CubicEasingUI::mouseDrag(const MouseEvent & e)
 }
 
 
-EasingUI::EasingHandle::EasingHandle() 
+EasingTimelineUIBase::EasingHandle::EasingHandle() 
 {
 	setRepaintsOnMouseActivity(true);
 }
 
-void EasingUI::EasingHandle::paint(Graphics & g)
+void EasingTimelineUIBase::EasingHandle::paint(Graphics & g)
 {
 	Colour c =LIGHTCONTOUR_COLOR;
 	if (isMouseOver()) c = c.brighter(.8f);

@@ -165,12 +165,14 @@ ParameterNumberAutomation::ParameterNumberAutomation(Parameter* parameter, bool 
 
 }
 
-void ParameterNumberAutomation::setLength(float value, bool stretch, bool stickToEnd)
+template<class T>
+void ParameterNumberAutomation<T>::setLength(float value, bool stretch, bool stickToEnd)
 {
 	automation.setLength(value, stretch, stickToEnd);
 }
 
-void ParameterNumberAutomation::setAllowKeysOutside(bool value)
+template<class T>
+void ParameterNumberAutomation<T>::setAllowKeysOutside(bool value)
 {
 	automation.allowKeysOutside = true;
 }

@@ -10,15 +10,15 @@
 
 #pragma once
 
-class AutomationEditor :
+class AutomationTimelineEditor :
 	public GenericControllableContainerEditor
 {
 public:
-	AutomationEditor(Automation * automation, bool isRoot);
-	~AutomationEditor();
+	AutomationTimelineEditor(AutomationBase * automation, bool isRoot);
+	~AutomationTimelineEditor();
 
-	Automation * automation;
-	std::unique_ptr<AutomationUI> automationUI;
+	AutomationBase * automation;
+	std::unique_ptr<AutomationUIBase> automationUI;
 
 	void resizedInternalContent(juce::Rectangle<int> &r) override;
 

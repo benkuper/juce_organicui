@@ -9,6 +9,8 @@
 */
 
 #pragma once  
+
+/*
 class AutomationUI;
 
 class AutomationMultiKeyTransformer :
@@ -41,3 +43,4 @@ public:
 	void mouseUp(const MouseEvent &e) override;
 };
 
+*/

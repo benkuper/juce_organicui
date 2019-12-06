@@ -1,7 +1,6 @@
-#include "AutomationUI.h"
 /*  ==============================================================================
 
-	AutomationUI.cpp
+	AutomationTimelineUIBase.cpp
 	Created: 11 Dec 2016 1:22:02pm
 	Author:  Ben
 
@@ -9,7 +8,7 @@
 */
 
 
-AutomationUI::AutomationUI(Automation * _automation, Colour c) :
+AutomationTimelineUIBase::AutomationTimelineUIBase(AutomationBase * _automation) :
 	BaseManagerUI("Automation", _automation, false),
 	Thread("AutomationViewGenerator"),
 	autoSwitchMode(false),
@@ -18,8 +17,8 @@ AutomationUI::AutomationUI(Automation * _automation, Colour c) :
 	autoResetViewRangeOnLengthUpdate(false),
 	currentPosition(0),
 	color(c),
-	currentUI(nullptr),
-	transformer(nullptr)
+	currentUI(nullptr)
+	//,transformer(nullptr)
 {
 
 	manager->selectionManager->addSelectionListener(this);
@@ -47,7 +46,7 @@ AutomationUI::AutomationUI(Automation * _automation, Colour c) :
 	startTimerHz(20);
 }
 
-AutomationUI::~AutomationUI()
+AutomationTimelineUIBase::~AutomationTimelineUIBase()
 {
 	if (!inspectable.wasObjectDeleted() && manager->selectionManager != nullptr)
 	{
@@ -59,29 +58,29 @@ AutomationUI::~AutomationUI()
 	stopThread(1000);
 }
 
-void AutomationUI::setCurrentPosition(const float &pos)
+void AutomationTimelineUIBase::setCurrentPosition(const float &pos)
 {
 	currentPosition = pos;
 	currentUI = getClosestKeyUIForPos(currentPosition);
 	shouldRepaint = true;
 }
 
-void AutomationUI::setCurrentValue(const float &val)
+void AutomationTimelineUIBase::setCurrentValue(const float &val)
 {
 	currentValue = val;
 	shouldRepaint = true;
 }
 
-void AutomationUI::setViewMode(ViewMode mode)
+void AutomationTimelineUIBase::setViewMode(ViewMode mode)
 {
 	if (viewMode == mode) return;
 	viewMode = mode;
 
-	if (transformer != nullptr)
-	{
-		removeChildComponent(transformer.get());
-		transformer = nullptr;
-	}
+	//if (transformer != nullptr)
+	//{
+	//	removeChildComponent(transformer.get());
+	//	transformer = nullptr;
+	//}
 
 	switch (viewMode)
 	{
@@ -105,7 +104,7 @@ void AutomationUI::setViewMode(ViewMode mode)
 	repaint();
 }
 
-void AutomationUI::setViewRange(float start, float end)
+void AutomationTimelineUIBase::setViewRange(float start, float end)
 {
 	if (viewStartPos == start && viewEndPos == end) return;
 
@@ -117,7 +116,7 @@ void AutomationUI::setViewRange(float start, float end)
 	shouldRepaint = true;
 }
 
-void AutomationUI::updateROI()
+void AutomationTimelineUIBase::updateROI()
 {
 	if (viewMode != EDIT) return;
 
@@ -152,7 +151,7 @@ void AutomationUI::updateROI()
 	resized();
 }
 
-void AutomationUI::paint(Graphics & g)
+void AutomationTimelineUIBase::paint(Graphics & g)
 {
 	BaseManagerUI::paint(g);
 
@@ -177,7 +176,7 @@ void AutomationUI::paint(Graphics & g)
 		
 		int ty = getYForValue(currentValue);
 		juce::Rectangle<int> vr = getLocalBounds().withTop(ty);
-		g.setColour(color.withAlpha(.1f));
+		g.setColour(Colours::white.withAlpha(.1f));
 		if(vr.getHeight() > 0) g.fillRect(vr);
 		
 
@@ -217,7 +216,7 @@ void AutomationUI::paint(Graphics & g)
 }
 
 
-void AutomationUI::resized()
+void AutomationTimelineUIBase::resized()
 {
 	if (inspectable.wasObjectDeleted()) return;
 
@@ -239,12 +238,12 @@ void AutomationUI::resized()
 		//itemsUI[i]->toBack(); // place each ui in front of its right : to be better
 	}
 
-	if (transformer != nullptr) transformer->updateBoundsFromKeys();
+	//if (transformer != nullptr) transformer->updateBoundsFromKeys();
 
 	shouldRepaint = true;//overkill? needed to have proper value feedback when creating ui and resizing for the first time
 }
 
-void AutomationUI::placeKeyUI(AutomationKeyUI * kui, bool placePrevKUI)
+void AutomationTimelineUIBase::placeKeyUI(AutomationKeyTimelineUIBase * kui, bool placePrevKUI)
 {
 
 	int index = itemsUI.indexOf(kui);
@@ -256,16 +255,16 @@ void AutomationUI::placeKeyUI(AutomationKeyUI * kui, bool placePrevKUI)
 
 	if (index < itemsUI.size() - 1)
 	{
-		AutomationKeyUI * nextKey = itemsUI[index + 1];
+		AutomationKeyTimelineUIBase * nextKey = itemsUI[index + 1];
 		int tx2 = getXForPos(nextKey->item->position->floatValue());
 		int ty2 = getYForValue(nextKey->item->value->floatValue());
 
-		//Rectangle<int> kr2 = Rectangle<int>(0, 0, AutomationKeyUI::handleClickZone, AutomationKeyUI::handleClickZone).withCentre(Point<int>(tx2, ty2));
-		kr = juce::Rectangle<int>(tx, 0, tx2 - tx, getHeight()).expanded(AutomationKeyUI::handleClickZone / 2, 0);
+		//Rectangle<int> kr2 = Rectangle<int>(0, 0, AutomationKeyTimelineUIBase::handleClickZone, AutomationKeyTimelineUIBase::handleClickZone).withCentre(Point<int>(tx2, ty2));
+		kr = juce::Rectangle<int>(tx, 0, tx2 - tx, getHeight()).expanded(AutomationKeyTimelineUIBase::handleClickZone / 2, 0);
 		kui->setKeyPositions(ty, ty2);
 	} else
 	{
-		kr = juce::Rectangle<int>(0, 0, AutomationKeyUI::handleClickZone, getHeight()).withPosition(tx - AutomationKeyUI::handleClickZone / 2, 0);
+		kr = juce::Rectangle<int>(0, 0, AutomationKeyTimelineUIBase::handleClickZone, getHeight()).withPosition(tx - AutomationKeyTimelineUIBase::handleClickZone / 2, 0);
 		kui->setKeyPositions(ty, 0);
 	}
 
@@ -277,13 +276,13 @@ void AutomationUI::placeKeyUI(AutomationKeyUI * kui, bool placePrevKUI)
 	}
 }
 
-int AutomationUI::getXForPos(float time)
+int AutomationTimelineUIBase::getXForPos(float time)
 {
 	if (viewStartPos == viewEndPos) return 0;
 	return (int)jmap<float>(time, viewStartPos, viewEndPos, 0, (float)getWidth());
 }
 
-float AutomationUI::getPosForX(int tx, bool offsetStart)
+float AutomationTimelineUIBase::getPosForX(int tx, bool offsetStart)
 {
 
 	float viewRange = viewEndPos - viewStartPos;
@@ -293,22 +292,22 @@ float AutomationUI::getPosForX(int tx, bool offsetStart)
 	return jmap<float>((float)tx, 0, (float)getWidth(), mapStart, mapStart + viewRange);
 }
 
-int AutomationUI::getYForValue(float value)
+int AutomationTimelineUIBase::getYForValue(float value)
 {
 	return (int)((1 - value)*(getHeight()-1));
 }
 
-float AutomationUI::getValueForY(int ty)
+float AutomationTimelineUIBase::getValueForY(int ty)
 {
 	return (1 - ty * 1.f / (getHeight()-1));
 }
 
-bool AutomationUI::isInView(AutomationKeyUI * kui)
+bool AutomationTimelineUIBase::isInView(AutomationKeyTimelineUIBase * kui)
 {
 	return kui->item->position->floatValue() >= viewStartPos && kui->item->position->floatValue() <= viewEndPos;
 }
 
-AutomationKeyUI * AutomationUI::getClosestKeyUIForPos(float pos, int start, int end)
+AutomationKeyTimelineUIBase * AutomationTimelineUIBase::getClosestKeyUIForPos(float pos, int start, int end)
 {
 	if (itemsUI.size() == 0) return nullptr;
 
@@ -336,42 +335,42 @@ AutomationKeyUI * AutomationUI::getClosestKeyUIForPos(float pos, int start, int 
 	}
 }
 
-void AutomationUI::itemAddedAsync(AutomationKey * k)
+void AutomationTimelineUIBase::itemAddedAsync(AutomationKeyBase * k)
 {
 	BaseManagerUI::itemAddedAsync(k);
 	updateROI();
 
 }
 
-void AutomationUI::itemsReorderedAsync()
+void AutomationTimelineUIBase::itemsReorderedAsync()
 {
 	BaseManagerUI::itemsReorderedAsync();
 	updateROI();
 }
 
-AutomationKeyUI * AutomationUI::createUIForItem(AutomationKey * item)
+AutomationKeyTimelineUIBase * AutomationTimelineUIBase::createUIForItem(AutomationKeyBase * item)
 {
-	return new AutomationKeyUI(item, color);
+	return new AutomationKeyTimelineUIBase(item, color);
 }
 
-void AutomationUI::addItemUIInternal(AutomationKeyUI * kui)
+void AutomationTimelineUIBase::addItemUIInternal(AutomationKeyTimelineUIBase * kui)
 {
 	kui->handle.addMouseListener(this, false);
 }
 
-void AutomationUI::removeItemUIInternal(AutomationKeyUI * kui)
+void AutomationTimelineUIBase::removeItemUIInternal(AutomationKeyTimelineUIBase * kui)
 {
-	if (transformer != nullptr)
-	{
-		removeChildComponent(transformer.get());
-		transformer = nullptr;
-	}
+	//if (transformer != nullptr)
+	//{
+	//	removeChildComponent(transformer.get());
+	//	transformer = nullptr;
+	//}
 
 	kui->handle.removeMouseListener(this);
 	updateROI();
 }
 
-void AutomationUI::mouseDown(const MouseEvent & e)
+void AutomationTimelineUIBase::mouseDown(const MouseEvent & e)
 {
 	BaseManagerUI::mouseDown(e);
 
@@ -379,7 +378,9 @@ void AutomationUI::mouseDown(const MouseEvent & e)
 	{
 		if (e.mods.isLeftButtonDown() && e.mods.isAltDown())
 		{
-			manager->addItem(getPosForX(e.getPosition().x), getValueForY(e.getPosition().y));
+
+			addItemFromMouse();
+
 			manager->reorderItems();
 		} else
 		{
@@ -391,11 +392,11 @@ void AutomationUI::mouseDown(const MouseEvent & e)
 				inspectables.add(i->inspectable);
 			}
 
-			if (transformer != nullptr)
-			{
-				removeChildComponent(transformer.get());
-				transformer = nullptr;
-			}
+			//if (transformer != nullptr)
+			//{
+			//	removeChildComponent(transformer.get());
+			//	transformer = nullptr;
+			//}
 
 			if (InspectableSelector::getInstance()) InspectableSelector::getInstance()->startSelection(this, selectables, inspectables, manager->selectionManager, !e.mods.isCommandDown() && !e.mods.isShiftDown());
 		}
@@ -403,13 +404,13 @@ void AutomationUI::mouseDown(const MouseEvent & e)
 	{
 		if (e.mods.isShiftDown())
 		{
-			AutomationKeyUI::Handle * kHandle = dynamic_cast<AutomationKeyUI::Handle *>(e.eventComponent);
+			AutomationKeyTimelineUIBase::Handle * kHandle = dynamic_cast<AutomationKeyTimelineUIBase::Handle *>(e.eventComponent);
 			if (kHandle != nullptr)
 			{
 				if (manager->selectionManager->currentInspectables.size() > 0)
 				{
-					AutomationKey * lastSelectedKey = dynamic_cast<AutomationKey *>(manager->selectionManager->currentInspectables[manager->selectionManager->currentInspectables.size() - 1].get());
-					AutomationKey * sKey = ((AutomationKeyUI *)kHandle->getParentComponent())->item;
+					AutomationKeyBase * lastSelectedKey = dynamic_cast<AutomationKeyBase*>(manager->selectionManager->currentInspectables[manager->selectionManager->currentInspectables.size() - 1].get());
+					AutomationKeyBase* sKey = ((AutomationKeyTimelineUIBase *)kHandle->getParentComponent())->item;
 
 					int i1 = manager->items.indexOf(lastSelectedKey);
 					int i2 = manager->items.indexOf(sKey);
@@ -429,7 +430,7 @@ void AutomationUI::mouseDown(const MouseEvent & e)
 
 }
 
-void AutomationUI::mouseDoubleClick(const MouseEvent & e)
+void AutomationTimelineUIBase::mouseDoubleClick(const MouseEvent & e)
 {
 	if (e.eventComponent == this)
 	{
@@ -438,18 +439,18 @@ void AutomationUI::mouseDoubleClick(const MouseEvent & e)
 	}
 }
 
-void AutomationUI::mouseDrag(const MouseEvent & e)
+void AutomationTimelineUIBase::mouseDrag(const MouseEvent & e)
 {
 	if (e.originalComponent == this)
 	{
 
 	} else
 	{
-		AutomationKeyUI::Handle * h = dynamic_cast<AutomationKeyUI::Handle *>(e.eventComponent);
+		AutomationKeyTimelineUIBase::Handle * h = dynamic_cast<AutomationKeyTimelineUIBase::Handle *>(e.eventComponent);
 
 		if (h != nullptr)
 		{
-			AutomationKeyUI * kui = static_cast<AutomationKeyUI *>(h->getParentComponent());
+			AutomationKeyTimelineUIBase * kui = static_cast<AutomationKeyTimelineUIBase *>(h->getParentComponent());
 			if (e.mods.isLeftButtonDown())
 			{
 				Point<int> mp = e.getEventRelativeTo(this).getPosition();
@@ -493,17 +494,17 @@ void AutomationUI::mouseDrag(const MouseEvent & e)
 	}
 }
 
-void AutomationUI::mouseUp(const MouseEvent & e)
+void AutomationTimelineUIBase::mouseUp(const MouseEvent & e)
 {
 	if (e.originalComponent == this)
 	{
 
 	} else
 	{
-		AutomationKeyUI::Handle * h = dynamic_cast<AutomationKeyUI::Handle *>(e.eventComponent);
+		AutomationKeyTimelineUIBase::Handle * h = dynamic_cast<AutomationKeyTimelineUIBase::Handle *>(e.eventComponent);
 		if (h != nullptr)
 		{
-			AutomationKeyUI * kui = static_cast<AutomationKeyUI *>(h->getParentComponent());
+			AutomationKeyTimelineUIBase * kui = static_cast<AutomationKeyTimelineUIBase *>(h->getParentComponent());
 			if (e.mods.isLeftButtonDown())
 			{
 
@@ -517,13 +518,13 @@ void AutomationUI::mouseUp(const MouseEvent & e)
 	}
 }
 
-bool AutomationUI::keyPressed(const KeyPress & e)
+bool AutomationTimelineUIBase::keyPressed(const KeyPress & e)
 {
 	return BaseManagerUI::keyPressed(e);
 	//return false;
 }
 
-void AutomationUI::newMessage(const ContainerAsyncEvent & e)
+void AutomationTimelineUIBase::newMessage(const ContainerAsyncEvent & e)
 {
 	if (e.type == ContainerAsyncEvent::EventType::ControllableFeedbackUpdate)
 	{
@@ -556,7 +557,7 @@ void AutomationUI::newMessage(const ContainerAsyncEvent & e)
 
 }
 
-void AutomationUI::inspectablesSelectionChanged()
+void AutomationTimelineUIBase::inspectablesSelectionChanged()
 {
 	if (transformer != nullptr)
 	{
@@ -564,7 +565,7 @@ void AutomationUI::inspectablesSelectionChanged()
 		transformer = nullptr;
 	}
 
-	Array<AutomationKeyUI *> uiSelection;
+	Array<AutomationKeyTimelineUIBase *> uiSelection;
 	if (manager->selectionManager->currentInspectables.size() >= 2)
 	{
 
@@ -573,7 +574,7 @@ void AutomationUI::inspectablesSelectionChanged()
 	Array<AutomationKey *> keys = manager->selectionManager->getInspectablesAs<AutomationKey>();
 	for (auto &k: keys)
 	{
-		AutomationKeyUI * kui = getUIForItem(k);
+		AutomationKeyTimelineUIBase * kui = getUIForItem(k);
 		if (kui == nullptr) return;
 
 		uiSelection.add(kui);
@@ -587,7 +588,7 @@ void AutomationUI::inspectablesSelectionChanged()
 	}
 }
 
-void AutomationUI::inspectableDestroyed(Inspectable *)
+void AutomationTimelineUIBase::inspectableDestroyed(Inspectable *)
 {
 	if (!inspectable.wasObjectDeleted() && manager->selectionManager != nullptr)
 	{
@@ -596,19 +597,19 @@ void AutomationUI::inspectableDestroyed(Inspectable *)
 	}
 }
 
-void AutomationUI::focusGained(FocusChangeType cause)
+void AutomationTimelineUIBase::focusGained(FocusChangeType cause)
 {
 	if(autoSwitchMode) setViewMode(EDIT);
 }
 
-void AutomationUI::focusLost(FocusChangeType cause)
+void AutomationTimelineUIBase::focusLost(FocusChangeType cause)
 {
 	//DBG("AUI Focus lost " << cause);
 	if(autoSwitchMode) setViewMode(VIEW);
 }
 
 
-void AutomationUI::run()
+void AutomationTimelineUIBase::run()
 {
 	bool firstRun = true;
 
@@ -673,10 +674,10 @@ void AutomationUI::run()
 	viewImage.clear(viewImage.getBounds());
 	imageLock.exit();
 
-	//DBG("Exit AutomationUI Thread");
+	//DBG("Exit AutomationTimelineUIBase Thread");
 }
 
-void AutomationUI::timerCallback()
+void AutomationTimelineUIBase::timerCallback()
 {
 	if (shouldRepaint)
 	{

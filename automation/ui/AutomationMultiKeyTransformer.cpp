@@ -8,6 +8,7 @@
   ==============================================================================
 */
 
+/*
 AutomationMultiKeyTransformer::AutomationMultiKeyTransformer(AutomationUI * _aui, Array<AutomationKeyUI*> _keysUI) :
 	aui(_aui),
 	keysUI(_keysUI),
@@ -133,3 +134,5 @@ void AutomationMultiKeyTransformer::mouseUp(const MouseEvent & e)
 	}
 	UndoMaster::getInstance()->performActions("Move " + String(numKeys) + " keys", actions);
 }
+
+*/
