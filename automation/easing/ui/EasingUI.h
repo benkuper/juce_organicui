@@ -20,7 +20,7 @@ public:
 
 	WeakReference<EasingBase> easingBase;
 
-	Colour color;
+	const Colour dimensionColors[3]{ RED_COLOR, GREEN_COLOR, BLUE_COLOR };
 
 	int numDimensions;
 
@@ -38,11 +38,11 @@ public:
 	void resized() override;
 
 	virtual void generatePaths();
-	virtual void generatePathsInternal(int index);
-	virtual int getYValue(int index) = 0;
+	virtual void generatePathInternal(int index);
+	//virtual int getYValue(int index) = 0;
 	virtual void autoGeneratePathWithPrecision(int index, int precision = 100) = 0;
 
-	void buildHitPaths(bool isY1, int index);
+	void buildHitPath(int index);
 
     bool hitTest(int tx, int ty) override;
 
@@ -71,7 +71,7 @@ public:
 
 	Easing<T>* easing;
 
-	int getYValue(bool isY1, int index);
+	//int getYValue(bool isY1, int index);
 	void setKeyPositions(const T& k1, const T& k2);
 	void autoGeneratePathWithPrecision(int index, int precision = 100) override;
 
@@ -148,8 +148,10 @@ class LinearEasingTimelineUI :
 	public EasingTimelineUI<T>
 {
 public:
-	LinearEasingUI(LinearEasing<T> * e);
-	void generatePathInternal() override;
+	LinearEasingTimelineUI(LinearEasing<T> * e) :
+		EasingTimelineUI<T>(e) {}
+
+	void generatePathInternal(int index) override;
 
 	// Inherited via EasingUI
 };
@@ -160,8 +162,10 @@ class HoldEasingTimelineUI :
 	public EasingTimelineUI<T>
 {
 public:
-	HoldEasingUI(HoldEasing<T> * e);
-	void generatePathInternal() override;
+	HoldEasingTimelineUI(HoldEasing<T>* e) :
+		EasingTimelineUI<T>(e){}
+
+	void generatePathInternal(int index) override;
 };
 
 
@@ -210,3 +214,16 @@ public:
 	void mouseDrag(const MouseEvent &e) override;
 };
 */
+
+template<class T>
+void LinearEasingTimelineUI<T>::generatePathInternal(int index)
+{
+	drawPath.lineTo(getWidth(), y2[index]);
+}
+
+template<class T>
+void HoldEasingTimelineUI<T>::generatePathInternal(int index)
+{
+	drawPath.lineTo(getWidth(), y1[index]);
+	drawPath.lineTo(getWidth(), y2[index]);
+}

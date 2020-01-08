@@ -10,6 +10,7 @@
 
 AutomationBase::AutomationBase(const String &name) :
 	BaseManager(name),
+	numDimensions(0),
 	value(nullptr),
 	recorder(nullptr),
 	showUIInEditor(false),
@@ -240,7 +241,7 @@ int AutomationBase::compareTime(AutomationKeyBase * t1, AutomationKeyBase * t2)
 
 InspectableEditor * AutomationBase::getEditor(bool isRoot)
 {
-	return new AutomationEditor(this, isRoot);
+	return new AutomationTimelineEditor(this, isRoot);
 }
 
 

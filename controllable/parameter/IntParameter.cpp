@@ -57,7 +57,7 @@ bool IntParameter::hasRange()
 
 void IntParameter::setControlAutomation()
 {
-	automation.reset(new ParameterNumberAutomation(this, !isLoadingData));
+	automation.reset(new ParameterNumberAutomation<float>(this, !isLoadingData));
 }
 
 var IntParameter::getJSONDataInternal()

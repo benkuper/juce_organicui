@@ -100,6 +100,7 @@ public:
 
 	//Generate image thread
 	void run() override;
+	virtual void drawPixelAtX(int tx) {}
 	void timerCallback() override;
 
 private:
@@ -118,7 +119,11 @@ public:
 
 	Automation<T> * typedManager;
 
+	const Colour dimensionColors[3]{ RED_COLOR, GREEN_COLOR, BLUE_COLOR };
+
 	virtual void addItemFromMouse(const MouseEvent &e) override;
+
+	void drawPixelAtX(int tx) override;
 };
 
 template<class T>
@@ -138,6 +143,26 @@ template<>
 void AutomationTimelineUI<Point<float>>::addItemFromMouse(const MouseEvent& e)
 {
 	typedManager->addItem(getPosForX(e.getPosition().x), Point<float>(getValueForY(e.getPosition().y),0));
+}
+
+template<class T>
+void AutomationTimelineUI<T>::drawPixelAtX(int tx)
+{
+	Array<float> values = manager->getValuesForPosition(getPosForX(tx));
+
+	for (int i = 0; i < manager->numDimensions; i++)
+	{
+		Colour c = manager->numDimensions == 1 ? Colours::white : dimensionColors[i];
+		float y = (1 - values[i]) * (getHeight() - 1);
+		int ty = (int)y;
+		int maxDist = 1;
+		for (int i = ty - maxDist; i <= ty + maxDist; i++)
+		{
+			if (i < 0 || i >= viewImage.getHeight()) continue;
+			float alpha = jlimit<float>(0, 1, 1 - (abs(y - i) / maxDist));
+			viewImage.setPixelAt(tx, i, c.withAlpha(alpha));
+		}
+	}
 }
 
 template<>

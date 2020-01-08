@@ -23,7 +23,10 @@ public:
 	
 	Type type;
 
-	virtual EasingUI * createUI() = 0; //must be overriden
+	virtual EasingUI* createUI() {
+		jassertfalse;
+		return nullptr;
+	}; //must be overriden
 
 private :
 	WeakReference<EasingBase>::Master masterReference;
@@ -51,7 +54,7 @@ class LinearEasing :
 public:
 	LinearEasing();
 
-	float getValue(const T &start, const T &end, const float &weight) override;
+	T getValue(const T &start, const T &end, const float &weight) override;
 
 	EasingUI * createUI() override;
 };
@@ -63,7 +66,7 @@ class HoldEasing :
 public:
 	HoldEasing();
 
-	virtual float getValue(const T &start, const T &end, const float &weight) override;
+	virtual T getValue(const T &start, const T &end, const float &weight) override;
 
 	EasingUI * createUI() override;
 };
@@ -138,14 +141,14 @@ EasingUI* HoldEasing<T>::createUI()
 
 
 template<class T>
-float LinearEasing<T>::getValue(const T& start, const T& end, const float& weight)
+T LinearEasing<T>::getValue(const T& start, const T& end, const float& weight)
 {
 	return start + (end - start) * weight;
 }
 
 
 template<class T>
-float HoldEasing<T>::getValue(const T& start, const T& end, const float& weight)
+T HoldEasing<T>::getValue(const T& start, const T& end, const float& weight)
 {
 	if (weight >= 1) return end;
 	return start;

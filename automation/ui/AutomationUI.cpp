@@ -16,7 +16,6 @@ AutomationTimelineUIBase::AutomationTimelineUIBase(AutomationBase * _automation)
 	lastROIKey(0),
 	autoResetViewRangeOnLengthUpdate(false),
 	currentPosition(0),
-	color(c),
 	currentUI(nullptr)
 	//,transformer(nullptr)
 {
@@ -350,12 +349,15 @@ void AutomationTimelineUIBase::itemsReorderedAsync()
 
 AutomationKeyTimelineUIBase * AutomationTimelineUIBase::createUIForItem(AutomationKeyBase * item)
 {
-	return new AutomationKeyTimelineUIBase(item, color);
+	return new AutomationKeyTimelineUIBase(item);
 }
 
 void AutomationTimelineUIBase::addItemUIInternal(AutomationKeyTimelineUIBase * kui)
 {
-	kui->handle.addMouseListener(this, false);
+	for (auto& h : kui->handles)
+	{
+		h->addMouseListener(this, false);
+	}
 }
 
 void AutomationTimelineUIBase::removeItemUIInternal(AutomationKeyTimelineUIBase * kui)
@@ -366,7 +368,11 @@ void AutomationTimelineUIBase::removeItemUIInternal(AutomationKeyTimelineUIBase 
 	//	transformer = nullptr;
 	//}
 
-	kui->handle.removeMouseListener(this);
+	for (auto& h : kui->handles)
+	{
+		h->removeMouseListener(this);
+	}
+
 	updateROI();
 }
 
@@ -379,18 +385,18 @@ void AutomationTimelineUIBase::mouseDown(const MouseEvent & e)
 		if (e.mods.isLeftButtonDown() && e.mods.isAltDown())
 		{
 
-			addItemFromMouse();
+			addItemFromMouse(e);
 
 			manager->reorderItems();
 		} else
 		{
-			Array<Component *> selectables;
-			Array<Inspectable *> inspectables;
-			for (auto &i : itemsUI) if (i->isVisible())
-			{
-				selectables.add(&i->handle);
-				inspectables.add(i->inspectable);
-			}
+			//Array<Component *> selectables;
+			//Array<Inspectable *> inspectables;
+			//for (auto &i : itemsUI) if (i->isVisible())
+			//{
+			//	selectables.add(&i->handle);
+			//	inspectables.add(i->inspectable);
+			//}
 
 			//if (transformer != nullptr)
 			//{
@@ -398,7 +404,7 @@ void AutomationTimelineUIBase::mouseDown(const MouseEvent & e)
 			//	transformer = nullptr;
 			//}
 
-			if (InspectableSelector::getInstance()) InspectableSelector::getInstance()->startSelection(this, selectables, inspectables, manager->selectionManager, !e.mods.isCommandDown() && !e.mods.isShiftDown());
+			//if (InspectableSelector::getInstance()) InspectableSelector::getInstance()->startSelection(this, selectables, inspectables, manager->selectionManager, !e.mods.isCommandDown() && !e.mods.isShiftDown());
 		}
 	} else
 	{
@@ -434,7 +440,7 @@ void AutomationTimelineUIBase::mouseDoubleClick(const MouseEvent & e)
 {
 	if (e.eventComponent == this)
 	{
-		manager->addItem(getPosForX(e.getPosition().x), getValueForY(e.getPosition().y));
+		addItemFromMouse(e);
 		manager->reorderItems();
 	}
 }
@@ -466,16 +472,16 @@ void AutomationTimelineUIBase::mouseDrag(const MouseEvent & e)
 
 					if (fabsf(mp.x - initX) > fabsf(mp.y - initY))
 					{
-						kui->handle.setMouseCursor(MouseCursor::LeftRightResizeCursor);
+						kui->handles[kui->selectedHandleIndex]->setMouseCursor(MouseCursor::LeftRightResizeCursor);
 						val = kui->valueAtMouseDown;
 					} else
 					{
-						kui->handle.setMouseCursor(MouseCursor::UpDownResizeCursor);
+						kui->handles[kui->selectedHandleIndex]->setMouseCursor(MouseCursor::UpDownResizeCursor);
 						pos = kui->posAtMouseDown;
 					}
 				} else
 				{
-					kui->handle.setMouseCursor(MouseCursor::NormalCursor);
+					kui->handles[kui->selectedHandleIndex]->setMouseCursor(MouseCursor::NormalCursor);
 				}
 
 				
@@ -539,7 +545,7 @@ void AutomationTimelineUIBase::newMessage(const ContainerAsyncEvent & e)
 			if (autoResetViewRangeOnLengthUpdate) setViewRange(0, manager->length->floatValue());
 		}else if (e.targetControllable != nullptr)
 		{
-			AutomationKey * k = e.targetControllable->getParentAs<AutomationKey>();
+			AutomationKeyBase * k = e.targetControllable->getParentAs<AutomationKeyBase>();
 			if (k != nullptr)
 			{
 				if (e.targetControllable == k->easingType)
@@ -559,11 +565,13 @@ void AutomationTimelineUIBase::newMessage(const ContainerAsyncEvent & e)
 
 void AutomationTimelineUIBase::inspectablesSelectionChanged()
 {
+	/*
 	if (transformer != nullptr)
 	{
 		removeChildComponent(transformer.get());
 		transformer = nullptr;
 	}
+	*/
 
 	Array<AutomationKeyTimelineUIBase *> uiSelection;
 	if (manager->selectionManager->currentInspectables.size() >= 2)
@@ -571,7 +579,8 @@ void AutomationTimelineUIBase::inspectablesSelectionChanged()
 
 	}
 
-	Array<AutomationKey *> keys = manager->selectionManager->getInspectablesAs<AutomationKey>();
+	/*
+	Array<AutomationKeyBase *> keys = manager->selectionManager->getInspectablesAs<AutomationKeyBase>();
 	for (auto &k: keys)
 	{
 		AutomationKeyTimelineUIBase * kui = getUIForItem(k);
@@ -582,10 +591,12 @@ void AutomationTimelineUIBase::inspectablesSelectionChanged()
 
 	if (uiSelection.size() >= 2)
 	{
+		
 		transformer.reset(new AutomationMultiKeyTransformer(this, uiSelection));
 		addAndMakeVisible(transformer.get());
 		transformer->grabKeyboardFocus(); // so no specific key has the focus for deleting
 	}
+	*/
 }
 
 void AutomationTimelineUIBase::inspectableDestroyed(Inspectable *)
@@ -645,16 +656,7 @@ void AutomationTimelineUIBase::run()
 				return;
 			}
 
-			float val = manager->getValueForPosition(getPosForX(tx));
-			float y = (1 - val)*(getHeight() - 1);
-			int ty = (int)y;
-			int maxDist = 1;
-			for (int i = ty - maxDist; i <= ty + maxDist; i++)
-			{
-				if (i < 0 || i >= viewImage.getHeight()) continue;
-				float alpha = jlimit<float>(0, 1, 1 - (abs(y - i) / maxDist));
-				viewImage.setPixelAt(tx, i, Colours::white.withAlpha(alpha));
-			}
+			drawPixelAtX(tx);
 
 			//if(ty < viewImage.getHeight()) viewImage.setPixelAt(tx, ty+1, Colours::white.withAlpha(.2f));
 			//if(ty > 0) viewImage.setPixelAt(tx, ty-1, Colours::white.withAlpha(.2f));

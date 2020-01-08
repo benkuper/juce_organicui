@@ -141,14 +141,15 @@ void ParameterAutomation::loadJSONDataInternal(var data)
 // NUMBER
 
 
-ParameterNumberAutomation::ParameterNumberAutomation(Parameter* parameter, bool addDefaultItems) :
+template<class T>
+ParameterNumberAutomation<T>::ParameterNumberAutomation(Parameter * parameter, bool addDefaultItems) :
 	ParameterAutomation(parameter)
 {
 	timeParamRef = automation.position;
 	lengthParamRef = automation.length;
 	valueParamRef = automation.value;
 	automationContainer = &automation;
-	
+
 	valueIsNormalized = true;
 
 	setup();
@@ -159,10 +160,9 @@ ParameterNumberAutomation::ParameterNumberAutomation(Parameter* parameter, bool 
 	if (addDefaultItems)
 	{
 		automation.addItem(0, parameter->getNormalizedValue(), false);
-		automation.items[0]->setEasing(Easing::BEZIER);
+		automation.items[0]->setEasing(EasingBase::LINEAR);
 		automation.addItem(automation.length->floatValue(), parameter->getNormalizedValue(), false);
 	}
-
 }
 
 template<class T>
@@ -176,8 +176,6 @@ void ParameterNumberAutomation<T>::setAllowKeysOutside(bool value)
 {
 	automation.allowKeysOutside = true;
 }
-
-
 
 ParameterColorAutomation::ParameterColorAutomation(ColorParameter* colorParam, bool addDefaultItems) :
 	ParameterAutomation(colorParam),

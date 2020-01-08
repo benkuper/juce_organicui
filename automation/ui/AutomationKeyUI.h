@@ -14,18 +14,19 @@ class AutomationKeyTimelineUIBase :
 	public BaseItemMinimalUI<AutomationKeyBase>
 {
 public:
-	AutomationKeyTimelineUIBase(AutomationKeyBase *, Colour c = Colours::white);
+	AutomationKeyTimelineUIBase(AutomationKeyBase *);
 	virtual ~AutomationKeyTimelineUIBase();
     
-	Colour color;
-    
-    std::unique_ptr<EasingUI> easingUI;
+	const Colour dimensionColors[3]{ RED_COLOR, GREEN_COLOR, BLUE_COLOR };
+	
+	std::unique_ptr<EasingUI> easingUI;
 
     int keyYPos1;
     int keyYPos2;
     
     float posAtMouseDown;
     float valueAtMouseDown;
+	int selectedHandleIndex;
 
 	bool showHandle;
 	
@@ -44,7 +45,7 @@ public:
 		void paint(Graphics &g) override;
 	};
 
-    Handle handle;
+    OwnedArray<Handle> handles;
     
 
 	void paint(Graphics &) override {}; //avoid default item painting

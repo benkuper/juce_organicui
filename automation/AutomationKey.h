@@ -20,10 +20,14 @@ public:
 	FloatParameter * position;
 	Parameter* value;
 
+	int numDimensions;
+
 	EnumParameter * easingType;
 
 	std::unique_ptr<EasingBase> easingBase;
 	virtual void setEasing(EasingBase::Type t) = 0;
+
+	virtual Array<float> getValues() = 0;
 
 	float getRelativePosition(float pos1, float pos2, float weight) const;
 
@@ -51,6 +55,7 @@ public:
 	virtual void setEasing(EasingBase::Type t) override;
 	T getValue() const;
 	T getValue(AutomationKey<T>* nextKey, const float& targetPos) const;
+	virtual Array<float> getValues() override;
 
 };
 
@@ -60,9 +65,21 @@ template<class T>
 AutomationKey<T>::AutomationKey() :
 	AutomationKeyBase()
 {
-	if (std::is_same<T, float>) value = addFloatParameter("Value", "Value of the key", 0);
-	else if (std::is_same<T, Point<float>) value = addPoint2DParameter("Position", "Position of the key");
-	else if (std::is_same < T, Vector3D<float>) value = addPoint3DParameter("Position", "Position of the key");
+	if (std::is_same<T, float>)
+	{
+		value = addFloatParameter("Value", "Value of the key", 0);
+		numDimensions = 1;
+	}
+	else if (std::is_same < T, Point<float>)
+	{
+		value = addPoint2DParameter("Position", "Position of the key");
+		numDimensions = 2;
+	}
+	else if (std::is_same < T, Vector3D<float>)
+	{
+		value = addPoint3DParameter("Position", "Position of the key");
+		numDimensions = 3;
+	}
 
 	easing = easingBase.get();
 }
@@ -102,9 +119,9 @@ void AutomationKey<T>::setEasing(EasingBase::Type t)
 	easingBase.reset(e);
 	if (easing != nullptr)
 	{
-		easing = easingBase.get();
+		easing = (Easing<T> *)easingBase.get();
 		easing->setSelectionManager(selectionManager);
-		addChildControllableContainer(easing.get());
+		addChildControllableContainer(easing);
 	}
 }
 
@@ -116,5 +133,41 @@ template<class T>
 T AutomationKey<T>::getValue(AutomationKey<T>* nextKey, const float& position) const
 {
 	return easing->getValue(getValue(), nextKey->getValue(), getRelativePosition(position->floatValue(), nextKey->position->floatValue(), targetPos));
+}
+
+template<class T>
+Array<float> AutomationKey<T>::getValues()
+{
+	return Array<float>();
+}
+
+template<>
+Array<float> AutomationKey<float>::getValues()
+{
+	float val = getValue();
+
+	Array<float> result;
+	result.add(val);
+	return  result;
+}
+
+template<>
+Array<float> AutomationKey<Point<float>>::getValues()
+{
+	Point<float> val = getValue();
+
+	Array<float> result;
+	result.add(val.x,val.y);
+	return  result;
+}
+
+template<>
+Array<float> AutomationKey<Vector3D<float>>::getValues()
+{
+	Vector3D<float> val = getValue();
+
+	Array<float> result;
+	result.add(val.x,val.y,val.z);
+	return  result;
 }
 

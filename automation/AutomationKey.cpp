@@ -9,7 +9,8 @@
 */
 
 AutomationKeyBase::AutomationKeyBase() :
-	BaseItem("Key",false)
+	BaseItem("Key",false),
+	numDimensions(0)
 {
 	itemDataType = "AutomationKeyBase";
 	hideEditorHeader = true;

@@ -11,6 +11,7 @@
 #pragma once
 
 class InspectableSelectionManager;
+class AutomationTimelineUIBase;
 
 class AutomationBase :
 	public BaseManager<AutomationKeyBase>
@@ -21,6 +22,8 @@ public:
 
 	//Recorder
 	AutomationRecorder * recorder;
+
+	int numDimensions;
 
 	//ui
 	bool showUIInEditor;
@@ -57,11 +60,15 @@ public:
 	AutomationKeyBase * getClosestKeyForPos(float pos, int start = -1, int end = -1);
 	AutomationKeyBase * getKeyAtPos(float pos);
 
+	virtual Array<float> getValuesForPosition(float pos) = 0;
+
+
 	virtual void onControllableFeedbackUpdate(ControllableContainer * cc, Controllable *c) override;
 	virtual void onContainerParameterChanged(Parameter *) override;
 
 	static int compareTime(AutomationKeyBase * t1, AutomationKeyBase * t2);
 
+	virtual AutomationTimelineUIBase* createTimelineUI() = 0;
 	InspectableEditor * getEditor(bool isRoot) override;
 
 private:
@@ -81,11 +88,14 @@ public:
 
 	virtual void updateCurrentValue() override;
 	T getValueForPosition(float pos);
+	Array<float> getValuesForPosition(float pos) override;
 
 	AutomationKey<T> * createItem() override;
 	void addItems(HashMap<float, T> keys, bool removeExistingOverlappingKeys = true, bool addToUndo = true, bool autoSmoothCurve = false);
 	AutomationKey<T> * addItem(const float position, const T value, bool addToUndo = true, bool reorder = false);
-	Array<AutomationKey<T>*> addItemsFromClipboard(bool showWarning = false) override;
+	Array<AutomationKeyBase*> addItemsFromClipboard(bool showWarning = false) override;
+
+	virtual AutomationTimelineUIBase* createTimelineUI() override;
 };
 
 
@@ -94,10 +104,22 @@ template<class T>
 Automation<T>::Automation(const juce::String& name) : // , AutomationRecorder* recorder, bool freeRange, bool allowKeysOutside, bool dedicatedSelectionManager) :
 	AutomationBase(name)
 {
+	if (std::is_same<T, float>())
+	{
+		value = addFloatParameter("Value", "Current value of the automation", 0);
+		numDimensions = 1;
+	}
+	else if (std::is_same<T, Point<float>>())
+	{
+		value = addPoint2DParameter("Position", "Current value of the automation");
+		numDimensions = 2;
+	}
+	else if (std::is_same<T, Vector3D<float>>())
+	{
+		value = addPoint3DParameter("Position", "Current value of the automation");
+		numDimensions = 3;
+	}
 
-	if (std::is_same<T, float>) value = addFloatParameter("Value", "Current value of the automation", 0);
-	else if (std::is_same < T, Point<float>) value = addPoint2DParameter("Position", "Current value of the automation");
-	else if (std::is_same < T, Vector3D<float>) value = addPoint3DParameter("Position", "Current value of the automation");
 	value->hideInEditor = true;
 	value->isControllableFeedbackOnly = true;
 
@@ -126,27 +148,62 @@ template<class T>
 void Automation<T>::updateCurrentValue()
 {
 	value->setValue(getValueForPosition(position->floatValue()));
-
 }
 
 template <class T>
 T Automation<T>::getValueForPosition(float pos)
 {
 	if (items.size() == 0) return 0;
-	if (pos <= items[0]->position->floatValue()) return items[0]->getValue();
-	else if (pos >= items[items.size() - 1]->position->floatValue()) return items[items.size() - 1]->getValue();
+	if (pos <= items[0]->position->floatValue()) return ((AutomationKey<T> *)items[0])->getValue();
+	else if (pos >= items[items.size() - 1]->position->floatValue()) return ((AutomationKey<T>*)items[items.size() - 1])->getValue();
 
-	AutomationKey<T> * k = getClosestKeyForPos(pos);
+	AutomationKey<T> * k = (AutomationKey<T> *)getClosestKeyForPos(pos);
 	if (k == nullptr) return 0;
-	return k->getValue(items[items.indexOf(k) + 1], pos);
+	return k->getValue(((AutomationKey<T>*)items[items.indexOf(k) + 1]), pos);
+}
+
+template<class T>
+Array<float> Automation<T>::getValuesForPosition(float pos)
+{
+	return Array<float>();
+}
+
+template<>
+Array<float> Automation<float>::getValuesForPosition(float pos)
+{
+	float val = getValueForPosition(pos);
+
+	Array<float> result;
+	result.add(val);
+	return  result;
+}
+
+template<>
+Array<float> Automation<Point<float>>::getValuesForPosition(float pos)
+{
+	Point<float> val = getValueForPosition(pos);
+
+	Array<float> result;
+	result.add(val.x, val.y);
+	return  result;
+}
+
+template<>
+Array<float> Automation<Vector3D<float>>::getValuesForPosition(float pos)
+{
+	Vector3D<float> val = getValueForPosition(pos);
+
+	Array<float> result;
+	result.add(val.x, val.y, val.z);
+	return result;
 }
 
 
 template <class T>
 AutomationKey<T> * Automation<T>::createItem()
 {
-	AutomationKey<T> * k = new AutomationKey();
-	if (value->hasRange()) k->setRange(value->minimumValue, value->maximumValue);
+	AutomationKey<T> * k = new AutomationKey<T>();
+	if (value->hasRange()) k->value->setRange(value->minimumValue, value->maximumValue);
 	if(selectionManager != nullptr) k->setSelectionManager(selectionManager);
 	if(!allowKeysOutside) k->position->setRange(0, length->floatValue());
 	return k;
@@ -188,10 +245,10 @@ AutomationKey<T> * Automation<T>::addItem(const float _position, const T _value,
 	AutomationKey<T> * k = createItem();
 	k->position->setValue(_position);
 	
-	if (std::is_same<T, float>)	k->value->setValue(_value);
-	else if (std::is_same < T, Point<float>) k->value->setPoint(_value);
-	else if (std::is_same < T, Vector3D<float>)	k->value->setVector(_value);
-	
+	if (std::is_same<T, float>())	k->value->setValue(_value);
+	else if (std::is_same<T, Point<float>>()) ((Point2DParameter *)(k->value))->setPoint(_value);
+	else if (std::is_same<T, Vector3D<float>>())((Point3DParameter*)(k->value))->setVector(_value);
+
 	BaseManager::addItem(k,var(), addToUndo);
 	if (reorder) reorderItems();
 
@@ -200,9 +257,9 @@ AutomationKey<T> * Automation<T>::addItem(const float _position, const T _value,
 }
 
 template <class T>
-Array<AutomationKey<T>*> Automation<T>::addItemsFromClipboard(bool showWarning)
+Array<AutomationKeyBase *> Automation<T>::addItemsFromClipboard(bool showWarning)
 {
-	Array<AutomationKey<T> *> keys = BaseManager::addItemsFromClipboard(showWarning);
+	Array<AutomationKeyBase *> keys = BaseManager::addItemsFromClipboard(showWarning);
 	if (keys.isEmpty()) return nullptr;
 	
 	float minTime = keys[0]->position->floatValue();
@@ -229,4 +286,10 @@ Array<AutomationKey<T>*> Automation<T>::addItemsFromClipboard(bool showWarning)
 	reorderItems();
 
 	return  keys;
+}
+
+template<class T>
+AutomationTimelineUIBase* Automation<T>::createTimelineUI()
+{
+	return new AutomationTimelineUI<T>(this);
 }

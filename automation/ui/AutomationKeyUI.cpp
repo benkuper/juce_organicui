@@ -8,17 +8,19 @@
   ==============================================================================
 */
 
-
-AutomationKeyTimelineUIBase::AutomationKeyTimelineUIBase(AutomationKeyBase * key, Colour c) :
+AutomationKeyTimelineUIBase::AutomationKeyTimelineUIBase(AutomationKeyBase * key) :
 	BaseItemMinimalUI(key),
-    color(c),
 	keyYPos1(-1),
     keyYPos2(-1),
-    showHandle(true),
-    handle(c)
+	selectedHandleIndex(-1),
+    showHandle(true)
 {
-
-	addAndMakeVisible(&handle);
+	for (int i = 0; i < key->numDimensions; i++)
+	{
+		Handle * h = new Handle(dimensionColors[i]);
+		handles.add(h);
+		addAndMakeVisible(h);
+	}
 	//removeMouseListener(this);
 
 	bringToFrontOnSelect = false;
@@ -26,7 +28,7 @@ AutomationKeyTimelineUIBase::AutomationKeyTimelineUIBase(AutomationKeyBase * key
 	setMouseClickGrabsKeyboardFocus(false);
 
 	autoDrawContourWhenSelected = false;
-	setEasingUI(item->easing != nullptr ? item->easing->createUI() : nullptr);
+	setEasingUI(item->easingBase != nullptr ? item->easingBase->createUI() : nullptr);
 }
 
 AutomationKeyTimelineUIBase::~AutomationKeyTimelineUIBase()
@@ -38,13 +40,19 @@ void AutomationKeyTimelineUIBase::setShowHandle(bool value)
 
 	if (showHandle == value) return;
 	showHandle = value;
-	if (showHandle)
+	
+	for (auto& handle : handles)
 	{
-		if(handle.getParentComponent() == nullptr) addChildComponent(&handle);
-	} else
-	{
-		if (handle.getParentComponent() == this) removeChildComponent(&handle);
+		if (showHandle)
+		{
+			if (handle->getParentComponent() == nullptr) addChildComponent(handle);
+		}
+		else
+		{
+			if (handle->getParentComponent() == this) removeChildComponent(handle);
+		}
 	}
+	
 }
 
 
@@ -61,7 +69,6 @@ void AutomationKeyTimelineUIBase::setEasingUI(EasingUI * eui)
 	{
 
 		addAndMakeVisible(easingUI.get());
-		easingUI->color = color;
 		easingUI->toBack();
 		resized();
 		if(keyYPos1 > -1 && keyYPos2 > -1) easingUI->setKeyPositions(keyYPos1, keyYPos2);
@@ -74,10 +81,14 @@ void AutomationKeyTimelineUIBase::setKeyPositions(const int &k1, const int &k2)
 	keyYPos2 = k2;
 	if (easingUI != nullptr) easingUI->setKeyPositions(keyYPos1, keyYPos2);
 
-	juce::Rectangle<int> hr = getLocalBounds().withSize(AutomationKeyTimelineUIBase::handleClickZone, AutomationKeyTimelineUIBase::handleClickZone)
-		.withCentre(Point<int>(AutomationKeyTimelineUIBase::handleClickZone / 2, (int)((1 - item->value->floatValue())*getHeight())));
+	Array<float> values = item->getValues();
+	for (int i = 0; i < item->numDimensions; i++)
+	{
+		juce::Rectangle<int> hr = getLocalBounds().withSize(AutomationKeyTimelineUIBase::handleClickZone, AutomationKeyTimelineUIBase::handleClickZone)
+			.withCentre(Point<int>(AutomationKeyTimelineUIBase::handleClickZone / 2, (int)((1 - values[i]) * getHeight())));
 
-	handle.setBounds(hr);
+		handles[i]->setBounds(hr);
+	}
 }
 
 void AutomationKeyTimelineUIBase::showKeyEditorWindow()
@@ -106,10 +117,14 @@ void AutomationKeyTimelineUIBase::showKeyEditorWindow()
 
 void AutomationKeyTimelineUIBase::resized()
 {
-	juce::Rectangle<int> hr = getLocalBounds().withSize(AutomationKeyTimelineUIBase::handleClickZone, AutomationKeyTimelineUIBase::handleClickZone)
-		.withCentre(Point<int>(AutomationKeyTimelineUIBase::handleClickZone / 2, (int)((1 - item->value->floatValue())*getHeight())));
+	Array<float> values = item->getValues();
+	for (int i = 0; i < item->numDimensions; i++)
+	{
+		juce::Rectangle<int> hr = getLocalBounds().withSize(AutomationKeyTimelineUIBase::handleClickZone, AutomationKeyTimelineUIBase::handleClickZone)
+			.withCentre(Point<int>(AutomationKeyTimelineUIBase::handleClickZone / 2, (int)((1 - values[i]) * getHeight())));
 
-	handle.setBounds(hr);
+		handles[i]->setBounds(hr);
+	}
 
 	juce::Rectangle<int> r = getLocalBounds().reduced(AutomationKeyTimelineUIBase::handleClickZone / 2, 0);
 	if (easingUI != nullptr)
@@ -120,27 +135,42 @@ void AutomationKeyTimelineUIBase::resized()
 
 bool AutomationKeyTimelineUIBase::hitTest(int tx, int ty)
 {
-	return handle.getBounds().contains(tx, ty) || (easingUI != nullptr && easingUI->hitTest(tx, ty));
+	for (auto& handle : handles)
+	{
+		if (handle->getBounds().contains(tx, ty)) return true;
+	}
+	
+	if (easingUI != nullptr && easingUI->hitTest(tx, ty)) return true;
+
+	return false;
 }
 
 void AutomationKeyTimelineUIBase::mouseDown(const MouseEvent & e)
 {
 	BaseItemMinimalUI::mouseDown(e);
 	setMouseCursor(e.mods.isShiftDown() ? MouseCursor::LeftRightResizeCursor : MouseCursor::NormalCursor);
-	if (e.eventComponent == &handle)
+	selectedHandleIndex = -1;
+	for (int i = 0; i < item->numDimensions; i++)
 	{
-		if (e.mods.isLeftButtonDown())
+		if (e.eventComponent == handles[i])
 		{
-			if (e.mods.isCommandDown())
+			if (e.mods.isLeftButtonDown())
 			{
-				//add to selection here
-			} else
-			{
-				posAtMouseDown = item->position->floatValue();
-				valueAtMouseDown = item->value->floatValue();
+				if (e.mods.isCommandDown())
+				{
+					//add to selection here
+				}
+				else
+				{
+					posAtMouseDown = item->position->floatValue();
+					valueAtMouseDown = item->value->floatValue();
+					selectedHandleIndex = i;
+				}
 			}
 		}
-	} else if (e.eventComponent == easingUI.get())
+	}
+
+	if (e.eventComponent == easingUI.get())
 	{
 		if (e.mods.isRightButtonDown())
 		{
@@ -157,41 +187,48 @@ void AutomationKeyTimelineUIBase::mouseDown(const MouseEvent & e)
 			if (result >= 1 && result <= keys.size())
 			{
 				item->easingType->setUndoableValue(item->easingType->value,keys[result - 1]);
-				item->easing->selectThis(); //reselect after changing easing
+				item->easingBase->selectThis(); //reselect after changing easing
 			}
 		} else if (e.mods.isCommandDown())
 		{
 			item->easingType->setNext(true,true);
-			item->easing->selectThis(); //reselect after changing easing
+			item->easingBase->selectThis(); //reselect after changing easing
 		}
 	}
 }
 
 void AutomationKeyTimelineUIBase::mouseUp(const MouseEvent & e)
 {
-	handle.setMouseCursor(MouseCursor::NormalCursor);
+	selectedHandleIndex = -1;
+	//handle->setMouseCursor(MouseCursor::NormalCursor);
 }
 
 void AutomationKeyTimelineUIBase::controllableFeedbackUpdateInternal(Controllable * c)
 {
 	if (c == item->easingType)
 	{
-		setEasingUI(item->easing != nullptr ? item->easing->createUI() : nullptr);
+		setEasingUI(item->easingBase != nullptr ? item->easingBase->createUI() : nullptr);
 	}
 }
 
 void AutomationKeyTimelineUIBase::inspectableSelectionChanged(Inspectable * i)
 {
 	BaseItemMinimalUI::inspectableSelectionChanged(i);
-	handle.highlight = item->isSelected;
-	handle.color = item->isSelected ? HIGHLIGHT_COLOR : item->isPreselected ? PRESELECT_COLOR : color;
+	for (int i = 0; i < item->numDimensions; i++)
+	{
+		handles[i]->highlight = item->isSelected && selectedHandleIndex == i;
+		handles[i]->repaint();
+	}
 }
 
 void AutomationKeyTimelineUIBase::inspectablePreselectionChanged(Inspectable * i)
 {
 	BaseItemMinimalUI::inspectablePreselectionChanged(i);
-	handle.highlight = false;
-	handle.color = item->isPreselected ? PRESELECT_COLOR : color;
+	for (int i = 0; i < item->numDimensions; i++)
+	{
+		handles[i]->highlight = false;
+		handles[i]->repaint();
+	}
 }
 
 AutomationKeyTimelineUIBase::Handle::Handle(Colour c) :
@@ -205,14 +242,15 @@ AutomationKeyTimelineUIBase::Handle::Handle(Colour c) :
 
 void AutomationKeyTimelineUIBase::Handle::paint(Graphics & g)
 {
+	Colour c = highlight ? HIGHLIGHT_COLOR : /*item->isPreselected ? PRESELECT_COLOR : */color;
 
 	int rad = AutomationKeyTimelineUIBase::handleSize;
 	if (isMouseOver() || highlight) rad += 4;
 
 	juce::Rectangle<float> er = getLocalBounds().withSizeKeepingCentre(rad, rad).toFloat();
 
-	Colour cc = isMouseOver() ? color.brighter() : color.darker(.3f);
-	g.setColour(color);
+	Colour cc = isMouseOver() ? c.brighter() : c.darker(.3f);
+	g.setColour(c);
 	g.fillEllipse(er);
 	g.setColour(cc);
 	g.drawEllipse(er, 1);

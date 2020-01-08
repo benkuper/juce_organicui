@@ -8,17 +8,17 @@
   ==============================================================================
 */
 
-AutomationEditor::AutomationEditor(AutomationBase * automation, bool isRoot) :
+AutomationTimelineEditor::AutomationTimelineEditor(AutomationBase * automation, bool isRoot) :
 	GenericControllableContainerEditor(automation, isRoot),
 	automation(automation),
 	automationUI(nullptr)
 {
 	if (automation->showUIInEditor)
 	{
-		automationUI.reset(new AutomationUI(automation));
+		automationUI.reset(automation->createTimelineUI());
 
 		automationUI->bgColor = BG_COLOR;
-		automationUI->transparentBG = false;AutomationKeyBase
+		automationUI->transparentBG = false;
 		automationUI->autoResetViewRangeOnLengthUpdate = true;
 
 		addAndMakeVisible(automationUI.get());
@@ -27,11 +27,11 @@ AutomationEditor::AutomationEditor(AutomationBase * automation, bool isRoot) :
 	}
 }
 
-AutomationEditor::~AutomationEditor()
+AutomationTimelineEditor::~AutomationTimelineEditor()
 {
 }
 
-void AutomationEditor::resizedInternalContent(juce::Rectangle<int> &r)
+void AutomationTimelineEditor::resizedInternalContent(juce::Rectangle<int> &r)
 {
 	if (automationUI != nullptr)
 	{
