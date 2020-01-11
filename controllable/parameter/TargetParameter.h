@@ -76,7 +76,7 @@ public:
 	static var getTargetFromScript(const juce::var::NativeFunctionArgs& a);
 
 
-	static StringParameter * create() { return new StringParameter("New TargetParameter", "", ""); }
+	static StringParameter * create() { return new TargetParameter("New TargetParameter", "", ""); }
 	virtual String getTypeString() const override { return getTypeStringStatic(); }
 	static String getTypeStringStatic() { return "Target"; }
 

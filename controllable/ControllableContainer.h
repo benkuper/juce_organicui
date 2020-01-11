@@ -49,10 +49,10 @@ public:
 	//save / load
 	bool saveAndLoadRecursiveData;
 	bool saveAndLoadName;
+	bool includeInRecursiveSave;
 	bool includeTriggersInSaveLoad;
 	bool isCurrentlyLoadingData;
 	bool notifyStructureChangeWhenLoadingData;
-
 
 	//Script
 	bool includeInScriptObject;

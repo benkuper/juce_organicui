@@ -25,6 +25,7 @@ ControllableContainer::ControllableContainer(const String & niceName) :
 	customGetEditorFunc(nullptr),
 	saveAndLoadRecursiveData(false),
 	saveAndLoadName(false),
+	includeInRecursiveSave(true),
 	includeTriggersInSaveLoad(false),
 	isCurrentlyLoadingData(false),
 	notifyStructureChangeWhenLoadingData(true),
@@ -511,8 +512,8 @@ void ControllableContainer::orderControllablesAlphabetically()
 void ControllableContainer::setParentContainer(ControllableContainer * container)
 {
 	this->parentContainer = container;
-	for (auto &c : controllables) c->updateControlAddress();
-	for (auto &cc : controllableContainers) cc->updateChildrenControlAddress();
+	for (auto &c : controllables) if(c != nullptr) c->updateControlAddress();
+	for (auto &cc : controllableContainers) if (!cc.wasObjectDeleted()) cc->updateChildrenControlAddress();
 
 }
 
@@ -809,6 +810,8 @@ var ControllableContainer::getJSONData()
 		var containersData = new DynamicObject();
 		for (auto &cc : controllableContainers)
 		{
+			if (!cc->includeInRecursiveSave) continue;
+			
 			var ccData = cc->getJSONData();
 			if (ownedContainers.contains(cc))
 			{
