@@ -425,6 +425,10 @@ void GenericControllableContainerEditor::newMessage(const ContainerAsyncEvent & 
 		//resized();
 		break;
 
+	case ContainerAsyncEvent::ControllableContainerCollapsedChanged:
+		setCollapsed(container->editorIsCollapsed);
+		break;
+
 	default:
 		//not handled
 		break;

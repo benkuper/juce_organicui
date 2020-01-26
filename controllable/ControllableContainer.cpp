@@ -40,6 +40,7 @@ ControllableContainer::ControllableContainer(const String & niceName) :
 	scriptObject.setMethod("getChild", ControllableContainer::getChildFromScript);
 	scriptObject.setMethod("getParent", ControllableContainer::getParentFromScript);
 	scriptObject.setMethod("setName", ControllableContainer::setNameFromScript);
+	scriptObject.setMethod("setCollapsed", ControllableContainer::setCollapsedFromScript);
 }
 
 ControllableContainer::~ControllableContainer()
@@ -1008,6 +1009,15 @@ var ControllableContainer::setNameFromScript(const juce::var::NativeFunctionArgs
 	else cc->setAutoShortName();
 
 	return var(); 
+}
+
+var ControllableContainer::setCollapsedFromScript(const juce::var::NativeFunctionArgs& a)
+{
+	if (a.numArguments == 0) return var();
+	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(a);
+	cc->editorIsCollapsed = (int)a.arguments[0] > 0;
+	cc->queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableContainerCollapsedChanged, cc));
+	return var();
 }
 
 

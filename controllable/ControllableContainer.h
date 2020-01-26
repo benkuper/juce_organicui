@@ -150,7 +150,7 @@ public:
 	static var getChildFromScript(const var::NativeFunctionArgs &a);
 	static var getParentFromScript(const juce::var::NativeFunctionArgs& a);
 	static var setNameFromScript(const juce::var::NativeFunctionArgs& a);
-
+	static var setCollapsedFromScript(const juce::var::NativeFunctionArgs& a);
 
 	// Inherited via DashboardItemTarget
 
