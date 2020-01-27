@@ -15,15 +15,15 @@ Inspectable::Inspectable() :
 
 Inspectable::~Inspectable()
 {
-	listeners.call(&InspectableListener::inspectableDestroyed, this);
-	inspectableNotifier.addMessage(new InspectableEvent(InspectableEvent::DESTROYED, this));
-
 	for (auto &i : linkedInspectables)
 	{
 		if (i.wasObjectDeleted()) continue;
 		if (isHighlighted) i->setHighlighted(false);
-		i->unregisterLinkedInspectable(this);
+		i->unregisterLinkedInspectable(this, false);
 	}
+
+	listeners.call(&InspectableListener::inspectableDestroyed, this);
+	inspectableNotifier.addMessage(new InspectableEvent(InspectableEvent::DESTROYED, this));
 
 	masterReference.clear();
 } 
