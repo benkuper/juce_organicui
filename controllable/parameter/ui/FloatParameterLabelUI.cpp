@@ -163,6 +163,8 @@ void FloatParameterLabelUI::timerCallback()
     if (!shouldUpdateLabel) return;
     shouldUpdateLabel = false;
     
+	if (parameter.wasObjectDeleted()) return;
+
 	int newStyle = parameter->isOverriden ? Font::bold : Font::plain;
 	if (valueLabel.getFont().getStyleFlags() != newStyle) valueLabel.setFont(valueLabel.getFont().withStyle(newStyle));
 
