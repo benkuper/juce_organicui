@@ -66,6 +66,7 @@ var ScriptUtil::getInt64FromBytes(const var::NativeFunctionArgs & a)
 	return result;
 }
 
+/*
 var ScriptUtil::cosFromScript(const var::NativeFunctionArgs & a)
 {
 	if (a.numArguments < 1) return 0;
@@ -97,6 +98,7 @@ var ScriptUtil::toRadians(const var::NativeFunctionArgs & a)
 	if (a.numArguments < 1) return 0;
 	return degreesToRadians((double)a.arguments[0]);
 }
+*/
 
 var ScriptUtil::getIPs(const var::NativeFunctionArgs& a)
 {
