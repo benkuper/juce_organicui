@@ -89,7 +89,7 @@ void Script::loadScript()
 #if JUCE_WINDOWS
 	if (path.startsWithChar('/')) //avoid jassertfalse
 	{
-		NLOG(niceName, "Path " + path + " is not a valid Windows-style path.");
+		NLOGWARNING(niceName, "Path " + path + " is not a valid Windows-style path.");
 		setState(SCRIPT_ERROR);
 		setWarningMessage("Path " + path + " is not a valid Windows-style path.");
 		return; //OSX / Linux file
@@ -101,7 +101,7 @@ void Script::loadScript()
 	if (!f.exists())
 	{
 		//check local director
-		NLOG(niceName, "File not found : " + f.getFileName());
+		NLOGWARNING(niceName, "File not found : " + f.getFileName());
 		setState(SCRIPT_EMPTY);
 		setWarningMessage("File not found : " + f.getFileName());
 		return;
@@ -132,7 +132,7 @@ void Script::loadScript()
 	}
 	else
 	{
-		NLOG("Script : " + niceName, "Script error : " + result.getErrorMessage());
+		NLOGERROR("Script : " + niceName, "Script error : " + result.getErrorMessage());
 		setState(SCRIPT_ERROR);
 		setWarningMessage("Script error : " + result.getErrorMessage());
 		return;
@@ -213,7 +213,7 @@ var Script::callFunction(const Identifier & function, const Array<var> args, Res
 
 	if (result->getErrorMessage().isNotEmpty())
 	{
-		NLOG(niceName, "Script Error :\n" + result->getErrorMessage());
+		NLOGERROR(niceName, "Script Error :\n" + result->getErrorMessage());
 		return var();
 	}
 
