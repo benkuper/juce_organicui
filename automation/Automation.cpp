@@ -8,11 +8,12 @@
   ==============================================================================
 */
 
-Automation::Automation(const String &name, AutomationRecorder * _recorder, bool freeRange, bool allowKeysOutside, bool dedicatedSelectionManager) :
+Automation::Automation(const String &name, int numDimensions, AutomationRecorder * _recorder, bool allowKeysOutside, bool dedicatedSelectionManager) :
 	BaseManager(name),
+	numDimensions(numDimensions),
 	recorder(_recorder),
+	hasRange(false),
 	showUIInEditor(false),
-	freeRange(freeRange),
 	allowKeysOutside(allowKeysOutside)
 {
 
@@ -30,9 +31,16 @@ Automation::Automation(const String &name, AutomationRecorder * _recorder, bool 
 	position = addFloatParameter("Position", "The current position in the automation. Used for automatic retrieve value and feedback.", 0, 0, length->floatValue());
 	position->hideInEditor = true;
 
-	value = addFloatParameter("Value", "The current value, depending on the position", 0, freeRange?INT32_MIN:0,freeRange?INT32_MAX:1);
-	value->hideInEditor = true;
-	value->isControllableFeedbackOnly = true;
+	for (int i = 0; i < numDimensions; i++)
+	{
+		FloatParameter * value = addFloatParameter("Value", "The current value, depending on the position", 0);
+		value->hideInEditor = true;
+		value->isControllableFeedbackOnly = true;
+		values.add(value);
+
+		minimumValues.add(INT32_MIN);
+		maximumValues.add(INT32_MAX);
+	}
 
 	enableSnap = addBoolParameter("Enable Snap", "If enabled, moving keys will be automatically adjusted to interesting positions such as automation position", false);
 	snapSensitivity = addFloatParameter("Snap Sensitivity", "Controls the sensitivity of the snapping, if enabled.\nThe greater the value, the more likely a position will be snapped.", .5f, 0, 3, false);
@@ -103,18 +111,21 @@ float Automation::getClosestSnapForPos(float pos, int start, int end)
 
 void Automation::clearRange()
 {
-	value->clearRange();
-	freeRange = true;
+	for(auto &value: values) value->clearRange();
+	hasRange = false;
 }
 
-void Automation::setRange(float minValue, float maxValue)
+
+void Automation::setRange(Array<float> minValues, Array<float> maxValues)
 {
-	value->setRange(minValue, maxValue);
-	freeRange = !value->hasRange();
+	hasRange = true;
+	
+	for (int i = 0; i < numDimensions;i++) values[i]->setRange(minValues[i], maxValues[i]);
+
 	for (auto &k : items)
 	{
-		if (freeRange) k->value->clearRange();
-		else k->value->setRange(value->minimumValue, value->maximumValue);
+		if (hasRange)k->setRange(minValues, maxValues);
+		else  k->clearRange();
 	}
 }
 
@@ -176,49 +187,59 @@ void Automation::setLength(float newLength, bool stretch, bool stickToEnd)
 	
 }
 
-float Automation::getValueForPosition(float pos)
+Array<float> Automation::getValuesForPosition(float pos)
 {
 	if (items.size() == 0) return 0;
-	if (pos <= items[0]->position->floatValue()) return items[0]->value->floatValue();
-	else if (pos >= items[items.size() - 1]->position->floatValue()) return items[items.size() - 1]->value->floatValue();
+	if (pos <= items[0]->position->floatValue()) return items[0]->getValues();
+	else if (pos >= items[items.size() - 1]->position->floatValue()) return items[items.size() - 1]->getValues();
 
 	AutomationKey * k = getClosestKeyForPos(pos);
 	if (k == nullptr) return 0;
-	return k->getValue(items[items.indexOf(k) + 1], pos);
+	return k->getValues(items[items.indexOf(k) + 1], pos);
 }
 
-float Automation::getNormalizedValueForPosition(float pos)
+Array<float>  Automation::getNormalizedValuesForPosition(float pos)
 {
-	return jmap<float>(getValueForPosition(pos), value->minimumValue, value->maximumValue,0 ,1);
+	Array<float> curValues = getValuesForPosition(pos);
+	Array<float> result;
+	for (int i = 0; i < numDimensions; i++) result.add(jmap<float>(curValues[i], values[i]->minimumValue, values[i]->maximumValue, 0, 1));
+	return result;
 }
 
 AutomationKey * Automation::createItem()
 {
-	AutomationKey * k = new AutomationKey(value->minimumValue, value->maximumValue);
+	AutomationKey * k = new AutomationKey(numDimensions,minimumValues, maximumValues);
 	if(selectionManager != nullptr) k->setSelectionManager(selectionManager);
 	if(!allowKeysOutside) k->position->setRange(0, length->floatValue());
 	return k;
 }
 
-void Automation::addItems(Array<Point<float>> keys, bool removeExistingOverlappingKeys, bool addToUndo, bool autoSmoothCurve)
+void Automation::addItems(Array<float> positions, Array<Array<float>> keyValues, bool removeExistingOverlappingKeys, bool addToUndo, bool autoSmoothCurve)
 {
 	if(selectionManager != nullptr) selectionManager->setEnabled(false);
+
+	if (positions.size() != keyValues.size())
+	{
+		jassertfalse;
+		return;
+	}
 
 	//Array<UndoableAction *> actions;
 	//if(removeExistingOverlappingKeys) actions.addArray(getRemoveKeysBetweenAction(keys[0].x, keys[keys.size() - 1].x));
 	
 	DBG("Add items in Automation");
-	removeKeysBetween(keys[0].x, keys[keys.size() - 1].x);
+	removeKeysBetween(positions[0], positions[positions.size() - 1]);
 
 	Array<AutomationKey *> newKeys;
 
 	int autoIndex = items.size();
-	for (auto &k : keys)
+	int numNewKeys = positions.size();
+	for (int i = 0; i < numNewKeys; i++)
 	{
 		AutomationKey * ak = createItem();
 		ak->setNiceName("Key " + String(autoIndex));
-		ak->position->setValue(k.x);
-		ak->value->setValue(k.y);
+		ak->position->setValue(positions[i]);
+		ak->setValues(keyValues[i]);
 		if (autoSmoothCurve) ak->setEasing(Easing::BEZIER);
 		newKeys.add(ak);
 
@@ -232,11 +253,11 @@ void Automation::addItems(Array<Point<float>> keys, bool removeExistingOverlappi
 
 }
 
-AutomationKey * Automation::addItem(const float _position, const float _value, bool addToUndo, bool reorder)
+AutomationKey * Automation::addItem(const float _position, const Array<float> _values, bool addToUndo, bool reorder)
 {
 	AutomationKey * k = createItem();
 	k->position->setValue(_position);
-	k->value->setValue(_value);
+	k->setValues(_values);
 	BaseManager::addItem(k,var(), addToUndo);
 	if (reorder) reorderItems();
 
@@ -300,7 +321,8 @@ void Automation::onControllableFeedbackUpdate(ControllableContainer * cc, Contro
 			}
 		}
 
-		value->setValue(getValueForPosition(position->floatValue()));
+		Array<float> curValues = getValuesForPosition(position->floatValue());
+		for (int i = 0; i < numDimensions; i++) values[i]->setValue(curValues[i]);
 
 		if (c == t->position)
 		{
@@ -324,7 +346,8 @@ void Automation::onContainerParameterChanged(Parameter * p)
 {
 	if (p == position)
 	{
-		value->setValue(getValueForPosition(position->floatValue()));
+		Array<float> curValues = getValuesForPosition(position->floatValue());
+		for (int i = 0; i < numDimensions; i++) values[i]->setValue(curValues[i]);
 	} else if (p == enableSnap)
 	{
 		snapSensitivity->setEnabled(enableSnap->boolValue());

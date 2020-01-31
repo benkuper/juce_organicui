@@ -10,16 +10,22 @@
 */
 
 
-AutomationKeyUI::AutomationKeyUI(AutomationKey * key, Colour c) :
+AutomationKeyUI::AutomationKeyUI(AutomationKey * key) :
 	BaseItemMinimalUI(key),
-    color(c),
 	keyYPos1(-1),
     keyYPos2(-1),
-    showHandle(true),
-    handle(c)
+    showHandles(true),
+	draggingHandle(nullptr)
 {
+	
+	for (int i = 0; i < key->numDimensions; i++)
+	{
+		Handle* h = new Handle(i, key->numDimensions == 1 ? Colours::white : Colour::fromHSV(i * .3f, .9f, 1, 0xFF));
+		addAndMakeVisible(h);
+		handles.add(h);
+		easingsUI.add(nullptr);
+	}
 
-	addAndMakeVisible(&handle);
 	//removeMouseListener(this);
 
 	bringToFrontOnSelect = false;
@@ -27,65 +33,73 @@ AutomationKeyUI::AutomationKeyUI(AutomationKey * key, Colour c) :
 	setMouseClickGrabsKeyboardFocus(false);
 
 	autoDrawContourWhenSelected = false;
-	setEasingUI(item->easing != nullptr ? item->easing->createUI() : nullptr);
+	updateEasingsUI();
 }
 
 AutomationKeyUI::~AutomationKeyUI()
 {
 }
 
-void AutomationKeyUI::setShowHandle(bool value)
+void AutomationKeyUI::setShowHandles(bool value)
 {
 
-	if (showHandle == value) return;
-	showHandle = value;
-	if (showHandle)
+	if (showHandles == value) return;
+	showHandles = value;
+
+	if (showHandles)
 	{
-		if(handle.getParentComponent() == nullptr) addChildComponent(&handle);
+		for(int i=0;i<item->numDimensions;i++) if(handles[i]->getParentComponent() == nullptr) addChildComponent(handles[i]);
 	} else
 	{
-		if (handle.getParentComponent() == this) removeChildComponent(&handle);
+		for (int i = 0; i < item->numDimensions; i++) if (handles[i]->getParentComponent() == this) removeChildComponent(handles[i]);
 	}
 }
 
 
-void AutomationKeyUI::setEasingUI(EasingUI * eui)
+void AutomationKeyUI::paint(Graphics& g)
 {
-	if (easingUI != nullptr)
+	//nothing
+}
+
+void AutomationKeyUI::updateEasingsUI()
+{
+	for (int i = 0; i < item->numDimensions; i++)
 	{
-		removeChildComponent(easingUI.get());
-	}
+		if (easingsUI[i] != nullptr) removeChildComponent(easingsUI[i]);
 
-	easingUI.reset(eui);
+		EasingUI* eui = item->easings[i] != nullptr ? item->easings[i]->createUI() : nullptr;
+		easingsUI.set(i, eui);
 
-	if (easingUI != nullptr)
-	{
+		if (eui != nullptr)
+		{
 
-		addAndMakeVisible(easingUI.get());
-		easingUI->color = color;
-		easingUI->toBack();
-		resized();
-		if(keyYPos1 > -1 && keyYPos2 > -1) easingUI->setKeyPositions(keyYPos1, keyYPos2);
+			addAndMakeVisible(eui);
+			eui->color = item->numDimensions == 1 ? Colours::white : Colour::fromHSV(i * .3f, .9f, 1, 0xFF);
+			eui->toBack();
+			resized();
+			eui->setKeyPositions(keyYPos1[i], keyYPos2[i]);
+		}
 	}
 }
 
-void AutomationKeyUI::setKeyPositions(const int &k1, const int &k2)
+void AutomationKeyUI::setKeyPositions(const Array<int> k1, const Array<int> k2)
 {
 	keyYPos1 = k1;
 	keyYPos2 = k2;
-	if (easingUI != nullptr) easingUI->setKeyPositions(keyYPos1, keyYPos2);
 
-	juce::Rectangle<int> hr = getLocalBounds().withSize(AutomationKeyUI::handleClickZone, AutomationKeyUI::handleClickZone)
-		.withCentre(Point<int>(AutomationKeyUI::handleClickZone / 2, (int)((1 - item->value->floatValue())*getHeight())));
+	for (int i = 0; i < item->numDimensions; i++)
+	{
+		if (easingsUI[i] != nullptr) easingsUI[i]->setKeyPositions(keyYPos1[i], keyYPos2[i]);
+	}
 
-	handle.setBounds(hr);
+	resized();
 }
 
 void AutomationKeyUI::showKeyEditorWindow()
 {
 	AlertWindow keyEditorWindow("Set key position and value", "Fine tune this key's position and value", AlertWindow::AlertIconType::NoIcon, this);
 	keyEditorWindow.addTextEditor("pos", item->position->stringValue(), "Position");
-	keyEditorWindow.addTextEditor("val", item->value->stringValue(), "Value");
+	for(int i=0;i<item->numDimensions;i++) keyEditorWindow.addTextEditor("val"+String(i), item->values[i]->stringValue(), "Value "+String(i));
 
 
 	keyEditorWindow.addButton("OK", 1, KeyPress(KeyPress::returnKey));
@@ -96,39 +110,48 @@ void AutomationKeyUI::showKeyEditorWindow()
 	if (result)
 	{
 		float newPos = keyEditorWindow.getTextEditorContents("pos").getFloatValue();
-		float newValue = keyEditorWindow.getTextEditorContents("val").getFloatValue();
 
 		Array<UndoableAction *> actions;
 		actions.add(item->position->setUndoableValue(item->position->value,newPos,true));
-		actions.add(item->value->setUndoableValue(item->value->value, newValue, true));
+		for (int i = 0; i < item->numDimensions; i++)
+		{
+			float newValue = keyEditorWindow.getTextEditorContents("val"+String(i)).getFloatValue();
+			actions.add(item->values[i]->setUndoableValue(item->values[i]->value, newValue, true));
+		}
 		UndoMaster::getInstance()->performActions("Move automation key", actions);
 	}
 }
 
 void AutomationKeyUI::resized()
 {
-	juce::Rectangle<int> hr = getLocalBounds().withSize(AutomationKeyUI::handleClickZone, AutomationKeyUI::handleClickZone)
-		.withCentre(Point<int>(AutomationKeyUI::handleClickZone / 2, (int)((1 - item->value->floatValue())*getHeight())));
-
-	handle.setBounds(hr);
-
-	juce::Rectangle<int> r = getLocalBounds().reduced(AutomationKeyUI::handleClickZone / 2, 0);
-	if (easingUI != nullptr)
+	for (int i = 0; i < item->numDimensions; i++)
 	{
-		easingUI->setBounds(r);
+		juce::Rectangle<int> hr = getLocalBounds().withSize(AutomationKeyUI::handleClickZone, AutomationKeyUI::handleClickZone)
+			.withCentre(Point<int>(AutomationKeyUI::handleClickZone / 2, (int)((1 - item->values[i]->floatValue()) * getHeight())));
+
+		handles[i]->setBounds(hr);
+
+		juce::Rectangle<int> r = getLocalBounds().reduced(AutomationKeyUI::handleClickZone / 2, 0);
+		if (easingsUI[i] != nullptr) easingsUI[i]->setBounds(r);
 	}
+	
 }
 
 bool AutomationKeyUI::hitTest(int tx, int ty)
 {
-	return handle.getBounds().contains(tx, ty) || (easingUI != nullptr && easingUI->hitTest(tx, ty));
+	for (int i = 0; i < item->numDimensions; i++)
+	{
+		if (handles[i]->getBounds().contains(tx, ty) || (easingsUI[i] != nullptr && easingsUI[i]->hitTest(tx, ty))) return true;
+	}
+
+	return false;
 }
 
 void AutomationKeyUI::mouseDown(const MouseEvent & e)
 {
 	BaseItemMinimalUI::mouseDown(e);
 	setMouseCursor(e.mods.isShiftDown() ? MouseCursor::LeftRightResizeCursor : MouseCursor::NormalCursor);
-	if (e.eventComponent == &handle)
+	if (Handle * h = dynamic_cast<Handle *>(e.eventComponent))
 	{
 		if (e.mods.isLeftButtonDown())
 		{
@@ -138,11 +161,15 @@ void AutomationKeyUI::mouseDown(const MouseEvent & e)
 			} else
 			{
 				posAtMouseDown = item->position->floatValue();
-				valueAtMouseDown = item->value->floatValue();
+				valueAtMouseDown = item->values[h->dimensionIndex]->floatValue();
+				draggingHandle = h;
 			}
 		}
-	} else if (e.eventComponent == easingUI.get())
+	} else if (EasingUI * eui = dynamic_cast<EasingUI *>(e.eventComponent))
 	{
+		int index = easingsUI.indexOf(eui);
+		jassert(index != -1);
+
 		if (e.mods.isRightButtonDown())
 		{
 			PopupMenu ep;
@@ -158,45 +185,53 @@ void AutomationKeyUI::mouseDown(const MouseEvent & e)
 			if (result >= 1 && result <= keys.size())
 			{
 				item->easingType->setUndoableValue(item->easingType->value,keys[result - 1]);
-				item->easing->selectThis(); //reselect after changing easing
+				item->easings[index]->selectThis(); //reselect after changing easing
 			}
 		} else if (e.mods.isCommandDown())
 		{
 			item->easingType->setNext(true,true);
-			item->easing->selectThis(); //reselect after changing easing
+			item->easings[index]->selectThis(); //reselect after changing easing
 		}
 	}
 }
 
 void AutomationKeyUI::mouseUp(const MouseEvent & e)
 {
-	handle.setMouseCursor(MouseCursor::NormalCursor);
+	if(draggingHandle != nullptr ) draggingHandle->setMouseCursor(MouseCursor::NormalCursor);
+	draggingHandle = nullptr;
 }
 
 void AutomationKeyUI::controllableFeedbackUpdateInternal(Controllable * c)
 {
 	if (c == item->easingType)
 	{
-		setEasingUI(item->easing != nullptr ? item->easing->createUI() : nullptr);
+		updateEasingsUI();
 	}
 }
 
 void AutomationKeyUI::inspectableSelectionChanged(Inspectable * i)
 {
 	BaseItemMinimalUI::inspectableSelectionChanged(i);
-	handle.highlight = item->isSelected;
-	handle.color = item->isSelected ? HIGHLIGHT_COLOR : item->isPreselected ? PRESELECT_COLOR : color;
+	for (auto& h : handles)
+	{
+		h->highlight = item->isSelected;
+		//h->color = item->isPreselected ? PRESELECT_COLOR : color;
+	}
 }
 
 void AutomationKeyUI::inspectablePreselectionChanged(Inspectable * i)
 {
 	BaseItemMinimalUI::inspectablePreselectionChanged(i);
-	handle.highlight = false;
-	handle.color = item->isPreselected ? PRESELECT_COLOR : color;
+	for (auto& h : handles)
+	{
+		h->highlight = item->isSelected;
+		//h->color = item->isPreselected ? PRESELECT_COLOR : color;
+	}
 }
 
-AutomationKeyUI::Handle::Handle(Colour c) :
+AutomationKeyUI::Handle::Handle(int dimensionIndex, Colour c) :
 	highlight(false),
+	dimensionIndex(dimensionIndex),
 	color(c)
 {
 	setRepaintsOnMouseActivity(true);

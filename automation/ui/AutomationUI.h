@@ -19,7 +19,7 @@ class AutomationUI :
 	public Timer
 {
 public:
-	AutomationUI(Automation * _automation, Colour c = Colours::white);
+	AutomationUI(Automation * _automation);
 	virtual ~AutomationUI();
 	
 	//View optimisation, generate in thread a preview of the image
@@ -39,15 +39,10 @@ public:
 
 	bool autoResetViewRangeOnLengthUpdate;
 
-	float currentPosition;
-	float currentValue;
-
 	bool fixedPosOrValueEnabled; //When using shift key and moving handles, keep either position or value
 
-	Colour color;
-
 	AutomationKeyUI * currentUI;
-	std::unique_ptr<AutomationMultiKeyTransformer> transformer;
+	//std::unique_ptr<AutomationMultiKeyTransformer> transformer;
 
 	bool shouldRepaint;
 
@@ -68,6 +63,7 @@ public:
 	float getPosForX(int tx, bool offsetStart = true);
 
 	int getYForValue(float value);
+	Array<int> getYForKey(AutomationKey * k);
 	float getValueForY(int ty);
 
 	bool isInView(AutomationKeyUI * kui);

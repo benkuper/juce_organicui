@@ -17,9 +17,10 @@ class Automation :
 	public BaseManager<AutomationKey>
 {
 public:
-	Automation(const String &name = "Automation", AutomationRecorder * recorder = nullptr, bool freeRange = false, bool allowKeysOutside = false, bool dedicatedSelectionManager = true);
+	Automation(const String &name = "Automation", int numDimensions = 1, AutomationRecorder * recorder = nullptr, bool allowKeysOutside = false, bool dedicatedSelectionManager = true);
 	virtual ~Automation();
 
+	int numDimensions;
 
 	//Recorder
 	AutomationRecorder * recorder;
@@ -28,10 +29,13 @@ public:
 	bool showUIInEditor;
 
 	//Position and value
-	bool freeRange;
+	bool hasRange;
+	Array<float> minimumValues;
+	Array<float> maximumValues;
+
 	bool allowKeysOutside; //allow keys positions to be outside automation timing
 	FloatParameter * position;
-	FloatParameter * value;
+	Array<FloatParameter *> values;
 	FloatParameter * length;
 
 	//snapping
@@ -43,23 +47,22 @@ public:
 
 	void setLength(float value, bool stretch = false, bool stickToEnd = false);
 
-	float getValueForPosition(float pos);
-	float getNormalizedValueForPosition(float pos);
+	Array<float> getValuesForPosition(float pos);
+	Array<float> getNormalizedValuesForPosition(float pos);
 
 	AutomationKey * createItem() override;
-	void addItems(Array<Point<float>> keys, bool removeExistingOverlappingKeys = true, bool addToUndo = true, bool autoSmoothCurve = false);
-	AutomationKey * addItem(const float position, const float value, bool addToUndo = true, bool reorder = false);
+	void addItems(Array<float> positions, Array<Array<float>> values, bool removeExistingOverlappingKeys = true, bool addToUndo = true, bool autoSmoothCurve = false);
+	AutomationKey * addItem(const float position, const Array<float> value, bool addToUndo = true, bool reorder = false);
     Array<AutomationKey *> addItemsFromClipboard(bool showWarning = false) override;
 
 	void removeKeysBetween(float start, float end);
 	void removeAllSelectedKeys();
 
 	void setSnapPositions(Array<float> positions);
-
 	float getClosestSnapForPos(float pos, int start = -1, int end = -1);
 
 	void clearRange();
-	void setRange(float minValue, float maxValue);
+	void setRange(Array<float> minValue, Array<float> maxValue);
 
 	AutomationKey * getClosestKeyForPos(float pos, int start = -1, int end = -1);
 	AutomationKey * getKeyAtPos(float pos);

@@ -15,7 +15,7 @@ class EasingUI :
 	public ContainerAsyncListener
 {
 public:
-	EasingUI(Easing * e);
+	EasingUI(Easing * e, Colour color = Colours::white);
 	virtual ~EasingUI();
 
 	WeakReference<Easing> easing;

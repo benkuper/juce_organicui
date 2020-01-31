@@ -8,6 +8,7 @@
   ==============================================================================
 */
 
+/*
 #pragma once  
 class AutomationUI;
 
@@ -41,3 +42,4 @@ public:
 	void mouseUp(const MouseEvent &e) override;
 };
 
+*/

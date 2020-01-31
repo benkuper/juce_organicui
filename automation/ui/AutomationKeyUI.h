@@ -14,45 +14,44 @@ class AutomationKeyUI :
 	public BaseItemMinimalUI<AutomationKey>
 {
 public:
-	AutomationKeyUI(AutomationKey *, Colour c = Colours::white);
+	AutomationKeyUI(AutomationKey *);
 	virtual ~AutomationKeyUI();
     
-	Colour color;
-    
-    std::unique_ptr<EasingUI> easingUI;
+	OwnedArray<EasingUI> easingsUI;
 
-    int keyYPos1;
-    int keyYPos2;
+    Array<int> keyYPos1;
+    Array<int> keyYPos2;
     
     float posAtMouseDown;
     float valueAtMouseDown;
 
-	bool showHandle;
+	bool showHandles;
 	
 	const static int handleSize = 6;
 	const static int handleClickZone = 10;
 
-	
-    void setShowHandle(bool value);
+    void setShowHandles(bool value);
 
 	class Handle :
 		public Component
 	{
 	public:
-		Handle(Colour c);
+		Handle(int dimensionIndex, Colour c);
 		bool highlight;
 		Colour color;
+		int dimensionIndex;
 		void paint(Graphics &g) override;
 	};
 
-    Handle handle;
-    
+    OwnedArray<Handle> handles;
+	Handle* draggingHandle;
 
-	void paint(Graphics &) override {}; //avoid default item painting
 
-	void setEasingUI(EasingUI * eui);
+	void paint(Graphics &) override; //avoid default item painting
 
-	void setKeyPositions(const int &k1, const int &k2);
+	void updateEasingsUI();
+
+	void setKeyPositions(const Array<int> k1, const Array<int> k2);
 
 	void showKeyEditorWindow();
 	

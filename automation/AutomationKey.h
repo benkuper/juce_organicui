@@ -14,24 +14,28 @@ class AutomationKey :
 	public BaseItem
 {
 public:
-	AutomationKey(float minimumValue = 0, float maximumValue = 1);
+	AutomationKey(int numDimensions = 1, Array<float> minimumValues = Array<float>((float)INT32_MIN), Array<float> maximumValue = Array<float>((float)INT32_MAX));
 	virtual ~AutomationKey();
 
+	int numDimensions;
+
 	FloatParameter * position; //depends on parent automation
-	FloatParameter * value; //0-1
+	Array<FloatParameter *> values; //0-1
 
 	EnumParameter * easingType;
 
-	std::unique_ptr<Easing> easing;
+	OwnedArray<Easing> easings;
+
+	void clearRange();
+	void setRange(Array<float> minVal, Array<float> maxVal);
 
 	void setEasing(Easing::Type t);
 
-	float getValue(AutomationKey * nextKey, const float &position);
+	Array<float> getValues(AutomationKey * nextKey = nullptr, const float &position = 0);
+	void setValues(Array<float> newValues);
 
 	void setSelectionManager(InspectableSelectionManager * ism) override;
-
 	void onContainerParameterChangedInternal(Parameter *) override;
-
 
 	var getJSONData() override;
 	void loadJSONDataInternal(var data) override;

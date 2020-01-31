@@ -10,9 +10,10 @@
 
 #pragma warning(disable:4244)
 
-EasingUI::EasingUI(Easing * e) :
+EasingUI::EasingUI(Easing * e, Colour color) :
 	InspectableContentComponent(e),
 	easing(e),
+	color(color),
 	y1(0),y2(0)
 {
 	autoDrawContourWhenSelected = false;

@@ -8,15 +8,23 @@
   ==============================================================================
 */
 
-AutomationKey::AutomationKey(float minimumValue, float maximumValue) :
-	BaseItem("Key",false)
+AutomationKey::AutomationKey(int numDimensions, Array<float> minimumValues, Array<float> maximumValues) :
+	BaseItem("Key",false),
+	numDimensions(numDimensions)
 {
 	itemDataType = "AutomationKey";
 	hideEditorHeader = true;
 
 	position = addFloatParameter("Position", "Position of the key", 0);
 	position->defaultUI = FloatParameter::TIME;
-	value = addFloatParameter("Value", "Value of the key", 0, minimumValue, maximumValue);
+
+	for (int i = 0; i < numDimensions; i++)
+	{
+		FloatParameter* value = addFloatParameter("Value", "Value of the key", 0, minimumValues[i], maximumValues[i]);
+		values.add(value);
+
+		easings.add(nullptr);
+	}
 
 	easingType = addEnumParameter("EasingType", "Type of transition to the next key");
 
@@ -36,51 +44,69 @@ AutomationKey::AutomationKey(float minimumValue, float maximumValue) :
 	helpID = "AutomationKey";
 }
 
-
 AutomationKey::~AutomationKey()
 {
 }
 
+void AutomationKey::clearRange()
+{
+	for (auto& v : values) v->clearRange();
+}
+
+void AutomationKey::setRange(Array<float> minVal, Array<float> maxVal)
+{
+	for (int i = 0; i < numDimensions; i++) values[i]->setRange(minVal[i], maxVal[i]);
+}
+
 void AutomationKey::setEasing(Easing::Type t)
 {
-
-	if (easing != nullptr)
+	for (int i = 0; i < numDimensions; i++)
 	{
-		if (easing->type == t) return;
-		removeChildControllableContainer(easing.get());
-	}
+		if (easings[i] != nullptr)
+		{
+			if (easings[i]->type == t) return;
+			removeChildControllableContainer(easings[i]);
+		}
 
-	Easing* e = nullptr;
-	switch (t)
-	{
-	case Easing::LINEAR:
-		e = new LinearEasing();
-		break;
+		Easing* e = nullptr;
+		switch (t)
+		{
+		case Easing::LINEAR:
+			e = new LinearEasing();
+			break;
 
-	case Easing::HOLD:
-		e = new HoldEasing();
-		break;
+		case Easing::HOLD:
+			e = new HoldEasing();
+			break;
 
-	case Easing::BEZIER:
-		e = new CubicEasing();
-		break;
+		case Easing::BEZIER:
+			e = new CubicEasing();
+			break;
 
-	case Easing::SINE:
-		e = new  SineEasing();
-		break;
-	}
+		case Easing::SINE:
+			e = new  SineEasing();
+			break;
+		}
 
-	easing.reset(e);
+		easings.set(i, e);
 
-	if (easing != nullptr)
-	{
-        easing->setSelectionManager(selectionManager);
-		addChildControllableContainer(easing.get());
+		if (easings[i] != nullptr)
+		{
+			easings[i]->setSelectionManager(selectionManager);
+			addChildControllableContainer(easings[i]);
+		}
 	}
 }
 
-float AutomationKey::getValue(AutomationKey * nextKey, const float & _pos)
+Array<float> AutomationKey::getValues(AutomationKey* nextKey, const float& _pos)
 {
+	Array<float> result;
+
+	if (nextKey == nullptr || _pos == 0)
+	{
+		for (auto& v : values) result.add(v->floatValue());
+		return result;
+	}
 
 	float relPos = 0;
 	if(position->floatValue() < nextKey->position->floatValue()) relPos = jmap<float>(_pos, position->floatValue(), nextKey->position->floatValue(), 0, 1); 
@@ -88,13 +114,19 @@ float AutomationKey::getValue(AutomationKey * nextKey, const float & _pos)
 	if (relPos < 0) relPos = 0;
 	if (relPos > 1) relPos = 1;
 
-	return easing->getValue(value->floatValue(), nextKey->value->floatValue(), relPos);
+	for (int i = 0; i < numDimensions;i++) result.add(easings[i]->getValue(values[i]->floatValue(), nextKey->values[i]->floatValue(), relPos));
+	return result;
+}
+
+void AutomationKey::setValues(Array<float> newValues)
+{
+	for (int i = 0; i < numDimensions; i++) values[i]->setValue(newValues[i]);
 }
 
 void AutomationKey::setSelectionManager(InspectableSelectionManager * ism)
 {
 	BaseItem::setSelectionManager(ism);
-	if (easing != nullptr) easing->setSelectionManager(ism);
+	for(auto & e: easings) if (e != nullptr) e->setSelectionManager(ism);
 }
 
 void AutomationKey::onContainerParameterChangedInternal(Parameter * p)
@@ -108,12 +140,24 @@ void AutomationKey::onContainerParameterChangedInternal(Parameter * p)
 var AutomationKey::getJSONData()
 {
 	var data = BaseItem::getJSONData();
-	if (easing != nullptr) data.getDynamicObject()->setProperty("easing", easing->getJSONData());
+
+	var easingsData = new DynamicObject();
+	for (int i = 0; i < numDimensions; i++)
+	{
+		if(easings[i] != nullptr) easingsData.getDynamicObject()->setProperty("easing"+String(i), easings[i]->getJSONData());
+	}
+
+	data.getDynamicObject()->setProperty("easings",easingsData);
 	return data;
 }
 
 void AutomationKey::loadJSONDataInternal(var data)
 {
 	BaseItem::loadJSONDataInternal(data);
-	if (easing != nullptr) easing->loadJSONData(data.getProperty("easing", var()));
+
+	var easingsData = data.getProperty("easings",var());
+	for (int i = 0; i < numDimensions; i++)
+	{
+		if (easings[i] != nullptr) easings[i]->loadJSONData(data.getProperty("easing"+String(i), var()));
+	}
 }

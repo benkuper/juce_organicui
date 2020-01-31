@@ -1,4 +1,3 @@
-#include "ParameterAutomation.h"
 /*
   ==============================================================================
 
@@ -146,7 +145,7 @@ ParameterNumberAutomation::ParameterNumberAutomation(Parameter* parameter, bool 
 {
 	timeParamRef = automation.position;
 	lengthParamRef = automation.length;
-	valueParamRef = automation.value;
+	valueParamRef = automation.values[0];
 	automationContainer = &automation;
 	
 	valueIsNormalized = true;
