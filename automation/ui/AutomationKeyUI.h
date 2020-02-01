@@ -53,13 +53,14 @@ public:
 
 	void setKeyPositions(const Array<int> k1, const Array<int> k2);
 
-	void showKeyEditorWindow();
+	void showKeyEditorWindow(int index);
 	
 	void resized() override;
 
 	bool hitTest(int tx, int ty) override;
 
 	void mouseDown(const MouseEvent &e) override;
+	void mouseDoubleClick(const MouseEvent& e) override;
 	void mouseUp(const MouseEvent &e) override;
 
 	void controllableFeedbackUpdateInternal(Controllable * c) override;

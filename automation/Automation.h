@@ -27,11 +27,13 @@ public:
 
 	//ui
 	bool showUIInEditor;
+	Point2DParameter* viewValueRange;
 
 	//Position and value
 	bool hasRange;
 	Array<float> minimumValues;
 	Array<float> maximumValues;
+
 
 	bool allowKeysOutside; //allow keys positions to be outside automation timing
 	FloatParameter * position;

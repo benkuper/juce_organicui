@@ -55,6 +55,10 @@ Automation::Automation(const String &name, int numDimensions, AutomationRecorder
 		selectionManager = customSelectionManager.get();
 	}
 
+	viewValueRange = addPoint2DParameter("View Value Range", "Range of minimum and maximum value that is currently focused");
+	viewValueRange->setPoint(0, 1);
+	viewValueRange->hideInEditor = true;
+
 	helpID = "Automation";
 }
 

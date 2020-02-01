@@ -19,6 +19,9 @@ AutomationUI::AutomationUI(Automation * _automation) :
 	//transformer(nullptr)
 {
 
+	setMouseClickGrabsKeyboardFocus(true);
+	setWantsKeyboardFocus(true);
+
 	manager->selectionManager->addSelectionListener(this);
 
 	
@@ -41,7 +44,7 @@ AutomationUI::AutomationUI(Automation * _automation) :
 
 	setSize(100, 100);
 
-	startTimerHz(20);
+	startTimerHz(30);
 }
 
 AutomationUI::~AutomationUI()
@@ -144,6 +147,34 @@ void AutomationUI::paint(Graphics & g)
 
 	if (getWidth() == 0 || getHeight() == 0) return;
 
+
+	float step = .25f;
+	float rangeDiff = manager->viewValueRange->y - manager->viewValueRange->x;
+	float stepY = getHeight() * step / rangeDiff;
+	while (stepY < 20)
+	{
+		step *= 2;
+		stepY = getHeight() * step / rangeDiff;
+	}
+
+	float bigStep = step >= 1 ? 10 : step >= .5f ? 5 : 1;
+
+	float startY = manager->viewValueRange->x - fmodf(manager->viewValueRange->x, step);
+	float endY = manager->viewValueRange->y - fmodf(manager->viewValueRange->x, step);
+	
+	g.setFont(12.0);
+
+	for (float i = startY; i <= endY; i += step)
+	{
+		float thickness = fmodf(i, bigStep) == 0 ? 2 : fmodf(i, bigStep / 2) == 0 ? 1 : .5f;
+		float alpha = fmodf(i, 1) == 0 ? .4f : fmodf(i, .5f) == 0 ? .2f : .1f;
+		g.setColour(Colours::white.withAlpha(alpha));
+		float ty = getYForValue(i);
+		float textOffset = ty > getHeight() / 2 ? -12 : 4;
+		g.drawText(String(i, 2), Rectangle<int>(0, ty+textOffset, 35, 10),Justification::centred);
+		g.drawLine(0, ty, getWidth(), ty, thickness);
+	}
+
 	if (viewMode == VIEW)
 	{
 		imageLock.enter();
@@ -153,23 +184,24 @@ void AutomationUI::paint(Graphics & g)
 			imageLock.exit();
 		//}
 	}
-	
 
 	//int count = 0;
 	if (itemsUI.size() >= 2)
 	{
+		int y0 = getYForValue(0);
 		for (int i = 0; i < manager->numDimensions; i++)
 		{
 			Colour c = manager->numDimensions == 1 ? Colours::white : Colour::fromHSV(i * .3f, .9f, 1, 0xFF);
 
 			int ty = getYForValue(manager->values[i]->floatValue());
-			juce::Rectangle<int> vr = getLocalBounds().withTop(ty);
+			
+			juce::Rectangle<int> vr(0, jmin(y0,ty), getWidth(), abs(ty - y0));
 			g.setColour(c.withAlpha(.1f));
-			if (vr.getHeight() > 0) g.fillRect(vr);
+			if (vr.getHeight() != 0) g.fillRect(vr);
 
 			//pos-value feedback
-			g.setColour(Colours::orange);
-			g.drawEllipse(juce::Rectangle<int>(0, 0, 3, 3).withCentre(Point<int>(getXForPos(manager->position->floatValue()), ty)).toFloat(), 1);
+			g.setColour(c.brighter(.7f).withAlpha(.7f));
+			g.drawEllipse(juce::Rectangle<int>(0, 0, 6, 6).withCentre(Point<int>(getXForPos(manager->position->floatValue()), ty)).toFloat(),1);
 		}
 	}
 
@@ -282,7 +314,10 @@ float AutomationUI::getPosForX(int tx, bool offsetStart)
 
 int AutomationUI::getYForValue(float value)
 {
-	return (int)((1 - value)*(getHeight()-1));
+	int result = (int)jmap<float>(value, manager->viewValueRange->x, manager->viewValueRange->y, getHeight()-1, 0);
+	return result;
+
+	//(int)((1 - value) * (getHeight() - 1));
 }
 
 Array<int> AutomationUI::getYForKey(AutomationKey* k)
@@ -292,14 +327,54 @@ Array<int> AutomationUI::getYForKey(AutomationKey* k)
 	return result;
 }
 
-float AutomationUI::getValueForY(int ty)
+float AutomationUI::getValueForY(int ty, bool zeroIsBottom, bool relative)
 {
-	return (1 - ty * 1.f / (getHeight()-1));
+	float rel = ty * 1.f / (getHeight() - 1);
+	if (zeroIsBottom) rel = 1 - rel;
+	if (relative) return rel * (manager->viewValueRange->y - manager->viewValueRange->x);
+	float result = jmap<float>(rel, manager->viewValueRange->x, manager->viewValueRange->y);
+
+	return result;
 }
 
 bool AutomationUI::isInView(AutomationKeyUI * kui)
 {
 	return kui->item->position->floatValue() >= viewStartPos && kui->item->position->floatValue() <= viewEndPos;
+}
+
+void AutomationUI::homeViewYRange()
+{
+	manager->viewValueRange->setPoint(0, 1);
+}
+
+void AutomationUI::frameViewYRange()
+{
+	float minY = INT32_MAX;
+	float maxY = INT32_MIN;
+
+	for (int i = firstROIKey; i <= lastROIKey; i++)
+	{
+		for (auto& v : manager->items[i]->values)
+		{
+			minY = jmin(v->floatValue(), minY);
+			maxY = jmax(v->floatValue(), maxY);
+		}
+	}
+
+	if (minY == maxY)
+	{
+		minY -= .5f;
+		maxY += .5f;
+	}
+	else
+	{
+		float dist = maxY - minY;
+		minY -= dist * .1f;
+		maxY += dist * .1f;
+	}
+
+	manager->viewValueRange->setPoint(minY, maxY);
+
 }
 
 AutomationKeyUI * AutomationUI::getClosestKeyUIForPos(float pos, int start, int end)
@@ -373,10 +448,18 @@ void AutomationUI::mouseDown(const MouseEvent & e)
 
 	if (e.eventComponent == this)
 	{
-		if (e.mods.isLeftButtonDown() && e.mods.isAltDown())
+		if (e.mods.isLeftButtonDown())
 		{
-			manager->addItem(getPosForX(e.getPosition().x), getValueForY(e.getPosition().y));
-			manager->reorderItems();
+			if (e.mods.isAltDown())
+			{
+				float position = getPosForX(e.getPosition().x);
+				Array<float> values = manager->getValuesForPosition(position);
+				values.set(0, getValueForY(e.getPosition().y));
+				manager->addItem(position, values);
+				manager->reorderItems();
+			}
+			rangeAtMouseDown = manager->viewValueRange->getPoint();
+
 		} else
 		{
 			/*
@@ -433,16 +516,23 @@ void AutomationUI::mouseDoubleClick(const MouseEvent & e)
 {
 	if (e.eventComponent == this)
 	{
-		manager->addItem(getPosForX(e.getPosition().x), getValueForY(e.getPosition().y));
+		float position = getPosForX(e.getPosition().x);
+		Array<float> values = manager->getValuesForPosition(position);
+		values.set(0, getValueForY(e.getPosition().y));
+		manager->addItem(position, values); 
 		manager->reorderItems();
 	}
 }
 
 void AutomationUI::mouseDrag(const MouseEvent & e)
 {
-	if (e.originalComponent == this)
+	if (e.eventComponent == this)
 	{
-
+		if (!e.mods.isAltDown() && !e.mods.isShiftDown())
+		{
+			float valOffset = getValueForY(e.getDistanceFromDragStartY(), false, true);
+			manager->viewValueRange->setPoint(rangeAtMouseDown.x + valOffset, rangeAtMouseDown.y + valOffset);
+		}
 	} else
 	{
 		AutomationKeyUI::Handle * h = dynamic_cast<AutomationKeyUI::Handle *>(e.eventComponent);
@@ -523,6 +613,17 @@ void AutomationUI::mouseUp(const MouseEvent & e)
 
 bool AutomationUI::keyPressed(const KeyPress & e)
 {
+	if (e.getKeyCode() == KeyPress::createFromDescription("f").getKeyCode())
+	{
+		frameViewYRange();
+		return true;
+	}
+	else if (e.getKeyCode() == KeyPress::createFromDescription("h").getKeyCode())
+	{
+		homeViewYRange();
+		return true;
+	}
+
 	return BaseManagerUI::keyPressed(e);
 	//return false;
 }
@@ -535,6 +636,10 @@ void AutomationUI::newMessage(const ContainerAsyncEvent & e)
 		{
 			currentUI = getClosestKeyUIForPos(manager->position->floatValue());
 			shouldRepaint = true;
+		}
+		else if (e.targetControllable == manager->viewValueRange)
+		{
+			resized();
 		}
 		else if (manager->values.contains(dynamic_cast<FloatParameter*>(e.targetControllable)))
 		{
@@ -556,7 +661,7 @@ void AutomationUI::newMessage(const ContainerAsyncEvent & e)
 				else if (e.targetControllable == k->position || k->values.contains(dynamic_cast<FloatParameter*>(e.targetControllable)))
 				{
 					placeKeyUI(getUIForItem(k));
-					//repaint();
+					shouldRepaint = true;
 				}
 			}
 		}

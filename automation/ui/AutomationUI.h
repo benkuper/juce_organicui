@@ -34,6 +34,8 @@ public:
 	float viewStartPos;
 	float viewEndPos;
 
+	Point<float> rangeAtMouseDown;
+
 	int firstROIKey;
 	int lastROIKey;
 
@@ -45,9 +47,6 @@ public:
 	//std::unique_ptr<AutomationMultiKeyTransformer> transformer;
 
 	bool shouldRepaint;
-
-	void setCurrentPosition(const float &pos);
-	void setCurrentValue(const float &val);
 
 	void setViewMode(ViewMode mode);
 
@@ -64,9 +63,11 @@ public:
 
 	int getYForValue(float value);
 	Array<int> getYForKey(AutomationKey * k);
-	float getValueForY(int ty);
+	float getValueForY(int ty, bool zeroIsBottom = true, bool relative = false);
 
 	bool isInView(AutomationKeyUI * kui);
+	void homeViewYRange();
+	void frameViewYRange();
 
 	AutomationKeyUI * getClosestKeyUIForPos(float pos, int start = - 1, int end = -1);
 

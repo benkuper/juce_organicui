@@ -1,4 +1,3 @@
-#include "AutomationKeyUI.h"
 /*
   ==============================================================================
 
@@ -28,6 +27,7 @@ AutomationKeyUI::AutomationKeyUI(AutomationKey * key) :
 
 	//removeMouseListener(this);
 
+	dragAndDropEnabled = false;
 	bringToFrontOnSelect = false;
 	setWantsKeyboardFocus(false);
 	setMouseClickGrabsKeyboardFocus(false);
@@ -95,11 +95,11 @@ void AutomationKeyUI::setKeyPositions(const Array<int> k1, const Array<int> k2)
 	resized();
 }
 
-void AutomationKeyUI::showKeyEditorWindow()
+void AutomationKeyUI::showKeyEditorWindow(int index)
 {
 	AlertWindow keyEditorWindow("Set key position and value", "Fine tune this key's position and value", AlertWindow::AlertIconType::NoIcon, this);
 	keyEditorWindow.addTextEditor("pos", item->position->stringValue(), "Position");
-	for(int i=0;i<item->numDimensions;i++) keyEditorWindow.addTextEditor("val"+String(i), item->values[i]->stringValue(), "Value "+String(i));
+	/*for(int i=0;i<item->numDimensions;i++) */ keyEditorWindow.addTextEditor("val"/*+String(i)*/, item->values[index]->stringValue(), "Value" /*+ String(i)*/);
 
 
 	keyEditorWindow.addButton("OK", 1, KeyPress(KeyPress::returnKey));
@@ -113,11 +113,11 @@ void AutomationKeyUI::showKeyEditorWindow()
 
 		Array<UndoableAction *> actions;
 		actions.add(item->position->setUndoableValue(item->position->value,newPos,true));
-		for (int i = 0; i < item->numDimensions; i++)
-		{
-			float newValue = keyEditorWindow.getTextEditorContents("val"+String(i)).getFloatValue();
-			actions.add(item->values[i]->setUndoableValue(item->values[i]->value, newValue, true));
-		}
+		//for (int i = 0; i < item->numDimensions; i++)
+		//{
+			float newValue = keyEditorWindow.getTextEditorContents("val"/*+String(i)*/).getFloatValue();
+			actions.add(item->values[index]->setUndoableValue(item->values[index]->value, newValue, true));
+		//}
 		UndoMaster::getInstance()->performActions("Move automation key", actions);
 	}
 }
@@ -127,7 +127,7 @@ void AutomationKeyUI::resized()
 	for (int i = 0; i < item->numDimensions; i++)
 	{
 		juce::Rectangle<int> hr = getLocalBounds().withSize(AutomationKeyUI::handleClickZone, AutomationKeyUI::handleClickZone)
-			.withCentre(Point<int>(AutomationKeyUI::handleClickZone / 2, (int)((1 - item->values[i]->floatValue()) * getHeight())));
+			.withCentre(Point<int>(AutomationKeyUI::handleClickZone / 2, keyYPos1[i]));
 
 		handles[i]->setBounds(hr);
 
@@ -192,6 +192,14 @@ void AutomationKeyUI::mouseDown(const MouseEvent & e)
 			item->easingType->setNext(true,true);
 			item->easings[index]->selectThis(); //reselect after changing easing
 		}
+	}
+}
+
+void AutomationKeyUI::mouseDoubleClick(const MouseEvent& e)
+{
+	if (Handle* h = dynamic_cast<Handle*>(e.eventComponent))
+	{
+		showKeyEditorWindow(h->dimensionIndex);
 	}
 }
 
