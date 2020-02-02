@@ -45,7 +45,7 @@ GlobalSettings::GlobalSettings() :
 	addChildControllableContainer(&startupCC);
 
 	fontSize = interfaceCC.addIntParameter("Font size", "Global font size, may be altered in some cases but this is used as a reference", 14, 0, 30);
-	helpLanguage = interfaceCC.addEnumParameter("Help language", "What language to download ? You will need to restart Chataigne to see changes");
+	helpLanguage = interfaceCC.addEnumParameter("Help language", "What language to download ? You will need to restart the software to see changes");
 	helpLanguage->addOption("English", "en")->addOption("French", "fr")->addOption("Chinese", "cn");
 
 	addChildControllableContainer(&interfaceCC);

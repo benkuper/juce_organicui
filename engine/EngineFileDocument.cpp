@@ -277,7 +277,7 @@ void Engine::loadJSONData(var data, ProgressTask * loadingTask)
 
 			if (needsOnlineUpdate)
 			{
-				result = AlertWindow::showYesNoCancelBox(AlertWindow::QuestionIcon, "File compatibility check", "Your file has been save with an older version of Chataigne (" + versionString + "), some data may be lost if you load it directly. You can choose to update the file online, load it directly or cancel the operation.\nIn any case, your current file will be backed up with \"_backup\" appended to its name.", "Update", "Load directly", "Cancel");
+				result = AlertWindow::showYesNoCancelBox(AlertWindow::QuestionIcon, "File compatibility check", "Your file has been save with an older version of "+ OrganicApplication::getInstance()->getApplicationName() +" (" + versionString + "), some data may be lost if you load it directly. You can choose to update the file online, load it directly or cancel the operation.\nIn any case, your current file will be backed up with \"_backup\" appended to its name.", "Update", "Load directly", "Cancel");
 			}
 			
 			if (result == 0)

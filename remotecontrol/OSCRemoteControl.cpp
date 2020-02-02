@@ -1,4 +1,3 @@
-#include "OSCRemoteControl.h"
 /*
   ==============================================================================
 
@@ -215,7 +214,7 @@ void OSCRemoteControl::oscBundleReceived(const OSCBundle & b)
 #if ORGANICUI_USE_SERVUS
 void OSCRemoteControl::run()
 {
-	String nameToAdvertise = "Chataigne - Remote Control";
+	String nameToAdvertise = OrganicApplication::getInstance()->getApplicationName() + " - Remote Control";
 	int portToAdvertise = 0;
 	while (portToAdvertise != localPort->intValue() && !threadShouldExit())
 	{
