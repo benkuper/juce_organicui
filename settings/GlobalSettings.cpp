@@ -28,8 +28,8 @@ GlobalSettings::GlobalSettings() :
 #if JUCE_WINDOWS
 	launchOnStartup = startupCC.addBoolParameter("Launch on system startup", "If checked, this app will automatically launch on system startup", false);
 #endif
-	launchMinimised = startupCC.addBoolParameter("Launch minimised", "If checked, this app will automatically minimized it self when launched", false);
 
+	launchMinimised = startupCC.addBoolParameter("Launch minimized", "If checked, this app will automatically minimized it self when launched", false);
 	checkUpdatesOnStartup = startupCC.addBoolParameter("Check updates on startup", "If enabled, app will check if any updates are available",true);
 	checkBetaUpdates = startupCC.addBoolParameter("Check for beta updates", "If enabled the app will also check for beta versions of the software", false);
 	updateHelpOnStartup = startupCC.addBoolParameter("Update help on startup", "If enabled, app will try and download the last help file locally", true);
@@ -44,6 +44,7 @@ GlobalSettings::GlobalSettings() :
 
 	addChildControllableContainer(&startupCC);
 
+	closeToSystemTray = interfaceCC.addBoolParameter("Close to system tray", "If checked, closing the main window will remove the window from desktop and put it on the system tray, but the app will still be running", false);
 	fontSize = interfaceCC.addIntParameter("Font size", "Global font size, may be altered in some cases but this is used as a reference", 14, 0, 30);
 	helpLanguage = interfaceCC.addEnumParameter("Help language", "What language to download ? You will need to restart the software to see changes");
 	helpLanguage->addOption("English", "en")->addOption("French", "fr")->addOption("Chinese", "cn");

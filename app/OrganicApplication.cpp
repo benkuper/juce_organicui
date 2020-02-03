@@ -2,6 +2,7 @@
 #if JUCE_MAC //for chmod
 #include <sys/types.h>
 #include <sys/stat.h>
+#include "OrganicApplication.h"
 #endif
 //
 //#if JUCE_WINDOWS_
@@ -12,16 +13,17 @@ static OrganicApplication& getApp() { return *dynamic_cast<OrganicApplication*>(
 String getAppVersion() { return getApp().getApplicationVersion(); }
 ControllableContainer * getAppSettings() { return &(getApp().appSettings); }
 ApplicationProperties& getAppProperties() { return *getApp().appProperties; }
-OpenGLContext * getOpenGLContext() { return &getApp().mainComponent->openGLContext; }
+OpenGLContext * getOpenGLContext() { return getApp().mainComponent->openGLContext.get(); }
 ApplicationCommandManager& getCommandManager() { return getApp().commandManager; }
 OrganicApplication::MainWindow * getMainWindow() { return getApp().mainWindow.get(); }
 
 #define TEST_CRASH 0
 
-OrganicApplication::OrganicApplication(const String &appName, bool useWindow) :
+OrganicApplication::OrganicApplication(const String &appName, bool useWindow, const Image &trayIcon) :
 	appSettings("Other Settings"),
 	engine(nullptr),
 	mainComponent(nullptr),
+	trayIconImage(trayIcon),
 	useWindow(useWindow)
 {
 	PropertiesFile::Options options;
@@ -61,7 +63,7 @@ void OrganicApplication::initialise(const String & commandLine)
 
 	if (useWindow)
 	{
-		mainWindow.reset(new MainWindow(getApplicationName(), mainComponent.get()));
+		mainWindow.reset(new MainWindow(getApplicationName(), mainComponent.get(), trayIconImage));
 		updateAppTitle();
 	}
 
@@ -210,11 +212,12 @@ void OrganicApplication::updateAppTitle()
 	if(useWindow && mainWindow != nullptr) mainWindow->setName(getApplicationName() + " " + getApplicationVersion() + " - " + Engine::mainEngine->getDocumentTitle()+(Engine::mainEngine->hasChangedSinceSaved()?" *":"")); 
 }
 
-inline OrganicApplication::MainWindow::MainWindow(String name, OrganicMainContentComponent * mainComponent) :
+inline OrganicApplication::MainWindow::MainWindow(String name, OrganicMainContentComponent* mainComponent, const Image &image) :
 	DocumentWindow(name,
 	Colours::lightgrey,
 	DocumentWindow::allButtons),
-	mainComponent(mainComponent)
+	mainComponent(mainComponent),
+	iconImage(image)
 {
 	setResizable(true, true);
 	setUsingNativeTitleBar(true);
@@ -244,19 +247,94 @@ inline OrganicApplication::MainWindow::MainWindow(String name, OrganicMainConten
 	setMenuBar(mainComponent);
 #endif
 
-	setVisible(true);
 
+
+	setVisible(true);
 	mainComponent->init();
 	
-	if (GlobalSettings::getInstance()->launchMinimised->boolValue()) setMinimised(true);
+	if (GlobalSettings::getInstance()->launchMinimised->boolValue())
+	{
+		if (GlobalSettings::getInstance()->closeToSystemTray->boolValue()) removeFromDesktop();
+		else setMinimised(true);
+	}
+
 }
 
 void OrganicApplication::MainWindow::closeButtonPressed() 
 {
-	JUCEApplication::getInstance()->systemRequestedQuit();
+	if (GlobalSettings::getInstance()->closeToSystemTray->boolValue())
+	{
+		setTrayIconVisible(true);
+		removeFromDesktop();
+		mainComponent->clear();
+	}
+	else
+	{
+		JUCEApplication::getInstance()->systemRequestedQuit();
+	}
 }
+
+void OrganicApplication::MainWindow::trayIconMouseDown(const MouseEvent& e)
+{
+	if (e.mods.isRightButtonDown()) showTrayMenu();
+	else
+	{
+		addToDesktop();
+		mainComponent->setupOpenGL();
+		setTrayIconVisible(false);
+	}
+}
+
+
+void OrganicApplication::MainWindow::setTrayIconVisible(bool visible)
+{
+	if (visible)
+	{
+		trayIcon.reset(new TrayIcon(iconImage));
+		trayIcon->addTrayIconListener(this);
+	}
+	else
+	{
+		if (trayIcon) trayIcon->removeFromDesktop();
+	}
+}
+
+void OrganicApplication::MainWindow::showTrayMenu()
+{
+	PopupMenu p;
+	addTrayMenuOptions(p);
+	p.addSeparator();
+	p.addItem(-1, "Exit");
+
+	int result = p.show();
+	if (!result) return;
+	if (result == -1) OrganicApplication::quit();
+	else handlTrayMenuResult(result);
+}
+
 
 void OrganicApplication::MainWindow::visibilityChanged()
 {
-	if(isShowing()) grabKeyboardFocus();
+	if (isShowing())
+	{
+		grabKeyboardFocus();
+	}
+}
+
+
+
+OrganicApplication::TrayIcon::TrayIcon(const Image& iconImage) :
+	SystemTrayIconComponent()
+{
+	setIconImage(iconImage, iconImage);
+}
+
+OrganicApplication::TrayIcon::~TrayIcon()
+{
+	removeFromDesktop();
+}
+
+void OrganicApplication::TrayIcon::mouseDown(const MouseEvent& e)
+{
+	trayIconListeners.call(&TrayIconListener::trayIconMouseDown, e);
 }
