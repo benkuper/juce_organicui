@@ -129,19 +129,23 @@ void BaseItemMinimalUI<T>::mouseDrag(const MouseEvent & e)
 	{
 		if (!dragAndDropEnabled || isDragAndDropActive() || !canStartDrag(e)) return;
 
-		var desc = var(new DynamicObject());
-		desc.getDynamicObject()->setProperty("type", baseItem->getTypeString());
-		desc.getDynamicObject()->setProperty("dataType", baseItem->itemDataType);
-		desc.getDynamicObject()->setProperty("initX", baseItem->viewUIPosition->x);
-		desc.getDynamicObject()->setProperty("initY", baseItem->viewUIPosition->y);
-		desc.getDynamicObject()->setProperty("offsetX", (int)(getMouseXYRelative().x * viewZoom));
-		desc.getDynamicObject()->setProperty("offsetY", (int)(getMouseXYRelative().y * viewZoom));
 
-		Image dragImage = this->createComponentSnapshot(this->getLocalBounds()).convertedToFormat(Image::ARGB).rescaled(this->getWidth() * this->viewZoom, this->getHeight() * this->viewZoom);
-		dragImage.multiplyAllAlphas(drawEmptyDragIcon ? 0 : .5f);
+		if (e.getDistanceFromDragStart() > dragStartDistance)
+		{
+			var desc = var(new DynamicObject());
+			desc.getDynamicObject()->setProperty("type", baseItem->getTypeString());
+			desc.getDynamicObject()->setProperty("dataType", baseItem->itemDataType);
+			desc.getDynamicObject()->setProperty("initX", baseItem->viewUIPosition->x);
+			desc.getDynamicObject()->setProperty("initY", baseItem->viewUIPosition->y);
+			desc.getDynamicObject()->setProperty("offsetX", (int)(getMouseXYRelative().x * viewZoom));
+			desc.getDynamicObject()->setProperty("offsetY", (int)(getMouseXYRelative().y * viewZoom));
 
-		Point<int> offset = -getMouseXYRelative() * viewZoom;
-		if (e.getDistanceFromDragStart() > dragStartDistance) startDragging(desc, this, dragImage, true, &offset);
+			Image dragImage = drawEmptyDragIcon ? Image(Image::PixelFormat::ARGB,1,1,true):this->createComponentSnapshot(this->getLocalBounds()).convertedToFormat(Image::ARGB).rescaled(this->getWidth() * this->viewZoom, this->getHeight() * this->viewZoom);
+			//dragImage.multiplyAllAlphas(drawEmptyDragIcon ? 0 : .5f);
+
+			Point<int> offset = -getMouseXYRelative() * viewZoom;
+			startDragging(desc, this, dragImage, true, &offset);
+		}
 	}
 }
 	
