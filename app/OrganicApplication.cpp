@@ -249,13 +249,24 @@ inline OrganicApplication::MainWindow::MainWindow(String name, OrganicMainConten
 
 
 
-	setVisible(true);
 	mainComponent->init();
-	
+
 	if (GlobalSettings::getInstance()->launchMinimised->boolValue())
 	{
-		if (GlobalSettings::getInstance()->closeToSystemTray->boolValue()) removeFromDesktop();
-		else setMinimised(true);
+		if (GlobalSettings::getInstance()->closeToSystemTray->boolValue())
+		{
+			removeFromDesktop();
+			setTrayIconVisible(true);
+		}
+		else
+		{
+			setMinimised(true);
+			setVisible(true);
+		}
+	}
+	else
+	{
+		setVisible(true);
 	}
 
 }
@@ -280,6 +291,7 @@ void OrganicApplication::MainWindow::trayIconMouseDown(const MouseEvent& e)
 	else
 	{
 		addToDesktop();
+		setVisible(true);
 		mainComponent->setupOpenGL();
 		setTrayIconVisible(false);
 	}

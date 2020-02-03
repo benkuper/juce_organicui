@@ -27,7 +27,6 @@ OrganicMainContentComponent::OrganicMainContentComponent()
 #endif
 
 	setupOpenGL();
-
 }
 
 OrganicMainContentComponent::~OrganicMainContentComponent()
@@ -55,7 +54,7 @@ void OrganicMainContentComponent::init()
 
 
 	addAndMakeVisible(&ShapeShifterManager::getInstance()->mainContainer);
-	grabKeyboardFocus();
+	if(isShowing()) grabKeyboardFocus();
 }
 
 void OrganicMainContentComponent::setupOpenGL()
@@ -63,17 +62,16 @@ void OrganicMainContentComponent::setupOpenGL()
 #if JUCE_OPENGL && JUCE_WINDOWS
 	if (openGLContext == nullptr)
 	{
-		OpenGLContext* ctx = OpenGLContext::getContextAttachedTo(*this);
-		openGLContext.reset(ctx != nullptr ? ctx: new OpenGLContext());	
+		openGLContext.reset(new OpenGLContext());
+		openGLContext->setComponentPaintingEnabled(true);
+		openGLContext->setContinuousRepainting(false);
+
+		setupOpenGLInternal();
+
+		openGLContext->attachTo(*this);
 	}
 
-	openGLContext->setComponentPaintingEnabled(true);
-	openGLContext->setContinuousRepainting(false);
-
-	setupOpenGLInternal();
-
-	openGLContext->attachTo(*this);
-	DBG((int)openGLContext->getContextAttachedTo(*this) << "  < > " << (int)(openGLContext.get()));
+	
 
 #endif
 }
