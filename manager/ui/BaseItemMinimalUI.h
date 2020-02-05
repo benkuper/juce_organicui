@@ -28,7 +28,10 @@ public:
 	Colour bgColor;
 	Colour selectedColor;
 
+	bool syncWithItemSize;
+
 	float viewZoom;
+	float viewCheckerSize;
 
 	bool dimAlphaOnDisabled;
 	bool highlightOnMouseOver;
@@ -48,12 +51,13 @@ public:
 	virtual void mouseDrag(const MouseEvent &e) override;
 	virtual void mouseExit(const MouseEvent &e) override;
 
-
 	void setHighlightOnMouseOver(bool highlight);
-
 	void paint(Graphics &g) override;
-
 	void setViewZoom(float value);
+	void setViewCheckerSize(float value);
+
+	void setViewSize(float x, float y);
+	void setViewSize(Point<float> size);
 
 	virtual void newMessage(const ContainerAsyncEvent &e) override;
 
@@ -94,7 +98,9 @@ BaseItemMinimalUI<T>::BaseItemMinimalUI(T* _item) :
 	item(_item),
 	bgColor(BG_COLOR.brighter(.1f)),
 	selectedColor(HIGHLIGHT_COLOR),
+	syncWithItemSize(false),
 	viewZoom(1),
+	viewCheckerSize(1),
 	dimAlphaOnDisabled(true),
 	highlightOnMouseOver(false),
 	fillColorOnSelected(false),
@@ -190,6 +196,25 @@ void BaseItemMinimalUI<T>::setViewZoom(float value)
 	viewZoom = value;
 }
 
+template<class T>
+void BaseItemMinimalUI<T>::setViewCheckerSize(float value)
+{
+	viewCheckerSize = value;
+	if (syncWithItemSize) setViewSize(item->viewUISize->getPoint());
+}
+
+
+template<class T>
+void BaseItemMinimalUI<T>::setViewSize(float x, float y)
+{
+	setSize(x * viewCheckerSize, y * viewCheckerSize);
+}
+
+template<class T>
+void BaseItemMinimalUI<T>::setViewSize(Point<float> size)
+{
+	setSize(size.x * viewCheckerSize, size.y * viewCheckerSize);
+}
 
 template<class T>
 void BaseItemMinimalUI<T>::newMessage(const ContainerAsyncEvent & e)
@@ -205,6 +230,10 @@ void BaseItemMinimalUI<T>::newMessage(const ContainerAsyncEvent & e)
 		}else if(e.targetControllable  == baseItem->viewUIPosition)
 		{
 			itemMinimalUIListeners.call(&ItemMinimalUIListener::itemUIViewPositionChanged, this);
+		}
+		else if (e.targetControllable == baseItem->viewUISize && syncWithItemSize)
+		{
+			setViewSize(item->viewUISize->getPoint());
 		}
 
 		controllableFeedbackUpdateInternal(e.targetControllable);

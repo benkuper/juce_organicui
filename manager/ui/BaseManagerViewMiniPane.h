@@ -73,7 +73,7 @@ void BaseManagerViewMiniPane<M, T, U>::paint(juce::Graphics& g)
 		itemViewBounds.expand((targetWidth - itemViewBounds.getWidth()) / 2, 0);
 	}
 
-	juce::Rectangle<float> itemRealBounds = managerUI->getBoundsInView(itemViewBounds);
+	juce::Rectangle<int> itemRealBounds = managerUI->getBoundsInView(itemViewBounds);
 
 	for (auto& ui : managerUI->itemsUI)
 	{
