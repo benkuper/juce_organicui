@@ -90,7 +90,7 @@ void Outliner::buildTree(OutlinerItem * parentItem, ControllableContainer * pare
 	if (parentContainer == nullptr) return;
 	Array<WeakReference<ControllableContainer>> childContainers = parentContainer->getAllContainers(false);
 	
-	//parentContainer->controllableContainers.getLock().enter();
+	parentContainer->controllableContainers.getLock().enter();
 	for (auto &cc : parentContainer->controllableContainers)
 	{
 		/*if (cc->skipControllableNameInAddress && !showHiddenContainers)
@@ -114,7 +114,7 @@ void Outliner::buildTree(OutlinerItem * parentItem, ControllableContainer * pare
 		OutlinerItem * cItem = new OutlinerItem(c);
 		parentItem->addSubItem(cItem);
 	}
-	//parentContainer->controllables.getLock().exit();
+	parentContainer->controllables.getLock().exit();
 
 }
 
