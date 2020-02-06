@@ -122,11 +122,9 @@ void Outliner::childStructureChanged(ControllableContainer *)
 {
 	if (enabled)
 	{
-		DBG("OUTLINER LOCK ENTER");
 		MessageManagerLock mmLock;
 		rebuildTree();
 	}
-	DBG("OUTLINER LOCK EXIT");
 
 }
 
