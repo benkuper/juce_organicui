@@ -560,7 +560,7 @@ void BaseManager<T>::reorderItems()
 template<class T>
  T * BaseManager<T>::getItemWithName(const String & itemShortName, bool searchItemWithNiceNameToo, bool searchWithLowerCaseIfNotFound)
 {
-	const ScopedLock(items.getLock());
+	const ScopedLock lock(items.getLock());
 	for (auto &t : items)
 	{
 		if (((BaseItem *)t)->shortName == itemShortName) return t;
@@ -581,7 +581,7 @@ template<class T>
 template<class T>
 void BaseManager<T>::clear()
 {
-	const ScopedLock(items.getLock());
+	const ScopedLock lock(items.getLock());
 	while (items.size() > 0) removeItem(items[0], false);
 }
 
