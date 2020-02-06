@@ -11,7 +11,7 @@
 
 ControllableComparator ControllableContainer::comparator;
 
-ControllableContainer::ControllableContainer(const String & niceName) :
+ControllableContainer::ControllableContainer(const String& niceName) :
 	ScriptTarget("", this),
 	hasCustomShortName(false),
 	nameCanBeChangedByUser(false),
@@ -29,9 +29,9 @@ ControllableContainer::ControllableContainer(const String & niceName) :
 	includeTriggersInSaveLoad(false),
 	isCurrentlyLoadingData(false),
 	notifyStructureChangeWhenLoadingData(true),
-    includeInScriptObject(true),
-    parentContainer(nullptr),
-    queuedNotifier(500) //what to put in max size ??
+	includeInScriptObject(true),
+	parentContainer(nullptr),
+	queuedNotifier(500) //what to put in max size ??
 						//500 seems ok on my computer, but if too low, generates leaks when closing app while heavy use of async (like  parameter update from audio signal)
 {
 	setNiceName(niceName);
@@ -55,23 +55,14 @@ ControllableContainer::~ControllableContainer()
 void ControllableContainer::clear() {
 
 	queuedNotifier.cancelPendingUpdate();
-	
-	controllables.getLock().enter();
+
 	controllables.clear();
-	controllables.getLock().exit();
-
-
-	controllableContainers.getLock().enter();
 	controllableContainers.clear();
-	controllableContainers.getLock().exit();
-
-	ownedContainers.getLock().enter();
 	ownedContainers.clear();
-	ownedContainers.getLock().exit();
 }
 
 
-UndoableAction * ControllableContainer::addUndoableControllable(Controllable * c, bool onlyReturnAction)
+UndoableAction* ControllableContainer::addUndoableControllable(Controllable* c, bool onlyReturnAction)
 {
 	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile)
 	{
@@ -80,124 +71,121 @@ UndoableAction * ControllableContainer::addUndoableControllable(Controllable * c
 		return nullptr;
 	}
 
-	UndoableAction * a = new AddControllableAction(this, c);
+	UndoableAction* a = new AddControllableAction(this, c);
 	if (onlyReturnAction) return a;
 
 	UndoMaster::getInstance()->performAction("Add " + c->niceName, a);
 	return a;
 }
 
-void ControllableContainer::addControllable(Controllable * c)
+void ControllableContainer::addControllable(Controllable* c)
 {
-	if (c->type == Controllable::TRIGGER) addTriggerInternal((Trigger *)c);
-	else addParameterInternal((Parameter *)c);
+	if (c->type == Controllable::TRIGGER) addTriggerInternal((Trigger*)c);
+	else addParameterInternal((Parameter*)c);
 
 	c->addControllableListener(this);
 	c->addAsyncWarningTargetListener(this);
 	c->warningResolveInspectable = this;
 }
 
-void ControllableContainer::addParameter(Parameter * p)
+void ControllableContainer::addParameter(Parameter* p)
 {
 	addControllable(p);
 }
 
-FloatParameter * ControllableContainer::addFloatParameter(const String & _niceName, const String & description, const float & initialValue, const float & minValue, const float & maxValue, const bool & enabled)
+FloatParameter* ControllableContainer::addFloatParameter(const String& _niceName, const String& description, const float& initialValue, const float& minValue, const float& maxValue, const bool& enabled)
 {
-	String targetName = (Engine::mainEngine == nullptr || Engine::mainEngine->isLoadingFile)?_niceName:getUniqueNameInContainer(_niceName);
-	FloatParameter * p = new FloatParameter(targetName, description, initialValue, minValue, maxValue, enabled);
+	String targetName = (Engine::mainEngine == nullptr || Engine::mainEngine->isLoadingFile) ? _niceName : getUniqueNameInContainer(_niceName);
+	FloatParameter* p = new FloatParameter(targetName, description, initialValue, minValue, maxValue, enabled);
 	addControllable(p);
 	return p;
 }
 
-IntParameter * ControllableContainer::addIntParameter(const String & _niceName, const String & _description, const int & initialValue, const int & minValue, const int & maxValue, const bool & enabled)
+IntParameter* ControllableContainer::addIntParameter(const String& _niceName, const String& _description, const int& initialValue, const int& minValue, const int& maxValue, const bool& enabled)
 {
 	String targetName = (Engine::mainEngine == nullptr || Engine::mainEngine->isLoadingFile) ? _niceName : getUniqueNameInContainer(_niceName);
-	IntParameter * p = new IntParameter(targetName, _description, initialValue, minValue, maxValue, enabled);
+	IntParameter* p = new IntParameter(targetName, _description, initialValue, minValue, maxValue, enabled);
 	addControllable(p);
 	return p;
 }
 
-BoolParameter * ControllableContainer::addBoolParameter(const String & _niceName, const String & _description, const bool & value, const bool & enabled)
+BoolParameter* ControllableContainer::addBoolParameter(const String& _niceName, const String& _description, const bool& value, const bool& enabled)
 {
 	String targetName = (Engine::mainEngine == nullptr || Engine::mainEngine->isLoadingFile) ? _niceName : getUniqueNameInContainer(_niceName);
-	BoolParameter * p = new BoolParameter(targetName, _description, value, enabled);
+	BoolParameter* p = new BoolParameter(targetName, _description, value, enabled);
 	addControllable(p);
 	return p;
 }
 
-StringParameter * ControllableContainer::addStringParameter(const String & _niceName, const String & _description, const String &value, const bool & enabled)
+StringParameter* ControllableContainer::addStringParameter(const String& _niceName, const String& _description, const String& value, const bool& enabled)
 {
 	String targetName = (Engine::mainEngine == nullptr || Engine::mainEngine->isLoadingFile) ? _niceName : getUniqueNameInContainer(_niceName);
-	StringParameter * p = new StringParameter(targetName, _description, value, enabled);
+	StringParameter* p = new StringParameter(targetName, _description, value, enabled);
 	addControllable(p);
 	return p;
 }
 
-EnumParameter * ControllableContainer::addEnumParameter(const String & _niceName, const String & _description, const bool & enabled)
+EnumParameter* ControllableContainer::addEnumParameter(const String& _niceName, const String& _description, const bool& enabled)
 {
 	String targetName = (Engine::mainEngine == nullptr || Engine::mainEngine->isLoadingFile) ? _niceName : getUniqueNameInContainer(_niceName);
-	EnumParameter * p = new EnumParameter(targetName, _description, enabled);
+	EnumParameter* p = new EnumParameter(targetName, _description, enabled);
 	addControllable(p);
 	return p;
 }
 
-Point2DParameter * ControllableContainer::addPoint2DParameter(const String & _niceName, const String & _description, const bool & enabled)
+Point2DParameter* ControllableContainer::addPoint2DParameter(const String& _niceName, const String& _description, const bool& enabled)
 {
 	String targetName = (Engine::mainEngine == nullptr || Engine::mainEngine->isLoadingFile) ? _niceName : getUniqueNameInContainer(_niceName);
-	Point2DParameter * p = new Point2DParameter(targetName, _description, enabled);
+	Point2DParameter* p = new Point2DParameter(targetName, _description, enabled);
 	addControllable(p);
 	return p;
 }
 
-Point3DParameter * ControllableContainer::addPoint3DParameter(const String & _niceName, const String & _description, const bool & enabled)
+Point3DParameter* ControllableContainer::addPoint3DParameter(const String& _niceName, const String& _description, const bool& enabled)
 {
 	String targetName = (Engine::mainEngine == nullptr || Engine::mainEngine->isLoadingFile) ? _niceName : getUniqueNameInContainer(_niceName);
-	Point3DParameter * p = new Point3DParameter(targetName, _description, enabled);
+	Point3DParameter* p = new Point3DParameter(targetName, _description, enabled);
 	addControllable(p);
 	return p;
 }
 
-ColorParameter * ControllableContainer::addColorParameter(const String & _niceName, const String & _description, const Colour &initialColor, const bool & enabled)
+ColorParameter* ControllableContainer::addColorParameter(const String& _niceName, const String& _description, const Colour& initialColor, const bool& enabled)
 {
 	String targetName = (Engine::mainEngine == nullptr || Engine::mainEngine->isLoadingFile) ? _niceName : getUniqueNameInContainer(_niceName);
-	ColorParameter * p = new ColorParameter(targetName, _description, initialColor, enabled);
+	ColorParameter* p = new ColorParameter(targetName, _description, initialColor, enabled);
 	addControllable(p);
 	return p;
 }
 
-TargetParameter * ControllableContainer::addTargetParameter(const String & _niceName, const String & _description, WeakReference<ControllableContainer> rootReference, const bool & enabled)
+TargetParameter* ControllableContainer::addTargetParameter(const String& _niceName, const String& _description, WeakReference<ControllableContainer> rootReference, const bool& enabled)
 {
 	String targetName = (Engine::mainEngine == nullptr || Engine::mainEngine->isLoadingFile) ? _niceName : getUniqueNameInContainer(_niceName);
-	TargetParameter * p = new TargetParameter(targetName, _description, "", rootReference, enabled);
+	TargetParameter* p = new TargetParameter(targetName, _description, "", rootReference, enabled);
 	addControllable(p);
 	return p;
 }
 
-FileParameter * ControllableContainer::addFileParameter(const String & _niceName, const String & _description, const String & _initialValue)
+FileParameter* ControllableContainer::addFileParameter(const String& _niceName, const String& _description, const String& _initialValue)
 {
 	String targetName = (Engine::mainEngine == nullptr || Engine::mainEngine->isLoadingFile) ? _niceName : getUniqueNameInContainer(_niceName);
-	FileParameter * p = new FileParameter(targetName, _description, _initialValue);
+	FileParameter* p = new FileParameter(targetName, _description, _initialValue);
 	addControllable(p);
 	return p;
 }
 
-Trigger * ControllableContainer::addTrigger(const String & _niceName, const String & _description, const bool & enabled)
+Trigger* ControllableContainer::addTrigger(const String& _niceName, const String& _description, const bool& enabled)
 {
 	String targetName = (Engine::mainEngine == nullptr || Engine::mainEngine->isLoadingFile) ? _niceName : getUniqueNameInContainer(_niceName);
-	Trigger * t = new Trigger(targetName, _description, enabled);
+	Trigger* t = new Trigger(targetName, _description, enabled);
 	addControllable(t);
 	return t;
 }
 
 
-void ControllableContainer::addTriggerInternal(Trigger * t)
+void ControllableContainer::addTriggerInternal(Trigger* t)
 {
-	{
-		ScopedLock lock(controllables.getLock());
-		controllables.add(t);
-	}
-	
+	controllables.add(t);
+
 	t->setParentContainer(this);
 	t->addTriggerListener(this);
 	onControllableAdded(t);
@@ -206,14 +194,12 @@ void ControllableContainer::addTriggerInternal(Trigger * t)
 	notifyStructureChanged();
 }
 
-void ControllableContainer::addParameterInternal(Parameter * p)
+void ControllableContainer::addParameterInternal(Parameter* p)
 {
 	p->setParentContainer(this);
 
-	{
-		ScopedLock lock(controllables.getLock());
-		controllables.add(p);
-	}
+	controllables.add(p);
+
 	p->addParameterListener(this);
 	p->addAsyncParameterListener(this);
 	onControllableAdded(p);
@@ -222,7 +208,7 @@ void ControllableContainer::addParameterInternal(Parameter * p)
 	notifyStructureChanged();
 }
 
-UndoableAction * ControllableContainer::removeUndoableControllable(Controllable * c, bool onlyReturnAction)
+UndoableAction* ControllableContainer::removeUndoableControllable(Controllable* c, bool onlyReturnAction)
 {
 	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile)
 	{
@@ -231,7 +217,7 @@ UndoableAction * ControllableContainer::removeUndoableControllable(Controllable 
 		return nullptr;
 	}
 
-	UndoableAction * a = new RemoveControllableAction(this, c);
+	UndoableAction* a = new RemoveControllableAction(this, c);
 	if (onlyReturnAction) return a;
 
 	UndoMaster::getInstance()->performAction("Remove " + c->niceName, a);
@@ -249,7 +235,7 @@ void ControllableContainer::removeControllable(WeakReference<Controllable> c)
 	controllableContainerListeners.call(&ControllableContainerListener::controllableRemoved, c);
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableRemoved, this, c));
 
-	Parameter * p = dynamic_cast<Parameter*>(c.get());
+	Parameter* p = dynamic_cast<Parameter*>(c.get());
 	if (p != nullptr) {
 		p->removeParameterListener(this);
 		p->removeAsyncParameterListener(this);
@@ -260,19 +246,16 @@ void ControllableContainer::removeControllable(WeakReference<Controllable> c)
 
 	onControllableRemoved(c);
 
-	{
-		ScopedLock lock(controllables.getLock());
-		controllables.removeObject(c);
-	}
-	 
+	controllables.removeObject(c);
+
 	notifyStructureChanged();
 }
 
 
-void ControllableContainer::notifyStructureChanged() 
+void ControllableContainer::notifyStructureChanged()
 {
 	if (isCurrentlyLoadingData && !notifyStructureChangeWhenLoadingData) return;
-	
+
 	liveScriptObjectIsDirty = true;
 
 	controllableContainerListeners.call(&ControllableContainerListener::childStructureChanged, this);
@@ -280,7 +263,7 @@ void ControllableContainer::notifyStructureChanged()
 
 }
 
-void ControllableContainer::newMessage(const Parameter::ParameterEvent &e) 
+void ControllableContainer::newMessage(const Parameter::ParameterEvent& e)
 {
 	if (e.type == Parameter::ParameterEvent::VALUE_CHANGED) {
 		onContainerParameterChangedAsync(e.parameter, e.value);
@@ -296,7 +279,7 @@ void ControllableContainer::newMessage(const WarningTarget::WarningTargetEvent& 
 	}
 }
 
-UndoableAction * ControllableContainer::setUndoableNiceName(const String & newNiceName, bool onlyReturnAction)
+UndoableAction* ControllableContainer::setUndoableNiceName(const String& newNiceName, bool onlyReturnAction)
 {
 	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile)
 	{
@@ -305,13 +288,13 @@ UndoableAction * ControllableContainer::setUndoableNiceName(const String & newNi
 		return nullptr;
 	}
 
-	UndoableAction * a = new ControllableContainerChangeNameAction(this, niceName, newNiceName);
+	UndoableAction* a = new ControllableContainerChangeNameAction(this, niceName, newNiceName);
 	if (onlyReturnAction) return a;
 
 	UndoMaster::getInstance()->performAction("Rename " + niceName, a);
-	return a;	
+	return a;
 }
-void ControllableContainer::setNiceName(const String &_niceName) {
+void ControllableContainer::setNiceName(const String& _niceName) {
 	if (niceName == _niceName) return;
 	niceName = _niceName;
 	if (!hasCustomShortName) setAutoShortName();
@@ -319,7 +302,7 @@ void ControllableContainer::setNiceName(const String &_niceName) {
 	onContainerNiceNameChanged();
 }
 
-void ControllableContainer::setCustomShortName(const String &_shortName) {
+void ControllableContainer::setCustomShortName(const String& _shortName) {
 	shortName = _shortName;
 	hasCustomShortName = true;
 	scriptTargetName = shortName;
@@ -333,7 +316,7 @@ void ControllableContainer::setCustomShortName(const String &_shortName) {
 
 void ControllableContainer::setAutoShortName() {
 	hasCustomShortName = false;
-	shortName = StringUtil::toShortName(niceName,true);
+	shortName = StringUtil::toShortName(niceName, true);
 	scriptTargetName = shortName;
 	liveScriptObjectIsDirty = true;
 	updateChildrenControlAddress();
@@ -344,10 +327,10 @@ void ControllableContainer::setAutoShortName() {
 
 
 
-Controllable * ControllableContainer::getControllableByName(const String & name, bool searchNiceNameToo, bool searchLowerCaseToo)
+Controllable* ControllableContainer::getControllableByName(const String& name, bool searchNiceNameToo, bool searchLowerCaseToo)
 {
 	controllables.getLock().enter();
-	for (auto &c : controllables)
+	for (auto& c : controllables)
 	{
 		if (c->shortName == name || (searchNiceNameToo && c->niceName == name) || (searchLowerCaseToo && c->shortName.toLowerCase() == name.toLowerCase())) return c;
 	}
@@ -356,26 +339,19 @@ Controllable * ControllableContainer::getControllableByName(const String & name,
 	return nullptr;
 }
 
-Parameter * ControllableContainer::getParameterByName(const String & name, bool searchNiceNameToo, bool searchLowerCaseToo)
+Parameter* ControllableContainer::getParameterByName(const String& name, bool searchNiceNameToo, bool searchLowerCaseToo)
 {
-	return dynamic_cast<Parameter *>(getControllableByName(name, searchNiceNameToo, searchLowerCaseToo));
+	return dynamic_cast<Parameter*>(getControllableByName(name, searchNiceNameToo, searchLowerCaseToo));
 }
 
-void ControllableContainer::addChildControllableContainer(ControllableContainer * container, bool owned, int index, bool notify)
+void ControllableContainer::addChildControllableContainer(ControllableContainer* container, bool owned, int index, bool notify)
 {
 
 	String targetName = (Engine::mainEngine == nullptr || Engine::mainEngine->isLoadingFile) ? container->niceName : getUniqueNameInContainer(container->niceName);
 	container->setNiceName(targetName);
 
-	controllableContainers.getLock().enter();
 	controllableContainers.insert(index, container);
-	controllableContainers.getLock().exit();
-	if (owned)
-	{
-		ownedContainers.getLock().enter();
-		ownedContainers.add(container);
-		ownedContainers.getLock().exit();
-	}
+	if (owned) ownedContainers.add(container);
 
 	container->addControllableContainerListener(this);
 	container->addAsyncWarningTargetListener(this);
@@ -389,21 +365,19 @@ void ControllableContainer::addChildControllableContainer(ControllableContainer 
 	controllableContainerListeners.call(&ControllableContainerListener::controllableContainerAdded, container);
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableContainerAdded, this, container));
 
-	if(notify) notifyStructureChanged();
+	if (notify) notifyStructureChanged();
 }
 
 void ControllableContainer::addChildControllableContainers(Array<ControllableContainer*> containers, bool owned, int index, bool notify)
 {
 	int i = index;
-	for (auto &c : containers) addChildControllableContainer(c, owned, i++, false);
-	if(notify) notifyStructureChanged();
+	for (auto& c : containers) addChildControllableContainer(c, owned, i++, false);
+	if (notify) notifyStructureChanged();
 }
 
-void ControllableContainer::removeChildControllableContainer(ControllableContainer * container)
+void ControllableContainer::removeChildControllableContainer(ControllableContainer* container)
 {
-	controllableContainers.getLock().enter();
 	this->controllableContainers.removeAllInstancesOf(container);
-	controllableContainers.getLock().exit();
 
 	container->removeControllableContainerListener(this);
 	container->removeAsyncWarningTargetListener(this);
@@ -418,20 +392,15 @@ void ControllableContainer::removeChildControllableContainer(ControllableContain
 
 	notifyStructureChanged();
 	container->setParentContainer(nullptr);
-	if (ownedContainers.contains(container))
-	{
-		ownedContainers.getLock().enter();
-		ownedContainers.removeObject(container);
-		ownedContainers.getLock().exit();
-	}
+	if (ownedContainers.contains(container)) ownedContainers.removeObject(container);
 }
 
 
-ControllableContainer * ControllableContainer::getControllableContainerByName(const String & name, bool searchNiceNameToo, bool searchLowerCaseToo)
+ControllableContainer* ControllableContainer::getControllableContainerByName(const String& name, bool searchNiceNameToo, bool searchLowerCaseToo)
 {
 	controllableContainers.getLock().enter();
 	ControllableContainer* result = nullptr;
-	for (auto &cc : controllableContainers)
+	for (auto& cc : controllableContainers)
 	{
 		if (!cc.wasObjectDeleted() && cc != nullptr && (
 			cc->shortName == name ||
@@ -442,16 +411,16 @@ ControllableContainer * ControllableContainer::getControllableContainerByName(co
 			result = cc;
 			break;
 		}
-			
+
 	}
 	controllableContainers.getLock().exit();
 
-	
+
 	return result;
 
 }
 
-ControllableContainer * ControllableContainer::getControllableContainerForAddress(const String&  address, bool recursive, bool getNotExposed)
+ControllableContainer* ControllableContainer::getControllableContainerForAddress(const String& address, bool recursive, bool getNotExposed)
 {
 	StringArray addrArray;
 	addrArray.addTokens(address, juce::StringRef("/"), juce::StringRef("\""));
@@ -460,7 +429,7 @@ ControllableContainer * ControllableContainer::getControllableContainerForAddres
 	return getControllableContainerForAddress(addrArray, recursive, getNotExposed);
 }
 
-ControllableContainer * ControllableContainer::getControllableContainerForAddress(StringArray  addressSplit, bool recursive, bool getNotExposed)
+ControllableContainer* ControllableContainer::getControllableContainerForAddress(StringArray  addressSplit, bool recursive, bool getNotExposed)
 {
 
 	if (addressSplit.size() == 0) jassertfalse; // SHOULD NEVER BE THERE !
@@ -470,30 +439,19 @@ ControllableContainer * ControllableContainer::getControllableContainerForAddres
 	if (isTargetFinal)
 	{
 
-		if (ControllableContainer * res = getControllableContainerByName(addressSplit[0]))   //get not exposed here here ?
+		if (ControllableContainer* res = getControllableContainerByName(addressSplit[0]))   //get not exposed here here ?
 			return res;
 
-		//no found in direct children Container, maybe in a skip container ?
-		controllableContainers.getLock().enter();
-		for (auto &cc : controllableContainers)
-		{
-			if (cc == nullptr || cc.wasObjectDeleted()) continue;
-			/*if (cc->skipControllableNameInAddress)
-			{
-				if (ControllableContainer * res = cc->getControllableContainerForAddress(addressSplit, recursive, getNotExposed)) return res;
-			}*/
-		}
-		controllableContainers.getLock().exit();
-
-	} else //if recursive here ?
+	}
+	else //if recursive here ?
 	{
 		ControllableContainer* result = nullptr;
-		
+
 		controllableContainers.getLock().enter();
-		for (auto &cc : controllableContainers)
+		for (auto& cc : controllableContainers)
 		{
 			if (cc == nullptr || cc.wasObjectDeleted()) continue;
-			
+
 			if (cc->shortName == addressSplit[0])
 			{
 				addressSplit.remove(0);
@@ -510,13 +468,13 @@ ControllableContainer * ControllableContainer::getControllableContainerForAddres
 
 }
 
-String ControllableContainer::getControlAddress(ControllableContainer * relativeTo) {
+String ControllableContainer::getControlAddress(ControllableContainer* relativeTo) {
 
 	StringArray addressArray;
-	ControllableContainer * pc = this;
+	ControllableContainer* pc = this;
 	while (pc != relativeTo && pc != nullptr && pc != Engine::mainEngine)
 	{
-		/*if (!pc->skipControllableNameInAddress)*/ addressArray.insert(0, pc->shortName);
+		addressArray.insert(0, pc->shortName);
 		pc = pc->parentContainer;
 	}
 	if (addressArray.size() == 0)return "";
@@ -525,25 +483,23 @@ String ControllableContainer::getControlAddress(ControllableContainer * relative
 
 void ControllableContainer::orderControllablesAlphabetically()
 {
-	controllables.getLock().enter();
 	controllables.sort(ControllableContainer::comparator, true);
-	controllables.getLock().exit();
 
 	controllableContainerListeners.call(&ControllableContainerListener::controllableContainerReordered, this);
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableContainerReordered, this));
 
 }
 
-void ControllableContainer::setParentContainer(ControllableContainer * container)
+void ControllableContainer::setParentContainer(ControllableContainer* container)
 {
 	this->parentContainer = container;
-	
+
 	controllables.getLock().enter();
-	for (auto &c : controllables) if(c != nullptr) c->updateControlAddress();
+	for (auto& c : controllables) if (c != nullptr) c->updateControlAddress();
 	controllables.getLock().exit();
 
 	controllableContainers.getLock().enter();
-	for (auto &cc : controllableContainers) if (!cc.wasObjectDeleted()) cc->updateChildrenControlAddress();
+	for (auto& cc : controllableContainers) if (!cc.wasObjectDeleted()) cc->updateChildrenControlAddress();
 	controllableContainers.getLock().exit();
 
 }
@@ -581,7 +537,7 @@ Array<WeakReference<Controllable>> ControllableContainer::getAllControllables(bo
 {
 	Array<WeakReference<Controllable>> result;
 	controllables.getLock().enter();
-	for (auto &c : controllables)
+	for (auto& c : controllables)
 	{
 		if (getNotExposed || c->isControllableExposed) result.add(c);
 	}
@@ -590,7 +546,7 @@ Array<WeakReference<Controllable>> ControllableContainer::getAllControllables(bo
 	controllableContainers.getLock().enter();
 	if (recursive)
 	{
-		for (auto &cc : controllableContainers)
+		for (auto& cc : controllableContainers)
 		{
 			if (cc.wasObjectDeleted() || cc.get() == nullptr) continue;
 			result.addArray(cc->getAllControllables(true, getNotExposed));
@@ -607,11 +563,11 @@ Array<WeakReference<Parameter>> ControllableContainer::getAllParameters(bool rec
 	Array<WeakReference<Parameter>> result;
 
 	controllables.getLock().enter();
-	for (auto &c : controllables)
+	for (auto& c : controllables)
 	{
 		if (c->type == Controllable::Type::TRIGGER) continue;
 		if (getNotExposed || c->isControllableExposed) {
-			if (Parameter * cc = dynamic_cast<Parameter*>(c)) {
+			if (Parameter* cc = dynamic_cast<Parameter*>(c)) {
 				result.add(cc);
 			}
 		}
@@ -621,7 +577,7 @@ Array<WeakReference<Parameter>> ControllableContainer::getAllParameters(bool rec
 	if (recursive)
 	{
 		controllableContainers.getLock().enter();
-		for (auto &cc : controllableContainers) result.addArray(cc->getAllParameters(true, getNotExposed));
+		for (auto& cc : controllableContainers) result.addArray(cc->getAllParameters(true, getNotExposed));
 		controllableContainers.getLock().exit();
 	}
 
@@ -631,28 +587,30 @@ Array<WeakReference<Parameter>> ControllableContainer::getAllParameters(bool rec
 Array<WeakReference<ControllableContainer>> ControllableContainer::getAllContainers(bool recursive)
 {
 	Array<WeakReference<ControllableContainer>> result;
-	for (auto& cc : controllableContainers) 
+
+	controllableContainers.getLock().enter();
+	for (auto& cc : controllableContainers)
 	{
-		if (cc.wasObjectDeleted() || cc.get() == nullptr) continue; 
+		if (cc.wasObjectDeleted() || cc.get() == nullptr) continue;
 		result.add(cc);
 		if (recursive) result.addArray(cc->getAllContainers(true));
 	}
-
+	controllableContainers.getLock().exit();
 	return result;
 }
 
 
 
-Controllable * ControllableContainer::getControllableForAddress(const String &address, bool recursive, bool getNotExposed)
+Controllable* ControllableContainer::getControllableForAddress(const String& address, bool recursive, bool getNotExposed)
 {
 	StringArray addrArray;
-	addrArray.addTokens(address.startsWith("/")?address:"/"+address, juce::StringRef("/"), juce::StringRef("\""));
+	addrArray.addTokens(address.startsWith("/") ? address : "/" + address, juce::StringRef("/"), juce::StringRef("\""));
 	addrArray.remove(0);
 
 	return getControllableForAddress(addrArray, recursive, getNotExposed);
 }
 
-Controllable * ControllableContainer::getControllableForAddress(StringArray addressSplit, bool recursive, bool getNotExposed)
+Controllable* ControllableContainer::getControllableForAddress(StringArray addressSplit, bool recursive, bool getNotExposed)
 {
 	if (addressSplit.size() == 0) jassertfalse; // SHOULD NEVER BE THERE !
 
@@ -665,10 +623,11 @@ Controllable * ControllableContainer::getControllableForAddress(StringArray addr
 		{
 			if (c->isControllableExposed || getNotExposed) return c;
 			else return nullptr;
-			
+
 		}
 
-	} else  //if recursive here ?
+	}
+	else  //if recursive here ?
 	{
 		ControllableContainer* cc = getControllableContainerByName(addressSplit[0], false, true);
 		if (cc != nullptr)
@@ -681,11 +640,11 @@ Controllable * ControllableContainer::getControllableForAddress(StringArray addr
 	return nullptr;
 }
 
-bool ControllableContainer::containsControllable(Controllable * c, int maxSearchLevels)
+bool ControllableContainer::containsControllable(Controllable* c, int maxSearchLevels)
 {
 	if (c == nullptr) return false;
 
-	ControllableContainer * pc = c->parentContainer;
+	ControllableContainer* pc = c->parentContainer;
 	if (pc == nullptr) return false;
 	int curLevel = 0;
 
@@ -701,7 +660,7 @@ bool ControllableContainer::containsControllable(Controllable * c, int maxSearch
 }
 
 
-void ControllableContainer::dispatchFeedback(Controllable * c)
+void ControllableContainer::dispatchFeedback(Controllable* c)
 {
 	//    @ben removed else here to enable containerlistener call back of non root (proxies) is it overkill?
 	if (parentContainer != nullptr) { parentContainer->dispatchFeedback(c); }
@@ -726,13 +685,14 @@ void ControllableContainer::controllableStateChanged(Controllable* c)
 	if (c->parentContainer == this) dispatchState(c);
 }
 
-void ControllableContainer::parameterValueChanged(Parameter * p)
+void ControllableContainer::parameterValueChanged(Parameter* p)
 {
 	if (p->parentContainer == this)
 	{
 		onContainerParameterChanged(p);
 		dispatchFeedback(p);
-	} else
+	}
+	else
 	{
 		onExternalParameterValueChanged(p);
 	}
@@ -740,7 +700,7 @@ void ControllableContainer::parameterValueChanged(Parameter * p)
 }
 
 
-void ControllableContainer::parameterRangeChanged(Parameter * p)
+void ControllableContainer::parameterRangeChanged(Parameter* p)
 {
 	if (p->parentContainer == this)
 	{
@@ -753,7 +713,7 @@ void ControllableContainer::parameterRangeChanged(Parameter * p)
 }
 
 
-void ControllableContainer::triggerTriggered(Trigger * t)
+void ControllableContainer::triggerTriggered(Trigger* t)
 {
 	if (t->parentContainer == this) onContainerTriggerTriggered(t);
 	else onExternalTriggerTriggered(t);
@@ -762,23 +722,23 @@ void ControllableContainer::triggerTriggered(Trigger * t)
 	if (t->isControllableExposed) dispatchFeedback(t);
 }
 
-void ControllableContainer::controllableFeedbackUpdate(ControllableContainer * cc, Controllable * c)
-{ 
+void ControllableContainer::controllableFeedbackUpdate(ControllableContainer* cc, Controllable* c)
+{
 	onControllableFeedbackUpdate(cc, c); //This is the function to override from child classes
 }
 
-void ControllableContainer::controllableNameChanged(Controllable * c)
+void ControllableContainer::controllableNameChanged(Controllable* c)
 {
 	notifyStructureChanged();
 }
 
-void ControllableContainer::askForRemoveControllable(Controllable * c, bool addToUndo)
+void ControllableContainer::askForRemoveControllable(Controllable* c, bool addToUndo)
 {
 	if (addToUndo) removeUndoableControllable(c);
 	else removeControllable(c);
 }
 
-void ControllableContainer::warningChanged(WarningTarget *target)
+void ControllableContainer::warningChanged(WarningTarget* target)
 {
 	notifyWarningChanged();
 	onWarningChanged(target);
@@ -788,7 +748,7 @@ void ControllableContainer::warningChanged(WarningTarget *target)
 String ControllableContainer::getWarningMessage() const
 {
 	StringArray s;
-	if(WarningTarget::getWarningMessage().isNotEmpty()) s.add(WarningTarget::getWarningMessage());
+	if (WarningTarget::getWarningMessage().isNotEmpty()) s.add(WarningTarget::getWarningMessage());
 
 	controllables.getLock().enter();
 	for (auto& c : controllables)
@@ -797,7 +757,7 @@ String ControllableContainer::getWarningMessage() const
 		String cs = c->getWarningMessage();
 		if (cs.isNotEmpty())
 		{
-			s.add(c->parentContainer->niceName+" > "+c->niceName + " : " + cs);
+			s.add(c->parentContainer->niceName + " > " + c->niceName + " : " + cs);
 		}
 	}
 	controllables.getLock().exit();
@@ -817,8 +777,8 @@ String ControllableContainer::getWarningMessage() const
 	return s.joinIntoString("\n");
 }
 
-String ControllableContainer::getWarningTargetName() const 
-{ 
+String ControllableContainer::getWarningTargetName() const
+{
 	return niceName;
 }
 
@@ -828,23 +788,23 @@ var ControllableContainer::getJSONData()
 
 	var paramsData;
 
-	
+
 	Array<WeakReference<Controllable>> cont = getAllControllables(false, true);
 
 	controllables.getLock().enter();
-	for (auto &wc : cont) {
+	for (auto& wc : cont) {
 		if (wc->type == Controllable::TRIGGER && !includeTriggersInSaveLoad) continue;
 		if (wc.wasObjectDeleted()) continue;
 		if (!wc->isSavable) continue;
-		Parameter * p = dynamic_cast<Parameter *>(wc.get());
+		Parameter* p = dynamic_cast<Parameter*>(wc.get());
 		if (p != nullptr && p->saveValueOnly && !p->isControllableFeedbackOnly && !p->isOverriden && !p->forceSaveValue && p->controlMode == Parameter::ControlMode::MANUAL) continue; //do not save parameters that have not changed. it should light up the file. But save custom-made parameters even if there not overriden !
 		paramsData.append(wc->getJSONData(this));
 	}
 	controllables.getLock().exit();
 
 	//data.getDynamicObject()->setProperty("uid", uid.toString());
-	if(paramsData.size() > 0) data.getDynamicObject()->setProperty("parameters", paramsData);
-	
+	if (paramsData.size() > 0) data.getDynamicObject()->setProperty("parameters", paramsData);
+
 	if (saveAndLoadName)
 	{
 		data.getDynamicObject()->setProperty("niceName", niceName);
@@ -859,15 +819,15 @@ var ControllableContainer::getJSONData()
 		var containersData = new DynamicObject();
 		controllableContainers.getLock().enter();
 		ownedContainers.getLock().enter();
-		for (auto &cc : controllableContainers)
+		for (auto& cc : controllableContainers)
 		{
 			if (!cc->includeInRecursiveSave) continue;
-			
+
 			var ccData = cc->getJSONData();
 			if (ownedContainers.contains(cc))
 			{
 				ccData.getDynamicObject()->setProperty("owned", true);
-				if(!saveAndLoadName) ccData.getDynamicObject()->setProperty("niceName", cc->niceName);
+				if (!saveAndLoadName) ccData.getDynamicObject()->setProperty("niceName", cc->niceName);
 			}
 
 			containersData.getDynamicObject()->setProperty(cc->shortName, ccData);
@@ -875,7 +835,7 @@ var ControllableContainer::getJSONData()
 		ownedContainers.getLock().exit();
 		controllableContainers.getLock().exit();
 
-		if(containersData.getDynamicObject()->getProperties().size() > 0) data.getDynamicObject()->setProperty("containers", containersData);
+		if (containersData.getDynamicObject()->getProperties().size() > 0) data.getDynamicObject()->setProperty("containers", containersData);
 	}
 
 	return data;
@@ -893,24 +853,25 @@ void ControllableContainer::loadJSONData(var data, bool createIfNotThere)
 	if (data.getDynamicObject()->hasProperty("shortName")) setCustomShortName(data.getDynamicObject()->getProperty("shortName"));
 	if (data.getDynamicObject()->hasProperty("editorIsCollapsed")) editorIsCollapsed = data.getDynamicObject()->getProperty("editorIsCollapsed");
 
-	Array<var> * paramsData = data.getDynamicObject()->getProperty("parameters").getArray();
+	Array<var>* paramsData = data.getDynamicObject()->getProperty("parameters").getArray();
 
 	if (paramsData != nullptr)
 	{
-		for (var &pData : *paramsData)
+		for (var& pData : *paramsData)
 		{
-			DynamicObject * o = pData.getDynamicObject();
+			DynamicObject* o = pData.getDynamicObject();
 			String pControlAddress = o->getProperty("controlAddress");
 
-			Controllable * c = getControllableForAddress(pControlAddress, false);
+			Controllable* c = getControllableForAddress(pControlAddress, false);
 
 			if (c != nullptr)
 			{
-				if (Parameter * p = dynamic_cast<Parameter*>(c)) {
+				if (Parameter* p = dynamic_cast<Parameter*>(c)) {
 					if (p->isSavable) p->loadJSONData(pData.getDynamicObject());
 				}
 
-			} else if (createIfNotThere)
+			}
+			else if (createIfNotThere)
 			{
 				c = ControllableFactory::getInstance()->createControllable(o->getProperty("type"));
 				if (c != nullptr)
@@ -925,10 +886,10 @@ void ControllableContainer::loadJSONData(var data, bool createIfNotThere)
 
 	if (saveAndLoadRecursiveData && data.hasProperty("containers"))
 	{
-		NamedValueSet ccData = data.getProperty("containers",var()).getDynamicObject()->getProperties();
-		for (auto &nv : ccData)
+		NamedValueSet ccData = data.getProperty("containers", var()).getDynamicObject()->getProperties();
+		for (auto& nv : ccData)
 		{
-			ControllableContainer * cc = getControllableContainerByName(nv.name.toString());
+			ControllableContainer* cc = getControllableContainerByName(nv.name.toString());
 			if (cc == nullptr && createIfNotThere)
 			{
 				bool owned = nv.value.getProperty("owned", false);
@@ -947,18 +908,18 @@ void ControllableContainer::loadJSONData(var data, bool createIfNotThere)
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableContainerFinishedLoading, this));
 }
 
-void ControllableContainer::childStructureChanged(ControllableContainer * cc)
+void ControllableContainer::childStructureChanged(ControllableContainer* cc)
 {
 	notifyStructureChanged();
 }
 
-void ControllableContainer::childAddressChanged(ControllableContainer * cc)
+void ControllableContainer::childAddressChanged(ControllableContainer* cc)
 {
 	notifyStructureChanged();
 }
 
 
-String ControllableContainer::getUniqueNameInContainer(const String & sourceName, int suffix)
+String ControllableContainer::getUniqueNameInContainer(const String& sourceName, int suffix)
 {
 	String resultName = sourceName;
 	if (suffix > 0)
@@ -971,7 +932,8 @@ String ControllableContainer::getUniqueNameInContainer(const String & sourceName
 			sa.remove(sa.size() - 1);
 			sa.add(String(num));
 			resultName = sa.joinIntoString(" ");
-		} else
+		}
+		else
 		{
 			resultName += " " + String(suffix);
 		}
@@ -990,69 +952,61 @@ String ControllableContainer::getUniqueNameInContainer(const String & sourceName
 	return resultName;
 }
 
-void ControllableContainer::updateLiveScriptObjectInternal(DynamicObject * parent) 
-{	
+void ControllableContainer::updateLiveScriptObjectInternal(DynamicObject* parent)
+{
 	ScriptTarget::updateLiveScriptObjectInternal(parent);
-	
+
 
 	bool transferToParent = parent != nullptr;
 
 	controllableContainers.getLock().enter();
-	for (auto &cc : controllableContainers)
+	for (auto& cc : controllableContainers)
 	{
 		if (cc == nullptr || cc.wasObjectDeleted()) continue;
 
 		if (!cc->includeInScriptObject) continue;
-		/*if (cc->skipControllableNameInAddress)
-		{
-			cc->updateLiveScriptObject(transferToParent?parent:(DynamicObject *)liveScriptObject);
-		}else
-		{*/
-			if (transferToParent) parent->setProperty(cc->shortName, cc->getScriptObject());
-			else liveScriptObject->setProperty(cc->shortName, cc->getScriptObject());
-		//}
+
+		if (transferToParent) parent->setProperty(cc->shortName, cc->getScriptObject());
+		else liveScriptObject->setProperty(cc->shortName, cc->getScriptObject());
 
 	}
 	controllableContainers.getLock().exit();
 
 
 	controllables.getLock().enter();
-	for (auto &c : controllables)
+	for (auto& c : controllables)
 	{
 		if (!c->includeInScriptObject) continue;
-		if(transferToParent) parent->setProperty(c->shortName,c->getScriptObject());
+		if (transferToParent) parent->setProperty(c->shortName, c->getScriptObject());
 		else liveScriptObject->setProperty(c->shortName, c->getScriptObject());
 	}
 	controllables.getLock().exit();
-	
-	/*if (!(skipControllableNameInAddress && parent != nullptr))
-	{*/
-		liveScriptObject->setProperty("name", shortName);
-		liveScriptObject->setProperty("niceName", niceName);
-	//}
 
-	
+	liveScriptObject->setProperty("name", shortName);
+	liveScriptObject->setProperty("niceName", niceName);
+
+
 }
 
-var ControllableContainer::getChildFromScript(const var::NativeFunctionArgs & a)
+var ControllableContainer::getChildFromScript(const var::NativeFunctionArgs& a)
 {
 	if (a.numArguments == 0) return var();
-	ControllableContainer * m = getObjectFromJS<ControllableContainer>(a);
+	ControllableContainer* m = getObjectFromJS<ControllableContainer>(a);
 	if (m == nullptr) return var();
 	String nameToFind = a.arguments[0].toString();
-	ControllableContainer * cc = m->getControllableContainerByName(nameToFind);
+	ControllableContainer* cc = m->getControllableContainerByName(nameToFind);
 	if (cc != nullptr) return cc->getScriptObject();
 
-	Controllable * c = m->getControllableByName(nameToFind);
+	Controllable* c = m->getControllableByName(nameToFind);
 	if (c != nullptr) return c->getScriptObject();
 
 	LOG("Child not found from script " + a.arguments[0].toString());
 	return var();
 }
 
-var ControllableContainer::getParentFromScript(const juce::var::NativeFunctionArgs & a)
+var ControllableContainer::getParentFromScript(const juce::var::NativeFunctionArgs& a)
 {
-	ControllableContainer * m = getObjectFromJS<ControllableContainer>(a);
+	ControllableContainer* m = getObjectFromJS<ControllableContainer>(a);
 	if (m->parentContainer == nullptr) return var();
 	return m->parentContainer->getScriptObject();
 }
@@ -1060,12 +1014,12 @@ var ControllableContainer::getParentFromScript(const juce::var::NativeFunctionAr
 var ControllableContainer::setNameFromScript(const juce::var::NativeFunctionArgs& a)
 {
 	if (a.numArguments == 0) return var();
-	ControllableContainer * cc = getObjectFromJS<ControllableContainer>(a);
+	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(a);
 	cc->setNiceName(a.arguments[0].toString());
 	if (a.numArguments >= 2) cc->setCustomShortName(a.arguments[1].toString());
 	else cc->setAutoShortName();
 
-	return var(); 
+	return var();
 }
 
 var ControllableContainer::setCollapsedFromScript(const juce::var::NativeFunctionArgs& a)
@@ -1078,24 +1032,24 @@ var ControllableContainer::setCollapsedFromScript(const juce::var::NativeFunctio
 }
 
 
-InspectableEditor * ControllableContainer::getEditor(bool isRoot)
+InspectableEditor* ControllableContainer::getEditor(bool isRoot)
 {
 	if (customGetEditorFunc != nullptr) return customGetEditorFunc(this, isRoot);
 	return new GenericControllableContainerEditor(this, isRoot);
 }
 
-DashboardItem * ControllableContainer::createDashboardItem()
+DashboardItem* ControllableContainer::createDashboardItem()
 {
 	return new DashboardCCItem(this);
 }
 
-EnablingControllableContainer::EnablingControllableContainer(const String & n, bool _canBeDisabled) :
+EnablingControllableContainer::EnablingControllableContainer(const String& n, bool _canBeDisabled) :
 	ControllableContainer(n),
 	enabled(nullptr),
-	canBeDisabled(false) 
+	canBeDisabled(false)
 {
 	setCanBeDisabled(_canBeDisabled);
-	
+
 }
 
 void EnablingControllableContainer::setCanBeDisabled(bool value)
@@ -1108,25 +1062,26 @@ void EnablingControllableContainer::setCanBeDisabled(bool value)
 	{
 		enabled = addBoolParameter("Enabled", "Activate OSC Input for this module", true);
 		enabled->hideInEditor = true;
-	} else
+	}
+	else
 	{
 		removeControllable(enabled);
 		enabled = nullptr;
 	}
 }
 
-InspectableEditor * EnablingControllableContainer::getEditor(bool isRoot)
+InspectableEditor* EnablingControllableContainer::getEditor(bool isRoot)
 {
 	if (customGetEditorFunc != nullptr) return customGetEditorFunc(this, isRoot);
 	return new EnablingControllableContainerEditor(this, isRoot);
 }
 
-ControllableContainer * ControllableContainer::ControllableContainerAction::getControllableContainer()
+ControllableContainer* ControllableContainer::ControllableContainerAction::getControllableContainer()
 {
 	if (containerRef != nullptr && !containerRef.wasObjectDeleted()) return containerRef.get();
-	else if(Engine::mainEngine != nullptr)
+	else if (Engine::mainEngine != nullptr)
 	{
-		ControllableContainer * cc = Engine::mainEngine->getControllableContainerForAddress(controlAddress, true);
+		ControllableContainer* cc = Engine::mainEngine->getControllableContainerForAddress(controlAddress, true);
 		return cc;
 	}
 
@@ -1136,7 +1091,7 @@ ControllableContainer * ControllableContainer::ControllableContainerAction::getC
 
 bool ControllableContainer::ControllableContainerChangeNameAction::perform()
 {
-	ControllableContainer * cc = getControllableContainer();
+	ControllableContainer* cc = getControllableContainer();
 	if (cc != nullptr)
 	{
 		cc->setNiceName(newName);
@@ -1147,7 +1102,7 @@ bool ControllableContainer::ControllableContainerChangeNameAction::perform()
 
 bool ControllableContainer::ControllableContainerChangeNameAction::undo()
 {
-	ControllableContainer * cc = getControllableContainer();
+	ControllableContainer* cc = getControllableContainer();
 	if (cc != nullptr)
 	{
 		cc->setNiceName(oldName);
@@ -1156,7 +1111,7 @@ bool ControllableContainer::ControllableContainerChangeNameAction::undo()
 	return false;
 }
 
-ControllableContainer::ControllableContainerControllableAction::ControllableContainerControllableAction(ControllableContainer * cc, Controllable * c) :
+ControllableContainer::ControllableContainerControllableAction::ControllableContainerControllableAction(ControllableContainer* cc, Controllable* c) :
 	ControllableContainerAction(cc),
 	cRef(c)
 {
@@ -1168,12 +1123,12 @@ ControllableContainer::ControllableContainerControllableAction::ControllableCont
 	}
 }
 
-Controllable * ControllableContainer::ControllableContainerControllableAction::getItem()
+Controllable* ControllableContainer::ControllableContainerControllableAction::getItem()
 {
-	if (cRef != nullptr && !cRef.wasObjectDeleted()) return dynamic_cast<Controllable *>(cRef.get());
+	if (cRef != nullptr && !cRef.wasObjectDeleted()) return dynamic_cast<Controllable*>(cRef.get());
 	else
 	{
-		ControllableContainer * cc = this->getControllableContainer();
+		ControllableContainer* cc = this->getControllableContainer();
 		if (cc != nullptr) return cc->getControllableByName(cShortName);
 	}
 
@@ -1182,17 +1137,18 @@ Controllable * ControllableContainer::ControllableContainerControllableAction::g
 
 bool ControllableContainer::AddControllableAction::perform()
 {
-	ControllableContainer * cc = this->getControllableContainer();
+	ControllableContainer* cc = this->getControllableContainer();
 	if (cc == nullptr)
 	{
 		return false;
 	}
 
-	Controllable * c = this->getItem();
+	Controllable* c = this->getItem();
 	if (c != nullptr)
 	{
 		cc->addControllable(c);
-	} else
+	}
+	else
 	{
 		c = ControllableFactory::createControllable(cType);
 	}
@@ -1205,10 +1161,10 @@ bool ControllableContainer::AddControllableAction::perform()
 
 bool ControllableContainer::AddControllableAction::undo()
 {
-	Controllable * c = this->getItem();
+	Controllable* c = this->getItem();
 	if (c == nullptr) return false;
 	data = c->getJSONData();
-	ControllableContainer * cc = getControllableContainer();
+	ControllableContainer* cc = getControllableContainer();
 	if (cc != nullptr)
 	{
 		cc->removeControllable(c);
@@ -1217,14 +1173,14 @@ bool ControllableContainer::AddControllableAction::undo()
 	return true;
 }
 
-ControllableContainer::RemoveControllableAction::RemoveControllableAction(ControllableContainer * cc, Controllable * c) :
+ControllableContainer::RemoveControllableAction::RemoveControllableAction(ControllableContainer* cc, Controllable* c) :
 	ControllableContainerControllableAction(cc, c)
 {
 }
 
 bool ControllableContainer::RemoveControllableAction::perform()
 {
-	Controllable * c = this->getItem();
+	Controllable* c = this->getItem();
 
 	if (c == nullptr) return false;
 	getControllableContainer()->removeControllable(c);
@@ -1234,12 +1190,12 @@ bool ControllableContainer::RemoveControllableAction::perform()
 
 bool ControllableContainer::RemoveControllableAction::undo()
 {
-	ControllableContainer * cc = getControllableContainer();
+	ControllableContainer* cc = getControllableContainer();
 	if (cc == nullptr) return false;
-	Controllable * c = ControllableFactory::createControllable(cType);
+	Controllable* c = ControllableFactory::createControllable(cType);
 	if (c != nullptr)
 	{
-		c->loadJSONData(data); 
+		c->loadJSONData(data);
 		cc->addControllable(c);
 		cRef = c;
 	}

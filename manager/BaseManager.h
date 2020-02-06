@@ -288,10 +288,10 @@ T * BaseManager<T>::addItem(T * item, var data, bool addToUndo, bool notify)
 	if(targetIndex != -1) items.insert(targetIndex, item);
 	else
 	{
-		items.getLock().enter();
+		//items.getLock().enter();
 		if (autoReorderOnAdd && !isCurrentlyLoadingData && comparator.compareFunc != nullptr) items.addSorted(comparator, item);
 		else items.add(item);
-		items.getLock().exit();
+		//items.getLock().exit();
 	}
 
 	bi->addBaseItemListener(this);
@@ -505,9 +505,9 @@ void BaseManager<T>::removeItem(T * item, bool addToUndo, bool notify)
 	}
 
 
-	items.getLock().enter();
+	//items.getLock().enter();
 	items.removeObject(item, false);
-	items.getLock().exit();
+	//items.getLock().exit();
 	
 	removeItemInternal(item);
 	
@@ -532,10 +532,10 @@ void BaseManager<T>::setItemIndex(T * item, int newIndex)
 	int index = items.indexOf(item);
 	if (index == -1 || index == newIndex) return;
 
-	items.getLock().enter();
+	//items.getLock().enter();
 	items.move(index, newIndex);
 	controllableContainers.move(index, newIndex);
-	items.getLock().exit();
+	//items.getLock().exit();
 
 	baseManagerListeners.call(&BaseManagerListener<T>::itemsReordered);
 	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_REORDERED));
@@ -546,9 +546,9 @@ void BaseManager<T>::reorderItems()
 {
 	if (comparator.compareFunc != nullptr)
 	{
-		items.getLock().enter();
+		//items.getLock().enter();
 		items.sort(comparator);
-		items.getLock().exit();
+		//items.getLock().exit();
 		controllableContainers.clear();
 		controllableContainers.addArray(items);
 	}
@@ -560,6 +560,7 @@ void BaseManager<T>::reorderItems()
 template<class T>
  T * BaseManager<T>::getItemWithName(const String & itemShortName, bool searchItemWithNiceNameToo, bool searchWithLowerCaseIfNotFound)
 {
+	const ScopedLock(items.getLock());
 	for (auto &t : items)
 	{
 		if (((BaseItem *)t)->shortName == itemShortName) return t;
@@ -580,6 +581,7 @@ template<class T>
 template<class T>
 void BaseManager<T>::clear()
 {
+	const ScopedLock(items.getLock());
 	while (items.size() > 0) removeItem(items[0], false);
 }
 
@@ -665,10 +667,12 @@ var BaseManager<T>::getJSONData()
 {
 	var data = ControllableContainer::getJSONData();
 	var itemsData = var();
+	items.getLock().enter();
 	for (auto &t : items)
 	{
 		if(t->isSavable) itemsData.append(t->getJSONData());
 	}
+	items.getLock().exit();
 
 	if (itemsData.size() > 0) data.getDynamicObject()->setProperty("items", itemsData);
 
@@ -701,7 +705,11 @@ void BaseManager<T>::updateLiveScriptObjectInternal(DynamicObject *)
 	ControllableContainer::updateLiveScriptObjectInternal();
 
 	var itemsArray = var();
+
+	items.getLock().enter();
 	for (auto &t : items) itemsArray.append(t->getScriptObject());
+	items.getLock().exit();
+
 	liveScriptObject->setProperty("items", itemsArray);
 }
 
