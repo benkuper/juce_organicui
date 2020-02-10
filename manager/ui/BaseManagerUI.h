@@ -288,9 +288,7 @@ void BaseManagerUI<M, T, U>::addExistingItems(bool resizeAfter)
 {
 
 	//add existing items
-	manager->items.getLock().enter();
 	for (auto &t : manager->items) addItemUI(t, false);
-	manager->items.getLock().exit();
 	if (resizeAfter) resized();
 }
 
@@ -599,7 +597,8 @@ U * BaseManagerUI<M, T, U>::addItemUI(T * item, bool animate, bool resizeAndRepa
 	if (useViewport) container.addAndMakeVisible(bui);
 	else addAndMakeVisible(bui);
 
-	itemsUI.insert(manager->items.indexOf(item), tui);
+	int index = manager->items.indexOf(item);
+	itemsUI.insert(index, tui);
 	
 	bui->addItemMinimalUIListener(this);
 

@@ -560,7 +560,7 @@ void BaseManager<T>::reorderItems()
 template<class T>
  T * BaseManager<T>::getItemWithName(const String & itemShortName, bool searchItemWithNiceNameToo, bool searchWithLowerCaseIfNotFound)
 {
-	const ScopedLock lock(items.getLock());
+	//const ScopedLock lock(items.getLock());
 	for (auto &t : items)
 	{
 		if (((BaseItem *)t)->shortName == itemShortName) return t;
@@ -581,7 +581,7 @@ template<class T>
 template<class T>
 void BaseManager<T>::clear()
 {
-	const ScopedLock lock(items.getLock());
+	//const ScopedLock lock(items.getLock());
 	while (items.size() > 0) removeItem(items[0], false);
 }
 
@@ -667,12 +667,12 @@ var BaseManager<T>::getJSONData()
 {
 	var data = ControllableContainer::getJSONData();
 	var itemsData = var();
-	items.getLock().enter();
+	//items.getLock().enter();
 	for (auto &t : items)
 	{
 		if(t->isSavable) itemsData.append(t->getJSONData());
 	}
-	items.getLock().exit();
+	//items.getLock().exit();
 
 	if (itemsData.size() > 0) data.getDynamicObject()->setProperty("items", itemsData);
 
@@ -706,9 +706,9 @@ void BaseManager<T>::updateLiveScriptObjectInternal(DynamicObject *)
 
 	var itemsArray = var();
 
-	items.getLock().enter();
+	//items.getLock().enter();
 	for (auto &t : items) itemsArray.append(t->getScriptObject());
-	items.getLock().exit();
+	//items.getLock().exit();
 
 	liveScriptObject->setProperty("items", itemsArray);
 }
