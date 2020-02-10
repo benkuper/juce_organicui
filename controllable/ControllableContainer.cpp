@@ -1,4 +1,3 @@
-#include "ControllableContainer.h"
 /*
  ==============================================================================
 
@@ -329,12 +328,12 @@ void ControllableContainer::setAutoShortName() {
 
 Controllable* ControllableContainer::getControllableByName(const String& name, bool searchNiceNameToo, bool searchLowerCaseToo)
 {
-	controllables.getLock().enter();
+	//controllables.getLock().enter();
 	for (auto& c : controllables)
 	{
 		if (c->shortName == name || (searchNiceNameToo && c->niceName == name) || (searchLowerCaseToo && c->shortName.toLowerCase() == name.toLowerCase())) return c;
 	}
-	controllables.getLock().exit();
+	//controllables.getLock().exit();
 
 	return nullptr;
 }
@@ -494,19 +493,19 @@ void ControllableContainer::setParentContainer(ControllableContainer* container)
 {
 	this->parentContainer = container;
 
-	controllables.getLock().enter();
+	//controllables.getLock().enter();
 	for (auto& c : controllables) if (c != nullptr) c->updateControlAddress();
-	controllables.getLock().exit();
+	//controllables.getLock().exit();
 
-	controllableContainers.getLock().enter();
+	//controllableContainers.getLock().enter();
 	for (auto& cc : controllableContainers) if (!cc.wasObjectDeleted()) cc->updateChildrenControlAddress();
-	controllableContainers.getLock().exit();
+	//controllableContainers.getLock().exit();
 
 }
 
 void ControllableContainer::updateChildrenControlAddress()
 {
-	controllables.getLock().enter();
+	//controllables.getLock().enter();
 	for (auto& c : controllables)
 	{
 		if (c == nullptr)
@@ -516,10 +515,10 @@ void ControllableContainer::updateChildrenControlAddress()
 		}
 		c->updateControlAddress();
 	}
-	controllables.getLock().exit();
+	//controllables.getLock().exit();
 
 
-	controllableContainers.getLock().enter();
+	//controllableContainers.getLock().enter();
 	for (auto& cc : controllableContainers)
 	{
 		if (cc == nullptr)
@@ -529,21 +528,21 @@ void ControllableContainer::updateChildrenControlAddress()
 		}
 		cc->updateChildrenControlAddress();
 	}
-	controllableContainers.getLock().exit();
+	//controllableContainers.getLock().exit();
 
 }
 
 Array<WeakReference<Controllable>> ControllableContainer::getAllControllables(bool recursive, bool getNotExposed)
 {
 	Array<WeakReference<Controllable>> result;
-	controllables.getLock().enter();
+	//controllables.getLock().enter();
 	for (auto& c : controllables)
 	{
 		if (getNotExposed || c->isControllableExposed) result.add(c);
 	}
-	controllables.getLock().exit();
+	//controllables.getLock().exit();
 
-	controllableContainers.getLock().enter();
+	//controllableContainers.getLock().enter();
 	if (recursive)
 	{
 		for (auto& cc : controllableContainers)
@@ -552,7 +551,7 @@ Array<WeakReference<Controllable>> ControllableContainer::getAllControllables(bo
 			result.addArray(cc->getAllControllables(true, getNotExposed));
 		}
 	}
-	controllableContainers.getLock().exit();
+	//controllableContainers.getLock().exit();
 
 	return result;
 
@@ -562,7 +561,7 @@ Array<WeakReference<Parameter>> ControllableContainer::getAllParameters(bool rec
 {
 	Array<WeakReference<Parameter>> result;
 
-	controllables.getLock().enter();
+	//controllables.getLock().enter();
 	for (auto& c : controllables)
 	{
 		if (c->type == Controllable::Type::TRIGGER) continue;
@@ -572,13 +571,13 @@ Array<WeakReference<Parameter>> ControllableContainer::getAllParameters(bool rec
 			}
 		}
 	}
-	controllables.getLock().exit();
+	//controllables.getLock().exit();
 
 	if (recursive)
 	{
-		controllableContainers.getLock().enter();
+		//controllableContainers.getLock().enter();
 		for (auto& cc : controllableContainers) result.addArray(cc->getAllParameters(true, getNotExposed));
-		controllableContainers.getLock().exit();
+		//controllableContainers.getLock().exit();
 	}
 
 	return result;
@@ -588,14 +587,14 @@ Array<WeakReference<ControllableContainer>> ControllableContainer::getAllContain
 {
 	Array<WeakReference<ControllableContainer>> result;
 
-	controllableContainers.getLock().enter();
+	//controllableContainers.getLock().enter();
 	for (auto& cc : controllableContainers)
 	{
 		if (cc.wasObjectDeleted() || cc.get() == nullptr) continue;
 		result.add(cc);
 		if (recursive) result.addArray(cc->getAllContainers(true));
 	}
-	controllableContainers.getLock().exit();
+	//controllableContainers.getLock().exit();
 	return result;
 }
 
@@ -791,7 +790,7 @@ var ControllableContainer::getJSONData()
 
 	Array<WeakReference<Controllable>> cont = getAllControllables(false, true);
 
-	controllables.getLock().enter();
+	//controllables.getLock().enter();
 	for (auto& wc : cont) {
 		if (wc->type == Controllable::TRIGGER && !includeTriggersInSaveLoad) continue;
 		if (wc.wasObjectDeleted()) continue;
@@ -800,7 +799,7 @@ var ControllableContainer::getJSONData()
 		if (p != nullptr && p->saveValueOnly && !p->isControllableFeedbackOnly && !p->isOverriden && !p->forceSaveValue && p->controlMode == Parameter::ControlMode::MANUAL) continue; //do not save parameters that have not changed. it should light up the file. But save custom-made parameters even if there not overriden !
 		paramsData.append(wc->getJSONData(this));
 	}
-	controllables.getLock().exit();
+	//controllables.getLock().exit();
 
 	//data.getDynamicObject()->setProperty("uid", uid.toString());
 	if (paramsData.size() > 0) data.getDynamicObject()->setProperty("parameters", paramsData);
@@ -817,8 +816,8 @@ var ControllableContainer::getJSONData()
 	if (saveAndLoadRecursiveData)
 	{
 		var containersData = new DynamicObject();
-		controllableContainers.getLock().enter();
-		ownedContainers.getLock().enter();
+		//controllableContainers.getLock().enter();
+		//ownedContainers.getLock().enter();
 		for (auto& cc : controllableContainers)
 		{
 			if (!cc->includeInRecursiveSave) continue;
@@ -832,8 +831,8 @@ var ControllableContainer::getJSONData()
 
 			containersData.getDynamicObject()->setProperty(cc->shortName, ccData);
 		}
-		ownedContainers.getLock().exit();
-		controllableContainers.getLock().exit();
+		//ownedContainers.getLock().exit();
+		//controllableContainers.getLock().exit();
 
 		if (containersData.getDynamicObject()->getProperties().size() > 0) data.getDynamicObject()->setProperty("containers", containersData);
 	}
@@ -959,7 +958,7 @@ void ControllableContainer::updateLiveScriptObjectInternal(DynamicObject* parent
 
 	bool transferToParent = parent != nullptr;
 
-	controllableContainers.getLock().enter();
+	//controllableContainers.getLock().enter();
 	for (auto& cc : controllableContainers)
 	{
 		if (cc == nullptr || cc.wasObjectDeleted()) continue;
@@ -970,17 +969,17 @@ void ControllableContainer::updateLiveScriptObjectInternal(DynamicObject* parent
 		else liveScriptObject->setProperty(cc->shortName, cc->getScriptObject());
 
 	}
-	controllableContainers.getLock().exit();
+	//controllableContainers.getLock().exit();
 
 
-	controllables.getLock().enter();
+	//controllables.getLock().enter();
 	for (auto& c : controllables)
 	{
 		if (!c->includeInScriptObject) continue;
 		if (transferToParent) parent->setProperty(c->shortName, c->getScriptObject());
 		else liveScriptObject->setProperty(c->shortName, c->getScriptObject());
 	}
-	controllables.getLock().exit();
+	//controllables.getLock().exit();
 
 	liveScriptObject->setProperty("name", shortName);
 	liveScriptObject->setProperty("niceName", niceName);
