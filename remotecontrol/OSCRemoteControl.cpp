@@ -130,6 +130,20 @@ void OSCRemoteControl::processMessage(const OSCMessage& m)
 
 		if (c == nullptr)
 		{
+			if (add.endsWith("enabled"))
+			{
+				String cAdd = add.substring(0, add.length() - 8);
+				c = Engine::mainEngine != nullptr ? Engine::mainEngine->getControllableForAddress(cAdd) : nullptr;
+				if (c != nullptr)
+				{
+					if(m.size() >= 1) c->setEnabled(OSCHelpers::getIntArg(m[0]) > 0);
+					return;
+				}
+			}
+		}
+
+		if (c == nullptr)
+		{
 			//NLOGWARNING(niceName, "No target found for " << add);
 			remoteControlListeners.call(&RemoteControlListener::processMessage, m);
 			return;
@@ -167,7 +181,8 @@ void OSCRemoteControl::processMessage(const OSCMessage& m)
 				break;
 
 			case Controllable::COLOR:
-				if (m.size() < 3) NLOG(niceName, "Parameter " << p->niceName << " requires at least 3 arguments");
+				if (m[0].isColour()) static_cast<ColorParameter*>(p)->setColor(OSCHelpers::getColourFromOSC(m[0].getColour()));
+				else if (m.size() < 3) NLOG(niceName, "Parameter " << p->niceName << " requires at least 3 arguments");
 				else static_cast<ColorParameter*>(p)->setColor(Colour::fromFloatRGBA(OSCHelpers::getFloatArg(m[0]), OSCHelpers::getFloatArg(m[1]), OSCHelpers::getFloatArg(m[2]), m.size() >= 4 ? OSCHelpers::getFloatArg(m[3]) : 1));
 				break;
 
