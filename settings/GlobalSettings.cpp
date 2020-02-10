@@ -116,7 +116,7 @@ void GlobalSettings::loadJSONDataInternal(var data)
 KeyMappingsContainer::KeyMappingsContainer() :
 	ControllableContainer("Key Mappings")
 {
-
+	editorIsCollapsed = true;
 }
 
 KeyMappingsContainer::~KeyMappingsContainer()

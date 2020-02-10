@@ -17,6 +17,9 @@ OSCRemoteControl::OSCRemoteControl() :
 	,servus("_osc._udp")
 #endif
 {
+
+	saveAndLoadRecursiveData = true; //can be useful when app include other settings there
+
 	enabled->setValue(false);
 
 	localPort = addIntParameter("Local Port", "Local port to connect to for global control over the application", 42000, 1024, 65535);
