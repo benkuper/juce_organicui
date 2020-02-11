@@ -1,6 +1,5 @@
 #pragma once
 
-
 class OrganicMainContentComponent   : 
 	public Component, 
 	public ApplicationCommandTarget, 
@@ -15,15 +14,15 @@ public:
 	TooltipWindow tooltipWindow; //just declare one here
 
 #if JUCE_OPENGL
-	OpenGLContext openGLContext;
+	std::unique_ptr<OpenGLContext> openGLContext;
 #endif
 
 	std::unique_ptr<LookAndFeelOO> lookAndFeelOO;
 	std::unique_ptr<ProgressWindow> fileProgressWindow;
-
-
+	
 	virtual void init();
-
+	void setupOpenGL();
+	virtual void setupOpenGLInternal() {}
 	virtual void clear();
 
     virtual void paint (Graphics&) override;
@@ -35,6 +34,7 @@ public:
 	virtual void fileProgress(float percent, int state) override;
 	virtual void endLoadFile() override;
 
+
 	// inherited from MenuBarModel , ApplicationCommandTarget
 	ApplicationCommandTarget* getNextCommandTarget() override { return findFirstTargetParentComponent(); }
 	virtual void getAllCommands(Array<CommandID>& commands) override;
@@ -44,8 +44,6 @@ public:
 	virtual PopupMenu getMenuForIndex(int topLevelMenuIndex, const String& menuName) override;
 	virtual void fillFileMenuInternal(PopupMenu &p) {}
 	virtual void menuItemSelected(int /*menuItemID*/, int /*topLevelMenuIndex*/) override;
-
-
 
 
 private:

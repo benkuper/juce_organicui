@@ -88,8 +88,10 @@ void Outliner::rebuildTree()
 void Outliner::buildTree(OutlinerItem * parentItem, ControllableContainer * parentContainer)
 {
 	if (parentContainer == nullptr) return;
-	Array<WeakReference<ControllableContainer>> childContainers = parentContainer->controllableContainers;
-	for (auto &cc : childContainers)
+	Array<WeakReference<ControllableContainer>> childContainers = parentContainer->getAllContainers(false);
+	
+	parentContainer->controllableContainers.getLock().enter();
+	for (auto &cc : parentContainer->controllableContainers)
 	{
 		/*if (cc->skipControllableNameInAddress && !showHiddenContainers)
 		{
@@ -102,17 +104,17 @@ void Outliner::buildTree(OutlinerItem * parentItem, ControllableContainer * pare
 
 			buildTree(ccItem, cc);
 		//}
-
 	}
+	parentContainer->controllableContainers.getLock().exit();
 
-	Array<WeakReference<Controllable>> childControllables = parentContainer->getAllControllables(false);
-
-	for (auto &c : childControllables)
+	parentContainer->controllables.getLock().enter();
+	for (auto &c : parentContainer->controllables)
 	{
 		if (c->hideInOutliner) continue;
 		OutlinerItem * cItem = new OutlinerItem(c);
 		parentItem->addSubItem(cItem);
 	}
+	parentContainer->controllables.getLock().exit();
 
 }
 
@@ -121,8 +123,9 @@ void Outliner::childStructureChanged(ControllableContainer *)
 	if (enabled)
 	{
 		MessageManagerLock mmLock;
-		if (mmLock.lockWasGained()) rebuildTree();
+		rebuildTree();
 	}
+
 }
 
 

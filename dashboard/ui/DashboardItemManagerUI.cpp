@@ -49,8 +49,8 @@ void DashboardItemManagerUI::paint(Graphics& g)
 
 	g.setColour(Colours::white.withAlpha(alpha));
 	float scale = manager->bgImageScale->floatValue();
-	Rectangle<float> r = getBoundsInView(Rectangle<float>().withSizeKeepingCentre(bgImage.getWidth()*scale, bgImage.getHeight()*scale));
-	g.drawImage(bgImage, r, RectanglePlacement::stretchToFit, false);
+	Rectangle<int> r = getBoundsInView(Rectangle<float>().withSizeKeepingCentre(bgImage.getWidth()*scale, bgImage.getHeight()*scale));
+	g.drawImage(bgImage, r.toFloat(), RectanglePlacement::stretchToFit, false);
 	
 }
 

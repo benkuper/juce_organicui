@@ -62,8 +62,8 @@ public:
 	Uuid uid;
 
 	OwnedArray<Controllable, CriticalSection> controllables;
-	Array<WeakReference<ControllableContainer>> controllableContainers;
-	OwnedArray<ControllableContainer> ownedContainers;
+	Array<WeakReference<ControllableContainer>, CriticalSection> controllableContainers;
+	OwnedArray<ControllableContainer, CriticalSection> ownedContainers;
 	WeakReference<ControllableContainer> parentContainer;
 
 	UndoableAction * setUndoableNiceName(const String &_niceName, bool onlyReturnAction = false);

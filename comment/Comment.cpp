@@ -12,7 +12,7 @@ Comment::Comment() :
 	BaseItem("Comment",false)
 {
 	itemDataType = "Comment";
-	text = addStringParameter("Text", "The comment text", "I Love Chataigne !");
+	text = addStringParameter("Text", "The comment text", "I Love "+ OrganicApplication::getInstance()->getApplicationName()+ " !");
 	//text->multiline = true;
 
 	size = addFloatParameter("Size", "The text size", 14, 0,80);
