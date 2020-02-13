@@ -169,7 +169,10 @@ bool Point3DParameter::checkValueIsTheSame(var newValue, var oldValue)
 	if (!(newValue.isArray() && oldValue.isArray())) return false;
 	
 	valueSetLock.enter();
-	bool result = newValue[0] == oldValue[0] && newValue[1] == oldValue[1] && newValue[2] == oldValue[2];
+	bool result = jlimit<float>(minimumValue[0], maximumValue[0], newValue[0]) == (float)oldValue[0]
+		&& jlimit<float>(minimumValue[1], maximumValue[1], newValue[1]) == (float)oldValue[1]
+	&& jlimit<float>(minimumValue[2], maximumValue[2], newValue[2]) == (float)oldValue[2];
+
 	valueSetLock.exit();
 
 	return result;

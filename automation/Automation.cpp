@@ -1,4 +1,3 @@
-#include "Automation.h"
 /*  ==============================================================================
 
 	Automation.cpp
@@ -13,7 +12,7 @@ Automation::Automation(const String &name, int numDimensions, AutomationRecorder
 	numDimensions(numDimensions),
 	recorder(_recorder),
 	hasRange(false),
-	showUIInEditor(false),
+	showUIInEditor(numDimensions == 2),
 	allowKeysOutside(allowKeysOutside)
 {
 
@@ -33,7 +32,7 @@ Automation::Automation(const String &name, int numDimensions, AutomationRecorder
 
 	for (int i = 0; i < numDimensions; i++)
 	{
-		FloatParameter * value = addFloatParameter("Value", "The current value, depending on the position", 0);
+		FloatParameter* value = addFloatParameter("Value" + (i > 0 ? String(i + 1) : ""), "The current value, depending on the position", 0);
 		value->hideInEditor = true;
 		value->isControllableFeedbackOnly = true;
 		values.add(value);
@@ -199,7 +198,7 @@ Array<float> Automation::getValuesForPosition(float pos)
 
 	AutomationKey * k = getClosestKeyForPos(pos);
 	if (k == nullptr) return 0;
-	return k->getValues(items[items.indexOf(k) + 1], pos);
+	return k->getValues(pos);
 }
 
 Array<float>  Automation::getNormalizedValuesForPosition(float pos)
@@ -218,7 +217,7 @@ AutomationKey * Automation::createItem()
 	return k;
 }
 
-void Automation::addItems(Array<float> positions, Array<Array<float>> keyValues, bool removeExistingOverlappingKeys, bool addToUndo, bool autoSmoothCurve)
+void Automation::addKeys(Array<float> positions, Array<Array<float>> keyValues, bool removeExistingOverlappingKeys, bool addToUndo, bool autoSmoothCurve)
 {
 	if(selectionManager != nullptr) selectionManager->setEnabled(false);
 
@@ -257,7 +256,7 @@ void Automation::addItems(Array<float> positions, Array<Array<float>> keyValues,
 
 }
 
-AutomationKey * Automation::addItem(const float _position, const Array<float> _values, bool addToUndo, bool reorder)
+AutomationKey * Automation::addKey(const float _position, const Array<float> _values, bool addToUndo, bool reorder)
 {
 	AutomationKey * k = createItem();
 	k->position->setValue(_position);
@@ -298,6 +297,23 @@ Array<AutomationKey*> Automation::addItemsFromClipboard(bool showWarning)
 	reorderItems();
 
 	return  keys;
+}
+
+void Automation::addItemInternal(AutomationKey* k, var data)
+{
+	int index = items.indexOf(k);
+	if (index > 0) items[index - 1]->setNextKey(k);
+}
+
+void Automation::reorderItems()
+{
+	BaseManager::reorderItems();
+	AutomationKey* prevKey = nullptr;
+	for (auto& i : items)
+	{
+		if (prevKey != nullptr) prevKey->setNextKey(i);
+		prevKey = i;
+	}
 }
 
 void Automation::onControllableFeedbackUpdate(ControllableContainer * cc, Controllable * c)

@@ -1,3 +1,4 @@
+#include "AutomationKey.h"
 /*
   ==============================================================================
 
@@ -10,7 +11,8 @@
 
 AutomationKey::AutomationKey(int numDimensions, Array<float> minimumValues, Array<float> maximumValues) :
 	BaseItem("Key",false),
-	numDimensions(numDimensions)
+	numDimensions(numDimensions),
+	nextKey(nullptr)
 {
 	itemDataType = "AutomationKey";
 	hideEditorHeader = true;
@@ -20,7 +22,7 @@ AutomationKey::AutomationKey(int numDimensions, Array<float> minimumValues, Arra
 
 	for (int i = 0; i < numDimensions; i++)
 	{
-		FloatParameter* value = addFloatParameter("Value", "Value of the key", 0, minimumValues[i], maximumValues[i]);
+		FloatParameter* value = addFloatParameter("Value" + (i > 0 ? String(i + 1) : ""), "Value of the key", 0, minimumValues[i], maximumValues[i]);
 		values.add(value);
 
 		easings.add(nullptr);
@@ -48,6 +50,32 @@ AutomationKey::~AutomationKey()
 {
 }
 
+void AutomationKey::clearItem()
+{
+	BaseItem::clearItem();
+	setNextKey(nullptr);
+}
+
+void AutomationKey::setNextKey(AutomationKey* k)
+{
+	if (nextKey == k) return;
+	if (nextKey != nullptr)
+	{
+		nextKey->removeInspectableListener(this);
+		nextKey->removeControllableContainerListener(this);
+	}
+
+	nextKey = k;
+
+	if (nextKey != nullptr)
+	{
+		nextKey->addInspectableListener(this);
+		nextKey->addControllableContainerListener(this);
+	}
+
+	for (auto& e : easings) if (e != nullptr) e->setNextKey(nextKey);
+}
+
 void AutomationKey::clearRange()
 {
 	for (auto& v : values) v->clearRange();
@@ -72,19 +100,19 @@ void AutomationKey::setEasing(Easing::Type t)
 		switch (t)
 		{
 		case Easing::LINEAR:
-			e = new LinearEasing();
+			e = new LinearEasing(this, nextKey, i);
 			break;
 
 		case Easing::HOLD:
-			e = new HoldEasing();
+			e = new HoldEasing(this, nextKey, i);
 			break;
 
 		case Easing::BEZIER:
-			e = new CubicEasing();
+			e = new CubicEasing(this, nextKey, i);
 			break;
 
 		case Easing::SINE:
-			e = new  SineEasing();
+			e = new  SineEasing(this, nextKey, i);
 			break;
 		}
 
@@ -98,7 +126,12 @@ void AutomationKey::setEasing(Easing::Type t)
 	}
 }
 
-Array<float> AutomationKey::getValues(AutomationKey* nextKey, const float& _pos)
+float AutomationKey::getDimensionValue(int index)
+{
+	return values[index]->floatValue();
+}
+
+Array<float> AutomationKey::getValues(const float& _pos)
 {
 	Array<float> result;
 
@@ -114,13 +147,18 @@ Array<float> AutomationKey::getValues(AutomationKey* nextKey, const float& _pos)
 	if (relPos < 0) relPos = 0;
 	if (relPos > 1) relPos = 1;
 
-	for (int i = 0; i < numDimensions;i++) result.add(easings[i]->getValue(values[i]->floatValue(), nextKey->values[i]->floatValue(), relPos));
+	for (int i = 0; i < numDimensions;i++) result.add(easings[i]->getValue(relPos));
 	return result;
 }
 
-void AutomationKey::setValues(Array<float> newValues)
+void AutomationKey::setValues(Array<float> newValues, bool updatePosition)
 {
-	for (int i = 0; i < numDimensions; i++) values[i]->setValue(newValues[i]);
+	for (int i = 0; i < numDimensions; i++)
+	{
+		values[i]->setValue(newValues[i]);
+		easings[i]->updateFromKeys();
+	}
+	if (numDimensions > 1 && updatePosition) viewUIPosition->setPoint(values[0]->floatValue(), -values[1]->floatValue());
 }
 
 void AutomationKey::setSelectionManager(InspectableSelectionManager * ism)
@@ -135,6 +173,34 @@ void AutomationKey::onContainerParameterChangedInternal(Parameter * p)
 	{
 		setEasing((Easing::Type)(int)easingType->getValueData());
 	}
+	else if (p == viewUIPosition)
+	{
+		setValues(Array<float>(viewUIPosition->x, -viewUIPosition->y), false);
+	}
+	else if (values.contains((FloatParameter *)p))
+	{
+		if (numDimensions > 1) viewUIPosition->setPoint(values[0]->floatValue(), -values[1]->floatValue());
+	}
+}
+
+void AutomationKey::controllableFeedbackUpdate(ControllableContainer* cc, Controllable* c)
+{
+	if (cc == nextKey)
+	{
+		for (int i = 0; i < numDimensions; i++)
+		{
+			easings[i]->updateFromKeys();
+		}
+	}
+	else
+	{
+		BaseItem::controllableFeedbackUpdate(cc, c);
+	}
+}
+
+void AutomationKey::inspectableDestroyed(Inspectable* i)
+{
+	if (i == nextKey) setNextKey(nullptr);
 }
 
 var AutomationKey::getJSONData()

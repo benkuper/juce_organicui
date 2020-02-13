@@ -1,3 +1,4 @@
+#include "EasingUI.h"
 /*
   ==============================================================================
 
@@ -14,7 +15,7 @@ EasingUI::EasingUI(Easing * e, Colour color) :
 	InspectableContentComponent(e),
 	easing(e),
 	color(color),
-	y1(0),y2(0)
+	viewValueRange(0,1)
 {
 	autoDrawContourWhenSelected = false;
 	
@@ -31,10 +32,14 @@ EasingUI::~EasingUI()
 	if(!easing.wasObjectDeleted()) easing->removeAsyncContainerListener(this);
 }
 
-void EasingUI::setKeyPositions(const int &k1, const int &k2)
+void EasingUI::setViewValueRange(const Point<float> range)
 {
-	y1 = k1;
-	y2 = k2;
+	//if (viewValueRange == range) return;
+	
+	p1 = Point<int>(0, getYForValue(easing->getValue(0)));
+	p2 = Point<int>(getWidth(), getYForValue(easing->getValue(1)));
+	
+	viewValueRange.setXY(range.x, range.y);
 	generatePath();
 }
 
@@ -65,7 +70,7 @@ void EasingUI::generatePath()
 {
 	
 	drawPath.clear();
-	drawPath.startNewSubPath(0, y1); 
+	drawPath.startNewSubPath(p1.x, p1.y); 
 	generatePathInternal();
 
 	if(drawPath.getLength()) buildHitPath();
@@ -83,13 +88,15 @@ void EasingUI::autoGeneratePathWithPrecision(int precision)
 	if (precision == 0) precision = getWidth();
 	else precision = jmin(getWidth(), precision);
 
+	jassert(viewValueRange.x != viewValueRange.y);
+
 	for (int i = 1; i <= precision; i++)
 	{
 		float t = i*1.f / precision;
-		float v1 = 1 - (y1*1.f / getHeight());
-		float v2 = 1 - (y2*1.f / getHeight());
-		float v = easing->getValue(v1,v2, t);
-		drawPath.lineTo(t*getWidth(), (1-v)*getHeight());
+		//float v1 = 1 - (y1*1.f / getHeight());
+		//float v2 = 1 - (y2*1.f / getHeight());
+		float val = easing->getValue(t);
+		drawPath.lineTo(t * getWidth(), getYForValue(val));
 		
 	}
 }
@@ -160,6 +167,16 @@ void EasingUI::buildHitPath()
 	}
 }
 
+int EasingUI::getYForValue(float value)
+{
+	return jmap<float>(value, viewValueRange.x, viewValueRange.y, getHeight(), 0);
+}
+
+float EasingUI::getValueForY(int y)
+{
+	return jmap<float>(y, getHeight(), 0, viewValueRange.x, viewValueRange.y);
+}
+
 bool EasingUI::hitTest(int tx, int ty)
 {
 	return hitPath.contains((float)tx, (float)ty);
@@ -191,7 +208,7 @@ LinearEasingUI::LinearEasingUI(LinearEasing * e) :
 void LinearEasingUI::generatePathInternal()
 {
 	
-	drawPath.lineTo(getWidth(), y2);
+	drawPath.lineTo(p2.x, p2.y);
 }
 
 HoldEasingUI::HoldEasingUI(HoldEasing * e) :
@@ -202,8 +219,8 @@ HoldEasingUI::HoldEasingUI(HoldEasing * e) :
 
 void HoldEasingUI::generatePathInternal()
 {
-	drawPath.lineTo(getWidth(), y1);
-	drawPath.lineTo(getWidth(), y2);
+	drawPath.lineTo(p2.x, p1.y);
+	drawPath.lineTo(p2.x, p2.y);
 
 }
 
@@ -234,40 +251,30 @@ bool CubicEasingUI::hitTest(int tx, int ty)
 
 void CubicEasingUI::resized()
 {
-	
-	Point<int> p1 = Point<int>(0, y1);
-	Point<int> p2 = Point<int>(getWidth(), y2);
-
 	CubicEasing * ce = static_cast<CubicEasing *>(easing.get());
 
-	Point<float> a = Point<float>(jmap<float>(ce->anchor1->getPoint().x, p1.x, p2.x), jmap<float>(ce->anchor1->getPoint().y, p1.y, p2.y));
-	Point<float> b = Point<float>(jmap<float>(ce->anchor2->getPoint().x, p1.x, p2.x), jmap<float>(ce->anchor2->getPoint().y, p1.y, p2.y));
+	Point<int> a = Point<int>(p1.x+(ce->k1Anchor->x / ce->length)*getWidth(), getYForValue(ce->getValue(0) + ce->k1Anchor->y));
+	Point<int> b = Point<int>(p2.x-(ce->k2Anchor->x / ce->length)*getWidth(), getYForValue(ce->getValue(1) + ce->k2Anchor->y));
 	 
-	h1.setBounds(juce::Rectangle<int>(0, 0, 16,16).withCentre(a.toInt()));
-	h2.setBounds(juce::Rectangle<int>(0, 0, 16,16).withCentre(b.toInt()));
+	h1.setBounds(juce::Rectangle<int>(0, 0, 16, 16).withCentre(a));
+	h2.setBounds(juce::Rectangle<int>(0, 0, 16, 16).withCentre(b));
 
 	EasingUI::resized();
 }
 
 void CubicEasingUI::generatePathInternal()
 {
-	Point<int> p1 = Point<int>(0, y1);
-	Point<int> p2 = Point<int>(getWidth(), y2);
+	CubicEasing* ce = static_cast<CubicEasing*>(easing.get());
 
-	CubicEasing * ce = static_cast<CubicEasing *>(easing.get());
-	
-	Point<float> a = Point<float>(jmap<float>(ce->anchor1->getPoint().x, p1.x, p2.x), jmap<float>(ce->anchor1->getPoint().y, p1.y, p2.y));
-	Point<float> b = Point<float>(jmap<float>(ce->anchor2->getPoint().x, p1.x, p2.x), jmap<float>(ce->anchor2->getPoint().y, p1.y, p2.y));
+	Point<int> a = Point<int>(p1.x + (ce->k1Anchor->x / ce->length) * getWidth(), getYForValue(ce->getValue(0) + ce->k1Anchor->y));
+	Point<int> b = Point<int>(p2.x - (ce->k2Anchor->x / ce->length) * getWidth(), getYForValue(ce->getValue(1) + ce->k2Anchor->y));
 
-	drawPath.cubicTo(a, b, p2.toFloat());
+	drawPath.cubicTo(a.toFloat(), b.toFloat(), p2.toFloat());
 }
 
 void CubicEasingUI::paintInternal(Graphics & g)
 { 
 	if (!easing->isSelected) return;
-
-	Point<int> p1 = Point<int>(0, y1);
-	Point<int> p2 = Point<int>(getWidth(), y2);
 
 	Colour c = LIGHTCONTOUR_COLOR;
 	if (isMouseOver()) c = c.brighter();
@@ -290,7 +297,7 @@ void CubicEasingUI::inspectableSelectionChanged(Inspectable *)
 void CubicEasingUI::easingControllableFeedbackUpdate(Controllable * c)
 {
 	CubicEasing * ce = static_cast<CubicEasing *>(easing.get());
-	if (c == ce->anchor1 || c == ce->anchor2)
+	if (c == ce->k1Anchor || c == ce->k2Anchor)
 	{
 		resized();
 		repaint();
@@ -303,18 +310,28 @@ void CubicEasingUI::mouseDrag(const MouseEvent & e)
 	{
 		CubicEasing * ce = static_cast<CubicEasing *>(easing.get());
 		
-		Point2DParameter * targetAnchor = (e.eventComponent == &h1) ? ce->anchor1 : ce->anchor2;
+		Point2DParameter * targetAnchor = (e.eventComponent == &h1) ? ce->k1Anchor : ce->k2Anchor;
 		Point<int> mp = e.getEventRelativeTo(this).getPosition();
 		
-		Point<float> targetPoint = Point<float>(mp.x*1.f/ getWidth(), jmap<float>(mp.y,y1,y2,0,1));
+		float relX = mp.x * 1.0f / getWidth();
+		float val = getValueForY(mp.y);
+		if (targetAnchor == ce->k2Anchor)
+		{
+			relX = 1 - relX;
+			val -= ce->getValue(1);
+		}
+		else
+		{
+			val -= ce->getValue(0);
+		}
+
+		Point<float> targetPoint = Point<float>(relX * easing->length, val);
 		targetAnchor->setPoint(targetPoint);
 	}
 	else
 	{
 		CubicEasing * ce = static_cast<CubicEasing *>(easing.get());
 
-		Point<int> p1 = Point<int>(0, y1);
-		Point<int> p2 = Point<int>(getWidth(), y2);
 		Point<int> mp = e.getEventRelativeTo(this).getPosition();
 		Point<int> mp1;
 		Point<int> mp2;
@@ -335,11 +352,11 @@ void CubicEasingUI::mouseDrag(const MouseEvent & e)
 			mp2 = (p2 + mp) / 2;
 		}
 		
-		Point<float> t1 = Point<float>(mp1.x*1.f / getWidth(), jmap<float>(mp1.y, y1, y2, 0, 1));
-		Point<float> t2 = Point<float>(mp2.x*1.f / getWidth(), jmap<float>(mp2.y, y1, y2, 0, 1));
+		Point<float> t1 = Point<float>((mp1.x * 1.f / getWidth()) * easing->length, getValueForY(mp1.y) - easing->getValue(0));
+		Point<float> t2 = Point<float>((1 - (mp2.x * 1.f / getWidth())) * easing->length, getValueForY(mp2.y) - easing->getValue(1));
 
-		ce->anchor1->setPoint(t1);
-		ce->anchor2->setPoint(t2);
+		ce->k1Anchor->setPoint(t1);
+		ce->k2Anchor->setPoint(t2);
 	}
 }
 
@@ -382,13 +399,9 @@ bool SineEasingUI::hitTest(int tx, int ty)
 
 void SineEasingUI::resized()
 {
-
-	Point<int> p1 = Point<int>(0, y1);
-	Point<int> p2 = Point<int>(getWidth(), y2);
-
 	SineEasing * ce = static_cast<SineEasing *>(easing.get());
 
-	Point<float> a = Point<float>(jmap<float>(ce->freqAmp->getPoint().x, p1.x, p2.x), jmap<float>(ce->freqAmp->getPoint().y, p1.y, p2.y));
+	Point<int> a = p1 + Point<int>(ce->freqAmp->x * getWidth() / easing->length, getYForValue(ce->freqAmp->y));
 
 	h1.setBounds(juce::Rectangle<int>(0, 0, 16, 16).withCentre(a.toInt()));
 
@@ -405,8 +418,8 @@ void SineEasingUI::paintInternal(Graphics & g)
 	g.setColour(c);
 
 	Point<int> hp = h1.getBounds().getCentre();
-	g.drawLine(0, y1, hp.x, y1);
-	g.drawLine(hp.x, y1, hp.x,hp.y,2);
+	g.drawLine(p1.x, p1.y, hp.x, p1.y, 2);
+	g.drawLine(hp.x, p1.y, hp.x, hp.y, 2);
 }
 
 void SineEasingUI::inspectableSelectionChanged(Inspectable *)
@@ -434,10 +447,10 @@ void SineEasingUI::mouseDrag(const MouseEvent & e)
 	{
 		CubicEasing * ce = static_cast<CubicEasing *>(easing.get());
 
-		Point2DParameter * targetAnchor = (e.eventComponent == &h1) ? ce->anchor1 : ce->anchor2;
+		Point2DParameter * targetAnchor = (e.eventComponent == &h1) ? ce->k1Anchor : ce->k2Anchor;
 		Point<int> mp = e.getEventRelativeTo(this).getPosition();
 
-		Point<float> targetPoint = Point<float>(mp.x*1.f / getWidth(), jmap<float>(mp.y, y1, y2, 0, 1));
+		Point<float> targetPoint = Point<float>(mp.x*1.f / getWidth(), getValueForY(mp.y)-p1.y);
 		targetAnchor->setPoint(targetPoint);
 	}
 }

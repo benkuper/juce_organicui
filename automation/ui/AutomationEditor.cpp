@@ -15,15 +15,25 @@ AutomationEditor::AutomationEditor(Automation * automation, bool isRoot) :
 {
 	if (automation->showUIInEditor)
 	{
-		automationUI.reset(new AutomationUI(automation));
-
-		automationUI->bgColor = BG_COLOR;
-		automationUI->transparentBG = false;
-		automationUI->autoResetViewRangeOnLengthUpdate = true;
-
-		addAndMakeVisible(automationUI.get());
-		automationUI->setViewRange(0, automation->length->floatValue());
-		setSize(100, 100);
+		if (automation->numDimensions == 1)
+		{
+			AutomationUI* aui = new AutomationUI(automation);
+			aui->bgColor = BG_COLOR;
+			aui->transparentBG = false;
+			aui->autoResetViewRangeOnLengthUpdate = true;
+			aui->setViewRange(0, automation->length->floatValue());
+			automationUI.reset(aui);
+		}
+		else if (automation->numDimensions == 2)
+		{
+			automationUI.reset(new Automation2DUI(automation));
+			setSize(100, 400);
+		}
+		
+		if (automationUI != nullptr)
+		{
+			addAndMakeVisible(automationUI.get());
+		}
 	}
 }
 

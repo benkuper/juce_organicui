@@ -19,8 +19,7 @@ public:
     
 	OwnedArray<EasingUI> easingsUI;
 
-    Array<int> keyYPos1;
-    Array<int> keyYPos2;
+	Point<float> viewValueRange;
     
     float posAtMouseDown;
     float valueAtMouseDown;
@@ -51,7 +50,8 @@ public:
 
 	void updateEasingsUI();
 
-	void setKeyPositions(const Array<int> k1, const Array<int> k2);
+
+	void setViewValueRange(const Point<float> range);
 
 	void showKeyEditorWindow(int index);
 	
@@ -62,6 +62,9 @@ public:
 	void mouseDown(const MouseEvent &e) override;
 	void mouseDoubleClick(const MouseEvent& e) override;
 	void mouseUp(const MouseEvent &e) override;
+
+	int getYForValue(float value);
+	float getValueForY(int y);
 
 	void controllableFeedbackUpdateInternal(Controllable * c) override;
 

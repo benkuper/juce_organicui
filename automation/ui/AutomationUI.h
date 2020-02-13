@@ -10,7 +10,6 @@
 
 #pragma once
 
-
 class AutomationUI :
 	public BaseManagerUI<Automation,AutomationKey,AutomationKeyUI>,
 	public ContainerAsyncListener,

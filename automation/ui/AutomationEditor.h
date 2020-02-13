@@ -18,14 +18,12 @@ public:
 	~AutomationEditor();
 
 	Automation * automation;
-	std::unique_ptr<AutomationUI> automationUI;
+	std::unique_ptr<Component> automationUI;
 
 	void resizedInternalContent(juce::Rectangle<int> &r) override;
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AutomationEditor)
 };
-
-
 
 #pragma once

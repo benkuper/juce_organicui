@@ -22,15 +22,16 @@ public:
 
 	Colour color;
 
-	int y1;
-	int y2;
+	Point<float> viewValueRange;
+	Point<int> p1;
+	Point<int> p2;
 
 	Path drawPath;
 	Path hitPath;
 
 	int hitPathPrecision = 10;
 
-	void setKeyPositions(const int &k1, const int &k2);
+	void setViewValueRange(const Point<float> range);
 
 	void paint(Graphics &g) override;
 	virtual void paintInternal(Graphics &) {}
@@ -43,7 +44,11 @@ public:
 
 	void buildHitPath();
 
+	int getYForValue(float value);
+	float getValueForY(int y);
+
     bool hitTest(int tx, int ty) override;
+
 
 	virtual void newMessage(const ContainerAsyncEvent &e) override;
 	virtual void easingControllableFeedbackUpdate(Controllable *) {}

@@ -11,8 +11,7 @@
 
 AutomationKeyUI::AutomationKeyUI(AutomationKey * key) :
 	BaseItemMinimalUI(key),
-	keyYPos1(-1),
-    keyYPos2(-1),
+	viewValueRange(0,1),
     showHandles(true),
 	draggingHandle(nullptr)
 {
@@ -72,25 +71,26 @@ void AutomationKeyUI::updateEasingsUI()
 
 		if (eui != nullptr)
 		{
-
 			addAndMakeVisible(eui);
 			eui->color = item->numDimensions == 1 ? Colours::white : Colour::fromHSV(i * .3f, .9f, 1, 0xFF);
 			eui->toBack();
 			resized();
-			eui->setKeyPositions(keyYPos1[i], keyYPos2[i]);
+			eui->setViewValueRange(viewValueRange);
 		}
 	}
 }
 
-void AutomationKeyUI::setKeyPositions(const Array<int> k1, const Array<int> k2)
+void AutomationKeyUI::setViewValueRange(const Point<float> range)
 {
-	keyYPos1 = k1;
-	keyYPos2 = k2;
+	//if (viewValueRange != range)
+	//{
+		viewValueRange.setXY(range.x, range.y);
 
-	for (int i = 0; i < item->numDimensions; i++)
-	{
-		if (easingsUI[i] != nullptr) easingsUI[i]->setKeyPositions(keyYPos1[i], keyYPos2[i]);
-	}
+		for (int i = 0; i < item->numDimensions; i++)
+		{
+			if (easingsUI[i] != nullptr) easingsUI[i]->setViewValueRange(viewValueRange);
+		}
+	//}
 
 	resized();
 }
@@ -124,10 +124,13 @@ void AutomationKeyUI::showKeyEditorWindow(int index)
 
 void AutomationKeyUI::resized()
 {
+	if (viewValueRange.x == viewValueRange.y) return;
+	if (getWidth() == 0 || getHeight() == 0) return;
+
 	for (int i = 0; i < item->numDimensions; i++)
 	{
 		juce::Rectangle<int> hr = getLocalBounds().withSize(AutomationKeyUI::handleClickZone, AutomationKeyUI::handleClickZone)
-			.withCentre(Point<int>(AutomationKeyUI::handleClickZone / 2, keyYPos1[i]));
+			.withCentre(Point<int>(AutomationKeyUI::handleClickZone / 2, getYForValue(item->values[i]->floatValue())));
 
 		handles[i]->setBounds(hr);
 
@@ -207,6 +210,16 @@ void AutomationKeyUI::mouseUp(const MouseEvent & e)
 {
 	if(draggingHandle != nullptr ) draggingHandle->setMouseCursor(MouseCursor::NormalCursor);
 	draggingHandle = nullptr;
+}
+
+int AutomationKeyUI::getYForValue(float value)
+{
+	return jmap<float>(value, viewValueRange.x, viewValueRange.y, getHeight(), 0);
+}
+
+float AutomationKeyUI::getValueForY(int y)
+{
+	return jmap<float>(y, getHeight(), 0, viewValueRange.x, viewValueRange.y);
 }
 
 void AutomationKeyUI::controllableFeedbackUpdateInternal(Controllable * c)

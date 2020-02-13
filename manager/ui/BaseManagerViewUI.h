@@ -48,8 +48,6 @@ public:
 						   //interaction
 	Point<int> initViewOffset;
 
-
-
 	std::unique_ptr<BaseManagerViewMiniPane<M, T, U>> viewPane;
 
 	virtual void mouseDown(const MouseEvent &e) override;

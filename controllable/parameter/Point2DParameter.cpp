@@ -160,7 +160,7 @@ bool Point2DParameter::checkValueIsTheSame(var newValue, var oldValue)
 	if (newValue.size() == 0 || oldValue.size() == 0) return false;
 
 	valueSetLock.enter();
-	bool result = newValue[0] == oldValue[0] && newValue[1] == oldValue[1];
+	bool result = jlimit<float>(minimumValue[0], maximumValue[0], newValue[0]) == (float)oldValue[0] && jlimit<float>(minimumValue[1], maximumValue[1], newValue[1]) == (float)oldValue[1];
 	valueSetLock.exit();
 
 	return result;

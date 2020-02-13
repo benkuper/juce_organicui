@@ -166,8 +166,8 @@ void AutomationUI::paint(Graphics & g)
 
 	for (float i = startY; i <= endY; i += step)
 	{
-		float thickness = fmodf(i, bigStep) == 0 ? 2 : fmodf(i, bigStep / 2) == 0 ? 1 : .5f;
-		float alpha = fmodf(i, 1) == 0 ? .4f : fmodf(i, .5f) == 0 ? .2f : .1f;
+		float thickness = fmodf(i, bigStep) == 0 ? 1 : fmodf(i, bigStep / 2) == 0 ? 1 : .5f;
+		float alpha = fmodf(i, 1) == 0 ? .25f : fmodf(i, .5f) == 0 ? .15f : .1f;
 		g.setColour(Colours::white.withAlpha(alpha));
 		float ty = getYForValue(i);
 		float textOffset = ty > getHeight() / 2 ? -12 : 4;
@@ -270,24 +270,25 @@ void AutomationUI::placeKeyUI(AutomationKeyUI * kui, bool placePrevKUI)
 	if (kui == nullptr) return;
 
 	int tx = getXForPos(kui->item->position->floatValue());
-	Array<int> ty = getYForKey(kui->item);
+	//Array<int> ty = getYForKey(kui->item);
 	juce::Rectangle<int> kr;
 
 	if (index < itemsUI.size() - 1)
 	{
 		AutomationKeyUI * nextKey = itemsUI[index + 1];
 		int tx2 = getXForPos(nextKey->item->position->floatValue());
-		Array<int> ty2 = getYForKey(nextKey->item);
+		//Array<int> ty2 = getYForKey(nextKey->item);
 
 		//Rectangle<int> kr2 = Rectangle<int>(0, 0, AutomationKeyUI::handleClickZone, AutomationKeyUI::handleClickZone).withCentre(Point<int>(tx2, ty2));
 		kr = juce::Rectangle<int>(tx, 0, tx2 - tx, getHeight()).expanded(AutomationKeyUI::handleClickZone / 2, 0);
-		kui->setKeyPositions(ty, ty2);
+		//kui->setKeyPositions(ty, ty2);
 	} else
 	{
 		kr = juce::Rectangle<int>(0, 0, AutomationKeyUI::handleClickZone, getHeight()).withPosition(tx - AutomationKeyUI::handleClickZone / 2, 0);
-		kui->setKeyPositions(ty, 0);
+		//kui->setKeyPositions(ty, 0);
 	}
 
+	kui->setViewValueRange(manager->viewValueRange->getPoint());
 	kui->setBounds(kr);
 
 	if (placePrevKUI && index > 0)
@@ -455,7 +456,7 @@ void AutomationUI::mouseDown(const MouseEvent & e)
 				float position = getPosForX(e.getPosition().x);
 				Array<float> values = manager->getValuesForPosition(position);
 				values.set(0, getValueForY(e.getPosition().y));
-				manager->addItem(position, values);
+				manager->addKey(position, values);
 				manager->reorderItems();
 			}
 			rangeAtMouseDown = manager->viewValueRange->getPoint();
@@ -519,7 +520,7 @@ void AutomationUI::mouseDoubleClick(const MouseEvent & e)
 		float position = getPosForX(e.getPosition().x);
 		Array<float> values = manager->getValuesForPosition(position);
 		values.set(0, getValueForY(e.getPosition().y));
-		manager->addItem(position, values); 
+		manager->addKey(position, values); 
 		manager->reorderItems();
 	}
 }
@@ -580,7 +581,6 @@ void AutomationUI::mouseDrag(const MouseEvent & e)
 
 				kui->item->position->setValue(pos);
 				kui->item->values[index]->setValue(val);
-
 			}
 		}
 	}
@@ -651,8 +651,7 @@ void AutomationUI::newMessage(const ContainerAsyncEvent & e)
 		}
 		else if (e.targetControllable != nullptr)
 		{
-			AutomationKey* k = e.targetControllable->getParentAs<AutomationKey>();
-			if (k != nullptr)
+			if (AutomationKey* k = e.targetControllable->getParentAs<AutomationKey>())
 			{
 				if (e.targetControllable == k->easingType)
 				{
@@ -662,6 +661,7 @@ void AutomationUI::newMessage(const ContainerAsyncEvent & e)
 				{
 					placeKeyUI(getUIForItem(k));
 					shouldRepaint = true;
+
 				}
 			}
 		}

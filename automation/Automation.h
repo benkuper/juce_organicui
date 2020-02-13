@@ -34,7 +34,6 @@ public:
 	Array<float> minimumValues;
 	Array<float> maximumValues;
 
-
 	bool allowKeysOutside; //allow keys positions to be outside automation timing
 	FloatParameter * position;
 	Array<FloatParameter *> values;
@@ -53,9 +52,12 @@ public:
 	Array<float> getNormalizedValuesForPosition(float pos);
 
 	AutomationKey * createItem() override;
-	void addItems(Array<float> positions, Array<Array<float>> values, bool removeExistingOverlappingKeys = true, bool addToUndo = true, bool autoSmoothCurve = false);
-	AutomationKey * addItem(const float position, const Array<float> value, bool addToUndo = true, bool reorder = false);
+	void addKeys(Array<float> positions, Array<Array<float>> values, bool removeExistingOverlappingKeys = true, bool addToUndo = true, bool autoSmoothCurve = false);
+	AutomationKey * addKey(const float position, const Array<float> value, bool addToUndo = true, bool reorder = false);
     Array<AutomationKey *> addItemsFromClipboard(bool showWarning = false) override;
+
+	virtual void addItemInternal(AutomationKey* k, var data) override;
+	virtual void reorderItems() override;
 
 	void removeKeysBetween(float start, float end);
 	void removeAllSelectedKeys();

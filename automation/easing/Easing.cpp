@@ -1,3 +1,4 @@
+#include "Easing.h"
 /*
   ==============================================================================
 
@@ -8,12 +9,17 @@
   ==============================================================================
 */
 
-Easing::Easing(Type _type) :
-ControllableContainer("ease"),
-type(_type)
+Easing::Easing(Type _type, AutomationKey * k1, AutomationKey * k2, int dimension) :
+	ControllableContainer("ease"),
+	k1(k1),
+	k2(k2),
+	length(1),
+	dimension(dimension),
+	type(_type)
 {
 	//showInspectorOnSelect = false;
 
+	updateFromKeys();
 	helpID = "Easing";
 }
 
@@ -22,9 +28,31 @@ Easing::~Easing()
 	masterReference.clear();
 }
 
+void Easing::setNextKey(AutomationKey* k)
+{
+	if (k2 == k) return;
+	k2 = k;
+	updateFromKeys();
+}
 
-LinearEasing::LinearEasing() : Easing(LINEAR) {}
-HoldEasing::HoldEasing() : Easing(HOLD) {}
+void Easing::updateFromKeys()
+{
+	if (k2 != nullptr)
+	{
+		length = k2->position->floatValue() - k1->position->floatValue();
+		updateFromKeysInternal();
+	}
+}
+
+//must be overriden
+
+inline const float Easing::getKeyValue(AutomationKey* k) { 
+	return k != nullptr ? k->getDimensionValue(dimension) : 0; 
+}
+
+
+LinearEasing::LinearEasing(AutomationKey* k1, AutomationKey* k2, int dimension) : Easing(LINEAR, k1, k2, dimension) {}
+HoldEasing::HoldEasing(AutomationKey* k1, AutomationKey* k2, int dimension) : Easing(HOLD, k1, k2, dimension) {}
 
 
 EasingUI * LinearEasing::createUI()
@@ -44,51 +72,92 @@ EasingUI * CubicEasing::createUI()
 }
 
 
-float LinearEasing::getValue(const float & start, const float & end, const float & weight)
+float LinearEasing::getValue(const float & weight)
 {
-	return start + (end - start)*weight;
+	return jmap(weight, getKeyValue(k1), getKeyValue(k2));
 }
 
 
-
-float HoldEasing::getValue(const float & start, const float & end, const float & weight)
+float HoldEasing::getValue(const float & weight)
 {
-	if (weight >= 1) return end;
-	return start;
+	if (weight >= 1) return  getKeyValue(k1);
+	return  getKeyValue(k2);
 }
 
 
-CubicEasing::CubicEasing() :
-	Easing(BEZIER)
+CubicEasing::CubicEasing(AutomationKey* k1, AutomationKey* k2, int dimension) :
+	Easing(BEZIER, k1, k2, dimension)
 {
-	anchor1 = addPoint2DParameter("Anchor 1", "Anchor 1 of the quadratic curve");
-	anchor2 = addPoint2DParameter("Anchor 2", "Anchor 2 of the quadratic curve");
+	k1Anchor = addPoint2DParameter("Anchor 1", "Anchor 1 of the quadratic curve");
+	k2Anchor = addPoint2DParameter("Anchor 2", "Anchor 2 of the quadratic curve");
 
-	anchor1->setBounds(0, -1, .99f, 2);
-	anchor2->setBounds(.01f, -1, 1, 2);
+	k1Anchor->setPoint(length * .3f, 0);
+	k2Anchor->setPoint(length * .3f, 0);
 	
-	anchor1->setPoint(.5f, 0);
-	anchor2->setPoint(.5f, 1);
-
-	bezier.setup(anchor1->getPoint(), anchor2->getPoint());
+	updateBezier();
 }
 
 
-void CubicEasing::onContainerParameterChanged(Parameter * p)
+void CubicEasing::onContainerParameterChanged(Parameter* p)
 {
-	if(p == anchor1 || p == anchor2) bezier.setup(anchor1->getPoint(), anchor2->getPoint());
+	if (p == k1Anchor || p == k2Anchor) updateBezier();
 }
 
 
-float CubicEasing::getValue(const float & start, const float & end, const float & weight)
+float CubicEasing::getValue(const float & weight)
 {
-	if (weight <= 0) return start;
-	if (weight >= 1) return end;
+	if (weight <= 0 || k2 == nullptr) return getKeyValue(k1);
+	if (weight >= 1) return getKeyValue(k2);
 
-	float val =  bezier.getValueForX(weight);
-	return jmap<float>(val, start, end);
+	int numLUT = bezierLUT.size();
+	if (numLUT == 0) return getKeyValue(k1);
+
+	float tx = weight * length; //use this to figure out
+	
+	Point<float> prevPoint = bezierLUT[0];
+	for (int i = 1; i < numLUT; i++)
+	{
+		Point<float> p = bezierLUT[i];
+		if (p.x >= tx)
+		{
+			return jmap(tx, prevPoint.x, p.x, prevPoint.y, p.y);
+		}
+		prevPoint.setXY(p.x, p.y);
+	}
+	
+	return getKeyValue(k1);
 }
 
+void CubicEasing::updateFromKeysInternal()
+{
+	k1Anchor->setBounds(0, INT32_MIN, length, INT32_MAX);
+	k2Anchor->setBounds(0, INT32_MIN, length, INT32_MAX);
+	updateBezier();
+}
+
+void CubicEasing::updateBezier()
+{
+	if (k1 == nullptr || k2 == nullptr) return;
+
+	float v1 = getKeyValue(k1);
+	float v2 = getKeyValue(k2);
+
+	Bezier::Point a(0, v1);
+	Bezier::Point b(k1Anchor->x, v1+k1Anchor->y);
+	Bezier::Point c(length - k2Anchor->x, v2+k2Anchor->y);
+	Bezier::Point d(length, v2);
+	bezier = Bezier::Bezier<3>({ a, b, c, d });
+
+	//Generate LUT
+	const int lutPrecision = 50*length;
+	bezierLUT.clear();
+	for (int i = 0; i < lutPrecision; i++) {
+		Bezier::Point p = bezier.valueAt(i * length / lutPrecision);
+		bezierLUT.add({ p.x,p.y });
+	}
+}
+
+/*
 void CubicEasing::Bezier::setup(const Point<float>& a1, const Point<float>& a2)
 {
 	c.setXY(3 * a1.x, 3 * a1.y);
@@ -154,19 +223,20 @@ float CubicEasing::Bezier::solveCurveX(const float & tx)
 	// Give up
 	return t2;
 }
+*/
 
-SineEasing::SineEasing() :
-	Easing(SINE)
+SineEasing::SineEasing(AutomationKey* k1, AutomationKey* k2, int dimension) :
+	Easing(SINE, k1, k2, dimension)
 {
 	freqAmp = addPoint2DParameter("Anchor 1", "Anchor 1 of the quadratic curve");
 	freqAmp->setBounds(.01f, -1, 1, 2);
 	freqAmp->setPoint(.2f, .5f);
 }
 
-float SineEasing::getValue(const float & start, const float & end, const float & weight)
+float SineEasing::getValue(const float & weight)
 {
 	//DBG(freqAmp->getPoint().toString() << " / " << sinf(weight / freqAmp->x));
-	return start + (end - start)*weight + sinf(weight*float_Pi*2/freqAmp->x)*freqAmp->y;
+	return 0;// start + (end - start) * weight + sinf(weight * float_Pi * 2 / freqAmp->x) * freqAmp->y;
 }
 
 
