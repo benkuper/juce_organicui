@@ -230,7 +230,6 @@ void Automation::addKeys(Array<float> positions, Array<Array<float>> keyValues, 
 	//Array<UndoableAction *> actions;
 	//if(removeExistingOverlappingKeys) actions.addArray(getRemoveKeysBetweenAction(keys[0].x, keys[keys.size() - 1].x));
 	
-	DBG("Add items in Automation");
 	removeKeysBetween(positions[0], positions[positions.size() - 1]);
 
 	Array<AutomationKey *> newKeys;
@@ -352,6 +351,8 @@ void Automation::onControllableFeedbackUpdate(ControllableContainer * cc, Contro
 			if (index > 0 && t->position->floatValue() < items[index - 1]->position->floatValue()) items.swap(index, index - 1);
 			else if (index < items.size() - 1 && t->position->floatValue() > items[index + 1]->position->floatValue()) items.swap(index, index + 1);
 			else swapped = false;
+
+			for (int i = jmax(index - 1, 0); i < jmin(index + 2, items.size()); i++) items[i]->setNextKey(i < items.size() - 1 ? items[i + 1] : nullptr);
 
 			if (swapped)
 			{

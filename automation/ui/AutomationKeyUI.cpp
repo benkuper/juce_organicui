@@ -71,13 +71,14 @@ void AutomationKeyUI::updateEasingsUI()
 
 		if (eui != nullptr)
 		{
-			addAndMakeVisible(eui);
 			eui->color = item->numDimensions == 1 ? Colours::white : Colour::fromHSV(i * .3f, .9f, 1, 0xFF);
 			eui->toBack();
-			resized();
 			eui->setViewValueRange(viewValueRange);
+			addAndMakeVisible(eui);
 		}
 	}
+	resized();
+
 }
 
 void AutomationKeyUI::setViewValueRange(const Point<float> range)

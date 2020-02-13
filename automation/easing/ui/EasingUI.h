@@ -31,7 +31,7 @@ public:
 
 	int hitPathPrecision = 10;
 
-	void setViewValueRange(const Point<float> range);
+	void setViewValueRange(const Point<float> range, bool updatePath = true);
 
 	void paint(Graphics &g) override;
 	virtual void paintInternal(Graphics &) {}

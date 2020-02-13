@@ -80,7 +80,7 @@ float LinearEasing::getValue(const float & weight)
 
 float HoldEasing::getValue(const float & weight)
 {
-	if (weight >= 1) return  getKeyValue(k1);
+	if (weight < 1) return  getKeyValue(k1);
 	return  getKeyValue(k2);
 }
 
@@ -94,7 +94,7 @@ CubicEasing::CubicEasing(AutomationKey* k1, AutomationKey* k2, int dimension) :
 	k1Anchor->setPoint(length * .3f, 0);
 	k2Anchor->setPoint(length * .3f, 0);
 	
-	updateBezier();
+	updateFromKeys();
 }
 
 

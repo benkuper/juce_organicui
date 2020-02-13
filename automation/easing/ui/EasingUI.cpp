@@ -1,4 +1,3 @@
-#include "EasingUI.h"
 /*
   ==============================================================================
 
@@ -32,7 +31,7 @@ EasingUI::~EasingUI()
 	if(!easing.wasObjectDeleted()) easing->removeAsyncContainerListener(this);
 }
 
-void EasingUI::setViewValueRange(const Point<float> range)
+void EasingUI::setViewValueRange(const Point<float> range, bool updatePath)
 {
 	//if (viewValueRange == range) return;
 	
@@ -40,7 +39,7 @@ void EasingUI::setViewValueRange(const Point<float> range)
 	p2 = Point<int>(getWidth(), getYForValue(easing->getValue(1)));
 	
 	viewValueRange.setXY(range.x, range.y);
-	generatePath();
+	if(updatePath) generatePath();
 }
 
 void EasingUI::paint(Graphics &g)
@@ -63,7 +62,7 @@ void EasingUI::paint(Graphics &g)
 
 void EasingUI::resized()
 {
-	generatePath();
+	setViewValueRange(viewValueRange); //force update range
 }
 
 void EasingUI::generatePath()
