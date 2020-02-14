@@ -97,11 +97,13 @@ bool ColorParameter::checkValueIsTheSame(var oldValue, var newValue)
 var ColorParameter::getLerpValueTo(var targetValue, float weight)
 {
 	if (!targetValue.isArray()) return value;
+	valueSetLock.enter();
 	var result;
 	result.append(jmap(weight, (float)value[0], (float)targetValue[0]));
 	result.append(jmap(weight, (float)value[1], (float)targetValue[1]));
 	result.append(jmap(weight, (float)value[2], (float)targetValue[2]));
 	result.append(jmap(weight, (float)value[3], (float)targetValue[3]));
+	valueSetLock.exit();
 	return result;
 }
 
