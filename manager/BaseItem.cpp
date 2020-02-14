@@ -55,6 +55,8 @@ BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts
 	viewUISize->defaultValue = viewUISize->getValue();
 	viewUISize->hideInEditor = true;
 	viewUISize->hideInOutliner = true;
+
+	scriptObject.setMethod("getType", BaseItem::getTypeStringFromScript);
 }
 
 BaseItem::~BaseItem()
@@ -168,4 +170,10 @@ void BaseItem::loadJSONDataInternal(var data)
 InspectableEditor * BaseItem::getEditor(bool isRoot)
 {
 	return new BaseItemEditor(this, isRoot);
+}
+
+var BaseItem::getTypeStringFromScript(const juce::var::NativeFunctionArgs& a)
+{
+	if (BaseItem* b = getObjectFromJS<BaseItem>(a)) return b->getTypeString();
+	return var();
 }
