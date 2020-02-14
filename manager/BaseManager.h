@@ -217,6 +217,7 @@ public:
 
 	static var addItemFromScript(const var::NativeFunctionArgs& args);
 	static var removeItemFromScript(const var::NativeFunctionArgs& args);
+	static var getItemsFromScript(const var::NativeFunctionArgs& args);
 
 	private:
 		JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BaseManager<T>)
@@ -240,6 +241,7 @@ BaseManager<T>::BaseManager(const String & name) :
 
 	scriptObject.setMethod("addItem", &BaseManager<T>::addItemFromScript);
 	scriptObject.setMethod("removeItem", &BaseManager<T>::removeItemFromScript);
+	scriptObject.setMethod("getItems", &BaseManager<T>::getItemsFromScript);
 
 	skipLabelInTarget = true; //by default manager label in targetParameter UI are not interesting
 	nameCanBeChangedByUser = false;
@@ -794,6 +796,18 @@ var BaseManager<T>::removeItemFromScript(const var::NativeFunctionArgs& args)
 
 	NLOGWARNING(m->niceName, "Remove item : item not found in manager");
 	return var();
+}
+
+template<class T>
+var BaseManager<T>::getItemsFromScript(const var::NativeFunctionArgs& args)
+{
+	var result = var();
+	if (BaseManager<T>* m = getObjectFromJS<BaseManager<T>>(args))
+	{
+		for (auto& i : m->items) result.append(i->getScriptObject());
+	}
+
+	return result;
 }
 
 
