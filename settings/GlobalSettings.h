@@ -39,7 +39,7 @@ public:
 #if JUCE_WINDOWS
 	BoolParameter * launchOnStartup;
 #endif
-	BoolParameter * launchMinimised;
+	BoolParameter* launchMinimised;
 	BoolParameter * checkUpdatesOnStartup;
 	BoolParameter * checkBetaUpdates;
 	BoolParameter * updateHelpOnStartup;
@@ -49,6 +49,7 @@ public:
 
 
 	ControllableContainer interfaceCC;
+	BoolParameter* closeToSystemTray;
 	IntParameter* fontSize;
 	EnumParameter* helpLanguage;
 

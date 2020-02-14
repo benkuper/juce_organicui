@@ -597,7 +597,8 @@ U * BaseManagerUI<M, T, U>::addItemUI(T * item, bool animate, bool resizeAndRepa
 	if (useViewport) container.addAndMakeVisible(bui);
 	else addAndMakeVisible(bui);
 
-	itemsUI.insert(manager->items.indexOf(item), tui);
+	int index = manager->items.indexOf(item);
+	itemsUI.insert(index, tui);
 	
 	bui->addItemMinimalUIListener(this);
 
@@ -634,33 +635,35 @@ inline U * BaseManagerUI<M, T, U>::createUIForItem(T * item)
 template<class M, class T, class U>
 void BaseManagerUI<M, T, U>::removeItemUI(T * item, bool resizeAndRepaint)
 {
-	MessageManagerLock mmLock; //Ensure this method can be called from another thread than the UI one
-
-	U * tui = getUIForItem(item, false);
-	if (tui == nullptr) return;
-
-	BaseItemMinimalUI<T> * bui = static_cast<BaseItemMinimalUI<T>*>(tui);
-
-	if (useViewport) container.removeChildComponent(bui);
-	else removeChildComponent(bui);
-
-	bui->removeItemMinimalUIListener(this);
-
-	BaseItemUI<T> * biui = dynamic_cast<BaseItemUI<T> *>(tui);
-	if (biui != nullptr) biui->removeItemUIListener(this);
-
-	itemsUI.removeObject(tui, false);
-	removeItemUIInternal(tui);
-
-	managerUIListeners.call(&ManagerUIListener::itemUIRemoved, tui);
-
-	delete tui;
-
-	if (resizeAndRepaint)
 	{
-		resized();
-		updateItemsVisibility();
-		repaint();
+		MessageManagerLock mmLock; //Ensure this method can be called from another thread than the UI one
+
+		U* tui = getUIForItem(item, false);
+		if (tui == nullptr) return;
+
+		BaseItemMinimalUI<T>* bui = static_cast<BaseItemMinimalUI<T>*>(tui);
+
+		if (useViewport) container.removeChildComponent(bui);
+		else removeChildComponent(bui);
+
+		bui->removeItemMinimalUIListener(this);
+
+		BaseItemUI<T>* biui = dynamic_cast<BaseItemUI<T>*>(tui);
+		if (biui != nullptr) biui->removeItemUIListener(this);
+
+		itemsUI.removeObject(tui, false);
+		removeItemUIInternal(tui);
+
+		managerUIListeners.call(&ManagerUIListener::itemUIRemoved, tui);
+
+		delete tui;
+
+		if (resizeAndRepaint)
+		{
+			resized();
+			updateItemsVisibility();
+			repaint();
+		}
 	}
 }
 
@@ -710,11 +713,9 @@ void BaseManagerUI<M, T, U>::itemsRemoved(Array<T*> items)
 	for (auto &i : items) removeItemUI(i,false);
 
 	MessageManagerLock mmLock;
-	if (mmLock.lockWasGained())
-	{
-		resized();
-		repaint();
-	}
+	resized();
+	repaint();
+
 }
 
 template<class M, class T, class U>

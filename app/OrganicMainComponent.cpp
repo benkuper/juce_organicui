@@ -26,14 +26,7 @@ OrganicMainContentComponent::OrganicMainContentComponent()
 	//done in Main.cpp as it's a method of DocumentWindow
 #endif
 
-
-
-#if JUCE_OPENGL && JUCE_WINDOWS
-	openGLContext.setComponentPaintingEnabled(true);
-	openGLContext.setContinuousRepainting(false);
-	openGLContext.attachTo(*this);
-#endif
-
+	setupOpenGL();
 }
 
 OrganicMainContentComponent::~OrganicMainContentComponent()
@@ -61,15 +54,38 @@ void OrganicMainContentComponent::init()
 
 
 	addAndMakeVisible(&ShapeShifterManager::getInstance()->mainContainer);
-	grabKeyboardFocus();
+	if(isShowing()) grabKeyboardFocus();
+}
+
+void OrganicMainContentComponent::setupOpenGL()
+{
+#if JUCE_OPENGL && JUCE_WINDOWS
+	if (openGLContext == nullptr)
+	{
+		openGLContext.reset(new OpenGLContext());
+		openGLContext->setComponentPaintingEnabled(true);
+		openGLContext->setContinuousRepainting(false);
+
+		setupOpenGLInternal();
+
+		openGLContext->attachTo(*this);
+	}
+
+	
+
+#endif
 }
 
 void OrganicMainContentComponent::clear()
 {
 
 #if JUCE_OPENGL && JUCE_WINDOWS
-	openGLContext.detach();
-	openGLContext.setRenderer(nullptr);
+	if (openGLContext)
+	{
+		openGLContext->detach();
+		openGLContext->setRenderer(nullptr);
+		openGLContext.reset();
+	}
 #endif
 
 	tooltipWindow.setMillisecondsBeforeTipAppears(300);
@@ -86,7 +102,6 @@ void OrganicMainContentComponent::resized()
 	juce::Rectangle<int> r = getLocalBounds();
 	ShapeShifterManager::getInstance()->mainContainer.setBounds(r);
 }
-
 
 void OrganicMainContentComponent::startLoadFile()
 {

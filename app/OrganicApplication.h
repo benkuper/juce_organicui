@@ -36,7 +36,7 @@ class OrganicApplication :
 {
 public:
 	//==============================================================================
-	OrganicApplication(const String & appName, bool useWindow = true);
+	OrganicApplication(const String & appName, bool useWindow = true, const Image &trayIconImage = Image());
 
 	ControllableContainer appSettings;
 
@@ -47,6 +47,7 @@ public:
 	std::unique_ptr<OrganicMainContentComponent> mainComponent;
 
 	bool useWindow;
+	Image trayIconImage;
 
 	const String getApplicationName() override;
 	const String getApplicationVersion() override;
@@ -66,15 +67,48 @@ public:
 
 	virtual void updateAppTitle();
 
-	class MainWindow : public DocumentWindow
+	class TrayIcon :
+		public SystemTrayIconComponent
+	{
+	public:
+		TrayIcon(const Image& iconImage);
+		~TrayIcon();
+
+		void mouseDown(const MouseEvent& e) override;
+
+		class  TrayIconListener
+		{
+		public:
+			/** Destructor. */
+			virtual ~TrayIconListener() {}
+			virtual void trayIconMouseDown(const MouseEvent& e) = 0;
+		};
+
+		ListenerList<TrayIconListener> trayIconListeners;
+		void addTrayIconListener(TrayIconListener* newListener) { trayIconListeners.add(newListener); }
+		void removeTrayIconListener(TrayIconListener* listener) { trayIconListeners.remove(listener); }
+	};
+
+	class MainWindow :
+		public DocumentWindow,
+		public TrayIcon::TrayIconListener
 	{		
 	public:
-		MainWindow(String name, OrganicMainContentComponent * mainComponent);
+		MainWindow(String name, OrganicMainContentComponent * mainComponent, const Image &image);
 
 		void closeButtonPressed() override;
 
-
 		OrganicMainContentComponent * mainComponent;
+		std::unique_ptr<TrayIcon> trayIcon;
+		Image iconImage;
+
+		virtual void trayIconMouseDown(const MouseEvent& e) override;
+
+		void setTrayIconVisible(bool visible);
+		virtual void showTrayMenu();
+		virtual void addTrayMenuOptions(const PopupMenu& menu) {};
+		virtual void handlTrayMenuResult(int result) {}
+
 		void visibilityChanged() override;
 
 
