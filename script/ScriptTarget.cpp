@@ -1,5 +1,3 @@
-#include "ScriptTarget.h"
-
 ScriptTarget::ScriptTarget(const String & name, void * ptr) :
 	thisPtr((int64)ptr),
 	scriptTargetName(name)
