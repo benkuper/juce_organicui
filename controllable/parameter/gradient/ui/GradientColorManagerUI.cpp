@@ -151,6 +151,7 @@ void GradientColorManagerUI::mouseDrag(const MouseEvent & e)
 
 void GradientColorManagerUI::placeItemUI(GradientColorUI * tui)
 {
+	if (tui == nullptr) return;
 	int tx = getXForPos(tui->item->position->floatValue());
 	tui->setBounds(tx-6,getHeight()-18,12,16);
 }
@@ -196,6 +197,7 @@ void GradientColorManagerUI::newMessage(const ContainerAsyncEvent & e)
 			if (gc != nullptr && (e.targetControllable == gc->position || e.targetControllable == gc->color || e.targetControllable == gc->interpolation))
 			{
 				shouldUpdateImage = true;
+				if (e.targetControllable == gc->position) placeItemUI(getUIForItem(gc, false));
 			}
 		}
 	}
