@@ -462,23 +462,63 @@ var Script::addFileParameterFromScript(const var::NativeFunctionArgs & args)
 
 var Script::readFileFromScript(const var::NativeFunctionArgs & args)
 {
-    Script * s = getObjectFromJS<Script>(args);
-    if (!checkNumArgs(s->niceName, args, 2)) return var();
-    return s->scriptParamsContainer.addFileParameter(args.arguments[0], args.arguments[1])->getScriptObject();
+    File f (args.arguments[0]);
+    if (!f.existsAsFile()) return var();
+
+    if (args.numArguments >= 2 && (int)args.arguments[1])
+    {
+        return JSON::parse(f);
+    }
+    else
+    {
+        FileInputStream fs(f);
+        return fs.readEntireStreamAsString();
+    }
 }
 
 var Script::writeFileFromScript(const var::NativeFunctionArgs & args)
 {
-    Script * s = getObjectFromJS<Script>(args);
-    if (!checkNumArgs(s->niceName, args, 2)) return var();
-    return s->scriptParamsContainer.addFileParameter(args.arguments[0], args.arguments[1])->getScriptObject();
+    if (args.numArguments < 2) return false;
+
+    File f (args.arguments[0]);
+
+    bool overwriteIfExists = args.numArguments > 2 ? ((int)args.arguments[2] > 0) : false;
+    if (f.existsAsFile())
+    {
+        if (overwriteIfExists) f.deleteFile();
+        else
+        {
+            LOG("File already exists : " << f.getFileName() << ", you need to enable overwrite to replace its content.");
+            return false;
+        }
+    }
+    
+    FileOutputStream fs(f);
+    if (args.arguments[1].isObject())
+    {
+        JSON::writeToStream(fs, args.arguments[1]);
+        return true;
+    }
+    
+    return fs.writeText(args.arguments[1].toString(), false, false, "\n");
+    return true;
 }
 
-var Script::createDirectoryFromScript(const var::NativeFunctionArgs & args)
+var Script::createDirectoryFromScript(const var::NativeFunctionArgs &args)
 {
-    Script * s = getObjectFromJS<Script>(args);
-    if (!checkNumArgs(s->niceName, args, 2)) return var();
-    return s->scriptParamsContainer.addFileParameter(args.arguments[0], args.arguments[1])->getScriptObject();
+    if (args.numArguments == 0) return false;
+    
+    File f (args.arguments[0]);
+    
+    if (f.exists())
+    {
+        LOG("Directory or file already exists : " << f.getFileName());
+        return false;
+    }
+    else {
+        f.createDirectory();
+        return true;
+    }
 }
 
 var Script::setUpdateRateFromScript(const var::NativeFunctionArgs& args)
