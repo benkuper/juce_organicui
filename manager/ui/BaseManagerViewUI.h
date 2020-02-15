@@ -115,12 +115,12 @@ BaseManagerViewUI<M, T, U>::BaseManagerViewUI(const String& contentName, M* _man
 	centerUIAroundPosition(false),
 	updatePositionOnDragMove(false),
 	enableSnapping(false),
+    useCheckersAsUnits(false),
 	canZoom(true),
 	zoomAffectsItemSize(true),
 	viewZoom(1),
 	minZoom(.4f),
 	maxZoom(1),
-	useCheckersAsUnits(false),
 	timeSinceLastWheel(0)
 {
     this->defaultLayout = this->FREE;
