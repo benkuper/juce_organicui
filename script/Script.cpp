@@ -39,7 +39,7 @@ Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled) :
 	scriptObject.setMethod("logWarning", Script::logWarningFromScript);
 	scriptObject.setMethod("logError", Script::logErrorFromScript);
 	scriptObject.setMethod("setUpdateRate", Script::setUpdateRateFromScript);
-
+    
 	scriptObject.setMethod("addTrigger", Script::addTriggerFromScript);
 	scriptObject.setMethod("addBoolParameter", Script::addBoolParameterFromScript);
 	scriptObject.setMethod("addIntParameter", Script::addIntParameterFromScript);
@@ -50,6 +50,11 @@ Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled) :
 	scriptObject.setMethod("addPoint2DParameter", Script::addPoint2DParameterFromScript);
 	scriptObject.setMethod("addPoint3DParameter", Script::addPoint2DParameterFromScript);
 	scriptObject.setMethod("addColorParameter", Script::addColorParameterFromScript);
+    scriptObject.setMethod("addFileParameter", Script::addFileParameterFromScript);
+    
+    scriptObject.setMethod("readFile", Script::readFileFromScript);
+    scriptObject.setMethod("writeFile", Script::writeFileFromScript);
+    scriptObject.setMethod("createDirectory", Script::createDirectoryFromScript);
 
 	scriptParamsContainer.hideEditorHeader = true;
 	addChildControllableContainer(&scriptParamsContainer);
@@ -446,6 +451,74 @@ var Script::addPoint3DParameterFromScript(const var::NativeFunctionArgs & args)
 	Script * s = getObjectFromJS<Script>(args);
 	if (!checkNumArgs(s->niceName, args, 2)) return var();
 	return s->scriptParamsContainer.addPoint3DParameter(args.arguments[0], args.arguments[1])->getScriptObject();
+}
+
+var Script::addFileParameterFromScript(const var::NativeFunctionArgs & args)
+{
+    Script * s = getObjectFromJS<Script>(args);
+    if (!checkNumArgs(s->niceName, args, 2)) return var();
+    return s->scriptParamsContainer.addFileParameter(args.arguments[0], args.arguments[1])->getScriptObject();
+}
+
+var Script::readFileFromScript(const var::NativeFunctionArgs & args)
+{
+    File f (args.arguments[0]);
+    if (!f.existsAsFile()) return var();
+
+    if (args.numArguments >= 2 && (int)args.arguments[1])
+    {
+        return JSON::parse(f);
+    }
+    else
+    {
+        FileInputStream fs(f);
+        return fs.readEntireStreamAsString();
+    }
+}
+
+var Script::writeFileFromScript(const var::NativeFunctionArgs & args)
+{
+    if (args.numArguments < 2) return false;
+
+    File f (args.arguments[0]);
+
+    bool overwriteIfExists = args.numArguments > 2 ? ((int)args.arguments[2] > 0) : false;
+    if (f.existsAsFile())
+    {
+        if (overwriteIfExists) f.deleteFile();
+        else
+        {
+            LOG("File already exists : " << f.getFileName() << ", you need to enable overwrite to replace its content.");
+            return false;
+        }
+    }
+    
+    FileOutputStream fs(f);
+    if (args.arguments[1].isObject())
+    {
+        JSON::writeToStream(fs, args.arguments[1]);
+        return true;
+    }
+    
+    return fs.writeText(args.arguments[1].toString(), false, false, "\n");
+    return true;
+}
+
+var Script::createDirectoryFromScript(const var::NativeFunctionArgs &args)
+{
+    if (args.numArguments == 0) return false;
+    
+    File f (args.arguments[0]);
+    
+    if (f.exists())
+    {
+        LOG("Directory or file already exists : " << f.getFileName());
+        return false;
+    }
+    else {
+        f.createDirectory();
+        return true;
+    }
 }
 
 var Script::setUpdateRateFromScript(const var::NativeFunctionArgs& args)
