@@ -1,4 +1,3 @@
-#include "FileParameter.h"
 /*
   ==============================================================================
 
@@ -18,6 +17,11 @@ FileParameter::FileParameter(const String & niceName, const String &description,
 
 {
 	defaultUI = FILE; 
+
+	scriptObject.setMethod("readFile", FileParameter::readFileFromScript);
+	scriptObject.setMethod("writeFile", FileParameter::writeFileFromScript);
+	scriptObject.setMethod("getAbsolutePath", FileParameter::getAbsolutePathFromScript);
+
 	if(Engine::mainEngine != nullptr) Engine::mainEngine->addEngineListener(this);
 }
 
@@ -96,4 +100,56 @@ void FileParameter::loadJSONDataInternal(var data)
 void FileParameter::fileSaved(bool savedAs)
 {
 	if(savedAs) setValue(absolutePath, false, true); //force re-evaluate relative path if changed
+}
+
+var FileParameter::readFileFromScript(const juce::var::NativeFunctionArgs& a)
+{
+	FileParameter* p = getObjectFromJS<FileParameter>(a);
+	File f = p->getFile();
+	if (!f.existsAsFile()) return var();
+
+	if (a.numArguments >= 1 && (int)a.arguments[0])
+	{
+		return JSON::parse(f);
+	}
+	else
+	{
+		FileInputStream fs(f);
+		return fs.readEntireStreamAsString();
+	}
+}
+
+var FileParameter::writeFileFromScript(const juce::var::NativeFunctionArgs& a)
+{
+	if (a.numArguments == 0) return false;
+
+	FileParameter* p = getObjectFromJS<FileParameter>(a);
+	File f = p->getFile();
+
+	bool overwriteIfExists = a.numArguments > 1 ? ((int)a.arguments[1] > 0) : false;
+	if (f.existsAsFile())
+	{
+		if (overwriteIfExists) f.deleteFile();
+		else
+		{
+			LOG("File already exists : " << f.getFileName() << ", you need to enable overwrite to replace its content.");
+			return false;
+		}
+	}
+	
+	FileOutputStream fs(f);
+	if (a.arguments[0].isObject())
+	{
+		JSON::writeToStream(fs, a.arguments[0]);
+		return true;
+	}
+	
+	return fs.writeText(a.arguments[0].toString(), false, false, "\n");
+	return true;
+}
+
+var FileParameter::getAbsolutePathFromScript(const juce::var::NativeFunctionArgs& a)
+{
+	return getObjectFromJS<FileParameter>(a)->getAbsolutePath();
+
 }
