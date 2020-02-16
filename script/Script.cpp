@@ -1,4 +1,3 @@
-#include "Script.h"
 /*
 ==============================================================================
 
@@ -8,6 +7,8 @@ Author:  Ben
 
 ==============================================================================
 */
+
+#include "../engine/Engine.h"
 
 Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled) :
 	BaseItem("Script", canBeDisabled, false),
@@ -457,12 +458,19 @@ var Script::addFileParameterFromScript(const var::NativeFunctionArgs & args)
 {
     Script * s = getObjectFromJS<Script>(args);
     if (!checkNumArgs(s->niceName, args, 2)) return var();
-    return s->scriptParamsContainer.addFileParameter(args.arguments[0], args.arguments[1])->getScriptObject();
+    FileParameter * fp = s->scriptParamsContainer.addFileParameter(args.arguments[0], args.arguments[1]);
+    fp->directoryMode = args.numArguments > 2 ? ((int)args.arguments[2] > 0) : false;
+    return fp->getScriptObject();
 }
 
 var Script::readFileFromScript(const var::NativeFunctionArgs & args)
 {
-    File f (args.arguments[0]);
+    String path = args.arguments[0].toString();
+    
+    if (!File::isAbsolutePath(path)) path = Engine::mainEngine->getFile().getParentDirectory().getChildFile(path).getFullPathName();
+    
+    File f(path);
+    
     if (!f.existsAsFile()) return var();
 
     if (args.numArguments >= 2 && (int)args.arguments[1])
@@ -480,8 +488,12 @@ var Script::writeFileFromScript(const var::NativeFunctionArgs & args)
 {
     if (args.numArguments < 2) return false;
 
-    File f (args.arguments[0]);
-
+    String path = args.arguments[0].toString();
+    
+    if (!File::isAbsolutePath(path)) path = Engine::mainEngine->getFile().getParentDirectory().getChildFile(path).getFullPathName();
+    
+    File f(path);
+    
     bool overwriteIfExists = args.numArguments > 2 ? ((int)args.arguments[2] > 0) : false;
     if (f.existsAsFile())
     {
@@ -508,7 +520,11 @@ var Script::createDirectoryFromScript(const var::NativeFunctionArgs &args)
 {
     if (args.numArguments == 0) return false;
     
-    File f (args.arguments[0]);
+    String path = args.arguments[0].toString();
+    
+    if (!File::isAbsolutePath(path)) path = Engine::mainEngine->getFile().getParentDirectory().getChildFile(path).getFullPathName();
+    
+    File f(path);
     
     if (f.exists())
     {

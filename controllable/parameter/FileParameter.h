@@ -21,6 +21,7 @@ public:
 
 	String absolutePath;
 	String fileTypeFilter;
+    bool directoryMode;
 
 	bool forceAbsolutePath;
 
