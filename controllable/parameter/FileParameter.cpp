@@ -13,8 +13,8 @@ FileParameter::FileParameter(const String & niceName, const String &description,
     StringParameter(niceName, description, initialValue, enabled),
 	customBasePath(""),
 	forceAbsolutePath(false),
-    directoryMode(false),
-    forceRelativePath(false)
+	directoryMode(false),
+	forceRelativePath(false)
 {
 	defaultUI = FILE; 
 
