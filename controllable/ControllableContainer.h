@@ -162,11 +162,11 @@ public:
 	static var addColorParameterFromScript(const var::NativeFunctionArgs &args);
 	static var addPoint2DParameterFromScript(const var::NativeFunctionArgs &args);
 	static var addPoint3DParameterFromScript(const var::NativeFunctionArgs &args);
-    static var addFileParameterFromScript(const var::NativeFunctionArgs &args);
+	static var addFileParameterFromScript(const var::NativeFunctionArgs &args);
 	
-    static var addContainerFromScript(const var::NativeFunctionArgs &args);
-    static var removeContainerFromScript(const var::NativeFunctionArgs &args);
-    static var removeControllableFromScript(const var::NativeFunctionArgs &args);
+	static var addContainerFromScript(const var::NativeFunctionArgs &args);
+	static var removeContainerFromScript(const var::NativeFunctionArgs &args);
+	static var removeControllableFromScript(const var::NativeFunctionArgs &args);
 	
 	static bool checkNumArgs(const String &logName, const var::NativeFunctionArgs &args, int expectedArgs);
 	

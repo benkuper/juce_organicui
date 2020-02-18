@@ -51,10 +51,10 @@ ControllableContainer::ControllableContainer(const String& niceName) :
 	scriptObject.setMethod("addPoint2DParameter", ControllableContainer::addPoint2DParameterFromScript);
 	scriptObject.setMethod("addPoint3DParameter", ControllableContainer::addPoint2DParameterFromScript);
 	scriptObject.setMethod("addColorParameter", ControllableContainer::addColorParameterFromScript);
-    scriptObject.setMethod("addFileParameter", ControllableContainer::addFileParameterFromScript);
-    scriptObject.setMethod("addContainer", ControllableContainer::addContainerFromScript);
-    scriptObject.setMethod("removeContainer", ControllableContainer::removeContainerFromScript);
-    scriptObject.setMethod("removeParameter", ControllableContainer::removeControllableFromScript);
+	scriptObject.setMethod("addFileParameter", ControllableContainer::addFileParameterFromScript);
+	scriptObject.setMethod("addContainer", ControllableContainer::addContainerFromScript);
+	scriptObject.setMethod("removeContainer", ControllableContainer::removeContainerFromScript);
+	scriptObject.setMethod("removeParameter", ControllableContainer::removeControllableFromScript);
 }
 
 ControllableContainer::~ControllableContainer()
@@ -1173,33 +1173,33 @@ var ControllableContainer::addPoint3DParameterFromScript(const var::NativeFuncti
 var ControllableContainer::addFileParameterFromScript(const var::NativeFunctionArgs & args)
 {
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(args);
-    if (!checkNumArgs(cc->niceName, args, 2)) return var();
+	if (!checkNumArgs(cc->niceName, args, 2)) return var();
 	
 	Controllable* c = cc->getControllableByName(args.arguments[0], true, false);
 	if (c != nullptr) return c->getScriptObject();
 
-    FileParameter * fp = cc->addFileParameter(args.arguments[0], args.arguments[1]);
-    fp->directoryMode = args.numArguments > 2 ? ((int)args.arguments[2] > 0) : false;
-    return fp->getScriptObject();
+	FileParameter * fp = cc->addFileParameter(args.arguments[0], args.arguments[1]);
+	fp->directoryMode = args.numArguments > 2 ? ((int)args.arguments[2] > 0) : false;
+	return fp->getScriptObject();
 }
 
 var ControllableContainer::addContainerFromScript(const var::NativeFunctionArgs & args)
 {
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(args);
-    if (!checkNumArgs(cc->niceName, args, 1)) return var();
+	if (!checkNumArgs(cc->niceName, args, 1)) return var();
 	
 	ControllableContainer* newCC = cc->getControllableContainerByName(args.arguments[0], true, false);
 	if (newCC != nullptr) return newCC->getScriptObject();
 
 	newCC = new ControllableContainer(args.arguments[0]);
 	cc->addChildControllableContainer(newCC, true);
-    return newCC->getScriptObject();
+	return newCC->getScriptObject();
 }
 
 var ControllableContainer::removeContainerFromScript(const var::NativeFunctionArgs & args)
 {
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(args);
-    if (!checkNumArgs(cc->niceName, args, 1)) return var();
+	if (!checkNumArgs(cc->niceName, args, 1)) return var();
 	
 	ControllableContainer* removeCC = cc->getControllableContainerByName(args.arguments[0], true, false);
 	if (removeCC == nullptr) return var();
@@ -1211,7 +1211,7 @@ var ControllableContainer::removeContainerFromScript(const var::NativeFunctionAr
 var ControllableContainer::removeControllableFromScript(const var::NativeFunctionArgs & args)
 {
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(args);
-    if (!checkNumArgs(cc->niceName, args, 1)) return var();
+	if (!checkNumArgs(cc->niceName, args, 1)) return var();
 	
 	Controllable* c = cc->getControllableByName(args.arguments[0], true, false);
 	if (c == nullptr) return var();
