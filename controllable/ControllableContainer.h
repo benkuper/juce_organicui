@@ -151,6 +151,25 @@ public:
 	static var getParentFromScript(const juce::var::NativeFunctionArgs& a);
 	static var setNameFromScript(const juce::var::NativeFunctionArgs& a);
 	static var setCollapsedFromScript(const juce::var::NativeFunctionArgs& a);
+	
+	static var addTriggerFromScript(const var::NativeFunctionArgs &args);
+	static var addBoolParameterFromScript(const var::NativeFunctionArgs &args);
+	static var addIntParameterFromScript(const var::NativeFunctionArgs &args);
+	static var addFloatParameterFromScript(const var::NativeFunctionArgs &args);
+	static var addStringParameterFromScript(const var::NativeFunctionArgs &args);
+	static var addEnumParameterFromScript(const var::NativeFunctionArgs &args);
+	static var addTargetParameterFromScript(const var::NativeFunctionArgs &args);
+	static var addColorParameterFromScript(const var::NativeFunctionArgs &args);
+	static var addPoint2DParameterFromScript(const var::NativeFunctionArgs &args);
+	static var addPoint3DParameterFromScript(const var::NativeFunctionArgs &args);
+	static var addFileParameterFromScript(const var::NativeFunctionArgs &args);
+	
+	static var addContainerFromScript(const var::NativeFunctionArgs &args);
+	static var removeContainerFromScript(const var::NativeFunctionArgs &args);
+	static var removeControllableFromScript(const var::NativeFunctionArgs &args);
+	
+	static bool checkNumArgs(const String &logName, const var::NativeFunctionArgs &args, int expectedArgs);
+	
 
 	// Inherited via DashboardItemTarget
 
