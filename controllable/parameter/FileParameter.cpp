@@ -145,7 +145,6 @@ var FileParameter::writeFileFromScript(const juce::var::NativeFunctionArgs& a)
 	}
 	
 	return fs.writeText(a.arguments[0].toString(), false, false, "\n");
-	return true;
 }
 
 var FileParameter::getAbsolutePathFromScript(const juce::var::NativeFunctionArgs& a)
