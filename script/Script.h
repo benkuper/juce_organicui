@@ -104,9 +104,7 @@ public:
 	static var addPoint3DParameterFromScript(const var::NativeFunctionArgs &args);
     static var addFileParameterFromScript(const var::NativeFunctionArgs &args);
 
-    static var readFileFromScript(const var::NativeFunctionArgs &args);
-    static var writeFileFromScript(const var::NativeFunctionArgs &args);
-    static var createDirectoryFromScript(const var::NativeFunctionArgs &args);
+
     
 	static var setUpdateRateFromScript(const var::NativeFunctionArgs& args);
 
