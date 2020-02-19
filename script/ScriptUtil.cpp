@@ -1,4 +1,3 @@
-#include "ScriptUtil.h"
 /*
   ==============================================================================
 
@@ -158,7 +157,6 @@ var ScriptUtil::writeFileFromScript(const var::NativeFunctionArgs& args)
 	}
 
 	return fs.writeText(args.arguments[1].toString(), false, false, "\n");
-	return true;
 }
 
 var ScriptUtil::createDirectoryFromScript(const var::NativeFunctionArgs& args)
