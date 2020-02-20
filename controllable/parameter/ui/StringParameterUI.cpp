@@ -177,7 +177,11 @@ void StringParameterFileUI::buttonClicked(Button * b)
 	{
 		Component::BailOutChecker checker(this); 
 		FileChooser chooser("Select a file", File(fp->getAbsolutePath()), fp->fileTypeFilter);
-		bool result = chooser.browseForFileToOpen();
+        bool result;
+        
+        if (fp->directoryMode) result = chooser.browseForDirectory();
+        else result = chooser.browseForFileToOpen();
+        
 		if (checker.shouldBailOut()) return;
 
 		if (parameter.wasObjectDeleted()) return;

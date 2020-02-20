@@ -1,4 +1,3 @@
-#include "ScriptUtil.h"
 /*
   ==============================================================================
 
@@ -25,6 +24,10 @@ ScriptUtil::ScriptUtil() :
 	scriptObject.setMethod("getIPs", ScriptUtil::getIPs);
 	scriptObject.setMethod("encodeHMAC_SHA1", ScriptUtil::encodeHMAC_SHA1);
 	scriptObject.setMethod("toBase64", ScriptUtil::toBase64);
+
+	scriptObject.setMethod("readFile", ScriptUtil::readFileFromScript);
+	scriptObject.setMethod("writeFile", ScriptUtil::writeFileFromScript);
+	scriptObject.setMethod("createDirectory", ScriptUtil::createDirectoryFromScript);
 }
 
 var ScriptUtil::getTime(const var::NativeFunctionArgs &)
@@ -152,4 +155,77 @@ var ScriptUtil::toBase64(const var::NativeFunctionArgs& a)
 {
 	if (a.numArguments < 1) return 0;
 	return Base64::toBase64(a.arguments[0].toString());
+}
+
+var ScriptUtil::readFileFromScript(const var::NativeFunctionArgs& args)
+{
+	String path = args.arguments[0].toString();
+
+	if (!File::isAbsolutePath(path)) path = Engine::mainEngine->getFile().getParentDirectory().getChildFile(path).getFullPathName();
+
+	File f(path);
+
+	if (!f.existsAsFile()) return var();
+
+	if (args.numArguments >= 2 && (int)args.arguments[1])
+	{
+		return JSON::parse(f);
+	}
+	else
+	{
+		FileInputStream fs(f);
+		return fs.readEntireStreamAsString();
+	}
+}
+
+var ScriptUtil::writeFileFromScript(const var::NativeFunctionArgs& args)
+{
+	if (args.numArguments < 2) return false;
+
+	String path = args.arguments[0].toString();
+
+	if (!File::isAbsolutePath(path)) path = Engine::mainEngine->getFile().getParentDirectory().getChildFile(path).getFullPathName();
+
+	File f(path);
+
+	bool overwriteIfExists = args.numArguments > 2 ? ((int)args.arguments[2] > 0) : false;
+	if (f.existsAsFile())
+	{
+		if (overwriteIfExists) f.deleteFile();
+		else
+		{
+			LOG("File already exists : " << f.getFileName() << ", you need to enable overwrite to replace its content.");
+			return false;
+		}
+	}
+
+	FileOutputStream fs(f);
+	if (args.arguments[1].isObject())
+	{
+		JSON::writeToStream(fs, args.arguments[1]);
+		return true;
+	}
+
+	return fs.writeText(args.arguments[1].toString(), false, false, "\n");
+}
+
+var ScriptUtil::createDirectoryFromScript(const var::NativeFunctionArgs& args)
+{
+	if (args.numArguments == 0) return false;
+
+	String path = args.arguments[0].toString();
+
+	if (!File::isAbsolutePath(path)) path = Engine::mainEngine->getFile().getParentDirectory().getChildFile(path).getFullPathName();
+
+	File f(path);
+
+	if (f.exists())
+	{
+		LOG("Directory or file already exists : " << f.getFileName());
+		return false;
+	}
+	else {
+		f.createDirectory();
+		return true;
+	}
 }

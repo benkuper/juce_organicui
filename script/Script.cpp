@@ -1,4 +1,3 @@
-#include "Script.h"
 /*
 ==============================================================================
 
@@ -8,6 +7,8 @@ Author:  Ben
 
 ==============================================================================
 */
+
+#include "../engine/Engine.h"
 
 Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled) :
 	BaseItem("Script", canBeDisabled, false),
@@ -39,7 +40,7 @@ Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled) :
 	scriptObject.setMethod("logWarning", Script::logWarningFromScript);
 	scriptObject.setMethod("logError", Script::logErrorFromScript);
 	scriptObject.setMethod("setUpdateRate", Script::setUpdateRateFromScript);
-
+    
 	scriptObject.setMethod("addTrigger", Script::addTriggerFromScript);
 	scriptObject.setMethod("addBoolParameter", Script::addBoolParameterFromScript);
 	scriptObject.setMethod("addIntParameter", Script::addIntParameterFromScript);
@@ -50,6 +51,7 @@ Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled) :
 	scriptObject.setMethod("addPoint2DParameter", Script::addPoint2DParameterFromScript);
 	scriptObject.setMethod("addPoint3DParameter", Script::addPoint2DParameterFromScript);
 	scriptObject.setMethod("addColorParameter", Script::addColorParameterFromScript);
+    scriptObject.setMethod("addFileParameter", Script::addFileParameterFromScript);
 
 	scriptParamsContainer.hideEditorHeader = true;
 	addChildControllableContainer(&scriptParamsContainer);
@@ -447,6 +449,16 @@ var Script::addPoint3DParameterFromScript(const var::NativeFunctionArgs & args)
 	if (!checkNumArgs(s->niceName, args, 2)) return var();
 	return s->scriptParamsContainer.addPoint3DParameter(args.arguments[0], args.arguments[1])->getScriptObject();
 }
+
+var Script::addFileParameterFromScript(const var::NativeFunctionArgs & args)
+{
+    Script * s = getObjectFromJS<Script>(args);
+    if (!checkNumArgs(s->niceName, args, 2)) return var();
+    FileParameter * fp = s->scriptParamsContainer.addFileParameter(args.arguments[0], args.arguments[1]);
+    fp->directoryMode = args.numArguments > 2 ? ((int)args.arguments[2] > 0) : false;
+    return fp->getScriptObject();
+}
+
 
 var Script::setUpdateRateFromScript(const var::NativeFunctionArgs& args)
 {
