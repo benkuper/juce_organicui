@@ -126,85 +126,12 @@ void OSCRemoteControl::processMessage(const OSCMessage& m)
 	}
 	else
 	{
-		Controllable* c = Engine::mainEngine != nullptr ? Engine::mainEngine->getControllableForAddress(add) : nullptr;
+		Controllable* c = OSCHelpers::findControllableAndHandleMessage(Engine::mainEngine, m);
 
 		if (c == nullptr)
 		{
-			if (add.endsWith("enabled"))
-			{
-				String cAdd = add.substring(0, add.length() - 8);
-				c = Engine::mainEngine != nullptr ? Engine::mainEngine->getControllableForAddress(cAdd) : nullptr;
-				if (c != nullptr)
-				{
-					if(m.size() >= 1) c->setEnabled(OSCHelpers::getIntArg(m[0]) > 0);
-					return;
-				}
-			}
-		}
-
-		if (c == nullptr)
-		{
-			//NLOGWARNING(niceName, "No target found for " << add);
 			remoteControlListeners.call(&RemoteControlListener::processMessage, m);
 			return;
-		}
-
-		if (c->type == Controllable::TRIGGER)
-		{
-			if (m.size() == 0 || (m.size() > 0 && OSCHelpers::getIntArg(m[0]) > 0)) static_cast<Trigger*>(c)->trigger();
-		}
-		else
-		{
-			Parameter* p = dynamic_cast<Parameter*>(c);
-			jassert(p != nullptr);
-			switch (p->type)
-			{
-
-			case Controllable::BOOL:
-				if (m.size() == 0) NLOG(niceName, "Parameter " << p->niceName << " requires 1 argument");
-				else p->setValue(OSCHelpers::getIntArg(m[0]) > 0);
-				break;
-
-			case Controllable::INT:
-				if (m.size() == 0) NLOG(niceName, "Parameter " << p->niceName << " requires 1 argument");
-				else p->setValue(OSCHelpers::getIntArg(m[0]));
-				break;
-
-			case Controllable::FLOAT:
-				if (m.size() == 0) NLOG(niceName, "Parameter " << p->niceName << " requires 1 argument");
-				else p->setValue(OSCHelpers::getFloatArg(m[0]));
-				break;
-
-			case Controllable::STRING:
-				if (m.size() == 0) NLOG(niceName, "Parameter " << p->niceName << " requires 1 argument");
-				else p->setValue(OSCHelpers::getStringArg(m[0]));
-				break;
-
-			case Controllable::COLOR:
-				if (m[0].isColour()) static_cast<ColorParameter*>(p)->setColor(OSCHelpers::getColourFromOSC(m[0].getColour()));
-				else if (m.size() < 3) NLOG(niceName, "Parameter " << p->niceName << " requires at least 3 arguments");
-				else static_cast<ColorParameter*>(p)->setColor(Colour::fromFloatRGBA(OSCHelpers::getFloatArg(m[0]), OSCHelpers::getFloatArg(m[1]), OSCHelpers::getFloatArg(m[2]), m.size() >= 4 ? OSCHelpers::getFloatArg(m[3]) : 1));
-				break;
-
-			case Controllable::POINT2D:
-				if (m.size() < 2) NLOG(niceName, "Parameter " << p->niceName << " requires at least 2 arguments");
-				else static_cast<Point2DParameter*>(p)->setPoint(OSCHelpers::getFloatArg(m[0]), OSCHelpers::getFloatArg(m[1]));
-				break;
-
-			case Controllable::POINT3D:
-				if (m.size() < 3) NLOG(niceName, "Parameter " << p->niceName << " requires at least 3 arguments");
-				else static_cast<Point3DParameter*>(p)->setVector(OSCHelpers::getFloatArg(m[0]), OSCHelpers::getFloatArg(m[1]), OSCHelpers::getFloatArg(m[2]));
-				break;
-
-			case Controllable::ENUM:
-				if (m.size() < 1) NLOG(niceName, "Parameter " << p->niceName << " requires at least 1 argument");
-				else static_cast<EnumParameter*>(p)->setValueWithKey(OSCHelpers::getStringArg(m[0]));
-				break;
-
-			default:
-				NLOG(niceName, "Type not handled : " << c->getTypeString());
-				break;
-			};
 		}
 	}
 }

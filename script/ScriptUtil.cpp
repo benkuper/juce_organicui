@@ -19,6 +19,8 @@ ScriptUtil::ScriptUtil() :
 	scriptObject.setMethod("getFloatFromBytes", ScriptUtil::getFloatFromBytes);
 	scriptObject.setMethod("getInt32FromBytes", ScriptUtil::getInt32FromBytes);
 	scriptObject.setMethod("getInt64FromBytes", ScriptUtil::getInt32FromBytes);
+	scriptObject.setMethod("getObjectProperties", ScriptUtil::getObjectPropertiesNames);
+
 	scriptObject.setMethod("getIPs", ScriptUtil::getIPs);
 	scriptObject.setMethod("encodeHMAC_SHA1", ScriptUtil::encodeHMAC_SHA1);
 	scriptObject.setMethod("toBase64", ScriptUtil::toBase64);
@@ -68,6 +70,54 @@ var ScriptUtil::getInt64FromBytes(const var::NativeFunctionArgs & a)
 	memcpy(&result, &bytes, 8);
 	return result;
 }
+
+var ScriptUtil::getObjectPropertiesNames(const var::NativeFunctionArgs& a)
+{
+	if (a.numArguments == 0 || !a.arguments[0].isObject()) return var();
+
+	NamedValueSet props = a.arguments[0].getDynamicObject()->getProperties();
+	var result;
+	for (auto& p : props)
+	{
+		result.append(p.name.toString());
+	}
+
+	return result;
+}
+
+/*
+var ScriptUtil::cosFromScript(const var::NativeFunctionArgs & a)
+{
+	if (a.numArguments < 1) return 0;
+	return cosf((float)a.arguments[0]);
+}
+
+
+var ScriptUtil::sinFromScript(const var::NativeFunctionArgs & a)
+{
+	if (a.numArguments < 1) return 0;
+	return sinf((float)a.arguments[0]);
+}
+
+
+var ScriptUtil::atan2FromScript(const var::NativeFunctionArgs & a)
+{
+	if (a.numArguments < 2) return 0;
+	return atan2((double)a.arguments[0], (double)a.arguments[1]);
+}
+
+var ScriptUtil::toDegrees(const var::NativeFunctionArgs & a)
+{
+	if (a.numArguments < 1) return 0;
+	return radiansToDegrees((double)a.arguments[0]);
+}
+
+var ScriptUtil::toRadians(const var::NativeFunctionArgs & a)
+{
+	if (a.numArguments < 1) return 0;
+	return degreesToRadians((double)a.arguments[0]);
+}
+*/
 
 var ScriptUtil::getIPs(const var::NativeFunctionArgs& a)
 {
