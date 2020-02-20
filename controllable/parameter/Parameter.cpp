@@ -267,6 +267,12 @@ float Parameter::getNormalizedValue()
 		return jmap<float>((float)value, (float)minimumValue, (float)maximumValue, 0.f, 1.f);
 }
 
+void Parameter::setAttribute(String param, var value)
+{
+	Controllable::setAttribute(param, value);
+
+	if (param == "alwaysNotify") alwaysNotify = value;
+}
 
 //helpers for fast typing
 
@@ -366,7 +372,7 @@ void Parameter::loadJSONDataInternal(var data)
 
  	if (data.getDynamicObject()->hasProperty("editable")) setControllableFeedbackOnly(!data.getProperty("editable", true));
 
-	alwaysNotify = data.getProperty("alwaysNotify", false);
+	alwaysNotify = data.getProperty("alwaysNotify", alwaysNotify);
 }
 
 var Parameter::getValueFromScript(const juce::var::NativeFunctionArgs & a)
