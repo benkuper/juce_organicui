@@ -24,6 +24,8 @@ public:
 	static var getFloatFromBytes(const var::NativeFunctionArgs &a);
 	static var getInt32FromBytes(const var::NativeFunctionArgs &a);
 	static var getInt64FromBytes(const var::NativeFunctionArgs &a);
+
+	static var getObjectPropertiesNames(const var::NativeFunctionArgs& a);
 	
 	/*
 	static var cosFromScript(const var::NativeFunctionArgs &a);
