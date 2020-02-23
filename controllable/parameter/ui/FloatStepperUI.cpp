@@ -1,4 +1,3 @@
-#include "FloatStepperUI.h"
 /*
   ==============================================================================
 
@@ -19,9 +18,20 @@ FloatStepperUI::FloatStepperUI(Parameter * _parameter) :
 
 	if ((int)parameter->minimumValue != (int)parameter->maximumValue)
 	{
-		slider->setRange((float)parameter->minimumValue, (float)parameter->maximumValue, 1);
-		int val = juce::jmin<int>(abs((int)parameter->maximumValue - (int)parameter->minimumValue), INT32_MAX);
-		slider->setMouseDragSensitivity(val);
+		if (parameter->hasRange())
+		{
+			if (parameter->type == Controllable::INT) slider->setRange((int)parameter->minimumValue, (int)parameter->maximumValue, 1);
+			else slider->setRange((float)parameter->minimumValue, (float)parameter->maximumValue, 1);
+			int val = juce::jmin<int>(abs((int)parameter->maximumValue - (int)parameter->minimumValue), INT32_MAX);
+			slider->setMouseDragSensitivity(val);
+		}
+		else
+		{
+			//workaround to keep good UI feeling
+			slider->setRange(INT32_MIN/2, INT32_MAX/2, 1);
+			slider->setMouseDragSensitivity(INT32_MAX);
+		}
+		
 	}
     slider->setValue(parameter->floatValue());
     slider->addListener(this);
@@ -30,8 +40,9 @@ FloatStepperUI::FloatStepperUI(Parameter * _parameter) :
 	slider->setColour(CaretComponent::caretColourId, Colours::orange);
 	slider->setScrollWheelEnabled(false);
 	slider->setColour(slider->textBoxTextColourId, useCustomTextColor ? customTextColor : (isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f)));
-	feedbackStateChanged();
 
+
+	feedbackStateChanged();
 	addAndMakeVisible(slider.get());
 
 	setSize(200, GlobalSettings::getInstance()->fontSize->floatValue() + 4);
@@ -110,7 +121,7 @@ void FloatStepperUI::rangeChanged(Parameter *){
 void FloatStepperUI::feedbackStateChanged()
 {
 	slider->setTextBoxIsEditable(isInteractable());
-	slider->setIncDecButtonsMode(isInteractable()?Slider::IncDecButtonMode::incDecButtonsDraggable_Vertical:Slider::IncDecButtonMode::incDecButtonsNotDraggable);
+	slider->setIncDecButtonsMode((isInteractable())?Slider::IncDecButtonMode::incDecButtonsDraggable_AutoDirection:Slider::IncDecButtonMode::incDecButtonsNotDraggable);
 	slider->setColour(slider->textBoxTextColourId, useCustomTextColor ? customTextColor : (isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f)));
 }
 

@@ -110,6 +110,8 @@ public:
 	void setUndoableNormalizedValue(const float &oldNormalizedValue, const float &newNormalizedValue);
 	void setNormalizedValue(const float &normalizedValue, bool silentSet = false, bool force = false);
     float getNormalizedValue();
+	
+	virtual void setAttribute(String param, var value) override;
 
     //helpers for fast typing
 	virtual float floatValue();

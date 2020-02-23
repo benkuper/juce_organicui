@@ -26,6 +26,8 @@ public:
 	std::unique_ptr<juce::DynamicObject> liveScriptObject;
 	bool liveScriptObjectIsDirty;
 
+	SpinLock scriptObjectLock;
+
 	juce::DynamicObject * getScriptObject();
 	void updateLiveScriptObject(juce::DynamicObject * parent = nullptr);
 

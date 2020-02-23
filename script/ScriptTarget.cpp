@@ -4,6 +4,7 @@ ScriptTarget::ScriptTarget(const String & name, void * ptr) :
 {
 	scriptObject.setProperty(scriptPtrIdentifier, thisPtr);
 	scriptObject.setMethod(ptrCompareIdentifier, ScriptTarget::checkTargetsAreTheSameFromScript);
+
 	liveScriptObjectIsDirty = true;
 }
 
@@ -23,9 +24,10 @@ DynamicObject * ScriptTarget::getScriptObject()
 
 void ScriptTarget::updateLiveScriptObject(DynamicObject * parent)
 {
+	scriptObjectLock.enter();
 	liveScriptObject.reset(new DynamicObject(scriptObject)); //is there a bettery way to deal with updating without recreating an object each time ?
-	
 	updateLiveScriptObjectInternal(parent);
+	scriptObjectLock.exit();
 
 	liveScriptObjectIsDirty = false;
 	scriptTargetListeners.call(&ScriptTargetListener::scriptObjectUpdated, this);

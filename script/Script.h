@@ -102,7 +102,10 @@ public:
 	static var addColorParameterFromScript(const var::NativeFunctionArgs &args);
 	static var addPoint2DParameterFromScript(const var::NativeFunctionArgs &args);
 	static var addPoint3DParameterFromScript(const var::NativeFunctionArgs &args);
+    static var addFileParameterFromScript(const var::NativeFunctionArgs &args);
 
+
+    
 	static var setUpdateRateFromScript(const var::NativeFunctionArgs& args);
 
 	static bool checkNumArgs(const String &logName, const var::NativeFunctionArgs &args, int expectedArgs);
