@@ -267,11 +267,11 @@ float Parameter::getNormalizedValue()
 		return jmap<float>((float)value, (float)minimumValue, (float)maximumValue, 0.f, 1.f);
 }
 
-void Parameter::setAttribute(String param, var value)
+void Parameter::setAttribute(String param, var val)
 {
-	Controllable::setAttribute(param, value);
+	Controllable::setAttribute(param, val);
 
-	if (param == "alwaysNotify") alwaysNotify = value;
+	if (param == "alwaysNotify") alwaysNotify = val;
 }
 
 //helpers for fast typing
