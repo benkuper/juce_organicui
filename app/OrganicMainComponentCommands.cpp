@@ -469,14 +469,11 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 	case CommandIDs::deleteItems:
 	{
 		InspectableSelectionManager * selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
-		Array<WeakReference<Inspectable>> items = selectionManager->currentInspectables;
-
-		for (auto &i : items)
+		Array<BaseItem*> items = selectionManager->getInspectablesAs<BaseItem>();
+		for (auto& i : items)
 		{
-			if (!i.wasObjectDeleted())
-			{
-				((BaseItem *)i.get())->remove();
-			}
+			if (i == nullptr) continue;
+			i->remove();
 		}
 	}
 	break;
