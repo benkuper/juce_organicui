@@ -28,7 +28,8 @@ TriggerImageUI::~TriggerImageUI()
 
 void TriggerImageUI::paint(Graphics & g)
 {
-	
+	if (getWidth() == 0 || getHeight() == 0) return;
+
 	g.drawImage(drawTriggering?onImage:offImage, getLocalBounds().toFloat());
 	if (isMouseOver() && !trigger->isControllableFeedbackOnly)
 	{
