@@ -976,8 +976,7 @@ void ControllableContainer::updateLiveScriptObjectInternal(DynamicObject* parent
 	//controllableContainers.getLock().enter();
 	for (auto& cc : controllableContainers)
 	{
-		if (cc == nullptr || cc.wasObjectDeleted()) continue;
-
+		if (cc == nullptr || cc.wasObjectDeleted() || cc->shortName.isEmpty()) continue;
 		if (!cc->includeInScriptObject) continue;
 
 		if (transferToParent) parent->setProperty(cc->shortName, cc->getScriptObject());
@@ -990,6 +989,7 @@ void ControllableContainer::updateLiveScriptObjectInternal(DynamicObject* parent
 	//controllables.getLock().enter();
 	for (auto& c : controllables)
 	{
+		if (c == nullptr || c->shortName.isEmpty()) return;
 		if (!c->includeInScriptObject) continue;
 		if (transferToParent) parent->setProperty(c->shortName, c->getScriptObject());
 		else liveScriptObject->setProperty(c->shortName, c->getScriptObject());
