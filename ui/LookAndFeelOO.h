@@ -25,7 +25,7 @@ namespace LookAndFeelHelpers {
 	static const uint32 standardColours[] =
 	{
 		TextButton::buttonColourId,                 textButtonColour,
-		TextButton::buttonOnColourId,               HIGHLIGHT_COLOR.getARGB(),
+		TextButton::buttonOnColourId,               HIGHLIGHT_COLOR.darker().getARGB(),
 		TextButton::textColourOnId,                 textHighlightColour,
 		TextButton::textColourOffId,                TEXT_COLOR.getARGB(),
 
