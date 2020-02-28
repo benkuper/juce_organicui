@@ -10,7 +10,8 @@ public:
 	~DashboardCCItemUI();
 
 	DashboardCCItem* ccItem;
-	std::unique_ptr<Component> itemUI;
+	Viewport vp;
+	Component * itemUI;
 
 	virtual void paint(Graphics& g) override;
 	virtual void resizedDashboardItemInternal() override;
