@@ -91,9 +91,8 @@ Array<T*> InspectableSelectionManager::getInspectablesAs()
 	Array<T *> result;
 	for (auto &i : currentInspectables)
 	{
-		if (i.wasObjectDeleted()) continue;
-		T* ti = dynamic_cast<T*>(i.get());
-		if(ti != nullptr) result.add(ti);
+		if (i == nullptr || i.wasObjectDeleted()) continue;
+		if (T* ti = dynamic_cast<T*>(i.get())) result.add(ti);
 	}
 	return result;
 }
