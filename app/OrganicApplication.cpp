@@ -209,7 +209,7 @@ void OrganicApplication::newMessage(const AppUpdateEvent & e)
 
 void OrganicApplication::updateAppTitle()
 {
-	if(useWindow && mainWindow != nullptr) mainWindow->setName(getApplicationName() + " " + getApplicationVersion() + " - " + Engine::mainEngine->getDocumentTitle()+(Engine::mainEngine->hasChangedSinceSaved()?" *":"")); 
+	if(useWindow && mainWindow != nullptr && Engine::mainEngine != nullptr) mainWindow->setName(getApplicationName() + " " + getApplicationVersion() + " - " + Engine::mainEngine->getDocumentTitle()+(Engine::mainEngine->hasChangedSinceSaved()?" *":"")); 
 }
 
 inline OrganicApplication::MainWindow::MainWindow(String name, OrganicMainContentComponent* mainComponent, const Image &image) :
