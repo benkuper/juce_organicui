@@ -58,7 +58,7 @@ void CustomLoggerUI::timerCallback()
 //        lastUpdateTime = cTime;
 
 	logListComponent->updateContent();
-	logListComponent->scrollToEnsureRowIsOnscreen(totalLogRow.get() - 1);
+	if (autoScrollB.getToggleState()) logListComponent->scrollToEnsureRowIsOnscreen(totalLogRow.get() - 1);
 #if USE_CACHED_GLYPH
 	logList.cleanUnusedGlyphs();
 #endif
@@ -102,10 +102,15 @@ CustomLoggerUI::CustomLoggerUI(const String& contentName, CustomLogger * l) :
 	clearB.addListener(this);
 	addAndMakeVisible(clearB);
 
-	copyB.setButtonText(juce::translate("Copy All to Clipboard"));
+	copyB.setButtonText(juce::translate("Copy All"));
 	copyB.addListener(this);
 	addAndMakeVisible(copyB);
 	logListComponent->setMouseCursor(MouseCursor::IBeamCursor);
+	
+	autoScrollB.setButtonText(juce::translate("Auto Scroll"));
+	autoScrollB.setClickingTogglesState(true);
+	autoScrollB.setToggleState(true, dontSendNotification);
+	addAndMakeVisible(autoScrollB);
 
 	logListComponent->setMultipleSelectionEnabled(true);
 	setInterceptsMouseClicks(true, false);
@@ -127,8 +132,11 @@ void CustomLoggerUI::resized()
 	ShapeShifterContentComponent::resized();
 	juce::Rectangle<int> area = getLocalBounds().withTop(5);
 	auto footer = area.removeFromBottom(30).reduced(5);
+	
+	autoScrollB.setBounds(footer.removeFromRight(60).reduced(2));
 	clearB.setBounds(footer.removeFromLeft(footer.getWidth() / 2).reduced(2));
 	copyB.setBounds(footer.reduced(2));
+
 	logListComponent->setBounds(area);
 	bool firstVisible = area.getWidth() > 400;
 	logListComponent->getHeader().setColumnVisible(1, firstVisible);
@@ -269,30 +277,6 @@ const Colour& CustomLoggerUI::getSeverityColourForRow(const int r) const
 	return Colours::pink;
 };
 
-
-bool CustomLoggerUI::keyPressed(const KeyPress& k) {
-
-	if (k == KeyPress('c', ModifierKeys::commandModifier, 0)) {
-		String textToCopy;
-		Array<Range<int>> ranges = logListComponent->getSelectedRows().getRanges();
-		for (auto &r : ranges) {
-			for (int i = r.getStart(); i < r.getEnd(); i++) {
-				StringArray arr;
-				for (int c = 1; c <= 3; c++) {
-					if (logListComponent->getHeader().isColumnVisible(c)) {
-						arr.add(logList.getTextAt(i, c));
-					}
-				}
-				textToCopy += arr.joinIntoString("\t") + "\n";
-			}
-		}
-		if (textToCopy.isNotEmpty()) {
-			SystemClipboard::copyTextToClipboard(textToCopy);
-			return true;
-		}
-	}
-	return false;
-}
 
 void CustomLoggerUI::mouseDown(const MouseEvent& me) {
 	auto pos = me.getEventRelativeTo(logListComponent.get());
