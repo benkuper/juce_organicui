@@ -287,4 +287,27 @@ void OutlinerItemComponent::labelTextChanged(Label *)
 void OutlinerItemComponent::mouseDown(const MouseEvent &e)
 {
 	InspectableContentComponent::mouseDown(e);
+
+	if (e.mods.isRightButtonDown())
+	{
+		PopupMenu p;
+		p.addItem(-1, "Copy OSC Control Address");
+		p.addItem(-2, "Copy Script Control Address");
+
+		int result = p.show();
+		switch (result)
+		{
+		case -1:
+			if (item->isContainer) SystemClipboard::copyTextToClipboard(item->container->getControlAddress());
+			else SystemClipboard::copyTextToClipboard(item->controllable->controlAddress);
+			break;
+		case -2:
+			if (item->isContainer)  SystemClipboard::copyTextToClipboard("root" + item->container->getControlAddress().replaceCharacter('/', '.'));
+			else SystemClipboard::copyTextToClipboard("root" + item->controllable->controlAddress.replaceCharacter('/', '.'));
+			break;
+
+		default:
+			break;
+		}
+	}
 }
