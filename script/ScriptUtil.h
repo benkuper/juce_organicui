@@ -37,4 +37,6 @@ public:
 	static var readFileFromScript(const var::NativeFunctionArgs& args);
 	static var writeFileFromScript(const var::NativeFunctionArgs& args);
 	static var createDirectoryFromScript(const var::NativeFunctionArgs& args);
+	static var launchFileFromScript(const var::NativeFunctionArgs& args);
+	static var killAppFromScript(const var::NativeFunctionArgs& args);
 };

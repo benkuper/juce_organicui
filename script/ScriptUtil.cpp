@@ -1,3 +1,4 @@
+#include "ScriptUtil.h"
 /*
   ==============================================================================
 
@@ -28,6 +29,8 @@ ScriptUtil::ScriptUtil() :
 	scriptObject.setMethod("readFile", ScriptUtil::readFileFromScript);
 	scriptObject.setMethod("writeFile", ScriptUtil::writeFileFromScript);
 	scriptObject.setMethod("createDirectory", ScriptUtil::createDirectoryFromScript);
+	scriptObject.setMethod("launchFile", ScriptUtil::launchFileFromScript);
+	scriptObject.setMethod("killApp", ScriptUtil::killAppFromScript);
 }
 
 var ScriptUtil::getTime(const var::NativeFunctionArgs &)
@@ -228,4 +231,37 @@ var ScriptUtil::createDirectoryFromScript(const var::NativeFunctionArgs& args)
 		f.createDirectory();
 		return true;
 	}
+}
+
+var ScriptUtil::launchFileFromScript(const var::NativeFunctionArgs& args)
+{
+	if (args.numArguments == 0) return false;
+
+	String path = args.arguments[0].toString();
+
+	if (!File::isAbsolutePath(path)) path = Engine::mainEngine->getFile().getParentDirectory().getChildFile(path).getFullPathName();
+
+	File f(path);
+
+	if (f.existsAsFile())
+	{
+		return f.startAsProcess(args.numArguments > 1 ? args.arguments[1].toString() : "");
+	}
+
+	return false;
+}
+
+var ScriptUtil::killAppFromScript(const var::NativeFunctionArgs& args)
+{
+	if (args.numArguments == 0) return false;
+	String appName = args.arguments[0].toString();
+	bool hardKill = args.numArguments > 1 ? (bool)args.arguments[1] : false;
+#if JUCE_WINDOWS
+	int result = system(String("taskkill " + String(hardKill ? "/f " : "") + "/im \"" + appName+ "\"").getCharPointer());
+	if (result != 0) LOGWARNING("Problem killing app " + appName);
+#else
+	int result = system(String("killall " + String(hardKill ? "-9" : "-2") + " \"" + appName + "\"").getCharPointer());
+	if (result != 0) LOGWARNING("Problem killing app " + appName);
+#endif
+	return var();
 }
