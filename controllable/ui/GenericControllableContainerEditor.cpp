@@ -1,4 +1,3 @@
-#include "GenericControllableContainerEditor.h"
 /*
   ==============================================================================
 
@@ -94,7 +93,11 @@ void GenericControllableContainerEditor::mouseDown(const MouseEvent & e)
 {
 	if (e.mods.isLeftButtonDown())
 	{
-		if (e.originalComponent == &headerSpacer) setCollapsed(!container->editorIsCollapsed);
+		if (e.originalComponent == &headerSpacer || (isRoot && e.eventComponent == this && e.getMouseDownY() < headerHeight))
+		{
+			if (e.mods.isShiftDown()) toggleCollapsedChildren();
+			else setCollapsed(!container->editorIsCollapsed);
+		}
 	}
 	else if (e.mods.isRightButtonDown())
 	{
@@ -137,6 +140,7 @@ void GenericControllableContainerEditor::setDragAndDropEnabled(bool value)
 void GenericControllableContainerEditor::showContextMenu()
 {
 	PopupMenu p;
+	p.addItem(-1, "Toggle childrens");
 	addPopupMenuItems(&p);
 
 	p.addSeparator();
@@ -150,13 +154,29 @@ void GenericControllableContainerEditor::showContextMenu()
 
 	p.addSubMenu("Send to Dashboard", dashboardMenu);
 
+	p.addSeparator();
+
+	p.addItem(-2, "Copy OSC Control Address");
+	p.addItem(-3, "Copy Script Control Address");
+
 	int result = p.show();
 
 	if (result != 0)
 	{
-		/*switch (result)
+		switch (result)
 		{
-		default:*/
+		case -1:
+			toggleCollapsedChildren();
+			break;
+
+		case -2:
+			SystemClipboard::copyTextToClipboard(container->getControlAddress());
+			break;
+		case -3:
+			SystemClipboard::copyTextToClipboard("root" + container->getControlAddress().replaceCharacter('/', '.'));
+			break;
+
+		default:
 			if (result >= 10000)
 			{
 				DashboardManager::getInstance()->items[result - 10000]->itemManager.addItem(container->createDashboardItem());
@@ -165,8 +185,8 @@ void GenericControllableContainerEditor::showContextMenu()
 			{
 				handleMenuSelectedID(result);
 			}
-		/*	break;
-		}*/
+			break;
+		}
 	}
 }
 
@@ -206,6 +226,22 @@ void GenericControllableContainerEditor::setCollapsed(bool value, bool force, bo
 		setSize(getWidth(),targetHeight);
 	}
 
+}
+
+void GenericControllableContainerEditor::toggleCollapsedChildren()
+{
+	Array< GenericControllableContainerEditor*> childContainers;
+	bool shouldCollapse = false;
+	for (auto& cui : childEditors)
+	{
+		if (GenericControllableContainerEditor* ccui = dynamic_cast<GenericControllableContainerEditor*>(cui))
+		{
+			childContainers.add(ccui);
+			if (ccui->container->editorCanBeCollapsed && !ccui->container->editorIsCollapsed) shouldCollapse = true;
+		}
+	}
+
+	for (auto& cui : childContainers) cui->setCollapsed(shouldCollapse);
 }
 
 void GenericControllableContainerEditor::resetAndBuild()

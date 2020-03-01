@@ -48,6 +48,7 @@ public:
 	bool dragAndDropEnabled;
 
 	virtual void setCollapsed(bool value, bool force = false, bool animate = true, bool doNotRebuild = false);
+	virtual void toggleCollapsedChildren();
 	virtual void resetAndBuild();
 
 
