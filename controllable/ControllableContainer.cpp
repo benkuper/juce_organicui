@@ -240,7 +240,7 @@ UndoableAction* ControllableContainer::removeUndoableControllable(Controllable* 
 
 void ControllableContainer::removeControllable(WeakReference<Controllable> c)
 {
-	if (c.wasObjectDeleted())
+	if (c == nullptr || c.wasObjectDeleted())
 	{
 		DBG("Remove controllable but ref was deleted");
 		return;
@@ -248,15 +248,19 @@ void ControllableContainer::removeControllable(WeakReference<Controllable> c)
 
 	controllableContainerListeners.call(&ControllableContainerListener::controllableRemoved, c);
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableRemoved, this, c));
+	
+	if (c != nullptr)
+	{
+		c->removeAsyncWarningTargetListener(this);
+		c->removeControllableListener(this);
 
-	Parameter* p = dynamic_cast<Parameter*>(c.get());
-	if (p != nullptr) {
-		p->removeParameterListener(this);
-		p->removeAsyncParameterListener(this);
+		if (Parameter* p = dynamic_cast<Parameter*>(c.get()))
+		{
+			p->removeParameterListener(this);
+			p->removeAsyncParameterListener(this);
+		}
 	}
-
-	c->removeAsyncWarningTargetListener(this);
-	c->removeControllableListener(this);
+	
 
 	onControllableRemoved(c);
 
@@ -920,6 +924,8 @@ void ControllableContainer::loadJSONData(var data, bool createIfNotThere)
 	isCurrentlyLoadingData = false;
 	controllableContainerListeners.call(&ControllableContainerListener::controllableContainerFinishedLoading, this);
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableContainerFinishedLoading, this));
+
+	afterLoadJSONDataInternal();
 }
 
 void ControllableContainer::childStructureChanged(ControllableContainer* cc)

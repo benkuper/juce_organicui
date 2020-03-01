@@ -139,6 +139,7 @@ public:
 	virtual var getJSONData();
 	virtual void loadJSONData(var data, bool createIfNotThere = false);
 	virtual void loadJSONDataInternal(var /*data*/) { /* to be overriden by child classes */ }
+	virtual void afterLoadJSONDataInternal() {} //allow for calling methods after isCurrentlyLoadingData is set to false
 
 	virtual void childStructureChanged(ControllableContainer *)override;
 	virtual void childAddressChanged(ControllableContainer *) override;
