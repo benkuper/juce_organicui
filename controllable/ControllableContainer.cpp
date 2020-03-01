@@ -1145,7 +1145,29 @@ var ControllableContainer::addColorParameterFromScript(const var::NativeFunction
 	Controllable* c = cc->getControllableByName(args.arguments[0], true, false);
 	if (c != nullptr) return c->getScriptObject();
 
-	return cc->addColorParameter(args.arguments[0], args.arguments[1], Colour((int)(args.arguments[2])))->getScriptObject();
+	var color;
+	if (args.arguments[2].isArray())
+	{
+		color = args.arguments[2];
+		while (color.size() < 4) color.append(color.size() < 3 ? 0 : 1);
+		for (int i = 0; i < color.size(); i++) color[i] = (float)color[i] * 255;
+	}
+	else if (args.numArguments >= 5)
+	{
+		color.append((float)args.arguments[2] * 255);
+		color.append((float)args.arguments[3] * 255);
+		color.append((float)args.arguments[4] * 255);
+		color.append((float)args.numArguments >= 6 ? (float)args.arguments[5] * 255 : 255);
+	}
+	else if (args.arguments[2].isInt() || args.arguments[2].isInt64())
+	{
+		color.append(((int)args.arguments[2] >> 24) & 0xFF);
+		color.append(((int)args.arguments[2] >> 16) & 0xFF);
+		color.append(((int)args.arguments[2] >> 8) & 0xFF);
+		color.append(((int)args.arguments[2]) & 0xFF);
+	}
+
+	return cc->addColorParameter(args.arguments[0], args.arguments[1], Colour((uint8)(int)color[0], (uint8)(int)color[1], (uint8)(int)color[2], (uint8)(int)color[3]))->getScriptObject();
 }
 
 var ControllableContainer::addPoint2DParameterFromScript(const var::NativeFunctionArgs & args)

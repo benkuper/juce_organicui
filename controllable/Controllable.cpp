@@ -275,16 +275,28 @@ var Controllable::setValueFromScript(const juce::var::NativeFunctionArgs& a) {
 						(float)(value[1]),
 						(float)(value[2]),
 						value.size() > 3 ? (float)(value[3]) : 1));
-					
+				}
+				else if (a.numArguments >= 3)
+				{
+					((ColorParameter*)c)->setColor(Colour::fromFloatRGBA((float)(a.arguments[0]),
+						(float)(a.arguments[1]),
+						(float)(a.arguments[2]),
+						a.numArguments > 3 ? (float)(a.arguments[3]) : 1));
+				}
+				else if (a.numArguments == 1 && valueIsANumber)
+				{
+					((ColorParameter*)c)->setColor(Colour((int)a.arguments[0]));
 				}
 				break;
 
 			case Controllable::Type::POINT2D:
 				if (value.isArray() && value.size() >= 2) ((Point2DParameter *)c)->setPoint((float)value[0], (float)value[1]);
+				else if (a.numArguments >= 2) ((Point2DParameter*)c)->setPoint((float)a.arguments[0], (float)a.arguments[1]);
 				break;
 
 			case Controllable::Type::POINT3D:
 				if (value.isArray() && value.size() >= 3) ((Point3DParameter *)c)->setVector((float)value[0], (float)value[1], (float)value[2]);
+				else if (a.numArguments >= 3) ((Point3DParameter*)c)->setVector((float)a.arguments[0], (float)a.arguments[1], (float)a.arguments[2]);
 				break;
 
 			case Controllable::Type::ENUM:
