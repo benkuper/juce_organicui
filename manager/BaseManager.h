@@ -326,15 +326,13 @@ T * BaseManager<T>::addItem(T * item, var data, bool addToUndo, bool notify)
 template<class T>
 T * BaseManager<T>::addItem(const Point<float> initialPosition, bool addToUndo, bool notify)
 {
-	T * i = createItem();
-	i->viewUIPosition->setPoint(initialPosition);
-	addItem(i, addToUndo, notify);
-	return i;
+	return addItem(nullptr, initialPosition, addToUndo, notify);
 }
 
 template<class T>
 T * BaseManager<T>::addItem(T * item, const Point<float> initialPosition, bool addToUndo, bool notify)
 {
+	if (item == nullptr) item = createItem();
 	item->viewUIPosition->setPoint(initialPosition);
 	addItem(item, addToUndo, notify);
 	return item;

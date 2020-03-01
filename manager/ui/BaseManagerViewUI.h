@@ -364,13 +364,13 @@ void BaseManagerViewUI<M, T, U>::updateItemsVisibility()
 template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::addItemFromMenu(bool isFromAddButton, Point<int> mouseDownPos)
 {
-	this->manager->addItem(getViewPos(mouseDownPos).toFloat());
+	addItemFromMenu(nullptr, isFromAddButton, mouseDownPos);
 }
 
 template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::addItemFromMenu(T * item, bool isFromAddButton, Point<int> mouseDownPos)
 {
-	this->manager->addItem(item, getViewPos(mouseDownPos).toFloat());
+	this->manager->addItem(item, isFromAddButton?Point<float>(0,0):getViewPos(mouseDownPos).toFloat());
 }
 
 template<class M, class T, class U>
