@@ -57,7 +57,7 @@ bool StringParameterUI::isEditing()
 void StringParameterUI::setOpaqueBackground(bool value)
 {
 	ParameterUI::setOpaqueBackground(value);
-	valueLabel.setColour(valueLabel.backgroundColourId, useCustomBGColor?customBGColor:(opaqueBackground ? (!controllable->isControllableFeedbackOnly ? BG_COLOR.darker(.1f).withAlpha(.7f):BG_COLOR.brighter(.2f)) : Colours::transparentBlack));
+	valueLabel.setColour(valueLabel.backgroundColourId, useCustomBGColor?customBGColor:(opaqueBackground ? (!controllable->isControllableFeedbackOnly ? BG_COLOR.darker(.1f).withAlpha(.7f):BG_COLOR.darker(.1f).withAlpha(.4f)) : Colours::transparentBlack));
 	valueLabel.setColour(valueLabel.outlineColourId, useCustomBGColor ? customBGColor.brighter():(opaqueBackground ? BG_COLOR.brighter(.1f):Colours::transparentWhite));
 	valueLabel.setColour(valueLabel.textColourId, useCustomTextColor ? customTextColor : (isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f)));
 	//valueLabel.setColour(valueLabel.textColourId, !controllable->isControllableFeedbackOnly ? TEXT_COLOR : TEXT_COLOR.withAlpha(.6f));

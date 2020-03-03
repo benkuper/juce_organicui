@@ -71,11 +71,11 @@ void  StringParameter::setValueInternal(var & newVal)
 	if (newVal.isArray())
 	{
 		String v = "";
-		for (int i = 0; i < newVal.size(); i++) v += (i > 0 ? " " : "") + newVal[i].toString();
+		for (int i = 0; i < newVal.size(); i++) v += (i > 0 ? " " : "") + String((float)newVal[i],3,0);
 		value = v;
 	} else
 	{
-		value = newVal.toString();
+		value = newVal.isString()?newVal.toString():String((float)newVal,3);
 	}    
 }
 bool StringParameter::checkValueIsTheSame(var oldValue, var newValue)
