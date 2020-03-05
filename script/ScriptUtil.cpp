@@ -20,7 +20,8 @@ ScriptUtil::ScriptUtil() :
 	scriptObject.setMethod("getFloatFromBytes", ScriptUtil::getFloatFromBytes);
 	scriptObject.setMethod("getInt32FromBytes", ScriptUtil::getInt32FromBytes);
 	scriptObject.setMethod("getInt64FromBytes", ScriptUtil::getInt32FromBytes);
-	scriptObject.setMethod("getObjectProperties", ScriptUtil::getObjectPropertiesNames);
+	scriptObject.setMethod("getObjectProperties", ScriptUtil::getObjectProperties);
+	scriptObject.setMethod("getObjectMethods", ScriptUtil::getObjectMethods);
 
 	scriptObject.setMethod("getIPs", ScriptUtil::getIPs);
 	scriptObject.setMethod("encodeHMAC_SHA1", ScriptUtil::encodeHMAC_SHA1);
@@ -74,15 +75,42 @@ var ScriptUtil::getInt64FromBytes(const var::NativeFunctionArgs & a)
 	return result;
 }
 
-var ScriptUtil::getObjectPropertiesNames(const var::NativeFunctionArgs& a)
+var ScriptUtil::getObjectMethods(const var::NativeFunctionArgs& a)
 {
 	if (a.numArguments == 0 || !a.arguments[0].isObject()) return var();
 
 	NamedValueSet props = a.arguments[0].getDynamicObject()->getProperties();
 	var result;
+		
 	for (auto& p : props)
 	{
-		result.append(p.name.toString());
+		if (p.value.isMethod())
+		{
+			result.append(p.name.toString());
+		}
+	}
+
+	return result;
+}
+
+
+var ScriptUtil::getObjectProperties(const var::NativeFunctionArgs& a)
+{
+	if (a.numArguments == 0 || !a.arguments[0].isObject()) return var();
+
+	NamedValueSet props = a.arguments[0].getDynamicObject()->getProperties();
+	var result;
+	
+	bool includeObjects = (a.numArguments > 1) ? (bool)a.arguments[1] : true;
+	bool includeParameters = (a.numArguments > 2) ? (bool)a.arguments[2] : true;
+		
+	for (auto& p : props)
+	{
+		if ( (includeObjects && p.value.isObject()) ||
+			 (includeParameters && !p.value.isObject() && !p.value.isMethod()) )
+		{
+			result.append(p.name.toString());
+		}
 	}
 
 	return result;
