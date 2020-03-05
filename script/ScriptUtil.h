@@ -25,8 +25,8 @@ public:
 	static var getInt32FromBytes(const var::NativeFunctionArgs &a);
 	static var getInt64FromBytes(const var::NativeFunctionArgs &a);
 
-	static var getObjectPropertiesNames(const var::NativeFunctionArgs& a);
-	
+	static var getObjectProperties(const var::NativeFunctionArgs& a);
+	static var getObjectMethods(const var::NativeFunctionArgs& a);
 
 	static var getIPs(const var::NativeFunctionArgs& a);
 
