@@ -80,9 +80,22 @@ var ScriptUtil::getObjectPropertiesNames(const var::NativeFunctionArgs& a)
 
 	NamedValueSet props = a.arguments[0].getDynamicObject()->getProperties();
 	var result;
+		
 	for (auto& p : props)
 	{
-		result.append(p.name.toString());
+		if (a.numArguments >= 2)
+		{
+			if ( (a.arguments[1].toString() == "o" && p.value.isObject() ) ||
+				 (a.arguments[1].toString() == "m" && p.value.isMethod() ) ||
+				 (a.arguments[1].toString() == "p" && !p.value.isObject() && !p.value.isMethod()) )
+			{
+				result.append(p.name.toString());
+			} 
+		}
+		else
+		{
+			result.append(p.name.toString());
+		}
 	}
 
 	return result;
