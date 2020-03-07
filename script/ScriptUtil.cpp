@@ -122,40 +122,6 @@ var ScriptUtil::getObjectProperties(const var::NativeFunctionArgs& a)
 	return result;
 }
 
-/*
-var ScriptUtil::cosFromScript(const var::NativeFunctionArgs & a)
-{
-	if (a.numArguments < 1) return 0;
-	return cosf((float)a.arguments[0]);
-}
-
-
-var ScriptUtil::sinFromScript(const var::NativeFunctionArgs & a)
-{
-	if (a.numArguments < 1) return 0;
-	return sinf((float)a.arguments[0]);
-}
-
-
-var ScriptUtil::atan2FromScript(const var::NativeFunctionArgs & a)
-{
-	if (a.numArguments < 2) return 0;
-	return atan2((double)a.arguments[0], (double)a.arguments[1]);
-}
-
-var ScriptUtil::toDegrees(const var::NativeFunctionArgs & a)
-{
-	if (a.numArguments < 1) return 0;
-	return radiansToDegrees((double)a.arguments[0]);
-}
-
-var ScriptUtil::toRadians(const var::NativeFunctionArgs & a)
-{
-	if (a.numArguments < 1) return 0;
-	return degreesToRadians((double)a.arguments[0]);
-}
-*/
-
 var ScriptUtil::getIPs(const var::NativeFunctionArgs& a)
 {
 	var result;
@@ -332,6 +298,6 @@ var ScriptUtil::getAppVersionFromScript(const var::NativeFunctionArgs&)
 
 var ScriptUtil::getEnvironmentVariableFromScript(const var::NativeFunctionArgs& a)
 {
-	if (a.numArguments == 0) return;
+	if (a.numArguments == 0) return var();
 	return SystemStats::getEnvironmentVariable(a.arguments[0], "");
 }
