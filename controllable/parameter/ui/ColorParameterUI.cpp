@@ -26,6 +26,8 @@ ColorParameterUI::~ColorParameterUI()
 
 void ColorParameterUI::paint(Graphics & g)
 {
+	if (shouldBailOut()) return;
+
 	Colour c = colorParam->getColor();
 	int size = jmin(getWidth(), getHeight()) / 2;
 	if (!c.isOpaque()) g.fillCheckerBoard(getLocalBounds().reduced(1).toFloat(), size, size, Colours::white, Colours::white.darker(.2f));
