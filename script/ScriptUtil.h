@@ -34,9 +34,14 @@ public:
 
 	static var toBase64(const var::NativeFunctionArgs& a);
 
+	static var fileExistsFromScript(const var::NativeFunctionArgs& args);
 	static var readFileFromScript(const var::NativeFunctionArgs& args);
 	static var writeFileFromScript(const var::NativeFunctionArgs& args);
+	static var directoryExistsFromScript(const var::NativeFunctionArgs& args);
 	static var createDirectoryFromScript(const var::NativeFunctionArgs& args);
 	static var launchFileFromScript(const var::NativeFunctionArgs& args);
 	static var killAppFromScript(const var::NativeFunctionArgs& args);
+	static var getOSInfosFromScript(const var::NativeFunctionArgs& args);
+	static var getAppVersionFromScript(const var::NativeFunctionArgs& args);
+	static var getEnvironmentVariableFromScript(const var::NativeFunctionArgs& args);
 };

@@ -1,4 +1,3 @@
-#include "ScriptUtil.h"
 /*
   ==============================================================================
 
@@ -11,6 +10,8 @@
 
 
 juce_ImplementSingleton(ScriptUtil)
+
+String getAppVersion();
 
 ScriptUtil::ScriptUtil() :
 	ScriptTarget("util", this)
@@ -27,11 +28,16 @@ ScriptUtil::ScriptUtil() :
 	scriptObject.setMethod("encodeHMAC_SHA1", ScriptUtil::encodeHMAC_SHA1);
 	scriptObject.setMethod("toBase64", ScriptUtil::toBase64);
 
+	scriptObject.setMethod("fileExists", ScriptUtil::fileExistsFromScript);
 	scriptObject.setMethod("readFile", ScriptUtil::readFileFromScript);
 	scriptObject.setMethod("writeFile", ScriptUtil::writeFileFromScript);
+	scriptObject.setMethod("directoryExists", ScriptUtil::directoryExistsFromScript);
 	scriptObject.setMethod("createDirectory", ScriptUtil::createDirectoryFromScript);
 	scriptObject.setMethod("launchFile", ScriptUtil::launchFileFromScript);
 	scriptObject.setMethod("killApp", ScriptUtil::killAppFromScript);
+	scriptObject.setMethod("getOSInfos", ScriptUtil::getOSInfosFromScript);
+	scriptObject.setMethod("getAppVersion", ScriptUtil::getAppVersionFromScript);
+	scriptObject.setMethod("getEnvironmentVariable", ScriptUtil::getEnvironmentVariableFromScript);
 }
 
 var ScriptUtil::getTime(const var::NativeFunctionArgs &)
@@ -188,6 +194,12 @@ var ScriptUtil::toBase64(const var::NativeFunctionArgs& a)
 	return Base64::toBase64(a.arguments[0].toString());
 }
 
+var ScriptUtil::fileExistsFromScript(const var::NativeFunctionArgs& args)
+{
+	if (args.numArguments == 0) return false;
+	return File(args.arguments[0]).existsAsFile();
+}
+
 var ScriptUtil::readFileFromScript(const var::NativeFunctionArgs& args)
 {
 	String path = args.arguments[0].toString();
@@ -238,6 +250,13 @@ var ScriptUtil::writeFileFromScript(const var::NativeFunctionArgs& args)
 	}
 
 	return fs.writeText(args.arguments[1].toString(), false, false, "\n");
+}
+
+var ScriptUtil::directoryExistsFromScript(const var::NativeFunctionArgs& args)
+{
+	if (args.numArguments == 0) return false;
+	File f(args.arguments[0]);
+	return f.exists() && f.isDirectory();
 }
 
 var ScriptUtil::createDirectoryFromScript(const var::NativeFunctionArgs& args)
@@ -292,4 +311,27 @@ var ScriptUtil::killAppFromScript(const var::NativeFunctionArgs& args)
 	if (result != 0) LOGWARNING("Problem killing app " + appName);
 #endif
 	return var();
+}
+
+var ScriptUtil::getOSInfosFromScript(const var::NativeFunctionArgs&)
+{
+	DynamicObject* result = new DynamicObject();
+	result->setProperty("name", SystemStats::getOperatingSystemName());
+	result->setProperty("type", SystemStats::getOperatingSystemType());
+	result->setProperty("computerName", SystemStats::getComputerName());
+	result->setProperty("language", SystemStats::getUserLanguage());
+	result->setProperty("username", SystemStats::getFullUserName());
+
+	return var(result);
+}
+
+var ScriptUtil::getAppVersionFromScript(const var::NativeFunctionArgs&)
+{
+	return getAppVersion();
+}
+
+var ScriptUtil::getEnvironmentVariableFromScript(const var::NativeFunctionArgs& a)
+{
+	if (a.numArguments == 0) return;
+	return SystemStats::getEnvironmentVariable(a.arguments[0], "");
 }
