@@ -60,6 +60,7 @@ public:
 	
 	static var getValueDataFromScript(const juce::var::NativeFunctionArgs& a);
 	static var addOptionFromScript(const juce::var::NativeFunctionArgs &a);
+	static var removeOptionsFromScript(const juce::var::NativeFunctionArgs &a);
 
 
 	EnumParameterUI * createUI(EnumParameter * target = nullptr);
