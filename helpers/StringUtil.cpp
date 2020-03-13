@@ -1,3 +1,4 @@
+#include "StringUtil.h"
 /*
  ==============================================================================
 
@@ -93,4 +94,41 @@ CommandLineElements StringUtil::parseCommandLine(const String& commandLine) {
 	}
 	return res;
 
-};
+}
+
+#pragma warning (push)
+#pragma warning(disable:4244)
+String StringUtil::valueToTimeString(float timeVal)
+{
+	int hours = floor(timeVal / 3600);
+	int minutes = floor(fmodf(timeVal, 3600) / 60);
+	float seconds = fmodf(timeVal, 60);
+	return String::formatted("%02i:%02i:%06.3f", hours, minutes, seconds);
+}
+
+float StringUtil::timeStringToValue(String str)
+{
+	StringArray sa;
+	str = str.retainCharacters("0123456789.:;,");
+	if (str.endsWithChar(':')) str += "0";
+	sa.addTokens(str.replace(",", "."), ":", "");
+
+	float value = 0;
+
+	value += sa.strings[sa.strings.size() - 1].getFloatValue();
+
+	if (sa.strings.size() >= 2)
+	{
+		int numMinutes = sa.strings[sa.strings.size() - 2].getIntValue() * 60;
+		value += numMinutes;
+		if (sa.strings.size() >= 3)
+		{
+			int numHours = sa.strings[sa.strings.size() - 3].getFloatValue() * 3600;
+			value += numHours;
+		}
+	}
+
+	return value;
+}
+
+

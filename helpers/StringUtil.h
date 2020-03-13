@@ -60,4 +60,8 @@ class StringUtil
 public:
 	static String toShortName(const String& niceName, bool replaceSlashes = false);
 	static CommandLineElements parseCommandLine(const String& commandLine);
+
+
+	static String valueToTimeString(float val);
+	static float timeStringToValue(String str);
 };
