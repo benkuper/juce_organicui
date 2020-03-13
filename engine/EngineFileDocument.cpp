@@ -235,6 +235,12 @@ var Engine::getJSONData()
 	if (!dData.isVoid() && dData.getDynamicObject()->getProperties().size() > 0) data.getDynamicObject()->setProperty("dashboardManager", dData);
 
 
+	if (ProjectSettings::getInstance()->saveLayoutReference->boolValue())
+	{
+		var layoutData = ShapeShifterManager::getInstance()->getCurrentLayout();
+		if (!layoutData.isVoid()) data.getDynamicObject()->setProperty("layout", layoutData);
+	}
+	
 	return data;
 }
 
@@ -344,6 +350,8 @@ void Engine::loadJSONData(var data, ProgressTask * loadingTask)
 	ProgressTask * projectTask = loadingTask->addTask("Project Settings");
 	ProgressTask * dashboardTask = loadingTask->addTask("Dashboard");
 
+
+	if (d->hasProperty("layout")) ShapeShifterManager::getInstance()->loadLayout(d->getProperty("layout"));
 
 	projectTask->start();
 	if (d->hasProperty("projectSettings")) ProjectSettings::getInstance()->loadJSONData(d->getProperty("projectSettings"));
