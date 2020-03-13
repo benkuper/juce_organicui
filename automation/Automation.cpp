@@ -200,7 +200,7 @@ AutomationKey * Automation::createItem()
 	return k;
 }
 
-void Automation::addItems(Array<Point<float>> keys, bool removeExistingOverlappingKeys, bool addToUndo, bool autoSmoothCurve)
+void Automation::addItems(Array<Point<float>> keys, bool removeExistingOverlappingKeys, bool addToUndo, Easing::Type defaultEasing)
 {
 	if(selectionManager != nullptr) selectionManager->setEnabled(false);
 
@@ -219,7 +219,7 @@ void Automation::addItems(Array<Point<float>> keys, bool removeExistingOverlappi
 		ak->setNiceName("Key " + String(autoIndex));
 		ak->position->setValue(k.x);
 		ak->value->setValue(k.y);
-		if (autoSmoothCurve) ak->setEasing(Easing::BEZIER);
+		ak->setEasing(defaultEasing);
 		newKeys.add(ak);
 
 		autoIndex++;

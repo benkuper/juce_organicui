@@ -19,11 +19,7 @@ AutomationKey::AutomationKey(float minimumValue, float maximumValue) :
 	value = addFloatParameter("Value", "Value of the key", 0, minimumValue, maximumValue);
 
 	easingType = addEnumParameter("EasingType", "Type of transition to the next key");
-
-	easingType->addOption("Linear", Easing::LINEAR);
-	easingType->addOption("Bezier", Easing::BEZIER);
-	easingType->addOption("Hold", Easing::HOLD);
-	easingType->addOption("Sine", Easing::SINE);
+	for (int i = 0; i < Easing::TYPE_MAX; i++) easingType->addOption(Easing::typeNames[i], (Easing::Type)i);
 
 	easingType->setValueWithData(Easing::LINEAR);
 	easingType->hideInEditor = true;
@@ -67,6 +63,9 @@ void AutomationKey::setEasing(Easing::Type t)
 
 	case Easing::SINE:
 		e = new  SineEasing();
+		break;
+
+	default:
 		break;
 	}
 
