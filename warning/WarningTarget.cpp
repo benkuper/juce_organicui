@@ -1,10 +1,9 @@
 #include "WarningTarget.h"
 
 WarningTarget::WarningTarget() :
-	warningResolveInspectable(nullptr),
 	showWarningInUI(false),
+    warningResolveInspectable(nullptr),
     warningTargetNotifier(10)
-
 {
 }
 

@@ -23,8 +23,8 @@ OrganicApplication::OrganicApplication(const String &appName, bool useWindow, co
 	appSettings("Other Settings"),
 	engine(nullptr),
 	mainComponent(nullptr),
-	trayIconImage(trayIcon),
-	useWindow(useWindow)
+	useWindow(useWindow),
+    trayIconImage(trayIcon)
 {
 	PropertiesFile::Options options;
 	options.applicationName = appName;

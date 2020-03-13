@@ -8,7 +8,7 @@
   ==============================================================================
 */
 
-CommentUI::CommentUI(Comment * comment) :
+CommentUI::CommentUI(CommentItem * comment) :
 	BaseItemMinimalUI(comment)
 {
 	int size = Font(item->size->floatValue()).getStringWidth(item->text->stringValue());

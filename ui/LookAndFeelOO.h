@@ -11,9 +11,8 @@
 #pragma once
 #pragma warning( disable : 4505 )
 
-//keep
 using namespace juce;
-
+//keep
 namespace LookAndFeelHelpers {
 
 
@@ -207,7 +206,7 @@ public:
     LookAndFeelOO();
     ~LookAndFeelOO();
     //==============================================================================
-    void drawButtonBackground (Graphics&, Button&, const Colour& backgroundColour,
+    void drawButtonBackground (Graphics&, juce::Button&, const Colour& backgroundColour,
                                bool isMouseOverButton, bool isButtonDown) override;
     Font getTextButtonFont (TextButton&, int buttonHeight) override;
 
@@ -218,7 +217,7 @@ public:
 
     void changeToggleButtonWidthToFitText (ToggleButton&) override;
 
-    void drawTickBox (Graphics&, Component&,
+    void drawTickBox (Graphics&, juce::Component&,
                       float x, float y, float w, float h,
                       bool ticked, bool isEnabled, bool isMouseOverButton, bool isButtonDown) override;
 
@@ -230,7 +229,7 @@ public:
                                     const String& button2,
                                     const String& button3,
                                     AlertWindow::AlertIconType iconType,
-                                    int numButtons, Component* associatedComponent) override;
+                                    int numButtons, juce::Component* associatedComponent) override;
 
     void drawAlertBox (Graphics&, AlertWindow&, const juce::Rectangle<int>& textArea, TextLayout&) override;
     int getAlertBoxWindowFlags() override;
@@ -298,7 +297,7 @@ public:
     //==============================================================================
     void fillTextEditorBackground (Graphics&, int width, int height, TextEditor&) override;
     void drawTextEditorOutline (Graphics&, int width, int height, TextEditor&) override;
-    CaretComponent* createCaretComponent (Component* keyFocusOwner) override;
+    CaretComponent* createCaretComponent (juce::Component* keyFocusOwner) override;
 
 
     AttributedString createFileChooserHeaderText (const String& title, const String& instructions) override;
@@ -306,23 +305,23 @@ public:
 	// Inherited via LookAndFeel
 	virtual void drawFileBrowserRow(Graphics &, int width, int height, const File & file, const String & filename, Image * optionalIcon, const String & fileSizeDescription, const String & fileTimeDescription, bool isDirectory, bool isItemSelected, int itemIndex, DirectoryContentsDisplayComponent &) override;
 
-	Button* createFileBrowserGoUpButton() override;
+    juce::Button* createFileBrowserGoUpButton() override;
 
     void layoutFileBrowserComponent (FileBrowserComponent&,
                                      DirectoryContentsDisplayComponent*,
                                      FilePreviewComponent*,
                                      ComboBox* currentPathBox,
                                      TextEditor* filenameBox,
-                                     Button* goUpButton) override;
+                                     juce::Button* goUpButton) override;
 
     //==============================================================================
     void drawBubble (Graphics&, BubbleComponent&, const Point<float>& tip, const juce::Rectangle<float>& body) override;
 
-    void drawLasso (Graphics&, Component&) override;
+    void drawLasso (Graphics&, juce::Component&) override;
 
     //==============================================================================
 
-	void preparePopupMenuWindow (Component& newWindow) override ;
+    void preparePopupMenuWindow (juce::Component& newWindow) override ;
     void drawPopupMenuBackground (Graphics&, int width, int height) override;
 
     void drawPopupMenuItem (Graphics&, const juce::Rectangle<int>& area,
@@ -351,7 +350,7 @@ public:
                           bool isMouseOverItem, bool isMenuOpen, bool isMouseOverBar,
                           MenuBarComponent&) override;
 
-	Component* getParentComponentForMenuOptions (const PopupMenu::Options& options) override;
+    juce::Component* getParentComponentForMenuOptions (const PopupMenu::Options& options) override;
     //==============================================================================
     void drawComboBox (Graphics&, int width, int height, bool isButtonDown,
                        int buttonX, int buttonY, int buttonW, int buttonH,
@@ -382,7 +381,7 @@ public:
                            Slider&) override;
 
     int getSliderThumbRadius (Slider&) override;
-    Button* createSliderButton (Slider&, bool isIncrement) override;
+    juce::Button* createSliderButton (Slider&, bool isIncrement) override;
     Label* createSliderTextBox (Slider&) override;
     ImageEffectFilter* getSliderEffect (Slider&) override;
     Font getSliderPopupFont (Slider&) override;
@@ -394,13 +393,13 @@ public:
     void drawTooltip (Graphics&, const String& text, int width, int height) override;
 
     //==============================================================================
-    Button* createFilenameComponentBrowseButton (const String& text) override;
-    void layoutFilenameComponent (FilenameComponent&, ComboBox* filenameBox, Button* browseButton) override;
+    juce::Button* createFilenameComponentBrowseButton (const String& text) override;
+    void layoutFilenameComponent (FilenameComponent&, ComboBox* filenameBox, juce::Button* browseButton) override;
 
     //==============================================================================
     void drawConcertinaPanelHeader (Graphics&, const juce::Rectangle<int>& area,
                                     bool isMouseOver, bool isMouseDown,
-                                    ConcertinaPanel&, Component& panel) override;
+                                    ConcertinaPanel&, juce::Component& panel) override;
 
     //==============================================================================
     void drawCornerResizer (Graphics&, int w, int h, bool isMouseOver, bool isMouseDragging) override;
@@ -415,17 +414,17 @@ public:
                                      int titleSpaceX, int titleSpaceW,
                                      const Image* icon, bool drawTitleTextOnLeft) override;
 
-    Button* createDocumentWindowButton (int buttonType) override;
+    juce::Button* createDocumentWindowButton (int buttonType) override;
 
     void positionDocumentWindowButtons (DocumentWindow&,
                                         int titleBarX, int titleBarY, int titleBarW, int titleBarH,
-                                        Button* minimiseButton,
-                                        Button* maximiseButton,
-                                        Button* closeButton,
+                                        juce::Button* minimiseButton,
+                                        juce::Button* maximiseButton,
+                                        juce::Button* closeButton,
                                         bool positionTitleBarButtonsOnLeft) override;
 
     //==============================================================================
-    DropShadower* createDropShadowerForComponent (Component*) override;
+    DropShadower* createDropShadowerForComponent (juce::Component*) override;
 
     //==============================================================================
     void drawStretchableLayoutResizerBar (Graphics&, int w, int h, bool isVerticalBar,
@@ -439,7 +438,7 @@ public:
     int getTabButtonSpaceAroundImage() override;
     int getTabButtonOverlap (int tabDepth) override;
     int getTabButtonBestWidth (TabBarButton&, int tabDepth) override;
-    juce::Rectangle<int> getTabButtonExtraComponentBounds (const TabBarButton&, juce::Rectangle<int>& textArea, Component& extraComp) override;
+    juce::Rectangle<int> getTabButtonExtraComponentBounds (const TabBarButton&, juce::Rectangle<int>& textArea, juce::Component& extraComp) override;
 
     void drawTabButton (TabBarButton&, Graphics&, bool isMouseOver, bool isMouseDown) override;
     void drawTabButtonText (TabBarButton&, Graphics&, bool isMouseOver, bool isMouseDown) override;
@@ -449,7 +448,7 @@ public:
     void createTabButtonShape (TabBarButton&, Path&,  bool isMouseOver, bool isMouseDown) override;
     void fillTabButtonShape (TabBarButton&, Graphics&, const Path&, bool isMouseOver, bool isMouseDown) override;
 
-    Button* createTabBarExtrasButton() override;
+    juce::Button* createTabBarExtrasButton() override;
 
     //==============================================================================
     void drawImageButton (Graphics&, Image*,
@@ -465,7 +464,7 @@ public:
     //==============================================================================
     void paintToolbarBackground (Graphics&, int width, int height, Toolbar&) override;
 
-    Button* createToolbarMissingItemsButton (Toolbar&) override;
+    juce::Button* createToolbarMissingItemsButton (Toolbar&) override;
 
     void paintToolbarButtonBackground (Graphics&, int width, int height,
                                        bool isMouseOver, bool isMouseDown,
@@ -487,7 +486,7 @@ public:
     //==============================================================================
     void drawLevelMeter (Graphics&, int width, int height, float level) override;
 
-    void drawKeymapChangeButton (Graphics&, int width, int height, Button&, const String& keyDescription) override;
+    void drawKeymapChangeButton (Graphics&, int width, int height, juce::Button&, const String& keyDescription) override;
 
     //==============================================================================
     /** Draws a 3D raised (or indented) bevel using two colours.

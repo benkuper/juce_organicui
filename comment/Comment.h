@@ -10,12 +10,12 @@
 
 #pragma once
 
-class Comment :
+class CommentItem :
 	public BaseItem
 {
 public:
-	Comment();
-	~Comment();
+	CommentItem();
+	~CommentItem();
 
 	StringParameter * text;
 	FloatParameter * size;

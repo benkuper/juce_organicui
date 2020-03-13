@@ -11,11 +11,11 @@
 #pragma once
 
 class CommentUI :
-	public BaseItemMinimalUI<Comment>,
+	public BaseItemMinimalUI<CommentItem>,
 	public Label::Listener
 {
 public:
-	CommentUI(Comment * comment);
+	CommentUI(CommentItem * comment);
 	~CommentUI();
 
 	Label textUI;

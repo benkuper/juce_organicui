@@ -15,7 +15,7 @@ ParameterAutomation::ParameterAutomation(Parameter* _parameter) :
 	timeParamRef(nullptr),
 	lengthParamRef(nullptr),
     valueParamRef(nullptr),
-    automationContainer(automationContainer),
+    automationContainer(nullptr),
     manualMode(true),
     valueIsNormalized(false),
     parameter(_parameter),
