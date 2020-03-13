@@ -1,16 +1,18 @@
 /*
   ==============================================================================
 
-    Easing.cpp
-    Created: 11 Dec 2016 1:29:02pm
-    Author:  Ben
+	Easing.cpp
+	Created: 11 Dec 2016 1:29:02pm
+	Author:  Ben
 
   ==============================================================================
 */
 
+const String Easing::typeNames[Easing::TYPE_MAX] = { "Linear", "Bezier", "Hold", "Sine" };
+
 Easing::Easing(Type _type) :
-ControllableContainer("ease"),
-type(_type)
+	ControllableContainer("ease"),
+	type(_type)
 {
 	//showInspectorOnSelect = false;
 
@@ -27,31 +29,31 @@ LinearEasing::LinearEasing() : Easing(LINEAR) {}
 HoldEasing::HoldEasing() : Easing(HOLD) {}
 
 
-EasingUI * LinearEasing::createUI()
+EasingUI* LinearEasing::createUI()
 {
 	return new LinearEasingUI(this);
 }
 
 
-EasingUI * HoldEasing::createUI()
+EasingUI* HoldEasing::createUI()
 {
 	return new HoldEasingUI(this);
 }
 
-EasingUI * CubicEasing::createUI()
+EasingUI* CubicEasing::createUI()
 {
 	return new CubicEasingUI(this);
 }
 
 
-float LinearEasing::getValue(const float & start, const float & end, const float & weight)
+float LinearEasing::getValue(const float& start, const float& end, const float& weight)
 {
-	return start + (end - start)*weight;
+	return start + (end - start) * weight;
 }
 
 
 
-float HoldEasing::getValue(const float & start, const float & end, const float & weight)
+float HoldEasing::getValue(const float& start, const float& end, const float& weight)
 {
 	if (weight >= 1) return end;
 	return start;
@@ -66,7 +68,7 @@ CubicEasing::CubicEasing() :
 
 	anchor1->setBounds(0, -1, .99f, 2);
 	anchor2->setBounds(.01f, -1, 1, 2);
-	
+
 	anchor1->setPoint(.5f, 0);
 	anchor2->setPoint(.5f, 1);
 
@@ -74,18 +76,18 @@ CubicEasing::CubicEasing() :
 }
 
 
-void CubicEasing::onContainerParameterChanged(Parameter * p)
+void CubicEasing::onContainerParameterChanged(Parameter* p)
 {
-	if(p == anchor1 || p == anchor2) bezier.setup(anchor1->getPoint(), anchor2->getPoint());
+	if (p == anchor1 || p == anchor2) bezier.setup(anchor1->getPoint(), anchor2->getPoint());
 }
 
 
-float CubicEasing::getValue(const float & start, const float & end, const float & weight)
+float CubicEasing::getValue(const float& start, const float& end, const float& weight)
 {
 	if (weight <= 0) return start;
 	if (weight >= 1) return end;
 
-	float val =  bezier.getValueForX(weight);
+	float val = bezier.getValueForX(weight);
 	return jmap<float>(val, start, end);
 }
 
@@ -108,12 +110,12 @@ inline float CubicEasing::Bezier::sampleCurveDerivativeX(float t) {
 	return (3 * a.x * t + 2 * b.x) * t + c.x;
 }
 
-float CubicEasing::Bezier::getValueForX(const float & tx)
+float CubicEasing::Bezier::getValueForX(const float& tx)
 {
 	return sampleCurveY(solveCurveX(tx));
 }
 
-float CubicEasing::Bezier::solveCurveX(const float & tx)
+float CubicEasing::Bezier::solveCurveX(const float& tx)
 {
 	float t0;
 	float t1;
@@ -143,7 +145,7 @@ float CubicEasing::Bezier::solveCurveX(const float & tx)
 
 	while (t0 < t1) {
 		x2 = sampleCurveX(t2);
-        if (std::abs(x2 - tx) < epsilon)
+		if (std::abs(x2 - tx) < epsilon)
 			return t2;
 		if (tx > x2) t0 = t2;
 		else t1 = t2;
@@ -163,14 +165,14 @@ SineEasing::SineEasing() :
 	freqAmp->setPoint(.2f, .5f);
 }
 
-float SineEasing::getValue(const float & start, const float & end, const float & weight)
+float SineEasing::getValue(const float& start, const float& end, const float& weight)
 {
 	//DBG(freqAmp->getPoint().toString() << " / " << sinf(weight / freqAmp->x));
-	return start + (end - start)*weight + sinf(weight*float_Pi*2/freqAmp->x)*freqAmp->y;
+	return start + (end - start) * weight + sinf(weight * float_Pi * 2 / freqAmp->x) * freqAmp->y;
 }
 
 
-EasingUI * SineEasing::createUI()
+EasingUI* SineEasing::createUI()
 {
 	return new SineEasingUI(this);
 }

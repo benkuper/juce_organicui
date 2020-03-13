@@ -21,8 +21,9 @@ AutomationRecorder::AutomationRecorder() :
 	//arm->setEnabled(input->target != nullptr);
 	//arm->enabled = input->target != nullptr;
 	autoDisarm = addBoolParameter("Auto Disarm", "If set, the arm parameter will be automatically set to off when a record has been saved", false);
-
 	simplificationFactor = addFloatParameter("Simplification", "Level of simplification after recording", .5f, 0, 1);
+	defaultEasing = addEnumParameter("Default Easing", "This is the interpolation that will be assigned to the keys once the recording is finished");
+	for (int i = 0; i < Easing::TYPE_MAX; i++) defaultEasing->addOption(Easing::typeNames[i], (Easing::Type)i);
 
 	isRecording = addBoolParameter("Is Recording", "Is the recorder currently recording or eating pasta", false);
 	isRecording->isControllableFeedbackOnly = true;

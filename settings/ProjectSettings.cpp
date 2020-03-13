@@ -22,6 +22,8 @@ ProjectSettings::ProjectSettings() :
 	showDashboardOnStartup->canBeDisabledByUser = true;
 	showDashboardOnStartup->maxDefaultSearchLevel = 0;
 
+	saveLayoutReference = addBoolParameter("Save Layout in file", "If checked, this will save the layout in the .noisette file", true);
+
 }
 
 ProjectSettings::~ProjectSettings()

@@ -20,7 +20,7 @@ public:
 
 	BoolParameter* fullScreenOnStartup;
 	TargetParameter* showDashboardOnStartup;
-
+	BoolParameter* saveLayoutReference;
 
 	void reset();
 };
