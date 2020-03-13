@@ -12,8 +12,8 @@
 FileParameter::FileParameter(const String & niceName, const String &description, const String & initialValue, bool enabled) :
     StringParameter(niceName, description, initialValue, enabled),
 	customBasePath(""),
-	forceAbsolutePath(false),
 	directoryMode(false),
+    forceAbsolutePath(false),
 	forceRelativePath(false)
 {
 	defaultUI = FILE; 

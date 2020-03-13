@@ -24,10 +24,10 @@ public:
     bool directoryMode;
 
 	bool forceAbsolutePath;
-
+    bool forceRelativePath;
+    
     // need to override this function because var Strings comparison  is based on pointer (we need full string comp)
     virtual void setValueInternal(var&) override;
-	bool forceRelativePath;
 	
 	void setForceRelativePath(bool value);
 

@@ -8,7 +8,7 @@
   ==============================================================================
 */
 
-Comment::Comment() :
+CommentItem::CommentItem() :
 	BaseItem("Comment",false)
 {
 	itemDataType = "Comment";
@@ -22,6 +22,6 @@ Comment::Comment() :
 	bgAlpha = addFloatParameter("Background Alpha", "The alpha", 0, 0, 1);
 }
 
-Comment::~Comment()
+CommentItem::~CommentItem()
 {
 }
