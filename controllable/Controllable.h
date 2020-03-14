@@ -20,20 +20,8 @@ class Controllable :
 	public DashboardItemTarget
 {
 public:
-	enum Type { //Add type here if creating new type of Controllable
-		CUSTOM,
-		TRIGGER,
-		FLOAT,
-		INT,
-		BOOL,
-		STRING,
-		ENUM,
-		POINT2D,
-		POINT3D,
-		TARGET,
-		COLOR
-	};
-
+	enum Type { CUSTOM,TRIGGER,FLOAT,INT,BOOL,STRING,ENUM,POINT2D,POINT3D,TARGET,COLOR, TYPE_MAX};
+	static const Array<String> typeNames;
 	
 	Controllable(const Type &type, const String &niceName, const String &description, bool enabled = true);
 	virtual ~Controllable();

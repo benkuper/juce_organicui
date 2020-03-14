@@ -8,6 +8,20 @@
   ==============================================================================
 */
 
+const Array<String> Controllable::typeNames = { 
+	"Custom", 
+	Trigger::getTypeStringStatic(),
+	FloatParameter::getTypeStringStatic(),
+	IntParameter::getTypeStringStatic(),
+	BoolParameter::getTypeStringStatic(),
+	StringParameter::getTypeStringStatic(),
+	EnumParameter::getTypeStringStatic(),
+	Point2DParameter::getTypeStringStatic(),
+	Point3DParameter::getTypeStringStatic(),
+	TargetParameter::getTypeStringStatic(),
+	ColorParameter::getTypeStringStatic()
+};
+
 Controllable::Controllable(const Type &type, const String & niceName, const String &description, bool enabled) :
 	ScriptTarget("", this),
 	type(type),
