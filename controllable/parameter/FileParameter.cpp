@@ -21,6 +21,7 @@ FileParameter::FileParameter(const String & niceName, const String &description,
 	scriptObject.setMethod("readFile", FileParameter::readFileFromScript);
 	scriptObject.setMethod("writeFile", FileParameter::writeFileFromScript);
 	scriptObject.setMethod("getAbsolutePath", FileParameter::getAbsolutePathFromScript);
+	scriptObject.setMethod("launchFile", FileParameter::launchFileFromScript);
 
 	if(Engine::mainEngine != nullptr) Engine::mainEngine->addEngineListener(this);
 }
@@ -151,4 +152,13 @@ var FileParameter::getAbsolutePathFromScript(const juce::var::NativeFunctionArgs
 {
 	return getObjectFromJS<FileParameter>(a)->getAbsolutePath();
 
+}
+
+var FileParameter::launchFileFromScript(const juce::var::NativeFunctionArgs& a)
+{
+	FileParameter* p = getObjectFromJS<FileParameter>(a);
+	File f = p->getFile();
+
+	if (f.existsAsFile()) f.startAsProcess(a.numArguments > 0 ? a.arguments[0].toString() : "");
+	return var();
 }
