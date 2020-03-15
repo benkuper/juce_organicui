@@ -226,16 +226,19 @@ void BaseItemMinimalUI<T>::mouseDown(const MouseEvent& e)
 {
 	InspectableContentComponent::mouseDown(e);
 	
-	PopupMenu p;
-	addContextMenuItems(p);
+	if (e.mods.isRightButtonDown())
+	{
+		PopupMenu p;
+		addContextMenuItems(p);
 
-	if (p.getNumItems() == 0) return;
+		if (p.getNumItems() == 0) return;
 
-	int result = p.show();
+		int result = p.show();
 
-	if (result == 0) return;
+		if (result == 0) return;
 
-	handleContextMenuResult(result);
+		handleContextMenuResult(result);
+	}
 }
 
 template<class T>
