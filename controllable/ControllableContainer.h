@@ -53,6 +53,7 @@ public:
 	bool includeTriggersInSaveLoad;
 	bool isCurrentlyLoadingData;
 	bool notifyStructureChangeWhenLoadingData;
+	bool canBeCopiedAndPasted;
 
 	//Script
 	bool includeInScriptObject;

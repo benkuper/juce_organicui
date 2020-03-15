@@ -28,6 +28,7 @@ ControllableContainer::ControllableContainer(const String& niceName) :
 	includeTriggersInSaveLoad(false),
 	isCurrentlyLoadingData(false),
 	notifyStructureChangeWhenLoadingData(true),
+	canBeCopiedAndPasted(false),
 	includeInScriptObject(true),
 	parentContainer(nullptr),
 	queuedNotifier(500) //what to put in max size ??

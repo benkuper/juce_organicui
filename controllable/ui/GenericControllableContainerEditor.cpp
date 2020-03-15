@@ -140,7 +140,13 @@ void GenericControllableContainerEditor::setDragAndDropEnabled(bool value)
 void GenericControllableContainerEditor::showContextMenu()
 {
 	PopupMenu p;
-	p.addItem(-1, "Toggle childrens");
+	p.addItem(1, "Toggle childrens");
+	if (container->canBeCopiedAndPasted)
+	{
+		p.addItem(2, "Copy");
+		p.addItem(3, "Paste (replace data)");
+	}
+
 	addPopupMenuItems(&p);
 
 	p.addSeparator();
@@ -156,8 +162,8 @@ void GenericControllableContainerEditor::showContextMenu()
 
 	p.addSeparator();
 
-	p.addItem(-2, "Copy OSC Control Address");
-	p.addItem(-3, "Copy Script Control Address");
+	p.addItem(-1000, "Copy OSC Control Address");
+	p.addItem(-1001, "Copy Script Control Address");
 
 	int result = p.show();
 
@@ -165,14 +171,22 @@ void GenericControllableContainerEditor::showContextMenu()
 	{
 		switch (result)
 		{
-		case -1:
+		case 1:
 			toggleCollapsedChildren();
 			break;
 
-		case -2:
+		case 2:
+			SystemClipboard::copyTextToClipboard(JSON::toString(container->getJSONData()));
+			break;
+		
+		case 3:
+			container->loadJSONData(JSON::fromString(SystemClipboard::getTextFromClipboard()));
+			break;
+
+		case -1000:
 			SystemClipboard::copyTextToClipboard(container->getControlAddress());
 			break;
-		case -3:
+		case -10001:
 			SystemClipboard::copyTextToClipboard("root" + container->getControlAddress().replaceCharacter('/', '.'));
 			break;
 
