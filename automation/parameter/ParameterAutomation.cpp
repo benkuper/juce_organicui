@@ -23,6 +23,7 @@ ParameterAutomation::ParameterAutomation(Parameter* _parameter) :
 {
 	isSelectable = false;
 	parameter->setControllableFeedbackOnly(true);
+	setManualMode(false);
 }
 
 ParameterAutomation::~ParameterAutomation()
