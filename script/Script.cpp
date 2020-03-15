@@ -303,22 +303,25 @@ void Script::timerCallback()
 
 void Script::run()
 {
-	float lastUpdateTime = (float)Time::getMillisecondCounter() / 1000.f;
-	
+	double millisAtLastUpdate = Time::getMillisecondCounterHiRes();
+
 	while (!Engine::mainEngine->isClearing && !threadShouldExit() && state == ScriptState::SCRIPT_LOADED && updateEnabled)
 	{
-		sleep(1000 / updateRate->floatValue());
-
-		float curTime = (float)Time::getMillisecondCounter() / 1000.f;
-		float deltaTime = curTime - lastUpdateTime;
-		lastUpdateTime = curTime;
+		double nowMillis = Time::getMillisecondCounterHiRes();
+		double deltaMillis = nowMillis - millisAtLastUpdate;
+		millisAtLastUpdate = nowMillis;
 
 		Array<var> args;
-		args.add(deltaTime);
+		args.add(deltaMillis/1000.0);
 
 		Result r = Result::ok();
 		callFunction(updateIdentifier, args, &r);
 		if (r != Result::ok()) return;
+
+		double afterProcessMillis = Time::getMillisecondCounterHiRes();
+		double processTime = afterProcessMillis - nowMillis;
+
+		sleep(jmax<int>((1000.0 / updateRate->floatValue()) - processTime, 0));
 	}
 }
 
