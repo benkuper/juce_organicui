@@ -36,7 +36,7 @@ ParameterUI::~ParameterUI()
 
 void ParameterUI::showEditWindowInternal()
 {
-	if (parameter->isControllableFeedbackOnly) return;
+	//if (parameter->isControllableFeedbackOnly) return;
 
 	Component * editComponent(getEditValueComponent());
 	CallOutBox * box = &CallOutBox::launchAsynchronously(editComponent, localAreaToGlobal(getLocalBounds()), nullptr);
