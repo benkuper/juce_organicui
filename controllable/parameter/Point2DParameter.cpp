@@ -69,7 +69,6 @@ void Point2DParameter::setValueInternal(var & _value)
 {
 	if (!_value.isArray()) return;
 
-	valueSetLock.enter();
 
 	bool hasChanged = false;
 	if (autoAdaptRange)
@@ -95,7 +94,6 @@ void Point2DParameter::setValueInternal(var & _value)
 	value.append(x);
 	value.append(y);
 
-	valueSetLock.exit();
 
 	if (hasChanged) setRange(minimumValue, maximumValue);
 
@@ -159,9 +157,7 @@ bool Point2DParameter::checkValueIsTheSame(var newValue, var oldValue)
 	if (!(newValue.isArray() && oldValue.isArray())) return false;
 	if (newValue.size() == 0 || oldValue.size() == 0) return false;
 
-	valueSetLock.enter();
 	bool result = newValue[0] == oldValue[0] && newValue[1] == oldValue[1];
-	valueSetLock.exit();
 
 	return result;
 }

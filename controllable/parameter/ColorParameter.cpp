@@ -89,7 +89,6 @@ bool ColorParameter::checkValueIsTheSame(var oldValue, var newValue)
 	if (!(newValue.isArray() && oldValue.isArray())) return false;
 	if (newValue.size() != 4 || oldValue.size() != 4) return false;
 
-	GenericScopedLock lock(valueSetLock);
 	bool result = newValue[0] == oldValue[0] && newValue[1] == oldValue[1] && newValue[2] == oldValue[2] && oldValue[3] == newValue[3];
 
 	return result;

@@ -75,7 +75,6 @@ void Point3DParameter::setValueInternal(var & _value)
 {
 	if (!_value.isArray()) return;
 
-	valueSetLock.enter();
 
 	bool hasChanged = false;
 
@@ -106,8 +105,6 @@ void Point3DParameter::setValueInternal(var & _value)
 	value.append(x);
 	value.append(y);
 	value.append(z);
-
-	valueSetLock.exit();
 
 	if (hasChanged) setRange(minimumValue, maximumValue, false);
 }
@@ -168,9 +165,7 @@ bool Point3DParameter::checkValueIsTheSame(var newValue, var oldValue)
 {
 	if (!(newValue.isArray() && oldValue.isArray())) return false;
 	
-	valueSetLock.enter();
 	bool result = newValue[0] == oldValue[0] && newValue[1] == oldValue[1] && newValue[2] == oldValue[2];
-	valueSetLock.exit();
 
 	return result;
 }

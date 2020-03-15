@@ -151,16 +151,16 @@ UndoableAction * Parameter::setUndoableValue(var oldValue, var newValue, bool on
 
 void Parameter::setValue(var _value, bool silentSet, bool force, bool forceOverride)
 {
-	if (!alwaysNotify && !force && checkValueIsTheSame(_value, value)) return;
-	
-	valueSetLock.enter();
-	lastValue = var(value);
-	valueSetLock.exit();
+	{
+		GenericScopedLock lock(valueSetLock);
 
-	setValueInternal(_value);
+		if (!alwaysNotify && !force && checkValueIsTheSame(_value, value)) return;
 
-	isOverriden =  _value != defaultValue || forceOverride;
+		lastValue = var(value);
+		setValueInternal(_value);
+		isOverriden = _value != defaultValue || forceOverride;
 
+	}
 	if (!silentSet) notifyValueChanged();
 }
 
