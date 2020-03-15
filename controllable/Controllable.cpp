@@ -358,8 +358,15 @@ var Controllable::checkIsParameterFromScript(const juce::var::NativeFunctionArgs
 var Controllable::getParentFromScript(const juce::var::NativeFunctionArgs & a)
 {
 	Controllable * c = getObjectFromJS<Controllable>(a);
-	if (c->parentContainer == nullptr) return var();
-	else return c->parentContainer->getScriptObject();
+	int level = a.numArguments > 0 ? (int)a.arguments[0] : 1;
+	ControllableContainer* target = c->parentContainer;
+	if (target == nullptr) return var();
+	for (int i = 1; i < level; i++)
+	{
+		target = target->parentContainer;
+		if (target == nullptr) return var();
+	}
+	return target->getScriptObject();
 
 }
 

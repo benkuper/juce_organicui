@@ -1026,9 +1026,18 @@ var ControllableContainer::getChildFromScript(const var::NativeFunctionArgs& a)
 
 var ControllableContainer::getParentFromScript(const juce::var::NativeFunctionArgs& a)
 {
-	ControllableContainer* m = getObjectFromJS<ControllableContainer>(a);
-	if (m->parentContainer == nullptr) return var();
-	return m->parentContainer->getScriptObject();
+	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(a);
+
+	int level = a.numArguments > 0 ? (int)a.arguments[0] : 1;
+	ControllableContainer* target = cc->parentContainer;
+	if (target == nullptr) return var();
+	for (int i = 1; i < level; i++)
+	{
+		target = target->parentContainer;
+		if (target == nullptr) return var();
+	}
+
+	return target->getScriptObject();
 }
 
 var ControllableContainer::setNameFromScript(const juce::var::NativeFunctionArgs& a)
