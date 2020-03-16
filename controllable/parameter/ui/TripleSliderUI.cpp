@@ -1,4 +1,3 @@
-#include "TripleSliderUI.h"
 /*
   ==============================================================================
 
@@ -42,6 +41,8 @@ TripleSliderUI::TripleSliderUI(Point3DParameter* parameter) :
 	addAndMakeVisible(zSlider.get());
 
 	setInterceptsMouseClicks(true, true);
+
+	setSize(200, GlobalSettings::getInstance()->fontSize->floatValue() + 4);//default size
 
 	feedbackStateChanged(); //force update
 }

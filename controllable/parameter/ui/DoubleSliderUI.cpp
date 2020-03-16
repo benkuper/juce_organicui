@@ -1,4 +1,3 @@
-#include "DoubleSliderUI.h"
 /*
   ==============================================================================
 
@@ -35,8 +34,9 @@ DoubleSliderUI::DoubleSliderUI(Point2DParameter* parameter) :
 
 	setInterceptsMouseClicks(true, true);
 
-	feedbackStateChanged(); //force update
+	setSize(200, GlobalSettings::getInstance()->fontSize->floatValue() + 4);//default size
 
+	feedbackStateChanged(); //force update
 }
 
 DoubleSliderUI::~DoubleSliderUI()
