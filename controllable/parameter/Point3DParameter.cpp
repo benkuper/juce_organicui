@@ -75,25 +75,6 @@ void Point3DParameter::setValueInternal(var & _value)
 {
 	if (!_value.isArray()) return;
 
-
-	bool hasChanged = false;
-
-	if (autoAdaptRange)
-	{
-		for (int i = 0; i < 3; i++)
-		{
-			if ((float)_value[i] < (float)minimumValue[i]) {
-				minimumValue[i] = _value[i];
-				hasChanged = true;
-			} else if ((float)_value[i] > (float)maximumValue[i])
-			{
-				maximumValue[i] = _value[i];
-				hasChanged = true;
-			}
-		}
-
-	}
-
 	jassert(minimumValue.isArray() && maximumValue.isArray());
 	
 	x = std::isnan((float)_value[0]) ? 0 : jlimit<float>(minimumValue[0], maximumValue[0], _value[0]);
@@ -105,8 +86,6 @@ void Point3DParameter::setValueInternal(var & _value)
 	value.append(x);
 	value.append(y);
 	value.append(z);
-
-	if (hasChanged) setRange(minimumValue, maximumValue, false);
 }
 
 void Point3DParameter::setBounds(float _minX, float _minY, float _minZ, float _maxX, float _maxY, float _maxZ)

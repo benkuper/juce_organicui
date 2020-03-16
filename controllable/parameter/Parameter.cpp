@@ -24,7 +24,6 @@ Parameter::Parameter(const Type &type, const String &niceName, const String &des
     canBeAutomated(false),
     isPresettable(true),
     isOverriden(false),
-    autoAdaptRange(false),
     forceSaveValue(false),
 	queuedNotifier(100)
 {

@@ -21,9 +21,6 @@ FloatParameter::FloatParameter(const String & niceName, const String &descriptio
 
 void FloatParameter::setValueInternal(var & _value)
 {
-	if ((float)_value < (float)minimumValue && autoAdaptRange) setRange(_value, maximumValue, false);
-	else if ((float)_value > (float)maximumValue && autoAdaptRange) setRange(minimumValue, _value, false);
-	
 	if ((float)minimumValue > (float)maximumValue) return;
 	value = jlimit<float>(minimumValue, maximumValue, _value);
 }
