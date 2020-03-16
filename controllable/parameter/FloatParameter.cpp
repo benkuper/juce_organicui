@@ -115,6 +115,18 @@ void FloatParameter::setControlAutomation()
 	automation.reset(new ParameterNumberAutomation(this, !isLoadingData));
 }
 
+void FloatParameter::setAttribute(String attribute, var val)
+{
+	Parameter::setAttribute(attribute, val);
+	if (attribute == "ui")
+	{
+		if (val == "time") defaultUI = TIME;
+		else if (val == "slider") defaultUI = SLIDER;
+		else if (val == "stepper") defaultUI = STEPPER;
+		else if (val == "label") defaultUI = LABEL;
+	}
+}
+
 var FloatParameter::getJSONDataInternal()
 {
 	var data = Parameter::getJSONDataInternal();
