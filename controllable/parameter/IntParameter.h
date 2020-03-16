@@ -30,6 +30,8 @@ public:
 
 	void setControlAutomation() override;
 
+	void setAttribute(String attribute, var val) override;
+
 	var getJSONDataInternal() override;
 	void loadJSONDataInternal(var data) override;
 

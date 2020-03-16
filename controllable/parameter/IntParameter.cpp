@@ -1,3 +1,4 @@
+#include "IntParameter.h"
 /*
   ==============================================================================
 
@@ -56,6 +57,12 @@ bool IntParameter::hasRange()
 void IntParameter::setControlAutomation()
 {
 	automation.reset(new ParameterNumberAutomation(this, !isLoadingData));
+}
+
+void IntParameter::setAttribute(String attribute, var val)
+{
+	Parameter::setAttribute(attribute, val);
+	if (attribute == "hexMode") hexMode = val;
 }
 
 var IntParameter::getJSONDataInternal()
