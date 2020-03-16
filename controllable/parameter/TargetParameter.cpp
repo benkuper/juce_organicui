@@ -1,4 +1,3 @@
-#include "TargetParameter.h"
 /*
   ==============================================================================
 
@@ -246,6 +245,23 @@ void TargetParameter::inspectableDestroyed(Inspectable * i)
 		setValue("");
 		//setGhostValue(oldValue);
 	}
+}
+
+void TargetParameter::setAttribute(String param, var attributeValue)
+{
+	Parameter::setAttribute(param, attributeValue);
+	if (param == "searchLevel") maxDefaultSearchLevel = jmax<int>(attributeValue, -1);
+	else if (param == "showParameters") showParameters = (int)attributeValue > 0;
+	else if (param == "showTriggers") showTriggers = (int)attributeValue > 0;
+	else if (param == "root")
+	{
+		if (value.isObject())
+		{
+			ControllableContainer* cc = dynamic_cast<ControllableContainer*>((ControllableContainer *)(int64)attributeValue.getDynamicObject()->getProperty(scriptPtrIdentifier));
+			if (cc != nullptr) setRootContainer(cc);
+		}
+	}
+	else if (param == "labelLevel") defaultParentLabelLevel = jmax<int>(attributeValue, 1);
 }
 
 
