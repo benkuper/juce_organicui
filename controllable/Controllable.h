@@ -102,6 +102,8 @@ public:
 	static var setNameFromScript(const juce::var::NativeFunctionArgs& a);
 	static var setAttributeFromScript(const juce::var::NativeFunctionArgs& a);
 
+	String getScriptTargetString() override;
+	
 	virtual String getWarningTargetName() const override;
 	
 	virtual InspectableEditor * getEditor(bool /*isRootEditor*/) override;

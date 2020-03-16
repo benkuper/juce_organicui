@@ -172,6 +172,7 @@ public:
 	
 	static bool checkNumArgs(const String &logName, const var::NativeFunctionArgs &args, int expectedArgs);
 	
+	String getScriptTargetString() override;
 
 	// Inherited via DashboardItemTarget
 

@@ -177,3 +177,8 @@ var BaseItem::getTypeStringFromScript(const juce::var::NativeFunctionArgs& a)
 	if (BaseItem* b = getObjectFromJS<BaseItem>(a)) return b->getTypeString();
 	return var();
 }
+
+String BaseItem::getScriptTargetString()
+{
+	return "[" + niceName + " : " + getTypeString() + "]";
+}

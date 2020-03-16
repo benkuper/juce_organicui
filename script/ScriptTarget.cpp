@@ -1,10 +1,10 @@
-ScriptTarget::ScriptTarget(const String & name, void * ptr) :
+ScriptTarget::ScriptTarget(const String & name, void * ptr, const String & targetType) :
 	thisPtr((int64)ptr),
 	scriptTargetName(name)
 {
 	scriptObject.setProperty(scriptPtrIdentifier, thisPtr);
+	scriptObject.setProperty(scriptTargetTypeIdentifier, targetType); 
 	scriptObject.setMethod(ptrCompareIdentifier, ScriptTarget::checkTargetsAreTheSameFromScript);
-
 	liveScriptObjectIsDirty = true;
 }
 
@@ -47,4 +47,9 @@ var ScriptTarget::checkTargetsAreTheSameFromScript(const var::NativeFunctionArgs
 	int64 thisId = (int64)d->getProperty(scriptPtrIdentifier);
 
 	return oId == thisId;
+}
+
+String ScriptTarget::getScriptTargetString()
+{
+	return "["+scriptTargetName+"]";
 }

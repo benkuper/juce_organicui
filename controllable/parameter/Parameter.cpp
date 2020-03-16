@@ -1,4 +1,3 @@
-#include "Parameter.h"
 /*
   ==============================================================================
 
@@ -382,6 +381,11 @@ var Parameter::getValueFromScript(const juce::var::NativeFunctionArgs & a)
 	WeakReference<Parameter> pRef(p); 
 	if (pRef == nullptr || pRef.wasObjectDeleted()) return var();
 	return p->getValue();
+}
+
+String Parameter::getScriptTargetString()
+{
+	return  "[" + niceName + " : " + getTypeString() + " > " + stringValue() + "]";
 }
 
 

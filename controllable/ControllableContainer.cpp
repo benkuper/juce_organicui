@@ -11,7 +11,7 @@
 ControllableComparator ControllableContainer::comparator;
 
 ControllableContainer::ControllableContainer(const String& niceName) :
-	ScriptTarget("", this),
+	ScriptTarget("", this, "Container"),
 	hasCustomShortName(false),
 	nameCanBeChangedByUser(false),
 	canInspectChildContainers(true),
@@ -1268,6 +1268,11 @@ bool ControllableContainer::checkNumArgs(const String &logName, const var::Nativ
 	}
 
 	return true;
+}
+
+String ControllableContainer::getScriptTargetString()
+{
+	return "[" + niceName + ": Container]";
 }
 
 InspectableEditor* ControllableContainer::getEditor(bool isRoot)

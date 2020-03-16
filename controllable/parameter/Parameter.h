@@ -141,6 +141,8 @@ public:
 	
 	static var getValueFromScript(const juce::var::NativeFunctionArgs &a);
 
+	String getScriptTargetString() override;
+
     ListenerList<ParameterListener> listeners;
     void addParameterListener(ParameterListener* newListener) { listeners.add(newListener); }
     void removeParameterListener(ParameterListener* listener) { listeners.remove(listener); }

@@ -325,45 +325,71 @@ void Script::run()
 	}
 }
 
-var Script::logFromScript(const var::NativeFunctionArgs & args)
+void Script::logFromArgs(const var::NativeFunctionArgs& args, int logLevel)
 {
-	Script * s = ScriptTarget::getObjectFromJS<Script>(args);
-	if (!s->logParam->boolValue()) return var();
+	Script* s = ScriptTarget::getObjectFromJS<Script>(args);
+	if (!s->logParam->boolValue()) return;
 
+	String logS = "";
 	for (int i = 0; i < args.numArguments; i++)
 	{
-		if (i == 0) NLOG("Script : " + s->niceName, args.arguments[i].toString());
-		else NLOG("", args.arguments[i].toString());
+		var a = args.arguments[i];
+		String as = "";
+		if (a.isObject())
+		{
+			if (a.hasProperty(scriptPtrIdentifier))
+			{
+				String st = a.getProperty("_type", "").toString();
+				if (st.isNotEmpty())
+				{
+					int64 ptr = (int64)a.getDynamicObject()->getProperty(scriptPtrIdentifier);
+
+					if (st == "Container")
+					{
+						as += dynamic_cast<ControllableContainer*>((ControllableContainer*)ptr)->getScriptTargetString();
+					}
+					else if (st == "Controllable")
+					{
+						as += dynamic_cast<Controllable*>((Controllable*)ptr)->getScriptTargetString();
+					}
+				}
+			}
+			else
+			{
+				as += a.toString();
+			}
+		}
+		else
+		{
+			as = a.toString();
+		}
+
+		logS += (i > 0 ? "\n" : "") + as;
 	}
 
+	switch (logLevel)
+	{
+	case 0: NLOG("Script : " + s->niceName, logS); break;
+	case 1: NLOGWARNING("Script : " + s->niceName, logS); break;
+	case 2: NLOGERROR("Script : " + s->niceName, logS); break;
+	}
+}
+
+var Script::logFromScript(const var::NativeFunctionArgs & args)
+{
+	logFromArgs(args, 0);
 	return var();
 }
 
 var Script::logWarningFromScript(const var::NativeFunctionArgs& args)
 {
-	Script* s = ScriptTarget::getObjectFromJS<Script>(args);
-	if (!s->logParam->boolValue()) return var();
-
-	for (int i = 0; i < args.numArguments; i++)
-	{
-		if (i == 0) NLOGWARNING("Script : " + s->niceName, args.arguments[i].toString());
-		else NLOGWARNING("", args.arguments[i].toString());
-	}
-
+	logFromArgs(args, 1);
 	return var();
 }
 
 var Script::logErrorFromScript(const var::NativeFunctionArgs& args)
 {
-	Script* s = ScriptTarget::getObjectFromJS<Script>(args);
-	if (!s->logParam->boolValue()) return var();
-
-	for (int i = 0; i < args.numArguments; i++)
-	{
-		if (i == 0) NLOGERROR("Script : " + s->niceName, args.arguments[i].toString());
-		else NLOGERROR("", args.arguments[i].toString());
-	}
-
+	logFromArgs(args, 2);
 	return var();
 }
 

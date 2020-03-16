@@ -23,7 +23,7 @@ const Array<String> Controllable::typeNames = {
 };
 
 Controllable::Controllable(const Type &type, const String & niceName, const String &description, bool enabled) :
-	ScriptTarget("", this),
+	ScriptTarget("", this, "Controllable"),
 	type(type),
 	description(description),
 	customData(var()),
@@ -388,6 +388,11 @@ var Controllable::setAttributeFromScript(const juce::var::NativeFunctionArgs& a)
 	if (c == nullptr) return var();
 	c->setAttribute(a.arguments[0].toString(), a.arguments[1].toString());
 	return var();
+}
+
+String Controllable::getScriptTargetString()
+{
+	return "[" + niceName + " : " + getTypeString() + "]";
 }
 
 String Controllable::getWarningTargetName() const 
