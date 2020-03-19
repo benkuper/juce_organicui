@@ -1,4 +1,3 @@
-#include "AutomationKey.h"
 /*
   ==============================================================================
 
@@ -224,6 +223,6 @@ void AutomationKey::loadJSONDataInternal(var data)
 	var easingsData = data.getProperty("easings",var());
 	for (int i = 0; i < numDimensions; i++)
 	{
-		if (easings[i] != nullptr) easings[i]->loadJSONData(data.getProperty("easing"+String(i), var()));
+		if (easings[i] != nullptr) easings[i]->loadJSONData(easingsData.getProperty("easing"+String(i), var()));
 	}
 }

@@ -16,6 +16,8 @@ AutomationKeyUI::AutomationKeyUI(AutomationKey * key) :
 	draggingHandle(nullptr)
 {
 	
+	setPaintingIsUnclipped(true);
+
 	for (int i = 0; i < key->numDimensions; i++)
 	{
 		Handle* h = new Handle(i, key->numDimensions == 1 ? Colours::white : Colour::fromHSV(i * .3f, .9f, 1, 0xFF));

@@ -4,8 +4,7 @@
 class Automation2DUI :
 	public BaseManagerViewUI<Automation, AutomationKey, AutomationKey2DUI>,
 	public ContainerAsyncListener,
-	//public InspectableSelectionManager::Listener,
-	//public Thread,
+	public AutomationKey2DUI::AsyncListener,
 	public Timer
 {
 public:
@@ -20,56 +19,29 @@ public:
 	int lastROIKey;
 	int numSteps;
 
-	//AutomationKey2DUI* currentUI;
-
 	bool shouldRepaint;
 
-	
-	//void setViewRange(float pos, float range);
-	//void updateROI();
-
+	Array<AutomationKey2DUI::Easing2DHandle*> handles;
 	void paint(Graphics& g) override;
 
+	void resizedInternalContent(Rectangle<int>& r) override;
 	void updateViewUIPosition(AutomationKey2DUI * kui) override;
 
-	//void resized() override;
-	//void placeKeyUI(AutomationKeyUI* kui, bool placePrevKUI = true);
+	void placeHandles();
 
-	//Point<int> getViewPosForPos(float time);
-	////float getPosForViewPos(Point<int> viewPos);
+	void mouseDown(const MouseEvent& e) override;
+	void mouseDrag(const MouseEvent &e) override;
 
-	//int getYForValue(float value);
-	//Array<int> getYForKey(AutomationKey* k);
-	//float getValueForY(int ty, bool zeroIsBottom = true, bool relative = false);
+	void updateHandlesForKey(AutomationKey2DUI* kui);
 
-	//bool isInView(AutomationKeyUI* kui);
-	//void homeViewYRange();
-	//void frameViewYRange();
-
-	//AutomationKeyUI* getClosestKeyUIForPos(float pos, int start = -1, int end = -1);
-
-	//void itemAddedAsync(AutomationKey*) override;
-	//void itemsReorderedAsync() override;
-
-	//AutomationKeyUI* createUIForItem(AutomationKey* item) override;
-
-	//void addItemUIInternal(AutomationKeyUI*) override;
-	//void removeItemUIInternal(AutomationKeyUI*) override;
-
-	//void mouseDown(const MouseEvent& e) override;
-	//void mouseDoubleClick(const MouseEvent& e) override;
-	//void mouseDrag(const MouseEvent& e) override;
-	//void mouseUp(const MouseEvent& e) override;
-	//bool keyPressed(const KeyPress& e) override;
+	void addItemUIInternal(AutomationKey2DUI* kui) override;
+	void removeItemUIInternal(AutomationKey2DUI* kui) override;
 
 	void newMessage(const ContainerAsyncEvent& e) override;
-
-	//void inspectablesSelectionChanged() override;
-	//void inspectableDestroyed(Inspectable*) override;
+	void newMessage(const AutomationKey2DUI::Key2DUIEvent& e) override;
 
 	void timerCallback() override;
 	
-
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Automation2DUI)
 
