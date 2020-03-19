@@ -21,9 +21,6 @@ FloatParameter::FloatParameter(const String & niceName, const String &descriptio
 
 void FloatParameter::setValueInternal(var & _value)
 {
-	if ((float)_value < (float)minimumValue && autoAdaptRange) setRange(_value, maximumValue, false);
-	else if ((float)_value > (float)maximumValue && autoAdaptRange) setRange(minimumValue, _value, false);
-	
 	if ((float)minimumValue > (float)maximumValue) return;
 	value = jlimit<float>(minimumValue, maximumValue, _value);
 }
@@ -113,6 +110,18 @@ bool FloatParameter::hasRange()
 void FloatParameter::setControlAutomation()
 {
 	automation.reset(new ParameterNumberAutomation(this, !isLoadingData));
+}
+
+void FloatParameter::setAttribute(String attribute, var val)
+{
+	Parameter::setAttribute(attribute, val);
+	if (attribute == "ui")
+	{
+		if (val == "time") defaultUI = TIME;
+		else if (val == "slider") defaultUI = SLIDER;
+		else if (val == "stepper") defaultUI = STEPPER;
+		else if (val == "label") defaultUI = LABEL;
+	}
 }
 
 var FloatParameter::getJSONDataInternal()

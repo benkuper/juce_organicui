@@ -2,9 +2,9 @@
 /*
   ==============================================================================
 
-    Easing.cpp
-    Created: 11 Dec 2016 1:29:02pm
-    Author:  Ben
+	Easing.cpp
+	Created: 11 Dec 2016 1:29:02pm
+	Author:  Ben
 
   ==============================================================================
 */
@@ -61,12 +61,12 @@ EasingUI * LinearEasing::createUI()
 }
 
 
-EasingUI * HoldEasing::createUI()
+EasingUI* HoldEasing::createUI()
 {
 	return new HoldEasingUI(this);
 }
 
-EasingUI * CubicEasing::createUI()
+EasingUI* CubicEasing::createUI()
 {
 	return new CubicEasingUI(this);
 }
@@ -177,12 +177,12 @@ inline float CubicEasing::Bezier::sampleCurveDerivativeX(float t) {
 	return (3 * a.x * t + 2 * b.x) * t + c.x;
 }
 
-float CubicEasing::Bezier::getValueForX(const float & tx)
+float CubicEasing::Bezier::getValueForX(const float& tx)
 {
 	return sampleCurveY(solveCurveX(tx));
 }
 
-float CubicEasing::Bezier::solveCurveX(const float & tx)
+float CubicEasing::Bezier::solveCurveX(const float& tx)
 {
 	float t0;
 	float t1;
@@ -212,7 +212,7 @@ float CubicEasing::Bezier::solveCurveX(const float & tx)
 
 	while (t0 < t1) {
 		x2 = sampleCurveX(t2);
-        if (std::abs(x2 - tx) < epsilon)
+		if (std::abs(x2 - tx) < epsilon)
 			return t2;
 		if (tx > x2) t0 = t2;
 		else t1 = t2;
@@ -240,7 +240,7 @@ float SineEasing::getValue(const float & weight)
 }
 
 
-EasingUI * SineEasing::createUI()
+EasingUI* SineEasing::createUI()
 {
 	return new SineEasingUI(this);
 }

@@ -4,12 +4,21 @@ DashboardCCItemUI::DashboardCCItemUI(DashboardCCItem* ccItem) :
 	ccItem(ccItem),
 	itemUI(nullptr)
 {
+	vp.setScrollBarsShown(true, false);
+	vp.setScrollOnDragEnabled(false);
+	vp.setScrollBarThickness(10);
+	addAndMakeVisible(vp);
+
+	resized();
+
 	inspectableChanged(); //force check inspectable
-	if (itemUI != nullptr) setSize(item->viewUISize->x, item->viewUISize->y);
+	setSize(item->viewUISize->x, item->viewUISize->y);
 }
 
 DashboardCCItemUI::~DashboardCCItemUI()
 {
+	itemUI = nullptr;
+	vp.setViewedComponent(nullptr);
 }
 
 void DashboardCCItemUI::paint(Graphics& g)
@@ -19,7 +28,8 @@ void DashboardCCItemUI::paint(Graphics& g)
 
 void DashboardCCItemUI::resizedDashboardItemInternal()
 {
-	if (itemUI != nullptr) itemUI->setBounds(getLocalBounds());
+	vp.setBounds(getLocalBounds());
+	if (itemUI != nullptr) itemUI->setBounds(Rectangle<int>(0,0,getWidth()-10,itemUI->getHeight()));
 }
 
 void DashboardCCItemUI::updateEditModeInternal(bool editMode)
@@ -33,7 +43,8 @@ void DashboardCCItemUI::inspectableChanged()
 
 	if (itemUI != nullptr)
 	{
-		removeChildComponent(itemUI.get());
+		vp.setViewedComponent(nullptr);
+		itemUI = nullptr;
 	}
 
 	if (!inspectable.wasObjectDeleted() && ccItem->container != nullptr)
@@ -42,9 +53,10 @@ void DashboardCCItemUI::inspectableChanged()
 		GenericControllableContainerEditor* gce = dynamic_cast<GenericControllableContainerEditor*>(e);
 		if (gce != nullptr) gce->setDragAndDropEnabled(false);
 
-		itemUI.reset(e);
-
-		addAndMakeVisible(itemUI.get());
+		itemUI = e;
+		DBG(itemUI->getWidth() << " / " << itemUI->getHeight());
+		vp.setViewedComponent(itemUI);
+		
 		if (getWidth() == 0 || getHeight() == 0) setSize(itemUI->getWidth(), itemUI->getHeight());
 	}
 

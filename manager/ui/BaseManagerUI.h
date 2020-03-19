@@ -75,6 +75,7 @@ public:
 	ManagerUIItemContainer<M, T, U> container;
 	Viewport viewport;
 
+	int headerSize;
 	Colour bgColor;
 	int labelHeight;
 	int minHeight;
@@ -122,6 +123,7 @@ public:
 	virtual void paint(Graphics &g) override;
 
 	virtual void resized() override;
+	virtual juce::Rectangle<int> setHeaderBounds(juce::Rectangle<int> &r);
 	virtual void resizedInternalHeader(juce::Rectangle<int> &r);
 	virtual void resizedInternalContent(juce::Rectangle<int> &r);
 	virtual void placeItems(juce::Rectangle<int>& r);
@@ -208,6 +210,7 @@ BaseManagerUI<M, T, U>::BaseManagerUI(const String & contentName, M * _manager, 
 	useViewport(_useViewport),
 	defaultLayout(VERTICAL),
 	container(this),
+	headerSize(24),
 	bgColor(BG_COLOR),
 	labelHeight(10),
 	minHeight(50),
@@ -405,7 +408,8 @@ void BaseManagerUI<M, T, U>::resized()
 	//resizeOnChildBoundsChanged = false; //avoir infinite loop if resize actually resizes inner components
 
 	juce::Rectangle<int> r = getLocalBounds().reduced(2);
-	resizedInternalHeader(r);
+	juce::Rectangle<int> hr = setHeaderBounds(r);
+	resizedInternalHeader(hr);
 	resizedInternalFooter(r);
 	resizedInternalContent(r);
 
@@ -413,28 +417,24 @@ void BaseManagerUI<M, T, U>::resized()
 }
 
 template<class M, class T, class U>
-void BaseManagerUI<M, T, U>::resizedInternalHeader(juce::Rectangle<int>& r)
+juce::Rectangle<int> BaseManagerUI<M, T, U>::setHeaderBounds(juce::Rectangle<int>& r)
 {
+	return defaultLayout == VERTICAL ? r.removeFromTop(headerSize) : r.removeFromRight(headerSize);
+}
 
+template<class M, class T, class U>
+void BaseManagerUI<M, T, U>::resizedInternalHeader(juce::Rectangle<int>& hr)
+{
+	if (addItemBT != nullptr && addItemBT->isVisible() && addItemBT->getParentComponent() == this)
+	{
+		if (defaultLayout == VERTICAL) addItemBT->setBounds(hr.removeFromRight(hr.getHeight()).reduced(2));
+		else addItemBT->setBounds(hr.removeFromTop(hr.getWidth()).reduced(2));
+	}
 }
 
 template<class M, class T, class U>
 void BaseManagerUI<M, T, U>::resizedInternalContent(juce::Rectangle<int>& r)
 {
-	if (addItemBT != nullptr && addItemBT->isVisible() && addItemBT->getParentComponent() == this)
-	{
-		if (defaultLayout == VERTICAL)
-		{
-			addItemBT->setBounds(r.withSize(24, 24).withX(r.getWidth() - 24));
-			r.removeFromTop(24);
-		}else
-		{
-			addItemBT->setBounds(r.withSize(24, 24).withX(r.getWidth() - 24));
-			r.removeFromRight(24);
-		}
-	}
-
-
 	if (useViewport)
 	{
 		viewport.setBounds(r);
@@ -576,9 +576,9 @@ void BaseManagerUI<M, T, U>::showMenuAndAddItem(bool isFromAddButton, Point<int>
 }
 
 template<class M, class T, class U>
-void BaseManagerUI<M, T, U>::addItemFromMenu(bool, Point<int>)
+void BaseManagerUI<M, T, U>::addItemFromMenu(bool fromAddButton, Point<int> pos)
 {
-	manager->BaseManager<T>::addItem();
+	addItemFromMenu(nullptr, fromAddButton, pos);
 }
 
 template<class M, class T, class U>

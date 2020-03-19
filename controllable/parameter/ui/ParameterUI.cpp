@@ -36,7 +36,7 @@ ParameterUI::~ParameterUI()
 
 void ParameterUI::showEditWindowInternal()
 {
-	if (parameter->isControllableFeedbackOnly) return;
+	//if (parameter->isControllableFeedbackOnly) return;
 
 	Component * editComponent(getEditValueComponent());
 	CallOutBox * box = &CallOutBox::launchAsynchronously(editComponent, localAreaToGlobal(getLocalBounds()), nullptr);
@@ -194,9 +194,9 @@ void ParameterUI::setNextFocusOrder(Component * focusComponent)
 
 
 bool ParameterUI::shouldBailOut() {
-	bool bailOut = parameter.get() == nullptr;
+	bool bailOut = parameter.wasObjectDeleted() || parameter == nullptr;
 	// we want a clean deletion no?
-	jassert(!bailOut);
+	//jassert(!bailOut);
 	return bailOut;
 
 }
@@ -231,7 +231,6 @@ ParameterUI::ValueEditCalloutComponent::ValueEditCalloutComponent(WeakReference<
 	label.setEditable(true);
 	addAndMakeVisible(&label);
 	setSize(100, 20);
-
 }
 
 ParameterUI::ValueEditCalloutComponent::~ValueEditCalloutComponent()

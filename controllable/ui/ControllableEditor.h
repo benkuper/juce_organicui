@@ -43,6 +43,7 @@ public:
 	void mouseDown(const MouseEvent &e) override;
 	void mouseDrag(const MouseEvent& e) override;
 
+
 	void newMessage(const Controllable::ControllableEvent &e) override;
 
 	void componentVisibilityChanged(Component& c) override;

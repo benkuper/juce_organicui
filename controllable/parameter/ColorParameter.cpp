@@ -39,6 +39,8 @@ ColorParameter::~ColorParameter() {}
 
 const Colour ColorParameter::getColor()
 {
+	GenericScopedLock<SpinLock> lock(valueSetLock);
+
 	if (!value.isArray()) return Colours::black;
 	while (value.size() < 4) value.append(0);
 
@@ -87,9 +89,7 @@ bool ColorParameter::checkValueIsTheSame(var oldValue, var newValue)
 	if (!(newValue.isArray() && oldValue.isArray())) return false;
 	if (newValue.size() != 4 || oldValue.size() != 4) return false;
 
-	valueSetLock.enter();
 	bool result = newValue[0] == oldValue[0] && newValue[1] == oldValue[1] && newValue[2] == oldValue[2] && oldValue[3] == newValue[3];
-	valueSetLock.exit();
 
 	return result;
 }
@@ -97,6 +97,7 @@ bool ColorParameter::checkValueIsTheSame(var oldValue, var newValue)
 var ColorParameter::getLerpValueTo(var targetValue, float weight)
 {
 	if (!targetValue.isArray()) return value;
+	GenericScopedLock<SpinLock> lock(valueSetLock);
 	var result;
 	result.append(jmap(weight, (float)value[0], (float)targetValue[0]));
 	result.append(jmap(weight, (float)value[1], (float)targetValue[1]));
@@ -112,12 +113,15 @@ void ColorParameter::setWeightedValue(Array<var> values, Array<float> weights)
 	float tValues[4];
 	tValues[0] = tValues[1] = tValues[2] = tValues[3] = 0;
 
-	for (int i = 0; i < values.size(); i++)
 	{
-		jassert(values[i].size() == 4);
-		for (int j = 0; j < 4; j++)
+		GenericScopedLock<SpinLock> lock(valueSetLock);
+		for (int i = 0; i < values.size(); i++)
 		{
-			tValues[j] += (float)values[i][j] * weights[i];
+			jassert(values[i].size() == 4);
+			for (int j = 0; j < 4; j++)
+			{
+				tValues[j] += (float)values[i][j] * weights[i];
+			}
 		}
 	}
 

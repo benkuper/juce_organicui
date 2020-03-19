@@ -13,7 +13,7 @@ BetterStepper::BetterStepper(const String &tooltip) :
 	Slider(SliderStyle::IncDecButtons,TextEntryBoxPosition::TextBoxLeft)
 {
 	setTooltip(tooltip);
-	setIncDecButtonsMode(IncDecButtonMode::incDecButtonsDraggable_Vertical);
+	setIncDecButtonsMode(IncDecButtonMode::incDecButtonsDraggable_Horizontal);
 }
 
 BetterStepper::~BetterStepper()

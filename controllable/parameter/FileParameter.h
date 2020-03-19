@@ -21,12 +21,13 @@ public:
 
 	String absolutePath;
 	String fileTypeFilter;
+    bool directoryMode;
 
 	bool forceAbsolutePath;
-
+    bool forceRelativePath;
+    
     // need to override this function because var Strings comparison  is based on pointer (we need full string comp)
     virtual void setValueInternal(var&) override;
-	bool forceRelativePath;
 	
 	void setForceRelativePath(bool value);
 
@@ -39,6 +40,11 @@ public:
 	void loadJSONDataInternal(var data) override;
 
 	void fileSaved(bool savedAs) override;
+
+	static var readFileFromScript(const juce::var::NativeFunctionArgs& a);
+	static var writeFileFromScript(const juce::var::NativeFunctionArgs& a);
+	static var getAbsolutePathFromScript(const juce::var::NativeFunctionArgs& a);
+	static var launchFileFromScript(const juce::var::NativeFunctionArgs& a);
 
 
 	static StringParameter * create() { return new FileParameter("New FileParameter", "",""); }

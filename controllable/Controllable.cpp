@@ -8,8 +8,22 @@
   ==============================================================================
 */
 
+const Array<String> Controllable::typeNames = { 
+	"Custom", 
+	Trigger::getTypeStringStatic(),
+	FloatParameter::getTypeStringStatic(),
+	IntParameter::getTypeStringStatic(),
+	BoolParameter::getTypeStringStatic(),
+	StringParameter::getTypeStringStatic(),
+	EnumParameter::getTypeStringStatic(),
+	Point2DParameter::getTypeStringStatic(),
+	Point3DParameter::getTypeStringStatic(),
+	TargetParameter::getTypeStringStatic(),
+	ColorParameter::getTypeStringStatic()
+};
+
 Controllable::Controllable(const Type &type, const String & niceName, const String &description, bool enabled) :
-	ScriptTarget("", this),
+	ScriptTarget("", this, "Controllable"),
 	type(type),
 	description(description),
 	customData(var()),
@@ -275,16 +289,28 @@ var Controllable::setValueFromScript(const juce::var::NativeFunctionArgs& a) {
 						(float)(value[1]),
 						(float)(value[2]),
 						value.size() > 3 ? (float)(value[3]) : 1));
-					
+				}
+				else if (a.numArguments >= 3)
+				{
+					((ColorParameter*)c)->setColor(Colour::fromFloatRGBA((float)(a.arguments[0]),
+						(float)(a.arguments[1]),
+						(float)(a.arguments[2]),
+						a.numArguments > 3 ? (float)(a.arguments[3]) : 1));
+				}
+				else if (a.numArguments == 1 && valueIsANumber)
+				{
+					((ColorParameter*)c)->setColor(Colour((int)a.arguments[0]));
 				}
 				break;
 
 			case Controllable::Type::POINT2D:
 				if (value.isArray() && value.size() >= 2) ((Point2DParameter *)c)->setPoint((float)value[0], (float)value[1]);
+				else if (a.numArguments >= 2) ((Point2DParameter*)c)->setPoint((float)a.arguments[0], (float)a.arguments[1]);
 				break;
 
 			case Controllable::Type::POINT3D:
 				if (value.isArray() && value.size() >= 3) ((Point3DParameter *)c)->setVector((float)value[0], (float)value[1], (float)value[2]);
+				else if (a.numArguments >= 3) ((Point3DParameter*)c)->setVector((float)a.arguments[0], (float)a.arguments[1], (float)a.arguments[2]);
 				break;
 
 			case Controllable::Type::ENUM:
@@ -332,8 +358,15 @@ var Controllable::checkIsParameterFromScript(const juce::var::NativeFunctionArgs
 var Controllable::getParentFromScript(const juce::var::NativeFunctionArgs & a)
 {
 	Controllable * c = getObjectFromJS<Controllable>(a);
-	if (c->parentContainer == nullptr) return var();
-	else return c->parentContainer->getScriptObject();
+	int level = a.numArguments > 0 ? (int)a.arguments[0] : 1;
+	ControllableContainer* target = c->parentContainer;
+	if (target == nullptr) return var();
+	for (int i = 1; i < level; i++)
+	{
+		target = target->parentContainer;
+		if (target == nullptr) return var();
+	}
+	return target->getScriptObject();
 
 }
 
@@ -355,6 +388,11 @@ var Controllable::setAttributeFromScript(const juce::var::NativeFunctionArgs& a)
 	if (c == nullptr) return var();
 	c->setAttribute(a.arguments[0].toString(), a.arguments[1].toString());
 	return var();
+}
+
+String Controllable::getScriptTargetString()
+{
+	return "[" + niceName + " : " + getTypeString() + "]";
 }
 
 String Controllable::getWarningTargetName() const 

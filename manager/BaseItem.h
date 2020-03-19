@@ -72,6 +72,9 @@ public:
 	
 	virtual String getTypeString() const { return "BaseItem"; };
 
+	static var getTypeStringFromScript(const juce::var::NativeFunctionArgs& a);
+
+	String getScriptTargetString() override;
 
 	ListenerList<BaseItemListener> baseItemListeners;
 	void addBaseItemListener(BaseItemListener* newListener) { baseItemListeners.add(newListener); }

@@ -235,6 +235,12 @@ var Engine::getJSONData()
 	if (!dData.isVoid() && dData.getDynamicObject()->getProperties().size() > 0) data.getDynamicObject()->setProperty("dashboardManager", dData);
 
 
+	if (ProjectSettings::getInstance()->saveLayoutReference->boolValue())
+	{
+		var layoutData = ShapeShifterManager::getInstance()->getCurrentLayout();
+		if (!layoutData.isVoid()) data.getDynamicObject()->setProperty("layout", layoutData);
+	}
+	
 	return data;
 }
 
@@ -271,7 +277,7 @@ void Engine::loadJSONData(var data, ProgressTask * loadingTask)
 		bool appVersionIsNewerThanFileVersion = versionIsNewerThan(getAppVersion(), versionString);
 		if (appVersionIsNewerThanFileVersion)
 		{
-			bool needsOnlineUpdate = md->hasProperty("needsOnlineUpdate") ? (bool)md->getProperty("needsOnlineUpdate") : false;
+			bool needsOnlineUpdate = versionNeedsOnlineUpdate(versionString);
 
 			int result = 2; //load directly by default
 
@@ -301,10 +307,12 @@ void Engine::loadJSONData(var data, ProgressTask * loadingTask)
 			{
 				//var postData = new DynamicObject();
 				//postData.getDynamicObject()->setProperty("file", );
+				data.getDynamicObject()->setProperty("appVersion", getAppVersion());
 				URL url = URL(convertURL).withPOSTData(JSON::toString(data, true));
 				WebInputStream stream(url, true);
 
 				String convertedData = stream.withExtraHeaders("Content-Type: Text/plain").readEntireStreamAsString();
+				DBG(convertedData);
 				if (convertedData.isEmpty())
 				{
 					AlertWindow::showMessageBox(AlertWindow::AlertIconType::WarningIcon, "Update error", "Could not connect to the update server, please make sure you are connected to internet. You can still reload your file and not update it.", "Well, shit happens");
@@ -342,6 +350,8 @@ void Engine::loadJSONData(var data, ProgressTask * loadingTask)
 	ProgressTask * projectTask = loadingTask->addTask("Project Settings");
 	ProgressTask * dashboardTask = loadingTask->addTask("Dashboard");
 
+
+	if (d->hasProperty("layout")) ShapeShifterManager::getInstance()->loadLayout(d->getProperty("layout"));
 
 	projectTask->start();
 	if (d->hasProperty("projectSettings")) ProjectSettings::getInstance()->loadJSONData(d->getProperty("projectSettings"));
@@ -422,6 +432,27 @@ int Engine::getBetaVersion(String version)
 	int indexOfB = version.indexOfChar('b');
 	String vString = version.substring(indexOfB+1);
 	return vString.getIntValue();
+}
+
+bool Engine::versionNeedsOnlineUpdate(String version)
+{
+	int curVersionRange = 0;
+	for (int i = 0; i < breakingChangesVersions.size(); i++)
+	{
+		if (versionIsNewerThan(breakingChangesVersions[i], getAppVersion())) break;
+		curVersionRange++;
+	}
+
+	int targetVersionRange = 0;
+	for (int i = 0; i < breakingChangesVersions.size(); i++)
+	{
+		if (versionIsNewerThan(breakingChangesVersions[i], version)) break;
+		targetVersionRange++;
+	}
+
+	DBG("Cur version range " << curVersionRange << ", target Version range " << targetVersionRange);
+
+	return curVersionRange > targetVersionRange;
 }
 
 String Engine::getMinimumRequiredFileVersion()

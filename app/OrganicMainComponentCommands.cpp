@@ -33,9 +33,6 @@ namespace CommandIDs
 	static const int toggleKioskMode = 0x50003;
 
 	static const int showAbout = 0x60000;
-	static const int gotoWebsite = 0x60001;
-	static const int gotoForum = 0x60002;
-
 	
 	//navigation
 	static const int selectPreviousItem = 0x70001;
@@ -100,13 +97,6 @@ void OrganicMainContentComponent::getCommandInfo(CommandID commandID, Applicatio
 
 	case CommandIDs::showAbout:
 		result.setInfo("About...", "", category, 0);
-		break;
-
-	case CommandIDs::gotoWebsite:
-		result.setInfo("Go to website", "", category, 0);
-		break;
-	case CommandIDs::gotoForum:
-		result.setInfo("Go to forum", "", category, 0);
 		break;
 
 	case CommandIDs::undo:
@@ -469,14 +459,11 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 	case CommandIDs::deleteItems:
 	{
 		InspectableSelectionManager * selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
-		Array<WeakReference<Inspectable>> items = selectionManager->currentInspectables;
-
-		for (auto &i : items)
+		Array<BaseItem*> items = selectionManager->getInspectablesAs<BaseItem>();
+		for (auto& i : items)
 		{
-			if (!i.wasObjectDeleted())
-			{
-				((BaseItem *)i.get())->remove();
-			}
+			if (i == nullptr) continue;
+			i->remove();
 		}
 	}
 	break;

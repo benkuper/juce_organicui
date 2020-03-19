@@ -227,19 +227,22 @@ void TargetParameterUI::newMessage(const ContainerAsyncEvent & e)
 {
 	if (e.type == ContainerAsyncEvent::ControllableFeedbackUpdate)
 	{
-		Controllable * c = e.targetControllable;
-		if (c == targetParameter->target) return;
+		if (Controllable* c = e.targetControllable)
+		{
+			if (c == targetParameter->target) return;
 
-		if (c->type == Controllable::TRIGGER)
-		{
-			if (!targetParameter->showTriggers) return;
-		} else
-		{
-			if (!targetParameter->showParameters) return;
+			if (c->type == Controllable::TRIGGER)
+			{
+				if (!targetParameter->showTriggers) return;
+			}
+			else
+			{
+				if (!targetParameter->showParameters) return;
+			}
+
+			bool isControllableValid = targetParameter->customCheckAssignOnNextChangeFunc(c);
+			if (isControllableValid) targetParameter->setValueFromTarget(c);
 		}
-
-		bool isControllableValid = targetParameter->customCheckAssignOnNextChangeFunc(c);
-		if (isControllableValid) targetParameter->setValueFromTarget(c);
 	}
 	
 }

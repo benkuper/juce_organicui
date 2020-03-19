@@ -10,7 +10,6 @@
 */
 
 
-
 IntParameter::IntParameter(const String& niceName, const String& description, const int& initialValue, const int& minValue, const int& maxValue, bool enabled) :
 	Parameter(Type::INT, niceName, description, initialValue, minValue, maxValue, enabled),
 	hexMode(false)
@@ -22,9 +21,6 @@ IntParameter::IntParameter(const String& niceName, const String& description, co
 
 void IntParameter::setValueInternal(var & _value)
 {
-	if ((int)_value < (int)minimumValue && autoAdaptRange) setRange(_value, maximumValue, false);
-	else if ((int)_value > (int)maximumValue && autoAdaptRange) setRange(minimumValue, _value, false);
-
 	if ((int)minimumValue > (int)maximumValue) return;
 	this->value = jlimit<int>(minimumValue, maximumValue, _value);
 }
@@ -58,6 +54,12 @@ bool IntParameter::hasRange()
 void IntParameter::setControlAutomation()
 {
 	automation.reset(new ParameterNumberAutomation(this, !isLoadingData));
+}
+
+void IntParameter::setAttribute(String attribute, var val)
+{
+	Parameter::setAttribute(attribute, val);
+	if (attribute == "hexMode") hexMode = val;
 }
 
 var IntParameter::getJSONDataInternal()

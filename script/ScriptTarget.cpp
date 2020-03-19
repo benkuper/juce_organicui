@@ -1,10 +1,9 @@
-#include "ScriptTarget.h"
-
-ScriptTarget::ScriptTarget(const String & name, void * ptr) :
+ScriptTarget::ScriptTarget(const String & name, void * ptr, const String & targetType) :
 	thisPtr((int64)ptr),
 	scriptTargetName(name)
 {
 	scriptObject.setProperty(scriptPtrIdentifier, thisPtr);
+	scriptObject.setProperty(scriptTargetTypeIdentifier, targetType); 
 	scriptObject.setMethod(ptrCompareIdentifier, ScriptTarget::checkTargetsAreTheSameFromScript);
 	liveScriptObjectIsDirty = true;
 }
@@ -25,9 +24,10 @@ DynamicObject * ScriptTarget::getScriptObject()
 
 void ScriptTarget::updateLiveScriptObject(DynamicObject * parent)
 {
+	scriptObjectLock.enter();
 	liveScriptObject.reset(new DynamicObject(scriptObject)); //is there a bettery way to deal with updating without recreating an object each time ?
-	
 	updateLiveScriptObjectInternal(parent);
+	scriptObjectLock.exit();
 
 	liveScriptObjectIsDirty = false;
 	scriptTargetListeners.call(&ScriptTargetListener::scriptObjectUpdated, this);
@@ -47,4 +47,9 @@ var ScriptTarget::checkTargetsAreTheSameFromScript(const var::NativeFunctionArgs
 	int64 thisId = (int64)d->getProperty(scriptPtrIdentifier);
 
 	return oId == thisId;
+}
+
+String ScriptTarget::getScriptTargetString()
+{
+	return "["+scriptTargetName+"]";
 }

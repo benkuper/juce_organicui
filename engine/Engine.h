@@ -34,6 +34,7 @@ public:
 	bool isBetaVersion;
 	int betaVersion;
 
+	StringArray breakingChangesVersions;
 	String convertURL = ""; //for file conversion
 
 	String fileName = "File";
@@ -41,6 +42,7 @@ public:
 	String fileWildcard = "*"+fileExtension;
 
 	String lastFileAbsolutePath; //Used for checking in saveDocument if new file is different
+
 
 	int autoSaveIndex;
 
@@ -75,6 +77,7 @@ public:
 	bool checkFileVersion(DynamicObject * metaData, bool checkForNewerVersion = false);
 	bool versionIsNewerThan(String versionToCheck, String referenceVersion);
 	int getBetaVersion(String version);
+	bool versionNeedsOnlineUpdate(String version);
 	virtual String getMinimumRequiredFileVersion();
 
 	int64 loadingStartTime;

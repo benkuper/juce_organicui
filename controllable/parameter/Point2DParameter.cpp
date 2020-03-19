@@ -1,4 +1,3 @@
-#include "Point2DParameter.h"
 /*
   ==============================================================================
 
@@ -69,35 +68,12 @@ void Point2DParameter::setValueInternal(var & _value)
 {
 	if (!_value.isArray()) return;
 
-	valueSetLock.enter();
-
-	bool hasChanged = false;
-	if (autoAdaptRange)
-	{
-		for (int i = 0; i < 2; i++)
-		{
-			if ((float)_value[i] < (float)minimumValue[i]) {
-				minimumValue[i] = _value[i];
-				hasChanged = true;
-			} else if ((float)_value[i] > (float)maximumValue[i])
-			{
-				maximumValue[i] = _value[i];
-				hasChanged = true;
-			}
-		}
-
-	}
-
 	x = std::isnan((float)value[0]) ? 0 : jlimit<float>(minimumValue[0], maximumValue[0], _value[0]);
 	y = std::isnan((float)value[1]) ? 0 : jlimit<float>(minimumValue[1], maximumValue[1], _value[1]);
 
 	value = var();
 	value.append(x);
 	value.append(y);
-
-	valueSetLock.exit();
-
-	if (hasChanged) setRange(minimumValue, maximumValue);
 
 }
 
@@ -159,9 +135,7 @@ bool Point2DParameter::checkValueIsTheSame(var newValue, var oldValue)
 	if (!(newValue.isArray() && oldValue.isArray())) return false;
 	if (newValue.size() == 0 || oldValue.size() == 0) return false;
 
-	valueSetLock.enter();
-	bool result = jlimit<float>(minimumValue[0], maximumValue[0], newValue[0]) == (float)oldValue[0] && jlimit<float>(minimumValue[1], maximumValue[1], newValue[1]) == (float)oldValue[1];
-	valueSetLock.exit();
+	bool result = newValue[0] == oldValue[0] && newValue[1] == oldValue[1];
 
 	return result;
 }

@@ -17,6 +17,7 @@ EnumParameter::EnumParameter(const String & niceName, const String &description,
 
 	scriptObject.setMethod("getData", EnumParameter::getValueDataFromScript);
 	scriptObject.setMethod("addOption", EnumParameter::addOptionFromScript);
+	scriptObject.setMethod("removeOptions", EnumParameter::removeOptionsFromScript);
 }
 
 EnumParameter * EnumParameter::addOption(String key, var data, bool selectIfFirstOption)
@@ -153,6 +154,15 @@ var EnumParameter::addOptionFromScript(const juce::var::NativeFunctionArgs& a)
 
 	ep->addOption(a.arguments[0].toString(), a.arguments[1]);
 
+	return var();
+}
+
+var EnumParameter::removeOptionsFromScript(const juce::var::NativeFunctionArgs& a)
+{
+	WeakReference<Parameter> c = getObjectFromJS<Parameter>(a);
+	if (c == nullptr || c.wasObjectDeleted()) return var();
+	EnumParameter * ep = dynamic_cast<EnumParameter *>(c.get());
+	ep->clearOptions();
 	return var();
 }
 

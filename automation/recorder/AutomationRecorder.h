@@ -22,6 +22,7 @@ public:
 	FloatParameter * simplificationFactor;
 	BoolParameter * arm;
 	BoolParameter * autoDisarm;
+	EnumParameter* defaultEasing;
 
 	WeakReference<Parameter> currentInput;
 

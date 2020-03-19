@@ -12,12 +12,13 @@
 #pragma once
 
 const Identifier scriptPtrIdentifier = "_ptr";
+const Identifier scriptTargetTypeIdentifier = "_type";
 const Identifier ptrCompareIdentifier = "is";
 
 class ScriptTarget
 {
 public:
-	ScriptTarget(const String &name, void * ptr);
+	ScriptTarget(const String &name, void * ptr, const String &targetType = "");
 	virtual ~ScriptTarget();
 
 	int64 thisPtr;
@@ -26,6 +27,8 @@ public:
 	std::unique_ptr<juce::DynamicObject> liveScriptObject;
 	bool liveScriptObjectIsDirty;
 
+	SpinLock scriptObjectLock;
+
 	juce::DynamicObject * getScriptObject();
 	void updateLiveScriptObject(juce::DynamicObject * parent = nullptr);
 
@@ -33,6 +36,7 @@ public:
 
 	static var checkTargetsAreTheSameFromScript(const var::NativeFunctionArgs &args);
 
+	virtual String getScriptTargetString();
 
 	class ScriptTargetListener
 	{

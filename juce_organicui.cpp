@@ -20,6 +20,7 @@
 //==============================================================================
 
 #include "helpers/StringUtil.cpp"
+#include "helpers/OSCHelpers.cpp"
 #include "helpers/crypto/hmac/SHA1.cpp"
 #include "helpers/crypto/hmac/HMAC_SHA1.cpp"
 

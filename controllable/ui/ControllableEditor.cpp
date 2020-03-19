@@ -1,4 +1,3 @@
-#include "ControllableEditor.h"
 /*
   ==============================================================================
 
@@ -114,7 +113,7 @@ void ControllableEditor::resized()
 		}
 	}
 
-	int controlSpace = jmax<int>(showLabel ? getWidth() * .6f : getWidth(), 100);
+	int controlSpace = jmax<int>(showLabel? jmin<int>(getWidth() - 160, getWidth()*.75f) : getWidth(), 100);
 	
 	ui->setBounds(r.removeFromRight(controlSpace));
 	

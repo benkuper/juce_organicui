@@ -18,11 +18,11 @@ class BaseItemMinimalUI :
 	public DragAndDropTarget
 {
 public:
-	BaseItemMinimalUI<T>(T * _item);
+	BaseItemMinimalUI<T>(T* _item);
 	virtual ~BaseItemMinimalUI<T>();
 
-	T * item;
-	BaseItem * baseItem;
+	T* item;
+	BaseItem* baseItem;
 
 	//ui
 	Colour bgColor;
@@ -48,16 +48,21 @@ public:
 	bool isDraggingOver;
 	bool highlightOnDragOver;
 
-	virtual void mouseDrag(const MouseEvent &e) override;
-	virtual void mouseExit(const MouseEvent &e) override;
+	virtual void mouseDrag(const MouseEvent& e) override;
+	virtual void mouseExit(const MouseEvent& e) override;
 
 	void setHighlightOnMouseOver(bool highlight);
-	void paint(Graphics &g) override;
+	void paint(Graphics& g) override;
 	void setViewZoom(float value);
 	void setViewCheckerSize(float value);
 
 	void setViewSize(float x, float y);
 	void setViewSize(Point<float> size);
+
+	virtual void mouseDown(const MouseEvent& e) override;
+
+	virtual void addContextMenuItems(PopupMenu& p) {}
+	virtual void handleContextMenuResult(int result) {}
 
 	virtual void newMessage(const ContainerAsyncEvent &e) override;
 
@@ -214,6 +219,26 @@ template<class T>
 void BaseItemMinimalUI<T>::setViewSize(Point<float> size)
 {
 	setSize(size.x * viewCheckerSize, size.y * viewCheckerSize);
+}
+
+template<class T>
+void BaseItemMinimalUI<T>::mouseDown(const MouseEvent& e)
+{
+	InspectableContentComponent::mouseDown(e);
+	
+	if (e.mods.isRightButtonDown())
+	{
+		PopupMenu p;
+		addContextMenuItems(p);
+
+		if (p.getNumItems() == 0) return;
+
+		int result = p.show();
+
+		if (result == 0) return;
+
+		handleContextMenuResult(result);
+	}
 }
 
 template<class T>

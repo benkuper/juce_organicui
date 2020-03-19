@@ -20,7 +20,8 @@ class Easing :
 	public ControllableContainer
 {
 public:
-	enum Type { LINEAR, BEZIER, HOLD, SINE };
+	enum Type { LINEAR, BEZIER, HOLD, SINE, TYPE_MAX };
+	static const String typeNames[TYPE_MAX];
 
 	Easing(Type type, AutomationKey* k1, AutomationKey* k2, int dimension);
 	virtual ~Easing();

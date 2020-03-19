@@ -1,4 +1,3 @@
-#include "Parameter.h"
 /*
   ==============================================================================
 
@@ -25,7 +24,6 @@ Parameter::Parameter(const Type &type, const String &niceName, const String &des
     canBeAutomated(false),
     isPresettable(true),
     isOverriden(false),
-    autoAdaptRange(false),
     forceSaveValue(false),
 	queuedNotifier(100)
 {
@@ -151,16 +149,16 @@ UndoableAction * Parameter::setUndoableValue(var oldValue, var newValue, bool on
 
 void Parameter::setValue(var _value, bool silentSet, bool force, bool forceOverride)
 {
-	if (!alwaysNotify && !force && checkValueIsTheSame(_value, value)) return;
-	
-	valueSetLock.enter();
-	lastValue = var(value);
-	valueSetLock.exit();
+	{
+		GenericScopedLock<SpinLock> lock(valueSetLock);
 
-	setValueInternal(_value);
+		if (!alwaysNotify && !force && checkValueIsTheSame(_value, value)) return;
 
-	isOverriden =  _value != defaultValue || forceOverride;
+		lastValue = var(value);
+		setValueInternal(_value);
+		isOverriden = _value != defaultValue || forceOverride;
 
+	}
 	if (!silentSet) notifyValueChanged();
 }
 
@@ -267,6 +265,12 @@ float Parameter::getNormalizedValue()
 		return jmap<float>((float)value, (float)minimumValue, (float)maximumValue, 0.f, 1.f);
 }
 
+void Parameter::setAttribute(String param, var val)
+{
+	Controllable::setAttribute(param, val);
+
+	if (param == "alwaysNotify") alwaysNotify = val;
+}
 
 //helpers for fast typing
 
@@ -366,7 +370,7 @@ void Parameter::loadJSONDataInternal(var data)
 
  	if (data.getDynamicObject()->hasProperty("editable")) setControllableFeedbackOnly(!data.getProperty("editable", true));
 
-	alwaysNotify = data.getProperty("alwaysNotify", false);
+	alwaysNotify = data.getProperty("alwaysNotify", alwaysNotify);
 }
 
 var Parameter::getValueFromScript(const juce::var::NativeFunctionArgs & a)
@@ -376,6 +380,11 @@ var Parameter::getValueFromScript(const juce::var::NativeFunctionArgs & a)
 	WeakReference<Parameter> pRef(p); 
 	if (pRef == nullptr || pRef.wasObjectDeleted()) return var();
 	return p->getValue();
+}
+
+String Parameter::getScriptTargetString()
+{
+	return  "[" + niceName + " : " + getTypeString() + " > " + stringValue() + "]";
 }
 
 

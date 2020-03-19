@@ -1,4 +1,3 @@
-#include "Point3DParameter.h"
 /*
 ==============================================================================
 
@@ -75,26 +74,6 @@ void Point3DParameter::setValueInternal(var & _value)
 {
 	if (!_value.isArray()) return;
 
-	valueSetLock.enter();
-
-	bool hasChanged = false;
-
-	if (autoAdaptRange)
-	{
-		for (int i = 0; i < 3; i++)
-		{
-			if ((float)_value[i] < (float)minimumValue[i]) {
-				minimumValue[i] = _value[i];
-				hasChanged = true;
-			} else if ((float)_value[i] > (float)maximumValue[i])
-			{
-				maximumValue[i] = _value[i];
-				hasChanged = true;
-			}
-		}
-
-	}
-
 	jassert(minimumValue.isArray() && maximumValue.isArray());
 	
 	x = std::isnan((float)_value[0]) ? 0 : jlimit<float>(minimumValue[0], maximumValue[0], _value[0]);
@@ -106,10 +85,6 @@ void Point3DParameter::setValueInternal(var & _value)
 	value.append(x);
 	value.append(y);
 	value.append(z);
-
-	valueSetLock.exit();
-
-	if (hasChanged) setRange(minimumValue, maximumValue, false);
 }
 
 void Point3DParameter::setBounds(float _minX, float _minY, float _minZ, float _maxX, float _maxY, float _maxZ)
@@ -168,12 +143,7 @@ bool Point3DParameter::checkValueIsTheSame(var newValue, var oldValue)
 {
 	if (!(newValue.isArray() && oldValue.isArray())) return false;
 	
-	valueSetLock.enter();
-	bool result = jlimit<float>(minimumValue[0], maximumValue[0], newValue[0]) == (float)oldValue[0]
-		&& jlimit<float>(minimumValue[1], maximumValue[1], newValue[1]) == (float)oldValue[1]
-	&& jlimit<float>(minimumValue[2], maximumValue[2], newValue[2]) == (float)oldValue[2];
-
-	valueSetLock.exit();
+	bool result = newValue[0] == oldValue[0] && newValue[1] == oldValue[1] && newValue[2] == oldValue[2];
 
 	return result;
 }

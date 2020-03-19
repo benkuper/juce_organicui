@@ -1,3 +1,4 @@
+#include "StringUtil.h"
 /*
  ==============================================================================
 
@@ -23,12 +24,12 @@ String StringUtil::toShortName(const String& niceName, bool replaceSlashes) {
 
 	res = res.replaceCharacter('\"', '_');
 	
-	String specials = "+-()[]{}<>^'@#*$~";// ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏĞÑÒÓÔÕÖ×ÙÚÛÜİßàáâãäåæçèéêëìíîïğñòóôõöùúûüıÿ";
+	String specials = "+-()[]{}<>^'@#*$~";// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½";
 	String replaces = "_________________";//AAAAAAECEEEEIIIIDNOOOOOxUUUUYsaaaaaaeceeeeiiiiOnooooouuuuyy";
 	res = res.replaceCharacters(specials, replaces);
-	res = res.replaceCharacter('é', 'e').replaceCharacter('è', 'e').replaceCharacter('ê', 'e')
-		.replaceCharacter('à', 'a').replaceCharacter('â', 'a').replaceCharacter('ô', 'o')
-		.replaceCharacter('ü', 'u').replaceCharacter('ç', 'c');
+	res = res.replaceCharacter('ï¿½', 'e').replaceCharacter('ï¿½', 'e').replaceCharacter('ï¿½', 'e')
+		.replaceCharacter('ï¿½', 'a').replaceCharacter('ï¿½', 'a').replaceCharacter('ï¿½', 'o')
+		.replaceCharacter('ï¿½', 'u').replaceCharacter('ï¿½', 'c');
 
 	//for (int i = 0; i < specials.length(); i++) res = res.replaceCharacter(specials[i], replaces[i]);
 
@@ -93,4 +94,41 @@ CommandLineElements StringUtil::parseCommandLine(const String& commandLine) {
 	}
 	return res;
 
-};
+}
+
+#pragma warning (push)
+#pragma warning(disable:4244)
+String StringUtil::valueToTimeString(float timeVal)
+{
+	int hours = floor(timeVal / 3600);
+	int minutes = floor(fmodf(timeVal, 3600) / 60);
+	float seconds = fmodf(timeVal, 60);
+	return String::formatted("%02i:%02i:%06.3f", hours, minutes, seconds);
+}
+
+float StringUtil::timeStringToValue(String str)
+{
+	StringArray sa;
+	str = str.retainCharacters("0123456789.:;,");
+	if (str.endsWithChar(':')) str += "0";
+	sa.addTokens(str.replace(",", "."), ":", "");
+
+	float value = 0;
+
+	value += sa.strings[sa.strings.size() - 1].getFloatValue();
+
+	if (sa.strings.size() >= 2)
+	{
+		int numMinutes = sa.strings[sa.strings.size() - 2].getIntValue() * 60;
+		value += numMinutes;
+		if (sa.strings.size() >= 3)
+		{
+			int numHours = sa.strings[sa.strings.size() - 3].getFloatValue() * 3600;
+			value += numHours;
+		}
+	}
+
+	return value;
+}
+
+

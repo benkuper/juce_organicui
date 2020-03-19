@@ -113,12 +113,12 @@ BaseManagerViewUI<M, T, U>::BaseManagerViewUI(const String& contentName, M* _man
 	centerUIAroundPosition(false),
 	updatePositionOnDragMove(false),
 	enableSnapping(false),
+    useCheckersAsUnits(false),
 	canZoom(true),
 	zoomAffectsItemSize(true),
 	viewZoom(1),
 	minZoom(.4f),
 	maxZoom(1),
-	useCheckersAsUnits(false),
 	timeSinceLastWheel(0)
 {
     this->defaultLayout = this->FREE;
@@ -362,13 +362,13 @@ void BaseManagerViewUI<M, T, U>::updateItemsVisibility()
 template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::addItemFromMenu(bool isFromAddButton, Point<int> mouseDownPos)
 {
-	this->manager->addItem(getViewPos(mouseDownPos).toFloat());
+	addItemFromMenu(nullptr, isFromAddButton, mouseDownPos);
 }
 
 template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::addItemFromMenu(T * item, bool isFromAddButton, Point<int> mouseDownPos)
 {
-	this->manager->addItem(item, getViewPos(mouseDownPos).toFloat());
+	this->manager->addItem(item, isFromAddButton?Point<float>(0,0):getViewPos(mouseDownPos).toFloat());
 }
 
 template<class M, class T, class U>
@@ -490,10 +490,11 @@ void BaseManagerViewUI<M, T, U>::itemDragMove(const DragAndDropTarget::SourceDet
 	BaseManagerUI<M, T, U>::itemDragMove(dragSourceDetails);
 
 	BaseItemMinimalUI<T>* bui = dynamic_cast<BaseItemMinimalUI<T>*>(dragSourceDetails.sourceComponent.get());
+	if (bui == nullptr) return;
+	
 	Point<int> relOffset = Point<int>((int)dragSourceDetails.description.getProperty("offsetX", 0), (int)dragSourceDetails.description.getProperty("offsetY", 0));
 	Point<int> realP = this->getMouseXYRelative() - (this->getLocalPoint(bui, relOffset) - bui->getPosition()) *1.0f / viewZoom;
 
-	if (bui == nullptr) return;
 
 	Point<int> snapPosition = realP;
 

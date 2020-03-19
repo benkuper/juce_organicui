@@ -65,6 +65,7 @@ public:
 
 	void inspectableDestroyed(Inspectable * i) override;
 
+	void setAttribute(String param, var value) override;
 
 	var getJSONDataInternal() override;
 	void loadJSONDataInternal(var data) override;

@@ -14,7 +14,7 @@ ParameterAutomation::ParameterAutomation(Parameter* _parameter) :
 	timeParamRef(nullptr),
 	lengthParamRef(nullptr),
     valueParamRef(nullptr),
-    automationContainer(automationContainer),
+    automationContainer(nullptr),
     manualMode(true),
     valueIsNormalized(false),
     parameter(_parameter),
@@ -22,6 +22,7 @@ ParameterAutomation::ParameterAutomation(Parameter* _parameter) :
 {
 	isSelectable = false;
 	parameter->setControllableFeedbackOnly(true);
+	setManualMode(false);
 }
 
 ParameterAutomation::~ParameterAutomation()

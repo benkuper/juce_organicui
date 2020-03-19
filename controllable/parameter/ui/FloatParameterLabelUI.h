@@ -76,10 +76,6 @@ protected:
 	void valueChanged(const var &) override;
 	void labelTextChanged(Label * l) override;
 
-
-	String valueToTimeString(float val) const;
-	float timeStringToValue(String str) const;
-
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TimeLabel)
 };

@@ -78,10 +78,10 @@ public:
 	virtual void loadJSONDataInternal(var data) override;
 	virtual void loadJSONDataManagerInternal(var data);
 
-	void updateLiveScriptObjectInternal(DynamicObject * = nullptr) override;
-
 	PopupMenu getItemsMenu(int startID);
 	T * getItemForMenuResultID(int id, int startID);
+
+	String getScriptTargetString() override;
 
     //using BManagerListener = typename BaseManagerListener<T>;
     //friend class BaseManagerListener<T>;
@@ -217,6 +217,12 @@ public:
 
 	static var addItemFromScript(const var::NativeFunctionArgs& args);
 	static var removeItemFromScript(const var::NativeFunctionArgs& args);
+	static var getItemsFromScript(const var::NativeFunctionArgs& args);
+	static var getItemWithNameFromScript(const var::NativeFunctionArgs& args);
+	static var getItemAtFromScript(const var::NativeFunctionArgs& args);
+	static var getItemIndexFromScript(const var::NativeFunctionArgs& args);
+	static var getItemBeforeFromScript(const var::NativeFunctionArgs& args);
+	static var getItemAfterFromScript(const var::NativeFunctionArgs& args);
 
 	private:
 		JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BaseManager<T>)
@@ -240,6 +246,12 @@ BaseManager<T>::BaseManager(const String & name) :
 
 	scriptObject.setMethod("addItem", &BaseManager<T>::addItemFromScript);
 	scriptObject.setMethod("removeItem", &BaseManager<T>::removeItemFromScript);
+	scriptObject.setMethod("getItems", &BaseManager<T>::getItemsFromScript);
+	scriptObject.setMethod("getItemWithName", &BaseManager<T>::getItemWithNameFromScript);
+	scriptObject.setMethod("getItemAt", &BaseManager<T>::getItemAtFromScript);
+	scriptObject.setMethod("getItemIndex", &BaseManager<T>::getItemIndexFromScript);
+	scriptObject.setMethod("getItemBefore", &BaseManager<T>::getItemBeforeFromScript);
+	scriptObject.setMethod("getItemAfter", &BaseManager<T>::getItemAfterFromScript);
 
 	skipLabelInTarget = true; //by default manager label in targetParameter UI are not interesting
 	nameCanBeChangedByUser = false;
@@ -324,15 +336,13 @@ T * BaseManager<T>::addItem(T * item, var data, bool addToUndo, bool notify)
 template<class T>
 T * BaseManager<T>::addItem(const Point<float> initialPosition, bool addToUndo, bool notify)
 {
-	T * i = createItem();
-	i->viewUIPosition->setPoint(initialPosition);
-	addItem(i, addToUndo, notify);
-	return i;
+	return addItem(nullptr, initialPosition, addToUndo, notify);
 }
 
 template<class T>
 T * BaseManager<T>::addItem(T * item, const Point<float> initialPosition, bool addToUndo, bool notify)
 {
+	if (item == nullptr) item = createItem();
 	item->viewUIPosition->setPoint(initialPosition);
 	addItem(item, addToUndo, notify);
 	return item;
@@ -700,20 +710,6 @@ void BaseManager<T>::loadJSONDataManagerInternal(var data)
 }
 
 template<class T>
-void BaseManager<T>::updateLiveScriptObjectInternal(DynamicObject *)
-{
-	ControllableContainer::updateLiveScriptObjectInternal();
-
-	var itemsArray = var();
-
-	//items.getLock().enter();
-	for (auto &t : items) itemsArray.append(t->getScriptObject());
-	//items.getLock().exit();
-
-	liveScriptObject->setProperty("items", itemsArray);
-}
-
-template<class T>
 inline PopupMenu BaseManager<T>::getItemsMenu(int startID)
 {
 	PopupMenu menu;
@@ -730,6 +726,12 @@ template<class T>
 inline T * BaseManager<T>::getItemForMenuResultID(int id, int startID)
 {
 	return items[id - startID];
+}
+
+template<class T>
+String BaseManager<T>::getScriptTargetString()
+{
+	return "[" + niceName + " : Manager(" + itemDataType + ")]";
 }
 
 
@@ -811,6 +813,94 @@ var BaseManager<T>::removeItemFromScript(const var::NativeFunctionArgs& args)
 	return var();
 }
 
+template<class T>
+var BaseManager<T>::getItemsFromScript(const var::NativeFunctionArgs& args)
+{
+	var result = var();
+	if (BaseManager<T>* m = getObjectFromJS<BaseManager<T>>(args))
+	{
+		for (auto& i : m->items) result.append(i->getScriptObject());
+	}
+
+	return result;
+}
+
+template<class T>
+var BaseManager<T>::getItemWithNameFromScript(const var::NativeFunctionArgs& args)
+{
+	if (BaseManager<T>* m = getObjectFromJS<BaseManager<T>>(args))
+	{
+		if (!checkNumArgs(m->niceName, args, 1)) return var();
+		T* i = m->getItemWithName(args.arguments[0].toString(), true, true);
+		if (i != nullptr) return i->getScriptObject();
+	}
+
+	return var();
+}
+
+template<class T>
+var BaseManager<T>::getItemAtFromScript(const var::NativeFunctionArgs& args)
+{
+	if (BaseManager<T>* m = getObjectFromJS<BaseManager<T>>(args))
+	{
+		if (!checkNumArgs(m->niceName, args, 1)) return var();
+		int index = args.arguments[0];
+		if (index < 0 || index >= m->items.size()) return var();
+		T* i = m->items[index];
+		if (i != nullptr) return i->getScriptObject();
+	}
+
+	return var();
+}
+
+template<class T>
+var BaseManager<T>::getItemIndexFromScript(const var::NativeFunctionArgs& args)
+{
+	if (BaseManager<T>* m = getObjectFromJS<BaseManager<T>>(args))
+	{
+		if (!checkNumArgs(m->niceName, args, 1)) return var();
+		if (!args.arguments[0].isObject()) return var();
+		T* item = dynamic_cast<T*>((T*)(int64)args.arguments[0].getDynamicObject()->getProperty(scriptPtrIdentifier));
+		if (item == nullptr) return var();
+		return m->items.indexOf(item);
+	}
+
+	return var();
+}
+
+template<class T>
+var BaseManager<T>::getItemBeforeFromScript(const var::NativeFunctionArgs& args)
+{
+	if (BaseManager<T>* m = getObjectFromJS<BaseManager<T>>(args))
+	{
+		if (!checkNumArgs(m->niceName, args, 1)) return var();
+		if (!args.arguments[0].isObject()) return var();
+		T* item = dynamic_cast<T*>((T*)(int64)args.arguments[0].getDynamicObject()->getProperty(scriptPtrIdentifier));
+		if (item == nullptr) return var();
+		int index = m->items.indexOf(item);
+		if (index <= 0) return var();
+		return m->items[index - 1]->getScriptObject();
+	}
+
+	return var();
+}
+
+template<class T>
+var BaseManager<T>::getItemAfterFromScript(const var::NativeFunctionArgs& args)
+{
+	if (BaseManager<T>* m = getObjectFromJS<BaseManager<T>>(args))
+	{
+		if (!checkNumArgs(m->niceName, args, 1)) return var();
+		if (!args.arguments[0].isObject()) return var();
+		T* item = dynamic_cast<T*>((T*)(int64)args.arguments[0].getDynamicObject()->getProperty(scriptPtrIdentifier));
+		if (item == nullptr) return var();
+		int index = m->items.indexOf(item);
+		if (index >= m->items.size()-1) return var();
+		return m->items[index + 1]->getScriptObject();
+	}
+
+	return var();
+}
 
 
 //MANAGER EVENT

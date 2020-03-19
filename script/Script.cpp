@@ -8,6 +8,8 @@ Author:  Ben
 ==============================================================================
 */
 
+#include "../engine/Engine.h"
+
 Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled) :
 	BaseItem("Script", canBeDisabled, false),
 	Thread("Script"),
@@ -38,7 +40,7 @@ Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled) :
 	scriptObject.setMethod("logWarning", Script::logWarningFromScript);
 	scriptObject.setMethod("logError", Script::logErrorFromScript);
 	scriptObject.setMethod("setUpdateRate", Script::setUpdateRateFromScript);
-
+    
 	scriptObject.setMethod("addTrigger", Script::addTriggerFromScript);
 	scriptObject.setMethod("addBoolParameter", Script::addBoolParameterFromScript);
 	scriptObject.setMethod("addIntParameter", Script::addIntParameterFromScript);
@@ -49,6 +51,7 @@ Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled) :
 	scriptObject.setMethod("addPoint2DParameter", Script::addPoint2DParameterFromScript);
 	scriptObject.setMethod("addPoint3DParameter", Script::addPoint2DParameterFromScript);
 	scriptObject.setMethod("addColorParameter", Script::addColorParameterFromScript);
+    scriptObject.setMethod("addFileParameter", Script::addFileParameterFromScript);
 
 	scriptParamsContainer.hideEditorHeader = true;
 	addChildControllableContainer(&scriptParamsContainer);
@@ -300,64 +303,93 @@ void Script::timerCallback()
 
 void Script::run()
 {
-	float lastUpdateTime = (float)Time::getMillisecondCounter() / 1000.f;
-	
+	double millisAtLastUpdate = Time::getMillisecondCounterHiRes();
+
 	while (!Engine::mainEngine->isClearing && !threadShouldExit() && state == ScriptState::SCRIPT_LOADED && updateEnabled)
 	{
-		sleep(1000 / updateRate->floatValue());
-
-		float curTime = (float)Time::getMillisecondCounter() / 1000.f;
-		float deltaTime = curTime - lastUpdateTime;
-		lastUpdateTime = curTime;
+		double nowMillis = Time::getMillisecondCounterHiRes();
+		double deltaMillis = nowMillis - millisAtLastUpdate;
+		millisAtLastUpdate = nowMillis;
 
 		Array<var> args;
-		args.add(deltaTime);
+		args.add(deltaMillis/1000.0);
 
 		Result r = Result::ok();
 		callFunction(updateIdentifier, args, &r);
 		if (r != Result::ok()) return;
+
+		double afterProcessMillis = Time::getMillisecondCounterHiRes();
+		double processTime = afterProcessMillis - nowMillis;
+
+		sleep(jmax<int>((1000.0 / updateRate->floatValue()) - processTime, 0));
+	}
+}
+
+void Script::logFromArgs(const var::NativeFunctionArgs& args, int logLevel)
+{
+	Script* s = ScriptTarget::getObjectFromJS<Script>(args);
+	if (!s->logParam->boolValue()) return;
+
+	String logS = "";
+	for (int i = 0; i < args.numArguments; i++)
+	{
+		var a = args.arguments[i];
+		String as = "";
+		if (a.isObject())
+		{
+			if (a.hasProperty(scriptPtrIdentifier))
+			{
+				String st = a.getProperty("_type", "").toString();
+				if (st.isNotEmpty())
+				{
+					int64 ptr = (int64)a.getDynamicObject()->getProperty(scriptPtrIdentifier);
+
+					if (st == "Container")
+					{
+						as += dynamic_cast<ControllableContainer*>((ControllableContainer*)ptr)->getScriptTargetString();
+					}
+					else if (st == "Controllable")
+					{
+						as += dynamic_cast<Controllable*>((Controllable*)ptr)->getScriptTargetString();
+					}
+				}
+			}
+			else
+			{
+				as += a.toString();
+			}
+		}
+		else
+		{
+			as = a.toString();
+		}
+
+		logS += (i > 0 ? "\n" : "") + as;
+	}
+
+	switch (logLevel)
+	{
+	case 0: NLOG("Script : " + s->niceName, logS); break;
+	case 1: NLOGWARNING("Script : " + s->niceName, logS); break;
+	case 2: NLOGERROR("Script : " + s->niceName, logS); break;
 	}
 }
 
 var Script::logFromScript(const var::NativeFunctionArgs & args)
 {
-	Script * s = ScriptTarget::getObjectFromJS<Script>(args);
-	if (!s->logParam->boolValue()) return var();
-
-	for (int i = 0; i < args.numArguments; i++)
-	{
-		if (i == 0) NLOG("Script : " + s->niceName, args.arguments[i].toString());
-		else NLOG("", args.arguments[i].toString());
-	}
-
+	logFromArgs(args, 0);
 	return var();
 }
 
 var Script::logWarningFromScript(const var::NativeFunctionArgs& args)
 {
-	Script* s = ScriptTarget::getObjectFromJS<Script>(args);
-	if (!s->logParam->boolValue()) return var();
-
-	for (int i = 0; i < args.numArguments; i++)
-	{
-		if (i == 0) NLOGWARNING("Script : " + s->niceName, args.arguments[i].toString());
-		else NLOGWARNING("", args.arguments[i].toString());
-	}
-
+	logFromArgs(args, 1);
 	return var();
 }
 
 var Script::logErrorFromScript(const var::NativeFunctionArgs& args)
 {
-	Script* s = ScriptTarget::getObjectFromJS<Script>(args);
-	if (!s->logParam->boolValue()) return var();
-
-	for (int i = 0; i < args.numArguments; i++)
-	{
-		if (i == 0) NLOGERROR("Script : " + s->niceName, args.arguments[i].toString());
-		else NLOGERROR("", args.arguments[i].toString());
-	}
-
+	logFromArgs(args, 2);
 	return var();
 }
 
@@ -430,7 +462,29 @@ var Script::addColorParameterFromScript(const var::NativeFunctionArgs & args)
 {
 	Script * s = getObjectFromJS<Script>(args);
 	if (!checkNumArgs(s->niceName, args, 3)) return var();
-	return s->scriptParamsContainer.addColorParameter(args.arguments[0], args.arguments[1], Colour((int)(args.arguments[2])))->getScriptObject();
+	var color;
+	if (args.arguments[2].isArray())
+	{
+		color = args.arguments[2];
+		while (color.size() < 4) color.append(color.size() < 3 ? 0 : 1);
+		for (int i = 0; i < color.size();i++) color[i] = (float)color[i] * 255;
+	}
+	else if (args.numArguments >= 5)
+	{
+		color.append((float)args.arguments[2] * 255);
+		color.append((float)args.arguments[3] * 255);
+		color.append((float)args.arguments[4] * 255);
+		color.append((float)args.numArguments >= 6 ?(float)args.arguments[5]*255:255);
+	}
+	else if (args.arguments[2].isInt() || args.arguments[2].isInt64())
+	{
+		color.append(((int)args.arguments[2] >> 24) & 0xFF);
+		color.append(((int)args.arguments[2] >> 16) & 0xFF);
+		color.append(((int)args.arguments[2] >> 8) & 0xFF);
+		color.append(((int)args.arguments[2]) & 0xFF);
+	}
+
+	return s->scriptParamsContainer.addColorParameter(args.arguments[0], args.arguments[1], Colour((uint8)(int)color[0], (uint8)(int)color[1], (uint8)(int)color[2], (uint8)(int)color[3]))->getScriptObject();
 }
 
 var Script::addPoint2DParameterFromScript(const var::NativeFunctionArgs & args)
@@ -446,6 +500,16 @@ var Script::addPoint3DParameterFromScript(const var::NativeFunctionArgs & args)
 	if (!checkNumArgs(s->niceName, args, 2)) return var();
 	return s->scriptParamsContainer.addPoint3DParameter(args.arguments[0], args.arguments[1])->getScriptObject();
 }
+
+var Script::addFileParameterFromScript(const var::NativeFunctionArgs & args)
+{
+    Script * s = getObjectFromJS<Script>(args);
+    if (!checkNumArgs(s->niceName, args, 2)) return var();
+    FileParameter * fp = s->scriptParamsContainer.addFileParameter(args.arguments[0], args.arguments[1]);
+    fp->directoryMode = args.numArguments > 2 ? ((int)args.arguments[2] > 0) : false;
+    return fp->getScriptObject();
+}
+
 
 var Script::setUpdateRateFromScript(const var::NativeFunctionArgs& args)
 {

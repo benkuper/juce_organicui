@@ -85,7 +85,6 @@ public:
 
 	bool isPresettable;
     bool isOverriden;
-	bool autoAdaptRange;
 	bool forceSaveValue; //if true, will save value even if not overriden
 
 	virtual void setEnabled(bool value, bool silentSet = false, bool force = false) override;
@@ -110,6 +109,8 @@ public:
 	void setUndoableNormalizedValue(const float &oldNormalizedValue, const float &newNormalizedValue);
 	void setNormalizedValue(const float &normalizedValue, bool silentSet = false, bool force = false);
     float getNormalizedValue();
+	
+	virtual void setAttribute(String param, var value) override;
 
     //helpers for fast typing
 	virtual float floatValue();
@@ -138,6 +139,8 @@ public:
 	virtual void loadJSONDataInternal(var data) override;
 	
 	static var getValueFromScript(const juce::var::NativeFunctionArgs &a);
+
+	String getScriptTargetString() override;
 
     ListenerList<ParameterListener> listeners;
     void addParameterListener(ParameterListener* newListener) { listeners.add(newListener); }

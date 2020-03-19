@@ -73,7 +73,7 @@ public:
 
 	void resized()override;
 	LogList logList;
-	TextButton clearB, copyB;
+	TextButton clearB, copyB, autoScrollB;
 	std::unique_ptr<TableListBox> logListComponent;
 	int maxNumElement;
 
@@ -87,8 +87,6 @@ public:
 	static CustomLoggerUI * create(const String &contentName) { return new CustomLoggerUI(contentName, CustomLogger::getInstance()); }
 
 private:
-	bool keyPressed(const KeyPress&) override;
-
 	MouseCursor  getMouseCursor() override;
 	void mouseDown(const MouseEvent&) override;
 	void mouseDrag(const MouseEvent&) override;
