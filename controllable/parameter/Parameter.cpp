@@ -150,7 +150,7 @@ UndoableAction * Parameter::setUndoableValue(var oldValue, var newValue, bool on
 void Parameter::setValue(var _value, bool silentSet, bool force, bool forceOverride)
 {
 	{
-		GenericScopedLock lock(valueSetLock);
+		GenericScopedLock<SpinLock> lock(valueSetLock);
 
 		if (!alwaysNotify && !force && checkValueIsTheSame(_value, value)) return;
 
