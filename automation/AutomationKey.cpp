@@ -80,6 +80,7 @@ void AutomationKey::setEasing(Easing::Type t)
 
 float AutomationKey::getValue(AutomationKey * nextKey, const float & _pos)
 {
+	if (position == nullptr || nextKey == nullptr) return 0;
 
 	float relPos = 0;
 	if(position->floatValue() < nextKey->position->floatValue()) relPos = jmap<float>(_pos, position->floatValue(), nextKey->position->floatValue(), 0, 1); 
