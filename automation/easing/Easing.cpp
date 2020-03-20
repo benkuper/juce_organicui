@@ -1,4 +1,3 @@
-#include "Easing.h"
 /*
   ==============================================================================
 
@@ -8,6 +7,8 @@
 
   ==============================================================================
 */
+
+const String Easing::typeNames[Easing::TYPE_MAX]{"Linear", "Bezier", "Hold","Sine"};
 
 Easing::Easing(Type _type, AutomationKey * k1, AutomationKey * k2, int dimension) :
 	ControllableContainer("ease"),
