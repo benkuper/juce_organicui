@@ -1,4 +1,3 @@
-#include "InspectableContentComponent.h"
 /*
   ==============================================================================
 
@@ -88,8 +87,6 @@ void InspectableContentComponent::mouseDown(const MouseEvent & e)
 
 		if (!foundAChildComponent)
 		{
-			DBG("Mouse down " << ((ControllableContainer *)inspectable.get())->niceName);
-			
 			//grabKeyboardFocus();
 			if (e.mods.isShiftDown()) inspectable->selectThis(true);
 			else

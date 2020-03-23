@@ -76,7 +76,8 @@ public:
 
 	Point<int> getSize();
 	Point<float> getViewMousePosition();
-	Point<float> getViewPos(const Point<int> &originalPos);
+	Point<float> getViewPos(const Point<int>& originalPos);
+	juce::Rectangle<float> getViewBounds(const juce::Rectangle<int> &originalBounds);
 	Point<int> getViewCenter();
 	Point<int> getPosInView(const Point<float> &viewPos);
 	juce::Rectangle<int> getBoundsInView(const juce::Rectangle<float> &r);
@@ -186,7 +187,7 @@ template<class M, class T, class U>
 			 setViewZoom(viewZoom + d.deltaY);
 			 
 			 Point<float> newMousePos = getViewMousePosition();
-			 viewOffset += ((newMousePos - curMousePos) * viewZoom).toInt();
+			 viewOffset += ((newMousePos - curMousePos) * viewZoom * (useCheckersAsUnits ? checkerSize : 1)).toInt();
 			 updateItemsVisibility();
 			 this->resized();
 		 }
@@ -389,6 +390,13 @@ template<class M, class T, class U>
 Point<float> BaseManagerViewUI<M, T, U>::getViewPos(const Point<int>& originalPos)
 {
 	return (originalPos - getViewCenter()).toFloat() / (viewZoom * (useCheckersAsUnits?checkerSize:1));
+}
+
+template<class M, class T, class U>
+juce::Rectangle<float> BaseManagerViewUI<M, T, U>::getViewBounds(const juce:: Rectangle<int>& r)
+{
+	const int checkerMultiplier = useCheckersAsUnits ? checkerSize : 1;
+	return juce::Rectangle<float>().withPosition(getViewPos(r.getPosition())).withSize(r.getWidth() / (viewZoom * checkerMultiplier), r.getHeight() / (viewZoom * checkerMultiplier));
 }
 
 template<class M, class T, class U>

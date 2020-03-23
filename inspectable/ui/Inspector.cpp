@@ -46,7 +46,7 @@ void Inspector::paint(Graphics& g)
 		g.setColour(Colours::white.withAlpha(.4f));
 		g.setFont(jmin(getHeight() - 2, 14));
 		String text = selectionManager->currentInspectables.size() == 0 ? "Select an object to edit its parameters here" : "Multi Editing is not supported right now, but keep trying :)";
-		if(text.isNotEmpty()) g.drawFittedText(text, getLocalBounds(), Justification::centred, 3);
+		if (text.isNotEmpty()) g.drawFittedText(text, getLocalBounds(), Justification::centred, 3);
 	}
 }
 
@@ -88,7 +88,7 @@ void Inspector::setCurrentInspectable(WeakReference<Inspectable> inspectable, bo
 		if (!currentInspectable.wasObjectDeleted())
 		{
 			currentInspectable->removeInspectableListener(this);
-			if(setInspectableSelection) currentInspectable->setSelected(false);
+			if (setInspectableSelection) currentInspectable->setSelected(false);
 		}
 
 		if (currentEditor != nullptr)
@@ -101,7 +101,7 @@ void Inspector::setCurrentInspectable(WeakReference<Inspectable> inspectable, bo
 
 	if (currentInspectable.get() != nullptr)
 	{
-		if(setInspectableSelection) currentInspectable->setSelected(true);
+		if (setInspectableSelection) currentInspectable->setSelected(true);
 		currentInspectable->addInspectableListener(this);
 		currentEditor.reset(currentInspectable->getEditor(true));
 	}
@@ -129,20 +129,20 @@ void Inspector::newMessage(const InspectableSelectionManager::SelectionEvent& e)
 	{
 		if (selectionManager->isEmpty())
 		{
+			if (curSelectionDoesNotAffectInspector) return;
 			setCurrentInspectable(nullptr);
-		}else if (selectionManager->currentInspectables.size() == 1)
-		{
-			Inspectable* newI = selectionManager->currentInspectables[0];
-			if (!newI->showInspectorOnSelect) return;
-			setCurrentInspectable(newI);
 		}
 		else
 		{
-			setCurrentInspectable(nullptr, false);
+			Inspectable* newI = selectionManager->currentInspectables[0];
+			curSelectionDoesNotAffectInspector = !newI->showInspectorOnSelect;
+			if (curSelectionDoesNotAffectInspector) return;
+
+			if (selectionManager->currentInspectables.size() == 1) setCurrentInspectable(newI);
+			else setCurrentInspectable(nullptr, false);
 		}
 
 		repaint();
-
 	}
 }
 

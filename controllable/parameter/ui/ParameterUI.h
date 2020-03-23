@@ -59,7 +59,7 @@ public:
 		~ValueEditCalloutComponent();
 		
 		WeakReference<Parameter> p;
-		Label label;
+		OwnedArray<Label> labels;
 
 		void resized() override;
 		void paint(Graphics& g) override;
