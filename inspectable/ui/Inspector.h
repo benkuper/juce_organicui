@@ -29,6 +29,8 @@ public:
 	Viewport vp;
 	std::unique_ptr<InspectableEditor> currentEditor;
 
+	bool curSelectionDoesNotAffectInspector;
+
 	void setSelectionManager(InspectableSelectionManager* newSM);
 	void setCurrentInspectable(WeakReference<Inspectable> inspectable, bool setInspectableSelection = true);
 	
