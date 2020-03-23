@@ -1,3 +1,4 @@
+#include "Automation.h"
 /*  ==============================================================================
 
 	Automation.cpp
@@ -171,8 +172,6 @@ void Automation::setLength(float newLength, bool stretch, bool stickToEnd)
 
 		if (stickToEnd) for (auto &k : items) k->position->setValue(k->position->floatValue() + lengthDiff);
 	}
-
-	
 }
 
 float Automation::getValueForPosition(float pos)
