@@ -1,4 +1,3 @@
-#include "ParameterUI.h"
 /*
   ==============================================================================
 
@@ -223,14 +222,21 @@ void ParameterUI::newMessage(const Parameter::ParameterEvent &e) {
 }
 
 ParameterUI::ValueEditCalloutComponent::ValueEditCalloutComponent(WeakReference<Parameter> p) :
-	p(p),
-	label("ValueEditorLabel")
+	p(p)
 {
-	label.addListener(this);
-	label.setText(p->stringValue(), dontSendNotification);
-	label.setEditable(true);
-	addAndMakeVisible(&label);
-	setSize(100, 20);
+	int numValues = p->isComplex() ? p->value.size() : 1;
+	for (int i = 0; i < numValues; i++)
+	{
+		Label* label = new Label("ValueLabel" + String(i));
+		label->addListener(this);
+		label->setText(p->isComplex()?p->value[i].toString():p->stringValue(), dontSendNotification);
+		label->setEditable(true);
+		if (p->isComplex()) label->setColour(label->outlineColourId, BG_COLOR);
+		addAndMakeVisible(label);
+		labels.add(label);
+	}
+	
+	setSize(100 * numValues, 20);
 }
 
 ParameterUI::ValueEditCalloutComponent::~ValueEditCalloutComponent()
@@ -239,7 +245,15 @@ ParameterUI::ValueEditCalloutComponent::~ValueEditCalloutComponent()
 
 void ParameterUI::ValueEditCalloutComponent::resized()
 {
-	label.setBounds(getLocalBounds());
+	const int gap = 4;
+	int numValues = p->isComplex() ? p->value.size() : 1;
+	int labelWidth = (getWidth() - (gap * numValues - 1)) / numValues;
+	juce::Rectangle<int> r = getLocalBounds();
+	for (int i = 0; i < numValues; i++)
+	{
+		if (i > 0) r.removeFromLeft(gap);
+		labels[i]->setBounds(r.removeFromLeft(labelWidth));
+	}
 }
 
 void ParameterUI::ValueEditCalloutComponent::paint(Graphics& g)
@@ -250,8 +264,19 @@ void ParameterUI::ValueEditCalloutComponent::labelTextChanged(Label* l)
 {
 	if (!p.wasObjectDeleted() && p != nullptr)
 	{
-		if (p->type == Parameter::STRING) p->setUndoableValue(p->getValue(), label.getText());
-		else p->setUndoableValue(p->getValue(), label.getText().replace(",", ".").getFloatValue());
+		var labelVal;
+		
+		var oldVal = p->getValue();
+
+		var newVal;
+		int numValues = p->value.size();
+		for (int i = 0; i < numValues; i++)
+		{
+			if (p->type == Parameter::STRING) newVal.append(labels[i]->getText());
+			else newVal.append((labels[i]->getText().replace(",", ".").getFloatValue()));
+		}
+
+		p->setUndoableValue(oldVal, p->isComplex()?newVal: newVal[0]);
 	}
 }
 
@@ -260,15 +285,15 @@ void ParameterUI::ValueEditCalloutComponent::editorHidden(Label* l, TextEditor&)
 	CallOutBox* b = dynamic_cast<CallOutBox*>(getParentComponent());
 	if (b != nullptr)
 	{
-		b->dismiss();
+		if(l == labels[labels.size()-1]) b->dismiss();
 	}
 }
 
 void ParameterUI::ValueEditCalloutComponent::parentHierarchyChanged()
 {
-	if (label.isShowing())
+	if (labels[0]->isShowing())
 	{
-		label.grabKeyboardFocus();
-		label.showEditor();
+		labels[0]->grabKeyboardFocus();
+		labels[0]->showEditor();
 	}
 }
