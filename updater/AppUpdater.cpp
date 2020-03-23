@@ -104,7 +104,8 @@ void AppUpdater::downloadUpdate()
 	URL downloadURL = URL(downloadURLBase + downloadingFileName);
 
 	LOG("Downloading " + downloadURL.toString(false) + "...");
-	downloadTask.reset(downloadURL.downloadToFile(targetFile, "", this));
+	downloadTask = downloadURL.downloadToFile(targetFile, "", this);
+
 
 	if (downloadTask == nullptr)
 	{
