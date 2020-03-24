@@ -179,6 +179,10 @@ void AutomationKeyUI::controllableFeedbackUpdateInternal(Controllable * c)
 	{
 		setEasingUI(item->easing != nullptr ? item->easing->createUI() : nullptr);
 	}
+	else if (c == item->value)
+	{
+		repaint();
+	}
 }
 
 void AutomationKeyUI::inspectableSelectionChanged(Inspectable * i)
