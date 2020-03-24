@@ -53,9 +53,6 @@ public:
     var minimumValue;
     var maximumValue;
 
-	var defaultMinValue;//for autoAdaptRange
-	var defaultMaxValue;
-   
 	//Control Mode
 	bool lockManualControlMode;
 	ControlMode controlMode;
@@ -79,7 +76,7 @@ public:
 	bool isComplex();
 	virtual StringArray getValuesNames();
 
-	virtual void setRange(var,var, bool setDefaultRange = true);
+	virtual void setRange(var min, var max);
 	virtual void clearRange();
 	virtual bool hasRange();
 
