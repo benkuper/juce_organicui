@@ -269,7 +269,7 @@ void ParameterUI::ValueEditCalloutComponent::labelTextChanged(Label* l)
 		var oldVal = p->getValue();
 
 		var newVal;
-		int numValues = p->value.size();
+		int numValues = p->isComplex() ? p->value.size() : 1;
 		for (int i = 0; i < numValues; i++)
 		{
 			if (p->type == Parameter::STRING) newVal.append(labels[i]->getText());
