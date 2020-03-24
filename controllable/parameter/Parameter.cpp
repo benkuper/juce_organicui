@@ -14,8 +14,6 @@ Parameter::Parameter(const Type &type, const String &niceName, const String &des
 	canHaveRange(false),
 	minimumValue(minValue),
 	maximumValue(maxValue),
-	defaultMinValue(minValue),
-	defaultMaxValue(maxValue),
     lockManualControlMode(false),
     controlMode(MANUAL),
 	alwaysNotify(false),
@@ -179,15 +177,9 @@ StringArray Parameter::getValuesNames()
 	return result;
 }
 
-void Parameter::setRange(var min, var max, bool setDefaultRange) {
+void Parameter::setRange(var min, var max) {
 
 	if(isComplex() && (!(min.isArray() && min.size() == value.size()) || !(max.isArray() && max.size() == value.size()))) return;
-
-	if (setDefaultRange)
-	{
-		defaultMinValue = min;
-		defaultMaxValue = max;
-	}
 
 	if (minimumValue == min && maximumValue == max) return;
 
