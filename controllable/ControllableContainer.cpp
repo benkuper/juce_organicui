@@ -56,6 +56,9 @@ ControllableContainer::ControllableContainer(const String& niceName) :
 	scriptObject.setMethod("addContainer", ControllableContainer::addContainerFromScript);
 	scriptObject.setMethod("removeContainer", ControllableContainer::removeContainerFromScript);
 	scriptObject.setMethod("removeParameter", ControllableContainer::removeControllableFromScript);
+
+	scriptObject.setMethod("getControlAddress", ControllableContainer::getControlAddressFromScript);
+	scriptObject.setMethod("getScriptControlAdress", ControllableContainer::getScriptControlAddressFromScript);
 }
 
 ControllableContainer::~ControllableContainer()
@@ -1257,6 +1260,29 @@ var ControllableContainer::removeControllableFromScript(const var::NativeFunctio
 	cc->removeControllable(c);
 	return var();
 }
+
+var ControllableContainer::getControlAddressFromScript(const juce::var::NativeFunctionArgs& a)
+{
+	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(a);
+	if (cc == nullptr) return var();
+	ControllableContainer* ref = nullptr;
+	if (a.numArguments > 0 && a.arguments[0].isObject())
+	{
+		if (DynamicObject* d = a.thisObject.getDynamicObject())
+		{
+			ref = dynamic_cast<ControllableContainer*>((ControllableContainer*)(int64)d->getProperty(scriptPtrIdentifier));
+		}
+	}
+
+	return cc->getControlAddress(ref);
+}
+
+var ControllableContainer::getScriptControlAddressFromScript(const juce::var::NativeFunctionArgs& a)
+{
+	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(a);
+	return "root" + cc->getControlAddress().replaceCharacter('/', '.');
+}
+
 
 bool ControllableContainer::checkNumArgs(const String &logName, const var::NativeFunctionArgs & args, int expectedArgs)
 {

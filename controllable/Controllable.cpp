@@ -48,6 +48,8 @@ Controllable::Controllable(const Type &type, const String & niceName, const Stri
 	scriptObject.setMethod("getParent", Controllable::getParentFromScript);
 	scriptObject.setMethod("setName", Controllable::setNameFromScript);
 	scriptObject.setMethod("setAttribute", Controllable::setAttributeFromScript);
+	scriptObject.setMethod("getControlAddress", Controllable::getControlAddressFromScript);
+	scriptObject.setMethod("getScriptControlAdress", Controllable::getScriptControlAddressFromScript);
 
 	setEnabled(enabled);
 	setNiceName(niceName);
@@ -388,6 +390,29 @@ var Controllable::setAttributeFromScript(const juce::var::NativeFunctionArgs& a)
 	if (c == nullptr) return var();
 	c->setAttribute(a.arguments[0].toString(), a.arguments[1].toString());
 	return var();
+}
+
+var Controllable::getControlAddressFromScript(const juce::var::NativeFunctionArgs& a)
+{
+	Controllable* c = getObjectFromJS<Controllable>(a);
+	if (c == nullptr) return var();
+	ControllableContainer* ref = nullptr;
+	if (a.numArguments > 0 && a.arguments[0].isObject())
+	{
+		if (DynamicObject* d = a.thisObject.getDynamicObject())
+		{
+			ref = dynamic_cast<ControllableContainer*>((ControllableContainer*)(int64)d->getProperty(scriptPtrIdentifier));
+		}
+	}
+
+	return c->getControlAddress(ref);
+}
+
+var Controllable::getScriptControlAddressFromScript(const juce::var::NativeFunctionArgs& a)
+{
+	Controllable* c = getObjectFromJS<Controllable>(a);
+	if (c == nullptr) return var();
+	return "root" + c->controlAddress.replaceCharacter('/', '.');
 }
 
 String Controllable::getScriptTargetString()
