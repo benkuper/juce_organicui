@@ -44,4 +44,8 @@ public:
 	static var getOSInfosFromScript(const var::NativeFunctionArgs& args);
 	static var getAppVersionFromScript(const var::NativeFunctionArgs& args);
 	static var getEnvironmentVariableFromScript(const var::NativeFunctionArgs& args);
+
+	static var copyToClipboardFromScript(const var::NativeFunctionArgs& args);
+	static var getFromClipboardFromScript(const var::NativeFunctionArgs& args);
+
 };

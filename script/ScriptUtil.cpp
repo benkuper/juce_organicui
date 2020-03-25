@@ -1,3 +1,4 @@
+#include "ScriptUtil.h"
 /*
   ==============================================================================
 
@@ -38,6 +39,9 @@ ScriptUtil::ScriptUtil() :
 	scriptObject.setMethod("getOSInfos", ScriptUtil::getOSInfosFromScript);
 	scriptObject.setMethod("getAppVersion", ScriptUtil::getAppVersionFromScript);
 	scriptObject.setMethod("getEnvironmentVariable", ScriptUtil::getEnvironmentVariableFromScript);
+
+	scriptObject.setMethod("copyToClipboard", ScriptUtil::copyToClipboardFromScript);
+	scriptObject.setMethod("getFromClipboard", ScriptUtil::getFromClipboardFromScript);
 }
 
 var ScriptUtil::getTime(const var::NativeFunctionArgs &)
@@ -300,4 +304,20 @@ var ScriptUtil::getEnvironmentVariableFromScript(const var::NativeFunctionArgs& 
 {
 	if (a.numArguments == 0) return var();
 	return SystemStats::getEnvironmentVariable(a.arguments[0], "");
+}
+
+var ScriptUtil::copyToClipboardFromScript(const var::NativeFunctionArgs& args)
+{
+	String s = "";
+	for (int i = 0; i < args.numArguments; i++)
+	{
+		s += (i > 0 ? " " : "") + args.arguments[i].toString();
+	}
+	SystemClipboard::copyTextToClipboard(s);
+	return s;
+}
+
+var ScriptUtil::getFromClipboardFromScript(const var::NativeFunctionArgs& args)
+{
+	return SystemClipboard::getTextFromClipboard();
 }
