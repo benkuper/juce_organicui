@@ -49,8 +49,6 @@ void Curve2D::setControlMode(ControlMode mode)
         position->automation->setManualMode(true);
         position->automation->setLength(length->floatValue(), true);
         ((Automation*)position->automation->automationContainer)->clear();
-        ((Automation*)position->automation->automationContainer)->addItem(0, 0, false);
-        ((Automation*)position->automation->automationContainer)->addItem(length->floatValue(), 1, false);
     }
 
     keySyncMode->setEnabled(position->controlMode == Parameter::AUTOMATION);
