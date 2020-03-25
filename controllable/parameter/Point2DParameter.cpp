@@ -85,7 +85,7 @@ void Point2DParameter::setBounds(float _minX, float _minY, float _maxX, float _m
 	minRange.append(_minY);
 	maxRange.append(_maxX);
 	maxRange.append(_maxY);
-	setRange(minRange, maxRange, true);
+	setRange(minRange, maxRange);
 }
 
 void Point2DParameter::clearRange()

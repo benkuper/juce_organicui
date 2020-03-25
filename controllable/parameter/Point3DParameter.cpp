@@ -97,7 +97,7 @@ void Point3DParameter::setBounds(float _minX, float _minY, float _minZ, float _m
 	maxRange.append(_maxX);
 	maxRange.append(_maxY);
 	maxRange.append(_maxZ);
-	setRange(minRange, maxRange, true);
+	setRange(minRange, maxRange);
 }
 
 void Point3DParameter::clearRange()
