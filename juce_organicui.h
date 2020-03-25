@@ -238,6 +238,13 @@ using namespace juce;
 #include "automation/ui/AutomationEditor.h"
 #include "automation/recorder/ui/AutomationRecorderEditor.h"
 #include "automation/parameter/ui/ParameterAutomationEditor.h"
+#include "automation/curve/curve2D/easing/Easing2D.h"
+#include "automation/curve/curve2D/Curve2DKey.h"
+#include "automation/curve/curve2D/Curve2D.h"
+#include "automation/curve/curve2D/easing/ui/Easing2DUI.h"
+#include "automation/curve/curve2D/ui/Curve2DKeyUI.h"
+#include "automation/curve/curve2D/ui/Curve2DUI.h"
+#include "automation/curve/curve2D/ui/Curve2DEditor.h"
 
 #include "comment/Comment.h"
 #include "comment/CommentManager.h"

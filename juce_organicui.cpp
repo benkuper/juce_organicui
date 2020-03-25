@@ -90,7 +90,13 @@
 #include "automation/ui/AutomationEditor.cpp"
 #include "automation/recorder/ui/AutomationRecorderEditor.cpp"
 #include "automation/parameter/ui/ParameterAutomationEditor.cpp"
-
+#include "automation/curve/curve2D/easing/Easing2D.cpp"
+#include "automation/curve/curve2D/Curve2DKey.cpp"
+#include "automation/curve/curve2D/Curve2D.cpp"
+#include "automation/curve/curve2D/easing/ui/Easing2DUI.cpp"
+#include "automation/curve/curve2D/ui/Curve2DKeyUI.cpp"
+#include "automation/curve/curve2D/ui/Curve2DUI.cpp"
+#include "automation/curve/curve2D/ui/Curve2DEditor.cpp"
 
 
 #include "comment/Comment.cpp"
