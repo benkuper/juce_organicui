@@ -244,7 +244,7 @@ Point<float> CubicEasing2D::getClosestPointForPos(Point<float> pos)
 {
 	const int precision = length*30;
 	Point<float> closestP;
-	float minDist = INT_MAX;
+	float minDist = INT32_MAX;
 	for (int i = 0; i < precision; i++)
 	{
 		Bezier::Point bp = bezier.valueAt(i * 1.0f / precision);

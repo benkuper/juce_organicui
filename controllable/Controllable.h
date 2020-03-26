@@ -102,6 +102,10 @@ public:
 	static var setNameFromScript(const juce::var::NativeFunctionArgs& a);
 	static var setAttributeFromScript(const juce::var::NativeFunctionArgs& a);
 
+	static var getControlAddressFromScript(const juce::var::NativeFunctionArgs& a);
+	static var getScriptControlAddressFromScript(const juce::var::NativeFunctionArgs& a);
+
+
 	String getScriptTargetString() override;
 	
 	virtual String getWarningTargetName() const override;
