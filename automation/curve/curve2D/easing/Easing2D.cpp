@@ -9,6 +9,7 @@
 */
 
 #include "ui/Easing2DUI.h"
+#include "Easing2D.h"
 
 const String Easing2D::typeNames[Easing2D::TYPE_MAX] = { "Linear", "Bezier" };
 
@@ -116,9 +117,74 @@ void CubicEasing2D::updateBezier()
 	bezier = Bezier::Bezier<3>({ {start.x, start.y},{a1.x, a1.y},{a2.x,a2.y},{end.x,end.y} });
 
 	updateLength();
+
+	if (length == 0) return;
+	updateUniformLUT(10 + length * 40);
+}
+
+void CubicEasing2D::updateUniformLUT(int precision)
+{
+	uniformLUT.clear();
+
+	Array<float> arcLengths;
+	arcLengths.add(0);
+
+	Point<float> prevP = getRawValue(0);
+
+	float dist = 0;
+	for (int i = 1; i <= precision; i ++) {
+		float rel =  i * 1.0f/ precision;
+		Point<float> p = getRawValue(rel);
+
+		dist += p.getDistanceFrom(prevP);
+		arcLengths.add(dist);
+		prevP.setXY(p.x, p.y);
+	}
+
+	for (int i = 0; i <= precision; i++)
+	{
+		float targetLength = (i * 1.0f / precision) * length;
+		int low = 0;
+		int high = precision;
+		int index = 0;
+
+		while (low < high) {
+			index = low + (((high - low) / 2) | 0);
+			if (arcLengths[index] < targetLength) low = index + 1;
+			else  high = index;
+		}
+
+		if (arcLengths[index] > targetLength) index--;
+
+		float lengthBefore = arcLengths[index];
+
+		float pos = 0;
+		if (lengthBefore == targetLength) pos = index / precision;
+		else pos = (index + (targetLength - lengthBefore) / (arcLengths[index + 1] - lengthBefore)) / precision;
+
+		Point<float> curPoint = getRawValue(pos);
+		uniformLUT.add(curPoint);
+	}
+
 }
 
 Point<float> CubicEasing2D::getValue(const float& weight)
+{
+	if (weight <= 0 || length == 0 || uniformLUT.size() == 0) return start;
+	if (weight >= 1) return end;
+
+	float indexF = weight * (uniformLUT.size() - 1);
+	int index = (int)floor(indexF);
+	float rel = indexF - index;
+	Point<float> p1 = uniformLUT[index];
+	Point<float> p2 = uniformLUT[index + 1];
+
+	Point<float> p = p1 + (p2 - p1) * rel;
+	return p;
+}
+
+
+Point<float> CubicEasing2D::getRawValue(const float& weight)
 {
 	if (weight <= 0 || length == 0) return start;
 	if (weight >= 1) return end;
@@ -127,6 +193,8 @@ Point<float> CubicEasing2D::getValue(const float& weight)
 	p = bezier.valueAt(weight);
 	return Point<float>(p.x, p.y);
 }
+
+
 
 void CubicEasing2D::updateLength()
 {

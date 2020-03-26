@@ -64,16 +64,20 @@ class CubicEasing2D :
 {
 public:
 	CubicEasing2D();
+
 	Point2DParameter* anchor1;
 	Point2DParameter* anchor2;
 
 	Bezier::Bezier<3> bezier;
+	Array<Point<float>, CriticalSection> uniformLUT;
 
 	void updateKeys(const Point<float>& start, const Point<float>& end, bool updateKeys = true) override;
 	void updateBezier();
+	void updateUniformLUT(int precision);
 
 	Point<float> getValue(const float& weight) override;
-	
+	Point<float> getRawValue(const float& weight);
+
 	void updateLength() override;
 	void getBezierLength(Point<float> a, Point<float> b, Point<float> c, Point<float> d, int precision, float& length);
 	

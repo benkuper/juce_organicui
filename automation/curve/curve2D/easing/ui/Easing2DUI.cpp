@@ -48,6 +48,7 @@ void Easing2DUI::paint(Graphics& g)
 	//g.setColour(Colours::purple);
 	//g.strokePath(hitPath, PathStrokeType(2));
 
+
 	paintInternal(g);
 
 }
@@ -275,6 +276,13 @@ void CubicEasing2DUI::generatePathInternal()
 
 void CubicEasing2DUI::paintInternal(Graphics& g)
 {
+/*	g.setColour(Colours::lightpink);
+	for (int i = 0; i < ce->uniformLUT.size(); i++)
+	{
+		g.fillEllipse(Rectangle<int>(0, 0, 4, 4).withCentre(getUIPosForValuePos(ce->uniformLUT[i])).toFloat());
+	}
+	*/
+
 	if (!showFirstHandle && !showLastHandle) return;
 
 	Point<int> p1 = Point<int>(getUIPosForValuePos(easing->start));
