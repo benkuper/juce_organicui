@@ -86,26 +86,6 @@ CubicEasing2D::CubicEasing2D() :
 void CubicEasing2D::updateKeys(const Point<float>& _start, const Point<float>& _end, bool updateKeys)
 {
 	Easing2D::updateKeys(_start, _end, false);
-	/*if (!anchor1->isOverriden)
-	{
-		Point<float> v = (_end - _start) * .3f;
-		var dv;
-		dv.append(v.x);
-		dv.append(v.y);
-		anchor1->setValue(dv);
-		//anchor1->resetValue();
-	}
-
-	if (!anchor2->isOverriden)
-	{
-		Point<float> v = (_start - _end) * .3f;
-		var dv;
-		dv.append(v.x);
-		dv.append(v.y);
-		anchor2->setValue(dv);
-		//anchor2->resetValue();
-	}
-	*/
 	if(updateKeys) updateBezier();
 }
 

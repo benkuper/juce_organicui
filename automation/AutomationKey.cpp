@@ -19,15 +19,14 @@ AutomationKey::AutomationKey(float minimumValue, float maximumValue) :
 	value = addFloatParameter("Value", "Value of the key", 0, minimumValue, maximumValue);
 
 	easingType = addEnumParameter("EasingType", "Type of transition to the next key");
-	for (int i = 0; i < Easing::TYPE_MAX; i++) easingType->addOption(Easing::typeNames[i], (Easing::Type)i);
+	for (int i = 0; i < Easing::TYPE_MAX; i++) easingType->addOption(Easing::typeNames[i], (Easing::Type)i, false);
 
-	easingType->setValueWithData(Easing::LINEAR);
+	easingType->setValueWithData(Easing::BEZIER);
 	easingType->hideInEditor = true;
 	easingType->forceSaveValue = true;
 
 	canInspectChildContainers = false;
 
-	setEasing(Easing::LINEAR);
 
 	helpID = "AutomationKey";
 }
