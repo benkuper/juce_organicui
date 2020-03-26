@@ -21,7 +21,7 @@ AutomationKey::AutomationKey(float minimumValue, float maximumValue) :
 	easingType = addEnumParameter("EasingType", "Type of transition to the next key");
 	for (int i = 0; i < Easing::TYPE_MAX; i++) easingType->addOption(Easing::typeNames[i], (Easing::Type)i, false);
 
-	easingType->setValueWithData(Easing::BEZIER);
+	easingType->setValueWithData(GlobalSettings::getInstance()->defaultEasing->getValueDataAsEnum<Easing::Type>());
 	easingType->hideInEditor = true;
 	easingType->forceSaveValue = true;
 

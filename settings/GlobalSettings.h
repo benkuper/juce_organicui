@@ -63,6 +63,7 @@ public:
 	ControllableContainer editingCC;
 	BoolParameter * askBeforeRemovingItems;
 	BoolParameter * constrainKeysToNeighbours;
+	EnumParameter* defaultEasing;
 
 	KeyMappingsContainer keyMappingsCC;
 

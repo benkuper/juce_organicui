@@ -55,12 +55,15 @@ GlobalSettings::GlobalSettings() :
 	enableAutoSave = saveLoadCC.addBoolParameter("Enable auto-save", "When enabled, a backup file will be saved every 5 min", true);
 	autoSaveCount = saveLoadCC.addIntParameter("Auto-save count", "The number of different files to auto-save", 10, 1, 100);
 	compressOnSave = saveLoadCC.addBoolParameter("Compress file", "If checked, the JSON content will be minified, otherwise it will be human-readable but larger size as well", true);
+	enableCrashUpload = saveLoadCC.addBoolParameter("Enable Crash Upload", "If checked and a crashlog is found at startup, it will automatically upload it.\nThis crash log is a very small file but is immensely helpful for me, so please leave this option enabled unless you strongly feel like not helping me :)", true);
 
 	addChildControllableContainer(&saveLoadCC);
 
 	askBeforeRemovingItems = editingCC.addBoolParameter("Ask before removing items", "If enabled, you will get a confirmation prompt before removing any item", false);
 	constrainKeysToNeighbours = editingCC.addBoolParameter("Constrain curve keys editing", "If enabled, keys won't be able to be moved past their neighbours when editing a curve", false);
-	enableCrashUpload = editingCC.addBoolParameter("Enable Crash Upload", "If checked and a crashlog is found at startup, it will automatically upload it.\nThis crash log is a very small file but is immensely helpful for me, so please leave this option enabled unless you strongly feel like not helping me :)", true);
+	defaultEasing = editingCC.addEnumParameter("EasingType", "Type of transition to the next key");
+	for (int i = 0; i < Easing::TYPE_MAX; i++) defaultEasing->addOption(Easing::typeNames[i], (Easing::Type)i, true);
+	
 
 	addChildControllableContainer(&editingCC);
 
