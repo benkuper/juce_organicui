@@ -1,3 +1,4 @@
+#include "Automation.h"
 /*
   ==============================================================================
 
@@ -53,23 +54,22 @@ AutomationKey * Automation::addKey(const float& _position, const float& _value, 
     return addItem(key, params, addToUndo);
 }
 
-void Automation::addKeys(const Array<float>& positions, const Array<float>& values, bool addToUndo, bool removeExistingKeys)
+void Automation::addKeys(const Array<AutomationKey*>& keys, bool addToUndo, bool removeExistingKeys)
 {
-    if (positions.size() == 0) return;
+    if (keys.size() == 0) return;
 
     Array<UndoableAction*> actions;
 
     if (removeExistingKeys)
     {
-        Array<AutomationKey*> existingKeys = getKeysBetweenPositions(positions[0], positions[positions.size() - 1]);
+        Array<AutomationKey*> existingKeys = getKeysBetweenPositions(keys[0]->position->floatValue(), keys[keys.size() - 1]->position->floatValue());
         if (addToUndo) actions.addArray(getRemoveItemsUndoableAction(existingKeys));
         else removeItems(existingKeys, false);
     }
 
     Array<AutomationKey*> keysToAdd;
-    for (int i = 0; i < positions.size(); i++)
+    for (auto & k : keys)
     {
-        AutomationKey* k = new AutomationKey(positions[i], values[i]);
         if (addToUndo)  actions.add(getAddItemUndoableAction(k));
         else keysToAdd.add(k);
     }

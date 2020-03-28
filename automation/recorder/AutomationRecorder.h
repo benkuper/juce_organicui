@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include "../common/fitting/curve_fit_nd.h"
+
 class AutomationRecorder :
 	public EnablingControllableContainer,
 	public Inspectable::InspectableListener
@@ -37,7 +39,7 @@ public:
 
 	void startRecording();
 	void cancelRecording();
-	Array<Point<float>> stopRecordingAndGetKeys();
+	Array<AutomationKey *> stopRecordingAndGetKeys();
 
 	bool shouldRecord();
 
@@ -47,6 +49,6 @@ public:
 
 	InspectableEditor * getEditor(bool isRoot) override;
 
-	static Array<Point<float>> getSimplifiedKeys(Array<Point<float>> arr, float epsilon);
+	static Array<AutomationKey *> getSimplifiedKeys(Array<Point<float>> arr, float epsilon);
 	static const std::pair<int, float> findMaximumDistance(Array<Point<float>> arr);
 };

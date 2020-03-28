@@ -32,7 +32,7 @@ public:
     AutomationRecorder* recorder;
 
     AutomationKey * addKey(const float& position, const float& value, bool addToUndo = false);
-    void addKeys(const Array<float> & positions, const Array<float>& values, bool addToUndo = false, bool removeExistingKeys = true);
+    void addKeys(const Array<AutomationKey *> & keys, bool addToUndo = false, bool removeExistingKeys = true);
 
     void addItemInternal(AutomationKey* k, var params) override;
     void removeItemInternal(AutomationKey* k) override;

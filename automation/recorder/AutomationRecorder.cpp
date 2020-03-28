@@ -89,9 +89,9 @@ void AutomationRecorder::cancelRecording()
 	clearKeys();
 }
 
-Array<Point<float>> AutomationRecorder::stopRecordingAndGetKeys()
+Array<AutomationKey *> AutomationRecorder::stopRecordingAndGetKeys()
 {
-	Array<Point<float>> simplifiedKeys = getSimplifiedKeys(keys, simplificationFactor->floatValue() / 10); //fine tune with simplification factor
+	Array<AutomationKey *> simplifiedKeys = getSimplifiedKeys(keys, simplificationFactor->floatValue() / 10); //fine tune with simplification factor
 	isRecording->setValue(false);
 
 	clearKeys();
@@ -119,8 +119,9 @@ InspectableEditor * AutomationRecorder::getEditor(bool isRoot)
 	return new AutomationRecorderEditor(this, isRoot);
 }
 
-Array<Point<float>> AutomationRecorder::getSimplifiedKeys(Array<Point<float>> arr, float epsilon)
+Array<AutomationKey *> AutomationRecorder::getSimplifiedKeys(Array<Point<float>> arr, float epsilon)
 {
+	/*
 	if (arr.size() < 3) {  //base case 1
 		return arr;
 	}
@@ -133,11 +134,11 @@ Array<Point<float>> AutomationRecorder::getSimplifiedKeys(Array<Point<float>> ar
 		Array<Point<float>> path2;
 		path2.addArray(arr, index, arr.size() - index); // new path l2 from index to last
 
-		Array<Point<float>> r1 = getSimplifiedKeys(path1, epsilon);
-		Array<Point<float>> r2 = getSimplifiedKeys(path2, epsilon);
+		Array<AutomationKey*> r1 = getSimplifiedKeys(path1, epsilon);
+		Array<AutomationKey*> r2 = getSimplifiedKeys(path2, epsilon);
 
 		//Concat simplified path1 and path2 together
-		Array<Point<float>> rs(r1);
+		Array<AutomationKey* > rs(r1);
 		rs.removeLast();
 		rs.addArray(r2);
 		return rs;
@@ -148,6 +149,7 @@ Array<Point<float>> AutomationRecorder::getSimplifiedKeys(Array<Point<float>> ar
 		r.add(arr[arr.size() - 1]);
 		return r;
 	}
+	*/
 
 }
 
