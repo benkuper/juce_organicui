@@ -1,25 +1,24 @@
 /*
   ==============================================================================
 
-    EasingUI.cpp
-    Created: 16 Dec 2016 7:13:11pm
-    Author:  Ben
+	EasingUI.cpp
+	Created: 16 Dec 2016 7:13:11pm
+	Author:  Ben
 
   ==============================================================================
 */
 
 #pragma warning(disable:4244)
 
-EasingUI::EasingUI(Easing * e) :
+EasingUI::EasingUI(Easing* e) :
 	InspectableContentComponent(e),
 	easing(e),
-	y1(0),y2(0)
+	showFirstHandle(false),
+	showLastHandle(false)
 {
 	autoDrawContourWhenSelected = false;
-	
-	bringToFrontOnSelect = false; 
-	setWantsKeyboardFocus(false);
-	setMouseClickGrabsKeyboardFocus(false);
+
+	bringToFrontOnSelect = false;
 
 	setRepaintsOnMouseActivity(true);
 	easing->addAsyncContainerListener(this);
@@ -27,48 +26,52 @@ EasingUI::EasingUI(Easing * e) :
 
 EasingUI::~EasingUI()
 {
-	if(!easing.wasObjectDeleted()) easing->removeAsyncContainerListener(this);
+	if (!easing.wasObjectDeleted()) easing->removeAsyncContainerListener(this);
 }
 
-void EasingUI::setKeyPositions(const int &k1, const int &k2)
+void EasingUI::paint(Graphics& g)
 {
-	y1 = k1;
-	y2 = k2;
-	generatePath();
-}
+	if (inspectable.wasObjectDeleted()) return;
+	//g.fillAll(Colours::purple.withAlpha(.2f));
 
-void EasingUI::paint(Graphics &g)
-{
-	
-	Colour c = color;
+	Colour c = NORMAL_COLOR;
 	if (easing.wasObjectDeleted()) return;
 	if (easing->isSelected) c = HIGHLIGHT_COLOR;
 	if (isMouseOver()) c = c.brighter();
 
+	ColourGradient gr;
+	const int precision = 10;
+
 	g.setColour(c);
-	g.strokePath(drawPath, PathStrokeType(isMouseOver()?2:1));
+	g.strokePath(drawPath, PathStrokeType(isMouseOver() ? 2 : 1));
 
-	//g.setColour(Colours::purple);
-	//g.strokePath(hitPath, PathStrokeType(2));
-
-	paintInternal(g);
+	//g.setColour(Colours::pink);
+	//for (int i = 0; i < 10; i++)
+	//{
+	//	float p = i * 1.0f / 10;
+	//	float t = easing->start.x + p * easing->length;
+	//	g.fillEllipse(Rectangle<int>(0, 0, 4, 4).withCentre(getUIPosForValuePos(Point<float>(t, easing->getValue(p)))).toFloat());
+	//}
 	
+	paintInternal(g);
+
 }
 
 void EasingUI::resized()
 {
+	if (inspectable.wasObjectDeleted()) return;
 	generatePath();
 }
 
 void EasingUI::generatePath()
 {
-	
 	drawPath.clear();
-	drawPath.startNewSubPath(0, y1); 
-	generatePathInternal();
+	drawPath.startNewSubPath(getUIPosForValuePos(easing->start).toFloat());
 
-	if(drawPath.getLength()) buildHitPath();
-	
+	if (valueBounds.isEmpty() || (easing->start == easing->end)) return;
+
+	generatePathInternal();
+	if (drawPath.getLength()) buildHitPath();
 }
 
 void EasingUI::generatePathInternal()
@@ -84,22 +87,21 @@ void EasingUI::autoGeneratePathWithPrecision(int precision)
 
 	for (int i = 1; i <= precision; i++)
 	{
-		float t = i*1.f / precision;
-		float v1 = 1 - (y1*1.f / getHeight());
-		float v2 = 1 - (y2*1.f / getHeight());
-		float v = easing->getValue(v1,v2, t);
-		drawPath.lineTo(t*getWidth(), (1-v)*getHeight());
-		
+		float t = i * 1.f / precision;
+		float v = easing->getValue(t);
+		float tx = easing->start.x + (easing->end.x - easing->start.x) * t;
+		Point<int> pv = getUIPosForValuePos(Point<float>(tx, v));
+		drawPath.lineTo(pv.toFloat());
 	}
 }
 
 void EasingUI::buildHitPath()
 {
 	Array<Point<float>> hitPoints;
-	
+
 	for (int i = 0; i <= hitPathPrecision; i++)
 	{
-		hitPoints.add(drawPath.getPointAlongPath(drawPath.getLength()*i / (hitPathPrecision -1)));
+		hitPoints.add(drawPath.getPointAlongPath(drawPath.getLength() * i / (hitPathPrecision - 1)));
 	}
 
 	const float margin = 5;
@@ -118,7 +120,7 @@ void EasingUI::buildHitPath()
 		}
 		else
 		{
-			float angle1 = 0; 
+			float angle1 = 0;
 			float angle2 = 0;
 			/*if (hitPoints[i].x == hitPoints[i - 1].x) angle1 = 0;
 			else if (hitPoints[i].y == hitPoints[i - 1].y) angle1 = -float_Pi / 4;
@@ -128,7 +130,7 @@ void EasingUI::buildHitPath()
 			else if (hitPoints[i].y == hitPoints[i - 1].y) angle1 = -float_Pi / 4;
 			else */angle2 = hitPoints[i].getAngleToPoint(hitPoints[i + 1]);
 
-		
+
 			if (angle1 < 0) angle1 += float_Pi * 2;
 			if (angle2 < 0) angle2 += float_Pi * 2;
 
@@ -161,70 +163,86 @@ void EasingUI::buildHitPath()
 
 bool EasingUI::hitTest(int tx, int ty)
 {
-	return hitPath.contains((float)tx, (float)ty);
+	Point<int> p(tx, ty);
+	Point<int> p1 = Point<int>(getUIPosForValuePos(easing->start));
+	Point<int> p2 = Point<int>(getUIPosForValuePos(easing->end));
+
+	return p.getDistanceFrom(p1) > 16 && p.getDistanceFrom(p2) > 16 && hitPath.contains((float)tx, (float)ty);
 }
 
-/*
-void EasingUI::resized()
+void EasingUI::setShowEasingHandles(bool showFirst, bool showLast)
 {
-	//
+	showFirstHandle = showFirst;
+	showLastHandle = showLast;
 }
-*/
 
-void EasingUI::newMessage(const ContainerAsyncEvent & e)
+
+void EasingUI::newMessage(const ContainerAsyncEvent& e)
 {
 	if (e.type == ContainerAsyncEvent::ControllableFeedbackUpdate)
 	{
 		easingControllableFeedbackUpdate(e.targetControllable);
+		repaint();
 	}
 }
 
 
+void EasingUI::setValueBounds(const Rectangle<float> _valueBounds)
+{
+	valueBounds = _valueBounds;
+	resized();
+}
 
-LinearEasingUI::LinearEasingUI(LinearEasing * e) :
+
+Point<int> EasingUI::getUIPosForValuePos(const Point<float>& valuePos) const
+{
+	if (inspectable.wasObjectDeleted()) return Point<int>();
+	return getLocalBounds().getRelativePoint((valuePos.x - valueBounds.getX()) / valueBounds.getWidth(), 1 - ((valuePos.y - valueBounds.getY()) / valueBounds.getHeight()));
+}
+
+Point<float> EasingUI::getValuePosForUIPos(const Point<int>& uiPos) const
+{
+	if (inspectable.wasObjectDeleted()) return Point<float>();
+	return valueBounds.getRelativePoint(uiPos.x * 1.0f / getWidth(), 1- (uiPos.y * 1.0f / getHeight()));
+}
+
+// EASINGS
+LinearEasingUI::LinearEasingUI(LinearEasing* e) :
 	EasingUI(e)
 {
-	
+
 }
 
 void LinearEasingUI::generatePathInternal()
 {
-	
-	drawPath.lineTo(getWidth(), y2);
+	drawPath.lineTo(getUIPosForValuePos(easing->end).toFloat());
 }
 
-HoldEasingUI::HoldEasingUI(HoldEasing * e) :
-	EasingUI(e)
-{
-
-}
-
-void HoldEasingUI::generatePathInternal()
-{
-	drawPath.lineTo(getWidth(), y1);
-	drawPath.lineTo(getWidth(), y2);
-
-}
-
-CubicEasingUI::CubicEasingUI(CubicEasing * e) :
-	EasingUI(e)
+CubicEasingUI::CubicEasingUI(CubicEasing* e) :
+	EasingUI(e),
+	ce(e),
+	syncHandles(false)
 {
 	addChildComponent(h1);
 	addChildComponent(h2);
-	h1.setVisible(easing->isSelected);
-	h2.setVisible(easing->isSelected);
+	h1.setVisible(showFirstHandle);
+	h2.setVisible(showLastHandle);
 
-	h1.addMouseListener(this,false);
-	h2.addMouseListener(this,false);
+	h1.addMouseListener(this, false);
+	h2.addMouseListener(this, false);
 }
 
 bool CubicEasingUI::hitTest(int tx, int ty)
 {
 	bool result = EasingUI::hitTest(tx, ty);
 
-	if(easing->isSelected)
+	if (showFirstHandle)
 	{
 		result |= h1.getLocalBounds().contains(h1.getMouseXYRelative());
+	}
+
+	if (showLastHandle)
+	{
 		result |= h2.getLocalBounds().contains(h2.getMouseXYRelative());
 	}
 
@@ -233,62 +251,50 @@ bool CubicEasingUI::hitTest(int tx, int ty)
 
 void CubicEasingUI::resized()
 {
-	
-	Point<int> p1 = Point<int>(0, y1);
-	Point<int> p2 = Point<int>(getWidth(), y2);
+	if (inspectable.wasObjectDeleted()) return;
 
-	CubicEasing * ce = static_cast<CubicEasing *>(easing.get());
+	Point<int> p1 = Point<int>(getUIPosForValuePos(easing->start));
+	Point<int> p2 = Point<int>(getUIPosForValuePos(easing->end));
 
-	Point<float> a = Point<float>(jmap<float>(ce->anchor1->getPoint().x, p1.x, p2.x), jmap<float>(ce->anchor1->getPoint().y, p1.y, p2.y));
-	Point<float> b = Point<float>(jmap<float>(ce->anchor2->getPoint().x, p1.x, p2.x), jmap<float>(ce->anchor2->getPoint().y, p1.y, p2.y));
-	 
-	h1.setBounds(juce::Rectangle<int>(0, 0, 16,16).withCentre(a.toInt()));
-	h2.setBounds(juce::Rectangle<int>(0, 0, 16,16).withCentre(b.toInt()));
+	Point<int> a = getUIPosForValuePos(easing->start + ce->anchor1->getPoint());
+	Point<int> b = getUIPosForValuePos(easing->end + ce->anchor2->getPoint());
+
+	h1.setBounds(juce::Rectangle<int>(0, 0, 16, 16).withCentre(a));
+	h2.setBounds(juce::Rectangle<int>(0, 0, 16, 16).withCentre(b));
 
 	EasingUI::resized();
 }
 
 void CubicEasingUI::generatePathInternal()
 {
-	Point<int> p1 = Point<int>(0, y1);
-	Point<int> p2 = Point<int>(getWidth(), y2);
+	Point<int> p1 = Point<int>(getUIPosForValuePos(easing->start));
+	Point<int> p2 = Point<int>(getUIPosForValuePos(easing->end));
 
-	CubicEasing * ce = static_cast<CubicEasing *>(easing.get());
-	
-	Point<float> a = Point<float>(jmap<float>(ce->anchor1->getPoint().x, p1.x, p2.x), jmap<float>(ce->anchor1->getPoint().y, p1.y, p2.y));
-	Point<float> b = Point<float>(jmap<float>(ce->anchor2->getPoint().x, p1.x, p2.x), jmap<float>(ce->anchor2->getPoint().y, p1.y, p2.y));
+	Point<int> a = getUIPosForValuePos(easing->start + ce->anchor1->getPoint());
+	Point<int> b = getUIPosForValuePos(easing->end + ce->anchor2->getPoint());
 
-	drawPath.cubicTo(a, b, p2.toFloat());
+	drawPath.cubicTo(a.toFloat(), b.toFloat(), p2.toFloat());
 }
 
-void CubicEasingUI::paintInternal(Graphics & g)
-{ 
-	if (!easing->isSelected) return;
+void CubicEasingUI::paintInternal(Graphics& g)
+{
 
-	Point<int> p1 = Point<int>(0, y1);
-	Point<int> p2 = Point<int>(getWidth(), y2);
+	if (!showFirstHandle && !showLastHandle) return;
+
+	Point<int> p1 = Point<int>(getUIPosForValuePos(easing->start));
+	Point<int> p2 = Point<int>(getUIPosForValuePos(easing->end));
 
 	Colour c = LIGHTCONTOUR_COLOR;
 	if (isMouseOver()) c = c.brighter();
 	g.setColour(c);
 
-	g.drawLine(p1.x, p1.y, h1.getBounds().getCentreX(), h1.getBounds().getCentreY());
-	g.drawLine(p2.x, p2.y, h2.getBounds().getCentreX(), h2.getBounds().getCentreY());
-	
+	if (showFirstHandle) g.drawLine(p1.x, p1.y, h1.getBounds().getCentreX(), h1.getBounds().getCentreY());
+	if (showLastHandle) g.drawLine(p2.x, p2.y, h2.getBounds().getCentreX(), h2.getBounds().getCentreY());
+
 }
 
-void CubicEasingUI::inspectableSelectionChanged(Inspectable *)
+void CubicEasingUI::easingControllableFeedbackUpdate(Controllable* c)
 {
-	if (easing.wasObjectDeleted()) return;
-	h1.setVisible(easing->isSelected);
-	h2.setVisible(easing->isSelected);
-	resized();
-	repaint();
-}
-
-void CubicEasingUI::easingControllableFeedbackUpdate(Controllable * c)
-{
-	CubicEasing * ce = static_cast<CubicEasing *>(easing.get());
 	if (c == ce->anchor1 || c == ce->anchor2)
 	{
 		resized();
@@ -296,147 +302,97 @@ void CubicEasingUI::easingControllableFeedbackUpdate(Controllable * c)
 	}
 }
 
-void CubicEasingUI::mouseDrag(const MouseEvent & e)
+void CubicEasingUI::setShowEasingHandles(bool showFirst, bool showLast)
 {
-	if (e.eventComponent == &h1 || e.eventComponent == &h2)
-	{
-		CubicEasing * ce = static_cast<CubicEasing *>(easing.get());
-		
-		Point2DParameter * targetAnchor = (e.eventComponent == &h1) ? ce->anchor1 : ce->anchor2;
-		Point<int> mp = e.getEventRelativeTo(this).getPosition();
-		
-		Point<float> targetPoint = Point<float>(mp.x*1.f/ getWidth(), jmap<float>(mp.y,y1,y2,0,1));
-		targetAnchor->setPoint(targetPoint);
-	}
-	else
-	{
-		CubicEasing * ce = static_cast<CubicEasing *>(easing.get());
-
-		Point<int> p1 = Point<int>(0, y1);
-		Point<int> p2 = Point<int>(getWidth(), y2);
-		Point<int> mp = e.getEventRelativeTo(this).getPosition();
-		Point<int> mp1;
-		Point<int> mp2;
-		
-		if (e.mods.isShiftDown())
-		{
-			mp1 = Point<int>(mp.x, p1.y);
-			mp2 = Point<int>(p2.x - mp.x, p2.y);
-		}
-		else if (e.mods.isAltDown())
-		{
-			mp1 = Point<int>(p1.x, mp.y);
-			mp2 = Point<int>(p2.x, p1.y + (p2.y-mp.y));
-		}
-		else
-		{
-			mp1 = (p1 + mp) / 2;
-			mp2 = (p2 + mp) / 2;
-		}
-		
-		Point<float> t1 = Point<float>(mp1.x*1.f / getWidth(), jmap<float>(mp1.y, y1, y2, 0, 1));
-		Point<float> t2 = Point<float>(mp2.x*1.f / getWidth(), jmap<float>(mp2.y, y1, y2, 0, 1));
-
-		ce->anchor1->setPoint(t1);
-		ce->anchor2->setPoint(t2);
-	}
-}
-
-
-EasingUI::EasingHandle::EasingHandle() 
-{
-	setRepaintsOnMouseActivity(true);
-}
-
-void EasingUI::EasingHandle::paint(Graphics & g)
-{
-	Colour c =LIGHTCONTOUR_COLOR;
-	if (isMouseOver()) c = c.brighter(.8f);
-	g.setColour(c);
-	g.fillEllipse(getLocalBounds().reduced(isMouseOver()?3:5).toFloat());
-}
-
-SineEasingUI::SineEasingUI(SineEasing * e) :
-	EasingUI(e)
-{
-	hitPathPrecision = jmin<float>(1 / e->freqAmp->floatValue(), 100);
-	generatePath();
-
-	addChildComponent(h1);
-	h1.setVisible(easing->isSelected);
-	h1.addMouseListener(this, false);
-}
-
-bool SineEasingUI::hitTest(int tx, int ty)
-{
-	bool result = EasingUI::hitTest(tx, ty);
-
-	if (easing->isSelected)
-	{
-		result |= h1.getLocalBounds().contains(h1.getMouseXYRelative());
-	}
-
-	return result;
-}
-
-void SineEasingUI::resized()
-{
-
-	Point<int> p1 = Point<int>(0, y1);
-	Point<int> p2 = Point<int>(getWidth(), y2);
-
-	SineEasing * ce = static_cast<SineEasing *>(easing.get());
-
-	Point<float> a = Point<float>(jmap<float>(ce->freqAmp->getPoint().x, p1.x, p2.x), jmap<float>(ce->freqAmp->getPoint().y, p1.y, p2.y));
-
-	h1.setBounds(juce::Rectangle<int>(0, 0, 16, 16).withCentre(a.toInt()));
-
-	EasingUI::resized();
-
-}
-
-void SineEasingUI::paintInternal(Graphics & g)
-{
-	if (!easing->isSelected) return;
-
-	Colour c = LIGHTCONTOUR_COLOR;
-	if (isMouseOver()) c = c.brighter();
-	g.setColour(c);
-
-	Point<int> hp = h1.getBounds().getCentre();
-	g.drawLine(0, y1, hp.x, y1);
-	g.drawLine(hp.x, y1, hp.x,hp.y,2);
-}
-
-void SineEasingUI::inspectableSelectionChanged(Inspectable *)
-{
-	if (easing.wasObjectDeleted()) return;
-	h1.setVisible(easing->isSelected);
+	EasingUI::setShowEasingHandles(showFirst, showLast);
+	h1.setVisible(showFirstHandle);
+	h2.setVisible(showLastHandle);
 	resized();
 	repaint();
 }
 
-void SineEasingUI::easingControllableFeedbackUpdate(Controllable  * c)
+void CubicEasingUI::mouseDown(const MouseEvent& e)
 {
-	SineEasing * ce = static_cast<SineEasing *>(easing.get());
-	if (c == ce->freqAmp)
+	if (inspectable.wasObjectDeleted()) return;
+	EasingUI::mouseDown(e);
+
+	if (!e.mods.isCommandDown())
 	{
-		hitPathPrecision = jmin<float>(10 / ce->freqAmp->floatValue(),100);
-		resized();
-		repaint();
+		h1ValueAtMouseDown = ce->anchor1->getPoint();
+		h2ValueAtMouseDown = ce->anchor2->getPoint();
 	}
 }
 
-void SineEasingUI::mouseDrag(const MouseEvent & e)
+void CubicEasingUI::mouseDrag(const MouseEvent& e)
 {
-	if (e.eventComponent == &h1)
+	if (inspectable.wasObjectDeleted()) return;
+	syncHandles = !e.mods.isAltDown();
+
+	if (e.eventComponent == &h1 || e.eventComponent == &h2)
 	{
-		CubicEasing * ce = static_cast<CubicEasing *>(easing.get());
+		Point2DParameter* targetAnchor = (e.eventComponent == &h1) ? ce->anchor1 : ce->anchor2;
+		Point<float> targetRefPoint = (e.eventComponent == &h1) ? ce->start : ce->end;
 
-		Point2DParameter * targetAnchor = (e.eventComponent == &h1) ? ce->anchor1 : ce->anchor2;
-		Point<int> mp = e.getEventRelativeTo(this).getPosition();
-
-		Point<float> targetPoint = Point<float>(mp.x*1.f / getWidth(), jmap<float>(mp.y, y1, y2, 0, 1));
-		targetAnchor->setPoint(targetPoint);
+		Point<float> targetPoint = getValuePosForUIPos(e.getEventRelativeTo(this).getPosition()); //Point<float>(mp.x * 1.f / getWidth(), jmap<float>(mp.y, y1, y2, 0, 1));
+		targetAnchor->setPoint(targetPoint - targetRefPoint);
 	}
+	else
+	{
+		if (e.mods.isShiftDown())
+		{
+			syncHandles = false;
+			
+			if (e.mods.isAltDown())
+			{
+				Point<int> p1 = getUIPosForValuePos(easing->start);
+				Point<float> mVal = getValuePosForUIPos(e.getEventRelativeTo(this).getPosition());
+
+				float ty = mVal.y - easing->start.y;
+				ce->anchor1->setPoint(0, ty);
+				ce->anchor2->setPoint(0, -ty);
+			}
+			else
+			{
+				Point<int> p1 = getUIPosForValuePos(easing->start);
+				Point<float> mVal = getValuePosForUIPos(e.getEventRelativeTo(this).getPosition());
+
+				float tx = mVal.x - easing->start.x;
+				ce->anchor1->setPoint(tx, 0);
+				ce->anchor2->setPoint(-tx, 0);
+			}
+		}else
+		{
+			Point<int> p1 = getUIPosForValuePos(easing->start);
+			Point<int> p2 = getUIPosForValuePos(easing->end);
+			Point<float> mVal = getValuePosForUIPos(e.getEventRelativeTo(this).getPosition());
+
+			ce->anchor1->setPoint((mVal - easing->start) / 2);
+			ce->anchor2->setPoint((mVal - easing->end) / 2);
+		}
+	}
+		
+}
+
+void CubicEasingUI::mouseUp(const MouseEvent& e)
+{
+	EasingUI::mouseUp(e);
+
+	Array<UndoableAction*> actions;
+	actions.add(ce->anchor1->setUndoablePoint(h1ValueAtMouseDown, ce->anchor1->getPoint(), true));
+	actions.add(ce->anchor2->setUndoablePoint(h2ValueAtMouseDown, ce->anchor2->getPoint(), true));
+	UndoMaster::getInstance()->performActions("Move anchors", actions);
+}
+
+// HANDLES
+EasingUI::EasingHandle::EasingHandle()
+{
+	setRepaintsOnMouseActivity(true);
+}
+
+void EasingUI::EasingHandle::paint(Graphics& g)
+{
+	Colour c = LIGHTCONTOUR_COLOR;
+	if (isMouseOver()) c = c.brighter(.8f);
+	g.setColour(c);
+	g.fillEllipse(getLocalBounds().reduced(isMouseOver() ? 4 : 6).toFloat());
 }

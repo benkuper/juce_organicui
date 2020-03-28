@@ -19,12 +19,6 @@ IntParameter::IntParameter(const String& niceName, const String& description, co
 	argumentsDescription = "int";
 }
 
-void IntParameter::setValueInternal(var & _value)
-{
-	if ((int)minimumValue > (int)maximumValue) return;
-	this->value = jlimit<int>(minimumValue, maximumValue, _value);
-}
-
 var IntParameter::getLerpValueTo(var targetValue, float weight)
 {
 	return (int)jmap(weight, floatValue(), (float)targetValue);
@@ -101,4 +95,9 @@ ControllableUI * IntParameter::createDefaultUI(Controllable * targetControllable
 	//else pui = createStepper(p);
 
 	return pui;
-};
+}
+
+var IntParameter::getCroppedValue(var originalValue)
+{
+	return jlimit<float>(minimumValue, maximumValue, originalValue);
+}

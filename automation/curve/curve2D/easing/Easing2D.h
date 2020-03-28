@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "bezier.h"
+#include "../../../common/bezier.h"
 
 class Easing2DUI;
 

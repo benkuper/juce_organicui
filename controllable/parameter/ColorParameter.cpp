@@ -17,10 +17,6 @@ ColorParameter::ColorParameter(const String & niceName, const String & descripti
 
 	canBeAutomated = true;
 
-	setColor(initialColor, false, true);
-	defaultValue = value;
-	resetValue();
-
 	var minVal;
 	var maxVal;
 
@@ -32,7 +28,8 @@ ColorParameter::ColorParameter(const String & niceName, const String & descripti
 
 	minimumValue = minVal;
 	maximumValue = maxVal;
-	setRange(minVal, maxVal);
+
+	setColor(initialColor, false, true);
 }
 
 ColorParameter::~ColorParameter() {}

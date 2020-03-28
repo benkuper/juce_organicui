@@ -11,32 +11,72 @@
 #pragma once
 
 class AutomationKey :
-	public BaseItem
+    public BaseItem,
+    public Inspectable::InspectableListener
 {
 public:
-	AutomationKey(float minimumValue = 0, float maximumValue = 1);
-	virtual ~AutomationKey();
+    AutomationKey(const float &position = 0, const float &value = 0);
+    ~AutomationKey();
 
-	FloatParameter * position; //depends on parent automation
-	FloatParameter * value; //0-1
+    EnumParameter* easingType;
+    std::unique_ptr<Easing> easing;
+    AutomationKey* nextKey;
+    FloatParameter* position;
+    FloatParameter* value;
 
-	EnumParameter * easingType;
+    void setEasing(Easing::Type type);
+    void setNextKey(AutomationKey* key);
 
-	std::unique_ptr<Easing> easing;
+    float getValueAt(const float& position);
+    float getLength() const;
 
-	void setEasing(Easing::Type t);
+    void setValueRange(float minVal, float maxVal);
+    void clearValueRange();
 
-	float getValue(AutomationKey * nextKey, const float &position);
+    Point<float> getPosAndValue();
+    void setPosAndValue(Point<float> posAndValue, bool addToUndo = false);
 
-	void setSelectionManager(InspectableSelectionManager * ism) override;
+    void onContainerParameterChangedInternal(Parameter* p) override;
+    void onExternalParameterValueChanged(Parameter* p) override;
+    void onControllableFeedbackUpdateInternal(ControllableContainer* cc, Controllable* c) override;
 
-	void onContainerParameterChangedInternal(Parameter *) override;
+    void inspectableSelectionChanged(Inspectable* i) override;
+    void setSelectedInternal(bool) override;
+
+    void inspectableDestroyed(Inspectable* i) override;
+
+    bool isThisOrChildSelected();
+
+    void updateEasingKeys();
+    void notifyKeyUpdated();
 
 
-	var getJSONData() override;
-	void loadJSONDataInternal(var data) override;
+    String getTypeString() const override { return "2DKey"; }
+
+
+    class  AutomationKeyEvent
+    {
+    public:
+        enum Type { KEY_UPDATED, SELECTION_CHANGED };
+
+        AutomationKeyEvent(Type t, AutomationKey* key) : type(t), key(key) {}
+
+        Type type;
+        WeakReference<AutomationKey> key;
+    };
+
+    QueuedNotifier<AutomationKeyEvent> keyNotifier;
+    typedef QueuedNotifier<AutomationKeyEvent>::Listener AsyncListener;
+
+
+    void addAsyncKeyListener(AsyncListener* newListener) { keyNotifier.addListener(newListener); }
+    void addAsyncCoalescedKeyListener(AsyncListener* newListener) { keyNotifier.addAsyncCoalescedListener(newListener); }
+    void removeAsyncKeyListener(AsyncListener* listener) { keyNotifier.removeListener(listener); }
 
 private:
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AutomationKey)
+    WeakReference<AutomationKey>::Master masterReference;
+    friend class WeakReference<AutomationKey>;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AutomationKey)
 };
 

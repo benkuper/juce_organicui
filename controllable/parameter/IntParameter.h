@@ -22,7 +22,6 @@ public:
 
 	bool hexMode;
 
-    void setValueInternal(var & _value) override;
 	virtual var getLerpValueTo(var targetValue, float weight) override;
 	virtual void setWeightedValue(Array<var> values, Array<float> weights) override;
 
@@ -45,5 +44,5 @@ public:
 	static String getTypeStringStatic() { return "Integer"; }
 
 private:
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(IntParameter)
+	var getCroppedValue(var originalValue) override;
 };

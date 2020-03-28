@@ -19,12 +19,6 @@ FloatParameter::FloatParameter(const String & niceName, const String &descriptio
 	argumentsDescription = "float";
 }
 
-void FloatParameter::setValueInternal(var & _value)
-{
-	if ((float)minimumValue > (float)maximumValue) return;
-	value = jlimit<float>(minimumValue, maximumValue, _value);
-}
-
 var FloatParameter::getLerpValueTo(var targetValue, float weight)
 {
 	return jmap(weight,floatValue(), (float)targetValue);
@@ -136,5 +130,10 @@ void FloatParameter::loadJSONDataInternal(var data)
 	Parameter::loadJSONDataInternal(data);
 	if (data.getDynamicObject()->hasProperty("defaultUI")) defaultUI = (UIType)(int)data.getProperty("defaultUI", SLIDER);
 	customUI = (UIType)(int)data.getProperty("customUI", NONE);
+}
+
+var FloatParameter::getCroppedValue(var originalValue)
+{
+	return jlimit<float>(minimumValue, maximumValue, originalValue);
 }
 

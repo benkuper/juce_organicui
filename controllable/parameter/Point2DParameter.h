@@ -23,8 +23,7 @@ public:
 	UndoableAction * setUndoablePoint(Point<float> oldPoint, Point<float> newPoint, bool onlyReturnAction = false);
 	UndoableAction* setUndoablePoint(float oldX, float oldY, float newX, float newY, bool onlyReturnAction = false);
 
-	void setValueInternal(var & _value) override;
-	
+	void setValueInternal(var  &_value) override;
 	void setBounds(float _minX, float _minY, float _maxX, float _maxY);
 	
 	void clearRange() override;
@@ -43,6 +42,8 @@ public:
 	virtual String getTypeString() const override { return getTypeStringStatic(); }
 	static String getTypeStringStatic() { return "Point2D"; }
 
-private:
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Point2DParameter)
+
+
+protected:
+	virtual var getCroppedValue(var originalValue) override;
 };

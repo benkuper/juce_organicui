@@ -10,67 +10,51 @@
 
 #pragma once
 
-class InspectableSelectionManager;
 
+#pragma once
 
 class Automation :
-	public BaseManager<AutomationKey>
+    public BaseManager<AutomationKey>
 {
 public:
-	Automation(const String &name = "Automation", AutomationRecorder * recorder = nullptr, bool freeRange = false, bool allowKeysOutside = false, bool dedicatedSelectionManager = true);
-	virtual ~Automation();
+    Automation(const String& name = "Curve 2D");
+    ~Automation();
 
+    FloatParameter* position;
+    FloatParameter* length;
+    FloatParameter* value;
 
-	//Recorder
-	AutomationRecorder * recorder;
+    juce::Rectangle<float> bounds;
 
-	//ui
-	bool showUIInEditor;
+    Point2DParameter* valueRange;
+    Point2DParameter* viewValueRange;
 
-	//Position and value
-	bool freeRange;
-	bool allowKeysOutside; //allow keys positions to be outside automation timing
-	FloatParameter * position;
-	FloatParameter * value;
-	FloatParameter * length;
+    bool showUIInEditor;
 
-	//snapping
-	Array<float> snapPositions;
-	BoolParameter * enableSnap;
-	FloatParameter * snapSensitivity;
+    AutomationKey * addKey(const float& position, const float& value, bool addToUndo = false);
 
-	std::unique_ptr<InspectableSelectionManager> customSelectionManager;
+    void addItemInternal(AutomationKey* k, var params) override;
+    void removeItemInternal(AutomationKey* k) override;
 
-	void setLength(float value, bool stretch = false, bool stickToEnd = false);
+    void updateCurve();
+    void computeValue();
 
-	float getValueForPosition(float pos);
-	float getNormalizedValueForPosition(float pos);
+    void setLength(float newLength, float stretch = false, float stickToEnd = false);
 
-	AutomationKey * createItem() override;
-	void addItems(Array<Point<float>> keys, bool removeExistingOverlappingKeys = true, bool addToUndo = true, Easing::Type defaultEasing = Easing::LINEAR);
-	AutomationKey * addItem(const float position, const float value, bool addToUndo = true, bool reorder = false);
-    Array<AutomationKey *> addItemsFromClipboard(bool showWarning = false) override;
+    Point<float> getPosAndValue();
 
-	void removeKeysBetween(float start, float end);
-	void removeAllSelectedKeys();
+    void updateRange();
 
-	void setSnapPositions(Array<float> positions);
+    AutomationKey * getKeyForPosition(float pos); //to make binary search instead
 
-	float getClosestSnapForPos(float pos, int start = -1, int end = -1);
+    float getValueAtNormalizedPosition(float pos);
+    float getValueAtPosition(float pos);
+    float getNormalizedValueAtPosition(float pos);
 
-	void clearRange();
-	void setRange(float minValue, float maxValue);
+    void onContainerParameterChanged(Parameter* p) override;
+    void onControllableFeedbackUpdate(ControllableContainer* cc, Controllable* c) override;
 
-	AutomationKey * getClosestKeyForPos(float pos, int start = -1, int end = -1);
-	AutomationKey * getKeyAtPos(float pos);
+    void afterLoadJSONDataInternal() override;
 
-	virtual void onControllableFeedbackUpdate(ControllableContainer * cc, Controllable *c) override;
-	virtual void onContainerParameterChanged(Parameter *) override;
-
-	static int compareTime(AutomationKey * t1, AutomationKey * t2);
-
-	InspectableEditor * getEditor(bool isRoot) override;
-
-private:
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Automation)
+    InspectableEditor* getEditor(bool isRoot) override;
 };

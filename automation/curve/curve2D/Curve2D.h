@@ -19,7 +19,7 @@ public:
 
     FloatParameter* position;
     FloatParameter* length;
-    Rectangle<float> bounds;
+    juce::Rectangle<float> bounds;
 
     Point2DParameter* value;
 

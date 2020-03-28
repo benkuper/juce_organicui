@@ -19,7 +19,7 @@ AutomationEditor::AutomationEditor(Automation * automation, bool isRoot) :
 
 		automationUI->bgColor = BG_COLOR;
 		automationUI->transparentBG = false;
-		automationUI->autoResetViewRangeOnLengthUpdate = true;
+		//automationUI->autoResetViewRangeOnLengthUpdate = true;
 
 		addAndMakeVisible(automationUI.get());
 		automationUI->setViewRange(0, automation->length->floatValue());

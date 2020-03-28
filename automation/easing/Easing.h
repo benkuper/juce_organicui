@@ -11,6 +11,7 @@
 #pragma once
 
 class EasingUI;
+#include "../common/bezier.h"
 
 class Easing :
 	public ControllableContainer
@@ -21,21 +22,23 @@ public:
 
 	Easing(Type type);
 	virtual ~Easing();
-	
+
 	Type type;
+	Point<float> start;
+	Point<float> end;
+	float length;
 
-	virtual float getValue(const float &start, const float &end, const float &weight) = 0;//must be overriden
+	virtual void updateKeys(const Point<float>& start, const Point<float>& end);
+	virtual void updateKeysInternal() {}
 
-	virtual EasingUI * createUI() = 0; //must be overriden
+	virtual float getValue(const float& weight) = 0;//must be overriden
+	virtual Rectangle<float> getBounds(bool includeHandles = false) = 0;
+	virtual EasingUI* createUI();
 
-private :
+private:
 	WeakReference<Easing>::Master masterReference;
 	friend class WeakReference<Easing>;
-
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Easing)
-
 };
-
 
 class LinearEasing :
 	public Easing
@@ -43,9 +46,10 @@ class LinearEasing :
 public:
 	LinearEasing();
 
-	float getValue(const float &start, const float &end, const float &weight) override;
+	float getValue(const float& weight) override;
+	Rectangle<float> getBounds(bool includeHandles) override;
 
-	EasingUI * createUI() override;
+	EasingUI* createUI() override;
 };
 
 class HoldEasing :
@@ -54,9 +58,10 @@ class HoldEasing :
 public:
 	HoldEasing();
 
-	virtual float getValue(const float &start, const float &end, const float &weight) override;
+	virtual float getValue(const float& weight) override;
+	Rectangle<float> getBounds(bool includeHandles) override;
 
-	EasingUI * createUI() override;
+	//EasingUI* createUI() override;
 };
 
 class CubicEasing :
@@ -64,36 +69,30 @@ class CubicEasing :
 {
 public:
 	CubicEasing();
-	Point2DParameter * anchor1;
-	Point2DParameter * anchor2;
+	Point2DParameter* anchor1;
+	Point2DParameter* anchor2;
 
-	virtual float getValue(const float &start, const float &end, const float &weight) override;
+	//for generating timeLUT
+	Point<float> a;
+	Point<float> b;
+	Point<float> c;
 
-	void onContainerParameterChanged(Parameter * p) override;
-	class Bezier
-	{
-	public:
-		Point<float> a;
-		Point<float> b;
-		Point<float> c;
+	virtual float getValue(const float& weight) override;
+	Point<float> getRawValue(const float &weight);
 
-		const float epsilon = 1e-6f; //Precision
+	void updateKeysInternal() override;
+	void updateBezier();
 
-		void setup(const Point<float> &a1, const Point<float> &a2);
+	void updateUniformLUT(int precision);
 
-		inline float sampleCurveX(float t);
-		inline float sampleCurveY(float t);
-		inline float sampleCurveDerivativeX(float t);
+	void onContainerParameterChanged(Parameter* p) override;
 
-		float getValueForX(const float &tx);
+	Bezier::Bezier<3> bezier;
+	Array<float> uniformLUT;
 
-		float solveCurveX(const float &tx);
-	};
+	Rectangle<float> getBounds(bool includeHandles) override;
 
-	Bezier bezier;
-	//Array<float> solveCubic(float a, float b, float c, float d);
-
-	EasingUI * createUI() override;
+	EasingUI* createUI() override;
 };
 
 
@@ -104,8 +103,10 @@ public:
 	SineEasing();
 	Point2DParameter * freqAmp;
 
-	virtual float getValue(const float &start, const float &end, const float &weight) override;
+	virtual float getValue(const float &weight) override;
 
-	EasingUI * createUI() override;
+	Rectangle<float> getBounds(bool includeHandles) override;
+
+	//EasingUI * createUI() override;
 };
 

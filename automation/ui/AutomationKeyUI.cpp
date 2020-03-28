@@ -1,154 +1,85 @@
-#include "AutomationKeyUI.h"
 /*
   ==============================================================================
 
 	AutomationKeyUI.cpp
-	Created: 11 Dec 2016 1:22:27pm
-	Author:  Ben
+	Created: 21 Mar 2020 4:06:36pm
+	Author:  bkupe
 
   ==============================================================================
 */
 
-
-AutomationKeyUI::AutomationKeyUI(AutomationKey * key, Colour c) :
+AutomationKeyUI::AutomationKeyUI(AutomationKey* key) :
 	BaseItemMinimalUI(key),
-    color(c),
-	keyYPos1(-1),
-    keyYPos2(-1),
-    showHandle(true),
-    handle(c)
+	handle(key),
+	easingUI(nullptr)
 {
-
-	addAndMakeVisible(&handle);
-	//removeMouseListener(this);
-
 	bringToFrontOnSelect = false;
-	setWantsKeyboardFocus(false);
-	setMouseClickGrabsKeyboardFocus(false);
 
 	autoDrawContourWhenSelected = false;
-	setEasingUI(item->easing != nullptr ? item->easing->createUI() : nullptr);
+	dragAndDropEnabled = false;
+
+	addAndMakeVisible(&handle);
+
+	updateEasingUI();
 }
 
 AutomationKeyUI::~AutomationKeyUI()
 {
-}
-
-void AutomationKeyUI::setShowHandle(bool value)
-{
-
-	if (showHandle == value) return;
-	showHandle = value;
-	if (showHandle)
-	{
-		if(handle.getParentComponent() == nullptr) addChildComponent(&handle);
-	} else
-	{
-		if (handle.getParentComponent() == this) removeChildComponent(&handle);
-	}
-}
-
-
-void AutomationKeyUI::setEasingUI(EasingUI * eui)
-{
-	if (easingUI != nullptr)
-	{
-		removeChildComponent(easingUI.get());
-	}
-
-	easingUI.reset(eui);
-
-	if (easingUI != nullptr)
-	{
-
-		addAndMakeVisible(easingUI.get());
-		easingUI->color = color;
-		easingUI->toBack();
-		resized();
-		if(keyYPos1 > -1 && keyYPos2 > -1) easingUI->setKeyPositions(keyYPos1, keyYPos2);
-	}
-}
-
-void AutomationKeyUI::setKeyPositions(const int &k1, const int &k2)
-{
-	keyYPos1 = k1;
-	keyYPos2 = k2;
-	if (easingUI != nullptr) easingUI->setKeyPositions(keyYPos1, keyYPos2);
-
-	juce::Rectangle<int> hr = getLocalBounds().withSize(AutomationKeyUI::handleClickZone, AutomationKeyUI::handleClickZone)
-		.withCentre(Point<int>(AutomationKeyUI::handleClickZone / 2, (int)((1 - item->value->floatValue())*getHeight())));
-
-	handle.setBounds(hr);
-}
-
-void AutomationKeyUI::showKeyEditorWindow()
-{
-	AlertWindow keyEditorWindow("Set key position and value", "Fine tune this key's position and value", AlertWindow::AlertIconType::NoIcon, this);
-	keyEditorWindow.addTextEditor("pos", item->position->stringValue(), "Position");
-	keyEditorWindow.addTextEditor("val", item->value->stringValue(), "Value");
-
-
-	keyEditorWindow.addButton("OK", 1, KeyPress(KeyPress::returnKey));
-	keyEditorWindow.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
-
-	int result = keyEditorWindow.runModalLoop();
-
-	if (result)
-	{
-		float newPos = keyEditorWindow.getTextEditorContents("pos").getFloatValue();
-		float newValue = keyEditorWindow.getTextEditorContents("val").getFloatValue();
-
-		Array<UndoableAction *> actions;
-		actions.add(item->position->setUndoableValue(item->position->value,newPos,true));
-		actions.add(item->value->setUndoableValue(item->value->value, newValue, true));
-		UndoMaster::getInstance()->performActions("Move automation key", actions);
-	}
+	if (!inspectable.wasObjectDeleted()) if (item->easing != nullptr) item->easing->removeInspectableListener(this);
 }
 
 void AutomationKeyUI::resized()
 {
-	juce::Rectangle<int> hr = getLocalBounds().withSize(AutomationKeyUI::handleClickZone, AutomationKeyUI::handleClickZone)
-		.withCentre(Point<int>(AutomationKeyUI::handleClickZone / 2, (int)((1 - item->value->floatValue())*getHeight())));
+	Point<int> hp = getUIPosForValuePos(item->getPosAndValue());
+	const int handleSize = 14;
+	handle.setBounds(Rectangle<int>(hp.x - handleSize / 2, hp.y - handleSize / 2, handleSize, handleSize));
+	if (easingUI != nullptr) easingUI->setBounds(getLocalBounds()); 
+}
 
-	handle.setBounds(hr);
+void AutomationKeyUI::paint(Graphics& g)
+{
+}
 
-	juce::Rectangle<int> r = getLocalBounds().reduced(AutomationKeyUI::handleClickZone / 2, 0);
+void AutomationKeyUI::setShowEasingHandles(bool showFirst, bool showLast)
+{
+	if (inspectable.wasObjectDeleted()) return;
+	if (easingUI != nullptr) easingUI->setShowEasingHandles(showFirst && item->nextKey != nullptr, showLast && item->nextKey != nullptr);
+}
+
+void AutomationKeyUI::updateEasingUI()
+{
 	if (easingUI != nullptr)
 	{
-		easingUI->setBounds(r);
+		removeChildComponent(this);
 	}
-}
 
-bool AutomationKeyUI::hitTest(int tx, int ty)
-{
-	return handle.getBounds().contains(tx, ty) || (easingUI != nullptr && easingUI->hitTest(tx, ty));
-}
-
-void AutomationKeyUI::mouseDown(const MouseEvent & e)
-{
-	BaseItemMinimalUI::mouseDown(e);
-	setMouseCursor(e.mods.isShiftDown() ? MouseCursor::LeftRightResizeCursor : MouseCursor::NormalCursor);
-	if (e.eventComponent == &handle)
+	if (item->easing == nullptr)
 	{
-		if (e.mods.isLeftButtonDown())
-		{
-			if (e.mods.isCommandDown())
-			{
-				//add to selection here
-			} else
-			{
-				posAtMouseDown = item->position->floatValue();
-				valueAtMouseDown = item->value->floatValue();
-			}
-		}
-	} else if (e.eventComponent == easingUI.get())
+		easingUI.reset();
+		return;
+	}
+
+	easingUI.reset(item->easing->createUI());
+
+	if (easingUI != nullptr)
+	{
+		addAndMakeVisible(easingUI.get(), 0);
+		easingUI->setBounds(getLocalBounds());
+		easingUI->setValueBounds(valueBounds);
+	}
+
+}
+
+void AutomationKeyUI::mouseDown(const MouseEvent& e)
+{
+	if (e.eventComponent == easingUI.get())
 	{
 		if (e.mods.isRightButtonDown())
 		{
 			PopupMenu ep;
 			juce::StringArray keys = item->easingType->getAllKeys();
 			int kid = 1;
-			for (auto &i : keys)
+			for (auto& i : keys)
 			{
 				ep.addItem(kid, i, true, i == item->easingType->getValueKey());
 				kid++;
@@ -157,69 +88,88 @@ void AutomationKeyUI::mouseDown(const MouseEvent & e)
 			int result = ep.show();
 			if (result >= 1 && result <= keys.size())
 			{
-				item->easingType->setUndoableValue(item->easingType->value,keys[result - 1]);
+				item->easingType->setUndoableValue(item->easingType->value, keys[result - 1]);
 				item->easing->selectThis(); //reselect after changing easing
 			}
-		} else if (e.mods.isCommandDown())
+		}
+		else if (e.mods.isCommandDown())
 		{
-			item->easingType->setNext(true,true);
+			item->easingType->setNext(true, true);
 			item->easing->selectThis(); //reselect after changing easing
 		}
 	}
 }
 
-void AutomationKeyUI::mouseUp(const MouseEvent & e)
+void AutomationKeyUI::mouseDoubleClick(const MouseEvent& e)
 {
-	handle.setMouseCursor(MouseCursor::NormalCursor);
+	Component* editComponent = new ParameterUI::ValueEditCalloutComponent(item->position);
+	CallOutBox* box = &CallOutBox::launchAsynchronously(editComponent, localAreaToGlobal(getLocalBounds()), nullptr);
+	box->setArrowSize(8);
 }
 
-void AutomationKeyUI::controllableFeedbackUpdateInternal(Controllable * c)
+bool AutomationKeyUI::hitTest(int x, int y)
 {
-	if (c == item->easingType)
+	if (handle.getBounds().contains(x, y)) return true;
+	if (easingUI != nullptr && easingUI->hitTest(x, y)) return true;
+	return false;
+}
+
+void AutomationKeyUI::setValueBounds(const Rectangle<float> _valueBounds)
+{
+	valueBounds = _valueBounds;
+	if (easingUI != nullptr) easingUI->setValueBounds(valueBounds);
+	resized();
+}
+
+
+Point<int> AutomationKeyUI::getUIPosForValuePos(const Point<float>& valuePos) const
+{
+	return getLocalBounds().getRelativePoint((valuePos.x - valueBounds.getX()) / valueBounds.getWidth(), 1 - ((valuePos.y - valueBounds.getY()) / valueBounds.getHeight()));
+}
+
+
+void AutomationKeyUI::controllableFeedbackUpdateInternal(Controllable* c)
+{
+	if (c == item->easingType) updateEasingUI();
+	else if (CubicEasing* ce = dynamic_cast<CubicEasing*>(c->parentContainer.get()))
 	{
-		setEasingUI(item->easing != nullptr ? item->easing->createUI() : nullptr);
+		if (CubicEasingUI* eui = dynamic_cast<CubicEasingUI*>(easingUI.get()))
+		{
+			bool isFirst = c == ce->anchor1;
+			keyUIListeners.call(&KeyUIListener::keyEasingHandleMoved, this, eui->syncHandles, isFirst);
+		}
 	}
-	else if (c == item->value)
-	{
-		repaint();
-	}
 }
 
-void AutomationKeyUI::inspectableSelectionChanged(Inspectable * i)
+AutomationKeyHandle::AutomationKeyHandle(AutomationKey* key) :
+	InspectableContentComponent(key),
+	key(key)
 {
-	BaseItemMinimalUI::inspectableSelectionChanged(i);
-	handle.highlight = item->isSelected;
-	handle.color = item->isSelected ? HIGHLIGHT_COLOR : item->isPreselected ? PRESELECT_COLOR : color;
-}
-
-void AutomationKeyUI::inspectablePreselectionChanged(Inspectable * i)
-{
-	BaseItemMinimalUI::inspectablePreselectionChanged(i);
-	handle.highlight = false;
-	handle.color = item->isPreselected ? PRESELECT_COLOR : color;
-}
-
-AutomationKeyUI::Handle::Handle(Colour c) :
-	highlight(false),
-	color(c)
-{
+	autoDrawContourWhenSelected = false;
 	setRepaintsOnMouseActivity(true);
-	setWantsKeyboardFocus(false);
-	setMouseClickGrabsKeyboardFocus(false);
+
 }
 
-void AutomationKeyUI::Handle::paint(Graphics & g)
+AutomationKeyHandle::~AutomationKeyHandle()
 {
-
-	int rad = AutomationKeyUI::handleSize;
-	if (isMouseOver() || highlight) rad += 4;
-
-	juce::Rectangle<float> er = getLocalBounds().withSizeKeepingCentre(rad, rad).toFloat();
-
-	Colour cc = isMouseOver() ? color.brighter() : color.darker(.3f);
-	g.setColour(color);
-	g.fillEllipse(er);
-	g.setColour(cc);
-	g.drawEllipse(er, 1);
 }
 
+void AutomationKeyHandle::paint(Graphics& g)
+{
+	if (inspectable.wasObjectDeleted()) return;
+
+	Colour bc = NORMAL_COLOR;
+	Colour c = key->isSelected ? HIGHLIGHT_COLOR : bc;
+	if (isMouseOverOrDragging()) c = c.brighter(.2f);
+
+	Rectangle<float> r = getLocalBounds().reduced(3).toFloat();
+	g.setColour(c);
+	g.fillEllipse(r);
+	g.setColour(c.darker());
+	g.drawEllipse(r, 1);
+}
+
+void AutomationKeyHandle::inspectableSelectionChanged(Inspectable* i)
+{
+	repaint();
+}

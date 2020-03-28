@@ -1,84 +1,62 @@
-/*
-  ==============================================================================
-
-    EasingUI.h
-    Created: 16 Dec 2016 7:13:11pm
-    Author:  Ben
-
-  ==============================================================================
-*/
-
-#pragma once
-
 class EasingUI :
 	public InspectableContentComponent,
 	public ContainerAsyncListener
 {
 public:
-	EasingUI(Easing * e);
+	EasingUI(Easing* e);
 	virtual ~EasingUI();
 
 	WeakReference<Easing> easing;
 
-	Colour color;
-
-	int y1;
-	int y2;
-
 	Path drawPath;
 	Path hitPath;
 
+	bool showFirstHandle;
+	bool showLastHandle;
+
 	int hitPathPrecision = 10;
 
-	void setKeyPositions(const int &k1, const int &k2);
+	Rectangle<float> valueBounds;
 
-	void paint(Graphics &g) override;
-	virtual void paintInternal(Graphics &) {}
+	void paint(Graphics& g) override;
+	virtual void paintInternal(Graphics&) {}
 	void resized() override;
 
 	void generatePath();
 	virtual void generatePathInternal();
 
-	void autoGeneratePathWithPrecision(int precision = 100);
+	void autoGeneratePathWithPrecision(int precision = 50);
 
 	void buildHitPath();
 
-    bool hitTest(int tx, int ty) override;
+	bool hitTest(int tx, int ty) override;
 
-	virtual void newMessage(const ContainerAsyncEvent &e) override;
-	virtual void easingControllableFeedbackUpdate(Controllable *) {}
+	virtual void setShowEasingHandles(bool showFirst, bool showLast);
 
+	virtual void newMessage(const ContainerAsyncEvent& e) override;
+	virtual void easingControllableFeedbackUpdate(Controllable*) {}
 
+	void setValueBounds(const Rectangle<float> valueBounds);
+	Point<int> getUIPosForValuePos(const Point<float>& valuePos) const;
+	Point<float> getValuePosForUIPos(const Point<int>& uiPos) const;
 
 	class EasingHandle :
 		public Component
 	{
-	public :
+	public:
 		EasingHandle();
-		void paint(Graphics &g) override;
+		void paint(Graphics& g) override;
 	};
-
-private:
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(EasingUI)
 };
 
 class LinearEasingUI :
 	public EasingUI
 {
 public:
-	LinearEasingUI(LinearEasing * e);
+	LinearEasingUI(LinearEasing* e);
 	void generatePathInternal() override;
 
 	// Inherited via EasingUI
-};
-
-
-class HoldEasingUI :
-	public EasingUI
-{
-public:
-	HoldEasingUI(HoldEasing * e);
-	void generatePathInternal() override;
 };
 
 
@@ -86,41 +64,28 @@ class CubicEasingUI :
 	public EasingUI
 {
 public:
-	CubicEasingUI(CubicEasing * e);
-	
+	CubicEasingUI(CubicEasing* e);
+
+	CubicEasing* ce;
 	EasingHandle h1;
 	EasingHandle h2;
+	bool syncHandles;
 
+	Point<float> h1ValueAtMouseDown;
+	Point<float> h2ValueAtMouseDown;
 
 	bool hitTest(int tx, int ty) override;
 
 	void resized() override;
 
 	void generatePathInternal() override;
-	void paintInternal(Graphics &g) override;
+	void paintInternal(Graphics& g) override;
 
-	void inspectableSelectionChanged(Inspectable *) override;
-	void easingControllableFeedbackUpdate(Controllable *) override;
+	void easingControllableFeedbackUpdate(Controllable*) override;
 
-	void mouseDrag(const MouseEvent &e) override;
-};
+	void setShowEasingHandles(bool showFirst, bool showLast) override;
 
-class SineEasingUI :
-	public EasingUI
-{
-public:
-	SineEasingUI(SineEasing * e);
-
-	EasingHandle h1;
-
-	bool hitTest(int tx, int ty) override;
-
-	void resized() override;
-
-	void paintInternal(Graphics &g) override;
-
-	void inspectableSelectionChanged(Inspectable *) override;
-	void easingControllableFeedbackUpdate(Controllable *) override;
-
-	void mouseDrag(const MouseEvent &e) override;
+	void mouseDown(const MouseEvent& e) override;
+	void mouseDrag(const MouseEvent& e) override;
+	void mouseUp(const MouseEvent& e) override;
 };

@@ -14,6 +14,7 @@ DoubleSliderUI::DoubleSliderUI(Point2DParameter* parameter) :
 	xParam("X", "xParam", parameter->x, parameter->minimumValue[0], parameter->maximumValue[0]),
 	yParam("Y", "yParam", parameter->y, parameter->minimumValue[1], parameter->maximumValue[1])
 {
+
 	xParam.canHaveRange = parameter->canHaveRange;
 	yParam.canHaveRange = parameter->canHaveRange;
 	xParam.isCustomizableByUser = parameter->isCustomizableByUser;

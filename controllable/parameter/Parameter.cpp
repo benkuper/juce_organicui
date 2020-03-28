@@ -8,9 +8,10 @@
   ==============================================================================
 */
 
-Parameter::Parameter(const Type &type, const String &niceName, const String &description, var initialValue, var minValue, var maxValue, bool enabled) :
+Parameter::Parameter(const Type& type, const String& niceName, const String& description, var initialValue, var minValue, var maxValue, bool enabled) :
 	Controllable(type, niceName, description, enabled),
 	defaultValue(initialValue),
+	value(initialValue),
 	canHaveRange(false),
 	minimumValue(minValue),
 	maximumValue(maxValue),
@@ -25,7 +26,6 @@ Parameter::Parameter(const Type &type, const String &niceName, const String &des
     forceSaveValue(false),
 	queuedNotifier(100)
 {
-	resetValue(true);
 
 	scriptObject.setMethod("get", Parameter::getValueFromScript);
 	scriptObject.setMethod("set", Controllable::setValueFromScript);
@@ -150,12 +150,13 @@ void Parameter::setValue(var _value, bool silentSet, bool force, bool forceOverr
 	{
 		GenericScopedLock<SpinLock> lock(valueSetLock);
 
-		if (!alwaysNotify && !force && checkValueIsTheSame(_value, value)) return;
+		var croppedValue = getCroppedValue(_value);
+
+		if (!alwaysNotify && !force && checkValueIsTheSame(croppedValue, value)) return;
 
 		lastValue = var(value);
-		setValueInternal(_value);
-		isOverriden = _value != defaultValue || forceOverride;
-
+		setValueInternal(croppedValue);
+		isOverriden = croppedValue != defaultValue || forceOverride;
 	}
 	if (!silentSet) notifyValueChanged();
 }
@@ -179,12 +180,14 @@ StringArray Parameter::getValuesNames()
 
 void Parameter::setRange(var min, var max) {
 
-	if(isComplex() && (!(min.isArray() && min.size() == value.size()) || !(max.isArray() && max.size() == value.size()))) return;
-
-	if (minimumValue == min && maximumValue == max) return;
-
-	minimumValue = min;
-	maximumValue = max;
+	{
+		GenericScopedLock<SpinLock> lock(valueSetLock);
+		if (isComplex() && (!(min.isArray() && min.size() == value.size()) || !(max.isArray() && max.size() == value.size()))) return;
+		if (minimumValue == min && maximumValue == max) return;
+		minimumValue = min;
+		maximumValue = max;
+	}
+	
 
 	listeners.call(&ParameterListener::parameterRangeChanged, this);
 	var arr;
@@ -207,11 +210,10 @@ bool Parameter::hasRange()
 
 void Parameter::setValueInternal(var & _value) //to override by child classes
 {
+
 	value = _value;
 
-#ifdef JUCE_DEBUG
-	if (!checkVarIsConsistentWithType()) DBG("Problem with var type");
-#endif
+	jassert(checkVarIsConsistentWithType());
 }
 
 bool Parameter::checkValueIsTheSame(var newValue, var oldValue)
@@ -228,11 +230,17 @@ bool Parameter::checkValueIsTheSame(var newValue, var oldValue)
 }
 
 bool Parameter::checkVarIsConsistentWithType() {
-	if (type == Type::STRING)  return value.isString();
-	else if (type == Type::INT)     return value.isInt();
-	else if (type == Type::BOOL)    return value.isBool();
-	else if (type == Type::FLOAT)   return value.isDouble();
+	if (type == Type::STRING)		return value.isString();
+	else if (type == Type::INT)     return value.isBool() || value.isDouble() || value.isInt() || value.isInt64();
+	else if (type == Type::BOOL)    return value.isBool() || value.isDouble() || value.isInt() || value.isInt64();
+	else if (type == Type::FLOAT)   return value.isBool() || value.isDouble() || value.isInt() || value.isInt64();
+	else if (type == Type::POINT2D || type == Type::POINT3D || type == Type::COLOR) return value.isArray();
 	return true;
+}
+
+var Parameter::getCroppedValue(var originalValue)
+{
+	return originalValue;
 }
 
 void Parameter::setUndoableNormalizedValue(const float & oldNormalizedValue, const float & newNormalizedValue)

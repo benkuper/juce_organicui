@@ -124,6 +124,7 @@ void Curve2DKey::onExternalParameterValueChanged(Parameter* p)
 
 void Curve2DKey::onControllableFeedbackUpdateInternal(ControllableContainer* cc, Controllable* c)
 {
+    BaseItem::onControllableFeedbackUpdateInternal(cc, c);
     if (cc == easing.get()) notifyKeyUpdated();
 }
 

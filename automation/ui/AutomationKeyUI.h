@@ -2,69 +2,68 @@
   ==============================================================================
 
     AutomationKeyUI.h
-    Created: 11 Dec 2016 1:22:27pm
-    Author:  Ben
+    Created: 21 Mar 2020 4:06:36pm
+    Author:  bkupe
 
   ==============================================================================
 */
 
 #pragma once
 
-class AutomationKeyUI :
-	public BaseItemMinimalUI<AutomationKey>
+class AutomationKeyHandle :
+    public InspectableContentComponent
 {
 public:
-	AutomationKeyUI(AutomationKey *, Colour c = Colours::white);
-	virtual ~AutomationKeyUI();
-    
-	Colour color;
-    
+    AutomationKeyHandle(AutomationKey* key);
+    ~AutomationKeyHandle();
+
+    AutomationKey* key;
+
+    void paint(Graphics& g) override;
+
+    void inspectableSelectionChanged(Inspectable* i) override;
+};
+
+class AutomationKeyUI :
+    public BaseItemMinimalUI<AutomationKey>
+{
+public:
+    AutomationKeyUI(AutomationKey* key);
+    ~AutomationKeyUI();
+
+    AutomationKeyHandle handle;
+
+    Rectangle<float> valueBounds;
+
     std::unique_ptr<EasingUI> easingUI;
 
-    int keyYPos1;
-    int keyYPos2;
-    
-    float posAtMouseDown;
-    float valueAtMouseDown;
+    void resized() override;
+    void paint(Graphics& g) override;
 
-	bool showHandle;
-	
-	const static int handleSize = 6;
-	const static int handleClickZone = 10;
+    void setShowEasingHandles(bool showFirst, bool showLast);
 
-	
-    void setShowHandle(bool value);
+    void updateEasingUI();
 
-	class Handle :
-		public Component
-	{
-	public:
-		Handle(Colour c);
-		bool highlight;
-		Colour color;
-		void paint(Graphics &g) override;
-	};
+    void mouseDown(const MouseEvent& e) override;
+    void mouseDoubleClick(const MouseEvent& e) override;
 
-    Handle handle;
-    
+    bool hitTest(int x, int y) override;
 
-	void paint(Graphics &) override {}; //avoid default item painting
+    void setValueBounds(const Rectangle<float> valueBounds);
+    Point<int> getUIPosForValuePos(const Point<float>& valuePos) const;
 
-	void setEasingUI(EasingUI * eui);
+    void controllableFeedbackUpdateInternal(Controllable* c) override;
 
-	void setKeyPositions(const int &k1, const int &k2);
 
-	void showKeyEditorWindow();
-	
-	void resized() override;
+    class KeyUIListener
+    {
+    public:
+        virtual ~KeyUIListener() {}
+        virtual void keyEasingHandleMoved(AutomationKeyUI* key, bool syncOtherHandle, bool isFirstHandle) {}
+    };
 
-	bool hitTest(int tx, int ty) override;
+    ListenerList<KeyUIListener> keyUIListeners;
+    void addKeyUIListener(KeyUIListener* newListener) { keyUIListeners.add(newListener); }
+    void removeKeyUIListener(KeyUIListener* listener) { keyUIListeners.remove(listener); }
 
-	void mouseDown(const MouseEvent &e) override;
-	void mouseUp(const MouseEvent &e) override;
-
-	void controllableFeedbackUpdateInternal(Controllable * c) override;
-
-	void inspectableSelectionChanged(Inspectable *) override;
-	void inspectablePreselectionChanged(Inspectable *) override;
 };

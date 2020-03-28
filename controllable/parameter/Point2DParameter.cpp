@@ -1,3 +1,4 @@
+#include "Point2DParameter.h"
 /*
   ==============================================================================
 
@@ -18,6 +19,10 @@ Point2DParameter::Point2DParameter(const String & niceName, const String & descr
 	value = var();
 	value.append(0);
 	value.append(0);
+
+	defaultValue = var();
+	defaultValue.append(0);
+	defaultValue.append(0);
 
 	minimumValue = var();
 	minimumValue.append((float)INT32_MIN);
@@ -64,17 +69,11 @@ UndoableAction* Point2DParameter::setUndoablePoint(float oldX, float oldY, float
 	return setUndoableValue(od, d, onlyReturnAction);
 }
 
-void Point2DParameter::setValueInternal(var & _value)
+void Point2DParameter::setValueInternal(var& _value)
 {
-	if (!_value.isArray()) return;
-
-	x = std::isnan((float)value[0]) ? 0 : jlimit<float>(minimumValue[0], maximumValue[0], _value[0]);
-	y = std::isnan((float)value[1]) ? 0 : jlimit<float>(minimumValue[1], maximumValue[1], _value[1]);
-
-	value = var();
-	value.append(x);
-	value.append(y);
-
+	Parameter::setValueInternal(_value);
+	x = _value[0];
+	y = _value[1];
 }
 
 void Point2DParameter::setBounds(float _minX, float _minY, float _maxX, float _maxY)
@@ -143,4 +142,13 @@ bool Point2DParameter::checkValueIsTheSame(var newValue, var oldValue)
 ControllableUI * Point2DParameter::createDefaultUI(Controllable * targetControllable)
 {
 	return new DoubleSliderUI(targetControllable != nullptr ? (Point2DParameter *)targetControllable : this);
+}
+
+var Point2DParameter::getCroppedValue(var originalValue)
+{
+	jassert(originalValue.isArray() && minimumValue.isArray() && maximumValue.isArray());
+
+	var val;
+	for (int i = 0; i < 2; i++) val.append(jlimit(minimumValue[i], maximumValue[i], originalValue[i]));
+	return val;
 }

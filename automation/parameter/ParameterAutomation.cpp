@@ -154,14 +154,14 @@ ParameterNumberAutomation::ParameterNumberAutomation(Parameter* parameter, bool 
 
 	setup();
 
-	automation.enableSnap->setValue(false);
+	//automation.enableSnap->setValue(false);
 	automation.showUIInEditor = true;
 
 	if (addDefaultItems)
 	{
 		automation.addItem(0, parameter->getNormalizedValue(), false);
 		automation.items[0]->setEasing(Easing::BEZIER);
-		automation.addItem(automation.length->floatValue(), parameter->getNormalizedValue(), false);
+		automation.addKey(automation.length->floatValue(), parameter->getNormalizedValue() , false);
 	}
 
 }
@@ -173,10 +173,8 @@ void ParameterNumberAutomation::setLength(float value, bool stretch, bool stickT
 
 void ParameterNumberAutomation::setAllowKeysOutside(bool value)
 {
-	automation.allowKeysOutside = true;
+	//automation.allowKeysOutside = true;
 }
-
-
 
 ParameterColorAutomation::ParameterColorAutomation(ColorParameter* colorParam, bool addDefaultItems) :
 	ParameterAutomation(colorParam),

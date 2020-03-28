@@ -21,8 +21,6 @@ public:
     FloatParameter(const String &niceName, const String &description, const float &initialValue, const float &minValue = (float)INT32_MIN, const float &maxValue = (float)INT32_MAX, bool enabled = true);
     ~FloatParameter() {}
 
-    void setValueInternal(var & _value) override;
-
 	virtual var getLerpValueTo(var targetValue, float weight) override;
 	virtual void setWeightedValue(Array<var> values, Array<float> weights) override;
 
@@ -54,7 +52,7 @@ public:
 	virtual String getTypeString() const override { return getTypeStringStatic(); }
 	static String getTypeStringStatic() { return "Float"; }
 
-
-private:
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(FloatParameter)
+	
+protected:
+	virtual var getCroppedValue(var originalValue) override;
 };

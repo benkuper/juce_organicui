@@ -1,3 +1,4 @@
+#include "Point3DParameter.h"
 /*
 ==============================================================================
 
@@ -20,6 +21,10 @@ Point3DParameter::Point3DParameter(const String & niceName, const String & descr
 	value.append(0);
 	value.append(0);
 
+	defaultValue = var();
+	defaultValue.append(0);
+	defaultValue.append(0);
+	defaultValue.append(0);
 	 
 	minimumValue = var();
 	minimumValue.append(INT32_MIN);
@@ -70,21 +75,12 @@ void Point3DParameter::setUndoableVector(float oldX, float oldY, float oldZ, flo
 	setUndoableValue(od, d);
 }
 
-void Point3DParameter::setValueInternal(var & _value)
+void Point3DParameter::setValueInternal(var& _value)
 {
-	if (!_value.isArray()) return;
-
-	jassert(minimumValue.isArray() && maximumValue.isArray());
-	
-	x = std::isnan((float)_value[0]) ? 0 : jlimit<float>(minimumValue[0], maximumValue[0], _value[0]);
-	y = std::isnan((float)_value[1]) ? 0 : jlimit<float>(minimumValue[1], maximumValue[1], _value[1]);
-	z = std::isnan((float)_value[2]) ? 0 : jlimit<float>(minimumValue[2], maximumValue[2], _value[2]);
-	
-	
-	value = var();
-	value.append(x);
-	value.append(y);
-	value.append(z);
+	Parameter::setValueInternal(_value);
+	x = _value[0];
+	y = _value[1];
+	z = _value[2];
 }
 
 void Point3DParameter::setBounds(float _minX, float _minY, float _minZ, float _maxX, float _maxY, float _maxZ)
@@ -156,4 +152,13 @@ StringArray Point3DParameter::getValuesNames()
 ControllableUI * Point3DParameter::createDefaultUI(Controllable * targetControllable)
 {
 	return new TripleSliderUI(targetControllable != nullptr ? (Point3DParameter *)targetControllable : this);
+}
+
+var Point3DParameter::getCroppedValue(var originalValue)
+{
+	jassert(originalValue.isArray() && minimumValue.isArray() && maximumValue.isArray());
+
+	var val;
+	for (int i = 0; i < 3; i++) val.append(jlimit(minimumValue[i], maximumValue[i], originalValue[i]));
+	return val;
 }

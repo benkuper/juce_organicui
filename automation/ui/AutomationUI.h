@@ -10,100 +10,45 @@
 
 #pragma once
 
-
 class AutomationUI :
-	public BaseManagerUI<Automation,AutomationKey,AutomationKeyUI>,
-	public ContainerAsyncListener,
-	public InspectableSelectionManager::Listener,
-	public Thread,
-	public Timer
+    public BaseManagerUI<Automation, AutomationKey, AutomationKeyUI>,
+    public AutomationKey::AsyncListener,
+    public AutomationKeyUI::KeyUIListener,
+    public ContainerAsyncListener
 {
 public:
-	AutomationUI(Automation * _automation, Colour c = Colours::white);
-	virtual ~AutomationUI();
-	
-	//View optimisation, generate in thread a preview of the image
-	enum ViewMode { EDIT, VIEW };
-	ViewMode viewMode;
-	bool autoSwitchMode;
+    AutomationUI(Automation* manager);
+    ~AutomationUI();
 
-	Image viewImage;
-	bool shouldUpdateImage;
-	SpinLock imageLock;
+    Point<float> viewPosRange;
+    float viewLength;
 
-	float viewStartPos;
-	float viewEndPos;
+    void paintOverChildren(Graphics& g) override;
 
-	int firstROIKey;
-	int lastROIKey;
+    void resized() override;
+    void placeKeyUI(AutomationKeyUI* ui);
+    void updateHandlesForUI(AutomationKeyUI* ui, bool checkSideItems);
 
-	bool autoResetViewRangeOnLengthUpdate;
+    void setViewRange(float start, float end);
 
-	float currentPosition;
-	float currentValue;
+    void addItemUIInternal(AutomationKeyUI* ui) override;
+    void removeItemUIInternal(AutomationKeyUI* ui) override;
 
-	bool fixedPosOrValueEnabled; //When using shift key and moving handles, keep either position or value
+    void mouseDrag(const MouseEvent& e) override;
+    void mouseDoubleClick(const MouseEvent& e) override;
 
-	Colour color;
+    Point<float> getViewPos(Point<int> pos, bool relative = false);
+    Rectangle<float> getViewBounds(Rectangle<int> pos, bool relative = false);
+    Point<int> getPosInView(Point<float> pos, bool relative = false);
+    Rectangle<int> getBoundsInView(Rectangle<float> pos, bool relative = false);
 
-	AutomationKeyUI * currentUI;
-	std::unique_ptr<AutomationMultiKeyTransformer> transformer;
+    float getPosForX(int x, bool relative = false);
+    int getXForPos(float x, bool relative = false);
+    float getValueForY(int y, bool relative = false);
+    int getYForValue(float x, bool relative = false);
 
-	bool shouldRepaint;
+    void newMessage(const AutomationKey::AutomationKeyEvent& e) override;
+    void newMessage(const ContainerAsyncEvent& e) override;
 
-	void setCurrentPosition(const float &pos);
-	void setCurrentValue(const float &val);
-
-	void setViewMode(ViewMode mode);
-
-	void setViewRange(float start, float end);
-	void updateROI();
-
-	void paint(Graphics &g) override;
-	
-	void resized() override;
-	void placeKeyUI(AutomationKeyUI * kui, bool placePrevKUI = true);
-
-	int getXForPos(float time);
-	float getPosForX(int tx, bool offsetStart = true);
-
-	int getYForValue(float value);
-	float getValueForY(int ty);
-
-	bool isInView(AutomationKeyUI * kui);
-
-	AutomationKeyUI * getClosestKeyUIForPos(float pos, int start = - 1, int end = -1);
-
-	void itemAddedAsync(AutomationKey *) override;
-	void itemsReorderedAsync() override;
-
-	AutomationKeyUI * createUIForItem(AutomationKey * item) override;
-	
-	void addItemUIInternal(AutomationKeyUI *) override;
-	void removeItemUIInternal(AutomationKeyUI *) override;
-
-	void showMenuAndAddItem(bool, Point<int>) override {}; //no menu
-
-	void mouseDown(const MouseEvent &e) override;
-	void mouseDoubleClick(const MouseEvent &e) override;
-	void mouseDrag(const MouseEvent &e) override;
-	void mouseUp(const MouseEvent &e) override;
-	bool keyPressed(const KeyPress &e) override;
-
-	void newMessage(const ContainerAsyncEvent &e) override;
-
-	void inspectablesSelectionChanged() override;
-	void inspectableDestroyed(Inspectable *) override;
-
-	void focusGained(FocusChangeType cause) override;
-	void focusLost(FocusChangeType cause) override;
-
-	//Generate image thread
-	void run() override;
-
-	void timerCallback() override;
-
-private:
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AutomationUI)
-
+    void keyEasingHandleMoved(AutomationKeyUI* ui, bool syncOtherHandle, bool isFirst) override;
 };

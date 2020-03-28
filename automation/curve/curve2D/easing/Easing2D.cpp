@@ -26,11 +26,11 @@ Easing2D::~Easing2D()
 	masterReference.clear();
 }
 
-void Easing2D::updateKeys(const Point<float>& _start, const Point<float>& _end, bool updateKeys)
+void Easing2D::updateKeys(const Point<float>& _start, const Point<float>& _end, bool _updateLength)
 {
 	start = _start;
 	end = _end;
-	if(updateKeys) updateLength();
+	if(_updateLength) updateLength();
 }
 
 

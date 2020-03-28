@@ -8,15 +8,14 @@
   ==============================================================================
 */
 
-const String Easing::typeNames[Easing::TYPE_MAX] = { "Linear", "Bezier", "Hold", "Sine" };
+const String Easing::typeNames[Easing::TYPE_MAX]{"Linear", "Bezier", "Hold","Sine"};
 
-Easing::Easing(Type _type) :
-	ControllableContainer("ease"),
-	type(_type)
+Easing::Easing(Type type) :
+	ControllableContainer("Easing"),
+	type(type),
+	length(0)
 {
-	//showInspectorOnSelect = false;
-
-	helpID = "Easing";
+	showInspectorOnSelect = false;
 }
 
 Easing::~Easing()
@@ -24,21 +23,36 @@ Easing::~Easing()
 	masterReference.clear();
 }
 
+void Easing::updateKeys(const Point<float>& _start, const Point<float>& _end)
+{
+	if (start == _start && end == _end) return;
+	start = _start;
+	end = _end;
+	length = end.x - start.x;
+
+	updateKeysInternal();
+}
+
+EasingUI* Easing::createUI()
+{
+	return new EasingUI(this);
+}
+
 
 LinearEasing::LinearEasing() : Easing(LINEAR) {}
 HoldEasing::HoldEasing() : Easing(HOLD) {}
 
 
-EasingUI* LinearEasing::createUI()
+EasingUI * LinearEasing::createUI()
 {
 	return new LinearEasingUI(this);
 }
 
 
-EasingUI* HoldEasing::createUI()
-{
-	return new HoldEasingUI(this);
-}
+//EasingUI* HoldEasing::createUI()
+//{
+//	return new HoldEasingUI(this);
+//}
 
 EasingUI* CubicEasing::createUI()
 {
@@ -46,17 +60,27 @@ EasingUI* CubicEasing::createUI()
 }
 
 
-float LinearEasing::getValue(const float& start, const float& end, const float& weight)
+float LinearEasing::getValue(const float & weight)
 {
-	return start + (end - start) * weight;
+	return jmap(weight, start.y, end.y);
+}
+
+Rectangle<float> LinearEasing::getBounds(bool includeHandles)
+{
+	return 	Rectangle<float>(Point<float>(jmin(start.x, end.x), jmin(start.y, end.y)), Point<float>(jmax(start.x, end.x), jmax(start.y, end.y)));
+
 }
 
 
-
-float HoldEasing::getValue(const float& start, const float& end, const float& weight)
+float HoldEasing::getValue(const float & weight)
 {
-	if (weight >= 1) return end;
-	return start;
+	if (weight < 1) return  start.y;
+	return end.y;
+}
+
+Rectangle<float> HoldEasing::getBounds(bool includeHandles)
+{
+	return 	Rectangle<float>(Point<float>(jmin(start.x, end.x), jmin(start.y, end.y)), Point<float>(jmax(start.x, end.x), jmax(start.y, end.y)));
 }
 
 
@@ -66,113 +90,138 @@ CubicEasing::CubicEasing() :
 	anchor1 = addPoint2DParameter("Anchor 1", "Anchor 1 of the quadratic curve");
 	anchor2 = addPoint2DParameter("Anchor 2", "Anchor 2 of the quadratic curve");
 
-	anchor1->setBounds(0, -1, .99f, 2);
-	anchor2->setBounds(.01f, -1, 1, 2);
 
-	anchor1->setPoint(.5f, 0);
-	anchor2->setPoint(.5f, 1);
-
-	bezier.setup(anchor1->getPoint(), anchor2->getPoint());
 }
 
 
 void CubicEasing::onContainerParameterChanged(Parameter* p)
 {
-	if (p == anchor1 || p == anchor2) bezier.setup(anchor1->getPoint(), anchor2->getPoint());
+	if (p == anchor1 || p == anchor2) updateBezier();
 }
 
-
-float CubicEasing::getValue(const float& start, const float& end, const float& weight)
+Rectangle<float> CubicEasing::getBounds(bool includeHandles)
 {
-	if (weight <= 0) return start;
-	if (weight >= 1) return end;
+	Bezier::AxisAlignedBoundingBox  bbox = bezier.aabb();
+	Array<Point<float>> points;
+	points.add(Point<float>(bbox.minX(), bbox.minY()), Point<float>(bbox.maxX(), bbox.maxY()));
+	if (includeHandles) points.add(anchor1->getPoint() + start, anchor2->getPoint() + end);
 
-	float val = bezier.getValueForX(weight);
-	return jmap<float>(val, start, end);
+	return Rectangle<float>::findAreaContainingPoints(points.getRawDataPointer(), points.size());
 }
 
-void CubicEasing::Bezier::setup(const Point<float>& a1, const Point<float>& a2)
+
+float CubicEasing::getValue(const float & weight)
 {
-	c.setXY(3 * a1.x, 3 * a1.y);
-	b.setXY(3 * (a2.x - a1.x) - c.x, 3 * (a2.y - a1.y) - c.y);
-	a.setXY(1 - c.x - b.x, 1 - c.y - b.y);
+	if (length == 0 || weight <= 0 || uniformLUT.size() == 0) return start.y;
+	if (weight >= 1) return end.y;
+
+	float indexF = weight * (uniformLUT.size() - 1);
+	int index = (int)floor(indexF);
+	float rel = indexF - index;
+	float p1 = uniformLUT[index];
+	float p2 = uniformLUT[index + 1];
+
+	float p = p1 + (p2 - p1) * rel;
+	return p;
 }
 
-inline float CubicEasing::Bezier::sampleCurveX(float t) {
-	return ((a.x * t + b.x) * t + c.x) * t;
-}
-
-inline float CubicEasing::Bezier::sampleCurveY(float t) {
-	return ((a.y * t + b.y) * t + c.y) * t;
-}
-
-inline float CubicEasing::Bezier::sampleCurveDerivativeX(float t) {
-	return (3 * a.x * t + 2 * b.x) * t + c.x;
-}
-
-float CubicEasing::Bezier::getValueForX(const float& tx)
+Point<float> CubicEasing::getRawValue(const float& weight)
 {
-	return sampleCurveY(solveCurveX(tx));
+	Bezier::Point p = bezier.valueAt(weight);
+	return { p.x, p.y };
 }
 
-float CubicEasing::Bezier::solveCurveX(const float& tx)
+void CubicEasing::updateKeysInternal()
 {
-	float t0;
-	float t1;
-	float t2;
-	float x2;
-	float d2;
-	float i;
+	anchor1->setBounds(0, INT32_MIN, length, INT32_MAX);
+	anchor2->setBounds(-length, INT32_MIN, 0, INT32_MAX);
 
-	// First try a few iterations of Newton's method -- normally very fast.
-	for (t2 = tx, i = 0; i < 8; i++) {
-		x2 = sampleCurveX(t2) - tx;
-		if (std::abs(x2) < epsilon)
-			return t2;
-		d2 = sampleCurveDerivativeX(t2);
-		if (std::abs(d2) < epsilon)
-			break;
-		t2 = t2 - x2 / d2;
+	if (!anchor1->isOverriden && !anchor2->isOverriden)
+	{
+		anchor1->setPoint(length * .3f, 0);
+		anchor2->setPoint(-length * .3f, 0);
 	}
 
-	// No solution found - use bi-section
-	t0 = 0.0;
-	t1 = 1.0;
-	t2 = tx;
+	updateBezier();
+}
 
-	if (t2 < t0) return t0;
-	if (t2 > t1) return t1;
+void CubicEasing::updateBezier()
+{
+	if (length == 0) return;
+	
+	Point<float> a1 = start + anchor1->getPoint();
+	Point<float> a2 = end + anchor2->getPoint();
+	bezier = Bezier::Bezier<3>({ {start.x, start.y},{a1.x, a1.y},{a2.x,a2.y},{end.x,end.y} });
 
-	while (t0 < t1) {
-		x2 = sampleCurveX(t2);
-		if (std::abs(x2 - tx) < epsilon)
-			return t2;
-		if (tx > x2) t0 = t2;
-		else t1 = t2;
+	updateUniformLUT(1 + length * 50);
+}
 
-		t2 = (t1 - t0) * .5f + t0;
+void CubicEasing::updateUniformLUT(int precision)
+{
+	uniformLUT.clear();
+	Array<float> arcLengths;
+	arcLengths.add(0);
+
+	Point<float> prevP = getRawValue(0);
+
+	float dist = 0;
+	for (int i = 1; i <= precision; i++) {
+		float rel = i * 1.0f / precision;
+		Point<float> p = getRawValue(rel);
+
+		dist += p.x - prevP.x;
+		arcLengths.add(dist);
+		prevP.setXY(p.x, p.y);
 	}
 
-	// Give up
-	return t2;
+	for (int i = 0; i <= precision; i++)
+	{
+		float targetLength = (i * 1.0f / precision) * length;
+		int low = 0;
+		int high = precision;
+		int index = 0;
+
+		while (low < high) {
+			index = low + (((high - low) / 2) | 0);
+			if (arcLengths[index] < targetLength) low = index + 1;
+			else  high = index;
+		}
+
+		if (arcLengths[index] > targetLength) index--;
+
+		float lengthBefore = arcLengths[index];
+
+		float pos = 0;
+		if (lengthBefore == targetLength) pos = index / precision;
+		else pos = (index + (targetLength - lengthBefore) / (arcLengths[index + 1] - lengthBefore)) / precision;
+
+		Point<float> curPoint = getRawValue(pos);
+		uniformLUT.add(curPoint.y);
+	}
 }
+
 
 SineEasing::SineEasing() :
 	Easing(SINE)
 {
-	freqAmp = addPoint2DParameter("Anchor 1", "Anchor 1 of the quadratic curve");
+	freqAmp = addPoint2DParameter("Frequency Amplitude", "Frequency and amplitude of the sine wave");
 	freqAmp->setBounds(.01f, -1, 1, 2);
 	freqAmp->setPoint(.2f, .5f);
 }
 
-float SineEasing::getValue(const float& start, const float& end, const float& weight)
+float SineEasing::getValue(const float & weight)
 {
-	//DBG(freqAmp->getPoint().toString() << " / " << sinf(weight / freqAmp->x));
-	return start + (end - start) * weight + sinf(weight * float_Pi * 2 / freqAmp->x) * freqAmp->y;
+	return  start.y + (end.y - start.y) * weight + sinf(weight * length * float_Pi * 2 / freqAmp->x) * freqAmp->y;
+}
+
+Rectangle<float> SineEasing::getBounds(bool includeHandles)
+{
+	return Rectangle<float>();
 }
 
 
-EasingUI* SineEasing::createUI()
-{
-	return new SineEasingUI(this);
-}
+//EasingUI* SineEasing::createUI()
+//{
+//	return new SineEasingUI(this);
+//}
+

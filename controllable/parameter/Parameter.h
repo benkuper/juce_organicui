@@ -173,6 +173,8 @@ public:
 	WeakReference<Parameter>::Master masterReference;
 	friend class WeakReference<Parameter>;
 
+protected:
+	virtual var getCroppedValue(var originalValue);
 
 public:
 	class ParameterAction :
@@ -210,7 +212,6 @@ public:
 		bool perform() override;
 		bool undo() override;
 	};
-
 
 	private:
 		JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Parameter)
