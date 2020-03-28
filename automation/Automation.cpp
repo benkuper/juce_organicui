@@ -8,9 +8,10 @@
   ==============================================================================
 */
 
-Automation::Automation(const String& name) :
+Automation::Automation(const String& name, AutomationRecorder * recorder) :
     BaseManager(name),
-    showUIInEditor(true)
+    recorder(recorder),
+    showUIInEditor(false)
 {
     isSelectable = false;
 
@@ -52,33 +53,49 @@ AutomationKey * Automation::addKey(const float& _position, const float& _value, 
     return addItem(key, params, addToUndo);
 }
 
+void Automation::addKeys(const Array<float>& positions, const Array<float>& values, bool addToUndo, bool removeExistingKeys)
+{
+    if (positions.size() == 0) return;
+
+    Array<UndoableAction*> actions;
+
+    if (removeExistingKeys)
+    {
+        Array<AutomationKey*> existingKeys = getKeysBetweenPositions(positions[0], positions[positions.size() - 1]);
+        if (addToUndo) actions.addArray(getRemoveItemsUndoableAction(existingKeys));
+        else removeItems(existingKeys, false);
+    }
+
+    Array<AutomationKey*> keysToAdd;
+    for (int i = 0; i < positions.size(); i++)
+    {
+        AutomationKey* k = new AutomationKey(positions[i], values[i]);
+        if (addToUndo)  actions.add(getAddItemUndoableAction(k));
+        else keysToAdd.add(k);
+    }
+    
+    if (addToUndo) UndoMaster::getInstance()->performActions("Add keys", actions);
+    else addItems(keysToAdd, var(), false);
+}
+
 void Automation::addItemInternal(AutomationKey* k, var)
 {
-    updateCurve();
+    updateNextKeys(items.indexOf(k) - 1, items.indexOf(k) + 1);
 }
 
-void Automation::removeItemInternal(AutomationKey*)
+void Automation::removeItemInternal(AutomationKey* k)
 {
-    updateCurve();
+    updateNextKeys();
 }
 
-void Automation::updateCurve()
+void Automation::updateNextKeys(int start, int end)
 {
     if (isCurrentlyLoadingData || Engine::mainEngine->isClearing) return;
 
-    Array<float> prevCurvePositions;
-
-    bounds = items.size() > 0 ? items[0]->easing->getBounds() : Rectangle<float>(0, 0, 0, 0);
-
-    float curLength = 0;
-    int numItems = items.size();
-    for (int i = 0; i < numItems; i++)
+    int endIndex = jmin(end, items.size());
+    for (int i = jmax(start, 0); i < endIndex; i++)
     {
-
-        if (i < numItems - 1) items[i]->setNextKey(items[i + 1]);
-        if (i < numItems - 1) curLength += items[i]->getLength();
-
-        bounds = bounds.getUnion(items[i]->easing->getBounds());
+        if (i < items.size() - 1) items[i]->setNextKey(items[i + 1]);
     }
 
     computeValue();
@@ -91,12 +108,38 @@ void Automation::computeValue()
 
 void Automation::setLength(float newLength, float stretch, float stickToEnd)
 {
-    length->setValue(newLength);
+    if (length->floatValue() == newLength) return;
+
+    if (stretch)
+    {
+        float stretchFactor = newLength / length->floatValue();
+        if (stretchFactor > 1) length->setValue(newLength); //if stretching, we have first to expand the length in case keys are not allowed outside
+        for (auto& k : items) k->position->setValue(k->position->floatValue() * stretchFactor);
+        if (stretchFactor < 1) length->setValue(newLength); //if reducing, we have to first reduce keys and then we can reduce the length, in case keys are not allowed outside
+    }
+    else
+    {
+        float lengthDiff = newLength - length->floatValue();
+        length->setValue(newLength); // just change the value, nothing unusual
+        if (stickToEnd) for (auto& k : items) k->position->setValue(k->position->floatValue() + lengthDiff);
+    }
 }
 
 Point<float> Automation::getPosAndValue()
 {
     return Point<float>(position->floatValue(), value->floatValue());
+}
+
+juce::Rectangle<float> Automation::getBounds()
+{
+    juce::Rectangle<float> bounds;
+    for (int i = 0; i < items.size(); i++)
+    {
+        if (i < items.size() - 1) items[i]->setNextKey(items[i + 1]);
+        bounds = bounds.getUnion(items[i]->easing->getBounds());
+    }
+
+    return bounds;
 }
 
 void Automation::updateRange()
@@ -126,6 +169,24 @@ AutomationKey* Automation::getKeyForPosition(float pos)
     }
 
     return nullptr;
+}
+
+Array<AutomationKey*> Automation::getKeysBetweenPositions(float startPos, float endPos)
+{
+    Array<AutomationKey*> result;
+
+    AutomationKey* startK = getKeyForPosition(startPos);
+    if (startK->position->floatValue() < startPos) startK = startK->nextKey;
+
+    if (startK == nullptr) return result;
+
+    AutomationKey* endK = getKeyForPosition(endPos);
+    
+    int startIndex = items.indexOf(startK);
+    int endIndex = items.indexOf(endK);
+    result.addArray(items, startIndex, endIndex - startIndex);
+
+    return result;
 }
 
 float Automation::getValueAtNormalizedPosition(float pos)
@@ -183,13 +244,13 @@ void Automation::onControllableFeedbackUpdate(ControllableContainer* cc, Control
 
     if (AutomationKey* k = dynamic_cast<AutomationKey*>(cc))
     {
-        updateCurve();
+        updateNextKeys();
     }
 }
 
 void Automation::afterLoadJSONDataInternal()
 {
-    updateCurve();
+    updateNextKeys();
 }
 
 InspectableEditor* Automation::getEditor(bool isRoot)

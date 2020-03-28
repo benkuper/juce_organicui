@@ -36,10 +36,35 @@ AutomationUI::~AutomationUI()
 
 void AutomationUI::paintOverChildren(Graphics& g)
 {
-    Point<int> p = getPosInView(manager->getPosAndValue());
 
     g.setColour(GREEN_COLOR);
-    g.drawEllipse(Rectangle<int>(0, 0, 8, 8).withCentre(p).toFloat(), 2);
+    g.drawEllipse(Rectangle<int>(0, 0, 6, 6).withCentre(getPosInView(manager->getPosAndValue())).toFloat(), 1.5f);
+
+
+    //recorder
+    if (manager->recorder != nullptr)
+    {
+        if (manager->recorder->isRecording->boolValue())
+        {
+            int numRKeys = manager->recorder->keys.size();
+            if (numRKeys > 0)
+            {
+                g.setColour(Colours::red.withAlpha(.3f));
+                g.fillRect(getLocalBounds().withLeft(getXForPos(manager->recorder->keys[0].x)).withRight(getXForPos(manager->position->floatValue())));
+
+                if (numRKeys >= 2)
+                {
+                    Path p;
+                    Point<float> k = manager->recorder->keys[0];
+                    p.startNewSubPath(getPosInView(manager->recorder->keys[0]).toFloat());
+                    for (int i = 1; i < numRKeys; i++)  p.lineTo(getPosInView(manager->recorder->keys[i]).toFloat());
+                    
+                    g.setColour(Colours::orangered);
+                    g.strokePath(p, PathStrokeType(2));
+                }
+            }
+        }
+    }
 }
 
 
