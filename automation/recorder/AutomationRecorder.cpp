@@ -150,7 +150,7 @@ Array<AutomationKey *> AutomationRecorder::getSimplifiedKeys(Array<Point<float>>
 		return r;
 	}
 	*/
-
+	return Array<AutomationKey*>();
 }
 
 

@@ -23,6 +23,9 @@ public:
     Point<float> viewPosRange;
     float viewLength;
 
+    bool paintingMode;
+    Array<Point<float>> paintingPoints;
+
     void paintOverChildren(Graphics& g) override;
 
     void resized() override;
@@ -34,7 +37,9 @@ public:
     void addItemUIInternal(AutomationKeyUI* ui) override;
     void removeItemUIInternal(AutomationKeyUI* ui) override;
 
+    void mouseDown(const MouseEvent& e) override;
     void mouseDrag(const MouseEvent& e) override;
+    void mouseUp(const MouseEvent& e) override;
     void mouseDoubleClick(const MouseEvent& e) override;
 
     Point<float> getViewPos(Point<int> pos, bool relative = false);

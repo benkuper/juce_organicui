@@ -20,6 +20,9 @@ public:
     Curve2DUI(Curve2D * manager);
     ~Curve2DUI();
 
+    bool paintingMode;
+    Array<Point<float>> paintingPoints;
+
     void paintOverChildren(Graphics& g) override;
 
     void updateViewUIPosition(Curve2DKeyUI * ui) override;
@@ -28,7 +31,10 @@ public:
     void addItemUIInternal(Curve2DKeyUI* ui) override;
     void removeItemUIInternal(Curve2DKeyUI* ui) override;
 
+    void mouseDown(const MouseEvent& e) override;
     void mouseDrag(const MouseEvent& e) override;
+    void mouseUp(const MouseEvent& e) override;
+
     void mouseDoubleClick(const MouseEvent& e) override;
 
 

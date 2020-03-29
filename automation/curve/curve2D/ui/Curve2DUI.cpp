@@ -8,8 +8,12 @@
   ==============================================================================
 */
 
+
+#include "../../../common/fitting/intern/curve_fit_cubic.c";
+
 Curve2DUI::Curve2DUI(Curve2D* manager) :
-    BaseManagerViewUI(manager->niceName, manager)
+    BaseManagerViewUI(manager->niceName, manager),
+    paintingMode(false)
 {
     useCheckersAsUnits = true;
     minZoom = .1f;
@@ -38,10 +42,23 @@ Curve2DUI::~Curve2DUI()
 
 void Curve2DUI::paintOverChildren(Graphics& g)
 {
-    Point<int> p = getPosInView(manager->value->getPoint());
-
     g.setColour(GREEN_COLOR);
-    g.drawEllipse(Rectangle<int>(0, 0, 8, 8).withCentre(p).toFloat(), 2);
+    g.drawEllipse(Rectangle<int>(0, 0, 8, 8).withCentre(getPosInView(manager->value->getPoint())).toFloat(), 2);
+
+    if (paintingMode && paintingPoints.size() > 0)
+    {
+        g.setColour(YELLOW_COLOR);
+        Path p;
+        p.startNewSubPath(getPosInView(paintingPoints[0]).toFloat());
+        for (auto& pp : paintingPoints)
+        {
+            Point<int> vpp = getPosInView(pp);
+            g.fillEllipse(Rectangle<int>(0, 0, 3, 3).withCentre(vpp).toFloat());
+            p.lineTo(vpp.toFloat());
+        }
+
+        g.strokePath(p, PathStrokeType(1));
+    }
 }
 
 void Curve2DUI::updateViewUIPosition(Curve2DKeyUI* ui)
@@ -97,15 +114,87 @@ void Curve2DUI::removeItemUIInternal(Curve2DKeyUI* ui)
     }
 }
 
+void Curve2DUI::mouseDown(const MouseEvent& e)
+{
+    if (e.eventComponent == this)
+    {
+        paintingMode = e.mods.isLeftButtonDown() && e.mods.isCommandDown() && e.mods.isShiftDown();
+        paintingPoints.clear();
+        paintingPoints.add(getViewPos(e.getPosition()));
+    }
+}
+
 void Curve2DUI::mouseDrag(const MouseEvent& e)
 {
     if (Curve2DKeyHandle* handle = dynamic_cast<Curve2DKeyHandle*>(e.eventComponent))
     {
         handle->key->position->setPoint(getViewMousePosition());
     }
-    else if(e.eventComponent == this)
+    else if (e.eventComponent == this)
     {
-        BaseManagerViewUI::mouseDrag(e);
+        if (paintingMode)
+        {
+            paintingPoints.add(getViewPos(e.getPosition()));
+            repaint();
+        }
+        else
+        {
+            BaseManagerUI::mouseDrag(e);
+        }
+    }
+}
+
+void Curve2DUI::mouseUp(const MouseEvent& e)
+{
+    if (paintingMode)
+    {
+        Array<float> points;
+        for (auto& pp : paintingPoints) points.add(pp.x, pp.y);
+        float* result;
+        unsigned int resultNum = 0;
+        unsigned int * origIndex;
+        unsigned int * cornerIndex;
+        unsigned int cornerIndexLength;
+
+        int fitResult = curve_fit_cubic_to_points_fl(points.getRawDataPointer(), points.size(), 2, .1f, CURVE_FIT_CALC_HIGH_QUALIY, nullptr, 0, &result, &resultNum, &origIndex, &cornerIndex, &cornerIndexLength);
+        
+        LOG("RESULT : " << fitResult << " / " << (int)resultNum);
+
+        Array<Curve2DKey*> keys;
+
+        Curve2DKey* prevKey = nullptr;
+        CubicEasing2D * prevEasing = nullptr;
+
+        for (int i = 0; i < resultNum; i+=6)
+        {
+            Point<float> h1(result[i+0], result[i+1]);
+            Point<float> rp(result[i+2], result[i+3]);
+            Point<float> h2(result[i+4], result[i+5]);
+
+            if (rp.getDistanceFromOrigin() > 10) break;;
+            DBG(" > " << h1.toString() << " / " << rp.toString() << " / " << h2.toString());
+
+            if (prevKey != nullptr)
+            {
+                prevEasing->anchor2->setPoint(h1 - rp);
+            }
+
+
+            Curve2DKey * k = new Curve2DKey();
+            k->easingType->setValueWithData(Easing2D::BEZIER);
+            CubicEasing2D* ce = (CubicEasing2D*)k->easing.get();
+            ce->anchor1->setPoint(h2 - rp);
+            k->position->setPoint(rp);
+            keys.add(k);
+            manager->addItem(k);
+            prevKey = k;
+            prevEasing = ce;
+        }
+        
+
+        paintingMode = false;
+        paintingPoints.clear();
+        repaint();
     }
 }
 

@@ -129,7 +129,7 @@ static size_t cubic_alloc_size(const uint dims)
 
 static Cubic *cubic_alloc(const uint dims)
 {
-	return malloc(cubic_alloc_size(dims));
+	return (Cubic *)malloc(cubic_alloc_size(dims));
 }
 
 static void cubic_copy(Cubic *cubic_dst, const Cubic *cubic_src, const uint dims)
@@ -186,7 +186,7 @@ static double *cubic_list_as_array(
 	const uint dims = clist->dims;
 	const uint array_flat_len = (clist->len + 1) * 3 * dims;
 
-	double *array = malloc(sizeof(double) * array_flat_len);
+	double *array = (double *)malloc(sizeof(double) * array_flat_len);
 	const double *handle_prev = &((Cubic *)clist->items)->pt_data[dims];
 
 #ifdef USE_ORIG_INDEX_DATA
@@ -316,7 +316,7 @@ static double cubic_calc_error(
 #ifdef USE_VLA
 	double        pt_eval[dims];
 #else
-	double       *pt_eval = alloca(sizeof(double) * dims);
+	double       *pt_eval = (double*)alloca(sizeof(double) * dims);
 #endif
 
 	for (uint i = 1; i < points_offset_len - 1; i++, pt_real += dims) {
@@ -352,7 +352,7 @@ static double cubic_calc_error_simple(
 #ifdef USE_VLA
 	double        pt_eval[dims];
 #else
-	double       *pt_eval = alloca(sizeof(double) * dims);
+	double       *pt_eval = (double*)alloca(sizeof(double) * dims);
 #endif
 
 	for (uint i = 1; i < points_offset_len - 1; i++, pt_real += dims) {
@@ -456,7 +456,7 @@ static double points_calc_circumference_factor(
 	const double len_tangent = dot < 0.0 ? len_vnvn(tan_l, tan_r, dims) : len_negated_vnvn(tan_l, tan_r, dims);
 	if (len_tangent > DBL_EPSILON) {
 		/* only clamp to avoid precision error */
-		double angle = acos(max(-fabs(dot), -1.0));
+		double angle = acos(std::max(-fabs(dot), -1.0));
 		/* Angle may be less than the length when the tangents define >180 degrees of the circle,
 		 * (tangents that point away from each other).
 		 * We could try support this but will likely cause extreme >1 scales which could cause other issues. */
@@ -582,12 +582,12 @@ static void cubic_from_points_offset_fallback(
 	double a[2][dims];
 	double tmp[dims];
 #else
-	double *dir_unit = alloca(sizeof(double) * dims);
+	double *dir_unit = (double *)alloca(sizeof(double) * dims);
 	double *a[2] = {
-	    alloca(sizeof(double) * dims),
-	    alloca(sizeof(double) * dims),
+		(double*)alloca(sizeof(double) * dims),
+		(double*)alloca(sizeof(double) * dims),
 	};
-	double *tmp = alloca(sizeof(double) * dims);
+	double *tmp = (double*)alloca(sizeof(double) * dims);
 #endif
 
 	const double dir_dist = normalize_vn_vnvn(dir_unit, p3, p0, dims);
@@ -607,7 +607,7 @@ static void cubic_from_points_offset_fallback(
 		for (uint k = 0; k < 2; k++) {
 			sub_vn_vnvn(tmp, p0, pt, dims);
 			project_vn_vnvn_normalized(tmp, tmp, a[k], dims);
-			dists[k] = max(dists[k], dot_vnvn(tmp, a[k], dims));
+			dists[k] = std::max(dists[k], dot_vnvn(tmp, a[k], dims));
 		}
 	}
 
@@ -680,8 +680,8 @@ static void cubic_from_points(
 	double a[2][dims];
 #else
 	double *a[2] = {
-	    alloca(sizeof(double) * dims),
-	    alloca(sizeof(double) * dims),
+	    (double *)alloca(sizeof(double) * dims),
+	    (double *)alloca(sizeof(double) * dims),
 	};
 #endif
 
@@ -777,7 +777,7 @@ static void cubic_from_points(
 #ifdef USE_VLA
 		double center[dims];
 #else
-		double *center = alloca(sizeof(double) * dims);
+		double *center = (double *)alloca(sizeof(double) * dims);
 #endif
 		points_calc_center_weighted(points_offset, points_offset_len, dims, center);
 
@@ -796,7 +796,7 @@ static void cubic_from_points(
 					dist_sq_test += sq((pt[j] - center[j]) * clamp_scale);
 				}
 #endif
-				dist_sq_max = max(dist_sq_max, dist_sq_test);
+				dist_sq_max = std::max(dist_sq_max, dist_sq_test);
 			}
 		}
 
@@ -923,9 +923,9 @@ static double cubic_find_root(
 	double q1_u[dims];
 	double q2_u[dims];
 #else
-	double *q0_u = alloca(sizeof(double) * dims);
-	double *q1_u = alloca(sizeof(double) * dims);
-	double *q2_u = alloca(sizeof(double) * dims);
+	double *q0_u = (double *)alloca(sizeof(double) * dims);
+	double *q1_u = (double *)alloca(sizeof(double) * dims);
+	double *q2_u = (double *)alloca(sizeof(double) * dims);
 #endif
 
 	cubic_calc_point(cubic, u, dims, q0_u);
@@ -941,8 +941,8 @@ static double cubic_find_root(
 
 static int compare_double_fn(const void *a_, const void *b_)
 {
-	const double *a = a_;
-	const double *b = b_;
+	const double *a = (double *)a_;
+	const double *b = (double *)b_;
 	if      (*a > *b) return  1;
 	else if (*a < *b) return -1;
 	else              return  0;
@@ -1017,7 +1017,7 @@ static bool fit_cubic_to_points(
 		return true;
 	}
 
-	double *u = malloc(sizeof(double) * points_offset_len);
+	double *u = (double *)malloc(sizeof(double) * points_offset_len);
 
 #ifdef USE_CIRCULAR_FALLBACK
 	const double points_offset_coords_length  =
@@ -1045,7 +1045,7 @@ static bool fit_cubic_to_points(
 	        r_cubic, points_offset, points_offset_len, u, dims,
 	        &split_index);
 
-	Cubic *cubic_test = alloca(cubic_alloc_size(dims));
+	Cubic *cubic_test = (Cubic *)alloca(cubic_alloc_size(dims));
 
 	/* Run this so we use the non-circular calculation when the circular-fallback
 	 * in 'cubic_from_points' failed to give a close enough result. */
@@ -1096,7 +1096,7 @@ static bool fit_cubic_to_points(
 		cubic_copy(cubic_test, r_cubic, dims);
 
 		/* If error not too large, try some reparameterization and iteration */
-		double *u_prime = malloc(sizeof(double) * points_offset_len);
+		double *u_prime = (double *)malloc(sizeof(double) * points_offset_len);
 		for (uint iter = 0; iter < iteration_max; iter++) {
 			if (!cubic_reparameterize(
 			        cubic_test, points_offset, points_offset_len, u, dims, u_prime))
@@ -1191,7 +1191,7 @@ static void fit_cubic_to_points_recursive(
 #ifdef USE_VLA
 	double tan_center[dims];
 #else
-	double *tan_center = alloca(sizeof(double) * dims);
+	double *tan_center = (double *)alloca(sizeof(double) * dims);
 #endif
 
 	const double *pt_a = &points_offset[(split_index - 1) * dims];
@@ -1207,8 +1207,8 @@ static void fit_cubic_to_points_recursive(
 		double tan_center_a[dims];
 		double tan_center_b[dims];
 #else
-		double *tan_center_a = alloca(sizeof(double) * dims);
-		double *tan_center_b = alloca(sizeof(double) * dims);
+		double *tan_center_a = (double *)alloca(sizeof(double) * dims);
+		double *tan_center_b = (double *)alloca(sizeof(double) * dims);
 #endif
 		const double *pt   = &points_offset[split_index * dims];
 
@@ -1277,8 +1277,8 @@ int curve_fit_cubic_to_points_db(
 	double tan_l[dims];
 	double tan_r[dims];
 #else
-	double *tan_l = alloca(sizeof(double) * dims);
-	double *tan_r = alloca(sizeof(double) * dims);
+	double *tan_l = (double *)alloca(sizeof(double) * dims);
+	double *tan_r = (double *)alloca(sizeof(double) * dims);
 #endif
 
 #ifdef USE_LENGTH_CACHE
@@ -1289,7 +1289,7 @@ int curve_fit_cubic_to_points_db(
 	uint *corner_index_array = NULL;
 	uint  corner_index = 0;
 	if (r_corner_index_array && (corners != corners_buf)) {
-		corner_index_array = malloc(sizeof(uint) * corners_len);
+		corner_index_array = (uint *)malloc(sizeof(uint) * corners_len);
 		corner_index_array[corner_index++] = corners[0];
 	}
 
@@ -1317,7 +1317,7 @@ int curve_fit_cubic_to_points_db(
 				if (points_length_cache) {
 					free(points_length_cache);
 				}
-				points_length_cache = malloc(sizeof(double) * points_offset_len);
+				points_length_cache =(double *)malloc(sizeof(double) * points_offset_len);
 			}
 			points_calc_coord_length_cache(
 			        &points[first_point * dims], points_offset_len, dims,
@@ -1356,7 +1356,7 @@ int curve_fit_cubic_to_points_db(
 #ifdef USE_ORIG_INDEX_DATA
 	uint *cubic_orig_index = NULL;
 	if (r_cubic_orig_index) {
-		cubic_orig_index = malloc(sizeof(uint) * (clist.len + 1));
+		cubic_orig_index =(uint *)malloc(sizeof(uint) * (clist.len + 1));
 	}
 #else
 	*r_cubic_orig_index = NULL;
@@ -1405,7 +1405,7 @@ int curve_fit_cubic_to_points_fl(
         uint **r_corner_index_array, uint *r_corner_index_len)
 {
 	const uint points_flat_len = points_len * dims;
-	double *points_db = malloc(sizeof(double) * points_flat_len);
+	double *points_db =(double *)malloc(sizeof(double) * points_flat_len);
 
 	copy_vndb_vnfl(points_db, points, points_flat_len);
 
@@ -1422,7 +1422,7 @@ int curve_fit_cubic_to_points_fl(
 
 	if (!result) {
 		uint cubic_array_flat_len = cubic_array_len * 3 * dims;
-		cubic_array_fl = malloc(sizeof(float) * cubic_array_flat_len);
+		cubic_array_fl = (float *)malloc(sizeof(float) * cubic_array_flat_len);
 		for (uint i = 0; i < cubic_array_flat_len; i++) {
 			cubic_array_fl[i] = (float)cubic_array_db[i];
 		}
@@ -1452,14 +1452,14 @@ int curve_fit_cubic_to_points_single_db(
         double *r_error_max_sq,
         uint   *r_error_index)
 {
-	Cubic *cubic = alloca(cubic_alloc_size(dims));
+	Cubic *cubic = (Cubic *)alloca(cubic_alloc_size(dims));
 
 	/* in this instance theres no advantage in using length cache,
 	 * since we're not recursively calculating values. */
 #ifdef USE_LENGTH_CACHE
 	double *points_length_cache_alloc = NULL;
 	if (points_length_cache == NULL) {
-		points_length_cache_alloc = malloc(sizeof(double) * points_len);
+		points_length_cache_alloc = (double *)malloc(sizeof(double) * points_len);
 		points_calc_coord_length_cache(
 		        points, points_len, dims,
 		        points_length_cache_alloc);
@@ -1503,13 +1503,13 @@ int curve_fit_cubic_to_points_single_fl(
         uint   *r_error_index)
 {
 	const uint points_flat_len = points_len * dims;
-	double *points_db = malloc(sizeof(double) * points_flat_len);
+	double *points_db = (double *)malloc(sizeof(double) * points_flat_len);
 	double *points_length_cache_db = NULL;
 
 	copy_vndb_vnfl(points_db, points, points_flat_len);
 
 	if (points_length_cache) {
-		points_length_cache_db = malloc(sizeof(double) * points_len);
+		points_length_cache_db = (double *)malloc(sizeof(double) * points_len);
 		copy_vndb_vnfl(points_length_cache_db, points_length_cache, points_len);
 	}
 
@@ -1519,10 +1519,10 @@ int curve_fit_cubic_to_points_single_fl(
 	double r_handle_l_db[dims];
 	double r_handle_r_db[dims];
 #else
-	double *tan_l_db = alloca(sizeof(double) * dims);
-	double *tan_r_db = alloca(sizeof(double) * dims);
-	double *r_handle_l_db = alloca(sizeof(double) * dims);
-	double *r_handle_r_db = alloca(sizeof(double) * dims);
+	double *tan_l_db = (double *)alloca(sizeof(double) * dims);
+	double *tan_r_db = (double *)alloca(sizeof(double) * dims);
+	double *r_handle_l_db = (double *)alloca(sizeof(double) * dims);
+	double *r_handle_r_db = (double *)alloca(sizeof(double) * dims);
 #endif
 	double r_error_sq_db;
 

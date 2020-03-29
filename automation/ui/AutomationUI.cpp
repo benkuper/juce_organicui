@@ -1,3 +1,4 @@
+#include "AutomationUI.h"
 /*
   ==============================================================================
 
@@ -9,7 +10,8 @@
 */
 
 AutomationUI::AutomationUI(Automation* manager) :
-    BaseManagerUI(manager->niceName, manager, false)
+    BaseManagerUI(manager->niceName, manager, false),
+    paintingMode(false)
 {
     animateItemOnAdd = false;
     manager->addAsyncContainerListener(this);
@@ -64,6 +66,21 @@ void AutomationUI::paintOverChildren(Graphics& g)
                 }
             }
         }
+    }
+
+    if (paintingMode && paintingPoints.size() > 0)
+    {
+        g.setColour(YELLOW_COLOR);
+        Path p; 
+        p.startNewSubPath(getPosInView(paintingPoints[0]).toFloat());
+        for (auto& pp : paintingPoints)
+        {
+            Point<int> vpp = getPosInView(pp);
+            g.fillEllipse(Rectangle<int>(0, 0, 3, 3).withCentre(vpp).toFloat());
+            p.lineTo(vpp.toFloat());
+        }
+
+        g.strokePath(p, PathStrokeType(1));
     }
 }
 
@@ -137,6 +154,16 @@ void AutomationUI::removeItemUIInternal(AutomationKeyUI* ui)
     }
 }
 
+void AutomationUI::mouseDown(const MouseEvent& e)
+{
+    if (e.eventComponent == this)
+    {
+        paintingMode = e.mods.isLeftButtonDown() && e.mods.isCommandDown() && e.mods.isShiftDown();
+        paintingPoints.clear();
+        paintingPoints.add(getViewPos(e.getPosition()));
+    }
+}
+
 void AutomationUI::mouseDrag(const MouseEvent& e)
 {    
     if (AutomationKeyHandle* handle = dynamic_cast<AutomationKeyHandle*>(e.eventComponent))
@@ -151,7 +178,24 @@ void AutomationUI::mouseDrag(const MouseEvent& e)
     }
     else if (e.eventComponent == this)
     {
-        BaseManagerUI::mouseDrag(e);
+        if (paintingMode)
+        {
+            paintingPoints.add(getViewPos(e.getPosition()));
+            repaint();
+        }
+        else
+        {
+            BaseManagerUI::mouseDrag(e);
+        }
+    }
+}
+
+void AutomationUI::mouseUp(const MouseEvent& e)
+{
+    if (paintingMode)
+    {
+        paintingPoints.clear();
+        paintingMode = false;
     }
 }
 

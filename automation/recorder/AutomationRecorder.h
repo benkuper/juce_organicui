@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "../common/fitting/curve_fit_nd.h"
+class AutomationKey;
 
 class AutomationRecorder :
 	public EnablingControllableContainer,
