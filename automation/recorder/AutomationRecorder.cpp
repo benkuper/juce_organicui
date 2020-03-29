@@ -21,9 +21,6 @@ AutomationRecorder::AutomationRecorder() :
 	//arm->setEnabled(input->target != nullptr);
 	//arm->enabled = input->target != nullptr;
 	autoDisarm = addBoolParameter("Auto Disarm", "If set, the arm parameter will be automatically set to off when a record has been saved", false);
-	simplificationFactor = addFloatParameter("Simplification", "Level of simplification after recording", .5f, 0, 1);
-	defaultEasing = addEnumParameter("Default Easing", "This is the interpolation that will be assigned to the keys once the recording is finished");
-	for (int i = 0; i < Easing::TYPE_MAX; i++) defaultEasing->addOption(Easing::typeNames[i], (Easing::Type)i);
 
 	isRecording = addBoolParameter("Is Recording", "Is the recorder currently recording or eating pasta", false);
 	isRecording->isControllableFeedbackOnly = true;
@@ -89,14 +86,17 @@ void AutomationRecorder::cancelRecording()
 	clearKeys();
 }
 
-Array<AutomationKey *> AutomationRecorder::stopRecordingAndGetKeys()
+Array<Point<float>> AutomationRecorder::stopRecordingAndGetKeys()
 {
-	Array<AutomationKey *> simplifiedKeys = getSimplifiedKeys(keys, simplificationFactor->floatValue() / 10); //fine tune with simplification factor
 	isRecording->setValue(false);
+	if (autoDisarm->boolValue()) arm->setValue(false);
+
+	Array<Point<float>> result;
+	result.addArray(keys);
 
 	clearKeys();
-	if (autoDisarm->boolValue()) arm->setValue(false);
-	return simplifiedKeys;
+
+	return result;
 }
 
 bool AutomationRecorder::shouldRecord()
@@ -117,62 +117,4 @@ void AutomationRecorder::inspectableDestroyed(Inspectable * i)
 InspectableEditor * AutomationRecorder::getEditor(bool isRoot)
 {
 	return new AutomationRecorderEditor(this, isRoot);
-}
-
-Array<AutomationKey *> AutomationRecorder::getSimplifiedKeys(Array<Point<float>> arr, float epsilon)
-{
-	/*
-	if (arr.size() < 3) {  //base case 1
-		return arr;
-	}
-	std::pair<int, float> maxDistance = findMaximumDistance(arr);
-
-	if (maxDistance.second >= epsilon) {
-		int index = maxDistance.first;
-		Array<Point<float>> path1;
-		path1.addArray(arr, 0, index + 1);
-		Array<Point<float>> path2;
-		path2.addArray(arr, index, arr.size() - index); // new path l2 from index to last
-
-		Array<AutomationKey*> r1 = getSimplifiedKeys(path1, epsilon);
-		Array<AutomationKey*> r2 = getSimplifiedKeys(path2, epsilon);
-
-		//Concat simplified path1 and path2 together
-		Array<AutomationKey* > rs(r1);
-		rs.removeLast();
-		rs.addArray(r2);
-		return rs;
-	}
-	else { //base case 2, all points between are to be removed.
-		Array<Point<float>> r;
-		r.add(arr[0]);
-		r.add(arr[arr.size() - 1]);
-		return r;
-	}
-	*/
-	return Array<AutomationKey*>();
-}
-
-
-const std::pair<int, float> AutomationRecorder::findMaximumDistance(Array<Point<float>> arr)
-{
-	int numKeys = arr.size();
-	Point<float> firstpoint = arr[0];
-	Point<float> lastpoint = arr[numKeys - 1];
-	int index = 0;  //index to be returned
-	float Mdist = -1; //the Maximum distance to be returned
-
-					   //distance calculation
-	Line<float> line(firstpoint, lastpoint);
-
-	//Point<float> p = lastpoint - firstpoint;
-	Point<float> lp;
-	for (int i = 1; i < numKeys - 1; i++) { //traverse through second point to second last point
-		float Dist = line.getDistanceFromPoint(arr[i], lp);
-		if (Dist > Mdist) {
-			Mdist = Dist;
-			index = i;
-		}
-	}
-	return std::make_pair(index, Mdist);
 }

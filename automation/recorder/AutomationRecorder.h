@@ -21,10 +21,8 @@ public:
 	~AutomationRecorder();
 
 	TargetParameter * input;
-	FloatParameter * simplificationFactor;
 	BoolParameter * arm;
 	BoolParameter * autoDisarm;
-	EnumParameter* defaultEasing;
 
 	WeakReference<Parameter> currentInput;
 
@@ -39,7 +37,7 @@ public:
 
 	void startRecording();
 	void cancelRecording();
-	Array<AutomationKey *> stopRecordingAndGetKeys();
+	Array<Point<float>> stopRecordingAndGetKeys();
 
 	bool shouldRecord();
 
@@ -48,7 +46,4 @@ public:
 	void inspectableDestroyed(Inspectable * i) override;
 
 	InspectableEditor * getEditor(bool isRoot) override;
-
-	static Array<AutomationKey *> getSimplifiedKeys(Array<Point<float>> arr, float epsilon);
-	static const std::pair<int, float> findMaximumDistance(Array<Point<float>> arr);
 };

@@ -219,66 +219,7 @@ void AutomationUI::mouseUp(const MouseEvent& e)
 {
     if (paintingMode)
     {
-        Array<float> points;
-        for (auto& pp : paintingPoints) points.add(pp.x, pp.y);
-        float* result;
-        unsigned int resultNum = 0;
-        unsigned int* origIndex;
-        unsigned int* corners = nullptr;
-        unsigned int cornersLength = 0;
-        unsigned int* cornerIndex = nullptr;
-        unsigned int cornerIndexLength = 0;
-
-        int detectResult = curve_fit_corners_detect_fl(points.getRawDataPointer(), points.size(), 2, 0, .02f, 20, 30, &corners, &cornersLength);
-        if (cornersLength == 0) corners = nullptr;
-
-        int fitResult = curve_fit_cubic_to_points_fl(points.getRawDataPointer(), points.size(), 2, .04f, CURVE_FIT_CALC_HIGH_QUALIY, corners, cornersLength, &result, &resultNum, &origIndex, &cornerIndex, &cornerIndexLength);
-
-        int numPoints = ((int)resultNum);
-
-        Array<AutomationKey*> keys;
-
-        AutomationKey* prevKey = nullptr;
-        CubicEasing* prevEasing = nullptr;
-
-        for (int i = 0; i < numPoints; i++)
-        {
-            int index = i * 6;
-            Point<float> h1(result[index + 0], result[index + 1]);
-            Point<float> rp(result[index + 2], result[index + 3]);
-            Point<float> h2(result[index + 4], result[index + 5]);
-
-
-            if (prevEasing != nullptr && h1.getDistanceFromOrigin() < 100)
-            {
-                prevEasing->anchor2->setPoint(h1 - rp);
-            }
-
-            if (rp.getDistanceFromOrigin() > 100)
-            {
-                break;
-            }
-
-            AutomationKey * k = new AutomationKey();
-            k->setPosAndValue(rp);
-
-            k->easingType->setValueWithData(Easing::BEZIER);
-            CubicEasing* ce = (CubicEasing*)k->easing.get();
-            if (h2.getDistanceFromOrigin() < 100) ce->anchor1->setPoint(h2 - rp);
-
-            keys.add(k);
-
-            prevEasing = ce;
-        }
-
-        delete result;
-        delete origIndex;
-        delete corners;
-        delete cornerIndex;
-
-        manager->addKeys(keys, true);
-
-
+        manager->addFromPointsAndSimplify(paintingPoints);
         paintingMode = false;
         paintingPoints.clear();
         repaint();
