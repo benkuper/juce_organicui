@@ -694,6 +694,8 @@ void ControllableContainer::dispatchFeedback(Controllable* c)
 
 void ControllableContainer::dispatchState(Controllable* c)
 {
+	onControllableStateChanged(c);
+
 	if (parentContainer != nullptr) { parentContainer->dispatchState(c); }
 	if (!c->isControllableExposed) return;
 

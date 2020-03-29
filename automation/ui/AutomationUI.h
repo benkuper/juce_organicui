@@ -27,8 +27,13 @@ public:
     Array<Point<float>> paintingPoints;
 
     bool previewMode; //avoid repainting everything
+    bool showNumberLines;
+
+    Point<float> viewValueRangeAtMouseDown;
 
     void paint(Graphics& g) override;
+    void drawLinesBackground(Graphics& g);
+
     void paintOverChildren(Graphics& g) override;
 
     void resized() override;

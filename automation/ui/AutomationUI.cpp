@@ -1,4 +1,3 @@
-#include "AutomationUI.h"
 /*
   ==============================================================================
 
@@ -12,7 +11,8 @@
 AutomationUI::AutomationUI(Automation* manager) :
     BaseManagerUI(manager->niceName, manager, false),
     paintingMode(false),
-    previewMode(false)
+    previewMode(false),
+    showNumberLines(true)
 {
     resizeOnChildBoundsChanged = false;
 
@@ -51,13 +51,19 @@ void AutomationUI::paint(Graphics& g)
         {
             p.lineTo(Point<float>(i, getYForValue(manager->getValueAtPosition(getPosForX(i)))));
         }
+
+
         g.setColour(NORMAL_COLOR);
         g.strokePath(p, PathStrokeType(1));
         return;
     }
+
+    if(showNumberLines) drawLinesBackground(g);
     
     g.setColour(Colours::white.withAlpha(.04f));
-    g.fillRect(getLocalBounds().withTop(getYForValue(manager->value->floatValue())));
+    float ty = getYForValue(manager->value->floatValue());
+    float t0 = getYForValue(0);
+    g.fillRect(getLocalBounds().withTop(jmin(ty,t0)).withBottom(jmax(ty,t0)));
 
     if (manager->items.size() > 0)
     {
@@ -75,6 +81,93 @@ void AutomationUI::paint(Graphics& g)
             Point<int> p = getPosInView(manager->items[manager->items.size()-1]->getPosAndValue());
             const float dashLengths[] = { 5, 5 };
             g.drawDashedLine(Line<int>(p, Point<int>(getWidth(), p.y)).toFloat(), dashLengths, 2);
+        }
+    }
+}
+
+void AutomationUI::drawLinesBackground(Graphics& g)
+{
+    float start = manager->viewValueRange->x;
+    float end = manager->viewValueRange->y;
+
+    if (end <= start) return;
+
+    int minGap = 10;
+    int fadeGap = 30;
+    const int numDecUnitPerUnit = 10;
+
+    float decimalGap = (getHeight() / (end - start)) / numDecUnitPerUnit;
+    float unitGap = (getHeight() / (end - start));
+
+    bool showSeconds = unitGap > minGap;
+
+    float decimalSteps = 1;
+    float unitSteps = 1;
+
+    if (showSeconds)
+    {
+        while (decimalGap < minGap)
+        {
+            decimalSteps *= 2;
+            decimalGap = (getHeight() / (end - start)) * decimalSteps / numDecUnitPerUnit;
+        }
+    }
+    else
+    {
+        while (unitGap < minGap)
+        {
+            unitSteps *= 2;
+            unitGap = ((getHeight() / (end - start)) * numDecUnitPerUnit) * unitSteps;
+        }
+    }
+
+    int unitStart = floor((start / unitSteps)) * unitSteps;
+    int unitEndTime = jmax<int>(ceil((end / unitSteps)) * unitSteps, unitStart + 1);
+
+    g.setFont(12);
+    float fadeAlpha = jlimit<float>(0, 1, jmap<float>(decimalGap, minGap, fadeGap, 0, 1));
+    DBG("Fade alpha : " << fadeAlpha << " / " << decimalGap);
+
+    for (float i = unitStart; i <= unitEndTime; i += unitSteps)
+    {
+        int mty = getYForValue(i);
+
+        //Draw minute
+        g.setColour(BG_COLOR.brighter(.3f).withAlpha(.7f));
+        //g.drawLine(tx, 0, tx, getHeight(), 1);
+        g.drawHorizontalLine(mty, 30, (float)getWidth());
+        //g.setColour(BG_COLOR.darker(.6f));
+        //g.drawRoundedRectangle(getLocalBounds().toFloat(), 2, 2);
+
+        //g.setColour(BG_COLOR.brighter(.7f));
+        //g.fillRoundedRectangle( 0, mty - 10, 20, 14, 2);
+        g.setColour(BG_COLOR.brighter(.3f));
+        g.drawText(String(i,1), 2, mty - 10, 30, 14, Justification::left);
+
+        if (showSeconds)
+        {
+            int sIndex = 0;
+            for (float s = decimalSteps; s < numDecUnitPerUnit && i + s/numDecUnitPerUnit <= end; s += decimalSteps)
+            {
+                int sty = getYForValue(i + s*1.0f / numDecUnitPerUnit);
+
+                float alpha = 1;
+                if (sIndex % 2 == 0) alpha = fadeAlpha;
+                g.setColour(BG_COLOR.brighter(.3f).withAlpha(alpha*.5f));
+                //g.drawLine(tx, 0, tx, getHeight(), 1);
+                g.drawHorizontalLine(sty, 25, (float)getWidth());
+                g.setColour(BG_COLOR.brighter(.3f).withAlpha(alpha));
+                g.drawText(String(s / numDecUnitPerUnit,1), 2, sty - 10, 25, 14, Justification::left);
+
+                //show subsecond ?
+                /*
+                g.setColour(BG_COLOR);
+                g.drawVerticalLine(tx, 0, (float)getHeight());
+                */
+
+                sIndex++;
+
+            }
         }
     }
 }
@@ -243,7 +336,10 @@ void AutomationUI::mouseDown(const MouseEvent& e)
             paintingPoints.clear();
             paintingPoints.add(getViewPos(e.getPosition()));
         }
-        else
+        else if (e.mods.isAltDown())
+        {
+            viewValueRangeAtMouseDown = manager->viewValueRange->getPoint();
+        }else
         {
             BaseManagerUI::mouseDown(e);
         }
@@ -270,7 +366,11 @@ void AutomationUI::mouseDrag(const MouseEvent& e)
             if (p.x > paintingPoints[paintingPoints.size() - 1].x) paintingPoints.add(p);
             repaint();
         }
-        else
+        else if (e.mods.isAltDown())
+        {
+            float deltaVal = getValueForY(e.getDistanceFromDragStartY(), true);
+            manager->viewValueRange->setPoint(viewValueRangeAtMouseDown.x + deltaVal, viewValueRangeAtMouseDown.y + deltaVal);
+        }
         {
             BaseManagerUI::mouseDrag(e);
         }
@@ -344,7 +444,7 @@ int AutomationUI::getXForPos(float x, bool relative)
 float AutomationUI::getValueForY(int y, bool relative)
 {
     float rel = (1- y*1.0f / getHeight()) * (manager->viewValueRange->y - manager->viewValueRange->x);
-    return relative ? rel : manager->viewValueRange->x + rel;
+    return relative ? 1-rel : manager->viewValueRange->x + rel;
 }
 
 int AutomationUI::getYForValue(float x, bool relative)
@@ -380,6 +480,11 @@ void AutomationUI::newMessage(const ContainerAsyncEvent& e)
         }
         else if (e.targetControllable->parentContainer == manager->items[0] || e.targetControllable->parentContainer == manager->items[manager->items.size() - 1])
         {
+            repaint();
+        }
+        else if (e.targetControllable == manager->viewValueRange)
+        {
+            resized();
             repaint();
         }
     }

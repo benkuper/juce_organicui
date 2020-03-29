@@ -1,3 +1,4 @@
+#include "Automation.h"
 /*
   ==============================================================================
 
@@ -13,8 +14,6 @@ Automation::Automation(const String& name, AutomationRecorder * recorder, bool a
     recorder(recorder),
     allowKeysOutside(allowKeysOutside)
 {
-    isSelectable = false;
-
     comparator.compareFunc = &Automation::compareKeys;
 
     editorCanBeCollapsed = false;
@@ -40,6 +39,7 @@ Automation::Automation(const String& name, AutomationRecorder * recorder, bool a
     valueRange = addPoint2DParameter("Range", "The range between allowed minimum value and maximum value");
     valueRange->canBeDisabledByUser = true;
     valueRange->setPoint(0, 1);
+
 }
 
 Automation::~Automation()
@@ -142,7 +142,7 @@ void Automation::addFromPointsAndSimplify(const Array<Point<float>>& sourcePoint
 void Automation::addItemInternal(AutomationKey* k, var)
 {
     if (!allowKeysOutside) k->position->setRange(0, length->floatValue());
-    k->setValueRange(valueRange->x, valueRange->y);
+    if(valueRange->enabled) k->setValueRange(valueRange->x, valueRange->y);
 
     if(!isManipulatingMultipleItems) updateNextKeys(items.indexOf(k) - 1, items.indexOf(k) + 1);
 }
@@ -230,7 +230,7 @@ void Automation::updateRange()
     if (valueRange->enabled)
     {
         value->setRange(valueRange->x, valueRange->y);
-        viewValueRange->setRange(valueRange->x, valueRange->y);
+        viewValueRange->setBounds(valueRange->x, valueRange->x, valueRange->y, valueRange->y);
         for (auto& k : items) k->setValueRange(valueRange->x, valueRange->y);
     }
     else
@@ -325,13 +325,12 @@ void Automation::onContainerParameterChanged(Parameter* p)
     }
 }
 
-void Automation::onControllableFeedbackUpdate(ControllableContainer* cc, Controllable* c)
-{
-    BaseManager::onControllableFeedbackUpdate(cc, c);
 
-    if (AutomationKey* k = dynamic_cast<AutomationKey*>(cc))
+void Automation::onControllableStateChanged(Controllable* c)
+{
+    if (c == valueRange)
     {
-      //  updateNextKeys();
+        updateRange();
     }
 }
 

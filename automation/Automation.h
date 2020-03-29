@@ -58,7 +58,7 @@ public:
     float getNormalizedValueAtPosition(float pos);
 
     void onContainerParameterChanged(Parameter* p) override;
-    void onControllableFeedbackUpdate(ControllableContainer* cc, Controllable* c) override;
+    void onControllableStateChanged(Controllable* c) override;
 
     void afterLoadJSONDataInternal() override;
 

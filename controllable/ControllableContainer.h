@@ -182,7 +182,8 @@ public:
 protected:
 	virtual void onContainerNiceNameChanged() {};
 	virtual void onContainerShortNameChanged() {};
-	virtual void onContainerParameterChanged(Parameter *) {};
+	virtual void onContainerParameterChanged(Parameter*) {};
+	virtual void onControllableStateChanged(Controllable *) {};
 	virtual void onExternalParameterValueChanged(Parameter *) {}; //When listening to other child controllable than this container's children
 	virtual void onExternalParameterRangeChanged(Parameter *) {};
 	virtual void onControllableFeedbackUpdate(ControllableContainer*, Controllable*) {}
