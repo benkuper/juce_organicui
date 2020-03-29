@@ -33,6 +33,8 @@
 /** \name Simple Vector Math Lib
  * \{ */
 
+#pragma once
+
 #ifdef _MSC_VER
 #  define MINLINE static __forceinline
 #else

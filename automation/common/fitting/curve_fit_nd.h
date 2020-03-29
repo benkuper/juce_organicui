@@ -25,8 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __CURVE_FIT_ND_H__
-#define __CURVE_FIT_ND_H__
+
+#pragma once
 
 /** \file curve_fit_nd.h
  *  \ingroup curve_fit
@@ -201,5 +201,3 @@ int curve_fit_corners_detect_fl(
 
         unsigned int **r_corners,
         unsigned int  *r_corners_len);
-
-#endif  /* __CURVE_FIT_ND_H__ */

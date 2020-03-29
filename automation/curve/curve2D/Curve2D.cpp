@@ -9,6 +9,7 @@
 */
 
 #include "ui/Curve2DEditor.h"
+#include "Curve2D.h"
 
 Curve2D::Curve2D(const String &name) :
     BaseManager(name),
@@ -57,12 +58,22 @@ void Curve2D::setControlMode(ControlMode mode)
 void Curve2D::addItemInternal(Curve2DKey* k, var)
 {
     k->isFirst = items.size() == 1;
-    updateCurve(false);
+    if(!isManipulatingMultipleItems && !isCurrentlyLoadingData) updateCurve(false);
+}
+
+void Curve2D::addItemsInternal(Array<Curve2DKey*> keys, var)
+{
+    if (!isCurrentlyLoadingData) updateCurve();
 }
 
 void Curve2D::removeItemInternal(Curve2DKey*)
 {
-    updateCurve(false);
+    if(!isManipulatingMultipleItems && !isCurrentlyLoadingData) updateCurve(false);
+}
+
+void Curve2D::removeItemsInternal()
+{
+    if (!isCurrentlyLoadingData) updateCurve(false);
 }
 
 void Curve2D::updateCurve(bool relativeAutomationKeySyncMode)

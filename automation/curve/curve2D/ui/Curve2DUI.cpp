@@ -10,6 +10,7 @@
 
 
 #include "../../../common/fitting/intern/curve_fit_cubic.c";
+#include "../../../common/fitting/intern/curve_fit_corners_detect.c";
 
 Curve2DUI::Curve2DUI(Curve2D* manager) :
     BaseManagerViewUI(manager->niceName, manager),
@@ -139,7 +140,7 @@ void Curve2DUI::mouseDrag(const MouseEvent& e)
         }
         else
         {
-            BaseManagerUI::mouseDrag(e);
+            BaseManagerViewUI::mouseDrag(e);
         }
     }
 }
@@ -153,44 +154,59 @@ void Curve2DUI::mouseUp(const MouseEvent& e)
         float* result;
         unsigned int resultNum = 0;
         unsigned int * origIndex;
-        unsigned int * cornerIndex;
-        unsigned int cornerIndexLength;
+        unsigned int* corners = nullptr;
+        unsigned int cornersLength = 0;
+        unsigned int* cornerIndex = nullptr;
+        unsigned int cornerIndexLength = 0;
 
-        int fitResult = curve_fit_cubic_to_points_fl(points.getRawDataPointer(), points.size(), 2, .1f, CURVE_FIT_CALC_HIGH_QUALIY, nullptr, 0, &result, &resultNum, &origIndex, &cornerIndex, &cornerIndexLength);
+        int detectResult = curve_fit_corners_detect_fl(points.getRawDataPointer(), points.size(), 2, 0, .02f, 20, 30, &corners, &cornersLength);
+        DBG("detect result : " << detectResult << ", numCorners : " << (int)cornersLength);
+        if (cornersLength == 0) corners = nullptr;
+
+        int fitResult = curve_fit_cubic_to_points_fl(points.getRawDataPointer(), points.size(), 2, .1f, CURVE_FIT_CALC_HIGH_QUALIY, corners, cornersLength, &result, &resultNum, &origIndex, &cornerIndex, &cornerIndexLength);
         
-        LOG("RESULT : " << fitResult << " / " << (int)resultNum);
+        int numPoints = ((int)resultNum);
+        DBG("fit result : " << fitResult << ", num points : " << numPoints);
 
         Array<Curve2DKey*> keys;
 
         Curve2DKey* prevKey = nullptr;
         CubicEasing2D * prevEasing = nullptr;
 
-        for (int i = 0; i < resultNum; i+=6)
+        for (int i = 0; i < numPoints; i++)
         {
-            Point<float> h1(result[i+0], result[i+1]);
-            Point<float> rp(result[i+2], result[i+3]);
-            Point<float> h2(result[i+4], result[i+5]);
+            int index = i * 6;
+            Point<float> h1(result[index+0], result[index+1]);
+            Point<float> rp(result[index+2], result[index+3]);
+            Point<float> h2(result[index+4], result[index+5]);
 
-            if (rp.getDistanceFromOrigin() > 10) break;;
-            DBG(" > " << h1.toString() << " / " << rp.toString() << " / " << h2.toString());
-
-            if (prevKey != nullptr)
+           
+            if (prevEasing != nullptr && h1.getDistanceFromOrigin() < 100)
             {
                 prevEasing->anchor2->setPoint(h1 - rp);
             }
 
+            if (rp.getDistanceFromOrigin() > 100)
+            {
+                DBG(" Discarded " << h1.toString() << " / " << rp.toString() << " / " << h2.toString());
+                break;
+            }
+
+            DBG(" > " << h1.toString() << " / " << rp.toString() << " / " << h2.toString());
 
             Curve2DKey * k = new Curve2DKey();
+            k->position->setPoint(rp);
+           
             k->easingType->setValueWithData(Easing2D::BEZIER);
             CubicEasing2D* ce = (CubicEasing2D*)k->easing.get();
-            ce->anchor1->setPoint(h2 - rp);
-            k->position->setPoint(rp);
+            if (h2.getDistanceFromOrigin() < 100) ce->anchor1->setPoint(h2 - rp);
+            
             keys.add(k);
-            manager->addItem(k);
-            prevKey = k;
+
             prevEasing = ce;
         }
-        
+
+        manager->addItems(keys);
 
         paintingMode = false;
         paintingPoints.clear();

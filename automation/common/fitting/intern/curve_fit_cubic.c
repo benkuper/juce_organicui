@@ -53,7 +53,7 @@
 #define USE_OFFSET_FALLBACK
 
 /* avoid re-calculating lengths multiple times */
-#define USE_LENGTH_CACHE
+//#define USE_LENGTH_CACHE
 
 /* store the indices in the cubic data so we can return the original indices,
  * useful when the caller has data associated with the curve. */
@@ -64,7 +64,9 @@ typedef unsigned int uint;
 #include "curve_fit_inline.h"
 
 #ifdef _MSC_VER
-#  define alloca(size) _alloca(size)
+#ifndef alloca(size)
+define alloca(size) _alloca(size)
+#endif
 #endif
 
 #if !defined(_MSC_VER)

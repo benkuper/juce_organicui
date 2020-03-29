@@ -44,7 +44,9 @@ typedef unsigned int uint;
 #include "curve_fit_inline.h"
 
 #ifdef _MSC_VER
-#  define alloca(size) _alloca(size)
+#ifndef alloca(size)
+#define alloca(size) _alloca(size)
+#endif
 #endif
 
 #if !defined(_MSC_VER)
@@ -74,14 +76,14 @@ static double cos_vnvnvn(
 	double dvec0[dims];
 	double dvec1[dims];
 #else
-	double *dvec0 = alloca(sizeof(double) * dims);
-	double *dvec1 = alloca(sizeof(double) * dims);
+	double *dvec0 = (double *)alloca(sizeof(double) * dims);
+	double *dvec1 = (double *)alloca(sizeof(double) * dims);
 #endif
 	normalize_vn_vnvn(dvec0, v0, v1, dims);
 	normalize_vn_vnvn(dvec1, v1, v2, dims);
 	double d = dot_vnvn(dvec0, dvec1, dims);
 	/* sanity check */
-	d = max(-1.0, min(1.0, d));
+	d = std::max(-1.0, std::min(1.0, d));
 	return d;
 }
 
@@ -110,8 +112,8 @@ static bool isect_line_sphere_vn(
 	double ldir[dims];
 	double tvec[dims];
 #else
-	double *ldir = alloca(sizeof(double) * dims);
-	double *tvec = alloca(sizeof(double) * dims);
+	double *ldir = (double *)alloca(sizeof(double) * dims);
+	double *tvec = (double *)alloca(sizeof(double) * dims);
 #endif
 
 	sub_vn_vnvn(ldir, l2, l1, dims);
@@ -268,8 +270,8 @@ static double point_corner_angle(
 	double p_mid_prev[dims];
 	double p_mid_next[dims];
 #else
-	double *p_mid_prev = alloca(sizeof(double) * dims);
-	double *p_mid_next = alloca(sizeof(double) * dims);
+	double *p_mid_prev = (double *)alloca(sizeof(double) * dims);
+	double *p_mid_next = (double *)alloca(sizeof(double) * dims);
 #endif
 
 	uint i_mid_prev_next, i_mid_next_prev;
@@ -293,8 +295,8 @@ static double point_corner_angle(
 			double p_max_prev[dims];
 			double p_max_next[dims];
 #else
-			double *p_max_prev = alloca(sizeof(double) * dims);
-			double *p_max_next = alloca(sizeof(double) * dims);
+			double *p_max_prev = (double *)alloca(sizeof(double) * dims);
+			double *p_max_next = (double *)alloca(sizeof(double) * dims);
 #endif
 
 			uint i_max_prev_next, i_max_next_prev;
@@ -342,7 +344,7 @@ int curve_fit_corners_detect_db(
 	const double radius_mid = (radius_min + radius_max) / 2.0;
 
 	/* we could ignore first/last- but simple to keep aligned with the point array */
-	double *points_angle = malloc(sizeof(double) * points_len);
+	double *points_angle = (double *)malloc(sizeof(double) * points_len);
 	points_angle[0] = 0.0;
 
 	*r_corners = NULL;
@@ -416,7 +418,7 @@ int curve_fit_corners_detect_db(
 	/* End angle limit cleaning! */
 
 	corners_len += 2;  /* first and last */
-	uint *corners = malloc(sizeof(uint) * corners_len);
+	uint *corners =(uint *)malloc(sizeof(uint) * corners_len);
 	uint i_corner = 0;
 	corners[i_corner++] = 0;
 	for (uint i = 0; i < points_len; i++) {
@@ -448,7 +450,7 @@ int curve_fit_corners_detect_fl(
         uint  *r_corners_len)
 {
 	const uint points_flat_len = points_len * dims;
-	double *points_db = malloc(sizeof(double) * points_flat_len);
+	double *points_db = (double *)malloc(sizeof(double) * points_flat_len);
 
 	for (uint i = 0; i < points_flat_len; i++) {
 		points_db[i] = (double)points[i];

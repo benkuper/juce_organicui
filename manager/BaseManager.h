@@ -29,6 +29,7 @@ public:
 	bool userCanAddItemsManually;
 	bool selectItemWhenCreated;
 	bool autoReorderOnAdd;
+	bool isManipulatingMultipleItems;
 
 	virtual T * createItem(); //to override if special constructor to use
 	virtual T * addItemFromData(var data, bool addToUndo = true); //to be overriden for specific item creation (from data)
@@ -58,8 +59,10 @@ public:
 
 
 	//to override for specific handling like adding custom listeners, etc.
-	virtual void addItemInternal(T *, var data) {}
+	virtual void addItemInternal(T*, var data) {}
+	virtual void addItemsInternal(Array<T *>, var data) {}
 	virtual void removeItemInternal(T *) {}
+	virtual void removeItemsInternal() {}
 
 
 	T * getItemWithName(const String &itemShortName, bool searchNiceNameToo = false, bool searchWithLowerCaseIfNotFound = true);
@@ -237,6 +240,7 @@ BaseManager<T>::BaseManager(const String & name) :
 	userCanAddItemsManually(true),
 	selectItemWhenCreated(true),
 	autoReorderOnAdd(true),
+	isManipulatingMultipleItems(false),
 	managerNotifier(50),
     comparator(this)
 {
@@ -353,12 +357,14 @@ Array<T *> BaseManager<T>::addItems(Array<T *> itemsToAdd, var data, bool addToU
 {
 
 	isCurrentlyLoadingData = true;
+	isManipulatingMultipleItems = true;
 
 	if (addToUndo && !UndoMaster::getInstance()->isPerforming)
 	{
 		AddItemsAction * a = new AddItemsAction(this, itemsToAdd, data);
 		UndoMaster::getInstance()->performAction("Add " + String(itemsToAdd.size()) + " items", a);
 		isCurrentlyLoadingData = false;
+		isManipulatingMultipleItems = false;
 		return itemsToAdd;
 	}
 
@@ -375,6 +381,9 @@ Array<T *> BaseManager<T>::addItems(Array<T *> itemsToAdd, var data, bool addToU
 
 	reorderItems();
 	isCurrentlyLoadingData = false;
+	isManipulatingMultipleItems = false;
+
+	addItemsInternal(itemsToAdd, data);
 
 	return itemsToAdd;
 }
@@ -488,17 +497,23 @@ Array<UndoableAction*> BaseManager<T>::getRemoveItemsUndoableAction(Array<T*> it
 template<class T>
 void BaseManager<T>::removeItems(Array<T *> itemsToRemove, bool addToUndo)
 {
+	isManipulatingMultipleItems = true;
 	if (addToUndo)
 	{
 		Array<UndoableAction *> a = getRemoveItemsUndoableAction(itemsToRemove);
 		UndoMaster::getInstance()->performActions("Remove " + String(itemsToRemove.size()) + " items", a);
+		isManipulatingMultipleItems = false;
 		return;
 	}
 
 	baseManagerListeners.call(&BaseManagerListener<T>::itemsRemoved, itemsToRemove);
 	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_REMOVED));
-
+	
 	for (auto &i : itemsToRemove) removeItem(i, false, false);
+
+	isManipulatingMultipleItems = false;
+
+	removeItemsInternal();
 }
 
 template<class T>
