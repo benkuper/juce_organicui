@@ -62,7 +62,8 @@ void InspectableSelector::startSelection(Component * parent, Array<Component*> _
 
 void InspectableSelector::endSelection(bool confirmSelection)
 {
-	
+	if (selectablesParent == nullptr || selectables.size() == 0) return;
+
 	selectablesParent->removeChildComponent(this);
 	selectablesParent->removeMouseListener(this);
 
@@ -114,8 +115,8 @@ void InspectableSelector::mouseDrag(const MouseEvent & e)
 		int numSelectables = selectables.size();
 		for (int i=0;i<numSelectables;i++)
 		{
-			Point<int> icp = selectablesParent->getLocalPoint(selectables[i], selectables[i]->getLocalBounds().getCentre());
-			if (selectionBounds.contains(icp))
+			juce::Rectangle<int> icp = selectablesParent->getLocalArea(selectables[i], selectables[i]->getLocalBounds());
+			if (selectionBounds.intersects(icp))
 			{
 				inspectables[i]->setPreselected(true);
 			}

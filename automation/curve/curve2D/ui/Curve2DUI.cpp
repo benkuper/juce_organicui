@@ -246,7 +246,7 @@ void Curve2DUI::mouseDoubleClick(const MouseEvent& e)
     }
 }
 
-Component* Curve2DUI::getSelectableComponentForItemUI(AutomationKeyUI* ui)
+Component* Curve2DUI::getSelectableComponentForItemUI(Curve2DKeyUI* ui)
 {
     return &ui->handle;
 }

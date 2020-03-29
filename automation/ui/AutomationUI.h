@@ -48,7 +48,7 @@ public:
     void mouseUp(const MouseEvent& e) override;
     void mouseDoubleClick(const MouseEvent& e) override;
 
-    Component * getSelectableComponentForItemUI(AutomationKeyUI * ui);
+    Component* getSelectableComponentForItemUI(AutomationKeyUI* ui) override;
 
     Point<float> getViewPos(Point<int> pos, bool relative = false);
     Rectangle<float> getViewBounds(Rectangle<int> pos, bool relative = false);
