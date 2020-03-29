@@ -120,11 +120,15 @@ void Curve2DUI::removeItemUIInternal(Curve2DKeyUI* ui)
 
 void Curve2DUI::mouseDown(const MouseEvent& e)
 {
-    if (e.eventComponent == this)
+    if (e.eventComponent == this && e.mods.isLeftButtonDown() && e.mods.isCommandDown() && e.mods.isShiftDown())
     {
-        paintingMode = e.mods.isLeftButtonDown() && e.mods.isCommandDown() && e.mods.isShiftDown();
+        paintingMode = true;
         paintingPoints.clear();
         paintingPoints.add(getViewPos(e.getPosition()));
+    }
+    else
+    {
+        BaseManagerViewUI::mouseDown(e);
     }
 }
 
@@ -215,6 +219,10 @@ void Curve2DUI::mouseUp(const MouseEvent& e)
         paintingPoints.clear();
         repaint();
     }
+    else
+    {
+        BaseManagerViewUI::mouseUp(e);
+    }
 }
 
 void Curve2DUI::mouseDoubleClick(const MouseEvent& e)
@@ -236,6 +244,11 @@ void Curve2DUI::mouseDoubleClick(const MouseEvent& e)
         params.getDynamicObject()->setProperty("index", itemsUI.indexOf(kui)+1);
         manager->addItem(k, params);
     }
+}
+
+Component* Curve2DUI::getSelectableComponentForItemUI(AutomationKeyUI* ui)
+{
+    return &ui->handle;
 }
 
 void Curve2DUI::newMessage(const Curve2DKey::Curve2DKeyEvent& e)

@@ -39,15 +39,18 @@ void InspectableSelector::startSelection(Component * parent, Array<Component *> 
 void InspectableSelector::startSelection(Component * parent, Array<Component*> _selectables, Array<Inspectable*> relatedInspectables, InspectableSelectionManager * manager, bool clearSelection)
 {
 	jassert(_selectables.size() == relatedInspectables.size());
+	
+	currentSelectionManager = manager != nullptr ? manager : InspectableSelectionManager::mainSelectionManager;
+	if (clearSelection) currentSelectionManager->clearSelection();
+	
+	if (_selectables.size() == 0) return;
 
 	selectablesParent = parent;
 	selectables = _selectables;
 	inspectables = relatedInspectables;
 
 	clearSelectionAtEnd = clearSelection;
-	currentSelectionManager = manager != nullptr ? manager : InspectableSelectionManager::mainSelectionManager;
 
-	if (clearSelection) currentSelectionManager->clearSelection();
 
 	selectablesParent->addAndMakeVisible(this);
 	selectablesParent->addMouseListener(this, false);

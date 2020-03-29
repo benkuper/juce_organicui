@@ -37,6 +37,7 @@ public:
 
     void mouseDoubleClick(const MouseEvent& e) override;
 
+    Component* getSelectableComponentForItemUI(AutomationKeyUI* ui);
 
     void newMessage(const Curve2DKey::Curve2DKeyEvent& e) override;
     void newMessage(const ContainerAsyncEvent& e) override;

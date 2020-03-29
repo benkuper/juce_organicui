@@ -1,3 +1,4 @@
+#include "AutomationUI.h"
 /*
   ==============================================================================
 
@@ -298,6 +299,11 @@ void AutomationUI::mouseDoubleClick(const MouseEvent& e)
         Point<float> p = getViewPos(e.getPosition());
         manager->addKey(p.x, p.y);
     }
+}
+
+Component* AutomationUI::getSelectableComponentForItemUI(AutomationKeyUI* ui)
+{
+    return &ui->handle;
 }
 
 Point<float> AutomationUI::getViewPos(Point<int> pos, bool relative)
