@@ -15,8 +15,8 @@ AutomationUI::AutomationUI(Automation* manager) :
 {
     animateItemOnAdd = false;
     manager->addAsyncContainerListener(this);
-
-    bgColor = BG_COLOR.brighter(.1f);
+    
+    transparentBG = true;
 
     addExistingItems(false);
     setSize(100, 300);
@@ -36,12 +36,36 @@ AutomationUI::~AutomationUI()
     }
 }
 
+void AutomationUI::paint(Graphics& g)
+{
+    g.setColour(Colours::white.withAlpha(.04f));
+    g.fillRect(getLocalBounds().withTop(getYForValue(manager->value->floatValue())));
+
+    if (manager->items.size() > 0)
+    {
+        if (manager->items[0]->position->floatValue() > 0)
+        {
+            g.setColour(NORMAL_COLOR);
+            Point<int> p = getPosInView(manager->items[0]->getPosAndValue());
+            const float dashLengths[] = { 5, 5 };
+            g.drawDashedLine(Line<int>(Point<int>(0, p.y), p).toFloat(), dashLengths, 2);
+        }
+
+        if (manager->items[manager->items.size()-1]->position->floatValue() < manager->length->floatValue())
+        {
+            g.setColour(NORMAL_COLOR);
+            Point<int> p = getPosInView(manager->items[manager->items.size()-1]->getPosAndValue());
+            const float dashLengths[] = { 5, 5 };
+            g.drawDashedLine(Line<int>(p, Point<int>(getWidth(), p.y)).toFloat(), dashLengths, 2);
+        }
+    }
+}
+
 void AutomationUI::paintOverChildren(Graphics& g)
 {
 
     g.setColour(GREEN_COLOR);
     g.drawEllipse(Rectangle<int>(0, 0, 6, 6).withCentre(getPosInView(manager->getPosAndValue())).toFloat(), 1.5f);
-
 
     //recorder
     if (manager->recorder != nullptr)
@@ -82,6 +106,7 @@ void AutomationUI::paintOverChildren(Graphics& g)
 
         g.strokePath(p, PathStrokeType(1));
     }
+
 }
 
 
@@ -101,7 +126,6 @@ void AutomationUI::placeKeyUI(AutomationKeyUI* ui)
     ui->setBounds(pr);
     ui->setValueBounds(getViewBounds(pr));
 
-   // DBG("place key ui " << itemsUI.indexOf(ui) << " : " << ui->getBounds().toString()  << " / " << (int)ui->isShowing());
 }
 
 void AutomationUI::updateHandlesForUI(AutomationKeyUI* ui, bool checkSideItems)
@@ -180,7 +204,8 @@ void AutomationUI::mouseDrag(const MouseEvent& e)
     {
         if (paintingMode)
         {
-            paintingPoints.add(getViewPos(e.getPosition()));
+            Point<float> p = getViewPos(e.getPosition());
+            if (p.x > paintingPoints[paintingPoints.size() - 1].x) paintingPoints.add(p);
             repaint();
         }
         else
@@ -194,8 +219,69 @@ void AutomationUI::mouseUp(const MouseEvent& e)
 {
     if (paintingMode)
     {
-        paintingPoints.clear();
+        Array<float> points;
+        for (auto& pp : paintingPoints) points.add(pp.x, pp.y);
+        float* result;
+        unsigned int resultNum = 0;
+        unsigned int* origIndex;
+        unsigned int* corners = nullptr;
+        unsigned int cornersLength = 0;
+        unsigned int* cornerIndex = nullptr;
+        unsigned int cornerIndexLength = 0;
+
+        int detectResult = curve_fit_corners_detect_fl(points.getRawDataPointer(), points.size(), 2, 0, .02f, 20, 30, &corners, &cornersLength);
+        if (cornersLength == 0) corners = nullptr;
+
+        int fitResult = curve_fit_cubic_to_points_fl(points.getRawDataPointer(), points.size(), 2, .04f, CURVE_FIT_CALC_HIGH_QUALIY, corners, cornersLength, &result, &resultNum, &origIndex, &cornerIndex, &cornerIndexLength);
+
+        int numPoints = ((int)resultNum);
+
+        Array<AutomationKey*> keys;
+
+        AutomationKey* prevKey = nullptr;
+        CubicEasing* prevEasing = nullptr;
+
+        for (int i = 0; i < numPoints; i++)
+        {
+            int index = i * 6;
+            Point<float> h1(result[index + 0], result[index + 1]);
+            Point<float> rp(result[index + 2], result[index + 3]);
+            Point<float> h2(result[index + 4], result[index + 5]);
+
+
+            if (prevEasing != nullptr && h1.getDistanceFromOrigin() < 100)
+            {
+                prevEasing->anchor2->setPoint(h1 - rp);
+            }
+
+            if (rp.getDistanceFromOrigin() > 100)
+            {
+                break;
+            }
+
+            AutomationKey * k = new AutomationKey();
+            k->setPosAndValue(rp);
+
+            k->easingType->setValueWithData(Easing::BEZIER);
+            CubicEasing* ce = (CubicEasing*)k->easing.get();
+            if (h2.getDistanceFromOrigin() < 100) ce->anchor1->setPoint(h2 - rp);
+
+            keys.add(k);
+
+            prevEasing = ce;
+        }
+
+        delete result;
+        delete origIndex;
+        delete corners;
+        delete cornerIndex;
+
+        manager->addKeys(keys, true);
+
+
         paintingMode = false;
+        paintingPoints.clear();
+        repaint();
     }
 }
 
@@ -289,6 +375,10 @@ void AutomationUI::newMessage(const ContainerAsyncEvent& e)
     if (e.type == ContainerAsyncEvent::ControllableFeedbackUpdate)
     {
         if (e.targetControllable == manager->value || e.targetControllable == manager->position)
+        {
+            repaint();
+        }
+        else if (e.targetControllable->parentContainer == manager->items[0] || e.targetControllable->parentContainer == manager->items[manager->items.size() - 1])
         {
             repaint();
         }

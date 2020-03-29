@@ -77,7 +77,8 @@
 #include "controllable/ui/TriggerUI.cpp"
 
 
-
+#include "automation/common/fitting/intern/curve_fit_cubic.c";
+#include "automation/common/fitting/intern/curve_fit_corners_detect.c";
 #include "automation/recorder/AutomationRecorder.cpp"
 #include "automation/easing/Easing.cpp"
 #include "automation/AutomationKey.cpp"

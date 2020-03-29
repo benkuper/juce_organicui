@@ -26,6 +26,7 @@ public:
     bool paintingMode;
     Array<Point<float>> paintingPoints;
 
+    void paint(Graphics& g) override;
     void paintOverChildren(Graphics& g) override;
 
     void resized() override;

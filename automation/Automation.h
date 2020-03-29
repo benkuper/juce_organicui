@@ -17,7 +17,7 @@ class Automation :
     public BaseManager<AutomationKey>
 {
 public:
-    Automation(const String& name = "Curve 2D", AutomationRecorder * recorder = nullptr);
+    Automation(const String& name = "Curve 2D", AutomationRecorder * recorder = nullptr, bool allowKeysOutside = false);
     ~Automation();
 
     FloatParameter* position;
@@ -26,6 +26,7 @@ public:
 
     Point2DParameter* valueRange;
     Point2DParameter* viewValueRange;
+    bool allowKeysOutside;
 
     bool showUIInEditor;
 
@@ -35,7 +36,9 @@ public:
     void addKeys(const Array<AutomationKey *> & keys, bool addToUndo = false, bool removeExistingKeys = true);
 
     void addItemInternal(AutomationKey* k, var params) override;
+    void addItemsInternal(Array<AutomationKey*>, var params) override;
     void removeItemInternal(AutomationKey* k) override;
+    void removeItemsInternal() override;
 
     void updateNextKeys(int start = 0, int end = -1);
     void computeValue();
@@ -59,6 +62,8 @@ public:
     void onControllableFeedbackUpdate(ControllableContainer* cc, Controllable* c) override;
 
     void afterLoadJSONDataInternal() override;
+
+    static int compareKeys(AutomationKey* k1, AutomationKey* k2);
 
     InspectableEditor* getEditor(bool isRoot) override;
 };

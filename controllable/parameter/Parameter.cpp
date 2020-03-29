@@ -152,11 +152,11 @@ void Parameter::setValue(var _value, bool silentSet, bool force, bool forceOverr
 
 		var croppedValue = getCroppedValue(_value);
 
-		if (!alwaysNotify && !force && checkValueIsTheSame(croppedValue, value)) return;
+		if (!alwaysNotify && !force && checkValueIsTheSame(value, croppedValue)) return;
 
 		lastValue = var(value);
 		setValueInternal(croppedValue);
-		isOverriden = croppedValue != defaultValue || forceOverride;
+		if(!isOverriden) isOverriden = croppedValue != defaultValue || forceOverride;
 	}
 	if (!silentSet) notifyValueChanged();
 }

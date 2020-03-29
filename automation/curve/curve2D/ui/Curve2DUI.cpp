@@ -9,8 +9,7 @@
 */
 
 
-#include "../../../common/fitting/intern/curve_fit_cubic.c";
-#include "../../../common/fitting/intern/curve_fit_corners_detect.c";
+
 
 Curve2DUI::Curve2DUI(Curve2D* manager) :
     BaseManagerViewUI(manager->niceName, manager),
@@ -160,13 +159,11 @@ void Curve2DUI::mouseUp(const MouseEvent& e)
         unsigned int cornerIndexLength = 0;
 
         int detectResult = curve_fit_corners_detect_fl(points.getRawDataPointer(), points.size(), 2, 0, .02f, 20, 30, &corners, &cornersLength);
-        DBG("detect result : " << detectResult << ", numCorners : " << (int)cornersLength);
         if (cornersLength == 0) corners = nullptr;
 
         int fitResult = curve_fit_cubic_to_points_fl(points.getRawDataPointer(), points.size(), 2, .1f, CURVE_FIT_CALC_HIGH_QUALIY, corners, cornersLength, &result, &resultNum, &origIndex, &cornerIndex, &cornerIndexLength);
         
         int numPoints = ((int)resultNum);
-        DBG("fit result : " << fitResult << ", num points : " << numPoints);
 
         Array<Curve2DKey*> keys;
 
@@ -188,11 +185,8 @@ void Curve2DUI::mouseUp(const MouseEvent& e)
 
             if (rp.getDistanceFromOrigin() > 100)
             {
-                DBG(" Discarded " << h1.toString() << " / " << rp.toString() << " / " << h2.toString());
                 break;
             }
-
-            DBG(" > " << h1.toString() << " / " << rp.toString() << " / " << h2.toString());
 
             Curve2DKey * k = new Curve2DKey();
             k->position->setPoint(rp);
@@ -205,6 +199,11 @@ void Curve2DUI::mouseUp(const MouseEvent& e)
 
             prevEasing = ce;
         }
+
+        delete result;
+        delete origIndex;
+        delete corners;
+        delete cornerIndex;
 
         manager->addItems(keys);
 

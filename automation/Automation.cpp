@@ -9,12 +9,15 @@
   ==============================================================================
 */
 
-Automation::Automation(const String& name, AutomationRecorder * recorder) :
+Automation::Automation(const String& name, AutomationRecorder * recorder, bool allowKeysOutside) :
     BaseManager(name),
     recorder(recorder),
+    allowKeysOutside(allowKeysOutside),
     showUIInEditor(false)
 {
     isSelectable = false;
+
+    comparator.compareFunc = &Automation::compareKeys;
 
     editorCanBeCollapsed = false;
     showInspectorOnSelect = false;
@@ -32,12 +35,15 @@ Automation::Automation(const String& name, AutomationRecorder * recorder) :
     value->hideInEditor = true;
     value->setControllableFeedbackOnly(true);
 
-    valueRange = addPoint2DParameter("Range", "The range between allowed minimum value and maximum value");
-    valueRange->canBeDisabledByUser = true;
-
     viewValueRange = addPoint2DParameter("View Value Range", "The minimum and maximum values to view in editor");
     viewValueRange->hideInEditor = true;
     viewValueRange->setPoint(0, 1);
+
+    valueRange = addPoint2DParameter("Range", "The range between allowed minimum value and maximum value");
+    valueRange->canBeDisabledByUser = true;
+    valueRange->setPoint(0, 1);
+
+   
 }
 
 Automation::~Automation()
@@ -68,22 +74,32 @@ void Automation::addKeys(const Array<AutomationKey*>& keys, bool addToUndo, bool
     }
 
     Array<AutomationKey*> keysToAdd;
-    for (auto & k : keys)
-    {
-        if (addToUndo)  actions.add(getAddItemUndoableAction(k));
-        else keysToAdd.add(k);
-    }
-    
-    if (addToUndo) UndoMaster::getInstance()->performActions("Add keys", actions);
+    if (addToUndo)  actions.add(getAddItemsUndoableAction(keys));
     else addItems(keysToAdd, var(), false);
+
+    if (addToUndo) UndoMaster::getInstance()->performActions("Add Keys", actions);
+
 }
 
 void Automation::addItemInternal(AutomationKey* k, var)
 {
-    updateNextKeys(items.indexOf(k) - 1, items.indexOf(k) + 1);
+    if (!allowKeysOutside) k->position->setRange(0, length->floatValue());
+    k->setValueRange(valueRange->x, valueRange->y);
+
+    if(!isManipulatingMultipleItems) updateNextKeys(items.indexOf(k) - 1, items.indexOf(k) + 1);
+}
+
+void Automation::addItemsInternal(Array<AutomationKey*>, var params)
+{
+    updateNextKeys();
 }
 
 void Automation::removeItemInternal(AutomationKey* k)
+{
+    if (!isManipulatingMultipleItems) updateNextKeys();
+}
+
+void Automation::removeItemsInternal()
 {
     updateNextKeys();
 }
@@ -91,11 +107,18 @@ void Automation::removeItemInternal(AutomationKey* k)
 void Automation::updateNextKeys(int start, int end)
 {
     if (isCurrentlyLoadingData || Engine::mainEngine->isClearing) return;
+    if (items.size() == 0) return;
 
-    int endIndex = jmin(end, items.size());
-    for (int i = jmax(start, 0); i < endIndex; i++)
+    int startIndex = jmax(start, 0);
+    int endIndex = end == -1 ? items.size() : jmin(end, items.size());
+
+    for (int i = startIndex; i < endIndex; i++)
     {
-        if (i < items.size() - 1) items[i]->setNextKey(items[i + 1]);
+        if (i < items.size() - 1)
+        {
+            jassert(items[i]->position->floatValue() <= items[i + 1]->position->floatValue());
+            items[i]->setNextKey(items[i + 1]);
+        }
     }
 
     computeValue();
@@ -110,7 +133,7 @@ void Automation::setLength(float newLength, float stretch, float stickToEnd)
 {
     if (length->floatValue() == newLength) return;
 
-    if (stretch)
+    if (stretch && length->floatValue() > 0)
     {
         float stretchFactor = newLength / length->floatValue();
         if (stretchFactor > 1) length->setValue(newLength); //if stretching, we have first to expand the length in case keys are not allowed outside
@@ -123,6 +146,8 @@ void Automation::setLength(float newLength, float stretch, float stickToEnd)
         length->setValue(newLength); // just change the value, nothing unusual
         if (stickToEnd) for (auto& k : items) k->position->setValue(k->position->floatValue() + lengthDiff);
     }
+
+    if (!allowKeysOutside) for (auto& k : items) k->position->setRange(0, length->floatValue());
 }
 
 Point<float> Automation::getPosAndValue()
@@ -161,6 +186,7 @@ void Automation::updateRange()
 AutomationKey* Automation::getKeyForPosition(float pos)
 {
     if (items.size() == 0) return nullptr;
+    if (pos < items[0]->position->floatValue()) return items[0];
     if (pos == 0) return items[0];
 
     for (int i = items.size() - 1; i >= 0; i--)
@@ -174,6 +200,8 @@ AutomationKey* Automation::getKeyForPosition(float pos)
 Array<AutomationKey*> Automation::getKeysBetweenPositions(float startPos, float endPos)
 {
     Array<AutomationKey*> result;
+    if (items.size() == 0) return result;
+    if(startPos > items[items.size() - 1]->position->floatValue() || endPos < items[0]->position->floatValue()) return result;
 
     AutomationKey* startK = getKeyForPosition(startPos);
     if (startK->position->floatValue() < startPos) startK = startK->nextKey;
@@ -181,9 +209,10 @@ Array<AutomationKey*> Automation::getKeysBetweenPositions(float startPos, float 
     if (startK == nullptr) return result;
 
     AutomationKey* endK = getKeyForPosition(endPos);
-    
+    if (endK == nullptr) endK = startK;
+
     int startIndex = items.indexOf(startK);
-    int endIndex = items.indexOf(endK);
+    int endIndex = items.indexOf(endK)+1;
     result.addArray(items, startIndex, endIndex - startIndex);
 
     return result;
@@ -251,6 +280,11 @@ void Automation::onControllableFeedbackUpdate(ControllableContainer* cc, Control
 void Automation::afterLoadJSONDataInternal()
 {
     updateNextKeys();
+}
+
+int Automation::compareKeys(AutomationKey* k1, AutomationKey* k2)
+{
+    return k2->position->floatValue() < k1->position->floatValue() ? 1 : k2->position->floatValue() > k1->position->floatValue() ? -1 : 0;
 }
 
 InspectableEditor* Automation::getEditor(bool isRoot)

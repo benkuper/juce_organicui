@@ -133,6 +133,7 @@ Point<float> CubicEasing::getRawValue(const float& weight)
 
 void CubicEasing::updateKeysInternal()
 {
+	if (length == 0) return;
 	anchor1->setBounds(0, INT32_MIN, length, INT32_MAX);
 	anchor2->setBounds(-length, INT32_MIN, 0, INT32_MAX);
 

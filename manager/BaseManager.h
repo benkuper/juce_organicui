@@ -40,7 +40,8 @@ public:
 	virtual void loadItemsData(var data);
 
 
-	virtual UndoableAction * getAddItemUndoableAction(T * item = nullptr, var data = var());
+	virtual UndoableAction* getAddItemUndoableAction(T* item = nullptr, var data = var());
+	virtual UndoableAction * getAddItemsUndoableAction(Array<T *> item = nullptr, var data = var());
 
 	T * addItem(T * item = nullptr, var data = var(), bool addToUndo = true, bool notify = true); //if data is not empty, load data
 	T * addItem(const Point<float> initialPosition, bool addToUndo = true, bool notify = true);
@@ -281,6 +282,14 @@ UndoableAction * BaseManager<T>::getAddItemUndoableAction(T * item, var data)
 	jassert(items.indexOf(item) == -1); //be sure item is no here already
 	if (item == nullptr) item = createItem();
 	return new AddItemAction(this, item, data);
+}
+
+template<class T>
+ UndoableAction* BaseManager<T>::getAddItemsUndoableAction(Array<T*> _items, var data)
+{
+	 if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile) return nullptr;
+	 if (_items.size() == 0) return nullptr;
+	 return new AddItemsAction(this, _items, data);
 }
 
 template<class T>
