@@ -41,7 +41,6 @@ void InspectableSelector::startSelection(Component * parent, Array<Component*> _
 	jassert(_selectables.size() == relatedInspectables.size());
 	
 	currentSelectionManager = manager != nullptr ? manager : InspectableSelectionManager::mainSelectionManager;
-	if (clearSelection) currentSelectionManager->clearSelection();
 	
 	if (_selectables.size() == 0) return;
 
