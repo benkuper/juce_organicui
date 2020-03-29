@@ -3,6 +3,7 @@
 Inspectable::Inspectable() :
 	selectionManager(nullptr), //default nullptr will target main selectionManager
 	isSelected(false),
+	isPreselected(false),
 	isSelectable(true),
 	showInspectorOnSelect(true),
 	hideInEditor(false),

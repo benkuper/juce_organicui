@@ -28,8 +28,6 @@ public:
     Point2DParameter* viewValueRange;
     bool allowKeysOutside;
 
-    bool showUIInEditor;
-
     AutomationRecorder* recorder;
 
     AutomationKey * addKey(const float& position, const float& value, bool addToUndo = false);

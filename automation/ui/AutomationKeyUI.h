@@ -33,12 +33,12 @@ public:
 
     AutomationKeyHandle handle;
 
-    Rectangle<float> valueBounds;
+    juce::Rectangle<float> valueBounds;
 
     std::unique_ptr<EasingUI> easingUI;
 
+    void paint(Graphics& g) override {} //avoid painting background
     void resized() override;
-    void paint(Graphics& g) override;
 
     void setShowEasingHandles(bool showFirst, bool showLast);
 
@@ -49,7 +49,7 @@ public:
 
     bool hitTest(int x, int y) override;
 
-    void setValueBounds(const Rectangle<float> valueBounds);
+    void setValueBounds(const juce::Rectangle<float> valueBounds);
     Point<int> getUIPosForValuePos(const Point<float>& valuePos) const;
 
     void controllableFeedbackUpdateInternal(Controllable* c) override;

@@ -155,7 +155,6 @@ ParameterNumberAutomation::ParameterNumberAutomation(Parameter* parameter, bool 
 	setup();
 
 	//automation.enableSnap->setValue(false);
-	automation.showUIInEditor = true;
 
 	if (addDefaultItems)
 	{

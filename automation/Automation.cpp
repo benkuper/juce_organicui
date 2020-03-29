@@ -1,4 +1,3 @@
-#include "Automation.h"
 /*
   ==============================================================================
 
@@ -12,8 +11,7 @@
 Automation::Automation(const String& name, AutomationRecorder * recorder, bool allowKeysOutside) :
     BaseManager(name),
     recorder(recorder),
-    allowKeysOutside(allowKeysOutside),
-    showUIInEditor(false)
+    allowKeysOutside(allowKeysOutside)
 {
     isSelectable = false;
 
@@ -42,8 +40,6 @@ Automation::Automation(const String& name, AutomationRecorder * recorder, bool a
     valueRange = addPoint2DParameter("Range", "The range between allowed minimum value and maximum value");
     valueRange->canBeDisabledByUser = true;
     valueRange->setPoint(0, 1);
-
-   
 }
 
 Automation::~Automation()
@@ -335,7 +331,7 @@ void Automation::onControllableFeedbackUpdate(ControllableContainer* cc, Control
 
     if (AutomationKey* k = dynamic_cast<AutomationKey*>(cc))
     {
-        updateNextKeys();
+      //  updateNextKeys();
     }
 }
 

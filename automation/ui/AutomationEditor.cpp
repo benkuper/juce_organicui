@@ -13,18 +13,15 @@ AutomationEditor::AutomationEditor(Automation * automation, bool isRoot) :
 	automation(automation),
 	automationUI(nullptr)
 {
-	if (automation->showUIInEditor)
-	{
-		automationUI.reset(new AutomationUI(automation));
+	automationUI.reset(new AutomationUI(automation));
 
-		automationUI->bgColor = BG_COLOR;
-		automationUI->transparentBG = false;
-		//automationUI->autoResetViewRangeOnLengthUpdate = true;
+	automationUI->bgColor = BG_COLOR;
+	automationUI->transparentBG = false;
+	//automationUI->autoResetViewRangeOnLengthUpdate = true;
 
-		addAndMakeVisible(automationUI.get());
-		automationUI->setViewRange(0, automation->length->floatValue());
-		setSize(100, 100);
-	}
+	addAndMakeVisible(automationUI.get());
+	automationUI->setViewRange(0, automation->length->floatValue());
+	setSize(100, 100);
 }
 
 AutomationEditor::~AutomationEditor()

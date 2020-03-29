@@ -1,4 +1,3 @@
-#include "AutomationUI.h"
 /*
   ==============================================================================
 
@@ -11,8 +10,11 @@
 
 AutomationUI::AutomationUI(Automation* manager) :
     BaseManagerUI(manager->niceName, manager, false),
-    paintingMode(false)
+    paintingMode(false),
+    previewMode(false)
 {
+    resizeOnChildBoundsChanged = false;
+
     animateItemOnAdd = false;
     manager->addAsyncContainerListener(this);
     
@@ -38,6 +40,21 @@ AutomationUI::~AutomationUI()
 
 void AutomationUI::paint(Graphics& g)
 {
+    if (getWidth() == 0 || !isShowing()) return;
+
+    if (previewMode)
+    {
+        Path p;
+        p.startNewSubPath(Point<float>(0, getYForValue(manager->getValueAtPosition(getPosForX(0)))));
+        for (int i = 1; i < getWidth(); i+=2)
+        {
+            p.lineTo(Point<float>(i, getYForValue(manager->getValueAtPosition(getPosForX(i)))));
+        }
+        g.setColour(NORMAL_COLOR);
+        g.strokePath(p, PathStrokeType(1));
+        return;
+    }
+    
     g.setColour(Colours::white.withAlpha(.04f));
     g.fillRect(getLocalBounds().withTop(getYForValue(manager->value->floatValue())));
 
@@ -63,6 +80,7 @@ void AutomationUI::paint(Graphics& g)
 
 void AutomationUI::paintOverChildren(Graphics& g)
 {
+    if (previewMode || !isShowing()) return;
 
     g.setColour(GREEN_COLOR);
     g.drawEllipse(Rectangle<int>(0, 0, 6, 6).withCentre(getPosInView(manager->getPosAndValue())).toFloat(), 1.5f);
@@ -106,18 +124,18 @@ void AutomationUI::paintOverChildren(Graphics& g)
 
         g.strokePath(p, PathStrokeType(1));
     }
-
 }
 
 
 void AutomationUI::resized()
 {
+    if (previewMode || !isShowing()) return;
     for (auto& kui : itemsUI) placeKeyUI(kui);
 }
 
 void AutomationUI::placeKeyUI(AutomationKeyUI* ui)
 {
-    if (ui == nullptr) return;
+    if (ui == nullptr || !ui->isVisible()) return;
 
     Point<int> p = getPosInView(ui->item->getPosAndValue());
     Rectangle<int> pr = Rectangle<int>(0, 0, 20, 20).withCentre(p);
@@ -146,19 +164,55 @@ void AutomationUI::updateHandlesForUI(AutomationKeyUI* ui, bool checkSideItems)
         return;
     }
 
-
-    bool prevSelected = index > 0 && itemsUI[index - 1] != nullptr && itemsUI[index - 1]->item->isThisOrChildSelected();
+    bool prevSelected = false;
+    if (index > 0 && itemsUI[index - 1] != nullptr)
+    {
+        AutomationKey* prevItem = itemsUI[index - 1]->item;
+        prevSelected = prevItem->isThisOrChildSelected() && !prevItem->isSelected; //we only want to show if easing is selected only easing
+    }
     bool nextSelected = index < itemsUI.size() && itemsUI[index + 1] != nullptr && itemsUI[index + 1]->item->isThisOrChildSelected();
 
     ui->setShowEasingHandles(prevSelected, nextSelected);
 
 }
 
+void AutomationUI::setPreviewMode(bool value)
+{
+    previewMode = value;
+    if (previewMode)
+    {
+        for (auto& kui : itemsUI) kui->setVisible(false);
+    }
+    else
+    {
+        updateItemsVisibility();
+    }
+
+    resized();
+    repaint();
+}
+
 void AutomationUI::setViewRange(float start, float end)
 {
     viewPosRange.setXY(start, end);
     viewLength = viewPosRange.y - viewPosRange.x;
+
     resized();
+    repaint();
+}
+
+void AutomationUI::updateItemsVisibility()
+{
+    if (itemsUI.size() == 0) return;
+    if (previewMode) return;
+
+    int firstIndex = jmax(manager->items.indexOf(manager->getKeyForPosition(viewPosRange.x)), 0);
+    int lastIndex = jmax(manager->items.indexOf(manager->getKeyForPosition(viewPosRange.y))+1, firstIndex);
+   
+    for (int i=0;i<itemsUI.size();i++)
+    {
+        itemsUI[i]->setVisible(i >= firstIndex && i <= lastIndex);
+    }
 }
 
 void AutomationUI::addItemUIInternal(AutomationKeyUI* ui)
@@ -182,9 +236,16 @@ void AutomationUI::mouseDown(const MouseEvent& e)
 {
     if (e.eventComponent == this)
     {
-        paintingMode = e.mods.isLeftButtonDown() && e.mods.isCommandDown() && e.mods.isShiftDown();
-        paintingPoints.clear();
-        paintingPoints.add(getViewPos(e.getPosition()));
+        if (e.mods.isLeftButtonDown() && e.mods.isCommandDown() && e.mods.isShiftDown())
+        {
+            paintingMode = true;
+            paintingPoints.clear();
+            paintingPoints.add(getViewPos(e.getPosition()));
+        }
+        else
+        {
+            BaseManagerUI::mouseDown(e);
+        }
     }
 }
 
@@ -224,6 +285,10 @@ void AutomationUI::mouseUp(const MouseEvent& e)
         paintingPoints.clear();
         repaint();
     }
+    else
+    {
+        BaseManagerUI::mouseUp(e);
+    }
 }
 
 void AutomationUI::mouseDoubleClick(const MouseEvent& e)
@@ -233,18 +298,6 @@ void AutomationUI::mouseDoubleClick(const MouseEvent& e)
         Point<float> p = getViewPos(e.getPosition());
         manager->addKey(p.x, p.y);
     }
-    /*
-    else if (EasingUI* eui = dynamic_cast<EasingUI*>(e.eventComponent))
-    {
-        float p = eui->easing->getClosestPointForPos(getViewPos(e.getPosition()));
-        AutomationKey* k = manager->createItem();
-        k->setPosAndValue(p);
-        var params(new DynamicObject());
-        AutomationKeyUI* kui = dynamic_cast<AutomationKeyUI*>(eui->getParentComponent());
-        params.getDynamicObject()->setProperty("index", itemsUI.indexOf(kui) + 1);
-        manager->addItem(k, params);
-    }
-    */
 }
 
 Point<float> AutomationUI::getViewPos(Point<int> pos, bool relative)

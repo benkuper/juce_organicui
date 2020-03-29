@@ -1,4 +1,3 @@
-#include "InspectableSelector.h"
 /*
   ==============================================================================
 
@@ -14,8 +13,8 @@ juce_ImplementSingleton(InspectableSelector)
 
 InspectableSelector::InspectableSelector() :
 	selectablesParent(nullptr),
-currentSelectionManager(nullptr),
-clearSelectionAtEnd(false)
+	currentSelectionManager(nullptr),
+	clearSelectionAtEnd(false)
 {
 	setRepaintsOnMouseActivity(true);
 }

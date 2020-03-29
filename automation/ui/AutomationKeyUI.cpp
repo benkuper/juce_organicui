@@ -36,9 +36,6 @@ void AutomationKeyUI::resized()
 	if (easingUI != nullptr) easingUI->setBounds(getLocalBounds()); 
 }
 
-void AutomationKeyUI::paint(Graphics& g)
-{
-}
 
 void AutomationKeyUI::setShowEasingHandles(bool showFirst, bool showLast)
 {
@@ -159,7 +156,7 @@ void AutomationKeyHandle::paint(Graphics& g)
 	if (inspectable.wasObjectDeleted()) return;
 
 	Colour bc = NORMAL_COLOR;
-	Colour c = key->isSelected ? HIGHLIGHT_COLOR : bc;
+	Colour c = key->isSelected ? HIGHLIGHT_COLOR : key->isPreselected? PRESELECT_COLOR : bc;
 	if (isMouseOverOrDragging()) c = c.brighter(.2f);
 
 	Rectangle<float> r = getLocalBounds().reduced(3).toFloat();

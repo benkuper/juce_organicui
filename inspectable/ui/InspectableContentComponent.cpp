@@ -108,9 +108,9 @@ void InspectableContentComponent::paintOverChildren(Graphics & g)
 		g.drawRoundedRectangle(getMainBounds().toFloat(), rounderCornerSize, 4);
 	}
 
-	if (autoDrawContourWhenSelected && inspectable->isSelected)
+	if (autoDrawContourWhenSelected && (inspectable->isSelected || inspectable->isPreselected))
 	{
-		g.setColour(selectionContourColor);
+		g.setColour(inspectable->isSelected?selectionContourColor:PRESELECT_COLOR);
 		g.drawRoundedRectangle(getMainBounds().toFloat(), rounderCornerSize, 2);
 	}
 }

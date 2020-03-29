@@ -26,6 +26,8 @@ public:
     bool paintingMode;
     Array<Point<float>> paintingPoints;
 
+    bool previewMode; //avoid repainting everything
+
     void paint(Graphics& g) override;
     void paintOverChildren(Graphics& g) override;
 
@@ -33,7 +35,10 @@ public:
     void placeKeyUI(AutomationKeyUI* ui);
     void updateHandlesForUI(AutomationKeyUI* ui, bool checkSideItems);
 
+    void setPreviewMode(bool value);
+
     void setViewRange(float start, float end);
+    void updateItemsVisibility() override;
 
     void addItemUIInternal(AutomationKeyUI* ui) override;
     void removeItemUIInternal(AutomationKeyUI* ui) override;

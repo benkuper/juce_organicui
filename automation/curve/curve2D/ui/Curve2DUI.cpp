@@ -89,8 +89,12 @@ void Curve2DUI::updateHandlesForUI(Curve2DKeyUI* ui, bool checkSideItems)
         return;
     }
 
-
-    bool prevSelected = index > 0 && itemsUI[index - 1] != nullptr && itemsUI[index - 1]->item->isThisOrChildSelected();
+    bool prevSelected = false;
+    if (index > 0 && itemsUI[index - 1] != nullptr)
+    {
+        Curve2DKey* prevItem = itemsUI[index - 1]->item;
+        prevSelected = prevItem->isThisOrChildSelected() && !prevItem->isSelected; //we only want to show if easing is selected only easing
+    }
     bool nextSelected = index < itemsUI.size() && itemsUI[index + 1] != nullptr && itemsUI[index + 1]->item->isThisOrChildSelected();
 
     ui->setShowEasingHandles(prevSelected, nextSelected);

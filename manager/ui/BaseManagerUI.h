@@ -98,12 +98,9 @@ public:
 	bool animateItemOnAdd;
 	ComponentAnimator itemAnimator;
 
-	//interaction
-	/*
-	BaseItemMinimalUI<T> * grabbingItem;
-	int grabbingItemDropIndex;
-	juce::Rectangle<int> grabSpaceRect;
-	*/
+	//selection
+	bool useDedicatedSelector;
+	bool selectingItems;
 
 	//drag and drop
 	StringArray acceptedDropTypes;
@@ -148,11 +145,11 @@ public:
 	virtual void addItemUIInternal(U *) {}
 
 	virtual void mouseDown(const MouseEvent &e) override;
+	virtual void mouseUp(const MouseEvent& e) override;
 
 	virtual void removeItemUI(T * item, bool resizeAndRepaint = true);
 	virtual void removeItemUIInternal(U *) {}
 
-	 
 	//Drag drop target
 	virtual bool isInterestedInDragSource(const SourceDetails & dragSourceDetails) override;
 
@@ -160,6 +157,10 @@ public:
 	virtual void itemDragMove(const SourceDetails& dragSourceDetails) override;
 	virtual void itemDragExit(const SourceDetails&) override;
 	virtual void itemDropped(const SourceDetails & dragSourceDetails) override;
+
+	//Selection
+	virtual void addSelectableComponentsAndInspectables(Array<Component*> &selectables, Array<Inspectable*> &inspectables);
+	virtual Component * getSelectableComponentForItemUI(U* itemUI);
 
 	virtual int getDropIndexForPosition(Point<int> localPosition);
 	virtual void itemUIMiniModeChanged(BaseItemUI<T> * se) override {}
@@ -203,7 +204,7 @@ public:
 
 
 template<class M, class T, class U>
-BaseManagerUI<M, T, U>::BaseManagerUI(const String & contentName, M * _manager, bool _useViewport) :
+BaseManagerUI<M, T, U>::BaseManagerUI(const String& contentName, M* _manager, bool _useViewport) :
 	InspectableContentComponent(_manager),
 	manager(_manager),
 	managerComparator(_manager),
@@ -221,6 +222,8 @@ BaseManagerUI<M, T, U>::BaseManagerUI(const String & contentName, M * _manager, 
 	autoFilterHitTestOnItems(false),
 	validateHitTestOnNoItem(true),
 	animateItemOnAdd(true),
+	useDedicatedSelector(true),
+	selectingItems(false),
 	isDraggingOver(false),
 	highlightOnDragOver(true),
 	fixedItemHeight(true),
@@ -315,11 +318,33 @@ void BaseManagerUI<M, T, U>::mouseDown(const MouseEvent & e)
 {
 	InspectableContentComponent::mouseDown(e);
 
-	if (e.mods.isLeftButtonDown())
+	if (e.mods.isLeftButtonDown() && e.eventComponent == this)
 	{
+		if (!e.mods.isCommandDown() && !e.mods.isAltDown())
+		{
+			if (useDedicatedSelector)
+			{
+				Array<Component*> selectables;
+				Array<Inspectable*> inspectables;
+				addSelectableComponentsAndInspectables(selectables, inspectables);
+
+				InspectableSelector::getInstance()->startSelection(this, selectables, inspectables, nullptr, !e.mods.isShiftDown());
+				selectingItems = true;
+			}
+		}
 	} else if (e.mods.isRightButtonDown() && e.eventComponent == this)
 	{
 		if (manager->userCanAddItemsManually) showMenuAndAddItem(false, e.getEventRelativeTo(this).getMouseDownPosition());
+	}
+}
+
+template<class M, class T, class U>
+void BaseManagerUI<M, T, U>::mouseUp(const MouseEvent& e)
+{
+	if (selectingItems)
+	{
+		InspectableSelector::getInstance()->endSelection();
+		selectingItems = false;
 	}
 }
 
@@ -816,6 +841,26 @@ void BaseManagerUI<M, T, U>::itemDropped(const SourceDetails & dragSourceDetails
 
 	this->isDraggingOver = false;
 	if (highlightOnDragOver) repaint();
+}
+
+template<class M, class T, class U>
+void BaseManagerUI<M, T, U>::addSelectableComponentsAndInspectables(Array<Component*> &selectables, Array<Inspectable*> &inspectables)
+{
+	for (auto& i : itemsUI)
+	{
+		if (i->isVisible())
+		{
+			selectables.add(getSelectableComponentForItemUI(i));
+			inspectables.add(i->inspectable);
+		}
+	}
+
+}
+
+template<class M, class T, class U>
+Component * BaseManagerUI<M, T, U>::getSelectableComponentForItemUI(U* itemUI)
+{
+	return itemUI;
 }
 
 template<class M, class T, class U>
