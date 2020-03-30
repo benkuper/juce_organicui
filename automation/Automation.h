@@ -17,7 +17,7 @@ class Automation :
     public BaseManager<AutomationKey>
 {
 public:
-    Automation(const String& name = "Curve 2D", AutomationRecorder * recorder = nullptr, bool allowKeysOutside = false);
+    Automation(const String& name = "Automation", AutomationRecorder * recorder = nullptr, bool allowKeysOutside = false);
     ~Automation();
 
     FloatParameter* position;

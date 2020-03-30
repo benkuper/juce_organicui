@@ -227,6 +227,7 @@ public:
 	static var getItemIndexFromScript(const var::NativeFunctionArgs& args);
 	static var getItemBeforeFromScript(const var::NativeFunctionArgs& args);
 	static var getItemAfterFromScript(const var::NativeFunctionArgs& args);
+	static var reorderItemsFromScript(const var::NativeFunctionArgs& args);
 
 	private:
 		JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BaseManager<T>)
@@ -257,6 +258,7 @@ BaseManager<T>::BaseManager(const String & name) :
 	scriptObject.setMethod("getItemIndex", &BaseManager<T>::getItemIndexFromScript);
 	scriptObject.setMethod("getItemBefore", &BaseManager<T>::getItemBeforeFromScript);
 	scriptObject.setMethod("getItemAfter", &BaseManager<T>::getItemAfterFromScript);
+	scriptObject.setMethod("reorderItems", &BaseManager<T>::getItemAfterFromScript);
 
 	skipLabelInTarget = true; //by default manager label in targetParameter UI are not interesting
 	nameCanBeChangedByUser = false;
@@ -779,7 +781,7 @@ inline var BaseManager<T>::addItemFromScript(const var::NativeFunctionArgs& args
 	//if (args.numArguments) return var(); 
 	if (m->managerFactory == nullptr || m->managerFactory->defs.size() == 1)
 	{
-		T* item = m->addItem();
+		T* item = m->addItem(nullptr, args.numArguments > 1 && args.arguments[1].isObject() ? args.arguments[1] : var());
 		return item->getScriptObject();
 	}
 	else
@@ -797,6 +799,7 @@ inline var BaseManager<T>::addItemFromScript(const var::NativeFunctionArgs& args
 		else
 		{
 			T* item = m->managerFactory->create(args.arguments[0].toString());
+			m->addItem(item, args.numArguments > 1 && args.arguments[1].isObject() ? args.arguments[1] : var());
 			if (item != nullptr) return item->getScriptObject();
 		}
 		
@@ -923,6 +926,17 @@ var BaseManager<T>::getItemAfterFromScript(const var::NativeFunctionArgs& args)
 		int index = m->items.indexOf(item);
 		if (index >= m->items.size()-1) return var();
 		return m->items[index + 1]->getScriptObject();
+	}
+
+	return var();
+}
+
+template<class T>
+var BaseManager<T>::reorderItemsFromScript(const var::NativeFunctionArgs& args)
+{
+	if (BaseManager<T>* m = getObjectFromJS<BaseManager<T>>(args))
+	{
+		m->reorderItems();
 	}
 
 	return var();

@@ -77,8 +77,12 @@
 #include "controllable/ui/TriggerUI.cpp"
 
 
+#pragma warning(push)
+#pragma warning(disable:4067 4200)
 #include "automation/common/fitting/intern/curve_fit_cubic.c";
 #include "automation/common/fitting/intern/curve_fit_corners_detect.c";
+#pragma warning(pop)
+
 #include "automation/recorder/AutomationRecorder.cpp"
 #include "automation/easing/Easing.cpp"
 #include "automation/AutomationKey.cpp"

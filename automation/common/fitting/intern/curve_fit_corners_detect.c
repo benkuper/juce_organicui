@@ -44,9 +44,11 @@ typedef unsigned int uint;
 #include "curve_fit_inline.h"
 
 #ifdef _MSC_VER
-#ifndef alloca(size)
+
+#ifndef alloca
 #define alloca(size) _alloca(size)
 #endif
+
 #endif
 
 #if !defined(_MSC_VER)

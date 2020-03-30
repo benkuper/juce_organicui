@@ -312,7 +312,6 @@ void Engine::loadJSONData(var data, ProgressTask * loadingTask)
 				WebInputStream stream(url, true);
 
 				String convertedData = stream.withExtraHeaders("Content-Type: Text/plain").readEntireStreamAsString();
-				DBG(convertedData);
 				if (convertedData.isEmpty())
 				{
 					AlertWindow::showMessageBox(AlertWindow::AlertIconType::WarningIcon, "Update error", "Could not connect to the update server, please make sure you are connected to internet. You can still reload your file and not update it.", "Well, shit happens");
@@ -321,6 +320,7 @@ void Engine::loadJSONData(var data, ProgressTask * loadingTask)
 				}
 
 				data = JSON::parse(convertedData);
+				DBG(JSON::toString(data));
 
 				if (data.isVoid())
 				{

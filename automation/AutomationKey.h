@@ -51,7 +51,7 @@ public:
     void notifyKeyUpdated();
 
 
-    String getTypeString() const override { return "2DKey"; }
+    String getTypeString() const override { return "Key"; }
 
 
     class  AutomationKeyEvent

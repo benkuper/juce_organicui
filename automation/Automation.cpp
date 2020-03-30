@@ -89,16 +89,15 @@ void Automation::addFromPointsAndSimplify(const Array<Point<float>>& sourcePoint
     unsigned int* cornerIndex = nullptr;
     unsigned int cornerIndexLength = 0;
 
-    int detectResult = curve_fit_corners_detect_fl(points.getRawDataPointer(), points.size(), 2, 0, .02f, 20, 30, &corners, &cornersLength);
+    curve_fit_corners_detect_fl(points.getRawDataPointer(), points.size(), 2, 0, .02f, 20, 30, &corners, &cornersLength);
     if (cornersLength == 0) corners = nullptr;
 
-    int fitResult = curve_fit_cubic_to_points_fl(points.getRawDataPointer(), points.size(), 2, .04f, CURVE_FIT_CALC_HIGH_QUALIY, corners, cornersLength, &result, &resultNum, &origIndex, &cornerIndex, &cornerIndexLength);
+    curve_fit_cubic_to_points_fl(points.getRawDataPointer(), points.size(), 2, .04f, CURVE_FIT_CALC_HIGH_QUALIY, corners, cornersLength, &result, &resultNum, &origIndex, &cornerIndex, &cornerIndexLength);
 
     int numPoints = ((int)resultNum);
 
     Array<AutomationKey*> keys;
 
-    AutomationKey* prevKey = nullptr;
     CubicEasing* prevEasing = nullptr;
 
     for (int i = 0; i < numPoints; i++)
