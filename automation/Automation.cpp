@@ -99,7 +99,9 @@ void Automation::addFromPointsAndSimplify(const Array<Point<float>>& sourcePoint
     Array<AutomationKey*> keys;
 
     CubicEasing* prevEasing = nullptr;
+    Point<float> prevRP;
 
+    float maxDist = valueRange->enabled ? (valueRange->y - valueRange->x)*100 : 1000;
     for (int i = 0; i < numPoints; i++)
     {
         int index = i * 6;
@@ -108,12 +110,13 @@ void Automation::addFromPointsAndSimplify(const Array<Point<float>>& sourcePoint
         Point<float> h2(result[index + 4], result[index + 5]);
 
 
-        if (prevEasing != nullptr && h1.getDistanceFromOrigin() < 100)
+        if (prevEasing != nullptr && h1.getDistanceFrom(rp) < maxDist)
         {
             prevEasing->anchor2->setPoint(h1 - rp);
         }
 
-        if (rp.getDistanceFromOrigin() > 100)
+
+        if (i > 0 && rp.getDistanceFrom(prevRP) > maxDist)
         {
             break;
         }
@@ -123,11 +126,12 @@ void Automation::addFromPointsAndSimplify(const Array<Point<float>>& sourcePoint
 
         k->easingType->setValueWithData(Easing::BEZIER);
         CubicEasing* ce = (CubicEasing*)k->easing.get();
-        if (h2.getDistanceFromOrigin() < 100) ce->anchor1->setPoint(h2 - rp);
+        if (h2.getDistanceFrom(rp) < maxDist) ce->anchor1->setPoint(h2 - rp);
 
         keys.add(k);
 
         prevEasing = ce;
+        prevRP.setXY(rp.x, rp.y);
     }
 
     delete result;
@@ -228,6 +232,12 @@ void Automation::updateRange()
 {
     if (valueRange->enabled)
     {
+        if(valueRange->y < valueRange->x +.2f)
+        {
+            valueRange->setPoint(valueRange->x, jmax(valueRange->y, valueRange->x + .2f));
+            return;
+        }
+
         value->setRange(valueRange->x, valueRange->y);
         viewValueRange->setBounds(valueRange->x, valueRange->x, valueRange->y, valueRange->y);
         viewValueRange->setPoint(valueRange->getPoint());

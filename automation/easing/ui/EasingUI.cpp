@@ -66,6 +66,9 @@ void EasingUI::resized()
 void EasingUI::generatePath()
 {
 	drawPath.clear();
+
+	if (getHeight() == 0 || getWidth() == 0) return;
+
 	drawPath.startNewSubPath(getUIPosForValuePos(easing->start).toFloat());
 
 	if (valueBounds.isEmpty() || (easing->start == easing->end)) return;
@@ -91,6 +94,7 @@ void EasingUI::autoGeneratePathWithPrecision(int precision)
 		float v = easing->getValue(t);
 		float tx = easing->start.x + (easing->end.x - easing->start.x) * t;
 		Point<int> pv = getUIPosForValuePos(Point<float>(tx, v));
+		if (pv.y > valueBounds.getBottom() + 10 || pv.y > valueBounds.getY() - 10) continue;
 		drawPath.lineTo(pv.toFloat());
 	}
 }
