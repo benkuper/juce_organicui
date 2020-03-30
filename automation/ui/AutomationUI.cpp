@@ -194,14 +194,18 @@ void AutomationUI::paintOverChildren(Graphics& g)
             if (numRKeys > 0)
             {
                 g.setColour(Colours::red.withAlpha(.3f));
-                g.fillRect(getLocalBounds().withLeft(getXForPos(manager->recorder->keys[0].x)).withRight(getXForPos(manager->position->floatValue())));
+                g.fillRect(getLocalBounds().withLeft(getXForPos(manager->recorder->keys[0].time)).withRight(getXForPos(manager->position->floatValue())));
 
                 if (numRKeys >= 2)
                 {
                     Path p;
-                    Point<float> k = manager->recorder->keys[0];
-                    p.startNewSubPath(getPosInView(manager->recorder->keys[0]).toFloat());
-                    for (int i = 1; i < numRKeys; i++)  p.lineTo(getPosInView(manager->recorder->keys[i]).toFloat());
+                    Point<float> k0(manager->recorder->keys[0].time, manager->recorder->keys[0].value);
+                    p.startNewSubPath(getPosInView(k0).toFloat());
+                    for (int i = 1; i < numRKeys; i++)
+                    {
+                        Point<float> ki(manager->recorder->keys[i].time, manager->recorder->keys[i].value);
+                        p.lineTo(getPosInView(ki).toFloat());
+                    }
                     
                     g.setColour(Colours::orangered);
                     g.strokePath(p, PathStrokeType(2));
@@ -213,15 +217,17 @@ void AutomationUI::paintOverChildren(Graphics& g)
     if (paintingMode && paintingPoints.size() > 0)
     {
         g.setColour(YELLOW_COLOR);
+        
         Path p; 
         p.startNewSubPath(getPosInView(paintingPoints[0]).toFloat());
         for (auto& pp : paintingPoints)
         {
             Point<int> vpp = getPosInView(pp);
-            g.fillEllipse(Rectangle<int>(0, 0, 3, 3).withCentre(vpp).toFloat());
+            g.fillEllipse(Rectangle<int>(0, 0, 2,2).withCentre(vpp).toFloat());
             p.lineTo(vpp.toFloat());
         }
 
+        g.setColour(YELLOW_COLOR.withAlpha(.5f));
         g.strokePath(p, PathStrokeType(1));
     }
 }
@@ -343,6 +349,7 @@ void AutomationUI::mouseDown(const MouseEvent& e)
             paintingMode = true;
             paintingPoints.clear();
             paintingPoints.add(getViewPos(e.getPosition()));
+            lastPaintingPoint = paintingPoints[0];
         }
         else if (e.mods.isAltDown())
         {
@@ -370,8 +377,39 @@ void AutomationUI::mouseDrag(const MouseEvent& e)
     {
         if (paintingMode)
         {
-            Point<float> p = getViewPos(e.getPosition());
-            if (p.x > paintingPoints[paintingPoints.size() - 1].x) paintingPoints.add(p);
+            Point<float> newPoint = getViewPos(e.getPosition());
+            
+            float minX = jmin(newPoint.x, lastPaintingPoint.x);
+            float maxX = jmax(newPoint.x, lastPaintingPoint.x);
+
+            int inKeyStart = -1;
+            int inKeyEnd = -1;
+            int indexBeforeNewPoint = 0;
+            int indexAfterNewPoint = paintingPoints.size();
+
+            for (int i = 0; i < paintingPoints.size(); i++)
+            {
+                Point<float> p = paintingPoints[i];
+                if (p.x >= newPoint.x) indexAfterNewPoint = jmin(indexAfterNewPoint, i);
+                else indexBeforeNewPoint = jmax(indexBeforeNewPoint, i);
+
+                if (p.x == lastPaintingPoint.x) continue;
+
+                if (p.x >= minX && p.x <= maxX)
+                {
+                    inKeyStart = inKeyStart == -1 ? i : jmin(i, inKeyStart);
+                    inKeyEnd = jmax(inKeyEnd, i);
+                }
+            }
+
+            bool foundKeysToRemove = inKeyStart != -1 && inKeyEnd != -1;
+            if (foundKeysToRemove)
+            {
+                paintingPoints.removeRange(inKeyStart, inKeyEnd - inKeyStart+1);
+            }
+            
+            paintingPoints.insert(indexAfterNewPoint, newPoint);
+            lastPaintingPoint.setXY(newPoint.x, newPoint.y);
             repaint();
         }
         else if (e.mods.isAltDown())

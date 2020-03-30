@@ -28,7 +28,14 @@ public:
 
 	BoolParameter * isRecording;
 
-	Array<Point<float>> keys;
+	struct RecordValue
+	{
+		RecordValue(float t = 0, var v = var()) : time(t), value(v) {}
+		float time;
+		var value;
+	};
+
+	Array<RecordValue> keys;
 
 	void setCurrentInput(Parameter * input);
 
@@ -37,7 +44,7 @@ public:
 
 	void startRecording();
 	void cancelRecording();
-	Array<Point<float>> stopRecordingAndGetKeys();
+	Array<RecordValue> stopRecordingAndGetKeys();
 
 	bool shouldRecord();
 
@@ -45,5 +52,22 @@ public:
 	
 	void inspectableDestroyed(Inspectable * i) override;
 
+	class  RecorderEvent
+	{
+	public:
+		enum Type { RECORDER_UPDATED };
+
+		RecorderEvent(Type t) : type(t) {}
+		Type type;
+	};
+
+	QueuedNotifier<RecorderEvent> recorderNotifier;
+	typedef QueuedNotifier<RecorderEvent>::Listener AsyncListener;
+
+	void addAsyncRecorderListener(AsyncListener* newListener) { recorderNotifier.addListener(newListener); }
+	void addAsyncCoalescedRecorderListener(AsyncListener* newListener) { recorderNotifier.addAsyncCoalescedListener(newListener); }
+	void removeAsyncRecorderListener(AsyncListener* listener) { recorderNotifier.removeListener(listener); }
+
 	InspectableEditor * getEditor(bool isRoot) override;
 };
+

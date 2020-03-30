@@ -14,13 +14,14 @@ class ControllableChooserPopupMenu :
 	public PopupMenu
 {
 public:
-	ControllableChooserPopupMenu(ControllableContainer * rootContainer, bool showParameters = true, bool showTriggers = true, int indexOffset = 0, int maxSearchLevel = -1);
+	ControllableChooserPopupMenu(ControllableContainer* rootContainer, bool showParameters = true, bool showTriggers = true, int indexOffset = 0, int maxSearchLevel = -1, StringArray typesFilter = StringArray());
 	virtual ~ControllableChooserPopupMenu();
 
 	int indexOffset;
 	int maxDefaultSearchLevel;
 	bool showParameters;
 	bool showTriggers;
+	StringArray typesFilter;
 
 	Array<Controllable *> controllableList;
 	void populateMenu(PopupMenu *subMenu, ControllableContainer * container, int &currentId, int currentLevel = 0);
