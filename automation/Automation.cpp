@@ -231,6 +231,7 @@ void Automation::updateRange()
     {
         value->setRange(valueRange->x, valueRange->y);
         viewValueRange->setBounds(valueRange->x, valueRange->x, valueRange->y, valueRange->y);
+        viewValueRange->setPoint(valueRange->getPoint());
         for (auto& k : items) k->setValueRange(valueRange->x, valueRange->y);
     }
     else
