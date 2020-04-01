@@ -19,6 +19,12 @@ IntParameter::IntParameter(const String& niceName, const String& description, co
 	argumentsDescription = "int";
 }
 
+void IntParameter::setValueInternal(var& _value)
+{
+	if (value.isObject() || value.isArray()) return;
+	value =  value.isString()?value.toString().getIntValue():(int)value;
+}
+
 var IntParameter::getLerpValueTo(var targetValue, float weight)
 {
 	return (int)jmap(weight, floatValue(), (float)targetValue);
