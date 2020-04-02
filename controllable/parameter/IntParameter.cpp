@@ -21,8 +21,8 @@ IntParameter::IntParameter(const String& niceName, const String& description, co
 
 void IntParameter::setValueInternal(var& _value)
 {
-	if (value.isObject() || value.isArray()) return;
-	value =  value.isString()?value.toString().getIntValue():(int)value;
+	if (_value.isObject() || _value.isArray()) return;
+	value =  _value.isString()?_value.toString().getIntValue():(int)_value;
 }
 
 var IntParameter::getLerpValueTo(var targetValue, float weight)
