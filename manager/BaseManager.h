@@ -530,6 +530,8 @@ void BaseManager<T>::removeItems(Array<T *> itemsToRemove, bool addToUndo)
 template<class T>
 void BaseManager<T>::removeItem(T * item, bool addToUndo, bool notify)
 {
+	if (item == nullptr) return;
+
 	if (addToUndo && !UndoMaster::getInstance()->isPerforming)
 	{
 		if (Engine::mainEngine != nullptr && !Engine::mainEngine->isLoadingFile)
