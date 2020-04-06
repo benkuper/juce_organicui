@@ -68,6 +68,9 @@ public:
 
 	T * getItemWithName(const String &itemShortName, bool searchNiceNameToo = false, bool searchWithLowerCaseIfNotFound = true);
 
+	template<class IType>
+	Array<IType*> getItemsWithType();
+
     virtual void clear() override;
 	void askForRemoveBaseItem(BaseItem * item) override;
 	void askForDuplicateItem(BaseItem * item) override;
@@ -269,6 +272,19 @@ BaseManager<T>::~BaseManager()
 {
 
 	clear();
+}
+
+template<class T>
+template<class IType>
+Array<IType*> BaseManager<T>::getItemsWithType()
+{
+	Array<IType*> result;
+	for (auto& i : items)
+	{
+		if (IType* it = dynamic_cast<IType*>(i)) result.add(it);
+	}
+
+	return result;
 }
 
 template<class T>
