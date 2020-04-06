@@ -11,7 +11,7 @@
 DashboardItem::DashboardItem(Inspectable * _target) :
 	BaseItem("Dashboard Item",false)
 {
-	viewUISize->setValue(100, 20);
+	viewUISize->setPoint(100, 20);
 	
 	viewUIPosition->hideInEditor = false;
 	viewUISize->hideInEditor = false;
