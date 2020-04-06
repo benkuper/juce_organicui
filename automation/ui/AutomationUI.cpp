@@ -43,6 +43,8 @@ void AutomationUI::paint(Graphics& g)
 {
     if (getWidth() == 0 || !isShowing()) return;
 
+    if (!transparentBG) g.fillAll(bgColor);
+
     if (previewMode)
     {
         Path p;
@@ -235,7 +237,7 @@ void AutomationUI::paintOverChildren(Graphics& g)
 
 void AutomationUI::resized()
 {
-    if (previewMode || !isShowing()) return;
+    if (previewMode || !isVisible()) return;
     for (auto& kui : itemsUI) placeKeyUI(kui);
 }
 
