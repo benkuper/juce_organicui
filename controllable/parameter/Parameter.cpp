@@ -210,7 +210,7 @@ bool Parameter::hasRange()
 
 void Parameter::setValueInternal(var & _value) //to override by child classes
 {
-
+	jassert(!value.isVoid());
 	value = _value;
 
 	jassert(checkVarIsConsistentWithType());
