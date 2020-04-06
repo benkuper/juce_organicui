@@ -238,7 +238,11 @@ void TargetParameterUI::newMessage(const ContainerAsyncEvent & e)
 			}
 
 			bool isControllableValid = targetParameter->customCheckAssignOnNextChangeFunc(c);
-			if (isControllableValid) targetParameter->setValueFromTarget(c);
+			if (isControllableValid)
+			{
+				listeningToNextChange->setValue(false); //do it before value is change so there is no double value possible
+				targetParameter->setValueFromTarget(c);
+			}
 		}
 	}
 	
