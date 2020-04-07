@@ -1,3 +1,6 @@
+#pragma once
+
+
 class EasingUI :
 	public InspectableContentComponent,
 	public ContainerAsyncListener
@@ -79,6 +82,42 @@ public:
 	void resized() override;
 
 	void generatePathInternal() override;
+	void paintInternal(Graphics& g) override;
+
+	void easingControllableFeedbackUpdate(Controllable*) override;
+
+	void setShowEasingHandles(bool showFirst, bool showLast) override;
+
+	void mouseDown(const MouseEvent& e) override;
+	void mouseDrag(const MouseEvent& e) override;
+	void mouseUp(const MouseEvent& e) override;
+};
+
+class HoldEasingUI :
+	public EasingUI
+{
+public:
+	HoldEasingUI(HoldEasing* e);
+	void generatePathInternal() override;
+
+	// Inherited via EasingUI
+};
+
+class SineEasingUI :
+	public EasingUI
+{
+public:
+	SineEasingUI(SineEasing* e);
+
+	SineEasing* se;
+
+	EasingHandle h1;
+	Point<float> h1ValueAtMouseDown;
+
+	bool hitTest(int tx, int ty) override;
+
+	void resized() override;
+
 	void paintInternal(Graphics& g) override;
 
 	void easingControllableFeedbackUpdate(Controllable*) override;

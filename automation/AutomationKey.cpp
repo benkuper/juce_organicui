@@ -25,7 +25,7 @@ AutomationKey::AutomationKey(const float & _position, const float & _value) :
     value->setValue(_value);
 
     easingType = addEnumParameter("Easing Type", "The type of interpolation to use");
-    easingType->addOption("Linear", Easing::LINEAR, false)->addOption("Bezier", Easing::BEZIER);
+    easingType->addOption("Linear", Easing::LINEAR, false)->addOption("Bezier", Easing::BEZIER)->addOption("Hold", Easing::HOLD)->addOption("Sine", Easing::SINE);
 
     easingType->setValueWithData(GlobalSettings::getInstance()->defaultEasing->getValueDataAsEnum<Easing::Type>());
 
@@ -53,6 +53,8 @@ void AutomationKey::setEasing(Easing::Type type)
     {
     case Easing::LINEAR: e = new LinearEasing(); break;
     case Easing::BEZIER: e = new CubicEasing(); break;
+    case Easing::HOLD: e = new HoldEasing(); break;
+    case Easing::SINE: e = new SineEasing(); break;
     default:
         break;
     }
