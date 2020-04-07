@@ -224,7 +224,7 @@ float SineEasing::getValue(const float & weight)
 Rectangle<float> SineEasing::getBounds(bool includeHandles)
 {
 	Array<Point<float>> points;
-	points.add(Point<float>(start.x, start.y - std::abs(freqAmp->y)), Point<float>(end.x, end.y + std::abs(freqAmp->y)));
+	points.add(Point<float>(start.x, start.y - std::abs(freqAmp->y)), Point<float>(end.x, end.y + std::abs(freqAmp->y)), Point<float>(start.x, start.y + std::abs(freqAmp->y)), Point<float>(end.x, end.y - std::abs(freqAmp->y)));
 	return Rectangle<float>::findAreaContainingPoints(points.getRawDataPointer(), points.size());
 }
 
