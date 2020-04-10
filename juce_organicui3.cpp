@@ -50,6 +50,7 @@
 #include "script/ScriptManager.cpp"
 #include "script/ScriptUtil.cpp"
 #include "script/ui/ScriptEditor.cpp"
+#include "script/ui/ScriptManagerEditor.cpp"
 
 #include "ui/AssetManager.cpp"
 #include "ui/LookAndFeelOO.cpp"

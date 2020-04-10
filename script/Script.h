@@ -45,6 +45,8 @@ public:
 	SpinLock engineLock;
 	Thread::ThreadID lockedThreadId;
 
+	void chooseFileScript();
+
 	void loadScript();
 	void buildEnvironment();
 

@@ -102,28 +102,7 @@ void ScriptEditor::buttonClicked(Button * b)
 	{
 		if (script->filePath->stringValue().isEmpty())
 		{
-			FileChooser chooser("Create a new cacahuete",File(),"*.js");
-			bool result = chooser.browseForFileToSave(true);
-			if (result)
-			{
-				File f = chooser.getResult();
-				if (!f.exists())
-				{
-					f.create();
-
-					if (script->scriptTemplate != nullptr && script->scriptTemplate->isNotEmpty())
-					{
-						FileOutputStream fos(f);
-						if (fos.openedOk())
-						{
-							fos.writeText(*script->scriptTemplate,false,false,"\n");
-							fos.flush();
-						}
-					}
-				}
-
-				script->filePath->setValue(chooser.getResult().getFullPathName());
-			}
+			script->chooseFileScript();
 		} 
 		
 		if (script->filePath->stringValue().isEmpty()) return;
