@@ -1,4 +1,3 @@
-#include "EnumParameter.h"
 /*
   ==============================================================================
 
@@ -15,7 +14,7 @@ EnumParameter::EnumParameter(const String & niceName, const String &description,
 {
 	lockManualControlMode = true;
 
-	scriptObject.setMethod("getData", EnumParameter::getValueDataFromScript);
+	scriptObject.setMethod("getKey", EnumParameter::getValueKeyFromScript);
 	scriptObject.setMethod("addOption", EnumParameter::addOptionFromScript);
 	scriptObject.setMethod("removeOptions", EnumParameter::removeOptionsFromScript);
 }
@@ -132,12 +131,12 @@ bool EnumParameter::checkValueIsTheSame(var oldValue, var newValue)
 	return oldValue.toString() == newValue.toString();
 }
 
-var EnumParameter::getValueDataFromScript(const juce::var::NativeFunctionArgs & a)
+var EnumParameter::getValueKeyFromScript(const juce::var::NativeFunctionArgs& a)
 {
 	WeakReference<Parameter> c = getObjectFromJS<Parameter>(a);
 	if (c == nullptr || c.wasObjectDeleted()) return var();
-	EnumParameter * ep = dynamic_cast<EnumParameter *>(c.get());
-	return ep->getValueData();
+	EnumParameter* ep = dynamic_cast<EnumParameter*>(c.get());
+	return ep->getValueKey();
 }
 
 var EnumParameter::addOptionFromScript(const juce::var::NativeFunctionArgs& a)
