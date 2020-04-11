@@ -190,7 +190,7 @@ void Automation::computeValue()
     value->setValue(getValueAtPosition(position->floatValue()));
 }
 
-void Automation::setLength(float newLength, float stretch, float stickToEnd)
+void Automation::setLength(float newLength, bool stretch, bool stickToEnd)
 {
     if (length->floatValue() == newLength) return;
 
