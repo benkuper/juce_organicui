@@ -95,7 +95,7 @@ void FloatStepperUI::valueChanged(const var & value)
 void FloatStepperUI::sliderValueChanged(Slider * _slider)
 {
 	if (parameter.wasObjectDeleted()) return;
-	parameter->setValue(_slider->getValue());
+	parameter->setValue(slider->getValue());
 }
 
 void FloatStepperUI::controlModeChanged(Parameter* p)
@@ -115,7 +115,6 @@ void FloatStepperUI::controllableStateChanged()
 
 void FloatStepperUI::rangeChanged(Parameter *){
 	slider->setRange((int)parameter->minimumValue, (int)parameter->maximumValue, 1);
-
 }
 
 void FloatStepperUI::feedbackStateChanged()

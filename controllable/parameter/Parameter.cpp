@@ -13,6 +13,7 @@ Parameter::Parameter(const Type& type, const String& niceName, const String& des
 	defaultValue(initialValue),
 	value(initialValue),
 	canHaveRange(false),
+	rebuildUIOnRangeChange(true),
 	minimumValue(minValue),
 	maximumValue(maxValue),
     lockManualControlMode(false),

@@ -50,6 +50,7 @@ public:
 
 	//Range
 	bool canHaveRange;
+	bool rebuildUIOnRangeChange;
     var minimumValue;
     var maximumValue;
 
