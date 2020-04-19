@@ -30,7 +30,7 @@ public:
     float getValueAt(const float& position);
     float getLength() const;
 
-    void setValueRange(float minVal, float maxVal);
+    void setValueRange(float minVal, float maxVal, bool proportional = false);
     void clearValueRange();
 
     

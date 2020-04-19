@@ -1,3 +1,4 @@
+#include "AutomationKey.h"
 /*
   ==============================================================================
 
@@ -106,9 +107,11 @@ float AutomationKey::getLength() const
     return easing != nullptr ? easing->length : 0;
 }
 
-void AutomationKey::setValueRange(float minVal, float maxVal)
+void AutomationKey::setValueRange(float minVal, float maxVal, bool proportional)
 {
+    float nv = (proportional && value->hasRange()) ? value->getNormalizedValue() : -1;
     value->setRange(minVal, maxVal);
+    if (nv != -1) value->setNormalizedValue(nv);
 }
 
 void AutomationKey::clearValueRange()

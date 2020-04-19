@@ -29,6 +29,8 @@ public:
     bool allowKeysOutside;
 
     AutomationRecorder* recorder;
+    enum RangeRemapMode { ABSOLUTE, PROPORTIONAL };
+    EnumParameter * rangeRemapMode;
 
     AutomationKey * addKey(const float& position, const float& value, bool addToUndo = false);
     void addKeys(const Array<AutomationKey *> & keys, bool addToUndo = true, bool removeExistingKeys = true);
@@ -49,7 +51,6 @@ public:
 
     void updateRange();
 
-
     AutomationKey* getKeyForPosition(float pos); //to make binary search instead
     Array<AutomationKey *> getKeysBetweenPositions(float startPos, float endPos); //to make binary search instead
 
@@ -58,6 +59,7 @@ public:
     float getNormalizedValueAtPosition(float pos);
 
     void onContainerParameterChanged(Parameter* p) override;
+    void onControllableFeedbackUpdate(ControllableContainer* cc, Controllable* c) override;
     void onControllableStateChanged(Controllable* c) override;
 
     void afterLoadJSONDataInternal() override;

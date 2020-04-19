@@ -1,3 +1,4 @@
+#include "Automation.h"
 /*
   ==============================================================================
 
@@ -37,8 +38,10 @@ Automation::Automation(const String& name, AutomationRecorder * recorder, bool a
 
     valueRange = addPoint2DParameter("Range", "The range between allowed minimum value and maximum value");
     valueRange->canBeDisabledByUser = true;
-    valueRange->setPoint(0, 1);
 
+    rangeRemapMode = addEnumParameter("Range Remap Mode", "The way of recaculating the key values when changing the range.\nAbsolute means no modification is done. Proportional means that the relative value of the key will be maintained.");
+    rangeRemapMode->addOption("Absolute", ABSOLUTE)->addOption("Proportional", PROPORTIONAL);
+    valueRange->setPoint(0, 1);
 }
 
 Automation::~Automation()
@@ -232,7 +235,7 @@ void Automation::updateRange()
 {
     if (valueRange->enabled)
     {
-        if(valueRange->y < valueRange->x +.2f)
+        if (valueRange->y < valueRange->x + .2f)
         {
             valueRange->setPoint(valueRange->x, jmax(valueRange->y, valueRange->x + .2f));
             return;
@@ -241,7 +244,9 @@ void Automation::updateRange()
         value->setRange(valueRange->x, valueRange->y);
         viewValueRange->setBounds(valueRange->x, valueRange->x, valueRange->y, valueRange->y);
         viewValueRange->setPoint(valueRange->getPoint());
-        for (auto& k : items) k->setValueRange(valueRange->x, valueRange->y);
+
+        RangeRemapMode rrm = rangeRemapMode->getValueDataAsEnum<RangeRemapMode>();
+        for (auto& k : items) k->setValueRange(valueRange->x, valueRange->y, rrm == PROPORTIONAL);
     }
     else
     {
@@ -332,6 +337,17 @@ void Automation::onContainerParameterChanged(Parameter* p)
     else if (p == length)
     {
         position->setRange(0, length->floatValue());
+    }
+}
+
+void Automation::onControllableFeedbackUpdate(ControllableContainer* cc, Controllable* c)
+{
+    if (AutomationKey* k = c->getParentAs<AutomationKey>())
+    {
+        if (c == k->value || c == k->position)
+        {
+            computeValue();
+        }
     }
 }
 
