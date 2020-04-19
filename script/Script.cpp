@@ -9,6 +9,7 @@ Author:  Ben
 */
 
 #include "../engine/Engine.h"
+#include "Script.h"
 
 Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled) :
 	BaseItem("Script", canBeDisabled, false),
@@ -68,6 +69,33 @@ Script::~Script()
 	signalThreadShouldExit();
 	waitForThreadToExit(1000);
 	stopThread(1000);
+}
+
+void Script::chooseFileScript()
+{
+	FileChooser chooser("Create or load a cacahuete", File(), "*.js");
+	bool result = chooser.browseForFileToSave(false);
+
+	if (result)
+	{
+		File f = chooser.getResult();
+		if (!f.exists())
+		{
+			f.create();
+
+			if (scriptTemplate != nullptr && scriptTemplate->isNotEmpty())
+			{
+				FileOutputStream fos(f);
+				if (fos.openedOk())
+				{
+					fos.writeText(*scriptTemplate, false, false, "\n");
+					fos.flush();
+				}
+			}
+		}
+
+		filePath->setValue(chooser.getResult().getFullPathName());
+	}
 }
 
 void Script::loadScript()

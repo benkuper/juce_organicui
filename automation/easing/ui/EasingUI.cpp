@@ -1,3 +1,4 @@
+#include "EasingUI.h"
 /*
   ==============================================================================
 
@@ -45,10 +46,14 @@ void EasingUI::paint(Graphics& g)
 	g.setColour(c);
 	g.strokePath(drawPath, PathStrokeType(isMouseOver() ? 2 : 1));
 
+	//g.setColour(Colours::lightgoldenrodyellow);
+	//g.strokePath(hitPath, PathStrokeType(isMouseOver() ? 2 : 1));
+
+
 	//g.setColour(Colours::pink);
-	//for (int i = 0; i < 10; i++)
+	//for (int i = 0; i < 100; i++)
 	//{
-	//	float p = i * 1.0f / 10;
+	//	float p = i * 1.0f / 100;
 	//	float t = easing->start.x + p * easing->length;
 	//	g.fillEllipse(Rectangle<int>(0, 0, 4, 4).withCentre(getUIPosForValuePos(Point<float>(t, easing->getValue(p)))).toFloat());
 	//}
@@ -66,6 +71,9 @@ void EasingUI::resized()
 void EasingUI::generatePath()
 {
 	drawPath.clear();
+
+	if (getHeight() == 0 || getWidth() == 0) return;
+
 	drawPath.startNewSubPath(getUIPosForValuePos(easing->start).toFloat());
 
 	if (valueBounds.isEmpty() || (easing->start == easing->end)) return;
@@ -76,7 +84,7 @@ void EasingUI::generatePath()
 
 void EasingUI::generatePathInternal()
 {
-	autoGeneratePathWithPrecision();
+	autoGeneratePathWithPrecision(getWidth()/2);
 }
 
 void EasingUI::autoGeneratePathWithPrecision(int precision)
@@ -89,8 +97,9 @@ void EasingUI::autoGeneratePathWithPrecision(int precision)
 	{
 		float t = i * 1.f / precision;
 		float v = easing->getValue(t);
-		float tx = easing->start.x + (easing->end.x - easing->start.x) * t;
+		float tx = easing->start.x + t * easing->length;
 		Point<int> pv = getUIPosForValuePos(Point<float>(tx, v));
+		//if (pv.y > valueBounds.getBottom() + 10 || pv.y > valueBounds.getY() - 10) continue;
 		drawPath.lineTo(pv.toFloat());
 	}
 }
@@ -395,4 +404,99 @@ void EasingUI::EasingHandle::paint(Graphics& g)
 	if (isMouseOver()) c = c.brighter(.8f);
 	g.setColour(c);
 	g.fillEllipse(getLocalBounds().reduced(isMouseOver() ? 4 : 6).toFloat());
+}
+
+HoldEasingUI::HoldEasingUI(HoldEasing* e) :
+	EasingUI(e)
+{
+}
+
+void HoldEasingUI::generatePathInternal()
+{
+	drawPath.lineTo(getUIPosForValuePos(easing->end.withY(easing->start.y)).toFloat());
+	drawPath.lineTo(getUIPosForValuePos(easing->end).toFloat());
+}
+
+SineEasingUI::SineEasingUI(SineEasing* e) :
+	EasingUI(e),
+	se(e)
+{
+	addChildComponent(h1);
+	h1.addMouseListener(this, false);
+}
+
+bool SineEasingUI::hitTest(int tx, int ty)
+{
+	bool result = EasingUI::hitTest(tx, ty);
+
+	if (showFirstHandle && showLastHandle) result |= h1.getLocalBounds().contains(h1.getMouseXYRelative());
+	return result;
+}
+
+void SineEasingUI::resized()
+{
+	if (inspectable.wasObjectDeleted()) return;
+	hitPathPrecision = getWidth() / 4;
+
+	Point<int> p1 = Point<int>(getUIPosForValuePos(easing->start));
+	Point<int> a = getUIPosForValuePos(easing->start + se->freqAmp->getPoint());
+	h1.setBounds(juce::Rectangle<int>(0, 0, 16, 16).withCentre(a));
+
+	EasingUI::resized();
+}
+
+void SineEasingUI::paintInternal(Graphics& g)
+{
+	Point<int> p1 = Point<int>(getUIPosForValuePos(easing->start));
+
+	Colour c = LIGHTCONTOUR_COLOR;
+	if (isMouseOver()) c = c.brighter();
+	g.setColour(c);
+
+	if (showFirstHandle && showLastHandle) g.drawLine(p1.x, p1.y, h1.getBounds().getCentreX(), h1.getBounds().getCentreY());
+}
+
+void SineEasingUI::easingControllableFeedbackUpdate(Controllable* c)
+{
+	if (c == se->freqAmp)
+	{
+		resized();
+		repaint();
+	}
+}
+
+void SineEasingUI::setShowEasingHandles(bool showFirst, bool showLast)
+{
+	EasingUI::setShowEasingHandles(showFirst, showLast);
+	h1.setVisible(showFirstHandle && showLastHandle);
+	resized();
+	repaint();
+}
+
+void SineEasingUI::mouseDown(const MouseEvent& e)
+{
+	if (inspectable.wasObjectDeleted()) return;
+	EasingUI::mouseDown(e);
+
+	if (!e.mods.isCommandDown())
+	{
+		h1ValueAtMouseDown = se->freqAmp->getPoint();
+	}
+}
+
+void SineEasingUI::mouseDrag(const MouseEvent& e)
+{
+	if (inspectable.wasObjectDeleted()) return;
+
+	if (e.eventComponent == &h1)
+	{
+		Point<float> targetPoint = getValuePosForUIPos(e.getEventRelativeTo(this).getPosition()); //Point<float>(mp.x * 1.f / getWidth(), jmap<float>(mp.y, y1, y2, 0, 1));
+		se->freqAmp->setPoint(targetPoint - se->start);
+	}
+}
+
+void SineEasingUI::mouseUp(const MouseEvent& e)
+{
+	se->freqAmp->setUndoablePoint(h1ValueAtMouseDown, se->freqAmp->getPoint());
+
 }

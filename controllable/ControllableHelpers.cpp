@@ -11,11 +11,12 @@
 
 //CONTROLLABLE
 
-ControllableChooserPopupMenu::ControllableChooserPopupMenu(ControllableContainer * rootContainer, bool _showParameters, bool _showTriggers, int _indexOffset, int _maxDefaultSearchLevel) :
+ControllableChooserPopupMenu::ControllableChooserPopupMenu(ControllableContainer * rootContainer, bool _showParameters, bool _showTriggers, int _indexOffset, int _maxDefaultSearchLevel, StringArray typesFilter) :
 	indexOffset(_indexOffset),
 	maxDefaultSearchLevel(_maxDefaultSearchLevel),
 	showParameters(_showParameters),
-	showTriggers(_showTriggers)
+	showTriggers(_showTriggers),
+	typesFilter(typesFilter)
 {
 	int id = indexOffset + 1;
 
@@ -61,14 +62,9 @@ void ControllableChooserPopupMenu::populateMenu(PopupMenu * subMenu, Controllabl
 
 		if (!c->isControllableExposed) continue;
 
-		if (c->type == Controllable::TRIGGER)
-		{
-			if (!showTriggers) continue;
-		}
-		else
-		{
-			if (!showParameters) continue;
-		}
+		if (c->type == Controllable::TRIGGER && !showTriggers) continue;
+		if (c->type != Controllable::TRIGGER && !showParameters) continue;
+		if (!typesFilter.isEmpty() && !typesFilter.contains(c->getTypeString())) continue;
 
 		subMenu->addItem(currentId, c->niceName);
 		controllableList.add(c);

@@ -26,6 +26,7 @@ public:
 	enum TargetType {CONTAINER, CONTROLLABLE};
 	TargetType targetType;
 
+
 	bool useGhosting;
 	String ghostValue;
 
@@ -35,6 +36,8 @@ public:
 	bool showParentNameInEditor;
 	int maxDefaultSearchLevel;
 	int defaultParentLabelLevel;
+
+	StringArray typesFilter; //leave empty to allow all when not using custom functions
 
 	WeakReference<ControllableContainer> rootContainer;
 	

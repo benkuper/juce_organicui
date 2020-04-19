@@ -19,7 +19,6 @@ ColorParameter::ColorParameter(const String & niceName, const String & descripti
 
 	var minVal;
 	var maxVal;
-
 	for (int i = 0; i < 4; i++)
 	{
 		minVal.append(0);
@@ -29,7 +28,24 @@ ColorParameter::ColorParameter(const String & niceName, const String & descripti
 	minimumValue = minVal;
 	maximumValue = maxVal;
 
-	setColor(initialColor, false, true);
+	defaultValue = var();
+	if (mode == FLOAT)
+	{
+		defaultValue.append(initialColor.getFloatRed());
+		defaultValue.append(initialColor.getFloatGreen());
+		defaultValue.append(initialColor.getFloatBlue());
+		defaultValue.append(initialColor.getFloatAlpha());
+	}
+	else
+	{
+		defaultValue.append(initialColor.getRed());
+		defaultValue.append(initialColor.getGreen());
+		defaultValue.append(initialColor.getBlue());
+		defaultValue.append(initialColor.getAlpha());
+	}
+
+	value = defaultValue.clone();
+
 }
 
 ColorParameter::~ColorParameter() {}

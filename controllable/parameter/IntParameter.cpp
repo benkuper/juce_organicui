@@ -1,4 +1,3 @@
-#include "IntParameter.h"
 /*
   ==============================================================================
 
@@ -15,8 +14,15 @@ IntParameter::IntParameter(const String& niceName, const String& description, co
 	hexMode(false)
 {
 	canHaveRange = true;
+	rebuildUIOnRangeChange = false;
 	canBeAutomated = true;
 	argumentsDescription = "int";
+}
+
+void IntParameter::setValueInternal(var& _value)
+{
+	if (_value.isObject() || _value.isArray()) return;
+	value =  _value.isString()?_value.toString().getIntValue():(int)_value;
 }
 
 var IntParameter::getLerpValueTo(var targetValue, float weight)
@@ -41,7 +47,7 @@ void IntParameter::setWeightedValue(Array<var> values, Array<float> weights)
 
 bool IntParameter::hasRange()
 {
-	return (float)minimumValue != INT32_MIN && (float)maximumValue != INT32_MAX;
+	return (float)minimumValue != INT32_MIN || (float)maximumValue != INT32_MAX;
 
 }
 

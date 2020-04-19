@@ -30,7 +30,7 @@ Script * ScriptManager::createItem()
 
 InspectableEditor * ScriptManager::getEditor(bool isRoot)
 {
-	return BaseManager::getEditor(isRoot);
+	return new ScriptManagerEditor(this, isRoot);
 }
 
 bool ScriptManager::callFunctionOnAllItems(const Identifier & function, var a)

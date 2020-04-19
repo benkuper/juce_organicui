@@ -42,14 +42,19 @@ void InspectableSelector::startSelection(Component * parent, Array<Component*> _
 	
 	currentSelectionManager = manager != nullptr ? manager : InspectableSelectionManager::mainSelectionManager;
 	
-	if (_selectables.size() == 0) return;
+	if (_selectables.size() == 0)
+	{
+		selectablesParent = nullptr;
+		selectables.clear();
+		inspectables.clear();
+		return;
+	}
 
 	selectablesParent = parent;
 	selectables = _selectables;
 	inspectables = relatedInspectables;
 
 	clearSelectionAtEnd = clearSelection;
-
 
 	selectablesParent->addAndMakeVisible(this);
 	selectablesParent->addMouseListener(this, false);

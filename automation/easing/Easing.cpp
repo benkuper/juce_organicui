@@ -1,3 +1,4 @@
+#include "Easing.h"
 /*
   ==============================================================================
 
@@ -9,7 +10,7 @@
 */
 
 const String Easing::typeNames[Easing::TYPE_MAX]{"Linear", "Bezier", "Hold","Sine"};
-
+ 
 Easing::Easing(Type type) :
 	ControllableContainer("Easing"),
 	type(type),
@@ -49,10 +50,10 @@ EasingUI * LinearEasing::createUI()
 }
 
 
-//EasingUI* HoldEasing::createUI()
-//{
-//	return new HoldEasingUI(this);
-//}
+EasingUI* HoldEasing::createUI()
+{
+	return new HoldEasingUI(this);
+}
 
 EasingUI* CubicEasing::createUI()
 {
@@ -68,7 +69,6 @@ float LinearEasing::getValue(const float & weight)
 Rectangle<float> LinearEasing::getBounds(bool includeHandles)
 {
 	return 	Rectangle<float>(Point<float>(jmin(start.x, end.x), jmin(start.y, end.y)), Point<float>(jmax(start.x, end.x), jmax(start.y, end.y)));
-
 }
 
 
@@ -207,7 +207,13 @@ SineEasing::SineEasing() :
 {
 	freqAmp = addPoint2DParameter("Frequency Amplitude", "Frequency and amplitude of the sine wave");
 	freqAmp->setBounds(.01f, -1, 1, 2);
-	freqAmp->setPoint(.2f, .5f);
+	freqAmp->setPoint(1.f, .25f);
+}
+
+void SineEasing::updateKeysInternal()
+{
+	if (length == 0) return;
+	freqAmp->setBounds(0, INT32_MIN, length, INT32_MAX);
 }
 
 float SineEasing::getValue(const float & weight)
@@ -217,12 +223,14 @@ float SineEasing::getValue(const float & weight)
 
 Rectangle<float> SineEasing::getBounds(bool includeHandles)
 {
-	return Rectangle<float>();
+	Array<Point<float>> points;
+	points.add(Point<float>(start.x, start.y - std::abs(freqAmp->y)), Point<float>(end.x, end.y + std::abs(freqAmp->y)), Point<float>(start.x, start.y + std::abs(freqAmp->y)), Point<float>(end.x, end.y - std::abs(freqAmp->y)));
+	return Rectangle<float>::findAreaContainingPoints(points.getRawDataPointer(), points.size());
 }
 
 
-//EasingUI* SineEasing::createUI()
-//{
-//	return new SineEasingUI(this);
-//}
+EasingUI* SineEasing::createUI()
+{
+	return new SineEasingUI(this);
+}
 

@@ -8,8 +8,6 @@
   ==============================================================================
 */
 
-#include "TargetParameterUI.h"
-
 TargetParameterUI::TargetParameterUI(TargetParameter * parameter, const String &_noTargetText) :
 	ParameterUI(parameter),
 	noTargetText(_noTargetText),
@@ -23,7 +21,6 @@ TargetParameterUI::TargetParameterUI(TargetParameter * parameter, const String &
 
 	if (targetParameter->customCheckAssignOnNextChangeFunc != nullptr)
 	{
-		
 		listeningToNextChange.reset(new BoolParameter("Learn", "When this parameter is on, any parameter that changes will be auto assigned to this target", false));
 		listeningToNextChange->addAsyncParameterListener(this);
 		listeningToNextChangeBT.reset(listeningToNextChange->createToggle());
@@ -161,7 +158,7 @@ void TargetParameterUI::showPopupAndGetTarget()
 			c = targetParameter->customGetTargetFunc(targetParameter->showTriggers,targetParameter->showParameters);
 		} else
 		{
-			ControllableChooserPopupMenu p(targetParameter->rootContainer, targetParameter->showParameters, targetParameter->showTriggers,0,targetParameter->maxDefaultSearchLevel);
+			ControllableChooserPopupMenu p(targetParameter->rootContainer, targetParameter->showParameters, targetParameter->showTriggers, 0, targetParameter->maxDefaultSearchLevel, targetParameter->typesFilter);
 			c = p.showAndGetControllable();
 		}
 		if (c != nullptr) targetParameter->setValueFromTarget(c);
@@ -241,7 +238,11 @@ void TargetParameterUI::newMessage(const ContainerAsyncEvent & e)
 			}
 
 			bool isControllableValid = targetParameter->customCheckAssignOnNextChangeFunc(c);
-			if (isControllableValid) targetParameter->setValueFromTarget(c);
+			if (isControllableValid)
+			{
+				listeningToNextChange->setValue(false); //do it before value is change so there is no double value possible
+				targetParameter->setValueFromTarget(c);
+			}
 		}
 	}
 	

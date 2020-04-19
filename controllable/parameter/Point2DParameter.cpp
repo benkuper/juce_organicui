@@ -146,6 +146,15 @@ ControllableUI * Point2DParameter::createDefaultUI(Controllable * targetControll
 var Point2DParameter::getCroppedValue(var originalValue)
 {
 	jassert(originalValue.isArray() && minimumValue.isArray() && maximumValue.isArray());
+	if (!originalValue.isArray())
+	{
+		var val;
+		val.append((int)originalValue);
+		val.append(0);
+		return val;
+	}
+
+	if (minimumValue.size() < 2 || maximumValue.size() < 2) return originalValue;
 
 	var val;
 	for (int i = 0; i < 2; i++) val.append(jlimit(minimumValue[i], maximumValue[i], originalValue[i]));

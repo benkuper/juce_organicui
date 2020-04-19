@@ -61,7 +61,7 @@ public:
 	virtual float getValue(const float& weight) override;
 	Rectangle<float> getBounds(bool includeHandles) override;
 
-	//EasingUI* createUI() override;
+	EasingUI* createUI() override;
 };
 
 class CubicEasing :
@@ -103,10 +103,11 @@ public:
 	SineEasing();
 	Point2DParameter * freqAmp;
 
-	virtual float getValue(const float &weight) override;
+	void updateKeysInternal() override;
 
+	virtual float getValue(const float &weight) override;
 	Rectangle<float> getBounds(bool includeHandles) override;
 
-	//EasingUI * createUI() override;
+	EasingUI * createUI() override;
 };
 

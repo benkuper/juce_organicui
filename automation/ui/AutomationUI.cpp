@@ -45,6 +45,8 @@ void AutomationUI::paint(Graphics& g)
 {
     if (getWidth() == 0 || !isShowing()) return;
 
+    if (!transparentBG) g.fillAll(bgColor);
+
     if (previewMode)
     {
         Path p;
@@ -110,40 +112,50 @@ void AutomationUI::drawLinesBackground(Graphics& g)
     {
         while (decimalGap < minGap)
         {
-            decimalSteps *= 2;
+            if (decimalSteps == 1) decimalSteps *= 2.5f;
+            else decimalSteps *= 2;
             decimalGap = (getHeight() / (end - start)) * decimalSteps / numDecUnitPerUnit;
         }
     }
-    else
+
+    while (unitGap < minGap)
     {
-        while (unitGap < minGap)
-        {
-            unitSteps *= 2;
-            unitGap = ((getHeight() / (end - start)) * numDecUnitPerUnit) * unitSteps;
-        }
+        unitSteps *= 2;
+        unitGap = ((getHeight() / (end - start))) * unitSteps;
     }
 
     int unitStart = floor((start / unitSteps)) * unitSteps;
     int unitEndTime = jmax<int>(ceil((end / unitSteps)) * unitSteps, unitStart + 1);
 
     g.setFont(12);
+    float unitFadeAlpha = jlimit<float>(0, 1, jmap<float>(unitGap, minGap, fadeGap, 0, 1));
     float fadeAlpha = jlimit<float>(0, 1, jmap<float>(decimalGap, minGap, fadeGap, 0, 1));
 
+    int uIndex = 0;
     for (float i = unitStart; i <= unitEndTime; i += unitSteps)
     {
         int mty = getYForValue(i);
 
-        //Draw minute
-        g.setColour(BG_COLOR.brighter(.3f).withAlpha(.7f));
-        //g.drawLine(tx, 0, tx, getHeight(), 1);
-        g.drawHorizontalLine(mty, 30, (float)getWidth());
-        //g.setColour(BG_COLOR.darker(.6f));
-        //g.drawRoundedRectangle(getLocalBounds().toFloat(), 2, 2);
+        if (mty >= 0 && mty <= getHeight())
+        {
+            //Draw minute
+            float alpha = 1;
+            if (uIndex % 2 == 0) alpha = unitFadeAlpha;
 
-        //g.setColour(BG_COLOR.brighter(.7f));
-        //g.fillRoundedRectangle( 0, mty - 10, 20, 14, 2);
-        g.setColour(BG_COLOR.brighter(.3f));
-        g.drawText(String(i,1), 2, mty - 10, 30, 14, Justification::left);
+            g.setColour(BG_COLOR.brighter(.3f).withAlpha(alpha * .4f));
+            //g.drawLine(tx, 0, tx, getHeight(), 1);
+            g.drawHorizontalLine(mty, 30, (float)getWidth());
+            //g.setColour(BG_COLOR.darker(.6f));
+            //g.drawRoundedRectangle(getLocalBounds().toFloat(), 2, 2);
+
+            //g.setColour(BG_COLOR.brighter(.7f));
+            //g.fillRoundedRectangle( 0, mty - 10, 20, 14, 2);
+            g.setColour(BG_COLOR.brighter(.2f).withAlpha(alpha * .5f));
+            g.drawText(String(i, 2), 2, mty - 10, 35, 14, Justification::left);
+
+        }
+    
+        uIndex++;
 
         if (showSeconds)
         {
@@ -151,20 +163,17 @@ void AutomationUI::drawLinesBackground(Graphics& g)
             for (float s = decimalSteps; s < numDecUnitPerUnit && i + s/numDecUnitPerUnit <= end; s += decimalSteps)
             {
                 int sty = getYForValue(i + s*1.0f / numDecUnitPerUnit);
+                if (sty >= 0 && sty <= getHeight())
+                {
+                    float alpha = 1;
+                    if (sIndex % 2 == 0) alpha = fadeAlpha;
+                    g.setColour(BG_COLOR.brighter(.2f).withAlpha(alpha * .2f));
+                    //g.drawLine(tx, 0, tx, getHeight(), 1);
+                    g.drawHorizontalLine(sty, 30, (float)getWidth());
+                    g.setColour(BG_COLOR.brighter(.2f).withAlpha(alpha));
+                    g.drawText(String(s / numDecUnitPerUnit, 2), 2, sty - 10, 35, 14, Justification::left);
 
-                float alpha = 1;
-                if (sIndex % 2 == 0) alpha = fadeAlpha;
-                g.setColour(BG_COLOR.brighter(.3f).withAlpha(alpha*.5f));
-                //g.drawLine(tx, 0, tx, getHeight(), 1);
-                g.drawHorizontalLine(sty, 25, (float)getWidth());
-                g.setColour(BG_COLOR.brighter(.3f).withAlpha(alpha));
-                g.drawText(String(s / numDecUnitPerUnit,1), 2, sty - 10, 25, 14, Justification::left);
-
-                //show subsecond ?
-                /*
-                g.setColour(BG_COLOR);
-                g.drawVerticalLine(tx, 0, (float)getHeight());
-                */
+                }
 
                 sIndex++;
 
@@ -189,14 +198,18 @@ void AutomationUI::paintOverChildren(Graphics& g)
             if (numRKeys > 0)
             {
                 g.setColour(Colours::red.withAlpha(.3f));
-                g.fillRect(getLocalBounds().withLeft(getXForPos(manager->recorder->keys[0].x)).withRight(getXForPos(manager->position->floatValue())));
+                g.fillRect(getLocalBounds().withLeft(getXForPos(manager->recorder->keys[0].time)).withRight(getXForPos(manager->position->floatValue())));
 
                 if (numRKeys >= 2)
                 {
                     Path p;
-                    Point<float> k = manager->recorder->keys[0];
-                    p.startNewSubPath(getPosInView(manager->recorder->keys[0]).toFloat());
-                    for (int i = 1; i < numRKeys; i++)  p.lineTo(getPosInView(manager->recorder->keys[i]).toFloat());
+                    Point<float> k0(manager->recorder->keys[0].time, manager->recorder->keys[0].value);
+                    p.startNewSubPath(getPosInView(k0).toFloat());
+                    for (int i = 1; i < numRKeys; i++)
+                    {
+                        Point<float> ki(manager->recorder->keys[i].time, manager->recorder->keys[i].value);
+                        p.lineTo(getPosInView(ki).toFloat());
+                    }
                     
                     g.setColour(Colours::orangered);
                     g.strokePath(p, PathStrokeType(2));
@@ -208,15 +221,17 @@ void AutomationUI::paintOverChildren(Graphics& g)
     if (paintingMode && paintingPoints.size() > 0)
     {
         g.setColour(YELLOW_COLOR);
+        
         Path p; 
         p.startNewSubPath(getPosInView(paintingPoints[0]).toFloat());
         for (auto& pp : paintingPoints)
         {
             Point<int> vpp = getPosInView(pp);
-            g.fillEllipse(Rectangle<int>(0, 0, 3, 3).withCentre(vpp).toFloat());
+            g.fillEllipse(Rectangle<int>(0, 0, 2,2).withCentre(vpp).toFloat());
             p.lineTo(vpp.toFloat());
         }
 
+        g.setColour(YELLOW_COLOR.withAlpha(.5f));
         g.strokePath(p, PathStrokeType(1));
     }
 }
@@ -224,7 +239,7 @@ void AutomationUI::paintOverChildren(Graphics& g)
 
 void AutomationUI::resized()
 {
-    if (previewMode || !isShowing()) return;
+    if (previewMode || !isVisible()) return;
     for (auto& kui : itemsUI) placeKeyUI(kui);
 }
 
@@ -232,10 +247,12 @@ void AutomationUI::placeKeyUI(AutomationKeyUI* ui)
 {
     if (ui == nullptr || !ui->isVisible()) return;
 
+    Rectangle<int> r = getLocalBounds();
+
     Point<int> p = getPosInView(ui->item->getPosAndValue());
     Rectangle<int> pr = Rectangle<int>(0, 0, 20, 20).withCentre(p);
     if (ui->item->easing != nullptr) pr = pr.getUnion(getBoundsInView(ui->item->easing->getBounds(true)));
-    pr.expand(5, 5);
+    pr = pr.expanded(5, 5).getIntersection(r);
     ui->setBounds(pr);
     ui->setValueBounds(getViewBounds(pr));
 
@@ -336,6 +353,7 @@ void AutomationUI::mouseDown(const MouseEvent& e)
             paintingMode = true;
             paintingPoints.clear();
             paintingPoints.add(getViewPos(e.getPosition()));
+            lastPaintingPoint = paintingPoints[0];
         }
         else if (e.mods.isAltDown())
         {
@@ -370,16 +388,63 @@ void AutomationUI::mouseDrag(const MouseEvent& e)
     {
         if (paintingMode)
         {
-            Point<float> p = getViewPos(e.getPosition());
-            if (p.x > paintingPoints[paintingPoints.size() - 1].x) paintingPoints.add(p);
+            Point<float> newPoint = getViewPos(e.getPosition());
+            
+            float minX = jmin(newPoint.x, lastPaintingPoint.x);
+            float maxX = jmax(newPoint.x, lastPaintingPoint.x);
+
+            int inKeyStart = -1;
+            int inKeyEnd = -1;
+            int indexBeforeNewPoint = 0;
+            int indexAfterNewPoint = paintingPoints.size();
+
+            for (int i = 0; i < paintingPoints.size(); i++)
+            {
+                Point<float> p = paintingPoints[i];
+                if (p.x >= newPoint.x) indexAfterNewPoint = jmin(indexAfterNewPoint, i);
+                else indexBeforeNewPoint = jmax(indexBeforeNewPoint, i);
+
+                if (p.x == lastPaintingPoint.x) continue;
+
+                if (p.x >= minX && p.x <= maxX)
+                {
+                    inKeyStart = inKeyStart == -1 ? i : jmin(i, inKeyStart);
+                    inKeyEnd = jmax(inKeyEnd, i);
+                }
+            }
+
+            bool foundKeysToRemove = inKeyStart != -1 && inKeyEnd != -1;
+            if (foundKeysToRemove)
+            {
+                paintingPoints.removeRange(inKeyStart, inKeyEnd - inKeyStart+1);
+            }
+            
+            paintingPoints.insert(indexAfterNewPoint, newPoint);
+            lastPaintingPoint.setXY(newPoint.x, newPoint.y);
             repaint();
         }
         else if (e.mods.isAltDown())
         {
             if (!manager->valueRange->enabled)
             {
-                float deltaVal = getValueForY(e.getDistanceFromDragStartY(), true);
-                manager->viewValueRange->setPoint(viewValueRangeAtMouseDown.x + deltaVal, viewValueRangeAtMouseDown.y + deltaVal);
+                if (e.mods.isShiftDown())
+                {
+                    float pRel = 1 - (e.getMouseDownPosition().y * 1.0f / getHeight());
+                    float rangeAtMouseDown = (viewValueRangeAtMouseDown.y - viewValueRangeAtMouseDown.x);
+                    float tRange = rangeAtMouseDown + (e.getOffsetFromDragStart().y / 10.0f);
+                    if (tRange > .2f)
+                    {
+                        float rangeDiff = tRange - rangeAtMouseDown;
+                        float tMin = viewValueRangeAtMouseDown.x - rangeDiff * pRel;
+                        float tMax = viewValueRangeAtMouseDown.y + rangeDiff * (1 - pRel);
+                        manager->viewValueRange->setPoint(tMin, tMax);
+                    }
+                }
+                else
+                {
+                    float deltaVal = getValueForY(e.getDistanceFromDragStartY(), true);
+                    manager->viewValueRange->setPoint(viewValueRangeAtMouseDown.x + deltaVal, viewValueRangeAtMouseDown.y + deltaVal);
+                }
             }
         }
         {
@@ -454,8 +519,9 @@ int AutomationUI::getXForPos(float x, bool relative)
 
 float AutomationUI::getValueForY(int y, bool relative)
 {
-    float rel = (1- y*1.0f / getHeight()) * (manager->viewValueRange->y - manager->viewValueRange->x);
-    return relative ? 1-rel : manager->viewValueRange->x + rel;
+    float valRange = (manager->viewValueRange->y - manager->viewValueRange->x);
+    float rel = (1 - y * 1.0f / getHeight());
+    return relative ? (1 - rel)* valRange : manager->viewValueRange->x + rel * valRange;
 }
 
 int AutomationUI::getYForValue(float x, bool relative)

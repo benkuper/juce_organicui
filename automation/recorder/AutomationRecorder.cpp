@@ -9,10 +9,12 @@
 */
 
 AutomationRecorder::AutomationRecorder() :
-	EnablingControllableContainer("Recorder")
+	EnablingControllableContainer("Recorder"),
+	recorderNotifier(2)
 {
 	input = addTargetParameter("Input Value", "Input value used for recording");
 	input->showTriggers = false;
+
 	//input->customGetTargetFunc = &ModuleManager::showAllValuesAndGetControllable;
 	//input->customGetControllableLabelFunc = &Module::getTargetLabelForValueControllable;
 	//input->customCheckAssignOnNextChangeFunc = &ModuleManager::checkControllableIsAValue;
@@ -58,7 +60,8 @@ void AutomationRecorder::addKeyAt(float time)
 {
 	if (isRecording->boolValue() && currentInput != nullptr)
 	{
-		keys.add(Point<float>(time, currentInput->hasRange() ? currentInput->getNormalizedValue() : jlimit<float>(0, 1, currentInput->getValue())));
+		keys.add(RecordValue(time, currentInput->getValue()));
+		recorderNotifier.addMessage(new RecorderEvent(RecorderEvent::RECORDER_UPDATED));
 	}
 }
 
@@ -76,25 +79,30 @@ void AutomationRecorder::startRecording()
 		cancelRecording();
 	}
 
-
 	isRecording->setValue(true);
+
+	recorderNotifier.addMessage(new RecorderEvent(RecorderEvent::RECORDER_UPDATED));
 }
 
 void AutomationRecorder::cancelRecording()
 {
 	isRecording->setValue(false);
 	clearKeys();
+
+	recorderNotifier.addMessage(new RecorderEvent(RecorderEvent::RECORDER_UPDATED));
 }
 
-Array<Point<float>> AutomationRecorder::stopRecordingAndGetKeys()
+Array<AutomationRecorder::RecordValue> AutomationRecorder::stopRecordingAndGetKeys()
 {
 	isRecording->setValue(false);
 	if (autoDisarm->boolValue()) arm->setValue(false);
 
-	Array<Point<float>> result;
+	Array<RecordValue> result;
 	result.addArray(keys);
 
 	clearKeys();
+
+	recorderNotifier.addMessage(new RecorderEvent(RecorderEvent::RECORDER_UPDATED));
 
 	return result;
 }
@@ -107,6 +115,10 @@ bool AutomationRecorder::shouldRecord()
 void AutomationRecorder::onContainerParameterChanged(Parameter * p)
 {
 	if (p == input) setCurrentInput(dynamic_cast<Parameter *>(input->target.get()));
+	else if (p == arm)
+	{
+		recorderNotifier.addMessage(new RecorderEvent(RecorderEvent::RECORDER_UPDATED));
+	}
 }
 
 void AutomationRecorder::inspectableDestroyed(Inspectable * i)

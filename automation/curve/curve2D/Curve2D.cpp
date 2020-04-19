@@ -13,7 +13,8 @@
 
 Curve2D::Curve2D(const String &name) :
     BaseManager(name),
-    showUIInEditor(true)
+    showUIInEditor(true),
+    recorder(nullptr)
 {
     isSelectable = false;
 
@@ -74,6 +75,75 @@ void Curve2D::removeItemInternal(Curve2DKey*)
 void Curve2D::removeItemsInternal()
 {
     if (!isCurrentlyLoadingData) updateCurve(false);
+}
+
+float Curve2D::addFromPointsAndSimplify(Array<Point<float>> sourcePoints, bool clearBeforeAdd, Array<float> pointTimes)
+{
+    if (clearBeforeAdd) clear();
+
+    float lengthBefore = length->floatValue();
+
+    Array<float> points;
+    for (auto& pp : sourcePoints) points.add(pp.x, pp.y);
+    float* result;
+    unsigned int resultNum = 0;
+    unsigned int* origIndex;
+    unsigned int* corners = nullptr;
+    unsigned int cornersLength = 0;
+    unsigned int* cornerIndex = nullptr;
+    unsigned int cornerIndexLength = 0;
+
+    curve_fit_corners_detect_fl(points.getRawDataPointer(), points.size(), 2, 0, .02f, 20, 30, &corners, &cornersLength);
+    if (cornersLength == 0) corners = nullptr;
+
+    curve_fit_cubic_to_points_fl(points.getRawDataPointer(), points.size(), 2, .1f, CURVE_FIT_CALC_HIGH_QUALIY, corners, cornersLength, &result, &resultNum, &origIndex, &cornerIndex, &cornerIndexLength);
+
+    int numPoints = ((int)resultNum);
+
+    Array<Curve2DKey*> keys;
+    CubicEasing2D* prevEasing = nullptr;
+
+    for (int i = 0; i < numPoints; i++)
+    {
+        int index = i * 6;
+        Point<float> h1(result[index + 0], result[index + 1]);
+        Point<float> rp(result[index + 2], result[index + 3]);
+        Point<float> h2(result[index + 4], result[index + 5]);
+
+
+        if (prevEasing != nullptr && h1.getDistanceFromOrigin() < 100)
+        {
+            prevEasing->anchor2->setPoint(h1 - rp);
+        }
+
+        if (rp.getDistanceFromOrigin() > 100)
+        {
+            break;
+        }
+
+        Curve2DKey* k = new Curve2DKey();
+        k->position->setPoint(rp);
+
+        k->easingType->setValueWithData(Easing2D::BEZIER);
+        CubicEasing2D* ce = (CubicEasing2D*)k->easing.get();
+        if (h2.getDistanceFromOrigin() < 100) ce->anchor1->setPoint(h2 - rp);
+
+        keys.add(k);
+
+        prevEasing = ce;
+    }
+
+    delete result;
+    delete origIndex;
+    delete corners;
+    delete cornerIndex;
+
+   addItems(keys); 
+   float addedLength = length->floatValue() - lengthBefore;
+
+   //TODO implement automation curve construction from times array (needs a getClosestPointForPosition in Easing2D)
+
+   return addedLength;
 }
 
 void Curve2D::updateCurve(bool relativeAutomationKeySyncMode)

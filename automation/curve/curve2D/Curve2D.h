@@ -21,6 +21,8 @@ public:
     FloatParameter* length;
     juce::Rectangle<float> bounds;
 
+    AutomationRecorder* recorder;
+
     Point2DParameter* value;
 
     enum ControlMode { MANUAL, AUTOMATION };
@@ -38,12 +40,15 @@ public:
     void removeItemInternal(Curve2DKey* k) override;
     void removeItemsInternal() override;
 
+    virtual float addFromPointsAndSimplify(Array<Point<float>> points, bool clearBeforeAdd = false, Array<float> pointTimes = Array<float>());
+
     void updateCurve(bool relativeAutomationKeySyncMode = true);
     void computeValue();
 
     Curve2DKey* getKeyForPosition(float pos);
     Point<float> getValueAtNormalizedPosition(float pos);
     Point<float> getValueAtPosition(float pos);
+
 
     void onContainerParameterChanged(Parameter* p) override;
     void onControllableFeedbackUpdate(ControllableContainer* cc, Controllable* c) override;

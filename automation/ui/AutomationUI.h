@@ -28,6 +28,7 @@ public:
 
     bool paintingMode;
     Array<Point<float>> paintingPoints;
+    Point<float> lastPaintingPoint;
 
     bool previewMode; //avoid repainting everything
     bool showNumberLines;

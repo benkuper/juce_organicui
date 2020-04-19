@@ -42,7 +42,7 @@ public:
     void updateNextKeys(int start = 0, int end = -1);
     void computeValue();
 
-    void setLength(float newLength, float stretch = false, float stickToEnd = false);
+    void setLength(float newLength, bool stretch = false, bool stickToEnd = false);
 
     Point<float> getPosAndValue();
     juce::Rectangle<float> getBounds();

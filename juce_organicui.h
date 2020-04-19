@@ -281,6 +281,7 @@ using namespace juce;
 #include "script/ScriptManager.h"
 #include "script/ScriptUtil.h"
 #include "script/ui/ScriptEditor.h"
+#include "script/ui/ScriptManagerEditor.h"
 
 
 #include "logger/CustomLogger.h"

@@ -1,3 +1,4 @@
+#include "Curve2DUI.h"
 /*
   ==============================================================================
 
@@ -21,6 +22,7 @@ Curve2DUI::Curve2DUI(Curve2D* manager) :
 
     animateItemOnAdd = false;
     manager->addAsyncContainerListener(this);
+    if (manager->recorder != nullptr) manager->recorder->addAsyncCoalescedRecorderListener(this);
 
     addExistingItems(false);
     setSize(100, 300);
@@ -28,7 +30,11 @@ Curve2DUI::Curve2DUI(Curve2D* manager) :
 
 Curve2DUI::~Curve2DUI()
 {
-    if(!inspectable.wasObjectDeleted()) manager->removeAsyncContainerListener(this);
+    if (!inspectable.wasObjectDeleted())
+    {
+        manager->removeAsyncContainerListener(this);
+        if (manager->recorder != nullptr) manager->recorder->removeAsyncRecorderListener(this);
+    }
 
     for (auto& ui : itemsUI)
     {
@@ -53,11 +59,37 @@ void Curve2DUI::paintOverChildren(Graphics& g)
         for (auto& pp : paintingPoints)
         {
             Point<int> vpp = getPosInView(pp);
-            g.fillEllipse(Rectangle<int>(0, 0, 3, 3).withCentre(vpp).toFloat());
+            g.fillEllipse(Rectangle<int>(0, 0, 2, 2).withCentre(vpp).toFloat());
             p.lineTo(vpp.toFloat());
         }
 
+        g.setColour(YELLOW_COLOR.withAlpha(.5f));
         g.strokePath(p, PathStrokeType(1));
+    }
+
+    //recorder
+    if (manager->recorder != nullptr)
+    {
+        if (manager->recorder->isRecording->boolValue())
+        {
+            int numRKeys = manager->recorder->keys.size();
+            if (numRKeys > 0)
+            {
+                if (numRKeys >= 2)
+                {
+                    Path p;
+                    Point<float> k0(manager->recorder->keys[0].value[0], manager->recorder->keys[0].value[1]);
+                    p.startNewSubPath(getPosInView(k0).toFloat());
+                    for (int i = 1; i < numRKeys; i++)
+                    {
+                        Point<float> ki(manager->recorder->keys[i].value[0], manager->recorder->keys[i].value[1]);
+                        p.lineTo(getPosInView(ki).toFloat());
+                    }
+                    g.setColour(Colours::orangered);
+                    g.strokePath(p, PathStrokeType(2));
+                }
+            }
+        }
     }
 }
 
@@ -156,62 +188,7 @@ void Curve2DUI::mouseUp(const MouseEvent& e)
 {
     if (paintingMode)
     {
-        Array<float> points;
-        for (auto& pp : paintingPoints) points.add(pp.x, pp.y);
-        float* result;
-        unsigned int resultNum = 0;
-        unsigned int * origIndex;
-        unsigned int* corners = nullptr;
-        unsigned int cornersLength = 0;
-        unsigned int* cornerIndex = nullptr;
-        unsigned int cornerIndexLength = 0;
-
-        curve_fit_corners_detect_fl(points.getRawDataPointer(), points.size(), 2, 0, .02f, 20, 30, &corners, &cornersLength);
-        if (cornersLength == 0) corners = nullptr;
-
-        curve_fit_cubic_to_points_fl(points.getRawDataPointer(), points.size(), 2, .1f, CURVE_FIT_CALC_HIGH_QUALIY, corners, cornersLength, &result, &resultNum, &origIndex, &cornerIndex, &cornerIndexLength);
-        
-        int numPoints = ((int)resultNum);
-
-        Array<Curve2DKey*> keys;
-        CubicEasing2D * prevEasing = nullptr;
-
-        for (int i = 0; i < numPoints; i++)
-        {
-            int index = i * 6;
-            Point<float> h1(result[index+0], result[index+1]);
-            Point<float> rp(result[index+2], result[index+3]);
-            Point<float> h2(result[index+4], result[index+5]);
-
-           
-            if (prevEasing != nullptr && h1.getDistanceFromOrigin() < 100)
-            {
-                prevEasing->anchor2->setPoint(h1 - rp);
-            }
-
-            if (rp.getDistanceFromOrigin() > 100)
-            {
-                break;
-            }
-
-            Curve2DKey * k = new Curve2DKey();
-            k->position->setPoint(rp);
-           
-            k->easingType->setValueWithData(Easing2D::BEZIER);
-            CubicEasing2D* ce = (CubicEasing2D*)k->easing.get();
-            if (h2.getDistanceFromOrigin() < 100) ce->anchor1->setPoint(h2 - rp);
-            
-            keys.add(k);
-
-            prevEasing = ce;
-        }
-
-        delete result;
-        delete origIndex;
-        delete corners;
-        delete cornerIndex;
-
-        manager->addItems(keys);
+        manager->addFromPointsAndSimplify(paintingPoints);
 
         paintingMode = false;
         paintingPoints.clear();
@@ -276,6 +253,11 @@ void Curve2DUI::newMessage(const ContainerAsyncEvent& e)
             repaint();
         }
     }
+}
+
+void Curve2DUI::newMessage(const AutomationRecorder::RecorderEvent& e)
+{
+    if (e.type == AutomationRecorder::RecorderEvent::RECORDER_UPDATED) repaint();
 }
 
 void Curve2DUI::keyEasingHandleMoved(Curve2DKeyUI* ui, bool syncOtherHandle, bool isFirst)
