@@ -33,8 +33,17 @@ public:
     void setValueRange(float minVal, float maxVal);
     void clearValueRange();
 
+    
+
     Point<float> getPosAndValue();
     void setPosAndValue(Point<float> posAndValue, bool addToUndo = false);
+
+
+    //UI manipulation
+    void setMovePositionReferenceInternal() override;
+    void setPosition(Point<float> targetTime) override;
+    Point<float> getPosition() override;
+    void addUndoableMoveAction(Array<UndoableAction*>& actions) override;
 
     void onContainerParameterChangedInternal(Parameter* p) override;
     void onExternalParameterValueChanged(Parameter* p) override;

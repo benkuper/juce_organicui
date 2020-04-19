@@ -21,6 +21,8 @@ AutomationUI::AutomationUI(Automation* manager) :
     
     transparentBG = true;
 
+    startTimerHz(30);
+
     addExistingItems(false);
     setSize(100, 300);
 }
@@ -126,7 +128,6 @@ void AutomationUI::drawLinesBackground(Graphics& g)
 
     g.setFont(12);
     float fadeAlpha = jlimit<float>(0, 1, jmap<float>(decimalGap, minGap, fadeGap, 0, 1));
-    DBG("Fade alpha : " << fadeAlpha << " / " << decimalGap);
 
     for (float i = unitStart; i <= unitEndTime; i += unitSteps)
     {
@@ -292,7 +293,7 @@ void AutomationUI::setViewRange(float start, float end)
     viewLength = viewPosRange.y - viewPosRange.x;
 
     resized();
-    repaint();
+    shouldRepaint = true;
 }
 
 void AutomationUI::updateItemsVisibility()
@@ -353,10 +354,17 @@ void AutomationUI::mouseDrag(const MouseEvent& e)
         AutomationKey* k = handle->key;
         int index = manager->items.indexOf(k);
 
-        Point<float> p = getViewPos(e.getEventRelativeTo(this).getPosition());
-        if (k->nextKey != nullptr) p.x = jmin(p.x, k->nextKey->position->floatValue());
-        if (index > 0) p.x = jmax(p.x, manager->items[index - 1]->position->floatValue());
-        k->setPosAndValue(p);
+        Point<float> offset = getViewPos(e.getEventRelativeTo(this).getOffsetFromDragStart(),true);
+        offset.setY(-offset.y);
+
+
+        if (k->nextKey != nullptr) offset.setX(jmin(offset.x, k->nextKey->position->floatValue() - k->movePositionReference.x));
+        if (index > 0) offset.setX(jmax(offset.x, manager->items[index - 1]->position->floatValue() - k->movePositionReference.x));
+        
+
+        if (e.mods.isShiftDown()) offset.setY(0);
+        if (e.mods.isAltDown()) k->scalePosition(offset, true);
+        else k->movePosition(offset, true);
     }
     else if (e.eventComponent == this)
     {
@@ -479,16 +487,16 @@ void AutomationUI::newMessage(const ContainerAsyncEvent& e)
     {
         if (e.targetControllable == manager->value || e.targetControllable == manager->position)
         {
-            repaint();
+            shouldRepaint = true;
         }
         else if (e.targetControllable->parentContainer == manager->items[0] || e.targetControllable->parentContainer == manager->items[manager->items.size() - 1])
         {
-            repaint();
+            shouldRepaint = true;
         }
         else if (e.targetControllable == manager->viewValueRange)
         {
             resized();
-            repaint();
+            shouldRepaint = true;
         }
     }
 }
@@ -526,6 +534,15 @@ void AutomationUI::keyEasingHandleMoved(AutomationKeyUI* ui, bool syncOtherHandl
                 }
             }
         }
+    }
+}
+
+void AutomationUI::timerCallback()
+{
+    if (shouldRepaint)
+    {
+        repaint();
+        shouldRepaint = false;
     }
 }
 

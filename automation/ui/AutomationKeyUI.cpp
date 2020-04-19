@@ -1,3 +1,4 @@
+#include "AutomationKeyUI.h"
 /*
   ==============================================================================
 
@@ -95,13 +96,25 @@ void AutomationKeyUI::mouseDown(const MouseEvent& e)
 			item->easing->selectThis(); //reselect after changing easing
 		}
 	}
+	else
+	{
+		item->setMovePositionReference(true);
+		BaseItemMinimalUI::mouseDown(e);
+	}
 }
 
 void AutomationKeyUI::mouseDoubleClick(const MouseEvent& e)
 {
+	BaseItemMinimalUI::mouseDoubleClick(e);
 	Component* editComponent = new ParameterUI::ValueEditCalloutComponent(item->position);
 	CallOutBox* box = &CallOutBox::launchAsynchronously(editComponent, localAreaToGlobal(getLocalBounds()), nullptr);
 	box->setArrowSize(8);
+}
+
+void AutomationKeyUI::mouseUp(const MouseEvent& e)
+{
+	BaseItemMinimalUI::mouseUp(e);
+	item->addMoveToUndoManager(true);
 }
 
 bool AutomationKeyUI::hitTest(int x, int y)

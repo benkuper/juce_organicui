@@ -55,6 +55,9 @@ BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts
 	viewUISize->hideInEditor = true;
 	viewUISize->hideInOutliner = true;
 
+	isUILocked = addBoolParameter("Locked", "if checked, item is locked in UI", false);
+	isUILocked->hideInEditor = true;
+
 	scriptObject.setMethod("getType", BaseItem::getTypeStringFromScript);
 }
 
@@ -118,6 +121,135 @@ void BaseItem::remove()
 	baseItemListeners.call(&BaseItemListener::askForRemoveBaseItem, this);
 }
 
+
+void BaseItem::setMovePositionReference(bool setOtherSelectedItems)
+{
+	setMovePositionReferenceInternal();
+
+	if (setOtherSelectedItems)
+	{
+		Array<BaseItem*> items = InspectableSelectionManager::activeSelectionManager->getInspectablesAs<BaseItem>();
+		for (auto& i : items)
+		{
+			if (i == this) continue;
+			i->setMovePositionReference(false);
+		}
+	}
+}
+
+void BaseItem::setMovePositionReferenceInternal()
+{
+	movePositionReference = getPosition();
+}
+
+void BaseItem::movePosition(Point<float> positionOffset, bool moveOtherSelectedItems)
+{
+	setPosition(movePositionReference + positionOffset);
+	if (moveOtherSelectedItems)
+	{
+		Array<BaseItem*> items = InspectableSelectionManager::activeSelectionManager->getInspectablesAs<BaseItem>();
+		for (auto& i : items)
+		{
+			if (i == this) continue;
+			i->movePosition(positionOffset, false);
+		}
+	}
+}
+
+void BaseItem::scalePosition(Point<float> positionOffset, bool moveOtherSelectedItems)
+{
+	if (moveOtherSelectedItems)
+	{
+		Array<BaseItem*> items = InspectableSelectionManager::activeSelectionManager->getInspectablesAs<BaseItem>();
+
+		if (items.size() < 2) return;
+		BaseItem* firstItemX = items[0];
+		BaseItem* lastItemX = items[0];
+		BaseItem* firstItemY = items[0];
+		BaseItem* lastItemY = items[0];
+
+		Point<float> minPosition = items[0]->movePositionReference;
+		Point<float> maxPosition = items[0]->movePositionReference;
+		for (auto& i : items)
+		{
+			Point<float> t = i->movePositionReference;
+			if (t.x < minPosition.x)
+			{
+				minPosition.setX(t.x);
+				firstItemX = i;
+			}
+			else if (t.x > maxPosition.x)
+			{
+				maxPosition.setX(t.x);
+				lastItemX = i;
+			}
+
+			if (t.y < minPosition.y)
+			{
+				minPosition.setY(t.y);
+				firstItemY = i;
+			}
+			else if (t.y > maxPosition.y)
+			{
+				maxPosition.setY(t.y);
+				lastItemY = i;
+			}
+		}
+
+		Point<float> anchorPosition = Point<float>((this == firstItemX) ? maxPosition.x : minPosition.x, (this == firstItemY) ? maxPosition.y : minPosition.y);
+		Point<float> anchorDiffToReference = movePositionReference - anchorPosition;
+		
+		if (anchorDiffToReference.isOrigin()) return;
+
+		DBG("anchor diff to selected < " << anchorDiffToReference.toString() << " / anchorTIme " << anchorPosition.toString());
+		for (auto& i : items)
+		{
+			Point<float> positionScale = (i->movePositionReference - anchorPosition) / anchorDiffToReference;
+			Point<float> targetOffset = positionOffset * positionScale;
+			DBG(" > time scale " << positionScale.toString() << " / target offset " << targetOffset.toString());
+
+			i->movePosition(targetOffset, false);
+		}
+	}
+}
+
+void BaseItem::setPosition(Point<float> position)
+{
+	viewUIPosition->setPoint(position);
+}
+
+Point<float> BaseItem::getPosition()
+{
+	return viewUIPosition->getPoint();
+}
+
+void BaseItem::addMoveToUndoManager(bool addOtherSelectedItems)
+{
+	Array<UndoableAction*> actions;
+
+	int numItems = 1;
+	if (!addOtherSelectedItems)
+	{
+		addUndoableMoveAction(actions);
+	}
+	else
+	{
+		Array<BaseItem*> items = InspectableSelectionManager::activeSelectionManager->getInspectablesAs<BaseItem>();
+		for (auto& i : items)
+		{
+			i->addUndoableMoveAction(actions);
+		}
+
+		numItems = items.size();
+	}
+
+	UndoMaster::getInstance()->performActions("Move " + String(numItems) + " item"+String(numItems > 1?"s":""), actions);
+}
+
+void BaseItem::addUndoableMoveAction(Array<UndoableAction *> &arrayToAdd)
+{
+	arrayToAdd.add(viewUIPosition->setUndoablePoint(movePositionReference, viewUIPosition->getPoint(), true));
+}
 
 void BaseItem::onContainerParameterChanged(Parameter * p)
 {

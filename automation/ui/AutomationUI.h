@@ -14,7 +14,8 @@ class AutomationUI :
     public BaseManagerUI<Automation, AutomationKey, AutomationKeyUI>,
     public AutomationKey::AsyncListener,
     public AutomationKeyUI::KeyUIListener,
-    public ContainerAsyncListener
+    public ContainerAsyncListener,
+    public Timer
 {
 public:
     AutomationUI(Automation* manager);
@@ -22,6 +23,8 @@ public:
 
     Point<float> viewPosRange;
     float viewLength;
+
+    bool shouldRepaint;
 
     bool paintingMode;
     Array<Point<float>> paintingPoints;
@@ -69,4 +72,6 @@ public:
     void newMessage(const ContainerAsyncEvent& e) override;
 
     void keyEasingHandleMoved(AutomationKeyUI* ui, bool syncOtherHandle, bool isFirst) override;
+
+    void timerCallback() override;
 };

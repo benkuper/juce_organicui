@@ -132,7 +132,7 @@ void FloatSliderUI::mouseDrag(const MouseEvent & e)
 {
 	if (!isInteractable()) return;
 
-	if(changeParamOnMouseUpOnly) shouldRepaint = true;
+	if (changeParamOnMouseUpOnly) repaint();
     else
     {
 		if (e.mods.isLeftButtonDown())
@@ -203,7 +203,7 @@ void FloatSliderUI::valueChanged(const var &) {
 
 
 void FloatSliderUI::rangeChanged(Parameter *) {
-	repaint();
+	shouldRepaint = true;
 }
 
 void FloatSliderUI::visibilityChanged()
@@ -212,7 +212,7 @@ void FloatSliderUI::visibilityChanged()
 	{
 		//DBG(parameter->niceName << " start Timer");
 #if JUCE_MAC
-		startTimerHz(20); //20 fps for slider on mac because of bad UI handling
+		startTimerHz(15); //20 fps for slider on mac because of bad UI handling
 #else
         startTimerHz(30); //30 fps for slider
 #endif

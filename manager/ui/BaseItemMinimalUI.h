@@ -238,6 +238,9 @@ void BaseItemMinimalUI<T>::mouseDown(const MouseEvent& e)
 		if (result == 0) return;
 
 		handleContextMenuResult(result);
+	}else
+	{
+		baseItem->setMovePositionReference(true);
 	}
 }
 

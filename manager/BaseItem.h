@@ -19,14 +19,15 @@ class BaseItem :
 	public BaseManagerListener<Script>
 {
 public:
-	BaseItem(const String &name = "", bool canBeDisabled = true, bool canHaveScript = false);
+	BaseItem(const String& name = "", bool canBeDisabled = true, bool canHaveScript = false);
 	virtual ~BaseItem();
 
 	//UI - should move outside data class ? how to save/load if not there 
-	BoolParameter * miniMode;
-	FloatParameter * listUISize; //width or height in a list
-	Point2DParameter * viewUIPosition; //position in a vieww
-	Point2DParameter * viewUISize; //size in a view
+	BoolParameter* miniMode;
+	FloatParameter* listUISize; //width or height in a list
+	Point2DParameter* viewUIPosition; //position in a view
+	Point2DParameter* viewUISize; //size in a view
+	BoolParameter* isUILocked; //lock in UI
 
 	bool canHaveScripts;
 	bool userCanRemove;
@@ -39,8 +40,10 @@ public:
 	std::unique_ptr<ScriptManager> scriptManager;
 
 	String itemDataType;
-
 	bool isClearing;
+
+	//UI moving X/Y
+	Point<float> movePositionReference;
 
 	virtual void clearItem();
 
@@ -51,11 +54,21 @@ public:
 	virtual void selectPrevious(bool addToSelection = false);
 	virtual void selectNext(bool addToSelection = false);
 
-	virtual void moveBefore();
-	virtual void moveAfter();
+	virtual void moveBefore(); //list
+	virtual void moveAfter(); //list
 
 	void remove();
 
+	void setMovePositionReference(bool setOtherSelectedItems = false);
+	virtual void setMovePositionReferenceInternal();
+	void movePosition(Point<float> positionOffset, bool moveOtherSelectedItems = false);
+	void scalePosition(Point<float> positionOffset, bool moveOtherSelectedItems = false);
+	virtual void setPosition(Point<float> position);
+	virtual Point<float> getPosition();
+	void addMoveToUndoManager(bool addOtherSelectedItems = false);
+	virtual void addUndoableMoveAction(Array<UndoableAction *> &arrayToAdd);
+
+	//listeners
 	virtual void onContainerParameterChanged(Parameter *) override;
 	virtual void onContainerTriggerTriggered(Trigger *) override;
 	virtual void onContainerParameterChangedInternal(Parameter *) {} //child classes override this function
@@ -64,16 +77,14 @@ public:
 
 	void itemAdded(Script* script) override;
 
+
 	var getJSONData() override;
 	void loadJSONDataInternal(var data) override;
 	virtual void loadJSONDataItemInternal(var data) {} //happens before loading scripts
 
 	InspectableEditor * getEditor(bool isRoot) override;
-	
 	virtual String getTypeString() const { return "BaseItem"; };
-
 	static var getTypeStringFromScript(const juce::var::NativeFunctionArgs& a);
-
 	String getScriptTargetString() override;
 
 	ListenerList<BaseItemListener> baseItemListeners;

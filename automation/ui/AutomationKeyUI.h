@@ -46,6 +46,7 @@ public:
 
     void mouseDown(const MouseEvent& e) override;
     void mouseDoubleClick(const MouseEvent& e) override;
+    void mouseUp(const MouseEvent& e) override;
 
     bool hitTest(int x, int y) override;
 

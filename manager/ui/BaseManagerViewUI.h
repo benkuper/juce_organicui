@@ -592,7 +592,8 @@ void BaseManagerViewUI<M, T, U>::itemDragMove(const DragAndDropTarget::SourceDet
 	if (updatePositionOnDragMove)
 	{
 		Point<float> targetPosition = (snapPosition != realP) ? targetSnapViewPosition : this->getPositionFromDrag(bui, dragSourceDetails);
-		bui->item->viewUIPosition->setPoint(targetPosition);
+		if(Desktop::getInstance().getMainMouseSource().getCurrentModifiers().isAltDown()) bui->baseItem->scalePosition(targetPosition - bui->baseItem->movePositionReference, true);
+		else bui->baseItem->movePosition(targetPosition - bui->baseItem->movePositionReference, true);
 	}
 }
 
@@ -605,10 +606,10 @@ void BaseManagerViewUI<M, T, U>::itemDropped(const DragAndDropTarget::SourceDeta
 
 	if (bui != nullptr &&  this->itemsUI.contains((U*)bui))
 	{
-		Point<float> initP = bui->item->viewUIPosition->getPoint();
-		initP = Point<float>((float)dragSourceDetails.description.getProperty("initX", initP.x), (float)dragSourceDetails.description.getProperty("initY", initP.y));
 		Point<float> p = enableSnapping ? targetSnapViewPosition : this->getPositionFromDrag(bui, dragSourceDetails);
-		bui->item->viewUIPosition->setUndoablePoint(initP, p);
+		if (Desktop::getInstance().getMainMouseSource().getCurrentModifiers().isAltDown()) bui->baseItem->scalePosition(p - bui->baseItem->movePositionReference, true);
+		else bui->baseItem->movePosition(p - bui->baseItem->movePositionReference, true);
+		bui->baseItem->addMoveToUndoManager(true);
 	}
 
 	snapLineX = Line<int>();

@@ -133,7 +133,28 @@ void AutomationKey::setPosAndValue(Point<float> posAndValue, bool addToUndo)
         position->setValue(posAndValue.x);
         value->setValue(posAndValue.y);
     }
-    
+}
+
+
+void AutomationKey::setMovePositionReferenceInternal()
+{
+    movePositionReference = Point<float>(position->floatValue(), value->floatValue());
+}
+
+void AutomationKey::setPosition(Point<float> targetPosition)
+{
+    setPosAndValue(targetPosition);
+}
+
+Point<float> AutomationKey::getPosition()
+{
+    return getPosAndValue();
+}
+
+void AutomationKey::addUndoableMoveAction(Array<UndoableAction*>& actions)
+{
+    actions.add(position->setUndoableValue(movePositionReference.x, position->floatValue(), true));
+    actions.add(value->setUndoableValue(movePositionReference.y, value->floatValue(), true));
 }
 
 void AutomationKey::onContainerParameterChangedInternal(Parameter* p)

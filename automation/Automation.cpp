@@ -1,4 +1,3 @@
-#include "Automation.h"
 /*
   ==============================================================================
 
@@ -52,7 +51,8 @@ AutomationKey * Automation::addKey(const float& _position, const float& _value, 
     AutomationKey* key = new AutomationKey(_position, _value);
 
     var params = new DynamicObject();
-    if (AutomationKey* k = getKeyForPosition(_position)) params.getDynamicObject()->setProperty("index", items.indexOf(k) + 1);
+    if (items.size() > 0 && items[0]->position->floatValue() > _position) params.getDynamicObject()->setProperty("index", 0);
+    else if (AutomationKey* k = getKeyForPosition(_position)) params.getDynamicObject()->setProperty("index", items.indexOf(k)+1);
     return addItem(key, params, addToUndo);
 }
 
