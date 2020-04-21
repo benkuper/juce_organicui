@@ -908,8 +908,9 @@ void ControllableContainer::loadJSONData(var data, bool createIfNotThere)
 		}
 	}
 
-	if (saveAndLoadRecursiveData && data.hasProperty("containers"))
+	if (/*saveAndLoadRecursiveData && */data.hasProperty("containers"))
 	{
+		saveAndLoadRecursiveData = true;
 		NamedValueSet ccData = data.getProperty("containers", var()).getDynamicObject()->getProperties();
 		for (auto& nv : ccData)
 		{
