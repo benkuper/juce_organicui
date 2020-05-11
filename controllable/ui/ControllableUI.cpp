@@ -84,6 +84,7 @@ void ControllableUI::drawContour(Graphics &g)
 
 bool ControllableUI::isInteractable()
 {
+	if (controllable.wasObjectDeleted()) return false;
 	return controllable->enabled && !controllable->isControllableFeedbackOnly;
 }
 
