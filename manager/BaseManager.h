@@ -261,7 +261,7 @@ BaseManager<T>::BaseManager(const String & name) :
 	scriptObject.setMethod("getItemIndex", &BaseManager<T>::getItemIndexFromScript);
 	scriptObject.setMethod("getItemBefore", &BaseManager<T>::getItemBeforeFromScript);
 	scriptObject.setMethod("getItemAfter", &BaseManager<T>::getItemAfterFromScript);
-	scriptObject.setMethod("reorderItems", &BaseManager<T>::getItemAfterFromScript);
+	scriptObject.setMethod("reorderItems", &BaseManager<T>::reorderItemsFromScript);
 
 	skipLabelInTarget = true; //by default manager label in targetParameter UI are not interesting
 	nameCanBeChangedByUser = false;
