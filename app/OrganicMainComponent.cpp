@@ -26,7 +26,6 @@ OrganicMainContentComponent::OrganicMainContentComponent()
 	//done in Main.cpp as it's a method of DocumentWindow
 #endif
 
-	setupOpenGL();
 }
 
 OrganicMainContentComponent::~OrganicMainContentComponent()
@@ -43,6 +42,8 @@ OrganicMainContentComponent::~OrganicMainContentComponent()
 
 void OrganicMainContentComponent::init()
 {
+	setupOpenGL();
+
 	String lastVersion = getAppProperties().getUserSettings()->getValue("lastVersion", "0");
 	if (lastVersion != getAppVersion())
 	{
