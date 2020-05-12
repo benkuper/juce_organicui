@@ -21,6 +21,8 @@ AutomationUI::AutomationUI(Automation* manager) :
     
     transparentBG = true;
 
+    setViewRange(0, manager->length->floatValue());
+
     startTimerHz(30);
 
     addExistingItems(false);
@@ -46,6 +48,8 @@ void AutomationUI::paint(Graphics& g)
     if (getWidth() == 0 || !isShowing()) return;
 
     if (!transparentBG) g.fillAll(bgColor);
+
+    //g.fillAll(Colours::purple.withAlpha(.1f));
 
     if (previewMode)
     {
