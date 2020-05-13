@@ -173,12 +173,27 @@ var ScriptUtil::fileExistsFromScript(const var::NativeFunctionArgs& args)
 var ScriptUtil::readFileFromScript(const var::NativeFunctionArgs& args)
 {
 	String path = args.arguments[0].toString();
+	
+	if (!File::isAbsolutePath(path))
+	{
+		File folder = Engine::mainEngine->getFile().getParentDirectory();
+		if (args.numArguments >= 3 && (int)args.arguments[2])
+		{
+			String scriptPath = args.thisObject.getProperty("scriptPath", "").toString();
+			folder = File(scriptPath).getParentDirectory();
+		}
 
-	if (!File::isAbsolutePath(path)) path = Engine::mainEngine->getFile().getParentDirectory().getChildFile(path).getFullPathName();
+		path = folder.getChildFile(path).getFullPathName();
+	}
 
 	File f(path);
 
-	if (!f.existsAsFile()) return var();
+
+	if (!f.existsAsFile())
+	{
+		LOGWARNING("File not found : " << f.getFullPathName());
+		return var();
+	}
 
 	if (args.numArguments >= 2 && (int)args.arguments[1])
 	{
@@ -197,7 +212,18 @@ var ScriptUtil::writeFileFromScript(const var::NativeFunctionArgs& args)
 
 	String path = args.arguments[0].toString();
 
-	if (!File::isAbsolutePath(path)) path = Engine::mainEngine->getFile().getParentDirectory().getChildFile(path).getFullPathName();
+	if (!File::isAbsolutePath(path))
+	{
+		File folder = Engine::mainEngine->getFile().getParentDirectory();
+		if (args.numArguments >= 3 && (int)args.arguments[2])
+		{
+			String scriptPath = args.thisObject.getProperty("scriptPath", "").toString();
+			folder = File(scriptPath).getParentDirectory();
+		}
+
+		path = folder.getChildFile(path).getFullPathName();
+	}
+
 
 	File f(path);
 

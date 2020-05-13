@@ -198,10 +198,15 @@ void Script::buildEnvironment()
 	while (scriptParamsContainer.controllables.size() > 0) scriptParamsContainer.removeControllable(scriptParamsContainer.controllables[0]);
 	scriptParamsContainer.clear();
 
-	scriptEngine->registerNativeObject("script", getScriptObject()); //force "script" for this objet
+	scriptEngine->registerNativeObject("script", getScriptObject()); //force "script" for this object
 	if (parentTarget != nullptr) scriptEngine->registerNativeObject("local", parentTarget->getScriptObject()); //force "local" for the related object
 	if (Engine::mainEngine != nullptr) scriptEngine->registerNativeObject(Engine::mainEngine->scriptTargetName, Engine::mainEngine->getScriptObject());
-	if (ScriptUtil::getInstanceWithoutCreating() != nullptr) scriptEngine->registerNativeObject(ScriptUtil::getInstance()->scriptTargetName, ScriptUtil::getInstance()->getScriptObject());
+	if (ScriptUtil::getInstanceWithoutCreating() != nullptr)
+	{
+		DynamicObject* utilObject = ScriptUtil::getInstance()->getScriptObject();
+		utilObject->setProperty("scriptPath", filePath->getAbsolutePath());
+		scriptEngine->registerNativeObject(ScriptUtil::getInstance()->scriptTargetName, utilObject);
+	}
 }
 
 void Script::setState(ScriptState newState)
