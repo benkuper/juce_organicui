@@ -362,6 +362,7 @@ void Automation::onControllableStateChanged(Controllable* c)
 
 void Automation::afterLoadJSONDataInternal()
 {
+    reorderItems();
     updateNextKeys();
 }
 
