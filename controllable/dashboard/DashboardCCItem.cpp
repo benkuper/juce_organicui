@@ -36,7 +36,7 @@ void DashboardCCItem::loadJSONDataItemInternal(var data)
 {
 
 	String address = data.getProperty("container", inspectableGhostAddress);
-	setInspectable(Engine::mainEngine->getControllableContainerForAddress(address));
+	if(address.isNotEmpty()) setInspectable(Engine::mainEngine->getControllableContainerForAddress(address));
 
 	DashboardInspectableItem::loadJSONDataItemInternal(data);
 }
