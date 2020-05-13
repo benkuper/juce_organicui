@@ -1,4 +1,3 @@
-#include "Automation.h"
 /*
   ==============================================================================
 
@@ -21,7 +20,7 @@ Automation::Automation(const String& name, AutomationRecorder * recorder, bool a
     userCanAddItemsManually = false;
     canInspectChildContainers = false;
 
-    length = addFloatParameter("Length", "The length of the curve", 0, 0.01f);
+    length = addFloatParameter("Length", "The length of the curve", 1, 0.01f);
     length->hideInEditor = true;
     length->setControllableFeedbackOnly(true);
 

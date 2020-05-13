@@ -150,17 +150,19 @@ ParameterNumberAutomation::ParameterNumberAutomation(Parameter* parameter, bool 
 	valueParamRef = automation.value;
 	automationContainer = &automation;
 	
-	valueIsNormalized = true;
+	valueIsNormalized = false;
 
 	setup();
 
 	//automation.enableSnap->setValue(false);
+	if (parameter->hasRange()) automation.valueRange->setPoint(parameter->minimumValue, parameter->maximumValue);
+	else automation.valueRange->setEnabled(false);
 
 	if (addDefaultItems)
 	{
-		automation.addItem(0, parameter->getNormalizedValue(), false);
+		automation.addItem(0, parameter->floatValue(), false);
 		automation.items[0]->setEasing(Easing::BEZIER);
-		automation.addKey(automation.length->floatValue(), parameter->getNormalizedValue() , false);
+		automation.addKey(automation.length->floatValue(), parameter->floatValue() , false);
 	}
 
 }
