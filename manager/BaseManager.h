@@ -224,6 +224,7 @@ public:
 
 	static var addItemFromScript(const var::NativeFunctionArgs& args);
 	static var removeItemFromScript(const var::NativeFunctionArgs& args);
+	static var removeAllItemsFromScript(const var::NativeFunctionArgs& args);
 	static var getItemsFromScript(const var::NativeFunctionArgs& args);
 	static var getItemWithNameFromScript(const var::NativeFunctionArgs& args);
 	static var getItemAtFromScript(const var::NativeFunctionArgs& args);
@@ -255,6 +256,7 @@ BaseManager<T>::BaseManager(const String & name) :
 
 	scriptObject.setMethod("addItem", &BaseManager<T>::addItemFromScript);
 	scriptObject.setMethod("removeItem", &BaseManager<T>::removeItemFromScript);
+	scriptObject.setMethod("removeAll", &BaseManager<T>::removeAllItemsFromScript);
 	scriptObject.setMethod("getItems", &BaseManager<T>::getItemsFromScript);
 	scriptObject.setMethod("getItemWithName", &BaseManager<T>::getItemWithNameFromScript);
 	scriptObject.setMethod("getItemAt", &BaseManager<T>::getItemAtFromScript);
@@ -857,6 +859,17 @@ var BaseManager<T>::removeItemFromScript(const var::NativeFunctionArgs& args)
 	}
 
 	NLOGWARNING(m->niceName, "Remove item : item not found in manager");
+	return var();
+}
+
+template<class T>
+var BaseManager<T>::removeAllItemsFromScript(const var::NativeFunctionArgs& args)
+{
+	if (BaseManager<T>* m = getObjectFromJS<BaseManager<T>>(args))
+	{
+		m->clear();
+	}
+
 	return var();
 }
 
