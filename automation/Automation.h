@@ -62,6 +62,8 @@ public:
     void onControllableFeedbackUpdate(ControllableContainer* cc, Controllable* c) override;
     void onControllableStateChanged(Controllable* c) override;
 
+    void reorderItems() override;
+
     void afterLoadJSONDataInternal() override;
 
     static int compareKeys(AutomationKey* k1, AutomationKey* k2);

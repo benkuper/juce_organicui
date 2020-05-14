@@ -1,3 +1,4 @@
+#include "Automation.h"
 /*
   ==============================================================================
 
@@ -182,6 +183,10 @@ void Automation::updateNextKeys(int start, int end)
             jassert(items[i]->position->floatValue() <= items[i + 1]->position->floatValue());
             items[i]->setNextKey(items[i + 1]);
         }
+        else
+        {
+            items[i]->setNextKey(nullptr);
+        }
     }
 
     computeValue();
@@ -359,10 +364,15 @@ void Automation::onControllableStateChanged(Controllable* c)
     }
 }
 
+void Automation::reorderItems()
+{
+    BaseManager::reorderItems();
+    updateNextKeys();
+}
+
 void Automation::afterLoadJSONDataInternal()
 {
     reorderItems();
-    updateNextKeys();
 }
 
 int Automation::compareKeys(AutomationKey* k1, AutomationKey* k2)
