@@ -2,7 +2,7 @@
 
 <JUCERPROJECT id="nJCeN1" name="organicui_resources" projectType="guiapp" version="1.0.0"
               bundleIdentifier="com.benkuper.organicui_resources" includeBinaryInAppConfig="1"
-              jucerVersion="5.4.3" displaySplashScreen="1" reportAppUsage="1"
+              jucerVersion="5.4.7" displaySplashScreen="1" reportAppUsage="1"
               splashScreenColour="Dark" cppLanguageStandard="11" companyCopyright=""
               binaryDataNamespace="OrganicUIBinaryData">
   <MAINGROUP id="gdPnjI" name="organicui_resources">
@@ -25,6 +25,7 @@
       <FILE id="bcK2wO" name="file.png" compile="0" resource="1" file="Resources/file.png"/>
       <FILE id="Lih37O" name="in.png" compile="0" resource="1" file="Resources/in.png"/>
       <FILE id="QKRm2O" name="out.png" compile="0" resource="1" file="Resources/out.png"/>
+      <FILE id="wN1HOW" name="padlock.png" compile="0" resource="1" file="Resources/padlock.png"/>
       <FILE id="C97VIu" name="power.png" compile="0" resource="1" file="Resources/power.png"/>
       <FILE id="avHafs" name="relative.png" compile="0" resource="1" file="Resources/relative.png"/>
       <FILE id="OR6cVw" name="reload.png" compile="0" resource="1" file="Resources/reload.png"/>

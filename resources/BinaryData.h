@@ -27,7 +27,7 @@ namespace OrganicUIBinaryData
     const int            checkbox_off_pngSize = 2517;
 
     extern const char*   checkbox_off_readonly_png;
-    const int            checkbox_off_readonly_pngSize = 2593;
+    const int            checkbox_off_readonly_pngSize = 2667;
 
     extern const char*   checkbox_on_png;
     const int            checkbox_on_pngSize = 2643;
@@ -52,6 +52,9 @@ namespace OrganicUIBinaryData
 
     extern const char*   out_png;
     const int            out_pngSize = 20427;
+
+    extern const char*   padlock_png;
+    const int            padlock_pngSize = 584;
 
     extern const char*   power_png;
     const int            power_pngSize = 15366;
@@ -81,7 +84,7 @@ namespace OrganicUIBinaryData
     const int            warning_pngSize = 1153;
 
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 24;
+    const int namedResourceListSize = 25;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];
