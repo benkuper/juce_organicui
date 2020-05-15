@@ -50,6 +50,12 @@ public:
 	GradientColor * addColorAt(float time, Colour color);
 	GradientColor * getItemAt(float time, bool getNearestPreviousKeyIfNotFound = false) const;
 
+	Array<GradientColor*> getItemsInTimespan(float startTime, float endTime);
+
+	Array<UndoableAction*> getMoveKeysBy(float start, float offset);
+	Array<UndoableAction*> getRemoveTimespan(float start, float end);
+
+
     void addItemInternal(GradientColor * item, var data) override;
 	void removeItemInternal(GradientColor * item) override;
 	

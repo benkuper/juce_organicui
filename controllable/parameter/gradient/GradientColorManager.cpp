@@ -1,4 +1,3 @@
-#include "GradientColorManager.h"
 /*
   ==============================================================================
 
@@ -153,6 +152,38 @@ GradientColor * GradientColorManager::getItemAt(float time, bool getNearestPrevi
 
 	return getNearestPreviousKeyIfNotFound ? nearestPrevious : nullptr;
 }
+Array<GradientColor*> GradientColorManager::getItemsInTimespan(float startTime, float endTime)
+{
+	Array<GradientColor*> result;
+
+	for (auto& gc : items)
+	{
+		if (gc->position->floatValue() >= startTime && gc->position->floatValue() <= endTime)
+		{
+			result.add(gc);
+		}
+	}
+	return result;
+}
+
+Array<UndoableAction*> GradientColorManager::getMoveKeysBy(float start, float offset)
+{
+	Array<UndoableAction*> actions;
+	Array<GradientColor*> triggers = getItemsInTimespan(start, length->floatValue());
+	for (auto& t : triggers) actions.add(t->position->setUndoableValue(t->position->floatValue(), t->position->floatValue() + offset, true));
+	return actions;
+}
+
+Array<UndoableAction*> GradientColorManager::getRemoveTimespan(float start, float end)
+{
+	Array<UndoableAction*> actions;
+	Array<GradientColor*> triggers = getItemsInTimespan(start, end);
+	actions.addArray(getRemoveItemsUndoableAction(triggers));
+	actions.addArray(getMoveKeysBy(end, start - end));
+	return actions;
+}
+
+
 
 void GradientColorManager::addItemInternal(GradientColor * item, var data)
 {
