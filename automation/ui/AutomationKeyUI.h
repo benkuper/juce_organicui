@@ -37,7 +37,7 @@ public:
 
     std::unique_ptr<EasingUI> easingUI;
 
-    void paint(Graphics& g) override {} //avoid painting background
+    void paint(Graphics& g) override; //avoid painting background
     void resized() override;
 
     void setShowEasingHandles(bool showFirst, bool showLast);

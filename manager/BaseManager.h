@@ -25,7 +25,6 @@ public:
 	Factory<T> * managerFactory;
 	String itemDataType;
 
-
 	bool userCanAddItemsManually;
 	bool selectItemWhenCreated;
 	bool autoReorderOnAdd;

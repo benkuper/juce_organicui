@@ -168,6 +168,34 @@ void Automation::removeItemsInternal()
     updateNextKeys();
 }
 
+Array<UndoableAction*> Automation::getMoveKeysBy(float start, float offset)
+{
+    Array<UndoableAction*> actions;
+
+    AutomationKey* k = getKeyForPosition(start);
+    if (k->position->floatValue() < start) k = k->nextKey;
+    if (k == nullptr) return Array<UndoableAction *>();
+
+    while (k != nullptr)
+    {
+        actions.add(k->position->setUndoableValue(k->position->floatValue(), k->position->floatValue() + offset, true));
+        k = k->nextKey;
+    }
+
+    return actions;
+}
+
+Array<UndoableAction*> Automation::getRemoveTimespan(float start, float end)
+{
+    Array<UndoableAction*> actions;
+
+    Array<AutomationKey*> keys = getKeysBetweenPositions(start, end);
+    actions.addArray(getRemoveItemsUndoableAction(keys));
+    actions.addArray(getMoveKeysBy(start, start - end));
+
+    return actions;
+}
+
 void Automation::updateNextKeys(int start, int end)
 {
     if (isCurrentlyLoadingData || Engine::mainEngine->isClearing) return;

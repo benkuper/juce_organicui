@@ -255,7 +255,13 @@ void AutomationUI::placeKeyUI(AutomationKeyUI* ui)
 
     Point<int> p = getPosInView(ui->item->getPosAndValue());
     Rectangle<int> pr = Rectangle<int>(0, 0, 20, 20).withCentre(p);
-    if (ui->item->easing != nullptr) pr = pr.getUnion(getBoundsInView(ui->item->easing->getBounds(true)));
+    if (ui->item->easing != nullptr)
+    {
+        Rectangle<int> er = getBoundsInView(ui->item->easing->getBounds(true));
+        er.setSize(jmax(er.getWidth(), er.getWidth() + 1), jmax(er.getHeight(), er.getHeight() + 1));
+        pr = pr.getUnion(er);
+    }
+
     pr = pr.expanded(5, 5).getIntersection(r);
     ui->setBounds(pr);
     ui->setValueBounds(getViewBounds(pr));

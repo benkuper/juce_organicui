@@ -41,6 +41,9 @@ public:
     void removeItemInternal(AutomationKey* k) override;
     void removeItemsInternal() override;
 
+    Array<UndoableAction*> getMoveKeysBy(float start, float offset);
+    Array<UndoableAction*> getRemoveTimespan(float start, float end);
+
     void updateNextKeys(int start = 0, int end = -1);
     void computeValue();
 

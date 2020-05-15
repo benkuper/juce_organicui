@@ -26,7 +26,7 @@ Easing::~Easing()
 
 void Easing::updateKeys(const Point<float>& _start, const Point<float>& _end)
 {
-	if (start == _start && end == _end) return;
+	if ((start == _start && end == _end) || (_start.x > _end.x)) return;
 	start = _start;
 	end = _end;
 	length = end.x - start.x;
@@ -102,8 +102,9 @@ void CubicEasing::onContainerParameterChanged(Parameter* p)
 Rectangle<float> CubicEasing::getBounds(bool includeHandles)
 {
 	Bezier::AxisAlignedBoundingBox  bbox = bezier.aabb();
+
 	Array<Point<float>> points;
-	points.add(Point<float>(bbox.minX(), bbox.minY()), Point<float>(bbox.maxX(), bbox.maxY()));
+	if (bbox.width() > 0 && bbox.height() > 0) points.add(Point<float>(bbox.minX(), bbox.minY()), Point<float>(bbox.maxX(), bbox.maxY()));
 	if (includeHandles) points.add(anchor1->getPoint() + start, anchor2->getPoint() + end);
 
 	return Rectangle<float>::findAreaContainingPoints(points.getRawDataPointer(), points.size());

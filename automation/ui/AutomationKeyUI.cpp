@@ -29,6 +29,11 @@ AutomationKeyUI::~AutomationKeyUI()
 	if (!inspectable.wasObjectDeleted()) if (item->easing != nullptr) item->easing->removeInspectableListener(this);
 }
 
+void AutomationKeyUI::paint(Graphics& g) 
+{
+	g.fillAll(Colours::purple.withAlpha(.1f));
+}
+
 void AutomationKeyUI::resized()
 {
 	Point<int> hp = getUIPosForValuePos(item->getPosAndValue());
