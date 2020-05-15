@@ -191,7 +191,7 @@ Array<UndoableAction*> Automation::getRemoveTimespan(float start, float end)
 
     Array<AutomationKey*> keys = getKeysBetweenPositions(start, end);
     actions.addArray(getRemoveItemsUndoableAction(keys));
-    actions.addArray(getMoveKeysBy(start, start - end));
+    actions.addArray(getMoveKeysBy(end, start - end));
 
     return actions;
 }

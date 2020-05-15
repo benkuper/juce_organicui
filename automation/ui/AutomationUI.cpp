@@ -190,8 +190,8 @@ void AutomationUI::paintOverChildren(Graphics& g)
 {
     if (previewMode || !isShowing()) return;
 
-    g.setColour(GREEN_COLOR);
-    g.drawEllipse(Rectangle<int>(0, 0, 6, 6).withCentre(getPosInView(manager->getPosAndValue())).toFloat(), 1.5f);
+    g.setColour(BLUE_COLOR);
+    g.fillEllipse(Rectangle<int>(0, 0, 4,4).withCentre(getPosInView(manager->getPosAndValue())).toFloat());
 
     //recorder
     if (manager->recorder != nullptr)

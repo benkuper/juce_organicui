@@ -31,7 +31,7 @@ AutomationKeyUI::~AutomationKeyUI()
 
 void AutomationKeyUI::paint(Graphics& g) 
 {
-	g.fillAll(Colours::purple.withAlpha(.1f));
+	//g.fillAll(Colours::purple.withAlpha(.1f));
 }
 
 void AutomationKeyUI::resized()
