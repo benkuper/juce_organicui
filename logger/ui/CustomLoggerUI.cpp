@@ -109,6 +109,8 @@ CustomLoggerUI::CustomLoggerUI(const String& contentName, CustomLogger * l) :
 	
 	autoScrollB.setButtonText(juce::translate("Auto Scroll"));
 	autoScrollB.setClickingTogglesState(true);
+	autoScrollB.setColour(autoScrollB.buttonColourId, NORMAL_COLOR.darker().withAlpha(.5f));
+	autoScrollB.setColour(autoScrollB.buttonOnColourId, NORMAL_COLOR);
 	autoScrollB.setToggleState(true, dontSendNotification);
 	addAndMakeVisible(autoScrollB);
 
