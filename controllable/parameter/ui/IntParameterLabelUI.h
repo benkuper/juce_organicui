@@ -22,6 +22,7 @@ public:
 protected:
 	virtual void labelTextChanged(Label * labelThatHasChanged) override;
 	virtual void valueChanged(const var& v) override;
+	String getValueString(const var &val) const override;
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(IntParameterLabelUI)

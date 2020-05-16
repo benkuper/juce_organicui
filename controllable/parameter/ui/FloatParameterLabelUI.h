@@ -24,7 +24,6 @@ public:
 
 	String prefix;
 	String suffix;
-    String valueString;
 
 	float maxFontHeight;
     
@@ -55,6 +54,8 @@ public:
 	void updateUIParams() override;
 
 protected:
+	virtual String getValueString(const var &val) const;
+
 	virtual void valueChanged(const var & v) override;
 	virtual void labelTextChanged(Label * labelThatHasChanged) override;
 
@@ -72,10 +73,14 @@ public:
 	TimeLabel(Parameter * p);
 	~TimeLabel();
 
+	bool showStepsMode;
+	void setShowStepsMode(bool stepsMode);
+
 protected:
 	void valueChanged(const var &) override;
 	void labelTextChanged(Label * l) override;
 
+	String getValueString(const var &val) const override;
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TimeLabel)
 };

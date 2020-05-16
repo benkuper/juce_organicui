@@ -21,6 +21,8 @@ public:
     FloatParameter(const String &niceName, const String &description, const float &initialValue, const float &minValue = (float)INT32_MIN, const float &maxValue = (float)INT32_MAX, bool enabled = true);
     ~FloatParameter() {}
 
+	float unitSteps;
+
 	virtual var getLerpValueTo(var targetValue, float weight) override;
 	virtual void setWeightedValue(Array<var> values, Array<float> weights) override;
 
@@ -36,6 +38,9 @@ public:
     ControllableUI * createDefaultUI(Controllable * targetControllable = nullptr) override;
 
 	bool checkValueIsTheSame(var oldValue, var newValue) override;
+
+
+	void setValueInternal(var &value) override;
 
 	virtual bool hasRange() override;
 

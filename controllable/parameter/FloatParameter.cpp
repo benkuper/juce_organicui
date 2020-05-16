@@ -11,7 +11,8 @@
 FloatParameter::FloatParameter(const String & niceName, const String &description, const float & initialValue, const float & minValue, const float & maxValue, bool enabled) :
 	Parameter(Type::FLOAT, niceName, description, (float)initialValue, (float)minValue, (float)maxValue, enabled),
 	defaultUI(NONE),
-	customUI(NONE)
+	customUI(NONE),
+	unitSteps(0)
 {
 	canHaveRange = true;
 	canBeAutomated = true;
@@ -95,6 +96,12 @@ bool FloatParameter::checkValueIsTheSame(var oldValue, var newValue)
 }
 
 
+void FloatParameter::setValueInternal(var& val)
+{
+	if (unitSteps > 0) value = round((float)val * unitSteps) / unitSteps;
+	else Parameter::setValueInternal(val);
+}
+
 bool FloatParameter::hasRange()
 {
 	return (float)minimumValue != INT32_MIN && (float)maximumValue != INT32_MAX;
@@ -114,6 +121,10 @@ void FloatParameter::setAttribute(String attribute, var val)
 		else if (val == "slider") defaultUI = SLIDER;
 		else if (val == "stepper") defaultUI = STEPPER;
 		else if (val == "label") defaultUI = LABEL;
+	}
+	else if (attribute == "unitSteps")
+	{
+		unitSteps = (float)val;
 	}
 }
 

@@ -1,15 +1,14 @@
-#include "FloatParameterLabelUI.h"
 /*
   ==============================================================================
 
-    FloatParameterLabelUI.cpp
-    Created: 10 Dec 2016 10:51:19am
-    Author:  Ben
+	FloatParameterLabelUI.cpp
+	Created: 10 Dec 2016 10:51:19am
+	Author:  Ben
 
   ==============================================================================
 */
 
-FloatParameterLabelUI::FloatParameterLabelUI(Parameter * p) :
+FloatParameterLabelUI::FloatParameterLabelUI(Parameter* p) :
 	ParameterUI(p),
 	valueLabel(p->niceName + "_ValueLabel"),
 	maxFontHeight(GlobalSettings::getInstance()->fontSize->floatValue()),
@@ -22,23 +21,23 @@ FloatParameterLabelUI::FloatParameterLabelUI(Parameter * p) :
 
 	showEditWindowOnDoubleClick = false;
 
-	setSize(200, GlobalSettings::getInstance()->fontSize->floatValue()+4);//default size
+	setSize(200, GlobalSettings::getInstance()->fontSize->floatValue() + 4);//default size
 
-	valueChanged(parameter->getValue());	
+	valueChanged(parameter->getValue());
 	feedbackStateChanged();
 
 	ParameterUI::setNextFocusOrder(&valueLabel);
 
 	addMouseListener(this, true);
-    
+
 #if JUCE_MAC
-    startTimerHz(10);
+	startTimerHz(10);
 #else
-    startTimerHz(20);
+	startTimerHz(20);
 #endif
 
 	timerCallback();
-    
+
 }
 
 void FloatParameterLabelUI::setAutoSize(bool value)
@@ -47,14 +46,14 @@ void FloatParameterLabelUI::setAutoSize(bool value)
 	valueChanged(parameter->getValue());
 }
 
-void FloatParameterLabelUI::setPrefix(const String & _prefix)
+void FloatParameterLabelUI::setPrefix(const String& _prefix)
 {
 	if (prefix == _prefix) return;
 	prefix = _prefix;
 	valueChanged(parameter->stringValue());
 }
 
-void FloatParameterLabelUI::setSuffix(const String & _suffix)
+void FloatParameterLabelUI::setSuffix(const String& _suffix)
 {
 	if (suffix == _suffix) return;
 	suffix = _suffix;
@@ -83,14 +82,22 @@ g.fillAll(Colours::purple.withAlpha(.2f));
 
 void FloatParameterLabelUI::resized()
 {
-	 juce::Rectangle<int> r = getLocalBounds();
-	valueLabel.setFont(valueLabel.getFont().withHeight(jmin<float>((float)r.getHeight(), maxFontHeight)));
+	juce::Rectangle<int> r = getLocalBounds();
+
+	float fontHeight = jmin<float>((float)r.getHeight(), maxFontHeight);
+	if (showLabel)
+	{
+		nameLabel.setFont(valueLabel.getFont().withHeight(fontHeight));
+		nameLabel.setBounds(r.removeFromLeft(nameLabel.getFont().getStringWidth(nameLabel.getText())));
+		r.removeFromLeft(4);
+	}
+
+	valueLabel.setFont(valueLabel.getFont().withHeight(fontHeight));
 	valueLabel.setBounds(r);
-	
 }
 
 
-void FloatParameterLabelUI::mouseDownInternal(const MouseEvent & e)
+void FloatParameterLabelUI::mouseDownInternal(const MouseEvent& e)
 {
 	valueAtMouseDown = parameter->floatValue();
 	valueOffsetSinceMouseDown = 0;
@@ -98,7 +105,7 @@ void FloatParameterLabelUI::mouseDownInternal(const MouseEvent & e)
 }
 
 
-void FloatParameterLabelUI::mouseDrag(const MouseEvent & e)
+void FloatParameterLabelUI::mouseDrag(const MouseEvent& e)
 {
 	if (!isInteractable()) return;
 	if (valueLabel.isBeingEdited()) return;
@@ -110,18 +117,18 @@ void FloatParameterLabelUI::mouseDrag(const MouseEvent & e)
 	}
 
 	float sensitivity = e.mods.isShiftDown() ? 10 : (e.mods.isAltDown() ? .1f : 1);
-	
+
 	valueOffsetSinceMouseDown += (e.getPosition().x - lastMouseX) * sensitivity / pixelsPerUnit;
 	lastMouseX = e.getPosition().x;
 
 	parameter->setValue(valueAtMouseDown + valueOffsetSinceMouseDown);
 }
 
-void FloatParameterLabelUI::mouseUpInternal(const MouseEvent & e)
+void FloatParameterLabelUI::mouseUpInternal(const MouseEvent& e)
 {
 	if (!isInteractable()) return;
-	if (valueLabel.isBeingEdited()) return;  
-	
+	if (valueLabel.isBeingEdited()) return;
+
 	valueLabel.setMouseCursor(MouseCursor::NormalCursor);
 	valueLabel.updateMouseCursor();
 
@@ -132,26 +139,31 @@ void FloatParameterLabelUI::updateUIParams()
 {
 	valueLabel.setEditable(false, isInteractable(), false, true);
 	valueLabel.setEnabled(isInteractable());
-	
+
 	valueLabel.setJustificationType(Justification::centred);
 	valueLabel.setColour(Label::ColourIds::textColourId, useCustomTextColor ? customTextColor : (isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f)));
 
-	valueLabel.setColour(valueLabel.backgroundColourId, useCustomBGColor?customBGColor:BG_COLOR.darker(.3f));
+	valueLabel.setColour(valueLabel.backgroundColourId, useCustomBGColor ? customBGColor : BG_COLOR.darker(.3f));
 	valueLabel.setColour(valueLabel.backgroundWhenEditingColourId, Colours::black);
 	valueLabel.setColour(CaretComponent::caretColourId, Colours::orange);
 	valueLabel.setColour(valueLabel.textWhenEditingColourId, Colours::orange);
 	valueLabel.setTooltip(tooltip);
-	
+
 	setOpaqueBackground(opaqueBackground); //force refresh color
 }
 
-void FloatParameterLabelUI::valueChanged(const var & v)
+
+String FloatParameterLabelUI::getValueString(const var &val) const
 {
-    valueString = v.isDouble()?String(parameter->floatValue(),3):v.toString();
+	return val.isDouble() ? String(parameter->floatValue(), 3) : val.toString();
+}
+
+void FloatParameterLabelUI::valueChanged(const var& v)
+{
 	shouldUpdateLabel = true;
 }
 
-void FloatParameterLabelUI::labelTextChanged(Label *)
+void FloatParameterLabelUI::labelTextChanged(Label*)
 {
 	//String  originalString = valueLabel.getText().substring(prefix.length(), valueLabel.getText().length() - suffix.length());
 	parameter->setValue(valueLabel.getText().replace(",", ".").getFloatValue());
@@ -160,33 +172,27 @@ void FloatParameterLabelUI::labelTextChanged(Label *)
 
 void FloatParameterLabelUI::timerCallback()
 {
-    if (!shouldUpdateLabel) return;
-    shouldUpdateLabel = false;
-    
+	if (!shouldUpdateLabel) return;
+	shouldUpdateLabel = false;
+
 	if (parameter.wasObjectDeleted()) return;
 
 	int newStyle = parameter->isOverriden ? Font::bold : Font::plain;
 	if (valueLabel.getFont().getStyleFlags() != newStyle) valueLabel.setFont(valueLabel.getFont().withStyle(newStyle));
 
-
-	valueLabel.setText(/*(showLabel ? parameter->niceName + " : " : "") + */prefix + valueString + suffix, NotificationType::dontSendNotification);
-    
-    if (autoSize)
-    {
-        int valueLabelWidth = valueLabel.getFont().getStringWidth(valueLabel.getText());
-        int tw = valueLabelWidth;
-        setSize(tw + 10, (int)valueLabel.getFont().getHeight());
-    }
-    
+	valueLabel.setText(prefix + getValueString(parameter->value) + suffix, NotificationType::dontSendNotification);
+	if (autoSize)
+	{
+		int valueLabelWidth = valueLabel.getFont().getStringWidth(valueLabel.getText());
+		int tw = valueLabelWidth;
+		setSize(tw + 10, (int)valueLabel.getFont().getHeight());
+	}
 }
 
-
-
 //TIME LABEL
-
-
-TimeLabel::TimeLabel(Parameter * p) :
-	FloatParameterLabelUI(p)
+TimeLabel::TimeLabel(Parameter* p) :
+	FloatParameterLabelUI(p),
+	showStepsMode(false)
 {
 	valueChanged(parameter->getValue());
 }
@@ -195,16 +201,26 @@ TimeLabel::~TimeLabel()
 {
 }
 
-void TimeLabel::valueChanged(const var & v)
+void TimeLabel::setShowStepsMode(bool stepsMode)
 {
-	String timeString = StringUtil::valueToTimeString(v);
+	showStepsMode = stepsMode;
+	shouldUpdateLabel = true;
+}
+
+void TimeLabel::valueChanged(const var& v)
+{
+	String timeString = showStepsMode ? String((float)v * ((FloatParameter*)parameter.get())->unitSteps) : StringUtil::valueToTimeString(v);
 	FloatParameterLabelUI::valueChanged(timeString);
 
 }
 
-void TimeLabel::labelTextChanged(Label *)
+void TimeLabel::labelTextChanged(Label*)
 {
-	parameter->setValue(StringUtil::timeStringToValue(valueLabel.getText()));
-	valueLabel.setText(StringUtil::valueToTimeString(parameter->value), dontSendNotification);
+	parameter->setValue(showStepsMode ? valueLabel.getText().getFloatValue() / ((FloatParameter*)parameter.get())->unitSteps : StringUtil::timeStringToValue(valueLabel.getText()));
+	shouldUpdateLabel = true;
 }
 
+String TimeLabel::getValueString(const var &val) const
+{
+	return showStepsMode ? String((float)val * ((FloatParameter*)parameter.get())->unitSteps) : StringUtil::valueToTimeString(val);
+}

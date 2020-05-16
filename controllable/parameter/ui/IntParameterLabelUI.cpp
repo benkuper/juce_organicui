@@ -25,11 +25,15 @@ void IntParameterLabelUI::valueChanged(const var& v)
 {
 	if (intParam->hexMode)
 	{
-		valueString = "0x" + String::toHexString(intParam->intValue()).toUpperCase();
 		shouldUpdateLabel = true;
 	}
 	else
 	{
 		FloatParameterLabelUI::valueChanged(v);
 	}
+}
+
+String IntParameterLabelUI::getValueString(const var &val) const
+{
+	return "0x" + String::toHexString(intParam->intValue()).toUpperCase();
 }
