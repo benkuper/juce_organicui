@@ -111,7 +111,7 @@ void AutomationKeyUI::mouseDown(const MouseEvent& e)
 void AutomationKeyUI::mouseDoubleClick(const MouseEvent& e)
 {
 	BaseItemMinimalUI::mouseDoubleClick(e);
-	Component* editComponent = new ParameterUI::ValueEditCalloutComponent(item->position);
+	Component* editComponent = new KeyEditCalloutComponent(item);
 	CallOutBox* box = &CallOutBox::launchAsynchronously(editComponent, localAreaToGlobal(getLocalBounds()), nullptr);
 	box->setArrowSize(8);
 }
@@ -187,4 +187,52 @@ void AutomationKeyHandle::paint(Graphics& g)
 void AutomationKeyHandle::inspectableSelectionChanged(Inspectable* i)
 {
 	repaint();
+}
+
+
+
+//
+AutomationKeyUI::KeyEditCalloutComponent::KeyEditCalloutComponent(AutomationKey * k) :
+	k(k)
+{
+	positionEditor.reset((ParameterEditor *)k->position->getEditor(false));
+	valueEditor.reset((ParameterEditor *)k->value->getEditor(false));
+	addAndMakeVisible(positionEditor.get());
+	addAndMakeVisible(valueEditor.get());
+	setSize(160, 50);
+}
+
+AutomationKeyUI::KeyEditCalloutComponent::~KeyEditCalloutComponent()
+{
+}
+
+void AutomationKeyUI::KeyEditCalloutComponent::resized()
+{
+	juce::Rectangle<int> r = getLocalBounds();
+	positionEditor->setBounds(r.removeFromTop(25).reduced(2));
+	valueEditor->setBounds(r.reduced(2));
+}
+
+
+/*
+void AutomationKeyUI::KeyEditCalloutComponent::editorHidden(Label* l, TextEditor&)
+{
+	CallOutBox* b = dynamic_cast<CallOutBox*>(getParentComponent());
+	if (b != nullptr)
+	{
+		if (l == labels[labels.size() - 1]) b->dismiss();
+	}
+	
+}
+*/
+
+void AutomationKeyUI::KeyEditCalloutComponent::parentHierarchyChanged()
+{
+	/*
+	if (labels[0]->isShowing())
+	{
+		labels[0]->grabKeyboardFocus();
+		labels[0]->showEditor();
+	}
+	*/
 }

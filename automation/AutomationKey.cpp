@@ -23,6 +23,7 @@ AutomationKey::AutomationKey(const float & _position, const float & _value) :
     value = addFloatParameter("Value", "The value of the key", 0);
 
     position->setValue(_position);
+    position->defaultUI = FloatParameter::TIME;
     value->setValue(_value);
 
     easingType = addEnumParameter("Easing Type", "The type of interpolation to use");

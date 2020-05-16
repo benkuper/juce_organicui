@@ -33,8 +33,6 @@ public:
     void setValueRange(float minVal, float maxVal, bool proportional = false);
     void clearValueRange();
 
-    
-
     Point<float> getPosAndValue();
     void setPosAndValue(Point<float> posAndValue, bool addToUndo = false);
 
@@ -61,6 +59,8 @@ public:
 
 
     String getTypeString() const override { return "Key"; }
+
+    
 
 
     class  AutomationKeyEvent

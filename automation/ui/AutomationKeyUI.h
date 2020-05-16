@@ -67,4 +67,22 @@ public:
     void addKeyUIListener(KeyUIListener* newListener) { keyUIListeners.add(newListener); }
     void removeKeyUIListener(KeyUIListener* listener) { keyUIListeners.remove(listener); }
 
+
+    class KeyEditCalloutComponent :
+        public Component
+    {
+    public:
+        KeyEditCalloutComponent(AutomationKey* k);
+        ~KeyEditCalloutComponent();
+
+        AutomationKey* k;
+        std::unique_ptr<ParameterEditor> positionEditor;
+        std::unique_ptr<ParameterEditor> valueEditor;
+
+        void resized() override;
+       
+       // void editorHidden(Label* l, TextEditor&) override;
+        void parentHierarchyChanged() override;
+    };
+
 };
