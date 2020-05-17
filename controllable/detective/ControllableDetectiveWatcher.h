@@ -7,13 +7,15 @@ class ControllableDetectiveWatcher :
 	public Thread
 {
 public:
-	ControllableDetectiveWatcher(Controllable * p = nullptr);
-	~ControllableDetectiveWatcher();
+	ControllableDetectiveWatcher();
+	virtual ~ControllableDetectiveWatcher();
+
+	virtual void clearItem() override;
 
 	WeakReference<Controllable> controllable;
 
+	TargetParameter* target;
 	FloatParameter* watchTime;
-	//IntParameter* fps;
 
 	struct WatcherData
 	{
@@ -24,6 +26,8 @@ public:
 
 	OwnedArray<WatcherData, CriticalSection> data;
 	var oldestVal;
+
+	virtual void setControllable(Controllable* c);
 
 	void onContainerParameterChangedInternal(Parameter* p) override;
 

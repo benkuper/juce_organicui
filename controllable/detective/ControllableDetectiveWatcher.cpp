@@ -1,27 +1,51 @@
-
-ControllableDetectiveWatcher::ControllableDetectiveWatcher(Controllable* p) :
-	BaseItem(p->niceName),
+#include "ControllableDetectiveWatcher.h"
+ControllableDetectiveWatcher::ControllableDetectiveWatcher() :
+	BaseItem("No target"),
 	Thread("Watcher"),
-	controllable(p),
+	controllable(nullptr),
 	oldestVal(0)
 {
 	isSelectable = false;
 
 	userCanDuplicate = false;
 
+	target = addTargetParameter("Target", "Target to watch");
+	target->showTriggers = false;
+	target->hideInEditor = true;
+
 	watchTime = addFloatParameter("Time Window", "The time window to watch", 3, .1f, 3600);
 	watchTime->defaultUI = FloatParameter::TIME;
 	watchTime->hideInEditor = true;
-
-	//fps = addFloatParameter("FPS", "The number of samples per second to record. Keep 0 to record everything", 0, 0, 100);
-
-	startThread();
 }
 
 ControllableDetectiveWatcher::~ControllableDetectiveWatcher()
 {
-	signalThreadShouldExit();
-	waitForThreadToExit(100);
+	stopThread(100);
+}
+
+void ControllableDetectiveWatcher::clearItem()
+{
+	setControllable(nullptr);
+}
+
+void ControllableDetectiveWatcher::setControllable(Controllable* c)
+{
+	if (c == controllable) return;
+
+	if (controllable != nullptr)
+	{
+		stopThread(100);
+	}
+	
+	controllable = c;
+
+	if (controllable != nullptr)
+	{
+		stopThread(100);
+	}
+
+	data.clear();
+	setNiceName(controllable != nullptr ? controllable->niceName : "No target");
 }
 
 void ControllableDetectiveWatcher::onContainerParameterChangedInternal(Parameter* p)
@@ -31,9 +55,12 @@ void ControllableDetectiveWatcher::onContainerParameterChangedInternal(Parameter
 		if (enabled->boolValue()) startThread();
 		else
 		{
-			signalThreadShouldExit();
-			waitForThreadToExit(100);
+			stopThread(100);
 		}
+	}
+	else if (p == target)
+	{
+		setControllable(target->target);
 	}
 }
 
@@ -44,7 +71,7 @@ void ControllableDetectiveWatcher::addValue(var val)
 
 void ControllableDetectiveWatcher::run()
 {
-	while (!threadShouldExit())
+	while (!threadShouldExit() && !controllable.wasObjectDeleted())
 	{
 		float curTime = Time::getMillisecondCounter() / 1000.0f;
 		float maxTime = curTime - watchTime->floatValue();
@@ -69,7 +96,6 @@ void ControllableDetectiveWatcher::run()
 
 		sleep(50);
 	}
-	
 }
 
 ControllableDetectiveWatcherUI* ControllableDetectiveWatcher::getUI()

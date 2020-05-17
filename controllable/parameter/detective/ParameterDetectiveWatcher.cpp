@@ -1,18 +1,33 @@
 
-ParameterDetectiveWatcher::ParameterDetectiveWatcher(Parameter* p) :
-	ControllableDetectiveWatcher(p),
-	parameter(p)
+ParameterDetectiveWatcher::ParameterDetectiveWatcher() :
+	ControllableDetectiveWatcher(),
+	parameter(nullptr)
 {
-	oldestVal = parameter->value.clone();
-	parameter->addParameterListener(this);
 	listUISize->setValue(100);
 }
 
 ParameterDetectiveWatcher::~ParameterDetectiveWatcher()
 {
-	if (!parameter.wasObjectDeleted()) parameter->removeParameterListener(this);
 }
 
+
+void ParameterDetectiveWatcher::setControllable(Controllable* c)
+{
+	if (parameter != nullptr)
+	{
+		parameter->removeParameterListener(this);
+	}
+
+	ControllableDetectiveWatcher::setControllable(c);
+
+	parameter = (Parameter*)controllable.get();
+
+	if (parameter != nullptr)
+	{
+		parameter->addParameterListener(this);
+		oldestVal = parameter->value.clone();
+	}
+}
 
 void ParameterDetectiveWatcher::onExternalParameterValueChanged(Parameter* p)
 {

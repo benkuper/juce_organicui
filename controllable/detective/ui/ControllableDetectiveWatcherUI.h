@@ -6,9 +6,10 @@ class ControllableDetectiveWatcherUI :
 {
 public:
 	ControllableDetectiveWatcherUI(ControllableDetectiveWatcher* watcher);
-	~ControllableDetectiveWatcherUI();
+	virtual ~ControllableDetectiveWatcherUI();
 
 	juce::Rectangle<int> canvasRect;
+	TargetParameterUI targetUI;
 	TimeLabel watchTimeUI;
 	Image canvasSnapshot;
 	bool snapshotMode;

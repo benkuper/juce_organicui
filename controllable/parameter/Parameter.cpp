@@ -328,7 +328,7 @@ InspectableEditor * Parameter::getEditor(bool isRoot)
 
 ControllableDetectiveWatcher* Parameter::getDetectiveWatcher()
 {
-	return new ParameterDetectiveWatcher(this);
+	return new ParameterDetectiveWatcher();
 }
 
 DashboardItem* Parameter::createDashboardItem()

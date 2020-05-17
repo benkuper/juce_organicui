@@ -4,10 +4,12 @@ class ParameterDetectiveWatcher :
 	public ControllableDetectiveWatcher
 {
 public:
-	ParameterDetectiveWatcher(Parameter * p = nullptr);
-	~ParameterDetectiveWatcher();
+	ParameterDetectiveWatcher();
+	virtual ~ParameterDetectiveWatcher();
 
 	WeakReference<Parameter> parameter;
+
+	virtual void setControllable(Controllable* c) override;
 
 	void onExternalParameterValueChanged(Parameter* p) override;
 

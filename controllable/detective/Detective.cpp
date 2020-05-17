@@ -15,7 +15,12 @@ Detective::~Detective()
 void Detective::watchControllable(Controllable* c)
 {
 	ControllableDetectiveWatcher* w = getItemForControllable(c);
-	if (w == nullptr) addItem(c->getDetectiveWatcher());
+	if (w == nullptr)
+	{
+		w = addItem(c->getDetectiveWatcher());
+		w->target->setValueFromTarget(c);
+	}
+
 	ShapeShifterManager::getInstance()->showContent("The Detective");
 }
 

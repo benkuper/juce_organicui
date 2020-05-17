@@ -218,7 +218,7 @@ InspectableEditor * Controllable::getEditor(bool isRootEditor) {
 
 ControllableDetectiveWatcher* Controllable::getDetectiveWatcher()
 {
-	return new ControllableDetectiveWatcher(this);
+	return new ControllableDetectiveWatcher();
 }
 
 DashboardItem * Controllable::createDashboardItem()
