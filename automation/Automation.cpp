@@ -176,6 +176,8 @@ Array<UndoableAction*> Automation::getMoveKeysBy(float start, float offset)
 {
     Array<UndoableAction*> actions;
 
+    if (items.size() == 0) return actions;
+
     AutomationKey* k = getKeyForPosition(start);
     if (k->position->floatValue() < start) k = k->nextKey;
     if (k == nullptr) return Array<UndoableAction *>();
