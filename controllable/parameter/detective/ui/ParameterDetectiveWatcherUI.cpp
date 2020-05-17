@@ -24,8 +24,8 @@ void ParameterDetectiveWatcherUI::paintWatcherInternal(Graphics& g, const juce::
 	int numParamValues = parameterWatcher->parameter->isComplex() ? parameterWatcher->parameter->value.size() : 1;
 	for (int pi = 0; pi < numParamValues; pi++)
 	{
-		float minV = p->hasRange() ? (numParamValues > 1 ? p->minimumValue[pi]: p->minimumValue) : 0;
-		float maxV = p->hasRange() ? (numParamValues > 1 ? p->maximumValue[pi] : p->maximumValue) : 1;
+		float minV = p->hasRange() ? (float)(numParamValues > 1 ? p->minimumValue[pi]: p->minimumValue) : 0.0f;
+		float maxV = p->hasRange() ? (float)(numParamValues > 1 ? p->maximumValue[pi] : p->maximumValue) : 1.0f;
 		
 		Path* path = new Path();
 		paths.add(path);

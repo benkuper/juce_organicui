@@ -79,8 +79,8 @@
 
 #pragma warning(push)
 #pragma warning(disable:4067 4200)
-#include "automation/common/fitting/intern/curve_fit_cubic.c";
-#include "automation/common/fitting/intern/curve_fit_corners_detect.c";
+#include "automation/common/fitting/intern/curve_fit_cubic.c"
+#include "automation/common/fitting/intern/curve_fit_corners_detect.c"
 #pragma warning(pop)
 
 #include "automation/recorder/AutomationRecorder.cpp"
