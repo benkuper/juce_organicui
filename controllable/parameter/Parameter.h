@@ -129,6 +129,7 @@ public:
 
 
 	InspectableEditor * getEditor(bool isRoot) override;
+	virtual ControllableDetectiveWatcher* getDetectiveWatcher() override;
 
 	virtual DashboardItem* createDashboardItem() override;
 

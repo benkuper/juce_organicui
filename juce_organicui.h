@@ -127,7 +127,6 @@ using namespace juce;
 #include "controllable/parameter/ui/ParameterUI.h"
 #include "controllable/parameter/ui/ParameterEditor.h"
 
-
 #include "script/ScriptExpression.h"
 
 #include "controllable/ControllableFactory.h"
@@ -173,6 +172,8 @@ using namespace juce;
 
 #include "controllable/ControllableUtil.h"
 
+
+
 #include "updater/AppUpdater.h"
 
 #include "progress/ProgressNotifier.h"
@@ -217,6 +218,13 @@ using namespace juce;
 #include "manager/GenericControllableItem.h"
 #include "manager/GenericControllableManager.h"
 #include "manager/ui/GenericControllableItemEditor.h"
+
+#include "controllable/detective/ControllableDetectiveWatcher.h"
+#include "controllable/parameter/detective/ParameterDetectiveWatcher.h"
+#include "controllable/detective/Detective.h"
+#include "controllable/detective/ui/ControllableDetectiveWatcherEditor.h"
+#include "controllable/parameter/detective/ui/ParameterDetectiveWatcherEditor.h"
+#include "controllable/detective/ui/DetectivePanel.h"
 
 
 #include "controllable/parameter/gradient/GradientColor.h"

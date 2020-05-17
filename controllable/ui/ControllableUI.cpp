@@ -124,6 +124,8 @@ void ControllableUI::showContextMenu()
 		dashboardMenu.addItem(index + 10000, di->niceName);
 		index++;
 	}
+	
+	if(controllable->type == Controllable::FLOAT || controllable->type == Controllable::INT) p->addItem(-10, "Watch this with The Detective");
 	p->addSubMenu("Send to Dashboard", dashboardMenu);
 
 
@@ -145,6 +147,10 @@ void ControllableUI::showContextMenu()
 
 		case -3:
 			showEditWindow();
+			break;
+
+		case -10:
+			Detective::getInstance()->watchControllable(controllable);
 			break;
 
 		default:

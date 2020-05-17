@@ -13,6 +13,7 @@
 class ControllableUI;
 class ControllableContainer;
 class DashboardItem;
+class ControllableDetectiveWatcher;
 
 class Controllable :
 	public Inspectable,
@@ -111,6 +112,7 @@ public:
 	virtual String getWarningTargetName() const override;
 	
 	virtual InspectableEditor * getEditor(bool /*isRootEditor*/) override;
+	virtual ControllableDetectiveWatcher* getDetectiveWatcher();
 	virtual String getTypeString() const { jassert(false); return ""; } //should be overriden
 
 

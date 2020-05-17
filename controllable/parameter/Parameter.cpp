@@ -1,3 +1,4 @@
+#include "Parameter.h"
 /*
   ==============================================================================
 
@@ -323,6 +324,11 @@ void Parameter::parameterValueChanged(Parameter * p)
 InspectableEditor * Parameter::getEditor(bool isRoot)
 {
 	return new ParameterEditor(this, isRoot);
+}
+
+ControllableDetectiveWatcher* Parameter::getDetectiveWatcher()
+{
+	return new ParameterDetectiveWatcher(this);
 }
 
 DashboardItem* Parameter::createDashboardItem()

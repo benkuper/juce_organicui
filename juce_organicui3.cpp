@@ -23,6 +23,13 @@
 #include "inspectable/InspectableContent.cpp"
 #include "inspectable/InspectableSelectionManager.cpp"
 
+#include "controllable/detective/ControllableDetectiveWatcher.cpp"
+#include "controllable/parameter/detective/ParameterDetectiveWatcher.cpp"
+#include "controllable/detective/Detective.cpp"
+#include "controllable/detective/ui/ControllableDetectiveWatcherEditor.cpp"
+#include "controllable/parameter/detective/ui/ParameterDetectiveWatcherEditor.cpp"
+#include "controllable/detective/ui/DetectivePanel.cpp"
+
 #include "help/HelpBox.cpp"
 
 #include "inspectable/ui/InspectableContentComponent.cpp"

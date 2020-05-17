@@ -1,3 +1,4 @@
+#include "Controllable.h"
 /*
   ==============================================================================
 
@@ -210,12 +211,15 @@ String Controllable::getControlAddress(ControllableContainer * relativeTo)
 	return parentContainer->getControlAddress(relativeTo) + "/" + shortName;
 }
 
-
 InspectableEditor * Controllable::getEditor(bool isRootEditor) {
 
 	return new ControllableEditor(this, isRootEditor);
 }
 
+ControllableDetectiveWatcher* Controllable::getDetectiveWatcher()
+{
+	return new ControllableDetectiveWatcher(this);
+}
 
 DashboardItem * Controllable::createDashboardItem()
 {

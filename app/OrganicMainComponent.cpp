@@ -1,4 +1,3 @@
-#include "OrganicMainComponent.h"
 
 ApplicationProperties& getAppProperties();
 ApplicationCommandManager& getCommandManager();

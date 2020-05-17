@@ -44,6 +44,9 @@ Engine::Engine(const String & fileName, const String & fileExtension) :
 
 	addChildControllableContainer(DashboardManager::getInstance());
 	addChildControllableContainer(ProjectSettings::getInstance());
+
+	Detective::getInstance();
+
 	ScriptUtil::getInstance(); //trigger ScriptUtil constructor
 
 	startTimer(60000*5); //auto-save every 5 minutes
@@ -60,6 +63,8 @@ Engine::~Engine() {
 	engineListeners.clear();
 
 	selectionManager = nullptr; //delete selection manager
+
+	Detective::deleteInstance();
 
 	DashboardManager::deleteInstance();
 	Outliner::deleteInstance();
