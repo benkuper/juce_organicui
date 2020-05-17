@@ -51,6 +51,7 @@ public:
 	void mouseDrag(const MouseEvent &e) override;
 	void mouseUpInternal(const MouseEvent &e) override;
 
+	void setOpaqueBackground(bool value) override;
 	void updateUIParams() override;
 
 protected:

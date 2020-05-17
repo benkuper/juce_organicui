@@ -5,6 +5,7 @@ Detective::Detective() :
 	BaseManager("The Detective")
 {
 	userCanAddItemsManually = false;
+	isSelectable = false;
 }
 
 Detective::~Detective()

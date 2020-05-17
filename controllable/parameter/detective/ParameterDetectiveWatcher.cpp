@@ -1,10 +1,11 @@
-#include "ParameterDetectiveWatcher.h"
 
 ParameterDetectiveWatcher::ParameterDetectiveWatcher(Parameter* p) :
 	ControllableDetectiveWatcher(p),
 	parameter(p)
 {
+	oldestVal = parameter->value.clone();
 	parameter->addParameterListener(this);
+	listUISize->setValue(100);
 }
 
 ParameterDetectiveWatcher::~ParameterDetectiveWatcher()
@@ -12,13 +13,14 @@ ParameterDetectiveWatcher::~ParameterDetectiveWatcher()
 	if (!parameter.wasObjectDeleted()) parameter->removeParameterListener(this);
 }
 
-InspectableEditor* ParameterDetectiveWatcher::getEditor(bool isRoot)
-{
-	return new ParameterDetectiveWatcherEditor(this, isRoot);
-}
 
 void ParameterDetectiveWatcher::onExternalParameterValueChanged(Parameter* p)
 {
-	if (p == parameter) addValue(p->floatValue());
+	if (p == parameter) addValue(p->value.clone());
 	ControllableDetectiveWatcher::onExternalParameterValueChanged(p);
+}
+
+ControllableDetectiveWatcherUI* ParameterDetectiveWatcher::getUI()
+{
+	return new ParameterDetectiveWatcherUI(this);
 }

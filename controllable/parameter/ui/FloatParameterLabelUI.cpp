@@ -1,3 +1,4 @@
+#include "FloatParameterLabelUI.h"
 /*
   ==============================================================================
 
@@ -135,6 +136,12 @@ void FloatParameterLabelUI::mouseUpInternal(const MouseEvent& e)
 	if (valueAtMouseDown != parameter->floatValue()) parameter->setUndoableValue(valueAtMouseDown, parameter->floatValue());
 }
 
+void FloatParameterLabelUI::setOpaqueBackground(bool value)
+{
+	ParameterUI::setOpaqueBackground(value);
+	updateUIParams();
+}
+
 void FloatParameterLabelUI::updateUIParams()
 {
 	valueLabel.setEditable(false, isInteractable(), false, true);
@@ -143,13 +150,13 @@ void FloatParameterLabelUI::updateUIParams()
 	valueLabel.setJustificationType(Justification::centred);
 	valueLabel.setColour(Label::ColourIds::textColourId, useCustomTextColor ? customTextColor : (isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f)));
 
-	valueLabel.setColour(valueLabel.backgroundColourId, useCustomBGColor ? customBGColor : BG_COLOR.darker(.3f));
+	valueLabel.setColour(valueLabel.backgroundColourId, opaqueBackground?(useCustomBGColor ? customBGColor : BG_COLOR.darker(.3f)):Colours::transparentBlack);
 	valueLabel.setColour(valueLabel.backgroundWhenEditingColourId, Colours::black);
 	valueLabel.setColour(CaretComponent::caretColourId, Colours::orange);
 	valueLabel.setColour(valueLabel.textWhenEditingColourId, Colours::orange);
 	valueLabel.setTooltip(tooltip);
 
-	setOpaqueBackground(opaqueBackground); //force refresh color
+	repaint();
 }
 
 

@@ -26,8 +26,8 @@
 #include "controllable/detective/ControllableDetectiveWatcher.cpp"
 #include "controllable/parameter/detective/ParameterDetectiveWatcher.cpp"
 #include "controllable/detective/Detective.cpp"
-#include "controllable/detective/ui/ControllableDetectiveWatcherEditor.cpp"
-#include "controllable/parameter/detective/ui/ParameterDetectiveWatcherEditor.cpp"
+#include "controllable/detective/ui/ControllableDetectiveWatcherUI.cpp"
+#include "controllable/parameter/detective/ui/ParameterDetectiveWatcherUI.cpp"
 #include "controllable/detective/ui/DetectivePanel.cpp"
 
 #include "help/HelpBox.cpp"

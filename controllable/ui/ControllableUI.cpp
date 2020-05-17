@@ -125,7 +125,15 @@ void ControllableUI::showContextMenu()
 		index++;
 	}
 	
-	if(controllable->type == Controllable::FLOAT || controllable->type == Controllable::INT) p->addItem(-10, "Watch this with The Detective");
+	if (controllable->type == Controllable::FLOAT ||
+		controllable->type == Controllable::INT ||
+		controllable->type == Controllable::POINT2D ||
+		controllable->type == Controllable::POINT3D ||
+		controllable->type == Controllable::COLOR)
+	{
+		p->addItem(-10, "Watch this with The Detective");
+	}
+
 	p->addSubMenu("Send to Dashboard", dashboardMenu);
 
 

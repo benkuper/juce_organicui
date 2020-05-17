@@ -222,8 +222,8 @@ using namespace juce;
 #include "controllable/detective/ControllableDetectiveWatcher.h"
 #include "controllable/parameter/detective/ParameterDetectiveWatcher.h"
 #include "controllable/detective/Detective.h"
-#include "controllable/detective/ui/ControllableDetectiveWatcherEditor.h"
-#include "controllable/parameter/detective/ui/ParameterDetectiveWatcherEditor.h"
+#include "controllable/detective/ui/ControllableDetectiveWatcherUI.h"
+#include "controllable/parameter/detective/ui/ParameterDetectiveWatcherUI.h"
 #include "controllable/detective/ui/DetectivePanel.h"
 
 

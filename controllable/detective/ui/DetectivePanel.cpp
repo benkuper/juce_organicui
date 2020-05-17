@@ -1,16 +1,15 @@
+#include "DetectivePanel.h"
 
 DetectivePanel::DetectivePanel(const String& name) :
-	ShapeShifterContentComponent(name),
-	managerEditor(Detective::getInstance(), true)
+	BaseManagerShapeShifterUI(name, Detective::getInstance())
 {
-	addAndMakeVisible(&managerEditor);
 }
 
 DetectivePanel::~DetectivePanel()
 {
 }
 
-void DetectivePanel::resized()
+ControllableDetectiveWatcherUI* DetectivePanel::createUIForItem(ControllableDetectiveWatcher* w)
 {
-	managerEditor.setBounds(getLocalBounds());
+	return w->getUI();
 }

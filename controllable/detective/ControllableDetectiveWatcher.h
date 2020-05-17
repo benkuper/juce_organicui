@@ -1,5 +1,7 @@
 #pragma once
 
+class ControllableDetectiveWatcherUI;
+
 class ControllableDetectiveWatcher :
 	public BaseItem,
 	public Thread
@@ -21,11 +23,12 @@ public:
 	};
 
 	OwnedArray<WatcherData, CriticalSection> data;
+	var oldestVal;
+
+	void onContainerParameterChangedInternal(Parameter* p) override;
 
 	void addValue(var data);
-
 	void run() override;
 
-	InspectableEditor* getEditor(bool isRoot) override;
-
+	virtual ControllableDetectiveWatcherUI* getUI();
 };

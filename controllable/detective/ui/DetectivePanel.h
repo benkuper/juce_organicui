@@ -2,15 +2,13 @@
 
 
 class DetectivePanel :
-	public ShapeShifterContentComponent
+	public BaseManagerShapeShifterUI<Detective,ControllableDetectiveWatcher,ControllableDetectiveWatcherUI>
 {
 public:
 	DetectivePanel(const String& name);
 	~DetectivePanel();
 
-	GenericManagerEditor<ControllableDetectiveWatcher> managerEditor;
-
-	void resized() override;
+	ControllableDetectiveWatcherUI* createUIForItem(ControllableDetectiveWatcher* w) override;
 
 	static DetectivePanel* create(const String& contentName) { return new DetectivePanel(contentName); }
 private:
