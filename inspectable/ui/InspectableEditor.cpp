@@ -40,7 +40,15 @@ void InspectableEditor::updateVisibility()
 	juce::Rectangle<int> ir = parentInspector->getLocalBounds().getIntersection(r);
 	
 	isInsideInspectorBounds = !ir.isEmpty();
-	setVisible(isInsideInspectorBounds);
+	bool shouldBeVisible = isInsideInspectorBounds;
+
+	//Too hacky ? parent should handle children visibility
+	if (GenericControllableContainerEditor* pe = dynamic_cast<GenericControllableContainerEditor*>(getParentComponent()))
+	{
+		if (!pe->isRoot && pe->container->editorIsCollapsed) shouldBeVisible = false;
+	}
+
+	setVisible(shouldBeVisible);
 
 	Array<Component *> children = getChildren();
 	for (auto &c : children)

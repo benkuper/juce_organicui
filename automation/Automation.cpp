@@ -74,7 +74,7 @@ void Automation::addKeys(const Array<AutomationKey*>& keys, bool addToUndo, bool
 
     Array<AutomationKey*> keysToAdd;
     if (addToUndo)  actions.add(getAddItemsUndoableAction(keys));
-    else addItems(keysToAdd, var(), false);
+    else addItems(keys, var(), false);
 
     if (addToUndo) UndoMaster::getInstance()->performActions("Add Keys", actions);
 
@@ -83,7 +83,7 @@ void Automation::addKeys(const Array<AutomationKey*>& keys, bool addToUndo, bool
 void Automation::addFromPointsAndSimplify(const Array<Point<float>>& sourcePoints, bool addToUndo, bool removeExistingKeys)
 {
     Array<float> points;
-    for (auto& pp : sourcePoints) points.add(pp.x, pp.y);
+    for (auto& pp : sourcePoints)  points.add(pp.x, pp.y);
     float* result;
     unsigned int resultNum = 0;
     unsigned int* origIndex;
@@ -92,10 +92,10 @@ void Automation::addFromPointsAndSimplify(const Array<Point<float>>& sourcePoint
     unsigned int* cornerIndex = nullptr;
     unsigned int cornerIndexLength = 0;
 
-    curve_fit_corners_detect_fl(points.getRawDataPointer(), points.size(), 2, 0, .02f, 20, 30, &corners, &cornersLength);
+    curve_fit_corners_detect_fl(points.getRawDataPointer(), points.size(), 2, 0, .1f, 50, 30, &corners, &cornersLength);
     if (cornersLength == 0) corners = nullptr;
 
-    curve_fit_cubic_to_points_fl(points.getRawDataPointer(), points.size(), 2, .04f, CURVE_FIT_CALC_HIGH_QUALIY, corners, cornersLength, &result, &resultNum, &origIndex, &cornerIndex, &cornerIndexLength);
+    curve_fit_cubic_to_points_fl(points.getRawDataPointer(), points.size(), 2, .06f, CURVE_FIT_CALC_HIGH_QUALIY, corners, cornersLength, &result, &resultNum, &origIndex, &cornerIndex, &cornerIndexLength);
 
     int numPoints = ((int)resultNum);
 
@@ -105,6 +105,8 @@ void Automation::addFromPointsAndSimplify(const Array<Point<float>>& sourcePoint
     Point<float> prevRP;
 
     float maxDist = valueRange->enabled ? (valueRange->y - valueRange->x)*100 : 1000;
+
+    int numBadPoints = 0;
     for (int i = 0; i < numPoints; i++)
     {
         int index = i * 6;
@@ -119,18 +121,20 @@ void Automation::addFromPointsAndSimplify(const Array<Point<float>>& sourcePoint
         }
 
 
-        if (i > 0 && rp.getDistanceFrom(prevRP) > maxDist)
+        if (i > 0 && (rp.getDistanceFrom(prevRP) > maxDist || rp.x  <= prevRP.x))
         {
-            break;
+            numBadPoints++;
+            continue;
         }
 
         AutomationKey* k = new AutomationKey();
         k->setPosAndValue(rp);
-
+        k->setNiceName("Key " + String(i));
         k->easingType->setValueWithData(Easing::BEZIER);
         CubicEasing* ce = (CubicEasing*)k->easing.get();
         if (h2.getDistanceFrom(rp) < maxDist) ce->anchor1->setPoint(h2 - rp);
 
+        DBG("Add good point : " << k->getPosAndValue().toString());
         keys.add(k);
 
         prevEasing = ce;
