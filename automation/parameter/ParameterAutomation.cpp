@@ -145,8 +145,11 @@ void ParameterAutomation::loadJSONDataInternal(var data)
 ParameterNumberAutomation::ParameterNumberAutomation(Parameter* parameter, bool addDefaultItems) :
 	ParameterAutomation(parameter)
 {
+	length = addFloatParameter("Length", "Length of this parameter animation", automation.length->floatValue(), .1f);
+	length->defaultUI = FloatParameter::TIME;
+	length->hideInEditor = true;
 	timeParamRef = automation.position;
-	lengthParamRef = automation.length;
+	lengthParamRef = length;
 	valueParamRef = automation.value;
 	automationContainer = &automation;
 	
@@ -175,6 +178,12 @@ void ParameterNumberAutomation::setLength(float value, bool stretch, bool stickT
 void ParameterNumberAutomation::setAllowKeysOutside(bool value)
 {
 	//automation.allowKeysOutside = true;
+}
+
+void ParameterNumberAutomation::onContainerParameterChangedInternal(Parameter* p)
+{
+	ParameterAutomation::onContainerParameterChangedInternal(p);
+	if (p == length) setLength(length->floatValue(), true);
 }
 
 ParameterColorAutomation::ParameterColorAutomation(ColorParameter* colorParam, bool addDefaultItems) :

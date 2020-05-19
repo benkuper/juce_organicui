@@ -13,6 +13,11 @@ ParameterAutomationEditor::ParameterAutomationEditor(ParameterAutomation * ppa) 
 		addAndMakeVisible(modeUI.get());
 		addAndMakeVisible(lengthUI.get());
 	}
+
+	if (AutomationEditor * ae = dynamic_cast<AutomationEditor *>(automationEditor.get()))
+	{
+		ae->automationUI->autoAdaptViewRange = true;
+	}
 	
 	setSize(100, automationEditor->getHeight());
 }

@@ -23,6 +23,7 @@ public:
 
     Point<float> viewPosRange;
     float viewLength;
+    bool autoAdaptViewRange;
 
     bool shouldRepaint;
 

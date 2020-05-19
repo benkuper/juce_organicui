@@ -1,4 +1,3 @@
-#include "ParameterEditor.h"
 ParameterEditor::ParameterEditor(Parameter* _parameter, bool isRoot) :
 	ControllableEditor(_parameter, isRoot),
 	parameter(_parameter),

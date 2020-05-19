@@ -124,7 +124,7 @@ void ParameterUI::addPopupMenuItems(PopupMenu * p)
 {
 	if (isInteractable() || parameter->controlMode != Parameter::MANUAL)
 	{
-		p->addItem(1, "Reset value");
+		if (isInteractable()) p->addItem(1, "Reset value");
 
 		if (isInteractable())
 		{

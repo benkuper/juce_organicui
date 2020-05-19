@@ -38,9 +38,11 @@ Automation::Automation(const String& name, AutomationRecorder * recorder, bool a
 
     valueRange = addPoint2DParameter("Range", "The range between allowed minimum value and maximum value");
     valueRange->canBeDisabledByUser = true;
+    valueRange->hideInEditor = true;
 
     rangeRemapMode = addEnumParameter("Range Remap Mode", "The way of recaculating the key values when changing the range.\nAbsolute means no modification is done. Proportional means that the relative value of the key will be maintained.");
     rangeRemapMode->addOption("Absolute", ABSOLUTE)->addOption("Proportional", PROPORTIONAL);
+    rangeRemapMode->hideInEditor = true;
     valueRange->setPoint(0, 1);
 }
 
