@@ -15,6 +15,8 @@ FloatParameterLabelUI::FloatParameterLabelUI(Parameter* p) :
 	maxFontHeight(GlobalSettings::getInstance()->fontSize->floatValue()),
 	autoSize(false)
 {
+	opaqueBackground = true;
+
 	updateUIParams();
 
 	addAndMakeVisible(&valueLabel);

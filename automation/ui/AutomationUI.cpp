@@ -15,6 +15,7 @@ AutomationUI::AutomationUI(Automation* manager) :
     showNumberLines(true),
     autoAdaptViewRange(false)
 {
+    autoSelectWithChildRespect = false;
     resizeOnChildBoundsChanged = false;
 
     animateItemOnAdd = false;
