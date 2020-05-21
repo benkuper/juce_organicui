@@ -423,21 +423,21 @@ int Automation::compareKeys(AutomationKey* k1, AutomationKey* k2)
 var Automation::getValueAtPositionFromScript(const juce::var::NativeFunctionArgs& a)
 {
     Automation * au = getObjectFromJS<Automation>(a);
-    if (!checkNumArgs(au->niceName, a, 1)) return;
+    if (!checkNumArgs(au->niceName, a, 1)) return var();
     return au->getValueAtPosition(a.arguments[0]);
 }
 
 var Automation::getKeyAtPositionFromScript(const juce::var::NativeFunctionArgs& a)
 {
     Automation* au = getObjectFromJS<Automation>(a);
-    if (!checkNumArgs(au->niceName, a, 1)) return;
+    if (!checkNumArgs(au->niceName, a, 1)) return var();
     return au->getKeyForPosition(a.arguments[0])->getScriptObject();
 }
 
 var Automation::getKeysBetweenFromScript(const juce::var::NativeFunctionArgs& a)
 {
     Automation* au = getObjectFromJS<Automation>(a);
-    if (!checkNumArgs(au->niceName, a, 2)) return;
+    if (!checkNumArgs(au->niceName, a, 2)) return var();
     var result = var();
     Array<AutomationKey* > keys = au->getKeysBetweenPositions(a.arguments[0], a.arguments[1]);
     for (auto& k : keys) result.append(k->getScriptObject());
