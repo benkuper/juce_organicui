@@ -1,3 +1,4 @@
+#include "Automation.h"
 /*
   ==============================================================================
 
@@ -43,6 +44,10 @@ Automation::Automation(const String& name, AutomationRecorder * recorder, bool a
     rangeRemapMode->addOption("Absolute", ABSOLUTE)->addOption("Proportional", PROPORTIONAL);
     rangeRemapMode->hideInEditor = true;
     valueRange->setPoint(0, 1);
+
+    scriptObject.setMethod("getValueAtPosition", &Automation::getValueAtPositionFromScript);
+    scriptObject.setMethod("getKeyAtPosition", &Automation::getKeyAtPositionFromScript);
+    scriptObject.setMethod("getKeysBetween", &Automation::getKeysBetweenFromScript);
 }
 
 Automation::~Automation()
@@ -413,6 +418,30 @@ void Automation::afterLoadJSONDataInternal()
 int Automation::compareKeys(AutomationKey* k1, AutomationKey* k2)
 {
     return k2->position->floatValue() < k1->position->floatValue() ? 1 : k2->position->floatValue() > k1->position->floatValue() ? -1 : 0;
+}
+
+var Automation::getValueAtPositionFromScript(const juce::var::NativeFunctionArgs& a)
+{
+    Automation * au = getObjectFromJS<Automation>(a);
+    if (!checkNumArgs(au->niceName, a, 1)) return;
+    return au->getValueAtPosition(a.arguments[0]);
+}
+
+var Automation::getKeyAtPositionFromScript(const juce::var::NativeFunctionArgs& a)
+{
+    Automation* au = getObjectFromJS<Automation>(a);
+    if (!checkNumArgs(au->niceName, a, 1)) return;
+    return au->getKeyForPosition(a.arguments[0])->getScriptObject();
+}
+
+var Automation::getKeysBetweenFromScript(const juce::var::NativeFunctionArgs& a)
+{
+    Automation* au = getObjectFromJS<Automation>(a);
+    if (!checkNumArgs(au->niceName, a, 2)) return;
+    var result = var();
+    Array<AutomationKey* > keys = au->getKeysBetweenPositions(a.arguments[0], a.arguments[1]);
+    for (auto& k : keys) result.append(k->getScriptObject());
+    return result;
 }
 
 InspectableEditor* Automation::getEditor(bool isRoot)
