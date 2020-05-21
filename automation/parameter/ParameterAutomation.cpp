@@ -173,6 +173,7 @@ ParameterNumberAutomation::ParameterNumberAutomation(Parameter* parameter, bool 
 void ParameterNumberAutomation::setLength(float value, bool stretch, bool stickToEnd)
 {
 	automation.setLength(value, stretch, stickToEnd);
+	length->setValue(value);
 }
 
 void ParameterNumberAutomation::setAllowKeysOutside(bool value)
