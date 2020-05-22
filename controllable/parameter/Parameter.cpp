@@ -180,7 +180,10 @@ StringArray Parameter::getValuesNames()
 	return result;
 }
 
-void Parameter::setRange(var min, var max) {
+void Parameter::setRange(var min, var max)
+{
+
+	if (!canHaveRange) return;
 
 	{
 		GenericScopedLock<SpinLock> lock(valueSetLock);
@@ -202,12 +205,47 @@ void Parameter::setRange(var min, var max) {
 
 void Parameter::clearRange()
 {
-	setRange(INT32_MIN, INT32_MAX);
+	if (!canHaveRange) return;
+
+	if (isComplex())
+	{
+		{
+			GenericScopedLock<SpinLock> lock(valueSetLock);
+			var minVal = var();
+			var maxVal = var();
+			for (int i = 0; i < value.size(); i++)
+			{
+				minVal.append(INT32_MIN);
+				maxVal.append(INT32_MAX);
+			}
+			minimumValue = minVal;
+			maximumValue = maxVal;
+		}
+
+	}
+	else
+	{
+		setRange(INT32_MIN, INT32_MAX);
+	}
 }
 
 bool Parameter::hasRange()
 {
-	return canHaveRange;
+	if (!canHaveRange) return false;
+
+	{
+		GenericScopedLock<SpinLock> lock(valueSetLock);
+		if (isComplex())
+		{
+			for (int i = 0; i < value.size(); i++) if ((int)minimumValue[i] != INT32_MIN || (int)maximumValue[i] != INT32_MAX) return false;
+		}
+		else
+		{
+			if ((int)minimumValue != INT32_MIN || (int)maximumValue != INT32_MAX) return false;
+		}
+	}
+
+	return false;
 }
 
 void Parameter::setValueInternal(var & _value) //to override by child classes
