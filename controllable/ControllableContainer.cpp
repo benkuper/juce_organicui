@@ -956,7 +956,6 @@ void ControllableContainer::childAddressChanged(ControllableContainer* cc)
 
 bool ControllableContainer::isNameTaken(const String& targetName, Controllable* excludeC, ControllableContainer* excludeCC)
 {
-	bool nameIsTaken = false;
 	for (auto& tc : controllables)
 	{
 		if (tc != excludeC && tc->niceName == targetName)
