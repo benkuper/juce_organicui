@@ -1,3 +1,4 @@
+#include "ControllableUI.h"
 /*
   ==============================================================================
 
@@ -177,6 +178,11 @@ void ControllableUI::showContextMenu()
 			}
 		}
 	}
+}
+
+void ControllableUI::updateUIParams()
+{
+	setInterceptsMouseClicks(isInteractable(), isInteractable());
 }
 
 void ControllableUI::setOpaqueBackground(bool value)

@@ -34,6 +34,7 @@ public:
 	virtual void feedbackStateChanged() override; 
 
 	virtual void updateTooltip() override;
+	virtual void updateUIParams() override;
 
 	void paint(Graphics &g) override;
     void resized() override;

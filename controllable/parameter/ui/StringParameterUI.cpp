@@ -25,16 +25,11 @@ StringParameterUI::StringParameterUI(Parameter * p) :
     valueLabel.setJustificationType(Justification::topLeft);
     valueLabel.setText(parameter->getValue(),NotificationType::dontSendNotification);
 	valueLabel.addListener(this);
-
-	valueLabel.setColour(valueLabel.backgroundWhenEditingColourId, Colours::black);
-	valueLabel.setColour(valueLabel.textWhenEditingColourId, Colours::white);
-	valueLabel.setColour(CaretComponent::caretColourId, Colours::orange);
-	valueLabel.setColour(valueLabel.textColourId, useCustomTextColor ? customTextColor : (isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f)));
 	valueLabel.addMouseListener(this, false);
 
 	ParameterUI::setNextFocusOrder(&valueLabel);
 
-	feedbackStateChanged();
+	updateUIParams();
 
 	setSize(200, GlobalSettings::getInstance()->fontSize->floatValue()+4);//default size
 }
@@ -57,24 +52,29 @@ bool StringParameterUI::isEditing()
 void StringParameterUI::setOpaqueBackground(bool value)
 {
 	ParameterUI::setOpaqueBackground(value);
-	valueLabel.setColour(valueLabel.backgroundColourId, useCustomBGColor?customBGColor:(opaqueBackground ? (!controllable->isControllableFeedbackOnly ? BG_COLOR.darker(.1f).withAlpha(.7f):BG_COLOR.darker(.1f).withAlpha(.4f)) : Colours::transparentBlack));
-	valueLabel.setColour(valueLabel.outlineColourId, useCustomBGColor ? customBGColor.brighter():(opaqueBackground ? BG_COLOR.brighter(.1f):Colours::transparentWhite));
-	valueLabel.setColour(valueLabel.textColourId, useCustomTextColor ? customTextColor : (isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f)));
-	//valueLabel.setColour(valueLabel.textColourId, !controllable->isControllableFeedbackOnly ? TEXT_COLOR : TEXT_COLOR.withAlpha(.6f));
+	updateUIParams();
 }
 
 void StringParameterUI::feedbackStateChanged()
 {
-	valueLabel.setEditable(!controllable->isControllableFeedbackOnly);
-	valueLabel.setEnabled(!controllable->isControllableFeedbackOnly);
-	valueLabel.setColour(valueLabel.textColourId, useCustomTextColor ? customTextColor : (isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f)));
-	setOpaqueBackground(opaqueBackground); //force refresh color
+	ParameterUI::feedbackStateChanged();
+	updateUIParams();
 }
 
 void StringParameterUI::updateTooltip()
 {
 	ParameterUI::updateTooltip();
 	valueLabel.setTooltip(tooltip);
+}
+
+void StringParameterUI::updateUIParams()
+{
+	ParameterUI::updateUIParams();
+	valueLabel.setEditable(!controllable->isControllableFeedbackOnly);
+	valueLabel.setEnabled(!controllable->isControllableFeedbackOnly);
+	valueLabel.setColour(valueLabel.backgroundColourId, useCustomBGColor ? customBGColor : (opaqueBackground ? (!controllable->isControllableFeedbackOnly ? BG_COLOR.darker(.1f).withAlpha(.7f) : BG_COLOR.darker(.1f).withAlpha(.4f)) : Colours::transparentBlack));
+	valueLabel.setColour(valueLabel.outlineColourId, useCustomBGColor ? customBGColor.brighter() : (opaqueBackground ? BG_COLOR.brighter(.1f) : Colours::transparentWhite));
+	valueLabel.setColour(valueLabel.textColourId, useCustomTextColor ? customTextColor : (isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f)));
 }
 
 void StringParameterUI::paint(Graphics& g)

@@ -146,6 +146,7 @@ void FloatParameterLabelUI::setOpaqueBackground(bool value)
 
 void FloatParameterLabelUI::updateUIParams()
 {
+	ParameterUI::updateUIParams();
 	valueLabel.setEditable(false, isInteractable(), false, true);
 	valueLabel.setEnabled(isInteractable());
 
