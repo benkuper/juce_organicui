@@ -86,7 +86,6 @@ void Automation::addFromPointsAndSimplify(const Array<Point<float>>& sourcePoint
     for (auto& pp : sourcePoints)  points.add(pp.x, pp.y);
     float* result;
     unsigned int resultNum = 0;
-    unsigned int* origIndex;
     unsigned int* corners = nullptr;
     unsigned int cornersLength = 0;
     unsigned int* cornerIndex = nullptr;
@@ -102,7 +101,7 @@ void Automation::addFromPointsAndSimplify(const Array<Point<float>>& sourcePoint
         .06f, CURVE_FIT_CALC_HIGH_QUALIY,
         corners, cornersLength,
         &result, &resultNum,
-        &origIndex,
+        nullptr,
         &cornerIndex, &cornerIndexLength);
     
     int numPoints = ((int)resultNum);
@@ -151,7 +150,6 @@ void Automation::addFromPointsAndSimplify(const Array<Point<float>>& sourcePoint
     DBG(numBadPoints << " bad points discarded");
 
     delete result;
-    delete origIndex;
     delete corners;
     delete cornerIndex;
 

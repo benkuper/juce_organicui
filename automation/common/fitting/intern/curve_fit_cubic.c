@@ -53,7 +53,7 @@
 #define USE_OFFSET_FALLBACK
 
 /* avoid re-calculating lengths multiple times */
-//#define USE_LENGTH_CACHE
+#define USE_LENGTH_CACHE
 
 /* store the indices in the cubic data so we can return the original indices,
  * useful when the caller has data associated with the curve. */
