@@ -92,11 +92,19 @@ void Automation::addFromPointsAndSimplify(const Array<Point<float>>& sourcePoint
     unsigned int* cornerIndex = nullptr;
     unsigned int cornerIndexLength = 0;
 
-    curve_fit_corners_detect_fl(points.getRawDataPointer(), points.size(), 2, 0, .1f, 50, 30, &corners, &cornersLength);
+    curve_fit_corners_detect_fl(points.getRawDataPointer(), points.size() / 2, 2, 
+        0, .1f, 50, 30, 
+        &corners, &cornersLength);
     if (cornersLength == 0) corners = nullptr;
 
-    curve_fit_cubic_to_points_fl(points.getRawDataPointer(), points.size(), 2, .06f, CURVE_FIT_CALC_HIGH_QUALIY, corners, cornersLength, &result, &resultNum, &origIndex, &cornerIndex, &cornerIndexLength);
 
+    curve_fit_cubic_to_points_fl(points.getRawDataPointer(), points.size() / 2, 2,
+        .06f, CURVE_FIT_CALC_HIGH_QUALIY,
+        corners, cornersLength,
+        &result, &resultNum,
+        &origIndex,
+        &cornerIndex, &cornerIndexLength);
+    
     int numPoints = ((int)resultNum);
 
     Array<AutomationKey*> keys;
@@ -140,6 +148,7 @@ void Automation::addFromPointsAndSimplify(const Array<Point<float>>& sourcePoint
         prevEasing = ce;
         prevRP.setXY(rp.x, rp.y);
     }
+    DBG(numBadPoints << " bad points discarded");
 
     delete result;
     delete origIndex;
