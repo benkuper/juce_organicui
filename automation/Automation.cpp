@@ -88,21 +88,37 @@ void Automation::addKeys(const Array<AutomationKey*>& keys, bool addToUndo, bool
 
 void Automation::addFromPointsAndSimplify(const Array<Point<float>>& sourcePoints, bool addToUndo, bool removeExistingKeys)
 {
+    // Normalize X and Y values to [0,1] for correct corner detection
+    float xScale = sourcePoints.getLast().x - sourcePoints.getLast().y;
+    float yScale = valueRange->enabled ? (valueRange->y - valueRange->x) : 1.0f;
+
     Array<float> points;
-    for (auto& pp : sourcePoints)  points.add(pp.x, pp.y);
+    for (auto& pp : sourcePoints)  
+        points.add(pp.x / xScale, pp.y / yScale);
+    
     float* result;
     unsigned int resultNum = 0;
-    unsigned int* origIndex;
     unsigned int* corners = nullptr;
     unsigned int cornersLength = 0;
     unsigned int* cornerIndex = nullptr;
     unsigned int cornerIndexLength = 0;
 
-    curve_fit_corners_detect_fl(points.getRawDataPointer(), points.size(), 2, 0, .1f, 50, 30, &corners, &cornersLength);
+    const float errorThreshold = 0.02f;
+
+    curve_fit_corners_detect_fl(points.getRawDataPointer(), points.size() / 2, 2, 
+        errorThreshold / 4, errorThreshold * 4, 32, M_PI/8, 
+        &corners, &cornersLength);
     if (cornersLength == 0) corners = nullptr;
 
-    curve_fit_cubic_to_points_fl(points.getRawDataPointer(), points.size(), 2, .06f, CURVE_FIT_CALC_HIGH_QUALIY, corners, cornersLength, &result, &resultNum, &origIndex, &cornerIndex, &cornerIndexLength);
+    DBG((int)cornersLength << " corners detected");
 
+    curve_fit_cubic_to_points_fl(points.getRawDataPointer(), points.size() / 2, 2,
+        errorThreshold, CURVE_FIT_CALC_HIGH_QUALIY,
+        corners, cornersLength,
+        &result, &resultNum,
+        nullptr,
+        &cornerIndex, &cornerIndexLength);
+    
     int numPoints = ((int)resultNum);
 
     Array<AutomationKey*> keys;
@@ -116,9 +132,9 @@ void Automation::addFromPointsAndSimplify(const Array<Point<float>>& sourcePoint
     for (int i = 0; i < numPoints; i++)
     {
         int index = i * 6;
-        Point<float> h1(result[index + 0], result[index + 1]);
-        Point<float> rp(result[index + 2], result[index + 3]);
-        Point<float> h2(result[index + 4], result[index + 5]);
+        Point<float> h1(result[index + 0] * xScale, result[index + 1] * yScale);
+        Point<float> rp(result[index + 2] * xScale, result[index + 3] * yScale);
+        Point<float> h2(result[index + 4] * xScale, result[index + 5] * yScale);
 
 
         if (prevEasing != nullptr && h1.getDistanceFrom(rp) < maxDist)
@@ -146,9 +162,9 @@ void Automation::addFromPointsAndSimplify(const Array<Point<float>>& sourcePoint
         prevEasing = ce;
         prevRP.setXY(rp.x, rp.y);
     }
+    DBG(numBadPoints << " bad points discarded");
 
     delete result;
-    delete origIndex;
     delete corners;
     delete cornerIndex;
 
