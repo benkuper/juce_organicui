@@ -12,8 +12,10 @@ AutomationUI::AutomationUI(Automation* manager) :
     BaseManagerUI(manager->niceName, manager, false),
     paintingMode(false),
     previewMode(false),
-    showNumberLines(true)
+    showNumberLines(true),
+    autoAdaptViewRange(false)
 {
+    autoSelectWithChildRespect = false;
     resizeOnChildBoundsChanged = false;
 
     animateItemOnAdd = false;
@@ -573,6 +575,13 @@ void AutomationUI::newMessage(const ContainerAsyncEvent& e)
         {
             resized();
             shouldRepaint = true;
+        }
+        else if (e.targetControllable == manager->length)
+        {
+            if (autoAdaptViewRange)
+            {
+                setViewRange(0, manager->length->floatValue());
+            }
         }
     }
 }

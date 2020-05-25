@@ -142,9 +142,11 @@ public:
 	virtual void loadJSONDataInternal(var /*data*/) { /* to be overriden by child classes */ }
 	virtual void afterLoadJSONDataInternal() {} //allow for calling methods after isCurrentlyLoadingData is set to false
 
+	virtual void controllableContainerNameChanged(ControllableContainer *) override;
 	virtual void childStructureChanged(ControllableContainer *)override;
 	virtual void childAddressChanged(ControllableContainer *) override;
 	
+	bool isNameTaken(const String& name, Controllable* excludeC = nullptr, ControllableContainer* excludeCC = nullptr);
 	String getUniqueNameInContainer(const String &sourceName, int suffix = 0);
 
 	//SCRIPT

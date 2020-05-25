@@ -321,6 +321,7 @@ void ControllableContainer::setNiceName(const String& _niceName) {
 	niceName = _niceName;
 	if (!hasCustomShortName) setAutoShortName();
 	liveScriptObjectIsDirty = true;
+	controllableContainerListeners.call(&ControllableContainerListener::controllableContainerNameChanged, this);
 	onContainerNiceNameChanged();
 }
 
@@ -753,6 +754,8 @@ void ControllableContainer::controllableFeedbackUpdate(ControllableContainer* cc
 
 void ControllableContainer::controllableNameChanged(Controllable* c)
 {
+	if (isNameTaken(c->niceName, c)) c->setNiceName(getUniqueNameInContainer(c->niceName));
+
 	notifyStructureChanged();
 }
 
@@ -935,6 +938,11 @@ void ControllableContainer::loadJSONData(var data, bool createIfNotThere)
 	afterLoadJSONDataInternal();
 }
 
+void ControllableContainer::controllableContainerNameChanged(ControllableContainer* cc)
+{
+	if (isNameTaken(cc->niceName, nullptr, cc)) cc->setNiceName(getUniqueNameInContainer(cc->niceName));
+}
+
 void ControllableContainer::childStructureChanged(ControllableContainer* cc)
 {
 	notifyStructureChanged();
@@ -945,6 +953,26 @@ void ControllableContainer::childAddressChanged(ControllableContainer* cc)
 	notifyStructureChanged();
 }
 
+
+bool ControllableContainer::isNameTaken(const String& targetName, Controllable* excludeC, ControllableContainer* excludeCC)
+{
+	for (auto& tc : controllables)
+	{
+		if (tc != excludeC && tc->niceName == targetName)
+		{
+			return true;
+		}
+	}
+	for (auto& tcc : controllableContainers)
+	{
+		if (tcc != excludeCC && tcc->niceName == targetName)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
 
 String ControllableContainer::getUniqueNameInContainer(const String& sourceName, int suffix)
 {

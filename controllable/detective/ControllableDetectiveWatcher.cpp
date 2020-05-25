@@ -1,4 +1,3 @@
-#include "ControllableDetectiveWatcher.h"
 ControllableDetectiveWatcher::ControllableDetectiveWatcher() :
 	BaseItem("No target"),
 	Thread("Watcher"),

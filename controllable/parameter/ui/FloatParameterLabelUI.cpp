@@ -15,6 +15,8 @@ FloatParameterLabelUI::FloatParameterLabelUI(Parameter* p) :
 	maxFontHeight(GlobalSettings::getInstance()->fontSize->floatValue()),
 	autoSize(false)
 {
+	opaqueBackground = true;
+
 	updateUIParams();
 
 	addAndMakeVisible(&valueLabel);
@@ -144,6 +146,7 @@ void FloatParameterLabelUI::setOpaqueBackground(bool value)
 
 void FloatParameterLabelUI::updateUIParams()
 {
+	ParameterUI::updateUIParams();
 	valueLabel.setEditable(false, isInteractable(), false, true);
 	valueLabel.setEnabled(isInteractable());
 

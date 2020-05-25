@@ -96,11 +96,6 @@ void Point3DParameter::setBounds(float _minX, float _minY, float _minZ, float _m
 	setRange(minRange, maxRange);
 }
 
-void Point3DParameter::clearRange()
-{
-	setBounds(INT32_MIN, INT32_MIN, INT32_MIN, INT32_MAX, INT32_MAX, INT32_MAX);
-}
-
 Vector3D<float> Point3DParameter::getVector() {
 	return Vector3D<float>(x, y, z);
 }

@@ -64,9 +64,12 @@ public:
 	~ParameterNumberAutomation() {}
 
 	Automation automation;
+	FloatParameter* length;
 
 	void setLength(float value, bool stretch = false, bool stickToEnd = false);
 	void setAllowKeysOutside(bool value);
+
+	virtual void onContainerParameterChangedInternal(Parameter* p) override;
 };
 
 class ParameterColorAutomation :

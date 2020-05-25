@@ -86,11 +86,6 @@ void Point2DParameter::setBounds(float _minX, float _minY, float _maxX, float _m
 	setRange(minRange, maxRange);
 }
 
-void Point2DParameter::clearRange()
-{
-	setBounds(INT32_MIN, INT32_MIN, INT32_MAX, INT32_MAX);
-}
-
 StringArray Point2DParameter::getValuesNames()
 {
 	return StringArray("X","Y");
