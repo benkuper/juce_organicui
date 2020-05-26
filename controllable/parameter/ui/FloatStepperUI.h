@@ -26,6 +26,8 @@ public:
     
 	void paint(Graphics& g) override;
     void resized() override;
+
+    void updateUIParams() override;
     
     void timerCallback() override;
     

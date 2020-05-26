@@ -1,3 +1,4 @@
+#include "FloatStepperUI.h"
 /*
   ==============================================================================
 
@@ -36,6 +37,7 @@ FloatStepperUI::FloatStepperUI(Parameter * _parameter) :
     slider->setValue(parameter->floatValue());
     slider->addListener(this);
 	slider->addMouseListener(this,true);
+	
 	slider->setColour(slider->textBoxBackgroundColourId,BG_COLOR.darker(.1f).withAlpha(.8f));
 	slider->setColour(CaretComponent::caretColourId, Colours::orange);
 	slider->setScrollWheelEnabled(false);
@@ -85,6 +87,14 @@ void FloatStepperUI::resized()
 	}
 }
 
+void FloatStepperUI::updateUIParams()
+{
+	ParameterUI::updateUIParams();
+	slider->setTextBoxIsEditable(isInteractable());
+	slider->setIncDecButtonsMode((isInteractable()) ? Slider::IncDecButtonMode::incDecButtonsDraggable_AutoDirection : Slider::IncDecButtonMode::incDecButtonsNotDraggable);
+	slider->setColour(slider->textBoxTextColourId, useCustomTextColor ? customTextColor : (isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f)));
+}
+
 
 void FloatStepperUI::valueChanged(const var & value)
 {
@@ -119,9 +129,7 @@ void FloatStepperUI::rangeChanged(Parameter *){
 
 void FloatStepperUI::feedbackStateChanged()
 {
-	slider->setTextBoxIsEditable(isInteractable());
-	slider->setIncDecButtonsMode((isInteractable())?Slider::IncDecButtonMode::incDecButtonsDraggable_AutoDirection:Slider::IncDecButtonMode::incDecButtonsNotDraggable);
-	slider->setColour(slider->textBoxTextColourId, useCustomTextColor ? customTextColor : (isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f)));
+	updateUIParams();
 }
 
 void FloatStepperUI::timerCallback()
