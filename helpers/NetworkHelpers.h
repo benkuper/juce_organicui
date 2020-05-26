@@ -31,4 +31,19 @@ public:
 		}
 		return result;
 	}
+
+	static String getLocalIPForRemoteIP(const String &remoteIP, bool returnDefaultLocalIPIfNotFound = true)
+	{
+		StringArray ips = getLocalIPs();
+		StringArray ripSplit;
+		ripSplit.addTokens(remoteIP, ".", "\"");
+		for (auto& ip : ips)
+		{
+			StringArray ipSplit;
+			ipSplit.addTokens(ip, ".", "\"");
+			if (ripSplit[0] == ipSplit[0] && ripSplit[1] == ipSplit[1] && ripSplit[2] == ipSplit[2]) return ip;
+		}
+
+		return returnDefaultLocalIPIfNotFound?getLocalIP():"";
+	}
 };
