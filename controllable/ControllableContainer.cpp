@@ -918,11 +918,10 @@ void ControllableContainer::loadJSONData(var data, bool createIfNotThere)
 		for (auto& nv : ccData)
 		{
 			ControllableContainer* cc = getControllableContainerByName(nv.name.toString());
-			if (cc == nullptr && createIfNotThere)
+			if (cc == nullptr && (createIfNotThere || nv.value.getProperty("owned", false)))
 			{
-				bool owned = nv.value.getProperty("owned", false);
 				cc = new ControllableContainer(nv.value.getProperty("niceName", nv.name.toString()));
-				addChildControllableContainer(cc, owned);
+				addChildControllableContainer(cc, true);
 			}
 
 			if (cc != nullptr) cc->loadJSONData(nv.value, true);
