@@ -70,9 +70,6 @@ void OrganicMainContentComponent::setupOpenGL()
 
 		openGLContext->attachTo(*this);
 	}
-
-	
-
 #endif
 }
 
