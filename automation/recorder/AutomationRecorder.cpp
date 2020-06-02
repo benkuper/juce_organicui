@@ -1,3 +1,4 @@
+#include "AutomationRecorder.h"
 /*
   ==============================================================================
 
@@ -54,6 +55,18 @@ void AutomationRecorder::setCurrentInput(Parameter * newInput)
 void AutomationRecorder::clearKeys()
 {
 	keys.clear();
+}
+
+void AutomationRecorder::removeKeysAfter(float time)
+{
+	int amountToRemove = 0;
+	for (int i = keys.size() - 1; i >= 0; i--)
+	{
+		if (keys[i].time >= time) amountToRemove++;
+		else break;
+	}
+
+	if(amountToRemove > 0) keys.removeLast(amountToRemove);
 }
 
 void AutomationRecorder::addKeyAt(float time)
