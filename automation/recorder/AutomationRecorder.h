@@ -40,6 +40,7 @@ public:
 	void setCurrentInput(Parameter * input);
 
 	void clearKeys();
+	void removeKeysAfter(float time);
 	void addKeyAt(float time);
 
 	void startRecording();
