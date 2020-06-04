@@ -1,3 +1,4 @@
+#include "DoubleSliderUI.h"
 /*
   ==============================================================================
 
@@ -33,11 +34,9 @@ DoubleSliderUI::DoubleSliderUI(Point2DParameter* parameter) :
 	addAndMakeVisible(xSlider.get());
 	addAndMakeVisible(ySlider.get());
 
-	setInterceptsMouseClicks(true, true);
-
 	setSize(200, GlobalSettings::getInstance()->fontSize->floatValue() + 4);//default size
 
-	feedbackStateChanged(); //force update
+	updateUIParams(); //force update
 }
 
 DoubleSliderUI::~DoubleSliderUI()
@@ -147,8 +146,7 @@ void DoubleSliderUI::rangeChanged(Parameter * p)
 	yParam.setRange(parameter->minimumValue[1], parameter->maximumValue[1]);
 }
 
-
-void DoubleSliderUI::feedbackStateChanged()
+void DoubleSliderUI::updateUIParamsInternal()
 {
 	xParam.setControllableFeedbackOnly(parameter->isControllableFeedbackOnly);
 	yParam.setControllableFeedbackOnly(parameter->isControllableFeedbackOnly);

@@ -29,12 +29,8 @@ public:
 
 	bool isEditing();
 
-	void setOpaqueBackground(bool value) override;
-
-	virtual void feedbackStateChanged() override; 
-
 	virtual void updateTooltip() override;
-	virtual void updateUIParams() override;
+	virtual void updateUIParamsInternal() override;
 
 	void paint(Graphics &g) override;
     void resized() override;

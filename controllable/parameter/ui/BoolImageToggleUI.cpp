@@ -17,9 +17,7 @@ BoolImageToggleUI::BoolImageToggleUI(ImageButton * i, BoolParameter *p) :
 	showLabel = false; //remove label by default
 
 	addAndMakeVisible(bt.get());
-	if (!boolParam->isControllableFeedbackOnly) bt->addListener(this);
-	else bt->setInterceptsMouseClicks(false, false);
-	setInterceptsMouseClicks(true, true); 
+	bt->addListener(this);
 	bt->setOpaque(false);
 	bt->setToggleState(boolParam->boolValue(), dontSendNotification);
 	bt->setTooltip(tooltip);

@@ -61,8 +61,7 @@ void IntStepperUI::handleMenuSelectedID(int result)
 	}
 }
 
-void IntStepperUI::feedbackStateChanged()
+void IntStepperUI::updateUIParamsInternal()
 {
-	FloatStepperUI::feedbackStateChanged();
 	slider->setNumDecimalPlacesToDisplay(0);
 }

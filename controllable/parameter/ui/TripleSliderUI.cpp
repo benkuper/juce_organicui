@@ -1,3 +1,4 @@
+#include "TripleSliderUI.h"
 /*
   ==============================================================================
 
@@ -54,7 +55,7 @@ TripleSliderUI::~TripleSliderUI()
 	zParam.removeAsyncParameterListener(this);
 }
 
-void TripleSliderUI::feedbackStateChanged()
+void TripleSliderUI::updateUIParamsInternal()
 {
 	xParam.setControllableFeedbackOnly(parameter->isControllableFeedbackOnly);
 	yParam.setControllableFeedbackOnly(parameter->isControllableFeedbackOnly);

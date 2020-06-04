@@ -1,3 +1,4 @@
+#include "EnumParameterUI.h"
 /*
   ==============================================================================
 
@@ -48,8 +49,7 @@ void EnumParameterUI::updateComboBox()
 
 	cb.setSelectedId(keyIdMap[ep->getValueKey()], dontSendNotification);
 	cb.setEnabled(isInteractable());
-	cb.setInterceptsMouseClicks(isInteractable(), isInteractable());
-
+	
 	updateTooltip();
 }
 
@@ -73,7 +73,7 @@ void EnumParameterUI::enumOptionRemoved(EnumParameter *, const String &)
 	updateComboBox();
 }
 
-void EnumParameterUI::feedbackStateChanged()
+void EnumParameterUI::updateUIParamsInternal()
 {
 	updateComboBox();
 }

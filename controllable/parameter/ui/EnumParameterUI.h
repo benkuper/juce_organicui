@@ -42,7 +42,7 @@ private:
 	HashMap<String,int> keyIdMap;
 
 protected:
-	void feedbackStateChanged() override;
+	void updateUIParamsInternal() override;
     void valueChanged(const var &) override ;
 
 private:

@@ -1,4 +1,3 @@
-#include "ControllableUI.h"
 /*
   ==============================================================================
 
@@ -30,7 +29,7 @@ ControllableUI::ControllableUI(Controllable * controllable) :
 	setEnabled(controllable->enabled);
 	setAlpha(controllable->enabled ? 1 : .5f);
 
-	setInterceptsMouseClicks(controllable->enabled, controllable->enabled);
+	updateUIParams();
 }
 
 ControllableUI::~ControllableUI()
@@ -183,11 +182,13 @@ void ControllableUI::showContextMenu()
 void ControllableUI::updateUIParams()
 {
 	setInterceptsMouseClicks(isInteractable(), isInteractable());
+	updateUIParamsInternal();
 }
 
 void ControllableUI::setOpaqueBackground(bool value)
 {
 	opaqueBackground = value;
+	updateUIParams();
 }
 
 void ControllableUI::showEditWindow()
@@ -238,6 +239,16 @@ void ControllableUI::newMessage(const Controllable::ControllableEvent & e)
 		break;
 
 	}
+}
+
+void ControllableUI::controllableStateChanged()
+{
+	updateUIParams();
+}
+
+void ControllableUI::feedbackStateChanged()
+{
+	updateUIParams();
 }
 
 void ControllableUI::updateTooltip()

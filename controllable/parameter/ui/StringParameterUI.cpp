@@ -49,27 +49,14 @@ bool StringParameterUI::isEditing()
 	return valueLabel.isBeingEdited();
 }
 
-void StringParameterUI::setOpaqueBackground(bool value)
-{
-	ParameterUI::setOpaqueBackground(value);
-	updateUIParams();
-}
-
-void StringParameterUI::feedbackStateChanged()
-{
-	ParameterUI::feedbackStateChanged();
-	updateUIParams();
-}
-
 void StringParameterUI::updateTooltip()
 {
 	ParameterUI::updateTooltip();
 	valueLabel.setTooltip(tooltip);
 }
 
-void StringParameterUI::updateUIParams()
+void StringParameterUI::updateUIParamsInternal()
 {
-	ParameterUI::updateUIParams();
 	valueLabel.setEditable(!controllable->isControllableFeedbackOnly);
 	valueLabel.setEnabled(!controllable->isControllableFeedbackOnly);
 	valueLabel.setColour(valueLabel.backgroundColourId, useCustomBGColor ? customBGColor : (opaqueBackground ? (!controllable->isControllableFeedbackOnly ? BG_COLOR.darker(.1f).withAlpha(.7f) : BG_COLOR.darker(.1f).withAlpha(.4f)) : Colours::transparentBlack));

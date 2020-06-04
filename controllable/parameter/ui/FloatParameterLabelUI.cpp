@@ -63,13 +63,6 @@ void FloatParameterLabelUI::setSuffix(const String& _suffix)
 	valueChanged(parameter->stringValue());
 }
 
-
-
-void FloatParameterLabelUI::feedbackStateChanged()
-{
-	updateUIParams();
-}
-
 void FloatParameterLabelUI::updateTooltip()
 {
 	ParameterUI::updateTooltip();
@@ -138,15 +131,8 @@ void FloatParameterLabelUI::mouseUpInternal(const MouseEvent& e)
 	if (valueAtMouseDown != parameter->floatValue()) parameter->setUndoableValue(valueAtMouseDown, parameter->floatValue());
 }
 
-void FloatParameterLabelUI::setOpaqueBackground(bool value)
+void FloatParameterLabelUI::updateUIParamsInternal()
 {
-	ParameterUI::setOpaqueBackground(value);
-	updateUIParams();
-}
-
-void FloatParameterLabelUI::updateUIParams()
-{
-	ParameterUI::updateUIParams();
 	valueLabel.setEditable(false, isInteractable(), false, true);
 	valueLabel.setEnabled(isInteractable());
 

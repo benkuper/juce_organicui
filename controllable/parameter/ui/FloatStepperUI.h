@@ -27,15 +27,13 @@ public:
 	void paint(Graphics& g) override;
     void resized() override;
 
-    void updateUIParams() override;
+    void updateUIParamsInternal() override;
     
     void timerCallback() override;
     
 protected:
     void valueChanged(const var &) override;
     void rangeChanged(Parameter * p) override;
-
-	virtual void feedbackStateChanged() override;
 
     // Inherited via Listener
     virtual void sliderValueChanged(Slider * slider) override;

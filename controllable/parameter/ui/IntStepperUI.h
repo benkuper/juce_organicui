@@ -25,7 +25,7 @@ public:
 	void handleMenuSelectedID(int result) override;
 
 protected:
-	void feedbackStateChanged() override;
+	void updateUIParamsInternal() override;
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(IntStepperUI)

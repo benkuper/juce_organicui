@@ -32,7 +32,7 @@ public:
 
 	var mouseDownValue;
 
-	void feedbackStateChanged() override;
+	void updateUIParamsInternal() override;
 
 	void paint(Graphics& g) override;
 	void resized() override;

@@ -1,4 +1,3 @@
-#include "FloatStepperUI.h"
 /*
   ==============================================================================
 
@@ -87,9 +86,8 @@ void FloatStepperUI::resized()
 	}
 }
 
-void FloatStepperUI::updateUIParams()
+void FloatStepperUI::updateUIParamsInternal()
 {
-	ParameterUI::updateUIParams();
 	slider->setTextBoxIsEditable(isInteractable());
 	slider->setIncDecButtonsMode((isInteractable()) ? Slider::IncDecButtonMode::incDecButtonsDraggable_AutoDirection : Slider::IncDecButtonMode::incDecButtonsNotDraggable);
 	slider->setColour(slider->textBoxTextColourId, useCustomTextColor ? customTextColor : (isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f)));
@@ -125,11 +123,6 @@ void FloatStepperUI::controllableStateChanged()
 
 void FloatStepperUI::rangeChanged(Parameter *){
 	slider->setRange((int)parameter->minimumValue, (int)parameter->maximumValue, 1);
-}
-
-void FloatStepperUI::feedbackStateChanged()
-{
-	updateUIParams();
 }
 
 void FloatStepperUI::timerCallback()

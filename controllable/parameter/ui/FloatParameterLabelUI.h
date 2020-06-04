@@ -40,7 +40,6 @@ public:
 	void setPrefix(const String &_prefix);
 	void setSuffix(const String &_suffix);
 
-	virtual void feedbackStateChanged() override;
 
 	virtual void updateTooltip() override;
 
@@ -51,8 +50,7 @@ public:
 	void mouseDrag(const MouseEvent &e) override;
 	void mouseUpInternal(const MouseEvent &e) override;
 
-	void setOpaqueBackground(bool value) override;
-	void updateUIParams() override;
+	void updateUIParamsInternal() override;
 
 protected:
 	virtual String getValueString(const var &val) const;
