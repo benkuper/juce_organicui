@@ -10,10 +10,10 @@
 
 AutomationUI::AutomationUI(Automation* manager) :
     BaseManagerUI(manager->niceName, manager, false),
+    autoAdaptViewRange(false),
     paintingMode(false),
     previewMode(false),
-    showNumberLines(true),
-    autoAdaptViewRange(false)
+    showNumberLines(true)
 {
     autoSelectWithChildRespect = false;
     resizeOnChildBoundsChanged = false;

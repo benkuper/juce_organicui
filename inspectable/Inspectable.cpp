@@ -3,12 +3,12 @@
 Inspectable::Inspectable() :
 	selectionManager(nullptr), //default nullptr will target main selectionManager
 	isSelected(false),
-	isPreselected(false),
 	isSelectable(true),
-	showInspectorOnSelect(true),
+    showInspectorOnSelect(true),
 	hideInEditor(false),
 	isHighlighted(false),
-	highlightLinkedInspectableOnSelect(true),
+	isPreselected(false),
+    highlightLinkedInspectableOnSelect(true),
     inspectableNotifier(10)
 {
 	setSelectionManager(nullptr);

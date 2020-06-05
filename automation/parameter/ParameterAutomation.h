@@ -66,8 +66,8 @@ public:
 	Automation automation;
 	FloatParameter* length;
 
-	void setLength(float value, bool stretch = false, bool stickToEnd = false);
-	void setAllowKeysOutside(bool value);
+	void setLength(float value, bool stretch = false, bool stickToEnd = false) override;
+	void setAllowKeysOutside(bool value) override;
 
 	virtual void onContainerParameterChangedInternal(Parameter* p) override;
 };
