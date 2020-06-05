@@ -1359,7 +1359,7 @@ void EnablingControllableContainer::setCanBeDisabled(bool value)
 
 	if (canBeDisabled)
 	{
-		enabled = addBoolParameter("Enabled", "Activate OSC Input for this module", true);
+		enabled = addBoolParameter("Enabled", "Enable or disable this element.\nMost of the time it will mean stopping the process of what's going on inside it.", true);
 		enabled->hideInEditor = true;
 	}
 	else
