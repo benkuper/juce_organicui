@@ -13,8 +13,8 @@
 
 Curve2D::Curve2D(const String &name) :
     BaseManager(name),
-    showUIInEditor(true),
-    recorder(nullptr)
+    recorder(nullptr),
+    showUIInEditor(true)
 {
     isSelectable = false;
 

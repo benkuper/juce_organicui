@@ -10,9 +10,9 @@
 
 FloatParameter::FloatParameter(const String & niceName, const String &description, const float & initialValue, const float & minValue, const float & maxValue, bool enabled) :
 	Parameter(Type::FLOAT, niceName, description, (float)initialValue, (float)minValue, (float)maxValue, enabled),
-	defaultUI(NONE),
-	customUI(NONE),
-	unitSteps(0)
+	unitSteps(0),
+    defaultUI(NONE),
+    customUI(NONE)
 {
 	canHaveRange = true;
 	canBeAutomated = true;

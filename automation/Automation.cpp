@@ -11,8 +11,8 @@
 
 Automation::Automation(const String& name, AutomationRecorder * recorder, bool allowKeysOutside) :
     BaseManager(name),
-    recorder(recorder),
-    allowKeysOutside(allowKeysOutside)
+    allowKeysOutside(allowKeysOutside),
+    recorder(recorder)
 {
     comparator.compareFunc = &Automation::compareKeys;
 

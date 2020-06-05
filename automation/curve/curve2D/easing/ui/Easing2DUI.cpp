@@ -40,7 +40,7 @@ void Easing2DUI::paint(Graphics& g)
 	if (isMouseOver()) c = c.brighter();
 
 	ColourGradient gr;
-	const int precision = 10;
+	//const int precision = 10;
 
 	g.setColour(c);
 	g.strokePath(drawPath, PathStrokeType(isMouseOver() ? 2 : 1));
@@ -251,8 +251,8 @@ void CubicEasing2DUI::resized()
 {
 	if (inspectable.wasObjectDeleted()) return;
 
-	Point<int> p1 = Point<int>(getUIPosForValuePos(easing->start));
-	Point<int> p2 = Point<int>(getUIPosForValuePos(easing->end));
+	//Point<int> p1 = Point<int>(getUIPosForValuePos(easing->start));
+	//Point<int> p2 = Point<int>(getUIPosForValuePos(easing->end));
 
 	Point<int> a = getUIPosForValuePos(easing->start + ce->anchor1->getPoint());
 	Point<int> b = getUIPosForValuePos(easing->end + ce->anchor2->getPoint());
@@ -265,7 +265,7 @@ void CubicEasing2DUI::resized()
 
 void CubicEasing2DUI::generatePathInternal()
 {
-	Point<int> p1 = Point<int>(getUIPosForValuePos(easing->start));
+	//Point<int> p1 = Point<int>(getUIPosForValuePos(easing->start));
 	Point<int> p2 = Point<int>(getUIPosForValuePos(easing->end));
 
 	Point<int> a = getUIPosForValuePos(easing->start + ce->anchor1->getPoint());
@@ -342,8 +342,8 @@ void CubicEasing2DUI::mouseDrag(const MouseEvent& e)
 	}
 	else
 	{
-		Point<int> p1 = getUIPosForValuePos(easing->start);
-		Point<int> p2 = getUIPosForValuePos(easing->end);
+		//Point<int> p1 = getUIPosForValuePos(easing->start);
+		//Point<int> p2 = getUIPosForValuePos(easing->end);
 		Point<float> mVal = getValuePosForUIPos(e.getEventRelativeTo(this).getPosition());
 		
 		ce->anchor1->setPoint((mVal - easing->start) / 2);

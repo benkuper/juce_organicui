@@ -41,7 +41,7 @@ void EasingUI::paint(Graphics& g)
 	if (isMouseOver()) c = c.brighter();
 
 	ColourGradient gr;
-	const int precision = 10;
+	//const int precision = 10;
 
 	g.setColour(c);
 	g.strokePath(drawPath, PathStrokeType(isMouseOver() ? 2 : 1));
@@ -262,8 +262,8 @@ void CubicEasingUI::resized()
 {
 	if (inspectable.wasObjectDeleted()) return;
 
-	Point<int> p1 = Point<int>(getUIPosForValuePos(easing->start));
-	Point<int> p2 = Point<int>(getUIPosForValuePos(easing->end));
+	//Point<int> p1 = Point<int>(getUIPosForValuePos(easing->start));
+	//Point<int> p2 = Point<int>(getUIPosForValuePos(easing->end));
 
 	Point<int> a = getUIPosForValuePos(easing->start + ce->anchor1->getPoint());
 	Point<int> b = getUIPosForValuePos(easing->end + ce->anchor2->getPoint());
@@ -276,7 +276,7 @@ void CubicEasingUI::resized()
 
 void CubicEasingUI::generatePathInternal()
 {
-	Point<int> p1 = Point<int>(getUIPosForValuePos(easing->start));
+	//Point<int> p1 = Point<int>(getUIPosForValuePos(easing->start));
 	Point<int> p2 = Point<int>(getUIPosForValuePos(easing->end));
 
 	Point<int> a = getUIPosForValuePos(easing->start + ce->anchor1->getPoint());
@@ -353,7 +353,7 @@ void CubicEasingUI::mouseDrag(const MouseEvent& e)
 			
 			if (e.mods.isAltDown())
 			{
-				Point<int> p1 = getUIPosForValuePos(easing->start);
+				//Point<int> p1 = getUIPosForValuePos(easing->start);
 				Point<float> mVal = getValuePosForUIPos(e.getEventRelativeTo(this).getPosition());
 
 				float ty = mVal.y - easing->start.y;
@@ -362,7 +362,7 @@ void CubicEasingUI::mouseDrag(const MouseEvent& e)
 			}
 			else
 			{
-				Point<int> p1 = getUIPosForValuePos(easing->start);
+				//Point<int> p1 = getUIPosForValuePos(easing->start);
 				Point<float> mVal = getValuePosForUIPos(e.getEventRelativeTo(this).getPosition());
 
 				float tx = mVal.x - easing->start.x;
@@ -371,8 +371,8 @@ void CubicEasingUI::mouseDrag(const MouseEvent& e)
 			}
 		}else
 		{
-			Point<int> p1 = getUIPosForValuePos(easing->start);
-			Point<int> p2 = getUIPosForValuePos(easing->end);
+			//Point<int> p1 = getUIPosForValuePos(easing->start);
+			//Point<int> p2 = getUIPosForValuePos(easing->end);
 			Point<float> mVal = getValuePosForUIPos(e.getEventRelativeTo(this).getPosition());
 
 			ce->anchor1->setPoint((mVal - easing->start) / 2);
@@ -438,7 +438,7 @@ void SineEasingUI::resized()
 	if (inspectable.wasObjectDeleted()) return;
 	hitPathPrecision = getWidth() / 4;
 
-	Point<int> p1 = Point<int>(getUIPosForValuePos(easing->start));
+	//Point<int> p1 = Point<int>(getUIPosForValuePos(easing->start));
 	Point<int> a = getUIPosForValuePos(easing->start + se->freqAmp->getPoint());
 	h1.setBounds(juce::Rectangle<int>(0, 0, 16, 16).withCentre(a));
 
