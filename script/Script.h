@@ -44,6 +44,8 @@ public:
 	std::unique_ptr<JavascriptEngine> scriptEngine;
 	SpinLock engineLock;
 	Thread::ThreadID lockedThreadId;
+	float executionTimeout;
+
 
 	void chooseFileScript();
 
@@ -93,7 +95,7 @@ public:
 	static void logFromArgs(const var::NativeFunctionArgs& args, int logLevel);
 	static var logFromScript(const var::NativeFunctionArgs& args);
 	static var logWarningFromScript(const var::NativeFunctionArgs& args);
-	static var logErrorFromScript(const var::NativeFunctionArgs &args);
+	static var logErrorFromScript(const var::NativeFunctionArgs& args);
 
 	static var addTriggerFromScript(const var::NativeFunctionArgs &args);
 	static var addBoolParameterFromScript(const var::NativeFunctionArgs &args);
@@ -107,9 +109,8 @@ public:
 	static var addPoint3DParameterFromScript(const var::NativeFunctionArgs &args);
     static var addFileParameterFromScript(const var::NativeFunctionArgs &args);
 
-
-    
 	static var setUpdateRateFromScript(const var::NativeFunctionArgs& args);
+	static var setExecutionTimeoutFromScript(const var::NativeFunctionArgs& args);
 
 	static bool checkNumArgs(const String &logName, const var::NativeFunctionArgs &args, int expectedArgs);
 
