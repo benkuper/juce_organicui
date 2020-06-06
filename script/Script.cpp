@@ -562,7 +562,7 @@ var Script::setExecutionTimeoutFromScript(const var::NativeFunctionArgs& args)
 {
 	Script* s = getObjectFromJS<Script>(args);
 	if (!checkNumArgs(s->niceName, args, 1)) return var();
-	s->executionTimeout == (int)args.arguments[0];
+	s->executionTimeout = (int)args.arguments[0];
 	if (s->scriptEngine != nullptr) s->scriptEngine->maximumExecutionTime = RelativeTime::seconds(s->executionTimeout);
 
 	return var();
