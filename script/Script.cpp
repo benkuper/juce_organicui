@@ -550,10 +550,7 @@ var Script::setUpdateRateFromScript(const var::NativeFunctionArgs& args)
 {
 	Script* s = getObjectFromJS<Script>(args);
 	if (!checkNumArgs(s->niceName, args, 1)) return var();
-	if (s->updateEnabled)
-	{
-		s->updateRate->setValue(args.arguments[0]);
-	}
+	if (s->updateEnabled) s->updateRate->setValue(args.arguments[0]);
 
 	return var();
 }
@@ -562,7 +559,7 @@ var Script::setExecutionTimeoutFromScript(const var::NativeFunctionArgs& args)
 {
 	Script* s = getObjectFromJS<Script>(args);
 	if (!checkNumArgs(s->niceName, args, 1)) return var();
-	s->executionTimeout = (int)args.arguments[0];
+	s->executionTimeout = (float)args.arguments[0];
 	if (s->scriptEngine != nullptr) s->scriptEngine->maximumExecutionTime = RelativeTime::seconds(s->executionTimeout);
 
 	return var();
