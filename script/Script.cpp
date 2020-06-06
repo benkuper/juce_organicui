@@ -19,6 +19,7 @@ Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled) :
     scriptParamsContainer("params"),
 	parentTarget(_parentTarget),
 	lockedThreadId(0),
+	executionTimeout(5),
 	scriptAsyncNotifier(10)
 {
 	isSelectable = false;
@@ -41,7 +42,8 @@ Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled) :
 	scriptObject.setMethod("logWarning", Script::logWarningFromScript);
 	scriptObject.setMethod("logError", Script::logErrorFromScript);
 	scriptObject.setMethod("setUpdateRate", Script::setUpdateRateFromScript);
-    
+	scriptObject.setMethod("setExecutionTimeout", Script::setExecutionTimeoutFromScript);
+
 	scriptObject.setMethod("addTrigger", Script::addTriggerFromScript);
 	scriptObject.setMethod("addBoolParameter", Script::addBoolParameterFromScript);
 	scriptObject.setMethod("addIntParameter", Script::addIntParameterFromScript);
@@ -52,7 +54,7 @@ Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled) :
 	scriptObject.setMethod("addPoint2DParameter", Script::addPoint2DParameterFromScript);
 	scriptObject.setMethod("addPoint3DParameter", Script::addPoint2DParameterFromScript);
 	scriptObject.setMethod("addColorParameter", Script::addColorParameterFromScript);
-    scriptObject.setMethod("addFileParameter", Script::addFileParameterFromScript);
+	scriptObject.setMethod("addFileParameter", Script::addFileParameterFromScript);
 
 	scriptParamsContainer.hideEditorHeader = true;
 	addChildControllableContainer(&scriptParamsContainer);
@@ -194,7 +196,7 @@ void Script::buildEnvironment()
 	setState(SCRIPT_CLEAR);
 
 	scriptEngine.reset(new JavascriptEngine());
-	scriptEngine->maximumExecutionTime = RelativeTime::seconds(2);
+	scriptEngine->maximumExecutionTime = RelativeTime::seconds(executionTimeout);
 	while (scriptParamsContainer.controllables.size() > 0) scriptParamsContainer.removeControllable(scriptParamsContainer.controllables[0]);
 	scriptParamsContainer.clear();
 
@@ -552,6 +554,16 @@ var Script::setUpdateRateFromScript(const var::NativeFunctionArgs& args)
 	{
 		s->updateRate->setValue(args.arguments[0]);
 	}
+
+	return var();
+}
+
+var Script::setExecutionTimeoutFromScript(const var::NativeFunctionArgs& args)
+{
+	Script* s = getObjectFromJS<Script>(args);
+	if (!checkNumArgs(s->niceName, args, 1)) return var();
+	s->executionTimeout == (int)args.arguments[0];
+	if (s->scriptEngine != nullptr) s->scriptEngine->maximumExecutionTime = RelativeTime::seconds(s->executionTimeout);
 
 	return var();
 }
