@@ -46,8 +46,11 @@ bool CrashDumpUploader::init(bool autoUpload, bool showWindow)
 #if JUCE_WINDOWS
 	crashFile = File::getSpecialLocation(File::tempDirectory).getParentDirectory().getChildFile(getApp().getApplicationName()+"_crash.dmp");
     SystemStats::setApplicationCrashHandler((SystemStats::CrashHandlerFunction)createMiniDump);
-#else
+#elif JUCE_MAC
     crashFile = File::getSpecialLocation(File::tempDirectory).getParentDirectory().getChildFile(getApp().getApplicationName()+"_crash.txt");
+    SystemStats::setApplicationCrashHandler((SystemStats::CrashHandlerFunction)createStackTrace);
+#else //LINUX
+    crashFile = File::getSpecialLocation(File::tempDirectory).getChildFile(getApp().getApplicationName()+"_crash.txt");
     SystemStats::setApplicationCrashHandler((SystemStats::CrashHandlerFunction)createStackTrace);
 #endif
 
@@ -168,7 +171,7 @@ LONG WINAPI createMiniDump(LPEXCEPTION_POINTERS exceptionPointers)
 	 
 	MessageBox(nullptr,
 		_T("Oh, no ! I got very sad and died alone. The autospy report will be send to the headquarters for further investigation. You can disable this procedure in your preferences, but please remember that the forensics team needs sample to keep healing our little Chataigne ! Otherwise nothing will be done and this sad event will be forever forgotten."),
-		_T("Sacré Hubert, toujours le mot pour rire !"),
+		_T("Sacrï¿½ Hubert, toujours le mot pour rire !"),
 		MB_ICONWARNING | MB_OK
 	);
 
