@@ -34,6 +34,8 @@ public:
 
 	static String getLocalIPForRemoteIP(const String &remoteIP, bool returnDefaultLocalIPIfNotFound = true)
 	{
+		if (remoteIP == "127.0.0.1") return "127.0.0.1";
+
 		StringArray ips = getLocalIPs();
 		StringArray ripSplit;
 		ripSplit.addTokens(remoteIP, ".", "\"");
