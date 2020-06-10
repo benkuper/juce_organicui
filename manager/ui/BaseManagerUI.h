@@ -343,7 +343,7 @@ void BaseManagerUI<M, T, U>::mouseUp(const MouseEvent& e)
 {
 	if (selectingItems)
 	{
-		InspectableSelector::getInstance()->endSelection();
+		//InspectableSelector::getInstance()->endSelection();
 		selectingItems = false;
 	}
 }
