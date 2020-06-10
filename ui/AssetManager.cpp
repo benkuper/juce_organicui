@@ -56,3 +56,14 @@ ImageButton * AssetManager::getToggleBTImage(const Image & image)
 		image, 1.0f, Colours::transparentBlack, 0);
 	return bt; 
 }
+
+ImageButton* AssetManager::getBTDoubleImage(const Image& onImage, const Image& offImage)
+{
+	ImageButton* bt = new ImageButton();
+
+	bt->setImages(false, true, true,
+		offImage, 0.5f, Colours::transparentBlack,
+		offImage, 1.0f, Colours::white.withAlpha(.2f),
+		onImage, 1.0f, Colours::transparentBlack, 0);
+	return bt;
+}

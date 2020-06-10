@@ -37,13 +37,11 @@ public:
 	Image getInImage();
 	Image getOutImage();
 	Image getReloadImage();
-	Image getPlayImage();
-	Image getStopImage();
-	Image getPrevCueImage();
-	Image getNextCueImage();
 	Image getTriggerImage();
 	Image getRelativeImage();
 
 	ImageButton * getSetupBTImage(const Image & image);
 	ImageButton * getToggleBTImage(const Image &image);
+	ImageButton* getBTDoubleImage(const Image& onImage, const Image& offImage);
+
 };
