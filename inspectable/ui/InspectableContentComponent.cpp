@@ -8,8 +8,8 @@
   ==============================================================================
 */
 
-InspectableContentComponent::InspectableContentComponent(Inspectable * inspectable) :
-	InspectableContent(inspectable),
+InspectableContentComponent::InspectableContentComponent(Inspectable * _inspectable) :
+	InspectableContent(nullptr), //force set in constructor
 	repaintOnSelectionChanged(true),
 	rounderCornerSize(4),
 	autoDrawContourWhenSelected(true),
@@ -21,7 +21,7 @@ InspectableContentComponent::InspectableContentComponent(Inspectable * inspectab
 {
 	//setWantsKeyboardFocus(true);
 	setMouseClickGrabsKeyboardFocus(true);
-	inspectable->addAsyncInspectableListener(this);
+	setInspectable(_inspectable); //set here to have setInspectable run
 }
 
 InspectableContentComponent::~InspectableContentComponent()
@@ -33,6 +33,21 @@ InspectableContentComponent::~InspectableContentComponent()
 	}
 }
 
+
+void InspectableContentComponent::setInspectable(Inspectable* i)
+{
+	if (inspectable != nullptr && !inspectable.wasObjectDeleted())
+	{
+		inspectable->removeAsyncInspectableListener(this);
+	}
+
+	InspectableContent::setInspectable(i);
+
+	if (inspectable != nullptr)
+	{
+		inspectable->addAsyncInspectableListener(this);
+	}
+}
 
 void InspectableContentComponent::mouseEnter(const MouseEvent & e)
 {
@@ -74,7 +89,7 @@ void InspectableContentComponent::mouseDown(const MouseEvent & e)
 		Component * c = e.eventComponent;
 
 		bool foundAChildComponent = false;
-		while (c != this)
+		while (c != this && c != nullptr)
 		{
 			InspectableContentComponent * ie = dynamic_cast<InspectableContentComponent *>(c);
 			if (ie != nullptr)

@@ -29,11 +29,13 @@ public:
 
 	Colour selectionContourColor;
 
-
 	bool autoSelectWithChildRespect;
 	Colour highlightColor;
 
 	bool bringToFrontOnSelect;
+
+	virtual void setInspectable(Inspectable* i);
+
 
 	void mouseEnter(const MouseEvent &e) override;
 	void mouseExit(const MouseEvent &e) override;

@@ -23,10 +23,10 @@ class Engine :
 	public Timer //for auto save
 {
 public:
-	Engine(const String &fileName = "File",const String &fileExtension = ".file");
+	Engine(const String& fileName = "File", const String& fileExtension = ".file");
 	virtual ~Engine();
 
-	static Engine * mainEngine;
+	static Engine* mainEngine;
 
 	std::unique_ptr<InspectableSelectionManager> selectionManager;
 
@@ -39,7 +39,7 @@ public:
 
 	String fileName = "File";
 	String fileExtension = ".file";
-	String fileWildcard = "*"+fileExtension;
+	String fileWildcard = "*" + fileExtension;
 
 	String lastFileAbsolutePath; //Used for checking in saveDocument if new file is different
 
@@ -48,6 +48,9 @@ public:
 
 	virtual void changed() override;
 	void createNewGraph();
+	virtual void createNewGraphInternal() {}
+	virtual void afterLoadFileInternal() {}
+
     void clear() override;
 	virtual void clearInternal() {}; //to override to clear specific application classes
 
@@ -153,7 +156,7 @@ public:
 	bool isClearing;
 	var jsonData;
 
-	virtual void handleAsyncUpdate()override;
+	virtual void handleAsyncUpdate() override;
 
 	void childStructureChanged(ControllableContainer *) override;
 

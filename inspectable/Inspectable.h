@@ -40,6 +40,7 @@ public:
 	String helpID;
 	virtual String getHelpID();
 
+
 	virtual void selectThis(bool addToSelection = false, bool notify = true);
 	virtual void deselectThis(bool notify = true);
 	virtual void setSelected(bool value);

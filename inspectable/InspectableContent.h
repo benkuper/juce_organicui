@@ -21,7 +21,8 @@ public:
 
 	WeakReference<Inspectable> inspectable;
 
-	void inspectableSelectionChanged(Inspectable *) override;
+	virtual void setInspectable(Inspectable* i);
+
 	void inspectableDestroyed(Inspectable *) override;
 
 private:

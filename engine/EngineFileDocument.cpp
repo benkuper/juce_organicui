@@ -38,9 +38,13 @@ void Engine::createNewGraph() {
 
 	//init with default data here
 
+	createNewGraphInternal();
+
 	setFile(File());
 	isLoadingFile = false;
 	setChangedFlag(false);
+
+	afterLoadFileInternal();
 
 	engineListeners.call(&EngineListener::endLoadFile);
 	engineNotifier.addMessage(new EngineEvent(EngineEvent::END_LOAD_FILE, this));
@@ -129,6 +133,7 @@ void Engine::fileLoaderEnded() {
 void Engine::handleAsyncUpdate()
 {
 	isLoadingFile = false;
+
 	if (getFile().exists()) {
 		setLastDocumentOpened(getFile());
 	}
@@ -138,6 +143,8 @@ void Engine::handleAsyncUpdate()
 	int64 timeForLoading = Time::currentTimeMillis() - loadingStartTime;
 	setChangedFlag(false);
 
+	afterLoadFileInternal();
+	
 	engineListeners.call(&EngineListener::endLoadFile);
 	engineNotifier.addMessage(new EngineEvent(EngineEvent::END_LOAD_FILE, this));
 

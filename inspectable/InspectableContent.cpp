@@ -10,9 +10,9 @@
 
 
 InspectableContent::InspectableContent(Inspectable * _inspectable) :
-	inspectable(_inspectable)
+	inspectable(nullptr)
 {
-	inspectable->addInspectableListener(this);
+	setInspectable(_inspectable);
 }
 
 InspectableContent::~InspectableContent()
@@ -20,9 +20,21 @@ InspectableContent::~InspectableContent()
 	if(!inspectable.wasObjectDeleted()) inspectable->removeInspectableListener(this);
 }
 
-void InspectableContent::inspectableSelectionChanged(Inspectable *)
+void InspectableContent::setInspectable(Inspectable* i)
 {
+	if (inspectable == i) return;
 
+	if (inspectable != nullptr && !inspectable.wasObjectDeleted())
+	{
+		inspectable->removeInspectableListener(this); 
+	}
+
+	inspectable = i;
+
+	if (inspectable != nullptr && !inspectable.wasObjectDeleted())
+	{
+		inspectable->addInspectableListener(this);
+	}
 }
 
 void InspectableContent::inspectableDestroyed(Inspectable *)
