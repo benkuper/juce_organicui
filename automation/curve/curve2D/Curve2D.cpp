@@ -8,9 +8,6 @@
   ==============================================================================
 */
 
-#include "ui/Curve2DEditor.h"
-#include "Curve2D.h"
-
 Curve2D::Curve2D(const String &name) :
     BaseManager(name),
     recorder(nullptr),

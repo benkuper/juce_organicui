@@ -41,6 +41,8 @@ public:
     void removeItemInternal(AutomationKey* k) override;
     void removeItemsInternal() override;
 
+    Array<AutomationKey*> addItemsFromClipboard(bool showWarning = false) override;
+
     Array<UndoableAction*> getMoveKeysBy(float start, float offset);
     Array<UndoableAction*> getRemoveTimespan(float start, float end);
 
