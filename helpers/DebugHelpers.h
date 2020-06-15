@@ -60,7 +60,7 @@ juce::Logger::writeToLog(tempDbgBuf);)
 
 
 inline String getLogSource(const String & logString) {
-    return logString.substring(0, logString.indexOf("::")).trim();
+	return logString.substring(0, logString.indexOf("::"));// .trim();
 }
 
 
@@ -68,7 +68,7 @@ inline String getLogContent(const String & logString) {
   int startString = logString.indexOf("::");
   if (startString>=0)startString+=2;
   else startString=0;
-    return logString.substring( startString,logString.length()).trim();
+    return logString.substring( startString,logString.length());//.trim();
 }
 
 
