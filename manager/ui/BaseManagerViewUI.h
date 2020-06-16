@@ -71,6 +71,8 @@ public:
 
 	virtual void updateItemsVisibility() override;
 
+	virtual void parentHierarchyChanged() override;
+
 	virtual void addItemFromMenu(bool isFromAddButton, Point<int> mouseDownPos) override;
 	virtual void addItemFromMenu(T * item, bool isFromAddButton, Point<int> mouseDownPos) override;
 
@@ -360,6 +362,12 @@ void BaseManagerViewUI<M, T, U>::updateItemsVisibility()
 		viewPane->updateContent();
 		viewPane->toFront(false);
 	}
+}
+
+template<class M, class T, class U>
+void BaseManagerViewUI<M, T, U>::parentHierarchyChanged()
+{
+	updateItemsVisibility();
 }
 
 template<class M, class T, class U>
