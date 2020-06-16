@@ -1,4 +1,3 @@
-#include "ShapeShifterManager.h"
 /*
   ==============================================================================
 
@@ -15,7 +14,8 @@ ShapeShifterManager::ShapeShifterManager() :
 	mainContainer(ShapeShifterContainer::Direction::VERTICAL),
 	currentCandidatePanel(nullptr),
 	defaultFileData(nullptr),
-	temporaryFullContent(nullptr)
+	temporaryFullContent(nullptr),
+	lockMode(false)
 {
 	GlobalSettings::getInstance()->fontSize->addAsyncParameterListener(this);
 }
@@ -410,7 +410,7 @@ PopupMenu ShapeShifterManager::getPanelsMenu()
 
 	Array<File> layoutFiles = getLayoutFiles();
 
-	int specialIndex = layoutP.getNumItems()+1;
+	int specialIndex = layoutP.getNumItems()+2; //+2 to have lockPanels
 	for (auto &f : layoutFiles)
 	{
 		layoutP.addItem(baseSpecialMenuCommandID+specialIndex,f.getFileNameWithoutExtension());
@@ -418,6 +418,7 @@ PopupMenu ShapeShifterManager::getPanelsMenu()
 	}
 
 	p.addSubMenu("Layout", layoutP);
+	p.addItem(baseSpecialMenuCommandID + 4, "Lock Panels", true, lockMode);
 
 	p.addSeparator();
 
@@ -452,6 +453,11 @@ void ShapeShifterManager::handleMenuPanelCommand(int commandID)
 
 		case 3: //Load
 			loadLayoutFromFile();
+			break;
+
+		case 4:
+			lockMode = !lockMode;
+			LOG("Panels are now " << (lockMode ? "locked" : "unlocked") << ".");
 			break;
 
 		default:

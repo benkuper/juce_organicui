@@ -39,6 +39,8 @@ public:
 	var ghostLayout; //for temporary full panels
 	ShapeShifterContent* temporaryFullContent;
 
+	bool lockMode;
+
 
 	void setDefaultFileData(const char *data);
 	void setLayoutInformations(const String &appLayoutExtension, const String &appSubLayoutFolder);
