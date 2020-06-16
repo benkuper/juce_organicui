@@ -293,7 +293,32 @@ void OutlinerItemComponent::mouseDown(const MouseEvent &e)
 		PopupMenu p;
 		p.addItem(-1, "Copy OSC Control Address");
 		p.addItem(-2, "Copy Script Control Address");
+		
+		p.addSeparator();
 
+		if (item->controllable != nullptr)
+		{
+			Controllable::Type cType = item->controllable->type;
+			if (cType == Controllable::FLOAT ||
+				cType == Controllable::INT ||
+				cType == Controllable::POINT2D ||
+				cType == Controllable::POINT3D ||
+				cType == Controllable::COLOR ||
+				cType == Controllable::BOOL )
+			{
+				p.addItem(-10, "Watch this with The Detective");
+			}
+		}
+
+		PopupMenu dashboardMenu;
+		int index = 0;
+		for (auto& di : DashboardManager::getInstance()->items)
+		{
+			dashboardMenu.addItem(index + 10000, di->niceName);
+			index++;
+		}
+		p.addSubMenu("Send to Dashboard", dashboardMenu);
+		
 		int result = p.show();
 		switch (result)
 		{
@@ -306,8 +331,17 @@ void OutlinerItemComponent::mouseDown(const MouseEvent &e)
 			else SystemClipboard::copyTextToClipboard("root" + item->controllable->controlAddress.replaceCharacter('/', '.'));
 			break;
 
-		default:
+		case -10:
+			Detective::getInstance()->watchControllable(item->controllable);
 			break;
+
+		default:
+			if (result >= 10000)
+			{
+				DashboardManager::getInstance()->items[result - 10000]->itemManager.addItem((item->isContainer?item->container->createDashboardItem():item->controllable->createDashboardItem()));
+			}
+			break;
+
 		}
 	}
 }
