@@ -1,3 +1,4 @@
+#include "ParameterUI.h"
 /*
   ==============================================================================
 
@@ -12,7 +13,7 @@
 int ParameterUI::currentFocusOrderIndex = 0;
 std::function<void(ParameterUI*)> ParameterUI::customShowEditRangeWindowFunction = nullptr;
 
-ParameterUI::ParameterUI(Parameter * parameter) :
+ParameterUI::ParameterUI(Parameter* parameter) :
 	ControllableUI(parameter),
 	parameter(parameter),
 	showEditWindowOnDoubleClick(true),
@@ -37,8 +38,8 @@ void ParameterUI::showEditWindowInternal()
 {
 	//if (parameter->isControllableFeedbackOnly) return;
 
-	Component * editComponent(getEditValueComponent());
-	CallOutBox * box = &CallOutBox::launchAsynchronously(editComponent, localAreaToGlobal(getLocalBounds()), nullptr);
+	Component* editComponent(getEditValueComponent());
+	CallOutBox* box = &CallOutBox::launchAsynchronously(editComponent, localAreaToGlobal(getLocalBounds()), nullptr);
 	box->setArrowSize(8);
 }
 
@@ -59,8 +60,8 @@ void ParameterUI::showEditRangeWindowInternal()
 
 	AlertWindow nameWindow("Set the range", "Set a new range for this parameter", AlertWindow::AlertIconType::NoIcon, this);
 
-	nameWindow.addTextEditor("minVal", parameter->hasRange()?String((float)parameter->minimumValue):"", "Minimum");
-	nameWindow.addTextEditor("maxVal", parameter->hasRange()?String((float)parameter->maximumValue):"", "Maximum");
+	nameWindow.addTextEditor("minVal", parameter->hasRange() ? String((float)parameter->minimumValue) : "", "Minimum");
+	nameWindow.addTextEditor("maxVal", parameter->hasRange() ? String((float)parameter->maximumValue) : "", "Maximum");
 
 	nameWindow.addButton("OK", 1, KeyPress(KeyPress::returnKey));
 	nameWindow.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
@@ -75,21 +76,21 @@ void ParameterUI::showEditRangeWindowInternal()
 			String maxRangeString = nameWindow.getTextEditorContents("maxVal");
 			float newMin = minRangeString.isNotEmpty() ? minRangeString.getFloatValue() : INT32_MIN;
 			float newMax = maxRangeString.isNotEmpty() ? maxRangeString.getFloatValue() : INT32_MAX;
-			parameter->setRange(newMin, jmax(newMin,newMax));
-		}	
+			parameter->setRange(newMin, jmax(newMin, newMax));
+		}
 	}
 }
 
-void ParameterUI::paintOverChildren(Graphics & g)
+void ParameterUI::paintOverChildren(Graphics& g)
 {
 	ControllableUI::paintOverChildren(g);
 	if (parameter == nullptr) return;
 
 	switch (parameter->controlMode)
 	{
-        case Parameter::MANUAL:
-            break;
-            
+	case Parameter::MANUAL:
+		break;
+
 	case Parameter::EXPRESSION:
 	{
 		Colour c = LIGHTCONTOUR_COLOR;
@@ -120,7 +121,7 @@ void ParameterUI::paintOverChildren(Graphics & g)
 	}
 }
 
-void ParameterUI::addPopupMenuItems(PopupMenu * p)
+void ParameterUI::addPopupMenuItems(PopupMenu* p)
 {
 	if (isInteractable() || parameter->controlMode != Parameter::MANUAL)
 	{
@@ -149,7 +150,7 @@ void ParameterUI::addPopupMenuItems(PopupMenu * p)
 			controlModeMenu.addItem(10, "Manual", true, parameter->controlMode == Parameter::MANUAL);
 			controlModeMenu.addItem(11, "Expression", true, parameter->controlMode == Parameter::EXPRESSION);
 			controlModeMenu.addItem(12, "Reference", true, parameter->controlMode == Parameter::REFERENCE);
-			if(parameter->canBeAutomated) controlModeMenu.addItem(13, "Animation", true, parameter->controlMode == Parameter::AUTOMATION);
+			if (parameter->canBeAutomated) controlModeMenu.addItem(13, "Animation", true, parameter->controlMode == Parameter::AUTOMATION);
 			p->addSubMenu("Control Mode", controlModeMenu);
 		}
 	}
@@ -163,7 +164,7 @@ void ParameterUI::handleMenuSelectedID(int id)
 	case 10: parameter->setControlMode(Parameter::MANUAL); break;
 	case 11: parameter->setControlMode(Parameter::EXPRESSION); break;
 	case 12: parameter->setControlMode(Parameter::REFERENCE); break;
-	case 13: 
+	case 13:
 	{
 		parameter->setControlMode(Parameter::AUTOMATION);
 		parameter->automation->setManualMode(false); //created from user menu, not manual
@@ -176,7 +177,7 @@ void ParameterUI::handleMenuSelectedID(int id)
 	}
 }
 
-void ParameterUI::mouseDoubleClick(const MouseEvent & e)
+void ParameterUI::mouseDoubleClick(const MouseEvent& e)
 {
 	if (showEditWindowOnDoubleClick && !e.mods.isAnyModifierKeyDown()) showEditWindow();
 }
@@ -186,11 +187,23 @@ bool ParameterUI::isInteractable()
 	return ControllableUI::isInteractable() && parameter->controlMode == Parameter::ControlMode::MANUAL;
 }
 
-void ParameterUI::setNextFocusOrder(Component * focusComponent)
+void ParameterUI::setNextFocusOrder(Component* focusComponent)
 {
 	focusComponent->setExplicitFocusOrder(ParameterUI::currentFocusOrderIndex++);
 }
 
+
+double ParameterUI::textToValue(const String& text)
+{
+	String error;
+	Expression e(text, error);
+	if (error.isNotEmpty())
+	{
+		LOGERROR("Error parsing this expression !");
+		return 0;
+	}
+	return e.evaluate();
+}
 
 bool ParameterUI::shouldBailOut() {
 	bool bailOut = parameter.wasObjectDeleted() || parameter == nullptr;
@@ -202,7 +215,7 @@ bool ParameterUI::shouldBailOut() {
 
 // see Parameter::AsyncListener
 
-void ParameterUI::newMessage(const Parameter::ParameterEvent &e) {
+void ParameterUI::newMessage(const Parameter::ParameterEvent& e) {
 	switch (e.type)
 	{
 	case Parameter::ParameterEvent::BOUNDS_CHANGED:
@@ -229,13 +242,13 @@ ParameterUI::ValueEditCalloutComponent::ValueEditCalloutComponent(WeakReference<
 	{
 		Label* label = new Label("ValueLabel" + String(i));
 		label->addListener(this);
-		label->setText(p->isComplex()?p->value[i].toString():p->stringValue(), dontSendNotification);
+		label->setText(p->isComplex() ? p->value[i].toString() : p->stringValue(), dontSendNotification);
 		label->setEditable(true);
 		if (p->isComplex()) label->setColour(label->outlineColourId, BG_COLOR);
 		addAndMakeVisible(label);
 		labels.add(label);
 	}
-	
+
 	setSize(100 * numValues, 20);
 }
 
@@ -265,7 +278,7 @@ void ParameterUI::ValueEditCalloutComponent::labelTextChanged(Label* l)
 	if (!p.wasObjectDeleted() && p != nullptr)
 	{
 		var labelVal;
-		
+
 		var oldVal = p->getValue();
 
 		var newVal;
@@ -273,10 +286,10 @@ void ParameterUI::ValueEditCalloutComponent::labelTextChanged(Label* l)
 		for (int i = 0; i < numValues; i++)
 		{
 			if (p->type == Parameter::STRING) newVal.append(labels[i]->getText());
-			else newVal.append((labels[i]->getText().replace(",", ".").getFloatValue()));
+			else newVal.append(ParameterUI::textToValue(labels[i]->getText().replace(",", ".")));
 		}
 
-		p->setUndoableValue(oldVal, p->isComplex()?newVal: newVal[0]);
+		p->setUndoableValue(oldVal, p->isComplex() ? newVal : newVal[0]);
 	}
 }
 
@@ -285,7 +298,7 @@ void ParameterUI::ValueEditCalloutComponent::editorHidden(Label* l, TextEditor&)
 	CallOutBox* b = dynamic_cast<CallOutBox*>(getParentComponent());
 	if (b != nullptr)
 	{
-		if(l == labels[labels.size()-1]) b->dismiss();
+		if (l == labels[labels.size() - 1]) b->dismiss();
 	}
 }
 

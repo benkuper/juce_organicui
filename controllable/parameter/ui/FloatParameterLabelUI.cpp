@@ -161,8 +161,7 @@ void FloatParameterLabelUI::valueChanged(const var& v)
 
 void FloatParameterLabelUI::labelTextChanged(Label*)
 {
-	//String  originalString = valueLabel.getText().substring(prefix.length(), valueLabel.getText().length() - suffix.length());
-	parameter->setValue(valueLabel.getText().replace(",", ".").getFloatValue());
+	parameter->setValue(ParameterUI::textToValue(valueLabel.getText().replace(",", ".")));
 }
 
 
