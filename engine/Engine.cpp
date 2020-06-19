@@ -1,4 +1,3 @@
-#include "Engine.h"
 
 /*
  ==============================================================================
@@ -39,11 +38,10 @@ Engine::Engine(const String & fileName, const String & fileExtension) :
 	selectionManager.reset(new InspectableSelectionManager(true)); //selectionManager constructor
 
 	Logger::setCurrentLogger(CustomLogger::getInstance());
-
-	DashboardItemFactory::getInstance()->providers.add(this);
+	addChildControllableContainer(ProjectSettings::getInstance());
 
 	addChildControllableContainer(DashboardManager::getInstance());
-	addChildControllableContainer(ProjectSettings::getInstance());
+	DashboardItemFactory::getInstance()->providers.add(this);
 
 	Detective::getInstance();
 

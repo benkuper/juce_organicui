@@ -19,12 +19,6 @@ DashboardManager::DashboardManager() :
 {
 	editMode = addBoolParameter("Edit Mode", "If checked, items are editable. If not, items are normally usable", true);
 	snapping = addBoolParameter("Snapping", "If checked, items are automatically aligned when dragging them closed to other ones", true);
-
-#if ORGANICUI_USE_WEBSERVER
-	enableServer = addBoolParameter("Enable server", "Activates / Deactivates exposing Dashboard as a webserver", true);
-	serverPort = addIntParameter("Server Port", "The port that the server binds to", 9999, 0, 65535);
-	setupServer();
-#endif
 }
 
 DashboardManager::~DashboardManager()
@@ -48,7 +42,7 @@ void DashboardManager::setupServer()
 	server.reset();
 	if (isCurrentlyLoadingData) return;
 
-	if (!enableServer->boolValue())
+	if (!ProjectSettings::getInstance()->enableServer->boolValue())
 	{
 		LOG("Dashboard server is not running");
 		#if ORGANICUI_USE_SERVUS
@@ -59,16 +53,18 @@ void DashboardManager::setupServer()
 		return;
 	}
 
+	int port = ProjectSettings::getInstance()->serverPort->intValue();
+
 	server.reset(new SimpleWebSocket());
 	server->rootPath = File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory).getChildFile(OrganicApplication::getInstance()->getApplicationName() + "/dashboard");
 	server->addWebSocketListener(this);
-	server->start(serverPort->intValue());
+	server->start(port);
 
 #if ORGANICUI_USE_SERVUS
 	setupZeroconf();
 #endif
 
-	LOG("Dashboard server is running on port " << serverPort->intValue());
+	LOG("Dashboard server is running on port " << port);
 
 }
 
@@ -161,16 +157,6 @@ void DashboardManager::itemDataFeedback(var data)
 #endif
 }
 
-void DashboardManager::onContainerParameterChanged(Parameter* p)
-{
-#if ORGANICUI_USE_WEBSERVER
-	if (p == enableServer || p == serverPort)
-	{
-		setupServer();
-	}
-#endif
-}
-
 void DashboardManager::afterLoadJSONDataInternal()
 {
 #if ORGANICUI_USE_WEBSERVER
@@ -182,21 +168,24 @@ void DashboardManager::afterLoadJSONDataInternal()
 #if ORGANICUI_USE_SERVUS
 void DashboardManager::setupZeroconf()
 {
-	if (Engine::mainEngine != nullptr && Engine::mainEngine->isClearing || serverPort == nullptr) return;
+	if(ProjectSettings::getInstanceWithoutCreating() == nullptr || ProjectSettings::getInstance()->serverPort == nullptr) return;
+
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->isClearing) return;
 	if (!isThreadRunning()) startThread();
 }
 
 void DashboardManager::run()
 {
 	String nameToAdvertise = OrganicApplication::getInstance()->getApplicationName() + " - Dashboard";
+	int port = ProjectSettings::getInstance()->serverPort->intValue();
 	int portToAdvertise = 0;
-	while (portToAdvertise != serverPort->intValue() && !threadShouldExit())
+	while (portToAdvertise != port && !threadShouldExit())
 	{
-		portToAdvertise = serverPort->intValue();
+		portToAdvertise = port;
 		servus.withdraw();
 		servus.announce(portToAdvertise, nameToAdvertise.toStdString());
 
-		if (serverPort->intValue() != portToAdvertise)
+		if (port != portToAdvertise)
 		{
 			DBG("Name or port changed during advertise, readvertising");
 		}

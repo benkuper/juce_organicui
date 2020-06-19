@@ -19,8 +19,14 @@ public:
 	~ProjectSettings();
 
 	BoolParameter* fullScreenOnStartup;
-	TargetParameter* showDashboardOnStartup;
 	BoolParameter* saveLayoutReference;
 
+	ControllableContainer dashboardCC;
+	TargetParameter* showDashboardOnStartup;
+	BoolParameter* enableServer;
+	IntParameter* serverPort;
+
 	void reset();
+
+	void onControllableFeedbackUpdate(ControllableContainer * cc, Controllable * c) override;
 };

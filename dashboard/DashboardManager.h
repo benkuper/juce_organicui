@@ -41,9 +41,6 @@ public:
 
 #if ORGANICUI_USE_WEBSERVER
 	std::unique_ptr<SimpleWebSocket> server;
-	
-	BoolParameter* enableServer;
-	IntParameter* serverPort;
 
 
 	void setupServer();
@@ -57,7 +54,6 @@ public:
 
 	void itemDataFeedback(var data) override;
 
-	void onContainerParameterChanged(Parameter* p) override;
 	void afterLoadJSONDataInternal() override;
 
 #if ORGANICUI_USE_SERVUS
