@@ -254,6 +254,8 @@ void ControllableUI::feedbackStateChanged()
 
 void ControllableUI::updateTooltip()
 {
+	if (controllable == nullptr || controllable.wasObjectDeleted()) return;
+
 	if (customDescription.isNotEmpty())
 	{
 		tooltip = customDescription;
