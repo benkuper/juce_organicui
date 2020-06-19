@@ -39,7 +39,7 @@ public:
     IntSliderUI * createSlider(IntParameter * target = nullptr);
 	IntStepperUI * createStepper(IntParameter * target = nullptr);
 	IntParameterLabelUI * createLabelUI(IntParameter * target = nullptr);
-    ControllableUI * createDefaultUI(Controllable * targetControllable = nullptr) override;
+    ControllableUI * createDefaultUI() override;
 
 	static IntParameter * create() { return new IntParameter("New Int Parameter", "", 0); }
 	virtual String getTypeString() const override { return getTypeStringStatic(); }

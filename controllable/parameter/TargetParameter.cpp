@@ -283,9 +283,9 @@ TargetParameterUI * TargetParameter::createTargetUI(TargetParameter * _target)
 	return new TargetParameterUI(_target == nullptr ?this:_target);
 }
 
-ControllableUI * TargetParameter::createDefaultUI(Controllable * targetControllable)
+ControllableUI * TargetParameter::createDefaultUI()
 {
-	return createTargetUI((TargetParameter*)targetControllable);
+	return createTargetUI(this);
 }
 
 var TargetParameter::getTargetFromScript(const juce::var::NativeFunctionArgs& a)

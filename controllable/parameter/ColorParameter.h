@@ -38,7 +38,7 @@ public:
 	void setControlAutomation() override;
 
 	ColorParameterUI * createColorParamUI();
-	ControllableUI * createDefaultUI(Controllable * targetControllable = nullptr) override;
+	ControllableUI * createDefaultUI() override;
 
 	static ColorParameter * create() { return new ColorParameter("New Color Parameter", ""); }
 	virtual String getTypeString() const override { return getTypeStringStatic(); }

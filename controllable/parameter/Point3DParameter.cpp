@@ -144,9 +144,9 @@ StringArray Point3DParameter::getValuesNames()
 	return StringArray("X","Y","Z");
 }
 
-ControllableUI * Point3DParameter::createDefaultUI(Controllable * targetControllable)
+ControllableUI * Point3DParameter::createDefaultUI()
 {
-	return new TripleSliderUI(targetControllable != nullptr ? (Point3DParameter *)targetControllable : this);
+	return new TripleSliderUI(this);
 }
 
 var Point3DParameter::getCroppedValue(var originalValue)

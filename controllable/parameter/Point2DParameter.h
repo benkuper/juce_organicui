@@ -35,7 +35,7 @@ public:
 
 	bool checkValueIsTheSame(var newValue, var oldValue) override;
 
-	ControllableUI * createDefaultUI(Controllable * targetControllable = nullptr) override;
+	ControllableUI * createDefaultUI() override;
 
 	static Point2DParameter * create() { return new Point2DParameter("New Point2D Parameter", ""); }
 	virtual String getTypeString() const override { return getTypeStringStatic(); }

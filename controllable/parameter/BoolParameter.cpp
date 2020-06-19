@@ -31,6 +31,6 @@ BoolImageToggleUI * BoolParameter::createImageToggle(ImageButton * bt, BoolParam
 }
 
 
-ControllableUI * BoolParameter::createDefaultUI(Controllable * targetControllable) {
-	return createToggle(dynamic_cast<BoolParameter *>(targetControllable));
+ControllableUI * BoolParameter::createDefaultUI() {
+	return createToggle(this);
 }

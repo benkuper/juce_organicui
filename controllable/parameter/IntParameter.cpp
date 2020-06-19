@@ -93,10 +93,9 @@ IntParameterLabelUI * IntParameter::createLabelUI(IntParameter * target)
 	return new IntParameterLabelUI(target);
 }
 
-ControllableUI * IntParameter::createDefaultUI(Controllable * targetControllable) {
+ControllableUI * IntParameter::createDefaultUI() {
 
-	IntParameter * p = dynamic_cast<IntParameter *>(targetControllable);
-	ParameterUI * pui = createStepper(p);
+	ParameterUI * pui = createStepper(this);
 	//if (/*isControllableFeedbackOnly || !enabled || */ !hasRange()) pui = createLabelUI(p);
 	//else pui = createStepper(p);
 

@@ -21,10 +21,10 @@ public:
 	~Trigger() {masterReference.clear();}
 	
 
-	TriggerButtonUI * createButtonUI(Trigger * target = nullptr);
-	TriggerImageUI * createImageUI(const Image &image, Trigger * target = nullptr);
-	TriggerBlinkUI * createBlinkUI(Trigger * target = nullptr);
-	ControllableUI * createDefaultUI(Controllable * targetControllable = nullptr) override;
+	TriggerButtonUI * createButtonUI();
+	TriggerImageUI * createImageUI(const Image &image);
+	TriggerBlinkUI * createBlinkUI();
+	ControllableUI * createDefaultUI() override;
 	
 	virtual void trigger();
 	

@@ -171,6 +171,6 @@ EnumParameterUI * EnumParameter::createUI(EnumParameter * target)
 	return new EnumParameterUI(target);
 }
 
-ControllableUI * EnumParameter::createDefaultUI(Controllable * targetControllable) {
-	return createUI(dynamic_cast<EnumParameter *>(targetControllable));
+ControllableUI * EnumParameter::createDefaultUI() {
+	return createUI(this);
 }

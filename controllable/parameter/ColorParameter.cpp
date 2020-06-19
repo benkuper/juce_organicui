@@ -151,7 +151,7 @@ ColorParameterUI * ColorParameter::createColorParamUI()
 	return new ColorParameterUI(this);
 }
 
-ControllableUI * ColorParameter::createDefaultUI(Controllable *)
+ControllableUI * ColorParameter::createDefaultUI()
 {
 	return createColorParamUI();
 }

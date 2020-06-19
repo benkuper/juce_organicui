@@ -35,7 +35,7 @@ public:
 	FloatParameterLabelUI * createLabelParameter(FloatParameter * target = nullptr);
 	TimeLabel * createTimeLabelParameter(FloatParameter * target = nullptr);
 
-    ControllableUI * createDefaultUI(Controllable * targetControllable = nullptr) override;
+    ControllableUI * createDefaultUI() override;
 
 	bool checkValueIsTheSame(var oldValue, var newValue) override;
 

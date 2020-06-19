@@ -20,27 +20,24 @@ queuedNotifier(5)
 	scriptObject.setMethod("trigger", Controllable::setValueFromScript);
 }
 
-TriggerButtonUI * Trigger::createButtonUI(Trigger * target)
+TriggerButtonUI * Trigger::createButtonUI()
 {
-	if (target == nullptr) target = this;
-    return new TriggerButtonUI(target);
+    return new TriggerButtonUI(this);
 }
 
-TriggerImageUI * Trigger::createImageUI(const Image &image, Trigger * target)
+TriggerImageUI * Trigger::createImageUI(const Image &image)
 {
-	if (target == nullptr) target = this;
 	return new TriggerImageUI(this, image);
 }
 
-TriggerBlinkUI * Trigger::createBlinkUI(Trigger * target)
+TriggerBlinkUI * Trigger::createBlinkUI()
 {
-	if (target == nullptr) target = this;
-	return new TriggerBlinkUI(target);
+	return new TriggerBlinkUI(this);
 }
 
-ControllableUI * Trigger::createDefaultUI(Controllable * targetControllable){
-	if (isControllableFeedbackOnly) return createBlinkUI(dynamic_cast<Trigger *>(targetControllable));
-	else return createButtonUI(dynamic_cast<Trigger *>(targetControllable));
+ControllableUI * Trigger::createDefaultUI(){
+	if (isControllableFeedbackOnly) return createBlinkUI();
+	else return createButtonUI();
 }
 
 void Trigger::trigger()

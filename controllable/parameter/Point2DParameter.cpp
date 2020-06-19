@@ -133,9 +133,9 @@ bool Point2DParameter::checkValueIsTheSame(var newValue, var oldValue)
 	return result;
 }
 
-ControllableUI * Point2DParameter::createDefaultUI(Controllable * targetControllable)
+ControllableUI * Point2DParameter::createDefaultUI()
 {
-	return new DoubleSliderUI(targetControllable != nullptr ? (Point2DParameter *)targetControllable : this);
+	return new DoubleSliderUI(this);
 }
 
 var Point2DParameter::getCroppedValue(var originalValue)
