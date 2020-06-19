@@ -41,11 +41,13 @@ void BaseManagerViewMiniPane<M, T, U>::paint(juce::Graphics& g)
 	if (managerUI->itemsUI.size() == 0) return;
 
 	juce::Rectangle<int> mr = managerUI->getLocalBounds();
-	juce::Rectangle<float> focusRect;
+	juce::Rectangle<float> focusRect = managerUI->getViewBounds(mr);
+
+	/*
 	focusRect.setPosition(managerUI->getViewPos(mr.getPosition()).toFloat());
 	juce::Point<float> vs(mr.getWidth() / managerUI->viewZoom, mr.getHeight() / managerUI->viewZoom);
 	focusRect.setSize(vs.x, vs.y);
-
+	*/
 
 	juce::Rectangle<float> itemViewBounds(focusRect);
 	for (auto& ui : managerUI->itemsUI)
@@ -77,8 +79,8 @@ void BaseManagerViewMiniPane<M, T, U>::paint(juce::Graphics& g)
 
 	for (auto& ui : managerUI->itemsUI)
 	{
-		juce::Rectangle<int> b = ui->getBoundsInParent();
-		
+		juce::Rectangle<float> b = ui->getBoundsInParent().toFloat();
+
 		float bx = jmap<float>(b.getX(), itemRealBounds.getX(), itemRealBounds.getRight(), r.getX(), r.getRight());
 		float by = jmap<float>(b.getY(), itemRealBounds.getY(), itemRealBounds.getBottom(), r.getY(), r.getBottom());
 		float bw = b.getWidth() * r.getWidth() / itemRealBounds.getWidth();
@@ -89,8 +91,6 @@ void BaseManagerViewMiniPane<M, T, U>::paint(juce::Graphics& g)
 		g.setColour(Colours::white.withAlpha(.3f));
 		g.fillRect(uiPaneBounds);
 	}
-
-	
 
 	float fx = jmap<float>(focusRect.getX(), itemViewBounds.getX(), itemViewBounds.getRight(), r.getX(), r.getRight());
 	float fy = jmap<float>(focusRect.getY(), itemViewBounds.getY(), itemViewBounds.getBottom(), r.getY(), r.getBottom());
