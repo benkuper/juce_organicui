@@ -20,12 +20,11 @@
 #endif
 
 class DashboardManager :
-	public BaseManager<Dashboard>
-#if ORGANICUI_USE_WEBSERVER
-	,public SimpleWebSocket::Listener,
+	public BaseManager<Dashboard>,
 	public Dashboard::DashboardListener
+#if ORGANICUI_USE_WEBSERVER
+	,public SimpleWebSocket::Listener
 #endif
-
 #if ORGANICUI_USE_SERVUS
 	,public Thread
 #endif

@@ -48,9 +48,11 @@ void ProjectSettings::reset()
 
 void ProjectSettings::onControllableFeedbackUpdate(ControllableContainer* cc, Controllable* c)
 {
+#if ORGANICUI_USE_WEBSERVER
 	if (c == enableServer || c == serverPort)
 	{
 		if(c == enableServer) serverPort->setEnabled(enableServer->boolValue());
 		DashboardManager::getInstance()->setupServer();
 	}
+#endif
 }
