@@ -23,10 +23,11 @@ DashboardItemManagerUI::DashboardItemManagerUI(DashboardItemManager * manager) :
 	File f = manager->bgImage->getFile();
 	if (f.existsAsFile()) bgImage = ImageCache::getFromFile(f);
 
-	addExistingItems(false);
 
 	acceptedDropTypes.add("Controllable");
 	acceptedDropTypes.add("Container");
+
+	addExistingItems();
 }
 
 DashboardItemManagerUI::~DashboardItemManagerUI()

@@ -49,6 +49,11 @@ void DashboardManagerView::setCurrentDashboard(Dashboard * d)
 	}
 
 	resized();
+
+	if (currentItemManagerUI != nullptr)
+	{
+		currentItemManagerUI->updateItemsVisibility();
+	}
 }
 
 void DashboardManagerView::resized()
