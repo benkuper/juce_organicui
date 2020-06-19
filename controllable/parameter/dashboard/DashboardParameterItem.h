@@ -21,6 +21,10 @@ public:
 
 	virtual void setInspectableInternal(Inspectable* i) override;
 
+	void onExternalParameterValueChanged(Parameter* p) override;
+
+	var getServerData() override;
+
 	static DashboardParameterItem* create(var) { return new DashboardParameterItem(); }
 	virtual String getTypeString() const override { return "DashboardParameterItem"; }
 

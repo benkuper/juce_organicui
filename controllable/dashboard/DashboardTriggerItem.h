@@ -17,6 +17,9 @@ public:
 
 	virtual void setInspectableInternal(Inspectable* i) override;
 
+	virtual void onExternalTriggerTriggered(Trigger* t) override;
+
+	var getServerData() override;
 
 	static DashboardTriggerItem* create(var) { return new DashboardTriggerItem(); }
 	virtual String getTypeString() const override { return "DashboardTriggerItem"; }

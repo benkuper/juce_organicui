@@ -58,6 +58,14 @@
 #endif
 */
 
+/** Config: ORGANICUI_USE_WEBSERVER
+	Enables the use of the JUCE SimpleWeb module to expose the dashboard as a webserver
+	You will need to add the juce_simpleweb in order to compile if you enable this option
+*/
+#ifndef ORGANICUI_USE_WEBSERVER
+#define ORGANICUI_USE_WEBSERVER 0
+#endif
+
 
 #include <juce_core/juce_core.h>
 #include <juce_events/juce_events.h>
@@ -65,6 +73,8 @@
 #include <juce_gui_extra/juce_gui_extra.h>
 #include <juce_opengl/juce_opengl.h>
 #include <juce_osc/juce_osc.h>
+
+
 
 using namespace juce;
 
@@ -108,7 +118,6 @@ using namespace juce;
 #include "inspectable/ui/InspectableEditor.h"
 #include "inspectable/ui/InspectableSelector.h"
 #include "inspectable/ui/Inspector.h"
-
 
 #include "help/HelpBox.h"
 

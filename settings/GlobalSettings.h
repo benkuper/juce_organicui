@@ -47,12 +47,10 @@ public:
 	BoolParameter * openSpecificFileOnStartup;
 	FileParameter * fileToOpenOnStartup;
 
-
 	ControllableContainer interfaceCC;
 	BoolParameter* closeToSystemTray;
 	IntParameter* fontSize;
 	EnumParameter* helpLanguage;
-
 
 	ControllableContainer saveLoadCC;
 	BoolParameter * enableAutoSave;

@@ -11,7 +11,7 @@ DashboardTriggerItem::DashboardTriggerItem(Trigger * item) :
 
 DashboardTriggerItem::~DashboardTriggerItem()
 {
-
+	if (trigger != nullptr && !inspectable.wasObjectDeleted()) trigger->removeTriggerListener(this);
 }
 
 DashboardItemUI* DashboardTriggerItem::createUI()
@@ -22,5 +22,36 @@ DashboardItemUI* DashboardTriggerItem::createUI()
 void DashboardTriggerItem::setInspectableInternal(Inspectable* i)
 {
 	DashboardControllableItem::setInspectableInternal(i);
+
+	if (trigger != nullptr && !inspectable.wasObjectDeleted())
+	{
+		trigger->removeTriggerListener(this);
+	}
+
 	trigger = dynamic_cast<Trigger*>(i);
+
+	if (trigger != nullptr)
+	{
+		trigger->addTriggerListener(this);
+	}
+}
+
+void DashboardTriggerItem::onExternalTriggerTriggered(Trigger* t)
+{
+	DashboardControllableItem::onExternalTriggerTriggered(t);
+
+	if (t == trigger)
+	{
+		var data(new DynamicObject());
+		data.getDynamicObject()->setProperty("controlAddress", trigger->getControlAddress());
+		notifyDataFeedback(data);
+	}
+}
+
+var DashboardTriggerItem::getServerData()
+{
+	var data = DashboardControllableItem::getServerData();
+	if (bgColor->enabled) data.getDynamicObject()->setProperty("bgColor", bgColor->value);
+	if (customImagePath->enabled) data.getDynamicObject()->setProperty("customImage", customImagePath->value);
+	return data;
 }
