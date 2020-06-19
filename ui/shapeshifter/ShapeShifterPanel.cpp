@@ -63,11 +63,13 @@ void ShapeShifterPanel::setCurrentContent(ShapeShifterContent * _content)
 		ShapeShifterPanelTab * tab = header.getTabForContent(currentContent);
 		if (tab != nullptr) tab->setSelected(true);
 
-		addAndMakeVisible(currentContent->contentComponent);
-
 		currentContent->contentIsShown = true;
 	}
+
 	resized();
+
+	if (currentContent != nullptr) addAndMakeVisible(currentContent->contentComponent); //add after resize
+	//after resized
 }
 
 void ShapeShifterPanel::setCurrentContent(const String & name)
@@ -119,7 +121,7 @@ void ShapeShifterPanel::paintOverChildren(Graphics & g)
 
 void ShapeShifterPanel::resized()
 {
- juce::Rectangle<int> r = getLocalBounds();
+	juce::Rectangle<int> r = getLocalBounds();
 	header.setBounds(r.removeFromTop(headerHeight));
 	if (currentContent != nullptr)
 	{

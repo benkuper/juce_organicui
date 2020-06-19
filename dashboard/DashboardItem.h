@@ -21,4 +21,20 @@ public:
 	virtual ~DashboardItem();
 
 	virtual DashboardItemUI* createUI();
+
+	virtual var getServerData();
+
+	void notifyDataFeedback(var data);
+
+	class  DashboardItemListener
+	{
+	public:
+		/** Destructor. */
+		virtual ~DashboardItemListener() {}
+		virtual void itemDataFeedback(var data) = 0;
+	};
+
+	ListenerList<DashboardItemListener> dashboardItemsListeners;
+	void addDashboardItemListener(DashboardItemListener* newListener) { dashboardItemsListeners.add(newListener); }
+	void removeDashboardItemListener(DashboardItemListener* listener) { dashboardItemsListeners.remove(listener); }
 };

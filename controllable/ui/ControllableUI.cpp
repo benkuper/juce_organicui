@@ -117,23 +117,24 @@ void ControllableUI::showContextMenu()
 	}
 
 	p->addSeparator();
-	PopupMenu dashboardMenu;
-	int index = 0;
-	for (auto &di : DashboardManager::getInstance()->items)
-	{
-		dashboardMenu.addItem(index + 10000, di->niceName);
-		index++;
-	}
 	
 	if (controllable->type == Controllable::FLOAT ||
 		controllable->type == Controllable::INT ||
 		controllable->type == Controllable::POINT2D ||
 		controllable->type == Controllable::POINT3D ||
-		controllable->type == Controllable::COLOR)
+		controllable->type == Controllable::COLOR ||
+		controllable->type == Controllable::BOOL )
 	{
 		p->addItem(-10, "Watch this with The Detective");
 	}
 
+	PopupMenu dashboardMenu;
+	int index = 0;
+	for (auto& di : DashboardManager::getInstance()->items)
+	{
+		dashboardMenu.addItem(index + 10000, di->niceName);
+		index++;
+	}
 	p->addSubMenu("Send to Dashboard", dashboardMenu);
 
 
@@ -253,6 +254,8 @@ void ControllableUI::feedbackStateChanged()
 
 void ControllableUI::updateTooltip()
 {
+	if (controllable == nullptr || controllable.wasObjectDeleted()) return;
+
 	if (customDescription.isNotEmpty())
 	{
 		tooltip = customDescription;

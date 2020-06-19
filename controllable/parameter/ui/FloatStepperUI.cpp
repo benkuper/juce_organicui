@@ -73,6 +73,8 @@ void FloatStepperUI::resized()
 {
 	Rectangle<int> r = getLocalBounds();
 	
+	if (parameter == nullptr || parameter.wasObjectDeleted()) return;
+
 	if (showLabel)
 	{
 		Font font(jlimit(12, 40, jmin(r.getHeight() - 4, r.getWidth()) - 16));

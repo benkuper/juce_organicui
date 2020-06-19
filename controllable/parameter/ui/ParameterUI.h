@@ -68,6 +68,8 @@ public:
 		void parentHierarchyChanged() override;
 	};
 
+	static double textToValue(const String & text);
+
 protected:
 
     // helper to spot wrong deletion order

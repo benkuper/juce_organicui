@@ -22,6 +22,7 @@ public:
 	Image bgImage;
 
 	virtual void paint(Graphics& g) override;
+	virtual void paintOverChildren(Graphics& g) override;
 
 	bool isInterestedInDragSource(const SourceDetails & dragSourceDetails) override;
 	void itemDropped(const SourceDetails &details) override;

@@ -1,4 +1,3 @@
-#include "DashboardManagerUI.h"
 /*
   ==============================================================================
 
@@ -24,6 +23,8 @@ DashboardManagerUI::DashboardManagerUI(DashboardManager* manager) :
 	addAndMakeVisible(snappingUI.get());
 	editModeUI->showLabel = true;
 	snappingUI->showLabel = true;
+
+	addExistingItems();
 }
 
 

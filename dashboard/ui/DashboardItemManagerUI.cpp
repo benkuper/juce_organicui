@@ -1,4 +1,3 @@
-#include "DashboardItemManagerUI.h"
 /*
   ==============================================================================
 
@@ -12,8 +11,6 @@
 DashboardItemManagerUI::DashboardItemManagerUI(DashboardItemManager * manager) :
 	BaseManagerViewUI("Dashboard", manager)
 {
-	//bgColor = Colours::purple;
-	//setWantsKeyboardFocus(true);
 
 	enableSnapping = DashboardManager::getInstance()->snapping->boolValue();
 	updatePositionOnDragMove = true;
@@ -26,10 +23,11 @@ DashboardItemManagerUI::DashboardItemManagerUI(DashboardItemManager * manager) :
 	File f = manager->bgImage->getFile();
 	if (f.existsAsFile()) bgImage = ImageCache::getFromFile(f);
 
-	addExistingItems(false);
 
 	acceptedDropTypes.add("Controllable");
 	acceptedDropTypes.add("Container");
+
+	addExistingItems();
 }
 
 DashboardItemManagerUI::~DashboardItemManagerUI()
@@ -52,6 +50,25 @@ void DashboardItemManagerUI::paint(Graphics& g)
 	Rectangle<int> r = getBoundsInView(Rectangle<float>().withSizeKeepingCentre(bgImage.getWidth()*scale, bgImage.getHeight()*scale));
 	g.drawImage(bgImage, r.toFloat(), RectanglePlacement::stretchToFit, false);
 	
+}
+
+void DashboardItemManagerUI::paintOverChildren(Graphics& g)
+{
+	BaseManagerViewUI::paintOverChildren(g);
+
+	if (manager == nullptr || inspectable.wasObjectDeleted()) return;
+	if (manager->canvasSize->enabled && manager->canvasSize->x > 0 && manager->canvasSize->y > 0)
+	{
+		Point<float> p = manager->canvasSize->getPoint();
+		Rectangle<int> canvasR = getBoundsInView(Rectangle<float>().withSizeKeepingCentre(p.x, p.y));
+		Path path;
+		path.addRectangle(getLocalBounds());
+		path.setUsingNonZeroWinding(false);
+		path.addRectangle(canvasR);
+
+		g.setColour(Colours::black.withAlpha(.5f));
+		g.fillPath(path);
+	}
 }
 
 bool DashboardItemManagerUI::isInterestedInDragSource(const SourceDetails & dragSourceDetails)
@@ -115,7 +132,7 @@ void DashboardItemManagerUI::newMessage(const ContainerAsyncEvent& e)
 			else bgImage = Image();
 			repaint();
 		}
-		else if (e.targetControllable == manager->bgImageAlpha || manager->bgImageScale)
+		else if (e.targetControllable == manager->bgImageAlpha || e.targetControllable == manager->bgImageScale || e.targetControllable == manager->canvasSize)
 		{
 			repaint();
 		}

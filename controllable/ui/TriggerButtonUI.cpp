@@ -14,7 +14,7 @@ TriggerButtonUI::TriggerButtonUI(Trigger *t) :
     TriggerUI(t),
 	drawTriggering(false)
 {
-	setSize(200, GlobalSettings::getInstance()->fontSize->floatValue() + 4);
+	setSize(Font(12).getStringWidth(t->niceName)+4, GlobalSettings::getInstance()->fontSize->floatValue() + 4);
 	setRepaintsOnMouseActivity(isInteractable());
 }
 

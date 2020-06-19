@@ -17,7 +17,7 @@ public:
 	DashboardItemManager();
 	~DashboardItemManager();
 
-
+	Point2DParameter* canvasSize;
 	FileParameter* bgImage;
 	FloatParameter* bgImageScale;
 	FloatParameter* bgImageAlpha;

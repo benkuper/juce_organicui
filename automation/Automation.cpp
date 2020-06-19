@@ -1,4 +1,3 @@
-#include "Automation.h"
 /*
   ==============================================================================
 
@@ -14,11 +13,13 @@ Automation::Automation(const String& name, AutomationRecorder * recorder, bool a
     allowKeysOutside(allowKeysOutside),
     recorder(recorder)
 {
+    itemDataType = "AutomationKey";
+
     comparator.compareFunc = &Automation::compareKeys;
 
     editorCanBeCollapsed = false;
     showInspectorOnSelect = false;
-    userCanAddItemsManually = false;
+    userCanAddItemsManually = true;
     canInspectChildContainers = false;
 
     length = addFloatParameter("Length", "The length of the curve", 1, 0.01f);
@@ -192,6 +193,42 @@ void Automation::removeItemInternal(AutomationKey* k)
 void Automation::removeItemsInternal()
 {
     updateNextKeys();
+}
+
+Array<AutomationKey*> Automation::addItemsFromClipboard(bool showWarning)
+{
+    Array<AutomationKey*> keys = BaseManager::addItemsFromClipboard(showWarning);
+
+    if (keys.isEmpty()) return keys;
+    if (keys[0] == nullptr) return Array<AutomationKey *>();
+
+    float minTime = keys[0]->position->floatValue();
+    for (auto& b : keys)
+    {
+        if (b->position->floatValue() < minTime)
+        {
+            minTime = b->position->floatValue();
+        }
+    }
+
+    float diffTime = position->floatValue() - minTime;
+
+    if (keys.size() > 1)
+    {
+        Array<AutomationKey*> keysBetween = getKeysBetweenPositions(keys[0]->position->floatValue() + diffTime, keys[keys.size() - 1]->position->floatValue() + diffTime);
+        if (keysBetween.size() > 0)
+        {
+            Array<AutomationKey*> keysToRemove;
+            for (auto& k : keysBetween) if (!keys.contains(k)) keysToRemove.add(k);
+            removeItems(keysToRemove);
+        }
+    }
+
+    for (auto& k : keys) k->position->setValue(k->position->floatValue() + diffTime);
+
+    reorderItems();
+
+    return keys;
 }
 
 Array<UndoableAction*> Automation::getMoveKeysBy(float start, float offset)

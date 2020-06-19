@@ -26,5 +26,7 @@ public:
 	virtual void ghostInspectable() override;
 	virtual void checkGhost() override;
 
+	virtual var getServerData() override;
+
 	virtual String getTypeString() const override { return "DashboardControllableItem"; }
 };

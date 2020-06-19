@@ -1,3 +1,4 @@
+#include "DashboardItem.h"
 /*
   ==============================================================================
 
@@ -24,4 +25,17 @@ DashboardItem::~DashboardItem()
 DashboardItemUI* DashboardItem::createUI()
 {
 	return new DashboardItemUI(this);
+}
+
+var DashboardItem::getServerData()
+{
+	var data(new DynamicObject());
+	data.getDynamicObject()->setProperty("position", viewUIPosition->value);
+	data.getDynamicObject()->setProperty("size", viewUISize->value);
+	return data;
+}
+
+void DashboardItem::notifyDataFeedback(var data)
+{
+	dashboardItemsListeners.call(&DashboardItemListener::itemDataFeedback, data);
 }

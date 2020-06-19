@@ -13,7 +13,7 @@ TriggerUI::TriggerUI(Trigger * trigger) :
     trigger(trigger),
 	useCustomBGColor(false)
 {
-	setSize(200, GlobalSettings::getInstance()->fontSize->floatValue() + 4);
+	setSize(80, GlobalSettings::getInstance()->fontSize->floatValue() + 4);
     trigger->addAsyncTriggerListener(this);
 }
 

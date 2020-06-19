@@ -33,7 +33,7 @@ AppUpdater::~AppUpdater()
 
 void AppUpdater::setURLs(URL _updateURL, StringRef _downloadURLBase, StringRef _filePrefix)
 {
-	updateURL = _updateURL;
+	updateURL = URL(_updateURL.toString(false));
 	filePrefix = _filePrefix;
 	downloadURLBase = _downloadURLBase;
 	if (!downloadURLBase.endsWithChar('/')) downloadURLBase += "/";

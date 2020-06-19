@@ -14,8 +14,9 @@ AutomationKey::AutomationKey(const float & _position, const float & _value) :
     nextKey(nullptr),
     keyNotifier(8)
 {
+    itemDataType = "AutomationKey";
+    
     saveAndLoadRecursiveData = true;
-
     showInspectorOnSelect = false;
 
     position = addFloatParameter("Position", "The position of the key", 0);

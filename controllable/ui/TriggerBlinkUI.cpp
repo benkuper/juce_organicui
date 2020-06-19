@@ -19,7 +19,7 @@ TriggerBlinkUI::TriggerBlinkUI(Trigger* t) :
 	refreshPeriod(50)
 {
 	setSize(30, 20);
-
+	
 }
 
 TriggerBlinkUI::~TriggerBlinkUI()

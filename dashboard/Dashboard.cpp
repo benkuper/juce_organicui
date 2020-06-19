@@ -1,3 +1,4 @@
+#include "Dashboard.h"
 /*
   ==============================================================================
 
@@ -13,10 +14,26 @@ Dashboard::Dashboard() :
 	BaseItem("Dashboard", false)
 {
 	addChildControllableContainer(&itemManager);
+	itemManager.addBaseManagerListener(this);
 }
 
 Dashboard::~Dashboard()
 {
+}
+
+void Dashboard::itemAdded(DashboardItem* item)
+{
+	item->addDashboardItemListener(this);
+}
+
+void Dashboard::itemRemoved(DashboardItem* item)
+{
+	item->removeDashboardItemListener(this);
+}
+
+void Dashboard::itemDataFeedback(var data)
+{
+	dashboardListeners.call(&DashboardListener::itemDataFeedback, data);
 }
 
 var Dashboard::getJSONData()
@@ -30,4 +47,20 @@ void Dashboard::loadJSONDataInternal(var data)
 {
 	BaseItem::loadJSONDataInternal(data);
 	itemManager.loadJSONData(data.getProperty("itemManager", var()));
+}
+
+var Dashboard::getServerData()
+{
+	var data(new DynamicObject());
+	data.getDynamicObject()->setProperty("id", shortName);
+	data.getDynamicObject()->setProperty("name", niceName);
+	data.getDynamicObject()->setProperty("size", itemManager.canvasSize->value);
+
+	var iData;
+	for (auto& i : itemManager.items)
+	{
+		iData.append(i->getServerData());
+	}
+	data.getDynamicObject()->setProperty("items", iData);
+	return data;
 }

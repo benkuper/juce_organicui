@@ -191,7 +191,7 @@ void createStackTrace(int signum)
     DBG("Create Stack trace here !");
     String stackTrace = SystemStats::getStackBacktrace();
     
-    DBG("Stack trace : " << stackTrace);
+    DBG("Stack trace :\n" << stackTrace);
     
     File f(dumpFileString);
     FileOutputStream fos(f);
