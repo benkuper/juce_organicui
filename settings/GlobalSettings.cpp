@@ -138,7 +138,7 @@ var KeyMappingsContainer::getJSONData()
 void KeyMappingsContainer::loadJSONDataInternal(var data)
 {
 	ControllableContainer::loadJSONDataInternal(data);
-	
+
 	KeyPressMappingSet * kms = getCommandManager().getKeyMappings();
 	std::unique_ptr<XmlElement> element = XmlDocument::parse(data.getProperty("keyMappings", "").toString());
 	if (element != nullptr) kms->restoreFromXml(*element);

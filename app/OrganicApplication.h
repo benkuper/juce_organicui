@@ -64,6 +64,7 @@ public:
 	virtual void newMessage(const Engine::EngineEvent &e) override;
 	virtual void newMessage(const AppUpdateEvent &e) override;
 
+	virtual void clearGlobalSettings();
 
 	virtual void updateAppTitle();
 

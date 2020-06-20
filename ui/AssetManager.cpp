@@ -31,8 +31,7 @@ Image AssetManager::getOutImage() { return ImageCache::getFromMemory(OrganicUIBi
 Image AssetManager::getReloadImage() { return ImageCache::getFromMemory(OrganicUIBinaryData::reload_png, OrganicUIBinaryData::reload_pngSize); }
 Image AssetManager::getTriggerImage() { return ImageCache::getFromMemory(OrganicUIBinaryData::trigger_png, OrganicUIBinaryData::trigger_pngSize); }
 Image AssetManager::getRelativeImage() { return ImageCache::getFromMemory(OrganicUIBinaryData::relative_png, OrganicUIBinaryData::relative_pngSize); }
-
-
+Image AssetManager::getMinusImage() { return ImageCache::getFromMemory(OrganicUIBinaryData::minus_png, OrganicUIBinaryData::minus_pngSize); }
 
 ImageButton * AssetManager::getSetupBTImage(const Image & image)
 {

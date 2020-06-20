@@ -31,6 +31,7 @@ namespace CommandIDs
 	static const int editProjectSettings = 0x50001;
 	static const int editGlobalSettings = 0x50002;
 	static const int toggleKioskMode = 0x50003;
+	static const int clearGlobalSettings = 0x50004;
 
 	static const int showAbout = 0x60000;
 	
@@ -88,6 +89,10 @@ void OrganicMainContentComponent::getCommandInfo(CommandID commandID, Applicatio
 	case CommandIDs::editGlobalSettings:
 		result.setInfo("Preferences", "Edit the general settings related to this application", category, 0);
 		result.defaultKeypresses.add(KeyPress(',', ModifierKeys::commandModifier, 0));
+		break;
+
+	case CommandIDs::clearGlobalSettings:
+		result.setInfo("Clear Preferences", "If you got some funky things going on, just clear your preferences and hopefully everything will be awesome again !", category, 0);
 		break;
 
 	case CommandIDs::toggleKioskMode:
@@ -236,6 +241,7 @@ void OrganicMainContentComponent::getAllCommands(Array<CommandID>& commands) {
 	  CommandIDs::deleteItems,
 	  CommandIDs::switchDashboardEditMode,
 	  CommandIDs::editGlobalSettings,
+	  CommandIDs::clearGlobalSettings,
 	  CommandIDs::editProjectSettings,
 	  CommandIDs::toggleKioskMode,
 	  CommandIDs::selectPreviousItem,
@@ -276,6 +282,7 @@ PopupMenu OrganicMainContentComponent::getMenuForIndex(int /*topLevelMenuIndex*/
 		menu.addSeparator();
 		menu.addCommandItem(&getCommandManager(), CommandIDs::editProjectSettings);
 		menu.addCommandItem(&getCommandManager(), CommandIDs::editGlobalSettings);
+		menu.addCommandItem(&getCommandManager(), CommandIDs::clearGlobalSettings);
 
 		fillFileMenuInternal(menu);
 
@@ -521,6 +528,10 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 
 	case CommandIDs::editGlobalSettings:
 		GlobalSettings::getInstance()->selectThis();
+		break;
+
+	case CommandIDs::clearGlobalSettings:
+		((OrganicApplication *)OrganicApplication::getInstance())->clearGlobalSettings();
 		break;
 
 	case CommandIDs::toggleKioskMode:

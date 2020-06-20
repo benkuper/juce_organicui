@@ -283,12 +283,14 @@ void BaseItemUI<T>::resized()
 		warningUI->setBounds(h.removeFromLeft(h.getHeight())); //warning
 		h.removeFromLeft(2);
 	}
+	int labelWidth = jmax(itemLabel.getFont().getStringWidth(this->baseItem->niceName)+10, 30);
+	itemLabel.setBounds(h.removeFromLeft(labelWidth).reduced(0, 1));
+	h.removeFromLeft(2);
 
 	if (removeBT != nullptr && showRemoveBT) removeBT->setBounds(h.removeFromRight(h.getHeight()));
 	h.removeFromRight(2);
 
 	resizedInternalHeader(h);
-	itemLabel.setBounds(h.reduced(1));
 
 	r.removeFromTop(headerGap);
 
@@ -378,6 +380,7 @@ void BaseItemUI<T>::labelTextChanged(Label * l)
 	{
 		if (l->getText().isEmpty()) itemLabel.setText(this->baseItem->niceName, dontSendNotification); //avoid setting empty names
 		else this->baseItem->setUndoableNiceName(l->getText());
+		resized();
 	}
 }
 
