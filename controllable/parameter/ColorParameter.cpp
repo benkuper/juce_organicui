@@ -19,7 +19,7 @@ ColorParameter::ColorParameter(const String & niceName, const String & descripti
 
 	var minVal;
 	var maxVal;
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 4; ++i)
 	{
 		minVal.append(0);
 		maxVal.append(mode == FLOAT ? 1.0f : 255);
@@ -128,7 +128,7 @@ void ColorParameter::setWeightedValue(Array<var> values, Array<float> weights)
 
 	{
 		GenericScopedLock<SpinLock> lock(valueSetLock);
-		for (int i = 0; i < values.size(); i++)
+		for (int i = 0; i < values.size(); ++i)
 		{
 			jassert(values[i].size() == 4);
 			for (int j = 0; j < 4; j++)

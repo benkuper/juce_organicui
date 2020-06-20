@@ -366,7 +366,7 @@ void Script::logFromArgs(const var::NativeFunctionArgs& args, int logLevel)
 	if (!s->logParam->boolValue()) return;
 
 	String logS = "";
-	for (int i = 0; i < args.numArguments; i++)
+	for (int i = 0; i < args.numArguments; ++i)
 	{
 		var a = args.arguments[i];
 		String as = "";
@@ -410,7 +410,7 @@ void Script::logFromArgs(const var::NativeFunctionArgs& args, int logLevel)
 	}
 }
 
-var Script::logFromScript(const var::NativeFunctionArgs & args)
+var Script::logFromScript(const var::NativeFunctionArgs& args)
 {
 	logFromArgs(args, 0);
 	return var();
@@ -428,48 +428,48 @@ var Script::logErrorFromScript(const var::NativeFunctionArgs& args)
 	return var();
 }
 
-var Script::addTriggerFromScript(const var::NativeFunctionArgs & args)
+var Script::addTriggerFromScript(const var::NativeFunctionArgs& args)
 {
-	Script * s = getObjectFromJS<Script>(args);
+	Script* s = getObjectFromJS<Script>(args);
 	if (!checkNumArgs(s->niceName, args, 2)) return var();
 	return s->scriptParamsContainer.addTrigger(args.arguments[0], args.arguments[1])->getScriptObject();
 }
 
-var Script::addBoolParameterFromScript(const var::NativeFunctionArgs & args)
+var Script::addBoolParameterFromScript(const var::NativeFunctionArgs& args)
 {
-	Script * s = getObjectFromJS<Script>(args);
+	Script* s = getObjectFromJS<Script>(args);
 	if (!checkNumArgs(s->niceName, args, 3)) return var();
 	return s->scriptParamsContainer.addBoolParameter(args.arguments[0], args.arguments[1], (bool)args.arguments[2])->getScriptObject();
 }
 
-var Script::addIntParameterFromScript(const var::NativeFunctionArgs & args)
+var Script::addIntParameterFromScript(const var::NativeFunctionArgs& args)
 {
-	Script * s = getObjectFromJS<Script>(args);
+	Script* s = getObjectFromJS<Script>(args);
 	if (!checkNumArgs(s->niceName, args, 3)) return var();
-	return s->scriptParamsContainer.addIntParameter(args.arguments[0], args.arguments[1], (int)args.arguments[2], args.numArguments >= 4?(int)args.arguments[3]:INT32_MIN, args.numArguments >= 5?(int)args.arguments[4]:INT32_MAX)->getScriptObject();
+	return s->scriptParamsContainer.addIntParameter(args.arguments[0], args.arguments[1], (int)args.arguments[2], args.numArguments >= 4 ? (int)args.arguments[3] : INT32_MIN, args.numArguments >= 5 ? (int)args.arguments[4] : INT32_MAX)->getScriptObject();
 }
 
-var Script::addFloatParameterFromScript(const var::NativeFunctionArgs & args)
+var Script::addFloatParameterFromScript(const var::NativeFunctionArgs& args)
 {
-	Script * s = getObjectFromJS<Script>(args);
+	Script* s = getObjectFromJS<Script>(args);
 	if (!checkNumArgs(s->niceName, args, 3)) return var();
 	return s->scriptParamsContainer.addFloatParameter(args.arguments[0], args.arguments[1], (float)args.arguments[2], args.numArguments >= 4 ? (int)args.arguments[3] : INT32_MIN, args.numArguments >= 5 ? (int)args.arguments[4] : INT32_MAX)->getScriptObject();
 }
 
-var Script::addStringParameterFromScript(const var::NativeFunctionArgs & args)
+var Script::addStringParameterFromScript(const var::NativeFunctionArgs& args)
 {
-	Script * s = getObjectFromJS<Script>(args);
+	Script* s = getObjectFromJS<Script>(args);
 	if (!checkNumArgs(s->niceName, args, 3)) return var();
 	return s->scriptParamsContainer.addStringParameter(args.arguments[0], args.arguments[1], args.arguments[2])->getScriptObject();
 }
 
-var Script::addEnumParameterFromScript(const var::NativeFunctionArgs & args)
+var Script::addEnumParameterFromScript(const var::NativeFunctionArgs& args)
 {
-	Script * s = getObjectFromJS<Script>(args);
+	Script* s = getObjectFromJS<Script>(args);
 	if (!checkNumArgs(s->niceName, args, 2)) return var();
-	EnumParameter * p = s->scriptParamsContainer.addEnumParameter(args.arguments[0], args.arguments[1]);
+	EnumParameter* p = s->scriptParamsContainer.addEnumParameter(args.arguments[0], args.arguments[1]);
 	int numOptions = (int)floor((args.numArguments - 2) / 2.0f);
-	for (int i = 0; i < numOptions; i++)
+	for (int i = 0; i < numOptions; ++i)
 	{
 		int optionIndex = 2 + i * 2;
 		p->addOption(args.arguments[optionIndex].toString(), args.arguments[optionIndex + 1]);
@@ -478,12 +478,12 @@ var Script::addEnumParameterFromScript(const var::NativeFunctionArgs & args)
 	return p->getScriptObject();
 }
 
-var Script::addTargetParameterFromScript(const var::NativeFunctionArgs & args)
+var Script::addTargetParameterFromScript(const var::NativeFunctionArgs& args)
 {
-	Script * s = getObjectFromJS<Script>(args);
+	Script* s = getObjectFromJS<Script>(args);
 	if (!checkNumArgs(s->niceName, args, 2)) return var();
 
-	TargetParameter * tp = s->scriptParamsContainer.addTargetParameter(args.arguments[0], args.arguments[1]);
+	TargetParameter* tp = s->scriptParamsContainer.addTargetParameter(args.arguments[0], args.arguments[1]);
 	if (args.numArguments >= 3)
 	{
 		bool isContainer = (int)args.arguments[2] > 0;
@@ -493,16 +493,16 @@ var Script::addTargetParameterFromScript(const var::NativeFunctionArgs & args)
 	return tp->getScriptObject();
 }
 
-var Script::addColorParameterFromScript(const var::NativeFunctionArgs & args)
+var Script::addColorParameterFromScript(const var::NativeFunctionArgs& args)
 {
-	Script * s = getObjectFromJS<Script>(args);
+	Script* s = getObjectFromJS<Script>(args);
 	if (!checkNumArgs(s->niceName, args, 3)) return var();
 	var color;
 	if (args.arguments[2].isArray())
 	{
 		color = args.arguments[2];
 		while (color.size() < 4) color.append(color.size() < 3 ? 0 : 1);
-		for (int i = 0; i < color.size();i++) color[i] = (float)color[i] * 255;
+		for (int i = 0; i < color.size(); ++i) color[i] = (float)color[i] * 255;
 	}
 	else if (args.numArguments >= 5)
 	{

@@ -111,7 +111,7 @@ void Point2DParameter::setWeightedValue(Array<var> values, Array<float> weights)
 	float tValues[2];
 	tValues[0] = tValues[1] = 0;
 
-	for (int i = 0; i < values.size(); i++)
+	for (int i = 0; i < values.size(); ++i)
 	{
 		jassert(values[i].size() == 2);
 		for (int j = 0; j < 2; j++)
@@ -133,7 +133,7 @@ bool Point2DParameter::checkValueIsTheSame(var newValue, var oldValue)
 	return result;
 }
 
-ControllableUI * Point2DParameter::createDefaultUI()
+ControllableUI* Point2DParameter::createDefaultUI()
 {
 	return new DoubleSliderUI(this);
 }
@@ -152,6 +152,6 @@ var Point2DParameter::getCroppedValue(var originalValue)
 	if (minimumValue.size() < 2 || maximumValue.size() < 2) return originalValue;
 
 	var val;
-	for (int i = 0; i < 2; i++) val.append(jlimit(minimumValue[i], maximumValue[i], originalValue[i]));
+	for (int i = 0; i < 2; ++i) val.append(jlimit(minimumValue[i], maximumValue[i], originalValue[i]));
 	return val;
 }

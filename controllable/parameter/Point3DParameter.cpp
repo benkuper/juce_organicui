@@ -117,7 +117,7 @@ void Point3DParameter::setWeightedValue(Array<var> values, Array<float> weights)
 	float tValues[3];
 	tValues[0] = tValues[1] = tValues[2] = 0;
 
-	for (int i = 0; i < values.size(); i++)
+	for (int i = 0; i < values.size(); ++i)
 	{
 		jassert(values[i].size() == 3);
 		for (int j = 0; j < 3; j++)
@@ -133,7 +133,7 @@ void Point3DParameter::setWeightedValue(Array<var> values, Array<float> weights)
 bool Point3DParameter::checkValueIsTheSame(var newValue, var oldValue)
 {
 	if (!(newValue.isArray() && oldValue.isArray())) return false;
-	
+
 	bool result = newValue[0] == oldValue[0] && newValue[1] == oldValue[1] && newValue[2] == oldValue[2];
 
 	return result;
@@ -141,10 +141,10 @@ bool Point3DParameter::checkValueIsTheSame(var newValue, var oldValue)
 
 StringArray Point3DParameter::getValuesNames()
 {
-	return StringArray("X","Y","Z");
+	return StringArray("X", "Y", "Z");
 }
 
-ControllableUI * Point3DParameter::createDefaultUI()
+ControllableUI* Point3DParameter::createDefaultUI()
 {
 	return new TripleSliderUI(this);
 }
@@ -154,6 +154,6 @@ var Point3DParameter::getCroppedValue(var originalValue)
 	jassert(originalValue.isArray() && minimumValue.isArray() && maximumValue.isArray());
 
 	var val;
-	for (int i = 0; i < 3; i++) val.append(jlimit(minimumValue[i], maximumValue[i], originalValue[i]));
+	for (int i = 0; i < 3; ++i) val.append(jlimit(minimumValue[i], maximumValue[i], originalValue[i]));
 	return val;
 }

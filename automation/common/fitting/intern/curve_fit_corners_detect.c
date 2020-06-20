@@ -352,7 +352,7 @@ int curve_fit_corners_detect_db(
 	*r_corners = NULL;
 	*r_corners_len = 0;
 
-	for (uint i = 0; i < points_len; i++) {
+	for (uint i = 0; i < points_len; ++i) {
 		points_angle[i] =  point_corner_angle(
 		        points, points_len, i,
 		        radius_mid, radius_max,
@@ -423,7 +423,7 @@ int curve_fit_corners_detect_db(
 	uint *corners =(uint *)malloc(sizeof(uint) * corners_len);
 	uint i_corner = 0;
 	corners[i_corner++] = 0;
-	for (uint i = 0; i < points_len; i++) {
+	for (uint i = 0; i < points_len; ++i) {
 		if (points_angle[i] != 0.0) {
 			corners[i_corner++] = i;
 		}
@@ -454,7 +454,7 @@ int curve_fit_corners_detect_fl(
 	const uint points_flat_len = points_len * dims;
 	double *points_db = (double *)malloc(sizeof(double) * points_flat_len);
 
-	for (uint i = 0; i < points_flat_len; i++) {
+	for (uint i = 0; i < points_flat_len; ++i) {
 		points_db[i] = (double)points[i];
 	}
 

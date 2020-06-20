@@ -107,11 +107,11 @@ private:
             int start1,size1,start2,size2;
             fifo.prepareToRead(fifo.getNumReady(), start1, size1, start2, size2);
 
-                for(int i = start1 ;i <start1+ size1 ; i++){
+                for(int i = start1 ;i <start1+ size1 ; ++i){
                     listeners.call(&Listener::newMessage,*messageQueue.getUnchecked(i));
                 }
 
-            for(int i = start2 ;i <start2+ size2 ; i++){
+            for(int i = start2 ;i <start2+ size2 ; ++i){
                 listeners.call(&Listener::newMessage,*messageQueue.getUnchecked(i));
             }
 

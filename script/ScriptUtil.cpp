@@ -58,28 +58,28 @@ var ScriptUtil::getFloatFromBytes(const var::NativeFunctionArgs & a)
 {
 	if (a.numArguments < 4) return 0;
 	uint8_t bytes[4];
-	for (int i = 0; i < 4; i++) bytes[i] = (uint8_t)(int)a.arguments[i];
+	for (int i = 0; i < 4; ++i) bytes[i] = (uint8_t)(int)a.arguments[i];
 	float result;
 	memcpy(&result, &bytes, 4);
 	return result;
 }
 
-var ScriptUtil::getInt32FromBytes(const var::NativeFunctionArgs & a)
+var ScriptUtil::getInt32FromBytes(const var::NativeFunctionArgs& a)
 {
 	if (a.numArguments < 4) return 0;
 	uint8_t bytes[4];
-	for (int i = 0; i < 4; i++) bytes[i] = (uint8_t)(int)a.arguments[i];
+	for (int i = 0; i < 4; ++i) bytes[i] = (uint8_t)(int)a.arguments[i];
 	int result;
 	memcpy(&result, &bytes, 4);
 	return result;
 }
 
 
-var ScriptUtil::getInt64FromBytes(const var::NativeFunctionArgs & a)
+var ScriptUtil::getInt64FromBytes(const var::NativeFunctionArgs& a)
 {
 	if (a.numArguments < 8) return 0;
 	uint8_t bytes[8];
-	for (int i = 0; i < 8; i++) bytes[i] = (uint8_t)(int)a.arguments[i];
+	for (int i = 0; i < 8; ++i) bytes[i] = (uint8_t)(int)a.arguments[i];
 	int64 result;
 	memcpy(&result, &bytes, 8);
 	return result;
@@ -91,7 +91,7 @@ var ScriptUtil::getObjectMethods(const var::NativeFunctionArgs& a)
 
 	NamedValueSet props = a.arguments[0].getDynamicObject()->getProperties();
 	var result;
-		
+
 	for (auto& p : props)
 	{
 		if (p.value.isMethod())
@@ -110,14 +110,14 @@ var ScriptUtil::getObjectProperties(const var::NativeFunctionArgs& a)
 
 	NamedValueSet props = a.arguments[0].getDynamicObject()->getProperties();
 	var result;
-	
+
 	bool includeObjects = (a.numArguments > 1) ? (bool)a.arguments[1] : true;
 	bool includeParameters = (a.numArguments > 2) ? (bool)a.arguments[2] : true;
-		
+
 	for (auto& p : props)
 	{
-		if ( (includeObjects && p.value.isObject()) ||
-			 (includeParameters && !p.value.isObject() && !p.value.isMethod()) )
+		if ((includeObjects && p.value.isObject()) ||
+			(includeParameters && !p.value.isObject() && !p.value.isMethod()))
 		{
 			result.append(p.name.toString());
 		}
@@ -148,9 +148,9 @@ var ScriptUtil::encodeHMAC_SHA1(const var::NativeFunctionArgs& a)
 
 	DBG("Encoding...\n" + a.arguments[0].toString() + "\n" + a.arguments[1].toString());
 
-	uint8_t * data = (uint8_t *)b.getData();
+	uint8_t* data = (uint8_t*)b.getData();
 	String dbgHex = "";
-	for (int i = 0; i < b.getSize(); i++)
+	for (int i = 0; i < b.getSize(); ++i)
 	{
 		dbgHex += String::toHexString(data[i]) + " ";
 	}
@@ -173,7 +173,7 @@ var ScriptUtil::fileExistsFromScript(const var::NativeFunctionArgs& args)
 var ScriptUtil::readFileFromScript(const var::NativeFunctionArgs& args)
 {
 	String path = args.arguments[0].toString();
-	
+
 	if (!File::isAbsolutePath(path))
 	{
 		File folder = Engine::mainEngine->getFile().getParentDirectory();
@@ -300,7 +300,7 @@ var ScriptUtil::killAppFromScript(const var::NativeFunctionArgs& args)
 	String appName = args.arguments[0].toString();
 	bool hardKill = args.numArguments > 1 ? (bool)args.arguments[1] : false;
 #if JUCE_WINDOWS
-	int result = system(String("taskkill " + String(hardKill ? "/f " : "") + "/im \"" + appName+ "\"").getCharPointer());
+	int result = system(String("taskkill " + String(hardKill ? "/f " : "") + "/im \"" + appName + "\"").getCharPointer());
 	if (result != 0) LOGWARNING("Problem killing app " + appName);
 #else
 	int result = system(String("killall " + String(hardKill ? "-9" : "-2") + " \"" + appName + "\"").getCharPointer());
@@ -335,7 +335,7 @@ var ScriptUtil::getEnvironmentVariableFromScript(const var::NativeFunctionArgs& 
 var ScriptUtil::copyToClipboardFromScript(const var::NativeFunctionArgs& args)
 {
 	String s = "";
-	for (int i = 0; i < args.numArguments; i++)
+	for (int i = 0; i < args.numArguments; ++i)
 	{
 		s += (i > 0 ? " " : "") + args.arguments[i].toString();
 	}

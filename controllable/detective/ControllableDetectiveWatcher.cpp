@@ -76,7 +76,7 @@ void ControllableDetectiveWatcher::run()
 		float maxTime = curTime - watchTime->floatValue();
 
 		bool foundInRange = false;
-		for (int i = 0; i < data.size(); i++)
+		for (int i = 0; i < data.size(); ++i)
 		{
 			if (data[i]->time > maxTime)
 			{

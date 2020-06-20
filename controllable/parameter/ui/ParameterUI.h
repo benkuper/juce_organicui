@@ -43,7 +43,6 @@ public:
 	virtual void handleMenuSelectedID(int id) override;
 
 	virtual void mouseDoubleClick(const MouseEvent &e) override;
-
 	virtual bool isInteractable() override;
 
 	//focus
@@ -79,7 +78,7 @@ protected:
     // for general behaviour see AsyncListener
     virtual void valueChanged(const var & ){};
 	virtual void rangeChanged(Parameter * ){};
-	virtual void controlModeChanged(Parameter*) {};
+	virtual void controlModeChanged(Parameter*);
 
 	virtual void newMessage(const Parameter::ParameterEvent &e) override;;
 };

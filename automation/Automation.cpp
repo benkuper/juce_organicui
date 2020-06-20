@@ -130,7 +130,7 @@ void Automation::addFromPointsAndSimplify(const Array<Point<float>>& sourcePoint
     float maxDist = valueRange->enabled ? (valueRange->y - valueRange->x)*100 : 1000;
 
     int numBadPoints = 0;
-    for (int i = 0; i < numPoints; i++)
+    for (int i = 0; i < numPoints; ++i)
     {
         int index = i * 6;
         Point<float> h1(result[index + 0] * xScale, result[index + 1] * yScale);
@@ -269,7 +269,7 @@ void Automation::updateNextKeys(int start, int end)
     int startIndex = jmax(start, 0);
     int endIndex = end == -1 ? items.size() : jmin(end, items.size());
 
-    for (int i = startIndex; i < endIndex; i++)
+    for (int i = startIndex; i < endIndex; ++i)
     {
         if (i < items.size() - 1)
         {
@@ -319,7 +319,7 @@ Point<float> Automation::getPosAndValue()
 juce::Rectangle<float> Automation::getBounds()
 {
     juce::Rectangle<float> bounds;
-    for (int i = 0; i < items.size(); i++)
+    for (int i = 0; i < items.size(); ++i)
     {
         if (i < items.size() - 1) items[i]->setNextKey(items[i + 1]);
         bounds = bounds.getUnion(items[i]->easing->getBounds());

@@ -22,7 +22,7 @@ void ParameterDetectiveWatcherUI::paintWatcherInternal(Graphics& g, const juce::
 	OwnedArray<Path> paths;
 	
 	int numParamValues = parameterWatcher->parameter->isComplex() ? parameterWatcher->parameter->value.size() : 1;
-	for (int pi = 0; pi < numParamValues; pi++)
+	for (int pi = 0; pi < numParamValues; ++pi)
 	{
 		float minV = p->hasRange() ? (float)(numParamValues > 1 ? p->minimumValue[pi]: p->minimumValue) : 0.0f;
 		float maxV = p->hasRange() ? (float)(numParamValues > 1 ? p->maximumValue[pi] : p->maximumValue) : 1.0f;
@@ -55,7 +55,7 @@ void ParameterDetectiveWatcherUI::paintWatcherInternal(Graphics& g, const juce::
 	
 	parameterWatcher->data.getLock().exit();
 
-	for (int i=0;i<paths.size();i++)
+	for (int i=0;i<paths.size();++i)
 	{
 		if (numParamValues > 1) g.setColour(Colour::fromHSV(.03f + .3f * i, 1, 1, 1));
 		else g.setColour(FRONT_COLOR);

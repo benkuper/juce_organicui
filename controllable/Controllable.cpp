@@ -117,13 +117,8 @@ void Controllable::setAutoShortName() {
 void Controllable::setEnabled(bool value, bool silentSet, bool force)
 {
 	if (!force && value == enabled) return;
-
 	enabled = value;
-	if (!silentSet)
-	{
-		listeners.call(&Listener::controllableStateChanged, this);
-		queuedNotifier.addMessage(new ControllableEvent(ControllableEvent::STATE_CHANGED, this));
-	}
+	if (!silentSet) notifyStateChanged();
 }
 
 void Controllable::setControllableFeedbackOnly(bool value)
@@ -132,6 +127,12 @@ void Controllable::setControllableFeedbackOnly(bool value)
 	isControllableFeedbackOnly = value;
 	listeners.call(&Listener::controllableFeedbackStateChanged, this);
 	queuedNotifier.addMessage(new ControllableEvent(ControllableEvent::FEEDBACK_STATE_CHANGED, this));
+}
+
+void Controllable::notifyStateChanged()
+{
+	listeners.call(&Listener::controllableStateChanged, this);
+	queuedNotifier.addMessage(new ControllableEvent(ControllableEvent::STATE_CHANGED, this));
 }
 
 void Controllable::setParentContainer(ControllableContainer * container)
@@ -367,7 +368,7 @@ var Controllable::getParentFromScript(const juce::var::NativeFunctionArgs & a)
 	int level = a.numArguments > 0 ? (int)a.arguments[0] : 1;
 	ControllableContainer* target = c->parentContainer;
 	if (target == nullptr) return var();
-	for (int i = 1; i < level; i++)
+	for (int i = 1; i < level; ++i)
 	{
 		target = target->parentContainer;
 		if (target == nullptr) return var();

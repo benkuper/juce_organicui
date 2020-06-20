@@ -100,7 +100,7 @@ float Curve2D::addFromPointsAndSimplify(Array<Point<float>> sourcePoints, bool c
     Array<Curve2DKey*> keys;
     CubicEasing2D* prevEasing = nullptr;
 
-    for (int i = 0; i < numPoints; i++)
+    for (int i = 0; i < numPoints; ++i)
     {
         int index = i * 6;
         Point<float> h1(result[index + 0], result[index + 1]);
@@ -154,7 +154,7 @@ void Curve2D::updateCurve(bool relativeAutomationKeySyncMode)
 
     float curLength = 0;
     int numItems = items.size();
-    for (int i = 0; i < numItems; i++)
+    for (int i = 0; i < numItems; ++i)
     {
 
         if (i < numItems - 1) items[i]->setNextKey(items[i + 1]);

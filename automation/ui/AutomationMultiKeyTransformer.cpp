@@ -49,7 +49,7 @@ void AutomationMultiKeyTransformer::updateBoundsFromKeys()
 void AutomationMultiKeyTransformer::updateKeysFromBounds()
 {
 	int numKeys = keysUI.size();
-	for (int i = 0; i < numKeys; i++)
+	for (int i = 0; i < numKeys; ++i)
 	{
 		Point<int> localPos = getLocalBounds().getRelativePoint(keysRelativePositions[i].x, keysRelativePositions[i].y);
 		Point<int> timelinePos = aui->getLocalPoint(this, localPos);
@@ -126,7 +126,7 @@ void AutomationMultiKeyTransformer::mouseUp(const MouseEvent & e)
 
 	Array<UndoableAction *> actions;
 	int numKeys = keysUI.size();
-	for (int i = 0; i < numKeys; i++)
+	for (int i = 0; i < numKeys; ++i)
 	{
 		actions.add(keysUI[i]->item->position->setUndoableValue(keysTimesAndValuesPositions[i].x, keysUI[i]->item->position->floatValue(), true));
 		actions.add(keysUI[i]->item->value->setUndoableValue(keysTimesAndValuesPositions[i].y, keysUI[i]->item->value->floatValue(), true));

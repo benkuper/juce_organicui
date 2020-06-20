@@ -28,7 +28,7 @@ ControllableFactory::ControllableFactory() {
 
 void ControllableFactory::buildPopupMenu()
 {
-	for (int i = 0; i < controllableDefs.size(); i++)
+	for (int i = 0; i < controllableDefs.size(); ++i)
 	{
 		menu.addItem(i + 1, controllableDefs[i]->controllableType);
 	}
@@ -37,7 +37,7 @@ void ControllableFactory::buildPopupMenu()
 PopupMenu ControllableFactory::getFilteredPopupMenu(StringArray typeFilters)
 {
 	PopupMenu result;
-	for (int i = 0; i < controllableDefs.size(); i++)
+	for (int i = 0; i < controllableDefs.size(); ++i)
 	{
 		if(typeFilters.contains(controllableDefs[i]->controllableType)) result.addItem(i + 1, controllableDefs[i]->controllableType);
 	}

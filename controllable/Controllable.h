@@ -70,6 +70,9 @@ public:
 	virtual void setEnabled(bool value, bool silentSet = false, bool force = false);
 	virtual void setControllableFeedbackOnly(bool value);
 
+	void notifyStateChanged();
+
+
 	void setParentContainer(ControllableContainer * container);
 
 	template<class T>

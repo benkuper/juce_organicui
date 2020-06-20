@@ -51,7 +51,7 @@ void EasingUI::paint(Graphics& g)
 
 
 	//g.setColour(Colours::pink);
-	//for (int i = 0; i < 100; i++)
+	//for (int i = 0; i < 100; ++i)
 	//{
 	//	float p = i * 1.0f / 100;
 	//	float t = easing->start.x + p * easing->length;
@@ -93,7 +93,7 @@ void EasingUI::autoGeneratePathWithPrecision(int precision)
 	if (precision == 0) precision = getWidth();
 	else precision = jmin(getWidth(), precision);
 
-	for (int i = 1; i <= precision; i++)
+	for (int i = 1; i <= precision; ++i)
 	{
 		float t = i * 1.f / precision;
 		float v = easing->getValue(t);
@@ -108,7 +108,7 @@ void EasingUI::buildHitPath()
 {
 	Array<Point<float>> hitPoints;
 
-	for (int i = 0; i <= hitPathPrecision; i++)
+	for (int i = 0; i <= hitPathPrecision; ++i)
 	{
 		hitPoints.add(drawPath.getPointAlongPath(drawPath.getLength() * i / (hitPathPrecision - 1)));
 	}
@@ -118,7 +118,7 @@ void EasingUI::buildHitPath()
 	hitPath.clear();
 	Array<Point<float>> firstPoints;
 	Array<Point<float>> secondPoints;
-	for (int i = 0; i < hitPathPrecision; i++)
+	for (int i = 0; i < hitPathPrecision; ++i)
 	{
 		Point<float> tp;
 		Point<float> sp;
@@ -158,11 +158,11 @@ void EasingUI::buildHitPath()
 	if (firstPoints.size() > 1 && !std::isnan(firstPoints[0].x))
 	{
 		hitPath.startNewSubPath(firstPoints[0]);
-		for (int i = 1; i < firstPoints.size(); i++)
+		for (int i = 1; i < firstPoints.size(); ++i)
 		{
 			if (!std::isnan(firstPoints[i].x)) hitPath.lineTo(firstPoints[i]);
 		}
-		for (int i = 0; i < secondPoints.size(); i++)
+		for (int i = 0; i < secondPoints.size(); ++i)
 		{
 			if (!std::isnan(firstPoints[i].x)) hitPath.lineTo(secondPoints[i]);
 		}

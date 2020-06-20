@@ -81,7 +81,7 @@ void Easing2DUI::autoGeneratePathWithPrecision(int precision)
 	if (precision == 0) precision = getWidth();
 	else precision = jmin(getWidth(), precision);
 
-	for (int i = 1; i <= precision; i++)
+	for (int i = 1; i <= precision; ++i)
 	{
 		float t = i * 1.f / precision;
 		Point<float> v = easing->getValue(t);
@@ -95,7 +95,7 @@ void Easing2DUI::buildHitPath()
 {
 	Array<Point<float>> hitPoints;
 
-	for (int i = 0; i <= hitPathPrecision; i++)
+	for (int i = 0; i <= hitPathPrecision; ++i)
 	{
 		hitPoints.add(drawPath.getPointAlongPath(drawPath.getLength() * i / (hitPathPrecision - 1)));
 	}
@@ -105,7 +105,7 @@ void Easing2DUI::buildHitPath()
 	hitPath.clear();
 	Array<Point<float>> firstPoints;
 	Array<Point<float>> secondPoints;
-	for (int i = 0; i < hitPathPrecision; i++)
+	for (int i = 0; i < hitPathPrecision; ++i)
 	{
 		Point<float> tp;
 		Point<float> sp;
@@ -145,11 +145,11 @@ void Easing2DUI::buildHitPath()
 	if (firstPoints.size() > 1 && !std::isnan(firstPoints[0].x))
 	{
 		hitPath.startNewSubPath(firstPoints[0]);
-		for (int i = 1; i < firstPoints.size(); i++)
+		for (int i = 1; i < firstPoints.size(); ++i)
 		{
 			if (!std::isnan(firstPoints[i].x)) hitPath.lineTo(firstPoints[i]);
 		}
-		for (int i = 0; i < secondPoints.size(); i++)
+		for (int i = 0; i < secondPoints.size(); ++i)
 		{
 			if (!std::isnan(firstPoints[i].x)) hitPath.lineTo(secondPoints[i]);
 		}
@@ -277,7 +277,7 @@ void CubicEasing2DUI::generatePathInternal()
 void CubicEasing2DUI::paintInternal(Graphics& g)
 {
 /*	g.setColour(Colours::lightpink);
-	for (int i = 0; i < ce->uniformLUT.size(); i++)
+	for (int i = 0; i < ce->uniformLUT.size(); ++i)
 	{
 		g.fillEllipse(Rectangle<int>(0, 0, 4, 4).withCentre(getUIPosForValuePos(ce->uniformLUT[i])).toFloat());
 	}

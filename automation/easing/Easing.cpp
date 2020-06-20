@@ -167,7 +167,7 @@ void CubicEasing::updateUniformLUT(int precision)
 	Point<float> prevP = getRawValue(0);
 
 	float dist = 0;
-	for (int i = 1; i <= precision; i++) {
+	for (int i = 1; i <= precision; ++i) {
 		float rel = i * 1.0f / precision;
 		Point<float> p = getRawValue(rel);
 
@@ -176,7 +176,7 @@ void CubicEasing::updateUniformLUT(int precision)
 		prevP.setXY(p.x, p.y);
 	}
 
-	for (int i = 0; i <= precision; i++)
+	for (int i = 0; i <= precision; ++i)
 	{
 		float targetLength = (i * 1.0f / precision) * length;
 		int low = 0;

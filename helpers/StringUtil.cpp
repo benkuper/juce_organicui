@@ -31,7 +31,7 @@ String StringUtil::toShortName(const String& niceName, bool replaceSlashes) {
 		.replaceCharacter('à', 'a').replaceCharacter('â', 'a').replaceCharacter('ô', 'o')
 		.replaceCharacter('ü', 'u').replaceCharacter('ç', 'c');
 
-	//for (int i = 0; i < specials.length(); i++) res = res.replaceCharacter(specials[i], replaces[i]);
+	//for (int i = 0; i < specials.length(); ++i) res = res.replaceCharacter(specials[i], replaces[i]);
 
 	res = res.retainCharacters("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_0123456789 ");
 

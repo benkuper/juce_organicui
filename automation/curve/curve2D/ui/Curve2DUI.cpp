@@ -80,7 +80,7 @@ void Curve2DUI::paintOverChildren(Graphics& g)
                     Path p;
                     Point<float> k0(manager->recorder->keys[0].value[0], manager->recorder->keys[0].value[1]);
                     p.startNewSubPath(getPosInView(k0).toFloat());
-                    for (int i = 1; i < numRKeys; i++)
+                    for (int i = 1; i < numRKeys; ++i)
                     {
                         Point<float> ki(manager->recorder->keys[i].value[0], manager->recorder->keys[i].value[1]);
                         p.lineTo(getPosInView(ki).toFloat());

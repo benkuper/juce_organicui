@@ -167,7 +167,7 @@ void HEAP_free(Heap *heap, HeapFreeFP ptrfreefp)
 	if (ptrfreefp) {
 		uint i;
 
-		for (i = 0; i < heap->size; i++) {
+		for (i = 0; i < heap->size; ++i) {
 			ptrfreefp(heap->tree[i]->ptr);
 		}
 	}
@@ -183,7 +183,7 @@ void HEAP_clear(Heap *heap, HeapFreeFP ptrfreefp)
 	if (ptrfreefp) {
 		uint i;
 
-		for (i = 0; i < heap->size; i++) {
+		for (i = 0; i < heap->size; ++i) {
 			ptrfreefp(heap->tree[i]->ptr);
 		}
 	}

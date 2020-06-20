@@ -394,7 +394,13 @@ void ControllableContainer::addChildControllableContainer(ControllableContainer*
 void ControllableContainer::addChildControllableContainers(Array<ControllableContainer*> containers, bool owned, int index, bool notify)
 {
 	int i = index;
-	for (auto& c : containers) addChildControllableContainer(c, owned, i++, false);
+
+	for (auto& c : containers)
+	{
+		addChildControllableContainer(c, owned, i, false);
+		++i;
+	}
+
 	if (notify) notifyStructureChanged();
 }
 
@@ -1065,7 +1071,7 @@ var ControllableContainer::getParentFromScript(const juce::var::NativeFunctionAr
 	int level = a.numArguments > 0 ? (int)a.arguments[0] : 1;
 	ControllableContainer* target = cc->parentContainer;
 	if (target == nullptr) return var();
-	for (int i = 1; i < level; i++)
+	for (int i = 1; i < level; ++i)
 	{
 		target = target->parentContainer;
 		if (target == nullptr) return var();
@@ -1159,7 +1165,7 @@ var ControllableContainer::addEnumParameterFromScript(const var::NativeFunctionA
 
 	EnumParameter * p = cc->addEnumParameter(args.arguments[0], args.arguments[1]);
 	int numOptions = (int)floor((args.numArguments - 2) / 2.0f);
-	for (int i = 0; i < numOptions; i++)
+	for (int i = 0; i < numOptions; ++i)
 	{
 		int optionIndex = 2 + i * 2;
 		p->addOption(args.arguments[optionIndex].toString(), args.arguments[optionIndex + 1]);
@@ -1199,7 +1205,7 @@ var ControllableContainer::addColorParameterFromScript(const var::NativeFunction
 	{
 		color = args.arguments[2];
 		while (color.size() < 4) color.append(color.size() < 3 ? 0 : 1);
-		for (int i = 0; i < color.size(); i++) color[i] = (float)color[i] * 255;
+		for (int i = 0; i < color.size(); ++i) color[i] = (float)color[i] * 255;
 	}
 	else if (args.numArguments >= 5)
 	{

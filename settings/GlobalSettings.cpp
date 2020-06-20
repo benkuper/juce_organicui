@@ -60,7 +60,7 @@ GlobalSettings::GlobalSettings() :
 
 	askBeforeRemovingItems = editingCC.addBoolParameter("Ask before removing items", "If enabled, you will get a confirmation prompt before removing any item", false);
 	defaultEasing = editingCC.addEnumParameter("EasingType", "Type of transition to the next key");
-	for (int i = 0; i < Easing::TYPE_MAX; i++) defaultEasing->addOption(Easing::typeNames[i], (Easing::Type)i, true);
+	for (int i = 0; i < Easing::TYPE_MAX; ++i) defaultEasing->addOption(Easing::typeNames[i], (Easing::Type)i, true);
 	
 
 	addChildControllableContainer(&editingCC);

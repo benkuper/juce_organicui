@@ -211,7 +211,7 @@ void AutomationUI::paintOverChildren(Graphics& g)
                     Path p;
                     Point<float> k0(manager->recorder->keys[0].time, manager->recorder->keys[0].value);
                     p.startNewSubPath(getPosInView(k0).toFloat());
-                    for (int i = 1; i < numRKeys; i++)
+                    for (int i = 1; i < numRKeys; ++i)
                     {
                         Point<float> ki(manager->recorder->keys[i].time, manager->recorder->keys[i].value);
                         p.lineTo(getPosInView(ki).toFloat());
@@ -333,7 +333,7 @@ void AutomationUI::updateItemsVisibility()
     int firstIndex = jmax(manager->items.indexOf(manager->getKeyForPosition(viewPosRange.x)), 0);
     int lastIndex = jmax(manager->items.indexOf(manager->getKeyForPosition(viewPosRange.y))+1, firstIndex);
    
-    for (int i=0;i<itemsUI.size();i++)
+    for (int i=0;i<itemsUI.size();++i)
     {
         itemsUI[i]->setVisible(i >= firstIndex && i <= lastIndex);
     }
@@ -410,7 +410,7 @@ void AutomationUI::mouseDrag(const MouseEvent& e)
             int indexBeforeNewPoint = 0;
             int indexAfterNewPoint = paintingPoints.size();
 
-            for (int i = 0; i < paintingPoints.size(); i++)
+            for (int i = 0; i < paintingPoints.size(); ++i)
             {
                 Point<float> p = paintingPoints[i];
                 if (p.x >= newPoint.x) indexAfterNewPoint = jmin(indexAfterNewPoint, i);

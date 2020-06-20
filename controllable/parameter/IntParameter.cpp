@@ -36,7 +36,7 @@ void IntParameter::setWeightedValue(Array<var> values, Array<float> weights)
 
 	float tValue = 0;
 
-	for (int i = 0; i < values.size(); i++)
+	for (int i = 0; i < values.size(); ++i)
 	{
 		tValue += (float)values[i] * weights[i];
 	}

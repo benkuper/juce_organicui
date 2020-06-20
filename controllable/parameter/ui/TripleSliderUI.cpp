@@ -112,7 +112,7 @@ void TripleSliderUI::showEditWindowInternal()
 
 	const String coordNames[3]{ "X","Y","Z" };
 
-	for (int i = 0; i < 3; i++) nameWindow.addTextEditor("val" + String(i), String((float)p3d->value[i]), "Value " + coordNames[i]);
+	for (int i = 0; i < 3; ++i) nameWindow.addTextEditor("val" + String(i), String((float)p3d->value[i]), "Value " + coordNames[i]);
 
 	nameWindow.addButton("OK", 1, KeyPress(KeyPress::returnKey));
 	nameWindow.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
@@ -122,7 +122,7 @@ void TripleSliderUI::showEditWindowInternal()
 	if (result)
 	{
 		float newVals[3];
-		for (int i = 0; i < 3; i++) newVals[i] = nameWindow.getTextEditorContents("val" + String(i)).getFloatValue();
+		for (int i = 0; i < 3; ++i) newVals[i] = nameWindow.getTextEditorContents("val" + String(i)).getFloatValue();
 		p3d->setVector(newVals[0], newVals[1], newVals[2]);
 	}
 }
@@ -135,7 +135,7 @@ void TripleSliderUI::showEditRangeWindowInternal()
 
 	const String coordNames[3]{ "X","Y","Z" };
 
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 3; ++i)
 	{
 		nameWindow.addTextEditor("minVal" + String(i), String((float)p3d->minimumValue), "Minimum " + coordNames[i]);
 		nameWindow.addTextEditor("maxVal" + String(i), String((float)p3d->maximumValue), "Maximum " + coordNames[i]);
@@ -150,7 +150,7 @@ void TripleSliderUI::showEditRangeWindowInternal()
 	{
 		float newMins[3];
 		float newMaxs[3];
-		for (int i = 0; i < 3; i++)
+		for (int i = 0; i < 3; ++i)
 		{
 			newMins[i] = nameWindow.getTextEditorContents("minVal" + String(i)).getFloatValue();
 			newMaxs[i] = nameWindow.getTextEditorContents("maxVal" + String(i)).getFloatValue();
