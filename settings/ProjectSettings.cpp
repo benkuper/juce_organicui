@@ -21,7 +21,7 @@ ProjectSettings::ProjectSettings() :
 	
 	saveLayoutReference = addBoolParameter("Save Layout in file", "If checked, this will save the layout in the .noisette file", true);
 
-	showDashboardOnStartup = addTargetParameter("Show Dashboard on startup", "If enabled, the selected dashboard will be the one displayed on startup", DashboardManager::getInstance(), false);
+	showDashboardOnStartup = dashboardCC.addTargetParameter("Show Dashboard on startup", "If enabled, the selected dashboard will be the one displayed on startup", DashboardManager::getInstance(), false);
 	showDashboardOnStartup->targetType = TargetParameter::CONTAINER;
 	showDashboardOnStartup->canBeDisabledByUser = true;
 	showDashboardOnStartup->maxDefaultSearchLevel = 0;
