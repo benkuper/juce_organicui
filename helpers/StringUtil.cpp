@@ -27,9 +27,12 @@ String StringUtil::toShortName(const String& niceName, bool replaceSlashes) {
 	String specials = "+-()[]{}<>^'@#*$~";// ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏĞÑÒÓÔÕÖ×ÙÚÛÜİßàáâãäåæçèéêëìíîïğñòóôõöùúûüıÿ";
 	String replaces = "_________________";//AAAAAAECEEEEIIIIDNOOOOOxUUUUYsaaaaaaeceeeeiiiiOnooooouuuuyy";
 	res = res.replaceCharacters(specials, replaces);
-	res = res.replaceCharacter('é', 'e').replaceCharacter('è', 'e').replaceCharacter('ê', 'e')
-		.replaceCharacter('à', 'a').replaceCharacter('â', 'a').replaceCharacter('ô', 'o')
-		.replaceCharacter('ü', 'u').replaceCharacter('ç', 'c');
+
+#if !JUCE_MAC
+    res = res.replaceCharacter('â', 'a').replaceCharacter('é', 'e').replaceCharacter('è', 'e').replaceCharacter('ê', 'e')
+		.replaceCharacter('à', 'a').replaceCharacter('ô', 'o')
+		.replaceCharacter('ç', 'c').replaceCharacter('ü', 'u');;
+#endif
 
 	//for (int i = 0; i < specials.length(); ++i) res = res.replaceCharacter(specials[i], replaces[i]);
 
