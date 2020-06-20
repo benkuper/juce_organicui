@@ -55,7 +55,7 @@ void DashboardManager::setupServer()
 
 	int port = ProjectSettings::getInstance()->serverPort->intValue();
 
-	server.reset(new SimpleWebSocket());
+	server.reset(new SimpleWebSocketServer());
 	server->rootPath = File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory).getChildFile(OrganicApplication::getInstance()->getApplicationName() + "/dashboard");
 	server->addWebSocketListener(this);
 	server->start(port);
