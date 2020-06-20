@@ -34,7 +34,7 @@ public:
 
 	bool bringToFrontOnSelect;
 
-	virtual void setInspectable(Inspectable* i);
+	virtual void setInspectable(Inspectable* i) override;
 
 
 	void mouseEnter(const MouseEvent &e) override;
