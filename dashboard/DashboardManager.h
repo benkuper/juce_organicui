@@ -23,7 +23,7 @@ class DashboardManager :
 	public BaseManager<Dashboard>,
 	public Dashboard::DashboardListener
 #if ORGANICUI_USE_WEBSERVER
-	,public SimpleWebSocket::Listener
+	,public SimpleWebSocketServer::Listener
 #endif
 #if ORGANICUI_USE_SERVUS
 	,public Thread
@@ -39,7 +39,7 @@ public:
 	BoolParameter* snapping;
 
 #if ORGANICUI_USE_WEBSERVER
-	std::unique_ptr<SimpleWebSocket> server;
+	std::unique_ptr<SimpleWebSocketServer> server;
 
 
 	void setupServer();
