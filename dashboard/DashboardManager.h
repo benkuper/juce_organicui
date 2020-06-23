@@ -17,16 +17,25 @@
 
 #if ORGANICUI_USE_SERVUS
 #include "servus/servus.h"
+
+class ServusThread :
+	public Thread
+{
+public:
+	ServusThread();
+	servus::Servus servus;
+	void setupZeroconf();
+	void run() override;
+};
 #endif
+
 
 class DashboardManager :
 	public BaseManager<Dashboard>,
 	public Dashboard::DashboardListener
 #if ORGANICUI_USE_WEBSERVER
 	,public SimpleWebSocketServer::Listener
-#endif
-#if ORGANICUI_USE_SERVUS
-	,public Thread
+	,public URL::DownloadTask::Listener
 #endif
 {
 public:
@@ -38,9 +47,28 @@ public:
 	BoolParameter* editMode;
 	BoolParameter* snapping;
 
+
+	void addItemInternal(Dashboard* item, var data) override;
+	void removeItemInternal(Dashboard* item) override;
+
+
+	void itemDataFeedback(var data) override;
+	void afterLoadJSONDataInternal() override;
+
 #if ORGANICUI_USE_WEBSERVER
 	std::unique_ptr<SimpleWebSocketServer> server;
 
+	URL downloadURL;
+	File serverRootPath;
+	File downloadedFileZip;
+	bool hasCustomDashboard;
+	std::unique_ptr<URL::DownloadTask> downloadTask;
+
+	void setupDownloadURL(const String& downloadURL);
+
+	void downloadDashboardFiles();
+	void progress(URL::DownloadTask* task, int64 bytesDownloaded, int64 bytesTotal) override;
+	void finished(URL::DownloadTask* task, bool success) override;
 
 	void setupServer();
 	void connectionOpened(const String& id) override;
@@ -48,16 +76,11 @@ public:
 	void connectionClosed(const String& id, int status, const String& reason) override;
 #endif
 
-	void addItemInternal(Dashboard* item, var data) override;
-	void removeItemInternal(Dashboard* item) override;
-
-	void itemDataFeedback(var data) override;
-
-	void afterLoadJSONDataInternal() override;
+private:
 
 #if ORGANICUI_USE_SERVUS
-	servus::Servus servus;
-	void setupZeroconf();
-	void run() override;
+	ServusThread servusThread;
 #endif
+
 };
+
