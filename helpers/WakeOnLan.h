@@ -22,11 +22,11 @@ public:
 		const int packetSize = 6 + 16 * 6;
 		uint8 packet[packetSize];
 		
-		for (int i = 0; i < 6; i++) packet[i] = ffBytes[i];
+		for (int i = 0; i < 6; ++i) packet[i] = ffBytes[i];
 		
-		for (int i = 0; i < 16; i++)
+		for (int i = 0; i < 16; ++i)
 		{
-			for (int j = 0; j < 6; j++)
+			for (int j = 0; j < 6; ++j)
 			{
 				int index = 6 + i * 6 + j;
 				packet[index] = macBytes[j];

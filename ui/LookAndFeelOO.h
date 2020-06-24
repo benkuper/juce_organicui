@@ -239,7 +239,7 @@ public:
 	{
 		Array<int> w;
 		
-		for (int i = 0; i<buttons.size(); i++)
+		for (int i = 0; i<buttons.size(); ++i)
 		{
 			w.add(jmax<int>(buttons.getUnchecked(i)->getWidth(),60));
 		}

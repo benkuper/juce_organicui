@@ -30,7 +30,7 @@ void FloatParameter::setWeightedValue(Array<var> values, Array<float> weights)
 
 	float tValue = 0;
 
-	for (int i = 0; i < values.size(); i++)
+	for (int i = 0; i < values.size(); ++i)
 	{
 		tValue += (float)values[i] * weights[i];
 	}
@@ -62,7 +62,7 @@ TimeLabel * FloatParameter::createTimeLabelParameter(FloatParameter * target)
 	return new TimeLabel(target);
 }
 
-ControllableUI * FloatParameter::createDefaultUI(Controllable * targetControllable) {
+ControllableUI * FloatParameter::createDefaultUI() {
 	UIType t = customUI != NONE ? customUI : defaultUI;
 
 	if (t == NONE) t = hasRange()?SLIDER:LABEL;
@@ -73,16 +73,16 @@ ControllableUI * FloatParameter::createDefaultUI(Controllable * targetControllab
         break;
             
 	case SLIDER:
-		return createSlider(dynamic_cast<FloatParameter *>(targetControllable));
+		return createSlider(this);
 		break;
 	case STEPPER:
-		return createStepper(dynamic_cast<FloatParameter *>(targetControllable));
+		return createStepper(this);
 		break;
 	case LABEL:
-		return createLabelParameter(dynamic_cast<FloatParameter *>(targetControllable));
+		return createLabelParameter(this);
 		break;
 	case TIME:
-		return createTimeLabelParameter(dynamic_cast<FloatParameter *>(targetControllable));
+		return createTimeLabelParameter(this);
 		break;
 	}
 	

@@ -69,6 +69,9 @@ public:
 	virtual void setEnabled(bool value, bool silentSet = false, bool force = false);
 	virtual void setControllableFeedbackOnly(bool value);
 
+	void notifyStateChanged();
+
+
 	void setParentContainer(ControllableContainer * container);
 
 	template<class T>
@@ -90,7 +93,7 @@ public:
 	String getControlAddress(ControllableContainer * relativeTo = nullptr);
 
 	// used for generating editor
-	virtual ControllableUI * createDefaultUI(Controllable * targetControllable = nullptr) = 0;
+	virtual ControllableUI * createDefaultUI() = 0;
 
 	virtual DashboardItem * createDashboardItem() override;
 

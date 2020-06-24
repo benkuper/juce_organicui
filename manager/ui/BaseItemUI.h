@@ -67,7 +67,8 @@ public:
 	//void setGrabber(Grabber * newGrabber);
 
 	virtual void resized() override;
-	virtual void resizedInternalHeader(juce::Rectangle<int> &) {}
+	virtual void resizedHeader(juce::Rectangle<int>& r);
+	virtual void resizedInternalHeader(juce::Rectangle<int>&) {}
 	virtual void resizedInternalContent(juce::Rectangle<int> &) {}
 	virtual void resizedInternalFooter(juce::Rectangle<int> &) {}
 	virtual void buttonClicked(Button *b) override;
@@ -283,12 +284,11 @@ void BaseItemUI<T>::resized()
 		warningUI->setBounds(h.removeFromLeft(h.getHeight())); //warning
 		h.removeFromLeft(2);
 	}
-
+	
 	if (removeBT != nullptr && showRemoveBT) removeBT->setBounds(h.removeFromRight(h.getHeight()));
 	h.removeFromRight(2);
 
-	resizedInternalHeader(h);
-	itemLabel.setBounds(h.reduced(1));
+	resizedHeader(h);
 
 	r.removeFromTop(headerGap);
 
@@ -341,6 +341,16 @@ void BaseItemUI<T>::resized()
 }
 
 template<class T>
+void BaseItemUI<T>::resizedHeader(juce::Rectangle<int>& r)
+{
+	int labelWidth = jmax(itemLabel.getFont().getStringWidth(this->baseItem->niceName) + 10, 30);
+	itemLabel.setBounds(r.removeFromLeft(labelWidth).reduced(0, 1));
+	r.removeFromLeft(2);
+
+	resizedInternalHeader(r);
+}
+
+template<class T>
 void BaseItemUI<T>::buttonClicked(Button * b)
 {
 	if (b == removeBT.get())
@@ -378,6 +388,7 @@ void BaseItemUI<T>::labelTextChanged(Label * l)
 	{
 		if (l->getText().isEmpty()) itemLabel.setText(this->baseItem->niceName, dontSendNotification); //avoid setting empty names
 		else this->baseItem->setUndoableNiceName(l->getText());
+		resized();
 	}
 }
 

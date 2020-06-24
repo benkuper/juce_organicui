@@ -90,6 +90,7 @@ void FloatStepperUI::resized()
 
 void FloatStepperUI::updateUIParamsInternal()
 {
+	slider->setEnabled(parameter->enabled);
 	slider->setTextBoxIsEditable(isInteractable());
 	slider->setIncDecButtonsMode((isInteractable()) ? Slider::IncDecButtonMode::incDecButtonsDraggable_AutoDirection : Slider::IncDecButtonMode::incDecButtonsNotDraggable);
 	slider->setColour(slider->textBoxTextColourId, useCustomTextColor ? customTextColor : (isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f)));
@@ -106,21 +107,6 @@ void FloatStepperUI::sliderValueChanged(Slider * _slider)
 {
 	if (parameter.wasObjectDeleted()) return;
 	parameter->setValue(slider->getValue());
-}
-
-void FloatStepperUI::controlModeChanged(Parameter* p)
-{
-	slider->setEnabled(parameter->enabled);
-	slider->setColour(slider->textBoxTextColourId, useCustomTextColor ? customTextColor : (isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f)));
-
-	ParameterUI::controlModeChanged(p);
-}
-
-void FloatStepperUI::controllableStateChanged()
-{
-	ParameterUI::controllableStateChanged();
-	slider->setEnabled(parameter->enabled);
-	slider->setColour(slider->textBoxTextColourId, useCustomTextColor ? customTextColor : (isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f)));
 }
 
 void FloatStepperUI::rangeChanged(Parameter *){

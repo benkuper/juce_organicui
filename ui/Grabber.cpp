@@ -8,7 +8,7 @@ void Grabber::paint(Graphics & g)
 	//juce::Rectangle<int> r = getLocalBounds();
 	g.setColour(BG_COLOR.brighter(.6f));
 	const int numLines = 3;
-	for (int i = 0; i < numLines; i++)
+	for (int i = 0; i < numLines; ++i)
 	{
 		if (dir == HORIZONTAL)
 		{

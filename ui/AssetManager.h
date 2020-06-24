@@ -39,6 +39,7 @@ public:
 	Image getReloadImage();
 	Image getTriggerImage();
 	Image getRelativeImage();
+	Image getMinusImage();
 
 	ImageButton * getSetupBTImage(const Image & image);
 	ImageButton * getToggleBTImage(const Image &image);

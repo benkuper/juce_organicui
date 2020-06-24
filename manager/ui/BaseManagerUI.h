@@ -509,7 +509,7 @@ void BaseManagerUI<M, T, U>::placeItems(juce::Rectangle<int>& r)
 		if (defaultLayout == VERTICAL) r.translate(0, tr.getHeight() + gap);
 		else r.translate(tr.getWidth() + gap, 0);
 
-		i++;
+		++i;
 	}
 }
 
@@ -866,7 +866,7 @@ Component * BaseManagerUI<M, T, U>::getSelectableComponentForItemUI(U* itemUI)
 template<class M, class T, class U>
 int BaseManagerUI<M, T, U>::getDropIndexForPosition(Point<int> localPosition)
 {
-	for (int i = 0; i < itemsUI.size(); i++)
+	for (int i = 0; i < itemsUI.size(); ++i)
 	{
 		BaseItemMinimalUI<T> * iui = dynamic_cast<BaseItemMinimalUI<T> *>(itemsUI[i]);
 		Point<int> p = getLocalArea(iui, iui->getLocalBounds()).getCentre();

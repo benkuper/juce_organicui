@@ -42,21 +42,21 @@ StringParameterTextUI * StringParameter::createStringParameterTextUI(StringParam
 	return new StringParameterTextUI(target);
 }
 
-ControllableUI* StringParameter::createDefaultUI(Controllable * targetControllable){
+ControllableUI* StringParameter::createDefaultUI(){
 
 	switch (defaultUI)
 	{
 	case TEXT: 
 	{
-		if (!multiline) return createStringParameterUI(dynamic_cast<StringParameter *>(targetControllable)); 
-		else return createStringParameterTextUI(dynamic_cast<StringParameter *>(targetControllable));
+		if (!multiline) return createStringParameterUI(this); 
+		else return createStringParameterTextUI(this);
 	}
 	break;
 
-	case  FILE: return createStringParameterFileUI(dynamic_cast<StringParameter *>(targetControllable)); break;
+	case  FILE: return createStringParameterFileUI(this); break;
 	}
 
-	return createStringParameterUI(dynamic_cast<StringParameter *>(targetControllable));
+	return createStringParameterUI(this);
 }
 
 var StringParameter::getLerpValueTo(var targetValue, float weight)
@@ -71,7 +71,7 @@ void  StringParameter::setValueInternal(var & newVal)
 	if (newVal.isArray())
 	{
 		String v = "";
-		for (int i = 0; i < newVal.size(); i++) v += (i > 0 ? " " : "") + String((float)newVal[i],3,0);
+		for (int i = 0; i < newVal.size(); ++i) v += (i > 0 ? " " : "") + String((float)newVal[i],3,0);
 		value = v;
 	} else
 	{

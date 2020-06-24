@@ -461,7 +461,7 @@ void CustomLoggerUI::LogList::cleanUnusedGlyphs() {
 		min = nmaxRow; max = maxRow;
 	}
 
-	for (int i = min; i < max; i++) {
+	for (int i = min; i < max; ++i) {
 		cachedG.remove(owner->getContentForRow(i));
 		if (owner->isPrimaryRow(i)) {
 			cachedG.remove(owner->getSourceForRow(i));
@@ -489,10 +489,10 @@ void CustomLoggerUI::buttonClicked(Button* b)
 
 	else if (b == &copyB) {
 		String s;
-		for (auto & el : logElements) {
+		for (auto& el : logElements) {
 			int leftS = el->source.length() + 3;
 			s += el->source + " : ";
-			for (int i = 0; i < el->getNumLines(); i++) {
+			for (int i = 0; i < el->getNumLines(); ++i) {
 				if (i != 0)for (int j = 0; j < leftS; j++) s += " ";
 				s += el->getLine(i) + "\n";
 			}

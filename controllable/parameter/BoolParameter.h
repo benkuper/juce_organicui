@@ -22,7 +22,7 @@ public:
     //ui creation
     BoolToggleUI * createToggle(BoolParameter * target = nullptr);
 	BoolImageToggleUI * createImageToggle(ImageButton * image, BoolParameter * target = nullptr);
-	ControllableUI * createDefaultUI(Controllable * targetControllable = nullptr) override;
+	ControllableUI * createDefaultUI() override;
 
 	static BoolParameter * create() { return new BoolParameter("New Bool Parameter", "", false); }
 	virtual String getTypeString() const override { return getTypeStringStatic(); }

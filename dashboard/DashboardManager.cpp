@@ -10,15 +10,31 @@
 
 juce_ImplementSingleton(DashboardManager)
 
+ApplicationProperties& getAppProperties();
+String getAppVersion();
+
 DashboardManager::DashboardManager() :
 	BaseManager("Dashboards")
-#if ORGANICUI_USE_SERVUS
-	, Thread("Global Zeroconf")
-	, servus("_http._tcp")
-#endif
 {
 	editMode = addBoolParameter("Edit Mode", "If checked, items are editable. If not, items are normally usable", true);
 	snapping = addBoolParameter("Snapping", "If checked, items are automatically aligned when dragging them closed to other ones", true);
+
+#if ORGANICUI_USE_WEBSERVER
+	File customDashboardPath = File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory).getChildFile(OrganicApplication::getInstance()->getApplicationName() + "/dashboard");
+	if (customDashboardPath.exists() && customDashboardPath.isDirectory())
+	{
+		hasCustomDashboard = true;
+		serverRootPath = customDashboardPath;
+		LOG("Custom Dashboard detected, using this one");
+	}
+	else
+	{
+		hasCustomDashboard = false;
+		serverRootPath = File::getSpecialLocation(File::SpecialLocationType::userApplicationDataDirectory).getChildFile(OrganicApplication::getInstance()->getApplicationName() + "/dashboard");
+		bool isNewVersion = getAppProperties().getUserSettings()->getValue("lastVersion", "0") != getAppVersion();
+		if(isNewVersion) serverRootPath.deleteRecursively();
+	}
+#endif
 }
 
 DashboardManager::~DashboardManager()
@@ -28,8 +44,8 @@ DashboardManager::~DashboardManager()
 #endif
 
 #if ORGANICUI_USE_SERVUS
-	signalThreadShouldExit();
-	waitForThreadToExit(1000);
+	servusThread.signalThreadShouldExit();
+	servusThread.waitForThreadToExit(1000);
 #endif
 
 	DashboardItemFactory::deleteInstance();
@@ -46,8 +62,8 @@ void DashboardManager::setupServer()
 	{
 		LOG("Dashboard server is not running");
 		#if ORGANICUI_USE_SERVUS
-				signalThreadShouldExit();
-				waitForThreadToExit(1000);
+			servusThread.signalThreadShouldExit();
+			servusThread.waitForThreadToExit(1000);
 		#endif
 
 		return;
@@ -55,13 +71,13 @@ void DashboardManager::setupServer()
 
 	int port = ProjectSettings::getInstance()->serverPort->intValue();
 
-	server.reset(new SimpleWebSocket());
-	server->rootPath = File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory).getChildFile(OrganicApplication::getInstance()->getApplicationName() + "/dashboard");
+	server.reset(new SimpleWebSocketServer());
+	server->rootPath = serverRootPath;
 	server->addWebSocketListener(this);
 	server->start(port);
 
 #if ORGANICUI_USE_SERVUS
-	setupZeroconf();
+	servusThread.setupZeroconf();
 #endif
 
 	LOG("Dashboard server is running on port " << port);
@@ -133,6 +149,43 @@ void DashboardManager::connectionClosed(const String& id, int status, const Stri
 {
 	LOG("Connection to the Dashboard closed by " << id);
 }
+
+void DashboardManager::setupDownloadURL(const String& _downloadURL)
+{
+	
+	if (hasCustomDashboard) return;
+	downloadURL = URL(_downloadURL);
+	if (!serverRootPath.exists()) downloadDashboardFiles();
+}
+
+void DashboardManager::downloadDashboardFiles()
+{
+	if (downloadURL.isEmpty())
+	{
+		DBG("No download URL for dashboard, exiting");
+		return;
+	}
+
+	LOG("Downloading dashboard files...");
+	downloadedFileZip = File::getSpecialLocation(File::userDesktopDirectory).getChildFile("dashboard.zip");
+	downloadTask = downloadURL.downloadToFile(downloadedFileZip, "", this);
+	if (downloadTask == nullptr)
+	{
+		LOGERROR("Error downloading dashboard files");
+	}
+}
+
+void DashboardManager::progress(URL::DownloadTask* task, int64 bytesDownloaded, int64 bytesTotal)
+{
+}
+
+void DashboardManager::finished(URL::DownloadTask* task, bool success)
+{
+	LOG("Success ? " << (int)success);
+	ZipFile zf(downloadedFileZip);
+	zf.uncompressTo(serverRootPath);
+	LOG("Dashboard : " << zf.getNumEntries() << " files downloaded to " << serverRootPath.getFullPathName());
+}
 #endif //ORGANICUI_USE_WEBSERVER
 
 
@@ -145,7 +198,6 @@ void DashboardManager::removeItemInternal(Dashboard* item)
 {
 	item->removeDashboardListener(this);
 }
-
 void DashboardManager::itemDataFeedback(var data)
 {
 #if ORGANICUI_USE_WEBSERVER
@@ -166,7 +218,12 @@ void DashboardManager::afterLoadJSONDataInternal()
 
 
 #if ORGANICUI_USE_SERVUS
-void DashboardManager::setupZeroconf()
+ServusThread::ServusThread() :
+	Thread("Dashboard Zeroconf"),
+	servus("_http._tcp")
+{
+}
+void ServusThread::setupZeroconf()
 {
 	if(ProjectSettings::getInstanceWithoutCreating() == nullptr || ProjectSettings::getInstance()->serverPort == nullptr) return;
 
@@ -174,7 +231,8 @@ void DashboardManager::setupZeroconf()
 	if (!isThreadRunning()) startThread();
 }
 
-void DashboardManager::run()
+
+void ServusThread::run()
 {
 	String nameToAdvertise = OrganicApplication::getInstance()->getApplicationName() + " - Dashboard";
 	int port = ProjectSettings::getInstance()->serverPort->intValue();
@@ -191,6 +249,6 @@ void DashboardManager::run()
 		}
 	}
 
-	NLOG(niceName, "Zeroconf service created : " << nameToAdvertise << ":" << portToAdvertise);
+	LOG("Dashboard Zeroconf service created : " << nameToAdvertise << ":" << portToAdvertise);
 }
 #endif

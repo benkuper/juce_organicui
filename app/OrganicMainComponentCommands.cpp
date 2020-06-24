@@ -19,6 +19,9 @@ namespace CommandIDs
 	static const int newFile = 0x30003;
 	static const int openLastDocument = 0x30004;
 	static const int checkForUpdates = 0x30005;
+#if ORGANICUI_USE_WEBSERVER
+	static const int updateDashboardFiles = 0x30006;
+#endif
 
 	//undo
 	static const int undo = 0x40001;
@@ -31,6 +34,7 @@ namespace CommandIDs
 	static const int editProjectSettings = 0x50001;
 	static const int editGlobalSettings = 0x50002;
 	static const int toggleKioskMode = 0x50003;
+	static const int clearGlobalSettings = 0x50004;
 
 	static const int showAbout = 0x60000;
 	
@@ -88,6 +92,10 @@ void OrganicMainContentComponent::getCommandInfo(CommandID commandID, Applicatio
 	case CommandIDs::editGlobalSettings:
 		result.setInfo("Preferences", "Edit the general settings related to this application", category, 0);
 		result.defaultKeypresses.add(KeyPress(',', ModifierKeys::commandModifier, 0));
+		break;
+
+	case CommandIDs::clearGlobalSettings:
+		result.setInfo("Clear Preferences", "If you got some funky things going on, just clear your preferences and hopefully everything will be awesome again !", category, 0);
 		break;
 
 	case CommandIDs::toggleKioskMode:
@@ -206,6 +214,15 @@ void OrganicMainContentComponent::getCommandInfo(CommandID commandID, Applicatio
 	}
 	break;
 
+#if ORGANICUI_USE_WEBSERVER
+	case CommandIDs::updateDashboardFiles:
+	{
+		result.setInfo("Update Dashboard Files", "Update the Dashboard server files", category, 0);
+		result.defaultKeypresses.add(KeyPress('e', ModifierKeys::commandModifier, 0));
+	}
+	break;
+#endif
+
 	default:
 		JUCEApplication::getInstance()->getCommandInfo(commandID, result);
 		break;
@@ -227,6 +244,9 @@ void OrganicMainContentComponent::getAllCommands(Array<CommandID>& commands) {
 	  CommandIDs::save,
 	  CommandIDs::saveAs,
 	  CommandIDs::checkForUpdates,
+#if ORGANICUI_USE_WEBSERVER
+	  CommandIDs::updateDashboardFiles,
+#endif
 	  StandardApplicationCommandIDs::quit,
 	  CommandIDs::selectAll,
 	  StandardApplicationCommandIDs::copy,
@@ -236,6 +256,7 @@ void OrganicMainContentComponent::getAllCommands(Array<CommandID>& commands) {
 	  CommandIDs::deleteItems,
 	  CommandIDs::switchDashboardEditMode,
 	  CommandIDs::editGlobalSettings,
+	  CommandIDs::clearGlobalSettings,
 	  CommandIDs::editProjectSettings,
 	  CommandIDs::toggleKioskMode,
 	  CommandIDs::selectPreviousItem,
@@ -276,11 +297,15 @@ PopupMenu OrganicMainContentComponent::getMenuForIndex(int /*topLevelMenuIndex*/
 		menu.addSeparator();
 		menu.addCommandItem(&getCommandManager(), CommandIDs::editProjectSettings);
 		menu.addCommandItem(&getCommandManager(), CommandIDs::editGlobalSettings);
+		menu.addCommandItem(&getCommandManager(), CommandIDs::clearGlobalSettings);
 
 		fillFileMenuInternal(menu);
 
 		menu.addSeparator();
 		menu.addCommandItem(&getCommandManager(), CommandIDs::checkForUpdates);
+#if ORGANICUI_USE_WEBSERVER
+		menu.addCommandItem(&getCommandManager(), CommandIDs::updateDashboardFiles);
+#endif
 		menu.addSeparator();
 		menu.addCommandItem(&getCommandManager(), StandardApplicationCommandIDs::quit);
 
@@ -523,9 +548,19 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 		GlobalSettings::getInstance()->selectThis();
 		break;
 
+	case CommandIDs::clearGlobalSettings:
+		((OrganicApplication *)OrganicApplication::getInstance())->clearGlobalSettings();
+		break;
+
 	case CommandIDs::toggleKioskMode:
 		Desktop::getInstance().setKioskModeComponent(Desktop::getInstance().getKioskModeComponent() == getMainWindow()?nullptr:getMainWindow());
 		break;
+
+#if ORGANICUI_USE_WEBSERVER
+	case CommandIDs::updateDashboardFiles:
+		DashboardManager::getInstance()->downloadDashboardFiles();
+		break;
+#endif
 
 	default:
 		return JUCEApplication::getInstance()->perform(info);

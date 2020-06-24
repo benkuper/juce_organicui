@@ -77,9 +77,9 @@ void InspectableSelector::endSelection(bool confirmSelection)
 
 	Array<Component *> selectedComponents;
 	int numSelectables = selectables.size();
-	for (int i = 0; i < numSelectables; i++) if (inspectables[i]->isPreselected) selectedComponents.add(selectables[i]);
+	for (int i = 0; i < numSelectables; ++i) if (inspectables[i]->isPreselected) selectedComponents.add(selectables[i]);
 
-	for (auto &s : inspectables)
+	for (auto& s : inspectables)
 	{
 		if (confirmSelection)
 		{
@@ -90,14 +90,14 @@ void InspectableSelector::endSelection(bool confirmSelection)
 			s->setPreselected(false);
 		}
 	}
-	
-	if(confirmSelection) currentSelectionManager->selectInspectables(selection,clearSelectionAtEnd);
+
+	if (confirmSelection) currentSelectionManager->selectInspectables(selection, clearSelectionAtEnd);
 
 	listeners.call(&SelectorListener::selectionEnded, selectedComponents);
-	
+
 }
 
-void InspectableSelector::paint(Graphics & g)
+void InspectableSelector::paint(Graphics& g)
 {
 	if (selectionBounds.getWidth() == 0 || selectionBounds.getHeight() == 0) return;
 	g.setColour(PRESELECT_COLOR.withAlpha(.2f));
@@ -106,18 +106,18 @@ void InspectableSelector::paint(Graphics & g)
 	g.drawRect(selectionBounds);
 }
 
-void InspectableSelector::mouseDrag(const MouseEvent & e)
+void InspectableSelector::mouseDrag(const MouseEvent& e)
 {
 	Point<int> topLeft = Point<int>(jmin(e.getMouseDownX(), e.getPosition().x), jmin(e.getMouseDownY(), e.getPosition().y));
-	Point<int> bottomRight = Point<int>(jmax(e.getMouseDownX(), e.getPosition().x),jmax(e.getMouseDownY(),e.getPosition().y));
-	
+	Point<int> bottomRight = Point<int>(jmax(e.getMouseDownX(), e.getPosition().x), jmax(e.getMouseDownY(), e.getPosition().y));
+
 	selectionBounds.setBounds(topLeft.x, topLeft.y, bottomRight.x - topLeft.x, bottomRight.y - topLeft.y);
 	repaint();
 
 	if (e.eventComponent == selectablesParent)
 	{
 		int numSelectables = selectables.size();
-		for (int i=0;i<numSelectables;i++)
+		for (int i = 0; i < numSelectables; ++i)
 		{
 			juce::Rectangle<int> icp = selectablesParent->getLocalArea(selectables[i], selectables[i]->getLocalBounds());
 			if (selectionBounds.intersects(icp))

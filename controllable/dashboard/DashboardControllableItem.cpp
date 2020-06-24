@@ -82,7 +82,7 @@ var DashboardControllableItem::getServerData()
 	}
 
 	o->setProperty("opaqueBackground", opaqueBackground->value);
-	o->setProperty("label", customLabel->enabled ? customLabel->value : controllable->niceName);
+	o->setProperty("label", customLabel->enabled ? customLabel->value.toString() : controllable->niceName);
 	o->setProperty("customDescription", customDescription->value);
 
 	return data;

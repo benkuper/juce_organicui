@@ -321,7 +321,7 @@ static double cubic_calc_error(
 	double       *pt_eval = (double*)alloca(sizeof(double) * dims);
 #endif
 
-	for (uint i = 1; i < points_offset_len - 1; i++, pt_real += dims) {
+	for (uint i = 1; i < points_offset_len - 1; ++i, pt_real += dims) {
 		cubic_calc_point(cubic, u[i], dims, pt_eval);
 
 		const double err_sq = len_squared_vnvn(pt_real, pt_eval, dims);
@@ -357,7 +357,7 @@ static double cubic_calc_error_simple(
 	double       *pt_eval = (double*)alloca(sizeof(double) * dims);
 #endif
 
-	for (uint i = 1; i < points_offset_len - 1; i++, pt_real += dims) {
+	for (uint i = 1; i < points_offset_len - 1; ++i, pt_real += dims) {
 		cubic_calc_point(cubic, u[i], dims, pt_eval);
 
 		const double err_sq = len_squared_vnvn(pt_real, pt_eval, dims);
@@ -605,7 +605,7 @@ static void cubic_from_points_offset_fallback(
 	double dists[2] = {0, 0};
 
 	const double *pt = &points_offset[dims];
-	for (uint i = 1; i < points_offset_len - 1; i++, pt += dims) {
+	for (uint i = 1; i < points_offset_len - 1; ++i, pt += dims) {
 		for (uint k = 0; k < 2; k++) {
 			sub_vn_vnvn(tmp, p0, pt, dims);
 			project_vn_vnvn_normalized(tmp, tmp, a[k], dims);
@@ -691,7 +691,7 @@ static void cubic_from_points(
 		double x[2] = {0.0}, c[2][2] = {{0.0}};
 		const double *pt = points_offset;
 
-		for (uint i = 0; i < points_offset_len; i++, pt += dims) {
+		for (uint i = 0; i < points_offset_len; ++i, pt += dims) {
 			mul_vnvn_fl(a[0], tan_l, B1(u_prime[i]), dims);
 			mul_vnvn_fl(a[1], tan_r, B2(u_prime[i]), dims);
 
@@ -788,7 +788,7 @@ static void cubic_from_points(
 
 		{
 			const double *pt = points_offset;
-			for (uint i = 0; i < points_offset_len; i++, pt += dims) {
+			for (uint i = 0; i < points_offset_len; ++i, pt += dims) {
 #if 0
 				double dist_sq_test = sq(len_vnvn(center, pt, dims) * clamp_scale);
 #else
@@ -857,7 +857,7 @@ static void points_calc_coord_length_cache(
 	const double *pt_prev = points_offset;
 	const double *pt = pt_prev + dims;
 	r_points_length_cache[0] = 0.0;
-	for (uint i = 1; i < points_offset_len; i++) {
+	for (uint i = 1; i < points_offset_len; ++i) {
 		r_points_length_cache[i] = len_vnvn(pt, pt_prev, dims);
 		pt_prev = pt;
 		pt += dims;
@@ -880,7 +880,7 @@ static double points_calc_coord_length(
 	const double *pt_prev = points_offset;
 	const double *pt = pt_prev + dims;
 	r_u[0] = 0.0;
-	for (uint i = 1, i_prev = 0; i < points_offset_len; i++) {
+	for (uint i = 1, i_prev = 0; i < points_offset_len; ++i) {
 		double length;
 
 #ifdef USE_LENGTH_CACHE
@@ -897,7 +897,7 @@ static double points_calc_coord_length(
 	}
 	assert(!is_almost_zero(r_u[points_offset_len - 1]));
 	const double w = r_u[points_offset_len - 1];
-	for (uint i = 1; i < points_offset_len; i++) {
+	for (uint i = 1; i < points_offset_len; ++i) {
 		r_u[i] /= w;
 	}
 	return w;
@@ -967,7 +967,7 @@ static bool cubic_reparameterize(
 	 */
 
 	const double *pt = points_offset;
-	for (uint i = 0; i < points_offset_len; i++, pt += dims) {
+	for (uint i = 0; i < points_offset_len; ++i, pt += dims) {
 		r_u_prime[i] = cubic_find_root(cubic, pt, u[i], dims);
 		if (!isfinite(r_u_prime[i])) {
 			return false;
@@ -1297,7 +1297,7 @@ int curve_fit_cubic_to_points_db(
 
 	const double error_threshold_sq = sq(error_threshold);
 
-	for (uint i = 1; i < corners_len; i++) {
+	for (uint i = 1; i < corners_len; ++i) {
 		const uint points_offset_len = corners[i] - corners[i - 1] + 1;
 		const uint first_point = corners[i - 1];
 
@@ -1425,7 +1425,7 @@ int curve_fit_cubic_to_points_fl(
 	if (!result) {
 		uint cubic_array_flat_len = cubic_array_len * 3 * dims;
 		cubic_array_fl = (float *)malloc(sizeof(float) * cubic_array_flat_len);
-		for (uint i = 0; i < cubic_array_flat_len; i++) {
+		for (uint i = 0; i < cubic_array_flat_len; ++i) {
 			cubic_array_fl[i] = (float)cubic_array_db[i];
 		}
 		free(cubic_array_db);

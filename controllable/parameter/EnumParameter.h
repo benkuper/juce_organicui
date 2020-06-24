@@ -63,7 +63,7 @@ public:
 	static var removeOptionsFromScript(const juce::var::NativeFunctionArgs &a);
 
 	EnumParameterUI * createUI(EnumParameter * target = nullptr);
-	ControllableUI * createDefaultUI(Controllable * targetControllable = nullptr) override;
+	ControllableUI * createDefaultUI() override;
 
 
 	//Listener

@@ -1,4 +1,3 @@
-#include "ParameterUI.h"
 /*
   ==============================================================================
 
@@ -215,6 +214,11 @@ bool ParameterUI::shouldBailOut() {
 
 // see Parameter::AsyncListener
 
+void ParameterUI::controlModeChanged(Parameter*) 
+{
+	updateUIParams();
+}
+
 void ParameterUI::newMessage(const Parameter::ParameterEvent& e) {
 	switch (e.type)
 	{
@@ -238,7 +242,7 @@ ParameterUI::ValueEditCalloutComponent::ValueEditCalloutComponent(WeakReference<
 	p(p)
 {
 	int numValues = p->isComplex() ? p->value.size() : 1;
-	for (int i = 0; i < numValues; i++)
+	for (int i = 0; i < numValues; ++i)
 	{
 		Label* label = new Label("ValueLabel" + String(i));
 		label->addListener(this);
@@ -262,7 +266,7 @@ void ParameterUI::ValueEditCalloutComponent::resized()
 	int numValues = p->isComplex() ? p->value.size() : 1;
 	int labelWidth = (getWidth() - (gap * numValues - 1)) / numValues;
 	juce::Rectangle<int> r = getLocalBounds();
-	for (int i = 0; i < numValues; i++)
+	for (int i = 0; i < numValues; ++i)
 	{
 		if (i > 0) r.removeFromLeft(gap);
 		labels[i]->setBounds(r.removeFromLeft(labelWidth));
@@ -283,7 +287,7 @@ void ParameterUI::ValueEditCalloutComponent::labelTextChanged(Label* l)
 
 		var newVal;
 		int numValues = p->isComplex() ? p->value.size() : 1;
-		for (int i = 0; i < numValues; i++)
+		for (int i = 0; i < numValues; ++i)
 		{
 			if (p->type == Parameter::STRING) newVal.append(labels[i]->getText());
 			else newVal.append(ParameterUI::textToValue(labels[i]->getText().replace(",", ".")));

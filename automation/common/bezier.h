@@ -46,7 +46,7 @@ namespace Bezier
             double d = 1.0;
             if (n == 0 || n == 1)
                 return d;
-            for (size_t i = 2; i <= n; i++)
+            for (size_t i = 2; i <= n; ++i)
                 d *= (double) i;
             return d;
         }
@@ -120,7 +120,7 @@ namespace Bezier
     public:
         PolynomialCoefficients()
         {
-            for (size_t i = 0; i <= N; i++)
+            for (size_t i = 0; i <= N; ++i)
             {
                 mPolynomialPairs[i].t = i;
                 mPolynomialPairs[i].one_minus_t = N - i;
@@ -444,7 +444,7 @@ namespace Bezier
             float minY = std::numeric_limits<float>::max();
             float maxY = -std::numeric_limits<float>::max();
 
-            for (size_t i = 0; i < xPoints.size(); i++)
+            for (size_t i = 0; i < xPoints.size(); ++i)
             {
                 if (xPoints[i].x > maxX)
                     maxX = xPoints[i].x;
@@ -532,7 +532,7 @@ namespace Bezier
             float minY = std::numeric_limits<float>::max();
             float maxY = -std::numeric_limits<float>::max();
 
-            for (size_t i = 0; i < xPoints.size(); i++)
+            for (size_t i = 0; i < xPoints.size(); ++i)
             {
                 if (xPoints[i].x > maxX)
                     maxX = xPoints[i].x;
@@ -552,7 +552,7 @@ namespace Bezier
             if (xPoints.empty())
                 return;
 
-            for (size_t i = 0; i < 4; i++)
+            for (size_t i = 0; i < 4; ++i)
             {
                 points[i].rotate(-rotation);
                 points[i].translate(-translation);
@@ -629,20 +629,20 @@ namespace Bezier
     public:
         Bezier()
         {
-            for (size_t i = 0; i < N+1; i++)
+            for (size_t i = 0; i < N+1; ++i)
                 mControlPoints[i].set(0, 0);
         }
 
         Bezier(const std::vector<Point>& controlPoints)
         {
             assert(controlPoints.size() == size()); // The Bezier curve must be initialized with the expected number og points
-            for (size_t i = 0; i < controlPoints.size(); i++)
+            for (size_t i = 0; i < controlPoints.size(); ++i)
                 mControlPoints[i] = Point(controlPoints[i]);
         }
 
         Bezier(const Bezier<N>& other)
         {
-            for (size_t i = 0; i < other.size(); i++)
+            for (size_t i = 0; i < other.size(); ++i)
                 mControlPoints[i] = Point(other[i]);
         }
 
@@ -664,7 +664,7 @@ namespace Bezier
 
             // Note: derivative weights/control points are not actual control points.
             std::vector<Point> derivativeWeights(N);
-            for (size_t i = 0; i < N; i++)
+            for (size_t i = 0; i < N; ++i)
                 derivativeWeights[i].set(Point((mControlPoints[i+1] - mControlPoints[i]) * N));
 
             return Bezier<N-1>(derivativeWeights);
@@ -685,7 +685,7 @@ namespace Bezier
         Point valueAt(float t) const
         {
             Point p;
-            for (size_t i = 0; i < Point::size; i++)
+            for (size_t i = 0; i < Point::size; ++i)
             {
                 p[i] = (float) valueAt(t, i);
             }
@@ -710,7 +710,7 @@ namespace Bezier
 
         void translate(const Vec2& distance)
         {
-            for (size_t i = 0; i < N+1; i++)
+            for (size_t i = 0; i < N+1; ++i)
             {
                 mControlPoints[i].translate(distance);
             }
@@ -718,7 +718,7 @@ namespace Bezier
 
         void translate(float dx, float dy)
         {
-            for (size_t i = 0; i < N+1; i++)
+            for (size_t i = 0; i < N+1; ++i)
             {
                 mControlPoints[i].translate(dx, dy);
             }
@@ -726,7 +726,7 @@ namespace Bezier
 
         void rotate(double angle, Vec2 pivot = Vec2(0, 0))
         {
-            for (size_t i = 0; i < N+1; i++)
+            for (size_t i = 0; i < N+1; ++i)
             {
                 mControlPoints[i].rotate(angle, pivot);
             }
@@ -757,7 +757,7 @@ namespace Bezier
             xVals.add(1.0f, 0);
 
             ExtremePoints xPoints;
-            for (size_t i = 0; i < xVals.size(); i++)
+            for (size_t i = 0; i < xVals.size(); ++i)
                 xPoints.add(valueAt(xVals[i].t));
 
             return xPoints;
@@ -838,7 +838,7 @@ namespace Bezier
             const Bezier<N-1> db = derivative();
             const Bezier<N-2> ddb = db.derivative();
 
-            for (size_t i = 0; i < Point::size; i++)
+            for (size_t i = 0; i < Point::size; ++i)
             {
                 double t = 0;
 

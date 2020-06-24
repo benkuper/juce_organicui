@@ -81,9 +81,16 @@ void OrganicApplication::initialise(const String & commandLine)
 	CrashDumpUploader::getInstance()->init();
 //#endif
 
-#if TIMELINE_ADD_MENU_ITEMS
-	TimelineAppCommands::init();
-#endif
+//BUG FIX !! To remove in a while
+	Array<WeakReference<ControllableContainer>> allCC = GlobalSettings::getInstance()->getAllContainers();
+	for (auto& cc : allCC)
+	{
+		if (cc->niceName.contains("Timeline"))
+		{
+			GlobalSettings::getInstance()->removeChildControllableContainer(cc); //All "Timeline XX" should not be there !
+		}
+	}
+
 
 	afterInit();
 
@@ -205,6 +212,12 @@ void OrganicApplication::newMessage(const AppUpdateEvent & e)
     
     default: break;
 	}
+}
+
+void OrganicApplication::clearGlobalSettings()
+{
+	getAppProperties().getUserSettings()->clear();
+	AlertWindow::showMessageBox(AlertWindow::InfoIcon, "So you want a fresh start","All settings are cleared ! You should definitely restart " + getApplicationName() + " in order to see changes.");
 }
 
 void OrganicApplication::updateAppTitle()

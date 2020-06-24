@@ -397,7 +397,7 @@ Array<T *> BaseManager<T>::addItems(Array<T *> itemsToAdd, var data, bool addToU
 	}
 
 
-	for (int i = 0; i < itemsToAdd.size(); i++)
+	for (int i = 0; i < itemsToAdd.size(); ++i)
 	{
 		addItem(itemsToAdd[i], data.isArray() ? data[i] : var(), false, false);
 	}
@@ -418,15 +418,16 @@ Array<T *> BaseManager<T>::addItems(Array<T *> itemsToAdd, var data, bool addToU
 
 //if data is not empty, load data
 template<class T>
-T * BaseManager<T>::addItemFromData(var data, bool addToUndo)
+T* BaseManager<T>::addItemFromData(var data, bool addToUndo)
 {
 	if (managerFactory != nullptr)
 	{
 		String type = data.getProperty("type", "");
 		if (type.isEmpty()) return nullptr;
-		T * i = managerFactory->create(type);
+		T* i = managerFactory->create(type);
 		if (i != nullptr) return addItem(i, data, addToUndo);
-	} else
+	}
+	else
 	{
 		return addItem(createItem(), data, addToUndo);
 	}
@@ -437,26 +438,27 @@ T * BaseManager<T>::addItemFromData(var data, bool addToUndo)
 template<class T>
 Array<T*> BaseManager<T>::addItemsFromData(var data, bool addToUndo)
 {
-	Array<T *> itemsToAdd;
+	Array<T*> itemsToAdd;
 	if (managerFactory != nullptr)
 	{
-		for (int i = 0; i < data.size(); i++)
+		for (int i = 0; i < data.size(); ++i)
 		{
 			String type = data[i].getProperty("type", "");
 			if (type.isEmpty()) return nullptr;
-			T * it = managerFactory->create(type);
-			if(it != nullptr) itemsToAdd.add(it);
+			T* it = managerFactory->create(type);
+			if (it != nullptr) itemsToAdd.add(it);
 		}
-	} else
+	}
+	else
 	{
-		for (int i = 0; i < data.size(); i++)  itemsToAdd.add(createItem());
+		for (int i = 0; i < data.size(); ++i)  itemsToAdd.add(createItem());
 	}
 
 	return addItems(itemsToAdd, data, addToUndo);
 }
 
 template<class T>
-Array<T *> BaseManager<T>::addItemsFromClipboard(bool showWarning)
+Array<T*> BaseManager<T>::addItemsFromClipboard(bool showWarning)
 {
 	if (!userCanAddItemsManually) return Array<T*>();
 	String s = SystemClipboard::getTextFromClipboard();
@@ -467,23 +469,23 @@ Array<T *> BaseManager<T>::addItemsFromClipboard(bool showWarning)
 	if (!canAddItemOfType(t))
 	{
 		if (showWarning) NLOGWARNING(niceName, "Can't paste data from clipboard : data is of wrong type (\"" + t + "\").");
-		return Array<T *>();
+		return Array<T*>();
 	}
 
 	int sIndex = items.indexOf(InspectableSelectionManager::activeSelectionManager->getInspectableAs<T>());
-	if(sIndex >= 0) data.getDynamicObject()->setProperty("index", sIndex+1);
-	Array<T *> copiedItems = addItemsFromData(data.getProperty("items",var()));
+	if (sIndex >= 0) data.getDynamicObject()->setProperty("index", sIndex + 1);
+	Array<T*> copiedItems = addItemsFromData(data.getProperty("items", var()));
 
-	for (auto &i : copiedItems)
+	for (auto& i : copiedItems)
 	{
-		((BaseItem *)i)->viewUIPosition->setPoint(((BaseItem *)i)->viewUIPosition->getPoint() + Point<float>(20, 20));
+		((BaseItem*)i)->viewUIPosition->setPoint(((BaseItem*)i)->viewUIPosition->getPoint() + Point<float>(20, 20));
 	}
 
 	return copiedItems;
 }
 
 template<class T>
-bool BaseManager<T>::canAddItemOfType(const String & typeToCheck)
+bool BaseManager<T>::canAddItemOfType(const String& typeToCheck)
 {
 	return typeToCheck == itemDataType;
 }
@@ -492,22 +494,22 @@ template<class T>
 void BaseManager<T>::loadItemsData(var data)
 {
 	if (data == var()) return;
-	Array<var> * itemsData = data.getProperty("items", var()).getArray();
+	Array<var>* itemsData = data.getProperty("items", var()).getArray();
 	if (itemsData == nullptr) return;
 
-	for (auto &td : *itemsData)
+	for (auto& td : *itemsData)
 	{
 		String n = td.getProperty("niceName", "");
-		BaseItem * i = getItemWithName(n, true);
+		BaseItem* i = getItemWithName(n, true);
 		if (i != nullptr) i->loadJSONData(td);
 	}
 }
 
 template<class T>
-Array<UndoableAction *> BaseManager<T>::getRemoveItemUndoableAction(T * item)
+Array<UndoableAction*> BaseManager<T>::getRemoveItemUndoableAction(T* item)
 {
 	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile) return nullptr;
-	Array<UndoableAction *> a;
+	Array<UndoableAction*> a;
 	a.add(new RemoveItemAction(this, item));
 	return a;
 }
@@ -517,18 +519,18 @@ Array<UndoableAction*> BaseManager<T>::getRemoveItemsUndoableAction(Array<T*> it
 {
 	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile) return nullptr;
 
-	Array<UndoableAction *> a;
+	Array<UndoableAction*> a;
 	a.add(new RemoveItemsAction(this, itemsToRemove));
 	return a;
 }
 
 template<class T>
-void BaseManager<T>::removeItems(Array<T *> itemsToRemove, bool addToUndo)
+void BaseManager<T>::removeItems(Array<T*> itemsToRemove, bool addToUndo)
 {
 	isManipulatingMultipleItems = true;
 	if (addToUndo)
 	{
-		Array<UndoableAction *> a = getRemoveItemsUndoableAction(itemsToRemove);
+		Array<UndoableAction*> a = getRemoveItemsUndoableAction(itemsToRemove);
 		UndoMaster::getInstance()->performActions("Remove " + String(itemsToRemove.size()) + " items", a);
 		isManipulatingMultipleItems = false;
 		return;
@@ -536,8 +538,8 @@ void BaseManager<T>::removeItems(Array<T *> itemsToRemove, bool addToUndo)
 
 	baseManagerListeners.call(&BaseManagerListener<T>::itemsRemoved, itemsToRemove);
 	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_REMOVED));
-	
-	for (auto &i : itemsToRemove) removeItem(i, false, false);
+
+	for (auto& i : itemsToRemove) removeItem(i, false, false);
 
 	isManipulatingMultipleItems = false;
 
@@ -545,7 +547,7 @@ void BaseManager<T>::removeItems(Array<T *> itemsToRemove, bool addToUndo)
 }
 
 template<class T>
-void BaseManager<T>::removeItem(T * item, bool addToUndo, bool notify)
+void BaseManager<T>::removeItem(T* item, bool addToUndo, bool notify)
 {
 	if (item == nullptr) return;
 
@@ -553,7 +555,7 @@ void BaseManager<T>::removeItem(T * item, bool addToUndo, bool notify)
 	{
 		if (Engine::mainEngine != nullptr && !Engine::mainEngine->isLoadingFile)
 		{
-			BaseItem * bi = static_cast<BaseItem *>(item);
+			BaseItem* bi = static_cast<BaseItem*>(item);
 			UndoMaster::getInstance()->performActions("Remove " + bi->getTypeString(), getRemoveItemUndoableAction(item));
 			return;
 		}
@@ -563,10 +565,10 @@ void BaseManager<T>::removeItem(T * item, bool addToUndo, bool notify)
 	//items.getLock().enter();
 	items.removeObject(item, false);
 	//items.getLock().exit();
-	
+
 	removeItemInternal(item);
-	
-	BaseItem * bi = static_cast<BaseItem *>(item);
+
+	BaseItem* bi = static_cast<BaseItem*>(item);
 	bi->removeBaseItemListener(this);
 	removeChildControllableContainer(bi);
 
@@ -581,7 +583,7 @@ void BaseManager<T>::removeItem(T * item, bool addToUndo, bool notify)
 }
 
 template<class T>
-void BaseManager<T>::setItemIndex(T * item, int newIndex)
+void BaseManager<T>::setItemIndex(T* item, int newIndex)
 {
 	newIndex = jlimit(0, items.size() - 1, newIndex);
 	int index = items.indexOf(item);
@@ -613,13 +615,13 @@ void BaseManager<T>::reorderItems()
 }
 
 template<class T>
- T * BaseManager<T>::getItemWithName(const String & itemShortName, bool searchItemWithNiceNameToo, bool searchWithLowerCaseIfNotFound)
+T* BaseManager<T>::getItemWithName(const String& itemShortName, bool searchItemWithNiceNameToo, bool searchWithLowerCaseIfNotFound)
 {
 	//const ScopedLock lock(items.getLock());
-	for (auto &t : items)
+	for (auto& t : items)
 	{
-		if (((BaseItem *)t)->shortName == itemShortName) return t;
-		else if (searchItemWithNiceNameToo && ((BaseItem *)t)->niceName == itemShortName) return t;
+		if (((BaseItem*)t)->shortName == itemShortName) return t;
+		else if (searchItemWithNiceNameToo && ((BaseItem*)t)->niceName == itemShortName) return t;
 	}
 
 	if (searchWithLowerCaseIfNotFound)
@@ -641,17 +643,17 @@ void BaseManager<T>::clear()
 }
 
 template<class T>
-void BaseManager<T>::askForRemoveBaseItem(BaseItem * item)
+void BaseManager<T>::askForRemoveBaseItem(BaseItem* item)
 {
 	removeItem(static_cast<T*>(item));
 }
 
 template<class T>
-void BaseManager<T>::askForDuplicateItem(BaseItem * item)
+void BaseManager<T>::askForDuplicateItem(BaseItem* item)
 {
 	if (!userCanAddItemsManually) return;
 	var data = item->getJSONData();
-	data.getDynamicObject()->setProperty("index", items.indexOf(static_cast<T *>(item))+1);
+	data.getDynamicObject()->setProperty("index", items.indexOf(static_cast<T*>(item)) + 1);
 	if (T* i = addItemFromData(data))
 	{
 		((BaseItem*)i)->viewUIPosition->setPoint(((BaseItem*)i)->viewUIPosition->getPoint() + Point<float>(20, 20));
@@ -665,24 +667,24 @@ void BaseManager<T>::askForPaste()
 }
 
 template<class T>
-void BaseManager<T>::askForMoveBefore(BaseItem * i)
+void BaseManager<T>::askForMoveBefore(BaseItem* i)
 {
 	T* item = static_cast<T*>(i);
 	setItemIndex(item, jmax(items.indexOf(item) - 1, 0));
-//	int index = items.indexOf(static_cast<T *>(i));
-//	if (index == 0) return;
-//	items.swap(index, index - 1);
-//	controllableContainers.swap(index, index - 1);
-//
-//	baseManagerListeners.call(&ManagerListener::itemsReordered);
-//	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_REORDERED));
+	//	int index = items.indexOf(static_cast<T *>(i));
+	//	if (index == 0) return;
+	//	items.swap(index, index - 1);
+	//	controllableContainers.swap(index, index - 1);
+	//
+	//	baseManagerListeners.call(&ManagerListener::itemsReordered);
+	//	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_REORDERED));
 }
 
 template<class T>
-void BaseManager<T>::askForMoveAfter(BaseItem * i)
+void BaseManager<T>::askForMoveAfter(BaseItem* i)
 {
 	T* item = static_cast<T*>(i);
-	setItemIndex(item, jmin(items.indexOf(item) + 1, items.size()-1));
+	setItemIndex(item, jmin(items.indexOf(item) + 1, items.size() - 1));
 	//int index = items.indexOf(static_cast<T *>(i));
 	//if (index == items.size() -1) return;
 	//items.swap(index, index + 1);
@@ -699,7 +701,7 @@ void BaseManager<T>::askForSelectAllItems(bool addToSelection)
 	if (!addToSelection) selectionManager->clearSelection(numItems == 0);
 	else deselectThis(numItems == 0);
 
-	if (numItems > 1) for (int i = 0; i < numItems; i++) items[i]->selectThis(true, i == numItems-1); //only notify on last
+	if (numItems > 1) for (int i = 0; i < numItems; ++i) items[i]->selectThis(true, i == numItems-1); //only notify on last
 	else if (numItems > 0) items[0]->selectThis(addToSelection, true);
 }
 

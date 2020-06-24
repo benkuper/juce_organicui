@@ -175,7 +175,7 @@ StringArray Parameter::getValuesNames()
 	if (!isComplex()) result.add("Value");
 	else
 	{
-		for (int i = 0; i < value.size(); i++) result.add("Value " + String(i));
+		for (int i = 0; i < value.size(); ++i) result.add("Value " + String(i));
 	}
 	return result;
 }
@@ -192,7 +192,7 @@ void Parameter::setRange(var min, var max)
 		minimumValue = min;
 		maximumValue = max;
 	}
-	
+
 
 	listeners.call(&ParameterListener::parameterRangeChanged, this);
 	var arr;
@@ -213,7 +213,7 @@ void Parameter::clearRange()
 			GenericScopedLock<SpinLock> lock(valueSetLock);
 			var minVal = var();
 			var maxVal = var();
-			for (int i = 0; i < value.size(); i++)
+			for (int i = 0; i < value.size(); ++i)
 			{
 				minVal.append(INT32_MIN);
 				maxVal.append(INT32_MAX);
@@ -237,7 +237,7 @@ bool Parameter::hasRange()
 		GenericScopedLock<SpinLock> lock(valueSetLock);
 		if (isComplex())
 		{
-			for (int i = 0; i < value.size(); i++) if ((int)minimumValue[i] != INT32_MIN || (int)maximumValue[i] != INT32_MAX) return false;
+			for (int i = 0; i < value.size(); ++i) if ((int)minimumValue[i] != INT32_MIN || (int)maximumValue[i] != INT32_MAX) return false;
 		}
 		else
 		{
@@ -248,7 +248,7 @@ bool Parameter::hasRange()
 	return false;
 }
 
-void Parameter::setValueInternal(var & _value) //to override by child classes
+void Parameter::setValueInternal(var& _value) //to override by child classes
 {
 	jassert(!value.isVoid());
 	value = _value;
@@ -262,7 +262,7 @@ bool Parameter::checkValueIsTheSame(var newValue, var oldValue)
 	{
 		if (!newValue.isArray()) return false;
 		if (newValue.size() != oldValue.size()) return false;
-		for (int i = 0; i < oldValue.size(); i++) if (oldValue[i] != newValue[i]) return false;
+		for (int i = 0; i < oldValue.size(); ++i) if (oldValue[i] != newValue[i]) return false;
 		return true;
 	}
 
@@ -283,12 +283,12 @@ var Parameter::getCroppedValue(var originalValue)
 	return originalValue;
 }
 
-void Parameter::setUndoableNormalizedValue(const float & oldNormalizedValue, const float & newNormalizedValue)
+void Parameter::setUndoableNormalizedValue(const float& oldNormalizedValue, const float& newNormalizedValue)
 {
 	setUndoableValue(jmap<float>(oldNormalizedValue, (float)minimumValue, (float)maximumValue), jmap<float>(newNormalizedValue, (float)minimumValue, (float)maximumValue));
 }
 
-void Parameter::setNormalizedValue(const float & normalizedValue, bool silentSet, bool force)
+void Parameter::setNormalizedValue(const float& normalizedValue, bool silentSet, bool force)
 {
 	setValue(jmap<float>(normalizedValue, (float)minimumValue, (float)maximumValue), silentSet, force);
 }
@@ -301,7 +301,8 @@ float Parameter::getNormalizedValue()
 
 	if ((float)minimumValue == (float)maximumValue) {
 		return 0.0;
-	} else
+	}
+	else
 		return jmap<float>((float)value, (float)minimumValue, (float)maximumValue, 0.f, 1.f);
 }
 
@@ -323,13 +324,13 @@ int Parameter::intValue() { return (int)getValue(); }
 bool Parameter::boolValue() { return (bool)getValue(); }
 
 String Parameter::stringValue() {
-	
+
 	var val = getValue();
 
 	if (!isComplex()) return val.toString();
 
 	String s = val[0];
-	for (int i = 1; i < val.size(); i++) s += "," + val[i].toString();
+	for (int i = 1; i < val.size(); ++i) s += "," + val[i].toString();
 	return "[" + s + "]";
 }
 

@@ -522,7 +522,7 @@ static uint curve_incremental_simplify(
 #endif
 	};
 
-	for (uint i = 0; i < knots_len; i++) {
+	for (uint i = 0; i < knots_len; ++i) {
 		struct Knot *k = &knots[i];
 		if (k->can_remove && (k->is_removed == false) && (k->is_corner == false)) {
 			knot_remove_error_recalculate(&params, k, error_sq_max, dims);
@@ -759,7 +759,7 @@ static uint curve_incremental_simplify_refit(
 #endif
 	};
 
-	for (uint i = 0; i < knots_len; i++) {
+	for (uint i = 0; i < knots_len; ++i) {
 		struct Knot *k = &knots[i];
 		if (k->can_remove &&
 		    (k->is_removed == false) &&
@@ -975,7 +975,7 @@ static uint curve_incremental_simplify_corners(
 
 	uint corner_index_len = 0;
 
-	for (uint i = 0; i < knots_len; i++) {
+	for (uint i = 0; i < knots_len; ++i) {
 		if ((knots[i].is_removed == false) &&
 		    (knots[i].can_remove == true) &&
 		    (knots[i].next && knots[i].next->can_remove))
@@ -1128,7 +1128,7 @@ int curve_fit_cubic_to_points_refit_db(
 
 	{
 		double *t_step = tangents;
-		for (uint i = 0; i < knots_len; i++) {
+		for (uint i = 0; i < knots_len; ++i) {
 			knots[i].next = (knots + i) + 1;
 			knots[i].prev = (knots + i) - 1;
 
@@ -1176,7 +1176,7 @@ int curve_fit_cubic_to_points_refit_db(
 #if 0
 		/* 2x normalize calculations, but correct */
 
-		for (uint i = 0; i < knots_len; i++) {
+		for (uint i = 0; i < knots_len; ++i) {
 			Knot *k = &knots[i];
 
 			if (k->prev) {
@@ -1209,7 +1209,7 @@ int curve_fit_cubic_to_points_refit_db(
 #else
 		if (knots_len < 2) {
 			/* NOP, set dummy values */
-			for (uint i = 0; i < knots_len; i++) {
+			for (uint i = 0; i < knots_len; ++i) {
 				struct Knot *k = &knots[i];
 				zero_vn(k->tan[0], dims);
 				zero_vn(k->tan[1], dims);
@@ -1286,7 +1286,7 @@ int curve_fit_cubic_to_points_refit_db(
 
 
 #if 0
-	for (uint i = 0; i < knots_len; i++) {
+	for (uint i = 0; i < knots_len; ++i) {
 		Knot *k = &knots[i];
 		printf("TAN %.8f %.8f %.8f %.8f\n", k->tan[0][0], k->tan[0][1], k->tan[1][0], k->tan[0][1]);
 	}
@@ -1312,7 +1312,7 @@ int curve_fit_cubic_to_points_refit_db(
 	if (use_corner) {
 
 #ifdef DEBUG
-		for (uint i = 0; i < knots_len; i++) {
+		for (uint i = 0; i < knots_len; ++i) {
 			assert(knots[i].heap_node == NULL);
 		}
 #endif
@@ -1347,10 +1347,10 @@ int curve_fit_cubic_to_points_refit_db(
 		if (is_cyclic == false) {
 			corner_index_array[c_index++] = k_index;
 			k_index++;
-			i++;
+			++i;
 		}
 
-		for (; i < knots_len; i++) {
+		for (; i < knots_len; ++i) {
 			if (knots[i].is_removed == false) {
 				if (knots[i].is_corner == true) {
 					corner_index_array[c_index++] = k_index;
@@ -1382,7 +1382,7 @@ int curve_fit_cubic_to_points_refit_db(
 	struct Knot *knots_first = NULL;
 	{
 		struct Knot *k;
-		for (uint i = 0; i < knots_len; i++) {
+		for (uint i = 0; i < knots_len; ++i) {
 			if (knots[i].is_removed == false) {
 				knots_first = &knots[i];
 				break;
@@ -1391,7 +1391,7 @@ int curve_fit_cubic_to_points_refit_db(
 
 		if (cubic_orig_index) {
 			k = knots_first;
-			for (uint i = 0; i < knots_len_remaining; i++, k = k->next) {
+			for (uint i = 0; i < knots_len_remaining; ++i, k = k->next) {
 				cubic_orig_index[i] = k->index;
 			}
 		}
@@ -1413,7 +1413,7 @@ int curve_fit_cubic_to_points_refit_db(
 	{
 		double *c_step = cubic_array;
 		struct Knot *k = knots_first;
-		for (uint i = 0; i < knots_len_remaining; i++, k = k->next) {
+		for (uint i = 0; i < knots_len_remaining; ++i, k = k->next) {
 			const double *p = &points[k->index * dims];
 
 			madd_vn_vnvn_fl(c_step, p, k->tan[0], k->handles[0], dims);
@@ -1479,7 +1479,7 @@ int curve_fit_cubic_to_points_refit_fl(
 	if (!result) {
 		uint cubic_array_flat_len = cubic_array_len * 3 * dims;
 		cubic_array_fl = malloc(sizeof(float) * cubic_array_flat_len);
-		for (uint i = 0; i < cubic_array_flat_len; i++) {
+		for (uint i = 0; i < cubic_array_flat_len; ++i) {
 			cubic_array_fl[i] = (float)cubic_array_db[i];
 		}
 		free(cubic_array_db);

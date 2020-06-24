@@ -40,7 +40,7 @@ public:
 	StringParameterUI * createStringParameterUI(StringParameter * target = nullptr);
 	StringParameterUI * createStringParameterFileUI(StringParameter * target = nullptr);
 	StringParameterTextUI * createStringParameterTextUI(StringParameter * target = nullptr);
-    ControllableUI* createDefaultUI(Controllable * targetControllable = nullptr) override;
+    ControllableUI* createDefaultUI() override;
 
 	static StringParameter * create() { return new StringParameter("New StringParameter", "",""); }
 	virtual String getTypeString() const override { return getTypeStringStatic(); }

@@ -420,7 +420,7 @@ bool Engine::versionIsNewerThan(String versionToCheck, String referenceVersion)
 	while (fileVersionSplit.size() < maxVersionNumbers) fileVersionSplit.add("0");
 	while (minVersionSplit.size() < maxVersionNumbers) minVersionSplit.add("0");
 
-	for (int i = 0; i < maxVersionNumbers; i++)
+	for (int i = 0; i < maxVersionNumbers; ++i)
 	{
 		int fV = fileVersionSplit[i].getIntValue();
 		int minV = minVersionSplit[i].getIntValue();
@@ -437,21 +437,21 @@ int Engine::getBetaVersion(String version)
 {
 	if (!version.containsChar('b')) return 0;
 	int indexOfB = version.indexOfChar('b');
-	String vString = version.substring(indexOfB+1);
+	String vString = version.substring(indexOfB + 1);
 	return vString.getIntValue();
 }
 
 bool Engine::versionNeedsOnlineUpdate(String version)
 {
 	int curVersionRange = 0;
-	for (int i = 0; i < breakingChangesVersions.size(); i++)
+	for (int i = 0; i < breakingChangesVersions.size(); ++i)
 	{
 		if (versionIsNewerThan(breakingChangesVersions[i], getAppVersion())) break;
 		curVersionRange++;
 	}
 
 	int targetVersionRange = 0;
-	for (int i = 0; i < breakingChangesVersions.size(); i++)
+	for (int i = 0; i < breakingChangesVersions.size(); ++i)
 	{
 		if (versionIsNewerThan(breakingChangesVersions[i], version)) break;
 		targetVersionRange++;

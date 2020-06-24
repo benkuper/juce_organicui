@@ -50,7 +50,7 @@ void EnumParameter::clearOptions()
 void EnumParameter::updateArgDescription()
 {
 	argumentsDescription = "";
-	for (int i = 0; i < enumValues.size(); i++)
+	for (int i = 0; i < enumValues.size(); ++i)
 	{
 		argumentsDescription += enumValues[i]->key;
 		if(i < enumValues.size()-1) argumentsDescription += " | ";
@@ -75,7 +75,7 @@ String EnumParameter::getValueKey() {
 int EnumParameter::getIndexForKey(StringRef key)
 {
 	int numValues = enumValues.size();
-	for (int i = 0; i < numValues; i++) if (enumValues[i]->key == key) return i;
+	for (int i = 0; i < numValues; ++i) if (enumValues[i]->key == key) return i;
 	return -1;
 }
 
@@ -171,6 +171,6 @@ EnumParameterUI * EnumParameter::createUI(EnumParameter * target)
 	return new EnumParameterUI(target);
 }
 
-ControllableUI * EnumParameter::createDefaultUI(Controllable * targetControllable) {
-	return createUI(dynamic_cast<EnumParameter *>(targetControllable));
+ControllableUI * EnumParameter::createDefaultUI() {
+	return createUI(this);
 }

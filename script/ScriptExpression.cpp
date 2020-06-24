@@ -165,7 +165,7 @@ Array<Parameter*> ScriptExpression::getParameterReferencesInExpression()
 	String remainingText = expression;
 	Array<StringArray> matches = RegexFunctions::findSubstringsThatMatchWildcard("(?:root|local)\\.([0-9a-zA-Z\\.]+)\\.get\\(\\)", expression); 
 	
-	for (int i = 0; i < matches.size(); i++)
+	for (int i = 0; i < matches.size(); ++i)
 	{
 		
 		String scriptToAddress = "/"+matches[i][1].replaceCharacter('.', '/');

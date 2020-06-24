@@ -130,7 +130,7 @@ public:
 
 			int subMenuIndex = -1;
 
-			for (int i = 0; i < subMenus.size(); i++)
+			for (int i = 0; i < subMenus.size(); ++i)
 			{
 				if (subMenuNames[i] == d->menuPath)
 				{
@@ -148,7 +148,7 @@ public:
 			subMenus[subMenuIndex]->addItem(itemID, d->type);
 		}
 
-		for (int i = 0; i < subMenus.size(); i++) menu.addSubMenu(subMenuNames[i], *subMenus[i]);
+		for (int i = 0; i < subMenus.size(); ++i) menu.addSubMenu(subMenuNames[i], *subMenus[i]);
 	}
 
 	virtual T* showCreateMenu()

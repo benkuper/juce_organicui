@@ -151,18 +151,18 @@ MemoryBlock SHA1::finalize()
 	uint32 i;
 	uint8 finalcount[8];
     
-	for(i = 0; i < 8; i++)
+	for(i = 0; i < 8; ++i)
 		finalcount[i] = (uint8)((m_count[((i >= 4) ? 0 : 1)]
-                                  >> ((3 - (i & 3)) * 8) ) & 255); // Endian independent
-    
-	update ((uint8 *)"\200", 1);
-    
+			>> ((3 - (i & 3)) * 8)) & 255); // Endian independent
+
+	update((uint8*)"\200", 1);
+
 	while ((m_count[0] & 504) != 448)
-		update ((uint8 *)"\0", 1);
-    
+		update((uint8*)"\0", 1);
+
 	update(finalcount, 8); // Cause a SHA1Transform()
-    
-	for(i = 0; i < 20; i++)
+
+	for (i = 0; i < 20; ++i)
 	{
 		m_digest[i] = (uint8)((m_state[i >> 2] >> ((3 - (i & 3)) * 8) ) & 255);
 	}

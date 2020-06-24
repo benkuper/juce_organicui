@@ -303,7 +303,7 @@ void AppUpdater::finished(URL::DownloadTask* task, bool success)
 			appFile.moveFileTo(td.getNonexistentChildFile("oldApp", appFile.getFileExtension()));
 
 			DBG("Move to " << appDir.getFullPathName());
-			for (int i = 0; i < zip.getNumEntries(); i++)
+			for (int i = 0; i < zip.getNumEntries(); ++i)
 			{
 				File zf = td.getChildFile(zip.getEntry(i)->filename);
 				DBG("File exists : " << (int)f.exists());

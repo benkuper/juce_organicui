@@ -28,7 +28,6 @@ public:
     void resized() override;
 
     void updateUIParamsInternal() override;
-    
     void timerCallback() override;
     
 protected:
@@ -37,8 +36,4 @@ protected:
 
     // Inherited via Listener
     virtual void sliderValueChanged(Slider * slider) override;
-
-	virtual void controlModeChanged(Parameter *) override;
-
-	virtual void controllableStateChanged() override;
 };
