@@ -37,7 +37,6 @@ public:
 	var customData;
 	bool saveCustomData;
 	
-	//
 	bool enabled;
 	bool canBeDisabledByUser;
 	bool descriptionIsEditable;

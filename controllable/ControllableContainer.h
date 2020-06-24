@@ -60,8 +60,6 @@ public:
 
 	static ControllableComparator comparator;
 
-	Uuid uid;
-
 	OwnedArray<Controllable, CriticalSection> controllables;
 	Array<WeakReference<ControllableContainer>, CriticalSection> controllableContainers;
 	OwnedArray<ControllableContainer, CriticalSection> ownedContainers;
