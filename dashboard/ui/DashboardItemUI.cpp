@@ -1,4 +1,3 @@
-#include "DashboardItemUI.h"
 
 DashboardItemUI::DashboardItemUI(DashboardItem* item) :
 	BaseItemMinimalUI(item),
