@@ -757,6 +757,11 @@ void BaseManagerUI<M, T, U>::newMessage(const typename BaseManager<T>::ManagerEv
 	{
 
 	case BaseManager<T>::ManagerEvent::ITEM_ADDED:
+		if (e.getItem() == nullptr)
+		{
+			LOGWARNING("Item added but null");
+			return;
+		}
 		itemAddedAsync(e.getItem());
 		break;
 
