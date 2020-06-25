@@ -23,8 +23,7 @@ public:
 
 	float unitSteps;
 
-	virtual var getLerpValueTo(var targetValue, float weight) override;
-	virtual void setWeightedValue(Array<var> values, Array<float> weights) override;
+	
 
 	enum UIType {NONE, SLIDER, STEPPER, LABEL, TIME };
 	UIType defaultUI;
@@ -39,10 +38,13 @@ public:
 
 	bool checkValueIsTheSame(var oldValue, var newValue) override;
 
-
 	void setValueInternal(var &value) override;
 
 	virtual bool hasRange() override;
+
+	virtual var getLerpValueTo(var targetValue, float weight) override;
+	virtual void setWeightedValue(Array<var> values, Array<float> weights) override;
+	virtual float getStepSnappedValueFor(float originalValue);
 
 	void setControlAutomation() override;
 

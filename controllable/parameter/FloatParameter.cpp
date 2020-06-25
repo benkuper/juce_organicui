@@ -1,3 +1,4 @@
+#include "FloatParameter.h"
 /*
   ==============================================================================
 
@@ -19,24 +20,6 @@ FloatParameter::FloatParameter(const String & niceName, const String &descriptio
 	argumentsDescription = "float";
 }
 
-var FloatParameter::getLerpValueTo(var targetValue, float weight)
-{
-	return jmap(weight,floatValue(), (float)targetValue);
-}
-
-void FloatParameter::setWeightedValue(Array<var> values, Array<float> weights)
-{
-	jassert(values.size() == weights.size());
-
-	float tValue = 0;
-
-	for (int i = 0; i < values.size(); ++i)
-	{
-		tValue += (float)values[i] * weights[i];
-	}
-
-	setValue(tValue);
-}
 
 FloatSliderUI * FloatParameter::createSlider(FloatParameter * target)
 {
@@ -98,13 +81,38 @@ bool FloatParameter::checkValueIsTheSame(var oldValue, var newValue)
 
 void FloatParameter::setValueInternal(var& val)
 {
-	if (unitSteps > 0) value = round((float)val * unitSteps) / unitSteps;
+	if (unitSteps > 0) value = getStepSnappedValueFor(val);
 	else Parameter::setValueInternal(val);
 }
 
 bool FloatParameter::hasRange()
 {
 	return (float)minimumValue != INT32_MIN && (float)maximumValue != INT32_MAX;
+}
+
+
+var FloatParameter::getLerpValueTo(var targetValue, float weight)
+{
+	return jmap(weight, floatValue(), (float)targetValue);
+}
+
+void FloatParameter::setWeightedValue(Array<var> values, Array<float> weights)
+{
+	jassert(values.size() == weights.size());
+
+	float tValue = 0;
+
+	for (int i = 0; i < values.size(); ++i)
+	{
+		tValue += (float)values[i] * weights[i];
+	}
+
+	setValue(tValue);
+}
+
+float FloatParameter::getStepSnappedValueFor(float originalValue)
+{
+	return round(originalValue * unitSteps) / unitSteps;
 }
 
 void FloatParameter::setControlAutomation()
