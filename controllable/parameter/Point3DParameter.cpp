@@ -151,7 +151,11 @@ ControllableUI* Point3DParameter::createDefaultUI()
 
 var Point3DParameter::getCroppedValue(var originalValue)
 {
-	jassert(originalValue.isArray() && minimumValue.isArray() && maximumValue.isArray());
+	if (originalValue.size() < 3 || minimumValue.size() < 3 || maximumValue.size() < 3)
+	{
+		LOGWARNING("Value is of the wrong format ! ");
+		return originalValue;
+	}
 
 	var val;
 	for (int i = 0; i < 3; ++i) val.append(jlimit(minimumValue[i], maximumValue[i], originalValue[i]));
