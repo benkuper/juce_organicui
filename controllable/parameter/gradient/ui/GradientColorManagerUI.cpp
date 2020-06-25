@@ -1,3 +1,4 @@
+#include "GradientColorManagerUI.h"
 /*
   ==============================================================================
 
@@ -9,12 +10,13 @@
 */
 
 
-GradientColorManagerUI::GradientColorManagerUI(GradientColorManager * manager) :
-	BaseManagerUI(manager->niceName,manager,false),
-	Thread("Colors "+String(manager->niceName)),
+GradientColorManagerUI::GradientColorManagerUI(GradientColorManager* manager) :
+	BaseManagerUI(manager->niceName, manager, false),
+	Thread("Colors " + String(manager->niceName)),
 	shouldRepaint(true),
 	shouldUpdateImage(true),
-    autoResetViewRangeOnLengthUpdate(false)
+	autoResetViewRangeOnLengthUpdate(false),
+	miniMode(false)
 {
 	setShowAddButton(false);
 	animateItemOnAdd = false;
@@ -49,16 +51,26 @@ void GradientColorManagerUI::setViewRange(float start, float end)
 	resized();
 }
 
+void GradientColorManagerUI::setMiniMode(bool value)
+{
+	if (miniMode == value) return;
+	miniMode = value;
+
+}
+
 void GradientColorManagerUI::paint(Graphics & g)
 {
 	BaseManagerUI::paint(g);
 
 	Rectangle<int> r = getLocalBounds();
-	g.setColour(manager->currentColor->getColor());
-	g.fillRect(r.removeFromBottom(16).reduced(2, 7));
+	
+	if (!miniMode)
+	{
+		g.setColour(manager->currentColor->getColor());
+		g.fillRect(r.removeFromBottom(16).reduced(2, 7));
+	}
 
 	g.fillCheckerBoard(r.toFloat(), 12, 12, Colours::white, Colours::white.darker(.2f));
-
 	imageLock.enter();
 	g.setColour(Colours::white);
 	g.drawImage(viewImage, r.toFloat());
@@ -89,13 +101,16 @@ void GradientColorManagerUI::resized()
 
 	shouldUpdateImage = true;
 
-	
 	for (auto &tui : itemsUI)
 	{
-		tui->setVisible(isInView(tui));
+		tui->setVisible(!miniMode && isInView(tui));
 		if(tui->isVisible()) placeItemUI(tui);
 	}
+}
 
+void GradientColorManagerUI::updateItemsVisibility()
+{
+	BaseManagerUI::updateItemsVisibility();
 }
 
 void GradientColorManagerUI::addItemUIInternal(GradientColorUI * item)
@@ -111,18 +126,19 @@ void GradientColorManagerUI::removeItemUIInternal(GradientColorUI * item)
 
 void GradientColorManagerUI::mouseDoubleClick(const MouseEvent & e)
 {
-	if (e.originalComponent == this)
+	if (e.originalComponent == this && !miniMode)
 	{
 		float pos = getPosForX(e.getMouseDownX());
 		manager->addColorAt(pos, manager->getColorForPosition(pos));
 	}
-	
 }
 
 
 
 void GradientColorManagerUI::mouseDrag(const MouseEvent & e)
 {
+	if (miniMode) return;
+
 	if (e.originalComponent == this)
 	{
 

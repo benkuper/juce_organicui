@@ -31,11 +31,17 @@ public:
 	Image viewImage;
 	SpinLock imageLock;
 
+	bool miniMode;
+
 	void setViewRange(float start, float end);
+
+	void setMiniMode(bool value);
 
 	void paint(Graphics &g) override;
 
 	void resized() override;
+
+	void updateItemsVisibility() override;
 
     void addItemUIInternal(GradientColorUI * item) override;
     void removeItemUIInternal(GradientColorUI * item) override;
