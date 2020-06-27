@@ -60,7 +60,6 @@ public:
 
 	ControllableContainer editingCC;
 	BoolParameter * askBeforeRemovingItems;
-	EnumParameter* defaultEasing;
 
 	KeyMappingsContainer keyMappingsCC;
 

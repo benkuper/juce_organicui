@@ -1,4 +1,3 @@
-#include "Curve2DUI.h"
 /*
   ==============================================================================
 
@@ -20,6 +19,7 @@ Curve2DUI::Curve2DUI(Curve2D* manager) :
     minZoom = .1f;
     maxZoom = 10;
 
+    updatePositionOnDragMove = true;
     animateItemOnAdd = false;
     manager->addAsyncContainerListener(this);
     if (manager->recorder != nullptr) manager->recorder->addAsyncCoalescedRecorderListener(this);
@@ -95,9 +95,15 @@ void Curve2DUI::paintOverChildren(Graphics& g)
 
 void Curve2DUI::updateViewUIPosition(Curve2DKeyUI* ui)
 {
-    Point<int> p = getPosInView(ui->item->position->getPoint());
+    Point<int> p = getPosInView(ui->item->viewUIPosition->getPoint());
     Rectangle<int> pr = Rectangle<int>(0, 0, 20, 20).withCentre(p);
-    if (ui->item->easing != nullptr) pr = pr.getUnion(getBoundsInView(ui->item->easing->getBounds(true)));
+    if (ui->item->easing != nullptr) pr = pr.getUnion(getBoundsInView(ui->item->easing->getBounds(true)).expanded(5,5));
+    if (ui->item->nextKey != nullptr && (pr.getWidth() == 20 && pr.getHeight() == 20))
+    {
+        Rectangle<float> t = ui->item->easing->getBounds(true);
+        Rectangle<int> vt = getBoundsInView(ui->item->easing->getBounds(true));
+        DBG("Weird");
+    }
     pr.expand(5, 5);
     ui->setBounds(pr);
     ui->setValueBounds(getViewBounds(pr));
@@ -168,7 +174,21 @@ void Curve2DUI::mouseDrag(const MouseEvent& e)
 {
     if (Curve2DKeyHandle* handle = dynamic_cast<Curve2DKeyHandle*>(e.eventComponent))
     {
-        handle->key->position->setPoint(getViewMousePosition());
+       /* Curve2DKey * k = handle->key;
+        int index = manager->items.indexOf(k);
+
+        Point<float> offset = getViewOffset(e.getEventRelativeTo(this).getOffsetFromDragStart());
+        offset.setY(-offset.y);
+
+
+        if (k->nextKey != nullptr) offset.setX(jmin(offset.x, k->nextKey->viewUIPosition->floatValue() - k->movePositionReference.x));
+        if (index > 0) offset.setX(jmax(offset.x, manager->items[index - 1]->viewUIPosition->floatValue() - k->movePositionReference.x));
+
+
+        if (e.mods.isShiftDown()) offset.setY(0);
+        if (e.mods.isAltDown()) k->scalePosition(offset, true);
+        else k->movePosition(offset, true);*/
+        BaseManagerViewUI::mouseDrag(e);
     }
     else if (e.eventComponent == this)
     {
@@ -206,14 +226,14 @@ void Curve2DUI::mouseDoubleClick(const MouseEvent& e)
     {
         Point<float> p = getViewMousePosition();
         Curve2DKey* k = manager->createItem();
-        k->position->setPoint(p);
+        k->viewUIPosition->setPoint(p);
         manager->addItem(k);
     }
     else if (Easing2DUI* eui = dynamic_cast<Easing2DUI*>(e.eventComponent))
     {
         Point<float> p = eui->easing->getClosestPointForPos(getViewMousePosition());
         Curve2DKey* k = manager->createItem();
-        k->position->setPoint(p);
+        k->viewUIPosition->setPoint(p);
         var params(new DynamicObject());
         Curve2DKeyUI* kui = dynamic_cast<Curve2DKeyUI*>(eui->getParentComponent());
         params.getDynamicObject()->setProperty("index", itemsUI.indexOf(kui)+1);

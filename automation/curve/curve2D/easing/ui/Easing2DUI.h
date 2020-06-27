@@ -66,6 +66,7 @@ class LinearEasing2DUI :
 {
 public:
 	LinearEasing2DUI(LinearEasing2D* e);
+	virtual ~LinearEasing2DUI() {}
 	void generatePathInternal() override;
 
 	// Inherited via Easing2DUI
@@ -77,7 +78,7 @@ class CubicEasing2DUI :
 {
 public:
 	CubicEasing2DUI(CubicEasing2D* e);
-
+	virtual ~CubicEasing2DUI() {}
 	CubicEasing2D* ce;
 	Easing2DHandle h1;
 	Easing2DHandle h2;

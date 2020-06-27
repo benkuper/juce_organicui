@@ -79,6 +79,7 @@ public:
 	Point<int> getSize();
 	Point<float> getViewMousePosition();
 	Point<float> getViewPos(const Point<int>& originalPos);
+	Point<float> getViewOffset(const Point<int>& offsetInView);
 	juce::Rectangle<float> getViewBounds(const juce::Rectangle<int> &originalBounds);
 	Point<int> getViewCenter();
 	Point<int> getPosInView(const Point<float> &viewPos);
@@ -398,6 +399,12 @@ template<class M, class T, class U>
 Point<float> BaseManagerViewUI<M, T, U>::getViewPos(const Point<int>& originalPos)
 {
 	return (originalPos - getViewCenter()).toFloat() / (viewZoom * (useCheckersAsUnits?checkerSize:1));
+}
+
+template<class M, class T, class U>
+inline Point<float> BaseManagerViewUI<M, T, U>::getViewOffset(const Point<int>& offsetInView)
+{
+	return offsetInView.toFloat() / (viewZoom * (useCheckersAsUnits ? checkerSize : 1));
 }
 
 template<class M, class T, class U>

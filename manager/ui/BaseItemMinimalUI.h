@@ -39,7 +39,7 @@ public:
 
 	//Dragging
 	bool dragAndDropEnabled; //tmp, waiting to implement full drag&drop system
-	const int dragStartDistance = 10;
+	int dragStartDistance = 10;
 	bool autoHideWhenDragging;
 	bool drawEmptyDragIcon;
 
@@ -48,9 +48,7 @@ public:
 	bool isDraggingOver;
 	bool highlightOnDragOver;
 
-	virtual void mouseDrag(const MouseEvent& e) override;
-	virtual void mouseExit(const MouseEvent& e) override;
-
+	
 	void setHighlightOnMouseOver(bool highlight);
 	void paint(Graphics& g) override;
 	void setViewZoom(float value);
@@ -60,6 +58,8 @@ public:
 	void setViewSize(Point<float> size);
 
 	virtual void mouseDown(const MouseEvent& e) override;
+	virtual void mouseDrag(const MouseEvent& e) override;
+	virtual void mouseExit(const MouseEvent& e) override;
 
 	virtual void addContextMenuItems(PopupMenu& p) {}
 	virtual void handleContextMenuResult(int result) {}
@@ -81,7 +81,7 @@ public:
 	virtual void itemDragEnter(const SourceDetails& ) override;
 	virtual void itemDragExit(const SourceDetails& ) override;
 	virtual void itemDropped(const SourceDetails & dragSourceDetails) override; //to be overriden
-
+	virtual Point<int> getDragOffset();
 
 	class ItemMinimalUIListener
 	{
@@ -131,43 +131,6 @@ BaseItemMinimalUI<T>::~BaseItemMinimalUI()
 	baseItem->removeAsyncContainerListener(this);
 }
 
-template<class T>
-void BaseItemMinimalUI<T>::mouseDrag(const MouseEvent & e)
-{
-	InspectableContentComponent::mouseDrag(e);
-
-	if (e.mods.isLeftButtonDown())
-	{
-		if (!dragAndDropEnabled || isDragAndDropActive() || !canStartDrag(e)) return;
-
-
-		if (e.getDistanceFromDragStart() > dragStartDistance)
-		{
-			var desc = var(new DynamicObject());
-			desc.getDynamicObject()->setProperty("type", baseItem->getTypeString());
-			desc.getDynamicObject()->setProperty("dataType", baseItem->itemDataType);
-			desc.getDynamicObject()->setProperty("initX", baseItem->viewUIPosition->x);
-			desc.getDynamicObject()->setProperty("initY", baseItem->viewUIPosition->y);
-			desc.getDynamicObject()->setProperty("offsetX", (int)(getMouseXYRelative().x * viewZoom));
-			desc.getDynamicObject()->setProperty("offsetY", (int)(getMouseXYRelative().y * viewZoom));
-
-			Image dragImage = drawEmptyDragIcon ? Image(Image::PixelFormat::ARGB,1,1,true):this->createComponentSnapshot(this->getLocalBounds()).convertedToFormat(Image::ARGB).rescaled(this->getWidth() * this->viewZoom, this->getHeight() * this->viewZoom);
-			//dragImage.multiplyAllAlphas(drawEmptyDragIcon ? 0 : .5f);
-
-			Point<int> offset = -getMouseXYRelative() * viewZoom;
-			startDragging(desc, this, dragImage, true, &offset);
-		}
-	}
-}
-	
-
-
-template<class T>
-void BaseItemMinimalUI<T>::mouseExit(const MouseEvent &e)
-{
-	InspectableContentComponent::mouseExit(e);
-	repaint();
-}
 
 template<class T>
 void BaseItemMinimalUI<T>::setHighlightOnMouseOver(bool highlight)
@@ -242,6 +205,47 @@ void BaseItemMinimalUI<T>::mouseDown(const MouseEvent& e)
 	{
 		baseItem->setMovePositionReference(true);
 	}
+}
+
+
+template<class T>
+void BaseItemMinimalUI<T>::mouseDrag(const MouseEvent& e)
+{
+	InspectableContentComponent::mouseDrag(e);
+
+	if (e.mods.isLeftButtonDown())
+	{
+		if (!dragAndDropEnabled || isDragAndDropActive() || !canStartDrag(e)) return;
+
+
+		if (e.getDistanceFromDragStart() > dragStartDistance)
+		{
+			Point<int> offset = getDragOffset();
+			
+			var desc = var(new DynamicObject());
+			desc.getDynamicObject()->setProperty("type", baseItem->getTypeString());
+			desc.getDynamicObject()->setProperty("dataType", baseItem->itemDataType);
+			desc.getDynamicObject()->setProperty("initX", baseItem->viewUIPosition->x);
+			desc.getDynamicObject()->setProperty("initY", baseItem->viewUIPosition->y);
+			desc.getDynamicObject()->setProperty("offsetX", offset.x);
+			desc.getDynamicObject()->setProperty("offsetY", offset.y);
+
+			Image dragImage = drawEmptyDragIcon ? Image(Image::PixelFormat::ARGB, 1, 1, true) : this->createComponentSnapshot(this->getLocalBounds()).convertedToFormat(Image::ARGB).rescaled(this->getWidth() * this->viewZoom, this->getHeight() * this->viewZoom);
+			//dragImage.multiplyAllAlphas(drawEmptyDragIcon ? 0 : .5f);
+
+			Point<int> imageOffset = -offset;
+			startDragging(desc, this, dragImage, true, &imageOffset);
+		}
+	}
+}
+
+
+
+template<class T>
+void BaseItemMinimalUI<T>::mouseExit(const MouseEvent& e)
+{
+	InspectableContentComponent::mouseExit(e);
+	repaint();
 }
 
 template<class T>
@@ -337,4 +341,10 @@ void BaseItemMinimalUI<T>::itemDropped(const SourceDetails & dragSourceDetails)
 {
 	isDraggingOver = false;
 	if(highlightOnDragOver) repaint();
+}
+
+template<class T>
+Point<int> BaseItemMinimalUI<T>::getDragOffset()
+{
+	return getMouseXYRelative() * viewZoom;
 }

@@ -27,9 +27,9 @@ AutomationKey::AutomationKey(const float & _position, const float & _value) :
     value->setValue(_value);
 
     easingType = addEnumParameter("Easing Type", "The type of interpolation to use");
-    easingType->addOption("Linear", Easing::LINEAR, false)->addOption("Bezier", Easing::BEZIER)->addOption("Hold", Easing::HOLD)->addOption("Sine", Easing::SINE);
+    easingType->addOption("Linear", Easing::LINEAR,false)->addOption("Bezier", Easing::BEZIER)->addOption("Hold", Easing::HOLD)->addOption("Sine", Easing::SINE);
 
-    easingType->setValueWithData(GlobalSettings::getInstance()->defaultEasing->getValueDataAsEnum<Easing::Type>());
+    easingType->setValueWithData(Easing::BEZIER);
 
 }
 

@@ -118,8 +118,8 @@ float Curve2D::addFromPointsAndSimplify(Array<Point<float>> sourcePoints, bool c
             break;
         }
 
-        Curve2DKey* k = new Curve2DKey();
-        k->position->setPoint(rp);
+        Curve2DKey* k = createItem();
+        k->viewUIPosition->setPoint(rp);
 
         k->easingType->setValueWithData(Easing2D::BEZIER);
         CubicEasing2D* ce = (CubicEasing2D*)k->easing.get();
@@ -232,8 +232,8 @@ Point<float> Curve2D::getValueAtNormalizedPosition(float pos)
 Point<float> Curve2D::getValueAtPosition(float pos)
 {
     if (items.size() == 0) return Point<float>();
-    if (items.size() == 1) return items[0]->position->getPoint();
-    if (pos == length->floatValue())  return items[items.size() - 1]->position->getPoint();
+    if (items.size() == 1) return items[0]->viewUIPosition->getPoint();
+    if (pos == length->floatValue())  return items[items.size() - 1]->viewUIPosition->getPoint();
 
     Curve2DKey* k = getKeyForPosition(pos);
     if (k == nullptr || k->easing == nullptr) return Point<float>();

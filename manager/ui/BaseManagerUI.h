@@ -755,7 +755,6 @@ void BaseManagerUI<M, T, U>::newMessage(const typename BaseManager<T>::ManagerEv
 {
 	switch (e.type)
 	{
-
 	case BaseManager<T>::ManagerEvent::ITEM_ADDED:
 		if (e.getItem() == nullptr)
 		{

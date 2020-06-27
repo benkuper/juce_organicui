@@ -46,6 +46,9 @@ public:
 
     void mouseDown(const MouseEvent& e) override;
     void mouseDoubleClick(const MouseEvent& e) override;
+    
+    bool canStartDrag(const MouseEvent& e) override;
+    Point<int> getDragOffset() override;
 
     bool hitTest(int x, int y) override;
 

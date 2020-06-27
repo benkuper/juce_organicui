@@ -11,9 +11,7 @@
 #include "ui/Easing2DUI.h"
 #include "Easing2D.h"
 
-const String Easing2D::typeNames[Easing2D::TYPE_MAX] = { "Linear", "Bezier" };
-
-Easing2D::Easing2D(Type type) :
+Easing2D::Easing2D(int type) :
 	ControllableContainer("Easing"),
 	type(type),
 	length(0)

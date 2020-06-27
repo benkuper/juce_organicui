@@ -18,13 +18,12 @@ class Easing2D :
 	public ControllableContainer
 {
 public:
-	enum Type { LINEAR, BEZIER, TYPE_MAX };
-	static const String typeNames[TYPE_MAX];
+	enum Type { LINEAR, BEZIER };
 
-	Easing2D(Type type);
+	Easing2D(int type);
 	virtual ~Easing2D();
 
-	Type type;
+	int type; //must be int to be able to extend
 	Point<float> start;
 	Point<float> end;
 	float length;
@@ -49,7 +48,7 @@ class LinearEasing2D :
 {
 public:
 	LinearEasing2D();
-
+	virtual ~LinearEasing2D() {}
 	Point<float> getValue(const float& weight) override;
 	void updateLength() override;
 	Rectangle<float> getBounds(bool includeHandles) override;
@@ -64,7 +63,7 @@ class CubicEasing2D :
 {
 public:
 	CubicEasing2D();
-
+	virtual ~CubicEasing2D() {}
 	Point2DParameter* anchor1;
 	Point2DParameter* anchor2;
 

@@ -15,9 +15,10 @@ Curve2DKeyUI::Curve2DKeyUI(Curve2DKey* key) :
 {
 	bringToFrontOnSelect = false;
 
+	drawEmptyDragIcon = true;
+	autoHideWhenDragging = false;
 	autoDrawContourWhenSelected = false;
-	dragAndDropEnabled = false;
-
+	dragStartDistance = 5;
 	addAndMakeVisible(&handle);
 
 	updateEasingUI();
@@ -30,7 +31,7 @@ Curve2DKeyUI::~Curve2DKeyUI()
 
 void Curve2DKeyUI::resized()
 {
-	Point<int> hp = getUIPosForValuePos(item->position->getPoint());
+	Point<int> hp = getUIPosForValuePos(item->viewUIPosition->getPoint());
 	const int handleSize = 14;
 	handle.setBounds(Rectangle<int>(hp.x - handleSize / 2, hp.y - handleSize / 2, handleSize, handleSize));
 	if (easingUI != nullptr) easingUI->setBounds(getLocalBounds());
@@ -72,6 +73,8 @@ void Curve2DKeyUI::updateEasingUI()
 
 void Curve2DKeyUI::mouseDown(const MouseEvent& e)
 {
+	BaseItemMinimalUI::mouseDown(e);
+	
 	if (e.eventComponent == easingUI.get())
 	{
 		if (e.mods.isRightButtonDown())
@@ -98,13 +101,24 @@ void Curve2DKeyUI::mouseDown(const MouseEvent& e)
 			item->easing->selectThis(); //reselect after changing easing
 		}
 	}
+	
 }
 
 void Curve2DKeyUI::mouseDoubleClick(const MouseEvent& e)
 {
-	Component* editComponent = new ParameterUI::ValueEditCalloutComponent(item->position);
+	Component* editComponent = new ParameterUI::ValueEditCalloutComponent(item->viewUIPosition);
 	CallOutBox* box = &CallOutBox::launchAsynchronously(editComponent, localAreaToGlobal(getLocalBounds()), nullptr);
 	box->setArrowSize(8);
+}
+
+bool Curve2DKeyUI::canStartDrag(const MouseEvent& e)
+{
+	return e.eventComponent == this || e.eventComponent == &handle;
+}
+
+Point<int> Curve2DKeyUI::getDragOffset()
+{
+	return Point<int>(); //no offset, mouse position should be the position of the curve point
 }
 
 bool Curve2DKeyUI::hitTest(int x, int y)

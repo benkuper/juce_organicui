@@ -9,6 +9,7 @@
 */
 
 #pragma once
+#include <juce_audio_formats\codecs\flac\ordinals.h>
 
 class Curve2DKey :
     public BaseItem,
@@ -22,10 +23,11 @@ public:
     std::unique_ptr<Easing2D> easing;
     Curve2DKey* nextKey;
     bool isFirst;
-    Point2DParameter* position;
     float curvePosition; //position on the curve, calculated by the curve to distribute evenly the points
 
-    void setEasing(Easing2D::Type type);
+
+    void updateEasing(bool forceRecreate = false);
+    virtual Easing2D* createEasingForType(int type);
     void setNextKey(Curve2DKey* key);
 
     Point<float> getValueAt(const float &position);
