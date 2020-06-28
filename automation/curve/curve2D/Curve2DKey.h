@@ -9,7 +9,6 @@
 */
 
 #pragma once
-#include <juce_audio_formats\codecs\flac\ordinals.h>
 
 class Curve2DKey :
     public BaseItem,
