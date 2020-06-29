@@ -78,7 +78,7 @@ CustomLoggerUI::CustomLoggerUI(const String& contentName, CustomLogger * l) :
 {
 
 	logger->addLogListener(this);
-	TableHeaderComponent* thc = new TableHeaderComponent();
+	std::unique_ptr<TableHeaderComponent> thc(new TableHeaderComponent());
 	thc->addColumn(juce::translate("Time"), 1, 60);
 	thc->addColumn(juce::translate("Source"), 2, 80);
 	thc->addColumn(juce::translate("Content"), 3, 400);
@@ -91,7 +91,7 @@ CustomLoggerUI::CustomLoggerUI(const String& contentName, CustomLogger * l) :
 	logListComponent->getViewport()->setScrollBarThickness(10);
 
 	logListComponent->setColour(TableListBox::backgroundColourId, findColour(ResizableWindow::backgroundColourId));
-	logListComponent->setHeader(thc);
+	logListComponent->setHeader(std::move(thc));
 	addAndMakeVisible(logListComponent.get());
 
 	LOG(l->getWelcomeMessage());
