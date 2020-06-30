@@ -1,4 +1,3 @@
-#include "DashboardControllableItemUI.h"
 
 DashboardControllableItemUI::DashboardControllableItemUI(DashboardControllableItem* controllableItem) :
 	DashboardInspectableItemUI(controllableItem),
@@ -38,8 +37,11 @@ void DashboardControllableItemUI::rebuildUI()
 	{
 		itemUI.reset(createControllableUI());
 		addAndMakeVisible(itemUI.get());
-		updateUIParameters();
 		if (getWidth() == 0 || getHeight() == 0) setSize(itemUI->getWidth(), itemUI->getHeight());
+	}
+	else
+	{
+		itemUI.reset();
 	}
 
 	updateUIParameters();
