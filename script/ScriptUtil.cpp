@@ -146,15 +146,12 @@ var ScriptUtil::encodeHMAC_SHA1(const var::NativeFunctionArgs& a)
 
 	MemoryBlock b = HMAC_SHA1::encode(a.arguments[0].toString(), a.arguments[1].toString());
 
-	DBG("Encoding...\n" + a.arguments[0].toString() + "\n" + a.arguments[1].toString());
-
 	uint8_t* data = (uint8_t*)b.getData();
 	String dbgHex = "";
 	for (int i = 0; i < b.getSize(); ++i)
 	{
 		dbgHex += String::toHexString(data[i]) + " ";
 	}
-	DBG("DBG HEX : " << dbgHex);
 	return Base64::toBase64(b.getData(), b.getSize());
 }
 
