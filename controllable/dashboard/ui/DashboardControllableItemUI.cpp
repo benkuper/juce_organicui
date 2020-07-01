@@ -33,11 +33,14 @@ void DashboardControllableItemUI::rebuildUI()
 		removeChildComponent(itemUI.get());
 	}
 
-	if (!inspectable.wasObjectDeleted() && controllableItem->controllable != nullptr)
+	if (!inspectable.wasObjectDeleted() && controllableItem->inspectable != nullptr && !controllableItem->inspectable.wasObjectDeleted())
 	{
 		itemUI.reset(createControllableUI());
-		addAndMakeVisible(itemUI.get());
-		if (getWidth() == 0 || getHeight() == 0) setSize(itemUI->getWidth(), itemUI->getHeight());
+		if (itemUI != nullptr)
+		{
+			addAndMakeVisible(itemUI.get());
+			if (getWidth() == 0 || getHeight() == 0) setSize(itemUI->getWidth(), itemUI->getHeight());
+		}
 	}
 	else
 	{
