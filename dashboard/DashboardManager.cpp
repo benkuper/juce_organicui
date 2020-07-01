@@ -40,7 +40,11 @@ DashboardManager::DashboardManager() :
 DashboardManager::~DashboardManager()
 {
 #if ORGANICUI_USE_WEBSERVER
-	server.reset();
+	if (server != nullptr)
+	{
+		server->stop();
+		server.reset();
+	}
 #endif
 
 #if ORGANICUI_USE_SERVUS
@@ -52,7 +56,6 @@ DashboardManager::~DashboardManager()
 }
 
 #if ORGANICUI_USE_WEBSERVER
-
 void DashboardManager::setupServer()
 {
 	server.reset();
