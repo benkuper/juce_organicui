@@ -360,7 +360,7 @@ T * BaseManager<T>::addItem(T * item, var data, bool addToUndo, bool notify)
 
 	}
 
-	if (selectItemWhenCreated) bi->selectThis();
+	if (selectItemWhenCreated && !isCurrentlyLoadingData && !isManipulatingMultipleItems) bi->selectThis();
 
 	return item;
 }
