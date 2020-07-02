@@ -895,7 +895,8 @@ void BaseManagerUI<M, T, U>::buttonClicked(Button  * b)
 template<class M, class T, class U>
 void BaseManagerUI<M, T, U>::inspectableDestroyed(Inspectable *)
 {
-	if (manager != nullptr) static_cast<BaseManager<T>*>(manager)->removeBaseManagerListener(this);
+	if (manager != nullptr && !manager->isClearing) 
+		static_cast<BaseManager<T>*>(manager)->removeBaseManagerListener(this);
 }
 
 template<class M, class T, class U>

@@ -20,6 +20,7 @@ public:
 	virtual ~BaseManager<T>();
 
 	OwnedArray<T, CriticalSection> items;
+	bool isClearing;
 
 	//Factory
 	Factory<T> * managerFactory;
@@ -247,6 +248,7 @@ BaseManager<T>::BaseManager(const String & name) :
 	autoReorderOnAdd(true),
 	isManipulatingMultipleItems(false),
 	managerNotifier(50),
+	isClearing(false),
     comparator(this)
 {
 
@@ -638,6 +640,7 @@ T* BaseManager<T>::getItemWithName(const String& itemShortName, bool searchItemW
 template<class T>
 void BaseManager<T>::clear()
 {
+	isClearing = true;
 	//const ScopedLock lock(items.getLock());
 	while (items.size() > 0) removeItem(items[0], false);
 }
