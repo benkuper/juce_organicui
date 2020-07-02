@@ -89,6 +89,9 @@ void Automation::addKeys(const Array<AutomationKey*>& keys, bool addToUndo, bool
 
 void Automation::addFromPointsAndSimplify(const Array<Point<float>>& sourcePoints, bool addToUndo, bool removeExistingKeys)
 {
+    if (sourcePoints.size() == 0)
+        return;
+        
     // Normalize X and Y values to [0,1] for correct corner detection
     float xScale = sourcePoints.getLast().x - sourcePoints.getLast().y;
     float yScale = valueRange->enabled ? (valueRange->y - valueRange->x) : 1.0f;
