@@ -1324,8 +1324,8 @@ bool ControllableContainer::checkNumArgs(const String &logName, const var::Nativ
 {
 	if (args.numArguments < expectedArgs)
 	{
-		NLOG(logName, "Error, function takes at least" + String(expectedArgs) + " arguments, got " + String(args.numArguments));
-		if (args.numArguments > 0) NLOG("", "When tying to add : " + args.arguments[0].toString());
+		NLOGERROR(logName, "Error, function takes at least" + String(expectedArgs) + " arguments, got " + String(args.numArguments));
+		if (args.numArguments > 0) NLOG("", " > When trying to add : " + args.arguments[0].toString());
 		return false;
 	}
 
