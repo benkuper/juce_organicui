@@ -165,9 +165,9 @@ void Automation::addFromPointsAndSimplify(const Array<Point<float>>& sourcePoint
     }
     DBG(numBadPoints << " bad points discarded");
 
-    delete result;
-    delete corners;
-    delete cornerIndex;
+    free(result);
+    free(corners);
+    free(cornerIndex);
 
     addKeys(keys, addToUndo, removeExistingKeys);
 }
