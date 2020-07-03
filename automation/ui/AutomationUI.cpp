@@ -485,7 +485,7 @@ void AutomationUI::mouseDoubleClick(const MouseEvent& e)
     if (e.eventComponent == this)
     {
         Point<float> p = getViewPos(e.getPosition());
-        manager->addKey(p.x, p.y);
+        manager->addKey(p.x, p.y, true);
     }
 }
 
