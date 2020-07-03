@@ -22,6 +22,8 @@ DashboardManagerView::DashboardManagerView(const String &contentName, DashboardM
 	DashboardManager::getInstance()->addBaseManagerListener(this);
 	
 	helpID = "Dashboard";
+	
+	if (manager->items.size() > 0) setCurrentDashboard(manager->items[0]);
 }
 
 DashboardManagerView::~DashboardManagerView()

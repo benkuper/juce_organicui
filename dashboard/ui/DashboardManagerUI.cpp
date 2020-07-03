@@ -15,7 +15,6 @@ DashboardManagerUI::DashboardManagerUI(DashboardManager* manager) :
 	setDefaultLayout(Layout::HORIZONTAL);
 
 	bgColor = bgColor.darker();
-	addExistingItems(false);
 
 	editModeUI.reset(manager->editMode->createToggle());
 	snappingUI.reset(manager->snapping->createToggle());
