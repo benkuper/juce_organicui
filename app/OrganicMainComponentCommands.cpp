@@ -218,7 +218,6 @@ void OrganicMainContentComponent::getCommandInfo(CommandID commandID, Applicatio
 	case CommandIDs::updateDashboardFiles:
 	{
 		result.setInfo("Update Dashboard Files", "Update the Dashboard server files", category, 0);
-		result.defaultKeypresses.add(KeyPress('e', ModifierKeys::commandModifier, 0));
 	}
 	break;
 #endif
