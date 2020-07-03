@@ -76,7 +76,7 @@ void AutomationKey::setNextKey(AutomationKey* key)
 {
     if (nextKey == key) return;
 
-    if (nextKey != nullptr)
+    if (nextKey != nullptr && !nextKey->isClearing)
     {
         nextKey->position->removeParameterListener(this);
         nextKey->value->removeParameterListener(this);
