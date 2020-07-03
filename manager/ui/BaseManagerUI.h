@@ -640,6 +640,7 @@ U * BaseManagerUI<M, T, U>::addItemUI(T * item, bool animate, bool resizeAndRepa
 		itemAnimator.animateComponent(bui, tb, 1, 200, false, 1, 0);
 	} else
 	{
+		if(biui != nullptr && biui->baseItem->miniMode->boolValue()) biui->updateMiniModeUI();
 		//DBG("resized");  
 		//resized();
 	}
