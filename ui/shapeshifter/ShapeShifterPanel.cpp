@@ -167,11 +167,11 @@ void ShapeShifterPanel::detachTab(ShapeShifterPanelTab * tab, bool createNewPane
 			setCurrentContent(contents[juce::jlimit<int>(0,contents.size()-1, contents.indexOf(content))]);
 		}else
 		{
-            DBG("panel emtied, num listeners " << listeners.size());
+			DBG("panel emptied, num listeners " << listeners.size());
 			listeners.call(&Listener::panelEmptied, this);
+			ShapeShifterManager::getInstance()->removePanel(this);
 		}
 	}
-
 }
 
 void ShapeShifterPanel::addContent(ShapeShifterContent * content, bool setCurrent)
@@ -234,42 +234,50 @@ void ShapeShifterPanel::removeTab(ShapeShifterPanelTab * tab)
 	listeners.call(&Listener::contentRemoved, content);
 	delete content;
 
+	if (contents.size() == 0)
+		ShapeShifterManager::getInstance()->removePanel(this);
 }
 
 bool ShapeShifterPanel::attachPanel(ShapeShifterPanel * panel)
 {
+	ShapeShifterPanel *newPanelForTabs = nullptr;
+
 	switch (candidateZone)
 	{
+	case NONE:
+		return false;
+
 	case LEFT:
 	case RIGHT:
 	case TOP:
 	case BOTTOM:
-		if (parentContainer != nullptr) parentContainer->insertPanelRelative(panel,this,candidateZone);
-		else return false;
+		if (parentContainer == nullptr) 
+			return false;
+		else
+		{
+			newPanelForTabs = ShapeShifterManager::getInstance()->createPanel(nullptr);
+			parentContainer->insertPanelRelative(newPanelForTabs,this,candidateZone);
+		}
 		break;
 
-	case NONE:
-		return false;
-
 	case CENTER:
+		{
+			newPanelForTabs = this;
+			break;
+		}
+	}
 
+	if (newPanelForTabs != nullptr)
+	{
 		int numTabs = panel->header.tabs.size();
-
 		while(numTabs > 0)
 		{
 			ShapeShifterPanelTab * t = panel->header.tabs[0];
 			panel->detachTab(t,false);
-			attachTab(t);
+			newPanelForTabs->attachTab(t);
 			numTabs--;
 		}
-
-		ShapeShifterManager::getInstance()->removePanel(panel);
-
-		break;
-
-
 	}
-
 	return true;
 }
 

@@ -329,7 +329,7 @@ void ShapeShifterContainer::panelDetach(ShapeShifterPanel * panel)
 
 void ShapeShifterContainer::panelEmptied(ShapeShifterPanel * panel)
 {
-	removeShifter(panel, true, false);
+	removeShifter(panel, false, false);
 }
 
 void ShapeShifterContainer::panelDestroyed(ShapeShifterPanel * panel)
