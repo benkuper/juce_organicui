@@ -38,7 +38,7 @@ void DashboardParameterItem::setInspectableInternal(Inspectable* i)
 {
 	DashboardControllableItem::setInspectableInternal(i);
 
-	if (parameter != nullptr && !inspectable.wasObjectDeleted())
+	if (parameter != nullptr)
 	{
 		parameter->removeParameterListener(this);
 	}
@@ -91,7 +91,7 @@ var DashboardParameterItem::getServerData()
 	 data.getDynamicObject()->setProperty("style", styleValue);
 	if (styleValue == -1)
 	{
-		if(parameter->type == Controllable::FLOAT) data.getDynamicObject()->setProperty("defaultUI", ((FloatParameter*)parameter)->defaultUI);
+		if(parameter->type == Controllable::FLOAT) data.getDynamicObject()->setProperty("defaultUI", ((FloatParameter*)parameter.get())->defaultUI);
 	}
 
 	if (btImage->stringValue().isNotEmpty()) data.getDynamicObject()->setProperty("customImage", btImage->stringValue());

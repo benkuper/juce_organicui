@@ -20,7 +20,7 @@ ControllableUI* DashboardParameterItemUI::createControllableUI()
 		if (f.existsAsFile())
 		{
 			ImageButton* b = AssetManager::getInstance()->getToggleBTImage(ImageCache::getFromFile(f));
-			return ((BoolParameter*)parameterItem->parameter)->createImageToggle(b);
+			return ((BoolParameter*)parameterItem->parameter.get())->createImageToggle(b);
 		}
 	}
 	break;
@@ -32,18 +32,18 @@ ControllableUI* DashboardParameterItemUI::createControllableUI()
 		case 0:
 		case 1:
 		{
-			FloatSliderUI* sliderUI = ((FloatParameter*)parameterItem->parameter)->createSlider();
+			FloatSliderUI* sliderUI = ((FloatParameter*)parameterItem->parameter.get())->createSlider();
 			sliderUI->orientation = (int)parameterItem->style->getValueData() == 0 ? FloatSliderUI::HORIZONTAL : FloatSliderUI::VERTICAL;
 			return sliderUI;
 		}
 			break;
 
 		case 2:
-			return ((FloatParameter*)parameterItem->parameter)->createLabelParameter();
+			return ((FloatParameter*)parameterItem->parameter.get())->createLabelParameter();
 			break;
 
 		case 3:
-			return ((FloatParameter*)parameterItem->parameter)->createTimeLabelParameter();
+			return ((FloatParameter*)parameterItem->parameter.get())->createTimeLabelParameter();
 			break;
 		}
 	}
