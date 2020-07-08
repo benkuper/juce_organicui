@@ -16,8 +16,6 @@ DashboardControllableItem::DashboardControllableItem(Controllable* item) :
 	contourColor->canBeDisabledByUser = true;
 	customLabel->canBeDisabledByUser = true;
 	customDescription->canBeDisabledByUser = true;
-
-	ghostInspectable();
 }
 
 DashboardControllableItem::~DashboardControllableItem()

@@ -3,6 +3,7 @@ DashboardCCItem::DashboardCCItem(ControllableContainer* container) :
 	DashboardInspectableItem(container),
 	container(container)
 {
+	setInspectable(container);
 	ghostInspectable();
 }
 

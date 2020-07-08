@@ -3,7 +3,6 @@ DashboardInspectableItem::DashboardInspectableItem(Inspectable* item) :
 	inspectable(nullptr),
 	inspectableItemNotifier(20)
 {
-	if(item != nullptr) setInspectable(item);
 }
 
 DashboardInspectableItem::~DashboardInspectableItem()
