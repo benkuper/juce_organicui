@@ -31,6 +31,9 @@ DoubleSliderUI::DoubleSliderUI(Point2DParameter* parameter) :
 	xSlider.reset((ParameterUI*)xParam.createDefaultUI());
 	ySlider.reset((ParameterUI*)yParam.createDefaultUI());
 
+	xSlider->showLabel = false;
+	ySlider->showLabel = false;
+
 	addAndMakeVisible(xSlider.get());
 	addAndMakeVisible(ySlider.get());
 
