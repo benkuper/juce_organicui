@@ -106,9 +106,13 @@ void Curve2DKeyUI::mouseDown(const MouseEvent& e)
 
 void Curve2DKeyUI::mouseDoubleClick(const MouseEvent& e)
 {
-	Component* editComponent = new ParameterUI::ValueEditCalloutComponent(item->viewUIPosition);
-	CallOutBox* box = &CallOutBox::launchAsynchronously(editComponent, localAreaToGlobal(getLocalBounds()), nullptr);
-	box->setArrowSize(8);
+	if (e.eventComponent == this || e.eventComponent == &handle)
+	{
+		Component* editComponent = new ParameterUI::ValueEditCalloutComponent(item->viewUIPosition);
+		CallOutBox* box = &CallOutBox::launchAsynchronously(editComponent, localAreaToGlobal(getLocalBounds()), nullptr);
+		box->setArrowSize(8);
+	}
+	
 }
 
 bool Curve2DKeyUI::canStartDrag(const MouseEvent& e)

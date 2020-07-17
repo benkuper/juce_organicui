@@ -24,8 +24,8 @@ Curve2DUI::Curve2DUI(Curve2D* manager) :
     manager->addAsyncContainerListener(this);
     if (manager->recorder != nullptr) manager->recorder->addAsyncCoalescedRecorderListener(this);
 
-    addExistingItems(false);
     setSize(100, 300);
+    addExistingItems(false);
 }
 
 Curve2DUI::~Curve2DUI()
@@ -141,6 +141,7 @@ void Curve2DUI::updateHandlesForUI(Curve2DKeyUI* ui, bool checkSideItems)
 
 void Curve2DUI::addItemUIInternal(Curve2DKeyUI* ui)
 {
+    BaseManagerViewUI::addItemUIInternal(ui);
     ui->addMouseListener(this, true);
     ui->item->addAsyncKeyListener(this);
     ui->addKeyUIListener(this);
@@ -148,6 +149,8 @@ void Curve2DUI::addItemUIInternal(Curve2DKeyUI* ui)
 
 void Curve2DUI::removeItemUIInternal(Curve2DKeyUI* ui)
 {
+    BaseManagerViewUI::removeItemUIInternal(ui);
+
     ui->removeMouseListener(this);
     if (!ui->inspectable.wasObjectDeleted())
     {
@@ -232,12 +235,34 @@ void Curve2DUI::mouseDoubleClick(const MouseEvent& e)
     else if (Easing2DUI* eui = dynamic_cast<Easing2DUI*>(e.eventComponent))
     {
         Point<float> p = eui->easing->getClosestPointForPos(getViewMousePosition());
+        Curve2DKeyUI* kui = dynamic_cast<Curve2DKeyUI*>(eui->getParentComponent());
+        
         Curve2DKey* k = manager->createItem();
         k->viewUIPosition->setPoint(p);
+        k->easingType->setValueWithData(kui->item->easingType->getValueData());
+
+        Array<Point<float>> controlPoints;
+        if (eui->easing->type == Easing::BEZIER)
+        {
+            CubicEasing2D* ce1 = (CubicEasing2D*)eui->easing.get();
+            controlPoints = ce1->getSplitControlPoints(p);
+        }
+
         var params(new DynamicObject());
-        Curve2DKeyUI* kui = dynamic_cast<Curve2DKeyUI*>(eui->getParentComponent());
         params.getDynamicObject()->setProperty("index", itemsUI.indexOf(kui)+1);
         manager->addItem(k, params);
+
+        if (eui->easing->type == Easing::BEZIER)
+        {
+            CubicEasing2D* ce1 = (CubicEasing2D*)eui->easing.get();
+            CubicEasing2D* ce2 = (CubicEasing2D*)k->easing.get();
+
+            ce1->anchor1->setPoint(controlPoints[0] - ce1->start);
+            ce1->anchor2->setPoint(controlPoints[1] - ce1->end);
+
+            ce2->anchor1->setPoint(controlPoints[2] - ce2->start);
+            ce2->anchor2->setPoint(controlPoints[3] - ce2->end);
+        }
     }
 }
 

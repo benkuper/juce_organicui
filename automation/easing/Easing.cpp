@@ -1,3 +1,4 @@
+#include "Easing.h"
 /*
   ==============================================================================
 
@@ -36,6 +37,16 @@ void Easing::updateKeys(const Point<float>& _start, const Point<float>& _end)
 EasingUI* Easing::createUI()
 {
 	return new EasingUI(this);
+}
+
+float Easing::getWeightForPos(float pos)
+{
+	return (pos - start.x) / (end.x - start.x);
+}
+
+Point<float> Easing::getClosestPointForPos(float pos)
+{
+	return Point<float>(pos, getValue(getWeightForPos(pos)));
 }
 
 
@@ -88,14 +99,36 @@ CubicEasing::CubicEasing() :
 {
 	anchor1 = addPoint2DParameter("Anchor 1", "Anchor 1 of the quadratic curve");
 	anchor2 = addPoint2DParameter("Anchor 2", "Anchor 2 of the quadratic curve");
-
-
 }
 
 
 void CubicEasing::onContainerParameterChanged(Parameter* p)
 {
 	if (p == anchor1 || p == anchor2) updateBezier();
+}
+
+Array<Point<float>> CubicEasing::getSplitControlPoints(float pos)
+{
+	float t = getBezierWeight(pos);
+
+	Point<float> p1 = start;
+	Point<float> p2 = start + anchor1->getPoint();
+	Point<float> p3 = end + anchor2->getPoint();
+	Point<float> p4 = end;
+
+	Point<float> cp1start, cp1End, cp2Start, cp2End;
+
+	Point<float> pp12 = p1 + (p2 - p1) * t;
+	Point<float> pp23 = p2 + (p3 - p2) * t;
+	Point<float> pp34 = p3 + (p4 - p3) * t;
+
+	Point<float> pp123 = pp12 + (pp23 - pp12) * t;
+	Point<float> pp234 = pp23 + (pp34 - pp23) * t;
+	Point<float> pp1234 = pp123 + (pp234 - pp123) * t;
+
+	Array<Point<float>> result;
+	result.add(pp12, pp123, pp234, pp34);
+	return result;
 }
 
 Rectangle<float> CubicEasing::getBounds(bool includeHandles)
@@ -129,6 +162,26 @@ Point<float> CubicEasing::getRawValue(const float& weight)
 {
 	Bezier::Point p = bezier.valueAt(weight);
 	return { p.x, p.y };
+}
+
+float CubicEasing::getBezierWeight(const float& pos)
+{
+	const int precision = length * 30;
+	float closestT = getWeightForPos(pos);
+	float minDist = INT32_MAX;
+	for (int i = 0; i < precision; ++i)
+	{
+		float t = i * 1.0f / precision;
+		Bezier::Point bp = bezier.valueAt(t);
+		float dist = fabsf(bp.x - pos);
+		if (dist < minDist)
+		{
+			closestT = t;
+			minDist = dist;
+		}
+	}
+
+	return closestT;
 }
 
 void CubicEasing::updateKeysInternal()
