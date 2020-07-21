@@ -28,22 +28,26 @@ void ColorParameterUI::paint(Graphics & g)
 {
 	if (shouldBailOut()) return;
 
+
+	Rectangle<int> r = getLocalBounds();
+	if (r.getWidth() < 2 || getHeight() < 2) return;
+
 	Colour c = colorParam->getColor();
 	int size = jmin(getWidth(), getHeight()) / 2;
-	if (!c.isOpaque()) g.fillCheckerBoard(getLocalBounds().reduced(1).toFloat(), size, size, Colours::white, Colours::white.darker(.2f));
+	if (!c.isOpaque()) g.fillCheckerBoard(r.reduced(1).toFloat(), size, size, Colours::white, Colours::white.darker(.2f));
 	
 	g.setColour(c);
-	g.fillRoundedRectangle(getLocalBounds().toFloat(), 2);
+	g.fillRoundedRectangle(r.toFloat(), 2);
 
 	if (isInteractable())
 	{
 		g.setColour(c.brighter(.5f));
-		g.drawRoundedRectangle(getLocalBounds().reduced(1).toFloat(), 2, 2);
+		g.drawRoundedRectangle(r.reduced(1).toFloat(), 2, 2);
 	}
 
 	if (showLabel)
 	{
-		Rectangle<int> tr = getLocalBounds().reduced(2);
+		Rectangle<int> tr = r.reduced(2);
 		g.setFont(jlimit(12, 40, jmin(tr.getHeight(), tr.getWidth()) - 16));
 		g.setColour(useCustomTextColor ? customTextColor : TEXT_COLOR);
 		g.drawFittedText(customLabel.isNotEmpty() ? customLabel : colorParam->niceName, tr, Justification::centred, 1);
