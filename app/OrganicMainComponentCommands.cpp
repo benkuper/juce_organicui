@@ -515,7 +515,7 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 		for (auto& i : items)
 		{
 			if (i == nullptr) continue;
-			i->selectPrevious(info.keyPress.getModifiers().isShiftDown());
+			if(!i->useCustomArrowKeysBehaviour) i->selectPrevious(info.keyPress.getModifiers().isShiftDown());
 		}
 	}
 	break; 
@@ -527,7 +527,7 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 		for (auto& i : items) 
 		{
 			if (i == nullptr) continue;
-			i->selectNext(info.keyPress.getModifiers().isShiftDown());
+			if (!i->useCustomArrowKeysBehaviour)i->selectNext(info.keyPress.getModifiers().isShiftDown());
 		}
 	}
 	break;

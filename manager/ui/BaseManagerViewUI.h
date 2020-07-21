@@ -355,7 +355,8 @@ void BaseManagerViewUI<M, T, U>::updateItemsVisibility()
 	juce::Rectangle<int> r = this->getLocalBounds();
 	for (auto& iui : this->itemsUI)
 	{
-		juce::Rectangle<int> ir = iui->getBounds().getIntersection(r);
+		juce::Rectangle<int> iuiB = iui->getBoundsInParent();
+		juce::Rectangle<int> ir = iuiB.getIntersection(r);
 		bool isInsideInspectorBounds = !ir.isEmpty();
 		iui->setVisible(isInsideInspectorBounds);
 	}
