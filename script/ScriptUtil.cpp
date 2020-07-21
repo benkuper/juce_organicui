@@ -42,6 +42,10 @@ ScriptUtil::ScriptUtil() :
 
 	scriptObject.setMethod("copyToClipboard", ScriptUtil::copyToClipboardFromScript);
 	scriptObject.setMethod("getFromClipboard", ScriptUtil::getFromClipboardFromScript);
+
+	scriptObject.setMethod("showMessageBox", ScriptUtil::showMessageBox);
+	scriptObject.setMethod("showOkCancelBox", ScriptUtil::showOkCancelBox);
+	scriptObject.setMethod("showYesNoCancelBox", ScriptUtil::showYesNoCancelBox);
 }
 
 var ScriptUtil::getTime(const var::NativeFunctionArgs &)
@@ -343,4 +347,70 @@ var ScriptUtil::copyToClipboardFromScript(const var::NativeFunctionArgs& args)
 var ScriptUtil::getFromClipboardFromScript(const var::NativeFunctionArgs& args)
 {
 	return SystemClipboard::getTextFromClipboard();
+}
+
+var ScriptUtil::showMessageBox(const var::NativeFunctionArgs& args)
+{
+	if (args.numArguments < 2) return false;
+
+	AlertWindow::AlertIconType iconType = AlertWindow::NoIcon;
+	if (args.numArguments >= 3)
+	{
+		String s = args.arguments[2].toString();
+		if (s == "warning") iconType = AlertWindow::WarningIcon;
+		if (s == "info") iconType = AlertWindow::AlertIconType::InfoIcon;
+		if (s == "question") iconType = AlertWindow::AlertIconType::QuestionIcon;
+	}
+
+	String title = args.arguments[0].toString();
+	String message = args.arguments[1].toString();
+	String buttonText = args.numArguments >= 4 ? args.arguments[3].toString() : "";
+	AlertWindow::showMessageBox(iconType, title, message, buttonText);
+
+	return var();
+}
+
+var ScriptUtil::showOkCancelBox(const var::NativeFunctionArgs& args)
+{
+	if (args.numArguments < 2) return false;
+
+	AlertWindow::AlertIconType iconType = AlertWindow::NoIcon;
+	if (args.numArguments >= 3)
+	{
+		String s = args.arguments[2].toString();
+		if (s == "warning") iconType = AlertWindow::WarningIcon;
+		if (s == "info") iconType = AlertWindow::AlertIconType::InfoIcon;
+		if (s == "question") iconType = AlertWindow::AlertIconType::QuestionIcon;
+	}
+
+	String title = args.arguments[0].toString();
+	String message = args.arguments[1].toString();
+	String button1Text = args.numArguments >= 4 ? args.arguments[3].toString() : "";
+	String button2Text = args.numArguments >= 5 ? args.arguments[4].toString() : "";
+	bool result = AlertWindow::showOkCancelBox(iconType, title, message, button1Text,button2Text);
+
+	return result;
+}
+
+var ScriptUtil::showYesNoCancelBox(const var::NativeFunctionArgs& args)
+{
+	if (args.numArguments < 2) return false;
+
+	AlertWindow::AlertIconType iconType = AlertWindow::NoIcon;
+	if (args.numArguments >= 3)
+	{
+		String s = args.arguments[2].toString();
+		if (s == "warning") iconType = AlertWindow::WarningIcon;
+		if (s == "info") iconType = AlertWindow::AlertIconType::InfoIcon;
+		if (s == "question") iconType = AlertWindow::AlertIconType::QuestionIcon;
+	}
+
+	String title = args.arguments[0].toString();
+	String message = args.arguments[1].toString();
+	String button1Text = args.numArguments >= 4 ? args.arguments[3].toString() : "";
+	String button2Text = args.numArguments >= 5 ? args.arguments[4].toString() : "";
+	String button3Text = args.numArguments >= 6 ? args.arguments[5].toString() : "";
+	int result = AlertWindow::showYesNoCancelBox(iconType, title, message, button1Text, button2Text, button3Text);
+
+	return result;
 }

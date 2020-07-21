@@ -48,4 +48,8 @@ public:
 	static var copyToClipboardFromScript(const var::NativeFunctionArgs& args);
 	static var getFromClipboardFromScript(const var::NativeFunctionArgs& args);
 
+
+	static var showMessageBox(const var::NativeFunctionArgs& args);
+	static var showOkCancelBox(const var::NativeFunctionArgs& args);
+	static var showYesNoCancelBox(const var::NativeFunctionArgs& args);
 };
