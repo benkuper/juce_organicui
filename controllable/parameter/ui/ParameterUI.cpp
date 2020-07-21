@@ -183,7 +183,7 @@ void ParameterUI::mouseDoubleClick(const MouseEvent& e)
 
 bool ParameterUI::isInteractable()
 {
-	return ControllableUI::isInteractable() && parameter->controlMode == Parameter::ControlMode::MANUAL;
+	return ControllableUI::isInteractable() || parameter->controlMode != Parameter::ControlMode::MANUAL;
 }
 
 void ParameterUI::setNextFocusOrder(Component* focusComponent)

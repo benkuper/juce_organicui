@@ -313,6 +313,8 @@ void BaseManagerViewUI<M, T, U>::resized()
 		int size = jlimit(50,200, jmin(r.getWidth()/5, r.getHeight()/5) - 20);
 		viewPane->setBounds(r.translated(-10, -10).removeFromRight(size).removeFromBottom(size));
 	}
+
+	updateItemsVisibility();
 }
 
 template<class M, class T, class U>
