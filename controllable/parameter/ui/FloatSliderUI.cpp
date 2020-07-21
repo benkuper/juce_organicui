@@ -135,6 +135,8 @@ void FloatSliderUI::mouseDrag(const MouseEvent & e)
 	if (changeParamOnMouseUpOnly) repaint();
     else
     {
+		scaleFactor = e.mods.isAltDown() ? .5f : 1;
+
 		if (e.mods.isLeftButtonDown())
 		{
 			if (assignOnMousePosDirect)
