@@ -9,6 +9,9 @@
 */
 
 
+bool IntStepperUI::showHexModeOption;
+
+
 IntStepperUI::IntStepperUI(Parameter * parameter) :
     FloatStepperUI(parameter),
 	intParam(dynamic_cast<IntParameter *>(parameter))
@@ -44,7 +47,7 @@ double IntStepperUI::textToHexValue(String t)
 void IntStepperUI::addPopupMenuItemsInternal(PopupMenu* p)
 {
 	FloatStepperUI::addPopupMenuItemsInternal(p);
-	p->addItem(-100, "Hex Mode", true, intParam->hexMode);
+	if(showHexModeOption) p->addItem(-100, "Hex Mode", true, intParam->hexMode);
 }
 
 void IntStepperUI::handleMenuSelectedID(int result)
