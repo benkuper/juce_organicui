@@ -9,7 +9,7 @@
 */
 
 
-bool IntStepperUI::showHexModeOption;
+bool IntStepperUI::showHexModeOption = true;
 
 
 IntStepperUI::IntStepperUI(Parameter * parameter) :
