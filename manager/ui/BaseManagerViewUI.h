@@ -91,6 +91,7 @@ public:
 
 	virtual void setViewZoom(float newZoom);
 	virtual void setShowPane(bool val);
+	virtual BaseManagerViewMiniPane<M, T, U>* createViewPane();
 
 	virtual void addItemUIInternal(U * se) override; 
 
@@ -494,7 +495,7 @@ void BaseManagerViewUI<M, T, U>::setShowPane(bool val)
 	if (val == showingPane) return;
 	if(val)
 	{
-		viewPane.reset(new BaseManagerViewMiniPane<M,T,U>(this));
+		viewPane.reset(createViewPane());
 		this->addAndMakeVisible(viewPane.get());
 	}
 	else
@@ -502,6 +503,12 @@ void BaseManagerViewUI<M, T, U>::setShowPane(bool val)
 		this->removeChildComponent(viewPane.get());
 		viewPane.reset(nullptr);
 	}
+}
+
+template<class M, class T, class U>
+BaseManagerViewMiniPane<M, T, U>* BaseManagerViewUI<M, T, U>::createViewPane()
+{
+	return new BaseManagerViewMiniPane<M, T, U>(this);
 }
 
 template<class M, class T, class U>
