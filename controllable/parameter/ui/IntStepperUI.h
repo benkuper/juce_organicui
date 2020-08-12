@@ -18,6 +18,8 @@ public:
 
 	IntParameter* intParam;
 
+	static bool showHexModeOption;
+
 	static String hexValueToText(double v);
 	static double textToHexValue(String t);
 

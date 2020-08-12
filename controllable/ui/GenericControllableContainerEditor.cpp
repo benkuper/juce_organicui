@@ -149,21 +149,25 @@ void GenericControllableContainerEditor::showContextMenu()
 
 	addPopupMenuItems(&p);
 
-	p.addSeparator();
-	PopupMenu dashboardMenu;
-	int index = 0;
-	for (auto &di : DashboardManager::getInstance()->items)
+	if (ControllableUI::showDashboardOption)
 	{
-		dashboardMenu.addItem(index + 10000, di->niceName);
-		index++;
-	}
+		p.addSeparator();
+		PopupMenu dashboardMenu;
+		int index = 0;
+		for (auto& di : DashboardManager::getInstance()->items)
+		{
+			dashboardMenu.addItem(index + 10000, di->niceName);
+			index++;
+		}
 
-	p.addSubMenu("Send to Dashboard", dashboardMenu);
+		p.addSubMenu("Send to Dashboard", dashboardMenu);
+	}
+	
 
 	p.addSeparator();
 
-	p.addItem(-1000, "Copy OSC Control Address");
-	p.addItem(-1001, "Copy Script Control Address");
+	if(ControllableUI::showOSCControlAddressOption) p.addItem(-1000, "Copy OSC Control Address");
+	if(ControllableUI::showScriptControlAddressOption) p.addItem(-1001, "Copy Script Control Address");
 
 	int result = p.show();
 

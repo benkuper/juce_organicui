@@ -203,6 +203,7 @@ void BaseItemMinimalUI<T>::mouseDown(const MouseEvent& e)
 		handleContextMenuResult(result);
 	}else
 	{
+		if (item->isUILocked->boolValue()) return;
 		baseItem->setMovePositionReference(true);
 	}
 }
@@ -216,7 +217,7 @@ void BaseItemMinimalUI<T>::mouseDrag(const MouseEvent& e)
 	if (e.mods.isLeftButtonDown())
 	{
 		if (!dragAndDropEnabled || isDragAndDropActive() || !canStartDrag(e)) return;
-
+		if (item->isUILocked->boolValue()) return;
 
 		if (e.getDistanceFromDragStart() > dragStartDistance)
 		{
