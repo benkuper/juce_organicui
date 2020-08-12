@@ -61,6 +61,7 @@ public:
 	static var getValueKeyFromScript(const juce::var::NativeFunctionArgs& a);
 	static var addOptionFromScript(const juce::var::NativeFunctionArgs &a);
 	static var removeOptionsFromScript(const juce::var::NativeFunctionArgs &a);
+	static var setValueWithDataFromScript(const juce::var::NativeFunctionArgs& a);
 
 	EnumParameterUI * createUI(EnumParameter * target = nullptr);
 	ControllableUI * createDefaultUI() override;
