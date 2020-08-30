@@ -15,6 +15,7 @@ EnumParameter::EnumParameter(const String & niceName, const String &description,
 	lockManualControlMode = true;
 
 	scriptObject.setMethod("getKey", EnumParameter::getValueKeyFromScript);
+	scriptObject.setMethod("setData", EnumParameter::setValueWithDataFromScript);
 	scriptObject.setMethod("addOption", EnumParameter::addOptionFromScript);
 	scriptObject.setMethod("removeOptions", EnumParameter::removeOptionsFromScript);
 }
@@ -162,6 +163,23 @@ var EnumParameter::removeOptionsFromScript(const juce::var::NativeFunctionArgs& 
 	if (c == nullptr || c.wasObjectDeleted()) return var();
 	EnumParameter * ep = dynamic_cast<EnumParameter *>(c.get());
 	ep->clearOptions();
+	return var();
+}
+
+var EnumParameter::setValueWithDataFromScript(const juce::var::NativeFunctionArgs& a)
+{
+	WeakReference<Parameter> c = getObjectFromJS<Parameter>(a);
+	if (c == nullptr || c.wasObjectDeleted()) return var();
+	EnumParameter* ep = dynamic_cast<EnumParameter*>(c.get());
+
+	if (a.numArguments < 1)
+	{
+		NLOGWARNING("Script", "EnumParameter setData requires 1 argument !");
+		return var();
+	}
+
+	ep->setValueWithData(a.arguments[0]);
+		
 	return var();
 }
 

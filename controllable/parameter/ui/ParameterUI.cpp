@@ -8,6 +8,8 @@
   ==============================================================================
 */
 
+bool ParameterUI::showAlwaysNotifyOption = true;
+bool ParameterUI::showControlModeOption = true;
 
 int ParameterUI::currentFocusOrderIndex = 0;
 std::function<void(ParameterUI*)> ParameterUI::customShowEditRangeWindowFunction = nullptr;
@@ -137,20 +139,23 @@ void ParameterUI::addPopupMenuItems(PopupMenu* p)
 				if (parameter->hasRange()) p->addItem(-5, "Clear Range");
 			}
 
-			p->addItem(-6, "Always Notify changes", true, parameter->alwaysNotify);
+			if(showAlwaysNotifyOption) p->addItem(-6, "Always Notify changes", true, parameter->alwaysNotify);
 
 			addPopupMenuItemsInternal(p);
 		}
 
-		p->addSeparator();
-		if (!parameter->lockManualControlMode)
+		if (showControlModeOption)
 		{
-			PopupMenu controlModeMenu;
-			controlModeMenu.addItem(10, "Manual", true, parameter->controlMode == Parameter::MANUAL);
-			controlModeMenu.addItem(11, "Expression", true, parameter->controlMode == Parameter::EXPRESSION);
-			controlModeMenu.addItem(12, "Reference", true, parameter->controlMode == Parameter::REFERENCE);
-			if (parameter->canBeAutomated) controlModeMenu.addItem(13, "Animation", true, parameter->controlMode == Parameter::AUTOMATION);
-			p->addSubMenu("Control Mode", controlModeMenu);
+			p->addSeparator();
+			if (!parameter->lockManualControlMode)
+			{
+				PopupMenu controlModeMenu;
+				controlModeMenu.addItem(10, "Manual", true, parameter->controlMode == Parameter::MANUAL);
+				controlModeMenu.addItem(11, "Expression", true, parameter->controlMode == Parameter::EXPRESSION);
+				controlModeMenu.addItem(12, "Reference", true, parameter->controlMode == Parameter::REFERENCE);
+				if (parameter->canBeAutomated) controlModeMenu.addItem(13, "Animation", true, parameter->controlMode == Parameter::AUTOMATION);
+				p->addSubMenu("Control Mode", controlModeMenu);
+			}
 		}
 	}
 }
@@ -183,7 +188,7 @@ void ParameterUI::mouseDoubleClick(const MouseEvent& e)
 
 bool ParameterUI::isInteractable()
 {
-	return ControllableUI::isInteractable() && parameter->controlMode == Parameter::ControlMode::MANUAL;
+	return ControllableUI::isInteractable() || parameter->controlMode != Parameter::ControlMode::MANUAL;
 }
 
 void ParameterUI::setNextFocusOrder(Component* focusComponent)

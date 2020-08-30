@@ -31,9 +31,10 @@ FloatStepperUI::FloatStepperUI(Parameter * _parameter) :
 			slider->setRange(INT32_MIN/2, INT32_MAX/2, 1);
 			slider->setMouseDragSensitivity(INT32_MAX);
 		}
-		
 	}
-    slider->setValue(parameter->floatValue());
+
+	slider->setNumDecimalPlacesToDisplay(0);
+	slider->setValue(parameter->floatValue());
     slider->addListener(this);
 	slider->addMouseListener(this,true);
 	

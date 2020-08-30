@@ -156,12 +156,22 @@ void OrganicApplication::systemRequestedQuit()
 	quit();
 }
 
-inline void OrganicApplication::anotherInstanceStarted(const String & commandLine)
+inline void OrganicApplication::anotherInstanceStarted(const String& commandLine)
 {
 	engine->parseCommandline(commandLine);
+
+	if (mainWindow->trayIcon != nullptr)
+	{
+		mainWindow->addToDesktop();
+		mainWindow->setVisible(true);
+		mainComponent->setupOpenGL();
+		mainWindow->setTrayIconVisible(false);
+	}
+	else if (mainWindow->isMinimised())
+	{
+		mainWindow->setMinimised(false);
+	}
 }
-
-
 
 void OrganicApplication::newMessage(const Engine::EngineEvent & e)
 {

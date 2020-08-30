@@ -23,6 +23,7 @@
 #include "helpers/OSCHelpers.cpp"
 #include "helpers/crypto/hmac/SHA1.cpp"
 #include "helpers/crypto/hmac/HMAC_SHA1.cpp"
+#include "helpers/WakeOnLan.cpp"
 
 #include "resources/BinaryData.cpp"
 #include "script/ScriptExpression.cpp"

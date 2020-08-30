@@ -35,6 +35,10 @@ public:
 	virtual Rectangle<float> getBounds(bool includeHandles = false) = 0;
 	virtual EasingUI* createUI();
 
+	float getWeightForPos(float pos);
+	Point<float> getClosestPointForPos(float pos);
+
+
 private:
 	WeakReference<Easing>::Master masterReference;
 	friend class WeakReference<Easing>;
@@ -80,6 +84,8 @@ public:
 	virtual float getValue(const float& weight) override;
 	Point<float> getRawValue(const float &weight);
 
+	float getBezierWeight(const float& pos);
+
 	void updateKeysInternal() override;
 	void updateBezier();
 
@@ -89,6 +95,8 @@ public:
 
 	Bezier::Bezier<3> bezier;
 	Array<float> uniformLUT;
+
+	Array<Point<float>> getSplitControlPoints(float pos);
 
 	Rectangle<float> getBounds(bool includeHandles) override;
 

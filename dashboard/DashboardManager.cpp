@@ -170,7 +170,7 @@ void DashboardManager::downloadDashboardFiles()
 	}
 
 	LOG("Downloading dashboard files...");
-	downloadedFileZip = File::getSpecialLocation(File::userDesktopDirectory).getChildFile("dashboard.zip");
+	downloadedFileZip = File::getSpecialLocation(File::tempDirectory).getChildFile(OrganicApplication::getInstance()->getApplicationName()+"/dashboard.zip");
 	downloadTask = downloadURL.downloadToFile(downloadedFileZip, "", this);
 	if (downloadTask == nullptr)
 	{
@@ -188,6 +188,7 @@ void DashboardManager::finished(URL::DownloadTask* task, bool success)
 	ZipFile zf(downloadedFileZip);
 	zf.uncompressTo(serverRootPath);
 	LOG("Dashboard : " << zf.getNumEntries() << " files downloaded to " << serverRootPath.getFullPathName());
+	downloadedFileZip.deleteFile();
 }
 #endif //ORGANICUI_USE_WEBSERVER
 

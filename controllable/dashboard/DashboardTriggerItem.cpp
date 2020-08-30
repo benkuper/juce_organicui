@@ -7,6 +7,9 @@ DashboardTriggerItem::DashboardTriggerItem(Trigger * item) :
 	bgColor->canBeDisabledByUser = true;
 	customImagePath = addFileParameter("Custom Image", "Choose a custom image instead of the default button");
 	customImagePath->fileTypeFilter = "*.png;*.jpg;*.jpeg;*.gif";
+
+	setInspectable(item);
+	ghostInspectable();
 }
 
 DashboardTriggerItem::~DashboardTriggerItem()

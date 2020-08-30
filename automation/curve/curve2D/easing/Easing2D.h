@@ -54,6 +54,7 @@ public:
 	Rectangle<float> getBounds(bool includeHandles) override;
 	Point<float> getClosestPointForPos(Point<float> pos) override;
 
+	
 	Easing2DUI* createUI() override;
 };
 
@@ -80,8 +81,12 @@ public:
 	void updateLength() override;
 	void getBezierLength(Point<float> a, Point<float> b, Point<float> c, Point<float> d, int precision, float& length);
 	
+	Array<Point<float>> getSplitControlPoints(const Point<float> & pos);
+
 	Rectangle<float> getBounds(bool includeHandles) override;
+
     Point<float> getClosestPointForPos(Point<float> pos) override;
+	float getBezierWeight(const Point<float>& pos);
 
 	void onContainerParameterChanged(Parameter* p) override;
 

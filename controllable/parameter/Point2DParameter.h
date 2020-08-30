@@ -26,6 +26,7 @@ public:
 	void setValueInternal(var  &_value) override;
 	void setBounds(float _minX, float _minY, float _maxX, float _maxY);
 	
+	virtual void setAttribute(String name, var val) override;
 
 	virtual StringArray getValuesNames() override;
 

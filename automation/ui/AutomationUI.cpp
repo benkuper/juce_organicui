@@ -487,6 +487,33 @@ void AutomationUI::mouseDoubleClick(const MouseEvent& e)
         Point<float> p = getViewPos(e.getPosition());
         manager->addKey(p.x, p.y, true);
     }
+    else if (EasingUI * eui = dynamic_cast<EasingUI*>(e.eventComponent))
+    {
+        AutomationKey* startKey = ((AutomationKeyUI*)eui->getParentComponent())->item;
+        Point<float> p = eui->easing->getClosestPointForPos(getPosForX(e.getEventRelativeTo(this).getPosition().x));
+        
+        Array<Point<float>> controlPoints;
+        if (startKey->easing->type == Easing::BEZIER)
+        {
+            CubicEasing* ce1 = (CubicEasing*)startKey->easing.get();
+            controlPoints = ce1->getSplitControlPoints(p.x);
+        }
+            
+        AutomationKey* k = manager->addKey(p.x, p.y, true);
+        k->easingType->setValueWithData(startKey->easingType->getValueData());
+        
+        if (startKey->easing->type == Easing::BEZIER)
+        {
+            CubicEasing* ce1 = (CubicEasing*)startKey->easing.get();
+            CubicEasing* ce2 = (CubicEasing*)k->easing.get();
+                      
+            ce1->anchor1->setPoint(controlPoints[0] - ce1->start);
+            ce1->anchor2->setPoint(controlPoints[1] - ce1->end);
+
+            ce2->anchor1->setPoint(controlPoints[2] - ce2->start);
+            ce2->anchor2->setPoint(controlPoints[3] - ce2->end);
+        }
+    }
 }
 
 Component* AutomationUI::getSelectableComponentForItemUI(AutomationKeyUI* ui)

@@ -86,6 +86,17 @@ void Point2DParameter::setBounds(float _minX, float _minY, float _maxX, float _m
 	setRange(minRange, maxRange);
 }
 
+void Point2DParameter::setAttribute(String name, var val)
+{
+	if (name == "ui")
+	{
+		if (val == "time") defaultUI = FloatParameter::TIME;
+		else if (val == "slider") defaultUI = FloatParameter::SLIDER;
+		else if (val == "stepper") defaultUI = FloatParameter::STEPPER;
+		else if (val == "label") defaultUI = FloatParameter::LABEL;
+	}
+}
+
 StringArray Point2DParameter::getValuesNames()
 {
 	return StringArray("X","Y");

@@ -147,7 +147,7 @@ void InspectableContentComponent::newMessage(const Inspectable::InspectableEvent
 {
 	if (e.type == Inspectable::InspectableEvent::SELECTION_CHANGED || e.type == Inspectable::InspectableEvent::PRESELECTION_CHANGED)
 	{
-		if (bringToFrontOnSelect && !inspectable.wasObjectDeleted() && inspectable->isSelected) toFront(true);
+		if (bringToFrontOnSelect && !inspectable.wasObjectDeleted() && inspectable->isSelected) toFront(false);
 		if (repaintOnSelectionChanged) repaint();
 	}
 	else if (e.type == Inspectable::InspectableEvent::HIGHLIGHT_CHANGED)

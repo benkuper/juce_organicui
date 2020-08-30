@@ -8,6 +8,11 @@
   ==============================================================================
 */
 
+bool ControllableUI::showOSCControlAddressOption = true;
+bool ControllableUI::showScriptControlAddressOption = true;
+bool ControllableUI::showDetectiveOption = true;
+bool ControllableUI::showDashboardOption = true;
+
 std::function<void(ControllableUI*)> ControllableUI::customShowContextMenuFunc = nullptr;
 std::function<void(ControllableUI *, PopupMenu *)> ControllableUI::customAddToContextMenuFunc = nullptr;
 std::function<bool(ControllableUI *, int)> ControllableUI::handleCustomContextMenuResultFunc = nullptr;
@@ -99,9 +104,7 @@ void ControllableUI::showContextMenu()
 	
 	std::unique_ptr<PopupMenu> p(new PopupMenu());
 	
-	
 	addPopupMenuItems(p.get());
-
 	
 	if (ControllableUI::customAddToContextMenuFunc != nullptr)
 	{
@@ -112,31 +115,39 @@ void ControllableUI::showContextMenu()
 	if (controllable->includeInScriptObject)
 	{
 		p->addSeparator();
-		p->addItem(-1, "Copy OSC Control Address");
-		p->addItem(-2, "Copy Script Control Address");
+		if(showOSCControlAddressOption) p->addItem(-1, "Copy OSC Control Address");
+		if(showScriptControlAddressOption) p->addItem(-2, "Copy Script Control Address");
 	}
+
 
 	p->addSeparator();
+
+	if (showDetectiveOption)
+	{
+		
+		if (controllable->type == Controllable::FLOAT ||
+			controllable->type == Controllable::INT ||
+			controllable->type == Controllable::POINT2D ||
+			controllable->type == Controllable::POINT3D ||
+			controllable->type == Controllable::COLOR ||
+			controllable->type == Controllable::BOOL)
+		{
+			p->addItem(-10, "Watch this with The Detective");
+		}
+	}
 	
-	if (controllable->type == Controllable::FLOAT ||
-		controllable->type == Controllable::INT ||
-		controllable->type == Controllable::POINT2D ||
-		controllable->type == Controllable::POINT3D ||
-		controllable->type == Controllable::COLOR ||
-		controllable->type == Controllable::BOOL )
+	if (showDashboardOption)
 	{
-		p->addItem(-10, "Watch this with The Detective");
+		PopupMenu dashboardMenu;
+		int index = 0;
+		for (auto& di : DashboardManager::getInstance()->items)
+		{
+			dashboardMenu.addItem(index + 10000, di->niceName);
+			index++;
+		}
+		p->addSubMenu("Send to Dashboard", dashboardMenu);
 	}
-
-	PopupMenu dashboardMenu;
-	int index = 0;
-	for (auto& di : DashboardManager::getInstance()->items)
-	{
-		dashboardMenu.addItem(index + 10000, di->niceName);
-		index++;
-	}
-	p->addSubMenu("Send to Dashboard", dashboardMenu);
-
+	
 
 	if (p->getNumItems() == 0) return;
 

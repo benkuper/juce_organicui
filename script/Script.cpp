@@ -108,6 +108,11 @@ void Script::loadScript()
 		//return;
 	}
 
+	if(isThreadRunning())
+	{
+		signalThreadShouldExit();
+		waitForThreadToExit(100);
+	}
 
 	setState(SCRIPT_LOADING);
 
@@ -180,11 +185,7 @@ void Script::loadScript()
 	{
 		if(!Engine::mainEngine->isLoadingFile) startThread();
 	}
-	else
-	{
-		signalThreadShouldExit();
-		waitForThreadToExit(100);
-	}
+	
 
 	scriptParamsContainer.hideInEditor = scriptParamsContainer.controllables.size() == 0;
 

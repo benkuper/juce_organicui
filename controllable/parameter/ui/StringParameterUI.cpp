@@ -62,6 +62,7 @@ void StringParameterUI::updateUIParamsInternal()
 	valueLabel.setColour(valueLabel.backgroundColourId, useCustomBGColor ? customBGColor : (opaqueBackground ? (!controllable->isControllableFeedbackOnly ? BG_COLOR.darker(.1f).withAlpha(.7f) : BG_COLOR.darker(.1f).withAlpha(.4f)) : Colours::transparentBlack));
 	valueLabel.setColour(valueLabel.outlineColourId, useCustomBGColor ? customBGColor.brighter() : (opaqueBackground ? BG_COLOR.brighter(.1f) : Colours::transparentWhite));
 	valueLabel.setColour(valueLabel.textColourId, useCustomTextColor ? customTextColor : (isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f)));
+	valueLabel.setColour(CaretComponent::caretColourId, Colours::orange);
 }
 
 void StringParameterUI::paint(Graphics& g)

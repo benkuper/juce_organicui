@@ -8,15 +8,18 @@ class BaseManagerViewMiniPane :
 {
 public:
 	BaseManagerViewMiniPane(BaseManagerViewUI<M,T,U> * managerUI);
-	~BaseManagerViewMiniPane() {}
+	virtual ~BaseManagerViewMiniPane() {}
 
 	BaseManagerViewUI<M, T, U> * managerUI;
 	ComponentAnimator ca;
 
-	void paint(juce::Graphics& g) override;
-	void resized() override;
+	float showTime;
 
-	void updateContent();
+	virtual void paint(juce::Graphics& g) override;
+	virtual void paintInternal(juce::Graphics& g, const juce::Rectangle<float>& itemViewBounds, const juce::Rectangle<int>& itemRealBounds) {}
+	virtual void resized() override;
+
+	virtual void updateContent();
 
 	void timerCallback() override;
 
@@ -24,7 +27,8 @@ public:
 
 template<class M, class T, class U>
 BaseManagerViewMiniPane<M, T, U>::BaseManagerViewMiniPane(BaseManagerViewUI<M, T, U> * managerUI) :
-	managerUI(managerUI)
+	managerUI(managerUI),
+	showTime(1.5f)
 {
 	setAlpha(0);
 	setOpaque(false);
@@ -40,14 +44,11 @@ void BaseManagerViewMiniPane<M, T, U>::paint(juce::Graphics& g)
 
 	if (managerUI->itemsUI.size() == 0) return;
 
+
 	juce::Rectangle<int> mr = managerUI->getLocalBounds();
 	juce::Rectangle<float> focusRect = managerUI->getViewBounds(mr);
 
-	/*
-	focusRect.setPosition(managerUI->getViewPos(mr.getPosition()).toFloat());
-	juce::Point<float> vs(mr.getWidth() / managerUI->viewZoom, mr.getHeight() / managerUI->viewZoom);
-	focusRect.setSize(vs.x, vs.y);
-	*/
+	//AffineTransform af = managerUI->getUITransform(ui);
 
 	juce::Rectangle<float> itemViewBounds(focusRect);
 	for (auto& ui : managerUI->itemsUI)
@@ -57,7 +58,6 @@ void BaseManagerViewMiniPane<M, T, U>::paint(juce::Graphics& g)
 		itemViewBounds.setRight(jmax<float>(ui->item->viewUIPosition->x + ui->item->viewUISize->x, itemViewBounds.getRight()));
 		itemViewBounds.setBottom(jmax<float>(ui->item->viewUIPosition->y + ui->item->viewUISize->y, itemViewBounds.getBottom()));
 	}
-
 
 	juce::Rectangle<int> r = getLocalBounds();
 
@@ -76,6 +76,9 @@ void BaseManagerViewMiniPane<M, T, U>::paint(juce::Graphics& g)
 	}
 
 	juce::Rectangle<int> itemRealBounds = managerUI->getBoundsInView(itemViewBounds);
+
+
+	paintInternal(g, itemViewBounds, itemRealBounds);
 
 	for (auto& ui : managerUI->itemsUI)
 	{
@@ -119,7 +122,7 @@ void BaseManagerViewMiniPane<M, T, U>::updateContent()
 	}
 
 	stopTimer();
-	startTimerHz(1);
+	startTimer(showTime*1000);
 
 	repaint();
 }

@@ -40,6 +40,12 @@ public:
 	String customLabel;
 	String customDescription;
 
+	//popupmenu filters
+	static bool showOSCControlAddressOption;
+	static bool showScriptControlAddressOption;
+	static bool showDetectiveOption;
+	static bool showDashboardOption;
+
 	static std::function<void(ControllableUI*)> customShowEditWindowFunction;
 
 	virtual void paintOverChildren(Graphics& g) override;

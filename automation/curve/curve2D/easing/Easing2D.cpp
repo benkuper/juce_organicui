@@ -69,6 +69,7 @@ Point<float> LinearEasing2D::getClosestPointForPos(Point<float> pos)
 	else return Point<float>(start.x + t * dx, start.y + t * dy);
 }
 
+
 Easing2DUI* LinearEasing2D::createUI()
 {
 	return new LinearEasing2DUI(this);
@@ -208,6 +209,30 @@ void CubicEasing2D::getBezierLength(Point<float> A, Point<float> B, Point<float>
 	}
 }
 
+Array<Point<float>> CubicEasing2D::getSplitControlPoints(const Point<float> &pos)
+{
+	float t = getBezierWeight(pos);
+
+	Point<float> p1 = start;
+	Point<float> p2 = start + anchor1->getPoint();
+	Point<float> p3 = end + anchor2->getPoint();
+	Point<float> p4 = end;
+
+	Point<float> cp1start, cp1End, cp2Start, cp2End;
+
+	Point<float> pp12 = p1 + (p2 - p1) * t;
+	Point<float> pp23 = p2 + (p3 - p2) * t;
+	Point<float> pp34 = p3 + (p4 - p3) * t;
+
+	Point<float> pp123 = pp12 + (pp23 - pp12) * t;
+	Point<float> pp234 = pp23 + (pp34 - pp23) * t;
+	Point<float> pp1234 = pp123 + (pp234 - pp123) * t;
+
+	Array<Point<float>> result;
+	result.add(pp12, pp123, pp234, pp34);
+	return result;
+}
+
 Rectangle<float> CubicEasing2D::getBounds(bool includeHandles)
 {
 	Bezier::AxisAlignedBoundingBox  bbox = bezier.aabb();
@@ -237,6 +262,29 @@ Point<float> CubicEasing2D::getClosestPointForPos(Point<float> pos)
 
 	return closestP;
 }
+
+
+float CubicEasing2D::getBezierWeight(const Point<float>& pos)
+{
+	const int precision = length * 30;
+	float result = 0;
+	float minDist = INT32_MAX;
+	for (int i = 0; i < precision; ++i)
+	{
+		float weight = i * 1.0f / precision;
+		Bezier::Point bp = bezier.valueAt(weight);
+		Point<float> p(bp.x, bp.y);
+		float dist = p.getDistanceSquaredFrom(pos);
+		if (dist < minDist)
+		{
+			result = weight;
+			minDist = dist;
+		}
+	}
+
+	return result;
+}
+
 
 void CubicEasing2D::onContainerParameterChanged(Parameter* p)
 {

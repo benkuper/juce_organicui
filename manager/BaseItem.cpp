@@ -10,6 +10,7 @@
 
 BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts) :
 	EnablingControllableContainer(name.isEmpty() ? getTypeString() : name, _canBeDisabled),
+	useCustomArrowKeysBehaviour(false),
 	canHaveScripts(_canHaveScripts),
 	userCanRemove(true),
 	userCanDuplicate(true),

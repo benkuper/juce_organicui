@@ -23,6 +23,9 @@ DashboardParameterItem::DashboardParameterItem(Parameter* parameter) :
 	}
 
 	btImage = addFileParameter("Toggle image", "The image of the toggle");
+
+	setInspectable(parameter);
+	ghostInspectable();
 }
 
 DashboardParameterItem::~DashboardParameterItem()
