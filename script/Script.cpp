@@ -18,7 +18,6 @@ Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled) :
     updateEnabled(false),
     scriptParamsContainer("params"),
 	parentTarget(_parentTarget),
-	lockedThreadId(0),
 	executionTimeout(5),
 	scriptAsyncNotifier(10)
 {
@@ -227,28 +226,10 @@ var Script::callFunction(const Identifier & function, const Array<var> args, Res
 	Result tmpResult = Result::ok();
 	if (result == nullptr) result = &tmpResult;
 
-	Thread::ThreadID curThreadId = Thread::getCurrentThreadId();
-	bool needsToEnterLock = lockedThreadId != curThreadId;
-
-	if(needsToEnterLock)
-	{
-		engineLock.enter();
-		//DBG("Lock Enterded " << (int)curThreadId << "(locked " << (int)lockedThreadId << ")");
-		lockedThreadId = curThreadId;
-	}
-	else
-	{
-		//DBG("Already locked from this thread");
-	}
+	const ScopedLock sl (engineLock);
 
 	var returnData = scriptEngine->callFunction(function, var::NativeFunctionArgs(var::undefined(), (const var*)args.begin(), args.size()), result);
 	
-	if (needsToEnterLock)
-	{
-		//DBG("Lock Exit " << (int)curThreadId << "(locked " << (int)lockedThreadId << ")");
-		engineLock.exit();
-	}
-
 	if (result->getErrorMessage().isNotEmpty())
 	{
 		NLOGERROR(niceName, "Script Error :\n" + result->getErrorMessage());
@@ -292,7 +273,12 @@ void Script::childStructureChanged(ControllableContainer* cc)
 {
 	if (state == ScriptState::SCRIPT_LOADED && Engine::mainEngine != nullptr && cc == Engine::mainEngine)
 	{
-		if(!Engine::mainEngine->isLoadingFile && !Engine::mainEngine->isClearing) scriptEngine->registerNativeObject(Engine::mainEngine->scriptTargetName, Engine::mainEngine->getScriptObject());
+		if(!Engine::mainEngine->isLoadingFile && !Engine::mainEngine->isClearing)
+		{
+			const ScopedLock sl (engineLock);
+
+			scriptEngine->registerNativeObject(Engine::mainEngine->scriptTargetName, Engine::mainEngine->getScriptObject());
+		}
 	}
 }
 

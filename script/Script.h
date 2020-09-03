@@ -42,8 +42,7 @@ public:
 	ScriptTarget * parentTarget;
 
 	std::unique_ptr<JavascriptEngine> scriptEngine;
-	SpinLock engineLock;
-	Thread::ThreadID lockedThreadId;
+	CriticalSection engineLock;
 	float executionTimeout;
 
 
