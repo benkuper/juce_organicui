@@ -1,4 +1,3 @@
-#include "DashboardParameterItem.h"
 
 DashboardParameterItem::DashboardParameterItem(Parameter* parameter) :
 	DashboardControllableItem(parameter),
