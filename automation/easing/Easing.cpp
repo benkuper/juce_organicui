@@ -166,6 +166,8 @@ Point<float> CubicEasing::getRawValue(const float& weight)
 
 float CubicEasing::getBezierWeight(const float& pos)
 {
+	if (length == 0) return 0;
+	
 	const int precision = length * 30;
 	float closestT = getWeightForPos(pos);
 	float minDist = INT32_MAX;
