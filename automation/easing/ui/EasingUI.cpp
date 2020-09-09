@@ -71,6 +71,7 @@ void EasingUI::resized()
 void EasingUI::generatePath()
 {
 	drawPath.clear();
+	hitPath.clear();
 
 	if (getHeight() == 0 || getWidth() == 0) return;
 
