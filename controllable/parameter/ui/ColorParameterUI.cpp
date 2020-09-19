@@ -69,7 +69,7 @@ void ColorParameterUI::showEditWindowInternal()
 {
 	if (!isInteractable()) return;
 
-	ColourSelector * selector = new ColourSelector(ColourSelector::showAlphaChannel | ColourSelector::showSliders | ColourSelector::showHexColorValue | ColourSelector::showColourspace);
+	std::unique_ptr<ColourSelector> selector(new ColourSelector(ColourSelector::showAlphaChannel | ColourSelector::showSliders | ColourSelector::showHexColorValue | ColourSelector::showColourspace));
 	selector->addChangeListener(this);
 	selector->setName("Color for " + parameter->niceName);
 	selector->setCurrentColour(colorParam->getColor());
@@ -77,7 +77,7 @@ void ColorParameterUI::showEditWindowInternal()
 	selector->setColour(ColourSelector::labelTextColourId, TEXT_COLOR);
 	selector->setSize(300, 400);
 	selector->addChangeListener(this);
-	CallOutBox::launchAsynchronously(selector, getScreenBounds(), nullptr);
+	CallOutBox::launchAsynchronously(std::move(selector), getScreenBounds(), nullptr);
 }
 
 void ColorParameterUI::valueChanged(const var &)

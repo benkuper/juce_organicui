@@ -39,8 +39,8 @@ void ParameterUI::showEditWindowInternal()
 {
 	//if (parameter->isControllableFeedbackOnly) return;
 
-	Component* editComponent(getEditValueComponent());
-	CallOutBox* box = &CallOutBox::launchAsynchronously(editComponent, localAreaToGlobal(getLocalBounds()), nullptr);
+	std::unique_ptr<Component> editComponent(getEditValueComponent());
+	CallOutBox* box = &CallOutBox::launchAsynchronously(std::move(editComponent), localAreaToGlobal(getLocalBounds()), nullptr);
 	box->setArrowSize(8);
 }
 

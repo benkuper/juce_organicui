@@ -19,7 +19,7 @@ Automation::Automation(const String& name, AutomationRecorder * recorder, bool a
 
     editorCanBeCollapsed = false;
     showInspectorOnSelect = false;
-    userCanAddItemsManually = false;
+    //userCanAddItemsManually = false;
     canInspectChildContainers = false;
 
     length = addFloatParameter("Length", "The length of the curve", 1, 0.01f);

@@ -17,7 +17,7 @@ Curve2D::Curve2D(const String &name) :
 
     editorCanBeCollapsed = false;
     showInspectorOnSelect = false;
-    userCanAddItemsManually = false;
+   //userCanAddItemsManually = false;
     canInspectChildContainers = false;
 
     length = addFloatParameter("Length", "The length of the curve", 0, 0);

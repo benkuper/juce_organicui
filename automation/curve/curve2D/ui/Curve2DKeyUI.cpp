@@ -108,8 +108,8 @@ void Curve2DKeyUI::mouseDoubleClick(const MouseEvent& e)
 {
 	if (e.eventComponent == this || e.eventComponent == &handle)
 	{
-		Component* editComponent = new ParameterUI::ValueEditCalloutComponent(item->viewUIPosition);
-		CallOutBox* box = &CallOutBox::launchAsynchronously(editComponent, localAreaToGlobal(getLocalBounds()), nullptr);
+		std::unique_ptr<Component> editComponent(new ParameterUI::ValueEditCalloutComponent(item->viewUIPosition));
+		CallOutBox* box = &CallOutBox::launchAsynchronously(std::move(editComponent), localAreaToGlobal(getLocalBounds()), nullptr);
 		box->setArrowSize(8);
 	}
 	

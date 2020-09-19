@@ -17,6 +17,7 @@ AutomationUI::AutomationUI(Automation* manager) :
 {
     //autoSelectWithChildRespect = false;
     resizeOnChildBoundsChanged = false;
+    setShowAddButton(false);
 
     animateItemOnAdd = false;
     manager->addAsyncContainerListener(this);

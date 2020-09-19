@@ -19,6 +19,8 @@ Curve2DUI::Curve2DUI(Curve2D* manager) :
     minZoom = .1f;
     maxZoom = 10;
 
+    setShowAddButton(false);
+
     updatePositionOnDragMove = true;
     animateItemOnAdd = false;
     manager->addAsyncContainerListener(this);
