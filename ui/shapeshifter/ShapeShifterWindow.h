@@ -23,8 +23,6 @@ public:
 	enum DragMode {NONE, TAB, PANEL};
 
 	ShapeShifterPanel * panel;
-    
-    bool checking;
 
 	void paintOverChildren(Graphics &g)override;
 	void resized() override;

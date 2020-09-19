@@ -11,7 +11,6 @@
 ShapeShifterWindow::ShapeShifterWindow(ShapeShifterPanel * _panel, juce::Rectangle<int> bounds) :
 	ResizableWindow(_panel->currentContent->contentName, true),
 	panel(_panel),
-	checking(false),
 	dragMode(PANEL)
 {
 	setTopLeftPosition(bounds.getTopLeft());
@@ -86,18 +85,8 @@ void ShapeShifterWindow::mouseDrag(const MouseEvent & e)
 void ShapeShifterWindow::mouseUp(const MouseEvent &)
 {
 	panel->setTransparentBackground(false);
-    
-    checking = true;
-	bool found = ShapeShifterManager::getInstance()->checkDropOnCandidateTarget(panel);
-    checking = false;
-
-    if(found)
-    {
-		clear();
-        ShapeShifterManager::getInstance()->closePanelWindow(this, false);   
-    }
+	ShapeShifterManager::getInstance()->checkDropOnCandidateTarget(panel);
 }
-
 
 void ShapeShifterWindow::clear()
 {
@@ -126,5 +115,5 @@ var ShapeShifterWindow::getCurrentLayout()
 
 void ShapeShifterWindow::panelEmptied(ShapeShifterPanel *)
 {
-	if(!checking) ShapeShifterManager::getInstance()->closePanelWindow(this, true);
+	ShapeShifterManager::getInstance()->closePanelWindow(this, false);
 }

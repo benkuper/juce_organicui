@@ -8,7 +8,7 @@ public:
 	DashboardParameterItem(Parameter* parameter = nullptr);
 	~DashboardParameterItem();
 
-	Parameter * parameter;
+	WeakReference<Parameter> parameter;
 	
 	BoolParameter* showValue;
 	ColorParameter* bgColor;
