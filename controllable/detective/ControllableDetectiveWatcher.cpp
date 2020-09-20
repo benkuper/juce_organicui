@@ -12,7 +12,7 @@ ControllableDetectiveWatcher::ControllableDetectiveWatcher() :
 	target->showTriggers = false;
 	target->hideInEditor = true;
 
-	watchTime = addFloatParameter("Time Window", "The time window to watch", 3, .1f, 3600);
+	watchTime = addFloatParameter("Time Window", "The time window to watch", 3, .1f);
 	watchTime->defaultUI = FloatParameter::TIME;
 	watchTime->hideInEditor = true;
 }

@@ -227,6 +227,7 @@ ServusThread::ServusThread() :
 	servus("_http._tcp")
 {
 }
+
 void ServusThread::setupZeroconf()
 {
 	if(ProjectSettings::getInstanceWithoutCreating() == nullptr || ProjectSettings::getInstance()->serverPort == nullptr) return;
