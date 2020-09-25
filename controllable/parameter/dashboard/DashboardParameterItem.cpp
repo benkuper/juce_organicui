@@ -80,6 +80,7 @@ var DashboardParameterItem::getServerData()
 	if (controllable == nullptr || controllable.wasObjectDeleted()) return data;
 
 	data.getDynamicObject()->setProperty("value", parameter->value);
+
 	if (parameter->hasRange())
 	{
 		data.getDynamicObject()->setProperty("minVal", parameter->minimumValue);
@@ -98,6 +99,21 @@ var DashboardParameterItem::getServerData()
 
 	if (btImage->stringValue().isNotEmpty()) data.getDynamicObject()->setProperty("customImage", btImage->stringValue());
 
+
+	if (parameter->type == Parameter::ENUM)
+	{
+		var epOptions;
+		EnumParameter* ep = (EnumParameter*)parameter.get();
+		for (auto& ev : ep->enumValues)
+		{
+			var epData(new DynamicObject());
+			epData.getDynamicObject()->setProperty("key", ev->key);
+			epData.getDynamicObject()->setProperty("id", ev->value);
+			epOptions.append(epData);
+		}
+
+		data.getDynamicObject()->setProperty("options", epOptions);
+	}
 
 	return data;
 
