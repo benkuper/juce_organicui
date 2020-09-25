@@ -237,11 +237,11 @@ bool Parameter::hasRange()
 		GenericScopedLock<SpinLock> lock(valueSetLock);
 		if (isComplex())
 		{
-			for (int i = 0; i < value.size(); ++i) if ((int)minimumValue[i] != INT32_MIN || (int)maximumValue[i] != INT32_MAX) return false;
+			for (int i = 0; i < value.size(); ++i) if ((int)minimumValue[i] != INT32_MIN || (int)maximumValue[i] != INT32_MAX) return true;
 		}
 		else
 		{
-			if ((int)minimumValue != INT32_MIN || (int)maximumValue != INT32_MAX) return false;
+			if ((int)minimumValue != INT32_MIN || (int)maximumValue != INT32_MAX) return true;
 		}
 	}
 
