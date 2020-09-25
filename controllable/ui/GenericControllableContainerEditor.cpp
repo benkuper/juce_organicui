@@ -356,7 +356,7 @@ void GenericControllableContainerEditor::removeEditorUI(InspectableEditor * ccui
 
 void GenericControllableContainerEditor::showMenuAndAddControllable()
 {
-	Controllable * c = ControllableFactory::showFilteredCreateMenu(container->userAddControllablesFilters);
+	Controllable * c = ControllableFactory::showFilteredCreateMenu(container->userAddControllablesFilters, true);
 	if (c != nullptr)
 	{
 		c->isCustomizableByUser = true;

@@ -15,10 +15,12 @@ class ControllableDefinition
 public:
 	String controllableType;
 	std::function<Controllable*()> createFunc;
+	bool isSpecial;
 
-	ControllableDefinition(const String &type, std::function<Controllable*()> createFunc) :
+	ControllableDefinition(const String &type, std::function<Controllable*()> createFunc, bool isSpecial = false) :
 		controllableType(type),
-		createFunc(createFunc)
+		createFunc(createFunc),
+		isSpecial(isSpecial)
 	{}
 };
 
@@ -33,13 +35,13 @@ public:
 	ControllableFactory();
 	~ControllableFactory() {}
 
-	void buildPopupMenu();
-	PopupMenu getFilteredPopupMenu(StringArray typeFilters);
+	void buildPopupMenu(bool excludeSpecials = false);
+	PopupMenu getFilteredPopupMenu(StringArray typeFilters, bool excludeSpecials = false);
 
-	static StringArray getTypesWithout(StringArray typesToExclude);
+	static StringArray getTypesWithout(StringArray typesToExclude, bool excludeSpecials = false);
 
-	static Controllable * showCreateMenu();
-	static Controllable * showFilteredCreateMenu(StringArray typeFilters);
+	static Controllable * showCreateMenu(bool excludeSpecials = false);
+	static Controllable * showFilteredCreateMenu(StringArray typeFilters, bool excludeSpecials = false);
 
 	static Controllable * createControllable(const String &controllableType);
 

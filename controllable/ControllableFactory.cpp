@@ -26,37 +26,39 @@ ControllableFactory::ControllableFactory() {
 	buildPopupMenu();
 }
 
-void ControllableFactory::buildPopupMenu()
+void ControllableFactory::buildPopupMenu(bool excludeSpecials)
 {
 	for (int i = 0; i < controllableDefs.size(); ++i)
 	{
+		if (controllableDefs[i]->isSpecial && excludeSpecials) continue;
 		menu.addItem(i + 1, controllableDefs[i]->controllableType);
 	}
 }
 
-PopupMenu ControllableFactory::getFilteredPopupMenu(StringArray typeFilters)
+PopupMenu ControllableFactory::getFilteredPopupMenu(StringArray typeFilters, bool excludeSpecials)
 {
 	PopupMenu result;
 	for (int i = 0; i < controllableDefs.size(); ++i)
 	{
-		if(typeFilters.contains(controllableDefs[i]->controllableType)) result.addItem(i + 1, controllableDefs[i]->controllableType);
+		if(typeFilters.contains(controllableDefs[i]->controllableType) && (!controllableDefs[i]->isSpecial || !excludeSpecials)) result.addItem(i + 1, controllableDefs[i]->controllableType);
 	}
 
 	return result;
 }
 
-StringArray ControllableFactory::getTypesWithout(StringArray typesToExclude)
+StringArray ControllableFactory::getTypesWithout(StringArray typesToExclude, bool excludeSpecials)
 {
 	StringArray result;
 	for (auto &d : getInstance()->controllableDefs)
 	{
-		if (!typesToExclude.contains(d->controllableType)) result.add(d->controllableType);
+		if (!typesToExclude.contains(d->controllableType) && (!d->isSpecial || !excludeSpecials)) result.add(d->controllableType);
 	}
 	return result;
 }
 
-Controllable * ControllableFactory::showCreateMenu()
+Controllable * ControllableFactory::showCreateMenu(bool excludeSpecials)
 {
+	getInstance()->buildPopupMenu(excludeSpecials);
 	int result = getInstance()->menu.show();
 	if (result == 0) return nullptr;
 	else
@@ -66,9 +68,9 @@ Controllable * ControllableFactory::showCreateMenu()
 	}
 }
 
-Controllable * ControllableFactory::showFilteredCreateMenu(StringArray typeFilters)
+Controllable * ControllableFactory::showFilteredCreateMenu(StringArray typeFilters, bool excludeSpecials)
 {
-	if (typeFilters.isEmpty()) return showCreateMenu();
+	if (typeFilters.isEmpty()) return showCreateMenu(excludeSpecials);
 
 	if (typeFilters.size() == 1)
 	{
@@ -79,7 +81,7 @@ Controllable * ControllableFactory::showFilteredCreateMenu(StringArray typeFilte
 		return nullptr;
 	}
 
-	PopupMenu filteredMenu = getInstance()->getFilteredPopupMenu(typeFilters);
+	PopupMenu filteredMenu = getInstance()->getFilteredPopupMenu(typeFilters, excludeSpecials);
 	
 	if (filteredMenu.getNumItems() == 0) return nullptr;
 	int result = filteredMenu.show();
