@@ -1,3 +1,4 @@
+#include "DashboardManager.h"
 /*
   ==============================================================================
 
@@ -35,6 +36,7 @@ DashboardManager::DashboardManager() :
 		if(isNewVersion) serverRootPath.deleteRecursively();
 	}
 #endif
+
 }
 
 DashboardManager::~DashboardManager()
@@ -53,13 +55,22 @@ DashboardManager::~DashboardManager()
 #endif
 
 	DashboardItemFactory::deleteInstance();
+
+	Engine::mainEngine->removeEngineListener(this);
 }
 
 #if ORGANICUI_USE_WEBSERVER
 void DashboardManager::setupServer()
 {
 	server.reset();
-	if (isCurrentlyLoadingData) return;
+	
+	if (Engine::mainEngine->isClearing) return;
+
+	if (isCurrentlyLoadingData || Engine::mainEngine->isLoadingFile)
+	{
+		Engine::mainEngine->addEngineListener(this);
+		return;
+	}
 
 	if (!ProjectSettings::getInstance()->enableServer->boolValue())
 	{
@@ -155,7 +166,6 @@ void DashboardManager::connectionClosed(const String& id, int status, const Stri
 
 void DashboardManager::setupDownloadURL(const String& _downloadURL)
 {
-	
 	if (hasCustomDashboard) return;
 	downloadURL = URL(_downloadURL);
 	if (!serverRootPath.exists()) downloadDashboardFiles();
@@ -184,7 +194,7 @@ void DashboardManager::progress(URL::DownloadTask* task, int64 bytesDownloaded, 
 
 void DashboardManager::finished(URL::DownloadTask* task, bool success)
 {
-	LOG("Success ? " << (int)success);
+	LOG("Dashboard download success ? " << (int)success);
 	ZipFile zf(downloadedFileZip);
 	zf.uncompressTo(serverRootPath);
 	LOG("Dashboard : " << zf.getNumEntries() << " files downloaded to " << serverRootPath.getFullPathName());
@@ -213,8 +223,10 @@ void DashboardManager::itemDataFeedback(var data)
 #endif
 }
 
-void DashboardManager::afterLoadJSONDataInternal()
+void DashboardManager::endLoadFile()
 {
+	Engine::mainEngine->removeEngineListener(this);
+
 #if ORGANICUI_USE_WEBSERVER
 	setupServer();
 #endif

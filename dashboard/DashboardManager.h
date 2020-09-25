@@ -32,7 +32,8 @@ public:
 
 class DashboardManager :
 	public BaseManager<Dashboard>,
-	public Dashboard::DashboardListener
+	public Dashboard::DashboardListener,
+	public EngineListener
 #if ORGANICUI_USE_WEBSERVER
 	,public SimpleWebSocketServer::Listener
 	,public URL::DownloadTask::Listener
@@ -53,7 +54,8 @@ public:
 
 
 	void itemDataFeedback(var data) override;
-	void afterLoadJSONDataInternal() override;
+
+	void endLoadFile() override;
 
 #if ORGANICUI_USE_WEBSERVER
 	std::unique_ptr<SimpleWebSocketServer> server;
