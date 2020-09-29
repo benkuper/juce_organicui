@@ -299,7 +299,7 @@ void BaseItemMinimalUI<T>::controllableFeedbackUpdateInternal(Controllable * c)
 template<class T>
 bool BaseItemMinimalUI<T>::canStartDrag(const MouseEvent & e)
 {
-	return e.eventComponent == this;
+	return e.eventComponent == this && !e.mods.isAltDown() && !e.mods.isCommandDown() && !e.mods.isShiftDown();
 }
 
 template<class T>
