@@ -61,6 +61,8 @@ public:
 	virtual void mouseDrag(const MouseEvent& e) override;
 	virtual void mouseExit(const MouseEvent& e) override;
 
+	virtual void selectToThis() override;
+
 	virtual void addContextMenuItems(PopupMenu& p) {}
 	virtual void handleContextMenuResult(int result) {}
 
@@ -89,6 +91,7 @@ public:
 		virtual ~ItemMinimalUIListener() {}
 		virtual void itemUIViewPositionChanged(BaseItemMinimalUI<T>*) {}
 		virtual void askForSyncPosAndSize(BaseItemMinimalUI<T>*) {}
+		virtual void askSelectToThis(BaseItemMinimalUI<T>*) {}
 	};
 
 	ListenerList<ItemMinimalUIListener> itemMinimalUIListeners;
@@ -247,6 +250,12 @@ void BaseItemMinimalUI<T>::mouseExit(const MouseEvent& e)
 {
 	InspectableContentComponent::mouseExit(e);
 	repaint();
+}
+
+template<class T>
+void BaseItemMinimalUI<T>::selectToThis()
+{
+	itemMinimalUIListeners.call(&ItemMinimalUIListener::askSelectToThis, this);
 }
 
 template<class T>

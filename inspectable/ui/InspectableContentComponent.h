@@ -42,6 +42,8 @@ public:
 
 	void mouseDown(const MouseEvent &e) override;
 
+	virtual void selectToThis();
+
 	virtual void paintOverChildren(Graphics &g) override;
 
 	virtual juce::Rectangle<int> getMainBounds();

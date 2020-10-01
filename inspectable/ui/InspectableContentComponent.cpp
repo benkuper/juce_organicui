@@ -1,3 +1,4 @@
+#include "InspectableContentComponent.h"
 /*
   ==============================================================================
 
@@ -102,15 +103,24 @@ void InspectableContentComponent::mouseDown(const MouseEvent & e)
 
 		if (!foundAChildComponent)
 		{
-			//grabKeyboardFocus();
-			if (e.mods.isShiftDown()) inspectable->selectThis(true);
-			else
+			if (!e.mods.isAltDown())
 			{
-				if (!inspectable->isSelected) inspectable->selectThis(e.mods.isCommandDown());
-				else if(e.mods.isCommandDown()) inspectable->deselectThis();
+				if (e.mods.isShiftDown()) selectToThis();
+				else
+				{
+					if (!inspectable->isSelected) inspectable->selectThis(e.mods.isCommandDown());
+					else if (e.mods.isCommandDown()) inspectable->deselectThis();
+				}
 			}
+			//grabKeyboardFocus();
+			
 		}
 	}
+}
+
+void InspectableContentComponent::selectToThis()
+{
+	inspectable->selectThis(true);
 }
 
 void InspectableContentComponent::paintOverChildren(Graphics & g)

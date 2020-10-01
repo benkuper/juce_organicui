@@ -147,6 +147,8 @@ public:
 	virtual void mouseDown(const MouseEvent &e) override;
 	virtual void mouseUp(const MouseEvent& e) override;
 
+	virtual void askSelectToThis(BaseItemMinimalUI<T> * item) override;
+
 	virtual void removeItemUI(T * item, bool resizeAndRepaint = true);
 	virtual void removeItemUIInternal(U *) {}
 
@@ -346,6 +348,29 @@ void BaseManagerUI<M, T, U>::mouseUp(const MouseEvent& e)
 		//InspectableSelector::getInstance()->endSelection();
 		selectingItems = false;
 	}
+}
+
+template<class M, class T, class U>
+void BaseManagerUI<M, T, U>::askSelectToThis(BaseItemMinimalUI<T>* itemUI)
+{
+	T * firstItem = InspectableSelectionManager::activeSelectionManager->getInspectableAs<T>();
+	int firstIndex = manager->items.indexOf(firstItem);
+	int itemIndex = manager->items.indexOf(itemUI->item);
+	
+	if (firstIndex == itemIndex) return;
+
+	if (firstIndex >= 0 && itemIndex >= 0)
+	{
+		int step = firstIndex < itemIndex ? 1 : -1;
+
+		for (int index = firstIndex; index != itemIndex; index += step)
+		{
+			manager->items[index]->selectThis(true);
+		}
+		
+	}
+
+	if (itemIndex >= 0) manager->items[itemIndex]->selectThis(true);
 }
 
 
