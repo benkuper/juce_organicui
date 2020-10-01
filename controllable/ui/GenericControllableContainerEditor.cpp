@@ -636,7 +636,7 @@ juce::Rectangle<int> GenericControllableContainerEditor::getContentBounds()
 
 bool GenericControllableContainerEditor::canBeCollapsed()
 {
-	return !isRoot && container->editorCanBeCollapsed && !container->hideEditorHeader;
+	return !container.wasObjectDeleted() && !isRoot && container->editorCanBeCollapsed && !container->hideEditorHeader;
 }
 
 
