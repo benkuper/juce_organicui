@@ -1,4 +1,3 @@
-#include "IntParameterLabelUI.h"
 /*
   ==============================================================================
 
@@ -35,5 +34,5 @@ void IntParameterLabelUI::valueChanged(const var& v)
 
 String IntParameterLabelUI::getValueString(const var &val) const
 {
-	return "0x" + String::toHexString(intParam->intValue()).toUpperCase();
+	return intParam->hexMode?"0x" + String::toHexString(intParam->intValue()).toUpperCase():String(intParam->intValue());
 }
