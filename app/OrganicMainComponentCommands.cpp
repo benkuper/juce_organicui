@@ -442,6 +442,7 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 			for (auto &i : items)
 			{
 				if (i == nullptr) continue;
+				if (!i->userCanDuplicate) continue;
 				itemsData.append(i->getJSONData());
 				if (info.commandID == StandardApplicationCommandIDs::cut) i->remove();
 			}
@@ -475,6 +476,7 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 		for (auto &i : items)
 		{
 			if (i == nullptr) continue;
+			if (!i->userCanDuplicate) continue;
 			i->duplicate();
 		}
 	}
@@ -484,10 +486,32 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 	{
 		InspectableSelectionManager * selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
 		Array<BaseItem*> items = selectionManager->getInspectablesAs<BaseItem>();
+		HashMap<BaseManager<BaseItem> *, Array<BaseItem*> *> managerItemMap;
 		for (auto& i : items)
 		{
 			if (i == nullptr) continue;
-			i->remove();
+			if (!i->userCanRemove) continue;
+
+			if (BaseManager<BaseItem>* managerContainer = (BaseManager<BaseItem>*)(i->parentContainer.get()))
+			{
+				if (!managerItemMap.contains(managerContainer)) managerItemMap.set(managerContainer, new Array<BaseItem*>());
+				managerItemMap[managerContainer]->addIfNotAlreadyThere(i);
+				DBG("Add " << i->niceName << " to " << managerContainer->niceName << " : " << managerItemMap[managerContainer]->size());
+			}
+		}
+
+		HashMap<BaseManager<BaseItem>*, Array<BaseItem*> *>::Iterator it(managerItemMap);
+		while (it.next())
+		{
+			if (it.getKey() == nullptr)
+			{
+				for (auto& i : *it.getValue()) i->remove();
+			}
+			else
+			{
+				it.getKey()->removeItems(*it.getValue());
+				delete it.getValue();
+			}
 		}
 	}
 	break;
