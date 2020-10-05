@@ -137,6 +137,8 @@ public:
 
 
 	virtual void showMenuAndAddItem(bool isFromAddButton, Point<int> mouseDownPos);
+	virtual void addMenuExtraItems(PopupMenu &p, int startIndex) {}
+	virtual void handleMenuExtraItemsResult(int result, int startIndex) {}
 	virtual void addItemFromMenu(bool isFromAddButton, Point<int> mouseDownPos);
 	virtual void addItemFromMenu(T * item, bool isFromAddButton, Point<int> mouseDownPos);
 
@@ -614,11 +616,17 @@ void BaseManagerUI<M, T, U>::showMenuAndAddItem(bool isFromAddButton, Point<int>
 		PopupMenu p;
 		p.addItem(1, addItemText);
 
+		addMenuExtraItems(p, 2);
+
 		int result = p.show();
 		switch (result)
 		{
 		case 1:
 			addItemFromMenu(isFromAddButton, mouseDownPos);
+			break;
+
+		default:
+			handleMenuExtraItemsResult(result, 2);
 			break;
 		}
 	}
