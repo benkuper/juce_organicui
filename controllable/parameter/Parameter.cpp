@@ -152,11 +152,11 @@ void Parameter::setValue(var _value, bool silentSet, bool force, bool forceOverr
 	{
 		GenericScopedLock<SpinLock> lock(valueSetLock);
 
-		var croppedValue = getCroppedValue(_value);
+		var croppedValue = getCroppedValue(_value.clone());
 
 		if (!alwaysNotify && !force && checkValueIsTheSame(value, croppedValue)) return;
 
-		lastValue = var(value);
+		lastValue = var(value.clone());
 		setValueInternal(croppedValue);
 		if(!isOverriden) isOverriden = croppedValue != defaultValue || forceOverride;
 	}
