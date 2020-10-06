@@ -58,6 +58,9 @@ public:
     void mouseUp(const MouseEvent& e) override;
     void mouseDoubleClick(const MouseEvent& e) override;
 
+    void addMenuExtraItems(PopupMenu &p, int startIndex) override;
+    void handleMenuExtraItemsResult(int result, int startIndex) override;
+
     Component* getSelectableComponentForItemUI(AutomationKeyUI* ui) override;
 
     Point<float> getViewPos(Point<int> pos, bool relative = false);

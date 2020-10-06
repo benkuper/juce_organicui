@@ -1,3 +1,4 @@
+#include "AutomationUI.h"
 /*
   ==============================================================================
 
@@ -515,6 +516,32 @@ void AutomationUI::mouseDoubleClick(const MouseEvent& e)
             ce2->anchor2->setPoint(controlPoints[3] - ce2->end);
         }
     }
+}
+
+void AutomationUI::addMenuExtraItems(PopupMenu& p, int startIndex)
+{
+    //p.addSeparator();
+    PopupMenu em;
+    int index = 0;
+    for (auto& e : Easing::typeNames)
+    {
+        em.addItem(startIndex+(index++), e);
+    }
+    p.addSubMenu("Change all easings", em);
+}
+
+void AutomationUI::handleMenuExtraItemsResult(int result, int startIndex)
+{
+    //Easing::Type t = (Easing::Type)(result - startIndex);
+    String typeName = Easing::typeNames[result - startIndex];
+
+    Array<UndoableAction*> actions;
+    for (auto& i : manager->items)
+    {
+        actions.add(i->easingType->setUndoableValue(i->easingType->getValueKey(), typeName, true));
+    }
+
+    UndoMaster::getInstance()->performActions("Change all easings", actions);
 }
 
 Component* AutomationUI::getSelectableComponentForItemUI(AutomationKeyUI* ui)
