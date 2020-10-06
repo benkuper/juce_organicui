@@ -88,7 +88,7 @@ void Inspectable::highlightLinkedInspectables(bool value)
 
 void Inspectable::registerLinkedInspectable(WeakReference<Inspectable> i, bool setAlsoInOtherInspectable)
 {
-	if (i.wasObjectDeleted()) return;
+	if (i.wasObjectDeleted() || i == nullptr) return;
 
 	linkedInspectables.addIfNotAlreadyThere(i);
 	if (setAlsoInOtherInspectable) i->registerLinkedInspectable(this, false);
@@ -103,7 +103,7 @@ void Inspectable::unregisterLinkedInspectable(WeakReference<Inspectable> i, bool
 	}
 
 	linkedInspectables.removeAllInstancesOf(i);
-	if (setAlsoInOtherInspectable && !i.wasObjectDeleted()) i->unregisterLinkedInspectable(this, false);
+	if (setAlsoInOtherInspectable && !i.wasObjectDeleted() && i != nullptr) i->unregisterLinkedInspectable(this, false);
 }
 
 void Inspectable::cleanLinkedInspectables()
