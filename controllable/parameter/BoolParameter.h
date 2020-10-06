@@ -12,6 +12,7 @@
 
 class BoolToggleUI;
 class BoolImageToggleUI;
+class BoolButtonToggleUI;
 
 class BoolParameter : public Parameter
 {
@@ -20,8 +21,9 @@ public:
     ~BoolParameter() {}
 
     //ui creation
-    BoolToggleUI * createToggle(BoolParameter * target = nullptr);
-	BoolImageToggleUI * createImageToggle(ImageButton * image, BoolParameter * target = nullptr);
+    BoolToggleUI * createToggle();
+	BoolButtonToggleUI* createButtonToggle();
+	BoolImageToggleUI * createImageToggle(ImageButton * image);
 	ControllableUI * createDefaultUI() override;
 
 	static BoolParameter * create() { return new BoolParameter("New Bool Parameter", "", false); }

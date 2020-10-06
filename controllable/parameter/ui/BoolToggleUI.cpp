@@ -9,7 +9,7 @@
 */
 
 BoolToggleUI::BoolToggleUI(Parameter * parameter) :
-    ParameterUI(parameter), invertVisuals(false)
+    ParameterUI(parameter)
 {
 	showEditWindowOnDoubleClick = false;
 
@@ -50,7 +50,7 @@ void BoolToggleUI::paint(Graphics & g)
     if(shouldBailOut())return;
 
 
-	bool valCheck = invertVisuals ? !parameter->boolValue():parameter->boolValue();
+	bool valCheck = parameter->boolValue();
 	Image m = valCheck ? onImage : offImage;
 	
 	juce::Rectangle<int> r = getLocalBounds();
@@ -82,35 +82,32 @@ void BoolToggleUI::paint(Graphics & g)
 
 	if (showLabel)
 	{
-		//g.setFont((float)jmin<int>(getHeight(),12));
 		g.setColour(useCustomTextColor?customTextColor:TEXT_COLOR);
 		g.drawFittedText(customLabel.isNotEmpty()?customLabel:parameter->niceName, r, Justification::left,1);
 	}
 
 	g.drawImage(m, cr.toFloat());
 	
-	/*
-    g.setGradientFill(ColourGradient(c.brighter(.2f),(float)getLocalBounds().getCentreX(),(float)getLocalBounds().getCentreY(), c.darker(.2f), 2.f,2.f,true));
-    g.fillRoundedRectangle(getLocalBounds().toFloat(),2);
-	*/
-
-	
 }
 
-void BoolToggleUI::mouseDownInternal(const MouseEvent & e)
+void BoolToggleUI::mouseDownInternal(const MouseEvent& e)
 {
 	if (!isInteractable()) return;
-	if (e.mods.isRightButtonDown()) parameter->setValue(parameter->boolValue(), !parameter->boolValue());
-	else parameter->setUndoableValue(parameter->boolValue(), !parameter->boolValue()); //only undoable when from left button, real toggle behaviour
+	if (e.mods.isLeftButtonDown())
+	{
+		if (e.mods.isAltDown()) parameter->setValue(!parameter->boolValue());
+		else parameter->setUndoableValue(parameter->boolValue(), !parameter->boolValue()); //only undoable when from left button, real toggle behaviour
+	}
 }
 
 void BoolToggleUI::mouseUpInternal(const MouseEvent & e)
 {
-	if (isInteractable()) return;
-    if (e.mods.isRightButtonDown()) parameter->setValue(!parameter->boolValue());
+	if (!isInteractable()) return;
+	if (e.mods.isLeftButtonDown())
+	{
+		if (e.mods.isAltDown()) parameter->setValue(!parameter->boolValue());
+	}
 }
-
-
 
 void BoolToggleUI::valueChanged(const var & )
 {
@@ -125,3 +122,49 @@ void BoolToggleUI::timerCallback()
     
 }
 
+BoolButtonToggleUI::BoolButtonToggleUI(Parameter* parameter) :
+	BoolToggleUI(parameter)
+{
+}
+
+BoolButtonToggleUI::~BoolButtonToggleUI()
+{
+}
+
+void BoolButtonToggleUI::paint(Graphics& g)
+{
+	if (parameter.wasObjectDeleted()) return;
+
+	juce::Rectangle<float> r = getLocalBounds().toFloat();
+	if (!showLabel) r.setWidth(jmin<float>(r.getWidth(), r.getHeight() * 3));
+
+	bool isOn = parameter->boolValue();
+	
+	Point<float> center = r.getCentre();
+
+	Colour bgColor = useCustomBGColor ? customBGColor : NORMAL_COLOR;
+	Colour c = bgColor.darker();
+
+	if (isInteractable())
+	{
+		if (isOn) c = HIGHLIGHT_COLOR;
+		else c = isMouseOverOrDragging(true) ? (isMouseButtonDown() ? HIGHLIGHT_COLOR : bgColor.brighter()) : bgColor;
+	}
+	else
+	{
+		if (isOn) c = FEEDBACK_COLOR;
+	}
+
+	g.setGradientFill(ColourGradient(c, center.x, center.y, c.darker(.5f), 2.f, 2.f, true));
+	g.fillRoundedRectangle(r.toFloat(), 4.f);
+	g.setColour(c.darker());
+	g.drawRoundedRectangle(r.toFloat(), 4.f, 2.f);
+
+	if (showLabel)
+	{
+		Rectangle<int> tr = getLocalBounds().reduced(2);
+		g.setFont(jlimit(10, 40, jmin(tr.getHeight() - 4, tr.getWidth()) - 16));
+		g.setColour(useCustomTextColor ? customTextColor : TEXT_COLOR);
+		g.drawFittedText(customLabel.isNotEmpty() ? customLabel : parameter->niceName, tr, Justification::centred, 1);
+	}
+}
