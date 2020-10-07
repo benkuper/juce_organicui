@@ -51,7 +51,6 @@ class BaseManagerUI :
 	public BaseManager<T>::ManagerListener,
 	public BaseManager<T>::AsyncListener,
 	public Button::Listener,
-	public EngineListener,
 	public BaseItemUI<T>::ItemUIListener,
 	public BaseItemMinimalUI<T>::ItemMinimalUIListener,
 	public ComponentListener,
@@ -187,11 +186,6 @@ public:
 
 	virtual void inspectableDestroyed(Inspectable *) override;
 
-	//From Engine Listener
-	bool tmpAnimate;
-	virtual void startLoadFile() override;
-	virtual void endLoadFile() override;
-
 	class  ManagerUIListener
 	{
 	public:
@@ -260,8 +254,6 @@ BaseManagerUI<M, T, U>::BaseManagerUI(const String& contentName, M* _manager, bo
 	addItemBT->addListener(this);
 
 	setShowAddButton(baseM->userCanAddItemsManually);
-
-	if(Engine::mainEngine != nullptr) Engine::mainEngine->addEngineListener(this);
 	
 	acceptedDropTypes.add(baseM->itemDataType);
 
@@ -277,8 +269,6 @@ BaseManagerUI<M, T, U>::~BaseManagerUI()
 		this->manager->removeBaseManagerListener(this);
 		this->manager->removeAsyncManagerListener(this);
 	}
-
-	if (Engine::mainEngine != nullptr) Engine::mainEngine->removeEngineListener(this);
 }
 
 template<class M, class T, class U>
@@ -666,7 +656,7 @@ U * BaseManagerUI<M, T, U>::addItemUI(T * item, bool animate, bool resizeAndRepa
 
 	addItemUIInternal(tui);
 
-	if (animate)
+	if (animate && !Engine::mainEngine->isLoadingFile)
 	{
 		juce::Rectangle<int> tb = bui->getBounds();
 		bui->setSize(10, 10);
@@ -931,18 +921,4 @@ void BaseManagerUI<M, T, U>::inspectableDestroyed(Inspectable *)
 {
 	if (manager != nullptr && !manager->isClearing) 
 		static_cast<BaseManager<T>*>(manager)->removeBaseManagerListener(this);
-}
-
-template<class M, class T, class U>
-inline void BaseManagerUI<M, T, U>::startLoadFile()
-{
-	tmpAnimate = animateItemOnAdd;
-	animateItemOnAdd = false;
-}
-
-template<class M, class T, class U>
-inline void BaseManagerUI<M, T, U>::endLoadFile()
-{
-	animateItemOnAdd = tmpAnimate;
-	resized();
 }
