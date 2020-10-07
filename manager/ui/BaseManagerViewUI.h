@@ -13,8 +13,7 @@
 
 template<class M, class T, class U>
 class BaseManagerViewUI :
-	public BaseManagerUI<M, T, U>,
-	public Engine::AsyncListener
+	public BaseManagerUI<M, T, U>
 {
 public:
 	BaseManagerViewUI<M, T, U>(const String &contentName, M * _manager);
@@ -107,8 +106,6 @@ public:
 	virtual void itemUIViewPositionChanged(BaseItemMinimalUI<T> * itemUI) override;
 	virtual void askForSyncPosAndSize(BaseItemMinimalUI<T>* itemUI) override;
 
-	virtual void newMessage(const Engine::EngineEvent& e) override;
-
 
 };
 
@@ -134,14 +131,12 @@ BaseManagerViewUI<M, T, U>::BaseManagerViewUI(const String& contentName, M* _man
 	this->resizeOnChildBoundsChanged = false;
 	this->bgColor = BG_COLOR.darker(.3f);
 
-	Engine::mainEngine->addAsyncEngineListener(this);
 }
 
 
 template<class M, class T, class U>
 BaseManagerViewUI<M, T, U>::~BaseManagerViewUI()
 {
-	Engine::mainEngine->removeAsyncEngineListener(this);
 }
 
 template<class M, class T, class U>
@@ -674,9 +669,3 @@ template<class M, class T, class U>
 	 actions.add(itemUI->baseItem->viewUISize->setUndoablePoint(itemUI->baseItem->viewUISize->getPoint(), Point<float>	(itemUI->getWidth(), itemUI->getHeight()),true));
 	 UndoMaster::getInstance()->performActions("Move / Resize "+itemUI->baseItem->niceName, actions);
  }
-
- template<class M, class T, class U>
- void BaseManagerViewUI<M, T, U>::newMessage(const Engine::EngineEvent& e)
- {
-	frameView();
-}

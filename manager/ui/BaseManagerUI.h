@@ -54,6 +54,7 @@ class BaseManagerUI :
 	public BaseItemUI<T>::ItemUIListener,
 	public BaseItemMinimalUI<T>::ItemMinimalUIListener,
 	public ComponentListener,
+	public Engine::AsyncListener,
 	public DragAndDropTarget
 {
 public:
@@ -186,6 +187,8 @@ public:
 
 	virtual void inspectableDestroyed(Inspectable *) override;
 
+	virtual void newMessage(const Engine::EngineEvent& e) override;
+
 	class  ManagerUIListener
 	{
 	public:
@@ -256,6 +259,8 @@ BaseManagerUI<M, T, U>::BaseManagerUI(const String& contentName, M* _manager, bo
 	setShowAddButton(baseM->userCanAddItemsManually);
 	
 	acceptedDropTypes.add(baseM->itemDataType);
+	
+	Engine::mainEngine->addAsyncEngineListener(this);
 
 	//must call addExistingItems from child class to get overrides
 }
@@ -269,6 +274,8 @@ BaseManagerUI<M, T, U>::~BaseManagerUI()
 		this->manager->removeBaseManagerListener(this);
 		this->manager->removeAsyncManagerListener(this);
 	}
+
+	Engine::mainEngine->removeAsyncEngineListener(this);
 }
 
 template<class M, class T, class U>
@@ -921,4 +928,10 @@ void BaseManagerUI<M, T, U>::inspectableDestroyed(Inspectable *)
 {
 	if (manager != nullptr && !manager->isClearing) 
 		static_cast<BaseManager<T>*>(manager)->removeBaseManagerListener(this);
+}
+
+template<class M, class T, class U>
+void BaseManagerUI<M, T, U>::newMessage(const Engine::EngineEvent& e)
+{
+	resized();
 }
