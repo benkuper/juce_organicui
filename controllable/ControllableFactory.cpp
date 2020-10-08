@@ -131,7 +131,9 @@ Parameter * ControllableFactory::createParameterFrom(Controllable * source, bool
 
 			if (copyValue)
 			{
-				p->defaultValue = (source->type == Controllable::ENUM) ? ((EnumParameter*)sourceP)->getValueKey() : sourceP->getValue();
+				if (p->type == Controllable::ENUM) p->defaultValue = ((EnumParameter*)sourceP)->getValueKey();
+				else p->defaultValue = sourceP->getValue();
+
 				p->resetValue();
 			}
 
