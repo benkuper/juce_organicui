@@ -153,7 +153,7 @@ public:
 
 	virtual T* showCreateMenu()
 	{
-		int result = getMenu().getNumItems() == 1 ? 1 : getMenu().show();
+		int result = defs.size() == 1 ? 1 : getMenu().show();
 		return createFromMenuResult(result);
 	}
 
