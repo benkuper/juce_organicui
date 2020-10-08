@@ -78,6 +78,12 @@ void Point3DParameter::setUndoableVector(float oldX, float oldY, float oldZ, flo
 void Point3DParameter::setValueInternal(var& _value)
 {
 	Parameter::setValueInternal(_value);
+	if (value.size() < 3)
+	{
+		jassertfalse;
+		return;
+	}
+
 	x = _value[0];
 	y = _value[1];
 	z = _value[2];
