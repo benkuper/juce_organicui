@@ -106,8 +106,6 @@ public:
 	virtual void itemUIViewPositionChanged(BaseItemMinimalUI<T> * itemUI) override;
 	virtual void askForSyncPosAndSize(BaseItemMinimalUI<T>* itemUI) override;
 
-	virtual void endLoadFile() override;
-
 
 };
 
@@ -132,6 +130,7 @@ BaseManagerViewUI<M, T, U>::BaseManagerViewUI(const String& contentName, M* _man
 
 	this->resizeOnChildBoundsChanged = false;
 	this->bgColor = BG_COLOR.darker(.3f);
+
 }
 
 
@@ -670,9 +669,3 @@ template<class M, class T, class U>
 	 actions.add(itemUI->baseItem->viewUISize->setUndoablePoint(itemUI->baseItem->viewUISize->getPoint(), Point<float>	(itemUI->getWidth(), itemUI->getHeight()),true));
 	 UndoMaster::getInstance()->performActions("Move / Resize "+itemUI->baseItem->niceName, actions);
  }
-
-template<class M, class T, class U>
-void BaseManagerViewUI<M, T, U>::endLoadFile()
-{
-	frameView();
-}

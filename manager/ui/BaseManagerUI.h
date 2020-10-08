@@ -51,10 +51,10 @@ class BaseManagerUI :
 	public BaseManager<T>::ManagerListener,
 	public BaseManager<T>::AsyncListener,
 	public Button::Listener,
-	public EngineListener,
 	public BaseItemUI<T>::ItemUIListener,
 	public BaseItemMinimalUI<T>::ItemMinimalUIListener,
 	public ComponentListener,
+	public Engine::AsyncListener,
 	public DragAndDropTarget
 {
 public:
@@ -187,10 +187,7 @@ public:
 
 	virtual void inspectableDestroyed(Inspectable *) override;
 
-	//From Engine Listener
-	bool tmpAnimate;
-	virtual void startLoadFile() override;
-	virtual void endLoadFile() override;
+	virtual void newMessage(const Engine::EngineEvent& e) override;
 
 	class  ManagerUIListener
 	{
@@ -260,10 +257,10 @@ BaseManagerUI<M, T, U>::BaseManagerUI(const String& contentName, M* _manager, bo
 	addItemBT->addListener(this);
 
 	setShowAddButton(baseM->userCanAddItemsManually);
-
-	if(Engine::mainEngine != nullptr) Engine::mainEngine->addEngineListener(this);
 	
 	acceptedDropTypes.add(baseM->itemDataType);
+	
+	Engine::mainEngine->addAsyncEngineListener(this);
 
 	//must call addExistingItems from child class to get overrides
 }
@@ -278,7 +275,7 @@ BaseManagerUI<M, T, U>::~BaseManagerUI()
 		this->manager->removeAsyncManagerListener(this);
 	}
 
-	if (Engine::mainEngine != nullptr) Engine::mainEngine->removeEngineListener(this);
+	Engine::mainEngine->removeAsyncEngineListener(this);
 }
 
 template<class M, class T, class U>
@@ -666,7 +663,7 @@ U * BaseManagerUI<M, T, U>::addItemUI(T * item, bool animate, bool resizeAndRepa
 
 	addItemUIInternal(tui);
 
-	if (animate)
+	if (animate && !Engine::mainEngine->isLoadingFile)
 	{
 		juce::Rectangle<int> tb = bui->getBounds();
 		bui->setSize(10, 10);
@@ -934,15 +931,7 @@ void BaseManagerUI<M, T, U>::inspectableDestroyed(Inspectable *)
 }
 
 template<class M, class T, class U>
-inline void BaseManagerUI<M, T, U>::startLoadFile()
+void BaseManagerUI<M, T, U>::newMessage(const Engine::EngineEvent& e)
 {
-	tmpAnimate = animateItemOnAdd;
-	animateItemOnAdd = false;
-}
-
-template<class M, class T, class U>
-inline void BaseManagerUI<M, T, U>::endLoadFile()
-{
-	animateItemOnAdd = tmpAnimate;
 	resized();
 }

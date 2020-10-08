@@ -21,12 +21,9 @@ public:
 	Image offImage;
 	Image onImage;
 
-
-    bool invertVisuals;
-    
     bool shouldRepaint;
-
-	void setImages(Image onImage, Image offImage);
+	
+    void setImages(Image onImage, Image offImage);
 
     void paint(Graphics &g) override;
     void mouseDownInternal(const MouseEvent &e) override;
@@ -39,4 +36,17 @@ protected:
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BoolToggleUI)
+};
+
+
+class BoolButtonToggleUI :
+    public BoolToggleUI
+{
+public:
+    BoolButtonToggleUI(Parameter* parameter);
+    virtual ~BoolButtonToggleUI();
+    
+    void paint(Graphics& g) override;
+private:
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BoolButtonToggleUI)
 };
