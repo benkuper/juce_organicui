@@ -10,6 +10,7 @@ public:
 	~CrashDumpUploader();
 
 	File crashFile;
+	File sessionFile;
 	URL remoteURL;
 	Image crashImage;
 
@@ -36,6 +37,7 @@ public:
 		TextEditor editor;
 		Image* image;
 		TextButton okBT;
+		ToggleButton attachSession;
 
 		juce::Rectangle<int> imageRect;
 

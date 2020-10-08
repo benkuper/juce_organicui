@@ -55,7 +55,7 @@ GlobalSettings::GlobalSettings() :
 	autoSaveCount = saveLoadCC.addIntParameter("Auto-save count", "The number of different files to auto-save", 10, 1, 100);
 	compressOnSave = saveLoadCC.addBoolParameter("Compress file", "If checked, the JSON content will be minified, otherwise it will be human-readable but larger size as well", true);
 	enableCrashUpload = saveLoadCC.addBoolParameter("Enable Crash Upload", "If checked and a crashlog is found at startup, it will automatically upload it.\nThis crash log is a very small file but is immensely helpful for me, so please leave this option enabled unless you strongly feel like not helping me :)", true);
-
+	testCrash = saveLoadCC.addTrigger("Test crash", "This will cause a crash, allowing for testing crashes. Don't push this unless you REALLY want to !!!");
 	addChildControllableContainer(&saveLoadCC);
 
 	askBeforeRemovingItems = editingCC.addBoolParameter("Ask before removing items", "If enabled, you will get a confirmation prompt before removing any item", false);
@@ -101,6 +101,11 @@ void GlobalSettings::onControllableFeedbackUpdate(ControllableContainer * cc, Co
 	else if (c == helpLanguage)
 	{
 		HelpBox::getInstance()->loadHelp();
+	}
+	else if (c == testCrash)
+	{
+		Controllable* c = nullptr;
+		c->getJSONData(); //this will crash
 	}
 }
 

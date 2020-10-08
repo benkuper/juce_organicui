@@ -63,6 +63,8 @@ public:
 
 	KeyMappingsContainer keyMappingsCC;
 
+	Trigger * testCrash;
+
 	void onControllableFeedbackUpdate(ControllableContainer *, Controllable * c) override;
 	void loadJSONDataInternal(var data) override;
 

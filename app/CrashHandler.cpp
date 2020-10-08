@@ -94,10 +94,10 @@ void CrashDumpUploader::uploadDump()
 		return;
 	}
 
-	URL url = remoteURL.withParameter("username", SystemStats::getFullUserName().replace(" ","-"))
-		.withParameter("os", SystemStats::getOperatingSystemName().replace(" ","-"))
+	URL url = remoteURL.withParameter("username", SystemStats::getFullUserName().replace(" ", "-"))
+		.withParameter("os", SystemStats::getOperatingSystemName().replace(" ", "-"))
 		.withParameter("version", getAppVersion())
-		.withParameter("message", crashMessage.isNotEmpty()?crashMessage:"No message")
+		.withParameter("message", crashMessage.isNotEmpty() ? crashMessage : "No message")
 #if JUCE_DEBUG
 		.withParameter("branch", "debug")
 #else
@@ -105,12 +105,17 @@ void CrashDumpUploader::uploadDump()
 #endif
 		.withFileToUpload("dumpfile", crashFile, "application/octet-stream");
 
+	if (sessionFile.existsAsFile())
+	{
+		url = url.withFileToUpload("sessionFile", sessionFile, "application/octet-stream");
+	}
+
 	WebInputStream stream(url, true);
 
 	String convertedData = stream.readEntireStreamAsString();
 
 #if JUCE_DEBUG
-	LOG("Received : " << convertedData);
+	LOG("Received : " << convertedData );
 #endif
 
 	if (convertedData.contains("error"))
@@ -122,7 +127,7 @@ void CrashDumpUploader::uploadDump()
 		crashFile.deleteFile();
 	} else
 	{
-		LOGWARNING("Unknown message from crash log server");
+		LOGWARNING("Unknown message from crash log server " << convertedData << " (code " << String(stream.getStatusCode()) << ")");
 	}
 }
 
@@ -170,8 +175,8 @@ LONG WINAPI createMiniDump(LPEXCEPTION_POINTERS exceptionPointers)
 	}
 	 
 	MessageBox(nullptr,
-		_T("Oh, no ! I got very sad and died alone. The autospy report will be send to the headquarters for further investigation. You can disable this procedure in your preferences, but please remember that the forensics team needs sample to keep healing our little Chataigne ! Otherwise nothing will be done and this sad event will be forever forgotten."),
-		_T("Sacr� Hubert, toujours le mot pour rire !"),
+		_T("Oh, no ! I got very sad and died alone. The autospy report will be send to the headquarters for further investigation. You can disable this procedure in your preferences, but please remember that the forensics team needs sample to keep healing this little baby ! Otherwise nothing will be done and this sad event will be forever forgotten."),
+		_T("Sacré Hubert, toujours le mot pour rire !"),
 		MB_ICONWARNING | MB_OK
 	);
 
@@ -207,19 +212,24 @@ void createStackTrace(int signum)
 #endif
 
 CrashDumpUploader::UploadWindow::UploadWindow() :
-	okBT("OK")
+	okBT("OK"),
+	attachSession("Send the session file")
 {
 	okBT.addListener(this);
+	addAndMakeVisible(&okBT);
 
 	addAndMakeVisible(&editor);
 	editor.setColour(editor.backgroundColourId, BG_COLOR.brighter(.3f));
-	editor.setColour(editor.textColourId, TEXT_COLOR);
+	editor.setColour(editor.textColourId, TEXT_COLOR.brighter());
 	editor.setColour(editor.outlineColourId, BG_COLOR.brighter(.6f));
-	editor.setTextToShowWhenEmpty("Your super comprehensive yet fun explanation here. You can write love messages as well, but only if you mean it.", BG_COLOR.brighter(.6f));
+	editor.setTextToShowWhenEmpty("Your super comprehensive yet fun explanation here. You can write love messages as well, but only if you mean it.", TEXT_COLOR);
 	editor.setMultiLine(true);
 	editor.setReturnKeyStartsNewLine(true);
 
-	addAndMakeVisible(&okBT);
+	attachSession.setToggleState(true, dontSendNotification);
+	addAndMakeVisible(&attachSession);
+	
+	
 	setSize(800, 600);
 
 }
@@ -237,7 +247,9 @@ void CrashDumpUploader::UploadWindow::paint(Graphics& g)
 void CrashDumpUploader::UploadWindow::resized()
 {
 	juce::Rectangle<int> r = getLocalBounds().removeFromBottom(getHeight() / 2);
-	okBT.setBounds(r.removeFromBottom(30).withSizeKeepingCentre(100, 20));
+	juce::Rectangle<int> br = r.removeFromBottom(30);
+	okBT.setBounds(br.withSizeKeepingCentre(100, 20));
+	attachSession.setBounds(br.withSize(200,30).reduced(3));
 	editor.setBounds(r.reduced(20));
 }
 
@@ -246,6 +258,8 @@ void CrashDumpUploader::UploadWindow::buttonClicked(Button* bt)
 	if (bt == &okBT)
 	{
 		CrashDumpUploader::getInstance()->crashMessage = editor.getText();
+		CrashDumpUploader::getInstance()->sessionFile = attachSession.getToggleState() ? Engine::mainEngine->getLastDocumentOpened() : File();
+
 		if(DialogWindow * dw = findParentComponentOfClass<DialogWindow>())
 			dw->exitModalState(0);
 	}
