@@ -27,3 +27,10 @@ void CommentManagerViewUI::mouseWheelMove(const MouseEvent& e, const MouseWheelD
 
 	Component::mouseWheelMove(e, d);
 }
+
+bool CommentManagerViewUI::keyPressed(const KeyPress &e)
+{
+	// skip manager handling (frame, home view)
+	return BaseManagerUI<CommentManager, CommentItem, CommentUI>::keyPressed(e);
+}
+
