@@ -16,11 +16,11 @@ template<class IT>
 class BaseManagerItemComparator
 {
 public:
-	BaseManagerItemComparator(BaseManager<IT> * _manager) :manager(_manager) {}
+	BaseManagerItemComparator(BaseManager<IT>* _manager) :manager(_manager) {}
 
-	BaseManager<IT> * manager;
+	BaseManager<IT>* manager;
 
-	int compareElements(BaseItemMinimalUI<IT> * u1, BaseItemMinimalUI<IT> * u2)
+	int compareElements(BaseItemMinimalUI<IT>* u1, BaseItemMinimalUI<IT>* u2)
 	{
 		return (manager->items.indexOf(u1->item) < manager->items.indexOf(u2->item)) ? -1 : 1;
 	}
@@ -35,12 +35,12 @@ class ManagerUIItemContainer :
 	public Component
 {
 public:
-	ManagerUIItemContainer<M, T, U>(BaseManagerUI<M, T, U> * _mui) : mui(_mui) {};
+	ManagerUIItemContainer<M, T, U>(BaseManagerUI<M, T, U>* _mui) : mui(_mui) {};
 	~ManagerUIItemContainer() {}
 
-	BaseManagerUI<M, T, U> * mui;
+	BaseManagerUI<M, T, U>* mui;
 
-	void childBoundsChanged(Component * c) { mui->childBoundsChanged(c); }
+	void childBoundsChanged(Component* c) { mui->childBoundsChanged(c); }
 };
 
 
@@ -55,15 +55,16 @@ class BaseManagerUI :
 	public BaseItemMinimalUI<T>::ItemMinimalUIListener,
 	public ComponentListener,
 	public Engine::AsyncListener,
-	public DragAndDropTarget
+	public DragAndDropTarget,
+	public Label::Listener
 {
 public:
-	BaseManagerUI<M, T, U>(const String &contentName, M * _manager, bool _useViewport = true);
+	BaseManagerUI<M, T, U>(const String& contentName, M* _manager, bool _useViewport = true);
 	virtual ~BaseManagerUI();
 
 	enum Layout { HORIZONTAL, VERTICAL, FREE };
 
-	M * manager;
+	M* manager;
 	OwnedArray<U> itemsUI;
 	BaseManagerItemComparator<T> managerComparator;
 
@@ -87,6 +88,7 @@ public:
 	bool validateHitTestOnNoItem;
 
 	std::unique_ptr<ImageButton> addItemBT;
+	std::unique_ptr<Label> searchBar;
 
 	//ui
 	String noItemText;
@@ -116,76 +118,83 @@ public:
 	void addExistingItems(bool resizeAfter = true);
 
 	void setShowAddButton(bool value);
+	void setShowSearchBar(bool value);
 
-	virtual void paint(Graphics &g) override;
+	virtual void paint(Graphics& g) override;
 
 	virtual void resized() override;
-	virtual juce::Rectangle<int> setHeaderBounds(juce::Rectangle<int> &r);
-	virtual void resizedInternalHeader(juce::Rectangle<int> &r);
-	virtual void resizedInternalContent(juce::Rectangle<int> &r);
+	virtual juce::Rectangle<int> setHeaderBounds(juce::Rectangle<int>& r);
+	virtual void resizedInternalHeader(juce::Rectangle<int>& r);
+	virtual void resizedInternalContent(juce::Rectangle<int>& r);
 	virtual void placeItems(juce::Rectangle<int>& r);
-	virtual void resizedInternalFooter(juce::Rectangle<int> &r);
+	virtual void resizedInternalFooter(juce::Rectangle<int>& r);
 
 	virtual void updateItemsVisibility();
+	virtual void updateItemVisibility(U * bui);
 
-	virtual void childBoundsChanged(Component *) override;
+	bool hasFiltering();
+	virtual Array<U *> getFilteredItems();
+	virtual bool checkFilterForItem(U* item);
+
+	virtual void childBoundsChanged(Component*) override;
 
 	virtual bool hitTest(int x, int y) override;
 
 	//For container check
-    virtual void componentMovedOrResized(Component &c, bool wasMoved, bool wasResized) override;
+	virtual void componentMovedOrResized(Component& c, bool wasMoved, bool wasResized) override;
 
 
 	virtual void showMenuAndAddItem(bool isFromAddButton, Point<int> mouseDownPos);
-	virtual void addMenuExtraItems(PopupMenu &p, int startIndex) {}
+	virtual void addMenuExtraItems(PopupMenu& p, int startIndex) {}
 	virtual void handleMenuExtraItemsResult(int result, int startIndex) {}
 	virtual void addItemFromMenu(bool isFromAddButton, Point<int> mouseDownPos);
-	virtual void addItemFromMenu(T * item, bool isFromAddButton, Point<int> mouseDownPos);
+	virtual void addItemFromMenu(T* item, bool isFromAddButton, Point<int> mouseDownPos);
 
-	virtual U * addItemUI(T * item, bool animate = false, bool resizeAndRepaint = true);
-	virtual U * createUIForItem(T * item);
-	virtual void addItemUIInternal(U *) {}
+	virtual U* addItemUI(T* item, bool animate = false, bool resizeAndRepaint = true);
+	virtual U* createUIForItem(T* item);
+	virtual void addItemUIInternal(U*) {}
 
-	virtual void mouseDown(const MouseEvent &e) override;
+	virtual void mouseDown(const MouseEvent& e) override;
 	virtual void mouseUp(const MouseEvent& e) override;
 
-	virtual void askSelectToThis(BaseItemMinimalUI<T> * item) override;
+	virtual void askSelectToThis(BaseItemMinimalUI<T>* item) override;
 
-	virtual void removeItemUI(T * item, bool resizeAndRepaint = true);
-	virtual void removeItemUIInternal(U *) {}
+	virtual void removeItemUI(T* item, bool resizeAndRepaint = true);
+	virtual void removeItemUIInternal(U*) {}
 
 	//Drag drop target
-	virtual bool isInterestedInDragSource(const SourceDetails & dragSourceDetails) override;
+	virtual bool isInterestedInDragSource(const SourceDetails& dragSourceDetails) override;
 
 	virtual void itemDragEnter(const SourceDetails&) override;
 	virtual void itemDragMove(const SourceDetails& dragSourceDetails) override;
 	virtual void itemDragExit(const SourceDetails&) override;
-	virtual void itemDropped(const SourceDetails & dragSourceDetails) override;
+	virtual void itemDropped(const SourceDetails& dragSourceDetails) override;
 
 	//Selection
-	virtual void addSelectableComponentsAndInspectables(Array<Component*> &selectables, Array<Inspectable*> &inspectables);
-	virtual Component * getSelectableComponentForItemUI(U* itemUI);
+	virtual void addSelectableComponentsAndInspectables(Array<Component*>& selectables, Array<Inspectable*>& inspectables);
+	virtual Component* getSelectableComponentForItemUI(U* itemUI);
 
 	virtual int getDropIndexForPosition(Point<int> localPosition);
-	virtual void itemUIMiniModeChanged(BaseItemUI<T> * se) override {}
+	virtual void itemUIMiniModeChanged(BaseItemUI<T>* se) override {}
 
 	//menu
-	U * getUIForItem(T * item, bool directIndexAccess = true);
+	U* getUIForItem(T* item, bool directIndexAccess = true);
 
 	int getContentHeight();
 
-	virtual void itemAddedAsync(T * item);
-	virtual void itemsAddedAsync(Array<T *> items);
+	virtual void itemAddedAsync(T* item);
+	virtual void itemsAddedAsync(Array<T*> items);
 
-	virtual void itemRemoved(T * item) override; //must keep this one realtime because the async may cause the target item to already be deleted by the time this function is called
-	virtual void itemsRemoved(Array<T *> items) override;
+	virtual void itemRemoved(T* item) override; //must keep this one realtime because the async may cause the target item to already be deleted by the time this function is called
+	virtual void itemsRemoved(Array<T*> items) override;
 	virtual void itemsReorderedAsync();
 
-	void newMessage(const typename BaseManager<T>::ManagerEvent &e) override;
+	void newMessage(const typename BaseManager<T>::ManagerEvent& e) override;
 
-	void buttonClicked(Button *) override;
+	void buttonClicked(Button* b) override;
+	void labelTextChanged(Label* l) override;
 
-	virtual void inspectableDestroyed(Inspectable *) override;
+	virtual void inspectableDestroyed(Inspectable*) override;
 
 	virtual void newMessage(const Engine::EngineEvent& e) override;
 
@@ -194,8 +203,8 @@ public:
 	public:
 		/** Destructor. */
 		virtual ~ManagerUIListener() {}
-		virtual void itemUIAdded(U *) {}
-		virtual void itemUIRemoved(U *) {}
+		virtual void itemUIAdded(U*) {}
+		virtual void itemUIRemoved(U*) {}
 	};
 
 	ListenerList<ManagerUIListener> managerUIListeners;
@@ -230,7 +239,7 @@ BaseManagerUI<M, T, U>::BaseManagerUI(const String& contentName, M* _manager, bo
 	fixedItemHeight(true),
 	gap(2)
 {
-	
+
 	selectionContourColor = LIGHTCONTOUR_COLOR;
 	addItemText = "Add Item";
 
@@ -257,9 +266,21 @@ BaseManagerUI<M, T, U>::BaseManagerUI(const String& contentName, M* _manager, bo
 	addItemBT->addListener(this);
 
 	setShowAddButton(baseM->userCanAddItemsManually);
-	
+
+	searchBar.reset(new Label("SearchBar"));
+	searchBar->setJustificationType(Justification::topLeft);
+	searchBar->setColour(searchBar->backgroundColourId, BG_COLOR.darker(.1f).withAlpha(.7f));
+	searchBar->setColour(searchBar->outlineColourId, BG_COLOR.brighter(.1f));
+	searchBar->setColour(searchBar->textColourId,TEXT_COLOR);
+	searchBar->setColour(CaretComponent::caretColourId, Colours::orange);
+	searchBar->setEditable(true);
+
+	searchBar->addListener(this);
+
+	setShowSearchBar(true);
+
 	acceptedDropTypes.add(baseM->itemDataType);
-	
+
 	Engine::mainEngine->addAsyncEngineListener(this);
 
 	//must call addExistingItems from child class to get overrides
@@ -295,7 +316,7 @@ void BaseManagerUI<M, T, U>::addExistingItems(bool resizeAfter)
 {
 
 	//add existing items
-	for (auto &t : manager->items) addItemUI(t, false);
+	for (auto& t : manager->items) addItemUI(t, false);
 	if (resizeAfter) resized();
 }
 
@@ -307,7 +328,8 @@ void BaseManagerUI<M, T, U>::setShowAddButton(bool value)
 	if (value)
 	{
 		addAndMakeVisible(addItemBT.get());
-	} else
+	}
+	else
 	{
 		removeChildComponent(addItemBT.get());
 	}
@@ -315,47 +337,69 @@ void BaseManagerUI<M, T, U>::setShowAddButton(bool value)
 }
 
 template<class M, class T, class U>
-void BaseManagerUI<M, T, U>::mouseDown(const MouseEvent & e)
+void BaseManagerUI<M, T, U>::setShowSearchBar(bool value)
+{
+	searchBar->setVisible(value);
+	if (value)
+	{
+		addAndMakeVisible(searchBar.get());
+	}
+	else
+	{
+		removeChildComponent(searchBar.get());
+	}
+}
+
+template<class M, class T, class U>
+void BaseManagerUI<M, T, U>::mouseDown(const MouseEvent& e)
 {
 	InspectableContentComponent::mouseDown(e);
 
-	if (e.mods.isLeftButtonDown() && e.eventComponent == this)
+	if (e.eventComponent == this)
 	{
-		if (!e.mods.isCommandDown() && !e.mods.isAltDown())
+		if (e.mods.isLeftButtonDown())
 		{
-			if (useDedicatedSelector)
+			if (!e.mods.isCommandDown() && !e.mods.isAltDown())
 			{
-				Array<Component*> selectables;
-				Array<Inspectable*> inspectables;
-				addSelectableComponentsAndInspectables(selectables, inspectables);
+				if (useDedicatedSelector)
+				{
+					Array<Component*> selectables;
+					Array<Inspectable*> inspectables;
+					addSelectableComponentsAndInspectables(selectables, inspectables);
 
-				InspectableSelector::getInstance()->startSelection(this, selectables, inspectables, nullptr, !e.mods.isShiftDown());
-				selectingItems = true;
+					InspectableSelector::getInstance()->startSelection(this, selectables, inspectables, nullptr, !e.mods.isShiftDown());
+					selectingItems = true;
+				}
 			}
 		}
-	} else if (e.mods.isRightButtonDown() && e.eventComponent == this)
-	{
-		if (manager->userCanAddItemsManually) showMenuAndAddItem(false, e.getEventRelativeTo(this).getMouseDownPosition());
+		else if (e.mods.isRightButtonDown() && e.eventComponent == this)
+		{
+			if (manager->userCanAddItemsManually) showMenuAndAddItem(false, e.getEventRelativeTo(this).getMouseDownPosition());
+		}
 	}
+
 }
 
 template<class M, class T, class U>
 void BaseManagerUI<M, T, U>::mouseUp(const MouseEvent& e)
 {
-	if (selectingItems)
+	if (e.eventComponent == this)
 	{
-		//InspectableSelector::getInstance()->endSelection();
-		selectingItems = false;
+		if (selectingItems)
+		{
+			//InspectableSelector::getInstance()->endSelection();
+			selectingItems = false;
+		}
 	}
 }
 
 template<class M, class T, class U>
 void BaseManagerUI<M, T, U>::askSelectToThis(BaseItemMinimalUI<T>* itemUI)
 {
-	T * firstItem = InspectableSelectionManager::activeSelectionManager->getInspectableAs<T>();
+	T* firstItem = InspectableSelectionManager::activeSelectionManager->getInspectableAs<T>();
 	int firstIndex = manager->items.indexOf(firstItem);
 	int itemIndex = manager->items.indexOf(itemUI->item);
-	
+
 	if (firstIndex == itemIndex) return;
 
 	if (firstIndex >= 0 && itemIndex >= 0)
@@ -366,7 +410,7 @@ void BaseManagerUI<M, T, U>::askSelectToThis(BaseItemMinimalUI<T>* itemUI)
 		{
 			manager->items[index]->selectThis(true);
 		}
-		
+
 	}
 
 	if (itemIndex >= 0) manager->items[itemIndex]->selectThis(true);
@@ -374,7 +418,7 @@ void BaseManagerUI<M, T, U>::askSelectToThis(BaseItemMinimalUI<T>* itemUI)
 
 
 template<class M, class T, class U>
-void BaseManagerUI<M, T, U>::paint(Graphics & g)
+void BaseManagerUI<M, T, U>::paint(Graphics& g)
 {
 	juce::Rectangle<int> r = getLocalBounds();
 
@@ -398,7 +442,8 @@ void BaseManagerUI<M, T, U>::paint(Graphics & g)
 		g.setColour(textColor);
 
 		g.drawText(managerUIName, tr, Justification::centred, 1);
-	} else
+	}
+	else
 	{
 		if (!transparentBG)	g.fillAll(bgColor);
 	}
@@ -406,7 +451,7 @@ void BaseManagerUI<M, T, U>::paint(Graphics & g)
 	if (isDraggingOver && highlightOnDragOver)
 	{
 		g.setColour(BLUE_COLOR);
-		
+
 		switch (defaultLayout)
 		{
 		case HORIZONTAL:
@@ -414,7 +459,7 @@ void BaseManagerUI<M, T, U>::paint(Graphics & g)
 		{
 			if (itemsUI.size() > 0)
 			{
-				BaseItemMinimalUI<T> * bui = dynamic_cast<BaseItemMinimalUI<T> *>(itemsUI[currentDropIndex >= 0 ? currentDropIndex : itemsUI.size() - 1]);
+				BaseItemMinimalUI<T>* bui = dynamic_cast<BaseItemMinimalUI<T>*>(itemsUI[currentDropIndex >= 0 ? currentDropIndex : itemsUI.size() - 1]);
 				if (bui != nullptr)
 				{
 					juce::Rectangle<int> buiBounds = getLocalArea(bui, bui->getLocalBounds());
@@ -426,7 +471,7 @@ void BaseManagerUI<M, T, U>::paint(Graphics & g)
 					else if (defaultLayout == VERTICAL)
 					{
 						int ty = currentDropIndex >= 0 ? buiBounds.getY() - 1 : buiBounds.getBottom() + 1;
-						g.drawLine(0,ty , getWidth(), ty, 2);
+						g.drawLine(0, ty, getWidth(), ty, 2);
 					}
 				}
 			}
@@ -443,7 +488,7 @@ void BaseManagerUI<M, T, U>::paint(Graphics & g)
 	if (this->manager->items.size() == 0 && noItemText.isNotEmpty())
 	{
 		g.setColour(Colours::white.withAlpha(.4f));
-		g.setFont(jmin(getHeight()-2,14));
+		g.setFont(jmin(getHeight() - 2, 14));
 		g.drawFittedText(noItemText, getLocalBounds().reduced(5), Justification::centred, 6);
 	}
 }
@@ -462,6 +507,8 @@ void BaseManagerUI<M, T, U>::resized()
 	resizedInternalFooter(r);
 	resizedInternalContent(r);
 
+	updateItemsVisibility();
+
 	//resizeOnChildBoundsChanged = resizeOnChange;
 }
 
@@ -477,7 +524,13 @@ void BaseManagerUI<M, T, U>::resizedInternalHeader(juce::Rectangle<int>& hr)
 	if (addItemBT != nullptr && addItemBT->isVisible() && addItemBT->getParentComponent() == this)
 	{
 		if (defaultLayout == VERTICAL) addItemBT->setBounds(hr.removeFromRight(hr.getHeight()).reduced(2));
-		else addItemBT->setBounds(hr.removeFromTop(hr.getWidth()).reduced(2));
+		else addItemBT->setBounds(hr.removeFromTop(24).removeFromRight(24).reduced(2));
+	}
+
+	if (searchBar != nullptr && searchBar->isVisible() && searchBar->getParentComponent() == this)
+	{
+		if (defaultLayout == VERTICAL) searchBar->setBounds(hr.removeFromLeft(150).reduced(1));
+		else searchBar->setBounds(hr.removeFromTop(20).reduced(2));
 	}
 }
 
@@ -505,7 +558,8 @@ void BaseManagerUI<M, T, U>::resizedInternalContent(juce::Rectangle<int>& r)
 
 			if (useViewport) container.setSize(getWidth(), th);
 			else this->setSize(getWidth(), jmax<int>(th + 10, minHeight));
-		} else if (defaultLayout == HORIZONTAL)
+		}
+		else if (defaultLayout == HORIZONTAL)
 		{
 			float tw = 0;
 			if (itemsUI.size() > 0) tw = static_cast<BaseItemMinimalUI<T>*>(itemsUI[itemsUI.size() - 1])->getRight();
@@ -523,6 +577,12 @@ void BaseManagerUI<M, T, U>::placeItems(juce::Rectangle<int>& r)
 	for (auto& ui : itemsUI)
 	{
 		BaseItemMinimalUI<T>* bui = static_cast<BaseItemMinimalUI<T>*>(ui);
+		if (!checkFilterForItem(ui))
+		{
+			bui->setVisible(false);
+			continue;
+		}
+		bui->setVisible(true);
 
 		juce::Rectangle<int> tr;
 		if (defaultLayout == VERTICAL) tr = r.withHeight(bui->getHeight());
@@ -544,24 +604,52 @@ void BaseManagerUI<M, T, U>::resizedInternalFooter(juce::Rectangle<int>& r)
 
 template<class M, class T, class U>
 void BaseManagerUI<M, T, U>::updateItemsVisibility()
-{ 
-	for (auto &bui : itemsUI)
-	{
-		juce::Rectangle<int> vr = this->getLocalArea(bui, bui->getLocalBounds());
-		if (defaultLayout == VERTICAL)
-		{
-			if (viewport.getHeight() > 0 && (vr.getY() > viewport.getBounds().getBottom() || vr.getBottom() < viewport.getY())) bui->setVisible(false);
-			else bui->setVisible(true);
-		}else
-		{
-			bui->setVisible(true);
-		}
-	}
-
+{
+	for (auto& bui : itemsUI) updateItemVisibility(bui);
 }
 
 template<class M, class T, class U>
-void BaseManagerUI<M, T, U>::childBoundsChanged(Component * c)
+void BaseManagerUI<M, T, U>::updateItemVisibility(U * bui)
+{
+	if (!checkFilterForItem(bui)) return;
+
+	juce::Rectangle<int> vr = this->getLocalArea(bui, bui->getLocalBounds());
+	if (defaultLayout == VERTICAL)
+	{
+		if (viewport.getHeight() > 0 && (vr.getY() > viewport.getBounds().getBottom() || vr.getBottom() < viewport.getY())) bui->setVisible(false);
+		else bui->setVisible(true);
+	}
+	else
+	{
+		bui->setVisible(true);
+	}
+}
+
+template<class M, class T, class U>
+bool BaseManagerUI<M, T, U>::hasFiltering()
+{
+	return searchBar->getText().isNotEmpty();
+}
+
+template<class M, class T, class U>
+Array<U*> BaseManagerUI<M, T, U>::getFilteredItems()
+{
+	if (!this->hasFiltering()) return Array<U *>(this->itemsUI.getRawDataPointer(), this->itemsUI.size());
+
+	Array<U*> result;
+	for (auto& ui : this->itemsUI) if (checkFilterForItem(ui)) result.add(ui);
+	return result;
+}
+
+template<class M, class T, class U>
+bool BaseManagerUI<M, T, U>::checkFilterForItem(U* ui)
+{
+	if (!this->hasFiltering()) return true;
+	return ui->item->niceName.toLowerCase().contains(searchBar->getText().toLowerCase());
+}
+
+template<class M, class T, class U>
+void BaseManagerUI<M, T, U>::childBoundsChanged(Component* c)
 {
 	if (resizeOnChildBoundsChanged && c != &viewport) resized();
 }
@@ -572,7 +660,7 @@ bool BaseManagerUI<M, T, U>::hitTest(int x, int y)
 	if (!autoFilterHitTestOnItems) return InspectableContentComponent::hitTest(x, y);
 	if (itemsUI.size() == 0) return validateHitTestOnNoItem;
 
-	for (auto &i : itemsUI)
+	for (auto& i : itemsUI)
 	{
 		Point<int> p(x, y);
 		if (i->getBounds().contains(p))
@@ -581,17 +669,16 @@ bool BaseManagerUI<M, T, U>::hitTest(int x, int y)
 			if (i->hitTest(localP.x, localP.y)) return true;
 		}
 	}
-			
+
 	return false;
 }
 
 template<class M, class T, class U>
-inline void BaseManagerUI<M, T, U>::componentMovedOrResized(Component & c, bool wasMoved, bool wasResized)
+void BaseManagerUI<M, T, U>::componentMovedOrResized(Component& c, bool wasMoved, bool wasResized)
 {
 	if (&c == &container && useViewport && !itemAnimator.isAnimating())
 	{
 		resized();
-		updateItemsVisibility();
 	}
 }
 
@@ -600,9 +687,10 @@ void BaseManagerUI<M, T, U>::showMenuAndAddItem(bool isFromAddButton, Point<int>
 {
 	if (manager->managerFactory != nullptr)
 	{
-		T * item = manager->managerFactory->showCreateMenu();
+		T* item = manager->managerFactory->showCreateMenu();
 		if (item != nullptr) addItemFromMenu(item, isFromAddButton, mouseDownPos);
-	} else
+	}
+	else
 	{
 		if (isFromAddButton)
 		{
@@ -637,27 +725,27 @@ void BaseManagerUI<M, T, U>::addItemFromMenu(bool fromAddButton, Point<int> pos)
 }
 
 template<class M, class T, class U>
-void BaseManagerUI<M, T, U>::addItemFromMenu(T * item, bool, Point<int>)
+void BaseManagerUI<M, T, U>::addItemFromMenu(T* item, bool, Point<int>)
 {
 	manager->BaseManager<T>::addItem(item);
 }
 
 template<class M, class T, class U>
-U * BaseManagerUI<M, T, U>::addItemUI(T * item, bool animate, bool resizeAndRepaint)
+U* BaseManagerUI<M, T, U>::addItemUI(T* item, bool animate, bool resizeAndRepaint)
 {
-	U * tui = createUIForItem(item);
+	U* tui = createUIForItem(item);
 
-	BaseItemMinimalUI<T> * bui = static_cast<BaseItemMinimalUI<T>*>(tui);
+	BaseItemMinimalUI<T>* bui = static_cast<BaseItemMinimalUI<T>*>(tui);
 
 	if (useViewport) container.addAndMakeVisible(bui);
 	else addAndMakeVisible(bui);
 
 	int index = manager->items.indexOf(item);
 	itemsUI.insert(index, tui);
-	
+
 	bui->addItemMinimalUIListener(this);
 
-	BaseItemUI<T> * biui = dynamic_cast<BaseItemUI<T> *>(tui);
+	BaseItemUI<T>* biui = dynamic_cast<BaseItemUI<T>*>(tui);
 	if (biui != nullptr) biui->addItemUIListener(this);
 
 
@@ -668,9 +756,10 @@ U * BaseManagerUI<M, T, U>::addItemUI(T * item, bool animate, bool resizeAndRepa
 		juce::Rectangle<int> tb = bui->getBounds();
 		bui->setSize(10, 10);
 		itemAnimator.animateComponent(bui, tb, 1, 200, false, 1, 0);
-	} else
+	}
+	else
 	{
-		if(biui != nullptr && biui->baseItem->miniMode->boolValue()) biui->updateMiniModeUI();
+		if (biui != nullptr && biui->baseItem->miniMode->boolValue()) biui->updateMiniModeUI();
 		//DBG("resized");  
 		//resized();
 	}
@@ -683,13 +772,13 @@ U * BaseManagerUI<M, T, U>::addItemUI(T * item, bool animate, bool resizeAndRepa
 }
 
 template<class M, class T, class U>
-inline U * BaseManagerUI<M, T, U>::createUIForItem(T * item)
+U* BaseManagerUI<M, T, U>::createUIForItem(T* item)
 {
 	return new U(item);
 }
 
 template<class M, class T, class U>
-void BaseManagerUI<M, T, U>::removeItemUI(T * item, bool resizeAndRepaint)
+void BaseManagerUI<M, T, U>::removeItemUI(T* item, bool resizeAndRepaint)
 {
 	{
 		MessageManagerLock mmLock; //Ensure this method can be called from another thread than the UI one
@@ -717,18 +806,17 @@ void BaseManagerUI<M, T, U>::removeItemUI(T * item, bool resizeAndRepaint)
 		if (resizeAndRepaint)
 		{
 			resized();
-			updateItemsVisibility();
 			repaint();
 		}
 	}
 }
 
 template<class M, class T, class U>
-U * BaseManagerUI<M, T, U>::getUIForItem(T * item, bool directIndexAccess)
+U* BaseManagerUI<M, T, U>::getUIForItem(T* item, bool directIndexAccess)
 {
 	if (directIndexAccess) return itemsUI[static_cast<BaseManager<T>*>(manager)->items.indexOf(item)];
 
-	for (auto &ui : itemsUI) if (static_cast<BaseItemMinimalUI<T>*>(ui)->item == item) return ui; //brute search, not needed if ui/items are synchronized
+	for (auto& ui : itemsUI) if (static_cast<BaseItemMinimalUI<T>*>(ui)->item == item) return ui; //brute search, not needed if ui/items are synchronized
 	return nullptr;
 }
 
@@ -739,7 +827,7 @@ int BaseManagerUI<M, T, U>::getContentHeight()
 }
 
 template<class M, class T, class U>
-void BaseManagerUI<M, T, U>::itemAddedAsync(T * item)
+void BaseManagerUI<M, T, U>::itemAddedAsync(T* item)
 {
 	addItemUI(item, animateItemOnAdd);
 	if (!animateItemOnAdd) resized();
@@ -748,15 +836,15 @@ void BaseManagerUI<M, T, U>::itemAddedAsync(T * item)
 template<class M, class T, class U>
 void BaseManagerUI<M, T, U>::itemsAddedAsync(Array<T*> items)
 {
-	for (auto &i : items) addItemUI(i, false, false);
-	
+	for (auto& i : items) addItemUI(i, false, false);
+
 	resized();
 	repaint();
-	
+
 }
 
 template<class M, class T, class U>
-void BaseManagerUI<M, T, U>::itemRemoved(T * item)
+void BaseManagerUI<M, T, U>::itemRemoved(T* item)
 {
 	removeItemUI(item);
 }
@@ -766,7 +854,7 @@ void BaseManagerUI<M, T, U>::itemsRemoved(Array<T*> items)
 {
 	if (items.size() == 0) return;
 
-	for (auto &i : items) removeItemUI(i,false);
+	for (auto& i : items) removeItemUI(i, false);
 
 	MessageManagerLock mmLock;
 	resized();
@@ -782,7 +870,7 @@ void BaseManagerUI<M, T, U>::itemsReorderedAsync()
 }
 
 template<class M, class T, class U>
-void BaseManagerUI<M, T, U>::newMessage(const typename BaseManager<T>::ManagerEvent & e)
+void BaseManagerUI<M, T, U>::newMessage(const typename BaseManager<T>::ManagerEvent& e)
 {
 	switch (e.type)
 	{
@@ -809,11 +897,11 @@ void BaseManagerUI<M, T, U>::newMessage(const typename BaseManager<T>::ManagerEv
 }
 
 template<class M, class T, class U>
-bool BaseManagerUI<M, T, U>::isInterestedInDragSource(const SourceDetails & dragSourceDetails)
+bool BaseManagerUI<M, T, U>::isInterestedInDragSource(const SourceDetails& dragSourceDetails)
 {
 	if (acceptedDropTypes.contains(dragSourceDetails.description.getProperty("dataType", "").toString())) return true;
 
-	U * itemUI = dynamic_cast<U *>(dragSourceDetails.sourceComponent.get());
+	U* itemUI = dynamic_cast<U*>(dragSourceDetails.sourceComponent.get());
 	if (itemsUI.contains(itemUI)) return true;
 
 	return false;
@@ -827,7 +915,7 @@ void BaseManagerUI<M, T, U>::itemDragEnter(const SourceDetails&)
 }
 
 template<class M, class T, class U>
-void BaseManagerUI<M, T, U>::itemDragMove(const SourceDetails &dragSourceDetails)
+void BaseManagerUI<M, T, U>::itemDragMove(const SourceDetails& dragSourceDetails)
 {
 	if (defaultLayout == HORIZONTAL || defaultLayout == VERTICAL)
 	{
@@ -845,16 +933,16 @@ void BaseManagerUI<M, T, U>::itemDragExit(const SourceDetails&)
 }
 
 template<class M, class T, class U>
-void BaseManagerUI<M, T, U>::itemDropped(const SourceDetails & dragSourceDetails)
+void BaseManagerUI<M, T, U>::itemDropped(const SourceDetails& dragSourceDetails)
 {
-	
+
 	if (defaultLayout == HORIZONTAL || defaultLayout == VERTICAL)
 	{
-		BaseItemMinimalUI<T> * bui = dynamic_cast<BaseItemMinimalUI<T> *>(dragSourceDetails.sourceComponent.get());
+		BaseItemMinimalUI<T>* bui = dynamic_cast<BaseItemMinimalUI<T>*>(dragSourceDetails.sourceComponent.get());
 		if (bui != nullptr)
 		{
 			int droppingIndex = getDropIndexForPosition(dragSourceDetails.localPosition);
-			if (itemsUI.contains((U *)bui))
+			if (itemsUI.contains((U*)bui))
 			{
 				if (itemsUI.indexOf((U*)bui) < droppingIndex) droppingIndex--;
 				if (droppingIndex == -1) droppingIndex = itemsUI.size() - 1;
@@ -863,7 +951,7 @@ void BaseManagerUI<M, T, U>::itemDropped(const SourceDetails & dragSourceDetails
 			else
 			{
 				var data = bui->item->getJSONData();
-				T * newItem = manager->addItemFromData(data);
+				T* newItem = manager->addItemFromData(data);
 				if (newItem != nullptr)
 				{
 					if (droppingIndex == -1) droppingIndex = itemsUI.size() - 1;
@@ -879,7 +967,7 @@ void BaseManagerUI<M, T, U>::itemDropped(const SourceDetails & dragSourceDetails
 }
 
 template<class M, class T, class U>
-void BaseManagerUI<M, T, U>::addSelectableComponentsAndInspectables(Array<Component*> &selectables, Array<Inspectable*> &inspectables)
+void BaseManagerUI<M, T, U>::addSelectableComponentsAndInspectables(Array<Component*>& selectables, Array<Inspectable*>& inspectables)
 {
 	for (auto& i : itemsUI)
 	{
@@ -893,7 +981,7 @@ void BaseManagerUI<M, T, U>::addSelectableComponentsAndInspectables(Array<Compon
 }
 
 template<class M, class T, class U>
-Component * BaseManagerUI<M, T, U>::getSelectableComponentForItemUI(U* itemUI)
+Component* BaseManagerUI<M, T, U>::getSelectableComponentForItemUI(U* itemUI)
 {
 	return itemUI;
 }
@@ -903,7 +991,7 @@ int BaseManagerUI<M, T, U>::getDropIndexForPosition(Point<int> localPosition)
 {
 	for (int i = 0; i < itemsUI.size(); ++i)
 	{
-		BaseItemMinimalUI<T> * iui = dynamic_cast<BaseItemMinimalUI<T> *>(itemsUI[i]);
+		BaseItemMinimalUI<T>* iui = dynamic_cast<BaseItemMinimalUI<T>*>(itemsUI[i]);
 		Point<int> p = getLocalArea(iui, iui->getLocalBounds()).getCentre();
 
 		if (defaultLayout == HORIZONTAL && localPosition.x < p.x) return i;
@@ -915,7 +1003,7 @@ int BaseManagerUI<M, T, U>::getDropIndexForPosition(Point<int> localPosition)
 
 
 template<class M, class T, class U>
-void BaseManagerUI<M, T, U>::buttonClicked(Button  * b)
+void BaseManagerUI<M, T, U>::buttonClicked(Button* b)
 {
 	if (b == addItemBT.get())
 	{
@@ -924,9 +1012,18 @@ void BaseManagerUI<M, T, U>::buttonClicked(Button  * b)
 }
 
 template<class M, class T, class U>
-void BaseManagerUI<M, T, U>::inspectableDestroyed(Inspectable *)
+void BaseManagerUI<M, T, U>::labelTextChanged(Label* l)
 {
-	if (manager != nullptr && !manager->isClearing) 
+	if (l == searchBar.get())
+	{
+		resized();
+	}
+}
+
+template<class M, class T, class U>
+void BaseManagerUI<M, T, U>::inspectableDestroyed(Inspectable*)
+{
+	if (manager != nullptr && !manager->isClearing)
 		static_cast<BaseManager<T>*>(manager)->removeBaseManagerListener(this);
 }
 

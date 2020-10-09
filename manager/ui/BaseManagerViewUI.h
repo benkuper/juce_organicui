@@ -106,7 +106,6 @@ public:
 	virtual void itemUIViewPositionChanged(BaseItemMinimalUI<T> * itemUI) override;
 	virtual void askForSyncPosAndSize(BaseItemMinimalUI<T>* itemUI) override;
 
-
 };
 
 
@@ -303,7 +302,9 @@ void BaseManagerViewUI<M, T, U>::resized()
 {
 	juce::Rectangle<int> r = this->getLocalBounds();
 	this->addItemBT->setBounds(r.withSize(24, 24).withX(r.getWidth() - 24));
-	for (auto &tui : this->itemsUI)
+
+	Array<U*> filteredItems = this->getFilteredItems();
+	for (auto &tui : filteredItems)
 	{
 		updateViewUIPosition(tui);
 	}
