@@ -132,7 +132,7 @@ public:
 	virtual void updateItemsVisibility();
 	virtual void updateItemVisibility(U * bui);
 
-	bool hasFiltering();
+	virtual bool hasFiltering();
 	virtual Array<U *> getFilteredItems();
 	virtual bool checkFilterForItem(U* item);
 
