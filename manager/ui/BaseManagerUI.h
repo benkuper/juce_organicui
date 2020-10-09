@@ -267,17 +267,6 @@ BaseManagerUI<M, T, U>::BaseManagerUI(const String& contentName, M* _manager, bo
 
 	setShowAddButton(baseM->userCanAddItemsManually);
 
-	searchBar.reset(new Label("SearchBar"));
-	searchBar->setJustificationType(Justification::topLeft);
-	searchBar->setColour(searchBar->backgroundColourId, BG_COLOR.darker(.1f).withAlpha(.7f));
-	searchBar->setColour(searchBar->outlineColourId, BG_COLOR.brighter(.1f));
-	searchBar->setColour(searchBar->textColourId,TEXT_COLOR);
-	searchBar->setColour(CaretComponent::caretColourId, Colours::orange);
-	searchBar->setEditable(true);
-
-	searchBar->addListener(this);
-
-	setShowSearchBar(true);
 
 	acceptedDropTypes.add(baseM->itemDataType);
 
@@ -325,28 +314,30 @@ void BaseManagerUI<M, T, U>::setShowAddButton(bool value)
 {
 	addItemBT->setVisible(value);
 
-	if (value)
-	{
-		addAndMakeVisible(addItemBT.get());
-	}
-	else
-	{
-		removeChildComponent(addItemBT.get());
-	}
-
+	if (value) addAndMakeVisible(addItemBT.get());
+	else removeChildComponent(addItemBT.get());
 }
 
 template<class M, class T, class U>
 void BaseManagerUI<M, T, U>::setShowSearchBar(bool value)
 {
-	searchBar->setVisible(value);
-	if (value)
+	if (value) 
 	{
+		searchBar.reset(new Label("SearchBar"));
+		searchBar->setJustificationType(Justification::topLeft);
+		searchBar->setColour(searchBar->backgroundColourId, BG_COLOR.darker(.1f).withAlpha(.7f));
+		searchBar->setColour(searchBar->outlineColourId, BG_COLOR.brighter(.1f));
+		searchBar->setColour(searchBar->textColourId, TEXT_COLOR.darker(.3f));
+		searchBar->setFont(10);
+		searchBar->setColour(CaretComponent::caretColourId, Colours::orange);
+		searchBar->setEditable(true);
+		searchBar->addListener(this);
 		addAndMakeVisible(searchBar.get());
 	}
-	else
+	else if(searchBar != nullptr)
 	{
 		removeChildComponent(searchBar.get());
+		searchBar.reset();
 	}
 }
 
@@ -529,7 +520,7 @@ void BaseManagerUI<M, T, U>::resizedInternalHeader(juce::Rectangle<int>& hr)
 
 	if (searchBar != nullptr && searchBar->isVisible() && searchBar->getParentComponent() == this)
 	{
-		if (defaultLayout == VERTICAL) searchBar->setBounds(hr.removeFromLeft(150).reduced(1));
+		if (defaultLayout == VERTICAL) searchBar->setBounds(hr.removeFromLeft(150).reduced(2));
 		else searchBar->setBounds(hr.removeFromTop(20).reduced(2));
 	}
 }
@@ -628,7 +619,7 @@ void BaseManagerUI<M, T, U>::updateItemVisibility(U * bui)
 template<class M, class T, class U>
 bool BaseManagerUI<M, T, U>::hasFiltering()
 {
-	return searchBar->getText().isNotEmpty();
+	return searchBar != nullptr && searchBar->getText().isNotEmpty();
 }
 
 template<class M, class T, class U>
@@ -644,7 +635,7 @@ Array<U*> BaseManagerUI<M, T, U>::getFilteredItems()
 template<class M, class T, class U>
 bool BaseManagerUI<M, T, U>::checkFilterForItem(U* ui)
 {
-	if (!this->hasFiltering()) return true;
+	if (!this->hasFiltering() || searchBar == nullptr) return true;
 	return ui->item->niceName.toLowerCase().contains(searchBar->getText().toLowerCase());
 }
 
