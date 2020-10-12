@@ -92,7 +92,7 @@ void TargetParameter::setValueFromTarget(ControllableContainer * cc, bool addToU
 {
 	if (targetContainer != nullptr && cc == targetContainer.get())
 	{
-		String ca = targetContainer->getControlAddress();
+		String ca = targetContainer->getControlAddress(rootContainer);
 		if (stringValue() == ca) return;
 	}
 
