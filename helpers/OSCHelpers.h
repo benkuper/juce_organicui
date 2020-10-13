@@ -4,6 +4,8 @@ class Controllable;
 class ControllableContainer;
 class Parameter;
 
+#include "../manager/BaseManager.h"
+
 class OSCHelpers
 {
 public:
@@ -18,6 +20,8 @@ public:
 	static int getIntArg(OSCArgument a);
 	static String getStringArg(OSCArgument a);
 	static OSCColour getOSCColour(Colour c);
+	static Point<float> getP2DArg(const OSCMessage& m, int startIndex = 0);
+	static Vector3D<float> getP3DArg(const OSCMessage& m, int startIndex = 0);
 
 	static Colour getColourFromOSC(OSCColour c);
 
@@ -28,4 +32,19 @@ public:
 	static Controllable * findControllableAndHandleMessage(ControllableContainer* root, const OSCMessage& m, int dataOffset = 0);
 
 	static void handleControllableForOSCMessage(Controllable* c, const OSCMessage& m, int dataOffset = 0);
+
+	template<class T>
+	static T* getItemForArgument(BaseManager<T>* manager, const OSCMessage& m, int argIndex)
+	{
+		if (m.size() <= argIndex) return nullptr;
+
+		if (m[0].isInt32())
+		{
+			int index = m[0].getInt32();
+			if (manager->items.size() <= index) return nullptr;
+			return manager->items[index];
+		}
+		
+		return manager->getItemWithName(getStringArg(m[0]), true, true);
+	}
 };

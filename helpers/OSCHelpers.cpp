@@ -86,6 +86,18 @@ OSCColour OSCHelpers::getOSCColour(Colour c)
 	return OSCColour::fromInt32((int32)(c.getRed() << 24 | c.getGreen() << 16 | c.getBlue() << 8 | c.getAlpha()));
 }
 
+Point<float> OSCHelpers::getP2DArg(const OSCMessage& m, int startIndex)
+{
+	if (m.size() <= startIndex + 1) return Point<float>();
+	return Point<float>(getFloatArg(m[startIndex]), getFloatArg(m[startIndex+1]));
+}
+
+Vector3D<float> OSCHelpers::getP3DArg(const OSCMessage& m, int startIndex)
+{
+	if (m.size() <= startIndex + 2) return Vector3D<float>();
+	return Vector3D<float>(getFloatArg(m[startIndex]), getFloatArg(m[startIndex + 1]), getFloatArg(m[startIndex + 2]));
+}
+
 
 Colour OSCHelpers::getColourFromOSC(OSCColour c)
 {

@@ -96,11 +96,6 @@ using namespace juce;
 #include "helpers/crypto/hmac/SHA1.h"
 #include "helpers/crypto/hmac/HMAC_SHA1.h"
 
-#include "helpers/WakeOnLan.h"
-#include "helpers/OSCHelpers.h"
-#include "helpers/NetworkHelpers.h"
-
-
 #include "undo/UndoMaster.h"
 #include "manager/Factory.h"
 
@@ -313,4 +308,8 @@ using namespace juce;
 #include "app/OrganicApplication.h"
 
 #include "remotecontrol/OSCRemoteControl.h"
+
+#include "helpers/WakeOnLan.h"
+#include "helpers/OSCHelpers.h"
+#include "helpers/NetworkHelpers.h"
 
