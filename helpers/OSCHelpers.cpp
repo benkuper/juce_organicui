@@ -1,3 +1,4 @@
+#include "OSCHelpers.h"
 
 void OSCHelpers::logOSCFormatError(const char* message, int length)
 {
@@ -21,6 +22,30 @@ OSCArgument OSCHelpers::varToArgument(const var& v)
 
 	jassert(false);
 
+	return OSCArgument("error");
+}
+
+OSCArgument OSCHelpers::varToColorArgument(const var& v)
+{
+	if (v.isBool()) return OSCArgument(OSCHelpers::getOSCColour((bool)v ? Colours::white : Colours::black));
+	else if (v.isInt() || v.isInt64() || v.isDouble())
+	{
+		int iv = (int)v;
+		OSCColour c = OSCColour::fromInt32(iv);// >> 24 & 0xFF | iv >> 16 & 0xFF | iv >> 8 & 0xFF | iv & 0xFF);
+		return OSCArgument(c);
+	}
+	else if (v.isString())
+	{
+		Colour c = Colour::fromString(v.toString());
+		return OSCArgument(OSCHelpers::getOSCColour(c));
+	}
+	else if (v.isArray() && v.size() >= 3)
+	{
+		Colour c = Colour::fromFloatRGBA(v[0], v[1], v[2], v.size() >= 4 ? (float)v[3] : 1.0f);
+		return OSCArgument(OSCHelpers::getOSCColour(c));
+	}
+
+	jassert(false);
 	return OSCArgument("error");
 }
 
@@ -67,6 +92,25 @@ Colour OSCHelpers::getColourFromOSC(OSCColour c)
 	return Colour(c.red, c.green, c.blue, c.alpha);
 }
 
+OSCMessage OSCHelpers::getOSCMessageForParameter(Parameter* p, ControllableContainer* addressRelativeTo)
+{
+	OSCMessage m(p->getControlAddress(addressRelativeTo));
+	addArgumentsForParameters(m, p);
+	return m;
+}
+
+void OSCHelpers::addArgumentsForParameters(OSCMessage& m, Parameter* p)
+{
+	if (p->type == Parameter::COLOR) m.addArgument(varToColorArgument(p->value));
+	else if (p->isComplex())
+	{
+		for (int i = 0; i < p->value.size(); i++) m.addArgument(varToArgument(p->value[i]));
+	}
+	else
+	{
+		m.addArgument(varToArgument(p->value));
+	}
+}
 
 Controllable * OSCHelpers::findControllableAndHandleMessage(ControllableContainer* root, const OSCMessage& m, int dataOffset)
 {
