@@ -116,15 +116,13 @@ Array<Point<float>> CubicEasing::getSplitControlPoints(float pos)
 	Point<float> p3 = end + anchor2->getPoint();
 	Point<float> p4 = end;
 
-	Point<float> cp1start, cp1End, cp2Start, cp2End;
-
 	Point<float> pp12 = p1 + (p2 - p1) * t;
 	Point<float> pp23 = p2 + (p3 - p2) * t;
 	Point<float> pp34 = p3 + (p4 - p3) * t;
 
 	Point<float> pp123 = pp12 + (pp23 - pp12) * t;
 	Point<float> pp234 = pp23 + (pp34 - pp23) * t;
-	Point<float> pp1234 = pp123 + (pp234 - pp123) * t;
+	//Point<float> pp1234 = pp123 + (pp234 - pp123) * t;
 
 	Array<Point<float>> result;
 	result.add(pp12, pp123, pp234, pp34);

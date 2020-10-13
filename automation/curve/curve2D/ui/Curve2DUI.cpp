@@ -102,8 +102,8 @@ void Curve2DUI::updateViewUIPosition(Curve2DKeyUI* ui)
     if (ui->item->easing != nullptr) pr = pr.getUnion(getBoundsInView(ui->item->easing->getBounds(true)).expanded(5,5));
     if (ui->item->nextKey != nullptr && (pr.getWidth() == 20 && pr.getHeight() == 20))
     {
-        Rectangle<float> t = ui->item->easing->getBounds(true);
-        Rectangle<int> vt = getBoundsInView(ui->item->easing->getBounds(true));
+        //Rectangle<float> t = ui->item->easing->getBounds(true);
+        //Rectangle<int> vt = getBoundsInView(ui->item->easing->getBounds(true));
         DBG("Weird");
     }
     pr.expand(5, 5);
