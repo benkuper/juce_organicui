@@ -245,10 +245,10 @@ BaseManager<T>::BaseManager(const String & name) :
 	itemDataType(""),
 	userCanAddItemsManually(true),
 	selectItemWhenCreated(true),
-	autoReorderOnAdd(true),
-	isManipulatingMultipleItems(false),
-	managerNotifier(50),
 	isClearing(false),
+    autoReorderOnAdd(true),
+    isManipulatingMultipleItems(false),
+    managerNotifier(50),
     comparator(this)
 {
 
