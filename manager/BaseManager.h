@@ -241,14 +241,14 @@ public:
 template<class T>
 BaseManager<T>::BaseManager(const String & name) :
 	EnablingControllableContainer(name, false),
+    isClearing(false),
 	managerFactory(nullptr),
 	itemDataType(""),
-	userCanAddItemsManually(true),
-	selectItemWhenCreated(true),
-	autoReorderOnAdd(true),
-	isManipulatingMultipleItems(false),
-	managerNotifier(50),
-	isClearing(false),
+    userCanAddItemsManually(true),
+    selectItemWhenCreated(true),
+    autoReorderOnAdd(true),
+    isManipulatingMultipleItems(false),
+    managerNotifier(50),
     comparator(this)
 {
 
