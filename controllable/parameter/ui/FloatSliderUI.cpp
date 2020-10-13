@@ -34,7 +34,12 @@ FloatSliderUI::~FloatSliderUI()
 void FloatSliderUI::paint(Graphics & g)
 {
 
-	if (shouldBailOut()) return;
+	if (shouldBailOut())
+	{
+		DBG("BAIL OUT !");
+		return;
+	}
+
 
 	Colour baseColour = useCustomFGColor ? customFGColor : (isInteractable()? PARAMETER_FRONT_COLOR.darker() : FEEDBACK_COLOR);
     Colour c = (isMouseButtonDown() && changeParamOnMouseUpOnly) ? HIGHLIGHT_COLOR : baseColour;

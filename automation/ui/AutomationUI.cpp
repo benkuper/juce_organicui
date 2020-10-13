@@ -30,7 +30,7 @@ AutomationUI::AutomationUI(Automation* manager) :
     startTimerHz(30);
 
     addExistingItems(false);
-    setSize(100, 300);
+    setSize(100, 100);
 }
 
 AutomationUI::~AutomationUI()

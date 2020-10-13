@@ -56,11 +56,13 @@ void ControllableUI::mouseEnter(const MouseEvent & e)
 
 void ControllableUI::mouseExit(const MouseEvent & e)
 {
+	setTooltip(tooltip); //restore tooltip when leaving
 	if (controllable != nullptr) HelpBox::getInstance()->clearOverData(controllable->helpID);
 }
 
 void ControllableUI::mouseDown(const MouseEvent & e)
 {
+	setTooltip("");  //force not showing tooltip after click
 	if (e.mods.isRightButtonDown())
 	{
 		if (showMenuOnRightClick)

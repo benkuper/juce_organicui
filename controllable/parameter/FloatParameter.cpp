@@ -80,6 +80,11 @@ bool FloatParameter::checkValueIsTheSame(var oldValue, var newValue)
 
 void FloatParameter::setValueInternal(var& val)
 {
+	if (floatValue() == 0)
+	{
+		DBG("Here 0");
+	}
+
 	if (unitSteps > 0) value = getStepSnappedValueFor(val);
 	else Parameter::setValueInternal(val);
 }

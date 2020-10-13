@@ -11,7 +11,7 @@
 #pragma once
 
 class AutomationEditor :
-	public GenericControllableContainerEditor
+	public EnablingControllableContainerEditor
 {
 public:
 	AutomationEditor(Automation * automation, bool isRoot);
@@ -21,6 +21,7 @@ public:
 	std::unique_ptr<AutomationUI> automationUI;
 
 	void resizedInternalContent(juce::Rectangle<int> &r) override;
+	void resetAndBuild() override;
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AutomationEditor)
