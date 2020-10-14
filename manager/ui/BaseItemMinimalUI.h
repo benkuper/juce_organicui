@@ -61,6 +61,8 @@ public:
 	virtual void mouseDrag(const MouseEvent& e) override;
 	virtual void mouseExit(const MouseEvent& e) override;
 
+	virtual bool isUsingMouseWheel();
+
 	virtual void selectToThis() override;
 
 	virtual void addContextMenuItems(PopupMenu& p) {}
@@ -250,6 +252,12 @@ void BaseItemMinimalUI<T>::mouseExit(const MouseEvent& e)
 {
 	InspectableContentComponent::mouseExit(e);
 	repaint();
+}
+
+template<class T>
+bool BaseItemMinimalUI<T>::isUsingMouseWheel()
+{
+	return false;
 }
 
 template<class T>

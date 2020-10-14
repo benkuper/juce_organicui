@@ -196,21 +196,26 @@ template<class M, class T, class U>
 	 }
 	 else
 	 {
+		
 		 double curTime = Time::getApproximateMillisecondCounter() / 1000.0;
-		 bool newCheck = curTime - timeSinceLastWheel > 1;
 
-		 if (newCheck && e.originalComponent != this) return;
-		 
+		 if (e.originalComponent != this)
+		 {
+			 if (curTime - timeSinceLastWheel > 1)
+			 {
+				 BaseItemMinimalUI<T>* bui = e.originalComponent->findParentComponentOfClass<BaseItemMinimalUI<T>>();
+				 if (bui != nullptr && bui->isUsingMouseWheel()) return;
+			 }
+		 }
+
+		 timeSinceLastWheel = curTime;
+
 		 float sensitivity = 500;
 		 viewOffset += Point<int>(d.deltaX*sensitivity, d.deltaY*sensitivity);
 		 updateItemsVisibility(); 
 		 this->resized();
 		 this->repaint();
-
-		 timeSinceLastWheel = curTime;
 	 }
-	
-
 }
 
  template<class M, class T, class U>
