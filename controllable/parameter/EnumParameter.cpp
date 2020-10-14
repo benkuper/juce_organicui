@@ -1,3 +1,4 @@
+#include "EnumParameter.h"
 /*
   ==============================================================================
 
@@ -130,6 +131,35 @@ void EnumParameter::setNext(bool loop, bool addToUndo)
 bool EnumParameter::checkValueIsTheSame(var oldValue, var newValue)
 {
 	return oldValue.toString() == newValue.toString();
+}
+
+var EnumParameter::getJSONDataInternal()
+{
+	var data = Parameter::getJSONDataInternal();
+	if (!saveValueOnly)
+	{
+		var optData(new DynamicObject());
+		for (auto& e : enumValues) optData.getDynamicObject()->setProperty(e->key, e->value);
+		data.getDynamicObject()->setProperty("enumOptions", optData);
+	}
+	return data;
+}
+
+void EnumParameter::loadJSONDataInternal(var data)
+{
+	if (!saveValueOnly)
+	{
+		var optData = data.getProperty("enumOptions", var());
+		if (optData.isObject())
+		{
+			NamedValueSet props = optData.getDynamicObject()->getProperties();
+			for (auto& p : props)
+			{
+				addOption(p.name.toString(), p.value, false);
+			}
+		}
+	}
+	Parameter::loadJSONDataInternal(data);
 }
 
 var EnumParameter::getValueKeyFromScript(const juce::var::NativeFunctionArgs& a)

@@ -36,7 +36,47 @@ public:
 
 	// Inherited via Listener
 	virtual void comboBoxChanged(ComboBox *) override;
+
+	virtual void addPopupMenuItemsInternal(PopupMenu* p) override;
+	virtual void handleMenuSelectedID(int result) override;
+
+
 	
+
+	class EnumOptionManager :
+		public Component,
+		public Label::Listener
+	{
+	public:
+		EnumOptionManager(EnumParameter * ep);
+		~EnumOptionManager();
+
+		EnumParameter* ep;
+		Viewport viewport;
+		Component container;
+
+		class EnumOptionUI :
+			public Component
+		{
+		public:
+			EnumOptionUI(EnumParameter * ui, int index);
+
+			EnumParameter * ep;
+			int index;
+
+			Label keyLabel;
+			Label valueLabel;
+
+			void resized() override;
+		};
+
+		OwnedArray<EnumOptionUI> optionsUI;
+		
+		void paint(Graphics& g) override;
+		void resized() override;
+		void labelTextChanged(Label* l) override;
+	};
+
 private:
 	HashMap<int, String> idKeyMap;
 	HashMap<String,int> keyIdMap;
@@ -47,6 +87,5 @@ protected:
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EnumParameterUI)
-
-		
 };
+

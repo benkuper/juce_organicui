@@ -11,7 +11,7 @@
 
 #include "../manager/ui/GenericManagerEditor.h"
 
-GenericControllableManager::GenericControllableManager(const String & name, bool itemsCanBeDisabled, bool canAddTriggers, bool canAddTargets) :
+GenericControllableManager::GenericControllableManager(const String & name, bool itemsCanBeDisabled, bool canAddTriggers, bool canAddTargets, bool canAddEnums) :
 	BaseManager(name),
 	itemsCanBeDisabled(itemsCanBeDisabled),
 	forceItemsFeedbackOnly(false)
@@ -29,6 +29,9 @@ GenericControllableManager::GenericControllableManager(const String & name, bool
 	factory.defs.add(Factory<GenericControllableItem>::Definition::createDef("", "Color Parameter", &GenericControllableItem::create)->addParam("controllableType", ColorParameter::getTypeStringStatic()));
 	factory.defs.add(Factory<GenericControllableItem>::Definition::createDef("", "Point2D Parameter", &GenericControllableItem::create)->addParam("controllableType", Point2DParameter::getTypeStringStatic()));
 	factory.defs.add(Factory<GenericControllableItem>::Definition::createDef("", "Point3D Parameter", &GenericControllableItem::create)->addParam("controllableType", Point3DParameter::getTypeStringStatic()));
+
+	if (canAddEnums) factory.defs.add(Factory<GenericControllableItem>::Definition::createDef("", "Enum Parameter", &GenericControllableItem::create)->addParam("controllableType", EnumParameter::getTypeStringStatic()));
+
 	if(canAddTargets) factory.defs.add(Factory<GenericControllableItem>::Definition::createDef("", "Target Parameter", &GenericControllableItem::create)->addParam("controllableType", TargetParameter::getTypeStringStatic()));
 
 }

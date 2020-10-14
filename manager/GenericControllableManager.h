@@ -13,7 +13,7 @@ class GenericControllableManager :
 	public BaseManager<GenericControllableItem>
 {
 public:
-	GenericControllableManager(const String &name, bool itemsCanBeDisabled = true, bool canAddTriggers = true, bool canAddTargets = true);
+	GenericControllableManager(const String &name, bool itemsCanBeDisabled = true, bool canAddTriggers = true, bool canAddTargets = true, bool canAddEnums = true);
 	~GenericControllableManager();
 
 	bool itemsCanBeDisabled;

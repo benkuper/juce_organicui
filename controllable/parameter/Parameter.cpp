@@ -182,17 +182,21 @@ StringArray Parameter::getValuesNames()
 
 void Parameter::setRange(var min, var max)
 {
-
 	if (!canHaveRange) return;
+
 
 	{
 		GenericScopedLock<SpinLock> lock(valueSetLock);
-		if (isComplex() && (!(min.isArray() && min.size() == value.size()) || !(max.isArray() && max.size() == value.size()))) return;
+		if (isComplex())
+		{
+			if (!min.isArray() || min.size() != value.size()) return;
+			if (!max.isArray() || max.size() != value.size()) return;
+		}
+
 		if (minimumValue == min && maximumValue == max) return;
 		minimumValue = min;
 		maximumValue = max;
 	}
-
 
 	listeners.call(&ParameterListener::parameterRangeChanged, this);
 	var arr;
@@ -232,7 +236,6 @@ void Parameter::clearRange()
 bool Parameter::hasRange()
 {
 	if (!canHaveRange) return false;
-
 	{
 		GenericScopedLock<SpinLock> lock(valueSetLock);
 		if (isComplex())
