@@ -657,10 +657,7 @@ void BaseManager<T>::askForDuplicateItem(BaseItem* item)
 	if (!userCanAddItemsManually) return;
 	var data = item->getJSONData();
 	data.getDynamicObject()->setProperty("index", items.indexOf(static_cast<T*>(item)) + 1);
-	if (T* i = addItemFromData(data))
-	{
-		((BaseItem*)i)->viewUIPosition->setPoint(((BaseItem*)i)->viewUIPosition->getPoint() + Point<float>(20, 20));
-	}
+	addItemFromData(data);
 }
 
 template<class T>
