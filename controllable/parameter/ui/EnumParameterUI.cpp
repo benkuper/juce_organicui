@@ -180,13 +180,13 @@ EnumParameterUI::EnumOptionManager::EnumOptionUI::EnumOptionUI(EnumParameter*  e
 
 
 	keyLabel.setEditable(true);
-	keyLabel.setBorderSize(BorderSize(1));
+	keyLabel.setBorderSize(BorderSize<int>(1));
 	keyLabel.setColour(Label::backgroundColourId, BG_COLOR);
 	keyLabel.setColour(Label::textColourId, TEXT_COLOR.darker(.2f));
 	keyLabel.setColour(Label::textWhenEditingColourId, TEXT_COLOR);
 
 	valueLabel.setEditable(true);
-	valueLabel.setBorderSize(BorderSize(1));
+	valueLabel.setBorderSize(BorderSize<int>(1));
 	valueLabel.setColour(Label::backgroundColourId, BG_COLOR);
 	valueLabel.setColour(Label::textColourId, TEXT_COLOR.darker(.2f));
 	valueLabel.setColour(Label::textWhenEditingColourId, TEXT_COLOR);
