@@ -62,7 +62,7 @@ bool CrashDumpUploader::init(bool autoUpload, bool showWindow)
         LOGWARNING("Crash log found, sending to Houston...");
 		if (autoUpload)
 		{
-			if (showWindow)
+			if (showWindow && uploadEnabled)
 			{
 				UploadWindow w;
 				DialogWindow::showModalDialog("Crash found !", &w, getMainWindow(), Colours::black, true);

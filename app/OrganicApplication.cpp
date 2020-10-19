@@ -78,7 +78,8 @@ void OrganicApplication::initialise(const String & commandLine)
 	//Crash handler
 //#if JUCE_WINDOWS
 	CrashDumpUploader::getInstance()->uploadEnabled = GlobalSettings::getInstance()->enableCrashUpload->boolValue();
-	CrashDumpUploader::getInstance()->init();
+	bool noCrashWindow = GlobalSettings::getInstance()->launchOnStartup->boolValue() | GlobalSettings::getInstance()->openSpecificFileOnStartup->boolValue() | GlobalSettings::getInstance()->openLastDocumentOnStartup->boolValue();
+	CrashDumpUploader::getInstance()->init(true, !noCrashWindow);
 //#endif
 
 //BUG FIX !! To remove in a while
