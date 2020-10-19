@@ -84,6 +84,7 @@ public:
 	bool isPresettable;
     bool isOverriden;
 	bool forceSaveValue; //if true, will save value even if not overriden
+	bool forceSaveRange; //will save range even if saveValueOnly is true
 
 	virtual void setEnabled(bool value, bool silentSet = false, bool force = false) override;
 
