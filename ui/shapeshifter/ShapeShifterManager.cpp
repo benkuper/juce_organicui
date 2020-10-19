@@ -268,6 +268,8 @@ void ShapeShifterManager::loadLayoutFromFile(int fileIndexInLayoutFolder)
 
 void ShapeShifterManager::loadLayoutFromFile(const File & fromFile)
 {
+	if (!fromFile.existsAsFile()) return;
+
 	std::unique_ptr<InputStream> is(fromFile.createInputStream());
 	var data = JSON::parse(*is);
 	loadLayout(data);
