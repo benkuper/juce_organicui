@@ -1,4 +1,3 @@
-#include "DashboardManager.h"
 /*
   ==============================================================================
 
@@ -21,22 +20,8 @@ DashboardManager::DashboardManager() :
 	snapping = addBoolParameter("Snapping", "If checked, items are automatically aligned when dragging them closed to other ones", true);
 
 #if ORGANICUI_USE_WEBSERVER
-	File customDashboardPath = File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory).getChildFile(OrganicApplication::getInstance()->getApplicationName() + "/dashboard");
-	if (customDashboardPath.exists() && customDashboardPath.isDirectory())
-	{
-		hasCustomDashboard = true;
-		serverRootPath = customDashboardPath;
-		LOG("Custom Dashboard detected, using this one");
-	}
-	else
-	{
-		hasCustomDashboard = false;
-		serverRootPath = File::getSpecialLocation(File::SpecialLocationType::userApplicationDataDirectory).getChildFile(OrganicApplication::getInstance()->getApplicationName() + "/dashboard");
-		bool isNewVersion = getAppProperties().getUserSettings()->getValue("lastVersion", "0") != getAppVersion();
-		if(isNewVersion) serverRootPath.deleteRecursively();
-	}
+	serverRootPath = File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory).getChildFile(OrganicApplication::getInstance()->getApplicationName() + "/dashboard");
 #endif
-
 }
 
 DashboardManager::~DashboardManager()
@@ -166,7 +151,6 @@ void DashboardManager::connectionClosed(const String& id, int status, const Stri
 
 void DashboardManager::setupDownloadURL(const String& _downloadURL)
 {
-	if (hasCustomDashboard) return;
 	downloadURL = URL(_downloadURL);
 	if (!serverRootPath.exists()) downloadDashboardFiles();
 }
@@ -180,7 +164,7 @@ void DashboardManager::downloadDashboardFiles()
 	}
 
 	LOG("Downloading dashboard files...");
-	downloadedFileZip = File::getSpecialLocation(File::tempDirectory).getChildFile(OrganicApplication::getInstance()->getApplicationName()+"/dashboard.zip");
+	downloadedFileZip = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile(OrganicApplication::getInstance()->getApplicationName()+"/dashboard.zip");
 	downloadTask = downloadURL.downloadToFile(downloadedFileZip, "", this);
 	if (downloadTask == nullptr)
 	{

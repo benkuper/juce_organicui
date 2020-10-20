@@ -1,4 +1,3 @@
-#include "Dashboard.h"
 /*
   ==============================================================================
 
@@ -11,7 +10,8 @@
 
 
 Dashboard::Dashboard() :
-	BaseItem("Dashboard", false)
+	BaseItem("Dashboard", false),
+	isBeingEdited(false)
 {
 	addChildControllableContainer(&itemManager);
 	itemManager.addBaseManagerListener(this);
@@ -40,6 +40,7 @@ var Dashboard::getJSONData()
 {
 	var data = BaseItem::getJSONData();
 	data.getDynamicObject()->setProperty("itemManager", itemManager.getJSONData());
+	if (isBeingEdited) data.getDynamicObject()->setProperty("editing", true);
 	return data;
 }
 
@@ -47,6 +48,7 @@ void Dashboard::loadJSONDataInternal(var data)
 {
 	BaseItem::loadJSONDataInternal(data);
 	itemManager.loadJSONData(data.getProperty("itemManager", var()));
+	isBeingEdited = data.getProperty("editing", false);
 }
 
 var Dashboard::getServerData()

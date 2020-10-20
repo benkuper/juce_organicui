@@ -1,3 +1,4 @@
+#include "DashboardItemUI.h"
 
 DashboardItemUI::DashboardItemUI(DashboardItem* item) :
 	BaseItemMinimalUI(item),
@@ -66,6 +67,14 @@ void DashboardItemUI::resized()
 	resizedDashboardItemInternal();
 }
 
+void DashboardItemUI::mouseDown(const MouseEvent& e)
+{
+	bool editMode = DashboardManager::getInstance()->editMode->boolValue();
+	if (!editMode) return; //avoid dashboard item select when in play mode
+
+	BaseItemMinimalUI::mouseDown(e);
+}
+
 void DashboardItemUI::mouseEnter(const MouseEvent& e)
 {
 	BaseItemMinimalUI::mouseEnter(e);
@@ -88,6 +97,7 @@ void DashboardItemUI::updateEditMode()
 	bool editMode = DashboardManager::getInstance()->editMode->boolValue();
 	updateEditModeInternal(editMode);
 
+	autoDrawContourWhenSelected = editMode;
 	dragAndDropEnabled = editMode;
 	resizer.setVisible(editMode);
 	resizer.toFront(false);

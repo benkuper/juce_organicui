@@ -63,7 +63,6 @@ public:
 	URL downloadURL;
 	File serverRootPath;
 	File downloadedFileZip;
-	bool hasCustomDashboard;
 	std::unique_ptr<URL::DownloadTask> downloadTask;
 
 	void setupDownloadURL(const String& downloadURL);
