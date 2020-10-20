@@ -358,7 +358,9 @@ void Engine::loadJSONData(var data, ProgressTask * loadingTask)
 	ProgressTask * dashboardTask = loadingTask->addTask("Dashboard");
 
 
-	if (d->hasProperty("layout")) ShapeShifterManager::getInstance()->loadLayout(d->getProperty("layout"));
+	var layoutData = d->getProperty("layout");
+
+	ShapeShifterManager::getInstance()->clearAllPanelsAndWindows();
 
 	projectTask->start();
 	if (d->hasProperty("projectSettings")) ProjectSettings::getInstance()->loadJSONData(d->getProperty("projectSettings"));
@@ -369,6 +371,8 @@ void Engine::loadJSONData(var data, ProgressTask * loadingTask)
 	dashboardTask->start();
 	if (d->hasProperty("dashboardManager")) DashboardManager::getInstance()->loadJSONData(d->getProperty("dashboardManager"));
 	dashboardTask->end();
+
+	ShapeShifterManager::getInstance()->loadLayout(layoutData);
 
 
 	if (InspectableSelectionManager::mainSelectionManager != nullptr) InspectableSelectionManager::mainSelectionManager->setEnabled(true); //Re enable editor
