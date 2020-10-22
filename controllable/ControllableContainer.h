@@ -29,6 +29,7 @@ public:
 	String niceName;
 	String shortName;
 	bool hasCustomShortName;
+	bool allowSameChildrenNiceNames;
 
 	bool nameCanBeChangedByUser;
 
@@ -144,8 +145,8 @@ public:
 	virtual void childStructureChanged(ControllableContainer *)override;
 	virtual void childAddressChanged(ControllableContainer *) override;
 	
-	bool isNameTaken(const String& name, Controllable* excludeC = nullptr, ControllableContainer* excludeCC = nullptr);
-	String getUniqueNameInContainer(const String &sourceName, int suffix = 0);
+	bool isNameTaken(const String& name, bool searchNiceName = true, Controllable* excludeC = nullptr, ControllableContainer* excludeCC = nullptr);
+	String getUniqueNameInContainer(const String &sourceName, bool searchNiceName = true, int suffix = 0);
 
 	//SCRIPT
 	virtual void updateLiveScriptObjectInternal(DynamicObject * parent = nullptr) override;
