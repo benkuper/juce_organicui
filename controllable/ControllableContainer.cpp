@@ -765,7 +765,8 @@ void ControllableContainer::controllableNameChanged(Controllable* c)
 {
 	if (allowSameChildrenNiceNames)
 	{
-		if (isNameTaken(c->niceName, false, c)) c->setNiceName(getUniqueNameInContainer(c->niceName, false));
+		if (!isNameTaken(c->niceName, true, c)) c->setAutoShortName();
+		else if (isNameTaken(c->shortName, false, c)) c->setCustomShortName(getUniqueNameInContainer(c->shortName, false));
 	}
 	else
 	{
@@ -957,7 +958,8 @@ void ControllableContainer::controllableContainerNameChanged(ControllableContain
 {
 	if (allowSameChildrenNiceNames)
 	{
-		if (isNameTaken(cc->niceName, false, nullptr, cc)) cc->setNiceName(getUniqueNameInContainer(cc->niceName, false));
+		if (!isNameTaken(cc->niceName, true, nullptr, cc)) cc->setAutoShortName();
+		else if (isNameTaken(cc->shortName, false, nullptr, cc)) cc->setCustomShortName(getUniqueNameInContainer(cc->shortName, false));
 	}
 	else
 	{
@@ -1002,21 +1004,22 @@ bool ControllableContainer::isNameTaken(const String& name, bool searchNiceName,
 
 String ControllableContainer::getUniqueNameInContainer(const String& sourceName, bool searchNiceName, int suffix)
 {
+	String separator = searchNiceName ? " " : "_";
 	String resultName = sourceName;
 	if (suffix > 0)
 	{
 		StringArray sa;
-		sa.addTokens(resultName, false);
+		sa.addTokens(resultName, separator,"");
 		if (sa.size() > 1 && (sa[sa.size() - 1].getIntValue() != 0 || sa[sa.size() - 1].containsOnly("0")))
 		{
 			int num = sa[sa.size() - 1].getIntValue() + suffix;
 			sa.remove(sa.size() - 1);
 			sa.add(String(num));
-			resultName = sa.joinIntoString(" ");
+			resultName = sa.joinIntoString(separator);
 		}
 		else
 		{
-			resultName += " " + String(suffix);
+			resultName += separator + String(suffix);
 		}
 	}
 
