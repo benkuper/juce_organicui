@@ -13,6 +13,7 @@ ControllableComparator ControllableContainer::comparator;
 ControllableContainer::ControllableContainer(const String& niceName) :
 	ScriptTarget("", this, "Container"),
 	hasCustomShortName(false),
+	allowSameChildrenNiceNames(false),
 	nameCanBeChangedByUser(false),
 	canInspectChildContainers(true),
 	editorIsCollapsed(false),
@@ -760,7 +761,14 @@ void ControllableContainer::controllableFeedbackUpdate(ControllableContainer* cc
 
 void ControllableContainer::controllableNameChanged(Controllable* c)
 {
-	if (isNameTaken(c->niceName, c)) c->setNiceName(getUniqueNameInContainer(c->niceName));
+	if (allowSameChildrenNiceNames)
+	{
+		if (isNameTaken(c->niceName, false, c)) c->setNiceName(getUniqueNameInContainer(c->niceName, false));
+	}
+	else
+	{
+		if(isNameTaken(c->niceName, true, c)) c->setNiceName(getUniqueNameInContainer(c->niceName, true));
+	}
 
 	notifyStructureChanged();
 }
@@ -945,7 +953,16 @@ void ControllableContainer::loadJSONData(var data, bool createIfNotThere)
 
 void ControllableContainer::controllableContainerNameChanged(ControllableContainer* cc)
 {
-	if (isNameTaken(cc->niceName, nullptr, cc)) cc->setNiceName(getUniqueNameInContainer(cc->niceName));
+	if (allowSameChildrenNiceNames)
+	{
+		if (isNameTaken(cc->niceName, false, nullptr, cc)) cc->setNiceName(getUniqueNameInContainer(cc->niceName, false));
+	}
+	else
+	{
+		if (isNameTaken(cc->niceName, true, nullptr, cc)) cc->setNiceName(getUniqueNameInContainer(cc->niceName, true));
+
+	}
+
 }
 
 void ControllableContainer::childStructureChanged(ControllableContainer* cc)
@@ -959,18 +976,20 @@ void ControllableContainer::childAddressChanged(ControllableContainer* cc)
 }
 
 
-bool ControllableContainer::isNameTaken(const String& targetName, Controllable* excludeC, ControllableContainer* excludeCC)
+bool ControllableContainer::isNameTaken(const String& name, bool searchNiceName, Controllable* excludeC, ControllableContainer* excludeCC)
 {
 	for (auto& tc : controllables)
 	{
-		if (tc != excludeC && tc->niceName == targetName)
+		String tName = searchNiceName ? tc->niceName : tc->shortName;
+		if (tc != excludeC && tName == name)
 		{
 			return true;
 		}
 	}
 	for (auto& tcc : controllableContainers)
 	{
-		if (tcc != excludeCC && tcc->niceName == targetName)
+		String tName = searchNiceName ? tcc->niceName : tcc->shortName;
+		if (tcc != excludeCC && tName == name)
 		{
 			return true;
 		}
@@ -979,7 +998,7 @@ bool ControllableContainer::isNameTaken(const String& targetName, Controllable* 
 	return false;
 }
 
-String ControllableContainer::getUniqueNameInContainer(const String& sourceName, int suffix)
+String ControllableContainer::getUniqueNameInContainer(const String& sourceName, bool searchNiceName, int suffix)
 {
 	String resultName = sourceName;
 	if (suffix > 0)
@@ -1001,12 +1020,12 @@ String ControllableContainer::getUniqueNameInContainer(const String& sourceName,
 
 	if (getControllableByName(resultName, true) != nullptr)
 	{
-		return getUniqueNameInContainer(sourceName, suffix + 1);
+		return getUniqueNameInContainer(sourceName, searchNiceName, suffix + 1);
 	}
 
 	if (getControllableContainerByName(resultName, true) != nullptr)
 	{
-		return getUniqueNameInContainer(sourceName, suffix + 1);
+		return getUniqueNameInContainer(sourceName, searchNiceName, suffix + 1);
 	}
 
 	return resultName;

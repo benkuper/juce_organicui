@@ -104,8 +104,8 @@ void GlobalSettings::onControllableFeedbackUpdate(ControllableContainer * cc, Co
 	}
 	else if (c == testCrash)
 	{
-		Controllable* c = nullptr;
-		c->getJSONData(); //this will crash
+		Controllable* crashC = nullptr;
+		crashC->getJSONData(); //this will crash
 	}
 }
 
