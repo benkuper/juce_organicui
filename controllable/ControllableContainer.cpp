@@ -469,7 +469,7 @@ ControllableContainer* ControllableContainer::getControllableContainerForAddress
 	if (isTargetFinal)
 	{
 
-		if (ControllableContainer* res = getControllableContainerByName(addressSplit[0]))   //get not exposed here here ?
+		if (ControllableContainer* res = getControllableContainerByName(addressSplit[0], true))   //get not exposed here here ?
 			return res;
 
 	}
@@ -487,6 +487,8 @@ ControllableContainer* ControllableContainer::getControllableContainerForAddress
 				addressSplit.remove(0);
 				result = cc->getControllableContainerForAddress(addressSplit, recursive, getNotExposed);
 			}
+
+			if (result != nullptr) break;
 		}
 		controllableContainers.getLock().exit();
 

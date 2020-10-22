@@ -23,6 +23,7 @@ public:
 	virtual void resized() override;
 	virtual void resizedDashboardItemInternal() {}
 
+	virtual void mouseDown(const MouseEvent& e) override;
 	virtual void mouseEnter(const MouseEvent& e) override;
 	virtual void mouseUp(const MouseEvent& e) override;
 

@@ -19,6 +19,7 @@ public:
 	Dashboard();
 	~Dashboard();
 
+	bool isBeingEdited;
 	DashboardItemManager itemManager;
 
 	void itemAdded(DashboardItem*) override;

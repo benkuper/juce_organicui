@@ -150,9 +150,9 @@ void OrganicMainContentComponent::endLoadFile()
 
 			ShapeShifterContent* dContent = ShapeShifterManager::getInstance()->getContentForType<DashboardManagerView>();
 			
-			if (dContent != nullptr && dContent != ShapeShifterManager::getInstance()->temporaryFullContent)
+			if (ProjectSettings::getInstance()->fullScreenOnStartup->boolValue() && dContent != nullptr && dContent != ShapeShifterManager::getInstance()->temporaryFullContent)
 			{
-				ShapeShifterManager::getInstance()->toggleTemporaryFullContent(dContent);
+				ShapeShifterManager::getInstance()->toggleTemporaryFullContent(dContent); //only if fullScreen, otherwise it's weird
 			}
 			
 			d->selectThis();

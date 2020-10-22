@@ -23,7 +23,16 @@ DashboardManagerView::DashboardManagerView(const String &contentName, DashboardM
 	
 	helpID = "Dashboard";
 	
-	if (manager->items.size() > 0) setCurrentDashboard(manager->items[0]);
+	for (auto& i : manager->items)
+	{
+		if (i->isBeingEdited)
+		{
+			setCurrentDashboard(i);
+			break;
+		}
+	}
+
+	if (currentDashboard == nullptr && manager->items.size() > 0) setCurrentDashboard(manager->items[0]);
 }
 
 DashboardManagerView::~DashboardManagerView()
@@ -36,6 +45,11 @@ void DashboardManagerView::setCurrentDashboard(Dashboard * d)
 {
 	if (currentDashboard == d) return;
 
+	if (currentDashboard != nullptr)
+	{
+		currentDashboard->isBeingEdited = false;
+	}
+
 	if (currentItemManagerUI != nullptr)
 	{
 		removeChildComponent(currentItemManagerUI.get());
@@ -46,6 +60,7 @@ void DashboardManagerView::setCurrentDashboard(Dashboard * d)
 
 	if (currentDashboard != nullptr)
 	{
+		currentDashboard->isBeingEdited = true;
 		currentItemManagerUI.reset(new DashboardItemManagerUI(&currentDashboard->itemManager));
 		addAndMakeVisible(currentItemManagerUI.get());
 	}
