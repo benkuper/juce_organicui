@@ -58,6 +58,8 @@ public:
     void mouseUp(const MouseEvent& e) override;
     void mouseDoubleClick(const MouseEvent& e) override;
 
+    void addItemFromMenu(AutomationKey* k, bool fromAddbutton, Point<int> pos) override;
+
     void addMenuExtraItems(PopupMenu &p, int startIndex) override;
     void handleMenuExtraItemsResult(int result, int startIndex) override;
 

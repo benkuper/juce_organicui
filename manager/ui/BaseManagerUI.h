@@ -695,6 +695,8 @@ void BaseManagerUI<M, T, U>::showMenuAndAddItem(bool isFromAddButton, Point<int>
 		addMenuExtraItems(p, 2);
 
 		int result = p.show();
+		if (result == 0) return;
+
 		switch (result)
 		{
 		case 1:

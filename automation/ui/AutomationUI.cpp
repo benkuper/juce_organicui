@@ -518,6 +518,11 @@ void AutomationUI::mouseDoubleClick(const MouseEvent& e)
     }
 }
 
+void AutomationUI::addItemFromMenu(AutomationKey* k, bool fromAddbutton, Point<int> pos)
+{
+    manager->addKey(getPosForX(pos.x), getValueForY(pos.y), true);
+}
+
 void AutomationUI::addMenuExtraItems(PopupMenu& p, int startIndex)
 {
     //p.addSeparator();
