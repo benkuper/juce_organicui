@@ -40,6 +40,7 @@ public:
 	bool hideEditorHeader;
 	bool skipLabelInTarget;
 	bool userCanAddControllables;
+	bool isRemovableByUser;
 
 	std::function<void(ControllableContainer *)> customUserCreateControllableFunc; 
 	StringArray userAddControllablesFilters;
@@ -60,6 +61,7 @@ public:
 	bool includeInScriptObject;
 
 	static ControllableComparator comparator;
+	ControllableComparator* customControllableComparator;
 
 	OwnedArray<Controllable, CriticalSection> controllables;
 	Array<WeakReference<ControllableContainer>, CriticalSection> controllableContainers;
@@ -117,7 +119,7 @@ public:
 	bool containsControllable(Controllable * c, int maxSearchLevels = -1);
 	String getControlAddress(ControllableContainer * relativeTo = nullptr);
 
-	void orderControllablesAlphabetically();
+	void sortControllables();
 
 	void dispatchFeedback(Controllable* c);
 	void dispatchState(Controllable * c);

@@ -72,6 +72,13 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(WeakRefer
 		if(buildAtCreation) resetAndBuild();
 	}
 
+	if (container->isRemovableByUser)
+	{
+		removeBT.reset(AssetManager::getInstance()->getRemoveBT());
+		removeBT->addListener(this);
+		addAndMakeVisible(removeBT.get());
+	}
+
 }
 
 GenericControllableContainerEditor::~GenericControllableContainerEditor()
@@ -384,6 +391,9 @@ void GenericControllableContainerEditor::buttonClicked(Button * b)
 	{
 		if (container->customUserCreateControllableFunc != nullptr) container->customUserCreateControllableFunc(container);
 		else showMenuAndAddControllable();
+	}else if (b == removeBT.get())
+	{
+		if(container->parentContainer != nullptr) container->parentContainer->removeChildControllableContainer(container);
 	}
 }
 
@@ -595,6 +605,12 @@ void GenericControllableContainerEditor::resizedInternal(juce::Rectangle<int>& r
 
 void GenericControllableContainerEditor::resizedInternalHeader(juce::Rectangle<int>& r)
 {
+	if (container->isRemovableByUser && removeBT != nullptr)
+	{
+		removeBT->setBounds(r.removeFromRight(r.getHeight()).reduced(2));
+		r.removeFromRight(2);
+	}
+
 	if (warningUI != nullptr && warningUI->isVisible())
 	{
 		warningUI->setBounds(r.removeFromLeft(r.getHeight()).reduced(2));

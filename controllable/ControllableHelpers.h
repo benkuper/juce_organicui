@@ -65,5 +65,6 @@ class ControllableComparator
 {
 public:
 	ControllableComparator() {}
-	int compareElements(Controllable* c1, Controllable* c2);
+	virtual ~ControllableComparator() {}
+	virtual int compareElements(Controllable* c1, Controllable* c2);
 };

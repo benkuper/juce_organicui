@@ -42,6 +42,7 @@ public:
 	std::unique_ptr<ImageButton> collapseBT;
 	std::unique_ptr<ImageButton> addBT;
 	std::unique_ptr<WarningTargetUI> warningUI;
+	std::unique_ptr<ImageButton> removeBT;
 
 	Component headerSpacer;
 

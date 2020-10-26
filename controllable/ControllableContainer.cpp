@@ -21,6 +21,7 @@ ControllableContainer::ControllableContainer(const String& niceName) :
 	hideEditorHeader(false),
 	skipLabelInTarget(false),
 	userCanAddControllables(false),
+	isRemovableByUser(false),
 	customUserCreateControllableFunc(nullptr),
 	customGetEditorFunc(nullptr),
 	saveAndLoadRecursiveData(false),
@@ -31,6 +32,7 @@ ControllableContainer::ControllableContainer(const String& niceName) :
 	notifyStructureChangeWhenLoadingData(true),
 	canBeCopiedAndPasted(false),
 	includeInScriptObject(true),
+	customControllableComparator(nullptr),
 	parentContainer(nullptr),
 	queuedNotifier(500) //what to put in max size ??
 						//500 seems ok on my computer, but if too low, generates leaks when closing app while heavy use of async (like  parameter update from audio signal)
@@ -513,9 +515,9 @@ String ControllableContainer::getControlAddress(ControllableContainer* relativeT
 	else return "/" + addressArray.joinIntoString("/");
 }
 
-void ControllableContainer::orderControllablesAlphabetically()
+void ControllableContainer::sortControllables()
 {
-	controllables.sort(ControllableContainer::comparator, true);
+	controllables.sort(customControllableComparator != nullptr?*customControllableComparator:ControllableContainer::comparator, true);
 
 	controllableContainerListeners.call(&ControllableContainerListener::controllableContainerReordered, this);
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableContainerReordered, this));
@@ -857,6 +859,12 @@ var ControllableContainer::getJSONData()
 
 	if (editorIsCollapsed) data.getDynamicObject()->setProperty("editorIsCollapsed", true); //only set if true to avoid too much data
 
+	bool isOwned = (parentContainer != nullptr && parentContainer->ownedContainers.contains(this));
+	if (isOwned)
+	{
+		if (isRemovableByUser) data.getDynamicObject()->setProperty("removable", true);
+		if (includeTriggersInSaveLoad) data.getDynamicObject()->setProperty("includeTriggers", true);
+	}
 
 	if (saveAndLoadRecursiveData)
 	{
@@ -896,6 +904,8 @@ void ControllableContainer::loadJSONData(var data, bool createIfNotThere)
 	if (data.getDynamicObject()->hasProperty("niceName")) setNiceName(data.getDynamicObject()->getProperty("niceName"));
 	if (data.getDynamicObject()->hasProperty("shortName")) setCustomShortName(data.getDynamicObject()->getProperty("shortName"));
 	if (data.getDynamicObject()->hasProperty("editorIsCollapsed")) editorIsCollapsed = data.getDynamicObject()->getProperty("editorIsCollapsed");
+	if (data.getDynamicObject()->hasProperty("removable")) isRemovableByUser = data.getDynamicObject()->getProperty("removable");
+	if (data.getDynamicObject()->hasProperty("includeTriggers")) includeTriggersInSaveLoad = data.getDynamicObject()->getProperty("includeTriggers");
 
 	Array<var>* paramsData = data.getDynamicObject()->getProperty("parameters").getArray();
 
