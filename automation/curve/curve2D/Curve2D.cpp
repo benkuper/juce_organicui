@@ -78,28 +78,49 @@ float Curve2D::addFromPointsAndSimplify(Array<Point<float>> sourcePoints, bool c
 {
     if (clearBeforeAdd) clear();
 
+
+    if (sourcePoints.size() == 0)
+        return 0;
+
     float lengthBefore = length->floatValue();
 
+    
     Array<float> points;
     for (auto& pp : sourcePoints) points.add(pp.x, pp.y);
+
     float* result;
     unsigned int resultNum = 0;
-    unsigned int* origIndex;
     unsigned int* corners = nullptr;
     unsigned int cornersLength = 0;
     unsigned int* cornerIndex = nullptr;
     unsigned int cornerIndexLength = 0;
 
-    curve_fit_corners_detect_fl(points.getRawDataPointer(), points.size(), 2, 0, .02f, 20, 30, &corners, &cornersLength);
+    const float errorThreshold = 0.02f;
+
+    curve_fit_corners_detect_fl(points.getRawDataPointer(), points.size() / 2, 2,
+        errorThreshold / 4, errorThreshold * 4, 32, M_PI / 8,
+        &corners, &cornersLength);
     if (cornersLength == 0) corners = nullptr;
 
-    curve_fit_cubic_to_points_fl(points.getRawDataPointer(), points.size(), 2, .1f, CURVE_FIT_CALC_HIGH_QUALIY, corners, cornersLength, &result, &resultNum, &origIndex, &cornerIndex, &cornerIndexLength);
+    DBG((int)cornersLength << " corners detected");
+
+    curve_fit_cubic_to_points_fl(points.getRawDataPointer(), points.size() / 2, 2,
+        errorThreshold, CURVE_FIT_CALC_HIGH_QUALIY,
+        corners, cornersLength,
+        &result, &resultNum,
+        nullptr,
+        &cornerIndex, &cornerIndexLength);
 
     int numPoints = ((int)resultNum);
 
     Array<Curve2DKey*> keys;
-    CubicEasing2D* prevEasing = nullptr;
 
+    CubicEasing2D* prevEasing = nullptr;
+    Point<float> prevRP;
+
+    float maxDist = 100;
+
+    int numBadPoints = 0;
     for (int i = 0; i < numPoints; ++i)
     {
         int index = i * 6;
@@ -108,39 +129,44 @@ float Curve2D::addFromPointsAndSimplify(Array<Point<float>> sourcePoints, bool c
         Point<float> h2(result[index + 4], result[index + 5]);
 
 
-        if (prevEasing != nullptr && h1.getDistanceFromOrigin() < 100)
+        if (prevEasing != nullptr && h1.getDistanceFrom(rp) < maxDist)
         {
             prevEasing->anchor2->setPoint(h1 - rp);
         }
 
-        if (rp.getDistanceFromOrigin() > 100)
+
+        if (i > 0 && rp.getDistanceFrom(prevRP) > maxDist)
         {
-            break;
+            numBadPoints++;
+            continue;
         }
 
-        Curve2DKey* k = createItem();
-        k->viewUIPosition->setPoint(rp);
-
+        Curve2DKey * k = new Curve2DKey();
+        k->setPosition(rp);
+        k->setNiceName("Key " + String(i));
         k->easingType->setValueWithData(Easing2D::BEZIER);
         CubicEasing2D* ce = (CubicEasing2D*)k->easing.get();
-        if (h2.getDistanceFromOrigin() < 100) ce->anchor1->setPoint(h2 - rp);
+        if (h2.getDistanceFrom(rp) < maxDist) ce->anchor1->setPoint(h2 - rp);
 
+        DBG("Add good point : " << k->getPosition().toString());
         keys.add(k);
 
         prevEasing = ce;
+        prevRP.setXY(rp.x, rp.y);
     }
+    DBG(numBadPoints << " bad points discarded");
 
-    delete result;
-    delete origIndex;
-    delete corners;
-    delete cornerIndex;
+    free(result);
+    free(corners);
+    free(cornerIndex);
 
-   addItems(keys); 
-   float addedLength = length->floatValue() - lengthBefore;
+    addItems(keys);
+
+    float addedLength = length->floatValue() - lengthBefore;
+    return addedLength;
 
    //TODO implement automation curve construction from times array (needs a getClosestPointForPosition in Easing2D)
 
-   return addedLength;
 }
 
 void Curve2D::updateCurve(bool relativeAutomationKeySyncMode)

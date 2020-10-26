@@ -104,7 +104,7 @@ void Curve2DUI::updateViewUIPosition(Curve2DKeyUI* ui)
     {
         //Rectangle<float> t = ui->item->easing->getBounds(true);
         //Rectangle<int> vt = getBoundsInView(ui->item->easing->getBounds(true));
-        DBG("Weird");
+        //DBG("Weird");
     }
     pr.expand(5, 5);
     ui->setBounds(pr);
