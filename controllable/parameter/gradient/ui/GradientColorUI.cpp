@@ -28,9 +28,9 @@ GradientColorUI::~GradientColorUI()
 
 void GradientColorUI::paint(Graphics & g)
 {
-	g.setColour(item->isSelected ? HIGHLIGHT_COLOR:bgColor);
+	g.setColour(item->isSelected ? HIGHLIGHT_COLOR: (item->isPreselected?BLUE_COLOR:bgColor));
 	g.fillPath(drawPath);
-	g.setColour(item->isSelected?HIGHLIGHT_COLOR.brighter():bgColor.darker(.7f));
+	g.setColour(item->isSelected?HIGHLIGHT_COLOR.brighter():(item->isPreselected?BLUE_COLOR.brighter():bgColor.darker(.7f)));
 	g.strokePath(drawPath,PathStrokeType(1));
 }
 
@@ -50,7 +50,6 @@ void GradientColorUI::resized()
 
 void GradientColorUI::mouseDown(const MouseEvent & e)
 {
-	posAtMouseDown = item->position->floatValue();
 	BaseItemMinimalUI::mouseDown(e);
 	
 	if (e.mods.isCommandDown())
@@ -74,9 +73,4 @@ void GradientColorUI::mouseDown(const MouseEvent & e)
 		case 2: item->interpolation->setValueWithData(GradientColor::NONE); break;
 		}
 	}
-}
-
-void GradientColorUI::mouseUp(const MouseEvent & e)
-{
-	item->position->setUndoableValue(posAtMouseDown, item->position->floatValue());
 }

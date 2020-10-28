@@ -15,8 +15,11 @@ GradientColorManager::GradientColorManager(float maxPosition, bool addDefaultCol
 	allowKeysOutside(true)
 {
 
+	itemDataType = "GradientColor";
+
 	editorIsCollapsed = true;
 	selectItemWhenCreated = false;
+	isSelectable = false;
 
 	position = addFloatParameter("Position", "Position in the gradient", 0, 0, maxPosition);
 	position->isSavable = false;
@@ -36,18 +39,11 @@ GradientColorManager::GradientColorManager(float maxPosition, bool addDefaultCol
 		selectionManager = customSelectionManager.get();
 	}
 
-
-
 	if (addDefaultColors)
 	{
-		addColorAt(length->floatValue() / 5, Colours::green);
-		addColorAt(length->floatValue() * 2 / 5, Colours::yellow);
-		addColorAt(length->floatValue() * 3 / 5, Colours::red)->interpolation->setValueWithData(GradientColor::NONE);
-		addColorAt(length->floatValue() * 4 / 5, Colours::blue);
+		addColorAt(0, Colours::green);
+		addColorAt(1, Colours::yellow);
 	}
-	
-	//rebuildGradient();
-
 
 	currentColor->setColor(getColorForPosition(position->floatValue()));
 }
@@ -195,6 +191,42 @@ void GradientColorManager::addItemInternal(GradientColor * item, var data)
 void GradientColorManager::removeItemInternal(GradientColor *)
 {
 	//rebuildGradient();
+}
+
+Array<GradientColor*> GradientColorManager::addItemsFromClipboard(bool showWarning)
+{
+	Array<GradientColor*> keys = BaseManager::addItemsFromClipboard(showWarning);
+
+	if (keys.isEmpty()) return keys;
+	if (keys[0] == nullptr) return Array<GradientColor*>();
+
+	float minTime = keys[0]->position->floatValue();
+	for (auto& b : keys)
+	{
+		if (b->position->floatValue() < minTime)
+		{
+			minTime = b->position->floatValue();
+		}
+	}
+
+	float diffTime = position->floatValue() - minTime;
+
+	if (keys.size() > 1)
+	{
+		Array<GradientColor*> keysBetween = getItemsInTimespan(keys[0]->position->floatValue() + diffTime, keys[keys.size() - 1]->position->floatValue() + diffTime);
+		if (keysBetween.size() > 0)
+		{
+			Array<GradientColor*> keysToRemove;
+			for (auto& k : keysBetween) if (!keys.contains(k)) keysToRemove.add(k);
+			removeItems(keysToRemove);
+		}
+	}
+
+	for (auto& k : keys) k->position->setValue(k->position->floatValue() + diffTime);
+
+	reorderItems();
+
+	return keys;
 }
 
 void GradientColorManager::reorderItems()

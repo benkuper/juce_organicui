@@ -20,11 +20,8 @@ public:
 	std::unique_ptr<ColorParameterUI> colorUI;
 	Path drawPath;
 
-	float posAtMouseDown; 
-
 	void paint(Graphics &g) override;
 	void resized() override;
 
 	void mouseDown(const MouseEvent &e) override;
-	void mouseUp(const MouseEvent &e) override;
 };

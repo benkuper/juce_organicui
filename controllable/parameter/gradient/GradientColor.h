@@ -22,5 +22,10 @@ public:
 	FloatParameter * position;
 	EnumParameter * interpolation;
 
+	void setMovePositionReferenceInternal() override;
+	void setPosition(Point<float> targetTime) override;
+	Point<float> getPosition() override;
+	void addUndoableMoveAction(Array<UndoableAction*>& actions) override;
+
 	int gradientIndex;
 };

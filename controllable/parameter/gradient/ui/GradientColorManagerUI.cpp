@@ -1,4 +1,3 @@
-#include "GradientColorManagerUI.h"
 /*
   ==============================================================================
 
@@ -141,25 +140,20 @@ void GradientColorManagerUI::mouseDrag(const MouseEvent & e)
 
 	if (e.originalComponent == this)
 	{
-
+		BaseManagerUI::mouseDrag(e);
 	}
 	else
 	{
 		GradientColorUI * tui = dynamic_cast<GradientColorUI *>(e.eventComponent);
-		if (tui == nullptr)
-		{
-			tui = dynamic_cast<GradientColorUI *>(e.eventComponent->getParentComponent());
-		}
+		if (tui == nullptr) tui = dynamic_cast<GradientColorUI *>(e.eventComponent->getParentComponent());
 
 		if (tui != nullptr)
 		{
 			if (e.mods.isLeftButtonDown())
 			{
-				Point<int> mp = e.getEventRelativeTo(this).getPosition();
-				float pos = getPosForX(mp.x);
-				tui->item->position->setValue(pos);
-				placeItemUI(tui);
-				repaint();
+				float diffTime = getPosForX(e.getOffsetFromDragStart().x, false);
+				Point<float> p(diffTime, 0.f);
+				tui->item->BaseItem::movePosition(p, true);
 			}
 		}
 	}

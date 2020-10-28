@@ -58,6 +58,9 @@ public:
 
     void addItemInternal(GradientColor * item, var data) override;
 	void removeItemInternal(GradientColor * item) override;
+
+	Array<GradientColor*> addItemsFromClipboard(bool showWarning = false) override;
+
 	
 	void reorderItems() override;
 
