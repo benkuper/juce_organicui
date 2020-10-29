@@ -82,7 +82,6 @@ public:
 
 	TreeView treeView;
 	std::unique_ptr<OutlinerItem> rootItem;
-
 	bool showHiddenContainers; //include or exclude in treeview the "skipInAddress" containers (may be later exposed to user as an option)
 	bool enabled; //update or not
 
@@ -93,10 +92,13 @@ public:
 	void resized() override;
 	void paint(Graphics &g) override;
 
-	void rebuildTree();
+	void rebuildTree(ControllableContainer * fromContainer = nullptr);
 	void buildTree(OutlinerItem * parentItem, ControllableContainer * parentContainer);
 
+	OutlinerItem* getItemForContainer(ControllableContainer* cc);
+
 	void childStructureChanged(ControllableContainer *) override;
+
 
 
 	static Outliner * create(const String &contentName) { return new Outliner(contentName); }

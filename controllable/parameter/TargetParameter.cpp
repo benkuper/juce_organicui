@@ -63,10 +63,9 @@ void TargetParameter::setValueFromTarget(Controllable * c, bool addToUndo)
 
 	if (c != nullptr)
 	{
-
 		if (target != nullptr && c == target.get())
 		{
-			String ca = target->getControlAddress();
+			String ca = target->getControlAddress(rootContainer);
 			if (stringValue() == ca)
 			{
 				return;
