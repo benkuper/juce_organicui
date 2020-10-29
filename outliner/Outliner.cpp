@@ -1,3 +1,4 @@
+#include "Outliner.h"
 /*
   ==============================================================================
 
@@ -73,13 +74,16 @@ void Outliner::paint(Graphics & g)
 }
 
 
-void Outliner::rebuildTree()
+void Outliner::rebuildTree(ControllableContainer* fromContainer)
 {
 	if (Engine::mainEngine == nullptr) return;
 
+	if (fromContainer == nullptr) fromContainer = Engine::mainEngine;
+	OutlinerItem* fromItem = getItemForContainer(fromContainer);
+	fromItem->clearSubItems();
+
 	std::unique_ptr<XmlElement> os = treeView.getOpennessState(true);
-	clear();
-	buildTree(rootItem.get(), Engine::mainEngine);
+	buildTree(fromItem, fromContainer);
 	rootItem->setOpen(true);
 
 	treeView.restoreOpennessState(*os, true);
@@ -116,6 +120,29 @@ void Outliner::buildTree(OutlinerItem * parentItem, ControllableContainer * pare
 	}
 	parentContainer->controllables.getLock().exit();
 
+}
+
+OutlinerItem* Outliner::getItemForContainer(ControllableContainer* cc)
+{
+	if (cc == nullptr || cc == Engine::mainEngine) return rootItem.get();
+
+	Array<int> containerIndices;
+	ControllableContainer* cParent = cc;
+	while (cParent != Engine::mainEngine && cParent != nullptr)
+	{
+		ControllableContainer* parent = cParent->parentContainer;
+		if (parent == nullptr) return nullptr;
+		containerIndices.add(parent->controllableContainers.indexOf(cParent));
+	}
+
+	OutlinerItem* result = rootItem.get();
+	for (auto& index : containerIndices)
+	{
+		jassert(result != nullptr);
+		result = (OutlinerItem *)result->getSubItem(index);
+	}
+
+	return result;
 }
 
 void Outliner::childStructureChanged(ControllableContainer *)
