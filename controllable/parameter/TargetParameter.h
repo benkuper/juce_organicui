@@ -30,21 +30,20 @@ public:
 	bool useGhosting;
 	String ghostValue;
 
-	bool showParameters;
-	bool showTriggers;
 	bool showFullAddressInEditor;
 	bool showParentNameInEditor;
 	int maxDefaultSearchLevel;
 	int defaultParentLabelLevel;
 
 	StringArray typesFilter; //leave empty to allow all when not using custom functions
+	StringArray excludeTypesFilter; //leave empty to allow all when not using custom functions
 
 	WeakReference<ControllableContainer> rootContainer;
 	
 	WeakReference<Controllable> target;
 	WeakReference<ControllableContainer> targetContainer;
 	
-	std::function<Controllable*(bool, bool)> customGetTargetFunc;
+	std::function<Controllable*(const StringArray &, const StringArray &)> customGetTargetFunc;
 	std::function<String(Controllable*)> customGetControllableLabelFunc;
 	std::function<bool(Controllable*)> customCheckAssignOnNextChangeFunc;
 

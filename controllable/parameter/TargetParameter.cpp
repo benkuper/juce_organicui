@@ -13,8 +13,6 @@ TargetParameter::TargetParameter(const String & niceName, const String & descrip
 	StringParameter(niceName, description, initialValue, enabled),
 	targetType(CONTROLLABLE),
 	useGhosting(true),
-	showParameters(true),
-	showTriggers(true),
 	showFullAddressInEditor(false),
 	showParentNameInEditor(true),
 	maxDefaultSearchLevel(-1),
@@ -251,8 +249,24 @@ void TargetParameter::setAttribute(String param, var attributeValue)
 {
 	Parameter::setAttribute(param, attributeValue);
 	if (param == "searchLevel") maxDefaultSearchLevel = jmax<int>(attributeValue, -1);
-	else if (param == "showParameters") showParameters = (int)attributeValue > 0;
-	else if (param == "showTriggers") showTriggers = (int)attributeValue > 0;
+	else if (param == "allowedTypes")
+	{
+		typesFilter.clear();
+		if (attributeValue.isString()) typesFilter.add(attributeValue.toString());
+		else if (attributeValue.isArray())
+		{
+			for (int i = 0; i < attributeValue.size(); i++) typesFilter.add(attributeValue[i].toString());
+		}
+	}
+	else if (param == "excludedTypes")
+	{
+		excludeTypesFilter.clear();
+		if (attributeValue.isString()) excludeTypesFilter.add(attributeValue.toString());
+		else if (attributeValue.isArray())
+		{
+			for (int i = 0; i < attributeValue.size(); i++) excludeTypesFilter.add(attributeValue[i].toString());
+		}
+	}
 	else if (param == "root")
 	{
 		if (value.isObject())

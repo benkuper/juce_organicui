@@ -9,7 +9,7 @@ ControllableDetectiveWatcher::ControllableDetectiveWatcher() :
 	userCanDuplicate = false;
 
 	target = addTargetParameter("Target", "Target to watch");
-	target->showTriggers = false;
+	target->excludeTypesFilter.add(Trigger::getTypeStringStatic());
 	target->hideInEditor = true;
 
 	watchTime = addFloatParameter("Time Window", "The time window to watch", 3, .1f);

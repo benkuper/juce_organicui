@@ -121,12 +121,12 @@ void Engine::childStructureChanged(ControllableContainer * cc)
 
 PopupMenu Engine::getDashboardCreateMenu(int idOffset)
 {
-	return ControllableChooserPopupMenu(this, true, true, idOffset);
+	return ControllableChooserPopupMenu(this, idOffset);
 }
 
 DashboardItem * Engine::getDashboardItemFromMenuResult(int result)
 {
-	ControllableChooserPopupMenu chooser(this, true, true, 0);
+	ControllableChooserPopupMenu chooser(this, 0);
 	Controllable * c = chooser.getControllableForResult(result);
 	if (c == nullptr) return nullptr;
 	return c->createDashboardItem();

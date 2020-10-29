@@ -155,10 +155,10 @@ void TargetParameterUI::showPopupAndGetTarget()
 
 		if (targetParameter->customGetTargetFunc != nullptr)
 		{
-			c = targetParameter->customGetTargetFunc(targetParameter->showTriggers,targetParameter->showParameters);
+			c = targetParameter->customGetTargetFunc(targetParameter->typesFilter, targetParameter->excludeTypesFilter);
 		} else
 		{
-			ControllableChooserPopupMenu p(targetParameter->rootContainer, targetParameter->showParameters, targetParameter->showTriggers, 0, targetParameter->maxDefaultSearchLevel, targetParameter->typesFilter);
+			ControllableChooserPopupMenu p(targetParameter->rootContainer, 0, targetParameter->maxDefaultSearchLevel, targetParameter->typesFilter, targetParameter->excludeTypesFilter);
 			c = p.showAndGetControllable();
 		}
 		if (c != nullptr) targetParameter->setValueFromTarget(c);
@@ -228,14 +228,8 @@ void TargetParameterUI::newMessage(const ContainerAsyncEvent & e)
 		{
 			if (c == targetParameter->target) return;
 
-			if (c->type == Controllable::TRIGGER)
-			{
-				if (!targetParameter->showTriggers) return;
-			}
-			else
-			{
-				if (!targetParameter->showParameters) return;
-			}
+			if (targetParameter->excludeTypesFilter.contains(c->getTypeString())) return;
+			if (!targetParameter->typesFilter.isEmpty() && !targetParameter->typesFilter.contains(c->getTypeString())) return;
 
 			bool isControllableValid = targetParameter->customCheckAssignOnNextChangeFunc(c);
 			if (isControllableValid)

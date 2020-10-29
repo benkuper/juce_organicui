@@ -75,21 +75,18 @@ void Curve2DUI::paintOverChildren(Graphics& g)
         if (manager->recorder->isRecording->boolValue())
         {
             int numRKeys = manager->recorder->keys.size();
-            if (numRKeys > 0)
+            if (numRKeys >= 2 && manager->recorder->keys[0].value.isArray())
             {
-                if (numRKeys >= 2)
+                Path p;
+                Point<float> k0(manager->recorder->keys[0].value[0], manager->recorder->keys[0].value[1]);
+                p.startNewSubPath(getPosInView(k0).toFloat());
+                for (int i = 1; i < numRKeys; ++i)
                 {
-                    Path p;
-                    Point<float> k0(manager->recorder->keys[0].value[0], manager->recorder->keys[0].value[1]);
-                    p.startNewSubPath(getPosInView(k0).toFloat());
-                    for (int i = 1; i < numRKeys; ++i)
-                    {
-                        Point<float> ki(manager->recorder->keys[i].value[0], manager->recorder->keys[i].value[1]);
-                        p.lineTo(getPosInView(ki).toFloat());
-                    }
-                    g.setColour(Colours::orangered);
-                    g.strokePath(p, PathStrokeType(2));
+                    Point<float> ki(manager->recorder->keys[i].value[0], manager->recorder->keys[i].value[1]);
+                    p.lineTo(getPosInView(ki).toFloat());
                 }
+                g.setColour(Colours::orangered);
+                g.strokePath(p, PathStrokeType(2));
             }
         }
     }

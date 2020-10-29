@@ -14,7 +14,7 @@ AutomationRecorder::AutomationRecorder() :
 	recorderNotifier(2)
 {
 	input = addTargetParameter("Input Value", "Input value used for recording");
-	input->showTriggers = false;
+	input->excludeTypesFilter.add(Trigger::getTypeStringStatic());
 
 	//input->customGetTargetFunc = &ModuleManager::showAllValuesAndGetControllable;
 	//input->customGetControllableLabelFunc = &Module::getTargetLabelForValueControllable;
