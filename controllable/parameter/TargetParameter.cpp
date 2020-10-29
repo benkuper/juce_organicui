@@ -151,10 +151,16 @@ void TargetParameter::setTarget(WeakReference<Controllable> c)
 		target->addControllableListener(this);
 		setGhostValue(target->getControlAddress(rootContainer.get()));
 		clearWarning();
+		if (rootContainer != nullptr && !rootContainer.wasObjectDeleted()) rootContainer->removeControllableContainerListener(this);
 	}
 	else
 	{
-		if (ghostValue.isNotEmpty()) setWarningMessage("Link is broken : " + ghostValue);
+
+		if (ghostValue.isNotEmpty())
+		{
+			setWarningMessage("Link is broken : " + ghostValue);
+			if (rootContainer != nullptr && !rootContainer.wasObjectDeleted()) rootContainer->addControllableContainerListener(this);
+		}
 		else clearWarning();
 	}
 }
@@ -179,10 +185,16 @@ void TargetParameter::setTarget(WeakReference<ControllableContainer> cc)
 
 		setGhostValue(targetContainer->getControlAddress(rootContainer.get()));
 		clearWarning();
+		if (rootContainer != nullptr && !rootContainer.wasObjectDeleted()) rootContainer->removeControllableContainerListener(this);
+
 	}
 	else
 	{
-		if (ghostValue.isNotEmpty()) setWarningMessage("Link is broken : " + ghostValue);
+		if (ghostValue.isNotEmpty())
+		{
+			setWarningMessage("Link is broken : " + ghostValue);
+			if (rootContainer != nullptr && !rootContainer.wasObjectDeleted()) rootContainer->addControllableContainerListener(this);
+		}
 		else clearWarning();
 	}
 }
@@ -194,8 +206,6 @@ void TargetParameter::setRootContainer(WeakReference<ControllableContainer> newR
 	if (rootContainer != nullptr && !rootContainer.wasObjectDeleted()) rootContainer->removeControllableContainerListener(this);
 
 	rootContainer = newRootContainer;
-
-	if(rootContainer != nullptr && !rootContainer.wasObjectDeleted()) rootContainer->addControllableContainerListener(this);
 
 	setValue("");
 }
