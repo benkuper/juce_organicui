@@ -78,7 +78,7 @@ void AutomationUI::paint(Graphics& g)
 
     if (manager->items.size() > 0)
     {
-        if (manager->items[0]->position->floatValue() > 0)
+        if (manager->items[0] != nullptr && manager->items[0]->position->floatValue() > 0)
         {
             g.setColour(NORMAL_COLOR);
             Point<int> p = getPosInView(manager->items[0]->getPosAndValue());
@@ -86,7 +86,7 @@ void AutomationUI::paint(Graphics& g)
             g.drawDashedLine(Line<int>(Point<int>(0, p.y), p).toFloat(), dashLengths, 2);
         }
 
-        if (manager->items[manager->items.size()-1]->position->floatValue() < manager->length->floatValue())
+        if (manager->items[manager->items.size() - 1] != nullptr && manager->items[manager->items.size()-1]->position->floatValue() < manager->length->floatValue())
         {
             g.setColour(NORMAL_COLOR);
             Point<int> p = getPosInView(manager->items[manager->items.size()-1]->getPosAndValue());
