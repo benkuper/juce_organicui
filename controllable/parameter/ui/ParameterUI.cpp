@@ -188,6 +188,7 @@ void ParameterUI::mouseDoubleClick(const MouseEvent& e)
 
 bool ParameterUI::isInteractable()
 {
+	if (parameter == nullptr || parameter.wasObjectDeleted()) return false;
 	return ControllableUI::isInteractable() || parameter->controlMode != Parameter::ControlMode::MANUAL;
 }
 
