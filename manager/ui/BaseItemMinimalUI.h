@@ -147,6 +147,8 @@ void BaseItemMinimalUI<T>::setHighlightOnMouseOver(bool highlight)
 template<class T>
 void BaseItemMinimalUI<T>::paint(Graphics &g)
 {
+	if (inspectable.wasObjectDeleted()) return;
+
 	juce::Rectangle<float> r = this->getMainBounds().toFloat();
 	bool isItemEnabled = baseItem->canBeDisabled ? baseItem->enabled->boolValue() : true;
 

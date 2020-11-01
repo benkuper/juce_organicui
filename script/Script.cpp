@@ -274,7 +274,7 @@ void Script::childStructureChanged(ControllableContainer* cc)
 	{
 		if(!Engine::mainEngine->isLoadingFile && !Engine::mainEngine->isClearing)
 		{
-			const ScopedLock sl (engineLock); //need to check null MainEngine after lock
+			const ScopedLock sl (engineLock); //need to check null MainEngine again after lock
 			if(Engine::mainEngine != nullptr && scriptEngine != nullptr) scriptEngine->registerNativeObject(Engine::mainEngine->scriptTargetName, Engine::mainEngine->getScriptObject());
 		}
 	}
