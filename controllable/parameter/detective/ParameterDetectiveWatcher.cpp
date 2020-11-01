@@ -20,7 +20,8 @@ void ParameterDetectiveWatcher::setControllable(Controllable* c)
 
 	ControllableDetectiveWatcher::setControllable(c);
 
-	parameter = (Parameter*)controllable.get();
+	if (controllable != nullptr && !controllable.wasObjectDeleted()) parameter = (Parameter*)controllable.get();
+	else parameter = nullptr;
 
 	if (parameter != nullptr)
 	{
