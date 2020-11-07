@@ -190,6 +190,9 @@ TimeLabel::TimeLabel(Parameter* p) :
 	showStepsMode(false)
 {
 	valueChanged(parameter->getValue());
+	shouldUpdateLabel = true;
+	timerCallback();	
+
 }
 
 TimeLabel::~TimeLabel()
