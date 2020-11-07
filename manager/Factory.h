@@ -145,7 +145,7 @@ public:
 				subMenuIndex = subMenus.size() - 1;
 			}
 
-			subMenus[subMenuIndex]->addItem(itemID, d->type);
+			subMenus[subMenuIndex]->addItem(itemID, d->type, true, false, d->icon);
 		}
 
 		for (int i = 0; i < subMenus.size(); ++i) menu.addSubMenu(subMenuNames[i], *subMenus[i]);
