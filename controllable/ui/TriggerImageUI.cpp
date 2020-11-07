@@ -12,7 +12,8 @@ TriggerImageUI::TriggerImageUI(Trigger * t, const Image &i) :
 	TriggerUI(t),
 	onImage(i),
 	offImage(i.createCopy()),
-	drawTriggering(false)
+	drawTriggering(false),
+	forceDrawTriggering(false)
 {
 	showLabel = false;
 
@@ -30,7 +31,7 @@ void TriggerImageUI::paint(Graphics & g)
 {
 	if (getWidth() == 0 || getHeight() == 0) return;
 
-	g.drawImage(drawTriggering?onImage:offImage, getLocalBounds().toFloat());
+	g.drawImage((drawTriggering || forceDrawTriggering)?onImage:offImage, getLocalBounds().toFloat());
 	if (isMouseOver() && !trigger->isControllableFeedbackOnly)
 	{
 		g.setColour(HIGHLIGHT_COLOR.withAlpha(.2f));
