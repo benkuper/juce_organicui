@@ -895,7 +895,6 @@ var ControllableContainer::getJSONData()
 
 void ControllableContainer::loadJSONData(var data, bool createIfNotThere)
 {
-
 	if (data.isVoid()) return;
 	if (data.getDynamicObject() == nullptr) return;
 
