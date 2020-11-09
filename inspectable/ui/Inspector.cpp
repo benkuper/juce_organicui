@@ -9,7 +9,7 @@
   ==============================================================================
 */
 
-
+std::function<Inspector* (InspectableSelectionManager*)> InspectorUI::customCreateInspectorFunc = nullptr;
 
 Inspector::Inspector(InspectableSelectionManager* _selectionManager) :
 	selectionManager(nullptr),
@@ -53,6 +53,11 @@ void Inspector::paint(Graphics& g)
 void Inspector::resized()
 {
 	juce::Rectangle<int> r = getLocalBounds().reduced(3);
+	resizedInternal(r);
+}
+
+void Inspector::resizedInternal(juce::Rectangle<int>& r)
+{
 	vp.setBounds(r);
 	r.removeFromRight(10);
 
@@ -147,10 +152,10 @@ void Inspector::newMessage(const InspectableSelectionManager::SelectionEvent& e)
 }
 
 InspectorUI::InspectorUI(const String& name, InspectableSelectionManager* selectionManager) :
-	ShapeShifterContentComponent(name),
-	inspector(selectionManager)
+	ShapeShifterContentComponent(name)
 {
-	addAndMakeVisible(&inspector);
+	inspector.reset(customCreateInspectorFunc != nullptr ? customCreateInspectorFunc(selectionManager) : new Inspector(selectionManager));
+	addAndMakeVisible(inspector.get());
 
 	helpID = "Inspector";
 }
@@ -161,5 +166,5 @@ InspectorUI::~InspectorUI()
 
 void InspectorUI::resized()
 {
-	inspector.setBounds(getLocalBounds());
+	inspector->setBounds(getLocalBounds());
 }

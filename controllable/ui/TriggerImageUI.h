@@ -22,6 +22,7 @@ public:
 	Image offImage;
 
 	bool drawTriggering;
+	bool forceDrawTriggering;
 
 	void paint(Graphics &g) override;
 	void triggerTriggered(const Trigger * p) override;
@@ -29,7 +30,6 @@ public:
 	void mouseDownInternal(const MouseEvent &e) override;
 
 
-	// Inherited via Timer
 	virtual void timerCallback() override;
 };
 

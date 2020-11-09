@@ -30,20 +30,22 @@ public:
 	std::unique_ptr<InspectableEditor> currentEditor;
 
 	bool curSelectionDoesNotAffectInspector;
-
-	void setSelectionManager(InspectableSelectionManager* newSM);
-	void setCurrentInspectable(WeakReference<Inspectable> inspectable, bool setInspectableSelection = true);
-	
 	bool showTextOnEmptyOrMulti;
+
+	virtual void setSelectionManager(InspectableSelectionManager* newSM);
+	virtual void setCurrentInspectable(WeakReference<Inspectable> inspectable, bool setInspectableSelection = true);
 	
-	void paint(Graphics& g) override;
-	void resized() override;
-	void clear();
+	
+	virtual void paint(Graphics& g) override;
+	virtual void resized() override;
+	virtual void resizedInternal(juce::Rectangle<int>& r);
+
+	virtual void clear();
 
     void inspectableDestroyed(Inspectable * inspectable) override;
 
 	//From InspectableSelectionManager
-	void newMessage(const InspectableSelectionManager::SelectionEvent &e) override;
+	virtual void newMessage(const InspectableSelectionManager::SelectionEvent &e) override;
 
 	class  InspectorListener
 	{
@@ -69,7 +71,8 @@ public:
 	InspectorUI(const String &name, InspectableSelectionManager * selectionManager = nullptr);
 	~InspectorUI();
 
-	Inspector inspector;
+	std::unique_ptr<Inspector> inspector;
+	static std::function<Inspector* (InspectableSelectionManager*)> customCreateInspectorFunc;
 
 	void resized() override;
 
