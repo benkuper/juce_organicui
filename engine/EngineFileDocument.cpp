@@ -189,11 +189,18 @@ Result Engine::saveBackupDocument(int index)
 	File autoSaveDir = getFile().getParentDirectory().getChildFile(curFileName + "_autosave");
 	autoSaveDir.createDirectory();
 	File backupFile = autoSaveDir.getChildFile(curFileName + "_autosave_" + String(index) + fileExtension);
-	DBG(backupFile.getFullPathName() << " : " << (int)backupFile.exists());
+	//DBG(backupFile.getFullPathName() << " : " << (int)backupFile.exists());
 	var data = getJSONData();
 
 	if (backupFile.exists()) backupFile.deleteFile();
 	std::unique_ptr<OutputStream> os(backupFile.createOutputStream());
+
+	if (os == nullptr)
+	{
+		LOGERROR("Error saving the document");
+		return Result::fail();
+	}
+	
 	JSON::writeToStream(*os, data);
 	os->flush();
 
