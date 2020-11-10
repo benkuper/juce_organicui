@@ -198,7 +198,7 @@ Result Engine::saveBackupDocument(int index)
 	if (os == nullptr)
 	{
 		LOGERROR("Error saving the document");
-		return Result::fail();
+		return Result::fail("Error saving the document, maybe you don't have write access ?");
 	}
 	
 	JSON::writeToStream(*os, data);
