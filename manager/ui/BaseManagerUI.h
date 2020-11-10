@@ -904,7 +904,7 @@ template<class M, class T, class U>
 void BaseManagerUI<M, T, U>::itemDragEnter(const SourceDetails&)
 {
 	isDraggingOver = true;
-	if (highlightOnDragOver) repaint();
+	repaint();
 }
 
 template<class M, class T, class U>
@@ -922,7 +922,7 @@ template<class M, class T, class U>
 void BaseManagerUI<M, T, U>::itemDragExit(const SourceDetails&)
 {
 	isDraggingOver = false;
-	if (highlightOnDragOver) repaint();
+	repaint();
 }
 
 template<class M, class T, class U>
@@ -956,7 +956,7 @@ void BaseManagerUI<M, T, U>::itemDropped(const SourceDetails& dragSourceDetails)
 	}
 
 	this->isDraggingOver = false;
-	if (highlightOnDragOver) repaint();
+	repaint();
 }
 
 template<class M, class T, class U>
