@@ -43,7 +43,7 @@ TargetParameterUI::TargetParameterUI(TargetParameter * parameter, const String &
 TargetParameterUI::~TargetParameterUI()
 {
 	//in case we deleted with the listener still on
-	if(parameter != nullptr && !parameter.wasObjectDeleted()) targetParameter->rootContainer->removeAsyncContainerListener(this);
+	if(parameter != nullptr && !parameter.wasObjectDeleted() && targetParameter->rootContainer != nullptr) targetParameter->rootContainer->removeAsyncContainerListener(this);
 }
 
 void TargetParameterUI::paint(Graphics & g)
