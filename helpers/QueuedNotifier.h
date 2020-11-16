@@ -9,6 +9,25 @@
 */
 #pragma once
 
+#define ENUM_LIST(...) {__VA_ARGS__}
+;
+#define DECLARE_ASYNC_EVENT(BaseClass, EventPrefix, NotifierPrefix, Types) \
+class  EventPrefix ## Event \
+{ \
+public: \
+	enum Type Types; \
+	 EventPrefix ## Event(Type t, BaseClass * item) : type(t), item(item) {} \
+	Type type; \
+	BaseClass* item; \
+}; \
+QueuedNotifier<EventPrefix ## Event> NotifierPrefix ## Notifier; \
+typedef QueuedNotifier<EventPrefix ## Event>::Listener AsyncListener; \
+void addAsync ## EventPrefix ## Listener(AsyncListener* newListener) { NotifierPrefix ## Notifier.addListener(newListener); } \
+void addAsyncCoalesced ## EventPrefix ## Listener(AsyncListener* newListener) { NotifierPrefix ## Notifier.addAsyncCoalescedListener(newListener); } \
+void removeAsync ## EventPrefix ## Listener(AsyncListener* listener) { NotifierPrefix ## Notifier.removeListener(listener); }
+;
+
+
 template<typename MessageClass,class CriticalSectionToUse = CriticalSection>
 class QueuedNotifier:
 	public  AsyncUpdater
@@ -39,8 +58,6 @@ public:
         virtual ~Listener(){}
         virtual void newMessage(const MessageClass&) = 0;
     };
-
-
 
     void addMessage( MessageClass * msg,bool forceSendNow = false){
         if(listeners.size()==0 && lastListeners.size()==0){
@@ -131,5 +148,4 @@ private:
 
     ListenerList<Listener > listeners;
     ListenerList<Listener > lastListeners;
-
 };
