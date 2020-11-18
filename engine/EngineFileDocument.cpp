@@ -366,6 +366,7 @@ void Engine::loadJSONData(var data, ProgressTask * loadingTask)
 
 
 	var layoutData = d->getProperty("layout");
+	if (layoutData.isVoid()) layoutData = ShapeShifterManager::getInstance()->getCurrentLayout();
 
 	ShapeShifterManager::getInstance()->clearAllPanelsAndWindows();
 

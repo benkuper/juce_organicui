@@ -651,14 +651,14 @@ bool BaseManagerUI<M, T, U>::hitTest(int x, int y)
 	if (!autoFilterHitTestOnItems) return InspectableContentComponent::hitTest(x, y);
 	if (itemsUI.size() == 0) return validateHitTestOnNoItem;
 
+	Point<int> p(x, y);
 	for (auto& i : itemsUI)
 	{
-		Point<int> p(x, y);
-		if (i->getBounds().contains(p))
-		{
-			Point<int> localP = i->getLocalPoint(this, p);
-			if (i->hitTest(localP.x, localP.y)) return true;
-		}
+		//if (i->getBounds().contains(p))
+		//{
+		Point<int> localP = i->getLocalPoint(this, p);
+		if (i->hitTest(localP.x, localP.y)) return true;
+		//}
 	}
 
 	return false;

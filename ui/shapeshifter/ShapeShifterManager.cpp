@@ -208,8 +208,9 @@ ShapeShifterWindow * ShapeShifterManager::getWindowForPanel(ShapeShifterPanel * 
 
 void ShapeShifterManager::loadLayout(var layout)
 {
+	if (!layout.isObject()) return;
+
 	clearAllPanelsAndWindows();
-	if (layout.getDynamicObject() == nullptr) return;
 	mainContainer.loadLayout(layout.getDynamicObject()->getProperty("mainLayout"));
 
 	Array<var>* wData = layout.getDynamicObject()->getProperty("windows").getArray();
