@@ -27,7 +27,7 @@ InspectableContentComponent::InspectableContentComponent(Inspectable * _inspecta
 
 InspectableContentComponent::~InspectableContentComponent()
 {
-	if (!inspectable.wasObjectDeleted())
+	if (inspectable != nullptr && !inspectable.wasObjectDeleted())
 	{
 		inspectable->removeAsyncInspectableListener(this);
 		inspectable->setSelected(false);
@@ -125,7 +125,7 @@ void InspectableContentComponent::selectToThis()
 
 void InspectableContentComponent::paintOverChildren(Graphics & g)
 {
-	if (inspectable.wasObjectDeleted()) return;
+	if (inspectable == nullptr || inspectable.wasObjectDeleted()) return;
 	
 	if (inspectable->isHighlighted)
 	{

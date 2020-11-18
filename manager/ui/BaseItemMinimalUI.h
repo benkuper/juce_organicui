@@ -124,16 +124,19 @@ BaseItemMinimalUI<T>::BaseItemMinimalUI(T* _item) :
 
 	setDisableDefaultMouseEvents(true);
 	addMouseListener(this, true); //needs fixing, this is called twice on the component
-	baseItem->addAsyncContainerListener(this);
 	
-	if (baseItem->canBeDisabled && dimAlphaOnDisabled) setAlpha(baseItem->enabled->boolValue() ? 1 : .5f);
+	if (baseItem != nullptr)
+	{
+		baseItem->addAsyncContainerListener(this);
+		if (baseItem->canBeDisabled && dimAlphaOnDisabled) setAlpha(baseItem->enabled->boolValue() ? 1 : .5f);
+	}
 
 }
 
 template<class T>
 BaseItemMinimalUI<T>::~BaseItemMinimalUI()
 {
-	baseItem->removeAsyncContainerListener(this);
+	if(baseItem != nullptr) baseItem->removeAsyncContainerListener(this);
 }
 
 

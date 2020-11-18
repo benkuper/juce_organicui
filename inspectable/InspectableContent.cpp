@@ -17,7 +17,7 @@ InspectableContent::InspectableContent(Inspectable * _inspectable) :
 
 InspectableContent::~InspectableContent()
 {
-	if(!inspectable.wasObjectDeleted()) inspectable->removeInspectableListener(this);
+	if(inspectable != nullptr && !inspectable.wasObjectDeleted()) inspectable->removeInspectableListener(this);
 }
 
 void InspectableContent::setInspectable(Inspectable* i)
