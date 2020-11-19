@@ -159,7 +159,7 @@ void Parameter::setValue(var _value, bool silentSet, bool force, bool forceOverr
 
 		lastValue = var(value.clone());
 		setValueInternal(croppedValue);
-		if(!isOverriden) isOverriden = croppedValue != defaultValue || forceOverride;
+		if(!isOverriden && !isControllableFeedbackOnly) isOverriden = croppedValue != defaultValue || forceOverride;
 	}
 	if (!silentSet) notifyValueChanged();
 }
