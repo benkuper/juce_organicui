@@ -25,6 +25,7 @@ Automation::Automation(const String& name, AutomationRecorder * recorder, bool a
     length = addFloatParameter("Length", "The length of the curve", 1, 0.01f);
     length->hideInEditor = true;
     length->setControllableFeedbackOnly(true);
+    length->forceSaveValue = true;
 
     position = addFloatParameter("Position", "The length of the curve", 0);
     position->hideInEditor = true;

@@ -23,7 +23,7 @@ Curve2D::Curve2D(const String &name) :
     length = addFloatParameter("Length", "The length of the curve", 0, 0);
     length->hideInEditor = true;
     length->setControllableFeedbackOnly(true);
-
+    
     position = addFloatParameter("Position", "The length of the curve", 0, 0, 1);
     position->hideInEditor = true;
    
