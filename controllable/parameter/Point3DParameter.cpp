@@ -139,7 +139,11 @@ void Point3DParameter::setWeightedValue(Array<var> values, Array<float> weights)
 bool Point3DParameter::checkValueIsTheSame(var newValue, var oldValue)
 {
 	if (!(newValue.isArray() && oldValue.isArray())) return false;
-
+	if (newValue.size() < 3 || oldValue.size() < 3)
+	{
+		DBG("Problem with range !");
+		return false;
+	}
 	bool result = newValue[0] == oldValue[0] && newValue[1] == oldValue[1] && newValue[2] == oldValue[2];
 
 	return result;
