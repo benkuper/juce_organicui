@@ -50,6 +50,8 @@ Curve2DUI::~Curve2DUI()
 
 void Curve2DUI::paintOverChildren(Graphics& g)
 {
+    if (inspectable.wasObjectDeleted()) return;
+
     g.setColour(GREEN_COLOR);
     g.drawEllipse(Rectangle<int>(0, 0, 8, 8).withCentre(getPosInView(manager->value->getPoint())).toFloat(), 2);
 
@@ -82,6 +84,7 @@ void Curve2DUI::paintOverChildren(Graphics& g)
                 p.startNewSubPath(getPosInView(k0).toFloat());
                 for (int i = 1; i < numRKeys; ++i)
                 {
+                    if (!manager->recorder->keys[i].value.isArray()) continue;
                     Point<float> ki(manager->recorder->keys[i].value[0], manager->recorder->keys[i].value[1]);
                     p.lineTo(getPosInView(ki).toFloat());
                 }
