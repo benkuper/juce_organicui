@@ -126,7 +126,7 @@ void AppUpdater::run()
 
 	StringPairArray responseHeaders;
 	int statusCode = 0;
-	std::unique_ptr<InputStream> stream(updateURL.createInputStream(false, nullptr, nullptr, String(),
+	std::unique_ptr<InputStream> stream(updateURL.createInputStream(false, openStreamProgressCallback, this, String(),
 		2000, // timeout in millisecs
 		&responseHeaders, &statusCode));
 
@@ -323,6 +323,12 @@ void AppUpdater::progress(URL::DownloadTask* task, int64 bytesDownloaded, int64 
 	int percent = (int)(progression->floatValue() * 100);
 	queuedNotifier.addMessage(new AppUpdateEvent(AppUpdateEvent::DOWNLOAD_PROGRESS));
 	LOG("Progress : " << percent);
+}
+
+bool AppUpdater::openStreamProgressCallback(void* context, int, int)
+{
+	auto thread = static_cast<Thread*> (context);
+	return !thread->threadShouldExit();
 }
 
 void AppUpdater::newMessage(const AppUpdateEvent& e)
