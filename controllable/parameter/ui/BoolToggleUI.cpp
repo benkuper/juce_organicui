@@ -144,11 +144,12 @@ void BoolButtonToggleUI::paint(Graphics& g)
 
 	Colour bgColor = useCustomBGColor ? customBGColor : NORMAL_COLOR;
 	Colour c = bgColor.darker();
+	Colour hc = useCustomFGColor ? customFGColor : HIGHLIGHT_COLOR;
 
 	if (isInteractable())
 	{
-		if (isOn) c = HIGHLIGHT_COLOR;
-		else c = isMouseOverOrDragging(true) ? (isMouseButtonDown() ? HIGHLIGHT_COLOR : bgColor.brighter()) : bgColor;
+		if (isOn) c = hc;
+		else c = isMouseOverOrDragging(true) ? (isMouseButtonDown() ? hc : bgColor.brighter()) : bgColor;
 	}
 	else
 	{
