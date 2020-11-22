@@ -249,11 +249,7 @@ void ParameterUI::newMessage(const Parameter::ParameterEvent& e) {
 ParameterUI::ValueEditCalloutComponent::ValueEditCalloutComponent(WeakReference<Parameter> p) :
 	p(p)
 {
-	if (p.wasObjectDeleted())
-	{
-		b->dismiss();
-		return;
-	}
+	if (p.wasObjectDeleted()) return;
 
 	int numValues = p->isComplex() ? p->value.size() : 1;
 	for (int i = 0; i < numValues; ++i)
@@ -276,7 +272,11 @@ ParameterUI::ValueEditCalloutComponent::~ValueEditCalloutComponent()
 
 void ParameterUI::ValueEditCalloutComponent::resized()
 {
-	if (p.wasObjectDeleted()) return;
+	if (p.wasObjectDeleted())
+	{
+		if (CallOutBox* b = dynamic_cast<CallOutBox*>(getParentComponent())) b->dismiss();
+		return;
+	}
 
 	const int gap = 4;
 	int numValues = p->isComplex() ? p->value.size() : 1;
@@ -310,6 +310,10 @@ void ParameterUI::ValueEditCalloutComponent::labelTextChanged(Label* l)
 		}
 
 		p->setUndoableValue(oldVal, p->isComplex() ? newVal : newVal[0]);
+	}
+	else
+	{
+		if (CallOutBox* b = dynamic_cast<CallOutBox*>(getParentComponent())) b->dismiss();
 	}
 }
 
