@@ -48,6 +48,7 @@ TargetParameterUI::~TargetParameterUI()
 
 void TargetParameterUI::paint(Graphics & g)
 {
+	if (parameter.wasObjectDeleted()) return;
 
 	Colour c = targetParameter->target != nullptr || targetParameter->targetContainer != nullptr ? GREEN_COLOR : NORMAL_COLOR;
 	if (isMouseOver()) c = c.brighter();
