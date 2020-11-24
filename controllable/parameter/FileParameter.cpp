@@ -89,13 +89,21 @@ var FileParameter::getJSONDataInternal()
 {
 	var data = StringParameter::getJSONDataInternal();
 	if(forceRelativePath) data.getDynamicObject()->setProperty("relative", true);
+
+	if (!saveValueOnly)
+	{
+		if (directoryMode) data.getDynamicObject()->setProperty("directoryMode", true);
+	}
+
 	return data;
 }
 
 void FileParameter::loadJSONDataInternal(var data)
 {
-	StringParameter::loadJSONDataInternal(data);
+	if (!saveValueOnly) directoryMode = data.getProperty("directoryMode", directoryMode);
+	
 	setForceRelativePath(data.getProperty("relative", false));
+	StringParameter::loadJSONDataInternal(data);
 }
 
 void FileParameter::fileSaved(bool savedAs)
