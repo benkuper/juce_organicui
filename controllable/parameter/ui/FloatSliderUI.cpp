@@ -1,3 +1,4 @@
+#include "FloatSliderUI.h"
 /*
  ==============================================================================
 
@@ -14,7 +15,14 @@ FloatSliderUI::FloatSliderUI(Parameter * parameter) :
 	ParameterUI(parameter),
 	addToUndoOnMouseUp(true),
 	fixedDecimals(3),
-	shouldRepaint(true)
+	shouldRepaint(true),
+
+#if JUCE_MAC
+	updateRate(15)
+#else
+	updateRate(30)
+#endif
+
 {
     assignOnMousePosDirect = false;
     changeParamOnMouseUpOnly = false;
@@ -48,17 +56,14 @@ void FloatSliderUI::paint(Graphics & g)
 	g.setColour(bgColor);
 
     
-	float normalizedValue = getParamNormalizedValue();
 
 	juce::Rectangle<int> sliderBounds = getLocalBounds();
     g.fillRoundedRectangle(sliderBounds.toFloat(), 2);
 	
     g.setColour(c);
-    float drawPos = 0;
+	float drawPos = getDrawPos();
     if (orientation == HORIZONTAL)
     {
-        drawPos = changeParamOnMouseUpOnly ? getMouseXYRelative().x : normalizedValue*getWidth();
-
 		if ((float)parameter->minimumValue < 0 && (float)parameter->maximumValue >= 0)
 		{
 			float zeroPos = jmap<float>(0, parameter->minimumValue, parameter->maximumValue, 0, getWidth());
@@ -70,10 +75,11 @@ void FloatSliderUI::paint(Graphics & g)
 		}
     }
     else {
-        drawPos = changeParamOnMouseUpOnly ? getMouseXYRelative().y : normalizedValue*getHeight();
+		
         g.fillRoundedRectangle(sliderBounds.removeFromBottom((int)drawPos).reduced(1).toFloat(), 2);
     }
 
+	lastDrawPos = drawPos;
 
     if(showLabel || showValue){
 
@@ -191,6 +197,13 @@ float FloatSliderUI::getValueFromPosition(const Point<int> &pos)
     else return 1-(pos.y*1.0f/ getHeight());
 }
 
+int FloatSliderUI::getDrawPos()
+{
+	float normalizedValue = getParamNormalizedValue();
+	if(orientation == HORIZONTAL) return changeParamOnMouseUpOnly ? getMouseXYRelative().x : normalizedValue * getWidth();
+	else return changeParamOnMouseUpOnly ? getMouseXYRelative().y : normalizedValue * getHeight();
+}
+
 void FloatSliderUI::setParamNormalizedValueUndoable(float oldValue, float newValue)
 {
 	parameter->setUndoableNormalizedValue(oldValue, newValue);
@@ -208,6 +221,7 @@ float FloatSliderUI::getParamNormalizedValue()
 
 
 void FloatSliderUI::valueChanged(const var &) {
+	if (getDrawPos() == lastDrawPos) return; //don't repaint if there is no visible change (useful for very small and fast changes like RMS)
 	shouldRepaint = true;
 };
 
@@ -220,12 +234,7 @@ void FloatSliderUI::visibilityChanged()
 {
 	if (isVisible())
 	{
-		//DBG(parameter->niceName << " start Timer");
-#if JUCE_MAC
-		startTimerHz(15); //20 fps for slider on mac because of bad UI handling
-#else
-        startTimerHz(30); //30 fps for slider
-#endif
+        startTimerHz(updateRate); //30 fps for slider
 	} else
 	{
 		//DBG(parameter->niceName << " stop Timer");
@@ -238,7 +247,6 @@ void FloatSliderUI::timerCallback()
 	if (!shouldRepaint) return;
 	shouldRepaint = false;
 	repaint();
-
 }
 
 void FloatSliderUI::focusGained(FocusChangeType cause)
