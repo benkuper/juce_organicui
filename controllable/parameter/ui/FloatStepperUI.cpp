@@ -60,6 +60,8 @@ void FloatStepperUI::paint(Graphics& g)
 {
 	ParameterUI::paint(g);
 
+	if (parameter == nullptr || parameter.wasObjectDeleted()) return;
+
 	if (showLabel)
 	{
 		Rectangle<int> r = getLocalBounds();

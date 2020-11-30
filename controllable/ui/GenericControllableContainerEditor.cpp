@@ -284,7 +284,6 @@ void GenericControllableContainerEditor::resetAndBuild()
 	
 	if (!canBeCollapsed() || !container->editorIsCollapsed)
 	{
-		
 		if (container->controllables.getLock().tryEnter())
 		{
 			for (auto &c : container->controllables)
@@ -336,6 +335,8 @@ InspectableEditor * GenericControllableContainerEditor::getEditorUIForContainer(
 
 InspectableEditor * GenericControllableContainerEditor::addEditorUI(ControllableContainer * cc, bool resize)
 {
+	if (cc == nullptr) return;
+
 	InspectableEditor * ccui = getEditorUIForContainer(cc);
 	
 	GenericControllableContainerEditor* gce = dynamic_cast<GenericControllableContainerEditor*>(ccui);
@@ -416,7 +417,7 @@ InspectableEditor * GenericControllableContainerEditor::getEditorUIForControllab
 
 InspectableEditor * GenericControllableContainerEditor::addControllableUI(Controllable * c, bool resize)
 {
-	if (!c->isControllableExposed || c->hideInEditor) return nullptr;
+	if (c == nullptr || !c->isControllableExposed || c->hideInEditor) return nullptr;
 
 	InspectableEditor * cui = getEditorUIForControllable(c);
 	
