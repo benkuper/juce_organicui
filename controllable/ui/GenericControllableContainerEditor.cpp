@@ -335,7 +335,7 @@ InspectableEditor * GenericControllableContainerEditor::getEditorUIForContainer(
 
 InspectableEditor * GenericControllableContainerEditor::addEditorUI(ControllableContainer * cc, bool resize)
 {
-	if (cc == nullptr) return;
+	if (cc == nullptr) return nullptr;
 
 	InspectableEditor * ccui = getEditorUIForContainer(cc);
 	
