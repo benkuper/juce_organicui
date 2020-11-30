@@ -37,7 +37,9 @@ public:
     float initValue;
 
     //drawing checks
+    int updateRate;
     float shouldRepaint;
+    int lastDrawPos;
 	
     virtual void paint(Graphics &g) override;
     virtual void mouseDownInternal(const MouseEvent &e) override;
@@ -46,6 +48,7 @@ public:
 
     virtual float getValueFromMouse();
     virtual float getValueFromPosition(const Point<int> &pos);
+    int getDrawPos();
 
     virtual void setParamNormalizedValueUndoable(float oldValue, float newValue);
     virtual void setParamNormalizedValue(float value);

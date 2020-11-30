@@ -370,6 +370,7 @@ void GenericControllableContainerEditor::showMenuAndAddControllable()
 		c->isCustomizableByUser = true;
 		c->isRemovableByUser = true;
 		c->isSavable = true;
+		c->saveValueOnly = false;
 		container->addControllable(c);
 	}
 }

@@ -97,6 +97,8 @@ bool ControllableUI::isInteractable()
 
 void ControllableUI::showContextMenu()
 {
+	if (controllable == nullptr || controllable.wasObjectDeleted()) return;
+
 	if (customShowContextMenuFunc != nullptr)
 	{
 		customShowContextMenuFunc(this); //full override
@@ -154,6 +156,8 @@ void ControllableUI::showContextMenu()
 	if (p->getNumItems() == 0) return;
 
 	int result = p->show();
+
+	if (controllable.wasObjectDeleted()) return; //in cas it has been deleted while menu was out...
 
 	if (result != 0)
 	{

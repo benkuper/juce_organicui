@@ -124,6 +124,8 @@ void ParameterUI::paintOverChildren(Graphics& g)
 
 void ParameterUI::addPopupMenuItems(PopupMenu* p)
 {
+	if (parameter.wasObjectDeleted()) return;
+
 	if (isInteractable() || parameter->controlMode != Parameter::MANUAL)
 	{
 		if (isInteractable()) p->addItem(1, "Reset value");
@@ -247,6 +249,8 @@ void ParameterUI::newMessage(const Parameter::ParameterEvent& e) {
 ParameterUI::ValueEditCalloutComponent::ValueEditCalloutComponent(WeakReference<Parameter> p) :
 	p(p)
 {
+	if (p.wasObjectDeleted()) return;
+
 	int numValues = p->isComplex() ? p->value.size() : 1;
 	for (int i = 0; i < numValues; ++i)
 	{
@@ -268,6 +272,12 @@ ParameterUI::ValueEditCalloutComponent::~ValueEditCalloutComponent()
 
 void ParameterUI::ValueEditCalloutComponent::resized()
 {
+	if (p.wasObjectDeleted())
+	{
+		if (CallOutBox* b = dynamic_cast<CallOutBox*>(getParentComponent())) b->dismiss();
+		return;
+	}
+
 	const int gap = 4;
 	int numValues = p->isComplex() ? p->value.size() : 1;
 	int labelWidth = (getWidth() - (gap * numValues - 1)) / numValues;
@@ -300,6 +310,10 @@ void ParameterUI::ValueEditCalloutComponent::labelTextChanged(Label* l)
 		}
 
 		p->setUndoableValue(oldVal, p->isComplex() ? newVal : newVal[0]);
+	}
+	else
+	{
+		if (CallOutBox* b = dynamic_cast<CallOutBox*>(getParentComponent())) b->dismiss();
 	}
 }
 
