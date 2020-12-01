@@ -53,7 +53,7 @@ void InspectableContentComponent::setInspectable(Inspectable* i)
 void InspectableContentComponent::mouseEnter(const MouseEvent & e)
 {
 	//DBG("Mouse Enter : " << inspectable->getHelpID());
-	if (inspectable.wasObjectDeleted()) return;
+	if (inspectable == nullptr || inspectable.wasObjectDeleted()) return;
 	if (HelpBox::getInstance()->overDataID.isEmpty()) HelpBox::getInstance()->setOverData(inspectable->getHelpID());
 
 	if (highlightLinkedInspectablesOnOver) inspectable->highlightLinkedInspectables(true);
@@ -63,7 +63,7 @@ void InspectableContentComponent::mouseExit(const MouseEvent & e)
 {
 	//DBG("Mouse Exit : " << inspectable->getHelpID());
 	String helpID = "";
-	if (!inspectable.wasObjectDeleted())
+	if (inspectable != nullptr && !inspectable.wasObjectDeleted())
 	{
 		helpID = inspectable->getHelpID();
 		if (highlightLinkedInspectablesOnOver) inspectable->highlightLinkedInspectables(false);
@@ -76,7 +76,7 @@ void InspectableContentComponent::mouseExit(const MouseEvent & e)
 void InspectableContentComponent::mouseDown(const MouseEvent & e)
 {
 
-	if (inspectable.wasObjectDeleted())
+	if (inspectable == nullptr || inspectable.wasObjectDeleted())
 	{
 		DBG("Object deleted on inspectable content, should never be there !");
 		return;
