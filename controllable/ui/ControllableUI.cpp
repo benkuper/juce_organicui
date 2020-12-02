@@ -157,7 +157,7 @@ void ControllableUI::showContextMenu()
 
 	int result = p->show();
 
-	if (controllable.wasObjectDeleted()) return; //in cas it has been deleted while menu was out...
+	if (controllable == nullptr || controllable.wasObjectDeleted()) return; //in cas it has been deleted while menu was out...
 
 	if (result != 0)
 	{
