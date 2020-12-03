@@ -55,6 +55,8 @@ public:
 	ControllableContainer saveLoadCC;
 	BoolParameter * enableAutoSave;
 	IntParameter * autoSaveCount;
+	IntParameter* autoSaveTime;
+
 	BoolParameter* compressOnSave;
 	BoolParameter* enableCrashUpload;
 

@@ -47,7 +47,7 @@ Engine::Engine(const String & fileName, const String & fileExtension) :
 
 	ScriptUtil::getInstance(); //trigger ScriptUtil constructor
 
-	startTimer(60000*5); //auto-save every 5 minutes
+	startTimer(60000); //auto-save every 5 minutes
 }
 
 Engine::~Engine() {
@@ -179,6 +179,7 @@ void Engine::timerCallback()
 	{
 		saveBackupDocument(autoSaveIndex);
 		autoSaveIndex = (autoSaveIndex + 1) % GlobalSettings::getInstance()->autoSaveCount->intValue();
+		startTimer(60000 * GlobalSettings::getInstance()->autoSaveTime->intValue());
 	}
 }
 
