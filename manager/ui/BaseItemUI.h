@@ -232,8 +232,20 @@ void BaseItemUI<T>::updateMiniModeUI()
 	{
 		if (resizer != nullptr) this->removeChildComponent(resizer);
 
-		int targetWidth = (this->getWidth() > 0) ? this->getWidth() : this->baseItem->viewUISize->getPoint().x;
+		int targetWidth = this->getWidth();
+		if (targetWidth == 0)
+		{
+			if (resizeDirection == ALL) targetWidth = this->baseItem->viewUISize->getPoint().x;
+			else if (resizeDirection == HORIZONTAL) targetWidth = this->baseItem->listUISize->floatValue();
+		}
+
 		int targetHeight = getHeightWithoutContent();
+		if (targetHeight == 0)
+		{
+			if (resizeDirection == ALL) targetHeight = this->baseItem->viewUISize->getPoint().x;
+			else if (resizeDirection == VERTICAL) targetHeight = this->baseItem->listUISize->floatValue();
+		}
+
 		this->setSize(targetWidth, targetHeight);
 	}
 	else
