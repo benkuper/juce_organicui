@@ -50,9 +50,9 @@ GlobalSettings::GlobalSettings() :
 
 	addChildControllableContainer(&interfaceCC);
 
-
 	enableAutoSave = saveLoadCC.addBoolParameter("Enable auto-save", "When enabled, a backup file will be saved every 5 min", true);
 	autoSaveCount = saveLoadCC.addIntParameter("Auto-save count", "The number of different files to auto-save", 10, 1, 100);
+	autoSaveTime = saveLoadCC.addIntParameter("Auto-save time", "The time in minutes between two auto-saves (will)", 5, 1, 100);
 	compressOnSave = saveLoadCC.addBoolParameter("Compress file", "If checked, the JSON content will be minified, otherwise it will be human-readable but larger size as well", true);
 	enableCrashUpload = saveLoadCC.addBoolParameter("Enable Crash Upload", "If checked and a crashlog is found at startup, it will automatically upload it.\nThis crash log is a very small file but is immensely helpful for me, so please leave this option enabled unless you strongly feel like not helping me :)", true);
 	testCrash = saveLoadCC.addTrigger("Test crash", "This will cause a crash, allowing for testing crashes. Don't push this unless you REALLY want to !!!");
