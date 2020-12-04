@@ -47,7 +47,7 @@ public:
 			type(t), target(target) {}
 
 		Type type;
-		WarningTarget* target;
+		WeakReference<WarningTarget> target;
 	};
 
 	QueuedNotifier<WarningTargetEvent> warningTargetNotifier;

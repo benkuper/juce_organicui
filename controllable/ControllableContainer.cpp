@@ -299,7 +299,7 @@ void ControllableContainer::newMessage(const WarningTarget::WarningTargetEvent& 
 	switch (e.type)
 	{
 	case WarningTarget::WarningTargetEvent::WARNING_CHANGED:
-		warningChanged(e.target);
+		if(!e.target.wasObjectDeleted()) warningChanged(e.target);
 		break;
 	}
 }

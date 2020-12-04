@@ -6,7 +6,7 @@ class WarningTargetUI :
 	public WarningTarget::AsyncListener
 {
 public:
-	WarningTargetUI(WarningTarget* target);
+	WarningTargetUI(WarningTarget * target);
 	~WarningTargetUI();
 
 	WeakReference<WarningTarget> target;

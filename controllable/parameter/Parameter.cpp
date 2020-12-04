@@ -34,9 +34,15 @@ Parameter::Parameter(const Type& type, const String& niceName, const String& des
 	scriptObject.setMethod("set", Controllable::setValueFromScript);
 }
 
-Parameter::~Parameter() {
+Parameter::~Parameter() 
+{
 	if(referenceTarget != nullptr) referenceTarget->removeParameterListener(this); //avoid reassigning on deletion
 	setReferenceParameter(nullptr);
+
+	MessageManagerLock mmLock;
+	queuedNotifier.handleUpdateNowIfNeeded();
+	queuedNotifier.cancelPendingUpdate();
+
 	Parameter::masterReference.clear();
 }
 

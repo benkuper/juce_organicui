@@ -1,4 +1,4 @@
-WarningTargetUI::WarningTargetUI(WarningTarget* target) :
+WarningTargetUI::WarningTargetUI(WarningTarget * target) :
 	target(target)
 {
 	target->addAsyncWarningTargetListener(this);

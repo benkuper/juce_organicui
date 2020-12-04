@@ -54,25 +54,38 @@ int WarningReporterContainer::getContentHeight()
 	return items.size() * lineHeight;
 }
 
-void WarningReporterContainer::addTarget(WarningTarget* t)
+void WarningReporterContainer::addTarget(WeakReference<WarningTarget> t)
 {
-	WarningReporterItem* item = getUIForTarget(t); 
-	if (item != nullptr) return;
+	WarningReporterItem * item = getUIForTarget(t); 
+	if (item == nullptr) return;
 	item = new WarningReporterItem(t);
 	items.add(item);
 	addAndMakeVisible(item);
 }
 
-void WarningReporterContainer::removeTarget(WarningTarget* t)
+void WarningReporterContainer::removeTarget(WeakReference<WarningTarget> t)
 {
-	WarningReporterItem* item = getUIForTarget(t);
+	if (t.wasObjectDeleted())
+	{
+		//force cleanup becasue we don't know which one has been removed
+		Array<WarningReporterItem*> itemsToRemove;
+		for (auto& i : items) if (i->target == nullptr || i->target.wasObjectDeleted()) itemsToRemove.add(i);
+		for (auto& i : itemsToRemove)
+		{
+			removeChildComponent(i);
+			items.removeObject(i);
+		}
+		return;
+	}
+
+	WarningReporterItem * item = getUIForTarget(t);
 	if (item == nullptr) return;
 	removeChildComponent(item);
 	items.removeObject(item);
 	DBG("Warning Reporter, num items now : " << items.size());
 }
 
-WarningReporterItem * WarningReporterContainer::getUIForTarget(WarningTarget* t)
+WarningReporterItem * WarningReporterContainer::getUIForTarget(WeakReference<WarningTarget> t)
 {
 	for (auto& i : items) if (i->target == t) return i;
 	return nullptr;
@@ -94,7 +107,7 @@ void WarningReporterContainer::newMessage(const WarningReporter::WarningReporter
 	}
 }
 
-WarningReporterItem::WarningReporterItem(WarningTarget* target) :
+WarningReporterItem::WarningReporterItem(WeakReference<WarningTarget> target) :
 	itemLabel("ItemLabel", target->getWarningTargetName()),
 	warningLabel("WarningLabel", target->getWarningMessage()),
 	resolveBT("Resolve"),

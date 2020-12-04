@@ -252,7 +252,7 @@ void BaseItemUI<T>::updateMiniModeUI()
 	{
 		if (resizer != nullptr) this->addAndMakeVisible(resizer);
 
-		int targetHeight = this->getHeight() > 0 ? this->getHeight() : 24;//Default size if zero
+		int targetHeight = this->getHeight() > 0 ? jmax(minContentHeight, this->getHeight()) : 24;//Default size if zero
 		int targetWidth = this->getWidth() > 0 ? this->getWidth() : 100;//default size if zero
 
 		switch (resizeDirection)

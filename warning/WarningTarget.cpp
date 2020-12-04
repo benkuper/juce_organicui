@@ -9,24 +9,18 @@ WarningTarget::WarningTarget() :
 
 WarningTarget::~WarningTarget()
 {
-	clearWarning();
-	
-	if (warningTargetNotifier.isUpdatePending())
+	if (warningMessage.isNotEmpty())
 	{
-		warningTargetNotifier.triggerAsyncUpdate();
-		uint32 t = Time::getApproximateMillisecondCounter();
-		while (warningTargetNotifier.isUpdatePending())
-		{
-			if (Time::getApproximateMillisecondCounter() - t > 1000)
-			{
-				jassertfalse;
-				break;
-			}
-		}
-		warningTargetNotifier.cancelPendingUpdate();
+		MessageManagerLock mmLock;
+		WarningReporter::getInstance()->unregisterWarning(this);
 	}
 
+	MessageManagerLock mmLock;
+	warningTargetNotifier.handleUpdateNowIfNeeded();
+	warningTargetNotifier.cancelPendingUpdate();
+
 	masterReference.clear();
+
 }
 
 void WarningTarget::setWarningMessage(StringRef message)

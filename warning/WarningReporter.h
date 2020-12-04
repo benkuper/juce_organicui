@@ -16,15 +16,15 @@ class WarningReporter :
 public:
 	juce_DeclareSingleton(WarningReporter, true);
 
-	Array<WarningTarget*> targets;
+	Array<WeakReference<WarningTarget>> targets;
 
 	WarningReporter();
 	~WarningReporter();
 
 	void clear();
 
-	void registerWarning(WarningTarget*);
-	void unregisterWarning(WarningTarget*);
+	void registerWarning(WeakReference<WarningTarget>);
+	void unregisterWarning(WeakReference<WarningTarget>);
 
 	void endLoadFile() override;
 
@@ -34,11 +34,11 @@ public:
 	public:
 		enum Type { WARNING_REGISTERED, WARNING_UNREGISTERED };
 
-		WarningReporterEvent(Type t, WarningTarget * target) :
+		WarningReporterEvent(Type t, WeakReference<WarningTarget> target) :
 			type(t), target(target) {}
 
 		Type type;
-		WarningTarget* target;
+		WeakReference<WarningTarget> target;
 	};
 
 	QueuedNotifier<WarningReporterEvent> warningReporterNotifier;

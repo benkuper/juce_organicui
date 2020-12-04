@@ -7,14 +7,14 @@ class WarningReporterItem :
 	public Button::Listener
 {
 public:
-	WarningReporterItem(WarningTarget* target);
+	WarningReporterItem(WeakReference<WarningTarget> target);
 	~WarningReporterItem();
 
 	Label itemLabel;
 	Label warningLabel;
 	TextButton resolveBT;
 
-	WarningTarget* target;
+	WeakReference<WarningTarget> target;
 
 	void resized() override;
 	virtual void buttonClicked(Button*) override;
@@ -35,10 +35,10 @@ public:
 	void resized() override;
 	int getContentHeight();
 
-	void addTarget(WarningTarget* t);
-	void removeTarget(WarningTarget* t);
+	void addTarget(WeakReference<WarningTarget> t);
+	void removeTarget(WeakReference<WarningTarget> t);
 
-	WarningReporterItem * getUIForTarget(WarningTarget* t);
+	WarningReporterItem * getUIForTarget(WeakReference<WarningTarget> t);
 
 	void newMessage(const WarningReporter::WarningReporterEvent& e) override;
 

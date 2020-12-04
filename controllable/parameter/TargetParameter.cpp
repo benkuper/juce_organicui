@@ -43,6 +43,7 @@ TargetParameter::TargetParameter(const String & niceName, const String & descrip
 TargetParameter::~TargetParameter()
 {
 	setRootContainer(nullptr);
+	ghostValue = ""; //force not ghost to avoid launching a warning
 
 	setTarget((ControllableContainer *)nullptr);
 	setTarget((Controllable *)nullptr);
@@ -53,7 +54,10 @@ void TargetParameter::setGhostValue(const String & ghostVal)
 {
 	if (ghostVal == ghostValue) return;
 	ghostValue = ghostVal;
-	if (ghostValue.isNotEmpty() && target == nullptr && targetContainer == nullptr) setWarningMessage("Link is broken !");
+	if (ghostValue.isNotEmpty() && target == nullptr && targetContainer == nullptr)
+	{
+		setWarningMessage("Link is broken !");
+	}
 	
 }
 
@@ -297,8 +301,8 @@ var TargetParameter::getJSONDataInternal()
 
 void TargetParameter::loadJSONDataInternal(var data)
 {
+	ghostValue = data.getProperty("ghostValue", data.getProperty("value",""));
 	StringParameter::loadJSONDataInternal(data);
-	setGhostValue(data.getProperty("ghostValue", stringValue()));
 }
 
 TargetParameterUI * TargetParameter::createTargetUI(TargetParameter * _target)

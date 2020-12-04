@@ -18,16 +18,16 @@ void WarningReporter::clear()
 	targets.clear();
 }
 
-void WarningReporter::registerWarning(WarningTarget* target)
+void WarningReporter::registerWarning(WeakReference<WarningTarget> target)
 {
-	if (target == nullptr || targets.contains(target)) return;
+	if (target == nullptr || target.wasObjectDeleted() || targets.contains(target)) return;
 	targets.addIfNotAlreadyThere(target);
 	warningReporterNotifier.addMessage(new WarningReporterEvent(WarningReporterEvent::WARNING_REGISTERED, target));
 }
 
-void WarningReporter::unregisterWarning(WarningTarget* target)
+void WarningReporter::unregisterWarning(WeakReference<WarningTarget> target)
 {
-	if (target == nullptr || !targets.contains(target)) return;
+	if (target == nullptr || target.wasObjectDeleted() || !targets.contains(target)) return;
 	targets.removeAllInstancesOf(target);
 	warningReporterNotifier.addMessage(new WarningReporterEvent(WarningReporterEvent::WARNING_UNREGISTERED, target));
 

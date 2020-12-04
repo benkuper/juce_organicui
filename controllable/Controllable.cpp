@@ -59,7 +59,8 @@ Controllable::Controllable(const Type &type, const String & niceName, const Stri
 Controllable::~Controllable() {
 	Controllable::masterReference.clear();
 	listeners.call(&Controllable::Listener::controllableRemoved, this);
-	queuedNotifier.addMessage(new ControllableEvent(ControllableEvent::CONTROLLABLE_REMOVED, this));
+	queuedNotifier.cancelPendingUpdate();
+	//queuedNotifier.addMessage(new ControllableEvent(ControllableEvent::CONTROLLABLE_REMOVED, this));
 }
 
 UndoableAction * Controllable::setUndoableNiceName(const String & newNiceName, bool onlyReturnAction)
