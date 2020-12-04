@@ -36,7 +36,7 @@ BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts
 	miniMode->hideInOutliner = true;
 	miniMode->hideInEditor = true;
 
-	listUISize = addFloatParameter("ListSize", "Size in list", 0, 0, 5000);
+	listUISize = addFloatParameter("ListSize", "Size in list", 24, 0, 5000);
 	listUISize->hideInEditor = true;
 	listUISize->hideInOutliner = true;
 

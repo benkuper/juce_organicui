@@ -252,8 +252,8 @@ void BaseItemUI<T>::updateMiniModeUI()
 	{
 		if (resizer != nullptr) this->addAndMakeVisible(resizer);
 
-		int targetHeight = this->getHeight();
-		int targetWidth = this->getWidth();
+		int targetHeight = this->getHeight() > 0 ? this->getHeight() : 24;//Default size if zero
+		int targetWidth = this->getWidth() > 0 ? this->getWidth() : 100;//default size if zero
 
 		switch (resizeDirection)
 		{
@@ -261,13 +261,18 @@ void BaseItemUI<T>::updateMiniModeUI()
 			targetWidth = (int)this->baseItem->viewUISize->getPoint().x;
 			targetHeight = (int)this->baseItem->viewUISize->getPoint().y;
 			break;
+
 		case VERTICAL:
 			targetHeight = (int)this->baseItem->listUISize->floatValue();
 			break;
+
 		case HORIZONTAL:
 			targetWidth = (int)this->baseItem->listUISize->floatValue();
 			break;
+
 		case NONE:
+			targetWidth = (int)this->baseItem->listUISize->floatValue();
+			targetHeight = (int)this->baseItem->listUISize->floatValue();
 			break;
 		}
 
@@ -339,7 +344,7 @@ void BaseItemUI<T>::resized()
 				juce::Rectangle<int> fr = r.removeFromBottom(resizerHeight);
 				resizedInternalFooter(fr);
 				edgeResizer->setBounds(fr);
-				this->baseItem->listUISize->setValue((float)r.getHeight());
+				this->baseItem->listUISize->setValue(this->getHeight());
 
 			}
 			break;
@@ -347,7 +352,7 @@ void BaseItemUI<T>::resized()
 			case HORIZONTAL:
 			{
 				edgeResizer->setBounds(r.removeFromRight(resizerWidth));
-				this->baseItem->listUISize->setValue((float)r.getWidth());
+				this->baseItem->listUISize->setValue(this->getWidth());
 			}
 			break;
 
