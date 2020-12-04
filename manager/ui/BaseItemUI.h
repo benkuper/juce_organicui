@@ -21,7 +21,7 @@ class BaseItemUI :
 public:
 	enum Direction { NONE, VERTICAL, HORIZONTAL, ALL };
 
-	BaseItemUI<T>(T * _item, Direction resizeDirection = NONE);
+	BaseItemUI<T>(T * _item, Direction resizeDirection = NONE, bool showMiniModeBT = false);
 	virtual ~BaseItemUI<T>();
 
 	//LAYOUT
@@ -52,6 +52,7 @@ public:
 	std::unique_ptr<BoolImageToggleUI> enabledBT;
 	std::unique_ptr<ImageButton> removeBT;
 	std::unique_ptr<WarningTargetUI> warningUI;
+	std::unique_ptr<BoolImageToggleUI> miniModeBT;
 
 	//std::unique_ptr<Grabber> grabber;
 
@@ -107,7 +108,7 @@ private:
 
 
 template<class T>
-BaseItemUI<T>::BaseItemUI(T * _item, Direction _resizeDirection) :
+BaseItemUI<T>::BaseItemUI(T * _item, Direction _resizeDirection, bool showMiniModeBT) :
 	BaseItemMinimalUI<T>(_item),
 	margin(3),
 	minContentHeight(2),
@@ -186,6 +187,12 @@ BaseItemUI<T>::BaseItemUI(T * _item, Direction _resizeDirection) :
 		this->addChildComponent(warningUI.get());
 	}
 
+	if (showMiniModeBT)
+	{
+		miniModeBT.reset(this->baseItem->miniMode->createImageToggle(AssetManager::getInstance()->getToggleBTImage(AssetManager::getInstance()->getMinusImage())));
+		this->addAndMakeVisible(miniModeBT.get());
+	}
+
 	this->setHighlightOnMouseOver(true);
 
 	GlobalSettings::getInstance()->fontSize->addAsyncParameterListener(this);
@@ -225,14 +232,15 @@ void BaseItemUI<T>::updateMiniModeUI()
 	{
 		if (resizer != nullptr) this->removeChildComponent(resizer);
 
+		int targetWidth = (this->getWidth() > 0) ? this->getWidth() : this->baseItem->viewUISize->getPoint().x;
 		int targetHeight = getHeightWithoutContent();
-		this->setSize((int)this->baseItem->viewUISize->getPoint().x, targetHeight);
+		this->setSize(targetWidth, targetHeight);
 	}
 	else
 	{
 		if (resizer != nullptr) this->addAndMakeVisible(resizer);
 
-		int targetHeight = 0;
+		int targetHeight = this->getHeight();
 		int targetWidth = this->getWidth();
 
 		switch (resizeDirection)
@@ -251,7 +259,7 @@ void BaseItemUI<T>::updateMiniModeUI()
 			break;
 		}
 
-		setContentSize(targetWidth, targetHeight);
+		this->setSize(targetWidth, targetHeight);
 	}
 
 	itemUIListeners.call(&ItemUIListener::itemUIMiniModeChanged, this);
@@ -285,8 +293,17 @@ void BaseItemUI<T>::resized()
 		h.removeFromLeft(2);
 	}
 	
-	if (removeBT != nullptr && showRemoveBT) removeBT->setBounds(h.removeFromRight(h.getHeight()));
-	h.removeFromRight(2);
+	if (removeBT != nullptr && showRemoveBT)
+	{
+		removeBT->setBounds(h.removeFromRight(h.getHeight()));
+		h.removeFromRight(2);
+	}
+
+	if (miniModeBT != nullptr)
+	{
+		miniModeBT->setBounds(h.removeFromRight(h.getHeight()));
+		h.removeFromRight(2);
+	}
 
 	resizedHeader(h);
 
@@ -327,7 +344,9 @@ void BaseItemUI<T>::resized()
 				juce::Rectangle<int> fr = r.removeFromBottom(resizerHeight);
 				resizedInternalFooter(fr);
 				cornerResizer->setBounds(fr.withLeft(r.getWidth() - resizerHeight));
-				this->baseItem->viewUISize->setPoint((float)r.getWidth() + this->getExtraWidth(), (float)r.getHeight() + this->getExtraHeight());
+
+				this->baseItem->viewUISize->setPoint(this->getWidth(), this->getHeight());
+
 			}
 			break;
 
