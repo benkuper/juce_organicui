@@ -216,7 +216,7 @@ void TargetParameter::setRootContainer(WeakReference<ControllableContainer> newR
 
 void TargetParameter::childStructureChanged(ControllableContainer *)
 {
-	if (Engine::mainEngine != nullptr && (Engine::mainEngine->isClearing /*|| Engine::mainEngine->isLoadingFile /*Not sure?*/)) return;
+	if (Engine::mainEngine != nullptr && (Engine::mainEngine->isClearing /*|| Engine::mainEngine->isLoadingFile > Not sure?*/)) return;
 
 	if (targetType == CONTROLLABLE)
 	{
