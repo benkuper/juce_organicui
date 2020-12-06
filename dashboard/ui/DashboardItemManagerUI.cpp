@@ -125,6 +125,8 @@ void DashboardItemManagerUI::newMessage(const ContainerAsyncEvent& e)
 	switch (e.type)
 	{
 	case ContainerAsyncEvent::ControllableFeedbackUpdate:
+		if (e.targetControllable.wasObjectDeleted()) return;
+		
 		if (e.targetControllable == manager->bgImage)
 		{
 			File f = manager->bgImage->getFile();

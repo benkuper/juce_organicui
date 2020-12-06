@@ -278,6 +278,8 @@ void BaseItemMinimalUI<T>::newMessage(const ContainerAsyncEvent & e)
 	{
 	case ContainerAsyncEvent::ControllableFeedbackUpdate:
 	{
+		if (e.targetControllable.wasObjectDeleted()) return;
+		
 		if (e.targetControllable == baseItem->enabled)
 		{
 			if (baseItem->canBeDisabled && dimAlphaOnDisabled) setAlpha(baseItem->enabled->boolValue() ? 1 : .5f);
@@ -297,12 +299,14 @@ void BaseItemMinimalUI<T>::newMessage(const ContainerAsyncEvent & e)
 
 	case ContainerAsyncEvent::ControllableStateUpdate:
 	{
+		if (e.targetControllable.wasObjectDeleted()) return;
 		controllableStateUpdateInternal(e.targetControllable);
 	}
 	break;
 
 	case ContainerAsyncEvent::ChildAddressChanged:
 	{
+		if (e.targetContainer.wasObjectDeleted()) return;
 		containerChildAddressChangedAsync(e.targetContainer);
 	}
 	break;

@@ -177,6 +177,7 @@ void Easing2DUI::newMessage(const ContainerAsyncEvent& e)
 {
 	if (e.type == ContainerAsyncEvent::ControllableFeedbackUpdate)
 	{
+		if (e.targetControllable.wasObjectDeleted()) return;
 		easingControllableFeedbackUpdate(e.targetControllable);
 		repaint();
 	}
