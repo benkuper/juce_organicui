@@ -186,6 +186,7 @@ bool GradientColorManagerUI::isInView(GradientColorUI * kui)
 
 void GradientColorManagerUI::newMessage(const ContainerAsyncEvent & e)
 {
+	if (e.targetControllable.wasObjectDeleted()) return;
 	if (e.type == ContainerAsyncEvent::ControllableFeedbackUpdate)
 	{
 		//if (ControllableUtil::findParentAs<GradientColorManager>(e.targetControllable) != nullptr)

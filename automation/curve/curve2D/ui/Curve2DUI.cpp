@@ -295,6 +295,7 @@ void Curve2DUI::newMessage(const ContainerAsyncEvent& e)
 {
     if (e.type == ContainerAsyncEvent::ControllableFeedbackUpdate)
     {
+        if (e.targetControllable.wasObjectDeleted()) return;
         if (e.targetControllable == manager->value)
         {
             repaint();

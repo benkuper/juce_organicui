@@ -189,6 +189,7 @@ void EasingUI::setShowEasingHandles(bool showFirst, bool showLast)
 
 void EasingUI::newMessage(const ContainerAsyncEvent& e)
 {
+	if (e.targetControllable.wasObjectDeleted()) return; 
 	if (e.type == ContainerAsyncEvent::ControllableFeedbackUpdate)
 	{
 		easingControllableFeedbackUpdate(e.targetControllable);
