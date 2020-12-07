@@ -38,7 +38,7 @@ public:
 
 	bool checkValueIsTheSame(var oldValue, var newValue) override;
 
-	void setValueInternal(var &value) override;
+	virtual void setValueInternal(var &value) override;
 
 	virtual bool hasRange() override;
 

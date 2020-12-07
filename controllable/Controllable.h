@@ -132,7 +132,6 @@ public:
 		virtual void controllableFeedbackStateChanged(Controllable *) {}
 		virtual void controllableControlAddressChanged(Controllable *) {}
 		virtual void controllableNameChanged(Controllable *) {}
-		virtual void controllableRemoved(Controllable *) {}
 		virtual void askForRemoveControllable(Controllable *, bool /*addToUndo*/ = false) {}
 	};
 
