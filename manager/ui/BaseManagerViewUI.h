@@ -254,8 +254,9 @@ bool BaseManagerViewUI<M, T, U>::keyPressed(const KeyPress & e)
 template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::paint(Graphics & g)
 {
-	if(!this->transparentBG) paintBackground(g);
+	if (inspectable.wasObjectDeleted()) return;
 
+	if(!this->transparentBG) paintBackground(g);
 	if (this->manager->items.size() == 0 && this->noItemText.isNotEmpty())
 	{
 		g.setColour(Colours::white.withAlpha(.4f));
@@ -285,6 +286,8 @@ void BaseManagerViewUI<M, T, U>::paintBackground(Graphics & g)
 template<class M, class T, class U>
 inline void BaseManagerViewUI<M, T, U>::paintOverChildren(Graphics& g)
 {
+	if (inspectable.wasObjectDeleted()) return;
+
 	BaseManagerUI<M, T, U>::paintOverChildren(g);
 
 	if (snapLineX.getLength() > 0)
@@ -305,6 +308,8 @@ inline void BaseManagerViewUI<M, T, U>::paintOverChildren(Graphics& g)
 template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::resized()
 {
+	if (inspectable.wasObjectDeleted()) return;
+	
 	juce::Rectangle<int> r = this->getLocalBounds();
 	this->addItemBT->setBounds(r.withSize(24, 24).withX(r.getWidth() - 24));
 
