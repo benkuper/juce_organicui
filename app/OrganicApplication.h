@@ -65,6 +65,7 @@ public:
 	virtual void newMessage(const AppUpdateEvent &e) override;
 
 	virtual void clearGlobalSettings();
+	virtual void saveGlobalSettings();
 
 	virtual void updateAppTitle();
 

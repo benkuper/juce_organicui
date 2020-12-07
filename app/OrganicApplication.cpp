@@ -44,7 +44,7 @@ void OrganicApplication::initialise(const String & commandLine)
 	CommandLineElements commands = StringUtil::parseCommandLine(commandLine);
 	for (auto& c : commands)
 	{
-		if (c.command == "r") getAppProperties().getUserSettings()->getFile().deleteFile();
+		if (c.command == "r") clearGlobalSettings();
 	}
 
 	GlobalSettings::getInstance()->addChildControllableContainer(&appSettings,false, GlobalSettings::getInstance()->controllableContainers.size()-1);
@@ -97,7 +97,6 @@ void OrganicApplication::initialise(const String & commandLine)
 		}
 	}
 
-
 	afterInit();
 
 	engine->parseCommandline(commandLine);
@@ -120,22 +119,7 @@ void OrganicApplication::initialise(const String & commandLine)
 
 void OrganicApplication::shutdown()
 {   
-	if (useWindow)
-	{
-		var boundsVar = var(new DynamicObject());
-		juce::Rectangle<int> r = mainWindow->getScreenBounds();
-
-		getAppProperties().getUserSettings()->setValue("windowX", r.getPosition().x);
-		getAppProperties().getUserSettings()->setValue("windowY", r.getPosition().y);
-		getAppProperties().getUserSettings()->setValue("windowWidth", r.getWidth());
-		getAppProperties().getUserSettings()->setValue("windowHeight", r.getHeight());
-		getAppProperties().getUserSettings()->setValue("fullscreen", mainWindow->isFullScreen());
-		getAppProperties().getUserSettings()->setValue("lastVersion", getApplicationVersion());
-	}
-
-	getAppProperties().getUserSettings()->setValue("globalSettings", JSON::toString(GlobalSettings::getInstance()->getJSONData()));
-	getAppProperties().getUserSettings()->saveIfNeeded();
-
+	saveGlobalSettings();
 	
 	// Add your application's shutdown code here..
 	mainComponent->clear();
@@ -232,8 +216,28 @@ void OrganicApplication::newMessage(const AppUpdateEvent & e)
 
 void OrganicApplication::clearGlobalSettings()
 {
+	getAppProperties().getUserSettings()->getFile().deleteFile();
 	getAppProperties().getUserSettings()->clear();
 	AlertWindow::showMessageBox(AlertWindow::InfoIcon, "So you want a fresh start","All settings are cleared ! You should definitely restart " + getApplicationName() + " in order to see changes.");
+}
+
+void OrganicApplication::saveGlobalSettings()
+{
+	if (useWindow)
+	{
+		var boundsVar = var(new DynamicObject());
+		juce::Rectangle<int> r = mainWindow->getScreenBounds();
+
+		getAppProperties().getUserSettings()->setValue("windowX", r.getPosition().x);
+		getAppProperties().getUserSettings()->setValue("windowY", r.getPosition().y);
+		getAppProperties().getUserSettings()->setValue("windowWidth", r.getWidth());
+		getAppProperties().getUserSettings()->setValue("windowHeight", r.getHeight());
+		getAppProperties().getUserSettings()->setValue("fullscreen", mainWindow->isFullScreen());
+		getAppProperties().getUserSettings()->setValue("lastVersion", getApplicationVersion());
+	}
+
+	getAppProperties().getUserSettings()->setValue("globalSettings", JSON::toString(GlobalSettings::getInstance()->getJSONData()));
+	getAppProperties().getUserSettings()->saveIfNeeded();
 }
 
 void OrganicApplication::updateAppTitle()
