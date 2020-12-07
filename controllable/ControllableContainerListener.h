@@ -17,7 +17,6 @@ public:
 	virtual void controllableStateUpdate(ControllableContainer *, Controllable *) {}
 	virtual void childStructureChanged(ControllableContainer *) {}
 	virtual void childAddressChanged(ControllableContainer *) {};
-	//virtual void controllableContainerPresetLoaded(ControllableContainer *) {}
 	virtual void controllableContainerNameChanged(ControllableContainer*) {}
 	virtual void controllableContainerReordered(ControllableContainer *) {}
 	virtual void controllableContainerFinishedLoading(ControllableContainer *) {};

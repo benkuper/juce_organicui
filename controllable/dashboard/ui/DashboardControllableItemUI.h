@@ -2,7 +2,8 @@
 
 
 class DashboardControllableItemUI :
-	public DashboardInspectableItemUI
+	public DashboardInspectableItemUI,
+	public DashboardControllableItem::AsyncListener
 {
 public:
 	DashboardControllableItemUI(DashboardControllableItem * controllableItem);
@@ -25,4 +26,6 @@ public:
 
 	virtual void controllableFeedbackUpdateInternal(Controllable* c) override;
 	virtual void controllableStateUpdateInternal(Controllable* c) override;
+
+	virtual void newMessage(const DashboardControllableItem::DashboardControllableItemEvent& e) override;
 };

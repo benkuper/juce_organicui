@@ -8,18 +8,26 @@
   ==============================================================================
 */
 
-BoolToggleUI::BoolToggleUI(Parameter * parameter) :
+BoolToggleUI::BoolToggleUI(BoolParameter * parameter, Image _onImage, Image _offImage) :
     ParameterUI(parameter)
 {
 	showEditWindowOnDoubleClick = false;
 
-	if (!isInteractable() && (parameter->enabled || parameter->isControllableFeedbackOnly)) 
+	if (_onImage.isValid())
 	{
-		setImages(ImageCache::getFromMemory(OrganicUIBinaryData::checkbox_on_readonly_png, OrganicUIBinaryData::checkbox_on_readonly_pngSize), ImageCache::getFromMemory(OrganicUIBinaryData::checkbox_off_readonly_png, OrganicUIBinaryData::checkbox_off_readonly_pngSize));
-	}else
+		setImages(_onImage, _offImage);
+	}
+	else
 	{
-		setImages(ImageCache::getFromMemory(OrganicUIBinaryData::checkbox_on_png, OrganicUIBinaryData::checkbox_on_pngSize), ImageCache::getFromMemory(OrganicUIBinaryData::checkbox_off_png, OrganicUIBinaryData::checkbox_off_pngSize));
-		setRepaintsOnMouseActivity(true);
+		if (!isInteractable() && (parameter->enabled || parameter->isControllableFeedbackOnly))
+		{
+			setImages(ImageCache::getFromMemory(OrganicUIBinaryData::checkbox_on_readonly_png, OrganicUIBinaryData::checkbox_on_readonly_pngSize), ImageCache::getFromMemory(OrganicUIBinaryData::checkbox_off_readonly_png, OrganicUIBinaryData::checkbox_off_readonly_pngSize));
+		}
+		else
+		{
+			setImages(ImageCache::getFromMemory(OrganicUIBinaryData::checkbox_on_png, OrganicUIBinaryData::checkbox_on_pngSize), ImageCache::getFromMemory(OrganicUIBinaryData::checkbox_off_png, OrganicUIBinaryData::checkbox_off_pngSize));
+			setRepaintsOnMouseActivity(true);
+		}
 	}
 
 	setSize(200, GlobalSettings::getInstance()->fontSize->floatValue() + 4);//default size
@@ -42,13 +50,17 @@ void BoolToggleUI::setImages(Image _onImage, Image _offImage)
 {
 	onImage = _onImage;
 	offImage = _offImage;
+
+	if (onImage.isValid() && !offImage.isValid()) {
+		offImage = onImage.createCopy();
+		offImage.desaturate();
+	}
 }
 
 void BoolToggleUI::paint(Graphics & g)
 {
     // we are on component deletion
     if(shouldBailOut())return;
-
 
 	bool valCheck = parameter->boolValue();
 	Image m = valCheck ? onImage : offImage;
@@ -86,8 +98,8 @@ void BoolToggleUI::paint(Graphics & g)
 		g.drawFittedText(customLabel.isNotEmpty()?customLabel:parameter->niceName, r, Justification::left,1);
 	}
 
-	g.drawImage(m, cr.toFloat());
-	
+	if (m.isValid()) g.drawImage(m, cr.toFloat());
+
 }
 
 void BoolToggleUI::mouseDownInternal(const MouseEvent& e)
@@ -122,7 +134,7 @@ void BoolToggleUI::timerCallback()
     
 }
 
-BoolButtonToggleUI::BoolButtonToggleUI(Parameter* parameter) :
+BoolButtonToggleUI::BoolButtonToggleUI(BoolParameter* parameter) :
 	BoolToggleUI(parameter)
 {
 }

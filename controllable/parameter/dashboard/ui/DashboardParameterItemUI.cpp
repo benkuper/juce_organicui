@@ -19,8 +19,7 @@ ControllableUI* DashboardParameterItemUI::createControllableUI()
 		File f = parameterItem->btImage->getFile();
 		if (f.existsAsFile())
 		{
-			ImageButton* b = AssetManager::getInstance()->getToggleBTImage(ImageCache::getFromFile(f));
-			return ((BoolParameter*)parameterItem->parameter.get())->createImageToggle(b);
+			return ((BoolParameter*)parameterItem->parameter.get())->createToggle(ImageCache::getFromFile(f));
 		}
 	}
 	break;

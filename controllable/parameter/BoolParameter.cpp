@@ -1,4 +1,3 @@
-#include "BoolParameter.h"
 /*
   ==============================================================================
 
@@ -19,19 +18,14 @@ BoolParameter::BoolParameter(const String & niceName, const String &description,
 	argumentsDescription = "0/1";
 }
 
-BoolToggleUI * BoolParameter::createToggle()
+BoolToggleUI * BoolParameter::createToggle(Image onImage, Image offImage)
 {
-    return new BoolToggleUI(this);
+    return new BoolToggleUI(this, onImage, offImage);
 }
 
 BoolButtonToggleUI* BoolParameter::createButtonToggle()
 {
 	return new BoolButtonToggleUI(this);
-}
-
-BoolImageToggleUI * BoolParameter::createImageToggle(ImageButton * bt)
-{
-	return new BoolImageToggleUI(bt, this);
 }
 
 ControllableUI * BoolParameter::createDefaultUI() {

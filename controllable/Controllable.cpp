@@ -1,4 +1,3 @@
-#include "Controllable.h"
 /*
   ==============================================================================
 
@@ -42,6 +41,8 @@ Controllable::Controllable(const Type &type, const String & niceName, const Stri
 	isCustomizableByUser(false),
 	isRemovableByUser(false),
 	replaceSlashesInShortName(true),
+	dashboardDefaultLabelParentLevel(1), 
+	dashboardDefaultAppendLabel(true),
 	parentContainer(nullptr),
 	queuedNotifier(10)
 {
@@ -57,10 +58,8 @@ Controllable::Controllable(const Type &type, const String & niceName, const Stri
 }
 
 Controllable::~Controllable() {
-	Controllable::masterReference.clear();
-	listeners.call(&Controllable::Listener::controllableRemoved, this);
 	queuedNotifier.cancelPendingUpdate();
-	//queuedNotifier.addMessage(new ControllableEvent(ControllableEvent::CONTROLLABLE_REMOVED, this));
+	Controllable::masterReference.clear();
 }
 
 UndoableAction * Controllable::setUndoableNiceName(const String & newNiceName, bool onlyReturnAction)
@@ -226,6 +225,20 @@ ControllableDetectiveWatcher* Controllable::getDetectiveWatcher()
 DashboardItem * Controllable::createDashboardItem()
 {
 	return new DashboardControllableItem(this);
+}
+
+String Controllable::getDefaultDashboardLabel() const
+{
+	if (dashboardDefaultLabelParentLevel == 0) return niceName;
+	String s = "";
+	ControllableContainer* cParent = parentContainer;
+	for (int i = 0; i < dashboardDefaultLabelParentLevel-1; i++)
+	{
+		if (cParent != nullptr) cParent = cParent->parentContainer;
+	}
+	if (cParent != nullptr) s = cParent->niceName;
+	if (dashboardDefaultAppendLabel) s += " : " + niceName;
+	return s.isNotEmpty() ? s : niceName;
 }
 
 void Controllable::setAttribute(String param, var value)

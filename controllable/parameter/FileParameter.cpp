@@ -108,7 +108,7 @@ void FileParameter::loadJSONDataInternal(var data)
 
 void FileParameter::fileSaved(bool savedAs)
 {
-	if(savedAs) setValue(absolutePath, false, true); //force re-evaluate relative path if changed
+	if(savedAs && !forceAbsolutePath) setValue(absolutePath, false, true); //force re-evaluate relative path if changed
 }
 
 var FileParameter::readFileFromScript(const juce::var::NativeFunctionArgs& a)

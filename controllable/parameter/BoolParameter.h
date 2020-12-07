@@ -21,9 +21,8 @@ public:
     ~BoolParameter() {}
 
     //ui creation
-    BoolToggleUI * createToggle();
+    BoolToggleUI * createToggle(Image onImage = Image(), Image offImage = Image());
 	BoolButtonToggleUI* createButtonToggle();
-	BoolImageToggleUI * createImageToggle(ImageButton * image);
 	ControllableUI * createDefaultUI() override;
 
 	static BoolParameter * create() { return new BoolParameter("New Bool Parameter", "", false); }

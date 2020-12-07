@@ -667,7 +667,7 @@ EnablingControllableContainerEditor::EnablingControllableContainerEditor(Enablin
 {
 	if (cc->canBeDisabled)
 	{
-		enabledUI.reset(ioContainer->enabled->createImageToggle(AssetManager::getInstance()->getPowerBT()));
+		enabledUI.reset(ioContainer->enabled->createToggle(ImageCache::getFromMemory(OrganicUIBinaryData::power_png, OrganicUIBinaryData::power_pngSize)));
 		addAndMakeVisible(enabledUI.get());
 	}
 }

@@ -49,10 +49,10 @@ public:
 	Component * resizer;
 
 	Label itemLabel;
-	std::unique_ptr<BoolImageToggleUI> enabledBT;
+	std::unique_ptr<BoolToggleUI> enabledBT;
 	std::unique_ptr<ImageButton> removeBT;
 	std::unique_ptr<WarningTargetUI> warningUI;
-	std::unique_ptr<BoolImageToggleUI> miniModeBT;
+	std::unique_ptr<BoolToggleUI> miniModeBT;
 
 	//std::unique_ptr<Grabber> grabber;
 
@@ -169,7 +169,7 @@ BaseItemUI<T>::BaseItemUI(T * _item, Direction _resizeDirection, bool showMiniMo
 
 	if (this->baseItem->canBeDisabled)
 	{
-		enabledBT.reset(this->baseItem->enabled->createImageToggle(AssetManager::getInstance()->getPowerBT()));
+		enabledBT.reset(this->baseItem->enabled->createToggle(ImageCache::getFromMemory(OrganicUIBinaryData::power_png, OrganicUIBinaryData::power_pngSize)));
 		this->addAndMakeVisible(enabledBT.get());
 	}
 
@@ -189,7 +189,7 @@ BaseItemUI<T>::BaseItemUI(T * _item, Direction _resizeDirection, bool showMiniMo
 
 	if (showMiniModeBT)
 	{
-		miniModeBT.reset(this->baseItem->miniMode->createImageToggle(AssetManager::getInstance()->getToggleBTImage(AssetManager::getInstance()->getMinusImage())));
+		miniModeBT.reset(this->baseItem->miniMode->createToggle(ImageCache::getFromMemory(OrganicUIBinaryData::minus_png, OrganicUIBinaryData::minus_pngSize)));
 		this->addAndMakeVisible(miniModeBT.get());
 	}
 

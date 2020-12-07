@@ -125,7 +125,7 @@ public:
 	~EnablingControllableContainerEditor() {}
 
 	EnablingControllableContainer * ioContainer;
-	std::unique_ptr<BoolImageToggleUI> enabledUI;
+	std::unique_ptr<BoolToggleUI> enabledUI;
 
 	virtual void resizedInternalHeader(juce::Rectangle<int> &r) override;
 	virtual void controllableFeedbackUpdate(Controllable *) override;

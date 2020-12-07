@@ -1,14 +1,17 @@
+#include "DashboardControllableItemUI.h"
 
 DashboardControllableItemUI::DashboardControllableItemUI(DashboardControllableItem* controllableItem) :
 	DashboardInspectableItemUI(controllableItem),
 	controllableItem(controllableItem),
 	itemUI(nullptr)
 {
+	controllableItem->addAsyncDashboardControllableItemListener(this);
 	setSize(item->viewUISize->x, item->viewUISize->y);
 }
 
 DashboardControllableItemUI::~DashboardControllableItemUI()
 {
+	if(!inspectable.wasObjectDeleted()) controllableItem->removeAsyncDashboardControllableItemListener(this);
 }
 
 void DashboardControllableItemUI::paint(Graphics& g)
@@ -63,7 +66,14 @@ void DashboardControllableItemUI::updateUIParameters()
 	itemUI->customContourColor = controllableItem->contourColor->getColor();
 	itemUI->customContourThickness = controllableItem->contourThickness->floatValue();
 
-	itemUI->customLabel = controllableItem->customLabel->enabled ? controllableItem->customLabel->stringValue() : "";
+	String customLabel = controllableItem->customLabel->stringValue();
+	if (customLabel.isNotEmpty() && controllableItem->customLabel->enabled) itemUI->customLabel = customLabel;
+	else
+	{
+		String defaultLabel = controllableItem->controllable->getDefaultDashboardLabel();
+		if (defaultLabel != controllableItem->controllable->niceName) itemUI->customLabel = defaultLabel;
+	}
+
 	itemUI->customDescription = controllableItem->customDescription->enabled ? controllableItem->customDescription->stringValue() : "";
 
 	itemUI->setOpaqueBackground(controllableItem->opaqueBackground->boolValue());
@@ -115,6 +125,14 @@ void DashboardControllableItemUI::controllableStateUpdateInternal(Controllable* 
 		|| c == controllableItem->contourColor
 		|| c == controllableItem->contourThickness
 		)
+	{
+		updateUIParameters();
+	}
+}
+
+void DashboardControllableItemUI::newMessage(const DashboardControllableItem::DashboardControllableItemEvent& e)
+{
+	if (e.type == e.NEEDS_UI_UPDATE)
 	{
 		updateUIParameters();
 	}
