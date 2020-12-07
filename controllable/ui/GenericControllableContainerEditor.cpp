@@ -680,6 +680,8 @@ void EnablingControllableContainerEditor::resizedInternalHeader(juce::Rectangle<
 
 void EnablingControllableContainerEditor::controllableFeedbackUpdate(Controllable * c)
 {
+	if (c == nullptr) return;
+
 	if (c == ioContainer->enabled)
 	{
 		setCollapsed(!ioContainer->enabled->boolValue(), true);
