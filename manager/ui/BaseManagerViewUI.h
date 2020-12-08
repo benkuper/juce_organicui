@@ -308,7 +308,7 @@ inline void BaseManagerViewUI<M, T, U>::paintOverChildren(Graphics& g)
 template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::resized()
 {
-	if (inspectable.wasObjectDeleted()) return;
+	if (this->inspectable.wasObjectDeleted()) return;
 	
 	juce::Rectangle<int> r = this->getLocalBounds();
 	this->addItemBT->setBounds(r.withSize(24, 24).withX(r.getWidth() - 24));
