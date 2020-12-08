@@ -106,7 +106,11 @@ void FloatSliderUI::paint(Graphics & g)
 		}
 
 
-		if (showValue) text += fixedDecimals == 0 ? parameter->stringValue():String::formatted("%." + String(fixedDecimals + 1) + "f", parameter->floatValue()).dropLastCharacters(1);
+		if (showValue)
+		{
+			lastValueText = getValueText();
+			text += lastValueText;
+		}
 		
 		float fontSizeLimit = orientation == HORIZONTAL ? getHeight() : getWidth();
 		g.setFont((float)jmin<int>(fontSizeLimit - 6, 16));
@@ -203,6 +207,11 @@ int FloatSliderUI::getDrawPos()
 	else return changeParamOnMouseUpOnly ? getMouseXYRelative().y : normalizedValue * getHeight();
 }
 
+String FloatSliderUI::getValueText() const
+{
+	return fixedDecimals == 0 ? parameter->stringValue() : String::formatted("%." + String(fixedDecimals + 1) + "f", parameter->floatValue()).dropLastCharacters(1);
+}
+
 void FloatSliderUI::setParamNormalizedValueUndoable(float oldValue, float newValue)
 {
 	parameter->setUndoableNormalizedValue(oldValue, newValue);
@@ -220,8 +229,13 @@ float FloatSliderUI::getParamNormalizedValue()
 
 
 void FloatSliderUI::valueChanged(const var &) {
-	if (getDrawPos() == lastDrawPos) return; //don't repaint if there is no visible change (useful for very small and fast changes like RMS)
-	shouldRepaint = true;
+
+	//don't repaint if there is no visible change (useful for very small and fast changes like RMS)
+	if (getDrawPos() != lastDrawPos 
+		|| (showValue && getValueText() != lastValueText))
+	{
+		shouldRepaint = true;
+	}
 };
 
 

@@ -2,22 +2,22 @@
 static String EmptyString;
 void CustomLoggerUI::newMessage(const String& s)
 {
-	LogElement* el = new LogElement(s);
+	if (LogElement* el = new LogElement(s))
+	{
+
+		logElements.add(el);
+		totalLogRow += el->getNumLines();
 
 
+		//bool overFlow = false;
 
-	logElements.add(el);
-	totalLogRow += el->getNumLines();
-
-
-	//bool overFlow = false;
-
-	//coalesce messages
-	if (!Timer::isTimerRunning()) {
-		startTimer(100);
+		//coalesce messages
+		if (!Timer::isTimerRunning()) {
+			startTimer(100);
+		}
 	}
+}
 
-};
 void CustomLoggerUI::timerCallback()
 {
 	stopTimer();
@@ -68,7 +68,7 @@ void CustomLoggerUI::timerCallback()
 	//    }
 }
 
-CustomLoggerUI::CustomLoggerUI(const String& contentName, CustomLogger * l) :
+CustomLoggerUI::CustomLoggerUI(const String& contentName, CustomLogger* l) :
 	ShapeShifterContentComponent(contentName),
 	logger(l),
 	logList(this),
@@ -106,7 +106,7 @@ CustomLoggerUI::CustomLoggerUI(const String& contentName, CustomLogger * l) :
 	copyB.addListener(this);
 	addAndMakeVisible(copyB);
 	logListComponent->setMouseCursor(MouseCursor::IBeamCursor);
-	
+
 	autoScrollB.setButtonText(juce::translate("Auto Scroll"));
 	autoScrollB.setClickingTogglesState(true);
 	autoScrollB.setColour(autoScrollB.buttonColourId, NORMAL_COLOR.darker().withAlpha(.5f));
@@ -134,7 +134,7 @@ void CustomLoggerUI::resized()
 	ShapeShifterContentComponent::resized();
 	juce::Rectangle<int> area = getLocalBounds().withTop(5);
 	auto footer = area.removeFromBottom(30).reduced(5);
-	
+
 	autoScrollB.setBounds(footer.removeFromRight(60).reduced(2));
 	clearB.setBounds(footer.removeFromLeft(footer.getWidth() / 2).reduced(2));
 	copyB.setBounds(footer.reduced(2));
@@ -194,7 +194,7 @@ const bool CustomLoggerUI::isPrimaryRow(const int r) const
 	return false;
 }
 
-const String&   CustomLoggerUI::getContentForRow(const int r) const
+const String& CustomLoggerUI::getContentForRow(const int r) const
 {
 	int count = 0;
 	int idx = 0;
@@ -242,7 +242,7 @@ const LogElement* CustomLoggerUI::getElementForRow(const int r) const {
 const String  CustomLoggerUI::getTimeStringForRow(const int r) const
 {
 	if (auto el = getElementForRow(r)) {
-		return String(el->time.toString(false, true, true, true)+"."+String(el->time.getMilliseconds()));
+		return String(el->time.toString(false, true, true, true) + "." + String(el->time.getMilliseconds()));
 	}
 
 	return "";
@@ -298,8 +298,8 @@ void CustomLoggerUI::mouseDown(const MouseEvent& me) {
 		{
 		case 1:
 			SystemClipboard::copyTextToClipboard(logList.getTextAt(rowUnderMouse, 3));
-		break; 
-		
+			break;
+
 		case 2:
 			SystemClipboard::copyTextToClipboard(logList.getTextAt(rowUnderMouse, 1) + "\t" + logList.getTextAt(rowUnderMouse, 2) + "\t" + logList.getTextAt(rowUnderMouse, 3));
 			break;
@@ -323,7 +323,7 @@ MouseCursor  CustomLoggerUI::getMouseCursor() {
 //////////////
 // logList
 
-CustomLoggerUI::LogList::LogList(CustomLoggerUI* o) :  minRow(0), maxRow(0),owner(o)
+CustomLoggerUI::LogList::LogList(CustomLoggerUI* o) : minRow(0), maxRow(0), owner(o)
 {
 }
 
@@ -374,11 +374,11 @@ String CustomLoggerUI::LogList::getTextAt(int rowNumber, int columnId) {
 
 }
 #if LOGGER_USE_LABEL
-Component * CustomLoggerUI::LogList::refreshComponentForCell(int rowNumber, int columnId, bool isRowSelected,
+Component* CustomLoggerUI::LogList::refreshComponentForCell(int rowNumber, int columnId, bool isRowSelected,
 	Component* existingComponentToUpdate) {
 	Colour color = owner->findColour(Label::textColourId);
 	String text = getTextAt(rowNumber, columnId);
-	Label * lp = nullptr;
+	Label* lp = nullptr;
 
 	if (existingComponentToUpdate) {
 		lp = dynamic_cast<Label*>(existingComponentToUpdate);
@@ -413,13 +413,13 @@ void CustomLoggerUI::LogList::paintCell(Graphics& g,
 
 #if USE_CACHED_GLYPH
 	if (cachedG.contains(text)) {
-		auto & cg = cachedG.getReference(text);
+		auto& cg = cachedG.getReference(text);
 		cg.paint(g);
 		return;
 	}
 
 
-	auto & cg = cachedG.getReference(text);
+	auto& cg = cachedG.getReference(text);
 	cg.setFont(getLogFont());
 	cg.setText(text);
 	cg.setSize(width, height);

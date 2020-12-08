@@ -87,16 +87,6 @@ void OrganicApplication::initialise(const String & commandLine)
 	CrashDumpUploader::getInstance()->init(true, !noCrashWindow);
 //#endif
 
-//BUG FIX !! To remove in a while
-	Array<WeakReference<ControllableContainer>> allCC = GlobalSettings::getInstance()->getAllContainers();
-	for (auto& cc : allCC)
-	{
-		if (cc->niceName.contains("Timeline"))
-		{
-			GlobalSettings::getInstance()->removeChildControllableContainer(cc); //All "Timeline XX" should not be there !
-		}
-	}
-
 	afterInit();
 
 	engine->parseCommandline(commandLine);
@@ -110,11 +100,6 @@ void OrganicApplication::initialise(const String & commandLine)
 			engine->setChangedFlag(false);
 		}
 	}
-
-#if TEST_CRASH
-	Engine* n = nullptr;
-	n->getJSONData();
-#endif
 }
 
 void OrganicApplication::shutdown()

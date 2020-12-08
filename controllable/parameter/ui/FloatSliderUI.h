@@ -40,7 +40,8 @@ public:
     int updateRate;
     float shouldRepaint;
     int lastDrawPos;
-	
+    String lastValueText;
+
     virtual void paint(Graphics &g) override;
     virtual void mouseDownInternal(const MouseEvent &e) override;
     virtual void mouseDrag(const MouseEvent &e) override;
@@ -49,6 +50,7 @@ public:
     virtual float getValueFromMouse();
     virtual float getValueFromPosition(const Point<int> &pos);
     int getDrawPos();
+    String getValueText() const;
 
     virtual void setParamNormalizedValueUndoable(float oldValue, float newValue);
     virtual void setParamNormalizedValue(float value);

@@ -162,8 +162,12 @@ void ControllableEditor::newMessage(const Controllable::ControllableEvent & e)
 		label.setText(controllable->niceName, dontSendNotification);
 		break;
             
-        default:
-            break;
+	case Controllable::ControllableEvent::STATE_CHANGED:
+		if(enableBT != nullptr) enableBT->setToggleState(controllable->enabled, dontSendNotification);
+		break;
+
+	default:
+		break;
 
 	}
 }
@@ -183,6 +187,5 @@ void ControllableEditor::buttonClicked(Button * b)
 	else if (b == enableBT.get())
 	{
 		controllable->setEnabled(!controllable->enabled);
-		enableBT->setToggleState(controllable->enabled, dontSendNotification);
 	}
 }

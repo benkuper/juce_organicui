@@ -11,7 +11,6 @@
 #pragma once
 
 class BoolToggleUI;
-class BoolImageToggleUI;
 class BoolButtonToggleUI;
 
 class BoolParameter : public Parameter
