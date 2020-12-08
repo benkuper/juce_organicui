@@ -30,7 +30,6 @@ TargetParameter::TargetParameter(const String & niceName, const String & descrip
 {
 	showWarningInUI = true;
 
-	lockManualControlMode = true;
 	type = TARGET;
 
 	setRootContainer(rootReference != nullptr?rootReference:Engine::mainEngine);
