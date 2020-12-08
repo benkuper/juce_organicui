@@ -17,7 +17,6 @@ public:
 	virtual void controllableStateUpdate(ControllableContainer *, Controllable *) {}
 	virtual void childStructureChanged(ControllableContainer *) {}
 	virtual void childAddressChanged(ControllableContainer *) {};
-	//virtual void controllableContainerPresetLoaded(ControllableContainer *) {}
 	virtual void controllableContainerNameChanged(ControllableContainer*) {}
 	virtual void controllableContainerReordered(ControllableContainer *) {}
 	virtual void controllableContainerFinishedLoading(ControllableContainer *) {};
@@ -51,9 +50,9 @@ public:
 	ContainerAsyncEvent(EventType _type, ControllableContainer* _source, ControllableContainer *_target) : type(_type), source(_source), targetContainer(_target), targetControllable(nullptr) {}
 
 	EventType type;
-	ControllableContainer * source;
-	ControllableContainer * targetContainer;
-	Controllable * targetControllable;
+	WeakReference<ControllableContainer> source;
+	WeakReference<ControllableContainer> targetContainer;
+	WeakReference<Controllable> targetControllable;
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ContainerAsyncEvent)

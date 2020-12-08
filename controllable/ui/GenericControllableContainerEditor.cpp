@@ -667,7 +667,7 @@ EnablingControllableContainerEditor::EnablingControllableContainerEditor(Enablin
 {
 	if (cc->canBeDisabled)
 	{
-		enabledUI.reset(ioContainer->enabled->createImageToggle(AssetManager::getInstance()->getPowerBT()));
+		enabledUI.reset(ioContainer->enabled->createToggle(ImageCache::getFromMemory(OrganicUIBinaryData::power_png, OrganicUIBinaryData::power_pngSize)));
 		addAndMakeVisible(enabledUI.get());
 	}
 }
@@ -680,6 +680,8 @@ void EnablingControllableContainerEditor::resizedInternalHeader(juce::Rectangle<
 
 void EnablingControllableContainerEditor::controllableFeedbackUpdate(Controllable * c)
 {
+	if (c == nullptr) return;
+
 	if (c == ioContainer->enabled)
 	{
 		setCollapsed(!ioContainer->enabled->boolValue(), true);

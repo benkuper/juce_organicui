@@ -15,14 +15,13 @@ FloatSliderUI::FloatSliderUI(Parameter * parameter) :
 	ParameterUI(parameter),
 	addToUndoOnMouseUp(true),
 	fixedDecimals(3),
-	shouldRepaint(true),
-
 #if JUCE_MAC
-	updateRate(15)
+	updateRate(15),
 #else
-	updateRate(30)
+	updateRate(30),
 #endif
-
+    shouldRepaint(true),
+    lastDrawPos(0)
 {
     assignOnMousePosDirect = false;
     changeParamOnMouseUpOnly = false;

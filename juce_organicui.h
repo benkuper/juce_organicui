@@ -150,7 +150,6 @@ using namespace juce;
 #include "controllable/parameter/TargetParameter.h"
 
 #include "controllable/parameter/ui/BetterStepper.h"
-#include "controllable/parameter/ui/BoolImageToggleUI.h"
 #include "controllable/parameter/ui/BoolToggleUI.h"
 #include "controllable/parameter/ui/ColorParameterUI.h"
 #include "controllable/parameter/ui/EnumParameterUI.h"

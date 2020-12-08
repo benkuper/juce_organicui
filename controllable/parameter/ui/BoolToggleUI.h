@@ -15,7 +15,7 @@ class BoolToggleUI :
     public Timer
 {
 public:
-    BoolToggleUI(Parameter * parameter);
+    BoolToggleUI(BoolParameter * parameter, Image onImage = Image(), Image offImage = Image());
     virtual ~BoolToggleUI();
 
 	Image offImage;
@@ -23,7 +23,7 @@ public:
 
     bool shouldRepaint;
 	
-    void setImages(Image onImage, Image offImage);
+    void setImages(Image onImage, Image offImage = Image());
 
     void paint(Graphics &g) override;
     void mouseDownInternal(const MouseEvent &e) override;
@@ -43,7 +43,7 @@ class BoolButtonToggleUI :
     public BoolToggleUI
 {
 public:
-    BoolButtonToggleUI(Parameter* parameter);
+    BoolButtonToggleUI(BoolParameter* parameter);
     virtual ~BoolButtonToggleUI();
     
     void paint(Graphics& g) override;

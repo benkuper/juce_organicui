@@ -45,7 +45,6 @@
 #include "controllable/parameter/FileParameter.cpp"
 #include "controllable/parameter/TargetParameter.cpp"
 #include "controllable/parameter/ui/BetterStepper.cpp"
-#include "controllable/parameter/ui/BoolImageToggleUI.cpp"
 #include "controllable/parameter/ui/BoolToggleUI.cpp"
 #include "controllable/parameter/ui/ColorParameterUI.cpp"
 #include "controllable/parameter/ui/DoubleSliderUI.cpp"

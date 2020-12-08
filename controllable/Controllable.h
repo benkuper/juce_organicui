@@ -59,6 +59,11 @@ public:
 
 	bool replaceSlashesInShortName;
 
+	//dashboard
+	int dashboardDefaultLabelParentLevel; //used to show another 
+	bool dashboardDefaultAppendLabel;		//if default parent level is not 0 and this this will 
+										   //decide if this controllable's label will be added at the end
+
 	WeakReference<ControllableContainer> parentContainer;
 
 	UndoableAction * setUndoableNiceName(const String &_niceName, bool onlyReturnAction = false);
@@ -70,7 +75,6 @@ public:
 	virtual void setControllableFeedbackOnly(bool value);
 
 	void notifyStateChanged();
-
 
 	void setParentContainer(ControllableContainer * container);
 
@@ -96,6 +100,7 @@ public:
 	virtual ControllableUI * createDefaultUI() = 0;
 
 	virtual DashboardItem * createDashboardItem() override;
+	virtual String getDefaultDashboardLabel() const;
 
 	virtual void setAttribute(String param, var value);
 
@@ -127,7 +132,6 @@ public:
 		virtual void controllableFeedbackStateChanged(Controllable *) {}
 		virtual void controllableControlAddressChanged(Controllable *) {}
 		virtual void controllableNameChanged(Controllable *) {}
-		virtual void controllableRemoved(Controllable *) {}
 		virtual void askForRemoveControllable(Controllable *, bool /*addToUndo*/ = false) {}
 	};
 

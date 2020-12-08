@@ -101,6 +101,12 @@ UndoableAction* ControllableContainer::addUndoableControllable(Controllable* c, 
 
 void ControllableContainer::addControllable(Controllable* c)
 {
+	if (c == nullptr)
+	{
+		DBG("Controllable is null !");
+		return;
+	}
+
 	if (c->type == Controllable::TRIGGER) addTriggerInternal((Trigger*)c);
 	else addParameterInternal((Parameter*)c);
 

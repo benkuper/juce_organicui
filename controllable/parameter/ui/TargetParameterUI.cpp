@@ -225,6 +225,7 @@ void TargetParameterUI::newMessage(const ContainerAsyncEvent & e)
 {
 	if (e.type == ContainerAsyncEvent::ControllableFeedbackUpdate)
 	{
+		if (e.targetControllable.wasObjectDeleted()) return;
 		if (Controllable* c = e.targetControllable)
 		{
 			if (c == targetParameter->target) return;

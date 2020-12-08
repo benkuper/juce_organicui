@@ -1,6 +1,7 @@
 DashboardControllableItem::DashboardControllableItem(Controllable* item) :
 	DashboardInspectableItem(item),
-	controllable(item)
+	controllable(item),
+	dashboardItemNotifier(5)
 {
 	viewUISize->setPoint(200, 50);
 
@@ -16,11 +17,14 @@ DashboardControllableItem::DashboardControllableItem(Controllable* item) :
 	contourColor->canBeDisabledByUser = true;
 	customLabel->canBeDisabledByUser = true;
 	customDescription->canBeDisabledByUser = true;
+
+	if (controllable != nullptr && !controllable.wasObjectDeleted()) controllable->addControllableListener(this);
 }
 
 DashboardControllableItem::~DashboardControllableItem()
 {
-
+	if(inspectable != nullptr && !inspectable.wasObjectDeleted()) controllable->removeControllableListener(this);
+	dashboardItemNotifier.cancelPendingUpdate();
 }
 
 var DashboardControllableItem::getJSONData()
@@ -36,23 +40,72 @@ void DashboardControllableItem::loadJSONDataItemInternal(var data)
 	setInspectable(Engine::mainEngine->getControllableForAddress(address));
 
 	DashboardInspectableItem::loadJSONDataItemInternal(data);
-
 }
 
 
 void DashboardControllableItem::setInspectableInternal(Inspectable* i)
 {
+	if (controllable != nullptr && !controllable.wasObjectDeleted())
+	{
+		controllable->removeControllableListener(this);
+	}
+
 	controllable = dynamic_cast<Controllable*>(i);
+
+	if (controllable != nullptr && !controllable.wasObjectDeleted())
+	{
+		controllable->addControllableListener(this);
+	}
 }
 
 void DashboardControllableItem::ghostInspectable()
 {
-	if (!inspectable.wasObjectDeleted() && inspectable != nullptr) inspectableGhostAddress = dynamic_cast<Controllable*>(inspectable.get())->getControlAddress();
+	if (controllable != nullptr && !controllable.wasObjectDeleted())
+	{
+		if (ControllableUtil::findParentAs<Engine>(controllable) != nullptr) //ensure this controllable is attached to the global structure
+		{
+			inspectableGhostAddress = controllable->getControlAddress();
+		}
+	}
 }
 
 void DashboardControllableItem::checkGhost()
 {
 	setInspectable(Engine::mainEngine->getControllableForAddress(inspectableGhostAddress));
+}
+
+
+void DashboardControllableItem::controllableStateChanged(Controllable* c)
+{
+	if (c != controllable) ControllableContainer::controllableStateChanged(c);
+}
+
+void DashboardControllableItem::controllableFeedbackStateChanged(Controllable* c)
+{
+	if (c != controllable) ControllableContainer::controllableFeedbackStateChanged(c);
+}
+
+void DashboardControllableItem::controllableControlAddressChanged(Controllable* c)
+{
+	if (c == controllable)
+	{
+		ghostInspectable();
+		dashboardItemNotifier.addMessage(new DashboardControllableItemEvent(DashboardControllableItemEvent::NEEDS_UI_UPDATE, this));
+	}
+	else
+	{
+		ControllableContainer::controllableControlAddressChanged(c);
+	}
+}
+
+void DashboardControllableItem::controllableNameChanged(Controllable* c)
+{
+	if (c != controllable) ControllableContainer::controllableNameChanged(c);
+}
+
+void DashboardControllableItem::askForRemoveControllable(Controllable* c, bool addToUndo)
+{
+	if (c != controllable) ControllableContainer::askForRemoveControllable(c, addToUndo);
 }
 
 var DashboardControllableItem::getServerData()
@@ -80,7 +133,7 @@ var DashboardControllableItem::getServerData()
 	}
 
 	o->setProperty("opaqueBackground", opaqueBackground->value);
-	o->setProperty("label", customLabel->enabled ? customLabel->value.toString() : controllable->niceName);
+	o->setProperty("label", customLabel->enabled ? customLabel->value.toString() : controllable->getDefaultDashboardLabel());
 	o->setProperty("customDescription", customDescription->value);
 
 	return data;

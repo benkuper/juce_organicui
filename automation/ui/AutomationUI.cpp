@@ -620,6 +620,7 @@ void AutomationUI::newMessage(const AutomationKey::AutomationKeyEvent& e)
 
 void AutomationUI::newMessage(const ContainerAsyncEvent& e)
 {
+    if (e.targetControllable.wasObjectDeleted()) return;
     if (e.type == ContainerAsyncEvent::ControllableFeedbackUpdate)
     {
         if (e.targetControllable == manager->value || e.targetControllable == manager->position)
