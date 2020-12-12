@@ -1,4 +1,3 @@
-#include "CommentManagerViewUI.h"
 /*
   ==============================================================================
 
@@ -12,6 +11,7 @@
 CommentManagerViewUI::CommentManagerViewUI(CommentManager * manager) :
 	BaseManagerViewUI(manager->niceName, manager)
 {
+	bringToFrontOnSelect = false;
 	autoFilterHitTestOnItems = true;
 	validateHitTestOnNoItem = false;
 	transparentBG = true;
