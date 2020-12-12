@@ -1,11 +1,3 @@
-/*
-  ==============================================================================
-
-   
-
-  ==============================================================================
-*/
-
 #include "juce_organicui.h"
 
 //==============================================================================
@@ -27,13 +19,7 @@
 
 #include "help/HelpPanel.cpp"
 #include "undo/UndoMaster.cpp"
-#include "updater/AppUpdater.cpp"
 
-
-#include "app/CrashHandler.cpp"
-#include "app/OrganicMainComponent.cpp"
-#include "app/OrganicMainComponentCommands.cpp"
-#include "app/OrganicApplication.cpp"
 
 #include "remotecontrol/OSCRemoteControl.cpp"
 

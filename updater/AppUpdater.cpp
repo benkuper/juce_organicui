@@ -1,4 +1,3 @@
-#include "AppUpdater.h"
 /*
   ==============================================================================
 
@@ -13,6 +12,7 @@
 juce_ImplementSingleton(AppUpdater)
 
 String getAppVersion();
+ApplicationProperties& getAppProperties();// { return *getApp().appProperties; }
 
 #define FORCE_UPDATE 0 //to test
 

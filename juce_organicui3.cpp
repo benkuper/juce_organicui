@@ -1,11 +1,3 @@
-/*
-  ==============================================================================
-
-   
-
-  ==============================================================================
-*/
-
 #include "juce_organicui.h"
 
 //==============================================================================
@@ -56,3 +48,9 @@
 #include "script/ScriptUtil.cpp"
 #include "script/ui/ScriptEditor.cpp"
 #include "script/ui/ScriptManagerEditor.cpp"
+
+#include "updater/AppUpdater.cpp"
+#include "app/CrashHandler.cpp"
+#include "app/OrganicMainComponent.cpp"
+#include "app/OrganicMainComponentCommands.cpp"
+#include "app/OrganicApplication.cpp"
