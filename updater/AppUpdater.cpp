@@ -411,6 +411,9 @@ void UpdateDialogWindow::buttonClicked(Button* b)
 	{
 		AppUpdater::getInstance()->downloadUpdate();
 		okButton.setEnabled(false);
+		cancelButton.setEnabled(false);
+		skipThisVersionButton.setEnabled(false);
+
 	}
 	else if (b == &cancelButton)
 	{
