@@ -16,6 +16,7 @@ BoolToggleUI::BoolToggleUI(BoolParameter * parameter, Image _onImage, Image _off
 	if (_onImage.isValid())
 	{
 		setImages(_onImage, _offImage);
+		showLabel = false;
 	}
 	else
 	{
@@ -68,20 +69,19 @@ void BoolToggleUI::paint(Graphics & g)
 	juce::Rectangle<int> r = getLocalBounds();
 	g.setColour(Colours::white.withAlpha(isMouseOver() ? 1 : .8f));
 
-	 juce::Rectangle<int> cr;
-	 float labelWidth = 0;
-
+	juce::Rectangle<int> cr;
+	float labelWidth = 0;
 
 	if (showLabel)
 	{
 		g.setFont(jlimit(12, 40, jmin(r.getHeight(), r.getWidth()) - 16));
 		labelWidth = g.getCurrentFont().getStringWidth(parameter->niceName) + 10;
-		if (r.getHeight() > r.getWidth())
+		/*if (r.getHeight() > r.getWidth())
 		{
 			cr = r.removeFromRight(jmin<float>(r.getHeight(), r.getWidth() - labelWidth));
 			cr = cr.withSizeKeepingCentre(cr.getWidth(), cr.getWidth());
 		}
-		else
+		else*/
 		{
 			cr = r.removeFromRight(getHeight());
 		}
