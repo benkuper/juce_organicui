@@ -654,11 +654,11 @@ bool BaseManagerUI<M, T, U>::hitTest(int x, int y)
 	Point<int> p(x, y);
 	for (auto& i : itemsUI)
 	{
-		//if (i->getBounds().contains(p))
-		//{
-		Point<int> localP = i->getLocalPoint(this, p);
-		if (i->hitTest(localP.x, localP.y)) return true;
-		//}
+		if (i->getBounds().contains(p))
+		{
+			Point<int> localP = i->getLocalPoint(this, p);
+			if (i->hitTest(localP.x, localP.y)) return true;
+		}
 	}
 
 	return false;
