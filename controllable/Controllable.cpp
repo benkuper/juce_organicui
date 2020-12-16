@@ -41,8 +41,8 @@ Controllable::Controllable(const Type &type, const String & niceName, const Stri
 	isCustomizableByUser(false),
 	isRemovableByUser(false),
 	replaceSlashesInShortName(true),
-	dashboardDefaultLabelParentLevel(1), 
-	dashboardDefaultAppendLabel(true),
+	dashboardDefaultLabelParentLevel(0), 
+	dashboardDefaultAppendLabel(false),
 	parentContainer(nullptr),
 	queuedNotifier(10)
 {
