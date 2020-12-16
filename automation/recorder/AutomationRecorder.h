@@ -21,6 +21,7 @@ public:
 	~AutomationRecorder();
 
 	TargetParameter * input;
+	BoolParameter* normalize;
 	BoolParameter * arm;
 	BoolParameter * autoDisarm;
 

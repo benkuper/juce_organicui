@@ -1,4 +1,3 @@
-#include "AutomationRecorder.h"
 /*
   ==============================================================================
 
@@ -16,9 +15,7 @@ AutomationRecorder::AutomationRecorder() :
 	input = addTargetParameter("Input Value", "Input value used for recording");
 	input->excludeTypesFilter.add(Trigger::getTypeStringStatic());
 
-	//input->customGetTargetFunc = &ModuleManager::showAllValuesAndGetControllable;
-	//input->customGetControllableLabelFunc = &Module::getTargetLabelForValueControllable;
-	//input->customCheckAssignOnNextChangeFunc = &ModuleManager::checkControllableIsAValue;
+	normalize = addBoolParameter("Normalize", "If checked, this will normalize the input value to a 0-1 range. Only works if the input has a range", false, false);
 
 	arm = addBoolParameter("Arm", "If set, when a sequence will play, this will start recording. In any case, when a sequence is stopped or seeked, the recording stops as well", false);
 	//arm->setEnabled(input->target != nullptr);
@@ -48,6 +45,7 @@ void AutomationRecorder::setCurrentInput(Parameter * newInput)
 	{
 		//currentInput->addParameterListener(this);
 		currentInput->addInspectableListener(this);
+		normalize->setEnabled(currentInput->hasRange());
 		//arm->setEnabled(input->target != nullptr);
 	}
 }
@@ -73,7 +71,8 @@ void AutomationRecorder::addKeyAt(float time)
 {
 	if (isRecording->boolValue() && currentInput != nullptr)
 	{
-		keys.add(RecordValue(time, currentInput->getValue()));
+		float val = (normalize->enabled && normalize->boolValue()) ? currentInput->getNormalizedValue() : currentInput->getValue();
+		keys.add(RecordValue(time, val));
 		recorderNotifier.addMessage(new RecorderEvent(RecorderEvent::RECORDER_UPDATED));
 	}
 }
