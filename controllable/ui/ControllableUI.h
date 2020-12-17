@@ -60,7 +60,7 @@ public:
 	virtual void mouseDownInternal(const MouseEvent&) {} //avoid right click check in each child class
 	virtual void mouseUpInternal(const MouseEvent&) {} //
 
-	virtual bool isInteractable(); //Helper for checking if this ui can be interacted with
+	virtual bool isInteractable(bool falseIfFeedbackOnly = true); //Helper for checking if this ui can be interacted with
 
 	//PopupMenu
 	virtual void showContextMenu();

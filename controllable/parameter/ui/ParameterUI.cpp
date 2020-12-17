@@ -17,6 +17,7 @@ std::function<void(ParameterUI*)> ParameterUI::customShowEditRangeWindowFunction
 ParameterUI::ParameterUI(Parameter* parameter) :
 	ControllableUI(parameter),
 	parameter(parameter),
+	setUndoableValueOnMouseUp(true),
 	showEditWindowOnDoubleClick(true),
 	showValue(true),
 	useCustomBGColor(false),
@@ -188,10 +189,10 @@ void ParameterUI::mouseDoubleClick(const MouseEvent& e)
 	if (showEditWindowOnDoubleClick && !e.mods.isAnyModifierKeyDown()) showEditWindow();
 }
 
-bool ParameterUI::isInteractable()
+bool ParameterUI::isInteractable(bool falseIfFeedbackOnly)
 {
 	if (parameter == nullptr || parameter.wasObjectDeleted()) return false;
-	return ControllableUI::isInteractable() || parameter->controlMode != Parameter::ControlMode::MANUAL;
+	return ControllableUI::isInteractable(falseIfFeedbackOnly) || parameter->controlMode != Parameter::ControlMode::MANUAL;
 }
 
 void ParameterUI::setNextFocusOrder(Component* focusComponent)

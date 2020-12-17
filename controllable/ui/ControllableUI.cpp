@@ -89,10 +89,12 @@ void ControllableUI::drawContour(Graphics &g)
 	g.drawRoundedRectangle(getLocalBounds().toFloat(), 2, customContourThickness);
 }
 
-bool ControllableUI::isInteractable()
+bool ControllableUI::isInteractable(bool falseIfFeedbackOnly)
 {
 	if (controllable == nullptr || controllable.wasObjectDeleted()) return false;
-	return controllable->enabled && !controllable->isControllableFeedbackOnly;
+	if (!controllable->enabled) return false;
+	if (falseIfFeedbackOnly && controllable->isControllableFeedbackOnly) return false;
+	return true;
 }
 
 void ControllableUI::showContextMenu()
@@ -114,6 +116,12 @@ void ControllableUI::showContextMenu()
 	{
 		p->addSeparator();
 		ControllableUI::customAddToContextMenuFunc(this, p.get());
+	}
+
+	if (controllable->userCanSetReadOnly)
+	{
+		p->addSeparator();
+		p->addItem(-11, "Read Only", true, controllable->isControllableFeedbackOnly);
 	}
 
 	if (controllable->includeInScriptObject)
@@ -179,6 +187,10 @@ void ControllableUI::showContextMenu()
 			Detective::getInstance()->watchControllable(controllable);
 			break;
 
+		case -11:
+			controllable->setControllableFeedbackOnly(!controllable->isControllableFeedbackOnly);
+			break;
+
 		default:
 			if (result >= 10000)
 			{
@@ -199,7 +211,7 @@ void ControllableUI::showContextMenu()
 
 void ControllableUI::updateUIParams()
 {
-	setInterceptsMouseClicks(isInteractable(), isInteractable());
+	setInterceptsMouseClicks(isInteractable(false), isInteractable(false));
 	updateUIParamsInternal();
 }
 

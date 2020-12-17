@@ -24,6 +24,7 @@ DoubleSliderUI::DoubleSliderUI(Point2DParameter* parameter) :
 	xParam.defaultUI = parameter->defaultUI;
 	yParam.defaultUI = parameter->defaultUI;
 
+
 	xParam.addAsyncParameterListener(this);
 	yParam.addAsyncParameterListener(this);
 
@@ -32,6 +33,14 @@ DoubleSliderUI::DoubleSliderUI(Point2DParameter* parameter) :
 
 	xSlider->showLabel = false;
 	ySlider->showLabel = false;
+	xSlider->showMenuOnRightClick = false;
+	ySlider->showMenuOnRightClick = false;
+	
+	xSlider->setUndoableValueOnMouseUp = false;
+	ySlider->setUndoableValueOnMouseUp = false;
+	
+	xSlider->addMouseListener(this, true);
+	ySlider->addMouseListener(this, true);
 
 	addAndMakeVisible(xSlider.get());
 	addAndMakeVisible(ySlider.get());
@@ -55,7 +64,10 @@ void DoubleSliderUI::mouseDownInternal(const MouseEvent&)
 
 void DoubleSliderUI::mouseUpInternal(const MouseEvent&)
 {
-	parameter->setUndoableValue(mouseDownValue, parameter->getValue());
+	if (setUndoableValueOnMouseUp)
+	{
+		parameter->setUndoableValue(mouseDownValue, parameter->getValue());
+	}
 }
 
 void DoubleSliderUI::paint(Graphics& g)

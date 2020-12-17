@@ -32,9 +32,22 @@ TripleSliderUI::TripleSliderUI(Point3DParameter* parameter) :
 	yParam.addAsyncCoalescedParameterListener(this);
 	zParam.addAsyncCoalescedParameterListener(this);
 
-	xSlider.reset(xParam.createDefaultUI());
-	ySlider.reset(yParam.createDefaultUI());
-	zSlider.reset(zParam.createDefaultUI());
+	xSlider.reset((ParameterUI *)xParam.createDefaultUI());
+	ySlider.reset((ParameterUI*)yParam.createDefaultUI());
+	zSlider.reset((ParameterUI*)zParam.createDefaultUI());
+
+	xSlider->showMenuOnRightClick = false;
+	ySlider->showMenuOnRightClick = false;
+	zSlider->showMenuOnRightClick = false;
+
+	xSlider->setUndoableValueOnMouseUp = false;
+	ySlider->setUndoableValueOnMouseUp = false;
+	zSlider->setUndoableValueOnMouseUp = false;
+
+
+	xSlider->addMouseListener(this, true);
+	ySlider->addMouseListener(this, true);
+	zSlider->addMouseListener(this, true);
 
 	addAndMakeVisible(xSlider.get());
 	addAndMakeVisible(ySlider.get());

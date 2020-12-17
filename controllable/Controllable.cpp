@@ -40,6 +40,7 @@ Controllable::Controllable(const Type &type, const String & niceName, const Stri
 	isLoadingData(false),
 	isCustomizableByUser(false),
 	isRemovableByUser(false),
+	userCanSetReadOnly(false),
 	replaceSlashesInShortName(true),
 	dashboardDefaultLabelParentLevel(0), 
 	dashboardDefaultAppendLabel(false),
@@ -168,8 +169,10 @@ var Controllable::getJSONData(ControllableContainer * relativeTo)
 	
 	if (canBeDisabledByUser) data.getDynamicObject()->setProperty("enabled", enabled);
 
-	if (saveValueOnly) return data;
+	if(userCanSetReadOnly) data.getDynamicObject()->setProperty("feedbackOnly", isControllableFeedbackOnly);
 
+	if (saveValueOnly) return data;
+	
 	data.getDynamicObject()->setProperty("type", getTypeString());
 	data.getDynamicObject()->setProperty("niceName", niceName);
 	if (canBeDisabledByUser) data.getDynamicObject()->setProperty("enabled", enabled);
@@ -244,7 +247,7 @@ String Controllable::getDefaultDashboardLabel() const
 void Controllable::setAttribute(String param, var value)
 {
 	if (param == "description") description = value;
-	else if (param == "readonly") setControllableFeedbackOnly(value);
+	else if (param == "readonly" || param == "readOnly") setControllableFeedbackOnly(value);
 	else if (param == "enabled") setEnabled(value);
 }
 

@@ -20,6 +20,7 @@ public:
 
 	WeakReference<Parameter> parameter;
 
+	bool setUndoableValueOnMouseUp; //for slidable uis like floatSlider and floatLabelUIs
 	bool showEditWindowOnDoubleClick;
 	bool showValue;
 
@@ -34,6 +35,7 @@ public:
 
 	static std::function<void(ParameterUI*)> customShowEditRangeWindowFunction;
 
+
 	virtual void showEditWindowInternal() override;
 	virtual Component* getEditValueComponent();
 
@@ -47,7 +49,7 @@ public:
 	virtual void handleMenuSelectedID(int id) override;
 
 	virtual void mouseDoubleClick(const MouseEvent &e) override;
-	virtual bool isInteractable() override;
+	virtual bool isInteractable(bool falseIfFeedbackOnly = true) override;
 
 	//focus
 	static int currentFocusOrderIndex;

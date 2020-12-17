@@ -56,6 +56,7 @@ public:
 	//user control
 	bool isCustomizableByUser;
 	bool isRemovableByUser;
+	bool userCanSetReadOnly;
 
 	bool replaceSlashesInShortName;
 

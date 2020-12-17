@@ -174,12 +174,16 @@ void FloatSliderUI::mouseUpInternal(const MouseEvent &)
 {
 	BailOutChecker checker (this);
 	
-	if (changeParamOnMouseUpOnly)
+	if (setUndoableValueOnMouseUp)
 	{
-		setParamNormalizedValueUndoable(initValue, getValueFromMouse());
-	} else
-	{
-		setParamNormalizedValueUndoable(initValue, parameter->getNormalizedValue());
+		if (changeParamOnMouseUpOnly)
+		{
+			setParamNormalizedValueUndoable(initValue, getValueFromMouse());
+		}
+		else
+		{
+			setParamNormalizedValueUndoable(initValue, parameter->getNormalizedValue());
+		}
 	}
 	
     repaint();
