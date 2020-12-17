@@ -39,7 +39,7 @@ ControllableUI::ControllableUI(Controllable * controllable) :
 
 ControllableUI::~ControllableUI()
 {
-	if (controllable.get())controllable->removeAsyncControllableListener(this);
+	if (controllable != nullptr && !controllable.wasObjectDeleted()) controllable->removeAsyncControllableListener(this);
 }
 
 
@@ -51,17 +51,19 @@ void ControllableUI::paintOverChildren(Graphics& g)
 
 void ControllableUI::mouseEnter(const MouseEvent & e)
 {
-	if (controllable != nullptr) HelpBox::getInstance()->setOverData(controllable->helpID);
+	if (controllable != nullptr && !controllable.wasObjectDeleted()) HelpBox::getInstance()->setOverData(controllable->helpID);
 }
 
 void ControllableUI::mouseExit(const MouseEvent & e)
 {
 	setTooltip(tooltip); //restore tooltip when leaving
-	if (controllable != nullptr) HelpBox::getInstance()->clearOverData(controllable->helpID);
+	if (controllable != nullptr && !controllable.wasObjectDeleted()) HelpBox::getInstance()->clearOverData(controllable->helpID);
 }
 
 void ControllableUI::mouseDown(const MouseEvent & e)
 {
+	if (controllable == nullptr && controllable.wasObjectDeleted()) return;
+
 	setTooltip("");  //force not showing tooltip after click
 	if (e.mods.isRightButtonDown())
 	{
