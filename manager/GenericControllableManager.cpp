@@ -49,7 +49,7 @@ void GenericControllableManager::setForceItemsFeedbackOnly(bool value)
 void GenericControllableManager::addItemInternal(GenericControllableItem * item, var)
 {
 	item->canBeDisabled = itemsCanBeDisabled;
-	item->controllable->setControllableFeedbackOnly(forceItemsFeedbackOnly);
+	if(forceItemsFeedbackOnly) item->controllable->setControllableFeedbackOnly(true);
 }
 
 InspectableEditor * GenericControllableManager::getEditor(bool isRoot)

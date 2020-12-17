@@ -852,7 +852,7 @@ var ControllableContainer::getJSONData()
 		{
 			if (p->controlMode == Parameter::ControlMode::MANUAL && !p->forceSaveValue)
 			{
-				if (p->isControllableFeedbackOnly || (!p->isOverriden && p->saveValueOnly)) continue; //do not save parameters that have not changed. it should light up the file. But save custom-made parameters even if there not overriden !
+				if ((!p->userCanSetReadOnly && p->isControllableFeedbackOnly) || (!p->isOverriden && p->saveValueOnly)) continue; //do not save parameters that have not changed. it should light up the file. But save custom-made parameters even if there not overriden !
 			}
 		}
 		paramsData.append(wc->getJSONData(this));

@@ -422,8 +422,6 @@ void Parameter::loadJSONDataInternal(var data)
 	else if (data.getDynamicObject()->hasProperty("paramAutomation") && automation != nullptr) automation->loadJSONData(data.getProperty("paramAutomation", var()));
 	else if (data.getDynamicObject()->hasProperty("reference") && referenceTarget != nullptr) referenceTarget->loadJSONData(data.getProperty("reference", var()));
 
- 	if (data.getDynamicObject()->hasProperty("editable")) setControllableFeedbackOnly(!data.getProperty("editable", true));
-
 	alwaysNotify = data.getProperty("alwaysNotify", alwaysNotify);
 }
 
