@@ -16,24 +16,24 @@ Point3DParameter::Point3DParameter(const String & niceName, const String & descr
 	canHaveRange = true;
 
 	value = var();
-	value.append(0);
-	value.append(0);
-	value.append(0);
+	value.append(0.f);
+	value.append(0.f);
+	value.append(0.f);
 
 	defaultValue = var();
-	defaultValue.append(0);
-	defaultValue.append(0);
-	defaultValue.append(0);
+	defaultValue.append(0.f);
+	defaultValue.append(0.f);
+	defaultValue.append(0.f);
 	 
 	minimumValue = var();
-	minimumValue.append(INT32_MIN);
-	minimumValue.append(INT32_MIN);
-	minimumValue.append(INT32_MIN);
+	minimumValue.append((float)INT32_MIN);
+	minimumValue.append((float)INT32_MIN);
+	minimumValue.append((float)INT32_MIN);
 
 	maximumValue = var();
-	maximumValue.append(INT32_MAX);
-	maximumValue.append(INT32_MAX);
-	maximumValue.append(INT32_MAX);
+	maximumValue.append((float)INT32_MAX);
+	maximumValue.append((float)INT32_MAX);
+	maximumValue.append((float)INT32_MAX);
 
 	//hideInEditor = true;
 	argumentsDescription = "float, float, float";
@@ -83,9 +83,9 @@ void Point3DParameter::setValueInternal(var& _value)
 		return;
 	}
 
-	x = _value[0];
-	y = _value[1];
-	z = _value[2];
+	x = (float)_value[0];
+	y = (float)_value[1];
+	z = (float)_value[2];
 }
 
 void Point3DParameter::setBounds(float _minX, float _minY, float _minZ, float _maxX, float _maxY, float _maxZ)
@@ -167,6 +167,6 @@ var Point3DParameter::getCroppedValue(var originalValue)
 	}
 
 	var val;
-	for (int i = 0; i < 3; ++i) val.append(jlimit(minimumValue[i], maximumValue[i], originalValue[i]));
+	for (int i = 0; i < 3; ++i) val.append((float)jlimit(minimumValue[i], maximumValue[i], originalValue[i]));
 	return val;
 }

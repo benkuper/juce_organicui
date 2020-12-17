@@ -16,12 +16,12 @@ Point2DParameter::Point2DParameter(const String & niceName, const String & descr
 	canHaveRange = true;
 
 	value = var();
-	value.append(0);
-	value.append(0);
+	value.append(0.f);
+	value.append(0.f);
 
 	defaultValue = var();
-	defaultValue.append(0);
-	defaultValue.append(0);
+	defaultValue.append(0.f);
+	defaultValue.append(0.f);
 
 	minimumValue = var();
 	minimumValue.append((float)INT32_MIN);
@@ -71,8 +71,8 @@ UndoableAction* Point2DParameter::setUndoablePoint(float oldX, float oldY, float
 void Point2DParameter::setValueInternal(var& _value)
 {
 	Parameter::setValueInternal(_value);
-	x = _value[0];
-	y = _value[1];
+	x = (float)_value[0];
+	y = (float)_value[1];
 }
 
 void Point2DParameter::setBounds(float _minX, float _minY, float _maxX, float _maxY)
