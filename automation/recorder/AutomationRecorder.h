@@ -25,6 +25,10 @@ public:
 	BoolParameter * arm;
 	BoolParameter * autoDisarm;
 
+	enum SimplificationMethod { SIMPL_BEZIER, SIMPL_LINEAR, SIMPL_LINEAR_INTERACTIVE };
+	EnumParameter* simplificationMethod;
+	FloatParameter* simplificationTolerance;
+
 	WeakReference<Parameter> currentInput;
 
 	BoolParameter * isRecording;

@@ -21,7 +21,8 @@ AutomationUI::AutomationUI(Automation* manager) :
 
     animateItemOnAdd = false;
     manager->addAsyncContainerListener(this);
-    
+    manager->addAsyncAutomationListener(this);
+
     transparentBG = true;
 
     setViewRange(0, manager->length->floatValue());
@@ -34,7 +35,11 @@ AutomationUI::AutomationUI(Automation* manager) :
 
 AutomationUI::~AutomationUI()
 {
-    if (!inspectable.wasObjectDeleted()) manager->removeAsyncContainerListener(this);
+    if (!inspectable.wasObjectDeleted())
+    {
+        manager->removeAsyncContainerListener(this);
+        manager->removeAsyncAutomationListener(this);
+    }
 
     for (auto& ui : itemsUI)
     {
@@ -52,8 +57,6 @@ void AutomationUI::paint(Graphics& g)
 
     if (!transparentBG) g.fillAll(bgColor);
 
-    //g.fillAll(Colours::purple.withAlpha(.1f));
-
     if (previewMode)
     {
         Path p;
@@ -62,7 +65,6 @@ void AutomationUI::paint(Graphics& g)
         {
             p.lineTo(Point<float>(i, getYForValue(manager->getValueAtPosition(getPosForX(i)))));
         }
-
 
         g.setColour(NORMAL_COLOR);
         g.strokePath(p, PathStrokeType(1));
@@ -193,10 +195,10 @@ void AutomationUI::paintOverChildren(Graphics& g)
 {
     if (previewMode || !isShowing()) return;
 
-    g.setColour(BLUE_COLOR);
-    g.fillEllipse(Rectangle<int>(0, 0, 4,4).withCentre(getPosInView(manager->getPosAndValue())).toFloat());
-
     //recorder
+    
+    bool interactiveMode = !manager->interactiveSimplifiedPoints.isEmpty();
+
     if (manager->recorder != nullptr)
     {
         if (manager->recorder->isRecording->boolValue())
@@ -204,9 +206,12 @@ void AutomationUI::paintOverChildren(Graphics& g)
             int numRKeys = manager->recorder->keys.size();
             if (numRKeys > 0)
             {
-                g.setColour(Colours::red.withAlpha(.3f));
-                g.fillRect(getLocalBounds().withLeft(getXForPos(manager->recorder->keys[0].time)).withRight(getXForPos(manager->position->floatValue())));
-
+                if (!interactiveMode)
+                {
+                    g.setColour(Colours::red.withAlpha(.2f));
+                    g.fillRect(getLocalBounds().withLeft(getXForPos(manager->recorder->keys[0].time)).withRight(getXForPos(manager->position->floatValue())));
+                }
+                
                 if (numRKeys >= 2)
                 {
                     Path p;
@@ -219,9 +224,27 @@ void AutomationUI::paintOverChildren(Graphics& g)
                     }
                     
                     g.setColour(Colours::orangered);
-                    g.strokePath(p, PathStrokeType(2));
+                    g.strokePath(p, PathStrokeType(interactiveMode ? 1 : 2));
                 }
             }
+        }
+    }
+
+    if (interactiveMode)
+    {
+        if (manager->interactiveSimplifiedPoints.size() >= 2)
+        {
+            Path p;
+            Point<float> k0(manager->interactiveSimplifiedPoints[0].x, manager->interactiveSimplifiedPoints[0].y);
+            p.startNewSubPath(getPosInView(k0).toFloat());
+            for (int i = 1; i < manager->interactiveSimplifiedPoints.size(); ++i)
+            {
+                Point<float> ki(manager->interactiveSimplifiedPoints[i].x, manager->interactiveSimplifiedPoints[i].y);
+                p.lineTo(getPosInView(ki).toFloat());
+            }
+
+            g.setColour(GREEN_COLOR);
+            g.strokePath(p, PathStrokeType(2));
         }
     }
 
@@ -248,6 +271,14 @@ void AutomationUI::resized()
 {
     if (previewMode || !isVisible()) return;
     for (auto& kui : itemsUI) placeKeyUI(kui);
+
+    if (interactiveSimplificationUI != nullptr)
+    {
+        Rectangle<int> r = getLocalBounds().removeFromTop(24).withSizeKeepingCentre(300, 24).reduced(2);
+        validInteractiveBT->setBounds(r.removeFromRight(80));
+        r.removeFromRight(8);
+        interactiveSimplificationUI->setBounds(r);
+    }
 }
 
 void AutomationUI::placeKeyUI(AutomationKeyUI* ui)
@@ -470,7 +501,7 @@ void AutomationUI::mouseUp(const MouseEvent& e)
 {
     if (paintingMode)
     {
-        manager->addFromPointsAndSimplify(paintingPoints);
+        manager->addFromPointsAndSimplifyBezier(paintingPoints); //always use bezier for drawing
         paintingMode = false;
         paintingPoints.clear();
         repaint();
@@ -646,6 +677,41 @@ void AutomationUI::newMessage(const ContainerAsyncEvent& e)
     }
 }
 
+void AutomationUI::newMessage(const Automation::AutomationEvent& e)
+{
+    if (e.type == e.INTERACTIVE_SIMPLIFICATION_CHANGED)
+    {
+        bool interactiveMode = !manager->interactiveSourcePoints.isEmpty();
+        if (interactiveMode)
+        {
+            if (interactiveSimplificationUI == nullptr)
+            {
+                interactiveSimplificationUI.reset(manager->recorder->simplificationTolerance->createSlider());
+                validInteractiveBT.reset(new TextButton("Validate"));
+                
+                validInteractiveBT->addListener(this);
+
+                addAndMakeVisible(interactiveSimplificationUI.get());
+                addAndMakeVisible(validInteractiveBT.get());
+            }
+        }
+        else
+        {
+            if (interactiveSimplificationUI != nullptr)
+            {
+                removeChildComponent(interactiveSimplificationUI.get());
+                removeChildComponent(validInteractiveBT.get()); 
+                
+                interactiveSimplificationUI.reset();
+                validInteractiveBT.reset();
+            }
+        }
+
+        resized();
+        repaint();
+    }
+}
+
 void AutomationUI::keyEasingHandleMoved(AutomationKeyUI* ui, bool syncOtherHandle, bool isFirst)
 {
     if (syncOtherHandle)
@@ -688,6 +754,18 @@ void AutomationUI::timerCallback()
     {
         repaint();
         shouldRepaint = false;
+    }
+}
+
+void AutomationUI::buttonClicked(Button* b)
+{
+    if (b == validInteractiveBT.get())
+    {
+        manager->finishInteractiveSimplification();
+    }
+    else
+    {
+        BaseManagerUI::buttonClicked(b);
     }
 }
 

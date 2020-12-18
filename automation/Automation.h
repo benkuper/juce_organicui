@@ -32,9 +32,20 @@ public:
     enum RangeRemapMode { ABSOLUTE, PROPORTIONAL };
     EnumParameter * rangeRemapMode;
 
+    //Interactive simplification
+    Array<Point<float>> interactiveSourcePoints;
+    Array<Point<float>> interactiveSimplifiedPoints;
+
     AutomationKey * addKey(const float& position, const float& value, bool addToUndo = false);
     void addKeys(const Array<AutomationKey *> & keys, bool addToUndo = true, bool removeExistingKeys = true);
-    void addFromPointsAndSimplify(const Array<Point<float>>& points, bool addToUndo = true, bool removeExistingKeys = true);
+    
+    void addFromPointsAndSimplifyBezier(const Array<Point<float>>& sourcePoints, bool addToUndo = true, bool removeExistingKeys = true);
+    
+    void addFromPointsAndSimplifyLinear(const Array<Point<float>>& sourcePoints, float tolerance, bool addToUndo = true, bool removeExistingKeys = true);
+    Array<Point<float>> getLinearSimplifiedPointsFrom(const Array<Point<float>>& sourcePoints, float tolerance, int start = 0, int end = -1);
+
+    void launchInteractiveSimplification(const Array<Point<float>>& sourcePoints);
+    void finishInteractiveSimplification();
 
     void addItemInternal(AutomationKey* k, var params) override;
     void addItemsInternal(Array<AutomationKey*>, var params) override;
@@ -66,6 +77,7 @@ public:
     void onContainerParameterChanged(Parameter* p) override;
     void onControllableFeedbackUpdate(ControllableContainer* cc, Controllable* c) override;
     void onControllableStateChanged(Controllable* c) override;
+    void onExternalParameterValueChanged(Parameter* p) override;
 
     void reorderItems() override;
 
@@ -76,6 +88,8 @@ public:
     static var getValueAtPositionFromScript(const juce::var::NativeFunctionArgs& a);
     static var getKeyAtPositionFromScript(const juce::var::NativeFunctionArgs& a);
     static var getKeysBetweenFromScript(const juce::var::NativeFunctionArgs& a);
+
+    DECLARE_ASYNC_EVENT(Automation, Automation, automation, { INTERACTIVE_SIMPLIFICATION_CHANGED })
 
     InspectableEditor* getEditor(bool isRoot) override;
 };

@@ -18,9 +18,14 @@ AutomationRecorder::AutomationRecorder() :
 	normalize = addBoolParameter("Normalize", "If checked, this will normalize the input value to a 0-1 range. Only works if the input has a range", false, false);
 
 	arm = addBoolParameter("Arm", "If set, when a sequence will play, this will start recording. In any case, when a sequence is stopped or seeked, the recording stops as well", false);
-	//arm->setEnabled(input->target != nullptr);
-	//arm->enabled = input->target != nullptr;
 	autoDisarm = addBoolParameter("Auto Disarm", "If set, the arm parameter will be automatically set to off when a record has been saved", false);
+	
+	simplificationMethod = addEnumParameter("Simplification Method", "This decides which algorithm to use when simplifying the recorded data.\nBezier is using the least square approach and is best suited for natural curves.\nLinear is using the Douglas-Peucker method, and works best for straight lines and linear signal.\nLinear Interactive allows you to change the simplification interactively after the recording, where Linear will apply it automatically (useful for automated recording).");
+	simplificationMethod->addOption("Bezier (Least square)", SIMPL_BEZIER)->addOption("Linear (Douglas-Peucker)", SIMPL_LINEAR)->addOption("Linear Interactive", SIMPL_LINEAR_INTERACTIVE);
+
+	simplificationTolerance = addFloatParameter("Simplification Tolerance", "This is the tolerance of the simplification to apply to the recorded data. A higher value means more points will remain. Only available for Linear method right now.", .2f, 0, 1, false);
+
+	
 
 	isRecording = addBoolParameter("Is Recording", "Is the recorder currently recording or eating pasta", false);
 	isRecording->isControllableFeedbackOnly = true;
@@ -119,6 +124,7 @@ Array<AutomationRecorder::RecordValue> AutomationRecorder::stopRecordingAndGetKe
 	return result;
 }
 
+
 bool AutomationRecorder::shouldRecord()
 {
 	return input->target != nullptr && arm->boolValue();
@@ -130,6 +136,10 @@ void AutomationRecorder::onContainerParameterChanged(Parameter * p)
 	else if (p == arm)
 	{
 		recorderNotifier.addMessage(new RecorderEvent(RecorderEvent::RECORDER_UPDATED));
+	}
+	else if (p == simplificationMethod)
+	{
+		simplificationTolerance->setEnabled(simplificationMethod->getValueDataAsEnum<SimplificationMethod>() != SIMPL_BEZIER);
 	}
 }
 

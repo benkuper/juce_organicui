@@ -1,3 +1,4 @@
+#include "Automation.h"
 /*
   ==============================================================================
 
@@ -11,7 +12,8 @@
 Automation::Automation(const String& name, AutomationRecorder * recorder, bool allowKeysOutside) :
     BaseManager(name),
     allowKeysOutside(allowKeysOutside),
-    recorder(recorder)
+    recorder(recorder),
+    automationNotifier(5)
 {
     itemDataType = "AutomationKey";
 
@@ -88,19 +90,19 @@ void Automation::addKeys(const Array<AutomationKey*>& keys, bool addToUndo, bool
 
 }
 
-void Automation::addFromPointsAndSimplify(const Array<Point<float>>& sourcePoints, bool addToUndo, bool removeExistingKeys)
+void Automation::addFromPointsAndSimplifyBezier(const Array<Point<float>>& sourcePoints, bool addToUndo, bool removeExistingKeys)
 {
     if (sourcePoints.size() == 0)
         return;
-        
+
     // Normalize X and Y values to [0,1] for correct corner detection
     float xScale = sourcePoints.getLast().x - sourcePoints.getLast().y;
     float yScale = valueRange->enabled ? (valueRange->y - valueRange->x) : 1.0f;
 
     Array<float> points;
-    for (auto& pp : sourcePoints)  
+    for (auto& pp : sourcePoints)
         points.add(pp.x / xScale, pp.y / yScale);
-    
+
     float* result;
     unsigned int resultNum = 0;
     unsigned int* corners = nullptr;
@@ -110,12 +112,10 @@ void Automation::addFromPointsAndSimplify(const Array<Point<float>>& sourcePoint
 
     const float errorThreshold = 0.02f;
 
-    curve_fit_corners_detect_fl(points.getRawDataPointer(), points.size() / 2, 2, 
-        errorThreshold / 4, errorThreshold * 4, 32, M_PI/8, 
+    curve_fit_corners_detect_fl(points.getRawDataPointer(), points.size() / 2, 2,
+        errorThreshold / 4, errorThreshold * 4, 32, M_PI / 8,
         &corners, &cornersLength);
     if (cornersLength == 0) corners = nullptr;
-
-    DBG((int)cornersLength << " corners detected");
 
     curve_fit_cubic_to_points_fl(points.getRawDataPointer(), points.size() / 2, 2,
         errorThreshold, CURVE_FIT_CALC_HIGH_QUALIY,
@@ -123,7 +123,7 @@ void Automation::addFromPointsAndSimplify(const Array<Point<float>>& sourcePoint
         &result, &resultNum,
         nullptr,
         &cornerIndex, &cornerIndexLength);
-    
+
     int numPoints = ((int)resultNum);
 
     Array<AutomationKey*> keys;
@@ -131,7 +131,7 @@ void Automation::addFromPointsAndSimplify(const Array<Point<float>>& sourcePoint
     CubicEasing* prevEasing = nullptr;
     Point<float> prevRP;
 
-    float maxDist = valueRange->enabled ? (valueRange->y - valueRange->x)*100 : 1000;
+    float maxDist = valueRange->enabled ? (valueRange->y - valueRange->x) * 100 : 1000;
 
     int numBadPoints = 0;
     for (int i = 0; i < numPoints; ++i)
@@ -148,7 +148,7 @@ void Automation::addFromPointsAndSimplify(const Array<Point<float>>& sourcePoint
         }
 
 
-        if (i > 0 && (rp.getDistanceFrom(prevRP) > maxDist || rp.x  <= prevRP.x))
+        if (i > 0 && (rp.getDistanceFrom(prevRP) > maxDist || rp.x <= prevRP.x))
         {
             numBadPoints++;
             continue;
@@ -161,19 +161,118 @@ void Automation::addFromPointsAndSimplify(const Array<Point<float>>& sourcePoint
         CubicEasing* ce = (CubicEasing*)k->easing.get();
         if (h2.getDistanceFrom(rp) < maxDist) ce->anchor1->setPoint(h2 - rp);
 
-        DBG("Add good point : " << k->getPosAndValue().toString());
         keys.add(k);
 
         prevEasing = ce;
         prevRP.setXY(rp.x, rp.y);
     }
-    DBG(numBadPoints << " bad points discarded");
 
     free(result);
     free(corners);
     free(cornerIndex);
 
     addKeys(keys, addToUndo, removeExistingKeys);
+}
+
+void Automation::addFromPointsAndSimplifyLinear(const Array<Point<float>>& sourcePoints, float tolerance, bool addToUndo, bool removeExistingKeys)
+{
+    Array<Point<float>> simplifiedPoints = getLinearSimplifiedPointsFrom(sourcePoints, tolerance);
+    Array<AutomationKey*> keys;
+    
+    for (auto& p : simplifiedPoints)
+    {
+        AutomationKey* k = new AutomationKey();
+        k->setPosAndValue(p);
+        k->easingType->setValueWithData(Easing::LINEAR);
+        keys.add(k);
+    }
+
+    addKeys(keys, addToUndo, removeExistingKeys);
+}
+
+Array<Point<float>> Automation::getLinearSimplifiedPointsFrom(const Array<Point<float>>& sourcePoints, float tolerance, int start, int end)
+{
+    if (sourcePoints.size() < 2) return sourcePoints;
+
+    // Find the point with the maximum distance from line between start and end
+    double maxDist = 0.0;
+    size_t index = 0;
+    if (end == -1)  end = sourcePoints.size()-1;
+
+    Point<float> startP = sourcePoints[start];
+    Point<float> endP = sourcePoints[end];
+    Line<float> line(startP, endP);
+
+    for (size_t i = start+1; i < end-1; ++i)
+    {
+        float dist = line.getDistanceFromPoint(sourcePoints[i], Point<float>());
+        if (dist > maxDist)
+        {
+            index = i;
+            maxDist = dist;
+        }
+    }
+
+    Array<Point<float>> result;
+   
+    //If there is a range, we multiply the factor by the amplitude of this range, so 1 is the max value difference
+    float mappedTolerance = tolerance;
+    if (valueRange->enabled) mappedTolerance = tolerance * (valueRange->y - valueRange->x);
+
+    // If max distance is greater than epsilon, recursively simplify
+    if (maxDist > mappedTolerance)
+    {
+        // Recursive call
+        int start1 = start;
+        int end1 = index;
+        int start2 = index;
+        int end2 = end;
+
+        Array<Point<float>> result1 = getLinearSimplifiedPointsFrom(sourcePoints, tolerance, start1, end1);
+        Array<Point<float>> result2 = getLinearSimplifiedPointsFrom(sourcePoints, tolerance, start2, end2);
+        result1.removeLast();
+        // Build the result list
+        result.addArray(result1);
+        result.addArray(result2);
+    }
+    else
+    {
+        result.add(startP);
+        result.add(endP);
+    }
+
+    return result;
+}
+
+void Automation::launchInteractiveSimplification(const Array<Point<float>>& sourcePoints)
+{
+    if (recorder == nullptr) return;
+
+    recorder->simplificationTolerance->addParameterListener(this);
+
+    interactiveSourcePoints = sourcePoints;
+    interactiveSimplifiedPoints = getLinearSimplifiedPointsFrom(sourcePoints, recorder->simplificationTolerance->floatValue());
+    automationNotifier.addMessage(new AutomationEvent(AutomationEvent::INTERACTIVE_SIMPLIFICATION_CHANGED, this));
+}
+
+void Automation::finishInteractiveSimplification()
+{
+    recorder->simplificationTolerance->removeParameterListener(this);
+   
+    Array<AutomationKey*> keys;
+    for (auto& p : interactiveSimplifiedPoints)
+    {
+        AutomationKey* k = new AutomationKey();
+        k->setPosAndValue(p);
+        k->easingType->setValueWithData(Easing::LINEAR);
+        keys.add(k);
+    }
+   
+    interactiveSourcePoints.clear();
+    interactiveSimplifiedPoints.clear();
+
+    automationNotifier.addMessage(new AutomationEvent(AutomationEvent::INTERACTIVE_SIMPLIFICATION_CHANGED, this));
+    addKeys(keys, true, true);
 }
 
 void Automation::addItemInternal(AutomationKey* k, var)
@@ -450,6 +549,7 @@ void Automation::onControllableFeedbackUpdate(ControllableContainer* cc, Control
             computeValue();
         }
     }
+    
 }
 
 
@@ -458,6 +558,19 @@ void Automation::onControllableStateChanged(Controllable* c)
     if (c == valueRange)
     {
         updateRange();
+    }
+}
+
+void Automation::onExternalParameterValueChanged(Parameter* p)
+{
+    BaseManager::onExternalParameterValueChanged(p);
+    if (recorder != nullptr && p == recorder->simplificationTolerance)
+    {
+        if (!interactiveSourcePoints.isEmpty())
+        {
+            interactiveSimplifiedPoints = getLinearSimplifiedPointsFrom(interactiveSourcePoints, recorder->simplificationTolerance->floatValue());
+            automationNotifier.addMessage(new AutomationEvent(AutomationEvent::INTERACTIVE_SIMPLIFICATION_CHANGED, this));
+        }
     }
 }
 

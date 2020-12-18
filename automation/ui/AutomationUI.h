@@ -15,6 +15,7 @@ class AutomationUI :
     public AutomationKey::AsyncListener,
     public AutomationKeyUI::KeyUIListener,
     public ContainerAsyncListener,
+    public Automation::AsyncListener,
     public Timer
 {
 public:
@@ -35,6 +36,9 @@ public:
     bool showNumberLines;
 
     Point<float> viewValueRangeAtMouseDown;
+
+    std::unique_ptr<FloatSliderUI> interactiveSimplificationUI;
+    std::unique_ptr<TextButton> validInteractiveBT;
 
     void paint(Graphics& g) override;
     void drawLinesBackground(Graphics& g);
@@ -77,8 +81,11 @@ public:
 
     void newMessage(const AutomationKey::AutomationKeyEvent& e) override;
     void newMessage(const ContainerAsyncEvent& e) override;
+    void newMessage(const Automation::AutomationEvent& e) override;
 
     void keyEasingHandleMoved(AutomationKeyUI* ui, bool syncOtherHandle, bool isFirst) override;
 
     void timerCallback() override;
+
+    void buttonClicked(Button* b) override;
 };
