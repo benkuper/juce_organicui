@@ -23,6 +23,7 @@ public:
     std::unique_ptr<BetterStepper> slider;
 
     bool shouldUpdateStepper;
+    float valueAtDragStart;
     
 	void paint(Graphics& g) override;
     void resized() override;
@@ -36,4 +37,6 @@ protected:
 
     // Inherited via Listener
     virtual void sliderValueChanged(Slider * slider) override;
+    virtual void sliderDragStarted(Slider* slider) override;
+    virtual void sliderDragEnded(Slider* slider) override;
 };
