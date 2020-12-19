@@ -1,15 +1,16 @@
 /*
   ==============================================================================
 
-    FloatStepperUI.cpp
-    Created: 28 Apr 2016 6:00:28pm
-    Author:  bkupe
+	FloatStepperUI.cpp
+	Created: 28 Apr 2016 6:00:28pm
+	Author:  bkupe
 
   ==============================================================================
 */
 
-FloatStepperUI::FloatStepperUI(Parameter * _parameter) :
-    ParameterUI(_parameter)
+FloatStepperUI::FloatStepperUI(Parameter* _parameter) :
+	ParameterUI(_parameter),
+	valueAtDragStart(_parameter->floatValue())
 {
 	showEditWindowOnDoubleClick = false;
 
@@ -28,17 +29,17 @@ FloatStepperUI::FloatStepperUI(Parameter * _parameter) :
 		else
 		{
 			//workaround to keep good UI feeling
-			slider->setRange(INT32_MIN/2, INT32_MAX/2, 1);
+			slider->setRange(INT32_MIN / 2, INT32_MAX / 2, 1);
 			slider->setMouseDragSensitivity(INT32_MAX);
 		}
 	}
 
 	slider->setNumDecimalPlacesToDisplay(0);
 	slider->setValue(parameter->floatValue());
-    slider->addListener(this);
-	slider->addMouseListener(this,true);
-	
-	slider->setColour(slider->textBoxBackgroundColourId,BG_COLOR.darker(.1f).withAlpha(.8f));
+	slider->addListener(this);
+	slider->addMouseListener(this, true);
+
+	slider->setColour(slider->textBoxBackgroundColourId, BG_COLOR.darker(.1f).withAlpha(.8f));
 	slider->setColour(CaretComponent::caretColourId, Colours::orange);
 	slider->setScrollWheelEnabled(false);
 	slider->setColour(slider->textBoxTextColourId, useCustomTextColor ? customTextColor : (isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f)));
@@ -48,7 +49,7 @@ FloatStepperUI::FloatStepperUI(Parameter * _parameter) :
 	addAndMakeVisible(slider.get());
 
 	setSize(200, GlobalSettings::getInstance()->fontSize->floatValue() + 4);
-    startTimerHz(20);
+	startTimerHz(20);
 }
 
 FloatStepperUI::~FloatStepperUI()
@@ -65,7 +66,7 @@ void FloatStepperUI::paint(Graphics& g)
 	if (showLabel)
 	{
 		Rectangle<int> r = getLocalBounds();
-		g.setFont(jlimit(12, 40, jmin(r.getHeight()-4, r.getWidth()) - 16)); 
+		g.setFont(jlimit(12, 40, jmin(r.getHeight() - 4, r.getWidth()) - 16));
 		r = r.removeFromLeft(jmin(g.getCurrentFont().getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, r.getWidth() - 60));
 		g.setColour(useCustomTextColor ? customTextColor : TEXT_COLOR);
 		g.drawFittedText(customLabel.isNotEmpty() ? customLabel : parameter->niceName, r, Justification::centred, 1);
@@ -75,15 +76,15 @@ void FloatStepperUI::paint(Graphics& g)
 void FloatStepperUI::resized()
 {
 	Rectangle<int> r = getLocalBounds();
-	
+
 	if (parameter == nullptr || parameter.wasObjectDeleted()) return;
 
 	if (showLabel)
 	{
 		Font font(jlimit(12, 40, jmin(r.getHeight() - 4, r.getWidth()) - 16));
 
-		r.removeFromLeft(jmin(font.getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName), r.getWidth()-60));
-		slider->setBounds(r.removeFromRight(jmin(r.getWidth(),120)));
+		r.removeFromLeft(jmin(font.getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName), r.getWidth() - 60));
+		slider->setBounds(r.removeFromRight(jmin(r.getWidth(), 120)));
 	}
 	else
 	{
@@ -100,29 +101,41 @@ void FloatStepperUI::updateUIParamsInternal()
 }
 
 
-void FloatStepperUI::valueChanged(const var & value)
+void FloatStepperUI::valueChanged(const var& value)
 {
-    if ((float)value == slider->getValue()) return;
-    shouldUpdateStepper = true;
+	if ((float)value == slider->getValue()) return;
+	shouldUpdateStepper = true;
 }
 
-void FloatStepperUI::sliderValueChanged(Slider * _slider)
+void FloatStepperUI::sliderValueChanged(Slider* _slider)
 {
 	if (parameter.wasObjectDeleted()) return;
 	parameter->setValue(slider->getValue());
 }
 
-void FloatStepperUI::rangeChanged(Parameter *){
+void FloatStepperUI::sliderDragStarted(Slider* slider)
+{
+	if (parameter.wasObjectDeleted()) return;
+	valueAtDragStart = parameter->floatValue();
+}
+
+void FloatStepperUI::sliderDragEnded(Slider* slider)
+{
+	if (parameter.wasObjectDeleted()) return;
+	parameter->setUndoableValue(valueAtDragStart, parameter->floatValue());
+}
+
+void FloatStepperUI::rangeChanged(Parameter*) {
 	slider->setRange((int)parameter->minimumValue, (int)parameter->maximumValue, 1);
 }
 
 void FloatStepperUI::timerCallback()
 {
-    if (!shouldUpdateStepper) return;
-    shouldUpdateStepper = false;
-	
+	if (!shouldUpdateStepper) return;
+	shouldUpdateStepper = false;
+
 	if (parameter.wasObjectDeleted()) return;
 
-    slider->setValue(parameter->floatValue(), NotificationType::dontSendNotification);
+	slider->setValue(parameter->floatValue(), NotificationType::dontSendNotification);
 }
 
