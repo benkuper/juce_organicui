@@ -76,7 +76,7 @@ void AutomationRecorder::addKeyAt(float time)
 {
 	if (isRecording->boolValue() && currentInput != nullptr)
 	{
-		float val = (normalize->enabled && normalize->boolValue()) ? currentInput->getNormalizedValue() : currentInput->getValue();
+		float val = (normalize->enabled && normalize->boolValue()) ? currentInput->getNormalizedValue() : (float)currentInput->getValue();
 		keys.add(RecordValue(time, val));
 		recorderNotifier.addMessage(new RecorderEvent(RecorderEvent::RECORDER_UPDATED));
 	}
