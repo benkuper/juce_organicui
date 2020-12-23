@@ -205,7 +205,8 @@ Array<Point<float>> Automation::getLinearSimplifiedPointsFrom(const Array<Point<
 
     for (size_t i = start+1; i < end-1; ++i)
     {
-        float dist = line.getDistanceFromPoint(sourcePoints[i], Point<float>());
+        Point<float> pol;
+        float dist = line.getDistanceFromPoint(sourcePoints[i], pol);
         if (dist > maxDist)
         {
             index = i;
