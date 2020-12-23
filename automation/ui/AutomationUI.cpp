@@ -651,14 +651,14 @@ void AutomationUI::newMessage(const AutomationKey::AutomationKeyEvent& e)
 
 void AutomationUI::newMessage(const ContainerAsyncEvent& e)
 {
-    if (e.targetControllable.wasObjectDeleted()) return;
+    if (e.targetControllable == nullptr || e.targetControllable.wasObjectDeleted() || inspectable.wasObjectDeleted()) return;
     if (e.type == ContainerAsyncEvent::ControllableFeedbackUpdate)
     {
         if (e.targetControllable == manager->value || e.targetControllable == manager->position)
         {
             shouldRepaint = true;
         }
-        else if (e.targetControllable->parentContainer == manager->items[0] || e.targetControllable->parentContainer == manager->items[manager->items.size() - 1])
+        else if (manager->items.size() > 0 && (e.targetControllable->parentContainer == manager->items[0] || e.targetControllable->parentContainer == manager->items[manager->items.size() - 1]))
         {
             shouldRepaint = true;
         }
