@@ -38,7 +38,7 @@ public:
 
 	virtual void buildControllableUI(bool resizeAfter = false);
 
-	void resized() override;
+	virtual void resized() override;
 
 	void mouseDown(const MouseEvent &e) override;
 	void mouseDrag(const MouseEvent& e) override;
@@ -48,7 +48,7 @@ public:
 
 	void componentVisibilityChanged(Component& c) override;
 
-    void buttonClicked(Button * b) override;
+    virtual void buttonClicked(Button * b) override;
 };
 
 
