@@ -55,18 +55,18 @@ void BaseItemEditor::setIsLast(bool value)
 
 void BaseItemEditor::resizedInternalHeader(juce::Rectangle<int>& r)
 {
-	int targetHeight = r.getHeight();// jmax<int>(r.getHeight(), 18);
+	int targetHeight = jmin<int>(r.getHeight(), 20);
 
 	if (item->userCanRemove && removeBT != nullptr)
 	{
-		removeBT->setBounds(r.removeFromRight(targetHeight).reduced(3));
+		removeBT->setBounds(r.removeFromRight(targetHeight).reduced(2));
 		r.removeFromRight(2);
 
 	}
 
 	if (item->userCanDuplicate && duplicateBT != nullptr)
 	{
-		duplicateBT->setBounds(r.removeFromRight(targetHeight).reduced(3));
+		duplicateBT->setBounds(r.removeFromRight(targetHeight).reduced(2));
 		r.removeFromRight(2);
 	}
 
