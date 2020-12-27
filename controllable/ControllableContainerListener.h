@@ -42,12 +42,9 @@ public:
 		ControllableContainerFinishedLoading
 	};
 
-	ContainerAsyncEvent(EventType _type, ControllableContainer* _source) : type(_type), source(_source), targetContainer(nullptr), targetControllable(nullptr) {}
-	ContainerAsyncEvent(EventType _type, ControllableContainer* _source, Controllable *_target) :
-		type(_type), source(_source),
-		targetContainer(nullptr),
-		targetControllable(_target) {}
-	ContainerAsyncEvent(EventType _type, ControllableContainer* _source, ControllableContainer *_target) : type(_type), source(_source), targetContainer(_target), targetControllable(nullptr) {}
+	ContainerAsyncEvent(EventType _type, ControllableContainer* _source) : type(_type), source(_source) {}
+	ContainerAsyncEvent(EventType _type, ControllableContainer* _source, Controllable *_target) : type(_type), source(_source), targetControllable(_target) {}
+	ContainerAsyncEvent(EventType _type, ControllableContainer* _source, ControllableContainer *_target) : type(_type), source(_source), targetContainer(_target) {}
 
 	EventType type;
 	WeakReference<ControllableContainer> source;
