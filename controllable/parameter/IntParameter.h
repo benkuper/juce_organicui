@@ -26,6 +26,7 @@ public:
 
 	virtual var getLerpValueTo(var targetValue, float weight) override;
 	virtual void setWeightedValue(Array<var> values, Array<float> weights) override;
+	var getCroppedValue(var originalValue) override;
 
 	virtual bool hasRange() override;
 
@@ -44,7 +45,4 @@ public:
 	static IntParameter * create() { return new IntParameter("New Int Parameter", "", 0); }
 	virtual String getTypeString() const override { return getTypeStringStatic(); }
 	static String getTypeStringStatic() { return "Integer"; }
-
-private:
-	var getCroppedValue(var originalValue) override;
 };

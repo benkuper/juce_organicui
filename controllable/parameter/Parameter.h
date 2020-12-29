@@ -96,6 +96,7 @@ public:
 	virtual var getValue(); //may be useful, or testing expression or references (for now, forward update from expression timer)
 	virtual var getLerpValueTo(var targetValue, float weight);
 	virtual void setWeightedValue(Array<var> values, Array<float> weights) {} // to be overriden
+	virtual var getCroppedValue(var originalValue);
 
     void resetValue(bool silentSet = false);
 	virtual UndoableAction * setUndoableValue(var oldValue, var newValue, bool onlyReturnAction = false);
@@ -176,10 +177,6 @@ public:
 	WeakReference<Parameter>::Master masterReference;
 	friend class WeakReference<Parameter>;
 
-protected:
-	virtual var getCroppedValue(var originalValue);
-
-public:
 	class ParameterAction :
 		public ControllableAction
 	{

@@ -104,5 +104,5 @@ ControllableUI * IntParameter::createDefaultUI() {
 
 var IntParameter::getCroppedValue(var originalValue)
 {
-	return jlimit<float>(minimumValue, maximumValue, originalValue);
+	return (int)jlimit<float>(minimumValue, maximumValue, originalValue);
 }

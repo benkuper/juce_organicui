@@ -59,7 +59,5 @@ public:
 	virtual String getTypeString() const override { return getTypeStringStatic(); }
 	static String getTypeStringStatic() { return "Float"; }
 
-	
-protected:
 	virtual var getCroppedValue(var originalValue) override;
 };

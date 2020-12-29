@@ -189,8 +189,6 @@ StringArray Parameter::getValuesNames()
 void Parameter::setRange(var min, var max)
 {
 	if (!canHaveRange) return;
-
-
 	{
 		GenericScopedLock<SpinLock> lock(valueSetLock);
 		if (isComplex())
