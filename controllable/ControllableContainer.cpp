@@ -53,7 +53,7 @@ ControllableContainer::ControllableContainer(const String& niceName) :
 	scriptObject.setMethod("addEnumParameter", ControllableContainer::addEnumParameterFromScript);
 	scriptObject.setMethod("addTargetParameter", ControllableContainer::addTargetParameterFromScript);
 	scriptObject.setMethod("addPoint2DParameter", ControllableContainer::addPoint2DParameterFromScript);
-	scriptObject.setMethod("addPoint3DParameter", ControllableContainer::addPoint2DParameterFromScript);
+	scriptObject.setMethod("addPoint3DParameter", ControllableContainer::addPoint3DParameterFromScript);
 	scriptObject.setMethod("addColorParameter", ControllableContainer::addColorParameterFromScript);
 	scriptObject.setMethod("addFileParameter", ControllableContainer::addFileParameterFromScript);
 	scriptObject.setMethod("addContainer", ControllableContainer::addContainerFromScript);
