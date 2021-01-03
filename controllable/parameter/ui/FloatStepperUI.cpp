@@ -113,13 +113,13 @@ void FloatStepperUI::sliderValueChanged(Slider* _slider)
 	parameter->setValue(slider->getValue());
 }
 
-void FloatStepperUI::sliderDragStarted(Slider* slider)
+void FloatStepperUI::sliderDragStarted(Slider* _slider)
 {
 	if (parameter.wasObjectDeleted()) return;
 	valueAtDragStart = parameter->floatValue();
 }
 
-void FloatStepperUI::sliderDragEnded(Slider* slider)
+void FloatStepperUI::sliderDragEnded(Slider* _slider)
 {
 	if (parameter.wasObjectDeleted()) return;
 	parameter->setUndoableValue(valueAtDragStart, parameter->floatValue());
