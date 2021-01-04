@@ -31,16 +31,17 @@ void Engine::changed()
 }
 
 void Engine::createNewGraph() {
-	engineListeners.call(&EngineListener::startLoadFile);
-	engineNotifier.addMessage(new EngineEvent(EngineEvent::START_LOAD_FILE, this));
+	
 	clear();
 	isLoadingFile = true;
 
 	//init with default data here
-
 	createNewGraphInternal();
-
 	setFile(File());
+
+	engineListeners.call(&EngineListener::startLoadFile);
+	engineNotifier.addMessage(new EngineEvent(EngineEvent::START_LOAD_FILE, this));
+
 	isLoadingFile = false;
 	setChangedFlag(false);
 
