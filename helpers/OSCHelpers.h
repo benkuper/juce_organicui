@@ -16,6 +16,8 @@ public:
 	static OSCArgument varToColorArgument(const var& v);
 	static var argumentToVar(const OSCArgument& a);
 
+	static void addArgumentsForParameter(OSCMessage& m, Parameter* p);
+
 	static float getFloatArg(OSCArgument a);
 	static int getIntArg(OSCArgument a);
 	static String getStringArg(OSCArgument a);
@@ -26,8 +28,7 @@ public:
 	static Colour getColourFromOSC(OSCColour c);
 
 
-	static OSCMessage getOSCMessageForParameter(Parameter* p, ControllableContainer* addressRelativeTo = nullptr);
-	static void addArgumentsForParameters(OSCMessage& m, Parameter* p);
+	static OSCMessage getOSCMessageForControllable(Controllable* p, ControllableContainer* addressRelativeTo = nullptr);
 
 	static Controllable * findControllableAndHandleMessage(ControllableContainer* root, const OSCMessage& m, int dataOffset = 0);
 

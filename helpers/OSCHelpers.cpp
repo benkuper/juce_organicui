@@ -57,6 +57,36 @@ var OSCHelpers::argumentToVar(const OSCArgument& a)
 	return var("error");
 }
 
+void OSCHelpers::addArgumentsForParameter(OSCMessage& m, Parameter* p)
+{
+	switch (p->type)
+	{
+
+	case Controllable::BOOL: m.addInt32(p->intValue()); break;
+	case Controllable::INT: m.addInt32(p->intValue()); break;
+	case Controllable::FLOAT: m.addFloat32(p->floatValue()); break;
+	case Controllable::STRING: m.addString(p->stringValue()); break;
+	case Controllable::COLOR: m.addColour(OSCHelpers::getOSCColour(((ColorParameter*)p)->getColor())); break;
+	case Controllable::POINT2D: 
+		m.addFloat32(((Point2DParameter*)p)->x);
+		m.addFloat32(((Point2DParameter*)p)->y);
+		break;
+	case Controllable::POINT3D:
+		m.addFloat32(((Point3DParameter*)p)->x);
+		m.addFloat32(((Point3DParameter*)p)->y);
+		m.addFloat32(((Point3DParameter*)p)->z);
+		break;
+
+	case Controllable::ENUM: m.addString(((EnumParameter*)p)->getValueKey()); break;
+
+	default:
+		jassertfalse;
+		if (p->isComplex()) for (int i = 0; i < p->value.size(); i++) m.addArgument(varToArgument(p->value[i]));
+		else m.addArgument(varToArgument(p->value));
+		break;
+	}
+}
+
 float OSCHelpers::getFloatArg(OSCArgument a)
 {
 	if (a.isFloat32()) return a.getFloat32();
@@ -104,24 +134,11 @@ Colour OSCHelpers::getColourFromOSC(OSCColour c)
 	return Colour(c.red, c.green, c.blue, c.alpha);
 }
 
-OSCMessage OSCHelpers::getOSCMessageForParameter(Parameter* p, ControllableContainer* addressRelativeTo)
+OSCMessage OSCHelpers::getOSCMessageForControllable(Controllable* c, ControllableContainer* addressRelativeTo)
 {
-	OSCMessage m(p->getControlAddress(addressRelativeTo));
-	addArgumentsForParameters(m, p);
+	OSCMessage m(c->getControlAddress(addressRelativeTo));
+	if(c->type != c->TRIGGER) addArgumentsForParameter(m, (Parameter *)c);
 	return m;
-}
-
-void OSCHelpers::addArgumentsForParameters(OSCMessage& m, Parameter* p)
-{
-	if (p->type == Parameter::COLOR) m.addArgument(varToColorArgument(p->value));
-	else if (p->isComplex())
-	{
-		for (int i = 0; i < p->value.size(); i++) m.addArgument(varToArgument(p->value[i]));
-	}
-	else
-	{
-		m.addArgument(varToArgument(p->value));
-	}
 }
 
 Controllable * OSCHelpers::findControllableAndHandleMessage(ControllableContainer* root, const OSCMessage& m, int dataOffset)
