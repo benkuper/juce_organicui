@@ -51,7 +51,7 @@ Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled) :
 	scriptObject.setMethod("addEnumParameter", Script::addEnumParameterFromScript);
 	scriptObject.setMethod("addTargetParameter", Script::addTargetParameterFromScript);
 	scriptObject.setMethod("addPoint2DParameter", Script::addPoint2DParameterFromScript);
-	scriptObject.setMethod("addPoint3DParameter", Script::addPoint2DParameterFromScript);
+	scriptObject.setMethod("addPoint3DParameter", Script::addPoint3DParameterFromScript);
 	scriptObject.setMethod("addColorParameter", Script::addColorParameterFromScript);
 	scriptObject.setMethod("addFileParameter", Script::addFileParameterFromScript);
 
