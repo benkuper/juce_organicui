@@ -13,7 +13,8 @@ AutomationUI::AutomationUI(Automation* manager) :
     autoAdaptViewRange(false),
     paintingMode(false),
     previewMode(false),
-    showNumberLines(true)
+    showNumberLines(true),
+    showMenuOnRightClick(true)
 {
     //autoSelectWithChildRespect = false;
     resizeOnChildBoundsChanged = false;
@@ -404,7 +405,7 @@ void AutomationUI::mouseDown(const MouseEvent& e)
             viewValueRangeAtMouseDown = manager->viewValueRange->getPoint();
         }else
         {
-            BaseManagerUI::mouseDown(e);
+            if(!e.mods.isRightButtonDown() || showMenuOnRightClick) BaseManagerUI::mouseDown(e);
         }
     }
 }
