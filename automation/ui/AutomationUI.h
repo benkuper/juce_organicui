@@ -34,6 +34,7 @@ public:
 
     bool previewMode; //avoid repainting everything
     bool showNumberLines;
+    bool showMenuOnRightClick;
 
     Point<float> viewValueRangeAtMouseDown;
 
