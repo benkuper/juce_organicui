@@ -41,12 +41,12 @@ TargetParameter::TargetParameter(const String & niceName, const String & descrip
 
 TargetParameter::~TargetParameter()
 {
+	if (rootContainer != nullptr && !rootContainer.wasObjectDeleted()) rootContainer->removeControllableContainerListener(this);
 	setRootContainer(nullptr);
 	ghostValue = ""; //force not ghost to avoid launching a warning
-
 	setTarget((ControllableContainer *)nullptr);
 	setTarget((Controllable *)nullptr);
-	setValue("");
+	setValue("", true, false);
 }
 
 void TargetParameter::setGhostValue(const String & ghostVal)
@@ -205,11 +205,16 @@ void TargetParameter::setTarget(WeakReference<ControllableContainer> cc)
 void TargetParameter::setRootContainer(WeakReference<ControllableContainer> newRootContainer)
 {
 	if (rootContainer == newRootContainer) return;
+	
+	if (rootContainer != nullptr && !rootContainer.wasObjectDeleted())
+	{
+		rootContainer->removeControllableContainerListener(this);
+	}
 
-	if (rootContainer != nullptr && !rootContainer.wasObjectDeleted()) rootContainer->removeControllableContainerListener(this);
-
+	if (newRootContainer == nullptr) newRootContainer = Engine::mainEngine;
 	rootContainer = newRootContainer;
 
+	ghostValue = "";
 	setValue("");
 }
 
@@ -260,7 +265,9 @@ void TargetParameter::inspectableDestroyed(Inspectable * i)
 void TargetParameter::setAttribute(String param, var attributeValue)
 {
 	Parameter::setAttribute(param, attributeValue);
-	if (param == "searchLevel") maxDefaultSearchLevel = jmax<int>(attributeValue, -1);
+	
+	if (param == "targetType") targetType = (attributeValue.toString().toLowerCase() == "container") ? CONTAINER : CONTROLLABLE;
+	else if (param == "searchLevel") maxDefaultSearchLevel = jmax<int>(attributeValue, -1);
 	else if (param == "allowedTypes")
 	{
 		typesFilter.clear();
@@ -281,7 +288,7 @@ void TargetParameter::setAttribute(String param, var attributeValue)
 	}
 	else if (param == "root")
 	{
-		if (value.isObject())
+		if (attributeValue.isObject())
 		{
 			ControllableContainer* cc = dynamic_cast<ControllableContainer*>((ControllableContainer *)(int64)attributeValue.getDynamicObject()->getProperty(scriptPtrIdentifier));
 			if (cc != nullptr) setRootContainer(cc);
