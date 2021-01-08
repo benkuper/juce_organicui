@@ -410,7 +410,7 @@ var Controllable::setAttributeFromScript(const juce::var::NativeFunctionArgs& a)
 	if (a.numArguments < 2) return var();
 	Controllable* c = getObjectFromJS<Controllable>(a);
 	if (c == nullptr) return var();
-	c->setAttribute(a.arguments[0].toString(), a.arguments[1].toString());
+	c->setAttribute(a.arguments[0].toString(), a.arguments[1]);
 	return var();
 }
 
