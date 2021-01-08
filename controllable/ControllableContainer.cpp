@@ -73,11 +73,45 @@ ControllableContainer::~ControllableContainer()
 }
 
 
+void ControllableContainer::addControllableContainerListener(ControllableContainerListener* newListener) { 
+	/*
+	if (this == Engine::mainEngine)
+	{
+		DBG("ADD Engine Container Listener " << ((ControllableContainer*)newListener)->niceName);
+	}
+	*/
+	controllableContainerListeners.add(newListener); 
+}
+
+void ControllableContainer::removeControllableContainerListener(ControllableContainerListener* listener) {
+	/*
+	if (this == Engine::mainEngine)
+	{
+		DBG("REMOVE Engine Container Listener " << ((ControllableContainer*)listener)->niceName);
+	}
+	*/
+	controllableContainerListeners.remove(listener);
+}
+
 void ControllableContainer::clear() {
 
 	queuedNotifier.cancelPendingUpdate();
 
+	for (auto& c : controllables)
+	{
+		if (c == nullptr) continue;
+		c->removeControllableListener(this);
+		if (c->type != c->TRIGGER) ((Parameter*)c)->removeParameterListener(this);
+	}
+
 	controllables.clear();
+
+	for (auto& cc : controllableContainers)
+	{
+		if (cc.wasObjectDeleted() || cc == nullptr) continue;
+		cc->removeControllableContainerListener(this);
+	}
+
 	controllableContainers.clear();
 	ownedContainers.clear();
 }
