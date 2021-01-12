@@ -65,10 +65,16 @@ Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled) :
 
 Script::~Script()
 {
-	if(Engine::mainEngine != nullptr) Engine::mainEngine->removeControllableContainerListener(this);
+	if (Engine::mainEngine != nullptr)
+	{
+		Engine::mainEngine->removeControllableContainerListener(this);
+	}
+
 	signalThreadShouldExit();
 	waitForThreadToExit(1000);
 	stopThread(1000);
+
+	scriptParamsContainer.clear();
 }
 
 void Script::chooseFileScript()
