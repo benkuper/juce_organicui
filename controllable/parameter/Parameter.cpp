@@ -123,12 +123,13 @@ void Parameter::setControlAutomation()
 
 var Parameter::getValue()
 {
+	GenericScopedLock<SpinLock> lock(valueSetLock);
 	return value;
 }
 
 var Parameter::getLerpValueTo(var targetValue, float weight)
 {
-	return value; //to be overriden
+	return getValue(); //to be overriden
 }
 
 void Parameter::resetValue(bool silentSet)
