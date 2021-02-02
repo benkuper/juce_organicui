@@ -311,7 +311,7 @@ void Engine::loadJSONData(var data, ProgressTask * loadingTask)
 			File f = getFile();
 			if (f.exists())
 			{
-				File backupF = f.getParentDirectory().getChildFile(f.getFileNameWithoutExtension() + "_backup" + f.getFileExtension());
+				File backupF = f.getParentDirectory().getNonexistentChildFile(f.getFileNameWithoutExtension() + "_backup",f.getFileExtension(), true);
 				f.copyFileTo(backupF);
 				LOG("Your original file has been copied to " << backupF.getFullPathName());
 			}
