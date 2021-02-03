@@ -53,7 +53,7 @@ public:
 	virtual Array<UndoableAction *> getRemoveItemsUndoableAction(Array<T *> items);
 
 	void removeItems(Array<T *> items, bool addToUndo = true);
-	void removeItem(T * item, bool addToUndo = true, bool notify = true);
+	T * removeItem(T * item, bool addToUndo = true, bool notify = true, bool returnItem = false);
 
 	virtual void setItemIndex(T * item, int newIndex);
 	virtual void reorderItems(); //to be overriden if needed
@@ -537,21 +537,28 @@ void BaseManager<T>::removeItems(Array<T*> itemsToRemove, bool addToUndo)
 		isManipulatingMultipleItems = false;
 		return;
 	}
-
-	baseManagerListeners.call(&BaseManagerListener<T>::itemsRemoved, itemsToRemove);
-	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_REMOVED));
-
-	for (auto& i : itemsToRemove) removeItem(i, false, false);
-
-	isManipulatingMultipleItems = false;
+	
+	Array<T*> itemsRemoved;
+	for (auto& i : itemsToRemove) itemsRemoved.add(removeItem(i, false, false, true));
 
 	removeItemsInternal();
+
+	baseManagerListeners.call(&BaseManagerListener<T>::itemsRemoved, itemsRemoved);
+	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_REMOVED));
+	
+	for (auto& i : itemsRemoved)
+	{
+		((BaseItem*)i)->clearItem();
+		delete i;
+	}
+
+	isManipulatingMultipleItems = false;
 }
 
 template<class T>
-void BaseManager<T>::removeItem(T* item, bool addToUndo, bool notify)
+T * BaseManager<T>::removeItem(T* item, bool addToUndo, bool notify, bool returnItem)
 {
-	if (item == nullptr) return;
+	if (item == nullptr) return nullptr;
 
 	if (addToUndo && !UndoMaster::getInstance()->isPerforming)
 	{
@@ -559,7 +566,7 @@ void BaseManager<T>::removeItem(T* item, bool addToUndo, bool notify)
 		{
 			BaseItem* bi = static_cast<BaseItem*>(item);
 			UndoMaster::getInstance()->performActions("Remove " + bi->getTypeString(), getRemoveItemUndoableAction(item));
-			return;
+			return nullptr;
 		}
 	}
 
@@ -580,8 +587,12 @@ void BaseManager<T>::removeItem(T* item, bool addToUndo, bool notify)
 		managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEM_REMOVED, item));
 	}
 
+	if (returnItem) return item; //will need to delete !
+
 	bi->clearItem();
-	delete item;
+	delete item;	
+
+	return nullptr;
 }
 
 template<class T>
@@ -759,7 +770,7 @@ void BaseManager<T>::loadJSONDataManagerInternal(var data)
 }
 
 template<class T>
-inline PopupMenu BaseManager<T>::getItemsMenu(int startID)
+PopupMenu BaseManager<T>::getItemsMenu(int startID)
 {
 	PopupMenu menu;
 	int numValues = items.size();
@@ -772,7 +783,7 @@ inline PopupMenu BaseManager<T>::getItemsMenu(int startID)
 }
 
 template<class T>
-inline T * BaseManager<T>::getItemForMenuResultID(int id, int startID)
+T * BaseManager<T>::getItemForMenuResultID(int id, int startID)
 {
 	return items[id - startID];
 }
@@ -795,7 +806,7 @@ InspectableEditor * BaseManager<T>::getEditor(bool isRoot)
 // SCRIPT
 
 template<class T>
-inline var BaseManager<T>::addItemFromScript(const var::NativeFunctionArgs& args)
+var BaseManager<T>::addItemFromScript(const var::NativeFunctionArgs& args)
 {
 	BaseManager<T>* m = getObjectFromJS<BaseManager<T>>(args);
 	
@@ -978,13 +989,13 @@ var BaseManager<T>::reorderItemsFromScript(const var::NativeFunctionArgs& args)
 //MANAGER EVENT
 
 template<class T>
-inline BaseManager<T>::ManagerEvent::ManagerEvent(Type t, T* i) : type(t)
+BaseManager<T>::ManagerEvent::ManagerEvent(Type t, T* i) : type(t)
 {
 	itemsRef.add(i);
 }
 
 template<class T>
-inline BaseManager<T>::ManagerEvent::ManagerEvent(Type t, Array<T*> iList) : type(t)
+BaseManager<T>::ManagerEvent::ManagerEvent(Type t, Array<T*> iList) : type(t)
 {
 	for (auto& i : iList)
 	{
@@ -993,7 +1004,7 @@ inline BaseManager<T>::ManagerEvent::ManagerEvent(Type t, Array<T*> iList) : typ
 }
 
 template<class T>
-inline Array<T*> BaseManager<T>::ManagerEvent::getItems() const
+Array<T*> BaseManager<T>::ManagerEvent::getItems() const
 {
 	Array<T*> result;
 	for (auto& i : itemsRef)
@@ -1004,7 +1015,7 @@ inline Array<T*> BaseManager<T>::ManagerEvent::getItems() const
 }
 
 template<class T>
-inline T* BaseManager<T>::ManagerEvent::getItem(int index) const
+T* BaseManager<T>::ManagerEvent::getItem(int index) const
 {
 	if (itemsRef.size() > index && itemsRef[index] != nullptr && !itemsRef[index].wasObjectDeleted()) return static_cast<T*>(itemsRef[index].get());
 	return nullptr;
@@ -1019,14 +1030,14 @@ inline T* BaseManager<T>::ManagerEvent::getItem(int index) const
 //ACTIONS
 
 template<class T>
-inline BaseManager<T>::ManagerBaseAction::ManagerBaseAction(BaseManager* manager, var _data) :
+BaseManager<T>::ManagerBaseAction::ManagerBaseAction(BaseManager* manager, var _data) :
 	managerControlAddress(manager->getControlAddress()),
 	data(_data),
 	managerRef(manager)
 {}
 
 template<class T>
-inline BaseManager<T>* BaseManager<T>::ManagerBaseAction::getManager() {
+BaseManager<T>* BaseManager<T>::ManagerBaseAction::getManager() {
 	if (managerRef != nullptr && !managerRef.wasObjectDeleted()) return dynamic_cast<BaseManager<T>*>(managerRef.get());
 	else if (Engine::mainEngine != nullptr)
 	{
@@ -1038,7 +1049,7 @@ inline BaseManager<T>* BaseManager<T>::ManagerBaseAction::getManager() {
 }
 
 template<class T>
-inline BaseManager<T>::ItemBaseAction::ItemBaseAction(BaseManager* m, T* i, var data) :
+BaseManager<T>::ItemBaseAction::ItemBaseAction(BaseManager* m, T* i, var data) :
 	ManagerBaseAction(m, data),
 	itemRef(i),
 	itemIndex(0)
@@ -1053,7 +1064,7 @@ inline BaseManager<T>::ItemBaseAction::ItemBaseAction(BaseManager* m, T* i, var 
 }
 
 template<class T>
-inline T* BaseManager<T>::ItemBaseAction::getItem()
+T* BaseManager<T>::ItemBaseAction::getItem()
 {
 	if (itemRef != nullptr && !itemRef.wasObjectDeleted()) return dynamic_cast<T*>(itemRef.get());
 	else
@@ -1066,11 +1077,11 @@ inline T* BaseManager<T>::ItemBaseAction::getItem()
 }
 
 template<class T>
-inline BaseManager<T>::AddItemAction::AddItemAction(BaseManager* m, T* i, var data) : ItemBaseAction(m, i, data) {
+BaseManager<T>::AddItemAction::AddItemAction(BaseManager* m, T* i, var data) : ItemBaseAction(m, i, data) {
 }
 
 template<class T>
-inline bool BaseManager<T>::AddItemAction::perform()
+bool BaseManager<T>::AddItemAction::perform()
 {
 	BaseManager* m = this->getManager();
 	if (m == nullptr)
@@ -1095,7 +1106,7 @@ inline bool BaseManager<T>::AddItemAction::perform()
 }
 
 template<class T>
-inline bool BaseManager<T>::AddItemAction::undo()
+bool BaseManager<T>::AddItemAction::undo()
 {
 	T* s = this->getItem();
 	if (s == nullptr) return false;
@@ -1108,11 +1119,11 @@ inline bool BaseManager<T>::AddItemAction::undo()
 }
 
 template<class T>
-inline BaseManager<T>::RemoveItemAction::RemoveItemAction(BaseManager* m, T* i, var data) : ItemBaseAction(m, i, data) {
+BaseManager<T>::RemoveItemAction::RemoveItemAction(BaseManager* m, T* i, var data) : ItemBaseAction(m, i, data) {
 }
 
 template<class T>
-inline bool BaseManager<T>::RemoveItemAction::perform()
+bool BaseManager<T>::RemoveItemAction::perform()
 {
 
 	T* s = this->getItem();
@@ -1130,7 +1141,7 @@ inline bool BaseManager<T>::RemoveItemAction::perform()
 }
 
 template<class T>
-inline bool BaseManager<T>::RemoveItemAction::undo()
+bool BaseManager<T>::RemoveItemAction::undo()
 {
 	BaseManager* m = this->getManager();
 	if (m == nullptr) return false;
@@ -1139,7 +1150,7 @@ inline bool BaseManager<T>::RemoveItemAction::undo()
 }
 
 template<class T>
-inline BaseManager<T>::ItemsBaseAction::ItemsBaseAction(BaseManager* m, Array<T*> iList, var data) :
+BaseManager<T>::ItemsBaseAction::ItemsBaseAction(BaseManager* m, Array<T*> iList, var data) :
 	ManagerBaseAction(m, data)
 {
 
@@ -1152,7 +1163,7 @@ inline BaseManager<T>::ItemsBaseAction::ItemsBaseAction(BaseManager* m, Array<T*
 }
 
 template<class T>
-inline Array<T*> BaseManager<T>::ItemsBaseAction::getItems()
+Array<T*> BaseManager<T>::ItemsBaseAction::getItems()
 {
 	Array<T*> iList;
 	int index = 0;
@@ -1179,11 +1190,11 @@ inline Array<T*> BaseManager<T>::ItemsBaseAction::getItems()
 }
 
 template<class T>
-inline BaseManager<T>::AddItemsAction::AddItemsAction(BaseManager* m, Array<T*> iList, var data) : ItemsBaseAction(m, iList, data) {
+BaseManager<T>::AddItemsAction::AddItemsAction(BaseManager* m, Array<T*> iList, var data) : ItemsBaseAction(m, iList, data) {
 }
 
 template<class T>
-inline bool BaseManager<T>::AddItemsAction::perform()
+bool BaseManager<T>::AddItemsAction::perform()
 {
 	BaseManager* m = this->getManager();
 	if (m == nullptr) return false;
@@ -1197,7 +1208,7 @@ inline bool BaseManager<T>::AddItemsAction::perform()
 }
 
 template<class T>
-inline bool BaseManager<T>::AddItemsAction::undo()
+bool BaseManager<T>::AddItemsAction::undo()
 {
 	Array<T*> iList = this->getItems();
 	this->data = var();
@@ -1209,11 +1220,11 @@ inline bool BaseManager<T>::AddItemsAction::undo()
 }
 
 template<class T>
-inline BaseManager<T>::RemoveItemsAction::RemoveItemsAction(BaseManager* m, Array<T*> iList) : ItemsBaseAction(m, iList) {
+BaseManager<T>::RemoveItemsAction::RemoveItemsAction(BaseManager* m, Array<T*> iList) : ItemsBaseAction(m, iList) {
 }
 
 template<class T>
-inline bool BaseManager<T>::RemoveItemsAction::perform()
+bool BaseManager<T>::RemoveItemsAction::perform()
 {
 	Array<T*> iList = this->getItems();
 	this->data = var();
@@ -1225,7 +1236,7 @@ inline bool BaseManager<T>::RemoveItemsAction::perform()
 }
 
 template<class T>
-inline bool BaseManager<T>::RemoveItemsAction::undo()
+bool BaseManager<T>::RemoveItemsAction::undo()
 {
 	BaseManager* m = this->getManager();
 	if (m == nullptr) return false;
@@ -1238,13 +1249,13 @@ inline bool BaseManager<T>::RemoveItemsAction::undo()
 }
 
 template<class T>
-inline BaseManager<T>::ManagerItemComparator::ManagerItemComparator(BaseManager* manager) : m(manager), compareFunc(nullptr)
+BaseManager<T>::ManagerItemComparator::ManagerItemComparator(BaseManager* manager) : m(manager), compareFunc(nullptr)
 {
 	compareFunc = nullptr;
 }
 
 template<class T>
-inline int BaseManager<T>::ManagerItemComparator::compareElements(ControllableContainer* i1, ControllableContainer* i2)
+int BaseManager<T>::ManagerItemComparator::compareElements(ControllableContainer* i1, ControllableContainer* i2)
 {
 	jassert(compareFunc != nullptr);
 	return compareFunc(static_cast<T*>(i1), static_cast<T*>(i2));
