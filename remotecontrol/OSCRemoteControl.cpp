@@ -124,6 +124,23 @@ void OSCRemoteControl::processMessage(const OSCMessage& m)
 		MessageManagerLock mmLock;
 		OrganicApplication::quit();
 	}
+	else if (add == "/toTray")
+	{
+		MessageManager::callAsync([]() {((OrganicApplication*)OrganicApplication::getInstance())->mainWindow->closeToTray(); });
+	}
+	else if (add == "/minimize")
+	{
+		MessageManager::callAsync([]() {((OrganicApplication*)OrganicApplication::getInstance())->mainWindow->setMinimised(true); });
+		((OrganicApplication*)OrganicApplication::getInstance())->mainWindow->setMinimised(true);
+
+	}
+	else if (add == "/maximize")
+	{
+		MessageManager::callAsync([]() {
+			((OrganicApplication*)OrganicApplication::getInstance())->mainWindow->setMinimised(false);
+			((OrganicApplication*)OrganicApplication::getInstance())->mainWindow->openFromTray();
+		});
+	}
 	else
 	{
 		Controllable* c = OSCHelpers::findControllableAndHandleMessage(Engine::mainEngine, m);
