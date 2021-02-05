@@ -35,9 +35,7 @@ FloatStepperUI::FloatStepperUI(Parameter* _parameter) :
 	}
 
 	slider->setNumDecimalPlacesToDisplay(0);
-	slider->setValue(parameter->floatValue());
-	slider->addListener(this);
-	slider->addMouseListener(this, true);
+	slider->setValue(parameter->floatValue(), dontSendNotification);
 
 	slider->setColour(slider->textBoxBackgroundColourId, BG_COLOR.darker(.1f).withAlpha(.8f));
 	slider->setColour(CaretComponent::caretColourId, Colours::orange);
@@ -48,8 +46,12 @@ FloatStepperUI::FloatStepperUI(Parameter* _parameter) :
 	feedbackStateChanged();
 	addAndMakeVisible(slider.get());
 
+
 	setSize(200, GlobalSettings::getInstance()->fontSize->floatValue() + 4);
 	startTimerHz(20);
+
+	slider->addListener(this);
+	slider->addMouseListener(this, true);
 }
 
 FloatStepperUI::~FloatStepperUI()
