@@ -326,7 +326,7 @@ void AppUpdater::progress(URL::DownloadTask* task, int64 bytesDownloaded, int64 
 
 bool AppUpdater::openStreamProgressCallback(void* context, int, int)
 {
-	auto thread = static_cast<Thread*> (context);
+	auto thread = static_cast<AppUpdater*> (context);
 	return !thread->threadShouldExit();
 }
 
