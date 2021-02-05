@@ -10,6 +10,8 @@
 
 juce_ImplementSingleton(OSCRemoteControl)
 
+static OrganicApplication& getApp() { return *dynamic_cast<OrganicApplication*>(JUCEApplication::getInstance()); }
+
 OSCRemoteControl::OSCRemoteControl() :
 	EnablingControllableContainer("OSC Remote Control")
 #if ORGANICUI_USE_SERVUS
@@ -117,7 +119,21 @@ void OSCRemoteControl::processMessage(const OSCMessage& m)
 	else if (add == "/saveFile")
 	{
 		MessageManagerLock mmLock;
-		Engine::mainEngine->save(false, false);
+		if (m.size() >= 1 && m[0].isString())
+		{
+			File f = File::getSpecialLocation(File::userDocumentsDirectory).getNonexistentChildFile(getApp().getApplicationName() + "/" + m[0].getString(), Engine::mainEngine->fileExtension, true);
+
+			Engine::mainEngine->saveAs(f, false, false, false, false);
+		}
+		else
+		{
+			if(Engine::mainEngine->getFile().existsAsFile()) Engine::mainEngine->save(false, false);
+			else
+			{
+				File f = File::getSpecialLocation(File::userDocumentsDirectory).getNonexistentChildFile(getApp().getApplicationName() + "/default", Engine::mainEngine->fileExtension, true);
+				Engine::mainEngine->saveAs(f, false, false, false, false);
+			}
+		}
 	}
 	else if (add == "/closeApp")
 	{
