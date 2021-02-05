@@ -30,7 +30,6 @@ public:
 	~OSCRemoteControl();
 
 	IntParameter * localPort;
-
 	OSCReceiver receiver;
 
 	void setupReceiver();
@@ -41,7 +40,6 @@ public:
 #endif
 
 	void processMessage(const OSCMessage &m);
-
 
 	void onContainerParameterChanged(Parameter * p) override;
 	

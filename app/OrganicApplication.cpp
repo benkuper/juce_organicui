@@ -289,13 +289,26 @@ inline OrganicApplication::MainWindow::MainWindow(String name, OrganicMainConten
 
 }
 
-void OrganicApplication::MainWindow::closeButtonPressed() 
+void OrganicApplication::MainWindow::closeToTray()
+{
+	setTrayIconVisible(true);
+	removeFromDesktop();
+	mainComponent->clear();
+}
+
+void OrganicApplication::MainWindow::openFromTray()
+{
+	addToDesktop();
+	setVisible(true);
+	mainComponent->setupOpenGL();
+	setTrayIconVisible(false);
+}
+
+void OrganicApplication::MainWindow::closeButtonPressed()
 {
 	if (GlobalSettings::getInstance()->closeToSystemTray->boolValue())
 	{
-		setTrayIconVisible(true);
-		removeFromDesktop();
-		mainComponent->clear();
+		closeToTray();
 	}
 	else
 	{
@@ -308,10 +321,7 @@ void OrganicApplication::MainWindow::trayIconMouseDown(const MouseEvent& e)
 	if (e.mods.isRightButtonDown()) showTrayMenu();
 	else
 	{
-		addToDesktop();
-		setVisible(true);
-		mainComponent->setupOpenGL();
-		setTrayIconVisible(false);
+		openFromTray();
 	}
 }
 

@@ -311,7 +311,7 @@ void Engine::loadJSONData(var data, ProgressTask * loadingTask)
 			File f = getFile();
 			if (f.exists())
 			{
-				File backupF = f.getParentDirectory().getChildFile(f.getFileNameWithoutExtension() + "_backup" + f.getFileExtension());
+				File backupF = f.getParentDirectory().getNonexistentChildFile(f.getFileNameWithoutExtension() + "_backup",f.getFileExtension(), true);
 				f.copyFileTo(backupF);
 				LOG("Your original file has been copied to " << backupF.getFullPathName());
 			}
@@ -335,10 +335,11 @@ void Engine::loadJSONData(var data, ProgressTask * loadingTask)
 				}
 
 				data = JSON::parse(convertedData);
-				DBG(JSON::toString(data));
 
 				if (data.isVoid())
 				{
+					DBG(convertedData);
+
 					AlertWindow::showMessageBox(AlertWindow::AlertIconType::WarningIcon, "Update error", "There is an error with the converted file, the data is badly formatted. I mean, real bad. You can still reload your file and not update it.", "Well, shit happens");
 					setFile(File());
 					return;

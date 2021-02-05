@@ -98,11 +98,16 @@ public:
 	public:
 		MainWindow(String name, OrganicMainContentComponent * mainComponent, const Image &image);
 
-		void closeButtonPressed() override;
 
 		OrganicMainContentComponent * mainComponent;
 		std::unique_ptr<TrayIcon> trayIcon;
 		Image iconImage;
+
+
+		void closeToTray();
+		void openFromTray();
+
+		void closeButtonPressed() override;
 
 		virtual void trayIconMouseDown(const MouseEvent& e) override;
 
@@ -110,6 +115,7 @@ public:
 		virtual void showTrayMenu();
 		virtual void addTrayMenuOptions(const PopupMenu& menu) {};
 		virtual void handlTrayMenuResult(int result) {}
+
 
 		void visibilityChanged() override;
 
