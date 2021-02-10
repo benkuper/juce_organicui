@@ -375,6 +375,7 @@ void ControllableContainer::setCustomShortName(const String& _shortName) {
 	liveScriptObjectIsDirty = true;
 	updateChildrenControlAddress();
 	onContainerShortNameChanged();
+
 	controllableContainerListeners.call(&ControllableContainerListener::childAddressChanged, this);
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ChildAddressChanged, this));
 
@@ -387,6 +388,7 @@ void ControllableContainer::setAutoShortName() {
 	liveScriptObjectIsDirty = true;
 	updateChildrenControlAddress();
 	onContainerShortNameChanged();
+
 	controllableContainerListeners.call(&ControllableContainerListener::childAddressChanged, this);
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ChildAddressChanged, this));
 }
