@@ -107,7 +107,7 @@ public:
 	ControllableContainer * getControllableContainerForAddress(const String &address, bool recursive = false, bool getNotExposed = false);
 	ControllableContainer * getControllableContainerForAddress(StringArray  addressSplit, bool recursive = false, bool getNotExposed = false);
 
-	void setParentContainer(ControllableContainer * container);
+	virtual void setParentContainer(ControllableContainer * container);
 	void updateChildrenControlAddress();
 
 
