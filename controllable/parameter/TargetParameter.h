@@ -65,6 +65,9 @@ public:
 
 	void childStructureChanged(ControllableContainer *) override;
 
+	void controllableControlAddressChanged(Controllable* c) override; //for target Controllable
+	void childAddressChanged(ControllableContainer* cc) override;
+
 	void inspectableDestroyed(Inspectable * i) override;
 
 	void setAttribute(String param, var value) override;

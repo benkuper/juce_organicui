@@ -1,3 +1,4 @@
+#include "TargetParameter.h"
 /*
   ==============================================================================
 
@@ -248,6 +249,22 @@ void TargetParameter::childStructureChanged(ControllableContainer *)
 		{
 			setValueFromTarget(targetContainer);
 		}
+	}
+}
+
+void TargetParameter::controllableControlAddressChanged(Controllable* c)
+{
+	if (target == c)
+	{
+		setValueFromTarget(target); //force update
+	}
+}
+
+void TargetParameter::childAddressChanged(ControllableContainer* cc)
+{
+	if (targetContainer == cc)
+	{
+		setValueFromTarget(targetContainer);
 	}
 }
 
