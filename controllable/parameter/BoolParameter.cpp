@@ -1,3 +1,4 @@
+#include "BoolParameter.h"
 /*
   ==============================================================================
 
@@ -16,6 +17,11 @@ BoolParameter::BoolParameter(const String & niceName, const String &description,
 	canHaveRange = true;
     setValue(initialValue);
 	argumentsDescription = "0/1";
+}
+
+void BoolParameter::setValueInternal(var& _value)
+{
+	value = (bool)(int)_value;
 }
 
 BoolToggleUI * BoolParameter::createToggle(Image onImage, Image offImage)

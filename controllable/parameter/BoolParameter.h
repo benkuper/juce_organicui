@@ -20,6 +20,9 @@ public:
     ~BoolParameter() {}
 
     //ui creation
+
+    void setValueInternal(var& value) override;
+
     BoolToggleUI * createToggle(Image onImage = Image(), Image offImage = Image());
 	BoolButtonToggleUI* createButtonToggle();
 	ControllableUI * createDefaultUI() override;
