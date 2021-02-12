@@ -110,7 +110,7 @@ void Automation::addFromPointsAndSimplifyBezier(const Array<Point<float>>& sourc
     unsigned int* cornerIndex = nullptr;
     unsigned int cornerIndexLength = 0;
 
-    const float errorThreshold = 0.02f;
+    const float errorThreshold = 0.03f;// 0.02f;
 
     curve_fit_corners_detect_fl(points.getRawDataPointer(), points.size() / 2, 2,
         errorThreshold / 4, errorThreshold * 4, 32, M_PI / 8,
