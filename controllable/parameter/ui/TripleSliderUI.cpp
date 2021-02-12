@@ -15,6 +15,7 @@ TripleSliderUI::TripleSliderUI(Point3DParameter* parameter) :
 	yParam("Y", "yParam", parameter->y, parameter->minimumValue[1], parameter->maximumValue[1]),
 	zParam("Z", "zParam", parameter->z, parameter->minimumValue[2], parameter->maximumValue[2])
 {
+	showEditWindowOnDoubleClick = false;
 
 	xParam.canHaveRange = parameter->canHaveRange;
 	yParam.canHaveRange = parameter->canHaveRange;
@@ -115,7 +116,10 @@ void TripleSliderUI::mouseDownInternal(const MouseEvent&)
 
 void TripleSliderUI::mouseUpInternal(const MouseEvent&)
 {
-	parameter->setUndoableValue(mouseDownValue, parameter->getValue());
+	if (setUndoableValueOnMouseUp)
+	{
+		if ((float)mouseDownValue[0] != xParam.floatValue() || (float)mouseDownValue[1] != yParam.floatValue() || (float)mouseDownValue[2] != zParam.floatValue()) p3d->setUndoableVector((float)mouseDownValue[0], (float)mouseDownValue[1], (float)mouseDownValue[2], xParam.floatValue(), yParam.floatValue(), zParam.floatValue());
+	}
 }
 
 void TripleSliderUI::showEditWindowInternal()
@@ -135,7 +139,7 @@ void TripleSliderUI::showEditWindowInternal()
 	{
 		float newVals[3];
 		for (int i = 0; i < 3; ++i) newVals[i] = nameWindow.getTextEditorContents("val" + String(i)).getFloatValue();
-		p3d->setVector(newVals[0], newVals[1], newVals[2]);
+		p3d->setUndoableVector(p3d->x, p3d->y, p3d->z, newVals[0], newVals[1], newVals[2]);
 	}
 }
 
@@ -193,17 +197,13 @@ void TripleSliderUI::newMessage(const Parameter::ParameterEvent& e)
 	}
 	else if (isInteractable())
 	{
-		if (e.parameter == &xParam)
+		if (e.parameter == &xParam || e.parameter == &yParam || e.parameter == &zParam)
 		{
-			if (xParam.floatValue() != p3d->x) p3d->setVector(xParam.floatValue(), yParam.floatValue(), zParam.floatValue());
-		}
-		else if (e.parameter == &yParam)
-		{
-			if (yParam.floatValue() != p3d->y) p3d->setVector(xParam.floatValue(), yParam.floatValue(), zParam.floatValue());
-		}
-		else if (e.parameter == &zParam)
-		{
-			if (zParam.floatValue() != p3d->z) p3d->setVector(xParam.floatValue(), yParam.floatValue(), zParam.floatValue());
+			if (xParam.floatValue() != p3d->x || yParam.floatValue() != p3d->y || yParam.floatValue() != p3d->z)
+			{
+				if (!isMouseButtonDown(true) && !UndoMaster::getInstance()->isPerformingUndoRedo()) p3d->setUndoableVector(p3d->x, p3d->y, p3d->z, xParam.floatValue(), yParam.floatValue(), zParam.floatValue());
+				else p3d->setVector(xParam.floatValue(), yParam.floatValue(), zParam.floatValue());
+			}
 		}
 	}
 }

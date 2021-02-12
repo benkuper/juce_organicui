@@ -177,11 +177,11 @@ void FloatSliderUI::mouseUpInternal(const MouseEvent &)
 	{
 		if (changeParamOnMouseUpOnly)
 		{
-			setParamNormalizedValueUndoable(initValue, getValueFromMouse());
+			if (initValue !=  getValueFromMouse()) setParamNormalizedValueUndoable(initValue, getValueFromMouse());
 		}
 		else
 		{
-			setParamNormalizedValueUndoable(initValue, parameter->getNormalizedValue());
+			if (initValue != getValueFromMouse()) setParamNormalizedValueUndoable(initValue, parameter->getNormalizedValue());
 		}
 	}
 	

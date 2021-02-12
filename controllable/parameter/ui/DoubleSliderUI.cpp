@@ -15,6 +15,8 @@ DoubleSliderUI::DoubleSliderUI(Point2DParameter* parameter) :
 	yParam("Y", "yParam", parameter->y, parameter->minimumValue[1], parameter->maximumValue[1])
 {
 
+	showEditWindowOnDoubleClick = false;
+
 	xParam.canHaveRange = parameter->canHaveRange;
 	yParam.canHaveRange = parameter->canHaveRange;
 	xParam.isCustomizableByUser = parameter->isCustomizableByUser;
@@ -35,10 +37,10 @@ DoubleSliderUI::DoubleSliderUI(Point2DParameter* parameter) :
 	ySlider->showLabel = false;
 	xSlider->showMenuOnRightClick = false;
 	ySlider->showMenuOnRightClick = false;
-	
+
 	xSlider->setUndoableValueOnMouseUp = false;
 	ySlider->setUndoableValueOnMouseUp = false;
-	
+
 	xSlider->addMouseListener(this, true);
 	ySlider->addMouseListener(this, true);
 
@@ -66,7 +68,7 @@ void DoubleSliderUI::mouseUpInternal(const MouseEvent&)
 {
 	if (setUndoableValueOnMouseUp)
 	{
-		parameter->setUndoableValue(mouseDownValue, parameter->getValue());
+		if ((float)mouseDownValue[0] != xParam.floatValue() || (float)mouseDownValue[1] != yParam.floatValue()) p2d->setUndoablePoint((float)mouseDownValue[0], (float)mouseDownValue[1], xParam.floatValue(), yParam.floatValue());
 	}
 }
 
@@ -94,7 +96,7 @@ void DoubleSliderUI::resized()
 		r.removeFromLeft(jmin(font.getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, r.getWidth() - 60));
 		r.removeFromLeft(2);
 	}
-	
+
 	xSlider->setBounds(r.removeFromLeft(r.getWidth() / 2 - 5));
 	ySlider->setBounds(r.removeFromRight(r.getWidth() - 10));
 }
@@ -116,7 +118,7 @@ void DoubleSliderUI::showEditWindowInternal()
 	{
 		float newVals[2];
 		for (int i = 0; i < 2; ++i) newVals[i] = nameWindow.getTextEditorContents("val" + String(i)).getFloatValue();
-		p2d->setPoint(newVals[0], newVals[1]);
+		p2d->setUndoablePoint(p2d->x, p2d->y, newVals[0], newVals[1]);
 	}
 }
 
@@ -153,7 +155,7 @@ void DoubleSliderUI::showEditRangeWindowInternal()
 }
 
 
-void DoubleSliderUI::rangeChanged(Parameter * p)
+void DoubleSliderUI::rangeChanged(Parameter* p)
 {
 	if (p != parameter) return;
 	xParam.setRange(parameter->minimumValue[0], parameter->maximumValue[0]);
@@ -166,7 +168,7 @@ void DoubleSliderUI::updateUIParamsInternal()
 	yParam.setControllableFeedbackOnly(parameter->isControllableFeedbackOnly);
 }
 
-void DoubleSliderUI::newMessage(const Parameter::ParameterEvent & e)
+void DoubleSliderUI::newMessage(const Parameter::ParameterEvent& e)
 {
 	ParameterUI::newMessage(e);
 
@@ -177,13 +179,13 @@ void DoubleSliderUI::newMessage(const Parameter::ParameterEvent & e)
 	}
 	else if (isInteractable())
 	{
-		if (e.parameter == &xParam)
+		if (e.parameter == &xParam || e.parameter == &yParam)
 		{
-			if (xParam.floatValue() != p2d->x) p2d->setPoint(xParam.floatValue(), yParam.floatValue());
-		}
-		else if (e.parameter == &yParam)
-		{
-			if (yParam.floatValue() != p2d->y) p2d->setPoint(xParam.floatValue(), yParam.floatValue());
+			if (xParam.floatValue() != p2d->x || yParam.floatValue() != p2d->y ) 
+			{
+				if (!isMouseButtonDown(true) && !UndoMaster::getInstance()->isPerformingUndoRedo()) p2d->setUndoablePoint(p2d->x, p2d->y, xParam.floatValue(), yParam.floatValue());
+				else p2d->setPoint(xParam.floatValue(), yParam.floatValue());
+			}
 		}
 	}
 }
