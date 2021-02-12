@@ -430,8 +430,10 @@ void AutomationUI::mouseDrag(const MouseEvent& e)
         
 
         if (e.mods.isShiftDown()) offset.setY(0);
-        if (e.mods.isAltDown()) k->scalePosition(offset, true);
-        else k->movePosition(offset, true);
+        else if (e.mods.isAltDown()) offset.setX(0);//k->scalePosition(offset, true);
+
+        if (e.mods.isLeftButtonDown()) k->movePosition(offset, true);
+        else if(e.mods.isRightButtonDown()) k->scalePosition(offset, true);
     }
     else if (e.eventComponent == this)
     {
