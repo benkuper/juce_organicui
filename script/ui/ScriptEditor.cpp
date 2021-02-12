@@ -87,7 +87,7 @@ void ScriptEditor::newMessage(const Script::ScriptEvent & e)
 	switch (e.type)
 	{
 	case Script::ScriptEvent::STATE_CHANGE:
-			resetAndBuild();
+			if(script->state == Script::SCRIPT_CLEAR && script->state == Script::ScriptState::SCRIPT_LOADED) resetAndBuild();
 			resized();
 			repaint();
 		break;
