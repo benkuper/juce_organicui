@@ -197,7 +197,6 @@ void AutomationUI::paintOverChildren(Graphics& g)
     if (previewMode || !isShowing()) return;
 
     //recorder
-    
     bool interactiveMode = !manager->interactiveSimplifiedPoints.isEmpty();
 
     if (manager->recorder != nullptr)
@@ -265,6 +264,11 @@ void AutomationUI::paintOverChildren(Graphics& g)
         g.setColour(YELLOW_COLOR.withAlpha(.5f));
         g.strokePath(p, PathStrokeType(1));
     }
+
+    //draw current point
+    g.setColour(BLUE_COLOR);
+    Point<float> p(getXForPos(manager->position->floatValue()), getYForValue(manager->value->floatValue()));
+    g.fillEllipse(Rectangle<float>(0, 0, 6, 6).withCentre(p));
 }
 
 
