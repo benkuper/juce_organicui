@@ -29,6 +29,7 @@ ParameterAutomation::ParameterAutomation(Parameter* _parameter) :
 
 ParameterAutomation::~ParameterAutomation()
 {
+	stopThread(1000);
 	if (!parameter.wasObjectDeleted() && parameter != nullptr) parameter->setControllableFeedbackOnly(false);
 }
 
@@ -38,6 +39,8 @@ void ParameterAutomation::setup()
 	automationContainer->editorIsCollapsed = false;
 	automationContainer->isSelectable = false;
 	addChildControllableContainer(automationContainer);
+
+	startThread();
 }
 
 void ParameterAutomation::setManualMode(bool value)
@@ -48,12 +51,12 @@ void ParameterAutomation::setManualMode(bool value)
 
 	if (manualMode)
 	{
-		stopThread(1000);
 
 		if (mode != nullptr)
 		{
 			removeControllable(mode);
 			mode = nullptr;
+			stopThread(1000);
 		}
 	}
 	else
@@ -65,7 +68,7 @@ void ParameterAutomation::setManualMode(bool value)
 			mode->addOption("Loop", LOOP)->addOption("Ping Pong", PING_PONG);
 		}
 
-		startThread(50);
+		startThread();
 	}
 }
 
@@ -99,10 +102,9 @@ void ParameterAutomation::onControllableFeedbackUpdateInternal(ControllableConta
 
 void ParameterAutomation::run()
 {
-	
-	if (mode == nullptr) return;
+	if (mode == nullptr || timeParamRef == nullptr || lengthParamRef == nullptr) return;
 
-	float lastUpdateTime = Time::getMillisecondCounter();
+	float lastUpdateTime = Time::getMillisecondCounter() / 1000.0f;
 
 	while (!threadShouldExit())
 	{
@@ -123,6 +125,7 @@ void ParameterAutomation::run()
 			timeParamRef->setValue(ft);
 		}
 
+		lastUpdateTime = Time::getMillisecondCounter() / 1000.0f;
 		wait(20); //50fps
 	}
 }
