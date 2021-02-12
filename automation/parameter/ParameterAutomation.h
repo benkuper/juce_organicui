@@ -14,7 +14,7 @@
 
 class ParameterAutomation :
 	public BaseItem,
-	public Timer
+	public Thread
 {
 public:
 	enum Mode { LOOP, PING_PONG };
@@ -42,7 +42,6 @@ public:
 	virtual void setLength(float value, bool stretch = false, bool stickToEnd = false) {}
 	virtual void setAllowKeysOutside(bool value) {}
 
-	float lastUpdateTime;
 	bool reversePlay; //pingPong
 
 	virtual InspectableEditor* getContentEditor(bool isRoot);
@@ -50,7 +49,7 @@ public:
 	virtual void onContainerParameterChangedInternal(Parameter *) override;
 	virtual void onControllableFeedbackUpdateInternal(ControllableContainer* cc, Controllable* c) override;
 
-	void timerCallback() override;
+	void run() override;
 
 	var getJSONData() override;
 	void loadJSONDataInternal(var data) override;

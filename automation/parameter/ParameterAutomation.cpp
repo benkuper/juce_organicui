@@ -1,4 +1,3 @@
-#include "ParameterAutomation.h"
 /*
   ==============================================================================
 
@@ -12,6 +11,7 @@
 
 ParameterAutomation::ParameterAutomation(Parameter* _parameter) :
 	BaseItem(_parameter->niceName +" automation", false),
+	Thread("ParameterAutomation"),
 	timeParamRef(nullptr),
 	lengthParamRef(nullptr),
     valueParamRef(nullptr),
@@ -24,6 +24,7 @@ ParameterAutomation::ParameterAutomation(Parameter* _parameter) :
 	isSelectable = false;
 	parameter->setControllableFeedbackOnly(true);
 	setManualMode(false);
+
 }
 
 ParameterAutomation::~ParameterAutomation()
@@ -47,7 +48,7 @@ void ParameterAutomation::setManualMode(bool value)
 
 	if (manualMode)
 	{
-		stopTimer();
+		stopThread(1000);
 
 		if (mode != nullptr)
 		{
@@ -64,8 +65,7 @@ void ParameterAutomation::setManualMode(bool value)
 			mode->addOption("Loop", LOOP)->addOption("Ping Pong", PING_PONG);
 		}
 
-		startTimerHz(50);
-		
+		startThread(50);
 	}
 }
 
@@ -97,33 +97,34 @@ void ParameterAutomation::onControllableFeedbackUpdateInternal(ControllableConta
 	}
 }
 
-
-void ParameterAutomation::timerCallback()
+void ParameterAutomation::run()
 {
-	if (mode == nullptr)
-	{
-		stopTimer();
-		return;
-	}
+	
+	if (mode == nullptr) return;
 
-	float t = Time::getMillisecondCounter() / 1000.0f;
-	float delta = t - lastUpdateTime;
+	float lastUpdateTime = Time::getMillisecondCounter();
 
-	Mode m = mode->getValueDataAsEnum<Mode>();
-	if (m == LOOP) timeParamRef->setValue(fmodf(timeParamRef->floatValue() + delta, lengthParamRef->floatValue()));
-	else if (m == PING_PONG)
+	while (!threadShouldExit())
 	{
-		float ft = timeParamRef->floatValue() + delta * (reversePlay ? -1 : 1);
-		if (ft < 0 || ft > lengthParamRef->floatValue())
+		float t = Time::getMillisecondCounter() / 1000.0f;
+		float delta = t - lastUpdateTime;
+
+		Mode m = mode->getValueDataAsEnum<Mode>();
+		if (m == LOOP) timeParamRef->setValue(fmodf(timeParamRef->floatValue() + delta, lengthParamRef->floatValue()));
+		else if (m == PING_PONG)
 		{
-			reversePlay = !reversePlay;
-			ft = timeParamRef->floatValue() + delta * (reversePlay ? -1 : 1);
+			float ft = timeParamRef->floatValue() + delta * (reversePlay ? -1 : 1);
+			if (ft < 0 || ft > lengthParamRef->floatValue())
+			{
+				reversePlay = !reversePlay;
+				ft = timeParamRef->floatValue() + delta * (reversePlay ? -1 : 1);
+			}
+
+			timeParamRef->setValue(ft);
 		}
 
-		timeParamRef->setValue(ft);
+		wait(20); //50fps
 	}
-
-	lastUpdateTime = t;
 }
 
 var ParameterAutomation::getJSONData()
