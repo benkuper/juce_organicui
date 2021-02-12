@@ -1,4 +1,3 @@
-#include "ScriptExpression.h"
 /*
 ==============================================================================
 
@@ -11,13 +10,16 @@ Author:  Ben
 
 
 ScriptExpression::ScriptExpression() :
-	state(EXPRESSION_EMPTY)
+	state(EXPRESSION_EMPTY),
+	Thread("ScriptExpression")
 {
 	if(Engine::mainEngine != nullptr) Engine::mainEngine->addScriptTargetListener(this);
 }
 
 ScriptExpression::~ScriptExpression()
 {
+	stopThread(1000);
+
 	if (Engine::mainEngine != nullptr)
 	{
 		Engine::mainEngine->removeEngineListener(this);
@@ -37,13 +39,13 @@ void ScriptExpression::setExpression(const String & newExpression)
 {
 	if (Engine::mainEngine == nullptr)
 	{
-		stopTimer();
+		stopThread(1000);
 		return;
 	}
 
 	if (newExpression.isEmpty())
 	{
-		stopTimer();
+		stopThread(1000);
 		state = EXPRESSION_EMPTY;
 		return;
 	}
@@ -66,7 +68,7 @@ void ScriptExpression::setExpression(const String & newExpression)
 		if (expression.contains("getTime()"))
 		{
 			DBG("Start expression timer because expression uses getTime()");
-			startTimerHz(50); //loop at 50fps only if expression is using time, otherwise relies on parameter value changed
+			startThread(); 
 		}
 
 	}
@@ -113,7 +115,7 @@ void ScriptExpression::evaluate(bool resetListeners)
 	{
 		LOG("Expression error :\n" + result.getErrorMessage());
 		setState(EXPRESSION_ERROR);
-		stopTimer();
+		stopThread(1000);
 		return;
 	}
 
@@ -188,7 +190,11 @@ void ScriptExpression::parameterValueChanged(Parameter * p)
 	evaluate();
 }
 
-void ScriptExpression::timerCallback()
+void ScriptExpression::run()
 {
-	evaluate();
+	while (!threadShouldExit())
+	{
+		evaluate();
+		wait(20); //loop at 50fps only if expression is using time, otherwise relies on parameter value changed
+	}
 }

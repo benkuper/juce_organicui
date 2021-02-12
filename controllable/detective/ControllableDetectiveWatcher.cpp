@@ -93,7 +93,7 @@ void ControllableDetectiveWatcher::run()
 			data.clear();
 		}
 
-		sleep(50);
+		wait(50);
 	}
 }
 

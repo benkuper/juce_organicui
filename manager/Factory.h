@@ -95,9 +95,7 @@ public:
 		return this->createFunc(this->params);
 	}
 
-	template<class S>
-	static T* createTemplated(var params = new DynamicObject()) { return new S(params); }
-
+	
 	static FactorySimpleParametricDefinition* createDef(StringRef menu, StringRef type, std::function<T* (var)> createFunc, var params = new DynamicObject())
 	{
 		return new FactorySimpleParametricDefinition(menu, type, createFunc, params);
@@ -109,7 +107,9 @@ public:
 		return createDef(menu, type, &FactorySimpleParametricDefinition<T>::createTemplated<S>, params);
 	}
 
-	
+	template<class S>
+	static T* createTemplated(var params = new DynamicObject()) { return new S(params); }
+
 };
 
 

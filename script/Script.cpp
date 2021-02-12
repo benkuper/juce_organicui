@@ -70,8 +70,6 @@ Script::~Script()
 		Engine::mainEngine->removeControllableContainerListener(this);
 	}
 
-	signalThreadShouldExit();
-	waitForThreadToExit(1000);
 	stopThread(1000);
 
 	scriptParamsContainer.clear();
@@ -114,8 +112,7 @@ void Script::loadScript()
 
 	if(isThreadRunning())
 	{
-		signalThreadShouldExit();
-		waitForThreadToExit(100);
+		stopThread(1000);
 	}
 
 	setState(SCRIPT_LOADING);
@@ -347,7 +344,7 @@ void Script::run()
 		double afterProcessMillis = Time::getMillisecondCounterHiRes();
 		double processTime = afterProcessMillis - nowMillis;
 
-		sleep(jmax<int>((1000.0 / updateRate->floatValue()) - processTime, 0));
+		wait(jmax<int>((1000.0 / updateRate->floatValue()) - processTime, 0));
 	}
 }
 

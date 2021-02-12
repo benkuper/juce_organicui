@@ -35,8 +35,7 @@ OSCRemoteControl::OSCRemoteControl() :
 OSCRemoteControl::~OSCRemoteControl()
 {
 #if ORGANICUI_USE_SERVUS
-	signalThreadShouldExit();
-	waitForThreadToExit(1000);
+	stopThread(1000);
 #endif
 }
 

@@ -35,8 +35,7 @@ DashboardManager::~DashboardManager()
 #endif
 
 #if ORGANICUI_USE_SERVUS
-	servusThread.signalThreadShouldExit();
-	servusThread.waitForThreadToExit(1000);
+	servusThread.stopThread(1000);
 #endif
 
 	DashboardItemFactory::deleteInstance();
@@ -61,8 +60,7 @@ void DashboardManager::setupServer()
 	{
 		LOG("Dashboard server is not running");
 		#if ORGANICUI_USE_SERVUS
-			servusThread.signalThreadShouldExit();
-			servusThread.waitForThreadToExit(1000);
+			servusThread.stopThread(1000);
 		#endif
 
 		return;

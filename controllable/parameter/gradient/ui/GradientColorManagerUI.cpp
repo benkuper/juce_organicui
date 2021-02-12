@@ -35,8 +35,7 @@ GradientColorManagerUI::GradientColorManagerUI(GradientColorManager* manager) :
 GradientColorManagerUI::~GradientColorManagerUI()
 {
 	manager->removeAsyncContainerListener(this);
-	signalThreadShouldExit();
-	waitForThreadToExit(10000);
+	stopThread(1000);
 	//stopThread(100);
 }
 
@@ -218,7 +217,7 @@ void GradientColorManagerUI::run()
 {
 	while (!threadShouldExit())
 	{
-		sleep(50); //20ms is plenty enough
+		wait(50); //20ms is plenty enough
 
 		if (Engine::mainEngine->isLoadingFile || Engine::mainEngine->isClearing) continue;
 		if (!shouldUpdateImage) continue;

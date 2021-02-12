@@ -11,7 +11,7 @@ Author:  Ben
 #pragma once
 
 class ScriptExpression :
-	public Timer,
+	public Thread,
 	public EngineListener,
 	public ScriptTarget::ScriptTargetListener,
 	public Inspectable::InspectableListener,
@@ -51,5 +51,5 @@ public:
 
 
 	// Inherited via Timer
-	virtual void timerCallback() override;
+	virtual void run() override;
 };
