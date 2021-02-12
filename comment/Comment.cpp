@@ -13,7 +13,7 @@ CommentItem::CommentItem() :
 {
 	itemDataType = "Comment";
 	text = addStringParameter("Text", "The comment text", "I Love "+ OrganicApplication::getInstance()->getApplicationName()+ " !");
-	//text->multiline = true;
+	text->multiline = true;
 
 	size = addFloatParameter("Size", "The text size", 14, 0,80);
 	size->customUI = FloatParameter::LABEL;

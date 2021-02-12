@@ -11,21 +11,32 @@
 CommentUI::CommentUI(CommentItem * comment) :
 	BaseItemMinimalUI(comment)
 {
-	int size = Font(item->size->floatValue()).getStringWidth(item->text->stringValue());
-	setSize(size + 8, item->size->floatValue() + 8);
-	
 	bgColor = item->color->getColor().darker().withAlpha(item->bgAlpha->floatValue());
 
-	textUI.setJustificationType(Justification::centred);
-	textUI.setFont(item->size->floatValue());
-	textUI.setEditable(false, true, false);
+	//textUI.setEditable(false, true, false);
 	textUI.setColour(textUI.textColourId, item->color->getColor());
-	textUI.setColour(textUI.backgroundColourId, Colours::transparentWhite);
-	textUI.setColour(textUI.backgroundWhenEditingColourId, Colours::darkgrey.withAlpha(.2f));
-	textUI.setText(item->text->stringValue(), dontSendNotification);
-	textUI.addListener(this);
+	textUI.setColour(textUI.backgroundColourId, Colours::transparentBlack);
+	textUI.setColour(TextEditor::outlineColourId, Colours::transparentBlack); // non-transparent red
+	textUI.setColour(TextEditor::shadowColourId, Colours::transparentBlack); // non-transparent red
+	textUI.setColour(CaretComponent::caretColourId, Colours::orange);
 
+	//textUI.setColour(textUI.backgroundWhenEditingColourId, Colours::darkgrey.withAlpha(.2f));
+	
+	textUI.setFont(item->size->floatValue());
+	textUI.setMultiLine(true, false);
+	textUI.setText(item->text->stringValue(), dontSendNotification);
+	textUI.setReturnKeyStartsNewLine(false);
+	textUI.setShiftReturnKeyStartsNewLine(true);
+	textUI.setScrollbarsShown(false);
+	
+	textUI.addListener(this);
+	
+	disableTextEditor();
+
+	textUI.setFont(item->size->floatValue());
 	addAndMakeVisible(&textUI);
+
+	setSize(textUI.getTextWidth(), textUI.getTextHeight()+4);
 }
 
 CommentUI::~CommentUI()
@@ -57,9 +68,56 @@ void CommentUI::resized()
 	textUI.setBounds(getLocalBounds());
 }
 
-void CommentUI::labelTextChanged(Label *)
+void CommentUI::mouseDown(const MouseEvent& e)
+{
+	BaseItemMinimalUI::mouseDown(e);
+}
+
+void CommentUI::mouseDrag(const MouseEvent& e)
+{
+	if (e.eventComponent == &textUI)
+	{
+		//avoid dragging the item if selecting text inside editor
+	}
+	else
+	{
+		BaseItemMinimalUI::mouseDrag(e);
+	}
+}
+
+void CommentUI::mouseDoubleClick(const MouseEvent& e)
+{
+	BaseItemMinimalUI::mouseDoubleClick(e);
+	textUI.setColour(textUI.backgroundColourId, Colours::black);
+	textUI.setInterceptsMouseClicks(true, true);
+	textUI.setReadOnly(false);
+	textUI.setHighlightedRegion({ 0,0 });
+}
+
+void CommentUI::textEditorTextChanged(TextEditor&)
 {
 	item->text->setValue(textUI.getText());
+}
+
+void CommentUI::textEditorEscapeKeyPressed(TextEditor&)
+{
+}
+
+void CommentUI::textEditorReturnKeyPressed(TextEditor&)
+{
+	disableTextEditor();
+}
+
+void CommentUI::textEditorFocusLost(TextEditor&)
+{
+	disableTextEditor();
+}	
+
+
+void CommentUI::focusLost(FocusChangeType type)
+{
+	disableTextEditor();
+	BaseItemMinimalUI::focusLost(type);
 }
 
 bool CommentUI::canStartDrag(const MouseEvent & e)
@@ -67,21 +125,38 @@ bool CommentUI::canStartDrag(const MouseEvent & e)
 	return e.eventComponent == this || e.eventComponent == &textUI;
 }
 
+void CommentUI::inspectableSelectionChanged(Inspectable* i)
+{
+	if (!item->isSelected)
+	{
+		disableTextEditor();
+	}
+
+	BaseItemMinimalUI::inspectableSelectionChanged(i);
+}
+
+void CommentUI::disableTextEditor()
+{
+	textUI.setColour(textUI.backgroundColourId, Colours::transparentWhite);
+	textUI.setInterceptsMouseClicks(false, false);
+	textUI.setReadOnly(true);
+	textUI.setHighlightedRegion({ 0,0 });
+}
+
 void CommentUI::controllableFeedbackUpdateInternal(Controllable * c)
 {
 	BaseItemMinimalUI::controllableFeedbackUpdateInternal(c);
 
-	if (c == item->text) textUI.setText(item->text->stringValue(), dontSendNotification);
-	else if(c == item->size)
+	if(c == item->size || c == item->text)
 	{
-		int size = Font(item->size->floatValue()).getStringWidth(item->text->stringValue());
-		textUI.setFont(item->size->floatValue());
-		setSize(size+8, item->size->floatValue()+8);
+		if (c == item->text) textUI.setText(item->text->stringValue(), dontSendNotification);
+		textUI.applyFontToAllText(item->size->floatValue(), true);
+		setSize(textUI.getTextWidth(), textUI.getTextHeight()+4);
 	}
 	else if (c == item->color || c == item->bgAlpha)
 	{
 		bgColor = item->color->getColor().darker().withAlpha(item->bgAlpha->floatValue());
-		textUI.setColour(textUI.textColourId, item->color->getColor());
+		textUI.applyColourToAllText(item->color->getColor(), true);
 		repaint();
 	}
 }

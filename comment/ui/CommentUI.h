@@ -12,20 +12,33 @@
 
 class CommentUI :
 	public BaseItemMinimalUI<CommentItem>,
-	public Label::Listener
+	public TextEditor::Listener
 {
 public:
 	CommentUI(CommentItem * comment);
 	~CommentUI();
 
-	Label textUI;
+	TextEditor textUI;
 
 	void paint(Graphics &g) override;
 	void resized() override;
 
-	void labelTextChanged(Label *) override;
-	
+	void mouseDown(const MouseEvent& e) override;
+	void mouseDrag(const MouseEvent& e) override;
+	void mouseDoubleClick(const MouseEvent& e) override;
+
+	void textEditorTextChanged(TextEditor&) override;
+	void textEditorEscapeKeyPressed(TextEditor&) override;
+	void textEditorReturnKeyPressed(TextEditor&) override;
+	void textEditorFocusLost(TextEditor&) override;
+
+	void focusLost(FocusChangeType type) override;
+
 	bool canStartDrag(const MouseEvent &e) override;
+
+	void inspectableSelectionChanged(Inspectable* i) override;
+
+	void disableTextEditor();
 
 	void controllableFeedbackUpdateInternal(Controllable * c) override;
 };
