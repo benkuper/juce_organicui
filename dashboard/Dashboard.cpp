@@ -13,6 +13,7 @@ Dashboard::Dashboard() :
 	BaseItem("Dashboard", false),
 	isBeingEdited(false)
 {
+	itemManager.editorIsCollapsed = true;
 	addChildControllableContainer(&itemManager);
 	itemManager.addBaseManagerListener(this);
 }

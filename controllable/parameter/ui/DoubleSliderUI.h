@@ -29,6 +29,8 @@ public:
 
 	var mouseDownValue;
 
+	bool isUpdatingFromParam;
+
 	void mouseDownInternal(const MouseEvent &) override;
 	void mouseUpInternal(const MouseEvent &) override;
 

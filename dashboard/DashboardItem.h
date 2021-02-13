@@ -17,7 +17,7 @@ class DashboardItem :
 	public Inspectable::InspectableListener
 {
 public:
-	DashboardItem(Inspectable* _target = nullptr);
+	DashboardItem(Inspectable* _target = nullptr, const String &name = "Item");
 	virtual ~DashboardItem();
 
 	virtual DashboardItemUI* createUI();

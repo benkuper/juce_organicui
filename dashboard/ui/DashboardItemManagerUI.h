@@ -20,6 +20,11 @@ public:
 	~DashboardItemManagerUI();
 
 	Image bgImage;
+	std::unique_ptr<CommentManagerViewUI> commentManagerUI;
+
+	virtual void resized() override;
+	virtual void setViewZoom(float value) override;
+	virtual void updateItemsVisibility() override;
 
 	virtual void paint(Graphics& g) override;
 	virtual void paintOverChildren(Graphics& g) override;

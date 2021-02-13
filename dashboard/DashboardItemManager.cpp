@@ -14,11 +14,9 @@ DashboardItemManager::DashboardItemManager() :
 	managerFactory = DashboardItemFactory::getInstance();
 	selectItemWhenCreated = false;
 
-
-	canvasSize = addPoint2DParameter("Canvas Size", "If enabled, this will limit the canvas to this size");
+	canvasSize = addPoint2DParameter("Canvas Size", "If enabled, this will limit the canvas to this size", false);
 	canvasSize->canBeDisabledByUser = true;
-	canvasSize->setPoint(800, 400);
-
+	canvasSize->setPoint(1200, 800);
 
 	bgImage = addFileParameter("Backround Image", "Image to put in the background");
 	bgImageScale = addFloatParameter("Background Image Scale", "The scale to multiply the image with", 1, .1f, 10);
@@ -27,4 +25,23 @@ DashboardItemManager::DashboardItemManager() :
 
 DashboardItemManager::~DashboardItemManager()
 {
+}
+
+void DashboardItemManager::clear()
+{
+	commentManager.clear();
+	BaseManager::clear();
+}
+
+var DashboardItemManager::getJSONData()
+{
+	var data = BaseManager::getJSONData();
+	data.getDynamicObject()->setProperty("commentManager", commentManager.getJSONData());
+	return data;
+}
+
+void DashboardItemManager::loadJSONDataManagerInternal(var data)
+{
+	BaseManager::loadJSONDataManagerInternal(data);
+	commentManager.loadJSONData(data.getProperty("commentManager", var()));
 }

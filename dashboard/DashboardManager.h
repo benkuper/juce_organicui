@@ -48,6 +48,8 @@ public:
 	BoolParameter* editMode;
 	BoolParameter* snapping;
 
+	CommentManager commentManager;
+
 
 	void addItemInternal(Dashboard* item, var data) override;
 	void removeItemInternal(Dashboard* item) override;
@@ -77,8 +79,8 @@ public:
 	void connectionClosed(const String& id, int status, const String& reason) override;
 #endif
 
-private:
 
+private:
 #if ORGANICUI_USE_SERVUS
 	ServusThread servusThread;
 #endif

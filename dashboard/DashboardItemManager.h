@@ -17,8 +17,15 @@ public:
 	DashboardItemManager();
 	~DashboardItemManager();
 
+	CommentManager commentManager;
+
 	Point2DParameter* canvasSize;
 	FileParameter* bgImage;
 	FloatParameter* bgImageScale;
 	FloatParameter* bgImageAlpha;
+
+	void clear() override;
+
+	var getJSONData() override;
+	void loadJSONDataManagerInternal(var data) override;
 };

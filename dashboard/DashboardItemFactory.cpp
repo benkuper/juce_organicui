@@ -2,9 +2,10 @@ juce_ImplementSingleton(DashboardItemFactory)
 
 DashboardItemFactory::DashboardItemFactory()
 {
-	defs.add(Definition::createDef("", "DashboardTriggerItem", &DashboardTriggerItem::create));
+	defs.add(Definition::createDef("", "DashboardTriggerItem",&DashboardTriggerItem::create));
 	defs.add(Definition::createDef("", "DashboardParameterItem", &DashboardParameterItem::create));
 	defs.add(Definition::createDef("", "DashboardCCItem", &DashboardCCItem::create));
+	defs.add(Definition::createDef("", "DashboardGroupItem", &DashboardGroupItem::create));
 }
 
 void DashboardItemFactory::buildPopupMenu()
@@ -35,8 +36,11 @@ DashboardItem * DashboardItemFactory::showCreateMenu()
 
 DashboardItem * DashboardItemFactory::createFromMenuResult(int result)
 {
+	if (result < 0) return nullptr;
+
 	int providerId = (int)floorf(result / 10000);
 	if (providerId < providers.size()) return providers[providerId]->getDashboardItemFromMenuResult(result - providerId * 10000);
 	else if (providerId - providers.size() < specialProviders.size()) return specialProviders[providerId - providers.size()]->getDashboardItemFromMenuResult(result - providerId * 10000);
+	
 	return nullptr;
 }

@@ -1,4 +1,3 @@
-#include "DashboardItem.h"
 /*
   ==============================================================================
 
@@ -9,8 +8,8 @@
   ==============================================================================
 */
 
-DashboardItem::DashboardItem(Inspectable * _target) :
-	BaseItem("Dashboard Item",false)
+DashboardItem::DashboardItem(Inspectable * _target, const String &name) :
+	BaseItem(name, false)
 {
 	viewUISize->setPoint(100, 20);
 	

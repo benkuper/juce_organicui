@@ -12,6 +12,7 @@ CommentManagerViewUI::CommentManagerViewUI(CommentManager * manager) :
 	BaseManagerViewUI(manager->niceName, manager)
 {
 	//animateItemOnAdd = false;
+	setShowAddButton(false);
 	bringToFrontOnSelect = false;
 	autoFilterHitTestOnItems = true;
 	validateHitTestOnNoItem = false;

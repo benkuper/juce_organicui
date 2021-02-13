@@ -24,7 +24,6 @@ public:
 
 	void itemAdded(DashboardItem*) override;
 	void itemRemoved(DashboardItem*) override;
-
 	void itemDataFeedback(var data) override; //from DashboardItemListener
 
 	var getJSONData() override;

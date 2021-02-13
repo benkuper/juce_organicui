@@ -1,5 +1,3 @@
-#include "DashboardControllableItemUI.h"
-
 DashboardControllableItemUI::DashboardControllableItemUI(DashboardControllableItem* controllableItem) :
 	DashboardInspectableItemUI(controllableItem),
 	controllableItem(controllableItem),

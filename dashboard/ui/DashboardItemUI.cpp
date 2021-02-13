@@ -97,6 +97,9 @@ void DashboardItemUI::updateEditMode()
 	bool editMode = DashboardManager::getInstance()->editMode->boolValue();
 	updateEditModeInternal(editMode);
 
+	autoSelectWithChildRespect = editMode;
+	//item->isSelectable = editMode; //should this be here ?
+
 	autoDrawContourWhenSelected = editMode;
 	dragAndDropEnabled = editMode;
 	resizer.setVisible(editMode);

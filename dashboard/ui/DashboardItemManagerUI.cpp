@@ -15,7 +15,6 @@ DashboardItemManagerUI::DashboardItemManagerUI(DashboardItemManager * manager) :
 	enableSnapping = DashboardManager::getInstance()->snapping->boolValue();
 	updatePositionOnDragMove = true;
 
-	setShowAddButton(false);
 
 	manager->addAsyncCoalescedContainerListener(this);
 	DashboardManager::getInstance()->snapping->addAsyncParameterListener(this);
@@ -27,13 +26,46 @@ DashboardItemManagerUI::DashboardItemManagerUI(DashboardItemManager * manager) :
 	acceptedDropTypes.add("Controllable");
 	acceptedDropTypes.add("Container");
 
-	addExistingItems();
+	addExistingItems(false);
+
+	commentManagerUI.reset(new CommentManagerViewUI(&manager->commentManager));
+	commentManagerUI->canZoom = true;
+	commentManagerUI->addExistingItems();
+	addAndMakeVisible(commentManagerUI.get(), 0);
+
+	setShowAddButton(false);
 }
 
 DashboardItemManagerUI::~DashboardItemManagerUI()
 {
 	if(!inspectable.wasObjectDeleted()) manager->removeAsyncContainerListener(this);
 	if(DashboardManager::getInstanceWithoutCreating() != nullptr) DashboardManager::getInstance()->snapping->removeAsyncParameterListener(this);
+}
+
+void DashboardItemManagerUI::resized()
+{
+	BaseManagerViewUI::resized();
+
+	addItemBT->setBounds(Rectangle<int>(0, 0, 50, 50));
+
+	if (commentManagerUI != nullptr)
+	{
+		commentManagerUI->viewOffset = viewOffset;
+		commentManagerUI->setBounds(getLocalBounds());
+		commentManagerUI->resized();
+	}
+}
+
+void DashboardItemManagerUI::setViewZoom(float value)
+{
+	BaseManagerViewUI::setViewZoom(value);
+	if (commentManagerUI != nullptr) commentManagerUI->setViewZoom(value);
+}
+
+void DashboardItemManagerUI::updateItemsVisibility()
+{
+	BaseManagerViewUI::updateItemsVisibility();
+	if (commentManagerUI != nullptr) commentManagerUI->updateItemsVisibility();
 }
 
 void DashboardItemManagerUI::paint(Graphics& g)
@@ -78,6 +110,13 @@ bool DashboardItemManagerUI::isInterestedInDragSource(const SourceDetails & drag
 
 void DashboardItemManagerUI::itemDropped(const SourceDetails & details)
 {
+	String type = details.description.getProperty("type", "").toString();
+	if (type == "Comment")
+	{
+		commentManagerUI->itemDropped(details);
+		return;
+	}
+
 	BaseManagerViewUI::itemDropped(details);
 
 	if (details.sourceComponent->getParentComponent() == this) return;
@@ -85,7 +124,7 @@ void DashboardItemManagerUI::itemDropped(const SourceDetails & details)
 	InspectableContentComponent * icc = dynamic_cast<InspectableContentComponent *>(details.sourceComponent.get());
 	if (icc != nullptr && icc->inspectable != nullptr)
 	{
-		BaseItem * bi = dynamic_cast<BaseItem *>(icc->inspectable.get());
+		BaseItem* bi = dynamic_cast<BaseItem*>(icc->inspectable.get());
 		if (bi != nullptr)
 		{
 			manager->addItem(bi->createDashboardItem(), getViewMousePosition().toFloat());
@@ -111,8 +150,23 @@ void DashboardItemManagerUI::itemDropped(const SourceDetails & details)
 void DashboardItemManagerUI::showMenuAndAddItem(bool fromAddButton, Point<int> mousePos)
 {
 	if (!DashboardManager::getInstance()->editMode->boolValue()) return;
-	BaseManagerViewUI::showMenuAndAddItem(fromAddButton, mousePos);
+	//BaseManagerViewUI::showMenuAndAddItem(fromAddButton, mousePos);
 
+	PopupMenu menu;
+	menu.addItem(-1, "Add Group");
+	menu.addItem(-2, "Add Comment");
+	menu.addSeparator();
+
+	manager->managerFactory->buildPopupMenu();
+	menu.addSubMenu("Add Item", manager->managerFactory->getMenu());
+
+	if (int result = menu.show())
+	{
+		Point<float> p = getViewPos(mousePos);
+		if (result == -1) manager->addItem(new DashboardGroupItem(), p);
+		else if (result == -2) manager->commentManager.addItem(p);
+		else manager->addItem(manager->managerFactory->createFromMenuResult(result), p);
+	}
 }
 
 BaseItemMinimalUI<DashboardItem> * DashboardItemManagerUI::createUIForItem(DashboardItem * item)

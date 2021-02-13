@@ -1,4 +1,3 @@
-#include "DashboardTriggerItem.h"
 DashboardTriggerItem::DashboardTriggerItem(Trigger * item) :
 	DashboardControllableItem(item),
 	trigger(item)

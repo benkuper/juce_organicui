@@ -12,7 +12,8 @@ DoubleSliderUI::DoubleSliderUI(Point2DParameter* parameter) :
 	ParameterUI(parameter),
 	p2d(parameter),
 	xParam("X", "xParam", parameter->x, parameter->minimumValue[0], parameter->maximumValue[0]),
-	yParam("Y", "yParam", parameter->y, parameter->minimumValue[1], parameter->maximumValue[1])
+	yParam("Y", "yParam", parameter->y, parameter->minimumValue[1], parameter->maximumValue[1]),
+	isUpdatingFromParam(false)
 {
 
 	showEditWindowOnDoubleClick = false;
@@ -158,8 +159,10 @@ void DoubleSliderUI::showEditRangeWindowInternal()
 void DoubleSliderUI::rangeChanged(Parameter* p)
 {
 	if (p != parameter) return;
+	isUpdatingFromParam = true;
 	xParam.setRange(parameter->minimumValue[0], parameter->maximumValue[0]);
 	yParam.setRange(parameter->minimumValue[1], parameter->maximumValue[1]);
+	isUpdatingFromParam = false;
 }
 
 void DoubleSliderUI::updateUIParamsInternal()
@@ -174,14 +177,16 @@ void DoubleSliderUI::newMessage(const Parameter::ParameterEvent& e)
 
 	if (e.parameter == parameter)
 	{
+		isUpdatingFromParam = true;
 		xParam.setValue(((Point2DParameter*)e.parameter)->x);
 		yParam.setValue(((Point2DParameter*)e.parameter)->y);
+		isUpdatingFromParam = false;
 	}
-	else if (isInteractable())
+	else if (isInteractable() &&!isUpdatingFromParam)
 	{
 		if (e.parameter == &xParam || e.parameter == &yParam)
 		{
-			if (xParam.floatValue() != p2d->x || yParam.floatValue() != p2d->y ) 
+			if (xParam.floatValue() != p2d->x || yParam.floatValue() != p2d->y)
 			{
 				if (!isMouseButtonDown(true) && !UndoMaster::getInstance()->isPerformingUndoRedo()) p2d->setUndoablePoint(p2d->x, p2d->y, xParam.floatValue(), yParam.floatValue());
 				else p2d->setPoint(xParam.floatValue(), yParam.floatValue());
