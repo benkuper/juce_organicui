@@ -264,9 +264,7 @@ void OutlinerItem::setParentsHaveHideInRemote(bool value)
 	}
 
 	itemListeners.call(&OutlinerItemListener::hideRemoteChanged);
-
 }
-
 
 
 // OutlinerItemComponent
