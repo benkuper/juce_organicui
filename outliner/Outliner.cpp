@@ -114,7 +114,6 @@ void Outliner::buildTree(OutlinerItem * parentItem, ControllableContainer * pare
 	parentContainer->controllables.getLock().enter();
 	for (auto &c : parentContainer->controllables)
 	{
-		if (c->hideInOutliner) continue;
 		OutlinerItem * cItem = new OutlinerItem(c);
 		parentItem->addSubItem(cItem);
 	}

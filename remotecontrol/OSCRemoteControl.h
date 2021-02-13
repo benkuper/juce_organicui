@@ -15,11 +15,22 @@
 #include "servus/servus.h"
 #endif
 
+#if ORGANICUI_USE_WEBSERVER
+#include <juce_simpleweb/juce_simpleweb.h>
+#include "OSCInputHelper.h"
+#endif
+
 class OSCRemoteControl :
 	public EnablingControllableContainer,
 #if ORGANICUI_USE_SERVUS
 	public Thread,
 #endif
+
+#if ORGANICUI_USE_WEBSERVER
+	public SimpleWebSocketServer::Listener,
+	public SimpleWebSocketServer::RequestHandler,
+#endif
+
 	public OSCReceiver::Listener<OSCReceiver::RealtimeCallback>
 
 {
@@ -36,6 +47,11 @@ public:
 
 #if ORGANICUI_USE_SERVUS
 	servus::Servus servus;
+
+#if ORGANICUI_USE_WEBSERVER
+	servus::Servus oscQueryServus;
+#endif
+
 	void setupZeroconf();
 #endif
 
@@ -48,6 +64,18 @@ public:
 
 #if ORGANICUI_USE_SERVUS
 	void run() override;
+#endif
+
+#if ORGANICUI_USE_WEBSERVER
+	std::unique_ptr<SimpleWebSocketServer> server;
+	void setupServer();
+	void handleHTTPRequest(std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request) override;
+	var getOSCQueryDataForContainer(ControllableContainer* cc);
+	var getOSCQueryDataForControllable(Controllable* c);
+
+	void connectionOpened(const String& id) override;
+	void messageReceived(const String& id, const String& message) override;
+	void connectionClosed(const String& id, int status, const String& reason) override;
 #endif
 
 	class RemoteControlListener

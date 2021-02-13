@@ -609,23 +609,16 @@ void ControllableContainer::updateChildrenControlAddress()
 
 }
 
-Array<WeakReference<Controllable>> ControllableContainer::getAllControllables(bool recursive, bool getNotExposed)
+Array<WeakReference<Controllable>> ControllableContainer::getAllControllables(bool recursive)
 {
-	Array<WeakReference<Controllable>> result;
-	
-	for (auto& c : controllables)
-	{
-		if (getNotExposed || c->isControllableExposed) result.add(c);
-	}
-	
-
+	Array<WeakReference<Controllable>> result(controllables.getRawDataPointer(), controllables.size());
 	
 	if (recursive)
 	{
 		for (auto& cc : controllableContainers)
 		{
 			if (cc.wasObjectDeleted() || cc.get() == nullptr) continue;
-			result.addArray(cc->getAllControllables(true, getNotExposed));
+			result.addArray(cc->getAllControllables(true));
 		}
 	}
 	
@@ -634,27 +627,19 @@ Array<WeakReference<Controllable>> ControllableContainer::getAllControllables(bo
 
 }
 
-Array<WeakReference<Parameter>> ControllableContainer::getAllParameters(bool recursive, bool getNotExposed)
+Array<WeakReference<Parameter>> ControllableContainer::getAllParameters(bool recursive)
 {
 	Array<WeakReference<Parameter>> result;
 
-	
 	for (auto& c : controllables)
 	{
 		if (c->type == Controllable::Type::TRIGGER) continue;
-		if (getNotExposed || c->isControllableExposed) {
-			if (Parameter* cc = dynamic_cast<Parameter*>(c)) {
-				result.add(cc);
-			}
-		}
+		result.add((Parameter *)c);
 	}
-	
 
 	if (recursive)
 	{
-		
-		for (auto& cc : controllableContainers) result.addArray(cc->getAllParameters(true, getNotExposed));
-		
+		for (auto& cc : controllableContainers) result.addArray(cc->getAllParameters(true));	
 	}
 
 	return result;
@@ -677,16 +662,16 @@ Array<WeakReference<ControllableContainer>> ControllableContainer::getAllContain
 
 
 
-Controllable* ControllableContainer::getControllableForAddress(const String& address, bool recursive, bool getNotExposed)
+Controllable* ControllableContainer::getControllableForAddress(const String& address, bool recursive)
 {
 	StringArray addrArray;
 	addrArray.addTokens(address.startsWith("/") ? address : "/" + address, juce::StringRef("/"), juce::StringRef("\""));
 	addrArray.remove(0);
 
-	return getControllableForAddress(addrArray, recursive, getNotExposed);
+	return getControllableForAddress(addrArray, recursive);
 }
 
-Controllable* ControllableContainer::getControllableForAddress(StringArray addressSplit, bool recursive, bool getNotExposed)
+Controllable* ControllableContainer::getControllableForAddress(StringArray addressSplit, bool recursive)
 {
 	if (addressSplit.size() == 0) jassertfalse; // SHOULD NEVER BE THERE !
 
@@ -694,13 +679,7 @@ Controllable* ControllableContainer::getControllableForAddress(StringArray addre
 
 	if (isTargetAControllable)
 	{
-		Controllable* c = getControllableByName(addressSplit[0], false, true);
-		if (c != nullptr)
-		{
-			if (c->isControllableExposed || getNotExposed) return c;
-			else return nullptr;
-
-		}
+		if (Controllable* c = getControllableByName(addressSplit[0], false, true)) return c;
 
 	}
 	else  //if recursive here ?
@@ -709,7 +688,7 @@ Controllable* ControllableContainer::getControllableForAddress(StringArray addre
 		if (cc != nullptr)
 		{
 			addressSplit.remove(0);
-			return cc->getControllableForAddress(addressSplit, recursive, getNotExposed);
+			return cc->getControllableForAddress(addressSplit, recursive);
 		}
 
 	}
@@ -740,7 +719,6 @@ void ControllableContainer::dispatchFeedback(Controllable* c)
 {
 	//    @ben removed else here to enable containerlistener call back of non root (proxies) is it overkill?
 	if (parentContainer != nullptr) { parentContainer->dispatchFeedback(c); }
-	if (!c->isControllableExposed) return;
 
 	controllableContainerListeners.call(&ControllableContainerListener::controllableFeedbackUpdate, this, c);
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableFeedbackUpdate, this, c));
@@ -751,7 +729,6 @@ void ControllableContainer::dispatchState(Controllable* c)
 	onControllableStateChanged(c);
 
 	if (parentContainer != nullptr) { parentContainer->dispatchState(c); }
-	if (!c->isControllableExposed) return;
 
 	controllableContainerListeners.call(&ControllableContainerListener::controllableStateUpdate, this, c);
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableStateUpdate, this, c));
@@ -797,7 +774,7 @@ void ControllableContainer::triggerTriggered(Trigger* t)
 	else onExternalTriggerTriggered(t);
 
 
-	if (t->isControllableExposed) dispatchFeedback(t);
+	dispatchFeedback(t);
 }
 
 void ControllableContainer::controllableFeedbackUpdate(ControllableContainer* cc, Controllable* c)
@@ -880,7 +857,7 @@ var ControllableContainer::getJSONData()
 	var paramsData;
 
 
-	Array<WeakReference<Controllable>> cont = getAllControllables(false, true);
+	Array<WeakReference<Controllable>> cont = getAllControllables(false);
 
 	
 	for (auto& wc : cont) {

@@ -1,3 +1,4 @@
+#include "OSCRemoteControl.h"
 /*
   ==============================================================================
 
@@ -15,8 +16,13 @@ static OrganicApplication& getApp() { return *dynamic_cast<OrganicApplication*>(
 OSCRemoteControl::OSCRemoteControl() :
 	EnablingControllableContainer("OSC Remote Control")
 #if ORGANICUI_USE_SERVUS
-	,Thread("Global Zeroconf")
-	,servus("_osc._udp")
+	, Thread("Global Zeroconf")
+	, servus("_osc._udp")
+
+#if ORGANICUI_USE_WEBSERVER
+	, oscQueryServus("_oscjson._tcp")
+#endif
+
 #endif
 {
 
@@ -37,6 +43,15 @@ OSCRemoteControl::~OSCRemoteControl()
 #if ORGANICUI_USE_SERVUS
 	stopThread(1000);
 #endif
+
+#if ORGANICUI_USE_WEBSERVER
+	if (server != nullptr)
+	{
+		server->stop();
+		server.reset();
+	}
+#endif
+
 }
 
 void OSCRemoteControl::setupReceiver()
@@ -50,14 +65,18 @@ void OSCRemoteControl::setupReceiver()
 
 	//if (!receiveCC->enabled->boolValue()) return;
 	bool result = receiver.connect(localPort->intValue());
+	
 
 	if (result)
 	{
+		setupServer();
+
 		NLOG(niceName, "Now receiving on port : " + localPort->stringValue());
 #if ORGANICUI_USE_SERVUS
 		setupZeroconf();
 #endif
-	} else
+	}
+	else
 	{
 		NLOGERROR(niceName, "Error binding port " + localPort->stringValue());
 	}
@@ -67,10 +86,10 @@ void OSCRemoteControl::setupReceiver()
 	IPAddress::findAllAddresses(ad);
 
 	Array<String> ips;
-	for (auto &a : ad) ips.add(a.toString());
+	for (auto& a : ad) ips.add(a.toString());
 	ips.sort();
 	String s = "Local IPs:";
-	for (auto &ip : ips) s += String("\n > ") + ip;
+	for (auto& ip : ips) s += String("\n > ") + ip;
 
 	NLOG(niceName, s);
 }
@@ -79,7 +98,7 @@ void OSCRemoteControl::setupReceiver()
 void OSCRemoteControl::setupZeroconf()
 {
 	if (Engine::mainEngine->isClearing || localPort == nullptr) return;
-	if(!isThreadRunning()) startThread();
+	if (!isThreadRunning()) startThread();
 }
 #endif
 
@@ -126,7 +145,7 @@ void OSCRemoteControl::processMessage(const OSCMessage& m)
 		}
 		else
 		{
-			if(Engine::mainEngine->getFile().existsAsFile()) Engine::mainEngine->save(false, false);
+			if (Engine::mainEngine->getFile().existsAsFile()) Engine::mainEngine->save(false, false);
 			else
 			{
 				File f = File::getSpecialLocation(File::userDocumentsDirectory).getNonexistentChildFile(getApp().getApplicationName() + "/default", Engine::mainEngine->fileExtension, true);
@@ -168,21 +187,21 @@ void OSCRemoteControl::processMessage(const OSCMessage& m)
 	}
 }
 
-void OSCRemoteControl::onContainerParameterChanged(Parameter * p)
+void OSCRemoteControl::onContainerParameterChanged(Parameter* p)
 {
 	if (p == enabled || p == localPort) setupReceiver();
 }
 
-void OSCRemoteControl::oscMessageReceived(const OSCMessage & m)
+void OSCRemoteControl::oscMessageReceived(const OSCMessage& m)
 {
 	if (!enabled->boolValue()) return;
 	processMessage(m);
 }
 
-void OSCRemoteControl::oscBundleReceived(const OSCBundle & b)
+void OSCRemoteControl::oscBundleReceived(const OSCBundle& b)
 {
 	if (!enabled->boolValue()) return;
-	for (auto &m : b)
+	for (auto& m : b)
 	{
 		processMessage(m.getMessage());
 	}
@@ -199,6 +218,12 @@ void OSCRemoteControl::run()
 		servus.withdraw();
 		servus.announce(portToAdvertise, nameToAdvertise.toStdString());
 
+
+#if ORGANICUI_USE_WEBSERVER
+		oscQueryServus.withdraw();
+		oscQueryServus.announce(portToAdvertise, nameToAdvertise.toStdString());
+#endif
+
 		if (localPort->intValue() != portToAdvertise)
 		{
 			DBG("Name or port changed during advertise, readvertising");
@@ -207,4 +232,196 @@ void OSCRemoteControl::run()
 
 	NLOG(niceName, "Zeroconf service created : " << nameToAdvertise << ":" << portToAdvertise);
 }
+
+#if ORGANICUI_USE_WEBSERVER
+void OSCRemoteControl::setupServer()
+{
+	server.reset();
+
+	server.reset(new SimpleWebSocketServer());
+	server->handler = this;
+	server->addWebSocketListener(this);
+	server->start(localPort->intValue());
+}
+
+void OSCRemoteControl::handleHTTPRequest(std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request)
+{
+	var data;
+	if (String(request->path).contains("HOST_INFO"))
+	{
+		var extensionData(new DynamicObject());
+		extensionData.getDynamicObject()->setProperty("ACCESS", true);
+		extensionData.getDynamicObject()->setProperty("CLIPMODE", false);
+		extensionData.getDynamicObject()->setProperty("CRITICAL", false);
+		extensionData.getDynamicObject()->setProperty("RANGE", true);
+		extensionData.getDynamicObject()->setProperty("TAGS", false);
+		extensionData.getDynamicObject()->setProperty("TYPE", true);
+		extensionData.getDynamicObject()->setProperty("UNIT", false);
+		extensionData.getDynamicObject()->setProperty("VALUE", true);
+		extensionData.getDynamicObject()->setProperty("LISTEN", true);
+
+		var data(new DynamicObject());
+		data.getDynamicObject()->setProperty("EXTENSIONS", extensionData);
+		data.getDynamicObject()->setProperty("NAME", ProjectInfo::projectName);
+		data.getDynamicObject()->setProperty("OSC_PORT", localPort->intValue());
+		data.getDynamicObject()->setProperty("OSC_TRANSPORT", "UDP");
+	}
+	else
+	{
+		data = getOSCQueryDataForContainer(Engine::mainEngine);
+	}
+
+	
+	String dataStr = JSON::toString(data);
+
+	SimpleWeb::CaseInsensitiveMultimap header;
+	header.emplace("Content-Length", String(dataStr.length()).toStdString());
+	header.emplace("Content-Type",  "application/json");
+	header.emplace("Accept-range", "bytes");
+
+	response->write(SimpleWeb::StatusCode::success_ok, header);
+	*response << dataStr;
+}
+
+var OSCRemoteControl::getOSCQueryDataForContainer(ControllableContainer* cc)
+{
+	var data(new DynamicObject());
+
+	data.getDynamicObject()->setProperty("DESCRIPTION", cc->niceName);
+	data.getDynamicObject()->setProperty("FULL_PATH", cc->getControlAddress());
+	data.getDynamicObject()->setProperty("ACCESS", 0); //container, no value directly associated
+
+	var contentData(new DynamicObject());
+
+	for (auto& childC : cc->controllables)
+	{
+		if (childC->hideInRemoteControl) continue;
+		contentData.getDynamicObject()->setProperty(childC->shortName, getOSCQueryDataForControllable(childC));
+	}
+
+	for (auto& childCC : cc->controllableContainers)
+	{
+		if (childCC->hideInRemoteControl) continue;
+		contentData.getDynamicObject()->setProperty(childCC->shortName, getOSCQueryDataForContainer(childCC));
+	}
+
+	data.getDynamicObject()->setProperty("CONTENTS", contentData);
+
+	return data;
+}
+
+var OSCRemoteControl::getOSCQueryDataForControllable(Controllable* c)
+{
+	var data(new DynamicObject());
+
+	data.getDynamicObject()->setProperty("DESCRIPTION", c->niceName);
+	data.getDynamicObject()->setProperty("FULL_PATH", c->getControlAddress());
+	data.getDynamicObject()->setProperty("ACCESS", c->isControllableFeedbackOnly ? 1 : 3);
+
+	String typeString = "";
+	var value;
+	var range;
+
+	if (c->type == Controllable::TRIGGER) typeString = "N";
+	else
+	{
+		Parameter* p = (Parameter*)c;
+
+		if (p->hasRange())
+		{
+			for (int i = 0; i < p->minimumValue.size(); i++)
+			{
+				var rData(new DynamicObject());
+				rData.getDynamicObject()->setProperty("MIN", p->minimumValue[i]);
+				rData.getDynamicObject()->setProperty("MAX", p->maximumValue[i]);
+				range.append(rData);
+			}
+		}
+
+		switch (p->type)
+		{
+		case Parameter::BOOL:
+			value.append(p->boolValue());
+			typeString = "T";
+			break;
+
+		case Parameter::INT:
+		{
+			//add range
+			value.append(p->intValue());
+
+			typeString = "i";
+		}
+		break;
+
+		case Parameter::FLOAT:
+			value.append(p->floatValue());
+			typeString = "f";
+			break;
+
+		case Parameter::STRING:
+			typeString = "s";
+			value.append(p->stringValue());
+			break;
+
+		case Parameter::POINT2D:
+			value.append(((Point2DParameter*)p)->x);
+			value.append(((Point2DParameter*)p)->y);
+			typeString = "ff";
+			break;
+
+		case Parameter::POINT3D:
+			value.append(((Point3DParameter*)p)->x);
+			value.append(((Point3DParameter*)p)->y);
+			value.append(((Point3DParameter*)p)->z);
+			typeString = "fff";
+			break;
+
+		case Parameter::COLOR:
+			value.append(((ColorParameter*)p)->getColor().toString());
+			typeString = "r";
+			break;
+
+
+		case Parameter::ENUM:
+		{
+			typeString = "s";
+
+			EnumParameter* ep = (EnumParameter*)p;
+			value.append(ep->getValueData().toString());
+
+			StringArray keys = ep->getAllKeys();
+			var enumRange;
+			for (auto& k : keys) enumRange.append(k);
+			var rData(new DynamicObject());
+			rData.getDynamicObject()->setProperty("VALS", rData);
+			range.append(rData);
+		}
+		break;
+		}
+	}
+
+	data.getDynamicObject()->setProperty("TYPE", typeString);
+	if (!value.isVoid()) data.getDynamicObject()->setProperty("VALUE", value);
+	if (!range.isVoid()) data.getDynamicObject()->setProperty("RANGE", range);
+
+	return data;
+}
+
+void OSCRemoteControl::connectionOpened(const String& id)
+{
+	NLOG(niceName, "Got a connection from " << id);
+}
+
+void OSCRemoteControl::messageReceived(const String& id, const String& message)
+{
+	NLOG(niceName, "Got a message from " << id << " : " << message);
+}
+
+void OSCRemoteControl::connectionClosed(const String& id, int status, const String& reason)
+{
+	NLOG(niceName, "Connection close from " << id << " : " << status << " (" << reason << ")");
+}
+#endif
+
 #endif

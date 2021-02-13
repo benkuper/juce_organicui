@@ -41,9 +41,7 @@ public:
 	bool canBeDisabledByUser;
 	bool descriptionIsEditable;
 	bool hasCustomShortName;
-	bool isControllableExposed;
 	bool isControllableFeedbackOnly;
-	bool hideInOutliner;
 	bool includeInScriptObject;
 
 	String controlAddress;

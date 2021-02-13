@@ -417,7 +417,7 @@ InspectableEditor * GenericControllableContainerEditor::getEditorUIForControllab
 
 InspectableEditor * GenericControllableContainerEditor::addControllableUI(Controllable * c, bool resize)
 {
-	if (c == nullptr || !c->isControllableExposed || c->hideInEditor) return nullptr;
+	if (c == nullptr || c->hideInEditor) return nullptr;
 
 	InspectableEditor * cui = getEditorUIForControllable(c);
 	

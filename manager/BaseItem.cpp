@@ -33,17 +33,14 @@ BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts
 
 	//For UI
 	miniMode = addBoolParameter("MiniMode", "Set the mini mode", false);
-	miniMode->hideInOutliner = true;
 	miniMode->hideInEditor = true;
 
 	listUISize = addFloatParameter("ListSize", "Size in list", 24, 0, 5000);
 	listUISize->hideInEditor = true;
-	listUISize->hideInOutliner = true;
 
 	viewUIPosition = addPoint2DParameter("ViewUIPosition", "Position the view");
 	//viewUIPosition->setBounds(-100000, -100000, 100000, 100000);
 	viewUIPosition->hideInEditor = true;
-	viewUIPosition->hideInOutliner = true;
 
 	viewUISize = addPoint2DParameter("ViewUISize", "Size in the view");
 	//viewUISize->setBounds(30, 60, 10000, 10000);
@@ -54,7 +51,6 @@ BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts
 	viewUISize->resetValue();
 	viewUISize->defaultValue = viewUISize->getValue();
 	viewUISize->hideInEditor = true;
-	viewUISize->hideInOutliner = true;
 
 	isUILocked = addBoolParameter("Locked", "if checked, item is locked in UI", false);
 	isUILocked->hideInEditor = true;

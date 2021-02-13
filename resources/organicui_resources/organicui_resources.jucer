@@ -2,9 +2,9 @@
 
 <JUCERPROJECT id="nJCeN1" name="organicui_resources" projectType="guiapp" version="1.0.0"
               bundleIdentifier="com.benkuper.organicui_resources" includeBinaryInAppConfig="1"
-              jucerVersion="5.4.7" displaySplashScreen="1" reportAppUsage="1"
-              splashScreenColour="Dark" cppLanguageStandard="11" companyCopyright=""
-              binaryDataNamespace="OrganicUIBinaryData">
+              displaySplashScreen="1" reportAppUsage="1" splashScreenColour="Dark"
+              cppLanguageStandard="11" companyCopyright="" binaryDataNamespace="OrganicUIBinaryData"
+              jucerFormatVersion="1">
   <MAINGROUP id="gdPnjI" name="organicui_resources">
     <GROUP id="{471DD8BF-5339-7ED5-BF79-1FCB0A8A6B3D}" name="Resources">
       <FILE id="zCaAEj" name="add.png" compile="0" resource="1" file="Resources/add.png"/>
@@ -22,6 +22,7 @@
       <FILE id="yRr25C" name="down.png" compile="0" resource="1" file="Resources/down.png"/>
       <FILE id="UEC663" name="duplicate.png" compile="0" resource="1" file="Resources/duplicate.png"/>
       <FILE id="JhfeGX" name="edit.png" compile="0" resource="1" file="Resources/edit.png"/>
+      <FILE id="gfgQyR" name="eye.png" compile="0" resource="1" file="Resources/eye.png"/>
       <FILE id="bcK2wO" name="file.png" compile="0" resource="1" file="Resources/file.png"/>
       <FILE id="Lih37O" name="in.png" compile="0" resource="1" file="Resources/in.png"/>
       <FILE id="KnEPmE" name="minus.png" compile="0" resource="1" file="Resources/minus.png"/>

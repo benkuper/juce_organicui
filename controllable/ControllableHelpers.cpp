@@ -59,8 +59,6 @@ void ControllableChooserPopupMenu::populateMenu(PopupMenu * subMenu, Controllabl
 	{
 		if (c == nullptr) continue;
 
-		if (!c->isControllableExposed) continue;
-
 		if (excludeTypesFilter.contains(c->getTypeString())) continue;
 		if (!typesFilter.isEmpty() && !typesFilter.contains(c->getTypeString())) continue;
 

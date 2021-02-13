@@ -27,6 +27,7 @@ public:
 	bool showInspectorOnSelect;
 
 	bool hideInEditor;
+	bool hideInRemoteControl;
 
 	bool isHighlighted;
 

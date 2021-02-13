@@ -111,11 +111,11 @@ public:
 	void updateChildrenControlAddress();
 
 
-	virtual Array<WeakReference<Controllable>> getAllControllables(bool recursive = false, bool getNotExposed = false);
-	virtual Array<WeakReference<Parameter>> getAllParameters(bool recursive = false, bool getNotExposed = false);
+	virtual Array<WeakReference<Controllable>> getAllControllables(bool recursive = false);
+	virtual Array<WeakReference<Parameter>> getAllParameters(bool recursive = false);
 	virtual Array<WeakReference<ControllableContainer>> getAllContainers(bool recursive = false);
-	virtual Controllable * getControllableForAddress(const String &address, bool recursive = true, bool getNotExposed = false);
-	virtual Controllable * getControllableForAddress(StringArray addressSplit, bool recursive = true, bool getNotExposed = false);
+	virtual Controllable * getControllableForAddress(const String &address, bool recursive = true);
+	virtual Controllable * getControllableForAddress(StringArray addressSplit, bool recursive = true);
 	bool containsControllable(Controllable * c, int maxSearchLevels = -1);
 	String getControlAddress(ControllableContainer * relativeTo = nullptr);
 
