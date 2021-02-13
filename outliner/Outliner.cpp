@@ -21,7 +21,7 @@ Outliner::Outliner(const String &contentName) :
 
 	showHiddenContainers = false;
 
-	rootItem.reset(new OutlinerItem(Engine::mainEngine));
+	rootItem.reset(new OutlinerItem(Engine::mainEngine, false));
 	treeView.setRootItem(rootItem.get());
 	treeView.setRootItemVisible(false);
 	addAndMakeVisible(treeView);
@@ -83,17 +83,19 @@ void Outliner::rebuildTree(ControllableContainer* fromContainer)
 	fromItem->clearSubItems();
 
 	std::unique_ptr<XmlElement> os = treeView.getOpennessState(true);
-	buildTree(fromItem, fromContainer);
+	buildTree(fromItem, fromContainer, false);
 	rootItem->setOpen(true);
 
 	treeView.restoreOpennessState(*os, true);
 }
 
-void Outliner::buildTree(OutlinerItem * parentItem, ControllableContainer * parentContainer)
+void Outliner::buildTree(OutlinerItem * parentItem, ControllableContainer * parentContainer, bool parentsHaveHideInRemote)
 {
 	if (parentContainer == nullptr) return;
 	Array<WeakReference<ControllableContainer>> childContainers = parentContainer->getAllContainers(false);
 	
+	parentsHaveHideInRemote |= parentContainer->hideInRemoteControl;
+
 	parentContainer->controllableContainers.getLock().enter();
 	for (auto &cc : parentContainer->controllableContainers)
 	{
@@ -103,10 +105,11 @@ void Outliner::buildTree(OutlinerItem * parentItem, ControllableContainer * pare
 		}
 		else
 		{*/
-			OutlinerItem * ccItem = new OutlinerItem(cc);
+
+			OutlinerItem * ccItem = new OutlinerItem(cc, parentsHaveHideInRemote);
 			parentItem->addSubItem(ccItem);
 
-			buildTree(ccItem, cc);
+			buildTree(ccItem, cc, parentsHaveHideInRemote);
 		//}
 	}
 	parentContainer->controllableContainers.getLock().exit();
@@ -114,7 +117,7 @@ void Outliner::buildTree(OutlinerItem * parentItem, ControllableContainer * pare
 	parentContainer->controllables.getLock().enter();
 	for (auto &c : parentContainer->controllables)
 	{
-		OutlinerItem * cItem = new OutlinerItem(c);
+		OutlinerItem * cItem = new OutlinerItem(c, parentsHaveHideInRemote);
 		parentItem->addSubItem(cItem);
 	}
 	parentContainer->controllables.getLock().exit();
@@ -157,22 +160,24 @@ void Outliner::childStructureChanged(ControllableContainer *)
 
 // OUTLINER ITEM
 
-OutlinerItem::OutlinerItem(WeakReference<ControllableContainer> _container) :
+OutlinerItem::OutlinerItem(WeakReference<ControllableContainer> _container, bool parentsHaveHideInRemote) :
 	InspectableContent(_container),
 	isContainer(true),
 	itemName(_container->niceName),
 	container(_container),
-	controllable(nullptr)
+	controllable(nullptr),
+	parentsHaveHideInRemote(parentsHaveHideInRemote)
 {
 	container->addControllableContainerListener(this);
 }
 
-OutlinerItem::OutlinerItem(WeakReference<Controllable> _controllable) :
+OutlinerItem::OutlinerItem(WeakReference<Controllable> _controllable, bool parentsHaveHideInRemote) :
 	InspectableContent(_controllable),
 	isContainer(false),
 	itemName(_controllable->niceName),
 	container(nullptr),
-	controllable(_controllable)
+	controllable(_controllable),
+	parentsHaveHideInRemote(parentsHaveHideInRemote)
 {
 }
 
@@ -203,6 +208,15 @@ String OutlinerItem::getUniqueName() const
 	return n;
 }
 
+void OutlinerItem::childAddressChanged(ControllableContainer*)
+{
+	if (isContainer)
+	{
+		itemName = container->niceName;
+		itemListeners.call(&OutlinerItemListener::itemNameChanged);
+	}
+}
+
 
 void OutlinerItem::inspectableSelectionChanged(Inspectable * i)
 {
@@ -231,11 +245,27 @@ void OutlinerItem::inspectableSelectionChanged(Inspectable * i)
 
 }
 
-void OutlinerItemComponent::itemNameChanged()
+void OutlinerItem::setHideInRemote(bool value)
 {
-	label.setText(item->container->niceName, dontSendNotification);
+	for (int i = 0; i < getNumSubItems(); i++)
+	{
+		((OutlinerItem*)getSubItem(i))->setParentsHaveHideInRemote(inspectable->hideInRemoteControl || parentsHaveHideInRemote);
+	}
 }
 
+void OutlinerItem::setParentsHaveHideInRemote(bool value)
+{
+	if (parentsHaveHideInRemote == value) return;
+	parentsHaveHideInRemote = value;
+
+	for (int i = 0; i < getNumSubItems(); i++)
+	{
+		((OutlinerItem*)getSubItem(i))->setParentsHaveHideInRemote(inspectable->hideInRemoteControl || parentsHaveHideInRemote);
+	}
+
+	itemListeners.call(&OutlinerItemListener::hideRemoteChanged);
+
+}
 
 
 
@@ -251,9 +281,13 @@ OutlinerItemComponent::OutlinerItemComponent(OutlinerItem * _item) :
 	setTooltip(item->isContainer ? item->container->getControlAddress() : item->controllable->description + "\nControl Address : " + item->controllable->controlAddress);
 	addAndMakeVisible(&label);
 
+	color = BLUE_COLOR;
+	if (item->isContainer) color = item->container->nameCanBeChangedByUser ? HIGHLIGHT_COLOR : TEXT_COLOR;
+
 
 	label.setFont(label.getFont().withHeight(12));
 	label.setColour(label.backgroundWhenEditingColourId, Colours::white);
+	label.setColour(Label::textColourId, inspectable->isSelected ? Colours::grey.darker() : color);
 
 
 	if (item->isContainer && item->container->nameCanBeChangedByUser)
@@ -266,6 +300,18 @@ OutlinerItemComponent::OutlinerItemComponent(OutlinerItem * _item) :
 	{
 		label.setInterceptsMouseClicks(false, false);
 	}
+
+	hideInRemoteBT.reset(AssetManager::getInstance()->getToggleBTImage(AssetManager::getInstance()->eyeImage));
+	hideInRemoteBT->setToggleState(!item->inspectable->hideInRemoteControl, dontSendNotification);
+	hideInRemoteBT->setAlpha(item->parentsHaveHideInRemote ? .5f : 1);
+	
+	hideInRemoteBT->setTooltip("Hide in Remote Control. If remote control is enabled in Preferences, this decides whether to expose or not this (and all its children) to the OSCQuery structure");
+
+	hideInRemoteBT->addListener(this);
+
+	addAndMakeVisible(hideInRemoteBT.get());
+
+	resized();
 }
 
 OutlinerItemComponent::~OutlinerItemComponent()
@@ -275,35 +321,39 @@ OutlinerItemComponent::~OutlinerItemComponent()
 
 void OutlinerItemComponent::paint(Graphics & g)
 {
-	juce::Rectangle<int> r = getLocalBounds();
-
-	Colour c = BLUE_COLOR;
 	if (inspectable.wasObjectDeleted()) return;
-	if (item->isContainer) c = item->container->nameCanBeChangedByUser ? HIGHLIGHT_COLOR : TEXT_COLOR;
 
-
+	juce::Rectangle<int> r = getLocalBounds();
+	
 	int labelWidth = label.getFont().getStringWidth(label.getText());
 
-	if (item->isSelected())
+	if (inspectable->isSelected)
 	{
-		g.setColour(c);
+		g.setColour(color);
 		g.fillRoundedRectangle(r.withSize(labelWidth + 20, r.getHeight()).toFloat(), 2);
 	}
 
+}
+
+void OutlinerItemComponent::resized()
+{
+	Rectangle<int> r = getLocalBounds();
+	if (r.isEmpty()) return;
+	hideInRemoteBT->setBounds(r.removeFromRight(r.getHeight()).reduced(1));
 	r.removeFromLeft(3);
 	label.setBounds(r);
-	label.setColour(Label::textColourId, item->isSelected() ? Colours::grey.darker() : c);
 }
 
-
-void OutlinerItem::childAddressChanged(ControllableContainer *)
+void OutlinerItemComponent::buttonClicked(Button* b)
 {
-	if (isContainer)
+	if (b == hideInRemoteBT.get())
 	{
-		itemName = container->niceName;
-		itemListeners.call(&OutlinerItemListener::itemNameChanged);
+		item->inspectable->hideInRemoteControl = !item->inspectable->hideInRemoteControl;
+		hideInRemoteBT->setToggleState(!item->inspectable->hideInRemoteControl, dontSendNotification);
+		item->setHideInRemote(item->inspectable->hideInRemoteControl);
 	}
 }
+
 void OutlinerItemComponent::labelTextChanged(Label *)
 {
 	if (item.wasObjectDeleted()) return;
@@ -371,3 +421,20 @@ void OutlinerItemComponent::mouseDown(const MouseEvent &e)
 		}
 	}
 }
+
+void OutlinerItemComponent::inspectableSelectionChanged(Inspectable* i)
+{
+	label.setColour(Label::textColourId, inspectable->isSelected ? Colours::grey.darker() : color);
+	repaint();
+}
+
+void OutlinerItemComponent::itemNameChanged()
+{
+	label.setText(item->container->niceName, dontSendNotification);
+}
+
+void OutlinerItemComponent::hideRemoteChanged()
+{
+	hideInRemoteBT->setAlpha(item->parentsHaveHideInRemote ? .5f : 1);
+}
+

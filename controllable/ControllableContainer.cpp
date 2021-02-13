@@ -886,6 +886,9 @@ var ControllableContainer::getJSONData()
 
 	if (editorIsCollapsed) data.getDynamicObject()->setProperty("editorIsCollapsed", true); //only set if true to avoid too much data
 
+	if (hideInEditor) data.getDynamicObject()->setProperty("hideInEditor", hideInEditor);
+	if (hideInRemoteControl) data.getDynamicObject()->setProperty("hideInRemoteControl", hideInRemoteControl);
+
 	bool isOwned = (parentContainer != nullptr && parentContainer->ownedContainers.contains(this));
 	if (isOwned)
 	{
@@ -929,9 +932,13 @@ void ControllableContainer::loadJSONData(var data, bool createIfNotThere)
 	//if (data.getDynamicObject()->hasProperty("uid")) uid = data.getDynamicObject()->getProperty("uid");
 	if (data.getDynamicObject()->hasProperty("niceName")) setNiceName(data.getDynamicObject()->getProperty("niceName"));
 	if (data.getDynamicObject()->hasProperty("shortName")) setCustomShortName(data.getDynamicObject()->getProperty("shortName"));
-	if (data.getDynamicObject()->hasProperty("editorIsCollapsed")) editorIsCollapsed = data.getDynamicObject()->getProperty("editorIsCollapsed");
-	if (data.getDynamicObject()->hasProperty("removable")) isRemovableByUser = data.getDynamicObject()->getProperty("removable");
-	if (data.getDynamicObject()->hasProperty("includeTriggers")) includeTriggersInSaveLoad = data.getDynamicObject()->getProperty("includeTriggers");
+	
+	editorIsCollapsed = data.getProperty("editorIsCollapsed", editorIsCollapsed);
+	isRemovableByUser = data.getProperty("removable", isRemovableByUser);
+	includeTriggersInSaveLoad = data.getProperty("includeTriggers", includeTriggersInSaveLoad);
+	
+	hideInEditor = data.getProperty("hideInEditor", hideInEditor);
+	hideInRemoteControl = data.getProperty("hideInRemoteControl", hideInRemoteControl);
 
 	Array<var>* paramsData = data.getDynamicObject()->getProperty("parameters").getArray();
 

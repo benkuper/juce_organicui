@@ -20,6 +20,7 @@ public:
 	virtual ~AssetManager();
 
 	Image warningImage;
+	Image eyeImage;
 
 	ImageButton * getRemoveBT();
 	ImageButton * getConfigBT();

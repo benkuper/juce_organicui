@@ -16,7 +16,8 @@ class  OutlinerItemListener
 public:
 	/** Destructor. */
 	virtual ~OutlinerItemListener() {}
-	virtual void itemNameChanged() {};
+	virtual void itemNameChanged() {}
+	virtual void hideRemoteChanged() {}
 };
 
 class OutlinerItemComponent : 
@@ -24,7 +25,8 @@ class OutlinerItemComponent :
 	public SettableTooltipClient,
 	public ControllableContainerListener,
 	public OutlinerItemListener,
-	public Label::Listener
+	public Label::Listener,
+	public Button::Listener
 {
 public:
 	OutlinerItemComponent(OutlinerItem * item);
@@ -32,11 +34,23 @@ public:
 
 	WeakReference<OutlinerItem> item;
 	Label label;
+	Colour color;
+
+	std::unique_ptr<ImageButton> hideInRemoteBT;
 	
 	void paint(Graphics &g) override;
+	void resized() override;
 	void itemNameChanged() override;
+	void hideRemoteChanged() override;
+
+	void buttonClicked(Button* b) override;
+
 	void labelTextChanged(Label*) override;
 	void mouseDown(const MouseEvent &e) override;
+
+	void inspectableSelectionChanged(Inspectable * i) override;
+
+
 };
 
 class OutlinerItem :
@@ -45,12 +59,13 @@ class OutlinerItem :
 	public ControllableContainerListener
 {
 public:
-	OutlinerItem(WeakReference<ControllableContainer> container);
-	OutlinerItem(WeakReference<Controllable> controllable);
+	OutlinerItem(WeakReference<ControllableContainer> container, bool parentsHaveHideInRemote);
+	OutlinerItem(WeakReference<Controllable> controllable, bool parentsHaveHideInRemote);
 	~OutlinerItem();
 
 	bool isContainer;
 	String itemName;
+	bool parentsHaveHideInRemote;
 
 	WeakReference<ControllableContainer> container;
 	WeakReference<Controllable> controllable;
@@ -61,6 +76,9 @@ public:
 
 	String getUniqueName() const override;
 	void inspectableSelectionChanged(Inspectable * inspectable) override;
+
+	void setHideInRemote(bool value);
+	void setParentsHaveHideInRemote(bool value);
 	
 	void childAddressChanged(ControllableContainer *) override;
 
@@ -93,7 +111,7 @@ public:
 	void paint(Graphics &g) override;
 
 	void rebuildTree(ControllableContainer * fromContainer = nullptr);
-	void buildTree(OutlinerItem * parentItem, ControllableContainer * parentContainer);
+	void buildTree(OutlinerItem * parentItem, ControllableContainer * parentContainer, bool parentsHaveHideInRemote);
 
 	OutlinerItem* getItemForContainer(ControllableContainer* cc);
 

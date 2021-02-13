@@ -166,7 +166,7 @@ var Controllable::getJSONData(ControllableContainer * relativeTo)
 	data.getDynamicObject()->setProperty("controlAddress", getControlAddress(relativeTo));
 	
 	if (canBeDisabledByUser) data.getDynamicObject()->setProperty("enabled", enabled);
-
+	if (hideInRemoteControl) data.getDynamicObject()->setProperty("hideInRemoteControl", hideInRemoteControl);
 	if(userCanSetReadOnly) data.getDynamicObject()->setProperty("feedbackOnly", isControllableFeedbackOnly);
 
 	if (saveValueOnly) return data;
@@ -196,12 +196,13 @@ void Controllable::loadJSONData(var data)
 	if (data.getDynamicObject()->hasProperty("niceName")) setNiceName(data.getProperty("niceName", ""));
 	if (data.getDynamicObject()->hasProperty("shortName")) setCustomShortName(data.getProperty("shortName", ""));
 	if (data.getDynamicObject()->hasProperty("enabled")) setEnabled(data.getProperty("enabled", enabled));
-	if (data.getDynamicObject()->hasProperty("customizable")) isCustomizableByUser = data.getProperty("customizable", isCustomizableByUser);
-	if (data.getDynamicObject()->hasProperty("removable")) isRemovableByUser = data.getProperty("removable", false);
-	if (data.getDynamicObject()->hasProperty("description")) description = data.getProperty("description", description);
-	if (data.getDynamicObject()->hasProperty("hideInEditor")) hideInEditor = data.getProperty("hideInEditor", false);
+	isCustomizableByUser = data.getProperty("customizable", isCustomizableByUser);
+	isRemovableByUser = data.getProperty("removable", isRemovableByUser);
+	description = data.getProperty("description", description);
+	hideInEditor = data.getProperty("hideInEditor", hideInEditor);
+	hideInRemoteControl = data.getProperty("hideInRemoteControl", hideInRemoteControl);
 	if (data.getDynamicObject()->hasProperty("feedbackOnly")) setControllableFeedbackOnly(data.getProperty("feedbackOnly",false));
-	if (data.getDynamicObject()->hasProperty("customData")) customData = data.getProperty("customData", customData);
+	customData = data.getProperty("customData", customData);
 
 	loadJSONDataInternal(data);
 
