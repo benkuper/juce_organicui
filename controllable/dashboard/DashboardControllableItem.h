@@ -27,11 +27,11 @@ public:
 	virtual void checkGhost() override;
 
 	//override all to avoid sending events to the real parent container
-	virtual void controllableStateChanged(Controllable*);
-	virtual void controllableFeedbackStateChanged(Controllable*);
+	virtual void controllableStateChanged(Controllable*) override;
+	virtual void controllableFeedbackStateChanged(Controllable*) override;
 	virtual void controllableControlAddressChanged(Controllable* c) override;
-	virtual void controllableNameChanged(Controllable*);
-	virtual void askForRemoveControllable(Controllable*, bool /*addToUndo*/ = false);
+	virtual void controllableNameChanged(Controllable*) override;
+	virtual void askForRemoveControllable(Controllable*, bool /*addToUndo*/ = false) override;
 
 
 	virtual var getServerData() override;

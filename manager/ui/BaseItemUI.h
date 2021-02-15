@@ -123,7 +123,7 @@ BaseItemUI<T>::BaseItemUI(T * _item, Direction _resizeDirection, bool showMiniMo
 	itemLabel("itemLabel", dynamic_cast<BaseItem *>(this->inspectable.get())->niceName)
 {
 
-	setName(item->niceName);
+	setName(this->baseItem->niceName);
 
 	itemLabel.setColour(itemLabel.backgroundColourId, Colours::transparentWhite);
 	itemLabel.setColour(itemLabel.textColourId, TEXT_COLOR);
