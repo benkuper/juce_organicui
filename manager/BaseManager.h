@@ -81,6 +81,7 @@ public:
 	void askForSelectPreviousItem(BaseItem * item, bool addToSelection = false) override;
 	void askForSelectNextItem(BaseItem* item, bool addToSelection = false) override;
 
+	virtual var getExportSelectionData();
 	virtual var getJSONData() override;
 	virtual void loadJSONDataInternal(var data) override;
 	virtual void loadJSONDataManagerInternal(var data);
@@ -730,6 +731,19 @@ void BaseManager<T>::askForSelectNextItem(BaseItem* item, bool addToSelection)
 	int index = items.indexOf(dynamic_cast<T*>(item));
 	if (index == -1 || index >= items.size() - 1) return;
 	items[index + 1]->selectThis(addToSelection);
+}
+
+template<class T>
+var BaseManager<T>::getExportSelectionData()
+{
+	var data;
+	
+	for (auto& t : items)
+	{
+		if (t->isSavable && t->isSelected) data.append(t->getJSONData());
+	}
+
+	return data;
 }
 
 template<class T>
