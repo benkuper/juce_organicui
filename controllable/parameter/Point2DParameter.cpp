@@ -70,6 +70,12 @@ UndoableAction* Point2DParameter::setUndoablePoint(float oldX, float oldY, float
 
 void Point2DParameter::setValueInternal(var& _value)
 {
+	if (_value.size() < 2)
+	{
+		jassertfalse;
+		return;
+	}
+
 	Parameter::setValueInternal(_value);
 	x = (float)_value[0];
 	y = (float)_value[1];
