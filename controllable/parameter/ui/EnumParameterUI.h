@@ -13,7 +13,7 @@
 
 class EnumParameterUI : 
 	public ParameterUI, 
-	public EnumParameter::Listener, 
+	public EnumParameter::AsyncListener, 
 	public ComboBox::Listener
 {
 public:
@@ -31,8 +31,7 @@ public:
 
 	void resized() override;
 	
-	void enumOptionAdded(EnumParameter *, const String &key) override;
-	void enumOptionRemoved(EnumParameter *, const String &key) override;
+	void newMessage(const EnumParameter::EnumParameterEvent& e) override;
 
 	// Inherited via Listener
 	virtual void comboBoxChanged(ComboBox *) override;

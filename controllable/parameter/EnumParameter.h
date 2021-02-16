@@ -86,6 +86,7 @@ public:
 	void addEnumParameterListener(Listener* newListener) { enumListeners.add(newListener); }
 	void removeEnumParameterListener(Listener* listener) { enumListeners.remove(listener); }
 
+	DECLARE_ASYNC_EVENT(EnumParameter, EnumParameter, enumParameter, ENUM_LIST(ENUM_OPTION_ADDED, ENUM_OPTION_REMOVED))
 
 	static EnumParameter * create() { return new EnumParameter("new Enum Parameter",""); }
 	virtual String getTypeString() const override { return getTypeStringStatic(); }

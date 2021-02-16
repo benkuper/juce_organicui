@@ -1,4 +1,3 @@
-#include "EnumParameter.h"
 /*
   ==============================================================================
 
@@ -11,7 +10,8 @@
 
 
 EnumParameter::EnumParameter(const String & niceName, const String &description, bool enabled) :
-	Parameter(Type::ENUM, niceName, description, "" ,var(),var(), enabled)
+	Parameter(Type::ENUM, niceName, description, "" ,var(),var(), enabled),
+	enumParameterNotifier(5)
 {
 	lockManualControlMode = true;
 
@@ -31,6 +31,7 @@ EnumParameter * EnumParameter::addOption(String key, var data, bool selectIfFirs
 	}
 
 	enumListeners.call(&Listener::enumOptionAdded, this, key);
+	enumParameterNotifier.addMessage(new EnumParameterEvent(EnumParameterEvent::ENUM_OPTION_ADDED, this));
 	updateArgDescription();
 	return this;
 }
@@ -39,6 +40,7 @@ void EnumParameter::removeOption(String key)
 {
 	enumValues.remove(getIndexForKey(key));
 	enumListeners.call(&Listener::enumOptionRemoved, this, key);
+	enumParameterNotifier.addMessage(new EnumParameterEvent(EnumParameterEvent::ENUM_OPTION_REMOVED, this));
 	updateArgDescription();
 }
 

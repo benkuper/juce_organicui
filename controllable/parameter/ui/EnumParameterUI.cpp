@@ -20,7 +20,7 @@ EnumParameterUI::EnumParameterUI(Parameter * parameter) :
 	cb.setTooltip(ep->description);
 	addAndMakeVisible(cb);
 
-	ep->addEnumParameterListener(this);
+	ep->addAsyncEnumParameterListener(this);
 
 	cb.addMouseListener(this, true);
 
@@ -33,7 +33,7 @@ EnumParameterUI::EnumParameterUI(Parameter * parameter) :
 
 EnumParameterUI::~EnumParameterUI()
 {
-	if(!parameter.wasObjectDeleted()) ep->removeEnumParameterListener(this);
+	if(!parameter.wasObjectDeleted()) ep->removeAsyncEnumParameterListener(this);
 	cb.removeListener(this);
 }
 
@@ -67,12 +67,7 @@ void EnumParameterUI::resized()
 	cb.setBounds(getLocalBounds());
 }
 
-void EnumParameterUI::enumOptionAdded(EnumParameter *, const String &)
-{
-	updateComboBox();
-}
-
-void EnumParameterUI::enumOptionRemoved(EnumParameter *, const String &)
+void EnumParameterUI::newMessage(const EnumParameter::EnumParameterEvent& e)
 {
 	updateComboBox();
 }
