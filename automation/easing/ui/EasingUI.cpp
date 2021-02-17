@@ -327,7 +327,7 @@ void CubicEasingUI::mouseDown(const MouseEvent& e)
 	if (inspectable.wasObjectDeleted()) return;
 	EasingUI::mouseDown(e);
 
-	if (!e.mods.isCommandDown())
+	if (!e.mods.isAnyModifierKeyDown())
 	{
 		h1ValueAtMouseDown = ce->anchor1->getPoint();
 		h2ValueAtMouseDown = ce->anchor2->getPoint();
