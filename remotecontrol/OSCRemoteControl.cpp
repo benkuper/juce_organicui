@@ -398,6 +398,9 @@ var OSCRemoteControl::getOSCQueryDataForControllable(Controllable* c)
 			range.append(rData);
 		}
 		break;
+
+		default:
+			break;
 		}
 	}
 

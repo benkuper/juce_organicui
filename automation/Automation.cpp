@@ -515,8 +515,8 @@ float Automation::getNormalizedValueAtPosition(float pos)
 {
     if (!viewValueRange->enabled) return 0;
     if (items.size() == 0) return 0;
-    if (items.size() == 1) return items[0]->value->getNormalizedValue();
-    if (pos == length->floatValue())  return items[items.size() - 1]->value->getNormalizedValue();
+    if (items.size() == 1) return (float)items[0]->value->getNormalizedValue();
+    if (pos == length->floatValue())  return (float)items[items.size() - 1]->value->getNormalizedValue();
 
     AutomationKey* k = getKeyForPosition(pos);
     if (k == nullptr || k->easing == nullptr) return 0;

@@ -25,5 +25,5 @@ void IntSliderUI::setParamNormalizedValue(float value)
 
 float IntSliderUI::getParamNormalizedValue()
 {
-    return parameter->getNormalizedValue();
+    return (float)parameter->getNormalizedValue();
 }

@@ -110,7 +110,7 @@ float AutomationKey::getLength() const
 
 void AutomationKey::setValueRange(float minVal, float maxVal, bool proportional)
 {
-    float nv = (proportional && value->hasRange()) ? value->getNormalizedValue() : -1;
+    float nv = (proportional && value->hasRange()) ? (float)value->getNormalizedValue() : -1;
     value->setRange(minVal, maxVal);
     if (nv != -1) value->setNormalizedValue(nv);
 }

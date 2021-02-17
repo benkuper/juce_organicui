@@ -1,4 +1,3 @@
-#include "Outliner.h"
 /*
   ==============================================================================
 
@@ -165,8 +164,8 @@ OutlinerItem::OutlinerItem(WeakReference<ControllableContainer> _container, bool
 	isContainer(true),
 	itemName(_container->niceName),
 	container(_container),
-	controllable(nullptr),
-	parentsHaveHideInRemote(parentsHaveHideInRemote)
+	parentsHaveHideInRemote(parentsHaveHideInRemote),
+	controllable(nullptr)
 {
 	container->addControllableContainerListener(this);
 }
@@ -176,8 +175,8 @@ OutlinerItem::OutlinerItem(WeakReference<Controllable> _controllable, bool paren
 	isContainer(false),
 	itemName(_controllable->niceName),
 	container(nullptr),
-	controllable(_controllable),
-	parentsHaveHideInRemote(parentsHaveHideInRemote)
+	parentsHaveHideInRemote(parentsHaveHideInRemote),
+	controllable(_controllable)
 {
 }
 

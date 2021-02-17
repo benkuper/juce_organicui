@@ -227,7 +227,7 @@ void FloatSliderUI::setParamNormalizedValue(float value)
 
 float FloatSliderUI::getParamNormalizedValue()
 {
-    return parameter->getNormalizedValue();
+    return (float)parameter->getNormalizedValue();
 }
 
 
