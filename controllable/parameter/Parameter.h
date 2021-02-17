@@ -106,9 +106,9 @@ public:
 	virtual bool checkValueIsTheSame(var newValue, var oldValue); //can be overriden to modify check behavior
 
     //For Number type parameters
-	void setUndoableNormalizedValue(const float &oldNormalizedValue, const float &newNormalizedValue);
-	void setNormalizedValue(const float &normalizedValue, bool silentSet = false, bool force = false);
-    float getNormalizedValue();
+	void setUndoableNormalizedValue(const var &oldNormalizedValue, const var &newNormalizedValue);
+	void setNormalizedValue(const var &normalizedValue, bool silentSet = false, bool force = false);
+	var getNormalizedValue();
 	
 	virtual void setAttribute(String param, var value) override;
 

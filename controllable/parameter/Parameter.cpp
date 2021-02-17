@@ -245,11 +245,19 @@ bool Parameter::hasRange()
 		GenericScopedLock<SpinLock> lock(valueSetLock);
 		if (isComplex())
 		{
-			for (int i = 0; i < value.size(); ++i) if ((int)minimumValue[i] != INT32_MIN || (int)maximumValue[i] != INT32_MAX) return true;
+			for (int i = 0; i < value.size(); ++i) if ((float)minimumValue[i] != INT32_MIN || (float)maximumValue[i] != INT32_MAX) return true;
 		}
 		else
 		{
-			if ((int)minimumValue != INT32_MIN || (int)maximumValue != INT32_MAX) return true;
+			if (minimumValue.isInt())
+			{
+				if ((int)minimumValue != INT32_MIN || (int)maximumValue != INT32_MAX) return true;
+			}
+			else if (minimumValue.isDouble())
+			{
+				if ((float)minimumValue != INT32_MIN || (float)maximumValue != INT32_MAX) return true;
+
+			}
 		}
 	}
 
@@ -291,27 +299,66 @@ var Parameter::getCroppedValue(var originalValue)
 	return originalValue;
 }
 
-void Parameter::setUndoableNormalizedValue(const float& oldNormalizedValue, const float& newNormalizedValue)
+void Parameter::setUndoableNormalizedValue(const var& oldNormalizedValue, const var& newNormalizedValue)
 {
-	setUndoableValue(jmap<float>(oldNormalizedValue, (float)minimumValue, (float)maximumValue), jmap<float>(newNormalizedValue, (float)minimumValue, (float)maximumValue));
+	if (!isComplex())
+	{
+		setUndoableValue(jmap<float>(oldNormalizedValue, (float)minimumValue, (float)maximumValue), jmap<float>(newNormalizedValue, (float)minimumValue, (float)maximumValue));
+	}
+	else
+	{
+		var oldVal;
+		var newVal;
+		for (int i = 0; i < value.size(); i++)
+		{
+			oldVal.append(jmap<float>(oldNormalizedValue[i], minimumValue[i], maximumValue[i]));
+			newVal.append(jmap<float>(oldNormalizedValue[i], minimumValue[i], maximumValue[i]));
+		}
+		setUndoableValue(oldVal, newVal);
+	}
+
 }
 
-void Parameter::setNormalizedValue(const float& normalizedValue, bool silentSet, bool force)
+void Parameter::setNormalizedValue(const var& normalizedValue, bool silentSet, bool force)
 {
-	setValue(jmap<float>(normalizedValue, (float)minimumValue, (float)maximumValue), silentSet, force);
+	if (!isComplex())
+	{
+		setValue(jmap<float>(normalizedValue, (float)minimumValue, (float)maximumValue), silentSet, force);
+
+	}
+	else
+	{
+		var targetVal;
+		for (int i = 0; i < value.size(); i++) targetVal.append(jmap<float>(normalizedValue[i], minimumValue[i], maximumValue[i]));
+		setValue(targetVal, silentSet, force);
+	}
 }
 
-float Parameter::getNormalizedValue()
+var Parameter::getNormalizedValue()
 {
 	if (type == BOOL) return (float)value;
 
 	if (!canHaveRange) return 0;
 
-	if ((float)minimumValue == (float)maximumValue) {
-		return 0.0;
+	if (!isComplex())
+	{
+		if ((float)minimumValue == (float)maximumValue) {
+			return 0.0;
+		}
+		else
+			return jmap<float>((float)value, (float)minimumValue, (float)maximumValue, 0.f, 1.f);
 	}
 	else
-		return jmap<float>((float)value, (float)minimumValue, (float)maximumValue, 0.f, 1.f);
+	{
+		var normVal;
+		for (int i = 0; i < value.size(); i++)
+		{
+			if ((float)minimumValue[i] == (float)maximumValue[i]) normVal.append(0.f);
+			else normVal.append(jmap<float>((float)value[i], (float)minimumValue[i], (float)maximumValue[i], 0.f, 1.f));
+		}
+		
+		return normVal;
+	}
 }
 
 void Parameter::setAttribute(String param, var val)
