@@ -1,3 +1,4 @@
+#include "BoolToggleUI.h"
 /*
   ==============================================================================
 
@@ -121,6 +122,7 @@ void BoolToggleUI::mouseUpInternal(const MouseEvent & e)
 	}
 }
 
+
 void BoolToggleUI::valueChanged(const var & )
 {
     shouldRepaint = true;
@@ -147,12 +149,12 @@ void BoolButtonToggleUI::paint(Graphics& g)
 {
 	if (parameter.wasObjectDeleted()) return;
 
-	juce::Rectangle<float> r = getLocalBounds().toFloat();
-	if (!showLabel) r.setWidth(jmin<float>(r.getWidth(), r.getHeight() * 3));
+	buttonRect = getLocalBounds().toFloat();
+	if (!showLabel) buttonRect.setWidth(jmin<float>(buttonRect.getWidth(), buttonRect.getHeight() * 3));
 
 	bool isOn = parameter->boolValue();
 	
-	Point<float> center = r.getCentre();
+	Point<float> center = buttonRect.getCentre();
 
 	Colour bgColor = useCustomBGColor ? customBGColor : NORMAL_COLOR;
 	Colour c = bgColor.darker();
@@ -169,9 +171,9 @@ void BoolButtonToggleUI::paint(Graphics& g)
 	}
 
 	g.setGradientFill(ColourGradient(c, center.x, center.y, c.darker(.5f), 2.f, 2.f, true));
-	g.fillRoundedRectangle(r.toFloat(), 4.f);
+	g.fillRoundedRectangle(buttonRect.toFloat(), 4.f);
 	g.setColour(c.darker());
-	g.drawRoundedRectangle(r.toFloat(), 4.f, 2.f);
+	g.drawRoundedRectangle(buttonRect.toFloat(), 4.f, 2.f);
 
 	if (showLabel)
 	{
@@ -180,4 +182,9 @@ void BoolButtonToggleUI::paint(Graphics& g)
 		g.setColour(useCustomTextColor ? customTextColor : TEXT_COLOR);
 		g.drawFittedText(customLabel.isNotEmpty() ? customLabel : parameter->niceName, tr, Justification::centred, 1);
 	}
+}
+
+bool BoolButtonToggleUI::hitTest(int x, int y)
+{
+	return buttonRect.contains(x, y);;
 }

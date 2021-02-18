@@ -46,7 +46,12 @@ public:
     BoolButtonToggleUI(BoolParameter* parameter);
     virtual ~BoolButtonToggleUI();
     
+
+    Rectangle<float> buttonRect;
+
     void paint(Graphics& g) override;
+    bool hitTest(int x, int y) override;
+
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BoolButtonToggleUI)
 };
