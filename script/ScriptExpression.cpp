@@ -10,8 +10,8 @@ Author:  Ben
 
 
 ScriptExpression::ScriptExpression() :
-	state(EXPRESSION_EMPTY),
-	Thread("ScriptExpression")
+	Thread("ScriptExpression"),
+    state(EXPRESSION_EMPTY)
 {
 	if(Engine::mainEngine != nullptr) Engine::mainEngine->addScriptTargetListener(this);
 }

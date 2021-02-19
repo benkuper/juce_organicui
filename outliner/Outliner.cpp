@@ -163,8 +163,9 @@ OutlinerItem::OutlinerItem(WeakReference<ControllableContainer> _container, bool
 	InspectableContent(_container),
 	isContainer(true),
 	itemName(_container->niceName),
-	container(_container),
+	
 	parentsHaveHideInRemote(parentsHaveHideInRemote),
+    container(_container),
 	controllable(nullptr)
 {
 	container->addControllableContainerListener(this);
@@ -174,9 +175,11 @@ OutlinerItem::OutlinerItem(WeakReference<Controllable> _controllable, bool paren
 	InspectableContent(_controllable),
 	isContainer(false),
 	itemName(_controllable->niceName),
-	container(nullptr),
+	
 	parentsHaveHideInRemote(parentsHaveHideInRemote),
-	controllable(_controllable)
+    container(nullptr),
+    controllable(_controllable)
+    
 {
 }
 
