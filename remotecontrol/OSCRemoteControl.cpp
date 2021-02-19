@@ -69,7 +69,10 @@ void OSCRemoteControl::setupReceiver()
 
 	if (result)
 	{
+
+#if ORGANICUI_USE_WEBSERVER
 		setupServer();
+#endif
 
 		NLOG(niceName, "Now receiving on port : " + localPort->stringValue());
 #if ORGANICUI_USE_SERVUS

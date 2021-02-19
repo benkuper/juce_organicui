@@ -36,12 +36,17 @@ void TriggerButtonUI::mouseDownInternal(const MouseEvent & e)
 	trigger->trigger();
 }
 
+bool TriggerButtonUI::hitTest(int x, int y)
+{
+	return hitRect.contains(x, y);
+}
+
 void TriggerButtonUI::paint(Graphics& g)
 {
-	juce::Rectangle<float> r = getLocalBounds().toFloat();
-	if (!showLabel) r.setWidth(jmin<float>(r.getWidth(), r.getHeight()*3));
+	hitRect = getLocalBounds().toFloat();
+	if (!showLabel) hitRect.setWidth(jmin<float>(hitRect.getWidth(), hitRect.getHeight()*3));
 
-	Point<float> center = r.getCentre();
+	Point<float> center = hitRect.getCentre();
 
 	Colour bgColor = useCustomBGColor ? customBGColor : NORMAL_COLOR;
 	Colour c = bgColor.darker();
@@ -58,9 +63,9 @@ void TriggerButtonUI::paint(Graphics& g)
 	}
 
 	g.setGradientFill(ColourGradient(c, center.x, center.y, c.darker(.5f), 2.f, 2.f, true));
-	g.fillRoundedRectangle(r.toFloat(), 4.f);
+	g.fillRoundedRectangle(hitRect.toFloat(), 4.f);
 	g.setColour(c.darker());
-	g.drawRoundedRectangle(r.toFloat(), 4.f, 2.f);
+	g.drawRoundedRectangle(hitRect.toFloat(), 4.f, 2.f);
 
 	if (showLabel)
 	{

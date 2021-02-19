@@ -1,4 +1,3 @@
-#include "Inspector.h"
 /*
   ==============================================================================
 
@@ -87,6 +86,8 @@ void Inspector::setCurrentInspectable(WeakReference<Inspectable> inspectable, bo
 	{
 		return;
 	}
+
+	MessageManagerLock mmLock;
 
 	if (currentInspectable != nullptr)
 	{
