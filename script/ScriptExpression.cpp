@@ -78,6 +78,8 @@ void ScriptExpression::evaluate(bool resetListeners)
 {
 	Result result = Result::ok();
 
+	if (state != EXPRESSION_LOADED) return;
+
 	if (resetListeners)
 	{
 		for (auto &p : linkedParameters)

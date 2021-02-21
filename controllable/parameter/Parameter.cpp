@@ -73,6 +73,7 @@ void Parameter::setControlMode(ControlMode _mode)
 
 	case REFERENCE:
 		referenceTarget.reset(new TargetParameter("Reference", "Reference for parameter " + niceName, ""));
+		referenceTarget->lockManualControlMode = true;
 		referenceTarget->addParameterListener(this);
 		break;
 
