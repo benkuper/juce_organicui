@@ -1,3 +1,4 @@
+#include "EnumParameter.h"
 /*
   ==============================================================================
 
@@ -34,6 +35,15 @@ EnumParameter * EnumParameter::addOption(String key, var data, bool selectIfFirs
 	enumParameterNotifier.addMessage(new EnumParameterEvent(EnumParameterEvent::ENUM_OPTION_ADDED, this));
 	updateArgDescription();
 	return this;
+}
+
+void EnumParameter::updateOption(int index, String key, var data)
+{
+	String k = enumValues[index]->key;
+	enumValues.set(index, new EnumValue(key, data));
+	enumListeners.call(&Listener::enumOptionUpdated, this, index, k, key);
+	enumParameterNotifier.addMessage(new EnumParameterEvent(EnumParameterEvent::ENUM_OPTION_UPDATED, this));
+	updateArgDescription();
 }
 
 void EnumParameter::removeOption(String key)

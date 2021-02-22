@@ -21,6 +21,7 @@ public:
 	~EnumParameter() {}
 
 	EnumParameter * addOption(String key, var data, bool selectIfFirstOption = true); //daisy chain
+	void updateOption(int index, String key, var data);
 	void removeOption(String key);
 	void clearOptions();
 
@@ -78,7 +79,8 @@ public:
 	public:
 		/** Destructor. */
 		virtual ~Listener() {}
-		virtual void enumOptionAdded(EnumParameter *, const String &) = 0;
+		virtual void enumOptionAdded(EnumParameter*, const String&) = 0;
+		virtual void enumOptionUpdated(EnumParameter *, int index, const String & prevKey, const String &newKey) = 0;
 		virtual void enumOptionRemoved(EnumParameter *, const String &) = 0;
 	};
 
@@ -86,7 +88,7 @@ public:
 	void addEnumParameterListener(Listener* newListener) { enumListeners.add(newListener); }
 	void removeEnumParameterListener(Listener* listener) { enumListeners.remove(listener); }
 
-	DECLARE_ASYNC_EVENT(EnumParameter, EnumParameter, enumParameter, ENUM_LIST(ENUM_OPTION_ADDED, ENUM_OPTION_REMOVED))
+	DECLARE_ASYNC_EVENT(EnumParameter, EnumParameter, enumParameter, ENUM_LIST(ENUM_OPTION_ADDED, ENUM_OPTION_UPDATED, ENUM_OPTION_REMOVED))
 
 	static EnumParameter * create() { return new EnumParameter("new Enum Parameter",""); }
 	virtual String getTypeString() const override { return getTypeStringStatic(); }
