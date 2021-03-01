@@ -10,11 +10,7 @@
 
 #pragma once
 
-const OSCType OSCTypes::int32 = 'i';
-const OSCType OSCTypes::float32 = 'f';
-const OSCType OSCTypes::string = 's';
-const OSCType OSCTypes::blob = 'b';
-const OSCType OSCTypes::colour = 'r';
+
 
 class OSCPacketParser
 {
@@ -384,11 +380,11 @@ public:
 	{
 		switch (arg.getType())
 		{
-		case OSCTypes::int32:       return writeInt32(arg.getInt32());
-		case OSCTypes::float32:     return writeFloat32(arg.getFloat32());
-		case OSCTypes::string:      return writeString(arg.getString());
-		case OSCTypes::blob:        return writeBlob(arg.getBlob());
-		case OSCTypes::colour:      return writeColour(arg.getColour());
+		case 'i':       return writeInt32(arg.getInt32());
+		case 'f':     return writeFloat32(arg.getFloat32());
+		case 's':      return writeString(arg.getString());
+		case 'b':        return writeBlob(arg.getBlob());
+		case 'r':      return writeColour(arg.getColour());
 
 		default:
 			// In this very unlikely case you supplied an invalid OSCType!
