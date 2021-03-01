@@ -34,7 +34,9 @@ OSCRemoteControl::OSCRemoteControl() :
 	receiver.addListener(this);
 	receiver.registerFormatErrorHandler(&OSCHelpers::logOSCFormatError);
 
-	//setupReceiver();
+#if ORGANICUI_USE_WEBSERVER
+	Engine::mainEngine->addControllableContainerListener(this);
+#endif
 }
 
 OSCRemoteControl::~OSCRemoteControl()
@@ -49,6 +51,8 @@ OSCRemoteControl::~OSCRemoteControl()
 		server->stop();
 		server.reset();
 	}
+
+	Engine::mainEngine->removeControllableContainerListener(this);
 #endif
 
 }
@@ -64,7 +68,7 @@ void OSCRemoteControl::setupReceiver()
 
 	//if (!receiveCC->enabled->boolValue()) return;
 	bool result = receiver.connect(localPort->intValue());
-	
+
 
 	if (result)
 	{
@@ -234,6 +238,7 @@ void OSCRemoteControl::run()
 
 	NLOG(niceName, "Zeroconf service created : " << nameToAdvertise << ":" << portToAdvertise);
 }
+#endif //SERVUS
 
 #if ORGANICUI_USE_WEBSERVER
 void OSCRemoteControl::setupServer()
@@ -249,7 +254,7 @@ void OSCRemoteControl::setupServer()
 void OSCRemoteControl::handleHTTPRequest(std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request)
 {
 	var data;
-	if (String(request->path).contains("HOST_INFO"))
+	if (String(request->query_string).contains("HOST_INFO"))
 	{
 		var extensionData(new DynamicObject());
 		extensionData.getDynamicObject()->setProperty("ACCESS", true);
@@ -262,7 +267,7 @@ void OSCRemoteControl::handleHTTPRequest(std::shared_ptr<HttpServer::Response> r
 		extensionData.getDynamicObject()->setProperty("VALUE", true);
 		extensionData.getDynamicObject()->setProperty("LISTEN", true);
 
-		var data(new DynamicObject());
+		data = new DynamicObject();
 		data.getDynamicObject()->setProperty("EXTENSIONS", extensionData);
 		data.getDynamicObject()->setProperty("NAME", ProjectInfo::projectName);
 		data.getDynamicObject()->setProperty("OSC_PORT", localPort->intValue());
@@ -273,12 +278,12 @@ void OSCRemoteControl::handleHTTPRequest(std::shared_ptr<HttpServer::Response> r
 		data = getOSCQueryDataForContainer(Engine::mainEngine);
 	}
 
-	
+
 	String dataStr = JSON::toString(data);
 
 	SimpleWeb::CaseInsensitiveMultimap header;
 	header.emplace("Content-Length", String(dataStr.length()).toStdString());
-	header.emplace("Content-Type",  "application/json");
+	header.emplace("Content-Type", "application/json");
 	header.emplace("Accept-range", "bytes");
 
 	response->write(SimpleWeb::StatusCode::success_ok, header);
@@ -396,7 +401,7 @@ var OSCRemoteControl::getOSCQueryDataForControllable(Controllable* c)
 			var enumRange;
 			for (auto& k : keys) enumRange.append(k);
 			var rData(new DynamicObject());
-			rData.getDynamicObject()->setProperty("VALS", rData);
+			rData.getDynamicObject()->setProperty("VALS", enumRange);
 			range.append(rData);
 		}
 		break;
@@ -421,12 +426,64 @@ void OSCRemoteControl::connectionOpened(const String& id)
 void OSCRemoteControl::messageReceived(const String& id, const String& message)
 {
 	NLOG(niceName, "Got a message from " << id << " : " << message);
+
+	var o = JSON::parse(message);
+	if (o.isObject())
+	{
+		String command = o["COMMAND"];
+		String data = o["DATA"];
+
+		DBG("Received Command " + command + " > " + data);
+
+		if (Controllable* c = Engine::mainEngine->getControllableForAddress(data))
+		{
+			if (command == "LISTEN")
+			{
+				if (!feedbackMap.contains(id)) feedbackMap.set(id, Array<Controllable*>());
+				feedbackMap[id].addIfNotAlreadyThere(c);
+			}
+			else if (command == "IGNORE")
+			{
+				if (feedbackMap.contains(id)) feedbackMap[id].removeAllInstancesOf(c);
+			}
+		}
+	}
+}
+
+void OSCRemoteControl::dataReceived(const String& id, const MemoryBlock& data)
+{
+	const OSCMessage * m = (OSCMessage *)data.getData();
+	if (m != nullptr)
+	{
+		processMessage(*m);
+	}
 }
 
 void OSCRemoteControl::connectionClosed(const String& id, int status, const String& reason)
 {
 	NLOG(niceName, "Connection close from " << id << " : " << status << " (" << reason << ")");
 }
-#endif
 
+void OSCRemoteControl::controllableFeedbackUpdate(ControllableContainer* cc, Controllable* c)
+{
+	if (cc == Engine::mainEngine)
+	{
+		HashMap<String, Array<Controllable*>, DefaultHashFunctions, CriticalSection>::Iterator it(feedbackMap);
+		while (it.next())
+		{
+			if (it.getValue().contains(c)) sendOSCQueryFeedback(c);
+		}
+	}
+}
+
+void OSCRemoteControl::sendOSCQueryFeedback(Controllable* c, const String& excludeId)
+{
+	if (c == nullptr) return;
+
+	OSCMessage m = OSCHelpers::getOSCMessageForControllable(c);
+
+	MemoryBlock b;
+	b.copyFrom(&m, 0, sizeof(m));
+	server->sendExclude(b, excludeId);
+}
 #endif

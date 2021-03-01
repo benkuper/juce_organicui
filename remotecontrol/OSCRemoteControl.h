@@ -68,6 +68,9 @@ public:
 
 #if ORGANICUI_USE_WEBSERVER
 	std::unique_ptr<SimpleWebSocketServer> server;
+
+	HashMap<String, Array<Controllable*>, DefaultHashFunctions, CriticalSection> feedbackMap;
+
 	void setupServer();
 	void handleHTTPRequest(std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request) override;
 	var getOSCQueryDataForContainer(ControllableContainer* cc);
@@ -75,7 +78,13 @@ public:
 
 	void connectionOpened(const String& id) override;
 	void messageReceived(const String& id, const String& message) override;
+	void dataReceived(const String& id, const MemoryBlock &data) override;
 	void connectionClosed(const String& id, int status, const String& reason) override;
+
+	void controllableFeedbackUpdate(ControllableContainer * cc, Controllable * c) override;
+
+	void sendOSCQueryFeedback(Controllable* c, const String & excludeId = "");
+
 #endif
 
 	class RemoteControlListener
