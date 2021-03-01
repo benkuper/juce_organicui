@@ -1,4 +1,3 @@
-#include "OSCRemoteControl.h"
 /*
   ==============================================================================
 
@@ -244,7 +243,7 @@ void OSCRemoteControl::setupServer()
 	server.reset(new SimpleWebSocketServer());
 	server->handler = this;
 	server->addWebSocketListener(this);
-	server->start(localPort->intValue());
+	server->start(localPort->intValue(), "");
 }
 
 void OSCRemoteControl::handleHTTPRequest(std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request)
