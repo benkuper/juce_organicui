@@ -350,13 +350,24 @@ var OSCRemoteControl::getOSCQueryDataForControllable(Controllable* c)
 
 		if (p->hasRange())
 		{
-			for (int i = 0; i < p->minimumValue.size(); i++)
+			if (p->isComplex())
+			{
+				for (int i = 0; i < p->minimumValue.size(); i++)
+				{
+					var rData(new DynamicObject());
+					rData.getDynamicObject()->setProperty("MIN", p->minimumValue[i]);
+					rData.getDynamicObject()->setProperty("MAX", p->maximumValue[i]);
+					range.append(rData);
+				}
+			}
+			else
 			{
 				var rData(new DynamicObject());
-				rData.getDynamicObject()->setProperty("MIN", p->minimumValue[i]);
-				rData.getDynamicObject()->setProperty("MAX", p->maximumValue[i]);
+				rData.getDynamicObject()->setProperty("MIN", p->minimumValue);
+				rData.getDynamicObject()->setProperty("MAX", p->maximumValue);
 				range.append(rData);
 			}
+			
 		}
 
 		switch (p->type)
@@ -409,7 +420,7 @@ var OSCRemoteControl::getOSCQueryDataForControllable(Controllable* c)
 			typeString = "s";
 
 			EnumParameter* ep = (EnumParameter*)p;
-			value.append(ep->getValueData().toString());
+			value.append(ep->getValueKey());
 
 			StringArray keys = ep->getAllKeys();
 			var enumRange;
@@ -439,15 +450,11 @@ void OSCRemoteControl::connectionOpened(const String& id)
 
 void OSCRemoteControl::messageReceived(const String& id, const String& message)
 {
-	NLOG(niceName, "Got a message from " << id << " : " << message);
-
 	var o = JSON::parse(message);
 	if (o.isObject())
 	{
 		String command = o["COMMAND"];
 		String data = o["DATA"];
-
-		DBG("Received Command " + command + " > " + data);
 
 		if (Controllable* c = Engine::mainEngine->getControllableForAddress(data))
 		{
@@ -458,7 +465,7 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 			}
 			else if (command == "IGNORE")
 			{
-				if (feedbackMap.contains(id)) feedbackMap[id].removeAllInstancesOf(c);
+				if (feedbackMap.contains(id)) (&(feedbackMap.getReference(id)))->removeAllInstancesOf(c);
 			}
 		}
 	}
