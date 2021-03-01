@@ -440,7 +440,8 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 			if (command == "LISTEN")
 			{
 				if (!feedbackMap.contains(id)) feedbackMap.set(id, Array<Controllable*>());
-				feedbackMap[id].addIfNotAlreadyThere(c);
+				(&(feedbackMap.getReference(id)))->addIfNotAlreadyThere(c);
+				DBG("map id size : " << feedbackMap[id].size());
 			}
 			else if (command == "IGNORE")
 			{
@@ -466,12 +467,24 @@ void OSCRemoteControl::connectionClosed(const String& id, int status, const Stri
 
 void OSCRemoteControl::controllableFeedbackUpdate(ControllableContainer* cc, Controllable* c)
 {
+	if (Engine::mainEngine->isLoadingFile || Engine::mainEngine->isClearing) return;
+	
 	if (cc == Engine::mainEngine)
 	{
 		HashMap<String, Array<Controllable*>, DefaultHashFunctions, CriticalSection>::Iterator it(feedbackMap);
 		while (it.next())
 		{
-			if (it.getValue().contains(c)) sendOSCQueryFeedback(c);
+			DBG(it.getKey() << ":" <<feedbackMap[it.getKey()].size());
+
+			for (auto& tc : it.getValue())
+			{
+				DBG(tc->niceName << " <> " << c->niceName);
+			}
+
+			if (it.getValue().contains(c))
+			{
+				sendOSCQueryFeedback(c);
+			}
 		}
 	}
 }
