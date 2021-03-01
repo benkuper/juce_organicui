@@ -484,13 +484,6 @@ void OSCRemoteControl::controllableFeedbackUpdate(ControllableContainer* cc, Con
 		HashMap<String, Array<Controllable*>, DefaultHashFunctions, CriticalSection>::Iterator it(feedbackMap);
 		while (it.next())
 		{
-			DBG(it.getKey() << ":" <<feedbackMap[it.getKey()].size());
-
-			for (auto& tc : it.getValue())
-			{
-				DBG(tc->niceName << " <> " << c->niceName);
-			}
-
 			if (it.getValue().contains(c))
 			{
 				sendOSCQueryFeedback(c);
