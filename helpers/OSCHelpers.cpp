@@ -143,15 +143,14 @@ OSCMessage OSCHelpers::getOSCMessageForControllable(Controllable* c, Controllabl
 
 Controllable * OSCHelpers::findControllableAndHandleMessage(ControllableContainer* root, const OSCMessage& m, int dataOffset)
 {
-	if (root == nullptr) return nullptr;
-	String address = m.getAddressPattern().toString();
-	Controllable* c = root->getControllableForAddress(address);
-
+	Controllable* c = findControllable(root, m, dataOffset);
 	if (c == nullptr)
 	{
-		if (address.endsWith("enabled"))
+		String addr = m.getAddressPattern().toString();
+
+		if (addr.endsWith("enabled"))
 		{
-			String cAdd = address.substring(0, address.length() - 8);
+			String cAdd = addr.substring(0, addr.length() - 8);
 			c = root->getControllableForAddress(cAdd);
 
 			if (c != nullptr)
@@ -166,6 +165,13 @@ Controllable * OSCHelpers::findControllableAndHandleMessage(ControllableContaine
 
 	return c;
 
+}
+
+Controllable* OSCHelpers::findControllable(ControllableContainer* root, const OSCMessage& m, int dataOffset)
+{
+	if (root == nullptr) return nullptr;
+	String address = m.getAddressPattern().toString();
+	return root->getControllableForAddress(address);
 }
 
 void OSCHelpers::handleControllableForOSCMessage(Controllable* c, const OSCMessage& m, int dataOffset)

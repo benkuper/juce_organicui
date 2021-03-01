@@ -8,7 +8,14 @@
   ==============================================================================
 */
 
+#include "JuceHeader.h"
+
 juce_ImplementSingleton(OSCRemoteControl)
+
+#if ORGANIC_USE_WEBSERVER
+#include "OSCPacketHelper.h"
+#include "OSCRemoteControl.h"
+#endif
 
 static OrganicApplication& getApp() { return *dynamic_cast<OrganicApplication*>(JUCEApplication::getInstance()); }
 
@@ -108,7 +115,7 @@ void OSCRemoteControl::setupZeroconf()
 }
 #endif
 
-void OSCRemoteControl::processMessage(const OSCMessage& m)
+void OSCRemoteControl::processMessage(const OSCMessage& m, const String& sourceId)
 {
 	String add = m.getAddressPattern().toString();
 
@@ -183,9 +190,16 @@ void OSCRemoteControl::processMessage(const OSCMessage& m)
 	}
 	else
 	{
-		Controllable* c = OSCHelpers::findControllableAndHandleMessage(Engine::mainEngine, m);
 
-		if (c == nullptr)
+		Controllable* c = OSCHelpers::findControllable(Engine::mainEngine, m);
+
+		if (c != nullptr)
+		{
+			if (sourceId.isNotEmpty()) noFeedbackMap.set(c, sourceId);
+			OSCHelpers::handleControllableForOSCMessage(c, m);
+			if (sourceId.isNotEmpty()) noFeedbackMap.remove(c);
+		}
+		else
 		{
 			remoteControlListeners.call(&RemoteControlListener::processMessage, m);
 			return;
@@ -441,7 +455,6 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 			{
 				if (!feedbackMap.contains(id)) feedbackMap.set(id, Array<Controllable*>());
 				(&(feedbackMap.getReference(id)))->addIfNotAlreadyThere(c);
-				DBG("map id size : " << feedbackMap[id].size());
 			}
 			else if (command == "IGNORE")
 			{
@@ -453,11 +466,8 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 
 void OSCRemoteControl::dataReceived(const String& id, const MemoryBlock& data)
 {
-	const OSCMessage * m = (OSCMessage *)data.getData();
-	if (m != nullptr)
-	{
-		processMessage(*m);
-	}
+	OSCMessage m = OSCPacketParser(data.getData(), data.getSize()).readMessage();
+	if (!m.isEmpty()) processMessage(m);
 }
 
 void OSCRemoteControl::connectionClosed(const String& id, int status, const String& reason)
@@ -494,9 +504,14 @@ void OSCRemoteControl::sendOSCQueryFeedback(Controllable* c, const String& exclu
 	if (c == nullptr) return;
 
 	OSCMessage m = OSCHelpers::getOSCMessageForControllable(c);
+	OSCPacketPacker packer;
+	if (packer.writeMessage(m))
+	{
+		MemoryBlock b(packer.getData(), packer.getDataSize());
 
-	MemoryBlock b;
-	b.copyFrom(&m, 0, sizeof(m));
-	server->sendExclude(b, excludeId);
+		StringArray ex = excludeId;
+		if (noFeedbackMap.contains(c)) ex.add(noFeedbackMap[c]);
+		server->sendExclude(b, ex);
+	}
 }
 #endif

@@ -30,7 +30,8 @@ public:
 
 	static OSCMessage getOSCMessageForControllable(Controllable* p, ControllableContainer* addressRelativeTo = nullptr);
 
-	static Controllable * findControllableAndHandleMessage(ControllableContainer* root, const OSCMessage& m, int dataOffset = 0);
+	static Controllable* findControllableAndHandleMessage(ControllableContainer* root, const OSCMessage& m, int dataOffset = 0);
+	static Controllable * findControllable(ControllableContainer* root, const OSCMessage& m, int dataOffset = 0);
 
 	static void handleControllableForOSCMessage(Controllable* c, const OSCMessage& m, int dataOffset = 0);
 
