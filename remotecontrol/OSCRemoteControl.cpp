@@ -191,15 +191,36 @@ void OSCRemoteControl::processMessage(const OSCMessage& m, const String& sourceI
 	else
 	{
 
+#if ORGANICUI_USE_WEBSERVER
 		Controllable* c = OSCHelpers::findControllable(Engine::mainEngine, m);
 
 		if (c != nullptr)
 		{
-			if (sourceId.isNotEmpty()) noFeedbackMap.set(c, sourceId);
+			if (sourceId.isEmpty())
+			{
+				HashMap<String, Array<Controllable*>, DefaultHashFunctions, CriticalSection>::Iterator it(feedbackMap);
+				while (it.next())
+				{
+					if (it.getKey().contains(m.getSenderIPAddress()))
+					{
+						noFeedbackMap.set(c, it.getKey());
+						break;
+					}
+				}
+					}
+			else
+			{
+				noFeedbackMap.set(c, sourceId);
+			}
+
 			OSCHelpers::handleControllableForOSCMessage(c, m);
-			if (sourceId.isNotEmpty()) noFeedbackMap.remove(c);
+			noFeedbackMap.remove(c);
 		}
-		else
+#else
+		Controllable* c = OSCHelpers::findControllableAndHandleMessage(Engine::mainEngine, m);
+#endif
+
+		if(c == nullptr)
 		{
 			remoteControlListeners.call(&RemoteControlListener::processMessage, m);
 			return;
