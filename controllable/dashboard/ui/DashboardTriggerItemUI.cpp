@@ -34,6 +34,11 @@ void DashboardTriggerItemUI::updateUIParameters()
 	if (triggerItem->bgColor->enabled) ((TriggerUI*)itemUI.get())->customBGColor = triggerItem->bgColor->getColor();
 }
 
+void DashboardTriggerItemUI::updateEditModeInternal(bool editMode)
+{
+	DashboardControllableItemUI::updateEditModeInternal(editMode);
+}
+
 void DashboardTriggerItemUI::controllableFeedbackUpdateInternal(Controllable* c)
 {
 	DashboardControllableItemUI::controllableFeedbackUpdateInternal(c);

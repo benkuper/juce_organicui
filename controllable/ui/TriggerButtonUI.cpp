@@ -38,11 +38,14 @@ void TriggerButtonUI::mouseDownInternal(const MouseEvent & e)
 
 bool TriggerButtonUI::hitTest(int x, int y)
 {
+	if (!TriggerUI::hitTest(x, y)) return false;
 	return hitRect.contains(x, y);
 }
 
 void TriggerButtonUI::paint(Graphics& g)
 {
+	if (trigger == nullptr) return;
+
 	hitRect = getLocalBounds().toFloat();
 	if (!showLabel) hitRect.setWidth(jmin<float>(hitRect.getWidth(), hitRect.getHeight()*3));
 

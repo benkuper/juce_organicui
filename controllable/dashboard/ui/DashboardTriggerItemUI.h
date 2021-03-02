@@ -13,6 +13,8 @@ public:
 	virtual ControllableUI* createControllableUI() override;
 	virtual void updateUIParameters() override;
 
+	virtual void updateEditModeInternal(bool editMode) override;
+
 	virtual void controllableFeedbackUpdateInternal(Controllable* c) override;
 
 };
