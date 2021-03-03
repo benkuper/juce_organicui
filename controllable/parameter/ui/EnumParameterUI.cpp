@@ -132,8 +132,8 @@ void EnumParameterUI::EnumOptionManager::paint(Graphics& g)
 {
 	Rectangle<int> hr = getLocalBounds().removeFromTop(20);
 	g.setColour(TEXT_COLOR);
-	g.drawText("Key", hr.removeFromRight(getWidth() / 2).reduced(2).toFloat(), Justification::centred, false);
-	g.drawText("Value", hr.reduced(2).toFloat(), Justification::centred, false);
+	g.drawText("Value", hr.removeFromRight(getWidth() / 2).reduced(2).toFloat(), Justification::centred, false);
+	g.drawText("Key", hr.reduced(2).toFloat(), Justification::centred, false);
 }
 
 void EnumParameterUI::EnumOptionManager::resized()
