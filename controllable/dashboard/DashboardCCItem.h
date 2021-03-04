@@ -10,10 +10,14 @@ public:
 
 	WeakReference<ControllableContainer> container;
 
+	virtual var getServerData() override;
+
     virtual var getJSONData() override;
 	virtual void loadJSONDataItemInternal(var data) override;
 
 	virtual void setInspectableInternal(Inspectable* i) override;
+
+	virtual void onControllableFeedbackUpdateInternal(ControllableContainer * cc, Controllable * c) override;
 
 	virtual DashboardItemUI* createUI() override;
 

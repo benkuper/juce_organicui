@@ -1,4 +1,3 @@
-#include "DashboardCCItem.h"
 DashboardCCItem::DashboardCCItem(ControllableContainer* container) :
 	DashboardInspectableItem(container),
 	container(container)
@@ -9,6 +8,7 @@ DashboardCCItem::DashboardCCItem(ControllableContainer* container) :
 
 DashboardCCItem::~DashboardCCItem()
 {
+	if (container != nullptr) container->removeControllableContainerListener(this);
 
 }
 
@@ -24,6 +24,13 @@ void DashboardCCItem::ghostInspectable()
 void DashboardCCItem::checkGhost()
 {
 	setInspectable(Engine::mainEngine->getControllableContainerForAddress(inspectableGhostAddress));
+}
+
+var DashboardCCItem::getServerData()
+{
+	var data = DashboardInspectableItem::getServerData();
+	if (container != nullptr) data.getDynamicObject()->setProperty("container", container->getJSONData());
+	return data;
 }
 
 var DashboardCCItem::getJSONData()
@@ -44,5 +51,30 @@ void DashboardCCItem::loadJSONDataItemInternal(var data)
 
 void DashboardCCItem::setInspectableInternal(Inspectable* i)
 {
+	if (!inspectable.wasObjectDeleted() && container != nullptr)
+	{
+		container->removeControllableContainerListener(this);
+	}
+
 	container = dynamic_cast<ControllableContainer*>(i);
+
+	if (container != nullptr)
+	{
+		container->addControllableContainerListener(this);
+	}
+}
+
+void DashboardCCItem::onControllableFeedbackUpdateInternal(ControllableContainer* cc, Controllable* c)
+{
+	if (cc == container.get())
+	{
+		var data(new DynamicObject());
+		data.getDynamicObject()->setProperty("controlAddress", c->getControlAddress());
+		if (Parameter* p = dynamic_cast<Parameter*>(c)) data.getDynamicObject()->setProperty("value", p->value);
+		notifyDataFeedback(data);
+	}
+	else
+	{
+		DashboardInspectableItem::onControllableFeedbackUpdateInternal(cc, c);
+	}
 }
