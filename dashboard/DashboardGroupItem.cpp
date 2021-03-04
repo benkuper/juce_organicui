@@ -29,8 +29,10 @@ var DashboardGroupItem::getServerData()
 	var data = DashboardItem::getServerData();
 	if(backgroundColor->enabled) data.getDynamicObject()->setProperty("backgroundColor", backgroundColor->value);
 	data.getDynamicObject()->setProperty("borderWidth", borderWidth->value);
-	data.getDynamicObject()->setProperty("borderColor", backgroundColor->value);
-	data.getDynamicObject()->setProperty("itemManager", itemManager.getJSONData());
+	data.getDynamicObject()->setProperty("borderColor", borderColor->value);
+
+
+
 	return data;
 }
 

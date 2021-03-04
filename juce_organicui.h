@@ -265,6 +265,7 @@ using namespace juce;
 #include "dashboard/DashboardItem.h"
 #include "dashboard/DashboardItemFactory.h"
 #include "dashboard/DashboardItemManager.h"
+#include "dashboard/DashboardCommentItem.h"
 #include "dashboard/DashboardGroupItem.h"
 
 #include "dashboard/Dashboard.h"
@@ -272,6 +273,7 @@ using namespace juce;
 #include "dashboard/ui/DashboardItemManagerUI.h"
 #include "dashboard/ui/DashboardUI.h"
 #include "dashboard/ui/DashboardItemUI.h"
+#include "dashboard/ui/DashboardCommentItemUI.h"
 #include "dashboard/ui/DashboardGroupItemUI.h"
 #include "dashboard/ui/DashboardManagerUI.h"
 #include "dashboard/ui/DashboardManagerView.h"

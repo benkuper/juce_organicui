@@ -29,19 +29,12 @@ DashboardItemManager::~DashboardItemManager()
 
 void DashboardItemManager::clear()
 {
-	commentManager.clear();
 	BaseManager::clear();
 }
 
-var DashboardItemManager::getJSONData()
+void DashboardItemManager::fillServerData(var &data)
 {
-	var data = BaseManager::getJSONData();
-	data.getDynamicObject()->setProperty("commentManager", commentManager.getJSONData());
-	return data;
-}
-
-void DashboardItemManager::loadJSONDataManagerInternal(var data)
-{
-	BaseManager::loadJSONDataManagerInternal(data);
-	commentManager.loadJSONData(data.getProperty("commentManager", var()));
+	var iData;
+	for (auto& i : items) iData.append(i->getServerData());
+	data.getDynamicObject()->setProperty("items", iData);
 }

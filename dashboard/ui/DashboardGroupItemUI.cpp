@@ -1,4 +1,3 @@
-#include "DashboardGroupItemUI.h"
 DashboardGroupItemUI::DashboardGroupItemUI(DashboardGroupItem* group) :
 	DashboardItemUI(group),
 	group(group)

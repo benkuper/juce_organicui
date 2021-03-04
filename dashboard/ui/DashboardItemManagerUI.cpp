@@ -28,11 +28,6 @@ DashboardItemManagerUI::DashboardItemManagerUI(DashboardItemManager * manager) :
 
 	addExistingItems(false);
 
-	commentManagerUI.reset(new CommentManagerViewUI(&manager->commentManager));
-	commentManagerUI->canZoom = true;
-	commentManagerUI->addExistingItems();
-	addAndMakeVisible(commentManagerUI.get(), 0);
-
 	setShowAddButton(false);
 }
 
@@ -45,27 +40,7 @@ DashboardItemManagerUI::~DashboardItemManagerUI()
 void DashboardItemManagerUI::resized()
 {
 	BaseManagerViewUI::resized();
-
 	addItemBT->setBounds(Rectangle<int>(0, 0, 50, 50));
-
-	if (commentManagerUI != nullptr)
-	{
-		commentManagerUI->viewOffset = viewOffset;
-		commentManagerUI->setBounds(getLocalBounds());
-		commentManagerUI->resized();
-	}
-}
-
-void DashboardItemManagerUI::setViewZoom(float value)
-{
-	BaseManagerViewUI::setViewZoom(value);
-	if (commentManagerUI != nullptr) commentManagerUI->setViewZoom(value);
-}
-
-void DashboardItemManagerUI::updateItemsVisibility()
-{
-	BaseManagerViewUI::updateItemsVisibility();
-	if (commentManagerUI != nullptr) commentManagerUI->updateItemsVisibility();
 }
 
 void DashboardItemManagerUI::paint(Graphics& g)
@@ -111,11 +86,6 @@ bool DashboardItemManagerUI::isInterestedInDragSource(const SourceDetails & drag
 void DashboardItemManagerUI::itemDropped(const SourceDetails & details)
 {
 	String type = details.description.getProperty("type", "").toString();
-	if (type == "Comment")
-	{
-		commentManagerUI->itemDropped(details);
-		return;
-	}
 
 	BaseManagerViewUI::itemDropped(details);
 
@@ -164,7 +134,7 @@ void DashboardItemManagerUI::showMenuAndAddItem(bool fromAddButton, Point<int> m
 	{
 		Point<float> p = getViewPos(mousePos);
 		if (result == -1) manager->addItem(new DashboardGroupItem(), p);
-		else if (result == -2) manager->commentManager.addItem(p);
+		else if (result == -2) manager->addItem(new DashboardCommentItem(), p);
 		else manager->addItem(manager->managerFactory->createFromMenuResult(result), p);
 	}
 }
