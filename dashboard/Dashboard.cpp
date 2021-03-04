@@ -58,12 +58,6 @@ var Dashboard::getServerData()
 	data.getDynamicObject()->setProperty("id", shortName);
 	data.getDynamicObject()->setProperty("name", niceName);
 	data.getDynamicObject()->setProperty("size", itemManager.canvasSize->value);
-
-	var iData;
-	for (auto& i : itemManager.items)
-	{
-		iData.append(i->getServerData());
-	}
-	data.getDynamicObject()->setProperty("items", iData);
+	itemManager.fillServerData(data);
 	return data;
 }

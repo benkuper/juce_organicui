@@ -32,6 +32,7 @@ var DashboardGroupItem::getServerData()
 	data.getDynamicObject()->setProperty("borderColor", borderColor->value);
 
 
+	itemManager.fillServerData(data);
 
 	return data;
 }
