@@ -35,6 +35,7 @@ class DashboardManager :
 	public Dashboard::DashboardListener,
 	public EngineListener
 #if ORGANICUI_USE_WEBSERVER
+	,public SimpleWebSocketServer::RequestHandler
 	,public SimpleWebSocketServer::Listener
 	,public URL::DownloadTask::Listener
 #endif
@@ -77,6 +78,12 @@ public:
 	void connectionOpened(const String& id) override;
 	void messageReceived(const String& id, const String& message) override;
 	void connectionClosed(const String& id, int status, const String& reason) override;
+
+	var getServerData();
+
+	// Inherited via RequestHandler
+	virtual bool handleHTTPRequest(std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request) override;
+
 #endif
 
 
@@ -85,5 +92,7 @@ private:
 	ServusThread servusThread;
 #endif
 
+
+	
 };
 

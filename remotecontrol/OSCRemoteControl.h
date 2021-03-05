@@ -73,7 +73,7 @@ public:
 	HashMap<Controllable*, String> noFeedbackMap;
 
 	void setupServer();
-	void handleHTTPRequest(std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request) override;
+	bool handleHTTPRequest(std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request) override;
 	var getOSCQueryDataForContainer(ControllableContainer* cc);
 	var getOSCQueryDataForControllable(Controllable* c);
 

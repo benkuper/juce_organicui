@@ -286,7 +286,7 @@ void OSCRemoteControl::setupServer()
 	server->start(localPort->intValue(), "");
 }
 
-void OSCRemoteControl::handleHTTPRequest(std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request)
+bool OSCRemoteControl::handleHTTPRequest(std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request)
 {
 	var data;
 	if (String(request->query_string).contains("HOST_INFO"))
@@ -323,6 +323,8 @@ void OSCRemoteControl::handleHTTPRequest(std::shared_ptr<HttpServer::Response> r
 
 	response->write(SimpleWeb::StatusCode::success_ok, header);
 	*response << dataStr;
+
+	return true;
 }
 
 var OSCRemoteControl::getOSCQueryDataForContainer(ControllableContainer* cc)

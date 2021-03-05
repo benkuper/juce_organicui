@@ -1,4 +1,3 @@
-#include "DashboardManager.h"
 /*
   ==============================================================================
 
@@ -70,6 +69,7 @@ void DashboardManager::setupServer()
 	int port = ProjectSettings::getInstance()->serverPort->intValue();
 
 	server.reset(new SimpleWebSocketServer());
+	server->handler = this;
 	server->rootPath = serverRootPath;
 	server->addWebSocketListener(this);
 	server->start(port);
@@ -85,20 +85,10 @@ void DashboardManager::setupServer()
 void DashboardManager::connectionOpened(const String& id)
 {
 	LOG("New browser connection to the Dashboard from " << id);
-	if (server == nullptr) return;
+	//if (server == nullptr) return;
+	//String s = JSON::toString(data, true);
+	//server->sendTo(s, id);
 
-	var data(new DynamicObject());
-	data.getDynamicObject()->setProperty("dataType", "all");
-	data.getDynamicObject()->setProperty("appName", OrganicApplication::getInstance()->getApplicationName());
-
-	var iData;
-	for (auto& d : items)
-	{
-		iData.append(d->getServerData());
-	}
-	data.getDynamicObject()->setProperty("items", iData);
-	String s = JSON::toString(data,true);
-	server->sendTo(s, id);
 }
 
 void DashboardManager::messageReceived(const String& id, const String& message)
@@ -146,6 +136,45 @@ void DashboardManager::messageReceived(const String& id, const String& message)
 void DashboardManager::connectionClosed(const String& id, int status, const String& reason)
 {
 	LOG("Connection to the Dashboard closed by " << id);
+}
+
+var DashboardManager::getServerData()
+{
+	var data(new DynamicObject());
+	data.getDynamicObject()->setProperty("dataType", "all");
+	data.getDynamicObject()->setProperty("appName", OrganicApplication::getInstance()->getApplicationName());
+
+	var iData;
+	for (auto& d : items)
+	{
+		iData.append(d->getServerData());
+	}
+	data.getDynamicObject()->setProperty("items", iData);
+	return data;
+}
+
+
+bool DashboardManager::handleHTTPRequest(std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request)
+{
+	if (String(request->path) == "/data")
+	{
+
+		var data = getServerData();
+
+		String dataStr = JSON::toString(data, true);
+
+		SimpleWeb::CaseInsensitiveMultimap header;
+		header.emplace("Content-Length", String(dataStr.length()).toStdString());
+		header.emplace("Content-Type", "application/json");
+		header.emplace("Accept-range", "bytes");
+
+		response->write(SimpleWeb::StatusCode::success_ok, header);
+		*response << dataStr;
+
+		return true;
+	}
+
+	return false;
 }
 
 void DashboardManager::setupDownloadURL(const String& _downloadURL)
