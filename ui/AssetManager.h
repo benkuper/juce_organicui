@@ -21,6 +21,8 @@ public:
 
 	Image warningImage;
 	Image eyeImage;
+	Image powerOn;
+	Image powerOff;
 
 	ImageButton * getRemoveBT();
 	ImageButton * getConfigBT();

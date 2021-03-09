@@ -7,6 +7,10 @@ AssetManager::AssetManager()
 {
 	warningImage = ImageCache::getFromMemory(OrganicUIBinaryData::warning_png, OrganicUIBinaryData::warning_pngSize);
 	eyeImage = ImageCache::getFromMemory(OrganicUIBinaryData::eye_png, OrganicUIBinaryData::eye_pngSize);
+
+	powerOn = ImageCache::getFromMemory(OrganicUIBinaryData::power_png, OrganicUIBinaryData::power_pngSize);
+	powerOff = powerOn.createCopy();
+	powerOff.desaturate();
 }
 
 AssetManager::~AssetManager()
