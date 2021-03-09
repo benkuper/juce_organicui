@@ -91,7 +91,12 @@ public:
 	{
 	public:
 		virtual ~ItemMinimalUIListener() {}
+
 		virtual void itemUIViewPositionChanged(BaseItemMinimalUI<T>*) {}
+		
+		virtual void itemUIResizeDrag(BaseItemMinimalUI<T>*, const Point<int>& dragOffset) {}
+		virtual void itemUIResizeEnd(BaseItemMinimalUI<T>*) {}
+
 		virtual void askForSyncPosAndSize(BaseItemMinimalUI<T>*) {}
 		virtual void askSelectToThis(BaseItemMinimalUI<T>*) {}
 	};
@@ -132,6 +137,7 @@ BaseItemMinimalUI<T>::BaseItemMinimalUI(T* _item) :
 	}
 
 }
+
 
 template<class T>
 BaseItemMinimalUI<T>::~BaseItemMinimalUI()

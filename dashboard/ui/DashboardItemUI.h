@@ -25,12 +25,13 @@ public:
 
 	virtual void mouseDown(const MouseEvent& e) override;
 	virtual void mouseEnter(const MouseEvent& e) override;
+	virtual void mouseDrag(const MouseEvent& e) override;
 	virtual void mouseUp(const MouseEvent& e) override;
 
 	virtual void updateEditMode();
 	virtual void updateEditModeInternal(bool editMode) {}
 
-	ResizableBorderComponent resizer;
+	BaseItemUI<DashboardItem>::ItemResizerComponent resizer;
 
 	virtual void newMessage(const Parameter::ParameterEvent& e) override;
 

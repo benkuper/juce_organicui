@@ -28,6 +28,8 @@ DashboardCommentItemUI::DashboardCommentItemUI(DashboardCommentItem* comment) :
 	addAndMakeVisible(&textUI);
 
 	setSize(textUI.getTextWidth(), textUI.getTextHeight() + 4);
+
+	removeChildComponent(&resizer);
 }
 
 DashboardCommentItemUI::~DashboardCommentItemUI()
@@ -41,6 +43,7 @@ void DashboardCommentItemUI::resizedDashboardItemInternal()
 
 void DashboardCommentItemUI::updateEditModeInternal(bool editMode)
 {
+
 	textUI.setReadOnly(!editMode);
 	disableTextEditor();
 }

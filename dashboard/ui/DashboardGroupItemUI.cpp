@@ -10,8 +10,6 @@ DashboardGroupItemUI::DashboardGroupItemUI(DashboardGroupItem* group) :
 	managerUI->setDisableDefaultMouseEvents(true);
 	managerUI->autoSelectWithChildRespect = DashboardManager::getInstance()->editMode->boolValue();
 	addAndMakeVisible(managerUI.get(), 0);
-
-	setSize(400, 300);
 }
 
 DashboardGroupItemUI::~DashboardGroupItemUI()

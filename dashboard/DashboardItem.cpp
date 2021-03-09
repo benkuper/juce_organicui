@@ -11,10 +11,10 @@
 DashboardItem::DashboardItem(Inspectable * _target, const String &name) :
 	BaseItem(name, false)
 {
-	viewUISize->setPoint(100, 20);
-	
 	viewUIPosition->hideInEditor = false;
 	viewUISize->hideInEditor = false;
+
+	viewUISize->setPoint(400, 300);
 }
 
 DashboardItem::~DashboardItem()

@@ -1,8 +1,6 @@
-#include "DashboardItemUI.h"
-
 DashboardItemUI::DashboardItemUI(DashboardItem* item) :
 	BaseItemMinimalUI(item),
-	resizer(this, nullptr)
+	resizer()
 {
 	bgColor = Colours::transparentBlack;
 
@@ -12,7 +10,7 @@ DashboardItemUI::DashboardItemUI(DashboardItem* item) :
 	setRepaintsOnMouseActivity(true);
 	autoDrawContourWhenSelected = false;
 
-	resizer.setBorderThickness(BorderSize<int>(6));
+	//resizer.setBorderThickness(BorderSize<int>(6));
 	addChildComponent(resizer);
 	setInterceptsMouseClicks(true, true);
 
@@ -21,6 +19,9 @@ DashboardItemUI::DashboardItemUI(DashboardItem* item) :
 	DashboardManager::getInstance()->editMode->addAsyncParameterListener(this);
 
 	item->viewUISize->addAsyncParameterListener(this);
+
+	setSize(item->viewUISize->x, item->viewUISize->y);
+
 }
 
 DashboardItemUI::~DashboardItemUI()
@@ -61,7 +62,7 @@ void DashboardItemUI::resized()
 {
 	if (resizer.isVisible())
 	{
-		resizer.setBounds(getLocalBounds());
+		resizer.setBounds(getLocalBounds().removeFromRight(10).removeFromBottom(10));
 	}
 
 	resizedDashboardItemInternal();
@@ -72,6 +73,11 @@ void DashboardItemUI::mouseDown(const MouseEvent& e)
 	bool editMode = DashboardManager::getInstance()->editMode->boolValue();
 	if (!editMode) return; //avoid dashboard item select when in play mode
 
+	if (e.eventComponent == &resizer)
+	{
+		this->baseItem->setSizeReference(true);
+	}
+
 	BaseItemMinimalUI::mouseDown(e);
 }
 
@@ -81,12 +87,32 @@ void DashboardItemUI::mouseEnter(const MouseEvent& e)
 	repaint();
 }
 
+void DashboardItemUI::mouseDrag(const MouseEvent& e)
+{
+	bool editMode = DashboardManager::getInstance()->editMode->boolValue();
+	if (!editMode) return; //avoid dashboard item select when in play mode
+	
+	if (e.eventComponent == &resizer)
+	{
+		itemMinimalUIListeners.call(&ItemMinimalUIListener::itemUIResizeDrag, this, e.getOffsetFromDragStart());
+	}
+	else
+	{
+		BaseItemMinimalUI::mouseDrag(e);
+	}
+}
+
 void DashboardItemUI::mouseUp(const MouseEvent& e)
 {
 	BaseItemMinimalUI::mouseUp(e);
+	
+	bool editMode = DashboardManager::getInstance()->editMode->boolValue();
+	if (!editMode) return; //avoid dashboard item select when in play mode
+	
 	if (e.originalComponent == &resizer)
 	{
-		itemMinimalUIListeners.call(&ItemMinimalUIListener::askForSyncPosAndSize, this);
+		itemMinimalUIListeners.call(&ItemMinimalUIListener::itemUIResizeEnd, this);
+		//itemMinimalUIListeners.call(&ItemMinimalUIListener::askForSyncPosAndSize, this);
 	}
 }
 

@@ -47,12 +47,16 @@ public:
 		public Component
 	{
 	public:
-		ItemResizerComponent() {}
+		ItemResizerComponent() 
+		{
+			setMouseCursor(MouseCursor::BottomRightCornerResizeCursor);
+		}
+
 		~ItemResizerComponent() {}
 
 		void paint(Graphics& g)
 		{
-			g.setColour(isMouseOverOrDragging() ? HIGHLIGHT_COLOR : Colours::lightgrey);
+			g.setColour(isMouseOverOrDragging() ? HIGHLIGHT_COLOR : Colours::lightgrey.withAlpha(.3f));
 			for (int i = 0; i < 3; i++) g.drawLine(getWidth() * i / 3, getHeight(), getWidth(), getHeight() * i / 3);
 		}
 	};
@@ -114,8 +118,6 @@ public:
 	public:
 		virtual ~ItemUIListener() {}
 		virtual void itemUIMiniModeChanged(BaseItemUI<T>*) {}
-		virtual void itemUIResizeDrag(BaseItemUI<T>*, const Point<int>& dragOffset) {}
-		virtual void itemUIResizeEnd(BaseItemUI<T>*) {}
 	};
 
 	ListenerList<ItemUIListener> itemUIListeners;
@@ -451,7 +453,7 @@ void BaseItemUI<T>::mouseDrag(const MouseEvent& e)
 {
 	if (e.eventComponent == cornerResizer.get())
 	{
-		itemUIListeners.call(&ItemUIListener::itemUIResizeDrag, this, e.getOffsetFromDragStart());
+		itemMinimalUIListeners.call(&ItemMinimalUIListener::itemUIResizeDrag, this, e.getOffsetFromDragStart());
 	}
 
 	BaseItemMinimalUI<T>::mouseDrag(e);
@@ -462,8 +464,7 @@ void BaseItemUI<T>::mouseUp(const MouseEvent& e)
 {
 	if (e.eventComponent == cornerResizer.get())
 	{
-		this->baseItem->addResizeToUndoManager(true);
-		itemUIListeners.call(&ItemUIListener::itemUIResizeEnd, this);
+		itemMinimalUIListeners.call(&ItemMinimalUIListener::itemUIResizeEnd, this);
 	}
 }
 
