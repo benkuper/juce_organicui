@@ -139,4 +139,5 @@ void DashboardItemUI::newMessage(const Parameter::ParameterEvent& e)
 	{
 		updateEditMode();
 	}
+
 }

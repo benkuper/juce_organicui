@@ -57,6 +57,8 @@ public:
 	void setViewSize(float x, float y);
 	void setViewSize(Point<float> size);
 
+	virtual void updateItemUISize();
+
 	virtual void mouseDown(const MouseEvent& e) override;
 	virtual void mouseDrag(const MouseEvent& e) override;
 	virtual void mouseExit(const MouseEvent& e) override;
@@ -201,6 +203,12 @@ void BaseItemMinimalUI<T>::setViewSize(Point<float> size)
 }
 
 template<class T>
+void BaseItemMinimalUI<T>::updateItemUISize()
+{
+	setViewSize(baseItem->viewUISize->getPoint());
+}
+
+template<class T>
 void BaseItemMinimalUI<T>::mouseDown(const MouseEvent& e)
 {
 	InspectableContentComponent::mouseDown(e);
@@ -325,7 +333,10 @@ void BaseItemMinimalUI<T>::newMessage(const ContainerAsyncEvent & e)
 template<class T>
 void BaseItemMinimalUI<T>::controllableFeedbackUpdateInternal(Controllable * c)
 {
-	
+	if (c == this->baseItem->viewUISize)
+	{
+		updateItemUISize();
+	}
 }
 
 template<class T>

@@ -83,7 +83,7 @@ public:
 	int getHeightWithoutContent();
 
 	virtual void updateMiniModeUI();
-	virtual void updateItemUISize();
+	virtual void updateItemUISize() override;
 
 	//void setGrabber(Grabber * newGrabber);
 
@@ -93,7 +93,6 @@ public:
 	virtual void resizedInternalContent(juce::Rectangle<int>&) {}
 	virtual void resizedInternalFooter(juce::Rectangle<int>&) {}
 	virtual void buttonClicked(Button* b) override;
-
 
 	virtual void mouseDown(const MouseEvent& e) override;
 	virtual void mouseDrag(const MouseEvent& e) override;
@@ -310,7 +309,7 @@ void BaseItemUI<T>::updateItemUISize()
 			break;
 		}
 
-		this->setSize(targetWidth, targetHeight);
+		this->setViewSize(targetWidth, targetHeight);
 	}
 
 }
@@ -514,10 +513,6 @@ void BaseItemUI<T>::controllableFeedbackUpdateInternal(Controllable* c)
 {
 	BaseItemMinimalUI<T>::controllableFeedbackUpdateInternal(c);
 	if (c == this->baseItem->miniMode) updateMiniModeUI();
-	else if (c == this->baseItem->viewUISize)
-	{
-		updateItemUISize();
-	}
 }
 
 template<class T>
