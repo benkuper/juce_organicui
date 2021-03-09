@@ -45,7 +45,7 @@ public:
 
 	//UI moving X/Y
 	Point<float> movePositionReference;
-
+	Point<float> sizeReference;
 
 	virtual void clearItem();
 
@@ -69,6 +69,16 @@ public:
 	virtual Point<float> getPosition();
 	void addMoveToUndoManager(bool addOtherSelectedItems = false);
 	virtual void addUndoableMoveAction(Array<UndoableAction *> &arrayToAdd);
+
+	void setSizeReference(bool setOtherSelectedItems = false);
+	virtual void setSizeReferenceInternal();
+	void resizeItem(Point<float> sizeOffset, bool resizeOtherSelectedItems = false);
+	virtual void setItemSize(Point<float> size);
+	virtual Point<float> getItemSize();
+
+	void addResizeToUndoManager(bool addOtherSelectedItems = false);
+	virtual void addUndoableResizeAction(Array<UndoableAction*>& arrayToAdd);
+
 
 	//listeners
 	virtual void onContainerParameterChanged(Parameter *) override;

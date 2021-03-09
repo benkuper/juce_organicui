@@ -1,3 +1,4 @@
+#include "BaseItem.h"
 /*
   ==============================================================================
 
@@ -246,6 +247,79 @@ void BaseItem::addMoveToUndoManager(bool addOtherSelectedItems)
 void BaseItem::addUndoableMoveAction(Array<UndoableAction *> &arrayToAdd)
 {
 	arrayToAdd.add(viewUIPosition->setUndoablePoint(movePositionReference, viewUIPosition->getPoint(), true));
+}
+
+void BaseItem::setSizeReference(bool setOtherSelectedItems)
+{
+	setSizeReferenceInternal();
+
+	if (setOtherSelectedItems)
+	{
+		Array<BaseItem*> items = InspectableSelectionManager::activeSelectionManager->getInspectablesAs<BaseItem>();
+		for (auto& i : items)
+		{
+			if (i == this) continue;
+			i->setSizeReference(false);
+		}
+	}
+}
+
+void BaseItem::setSizeReferenceInternal()
+{
+	sizeReference = getItemSize();
+}
+
+void BaseItem::resizeItem(Point<float> sizeOffset, bool resizeOtherSelectedItems)
+{
+	setItemSize(sizeReference + sizeOffset);
+
+	if (resizeOtherSelectedItems)
+	{
+		Array<BaseItem*> items = InspectableSelectionManager::activeSelectionManager->getInspectablesAs<BaseItem>();
+		for (auto& i : items)
+		{
+			if (i == this) continue;
+			i->resizeItem(sizeOffset, false);
+		}
+	}
+}
+
+void BaseItem::setItemSize(Point<float> size)
+{
+	viewUISize->setPoint(size);
+}
+
+Point<float> BaseItem::getItemSize()
+{
+	return viewUISize->getPoint();
+}
+
+void BaseItem::addResizeToUndoManager(bool addOtherSelectedItems)
+{
+	Array<UndoableAction*> actions;
+
+	int numItems = 1;
+	if (!addOtherSelectedItems)
+	{
+		addUndoableResizeAction(actions);
+	}
+	else
+	{
+		Array<BaseItem*> items = InspectableSelectionManager::activeSelectionManager->getInspectablesAs<BaseItem>();
+		for (auto& i : items)
+		{
+			i->addUndoableResizeAction(actions);
+		}
+
+		numItems = items.size();
+	}
+
+	UndoMaster::getInstance()->performActions("Resize " + String(numItems) + " item" + String(numItems > 1 ? "s" : ""), actions);
+}
+
+void BaseItem::addUndoableResizeAction(Array<UndoableAction*>& arrayToAdd)
+{
+	arrayToAdd.add(viewUISize->setUndoablePoint(sizeReference, viewUISize->getPoint(), true));
 }
 
 void BaseItem::onContainerParameterChanged(Parameter * p)

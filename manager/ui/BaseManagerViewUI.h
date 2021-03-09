@@ -95,8 +95,6 @@ public:
 
 	virtual void addItemUIInternal(U * se) override; 
 
-	//virtual void itemUIGrabbed(BaseItemMinimalUI<T> * se) override;
-
 	void itemDragMove(const DragAndDropTarget::SourceDetails& dragSourceDetails) override;
     void itemDropped(const DragAndDropTarget::SourceDetails &dragSourceDetails) override;
 
@@ -148,6 +146,11 @@ void BaseManagerViewUI<M, T, U>::mouseDown(const MouseEvent & e)
 		this->updateMouseCursor();
 		initViewOffset = Point<int>(viewOffset.x, viewOffset.y);
 	}
+	else if (ResizableCornerComponent* r = dynamic_cast<ResizableCornerComponent*>(e.eventComponent))
+	{
+		BaseItemUI<T>* ui = (BaseItemUI<T>*)r->getParentComponent();
+		ui->item->setSizeReference(true);
+	}
 }
 
 template<class M, class T, class U>
@@ -162,6 +165,12 @@ void BaseManagerViewUI<M, T, U>::mouseDrag(const MouseEvent & e)
 		this->resized();
 		this->repaint();
 	}
+	else if (ResizableCornerComponent* r = dynamic_cast<ResizableCornerComponent*>(e.eventComponent))
+	{
+		BaseItemUI<T>* ui = (BaseItemUI<T>*)r->getParentComponent();
+		Point<float> sizeOffset = ui->item->getItemSize() - ui->item->sizeReference;
+		ui->item->resizeItem(sizeOffset, true);
+	}
 }
 
 template<class M, class T, class U>
@@ -174,6 +183,13 @@ void BaseManagerViewUI<M, T, U>::mouseUp(const MouseEvent & e)
 
 	this->setMouseCursor(MouseCursor::NormalCursor);
 	this->updateMouseCursor();
+
+	if (ResizableCornerComponent* r = dynamic_cast<ResizableCornerComponent*>(e.eventComponent))
+	{
+		BaseItemUI<T>* ui = (BaseItemUI<T>*)r->getParentComponent();
+		Point<float> sizeOffset = ui->item->getItemSize() - ui->item->sizeReference;
+		ui->item->addResizeToUndoManager(true);
+	}
 }
 
 template<class M, class T, class U>
