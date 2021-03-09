@@ -13,7 +13,7 @@
 template<class T>
 class BaseItemUI :
 	public BaseItemMinimalUI<T>,
-	public Button::Listener, 
+	public Button::Listener,
 	public Label::Listener,
 	public ComponentListener,
 	public Parameter::AsyncListener
@@ -21,7 +21,7 @@ class BaseItemUI :
 public:
 	enum Direction { NONE, VERTICAL, HORIZONTAL, ALL };
 
-	BaseItemUI<T>(T * _item, Direction resizeDirection = NONE, bool showMiniModeBT = false);
+	BaseItemUI<T>(T* _item, Direction resizeDirection = NONE, bool showMiniModeBT = false);
 	virtual ~BaseItemUI<T>();
 
 	//LAYOUT
@@ -42,11 +42,26 @@ public:
 	int resizerWidth;
 	int resizerHeight;
 
-	std::unique_ptr<ResizableCornerComponent> cornerResizer;
+
+	class ItemResizerComponent :
+		public Component
+	{
+	public:
+		ItemResizerComponent() {}
+		~ItemResizerComponent() {}
+
+		void paint(Graphics& g)
+		{
+			g.setColour(isMouseOverOrDragging() ? HIGHLIGHT_COLOR : Colours::lightgrey);
+			for (int i = 0; i < 3; i++) g.drawLine(getWidth() * i / 3, getHeight(), getWidth(), getHeight() * i / 3);
+		}
+	};
+
+	std::unique_ptr<ItemResizerComponent> cornerResizer;
 	std::unique_ptr<ResizableEdgeComponent> edgeResizer;
 	ComponentBoundsConstrainer constrainer;
 
-	Component * resizer;
+	Component* resizer;
 
 	Label itemLabel;
 	std::unique_ptr<BoolToggleUI> enabledBT;
@@ -56,7 +71,7 @@ public:
 
 	//std::unique_ptr<Grabber> grabber;
 
-	Array<Component *> contentComponents;
+	Array<Component*> contentComponents;
 
 	void setContentSize(int contentWidth, int contentHeight);
 
@@ -64,37 +79,43 @@ public:
 	int getHeightWithoutContent();
 
 	virtual void updateMiniModeUI();
+	virtual void updateItemUISize();
 
 	//void setGrabber(Grabber * newGrabber);
 
 	virtual void resized() override;
 	virtual void resizedHeader(juce::Rectangle<int>& r);
 	virtual void resizedInternalHeader(juce::Rectangle<int>&) {}
-	virtual void resizedInternalContent(juce::Rectangle<int> &) {}
-	virtual void resizedInternalFooter(juce::Rectangle<int> &) {}
-	virtual void buttonClicked(Button *b) override;
+	virtual void resizedInternalContent(juce::Rectangle<int>&) {}
+	virtual void resizedInternalFooter(juce::Rectangle<int>&) {}
+	virtual void buttonClicked(Button* b) override;
 
 
-	virtual void mouseDown(const MouseEvent &e) override;
-	virtual void labelTextChanged(Label * l) override;
-	virtual bool keyPressed(const KeyPress &e) override;
+	virtual void mouseDown(const MouseEvent& e) override;
+	virtual void mouseDrag(const MouseEvent& e) override;
+	virtual void mouseUp(const MouseEvent& e) override;
 
-	virtual bool canStartDrag(const MouseEvent &e) override;
+	virtual void labelTextChanged(Label* l) override;
+	virtual bool keyPressed(const KeyPress& e) override;
 
-	virtual void containerChildAddressChangedAsync(ControllableContainer *) override;
-	virtual void controllableFeedbackUpdateInternal(Controllable *) override;
+	virtual bool canStartDrag(const MouseEvent& e) override;
+
+	virtual void containerChildAddressChangedAsync(ControllableContainer*) override;
+	virtual void controllableFeedbackUpdateInternal(Controllable*) override;
 
 	virtual void newMessage(const Parameter::ParameterEvent& e) override;
-	
+
 	virtual void visibilityChanged() override;
 
-	virtual void componentVisibilityChanged(Component &c) override;
+	virtual void componentVisibilityChanged(Component& c) override;
 
 	class ItemUIListener
 	{
 	public:
 		virtual ~ItemUIListener() {}
-		virtual void itemUIMiniModeChanged(BaseItemUI<T> *) {}
+		virtual void itemUIMiniModeChanged(BaseItemUI<T>*) {}
+		virtual void itemUIResizeDrag(BaseItemUI<T>*, const Point<int>& dragOffset) {}
+		virtual void itemUIResizeEnd(BaseItemUI<T>*) {}
 	};
 
 	ListenerList<ItemUIListener> itemUIListeners;
@@ -108,11 +129,11 @@ private:
 
 
 template<class T>
-BaseItemUI<T>::BaseItemUI(T * _item, Direction _resizeDirection, bool showMiniModeBT) :
+BaseItemUI<T>::BaseItemUI(T* _item, Direction _resizeDirection, bool showMiniModeBT) :
 	BaseItemMinimalUI<T>(_item),
 	margin(3),
 	minContentHeight(2),
-	headerHeight(GlobalSettings::getInstance()->fontSize->floatValue()+2),
+	headerHeight(GlobalSettings::getInstance()->fontSize->floatValue() + 2),
 	headerGap(2),
 	showEnableBT(true),
 	showRemoveBT(true),
@@ -120,7 +141,7 @@ BaseItemUI<T>::BaseItemUI(T * _item, Direction _resizeDirection, bool showMiniMo
 	resizerWidth(0),
 	resizerHeight(0),
 	resizer(nullptr),
-	itemLabel("itemLabel", dynamic_cast<BaseItem *>(this->inspectable.get())->niceName)
+	itemLabel("itemLabel", dynamic_cast<BaseItem*>(this->inspectable.get())->niceName)
 {
 
 	this->setName(this->baseItem->niceName);
@@ -162,8 +183,8 @@ BaseItemUI<T>::BaseItemUI(T * _item, Direction _resizeDirection, bool showMiniMo
 
 	case ALL:
 		resizerHeight = 10;
-		constrainer.setMinimumSize(resizerWidth + 20, headerHeight + headerGap + minContentHeight + resizerHeight);
-		cornerResizer.reset(new ResizableCornerComponent(this, &constrainer));
+		//constrainer.setMinimumSize(resizerWidth + 20, headerHeight + headerGap + minContentHeight + resizerHeight);
+		cornerResizer.reset(new ItemResizerComponent());
 		cornerResizer->setAlwaysOnTop(true);
 		this->addAndMakeVisible(cornerResizer.get());
 		break;
@@ -202,11 +223,12 @@ BaseItemUI<T>::BaseItemUI(T * _item, Direction _resizeDirection, bool showMiniMo
 	updateMiniModeUI();
 }
 
+
 template<class T>
 BaseItemUI<T>::~BaseItemUI()
 {
 	if (removeBT != nullptr) removeBT->removeListener(this);
-	if(GlobalSettings::getInstanceWithoutCreating() != nullptr) GlobalSettings::getInstance()->fontSize->removeAsyncParameterListener(this);
+	if (GlobalSettings::getInstanceWithoutCreating() != nullptr) GlobalSettings::getInstance()->fontSize->removeAsyncParameterListener(this);
 }
 
 template<class T>
@@ -228,8 +250,16 @@ template<class T>
 void BaseItemUI<T>::updateMiniModeUI()
 {
 	//auto hide/show component in content section
-	for (auto &c : contentComponents) c->setVisible(!this->baseItem->miniMode->boolValue());
+	for (auto& c : contentComponents) c->setVisible(!this->baseItem->miniMode->boolValue());
 
+	updateItemUISize();
+
+	itemUIListeners.call(&ItemUIListener::itemUIMiniModeChanged, this);
+}
+
+template<class T>
+void BaseItemUI<T>::updateItemUISize()
+{
 	if (this->baseItem->miniMode->boolValue())
 	{
 		if (resizer != nullptr) this->removeChildComponent(resizer);
@@ -237,14 +267,14 @@ void BaseItemUI<T>::updateMiniModeUI()
 		int targetWidth = this->getWidth();
 		if (targetWidth == 0)
 		{
-			if (resizeDirection == ALL) targetWidth = this->baseItem->viewUISize->getPoint().x;
+			if (resizeDirection == ALL) targetWidth = this->baseItem->viewUISize->x;
 			else if (resizeDirection == HORIZONTAL) targetWidth = this->baseItem->listUISize->floatValue();
 		}
 
 		int targetHeight = getHeightWithoutContent();
 		if (targetHeight == 0)
 		{
-			if (resizeDirection == ALL) targetHeight = this->baseItem->viewUISize->getPoint().x;
+			if (resizeDirection == ALL) targetHeight = this->baseItem->viewUISize->y;
 			else if (resizeDirection == VERTICAL) targetHeight = this->baseItem->listUISize->floatValue();
 		}
 
@@ -260,8 +290,8 @@ void BaseItemUI<T>::updateMiniModeUI()
 		switch (resizeDirection)
 		{
 		case ALL:
-			targetWidth = (int)this->baseItem->viewUISize->getPoint().x;
-			targetHeight = (int)this->baseItem->viewUISize->getPoint().y;
+			targetWidth = (int)this->baseItem->viewUISize->x;
+			targetHeight = (int)this->baseItem->viewUISize->y;
 			break;
 
 		case VERTICAL:
@@ -281,7 +311,6 @@ void BaseItemUI<T>::updateMiniModeUI()
 		this->setSize(targetWidth, targetHeight);
 	}
 
-	itemUIListeners.call(&ItemUIListener::itemUIMiniModeChanged, this);
 }
 
 
@@ -311,7 +340,7 @@ void BaseItemUI<T>::resized()
 		warningUI->setBounds(h.removeFromLeft(h.getHeight())); //warning
 		h.removeFromLeft(2);
 	}
-	
+
 	if (removeBT != nullptr && showRemoveBT)
 	{
 		removeBT->setBounds(h.removeFromRight(h.getHeight()));
@@ -364,7 +393,7 @@ void BaseItemUI<T>::resized()
 				resizedInternalFooter(fr);
 				cornerResizer->setBounds(fr.withLeft(r.getWidth() - resizerHeight));
 
-				this->baseItem->viewUISize->setPoint(this->getWidth(), this->getHeight());
+				//this->baseItem->viewUISize->setPoint(this->getWidth(), this->getHeight());
 
 			}
 			break;
@@ -389,7 +418,7 @@ void BaseItemUI<T>::resizedHeader(juce::Rectangle<int>& r)
 }
 
 template<class T>
-void BaseItemUI<T>::buttonClicked(Button * b)
+void BaseItemUI<T>::buttonClicked(Button* b)
 {
 	if (b == removeBT.get())
 	{
@@ -404,23 +433,42 @@ void BaseItemUI<T>::buttonClicked(Button * b)
 
 
 template<class T>
-void BaseItemUI<T>::mouseDown(const MouseEvent & e)
+void BaseItemUI<T>::mouseDown(const MouseEvent& e)
 {
 	//if ((removeBT != nullptr && e.eventComponent == removeBT) || (enabledBT != nullptr && e.eventComponent == enabledBT->bt)) return;
-	Button * b = dynamic_cast<Button *>(e.eventComponent);
-	if (b != nullptr) return;
-
-	TriggerUI * tui = dynamic_cast<TriggerUI *>(e.eventComponent);
-	if (tui != nullptr) return;
-
-	ParameterUI * pui = dynamic_cast<ParameterUI *>(e.eventComponent);
-	if (pui != nullptr) return;
+	if (dynamic_cast<Button*>(e.eventComponent) != nullptr) return;
+	else if (dynamic_cast<ControllableUI*>(e.eventComponent) != nullptr) return;
+	else if (e.eventComponent == cornerResizer.get())
+	{
+		this->baseItem->setSizeReference(true);
+	}
 
 	BaseItemMinimalUI<T>::mouseDown(e);
 }
 
 template<class T>
-void BaseItemUI<T>::labelTextChanged(Label * l)
+void BaseItemUI<T>::mouseDrag(const MouseEvent& e)
+{
+	if (e.eventComponent == cornerResizer.get())
+	{
+		itemUIListeners.call(&ItemUIListener::itemUIResizeDrag, this, e.getOffsetFromDragStart());
+	}
+
+	BaseItemMinimalUI<T>::mouseDrag(e);
+}
+
+template<class T>
+void BaseItemUI<T>::mouseUp(const MouseEvent& e)
+{
+	if (e.eventComponent == cornerResizer.get())
+	{
+		this->baseItem->addResizeToUndoManager(true);
+		itemUIListeners.call(&ItemUIListener::itemUIResizeEnd, this);
+	}
+}
+
+template<class T>
+void BaseItemUI<T>::labelTextChanged(Label* l)
 {
 	if (l == &itemLabel)
 	{
@@ -431,7 +479,7 @@ void BaseItemUI<T>::labelTextChanged(Label * l)
 }
 
 template<class T>
-bool BaseItemUI<T>::keyPressed(const KeyPress & e)
+bool BaseItemUI<T>::keyPressed(const KeyPress& e)
 {
 	if (!this->inspectable.wasObjectDeleted() && this->item->isSelected)
 	{
@@ -447,24 +495,28 @@ bool BaseItemUI<T>::keyPressed(const KeyPress & e)
 }
 
 template<class T>
-bool BaseItemUI<T>::canStartDrag(const MouseEvent & e)
+bool BaseItemUI<T>::canStartDrag(const MouseEvent& e)
 {
 	return e.eventComponent == this || (e.eventComponent == &itemLabel && !itemLabel.isBeingEdited());
 }
 
 
 template<class T>
-void BaseItemUI<T>::containerChildAddressChangedAsync(ControllableContainer *)
+void BaseItemUI<T>::containerChildAddressChangedAsync(ControllableContainer*)
 {
 
 	itemLabel.setText(this->baseItem->niceName, dontSendNotification);
 }
 
 template<class T>
-void BaseItemUI<T>::controllableFeedbackUpdateInternal(Controllable * c)
+void BaseItemUI<T>::controllableFeedbackUpdateInternal(Controllable* c)
 {
 	BaseItemMinimalUI<T>::controllableFeedbackUpdateInternal(c);
 	if (c == this->baseItem->miniMode) updateMiniModeUI();
+	else if (c == this->baseItem->viewUISize)
+	{
+		updateItemUISize();
+	}
 }
 
 template<class T>
