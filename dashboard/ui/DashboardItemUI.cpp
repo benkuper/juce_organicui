@@ -18,8 +18,6 @@ DashboardItemUI::DashboardItemUI(DashboardItem* item) :
 
 	DashboardManager::getInstance()->editMode->addAsyncParameterListener(this);
 
-	item->viewUISize->addAsyncParameterListener(this);
-
 	setSize(item->viewUISize->x, item->viewUISize->y);
 
 }
@@ -27,7 +25,6 @@ DashboardItemUI::DashboardItemUI(DashboardItem* item) :
 DashboardItemUI::~DashboardItemUI()
 {
 	if (DashboardManager::getInstanceWithoutCreating() != nullptr) DashboardManager::getInstance()->editMode->removeAsyncParameterListener(this);
-
 }
 
 void DashboardItemUI::paint(Graphics& g)
@@ -141,9 +138,5 @@ void DashboardItemUI::newMessage(const Parameter::ParameterEvent& e)
 	if (e.parameter == DashboardManager::getInstance()->editMode)
 	{
 		updateEditMode();
-	}
-	else if (e.parameter == item->viewUISize)
-	{
-		setSize(item->viewUISize->x, item->viewUISize->y);
 	}
 }
