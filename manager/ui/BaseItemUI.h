@@ -452,7 +452,7 @@ void BaseItemUI<T>::mouseDrag(const MouseEvent& e)
 {
 	if (e.eventComponent == cornerResizer.get())
 	{
-		itemMinimalUIListeners.call(&ItemMinimalUIListener::itemUIResizeDrag, this, e.getOffsetFromDragStart());
+		this->itemMinimalUIListeners.call(&ItemMinimalUIListener::itemUIResizeDrag, this, e.getOffsetFromDragStart());
 	}
 
 	BaseItemMinimalUI<T>::mouseDrag(e);
@@ -463,7 +463,7 @@ void BaseItemUI<T>::mouseUp(const MouseEvent& e)
 {
 	if (e.eventComponent == cornerResizer.get())
 	{
-		itemMinimalUIListeners.call(&ItemMinimalUIListener::itemUIResizeEnd, this);
+		this->itemMinimalUIListeners.call(&ItemMinimalUIListener::itemUIResizeEnd, this);
 	}
 }
 
