@@ -34,12 +34,12 @@ var DashboardControllableItem::getJSONData()
 	return data;
 }
 
-void DashboardControllableItem::loadJSONDataItemInternal(var data)
+void DashboardControllableItem::loadJSONData(var data, bool createIfNotThere)
 {
 	String address = data.getProperty("controllable", inspectableGhostAddress);
 	setInspectable(Engine::mainEngine->getControllableForAddress(address));
 
-	DashboardInspectableItem::loadJSONDataItemInternal(data);
+	DashboardInspectableItem::loadJSONData(data, createIfNotThere);
 }
 
 

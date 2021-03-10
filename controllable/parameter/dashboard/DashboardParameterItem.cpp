@@ -1,3 +1,4 @@
+#include "DashboardParameterItem.h"
 
 DashboardParameterItem::DashboardParameterItem(Parameter* parameter) :
 	DashboardControllableItem(parameter),
@@ -39,6 +40,8 @@ DashboardItemUI* DashboardParameterItem::createUI()
 void DashboardParameterItem::setInspectableInternal(Inspectable* i)
 {
 	DashboardControllableItem::setInspectableInternal(i);
+
+	if (parameter == i) return;
 
 	if (parameter != nullptr)
 	{
@@ -91,10 +94,10 @@ var DashboardParameterItem::getServerData()
 	if (fgColor->enabled) data.getDynamicObject()->setProperty("fgColor", bgColor->value);
 
 	int styleValue = (int)style->getValueData();
-	 data.getDynamicObject()->setProperty("style", styleValue);
+	data.getDynamicObject()->setProperty("style", styleValue);
 	if (styleValue == -1)
 	{
-		if(parameter->type == Controllable::FLOAT) data.getDynamicObject()->setProperty("defaultUI", ((FloatParameter*)parameter.get())->defaultUI);
+		if (parameter->type == Controllable::FLOAT) data.getDynamicObject()->setProperty("defaultUI", ((FloatParameter*)parameter.get())->defaultUI);
 	}
 
 	if (btImage->stringValue().isNotEmpty()) data.getDynamicObject()->setProperty("customImage", btImage->stringValue());

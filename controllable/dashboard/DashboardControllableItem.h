@@ -19,7 +19,7 @@ public:
 	StringParameter* customDescription;
 
     virtual var getJSONData() override;
-	virtual void loadJSONDataItemInternal(var data) override;
+	virtual void loadJSONData(var data, bool createIfNotThere = false) override; //needs to not override ItemInternal to force loading data after set inspectable
 
 	virtual void setInspectableInternal(Inspectable * i) override;
 
