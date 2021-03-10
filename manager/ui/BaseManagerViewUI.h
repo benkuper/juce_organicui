@@ -106,12 +106,12 @@ public:
 	virtual void itemUIResizeEnd(BaseItemMinimalUI<T>* itemUI) override;
 
 	//snapping
-	template<class T>
+	template<class ST>
 	class SnapResult
 	{
 	public:
-		SnapResult(BaseItemMinimalUI<T>* targetUI, float pos) : targetUI(targetUI), pos(pos) {}
-		BaseItemMinimalUI<T>* targetUI;
+		SnapResult(BaseItemMinimalUI<ST>* targetUI, float pos) : targetUI(targetUI), pos(pos) {}
+		BaseItemMinimalUI<ST>* targetUI;
 		float pos;
 	};
 
