@@ -29,6 +29,7 @@ DashboardItemUI* DashboardItem::createUI()
 var DashboardItem::getServerData()
 {
 	var data(new DynamicObject());
+	data.getDynamicObject()->setProperty("type", getTypeString());
 	data.getDynamicObject()->setProperty("position", viewUIPosition->value);
 	data.getDynamicObject()->setProperty("size", viewUISize->value);
 	return data;
