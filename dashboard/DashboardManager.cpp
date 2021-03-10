@@ -167,6 +167,7 @@ bool DashboardManager::handleHTTPRequest(std::shared_ptr<HttpServer::Response> r
 		header.emplace("Content-Length", String(dataStr.length()).toStdString());
 		header.emplace("Content-Type", "application/json");
 		header.emplace("Accept-range", "bytes");
+		header.emplace("Access-Control-Allow-Origin", "*");
 
 		response->write(SimpleWeb::StatusCode::success_ok, header);
 		*response << dataStr;
