@@ -106,16 +106,15 @@ public:
 	virtual void itemUIResizeEnd(BaseItemMinimalUI<T>* itemUI) override;
 
 	//snapping
-	template<class ST>
 	class SnapResult
 	{
 	public:
-		SnapResult(BaseItemMinimalUI<ST>* targetUI, float pos) : targetUI(targetUI), pos(pos) {}
-		BaseItemMinimalUI<ST>* targetUI;
+		SnapResult(BaseItemMinimalUI<T>* targetUI, float pos) : targetUI(targetUI), pos(pos) {}
+		BaseItemMinimalUI<T>* targetUI;
 		float pos;
 	};
 
-	virtual SnapResult<T> getClosestSnapUI(Point<float> pos, bool isX, float spacingBefore, float spacingAfter);
+	virtual SnapResult getClosestSnapUI(Point<float> pos, bool isX, float spacingBefore, float spacingAfter);
 };
 
 template<class M, class T, class U>
@@ -721,8 +720,8 @@ void BaseManagerViewUI<M, T, U>::itemUIResizeDrag(BaseItemMinimalUI<T>* itemUI, 
 
 	Point<float> snapPos = pos;
 
-	SnapResult<T> snapX = getClosestSnapUI(pos, true, snappingSpacing, 0);
-	SnapResult<T> snapY = getClosestSnapUI(pos, false, snappingSpacing, 0);
+	SnapResult snapX = getClosestSnapUI(pos, true, snappingSpacing, 0);
+	SnapResult snapY = getClosestSnapUI(pos, false, snappingSpacing, 0);
 
 	Point<int> snapInView = getPosInView(Point<float>(snapX.pos, snapY.pos));
 
@@ -760,7 +759,7 @@ void BaseManagerViewUI<M, T, U>::itemUIResizeEnd(BaseItemMinimalUI<T>* itemUI)
 }
 
 template<class M, class T, class U>
-BaseManagerViewUI<M, T, U>::SnapResult<T> BaseManagerViewUI<M, T, U>::getClosestSnapUI(Point<float> pos, bool isX, float spacingBefore, float spacingAfter)
+typename BaseManagerViewUI<M, T, U>::SnapResult BaseManagerViewUI<M, T, U>::getClosestSnapUI(Point<float> pos, bool isX, float spacingBefore, float spacingAfter)
 {
 	int dist = snappingThreshold;
 	int target = 0;
@@ -792,5 +791,5 @@ BaseManagerViewUI<M, T, U>::SnapResult<T> BaseManagerViewUI<M, T, U>::getClosest
 		}
 	}
 
-	return SnapResult<T>(targetUI, target);
+	return SnapResult(targetUI, target);
 }
