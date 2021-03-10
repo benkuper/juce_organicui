@@ -79,7 +79,9 @@ void OrganicApplication::initialise(const String & commandLine)
 //#if JUCE_WINDOWS
 	CrashDumpUploader::getInstance()->uploadEnabled = GlobalSettings::getInstance()->enableCrashUpload->boolValue();
 
-	bool noCrashWindow = GlobalSettings::getInstance()->openSpecificFileOnStartup->boolValue() | GlobalSettings::getInstance()->openLastDocumentOnStartup->boolValue();
+	bool noCrashWindow = GlobalSettings::getInstance()->openSpecificFileOnStartup->boolValue();
+	noCrashWindow |= GlobalSettings::getInstance()->openLastDocumentOnStartup->boolValue();
+
 #if JUCE_WINDOWS
 	if (GlobalSettings::getInstance()->launchOnStartup->boolValue()) noCrashWindow = true;
 #endif
