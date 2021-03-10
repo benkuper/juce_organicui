@@ -676,7 +676,7 @@ void BaseManagerViewUI<M, T, U>::itemDropped(const DragAndDropTarget::SourceDeta
 
 	snapLineX = Line<int>();
 	snapLineY = Line<int>();
-	repaint();
+	this->repaint();
 }
 
 template<class M, class T, class U>
@@ -756,7 +756,7 @@ void BaseManagerViewUI<M, T, U>::itemUIResizeEnd(BaseItemMinimalUI<T>* itemUI)
 
 	itemUI->baseItem->addResizeToUndoManager(true);
 
-	repaint();
+	this->repaint();
 }
 
 template<class M, class T, class U>
