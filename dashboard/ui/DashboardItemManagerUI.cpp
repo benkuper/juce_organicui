@@ -54,8 +54,10 @@ void DashboardItemManagerUI::paint(Graphics& g)
 
 	g.setColour(Colours::white.withAlpha(alpha));
 	float scale = manager->bgImageScale->floatValue();
+
 	Rectangle<int> r = getBoundsInView(Rectangle<float>().withSizeKeepingCentre(bgImage.getWidth()*scale, bgImage.getHeight()*scale));
 	g.drawImage(bgImage, r.toFloat(), RectanglePlacement::stretchToFit, false);
+	
 	
 }
 
@@ -75,6 +77,14 @@ void DashboardItemManagerUI::paintOverChildren(Graphics& g)
 
 		g.setColour(Colours::black.withAlpha(.5f));
 		g.fillPath(path);
+
+		int h = 50; // should be exposed
+		Rectangle<int> headerR = getBoundsInView(Rectangle<float>().withSizeKeepingCentre(p.x, p.y).removeFromTop(h));; 
+		g.setColour(BLUE_COLOR.withAlpha(.1f));
+		g.fillRect(headerR);
+		float dashes[] { 4, 3};
+		g.setColour(BLUE_COLOR.withAlpha(.3f));
+		g.drawDashedLine(Line<float>(headerR.getBottomLeft().toFloat(), headerR.getBottomRight().toFloat()), dashes , 2, .5f);
 	}
 }
 
