@@ -53,7 +53,7 @@ public:
 
 	void setState(ScriptState newState);
 
-	var callFunction(const Identifier &function, const Array<var> args, Result * result = (Result *)nullptr);
+	var callFunction(const Identifier &function, const Array<var> args, juce::Result * result = (juce::Result *)nullptr);
 
 	void onContainerParameterChangedInternal(Parameter *) override;
 	void onContainerTriggerTriggered(Trigger *) override;
