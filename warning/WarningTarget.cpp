@@ -1,4 +1,3 @@
-#include "WarningTarget.h"
 
 WarningTarget::WarningTarget() :
 	showWarningInUI(false),
@@ -15,9 +14,12 @@ WarningTarget::~WarningTarget()
 		WarningReporter::getInstance()->unregisterWarning(this);
 	}
 
-	MessageManagerLock mmLock;
-	warningTargetNotifier.handleUpdateNowIfNeeded();
-	warningTargetNotifier.cancelPendingUpdate();
+	if (warningTargetNotifier.isUpdatePending())
+	{
+		MessageManagerLock mmLock;
+		warningTargetNotifier.handleUpdateNowIfNeeded();
+		warningTargetNotifier.cancelPendingUpdate();
+	}
 
 	masterReference.clear();
 
