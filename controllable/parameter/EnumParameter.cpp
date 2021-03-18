@@ -19,6 +19,8 @@ EnumParameter::EnumParameter(const String & niceName, const String &description,
 	scriptObject.setMethod("setData", EnumParameter::setValueWithDataFromScript);
 	scriptObject.setMethod("addOption", EnumParameter::addOptionFromScript);
 	scriptObject.setMethod("removeOptions", EnumParameter::removeOptionsFromScript);
+
+	value = "";
 }
 
 EnumParameter * EnumParameter::addOption(String key, var data, bool selectIfFirstOption)
