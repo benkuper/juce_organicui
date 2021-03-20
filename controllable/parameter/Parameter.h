@@ -98,7 +98,7 @@ public:
 	virtual void setWeightedValue(Array<var> values, Array<float> weights) {} // to be overriden
 	virtual var getCroppedValue(var originalValue);
 
-    void resetValue(bool silentSet = false);
+    virtual void resetValue(bool silentSet = false);
 	virtual UndoableAction * setUndoableValue(var oldValue, var newValue, bool onlyReturnAction = false);
     virtual void setValue(var _value, bool silentSet = false, bool force = false, bool forceOverride = true);
     virtual void setValueInternal(var & _value);

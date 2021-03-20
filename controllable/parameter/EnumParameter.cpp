@@ -1,3 +1,4 @@
+#include "EnumParameter.h"
 /*
   ==============================================================================
 
@@ -123,6 +124,21 @@ void EnumParameter::setValueWithData(var data)
 void EnumParameter::setValueWithKey(String key)
 {
 	setValue(key);
+}
+
+void EnumParameter::setPrev(bool loop, bool addToUndo)
+{
+	int targetIndex = getIndexForKey(value.toString()) - 1;
+	if (targetIndex < 0)
+	{
+		if (loop) targetIndex = enumValues.size() -1;
+		else return;
+	}
+
+	String newValue = enumValues[targetIndex]->key;
+
+	if (addToUndo) setUndoableValue(value, newValue);
+	else setValueWithKey(newValue);
 }
 
 void EnumParameter::setNext(bool loop, bool addToUndo)

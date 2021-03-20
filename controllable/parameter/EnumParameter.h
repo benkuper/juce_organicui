@@ -55,6 +55,7 @@ public:
 
 	void setValueWithData(var data);
 	void setValueWithKey(String data);
+	void setPrev(bool loop = true, bool addToUndo = false);
 	void setNext(bool loop = true, bool addToUndo = false);
 
 	bool checkValueIsTheSame(var oldValue, var newValue) override;

@@ -51,6 +51,7 @@ public:
 	std::function<String(ControllableContainer*)> customGetContainerLabelFunc;
 	std::function<ControllableContainer*()> customGetTargetContainerFunc;
 
+	void resetValue(bool silentSet = false) override;
 	void setGhostValue(const String &ghostVal);
 
 	void setValueFromTarget(Controllable *, bool addToUndo = false);

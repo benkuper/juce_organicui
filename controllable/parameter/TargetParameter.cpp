@@ -36,7 +36,8 @@ TargetParameter::TargetParameter(const String & niceName, const String & descrip
 	setRootContainer(rootReference != nullptr?rootReference:Engine::mainEngine);
 	
 	scriptObject.setMethod("getTarget", TargetParameter::getTargetFromScript);
-
+	
+	defaultValue = "";
 	argumentsDescription = "target";
 }
 
@@ -48,6 +49,13 @@ TargetParameter::~TargetParameter()
 	setTarget((ControllableContainer *)nullptr);
 	setTarget((Controllable *)nullptr);
 	setValue("", true, false);
+}
+
+void TargetParameter::resetValue(bool silentSet)
+{
+	ghostValue = ""; 
+	Parameter::resetValue(silentSet);
+	clearWarning();
 }
 
 void TargetParameter::setGhostValue(const String & ghostVal)
