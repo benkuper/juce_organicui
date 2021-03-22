@@ -68,7 +68,29 @@ void DashboardManager::setupServer()
 
 	int port = ProjectSettings::getInstance()->serverPort->intValue();
 
+	/*
+	File k = File::getSpecialLocation(File::currentApplicationFile).getParentDirectory().getChildFile("server.key");
+	File c = File::getSpecialLocation(File::currentApplicationFile).getParentDirectory().getChildFile("server.crt");
+	
+	if (k.existsAsFile() && c.existsAsFile())
+	{
+		try
+		{
+			server.reset(new SecureWebSocketServer(c.getFullPathName(), k.getFullPathName()));
+		}
+		catch (std::exception e)
+		{
+			NLOGERROR(niceName, "Error creating secure server : " << e.what());
+			return;
+		}
+	}
+	else
+	{
+	*/
 	server.reset(new SimpleWebSocketServer());
+	//}
+	
+
 	server->handler = this;
 	server->rootPath = serverRootPath;
 	server->addWebSocketListener(this);
@@ -78,8 +100,7 @@ void DashboardManager::setupServer()
 	servusThread.setupZeroconf();
 #endif
 
-	LOG("Dashboard server is running on port " << port);
-
+	LOG("Dashboard server is running on port " << port << " on IPs :\n" + NetworkHelpers::getLocalIPs().joinIntoString("\n"));
 }
 
 void DashboardManager::connectionOpened(const String& id)
@@ -177,6 +198,31 @@ bool DashboardManager::handleHTTPRequest(std::shared_ptr<HttpServer::Response> r
 
 	return false;
 }
+
+bool DashboardManager::handleHTTPSRequest(std::shared_ptr<HttpsServer::Response> response, std::shared_ptr<HttpsServer::Request> request)
+{
+	if (String(request->path) == "/data")
+	{
+
+		var data = getServerData();
+
+		String dataStr = JSON::toString(data, true);
+
+		SimpleWeb::CaseInsensitiveMultimap header;
+		header.emplace("Content-Length", String(dataStr.length()).toStdString());
+		header.emplace("Content-Type", "application/json");
+		header.emplace("Accept-range", "bytes");
+		header.emplace("Access-Control-Allow-Origin", "*");
+
+		response->write(SimpleWeb::StatusCode::success_ok, header);
+		*response << dataStr;
+
+		return true;
+	}
+
+	return false;
+}
+
 
 void DashboardManager::setupDownloadURL(const String& _downloadURL)
 {

@@ -74,10 +74,7 @@
 #include <juce_opengl/juce_opengl.h>
 #include <juce_osc/juce_osc.h>
 
-
-
 using namespace juce;
-
 
 #include "resources/BinaryData.h"
 

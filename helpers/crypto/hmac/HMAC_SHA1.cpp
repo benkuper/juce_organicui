@@ -11,7 +11,7 @@
 #include "HMAC_SHA1.h"
 #include "SHA1.h"
 
-const static int HMAC_BLOCK_SIZE = SHA1::SHA1_BLOCK_SIZE;
+const static int HMAC_BLOCK_SIZE = OrganicCrypto::SHA1::SHA1_BLOCK_SIZE;
 
 
 //==============================================================================
@@ -24,7 +24,7 @@ MemoryBlock HMAC_SHA1::encode (const String& text, const String& key)
 //==============================================================================
 MemoryBlock HMAC_SHA1::encode (const char* text, int textLen, const char* key, int keyLen)
 {
-    SHA1 sha1;
+    OrganicCrypto::SHA1 sha1;
     
 	// Step 1, key
     MemoryBlock sha1Key (HMAC_BLOCK_SIZE, true);

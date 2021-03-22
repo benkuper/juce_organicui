@@ -278,8 +278,6 @@ void OSCRemoteControl::run()
 #if ORGANICUI_USE_WEBSERVER
 void OSCRemoteControl::setupServer()
 {
-	server.reset();
-
 	server.reset(new SimpleWebSocketServer());
 	server->handler = this;
 	server->addWebSocketListener(this);

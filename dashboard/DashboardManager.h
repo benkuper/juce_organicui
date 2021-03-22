@@ -61,7 +61,7 @@ public:
 	void endLoadFile() override;
 
 #if ORGANICUI_USE_WEBSERVER
-	std::unique_ptr<SimpleWebSocketServer> server;
+	std::unique_ptr<SimpleWebSocketServerBase> server;
 
 	URL downloadURL;
 	File serverRootPath;
@@ -83,6 +83,7 @@ public:
 
 	// Inherited via RequestHandler
 	virtual bool handleHTTPRequest(std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request) override;
+	virtual bool handleHTTPSRequest(std::shared_ptr<HttpsServer::Response> response, std::shared_ptr<HttpsServer::Request> request) override;
 
 #endif
 
