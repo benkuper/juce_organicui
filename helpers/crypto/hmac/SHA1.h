@@ -60,6 +60,5 @@ namespace OrganicCrypto
         SHA1_WORKSPACE_BLOCK* m_block; // SHA1 pointer to the byte array above
 
         //==============================================================================
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(OrganicCrypto::SHA1)
     };
 }
