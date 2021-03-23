@@ -26,6 +26,7 @@
 */
 
 #include "SHA1.h"
+#include "..\..\..\..\juce_simpleweb\common\SHA1.h"
 
 namespace OrganicCrypto
 {
@@ -180,4 +181,8 @@ namespace OrganicCrypto
 
 		return MemoryBlock(m_digest, 20);
 	}
+
+	
+
 }
+

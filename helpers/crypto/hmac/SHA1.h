@@ -31,6 +31,13 @@ namespace OrganicCrypto
         // Finalize hash and report
         MemoryBlock finalize();
 
+        static String SHA1::convert(const String& input)
+        {
+            SHA1 sha1;
+            sha1.update(input.getCharPointer(), input.length());
+            return sha1.finalize().toString();
+        }
+
         //==============================================================================
         enum {
             SHA1_DIGEST_SIZE = 20,
