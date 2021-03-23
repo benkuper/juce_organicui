@@ -31,12 +31,7 @@ namespace OrganicCrypto
         // Finalize hash and report
         MemoryBlock finalize();
 
-        static String convert(const String& input)
-        {
-            SHA1 sha1;
-            sha1.update(input.getCharPointer(), input.length());
-            return sha1.finalize().toString();
-        }
+        static String convert(const String& input);
 
         //==============================================================================
         enum {
