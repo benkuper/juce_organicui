@@ -84,7 +84,7 @@ public:
 	// Inherited via RequestHandler
 	virtual bool handleHTTPRequest(std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request) override;
 
-#if WEBSOCKET_SECURE_SUPPORTED
+#if SIMPLEWEB_SECURE_SUPPORTED
 	virtual bool handleHTTPSRequest(std::shared_ptr<HttpsServer::Response> response, std::shared_ptr<HttpsServer::Request> request) override;
 #endif
 
