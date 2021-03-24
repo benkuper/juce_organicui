@@ -90,7 +90,7 @@ void Engine::parseCommandline(const String & commandLine) {
 
 	for (auto & c : StringUtil::parseCommandLine(commandLine)) {
 
-		if (c.command == "f" || c.command == "") {
+		if (c.command == "f" || c.command == "" || c.command == "c") {
 			if (c.args.size() == 0) {
 				LOG("no file provided for command : " + c.command);
 				jassertfalse;
@@ -102,6 +102,8 @@ void Engine::parseCommandline(const String & commandLine) {
 				if (f.existsAsFile())
 				{
 					loadDocument(f);
+
+					if (c.command == "c") setFile(File()); //from crash : force no file to force saving again
 				}
 			} else {
 				NLOG("Engine", "File : " << fileArg << " not found.");

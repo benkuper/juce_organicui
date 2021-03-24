@@ -153,13 +153,15 @@ void OrganicApplication::handleCrashed(bool autoReopen)
 {
 	File f = Engine::mainEngine->getFile();
 
-	File crashedFile = f.existsAsFile() ? f.getParentDirectory().getChildFile(f.getFileNameWithoutExtension() + "_crashed" + f.getFileExtension()) : File::getSpecialLocation(File::userDocumentsDirectory).getChildFile(appProperties->getStorageParameters().applicationName + "/crashedSession" + Engine::mainEngine->fileExtension);
+	File crashedFile = f.existsAsFile() ? f.getParentDirectory().getChildFile(f.getFileNameWithoutExtension() + "_recovered" + f.getFileExtension()) : File::getSpecialLocation(File::userDocumentsDirectory).getChildFile(appProperties->getStorageParameters().applicationName + "/recovered_session" + Engine::mainEngine->fileExtension);
 
 	Engine::mainEngine->saveAs(crashedFile, false, false, false, false);
-
 	Engine::mainEngine->clear(); //make sure modules, dashboard, etc. are removed so reopening the file will allow binding ports, connecting devices, etc.
 
-	if (autoReopen) crashedFile.startAsProcess();
+	if (autoReopen)
+	{
+		File::getSpecialLocation(File::currentApplicationFile).startAsProcess("-c "+crashedFile.getFullPathName());
+	}
 }
 
 void OrganicApplication::newMessage(const Engine::EngineEvent & e)
