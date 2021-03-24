@@ -66,7 +66,7 @@ public:
 	AppUpdater();
 	~AppUpdater();
 
-	URL updateURL;
+	String updateURL;
 	String downloadURLBase;
 	String downloadingFileName;
     String extension;
@@ -78,7 +78,7 @@ public:
 
 	std::unique_ptr<URL::DownloadTask> downloadTask;
 
-	void setURLs(URL _updateURL, StringRef _downloadURLBase, StringRef filePrefix);
+	void setURLs(StringRef _updateURL, StringRef _downloadURLBase, StringRef filePrefix);
 
 	String getDownloadFileName(StringRef version, bool beta, StringRef extension); 
 	void checkForUpdates(bool includeSkippedVersion = false);

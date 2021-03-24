@@ -59,7 +59,7 @@ bool CrashDumpUploader::init(bool autoUpload, bool showWindow)
    
     if (crashFile.existsAsFile())
     {
-        LOGWARNING("Crash log found, sending to Houston...");
+        LOGWARNING("Crash log found : " << crashFile.getFullPathName() << ", sending to Houston...");
 		if (autoUpload)
 		{
 			if (showWindow && uploadEnabled)

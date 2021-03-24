@@ -30,9 +30,9 @@ AppUpdater::~AppUpdater()
 	stopThread(5000);
 }
 
-void AppUpdater::setURLs(URL _updateURL, StringRef _downloadURLBase, StringRef _filePrefix)
+void AppUpdater::setURLs(StringRef _updateURL, StringRef _downloadURLBase, StringRef _filePrefix)
 {
-	updateURL = URL(_updateURL.toString(false));
+	updateURL = _updateURL;
 	filePrefix = _filePrefix;
 	downloadURLBase = _downloadURLBase;
 	if (!downloadURLBase.endsWithChar('/')) downloadURLBase += "/";
@@ -125,7 +125,7 @@ void AppUpdater::run()
 
 	StringPairArray responseHeaders;
 	int statusCode = 0;
-	std::unique_ptr<InputStream> stream(updateURL.createInputStream(false, openStreamProgressCallback, this, String(),
+	std::unique_ptr<InputStream> stream(URL(updateURL).createInputStream(false, openStreamProgressCallback, this, String(),
 		2000, // timeout in millisecs
 		&responseHeaders, &statusCode));
 
