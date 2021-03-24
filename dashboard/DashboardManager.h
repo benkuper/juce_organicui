@@ -63,7 +63,7 @@ public:
 #if ORGANICUI_USE_WEBSERVER
 	std::unique_ptr<SimpleWebSocketServerBase> server;
 
-	URL downloadURL;
+	String downloadURL;
 	File serverRootPath;
 	File downloadedFileZip;
 	std::unique_ptr<URL::DownloadTask> downloadTask;

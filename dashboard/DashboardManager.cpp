@@ -227,7 +227,7 @@ bool DashboardManager::handleHTTPSRequest(std::shared_ptr<HttpsServer::Response>
 
 void DashboardManager::setupDownloadURL(const String& _downloadURL)
 {
-	downloadURL = URL(_downloadURL);
+	downloadURL = _downloadURL;
 	if (!serverRootPath.exists()) downloadDashboardFiles();
 }
 
@@ -241,7 +241,7 @@ void DashboardManager::downloadDashboardFiles()
 
 	LOG("Downloading dashboard files...");
 	downloadedFileZip = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile(OrganicApplication::getInstance()->getApplicationName()+"/dashboard.zip");
-	downloadTask = downloadURL.downloadToFile(downloadedFileZip, "", this);
+	downloadTask = URL(downloadURL).downloadToFile(downloadedFileZip, "", this);
 
 	if (downloadTask == nullptr)
 	{

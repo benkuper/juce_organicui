@@ -25,9 +25,12 @@ const Array<String> Controllable::typeNames = {
 Controllable::Controllable(const Type &type, const String & niceName, const String &description, bool enabled) :
 	ScriptTarget("", this, "Controllable"),
 	type(type),
+	niceName(""),
+	shortName(""),
 	description(description),
 	customData(var()),
 	saveCustomData(false),
+	enabled(true),
 	canBeDisabledByUser(false),
 	descriptionIsEditable(false),
 	hasCustomShortName(false),
@@ -51,6 +54,7 @@ Controllable::Controllable(const Type &type, const String & niceName, const Stri
 	scriptObject.setMethod("setAttribute", Controllable::setAttributeFromScript);
 	scriptObject.setMethod("getControlAddress", Controllable::getControlAddressFromScript);
 	scriptObject.setMethod("getScriptControlAdress", Controllable::getScriptControlAddressFromScript);
+
 
 	setEnabled(enabled);
 	setNiceName(niceName);

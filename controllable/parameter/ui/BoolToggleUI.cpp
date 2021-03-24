@@ -10,7 +10,8 @@
 */
 
 BoolToggleUI::BoolToggleUI(BoolParameter * parameter, Image _onImage, Image _offImage) :
-    ParameterUI(parameter)
+    ParameterUI(parameter),
+    shouldRepaint(false)
 {
 	showEditWindowOnDoubleClick = false;
 
