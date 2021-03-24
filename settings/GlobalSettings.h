@@ -46,6 +46,7 @@ public:
 	BoolParameter * openLastDocumentOnStartup;
 	BoolParameter * openSpecificFileOnStartup;
 	FileParameter * fileToOpenOnStartup;
+	BoolParameter* autoReopenFileOnCrash;
 
 	ControllableContainer interfaceCC;
 	BoolParameter* closeToSystemTray;

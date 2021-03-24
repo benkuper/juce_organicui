@@ -15,13 +15,14 @@
 #include <DbgHelp.h>
 #include <tchar.h>
 LONG WINAPI createMiniDump(LPEXCEPTION_POINTERS exceptionPointers);
-#else
-void createStackTrace(int signum);
 #endif
+
+void createStackTrace(int signum);
 
 String dumpFileString;
 char * dumpFileName = (char *)"notset.dmp";
 
+bool shoudShowWindowOnCrash = false;
 
 juce_ImplementSingleton(CrashDumpUploader)
 
@@ -42,7 +43,6 @@ CrashDumpUploader::~CrashDumpUploader()
 
 bool CrashDumpUploader::init(bool autoUpload, bool showWindow)
 {
-
 #if JUCE_WINDOWS
 	crashFile = File::getSpecialLocation(File::tempDirectory).getParentDirectory().getChildFile(getApp().getApplicationName()+"_crash.dmp");
     SystemStats::setApplicationCrashHandler((SystemStats::CrashHandlerFunction)createMiniDump);
@@ -57,6 +57,8 @@ bool CrashDumpUploader::init(bool autoUpload, bool showWindow)
     dumpFileString = crashFile.getFullPathName();
     dumpFileName = dumpFileString.getCharPointer().getAddress();
    
+	shoudShowWindowOnCrash = showWindow;
+
     if (crashFile.existsAsFile())
     {
         LOGWARNING("Crash log found : " << crashFile.getFullPathName() << ", sending to Houston...");
@@ -141,7 +143,6 @@ void CrashDumpUploader::run()
 
 LONG WINAPI createMiniDump(LPEXCEPTION_POINTERS exceptionPointers)
 {
-
 	HANDLE hFile = CreateFile(dumpFileName, GENERIC_READ | GENERIC_WRITE,
 		0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 
@@ -174,11 +175,18 @@ LONG WINAPI createMiniDump(LPEXCEPTION_POINTERS exceptionPointers)
 		_tprintf(_T("CreateFile failed. Error: %u \n"), GetLastError());
 	}
 	 
+	
+	/*
 	MessageBox(nullptr,
 		_T("Oh, no ! I got very sad and died alone. The autospy report will be send to the headquarters for further investigation. You can disable this procedure in your preferences, but please remember that the forensics team needs sample to keep healing this little baby ! Otherwise nothing will be done and this sad event will be forever forgotten."),
-		_T("Sacré Hubert, toujours le mot pour rire !"),
+		_T("Sacre Hubert, toujours le mot pour rire !"),
 		MB_ICONWARNING | MB_OK
 	);
+	*/
+
+	dumpFileString = String(dumpFileName).replace("dmp", "txt");
+	createStackTrace(exceptionPointers->ExceptionRecord->ExceptionCode);
+
 
 	//_tprintf(_T("User pushed : %d \n"), selectedButtonId);
 
@@ -188,11 +196,11 @@ LONG WINAPI createMiniDump(LPEXCEPTION_POINTERS exceptionPointers)
 	return EXCEPTION_EXECUTE_HANDLER;
 }
 
-
-#else
+#endif
 
 void createStackTrace(int signum)
 {
+
     DBG("Create Stack trace here !");
     String stackTrace = SystemStats::getStackBacktrace();
     
@@ -206,10 +214,16 @@ void createStackTrace(int signum)
         fos.flush();
     }
     
-    DBG("Written to file : " << f.getFullPathName());
+	bool autoReopen = GlobalSettings::getInstance()->autoReopenFileOnCrash->boolValue();
+
+	if (shoudShowWindowOnCrash)
+	{
+		autoReopen = AlertWindow::showOkCancelBox(AlertWindow::WarningIcon, "Oops, I did it again...", "Well, I crashed.\nIt was bound to happen at some point, right ?\nMaybe time to think about the meaning of all this, the meaning of life, make yourself a smoothie...\nYou can even start exactly where you left if you click the \"Yes\" button.\nDon't worry, in any case I will keep your baby safe and create a crash backup file.", "Yes", "No");
+	}
+
+	getApp().handleCrashed(autoReopen);
 }
 
-#endif
 
 CrashDumpUploader::UploadWindow::UploadWindow() :
 	okBT("OK"),

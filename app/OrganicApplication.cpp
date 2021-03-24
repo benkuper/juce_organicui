@@ -17,7 +17,6 @@ OpenGLContext * getOpenGLContext() { return getApp().mainComponent->openGLContex
 ApplicationCommandManager& getCommandManager() { return getApp().commandManager; }
 OrganicApplication::MainWindow * getMainWindow() { return getApp().mainWindow.get(); }
 
-#define TEST_CRASH 0
 
 OrganicApplication::OrganicApplication(const String &appName, bool useWindow, const Image &trayIcon) :
 	appSettings("Other Settings"),
@@ -148,6 +147,19 @@ inline void OrganicApplication::anotherInstanceStarted(const String& commandLine
 	{
 		mainWindow->setMinimised(false);
 	}
+}
+
+void OrganicApplication::handleCrashed(bool autoReopen)
+{
+	File f = Engine::mainEngine->getFile();
+
+	File crashedFile = f.existsAsFile() ? f.getParentDirectory().getChildFile(f.getFileNameWithoutExtension() + "_crashed" + f.getFileExtension()) : File::getSpecialLocation(File::userDocumentsDirectory).getChildFile(appProperties->getStorageParameters().applicationName + "/crashedSession" + Engine::mainEngine->fileExtension);
+
+	Engine::mainEngine->saveAs(crashedFile, false, false, false, false);
+
+	Engine::mainEngine->clear(); //make sure modules, dashboard, etc. are removed so reopening the file will allow binding ports, connecting devices, etc.
+
+	if (autoReopen) crashedFile.startAsProcess();
 }
 
 void OrganicApplication::newMessage(const Engine::EngineEvent & e)

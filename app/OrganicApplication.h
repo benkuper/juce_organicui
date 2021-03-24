@@ -61,6 +61,8 @@ public:
 	virtual void systemRequestedQuit() override;
 	virtual void anotherInstanceStarted(const String& commandLine) override;
 
+	virtual void handleCrashed(bool autoReopen);
+
 	virtual void newMessage(const Engine::EngineEvent &e) override;
 	virtual void newMessage(const AppUpdateEvent &e) override;
 

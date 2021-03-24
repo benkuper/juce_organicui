@@ -37,9 +37,8 @@ GlobalSettings::GlobalSettings() :
 	openSpecificFileOnStartup = startupCC.addBoolParameter("Load specific "+(Engine::mainEngine != nullptr?Engine::mainEngine->fileExtension:"")+" on startup", "If enabled, app will load the " + Engine::mainEngine->fileExtension + " specified below on startup", false,false);
 	fileToOpenOnStartup = new FileParameter("File to load on startup", "File to load when start, if the option above is checked", "", false);
 	fileToOpenOnStartup->forceAbsolutePath = true;
-
 	startupCC.addParameter(fileToOpenOnStartup);
-	
+	autoReopenFileOnCrash = startupCC.addBoolParameter("Auto Reopen crashed file", "If checked and a file was being edited while crashing, this will open Chataigne and a snapshot of the last session before the crash", false);
 
 	addChildControllableContainer(&startupCC);
 

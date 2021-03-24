@@ -1,4 +1,3 @@
-#include "BoolToggleUI.h"
 /*
   ==============================================================================
 
@@ -11,7 +10,7 @@
 
 BoolToggleUI::BoolToggleUI(BoolParameter * parameter, Image _onImage, Image _offImage) :
     ParameterUI(parameter),
-    shouldRepaint(false)
+	shouldRepaint(false)
 {
 	showEditWindowOnDoubleClick = false;
 
