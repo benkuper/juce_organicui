@@ -199,7 +199,7 @@ bool DashboardManager::handleHTTPRequest(std::shared_ptr<HttpServer::Response> r
 	return false;
 }
 
-#if JUCE_WINDOWS
+#if SIMPLEWEB_SECURE_SUPPORTED
 bool DashboardManager::handleHTTPSRequest(std::shared_ptr<HttpsServer::Response> response, std::shared_ptr<HttpsServer::Request> request)
 {
 	if (String(request->path) == "/data")
