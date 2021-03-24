@@ -41,9 +41,12 @@ void OrganicApplication::initialise(const String & commandLine)
 	initialiseInternal(commandLine);
 
 	CommandLineElements commands = StringUtil::parseCommandLine(commandLine);
+
+	bool fromCrashFile = false;
 	for (auto& c : commands)
 	{
 		if (c.command == "r") clearGlobalSettings();
+		else if (c.command == "c") fromCrashFile = true;
 	}
 
 	GlobalSettings::getInstance()->addChildControllableContainer(&appSettings,false, GlobalSettings::getInstance()->controllableContainers.size()-1);
@@ -92,13 +95,20 @@ void OrganicApplication::initialise(const String & commandLine)
 
 	engine->parseCommandline(commandLine);
 
-	if (!engine->getFile().existsAsFile()) {
-		if (GlobalSettings::getInstance()->openLastDocumentOnStartup->boolValue())  Engine::mainEngine->loadFrom(Engine::mainEngine->getLastDocumentOpened(), true);
-		else if (GlobalSettings::getInstance()->openSpecificFileOnStartup->boolValue() && GlobalSettings::getInstance()->fileToOpenOnStartup->stringValue().isNotEmpty())  Engine::mainEngine->loadFrom(File(GlobalSettings::getInstance()->fileToOpenOnStartup->stringValue()), true);
-		else
-		{
-			engine->createNewGraph();
-			engine->setChangedFlag(false);
+	if (fromCrashFile)
+	{
+		engine->setChangedFlag(true);
+	}
+	else
+	{
+		if (!engine->getFile().existsAsFile()) {
+			if (GlobalSettings::getInstance()->openLastDocumentOnStartup->boolValue())  Engine::mainEngine->loadFrom(Engine::mainEngine->getLastDocumentOpened(), true);
+			else if (GlobalSettings::getInstance()->openSpecificFileOnStartup->boolValue() && GlobalSettings::getInstance()->fileToOpenOnStartup->stringValue().isNotEmpty())  Engine::mainEngine->loadFrom(File(GlobalSettings::getInstance()->fileToOpenOnStartup->stringValue()), true);
+			else
+			{
+				engine->createNewGraph();
+				engine->setChangedFlag(false);
+			}
 		}
 	}
 }

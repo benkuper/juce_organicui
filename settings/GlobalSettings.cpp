@@ -106,6 +106,8 @@ void GlobalSettings::onControllableFeedbackUpdate(ControllableContainer * cc, Co
 		Controllable* crashC = nullptr;
 		crashC->getJSONData(); //this will crash
 	}
+
+	if (Engine::mainEngine != nullptr) Engine::mainEngine->setChangedFlag(false); //force no need to save when changing something in global settings
 }
 
 void GlobalSettings::loadJSONDataInternal(var data)
