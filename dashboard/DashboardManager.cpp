@@ -255,11 +255,20 @@ void DashboardManager::progress(URL::DownloadTask* task, int64 bytesDownloaded, 
 
 void DashboardManager::finished(URL::DownloadTask* task, bool success)
 {
-	LOG("Dashboard download success ? " << (int)success);
+	if(success) LOG("Dashboard downloaded. Extracting to " << serverRootPath.getFullPathName());
+	else
+	{
+		LOGERROR("Dashboard download error");
+		return;
+	}
+
+	if (serverRootPath.exists()) serverRootPath.deleteRecursively();
+
 	ZipFile zf(downloadedFileZip);
 	zf.uncompressTo(serverRootPath);
-	LOG("Dashboard : " << zf.getNumEntries() << " files downloaded to " << serverRootPath.getFullPathName());
 	downloadedFileZip.deleteFile();
+
+	LOG("You got a new dashboard my friend !");// << zf.getNumEntries() << " files downloaded to " << serverRootPath.getFullPathName());
 }
 #endif //ORGANICUI_USE_WEBSERVER
 
