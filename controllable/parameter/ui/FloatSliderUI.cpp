@@ -233,6 +233,8 @@ float FloatSliderUI::getParamNormalizedValue()
 
 void FloatSliderUI::valueChanged(const var &) {
 
+	if (parameter.wasObjectDeleted()) return;
+
 	//don't repaint if there is no visible change (useful for very small and fast changes like RMS)
 	if (getDrawPos() != lastDrawPos 
 		|| (showValue && getValueText() != lastValueText))

@@ -38,10 +38,13 @@ Parameter::~Parameter()
 	if(referenceTarget != nullptr) referenceTarget->removeParameterListener(this); //avoid reassigning on deletion
 	setReferenceParameter(nullptr);
 
-	MessageManagerLock mmLock(Thread::getCurrentThread());
-	if (mmLock.lockWasGained()) queuedNotifier.handleUpdateNowIfNeeded();
-	queuedNotifier.cancelPendingUpdate();
-
+	if (queuedNotifier.isUpdatePending())
+	{
+		MessageManagerLock mmLock(Thread::getCurrentThread());
+		if (mmLock.lockWasGained()) queuedNotifier.handleUpdateNowIfNeeded();
+		queuedNotifier.cancelPendingUpdate();
+	}
+	
 	Parameter::masterReference.clear();
 }
 
