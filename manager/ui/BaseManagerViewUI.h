@@ -137,6 +137,7 @@ BaseManagerViewUI<M, T, U>::BaseManagerViewUI(const String& contentName, M* _man
 	this->resizeOnChildBoundsChanged = false;
 	this->bgColor = BG_COLOR.darker(.3f);
 
+	this->setWantsKeyboardFocus(true);
 }
 
 
@@ -476,15 +477,18 @@ juce::Rectangle<int> BaseManagerViewUI<M, T, U>::getBoundsInView(const juce::Rec
 template<class M, class T, class U>
 Point<float> BaseManagerViewUI<M, T, U>::getItemsCenter()
 {
-	if (this->itemsUI.size() == 0) return Point<float>(0, 0);
+	if (this->manager->items.size() == 0) return Point<float>(0, 0);
 
 	juce::Rectangle<float> bounds;
-	for (auto& se : this->itemsUI)
+	for (auto& i : this->manager->items)
 	{
-		Point<float> p1 = se->item->viewUIPosition->getPoint();
-		Point<float> p2 = p1 + se->item->viewUISize->getPoint();
-		bounds = juce::Rectangle<float>(Point<float>(jmin(bounds.getX(), p1.x), jmin(bounds.getY(), p1.y)), Point<float>(jmax<float>(bounds.getRight(), p2.x), jmax<float>(bounds.getBottom(), p2.y)));
+		Point<float> p1 = i->viewUIPosition->getPoint();
+		Point<float> p2 = p1 + i->viewUISize->getPoint();
+		juce::Rectangle<float> r(p1, p2);
+		if (bounds.isEmpty()) bounds = r;
+		else bounds = bounds.getUnion(r);
 	}
+
 	return bounds.getCentre();
 }
 
