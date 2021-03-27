@@ -46,6 +46,7 @@ void FloatSliderUI::paint(Graphics & g)
 		return;
 	}
 
+	if (parameter.wasObjectDeleted()) return;
 
 	Colour baseColour = useCustomFGColor ? customFGColor : (isInteractable()? PARAMETER_FRONT_COLOR.darker() : FEEDBACK_COLOR);
     Colour c = (isMouseButtonDown() && changeParamOnMouseUpOnly) ? HIGHLIGHT_COLOR : baseColour;
