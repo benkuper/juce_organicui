@@ -717,21 +717,20 @@ bool ControllableContainer::containsControllable(Controllable* c, int maxSearchL
 
 void ControllableContainer::dispatchFeedback(Controllable* c)
 {
-	//    @ben removed else here to enable containerlistener call back of non root (proxies) is it overkill?
-	if (parentContainer != nullptr) { parentContainer->dispatchFeedback(c); }
-
 	controllableContainerListeners.call(&ControllableContainerListener::controllableFeedbackUpdate, this, c);
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableFeedbackUpdate, this, c));
+	
+	if (parentContainer != nullptr) { parentContainer->dispatchFeedback(c); }
 }
 
 void ControllableContainer::dispatchState(Controllable* c)
 {
 	onControllableStateChanged(c);
 
-	if (parentContainer != nullptr) { parentContainer->dispatchState(c); }
-
 	controllableContainerListeners.call(&ControllableContainerListener::controllableStateUpdate, this, c);
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableStateUpdate, this, c));
+
+	if (parentContainer != nullptr) { parentContainer->dispatchState(c); }
 }
 
 
