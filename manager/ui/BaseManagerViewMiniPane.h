@@ -13,12 +13,19 @@ public:
 	BaseManagerViewUI<M, T, U> * managerUI;
 	ComponentAnimator ca;
 
+	juce::Rectangle<float> paneViewBounds;
+	juce::Rectangle<float> paneRealBounds;
+
 	float showTime;
 
 	virtual void paint(juce::Graphics& g) override;
-	virtual void paintInternal(juce::Graphics& g, const juce::Rectangle<float>& itemViewBounds, const juce::Rectangle<int>& itemRealBounds) {}
-	virtual void resized() override;
+	virtual void paintInternal(juce::Graphics& g) {}
+	virtual void paintItem(juce::Graphics&g, U * ui);
+	
+	juce::Point<float> getPanePosForUIPos(Point<int> viewPoint);
+	juce::Point<float> getPanePosForViewPos(Point<float> viewPoint);
 
+	virtual void resized() override;
 	virtual void updateContent();
 
 	void timerCallback() override;
@@ -44,67 +51,89 @@ void BaseManagerViewMiniPane<M, T, U>::paint(juce::Graphics& g)
 
 	if (managerUI->itemsUI.size() == 0) return;
 
-
 	juce::Rectangle<int> mr = managerUI->getLocalBounds();
 	juce::Rectangle<float> focusRect = managerUI->getViewBounds(mr);
 
-	//AffineTransform af = managerUI->getUITransform(ui);
+	paneViewBounds = focusRect;
 
-	juce::Rectangle<float> itemViewBounds(focusRect);
 	for (auto& ui : managerUI->itemsUI)
 	{
-		itemViewBounds.setLeft(jmin<float>(ui->item->viewUIPosition->x, itemViewBounds.getX()));
-		itemViewBounds.setTop(jmin<float>(ui->item->viewUIPosition->y, itemViewBounds.getY()));
-		itemViewBounds.setRight(jmax<float>(ui->item->viewUIPosition->x + ui->item->viewUISize->x, itemViewBounds.getRight()));
-		itemViewBounds.setBottom(jmax<float>(ui->item->viewUIPosition->y + ui->item->viewUISize->y, itemViewBounds.getBottom()));
+		paneViewBounds.setLeft(jmin<float>(ui->item->viewUIPosition->x, paneViewBounds.getX()));
+		paneViewBounds.setTop(jmin<float>(ui->item->viewUIPosition->y, paneViewBounds.getY()));
+		paneViewBounds.setRight(jmax<float>(ui->item->viewUIPosition->x + ui->item->viewUISize->x, paneViewBounds.getRight()));
+		paneViewBounds.setBottom(jmax<float>(ui->item->viewUIPosition->y + ui->item->viewUISize->y, paneViewBounds.getBottom()));
 	}
 
 	juce::Rectangle<int> r = getLocalBounds();
 
-	float itemsRatio = itemViewBounds.getWidth()*1.0f / itemViewBounds.getHeight();
+	float itemsRatio = paneViewBounds.getWidth()*1.0f / paneViewBounds.getHeight();
 	float ratio = r.getWidth()*1.0f / r.getHeight();
 
 	if (itemsRatio > ratio)
 	{
-		float targetHeight = itemViewBounds.getWidth() / ratio;
-		itemViewBounds.expand(0, (targetHeight - itemViewBounds.getHeight()) / 2);
+		float targetHeight = paneViewBounds.getWidth() / ratio;
+		paneViewBounds.expand(0, (targetHeight - paneViewBounds.getHeight()) / 2);
 	}
 	else
 	{
-		float targetWidth = itemViewBounds.getHeight() * ratio;
-		itemViewBounds.expand((targetWidth - itemViewBounds.getWidth()) / 2, 0);
+		float targetWidth = paneViewBounds.getHeight() * ratio;
+		paneViewBounds.expand((targetWidth - paneViewBounds.getWidth()) / 2, 0);
 	}
 
-	juce::Rectangle<int> itemRealBounds = managerUI->getBoundsInView(itemViewBounds);
+	paneRealBounds = managerUI->getBoundsInView(paneViewBounds).toFloat();
 
-
-	paintInternal(g, itemViewBounds, itemRealBounds);
+	paintInternal(g);
 
 	for (auto& ui : managerUI->itemsUI)
 	{
-		juce::Rectangle<float> b = ui->getBoundsInParent().toFloat();
-
-		float bx = jmap<float>(b.getX(), itemRealBounds.getX(), itemRealBounds.getRight(), r.getX(), r.getRight());
-		float by = jmap<float>(b.getY(), itemRealBounds.getY(), itemRealBounds.getBottom(), r.getY(), r.getBottom());
-		float bw = b.getWidth() * r.getWidth() / itemRealBounds.getWidth();
-		float bh = b.getHeight() * r.getHeight() / itemRealBounds.getHeight();
-
-		juce::Rectangle<int> uiPaneBounds(bx, by, bw, bh);
-		
-		g.setColour(Colours::white.withAlpha(.3f));
-		g.fillRect(uiPaneBounds);
+		paintItem(g, ui);
 	}
 
-	float fx = jmap<float>(focusRect.getX(), itemViewBounds.getX(), itemViewBounds.getRight(), r.getX(), r.getRight());
-	float fy = jmap<float>(focusRect.getY(), itemViewBounds.getY(), itemViewBounds.getBottom(), r.getY(), r.getBottom());
-	float fw = focusRect.getWidth() * r.getWidth() / itemViewBounds.getWidth();
-	float fh = focusRect.getHeight() * r.getHeight() / itemViewBounds.getHeight();
+	float fx = jmap<float>(focusRect.getX(), paneViewBounds.getX(), paneViewBounds.getRight(), r.getX(), r.getRight());
+	float fy = jmap<float>(focusRect.getY(), paneViewBounds.getY(), paneViewBounds.getBottom(), r.getY(), r.getBottom());
+	float fw = focusRect.getWidth() * r.getWidth() / paneViewBounds.getWidth();
+	float fh = focusRect.getHeight() * r.getHeight() / paneViewBounds.getHeight();
 	juce::Rectangle<int> focusPaneRect(fx, fy, fw, fh);
 
 	g.setColour(BLUE_COLOR.withAlpha(.2f));
 	g.fillRect(focusPaneRect);
 	g.setColour(BLUE_COLOR.withAlpha(.5f));
 	g.drawRect(focusPaneRect);
+}
+
+template<class M, class T, class U>
+void BaseManagerViewMiniPane<M, T, U>::paintItem(juce::Graphics &g, U* ui)
+{
+	juce::Rectangle<int> b = ui->getBoundsInParent();
+
+	Point<float> bTopLeft = getPanePosForUIPos(b.getTopLeft());
+	Point<float> bBottomRight = getPanePosForUIPos(b.getBottomRight());
+
+	juce::Rectangle<float> uiPaneBounds(bTopLeft, bBottomRight);
+
+	g.setColour(Colours::white.withAlpha(.3f));
+	g.fillRect(uiPaneBounds);
+}
+
+template<class M, class T, class U>
+juce::Point<float> BaseManagerViewMiniPane<M, T, U>::getPanePosForUIPos(Point<int> uiPos)
+{
+	juce::Rectangle<float> r = getLocalBounds().toFloat();
+
+	return juce::Point<float>(
+		jmap<float>(uiPos.x, paneRealBounds.getX(), paneRealBounds.getRight(), r.getX(), r.getRight()),
+		jmap<float>(uiPos.y, paneRealBounds.getY(), paneRealBounds.getBottom(), r.getY(), r.getBottom()));
+}
+
+template<class M, class T, class U>
+juce::Point<float> BaseManagerViewMiniPane<M, T, U>::getPanePosForViewPos(Point<float> viewPos)
+{
+	juce::Rectangle<float> r = getLocalBounds().toFloat();
+	
+	return juce::Point<float>(
+		jmap<float>(viewPos.x, paneViewBounds.getX(), paneViewBounds.getRight(), r.getX(), r.getRight()),
+		jmap<float>(viewPos.y, paneViewBounds.getY(), paneViewBounds.getBottom(), r.getY(), r.getBottom()));
+
 }
 
 template<class M, class T, class U>
