@@ -20,7 +20,7 @@ class Engine :
 	public AsyncUpdater,
 	public ProgressNotifier,
 	public DashboardItemProvider,
-	public Timer //for auto save
+	public MultiTimer //for auto save and CPU
 {
 public:
 	Engine(const String& fileName = "File", const String& fileExtension = ".file");
@@ -42,7 +42,6 @@ public:
 	String fileWildcard = "*" + fileExtension;
 
 	String lastFileAbsolutePath; //Used for checking in saveDocument if new file is different
-
 
 	int autoSaveIndex;
 
@@ -89,7 +88,7 @@ public:
 	bool allLoadingThreadsAreEnded();
 	void loadDocumentAsync(const File & file);
 
-	virtual void timerCallback() override;
+	virtual void timerCallback(int timerID) override;
 
 
 	class FileLoader : public Thread, public Timer {

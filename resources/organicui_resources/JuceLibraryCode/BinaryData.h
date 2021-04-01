@@ -62,6 +62,9 @@ namespace OrganicUIBinaryData
     extern const char*   padlock_png;
     const int            padlock_pngSize = 584;
 
+    extern const char*   pin_png;
+    const int            pin_pngSize = 645;
+
     extern const char*   power_png;
     const int            power_pngSize = 15366;
 
@@ -90,7 +93,7 @@ namespace OrganicUIBinaryData
     const int            warning_pngSize = 1153;
 
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 27;
+    const int namedResourceListSize = 28;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];

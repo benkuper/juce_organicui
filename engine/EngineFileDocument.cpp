@@ -120,6 +120,8 @@ void Engine::loadDocumentAsync(const File & file) {
 	setChangedFlag(false);
 }
 
+
+
 bool Engine::allLoadingThreadsAreEnded() {
 	return true;//NodeManager::getInstance()->getNumJobs()== 0 && (fileLoader && fileLoader->isEnded);
 }

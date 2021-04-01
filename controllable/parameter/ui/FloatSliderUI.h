@@ -50,7 +50,7 @@ public:
     virtual float getValueFromMouse();
     virtual float getValueFromPosition(const Point<int> &pos);
     int getDrawPos();
-    String getValueText() const;
+    virtual String getValueText() const;
 
     virtual void setParamNormalizedValueUndoable(float oldValue, float newValue);
     virtual void setParamNormalizedValue(float value);

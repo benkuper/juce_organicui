@@ -19,7 +19,7 @@ class FloatParameter : public Parameter
 {
 public:
     FloatParameter(const String &niceName, const String &description, const float &initialValue, const float &minValue = (float)INT32_MIN, const float &maxValue = (float)INT32_MAX, bool enabled = true);
-    ~FloatParameter() {}
+    virtual ~FloatParameter() {}
 
 	float unitSteps;
 
@@ -34,7 +34,7 @@ public:
 	FloatParameterLabelUI * createLabelParameter(FloatParameter * target = nullptr);
 	TimeLabel * createTimeLabelParameter(FloatParameter * target = nullptr);
 
-    ControllableUI * createDefaultUI() override;
+    virtual ControllableUI * createDefaultUI() override;
 
 	bool checkValueIsTheSame(var oldValue, var newValue) override;
 

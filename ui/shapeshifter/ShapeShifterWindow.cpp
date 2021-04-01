@@ -19,11 +19,19 @@ ShapeShifterWindow::ShapeShifterWindow(ShapeShifterPanel * _panel, juce::Rectang
 	panel->setPreferredWidth(getWidth());
 	panel->setPreferredHeight(getHeight());
     
-    //DBG("window -> addShapeShifterListener " << panel->header.tabs[0]->content->contentName);
+	setAlwaysOnTop(true);
+	
+	//DBG("window -> addShapeShifterListener " << panel->header.tabs[0]->content->contentName);
 	panel->addShapeShifterPanelListener(this); //is it necessary ?
 
-	setAlwaysOnTop(true);
+	pinBT.reset(AssetManager::getInstance()->getToggleBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::pin_png, OrganicUIBinaryData::pin_pngSize)));
+	pinBT->setToggleState(isAlwaysOnTop(), dontSendNotification);
+	pinBT->addListener(this);
+	panel->addAndMakeVisible(pinBT.get());
+
 	setContentNonOwned(_panel,true);
+
+	
 
 	setBackgroundColour(BG_COLOR.darker(.1f).withAlpha(.3f));
 
@@ -57,8 +65,10 @@ void ShapeShifterWindow::resized()
 
 	if (panel == nullptr) return;
 
+
 	panel->setPreferredWidth(getWidth());
 	panel->setPreferredHeight(getHeight());
+	pinBT->setBounds(panel->getLocalBounds().removeFromTop(20).removeFromRight(20).reduced(2));
 }
 
 void ShapeShifterWindow::mouseDown(const MouseEvent & e)
@@ -111,6 +121,15 @@ var ShapeShifterWindow::getCurrentLayout()
 	data.getDynamicObject()->setProperty("width", getWidth());
 	data.getDynamicObject()->setProperty("height", getHeight());
 	return data;
+}
+
+void ShapeShifterWindow::buttonClicked(Button* b)
+{
+	if (b == pinBT.get())
+	{
+		setAlwaysOnTop(!isAlwaysOnTop());
+		pinBT->setToggleState(isAlwaysOnTop(), dontSendNotification);
+	}
 }
 
 void ShapeShifterWindow::panelEmptied(ShapeShifterPanel *)

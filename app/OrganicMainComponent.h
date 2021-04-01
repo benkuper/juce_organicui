@@ -10,7 +10,6 @@ public:
    	OrganicMainContentComponent();
     virtual ~OrganicMainContentComponent();
 
-
 	TooltipWindow tooltipWindow; //just declare one here
 
 #if JUCE_OPENGL

@@ -9,7 +9,6 @@
  ==============================================================================
  */
 
-
 Engine * Engine::mainEngine = nullptr;
 
 static OrganicApplication& getApp();
@@ -47,7 +46,7 @@ Engine::Engine(const String & fileName, const String & fileExtension) :
 
 	ScriptUtil::getInstance(); //trigger ScriptUtil constructor
 
-	startTimer(60000); //auto-save every 5 minutes
+	startTimer(1, 60000); //auto-save every 5 minutes
 }
 
 Engine::~Engine() {
@@ -173,15 +172,22 @@ void Engine::clear() {
 }
 
 
-void Engine::timerCallback()
+void Engine::timerCallback(int timerID)
 {
 	if (isClearing || isLoadingFile) return;
 
-	if (GlobalSettings::getInstance()->enableAutoSave->boolValue())
+	switch (timerID)
 	{
-		saveBackupDocument(autoSaveIndex);
-		autoSaveIndex = (autoSaveIndex + 1) % GlobalSettings::getInstance()->autoSaveCount->intValue();
-		startTimer(60000 * GlobalSettings::getInstance()->autoSaveTime->intValue());
+	case 1:
+	{
+		if (GlobalSettings::getInstance()->enableAutoSave->boolValue())
+		{
+			saveBackupDocument(autoSaveIndex);
+			autoSaveIndex = (autoSaveIndex + 1) % GlobalSettings::getInstance()->autoSaveCount->intValue();
+			startTimer(1,  60000 * GlobalSettings::getInstance()->autoSaveTime->intValue());
+		}
+	}
+	break;
 	}
 }
 
