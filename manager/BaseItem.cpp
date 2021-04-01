@@ -129,7 +129,7 @@ void BaseItem::setMovePositionReference(bool setOtherSelectedItems)
 		Array<BaseItem*> items = InspectableSelectionManager::activeSelectionManager->getInspectablesAs<BaseItem>();
 		for (auto& i : items)
 		{
-			if (i == this) continue;
+			if (i == this || i->isUILocked->boolValue()) continue;
 			i->setMovePositionReference(false);
 		}
 	}
@@ -148,7 +148,7 @@ void BaseItem::movePosition(Point<float> positionOffset, bool moveOtherSelectedI
 		Array<BaseItem*> items = InspectableSelectionManager::activeSelectionManager->getInspectablesAs<BaseItem>();
 		for (auto& i : items)
 		{
-			if (i == this) continue;
+			if (i == this || i->isUILocked->boolValue()) continue;
 			i->movePosition(positionOffset, false);
 		}
 	}
@@ -170,6 +170,8 @@ void BaseItem::scalePosition(Point<float> positionOffset, bool moveOtherSelected
 		Point<float> maxPosition = items[0]->movePositionReference;
 		for (auto& i : items)
 		{
+			if (i->isUILocked->boolValue()) continue;
+
 			Point<float> t = i->movePositionReference;
 			if (t.x < minPosition.x)
 			{
@@ -199,7 +201,6 @@ void BaseItem::scalePosition(Point<float> positionOffset, bool moveOtherSelected
 		
 		if (anchorDiffToReference.isOrigin()) return;
 
-		DBG("anchor diff to selected < " << anchorDiffToReference.toString() << " / anchorTIme " << anchorPosition.toString());
 		for (auto& i : items)
 		{
 			Point<float> positionScale = (i->movePositionReference - anchorPosition) / anchorDiffToReference;
@@ -235,6 +236,7 @@ void BaseItem::addMoveToUndoManager(bool addOtherSelectedItems)
 		Array<BaseItem*> items = InspectableSelectionManager::activeSelectionManager->getInspectablesAs<BaseItem>();
 		for (auto& i : items)
 		{
+			if (i->isUILocked->boolValue()) continue;
 			i->addUndoableMoveAction(actions);
 		}
 
@@ -258,7 +260,7 @@ void BaseItem::setSizeReference(bool setOtherSelectedItems)
 		Array<BaseItem*> items = InspectableSelectionManager::activeSelectionManager->getInspectablesAs<BaseItem>();
 		for (auto& i : items)
 		{
-			if (i == this) continue;
+			if (i == this || i->isUILocked->boolValue()) continue;
 			i->setSizeReference(false);
 		}
 	}
@@ -278,7 +280,7 @@ void BaseItem::resizeItem(Point<float> sizeOffset, bool resizeOtherSelectedItems
 		Array<BaseItem*> items = InspectableSelectionManager::activeSelectionManager->getInspectablesAs<BaseItem>();
 		for (auto& i : items)
 		{
-			if (i == this) continue;
+			if (i == this || i->isUILocked->boolValue()) continue;
 			i->resizeItem(sizeOffset, false);
 		}
 	}
@@ -308,6 +310,7 @@ void BaseItem::addResizeToUndoManager(bool addOtherSelectedItems)
 		Array<BaseItem*> items = InspectableSelectionManager::activeSelectionManager->getInspectablesAs<BaseItem>();
 		for (auto& i : items)
 		{
+			if (i->isUILocked->boolValue()) continue;
 			i->addUndoableResizeAction(actions);
 		}
 
