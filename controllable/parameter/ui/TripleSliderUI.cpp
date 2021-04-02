@@ -2,7 +2,7 @@
   ==============================================================================
 
 	TripleSliderUI.cpp
-	Created: 2 Nov 2016 4:17:34pm
+	Created: 25 Oct 2016 11:46:46am
 	Author:  bkupe
 
   ==============================================================================
@@ -13,30 +13,41 @@ TripleSliderUI::TripleSliderUI(Point3DParameter* parameter) :
 	p3d(parameter),
 	xParam("X", "xParam", parameter->x, parameter->minimumValue[0], parameter->maximumValue[0]),
 	yParam("Y", "yParam", parameter->y, parameter->minimumValue[1], parameter->maximumValue[1]),
-	zParam("Z", "zParam", parameter->z, parameter->minimumValue[2], parameter->maximumValue[2])
+	zParam("Z", "zParam", parameter->z, parameter->minimumValue[2], parameter->maximumValue[2]),
+	isUpdatingFromParam(false)
 {
+
 	showEditWindowOnDoubleClick = false;
 
 	xParam.canHaveRange = parameter->canHaveRange;
 	yParam.canHaveRange = parameter->canHaveRange;
 	zParam.canHaveRange = parameter->canHaveRange;
+	
 	xParam.isCustomizableByUser = parameter->isCustomizableByUser;
 	yParam.isCustomizableByUser = parameter->isCustomizableByUser;
 	zParam.isCustomizableByUser = parameter->isCustomizableByUser;
+	
 	xParam.defaultValue = 0;
 	yParam.defaultValue = 0;
 	zParam.defaultValue = 0;
+	
 	xParam.defaultUI = parameter->defaultUI;
 	yParam.defaultUI = parameter->defaultUI;
 	zParam.defaultUI = parameter->defaultUI;
-	xParam.addAsyncCoalescedParameterListener(this);
-	yParam.addAsyncCoalescedParameterListener(this);
-	zParam.addAsyncCoalescedParameterListener(this);
 
-	xSlider.reset((ParameterUI *)xParam.createDefaultUI());
+
+	xParam.addAsyncParameterListener(this);
+	yParam.addAsyncParameterListener(this);
+	zParam.addAsyncParameterListener(this);
+
+	xSlider.reset((ParameterUI*)xParam.createDefaultUI());
 	ySlider.reset((ParameterUI*)yParam.createDefaultUI());
-	zSlider.reset((ParameterUI*)zParam.createDefaultUI());
+	zSlider.reset((ParameterUI*)yParam.createDefaultUI());
 
+	xSlider->showLabel = false;
+	ySlider->showLabel = false;
+	zSlider->showLabel = false;
+	
 	xSlider->showMenuOnRightClick = false;
 	ySlider->showMenuOnRightClick = false;
 	zSlider->showMenuOnRightClick = false;
@@ -44,7 +55,6 @@ TripleSliderUI::TripleSliderUI(Point3DParameter* parameter) :
 	xSlider->setUndoableValueOnMouseUp = false;
 	ySlider->setUndoableValueOnMouseUp = false;
 	zSlider->setUndoableValueOnMouseUp = false;
-
 
 	xSlider->addMouseListener(this, true);
 	ySlider->addMouseListener(this, true);
@@ -54,11 +64,9 @@ TripleSliderUI::TripleSliderUI(Point3DParameter* parameter) :
 	addAndMakeVisible(ySlider.get());
 	addAndMakeVisible(zSlider.get());
 
-	setInterceptsMouseClicks(true, true);
-
 	setSize(200, GlobalSettings::getInstance()->fontSize->floatValue() + 4);//default size
 
-	feedbackStateChanged(); //force update
+	updateUIParams(); //force update
 }
 
 TripleSliderUI::~TripleSliderUI()
@@ -68,12 +76,23 @@ TripleSliderUI::~TripleSliderUI()
 	zParam.removeAsyncParameterListener(this);
 }
 
-void TripleSliderUI::updateUIParamsInternal()
+void TripleSliderUI::mouseDownInternal(const MouseEvent&)
 {
-	xParam.setControllableFeedbackOnly(parameter->isControllableFeedbackOnly);
-	yParam.setControllableFeedbackOnly(parameter->isControllableFeedbackOnly);
-	zParam.setControllableFeedbackOnly(parameter->isControllableFeedbackOnly);
+	mouseDownValue = parameter->getValue();
+}
 
+void TripleSliderUI::mouseUpInternal(const MouseEvent&)
+{
+	if (setUndoableValueOnMouseUp)
+	{
+		if ((float)mouseDownValue[0] != xParam.floatValue()
+			|| (float)mouseDownValue[1] != yParam.floatValue()
+			|| (float)mouseDownValue[2] != zParam.floatValue())
+		{
+
+			p3d->setUndoableVector((float)mouseDownValue[0], (float)mouseDownValue[1], (float)mouseDownValue[2], xParam.floatValue(), yParam.floatValue(), zParam.floatValue());
+		}
+	}
 }
 
 void TripleSliderUI::paint(Graphics& g)
@@ -101,30 +120,14 @@ void TripleSliderUI::resized()
 		r.removeFromLeft(2);
 	}
 
-	xSlider->setBounds(r.removeFromLeft(r.getWidth() / 3 - 2));
-	r.removeFromLeft(2);
-	ySlider->setBounds(r.removeFromLeft(r.getWidth() / 2 - 4));
-	r.removeFromLeft(2);
-	zSlider->setBounds(r.removeFromRight(r.getWidth() - 4));
-
-}
-
-void TripleSliderUI::mouseDownInternal(const MouseEvent&)
-{
-	mouseDownValue = parameter->getValue();
-}
-
-void TripleSliderUI::mouseUpInternal(const MouseEvent&)
-{
-	if (setUndoableValueOnMouseUp)
-	{
-		if ((float)mouseDownValue[0] != xParam.floatValue() || (float)mouseDownValue[1] != yParam.floatValue() || (float)mouseDownValue[2] != zParam.floatValue()) p3d->setUndoableVector((float)mouseDownValue[0], (float)mouseDownValue[1], (float)mouseDownValue[2], xParam.floatValue(), yParam.floatValue(), zParam.floatValue());
-	}
+	xSlider->setBounds(r.removeFromLeft(r.getWidth() / 3 - 15));
+	ySlider->setBounds(r.removeFromRight(r.getWidth() / 2 - 10));
+	zSlider->setBounds(r.removeFromRight(r.getWidth() - 5));
 }
 
 void TripleSliderUI::showEditWindowInternal()
 {
-	AlertWindow nameWindow("Change point3D params", "Set new values and bounds for this parameter", AlertWindow::AlertIconType::NoIcon, this);
+	AlertWindow nameWindow("Change point 2D params", "Set new values and bounds for this parameter", AlertWindow::AlertIconType::NoIcon, this);
 
 	const String coordNames[3]{ "X","Y","Z" };
 
@@ -147,14 +150,14 @@ void TripleSliderUI::showEditRangeWindowInternal()
 {
 	if (!parameter->isCustomizableByUser) return;
 
-	AlertWindow nameWindow("Change point 3D params", "Set new values and bounds for this parameter", AlertWindow::AlertIconType::NoIcon, this);
+	AlertWindow nameWindow("Change point 2D params", "Set new values and bounds for this parameter", AlertWindow::AlertIconType::NoIcon, this);
 
 	const String coordNames[3]{ "X","Y","Z" };
 
 	for (int i = 0; i < 3; ++i)
 	{
-		nameWindow.addTextEditor("minVal" + String(i), String((float)p3d->minimumValue), "Minimum " + coordNames[i]);
-		nameWindow.addTextEditor("maxVal" + String(i), String((float)p3d->maximumValue), "Maximum " + coordNames[i]);
+		nameWindow.addTextEditor("minVal" + String(i), String((float)p3d->minimumValue[i]), "Minimum " + coordNames[i]);
+		nameWindow.addTextEditor("maxVal" + String(i), String((float)p3d->maximumValue[i]), "Maximum " + coordNames[i]);
 	}
 
 	nameWindow.addButton("OK", 1, KeyPress(KeyPress::returnKey));
@@ -175,31 +178,41 @@ void TripleSliderUI::showEditRangeWindowInternal()
 	}
 }
 
+
 void TripleSliderUI::rangeChanged(Parameter* p)
 {
 	if (p != parameter) return;
-	if (!parameter->minimumValue.isArray() || !parameter->maximumValue.isArray()) return;
-
+	isUpdatingFromParam = true;
 	xParam.setRange(parameter->minimumValue[0], parameter->maximumValue[0]);
 	yParam.setRange(parameter->minimumValue[1], parameter->maximumValue[1]);
 	zParam.setRange(parameter->minimumValue[2], parameter->maximumValue[2]);
+	isUpdatingFromParam = false;
+}
+
+void TripleSliderUI::updateUIParamsInternal()
+{
+	xParam.setControllableFeedbackOnly(parameter->isControllableFeedbackOnly);
+	yParam.setControllableFeedbackOnly(parameter->isControllableFeedbackOnly);
+	zParam.setControllableFeedbackOnly(parameter->isControllableFeedbackOnly);
 }
 
 void TripleSliderUI::newMessage(const Parameter::ParameterEvent& e)
 {
 	ParameterUI::newMessage(e);
+
 	if (e.parameter == parameter)
 	{
+		isUpdatingFromParam = true;
 		xParam.setValue(((Point3DParameter*)e.parameter)->x);
 		yParam.setValue(((Point3DParameter*)e.parameter)->y);
 		zParam.setValue(((Point3DParameter*)e.parameter)->z);
-
+		isUpdatingFromParam = false;
 	}
-	else if (isInteractable())
+	else if (isInteractable() && !isUpdatingFromParam)
 	{
-		if (e.parameter == &xParam || e.parameter == &yParam || e.parameter == &zParam)
+		if (e.parameter == &xParam || e.parameter == &yParam)
 		{
-			if (xParam.floatValue() != p3d->x || yParam.floatValue() != p3d->y || yParam.floatValue() != p3d->z)
+			if (xParam.floatValue() != p3d->x || yParam.floatValue() != p3d->y || zParam.floatValue() != p3d->z)
 			{
 				if (!isMouseButtonDown(true) && !UndoMaster::getInstance()->isPerformingUndoRedo()) p3d->setUndoableVector(p3d->x, p3d->y, p3d->z, xParam.floatValue(), yParam.floatValue(), zParam.floatValue());
 				else p3d->setVector(xParam.floatValue(), yParam.floatValue(), zParam.floatValue());
