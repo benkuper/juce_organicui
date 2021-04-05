@@ -53,7 +53,7 @@ public:
     void clear() override;
 	virtual void clearInternal() {}; //to override to clear specific application classes
 
-	void parseCommandline(const String &);
+	virtual void parseCommandline(const String &);
 
 	//==============================================================================
 	// see EngineFileDocument.cpp

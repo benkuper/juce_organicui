@@ -1,3 +1,4 @@
+#include "FloatSliderUI.h"
 /*
  ==============================================================================
 
@@ -14,6 +15,8 @@ FloatSliderUI::FloatSliderUI(Parameter * parameter) :
 	ParameterUI(parameter),
 	addToUndoOnMouseUp(true),
 	fixedDecimals(3),
+	initValue(0),
+	initNormalizedValue(0),
 #if JUCE_MAC
 	updateRate(15),
 #else
@@ -25,7 +28,6 @@ FloatSliderUI::FloatSliderUI(Parameter * parameter) :
     assignOnMousePosDirect = false;
     changeParamOnMouseUpOnly = false;
     orientation = HORIZONTAL;
-    scaleFactor = 1;
 
 	setWantsKeyboardFocus(true);
 	ParameterUI::setNextFocusOrder(this);
@@ -126,7 +128,8 @@ void FloatSliderUI::paint(Graphics & g)
 
 void FloatSliderUI::mouseDownInternal(const MouseEvent & e)
 {
-    initValue = getParamNormalizedValue();
+	initValue = parameter->floatValue();
+    initNormalizedValue = getParamNormalizedValue();
     setMouseCursor(MouseCursor::NoCursor);
 
 	if (e.mods.isRightButtonDown()) {
@@ -135,7 +138,7 @@ void FloatSliderUI::mouseDownInternal(const MouseEvent & e)
 
     if (e.mods.isLeftButtonDown() && assignOnMousePosDirect)
     {
-        setParamNormalizedValue(getValueFromMouse());
+        setParamNormalizedValue(getNormalizedValueFromMouse());
     }
     else
     {
@@ -152,19 +155,15 @@ void FloatSliderUI::mouseDrag(const MouseEvent & e)
 	if (changeParamOnMouseUpOnly) repaint();
     else
     {
-		scaleFactor = e.mods.isAltDown() ? .5f : 1;
-
 		if (e.mods.isLeftButtonDown())
 		{
 			if (assignOnMousePosDirect)
 			{
-				setParamNormalizedValue(getValueFromMouse());
+				setParamNormalizedValue(getNormalizedValueFromMouse());
 			}else
 			{
-				float diffValue = getValueFromPosition((e.getPosition() - e.getMouseDownPosition()));
-				if (orientation == VERTICAL) diffValue -= 1;
-
-				setParamNormalizedValue(initValue + diffValue*scaleFactor);
+				float normVal = getNormalizedValueFromMouseDrag(e);
+				setParamNormalizedValue(normVal);
 			}
 		}
     }
@@ -178,11 +177,11 @@ void FloatSliderUI::mouseUpInternal(const MouseEvent &)
 	{
 		if (changeParamOnMouseUpOnly)
 		{
-			if (initValue !=  getValueFromMouse()) setParamNormalizedValueUndoable(initValue, getValueFromMouse());
+			if (initNormalizedValue !=  getNormalizedValueFromMouse()) setParamNormalizedValueUndoable(initNormalizedValue, getNormalizedValueFromMouse());
 		}
 		else
 		{
-			if (initValue != getValueFromMouse()) setParamNormalizedValueUndoable(initValue, parameter->getNormalizedValue());
+			if (initNormalizedValue != getNormalizedValueFromMouse()) setParamNormalizedValueUndoable(initNormalizedValue, parameter->getNormalizedValue());
 		}
 	}
 	
@@ -193,15 +192,24 @@ void FloatSliderUI::mouseUpInternal(const MouseEvent &)
     }
 }
 
-float FloatSliderUI::getValueFromMouse()
+float FloatSliderUI::getNormalizedValueFromMouse()
 {
-    return getValueFromPosition(getMouseXYRelative());
+    return getNormalizedValueFromPosition(getMouseXYRelative());
 }
 
-float FloatSliderUI::getValueFromPosition(const Point<int> &pos)
+float FloatSliderUI::getNormalizedValueFromMouseDrag(const MouseEvent& e)
 {
-    if (orientation == HORIZONTAL) return (pos.x*1.0f / getWidth());
-    else return 1-(pos.y*1.0f/ getHeight());
+	float scaleFactor = e.mods.isAltDown() ? .5f : 1;
+	Point<int> relPos = e.getOffsetFromDragStart() * scaleFactor;
+	float normRelVal = getNormalizedValueFromPosition(relPos);
+	if (orientation == VERTICAL) normRelVal = -(1 - normRelVal);
+	return initNormalizedValue + normRelVal;
+}
+
+float FloatSliderUI::getNormalizedValueFromPosition(const Point<int> &pos)
+{
+	if (orientation == HORIZONTAL) return (pos.x * 1.0f / getWidth());
+	else return 1 - (pos.y * 1.0f / getHeight());
 }
 
 int FloatSliderUI::getDrawPos()
