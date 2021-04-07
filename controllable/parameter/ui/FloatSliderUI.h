@@ -29,12 +29,12 @@ public:
 	
 	bool changeParamOnMouseUpOnly;
     bool assignOnMousePosDirect;
-    float scaleFactor;
 
     int fixedDecimals;
 
     //interaction
     float initValue;
+    float initNormalizedValue;
 
     //drawing checks
     int updateRate;
@@ -47,9 +47,10 @@ public:
     virtual void mouseDrag(const MouseEvent &e) override;
     virtual void mouseUpInternal(const MouseEvent &e) override;
 
-    virtual float getValueFromMouse();
-    virtual float getValueFromPosition(const Point<int> &pos);
-    int getDrawPos();
+    virtual float getNormalizedValueFromMouse();
+    virtual float getNormalizedValueFromMouseDrag(const MouseEvent &e);
+    virtual float getNormalizedValueFromPosition(const Point<int> &pos);
+    virtual int getDrawPos();
     virtual String getValueText() const;
 
     virtual void setParamNormalizedValueUndoable(float oldValue, float newValue);
