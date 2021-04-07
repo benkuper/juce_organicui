@@ -9,7 +9,8 @@
 */
 
 CommentUI::CommentUI(CommentItem * comment) :
-	BaseItemMinimalUI(comment)
+	BaseItemMinimalUI(comment),
+	resizer(this, nullptr)
 {
 	bgColor = item->color->getColor().darker().withAlpha(item->bgAlpha->floatValue());
 
@@ -23,7 +24,7 @@ CommentUI::CommentUI(CommentItem * comment) :
 	//textUI.setColour(textUI.backgroundWhenEditingColourId, Colours::darkgrey.withAlpha(.2f));
 	
 	textUI.setFont(item->size->floatValue());
-	textUI.setMultiLine(true, false);
+	textUI.setMultiLine(true, true);
 	textUI.setText(item->text->stringValue(), dontSendNotification);
 	textUI.setReturnKeyStartsNewLine(false);
 	textUI.setShiftReturnKeyStartsNewLine(true);
@@ -35,8 +36,11 @@ CommentUI::CommentUI(CommentItem * comment) :
 
 	textUI.setFont(item->size->floatValue());
 	addAndMakeVisible(&textUI);
-
-	setSize(textUI.getTextWidth(), textUI.getTextHeight()+4);
+	
+	addAndMakeVisible(&resizer);
+	
+	setSize(item->viewUISize->x, item->viewUISize->y);
+	//setSize(textUI.getTextWidth(), textUI.getTextHeight()+4);
 }
 
 CommentUI::~CommentUI()
@@ -65,6 +69,7 @@ void CommentUI::paint(Graphics & g)
 
 void CommentUI::resized()
 {
+	resizer.setBounds(getLocalBounds());
 	textUI.setBounds(getLocalBounds());
 }
 
@@ -151,7 +156,7 @@ void CommentUI::controllableFeedbackUpdateInternal(Controllable * c)
 	{
 		if (c == item->text) textUI.setText(item->text->stringValue(), dontSendNotification);
 		textUI.applyFontToAllText(item->size->floatValue(), true);
-		setSize(textUI.getTextWidth(), textUI.getTextHeight()+4);
+		//setSize(textUI.getTextWidth(), textUI.getTextHeight()+4);
 	}
 	else if (c == item->color || c == item->bgAlpha)
 	{

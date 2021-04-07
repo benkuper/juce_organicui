@@ -19,6 +19,7 @@ public:
 	~CommentUI();
 
 	TextEditor textUI;
+	ResizableBorderComponent resizer;
 
 	void paint(Graphics &g) override;
 	void resized() override;

@@ -20,6 +20,8 @@ CommentItem::CommentItem() :
 
 	color = addColorParameter("Color", "The color of the text", TEXT_COLOR);
 	bgAlpha = addFloatParameter("Background Alpha", "The alpha", 0, 0, 1);
+
+	viewUISize->setPoint(140, 30);
 }
 
 CommentItem::~CommentItem()
