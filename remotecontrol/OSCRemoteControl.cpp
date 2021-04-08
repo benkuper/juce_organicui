@@ -468,6 +468,7 @@ var OSCRemoteControl::getOSCQueryDataForControllable(Controllable* c)
 void OSCRemoteControl::connectionOpened(const String& id)
 {
 	NLOG(niceName, "Got a connection from " << id);
+	feedbackMap.set(id, Array<Controllable *>()); //Reset feedbacks
 }
 
 void OSCRemoteControl::messageReceived(const String& id, const String& message)
@@ -502,6 +503,7 @@ void OSCRemoteControl::dataReceived(const String& id, const MemoryBlock& data)
 void OSCRemoteControl::connectionClosed(const String& id, int status, const String& reason)
 {
 	NLOG(niceName, "Connection close from " << id << " : " << status << " (" << reason << ")");
+	feedbackMap.remove(id);
 }
 
 void OSCRemoteControl::controllableFeedbackUpdate(ControllableContainer* cc, Controllable* c)
