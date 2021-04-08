@@ -1,4 +1,3 @@
-#include "TargetParameter.h"
 /*
   ==============================================================================
 
@@ -54,7 +53,9 @@ TargetParameter::~TargetParameter()
 void TargetParameter::resetValue(bool silentSet)
 {
 	ghostValue = ""; 
-	Parameter::resetValue(silentSet);
+	setTarget((ControllableContainer*)nullptr);
+	setTarget((Controllable*)nullptr);
+	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::VALUE_CHANGED, this, getValue()));
 	clearWarning();
 }
 
@@ -82,7 +83,17 @@ void TargetParameter::setValueFromTarget(Controllable * c, bool addToUndo)
 			{
 				return;
 			}
+
+			if (rootContainer != nullptr)
+			{
+				if (rootContainer->getControllableForAddress(ca) == nullptr)
+				{
+					//DBG("Back link broken !");
+					return;
+				}
+			}
 		}
+
 
 		if (c->type < 0)
 		{
@@ -103,6 +114,15 @@ void TargetParameter::setValueFromTarget(ControllableContainer * cc, bool addToU
 	{
 		String ca = targetContainer->getControlAddress(rootContainer);
 		if (stringValue() == ca) return;
+
+		if (rootContainer != nullptr)
+		{
+			if (rootContainer->getControllableContainerForAddress(ca) == nullptr)
+			{
+				//DBG("Back link broken !");
+				return;
+			}
+		}
 	}
 
 	if (addToUndo) setUndoableValue(stringValue(), cc->getControlAddress(rootContainer));
@@ -326,7 +346,10 @@ void TargetParameter::setAttribute(String param, var attributeValue)
 var TargetParameter::getJSONDataInternal()
 {
 	var data = StringParameter::getJSONDataInternal();
-	if (value.toString().isEmpty() && ghostValue.isNotEmpty()) data.getDynamicObject()->setProperty("ghostValue", ghostValue);
+	if (value.toString().isEmpty() && ghostValue.isNotEmpty())
+	{
+		data.getDynamicObject()->setProperty("ghostValue", ghostValue);
+	}
 	return data;
 }
 
