@@ -52,6 +52,7 @@ Component* ParameterUI::getEditValueComponent()
 
 void ParameterUI::showEditRangeWindow()
 {
+	if (!isInteractable()) return;
 	if (customShowEditRangeWindowFunction != nullptr) customShowEditRangeWindowFunction(this);
 	else showEditRangeWindowInternal();
 }
@@ -264,7 +265,7 @@ ParameterUI::ValueEditCalloutComponent::ValueEditCalloutComponent(WeakReference<
 		labels.add(label);
 	}
 
-	setSize(100 * numValues, 20);
+	setSize(numValues == 1?200: 120 * numValues, 20);
 }
 
 ParameterUI::ValueEditCalloutComponent::~ValueEditCalloutComponent()
@@ -306,7 +307,7 @@ void ParameterUI::ValueEditCalloutComponent::labelTextChanged(Label* l)
 		int numValues = p->isComplex() ? p->value.size() : 1;
 		for (int i = 0; i < numValues; ++i)
 		{
-			if (p->type == Parameter::STRING) newVal.append(labels[i]->getText());
+			if (p->type == Parameter::STRING || p->type == Parameter::TARGET) newVal.append(labels[i]->getText());
 			else newVal.append(ParameterUI::textToValue(labels[i]->getText().replace(",", ".")));
 		}
 

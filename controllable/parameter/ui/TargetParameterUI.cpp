@@ -139,7 +139,11 @@ void TargetParameterUI::updateLabel()
 
 	if (newText.isEmpty())
 	{
-		if (targetParameter->ghostValue.isNotEmpty()) newText = "### " + targetParameter->ghostValue;
+		String ghostName = "";
+		if (targetParameter->value.toString().isNotEmpty()) ghostName = targetParameter->value.toString();
+		else if (targetParameter->ghostValue.isNotEmpty()) ghostName = targetParameter->ghostValue;
+
+		if (ghostName.isNotEmpty()) newText = "### " + ghostName;
 		else newText = noTargetText;
 	}
 
