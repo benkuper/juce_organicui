@@ -226,6 +226,8 @@ void ControllableUI::setOpaqueBackground(bool value)
 
 void ControllableUI::showEditWindow()
 {
+	if (!isInteractable()) return;
+
 	if (customShowEditWindowFunction != nullptr) customShowEditWindowFunction(this);
 	else showEditWindowInternal();
 }
