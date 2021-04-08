@@ -506,6 +506,12 @@ void OSCRemoteControl::connectionClosed(const String& id, int status, const Stri
 	feedbackMap.remove(id);
 }
 
+void OSCRemoteControl::connectionError(const String& id, const String& message)
+{
+	NLOGERROR(niceName, "Connection error from " << id << " : " << message);
+	feedbackMap.remove(id);
+}
+
 void OSCRemoteControl::controllableFeedbackUpdate(ControllableContainer* cc, Controllable* c)
 {
 	if (Engine::mainEngine->isLoadingFile || Engine::mainEngine->isClearing) return;

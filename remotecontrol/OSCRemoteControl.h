@@ -81,6 +81,7 @@ public:
 	void messageReceived(const String& id, const String& message) override;
 	void dataReceived(const String& id, const MemoryBlock &data) override;
 	void connectionClosed(const String& id, int status, const String& reason) override;
+	void connectionError(const String& id, const String& message) override;
 
 	void controllableFeedbackUpdate(ControllableContainer * cc, Controllable * c) override;
 
