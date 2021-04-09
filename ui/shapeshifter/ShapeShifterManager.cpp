@@ -193,7 +193,7 @@ bool ShapeShifterManager::checkDropOnCandidateTarget(WeakReference<ShapeShifterP
 	bool result = currentCandidatePanel->attachPanel(panel);
 	//if (result) closePanelWindow(getWindowForPanel(panel),false);
 	setCurrentCandidatePanel(nullptr);
-	return result;
+    return result;
 }
 
 ShapeShifterWindow * ShapeShifterManager::getWindowForPanel(ShapeShifterPanel * panel)
@@ -272,7 +272,12 @@ void ShapeShifterManager::loadLayoutFromFile(const File & fromFile)
 	if (!fromFile.existsAsFile()) return;
 
 	std::unique_ptr<InputStream> is(fromFile.createInputStream());
-	var data = JSON::parse(*is);
+	if(is == nullptr)
+    {
+        LOGERROR("Error loading layout");
+        return;
+    }
+    var data = JSON::parse(*is);
 	loadLayout(data);
 }
 

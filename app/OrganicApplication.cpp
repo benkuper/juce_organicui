@@ -234,9 +234,12 @@ void OrganicApplication::clearGlobalSettings()
 
 void OrganicApplication::saveGlobalSettings()
 {
-	if (useWindow)
+    
+	if (useWindow && mainWindow != nullptr)
 	{
-		var boundsVar = var(new DynamicObject());
+        MessageManagerLock mmLock;
+        
+        var boundsVar = var(new DynamicObject());
 		juce::Rectangle<int> r = mainWindow->getScreenBounds();
 
 		getAppProperties().getUserSettings()->setValue("windowX", r.getPosition().x);
