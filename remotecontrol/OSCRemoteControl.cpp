@@ -37,6 +37,8 @@ OSCRemoteControl::OSCRemoteControl() :
 	enabled->setValue(false);
 
 	localPort = addIntParameter("Local Port", "Local port to connect to for global control over the application", 42000, 1024, 65535);
+	logIncoming = addBoolParameter("Log Incoming", "If checked, this will log incoming messages", false);
+	logOutgoing = addBoolParameter("Log Outgoing", "If checked, this will log outgoing messages", false);
 
 	receiver.addListener(this);
 	receiver.registerFormatErrorHandler(&OSCHelpers::logOSCFormatError);
@@ -66,7 +68,6 @@ OSCRemoteControl::~OSCRemoteControl()
 
 void OSCRemoteControl::setupReceiver()
 {
-
 	//if (receiveCC == nullptr) return;
 
 	receiver.disconnect();
@@ -118,6 +119,19 @@ void OSCRemoteControl::setupZeroconf()
 void OSCRemoteControl::processMessage(const OSCMessage& m, const String& sourceId)
 {
 	String add = m.getAddressPattern().toString();
+
+	if (logIncoming->boolValue())
+	{
+		String s = add;
+		for (auto& a : m)
+		{
+			s += "\n" + OSCHelpers::getStringArg(a);
+		}
+
+		NLOG(niceName, "Received : " << s);
+	}
+
+
 
 	if (add == "/openFile")
 	{
@@ -542,6 +556,17 @@ void OSCRemoteControl::sendOSCQueryFeedback(Controllable* c, const String& exclu
 		StringArray ex = excludeId;
 		if (noFeedbackMap.contains(c)) ex.add(noFeedbackMap[c]);
 		server->sendExclude(b, ex);
+	}
+
+	if (logOutgoing->boolValue())
+	{
+		String s = m.getAddressPattern().toString();
+		for (auto& a : m)
+		{
+			s += "\n" + OSCHelpers::getStringArg(a);
+		}
+
+		NLOG(niceName, "Sent : " << s);
 	}
 }
 #endif

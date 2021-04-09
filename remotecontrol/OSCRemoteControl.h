@@ -42,6 +42,8 @@ public:
 
 	IntParameter * localPort;
 	OSCReceiver receiver;
+	BoolParameter* logIncoming;
+	BoolParameter* logOutgoing;
 
 	void setupReceiver();
 

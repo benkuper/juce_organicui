@@ -51,13 +51,13 @@ namespace OrganicUIBinaryData
     const int            file_pngSize = 16030;
 
     extern const char*   in_png;
-    const int            in_pngSize = 3608;
+    const int            in_pngSize = 3754;
 
     extern const char*   minus_png;
     const int            minus_pngSize = 2874;
 
     extern const char*   out_png;
-    const int            out_pngSize = 20427;
+    const int            out_pngSize = 4041;
 
     extern const char*   padlock_png;
     const int            padlock_pngSize = 584;
