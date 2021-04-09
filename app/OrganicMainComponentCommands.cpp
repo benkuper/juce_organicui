@@ -37,7 +37,7 @@ namespace CommandIDs
 	static const int clearGlobalSettings = 0x50004;
 
 	static const int showAbout = 0x60000;
-	
+
 	//navigation
 	static const int selectPreviousItem = 0x70001;
 	static const int selectNextItem = 0x70002;
@@ -122,10 +122,10 @@ void OrganicMainContentComponent::getCommandInfo(CommandID commandID, Applicatio
 
 	case StandardApplicationCommandIDs::copy:
 	{
-		InspectableSelectionManager * selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
-		Array<BaseItem *> items = selectionManager == nullptr ? Array<BaseItem *>() : selectionManager->getInspectablesAs<BaseItem>();
+		InspectableSelectionManager* selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
+		Array<BaseItem*> items = selectionManager == nullptr ? Array<BaseItem*>() : selectionManager->getInspectablesAs<BaseItem>();
 		String s = items.size() > 0 && items[0] != nullptr ? "Copy " + (items.size() > 1 ? String(items.size()) + " items" : items[0]->niceName) : "Nothing to duplicate";
-		result.setInfo(s, "Copy the selected items", category, 0);  
+		result.setInfo(s, "Copy the selected items", category, 0);
 		result.defaultKeypresses.add(KeyPress('c', ModifierKeys::commandModifier, 0));
 		result.setActive(items.size() > 0 && items[0] != nullptr);
 	}
@@ -133,8 +133,8 @@ void OrganicMainContentComponent::getCommandInfo(CommandID commandID, Applicatio
 
 	case StandardApplicationCommandIDs::cut:
 	{
-		InspectableSelectionManager * selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
-		Array<BaseItem *> items = selectionManager == nullptr ? Array<BaseItem *>() : selectionManager->getInspectablesAs<BaseItem>();
+		InspectableSelectionManager* selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
+		Array<BaseItem*> items = selectionManager == nullptr ? Array<BaseItem*>() : selectionManager->getInspectablesAs<BaseItem>();
 		String s = items.size() > 0 && items[0] != nullptr ? "Cut " + (items.size() > 1 ? String(items.size()) + " items" : items[0]->niceName) : "Nothing to duplicate";
 		result.setInfo(s, "Cut the selected items", category, 0);
 		result.defaultKeypresses.add(KeyPress('x', ModifierKeys::commandModifier, 0));
@@ -153,9 +153,9 @@ void OrganicMainContentComponent::getCommandInfo(CommandID commandID, Applicatio
 
 	case CommandIDs::duplicateItems:
 	{
-		InspectableSelectionManager * selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
-		Array<BaseItem *> items = selectionManager == nullptr ? Array<BaseItem *>() : selectionManager->getInspectablesAs<BaseItem>();
-		String s = items.size() > 0 && items[0] != nullptr ? "Duplicate " + (items.size() > 1?String(items.size())+" items":items[0]->niceName): "Nothing to duplicate";
+		InspectableSelectionManager* selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
+		Array<BaseItem*> items = selectionManager == nullptr ? Array<BaseItem*>() : selectionManager->getInspectablesAs<BaseItem>();
+		String s = items.size() > 0 && items[0] != nullptr ? "Duplicate " + (items.size() > 1 ? String(items.size()) + " items" : items[0]->niceName) : "Nothing to duplicate";
 		result.setInfo(s, "Duplicate the selected items", category, 0);
 		result.defaultKeypresses.add(KeyPress('d', ModifierKeys::commandModifier, 0));
 		result.setActive(items.size() > 0 && items[0] != nullptr);
@@ -164,9 +164,9 @@ void OrganicMainContentComponent::getCommandInfo(CommandID commandID, Applicatio
 
 	case CommandIDs::deleteItems:
 	{
-		InspectableSelectionManager * selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
-		Array<BaseItem *> items = selectionManager == nullptr ? Array<BaseItem *>() : selectionManager->getInspectablesAs<BaseItem>();
-		String s = items.size() > 0  && items[0] != nullptr? "Delete " + (items.size() > 1 ? String(items.size()) + " items" : items[0]->niceName) : "Nothing to delete";
+		InspectableSelectionManager* selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
+		Array<BaseItem*> items = selectionManager == nullptr ? Array<BaseItem*>() : selectionManager->getInspectablesAs<BaseItem>();
+		String s = items.size() > 0 && items[0] != nullptr ? "Delete " + (items.size() > 1 ? String(items.size()) + " items" : items[0]->niceName) : "Nothing to delete";
 		result.setInfo(s, "Delete the selected items", category, 0);
 		result.defaultKeypresses.add(KeyPress(KeyPress::deleteKey), KeyPress(KeyPress::backspaceKey));
 		result.setActive(items.size() > 0 && items[0] != nullptr);
@@ -185,10 +185,10 @@ void OrganicMainContentComponent::getCommandInfo(CommandID commandID, Applicatio
 	{
 		result.setInfo("Select Previous Item", "Select previous item in the list", category, 0);
 		result.defaultKeypresses.add(KeyPress(KeyPress::upKey), KeyPress(KeyPress::upKey, ModifierKeys::shiftModifier, 0));
-		
+
 		InspectableSelectionManager* selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
 		Array<BaseItem*> items = selectionManager == nullptr ? Array<BaseItem*>() : selectionManager->getInspectablesAs<BaseItem>();
-		
+
 
 		result.setActive(items.size() > 0);
 	}
@@ -197,11 +197,11 @@ void OrganicMainContentComponent::getCommandInfo(CommandID commandID, Applicatio
 	case CommandIDs::selectNextItem:
 	{
 		result.setInfo("Select Next Item", "Select next item in the list", category, 0);
-		result.defaultKeypresses.add(KeyPress(KeyPress::downKey),KeyPress(KeyPress::downKey, ModifierKeys::shiftModifier, 0));
-		
+		result.defaultKeypresses.add(KeyPress(KeyPress::downKey), KeyPress(KeyPress::downKey, ModifierKeys::shiftModifier, 0));
+
 		InspectableSelectionManager* selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
 		Array<BaseItem*> items = selectionManager == nullptr ? Array<BaseItem*>() : selectionManager->getInspectablesAs<BaseItem>();
-		
+
 		result.setActive(items.size() > 0);
 	}
 	break;
@@ -309,7 +309,8 @@ PopupMenu OrganicMainContentComponent::getMenuForIndex(int /*topLevelMenuIndex*/
 		menu.addCommandItem(&getCommandManager(), StandardApplicationCommandIDs::quit);
 
 
-	} else if (menuName == "Edit")
+	}
+	else if (menuName == "Edit")
 	{
 		menu.addCommandItem(&getCommandManager(), CommandIDs::undo);
 		menu.addCommandItem(&getCommandManager(), CommandIDs::redo);
@@ -342,7 +343,7 @@ PopupMenu OrganicMainContentComponent::getMenuForIndex(int /*topLevelMenuIndex*/
 bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 
 #if TIMELINE_ADD_MENU_ITEMS
-	if(info.commandID >= 0x80000 && info.commandID < 0x81000) return TimelineAppCommands::perform(info);
+	if (info.commandID >= 0x80000 && info.commandID < 0x81000) return TimelineAppCommands::perform(info);
 #endif
 
 	switch (info.commandID)
@@ -355,10 +356,12 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 		if (result == FileBasedDocument::SaveResult::userCancelledSave)
 		{
 
-		} else if (result == FileBasedDocument::SaveResult::failedToWriteToFile)
+		}
+		else if (result == FileBasedDocument::SaveResult::failedToWriteToFile)
 		{
 			LOGERROR("Could not save the document (Failed to write to file)\nCancelled loading of the new document");
-		} else
+		}
+		else
 		{
 			Engine::mainEngine->createNewGraph();
 		}
@@ -371,10 +374,12 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 		if (result == FileBasedDocument::SaveResult::userCancelledSave)
 		{
 
-		} else if (result == FileBasedDocument::SaveResult::failedToWriteToFile)
+		}
+		else if (result == FileBasedDocument::SaveResult::failedToWriteToFile)
 		{
 			LOGERROR("Could not save the document (Failed to write to file)\nCancelled loading of the new document");
-		} else
+		}
+		else
 		{
 			Engine::mainEngine->loadFromUserSpecifiedFile(true);
 		}
@@ -386,10 +391,12 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 		FileBasedDocument::SaveResult result = Engine::mainEngine->saveIfNeededAndUserAgrees();
 		if (result == FileBasedDocument::SaveResult::userCancelledSave)
 		{
-		} else if (result == FileBasedDocument::SaveResult::failedToWriteToFile)
+		}
+		else if (result == FileBasedDocument::SaveResult::failedToWriteToFile)
 		{
 			LOGERROR("Could not save the document (Failed to write to file)\nCancelled loading of the new document");
-		} else
+		}
+		else
 		{
 			Engine::mainEngine->loadFrom(Engine::mainEngine->getLastDocumentOpened(), true);
 		}
@@ -406,10 +413,12 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 		if (result == FileBasedDocument::SaveResult::userCancelledSave)
 		{
 
-		} else if (result == FileBasedDocument::SaveResult::failedToWriteToFile)
+		}
+		else if (result == FileBasedDocument::SaveResult::failedToWriteToFile)
 		{
 			LOGERROR("Could not save the document (Failed to write to file)\nCancelled loading of the new document");
-		} else if (result == FileBasedDocument::SaveResult::savedOk)
+		}
+		else if (result == FileBasedDocument::SaveResult::savedOk)
 		{
 			LOG("File saved.");
 		}
@@ -432,14 +441,14 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 	case StandardApplicationCommandIDs::copy:
 	case StandardApplicationCommandIDs::cut:
 	{
-		Array<BaseItem *> items = InspectableSelectionManager::activeSelectionManager->getInspectablesAs<BaseItem>();
+		Array<BaseItem*> items = InspectableSelectionManager::activeSelectionManager->getInspectablesAs<BaseItem>();
 		if (!items.isEmpty())
 		{
 			var data = new DynamicObject();
 			data.getDynamicObject()->setProperty("itemType", items[0]->itemDataType);
 
 			var itemsData = var();
-			for (auto &i : items)
+			for (auto& i : items)
 			{
 				if (i == nullptr) continue;
 				if (!i->userCanDuplicate) continue;
@@ -457,13 +466,13 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 
 	case StandardApplicationCommandIDs::paste:
 	{
-		InspectableSelectionManager * selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
+		InspectableSelectionManager* selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
 
-		BaseItem * item = selectionManager->getInspectableAs<BaseItem>();
+		BaseItem* item = selectionManager->getInspectableAs<BaseItem>();
 		if (item != nullptr) item->paste();
 		else
 		{
-			BaseItemListener * m = selectionManager->getInspectableAs<BaseItemListener>();
+			BaseItemListener* m = selectionManager->getInspectableAs<BaseItemListener>();
 			if (m != nullptr) m->askForPaste();
 		}
 	}
@@ -471,9 +480,9 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 
 	case CommandIDs::duplicateItems:
 	{
-		InspectableSelectionManager * selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
-		Array<BaseItem *> items = selectionManager->getInspectablesAs<BaseItem>();
-		for (auto &i : items)
+		InspectableSelectionManager* selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
+		Array<BaseItem*> items = selectionManager->getInspectablesAs<BaseItem>();
+		for (auto& i : items)
 		{
 			if (i == nullptr) continue;
 			if (!i->userCanDuplicate) continue;
@@ -484,9 +493,9 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 
 	case CommandIDs::deleteItems:
 	{
-		InspectableSelectionManager * selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
+		InspectableSelectionManager* selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
 		Array<BaseItem*> items = selectionManager->getInspectablesAs<BaseItem>();
-		HashMap<BaseManager<BaseItem> *, Array<BaseItem*> *> managerItemMap;
+		HashMap<BaseManager<BaseItem>*, Array<BaseItem*>*> managerItemMap;
 		for (auto& i : items)
 		{
 			if (i == nullptr) continue;
@@ -500,7 +509,7 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 			}
 		}
 
-		HashMap<BaseManager<BaseItem>*, Array<BaseItem*> *>::Iterator it(managerItemMap);
+		HashMap<BaseManager<BaseItem>*, Array<BaseItem*>*>::Iterator it(managerItemMap);
 		while (it.next())
 		{
 			if (it.getKey() == nullptr)
@@ -518,8 +527,8 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 
 	case CommandIDs::selectAll:
 	{
-		InspectableSelectionManager * selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
-		Array<BaseItemListener *> itemListeners = selectionManager->getInspectablesAs<BaseItemListener>();
+		InspectableSelectionManager* selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
+		Array<BaseItemListener*> itemListeners = selectionManager->getInspectablesAs<BaseItemListener>();
 		if (itemListeners.size() > 0)
 		{
 			for (auto& m : itemListeners) m->askForSelectAllItems(true);
@@ -527,7 +536,7 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 		else
 		{
 			Array<BaseItem*> items = selectionManager->getInspectablesAs<BaseItem>();
-			for(auto &item : items) item->selectAll(true);
+			for (auto& item : items) item->selectAll(true);
 		}
 	}
 	break;
@@ -535,20 +544,20 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 	case CommandIDs::selectPreviousItem:
 	{
 		InspectableSelectionManager* selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
-		Array<BaseItem *> items = selectionManager->getInspectablesAs<BaseItem>();
+		Array<BaseItem*> items = selectionManager->getInspectablesAs<BaseItem>();
 		for (auto& i : items)
 		{
 			if (i == nullptr) continue;
-			if(!i->useCustomArrowKeysBehaviour) i->selectPrevious(info.keyPress.getModifiers().isShiftDown());
+			if (!i->useCustomArrowKeysBehaviour) i->selectPrevious(info.keyPress.getModifiers().isShiftDown());
 		}
 	}
-	break; 
-	
+	break;
+
 	case CommandIDs::selectNextItem:
 	{
 		InspectableSelectionManager* selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
 		Array<BaseItem*> items = selectionManager->getInspectablesAs<BaseItem>();
-		for (auto& i : items) 
+		for (auto& i : items)
 		{
 			if (i == nullptr) continue;
 			if (!i->useCustomArrowKeysBehaviour)i->selectNext(info.keyPress.getModifiers().isShiftDown());
@@ -572,11 +581,11 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 		break;
 
 	case CommandIDs::clearGlobalSettings:
-		((OrganicApplication *)OrganicApplication::getInstance())->clearGlobalSettings();
+		((OrganicApplication*)OrganicApplication::getInstance())->clearGlobalSettings();
 		break;
 
 	case CommandIDs::toggleKioskMode:
-		Desktop::getInstance().setKioskModeComponent(Desktop::getInstance().getKioskModeComponent() == getMainWindow()?nullptr:getMainWindow());
+		Desktop::getInstance().setKioskModeComponent(Desktop::getInstance().getKioskModeComponent() == getMainWindow() ? nullptr : getMainWindow());
 		break;
 
 #if ORGANICUI_USE_WEBSERVER
@@ -587,12 +596,9 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 
 	default:
 		return JUCEApplication::getInstance()->perform(info);
-}
+	}
 
-
-
-
-return true;
+	return true;
 }
 
 void OrganicMainContentComponent::menuItemSelected(int menuItemID, int topLevelMenuIndex)
@@ -603,7 +609,8 @@ void OrganicMainContentComponent::menuItemSelected(int menuItemID, int topLevelM
 	{
 		ShapeShifterManager::getInstance()->handleMenuPanelCommand(menuItemID);
 
-	} else if (isPositiveAndBelow(menuItemID - CommandIDs::lastFileStartID, 100)) {
+	}
+	else if (isPositiveAndBelow(menuItemID - CommandIDs::lastFileStartID, 100)) {
 		RecentlyOpenedFilesList recentFiles;
 		recentFiles.restoreFromString(getAppProperties().getUserSettings()
 			->getValue("recentFiles"));
