@@ -886,7 +886,7 @@ var ControllableContainer::getJSONData()
 	if (editorIsCollapsed) data.getDynamicObject()->setProperty("editorIsCollapsed", true); //only set if true to avoid too much data
 
 	if (hideInEditor) data.getDynamicObject()->setProperty("hideInEditor", hideInEditor);
-	if (hideInRemoteControl) data.getDynamicObject()->setProperty("hideInRemoteControl", hideInRemoteControl);
+	if (hideInRemoteControl != defaultHideInRemoteControl) data.getDynamicObject()->setProperty("hideInRemoteControl", hideInRemoteControl);
 
 	bool isOwned = (parentContainer != nullptr && parentContainer->ownedContainers.contains(this));
 	if (isOwned)
@@ -937,7 +937,7 @@ void ControllableContainer::loadJSONData(var data, bool createIfNotThere)
 	includeTriggersInSaveLoad = data.getProperty("includeTriggers", includeTriggersInSaveLoad);
 	
 	hideInEditor = data.getProperty("hideInEditor", hideInEditor);
-	hideInRemoteControl = data.getProperty("hideInRemoteControl", hideInRemoteControl);
+	hideInRemoteControl = data.getProperty("hideInRemoteControl", defaultHideInRemoteControl);
 
 	Array<var>* paramsData = data.getDynamicObject()->getProperty("parameters").getArray();
 

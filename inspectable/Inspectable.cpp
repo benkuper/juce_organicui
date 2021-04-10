@@ -7,6 +7,7 @@ Inspectable::Inspectable() :
     showInspectorOnSelect(true),
 	hideInEditor(false),
 	hideInRemoteControl(false),
+	defaultHideInRemoteControl(false),
 	isHighlighted(false),
 	isPreselected(false),
     highlightLinkedInspectableOnSelect(true),
