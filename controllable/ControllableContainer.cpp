@@ -863,9 +863,11 @@ var ControllableContainer::getJSONData()
 		if (wc->type == Controllable::TRIGGER && !includeTriggersInSaveLoad) continue;
 		if (wc.wasObjectDeleted()) continue;
 		if (!wc->isSavable) continue;
+
+		//All of the following should reside in an overridable function "shoudBeSaved()" in Inspectable or Controllable
 		if (Parameter* p = dynamic_cast<Parameter*>(wc.get()))
 		{
-			if (p->controlMode == Parameter::ControlMode::MANUAL && !p->forceSaveValue)
+			if (p->controlMode == Parameter::ControlMode::MANUAL && !p->forceSaveValue && (p->defaultHideInRemoteControl == p->hideInRemoteControl))
 			{
 				if ((!p->userCanSetReadOnly && p->isControllableFeedbackOnly) || (!p->isOverriden && p->saveValueOnly)) continue; //do not save parameters that have not changed. it should light up the file. But save custom-made parameters even if there not overriden !
 			}
