@@ -469,7 +469,7 @@ void ShapeShifterManager::handleMenuPanelCommand(int commandID)
 			break;
 
 		default:
-			loadLayoutFromFile(sCommandID - 4);
+			loadLayoutFromFile(sCommandID - 5);
 			break;
 		}
 		return;
