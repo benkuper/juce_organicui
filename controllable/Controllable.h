@@ -88,6 +88,8 @@ public:
 
 	virtual void updateLiveScriptObjectInternal(DynamicObject * parent = nullptr) override;
 
+	virtual bool shouldBeSaved();
+
 	virtual var getJSONData(ControllableContainer * relativeTo = nullptr);
 	virtual var getJSONDataInternal() { return var(new DynamicObject()); } // to be overriden
 	virtual void loadJSONData(var data);

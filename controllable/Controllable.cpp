@@ -1,3 +1,4 @@
+#include "Controllable.h"
 /*
   ==============================================================================
 
@@ -161,6 +162,15 @@ void Controllable::updateLiveScriptObjectInternal(DynamicObject * parent)
 {
 	liveScriptObject->setProperty("name", shortName);
 	liveScriptObject->setProperty("niceName", niceName);
+}
+
+bool Controllable::shouldBeSaved()
+{
+	if (hideInRemoteControl != defaultHideInRemoteControl) return true;
+	if (userCanSetReadOnly && isControllableFeedbackOnly) return true;
+	if (!isSavable) return false;
+	if (!saveValueOnly) return true;
+	return false;
 }
 
 

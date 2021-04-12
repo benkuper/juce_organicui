@@ -434,10 +434,20 @@ DashboardItem* Parameter::createDashboardItem()
 	return new DashboardParameterItem(this);
 }
 
+bool Parameter::shouldBeSaved()
+{
+	if (Controllable::shouldBeSaved()) return true;
+	if (forceSaveValue) return true;
+	if (forceSaveRange) return true;
+	if (isOverriden) return true;
+
+	return false;
+}
+
 var Parameter::getJSONDataInternal()
 {
 	var data = Controllable::getJSONDataInternal();
-	data.getDynamicObject()->setProperty("value", value);
+	if(isOverriden) data.getDynamicObject()->setProperty("value", value);
 	
 	if (controlMode != MANUAL)
 	{

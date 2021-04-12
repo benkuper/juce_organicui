@@ -135,7 +135,7 @@ public:
 
 	virtual DashboardItem* createDashboardItem() override;
 
-
+	virtual bool shouldBeSaved() override;
 	virtual var getJSONDataInternal() override;
 	virtual void loadJSONDataInternal(var data) override;
 	
