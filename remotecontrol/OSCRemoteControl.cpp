@@ -9,7 +9,6 @@
 */
 
 #include "JuceHeader.h"
-
 juce_ImplementSingleton(OSCRemoteControl)
 
 #if ORGANIC_USE_WEBSERVER
@@ -316,7 +315,8 @@ bool OSCRemoteControl::handleHTTPRequest(std::shared_ptr<HttpServer::Response> r
 
 		data = new DynamicObject();
 		data.getDynamicObject()->setProperty("EXTENSIONS", extensionData);
-		data.getDynamicObject()->setProperty("NAME", ProjectInfo::projectName);
+		String s = String(ProjectInfo::projectName) + " - " + Engine::mainEngine->getDocumentTitle();
+		data.getDynamicObject()->setProperty("NAME", s);
 		data.getDynamicObject()->setProperty("OSC_PORT", localPort->intValue());
 		data.getDynamicObject()->setProperty("OSC_TRANSPORT", "UDP");
 	}
