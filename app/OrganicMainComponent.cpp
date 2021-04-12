@@ -164,4 +164,8 @@ void OrganicMainContentComponent::endLoadFile()
 	}
 	
 	Desktop::getInstance().setKioskModeComponent(ProjectSettings::getInstance()->fullScreenOnStartup->boolValue() ? fullScreenComponent : nullptr);
+    
+#if JUCE_MAC
+    MenuBarModel::handleAsyncUpdate(); //force refresh menu
+#endif
 }
