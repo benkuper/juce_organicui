@@ -439,7 +439,7 @@ bool Parameter::shouldBeSaved()
 	if (Controllable::shouldBeSaved()) return true;
 	if (forceSaveValue) return true;
 	if (forceSaveRange) return true;
-	if (isOverriden) return true;
+	if (isOverriden && !isControllableFeedbackOnly && isSavable) return true;
 
 	return false;
 }
@@ -447,7 +447,7 @@ bool Parameter::shouldBeSaved()
 var Parameter::getJSONDataInternal()
 {
 	var data = Controllable::getJSONDataInternal();
-	if(isOverriden) data.getDynamicObject()->setProperty("value", value);
+	if(forceSaveValue || (isOverriden && !isControllableFeedbackOnly && isSavable)) data.getDynamicObject()->setProperty("value", value);
 	
 	if (controlMode != MANUAL)
 	{
