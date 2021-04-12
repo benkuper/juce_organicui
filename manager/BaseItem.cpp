@@ -35,13 +35,19 @@ BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts
 	//For UI
 	miniMode = addBoolParameter("MiniMode", "Set the mini mode", false);
 	miniMode->hideInEditor = true;
+	miniMode->hideInRemoteControl = true;
+	miniMode->defaultHideInRemoteControl = true;
 
 	listUISize = addFloatParameter("ListSize", "Size in list", 24, 0, 5000);
 	listUISize->hideInEditor = true;
+	listUISize->hideInRemoteControl = true;
+	listUISize->defaultHideInRemoteControl = true;
 
 	viewUIPosition = addPoint2DParameter("ViewUIPosition", "Position the view");
 	//viewUIPosition->setBounds(-100000, -100000, 100000, 100000);
 	viewUIPosition->hideInEditor = true;
+	viewUIPosition->hideInRemoteControl = true;
+	viewUIPosition->defaultHideInRemoteControl = true;
 
 	viewUISize = addPoint2DParameter("ViewUISize", "Size in the view");
 	//viewUISize->setBounds(30, 60, 10000, 10000);
@@ -52,9 +58,13 @@ BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts
 	viewUISize->resetValue();
 	viewUISize->defaultValue = viewUISize->getValue();
 	viewUISize->hideInEditor = true;
+	viewUISize->hideInRemoteControl = true;
+	viewUISize->defaultHideInRemoteControl = true;
 
 	isUILocked = addBoolParameter("Locked", "if checked, item is locked in UI", false);
 	isUILocked->hideInEditor = true;
+	isUILocked->hideInRemoteControl = true;
+	isUILocked->defaultHideInRemoteControl = true;
 
 	scriptObject.setMethod("getType", BaseItem::getTypeStringFromScript);
 }

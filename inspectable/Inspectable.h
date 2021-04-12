@@ -28,6 +28,7 @@ public:
 
 	bool hideInEditor;
 	bool hideInRemoteControl;
+	bool defaultHideInRemoteControl;
 
 	bool isHighlighted;
 

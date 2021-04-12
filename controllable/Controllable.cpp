@@ -170,7 +170,7 @@ var Controllable::getJSONData(ControllableContainer * relativeTo)
 	data.getDynamicObject()->setProperty("controlAddress", getControlAddress(relativeTo));
 	
 	if (canBeDisabledByUser) data.getDynamicObject()->setProperty("enabled", enabled);
-	if (hideInRemoteControl) data.getDynamicObject()->setProperty("hideInRemoteControl", hideInRemoteControl);
+	if (hideInRemoteControl != defaultHideInRemoteControl) data.getDynamicObject()->setProperty("hideInRemoteControl", hideInRemoteControl);
 	if(userCanSetReadOnly) data.getDynamicObject()->setProperty("feedbackOnly", isControllableFeedbackOnly);
 
 	if (saveValueOnly) return data;
@@ -204,7 +204,7 @@ void Controllable::loadJSONData(var data)
 	isRemovableByUser = data.getProperty("removable", isRemovableByUser);
 	description = data.getProperty("description", description);
 	hideInEditor = data.getProperty("hideInEditor", hideInEditor);
-	hideInRemoteControl = data.getProperty("hideInRemoteControl", hideInRemoteControl);
+	hideInRemoteControl = data.getProperty("hideInRemoteControl", defaultHideInRemoteControl);
 	if (data.getDynamicObject()->hasProperty("feedbackOnly")) setControllableFeedbackOnly(data.getProperty("feedbackOnly",false));
 	customData = data.getProperty("customData", customData);
 

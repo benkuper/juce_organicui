@@ -863,9 +863,11 @@ var ControllableContainer::getJSONData()
 		if (wc->type == Controllable::TRIGGER && !includeTriggersInSaveLoad) continue;
 		if (wc.wasObjectDeleted()) continue;
 		if (!wc->isSavable) continue;
+
+		//All of the following should reside in an overridable function "shoudBeSaved()" in Inspectable or Controllable
 		if (Parameter* p = dynamic_cast<Parameter*>(wc.get()))
 		{
-			if (p->controlMode == Parameter::ControlMode::MANUAL && !p->forceSaveValue)
+			if (p->controlMode == Parameter::ControlMode::MANUAL && !p->forceSaveValue && (p->defaultHideInRemoteControl == p->hideInRemoteControl))
 			{
 				if ((!p->userCanSetReadOnly && p->isControllableFeedbackOnly) || (!p->isOverriden && p->saveValueOnly)) continue; //do not save parameters that have not changed. it should light up the file. But save custom-made parameters even if there not overriden !
 			}
@@ -886,7 +888,7 @@ var ControllableContainer::getJSONData()
 	if (editorIsCollapsed) data.getDynamicObject()->setProperty("editorIsCollapsed", true); //only set if true to avoid too much data
 
 	if (hideInEditor) data.getDynamicObject()->setProperty("hideInEditor", hideInEditor);
-	if (hideInRemoteControl) data.getDynamicObject()->setProperty("hideInRemoteControl", hideInRemoteControl);
+	if (hideInRemoteControl != defaultHideInRemoteControl) data.getDynamicObject()->setProperty("hideInRemoteControl", hideInRemoteControl);
 
 	bool isOwned = (parentContainer != nullptr && parentContainer->ownedContainers.contains(this));
 	if (isOwned)
@@ -937,7 +939,7 @@ void ControllableContainer::loadJSONData(var data, bool createIfNotThere)
 	includeTriggersInSaveLoad = data.getProperty("includeTriggers", includeTriggersInSaveLoad);
 	
 	hideInEditor = data.getProperty("hideInEditor", hideInEditor);
-	hideInRemoteControl = data.getProperty("hideInRemoteControl", hideInRemoteControl);
+	hideInRemoteControl = data.getProperty("hideInRemoteControl", defaultHideInRemoteControl);
 
 	Array<var>* paramsData = data.getDynamicObject()->getProperty("parameters").getArray();
 
