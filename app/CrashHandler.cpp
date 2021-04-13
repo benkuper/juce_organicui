@@ -73,7 +73,7 @@ void CrashDumpUploader::handleCrash(void * e)
 	std::unique_ptr<OutputStream> os(recoveredFile.createOutputStream());
 	if (os != nullptr)
 	{
-		JSON::writeToStream(*os, data, GlobalSettings::getInstance()->compressOnSave->boolValue());
+		JSON::writeToStream(*os, data, false);
 		os->flush();
 	}
 
@@ -300,6 +300,7 @@ void CrashDumpUploader::UploadWindow::buttonClicked(Button* bt)
 	if (bt == &okBT || bt == &autoReopenBT)
 	{
 		CrashDumpUploader::getInstance()->crashMessage = editor.getText();
+		CrashDumpUploader::getInstance()->doUpload = true;
 		if (bt == &autoReopenBT) CrashDumpUploader::getInstance()->autoReopen = true;
 	}
 	else if (bt == &cancelBT)
