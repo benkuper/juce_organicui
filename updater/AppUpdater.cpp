@@ -122,12 +122,21 @@ void AppUpdater::run()
 	targetDir = File::getSpecialLocation(File::currentApplicationFile).getParentDirectory().getChildFile("update_temp");
 	if (targetDir.exists()) targetDir.deleteRecursively();
 
+	std::function<bool(int, int)> callbackFunc = std::bind(&AppUpdater::openStreamProgressCallback, this, std::placeholders::_1, std::placeholders::_2);
 
 	StringPairArray responseHeaders;
-	int statusCode = 0;
-	std::unique_ptr<InputStream> stream(URL(updateURL).createInputStream(false, openStreamProgressCallback, this, String(),
-		2000, // timeout in millisecs
-		&responseHeaders, &statusCode));
+	int statusCode = 0; 
+	
+	URL::InputStreamOptions options = URL::InputStreamOptions(URL::ParameterHandling::inAddress)
+		.withExtraHeaders("Cache-Control: no-cache")
+		.withProgressCallback(callbackFunc)
+		.withResponseHeaders(&responseHeaders)
+		.withStatusCode(&statusCode)
+		.withConnectionTimeoutMs(2000)
+		;
+
+	
+	std::unique_ptr<InputStream> stream(URL(updateURL).createInputStream(options));
 
 #if JUCE_WINDOWS
 	if (statusCode != 200)
@@ -324,10 +333,9 @@ void AppUpdater::progress(URL::DownloadTask* task, int64 bytesDownloaded, int64 
 	LOG("Progress : " << percent);
 }
 
-bool AppUpdater::openStreamProgressCallback(void* context, int, int)
+bool AppUpdater::openStreamProgressCallback(int, int)
 {
-	auto thread = static_cast<AppUpdater*> (context);
-	return !thread->threadShouldExit();
+	return !threadShouldExit();
 }
 
 void AppUpdater::newMessage(const AppUpdateEvent& e)
