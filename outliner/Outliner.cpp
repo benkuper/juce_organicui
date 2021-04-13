@@ -11,22 +11,39 @@
 
 juce_ImplementSingleton(Outliner)
 
-Outliner::Outliner(const String &contentName) :
+Outliner::Outliner(const String& contentName) :
 	ShapeShifterContentComponent(contentName),
-	enabled(true)
+	enabled(true),
+	hideShowState(false)
 {
+	if (Engine::mainEngine != nullptr)
+	{
+		Engine::mainEngine->addControllableContainerListener(this);
+		Engine::mainEngine->addEngineListener(this);
+	}
 
-	if (Engine::mainEngine != nullptr) Engine::mainEngine->addControllableContainerListener(this);
-
-	showHiddenContainers = false;
-
-	rootItem.reset(new OutlinerItem(Engine::mainEngine, false));
+	rootItem.reset(new OutlinerItem(Engine::mainEngine, false, false));
 	treeView.setRootItem(rootItem.get());
 	treeView.setRootItemVisible(false);
 	addAndMakeVisible(treeView);
 	treeView.getViewport()->setScrollBarThickness(10);
 
+	remoteHideShowAllBT.reset(AssetManager::getInstance()->getToggleBTImage(AssetManager::getInstance()->eyeImage));
+	remoteHideShowAllBT->addListener(this);
+	addAndMakeVisible(remoteHideShowAllBT.get());
+
+	searchBar.setJustificationType(Justification::topLeft);
+	searchBar.setColour(searchBar.backgroundColourId, BG_COLOR.darker(.1f).withAlpha(.7f));
+	searchBar.setColour(searchBar.outlineColourId, BG_COLOR.brighter(.1f));
+	searchBar.setColour(searchBar.textColourId, TEXT_COLOR.darker(.3f));
+	searchBar.setFont(10);
+	searchBar.setColour(CaretComponent::caretColourId, Colours::orange);
+	searchBar.setEditable(true);
+	searchBar.addListener(this);
+	addAndMakeVisible(searchBar);
+
 	rebuildTree();
+
 
 	helpID = "Outliner";
 
@@ -36,7 +53,11 @@ Outliner::~Outliner()
 {
 	//DBG("Outliner destroy, engine ?" << (int)Engine::mainEngine);
 	treeView.setRootItem(nullptr);
-	if (Engine::mainEngine != nullptr) Engine::mainEngine->removeControllableContainerListener(this);
+	if (Engine::mainEngine != nullptr)
+	{
+		Engine::mainEngine->removeControllableContainerListener(this);
+		Engine::mainEngine->removeEngineListener(this);
+	}
 
 }
 
@@ -63,14 +84,19 @@ void Outliner::setEnabled(bool value)
 void Outliner::resized()
 {
 	juce::Rectangle<int> r = getLocalBounds();
-	r.removeFromTop(20);
+	juce::Rectangle<int> hr = r.removeFromTop(20);
+	searchBar.setBounds(hr.removeFromLeft(120).reduced(1));
+	remoteHideShowAllBT->setBounds(hr.removeFromRight(hr.getHeight()).reduced(2));
+
 	treeView.setBounds(r);
 }
 
-void Outliner::paint(Graphics & g)
+void Outliner::paint(Graphics& g)
 {
 	//g.fillAll(Colours::green.withAlpha(.2f));
 }
+
+
 
 
 void Outliner::rebuildTree(ControllableContainer* fromContainer)
@@ -78,49 +104,153 @@ void Outliner::rebuildTree(ControllableContainer* fromContainer)
 	if (Engine::mainEngine == nullptr) return;
 
 	if (fromContainer == nullptr) fromContainer = Engine::mainEngine;
+
+	updateFilteredList();
+
 	OutlinerItem* fromItem = getItemForContainer(fromContainer);
 	fromItem->clearSubItems();
 
 	std::unique_ptr<XmlElement> os = treeView.getOpennessState(true);
+
 	buildTree(fromItem, fromContainer, false);
 	rootItem->setOpen(true);
 
-	treeView.restoreOpennessState(*os, true);
+	if (!listIsFiltered) treeView.restoreOpennessState(*os, true);
 }
 
-void Outliner::buildTree(OutlinerItem * parentItem, ControllableContainer * parentContainer, bool parentsHaveHideInRemote)
+void Outliner::buildTree(OutlinerItem* parentItem, ControllableContainer* parentContainer, bool parentsHaveHideInRemote)
 {
 	if (parentContainer == nullptr) return;
 	Array<WeakReference<ControllableContainer>> childContainers = parentContainer->getAllContainers(false);
-	
+
 	parentsHaveHideInRemote |= parentContainer->hideInRemoteControl;
 
 	parentContainer->controllableContainers.getLock().enter();
-	for (auto &cc : parentContainer->controllableContainers)
+	for (auto& cc : parentContainer->controllableContainers)
 	{
-		/*if (cc->skipControllableNameInAddress && !showHiddenContainers)
+		bool forceOpen = false;
+		bool isFiltered = false;
+		bool passed = false;
+		if (listIsFiltered)
 		{
-			buildTree(parentItem, cc);
+			if (filteredContainers.contains(cc))
+			{
+				isFiltered = true;
+				passed = true;
+				filteredContainers.removeAllInstancesOf(cc);
+			}
+			
+			if (parentsOfFiltered.contains(cc))
+			{
+				forceOpen = true;
+				passed = true;
+				parentsOfFiltered.removeAllInstancesOf(cc);
+			}
+
+			if (childOfFiltered.contains(cc))
+			{
+				passed = true;
+				childOfFiltered.removeAllInstancesOf(cc);
+			}
+			
+			if(!passed) continue; //not found
 		}
-		else
-		{*/
 
-			OutlinerItem * ccItem = new OutlinerItem(cc, parentsHaveHideInRemote);
-			parentItem->addSubItem(ccItem);
-
-			buildTree(ccItem, cc, parentsHaveHideInRemote);
-		//}
+		OutlinerItem* ccItem = new OutlinerItem(cc, parentsHaveHideInRemote, isFiltered);
+		if (forceOpen) ccItem->setOpen(true);
+		parentItem->addSubItem(ccItem);
+		buildTree(ccItem, cc, parentsHaveHideInRemote);
 	}
 	parentContainer->controllableContainers.getLock().exit();
 
 	parentContainer->controllables.getLock().enter();
-	for (auto &c : parentContainer->controllables)
+	for (auto& c : parentContainer->controllables)
 	{
-		OutlinerItem * cItem = new OutlinerItem(c, parentsHaveHideInRemote);
+		bool isFiltered = false;
+
+		if (listIsFiltered)
+		{
+			if (filteredControllables.contains(c))
+			{
+				isFiltered = true;
+				filteredControllables.removeAllInstancesOf(c);
+			}
+			else if (childOfFiltered.contains(c))
+			{
+				childOfFiltered.removeAllInstancesOf(c);
+			}
+			else continue;
+		}
+		
+		OutlinerItem* cItem = new OutlinerItem(c, parentsHaveHideInRemote, isFiltered);
 		parentItem->addSubItem(cItem);
 	}
 	parentContainer->controllables.getLock().exit();
+}
 
+void Outliner::updateFilteredList()
+{
+	String searchFilter = searchBar.getText().toLowerCase();
+
+	filteredContainers.clear();
+	filteredControllables.clear();
+	parentsOfFiltered.clear();
+	childOfFiltered.clear();
+
+	listIsFiltered = searchFilter.isNotEmpty();
+	if (listIsFiltered)
+	{
+		Array<WeakReference<Controllable>> cont = Engine::mainEngine->getAllControllables(true);
+		Array<WeakReference<ControllableContainer>> containers = Engine::mainEngine->getAllContainers(true);
+		
+		for (auto& c : cont)
+		{
+			if (c->niceName.toLowerCase().contains(searchFilter))
+			{
+				filteredControllables.add(c);
+				WeakReference<ControllableContainer> pc = c->parentContainer;
+				while (pc != Engine::mainEngine && pc != nullptr)
+				{
+					parentsOfFiltered.addIfNotAlreadyThere(pc);
+					//containers.removeAllInstancesOf(pc);
+					pc = pc->parentContainer;
+				}
+			}
+		}
+
+		for (auto& cc : containers)
+		{
+			if (cc->niceName.toLowerCase().contains(searchFilter))
+			{
+				filteredContainers.addIfNotAlreadyThere(cc);
+
+				Array<WeakReference<Controllable>> childControllables = cc->getAllControllables(true);
+				for (auto& ccc : childControllables) childOfFiltered.addIfNotAlreadyThere(ccc);
+				
+				Array<WeakReference<ControllableContainer>> childContainers = cc->getAllContainers(true);
+				for (auto& ccont : childContainers) childOfFiltered.addIfNotAlreadyThere(ccont);
+
+				WeakReference<ControllableContainer> pc = cc->parentContainer;
+				while (pc != Engine::mainEngine && pc != nullptr)
+				{
+					parentsOfFiltered.addIfNotAlreadyThere(pc);
+					pc = pc->parentContainer;
+				}
+			}
+		}
+	}
+}
+
+void Outliner::endLoadFile()
+{
+	MessageManagerLock mmLock;
+	rebuildTree();
+}
+
+void Outliner::engineCleared()
+{
+	MessageManagerLock mmLock;
+	rebuildTree();
 }
 
 OutlinerItem* Outliner::getItemForContainer(ControllableContainer* cc)
@@ -140,15 +270,15 @@ OutlinerItem* Outliner::getItemForContainer(ControllableContainer* cc)
 	for (auto& index : containerIndices)
 	{
 		jassert(result != nullptr);
-		result = (OutlinerItem *)result->getSubItem(index);
+		result = (OutlinerItem*)result->getSubItem(index);
 	}
 
 	return result;
 }
 
-void Outliner::childStructureChanged(ControllableContainer *)
+void Outliner::childStructureChanged(ControllableContainer*)
 {
-	if (enabled)
+	if (enabled && !Engine::mainEngine->isClearing && !Engine::mainEngine->isLoadingFile)
 	{
 		MessageManagerLock mmLock;
 		rebuildTree();
@@ -156,36 +286,59 @@ void Outliner::childStructureChanged(ControllableContainer *)
 
 }
 
+void Outliner::labelTextChanged(Label* label)
+{
+	if (label == &searchBar)
+	{
+		rebuildTree();
+	}
+}
+
+void Outliner::buttonClicked(Button* b)
+{
+	if (b == remoteHideShowAllBT.get())
+	{
+		Array<WeakReference<Controllable>> cont = Engine::mainEngine->getAllControllables(true);
+		Array<WeakReference<ControllableContainer>> containers = Engine::mainEngine->getAllContainers(true);
+
+		for (auto& c : cont) c->hideInRemoteControl = hideShowState ? true : c->defaultHideInRemoteControl;
+		for (auto& cc : containers) cc->hideInRemoteControl = hideShowState ? true : cc->defaultHideInRemoteControl;
+
+		hideShowState = !hideShowState;
+		rebuildTree();
+	}
+}
+
 
 // OUTLINER ITEM
 
-OutlinerItem::OutlinerItem(WeakReference<ControllableContainer> _container, bool parentsHaveHideInRemote) :
+OutlinerItem::OutlinerItem(WeakReference<ControllableContainer> _container, bool parentsHaveHideInRemote, bool isFiltered) :
 	InspectableContent(_container),
 	isContainer(true),
 	itemName(_container->niceName),
-	
 	parentsHaveHideInRemote(parentsHaveHideInRemote),
-    container(_container),
-	controllable(nullptr)
+	container(_container),
+	controllable(nullptr),
+	isFiltered(isFiltered)
 {
 	container->addControllableContainerListener(this);
 }
 
-OutlinerItem::OutlinerItem(WeakReference<Controllable> _controllable, bool parentsHaveHideInRemote) :
+OutlinerItem::OutlinerItem(WeakReference<Controllable> _controllable, bool parentsHaveHideInRemote, bool isFiltered) :
 	InspectableContent(_controllable),
 	isContainer(false),
 	itemName(_controllable->niceName),
-	
 	parentsHaveHideInRemote(parentsHaveHideInRemote),
-    container(nullptr),
-    controllable(_controllable)
-    
+	container(nullptr),
+	controllable(_controllable),
+	isFiltered(isFiltered)
+
 {
 }
 
 OutlinerItem::~OutlinerItem()
 {
-	if (isContainer) container->removeControllableContainerListener(this);
+	if (isContainer && !container.wasObjectDeleted()) container->removeControllableContainerListener(this);
 	masterReference.clear();
 }
 
@@ -195,7 +348,7 @@ bool OutlinerItem::mightContainSubItems()
 	return isContainer;
 }
 
-Component * OutlinerItem::createItemComponent()
+Component* OutlinerItem::createItemComponent()
 {
 	return new OutlinerItemComponent(this);
 }
@@ -220,7 +373,7 @@ void OutlinerItem::childAddressChanged(ControllableContainer*)
 }
 
 
-void OutlinerItem::inspectableSelectionChanged(Inspectable * i)
+void OutlinerItem::inspectableSelectionChanged(Inspectable* i)
 {
 	InspectableContent::inspectableSelectionChanged(i);
 
@@ -236,7 +389,7 @@ void OutlinerItem::inspectableSelectionChanged(Inspectable * i)
 		//open all parents to view the item
 		if (!areAllParentsOpen())
 		{
-			TreeViewItem * ti = getParentItem();
+			TreeViewItem* ti = getParentItem();
 			while (ti != nullptr)
 			{
 				if (!ti->isOpen()) ti->setOpen(true);
@@ -271,7 +424,7 @@ void OutlinerItem::setParentsHaveHideInRemote(bool value)
 
 // OutlinerItemComponent
 
-OutlinerItemComponent::OutlinerItemComponent(OutlinerItem * _item) :
+OutlinerItemComponent::OutlinerItemComponent(OutlinerItem* _item) :
 	InspectableContentComponent(_item->inspectable),
 	item(_item),
 	label("label", _item->itemName)
@@ -304,7 +457,7 @@ OutlinerItemComponent::OutlinerItemComponent(OutlinerItem * _item) :
 	hideInRemoteBT.reset(AssetManager::getInstance()->getToggleBTImage(AssetManager::getInstance()->eyeImage));
 	hideInRemoteBT->setToggleState(!item->inspectable->hideInRemoteControl, dontSendNotification);
 	hideInRemoteBT->setAlpha(item->parentsHaveHideInRemote ? .5f : 1);
-	
+
 	hideInRemoteBT->setTooltip("Hide in Remote Control. If remote control is enabled in Preferences, this decides whether to expose or not this (and all its children) to the OSCQuery structure");
 
 	hideInRemoteBT->addListener(this);
@@ -319,20 +472,29 @@ OutlinerItemComponent::~OutlinerItemComponent()
 	if (!item.wasObjectDeleted()) item->removeItemListener(this);
 }
 
-void OutlinerItemComponent::paint(Graphics & g)
+void OutlinerItemComponent::paint(Graphics& g)
 {
 	if (inspectable.wasObjectDeleted()) return;
 
 	juce::Rectangle<int> r = getLocalBounds();
-	
+
 	int labelWidth = label.getFont().getStringWidth(label.getText());
 
+	Rectangle<float> lr = r.withSize(labelWidth + 20, r.getHeight()).toFloat();
 	if (inspectable->isSelected)
 	{
 		g.setColour(color);
-		g.fillRoundedRectangle(r.withSize(labelWidth + 20, r.getHeight()).toFloat(), 2);
+		g.fillRoundedRectangle(lr, 2);
 	}
 
+	if (item->isFiltered)
+	{
+		g.setColour(YELLOW_COLOR.withAlpha(.3f));
+		g.fillRoundedRectangle(lr.reduced(1), 2);
+
+		g.setColour(YELLOW_COLOR.withAlpha(.6f));
+		g.drawRoundedRectangle(lr.reduced(1), 2, 1);
+	}
 }
 
 void OutlinerItemComponent::resized()
@@ -354,13 +516,13 @@ void OutlinerItemComponent::buttonClicked(Button* b)
 	}
 }
 
-void OutlinerItemComponent::labelTextChanged(Label *)
+void OutlinerItemComponent::labelTextChanged(Label*)
 {
 	if (item.wasObjectDeleted()) return;
 	item->container->setUndoableNiceName(label.getText());
 }
 
-void OutlinerItemComponent::mouseDown(const MouseEvent &e)
+void OutlinerItemComponent::mouseDown(const MouseEvent& e)
 {
 	InspectableContentComponent::mouseDown(e);
 
@@ -369,7 +531,7 @@ void OutlinerItemComponent::mouseDown(const MouseEvent &e)
 		PopupMenu p;
 		p.addItem(-1, "Copy OSC Control Address");
 		p.addItem(-2, "Copy Script Control Address");
-		
+
 		p.addSeparator();
 
 		if (item->controllable != nullptr)
@@ -380,7 +542,7 @@ void OutlinerItemComponent::mouseDown(const MouseEvent &e)
 				cType == Controllable::POINT2D ||
 				cType == Controllable::POINT3D ||
 				cType == Controllable::COLOR ||
-				cType == Controllable::BOOL )
+				cType == Controllable::BOOL)
 			{
 				p.addItem(-10, "Watch this with The Detective");
 			}
@@ -394,7 +556,7 @@ void OutlinerItemComponent::mouseDown(const MouseEvent &e)
 			index++;
 		}
 		p.addSubMenu("Send to Dashboard", dashboardMenu);
-		
+
 		int result = p.show();
 		switch (result)
 		{
@@ -414,7 +576,7 @@ void OutlinerItemComponent::mouseDown(const MouseEvent &e)
 		default:
 			if (result >= 10000)
 			{
-				DashboardManager::getInstance()->items[result - 10000]->itemManager.addItem((item->isContainer?item->container->createDashboardItem():item->controllable->createDashboardItem()));
+				DashboardManager::getInstance()->items[result - 10000]->itemManager.addItem((item->isContainer ? item->container->createDashboardItem() : item->controllable->createDashboardItem()));
 			}
 			break;
 
