@@ -65,7 +65,7 @@ void handleCrashStatic(int e)
 #if JUCE_WINDOWS
 void CrashDumpUploader::handleCrash(void * e)
 #else
-void CrashDumpUploader::handleCrash(int signum)
+void CrashDumpUploader::handleCrash(int e)
 #endif
 {
 	//create recovered file 
