@@ -22,7 +22,11 @@ public:
 
 	void init(const String& url, Image image);
 
+#if JUCE_WINDOWS
 	void handleCrash(void * e);
+#else
+	void handleCrash(int signum);
+#endif
 
 	void run();
 	void uploadCrash();

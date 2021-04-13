@@ -53,14 +53,20 @@ LONG WINAPI handleCrashStatic(LPEXCEPTION_POINTERS e)
 void handleCrashStatic(int e)
 #endif
 {
-	CrashDumpUploader::getInstance()->handleCrash(e);
 
 #if JUCE_WINDOWS
+	CrashDumpUploader::getInstance()->handleCrash(e);
 	return EXCEPTION_EXECUTE_HANDLER;
+#else
+	CrashDumpUploader::getInstance()->handleCrash(e);
 #endif
 }
 
+#if JUCE_WINDOWS
 void CrashDumpUploader::handleCrash(void * e)
+#else
+void CrashDumpUploader::handleCrash(int signum)
+#endif
 {
 	//create recovered file 
 	File f = Engine::mainEngine->getFile();
