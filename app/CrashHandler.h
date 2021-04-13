@@ -9,21 +9,23 @@ public:
 	CrashDumpUploader();
 	~CrashDumpUploader();
 
-	File crashFile;
-	File sessionFile;
 	URL remoteURL;
 	Image crashImage;
 
-	bool uploadEnabled;
-	bool crashFound;
+	bool doUpload;
+	bool autoReopen;
 
+	File traceFile;
+	File dumpFile;
+	File recoveredFile;
 	String crashMessage;
 
+	void init(const String& url, Image image);
 
-	bool init(bool autoUpload = true, bool showWindow = true); //returns true if a crashlog is found
+	void handleCrash(void * e);
 
-	void uploadDump();
 	void run();
+	void uploadCrash();
 
 
 	class UploadWindow :
@@ -37,7 +39,8 @@ public:
 		TextEditor editor;
 		Image* image;
 		TextButton okBT;
-		ToggleButton attachSession;
+		TextButton cancelBT;
+		TextButton autoReopenBT;
 
 		juce::Rectangle<int> imageRect;
 

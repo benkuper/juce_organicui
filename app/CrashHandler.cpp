@@ -14,25 +14,23 @@
 #include <windows.h> 
 #include <DbgHelp.h>
 #include <tchar.h>
-LONG WINAPI createMiniDump(LPEXCEPTION_POINTERS exceptionPointers);
 #endif
 
-void createStackTrace(int signum);
+#if JUCE_WINDOWS
+LONG WINAPI handleCrashStatic(LPEXCEPTION_POINTERS e);
+#else
+void handleCrashStatic(int signum);
+#endif
 
-String dumpFileString;
-char * dumpFileName = (char *)"notset.dmp";
+void createDumpAndStrackTrace(void* e, File dumpFile, File traceFile);
 
-bool shoudShowWindowOnCrash = false;
 
 juce_ImplementSingleton(CrashDumpUploader)
-
 OrganicApplication::MainWindow* getMainWindow();
-
 
 CrashDumpUploader::CrashDumpUploader() :
 	Thread("Crashdump"),
-	uploadEnabled(true),
-    crashFound(false)
+	doUpload(true)
 {
 
 }
@@ -41,58 +39,100 @@ CrashDumpUploader::~CrashDumpUploader()
 {
 }
 
-bool CrashDumpUploader::init(bool autoUpload, bool showWindow)
+void CrashDumpUploader::init(const String& url, Image image)
 {
-#if JUCE_WINDOWS
-	crashFile = File::getSpecialLocation(File::tempDirectory).getParentDirectory().getChildFile(getApp().getApplicationName()+"_crash.dmp");
-    SystemStats::setApplicationCrashHandler((SystemStats::CrashHandlerFunction)createMiniDump);
-#elif JUCE_MAC
-    crashFile = File::getSpecialLocation(File::tempDirectory).getParentDirectory().getChildFile(getApp().getApplicationName()+"_crash.txt");
-    SystemStats::setApplicationCrashHandler((SystemStats::CrashHandlerFunction)createStackTrace);
-#else //LINUX
-    crashFile = File::getSpecialLocation(File::tempDirectory).getChildFile(getApp().getApplicationName()+"_crash.txt");
-    SystemStats::setApplicationCrashHandler((SystemStats::CrashHandlerFunction)createStackTrace);
-#endif
+	remoteURL = URL(url);
+	crashImage = image;
 
-    dumpFileString = crashFile.getFullPathName();
-    dumpFileName = dumpFileString.getCharPointer().getAddress();
-   
-	shoudShowWindowOnCrash = showWindow;
-
-    if (crashFile.existsAsFile())
-    {
-        LOGWARNING("Crash log found : " << crashFile.getFullPathName() << ", sending to Houston...");
-		if (autoUpload)
-		{
-			if (showWindow && uploadEnabled)
-			{
-				UploadWindow w;
-				DialogWindow::showModalDialog("Crash found !", &w, getMainWindow(), Colours::black, true);
-			}
-			startThread();
-		}
-		crashFound = true;
-		return true;
-    }
-
-	crashFound = false;
-	return false;
-	
+	SystemStats::setApplicationCrashHandler((SystemStats::CrashHandlerFunction)handleCrashStatic);
 }
 
-void CrashDumpUploader::uploadDump()
+#if JUCE_WINDOWS
+LONG WINAPI handleCrashStatic(LPEXCEPTION_POINTERS e)
+#else
+void handleCrashStatic(int signum)
+#endif
 {
-	if (!uploadEnabled)
+	CrashDumpUploader::getInstance()->handleCrash(e);
+
+#if JUCE_WINDOWS
+	return EXCEPTION_EXECUTE_HANDLER;
+#endif
+}
+
+void CrashDumpUploader::handleCrash(void * e)
+{
+	//create recovered file 
+	File f = Engine::mainEngine->getFile();
+
+	recoveredFile = f.existsAsFile() ? f.getParentDirectory().getChildFile(f.getFileNameWithoutExtension() + "_recovered" + f.getFileExtension()) : File::getSpecialLocation(File::userDocumentsDirectory).getChildFile(getApp().appProperties->getStorageParameters().applicationName + "/recovered_session" + Engine::mainEngine->fileExtension);
+
+	if (recoveredFile.existsAsFile()) recoveredFile.deleteFile();
+
+	var data = Engine::mainEngine->getJSONData();
+	std::unique_ptr<OutputStream> os(recoveredFile.createOutputStream());
+	if (os != nullptr)
 	{
-		LOGWARNING("Crash dump upload has been disabled");
-		crashFile.deleteFile();
-		return;
+		JSON::writeToStream(*os, data, GlobalSettings::getInstance()->compressOnSave->boolValue());
+		os->flush();
 	}
 
+
+	//Let the app handle app-specific actions for crash
+	getApp().handleCrashed();
+
+
+	autoReopen = GlobalSettings::getInstance()->autoReopenFileOnCrash->boolValue();
+
+
+	if (GlobalSettings::getInstance()->enableCrashUpload->boolValue())
+	{
+		traceFile = File::getSpecialLocation(File::currentApplicationFile).getParentDirectory().getChildFile("crashlog.txt");
+
+#if JUCE_WINDOWS
+		dumpFile = File::getSpecialLocation(File::currentApplicationFile).getParentDirectory().getChildFile("crashlog.dmp");
+#else
+		dumpFile = File();
+#endif
+
+		if (traceFile.existsAsFile()) traceFile.deleteFile();
+		if (dumpFile.existsAsFile()) dumpFile.deleteFile();
+
+		createDumpAndStrackTrace(e, dumpFile, traceFile);
+
+		/*
+		if (shoudShowWindowOnCrash)
+		{
+			autoReopen = AlertWindow::showOkCancelBox(AlertWindow::WarningIcon, "Oops, I did it again...", "Well, I crashed.\nIt was bound to happen at some point, right ?\nMaybe time to think about the meaning of all this, the meaning of life, make yourself a smoothie...\nYou can even start exactly where you left if you click the \"Yes\" button.\nDon't worry, in any case I will keep your baby safe and create a crash backup file.", "Yes", "No");
+		}
+		*/
+
+		doUpload = true; //by default, unless hit cancel
+
+		UploadWindow w;
+		DialogWindow::showModalDialog("Crash found !", &w, getMainWindow(), Colours::black, true);
+
+		if (doUpload)
+		{
+			uploadCrash();
+		}
+	}
+
+	if (autoReopen && recoveredFile.exists())
+	{
+		File::getSpecialLocation(File::currentApplicationFile).startAsProcess("-c " + recoveredFile.getFullPathName());
+	}
+
+	getApp().quit();
+}
+
+void CrashDumpUploader::uploadCrash()
+{
 	if (remoteURL.isEmpty())
 	{
 		LOGWARNING("Crash dump upload url has not been assigned");
-		crashFile.deleteFile();
+		dumpFile.deleteFile();
+		traceFile.deleteFile();
 		return;
 	}
 
@@ -105,11 +145,21 @@ void CrashDumpUploader::uploadDump()
 #else
 		.withParameter("branch", getAppVersion().containsChar('b') ? "beta" : "stable")
 #endif
-		.withFileToUpload("dumpfile", crashFile, "application/octet-stream");
+		;
 
-	if (sessionFile.existsAsFile())
+	if (dumpFile.existsAsFile())
 	{
-		url = url.withFileToUpload("sessionFile", sessionFile, "application/octet-stream");
+		url = url.withFileToUpload("dumpFile", dumpFile, "application/octet-stream");
+	}
+
+	if (traceFile.existsAsFile())
+	{
+		url = url.withFileToUpload("traceFile", traceFile, "application/octet-stream");
+	}
+
+	if (recoveredFile.existsAsFile())
+	{
+		url = url.withFileToUpload("sessionFile", recoveredFile, "application/octet-stream");
 	}
 
 	WebInputStream stream(url, true);
@@ -117,17 +167,19 @@ void CrashDumpUploader::uploadDump()
 	String convertedData = stream.readEntireStreamAsString();
 
 #if JUCE_DEBUG
-	LOG("Received : " << convertedData );
+	LOG("Received : " << convertedData);
 #endif
 
 	if (convertedData.contains("error"))
 	{
 		LOGWARNING("Error during upload");
-	} else if(convertedData.contains("ok"))
+	}
+	else if (convertedData.contains("ok"))
 	{
 		LOG("Crash log uploaded succesfully");
-		crashFile.deleteFile();
-	} else
+		//crashFile.deleteFile();
+	}
+	else
 	{
 		LOGWARNING("Unknown message from crash log server " << convertedData << " (code " << String(stream.getStatusCode()) << ")");
 	}
@@ -135,15 +187,17 @@ void CrashDumpUploader::uploadDump()
 
 void CrashDumpUploader::run()
 {
-	uploadDump();
+	uploadCrash();
 }
 
-
-#if JUCE_WINDOWS 
-
-LONG WINAPI createMiniDump(LPEXCEPTION_POINTERS exceptionPointers)
+void createDumpAndStrackTrace(void * ev, File dumpFile, File traceFile)
 {
-	HANDLE hFile = CreateFile(dumpFileName, GENERIC_READ | GENERIC_WRITE,
+
+#if JUCE_WINDOWS
+
+	LPEXCEPTION_POINTERS exceptionPointers = (LPEXCEPTION_POINTERS)ev;
+
+	HANDLE hFile = CreateFile(dumpFile.getFullPathName().getCharPointer(), GENERIC_READ | GENERIC_WRITE,
 		0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 
 	if (hFile != nullptr && hFile != INVALID_HANDLE_VALUE)
@@ -170,67 +224,41 @@ LONG WINAPI createMiniDump(LPEXCEPTION_POINTERS exceptionPointers)
 			_tprintf(_T("Minidump created.\n"));
 
 		CloseHandle(hFile);
-	} else
+	}
+	else
 	{
 		_tprintf(_T("CreateFile failed. Error: %u \n"), GetLastError());
 	}
-	 
-	
-	/*
-	MessageBox(nullptr,
-		_T("Oh, no ! I got very sad and died alone. The autospy report will be send to the headquarters for further investigation. You can disable this procedure in your preferences, but please remember that the forensics team needs sample to keep healing this little baby ! Otherwise nothing will be done and this sad event will be forever forgotten."),
-		_T("Sacre Hubert, toujours le mot pour rire !"),
-		MB_ICONWARNING | MB_OK
-	);
-	*/
-
-	dumpFileString = String(dumpFileName).replace("dmp", "txt");
-	createStackTrace(exceptionPointers->ExceptionRecord->ExceptionCode);
-
-
-	//_tprintf(_T("User pushed : %d \n"), selectedButtonId);
-
-	//if (selectedButtonId == IDNO)
-	//	DeleteFile(dumpFileName);
-	
-	return EXCEPTION_EXECUTE_HANDLER;
-}
-
 #endif
 
-void createStackTrace(int signum)
-{
+
+	//Stack trace
 
     DBG("Create Stack trace here !");
     String stackTrace = SystemStats::getStackBacktrace();
     
-    DBG("Stack trace :\n" << stackTrace);
-    
-    File f(dumpFileString);
-    FileOutputStream fos(f);
-    if (fos.openedOk())
-    {
-        fos.writeText(stackTrace,false,false,"\n");
-        fos.flush();
-    }
-    
-	bool autoReopen = GlobalSettings::getInstance()->autoReopenFileOnCrash->boolValue();
-
-	if (shoudShowWindowOnCrash)
+    FileOutputStream fos(traceFile);
+	if (fos.openedOk())
 	{
-		autoReopen = AlertWindow::showOkCancelBox(AlertWindow::WarningIcon, "Oops, I did it again...", "Well, I crashed.\nIt was bound to happen at some point, right ?\nMaybe time to think about the meaning of all this, the meaning of life, make yourself a smoothie...\nYou can even start exactly where you left if you click the \"Yes\" button.\nDon't worry, in any case I will keep your baby safe and create a crash backup file.", "Yes", "No");
+		fos.writeText(stackTrace, false, false, "\n");
+		fos.flush();
 	}
-
-	getApp().handleCrashed(autoReopen);
 }
 
 
 CrashDumpUploader::UploadWindow::UploadWindow() :
-	okBT("OK"),
-	attachSession("Send the session file")
+	okBT("Send and close"),
+	cancelBT("Cancel"),
+	autoReopenBT("Send and recover")
 {
 	okBT.addListener(this);
 	addAndMakeVisible(&okBT);
+
+	cancelBT.addListener(this);
+	addAndMakeVisible(&cancelBT);
+
+	autoReopenBT.addListener(this);
+	addAndMakeVisible(&autoReopenBT);
 
 	addAndMakeVisible(&editor);
 	editor.setColour(editor.backgroundColourId, BG_COLOR.brighter(.3f));
@@ -240,9 +268,6 @@ CrashDumpUploader::UploadWindow::UploadWindow() :
 	editor.setMultiLine(true);
 	editor.setReturnKeyStartsNewLine(true);
 
-	attachSession.setToggleState(true, dontSendNotification);
-	addAndMakeVisible(&attachSession);
-	
 	
 	setSize(800, 600);
 
@@ -261,20 +286,27 @@ void CrashDumpUploader::UploadWindow::paint(Graphics& g)
 void CrashDumpUploader::UploadWindow::resized()
 {
 	juce::Rectangle<int> r = getLocalBounds().removeFromBottom(getHeight() / 2);
-	juce::Rectangle<int> br = r.removeFromBottom(30);
-	okBT.setBounds(br.withSizeKeepingCentre(100, 20));
-	attachSession.setBounds(br.withSize(200,30).reduced(3));
+	juce::Rectangle<int> br = r.removeFromBottom(30).reduced(2);
+	autoReopenBT.setBounds(br.removeFromRight(100));
+	br.removeFromRight(8); 
+	okBT.setBounds(br.removeFromRight(100));
+	br.removeFromRight(8);
+	cancelBT.setBounds(br.removeFromRight(100));
 	editor.setBounds(r.reduced(20));
 }
 
 void CrashDumpUploader::UploadWindow::buttonClicked(Button* bt)
 {
-	if (bt == &okBT)
+	if (bt == &okBT || bt == &autoReopenBT)
 	{
 		CrashDumpUploader::getInstance()->crashMessage = editor.getText();
-		CrashDumpUploader::getInstance()->sessionFile = attachSession.getToggleState() ? Engine::mainEngine->getLastDocumentOpened() : File();
-
-		if(DialogWindow * dw = findParentComponentOfClass<DialogWindow>())
-			dw->exitModalState(0);
+		if (bt == &autoReopenBT) CrashDumpUploader::getInstance()->autoReopen = true;
 	}
+	else if (bt == &cancelBT)
+	{
+		CrashDumpUploader::getInstance()->doUpload = false;
+	}
+
+	if (DialogWindow* dw = findParentComponentOfClass<DialogWindow>())
+		dw->exitModalState(0);
 }

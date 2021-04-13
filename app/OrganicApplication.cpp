@@ -42,11 +42,10 @@ void OrganicApplication::initialise(const String & commandLine)
 
 	CommandLineElements commands = StringUtil::parseCommandLine(commandLine);
 
-	bool fromCrashFile = false;
 	for (auto& c : commands)
 	{
 		if (c.command == "r") clearGlobalSettings();
-		else if (c.command == "c") fromCrashFile = true;
+		else if (c.command == "c") launchedFromCrash = true;
 	}
 
 	GlobalSettings::getInstance()->addChildControllableContainer(&appSettings,false, GlobalSettings::getInstance()->controllableContainers.size()-1);
@@ -75,27 +74,11 @@ void OrganicApplication::initialise(const String & commandLine)
 
 	HelpBox::getInstance()->loadHelp();
 
-	
-
-	//Crash handler
-//#if JUCE_WINDOWS
-	CrashDumpUploader::getInstance()->uploadEnabled = GlobalSettings::getInstance()->enableCrashUpload->boolValue();
-
-	bool noCrashWindow = GlobalSettings::getInstance()->openSpecificFileOnStartup->boolValue();
-	noCrashWindow |= GlobalSettings::getInstance()->openLastDocumentOnStartup->boolValue();
-
-#if JUCE_WINDOWS
-	if (GlobalSettings::getInstance()->launchOnStartup->boolValue()) noCrashWindow = true;
-#endif
-
-	CrashDumpUploader::getInstance()->init(true, !noCrashWindow);
-//#endif
-
 	afterInit();
 
 	engine->parseCommandline(commandLine);
 
-	if (fromCrashFile)
+	if (launchedFromCrash)
 	{
 		engine->setChangedFlag(true);
 	}
@@ -159,20 +142,6 @@ inline void OrganicApplication::anotherInstanceStarted(const String& commandLine
 	}
 }
 
-void OrganicApplication::handleCrashed(bool autoReopen)
-{
-	File f = Engine::mainEngine->getFile();
-
-	File crashedFile = f.existsAsFile() ? f.getParentDirectory().getChildFile(f.getFileNameWithoutExtension() + "_recovered" + f.getFileExtension()) : File::getSpecialLocation(File::userDocumentsDirectory).getChildFile(appProperties->getStorageParameters().applicationName + "/recovered_session" + Engine::mainEngine->fileExtension);
-
-	Engine::mainEngine->saveAs(crashedFile, false, false, false, false);
-	Engine::mainEngine->clear(); //make sure modules, dashboard, etc. are removed so reopening the file will allow binding ports, connecting devices, etc.
-
-	if (autoReopen)
-	{
-		File::getSpecialLocation(File::currentApplicationFile).startAsProcess("-c "+crashedFile.getFullPathName());
-	}
-}
 
 void OrganicApplication::newMessage(const Engine::EngineEvent & e)
 {

@@ -36,7 +36,7 @@ class OrganicApplication :
 {
 public:
 	//==============================================================================
-	OrganicApplication(const String & appName, bool useWindow = true, const Image &trayIconImage = Image());
+	OrganicApplication(const String& appName, bool useWindow = true, const Image& trayIconImage = Image());
 
 	ControllableContainer appSettings;
 
@@ -48,20 +48,21 @@ public:
 
 	bool useWindow;
 	Image trayIconImage;
+	bool launchedFromCrash = false;
 
 	const String getApplicationName() override;
 	const String getApplicationVersion() override;
 	virtual bool moreThanOneInstanceAllowed() override { return true; }
 
 	void initialise(const String& /*commandLine*/) override;
-	virtual void initialiseInternal(const String &) = 0;
+	virtual void initialiseInternal(const String&) = 0;
 	virtual void afterInit() {}
 
 	virtual void shutdown() override;
 	virtual void systemRequestedQuit() override;
 	virtual void anotherInstanceStarted(const String& commandLine) override;
 
-	virtual void handleCrashed(bool autoReopen);
+	virtual void handleCrashed() {}
 
 	virtual void newMessage(const Engine::EngineEvent &e) override;
 	virtual void newMessage(const AppUpdateEvent &e) override;
