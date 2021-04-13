@@ -59,13 +59,14 @@ class OutlinerItem :
 	public ControllableContainerListener
 {
 public:
-	OutlinerItem(WeakReference<ControllableContainer> container, bool parentsHaveHideInRemote);
-	OutlinerItem(WeakReference<Controllable> controllable, bool parentsHaveHideInRemote);
+	OutlinerItem(WeakReference<ControllableContainer> container, bool parentsHaveHideInRemote, bool isFiltered);
+	OutlinerItem(WeakReference<Controllable> controllable, bool parentsHaveHideInRemote, bool isFiltered);
 	~OutlinerItem();
 
 	bool isContainer;
 	String itemName;
 	bool parentsHaveHideInRemote;
+	bool isFiltered;
 
 	WeakReference<ControllableContainer> container;
 	WeakReference<Controllable> controllable;
@@ -90,7 +91,10 @@ public:
 };
 
 class Outliner : public ShapeShifterContentComponent,
-				 public ControllableContainerListener
+	public ControllableContainerListener,
+	public Label::Listener,
+	public Button::Listener,
+	public EngineListener
 {
 public:
 	juce_DeclareSingleton(Outliner, true)
@@ -98,10 +102,20 @@ public:
 	Outliner(const String &contentName = "");
 	~Outliner();
 
+	Label searchBar;
+	bool listIsFiltered;
+	
+	std::unique_ptr<ImageButton> remoteHideShowAllBT;
+	bool hideShowState;
+
 	TreeView treeView;
 	std::unique_ptr<OutlinerItem> rootItem;
-	bool showHiddenContainers; //include or exclude in treeview the "skipInAddress" containers (may be later exposed to user as an option)
 	bool enabled; //update or not
+
+	Array<ControllableContainer*> parentsOfFiltered;
+	Array<ControllableContainer*> filteredContainers;
+	Array<Inspectable *> childOfFiltered;
+	Array<Controllable*> filteredControllables;
 
 	void clear();
 	
@@ -110,17 +124,23 @@ public:
 	void resized() override;
 	void paint(Graphics &g) override;
 
+
 	void rebuildTree(ControllableContainer * fromContainer = nullptr);
 	void buildTree(OutlinerItem * parentItem, ControllableContainer * parentContainer, bool parentsHaveHideInRemote);
+	void updateFilteredList();
+
+	void endLoadFile() override;
+	void engineCleared() override;
 
 	OutlinerItem* getItemForContainer(ControllableContainer* cc);
 
 	void childStructureChanged(ControllableContainer *) override;
 
-
-
 	static Outliner * create(const String &contentName) { return new Outliner(contentName); }
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Outliner)
+
+	virtual void labelTextChanged(Label* labelThatHasChanged) override;
+	virtual void buttonClicked(Button* b) override;
 };
