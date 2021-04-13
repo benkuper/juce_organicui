@@ -196,7 +196,11 @@ void CrashDumpUploader::run()
 	uploadCrash();
 }
 
-void createDumpAndStrackTrace(void * ev, File dumpFile, File traceFile)
+#if JUCE_WINDOWS
+void createDumpAndStrackTrace(void* ev, File dumpFile, File traceFile)
+#else
+void createDumpAndStrackTrace(int signum, File dumpFile, File traceFile)
+#endif
 {
 
 #if JUCE_WINDOWS
