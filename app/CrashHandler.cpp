@@ -18,11 +18,12 @@
 
 #if JUCE_WINDOWS
 LONG WINAPI handleCrashStatic(LPEXCEPTION_POINTERS e);
+void createDumpAndStrackTrace(void* e, File dumpFile, File traceFile);
 #else
 void handleCrashStatic(int signum);
+void createDumpAndStrackTrace(int signum, File dumpFile, File traceFile);
 #endif
 
-void createDumpAndStrackTrace(void* e, File dumpFile, File traceFile);
 
 
 juce_ImplementSingleton(CrashDumpUploader)
