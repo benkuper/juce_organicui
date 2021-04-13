@@ -50,7 +50,7 @@ void CrashDumpUploader::init(const String& url, Image image)
 #if JUCE_WINDOWS
 LONG WINAPI handleCrashStatic(LPEXCEPTION_POINTERS e)
 #else
-void handleCrashStatic(int signum)
+void handleCrashStatic(int e)
 #endif
 {
 	CrashDumpUploader::getInstance()->handleCrash(e);
