@@ -196,9 +196,16 @@ void OrganicApplication::newMessage(const AppUpdateEvent & e)
 
 void OrganicApplication::clearGlobalSettings()
 {
-	getAppProperties().getUserSettings()->getFile().deleteFile();
-	getAppProperties().getUserSettings()->clear();
-	AlertWindow::showMessageBox(AlertWindow::InfoIcon, "So you want a fresh start","All settings are cleared ! You should definitely restart " + getApplicationName() + " in order to see changes.");
+	
+	bool result = AlertWindow::showOkCancelBox(AlertWindow::QuestionIcon, "So you want a fresh start", "Are you sure you want to delete the Preferences ? If so, you should definitely restart " + getApplicationName() + " after clearing in order to see changes.", "Yes", "No");
+
+	if (result)
+	{
+		getAppProperties().getUserSettings()->getFile().deleteFile();
+		getAppProperties().getUserSettings()->clear();
+		LOG("Preferences have been cleared.");
+	}
+	
 }
 
 void OrganicApplication::saveGlobalSettings()
