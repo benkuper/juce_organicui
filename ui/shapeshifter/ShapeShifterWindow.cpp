@@ -8,8 +8,8 @@
   ==============================================================================
 */
 
-ShapeShifterWindow::ShapeShifterWindow(ShapeShifterPanel * _panel, juce::Rectangle<int> bounds) :
-	ResizableWindow(_panel->currentContent->contentName, true),
+ShapeShifterWindow::ShapeShifterWindow(ShapeShifterPanel* _panel, juce::Rectangle<int> bounds) :
+	ResizableWindow(_panel->currentContent != nullptr ? _panel->currentContent->contentName : "", true),
 	panel(_panel),
 	dragMode(PANEL)
 {
@@ -31,7 +31,6 @@ ShapeShifterWindow::ShapeShifterWindow(ShapeShifterPanel * _panel, juce::Rectang
 
 	setContentNonOwned(_panel,true);
 
-	
 
 	setBackgroundColour(BG_COLOR.darker(.1f).withAlpha(.3f));
 
