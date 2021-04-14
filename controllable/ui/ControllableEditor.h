@@ -39,6 +39,7 @@ public:
 	virtual void buildControllableUI(bool resizeAfter = false);
 
 	virtual void resized() override;
+	virtual void resizedInternal(Rectangle<int>&) {}
 
 	void mouseDown(const MouseEvent &e) override;
 	void mouseDrag(const MouseEvent& e) override;

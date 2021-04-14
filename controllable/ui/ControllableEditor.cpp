@@ -113,6 +113,8 @@ void ControllableEditor::resized()
 		}
 	}
 
+	resizedInternal(r);
+
 	int controlSpace = jmax<int>(showLabel? jmin<int>(getWidth() - 160, getWidth()*.75f) : getWidth(), 100);
 	
 	ui->setBounds(r.removeFromRight(controlSpace));
@@ -124,6 +126,7 @@ void ControllableEditor::resized()
 	}
 
 }
+
 void ControllableEditor::mouseDown(const MouseEvent & e)
 {
 	InspectableEditor::mouseDown(e);
