@@ -194,7 +194,7 @@ void OrganicApplication::newMessage(const AppUpdateEvent & e)
 	}
 }
 
-void OrganicApplication::clearGlobalSettings()
+bool OrganicApplication::clearGlobalSettings()
 {
 	
 	bool result = AlertWindow::showOkCancelBox(AlertWindow::QuestionIcon, "So you want a fresh start", "Are you sure you want to delete the Preferences ? If so, you should definitely restart " + getApplicationName() + " after clearing in order to see changes.", "Yes", "No");
@@ -206,6 +206,7 @@ void OrganicApplication::clearGlobalSettings()
 		LOG("Preferences have been cleared.");
 	}
 	
+	return result;
 }
 
 void OrganicApplication::saveGlobalSettings()
