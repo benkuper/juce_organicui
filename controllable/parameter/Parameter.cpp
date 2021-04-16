@@ -460,7 +460,7 @@ var Parameter::getJSONDataInternal()
 	if (alwaysNotify) data.getDynamicObject()->setProperty("alwaysNotify", true);
 
 
-	if (hasRange() && (!saveValueOnly || forceSaveRange))
+	if (hasRange() && (!saveValueOnly || forceSaveRange || isCustomizableByUser))
 	{
 		if((int)minimumValue != INT32_MIN) data.getDynamicObject()->setProperty("minValue", minimumValue);
 		if((int)maximumValue != INT32_MAX) data.getDynamicObject()->setProperty("maxValue", maximumValue);
@@ -473,7 +473,7 @@ void Parameter::loadJSONDataInternal(var data)
 {
 	Controllable::loadJSONDataInternal(data);
 
-	if (!saveValueOnly || forceSaveRange) setRange(data.getProperty("minValue", minimumValue), data.getProperty("maxValue", maximumValue));
+	if (!saveValueOnly || forceSaveRange || isCustomizableByUser) setRange(data.getProperty("minValue", minimumValue), data.getProperty("maxValue", maximumValue));
 	if (data.getDynamicObject()->hasProperty("value")) setValue(data.getProperty("value", 0),false, true, true);
 
 	if (data.getDynamicObject()->hasProperty("controlMode")) setControlMode((ControlMode)(int)data.getProperty("controlMode", MANUAL));
