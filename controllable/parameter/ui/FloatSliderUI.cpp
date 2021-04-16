@@ -129,24 +129,19 @@ void FloatSliderUI::mouseDownInternal(const MouseEvent & e)
     initNormalizedValue = getParamNormalizedValue();
     setMouseCursor(MouseCursor::NoCursor);
 
-	if (e.mods.isRightButtonDown()) {
-		parameter->resetValue();
-	}
-
     if (e.mods.isLeftButtonDown())
     {
 		if (e.mods.isCommandDown())
 		{
+			LOG("Reset slider value");
 			parameter->resetValue();
 		}else if (assignOnMousePosDirect)
 		{
 			setParamNormalizedValue(getNormalizedValueFromMouse());
 		}
     }
-    else
-    {
-        repaint();
-    }
+    
+	repaint();
 }
 
 
