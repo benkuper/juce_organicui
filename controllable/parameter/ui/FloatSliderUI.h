@@ -43,6 +43,7 @@ public:
     String lastValueText;
 
     virtual void paint(Graphics &g) override;
+    virtual void drawBG(Graphics &g);
     virtual void mouseDownInternal(const MouseEvent &e) override;
     virtual void mouseDrag(const MouseEvent &e) override;
     virtual void mouseUpInternal(const MouseEvent &e) override;

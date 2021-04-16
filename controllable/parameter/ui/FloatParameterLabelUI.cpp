@@ -95,6 +95,11 @@ void FloatParameterLabelUI::resized()
 
 void FloatParameterLabelUI::mouseDownInternal(const MouseEvent& e)
 {
+	if(e.mods.isLeftButtonDown () && e.mods.isCommandDown())
+	{
+		parameter->resetValue();
+	}
+
 	valueAtMouseDown = parameter->floatValue();
 	valueOffsetSinceMouseDown = 0;
 	lastMouseX = e.getMouseDownX();

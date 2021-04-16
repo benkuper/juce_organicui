@@ -1,4 +1,3 @@
-#include "FloatSliderUI.h"
 /*
  ==============================================================================
 
@@ -50,18 +49,13 @@ void FloatSliderUI::paint(Graphics & g)
 
 	if (parameter.wasObjectDeleted()) return;
 
-	Colour baseColour = useCustomFGColor ? customFGColor : (isInteractable()? PARAMETER_FRONT_COLOR.darker() : FEEDBACK_COLOR);
-    Colour c = (isMouseButtonDown() && changeParamOnMouseUpOnly) ? HIGHLIGHT_COLOR : baseColour;
-
-	Colour bgColor = useCustomBGColor ? customBGColor : BG_COLOR.darker(.1f).withAlpha(.8f);
-	g.setColour(bgColor);
-
-    
-
 	juce::Rectangle<int> sliderBounds = getLocalBounds();
-    g.fillRoundedRectangle(sliderBounds.toFloat(), 2);
 	
-    g.setColour(c);
+	Colour baseColor = useCustomFGColor ? customFGColor : (isInteractable() ? PARAMETER_FRONT_COLOR.darker() : FEEDBACK_COLOR);
+	drawBG(g);
+	
+	Colour c = (isMouseButtonDown() && changeParamOnMouseUpOnly) ? HIGHLIGHT_COLOR : baseColor;
+	g.setColour(c);
 	float drawPos = getDrawPos();
     if (orientation == HORIZONTAL)
     {
@@ -120,10 +114,13 @@ void FloatSliderUI::paint(Graphics & g)
 		if (parameter->isOverriden) g.setFont(g.getCurrentFont().boldened());
         g.drawFittedText(text, destRect, Justification::centred,1);
     }
+}
 
-	g.setColour(bgColor.brighter(.1f));
-	//g.drawRoundedRectangle(getLocalBounds().toFloat(), 2, 1);
-
+void FloatSliderUI::drawBG(Graphics &g)
+{
+	Colour bgColor = useCustomBGColor ? customBGColor : BG_COLOR.darker(.1f).withAlpha(.8f);
+	g.setColour(bgColor);
+	g.fillRoundedRectangle(getLocalBounds().toFloat(), 2);
 }
 
 void FloatSliderUI::mouseDownInternal(const MouseEvent & e)
@@ -136,9 +133,15 @@ void FloatSliderUI::mouseDownInternal(const MouseEvent & e)
 		parameter->resetValue();
 	}
 
-    if (e.mods.isLeftButtonDown() && assignOnMousePosDirect)
+    if (e.mods.isLeftButtonDown())
     {
-        setParamNormalizedValue(getNormalizedValueFromMouse());
+		if (e.mods.isCommandDown())
+		{
+			parameter->resetValue();
+		}else if (assignOnMousePosDirect)
+		{
+			setParamNormalizedValue(getNormalizedValueFromMouse());
+		}
     }
     else
     {
