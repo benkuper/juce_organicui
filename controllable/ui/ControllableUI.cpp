@@ -205,7 +205,7 @@ void ControllableUI::showContextMenu()
 			break;
 
 		default:
-			if (result >= 10000)
+			if (result >= 10000 && result <= 10100)
 			{
 				DashboardManager::getInstance()->items[result - 10000]->itemManager.addItem(controllable->createDashboardItem());
 			}
