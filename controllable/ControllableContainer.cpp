@@ -880,6 +880,8 @@ var ControllableContainer::getJSONData()
 
 	if (hideInEditor) data.getDynamicObject()->setProperty("hideInEditor", hideInEditor);
 	if (hideInRemoteControl != defaultHideInRemoteControl) data.getDynamicObject()->setProperty("hideInRemoteControl", hideInRemoteControl);
+	if (saveCustomData && !customData.isVoid()) data.getDynamicObject()->setProperty("customData", customData);
+
 
 	bool isOwned = (parentContainer != nullptr && parentContainer->ownedContainers.contains(this));
 	if (isOwned)

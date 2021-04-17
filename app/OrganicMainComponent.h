@@ -34,6 +34,9 @@ public:
 	virtual void endLoadFile() override;
 
 
+	//Override panel create functions
+	virtual Outliner* createOutliner(const String& contentName) { return new Outliner(contentName); }
+
 	// inherited from MenuBarModel , ApplicationCommandTarget
 	ApplicationCommandTarget* getNextCommandTarget() override { return findFirstTargetParentComponent(); }
 	virtual void getAllCommands(Array<CommandID>& commands) override;

@@ -30,7 +30,7 @@ class OutlinerItemComponent :
 {
 public:
 	OutlinerItemComponent(OutlinerItem * item);
-	~OutlinerItemComponent();
+	virtual ~OutlinerItemComponent();
 
 	WeakReference<OutlinerItem> item;
 	Label label;
@@ -38,19 +38,19 @@ public:
 
 	std::unique_ptr<ImageButton> hideInRemoteBT;
 	
-	void paint(Graphics &g) override;
-	void resized() override;
+	virtual void paint(Graphics &g) override;
+	virtual void resized() override;
+	virtual void resizedInternal(Rectangle<int>& r) {}
+
 	void itemNameChanged() override;
 	void hideRemoteChanged() override;
 
-	void buttonClicked(Button* b) override;
+	virtual void buttonClicked(Button* b) override;
 
 	void labelTextChanged(Label*) override;
-	void mouseDown(const MouseEvent &e) override;
+	virtual void mouseDown(const MouseEvent &e) override;
 
 	void inspectableSelectionChanged(Inspectable * i) override;
-
-
 };
 
 class OutlinerItem :
@@ -61,7 +61,7 @@ class OutlinerItem :
 public:
 	OutlinerItem(WeakReference<ControllableContainer> container, bool parentsHaveHideInRemote, bool isFiltered);
 	OutlinerItem(WeakReference<Controllable> controllable, bool parentsHaveHideInRemote, bool isFiltered);
-	~OutlinerItem();
+	virtual ~OutlinerItem();
 
 	bool isContainer;
 	String itemName;
@@ -73,7 +73,7 @@ public:
 
 	virtual bool mightContainSubItems() override;
 
-	Component * createItemComponent() override;
+	virtual Component * createItemComponent() override;
 
 	String getUniqueName() const override;
 	void inspectableSelectionChanged(Inspectable * inspectable) override;
@@ -100,7 +100,7 @@ public:
 	juce_DeclareSingleton(Outliner, true)
 
 	Outliner(const String &contentName = "");
-	~Outliner();
+	virtual ~Outliner();
 
 	Label searchBar;
 	bool listIsFiltered;
@@ -129,6 +129,9 @@ public:
 	void buildTree(OutlinerItem * parentItem, ControllableContainer * parentContainer, bool parentsHaveHideInRemote);
 	void updateFilteredList();
 
+	virtual OutlinerItem* createItem(WeakReference<ControllableContainer> container, bool parentsHaveHideInRemote, bool isFiltered);
+	virtual OutlinerItem* createItem(WeakReference<Controllable> controllable, bool parentsHaveHideInRemote, bool isFiltered);
+
 	void endLoadFile() override;
 	void engineCleared() override;
 
@@ -136,7 +139,6 @@ public:
 
 	void childStructureChanged(ControllableContainer *) override;
 
-	static Outliner * create(const String &contentName) { return new Outliner(contentName); }
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Outliner)
