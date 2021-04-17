@@ -163,7 +163,7 @@ void StringParameterFileUI::buttonClicked(Button * b)
 	if (b == &browseBT)
 	{
 		Component::BailOutChecker checker(this); 
-		FileChooser chooser("Select a file", File(fp->getAbsolutePath()), fp->fileTypeFilter);
+		FileChooser chooser("Select a file", File(fp->getBasePath()), fp->fileTypeFilter);
         bool result;
         
         if (fp->directoryMode) result = chooser.browseForDirectory();

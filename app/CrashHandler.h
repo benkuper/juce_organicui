@@ -1,7 +1,7 @@
 #pragma once
 
-
-class CrashDumpUploader : public Thread
+class CrashDumpUploader : 
+	public Thread
 {
 public:
 	juce_DeclareSingleton(CrashDumpUploader, true);
@@ -19,6 +19,7 @@ public:
 	File dumpFile;
 	File recoveredFile;
 	String crashMessage;
+	FloatParameter progress;
 
 	void init(const String& url, Image image);
 
@@ -31,6 +32,9 @@ public:
 	void run();
 	void uploadCrash();
 
+	bool openStreamProgressCallback(int /*bytesSent*/, int /*totalBytes*/);
+
+	void exitApp();
 
 	class UploadWindow :
 		public Component,
@@ -45,6 +49,7 @@ public:
 		TextButton okBT;
 		TextButton cancelBT;
 		TextButton autoReopenBT;
+		FloatSliderUI progressUI;
 
 		juce::Rectangle<int> imageRect;
 
@@ -52,5 +57,12 @@ public:
 		void resized() override;
 		
 		void buttonClicked(Button* bt) override;
+
+		JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(UploadWindow)
 	};
+
+	std::unique_ptr<UploadWindow> w;
+
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CrashDumpUploader)
+
 };

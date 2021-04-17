@@ -77,7 +77,7 @@ Script::~Script()
 
 void Script::chooseFileScript()
 {
-	FileChooser chooser("Create or load a cacahuete", File(), "*.js");
+	FileChooser chooser("Create or load a cacahuete", File::getCurrentWorkingDirectory(), "*.js");
 	bool result = chooser.browseForFileToSave(false);
 
 	if (result)

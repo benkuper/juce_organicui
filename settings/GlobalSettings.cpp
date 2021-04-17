@@ -103,8 +103,9 @@ void GlobalSettings::onControllableFeedbackUpdate(ControllableContainer * cc, Co
 	}
 	else if (c == testCrash)
 	{
-		Controllable* crashC = nullptr;
-		crashC->getJSONData(); //this will crash
+		CrashDumpUploader::getInstance()->handleCrash(nullptr);
+		//Controllable* crashC = nullptr;
+		//crashC->getJSONData(); //this will crash
 	}
 
 	if (Engine::mainEngine != nullptr) Engine::mainEngine->setChangedFlag(false); //force no need to save when changing something in global settings
