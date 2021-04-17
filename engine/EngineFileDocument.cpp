@@ -175,6 +175,8 @@ Result Engine::saveDocument(const File& file) {
 
 	setLastDocumentOpened(file);
 	setChangedFlag(false);
+	file.setAsCurrentWorkingDirectory();
+
 	engineListeners.call(&EngineListener::fileSaved, !sameFile);
 	engineNotifier.addMessage(new EngineEvent(EngineEvent::FILE_SAVED, this));
 

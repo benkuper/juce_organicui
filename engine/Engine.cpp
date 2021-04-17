@@ -102,7 +102,11 @@ void Engine::parseCommandline(const String & commandLine) {
 				{
 					loadDocument(f);
 
-					if (c.command == "c") setFile(File()); //from crash : force no file to force saving again
+					if (c.command == "c")
+					{
+						setFile(File()); //from crash : force other file to force saving again, but also keep working directory
+					}
+					f.setAsCurrentWorkingDirectory();
 				}
 			} else {
 				NLOG("Engine", "File : " << fileArg << " not found.");

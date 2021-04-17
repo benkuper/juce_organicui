@@ -99,13 +99,14 @@ void OrganicApplication::initialise(const String & commandLine)
 void OrganicApplication::shutdown()
 {   
 	saveGlobalSettings();
-	
+
+	CrashDumpUploader::deleteInstance();
+	AppUpdater::deleteInstance();
+
 	// Add your application's shutdown code here..
 	mainComponent->clear();
 	mainWindow = nullptr; // (deletes our window)
 
-	AppUpdater::deleteInstance();
-	CrashDumpUploader::deleteInstance();
 }
 
 

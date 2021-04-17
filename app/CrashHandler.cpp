@@ -31,7 +31,8 @@ OrganicApplication::MainWindow* getMainWindow();
 
 CrashDumpUploader::CrashDumpUploader() :
 	Thread("Crashdump"),
-	doUpload(true)
+	doUpload(true),
+	progress("Upload Progress", "", 0, 0, 1)
 {
 
 }
@@ -116,21 +117,9 @@ void CrashDumpUploader::handleCrash(int e)
 
 		doUpload = true; //by default, unless hit cancel
 
-		UploadWindow w;
-		DialogWindow::showModalDialog("Crash found !", &w, getMainWindow(), Colours::black, true);
-
-		if (doUpload)
-		{
-			uploadCrash();
-		}
+		w.reset(new UploadWindow());
+		DialogWindow::showModalDialog("Got crashed ?", w.get(), getMainWindow(), Colours::black, true);
 	}
-
-	if (autoReopen && recoveredFile.exists())
-	{
-		File::getSpecialLocation(File::currentApplicationFile).startAsProcess("-c " + recoveredFile.getFullPathName());
-	}
-
-	getApp().quit();
 }
 
 void CrashDumpUploader::uploadCrash()
@@ -169,9 +158,28 @@ void CrashDumpUploader::uploadCrash()
 		url = url.withFileToUpload("sessionFile", recoveredFile, "application/octet-stream");
 	}
 
-	WebInputStream stream(url, true);
+	std::function<bool(int, int)> callbackFunc = std::bind(&CrashDumpUploader::openStreamProgressCallback, this, std::placeholders::_1, std::placeholders::_2);
+	int statusCode = 0;
 
-	String convertedData = stream.readEntireStreamAsString();
+	URL::InputStreamOptions options = URL::InputStreamOptions(URL::ParameterHandling::inPostData)
+		.withExtraHeaders("Cache-Control: no-cache")
+		.withProgressCallback(callbackFunc)
+		.withStatusCode(&statusCode)
+		.withConnectionTimeoutMs(5000)
+		;
+
+	std::unique_ptr<InputStream> stream(URL(url).createInputStream(options));
+
+#if JUCE_WINDOWS
+	if (statusCode != 200)
+	{
+		LOGWARNING("Failed to connect, status code = " + String(statusCode));
+		exitApp(); 
+		return;
+	}
+#endif
+
+	String convertedData = stream->readEntireStreamAsString();
 
 #if JUCE_DEBUG
 	LOG("Received : " << convertedData);
@@ -188,8 +196,37 @@ void CrashDumpUploader::uploadCrash()
 	}
 	else
 	{
-		LOGWARNING("Unknown message from crash log server " << convertedData << " (code " << String(stream.getStatusCode()) << ")");
+		LOGWARNING("Unknown message from crash log server " << convertedData << " (code " << String(statusCode) << ")");
 	}
+
+	exitApp();
+}
+
+bool CrashDumpUploader::openStreamProgressCallback(int bytesDownloaded, int totalLength)
+{
+	progress.setValue(bytesDownloaded * 1.0f / totalLength);
+	LOG("Progress " << (int)(progress.floatValue() * 100) << "%");
+	return !threadShouldExit();
+}
+
+void CrashDumpUploader::exitApp()
+{
+	wait(1000);
+	
+	if (w != nullptr)
+	{
+		MessageManagerLock mmLock;
+		w->removeFromDesktop();
+		w.reset();
+	}
+
+	if (autoReopen && recoveredFile.exists())
+	{
+		File::getSpecialLocation(File::currentApplicationFile).startAsProcess("-c \"" + recoveredFile.getFullPathName() + "\"");
+	}
+
+	
+	getApp().quit();
 }
 
 void CrashDumpUploader::run()
@@ -258,9 +295,10 @@ void createDumpAndStrackTrace(int signum, File dumpFile, File traceFile)
 
 
 CrashDumpUploader::UploadWindow::UploadWindow() :
+	cancelBT("Close only"),
 	okBT("Send and close"),
-	cancelBT("Cancel"),
-	autoReopenBT("Send and recover")
+	autoReopenBT("Send and recover"),
+	progressUI(&CrashDumpUploader::getInstance()->progress)
 {
 	okBT.addListener(this);
 	addAndMakeVisible(&okBT);
@@ -270,6 +308,8 @@ CrashDumpUploader::UploadWindow::UploadWindow() :
 
 	autoReopenBT.addListener(this);
 	addAndMakeVisible(&autoReopenBT);
+
+	addAndMakeVisible(&progressUI);
 
 	addAndMakeVisible(&editor);
 	editor.setColour(editor.backgroundColourId, BG_COLOR.brighter(.3f));
@@ -303,22 +343,30 @@ void CrashDumpUploader::UploadWindow::resized()
 	okBT.setBounds(br.removeFromRight(100));
 	br.removeFromRight(8);
 	cancelBT.setBounds(br.removeFromRight(100));
+
+	progressUI.setBounds(r.removeFromBottom(30).reduced(20,5));
+
 	editor.setBounds(r.reduced(20));
 }
 
 void CrashDumpUploader::UploadWindow::buttonClicked(Button* bt)
 {
+	okBT.setEnabled(false);
+	autoReopenBT.setEnabled(false);
+	cancelBT.setEnabled(false);
+	
 	if (bt == &okBT || bt == &autoReopenBT)
 	{
 		CrashDumpUploader::getInstance()->crashMessage = editor.getText();
-		CrashDumpUploader::getInstance()->doUpload = true;
 		if (bt == &autoReopenBT) CrashDumpUploader::getInstance()->autoReopen = true;
+		CrashDumpUploader::getInstance()->startThread();
 	}
 	else if (bt == &cancelBT)
 	{
-		CrashDumpUploader::getInstance()->doUpload = false;
+		CrashDumpUploader::getInstance()->exitApp();
 	}
 
-	if (DialogWindow* dw = findParentComponentOfClass<DialogWindow>())
+	/*if (DialogWindow* dw = findParentComponentOfClass<DialogWindow>())
 		dw->exitModalState(0);
+		*/
 }

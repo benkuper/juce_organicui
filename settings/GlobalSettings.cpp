@@ -103,6 +103,7 @@ void GlobalSettings::onControllableFeedbackUpdate(ControllableContainer * cc, Co
 	}
 	else if (c == testCrash)
 	{
+		//CrashDumpUploader::getInstance()->handleCrash(nullptr); //win only
 		Controllable* crashC = nullptr;
 		crashC->getJSONData(); //this will crash
 	}
