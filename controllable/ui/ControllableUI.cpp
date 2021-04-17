@@ -126,6 +126,12 @@ void ControllableUI::showContextMenu()
 		p->addItem(-11, "Read Only", true, controllable->isControllableFeedbackOnly);
 	}
 
+	if (controllable->canBeDisabledByUser)
+	{
+		p->addSeparator();
+		p->addItem(-12, "Enabled", true, controllable->enabled);
+	}
+
 	if (controllable->includeInScriptObject)
 	{
 		p->addSeparator();
@@ -192,6 +198,10 @@ void ControllableUI::showContextMenu()
 
 		case -11:
 			controllable->setControllableFeedbackOnly(!controllable->isControllableFeedbackOnly);
+			break;
+
+		case -12:
+			controllable->setEnabled(!controllable->enabled);
 			break;
 
 		default:
