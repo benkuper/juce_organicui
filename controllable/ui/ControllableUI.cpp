@@ -133,6 +133,12 @@ void ControllableUI::showContextMenu()
 		p->addItem(-11, "Read Only", true, controllable->isControllableFeedbackOnly);
 	}
 
+	if (controllable->canBeDisabledByUser)
+	{
+		p->addSeparator();
+		p->addItem(-12, "Enabled", true, controllable->enabled);
+	}
+
 	if (controllable->includeInScriptObject)
 	{
 		p->addSeparator();
@@ -201,8 +207,12 @@ void ControllableUI::showContextMenu()
 			controllable->setControllableFeedbackOnly(!controllable->isControllableFeedbackOnly);
 			break;
 
+		case -12:
+			controllable->setEnabled(!controllable->enabled);
+			break;
+
 		default:
-			if (result >= 10000)
+			if (result >= 10000 && result <= 10100)
 			{
 				DashboardManager::getInstance()->items[result - 10000]->itemManager.addItem(controllable->createDashboardItem());
 			}

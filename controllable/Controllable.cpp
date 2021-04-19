@@ -1,4 +1,3 @@
-#include "Controllable.h"
 /*
   ==============================================================================
 
@@ -29,8 +28,6 @@ Controllable::Controllable(const Type &type, const String & niceName, const Stri
 	niceName(""),
 	shortName(""),
 	description(description),
-	customData(var()),
-	saveCustomData(false),
 	enabled(true),
 	canBeDisabledByUser(false),
 	descriptionIsEditable(false),
@@ -182,6 +179,7 @@ var Controllable::getJSONData(ControllableContainer * relativeTo)
 	if (canBeDisabledByUser) data.getDynamicObject()->setProperty("enabled", enabled);
 	if (hideInRemoteControl != defaultHideInRemoteControl) data.getDynamicObject()->setProperty("hideInRemoteControl", hideInRemoteControl);
 	if(userCanSetReadOnly) data.getDynamicObject()->setProperty("feedbackOnly", isControllableFeedbackOnly);
+	if (saveCustomData && !customData.isVoid()) data.getDynamicObject()->setProperty("customData", customData);
 
 	if (saveValueOnly) return data;
 	
@@ -195,7 +193,6 @@ var Controllable::getJSONData(ControllableContainer * relativeTo)
 	data.getDynamicObject()->setProperty("feedbackOnly", isControllableFeedbackOnly);
 
 	if (hasCustomShortName) data.getDynamicObject()->setProperty("shortName", shortName);
-	if (saveCustomData && !customData.isVoid()) data.getDynamicObject()->setProperty("customData", customData);
 
 	return data;
 }

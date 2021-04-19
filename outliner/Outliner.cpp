@@ -1,3 +1,4 @@
+#include "Outliner.h"
 /*
   ==============================================================================
 
@@ -156,7 +157,7 @@ void Outliner::buildTree(OutlinerItem* parentItem, ControllableContainer* parent
 			if(!passed) continue; //not found
 		}
 
-		OutlinerItem* ccItem = new OutlinerItem(cc, parentsHaveHideInRemote, isFiltered);
+		OutlinerItem* ccItem = createItem(cc, parentsHaveHideInRemote, isFiltered);
 		if (forceOpen) ccItem->setOpen(true);
 		parentItem->addSubItem(ccItem);
 		buildTree(ccItem, cc, parentsHaveHideInRemote);
@@ -182,7 +183,7 @@ void Outliner::buildTree(OutlinerItem* parentItem, ControllableContainer* parent
 			else continue;
 		}
 		
-		OutlinerItem* cItem = new OutlinerItem(c, parentsHaveHideInRemote, isFiltered);
+		OutlinerItem* cItem = createItem(c, parentsHaveHideInRemote, isFiltered);
 		parentItem->addSubItem(cItem);
 	}
 	parentContainer->controllables.getLock().exit();
@@ -239,6 +240,16 @@ void Outliner::updateFilteredList()
 			}
 		}
 	}
+}
+
+OutlinerItem* Outliner::createItem(WeakReference<ControllableContainer> container, bool parentsHaveHideInRemote, bool isFiltered)
+{
+	return new OutlinerItem(container, parentsHaveHideInRemote, isFiltered);
+}
+
+OutlinerItem* Outliner::createItem(WeakReference<Controllable> controllable, bool parentsHaveHideInRemote, bool isFiltered)
+{
+	return new OutlinerItem(controllable, parentsHaveHideInRemote, isFiltered);
 }
 
 void Outliner::endLoadFile()
@@ -434,9 +445,8 @@ OutlinerItemComponent::OutlinerItemComponent(OutlinerItem* _item) :
 	setTooltip(item->isContainer ? item->container->getControlAddress() : item->controllable->description + "\nControl Address : " + item->controllable->controlAddress);
 	addAndMakeVisible(&label);
 
-	color = BLUE_COLOR;
 	if (item->isContainer) color = item->container->nameCanBeChangedByUser ? HIGHLIGHT_COLOR : TEXT_COLOR;
-
+	else color = BLUE_COLOR.brighter(item->controllable->type == Controllable::TRIGGER);
 
 	label.setFont(label.getFont().withHeight(12));
 	label.setColour(label.backgroundWhenEditingColourId, Colours::white);
@@ -503,6 +513,7 @@ void OutlinerItemComponent::resized()
 	if (r.isEmpty()) return;
 	hideInRemoteBT->setBounds(r.removeFromRight(r.getHeight()).reduced(1));
 	r.removeFromLeft(3);
+	resizedInternal(r);
 	label.setBounds(r);
 }
 

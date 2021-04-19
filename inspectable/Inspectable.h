@@ -38,6 +38,10 @@ public:
 	bool highlightLinkedInspectableOnSelect;
 	Array<WeakReference<Inspectable>> linkedInspectables;
 
+	//For storing arbitraty data
+	var customData;
+	bool saveCustomData;
+
 	//Help
 	String helpID;
 	virtual String getHelpID();

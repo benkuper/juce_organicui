@@ -12,11 +12,5 @@ juce_ImplementSingleton(ShapeShifterFactory)
 
 ShapeShifterFactory::ShapeShifterFactory()
 {
-	defs.add(new ShapeShifterDefinition("Inspector", &InspectorUI::create));
-	defs.add(new ShapeShifterDefinition("Outliner", &Outliner::create));
-	defs.add(new ShapeShifterDefinition("Dashboard", &DashboardManagerView::create));
-	defs.add(new ShapeShifterDefinition("Logger", &CustomLoggerUI::create));
-	defs.add(new ShapeShifterDefinition("The Detective", &DetectivePanel::create));
-	defs.add(new ShapeShifterDefinition("Warnings", &WarningReporterPanel::create));
-	defs.add(new ShapeShifterDefinition("Help", &HelpPanel::create));
+
 }
