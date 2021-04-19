@@ -12,6 +12,7 @@ bool ControllableUI::showOSCControlAddressOption = true;
 bool ControllableUI::showScriptControlAddressOption = true;
 bool ControllableUI::showDetectiveOption = true;
 bool ControllableUI::showDashboardOption = true;
+bool ControllableUI::drawContourOnInspectableHighlighted = false;
 
 std::function<void(ControllableUI*)> ControllableUI::customShowContextMenuFunc = nullptr;
 std::function<void(ControllableUI *, PopupMenu *)> ControllableUI::customAddToContextMenuFunc = nullptr;
@@ -30,6 +31,7 @@ ControllableUI::ControllableUI(Controllable * controllable) :
 	jassert(controllable != nullptr);
 	updateTooltip();
 	controllable->addAsyncControllableListener(this);
+	controllable->addAsyncInspectableListener(this);
 
 	setEnabled(controllable->enabled);
 	setAlpha(controllable->enabled ? 1 : .5f);
@@ -39,14 +41,17 @@ ControllableUI::ControllableUI(Controllable * controllable) :
 
 ControllableUI::~ControllableUI()
 {
-	if (controllable != nullptr && !controllable.wasObjectDeleted()) controllable->removeAsyncControllableListener(this);
+	if (controllable != nullptr && !controllable.wasObjectDeleted())
+	{
+		controllable->removeAsyncControllableListener(this);
+		controllable->removeAsyncInspectableListener(this);
+	}
 }
 
 
 void ControllableUI::paintOverChildren(Graphics& g)
 {
-	if (useCustomContour) drawContour(g);
-
+	drawContour(g);
 }
 
 void ControllableUI::mouseEnter(const MouseEvent & e)
@@ -87,7 +92,9 @@ void ControllableUI::mouseUp(const MouseEvent & e)
 
 void ControllableUI::drawContour(Graphics &g)
 {
-	g.setColour(customContourColor);
+	bool isHighlighted = controllable->isHighlighted && ControllableUI::drawContourOnInspectableHighlighted;
+	if (!(useCustomContour || isHighlighted)) return;
+	g.setColour(isHighlighted ? Colours::pink : customContourColor);
 	g.drawRoundedRectangle(getLocalBounds().toFloat(), 2, customContourThickness);
 }
 
@@ -273,6 +280,14 @@ void ControllableUI::newMessage(const Controllable::ControllableEvent & e)
 		//NOT HANDLED
 		break;
 
+	}
+}
+
+void ControllableUI::newMessage(const Inspectable::InspectableEvent& e)
+{
+	if (e.type == Inspectable::InspectableEvent::HIGHLIGHT_CHANGED)
+	{
+		if (ControllableUI::drawContourOnInspectableHighlighted) repaint();
 	}
 }
 

@@ -13,11 +13,14 @@
 class ControllableUI :
 	public Component,
 	public SettableTooltipClient,
-	public Controllable::AsyncListener
+	public Controllable::AsyncListener,
+	public Inspectable::AsyncListener
 {
 public:
 	ControllableUI(Controllable* controllable);
 	virtual ~ControllableUI();
+
+	static bool drawContourOnInspectableHighlighted;
 
 	String tooltip;
 	WeakReference<Controllable>  controllable;
@@ -76,6 +79,7 @@ public:
 	virtual void showEditWindowInternal() {} //to be overriden by children
 
 	virtual void newMessage(const Controllable::ControllableEvent &e) override;
+	virtual void newMessage(const Inspectable::InspectableEvent& e) override;
 
 	virtual void controllableStateChanged();
 	virtual void feedbackStateChanged();
