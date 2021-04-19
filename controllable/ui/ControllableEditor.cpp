@@ -14,6 +14,8 @@ ControllableEditor::ControllableEditor(Controllable * _controllable, bool isRoot
 	controllable(_controllable),
 	label("Label"),
     subContentHeight(0),
+	minLabelWidth(160),
+	minControlUIWidth(100),
 	dragAndDropEnabled(true),
     showLabel(true)
 {
@@ -115,7 +117,7 @@ void ControllableEditor::resized()
 
 	resizedInternal(r);
 
-	int controlSpace = jmax<int>(showLabel? jmin<int>(getWidth() - 160, getWidth()*.75f) : getWidth(), 100);
+	int controlSpace = jmax<int>(showLabel? jmin<int>(getWidth() - minLabelWidth, getWidth()*.75f) : getWidth(), minControlUIWidth);
 	
 	ui->setBounds(r.removeFromRight(controlSpace));
 	
