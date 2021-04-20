@@ -11,6 +11,7 @@ Inspectable::Inspectable() :
 	isHighlighted(false),
 	isPreselected(false),
     highlightLinkedInspectableOnSelect(true),
+	saveCustomData(true),
     inspectableNotifier(10)
 {
 	setSelectionManager(nullptr);
