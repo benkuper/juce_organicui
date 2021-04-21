@@ -211,21 +211,24 @@ bool CrashDumpUploader::openStreamProgressCallback(int bytesDownloaded, int tota
 
 void CrashDumpUploader::exitApp()
 {
-	wait(1000);
 	
-	if (w != nullptr)
+	
+#if JUCE_WINDOWS
+   wait(1000);
+    if (w != nullptr)
 	{
 		MessageManagerLock mmLock;
 		w->removeFromDesktop();
 		w.reset();
 	}
-
+#endif
+    
 	if (autoReopen && recoveredFile.exists())
 	{
+        
 		File::getSpecialLocation(File::currentApplicationFile).startAsProcess("-c \"" + recoveredFile.getFullPathName() + "\"");
 	}
-
-	
+    
 	getApp().quit();
 }
 
