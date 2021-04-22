@@ -226,11 +226,6 @@ bool CrashDumpUploader::openStreamProgressCallback(int bytesDownloaded, int tota
 
 void CrashDumpUploader::exitApp()
 {
-	
-#if JUCE_WINDOWS
-   wait(200);
-#endif
-    
 	if (autoReopen && recoveredFile.exists())
 	{
         
