@@ -1,4 +1,3 @@
-#include "Inspectable.h"
 
 Inspectable::Inspectable() :
 	selectionManager(nullptr), //default nullptr will target main selectionManager
