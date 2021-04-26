@@ -24,8 +24,8 @@ String StringUtil::toShortName(const String& niceName, bool replaceSlashes) {
 
 	res = res.replaceCharacter('\"', '_');
 	
-	String specials = "+-()[]{}<>^'@#*$~°";// ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ÙÚÛÜÝ‗אבגדהוזחטיךכלםמןנסעףפץצשתûü‎ÿ";
-	String replaces = "_____________#____";//AAAAAAECEEEEIIIIDNOOOOOxUUUUYsaaaaaaeceeeeiiiiOnooooouuuuyy";
+	String specials = "+-()[]{}<>^'@#*$~";// ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ÙÚÛÜÝ‗אבגדהוזחטיךכלםמןנסעףפץצשתûü‎ÿ";
+	String replaces = "_____________#___";//AAAAAAECEEEEIIIIDNOOOOOxUUUUYsaaaaaaeceeeeiiiiOnooooouuuuyy";
 	res = res.replaceCharacters(specials, replaces);
 
 #if !JUCE_MAC
