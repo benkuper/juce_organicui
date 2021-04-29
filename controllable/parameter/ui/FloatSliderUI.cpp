@@ -221,7 +221,8 @@ int FloatSliderUI::getDrawPos()
 
 String FloatSliderUI::getValueText() const
 {
-	return fixedDecimals == 0 ? parameter->stringValue() : String::formatted("%." + String(fixedDecimals + 1) + "f", parameter->floatValue()).dropLastCharacters(1);
+	String v = fixedDecimals == 0 ? parameter->stringValue() : String::formatted("%." + String(fixedDecimals + 1) + "f", parameter->floatValue()).dropLastCharacters(1);
+	return prefix + v + suffix;
 }
 
 void FloatSliderUI::setParamNormalizedValueUndoable(float oldValue, float newValue)
