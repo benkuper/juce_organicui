@@ -134,10 +134,10 @@ void FloatSliderUI::mouseDownInternal(const MouseEvent & e)
 		{
 			parameter->setValue(parameter->defaultValue, false, true, true);
 
-		}else if (assignOnMousePosDirect)
+		}else 
 		{
 			setMouseCursor(MouseCursor::NoCursor);
-			setParamNormalizedValue(getNormalizedValueFromMouse());
+			if (assignOnMousePosDirect)	setParamNormalizedValue(getNormalizedValueFromMouse());
 		}
     }
     
