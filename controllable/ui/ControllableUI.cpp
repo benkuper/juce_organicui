@@ -101,7 +101,8 @@ void ControllableUI::mouseUp(const MouseEvent & e)
 
 void ControllableUI::drawContour(Graphics &g)
 {
-	bool isHighlighted = controllable->isHighlighted && drawContourOnInspectableHighlighted;
+	if (controllable == nullptr || controllable.wasObjectDeleted()) return;
+	bool isHighlighted = drawContourOnInspectableHighlighted && controllable->isHighlighted;
 	if (!(useCustomContour || isHighlighted)) return;
 	g.setColour(isHighlighted ? Colours::purple : customContourColor);
 	g.drawRoundedRectangle(getLocalBounds().toFloat().reduced(1), 2, customContourThickness);
