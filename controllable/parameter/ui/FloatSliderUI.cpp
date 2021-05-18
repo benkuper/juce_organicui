@@ -134,10 +134,10 @@ void FloatSliderUI::mouseDownInternal(const MouseEvent & e)
 		{
 			parameter->setValue(parameter->defaultValue, false, true, true);
 
-		}else if (assignOnMousePosDirect)
+		}else 
 		{
 			setMouseCursor(MouseCursor::NoCursor);
-			setParamNormalizedValue(getNormalizedValueFromMouse());
+			if (assignOnMousePosDirect)	setParamNormalizedValue(getNormalizedValueFromMouse());
 		}
     }
     
@@ -221,7 +221,7 @@ int FloatSliderUI::getDrawPos()
 
 String FloatSliderUI::getValueText() const
 {
-	String v = fixedDecimals == 0 ? parameter->stringValue() : String::formatted("%." + String(fixedDecimals + 1) + "f", parameter->floatValue()).dropLastCharacters(1);
+	String v = fixedDecimals == -1 ? String(parameter->intValue()) : (fixedDecimals == 0 ? parameter->stringValue() : String::formatted("%." + String(fixedDecimals + 1) + "f", parameter->floatValue()).dropLastCharacters(1));
 	return prefix + v + suffix;
 }
 
