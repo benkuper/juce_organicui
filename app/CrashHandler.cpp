@@ -207,6 +207,8 @@ void CrashDumpUploader::uploadCrash()
 		LOGWARNING("Unknown message from crash log server " << convertedData << " (code " << String(statusCode) << ")");
 	}
 
+	sleep(300);
+
 	if (w != nullptr)
 	{
 		w->findParentComponentOfClass<DialogWindow>()->exitModalState(0);
@@ -214,7 +216,6 @@ void CrashDumpUploader::uploadCrash()
 		w->removeFromDesktop();
 		w.reset();
 	}
-
 }
 
 bool CrashDumpUploader::openStreamProgressCallback(int bytesDownloaded, int totalLength)
