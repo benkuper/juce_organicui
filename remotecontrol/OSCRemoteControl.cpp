@@ -42,9 +42,6 @@ OSCRemoteControl::OSCRemoteControl() :
 	receiver.addListener(this);
 	receiver.registerFormatErrorHandler(&OSCHelpers::logOSCFormatError);
 
-#if ORGANICUI_USE_WEBSERVER
-	Engine::mainEngine->addControllableContainerListener(this);
-#endif
 }
 
 OSCRemoteControl::~OSCRemoteControl()
@@ -60,7 +57,6 @@ OSCRemoteControl::~OSCRemoteControl()
 		server.reset();
 	}
 
-	Engine::mainEngine->removeControllableContainerListener(this);
 #endif
 
 }
@@ -70,6 +66,10 @@ void OSCRemoteControl::setupReceiver()
 	//if (receiveCC == nullptr) return;
 
 	receiver.disconnect();
+
+#if ORGANICUI_USE_WEBSERVER
+	Engine::mainEngine->removeAsyncContainerListener(this);
+#endif
 
 	if (!enabled->boolValue()) return;
 
@@ -82,6 +82,7 @@ void OSCRemoteControl::setupReceiver()
 
 #if ORGANICUI_USE_WEBSERVER
 		setupServer();
+		Engine::mainEngine->addAsyncContainerListener(this);
 #endif
 
 		NLOG(niceName, "Now receiving on port : " + localPort->stringValue());
@@ -526,21 +527,22 @@ void OSCRemoteControl::connectionError(const String& id, const String& message)
 	feedbackMap.remove(id);
 }
 
-void OSCRemoteControl::controllableFeedbackUpdate(ControllableContainer* cc, Controllable* c)
+void OSCRemoteControl::newMessage(const ContainerAsyncEvent& e)
 {
 	if (Engine::mainEngine->isLoadingFile || Engine::mainEngine->isClearing) return;
-	
-	if (cc == Engine::mainEngine)
+
+	if (e.type == ContainerAsyncEvent::ControllableFeedbackUpdate)
 	{
 		HashMap<String, Array<Controllable*>, DefaultHashFunctions, CriticalSection>::Iterator it(feedbackMap);
 		while (it.next())
 		{
-			if (it.getValue().contains(c))
+			if (it.getValue().contains(e.targetControllable))
 			{
-				sendOSCQueryFeedback(c);
+				sendOSCQueryFeedback(e.targetControllable);
 			}
 		}
 	}
+	
 }
 
 void OSCRemoteControl::sendOSCQueryFeedback(Controllable* c, const String& excludeId)

@@ -80,9 +80,9 @@ void BaseItemEditor::resizedInternalHeader(juce::Rectangle<int>& r)
 		downBT->setBounds(r.removeFromRight(targetHeight).reduced(4));
 	}
 
+	EnablingControllableContainerEditor::resizedInternalHeader(r);
+	
 	resizedInternalHeaderItemInternal(r);
-
-	EnablingControllableContainerEditor::resizedInternalHeader(r); 
 }
 
 void BaseItemEditor::buttonClicked(Button * b)

@@ -1,4 +1,3 @@
-#include "StringUtil.h"
 /*
  ==============================================================================
 
@@ -25,18 +24,18 @@ String StringUtil::toShortName(const String& niceName, bool replaceSlashes) {
 	res = res.replaceCharacter('\"', '_');
 	
 	String specials = "+-()[]{}<>^'@#*$~";// ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏĞÑÒÓÔÕÖ×ÙÚÛÜİßàáâãäåæçèéêëìíîïğñòóôõöùúûüıÿ";
-	String replaces = "_________________";//AAAAAAECEEEEIIIIDNOOOOOxUUUUYsaaaaaaeceeeeiiiiOnooooouuuuyy";
+	String replaces = "_____________#___";//AAAAAAECEEEEIIIIDNOOOOOxUUUUYsaaaaaaeceeeeiiiiOnooooouuuuyy";
 	res = res.replaceCharacters(specials, replaces);
 
 #if !JUCE_MAC
     res = res.replaceCharacter('â', 'a').replaceCharacter('é', 'e').replaceCharacter('è', 'e').replaceCharacter('ê', 'e')
 		.replaceCharacter('à', 'a').replaceCharacter('ô', 'o')
-		.replaceCharacter('ç', 'c').replaceCharacter('ü', 'u');;
+		.replaceCharacter('ç', 'c').replaceCharacter('ü', 'u');
 #endif
 
 	//for (int i = 0; i < specials.length(); ++i) res = res.replaceCharacter(specials[i], replaces[i]);
 
-	res = res.retainCharacters("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_0123456789 ");
+	res = res.retainCharacters("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_0123456789# ");
 
 	StringArray sa;
 	sa.addTokens(res, false);

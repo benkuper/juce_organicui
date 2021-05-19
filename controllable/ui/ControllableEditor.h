@@ -30,6 +30,8 @@ public:
 	
 	int baseHeight; //height at init
 	int subContentHeight; //for additional content
+	int minLabelWidth;
+	int minControlUIWidth;
 
 	bool dragAndDropEnabled;
 

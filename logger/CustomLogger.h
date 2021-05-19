@@ -1,5 +1,4 @@
 
-
 #pragma once
 
  // do not use file logger atm
@@ -16,10 +15,8 @@ public:
 
 	void logMessage(const String& message) override;
 
-
 	QueuedNotifier<String> notifier;
 	typedef QueuedNotifier<String>::Listener Listener;
-
 
 	const String & getWelcomeMessage();
 	void addLogListener(Listener* l) { notifier.addListener(l); }
@@ -29,7 +26,7 @@ public:
 	class FileWriter : public Listener
 	{
 	public:
-		FileWriter() { fileLog = FileLogger::createDefaultAppLogger(getApp().getApplicationName(), "log", ""); }
+		FileWriter();
 
 		void newMessage(const String& s) override { if (fileLog && !s.isEmpty()) { fileLog->logMessage(s); } }
 		String getFilePath() { return fileLog->getLogFile().getFullPathName(); }

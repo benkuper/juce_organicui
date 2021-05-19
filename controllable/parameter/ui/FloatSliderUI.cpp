@@ -127,17 +127,17 @@ void FloatSliderUI::mouseDownInternal(const MouseEvent & e)
 {
 	initValue = parameter->floatValue();
     initNormalizedValue = getParamNormalizedValue();
-    setMouseCursor(MouseCursor::NoCursor);
 
     if (e.mods.isLeftButtonDown())
     {
 		if (e.mods.isCommandDown())
 		{
-			LOG("Reset slider value");
-			parameter->resetValue();
-		}else if (assignOnMousePosDirect)
+			parameter->setValue(parameter->defaultValue, false, true, true);
+
+		}else 
 		{
-			setParamNormalizedValue(getNormalizedValueFromMouse());
+			setMouseCursor(MouseCursor::NoCursor);
+			if (assignOnMousePosDirect)	setParamNormalizedValue(getNormalizedValueFromMouse());
 		}
     }
     
@@ -153,7 +153,7 @@ void FloatSliderUI::mouseDrag(const MouseEvent & e)
 	if (changeParamOnMouseUpOnly) repaint();
     else
     {
-		if (e.mods.isLeftButtonDown())
+		if (e.mods.isLeftButtonDown() && !e.mods.isCommandDown())
 		{
 			if (assignOnMousePosDirect)
 			{
@@ -167,10 +167,12 @@ void FloatSliderUI::mouseDrag(const MouseEvent & e)
     }
 }
 
-void FloatSliderUI::mouseUpInternal(const MouseEvent &)
+void FloatSliderUI::mouseUpInternal(const MouseEvent& e)
 {
 	BailOutChecker checker (this);
 	
+	if (e.mods.isLeftButtonDown() && e.mods.isCommandDown()) return;
+
 	if (setUndoableValueOnMouseUp)
 	{
 		if (changeParamOnMouseUpOnly)
@@ -219,7 +221,8 @@ int FloatSliderUI::getDrawPos()
 
 String FloatSliderUI::getValueText() const
 {
-	return fixedDecimals == 0 ? parameter->stringValue() : String::formatted("%." + String(fixedDecimals + 1) + "f", parameter->floatValue()).dropLastCharacters(1);
+	String v = fixedDecimals == -1 ? String(parameter->intValue()) : (fixedDecimals == 0 ? parameter->stringValue() : String::formatted("%." + String(fixedDecimals + 1) + "f", parameter->floatValue()).dropLastCharacters(1));
+	return prefix + v + suffix;
 }
 
 void FloatSliderUI::setParamNormalizedValueUndoable(float oldValue, float newValue)

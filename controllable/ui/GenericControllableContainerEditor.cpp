@@ -484,6 +484,7 @@ void GenericControllableContainerEditor::newMessage(const ContainerAsyncEvent & 
 
 	case ContainerAsyncEvent::ChildAddressChanged:
 		containerLabel.setText(container->niceName, dontSendNotification);
+		resized();
 		break;
 
 	case ContainerAsyncEvent::ControllableContainerNeedsRebuild:

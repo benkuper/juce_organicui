@@ -21,3 +21,10 @@ void CustomLogger::logMessage(const String& message)
 	notifier.addMessage(new String(message));
 	DBG(message);
 }
+
+#if USE_FILE_LOGGER
+CustomLogger::FileWriter::FileWriter() 
+{
+	fileLog.reset(FileLogger::createDefaultAppLogger(getApp().getApplicationName(), "log", ""));
+}
+#endif

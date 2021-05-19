@@ -31,6 +31,8 @@ public:
     bool assignOnMousePosDirect;
 
     int fixedDecimals;
+    String prefix;
+    String suffix;
 
     //interaction
     float initValue;

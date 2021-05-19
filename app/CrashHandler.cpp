@@ -120,6 +120,8 @@ void CrashDumpUploader::handleCrash(int e)
 		w.reset(new UploadWindow());
 		DialogWindow::showModalDialog("Got crashed ?", w.get(), getMainWindow(), Colours::black, true);
 	}
+
+	exitApp();
 }
 
 void CrashDumpUploader::uploadCrash()
@@ -174,8 +176,14 @@ void CrashDumpUploader::uploadCrash()
 	if (statusCode != 200)
 	{
 		LOGWARNING("Failed to connect, status code = " + String(statusCode));
-		exitApp(); 
-		return;
+
+		if (w != nullptr)
+		{
+			w->findParentComponentOfClass<DialogWindow>()->exitModalState(0);
+			MessageManagerLock mmLock;
+			w->removeFromDesktop();
+			w.reset();
+		}
 	}
 #endif
 
@@ -199,7 +207,15 @@ void CrashDumpUploader::uploadCrash()
 		LOGWARNING("Unknown message from crash log server " << convertedData << " (code " << String(statusCode) << ")");
 	}
 
-	exitApp();
+	sleep(300);
+
+	if (w != nullptr)
+	{
+		w->findParentComponentOfClass<DialogWindow>()->exitModalState(0);
+		MessageManagerLock mmLock;
+		w->removeFromDesktop();
+		w.reset();
+	}
 }
 
 bool CrashDumpUploader::openStreamProgressCallback(int bytesDownloaded, int totalLength)
@@ -211,21 +227,12 @@ bool CrashDumpUploader::openStreamProgressCallback(int bytesDownloaded, int tota
 
 void CrashDumpUploader::exitApp()
 {
-	wait(1000);
-	
-	if (w != nullptr)
-	{
-		MessageManagerLock mmLock;
-		w->removeFromDesktop();
-		w.reset();
-	}
-
 	if (autoReopen && recoveredFile.exists())
 	{
+        
 		File::getSpecialLocation(File::currentApplicationFile).startAsProcess("-c \"" + recoveredFile.getFullPathName() + "\"");
 	}
-
-	
+    
 	getApp().quit();
 }
 

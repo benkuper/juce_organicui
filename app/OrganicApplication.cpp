@@ -100,12 +100,12 @@ void OrganicApplication::shutdown()
 {   
 	saveGlobalSettings();
 
-	CrashDumpUploader::deleteInstance();
-	AppUpdater::deleteInstance();
-
 	// Add your application's shutdown code here..
 	mainComponent->clear();
 	mainWindow = nullptr; // (deletes our window)
+
+	CrashDumpUploader::deleteInstance();
+	AppUpdater::deleteInstance();
 
 }
 

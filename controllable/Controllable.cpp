@@ -167,6 +167,7 @@ bool Controllable::shouldBeSaved()
 	if (userCanSetReadOnly && isControllableFeedbackOnly) return true;
 	if (!isSavable) return false;
 	if (!saveValueOnly) return true;
+	if (saveCustomData && !customData.isVoid()) return true;
 	return false;
 }
 

@@ -16,7 +16,7 @@ InspectableContentComponent::InspectableContentComponent(Inspectable * _inspecta
 	highlightLinkedInspectablesOnOver(true),
     selectionContourColor(HIGHLIGHT_COLOR),
     autoSelectWithChildRespect(true),
-    highlightColor(Colours::purple),
+    highlightColor(Colours::purple.brighter(.3f)),
     bringToFrontOnSelect(true)
 {
 	//setWantsKeyboardFocus(true);

@@ -31,7 +31,7 @@ ControllableUI::ControllableUI(Controllable * controllable) :
 	jassert(controllable != nullptr);
 	updateTooltip();
 	controllable->addAsyncControllableListener(this);
-	controllable->addAsyncInspectableListener(this);
+	if(drawContourOnInspectableHighlighted) controllable->addAsyncInspectableListener(this);
 
 	setEnabled(controllable->enabled);
 	setAlpha(controllable->enabled ? 1 : .5f);
@@ -56,13 +56,22 @@ void ControllableUI::paintOverChildren(Graphics& g)
 
 void ControllableUI::mouseEnter(const MouseEvent & e)
 {
-	if (controllable != nullptr && !controllable.wasObjectDeleted()) HelpBox::getInstance()->setOverData(controllable->helpID);
+	if (controllable != nullptr && !controllable.wasObjectDeleted())
+	{
+		HelpBox::getInstance()->setOverData(controllable->helpID);
+		if (drawContourOnInspectableHighlighted) controllable->highlightLinkedInspectables(true);
+	}
 }
 
 void ControllableUI::mouseExit(const MouseEvent & e)
 {
 	setTooltip(tooltip); //restore tooltip when leaving
-	if (controllable != nullptr && !controllable.wasObjectDeleted()) HelpBox::getInstance()->clearOverData(controllable->helpID);
+	if (controllable != nullptr && !controllable.wasObjectDeleted())
+	{
+		HelpBox::getInstance()->clearOverData(controllable->helpID);
+		if (drawContourOnInspectableHighlighted) controllable->highlightLinkedInspectables(false);
+	}
+
 }
 
 void ControllableUI::mouseDown(const MouseEvent & e)
@@ -95,8 +104,8 @@ void ControllableUI::drawContour(Graphics &g)
 	if (controllable == nullptr || controllable.wasObjectDeleted()) return;
 	bool isHighlighted = controllable->isHighlighted && ControllableUI::drawContourOnInspectableHighlighted;
 	if (!(useCustomContour || isHighlighted)) return;
-	g.setColour(isHighlighted ? Colours::pink : customContourColor);
-	g.drawRoundedRectangle(getLocalBounds().toFloat(), 2, customContourThickness);
+	g.setColour(isHighlighted ? Colours::purple : customContourColor);
+	g.drawRoundedRectangle(getLocalBounds().toFloat().reduced(1), 2, customContourThickness);
 }
 
 bool ControllableUI::isInteractable(bool falseIfFeedbackOnly)
@@ -298,7 +307,7 @@ void ControllableUI::newMessage(const Inspectable::InspectableEvent& e)
 {
 	if (e.type == Inspectable::InspectableEvent::HIGHLIGHT_CHANGED)
 	{
-		if (ControllableUI::drawContourOnInspectableHighlighted) repaint();
+		if (drawContourOnInspectableHighlighted) repaint();
 	}
 }
 

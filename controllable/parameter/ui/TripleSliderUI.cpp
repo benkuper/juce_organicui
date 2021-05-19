@@ -42,7 +42,7 @@ TripleSliderUI::TripleSliderUI(Point3DParameter* parameter) :
 
 	xSlider.reset((ParameterUI*)xParam.createDefaultUI());
 	ySlider.reset((ParameterUI*)yParam.createDefaultUI());
-	zSlider.reset((ParameterUI*)yParam.createDefaultUI());
+	zSlider.reset((ParameterUI*)zParam.createDefaultUI());
 
 	xSlider->showLabel = false;
 	ySlider->showLabel = false;
@@ -120,9 +120,11 @@ void TripleSliderUI::resized()
 		r.removeFromLeft(2);
 	}
 
-	xSlider->setBounds(r.removeFromLeft(r.getWidth() / 3 - 15));
-	ySlider->setBounds(r.removeFromRight(r.getWidth() / 2 - 10));
-	zSlider->setBounds(r.removeFromRight(r.getWidth() - 5));
+	xSlider->setBounds(r.removeFromLeft(r.getWidth() / 3 - 10));
+	r.removeFromLeft(5);
+	ySlider->setBounds(r.removeFromLeft(r.getWidth() / 2 - 5));
+	r.removeFromLeft(5);
+	zSlider->setBounds(r);
 }
 
 void TripleSliderUI::showEditWindowInternal()
