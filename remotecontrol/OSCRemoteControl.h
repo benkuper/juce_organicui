@@ -86,11 +86,11 @@ public:
 	void connectionClosed(const String& id, int status, const String& reason) override;
 	void connectionError(const String& id, const String& message) override;
 
-	void newMessage(const ContainerAsyncEvent &e) override;
-
 	void sendOSCQueryFeedback(Controllable* c, const String & excludeId = "");
 
 #endif
+
+	void newMessage(const ContainerAsyncEvent& e) override;
 
 	class RemoteControlListener
 	{
