@@ -92,6 +92,7 @@ void ControllableUI::mouseUp(const MouseEvent & e)
 
 void ControllableUI::drawContour(Graphics &g)
 {
+	if (controllable == nullptr || controllable.wasObjectDeleted()) return;
 	bool isHighlighted = controllable->isHighlighted && ControllableUI::drawContourOnInspectableHighlighted;
 	if (!(useCustomContour || isHighlighted)) return;
 	g.setColour(isHighlighted ? Colours::pink : customContourColor);
