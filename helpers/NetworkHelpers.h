@@ -14,6 +14,14 @@ public:
         return "";	
 	}
 
+	static bool isIPLocal(const String& tip)
+	{
+		StringArray result;
+		Array<IPAddress> ad;
+		IPAddress::findAllAddresses(ad);
+		for (auto& ip : ad) if (ip.toString() == tip) return true;
+		return false;
+	}
 
 	static StringArray getLocalIPs()
 	{
