@@ -23,6 +23,7 @@ ControllableEditor::ControllableEditor(Controllable * _controllable, bool isRoot
 
 	addAndMakeVisible(&label);
 	label.setJustificationType(Justification::left);
+	label.setBorderSize(BorderSize<int>(0));
 	label.setFont(label.getFont().withHeight(GlobalSettings::getInstance()->fontSize->floatValue()));
 	label.setText(controllable->niceName, dontSendNotification);
 	label.setTooltip(ui->tooltip);
