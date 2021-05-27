@@ -28,6 +28,7 @@ ControllableFactory::ControllableFactory() {
 
 void ControllableFactory::buildPopupMenu(bool excludeSpecials)
 {
+	menu.clear();
 	for (int i = 0; i < controllableDefs.size(); ++i)
 	{
 		if (controllableDefs[i]->isSpecial && excludeSpecials) continue;
