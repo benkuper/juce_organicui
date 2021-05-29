@@ -94,9 +94,11 @@ void ControllableEditor::resized()
 	juce::Rectangle<int> r = getLocalBounds();
 	r.removeFromBottom(subContentHeight);// .withHeight(16);
 
+	int buttonSize = jmin(r.getHeight(), 20);
+
 	if (warningUI != nullptr && warningUI->isVisible())
 	{
-		warningUI->setBounds(r.removeFromLeft(r.getHeight())); //warning
+		warningUI->setBounds(r.removeFromLeft(buttonSize).withSizeKeepingCentre(buttonSize, buttonSize)); //warning
 		r.removeFromLeft(2);
 	}
 
@@ -104,14 +106,14 @@ void ControllableEditor::resized()
 	{
 		if (controllable->isRemovableByUser && removeBT != nullptr)
 		{
-			removeBT->setBounds(r.removeFromRight(r.getHeight()));
+			removeBT->setBounds(r.removeFromRight(buttonSize).withSizeKeepingCentre(buttonSize, buttonSize));
 			r.removeFromRight(2);
 		}
 
 
 		if (controllable->canBeDisabledByUser && enableBT != nullptr)
 		{
-			enableBT->setBounds(r.removeFromLeft(r.getHeight()));
+			enableBT->setBounds(r.removeFromLeft(buttonSize).withSizeKeepingCentre(buttonSize, buttonSize));
 			r.removeFromLeft(2);
 		}
 	}
