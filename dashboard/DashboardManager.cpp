@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    DashboardManager.cpp
-    Created: 19 Apr 2017 10:57:53pm
-    Author:  Ben
+	DashboardManager.cpp
+	Created: 19 Apr 2017 10:57:53pm
+	Author:  Ben
 
   ==============================================================================
 */
@@ -47,7 +47,7 @@ DashboardManager::~DashboardManager()
 void DashboardManager::setupServer()
 {
 	server.reset();
-	
+
 	if (Engine::mainEngine->isClearing) return;
 
 	if (isCurrentlyLoadingData || Engine::mainEngine->isLoadingFile)
@@ -59,9 +59,9 @@ void DashboardManager::setupServer()
 	if (!ProjectSettings::getInstance()->enableServer->boolValue())
 	{
 		LOG("Dashboard server is not running");
-		#if ORGANICUI_USE_SERVUS
-			servusThread.stopThread(1000);
-		#endif
+#if ORGANICUI_USE_SERVUS
+		servusThread.stopThread(1000);
+#endif
 
 		return;
 	}
@@ -71,7 +71,7 @@ void DashboardManager::setupServer()
 	/*
 	File k = File::getSpecialLocation(File::currentApplicationFile).getParentDirectory().getChildFile("server.key");
 	File c = File::getSpecialLocation(File::currentApplicationFile).getParentDirectory().getChildFile("server.crt");
-	
+
 	if (k.existsAsFile() && c.existsAsFile())
 	{
 		try
@@ -89,10 +89,20 @@ void DashboardManager::setupServer()
 	*/
 	server.reset(new SimpleWebSocketServer());
 	//}
-	
+
 
 	server->handler = this;
-	server->rootPath = serverRootPath;
+
+	File f = Engine::mainEngine->getFile();
+	File serverLocalPath;
+	if(f.existsAsFile()) serverLocalPath = f.getParentDirectory().getChildFile("dashboard");
+	if (serverLocalPath.exists() && serverLocalPath.isDirectory())
+	{
+		LOG("Found local dashboard in project's folder, using this one.");
+		server->rootPath = serverLocalPath;
+	}
+	else server->rootPath = serverRootPath;
+
 	server->addWebSocketListener(this);
 	server->start(port);
 
@@ -115,19 +125,19 @@ void DashboardManager::connectionOpened(const String& id)
 void DashboardManager::messageReceived(const String& id, const String& message)
 {
 	var data;
-	Result result =  JSON::parse(message, data);
+	Result result = JSON::parse(message, data);
 
 	if (result.failed())
 	{
 		DBG("Error parsing: " << message << ", error : " << result.getErrorMessage());
 		return;
 	}
-	
-	
+
+
 	String add = data.getProperty("controlAddress", "");
 	if (add.isNotEmpty())
 	{
-		Controllable * c = Engine::mainEngine->getControllableForAddress(add);
+		Controllable* c = Engine::mainEngine->getControllableForAddress(add);
 		if (c == nullptr)
 		{
 			DBG("Controllable not found for address " << add);
@@ -177,16 +187,46 @@ var DashboardManager::getServerData()
 
 bool DashboardManager::handleHTTPRequest(std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request)
 {
+	String dataStr;
+	SimpleWeb::CaseInsensitiveMultimap header;
+	
 	if (String(request->path) == "/data")
 	{
-
-		var data = getServerData();
-
-		String dataStr = JSON::toString(data, true);
-
-		SimpleWeb::CaseInsensitiveMultimap header;
-		header.emplace("Content-Length", String(dataStr.length()).toStdString());
 		header.emplace("Content-Type", "application/json");
+		var data = getServerData();
+		dataStr = JSON::toString(data, true);
+	}
+	else if (String(request->path) == "/fileData")
+	{
+		SimpleWeb::CaseInsensitiveMultimap query = request->parse_query_string();
+
+		// If key not found in map iterator to end is returned
+		auto arg = query.find("controlAddress");
+		if (arg == query.end())
+		{
+			header.emplace("Content-Type", "text/html");
+			dataStr = "Missing controlAddress argument in query";
+		}
+		else 
+		{
+			if (FileParameter* fp = dynamic_cast<FileParameter*>(Engine::mainEngine->getControllableForAddress(arg->second)))
+			{
+				File f = fp->getFile();
+				if (f.existsAsFile()) server->serveFile(f, response);
+			}
+			else
+			{
+				DBG(arg->second << " has not been found or is not a File Parameter");
+				*response << "HTTP/1.1 404 Not Found";
+			}
+
+			return true;
+		}	
+	}
+
+	if (dataStr.isNotEmpty())
+	{
+		header.emplace("Content-Length", String(dataStr.length()).toStdString());
 		header.emplace("Accept-range", "bytes");
 		header.emplace("Access-Control-Allow-Origin", "*");
 
@@ -240,7 +280,7 @@ void DashboardManager::downloadDashboardFiles()
 	}
 
 	LOG("Downloading dashboard files...");
-	downloadedFileZip = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile(OrganicApplication::getInstance()->getApplicationName()+"/dashboard.zip");
+	downloadedFileZip = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile(OrganicApplication::getInstance()->getApplicationName() + "/dashboard.zip");
 	downloadTask = URL(downloadURL).downloadToFile(downloadedFileZip, "", this);
 
 	if (downloadTask == nullptr)
@@ -255,7 +295,7 @@ void DashboardManager::progress(URL::DownloadTask* task, int64 bytesDownloaded, 
 
 void DashboardManager::finished(URL::DownloadTask* task, bool success)
 {
-	if(success) LOG("Dashboard downloaded. Extracting to " << serverRootPath.getFullPathName());
+	if (success) LOG("Dashboard downloaded. Extracting to " << serverRootPath.getFullPathName());
 	else
 	{
 		LOGERROR("Dashboard download error");
@@ -312,7 +352,7 @@ ServusThread::ServusThread() :
 
 void ServusThread::setupZeroconf()
 {
-	if(ProjectSettings::getInstanceWithoutCreating() == nullptr || ProjectSettings::getInstance()->serverPort == nullptr) return;
+	if (ProjectSettings::getInstanceWithoutCreating() == nullptr || ProjectSettings::getInstance()->serverPort == nullptr) return;
 
 	if (Engine::mainEngine != nullptr && Engine::mainEngine->isClearing) return;
 	if (!isThreadRunning()) startThread();

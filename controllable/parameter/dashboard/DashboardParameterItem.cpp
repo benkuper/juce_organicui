@@ -100,7 +100,7 @@ var DashboardParameterItem::getServerData()
 		if (parameter->type == Controllable::FLOAT) data.getDynamicObject()->setProperty("defaultUI", ((FloatParameter*)parameter.get())->defaultUI);
 	}
 
-	if (btImage->stringValue().isNotEmpty()) data.getDynamicObject()->setProperty("customImage", btImage->stringValue());
+	if (btImage->stringValue().isNotEmpty()) data.getDynamicObject()->setProperty("customImage", btImage->getControlAddress());
 
 
 	if (parameter->type == Parameter::ENUM)

@@ -54,6 +54,6 @@ var DashboardTriggerItem::getServerData()
 {
 	var data = DashboardControllableItem::getServerData();
 	if (bgColor->enabled) data.getDynamicObject()->setProperty("bgColor", bgColor->value);
-	if (customImagePath->enabled) data.getDynamicObject()->setProperty("customImage", customImagePath->value);
+	if (customImagePath->enabled) data.getDynamicObject()->setProperty("customImage", customImagePath->getControlAddress());
 	return data;
 }
