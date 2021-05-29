@@ -43,6 +43,7 @@ public:
 	WeakReference<Controllable> target;
 	WeakReference<ControllableContainer> targetContainer;
 	
+	std::function<bool(Controllable*)> customTargetFilterFunc;
 	std::function<Controllable*(const StringArray &, const StringArray &)> customGetTargetFunc;
 	std::function<String(Controllable*)> customGetControllableLabelFunc;
 	std::function<bool(Controllable*)> customCheckAssignOnNextChangeFunc;

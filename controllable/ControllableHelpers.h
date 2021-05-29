@@ -14,13 +14,16 @@ class ControllableChooserPopupMenu :
 	public PopupMenu
 {
 public:
-	ControllableChooserPopupMenu(ControllableContainer* rootContainer, int indexOffset = 0, int maxSearchLevel = -1, const StringArray & typesFilter = StringArray(), const StringArray & excludeTypeFilters = StringArray());
+	ControllableChooserPopupMenu(ControllableContainer* rootContainer, 
+		int indexOffset = 0, int maxSearchLevel = -1, 
+		const StringArray & typesFilter = StringArray(), const StringArray & excludeTypeFilters = StringArray(), std::function<bool(Controllable *)> filterFunc = nullptr);
 	virtual ~ControllableChooserPopupMenu();
 
 	int indexOffset;
 	int maxDefaultSearchLevel;
 	StringArray typesFilter;
 	StringArray excludeTypesFilter;
+	std::function<bool(Controllable*)> filterFunc;
 
 	Array<Controllable *> controllableList;
 	void populateMenu(PopupMenu *subMenu, ControllableContainer * container, int &currentId, int currentLevel = 0);

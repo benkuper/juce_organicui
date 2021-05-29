@@ -163,7 +163,7 @@ void TargetParameterUI::showPopupAndGetTarget()
 			c = targetParameter->customGetTargetFunc(targetParameter->typesFilter, targetParameter->excludeTypesFilter);
 		} else
 		{
-			ControllableChooserPopupMenu p(targetParameter->rootContainer, 0, targetParameter->maxDefaultSearchLevel, targetParameter->typesFilter, targetParameter->excludeTypesFilter);
+			ControllableChooserPopupMenu p(targetParameter->rootContainer, 0, targetParameter->maxDefaultSearchLevel, targetParameter->typesFilter, targetParameter->excludeTypesFilter, targetParameter->customTargetFilterFunc);
 			c = p.showAndGetControllable();
 		}
 		if (c != nullptr) targetParameter->setValueFromTarget(c);

@@ -11,11 +11,12 @@
 
 //CONTROLLABLE
 
-ControllableChooserPopupMenu::ControllableChooserPopupMenu(ControllableContainer * rootContainer, int _indexOffset, int _maxDefaultSearchLevel, const StringArray & typesFilter, const StringArray& excludeTypesFilter) :
+ControllableChooserPopupMenu::ControllableChooserPopupMenu(ControllableContainer * rootContainer, int _indexOffset, int _maxDefaultSearchLevel, const StringArray & typesFilter, const StringArray& excludeTypesFilter, std::function<bool(Controllable *)> filterFunc) :
 	indexOffset(_indexOffset),
 	maxDefaultSearchLevel(_maxDefaultSearchLevel),
 	typesFilter(typesFilter),
-	excludeTypesFilter(excludeTypesFilter)
+	excludeTypesFilter(excludeTypesFilter),
+	filterFunc(filterFunc)
 {
 	int id = indexOffset + 1;
 
@@ -61,6 +62,7 @@ void ControllableChooserPopupMenu::populateMenu(PopupMenu * subMenu, Controllabl
 
 		if (excludeTypesFilter.contains(c->getTypeString())) continue;
 		if (!typesFilter.isEmpty() && !typesFilter.contains(c->getTypeString())) continue;
+		if (filterFunc != nullptr && !filterFunc(c)) continue;
 
 		subMenu->addItem(currentId, c->niceName);
 		controllableList.add(c);
