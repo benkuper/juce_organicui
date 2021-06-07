@@ -46,7 +46,7 @@ String AppUpdater::getDownloadFileName(StringRef version, bool beta, StringRef _
 #elif JUCE_MAC
 	fileURL += "osx";
 #elif JUCE_LINUX
-	fileURL += "linux";
+	fileURL += "linux-x64";
 #endif
 
 	fileURL += "-" + version + "." + _extension;

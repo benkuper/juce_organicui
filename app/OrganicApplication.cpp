@@ -46,6 +46,7 @@ void OrganicApplication::initialise(const String & commandLine)
 	{
 		if (c.command == "r") clearGlobalSettings();
 		else if (c.command == "c") launchedFromCrash = true;
+		if (c.command == "headless") useWindow = false;
 	}
 
 	GlobalSettings::getInstance()->addChildControllableContainer(&appSettings,false, GlobalSettings::getInstance()->controllableContainers.size()-1);
@@ -53,24 +54,29 @@ void OrganicApplication::initialise(const String & commandLine)
 	var gs = JSON::fromString(getAppProperties().getUserSettings()->getValue("globalSettings", ""));
 	GlobalSettings::getInstance()->loadJSONData(gs);
 
-	jassert(engine != nullptr);
-	if (mainComponent == nullptr) mainComponent = std::make_unique<OrganicMainContentComponent>();
-
+	
 	engine->addAsyncEngineListener(this);
-
 	WarningReporter::getInstance(); //force creation after engine creation
-
 	GlobalSettings::getInstance()->selectionManager = InspectableSelectionManager::mainSelectionManager;
 
 	if (useWindow)
 	{
+		jassert(engine != nullptr);
+		if (mainComponent == nullptr) mainComponent = std::make_unique<OrganicMainContentComponent>();
+		
 		mainWindow.reset(new MainWindow(getApplicationName(), mainComponent.get(), trayIconImage));
 		updateAppTitle();
 	}
 
 	AppUpdater::getInstance()->addAsyncUpdateListener(this);
 
-	if (GlobalSettings::getInstance()->checkUpdatesOnStartup->boolValue()) AppUpdater::getInstance()->checkForUpdates();
+	if (GlobalSettings::getInstance()->checkUpdatesOnStartup->boolValue() 
+		&& !GlobalSettings::getInstance()->launchMinimised->boolValue()
+		&& useWindow	
+	 ) //only checking updates if there is a UI and it's not minimised by default
+	{
+		AppUpdater::getInstance()->checkForUpdates();
+	}
 
 	HelpBox::getInstance()->loadHelp();
 
