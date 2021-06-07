@@ -29,11 +29,9 @@ class OSCRemoteControl :
 #if ORGANICUI_USE_WEBSERVER
 	public SimpleWebSocketServer::Listener,
 	public SimpleWebSocketServer::RequestHandler,
+	public ContainerAsyncListener,
 #endif
-
-	public OSCReceiver::Listener<OSCReceiver::RealtimeCallback>,
-	public ContainerAsyncListener
-
+	public OSCReceiver::Listener<OSCReceiver::RealtimeCallback>
 {
 public: 
 	juce_DeclareSingleton(OSCRemoteControl, true);
@@ -88,9 +86,9 @@ public:
 
 	void sendOSCQueryFeedback(Controllable* c, const String & excludeId = "");
 
+	void newMessage(const ContainerAsyncEvent& e) override;
 #endif
 
-	void newMessage(const ContainerAsyncEvent& e) override;
 
 	class RemoteControlListener
 	{
