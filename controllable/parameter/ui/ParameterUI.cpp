@@ -128,38 +128,33 @@ void ParameterUI::addPopupMenuItems(PopupMenu* p)
 {
 	if (parameter.wasObjectDeleted()) return;
 
-	if (isInteractable() || parameter->controlMode != Parameter::MANUAL)
+	if (isInteractable())
 	{
-		if (isInteractable()) p->addItem(1, "Reset value");
+		p->addItem(1, "Reset value");
+		p->addSeparator();
+		p->addItem(-3, "Show Edit Window");
 
-		if (isInteractable())
+		if (parameter->canHaveRange && parameter->isCustomizableByUser)
 		{
-			p->addSeparator();
-			p->addItem(-3, "Show Edit Window");
-
-			if (parameter->canHaveRange && parameter->isCustomizableByUser)
-			{
-				p->addItem(-4, "Set Range...");
-				if (parameter->hasRange()) p->addItem(-5, "Clear Range");
-			}
-
-			if(showAlwaysNotifyOption) p->addItem(-6, "Always Notify changes", true, parameter->alwaysNotify);
-
-			addPopupMenuItemsInternal(p);
+			p->addItem(-4, "Set Range...");
+			if (parameter->hasRange()) p->addItem(-5, "Clear Range");
 		}
+	}
 
-		if (showControlModeOption)
+	if (showAlwaysNotifyOption) p->addItem(-6, "Always Notify changes", true, parameter->alwaysNotify);
+	addPopupMenuItemsInternal(p);
+
+	if (isInteractable() && showControlModeOption)
+	{
+		p->addSeparator();
+		if (!parameter->lockManualControlMode)
 		{
-			p->addSeparator();
-			if (!parameter->lockManualControlMode)
-			{
-				PopupMenu controlModeMenu;
-				controlModeMenu.addItem(10, "Manual", true, parameter->controlMode == Parameter::MANUAL);
-				controlModeMenu.addItem(11, "Expression", true, parameter->controlMode == Parameter::EXPRESSION);
-				controlModeMenu.addItem(12, "Reference", true, parameter->controlMode == Parameter::REFERENCE);
-				if (parameter->canBeAutomated) controlModeMenu.addItem(13, "Animation", true, parameter->controlMode == Parameter::AUTOMATION);
-				p->addSubMenu("Control Mode", controlModeMenu);
-			}
+			PopupMenu controlModeMenu;
+			controlModeMenu.addItem(10, "Manual", true, parameter->controlMode == Parameter::MANUAL);
+			controlModeMenu.addItem(11, "Expression", true, parameter->controlMode == Parameter::EXPRESSION);
+			controlModeMenu.addItem(12, "Reference", true, parameter->controlMode == Parameter::REFERENCE);
+			if (parameter->canBeAutomated) controlModeMenu.addItem(13, "Animation", true, parameter->controlMode == Parameter::AUTOMATION);
+			p->addSubMenu("Control Mode", controlModeMenu);
 		}
 	}
 }
