@@ -58,9 +58,14 @@ var Dashboard::getServerData()
 	data.getDynamicObject()->setProperty("id", shortName);
 	data.getDynamicObject()->setProperty("name", niceName);
 	data.getDynamicObject()->setProperty("size", itemManager.canvasSize->value);
-	data.getDynamicObject()->setProperty("bgImage", itemManager.bgImage->getControlAddress());
-	data.getDynamicObject()->setProperty("bgImageScale", itemManager.bgImageScale->getValue());
-	data.getDynamicObject()->setProperty("bgImageAlpha", itemManager.bgImageAlpha->getValue());
+
+	if (itemManager.bgImage->stringValue().isNotEmpty())
+	{
+		data.getDynamicObject()->setProperty("bgImage", itemManager.bgImage->getControlAddress());
+		data.getDynamicObject()->setProperty("bgImageScale", itemManager.bgImageScale->getValue());
+		data.getDynamicObject()->setProperty("bgImageAlpha", itemManager.bgImageAlpha->getValue());
+	}
+	
 	itemManager.fillServerData(data);
 	return data;
 }
