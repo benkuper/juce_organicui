@@ -11,9 +11,10 @@ Author:  Ben
 #include "../engine/Engine.h"
 #include "Script.h"
 
-Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled) :
+Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled, bool canBeRemoved) :
 	BaseItem("Script", canBeDisabled, false),
 	Thread("Script"),
+	forceDisabled(false),
 	scriptTemplate(nullptr),
     updateEnabled(false),
     scriptParamsContainer("params"),
@@ -22,6 +23,11 @@ Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled) :
 	scriptAsyncNotifier(10)
 {
 	isSelectable = false;
+
+	userCanRemove = canBeRemoved;
+	userCanDuplicate = canBeRemoved; //if not removable, then not duplicable
+	canBeCopiedAndPasted = canBeRemoved;
+	canBeReorderedInEditor = canBeRemoved;
 
 	filePath = new FileParameter("File Path", "Path to the script file", "");
 	addParameter(filePath);
@@ -221,7 +227,7 @@ void Script::setState(ScriptState newState)
 
 var Script::callFunction(const Identifier & function, const Array<var> args, Result  * result)
 {
-	if (canBeDisabled && !enabled->boolValue()) return false;
+	if (canBeDisabled && (!enabled->boolValue() || forceDisabled)) return false;
 
 	if (scriptEngine == nullptr) return false;
 

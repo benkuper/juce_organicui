@@ -18,10 +18,12 @@ class Script :
 	public EngineListener
 {
 public:
-	Script(ScriptTarget * parentTarget = nullptr, bool canBeDisabled = true);
+	Script(ScriptTarget * parentTarget = nullptr, bool canBeDisabled = true, bool canBeRemoved = true);
 	~Script();
 
 	enum ScriptState {SCRIPT_LOADING, SCRIPT_LOADED, SCRIPT_ERROR, SCRIPT_EMPTY, SCRIPT_CLEAR };
+
+	bool forceDisabled; //for scripts that can not be disabled by users directly
 
 	String * scriptTemplate;
 	FileParameter * filePath;
