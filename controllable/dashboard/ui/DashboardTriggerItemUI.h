@@ -9,7 +9,7 @@ public:
 	~DashboardTriggerItemUI();
 
 	DashboardTriggerItem* triggerItem;
-
+	
 	virtual ControllableUI* createControllableUI() override;
 	virtual void updateUIParameters() override;
 

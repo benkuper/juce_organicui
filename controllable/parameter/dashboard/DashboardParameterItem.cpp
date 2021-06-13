@@ -2,7 +2,7 @@
 
 DashboardParameterItem::DashboardParameterItem(Parameter* parameter) :
 	DashboardControllableItem(parameter),
-	parameter(parameter),
+	parameter(nullptr),
 	bgColor(nullptr), fgColor(nullptr), btImage(nullptr), style(nullptr)
 {
 	

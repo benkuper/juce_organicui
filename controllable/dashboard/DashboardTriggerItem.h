@@ -12,6 +12,7 @@ public:
 
 	ColorParameter * bgColor;
 	FileParameter * customImagePath;
+	BoolParameter* keepSaturation;
 
 	virtual DashboardItemUI* createUI() override;
 

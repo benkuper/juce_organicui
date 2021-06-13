@@ -8,12 +8,12 @@
   ==============================================================================
 */
 
-TriggerImageUI::TriggerImageUI(Trigger * t, const Image &i) :
+TriggerImageUI::TriggerImageUI(Trigger * t, const Image &i, bool keepSaturation) :
 	TriggerUI(t),
 	onImage(i),
 	offImage(i.createCopy()),
 	drawTriggering(false),
-	forceDrawTriggering(false)
+	forceDrawTriggering(keepSaturation)
 {
 	showLabel = false;
 
@@ -32,12 +32,21 @@ void TriggerImageUI::paint(Graphics & g)
 	if (getWidth() == 0 || getHeight() == 0) return;
 
 	g.drawImage((drawTriggering || forceDrawTriggering)?onImage:offImage, getLocalBounds().toFloat());
+	
+	if (forceDrawTriggering && !isMouseButtonDown())
+	{
+		g.setColour(Colours::black.withAlpha(.1f));
+		g.fillRoundedRectangle(getLocalBounds().toFloat(), 4);
+	}
+
+	/*
 	if (isMouseOver() && !trigger->isControllableFeedbackOnly)
 	{
 		g.setColour(HIGHLIGHT_COLOR.withAlpha(.2f));
 		g.fillEllipse(getLocalBounds().reduced(2).toFloat());
 	}
-	
+	*/
+
 	if (showLabel)
 	{
 		Rectangle<int> tr = getLocalBounds().reduced(2);

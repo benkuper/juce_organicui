@@ -6,6 +6,7 @@ DashboardTriggerItem::DashboardTriggerItem(Trigger * item) :
 	bgColor->canBeDisabledByUser = true;
 	customImagePath = addFileParameter("Custom Image", "Choose a custom image instead of the default button");
 	customImagePath->fileTypeFilter = "*.png;*.jpg;*.jpeg;*.gif";
+	keepSaturation = addBoolParameter("Keep Saturation", "If checked, this will keep saturation on the background image", false);
 
 	setInspectable(item);
 	ghostInspectable();
@@ -54,6 +55,11 @@ var DashboardTriggerItem::getServerData()
 {
 	var data = DashboardControllableItem::getServerData();
 	if (bgColor->enabled) data.getDynamicObject()->setProperty("bgColor", bgColor->value);
-	if (customImagePath->enabled) data.getDynamicObject()->setProperty("customImage", customImagePath->getControlAddress());
+	if (customImagePath->enabled)
+	{
+		data.getDynamicObject()->setProperty("customImage", customImagePath->getControlAddress());
+		data.getDynamicObject()->setProperty("keepSaturation", keepSaturation->boolValue());
+	}
+
 	return data;
 }

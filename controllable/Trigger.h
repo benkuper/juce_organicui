@@ -22,7 +22,7 @@ public:
 	
 
 	TriggerButtonUI * createButtonUI();
-	TriggerImageUI * createImageUI(const Image &image);
+	TriggerImageUI * createImageUI(const Image &image, bool keepSaturation = false);
 	TriggerBlinkUI * createBlinkUI();
 	ControllableUI * createDefaultUI() override;
 	

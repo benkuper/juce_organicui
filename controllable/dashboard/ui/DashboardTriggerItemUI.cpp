@@ -1,4 +1,3 @@
-#include "DashboardTriggerItemUI.h"
 
 DashboardTriggerItemUI::DashboardTriggerItemUI(DashboardTriggerItem* triggerItem) :
 	DashboardControllableItemUI(triggerItem),
@@ -18,7 +17,7 @@ ControllableUI* DashboardTriggerItemUI::createControllableUI()
 	if (f.existsAsFile())
 	{
 		Image img = ImageCache::getFromFile(f);
-		return triggerItem->trigger->createImageUI(img);
+		return triggerItem->trigger->createImageUI(img, triggerItem->keepSaturation->boolValue());
 	}
 
 	return DashboardControllableItemUI::createControllableUI();
@@ -43,7 +42,7 @@ void DashboardTriggerItemUI::controllableFeedbackUpdateInternal(Controllable* c)
 {
 	DashboardControllableItemUI::controllableFeedbackUpdateInternal(c);
 
-	if (c == triggerItem->customImagePath) rebuildUI();
+	if (c == triggerItem->customImagePath ||c == triggerItem->keepSaturation) rebuildUI();
 	else if (c == triggerItem->bgColor) updateUIParameters();
 }
 

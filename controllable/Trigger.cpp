@@ -1,4 +1,3 @@
-#include "Trigger.h"
 /*
  ==============================================================================
 
@@ -25,9 +24,9 @@ TriggerButtonUI * Trigger::createButtonUI()
     return new TriggerButtonUI(this);
 }
 
-TriggerImageUI * Trigger::createImageUI(const Image &image)
+TriggerImageUI * Trigger::createImageUI(const Image &image, bool keepSaturation)
 {
-	return new TriggerImageUI(this, image);
+	return new TriggerImageUI(this, image, keepSaturation);
 }
 
 TriggerBlinkUI * Trigger::createBlinkUI()
