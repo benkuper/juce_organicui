@@ -95,10 +95,10 @@ void CrashDumpUploader::handleCrash(int e)
 
 	if (GlobalSettings::getInstance()->enableCrashUpload->boolValue())
 	{
-		traceFile = File::getSpecialLocation(File::currentApplicationFile).getParentDirectory().getChildFile("crashlog.txt");
+		traceFile = recoveredFile.getParentDirectory().getChildFile("crashlog.txt");
 
 #if JUCE_WINDOWS
-		dumpFile = File::getSpecialLocation(File::currentApplicationFile).getParentDirectory().getChildFile("crashlog.dmp");
+		dumpFile = recoveredFile.getParentDirectory().getChildFile("crashlog.dmp");
 #else
 		dumpFile = File();
 #endif
@@ -147,16 +147,19 @@ void CrashDumpUploader::uploadCrash()
 
 	if (dumpFile.existsAsFile())
 	{
+		LOG("Attaching dumpFile " << dumpFile.getFullPathName());
 		url = url.withFileToUpload("dumpFile", dumpFile, "application/octet-stream");
 	}
 
 	if (traceFile.existsAsFile())
 	{
+		LOG("Attaching traceFile " << traceFile.getFullPathName());
 		url = url.withFileToUpload("traceFile", traceFile, "application/octet-stream");
 	}
 
 	if (recoveredFile.existsAsFile())
 	{
+		LOG("Attaching sessionFile " << recoveredFile.getFullPathName());
 		url = url.withFileToUpload("sessionFile", recoveredFile, "application/octet-stream");
 	}
 
@@ -195,7 +198,7 @@ void CrashDumpUploader::uploadCrash()
 
 	if (convertedData.contains("error"))
 	{
-		LOGWARNING("Error during upload");
+		LOGWARNING("Error during upload : " << convertedData);
 	}
 	else if (convertedData.contains("ok"))
 	{
