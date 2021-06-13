@@ -9,7 +9,7 @@
 */
 
 CommentItem::CommentItem() :
-	BaseItem("Comment",false)
+	BaseItem("Comment", false)
 {
 	itemDataType = "Comment";
 	text = addStringParameter("Text", "The comment text", "I Love "+ OrganicApplication::getInstance()->getApplicationName()+ " !");

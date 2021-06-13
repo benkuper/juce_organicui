@@ -71,6 +71,7 @@ void CommentUI::resized()
 {
 	resizer.setBounds(getLocalBounds());
 	textUI.setBounds(getLocalBounds());
+	item->viewUISize->setPoint(getWidth(), getHeight());
 }
 
 void CommentUI::mouseDown(const MouseEvent& e)
