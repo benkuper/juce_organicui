@@ -13,11 +13,11 @@ TriggerImageUI::TriggerImageUI(Trigger * t, const Image &i, bool keepSaturation)
 	onImage(i),
 	offImage(i.createCopy()),
 	drawTriggering(false),
-	forceDrawTriggering(keepSaturation)
+	forceDrawTriggering(false)
 {
 	showLabel = false;
 
-	offImage.desaturate();
+	if(!keepSaturation) offImage.desaturate();
 	if(trigger->isControllableFeedbackOnly) offImage.multiplyAllAlphas(.5f);
 	setRepaintsOnMouseActivity(true);
 }
@@ -31,9 +31,10 @@ void TriggerImageUI::paint(Graphics & g)
 {
 	if (getWidth() == 0 || getHeight() == 0) return;
 
-	g.drawImage((drawTriggering || forceDrawTriggering)?onImage:offImage, getLocalBounds().toFloat());
+	bool drawT = drawTriggering || forceDrawTriggering;
+	g.drawImage(drawT?onImage:offImage, getLocalBounds().toFloat());
 	
-	if (forceDrawTriggering && !isMouseButtonDown())
+	if (!drawT)
 	{
 		g.setColour(Colours::black.withAlpha(.1f));
 		g.fillRoundedRectangle(getLocalBounds().toFloat(), 4);
