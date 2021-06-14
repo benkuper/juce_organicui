@@ -160,19 +160,13 @@ void AppUpdater::run()
 			if (data.getProperty("testing", false)) return;
 #endif
 
-			//bool thisIsBeta = Engine::mainEngine->isBetaVersion;
-
-			bool shouldCheckForBeta = true;
-			if (!GlobalSettings::getInstance()->checkBetaUpdates->boolValue()) shouldCheckForBeta = false;
+			bool shouldCheckForBeta = Engine::mainEngine->isBetaVersion || GlobalSettings::getInstance()->checkBetaUpdates->boolValue();
 
 			var betaData = data.getProperty("betaversion", var());
 			var stableData = data.getProperty("stableversion", var());
 
 			String betaVersion = betaData.getProperty("version", "");
 			String stableVersion = stableData.getProperty("version", "");
-
-
-
 
 			var dataToCheck;
 			bool dataIsBeta = false;
