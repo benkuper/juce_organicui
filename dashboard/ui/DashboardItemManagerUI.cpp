@@ -48,6 +48,12 @@ void DashboardItemManagerUI::paint(Graphics& g)
 	BaseManagerViewUI::paint(g);
 
 	if (manager == nullptr || inspectable.wasObjectDeleted()) return;
+
+	Point<float> p = manager->canvasSize->getPoint();
+	Rectangle<int> canvasR = getBoundsInView(Rectangle<float>().withSizeKeepingCentre(p.x, p.y));
+	g.setColour(manager->bgColor->getColor());
+	g.fillRect(canvasR);
+
 	float alpha = manager->bgImageAlpha->floatValue();
 
 	if (bgImage.isNull() || alpha == 0) return;
@@ -57,8 +63,6 @@ void DashboardItemManagerUI::paint(Graphics& g)
 
 	Rectangle<int> r = getBoundsInView(Rectangle<float>().withSizeKeepingCentre(bgImage.getWidth()*scale, bgImage.getHeight()*scale));
 	g.drawImage(bgImage, r.toFloat(), RectanglePlacement::stretchToFit, false);
-	
-	
 }
 
 void DashboardItemManagerUI::paintOverChildren(Graphics& g)
@@ -168,7 +172,7 @@ void DashboardItemManagerUI::newMessage(const ContainerAsyncEvent& e)
 			else bgImage = Image();
 			repaint();
 		}
-		else if (e.targetControllable == manager->bgImageAlpha || e.targetControllable == manager->bgImageScale || e.targetControllable == manager->canvasSize)
+		else if (e.targetControllable == manager->bgColor || e.targetControllable == manager->bgImageAlpha || e.targetControllable == manager->bgImageScale || e.targetControllable == manager->canvasSize)
 		{
 			repaint();
 		}

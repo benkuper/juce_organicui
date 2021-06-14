@@ -49,6 +49,11 @@ public:
 	BoolParameter* editMode;
 	BoolParameter* snapping;
 
+	ColorParameter* tabsBGColor;
+	ColorParameter* tabsLabelColor;
+	ColorParameter* tabsBorderColor;
+	FloatParameter * tabsBorderWidth;
+
 	CommentManager commentManager;
 
 

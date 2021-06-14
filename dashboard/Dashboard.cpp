@@ -13,7 +13,7 @@ Dashboard::Dashboard() :
 	BaseItem("Dashboard", false),
 	isBeingEdited(false)
 {
-	itemManager.editorIsCollapsed = true;
+	//itemManager.editorIsCollapsed = true;
 	addChildControllableContainer(&itemManager);
 	itemManager.addBaseManagerListener(this);
 }
@@ -58,6 +58,7 @@ var Dashboard::getServerData()
 	data.getDynamicObject()->setProperty("id", shortName);
 	data.getDynamicObject()->setProperty("name", niceName);
 	data.getDynamicObject()->setProperty("size", itemManager.canvasSize->value);
+	data.getDynamicObject()->setProperty("bgColor", itemManager.bgColor->value);
 
 	if (itemManager.bgImage->stringValue().isNotEmpty())
 	{

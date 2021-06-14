@@ -19,6 +19,11 @@ DashboardManager::DashboardManager() :
 	editMode = addBoolParameter("Edit Mode", "If checked, items are editable. If not, items are normally usable", true);
 	snapping = addBoolParameter("Snapping", "If checked, items are automatically aligned when dragging them closed to other ones", true);
 
+	tabsBGColor = addColorParameter("Tabs BG Color", "Color for the tabs in the web view", NORMAL_COLOR);
+	tabsLabelColor = addColorParameter("Tabs Label Color","Color for the tabs in the web view", TEXT_COLOR);
+	tabsBorderColor = addColorParameter("Tabs Border Color", "Color for the tabs in the web view", Colours::black);
+	tabsBorderWidth = addFloatParameter("Tabs Border Width","Width for the border of tabs in the web view", 0, 0);
+
 #if ORGANICUI_USE_WEBSERVER
 	serverRootPath = File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory).getChildFile(OrganicApplication::getInstance()->getApplicationName() + "/dashboard");
 #endif
@@ -246,6 +251,13 @@ bool DashboardManager::handleHTTPSRequest(std::shared_ptr<HttpsServer::Response>
 	{
 
 		var data = getServerData();
+		
+		var tabsData(new DynamicObject());
+		tabsData.getDynamicObject()->setProperty("bgColor", tabsBGColor->value);
+		tabsData.getDynamicObject()->setProperty("labelColor", tabsLabelColor->value);
+		tabsData.getDynamicObject()->setProperty("borderColor", tabsBorderColor->value);
+		tabsData.getDynamicObject()->setProperty("borderWidth", tabsBorderWidth->floatValue());
+		data.getDynamicObject()->setProperty("tabs", tabsData);
 
 		String dataStr = JSON::toString(data, true);
 
