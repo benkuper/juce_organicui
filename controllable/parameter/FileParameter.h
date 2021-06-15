@@ -45,6 +45,9 @@ public:
 	static var writeFileFromScript(const juce::var::NativeFunctionArgs& a);
 	static var getAbsolutePathFromScript(const juce::var::NativeFunctionArgs& a);
 	static var launchFileFromScript(const juce::var::NativeFunctionArgs& a);
+	static var listFilesFromScript(const juce::var::NativeFunctionArgs& a);
+
+	virtual void setAttribute(String param, var paramVal) override;
 
 
 	static StringParameter * create() { return new FileParameter("New FileParameter", "",""); }

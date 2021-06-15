@@ -22,6 +22,7 @@ FileParameter::FileParameter(const String & niceName, const String &description,
 	scriptObject.setMethod("writeFile", FileParameter::writeFileFromScript);
 	scriptObject.setMethod("getAbsolutePath", FileParameter::getAbsolutePathFromScript);
 	scriptObject.setMethod("launchFile", FileParameter::launchFileFromScript);
+	scriptObject.setMethod("listFiles", FileParameter::listFilesFromScript);
 
 	if(Engine::mainEngine != nullptr) Engine::mainEngine->addEngineListener(this);
 }
@@ -171,4 +172,31 @@ var FileParameter::launchFileFromScript(const juce::var::NativeFunctionArgs& a)
 
 	if (f.existsAsFile()) f.startAsProcess(a.numArguments > 0 ? a.arguments[0].toString() : "");
 	return var();
+}
+
+var FileParameter::listFilesFromScript(const juce::var::NativeFunctionArgs& a)
+{
+	FileParameter* p = getObjectFromJS<FileParameter>(a);
+	File f = p->getFile();
+
+	var result;
+
+	if (f.exists() && f.isDirectory())
+	{
+		int whatToLook = 0;
+		if (a.numArguments == 0 || a.arguments[0]) whatToLook += File::findFiles;
+		if (a.numArguments > 1 && a.arguments[1]) whatToLook += File::findDirectories;
+		Array<File> files = f.findChildFiles(whatToLook, a.numArguments > 2 && a.arguments[2], a.numArguments > 3 ? a.arguments[3].toString() : "*");
+
+		for (auto& ff : files) result.append(ff.getFullPathName());
+	}
+
+	return result;
+}
+
+
+void FileParameter::setAttribute(String param, var paramVal)
+{
+	StringParameter::setAttribute(param, paramVal);
+	if (param == "directoryMode") directoryMode = paramVal;
 }
