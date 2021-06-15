@@ -65,13 +65,12 @@ void ControllableUI::mouseEnter(const MouseEvent & e)
 
 void ControllableUI::mouseExit(const MouseEvent & e)
 {
-	setTooltip(tooltip); //restore tooltip when leaving
 	if (controllable != nullptr && !controllable.wasObjectDeleted())
 	{
 		HelpBox::getInstance()->clearOverData(controllable->helpID);
 		if (drawContourOnInspectableHighlighted) controllable->highlightLinkedInspectables(false);
+		setTooltip(tooltip); //restore tooltip when leaving
 	}
-
 }
 
 void ControllableUI::mouseDown(const MouseEvent & e)
