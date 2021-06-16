@@ -199,6 +199,14 @@ bool DashboardManager::handleHTTPRequest(std::shared_ptr<HttpServer::Response> r
 	{
 		header.emplace("Content-Type", "application/json");
 		var data = getServerData();
+
+		var tabsData(new DynamicObject());
+		tabsData.getDynamicObject()->setProperty("bgColor", tabsBGColor->value);
+		tabsData.getDynamicObject()->setProperty("labelColor", tabsLabelColor->value);
+		tabsData.getDynamicObject()->setProperty("borderColor", tabsBorderColor->value);
+		tabsData.getDynamicObject()->setProperty("borderWidth", tabsBorderWidth->floatValue());
+		data.getDynamicObject()->setProperty("tabs", tabsData);
+
 		dataStr = JSON::toString(data, true);
 	}
 	else if (String(request->path) == "/fileData")
@@ -249,7 +257,6 @@ bool DashboardManager::handleHTTPSRequest(std::shared_ptr<HttpsServer::Response>
 {
 	if (String(request->path) == "/data")
 	{
-
 		var data = getServerData();
 		
 		var tabsData(new DynamicObject());
