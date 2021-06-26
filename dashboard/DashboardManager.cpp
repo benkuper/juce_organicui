@@ -263,6 +263,9 @@ bool DashboardManager::handleHTTPRequest(std::shared_ptr<HttpServer::Response> r
 #if SIMPLEWEB_SECURE_SUPPORTED
 bool DashboardManager::handleHTTPSRequest(std::shared_ptr<HttpsServer::Response> response, std::shared_ptr<HttpsServer::Request> request)
 {
+	String dataStr;
+	SimpleWeb::CaseInsensitiveMultimap header; 
+
 	if (String(request->path) == "/data")
 	{
 		var data = getServerData();
@@ -278,9 +281,8 @@ bool DashboardManager::handleHTTPSRequest(std::shared_ptr<HttpsServer::Response>
 		tabsData.getDynamicObject()->setProperty("borderWidthSelected", tabsSelectedBorderWidth->floatValue());
 		data.getDynamicObject()->setProperty("tabs", tabsData);
 
-		String dataStr = JSON::toString(data, true);
+		dataStr = JSON::toString(data, true);
 
-		SimpleWeb::CaseInsensitiveMultimap header;
 		header.emplace("Content-Length", String(dataStr.length()).toStdString());
 		header.emplace("Content-Type", "application/json");
 		header.emplace("Accept-range", "bytes");
@@ -290,6 +292,33 @@ bool DashboardManager::handleHTTPSRequest(std::shared_ptr<HttpsServer::Response>
 		*response << dataStr;
 
 		return true;
+	}
+	else if (String(request->path) == "/fileData")
+	{
+		SimpleWeb::CaseInsensitiveMultimap query = request->parse_query_string();
+
+		// If key not found in map iterator to end is returned
+		auto arg = query.find("controlAddress");
+		if (arg == query.end())
+		{
+			header.emplace("Content-Type", "text/html");
+			dataStr = "Missing controlAddress argument in query";
+		}
+		else
+		{
+			if (FileParameter* fp = dynamic_cast<FileParameter*>(Engine::mainEngine->getControllableForAddress(arg->second)))
+			{
+				File f = fp->getFile();
+				if (f.existsAsFile()) server->serveFile(f, response);
+			}
+			else
+			{
+				DBG(arg->second << " has not been found or is not a File Parameter");
+				*response << "HTTP/1.1 404 Not Found";
+			}
+
+			return true;
+		}
 	}
 
 	return false;
