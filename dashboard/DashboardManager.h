@@ -53,6 +53,10 @@ public:
 	ColorParameter* tabsLabelColor;
 	ColorParameter* tabsBorderColor;
 	FloatParameter * tabsBorderWidth;
+	ColorParameter* tabsSelectedBGColor;
+	ColorParameter* tabsSelectedLabelColor;
+	ColorParameter* tabsSelectedBorderColor;
+	FloatParameter* tabsSelectedBorderWidth;
 
 	CommentManager commentManager;
 

@@ -23,6 +23,10 @@ DashboardManager::DashboardManager() :
 	tabsLabelColor = addColorParameter("Tabs Label Color","Color for the tabs in the web view", TEXT_COLOR);
 	tabsBorderColor = addColorParameter("Tabs Border Color", "Color for the tabs in the web view", Colours::black);
 	tabsBorderWidth = addFloatParameter("Tabs Border Width","Width for the border of tabs in the web view", 0, 0);
+	tabsSelectedBGColor = addColorParameter("Tabs Selected BG Color", "Color for the tabs in the web view", GREEN_COLOR);
+	tabsSelectedLabelColor = addColorParameter("Tabs Selected Label Color", "Color for the tabs in the web view", TEXT_COLOR);
+	tabsSelectedBorderColor = addColorParameter("Tabs Selected Border Color", "Color for the tabs in the web view", Colours::black);
+	tabsSelectedBorderWidth = addFloatParameter("Tabs Selected Border Width", "Width for the border of tabs in the web view", 0, 0);
 
 #if ORGANICUI_USE_WEBSERVER
 	serverRootPath = File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory).getChildFile(OrganicApplication::getInstance()->getApplicationName() + "/dashboard");
@@ -205,6 +209,10 @@ bool DashboardManager::handleHTTPRequest(std::shared_ptr<HttpServer::Response> r
 		tabsData.getDynamicObject()->setProperty("labelColor", tabsLabelColor->value);
 		tabsData.getDynamicObject()->setProperty("borderColor", tabsBorderColor->value);
 		tabsData.getDynamicObject()->setProperty("borderWidth", tabsBorderWidth->floatValue());
+		tabsData.getDynamicObject()->setProperty("bgColorSelected", tabsSelectedBGColor->value);
+		tabsData.getDynamicObject()->setProperty("labelColorSelected", tabsSelectedLabelColor->value);
+		tabsData.getDynamicObject()->setProperty("borderColorSelected", tabsSelectedBorderColor->value);
+		tabsData.getDynamicObject()->setProperty("borderWidthSelected", tabsSelectedBorderWidth->floatValue()); 
 		data.getDynamicObject()->setProperty("tabs", tabsData);
 
 		dataStr = JSON::toString(data, true);
@@ -264,6 +272,10 @@ bool DashboardManager::handleHTTPSRequest(std::shared_ptr<HttpsServer::Response>
 		tabsData.getDynamicObject()->setProperty("labelColor", tabsLabelColor->value);
 		tabsData.getDynamicObject()->setProperty("borderColor", tabsBorderColor->value);
 		tabsData.getDynamicObject()->setProperty("borderWidth", tabsBorderWidth->floatValue());
+		tabsData.getDynamicObject()->setProperty("bgColorSelected", tabsSelectedBGColor->value);
+		tabsData.getDynamicObject()->setProperty("labelColorSelected", tabsSelectedLabelColor->value);
+		tabsData.getDynamicObject()->setProperty("borderColorSelected", tabsSelectedBorderColor->value);
+		tabsData.getDynamicObject()->setProperty("borderWidthSelected", tabsSelectedBorderWidth->floatValue());
 		data.getDynamicObject()->setProperty("tabs", tabsData);
 
 		String dataStr = JSON::toString(data, true);
