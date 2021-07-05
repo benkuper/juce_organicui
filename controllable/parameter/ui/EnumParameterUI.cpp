@@ -1,4 +1,3 @@
-#include "EnumParameterUI.h"
 /*
   ==============================================================================
 
@@ -42,6 +41,8 @@ void EnumParameterUI::updateComboBox()
 	cb.clear(dontSendNotification);
 	idKeyMap.clear();
 
+	if (parameter.wasObjectDeleted()) return;
+	
 	int id = 1;
 	for(auto &ev : ep->enumValues)
 	{
