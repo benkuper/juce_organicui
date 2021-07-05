@@ -47,7 +47,8 @@ TimeLabel * FloatParameter::createTimeLabelParameter(FloatParameter * target)
 ControllableUI * FloatParameter::createDefaultUI() {
 	UIType t = customUI != NONE ? customUI : defaultUI;
 
-	if (t == NONE) t = hasRange()?SLIDER:LABEL;
+	bool hasFullRange = ((float)minimumValue != INT32_MIN && (float)maximumValue != INT32_MAX);
+	if (t == NONE) t = hasFullRange?SLIDER:LABEL;
 
 	switch (t)
 	{
@@ -86,7 +87,7 @@ void FloatParameter::setValueInternal(var& val)
 
 bool FloatParameter::hasRange()
 {
-	return (float)minimumValue != INT32_MIN && (float)maximumValue != INT32_MAX;
+	return (float)minimumValue != INT32_MIN || (float)maximumValue != INT32_MAX;
 }
 
 
