@@ -163,7 +163,8 @@ var ScriptUtil::encodeHMAC_SHA1(const var::NativeFunctionArgs& a)
 var ScriptUtil::toBase64(const var::NativeFunctionArgs& a)
 {
 	if (a.numArguments < 1) return 0;
-	return base64_encode((const unsigned char *)a.arguments[0].toString().toStdString().c_str(), a.arguments[0].toString().length());
+	std::string result = base64_encode((const unsigned char *)a.arguments[0].toString().toStdString().c_str(), a.arguments[0].toString().length());
+	return String(result);
 }
 
 var ScriptUtil::fromBase64(const var::NativeFunctionArgs& a)
