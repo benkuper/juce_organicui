@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    ScriptUtil.h
-    Created: 21 Feb 2017 8:44:28am
-    Author:  Ben
+	ScriptUtil.h
+	Created: 21 Feb 2017 8:44:28am
+	Author:  Ben
 
   ==============================================================================
 */
@@ -16,14 +16,14 @@ class ScriptUtil :
 public:
 	juce_DeclareSingleton(ScriptUtil, true)
 
-	ScriptUtil();
+		ScriptUtil();
 	~ScriptUtil() {}
 
 	static var getTime(const var::NativeFunctionArgs& a);
-	static var getTimestamp(const var::NativeFunctionArgs &a);
-	static var getFloatFromBytes(const var::NativeFunctionArgs &a);
-	static var getInt32FromBytes(const var::NativeFunctionArgs &a);
-	static var getInt64FromBytes(const var::NativeFunctionArgs &a);
+	static var getTimestamp(const var::NativeFunctionArgs& a);
+	static var getFloatFromBytes(const var::NativeFunctionArgs& a);
+	static var getInt32FromBytes(const var::NativeFunctionArgs& a);
+	static var getInt64FromBytes(const var::NativeFunctionArgs& a);
 
 	static var getObjectProperties(const var::NativeFunctionArgs& a);
 	static var getObjectMethods(const var::NativeFunctionArgs& a);
@@ -33,6 +33,7 @@ public:
 	static var encodeHMAC_SHA1(const var::NativeFunctionArgs& a);
 
 	static var toBase64(const var::NativeFunctionArgs& a);
+	static var fromBase64(const var::NativeFunctionArgs& a);
 
 	static var fileExistsFromScript(const var::NativeFunctionArgs& args);
 	static var readFileFromScript(const var::NativeFunctionArgs& args);
@@ -52,4 +53,9 @@ public:
 	static var showMessageBox(const var::NativeFunctionArgs& args);
 	static var showOkCancelBox(const var::NativeFunctionArgs& args);
 	static var showYesNoCancelBox(const var::NativeFunctionArgs& args);
+
+
+	//Helpers
+	static std::string base64_encode(unsigned char const* src, unsigned int len);
+	static std::string base64_decode(std::string const& data);
 };
