@@ -34,6 +34,7 @@ public:
 
 	static var toBase64(const var::NativeFunctionArgs& a);
 	static var fromBase64(const var::NativeFunctionArgs& a);
+	static var fromBase64Bytes(const var::NativeFunctionArgs& a);
 
 	static var fileExistsFromScript(const var::NativeFunctionArgs& args);
 	static var readFileFromScript(const var::NativeFunctionArgs& args);
@@ -58,4 +59,5 @@ public:
 	//Helpers
 	static std::string base64_encode(unsigned char const* src, unsigned int len);
 	static std::string base64_decode(std::string const& data);
+	static var base64_decode_bytes(const String & data);
 };

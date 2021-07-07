@@ -1,4 +1,3 @@
-#include "ScriptUtil.h"
 /*
   ==============================================================================
 
@@ -29,6 +28,7 @@ ScriptUtil::ScriptUtil() :
 	scriptObject.setMethod("encodeHMAC_SHA1", ScriptUtil::encodeHMAC_SHA1);
 	scriptObject.setMethod("toBase64", ScriptUtil::toBase64);
 	scriptObject.setMethod("fromBase64", ScriptUtil::fromBase64);
+	scriptObject.setMethod("fromBase64Bytes", ScriptUtil::fromBase64Bytes);
 
 	scriptObject.setMethod("fileExists", ScriptUtil::fileExistsFromScript);
 	scriptObject.setMethod("readFile", ScriptUtil::readFileFromScript);
@@ -173,9 +173,13 @@ var ScriptUtil::fromBase64(const var::NativeFunctionArgs& a)
 
 	var result;
 	String s = base64_decode((const std::string)a.arguments[0].toString().toStdString());
-	CharPointer_UTF8 cp = s.getCharPointer();
-	for (int i = 0; i < s.length(); i++) result.append((uint8_t)cp[i]);
-	return result;
+	return s;
+}
+
+var ScriptUtil::fromBase64Bytes(const var::NativeFunctionArgs& a)
+{
+	if (a.numArguments < 1) return 0;
+	return base64_decode_bytes(a.arguments[0].toString());
 }
 
 var ScriptUtil::fileExistsFromScript(const var::NativeFunctionArgs& args)
@@ -510,4 +514,48 @@ inline std::string ScriptUtil::base64_decode(std::string const& data)
 		}
 	}
 	return str;
+}
+
+var ScriptUtil::base64_decode_bytes(const String& data)
+{
+	const int B64index[256] = { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+		0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+		0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 62, 63, 62, 62, 63, 52, 53, 54, 55,
+		56, 57, 58, 59, 60, 61,  0,  0,  0,  0,  0,  0,  0,  0,  1,  2,  3,  4,  5,  6,
+		7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,  0,
+		0,  0,  0, 63,  0, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
+		41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51 };
+	
+	CharPointer_UTF8 p = data.getCharPointer();
+	//unsigned char* p = (unsigned char*)data.toStdString().c_str();
+	int len = data.length();
+	int pad = len > 0 && (len % 4 || p[len - 1] == '=');
+	const size_t L = ((len + 3) / 4 - pad) * 4;
+	var result;
+	//result.resize(L);
+	//std::string str(L / 4 * 3 + pad, '\0');
+
+	for (size_t i = 0, j = 0; i < L; i += 4)
+	{
+		int n = B64index[p[i]] << 18 | B64index[p[i + 1]] << 12 | B64index[p[i + 2]] << 6 | B64index[p[i + 3]];
+		//result[j++] = n >> 16;
+		//result[j++] = n >> 8 & 0xFF;
+		//result[j++] = n & 0xFF;
+		result.append(n >> 16);
+		result.append(n >> 8 & 0xFF);
+		result.append(n & 0xFF);
+		j += 3;
+	}
+	if (pad)
+	{
+		int n = B64index[p[L]] << 18 | B64index[p[L + 1]] << 12;
+		result.append(n >> 16);
+
+		if (len > L + 2 && p[L + 2] != '=')
+		{
+			n |= B64index[p[L + 2]] << 6;
+			result.append(n >> 8 & 0xFF);
+		}
+	}
+	return result;
 }
