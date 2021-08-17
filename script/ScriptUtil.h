@@ -39,6 +39,7 @@ public:
 	static var fileExistsFromScript(const var::NativeFunctionArgs& args);
 	static var readFileFromScript(const var::NativeFunctionArgs& args);
 	static var writeFileFromScript(const var::NativeFunctionArgs& args);
+	static var writeBytesFromScript(const var::NativeFunctionArgs& args);
 	static var directoryExistsFromScript(const var::NativeFunctionArgs& args);
 	static var createDirectoryFromScript(const var::NativeFunctionArgs& args);
 	static var launchFileFromScript(const var::NativeFunctionArgs& args);
@@ -57,6 +58,9 @@ public:
 
 
 	//Helpers
+
+	static File getFileFromArgs(const var::NativeFunctionArgs& args, int deleteIfExistFromArg = -1);
+
 	static std::string base64_encode(unsigned char const* src, unsigned int len);
 	static std::string base64_decode(std::string const& data);
 	static var base64_decode_bytes(const String & data);

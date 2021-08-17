@@ -33,6 +33,7 @@ ScriptUtil::ScriptUtil() :
 	scriptObject.setMethod("fileExists", ScriptUtil::fileExistsFromScript);
 	scriptObject.setMethod("readFile", ScriptUtil::readFileFromScript);
 	scriptObject.setMethod("writeFile", ScriptUtil::writeFileFromScript);
+	scriptObject.setMethod("writeBytes", ScriptUtil::writeBytesFromScript);
 	scriptObject.setMethod("directoryExists", ScriptUtil::directoryExistsFromScript);
 	scriptObject.setMethod("createDirectory", ScriptUtil::createDirectoryFromScript);
 	scriptObject.setMethod("launchFile", ScriptUtil::launchFileFromScript);
@@ -190,23 +191,7 @@ var ScriptUtil::fileExistsFromScript(const var::NativeFunctionArgs& args)
 
 var ScriptUtil::readFileFromScript(const var::NativeFunctionArgs& args)
 {
-	String path = args.arguments[0].toString();
-
-	if (!File::isAbsolutePath(path))
-	{
-		File folder = Engine::mainEngine->getFile().getParentDirectory();
-		if (args.numArguments >= 3 && (int)args.arguments[2])
-		{
-			String scriptPath = args.thisObject.getProperty("scriptPath", "").toString();
-			folder = File(scriptPath).getParentDirectory();
-		}
-
-		path = folder.getChildFile(path).getFullPathName();
-	}
-
-	File f(path);
-
-
+	File f = getFileFromArgs(args);
 	if (!f.existsAsFile())
 	{
 		LOGWARNING("File not found : " << f.getFullPathName());
@@ -227,34 +212,8 @@ var ScriptUtil::readFileFromScript(const var::NativeFunctionArgs& args)
 var ScriptUtil::writeFileFromScript(const var::NativeFunctionArgs& args)
 {
 	if (args.numArguments < 2) return false;
-
-	String path = args.arguments[0].toString();
-
-	if (!File::isAbsolutePath(path))
-	{
-		File folder = Engine::mainEngine->getFile().getParentDirectory();
-		if (args.numArguments >= 3 && (int)args.arguments[2])
-		{
-			String scriptPath = args.thisObject.getProperty("scriptPath", "").toString();
-			folder = File(scriptPath).getParentDirectory();
-		}
-
-		path = folder.getChildFile(path).getFullPathName();
-	}
-
-
-	File f(path);
-
-	bool overwriteIfExists = args.numArguments > 2 ? ((int)args.arguments[2] > 0) : false;
-	if (f.existsAsFile())
-	{
-		if (overwriteIfExists) f.deleteFile();
-		else
-		{
-			LOG("File already exists : " << f.getFileName() << ", you need to enable overwrite to replace its content.");
-			return false;
-		}
-	}
+	File f = getFileFromArgs(args, 2);
+	if (f == File()) return false;
 
 	FileOutputStream fs(f);
 	if (args.arguments[1].isObject())
@@ -264,6 +223,30 @@ var ScriptUtil::writeFileFromScript(const var::NativeFunctionArgs& args)
 	}
 
 	return fs.writeText(args.arguments[1].toString(), false, false, "\n");
+}
+
+var ScriptUtil::writeBytesFromScript(const var::NativeFunctionArgs& args)
+{
+	if (args.numArguments < 2) return false;
+	File f = getFileFromArgs(args, 2);
+	if (f == File()) return false;
+
+	FileOutputStream fs(f);
+	Array<uint8_t> bytes;
+	if (args.arguments[1].isArray())
+	{
+		for (int i = 0; i < args.arguments[1].size(); i++)
+		{
+			bytes.add((uint8_t)(int)args.arguments[1][i]);
+		}
+	}
+	else
+	{
+		LOGWARNING("Write bytes needs an array of bytes");
+		return false;
+	}
+
+	return fs.write(bytes.getRawDataPointer(), bytes.size());
 }
 
 var ScriptUtil::directoryExistsFromScript(const var::NativeFunctionArgs& args)
@@ -430,6 +413,41 @@ var ScriptUtil::showYesNoCancelBox(const var::NativeFunctionArgs& args)
 	int result = AlertWindow::showYesNoCancelBox(iconType, title, message, button1Text, button2Text, button3Text);
 
 	return result;
+}
+
+File ScriptUtil::getFileFromArgs(const var::NativeFunctionArgs& args, int deleteIfExistsFromArg)
+{
+	String path = args.arguments[0].toString();
+
+	if (!File::isAbsolutePath(path))
+	{
+		File folder = Engine::mainEngine->getFile().getParentDirectory();
+		if (!Engine::mainEngine->getFile().existsAsFile())
+		{
+			String scriptPath = args.thisObject.getProperty("scriptPath", "").toString();
+			folder = File(scriptPath).getParentDirectory();
+		}
+
+		path = folder.getChildFile(path).getFullPathName();
+	}
+
+	File f(path);
+
+	if (deleteIfExistsFromArg > 0)
+	{
+		bool overwriteIfExists = args.numArguments > deleteIfExistsFromArg ? ((int)args.arguments[deleteIfExistsFromArg] > 0) : false;
+		if (f.existsAsFile())
+		{
+			if (overwriteIfExists) f.deleteFile();
+			else
+			{
+				LOG("File already exists : " << f.getFileName() << ", you need to enable overwrite to replace its content.");
+				return File();
+			}
+		}
+	}
+
+	return f;
 }
 
 inline std::string ScriptUtil::base64_encode(unsigned char const* src, unsigned int len) {
