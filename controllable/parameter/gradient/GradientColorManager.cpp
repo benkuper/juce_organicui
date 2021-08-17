@@ -46,6 +46,10 @@ GradientColorManager::GradientColorManager(float maxPosition, bool addDefaultCol
 	}
 
 	currentColor->setColor(getColorForPosition(position->floatValue()));
+
+	scriptObject.setMethod("getColorAtPosition", &GradientColorManager::getColorAtPositionFromScript);
+	scriptObject.setMethod("getKeyAtPosition", &GradientColorManager::getKeyAtPositionFromScript);
+	scriptObject.setMethod("getKeysBetween", &GradientColorManager::getKeysBetweenFromScript);
 }
 
 GradientColorManager::~GradientColorManager()
@@ -277,6 +281,37 @@ void GradientColorManager::onControllableFeedbackUpdate(ControllableContainer * 
 		currentColor->setColor(getColorForPosition(position->floatValue()));
 	}
 }
+
+var GradientColorManager::getColorAtPositionFromScript(const juce::var::NativeFunctionArgs& a)
+{
+	GradientColorManager* au = getObjectFromJS<GradientColorManager>(a);
+	if (!checkNumArgs(au->niceName, a, 1)) return var();
+	Colour c = au->getColorForPosition(a.arguments[0]);
+	var result;
+	result.append(c.getFloatRed());
+	result.append(c.getFloatGreen());
+	result.append(c.getFloatBlue());
+	result.append(c.getFloatAlpha());
+	return result;
+}
+
+var GradientColorManager::getKeyAtPositionFromScript(const juce::var::NativeFunctionArgs& a)
+{
+	GradientColorManager* au = getObjectFromJS<GradientColorManager>(a);
+	if (!checkNumArgs(au->niceName, a, 1)) return var();
+	return au->getItemAt(a.arguments[0])->getScriptObject();
+}
+
+var GradientColorManager::getKeysBetweenFromScript(const juce::var::NativeFunctionArgs& a)
+{
+	GradientColorManager* au = getObjectFromJS<GradientColorManager>(a);
+	if (!checkNumArgs(au->niceName, a, 2)) return var();
+	var result = var();
+	Array<GradientColor* > keys = au->getItemsInTimespan(a.arguments[0], a.arguments[1]);
+	for (auto& k : keys) result.append(k->getScriptObject());
+	return result;
+}
+
 
 void GradientColorManager::loadJSONDataInternal(var data)
 {

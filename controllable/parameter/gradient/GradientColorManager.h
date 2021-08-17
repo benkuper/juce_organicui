@@ -67,6 +67,10 @@ public:
 	void onContainerParameterChanged(Parameter *) override;
 	void onControllableFeedbackUpdate(ControllableContainer * cc, Controllable * c) override;
 
+	static var getColorAtPositionFromScript(const juce::var::NativeFunctionArgs& a);
+	static var getKeyAtPositionFromScript(const juce::var::NativeFunctionArgs& a);
+	static var getKeysBetweenFromScript(const juce::var::NativeFunctionArgs& a);
+
 	void loadJSONDataInternal(var data) override;
 
 	InspectableEditor* getEditor(bool isRoot) override;

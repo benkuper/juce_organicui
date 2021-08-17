@@ -20,6 +20,7 @@ FileParameter::FileParameter(const String & niceName, const String &description,
 
 	scriptObject.setMethod("readFile", FileParameter::readFileFromScript);
 	scriptObject.setMethod("writeFile", FileParameter::writeFileFromScript);
+	scriptObject.setMethod("writeBytes", FileParameter::writeBytesFromScript);
 	scriptObject.setMethod("getAbsolutePath", FileParameter::getAbsolutePathFromScript);
 	scriptObject.setMethod("launchFile", FileParameter::launchFileFromScript);
 	scriptObject.setMethod("listFiles", FileParameter::listFilesFromScript);
@@ -157,6 +158,43 @@ var FileParameter::writeFileFromScript(const juce::var::NativeFunctionArgs& a)
 	}
 	
 	return fs.writeText(a.arguments[0].toString(), false, false, "\n");
+}
+
+var FileParameter::writeBytesFromScript(const juce::var::NativeFunctionArgs& a)
+{
+	if (a.numArguments == 0) return false;
+
+	FileParameter* p = getObjectFromJS<FileParameter>(a);
+	File f = p->getFile();
+
+	bool overwriteIfExists = a.numArguments > 1 ? ((int)a.arguments[1] > 0) : false;
+	if (f.existsAsFile())
+	{
+		if (overwriteIfExists) f.deleteFile();
+		else
+		{
+			LOG("File already exists : " << f.getFileName() << ", you need to enable overwrite to replace its content.");
+			return false;
+		}
+	}
+
+	FileOutputStream fs(f);
+	Array<uint8_t> bytes;
+	if (a.arguments[0].isArray())
+	{
+		for (int i = 0; i < a.arguments[0].size(); i++)
+		{
+			bytes.add((uint8_t)(int)a.arguments[0][i]);
+		}
+		return true;
+	}
+	else
+	{
+		LOGWARNING("Write bytes needs an array of bytes");
+		return false;
+	}
+
+	return fs.write(bytes.getRawDataPointer(), bytes.size());
 }
 
 var FileParameter::getAbsolutePathFromScript(const juce::var::NativeFunctionArgs& a)
