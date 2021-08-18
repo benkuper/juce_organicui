@@ -31,6 +31,9 @@ Parameter::Parameter(const Type& type, const String& niceName, const String& des
 
 	scriptObject.setMethod("get", Parameter::getValueFromScript);
 	scriptObject.setMethod("set", Controllable::setValueFromScript);
+	scriptObject.setMethod("getRange", Parameter::getRangeFromScript);
+	scriptObject.setMethod("setRange", Parameter::setRangeFromScript);
+	scriptObject.setMethod("hasRange", Parameter::hasRangeFromScript);
 }
 
 Parameter::~Parameter() 
@@ -492,6 +495,47 @@ var Parameter::getValueFromScript(const juce::var::NativeFunctionArgs & a)
 	WeakReference<Parameter> pRef(p); 
 	if (pRef == nullptr || pRef.wasObjectDeleted()) return var();
 	return p->getValue();
+}
+
+var Parameter::getRangeFromScript(const juce::var::NativeFunctionArgs& a)
+{
+	Parameter* p = getObjectFromJS<Parameter>(a);
+	if (p == nullptr) return var();
+	WeakReference<Parameter> pRef(p);
+	if (pRef == nullptr || pRef.wasObjectDeleted()) return var();
+	var result;
+	result.append(p->minimumValue);
+	result.append(p->maximumValue);
+	return result;
+}
+
+var Parameter::setRangeFromScript(const juce::var::NativeFunctionArgs& a)
+{
+	if (a.numArguments < 2) return;
+	Parameter* p = getObjectFromJS<Parameter>(a);
+	if (p == nullptr) return var();
+	WeakReference<Parameter> pRef(p);
+	if (pRef == nullptr || pRef.wasObjectDeleted()) return var();
+	if (!p->canHaveRange || !p->isCustomizableByUser)
+	{
+		NLOGWARNING(p->niceName, "This parameter's range can not be changed.");
+		return;
+	}
+
+	var newMin = a.arguments[0];
+	var newMax = a.arguments[1];
+	p->setRange(newMin, newMax);
+
+	return var();
+}
+
+var Parameter::hasRangeFromScript(const juce::var::NativeFunctionArgs& a)
+{
+	Parameter* p = getObjectFromJS<Parameter>(a);
+	if (p == nullptr) return var();
+	WeakReference<Parameter> pRef(p);
+	if (pRef == nullptr || pRef.wasObjectDeleted()) return var();
+	return p->hasRange();
 }
 
 String Parameter::getScriptTargetString()

@@ -139,7 +139,10 @@ public:
 	virtual var getJSONDataInternal() override;
 	virtual void loadJSONDataInternal(var data) override;
 	
-	static var getValueFromScript(const juce::var::NativeFunctionArgs &a);
+	static var getValueFromScript(const juce::var::NativeFunctionArgs& a);
+	static var getRangeFromScript(const juce::var::NativeFunctionArgs& a);
+	static var setRangeFromScript(const juce::var::NativeFunctionArgs& a);
+	static var hasRangeFromScript(const juce::var::NativeFunctionArgs &a);
 
 	String getScriptTargetString() override;
 
