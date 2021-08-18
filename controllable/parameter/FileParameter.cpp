@@ -186,7 +186,6 @@ var FileParameter::writeBytesFromScript(const juce::var::NativeFunctionArgs& a)
 		{
 			bytes.add((uint8_t)(int)a.arguments[0][i]);
 		}
-		return true;
 	}
 	else
 	{

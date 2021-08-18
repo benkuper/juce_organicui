@@ -511,7 +511,7 @@ var Parameter::getRangeFromScript(const juce::var::NativeFunctionArgs& a)
 
 var Parameter::setRangeFromScript(const juce::var::NativeFunctionArgs& a)
 {
-	if (a.numArguments < 2) return;
+	if (a.numArguments < 2) return var();
 	Parameter* p = getObjectFromJS<Parameter>(a);
 	if (p == nullptr) return var();
 	WeakReference<Parameter> pRef(p);
@@ -519,7 +519,7 @@ var Parameter::setRangeFromScript(const juce::var::NativeFunctionArgs& a)
 	if (!p->canHaveRange || !p->isCustomizableByUser)
 	{
 		NLOGWARNING(p->niceName, "This parameter's range can not be changed.");
-		return;
+		return var();
 	}
 
 	var newMin = a.arguments[0];

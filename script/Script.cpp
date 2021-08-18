@@ -11,13 +11,13 @@ Author:  Ben
 #include "../engine/Engine.h"
 #include "Script.h"
 
-Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled, bool canBeRemoved) :
+Script::Script(ScriptTarget* _parentTarget, bool canBeDisabled, bool canBeRemoved) :
 	BaseItem("Script", canBeDisabled, false),
 	Thread("Script"),
 	forceDisabled(false),
 	scriptTemplate(nullptr),
-    updateEnabled(false),
-    scriptParamsContainer("params"),
+	updateEnabled(false),
+	scriptParamsContainer("params"),
 	parentTarget(_parentTarget),
 	executionTimeout(5),
 	scriptAsyncNotifier(10)
@@ -31,7 +31,7 @@ Script::Script(ScriptTarget * _parentTarget, bool canBeDisabled, bool canBeRemov
 
 	filePath = new FileParameter("File Path", "Path to the script file", "");
 	addParameter(filePath);
-	
+
 	updateRate = addIntParameter("Update Rate", "The Rate at which the \"update()\" function is called", 50, 1, 1000);
 	updateRate->hideInEditor = true;
 
@@ -116,7 +116,7 @@ void Script::loadScript()
 		//return;
 	}
 
-	if(isThreadRunning())
+	if (isThreadRunning())
 	{
 		stopThread(1000);
 	}
@@ -190,9 +190,9 @@ void Script::loadScript()
 
 	if (updateEnabled)
 	{
-		if(!Engine::mainEngine->isLoadingFile) startThread();
+		if (!Engine::mainEngine->isLoadingFile) startThread();
 	}
-	
+
 
 	scriptParamsContainer.hideInEditor = scriptParamsContainer.controllables.size() == 0;
 
@@ -225,7 +225,7 @@ void Script::setState(ScriptState newState)
 	scriptAsyncNotifier.addMessage(new ScriptEvent(ScriptEvent::STATE_CHANGE));
 }
 
-var Script::callFunction(const Identifier & function, const Array<var> args, Result  * result)
+var Script::callFunction(const Identifier& function, const Array<var> args, Result* result)
 {
 	if (canBeDisabled && (!enabled->boolValue() || forceDisabled)) return false;
 
@@ -234,10 +234,10 @@ var Script::callFunction(const Identifier & function, const Array<var> args, Res
 	Result tmpResult = Result::ok();
 	if (result == nullptr) result = &tmpResult;
 
-	const ScopedLock sl (engineLock);
+	const ScopedLock sl(engineLock);
 
 	var returnData = scriptEngine->callFunction(function, var::NativeFunctionArgs(var::undefined(), (const var*)args.begin(), args.size()), result);
-	
+
 	if (result->getErrorMessage().isNotEmpty())
 	{
 		NLOGERROR(niceName, "Script Error :\n" + result->getErrorMessage());
@@ -248,7 +248,7 @@ var Script::callFunction(const Identifier & function, const Array<var> args, Res
 }
 
 
-void Script::onContainerParameterChangedInternal(Parameter * p)
+void Script::onContainerParameterChangedInternal(Parameter* p)
 {
 	if (p == filePath)
 	{
@@ -256,7 +256,7 @@ void Script::onContainerParameterChangedInternal(Parameter * p)
 	}
 }
 
-void Script::onContainerTriggerTriggered(Trigger * t)
+void Script::onContainerTriggerTriggered(Trigger* t)
 {
 	if (t == reload)
 	{
@@ -264,7 +264,7 @@ void Script::onContainerTriggerTriggered(Trigger * t)
 	}
 }
 
-void Script::onControllableFeedbackUpdateInternal(ControllableContainer * cc, Controllable * c)
+void Script::onControllableFeedbackUpdateInternal(ControllableContainer* cc, Controllable* c)
 {
 	if (Engine::mainEngine->isClearing) return;
 
@@ -281,10 +281,10 @@ void Script::childStructureChanged(ControllableContainer* cc)
 {
 	if (state == ScriptState::SCRIPT_LOADED && Engine::mainEngine != nullptr && cc == Engine::mainEngine)
 	{
-		if(!Engine::mainEngine->isLoadingFile && !Engine::mainEngine->isClearing)
+		if (!Engine::mainEngine->isLoadingFile && !Engine::mainEngine->isClearing)
 		{
-			const ScopedLock sl (engineLock); //need to check null MainEngine again after lock
-			if(Engine::mainEngine != nullptr && scriptEngine != nullptr) scriptEngine->registerNativeObject(Engine::mainEngine->scriptTargetName, Engine::mainEngine->getScriptObject());
+			const ScopedLock sl(engineLock); //need to check null MainEngine again after lock
+			if (Engine::mainEngine != nullptr && scriptEngine != nullptr) scriptEngine->registerNativeObject(Engine::mainEngine->scriptTargetName, Engine::mainEngine->getScriptObject());
 		}
 	}
 }
@@ -307,14 +307,14 @@ void Script::loadJSONDataInternal(var data)
 void Script::endLoadFile()
 {
 	if (Engine::mainEngine != nullptr) Engine::mainEngine->removeEngineListener(this);
-	if(state != SCRIPT_LOADED) loadScript();
+	if (state != SCRIPT_LOADED) loadScript();
 	else if (updateEnabled)
 	{
 		startThread();
 	}
 }
 
-InspectableEditor * Script::getEditor(bool isRoot)
+InspectableEditor* Script::getEditor(bool isRoot)
 {
 	return new ScriptEditor(this, isRoot);
 }
@@ -341,7 +341,7 @@ void Script::run()
 		millisAtLastUpdate = nowMillis;
 
 		Array<var> args;
-		args.add(deltaMillis/1000.0);
+		args.add(deltaMillis / 1000.0);
 
 		Result r = Result::ok();
 		callFunction(updateIdentifier, args, &r);
@@ -433,28 +433,36 @@ var Script::addBoolParameterFromScript(const var::NativeFunctionArgs& args)
 {
 	Script* s = getObjectFromJS<Script>(args);
 	if (!checkNumArgs(s->niceName, args, 3)) return var();
-	return s->scriptParamsContainer.addBoolParameter(args.arguments[0], args.arguments[1], (bool)args.arguments[2])->getScriptObject();
+	Parameter* p = s->scriptParamsContainer.addBoolParameter(args.arguments[0], args.arguments[1], (bool)args.arguments[2]);
+	p->isCustomizableByUser = true;
+	return p->getScriptObject();
 }
 
 var Script::addIntParameterFromScript(const var::NativeFunctionArgs& args)
 {
 	Script* s = getObjectFromJS<Script>(args);
 	if (!checkNumArgs(s->niceName, args, 3)) return var();
-	return s->scriptParamsContainer.addIntParameter(args.arguments[0], args.arguments[1], (int)args.arguments[2], args.numArguments >= 4 ? (int)args.arguments[3] : INT32_MIN, args.numArguments >= 5 ? (int)args.arguments[4] : INT32_MAX)->getScriptObject();
+	Parameter* p = s->scriptParamsContainer.addIntParameter(args.arguments[0], args.arguments[1], (int)args.arguments[2], args.numArguments >= 4 ? (int)args.arguments[3] : INT32_MIN, args.numArguments >= 5 ? (int)args.arguments[4] : INT32_MAX);
+	p->isCustomizableByUser = true;
+	return p->getScriptObject();
 }
 
 var Script::addFloatParameterFromScript(const var::NativeFunctionArgs& args)
 {
 	Script* s = getObjectFromJS<Script>(args);
 	if (!checkNumArgs(s->niceName, args, 3)) return var();
-	return s->scriptParamsContainer.addFloatParameter(args.arguments[0], args.arguments[1], (float)args.arguments[2], args.numArguments >= 4 ? (int)args.arguments[3] : INT32_MIN, args.numArguments >= 5 ? (int)args.arguments[4] : INT32_MAX)->getScriptObject();
+	Parameter* p = s->scriptParamsContainer.addFloatParameter(args.arguments[0], args.arguments[1], (float)args.arguments[2], args.numArguments >= 4 ? (int)args.arguments[3] : INT32_MIN, args.numArguments >= 5 ? (int)args.arguments[4] : INT32_MAX);
+	p->isCustomizableByUser = true;
+	return p->getScriptObject();
 }
 
 var Script::addStringParameterFromScript(const var::NativeFunctionArgs& args)
 {
 	Script* s = getObjectFromJS<Script>(args);
 	if (!checkNumArgs(s->niceName, args, 3)) return var();
-	return s->scriptParamsContainer.addStringParameter(args.arguments[0], args.arguments[1], args.arguments[2])->getScriptObject();
+	Parameter* p = s->scriptParamsContainer.addStringParameter(args.arguments[0], args.arguments[1], args.arguments[2]);
+	p->isCustomizableByUser = true;
+	return p->getScriptObject();
 }
 
 var Script::addEnumParameterFromScript(const var::NativeFunctionArgs& args)
@@ -468,7 +476,7 @@ var Script::addEnumParameterFromScript(const var::NativeFunctionArgs& args)
 		int optionIndex = 2 + i * 2;
 		p->addOption(args.arguments[optionIndex].toString(), args.arguments[optionIndex + 1]);
 	}
-
+	p->isCustomizableByUser = true;
 	return p->getScriptObject();
 }
 
@@ -483,7 +491,7 @@ var Script::addTargetParameterFromScript(const var::NativeFunctionArgs& args)
 		bool isContainer = (int)args.arguments[2] > 0;
 		if (isContainer) tp->targetType = TargetParameter::CONTAINER;
 	}
-
+	tp->isCustomizableByUser = true;
 	return tp->getScriptObject();
 }
 
@@ -503,7 +511,7 @@ var Script::addColorParameterFromScript(const var::NativeFunctionArgs& args)
 		color.append((float)args.arguments[2] * 255);
 		color.append((float)args.arguments[3] * 255);
 		color.append((float)args.arguments[4] * 255);
-		color.append((float)args.numArguments >= 6 ?(float)args.arguments[5]*255:255);
+		color.append((float)args.numArguments >= 6 ? (float)args.arguments[5] * 255 : 255);
 	}
 	else if (args.arguments[2].isInt() || args.arguments[2].isInt64())
 	{
@@ -513,30 +521,37 @@ var Script::addColorParameterFromScript(const var::NativeFunctionArgs& args)
 		color.append(((int)args.arguments[2]) & 0xFF);
 	}
 
-	return s->scriptParamsContainer.addColorParameter(args.arguments[0], args.arguments[1], Colour((uint8)(int)color[0], (uint8)(int)color[1], (uint8)(int)color[2], (uint8)(int)color[3]))->getScriptObject();
+	Parameter* p = s->scriptParamsContainer.addColorParameter(args.arguments[0], args.arguments[1], Colour((uint8)(int)color[0], (uint8)(int)color[1], (uint8)(int)color[2], (uint8)(int)color[3]));
+	p->isCustomizableByUser = true;
+	return p->getScriptObject();
 }
 
-var Script::addPoint2DParameterFromScript(const var::NativeFunctionArgs & args)
+var Script::addPoint2DParameterFromScript(const var::NativeFunctionArgs& args)
 {
-	Script * s = getObjectFromJS<Script>(args);
+	Script* s = getObjectFromJS<Script>(args);
 	if (!checkNumArgs(s->niceName, args, 2)) return var();
-	return s->scriptParamsContainer.addPoint2DParameter(args.arguments[0], args.arguments[1])->getScriptObject();
+	Parameter* p = s->scriptParamsContainer.addPoint2DParameter(args.arguments[0], args.arguments[1]);
+	p->isCustomizableByUser = true;
+	return p->getScriptObject();
 }
 
-var Script::addPoint3DParameterFromScript(const var::NativeFunctionArgs & args)
+var Script::addPoint3DParameterFromScript(const var::NativeFunctionArgs& args)
 {
-	Script * s = getObjectFromJS<Script>(args);
+	Script* s = getObjectFromJS<Script>(args);
 	if (!checkNumArgs(s->niceName, args, 2)) return var();
-	return s->scriptParamsContainer.addPoint3DParameter(args.arguments[0], args.arguments[1])->getScriptObject();
+	Parameter* p = s->scriptParamsContainer.addPoint3DParameter(args.arguments[0], args.arguments[1]);
+	p->isCustomizableByUser = true;
+	return p->getScriptObject();
 }
 
-var Script::addFileParameterFromScript(const var::NativeFunctionArgs & args)
+var Script::addFileParameterFromScript(const var::NativeFunctionArgs& args)
 {
-    Script * s = getObjectFromJS<Script>(args);
-    if (!checkNumArgs(s->niceName, args, 2)) return var();
-    FileParameter * fp = s->scriptParamsContainer.addFileParameter(args.arguments[0], args.arguments[1]);
-    fp->directoryMode = args.numArguments > 2 ? ((int)args.arguments[2] > 0) : false;
-    return fp->getScriptObject();
+	Script* s = getObjectFromJS<Script>(args);
+	if (!checkNumArgs(s->niceName, args, 2)) return var();
+	FileParameter* fp = s->scriptParamsContainer.addFileParameter(args.arguments[0], args.arguments[1]);
+	fp->directoryMode = args.numArguments > 2 ? ((int)args.arguments[2] > 0) : false;
+	fp->isCustomizableByUser = true;
+	return fp->getScriptObject();
 }
 
 
@@ -560,7 +575,7 @@ var Script::setExecutionTimeoutFromScript(const var::NativeFunctionArgs& args)
 }
 
 
-bool Script::checkNumArgs(const String &logName, const var::NativeFunctionArgs & args, int expectedArgs)
+bool Script::checkNumArgs(const String& logName, const var::NativeFunctionArgs& args, int expectedArgs)
 {
 	if (args.numArguments < expectedArgs)
 	{

@@ -1180,7 +1180,9 @@ var ControllableContainer::addBoolParameterFromScript(const var::NativeFunctionA
 	Controllable* c = cc->getControllableByName(args.arguments[0], true, false);
 	if (c != nullptr) return c->getScriptObject();
 
-	return cc->addBoolParameter(args.arguments[0], args.arguments[1], (bool)args.arguments[2])->getScriptObject();
+	Parameter* p =  cc->addBoolParameter(args.arguments[0], args.arguments[1], (bool)args.arguments[2]);
+	p->isCustomizableByUser = true;
+	return p->getScriptObject();
 }
 
 var ControllableContainer::addIntParameterFromScript(const var::NativeFunctionArgs & args)
@@ -1191,7 +1193,9 @@ var ControllableContainer::addIntParameterFromScript(const var::NativeFunctionAr
 	Controllable* c = cc->getControllableByName(args.arguments[0], true, false);
 	if (c != nullptr) return c->getScriptObject();
 
-	return cc->addIntParameter(args.arguments[0], args.arguments[1], (int)args.arguments[2], args.numArguments >= 4?(int)args.arguments[3]:INT32_MIN, args.numArguments >= 5?(int)args.arguments[4]:INT32_MAX)->getScriptObject();
+	Parameter *p = cc->addIntParameter(args.arguments[0], args.arguments[1], (int)args.arguments[2], args.numArguments >= 4?(int)args.arguments[3]:INT32_MIN, args.numArguments >= 5?(int)args.arguments[4]:INT32_MAX);
+	p->isCustomizableByUser = true;
+	return p->getScriptObject();
 }
 
 var ControllableContainer::addFloatParameterFromScript(const var::NativeFunctionArgs & args)
@@ -1202,7 +1206,9 @@ var ControllableContainer::addFloatParameterFromScript(const var::NativeFunction
 	Controllable* c = cc->getControllableByName(args.arguments[0], true, false);
 	if (c != nullptr) return c->getScriptObject();
 
-	return cc->addFloatParameter(args.arguments[0], args.arguments[1], (float)args.arguments[2], args.numArguments >= 4 ? (int)args.arguments[3] : INT32_MIN, args.numArguments >= 5 ? (int)args.arguments[4] : INT32_MAX)->getScriptObject();
+	Parameter *p = cc->addFloatParameter(args.arguments[0], args.arguments[1], (float)args.arguments[2], args.numArguments >= 4 ? (int)args.arguments[3] : INT32_MIN, args.numArguments >= 5 ? (int)args.arguments[4] : INT32_MAX);
+	p->isCustomizableByUser = true;
+	return p->getScriptObject();
 }
 
 var ControllableContainer::addStringParameterFromScript(const var::NativeFunctionArgs & args)
@@ -1213,7 +1219,9 @@ var ControllableContainer::addStringParameterFromScript(const var::NativeFunctio
 	Controllable* c = cc->getControllableByName(args.arguments[0], true, false);
 	if (c != nullptr) return c->getScriptObject();
 
-	return cc->addStringParameter(args.arguments[0], args.arguments[1], args.arguments[2])->getScriptObject();
+	Parameter *p = cc->addStringParameter(args.arguments[0], args.arguments[1], args.arguments[2]);
+	p->isCustomizableByUser = true;
+	return p->getScriptObject();
 }
 
 var ControllableContainer::addEnumParameterFromScript(const var::NativeFunctionArgs & args)
@@ -1232,6 +1240,7 @@ var ControllableContainer::addEnumParameterFromScript(const var::NativeFunctionA
 		p->addOption(args.arguments[optionIndex].toString(), args.arguments[optionIndex + 1]);
 	}
 
+	p->isCustomizableByUser = true;
 	return p->getScriptObject();
 }
 
@@ -1250,6 +1259,7 @@ var ControllableContainer::addTargetParameterFromScript(const var::NativeFunctio
 		if (isContainer) tp->targetType = TargetParameter::CONTAINER;
 	}
 
+	tp->isCustomizableByUser = true;
 	return tp->getScriptObject();
 }
 
@@ -1283,7 +1293,10 @@ var ControllableContainer::addColorParameterFromScript(const var::NativeFunction
 		color.append(((int)args.arguments[2]) & 0xFF);
 	}
 
-	return cc->addColorParameter(args.arguments[0], args.arguments[1], Colour((uint8)(int)color[0], (uint8)(int)color[1], (uint8)(int)color[2], (uint8)(int)color[3]))->getScriptObject();
+
+	Parameter* p = cc->addColorParameter(args.arguments[0], args.arguments[1], Colour((uint8)(int)color[0], (uint8)(int)color[1], (uint8)(int)color[2], (uint8)(int)color[3]));
+	p->isCustomizableByUser = true;
+	return p->getScriptObject();
 }
 
 var ControllableContainer::addPoint2DParameterFromScript(const var::NativeFunctionArgs & args)
@@ -1294,7 +1307,9 @@ var ControllableContainer::addPoint2DParameterFromScript(const var::NativeFuncti
 	Controllable* c = cc->getControllableByName(args.arguments[0], true, false);
 	if (c != nullptr) return c->getScriptObject();
 
-	return cc->addPoint2DParameter(args.arguments[0], args.arguments[1])->getScriptObject();
+	Parameter *p = cc->addPoint2DParameter(args.arguments[0], args.arguments[1]);
+	p->isCustomizableByUser = true;
+	return p->getScriptObject();
 }
 
 var ControllableContainer::addPoint3DParameterFromScript(const var::NativeFunctionArgs & args)
@@ -1305,7 +1320,9 @@ var ControllableContainer::addPoint3DParameterFromScript(const var::NativeFuncti
 	Controllable* c = cc->getControllableByName(args.arguments[0], true, false);
 	if (c != nullptr) return c->getScriptObject();
 
-	return cc->addPoint3DParameter(args.arguments[0], args.arguments[1])->getScriptObject();
+	Parameter *p = cc->addPoint3DParameter(args.arguments[0], args.arguments[1]);
+	p->isCustomizableByUser = true;
+	return p->getScriptObject();
 }
 
 var ControllableContainer::addFileParameterFromScript(const var::NativeFunctionArgs & args)
@@ -1318,6 +1335,7 @@ var ControllableContainer::addFileParameterFromScript(const var::NativeFunctionA
 
 	FileParameter * fp = cc->addFileParameter(args.arguments[0], args.arguments[1]);
 	fp->directoryMode = args.numArguments > 2 ? ((int)args.arguments[2] > 0) : false;
+	fp->isCustomizableByUser = true;
 	return fp->getScriptObject();
 }
 
