@@ -359,9 +359,9 @@ bool OutlinerItem::mightContainSubItems()
 	return isContainer;
 }
 
-Component* OutlinerItem::createItemComponent()
+std::unique_ptr<Component> OutlinerItem::createItemComponent()
 {
-	return new OutlinerItemComponent(this);
+	return std::unique_ptr<Component>(new OutlinerItemComponent(this));
 }
 
 String OutlinerItem::getUniqueName() const

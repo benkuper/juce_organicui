@@ -73,7 +73,7 @@ public:
 
 	virtual bool mightContainSubItems() override;
 
-	virtual Component * createItemComponent() override;
+	virtual std::unique_ptr<Component> createItemComponent() override;
 
 	String getUniqueName() const override;
 	void inspectableSelectionChanged(Inspectable * inspectable) override;
