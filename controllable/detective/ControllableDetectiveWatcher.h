@@ -19,8 +19,8 @@ public:
 
 	struct WatcherData
 	{
-		WatcherData(float time, var val) : time(time), val(val) {}
-		float time;
+		WatcherData(double time, var val) : time(time), val(val) {}
+		double time;
 		var val;
 	};
 

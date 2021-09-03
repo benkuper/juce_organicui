@@ -104,12 +104,12 @@ void ParameterAutomation::run()
 {
 	if (mode == nullptr || timeParamRef == nullptr || lengthParamRef == nullptr) return;
 
-	float lastUpdateTime = Time::getMillisecondCounter() / 1000.0f;
+	double lastUpdateTime = Time::getMillisecondCounter() / 1000.0;
 
 	while (!threadShouldExit())
 	{
-		float t = Time::getMillisecondCounter() / 1000.0f;
-		float delta = t - lastUpdateTime;
+		double t = Time::getMillisecondCounter() / 1000.0;
+		double delta = t - lastUpdateTime;
 
 		Mode m = mode->getValueDataAsEnum<Mode>();
 		if (m == LOOP) timeParamRef->setValue(fmodf(timeParamRef->floatValue() + delta, lengthParamRef->floatValue()));
@@ -125,7 +125,7 @@ void ParameterAutomation::run()
 			timeParamRef->setValue(ft);
 		}
 
-		lastUpdateTime = Time::getMillisecondCounter() / 1000.0f;
+		lastUpdateTime = Time::getMillisecondCounter() / 1000.0;
 		wait(20); //50fps
 	}
 }

@@ -65,15 +65,15 @@ void ControllableDetectiveWatcher::onContainerParameterChangedInternal(Parameter
 
 void ControllableDetectiveWatcher::addValue(var val)
 {
-	data.add(new WatcherData(Time::getMillisecondCounter() / 1000.0f, val));
+	data.add(new WatcherData(Time::getMillisecondCounter() / 1000.0, val));
 }
 
 void ControllableDetectiveWatcher::run()
 {
 	while (!threadShouldExit() && !controllable.wasObjectDeleted())
 	{
-		float curTime = Time::getMillisecondCounter() / 1000.0f;
-		float maxTime = curTime - watchTime->floatValue();
+		double curTime = Time::getMillisecondCounter() / 1000.0;
+		double maxTime = curTime - watchTime->floatValue();
 
 		bool foundInRange = false;
 		for (int i = 0; i < data.size(); ++i)
