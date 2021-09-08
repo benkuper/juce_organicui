@@ -60,6 +60,8 @@ public:
 
 	void setValueInternal(var &) override;
 
+	var getCroppedValue(var val) override;
+
 	void setTarget(WeakReference<Controllable>);
 	void setTarget(WeakReference<ControllableContainer>);
 

@@ -1,3 +1,4 @@
+#include "TargetParameter.h"
 /*
   ==============================================================================
 
@@ -161,7 +162,11 @@ void TargetParameter::setValueInternal(var & newVal)
 		//setGhostValue("");
 	}
 
+}
 
+var TargetParameter::getCroppedValue(var val)
+{
+	return val.isString() ? val : "";
 }
 
 void TargetParameter::setTarget(WeakReference<Controllable> c)
