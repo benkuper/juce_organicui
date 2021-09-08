@@ -16,7 +16,7 @@ class ScriptUtil :
 public:
 	juce_DeclareSingleton(ScriptUtil, true)
 
-		ScriptUtil();
+	ScriptUtil();
 	~ScriptUtil() {}
 
 	static var getTime(const var::NativeFunctionArgs& a);
@@ -31,6 +31,7 @@ public:
 	static var getIPs(const var::NativeFunctionArgs& a);
 
 	static var encodeHMAC_SHA1(const var::NativeFunctionArgs& a);
+	static var encodeSHA512(const var::NativeFunctionArgs& a);
 
 	static var toBase64(const var::NativeFunctionArgs& a);
 	static var fromBase64(const var::NativeFunctionArgs& a);

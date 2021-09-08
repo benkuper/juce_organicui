@@ -92,6 +92,7 @@ using namespace juce;
 #include "helpers/StringUtil.h"
 #include "helpers/crypto/hmac/SHA1.h"
 #include "helpers/crypto/hmac/HMAC_SHA1.h"
+#include "helpers/crypto/sha512/SHA512.h"
 
 #include "undo/UndoMaster.h"
 #include "manager/Factory.h"

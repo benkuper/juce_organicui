@@ -26,6 +26,7 @@ ScriptUtil::ScriptUtil() :
 
 	scriptObject.setMethod("getIPs", ScriptUtil::getIPs);
 	scriptObject.setMethod("encodeHMAC_SHA1", ScriptUtil::encodeHMAC_SHA1);
+	scriptObject.setMethod("encodeSHA512", ScriptUtil::encodeSHA512);
 	scriptObject.setMethod("toBase64", ScriptUtil::toBase64);
 	scriptObject.setMethod("fromBase64", ScriptUtil::fromBase64);
 	scriptObject.setMethod("fromBase64Bytes", ScriptUtil::fromBase64Bytes);
@@ -159,6 +160,13 @@ var ScriptUtil::encodeHMAC_SHA1(const var::NativeFunctionArgs& a)
 		dbgHex += String::toHexString(data[i]) + " ";
 	}
 	return Base64::toBase64(b.getData(), b.getSize());
+}
+
+var ScriptUtil::encodeSHA512(const var::NativeFunctionArgs& a)
+{
+	if (a.numArguments < 1) return "";
+	String result = OrganicCrypto::detail::basic_sha512<char>::calculate(a.arguments[0].toString().toStdString());
+	return result;
 }
 
 var ScriptUtil::toBase64(const var::NativeFunctionArgs& a)
