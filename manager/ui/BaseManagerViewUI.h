@@ -128,7 +128,7 @@ BaseManagerViewUI<M, T, U>::BaseManagerViewUI(const String& contentName, M* _man
 	canZoom(true),
 	zoomAffectsItemSize(true),
 	viewZoom(1),
-	minZoom(.4f),
+	minZoom(.1f),
 	maxZoom(1),
 	timeSinceLastWheel(0)
 {

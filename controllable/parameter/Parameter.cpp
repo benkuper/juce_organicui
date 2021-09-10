@@ -443,7 +443,7 @@ bool Parameter::shouldBeSaved()
 	if (forceSaveValue) return true;
 	if (forceSaveRange) return true;
 	if (isOverriden && !isControllableFeedbackOnly && isSavable) return true;
-
+	if (controlMode != MANUAL) return true;
 	return false;
 }
 
