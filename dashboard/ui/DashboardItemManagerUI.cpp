@@ -11,7 +11,8 @@
 DashboardItemManagerUI::DashboardItemManagerUI(DashboardItemManager * manager) :
 	BaseManagerViewUI("Dashboard", manager)
 {
-
+	maxZoom = 2.0f;
+	
 	enableSnapping = DashboardManager::getInstance()->snapping->boolValue();
 	updatePositionOnDragMove = true;
 
