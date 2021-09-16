@@ -76,9 +76,13 @@ void Point2DParameter::setValueInternal(var& _value)
 		return;
 	}
 
+	_value[0] = (float)_value[0];
+	_value[1] = (float)_value[1];
+	
 	Parameter::setValueInternal(_value);
-	x = (float)_value[0];
-	y = (float)_value[1];
+	
+	x = _value[0];
+	y = _value[1];
 }
 
 void Point2DParameter::setBounds(float _minX, float _minY, float _maxX, float _maxY)
