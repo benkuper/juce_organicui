@@ -31,6 +31,11 @@ public:
 	bool autoReorderOnAdd;
 	bool isManipulatingMultipleItems;
 
+	//ui
+	Point<int> viewOffset; //in pixels, viewOffset of 0 means zeroPos is at the center of the window
+						   //interaction
+	float viewZoom;
+
 	virtual T * createItem(); //to override if special constructor to use
 	virtual T * addItemFromData(var data, bool addToUndo = true); //to be overriden for specific item creation (from data)
 	virtual Array<T *> addItemsFromData(var data, bool addToUndo = true); //to be overriden for specific item creation (from data)
@@ -249,7 +254,8 @@ BaseManager<T>::BaseManager(const String & name) :
     selectItemWhenCreated(true),
     autoReorderOnAdd(true),
     isManipulatingMultipleItems(false),
-    managerNotifier(50),
+	viewZoom(1),
+	managerNotifier(50),
     comparator(this)
 {
 
@@ -767,6 +773,12 @@ template<class T>
 void BaseManager<T>::loadJSONDataInternal(var data)
 {
 	clear();
+	var vData;
+	vData.append(viewOffset.x);
+	vData.append(viewOffset.y);
+	data.getDynamicObject()->setProperty("viewOffset", vData);
+	data.getDynamicObject()->setProperty("viewZoom", viewZoom);
+
 	loadJSONDataManagerInternal(data);
 }
 
@@ -780,6 +792,14 @@ void BaseManager<T>::loadJSONDataManagerInternal(var data)
 	{
 		addItemFromData(td, false);
 	}
+
+	if (data.hasProperty("viewOffset"))
+	{
+		var vData = data.getProperty("viewOffset", var());
+		viewOffset.setXY(vData[0], vData[1]);
+	}
+
+	viewZoom = data.getProperty("viewZoom", 1);
 
 }
 

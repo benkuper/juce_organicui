@@ -40,7 +40,7 @@ void DashboardGroupItemUI::resizedDashboardItemInternal()
 {
 	Rectangle<int> r = getLocalBounds().reduced(4);
 
-	managerUI->viewOffset = -r.getCentre(); //top left anchor
+	managerUI->manager->viewOffset = -r.getCentre(); //top left anchor
 	managerUI->setBounds(r);
 	
 	group->itemManager.canvasSize->setPoint(r.getWidth(), r.getHeight());

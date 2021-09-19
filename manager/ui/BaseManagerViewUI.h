@@ -37,14 +37,12 @@ public:
 	//Zoom
 	bool canZoom;
 	bool zoomAffectsItemSize;
-	float viewZoom;
 	float minZoom;
 	float maxZoom;
 
 	double timeSinceLastWheel;
 
-	Point<int> viewOffset; //in pixels, viewOffset of 0 means zeroPos is at the center of the window
-						   //interaction
+
 	Point<int> initViewOffset;
 
 	std::unique_ptr<BaseManagerViewMiniPane<M, T, U>> viewPane;
@@ -127,7 +125,6 @@ BaseManagerViewUI<M, T, U>::BaseManagerViewUI(const String& contentName, M* _man
 	useCheckersAsUnits(false),
 	canZoom(true),
 	zoomAffectsItemSize(true),
-	viewZoom(1),
 	minZoom(.1f),
 	maxZoom(1),
 	timeSinceLastWheel(0)
@@ -154,7 +151,7 @@ void BaseManagerViewUI<M, T, U>::mouseDown(const MouseEvent& e)
 	{
 		this->setMouseCursor(MouseCursor::UpDownLeftRightResizeCursor);
 		this->updateMouseCursor();
-		initViewOffset = Point<int>(viewOffset.x, viewOffset.y);
+		initViewOffset = Point<int>(manager->viewOffset.x, manager->viewOffset.y);
 	}
 	else if (ResizableCornerComponent* r = dynamic_cast<ResizableCornerComponent*>(e.eventComponent))
 	{
@@ -170,7 +167,7 @@ void BaseManagerViewUI<M, T, U>::mouseDrag(const MouseEvent& e)
 
 	if (canNavigate && ((e.mods.isLeftButtonDown() && e.mods.isAltDown()) || e.mods.isMiddleButtonDown()))
 	{
-		viewOffset = initViewOffset + e.getOffsetFromDragStart();
+		manager->viewOffset = initViewOffset + e.getOffsetFromDragStart();
 		updateItemsVisibility();
 		this->resized();
 		this->repaint();
@@ -212,10 +209,10 @@ void BaseManagerViewUI<M, T, U>::mouseWheelMove(const MouseEvent& e, const Mouse
 		{
 			Point<float> curMousePos = getViewMousePosition();
 
-			setViewZoom(viewZoom + d.deltaY);
+			setViewZoom(manager->viewZoom + d.deltaY);
 
 			Point<float> newMousePos = getViewMousePosition();
-			viewOffset += ((newMousePos - curMousePos) * viewZoom * (useCheckersAsUnits ? checkerSize : 1)).toInt();
+			manager->viewOffset += ((newMousePos - curMousePos) * manager->viewZoom * (useCheckersAsUnits ? checkerSize : 1)).toInt();
 			updateItemsVisibility();
 			this->resized();
 		}
@@ -237,7 +234,7 @@ void BaseManagerViewUI<M, T, U>::mouseWheelMove(const MouseEvent& e, const Mouse
 		timeSinceLastWheel = curTime;
 
 		float sensitivity = 500;
-		viewOffset += Point<int>(d.deltaX * sensitivity, d.deltaY * sensitivity);
+		manager->viewOffset += Point<int>(d.deltaX * sensitivity, d.deltaY * sensitivity);
 		updateItemsVisibility();
 		this->resized();
 		this->repaint();
@@ -251,10 +248,10 @@ void BaseManagerViewUI<M, T, U>::mouseMagnify(const MouseEvent& e, float scaleFa
 	{
 		Point<float> curMousePos = getViewMousePosition();
 
-		setViewZoom(viewZoom + scaleFactor);
+		setViewZoom(manager->viewZoom + scaleFactor);
 
 		Point<float> newMousePos = getViewMousePosition();
-		viewOffset += ((newMousePos - curMousePos) * viewZoom).toInt();
+		manager->viewOffset += ((newMousePos - curMousePos) * manager->viewZoom).toInt();
 		this->resized();
 	}
 }
@@ -295,16 +292,16 @@ void BaseManagerViewUI<M, T, U>::paint(Graphics& g)
 template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::paintBackground(Graphics& g)
 {
-	int zoomedCheckerSize = checkerSize * viewZoom;
+	int zoomedCheckerSize = checkerSize * manager->viewZoom;
 
-	int checkerTX = -zoomedCheckerSize * 2 + ((this->getWidth() / 2 + viewOffset.x) % (zoomedCheckerSize * 2));
-	int checkerTY = -zoomedCheckerSize * 2 + ((this->getHeight() / 2 + viewOffset.y) % (zoomedCheckerSize * 2));
+	int checkerTX = -zoomedCheckerSize * 2 + ((this->getWidth() / 2 + manager->viewOffset.x) % (zoomedCheckerSize * 2));
+	int checkerTY = -zoomedCheckerSize * 2 + ((this->getHeight() / 2 + manager->viewOffset.y) % (zoomedCheckerSize * 2));
 	juce::Rectangle<int> checkerBounds(checkerTX, checkerTY, this->getWidth() + zoomedCheckerSize * 4, this->getHeight() + zoomedCheckerSize * 4);
 	g.fillCheckerBoard(checkerBounds.toFloat(), zoomedCheckerSize, zoomedCheckerSize, BG_COLOR.darker(.3f), BG_COLOR.darker(.2f));
 
 	g.setColour(BG_COLOR.darker(.05f));
 	Point<int> center = getSize() / 2;
-	center += viewOffset;
+	center += manager->viewOffset;
 	g.drawLine(center.x, 0, center.x, this->getHeight(), 2);
 	g.drawLine(0, center.y, this->getWidth(), center.y, 2);
 
@@ -369,13 +366,13 @@ void BaseManagerViewUI<M, T, U>::updateComponentViewPosition(Component* c, Point
 
 	Point<int> p = getPosInView(position).toInt();
 
-	if (centerUIAroundPosition) p -= (Point<int>(c->getWidth(), c->getHeight()) * viewZoom) / 2;
+	if (centerUIAroundPosition) p -= (Point<int>(c->getWidth(), c->getHeight()) * manager->viewZoom) / 2;
 	c->setTopLeftPosition(p.x, p.y);
 
 	AffineTransform t = af;
 	if (zoomAffectsItemSize)
 	{
-		t = af.scaled(viewZoom, viewZoom, p.x, p.y);
+		t = af.scaled(manager->viewZoom, manager->viewZoom, p.x, p.y);
 	}
 	c->setTransform(t);
 }
@@ -439,39 +436,39 @@ Point<float> BaseManagerViewUI<M, T, U>::getViewMousePosition()
 template<class M, class T, class U>
 Point<float> BaseManagerViewUI<M, T, U>::getViewPos(const Point<int>& originalPos)
 {
-	return (originalPos - getViewCenter()).toFloat() / (viewZoom * (float)(useCheckersAsUnits ? checkerSize : 1));
+	return (originalPos - getViewCenter()).toFloat() / (manager->viewZoom * (float)(useCheckersAsUnits ? checkerSize : 1));
 }
 
 template<class M, class T, class U>
 inline Point<float> BaseManagerViewUI<M, T, U>::getViewOffset(const Point<int>& offsetInView)
 {
-	return offsetInView.toFloat() / (viewZoom * (useCheckersAsUnits ? checkerSize : 1));
+	return offsetInView.toFloat() / (manager->viewZoom * (useCheckersAsUnits ? checkerSize : 1));
 }
 
 template<class M, class T, class U>
 juce::Rectangle<float> BaseManagerViewUI<M, T, U>::getViewBounds(const juce::Rectangle<int>& r)
 {
 	const float checkerMultiplier = useCheckersAsUnits ? checkerSize : 1;
-	return juce::Rectangle<float>().withPosition(getViewPos(r.getPosition())).withSize(r.getWidth() / (viewZoom * checkerMultiplier), r.getHeight() / (viewZoom * checkerMultiplier));
+	return juce::Rectangle<float>().withPosition(getViewPos(r.getPosition())).withSize(r.getWidth() / (manager->viewZoom * checkerMultiplier), r.getHeight() / (manager->viewZoom * checkerMultiplier));
 }
 
 template<class M, class T, class U>
 Point<int> BaseManagerViewUI<M, T, U>::getViewCenter()
 {
-	return viewOffset + (getSize() / 2);
+	return manager->viewOffset + (getSize() / 2);
 }
 
 template<class M, class T, class U>
 Point<int> BaseManagerViewUI<M, T, U>::getPosInView(const Point<float>& viewPos)
 {
-	return (viewPos * viewZoom * (float)(useCheckersAsUnits ? checkerSize : 1)).toInt() + getViewCenter();
+	return (viewPos * manager->viewZoom * (float)(useCheckersAsUnits ? checkerSize : 1)).toInt() + getViewCenter();
 }
 
 template<class M, class T, class U>
 juce::Rectangle<int> BaseManagerViewUI<M, T, U>::getBoundsInView(const juce::Rectangle<float>& r)
 {
 	const float checkerMultiplier = useCheckersAsUnits ? checkerSize : 1;
-	return juce::Rectangle<int>().withPosition(getPosInView(r.getPosition())).withSize(r.getWidth() * viewZoom * checkerMultiplier, r.getHeight() * viewZoom * checkerMultiplier);
+	return juce::Rectangle<int>().withPosition(getPosInView(r.getPosition())).withSize(r.getWidth() * manager->viewZoom * checkerMultiplier, r.getHeight() * manager->viewZoom * checkerMultiplier);
 }
 
 template<class M, class T, class U>
@@ -495,7 +492,7 @@ Point<float> BaseManagerViewUI<M, T, U>::getItemsCenter()
 template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::homeView()
 {
-	viewOffset = Point<int>();
+	manager->viewOffset = Point<int>();
 
 	this->resized();
 	this->repaint();
@@ -506,8 +503,8 @@ void BaseManagerViewUI<M, T, U>::homeView()
 template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::frameView(U* se)
 {
-	if (se == nullptr) viewOffset = -getItemsCenter().toInt() * viewZoom;
-	else viewOffset = -(se->item->viewUIPosition->getPoint() + se->item->viewUISize->getPoint() / 2).toInt() * viewZoom;
+	if (se == nullptr) manager->viewOffset = -getItemsCenter().toInt() * manager->viewZoom;
+	else manager->viewOffset = -(se->item->viewUIPosition->getPoint() + se->item->viewUISize->getPoint() / 2).toInt() * manager->viewZoom;
 
 	this->resized();
 	this->repaint();
@@ -519,9 +516,9 @@ void BaseManagerViewUI<M, T, U>::frameView(U* se)
 template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::setViewZoom(float value)
 {
-	if (viewZoom == value) return;
-	viewZoom = jlimit<float>(minZoom, maxZoom, value);
-	for (auto& tui : this->itemsUI) tui->setViewZoom(viewZoom);
+	if (manager->viewZoom == value) return;
+	manager->viewZoom = jlimit<float>(minZoom, maxZoom, value);
+	for (auto& tui : this->itemsUI) tui->setViewZoom(manager->viewZoom);
 
 	updateItemsVisibility();
 	this->resized();
@@ -554,7 +551,7 @@ BaseManagerViewMiniPane<M, T, U>* BaseManagerViewUI<M, T, U>::createViewPane()
 template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::addItemUIInternal(U* se)
 {
-	se->setViewZoom(viewZoom);
+	se->setViewZoom(manager->viewZoom);
 	if (useCheckersAsUnits) se->setViewCheckerSize(checkerSize);
 	updateViewUIPosition(se);
 }
@@ -568,7 +565,7 @@ void BaseManagerViewUI<M, T, U>::itemDragMove(const DragAndDropTarget::SourceDet
 	if (bui == nullptr) return;
 
 	Point<int> relOffset = Point<int>((int)dragSourceDetails.description.getProperty("offsetX", 0), (int)dragSourceDetails.description.getProperty("offsetY", 0));
-	Point<int> realP = this->getMouseXYRelative() - (this->getLocalPoint(bui, relOffset) - bui->getPosition()) * 1.0f / viewZoom;
+	Point<int> realP = this->getMouseXYRelative() - (this->getLocalPoint(bui, relOffset) - bui->getPosition()) * 1.0f / manager->viewZoom;
 
 
 	Point<int> snapPosition = realP;
@@ -686,8 +683,8 @@ template<class M, class T, class U>
 Point<float> BaseManagerViewUI<M, T, U>::getPositionFromDrag(Component* c, const DragAndDropTarget::SourceDetails& dragSourceDetails)
 {
 	Point<int> relOffset = Point<int>((int)dragSourceDetails.description.getProperty("offsetX", 0), (int)dragSourceDetails.description.getProperty("offsetY", 0));
-	Point<int> realP = this->getMouseXYRelative() - (this->getLocalPoint(c, relOffset) - c->getPosition()) * 1.0f / viewZoom;
-	if (centerUIAroundPosition) realP += (Point<int>(c->getWidth(), c->getHeight()) * viewZoom) / 2;
+	Point<int> realP = this->getMouseXYRelative() - (this->getLocalPoint(c, relOffset) - c->getPosition()) * 1.0f / manager->viewZoom;
+	if (centerUIAroundPosition) realP += (Point<int>(c->getWidth(), c->getHeight()) * manager->viewZoom) / 2;
 	return this->getViewPos(realP);
 }
 
