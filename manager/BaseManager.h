@@ -766,6 +766,12 @@ var BaseManager<T>::getJSONData()
 
 	if (itemsData.size() > 0) data.getDynamicObject()->setProperty("items", itemsData);
 
+	var vData;
+	vData.append(viewOffset.x);
+	vData.append(viewOffset.y);
+	data.getDynamicObject()->setProperty("viewOffset", vData);
+	data.getDynamicObject()->setProperty("viewZoom", viewZoom);
+
 	return data;
 }
 
@@ -773,11 +779,14 @@ template<class T>
 void BaseManager<T>::loadJSONDataInternal(var data)
 {
 	clear();
-	var vData;
-	vData.append(viewOffset.x);
-	vData.append(viewOffset.y);
-	data.getDynamicObject()->setProperty("viewOffset", vData);
-	data.getDynamicObject()->setProperty("viewZoom", viewZoom);
+
+	if (data.hasProperty("viewOffset"))
+	{
+		var vData = data.getProperty("viewOffset", var());
+		viewOffset.setXY(vData[0], vData[1]);
+	}
+
+	viewZoom = data.getProperty("viewZoom", 1);
 
 	loadJSONDataManagerInternal(data);
 }
@@ -792,15 +801,6 @@ void BaseManager<T>::loadJSONDataManagerInternal(var data)
 	{
 		addItemFromData(td, false);
 	}
-
-	if (data.hasProperty("viewOffset"))
-	{
-		var vData = data.getProperty("viewOffset", var());
-		viewOffset.setXY(vData[0], vData[1]);
-	}
-
-	viewZoom = data.getProperty("viewZoom", 1);
-
 }
 
 template<class T>
