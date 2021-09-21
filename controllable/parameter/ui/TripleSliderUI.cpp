@@ -212,7 +212,7 @@ void TripleSliderUI::newMessage(const Parameter::ParameterEvent& e)
 	}
 	else if (isInteractable() && !isUpdatingFromParam)
 	{
-		if (e.parameter == &xParam || e.parameter == &yParam)
+		if (e.parameter == &xParam || e.parameter == &yParam || e.parameter == &zParam)
 		{
 			if (xParam.floatValue() != p3d->x || yParam.floatValue() != p3d->y || zParam.floatValue() != p3d->z)
 			{
