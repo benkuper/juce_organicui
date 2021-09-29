@@ -359,8 +359,11 @@ UndoableAction* ControllableContainer::setUndoableNiceName(const String& newNice
 	UndoMaster::getInstance()->performAction("Rename " + niceName, a);
 	return a;
 }
-void ControllableContainer::setNiceName(const String& _niceName) {
-	if (niceName == _niceName || _niceName.isEmpty())
+void ControllableContainer::setNiceName(const String& _niceName) 
+{
+	if (niceName == _niceName) return;
+
+	if(_niceName.isEmpty())
 	{
 		LOGWARNING("Container cannot have an empty name");
 		if (niceName.isEmpty()) setNiceName("[NoName]");
