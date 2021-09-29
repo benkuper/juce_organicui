@@ -1,4 +1,3 @@
-
 WarningTarget::WarningTarget() :
 	showWarningInUI(false),
     warningResolveInspectable(nullptr),

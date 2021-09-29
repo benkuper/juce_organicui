@@ -1,5 +1,3 @@
-#include "WarningReporterPanel.h"
-
 WarningReporterPanel::WarningReporterPanel(StringRef name) :
 	ShapeShifterContentComponent(name)
 {
@@ -57,7 +55,7 @@ int WarningReporterContainer::getContentHeight()
 void WarningReporterContainer::addTarget(WeakReference<WarningTarget> t)
 {
 	WarningReporterItem * item = getUIForTarget(t); 
-	if (item == nullptr) return;
+	if (item != nullptr) return;
 	item = new WarningReporterItem(t);
 	items.add(item);
 	addAndMakeVisible(item);

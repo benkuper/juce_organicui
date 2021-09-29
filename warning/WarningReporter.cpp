@@ -1,5 +1,3 @@
-#include "WarningReporter.h"
-
 juce_ImplementSingleton(WarningReporter)
 
 WarningReporter::WarningReporter() :
