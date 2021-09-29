@@ -360,7 +360,13 @@ UndoableAction* ControllableContainer::setUndoableNiceName(const String& newNice
 	return a;
 }
 void ControllableContainer::setNiceName(const String& _niceName) {
-	if (niceName == _niceName) return;
+	if (niceName == _niceName || _niceName.isEmpty())
+	{
+		LOGWARNING("Container cannot have an empty name");
+		if (niceName.isEmpty()) setNiceName("[NoName]");
+		return;
+	}
+
 	niceName = _niceName;
 	if (!hasCustomShortName) setAutoShortName();
 	liveScriptObjectIsDirty = true;
@@ -368,7 +374,15 @@ void ControllableContainer::setNiceName(const String& _niceName) {
 	onContainerNiceNameChanged();
 }
 
-void ControllableContainer::setCustomShortName(const String& _shortName) {
+void ControllableContainer::setCustomShortName(const String& _shortName) 
+{
+	if(_shortName.isEmpty())
+	{
+		LOGWARNING("Container cannot have an empty shortName");
+		if (shortName.isEmpty()) setCustomShortName("NoName");
+		return;
+	}
+
 	shortName = _shortName;
 	hasCustomShortName = true;
 	scriptTargetName = shortName;
