@@ -31,7 +31,7 @@ void Engine::changed()
 }
 
 void Engine::createNewGraph() {
-	
+
 	clear();
 	isLoadingFile = true;
 
@@ -82,14 +82,14 @@ Result Engine::loadDocument(const File& file) {
 }
 
 //Called from fileLoader
-void Engine::loadDocumentAsync(const File & file) {
+void Engine::loadDocumentAsync(const File& file) {
 
 	clearTasks();
 	taskName = "Loading File";
 
-	ProgressTask * clearTask = addTask("clearing");
-	ProgressTask * parseTask = addTask("parsing");
-	ProgressTask * loadTask = addTask("loading");
+	ProgressTask* clearTask = addTask("clearing");
+	ProgressTask* parseTask = addTask("parsing");
+	ProgressTask* loadTask = addTask("loading");
 
 	clearTask->start();
 	clear();
@@ -106,8 +106,18 @@ void Engine::loadDocumentAsync(const File & file) {
 
 	{
 		parseTask->start();
-		jsonData = JSON::parse(*is);
+		String s = is->readEntireStreamAsString();
+		Result result = JSON::parse(s, jsonData);
 		parseTask->end();
+
+		if (result.failed())
+		{
+			LOGERROR("Error reading file :\n" << result.getErrorMessage());
+
+			AlertWindow::showMessageBox(AlertWindow::AlertIconType::WarningIcon, "File format error", "The file you want to open is not a valid noisette. Error :\n" + result.getErrorMessage(), "Ok, i guess");
+			setFile(File());
+			return;
+		}
 
 		loadTask->start();
 		loadJSONData(jsonData, loadTask);
@@ -147,7 +157,7 @@ void Engine::handleAsyncUpdate()
 	setChangedFlag(false);
 
 	afterLoadFileInternal();
-	
+
 	engineListeners.call(&EngineListener::endLoadFile);
 	engineNotifier.addMessage(new EngineEvent(EngineEvent::END_LOAD_FILE, this));
 
@@ -205,7 +215,7 @@ Result Engine::saveBackupDocument(int index)
 		LOGERROR("Error saving the document");
 		return Result::fail("Error saving the document, maybe you don't have write access ?");
 	}
-	
+
 	JSON::writeToStream(*os, data);
 	os->flush();
 
@@ -259,18 +269,18 @@ var Engine::getJSONData()
 		var layoutData = ShapeShifterManager::getInstance()->getCurrentLayout();
 		if (!layoutData.isVoid()) data.getDynamicObject()->setProperty("layout", layoutData);
 	}
-	
+
 	return data;
 }
 
 /// ===================
 // loading
 
-void Engine::loadJSONData(var data, ProgressTask * loadingTask)
+void Engine::loadJSONData(var data, ProgressTask* loadingTask)
 {
 	clear();
 
-	DynamicObject * dObject = data.getDynamicObject();
+	DynamicObject* dObject = data.getDynamicObject();
 	if (dObject == nullptr)
 	{
 		AlertWindow::showMessageBox(AlertWindow::AlertIconType::WarningIcon, "File format error", "The file you want to open is not a valid noisette.", "Ok, i guess");
@@ -279,7 +289,7 @@ void Engine::loadJSONData(var data, ProgressTask * loadingTask)
 	}
 
 
-	DynamicObject * md = data.getDynamicObject()->getProperty("metaData").getDynamicObject();
+	DynamicObject* md = data.getDynamicObject()->getProperty("metaData").getDynamicObject();
 	bool versionChecked = checkFileVersion(md);
 
 	String versionString = md->hasProperty("version") ? md->getProperty("version").toString() : "?";
@@ -302,20 +312,20 @@ void Engine::loadJSONData(var data, ProgressTask * loadingTask)
 
 			if (needsOnlineUpdate)
 			{
-				result = AlertWindow::showYesNoCancelBox(AlertWindow::QuestionIcon, "File compatibility check", "Your file has been save with an older version of "+ OrganicApplication::getInstance()->getApplicationName() +" (" + versionString + "), some data may be lost if you load it directly. You can choose to update the file online, load it directly or cancel the operation.\nIn any case, your current file will be backed up with \"_backup\" appended to its name.", "Update", "Load directly", "Cancel");
+				result = AlertWindow::showYesNoCancelBox(AlertWindow::QuestionIcon, "File compatibility check", "Your file has been save with an older version of " + OrganicApplication::getInstance()->getApplicationName() + " (" + versionString + "), some data may be lost if you load it directly. You can choose to update the file online, load it directly or cancel the operation.\nIn any case, your current file will be backed up with \"_backup\" appended to its name.", "Update", "Load directly", "Cancel");
 			}
-			
+
 			if (result == 0)
 			{
 				setFile(File());
 				return;
 			}
 
-			
+
 			File f = getFile();
 			if (f.exists())
 			{
-				File backupF = f.getParentDirectory().getNonexistentChildFile(f.getFileNameWithoutExtension() + "_backup",f.getFileExtension(), true);
+				File backupF = f.getParentDirectory().getNonexistentChildFile(f.getFileNameWithoutExtension() + "_backup", f.getFileExtension(), true);
 				f.copyFileTo(backupF);
 				LOG("Your original file has been copied to " << backupF.getFullPathName());
 			}
@@ -365,10 +375,10 @@ void Engine::loadJSONData(var data, ProgressTask * loadingTask)
 	//if (InspectableSelectionManager::mainSelectionManager != nullptr) InspectableSelectionManager::mainSelectionManager->setEnabled(false); //avoid creation of inspector editor while recreating all nodes, controllers, rules,etc. from file
 	if (Outliner::getInstanceWithoutCreating() != nullptr) Outliner::getInstance()->setEnabled(false);
 
-	DynamicObject * d = data.getDynamicObject();
+	DynamicObject* d = data.getDynamicObject();
 
-	ProgressTask * projectTask = loadingTask->addTask("Project Settings");
-	ProgressTask * dashboardTask = loadingTask->addTask("Dashboard");
+	ProgressTask* projectTask = loadingTask->addTask("Project Settings");
+	ProgressTask* dashboardTask = loadingTask->addTask("Dashboard");
 
 
 	var layoutData = d->getProperty("layout");
@@ -393,7 +403,7 @@ void Engine::loadJSONData(var data, ProgressTask * loadingTask)
 	if (Outliner::getInstanceWithoutCreating() != nullptr) Outliner::getInstance()->setEnabled(true);
 }
 
-bool Engine::checkFileVersion(DynamicObject * metaData, bool checkForNewerVersion)
+bool Engine::checkFileVersion(DynamicObject* metaData, bool checkForNewerVersion)
 {
 	if (!metaData->hasProperty("version")) return false;
 	String versionToCheck = checkForNewerVersion ? getAppVersion() : getMinimumRequiredFileVersion();
