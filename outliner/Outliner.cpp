@@ -1,4 +1,3 @@
-#include "Outliner.h"
 /*
   ==============================================================================
 
@@ -490,7 +489,7 @@ void OutlinerItemComponent::paint(Graphics& g)
 
 	int labelWidth = label.getFont().getStringWidth(label.getText());
 
-	Rectangle<float> lr = r.withSize(labelWidth + 20, r.getHeight()).toFloat();
+	juce::Rectangle<float> lr = r.withSize(labelWidth + 20, r.getHeight()).toFloat();
 	if (inspectable->isSelected)
 	{
 		g.setColour(color);
@@ -509,7 +508,7 @@ void OutlinerItemComponent::paint(Graphics& g)
 
 void OutlinerItemComponent::resized()
 {
-	Rectangle<int> r = getLocalBounds();
+	juce::Rectangle<int> r = getLocalBounds();
 	if (r.isEmpty()) return;
 	hideInRemoteBT->setBounds(r.removeFromRight(r.getHeight()).reduced(1));
 	r.removeFromLeft(3);
