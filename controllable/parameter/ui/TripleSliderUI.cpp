@@ -129,7 +129,7 @@ void TripleSliderUI::resized()
 
 void TripleSliderUI::showEditWindowInternal()
 {
-	AlertWindow nameWindow("Change point 2D params", "Set new values and bounds for this parameter", AlertWindow::AlertIconType::NoIcon, this);
+	AlertWindow nameWindow("Change point 3D values", "Set new values for this parameter", AlertWindow::AlertIconType::NoIcon, this);
 
 	const String coordNames[3]{ "X","Y","Z" };
 
@@ -152,7 +152,7 @@ void TripleSliderUI::showEditRangeWindowInternal()
 {
 	if (!parameter->isCustomizableByUser) return;
 
-	AlertWindow nameWindow("Change point 2D params", "Set new values and bounds for this parameter", AlertWindow::AlertIconType::NoIcon, this);
+	AlertWindow nameWindow("Change point 3D bounds", "Set new bounds for this parameter", AlertWindow::AlertIconType::NoIcon, this);
 
 	const String coordNames[3]{ "X","Y","Z" };
 

@@ -104,7 +104,7 @@ void DoubleSliderUI::resized()
 
 void DoubleSliderUI::showEditWindowInternal()
 {
-	AlertWindow nameWindow("Change point 2D params", "Set new values and bounds for this parameter", AlertWindow::AlertIconType::NoIcon, this);
+	AlertWindow nameWindow("Change point 2D values", "Set new values for this parameter", AlertWindow::AlertIconType::NoIcon, this);
 
 	const String coordNames[2]{ "X","Y" };
 
@@ -127,7 +127,7 @@ void DoubleSliderUI::showEditRangeWindowInternal()
 {
 	if (!parameter->isCustomizableByUser) return;
 
-	AlertWindow nameWindow("Change point 2D params", "Set new values and bounds for this parameter", AlertWindow::AlertIconType::NoIcon, this);
+	AlertWindow nameWindow("Change point 2D bounds", "Set new bounds for this parameter", AlertWindow::AlertIconType::NoIcon, this);
 
 	const String coordNames[2]{ "X","Y" };
 
