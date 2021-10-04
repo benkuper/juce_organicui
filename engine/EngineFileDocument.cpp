@@ -263,6 +263,8 @@ var Engine::getJSONData()
 	var dData = DashboardManager::getInstance()->getJSONData();
 	if (!dData.isVoid() && dData.getDynamicObject()->getProperties().size() > 0) data.getDynamicObject()->setProperty("dashboardManager", dData);
 
+	var paData = ParrotManager::getInstance()->getJSONData();
+	if (!paData.isVoid() && paData.getDynamicObject()->getProperties().size() > 0) data.getDynamicObject()->setProperty(ParrotManager::getInstance()->shortName, paData);
 
 	if (ProjectSettings::getInstance()->saveLayoutReference->boolValue())
 	{
@@ -379,6 +381,7 @@ void Engine::loadJSONData(var data, ProgressTask* loadingTask)
 
 	ProgressTask* projectTask = loadingTask->addTask("Project Settings");
 	ProgressTask* dashboardTask = loadingTask->addTask("Dashboard");
+	ProgressTask* parrotTask = loadingTask->addTask("Parrot");
 
 
 	var layoutData = d->getProperty("layout");
@@ -388,12 +391,19 @@ void Engine::loadJSONData(var data, ProgressTask* loadingTask)
 
 	projectTask->start();
 	if (d->hasProperty("projectSettings")) ProjectSettings::getInstance()->loadJSONData(d->getProperty("projectSettings"));
+	projectTask->setProgress(1);
 	projectTask->end();
 
 	loadJSONDataInternalEngine(data, loadingTask);
 
+	parrotTask->start();
+	ParrotManager::getInstance()->loadJSONData(data.getProperty(ParrotManager::getInstance()->shortName, var()));
+	parrotTask->setProgress(1);
+	parrotTask->end();
+
 	dashboardTask->start();
 	if (d->hasProperty("dashboardManager")) DashboardManager::getInstance()->loadJSONData(d->getProperty("dashboardManager"));
+	dashboardTask->setProgress(1);
 	dashboardTask->end();
 
 	ShapeShifterManager::getInstance()->loadLayout(layoutData);

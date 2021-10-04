@@ -40,6 +40,7 @@ Engine::Engine(const String & fileName, const String & fileExtension) :
 	addChildControllableContainer(ProjectSettings::getInstance());
 
 	addChildControllableContainer(DashboardManager::getInstance());
+	addChildControllableContainer(ParrotManager::getInstance());
 	DashboardItemFactory::getInstance()->providers.add(this);
 
 	Detective::getInstance();
@@ -62,6 +63,7 @@ Engine::~Engine() {
 	selectionManager = nullptr; //delete selection manager
 
 	Detective::deleteInstance();
+	ParrotManager::deleteInstance();
 
 	DashboardManager::deleteInstance();
 	Outliner::deleteInstance();
@@ -140,6 +142,8 @@ DashboardItem * Engine::getDashboardItemFromMenuResult(int result)
 void Engine::clear() {
 
 	UndoMaster::getInstance()->clearUndoHistory();
+
+	ParrotManager::getInstance()->clear();
 
 	isClearing = true;
 	if (Outliner::getInstanceWithoutCreating())

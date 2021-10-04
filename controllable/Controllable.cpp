@@ -37,6 +37,7 @@ Controllable::Controllable(const Type &type, const String & niceName, const Stri
 	isSavable(true),
 	saveValueOnly(true),
 	isLoadingData(false),
+	isControlledByParrot(false),
 	isCustomizableByUser(false),
 	isRemovableByUser(false),
 	userCanSetReadOnly(false),
