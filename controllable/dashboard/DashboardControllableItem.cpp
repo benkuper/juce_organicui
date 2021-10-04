@@ -12,6 +12,7 @@ DashboardControllableItem::DashboardControllableItem(Controllable* item) :
 	opaqueBackground = addBoolParameter("Opaque Background", "If checked, background is opaque", true);
 	customLabel = addStringParameter("Custom text", "If not empty, will override the label of this control", "", false);
 	customDescription = addStringParameter("Custom description", "If not empty, will override the description of this control", "", false);
+	forceReadOnly = addBoolParameter("Read Only", "If not already read-only, this will force not being able to edit it from the dashboard", false);
 
 	textColor->canBeDisabledByUser = true;
 	contourColor->canBeDisabledByUser = true;
@@ -135,6 +136,7 @@ var DashboardControllableItem::getServerData()
 	o->setProperty("opaqueBackground", opaqueBackground->value);
 	o->setProperty("label", customLabel->enabled ? customLabel->value.toString() : controllable->getDefaultDashboardLabel());
 	o->setProperty("customDescription", customDescription->value);
+	o->setProperty("readOnly", forceReadOnly->value || controllable->isControllableFeedbackOnly);
 
 	return data;
 }

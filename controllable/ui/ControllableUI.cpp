@@ -25,6 +25,7 @@ ControllableUI::ControllableUI(Controllable * controllable) :
 	showLabel(true),
 	opaqueBackground(false),
 	showMenuOnRightClick(true),
+	forceFeedbackOnly(false),
 	useCustomTextColor(false),
     customContourThickness(1)
 {
@@ -111,6 +112,7 @@ bool ControllableUI::isInteractable(bool falseIfFeedbackOnly)
 {
 	if (controllable == nullptr || controllable.wasObjectDeleted()) return false;
 	if (!controllable->enabled) return false;
+	if (forceFeedbackOnly) return false;
 	if (falseIfFeedbackOnly && controllable->isControllableFeedbackOnly) return false;
 	return true;
 }
@@ -181,6 +183,10 @@ void ControllableUI::showContextMenu()
 			dashboardMenu.addItem(index + 10000, di->niceName);
 			index++;
 		}
+
+		if (index > 0) dashboardMenu.addSeparator();
+		dashboardMenu.addItem(9999, "Create new dashboard");
+
 		p->addSubMenu("Send to Dashboard", dashboardMenu);
 	}
 	
@@ -188,8 +194,6 @@ void ControllableUI::showContextMenu()
 	if (p->getNumItems() == 0) return;
 
 	int result = p->show();
-
-
 
 	if (result != 0)
 	{
@@ -218,6 +222,10 @@ void ControllableUI::showContextMenu()
 
 		case -12:
 			controllable->setEnabled(!controllable->enabled);
+			break;
+
+		case 9999:
+			DashboardManager::getInstance()->addItem()->itemManager.addItem(controllable->createDashboardItem());
 			break;
 
 		default:

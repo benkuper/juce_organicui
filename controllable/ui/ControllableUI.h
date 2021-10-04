@@ -33,6 +33,8 @@ public:
 	bool opaqueBackground;
 	bool showMenuOnRightClick;
 
+	bool forceFeedbackOnly;
+
 	bool useCustomTextColor;
 	Colour customTextColor;
 

@@ -29,27 +29,21 @@ ControllableUI* DashboardControllableItemUI::createControllableUI()
 
 void DashboardControllableItemUI::rebuildUI()
 {
-	if (itemUI != nullptr)
-	{
-		removeChildComponent(itemUI.get());
-	}
+	if (itemUI != nullptr) removeChildComponent(itemUI.get());
 
-	if (!inspectable.wasObjectDeleted() && controllableItem->inspectable != nullptr && !controllableItem->inspectable.wasObjectDeleted())
-	{
-		itemUI.reset(createControllableUI());
-		if (itemUI != nullptr)
-		{
-			addAndMakeVisible(itemUI.get());
-			if (getWidth() == 0 || getHeight() == 0) setSize(itemUI->getWidth(), itemUI->getHeight());
-		}
-	}
-	else
-	{
-		itemUI.reset();
-	}
+	if (!inspectable.wasObjectDeleted() 
+		&& controllableItem->inspectable != nullptr 
+		&& !controllableItem->inspectable.wasObjectDeleted()) itemUI.reset(createControllableUI());
+	else itemUI.reset();
 
 	updateUIParameters();
 	updateEditMode();
+
+	if (itemUI != nullptr)
+	{
+		addAndMakeVisible(itemUI.get());
+		if (getWidth() == 0 || getHeight() == 0) setSize(itemUI->getWidth(), itemUI->getHeight());
+	}
 }
 
 void DashboardControllableItemUI::updateUIParameters()
@@ -63,6 +57,7 @@ void DashboardControllableItemUI::updateUIParameters()
 	itemUI->useCustomContour = controllableItem->contourColor->enabled;
 	itemUI->customContourColor = controllableItem->contourColor->getColor();
 	itemUI->customContourThickness = controllableItem->contourThickness->floatValue();
+	itemUI->forceFeedbackOnly = controllableItem->forceReadOnly->boolValue();
 
 	String customLabel = controllableItem->customLabel->stringValue();
 	if (customLabel.isNotEmpty() && controllableItem->customLabel->enabled) itemUI->customLabel = customLabel;
@@ -82,6 +77,7 @@ void DashboardControllableItemUI::updateUIParameters()
 	itemUI->setInterceptsMouseClicks(!editMode, !editMode); //force edit mode here
 
 	itemUI->repaint();
+	itemUI->updateUIParams();
 }
 
 
@@ -107,6 +103,7 @@ void DashboardControllableItemUI::controllableFeedbackUpdateInternal(Controllabl
 		|| c == controllableItem->opaqueBackground
 		|| c == controllableItem->contourColor
 		|| c == controllableItem->contourThickness
+		|| c == controllableItem->forceReadOnly
 		)
 	{
 		updateUIParameters();

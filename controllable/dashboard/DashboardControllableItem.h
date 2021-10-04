@@ -17,6 +17,7 @@ public:
 	FloatParameter* contourThickness;
 	StringParameter* customLabel;
 	StringParameter* customDescription;
+	BoolParameter* forceReadOnly;
 
     virtual var getJSONData() override;
 	virtual void loadJSONData(var data, bool createIfNotThere = false) override; //needs to not override ItemInternal to force loading data after set inspectable
