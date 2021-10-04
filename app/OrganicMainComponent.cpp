@@ -48,6 +48,7 @@ void OrganicMainContentComponent::init()
 	ShapeShifterFactory::getInstance()->defs.add(new ShapeShifterDefinition("Outliner", outlinerFunc));
 	ShapeShifterFactory::getInstance()->defs.add(new ShapeShifterDefinition("Dashboard", &DashboardManagerView::create));
 	ShapeShifterFactory::getInstance()->defs.add(new ShapeShifterDefinition("Logger", &CustomLoggerUI::create));
+	ShapeShifterFactory::getInstance()->defs.add(new ShapeShifterDefinition("Parrots", &ParrotManagerUI::create));
 	ShapeShifterFactory::getInstance()->defs.add(new ShapeShifterDefinition("The Detective", &DetectivePanel::create));
 	ShapeShifterFactory::getInstance()->defs.add(new ShapeShifterDefinition("Warnings", &WarningReporterPanel::create));
 	ShapeShifterFactory::getInstance()->defs.add(new ShapeShifterDefinition("Help", &HelpPanel::create));

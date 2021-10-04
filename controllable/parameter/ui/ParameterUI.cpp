@@ -89,6 +89,14 @@ void ParameterUI::paintOverChildren(Graphics& g)
 	ControllableUI::paintOverChildren(g);
 	if (parameter == nullptr) return;
 
+	if (parameter->isControlledByParrot)
+	{
+		Colour c = Colours::rebeccapurple.brighter(.2f);
+		g.setColour(c.withAlpha(.2f));
+		g.fillRoundedRectangle(getLocalBounds().toFloat(), 1);
+		return;
+	}
+
 	switch (parameter->controlMode)
 	{
 	case Parameter::MANUAL:

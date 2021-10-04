@@ -50,6 +50,7 @@ public:
 	static bool showScriptControlAddressOption;
 	static bool showDetectiveOption;
 	static bool showDashboardOption;
+	static bool showParrotOption;
 
 	static std::function<void(ControllableUI*)> customShowEditWindowFunction;
 

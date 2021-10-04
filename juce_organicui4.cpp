@@ -2,6 +2,13 @@
 
 //==============================================================================
 
+#include "parrot/ParrotRecord.cpp"
+#include "parrot/ParrotRecordManager.cpp"
+#include "parrot/Parrot.cpp"
+#include "parrot/ParrotManager.cpp"
+#include "parrot/ui/ParrotUI.cpp"
+#include "parrot/ui/ParrotPanel.cpp"
+
 #include "ui/AssetManager.cpp"
 #include "ui/LookAndFeelOO.cpp"
 #include "ui/Grabber.cpp"

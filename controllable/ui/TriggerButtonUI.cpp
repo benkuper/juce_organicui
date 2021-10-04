@@ -54,6 +54,8 @@ void TriggerButtonUI::paint(Graphics& g)
 	Colour bgColor = useCustomBGColor ? customBGColor : NORMAL_COLOR;
 	Colour c = bgColor.darker();
 
+	if (trigger->isControlledByParrot) c = Colours::rebeccapurple.brighter(.2f);
+
 	if (isInteractable())
 	{
 		if (drawTriggering) c = HIGHLIGHT_COLOR;

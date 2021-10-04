@@ -12,6 +12,7 @@ bool ControllableUI::showOSCControlAddressOption = true;
 bool ControllableUI::showScriptControlAddressOption = true;
 bool ControllableUI::showDetectiveOption = true;
 bool ControllableUI::showDashboardOption = true;
+bool ControllableUI::showParrotOption = true;
 bool ControllableUI::drawContourOnInspectableHighlighted = false;
 
 std::function<void(ControllableUI*)> ControllableUI::customShowContextMenuFunc = nullptr;
@@ -173,6 +174,24 @@ void ControllableUI::showContextMenu()
 			p->addItem(-10, "Watch this with The Detective");
 		}
 	}
+
+	if (showParrotOption)
+	{
+		PopupMenu parrotMenu;
+		int index = 0;
+		for (auto& pa : ParrotManager::getInstance()->items)
+		{
+			bool isInParrot = pa->getTargetForControllable(controllable) != nullptr;
+			parrotMenu.addItem(index + 20000, pa->niceName, true, isInParrot);
+			index++;
+		}
+
+		if (index > 0) parrotMenu.addSeparator();
+		parrotMenu.addItem(19999, "Create new Parrot");
+
+		p->addSubMenu("Set in Parrot", parrotMenu);
+	}
+
 	
 	if (showDashboardOption)
 	{
@@ -185,12 +204,12 @@ void ControllableUI::showContextMenu()
 		}
 
 		if (index > 0) dashboardMenu.addSeparator();
-		dashboardMenu.addItem(9999, "Create new dashboard");
+		dashboardMenu.addItem(9999, "Create new Dashboard");
 
 		p->addSubMenu("Send to Dashboard", dashboardMenu);
 	}
 	
-
+	
 	if (p->getNumItems() == 0) return;
 
 	int result = p->show();
@@ -228,10 +247,21 @@ void ControllableUI::showContextMenu()
 			DashboardManager::getInstance()->addItem()->itemManager.addItem(controllable->createDashboardItem());
 			break;
 
+		case 19999:
+			ParrotManager::getInstance()->addItem()->addTarget(controllable);
+			break;
+
 		default:
 			if (result >= 10000 && result <= 10100)
 			{
 				DashboardManager::getInstance()->items[result - 10000]->itemManager.addItem(controllable->createDashboardItem());
+			}
+			else if (result >= 20000 && result <= 20100)
+			{
+				Parrot* pa = ParrotManager::getInstance()->items[result - 20000];
+				bool isInParrot = pa->getTargetForControllable(controllable) != nullptr;
+				if (isInParrot) pa->removeTargetForControllable(controllable);
+				else pa->addTarget(controllable);
 			}
 			else if (ControllableUI::handleCustomContextMenuResultFunc != nullptr)
 			{
