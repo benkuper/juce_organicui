@@ -73,9 +73,9 @@ void Parrot::setCurrentRecord(ParrotRecord* r)
 	if (currentRecord != nullptr)
 	{
 		resetDataPlayIndices();
+		playProgression->setRange(0, currentRecord->totalTime);
 	}
 
-	playProgression->setRange(0, currentRecord->totalTime);
 	playProgression->setValue(0);
 	updateControls();
 }
