@@ -28,6 +28,7 @@ public:
 	File lastFile;
 	String appLayoutExtension = "layout";
 	String appSubFolder = "layouts";
+	File layoutFolder;
 
 	OwnedArray<ShapeShifterPanel> openedPanels;
 	OwnedArray<ShapeShifterWindow> openedWindows;
@@ -43,7 +44,7 @@ public:
 
 
 	void setDefaultFileData(const char *data);
-	void setLayoutInformations(const String &appLayoutExtension, const String &appSubLayoutFolder);
+	void setLayoutInformations(const String &appLayoutExtension, const String &appSubLayoutFolder = "layouts");
 
 	void setCurrentCandidatePanel(ShapeShifterPanel *);
 

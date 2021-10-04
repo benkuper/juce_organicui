@@ -24,7 +24,7 @@ ShapeShifterManager::ShapeShifterManager() :
 
 ShapeShifterManager::~ShapeShifterManager()
 {
-	saveCurrentLayoutToFile(File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory).getChildFile(appSubFolder + "/_lastSession." + appLayoutExtension));
+	saveCurrentLayoutToFile(layoutFolder.getChildFile(+ "_lastSession." + appLayoutExtension));
 	openedWindows.clear();
 	if (GlobalSettings::getInstanceWithoutCreating() != nullptr) GlobalSettings::getInstance()->fontSize->removeAsyncParameterListener(this);
 }
@@ -38,6 +38,13 @@ void ShapeShifterManager::setLayoutInformations(const String& _appLayoutExtensio
 {
 	appLayoutExtension = _appLayoutExtension;
 	appSubFolder = appSubLayoutFolder;
+
+	layoutFolder = File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory).getChildFile(appSubFolder);
+	if (!layoutFolder.exists())
+	{
+		Result r = layoutFolder.createDirectory();
+		if (r.failed()) LOGERROR("Could not create layout folder in " << layoutFolder.getFullPathName() << ", is it accessible ?");
+	}
 }
 
 void ShapeShifterManager::setCurrentCandidatePanel(ShapeShifterPanel* panel)
@@ -257,16 +264,12 @@ var ShapeShifterManager::getCurrentLayout()
 void ShapeShifterManager::loadLayoutFromFile(int fileIndexInLayoutFolder)
 {
 
-	File destDir = File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory).getChildFile(appSubFolder);
-	if (!destDir.exists())
-	{
-		destDir.createDirectory();
-	}
+	if (!layoutFolder.exists()) layoutFolder.createDirectory();
 
 	File layoutFile;
 	if (fileIndexInLayoutFolder == -1)
 	{
-		FileChooser fc("Load layout", destDir, "*." + appLayoutExtension);
+		FileChooser fc("Load layout", layoutFolder, "*." + appLayoutExtension);
 		if (!fc.browseForFileToOpen()) return;
 		layoutFile = fc.getResult();
 	}
@@ -295,20 +298,14 @@ void ShapeShifterManager::loadLayoutFromFile(const File& fromFile)
 
 void ShapeShifterManager::loadLastSessionLayoutFile()
 {
-	lastFile = File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory).getChildFile(appSubFolder + "/_lastSession." + appLayoutExtension);
-	if (lastFile.exists())
-	{
-		loadLayoutFromFile(lastFile);
-	}
-	else
-	{
-		loadDefaultLayoutFile();
-	}
+	lastFile = layoutFolder.getChildFile("_lastSession." + appLayoutExtension);
+	if (lastFile.exists()) loadLayoutFromFile(lastFile);
+	else loadDefaultLayoutFile();
 }
 
 void ShapeShifterManager::loadDefaultLayoutFile(bool forceEmbeddedLayout)
 {
-	File defaultFile = File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory).getChildFile(appSubFolder + "/default." + appLayoutExtension);
+	File defaultFile = layoutFolder.getChildFile("default." + appLayoutExtension);
 	if (defaultFile.exists() && !forceEmbeddedLayout)
 	{
 		loadLayoutFromFile(defaultFile);
@@ -327,10 +324,9 @@ void ShapeShifterManager::loadDefaultLayoutFile(bool forceEmbeddedLayout)
 
 void ShapeShifterManager::saveCurrentLayout()
 {
-	File destDir = File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory).getChildFile(appSubFolder);
-	if (!destDir.exists()) destDir.createDirectory();
+	if (!layoutFolder.exists()) layoutFolder.createDirectory();
 
-	FileChooser fc("Save layout", destDir, "*." + appLayoutExtension);
+	FileChooser fc("Save layout", layoutFolder, "*." + appLayoutExtension);
 	if (fc.browseForFileToSave(true))
 	{
 		saveCurrentLayoutToFile(fc.getResult().withFileExtension(appLayoutExtension));
@@ -339,12 +335,14 @@ void ShapeShifterManager::saveCurrentLayout()
 
 void ShapeShifterManager::saveCurrentLayoutToFile(const File& toFile)
 {
+	if (!layoutFolder.exists()) layoutFolder.createDirectory();
+	
 	if (toFile.exists())
 	{
 		toFile.deleteFile();
 		toFile.create();
 	}
-	;
+
 	var data = temporaryFullContent == nullptr ? getCurrentLayout() : ghostLayout;
 	if (data.isUndefined() || data.isVoid()) return;
 
@@ -353,7 +351,7 @@ void ShapeShifterManager::saveCurrentLayoutToFile(const File& toFile)
 	std::unique_ptr<OutputStream> os(toFile.createOutputStream());
 	if (os == nullptr)
 	{
-		NLOG("Shape Shifter", "Error saving the layout file " + toFile.getFullPathName() + "\nMaybe it is read-only ?");
+		NLOGERROR("Shape Shifter", "Error saving the layout file " + toFile.getFullPathName() + "\nMaybe it is read-only ?");
 		return;
 	}
 	JSON::writeToStream(*os, data);
