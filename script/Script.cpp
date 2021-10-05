@@ -62,6 +62,7 @@ Script::Script(ScriptTarget* _parentTarget, bool canBeDisabled, bool canBeRemove
 	scriptObject.setMethod("addFileParameter", Script::addFileParameterFromScript);
 
 	scriptParamsContainer.hideEditorHeader = true;
+	scriptParamsContainer.saveAndLoadRecursiveData = true;
 	addChildControllableContainer(&scriptParamsContainer);
 
 	Engine::mainEngine->addControllableContainerListener(this);
