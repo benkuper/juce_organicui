@@ -1366,6 +1366,7 @@ var ControllableContainer::addContainerFromScript(const var::NativeFunctionArgs 
 
 	newCC = new ControllableContainer(args.arguments[0]);
 	cc->addChildControllableContainer(newCC, true);
+	cc->saveAndLoadRecursiveData = true;
 	return newCC->getScriptObject();
 }
 

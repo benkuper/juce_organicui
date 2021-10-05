@@ -475,6 +475,7 @@ var Parameter::getJSONDataInternal()
 	{
 		if ((int)minimumValue != INT32_MIN) data.getDynamicObject()->setProperty("minValue", minimumValue);
 		if ((int)maximumValue != INT32_MAX) data.getDynamicObject()->setProperty("maxValue", maximumValue);
+		data.getDynamicObject()->setProperty("default", defaultValue);
 	}
 
 	if (colorStatusMap.size() > 0)
@@ -503,8 +504,13 @@ void Parameter::loadJSONDataInternal(var data)
 {
 	Controllable::loadJSONDataInternal(data);
 
-	if (!saveValueOnly || forceSaveRange || isCustomizableByUser) setRange(data.getProperty("minValue", minimumValue), data.getProperty("maxValue", maximumValue));
-	if (data.getDynamicObject()->hasProperty("value")) setValue(data.getProperty("value", 0), false, true, true);
+	if (!saveValueOnly || forceSaveRange || isCustomizableByUser)
+	{
+		setRange(data.getProperty("minValue", minimumValue), data.getProperty("maxValue", maximumValue));
+		defaultValue = data.getProperty("default", defaultValue);
+	}
+
+	if (data.getDynamicObject()->hasProperty("value")) setValue(data.getProperty("value", defaultValue), false, true, true);
 
 	if (data.getDynamicObject()->hasProperty("controlMode")) setControlMode((ControlMode)(int)data.getProperty("controlMode", MANUAL));
 
