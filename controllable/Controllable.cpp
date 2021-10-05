@@ -240,7 +240,7 @@ String Controllable::getControlAddress(ControllableContainer * relativeTo)
 	return parentContainer->getControlAddress(relativeTo) + "/" + shortName;
 }
 
-InspectableEditor * Controllable::getEditor(bool isRootEditor) {
+InspectableEditor * Controllable::getEditorInternal(bool isRootEditor) {
 
 	return new ControllableEditor(this, isRootEditor);
 }

@@ -1,4 +1,3 @@
-
 Inspectable::Inspectable() :
 	selectionManager(nullptr), //default nullptr will target main selectionManager
 	isSelected(false),
@@ -141,4 +140,10 @@ void Inspectable::setPreselected(bool value)
 void Inspectable::setSelectedInternal(bool)
 {
 	//to be overriden
+}
+
+InspectableEditor* Inspectable::getEditor(bool isRoot)
+{
+	if (customGetEditorFunc != nullptr) return customGetEditorFunc(this, isRoot);
+	return getEditorInternal(isRoot);
 }

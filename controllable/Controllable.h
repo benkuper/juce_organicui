@@ -60,6 +60,7 @@ public:
 	bool dashboardDefaultAppendLabel;		//if default parent level is not 0 and this this will 
 										   //decide if this controllable's label will be added at the end
 
+	
 	WeakReference<ControllableContainer> parentContainer;
 
 	UndoableAction * setUndoableNiceName(const String &_niceName, bool onlyReturnAction = false);
@@ -119,7 +120,7 @@ public:
 	
 	virtual String getWarningTargetName() const override;
 	
-	virtual InspectableEditor * getEditor(bool /*isRootEditor*/) override;
+	virtual InspectableEditor * getEditorInternal(bool /*isRootEditor*/) override;
 	virtual ControllableDetectiveWatcher* getDetectiveWatcher();
 	virtual String getTypeString() const { jassert(false); return ""; } //should be overriden
 

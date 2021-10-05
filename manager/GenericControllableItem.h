@@ -26,5 +26,5 @@ public:
 
 	static GenericControllableItem * create(var params) { return new GenericControllableItem(params); }
 
-	InspectableEditor * getEditor(bool isRoot) override;
+	InspectableEditor * getEditorInternal(bool isRoot) override;
 };

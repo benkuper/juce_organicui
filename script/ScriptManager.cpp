@@ -28,7 +28,7 @@ Script * ScriptManager::createItem()
 	return s;
 }
 
-InspectableEditor * ScriptManager::getEditor(bool isRoot)
+InspectableEditor * ScriptManager::getEditorInternal(bool isRoot)
 {
 	return new ScriptManagerEditor(this, isRoot);
 }

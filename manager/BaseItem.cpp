@@ -381,7 +381,7 @@ void BaseItem::loadJSONDataInternal(var data)
 	if (canHaveScripts) scriptManager->loadJSONData(data.getProperty("scripts",var()));
 }
 
-InspectableEditor * BaseItem::getEditor(bool isRoot)
+InspectableEditor * BaseItem::getEditorInternal(bool isRoot)
 {
 	return new BaseItemEditor(this, isRoot);
 }

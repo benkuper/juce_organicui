@@ -1,5 +1,3 @@
-#include "DashboardParameterItem.h"
-
 DashboardParameterItem::DashboardParameterItem(Parameter* parameter) :
 	DashboardControllableItem(parameter),
 	parameter(nullptr),
@@ -15,15 +13,6 @@ DashboardParameterItem::DashboardParameterItem(Parameter* parameter) :
 	fgColor->canBeDisabledByUser = true;
 
 	style = addEnumParameter("Style", "The style of this UI");
-	style->addOption("Default", -1);
-
-	if (parameter != nullptr && parameter->type == Controllable::FLOAT)
-	{
-		style->addOption("Horizontal Slider", 0)->addOption("Vertical Slider", 1)->addOption("Text", 2)->addOption("Time", 3);
-	}
-	
-	style->addOption("Color Circle", 10);
-	style->addOption("Color Square", 11);
 
 	btImage = addFileParameter("Toggle image", "The image of the toggle");
 
@@ -38,6 +27,11 @@ DashboardParameterItem::~DashboardParameterItem()
 DashboardItemUI* DashboardParameterItem::createUI()
 {
 	return new DashboardParameterItemUI(this);
+}
+
+InspectableEditor* DashboardParameterItem::getStyleEditor(Inspectable* c, bool isRoot)
+{
+	return new DashboardParameterStyleEditor(style, this, isRoot);
 }
 
 void DashboardParameterItem::setInspectableInternal(Inspectable* i)
@@ -58,38 +52,7 @@ void DashboardParameterItem::setInspectableInternal(Inspectable* i)
 		parameter->addParameterListener(this);
 	}
 
-
-	style->clearOptions();
-	style->addOption("Default", -1);
-	if (parameter != nullptr && parameter->type == Controllable::FLOAT)
-	{
-		style->addOption("Horizontal Slider", 0)->addOption("Vertical Slider", 1)->addOption("Text", 2)->addOption("Time", 3);
-	}
-}
-
-void DashboardParameterItem::onContainerParameterChangedInternal(Parameter* p)
-{
-	DashboardControllableItem::onContainerParameterChangedInternal(p);
-	if (p == style)
-	{
-		int s = style->getValueData();
-		//if (s == 10 || s == 11)
-		//{
-		//	if (colorManager == nullptr)
-		//	{
-		//		colorManager.reset(new GradientColorManager());
-		//		addChildControllableContainer(colorManager.get());
-		//	}
-		//}
-		//else
-		//{
-		//	if (colorManager != nullptr)
-		//	{
-		//		removeChildControllableContainer(colorManager.get());
-		//		colorManager.reset();
-		//	}
-		//}
-	}
+	updateStyleOptions();
 }
 
 void DashboardParameterItem::onExternalParameterValueChanged(Parameter* p)
@@ -102,6 +65,22 @@ void DashboardParameterItem::onExternalParameterValueChanged(Parameter* p)
 		data.getDynamicObject()->setProperty("controlAddress", parameter->getControlAddress());
 		data.getDynamicObject()->setProperty("value", parameter->value);
 		notifyDataFeedback(data);
+	}
+}
+
+void DashboardParameterItem::updateStyleOptions()
+{
+	style->clearOptions();
+	style->addOption("Default", -1);
+	
+	if (parameter != nullptr)
+	{
+		if (parameter->type == Controllable::FLOAT || parameter->type == Controllable::INT || parameter->type == Controllable::ENUM)
+		{
+			if (parameter->type != Controllable::ENUM) style->addOption("Horizontal Slider", 0)->addOption("Vertical Slider", 1)->addOption("Text", 2)->addOption("Time", 3);
+			style->addOption("Color Circle", 10)->addOption("Color Square", 11);
+			style->customGetEditorFunc = std::bind(&DashboardParameterItem::getStyleEditor, this, std::placeholders::_1, std::placeholders::_2);
+		}
 	}
 }
 

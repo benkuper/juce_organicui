@@ -1,3 +1,4 @@
+#include "DashboardParameterItemUI.h"
 DashboardParameterItemUI::DashboardParameterItemUI(DashboardParameterItem* item) :
 	DashboardControllableItemUI(item),
 	parameterItem(item)
@@ -11,6 +12,7 @@ DashboardParameterItemUI::~DashboardParameterItemUI()
 
 ControllableUI* DashboardParameterItemUI::createControllableUI()
 {
+
 	switch (parameterItem->parameter->type)
 	{
 	case Controllable::BOOL:
@@ -24,6 +26,8 @@ ControllableUI* DashboardParameterItemUI::createControllableUI()
 	break;
 
 	case Controllable::FLOAT:
+	case Controllable::INT:
+	case Controllable::ENUM:
 	{
 		switch ((int)parameterItem->style->getValueData())
 		{
@@ -43,11 +47,19 @@ ControllableUI* DashboardParameterItemUI::createControllableUI()
 		case 3:
 			return ((FloatParameter*)parameterItem->parameter.get())->createTimeLabelParameter();
 			break;
+
+		case 10:
+			return new ColorStatusUI(parameterItem->parameter.get(), true);
+			break;
+
+		case 11:
+			return new ColorStatusUI(parameterItem->parameter.get(), false);
+			break;
 		}
 	}
     
-        default:
-            break;
+    default:
+		break;
             
 	}
 
@@ -93,24 +105,28 @@ void DashboardParameterItemUI::controllableStateUpdateInternal(Controllable* c)
 	else if (c == parameterItem->btImage || c == parameterItem->style) rebuildUI();
 }
 
-/*
-ParameterColorStyleUI::ParameterColorStyleUI(Parameter* p, bool isCircle, GradientColorManager * gradient) :
-	ParameterUI(p),
-	isCircle(isCircle),
-	gradient(gradient)
+DashboardParameterStyleEditor::DashboardParameterStyleEditor(Parameter* p, DashboardParameterItem * dpi, bool isRoot) :
+	ParameterEditor(p, isRoot),
+	dpi(dpi),
+	bt("Edit...")
+{
+	bt.addListener(this);
+	addAndMakeVisible(&bt);
+}
+
+DashboardParameterStyleEditor::~DashboardParameterStyleEditor()
 {
 }
 
-ParameterColorStyleUI::~ParameterColorStyleUI()
+void DashboardParameterStyleEditor::resizedInternal(juce::Rectangle<int>& r)
 {
+	bt.setBounds(r.removeFromRight(100));
+	r.removeFromRight(4);
+	ParameterEditor::resizedInternal(r);
 }
 
-void ParameterColorStyleUI::paint(Graphics& g)
+void DashboardParameterStyleEditor::buttonClicked(Button* b)
 {
-	g.setColour(gradient->getColorForPosition(parameter->floatValue()));
+	ParameterEditor::buttonClicked(b);
+	if (b == &bt) ColorStatusUI::ColorOptionManager::show(dpi->parameter, this);
 }
-
-void ParameterColorStyleUI::valueChanged(const var& v)
-{
-}
-*/

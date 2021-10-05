@@ -18,18 +18,18 @@ class Script :
 	public EngineListener
 {
 public:
-	Script(ScriptTarget * parentTarget = nullptr, bool canBeDisabled = true, bool canBeRemoved = true);
+	Script(ScriptTarget* parentTarget = nullptr, bool canBeDisabled = true, bool canBeRemoved = true);
 	~Script();
 
-	enum ScriptState {SCRIPT_LOADING, SCRIPT_LOADED, SCRIPT_ERROR, SCRIPT_EMPTY, SCRIPT_CLEAR };
+	enum ScriptState { SCRIPT_LOADING, SCRIPT_LOADED, SCRIPT_ERROR, SCRIPT_EMPTY, SCRIPT_CLEAR };
 
 	bool forceDisabled; //for scripts that can not be disabled by users directly
 
-	String * scriptTemplate;
-	FileParameter * filePath;
-	BoolParameter * logParam;
-	Trigger * reload;
-	IntParameter * updateRate;
+	String* scriptTemplate;
+	FileParameter* filePath;
+	BoolParameter* logParam;
+	Trigger* reload;
+	IntParameter* updateRate;
 
 	ScriptState state;
 	String fileName;
@@ -41,7 +41,7 @@ public:
 
 	ControllableContainer scriptParamsContainer;
 
-	ScriptTarget * parentTarget;
+	ScriptTarget* parentTarget;
 
 	std::unique_ptr<JavascriptEngine> scriptEngine;
 	CriticalSection engineLock;
@@ -55,27 +55,27 @@ public:
 
 	void setState(ScriptState newState);
 
-	var callFunction(const Identifier &function, const Array<var> args, juce::Result * result = (juce::Result *)nullptr);
+	var callFunction(const Identifier& function, const Array<var> args, juce::Result* result = (juce::Result*)nullptr);
 
-	void onContainerParameterChangedInternal(Parameter *) override;
-	void onContainerTriggerTriggered(Trigger *) override;
+	void onContainerParameterChangedInternal(Parameter*) override;
+	void onContainerTriggerTriggered(Trigger*) override;
 
-	void onControllableFeedbackUpdateInternal(ControllableContainer * cc, Controllable * c) override;
+	void onControllableFeedbackUpdateInternal(ControllableContainer* cc, Controllable* c) override;
 	void childStructureChanged(ControllableContainer* cc) override;
 
 	var getJSONData() override;
 	void loadJSONDataInternal(var data) override;
 
 	void endLoadFile() override;
-	
-	InspectableEditor * getEditor(bool isRoot) override;
+
+	InspectableEditor* getEditorInternal(bool isRoot) override;
 
 
 	// Inherited via Timer
 	virtual void timerCallback() override;
 
 	virtual void run() override;
-	
+
 	class ScriptEvent
 	{
 	public:
@@ -98,22 +98,22 @@ public:
 	static var logWarningFromScript(const var::NativeFunctionArgs& args);
 	static var logErrorFromScript(const var::NativeFunctionArgs& args);
 
-	static var addTriggerFromScript(const var::NativeFunctionArgs &args);
-	static var addBoolParameterFromScript(const var::NativeFunctionArgs &args);
-	static var addIntParameterFromScript(const var::NativeFunctionArgs &args);
-	static var addFloatParameterFromScript(const var::NativeFunctionArgs &args);
-	static var addStringParameterFromScript(const var::NativeFunctionArgs &args);
-	static var addEnumParameterFromScript(const var::NativeFunctionArgs &args);
-	static var addTargetParameterFromScript(const var::NativeFunctionArgs &args);
-	static var addColorParameterFromScript(const var::NativeFunctionArgs &args);
-	static var addPoint2DParameterFromScript(const var::NativeFunctionArgs &args);
-	static var addPoint3DParameterFromScript(const var::NativeFunctionArgs &args);
-    static var addFileParameterFromScript(const var::NativeFunctionArgs &args);
+	static var addTriggerFromScript(const var::NativeFunctionArgs& args);
+	static var addBoolParameterFromScript(const var::NativeFunctionArgs& args);
+	static var addIntParameterFromScript(const var::NativeFunctionArgs& args);
+	static var addFloatParameterFromScript(const var::NativeFunctionArgs& args);
+	static var addStringParameterFromScript(const var::NativeFunctionArgs& args);
+	static var addEnumParameterFromScript(const var::NativeFunctionArgs& args);
+	static var addTargetParameterFromScript(const var::NativeFunctionArgs& args);
+	static var addColorParameterFromScript(const var::NativeFunctionArgs& args);
+	static var addPoint2DParameterFromScript(const var::NativeFunctionArgs& args);
+	static var addPoint3DParameterFromScript(const var::NativeFunctionArgs& args);
+	static var addFileParameterFromScript(const var::NativeFunctionArgs& args);
 
 	static var setUpdateRateFromScript(const var::NativeFunctionArgs& args);
 	static var setExecutionTimeoutFromScript(const var::NativeFunctionArgs& args);
 
-	static bool checkNumArgs(const String &logName, const var::NativeFunctionArgs &args, int expectedArgs);
+	static bool checkNumArgs(const String& logName, const var::NativeFunctionArgs& args, int expectedArgs);
 
 
 };

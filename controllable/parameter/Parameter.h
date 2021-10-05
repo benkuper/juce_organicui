@@ -74,6 +74,9 @@ public:
 	std::unique_ptr<ParameterAutomation> automation;
 	bool canBeAutomated;
 
+	//ColorStatus
+	HashMap<var, Colour> colorStatusMap;
+
 	bool isComplex();
 	virtual StringArray getValuesNames();
 
@@ -131,7 +134,7 @@ public:
 	virtual void parameterValueChanged(Parameter * p) override;
 
 
-	InspectableEditor * getEditor(bool isRoot) override;
+	InspectableEditor* getEditorInternal(bool isRoot) override;
 	virtual ControllableDetectiveWatcher* getDetectiveWatcher() override;
 
 	virtual DashboardItem* createDashboardItem() override;

@@ -20,7 +20,7 @@ public:
 	var getJSONData() override;
 	void loadJSONDataInternal(var data) override;
 
-	InspectableEditor * getEditor(bool isRoot) override;
+	InspectableEditor * getEditorInternal(bool isRoot) override;
 };
 
 class GlobalSettings :

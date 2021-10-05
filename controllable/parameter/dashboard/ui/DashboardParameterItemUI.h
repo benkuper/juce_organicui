@@ -8,28 +8,25 @@ public:
 	DashboardParameterItemUI(DashboardParameterItem* item);
 	~DashboardParameterItemUI();
 
-	DashboardParameterItem * parameterItem;
+	DashboardParameterItem* parameterItem;
 
-	virtual ControllableUI * createControllableUI() override;
+	virtual ControllableUI* createControllableUI() override;
 	virtual void updateUIParameters() override;
-	
+
 	virtual void controllableFeedbackUpdateInternal(Controllable* c) override;
 	virtual void controllableStateUpdateInternal(Controllable* c) override;
 };
 
-/*
-class ParameterColorStyleUI :
-	public ParameterUI
+class DashboardParameterStyleEditor :
+	public ParameterEditor
 {
 public:
-	ParameterColorStyleUI(Parameter* p, bool isCircle, DashboardParameterItem * item);
-	~ParameterColorStyleUI();
+	DashboardParameterStyleEditor(Parameter* p, DashboardParameterItem * dpi, bool isRoot);
+	~DashboardParameterStyleEditor();
 
-	bool isCircle;
-	DashboardParameterItem * item;
+	DashboardParameterItem* dpi;
+	TextButton bt;
 
-	void paint(Graphics& g) override;
-
-	void valueChanged(const var &v) override;
+	void resizedInternal(juce::Rectangle<int>& r) override;
+	void buttonClicked(Button* b) override;
 };
-*/

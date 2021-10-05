@@ -148,7 +148,7 @@ void AutomationRecorder::inspectableDestroyed(Inspectable * i)
 	if (!currentInput.wasObjectDeleted() && i == currentInput) setCurrentInput(nullptr);
 }
 
-InspectableEditor * AutomationRecorder::getEditor(bool isRoot)
+InspectableEditor * AutomationRecorder::getEditorInternal(bool isRoot)
 {
 	return new AutomationRecorderEditor(this, isRoot);
 }

@@ -18,5 +18,4 @@
 #include "controllable/dashboard/ui/DashboardTriggerItemUI.cpp"
 #include "controllable/dashboard/ui/DashboardCCItemUI.cpp"
 #include "controllable/parameter/dashboard/DashboardParameterItem.cpp"
-#include "controllable/parameter/dashboard/DashboardParameterColorStyle.cpp"
 #include "controllable/parameter/dashboard/ui/DashboardParameterItemUI.cpp"

@@ -614,7 +614,7 @@ var Automation::getKeysBetweenFromScript(const juce::var::NativeFunctionArgs& a)
     return result;
 }
 
-InspectableEditor* Automation::getEditor(bool isRoot)
+InspectableEditor* Automation::getEditorInternal(bool isRoot)
 {
     return new AutomationEditor(this, isRoot);
 }

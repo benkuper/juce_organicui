@@ -430,7 +430,7 @@ void Parameter::parameterValueChanged(Parameter* p)
 	}
 }
 
-InspectableEditor* Parameter::getEditor(bool isRoot)
+InspectableEditor* Parameter::getEditorInternal(bool isRoot)
 {
 	return new ParameterEditor(this, isRoot);
 }
@@ -477,6 +477,25 @@ var Parameter::getJSONDataInternal()
 		if ((int)maximumValue != INT32_MAX) data.getDynamicObject()->setProperty("maxValue", maximumValue);
 	}
 
+	if (colorStatusMap.size() > 0)
+	{
+		var cMapData;
+		HashMap<var, Colour>::Iterator it(colorStatusMap);
+		while (it.next())
+		{
+			cMapData.append(it.getKey());
+			var colorVar;
+			Colour c = it.getValue();
+			colorVar.append(c.getFloatRed());
+			colorVar.append(c.getFloatGreen());
+			colorVar.append(c.getFloatBlue());
+			colorVar.append(c.getFloatAlpha());
+			cMapData.append(colorVar);
+		}
+
+		data.getDynamicObject()->setProperty("colorStatusMap", cMapData);
+	}
+
 	return data;
 }
 
@@ -492,6 +511,14 @@ void Parameter::loadJSONDataInternal(var data)
 	if (data.getDynamicObject()->hasProperty("expression")) setControlExpression(data.getProperty("expression", ""));
 	else if (data.getDynamicObject()->hasProperty("paramAutomation") && automation != nullptr) automation->loadJSONData(data.getProperty("paramAutomation", var()));
 	else if (data.getDynamicObject()->hasProperty("reference") && referenceTarget != nullptr) referenceTarget->loadJSONData(data.getProperty("reference", var()));
+
+	var cMapData = data.getProperty("colorStatusMap", var());
+	for (int i = 0; i < cMapData.size(); i+=2)
+	{
+		var cData = cMapData[i+1];
+		Colour c = Colour::fromFloatRGBA((float)cData[0], (float)cData[1], (float)cData[2], (float)cData[3]);
+		colorStatusMap.set(cMapData[i], c);
+	}
 
 	alwaysNotify = data.getProperty("alwaysNotify", alwaysNotify);
 }

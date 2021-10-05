@@ -23,7 +23,7 @@ public:
 
 	Script * createItem() override;
 
-	virtual InspectableEditor * getEditor(bool isRoot) override;
+	virtual InspectableEditor * getEditorInternal(bool isRoot) override;
 
 	bool callFunctionOnAllItems(const Identifier &function, var a = var());
 	bool callFunctionOnAllItems(const Identifier &function, Array<var> args);

@@ -1433,7 +1433,7 @@ String ControllableContainer::getScriptTargetString()
 	return "[" + niceName + ": Container]";
 }
 
-InspectableEditor* ControllableContainer::getEditor(bool isRoot)
+InspectableEditor* ControllableContainer::getEditorInternal(bool isRoot)
 {
 	if (customGetEditorFunc != nullptr) return customGetEditorFunc(this, isRoot);
 	return new GenericControllableContainerEditor(this, isRoot);
@@ -1471,7 +1471,7 @@ void EnablingControllableContainer::setCanBeDisabled(bool value)
 	}
 }
 
-InspectableEditor* EnablingControllableContainer::getEditor(bool isRoot)
+InspectableEditor* EnablingControllableContainer::getEditorInternal(bool isRoot)
 {
 	if (customGetEditorFunc != nullptr) return customGetEditorFunc(this, isRoot);
 	return new EnablingControllableContainerEditor(this, isRoot);

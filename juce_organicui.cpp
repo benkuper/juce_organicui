@@ -60,6 +60,7 @@
 #include "controllable/parameter/ui/StringParameterUI.cpp"
 #include "controllable/parameter/ui/TargetParameterUI.cpp"
 #include "controllable/parameter/ui/TripleSliderUI.cpp"
+#include "controllable/parameter/ui/ColorStatusUI.cpp"
 
 #include "controllable/parameter/gradient/GradientColor.cpp"
 #include "controllable/parameter/gradient/GradientColorManager.cpp"

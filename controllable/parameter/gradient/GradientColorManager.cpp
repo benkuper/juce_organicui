@@ -319,7 +319,7 @@ void GradientColorManager::loadJSONDataInternal(var data)
 	//rebuildGradient();
 }
 
-InspectableEditor* GradientColorManager::getEditor(bool isRoot)
+InspectableEditor* GradientColorManager::getEditorInternal(bool isRoot)
 {
 	return new GradientColorManagerEditor(this, isRoot);
 }

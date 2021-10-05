@@ -42,6 +42,9 @@ public:
 	var customData;
 	bool saveCustomData;
 
+	//editor
+	std::function<InspectableEditor* (Inspectable*, bool)> customGetEditorFunc;
+
 	//Help
 	String helpID;
 	virtual String getHelpID();
@@ -68,8 +71,8 @@ public:
 	virtual void setSelectedInternal(bool value); //to be overriden
 
 
-	virtual InspectableEditor * getEditor(bool /*isRoot*/) { jassert(false);  return nullptr; } //to override !
-
+	InspectableEditor* getEditor(bool isRoot);
+	virtual InspectableEditor* getEditorInternal(bool /*isRoot*/) { jassert(false);  return nullptr; } //to override !
 	//Listener
 	class  InspectableListener
 	{

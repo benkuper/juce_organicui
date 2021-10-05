@@ -296,7 +296,7 @@ public:
 
 
 
-	virtual InspectableEditor * getEditor(bool /*isRootEditor*/) override;
+	virtual InspectableEditor * getEditorInternal(bool /*isRootEditor*/) override;
 	virtual DashboardItem * createDashboardItem() override;
 
 	private:
@@ -316,5 +316,5 @@ public:
 	bool canBeDisabled;
 	void setCanBeDisabled(bool value);
 
-	virtual InspectableEditor * getEditor(bool isRoot) override;
+	virtual InspectableEditor * getEditorInternal(bool isRoot) override;
 };

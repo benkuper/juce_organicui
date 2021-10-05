@@ -74,6 +74,6 @@ public:
 	void addAsyncCoalescedRecorderListener(AsyncListener* newListener) { recorderNotifier.addAsyncCoalescedListener(newListener); }
 	void removeAsyncRecorderListener(AsyncListener* listener) { recorderNotifier.removeListener(listener); }
 
-	InspectableEditor * getEditor(bool isRoot) override;
+	InspectableEditor * getEditorInternal(bool isRoot) override;
 };
 

@@ -16,18 +16,17 @@ public:
 	FileParameter* btImage;
 
 	EnumParameter* style;
-	//std::unique_ptr<ColorStyleManager> colorManager;
-
 	virtual DashboardItemUI* createUI() override;
 
-	virtual void setInspectableInternal(Inspectable* i) override;
+	InspectableEditor* getStyleEditor(Inspectable* c, bool isRoot);
 
-	void onContainerParameterChangedInternal(Parameter* p) override;
+	virtual void setInspectableInternal(Inspectable* i) override;
 	void onExternalParameterValueChanged(Parameter* p) override;
+
+	virtual void updateStyleOptions();
 
 	var getServerData() override;
 
 	static DashboardParameterItem* create(var) { return new DashboardParameterItem(); }
 	virtual String getTypeString() const override { return "DashboardParameterItem"; }
 };
-
