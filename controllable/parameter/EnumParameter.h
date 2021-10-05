@@ -62,6 +62,7 @@ public:
 
 	var getJSONDataInternal() override;
 	void loadJSONDataInternal(var data) override;
+	virtual void setupFromJSONData(var data) override;
 
 	
 	static var getValueKeyFromScript(const juce::var::NativeFunctionArgs& a);

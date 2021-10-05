@@ -75,6 +75,7 @@ public:
 	void inspectableDestroyed(Inspectable * i) override;
 
 	void setAttribute(String param, var value) override;
+	virtual StringArray getValidAttributes() const override;
 
 	var getJSONDataInternal() override;
 	void loadJSONDataInternal(var data) override;

@@ -111,6 +111,7 @@ public:
 	var getNormalizedValue();
 	
 	virtual void setAttribute(String param, var value) override;
+	virtual StringArray getValidAttributes() const override;
 
     //helpers for fast typing
 	virtual float floatValue();
@@ -138,6 +139,7 @@ public:
 	virtual bool shouldBeSaved() override;
 	virtual var getJSONDataInternal() override;
 	virtual void loadJSONDataInternal(var data) override;
+	virtual void setupFromJSONData(var data) override;
 	
 	static var getValueFromScript(const juce::var::NativeFunctionArgs& a);
 	static var getRangeFromScript(const juce::var::NativeFunctionArgs& a);

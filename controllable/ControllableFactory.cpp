@@ -103,6 +103,18 @@ Controllable * ControllableFactory::createControllable(const String & controllab
 	return nullptr;
 }
 
+Controllable* ControllableFactory::createControllableFromJSON(const String &name, var data)
+{
+	String valueType = data.getProperty("type", "").toString();
+	Controllable* c = ControllableFactory::createControllable(valueType);
+	if (c == nullptr) return nullptr;
+
+	c->setNiceName(name);
+	c->setupFromJSONData(data);
+
+	return c;
+}
+
 Parameter * ControllableFactory::createParameterFrom(Controllable * source, bool copyName, bool copyValue)
 {
 	Parameter * sourceP = dynamic_cast<Parameter *>(source);

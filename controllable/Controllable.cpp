@@ -1,3 +1,4 @@
+#include "Controllable.h"
 /*
   ==============================================================================
 
@@ -222,6 +223,18 @@ void Controllable::loadJSONData(var data)
 	isLoadingData = false;
 }
 
+void Controllable::setupFromJSONData(var data)
+{
+	if (data.hasProperty("shortName")) setCustomShortName(data.getProperty("shortName", "[error]").toString());
+	if (data.hasProperty("description")) description = data.getProperty("description", "[no description]").toString();
+
+	StringArray attributes = getValidAttributes();
+	for (auto& a : attributes)
+	{
+		if (data.hasProperty(a)) setAttribute(a, data.getDynamicObject()->getProperty(a));
+	}
+}
+
 String Controllable::getControlAddress(ControllableContainer * relativeTo)
 {
 	return parentContainer->getControlAddress(relativeTo) + "/" + shortName;
@@ -261,6 +274,11 @@ void Controllable::setAttribute(String param, var value)
 	if (param == "description") description = value;
 	else if (param == "readonly" || param == "readOnly") setControllableFeedbackOnly(value);
 	else if (param == "enabled") setEnabled(value);
+}
+
+StringArray Controllable::getValidAttributes() const
+{
+	return { "targetType", "searchLevel", "allowedTypes", "excludedTypes","root", "labelLevel" };
 }
 
 

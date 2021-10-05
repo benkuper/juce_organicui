@@ -1,4 +1,3 @@
-#include "DashboardParameterItemUI.h"
 DashboardParameterItemUI::DashboardParameterItemUI(DashboardParameterItem* item) :
 	DashboardControllableItemUI(item),
 	parameterItem(item)
@@ -93,3 +92,25 @@ void DashboardParameterItemUI::controllableStateUpdateInternal(Controllable* c)
 	if (c == parameterItem->showValue || c == parameterItem->bgColor || c == parameterItem->fgColor) updateUIParameters();
 	else if (c == parameterItem->btImage || c == parameterItem->style) rebuildUI();
 }
+
+/*
+ParameterColorStyleUI::ParameterColorStyleUI(Parameter* p, bool isCircle, GradientColorManager * gradient) :
+	ParameterUI(p),
+	isCircle(isCircle),
+	gradient(gradient)
+{
+}
+
+ParameterColorStyleUI::~ParameterColorStyleUI()
+{
+}
+
+void ParameterColorStyleUI::paint(Graphics& g)
+{
+	g.setColour(gradient->getColorForPosition(parameter->floatValue()));
+}
+
+void ParameterColorStyleUI::valueChanged(const var& v)
+{
+}
+*/

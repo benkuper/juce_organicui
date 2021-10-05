@@ -237,3 +237,10 @@ void FileParameter::setAttribute(String param, var paramVal)
 	StringParameter::setAttribute(param, paramVal);
 	if (param == "directoryMode") directoryMode = paramVal;
 }
+
+StringArray FileParameter::getValidAttributes() const
+{
+	StringArray att = StringParameter::getValidAttributes();
+	att.add("directoryMode");
+	return att;
+}

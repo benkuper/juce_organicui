@@ -1,3 +1,4 @@
+#include "DashboardParameterItem.h"
 
 DashboardParameterItem::DashboardParameterItem(Parameter* parameter) :
 	DashboardControllableItem(parameter),
@@ -20,6 +21,9 @@ DashboardParameterItem::DashboardParameterItem(Parameter* parameter) :
 	{
 		style->addOption("Horizontal Slider", 0)->addOption("Vertical Slider", 1)->addOption("Text", 2)->addOption("Time", 3);
 	}
+	
+	style->addOption("Color Circle", 10);
+	style->addOption("Color Square", 11);
 
 	btImage = addFileParameter("Toggle image", "The image of the toggle");
 
@@ -60,6 +64,31 @@ void DashboardParameterItem::setInspectableInternal(Inspectable* i)
 	if (parameter != nullptr && parameter->type == Controllable::FLOAT)
 	{
 		style->addOption("Horizontal Slider", 0)->addOption("Vertical Slider", 1)->addOption("Text", 2)->addOption("Time", 3);
+	}
+}
+
+void DashboardParameterItem::onContainerParameterChangedInternal(Parameter* p)
+{
+	DashboardControllableItem::onContainerParameterChangedInternal(p);
+	if (p == style)
+	{
+		int s = style->getValueData();
+		//if (s == 10 || s == 11)
+		//{
+		//	if (colorManager == nullptr)
+		//	{
+		//		colorManager.reset(new GradientColorManager());
+		//		addChildControllableContainer(colorManager.get());
+		//	}
+		//}
+		//else
+		//{
+		//	if (colorManager != nullptr)
+		//	{
+		//		removeChildControllableContainer(colorManager.get());
+		//		colorManager.reset();
+		//	}
+		//}
 	}
 }
 

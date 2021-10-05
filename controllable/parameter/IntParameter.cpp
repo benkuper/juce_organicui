@@ -62,6 +62,14 @@ void IntParameter::setAttribute(String attribute, var val)
 	if (attribute == "hexMode") hexMode = val;
 }
 
+
+StringArray IntParameter::getValidAttributes() const
+{
+	StringArray att = Parameter::getValidAttributes();
+	att.addArray({ "hexMode" });
+	return att;
+}
+
 var IntParameter::getJSONDataInternal()
 {
 	var data = Parameter::getJSONDataInternal();

@@ -244,12 +244,20 @@ void ControllableUI::showContextMenu()
 			break;
 
 		case 9999:
-			DashboardManager::getInstance()->addItem()->itemManager.addItem(controllable->createDashboardItem());
-			break;
+		{
+			Dashboard* d = new Dashboard();
+			d->itemManager.addItem(controllable->createDashboardItem());
+			DashboardManager::getInstance()->addItem(d);
+		}
+		break;
 
 		case 19999:
-			ParrotManager::getInstance()->addItem()->addTarget(controllable);
-			break;
+		{
+			Parrot* p = new Parrot();
+			p->addTarget(controllable);
+			ParrotManager::getInstance()->addItem(p);
+		}
+		break;
 
 		default:
 			if (result >= 10000 && result <= 10100)

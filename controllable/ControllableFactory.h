@@ -44,6 +44,7 @@ public:
 	static Controllable * showFilteredCreateMenu(StringArray typeFilters, bool excludeSpecials = false);
 
 	static Controllable * createControllable(const String &controllableType);
+	static Controllable* createControllableFromJSON(const String &name, var data);
 
 	static Parameter * createParameterFrom(Controllable * source, bool copyName = false, bool copyValue = false);
 

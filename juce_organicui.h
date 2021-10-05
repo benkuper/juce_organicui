@@ -286,6 +286,7 @@ using namespace juce;
 #include "controllable/dashboard/ui/DashboardTriggerItemUI.h"
 #include "controllable/dashboard/ui/DashboardCCItemUI.h"
 #include "controllable/parameter/dashboard/DashboardParameterItem.h"
+#include "controllable/parameter/dashboard/DashboardParameterColorStyle.h"
 #include "controllable/parameter/dashboard/ui/DashboardParameterItemUI.h"
 
 #include "parrot/ParrotRecord.h"

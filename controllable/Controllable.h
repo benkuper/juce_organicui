@@ -92,6 +92,8 @@ public:
 	virtual void loadJSONData(var data);
 	virtual void loadJSONDataInternal(var data) {} //to be overriden
 
+	virtual void setupFromJSONData(var data);
+
 	String getControlAddress(ControllableContainer * relativeTo = nullptr);
 
 	// used for generating editor
@@ -101,6 +103,7 @@ public:
 	virtual String getDefaultDashboardLabel() const;
 
 	virtual void setAttribute(String param, var value);
+	virtual StringArray getValidAttributes() const;
 
 	static var setValueFromScript(const juce::var::NativeFunctionArgs& a);
 	static var checkIsParameterFromScript(const juce::var::NativeFunctionArgs& a);

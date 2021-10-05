@@ -92,3 +92,10 @@ void StringParameter::setAttribute(String param, var paramVal)
 	else if (param == "suffix") suffix = paramVal;
 }
 
+StringArray StringParameter::getValidAttributes() const
+{
+	StringArray att = Parameter::getValidAttributes();
+	att.addArray({ "multiline","prefix","suffix" });
+	return att;
+}
+

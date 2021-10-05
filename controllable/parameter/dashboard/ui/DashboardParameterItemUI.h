@@ -16,3 +16,20 @@ public:
 	virtual void controllableFeedbackUpdateInternal(Controllable* c) override;
 	virtual void controllableStateUpdateInternal(Controllable* c) override;
 };
+
+/*
+class ParameterColorStyleUI :
+	public ParameterUI
+{
+public:
+	ParameterColorStyleUI(Parameter* p, bool isCircle, DashboardParameterItem * item);
+	~ParameterColorStyleUI();
+
+	bool isCircle;
+	DashboardParameterItem * item;
+
+	void paint(Graphics& g) override;
+
+	void valueChanged(const var &v) override;
+};
+*/

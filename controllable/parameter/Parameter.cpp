@@ -16,15 +16,15 @@ Parameter::Parameter(const Type& type, const String& niceName, const String& des
 	rebuildUIOnRangeChange(true),
 	minimumValue(minValue),
 	maximumValue(maxValue),
-    lockManualControlMode(false),
-    controlMode(MANUAL),
+	lockManualControlMode(false),
+	controlMode(MANUAL),
 	alwaysNotify(false),
 	referenceTarget(nullptr),
-    referenceParameter(nullptr),
-    canBeAutomated(false),
-    isPresettable(true),
-    isOverriden(false),
-    forceSaveValue(false),
+	referenceParameter(nullptr),
+	canBeAutomated(false),
+	isPresettable(true),
+	isOverriden(false),
+	forceSaveValue(false),
 	forceSaveRange(false),
 	queuedNotifier(100)
 {
@@ -36,9 +36,9 @@ Parameter::Parameter(const Type& type, const String& niceName, const String& des
 	scriptObject.setMethod("hasRange", Parameter::hasRangeFromScript);
 }
 
-Parameter::~Parameter() 
+Parameter::~Parameter()
 {
-	if(referenceTarget != nullptr) referenceTarget->removeParameterListener(this); //avoid reassigning on deletion
+	if (referenceTarget != nullptr) referenceTarget->removeParameterListener(this); //avoid reassigning on deletion
 	setReferenceParameter(nullptr);
 
 	if (queuedNotifier.isUpdatePending())
@@ -47,7 +47,7 @@ Parameter::~Parameter()
 		if (mmLock.lockWasGained()) queuedNotifier.handleUpdateNowIfNeeded();
 		queuedNotifier.cancelPendingUpdate();
 	}
-	
+
 	Parameter::masterReference.clear();
 }
 
@@ -99,17 +99,17 @@ void Parameter::setControlMode(ControlMode _mode)
 	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::CONTROLMODE_CHANGED, this));
 }
 
-void Parameter::setControlExpression(const String & e)
+void Parameter::setControlExpression(const String& e)
 {
 	controlExpression = e;
 	if (expression != nullptr) expression->setExpression(e);
 }
 
-void Parameter::setReferenceParameter(Parameter * tp)
+void Parameter::setReferenceParameter(Parameter* tp)
 {
 	if (tp == referenceParameter) return;
-	
-	if(referenceParameter != nullptr)
+
+	if (referenceParameter != nullptr)
 	{
 		referenceParameter->removeParameterListener(this);
 	}
@@ -145,7 +145,7 @@ void Parameter::resetValue(bool silentSet)
 	setValue(defaultValue, silentSet, true, false);
 }
 
-UndoableAction * Parameter::setUndoableValue(var oldValue, var newValue, bool onlyReturnAction)
+UndoableAction* Parameter::setUndoableValue(var oldValue, var newValue, bool onlyReturnAction)
 {
 	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile)
 	{
@@ -154,7 +154,7 @@ UndoableAction * Parameter::setUndoableValue(var oldValue, var newValue, bool on
 		return nullptr;
 	}
 
-	UndoableAction * a = new ParameterSetValueAction(this, oldValue, newValue);
+	UndoableAction* a = new ParameterSetValueAction(this, oldValue, newValue);
 	if (onlyReturnAction) return a;
 
 	UndoMaster::getInstance()->performAction("Set " + niceName + " value", a);
@@ -172,7 +172,7 @@ void Parameter::setValue(var _value, bool silentSet, bool force, bool forceOverr
 
 		lastValue = var(value.clone());
 		setValueInternal(croppedValue);
-		if(!isOverriden /*&& !isControllableFeedbackOnly*/) isOverriden = croppedValue != defaultValue || forceOverride;
+		if (!isOverriden /*&& !isControllableFeedbackOnly*/) isOverriden = croppedValue != defaultValue || forceOverride;
 	}
 	if (!silentSet) notifyValueChanged();
 }
@@ -363,7 +363,7 @@ var Parameter::getNormalizedValue()
 			if ((float)minimumValue[i] == (float)maximumValue[i]) normVal.append(0.f);
 			else normVal.append(jmap<float>((float)value[i], (float)minimumValue[i], (float)maximumValue[i], 0.f, 1.f));
 		}
-		
+
 		return normVal;
 	}
 }
@@ -373,6 +373,13 @@ void Parameter::setAttribute(String param, var val)
 	Controllable::setAttribute(param, val);
 
 	if (param == "alwaysNotify") alwaysNotify = val;
+}
+
+StringArray Parameter::getValidAttributes() const
+{
+	StringArray att = Controllable::getValidAttributes();
+	att.add("alwaysNotify");
+	return att;
 }
 
 //helpers for fast typing
@@ -398,31 +405,32 @@ String Parameter::stringValue() {
 
 void Parameter::notifyValueChanged() {
 	listeners.call(&ParameterListener::parameterValueChanged, this);
-	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::VALUE_CHANGED,this, getValue()));
+	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::VALUE_CHANGED, this, getValue()));
 }
 
-void Parameter::expressionValueChanged(ScriptExpression *)
+void Parameter::expressionValueChanged(ScriptExpression*)
 {
 	setValue(expression->currentValue);
 }
 
-void Parameter::expressionStateChanged(ScriptExpression *)
+void Parameter::expressionStateChanged(ScriptExpression*)
 {
 	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::EXPRESSION_STATE_CHANGED, this));
 }
 
-void Parameter::parameterValueChanged(Parameter * p)
+void Parameter::parameterValueChanged(Parameter* p)
 {
 	if (p == referenceTarget.get())
 	{
-		setReferenceParameter(dynamic_cast<Parameter *>(referenceTarget->target.get()));
-	} else if (p == referenceParameter)
+		setReferenceParameter(dynamic_cast<Parameter*>(referenceTarget->target.get()));
+	}
+	else if (p == referenceParameter)
 	{
 		setValue(referenceParameter->getValue());
 	}
 }
 
-InspectableEditor * Parameter::getEditor(bool isRoot)
+InspectableEditor* Parameter::getEditor(bool isRoot)
 {
 	return new ParameterEditor(this, isRoot);
 }
@@ -450,8 +458,8 @@ bool Parameter::shouldBeSaved()
 var Parameter::getJSONDataInternal()
 {
 	var data = Controllable::getJSONDataInternal();
-	if(forceSaveValue || (isOverriden && !isControllableFeedbackOnly && isSavable)) data.getDynamicObject()->setProperty("value", value);
-	
+	if (forceSaveValue || (isOverriden && !isControllableFeedbackOnly && isSavable)) data.getDynamicObject()->setProperty("value", value);
+
 	if (controlMode != MANUAL)
 	{
 		data.getDynamicObject()->setProperty("controlMode", controlMode);
@@ -465,8 +473,8 @@ var Parameter::getJSONDataInternal()
 
 	if (hasRange() && (!saveValueOnly || forceSaveRange || isCustomizableByUser))
 	{
-		if((int)minimumValue != INT32_MIN) data.getDynamicObject()->setProperty("minValue", minimumValue);
-		if((int)maximumValue != INT32_MAX) data.getDynamicObject()->setProperty("maxValue", maximumValue);
+		if ((int)minimumValue != INT32_MIN) data.getDynamicObject()->setProperty("minValue", minimumValue);
+		if ((int)maximumValue != INT32_MAX) data.getDynamicObject()->setProperty("maxValue", maximumValue);
 	}
 
 	return data;
@@ -477,10 +485,10 @@ void Parameter::loadJSONDataInternal(var data)
 	Controllable::loadJSONDataInternal(data);
 
 	if (!saveValueOnly || forceSaveRange || isCustomizableByUser) setRange(data.getProperty("minValue", minimumValue), data.getProperty("maxValue", maximumValue));
-	if (data.getDynamicObject()->hasProperty("value")) setValue(data.getProperty("value", 0),false, true, true);
+	if (data.getDynamicObject()->hasProperty("value")) setValue(data.getProperty("value", 0), false, true, true);
 
 	if (data.getDynamicObject()->hasProperty("controlMode")) setControlMode((ControlMode)(int)data.getProperty("controlMode", MANUAL));
-	
+
 	if (data.getDynamicObject()->hasProperty("expression")) setControlExpression(data.getProperty("expression", ""));
 	else if (data.getDynamicObject()->hasProperty("paramAutomation") && automation != nullptr) automation->loadJSONData(data.getProperty("paramAutomation", var()));
 	else if (data.getDynamicObject()->hasProperty("reference") && referenceTarget != nullptr) referenceTarget->loadJSONData(data.getProperty("reference", var()));
@@ -488,11 +496,24 @@ void Parameter::loadJSONDataInternal(var data)
 	alwaysNotify = data.getProperty("alwaysNotify", alwaysNotify);
 }
 
-var Parameter::getValueFromScript(const juce::var::NativeFunctionArgs & a)
+void Parameter::setupFromJSONData(var data)
 {
-	Parameter * p = getObjectFromJS<Parameter>(a);
+	Controllable::setupFromJSONData(data);
+
+	if (data.hasProperty("min") || data.hasProperty("max")) setRange(data.getProperty("min", INT32_MIN), data.getProperty("max", INT32_MAX));
+
+	if (data.hasProperty("default"))
+	{
+		defaultValue = data.getProperty("default",defaultValue);
+		setValue(data.getProperty("default", defaultValue));
+	}
+}
+
+var Parameter::getValueFromScript(const juce::var::NativeFunctionArgs& a)
+{
+	Parameter* p = getObjectFromJS<Parameter>(a);
 	if (p == nullptr) return var();
-	WeakReference<Parameter> pRef(p); 
+	WeakReference<Parameter> pRef(p);
 	if (pRef == nullptr || pRef.wasObjectDeleted()) return var();
 	return p->getValue();
 }
@@ -546,13 +567,13 @@ String Parameter::getScriptTargetString()
 
 // UNDO MANAGEMENT
 
-Parameter * Parameter::ParameterAction::getParameter() {
-	return dynamic_cast<Parameter *>(getControllable());
+Parameter* Parameter::ParameterAction::getParameter() {
+	return dynamic_cast<Parameter*>(getControllable());
 }
 
 bool Parameter::ParameterSetValueAction::perform()
 {
-	Parameter * p = getParameter();
+	Parameter* p = getParameter();
 	if (p == nullptr)
 	{
 		LOGWARNING("Undo set value : parameter not found " << controlAddress);
@@ -565,7 +586,7 @@ bool Parameter::ParameterSetValueAction::perform()
 
 bool Parameter::ParameterSetValueAction::undo()
 {
-	Parameter * p = getParameter();
+	Parameter* p = getParameter();
 	if (p == nullptr)
 	{
 		LOGWARNING("Undo set value : parameter not found " << controlAddress);

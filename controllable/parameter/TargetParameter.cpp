@@ -1,4 +1,3 @@
-#include "TargetParameter.h"
 /*
   ==============================================================================
 
@@ -345,6 +344,13 @@ void TargetParameter::setAttribute(String param, var attributeValue)
 		}
 	}
 	else if (param == "labelLevel") defaultParentLabelLevel = jmax<int>(attributeValue, 1);
+}
+
+StringArray TargetParameter::getValidAttributes() const
+{
+	StringArray att = StringParameter::getValidAttributes();
+	att.addArray({ "targetType", "searchLevel","allowedTypes","excludedTypes","root","labelLevel" });
+	return att;
 }
 
 

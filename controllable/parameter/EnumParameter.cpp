@@ -1,4 +1,3 @@
-#include "EnumParameter.h"
 /*
   ==============================================================================
 
@@ -189,6 +188,24 @@ void EnumParameter::loadJSONDataInternal(var data)
 		}
 	}
 	Parameter::loadJSONDataInternal(data);
+}
+
+void EnumParameter::setupFromJSONData(var data)
+{
+	Parameter::setupFromJSONData(data);
+	var optionsData = data.getProperty("options", var());
+	if (optionsData.isObject())
+	{
+		NamedValueSet options = optionsData.getDynamicObject()->getProperties();
+		for (auto& o : options)
+		{
+			addOption(o.name.toString(), o.value);
+		}
+	}
+	else
+	{
+		LOGWARNING("Options property is not valid : " << optionsData.toString());
+	}
 }
 
 var EnumParameter::getValueKeyFromScript(const juce::var::NativeFunctionArgs& a)

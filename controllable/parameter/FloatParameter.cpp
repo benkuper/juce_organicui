@@ -136,6 +136,13 @@ void FloatParameter::setAttribute(String attribute, var val)
 	}
 }
 
+StringArray FloatParameter::getValidAttributes() const
+{
+	StringArray att = Parameter::getValidAttributes();
+	att.addArray({ "ui", "unitSteps" });
+	return att;
+}
+
 var FloatParameter::getJSONDataInternal()
 {
 	var data = Parameter::getJSONDataInternal();
