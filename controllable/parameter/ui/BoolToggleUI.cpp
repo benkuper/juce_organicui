@@ -64,7 +64,7 @@ void BoolToggleUI::paint(Graphics & g)
 	Image m = valCheck ? onImage : offImage;
 	
 	juce::Rectangle<int> r = getLocalBounds();
-	g.setColour(Colours::white.withAlpha(isMouseOver() ? 1 : .8f));
+	//g.setColour(Colours::white.withAlpha(isMouseOver() ? 1 : .8f));
 
 	juce::Rectangle<int> cr;
 	float labelWidth = 0;
@@ -91,7 +91,7 @@ void BoolToggleUI::paint(Graphics & g)
 
 	if (showLabel)
 	{
-		g.setColour(useCustomTextColor?customTextColor:TEXT_COLOR);
+		g.setColour(useCustomTextColor?customTextColor: (isInteractable() ? TEXT_COLOR : FEEDBACK_COLOR));
 		g.drawFittedText(customLabel.isNotEmpty()?customLabel:parameter->niceName, r, Justification::left,1);
 	}
 
