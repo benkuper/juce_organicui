@@ -19,7 +19,7 @@ public:
     FloatSliderUI(Parameter * parameter = nullptr);
     virtual ~FloatSliderUI();
 
-    enum Direction { HORIZONTAL, VERTICAL };
+    enum Direction { HORIZONTAL, VERTICAL, ROTARY };
 
     //settings
 
@@ -55,6 +55,9 @@ public:
     virtual float getNormalizedValueFromPosition(const Point<int> &pos);
     virtual int getDrawPos();
     virtual String getValueText() const;
+
+    virtual float getAngleForValue(float val, float angleReduction);
+    void drawRotary(Graphics &g, Colour c, float startPos, float endPos, float reduction = 0);
 
     virtual void setParamNormalizedValueUndoable(float oldValue, float newValue);
     virtual void setParamNormalizedValue(float value);

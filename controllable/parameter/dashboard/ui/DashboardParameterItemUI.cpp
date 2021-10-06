@@ -1,4 +1,3 @@
-#include "DashboardParameterItemUI.h"
 DashboardParameterItemUI::DashboardParameterItemUI(DashboardParameterItem* item) :
 	DashboardControllableItemUI(item),
 	parameterItem(item)
@@ -29,16 +28,18 @@ ControllableUI* DashboardParameterItemUI::createControllableUI()
 	case Controllable::INT:
 	case Controllable::ENUM:
 	{
-		switch ((int)parameterItem->style->getValueData())
+		int s = (int)parameterItem->style->getValueData();
+		switch (s)
 		{
 		case 0:
 		case 1:
+		case 5:
 		{
 			FloatSliderUI* sliderUI = ((FloatParameter*)parameterItem->parameter.get())->createSlider();
-			sliderUI->orientation = (int)parameterItem->style->getValueData() == 0 ? FloatSliderUI::HORIZONTAL : FloatSliderUI::VERTICAL;
+			sliderUI->orientation = s == 0 ? FloatSliderUI::HORIZONTAL : (s == 1 ? FloatSliderUI::VERTICAL : FloatSliderUI::ROTARY);
 			return sliderUI;
 		}
-			break;
+		break;
 
 		case 2:
 			return ((FloatParameter*)parameterItem->parameter.get())->createLabelParameter();
@@ -47,6 +48,8 @@ ControllableUI* DashboardParameterItemUI::createControllableUI()
 		case 3:
 			return ((FloatParameter*)parameterItem->parameter.get())->createTimeLabelParameter();
 			break;
+
+
 
 		case 10:
 			return new ColorStatusUI(parameterItem->parameter.get(), true);
@@ -57,10 +60,10 @@ ControllableUI* DashboardParameterItemUI::createControllableUI()
 			break;
 		}
 	}
-    
-    default:
+
+	default:
 		break;
-            
+
 	}
 
 	return DashboardControllableItemUI::createControllableUI();
@@ -105,7 +108,7 @@ void DashboardParameterItemUI::controllableStateUpdateInternal(Controllable* c)
 	else if (c == parameterItem->btImage || c == parameterItem->style) rebuildUI();
 }
 
-DashboardParameterStyleEditor::DashboardParameterStyleEditor(Parameter* p, DashboardParameterItem * dpi, bool isRoot) :
+DashboardParameterStyleEditor::DashboardParameterStyleEditor(Parameter* p, DashboardParameterItem* dpi, bool isRoot) :
 	ParameterEditor(p, isRoot),
 	dpi(dpi),
 	bt("Edit...")
