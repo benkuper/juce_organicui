@@ -22,12 +22,15 @@ public:
 	Image onImage;
 
     bool shouldRepaint;
+    bool usingCustomImages;
 	
     void setImages(Image onImage, Image offImage = Image());
 
     void paint(Graphics &g) override;
     void mouseDownInternal(const MouseEvent &e) override;
     void mouseUpInternal(const MouseEvent &e) override;
+
+    virtual void updateUIParamsInternal();
 
     void timerCallback() override;
 

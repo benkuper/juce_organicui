@@ -12,25 +12,21 @@ BoolToggleUI::BoolToggleUI(BoolParameter * parameter, Image _onImage, Image _off
     ParameterUI(parameter),
 	shouldRepaint(false)
 {
-	showEditWindowOnDoubleClick = false;
+	usingCustomImages = _onImage.isValid();
+	
 
-	if (_onImage.isValid())
+	if(usingCustomImages)
 	{
 		setImages(_onImage, _offImage);
 		showLabel = false;
 	}
 	else
 	{
-		if (!isInteractable() && (parameter->enabled || parameter->isControllableFeedbackOnly))
-		{
-			setImages(ImageCache::getFromMemory(OrganicUIBinaryData::checkbox_on_readonly_png, OrganicUIBinaryData::checkbox_on_readonly_pngSize), ImageCache::getFromMemory(OrganicUIBinaryData::checkbox_off_readonly_png, OrganicUIBinaryData::checkbox_off_readonly_pngSize));
-		}
-		else
-		{
-			setImages(ImageCache::getFromMemory(OrganicUIBinaryData::checkbox_on_png, OrganicUIBinaryData::checkbox_on_pngSize), ImageCache::getFromMemory(OrganicUIBinaryData::checkbox_off_png, OrganicUIBinaryData::checkbox_off_pngSize));
-			setRepaintsOnMouseActivity(true);
-		}
+		updateUIParams();
 	}
+
+
+	showEditWindowOnDoubleClick = false;
 
 	setSize(200, GlobalSettings::getInstance()->fontSize->floatValue() + 4);//default size
 
@@ -119,6 +115,24 @@ void BoolToggleUI::mouseUpInternal(const MouseEvent & e)
 	if (e.mods.isLeftButtonDown())
 	{
 		if (e.mods.isAltDown()) parameter->setValue(!parameter->boolValue());
+	}
+}
+
+void BoolToggleUI::updateUIParamsInternal()
+{
+	ParameterUI::updateUIParamsInternal();
+	
+	if (!usingCustomImages)
+	{
+		if (!isInteractable())
+		{
+			setImages(ImageCache::getFromMemory(OrganicUIBinaryData::checkbox_on_readonly_png, OrganicUIBinaryData::checkbox_on_readonly_pngSize), ImageCache::getFromMemory(OrganicUIBinaryData::checkbox_off_readonly_png, OrganicUIBinaryData::checkbox_off_readonly_pngSize));
+		}
+		else
+		{
+			setImages(ImageCache::getFromMemory(OrganicUIBinaryData::checkbox_on_png, OrganicUIBinaryData::checkbox_on_pngSize), ImageCache::getFromMemory(OrganicUIBinaryData::checkbox_off_png, OrganicUIBinaryData::checkbox_off_pngSize));
+			setRepaintsOnMouseActivity(true);
+		}
 	}
 }
 
