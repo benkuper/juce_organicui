@@ -32,6 +32,7 @@ OrganicApplication::MainWindow* getMainWindow();
 CrashDumpUploader::CrashDumpUploader() :
 	Thread("Crashdump"),
 	doUpload(true),
+	uploadFile(true),
 	progress("Upload Progress", "", 0, 0, 1)
 {
 
@@ -120,8 +121,10 @@ void CrashDumpUploader::handleCrash(int e)
 		w.reset(new UploadWindow());
 		DialogWindow::showModalDialog("Got crashed ?", w.get(), getMainWindow(), Colours::black, true);
 	}
-
-	exitApp();
+	else
+	{
+		exitApp();
+	}
 }
 
 void CrashDumpUploader::uploadCrash()
@@ -230,9 +233,10 @@ bool CrashDumpUploader::openStreamProgressCallback(int bytesDownloaded, int tota
 
 void CrashDumpUploader::exitApp()
 {
+	Engine::mainEngine->clear();
+
 	if (autoReopen && recoveredFile.exists())
 	{
-        
 		File::getSpecialLocation(File::currentApplicationFile).startAsProcess("-c \"" + recoveredFile.getFullPathName() + "\"");
 	}
     
@@ -308,6 +312,7 @@ CrashDumpUploader::UploadWindow::UploadWindow() :
 	cancelBT("Close only"),
 	okBT("Send and close"),
 	autoReopenBT("Send and recover"),
+	recoverOnlyBT("Recover Only"),
 	progressUI(&CrashDumpUploader::getInstance()->progress)
 {
 	okBT.addListener(this);
@@ -315,6 +320,9 @@ CrashDumpUploader::UploadWindow::UploadWindow() :
 
 	cancelBT.addListener(this);
 	addAndMakeVisible(&cancelBT);
+
+	recoverOnlyBT.addListener(this);
+	addAndMakeVisible(&recoverOnlyBT);
 
 	autoReopenBT.addListener(this);
 	addAndMakeVisible(&autoReopenBT);
@@ -350,6 +358,8 @@ void CrashDumpUploader::UploadWindow::resized()
 	juce::Rectangle<int> br = r.removeFromBottom(30).reduced(2);
 	autoReopenBT.setBounds(br.removeFromRight(100));
 	br.removeFromRight(8); 
+	recoverOnlyBT.setBounds(br.removeFromRight(100));
+	br.removeFromRight(8);
 	okBT.setBounds(br.removeFromRight(100));
 	br.removeFromRight(8);
 	cancelBT.setBounds(br.removeFromRight(100));
@@ -365,14 +375,17 @@ void CrashDumpUploader::UploadWindow::buttonClicked(Button* bt)
 	autoReopenBT.setEnabled(false);
 	cancelBT.setEnabled(false);
 	
-	if (bt == &okBT || bt == &autoReopenBT)
+	CrashDumpUploader::getInstance()->uploadFile = bt == &autoReopenBT || bt == &okBT;
+	CrashDumpUploader::getInstance()->crashMessage = editor.getText();
+	CrashDumpUploader::getInstance()->autoReopen = bt == &autoReopenBT || bt == &recoverOnlyBT;
+
+	if (bt == &autoReopenBT || bt == &okBT) 
 	{
-		CrashDumpUploader::getInstance()->crashMessage = editor.getText();
-		if (bt == &autoReopenBT) CrashDumpUploader::getInstance()->autoReopen = true;
 		CrashDumpUploader::getInstance()->startThread();
 	}
-	else if (bt == &cancelBT)
+	else if (bt == &cancelBT || bt == &recoverOnlyBT)
 	{
+		if (DialogWindow* dw = findParentComponentOfClass<DialogWindow>()) dw->exitModalState(0); 
 		CrashDumpUploader::getInstance()->exitApp();
 	}
 

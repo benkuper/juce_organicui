@@ -13,6 +13,7 @@ public:
 	Image crashImage;
 
 	bool doUpload;
+	bool uploadFile;
 	bool autoReopen;
 
 	File traceFile;
@@ -49,6 +50,7 @@ public:
 		TextButton okBT;
 		TextButton cancelBT;
 		TextButton autoReopenBT;
+		TextButton recoverOnlyBT;
 		FloatSliderUI progressUI;
 
 		juce::Rectangle<int> imageRect;

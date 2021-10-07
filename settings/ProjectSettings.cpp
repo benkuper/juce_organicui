@@ -43,7 +43,6 @@ void ProjectSettings::reset()
 {
 	fullScreenOnStartup->resetValue();
 	showDashboardOnStartup->resetValue();
-
 }
 
 void ProjectSettings::onControllableFeedbackUpdate(ControllableContainer* cc, Controllable* c)

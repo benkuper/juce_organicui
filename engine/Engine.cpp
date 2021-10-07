@@ -97,18 +97,29 @@ void Engine::parseCommandline(const String & commandLine) {
 				jassertfalse;
 				continue;
 			} 
+
+			bool fromCrash = c.command == "c";
+
 			String fileArg = c.args[0];
 			if (File::isAbsolutePath(fileArg)) {
 				File f(fileArg);
 				if (f.existsAsFile())
 				{
-					loadDocument(f);
-
-					if (c.command == "c")
+					if (fromCrash)
 					{
-						setFile(File()); //from crash : force other file to force saving again, but also keep working directory
+						setFile(f);
+						Timer::callAfterDelay(100, []() { //wait a bit to be sure the crashed instance is closed
+							Engine* e = Engine::mainEngine;
+							File f = e->getFile();
+							e->loadDocument(f);
+							e->setFile(File()); //from crash : force other file to force saving again, but also keep working directory
+							f.setAsCurrentWorkingDirectory();
+						});
 					}
-					f.setAsCurrentWorkingDirectory();
+					else
+					{
+						loadDocument(f);
+					}
 				}
 			} else {
 				NLOG("Engine", "File : " << fileArg << " not found.");
