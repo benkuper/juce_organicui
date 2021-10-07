@@ -69,6 +69,12 @@ ControllableUI* DashboardParameterItemUI::createControllableUI()
 		case 12:
 			return new P2DUI((Point2DParameter *)parameterItem->parameter.get());
 			break;
+
+		default:
+			DoubleSliderUI* dbui = new DoubleSliderUI((Point2DParameter*)parameterItem->parameter.get());
+			dbui->canShowExtendedEditor = false;
+			return dbui;
+			break;
 		}
 		break;
 

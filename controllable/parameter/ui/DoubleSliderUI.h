@@ -29,11 +29,11 @@ public:
 
 	std::unique_ptr<P2DUI> canvasUI;
 	juce::Rectangle<float> canvasSwitchRect;
+	bool canShowExtendedEditor;
 
 	var mouseDownValue;
 
 	bool isUpdatingFromParam;
-
 
 	void mouseDownInternal(const MouseEvent &) override;
 	void mouseUpInternal(const MouseEvent &) override;

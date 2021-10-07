@@ -13,7 +13,8 @@ DoubleSliderUI::DoubleSliderUI(Point2DParameter* parameter) :
 	p2d(parameter),
 	xParam("X", "xParam", parameter->x, parameter->minimumValue[0], parameter->maximumValue[0]),
 	yParam("Y", "yParam", parameter->y, parameter->minimumValue[1], parameter->maximumValue[1]),
-	isUpdatingFromParam(false)
+	isUpdatingFromParam(false),
+	canShowExtendedEditor(true)
 {
 
 	showEditWindowOnDoubleClick = false;
@@ -63,7 +64,7 @@ DoubleSliderUI::~DoubleSliderUI()
 
 void DoubleSliderUI::mouseDownInternal(const MouseEvent& e)
 {
-	if (canvasSwitchRect.contains(e.getMouseDownPosition().toFloat()))
+	if (canShowExtendedEditor && canvasSwitchRect.contains(e.getMouseDownPosition().toFloat()))
 	{
 		setUndoableValueOnMouseUp = false;
 		p2d->setShowExtendedEditor(!p2d->showExtendedEditor);
@@ -99,12 +100,15 @@ void DoubleSliderUI::paint(Graphics& g)
 		sr.removeFromLeft(2);
 	}
 
-	Rectangle<float> rr = canvasSwitchRect.reduced(4);
-	Path p;
-	if (canvasUI == nullptr) p.addTriangle(rr.getTopLeft(), Point<float>(rr.getRight(), rr.getCentreY()), rr.getBottomLeft());
-	else p.addTriangle(rr.getTopLeft(), rr.getTopRight(), Point<float>(rr.getCentreX(), rr.getBottom()));
-	g.setColour(isMouseOverOrDragging() ? NORMAL_COLOR.brighter() : NORMAL_COLOR);
-	g.fillPath(p.createPathWithRoundedCorners(3));
+	if (canShowExtendedEditor)
+	{
+		Rectangle<float> rr = canvasSwitchRect.reduced(4);
+		Path p;
+		if (canvasUI == nullptr) p.addTriangle(rr.getTopLeft(), Point<float>(rr.getRight(), rr.getCentreY()), rr.getBottomLeft());
+		else p.addTriangle(rr.getTopLeft(), rr.getTopRight(), Point<float>(rr.getCentreX(), rr.getBottom()));
+		g.setColour(isMouseOverOrDragging() && rr.contains(getMouseXYRelative().toFloat()) ? NORMAL_COLOR.brighter() : NORMAL_COLOR);
+		g.fillPath(p.createPathWithRoundedCorners(3));
+	}
 }
 
 void DoubleSliderUI::resized()
@@ -119,7 +123,7 @@ void DoubleSliderUI::resized()
 		sr.removeFromLeft(2);
 	}
 
-	canvasSwitchRect = sr.removeFromLeft(sr.getHeight()).toFloat();
+	if(canShowExtendedEditor) canvasSwitchRect = sr.removeFromLeft(sr.getHeight()).toFloat();
 
 	xSlider->setBounds(sr.removeFromLeft(sr.getWidth() / 2 - 5));
 	ySlider->setBounds(sr.removeFromRight(sr.getWidth() - 10));
@@ -188,7 +192,7 @@ void DoubleSliderUI::updateUseExtendedEditor()
 {
 	float baseHeight = GlobalSettings::getInstance()->fontSize->floatValue() + 4;
 
-	if (p2d->showExtendedEditor)
+	if (p2d->showExtendedEditor && canShowExtendedEditor)
 	{
 		if (canvasUI == nullptr)
 		{
