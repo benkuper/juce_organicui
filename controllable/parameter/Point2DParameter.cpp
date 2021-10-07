@@ -1,3 +1,4 @@
+#include "Point2DParameter.h"
 /*
   ==============================================================================
 
@@ -11,7 +12,8 @@
 Point2DParameter::Point2DParameter(const String & niceName, const String & description, bool _enabled) :
 	Parameter(POINT2D, niceName, description, 0, 0, 1, _enabled),
 	x(0), y(0),
-	defaultUI(FloatParameter::NONE)
+	defaultUI(FloatParameter::NONE),
+	showExtendedEditor(false)
 {
 	canHaveRange = true;
 
@@ -145,6 +147,13 @@ void Point2DParameter::setWeightedValue(Array<var> values, Array<float> weights)
 	setPoint(tValues[0], tValues[1]);
 }
 
+void Point2DParameter::setShowExtendedEditor(bool value)
+{
+	if (value == showExtendedEditor) return;
+	showExtendedEditor = value;
+	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::UI_PARAMS_CHANGED, this));
+}
+
 bool Point2DParameter::checkValueIsTheSame(var newValue, var oldValue)
 {
 	if (!(newValue.isArray() && oldValue.isArray())) return false;
@@ -158,6 +167,19 @@ bool Point2DParameter::checkValueIsTheSame(var newValue, var oldValue)
 ControllableUI* Point2DParameter::createDefaultUI()
 {
 	return new DoubleSliderUI(this);
+}
+
+var Point2DParameter::getJSONDataInternal()
+{
+	var data = Parameter::getJSONDataInternal();
+	data.getDynamicObject()->setProperty("extendedEditor", showExtendedEditor);
+	return data;
+}
+
+void Point2DParameter::loadJSONDataInternal(var data)
+{
+	Parameter::loadJSONDataInternal(data);
+	showExtendedEditor = data.getProperty("extendedEditor", showExtendedEditor);
 }
 
 var Point2DParameter::getCroppedValue(var originalValue)

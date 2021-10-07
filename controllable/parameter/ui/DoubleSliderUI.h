@@ -27,9 +27,13 @@ public:
 	std::unique_ptr<ParameterUI> xSlider;
 	std::unique_ptr<ParameterUI> ySlider;
 
+	std::unique_ptr<P2DUI> canvasUI;
+	juce::Rectangle<float> canvasSwitchRect;
+
 	var mouseDownValue;
 
 	bool isUpdatingFromParam;
+
 
 	void mouseDownInternal(const MouseEvent &) override;
 	void mouseUpInternal(const MouseEvent &) override;
@@ -38,6 +42,8 @@ public:
     void resized() override;
 	void showEditWindowInternal() override;
 	void showEditRangeWindowInternal() override;
+
+	void updateUseExtendedEditor();
 
 	virtual void rangeChanged(Parameter * p) override;
 

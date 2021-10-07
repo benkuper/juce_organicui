@@ -35,9 +35,7 @@
 #include "controllable/parameter/ColorParameter.cpp"
 #include "controllable/parameter/EnumParameter.cpp"
 #include "controllable/parameter/FloatParameter.cpp"
-#include "controllable/parameter/FloatRangeParameter.cpp"
 #include "controllable/parameter/IntParameter.cpp"
-#include "controllable/parameter/IntRangeParameter.cpp"
 #include "controllable/parameter/Parameter.cpp"
 #include "controllable/parameter/Point2DParameter.cpp"
 #include "controllable/parameter/Point3DParameter.cpp"
@@ -61,6 +59,7 @@
 #include "controllable/parameter/ui/TargetParameterUI.cpp"
 #include "controllable/parameter/ui/TripleSliderUI.cpp"
 #include "controllable/parameter/ui/ColorStatusUI.cpp"
+#include "controllable/parameter/ui/P2DUI.cpp"
 
 #include "controllable/parameter/gradient/GradientColor.cpp"
 #include "controllable/parameter/gradient/GradientColorManager.cpp"

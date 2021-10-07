@@ -42,6 +42,8 @@ public:
 
 	void newMessage(const Parameter::ParameterEvent &e) override;
 
+	virtual void childBoundsChanged(Component* c) override;
+
 	virtual void parameterControlModeChanged(Parameter *) override;
 
 	// Inherited via Listener

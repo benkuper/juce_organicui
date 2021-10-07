@@ -48,7 +48,8 @@ DoubleSliderUI::DoubleSliderUI(Point2DParameter* parameter) :
 	addAndMakeVisible(xSlider.get());
 	addAndMakeVisible(ySlider.get());
 
-	setSize(200, GlobalSettings::getInstance()->fontSize->floatValue() + 4);//default size
+	float baseHeight = GlobalSettings::getInstance()->fontSize->floatValue() + 4;
+	setSize(200, baseHeight);//default size
 
 	updateUIParams(); //force update
 }
@@ -60,9 +61,17 @@ DoubleSliderUI::~DoubleSliderUI()
 
 }
 
-void DoubleSliderUI::mouseDownInternal(const MouseEvent&)
+void DoubleSliderUI::mouseDownInternal(const MouseEvent& e)
 {
-	mouseDownValue = parameter->getValue();
+	if (canvasSwitchRect.contains(e.getMouseDownPosition().toFloat()))
+	{
+		setUndoableValueOnMouseUp = false;
+		p2d->setShowExtendedEditor(!p2d->showExtendedEditor);
+	}else
+	{
+		setUndoableValueOnMouseUp = true;
+		mouseDownValue = parameter->getValue();
+	}
 }
 
 void DoubleSliderUI::mouseUpInternal(const MouseEvent&)
@@ -77,29 +86,49 @@ void DoubleSliderUI::paint(Graphics& g)
 {
 	ParameterUI::paint(g);
 
+	float baseHeight = GlobalSettings::getInstance()->fontSize->floatValue() + 4;
+	juce::Rectangle<int> r = getLocalBounds();
+	juce::Rectangle<int> sr = canvasUI == nullptr ? r : r.removeFromTop(baseHeight);
+
 	if (showLabel)
 	{
-		Rectangle<int> r = getLocalBounds();
-		g.setFont(jlimit(12, 40, jmin(r.getHeight(), r.getWidth()) - 16));
-		r = r.removeFromLeft(jmin(g.getCurrentFont().getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, r.getWidth() - 60));
+		g.setFont(jlimit(12, 40, jmin(sr.getHeight(), sr.getWidth()) - 16));
+		juce::Rectangle<int> tr = sr.removeFromLeft(jmin(g.getCurrentFont().getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, sr.getWidth() - 60));
 		g.setColour(useCustomTextColor ? customTextColor : TEXT_COLOR);
-		g.drawFittedText(customLabel.isNotEmpty() ? customLabel : parameter->niceName, r, Justification::centred, 1);
+		g.drawFittedText(customLabel.isNotEmpty() ? customLabel : parameter->niceName, tr, Justification::centred, 1);
+		sr.removeFromLeft(2);
 	}
+
+	Rectangle<float> rr = canvasSwitchRect.reduced(4);
+	Path p;
+	if (canvasUI == nullptr) p.addTriangle(rr.getTopLeft(), Point<float>(rr.getRight(), rr.getCentreY()), rr.getBottomLeft());
+	else p.addTriangle(rr.getTopLeft(), rr.getTopRight(), Point<float>(rr.getCentreX(), rr.getBottom()));
+	g.setColour(isMouseOverOrDragging() ? NORMAL_COLOR.brighter() : NORMAL_COLOR);
+	g.fillPath(p.createPathWithRoundedCorners(3));
 }
 
 void DoubleSliderUI::resized()
 {
+	float baseHeight = GlobalSettings::getInstance()->fontSize->floatValue() + 4;
 	juce::Rectangle<int> r = getLocalBounds();
-
+	juce::Rectangle<int> sr = canvasUI == nullptr ? r : r.removeFromTop(baseHeight);
 	if (showLabel)
 	{
-		Font font(jlimit(12, 40, jmin(r.getHeight(), r.getWidth()) - 16));
-		r.removeFromLeft(jmin(font.getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, r.getWidth() - 60));
-		r.removeFromLeft(2);
+		Font font(jlimit(12, 40, jmin(sr.getHeight(), sr.getWidth()) - 16));
+		sr.removeFromLeft(jmin(font.getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, sr.getWidth() - 60));
+		sr.removeFromLeft(2);
 	}
 
-	xSlider->setBounds(r.removeFromLeft(r.getWidth() / 2 - 5));
-	ySlider->setBounds(r.removeFromRight(r.getWidth() - 10));
+	canvasSwitchRect = sr.removeFromLeft(sr.getHeight()).toFloat();
+
+	xSlider->setBounds(sr.removeFromLeft(sr.getWidth() / 2 - 5));
+	ySlider->setBounds(sr.removeFromRight(sr.getWidth() - 10));
+
+	if (canvasUI != nullptr)
+	{
+		r.removeFromTop(2);
+		canvasUI->setBounds(r);
+	}
 }
 
 void DoubleSliderUI::showEditWindowInternal()
@@ -155,6 +184,30 @@ void DoubleSliderUI::showEditRangeWindowInternal()
 	}
 }
 
+void DoubleSliderUI::updateUseExtendedEditor()
+{
+	float baseHeight = GlobalSettings::getInstance()->fontSize->floatValue() + 4;
+
+	if (p2d->showExtendedEditor)
+	{
+		if (canvasUI == nullptr)
+		{
+			canvasUI.reset(new P2DUI(p2d));
+			addAndMakeVisible(canvasUI.get());
+			setSize(getWidth(), baseHeight + 2 + getWidth());//default size
+		}
+	}
+	else
+	{
+		if (canvasUI != nullptr)
+		{
+			removeChildComponent(canvasUI.get());
+			canvasUI.reset();
+			setSize(getWidth(), baseHeight);//default size
+		}
+	}
+}
+
 
 void DoubleSliderUI::rangeChanged(Parameter* p)
 {
@@ -169,11 +222,17 @@ void DoubleSliderUI::updateUIParamsInternal()
 {
 	xParam.setControllableFeedbackOnly(parameter->isControllableFeedbackOnly);
 	yParam.setControllableFeedbackOnly(parameter->isControllableFeedbackOnly);
+	updateUseExtendedEditor();
 }
 
 void DoubleSliderUI::newMessage(const Parameter::ParameterEvent& e)
 {
 	ParameterUI::newMessage(e);
+
+	if (e.type == e.UI_PARAMS_CHANGED)
+	{
+		updateUseExtendedEditor();
+	}
 
 	if (e.parameter == parameter)
 	{

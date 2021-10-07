@@ -17,6 +17,7 @@ public:
 
 	float x, y;
 	FloatParameter::UIType defaultUI;
+	bool showExtendedEditor;
 
 	void setPoint(Point<float> value);
 	void setPoint(float x, float y);
@@ -34,6 +35,8 @@ public:
 	virtual var getLerpValueTo(var targetValue, float weight) override;
 	virtual void setWeightedValue(Array<var> values, Array<float> weights) override;
 
+	void setShowExtendedEditor(bool value);
+
 	bool checkValueIsTheSame(var newValue, var oldValue) override;
 
 	ControllableUI * createDefaultUI() override;
@@ -42,6 +45,8 @@ public:
 	virtual String getTypeString() const override { return getTypeStringStatic(); }
 	static String getTypeStringStatic() { return "Point2D"; }
 
+	virtual var getJSONDataInternal() override;
+	virtual void loadJSONDataInternal(var data) override;
 
 
 protected:

@@ -12,6 +12,8 @@ DashboardParameterItemUI::~DashboardParameterItemUI()
 ControllableUI* DashboardParameterItemUI::createControllableUI()
 {
 
+	int s = (int)parameterItem->style->getValueData();
+	
 	switch (parameterItem->parameter->type)
 	{
 	case Controllable::BOOL:
@@ -28,7 +30,6 @@ ControllableUI* DashboardParameterItemUI::createControllableUI()
 	case Controllable::INT:
 	case Controllable::ENUM:
 	{
-		int s = (int)parameterItem->style->getValueData();
 		switch (s)
 		{
 		case 0:
@@ -60,6 +61,16 @@ ControllableUI* DashboardParameterItemUI::createControllableUI()
 			break;
 		}
 	}
+	break;
+
+	case Controllable::POINT2D:
+		switch (s)
+		{
+		case 12:
+			return new P2DUI((Point2DParameter *)parameterItem->parameter.get());
+			break;
+		}
+		break;
 
 	default:
 		break;

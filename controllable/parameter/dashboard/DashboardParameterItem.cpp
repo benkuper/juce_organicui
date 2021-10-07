@@ -81,6 +81,10 @@ void DashboardParameterItem::updateStyleOptions()
 			style->addOption("Color Circle", 10)->addOption("Color Square", 11);
 			style->customGetEditorFunc = std::bind(&DashboardParameterItem::getStyleEditor, this, std::placeholders::_1, std::placeholders::_2);
 		}
+		else if (parameter->type == Controllable::POINT2D)
+		{
+			style->addOption("2D Canvas", 12);
+		}
 	}
 }
 

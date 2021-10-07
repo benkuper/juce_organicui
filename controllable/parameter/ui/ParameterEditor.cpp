@@ -1,3 +1,4 @@
+#include "ParameterEditor.h"
 ParameterEditor::ParameterEditor(Parameter* _parameter, bool isRoot) :
 	ControllableEditor(_parameter, isRoot),
 	parameter(_parameter),
@@ -8,7 +9,6 @@ ParameterEditor::ParameterEditor(Parameter* _parameter, bool isRoot) :
 	parameter->addParameterListener(this);
 	parameter->addAsyncParameterListener(this);
 	
-
 	updateUI();
 }
 
@@ -51,12 +51,13 @@ void ParameterEditor::resized()
 	case Parameter::AUTOMATION:
 		if (automationUI != nullptr) automationUI->setBounds(r);
 		break;
-	}
-	
+	}	
 }
 
 void ParameterEditor::updateUI()
 {
+	baseHeight = ui->getHeight();
+	if (baseHeight == 0) baseHeight = GlobalSettings::getInstance()->fontSize->floatValue() + 4;
 	subContentHeight = 0;
 
 	//cleanup
@@ -151,6 +152,16 @@ void ParameterEditor::newMessage(const Parameter::ParameterEvent & e)
 			currentUIHasRange = parameter->hasRange();
 		}
 	}
+	else if (e.type == Parameter::ParameterEvent::UI_PARAMS_CHANGED)
+	{
+		//updateUI();
+	}
+}
+
+void ParameterEditor::childBoundsChanged(Component* c)
+{
+	ControllableEditor::childBoundsChanged(c);
+	if (c == ui.get() && ui->getHeight() != baseHeight) updateUI();
 }
 
 void ParameterEditor::parameterControlModeChanged(Parameter *)

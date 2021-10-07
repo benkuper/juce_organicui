@@ -159,7 +159,7 @@ public:
     class  ParameterEvent
 	{
     public:
-		enum Type { VALUE_CHANGED, BOUNDS_CHANGED, CONTROLMODE_CHANGED, EXPRESSION_STATE_CHANGED };
+		enum Type { VALUE_CHANGED, BOUNDS_CHANGED, CONTROLMODE_CHANGED, EXPRESSION_STATE_CHANGED, UI_PARAMS_CHANGED };
 
 		ParameterEvent(Type t,Parameter * p,var v = var()) :
 			type(t),parameter(p),value(v)
