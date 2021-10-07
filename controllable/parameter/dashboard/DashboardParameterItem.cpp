@@ -98,7 +98,7 @@ var DashboardParameterItem::getServerData()
 	}
 
 	if (bgColor->enabled) data.getDynamicObject()->setProperty("bgColor", bgColor->value);
-	if (fgColor->enabled) data.getDynamicObject()->setProperty("fgColor", bgColor->value);
+	if (fgColor->enabled) data.getDynamicObject()->setProperty("fgColor", fgColor->value);
 
 	int styleValue = (int)style->getValueData();
 	data.getDynamicObject()->setProperty("style", styleValue);
