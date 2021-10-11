@@ -18,27 +18,27 @@ class TimeLabel;
 class FloatParameter : public Parameter
 {
 public:
-    FloatParameter(const String &niceName, const String &description, const float &initialValue, const float &minValue = (float)INT32_MIN, const float &maxValue = (float)INT32_MAX, bool enabled = true);
-    virtual ~FloatParameter() {}
+	FloatParameter(const String& niceName, const String& description, const float& initialValue, const float& minValue = (float)INT32_MIN, const float& maxValue = (float)INT32_MAX, bool enabled = true);
+	virtual ~FloatParameter() {}
 
 	float unitSteps;
 
-	
 
-	enum UIType {NONE, SLIDER, STEPPER, LABEL, TIME };
+
+	enum UIType { NONE, SLIDER, STEPPER, LABEL, TIME };
 	UIType defaultUI;
 	UIType customUI;
 
-    FloatSliderUI * createSlider(FloatParameter * target = nullptr);
-    FloatStepperUI * createStepper(FloatParameter * target = nullptr);
-	FloatParameterLabelUI * createLabelParameter(FloatParameter * target = nullptr);
-	TimeLabel * createTimeLabelParameter(FloatParameter * target = nullptr);
+	FloatSliderUI* createSlider(FloatParameter* target = nullptr);
+	FloatStepperUI* createStepper(FloatParameter* target = nullptr);
+	FloatParameterLabelUI* createLabelParameter(FloatParameter* target = nullptr);
+	TimeLabel* createTimeLabelParameter(FloatParameter* target = nullptr);
 
-    virtual ControllableUI * createDefaultUI() override;
+	virtual ControllableUI* createDefaultUI() override;
 
 	bool checkValueIsTheSame(var oldValue, var newValue) override;
 
-	virtual void setValueInternal(var &value) override;
+	virtual void setValueInternal(var& value) override;
 
 	virtual bool hasRange() override;
 
@@ -56,7 +56,7 @@ public:
 	var getJSONDataInternal() override;
 	void loadJSONDataInternal(var data) override;
 
-	static FloatParameter * create() { return new FloatParameter("New Float Parameter", "",0); }
+	static FloatParameter* create() { return new FloatParameter("New Float Parameter", "", 0); }
 	virtual String getTypeString() const override { return getTypeStringStatic(); }
 	static String getTypeStringStatic() { return "Float"; }
 
