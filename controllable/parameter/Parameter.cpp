@@ -511,6 +511,7 @@ void Parameter::loadJSONDataInternal(var data)
 	}
 
 	if (data.getDynamicObject()->hasProperty("value")) setValue(data.getProperty("value", defaultValue), false, true, true);
+	else value = defaultValue;
 
 	if (data.getDynamicObject()->hasProperty("controlMode")) setControlMode((ControlMode)(int)data.getProperty("controlMode", MANUAL));
 
