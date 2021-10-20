@@ -70,6 +70,7 @@ void DashboardParameterItem::onExternalParameterValueChanged(Parameter* p)
 
 void DashboardParameterItem::updateStyleOptions()
 {
+	var val = style->getValueData();
 	style->clearOptions();
 	style->addOption("Default", -1);
 	
@@ -86,6 +87,7 @@ void DashboardParameterItem::updateStyleOptions()
 			style->addOption("2D Canvas", 12);
 		}
 	}
+	style->setValueWithData(val);
 }
 
 var DashboardParameterItem::getServerData()

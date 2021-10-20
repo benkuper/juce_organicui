@@ -1,4 +1,3 @@
-#include "P2DUI.h"
 P2DUI::P2DUI(Point2DParameter* parameter) :
 	ParameterUI(parameter),
 	p2d(parameter),
@@ -30,12 +29,12 @@ void P2DUI::mouseDrag(const MouseEvent& e)
 
 	float sensitivity = e.mods.isAltDown() ? .5f : 1;
 
-	float x = e.getDistanceFromDragStartX() * sensitivity / getWidth();
-	float y = -e.getDistanceFromDragStartY() * sensitivity / getHeight();
+	float dx = e.mods.isAltDown() ? 0 : e.getDistanceFromDragStartX() * sensitivity / getWidth();
+	float dy = e.mods.isShiftDown() ? 0 : -e.getDistanceFromDragStartY() * sensitivity / getHeight();
 
 	var val;
-	val.append((float)mouseDownNormalizedValue[0] + x);
-	val.append((float)mouseDownNormalizedValue[1] + y);
+	val.append((float)mouseDownNormalizedValue[0] + dx);
+	val.append((float)mouseDownNormalizedValue[1] + dy);
 
 	p2d->setNormalizedValue(val);
 }
@@ -60,7 +59,7 @@ void P2DUI::paint(Graphics& g)
 	if (parameter == nullptr || parameter.wasObjectDeleted()) return;
 	Rectangle<int> r = getLocalBounds().reduced(2);
 
-	int radius = 5;
+	float radius = 4.5f;
 	Colour bgColor = useCustomBGColor ? customBGColor : BG_COLOR;
 
 	g.setColour(bgColor);
@@ -69,8 +68,10 @@ void P2DUI::paint(Graphics& g)
 	g.setColour(bgColor.brighter(.2f));
 	g.drawRoundedRectangle(r.toFloat(), 2, customContourThickness);
 
-	var val = p2d->getNormalizedValue();
-	Point<float> p(val[0], val[1]);
+	Point<float> p = p2d->getPoint();
+
+	var relVal = p2d->getNormalizedValue();
+	Point<float> relP(relVal[0], relVal[1]);
 
 	if (showLabel || showValue)
 	{
@@ -92,7 +93,7 @@ void P2DUI::paint(Graphics& g)
 		}
 	}
 
-	Point<int> rp = r.reduced(radius, radius).getRelativePoint(p.x, 1 - p.y);
+	Point<float> rp = r.toFloat().reduced(radius, radius).getRelativePoint(relP.x, 1 - relP.y);
 
 	if (isMouseOverOrDragging())
 	{
@@ -101,14 +102,14 @@ void P2DUI::paint(Graphics& g)
 		g.drawVerticalLine(rp.x, 0, getHeight());
 	}
 
-	Rectangle<int> pr = Rectangle<int>(0, 0, radius * 2, radius * 2).withCentre(rp);
+	Rectangle<float> pr = Rectangle<float>(0, 0, radius * 2, radius * 2).withCentre(rp);
 	Colour fgColor = useCustomFGColor ? customFGColor : (isInteractable() ? GREEN_COLOR : FEEDBACK_COLOR);
 	if (isInteractable())
 	{
 		if (isMouseButtonDown()) fgColor = HIGHLIGHT_COLOR;
 		else if (isMouseOver()) fgColor = fgColor.brighter();
 	}
-	
+
 	g.setColour(fgColor);
 	g.fillEllipse(pr.toFloat());
 

@@ -65,6 +65,7 @@ void DashboardControllableItemUI::updateUIParameters()
 	{
 		String defaultLabel = controllableItem->controllable->getDefaultDashboardLabel();
 		if (defaultLabel != controllableItem->controllable->niceName) itemUI->customLabel = defaultLabel;
+		else itemUI->customLabel = "";
 	}
 
 	itemUI->customDescription = controllableItem->customDescription->enabled ? controllableItem->customDescription->stringValue() : "";
@@ -112,6 +113,8 @@ void DashboardControllableItemUI::controllableFeedbackUpdateInternal(Controllabl
 
 void DashboardControllableItemUI::controllableStateUpdateInternal(Controllable* c)
 {
+	DashboardInspectableItemUI::controllableStateUpdateInternal(c);
+
 	if (c == controllableItem->showLabel
 		|| c == controllableItem->textColor
 		|| c == controllableItem->customLabel

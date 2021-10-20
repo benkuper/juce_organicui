@@ -121,6 +121,8 @@ void DashboardParameterItemUI::controllableFeedbackUpdateInternal(Controllable* 
 
 void DashboardParameterItemUI::controllableStateUpdateInternal(Controllable* c)
 {
+	DashboardControllableItemUI::controllableStateUpdateInternal(c);
+
 	if (c == parameterItem->showValue || c == parameterItem->bgColor || c == parameterItem->fgColor) updateUIParameters();
 	else if (c == parameterItem->btImage || c == parameterItem->style) rebuildUI();
 }
