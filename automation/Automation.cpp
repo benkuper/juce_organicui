@@ -542,9 +542,9 @@ void Automation::onContainerParameterChanged(Parameter* p)
 
 void Automation::onControllableFeedbackUpdate(ControllableContainer* cc, Controllable* c)
 {
-    if (AutomationKey* k = c->getParentAs<AutomationKey>())
+    if (AutomationKey* k = dynamic_cast<AutomationKey *>(cc))
     {
-        if (c == k->value || c == k->position)
+        if (c == k->value || c == k->position || c->parentContainer == k->easing.get())
         {
             computeValue();
         }
