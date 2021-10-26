@@ -89,6 +89,36 @@ void Automation::addKeys(const Array<AutomationKey*>& keys, bool addToUndo, bool
 
 }
 
+void Automation::insertKeyAt(const float& position, bool addToUndo)
+{
+    AutomationKey* startKey = getKeyForPosition(position);// ((AutomationKeyUI*)eui->getParentComponent())->item;
+    if (startKey == nullptr) return;
+
+    Point<float> p = startKey->easing->getClosestPointForPos(position);
+
+    Array<Point<float>> controlPoints;
+    if (startKey->easing->type == Easing::BEZIER)
+    {
+        CubicEasing* ce1 = (CubicEasing*)startKey->easing.get();
+        controlPoints = ce1->getSplitControlPoints(p.x);
+    }
+
+    AutomationKey* k = addKey(p.x, p.y, addToUndo);
+    k->easingType->setValueWithData(startKey->easingType->getValueData());
+
+    if (startKey->easing->type == Easing::BEZIER)
+    {
+        CubicEasing* ce1 = (CubicEasing*)startKey->easing.get();
+        CubicEasing* ce2 = (CubicEasing*)k->easing.get();
+
+        ce1->anchor1->setPoint(controlPoints[0] - ce1->start);
+        ce1->anchor2->setPoint(controlPoints[1] - ce1->end);
+
+        ce2->anchor1->setPoint(controlPoints[2] - ce2->start);
+        ce2->anchor2->setPoint(controlPoints[3] - ce2->end);
+    }
+}
+
 void Automation::addFromPointsAndSimplifyBezier(const Array<Point<float>>& sourcePoints, bool addToUndo, bool removeExistingKeys)
 {
     if (sourcePoints.size() == 0)
@@ -456,7 +486,7 @@ void Automation::updateRange()
     }
 }
 
-AutomationKey* Automation::getKeyForPosition(float pos)
+AutomationKey* Automation::getKeyForPosition(float pos, bool trueIfEqual)
 {
     if (items.size() == 0) return nullptr;
     if (pos < items[0]->position->floatValue()) return items[0];
@@ -464,10 +494,26 @@ AutomationKey* Automation::getKeyForPosition(float pos)
 
     for (int i = items.size() - 1; i >= 0; i--)
     {
-        if (items[i]->position->floatValue() <= pos) return items[i];
+        float p = items[i]->position->floatValue();
+        if (p < pos || (p == pos && trueIfEqual)) return items[i];
     }
 
     return nullptr;
+}
+
+AutomationKey* Automation::getNextKeyForPosition(float pos, bool trueIfEqual)
+{
+    if (items.size() == 0) return nullptr;
+    if (pos < items[0]->position->floatValue()) return items[0];
+    if (pos == 0) return items[0];
+
+    for (int i = 0; i < items.size(); i++)
+    {
+        float p = items[i]->position->floatValue();
+        if (p > pos || (p == pos && trueIfEqual)) return items[i];
+    }
+
+    return nullptr; 
 }
 
 Array<AutomationKey*> Automation::getKeysBetweenPositions(float startPos, float endPos)

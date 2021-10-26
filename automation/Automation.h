@@ -38,7 +38,8 @@ public:
 
     AutomationKey * addKey(const float& position, const float& value, bool addToUndo = false);
     void addKeys(const Array<AutomationKey *> & keys, bool addToUndo = true, bool removeExistingKeys = true);
-    
+    void insertKeyAt(const float& position, bool addToUndo = true);
+
     void addFromPointsAndSimplifyBezier(const Array<Point<float>>& sourcePoints, bool addToUndo = true, bool removeExistingKeys = true);
     
     void addFromPointsAndSimplifyLinear(const Array<Point<float>>& sourcePoints, float tolerance, bool addToUndo = true, bool removeExistingKeys = true);
@@ -67,7 +68,8 @@ public:
 
     void updateRange();
 
-    AutomationKey* getKeyForPosition(float pos); //to make binary search instead
+    AutomationKey* getKeyForPosition(float pos, bool trueIfEqual = true); //to make binary search instead
+    AutomationKey* getNextKeyForPosition(float pos, bool trueIfEqual = true); //to make binary search instead
     Array<AutomationKey *> getKeysBetweenPositions(float startPos, float endPos); //to make binary search instead
 
     float getValueAtNormalizedPosition(float pos);
