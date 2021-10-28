@@ -33,6 +33,9 @@ public:
 
 	bool miniMode;
 
+	Array<float> snapTimes;
+	std::function<void(Array<float>*)> getSnapTimesFunc;
+	
 	void setViewRange(float start, float end);
 
 	void setMiniMode(bool value);
@@ -46,6 +49,7 @@ public:
     void addItemUIInternal(GradientColorUI * item) override;
     void removeItemUIInternal(GradientColorUI * item) override;
 
+	void mouseDown(const MouseEvent& e) override;
 	void mouseDoubleClick(const MouseEvent &e) override;
 	void mouseDrag(const MouseEvent &e) override;
 

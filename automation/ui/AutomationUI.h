@@ -41,6 +41,9 @@ public:
     std::unique_ptr<FloatSliderUI> interactiveSimplificationUI;
     std::unique_ptr<TextButton> validInteractiveBT;
 
+    Array<float> snapTimes;
+    std::function<void(Array<float>*, AutomationKey * k)> getSnapTimesFunc;
+
     void paint(Graphics& g) override;
     void drawLinesBackground(Graphics& g);
 

@@ -379,16 +379,35 @@ var Controllable::setValueFromScript(const juce::var::NativeFunctionArgs& a) {
 					if (tp->targetType == TargetParameter::CONTROLLABLE)
 					{
 						Controllable * target = static_cast<Controllable *>((Controllable*)(int64)value.getDynamicObject()->getProperty(scriptPtrIdentifier));
-						if (target != nullptr) tp->setValueFromTarget((Controllable *)target);
+						if (target != nullptr) tp->setTarget(target);
+						else LOGWARNING("Set target from script, Target not found");
 					}else
 					{
 						ControllableContainer * target = static_cast<ControllableContainer*>((ControllableContainer*)(int64)value.getDynamicObject()->getProperty(scriptPtrIdentifier));
-						if (target != nullptr) tp->setValueFromTarget(target);
+						if (target != nullptr) tp->setTarget(target);
+						else LOGWARNING("Set target from script, Target not found");
 					}
+				}
+				else if(value.isString())
+				{
+					TargetParameter* tp = (TargetParameter*)c;
+					if (tp->targetType == TargetParameter::CONTROLLABLE)
+					{
+						Controllable* target = Engine::mainEngine->getControllableForAddress(value);
+						if (target != nullptr) tp->setValueFromTarget(target);
+						else LOGWARNING("Set target from script, Target not found : " << value.toString());
+					}
+					else
+					{
+						ControllableContainer* target = Engine::mainEngine->getControllableContainerForAddress(value);
+						if (target != nullptr) tp->setValueFromTarget(target);
+						else LOGWARNING("Set target from script, Target not found : " << value.toString());
+					}
+
 				}
 				else
 				{
-					LOGWARNING("Set target from script, value is not an object");
+					LOGWARNING("Set target from script, value is bad format : "+value.toString());
 				}
 				break;
 

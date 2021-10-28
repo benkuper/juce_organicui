@@ -1,3 +1,4 @@
+#include "GradientColorManagerUI.h"
 /*
   ==============================================================================
 
@@ -41,10 +42,10 @@ GradientColorManagerUI::~GradientColorManagerUI()
 
 void GradientColorManagerUI::setViewRange(float start, float end)
 {
-	
+
 	viewStartPos = start;
 	viewEndPos = end;
-	
+
 	shouldUpdateImage = true;
 	resized();
 }
@@ -56,12 +57,12 @@ void GradientColorManagerUI::setMiniMode(bool value)
 
 }
 
-void GradientColorManagerUI::paint(Graphics & g)
+void GradientColorManagerUI::paint(Graphics& g)
 {
 	BaseManagerUI::paint(g);
 
 	Rectangle<int> r = getLocalBounds();
-	
+
 	if (!miniMode)
 	{
 		g.setColour(manager->currentColor->getColor());
@@ -73,7 +74,7 @@ void GradientColorManagerUI::paint(Graphics & g)
 	g.setColour(Colours::white);
 	g.drawImage(viewImage, r.toFloat());
 	imageLock.exit();
-	
+
 	/*
 	g.setColour(manager->currentColor->getColor());
 	g.fillRect(r.removeFromBottom(16).reduced(2,7));z
@@ -99,10 +100,10 @@ void GradientColorManagerUI::resized()
 
 	shouldUpdateImage = true;
 
-	for (auto &tui : itemsUI)
+	for (auto& tui : itemsUI)
 	{
 		tui->setVisible(!miniMode && isInView(tui));
-		if(tui->isVisible()) placeItemUI(tui);
+		if (tui->isVisible()) placeItemUI(tui);
 	}
 }
 
@@ -111,18 +112,29 @@ void GradientColorManagerUI::updateItemsVisibility()
 	BaseManagerUI::updateItemsVisibility();
 }
 
-void GradientColorManagerUI::addItemUIInternal(GradientColorUI * item)
+void GradientColorManagerUI::addItemUIInternal(GradientColorUI* item)
 {
 	item->addMouseListener(this, true);
 	placeItemUI(item);
 }
 
-void GradientColorManagerUI::removeItemUIInternal(GradientColorUI * item)
+void GradientColorManagerUI::removeItemUIInternal(GradientColorUI* item)
 {
 	item->removeMouseListener(this);
 }
 
-void GradientColorManagerUI::mouseDoubleClick(const MouseEvent & e)
+void GradientColorManagerUI::mouseDown(const MouseEvent& e)
+{
+	BaseManagerUI::mouseDown(e);
+
+	if (GradientColorUI* handle = dynamic_cast<GradientColorUI*>(e.eventComponent))
+	{
+		snapTimes.clear();
+		if (getSnapTimesFunc != nullptr) getSnapTimesFunc(&snapTimes);
+	}
+}
+
+void GradientColorManagerUI::mouseDoubleClick(const MouseEvent& e)
 {
 	if (e.originalComponent == this && !miniMode)
 	{
@@ -132,8 +144,7 @@ void GradientColorManagerUI::mouseDoubleClick(const MouseEvent & e)
 }
 
 
-
-void GradientColorManagerUI::mouseDrag(const MouseEvent & e)
+void GradientColorManagerUI::mouseDrag(const MouseEvent& e)
 {
 	if (miniMode) return;
 
@@ -143,14 +154,33 @@ void GradientColorManagerUI::mouseDrag(const MouseEvent & e)
 	}
 	else
 	{
-		GradientColorUI * tui = dynamic_cast<GradientColorUI *>(e.eventComponent);
-		if (tui == nullptr) tui = dynamic_cast<GradientColorUI *>(e.eventComponent->getParentComponent());
+		GradientColorUI* tui = dynamic_cast<GradientColorUI*>(e.eventComponent);
+		if (tui == nullptr) tui = dynamic_cast<GradientColorUI*>(e.eventComponent->getParentComponent());
 
 		if (tui != nullptr)
 		{
 			if (e.mods.isLeftButtonDown())
 			{
 				float diffTime = getPosForX(e.getOffsetFromDragStart().x, false);
+
+				if (e.mods.isShiftDown())
+				{
+					float targetTime = tui->item->movePositionReference.x + diffTime;
+					float diff = INT32_MAX;
+					float tTime = targetTime;
+					for (auto& t : snapTimes)
+					{
+						float d = fabsf(tTime - t);
+						if (d < diff)
+						{
+							diff = d;
+							targetTime = t;
+						}
+					}
+
+					diffTime = targetTime - tui->item->movePositionReference.x;
+				}
+
 				Point<float> p(diffTime, 0.f);
 				tui->item->BaseItem::movePosition(p, true);
 			}
@@ -158,11 +188,11 @@ void GradientColorManagerUI::mouseDrag(const MouseEvent & e)
 	}
 }
 
-void GradientColorManagerUI::placeItemUI(GradientColorUI * tui)
+void GradientColorManagerUI::placeItemUI(GradientColorUI* tui)
 {
 	if (tui == nullptr) return;
 	int tx = getXForPos(tui->item->position->floatValue());
-	tui->setBounds(tx-6,getHeight()-18,12,16);
+	tui->setBounds(tx - 6, getHeight() - 18, 12, 16);
 }
 
 int GradientColorManagerUI::getXForPos(float time)
@@ -178,12 +208,12 @@ float GradientColorManagerUI::getPosForX(int tx, bool offsetStart)
 	return jmap<float>((float)tx, 0, (float)getWidth(), mapStart, mapStart + viewRange);
 }
 
-bool GradientColorManagerUI::isInView(GradientColorUI * kui)
+bool GradientColorManagerUI::isInView(GradientColorUI* kui)
 {
 	return kui->item->position->floatValue() >= viewStartPos && kui->item->position->floatValue() <= viewEndPos;
 }
 
-void GradientColorManagerUI::newMessage(const ContainerAsyncEvent & e)
+void GradientColorManagerUI::newMessage(const ContainerAsyncEvent& e)
 {
 	if (e.targetControllable.wasObjectDeleted()) return;
 	if (e.type == ContainerAsyncEvent::ControllableFeedbackUpdate)
@@ -203,7 +233,7 @@ void GradientColorManagerUI::newMessage(const ContainerAsyncEvent & e)
 		}
 		else
 		{
-			GradientColor * gc = e.targetControllable->getParentAs<GradientColor>();
+			GradientColor* gc = e.targetControllable->getParentAs<GradientColor>();
 			if (gc != nullptr && (e.targetControllable == gc->position || e.targetControllable == gc->color || e.targetControllable == gc->interpolation))
 			{
 				shouldUpdateImage = true;

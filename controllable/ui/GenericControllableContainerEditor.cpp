@@ -197,7 +197,7 @@ void GenericControllableContainerEditor::showContextMenu()
 		case -1000:
 			SystemClipboard::copyTextToClipboard(container->getControlAddress());
 			break;
-		case -10001:
+		case -1001:
 			SystemClipboard::copyTextToClipboard("root" + container->getControlAddress().replaceCharacter('/', '.'));
 			break;
 
