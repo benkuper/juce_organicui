@@ -23,8 +23,6 @@ public:
 
 	float unitSteps;
 
-
-
 	enum UIType { NONE, SLIDER, STEPPER, LABEL, TIME };
 	UIType defaultUI;
 	UIType customUI;

@@ -1,18 +1,18 @@
 /*
   ==============================================================================
 
-    FloatParameter.cpp
-    Created: 8 Mar 2016 1:22:10pm
-    Author:  bkupe
+	FloatParameter.cpp
+	Created: 8 Mar 2016 1:22:10pm
+	Author:  bkupe
 
   ==============================================================================
 */
 
-FloatParameter::FloatParameter(const String & niceName, const String &description, const float & initialValue, const float & minValue, const float & maxValue, bool enabled) :
+FloatParameter::FloatParameter(const String& niceName, const String& description, const float& initialValue, const float& minValue, const float& maxValue, bool enabled) :
 	Parameter(Type::FLOAT, niceName, description, (float)initialValue, (float)minValue, (float)maxValue, enabled),
 	unitSteps(0),
-    defaultUI(NONE),
-    customUI(NONE)
+	defaultUI(NONE),
+	customUI(NONE)
 {
 	canHaveRange = true;
 	canBeAutomated = true;
@@ -20,41 +20,41 @@ FloatParameter::FloatParameter(const String & niceName, const String &descriptio
 }
 
 
-FloatSliderUI * FloatParameter::createSlider(FloatParameter * target)
+FloatSliderUI* FloatParameter::createSlider(FloatParameter* target)
 {
 	if (target == nullptr) target = this;
-    return new FloatSliderUI(target);
+	return new FloatSliderUI(target);
 }
 
-FloatStepperUI * FloatParameter::createStepper(FloatParameter * target)
+FloatStepperUI* FloatParameter::createStepper(FloatParameter* target)
 {
 	if (target == nullptr) target = this;
 	return new FloatStepperUI(target);
 }
 
-FloatParameterLabelUI * FloatParameter::createLabelParameter(FloatParameter * target)
+FloatParameterLabelUI* FloatParameter::createLabelParameter(FloatParameter* target)
 {
 	if (target == nullptr) target = this;
 	return new FloatParameterLabelUI(target);
 }
 
-TimeLabel * FloatParameter::createTimeLabelParameter(FloatParameter * target)
+TimeLabel* FloatParameter::createTimeLabelParameter(FloatParameter* target)
 {
 	if (target == nullptr) target = this;
 	return new TimeLabel(target);
 }
 
-ControllableUI * FloatParameter::createDefaultUI() {
+ControllableUI* FloatParameter::createDefaultUI() {
 	UIType t = customUI != NONE ? customUI : defaultUI;
 
 	bool hasFullRange = ((float)minimumValue != INT32_MIN && (float)maximumValue != INT32_MAX);
-	if (t == NONE) t = hasFullRange?SLIDER:LABEL;
+	if (t == NONE) t = hasFullRange ? SLIDER : LABEL;
 
 	switch (t)
 	{
-    case NONE:
-        break;
-            
+	case NONE:
+		break;
+
 	case SLIDER:
 		return createSlider(this);
 		break;
@@ -68,7 +68,7 @@ ControllableUI * FloatParameter::createDefaultUI() {
 		return createTimeLabelParameter(this);
 		break;
 	}
-	
+
 	jassert(false);
 	return nullptr;
 }
@@ -112,7 +112,7 @@ void FloatParameter::setWeightedValue(Array<var> values, Array<float> weights)
 
 float FloatParameter::getStepSnappedValueFor(float originalValue)
 {
-	return round(originalValue * unitSteps) / unitSteps;
+	return unitSteps == 0 ? originalValue : round(originalValue * unitSteps) / unitSteps;
 }
 
 void FloatParameter::setControlAutomation()
