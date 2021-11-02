@@ -27,6 +27,8 @@ public:
     Point2DParameter* valueRange;
     Point2DParameter* viewValueRange;
     bool allowKeysOutside;
+    
+    float positionUnitSteps;
 
     AutomationRecorder* recorder;
     enum RangeRemapMode { ABSOLUTE, PROPORTIONAL };
@@ -35,6 +37,7 @@ public:
     //Interactive simplification
     Array<Point<float>> interactiveSourcePoints;
     Array<Point<float>> interactiveSimplifiedPoints;
+
 
     AutomationKey * addKey(const float& position, const float& value, bool addToUndo = false);
     void addKeys(const Array<AutomationKey *> & keys, bool addToUndo = true, bool removeExistingKeys = true);
@@ -47,6 +50,8 @@ public:
 
     void launchInteractiveSimplification(const Array<Point<float>>& sourcePoints);
     void finishInteractiveSimplification();
+
+    void setUnitSteps(float unitSteps);
 
     void addItemInternal(AutomationKey* k, var params) override;
     void addItemsInternal(Array<AutomationKey*>, var params) override;
