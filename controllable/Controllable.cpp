@@ -140,6 +140,9 @@ void Controllable::notifyStateChanged()
 
 void Controllable::setParentContainer(ControllableContainer * container)
 {
+	if (parentContainer == container) return;
+	if (parentContainer != nullptr) parentContainer->removeControllable(this, false);
+
 	this->parentContainer = container;
 	updateControlAddress();
 }

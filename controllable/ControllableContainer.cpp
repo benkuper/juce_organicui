@@ -285,7 +285,7 @@ UndoableAction* ControllableContainer::removeUndoableControllable(Controllable* 
 	return a;
 }
 
-void ControllableContainer::removeControllable(WeakReference<Controllable> c)
+void ControllableContainer::removeControllable(WeakReference<Controllable> c, bool deleteObject)
 {
 	if (c == nullptr || c.wasObjectDeleted())
 	{
@@ -311,8 +311,7 @@ void ControllableContainer::removeControllable(WeakReference<Controllable> c)
 
 	onControllableRemoved(c);
 
-	controllables.removeObject(c);
-
+	controllables.removeObject(c, deleteObject);
 	notifyStructureChanged();
 }
 

@@ -94,7 +94,7 @@ public:
 	void addParameterInternal(Parameter * p);
 
 	UndoableAction * removeUndoableControllable(Controllable * c, bool onlyReturnAction = false);
-	void removeControllable(WeakReference<Controllable> c);
+	void removeControllable(WeakReference<Controllable> c, bool deleteObject = true);
 	Controllable * getControllableByName(const String &name, bool searchNiceNameToo = false, bool searchLowerCaseToo = true);
 	Parameter * getParameterByName(const String &name, bool searchNiceNameToo = false, bool searchLowerCaseToo = true);
 
