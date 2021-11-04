@@ -12,7 +12,10 @@ Point2DParameter::Point2DParameter(const String & niceName, const String & descr
 	Parameter(POINT2D, niceName, description, 0, 0, 1, _enabled),
 	x(0), y(0),
 	defaultUI(FloatParameter::NONE),
-	showExtendedEditor(false)
+	showExtendedEditor(false),
+	extendedEditorInvertX(false),
+	extendedEditorInvertY(false),
+	extendedEditorStretchMode(false)
 {
 	canHaveRange = true;
 
@@ -171,7 +174,13 @@ ControllableUI* Point2DParameter::createDefaultUI()
 var Point2DParameter::getJSONDataInternal()
 {
 	var data = Parameter::getJSONDataInternal();
-	data.getDynamicObject()->setProperty("extendedEditor", showExtendedEditor);
+	if (showExtendedEditor)
+	{
+		data.getDynamicObject()->setProperty("extendedEditor", showExtendedEditor);
+		if (extendedEditorInvertX) data.getDynamicObject()->setProperty("extendedEditorInvertX", extendedEditorInvertX);
+		if (extendedEditorInvertY) data.getDynamicObject()->setProperty("extendedEditorInvertY", extendedEditorInvertY);
+		if(extendedEditorStretchMode) data.getDynamicObject()->setProperty("extendedEditorStretchMode", extendedEditorStretchMode);
+	}
 	return data;
 }
 
@@ -179,6 +188,9 @@ void Point2DParameter::loadJSONDataInternal(var data)
 {
 	Parameter::loadJSONDataInternal(data);
 	showExtendedEditor = data.getProperty("extendedEditor", showExtendedEditor);
+	extendedEditorInvertX = data.getProperty("extendedEditorInvertX", extendedEditorInvertX);
+	extendedEditorInvertY = data.getProperty("extendedEditorInvertY", extendedEditorInvertY);
+	extendedEditorStretchMode = data.getProperty("extendedEditorStretchMode", extendedEditorStretchMode);
 }
 
 var Point2DParameter::getCroppedValue(var originalValue)

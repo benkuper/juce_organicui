@@ -29,8 +29,10 @@ void P2DUI::mouseDrag(const MouseEvent& e)
 
 	float sensitivity = e.mods.isAltDown() ? .5f : 1;
 
-	float dx = e.mods.isAltDown() ? 0 : e.getDistanceFromDragStartX() * sensitivity / getWidth();
-	float dy = e.mods.isShiftDown() ? 0 : -e.getDistanceFromDragStartY() * sensitivity / getHeight();
+	float dx = e.mods.isAltDown() ? 0 : e.getDistanceFromDragStartX() * sensitivity / canvasRect.getWidth();
+	float dy = e.mods.isShiftDown() ? 0 : -e.getDistanceFromDragStartY() * sensitivity / canvasRect.getHeight();
+	if (p2d->extendedEditorInvertX) dx = -dx;
+	if (p2d->extendedEditorInvertY) dy = -dy;
 
 	var val;
 	val.append((float)mouseDownNormalizedValue[0] + dx);
@@ -57,43 +59,47 @@ void P2DUI::visibilityChanged()
 void P2DUI::paint(Graphics& g)
 {
 	if (parameter == nullptr || parameter.wasObjectDeleted()) return;
-	Rectangle<int> r = getLocalBounds().reduced(2);
 
 	float radius = 4.5f;
 	Colour bgColor = useCustomBGColor ? customBGColor : BG_COLOR;
 
+	g.setColour(bgColor.darker(.3f));
+	g.fillRoundedRectangle(getLocalBounds().reduced(1).toFloat(), 2);
+
 	g.setColour(bgColor);
-	g.fillRoundedRectangle(r.toFloat(), 2);
+	g.fillRoundedRectangle(canvasRect, 2);
 
 	g.setColour(bgColor.brighter(.2f));
-	g.drawRoundedRectangle(r.toFloat(), 2, customContourThickness);
+	g.drawRoundedRectangle(canvasRect, 2, customContourThickness);
 
 	Point<float> p = p2d->getPoint();
 
 	var relVal = p2d->getNormalizedValue();
 	Point<float> relP(relVal[0], relVal[1]);
+	if (p2d->extendedEditorInvertX) relP.setX(1 - relP.x);
+	if (p2d->extendedEditorInvertY) relP.setY(1 - relP.y);
 
 	if (showLabel || showValue)
 	{
 		g.setColour(bgColor.brighter(.15f));
-		if (showLabel) g.drawFittedText(parameter->niceName, r, Justification::centred, 3);
+		if (showLabel) g.drawFittedText(parameter->niceName, canvasRect.toNearestInt(), Justification::centred, 3);
 		if (showValue)
 		{
 			String xt = String::formatted("%." + String(3 + 1) + "f", p.x);
 			String yt = String::formatted("%." + String(3 + 1) + "f", p.y);
 
-			g.drawFittedText(xt, r.withTop(r.getBottom() - 16), Justification::centred, 3);
+			g.drawFittedText(xt, canvasRect.withTop(canvasRect.getBottom() - 16).toNearestInt(), Justification::centred, 3);
 
 			juce::AffineTransform at;
 			at = at.rotated((float)(-double_Pi / 2.0f));// , sliderBounds.getCentreX(), sliderBounds.getCentreY());
-			at = at.translated((float)r.getWidth() - 16, (float)getHeight());
+			at = at.translated(canvasRect.getRight() - 16, canvasRect.getBottom());
 			g.addTransform(at);
-			g.drawFittedText(yt, Rectangle<int>(0, 0, r.getHeight(), 16), Justification::centred, 3);
+			g.drawFittedText(yt, Rectangle<int>(0, 0, canvasRect.getHeight(), 16), Justification::centred, 3);
 			g.addTransform(at.inverted());
 		}
 	}
 
-	Point<float> rp = r.toFloat().reduced(radius, radius).getRelativePoint(relP.x, 1 - relP.y);
+	Point<float> rp = canvasRect.reduced(radius, radius).getRelativePoint(relP.x, 1 - relP.y);
 
 	if (isMouseOverOrDragging())
 	{
@@ -115,6 +121,30 @@ void P2DUI::paint(Graphics& g)
 
 }
 
+void P2DUI::resized()
+{
+	ParameterUI::resized();
+
+	canvasRect = getLocalBounds().reduced(2).toFloat();
+
+	if (!p2d->extendedEditorStretchMode)
+	{
+		float rRatio = canvasRect.getAspectRatio();
+		Point<float> range((float)p2d->maximumValue[0] - (float)p2d->minimumValue[0], (float)p2d->maximumValue[1] - (float)p2d->minimumValue[1]);
+		float pRatio = range.x / range.y;
+
+		if (pRatio > rRatio)
+		{
+			canvasRect = canvasRect.withSizeKeepingCentre(canvasRect.getWidth(), canvasRect.getWidth() / pRatio);
+		}
+		else
+		{
+			canvasRect = canvasRect.withSizeKeepingCentre(canvasRect.getHeight() * pRatio, canvasRect.getHeight());
+		}
+
+	}
+}
+
 void P2DUI::valueChanged(const var& v)
 {
 	shouldRepaint = true;
@@ -123,10 +153,32 @@ void P2DUI::valueChanged(const var& v)
 
 void P2DUI::rangeChanged(Parameter* p)
 {
+	resized();
 	shouldRepaint = true;
 }
 
 
+void P2DUI::addPopupMenuItemsInternal(PopupMenu* m)
+{
+	m->addItem(-100, "Stretch Mode", true, p2d->extendedEditorStretchMode);
+	m->addItem(-101, "Invert X", true, p2d->extendedEditorInvertX);
+	m->addItem(-102, "Invert Y", true, p2d->extendedEditorInvertY);
+}
+
+void P2DUI::handleMenuSelectedID(int result)
+{
+	ParameterUI::handleMenuSelectedID(result);
+
+	switch (result)
+	{
+	case -100: p2d->extendedEditorStretchMode = !p2d->extendedEditorStretchMode; break;
+	case -101: p2d->extendedEditorInvertX = !p2d->extendedEditorInvertX; break;
+	case -102: p2d->extendedEditorInvertY = !p2d->extendedEditorInvertY; break;
+	}
+
+	resized();
+	shouldRepaint = true;
+}
 
 void P2DUI::showEditWindowInternal()
 {
