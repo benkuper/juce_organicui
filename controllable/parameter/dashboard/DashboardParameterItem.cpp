@@ -3,7 +3,7 @@ DashboardParameterItem::DashboardParameterItem(Parameter* parameter) :
 	parameter(nullptr),
 	bgColor(nullptr), fgColor(nullptr), btImage(nullptr), style(nullptr)
 {
-	
+
 	showValue = addBoolParameter("Show Value", "If checked, the value will be shown on the control", true);
 
 	bgColor = addColorParameter("Background Color", "The color of the background", BG_COLOR, false);
@@ -73,7 +73,7 @@ void DashboardParameterItem::updateStyleOptions()
 	var val = style->getValueData();
 	style->clearOptions();
 	style->addOption("Default", -1);
-	
+
 	if (parameter != nullptr)
 	{
 		if (parameter->type == Controllable::FLOAT || parameter->type == Controllable::INT || parameter->type == Controllable::ENUM)
@@ -116,7 +116,9 @@ var DashboardParameterItem::getServerData()
 	if (btImage->stringValue().isNotEmpty()) data.getDynamicObject()->setProperty("customImage", btImage->getControlAddress());
 
 
-	if (parameter->type == Parameter::ENUM)
+	switch (parameter->type)
+	{
+	case Parameter::ENUM:
 	{
 		var epOptions;
 		EnumParameter* ep = (EnumParameter*)parameter.get();
@@ -130,7 +132,16 @@ var DashboardParameterItem::getServerData()
 
 		data.getDynamicObject()->setProperty("options", epOptions);
 	}
-
+	break;
+	case Parameter::POINT2D:
+	{
+		Point2DParameter* p2d = (Point2DParameter*)parameter.get();
+		data.getDynamicObject()->setProperty("stretchMode", p2d->extendedEditorStretchMode);
+		data.getDynamicObject()->setProperty("invertX", p2d->extendedEditorInvertX);
+		data.getDynamicObject()->setProperty("invertY", p2d->extendedEditorInvertY);
+	}
+	break;
+	}
+	
 	return data;
-
 }
