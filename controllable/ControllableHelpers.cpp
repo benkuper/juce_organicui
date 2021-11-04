@@ -107,9 +107,11 @@ void ContainerChooserPopupMenu::populateMenu(PopupMenu * subMenu, ControllableCo
 {
 	for (auto &cc : container->controllableContainers)
 	{
-		bool isATarget = currentLevel == maxDefaultSearchLevel;
-		if (typeCheckFunc != nullptr) isATarget |= typeCheckFunc(cc);
-		else if (cc->controllableContainers.size() == 0) isATarget = true;
+		bool isATarget = false;
+		bool lastLevel = currentLevel == maxDefaultSearchLevel || cc->controllableContainers.size() == 0;
+
+		if (typeCheckFunc != nullptr) isATarget = typeCheckFunc(cc);
+		else if(lastLevel) isATarget = true;
 
 		if (isATarget)
 		{
