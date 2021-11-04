@@ -18,6 +18,9 @@ public:
 	float x, y;
 	FloatParameter::UIType defaultUI;
 	bool showExtendedEditor;
+	bool extendedEditorInvertX;
+	bool extendedEditorInvertY;
+	bool extendedEditorStretchMode;
 
 	void setPoint(Point<float> value);
 	void setPoint(float x, float y);

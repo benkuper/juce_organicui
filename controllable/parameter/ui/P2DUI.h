@@ -26,6 +26,8 @@ public:
 	bool shouldRepaint;
 	int updateRate;
 
+	Rectangle<float> canvasRect;
+
 	void mouseDownInternal(const MouseEvent&) override;
 	void mouseDrag(const MouseEvent& e) override;
 	void mouseUpInternal(const MouseEvent&) override;
@@ -33,9 +35,13 @@ public:
 	void visibilityChanged() override;
 
 	void paint(Graphics& g) override;
+	void resized() override;
 
 	virtual void valueChanged(const var& v) override;
 	virtual void rangeChanged(Parameter* p) override;
+
+	void addPopupMenuItemsInternal(PopupMenu* m) override;
+	void handleMenuSelectedID(int result) override;
 
 	void showEditWindowInternal() override;
 	void showEditRangeWindowInternal() override;
