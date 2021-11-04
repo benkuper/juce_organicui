@@ -196,7 +196,6 @@ void Curve2D::updateCurve(bool relativeAutomationKeySyncMode)
     
     if (items.size() >= 2 && keySyncMode->boolValue() && prevLength > 0 && length->floatValue() > 0)
     {
-        DBG("***");
         Automation* a = (Automation*)position->automation->automationContainer;
         for (auto& k : a->items)
         {
