@@ -110,6 +110,16 @@ void Point2DParameter::setAttribute(String name, var val)
 		else if (val == "stepper") defaultUI = FloatParameter::STEPPER;
 		else if (val == "label") defaultUI = FloatParameter::LABEL;
 	}
+	else if (name == "canvasInvertX") extendedEditorInvertX = (bool)val;
+	else if (name == "canvasInvertY") extendedEditorInvertY = (bool)val;
+	else if (name == "canvasStretchMode") extendedEditorStretchMode = (bool)val;
+}
+
+StringArray Point2DParameter::getValidAttributes() const
+{
+	StringArray att = Parameter::getValidAttributes();
+	att.addArray({ "ui", "canvasInvertX","canvasInvertY","canvasStretchMode" });
+	return att;
 }
 
 StringArray Point2DParameter::getValuesNames()
