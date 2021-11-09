@@ -1,4 +1,3 @@
-#include "Automation.h"
 /*
   ==============================================================================
 
@@ -13,6 +12,7 @@ Automation::Automation(const String& name, AutomationRecorder* recorder, bool al
 	BaseManager(name),
 	allowKeysOutside(allowKeysOutside),
 	recorder(recorder),
+	positionUnitSteps(0),
 	automationNotifier(5)
 {
 	itemDataType = "AutomationKey";
@@ -322,7 +322,12 @@ void Automation::addItemInternal(AutomationKey* k, var)
 	k->position->unitSteps = positionUnitSteps;
 	if (positionUnitSteps > 0) k->position->setValue(k->position->getStepSnappedValueFor(k->position->floatValue()));
 
-	if (!allowKeysOutside) k->position->setRange(0, length->floatValue());
+	if (!allowKeysOutside)
+	{
+		k->position->setRange(0, length->floatValue());
+		LOG("New key, range = " << length->floatValue());
+	}
+
 	if (valueRange->enabled) k->setValueRange(valueRange->x, valueRange->y);
 
 	if (!isManipulatingMultipleItems) updateNextKeys(items.indexOf(k) - 1, items.indexOf(k) + 1);
@@ -457,7 +462,14 @@ void Automation::setLength(float newLength, bool stretch, bool stickToEnd)
 		if (stickToEnd) for (auto& k : items) k->position->setValue(k->position->floatValue() + lengthDiff);
 	}
 
-	if (!allowKeysOutside) for (auto& k : items) k->position->setRange(0, length->floatValue());
+	if (!allowKeysOutside)
+	{
+		LOG("Set all keys range " << length->floatValue());
+		for (auto& k : items)
+		{
+			k->position->setRange(0, length->floatValue());
+		}
+	}
 }
 
 Point<float> Automation::getPosAndValue()
