@@ -322,11 +322,7 @@ void Automation::addItemInternal(AutomationKey* k, var)
 	k->position->unitSteps = positionUnitSteps;
 	if (positionUnitSteps > 0) k->position->setValue(k->position->getStepSnappedValueFor(k->position->floatValue()));
 
-	if (!allowKeysOutside)
-	{
-		k->position->setRange(0, length->floatValue());
-		LOG("New key, range = " << length->floatValue());
-	}
+	if (!allowKeysOutside) k->position->setRange(0, length->floatValue());
 
 	if (valueRange->enabled) k->setValueRange(valueRange->x, valueRange->y);
 
@@ -464,7 +460,6 @@ void Automation::setLength(float newLength, bool stretch, bool stickToEnd)
 
 	if (!allowKeysOutside)
 	{
-		LOG("Set all keys range " << length->floatValue());
 		for (auto& k : items)
 		{
 			k->position->setRange(0, length->floatValue());
