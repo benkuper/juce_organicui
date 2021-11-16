@@ -18,6 +18,9 @@ ScriptUtil::ScriptUtil() :
 {
 	scriptObject.setMethod("getTime", ScriptUtil::getTime);
 	scriptObject.setMethod("getTimestamp", ScriptUtil::getTimestamp);
+	scriptObject.setMethod("delayThreadMS", ScriptUtil::delayThreadMS);
+
+
 	scriptObject.setMethod("getFloatFromBytes", ScriptUtil::getFloatFromBytes);
 	scriptObject.setMethod("getInt32FromBytes", ScriptUtil::getInt32FromBytes);
 	scriptObject.setMethod("getInt64FromBytes", ScriptUtil::getInt32FromBytes);
@@ -59,6 +62,21 @@ var ScriptUtil::getTime(const var::NativeFunctionArgs &)
 var ScriptUtil::getTimestamp(const var::NativeFunctionArgs&)
 {
 	return Time::currentTimeMillis()/1000;
+}
+
+var ScriptUtil::delayThreadMS(const var::NativeFunctionArgs& a)
+{
+	if (a.numArguments == 0) return false;
+	if (Thread* t = Thread::getCurrentThread())
+	{
+		t->wait((int)a.arguments[0]);
+	}
+	else
+	{
+		MessageManager::getInstance()->runDispatchLoopUntil((int)a.arguments[0]);
+	}
+
+	return true;
 }
 
 var ScriptUtil::getFloatFromBytes(const var::NativeFunctionArgs & a)
