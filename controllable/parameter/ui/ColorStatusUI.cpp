@@ -1,4 +1,3 @@
-#include "ColorStatusUI.h"
 /*
   ==============================================================================
 
@@ -43,6 +42,7 @@ Colour ColorStatusUI::getCurrentColor() const
 	{
 	case Controllable::FLOAT:
 	case Controllable::INT:
+	case Controllable::BOOL:
 	{
 		if (parameter->colorStatusMap.contains(parameter->value)) return parameter->colorStatusMap[parameter->value];
 		float minVal = INT32_MIN;
@@ -80,12 +80,19 @@ void ColorStatusUI::valueChanged(const var&)
 ColorStatusUI::ColorOptionManager::ColorOptionManager(Parameter* parameter) :
 	parameter(parameter)
 {
-	HashMap<var, Colour>::Iterator it(parameter->colorStatusMap);
-	while (it.next()) addOptionUI(it.getKey());
+	if (parameter->type != Controllable::BOOL)
+	{
+		HashMap<var, Colour>::Iterator it(parameter->colorStatusMap);
+		while (it.next()) addOptionUI(it.getKey());
+	}
 
 	if (parameter->type == Controllable::FLOAT || parameter->type == Controllable::INT)
 	{
 		for (int i = 0; i < 5; i++) addOptionUI("");
+	}else if (parameter->type == Controllable::BOOL)
+	{
+		addOptionUI(0);
+		addOptionUI(1);
 	}
 	else if (parameter->type == Controllable::ENUM && optionsUI.size() == 0)
 	{
@@ -148,19 +155,16 @@ void ColorStatusUI::ColorOptionManager::updateColorOptions()
 {
 	parameter->colorStatusMap.clear();
 
-	LOG("Updating color options :");
 	for (auto& o : optionsUI)
 	{
 		String kt = o->keyLabel.getText();
 		if (kt.isEmpty()) continue;
 
-		var k = parameter->type == Parameter::ENUM ? var(kt) : var(kt.getFloatValue());
+		var k = parameter->type == Parameter::ENUM ? var(kt) : parameter->type == Parameter::BOOL?var(kt.getIntValue()) : var(kt.getFloatValue());
 		Colour v = o->cp.getColor();
 
-		LOG(" > Set " << kt);
 		parameter->colorStatusMap.set(k, v);
 	}
-	LOG("Color Status : " << parameter->colorStatusMap.size() << " elements");
 }
 
 void ColorStatusUI::ColorOptionManager::show(Parameter* p, Component* c)
@@ -190,7 +194,7 @@ ColorStatusUI::ColorOptionManager::ColorOptionUI::ColorOptionUI(Parameter* p, co
 
 void ColorStatusUI::ColorOptionManager::ColorOptionUI::resized()
 {
-	Rectangle<int> r = getLocalBounds();
+	Rectangle<int> r = getLocalBounds().reduced(2);
 	keyLabel.setBounds(r.removeFromLeft(getWidth() / 2).reduced(2));
 	cpui->setBounds(r.reduced(2));
 }

@@ -13,15 +13,29 @@ ControllableUI* DashboardParameterItemUI::createControllableUI()
 {
 
 	int s = (int)parameterItem->style->getValueData();
-	
+
 	switch (parameterItem->parameter->type)
 	{
 	case Controllable::BOOL:
 	{
-		File f = parameterItem->btImage->getFile();
-		if (f.existsAsFile())
+		switch (s)
 		{
-			return ((BoolParameter*)parameterItem->parameter.get())->createToggle(ImageCache::getFromFile(f));
+		case 10:
+			return new ColorStatusUI(parameterItem->parameter.get(), true);
+			break;
+
+		case 11:
+			return new ColorStatusUI(parameterItem->parameter.get(), false);
+			break;
+		case 0:
+
+		default:
+			File f = parameterItem->btImage->getFile();
+			if (f.existsAsFile())
+			{
+				return ((BoolParameter*)parameterItem->parameter.get())->createToggle(ImageCache::getFromFile(f));
+			}
+			break;
 		}
 	}
 	break;
@@ -67,7 +81,7 @@ ControllableUI* DashboardParameterItemUI::createControllableUI()
 		switch (s)
 		{
 		case 12:
-			return new P2DUI((Point2DParameter *)parameterItem->parameter.get());
+			return new P2DUI((Point2DParameter*)parameterItem->parameter.get());
 			break;
 
 		default:

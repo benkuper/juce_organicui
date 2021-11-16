@@ -76,9 +76,9 @@ void DashboardParameterItem::updateStyleOptions()
 
 	if (parameter != nullptr)
 	{
-		if (parameter->type == Controllable::FLOAT || parameter->type == Controllable::INT || parameter->type == Controllable::ENUM)
+		if (parameter->type == Controllable::BOOL || parameter->type == Controllable::FLOAT || parameter->type == Controllable::INT || parameter->type == Controllable::ENUM)
 		{
-			if (parameter->type != Controllable::ENUM) style->addOption("Horizontal Slider", 0)->addOption("Vertical Slider", 1)->addOption("Rotary Slider", 5)->addOption("Text", 2)->addOption("Time", 3);
+			if (parameter->type != Controllable::ENUM && parameter->type != Controllable::BOOL) style->addOption("Horizontal Slider", 0)->addOption("Vertical Slider", 1)->addOption("Rotary Slider", 5)->addOption("Text", 2)->addOption("Time", 3);
 			style->addOption("Color Circle", 10)->addOption("Color Square", 11);
 			style->customGetEditorFunc = std::bind(&DashboardParameterItem::getStyleEditor, this, std::placeholders::_1, std::placeholders::_2);
 		}
