@@ -24,7 +24,7 @@ DashboardManager::DashboardManager() :
 	tabsBorderColor = addColorParameter("Tabs Border Color", "Color for the tabs in the web view", Colours::black);
 	tabsBorderWidth = addFloatParameter("Tabs Border Width","Width for the border of tabs in the web view", 0, 0);
 	tabsSelectedBGColor = addColorParameter("Tabs Selected BG Color", "Color for the tabs in the web view", GREEN_COLOR);
-	tabsSelectedLabelColor = addColorParameter("Tabs Selected Label Color", "Color for the tabs in the web view", TEXT_COLOR);
+	tabsSelectedLabelColor = addColorParameter("Tabs Selected Label Color", "Color for the tabs in the web view", Colours::black);
 	tabsSelectedBorderColor = addColorParameter("Tabs Selected Border Color", "Color for the tabs in the web view", Colours::black);
 	tabsSelectedBorderWidth = addFloatParameter("Tabs Selected Border Width", "Width for the border of tabs in the web view", 0, 0);
 
