@@ -58,6 +58,8 @@ GradientColorManager::~GradientColorManager()
 
 void GradientColorManager::setLength(float val, bool stretch, bool stickToEnd)
 {
+	updateKeyRanges();
+	
 	if (stretch)
 	{
 		float stretchFactor = val / length->floatValue();
@@ -70,6 +72,23 @@ void GradientColorManager::setLength(float val, bool stretch, bool stickToEnd)
 		float lengthDiff = val - length->floatValue();
 		length->setValue(val); // just change the value, nothing unusual
 		if (stickToEnd) for (auto& k : items) k->position->setValue(k->position->floatValue() + lengthDiff);
+	}
+
+}
+
+void GradientColorManager::setAllowKeysOutside(bool value)
+{
+	if (allowKeysOutside == value) return;
+	allowKeysOutside = value;
+	updateKeyRanges();
+}
+
+void GradientColorManager::updateKeyRanges()
+{
+	for (auto& i : items)
+	{
+		if (!allowKeysOutside) i->position->setRange(0, length->floatValue());
+		else i->position->clearRange();
 	}
 }
 
@@ -316,6 +335,7 @@ var GradientColorManager::getKeysBetweenFromScript(const juce::var::NativeFuncti
 void GradientColorManager::loadJSONDataInternal(var data)
 {
 	BaseManager::loadJSONDataInternal(data);
+	//updateKeyRanges();
 	//rebuildGradient();
 }
 

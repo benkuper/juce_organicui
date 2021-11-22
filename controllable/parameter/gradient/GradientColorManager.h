@@ -40,6 +40,8 @@ public:
 	bool allowKeysOutside;
 	
 	void setLength(float val, bool stretch = false, bool stickToEnd = false);
+	void setAllowKeysOutside(bool value);
+	void updateKeyRanges();
 
 	static GradientColorComparator comparator;
 
