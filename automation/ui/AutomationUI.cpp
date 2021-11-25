@@ -508,8 +508,8 @@ void AutomationUI::mouseDrag(const MouseEvent& e)
 		}
 		else if (e.mods.isAltDown())
 		{
-			if (!manager->valueRange->enabled)
-			{
+			//if (!manager->valueRange->enabled)
+			//{
 				if (e.mods.isShiftDown())
 				{
 					float pRel = 1 - (e.getMouseDownPosition().y * 1.0f / getHeight());
@@ -528,7 +528,7 @@ void AutomationUI::mouseDrag(const MouseEvent& e)
 					float deltaVal = getValueForY(e.getDistanceFromDragStartY(), true);
 					manager->viewValueRange->setPoint(viewValueRangeAtMouseDown.x + deltaVal, viewValueRangeAtMouseDown.y + deltaVal);
 				}
-			}
+			//}
 		}
 		{
 			BaseManagerUI::mouseDrag(e);

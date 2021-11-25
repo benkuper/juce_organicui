@@ -14,7 +14,7 @@ AutomationEditor::AutomationEditor(Automation * automation, bool isRoot) :
 	automationUI(nullptr)
 {
 	resetAndBuild();
-	setSize(100, 100);
+	setSize(100, 150);
 }
 
 AutomationEditor::~AutomationEditor()
