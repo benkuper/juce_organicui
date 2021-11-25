@@ -57,6 +57,7 @@ ControllableContainer::ControllableContainer(const String& niceName) :
 	scriptObject.setMethod("addColorParameter", ControllableContainer::addColorParameterFromScript);
 	scriptObject.setMethod("addFileParameter", ControllableContainer::addFileParameterFromScript);
 	scriptObject.setMethod("addContainer", ControllableContainer::addContainerFromScript);
+	scriptObject.setMethod("addAutomation", ControllableContainer::addAutomationFromScript);
 	scriptObject.setMethod("removeContainer", ControllableContainer::removeContainerFromScript);
 	scriptObject.setMethod("removeParameter", ControllableContainer::removeControllableFromScript);
 
@@ -1353,6 +1354,16 @@ var ControllableContainer::addFileParameterFromScript(const var::NativeFunctionA
 	fp->directoryMode = args.numArguments > 2 ? ((int)args.arguments[2] > 0) : false;
 	fp->isCustomizableByUser = true;
 	return fp->getScriptObject();
+}
+
+var ControllableContainer::addAutomationFromScript(const var::NativeFunctionArgs& args)
+{
+	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(args);
+	if (!checkNumArgs(cc->niceName, args, 1)) return var();
+
+	Automation* a = new Automation(args.arguments[0].toString(), nullptr, false);
+	cc->addChildControllableContainer(a, true);
+	return a->getScriptObject();
 }
 
 var ControllableContainer::addContainerFromScript(const var::NativeFunctionArgs & args)

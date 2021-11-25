@@ -92,6 +92,8 @@ public:
 
     static int compareKeys(AutomationKey* k1, AutomationKey* k2);
 
+    static var setLengthFromScript(const juce::var::NativeFunctionArgs& a);
+    static var addKeyFromScript(const juce::var::NativeFunctionArgs& a);
     static var getValueAtPositionFromScript(const juce::var::NativeFunctionArgs& a);
     static var getKeyAtPositionFromScript(const juce::var::NativeFunctionArgs& a);
     static var getKeysBetweenFromScript(const juce::var::NativeFunctionArgs& a);

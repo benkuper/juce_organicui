@@ -168,6 +168,7 @@ public:
 	static var addPoint2DParameterFromScript(const var::NativeFunctionArgs &args);
 	static var addPoint3DParameterFromScript(const var::NativeFunctionArgs &args);
 	static var addFileParameterFromScript(const var::NativeFunctionArgs &args);
+	static var addAutomationFromScript(const var::NativeFunctionArgs& args);
 	
 	static var addContainerFromScript(const var::NativeFunctionArgs &args);
 	static var removeContainerFromScript(const var::NativeFunctionArgs &args);

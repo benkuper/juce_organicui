@@ -49,6 +49,9 @@ Automation::Automation(const String& name, AutomationRecorder* recorder, bool al
 	rangeRemapMode->hideInEditor = true;
 	valueRange->setPoint(0, 1);
 
+	scriptObject.setMethod("setLength", &Automation::setLengthFromScript);
+	scriptObject.setMethod("addKey", &Automation::addKeyFromScript);
+	scriptObject.setMethod("getValueAtPosition", &Automation::getValueAtPositionFromScript);
 	scriptObject.setMethod("getValueAtPosition", &Automation::getValueAtPositionFromScript);
 	scriptObject.setMethod("getKeyAtPosition", &Automation::getKeyAtPositionFromScript);
 	scriptObject.setMethod("getKeysBetween", &Automation::getKeysBetweenFromScript);
@@ -657,6 +660,22 @@ void Automation::afterLoadJSONDataInternal()
 int Automation::compareKeys(AutomationKey* k1, AutomationKey* k2)
 {
 	return k2->position->floatValue() < k1->position->floatValue() ? 1 : k2->position->floatValue() > k1->position->floatValue() ? -1 : 0;
+}
+
+var Automation::setLengthFromScript(const juce::var::NativeFunctionArgs& a)
+{
+	Automation* au = getObjectFromJS<Automation>(a);
+	if (!checkNumArgs(au->niceName, a, 1)) return var();
+	au->setLength((float)a.arguments[0], a.numArguments >= 2 ? (bool)a.arguments[1] : false, a.numArguments >= 3 ? (bool)a.arguments[2] : false);
+	return var();
+}
+
+var Automation::addKeyFromScript(const juce::var::NativeFunctionArgs& a)
+{
+	Automation* au = getObjectFromJS<Automation>(a);
+	if (!checkNumArgs(au->niceName, a, 2)) return var();
+	au->addKey((float)a.arguments[0], (float)a.arguments[1]);
+	return var();
 }
 
 var Automation::getValueAtPositionFromScript(const juce::var::NativeFunctionArgs& a)
