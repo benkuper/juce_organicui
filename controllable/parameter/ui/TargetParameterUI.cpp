@@ -92,7 +92,7 @@ void TargetParameterUI::updateLabel()
 						while (cc != nullptr && (curPLevel <= targetParameter->defaultParentLabelLevel || cc->skipLabelInTarget))
 						{
 							if(curPLevel > 0 || cc->skipLabelInTarget) cc = cc->parentContainer;
-							if (cc == nullptr || cc == Engine::mainEngine) break;
+							if (cc == nullptr || cc == Engine::mainEngine || cc == targetParameter->rootContainer) break;
 							if (cc->skipLabelInTarget) continue;
 							
 							newText = cc->niceName + " > " + newText;
