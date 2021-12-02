@@ -124,7 +124,7 @@ void GenericControllableContainerEditor::mouseDrag(const MouseEvent& e)
 		//Image dragImage = this->createComponentSnapshot(this->getLocalBounds()).convertedToFormat(Image::ARGB);
 		//dragImage.multiplyAllAlphas(.5f);
 		Point<int> offset = -getMouseXYRelative();
-		if (e.getDistanceFromDragStart() > 30) startDragging(desc, this, Image(), true, &offset);
+		if (e.getDistanceFromDragStart() > 30) startDragging(desc, this, ScaledImage(), true, &offset);
 	}
 }
 

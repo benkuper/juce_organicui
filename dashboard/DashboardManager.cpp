@@ -341,7 +341,7 @@ void DashboardManager::downloadDashboardFiles()
 
 	LOG("Downloading dashboard files...");
 	downloadedFileZip = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile(OrganicApplication::getInstance()->getApplicationName() + "/dashboard.zip");
-	downloadTask = URL(downloadURL).downloadToFile(downloadedFileZip, "", this);
+	downloadTask = URL(downloadURL).downloadToFile(downloadedFileZip, URL::DownloadTaskOptions().withListener(this));
 
 	if (downloadTask == nullptr)
 	{

@@ -71,9 +71,15 @@ void HelpBox::run()
 	StringPairArray responseHeaders;
 	int statusCode = 0;
 	URL languageHelpURL = URL(helpURL.toString(false) + "help_"+ GlobalSettings::getInstance()->helpLanguage->getValueData().toString() + ".json");
-	std::unique_ptr<InputStream> stream(languageHelpURL.createInputStream(false, nullptr, nullptr, String(),
-		2000, // timeout in millisecs
-		&responseHeaders, &statusCode));
+	
+	std::unique_ptr<InputStream> stream(languageHelpURL.createInputStream(
+		URL::InputStreamOptions(URL::ParameterHandling::inAddress)
+		.withExtraHeaders("Cache-Control: no-cache")
+		.withConnectionTimeoutMs(2000)
+		.withResponseHeaders(&responseHeaders)
+		.withStatusCode(&statusCode)
+	));
+	
 #if JUCE_WINDOWS
 	if (statusCode != 200)
 	{

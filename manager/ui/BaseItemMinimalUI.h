@@ -259,7 +259,7 @@ void BaseItemMinimalUI<T>::mouseDrag(const MouseEvent& e)
 			//dragImage.multiplyAllAlphas(drawEmptyDragIcon ? 0 : .5f);
 
 			Point<int> imageOffset = -offset;
-			startDragging(desc, this, dragImage, true, &imageOffset);
+			startDragging(desc, this, ScaledImage(dragImage), true, &imageOffset);
 		}
 	}
 }
