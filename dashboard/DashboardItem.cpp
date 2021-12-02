@@ -13,6 +13,7 @@ DashboardItem::DashboardItem(Inspectable * _target, const String &name) :
 {
 	viewUIPosition->hideInEditor = false;
 	viewUISize->hideInEditor = false;
+	isUILocked->hideInEditor = false;
 
 	viewUISize->setPoint(400, 300);
 }
