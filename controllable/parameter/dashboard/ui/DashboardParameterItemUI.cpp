@@ -100,10 +100,8 @@ ControllableUI* DashboardParameterItemUI::createControllableUI()
 	return DashboardControllableItemUI::createControllableUI();
 }
 
-void DashboardParameterItemUI::updateUIParameters()
+void DashboardParameterItemUI::updateUIParametersInternal()
 {
-	DashboardControllableItemUI::updateUIParameters();
-
 	if (parameterItem == nullptr || parameterItem->inspectable.wasObjectDeleted()) return;
 
 	ParameterUI* pui = dynamic_cast<ParameterUI*>(itemUI.get());

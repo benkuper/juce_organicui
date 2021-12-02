@@ -23,10 +23,8 @@ ControllableUI* DashboardTriggerItemUI::createControllableUI()
 	return DashboardControllableItemUI::createControllableUI();
 }
 
-void DashboardTriggerItemUI::updateUIParameters()
+void DashboardTriggerItemUI::updateUIParametersInternal()
 {
-	DashboardControllableItemUI::updateUIParameters();
-
 	if (itemUI == nullptr) return;
 
 	((TriggerUI*)itemUI.get())->useCustomBGColor = triggerItem->bgColor->enabled;

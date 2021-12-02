@@ -11,7 +11,7 @@ public:
 	DashboardParameterItem* parameterItem;
 
 	virtual ControllableUI* createControllableUI() override;
-	virtual void updateUIParameters() override;
+	virtual void updateUIParametersInternal() override;
 
 	virtual void controllableFeedbackUpdateInternal(Controllable* c) override;
 	virtual void controllableStateUpdateInternal(Controllable* c) override;

@@ -11,7 +11,7 @@ public:
 	DashboardTriggerItem* triggerItem;
 	
 	virtual ControllableUI* createControllableUI() override;
-	virtual void updateUIParameters() override;
+	virtual void updateUIParametersInternal() override;
 
 	virtual void updateEditModeInternal(bool editMode) override;
 

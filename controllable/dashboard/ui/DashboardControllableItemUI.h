@@ -6,7 +6,7 @@ class DashboardControllableItemUI :
 	public DashboardControllableItem::AsyncListener
 {
 public:
-	DashboardControllableItemUI(DashboardControllableItem * controllableItem);
+	DashboardControllableItemUI(DashboardControllableItem* controllableItem);
 	~DashboardControllableItemUI();
 
 	DashboardControllableItem* controllableItem;
@@ -15,10 +15,11 @@ public:
 	virtual void paint(Graphics& g) override;
 	virtual void resizedDashboardItemInternal() override;
 
-	virtual ControllableUI * createControllableUI();
+	virtual ControllableUI* createControllableUI();
 	virtual void rebuildUI();
 
 	virtual void updateUIParameters();
+	virtual void updateUIParametersInternal() {}
 
 	virtual void updateEditModeInternal(bool editMode) override;
 

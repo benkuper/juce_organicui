@@ -73,12 +73,12 @@ void DashboardControllableItemUI::updateUIParameters()
 	itemUI->setOpaqueBackground(controllableItem->opaqueBackground->boolValue());
 	itemUI->updateTooltip();
 
+	updateUIParametersInternal();
 
-	bool editMode = DashboardManager::getInstance()->editMode->boolValue();
-	itemUI->setInterceptsMouseClicks(!editMode, !editMode); //force edit mode here
+	updateEditMode();
 
-	itemUI->repaint();
 	itemUI->updateUIParams();
+	itemUI->repaint();
 }
 
 

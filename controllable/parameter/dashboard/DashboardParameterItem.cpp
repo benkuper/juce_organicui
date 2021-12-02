@@ -87,7 +87,8 @@ void DashboardParameterItem::updateStyleOptions()
 			style->addOption("2D Canvas", 12);
 		}
 	}
-	style->setValueWithData(val);
+	
+	if(!val.isVoid()) style->setValueWithData(val);
 }
 
 var DashboardParameterItem::getServerData()
