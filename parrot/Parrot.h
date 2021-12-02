@@ -25,7 +25,7 @@ public:
     EnumParameter* currentRecordEnum;
     ParrotRecord* currentRecord;
 
-    HashMap<Controllable*, int> dataMapPlayIndex;
+    HashMap<WeakReference<Controllable>, int> dataMapPlayIndex;
 
     Trigger* startRecordTrigger;
     Trigger* stopRecordTrigger;

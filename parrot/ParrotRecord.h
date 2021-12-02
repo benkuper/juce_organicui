@@ -30,7 +30,7 @@ public:
 
     void addData(Controllable* c, double time, var value = var());
 
-    HashMap<Controllable*, Array<RecordValue>> dataMap;
+    HashMap<WeakReference<Controllable>, Array<RecordValue>> dataMap;
 
     var getJSONData() override;
     void loadJSONDataItemInternal(var data) override;

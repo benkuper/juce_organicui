@@ -37,9 +37,11 @@ var ParrotRecord::getJSONData()
 {
     var data = BaseItem::getJSONData();
     var vData = new DynamicObject();
-    HashMap<Controllable*, Array<RecordValue>>::Iterator it(dataMap);
+    HashMap<WeakReference<Controllable>, Array<RecordValue>>::Iterator it(dataMap);
     while (it.next())
     {
+        if (it.getKey().wasObjectDeleted() || it.getKey() == nullptr) continue;
+
         var vValues;
         Array<RecordValue> values = it.getValue();
         for (auto& v : values)
