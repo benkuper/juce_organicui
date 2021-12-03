@@ -14,11 +14,12 @@ class TripleSliderUI : public ParameterUI
 {
 
 public:
-	TripleSliderUI(Point3DParameter* parameter = nullptr);
+	TripleSliderUI(Array<Point3DParameter*>parameters);
 	virtual ~TripleSliderUI();
 
 	enum Direction { HORIZONTAL, VERTICAL };
 
+	Array<Point3DParameter*> p3ds;
 	Point3DParameter* p3d;
 
 	FloatParameter xParam;

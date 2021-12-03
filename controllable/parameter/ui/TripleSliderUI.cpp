@@ -8,32 +8,33 @@
   ==============================================================================
 */
 
-TripleSliderUI::TripleSliderUI(Point3DParameter* parameter) :
-	ParameterUI(parameter),
-	p3d(parameter),
-	xParam("X", "xParam", parameter->x, parameter->minimumValue[0], parameter->maximumValue[0]),
-	yParam("Y", "yParam", parameter->y, parameter->minimumValue[1], parameter->maximumValue[1]),
-	zParam("Z", "zParam", parameter->z, parameter->minimumValue[2], parameter->maximumValue[2]),
+TripleSliderUI::TripleSliderUI(Array<Point3DParameter*> parameters) :
+	ParameterUI(Inspectable::getArrayAs<Point3DParameter, Parameter>(parameters)),
+	p3ds(parameters),
+	p3d(parameters[0]),
+	xParam("X", "xParam", p3d->x, p3d->minimumValue[0], p3d->maximumValue[0]),
+	yParam("Y", "yParam", p3d->y, p3d->minimumValue[1], p3d->maximumValue[1]),
+	zParam("Z", "zParam", p3d->z, p3d->minimumValue[2], p3d->maximumValue[2]),
 	isUpdatingFromParam(false)
 {
 
 	showEditWindowOnDoubleClick = false;
 
-	xParam.canHaveRange = parameter->canHaveRange;
-	yParam.canHaveRange = parameter->canHaveRange;
-	zParam.canHaveRange = parameter->canHaveRange;
-	
-	xParam.isCustomizableByUser = parameter->isCustomizableByUser;
-	yParam.isCustomizableByUser = parameter->isCustomizableByUser;
-	zParam.isCustomizableByUser = parameter->isCustomizableByUser;
-	
+	xParam.canHaveRange = p3d->canHaveRange;
+	yParam.canHaveRange = p3d->canHaveRange;
+	zParam.canHaveRange = p3d->canHaveRange;
+
+	xParam.isCustomizableByUser = p3d->isCustomizableByUser;
+	yParam.isCustomizableByUser = p3d->isCustomizableByUser;
+	zParam.isCustomizableByUser = p3d->isCustomizableByUser;
+
 	xParam.defaultValue = 0;
 	yParam.defaultValue = 0;
 	zParam.defaultValue = 0;
-	
-	xParam.defaultUI = parameter->defaultUI;
-	yParam.defaultUI = parameter->defaultUI;
-	zParam.defaultUI = parameter->defaultUI;
+
+	xParam.defaultUI = p3d->defaultUI;
+	yParam.defaultUI = p3d->defaultUI;
+	zParam.defaultUI = p3d->defaultUI;
 
 
 	xParam.addAsyncParameterListener(this);
@@ -47,7 +48,7 @@ TripleSliderUI::TripleSliderUI(Point3DParameter* parameter) :
 	xSlider->showLabel = false;
 	ySlider->showLabel = false;
 	zSlider->showLabel = false;
-	
+
 	xSlider->showMenuOnRightClick = false;
 	ySlider->showMenuOnRightClick = false;
 	zSlider->showMenuOnRightClick = false;

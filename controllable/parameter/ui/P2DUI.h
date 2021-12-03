@@ -10,15 +10,16 @@
 
 #pragma once
 
-class P2DUI : 
+class P2DUI :
 	public ParameterUI,
 	public Timer
 {
 
 public:
-	P2DUI(Point2DParameter* parameter = nullptr);
+	P2DUI(Array<Point2DParameter*> parameters);
 	virtual ~P2DUI();
 
+	Array<Point2DParameter*> p2ds;
 	Point2DParameter* p2d;
 
 	var mouseDownNormalizedValue;

@@ -8,8 +8,8 @@
   ==============================================================================
 */
 
-IntSliderUI::IntSliderUI(Parameter * parameter) :
-    FloatSliderUI(parameter)
+IntSliderUI::IntSliderUI(Array<Parameter*> parameters) :
+    FloatSliderUI(parameters)
 {
 	fixedDecimals = 0;
 }

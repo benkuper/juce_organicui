@@ -8,11 +8,12 @@
   ==============================================================================
 */
 
-DoubleSliderUI::DoubleSliderUI(Point2DParameter* parameter) :
-	ParameterUI(parameter),
-	p2d(parameter),
-	xParam("X", "xParam", parameter->x, parameter->minimumValue[0], parameter->maximumValue[0]),
-	yParam("Y", "yParam", parameter->y, parameter->minimumValue[1], parameter->maximumValue[1]),
+DoubleSliderUI::DoubleSliderUI(Array<Point2DParameter*> parameters) :
+	ParameterUI(Inspectable::getArrayAs<Point2DParameter, Parameter>(parameters)),
+	p2ds(parameters),
+	p2d(parameters[0]),
+	xParam("X", "xParam", p2d->x, p2d->minimumValue[0], p2d->maximumValue[0]),
+	yParam("Y", "yParam", p2d->y, p2d->minimumValue[1], p2d->maximumValue[1]),
 	isUpdatingFromParam(false),
 	canShowExtendedEditor(true)
 {
@@ -25,8 +26,8 @@ DoubleSliderUI::DoubleSliderUI(Point2DParameter* parameter) :
 	yParam.isCustomizableByUser = parameter->isCustomizableByUser;
 	xParam.defaultValue = 0;
 	yParam.defaultValue = 0;
-	xParam.defaultUI = parameter->defaultUI;
-	yParam.defaultUI = parameter->defaultUI;
+	xParam.defaultUI = p2d->defaultUI;
+	yParam.defaultUI = p2d->defaultUI;
 
 
 	xParam.addAsyncParameterListener(this);
@@ -68,7 +69,8 @@ void DoubleSliderUI::mouseDownInternal(const MouseEvent& e)
 	{
 		setUndoableValueOnMouseUp = false;
 		p2d->setShowExtendedEditor(!p2d->showExtendedEditor);
-	}else
+	}
+	else
 	{
 		setUndoableValueOnMouseUp = true;
 		mouseDownValue = parameter->getValue();
@@ -123,7 +125,7 @@ void DoubleSliderUI::resized()
 		sr.removeFromLeft(2);
 	}
 
-	if(canShowExtendedEditor) canvasSwitchRect = sr.removeFromLeft(sr.getHeight()).toFloat();
+	if (canShowExtendedEditor) canvasSwitchRect = sr.removeFromLeft(sr.getHeight()).toFloat();
 
 	xSlider->setBounds(sr.removeFromLeft(sr.getWidth() / 2 - 5));
 	ySlider->setBounds(sr.removeFromRight(sr.getWidth() - 10));
@@ -245,7 +247,7 @@ void DoubleSliderUI::newMessage(const Parameter::ParameterEvent& e)
 		yParam.setValue(((Point2DParameter*)e.parameter)->y);
 		isUpdatingFromParam = false;
 	}
-	else if (isInteractable() &&!isUpdatingFromParam)
+	else if (isInteractable() && !isUpdatingFromParam)
 	{
 		if (e.parameter == &xParam || e.parameter == &yParam)
 		{

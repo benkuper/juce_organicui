@@ -80,8 +80,8 @@ public:
 	var getJSONDataInternal() override;
 	void loadJSONDataInternal(var data) override;
 
-	TargetParameterUI * createTargetUI(TargetParameter * target = nullptr);
-	ControllableUI* createDefaultUI() override;
+	TargetParameterUI* createTargetUI(Array<TargetParameter*> parameters = {});
+	ControllableUI* createDefaultUI(Array<Controllable*> controllables = {}) override;
 
 
 	static var getTargetFromScript(const juce::var::NativeFunctionArgs& a);

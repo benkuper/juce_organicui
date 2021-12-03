@@ -10,8 +10,8 @@
 
 
  //==============================================================================
-FloatSliderUI::FloatSliderUI(Parameter* parameter) :
-	ParameterUI(parameter),
+FloatSliderUI::FloatSliderUI(Array<Parameter*> parameters) :
+	ParameterUI(parameters),
 	addToUndoOnMouseUp(true),
 	fixedDecimals(3),
 	initValue(0),

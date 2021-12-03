@@ -146,12 +146,13 @@ void ColorParameter::setControlAutomation()
 	automation.reset(new ParameterColorAutomation(this, !isLoadingData));
 }
 
-ColorParameterUI * ColorParameter::createColorParamUI()
+ColorParameterUI * ColorParameter::createColorParamUI(Array<ColorParameter *> parameters)
 {
-	return new ColorParameterUI(this);
+	if (parameters.size() == 0) parameters = { this };
+	return new ColorParameterUI(parameters);
 }
 
-ControllableUI * ColorParameter::createDefaultUI()
+ControllableUI * ColorParameter::createDefaultUI(Array<Controllable*> controllables)
 {
-	return createColorParamUI();
+	return createColorParamUI(getArrayAs<Controllable, ColorParameter>(controllables));
 }

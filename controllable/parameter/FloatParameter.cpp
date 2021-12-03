@@ -20,35 +20,37 @@ FloatParameter::FloatParameter(const String& niceName, const String& description
 }
 
 
-FloatSliderUI* FloatParameter::createSlider(FloatParameter* target)
+FloatSliderUI* FloatParameter::createSlider(Array<Parameter*> parameters)
 {
-	if (target == nullptr) target = this;
-	return new FloatSliderUI(target);
+	if (parameters.size() == 0) parameters = { this };
+	return new FloatSliderUI(parameters);
 }
 
-FloatStepperUI* FloatParameter::createStepper(FloatParameter* target)
+FloatStepperUI* FloatParameter::createStepper(Array<Parameter*> parameters)
 {
-	if (target == nullptr) target = this;
-	return new FloatStepperUI(target);
+	if (parameters.size() == 0) parameters = { this };
+	return new FloatStepperUI(parameters);
 }
 
-FloatParameterLabelUI* FloatParameter::createLabelParameter(FloatParameter* target)
+FloatParameterLabelUI* FloatParameter::createLabelParameter(Array<Parameter*> parameters)
 {
-	if (target == nullptr) target = this;
-	return new FloatParameterLabelUI(target);
+	if (parameters.size() == 0) parameters = { this };
+	return new FloatParameterLabelUI(parameters);
 }
 
-TimeLabel* FloatParameter::createTimeLabelParameter(FloatParameter* target)
+TimeLabel* FloatParameter::createTimeLabelParameter(Array<Parameter*> parameters)
 {
-	if (target == nullptr) target = this;
-	return new TimeLabel(target);
+	if (parameters.size() == 0) parameters = { this };
+	return new TimeLabel(parameters);
 }
 
-ControllableUI* FloatParameter::createDefaultUI() {
+ControllableUI* FloatParameter::createDefaultUI(Array<Controllable*> controllables) {
 	UIType t = customUI != NONE ? customUI : defaultUI;
 
 	bool hasFullRange = ((float)minimumValue != INT32_MIN && (float)maximumValue != INT32_MAX);
 	if (t == NONE) t = hasFullRange ? SLIDER : LABEL;
+
+	Array<Parameter*> parameters = getArrayAs<Controllable, Parameter>(controllables);
 
 	switch (t)
 	{
@@ -56,16 +58,16 @@ ControllableUI* FloatParameter::createDefaultUI() {
 		break;
 
 	case SLIDER:
-		return createSlider(this);
+		return createSlider(parameters);
 		break;
 	case STEPPER:
-		return createStepper(this);
+		return createStepper(parameters);
 		break;
 	case LABEL:
-		return createLabelParameter(this);
+		return createLabelParameter(parameters);
 		break;
 	case TIME:
-		return createTimeLabelParameter(this);
+		return createTimeLabelParameter(parameters);
 		break;
 	}
 

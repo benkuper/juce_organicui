@@ -1,16 +1,16 @@
 /*
   ==============================================================================
 
-    StringParameter.cpp
-    Created: 9 Mar 2016 12:29:30am
-    Author:  bkupe
+	StringParameter.cpp
+	Created: 9 Mar 2016 12:29:30am
+	Author:  bkupe
 
   ==============================================================================
 */
 
 
-StringParameter::StringParameter(const String & niceName, const String &description, const String & initialValue, bool enabled) :
-    Parameter(Type::STRING, niceName, description, initialValue, var(), var(), enabled),
+StringParameter::StringParameter(const String& niceName, const String& description, const String& initialValue, bool enabled) :
+	Parameter(Type::STRING, niceName, description, initialValue, var(), var(), enabled),
 	defaultUI(TEXT),
 	multiline(false),
 	autoTrim(false)
@@ -23,40 +23,42 @@ StringParameter::~StringParameter()
 {
 }
 
-StringParameterUI * StringParameter::createStringParameterUI(StringParameter * target)
+StringParameterUI* StringParameter::createStringParameterUI(Array<StringParameter*> parameters)
 {
-	if (target == nullptr) target = this;
-    return new StringParameterUI(target);
+	if (parameters.size() == 0) parameters = { this };
+	return new StringParameterUI(parameters);
 }
 
 
-StringParameterUI * StringParameter::createStringParameterFileUI(StringParameter * target)
+StringParameterUI* StringParameter::createStringParameterFileUI(Array<StringParameter*> parameters)
 {
-	if (target == nullptr) target = this;
-	return new StringParameterFileUI(target);
+	if (parameters.size() == 0) parameters = { this };
+	return new StringParameterFileUI(parameters);
 }
 
-StringParameterTextUI * StringParameter::createStringParameterTextUI(StringParameter * target)
+StringParameterTextUI* StringParameter::createStringParameterTextUI(Array<StringParameter*> parameters)
 {
-	if (target == nullptr) target = this;
-	return new StringParameterTextUI(target);
+	if (parameters.size() == 0) parameters = { this };
+	return new StringParameterTextUI(parameters);
 }
 
-ControllableUI* StringParameter::createDefaultUI(){
+ControllableUI* StringParameter::createDefaultUI(Array<Controllable*> controllables) {
+
+	Array<StringParameter*> parameters = getArrayAs<Controllable, StringParameter>(controllables);
 
 	switch (defaultUI)
 	{
-	case TEXT: 
+	case TEXT:
 	{
-		if (!multiline) return createStringParameterUI(this); 
-		else return createStringParameterTextUI(this);
+		if (!multiline) return createStringParameterUI(parameters);
+		else return createStringParameterTextUI(parameters);
 	}
 	break;
 
-	case  FILE: return createStringParameterFileUI(this); break;
+	case  FILE: return createStringParameterFileUI(parameters); break;
 	}
 
-	return createStringParameterUI(this);
+	return createStringParameterUI(parameters);
 }
 
 var StringParameter::getLerpValueTo(var targetValue, float weight)
@@ -65,18 +67,19 @@ var StringParameter::getLerpValueTo(var targetValue, float weight)
 	return Parameter::getLerpValueTo(targetValue, weight);
 }
 
-void  StringParameter::setValueInternal(var & newVal)
+void  StringParameter::setValueInternal(var& newVal)
 {
-	
+
 	if (newVal.isArray())
 	{
 		String v = "";
-		for (int i = 0; i < newVal.size(); ++i) v += (i > 0 ? " " : "") + String((float)newVal[i],3,0);
+		for (int i = 0; i < newVal.size(); ++i) v += (i > 0 ? " " : "") + String((float)newVal[i], 3, 0);
 		value = v;
-	} else
+	}
+	else
 	{
-		value = newVal.isString()?newVal.toString():String((float)newVal,3);
-	}    
+		value = newVal.isString() ? newVal.toString() : String((float)newVal, 3);
+	}
 }
 bool StringParameter::checkValueIsTheSame(var oldValue, var newValue)
 {

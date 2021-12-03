@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    TargetParameterUI.h
-    Created: 2 Nov 2016 5:00:10pm
-    Author:  bkupe
+	TargetParameterUI.h
+	Created: 2 Nov 2016 5:00:10pm
+	Author:  bkupe
 
   ==============================================================================
 */
@@ -16,32 +16,33 @@ class TargetParameterUI :
 	public ContainerAsyncListener
 {
 public:
-	TargetParameterUI(TargetParameter * parameter, const String &noTargetText = "[Click to select an element]");
+	TargetParameterUI(Array<TargetParameter*> parameters, const String& noTargetText = "[Click to select an element]");
 	virtual ~TargetParameterUI();
 
 	String noTargetText;
 	Label label;
 	std::unique_ptr<ImageButton> targetBT;
-	
-	TargetParameter * targetParameter;
+
+	Array<TargetParameter*> targetParameters;
+	TargetParameter* targetParameter;
 
 	std::unique_ptr<BoolParameter> listeningToNextChange;
 	std::unique_ptr<BoolToggleUI> listeningToNextChangeBT;
 
-	void paint(Graphics &g) override;
+	void paint(Graphics& g) override;
 	void resized() override;
 
 	virtual void updateLabel();
-	
-	virtual void showPopupAndGetTarget();//can be overriden to get specific PopupMenu
-	void mouseDownInternal(const MouseEvent &e) override;
 
-	virtual void buttonClicked(Button * b) override;
+	virtual void showPopupAndGetTarget();//can be overriden to get specific PopupMenu
+	void mouseDownInternal(const MouseEvent& e) override;
+
+	virtual void buttonClicked(Button* b) override;
 
 protected:
-	void valueChanged(const var & v) override;
-	void newMessage(const Parameter::ParameterEvent &e) override;
-	void newMessage(const ContainerAsyncEvent &e) override;
+	void valueChanged(const var& v) override;
+	void newMessage(const Parameter::ParameterEvent& e) override;
+	void newMessage(const ContainerAsyncEvent& e) override;
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TargetParameterUI)

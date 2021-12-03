@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    ParameterUI.h
-    Created: 8 Mar 2016 3:48:44pm
-    Author:  bkupe
+	ParameterUI.h
+	Created: 8 Mar 2016 3:48:44pm
+	Author:  bkupe
 
   ==============================================================================
 */
@@ -15,9 +15,10 @@ class ParameterUI :
 	public Parameter::AsyncListener
 {
 public:
-	ParameterUI(Parameter* parameter);
+	ParameterUI(Array<Parameter*> parameter);
 	virtual ~ParameterUI();
 
+	Array<WeakReference<Parameter>> parameters;
 	WeakReference<Parameter> parameter;
 
 	bool setUndoableValueOnMouseUp; //for slidable uis like floatSlider and floatLabelUIs
@@ -42,18 +43,18 @@ public:
 	void showEditRangeWindow();
 	virtual void showEditRangeWindowInternal();
 
-	void paintOverChildren(Graphics &g) override;
+	void paintOverChildren(Graphics& g) override;
 
-	virtual void addPopupMenuItems(PopupMenu * p) override;
-	virtual void addPopupMenuItemsInternal(PopupMenu *) {}
+	virtual void addPopupMenuItems(PopupMenu* p) override;
+	virtual void addPopupMenuItemsInternal(PopupMenu*) {}
 	virtual void handleMenuSelectedID(int id) override;
 
-	virtual void mouseDoubleClick(const MouseEvent &e) override;
+	virtual void mouseDoubleClick(const MouseEvent& e) override;
 	virtual bool isInteractable(bool falseIfFeedbackOnly = true) override;
 
 	//focus
 	static int currentFocusOrderIndex;
-	static void setNextFocusOrder(Component * focusComponent);
+	static void setNextFocusOrder(Component* focusComponent);
 
 	class ValueEditCalloutComponent :
 		public Component,
@@ -62,7 +63,7 @@ public:
 	public:
 		ValueEditCalloutComponent(WeakReference<Parameter> pui);
 		~ValueEditCalloutComponent();
-		
+
 		WeakReference<Parameter> p;
 		OwnedArray<Label> labels;
 
@@ -73,19 +74,19 @@ public:
 		void parentHierarchyChanged() override;
 	};
 
-	static double textToValue(const String & text);
+	static double textToValue(const String& text);
 
 protected:
 
-    // helper to spot wrong deletion order
-    bool shouldBailOut();
+	// helper to spot wrong deletion order
+	bool shouldBailOut();
 
-    // here we are bound to only one parameter so no need to pass parameter*
-    // for general behaviour see AsyncListener
-    virtual void valueChanged(const var & ){};
-	virtual void rangeChanged(Parameter * ){};
+	// here we are bound to only one parameter so no need to pass parameter*
+	// for general behaviour see AsyncListener
+	virtual void valueChanged(const var&) {};
+	virtual void rangeChanged(Parameter*) {};
 	virtual void controlModeChanged(Parameter*);
 
-	virtual void newMessage(const Parameter::ParameterEvent &e) override;;
+	virtual void newMessage(const Parameter::ParameterEvent& e) override;;
 };
 

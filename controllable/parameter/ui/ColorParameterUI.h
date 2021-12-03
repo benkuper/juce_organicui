@@ -16,9 +16,10 @@ class ColorParameterUI :
 {
 
 public:
-	ColorParameterUI(ColorParameter * parameter = nullptr);
+	ColorParameterUI(Array<ColorParameter*> parameters);
 	~ColorParameterUI();
 
+	Array<ColorParameter*> colorParams;
 	ColorParameter * colorParam;
 
 	bool dispatchOnDoubleClick;

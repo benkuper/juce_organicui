@@ -18,15 +18,15 @@ class ColorParameter :
 public:
 
 	enum Mode { UINT, FLOAT };
-	ColorParameter(const String &niceName, const String &description, const Colour &initialColor = Colours::black, bool enabled = true);
+	ColorParameter(const String& niceName, const String& description, const Colour& initialColor = Colours::black, bool enabled = true);
 	~ColorParameter();
 
 	Mode mode;
 
 	const Colour getColor();
-	void setFloatRGBA(const float &r, const float &g, const float &b, const float &a);
-	void setColor(const uint32 &_color, bool silentSet = false, bool force = false);
-	void setColor(const Colour &_color, bool silentSet = false, bool force = false);
+	void setFloatRGBA(const float& r, const float& g, const float& b, const float& a);
+	void setColor(const uint32& _color, bool silentSet = false, bool force = false);
+	void setColor(const Colour& _color, bool silentSet = false, bool force = false);
 
 	virtual StringArray getValuesNames() override;
 
@@ -37,8 +37,8 @@ public:
 
 	void setControlAutomation() override;
 
-	ColorParameterUI * createColorParamUI();
-	ControllableUI * createDefaultUI() override;
+	ColorParameterUI* createColorParamUI(Array<ColorParameter*> colorParameters = {});
+	ControllableUI * createDefaultUI(Array<Controllable*> controllables = {}) override;
 
 	static ColorParameter * create() { return new ColorParameter("New Color Parameter", ""); }
 	virtual String getTypeString() const override { return getTypeStringStatic(); }

@@ -13,7 +13,7 @@ Author:  bkupe
 class TriggerBlinkUI : public TriggerUI, public Timer
 {
 public:
-    TriggerBlinkUI(Trigger * t);
+    TriggerBlinkUI(Array<Trigger *> t);
     virtual ~TriggerBlinkUI();
 
     void paint(Graphics&)override;

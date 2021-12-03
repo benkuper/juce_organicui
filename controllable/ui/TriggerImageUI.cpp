@@ -8,7 +8,7 @@
   ==============================================================================
 */
 
-TriggerImageUI::TriggerImageUI(Trigger * t, const Image &i, bool keepSaturation) :
+TriggerImageUI::TriggerImageUI(Array<Trigger *> t, const Image &i, bool keepSaturation) :
 	TriggerUI(t),
 	onImage(i),
 	offImage(i.createCopy()),

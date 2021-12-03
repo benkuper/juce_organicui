@@ -9,8 +9,8 @@
 */
 
 
-ColorStatusUI::ColorStatusUI(Parameter* parameter, bool isCircle) :
-	ParameterUI(parameter),
+ColorStatusUI::ColorStatusUI(Array<Parameter*> parameters, bool isCircle) :
+	ParameterUI(parameters),
 	isCircle(isCircle)
 {
 	setSize(32, 32);

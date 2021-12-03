@@ -13,7 +13,7 @@
 class IntSliderUI : public FloatSliderUI
 {
 public:
-    IntSliderUI(Parameter * parameter);
+    IntSliderUI(Array<Parameter*> parameters);
     virtual ~IntSliderUI();
 
     void setParamNormalizedValue(float value) override;

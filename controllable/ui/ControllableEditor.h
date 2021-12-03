@@ -17,9 +17,10 @@ class ControllableEditor :
 	public DragAndDropContainer
 {
 public:
-	ControllableEditor(Controllable * controllable, bool isRoot);  //Todo : handle full feedback if is root
+	ControllableEditor(Array<Controllable*> controllables, bool isRoot);  //Todo : handle full feedback if is root
 	virtual ~ControllableEditor();
 
+	Array<WeakReference<Controllable>> controllables;
 	WeakReference<Controllable> controllable;
 	
 	Label label;

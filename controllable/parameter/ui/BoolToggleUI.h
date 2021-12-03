@@ -15,7 +15,7 @@ class BoolToggleUI :
     public Timer
 {
 public:
-    BoolToggleUI(BoolParameter * parameter, Image onImage = Image(), Image offImage = Image());
+    BoolToggleUI(Array<BoolParameter *> parameters, Image onImage = Image(), Image offImage = Image());
     virtual ~BoolToggleUI();
 
 	Image offImage;

@@ -17,13 +17,14 @@ class ControllableUI :
 	public Inspectable::AsyncListener
 {
 public:
-	ControllableUI(Controllable* controllable);
+	ControllableUI(Array<Controllable*> controllables);
 	virtual ~ControllableUI();
 
 	static bool drawContourOnInspectableHighlighted;
 
 	String tooltip;
-	WeakReference<Controllable>  controllable;
+	Array<WeakReference<Controllable>>  controllables;
+	WeakReference<Controllable> controllable; //convenience access to the first item, which a lot of the UI is based upon
 
 	static std::function<void(ControllableUI*)> customShowContextMenuFunc;
 	static std::function<void(ControllableUI*, PopupMenu*)> customAddToContextMenuFunc;

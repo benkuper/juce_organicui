@@ -8,8 +8,8 @@
   ==============================================================================
 */
 
-BoolToggleUI::BoolToggleUI(BoolParameter * parameter, Image _onImage, Image _offImage) :
-    ParameterUI(parameter),
+BoolToggleUI::BoolToggleUI(Array<BoolParameter *> parameters, Image _onImage, Image _offImage) :
+    ParameterUI(Inspectable::getArrayAs<BoolParameter, Parameter>(parameters)),
 	shouldRepaint(false)
 {
 	usingCustomImages = _onImage.isValid();

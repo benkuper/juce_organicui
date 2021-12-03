@@ -2,7 +2,7 @@
 #pragma once
 
 GradientColorManagerEditor::GradientColorManagerEditor(GradientColorManager* manager, bool isRoot) :
-	InspectableEditor(manager, isRoot),
+	InspectableEditor(Array<Inspectable*>({ manager }), isRoot),
 	managerUI(manager)
 {
 	managerUI.autoResetViewRangeOnLengthUpdate = true;

@@ -1,6 +1,7 @@
-P2DUI::P2DUI(Point2DParameter* parameter) :
-	ParameterUI(parameter),
-	p2d(parameter),
+P2DUI::P2DUI(Array<Point2DParameter*>parameters) :
+	ParameterUI(Inspectable::getArrayAs<Point2DParameter, Parameter>(parameters)),
+	p2ds(parameters),
+	p2d(parameters[0]),
 	shouldRepaint(true),
 #if JUCE_MAC
 	updateRate(15)

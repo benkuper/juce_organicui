@@ -16,7 +16,7 @@ class FloatSliderUI :
 {
 
 public:
-    FloatSliderUI(Parameter * parameter = nullptr);
+    FloatSliderUI(Array<Parameter *> parameters);
     virtual ~FloatSliderUI();
 
     enum Direction { HORIZONTAL, VERTICAL, ROTARY };

@@ -38,10 +38,10 @@ public:
 	var getJSONDataInternal() override;
 	void loadJSONDataInternal(var data) override;
 
-    IntSliderUI * createSlider(IntParameter * target = nullptr);
-	IntStepperUI * createStepper(IntParameter * target = nullptr);
-	IntParameterLabelUI * createLabelUI(IntParameter * target = nullptr);
-    ControllableUI * createDefaultUI() override;
+	IntSliderUI* createSlider(Array<Parameter*> parameters = {});
+	IntStepperUI * createStepper(Array<Parameter*> parameters = {});
+	IntParameterLabelUI * createLabelUI(Array<Parameter*> parameters = {});
+    ControllableUI * createDefaultUI(Array<Controllable*> controllables = {}) override;
 
 	static IntParameter * create() { return new IntParameter("New Int Parameter", "", 0); }
 	virtual String getTypeString() const override { return getTypeStringStatic(); }

@@ -1,28 +1,29 @@
 /*
   ==============================================================================
 
-    StringParameterUI.cpp
-    Created: 9 Mar 2016 12:29:57am
-    Author:  bkupe
+	StringParameterUI.cpp
+	Created: 9 Mar 2016 12:29:57am
+	Author:  bkupe
 
   ==============================================================================
 */
 
 
 
-StringParameterUI::StringParameterUI(Parameter * p) :
-    ParameterUI(p),
-	stringParam((StringParameter *)p),
-	valueLabel(p->niceName+"_ValueLabel"),
+StringParameterUI::StringParameterUI(Array<StringParameter*> parameters) :
+	ParameterUI(Inspectable::getArrayAs<StringParameter, Parameter>(parameters)),
+	stringParams(parameters),
+	stringParam(parameters[0]),
+	valueLabel(parameters[0]->niceName + "_ValueLabel"),
 	maxFontHeight(16),
 	autoSize(false)
 {
 	showEditWindowOnDoubleClick = false;
 
-    addAndMakeVisible(&valueLabel);
+	addAndMakeVisible(&valueLabel);
 
-    valueLabel.setJustificationType(Justification::topLeft);
-    valueLabel.setText(parameter->getValue(),NotificationType::dontSendNotification);
+	valueLabel.setJustificationType(Justification::topLeft);
+	valueLabel.setText(parameter->getValue(), NotificationType::dontSendNotification);
 	valueLabel.addListener(this);
 	valueLabel.addMouseListener(this, false);
 
@@ -30,7 +31,7 @@ StringParameterUI::StringParameterUI(Parameter * p) :
 
 	updateUIParams();
 
-	setSize(200, GlobalSettings::getInstance()->fontSize->floatValue()+4);//default size
+	setSize(200, GlobalSettings::getInstance()->fontSize->floatValue() + 4);//default size
 }
 
 StringParameterUI::~StringParameterUI()
@@ -71,8 +72,8 @@ void StringParameterUI::paint(Graphics& g)
 	if (showLabel)
 	{
 		Rectangle<int> r = getLocalBounds();
-		g.setFont(jlimit(12, 40, jmin(r.getHeight()-2, r.getWidth()) - 16));
-		r = r.removeFromLeft(jmin(g.getCurrentFont().getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName)+10, r.getWidth() - 60));
+		g.setFont(jlimit(12, 40, jmin(r.getHeight() - 2, r.getWidth()) - 16));
+		r = r.removeFromLeft(jmin(g.getCurrentFont().getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, r.getWidth() - 60));
 		g.setColour(useCustomTextColor ? customTextColor : TEXT_COLOR);
 		g.drawFittedText(customLabel.isNotEmpty() ? customLabel : parameter->niceName, r, Justification::centred, 1);
 	}
@@ -84,8 +85,8 @@ void StringParameterUI::resized()
 
 	if (showLabel)
 	{
-		Font font(jlimit(12, 40, jmin(r.getHeight()-2, r.getWidth()) - 16));
-		r.removeFromLeft(jmin(font.getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName)+10, r.getWidth() - 60));
+		Font font(jlimit(12, 40, jmin(r.getHeight() - 2, r.getWidth()) - 16));
+		r.removeFromLeft(jmin(font.getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, r.getWidth() - 60));
 		r.removeFromLeft(2);
 		valueLabel.setJustificationType(Justification::centred);
 	}
@@ -93,32 +94,33 @@ void StringParameterUI::resized()
 	resizedInternal(r);
 
 	valueLabel.setBounds(r);
-	valueLabel.setFont(valueLabel.getFont().withHeight(jmin<float>((float)r.getHeight()-4, maxFontHeight)));
+	valueLabel.setFont(valueLabel.getFont().withHeight(jmin<float>((float)r.getHeight() - 4, maxFontHeight)));
 }
 
-void StringParameterUI::valueChanged(const var & v)
+void StringParameterUI::valueChanged(const var& v)
 {
-    valueLabel.setText(stringParam->prefix+parameter->stringValue()+stringParam->suffix,NotificationType::dontSendNotification);
+	valueLabel.setText(stringParam->prefix + parameter->stringValue() + stringParam->suffix, NotificationType::dontSendNotification);
 
 	if (autoSize)
 	{
 		int valueLabelWidth = valueLabel.getFont().getStringWidth(valueLabel.getText());
 		int tw = valueLabelWidth;
-		setSize(tw + 10,(int)valueLabel.getFont().getHeight());
+		setSize(tw + 10, (int)valueLabel.getFont().getHeight());
 	}
 
 }
 
-void StringParameterUI::labelTextChanged(Label *)
+void StringParameterUI::labelTextChanged(Label*)
 {
 	//String  originalString = valueLabel.getText().substring(prefix.length(), valueLabel.getText().length() - suffix.length());
 	if (stringParam->autoTrim) valueLabel.setText(valueLabel.getText().trim(), dontSendNotification);
-	parameter->setUndoableValue(parameter->stringValue(),valueLabel.getText());
+	parameter->setUndoableValue(parameter->stringValue(), valueLabel.getText());
 }
 
-StringParameterFileUI::StringParameterFileUI(Parameter * p) :
-	StringParameterUI(p),
-	fp((FileParameter *)p),
+StringParameterFileUI::StringParameterFileUI(Array<StringParameter*> parameters) :
+	StringParameterUI(parameters),
+	fps(Inspectable::getArrayAs<StringParameter, FileParameter>(parameters)),
+	fp(dynamic_cast<FileParameter *>(parameters[0])),
 	browseBT("Browse...")
 {
 	browseBT.addListener(this);
@@ -140,7 +142,7 @@ StringParameterFileUI::~StringParameterFileUI()
 {
 }
 
-void StringParameterFileUI::resizedInternal(juce::Rectangle<int> &r)
+void StringParameterFileUI::resizedInternal(juce::Rectangle<int>& r)
 {
 	if (relativeBT != nullptr)
 	{
@@ -158,17 +160,17 @@ void StringParameterFileUI::feedbackStateChanged()
 	if (relativeBT != nullptr) relativeBT->setEnabled(isInteractable());
 }
 
-void StringParameterFileUI::buttonClicked(Button * b)
+void StringParameterFileUI::buttonClicked(Button* b)
 {
 	if (b == &browseBT)
 	{
-		Component::BailOutChecker checker(this); 
+		Component::BailOutChecker checker(this);
 		FileChooser chooser("Select a file", File(fp->getBasePath()), fp->fileTypeFilter);
-        bool result;
-        
-        if (fp->directoryMode) result = chooser.browseForDirectory();
-        else result = chooser.browseForFileToOpen();
-        
+		bool result;
+
+		if (fp->directoryMode) result = chooser.browseForDirectory();
+		else result = chooser.browseForFileToOpen();
+
 		if (checker.shouldBailOut()) return;
 
 		if (parameter.wasObjectDeleted()) return;
@@ -176,15 +178,17 @@ void StringParameterFileUI::buttonClicked(Button * b)
 		{
 			parameter->setUndoableValue(parameter->stringValue(), chooser.getResult().getFullPathName());
 		}
-	} else if (relativeBT != nullptr && b == relativeBT.get())
+	}
+	else if (relativeBT != nullptr && b == relativeBT.get())
 	{
 		fp->setForceRelativePath(!fp->forceRelativePath);
 	}
 }
 
-StringParameterTextUI::StringParameterTextUI(Parameter * p) :
-	ParameterUI(p),
-	stringParam((StringParameter *)p)
+StringParameterTextUI::StringParameterTextUI(Array<StringParameter*> parameters) :
+	ParameterUI(Inspectable::getArrayAs<StringParameter, Parameter>(parameters)),
+	stringParams(parameters),
+	stringParam(parameters[0])
 {
 	editor.setColour(editor.backgroundColourId, Colours::black);
 	editor.setColour(CaretComponent::caretColourId, Colours::orange);
@@ -193,9 +197,9 @@ StringParameterTextUI::StringParameterTextUI(Parameter * p) :
 	editor.setText(stringParam->stringValue(), false);
 	editor.setReturnKeyStartsNewLine(stringParam->multiline);
 	editor.addListener(this);
-	
+
 	addAndMakeVisible(&editor);
-	setSize(100, stringParam->multiline?60:16);
+	setSize(100, stringParam->multiline ? 60 : 16);
 }
 
 void StringParameterTextUI::feedbackStateChanged()
@@ -210,21 +214,21 @@ void StringParameterTextUI::resized()
 	editor.setBounds(getLocalBounds());
 }
 
-void StringParameterTextUI::valueChanged(const var & v)
+void StringParameterTextUI::valueChanged(const var& v)
 {
 	editor.setText(stringParam->stringValue(), false);
 }
 
-void StringParameterTextUI::textEditorTextChanged(TextEditor &)
+void StringParameterTextUI::textEditorTextChanged(TextEditor&)
 {
 	stringParam->setValue(editor.getText());
 }
 
-void StringParameterTextUI::textEditorFocusLost(TextEditor &)
+void StringParameterTextUI::textEditorFocusLost(TextEditor&)
 {
-	
+
 }
 
-void StringParameterTextUI::textEditorReturnKeyPressed(TextEditor &)
+void StringParameterTextUI::textEditorReturnKeyPressed(TextEditor&)
 {
 }

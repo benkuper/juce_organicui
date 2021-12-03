@@ -8,7 +8,7 @@ Author:  bkupe
 ==============================================================================
 */
 
-Point3DParameter::Point3DParameter(const String & niceName, const String & description, bool enabled) :
+Point3DParameter::Point3DParameter(const String& niceName, const String& description, bool enabled) :
 	Parameter(POINT3D, niceName, description, 0, 0, 1, enabled),
 	x(0), y(0), z(0),
 	defaultUI(FloatParameter::NONE)
@@ -24,7 +24,7 @@ Point3DParameter::Point3DParameter(const String & niceName, const String & descr
 	defaultValue.append(0.f);
 	defaultValue.append(0.f);
 	defaultValue.append(0.f);
-	 
+
 	minimumValue = var();
 	minimumValue.append((float)INT32_MIN);
 	minimumValue.append((float)INT32_MIN);
@@ -85,7 +85,7 @@ void Point3DParameter::setValueInternal(var& _value)
 	_value[0] = (float)_value[0];
 	_value[1] = (float)_value[1];
 	_value[2] = (float)_value[2];
-	
+
 	Parameter::setValueInternal(_value);
 
 	x = _value[0];
@@ -158,9 +158,11 @@ StringArray Point3DParameter::getValuesNames()
 	return StringArray("X", "Y", "Z");
 }
 
-ControllableUI* Point3DParameter::createDefaultUI()
+ControllableUI* Point3DParameter::createDefaultUI(Array<Controllable*> controllables)
 {
-	return new TripleSliderUI(this);
+	Array<Point3DParameter*> parameters = getArrayAs<Controllable, Point3DParameter>(controllables);
+	if (parameters.size() == 0) parameters.add(this);
+	return new TripleSliderUI(parameters);
 }
 
 var Point3DParameter::getCroppedValue(var originalValue)

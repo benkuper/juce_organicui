@@ -1,24 +1,27 @@
 /*
   ==============================================================================
 
-    CustomEditor.cpp
-    Created: 9 May 2016 6:42:18pm
-    Author:  bkupe
+	CustomEditor.cpp
+	Created: 9 May 2016 6:42:18pm
+	Author:  bkupe
 
   ==============================================================================
 */
 
-#include "InspectableEditor.h"
-#include "Inspector.h"
-
-InspectableEditor::InspectableEditor(WeakReference<Inspectable> _inspectable, bool _isRoot) :
-    inspectable(_inspectable),
-    parentInspector(nullptr),
-    fitToContent(false),
-    isRoot(_isRoot),
-    isInsideInspectorBounds(false)
+InspectableEditor::InspectableEditor(Array<Inspectable*> inspectables, bool _isRoot) :
+	inspectables(Inspectable::getWeakArray(inspectables)),
+	inspectable(inspectables[0]),
+	parentInspector(nullptr),
+	fitToContent(false),
+	isRoot(_isRoot),
+	isInsideInspectorBounds(false)
 {
 	addComponentListener(this);
+}
+
+InspectableEditor::InspectableEditor(Inspectable * _inspectable, bool _isRoot) :
+	InspectableEditor(Array<Inspectable *>({ _inspectable }), _isRoot)
+{
 }
 
 
@@ -26,19 +29,19 @@ InspectableEditor::~InspectableEditor()
 {
 }
 
-void InspectableEditor::componentMovedOrResized(Component & c, bool wasMoved, bool wasResized)
+void InspectableEditor::componentMovedOrResized(Component& c, bool wasMoved, bool wasResized)
 {
-	if(&c == this) updateVisibility();
+	if (&c == this) updateVisibility();
 }
 
 void InspectableEditor::updateVisibility()
 {
 	if (parentInspector == nullptr) return;
-	if (inspectable.wasObjectDeleted()) return;
+	//if (inspectable.wasObjectDeleted()) return;
 
 	juce::Rectangle<int> r = parentInspector->getLocalArea(this, getLocalBounds()); //getLocalArea(parentInspector, parentInspector->getLocalBounds());
 	juce::Rectangle<int> ir = parentInspector->getLocalBounds().getIntersection(r);
-	
+
 	isInsideInspectorBounds = !ir.isEmpty();
 	bool shouldBeVisible = isInsideInspectorBounds;
 
@@ -50,10 +53,10 @@ void InspectableEditor::updateVisibility()
 
 	setVisible(shouldBeVisible);
 
-	Array<Component *> children = getChildren();
-	for (auto &c : children)
+	Array<Component*> children = getChildren();
+	for (auto& c : children)
 	{
-		InspectableEditor * ed = dynamic_cast<InspectableEditor *>(c);
+		InspectableEditor* ed = dynamic_cast<InspectableEditor*>(c);
 		if (ed != nullptr) ed->updateVisibility();
 	}
 }
@@ -68,7 +71,7 @@ void InspectableEditor::parentHierarchyChanged()
 
 //GENERIC COMPONENT EDITOR
 
-GenericComponentEditor::GenericComponentEditor(WeakReference<Inspectable> i, Component * c, bool isRoot) :
+GenericComponentEditor::GenericComponentEditor(WeakReference<Inspectable> i, Component* c, bool isRoot) :
 	InspectableEditor(i, isRoot),
 	child(c)
 {
@@ -86,7 +89,7 @@ void GenericComponentEditor::resized()
 	child->setBounds(getLocalBounds());
 }
 
-void GenericComponentEditor::childBoundsChanged(Component * c)
+void GenericComponentEditor::childBoundsChanged(Component* c)
 {
 	setSize(getWidth(), child->getHeight());
 }

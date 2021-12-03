@@ -17,14 +17,14 @@ class TriggerBlinkUI;
 class Trigger : public Controllable
 {
 public:
-	Trigger(const String &niceName, const String &description, bool enabled = true);
-	~Trigger() {masterReference.clear();}
-	
+	Trigger(const String& niceName, const String& description, bool enabled = true);
+	~Trigger() { masterReference.clear(); }
 
-	TriggerButtonUI * createButtonUI();
-	TriggerImageUI * createImageUI(const Image &image, bool keepSaturation = false);
-	TriggerBlinkUI * createBlinkUI();
-	ControllableUI * createDefaultUI() override;
+
+	TriggerButtonUI* createButtonUI(Array<Trigger *> triggers = {});
+	TriggerImageUI* createImageUI(const Image& image, bool keepSaturation = false, Array<Trigger *> triggers = {});
+	TriggerBlinkUI * createBlinkUI(Array<Trigger *> triggers = {});
+	ControllableUI * createDefaultUI(Array<Controllable *> controllables = {}) override;
 	
 	virtual void trigger();
 	

@@ -10,11 +10,11 @@
 
 
 //==============================================================================
-TriggerButtonUI::TriggerButtonUI(Trigger *t) :
-    TriggerUI(t),
+TriggerButtonUI::TriggerButtonUI(Array<Trigger *> triggers) :
+    TriggerUI(triggers),
 	drawTriggering(false)
 {
-	setSize(Font(12).getStringWidth(t->niceName)+4, GlobalSettings::getInstance()->fontSize->floatValue() + 4);
+	setSize(Font(12).getStringWidth(triggers[0]->niceName)+4, GlobalSettings::getInstance()->fontSize->floatValue() + 4);
 	setRepaintsOnMouseActivity(isInteractable());
 }
 
@@ -33,7 +33,7 @@ void TriggerButtonUI::triggerTriggered(const Trigger *)
 
 void TriggerButtonUI::mouseDownInternal(const MouseEvent & e)
 {
-	trigger->trigger();
+	for(auto & t : triggers) t->trigger();
 }
 
 bool TriggerButtonUI::hitTest(int x, int y)

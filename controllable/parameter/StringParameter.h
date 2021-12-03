@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    StringParameter.h
-    Created: 9 Mar 2016 12:29:30am
-    Author:  bkupe
+	StringParameter.h
+	Created: 9 Mar 2016 12:29:30am
+	Author:  bkupe
 
   ==============================================================================
 */
@@ -16,7 +16,7 @@ class StringParameterTextUI;
 class StringParameter : public Parameter
 {
 public:
-    StringParameter(const String &niceName, const String &description, const String &initialValue, bool enabled=true);
+	StringParameter(const String& niceName, const String& description, const String& initialValue, bool enabled = true);
 	virtual ~StringParameter();
 
 	enum UIType { TEXT, FILE };
@@ -30,20 +30,20 @@ public:
 	virtual var getLerpValueTo(var targetValue, float weight) override;
 
 
-    // need to override this function because var Strings comparison  is based on pointer (we need full string comp)
-    virtual  void setValueInternal(var&)override;
+	// need to override this function because var Strings comparison  is based on pointer (we need full string comp)
+	virtual  void setValueInternal(var&)override;
 
 	virtual bool checkValueIsTheSame(var oldValue, var newValue) override;
 
 	virtual void setAttribute(String param, var paramVal) override;
 	virtual StringArray getValidAttributes() const override;
 
-	StringParameterUI * createStringParameterUI(StringParameter * target = nullptr);
-	StringParameterUI * createStringParameterFileUI(StringParameter * target = nullptr);
-	StringParameterTextUI * createStringParameterTextUI(StringParameter * target = nullptr);
-    ControllableUI* createDefaultUI() override;
+	StringParameterUI* createStringParameterUI(Array<StringParameter*> parameters = {});
+	StringParameterUI* createStringParameterFileUI(Array<StringParameter*> parameters = {});
+	StringParameterTextUI* createStringParameterTextUI(Array<StringParameter*> parameters = {});
+	ControllableUI* createDefaultUI(Array<Controllable*> controllables = {}) override;
 
-	static StringParameter * create() { return new StringParameter("New StringParameter", "",""); }
+	static StringParameter* create() { return new StringParameter("New StringParameter", "", ""); }
 	virtual String getTypeString() const override { return getTypeStringStatic(); }
 	static String getTypeStringStatic() { return "String"; }
 

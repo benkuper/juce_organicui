@@ -16,24 +16,25 @@ bool ControllableUI::showParrotOption = true;
 bool ControllableUI::drawContourOnInspectableHighlighted = false;
 
 std::function<void(ControllableUI*)> ControllableUI::customShowContextMenuFunc = nullptr;
-std::function<void(ControllableUI *, PopupMenu *)> ControllableUI::customAddToContextMenuFunc = nullptr;
-std::function<bool(ControllableUI *, int)> ControllableUI::handleCustomContextMenuResultFunc = nullptr;
+std::function<void(ControllableUI*, PopupMenu*)> ControllableUI::customAddToContextMenuFunc = nullptr;
+std::function<bool(ControllableUI*, int)> ControllableUI::handleCustomContextMenuResultFunc = nullptr;
 std::function<void(ControllableUI*)> ControllableUI::customShowEditWindowFunction = nullptr;
 
-ControllableUI::ControllableUI(Controllable * controllable) :
-	Component(controllable->niceName),
-	controllable(controllable),
+ControllableUI::ControllableUI(Array<Controllable*> controllables) :
+	Component(controllables.size() > 0 ? controllables[0]->niceName : "[notset]"),
+	controllables(Inspectable::getWeakArray(controllables)),
+	controllable(controllables.size() > 0 ? controllables[0] : nullptr),
 	showLabel(true),
 	opaqueBackground(false),
 	showMenuOnRightClick(true),
 	forceFeedbackOnly(false),
 	useCustomTextColor(false),
-    customContourThickness(1)
+	customContourThickness(1)
 {
 	jassert(controllable != nullptr);
 	updateTooltip();
 	controllable->addAsyncControllableListener(this);
-	if(drawContourOnInspectableHighlighted) controllable->addAsyncInspectableListener(this);
+	if (drawContourOnInspectableHighlighted) controllable->addAsyncInspectableListener(this);
 
 	setEnabled(controllable->enabled);
 	setAlpha(controllable->enabled ? 1 : .5f);
@@ -56,7 +57,7 @@ void ControllableUI::paintOverChildren(Graphics& g)
 	drawContour(g);
 }
 
-void ControllableUI::mouseEnter(const MouseEvent & e)
+void ControllableUI::mouseEnter(const MouseEvent& e)
 {
 	if (controllable != nullptr && !controllable.wasObjectDeleted())
 	{
@@ -65,7 +66,7 @@ void ControllableUI::mouseEnter(const MouseEvent & e)
 	}
 }
 
-void ControllableUI::mouseExit(const MouseEvent & e)
+void ControllableUI::mouseExit(const MouseEvent& e)
 {
 	if (controllable != nullptr && !controllable.wasObjectDeleted())
 	{
@@ -75,7 +76,7 @@ void ControllableUI::mouseExit(const MouseEvent & e)
 	}
 }
 
-void ControllableUI::mouseDown(const MouseEvent & e)
+void ControllableUI::mouseDown(const MouseEvent& e)
 {
 	if (controllable == nullptr && controllable.wasObjectDeleted()) return;
 
@@ -93,14 +94,13 @@ void ControllableUI::mouseDown(const MouseEvent & e)
 	}
 }
 
-void ControllableUI::mouseUp(const MouseEvent & e)
+void ControllableUI::mouseUp(const MouseEvent& e)
 {
 	if (e.mods.isRightButtonDown()) return;
 	if (isInteractable()) mouseUpInternal(e);
-
 }
 
-void ControllableUI::drawContour(Graphics &g)
+void ControllableUI::drawContour(Graphics& g)
 {
 	if (controllable == nullptr || controllable.wasObjectDeleted()) return;
 	bool isHighlighted = controllable->isHighlighted && ControllableUI::drawContourOnInspectableHighlighted;
@@ -127,12 +127,12 @@ void ControllableUI::showContextMenu()
 		customShowContextMenuFunc(this); //full override
 		return;
 	}
-	
-	
+
+
 	std::unique_ptr<PopupMenu> p(new PopupMenu());
-	
+
 	addPopupMenuItems(p.get());
-	
+
 	if (ControllableUI::customAddToContextMenuFunc != nullptr)
 	{
 		p->addSeparator();
@@ -154,8 +154,8 @@ void ControllableUI::showContextMenu()
 	if (controllable->includeInScriptObject)
 	{
 		p->addSeparator();
-		if(showOSCControlAddressOption) p->addItem(-1, "Copy OSC Control Address");
-		if(showScriptControlAddressOption) p->addItem(-2, "Copy Script Control Address");
+		if (showOSCControlAddressOption) p->addItem(-1, "Copy OSC Control Address");
+		if (showScriptControlAddressOption) p->addItem(-2, "Copy Script Control Address");
 	}
 
 
@@ -163,7 +163,7 @@ void ControllableUI::showContextMenu()
 
 	if (showDetectiveOption)
 	{
-		
+
 		if (controllable->type == Controllable::FLOAT ||
 			controllable->type == Controllable::INT ||
 			controllable->type == Controllable::POINT2D ||
@@ -192,7 +192,7 @@ void ControllableUI::showContextMenu()
 		p->addSubMenu("Set in Parrot", parrotMenu);
 	}
 
-	
+
 	if (showDashboardOption)
 	{
 		PopupMenu dashboardMenu;
@@ -208,8 +208,8 @@ void ControllableUI::showContextMenu()
 
 		p->addSubMenu("Send to Dashboard", dashboardMenu);
 	}
-	
-	
+
+
 	if (p->getNumItems() == 0) return;
 
 	int result = p->show();
@@ -236,12 +236,19 @@ void ControllableUI::showContextMenu()
 			break;
 
 		case -11:
-			controllable->setControllableFeedbackOnly(!controllable->isControllableFeedbackOnly);
-			break;
+		{
+			bool tVal = !controllable->isControllableFeedbackOnly;
+			for (auto& c : controllables) c->setControllableFeedbackOnly(tVal);
+		}
+		break;
 
 		case -12:
-			controllable->setEnabled(!controllable->enabled);
-			break;
+		{
+
+			bool tVal = !controllable->enabled;
+			for (auto& c : controllables) c->setEnabled(tVal);
+		}
+		break;
 
 		case 9999:
 		{
@@ -304,7 +311,7 @@ void ControllableUI::showEditWindow()
 	else showEditWindowInternal();
 }
 
-void ControllableUI::newMessage(const Controllable::ControllableEvent & e)
+void ControllableUI::newMessage(const Controllable::ControllableEvent& e)
 {
 	switch (e.type)
 	{
@@ -380,6 +387,6 @@ void ControllableUI::updateTooltip()
 		if (controllable->type != Controllable::Type::TRIGGER) tooltip += " (" + controllable->argumentsDescription + ")";
 		if (controllable->isControllableFeedbackOnly) tooltip += " (read only)";
 	}
-	
+
 	setTooltip(tooltip);
 }

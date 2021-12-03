@@ -8,9 +8,9 @@
   ==============================================================================
 */
 
-FloatParameterLabelUI::FloatParameterLabelUI(Parameter* p) :
-	ParameterUI(p),
-	valueLabel(p->niceName + "_ValueLabel"),
+FloatParameterLabelUI::FloatParameterLabelUI(Array<Parameter*> parameters) :
+	ParameterUI(parameters),
+	valueLabel(parameters[0]->niceName + "_ValueLabel"),
 	maxFontHeight(GlobalSettings::getInstance()->fontSize->floatValue()),
 	autoSize(false)
 {
@@ -94,7 +94,7 @@ void FloatParameterLabelUI::resized()
 
 void FloatParameterLabelUI::mouseDownInternal(const MouseEvent& e)
 {
-	if(e.mods.isLeftButtonDown () && e.mods.isCommandDown())
+	if (e.mods.isLeftButtonDown() && e.mods.isCommandDown())
 	{
 		parameter->resetValue();
 	}
@@ -146,7 +146,7 @@ void FloatParameterLabelUI::updateUIParamsInternal()
 	valueLabel.setJustificationType(Justification::centred);
 	valueLabel.setColour(Label::ColourIds::textColourId, useCustomTextColor ? customTextColor : (isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f)));
 
-	valueLabel.setColour(valueLabel.backgroundColourId, opaqueBackground?(useCustomBGColor ? customBGColor : BG_COLOR.darker(.3f)):Colours::transparentBlack);
+	valueLabel.setColour(valueLabel.backgroundColourId, opaqueBackground ? (useCustomBGColor ? customBGColor : BG_COLOR.darker(.3f)) : Colours::transparentBlack);
 	valueLabel.setColour(valueLabel.backgroundWhenEditingColourId, Colours::black);
 	valueLabel.setColour(CaretComponent::caretColourId, Colours::orange);
 	valueLabel.setColour(valueLabel.textWhenEditingColourId, Colours::orange);
@@ -156,7 +156,7 @@ void FloatParameterLabelUI::updateUIParamsInternal()
 }
 
 
-String FloatParameterLabelUI::getValueString(const var &val) const
+String FloatParameterLabelUI::getValueString(const var& val) const
 {
 	return val.isDouble() ? String(parameter->floatValue(), 3) : val.toString();
 }
@@ -192,13 +192,13 @@ void FloatParameterLabelUI::timerCallback()
 }
 
 //TIME LABEL
-TimeLabel::TimeLabel(Parameter* p) :
-	FloatParameterLabelUI(p),
+TimeLabel::TimeLabel(Array<Parameter*> parameters) :
+	FloatParameterLabelUI(parameters),
 	showStepsMode(false)
 {
 	valueChanged(parameter->getValue());
 	shouldUpdateLabel = true;
-	timerCallback();	
+	timerCallback();
 
 }
 
@@ -225,7 +225,7 @@ void TimeLabel::labelTextChanged(Label*)
 	shouldUpdateLabel = true;
 }
 
-String TimeLabel::getValueString(const var &val) const
+String TimeLabel::getValueString(const var& val) const
 {
 	return showStepsMode ? String((float)val * ((FloatParameter*)parameter.get())->unitSteps) : StringUtil::valueToTimeString(val);
 }

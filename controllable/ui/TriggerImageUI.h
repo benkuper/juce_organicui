@@ -15,7 +15,7 @@ class TriggerImageUI :
 	public Timer
 {
 public:
-	TriggerImageUI(Trigger *, const Image &image, bool keepSaturation = false);
+	TriggerImageUI(Array<Trigger *>, const Image &image, bool keepSaturation = false);
 	~TriggerImageUI();
 
 	Image onImage;

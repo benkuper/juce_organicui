@@ -14,11 +14,12 @@ class DoubleSliderUI : public ParameterUI
 {
 
 public:
-	DoubleSliderUI(Point2DParameter * parameter = nullptr);
+	DoubleSliderUI(Array<Point2DParameter*> parameters);
 	virtual ~DoubleSliderUI();
 
 	enum Direction { HORIZONTAL, VERTICAL };
 	
+	Array<Point2DParameter*> p2ds;
 	Point2DParameter * p2d;
 
 	FloatParameter xParam;

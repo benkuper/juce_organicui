@@ -20,9 +20,10 @@ class ParameterEditor :
 	public Parameter::AsyncListener
 {
 public:
-	ParameterEditor(Parameter * p, bool isRoot);  //Todo : handle full feedback if is root
+	ParameterEditor(Array<Parameter *> parameters, bool isRoot);  //Todo : handle full feedback if is root
 	~ParameterEditor();
 
+	Array<WeakReference<Parameter>> parameters;
 	WeakReference<Parameter> parameter;
 	bool currentUIHasRange;
 

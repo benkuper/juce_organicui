@@ -1,14 +1,14 @@
-#include "ParameterEditor.h"
-ParameterEditor::ParameterEditor(Parameter* _parameter, bool isRoot) :
-	ControllableEditor(_parameter, isRoot),
-	parameter(_parameter),
-	currentUIHasRange(_parameter->hasRange())
+ParameterEditor::ParameterEditor(Array<Parameter*> parameters, bool isRoot) :
+	ControllableEditor(Inspectable::getArrayAs<Parameter, Controllable>(parameters), isRoot),
+	parameters(Inspectable::getWeakArray(parameters)),
+	parameter(parameters[0]),
+	currentUIHasRange(parameters[0]->hasRange())
 {
 	if (parameter->isOverriden && ui->isInteractable()) label.setFont(label.getFont().withStyle(Font::FontStyleFlags::bold));
-	
+
 	parameter->addParameterListener(this);
 	parameter->addAsyncParameterListener(this);
-	
+
 	updateUI();
 }
 
@@ -30,12 +30,12 @@ void ParameterEditor::resized()
 	if (parameter->controlMode == Parameter::MANUAL) return;
 
 	juce::Rectangle<int> r = getLocalBounds().removeFromBottom(subContentHeight - 2);
-	
+
 	switch (parameter->controlMode)
 	{
-        case Parameter::MANUAL:
-            break;
-            
+	case Parameter::MANUAL:
+		break;
+
 	case Parameter::EXPRESSION:
 		if (expressionText != nullptr)
 		{
@@ -51,7 +51,7 @@ void ParameterEditor::resized()
 	case Parameter::AUTOMATION:
 		if (automationUI != nullptr) automationUI->setBounds(r);
 		break;
-	}	
+	}
 }
 
 void ParameterEditor::updateUI()
@@ -85,9 +85,9 @@ void ParameterEditor::updateUI()
 
 	switch (parameter->controlMode)
 	{
-        case Parameter::MANUAL:
-            break;
-            
+	case Parameter::MANUAL:
+		break;
+
 	case Parameter::EXPRESSION:
 	{
 		if (expressionText == nullptr)
@@ -141,7 +141,7 @@ void ParameterEditor::updateUI()
 }
 
 
-void ParameterEditor::newMessage(const Parameter::ParameterEvent & e)
+void ParameterEditor::newMessage(const Parameter::ParameterEvent& e)
 {
 	if (ui->isInteractable()) label.setFont(label.getFont().withStyle(parameter->isOverriden ? Font::FontStyleFlags::bold : Font::FontStyleFlags::plain));
 	if (e.type == Parameter::ParameterEvent::BOUNDS_CHANGED)
@@ -164,12 +164,12 @@ void ParameterEditor::childBoundsChanged(Component* c)
 	if (c == ui.get() && ui->getHeight() != baseHeight) updateUI();
 }
 
-void ParameterEditor::parameterControlModeChanged(Parameter *)
+void ParameterEditor::parameterControlModeChanged(Parameter*)
 {
 	updateUI();
 }
 
-void ParameterEditor::labelTextChanged(Label * labelThatHasChanged)
+void ParameterEditor::labelTextChanged(Label* labelThatHasChanged)
 {
 	parameter->setControlExpression(expressionText->getText());
 }

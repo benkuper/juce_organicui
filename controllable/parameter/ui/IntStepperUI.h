@@ -13,9 +13,10 @@
 class IntStepperUI : public FloatStepperUI 
 {
 public:
-    IntStepperUI(Parameter * parameter);
+    IntStepperUI(Array<Parameter*> parameters);
     virtual ~IntStepperUI();
 
+	Array<IntParameter*> intParams;
 	IntParameter* intParam;
 
 	static bool showHexModeOption;

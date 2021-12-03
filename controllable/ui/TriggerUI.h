@@ -15,10 +15,11 @@ class TriggerUI :
 	public Trigger::AsyncListener
 {
 public :
-    TriggerUI(Trigger * trigger);
+    TriggerUI(Array<Trigger *> triggers);
     virtual ~TriggerUI();
 
-    WeakReference<Trigger>  trigger;
+    Array<WeakReference<Trigger>> triggers;
+	WeakReference<Trigger> trigger;
 
 	bool useCustomBGColor;
 	Colour customBGColor;

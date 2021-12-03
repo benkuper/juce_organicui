@@ -8,10 +8,11 @@
   ==============================================================================
 */
 
-TargetParameterUI::TargetParameterUI(TargetParameter * parameter, const String &_noTargetText) :
-	ParameterUI(parameter),
+TargetParameterUI::TargetParameterUI(Array<TargetParameter *> parameters, const String &_noTargetText) :
+	ParameterUI(Inspectable::getArrayAs<TargetParameter, Parameter>(parameters)),
 	noTargetText(_noTargetText),
-	targetParameter(parameter)
+	targetParameters(parameters),
+	targetParameter(parameters[0])
 {
 	setInterceptsMouseClicks(true, true);
 	showEditWindowOnDoubleClick = false;

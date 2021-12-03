@@ -1,17 +1,18 @@
 /*
   ==============================================================================
 
-    EnumParameterUI.cpp
-    Created: 29 Sep 2016 5:35:12pm
-    Author:  bkupe
+	EnumParameterUI.cpp
+	Created: 29 Sep 2016 5:35:12pm
+	Author:  bkupe
 
   ==============================================================================
 */
 
 
-EnumParameterUI::EnumParameterUI(Parameter * parameter) :
-	ParameterUI(parameter),
-	ep((EnumParameter *)parameter)
+EnumParameterUI::EnumParameterUI(Array<EnumParameter*> parameters) :
+	ParameterUI(Inspectable::getArrayAs<EnumParameter, Parameter>(parameters)),
+	eps(parameters),
+	ep(parameters[0])
 {
 	cb.addListener(this);
 	cb.setTextWhenNoChoicesAvailable(ep->niceName);
@@ -32,19 +33,19 @@ EnumParameterUI::EnumParameterUI(Parameter * parameter) :
 
 EnumParameterUI::~EnumParameterUI()
 {
-	if(!parameter.wasObjectDeleted()) ep->removeAsyncEnumParameterListener(this);
+	if (!parameter.wasObjectDeleted()) ep->removeAsyncEnumParameterListener(this);
 	cb.removeListener(this);
 }
 
 void EnumParameterUI::updateComboBox()
-{	
+{
 	cb.clear(dontSendNotification);
 	idKeyMap.clear();
 
 	if (parameter.wasObjectDeleted()) return;
-	
+
 	int id = 1;
-	for(auto &ev : ep->enumValues)
+	for (auto& ev : ep->enumValues)
 	{
 		cb.addItem(ev->key, id);
 		idKeyMap.set(id, ev->key);
@@ -54,7 +55,7 @@ void EnumParameterUI::updateComboBox()
 
 	cb.setSelectedId(keyIdMap[ep->getValueKey()], dontSendNotification);
 	cb.setEnabled(isInteractable());
-	
+
 	updateTooltip();
 }
 
@@ -78,17 +79,17 @@ void EnumParameterUI::updateUIParamsInternal()
 	updateComboBox();
 }
 
-void EnumParameterUI::valueChanged(const var & value)
+void EnumParameterUI::valueChanged(const var& value)
 {
 	cb.setSelectedId(keyIdMap[ep->getValueKey()], dontSendNotification);
 	prevValue = ep->getValueKey();
 }
 
-void EnumParameterUI::comboBoxChanged(ComboBox *)
+void EnumParameterUI::comboBoxChanged(ComboBox*)
 {
 	if (shouldBailOut()) return;
 	ep->setUndoableValue(prevValue, getSelectedKey());
-	
+
 }
 void EnumParameterUI::addPopupMenuItemsInternal(PopupMenu* p)
 {
@@ -122,7 +123,7 @@ EnumParameterUI::EnumOptionManager::EnumOptionManager(EnumParameter* ep) :
 	viewport.setScrollBarsShown(true, false);
 	addAndMakeVisible(&viewport);
 	viewport.setViewedComponent(&container, false);
-	
+
 	setSize(200, 140);
 }
 
@@ -151,7 +152,7 @@ void EnumParameterUI::EnumOptionManager::resized()
 void EnumParameterUI::EnumOptionManager::labelTextChanged(Label* l)
 {
 	String key = ep->getValueKey();
-	
+
 	ep->clearOptions();
 
 	for (auto& o : optionsUI)
@@ -165,7 +166,7 @@ void EnumParameterUI::EnumOptionManager::labelTextChanged(Label* l)
 	ep->setValueWithKey(key);
 }
 
-EnumParameterUI::EnumOptionManager::EnumOptionUI::EnumOptionUI(EnumParameter*  ep, int index) :
+EnumParameterUI::EnumOptionManager::EnumOptionUI::EnumOptionUI(EnumParameter* ep, int index) :
 	ep(ep),
 	index(index)
 {

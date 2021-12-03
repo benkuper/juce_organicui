@@ -71,8 +71,8 @@ public:
 	static var setValueWithDataFromScript(const juce::var::NativeFunctionArgs& a);
 
 
-	EnumParameterUI * createUI(EnumParameter * target = nullptr);
-	ControllableUI * createDefaultUI() override;
+	EnumParameterUI* createUI(Array<EnumParameter*> parameters = {});
+	ControllableUI * createDefaultUI(Array<Controllable*> controllables = {}) override;
 
 
 	//Listener

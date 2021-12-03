@@ -8,9 +8,9 @@
   ==============================================================================
 */
 
-FloatStepperUI::FloatStepperUI(Parameter* _parameter) :
-	ParameterUI(_parameter),
-	valueAtDragStart(_parameter->floatValue())
+FloatStepperUI::FloatStepperUI(Array<Parameter*> parameters) :
+	ParameterUI(parameters),
+	valueAtDragStart(parameters[0]->floatValue())
 {
 	showEditWindowOnDoubleClick = false;
 

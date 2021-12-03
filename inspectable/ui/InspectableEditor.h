@@ -18,9 +18,12 @@ class InspectableEditor :
 	public ComponentListener
 {
 public:
-	InspectableEditor(WeakReference<Inspectable> inspectable, bool isRoot);
+	InspectableEditor(Array<Inspectable *> inspectables, bool isRoot);
+	InspectableEditor(Inspectable * inspectable, bool isRoot);
+
 	virtual ~InspectableEditor();
 
+	Array<WeakReference<Inspectable>> inspectables;
 	WeakReference<Inspectable> inspectable;
     
     Inspector * parentInspector;
@@ -36,6 +39,21 @@ public:
 
 	virtual void parentHierarchyChanged() override;
 
+	bool isMultiEditing() const { return inspectables.size() > 1; }
+
+	template<typename Func>
+	bool multiHasOneOf(Func f)
+	{
+		for (auto& i : inspectables) if (f(i)) return true;
+		return false;
+	}
+
+	template<typename Func>
+	bool multiHasAllOf(Func f)
+	{
+		for (auto& i : inspectables) if (!f(i)) return false;
+		return true;
+	}
 	
 
 private:

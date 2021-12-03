@@ -71,6 +71,31 @@ public:
 	virtual void setSelectedInternal(bool value); //to be overriden
 
 
+	//Helper
+	template<class S, class T>
+	static Array<T*> getArrayAs(Array<S*> source)
+	{
+		Array<T*> result;
+		for (auto& i : source) result.add(static_cast<T *>(i));
+		return result;
+	}
+
+	template<class T>
+	static Array<WeakReference<T>> getWeakArray(Array<T*> source)
+	{
+		Array<WeakReference<T>> result;
+		for (auto& i : source) result.add(i);
+		return result;
+	}
+
+	template<class T>
+	static Array<T *> getArrayFromWeak(Array<WeakReference<T>> source)
+	{
+		Array<T *> result;
+		for (auto& i : source) result.add(i.get());
+		return result;
+	}
+
 	InspectableEditor* getEditor(bool isRoot);
 	virtual InspectableEditor* getEditorInternal(bool /*isRoot*/) { jassert(false);  return nullptr; } //to override !
 	//Listener

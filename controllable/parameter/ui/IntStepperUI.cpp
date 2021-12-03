@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    IntStepperUI.cpp
-    Created: 8 Mar 2016 3:46:43pm
-    Author:  bkupe
+	IntStepperUI.cpp
+	Created: 8 Mar 2016 3:46:43pm
+	Author:  bkupe
 
   ==============================================================================
 */
@@ -12,12 +12,12 @@
 bool IntStepperUI::showHexModeOption = true;
 
 
-IntStepperUI::IntStepperUI(Parameter * parameter) :
-    FloatStepperUI(parameter),
-	intParam(dynamic_cast<IntParameter *>(parameter))
+IntStepperUI::IntStepperUI(Array<Parameter*> parameters) :
+	FloatStepperUI(parameters),
+	intParams(Inspectable::getArrayAs<Parameter, IntParameter>(parameters)),
+	intParam(dynamic_cast<IntParameter*>(parameters[0]))
 {
 	jassert(intParam != nullptr);
-	
 
 	if (intParam != nullptr && intParam->hexMode)
 	{
@@ -47,7 +47,7 @@ double IntStepperUI::textToHexValue(String t)
 void IntStepperUI::addPopupMenuItemsInternal(PopupMenu* p)
 {
 	FloatStepperUI::addPopupMenuItemsInternal(p);
-	if(showHexModeOption) p->addItem(-100, "Hex Mode", true, intParam->hexMode);
+	if (showHexModeOption) p->addItem(-100, "Hex Mode", true, intParam->hexMode);
 }
 
 void IntStepperUI::handleMenuSelectedID(int result)

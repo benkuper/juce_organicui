@@ -17,7 +17,7 @@ class FloatStepperUI :
 {
 
 public:
-    FloatStepperUI(Parameter * _parameter);
+    FloatStepperUI(Array<Parameter *> parameters);
     virtual ~FloatStepperUI();
 
     std::unique_ptr<BetterStepper> slider;

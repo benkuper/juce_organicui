@@ -17,9 +17,10 @@ class EnumParameterUI :
 	public ComboBox::Listener
 {
 public:
-    EnumParameterUI(Parameter * parameter = nullptr);
+    EnumParameterUI(Array<EnumParameter *> parameters);
     virtual ~EnumParameterUI();
 
+	Array<EnumParameter*> eps;
 	EnumParameter * ep;
 
 	ComboBox cb;

@@ -21,10 +21,10 @@ class Controllable :
 	public DashboardItemTarget
 {
 public:
-	enum Type { CUSTOM,TRIGGER,FLOAT,INT,BOOL,STRING,ENUM,POINT2D,POINT3D,TARGET,COLOR, TYPE_MAX };
+	enum Type { CUSTOM, TRIGGER, FLOAT, INT, BOOL, STRING, ENUM, POINT2D, POINT3D, TARGET, COLOR, TYPE_MAX };
 	static const Array<String> typeNames;
-	
-	Controllable(const Type &type, const String &niceName, const String &description, bool enabled = true);
+
+	Controllable(const Type& type, const String& niceName, const String& description, bool enabled = true);
 	virtual ~Controllable();
 
 	Type type;
@@ -60,12 +60,12 @@ public:
 	bool dashboardDefaultAppendLabel;		//if default parent level is not 0 and this this will 
 										   //decide if this controllable's label will be added at the end
 
-	
+
 	WeakReference<ControllableContainer> parentContainer;
 
-	UndoableAction * setUndoableNiceName(const String &_niceName, bool onlyReturnAction = false);
-	void setNiceName(const String &_niceName);
-	void setCustomShortName(const String &_shortName);
+	UndoableAction* setUndoableNiceName(const String& _niceName, bool onlyReturnAction = false);
+	void setNiceName(const String& _niceName);
+	void setCustomShortName(const String& _shortName);
 	void setAutoShortName();
 
 	virtual void setEnabled(bool value, bool silentSet = false, bool force = false);
@@ -73,34 +73,37 @@ public:
 
 	void notifyStateChanged();
 
-	void setParentContainer(ControllableContainer * container);
+	void setParentContainer(ControllableContainer* container);
 
 	template<class T>
-	T * getParentAs() { 
+	T* getParentAs() {
 		if (parentContainer == nullptr || parentContainer.wasObjectDeleted()) return nullptr;
-		return dynamic_cast<T *>(parentContainer.get());
+		return dynamic_cast<T*>(parentContainer.get());
 	}
 	void updateControlAddress();
 
 	void remove(bool addToUndo = false); // called from external to make this object ask for remove
 
-	virtual void updateLiveScriptObjectInternal(DynamicObject * parent = nullptr) override;
+	virtual void updateLiveScriptObjectInternal(DynamicObject* parent = nullptr) override;
 
 	virtual bool shouldBeSaved();
 
-	virtual var getJSONData(ControllableContainer * relativeTo = nullptr);
+	virtual var getJSONData(ControllableContainer* relativeTo = nullptr);
 	virtual var getJSONDataInternal() { return var(new DynamicObject()); } // to be overriden
 	virtual void loadJSONData(var data);
 	virtual void loadJSONDataInternal(var data) {} //to be overriden
 
 	virtual void setupFromJSONData(var data);
 
-	String getControlAddress(ControllableContainer * relativeTo = nullptr);
+	String getControlAddress(ControllableContainer* relativeTo = nullptr);
 
 	// used for generating editor
-	virtual ControllableUI * createDefaultUI() = 0;
+	virtual ControllableUI* createDefaultUI(Array<Controllable*> = {}) {
+		jassertfalse;
+		return nullptr;
+	}
 
-	virtual DashboardItem * createDashboardItem() override;
+	virtual DashboardItem* createDashboardItem() override;
 	virtual String getDefaultDashboardLabel() const;
 
 	virtual void setAttribute(String param, var value);
@@ -117,10 +120,10 @@ public:
 
 
 	String getScriptTargetString() override;
-	
+
 	virtual String getWarningTargetName() const override;
-	
-	virtual InspectableEditor * getEditorInternal(bool /*isRootEditor*/) override;
+
+	virtual InspectableEditor* getEditorInternal(bool /*isRootEditor*/) override;
 	virtual ControllableDetectiveWatcher* getDetectiveWatcher();
 	virtual String getTypeString() const { jassert(false); return ""; } //should be overriden
 
@@ -130,27 +133,27 @@ public:
 	public:
 		/** Destructor. */
 		virtual ~Listener() {}
-		virtual void controllableStateChanged(Controllable *) {}
-		virtual void controllableFeedbackStateChanged(Controllable *) {}
-		virtual void controllableControlAddressChanged(Controllable *) {}
-		virtual void controllableNameChanged(Controllable *) {}
-		virtual void askForRemoveControllable(Controllable *, bool /*addToUndo*/ = false) {}
+		virtual void controllableStateChanged(Controllable*) {}
+		virtual void controllableFeedbackStateChanged(Controllable*) {}
+		virtual void controllableControlAddressChanged(Controllable*) {}
+		virtual void controllableNameChanged(Controllable*) {}
+		virtual void askForRemoveControllable(Controllable*, bool /*addToUndo*/ = false) {}
 	};
 
 	ListenerList<Listener> listeners;
 	void addControllableListener(Listener* newListener) { listeners.add(newListener); }
 	void removeControllableListener(Listener* listener) { listeners.remove(listener); }
 
-																		// ASYNC
+	// ASYNC
 	class  ControllableEvent
 	{
 	public:
 		enum Type { STATE_CHANGED, FEEDBACK_STATE_CHANGED, CONTROLADDRESS_CHANGED, NAME_CHANGED, CONTROLLABLE_REMOVED };
 
-		ControllableEvent(Type t, Controllable * c) : type(t),controllable(c) {}
+		ControllableEvent(Type t, Controllable* c) : type(t), controllable(c) {}
 
 		Type type;
-		Controllable * controllable;
+		Controllable* controllable;
 	};
 
 	QueuedNotifier<ControllableEvent> queuedNotifier;
@@ -172,7 +175,7 @@ public:
 		public UndoableAction
 	{
 	public:
-		ControllableAction(Controllable * c) :
+		ControllableAction(Controllable* c) :
 			controllableRef(c)
 		{
 			controlAddress = c->getControlAddress();
@@ -181,14 +184,14 @@ public:
 		WeakReference<Controllable> controllableRef;
 		String controlAddress;
 
-		Controllable * getControllable();
+		Controllable* getControllable();
 	};
 
 	class ControllableChangeNameAction :
 		public ControllableAction
 	{
 	public:
-		ControllableChangeNameAction(Controllable * c, String oldName, String newName) :
+		ControllableChangeNameAction(Controllable* c, String oldName, String newName) :
 			ControllableAction(c),
 			oldName(oldName),
 			newName(newName)
@@ -202,6 +205,6 @@ public:
 		bool undo() override;
 	};
 
-	private:
-		JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Controllable)
+private:
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Controllable)
 };

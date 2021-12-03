@@ -8,7 +8,7 @@
   ==============================================================================
 */
 
-Point2DParameter::Point2DParameter(const String & niceName, const String & description, bool _enabled) :
+Point2DParameter::Point2DParameter(const String& niceName, const String& description, bool _enabled) :
 	Parameter(POINT2D, niceName, description, 0, 0, 1, _enabled),
 	x(0), y(0),
 	defaultUI(FloatParameter::NONE),
@@ -53,7 +53,7 @@ void Point2DParameter::setPoint(float _x, float _y)
 	setValue(d);
 }
 
-UndoableAction * Point2DParameter::setUndoablePoint(Point<float> oldPoint, Point<float> newPoint, bool onlyReturnAction)
+UndoableAction* Point2DParameter::setUndoablePoint(Point<float> oldPoint, Point<float> newPoint, bool onlyReturnAction)
 {
 	return setUndoablePoint(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y, onlyReturnAction);
 }
@@ -82,9 +82,9 @@ void Point2DParameter::setValueInternal(var& _value)
 
 	_value[0] = (float)_value[0];
 	_value[1] = (float)_value[1];
-	
+
 	Parameter::setValueInternal(_value);
-	
+
 	x = _value[0];
 	y = _value[1];
 }
@@ -124,7 +124,7 @@ StringArray Point2DParameter::getValidAttributes() const
 
 StringArray Point2DParameter::getValuesNames()
 {
-	return StringArray("X","Y");
+	return StringArray("X", "Y");
 }
 
 Point<float> Point2DParameter::getPoint() {
@@ -176,9 +176,11 @@ bool Point2DParameter::checkValueIsTheSame(var newValue, var oldValue)
 	return result;
 }
 
-ControllableUI* Point2DParameter::createDefaultUI()
+ControllableUI* Point2DParameter::createDefaultUI(Array<Controllable*> controllables)
 {
-	return new DoubleSliderUI(this);
+	Array<Point2DParameter*> parameters = getArrayAs<Controllable, Point2DParameter>(controllables);
+	if (parameters.size() == 0) parameters.add(this);
+	return new DoubleSliderUI(parameters);
 }
 
 var Point2DParameter::getJSONDataInternal()
@@ -189,7 +191,7 @@ var Point2DParameter::getJSONDataInternal()
 		data.getDynamicObject()->setProperty("extendedEditor", showExtendedEditor);
 		if (extendedEditorInvertX) data.getDynamicObject()->setProperty("extendedEditorInvertX", extendedEditorInvertX);
 		if (extendedEditorInvertY) data.getDynamicObject()->setProperty("extendedEditorInvertY", extendedEditorInvertY);
-		if(extendedEditorStretchMode) data.getDynamicObject()->setProperty("extendedEditorStretchMode", extendedEditorStretchMode);
+		if (extendedEditorStretchMode) data.getDynamicObject()->setProperty("extendedEditorStretchMode", extendedEditorStretchMode);
 	}
 	return data;
 }

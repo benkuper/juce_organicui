@@ -14,7 +14,7 @@ class IntParameterLabelUI :
 	public FloatParameterLabelUI 
 {
 public:
-	IntParameterLabelUI(Parameter * p);
+	IntParameterLabelUI(Array<Parameter *> parameters);
 	virtual ~IntParameterLabelUI() {};
 
 	IntParameter* intParam;

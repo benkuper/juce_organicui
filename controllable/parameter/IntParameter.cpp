@@ -22,7 +22,7 @@ IntParameter::IntParameter(const String& niceName, const String& description, co
 void IntParameter::setValueInternal(var& _value)
 {
 	if (_value.isObject() || _value.isArray()) return;
-	value =  _value.isString()?_value.toString().getIntValue():(int)_value;
+	value = _value.isString() ? _value.toString().getIntValue() : (int)_value;
 }
 
 var IntParameter::getLerpValueTo(var targetValue, float weight)
@@ -42,7 +42,7 @@ void IntParameter::setWeightedValue(Array<var> values, Array<float> weights)
 	}
 
 	setValue((int)tValue);
-} 
+}
 
 
 bool IntParameter::hasRange()
@@ -83,27 +83,27 @@ void IntParameter::loadJSONDataInternal(var data)
 	hexMode = data.getProperty("hexMode", false);
 }
 
-IntSliderUI * IntParameter::createSlider(IntParameter * target)
+IntSliderUI* IntParameter::createSlider(Array<Parameter*> parameters)
 {
-	if (target == nullptr) target = this;
-	return new IntSliderUI(target);
+	if (parameters.size() == 0) parameters = { this };
+	return new IntSliderUI(parameters);
 }
 
-IntStepperUI * IntParameter::createStepper(IntParameter * target)
+IntStepperUI* IntParameter::createStepper(Array<Parameter*> parameters)
 {
-	if (target == nullptr) target = this;
-	return new IntStepperUI(target);
+	if (parameters.size() == 0) parameters = { this };
+	return new IntStepperUI(parameters);
 }
 
-IntParameterLabelUI * IntParameter::createLabelUI(IntParameter * target)
+IntParameterLabelUI* IntParameter::createLabelUI(Array<Parameter*> parameters)
 {
-	if (target == nullptr) target = this;
-	return new IntParameterLabelUI(target);
+	if (parameters.size() == 0) parameters = { this };
+	return new IntParameterLabelUI(parameters);
 }
 
-ControllableUI * IntParameter::createDefaultUI() {
+ControllableUI* IntParameter::createDefaultUI(Array<Controllable*> controllables) {
 
-	ParameterUI * pui = createStepper(this);
+	ParameterUI* pui = createStepper(getArrayAs<Controllable, Parameter>(controllables));
 	//if (/*isControllableFeedbackOnly || !enabled || */ !hasRange()) pui = createLabelUI(p);
 	//else pui = createStepper(p);
 

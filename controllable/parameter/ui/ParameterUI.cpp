@@ -14,9 +14,10 @@ bool ParameterUI::showControlModeOption = true;
 int ParameterUI::currentFocusOrderIndex = 0;
 std::function<void(ParameterUI*)> ParameterUI::customShowEditRangeWindowFunction = nullptr;
 
-ParameterUI::ParameterUI(Parameter* parameter) :
-	ControllableUI(parameter),
-	parameter(parameter),
+ParameterUI::ParameterUI(Array<Parameter*> parameters) :
+	ControllableUI(Inspectable::getArrayAs<Parameter, Controllable>(parameters)),
+	parameters(Inspectable::getWeakArray(parameters)),
+	parameter(parameters[0]),
 	setUndoableValueOnMouseUp(true),
 	showEditWindowOnDoubleClick(true),
 	showValue(true),
@@ -227,7 +228,7 @@ bool ParameterUI::shouldBailOut() {
 
 // see Parameter::AsyncListener
 
-void ParameterUI::controlModeChanged(Parameter*) 
+void ParameterUI::controlModeChanged(Parameter*)
 {
 	updateUIParams();
 }
@@ -268,7 +269,7 @@ ParameterUI::ValueEditCalloutComponent::ValueEditCalloutComponent(WeakReference<
 		labels.add(label);
 	}
 
-	setSize(numValues == 1?200: 120 * numValues, 20);
+	setSize(numValues == 1 ? 200 : 120 * numValues, 20);
 }
 
 ParameterUI::ValueEditCalloutComponent::~ValueEditCalloutComponent()

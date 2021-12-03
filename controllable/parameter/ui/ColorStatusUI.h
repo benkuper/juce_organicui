@@ -15,12 +15,12 @@ class ColorStatusUI :
 {
 
 public:
-	ColorStatusUI(Parameter * parameter = nullptr, bool isCircle = true);
+	ColorStatusUI(Array<Parameter*> parameters, bool isCircle = true);
 	~ColorStatusUI();
 
 	bool isCircle;
 
-	void paint(Graphics &g) override;
+	void paint(Graphics& g) override;
 
 	Colour getCurrentColor() const;
 
@@ -43,7 +43,7 @@ public:
 			public ChangeListener
 		{
 		public:
-			ColorOptionUI(Parameter * p, const var &key);
+			ColorOptionUI(Parameter* p, const var& key);
 
 			Parameter* parameter;
 
@@ -67,12 +67,12 @@ public:
 
 		void updateColorOptions();
 
-		static void show(Parameter* p, Component *c);
+		static void show(Parameter* p, Component* c);
 	};
 
 protected:
 	// Inherited via ChangeListener
-	void valueChanged(const var &) override;
+	void valueChanged(const var&) override;
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ColorStatusUI)

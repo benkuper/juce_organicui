@@ -16,7 +16,7 @@ class FloatParameterLabelUI :
     public Timer
 {
 public:
-	FloatParameterLabelUI(Parameter * p);
+	FloatParameterLabelUI(Array<Parameter *> parameters);
 	virtual ~FloatParameterLabelUI() {};
 
 	Label nameLabel;
@@ -69,7 +69,7 @@ class TimeLabel :
 	public FloatParameterLabelUI
 {
 public:
-	TimeLabel(Parameter * p);
+	TimeLabel(Array<Parameter *> parameters);
 	~TimeLabel();
 
 	bool showStepsMode;

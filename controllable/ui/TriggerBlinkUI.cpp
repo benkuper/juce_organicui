@@ -9,8 +9,8 @@ Author:  bkupe
 */
 
 //==============================================================================
-TriggerBlinkUI::TriggerBlinkUI(Trigger* t) :
-	TriggerUI(t),
+TriggerBlinkUI::TriggerBlinkUI(Array<Trigger*> triggers) :
+	TriggerUI(triggers),
 	intensity(0),
 	animateIntensity(true),
 	blinkTime(100),
@@ -19,7 +19,7 @@ TriggerBlinkUI::TriggerBlinkUI(Trigger* t) :
 	refreshPeriod(50)
 {
 	setSize(30, 20);
-	
+
 }
 
 TriggerBlinkUI::~TriggerBlinkUI()

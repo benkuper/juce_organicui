@@ -15,7 +15,7 @@ class TriggerButtonUI :
 	public Timer
 {
 public:
-    TriggerButtonUI(Trigger * t);
+    TriggerButtonUI(Array<Trigger *> t);
     ~TriggerButtonUI();
 
 	bool drawTriggering;

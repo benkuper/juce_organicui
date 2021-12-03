@@ -23,9 +23,9 @@ public:
 
     void setValueInternal(var& value) override;
 
-    BoolToggleUI * createToggle(Image onImage = Image(), Image offImage = Image());
-	BoolButtonToggleUI* createButtonToggle();
-	ControllableUI * createDefaultUI() override;
+    BoolToggleUI * createToggle(Image onImage = Image(), Image offImage = Image(), Array<BoolParameter*> c = {});
+	BoolButtonToggleUI* createButtonToggle(Array<BoolParameter *> c = {});
+    ControllableUI* createDefaultUI(Array<Controllable*> c = {}) override;
 
 	static BoolParameter * create() { return new BoolParameter("New Bool Parameter", "", false); }
 	virtual String getTypeString() const override { return getTypeStringStatic(); }

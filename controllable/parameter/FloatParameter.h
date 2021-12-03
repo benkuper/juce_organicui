@@ -27,12 +27,12 @@ public:
 	UIType defaultUI;
 	UIType customUI;
 
-	FloatSliderUI* createSlider(FloatParameter* target = nullptr);
-	FloatStepperUI* createStepper(FloatParameter* target = nullptr);
-	FloatParameterLabelUI* createLabelParameter(FloatParameter* target = nullptr);
-	TimeLabel* createTimeLabelParameter(FloatParameter* target = nullptr);
+	FloatSliderUI* createSlider(Array<Parameter*> parameters = {});
+	FloatStepperUI* createStepper(Array<Parameter *> parameters = {});
+	FloatParameterLabelUI* createLabelParameter(Array<Parameter *> parameters = {});
+	TimeLabel* createTimeLabelParameter(Array<Parameter *> parameters = {});
 
-	virtual ControllableUI* createDefaultUI() override;
+	virtual ControllableUI* createDefaultUI(Array<Controllable*> controllables = {}) override;
 
 	bool checkValueIsTheSame(var oldValue, var newValue) override;
 

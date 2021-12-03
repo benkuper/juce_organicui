@@ -1,15 +1,15 @@
 /*
   ==============================================================================
 
-    TargetParameter.cpp
-    Created: 2 Nov 2016 5:00:04pm
-    Author:  bkupe
+	TargetParameter.cpp
+	Created: 2 Nov 2016 5:00:04pm
+	Author:  bkupe
 
   ==============================================================================
 */
 
 
-TargetParameter::TargetParameter(const String & niceName, const String & description, const String & initialValue, WeakReference<ControllableContainer> rootReference, bool enabled) :
+TargetParameter::TargetParameter(const String& niceName, const String& description, const String& initialValue, WeakReference<ControllableContainer> rootReference, bool enabled) :
 	StringParameter(niceName, description, initialValue, enabled),
 	targetType(CONTROLLABLE),
 	useGhosting(true),
@@ -25,17 +25,17 @@ TargetParameter::TargetParameter(const String & niceName, const String & descrip
 	customCheckAssignOnNextChangeFunc(nullptr),
 	defaultContainerTypeCheckFunc(nullptr),
 	customGetContainerLabelFunc(nullptr),
-    customGetTargetContainerFunc(nullptr)
+	customGetTargetContainerFunc(nullptr)
 
 {
 	showWarningInUI = true;
 
 	type = TARGET;
 
-	setRootContainer(rootReference != nullptr?rootReference:Engine::mainEngine);
-	
+	setRootContainer(rootReference != nullptr ? rootReference : Engine::mainEngine);
+
 	scriptObject.setMethod("getTarget", TargetParameter::getTargetFromScript);
-	
+
 	defaultValue = "";
 	argumentsDescription = "target";
 }
@@ -45,21 +45,21 @@ TargetParameter::~TargetParameter()
 	if (rootContainer != nullptr && !rootContainer.wasObjectDeleted()) rootContainer->removeControllableContainerListener(this);
 	setRootContainer(nullptr);
 	ghostValue = ""; //force not ghost to avoid launching a warning
-	setTarget((ControllableContainer *)nullptr);
-	setTarget((Controllable *)nullptr);
+	setTarget((ControllableContainer*)nullptr);
+	setTarget((Controllable*)nullptr);
 	setValue("", true, false);
 }
 
 void TargetParameter::resetValue(bool silentSet)
 {
-	ghostValue = ""; 
+	ghostValue = "";
 	setTarget((ControllableContainer*)nullptr);
 	setTarget((Controllable*)nullptr);
 	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::VALUE_CHANGED, this, getValue()));
 	clearWarning();
 }
 
-void TargetParameter::setGhostValue(const String & ghostVal)
+void TargetParameter::setGhostValue(const String& ghostVal)
 {
 	if (ghostVal == ghostValue) return;
 	ghostValue = ghostVal;
@@ -67,10 +67,10 @@ void TargetParameter::setGhostValue(const String & ghostVal)
 	{
 		setWarningMessage("Link is broken !");
 	}
-	
+
 }
 
-void TargetParameter::setValueFromTarget(Controllable * c, bool addToUndo)
+void TargetParameter::setValueFromTarget(Controllable* c, bool addToUndo)
 {
 	String newValue;
 
@@ -103,12 +103,12 @@ void TargetParameter::setValueFromTarget(Controllable * c, bool addToUndo)
 
 		newValue = c->getControlAddress(rootContainer);
 	}
-	
-	if(addToUndo) setUndoableValue(stringValue(), newValue);
+
+	if (addToUndo) setUndoableValue(stringValue(), newValue);
 	else setValue(newValue, false, true);
 }
 
-void TargetParameter::setValueFromTarget(ControllableContainer * cc, bool addToUndo)
+void TargetParameter::setValueFromTarget(ControllableContainer* cc, bool addToUndo)
 {
 	if (targetContainer != nullptr && cc == targetContainer.get())
 	{
@@ -129,34 +129,36 @@ void TargetParameter::setValueFromTarget(ControllableContainer * cc, bool addToU
 	else setValue(cc->getControlAddress(rootContainer), false, true);
 }
 
-void TargetParameter::setValueInternal(var & newVal)
+void TargetParameter::setValueInternal(var& newVal)
 {
 	StringParameter::setValueInternal(newVal);
 	if (newVal.toString().isNotEmpty())
 	{
 		if (targetType == CONTAINER)
 		{
-			WeakReference<ControllableContainer> cc = rootContainer->getControllableContainerForAddress(newVal.toString(),true);
+			WeakReference<ControllableContainer> cc = rootContainer->getControllableContainerForAddress(newVal.toString(), true);
 			if (cc != nullptr) setTarget(cc);
 			else
 			{
-				setTarget((ControllableContainer *)nullptr);
-				//setGhostValue(newVal.toString());
-			}
-		} else
-		{
-			WeakReference<Controllable> c = rootContainer->getControllableForAddress(newVal.toString(),true);
-			if (c != nullptr && !c.wasObjectDeleted()) setTarget(c);
-			else
-			{
-				setTarget((Controllable *)nullptr);
+				setTarget((ControllableContainer*)nullptr);
 				//setGhostValue(newVal.toString());
 			}
 		}
-	} else
+		else
+		{
+			WeakReference<Controllable> c = rootContainer->getControllableForAddress(newVal.toString(), true);
+			if (c != nullptr && !c.wasObjectDeleted()) setTarget(c);
+			else
+			{
+				setTarget((Controllable*)nullptr);
+				//setGhostValue(newVal.toString());
+			}
+		}
+	}
+	else
 	{
-		if(targetType == CONTAINER) setTarget((ControllableContainer *)nullptr);
-		else setTarget((ControllableContainer *)nullptr);
+		if (targetType == CONTAINER) setTarget((ControllableContainer*)nullptr);
+		else setTarget((ControllableContainer*)nullptr);
 
 		//setGhostValue("");
 	}
@@ -178,7 +180,7 @@ void TargetParameter::setTarget(WeakReference<Controllable> c)
 			target->removeControllableListener(this);
 		}
 	}
-	
+
 	target = c;
 
 	if (target != nullptr)
@@ -238,7 +240,7 @@ void TargetParameter::setTarget(WeakReference<ControllableContainer> cc)
 void TargetParameter::setRootContainer(WeakReference<ControllableContainer> newRootContainer)
 {
 	if (rootContainer == newRootContainer) return;
-	
+
 	if (rootContainer != nullptr && !rootContainer.wasObjectDeleted())
 	{
 		rootContainer->removeControllableContainerListener(this);
@@ -251,7 +253,7 @@ void TargetParameter::setRootContainer(WeakReference<ControllableContainer> newR
 	setValue("");
 }
 
-void TargetParameter::childStructureChanged(ControllableContainer *)
+void TargetParameter::childStructureChanged(ControllableContainer*)
 {
 	if (Engine::mainEngine != nullptr && (Engine::mainEngine->isClearing /*|| Engine::mainEngine->isLoadingFile > Not sure?*/)) return;
 
@@ -264,11 +266,13 @@ void TargetParameter::childStructureChanged(ControllableContainer *)
 				WeakReference<Controllable> c = rootContainer->getControllableForAddress(ghostValue);
 				if (c != nullptr) setValueFromTarget(c);
 			}
-		} else
+		}
+		else
 		{
 			setValueFromTarget(target);
 		}
-	} else if (targetType == CONTAINER)
+	}
+	else if (targetType == CONTAINER)
 	{
 		if (targetContainer == nullptr)
 		{
@@ -277,7 +281,8 @@ void TargetParameter::childStructureChanged(ControllableContainer *)
 				WeakReference<ControllableContainer> tcc = rootContainer->getControllableContainerForAddress(ghostValue);
 				if (tcc != nullptr) setValueFromTarget(tcc);
 			}
-		} else
+		}
+		else
 		{
 			setValueFromTarget(targetContainer);
 		}
@@ -300,7 +305,7 @@ void TargetParameter::childAddressChanged(ControllableContainer* cc)
 	}
 }
 
-void TargetParameter::inspectableDestroyed(Inspectable * i)
+void TargetParameter::inspectableDestroyed(Inspectable* i)
 {
 	if ((targetType == CONTAINER && targetContainer == nullptr) || (targetType == CONTROLLABLE && target == nullptr))
 	{
@@ -314,7 +319,7 @@ void TargetParameter::inspectableDestroyed(Inspectable * i)
 void TargetParameter::setAttribute(String param, var attributeValue)
 {
 	Parameter::setAttribute(param, attributeValue);
-	
+
 	if (param == "targetType") targetType = (attributeValue.toString().toLowerCase() == "container") ? CONTAINER : CONTROLLABLE;
 	else if (param == "searchLevel") maxDefaultSearchLevel = jmax<int>(attributeValue, -1);
 	else if (param == "allowedTypes")
@@ -339,7 +344,7 @@ void TargetParameter::setAttribute(String param, var attributeValue)
 	{
 		if (attributeValue.isObject())
 		{
-			ControllableContainer* cc = dynamic_cast<ControllableContainer*>((ControllableContainer *)(int64)attributeValue.getDynamicObject()->getProperty(scriptPtrIdentifier));
+			ControllableContainer* cc = dynamic_cast<ControllableContainer*>((ControllableContainer*)(int64)attributeValue.getDynamicObject()->getProperty(scriptPtrIdentifier));
 			if (cc != nullptr) setRootContainer(cc);
 		}
 	}
@@ -366,23 +371,24 @@ var TargetParameter::getJSONDataInternal()
 
 void TargetParameter::loadJSONDataInternal(var data)
 {
-	ghostValue = data.getProperty("ghostValue", data.getProperty("value",""));
+	ghostValue = data.getProperty("ghostValue", data.getProperty("value", ""));
 	StringParameter::loadJSONDataInternal(data);
 }
 
-TargetParameterUI * TargetParameter::createTargetUI(TargetParameter * _target)
+TargetParameterUI* TargetParameter::createTargetUI(Array<TargetParameter*> parameters)
 {
-	return new TargetParameterUI(_target == nullptr ?this:_target);
+	if (parameters.size() == 0) parameters = { this };
+	return new TargetParameterUI(parameters);
 }
 
-ControllableUI * TargetParameter::createDefaultUI()
+ControllableUI* TargetParameter::createDefaultUI(Array<Controllable*> controllables)
 {
-	return createTargetUI(this);
+	return createTargetUI(getArrayAs<Controllable, TargetParameter>(controllables));
 }
 
 var TargetParameter::getTargetFromScript(const juce::var::NativeFunctionArgs& a)
 {
-	TargetParameter * p = getObjectFromJS<TargetParameter>(a);
+	TargetParameter* p = getObjectFromJS<TargetParameter>(a);
 	if (p == nullptr) return var();
 	if (p->targetType == CONTROLLABLE)
 	{

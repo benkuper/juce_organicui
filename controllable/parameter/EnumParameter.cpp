@@ -259,12 +259,12 @@ var EnumParameter::setValueWithDataFromScript(const juce::var::NativeFunctionArg
 	return var();
 }
 
-EnumParameterUI * EnumParameter::createUI(EnumParameter * target)
+EnumParameterUI * EnumParameter::createUI(Array<EnumParameter *> parameters)
 {
-	if (target == nullptr) target = this;
-	return new EnumParameterUI(target);
+	if (parameters.size() == 0) parameters = { this };
+	return new EnumParameterUI(parameters);
 }
 
-ControllableUI * EnumParameter::createDefaultUI() {
-	return createUI(this);
+ControllableUI * EnumParameter::createDefaultUI(Array<Controllable*> controllables) {
+	return createUI(getArrayAs<Controllable, EnumParameter>(controllables));
 }

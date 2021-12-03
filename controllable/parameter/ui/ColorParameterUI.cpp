@@ -9,9 +9,10 @@
 */
 
 
-ColorParameterUI::ColorParameterUI(ColorParameter * parameter) :
-	ParameterUI(parameter),
-    colorParam(parameter),
+ColorParameterUI::ColorParameterUI(Array<ColorParameter *> parameters) :
+	ParameterUI(Inspectable::getArrayAs<ColorParameter, Parameter>(parameters)),
+    colorParams(parameters),
+	colorParam(parameters[0]),
     dispatchOnDoubleClick(true),
 	dispatchOnSingleClick(false)
 {
