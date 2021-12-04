@@ -48,7 +48,7 @@ void InspectableEditor::updateVisibility()
 	//Too hacky ? parent should handle children visibility
 	if (GenericControllableContainerEditor* pe = dynamic_cast<GenericControllableContainerEditor*>(getParentComponent()))
 	{
-		if (!pe->isRoot && pe->container->editorIsCollapsed) shouldBeVisible = false;
+		if (!pe->isRoot && !pe->container.wasObjectDeleted() && pe->container->editorIsCollapsed) shouldBeVisible = false;
 	}
 
 	setVisible(shouldBeVisible);
