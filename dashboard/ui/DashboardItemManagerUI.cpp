@@ -8,6 +8,10 @@
   ==============================================================================
 */
 
+
+std::function<void(PopupMenu*, int)> DashboardItemManagerUI::customAddItemsToMenuFunc = nullptr;
+std::function<void(int, int, DashboardItemManagerUI*, Point<float>)> DashboardItemManagerUI::customHandleMenuResultFunc = nullptr;
+
 DashboardItemManagerUI::DashboardItemManagerUI(DashboardItemManager * manager) :
 	BaseManagerViewUI("Dashboard", manager)
 {
@@ -140,6 +144,7 @@ void DashboardItemManagerUI::showMenuAndAddItem(bool fromAddButton, Point<int> m
 	PopupMenu menu;
 	menu.addItem(-1, "Add Group");
 	menu.addItem(-2, "Add Comment");
+	if (customAddItemsToMenuFunc) customAddItemsToMenuFunc(&menu, -5000);
 	menu.addSeparator();
 
 	manager->managerFactory->buildPopupMenu();
@@ -150,6 +155,7 @@ void DashboardItemManagerUI::showMenuAndAddItem(bool fromAddButton, Point<int> m
 		Point<float> p = getViewPos(mousePos);
 		if (result == -1) manager->addItem(new DashboardGroupItem(), p);
 		else if (result == -2) manager->addItem(new DashboardCommentItem(), p);
+		else if (result < -1000) customHandleMenuResultFunc(result, -5000, this, p);
 		else manager->addItem(manager->managerFactory->createFromMenuResult(result), p);
 	}
 }
