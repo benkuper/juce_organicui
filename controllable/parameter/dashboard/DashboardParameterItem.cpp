@@ -87,8 +87,8 @@ void DashboardParameterItem::updateStyleOptions()
 			style->addOption("2D Canvas", 12);
 		}
 	}
-	
-	if(!val.isVoid()) style->setValueWithData(val);
+
+	if (!val.isVoid()) style->setValueWithData(val);
 }
 
 var DashboardParameterItem::getServerData()
@@ -109,9 +109,30 @@ var DashboardParameterItem::getServerData()
 
 	int styleValue = (int)style->getValueData();
 	data.getDynamicObject()->setProperty("style", styleValue);
-	if (styleValue == -1)
+	switch (styleValue)
 	{
+	case 1:
 		if (parameter->type == Controllable::FLOAT) data.getDynamicObject()->setProperty("defaultUI", ((FloatParameter*)parameter.get())->defaultUI);
+		break;
+
+	case 10:
+	case 11:
+	{
+		var colorMapData(new DynamicObject());
+		HashMap<var, Colour>::Iterator it(parameter->colorStatusMap);
+		while (it.next())
+		{
+			Colour c;
+			var cData;
+			cData.append(c.getRed());
+			cData.append(c.getGreen());
+			cData.append(c.getBlue());
+			cData.append(c.getAlpha());
+			colorMapData.getDynamicObject()->setProperty(it.getKey().toString(), cData);
+		}
+		data.getDynamicObject()->setProperty("colorMap", colorMapData);
+	}
+	break;
 	}
 
 	if (btImage->stringValue().isNotEmpty()) data.getDynamicObject()->setProperty("customImage", btImage->getControlAddress());
@@ -143,6 +164,6 @@ var DashboardParameterItem::getServerData()
 	}
 	break;
 	}
-	
+
 	return data;
 }
