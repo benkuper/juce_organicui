@@ -146,7 +146,7 @@ void DashboardItemManagerUI::showMenuAndAddItem(bool fromAddButton, Point<int> m
 	menu.addItem(-2, "Add Comment");
 
 #if ORGANICUI_USE_SHAREDTEXTURE
-	menu.addItem(-3, "Add Shared Txture");
+	menu.addItem(-3, "Add Shared Texture");
 #endif
 
 	if (customAddItemsToMenuFunc) customAddItemsToMenuFunc(&menu, -5000);
