@@ -65,30 +65,33 @@ Image SharedTextureDashboardItem::getImage()
 
 void SharedTextureDashboardItem::textureUpdated(SharedTextureReceiver*)
 {
-	//Spatializer::getInstance()->computeSpat(getImage());
-	//updateColorsFromImage();
-
-
-	/*
-	Rectangle<float> imgBounds = Rectangle<float>(0, 0, viewUISize->x, viewUISize->y);
-
-	RectanglePlacement p;
-	p.getTransformToFit(img.getBounds().toFloat(), imgBounds);
-
-	Graphics g(outImage);
-	g.drawImage(img, imgBounds, p);
-	*/
 	if (exposeOnWeb->boolValue())
 	{
-		Image img = getImage().rescaled(viewUISize->x, viewUISize->y);
+		Image img = getImage();
+		float sourceRatio = img.getWidth() * 1.0f / img.getHeight();
+		float tRatio = viewUISize->x / viewUISize->y;
+		float tWidth = 0, tHeight = 0;
+		if (sourceRatio > tRatio)
+		{
+			tWidth = viewUISize->x;
+			tHeight = tWidth / sourceRatio;
+		}
+		else
+		{
+			tHeight = viewUISize->y;
+			tWidth = tHeight * sourceRatio;
+		}
+
+		Image tImage = img.rescaled(tWidth, tHeight);
 		MemoryOutputStream os;
 		JPEGImageFormat fmt;
-		fmt.writeImageToStream(img, os);
+		fmt.writeImageToStream(tImage, os);
 		String s = base64_encode((const unsigned char*)os.getData(), os.getDataSize());
 
 		var data(new DynamicObject());
 		data.getDynamicObject()->setProperty("controlAddress", this->getControlAddress(DashboardManager::getInstance()));
 		data.getDynamicObject()->setProperty("value", s);
+		data.getDynamicObject()->setProperty("ratio", sourceRatio);
 		notifyDataFeedback(data);
 	}
 
