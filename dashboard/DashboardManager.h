@@ -66,6 +66,7 @@ public:
 
 
 	void itemDataFeedback(var data) override;
+	void askForRefresh(Dashboard *d) override;
 
 	void endLoadFile() override;
 

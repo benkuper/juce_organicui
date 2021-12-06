@@ -24,6 +24,8 @@ public:
 
 	virtual var getServerData();
 
+	virtual void onContainerParameterChangedInternal(Parameter *) override;
+
 	void notifyDataFeedback(var data);
 
 	class  DashboardItemListener

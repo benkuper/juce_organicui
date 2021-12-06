@@ -37,6 +37,7 @@ public:
 		/** Destructor. */
 		virtual ~DashboardListener() {}
 		virtual void itemDataFeedback(var data) = 0;
+		virtual void askForRefresh(Dashboard * d) = 0;
 	};
 
 	ListenerList<DashboardListener> dashboardListeners;

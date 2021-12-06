@@ -25,11 +25,14 @@ Dashboard::~Dashboard()
 void Dashboard::itemAdded(DashboardItem* item)
 {
 	item->addDashboardItemListener(this);
+	dashboardListeners.call(&DashboardListener::askForRefresh, this);
+
 }
 
 void Dashboard::itemRemoved(DashboardItem* item)
 {
 	item->removeDashboardItemListener(this);
+	dashboardListeners.call(&DashboardListener::askForRefresh, this);
 }
 
 void Dashboard::itemDataFeedback(var data)

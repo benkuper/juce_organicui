@@ -1,3 +1,4 @@
+#include "DashboardManager.h"
 /*
   ==============================================================================
 
@@ -248,7 +249,7 @@ bool DashboardManager::handleHTTPRequest(std::shared_ptr<HttpServer::Response> r
 	{
 		dataStr = customHandleHTTPRequestFunc(response, request, header);
 	}
-	
+
 
 
 	if (dataStr.isNotEmpty())
@@ -382,18 +383,33 @@ void DashboardManager::finished(URL::DownloadTask* task, bool success)
 void DashboardManager::addItemInternal(Dashboard* item, var data)
 {
 	item->addDashboardListener(this);
+	askForRefresh(nullptr);
 }
 
 void DashboardManager::removeItemInternal(Dashboard* item)
 {
 	item->removeDashboardListener(this);
+	askForRefresh(nullptr);
 }
+
 void DashboardManager::itemDataFeedback(var data)
 {
 #if ORGANICUI_USE_WEBSERVER
 	if (server != nullptr)
 	{
 		data.getDynamicObject()->setProperty("dataType", "feedback");
+		server->send(JSON::toString(data));
+	}
+#endif
+}
+
+void DashboardManager::askForRefresh(Dashboard* d)
+{
+#if ORGANICUI_USE_WEBSERVER
+	if (server != nullptr)
+	{
+		var data(new DynamicObject());
+		data.getDynamicObject()->setProperty("refresh", d != nullptr ? d->shortName : "*");
 		server->send(JSON::toString(data));
 	}
 #endif

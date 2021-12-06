@@ -1,3 +1,4 @@
+#include "DashboardItem.h"
 /*
   ==============================================================================
 
@@ -36,6 +37,16 @@ var DashboardItem::getServerData()
 	data.getDynamicObject()->setProperty("position", viewUIPosition->value);
 	data.getDynamicObject()->setProperty("size", viewUISize->value);
 	return data;
+}
+
+void DashboardItem::onContainerParameterChangedInternal(Parameter* p)
+{
+	var data(new DynamicObject());
+	data.getDynamicObject()->setProperty("type", "uiFeedback");
+	data.getDynamicObject()->setProperty("controlAddress", p->getControlAddress(DashboardManager::getInstance()));
+	data.getDynamicObject()->setProperty("dataType", p->getTypeString());
+	data.getDynamicObject()->setProperty("value", p->value);
+	notifyDataFeedback(data);
 }
 
 void DashboardItem::notifyDataFeedback(var data)

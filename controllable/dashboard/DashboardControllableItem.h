@@ -34,7 +34,6 @@ public:
 	virtual void controllableNameChanged(Controllable*) override;
 	virtual void askForRemoveControllable(Controllable*, bool /*addToUndo*/ = false) override;
 
-
 	virtual var getServerData() override;
 
 	virtual String getTypeString() const override { return "DashboardControllableItem"; }
