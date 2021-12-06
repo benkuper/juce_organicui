@@ -35,6 +35,9 @@ public:
 	virtual void connectionChanged(SharedTextureReceiver*) override;
 	virtual void receiverRemoved(SharedTextureReceiver* r) override;
 
+
+	static std::string base64_encode(unsigned char const* src, unsigned int len);
+
 	DashboardItemUI* createUI() override;
 
 	DECLARE_ASYNC_EVENT(SharedTextureDashboardItem, ST, st, { TEXTURE_UPDATED });
