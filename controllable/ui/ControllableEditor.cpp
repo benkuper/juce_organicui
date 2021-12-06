@@ -209,6 +209,7 @@ void ControllableEditor::buttonClicked(Button* b)
 	}
 	else if (b == enableBT.get())
 	{
-		for (auto& c : controllables) c->setEnabled(enableBT->getToggleState());
+		bool targetEnabled = controllables.size() > 0 ? !controllables[0]->enabled : false;
+		for (auto& c : controllables) c->setEnabled(targetEnabled);
 	}
 }
