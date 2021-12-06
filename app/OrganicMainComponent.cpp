@@ -24,6 +24,10 @@ OrganicMainContentComponent::OrganicMainContentComponent()
 	//done in Main.cpp as it's a method of DocumentWindow
 #endif
 
+#if ORGANICUI_USE_SHAREDTEXTURE
+	SharedTextureManager::getInstance(); //create the main instance
+#endif
+
 }
 
 OrganicMainContentComponent::~OrganicMainContentComponent()
@@ -78,6 +82,10 @@ void OrganicMainContentComponent::setupOpenGL()
 
 		setupOpenGLInternal();
 
+#if ORGANICUI_USE_SHAREDTEXTURE
+		openGLContext->setRenderer(this);
+#endif
+
 		openGLContext->attachTo(*this);
 	}
 #endif
@@ -109,6 +117,24 @@ void OrganicMainContentComponent::resized()
 	juce::Rectangle<int> r = getLocalBounds();
 	ShapeShifterManager::getInstance()->mainContainer.setBounds(r);
 }
+
+#if ORGANICUI_USE_SHAREDTEXTURE
+void OrganicMainContentComponent::newOpenGLContextCreated()
+{
+	if (SharedTextureManager::getInstanceWithoutCreating() != nullptr) SharedTextureManager::getInstance()->initGL();
+}
+
+void OrganicMainContentComponent::renderOpenGL()
+{
+	if (SharedTextureManager::getInstanceWithoutCreating() != nullptr) SharedTextureManager::getInstance()->renderGL();
+}
+
+void OrganicMainContentComponent::openGLContextClosing()
+{
+	if (SharedTextureManager::getInstanceWithoutCreating() != nullptr) SharedTextureManager::getInstance()->clearGL();
+}
+#endif
+
 
 void OrganicMainContentComponent::startLoadFile()
 {

@@ -20,9 +20,9 @@ DashboardManager::DashboardManager() :
 	snapping = addBoolParameter("Snapping", "If checked, items are automatically aligned when dragging them closed to other ones", true);
 
 	tabsBGColor = addColorParameter("Tabs BG Color", "Color for the tabs in the web view", NORMAL_COLOR);
-	tabsLabelColor = addColorParameter("Tabs Label Color","Color for the tabs in the web view", TEXT_COLOR);
+	tabsLabelColor = addColorParameter("Tabs Label Color", "Color for the tabs in the web view", TEXT_COLOR);
 	tabsBorderColor = addColorParameter("Tabs Border Color", "Color for the tabs in the web view", Colours::black);
-	tabsBorderWidth = addFloatParameter("Tabs Border Width","Width for the border of tabs in the web view", 0, 0);
+	tabsBorderWidth = addFloatParameter("Tabs Border Width", "Width for the border of tabs in the web view", 0, 0);
 	tabsSelectedBGColor = addColorParameter("Tabs Selected BG Color", "Color for the tabs in the web view", GREEN_COLOR);
 	tabsSelectedLabelColor = addColorParameter("Tabs Selected Label Color", "Color for the tabs in the web view", Colours::black);
 	tabsSelectedBorderColor = addColorParameter("Tabs Selected Border Color", "Color for the tabs in the web view", Colours::black);
@@ -104,7 +104,7 @@ void DashboardManager::setupServer()
 
 	File f = Engine::mainEngine->getFile();
 	File serverLocalPath;
-	if(f.existsAsFile()) serverLocalPath = f.getParentDirectory().getChildFile("dashboard");
+	if (f.existsAsFile()) serverLocalPath = f.getParentDirectory().getChildFile("dashboard");
 	if (serverLocalPath.exists() && serverLocalPath.isDirectory())
 	{
 		LOG("Found local dashboard in project's folder, using this one.");
@@ -198,7 +198,7 @@ bool DashboardManager::handleHTTPRequest(std::shared_ptr<HttpServer::Response> r
 {
 	String dataStr;
 	SimpleWeb::CaseInsensitiveMultimap header;
-	
+
 	if (String(request->path) == "/data")
 	{
 		header.emplace("Content-Type", "application/json");
@@ -212,7 +212,7 @@ bool DashboardManager::handleHTTPRequest(std::shared_ptr<HttpServer::Response> r
 		tabsData.getDynamicObject()->setProperty("bgColorSelected", tabsSelectedBGColor->value);
 		tabsData.getDynamicObject()->setProperty("labelColorSelected", tabsSelectedLabelColor->value);
 		tabsData.getDynamicObject()->setProperty("borderColorSelected", tabsSelectedBorderColor->value);
-		tabsData.getDynamicObject()->setProperty("borderWidthSelected", tabsSelectedBorderWidth->floatValue()); 
+		tabsData.getDynamicObject()->setProperty("borderWidthSelected", tabsSelectedBorderWidth->floatValue());
 		data.getDynamicObject()->setProperty("tabs", tabsData);
 
 		dataStr = JSON::toString(data, true);
@@ -228,7 +228,7 @@ bool DashboardManager::handleHTTPRequest(std::shared_ptr<HttpServer::Response> r
 			header.emplace("Content-Type", "text/html");
 			dataStr = "Missing controlAddress argument in query";
 		}
-		else 
+		else
 		{
 			if (FileParameter* fp = dynamic_cast<FileParameter*>(Engine::mainEngine->getControllableForAddress(arg->second)))
 			{
@@ -242,8 +242,14 @@ bool DashboardManager::handleHTTPRequest(std::shared_ptr<HttpServer::Response> r
 			}
 
 			return true;
-		}	
+		}
 	}
+	else if (customHandleHTTPRequestFunc)
+	{
+		dataStr = customHandleHTTPRequestFunc(response, request, header);
+	}
+	
+
 
 	if (dataStr.isNotEmpty())
 	{
@@ -264,12 +270,12 @@ bool DashboardManager::handleHTTPRequest(std::shared_ptr<HttpServer::Response> r
 bool DashboardManager::handleHTTPSRequest(std::shared_ptr<HttpsServer::Response> response, std::shared_ptr<HttpsServer::Request> request)
 {
 	String dataStr;
-	SimpleWeb::CaseInsensitiveMultimap header; 
+	SimpleWeb::CaseInsensitiveMultimap header;
 
 	if (String(request->path) == "/data")
 	{
 		var data = getServerData();
-		
+
 		var tabsData(new DynamicObject());
 		tabsData.getDynamicObject()->setProperty("bgColor", tabsBGColor->value);
 		tabsData.getDynamicObject()->setProperty("labelColor", tabsLabelColor->value);

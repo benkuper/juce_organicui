@@ -7,6 +7,10 @@ DashboardItemFactory::DashboardItemFactory()
 	defs.add(Definition::createDef("", "DashboardCCItem", &DashboardCCItem::create));
 	defs.add(Definition::createDef("", "DashboardGroupItem", &DashboardGroupItem::create));
 	defs.add(Definition::createDef("", "DashboardCommentItem", &DashboardCommentItem::create));
+
+#if ORGANICUI_USE_SHAREDTEXTURE
+	defs.add(Factory<DashboardItem>::Definition::createDef<SharedTextureDashboardItem>("", "Shared Texture"));
+#endif
 }
 
 void DashboardItemFactory::buildPopupMenu()

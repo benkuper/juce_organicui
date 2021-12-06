@@ -12,3 +12,9 @@
 #include "dashboard/DashboardItemFactory.cpp" 
 #include "dashboard/DashboardItemManager.cpp"
 #include "dashboard/DashboardManager.cpp"
+
+
+#if ORGANICUI_USE_SHAREDTEXTURE
+#include "dashboard/SharedTextureDashboardItem.cpp"
+#include "dashboard/ui/SharedTextureDashboardItemUI.cpp"
+#endif

@@ -77,6 +77,7 @@ public:
 	File downloadedFileZip;
 	std::unique_ptr<URL::DownloadTask> downloadTask;
 
+	std::function<String(std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request, SimpleWeb::CaseInsensitiveMultimap &header)> customHandleHTTPRequestFunc;
 	void setupDownloadURL(const String& downloadURL);
 
 	void downloadDashboardFiles();

@@ -49,14 +49,14 @@
 #define ORGANICUI_USE_SERVUS 0
 #endif
 
-/** Config: ORGANICUI_DEFAULT_REMOTECONTROL_PORT
-	Sets the default port for OSC Remote Control
+/** Config: ORGANICUI_USE_SHAREDTEXTURE
+	Enables the use of Shared Texture. If enabled, you'll need the juce_sharedtexture module
+	You will need to add the SpoutLibrary.dll alongside the windows .exe file
 */
-/*
-#ifndef ORGANICUI_DEFAULT_REMOTECONTROL_PORT
-#define ORGANICUI_DEFAULT_REMOTECONTROL_PORT 42000
+
+#ifndef ORGANICUI_USE_SHAREDTEXTURE
+#define ORGANICUI_USE_SHAREDTEXTURE 0
 #endif
-*/
 
 /** Config: ORGANICUI_USE_WEBSERVER
 	Enables the use of the JUCE SimpleWeb module to expose the dashboard as a webserver
@@ -73,6 +73,7 @@
 #include <juce_gui_extra/juce_gui_extra.h>
 #include <juce_opengl/juce_opengl.h>
 #include <juce_osc/juce_osc.h>
+
 
 using namespace juce;
 
@@ -276,7 +277,6 @@ using namespace juce;
 #include "dashboard/ui/DashboardManagerUI.h"
 #include "dashboard/ui/DashboardManagerView.h"
 
-
 #include "inspectable/dashboard/DashboardInspectableItem.h"
 #include "controllable/dashboard/DashboardControllableItem.h"
 #include "controllable/dashboard/DashboardTriggerItem.h"
@@ -318,4 +318,10 @@ using namespace juce;
 #include "helpers/WakeOnLan.h"
 #include "helpers/OSCHelpers.h"
 #include "helpers/NetworkHelpers.h"
+
+#if ORGANICUI_USE_SHAREDTEXTURE
+#include <juce_sharedtexture/juce_sharedtexture.h>
+#include "dashboard/SharedTextureDashboardItem.h"
+#include "dashboard/ui/SharedTextureDashboardItemUI.h"
+#endif
 

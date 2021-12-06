@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    DashboardItemManagerUI.cpp
-    Created: 23 Apr 2017 12:33:58pm
-    Author:  Ben
+	DashboardItemManagerUI.cpp
+	Created: 23 Apr 2017 12:33:58pm
+	Author:  Ben
 
   ==============================================================================
 */
@@ -12,11 +12,11 @@
 std::function<void(PopupMenu*, int)> DashboardItemManagerUI::customAddItemsToMenuFunc = nullptr;
 std::function<void(int, int, DashboardItemManagerUI*, Point<float>)> DashboardItemManagerUI::customHandleMenuResultFunc = nullptr;
 
-DashboardItemManagerUI::DashboardItemManagerUI(DashboardItemManager * manager) :
+DashboardItemManagerUI::DashboardItemManagerUI(DashboardItemManager* manager) :
 	BaseManagerViewUI("Dashboard", manager)
 {
 	maxZoom = 2.0f;
-	
+
 	enableSnapping = DashboardManager::getInstance()->snapping->boolValue();
 	updatePositionOnDragMove = true;
 
@@ -38,8 +38,8 @@ DashboardItemManagerUI::DashboardItemManagerUI(DashboardItemManager * manager) :
 
 DashboardItemManagerUI::~DashboardItemManagerUI()
 {
-	if(!inspectable.wasObjectDeleted()) manager->removeAsyncContainerListener(this);
-	if(DashboardManager::getInstanceWithoutCreating() != nullptr) DashboardManager::getInstance()->snapping->removeAsyncParameterListener(this);
+	if (!inspectable.wasObjectDeleted()) manager->removeAsyncContainerListener(this);
+	if (DashboardManager::getInstanceWithoutCreating() != nullptr) DashboardManager::getInstance()->snapping->removeAsyncParameterListener(this);
 }
 
 void DashboardItemManagerUI::resized()
@@ -66,7 +66,7 @@ void DashboardItemManagerUI::paint(Graphics& g)
 	g.setColour(Colours::white.withAlpha(alpha));
 	float scale = manager->bgImageScale->floatValue();
 
-	Rectangle<int> r = getBoundsInView(Rectangle<float>().withSizeKeepingCentre(bgImage.getWidth()*scale, bgImage.getHeight()*scale));
+	Rectangle<int> r = getBoundsInView(Rectangle<float>().withSizeKeepingCentre(bgImage.getWidth() * scale, bgImage.getHeight() * scale));
 	g.drawImage(bgImage, r.toFloat(), RectanglePlacement::stretchToFit, false);
 }
 
@@ -88,21 +88,21 @@ void DashboardItemManagerUI::paintOverChildren(Graphics& g)
 		g.fillPath(path);
 
 		int h = 50; // should be exposed
-		Rectangle<int> headerR = getBoundsInView(Rectangle<float>().withSizeKeepingCentre(p.x, p.y).removeFromTop(h));; 
+		Rectangle<int> headerR = getBoundsInView(Rectangle<float>().withSizeKeepingCentre(p.x, p.y).removeFromTop(h));;
 		g.setColour(BLUE_COLOR.withAlpha(.1f));
 		g.fillRect(headerR);
-		float dashes[] { 4, 3};
+		float dashes[]{ 4, 3 };
 		g.setColour(BLUE_COLOR.withAlpha(.3f));
-		g.drawDashedLine(Line<float>(headerR.getBottomLeft().toFloat(), headerR.getBottomRight().toFloat()), dashes , 2, .5f);
+		g.drawDashedLine(Line<float>(headerR.getBottomLeft().toFloat(), headerR.getBottomRight().toFloat()), dashes, 2, .5f);
 	}
 }
 
-bool DashboardItemManagerUI::isInterestedInDragSource(const SourceDetails & dragSourceDetails)
+bool DashboardItemManagerUI::isInterestedInDragSource(const SourceDetails& dragSourceDetails)
 {
 	return true;
 }
 
-void DashboardItemManagerUI::itemDropped(const SourceDetails & details)
+void DashboardItemManagerUI::itemDropped(const SourceDetails& details)
 {
 	String type = details.description.getProperty("type", "").toString();
 
@@ -110,7 +110,7 @@ void DashboardItemManagerUI::itemDropped(const SourceDetails & details)
 
 	if (details.sourceComponent->getParentComponent() == this) return;
 
-	InspectableContentComponent * icc = dynamic_cast<InspectableContentComponent *>(details.sourceComponent.get());
+	InspectableContentComponent* icc = dynamic_cast<InspectableContentComponent*>(details.sourceComponent.get());
 	if (icc != nullptr && icc->inspectable != nullptr)
 	{
 		BaseItem* bi = dynamic_cast<BaseItem*>(icc->inspectable.get());
@@ -120,7 +120,7 @@ void DashboardItemManagerUI::itemDropped(const SourceDetails & details)
 		}
 		return;
 	}
-	
+
 	ControllableEditor* e = dynamic_cast<ControllableEditor*>(details.sourceComponent.get());
 	if (e != nullptr)
 	{
@@ -144,6 +144,11 @@ void DashboardItemManagerUI::showMenuAndAddItem(bool fromAddButton, Point<int> m
 	PopupMenu menu;
 	menu.addItem(-1, "Add Group");
 	menu.addItem(-2, "Add Comment");
+
+#if ORGANICUI_USE_SHAREDTEXTURE
+	menu.addItem(-3, "Add Shared Txture");
+#endif
+
 	if (customAddItemsToMenuFunc) customAddItemsToMenuFunc(&menu, -5000);
 	menu.addSeparator();
 
@@ -155,12 +160,13 @@ void DashboardItemManagerUI::showMenuAndAddItem(bool fromAddButton, Point<int> m
 		Point<float> p = getViewPos(mousePos);
 		if (result == -1) manager->addItem(new DashboardGroupItem(), p);
 		else if (result == -2) manager->addItem(new DashboardCommentItem(), p);
+		else if (result == -3) manager->addItem(new SharedTextureDashboardItem(), p);
 		else if (result < -1000) customHandleMenuResultFunc(result, -5000, this, p);
 		else manager->addItem(manager->managerFactory->createFromMenuResult(result), p);
 	}
 }
 
-BaseItemMinimalUI<DashboardItem> * DashboardItemManagerUI::createUIForItem(DashboardItem * item)
+BaseItemMinimalUI<DashboardItem>* DashboardItemManagerUI::createUIForItem(DashboardItem* item)
 {
 	return item->createUI();
 }
@@ -171,7 +177,7 @@ void DashboardItemManagerUI::newMessage(const ContainerAsyncEvent& e)
 	{
 	case ContainerAsyncEvent::ControllableFeedbackUpdate:
 		if (e.targetControllable.wasObjectDeleted()) return;
-		
+
 		if (e.targetControllable == manager->bgImage)
 		{
 			File f = manager->bgImage->getFile();
@@ -185,8 +191,8 @@ void DashboardItemManagerUI::newMessage(const ContainerAsyncEvent& e)
 		}
 
 		break;
-        default:
-            break;
+	default:
+		break;
 	}
 }
 

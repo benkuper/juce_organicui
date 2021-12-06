@@ -5,6 +5,9 @@ class OrganicMainContentComponent   :
 	public ApplicationCommandTarget, 
 	public MenuBarModel, 
 	public EngineListener
+#if ORGANICUI_USE_SHAREDTEXTURE
+	,public OpenGLRenderer
+#endif
 {
 public:
    	OrganicMainContentComponent();
@@ -27,6 +30,11 @@ public:
     virtual void paint (Graphics&) override;
     virtual void resized() override;
 
+#if ORGANICUI_USE_SHAREDTEXTURE
+	virtual void newOpenGLContextCreated() override;
+	virtual void renderOpenGL() override;
+	virtual void openGLContextClosing() override;
+#endif
 
 	//engine
 	virtual void startLoadFile() override;
