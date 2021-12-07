@@ -74,10 +74,9 @@ void DashboardControllableItemUI::updateUIParameters()
 	itemUI->updateTooltip();
 
 	updateUIParametersInternal();
-
+	itemUI->updateUIParams();
 	updateEditMode();
 
-	itemUI->updateUIParams();
 	itemUI->repaint();
 }
 
