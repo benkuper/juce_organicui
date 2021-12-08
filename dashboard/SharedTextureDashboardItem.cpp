@@ -92,6 +92,7 @@ void SharedTextureDashboardItem::textureUpdated(SharedTextureReceiver*)
 		data.getDynamicObject()->setProperty("controlAddress", this->getControlAddress(DashboardManager::getInstance()));
 		data.getDynamicObject()->setProperty("value", s);
 		data.getDynamicObject()->setProperty("ratio", sourceRatio);
+		data.getDynamicObject()->setProperty("dataType", getTypeString());
 		notifyDataFeedback(data);
 	}
 

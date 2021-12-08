@@ -63,6 +63,7 @@ void DashboardParameterItem::onExternalParameterValueChanged(Parameter* p)
 	{
 		var data(new DynamicObject());
 		data.getDynamicObject()->setProperty("controlAddress", parameter->getControlAddress());
+		data.getDynamicObject()->setProperty("dataType", parameter->getTypeString());
 		data.getDynamicObject()->setProperty("value", parameter->value);
 		notifyDataFeedback(data);
 	}
