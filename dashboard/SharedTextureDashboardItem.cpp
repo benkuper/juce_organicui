@@ -15,7 +15,8 @@ SharedTextureDashboardItem::SharedTextureDashboardItem(var params) :
 {
 	textureName = addStringParameter("Texture Name", "The Spout / Syphon name of the texture", "");
 	exposeOnWeb = addBoolParameter("Expose on Web", "If checked, this will convert the GPU texture to a CPU rescaled one, and feed it to the web clients. The downside is that is will slow the UI on larger images.", false);
-	setupReceiver();
+	if (!Engine::mainEngine->isLoadingFile) setupReceiver();
+	else Engine::mainEngine->addEngineListener(this);
 
 	SharedTextureManager::getInstance()->addListener(this);
 }
@@ -38,23 +39,13 @@ SharedTextureDashboardItem::~SharedTextureDashboardItem()
 
 void SharedTextureDashboardItem::setupReceiver()
 {
-	if (receiver != nullptr)
+	if (receiver == nullptr)
 	{
-		receiver->removeListener(this);
-		SharedTextureManager::getInstance()->removeReceiver(receiver);
-	}
-
-	receiver = nullptr;
-
-	receiver = SharedTextureManager::getInstance()->addReceiver(textureName->stringValue());
-
-	if (receiver != nullptr)
-	{
+		receiver = SharedTextureManager::getInstance()->addReceiver(textureName->stringValue());
 		receiver->addListener(this);
-		//receiver->setUseCPUImage(true);
-		//receiver->createReceiver();
 	}
 
+	receiver->setSharingName(textureName->stringValue());
 }
 
 Image SharedTextureDashboardItem::getImage()
@@ -113,9 +104,20 @@ void SharedTextureDashboardItem::receiverRemoved(SharedTextureReceiver* r)
 
 void SharedTextureDashboardItem::onContainerParameterChangedInternal(Parameter* p)
 {
-	if (p == textureName) setupReceiver();
+	if (p == textureName && !isCurrentlyLoadingData) setupReceiver();
 }
 
+
+void SharedTextureDashboardItem::afterLoadJSONDataInternal()
+{
+	setupReceiver();
+}
+
+void SharedTextureDashboardItem::endLoadFile()
+{
+	Engine::mainEngine->removeEngineListener(this);
+	setupReceiver();
+}
 
 inline std::string SharedTextureDashboardItem::base64_encode(unsigned char const* src, unsigned int len) {
 	const unsigned char base64_table[65] =

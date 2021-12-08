@@ -13,7 +13,8 @@
 class SharedTextureDashboardItem :
 	public DashboardItem,
 	public SharedTextureReceiver::Listener,
-	public SharedTextureManager::Listener
+	public SharedTextureManager::Listener,
+	public EngineListener
 {
 public:
     SharedTextureDashboardItem(var params = var());
@@ -35,6 +36,8 @@ public:
 	virtual void connectionChanged(SharedTextureReceiver*) override;
 	virtual void receiverRemoved(SharedTextureReceiver* r) override;
 
+	virtual void afterLoadJSONDataInternal() override;
+	virtual void endLoadFile() override;
 
 	static std::string base64_encode(unsigned char const* src, unsigned int len);
 

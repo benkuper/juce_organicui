@@ -31,7 +31,7 @@ void SharedTextureDashboardItemUI::paint(Graphics& g)
 
 	Image img = st->getImage();
 
-	if (img.isValid() && img.getWidth() > 0 && img.getHeight() > 0)
+	if (img.isValid() && img.getWidth() > 1 && img.getHeight() > 1)
 	{
 		RectanglePlacement p;
 		p.getTransformToFit(img.getBounds().toFloat(), getLocalBounds().toFloat());
