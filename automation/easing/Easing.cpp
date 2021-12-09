@@ -271,7 +271,7 @@ void SineEasing::updateKeysInternal()
 
 float SineEasing::getValue(const float & weight)
 {
-	return  start.y + (end.y - start.y) * weight + sinf(weight * length * float_Pi * 2 / freqAmp->x) * freqAmp->y;
+	return  start.y + (end.y - start.y) * weight + sinf(weight * length * MathConstants<float>::pi * 2 / freqAmp->x) * freqAmp->y;
 }
 
 Rectangle<float> SineEasing::getBounds(bool includeHandles)

@@ -132,22 +132,22 @@ void EasingUI::buildHitPath()
 			float angle1 = 0;
 			float angle2 = 0;
 			/*if (hitPoints[i].x == hitPoints[i - 1].x) angle1 = 0;
-			else if (hitPoints[i].y == hitPoints[i - 1].y) angle1 = -float_Pi / 4;
+			else if (hitPoints[i].y == hitPoints[i - 1].y) angle1 = -MathConstants<float>::pi / 4;
 			else */ angle1 = hitPoints[i].getAngleToPoint(hitPoints[i - 1]);
 
 			/*if (hitPoints[i].x == hitPoints[i - 1].x) angle1 = 0;
-			else if (hitPoints[i].y == hitPoints[i - 1].y) angle1 = -float_Pi / 4;
+			else if (hitPoints[i].y == hitPoints[i - 1].y) angle1 = -MathConstants<float>::pi / 4;
 			else */angle2 = hitPoints[i].getAngleToPoint(hitPoints[i + 1]);
 
 
-			if (angle1 < 0) angle1 += float_Pi * 2;
-			if (angle2 < 0) angle2 += float_Pi * 2;
+			if (angle1 < 0) angle1 += MathConstants<float>::pi * 2;
+			if (angle2 < 0) angle2 += MathConstants<float>::pi * 2;
 
 			float angle = (angle1 + angle2) / 2.f;
 
-			if (angle1 < angle2) angle += float_Pi;
+			if (angle1 < angle2) angle += MathConstants<float>::pi;
 
-			tp = hitPoints[i].getPointOnCircumference(margin, angle + float_Pi);
+			tp = hitPoints[i].getPointOnCircumference(margin, angle + MathConstants<float>::pi);
 			sp = hitPoints[i].getPointOnCircumference(margin, angle);
 		}
 
