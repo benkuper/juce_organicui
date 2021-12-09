@@ -23,7 +23,9 @@ public:
 	DashboardItemManager itemManager;
 
 	void itemAdded(DashboardItem*) override;
+	void itemsAdded(Array<DashboardItem*>) override;
 	void itemRemoved(DashboardItem*) override;
+	void itemsRemoved(Array<DashboardItem*>) override;
 	void itemDataFeedback(var data) override; //from DashboardItemListener
 
 	var getJSONData() override;

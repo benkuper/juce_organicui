@@ -184,7 +184,12 @@ var DashboardManager::getServerData()
 	var data(new DynamicObject());
 	data.getDynamicObject()->setProperty("dataType", "all");
 	data.getDynamicObject()->setProperty("appName", OrganicApplication::getInstance()->getApplicationName());
-
+	data.getDynamicObject()->setProperty("appVersion", OrganicApplication::getInstance()->getApplicationVersion());
+	data.getDynamicObject()->setProperty("osName", SystemStats::getOperatingSystemName());
+	data.getDynamicObject()->setProperty("osType", SystemStats::getOperatingSystemType());
+	data.getDynamicObject()->setProperty("computerName", SystemStats::getComputerName());
+	data.getDynamicObject()->setProperty("userName", SystemStats::getFullUserName());
+	
 	var iData;
 	for (auto& d : items)
 	{

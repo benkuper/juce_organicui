@@ -62,8 +62,9 @@ void DashboardParameterItem::onExternalParameterValueChanged(Parameter* p)
 	if (p == parameter)
 	{
 		var data(new DynamicObject());
+		data.getDynamicObject()->setProperty("feedbackType", "targetFeedback");
 		data.getDynamicObject()->setProperty("controlAddress", parameter->getControlAddress());
-		data.getDynamicObject()->setProperty("dataType", parameter->getTypeString());
+		data.getDynamicObject()->setProperty("type", parameter->getTypeString());
 		data.getDynamicObject()->setProperty("value", parameter->value);
 		notifyDataFeedback(data);
 	}
@@ -112,7 +113,7 @@ var DashboardParameterItem::getServerData()
 	data.getDynamicObject()->setProperty("style", styleValue);
 	switch (styleValue)
 	{
-	case 1:
+	case -1:
 		if (parameter->type == Controllable::FLOAT) data.getDynamicObject()->setProperty("defaultUI", ((FloatParameter*)parameter.get())->defaultUI);
 		break;
 
@@ -123,7 +124,7 @@ var DashboardParameterItem::getServerData()
 		HashMap<var, Colour>::Iterator it(parameter->colorStatusMap);
 		while (it.next())
 		{
-			Colour c;
+			Colour c = it.getValue();
 			var cData;
 			cData.append(c.getRed());
 			cData.append(c.getGreen());

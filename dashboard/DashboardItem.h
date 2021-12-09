@@ -25,6 +25,8 @@ public:
 	virtual var getServerData();
 
 	virtual void onContainerParameterChangedInternal(Parameter *) override;
+	
+	virtual var getItemParameterFeedback(Parameter* p);
 
 	void notifyDataFeedback(var data);
 

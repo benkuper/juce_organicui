@@ -46,8 +46,9 @@ void DashboardTriggerItem::onExternalTriggerTriggered(Trigger* t)
 	if (t == trigger)
 	{
 		var data(new DynamicObject());
+		data.getDynamicObject()->setProperty("feedbackType", "targetFeedback");
 		data.getDynamicObject()->setProperty("controlAddress", trigger->getControlAddress());
-		data.getDynamicObject()->setProperty("dataType", trigger->getTypeString());
+		data.getDynamicObject()->setProperty("type", trigger->getTypeString());
 		notifyDataFeedback(data);
 	}
 }

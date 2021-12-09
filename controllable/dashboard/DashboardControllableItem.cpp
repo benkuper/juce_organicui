@@ -24,8 +24,15 @@ DashboardControllableItem::DashboardControllableItem(Controllable* item) :
 
 DashboardControllableItem::~DashboardControllableItem()
 {
-	if(inspectable != nullptr && !inspectable.wasObjectDeleted()) controllable->removeControllableListener(this);
+	if (inspectable != nullptr && !inspectable.wasObjectDeleted()) controllable->removeControllableListener(this);
 	dashboardItemNotifier.cancelPendingUpdate();
+}
+
+var DashboardControllableItem::getItemParameterFeedback(Parameter* p)
+{
+	var data = DashboardItem::getItemParameterFeedback(p);
+	data.getDynamicObject()->setProperty("targetType", controllable != nullptr ? controllable->getTypeString() : "");
+	return data;
 }
 
 var DashboardControllableItem::getJSONData()
@@ -118,7 +125,7 @@ var DashboardControllableItem::getServerData()
 
 	if (controllable == nullptr || controllable.wasObjectDeleted())
 	{
-		o->setProperty("ghostAddress",  inspectableGhostAddress);
+		o->setProperty("ghostAddress", inspectableGhostAddress);
 		return var(o);
 	}
 
@@ -126,7 +133,7 @@ var DashboardControllableItem::getServerData()
 	o->setProperty("controlAddress", controllable->getControlAddress());
 
 	o->setProperty("showLabel", showLabel->value);
-	if(textColor->enabled) o->setProperty("textColor", textColor->value);
+	if (textColor->enabled) o->setProperty("textColor", textColor->value);
 	if (contourColor->enabled)
 	{
 		o->setProperty("borderColor", contourColor->value);

@@ -29,9 +29,21 @@ void Dashboard::itemAdded(DashboardItem* item)
 
 }
 
+void Dashboard::itemsAdded(Array<DashboardItem*> items)
+{
+	for(auto & i : items) i->addDashboardItemListener(this);
+	dashboardListeners.call(&DashboardListener::askForRefresh, this);
+}
+
 void Dashboard::itemRemoved(DashboardItem* item)
 {
 	item->removeDashboardItemListener(this);
+	dashboardListeners.call(&DashboardListener::askForRefresh, this);
+}
+
+void Dashboard::itemsRemoved(Array<DashboardItem*> items)
+{
+	for (auto& i : items) i->removeDashboardItemListener(this);
 	dashboardListeners.call(&DashboardListener::askForRefresh, this);
 }
 

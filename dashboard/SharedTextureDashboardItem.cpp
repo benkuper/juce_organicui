@@ -80,10 +80,11 @@ void SharedTextureDashboardItem::textureUpdated(SharedTextureReceiver*)
 		String s = base64_encode((const unsigned char*)os.getData(), os.getDataSize());
 
 		var data(new DynamicObject());
+		data.getDynamicObject()->setProperty("feedbackType", "sharedTextureFeedback");
 		data.getDynamicObject()->setProperty("controlAddress", this->getControlAddress(DashboardManager::getInstance()));
 		data.getDynamicObject()->setProperty("value", s);
 		data.getDynamicObject()->setProperty("ratio", sourceRatio);
-		data.getDynamicObject()->setProperty("dataType", getTypeString());
+		data.getDynamicObject()->setProperty("type", getTypeString());
 		notifyDataFeedback(data);
 	}
 
