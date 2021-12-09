@@ -77,7 +77,7 @@ void SharedTextureDashboardItem::textureUpdated(SharedTextureReceiver*)
 		MemoryOutputStream os;
 		JPEGImageFormat fmt;
 		fmt.writeImageToStream(tImage, os);
-		String s = base64_encode((const unsigned char*)os.getData(), os.getDataSize());
+		String s = base64_encode((const unsigned char*)os.getData(), (int)os.getDataSize());
 
 		var data(new DynamicObject());
 		data.getDynamicObject()->setProperty("feedbackType", "sharedTextureFeedback");

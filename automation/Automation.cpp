@@ -11,8 +11,8 @@
 Automation::Automation(const String& name, AutomationRecorder* recorder, bool allowKeysOutside) :
 	BaseManager(name),
 	allowKeysOutside(allowKeysOutside),
-	recorder(recorder),
-	positionUnitSteps(0),
+    positionUnitSteps(0),
+    recorder(recorder),
 	automationNotifier(5)
 {
 	itemDataType = "AutomationKey";

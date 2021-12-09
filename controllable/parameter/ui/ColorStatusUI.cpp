@@ -176,8 +176,8 @@ void ColorStatusUI::ColorOptionManager::show(Parameter* p, Component* c)
 
 ColorStatusUI::ColorOptionManager::ColorOptionUI::ColorOptionUI(Parameter* p, const var& key) :
 	parameter(p),
-	cp("Color", "Color for this key"),
-	keyLabel("label", key.toString())
+    keyLabel("label", key.toString()),
+	cp("Color", "Color for this key")
 {
 	if (p->colorStatusMap.contains(key)) cp.setColor(p->colorStatusMap[key]);
 

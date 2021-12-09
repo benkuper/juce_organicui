@@ -534,12 +534,12 @@ inline std::string ScriptUtil::base64_decode(std::string const& data)
 		41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51 };
 
 	unsigned char* p = (unsigned char*)data.c_str();
-	int len = data.size();
+	int len = (int)data.size();
 	int pad = len > 0 && (len % 4 || p[len - 1] == '=');
 	const size_t L = ((len + 3) / 4 - pad) * 4;
 	std::string str(L / 4 * 3 + pad, '\0');
 
-	for (size_t i = 0, j = 0; i < L; i += 4)
+	for (int i = 0, j = 0; i < L; i += 4)
 	{
 		int n = B64index[p[i]] << 18 | B64index[p[i + 1]] << 12 | B64index[p[i + 2]] << 6 | B64index[p[i + 3]];
 		str[j++] = n >> 16;
@@ -574,12 +574,12 @@ var ScriptUtil::base64_decode_bytes(const String& data)
 	//unsigned char* p = (unsigned char*)data.toStdString().c_str();
 	int len = data.length();
 	int pad = len > 0 && (len % 4 || p[len - 1] == '=');
-	const size_t L = ((len + 3) / 4 - pad) * 4;
+	const int L = ((len + 3) / 4 - pad) * 4;
 	var result;
 	//result.resize(L);
 	//std::string str(L / 4 * 3 + pad, '\0');
 
-	for (size_t i = 0, j = 0; i < L; i += 4)
+	for (int i = 0, j = 0; i < L; i += 4)
 	{
 		int n = B64index[p[i]] << 18 | B64index[p[i + 1]] << 12 | B64index[p[i + 2]] << 6 | B64index[p[i + 3]];
 		//result[j++] = n >> 16;

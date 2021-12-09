@@ -78,7 +78,7 @@ public:
     void processControllables();
     void processControllable(Controllable* c, var val);
 
-    var getJSONData();
+    var getJSONData() override;
     void loadJSONDataItemInternal(var data) override;
 
     String getTypeString() const override { return "Parrot"; }

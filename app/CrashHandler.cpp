@@ -309,9 +309,9 @@ void createDumpAndStrackTrace(int signum, File dumpFile, File traceFile)
 
 
 CrashDumpUploader::UploadWindow::UploadWindow() :
-	cancelBT("Close only"),
 	okBT("Send and close"),
-	autoReopenBT("Send and recover"),
+    cancelBT("Close only"),
+    autoReopenBT("Send and recover"),
 	recoverOnlyBT("Recover Only"),
 	progressUI(&CrashDumpUploader::getInstance()->progress)
 {

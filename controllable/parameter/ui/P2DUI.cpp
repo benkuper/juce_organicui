@@ -92,7 +92,7 @@ void P2DUI::paint(Graphics& g)
 			g.drawFittedText(xt, canvasRect.withTop(canvasRect.getBottom() - 16).toNearestInt(), Justification::centred, 3);
 
 			juce::AffineTransform at;
-			at = at.rotated((float)(-double_Pi / 2.0f));// , sliderBounds.getCentreX(), sliderBounds.getCentreY());
+			at = at.rotated((float)(-MathConstants<double>::pi / 2.0f));// , sliderBounds.getCentreX(), sliderBounds.getCentreY());
 			at = at.translated(canvasRect.getRight() - 16, canvasRect.getBottom());
 			g.addTransform(at);
 			g.drawFittedText(yt, Rectangle<int>(0, 0, canvasRect.getHeight(), 16), Justification::centred, 3);
