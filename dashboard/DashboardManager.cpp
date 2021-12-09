@@ -397,7 +397,12 @@ void DashboardManager::itemDataFeedback(var data)
 #if ORGANICUI_USE_WEBSERVER
 	if (server != nullptr)
 	{
-		data.getDynamicObject()->setProperty("dataType", "feedback");
+		String t = data.getDynamicObject()->getProperty("type");
+		
+		if (t != "uiFeedback") {
+			data.getDynamicObject()->setProperty("type", "feedback");
+		}
+
 		server->send(JSON::toString(data));
 	}
 #endif
