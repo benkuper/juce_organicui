@@ -14,8 +14,9 @@ DoubleSliderUI::DoubleSliderUI(Array<Point2DParameter*> parameters) :
 	p2d(parameters[0]),
 	xParam("X", "xParam", p2d->x, p2d->minimumValue[0], p2d->maximumValue[0]),
 	yParam("Y", "yParam", p2d->y, p2d->minimumValue[1], p2d->maximumValue[1]),
-	isUpdatingFromParam(false),
-	canShowExtendedEditor(true)
+	canShowExtendedEditor(true),
+    isUpdatingFromParam(false)
+
 {
 
 	showEditWindowOnDoubleClick = false;

@@ -249,6 +249,8 @@ void ParameterUI::newMessage(const Parameter::ParameterEvent& e) {
 		controlModeChanged(e.parameter);
 		repaint();
 		break;
+    default:
+        break;
 	}
 }
 

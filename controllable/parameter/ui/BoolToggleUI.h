@@ -30,7 +30,7 @@ public:
     void mouseDownInternal(const MouseEvent &e) override;
     void mouseUpInternal(const MouseEvent &e) override;
 
-    virtual void updateUIParamsInternal();
+    virtual void updateUIParamsInternal() override;
 
     void timerCallback() override;
 

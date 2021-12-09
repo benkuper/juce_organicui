@@ -99,7 +99,7 @@ void FloatSliderUI::paint(Graphics& g)
 		if (orientation == VERTICAL) {
 			//destRect = juce::Rectangle<int>(0, 0, 100, 100);
 			juce::AffineTransform at;
-			at = at.rotated((float)(-double_Pi / 2.0f));// , sliderBounds.getCentreX(), sliderBounds.getCentreY());
+			at = at.rotated((float)(-MathConstants<double>::pi / 2.0f));// , sliderBounds.getCentreX(), sliderBounds.getCentreY());
 			at = at.translated(0.f, (float)getHeight());
 			g.addTransform(at);
 			destRect = juce::Rectangle<int>(0, 0, getHeight(), getWidth()).withSizeKeepingCentre(getHeight(), 10);

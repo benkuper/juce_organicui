@@ -13,8 +13,8 @@ juce_ImplementSingleton(Outliner)
 
 Outliner::Outliner(const String& contentName) :
 	ShapeShifterContentComponent(contentName),
-	enabled(true),
-	hideShowState(false)
+	hideShowState(false),
+    enabled(true)
 {
 	if (Engine::mainEngine != nullptr)
 	{
@@ -327,9 +327,9 @@ OutlinerItem::OutlinerItem(WeakReference<ControllableContainer> _container, bool
 	isContainer(true),
 	itemName(_container->niceName),
 	parentsHaveHideInRemote(parentsHaveHideInRemote),
-	container(_container),
-	controllable(nullptr),
-	isFiltered(isFiltered)
+    isFiltered(isFiltered),
+    container(_container),
+    controllable(nullptr)
 {
 	container->addControllableContainerListener(this);
 }
@@ -339,10 +339,9 @@ OutlinerItem::OutlinerItem(WeakReference<Controllable> _controllable, bool paren
 	isContainer(false),
 	itemName(_controllable->niceName),
 	parentsHaveHideInRemote(parentsHaveHideInRemote),
-	container(nullptr),
-	controllable(_controllable),
-	isFiltered(isFiltered)
-
+    isFiltered(isFiltered),
+    container(nullptr),
+    controllable(_controllable)
 {
 }
 

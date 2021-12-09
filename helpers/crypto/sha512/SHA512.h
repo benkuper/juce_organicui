@@ -109,10 +109,10 @@ namespace OrganicCrypto {
 				unsigned nb, n, n_tail;
 				const uint8_t* p;
 				n = 128 - sz_;
-				n_tail = size < n ? size : n;
+				n_tail = size < n ? (int)size : n;
 				memcpy(&block_[sz_], data, n_tail);
 				if (sz_ + size < 128) { sz_ += size; return; }
-				n = size - n_tail;
+				n = (int)size - n_tail;
 				nb = n >> 7;
 				p = (const uint8_t*)data + n_tail;
 				transform(block_, 1);

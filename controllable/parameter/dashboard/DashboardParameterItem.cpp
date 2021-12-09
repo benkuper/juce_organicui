@@ -165,7 +165,10 @@ var DashboardParameterItem::getServerData()
 		data.getDynamicObject()->setProperty("invertY", p2d->extendedEditorInvertY);
 	}
 	break;
-	}
+            
+    default:
+        break;
+    }
 
 	return data;
 }
