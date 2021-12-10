@@ -16,14 +16,14 @@ class BaseManager :
 	public BaseItemListener
 {
 public:
-	BaseManager<T>(const String &name);
+	BaseManager<T>(const String& name);
 	virtual ~BaseManager<T>();
 
 	OwnedArray<T, CriticalSection> items;
 	bool isClearing;
 
 	//Factory
-	Factory<T> * managerFactory;
+	Factory<T>* managerFactory;
 	String itemDataType;
 
 	bool userCanAddItemsManually;
@@ -36,54 +36,54 @@ public:
 						   //interaction
 	float viewZoom;
 
-	virtual T * createItem(); //to override if special constructor to use
-	virtual T * addItemFromData(var data, bool addToUndo = true); //to be overriden for specific item creation (from data)
-	virtual Array<T *> addItemsFromData(var data, bool addToUndo = true); //to be overriden for specific item creation (from data)
-	virtual Array<T *> addItemsFromClipboard(bool showWarning = true);
-	virtual bool canAddItemOfType(const String &typeToCheck);
+	virtual T* createItem(); //to override if special constructor to use
+	virtual T* addItemFromData(var data, bool addToUndo = true); //to be overriden for specific item creation (from data)
+	virtual Array<T*> addItemsFromData(var data, bool addToUndo = true); //to be overriden for specific item creation (from data)
+	virtual Array<T*> addItemsFromClipboard(bool showWarning = true);
+	virtual bool canAddItemOfType(const String& typeToCheck);
 
 	virtual void loadItemsData(var data);
 
 
 	virtual UndoableAction* getAddItemUndoableAction(T* item = nullptr, var data = var());
-	virtual UndoableAction * getAddItemsUndoableAction(Array<T *> item = nullptr, var data = var());
+	virtual UndoableAction* getAddItemsUndoableAction(Array<T*> item = nullptr, var data = var());
 
-	T * addItem(T * item = nullptr, var data = var(), bool addToUndo = true, bool notify = true); //if data is not empty, load data
-	T * addItem(const Point<float> initialPosition, bool addToUndo = true, bool notify = true);
-	T * addItem(T * item, const Point<float> initialPosition, bool addToUndo = true, bool notify = true);
-	Array<T *> addItems(Array<T *> items, var data = var(), bool addToUndo = true);
+	T* addItem(T* item = nullptr, var data = var(), bool addToUndo = true, bool notify = true); //if data is not empty, load data
+	T* addItem(const Point<float> initialPosition, bool addToUndo = true, bool notify = true);
+	T* addItem(T* item, const Point<float> initialPosition, bool addToUndo = true, bool notify = true);
+	Array<T*> addItems(Array<T*> items, var data = var(), bool addToUndo = true);
 
 
-	virtual Array<UndoableAction *> getRemoveItemUndoableAction(T * item);
-	virtual Array<UndoableAction *> getRemoveItemsUndoableAction(Array<T *> items);
+	virtual Array<UndoableAction*> getRemoveItemUndoableAction(T* item);
+	virtual Array<UndoableAction*> getRemoveItemsUndoableAction(Array<T*> items);
 
-	void removeItems(Array<T *> items, bool addToUndo = true);
-	T * removeItem(T * item, bool addToUndo = true, bool notify = true, bool returnItem = false);
+	void removeItems(Array<T*> items, bool addToUndo = true);
+	T* removeItem(T* item, bool addToUndo = true, bool notify = true, bool returnItem = false);
 
-	virtual void setItemIndex(T * item, int newIndex);
+	virtual void setItemIndex(T* item, int newIndex);
 	virtual void reorderItems(); //to be overriden if needed
 
 
 	//to override for specific handling like adding custom listeners, etc.
 	virtual void addItemInternal(T*, var data) {}
-	virtual void addItemsInternal(Array<T *>, var data) {}
-	virtual void removeItemInternal(T *) {}
+	virtual void addItemsInternal(Array<T*>, var data) {}
+	virtual void removeItemInternal(T*) {}
 	virtual void removeItemsInternal() {}
 
 
-	T * getItemWithName(const String &itemShortName, bool searchNiceNameToo = false, bool searchWithLowerCaseIfNotFound = true);
+	T* getItemWithName(const String& itemShortName, bool searchNiceNameToo = false, bool searchWithLowerCaseIfNotFound = true);
 
 	template<class IType>
 	Array<IType*> getItemsWithType();
 
-    virtual void clear() override;
-	void askForRemoveBaseItem(BaseItem * item) override;
-	void askForDuplicateItem(BaseItem * item) override;
+	virtual void clear() override;
+	void askForRemoveBaseItem(BaseItem* item) override;
+	void askForDuplicateItem(BaseItem* item) override;
 	void askForPaste() override;
-	void askForMoveBefore(BaseItem *) override;
-	void askForMoveAfter(BaseItem *) override;
+	void askForMoveBefore(BaseItem*) override;
+	void askForMoveAfter(BaseItem*) override;
 	void askForSelectAllItems(bool addToSelection = false) override;
-	void askForSelectPreviousItem(BaseItem * item, bool addToSelection = false) override;
+	void askForSelectPreviousItem(BaseItem* item, bool addToSelection = false) override;
 	void askForSelectNextItem(BaseItem* item, bool addToSelection = false) override;
 
 	virtual var getExportSelectionData();
@@ -92,15 +92,15 @@ public:
 	virtual void loadJSONDataManagerInternal(var data);
 
 	PopupMenu getItemsMenu(int startID);
-	T * getItemForMenuResultID(int id, int startID);
+	T* getItemForMenuResultID(int id, int startID);
 
 	String getScriptTargetString() override;
 
-    //using BManagerListener = typename BaseManagerListener<T>;
-    //friend class BaseManagerListener<T>;
-    
-    typedef BaseManagerListener<T> ManagerListener;
-    
+	//using BManagerListener = typename BaseManagerListener<T>;
+	//friend class BaseManagerListener<T>;
+
+	typedef BaseManagerListener<T> ManagerListener;
+
 	ListenerList<ManagerListener> baseManagerListeners;
 	void addBaseManagerListener(ManagerListener* newListener) { baseManagerListeners.add(newListener); }
 	void removeBaseManagerListener(ManagerListener* listener) { baseManagerListeners.remove(listener); }
@@ -124,12 +124,12 @@ public:
 	ManagerNotifier managerNotifier;
 	typedef typename QueuedNotifier<BManagerEvent>::Listener AsyncListener;
 
-	void addAsyncManagerListener(AsyncListener * newListener) { managerNotifier.addListener(newListener); }
-	void addAsyncCoalescedManagerListener(AsyncListener * newListener) { managerNotifier.addAsyncCoalescedListener(newListener); }
-	void removeAsyncManagerListener(AsyncListener * listener) { managerNotifier.removeListener(listener); }
+	void addAsyncManagerListener(AsyncListener* newListener) { managerNotifier.addListener(newListener); }
+	void addAsyncCoalescedManagerListener(AsyncListener* newListener) { managerNotifier.addAsyncCoalescedListener(newListener); }
+	void removeAsyncManagerListener(AsyncListener* listener) { managerNotifier.removeListener(listener); }
 
 
-	InspectableEditor * getEditorInternal(bool /*isRoot*/) override;
+	InspectableEditor* getEditorInternal(bool /*isRoot*/) override;
 
 	//UNDO MANAGER
 	class ManagerBaseAction :
@@ -218,13 +218,13 @@ public:
 	public:
 		ManagerItemComparator(BaseManager* manager);
 
-		BaseManager * m;
+		BaseManager* m;
 
-		std::function<int(T *, T*)> compareFunc;
+		std::function<int(T*, T*)> compareFunc;
 		int compareElements(ControllableContainer* i1, ControllableContainer* i2);
 
 	};
-	
+
 	ManagerItemComparator comparator;
 
 
@@ -239,24 +239,24 @@ public:
 	static var getItemAfterFromScript(const var::NativeFunctionArgs& args);
 	static var reorderItemsFromScript(const var::NativeFunctionArgs& args);
 
-	private:
-		JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BaseManager<T>)
+private:
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BaseManager<T>)
 };
 
 
 template<class T>
-BaseManager<T>::BaseManager(const String & name) :
+BaseManager<T>::BaseManager(const String& name) :
 	EnablingControllableContainer(name, false),
-    isClearing(false),
+	isClearing(false),
 	managerFactory(nullptr),
 	itemDataType(""),
-    userCanAddItemsManually(true),
-    selectItemWhenCreated(true),
-    autoReorderOnAdd(true),
-    isManipulatingMultipleItems(false),
+	userCanAddItemsManually(true),
+	selectItemWhenCreated(true),
+	autoReorderOnAdd(true),
+	isManipulatingMultipleItems(false),
 	viewZoom(1),
 	managerNotifier(50),
-    comparator(this)
+	comparator(this)
 {
 
 	//setCanHavePresets(false);
@@ -298,13 +298,14 @@ Array<IType*> BaseManager<T>::getItemsWithType()
 }
 
 template<class T>
-T * BaseManager<T>::createItem() {
+T* BaseManager<T>::createItem()
+{
+	if (managerFactory != nullptr && managerFactory->defs.size() == 1) return managerFactory->create(managerFactory->defs[0]);
 	return new T();
 }
 
-
 template<class T>
-UndoableAction * BaseManager<T>::getAddItemUndoableAction(T * item, var data)
+UndoableAction* BaseManager<T>::getAddItemUndoableAction(T* item, var data)
 {
 	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile) return nullptr;
 	jassert(items.indexOf(item) == -1); //be sure item is no here already
@@ -313,20 +314,20 @@ UndoableAction * BaseManager<T>::getAddItemUndoableAction(T * item, var data)
 }
 
 template<class T>
- UndoableAction* BaseManager<T>::getAddItemsUndoableAction(Array<T*> _items, var data)
+UndoableAction* BaseManager<T>::getAddItemsUndoableAction(Array<T*> _items, var data)
 {
-	 if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile) return nullptr;
-	 if (_items.size() == 0) return nullptr;
-	 return new AddItemsAction(this, _items, data);
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile) return nullptr;
+	if (_items.size() == 0) return nullptr;
+	return new AddItemsAction(this, _items, data);
 }
 
 template<class T>
-T * BaseManager<T>::addItem(T * item, var data, bool addToUndo, bool notify)
+T* BaseManager<T>::addItem(T* item, var data, bool addToUndo, bool notify)
 {
 
 	jassert(items.indexOf(item) == -1); //be sure item is no here already
 	if (item == nullptr) item = createItem();
-	BaseItem * bi = static_cast<BaseItem *>(item);
+	BaseItem* bi = static_cast<BaseItem*>(item);
 
 	if (addToUndo && !UndoMaster::getInstance()->isPerforming)
 	{
@@ -338,7 +339,7 @@ T * BaseManager<T>::addItem(T * item, var data, bool addToUndo, bool notify)
 	}
 
 	int targetIndex = data.getProperty("index", -1);
-	if(targetIndex != -1) items.insert(targetIndex, item);
+	if (targetIndex != -1) items.insert(targetIndex, item);
 	else
 	{
 		//items.getLock().enter();
@@ -364,7 +365,7 @@ T * BaseManager<T>::addItem(T * item, var data, bool addToUndo, bool notify)
 
 	if (notify)
 	{
-        baseManagerListeners.call(&BaseManagerListener<T>::itemAdded, item);
+		baseManagerListeners.call(&BaseManagerListener<T>::itemAdded, item);
 		managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEM_ADDED, item));
 
 	}
@@ -375,13 +376,13 @@ T * BaseManager<T>::addItem(T * item, var data, bool addToUndo, bool notify)
 }
 
 template<class T>
-T * BaseManager<T>::addItem(const Point<float> initialPosition, bool addToUndo, bool notify)
+T* BaseManager<T>::addItem(const Point<float> initialPosition, bool addToUndo, bool notify)
 {
 	return addItem(nullptr, initialPosition, addToUndo, notify);
 }
 
 template<class T>
-T * BaseManager<T>::addItem(T * item, const Point<float> initialPosition, bool addToUndo, bool notify)
+T* BaseManager<T>::addItem(T* item, const Point<float> initialPosition, bool addToUndo, bool notify)
 {
 	if (item == nullptr) item = createItem();
 	item->viewUIPosition->setPoint(initialPosition);
@@ -390,7 +391,7 @@ T * BaseManager<T>::addItem(T * item, const Point<float> initialPosition, bool a
 }
 
 template<class T>
-Array<T *> BaseManager<T>::addItems(Array<T *> itemsToAdd, var data, bool addToUndo)
+Array<T*> BaseManager<T>::addItems(Array<T*> itemsToAdd, var data, bool addToUndo)
 {
 
 	isCurrentlyLoadingData = true;
@@ -398,7 +399,7 @@ Array<T *> BaseManager<T>::addItems(Array<T *> itemsToAdd, var data, bool addToU
 
 	if (addToUndo && !UndoMaster::getInstance()->isPerforming)
 	{
-		AddItemsAction * a = new AddItemsAction(this, itemsToAdd, data);
+		AddItemsAction* a = new AddItemsAction(this, itemsToAdd, data);
 		UndoMaster::getInstance()->performAction("Add " + String(itemsToAdd.size()) + " items", a);
 		isCurrentlyLoadingData = false;
 		isManipulatingMultipleItems = false;
@@ -544,7 +545,7 @@ void BaseManager<T>::removeItems(Array<T*> itemsToRemove, bool addToUndo)
 		isManipulatingMultipleItems = false;
 		return;
 	}
-	
+
 	Array<T*> itemsRemoved;
 	for (auto& i : itemsToRemove) itemsRemoved.add(removeItem(i, false, false, true));
 
@@ -552,7 +553,7 @@ void BaseManager<T>::removeItems(Array<T*> itemsToRemove, bool addToUndo)
 
 	baseManagerListeners.call(&BaseManagerListener<T>::itemsRemoved, itemsRemoved);
 	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_REMOVED));
-	
+
 	for (auto& i : itemsRemoved)
 	{
 		((BaseItem*)i)->clearItem();
@@ -563,7 +564,7 @@ void BaseManager<T>::removeItems(Array<T*> itemsToRemove, bool addToUndo)
 }
 
 template<class T>
-T * BaseManager<T>::removeItem(T* item, bool addToUndo, bool notify, bool returnItem)
+T* BaseManager<T>::removeItem(T* item, bool addToUndo, bool notify, bool returnItem)
 {
 	if (item == nullptr) return nullptr;
 
@@ -597,7 +598,7 @@ T * BaseManager<T>::removeItem(T* item, bool addToUndo, bool notify, bool return
 	if (returnItem) return item; //will need to delete !
 
 	bi->clearItem();
-	delete item;	
+	delete item;
 
 	return nullptr;
 }
@@ -719,7 +720,7 @@ void BaseManager<T>::askForSelectAllItems(bool addToSelection)
 	if (!addToSelection) selectionManager->clearSelection(numItems == 0);
 	else deselectThis(numItems == 0);
 
-	if (numItems > 1) for (int i = 0; i < numItems; ++i) items[i]->selectThis(true, i == numItems-1); //only notify on last
+	if (numItems > 1) for (int i = 0; i < numItems; ++i) items[i]->selectThis(true, i == numItems - 1); //only notify on last
 	else if (numItems > 0) items[0]->selectThis(addToSelection, true);
 }
 
@@ -743,7 +744,7 @@ template<class T>
 var BaseManager<T>::getExportSelectionData()
 {
 	var data;
-	
+
 	for (auto& t : items)
 	{
 		if (t->isSavable && t->isSelected) data.append(t->getJSONData());
@@ -758,9 +759,9 @@ var BaseManager<T>::getJSONData()
 	var data = ControllableContainer::getJSONData();
 	var itemsData = var();
 	//items.getLock().enter();
-	for (auto &t : items)
+	for (auto& t : items)
 	{
-		if(t->isSavable) itemsData.append(t->getJSONData());
+		if (t->isSavable) itemsData.append(t->getJSONData());
 	}
 	//items.getLock().exit();
 
@@ -794,10 +795,10 @@ void BaseManager<T>::loadJSONDataInternal(var data)
 template<class T>
 void BaseManager<T>::loadJSONDataManagerInternal(var data)
 {
-	Array<var> * itemsData = data.getProperty("items", var()).getArray();
+	Array<var>* itemsData = data.getProperty("items", var()).getArray();
 	if (itemsData == nullptr) return;
 
-	for (auto &td : *itemsData)
+	for (auto& td : *itemsData)
 	{
 		addItemFromData(td, false);
 	}
@@ -810,14 +811,14 @@ PopupMenu BaseManager<T>::getItemsMenu(int startID)
 	int numValues = items.size();
 	for (int j = 0; j < numValues; j++)
 	{
-		T * c = items[j];
+		T* c = items[j];
 		menu.addItem(startID + j, c->niceName);
 	}
 	return menu;
 }
 
 template<class T>
-T * BaseManager<T>::getItemForMenuResultID(int id, int startID)
+T* BaseManager<T>::getItemForMenuResultID(int id, int startID)
 {
 	return items[id - startID];
 }
@@ -830,7 +831,7 @@ String BaseManager<T>::getScriptTargetString()
 
 
 template<class T>
-InspectableEditor * BaseManager<T>::getEditorInternal(bool isRoot)
+InspectableEditor* BaseManager<T>::getEditorInternal(bool isRoot)
 {
 	return new GenericManagerEditor<T>(this, isRoot);
 
@@ -843,7 +844,7 @@ template<class T>
 var BaseManager<T>::addItemFromScript(const var::NativeFunctionArgs& args)
 {
 	BaseManager<T>* m = getObjectFromJS<BaseManager<T>>(args);
-	
+
 	//if (args.numArguments) return var(); 
 	if (m->managerFactory == nullptr || m->managerFactory->defs.size() == 1)
 	{
@@ -868,7 +869,7 @@ var BaseManager<T>::addItemFromScript(const var::NativeFunctionArgs& args)
 			m->addItem(item, args.numArguments > 1 && args.arguments[1].isObject() ? args.arguments[1] : var());
 			if (item != nullptr) return item->getScriptObject();
 		}
-		
+
 		return var();
 	}
 }
@@ -878,7 +879,7 @@ template<class T>
 var BaseManager<T>::removeItemFromScript(const var::NativeFunctionArgs& args)
 {
 	BaseManager<T>* m = getObjectFromJS<BaseManager<T>>(args);
-	
+
 	if (args.numArguments < 1)
 	{
 		NLOGWARNING(m->niceName, "Needs at least one argument to remove an item from this manager");
@@ -887,7 +888,7 @@ var BaseManager<T>::removeItemFromScript(const var::NativeFunctionArgs& args)
 
 	if (args.arguments[0].isObject())
 	{
-		T* item = dynamic_cast<T*>((T *)(int64)(args.arguments[0].getDynamicObject()->getProperty(scriptPtrIdentifier)));
+		T* item = dynamic_cast<T*>((T*)(int64)(args.arguments[0].getDynamicObject()->getProperty(scriptPtrIdentifier)));
 		if (item != nullptr)
 		{
 			m->removeItem(item);
@@ -1001,7 +1002,7 @@ var BaseManager<T>::getItemAfterFromScript(const var::NativeFunctionArgs& args)
 		T* item = dynamic_cast<T*>((T*)(int64)args.arguments[0].getDynamicObject()->getProperty(scriptPtrIdentifier));
 		if (item == nullptr) return var();
 		int index = m->items.indexOf(item);
-		if (index >= m->items.size()-1) return var();
+		if (index >= m->items.size() - 1) return var();
 		return m->items[index + 1]->getScriptObject();
 	}
 
@@ -1247,7 +1248,7 @@ bool BaseManager<T>::AddItemsAction::undo()
 	Array<T*> iList = this->getItems();
 	this->data = var();
 	for (auto& i : iList) if (i != nullptr) this->data.append(i->getJSONData());
-	BaseManager * m = this->getManager();
+	BaseManager* m = this->getManager();
 	if (m != nullptr) m->removeItems(iList, false);
 	this->itemsRef.clear();
 	return true;
@@ -1263,7 +1264,7 @@ bool BaseManager<T>::RemoveItemsAction::perform()
 	Array<T*> iList = this->getItems();
 	this->data = var();
 	for (auto& i : iList) if (i != nullptr) this->data.append(i->getJSONData());
-	BaseManager * m = this->getManager();
+	BaseManager* m = this->getManager();
 	if (m != nullptr) m->removeItems(iList, false);
 	this->itemsRef.clear();
 	return true;
