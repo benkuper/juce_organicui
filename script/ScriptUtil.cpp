@@ -52,6 +52,9 @@ ScriptUtil::ScriptUtil() :
 	scriptObject.setMethod("showMessageBox", ScriptUtil::showMessageBox);
 	scriptObject.setMethod("showOkCancelBox", ScriptUtil::showOkCancelBox);
 	scriptObject.setMethod("showYesNoCancelBox", ScriptUtil::showYesNoCancelBox);
+
+	scriptObject.setMethod("getSelectedObject", ScriptUtil::getSelectedObjectFromScript);
+	scriptObject.setMethod("getSelectedObjectsCount", ScriptUtil::getSelectedObjectsCountFromScript);
 }
 
 var ScriptUtil::getTime(const var::NativeFunctionArgs &)
@@ -602,4 +605,32 @@ var ScriptUtil::base64_decode_bytes(const String& data)
 		}
 	}
 	return result;
+}
+
+var ScriptUtil::getSelectedObjectFromScript(const var::NativeFunctionArgs& args)
+{
+	BaseItem* item = nullptr;
+
+	if (args.numArguments > 0)
+	{
+		Array<BaseItem*> items = InspectableSelectionManager::activeSelectionManager->getInspectablesAs<BaseItem>();
+		int num = args.arguments[0];
+		if (num >= 0 && num < items.size())
+		{
+			item = items[num];
+		}
+	}
+	else
+	{
+		item = InspectableSelectionManager::activeSelectionManager->getInspectableAs<BaseItem>();
+	}
+
+	if(item) return item->getScriptObject();
+
+	return var();
+}
+
+var ScriptUtil::getSelectedObjectsCountFromScript(const var::NativeFunctionArgs& args)
+{
+	return InspectableSelectionManager::activeSelectionManager->getInspectablesAs<BaseItem>().size();
 }

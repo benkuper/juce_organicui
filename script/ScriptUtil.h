@@ -68,4 +68,7 @@ public:
 	static std::string base64_encode(unsigned char const* src, unsigned int len);
 	static std::string base64_decode(std::string const& data);
 	static var base64_decode_bytes(const String & data);
+
+	static var getSelectedObjectFromScript(const var::NativeFunctionArgs& args);
+	static var getSelectedObjectsCountFromScript(const var::NativeFunctionArgs& args);
 };
