@@ -295,6 +295,7 @@ void ControllableUI::updateUIParams()
 {
 	setInterceptsMouseClicks(isInteractable(false), isInteractable(false));
 	updateUIParamsInternal();
+	resized();
 }
 
 void ControllableUI::setOpaqueBackground(bool value)

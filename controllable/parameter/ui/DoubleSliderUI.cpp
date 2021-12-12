@@ -15,7 +15,7 @@ DoubleSliderUI::DoubleSliderUI(Array<Point2DParameter*> parameters) :
 	xParam("X", "xParam", p2d->x, p2d->minimumValue[0], p2d->maximumValue[0]),
 	yParam("Y", "yParam", p2d->y, p2d->minimumValue[1], p2d->maximumValue[1]),
 	canShowExtendedEditor(true),
-    isUpdatingFromParam(false)
+	isUpdatingFromParam(false)
 
 {
 
@@ -227,8 +227,24 @@ void DoubleSliderUI::rangeChanged(Parameter* p)
 
 void DoubleSliderUI::updateUIParamsInternal()
 {
-	xParam.setControllableFeedbackOnly(parameter->isControllableFeedbackOnly);
-	yParam.setControllableFeedbackOnly(parameter->isControllableFeedbackOnly);
+	xParam.setControllableFeedbackOnly(!isInteractable());
+	yParam.setControllableFeedbackOnly(!isInteractable());
+
+	Array<ParameterUI*> puis{ xSlider.get(), ySlider.get() };
+
+	for (auto& u : puis)
+	{
+		u->useCustomBGColor = useCustomBGColor;
+		u->customBGColor = customBGColor;
+		u->useCustomFGColor = useCustomFGColor;
+		u->customFGColor = customFGColor;
+		u->useCustomTextColor = useCustomTextColor;
+		u->customTextColor = customTextColor;
+		u->showValue = showValue;
+		u->showLabel = showLabel;
+		u->updateUIParams();
+	}
+
 	updateUseExtendedEditor();
 }
 

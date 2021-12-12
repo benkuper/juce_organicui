@@ -194,9 +194,24 @@ void TripleSliderUI::rangeChanged(Parameter* p)
 
 void TripleSliderUI::updateUIParamsInternal()
 {
-	xParam.setControllableFeedbackOnly(parameter->isControllableFeedbackOnly);
-	yParam.setControllableFeedbackOnly(parameter->isControllableFeedbackOnly);
-	zParam.setControllableFeedbackOnly(parameter->isControllableFeedbackOnly);
+	xParam.setControllableFeedbackOnly(!isInteractable());
+	yParam.setControllableFeedbackOnly(!isInteractable());
+	zParam.setControllableFeedbackOnly(!isInteractable());
+
+	Array<ParameterUI*> puis{ xSlider.get(), ySlider.get(), zSlider.get() };
+
+	for (auto& u : puis)
+	{
+		u->useCustomBGColor = useCustomBGColor;
+		u->customBGColor = customBGColor;
+		u->useCustomFGColor = useCustomFGColor;
+		u->customFGColor = customFGColor;
+		u->useCustomTextColor = useCustomTextColor;
+		u->customTextColor = customTextColor;
+		u->showValue = showValue;
+		u->showLabel = showLabel;
+		u->updateUIParams();
+	}
 }
 
 void TripleSliderUI::newMessage(const Parameter::ParameterEvent& e)

@@ -1,14 +1,15 @@
+#include "DashboardItem.h"
 /*
   ==============================================================================
 
-    DashboardItem.cpp
-    Created: 19 Apr 2017 11:06:51pm
-    Author:  Ben
+	DashboardItem.cpp
+	Created: 19 Apr 2017 11:06:51pm
+	Author:  Ben
 
   ==============================================================================
 */
 
-DashboardItem::DashboardItem(Inspectable * _target, const String &name) :
+DashboardItem::DashboardItem(Inspectable* _target, const String& name) :
 	BaseItem(name, false)
 {
 	viewUIPosition->hideInEditor = false;
@@ -43,13 +44,20 @@ void DashboardItem::onContainerParameterChangedInternal(Parameter* p)
 	notifyDataFeedback(getItemParameterFeedback(p));
 }
 
+void DashboardItem::onControllableStateChanged(Controllable* c)
+{
+	if (Parameter* p = dynamic_cast<Parameter*>(c)) notifyDataFeedback(getItemParameterFeedback(p));
+}
+
 var DashboardItem::getItemParameterFeedback(Parameter* p)
 {
 	var data(new DynamicObject());
 	data.getDynamicObject()->setProperty("feedbackType", "uiFeedback");
 	data.getDynamicObject()->setProperty("controlAddress", p->getControlAddress(DashboardManager::getInstance()));
 	data.getDynamicObject()->setProperty("type", p->getTypeString());
-	data.getDynamicObject()->setProperty("value", p->value);
+	data.getDynamicObject()->setProperty("value", p->enabled ? p->value : var());
+	if (p->canBeDisabledByUser) data.getDynamicObject()->setProperty("enabled", p->enabled);
+
 	return data;
 }
 

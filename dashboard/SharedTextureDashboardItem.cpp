@@ -105,6 +105,7 @@ void SharedTextureDashboardItem::receiverRemoved(SharedTextureReceiver* r)
 
 void SharedTextureDashboardItem::onContainerParameterChangedInternal(Parameter* p)
 {
+	DashboardItem::onContainerParameterChangedInternal(p);
 	if (p == textureName && !isCurrentlyLoadingData) setupReceiver();
 }
 

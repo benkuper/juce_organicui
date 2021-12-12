@@ -37,7 +37,7 @@ FloatStepperUI::FloatStepperUI(Array<Parameter*> parameters) :
 	slider->setNumDecimalPlacesToDisplay(0);
 	slider->setValue(parameter->floatValue(), dontSendNotification);
 
-	slider->setColour(slider->textBoxBackgroundColourId, BG_COLOR.darker(.1f).withAlpha(.8f));
+	slider->setColour(slider->textBoxBackgroundColourId, useCustomFGColor?customFGColor:BG_COLOR.darker(.1f).withAlpha(.8f));
 	slider->setColour(CaretComponent::caretColourId, Colours::orange);
 	slider->setScrollWheelEnabled(false);
 	slider->setColour(slider->textBoxTextColourId, useCustomTextColor ? customTextColor : (isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f)));
@@ -64,7 +64,9 @@ void FloatStepperUI::paint(Graphics& g)
 	ParameterUI::paint(g);
 
 	if (parameter == nullptr || parameter.wasObjectDeleted()) return;
-
+	
+	if (useCustomBGColor) g.fillAll(customBGColor);
+	
 	if (showLabel)
 	{
 		Rectangle<int> r = getLocalBounds();
@@ -100,6 +102,7 @@ void FloatStepperUI::updateUIParamsInternal()
 	slider->setTextBoxIsEditable(isInteractable());
 	slider->setIncDecButtonsMode((isInteractable()) ? Slider::IncDecButtonMode::incDecButtonsDraggable_AutoDirection : Slider::IncDecButtonMode::incDecButtonsNotDraggable);
 	slider->setColour(slider->textBoxTextColourId, useCustomTextColor ? customTextColor : (isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f)));
+	slider->setColour(slider->textBoxBackgroundColourId, useCustomFGColor ? customFGColor : BG_COLOR.darker(.1f).withAlpha(.8f));
 }
 
 

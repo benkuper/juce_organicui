@@ -19,7 +19,7 @@ EnumParameterUI::EnumParameterUI(Array<EnumParameter*> parameters) :
 	cb.setTextWhenNothingSelected(ep->niceName);
 	cb.setTooltip(ep->description);
 	addAndMakeVisible(cb);
-
+	
 	ep->addAsyncEnumParameterListener(this);
 
 	cb.addMouseListener(this, true);
@@ -28,7 +28,7 @@ EnumParameterUI::EnumParameterUI(Array<EnumParameter*> parameters) :
 
 	showEditWindowOnDoubleClick = false;
 
-	updateComboBox();
+	updateUIParams();
 }
 
 EnumParameterUI::~EnumParameterUI()
@@ -76,6 +76,9 @@ void EnumParameterUI::newMessage(const EnumParameter::EnumParameterEvent& e)
 
 void EnumParameterUI::updateUIParamsInternal()
 {
+	cb.setColour(cb.backgroundColourId, useCustomBGColor ? customBGColor : BG_COLOR);
+	cb.setColour(cb.textColourId, useCustomTextColor ? customTextColor : TEXT_COLOR);
+	cb.setColour(cb.buttonColourId, useCustomFGColor ? customFGColor : TEXT_COLOR);
 	updateComboBox();
 }
 
