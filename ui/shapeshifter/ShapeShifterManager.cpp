@@ -360,12 +360,7 @@ void ShapeShifterManager::saveCurrentLayoutToFile(const File& toFile)
 
 Array<File> ShapeShifterManager::getLayoutFiles()
 {
-	File layoutFolder = File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory).getChildFile(appSubFolder);
-	if (!layoutFolder.exists())
-	{
-		layoutFolder.createDirectory();
-	}
-
+	if (!layoutFolder.exists()) return Array<File>();
 	Array<File> layoutFiles;
 	layoutFolder.findChildFiles(layoutFiles, File::findFiles, false, "*." + appLayoutExtension);
 
