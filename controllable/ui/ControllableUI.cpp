@@ -260,9 +260,9 @@ void ControllableUI::showContextMenu()
 
 		case 19999:
 		{
-			Parrot* p = new Parrot();
-			p->addTarget(controllable);
-			ParrotManager::getInstance()->addItem(p);
+			Parrot* pa = new Parrot();
+			pa->addTarget(controllable);
+			ParrotManager::getInstance()->addItem(pa);
 		}
 		break;
 

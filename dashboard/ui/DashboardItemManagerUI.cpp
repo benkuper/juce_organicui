@@ -160,7 +160,9 @@ void DashboardItemManagerUI::showMenuAndAddItem(bool fromAddButton, Point<int> m
 		Point<float> p = getViewPos(mousePos);
 		if (result == -1) manager->addItem(new DashboardGroupItem(), p);
 		else if (result == -2) manager->addItem(new DashboardCommentItem(), p);
+#if ORGANICUI_USE_SHAREDTEXTURE
 		else if (result == -3) manager->addItem(new SharedTextureDashboardItem(), p);
+#endif
 		else if (result < -1000) customHandleMenuResultFunc(result, -5000, this, p);
 		else manager->addItem(manager->managerFactory->createFromMenuResult(result), p);
 	}

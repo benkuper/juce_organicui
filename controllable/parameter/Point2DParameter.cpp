@@ -159,10 +159,10 @@ void Point2DParameter::setWeightedValue(Array<var> values, Array<float> weights)
 	setPoint(tValues[0], tValues[1]);
 }
 
-void Point2DParameter::setShowExtendedEditor(bool value)
+void Point2DParameter::setShowExtendedEditor(bool val)
 {
-	if (value == showExtendedEditor) return;
-	showExtendedEditor = value;
+	if (val == showExtendedEditor) return;
+	showExtendedEditor = val;
 	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::UI_PARAMS_CHANGED, this));
 }
 
