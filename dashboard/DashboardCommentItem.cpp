@@ -7,6 +7,7 @@
 
   ==============================================================================
 */
+#include "DashboardCommentItem.h"
 
 DashboardCommentItem::DashboardCommentItem() :
 	DashboardItem(nullptr, "Comment")
@@ -38,4 +39,12 @@ var DashboardCommentItem::getServerData()
 DashboardItemUI * DashboardCommentItem::createUI()
 {
 	return new DashboardCommentItemUI(this);
+}
+
+var DashboardCommentItem::getItemParameterFeedback(Parameter* p)
+{
+	var data = DashboardItem::getItemParameterFeedback(p);
+	data.getDynamicObject()->setProperty("targetType", this->getTypeString());
+
+	return data;
 }
