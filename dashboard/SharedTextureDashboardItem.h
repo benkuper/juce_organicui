@@ -42,6 +42,7 @@ public:
 	static std::string base64_encode(unsigned char const* src, unsigned int len);
 
 	DashboardItemUI* createUI() override;
+	virtual var getItemParameterFeedback(Parameter* p) override;
 
 	DECLARE_ASYNC_EVENT(SharedTextureDashboardItem, ST, st, { TEXTURE_UPDATED });
 
