@@ -7,7 +7,6 @@
 
   ==============================================================================
 */
-#include "DashboardCommentItem.h"
 
 DashboardCommentItem::DashboardCommentItem() :
 	DashboardItem(nullptr, "Comment")

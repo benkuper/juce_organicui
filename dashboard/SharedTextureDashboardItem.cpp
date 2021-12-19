@@ -7,7 +7,6 @@
 
   ==============================================================================
 */
-#include "DashboardCommentItem.h"
 
 SharedTextureDashboardItem::SharedTextureDashboardItem(var params) :
 	DashboardItem(this, getTypeString()),
