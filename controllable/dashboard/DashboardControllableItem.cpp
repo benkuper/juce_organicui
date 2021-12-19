@@ -134,14 +134,15 @@ var DashboardControllableItem::getServerData()
 
 	o->setProperty("showLabel", showLabel->value);
 	if (textColor->enabled) o->setProperty("textColor", textColor->value);
-	if (contourColor->enabled)
-	{
-		o->setProperty("borderColor", contourColor->value);
-		o->setProperty("borderWidth", contourThickness->value);
-	}
+#
+	o->setProperty("borderColor", contourColor->value);
+	o->setProperty("borderWidth", contourThickness->value);
+	o->setProperty("borderColorEnabled", contourColor->enabled);
 
 	o->setProperty("opaqueBackground", opaqueBackground->value);
-	o->setProperty("label", customLabel->enabled ? customLabel->value.toString() : controllable->getDefaultDashboardLabel());
+	o->setProperty("label", controllable->getDefaultDashboardLabel());
+	o->setProperty("customTextEnabled", customLabel->enabled);
+	o->setProperty("customText", customLabel->value.toString());
 	o->setProperty("customDescription", customDescription->value);
 	o->setProperty("readOnly", forceReadOnly->value || controllable->isControllableFeedbackOnly);
 
