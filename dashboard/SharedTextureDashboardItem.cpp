@@ -172,3 +172,11 @@ DashboardItemUI* SharedTextureDashboardItem::createUI()
 {
 	return new SharedTextureDashboardItemUI(this);
 }
+
+var SharedTextureDashboardItem::getItemParameterFeedback(Parameter* p)
+{
+	var data = DashboardItem::getItemParameterFeedback(p);
+	data.getDynamicObject()->setProperty("targetType", this->getTypeString());
+
+	return data;
+}
