@@ -76,9 +76,15 @@ void EnumParameterUI::newMessage(const EnumParameter::EnumParameterEvent& e)
 
 void EnumParameterUI::updateUIParamsInternal()
 {
-	cb.setColour(cb.backgroundColourId, useCustomBGColor ? customBGColor : BG_COLOR);
-	cb.setColour(cb.textColourId, useCustomTextColor ? customTextColor : TEXT_COLOR);
-	cb.setColour(cb.buttonColourId, useCustomFGColor ? customFGColor : TEXT_COLOR);
+	Colour bgColor = useCustomBGColor ? customBGColor : BG_COLOR;
+	Colour fgColor = useCustomTextColor ? customTextColor : TEXT_COLOR;
+
+	cb.setColour(cb.backgroundColourId, bgColor);
+	cb.setColour(cb.outlineColourId, bgColor.brighter(.2f));
+	cb.setColour(cb.focusedOutlineColourId, bgColor.brighter(.3f));
+	cb.setColour(cb.textColourId, fgColor);
+	cb.setColour(cb.buttonColourId, fgColor);
+	cb.setColour(cb.arrowColourId, fgColor.darker(.2f));
 	updateComboBox();
 }
 
