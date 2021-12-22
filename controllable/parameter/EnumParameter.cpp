@@ -1,3 +1,4 @@
+#include "EnumParameter.h"
 /*
   ==============================================================================
 
@@ -21,6 +22,16 @@ EnumParameter::EnumParameter(const String & niceName, const String &description,
 	scriptObject.setMethod("removeOptions", EnumParameter::removeOptionsFromScript);
 
 	value = "";
+}
+
+EnumParameter::~EnumParameter() 
+{
+	if (enumParameterNotifier.isUpdatePending())
+	{
+		MessageManagerLock mmLock(Thread::getCurrentThread());
+		if (mmLock.lockWasGained()) enumParameterNotifier.handleUpdateNowIfNeeded();
+		enumParameterNotifier.cancelPendingUpdate();
+	}
 }
 
 EnumParameter * EnumParameter::addOption(String key, var data, bool selectIfFirstOption)

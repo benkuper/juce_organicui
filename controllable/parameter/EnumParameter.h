@@ -18,7 +18,7 @@ class EnumParameter : public Parameter
 public:
 
 	EnumParameter(const String &niceName, const String &description, bool enabled = true);
-	~EnumParameter() {}
+	~EnumParameter();
 
 	EnumParameter * addOption(String key, var data, bool selectIfFirstOption = true); //daisy chain
 	void updateOption(int index, String key, var data);
