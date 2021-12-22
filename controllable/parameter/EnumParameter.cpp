@@ -64,6 +64,8 @@ void EnumParameter::removeOption(String key)
 	enumListeners.call(&Listener::enumOptionRemoved, this, key);
 	enumParameterNotifier.addMessage(new EnumParameterEvent(EnumParameterEvent::ENUM_OPTION_REMOVED, this));
 	updateArgDescription();
+
+	if (getValueKey() == key) setValue("");
 }
 
 void EnumParameter::clearOptions()
