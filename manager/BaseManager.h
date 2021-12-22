@@ -30,6 +30,7 @@ public:
 	bool selectItemWhenCreated;
 	bool autoReorderOnAdd;
 	bool isManipulatingMultipleItems;
+	Point<float> clipboardCopyOffset;
 
 	//ui
 	Point<int> viewOffset; //in pixels, viewOffset of 0 means zeroPos is at the center of the window
@@ -486,9 +487,12 @@ Array<T*> BaseManager<T>::addItemsFromClipboard(bool showWarning)
 	if (sIndex >= 0) data.getDynamicObject()->setProperty("index", sIndex + 1);
 	Array<T*> copiedItems = addItemsFromData(data.getProperty("items", var()));
 
-	for (auto& i : copiedItems)
+	if (!clipboardCopyOffset.isOrigin())
 	{
-		((BaseItem*)i)->viewUIPosition->setPoint(((BaseItem*)i)->viewUIPosition->getPoint() + Point<float>(20, 20));
+		for (auto& i : copiedItems)
+		{
+			((BaseItem*)i)->viewUIPosition->setPoint(((BaseItem*)i)->viewUIPosition->getPoint() + clipboardCopyOffset);
+		}
 	}
 
 	return copiedItems;
