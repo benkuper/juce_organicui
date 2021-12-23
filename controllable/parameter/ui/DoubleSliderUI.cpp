@@ -66,7 +66,7 @@ DoubleSliderUI::~DoubleSliderUI()
 
 void DoubleSliderUI::mouseDownInternal(const MouseEvent& e)
 {
-	if (canShowExtendedEditor && canvasSwitchRect.contains(e.getMouseDownPosition().toFloat()))
+	if (canShowExtendedEditor && p2d->canShowExtendedEditor && canvasSwitchRect.contains(e.getMouseDownPosition().toFloat()))
 	{
 		setUndoableValueOnMouseUp = false;
 		p2d->setShowExtendedEditor(!p2d->showExtendedEditor);
@@ -103,7 +103,7 @@ void DoubleSliderUI::paint(Graphics& g)
 		sr.removeFromLeft(2);
 	}
 
-	if (canShowExtendedEditor)
+	if (canShowExtendedEditor && p2d->canShowExtendedEditor)
 	{
 		Rectangle<float> rr = canvasSwitchRect.reduced(4);
 		Path p;
@@ -126,7 +126,7 @@ void DoubleSliderUI::resized()
 		sr.removeFromLeft(2);
 	}
 
-	if (canShowExtendedEditor) canvasSwitchRect = sr.removeFromLeft(sr.getHeight()).toFloat();
+	if (canShowExtendedEditor && p2d->canShowExtendedEditor) canvasSwitchRect = sr.removeFromLeft(sr.getHeight()).toFloat();
 
 	xSlider->setBounds(sr.removeFromLeft(sr.getWidth() / 2 - 5));
 	ySlider->setBounds(sr.removeFromRight(sr.getWidth() - 10));

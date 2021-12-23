@@ -21,6 +21,7 @@ public:
 	bool extendedEditorInvertX;
 	bool extendedEditorInvertY;
 	bool extendedEditorStretchMode;
+	bool canShowExtendedEditor;
 
 	void setPoint(Point<float> value);
 	void setPoint(float x, float y);

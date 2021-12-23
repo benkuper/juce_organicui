@@ -15,7 +15,8 @@ Point2DParameter::Point2DParameter(const String& niceName, const String& descrip
 	showExtendedEditor(false),
 	extendedEditorInvertX(false),
 	extendedEditorInvertY(false),
-	extendedEditorStretchMode(false)
+	extendedEditorStretchMode(false),
+	canShowExtendedEditor(true)
 {
 	canHaveRange = true;
 
