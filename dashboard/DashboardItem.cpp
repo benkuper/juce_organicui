@@ -56,6 +56,12 @@ var DashboardItem::getItemParameterFeedback(Parameter* p)
 	data.getDynamicObject()->setProperty("controlAddress", p->getControlAddress(DashboardManager::getInstance()));
 	data.getDynamicObject()->setProperty("type", p->getTypeString());
 	data.getDynamicObject()->setProperty("value", p->enabled ? p->value : var());
+	
+	if (p->getTypeString() == "Enum") {
+		EnumParameter* ep = (EnumParameter*)p;
+		data.getDynamicObject()->setProperty("value", ep->getValueData());
+	}
+
 	if (p->canBeDisabledByUser) data.getDynamicObject()->setProperty("enabled", p->enabled);
 
 	return data;
