@@ -55,7 +55,17 @@ var DashboardItem::getItemParameterFeedback(Parameter* p)
 	data.getDynamicObject()->setProperty("feedbackType", "uiFeedback");
 	data.getDynamicObject()->setProperty("controlAddress", p->getControlAddress(DashboardManager::getInstance()));
 	data.getDynamicObject()->setProperty("type", p->getTypeString());
-	data.getDynamicObject()->setProperty("value", p->enabled ? p->value : var());
+	
+	if (p->type == Parameter::ENUM)
+	{
+		EnumParameter* ep = (EnumParameter*)p;
+		data.getDynamicObject()->setProperty("value", p->enabled ? ep->getValueData() : var());
+	} 
+	else 
+	{
+		data.getDynamicObject()->setProperty("value", p->enabled ? p->value : var());
+	}
+
 	if (p->canBeDisabledByUser) data.getDynamicObject()->setProperty("enabled", p->enabled);
 
 	return data;
