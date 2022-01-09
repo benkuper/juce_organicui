@@ -339,6 +339,8 @@ void ParameterUI::ValueEditCalloutComponent::parentHierarchyChanged()
 	if (labels[0]->isShowing())
 	{
 		labels[0]->grabKeyboardFocus();
-		labels[0]->showEditor();
+#if !JUCE_MAC
+        labels[0]->showEditor();
+#endif
 	}
 }
