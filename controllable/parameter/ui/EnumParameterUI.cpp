@@ -15,8 +15,8 @@ EnumParameterUI::EnumParameterUI(Array<EnumParameter*> parameters) :
 	ep(parameters[0])
 {
 	cb.addListener(this);
-	cb.setTextWhenNoChoicesAvailable(ep->niceName);
-	cb.setTextWhenNothingSelected(ep->niceName);
+	cb.setTextWhenNoChoicesAvailable("");
+	cb.setTextWhenNothingSelected("Select an element");
 	cb.setTooltip(ep->description);
 	addAndMakeVisible(cb);
 	

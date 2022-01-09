@@ -63,7 +63,7 @@ namespace LookAndFeelHelpers {
 
 		ComboBox::buttonColourId,                   0xffCCCCCC,
 		ComboBox::outlineColourId,                  standardOutlineColour,
-		ComboBox::textColourId,                     0xff000000,
+		ComboBox::textColourId,                     0xff666666,
 		ComboBox::backgroundColourId,               0xffCCCCCC,
 		ComboBox::arrowColourId,                    0x99000000,
 
