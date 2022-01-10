@@ -63,6 +63,9 @@ ControllableContainer::ControllableContainer(const String& niceName) :
 
 	scriptObject.setMethod("getControlAddress", ControllableContainer::getControlAddressFromScript);
 	scriptObject.setMethod("getScriptControlAdress", ControllableContainer::getScriptControlAddressFromScript);
+
+	scriptObject.setMethod("getJSONData", ControllableContainer::getJSONDataFromScript);
+	scriptObject.setMethod("loadJSONData", ControllableContainer::loadJSONDataFromScript);
 }
 
 ControllableContainer::~ControllableContainer()
@@ -1363,6 +1366,7 @@ var ControllableContainer::addAutomationFromScript(const var::NativeFunctionArgs
 
 	Automation* a = new Automation(args.arguments[0].toString(), nullptr, false);
 	cc->addChildControllableContainer(a, true);
+	cc->saveAndLoadRecursiveData = true;
 	return a->getScriptObject();
 }
 
@@ -1426,6 +1430,20 @@ var ControllableContainer::getScriptControlAddressFromScript(const juce::var::Na
 	return "root" + cc->getControlAddress().replaceCharacter('/', '.');
 }
 
+
+var ControllableContainer::getJSONDataFromScript(const var::NativeFunctionArgs& a)
+{
+	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(a);
+	return cc->getJSONData();
+}
+
+var ControllableContainer::loadJSONDataFromScript(const var::NativeFunctionArgs& a)
+{
+	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(a);
+	if (!checkNumArgs(cc->niceName, a, 1)) return false;
+	cc->loadJSONData(a.arguments[0], a.numArguments > 1 ? a.arguments[1] : false);
+	return true;
+}
 
 bool ControllableContainer::checkNumArgs(const String &logName, const var::NativeFunctionArgs & args, int expectedArgs)
 {

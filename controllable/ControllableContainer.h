@@ -175,7 +175,10 @@ public:
 	static var removeControllableFromScript(const var::NativeFunctionArgs& args);
 
 	static var getControlAddressFromScript(const var::NativeFunctionArgs& args);
-	static var getScriptControlAddressFromScript(const var::NativeFunctionArgs &args);
+	static var getScriptControlAddressFromScript(const var::NativeFunctionArgs& args);
+
+	static var getJSONDataFromScript(const var::NativeFunctionArgs& args);
+	static var loadJSONDataFromScript(const var::NativeFunctionArgs &args);
 	
 	static bool checkNumArgs(const String &logName, const var::NativeFunctionArgs &args, int expectedArgs);
 	

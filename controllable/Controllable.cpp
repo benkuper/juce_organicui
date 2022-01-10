@@ -54,6 +54,8 @@ Controllable::Controllable(const Type &type, const String & niceName, const Stri
 	scriptObject.setMethod("getControlAddress", Controllable::getControlAddressFromScript);
 	scriptObject.setMethod("getScriptControlAdress", Controllable::getScriptControlAddressFromScript);
 
+	scriptObject.setMethod("getJSONData", ControllableContainer::getJSONDataFromScript);
+	scriptObject.setMethod("loadJSONData", ControllableContainer::loadJSONDataFromScript);
 
 	setEnabled(enabled);
 	setNiceName(niceName);
@@ -487,6 +489,21 @@ var Controllable::getScriptControlAddressFromScript(const juce::var::NativeFunct
 	Controllable* c = getObjectFromJS<Controllable>(a);
 	if (c == nullptr) return var();
 	return "root" + c->controlAddress.replaceCharacter('/', '.');
+}
+
+
+var Controllable::getJSONDataFromScript(const var::NativeFunctionArgs& a)
+{
+	Controllable* cc = getObjectFromJS<Controllable>(a);
+	return cc->getJSONData();
+}
+
+var Controllable::loadJSONDataFromScript(const var::NativeFunctionArgs& a)
+{
+	Controllable* c = getObjectFromJS<Controllable>(a);
+	if (a.numArguments == 0) return false;
+	c->loadJSONData(a.arguments[0]);
+	return true;
 }
 
 String Controllable::getScriptTargetString()

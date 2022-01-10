@@ -118,6 +118,9 @@ public:
 	static var getControlAddressFromScript(const juce::var::NativeFunctionArgs& a);
 	static var getScriptControlAddressFromScript(const juce::var::NativeFunctionArgs& a);
 
+	static var getJSONDataFromScript(const var::NativeFunctionArgs& args);
+	static var loadJSONDataFromScript(const var::NativeFunctionArgs& args);
+
 
 	String getScriptTargetString() override;
 
