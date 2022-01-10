@@ -1441,7 +1441,7 @@ var ControllableContainer::loadJSONDataFromScript(const var::NativeFunctionArgs&
 {
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(a);
 	if (!checkNumArgs(cc->niceName, a, 1)) return false;
-	cc->loadJSONData(a.arguments[0], a.numArguments > 1 ? a.arguments[1] : false);
+	cc->loadJSONData(a.arguments[0], a.numArguments > 1 ? (bool)(int)a.arguments[1] : false);
 	return true;
 }
 
