@@ -1,4 +1,3 @@
-#include "EnumParameter.h"
 /*
   ==============================================================================
 
@@ -276,6 +275,12 @@ EnumParameterUI * EnumParameter::createUI(Array<EnumParameter *> parameters)
 {
 	if (parameters.size() == 0) parameters = { this };
 	return new EnumParameterUI(parameters);
+}
+
+EnumParameterButtonBarUI* EnumParameter::createButtonBarUI(Array<EnumParameter*> parameters)
+{
+	if (parameters.size() == 0) parameters = { this };
+	return new EnumParameterButtonBarUI(parameters);
 }
 
 ControllableUI * EnumParameter::createDefaultUI(Array<Controllable*> controllables) {

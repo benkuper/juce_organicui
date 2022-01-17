@@ -8,36 +8,67 @@
   ==============================================================================
 */
 
-
-EnumParameterUI::EnumParameterUI(Array<EnumParameter*> parameters) :
+EnumParameterUIBase::EnumParameterUIBase(Array<EnumParameter*> parameters) :
 	ParameterUI(Inspectable::getArrayAs<EnumParameter, Parameter>(parameters)),
 	eps(parameters),
 	ep(parameters[0])
+{
+	ep->addAsyncEnumParameterListener(this);
+	showEditWindowOnDoubleClick = false;
+}
+
+EnumParameterUIBase::~EnumParameterUIBase()
+{
+	if (!parameter.wasObjectDeleted()) ep->removeAsyncEnumParameterListener(this);
+}
+
+void EnumParameterUIBase::addPopupMenuItemsInternal(PopupMenu* p)
+{
+	p->addItem(101, "Set Options...");
+}
+
+void EnumParameterUIBase::handleMenuSelectedID(int result)
+{
+	ParameterUI::handleMenuSelectedID(result);
+	if (result == 101)
+	{
+		std::unique_ptr<Component> editComponent(new EnumOptionManager(ep));
+		CallOutBox* box = &CallOutBox::launchAsynchronously(std::move(editComponent), localAreaToGlobal(getLocalBounds()), nullptr);
+		box->setArrowSize(8);
+	}
+}
+
+
+void EnumParameterUIBase::newMessage(const EnumParameter::EnumParameterEvent& e)
+{
+	updateFromParameter();
+}
+
+
+
+EnumParameterUI::EnumParameterUI(Array<EnumParameter*> parameters) :
+	EnumParameterUIBase(parameters)
 {
 	cb.addListener(this);
 	cb.setTextWhenNoChoicesAvailable("");
 	cb.setTextWhenNothingSelected("Select an element");
 	cb.setTooltip(ep->description);
 	addAndMakeVisible(cb);
-	
-	ep->addAsyncEnumParameterListener(this);
 
 	cb.addMouseListener(this, true);
 
 	prevValue = ep->getValueKey();
 
-	showEditWindowOnDoubleClick = false;
 
 	updateUIParams();
 }
 
 EnumParameterUI::~EnumParameterUI()
 {
-	if (!parameter.wasObjectDeleted()) ep->removeAsyncEnumParameterListener(this);
 	cb.removeListener(this);
 }
 
-void EnumParameterUI::updateComboBox()
+void EnumParameterUI::updateFromParameter()
 {
 	cb.clear(dontSendNotification);
 	idKeyMap.clear();
@@ -69,11 +100,6 @@ void EnumParameterUI::resized()
 	cb.setBounds(getLocalBounds());
 }
 
-void EnumParameterUI::newMessage(const EnumParameter::EnumParameterEvent& e)
-{
-	updateComboBox();
-}
-
 void EnumParameterUI::updateUIParamsInternal()
 {
 	Colour bgColor = useCustomBGColor ? customBGColor : BG_COLOR;
@@ -85,7 +111,7 @@ void EnumParameterUI::updateUIParamsInternal()
 	cb.setColour(cb.textColourId, fgColor);
 	cb.setColour(cb.buttonColourId, fgColor);
 	cb.setColour(cb.arrowColourId, fgColor.darker(.2f));
-	updateComboBox();
+	updateFromParameter();
 }
 
 void EnumParameterUI::valueChanged(const var& value)
@@ -100,23 +126,8 @@ void EnumParameterUI::comboBoxChanged(ComboBox*)
 	ep->setUndoableValue(prevValue, getSelectedKey());
 
 }
-void EnumParameterUI::addPopupMenuItemsInternal(PopupMenu* p)
-{
-	p->addItem(101, "Set Options...");
-}
 
-void EnumParameterUI::handleMenuSelectedID(int result)
-{
-	ParameterUI::handleMenuSelectedID(result);
-	if (result == 101)
-	{
-		std::unique_ptr<Component> editComponent(new EnumOptionManager(ep));
-		CallOutBox* box = &CallOutBox::launchAsynchronously(std::move(editComponent), localAreaToGlobal(getLocalBounds()), nullptr);
-		box->setArrowSize(8);
-	}
-}
-
-EnumParameterUI::EnumOptionManager::EnumOptionManager(EnumParameter* ep) :
+EnumOptionManager::EnumOptionManager(EnumParameter* ep) :
 	ep(ep)
 {
 	int numRowsToDisplay = ep->enumValues.size() + 5;
@@ -136,11 +147,11 @@ EnumParameterUI::EnumOptionManager::EnumOptionManager(EnumParameter* ep) :
 	setSize(200, 140);
 }
 
-EnumParameterUI::EnumOptionManager::~EnumOptionManager()
+EnumOptionManager::~EnumOptionManager()
 {
 }
 
-void EnumParameterUI::EnumOptionManager::paint(Graphics& g)
+void EnumOptionManager::paint(Graphics& g)
 {
 	Rectangle<int> hr = getLocalBounds().removeFromTop(20);
 	g.setColour(TEXT_COLOR);
@@ -148,7 +159,7 @@ void EnumParameterUI::EnumOptionManager::paint(Graphics& g)
 	g.drawText("Key", hr.reduced(2).toFloat(), Justification::centred, false);
 }
 
-void EnumParameterUI::EnumOptionManager::resized()
+void EnumOptionManager::resized()
 {
 	Rectangle<int> r = getLocalBounds().withHeight(20);
 	for (int i = 0; i < optionsUI.size(); i++) optionsUI[i]->setBounds(r.translated(0, i * r.getHeight()));
@@ -158,7 +169,7 @@ void EnumParameterUI::EnumOptionManager::resized()
 	viewport.setBounds(getLocalBounds().withTrimmedTop(20));
 }
 
-void EnumParameterUI::EnumOptionManager::labelTextChanged(Label* l)
+void EnumOptionManager::labelTextChanged(Label* l)
 {
 	String key = ep->getValueKey();
 
@@ -175,7 +186,7 @@ void EnumParameterUI::EnumOptionManager::labelTextChanged(Label* l)
 	ep->setValueWithKey(key);
 }
 
-EnumParameterUI::EnumOptionManager::EnumOptionUI::EnumOptionUI(EnumParameter* ep, int index) :
+EnumOptionManager::EnumOptionUI::EnumOptionUI(EnumParameter* ep, int index) :
 	ep(ep),
 	index(index)
 {
@@ -203,8 +214,88 @@ EnumParameterUI::EnumOptionManager::EnumOptionUI::EnumOptionUI(EnumParameter* ep
 	addAndMakeVisible(&valueLabel);
 }
 
-void EnumParameterUI::EnumOptionManager::EnumOptionUI::resized()
+void EnumOptionManager::EnumOptionUI::resized()
 {
 	keyLabel.setBounds(getLocalBounds().removeFromLeft(getWidth() / 2).reduced(2));
 	valueLabel.setBounds(getLocalBounds().removeFromRight(getWidth() / 2).reduced(2));
+}
+
+EnumParameterButtonBarUI::EnumParameterButtonBarUI(Array<EnumParameter*> parameters) :
+	EnumParameterUIBase(parameters),
+	isVertical(false)
+{
+	updateFromParameter();
+}
+
+EnumParameterButtonBarUI::~EnumParameterButtonBarUI()
+{
+}
+
+void EnumParameterButtonBarUI::updateFromParameter()
+{
+	buttons.clear();
+	Random r;
+	int radioId = r.nextInt();
+
+	String selectedKey = ep->getValueKey();
+	for (auto& ev : ep->enumValues)
+	{
+		TextButton* tb = new TextButton(ev->key);
+		tb->addListener(this);
+		tb->setClickingTogglesState(true);
+		tb->setRadioGroupId(radioId);
+
+		if (ev->key == selectedKey) tb->setToggleState(true, dontSendNotification);
+
+		buttons.add(tb);
+		addAndMakeVisible(tb);
+	}
+
+	updateUIParams();
+}
+
+void EnumParameterButtonBarUI::resized()
+{
+	Rectangle<int> r = getLocalBounds();
+	if (buttons.size() == 0) return;
+
+	int bSize = (isVertical ? r.getHeight() : r.getWidth()) / buttons.size();
+	for (auto& tb : buttons)
+	{
+		tb->setBounds(isVertical ? r.removeFromTop(bSize) : r.removeFromLeft(bSize));
+	}
+}
+
+void EnumParameterButtonBarUI::updateUIParamsInternal()
+{
+	Colour tColor = useCustomTextColor ? customTextColor : TEXT_COLOR;
+	Colour bColor = useCustomBGColor ? customBGColor : BG_COLOR.brighter(.1f);
+	Colour fColor = useCustomFGColor ? customFGColor : (isInteractable() ? HIGHLIGHT_COLOR : FEEDBACK_COLOR);
+
+	for (int i = 0; i < buttons.size(); i++)
+	{
+		TextButton* tb = buttons[i];
+		tb->setColour(TextButton::textColourOffId, tColor.withMultipliedSaturation(.5f));
+		tb->setColour(TextButton::textColourOnId, tColor);
+		tb->setColour(TextButton::buttonColourId, bColor);
+		tb->setColour(TextButton::buttonOnColourId, fColor);
+
+		if (i == 0) tb->setConnectedEdges(isVertical ? Button::ConnectedOnBottom : Button::ConnectedOnRight);
+		else if (i == buttons.size() - 1) tb->setConnectedEdges(isVertical ? Button::ConnectedOnTop : Button::ConnectedOnLeft);
+		else tb->setConnectedEdges(isVertical ? (Button::ConnectedOnTop | Button::ConnectedOnBottom) : (Button::ConnectedOnLeft | Button::ConnectedOnRight));
+	}
+}
+
+void EnumParameterButtonBarUI::valueChanged(const var&)
+{
+	String selectedKey = ep->getValueKey();
+	for (auto& tb : buttons)
+	{
+		if (tb->getButtonText() == selectedKey) tb->setToggleState(true, dontSendNotification);
+	}
+}
+
+void EnumParameterButtonBarUI::buttonClicked(Button* b)
+{
+	ep->setValueWithKey(b->getButtonText());
 }

@@ -73,7 +73,26 @@ ControllableUI* DashboardParameterItemUI::createControllableUI()
 		case 11:
 			return new ColorStatusUI(parameterItem->parameter.get(), false);
 			break;
+
+
+		case 20:
+		{
+			EnumParameterButtonBarUI* ui = ((EnumParameter*)parameterItem->parameter.get())->createButtonBarUI();
+			ui->isVertical = false;
+			return ui;
 		}
+		break;
+
+
+		case 21:
+		{
+			EnumParameterButtonBarUI* ui = ((EnumParameter*)parameterItem->parameter.get())->createButtonBarUI();
+			ui->isVertical = true;
+			return ui;
+		}
+		break;
+		}
+		break;
 	}
 	break;
 
