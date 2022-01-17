@@ -11,6 +11,7 @@
 #pragma once
 
 class EnumParameterUI;
+class EnumParameterButtonBarUI;
 
 
 class EnumParameter : public Parameter
@@ -72,6 +73,7 @@ public:
 
 
 	EnumParameterUI* createUI(Array<EnumParameter*> parameters = {});
+	EnumParameterButtonBarUI* createButtonBarUI(Array<EnumParameter*> parameters = {});
 	ControllableUI * createDefaultUI(Array<Controllable*> controllables = {}) override;
 
 
