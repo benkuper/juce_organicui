@@ -275,8 +275,8 @@ void EnumParameterButtonBarUI::updateUIParamsInternal()
 	for (int i = 0; i < buttons.size(); i++)
 	{
 		TextButton* tb = buttons[i];
-		tb->setColour(TextButton::textColourOffId, tColor.withMultipliedSaturation(.5f));
-		tb->setColour(TextButton::textColourOnId, tColor);
+		tb->setColour(TextButton::textColourOffId, tColor);
+		tb->setColour(TextButton::textColourOnId, bColor);
 		tb->setColour(TextButton::buttonColourId, bColor);
 		tb->setColour(TextButton::buttonOnColourId, fColor);
 
