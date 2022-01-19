@@ -52,9 +52,11 @@ TargetParameter::~TargetParameter()
 
 void TargetParameter::resetValue(bool silentSet)
 {
-	ghostValue = "";
-	setTarget((ControllableContainer*)nullptr);
-	setTarget((Controllable*)nullptr);
+	setGhostValue("");
+	if (targetType == CONTAINER) setTarget((ControllableContainer*)nullptr);
+	else setTarget((Controllable*)nullptr);
+	setUndoableValue(value, "");
+
 	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::VALUE_CHANGED, this, getValue()));
 	clearWarning();
 }
