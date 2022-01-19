@@ -61,12 +61,6 @@ void DashboardControllableItemUI::updateUIParameters()
 
 	String customLabel = controllableItem->customLabel->stringValue();
 	if (customLabel.isNotEmpty() && controllableItem->customLabel->enabled) itemUI->customLabel = customLabel;
-	else
-	{
-		String defaultLabel = controllableItem->controllable->getDefaultDashboardLabel();
-		if (defaultLabel != controllableItem->controllable->niceName) itemUI->customLabel = defaultLabel;
-		else itemUI->customLabel = "";
-	}
 
 	itemUI->customDescription = controllableItem->customDescription->enabled ? controllableItem->customDescription->stringValue() : "";
 

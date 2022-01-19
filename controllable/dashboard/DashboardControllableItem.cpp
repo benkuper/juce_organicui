@@ -19,7 +19,16 @@ DashboardControllableItem::DashboardControllableItem(Controllable* item) :
 	customLabel->canBeDisabledByUser = true;
 	customDescription->canBeDisabledByUser = true;
 
-	if (controllable != nullptr && !controllable.wasObjectDeleted()) controllable->addControllableListener(this);
+	if (controllable != nullptr && !controllable.wasObjectDeleted())
+	{
+		if (controllable->dashboardDefaultLabelParentLevel > 0)
+		{
+			customLabel->setEnabled(true);
+			customLabel->setValue(controllable->getDefaultDashboardLabel());
+		}
+
+		controllable->addControllableListener(this);
+	}
 }
 
 DashboardControllableItem::~DashboardControllableItem()
