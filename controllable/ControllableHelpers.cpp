@@ -86,10 +86,11 @@ Controllable * ControllableChooserPopupMenu::getControllableForResult(int result
 //CONTAINER
 
 
-ContainerChooserPopupMenu::ContainerChooserPopupMenu(ControllableContainer * rootContainer, int indexOffset, int maxSearchLevel, std::function<bool(ControllableContainer*)> typeCheckFunc) :
+ContainerChooserPopupMenu::ContainerChooserPopupMenu(ControllableContainer * rootContainer, int indexOffset, int maxSearchLevel, std::function<bool(ControllableContainer*)> typeCheckFunc, bool allowSelectAtAnyLevel) :
 	indexOffset(indexOffset),
 	maxDefaultSearchLevel(maxSearchLevel),
-	typeCheckFunc(typeCheckFunc)
+	typeCheckFunc(typeCheckFunc),
+	allowSelectAtAnyLevel(allowSelectAtAnyLevel)
 {
 	int id = indexOffset + 1;
 
@@ -128,6 +129,15 @@ void ContainerChooserPopupMenu::populateMenu(PopupMenu * subMenu, ControllableCo
 			else
 			{*/
 				PopupMenu p;
+				
+				if (allowSelectAtAnyLevel)
+				{
+					containerList.add(cc);
+					p.addItem(currentId, "Select");
+					currentId++;
+					p.addSeparator();
+				}
+				
 				populateMenu(&p, cc, currentId, currentLevel + 1);
 				if (typeCheckFunc == nullptr || p.containsAnyActiveItems()) subMenu->addSubMenu(cc->niceName, p);
 			//}

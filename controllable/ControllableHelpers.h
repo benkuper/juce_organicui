@@ -47,12 +47,13 @@ class ContainerChooserPopupMenu :
 	public PopupMenu
 {
 public:
-	ContainerChooserPopupMenu(ControllableContainer * rootContainer, int indexOffset = 0, int maxSearchLevel = -1, std::function<bool(ControllableContainer *)> typeCheckFunc = nullptr);
+	ContainerChooserPopupMenu(ControllableContainer * rootContainer, int indexOffset = 0, int maxSearchLevel = -1, std::function<bool(ControllableContainer *)> typeCheckFunc = nullptr, bool allowSelectAtAnylevel = false);
 	virtual ~ContainerChooserPopupMenu();
 
 	int indexOffset;
 	int maxDefaultSearchLevel;
 	std::function<bool(ControllableContainer *)> typeCheckFunc;
+	bool allowSelectAtAnyLevel;
 
 	Array<ControllableContainer *> containerList;
 	void populateMenu(PopupMenu *subMenu, ControllableContainer * container, int &currentId, int currentLevel = 0);

@@ -184,7 +184,7 @@ public:
 	
 	String getScriptTargetString() override;
 
-	// Inherited via DashboardItemTarget
+
 
 protected:
 	virtual void onContainerNiceNameChanged() {};
