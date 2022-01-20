@@ -1134,11 +1134,19 @@ var ControllableContainer::getChildFromScript(const var::NativeFunctionArgs& a)
 	if (a.numArguments == 0) return var();
 	ControllableContainer* m = getObjectFromJS<ControllableContainer>(a);
 	if (m == nullptr) return var();
+
+	ControllableContainer* cc = nullptr;
+
 	String nameToFind = a.arguments[0].toString();
-	ControllableContainer* cc = m->getControllableContainerByName(nameToFind, a.numArguments >= 2 ? (bool)(int)a.arguments[1] : true);
+	if (nameToFind.contains("/")) cc = m->getControllableContainerForAddress(nameToFind, true);
+	else  cc = m->getControllableContainerByName(nameToFind, a.numArguments >= 2 ? (bool)(int)a.arguments[1] : true);
 	if (cc != nullptr) return cc->getScriptObject();
 
-	Controllable* c = m->getControllableByName(nameToFind);
+	Controllable* c = nullptr;
+	
+	
+	if (nameToFind.contains("/")) c = m->getControllableForAddress(nameToFind, true);
+	else  c = m->getControllableByName(nameToFind);
 	if (c != nullptr) return c->getScriptObject();
 
 	LOG("Child not found from script " + a.arguments[0].toString());
