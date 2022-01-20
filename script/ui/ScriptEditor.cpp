@@ -27,9 +27,9 @@ ScriptEditor::ScriptEditor(Script * _script, bool isRoot) :
 	logUI.reset(script->logParam->createToggle());
 
 
-	paramsEditor.reset(script->scriptParamsContainer.getEditor(false));
+	paramsEditor.reset(script->scriptParamsContainer->getEditor(false));
 	addChildComponent(paramsEditor.get());
-	paramsEditor->setVisible(script->scriptParamsContainer.controllables.size() > 0);
+	paramsEditor->setVisible(script->scriptParamsContainer->controllables.size() > 0);
 
 	addAndMakeVisible(reloadBT.get());
 	addAndMakeVisible(logUI.get());

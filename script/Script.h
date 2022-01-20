@@ -39,7 +39,7 @@ public:
 	bool updateEnabled; //When loading the script, checks if the update function is present
 	const Identifier updateIdentifier = "update";
 
-	ControllableContainer scriptParamsContainer;
+	std::unique_ptr<ControllableContainer> scriptParamsContainer;
 
 	ScriptTarget* parentTarget;
 
@@ -48,12 +48,14 @@ public:
 	float executionTimeout;
 
 
+	void setParamsContainer(ControllableContainer* cc);
 	void chooseFileScript();
 
 	void loadScript();
 	void buildEnvironment();
 
 	void setState(ScriptState newState);
+
 
 	var callFunction(const Identifier& function, const Array<var> args, juce::Result* result = (juce::Result*)nullptr);
 
