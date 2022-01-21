@@ -14,7 +14,8 @@ ColorParameterUI::ColorParameterUI(Array<ColorParameter *> parameters) :
     colorParams(parameters),
 	colorParam(parameters[0]),
     dispatchOnDoubleClick(true),
-	dispatchOnSingleClick(false)
+	dispatchOnSingleClick(false),
+	colorEditor(nullptr)
 {
 	setSize(200, GlobalSettings::getInstance()->fontSize->floatValue() + 4);//default size
 	showLabel = false;
@@ -77,7 +78,18 @@ void ColorParameterUI::showEditWindowInternal()
 	selector->setColour(ColourSelector::labelTextColourId, TEXT_COLOR);
 	selector->setSize(300, 400);
 	selector->addChangeListener(this);
-	CallOutBox::launchAsynchronously(std::move(selector), getScreenBounds(), nullptr);
+	valueOnEditorOpen = colorParam->getValue();
+	colorEditor = &CallOutBox::launchAsynchronously(std::move(selector), getScreenBounds(), nullptr);
+	colorEditor->addComponentListener(this);
+}
+
+void ColorParameterUI::componentBeingDeleted(Component& c)
+{
+	if (&c == colorEditor)
+	{
+		colorParam->setUndoableValue(valueOnEditorOpen, colorParam->value);
+		colorEditor = nullptr;
+	}
 }
 
 void ColorParameterUI::valueChanged(const var &)

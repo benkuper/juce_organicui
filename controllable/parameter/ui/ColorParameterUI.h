@@ -12,7 +12,8 @@
 
 class ColorParameterUI :
 	public ParameterUI,
-	public ChangeListener
+	public ChangeListener,
+	public ComponentListener
 {
 
 public:
@@ -20,7 +21,9 @@ public:
 	~ColorParameterUI();
 
 	Array<ColorParameter*> colorParams;
+	var valueOnEditorOpen;
 	ColorParameter * colorParam;
+	CallOutBox* colorEditor;
 
 	bool dispatchOnDoubleClick;
 	bool dispatchOnSingleClick;
@@ -30,6 +33,8 @@ public:
 	void mouseDownInternal(const MouseEvent &e) override;
 
 	void showEditWindowInternal() override;
+
+	void componentBeingDeleted(Component &) override;
 
 protected:
 	// Inherited via ChangeListener
