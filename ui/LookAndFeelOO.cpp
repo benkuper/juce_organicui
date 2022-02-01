@@ -1,4 +1,3 @@
-#include "LookAndFeelOO.h"
 /*
   ==============================================================================
 
@@ -1803,12 +1802,6 @@ void LookAndFeelOO::positionDocumentWindowButtons (DocumentWindow&,
 int LookAndFeelOO::getDefaultMenuBarHeight()
 {
     return 20;
-}
-
-//==============================================================================
-DropShadower* LookAndFeelOO::createDropShadowerForComponent (Component*)
-{
-    return new DropShadower (DropShadow (Colours::black.withAlpha (0.4f), 10, Point<int> (0, 2)));
 }
 
 //==============================================================================
