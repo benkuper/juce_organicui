@@ -29,8 +29,7 @@ ShapeShifterWindow::ShapeShifterWindow(ShapeShifterPanel* _panel, juce::Rectangl
 	pinBT->addListener(this);
 	panel->addAndMakeVisible(pinBT.get());
 
-	setContentNonOwned(_panel,true);
-
+	setContentNonOwned(_panel, true);
 
 	setBackgroundColour(BG_COLOR.darker(.1f).withAlpha(.3f));
 
@@ -39,6 +38,7 @@ ShapeShifterWindow::ShapeShifterWindow(ShapeShifterPanel* _panel, juce::Rectangl
 
 	setVisible(true);
 	toFront(true);
+
 
 
 	addMouseListener(this,true);
