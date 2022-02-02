@@ -34,6 +34,12 @@ void ColorStatusUI::paint(Graphics& g)
 	g.setColour(c.brighter(.3f));
 	if (isCircle) g.drawEllipse(r, 2);
 	else g.drawRoundedRectangle(r, 4, 2);
+
+	if (showLabel)
+	{
+		g.setColour(useCustomTextColor ? customTextColor : (isInteractable() ? TEXT_COLOR : FEEDBACK_COLOR));
+		g.drawFittedText(customLabel.isNotEmpty() ? customLabel : parameter->niceName, getLocalBounds().reduced(2), Justification::centred, 3);
+	}
 }
 
 Colour ColorStatusUI::getCurrentColor() const
