@@ -45,6 +45,7 @@ public:
 
 	static GradientColorComparator comparator;
 
+	void updateCurrentColor();
 	Colour getColorForPosition(const float & time) const;
 	
 	//void rebuildGradient();
