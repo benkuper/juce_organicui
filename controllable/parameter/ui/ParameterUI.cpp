@@ -145,7 +145,32 @@ void ParameterUI::addPopupMenuItems(PopupMenu* p)
 
 		if (parameter->canHaveRange && parameter->isCustomizableByUser)
 		{
-			p->addItem(-4, "Set Range...");
+			PopupMenu rangeMenu;
+			rangeMenu.addItem(-4, "Custom");
+			rangeMenu.addSeparator();
+			if (parameter->type == Parameter::FLOAT)
+			{
+				rangeMenu.addItem(-50, "0 : 1");
+				rangeMenu.addItem(-51, "-1 : 1");
+				rangeMenu.addItem(-52, "-90 : 90");
+				rangeMenu.addItem(-53, "0 : 180");
+				rangeMenu.addItem(-54, "-180 : 180");
+				rangeMenu.addItem(-55, "0 : 360");
+
+			}
+			else if (parameter->type == Parameter::INT)
+			{
+				rangeMenu.addItem(-60, "0 : 100");
+				rangeMenu.addItem(-61, "0 : 127");
+				rangeMenu.addItem(-62, "0 : 255");
+				rangeMenu.addItem(-63, "0 : 65535");
+				rangeMenu.addItem(-52, "-90 : 90");
+				rangeMenu.addItem(-53, "0 : 180");
+				rangeMenu.addItem(-54, "-180 : 180");
+				rangeMenu.addItem(-55, "0 : 360");
+			}
+			
+			p->addSubMenu("Set Range...",rangeMenu);
 			if (parameter->hasRange()) p->addItem(-5, "Clear Range");
 		}
 	}
@@ -186,6 +211,17 @@ void ParameterUI::handleMenuSelectedID(int id)
 	case -4: showEditRangeWindow(); break;
 	case -5: parameter->clearRange(); break;
 	case -6: parameter->alwaysNotify = !parameter->alwaysNotify; break;
+
+	case -50: parameter->setRange(0, 1); break;
+	case -51: parameter->setRange(-1, 1); break;
+	case -52: parameter->setRange(-90, 90); break;
+	case -53: parameter->setRange(0, 180); break;
+	case -54: parameter->setRange(-180, 180); break;
+	case -55: parameter->setRange(0, 360); break;
+	case -60: parameter->setRange(0, 100); break;
+	case -61: parameter->setRange(0, 127); break;
+	case -62: parameter->setRange(0, 255); break;
+	case -63: parameter->setRange(0, 65535); break;
 	}
 }
 
