@@ -23,7 +23,8 @@ public:
 
     bool shouldRepaint;
     bool usingCustomImages;
-	
+    bool momentaryMode;
+
     void setImages(Image onImage, Image offImage = Image());
 
     void paint(Graphics &g) override;

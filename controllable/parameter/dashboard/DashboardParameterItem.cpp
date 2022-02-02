@@ -82,7 +82,7 @@ void DashboardParameterItem::updateStyleOptions()
 		{
 			if (parameter->type != Controllable::ENUM && parameter->type != Controllable::BOOL) style->addOption("Horizontal Slider", 0)->addOption("Vertical Slider", 1)->addOption("Rotary Slider", 5)->addOption("Text", 2)->addOption("Time", 3);
 			if (parameter->type == Controllable::ENUM) style->addOption("Horizontal Bar", 20)->addOption("Vertical Bar", 21);
-
+			if (parameter->type == Controllable::BOOL) style->addOption("Toggle Checkbox", 22)->addOption("Toggle Button", 23)->addOption("Momentary Checkbox", 24)->addOption("Momentary Button", 25);
 			style->addOption("Color Circle", 10)->addOption("Color Square", 11);
 			style->customGetEditorFunc = std::bind(&DashboardParameterItem::getStyleEditor, this, std::placeholders::_1, std::placeholders::_2);
 		}
@@ -138,6 +138,15 @@ var DashboardParameterItem::getServerData()
 		data.getDynamicObject()->setProperty("colorMap", colorMapData);
 	}
 	break;
+
+	case 22:
+	case 23:
+	case 24:
+	case 25:
+		data.getDynamicObject()->setProperty("momentaryMode", styleValue == 24 || styleValue == 25);
+		data.getDynamicObject()->setProperty("buttonUI", styleValue == 23 || styleValue == 25);
+		break;
+
 	}
 
 	if (btImage->stringValue().isNotEmpty()) data.getDynamicObject()->setProperty("customImage", btImage->getControlAddress());
@@ -168,10 +177,11 @@ var DashboardParameterItem::getServerData()
 		data.getDynamicObject()->setProperty("invertY", p2d->extendedEditorInvertY);
 	}
 	break;
-            
-    default:
-        break;
-    }
+
+
+	default:
+		break;
+	}
 
 	return data;
 }

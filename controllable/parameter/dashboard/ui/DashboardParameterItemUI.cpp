@@ -27,15 +27,28 @@ ControllableUI* DashboardParameterItemUI::createControllableUI()
 		case 11:
 			return new ColorStatusUI(parameterItem->parameter.get(), false);
 			break;
-		case 0:
 
+		case 23:
+		case 25:
+		{
+
+			BoolToggleUI* bp = ((BoolParameter*)parameterItem->parameter.get())->createButtonToggle();
+			if (s == 25) bp->momentaryMode = true;
+			return bp;
+		}
+		break;
+
+		case 0:
+		case 22:
+		case 24:
 		default:
+		{
 			File f = parameterItem->btImage->getFile();
-			if (f.existsAsFile())
-			{
-				return ((BoolParameter*)parameterItem->parameter.get())->createToggle(ImageCache::getFromFile(f));
-			}
-			break;
+			BoolToggleUI* bp = ((BoolParameter*)parameterItem->parameter.get())->createToggle(ImageCache::getFromFile(f));
+			if (s == 24) bp->momentaryMode = true;
+			return bp;
+		}
+		break;
 		}
 	}
 	break;

@@ -10,7 +10,8 @@
 
 BoolToggleUI::BoolToggleUI(Array<BoolParameter *> parameters, Image _onImage, Image _offImage) :
     ParameterUI(Inspectable::getArrayAs<BoolParameter, Parameter>(parameters)),
-	shouldRepaint(false)
+	shouldRepaint(false),
+	momentaryMode(false)
 {
 	usingCustomImages = _onImage.isValid();
 	
@@ -104,7 +105,7 @@ void BoolToggleUI::mouseDownInternal(const MouseEvent& e)
 	if (!isInteractable()) return;
 	if (e.mods.isLeftButtonDown())
 	{
-		if (e.mods.isAltDown()) parameter->setValue(!parameter->boolValue());
+		if (e.mods.isAltDown() || momentaryMode) parameter->setValue(!parameter->boolValue());
 		else parameter->setUndoableValue(parameter->boolValue(), !parameter->boolValue()); //only undoable when from left button, real toggle behaviour
 	}
 }
@@ -114,7 +115,7 @@ void BoolToggleUI::mouseUpInternal(const MouseEvent & e)
 	if (!isInteractable()) return;
 	if (e.mods.isLeftButtonDown())
 	{
-		if (e.mods.isAltDown()) parameter->setValue(!parameter->boolValue());
+		if (e.mods.isAltDown() || momentaryMode) parameter->setValue(!parameter->boolValue());
 	}
 }
 
@@ -194,7 +195,7 @@ void BoolButtonToggleUI::paint(Graphics& g)
 		Rectangle<int> tr = getLocalBounds().reduced(2);
 		g.setFont(jlimit(10, 40, jmin(tr.getHeight() - 4, tr.getWidth()) - 16));
 		g.setColour(useCustomTextColor ? customTextColor : TEXT_COLOR);
-		g.drawFittedText(customLabel.isNotEmpty() ? customLabel : parameter->niceName, tr, Justification::centred, 1);
+		g.drawFittedText(customLabel.isNotEmpty() ? customLabel : parameter->niceName, tr, Justification::centred, 3);
 	}
 }
 
