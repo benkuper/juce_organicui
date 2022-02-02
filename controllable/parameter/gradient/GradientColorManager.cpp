@@ -1,3 +1,4 @@
+#include "GradientColorManager.h"
 /*
   ==============================================================================
 
@@ -45,7 +46,7 @@ GradientColorManager::GradientColorManager(float maxPosition, bool addDefaultCol
 		addColorAt(1, Colours::yellow);
 	}
 
-	currentColor->setColor(getColorForPosition(position->floatValue()));
+	updateCurrentColor();
 
 	scriptObject.setMethod("getColorAtPosition", &GradientColorManager::getColorAtPositionFromScript);
 	scriptObject.setMethod("getKeyAtPosition", &GradientColorManager::getKeyAtPositionFromScript);
@@ -92,6 +93,11 @@ void GradientColorManager::updateKeyRanges()
 	}
 }
 
+void GradientColorManager::updateCurrentColor()
+{
+	currentColor->setColor(getColorForPosition(position->floatValue()));
+}
+
 Colour GradientColorManager::getColorForPosition(const float & time) const
 {
 	if (items.isEmpty()) return Colours::transparentBlack;
@@ -135,7 +141,7 @@ void GradientColorManager::rebuildGradient()
 	}
 	gradientLock.exit();
 
-	currentColor->setColor(getColorForPosition(position->floatValue()));
+	updateCurrentColor();
 	colorManagerListeners.call(&GradientColorManagerListener::gradientUpdated);
 }
 */
@@ -214,6 +220,7 @@ void GradientColorManager::addItemInternal(GradientColor * item, var data)
 void GradientColorManager::removeItemInternal(GradientColor *)
 {
 	//rebuildGradient();
+	updateCurrentColor();
 }
 
 Array<GradientColor*> GradientColorManager::addItemsFromClipboard(bool showWarning)
@@ -262,7 +269,7 @@ void GradientColorManager::onContainerParameterChanged(Parameter * p)
 {
 	if (p == position)
 	{
-		currentColor->setColor(getColorForPosition(position->floatValue()));
+		updateCurrentColor();
 	}
 }
 
@@ -297,7 +304,7 @@ void GradientColorManager::onControllableFeedbackUpdate(ControllableContainer * 
 		}
 
 		//rebuildGradient();
-		currentColor->setColor(getColorForPosition(position->floatValue()));
+		updateCurrentColor();
 	}
 }
 
