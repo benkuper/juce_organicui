@@ -54,6 +54,8 @@ var OSCHelpers::argumentToVar(const OSCArgument& a)
 	if (a.isFloat32()) return var(a.getFloat32());
 	if (a.isInt32()) return var(a.getInt32());
 	if (a.isString()) return var(a.getString());
+	if (a.isTorF()) return var(a.getBool());
+	if (a.isImpulse()) return var();
 	return var("error");
 }
 
@@ -92,6 +94,8 @@ float OSCHelpers::getFloatArg(OSCArgument a)
 	if (a.isFloat32()) return a.getFloat32();
 	if (a.isInt32()) return (float)a.getInt32();
 	if (a.isString()) return a.getString().getFloatValue();
+	if (a.isTorF()) return var(a.getBool()?1.0f:0.0f);
+	if (a.isImpulse()) return var();
 	return 0;
 }
 
@@ -100,6 +104,8 @@ int OSCHelpers::getIntArg(OSCArgument a)
 	if (a.isInt32()) return a.getInt32();
 	if (a.isFloat32()) return (int)roundf(a.getFloat32());
 	if (a.isString()) return a.getString().getIntValue();
+	if (a.isTorF()) return var(a.getBool()?1:0);
+	if (a.isImpulse()) return var(); 
 	return 0;
 }
 
@@ -108,6 +114,8 @@ String OSCHelpers::getStringArg(OSCArgument a)
 	if (a.isString()) return a.getString();
 	if (a.isInt32()) return String(a.getInt32());
 	if (a.isFloat32()) return String(a.getFloat32());
+	if (a.isTorF()) return var(a.getBool() ? "True" : "False");
+	if (a.isImpulse()) return var("");
 	return "";
 }
 
