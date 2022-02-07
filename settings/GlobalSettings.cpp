@@ -55,6 +55,7 @@ GlobalSettings::GlobalSettings() :
 	compressOnSave = saveLoadCC.addBoolParameter("Compress file", "If checked, the JSON content will be minified, otherwise it will be human-readable but larger size as well", true);
 	enableCrashUpload = saveLoadCC.addBoolParameter("Enable Crash Upload", "If checked and a crashlog is found at startup, it will automatically upload it.\nThis crash log is a very small file but is immensely helpful for me, so please leave this option enabled unless you strongly feel like not helping me :)", true);
 	testCrash = saveLoadCC.addTrigger("Test crash", "This will cause a crash, allowing for testing crashes. Don't push this unless you REALLY want to !!!");
+	saveLogsToFile = saveLoadCC.addBoolParameter("Save logs", "If checked, the content of the Logger will be automatically saved to a file", false);
 	addChildControllableContainer(&saveLoadCC);
 
 	askBeforeRemovingItems = editingCC.addBoolParameter("Ask before removing items", "If enabled, you will get a confirmation prompt before removing any item", false);
@@ -109,6 +110,10 @@ void GlobalSettings::onControllableFeedbackUpdate(ControllableContainer * cc, Co
 		Controllable* crashC = nullptr;
 		crashC->getJSONData(); //this will crash
 #endif
+	}
+	else if (c == saveLogsToFile)
+	{
+		CustomLogger::getInstance()->setFileLogging(saveLogsToFile->boolValue());
 	}
 
 	if (Engine::mainEngine != nullptr) Engine::mainEngine->setChangedFlag(false); //force no need to save when changing something in global settings

@@ -60,6 +60,7 @@ public:
 
 	BoolParameter* compressOnSave;
 	BoolParameter* enableCrashUpload;
+	BoolParameter* saveLogsToFile;
 
 	ControllableContainer editingCC;
 	BoolParameter * askBeforeRemovingItems;
