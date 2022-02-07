@@ -1,10 +1,6 @@
 
 #pragma once
 
- // do not use file logger atm
- // TODO figure out true utility of such
-#define USE_FILE_LOGGER 0
-
 class CustomLogger : public Logger
 {
 public:
@@ -22,7 +18,8 @@ public:
 	void addLogListener(Listener* l) { notifier.addListener(l); }
 	void removeLogListener(Listener* l) { notifier.removeListener(l); }
 
-#if USE_FILE_LOGGER
+	void setFileLogging(bool enabled);
+
 	class FileWriter : public Listener
 	{
 	public:
@@ -33,8 +30,7 @@ public:
 		std::unique_ptr<FileLogger> fileLog;
 	};
 
-	FileWriter fileWriter;
-#endif
+	std::unique_ptr<FileWriter> fileWriter;
 
 private:
 	const String welcomeMessage;
