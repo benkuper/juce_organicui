@@ -483,31 +483,57 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 		InspectableSelectionManager* selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
 		Array<BaseItem*> items = selectionManager->getInspectablesAs<BaseItem>();
 		HashMap<BaseManager<BaseItem>*, Array<BaseItem*>*> managerItemMap;
-		for (auto& i : items)
-		{
-			if (i == nullptr) continue;
-			if (!i->userCanDuplicate) continue;
 
-			if (BaseManager<BaseItem>* managerContainer = (BaseManager<BaseItem>*)(i->parentContainer.get()))
-			{
-				if (!managerItemMap.contains(managerContainer)) managerItemMap.set(managerContainer, new Array<BaseItem*>());
-				managerItemMap[managerContainer]->addIfNotAlreadyThere(i);
-			}
+		if (items.size() == 1)
+		{
+			if (items[0] != nullptr && items[0]->userCanDuplicate) items[0]->duplicate();
 		}
-
-		HashMap<BaseManager<BaseItem>*, Array<BaseItem*>*>::Iterator it(managerItemMap);
-		while (it.next())
+		else
 		{
-			if (it.getKey() == nullptr)
+
+			for (auto& i : items)
 			{
-				for (auto& i : *it.getValue()) i->duplicate();
+				if (i == nullptr) continue;
+				if (!i->userCanDuplicate) continue;
+
+				if (BaseManager<BaseItem>* managerContainer = (BaseManager<BaseItem>*)(i->parentContainer.get()))
+				{
+					if (!managerItemMap.contains(managerContainer)) managerItemMap.set(managerContainer, new Array<BaseItem*>());
+					managerItemMap[managerContainer]->addIfNotAlreadyThere(i);
+				}
 			}
-			else
+
+			HashMap<BaseManager<BaseItem>*, Array<BaseItem*>*>::Iterator it(managerItemMap);
+			while (it.next())
 			{
-				var data;
-				for (auto& i : *it.getValue()) data.append(i->getJSONData());
-				if(data.size() > 0) it.getKey()->addItemsFromData(data);
-				delete it.getValue();
+				if (it.getKey() == nullptr)
+				{
+					for (auto& i : *it.getValue()) i->duplicate();
+				}
+				else if (it.getValue()->size() == 1)
+				{
+					it.getValue()->getUnchecked(0)->duplicate();
+				}
+				else
+				{
+					var data;
+					int maxIndex = 0;
+					for (auto& i : *it.getValue())
+					{
+						var iData = i->getJSONData();
+						maxIndex = jmax(it.getKey()->items.indexOf(i), maxIndex);
+						data.append(iData);
+					}
+
+					maxIndex++;
+					for (int i = 0; i < data.size(); i++)
+					{
+						data[i].getDynamicObject()->setProperty("index", maxIndex++);
+					}
+
+					if (data.size() > 0) it.getKey()->addItemsFromData(data);
+					delete it.getValue();
+				}
 			}
 		}
 	}
