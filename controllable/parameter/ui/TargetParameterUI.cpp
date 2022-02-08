@@ -51,8 +51,8 @@ void TargetParameterUI::paint(Graphics & g)
 {
 	if (parameter.wasObjectDeleted()) return;
 
-	Colour c = targetParameter->target != nullptr || targetParameter->targetContainer != nullptr ? GREEN_COLOR : NORMAL_COLOR;
-	if (isMouseOver()) c = c.brighter();
+	Colour c = targetParameter->target != nullptr || targetParameter->targetContainer != nullptr ? (isInteractable()?GREEN_COLOR:BLUE_COLOR) : NORMAL_COLOR;
+	if (isMouseOver() && isInteractable()) c = c.brighter();
 
 	g.setGradientFill(ColourGradient(c.brighter(.2f), (float)getLocalBounds().getCentreX(), (float)getLocalBounds().getCentreY(), c.darker(), 2.f, 2.f, true));
 	g.fillRoundedRectangle(targetBT->getBounds().expanded(2).toFloat(), 6);
@@ -186,7 +186,7 @@ void TargetParameterUI::showPopupAndGetTarget()
 
 void TargetParameterUI::mouseDownInternal(const MouseEvent &)
 {
-	showPopupAndGetTarget();
+	if(isInteractable()) showPopupAndGetTarget();
 }
 
 void TargetParameterUI::buttonClicked(Button * b)
