@@ -483,9 +483,18 @@ Array<T*> BaseManager<T>::addItemsFromClipboard(bool showWarning)
 		return Array<T*>();
 	}
 
+	var itemsData = data.getProperty("items", var());
 	int sIndex = items.indexOf(InspectableSelectionManager::activeSelectionManager->getInspectableAs<T>());
-	if (sIndex >= 0) data.getDynamicObject()->setProperty("index", sIndex + 1);
-	Array<T*> copiedItems = addItemsFromData(data.getProperty("items", var()));
+	if (sIndex >= 0)
+	{
+		sIndex++;
+		for (int i = 0; i < itemsData.size(); i++)
+		{
+			itemsData[i].getDynamicObject()->setProperty("index", sIndex++);
+		}
+	}
+
+	Array<T*> copiedItems = addItemsFromData(itemsData);
 
 	if (!clipboardCopyOffset.isOrigin())
 	{
