@@ -34,7 +34,12 @@ void DashboardCCItemUI::resizedDashboardItemInternal()
 
 void DashboardCCItemUI::updateEditModeInternal(bool editMode)
 {
-	if (itemUI != nullptr) itemUI->setInterceptsMouseClicks(!editMode, !editMode);
+	if (itemUI != nullptr)
+	{
+		setTooltip((editMode && !ccItem->container.wasObjectDeleted()) ? "Target : " + ccItem->container->getControlAddress() : "");
+		itemUI->setInterceptsMouseClicks(!editMode, !editMode);
+	}
+	else setTooltip("### " + ccItem->inspectableGhostAddress);
 }
 
 void DashboardCCItemUI::inspectableChanged()

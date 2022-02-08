@@ -73,6 +73,8 @@ void DashboardControllableItem::setInspectableInternal(Inspectable* i)
 	{
 		controllable->addControllableListener(this);
 	}
+
+	target->setValueFromTarget(controllable);
 }
 
 void DashboardControllableItem::ghostInspectable()

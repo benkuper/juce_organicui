@@ -12,7 +12,8 @@
 
 class DashboardItemUI :
 	public BaseItemMinimalUI<DashboardItem>,
-	public Parameter::AsyncListener
+	public Parameter::AsyncListener,
+	public SettableTooltipClient
 {
 public:
 	DashboardItemUI(DashboardItem * item);

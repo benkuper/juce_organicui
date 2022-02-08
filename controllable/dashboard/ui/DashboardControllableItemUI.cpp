@@ -9,7 +9,7 @@ DashboardControllableItemUI::DashboardControllableItemUI(DashboardControllableIt
 
 DashboardControllableItemUI::~DashboardControllableItemUI()
 {
-	if(!inspectable.wasObjectDeleted()) controllableItem->removeAsyncDashboardControllableItemListener(this);
+	if (!inspectable.wasObjectDeleted()) controllableItem->removeAsyncDashboardControllableItemListener(this);
 }
 
 void DashboardControllableItemUI::paint(Graphics& g)
@@ -19,7 +19,7 @@ void DashboardControllableItemUI::paint(Graphics& g)
 
 void DashboardControllableItemUI::resizedDashboardItemInternal()
 {
-	if(itemUI != nullptr) itemUI->setBounds(getLocalBounds());
+	if (itemUI != nullptr) itemUI->setBounds(getLocalBounds());
 }
 
 ControllableUI* DashboardControllableItemUI::createControllableUI()
@@ -31,8 +31,8 @@ void DashboardControllableItemUI::rebuildUI()
 {
 	if (itemUI != nullptr) removeChildComponent(itemUI.get());
 
-	if (!inspectable.wasObjectDeleted() 
-		&& controllableItem->inspectable != nullptr 
+	if (!inspectable.wasObjectDeleted()
+		&& controllableItem->inspectable != nullptr
 		&& !controllableItem->inspectable.wasObjectDeleted()) itemUI.reset(createControllableUI());
 	else itemUI.reset();
 
@@ -51,7 +51,7 @@ void DashboardControllableItemUI::updateUIParameters()
 	if (inspectable.wasObjectDeleted() || controllableItem->inspectable == nullptr || controllableItem->inspectable.wasObjectDeleted()) return;
 
 	itemUI->showLabel = controllableItem->showLabel->boolValue();
-	itemUI->useCustomTextColor = controllableItem->textColor->enabled; 
+	itemUI->useCustomTextColor = controllableItem->textColor->enabled;
 	itemUI->customTextColor = controllableItem->textColor->getColor();
 
 	itemUI->useCustomContour = controllableItem->contourColor->enabled;
@@ -77,7 +77,12 @@ void DashboardControllableItemUI::updateUIParameters()
 
 void DashboardControllableItemUI::updateEditModeInternal(bool editMode)
 {
-	if(itemUI != nullptr) itemUI->setInterceptsMouseClicks(!editMode, !editMode);
+	if (itemUI != nullptr)
+	{
+		setTooltip((editMode && !controllableItem->controllable.wasObjectDeleted())  ? "Target : " + controllableItem->controllable->getControlAddress() : "");
+		itemUI->setInterceptsMouseClicks(!editMode, !editMode);
+	}
+	else setTooltip("### " + controllableItem->inspectableGhostAddress);
 }
 
 void DashboardControllableItemUI::inspectableChanged()
@@ -90,9 +95,9 @@ void DashboardControllableItemUI::controllableFeedbackUpdateInternal(Controllabl
 {
 	DashboardInspectableItemUI::controllableFeedbackUpdateInternal(c);
 
-	if (c == controllableItem->showLabel 
-		|| c == controllableItem->textColor 
-		|| c == controllableItem->customLabel 
+	if (c == controllableItem->showLabel
+		|| c == controllableItem->textColor
+		|| c == controllableItem->customLabel
 		|| c == controllableItem->customDescription
 		|| c == controllableItem->opaqueBackground
 		|| c == controllableItem->contourColor

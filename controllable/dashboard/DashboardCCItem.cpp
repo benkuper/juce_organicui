@@ -2,6 +2,7 @@ DashboardCCItem::DashboardCCItem(ControllableContainer* container) :
 	DashboardInspectableItem(container),
 	container(container)
 {
+	target->targetType = TargetParameter::CONTAINER;
 	setInspectable(container);
 	ghostInspectable();
 }
@@ -62,6 +63,8 @@ void DashboardCCItem::setInspectableInternal(Inspectable* i)
 	{
 		container->addControllableContainerListener(this);
 	}
+
+	target->setValueFromTarget(container);
 }
 
 void DashboardCCItem::onControllableFeedbackUpdateInternal(ControllableContainer* cc, Controllable* c)

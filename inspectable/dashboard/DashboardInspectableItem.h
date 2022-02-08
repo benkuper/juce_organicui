@@ -10,6 +10,7 @@ public:
 
 	WeakReference<Inspectable> inspectable;
 	String inspectableGhostAddress;
+	TargetParameter* target;
 
 	virtual void clearItem() override;
 

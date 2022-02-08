@@ -3,6 +3,8 @@ DashboardInspectableItem::DashboardInspectableItem(Inspectable* item) :
 	inspectable(nullptr),
 	inspectableItemNotifier(20)
 {
+	target = addTargetParameter("Target", "The target for this dashboard item");
+	target->setControllableFeedbackOnly(true);
 }
 
 DashboardInspectableItem::~DashboardInspectableItem()
