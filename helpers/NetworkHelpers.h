@@ -8,10 +8,15 @@ public:
 		StringArray ips = getLocalIPs();
 		for (auto &ip : ips)
 		{
+			if (ip.startsWith("192.168.0") || ip.startsWith("192.168.1") || ip.startsWith("192.168.2") || ip.startsWith("192.168.3")) return ip;
+		}
+
+		for (auto& ip : ips)
+		{
 			if (ip.startsWith("192.168")) return ip;
 		}
-        
-        return "";	
+
+		return ips.size() > 0 ? ips[0] : "";
 	}
 
 	static bool isIPLocal(const String& tip)
