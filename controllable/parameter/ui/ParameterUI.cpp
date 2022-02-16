@@ -148,8 +148,8 @@ void ParameterUI::paintOverChildren(Graphics& g)
 
 void ParameterUI::handlePaintTimer()
 {
-	if (!shouldRepaint) return;
-	if (!parameter.wasObjectDeleted()) handlePaintTimerInternal();
+	if (!shouldRepaint || parameter.wasObjectDeleted() || !isShowing()) return;
+	handlePaintTimerInternal();
 	shouldRepaint = false;
 }
 
@@ -284,7 +284,7 @@ void ParameterUI::visibilityChanged()
 	if (paintTimerID == -1 || ParameterUITimers::getInstanceWithoutCreating() == nullptr) return;
 
 	if (isVisible()) ParameterUITimers::getInstance()->registerParameter(paintTimerID, this);
-	else ParameterUITimers::getInstance()->registerParameter(paintTimerID, this);
+	else ParameterUITimers::getInstance()->unregisterParameter(paintTimerID, this);
 }
 
 bool ParameterUI::shouldBailOut() {
