@@ -161,6 +161,7 @@ void FloatParameter::loadJSONDataInternal(var data)
 
 var FloatParameter::getCroppedValue(var originalValue)
 {
-	return jlimit<float>(minimumValue, maximumValue, originalValue);
+	float v = isnan((float)originalValue) ? 0 : originalValue;
+	return jlimit<float>(minimumValue, maximumValue, v);
 }
 
