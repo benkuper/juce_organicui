@@ -48,7 +48,6 @@ FloatStepperUI::FloatStepperUI(Array<Parameter*> parameters) :
 
 
 	setSize(200, GlobalSettings::getInstance()->fontSize->floatValue() + 4);
-	startTimerHz(20);
 
 	slider->addListener(this);
 	slider->addMouseListener(this, true);
@@ -56,7 +55,6 @@ FloatStepperUI::FloatStepperUI(Array<Parameter*> parameters) :
 
 FloatStepperUI::~FloatStepperUI()
 {
-	stopTimer();
 }
 
 void FloatStepperUI::paint(Graphics& g)
@@ -134,13 +132,8 @@ void FloatStepperUI::rangeChanged(Parameter*) {
 	slider->setRange((int)parameter->minimumValue, (int)parameter->maximumValue, 1);
 }
 
-void FloatStepperUI::timerCallback()
+void FloatStepperUI::handlePaintTimerInternal()
 {
-	if (!shouldUpdateStepper) return;
-	shouldUpdateStepper = false;
-
-	if (parameter.wasObjectDeleted()) return;
-
 	slider->setValue(parameter->floatValue(), NotificationType::dontSendNotification);
 }
 

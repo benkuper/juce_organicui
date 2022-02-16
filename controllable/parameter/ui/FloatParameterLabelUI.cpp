@@ -9,7 +9,7 @@
 */
 
 FloatParameterLabelUI::FloatParameterLabelUI(Array<Parameter*> parameters) :
-	ParameterUI(parameters),
+	ParameterUI(parameters, PARAMETERUI_SLOW_TIMER),
 	valueLabel(parameters[0]->niceName + "_ValueLabel"),
 	maxFontHeight(GlobalSettings::getInstance()->fontSize->floatValue()),
 	autoSize(false)
@@ -32,14 +32,7 @@ FloatParameterLabelUI::FloatParameterLabelUI(Array<Parameter*> parameters) :
 
 	addMouseListener(this, true);
 
-#if JUCE_MAC
-	startTimerHz(10);
-#else
-	startTimerHz(20);
-#endif
-
-	timerCallback();
-
+	handlePaintTimer(); //force update once
 }
 
 void FloatParameterLabelUI::setAutoSize(bool value)
@@ -163,7 +156,7 @@ String FloatParameterLabelUI::getValueString(const var& val) const
 
 void FloatParameterLabelUI::valueChanged(const var& v)
 {
-	shouldUpdateLabel = true;
+	shouldRepaint = true;
 }
 
 void FloatParameterLabelUI::labelTextChanged(Label*)
@@ -172,11 +165,8 @@ void FloatParameterLabelUI::labelTextChanged(Label*)
 }
 
 
-void FloatParameterLabelUI::timerCallback()
+void FloatParameterLabelUI::handlePaintTimerInternal()
 {
-	if (!shouldUpdateLabel) return;
-	shouldUpdateLabel = false;
-
 	if (parameter.wasObjectDeleted()) return;
 
 	int newStyle = parameter->isOverriden ? Font::bold : Font::plain;
@@ -197,9 +187,7 @@ TimeLabel::TimeLabel(Array<Parameter*> parameters) :
 	showStepsMode(false)
 {
 	valueChanged(parameter->getValue());
-	shouldUpdateLabel = true;
-	timerCallback();
-
+	handlePaintTimer(); //force update once
 }
 
 TimeLabel::~TimeLabel()
@@ -209,7 +197,7 @@ TimeLabel::~TimeLabel()
 void TimeLabel::setShowStepsMode(bool stepsMode)
 {
 	showStepsMode = stepsMode;
-	shouldUpdateLabel = true;
+	shouldRepaint = true;
 }
 
 void TimeLabel::valueChanged(const var& v)
@@ -222,7 +210,7 @@ void TimeLabel::valueChanged(const var& v)
 void TimeLabel::labelTextChanged(Label*)
 {
 	parameter->setValue(showStepsMode ? valueLabel.getText().getFloatValue() / ((FloatParameter*)parameter.get())->unitSteps : StringUtil::timeStringToValue(valueLabel.getText()));
-	shouldUpdateLabel = true;
+	shouldRepaint = true;
 }
 
 String TimeLabel::getValueString(const var& val) const

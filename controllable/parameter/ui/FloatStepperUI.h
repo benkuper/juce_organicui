@@ -12,8 +12,7 @@
 
 class FloatStepperUI : 
 	public ParameterUI, 
-	public Slider::Listener,
-    public Timer
+	public Slider::Listener
 {
 
 public:
@@ -29,7 +28,7 @@ public:
     void resized() override;
 
     void updateUIParamsInternal() override;
-    void timerCallback() override;
+    void handlePaintTimerInternal() override;
     
 protected:
     void valueChanged(const var &) override;

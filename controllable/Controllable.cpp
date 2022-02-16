@@ -152,8 +152,12 @@ void Controllable::updateControlAddress()
 {
 	this->controlAddress = getControlAddress();
 	this->liveScriptObjectIsDirty = true;
-	listeners.call(&Listener::controllableControlAddressChanged, this);
-	queuedNotifier.addMessage(new ControllableEvent(ControllableEvent::CONTROLADDRESS_CHANGED, this));
+
+	if (Engine::mainEngine != nullptr && !Engine::mainEngine->isClearing)
+	{
+		listeners.call(&Listener::controllableControlAddressChanged, this);
+		queuedNotifier.addMessage(new ControllableEvent(ControllableEvent::CONTROLADDRESS_CHANGED, this));
+	}
 }
 
 void Controllable::remove(bool addToUndo)

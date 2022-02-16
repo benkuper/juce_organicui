@@ -40,6 +40,7 @@ OrganicMainContentComponent::~OrganicMainContentComponent()
 
 	//ShapeShifterManager::getInstance()->toggleTemporaryFullContent(nullptr);
 	ShapeShifterManager::deleteInstance();
+	ParameterUITimers::deleteInstance();
 }
 
 void OrganicMainContentComponent::init()

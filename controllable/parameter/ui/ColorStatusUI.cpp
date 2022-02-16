@@ -10,7 +10,7 @@
 
 
 ColorStatusUI::ColorStatusUI(Array<Parameter*> parameters, bool isCircle) :
-	ParameterUI(parameters),
+	ParameterUI(parameters, PARAMETERUI_DEFAULT_TIMER),
 	isCircle(isCircle)
 {
 	setSize(32, 32);
@@ -77,7 +77,7 @@ Colour ColorStatusUI::getCurrentColor() const
 
 void ColorStatusUI::valueChanged(const var&)
 {
-	repaint();
+	shouldRepaint = true;
 }
 
 

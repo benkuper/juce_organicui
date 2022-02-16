@@ -24,7 +24,7 @@ void IntParameterLabelUI::valueChanged(const var& v)
 {
 	if (intParam->hexMode)
 	{
-		shouldUpdateLabel = true;
+		shouldRepaint = true;
 	}
 	else
 	{

@@ -11,8 +11,7 @@
 #pragma once
 
 class FloatSliderUI :
-	public ParameterUI,
-	public Timer
+	public ParameterUI
 {
 
 public:
@@ -38,9 +37,6 @@ public:
     float initValue;
     float initNormalizedValue;
 
-    //drawing checks
-    int updateRate;
-    float shouldRepaint;
     int lastDrawPos;
     String lastValueText;
 
@@ -63,9 +59,6 @@ public:
     virtual void setParamNormalizedValue(float value);
     virtual float getParamNormalizedValue();
     virtual void rangeChanged(Parameter *)override;
-
-    virtual void visibilityChanged() override;
-    virtual void timerCallback() override;
 
 	virtual void focusGained(FocusChangeType cause) override;
 

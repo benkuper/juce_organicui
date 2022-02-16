@@ -10,7 +10,7 @@
 
 
 ColorParameterUI::ColorParameterUI(Array<ColorParameter *> parameters) :
-	ParameterUI(Inspectable::getArrayAs<ColorParameter, Parameter>(parameters)),
+	ParameterUI(Inspectable::getArrayAs<ColorParameter, Parameter>(parameters), PARAMETERUI_DEFAULT_TIMER),
     colorParams(parameters),
 	colorParam(parameters[0]),
     dispatchOnDoubleClick(true),
@@ -94,7 +94,7 @@ void ColorParameterUI::componentBeingDeleted(Component& c)
 
 void ColorParameterUI::valueChanged(const var &)
 {
-	repaint();
+	shouldRepaint = true;
 }
 
 void ColorParameterUI::changeListenerCallback(ChangeBroadcaster * source)

@@ -10,16 +10,25 @@
 
 #pragma once
 
+#define PARAMETERUI_DEFAULT_TIMER 0
+#define PARAMETERUI_SLOW_TIMER 1
+
+
+
 class ParameterUI :
 	public ControllableUI,
 	public Parameter::AsyncListener
 {
 public:
-	ParameterUI(Array<Parameter*> parameter);
+	ParameterUI(Array<Parameter*> parameter, int paintTimerID = -1);
 	virtual ~ParameterUI();
 
 	Array<WeakReference<Parameter>> parameters;
 	WeakReference<Parameter> parameter;
+
+	//painting
+	int paintTimerID;
+	bool shouldRepaint;
 
 	bool setUndoableValueOnMouseUp; //for slidable uis like floatSlider and floatLabelUIs
 	bool showEditWindowOnDoubleClick;
@@ -44,6 +53,9 @@ public:
 	virtual void showEditRangeWindowInternal();
 
 	void paintOverChildren(Graphics& g) override;
+
+	virtual void handlePaintTimer();
+	virtual void handlePaintTimerInternal();
 
 	virtual void addPopupMenuItems(PopupMenu* p) override;
 	virtual void addPopupMenuItemsInternal(PopupMenu*) {}
@@ -76,7 +88,11 @@ public:
 
 	static double textToValue(const String& text);
 
+	WeakReference<ParameterUI>::Master masterReference;
+
 protected:
+
+	virtual void visibilityChanged() override;
 
 	// helper to spot wrong deletion order
 	bool shouldBailOut();
@@ -88,5 +104,21 @@ protected:
 	virtual void controlModeChanged(Parameter*);
 
 	virtual void newMessage(const Parameter::ParameterEvent& e) override;;
+
 };
 
+
+class ParameterUITimers :
+	public MultiTimer
+{
+public:
+	juce_DeclareSingleton(ParameterUITimers, true);
+	ParameterUITimers();
+	~ParameterUITimers() {}
+
+	HashMap<int, Array<WeakReference<ParameterUI>>> paramsTimerMap;
+
+	void registerParameter(int timerID, ParameterUI* ui);
+	void unregisterParameter(int timerID, ParameterUI* ui);
+	void timerCallback(int timerID);
+};

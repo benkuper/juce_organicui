@@ -1,13 +1,7 @@
 P2DUI::P2DUI(Array<Point2DParameter*>parameters) :
-	ParameterUI(Inspectable::getArrayAs<Point2DParameter, Parameter>(parameters)),
+	ParameterUI(Inspectable::getArrayAs<Point2DParameter, Parameter>(parameters), PARAMETERUI_DEFAULT_TIMER),
 	p2ds(parameters),
-	p2d(parameters[0]),
-	shouldRepaint(true),
-#if JUCE_MAC
-	updateRate(15)
-#else
-	updateRate(30)
-#endif
+	p2d(parameters[0])
 {
 	setRepaintsOnMouseActivity(true);
 }
@@ -49,12 +43,6 @@ void P2DUI::mouseUpInternal(const MouseEvent&)
 	mouseDownNormalizedValue = var();
 	setMouseCursor(MouseCursor::NormalCursor);
 	repaint();
-}
-
-void P2DUI::visibilityChanged()
-{
-	if (isVisible()) startTimerHz(updateRate); //30 fps for slider
-	else stopTimer();
 }
 
 void P2DUI::paint(Graphics& g)
@@ -231,14 +219,5 @@ void P2DUI::showEditRangeWindowInternal()
 			newMaxs[i] = nameWindow.getTextEditorContents("maxVal" + String(i)).getFloatValue();
 		}
 		p2d->setBounds(newMins[0], newMins[1], jmax(newMins[0], newMaxs[0]), jmax(newMins[1], newMaxs[1]));
-	}
-}
-
-void P2DUI::timerCallback()
-{
-	if (shouldRepaint)
-	{
-		repaint();
-		shouldRepaint = false;
 	}
 }

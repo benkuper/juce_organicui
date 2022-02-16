@@ -11,8 +11,7 @@
 #pragma once
 
 class BoolToggleUI :
-	public ParameterUI,
-    public Timer
+	public ParameterUI
 {
 public:
     BoolToggleUI(Array<BoolParameter *> parameters, Image onImage = Image(), Image offImage = Image());
@@ -21,7 +20,6 @@ public:
 	Image offImage;
 	Image onImage;
 
-    bool shouldRepaint;
     bool usingCustomImages;
     bool momentaryMode;
 
@@ -32,8 +30,6 @@ public:
     void mouseUpInternal(const MouseEvent &e) override;
 
     virtual void updateUIParamsInternal() override;
-
-    void timerCallback() override;
 
 protected:
     void valueChanged(const var & ) override;

@@ -11,8 +11,7 @@
 #pragma once
 
 class P2DUI :
-	public ParameterUI,
-	public Timer
+	public ParameterUI
 {
 
 public:
@@ -24,16 +23,12 @@ public:
 
 	var mouseDownNormalizedValue;
 	var mouseDownValue;
-	bool shouldRepaint;
-	int updateRate;
 
 	Rectangle<float> canvasRect;
 
 	void mouseDownInternal(const MouseEvent&) override;
 	void mouseDrag(const MouseEvent& e) override;
 	void mouseUpInternal(const MouseEvent&) override;
-
-	void visibilityChanged() override;
 
 	void paint(Graphics& g) override;
 	void resized() override;
@@ -46,8 +41,6 @@ public:
 
 	void showEditWindowInternal() override;
 	void showEditRangeWindowInternal() override;
-
-	virtual void timerCallback() override;
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(P2DUI)

@@ -11,17 +11,11 @@
 
  //==============================================================================
 FloatSliderUI::FloatSliderUI(Array<Parameter*> parameters) :
-	ParameterUI(parameters),
+	ParameterUI(parameters, PARAMETERUI_DEFAULT_TIMER),
 	addToUndoOnMouseUp(true),
 	fixedDecimals(3),
 	initValue(0),
 	initNormalizedValue(0),
-#if JUCE_MAC
-	updateRate(15),
-#else
-	updateRate(30),
-#endif
-	shouldRepaint(true),
 	lastDrawPos(0)
 {
 	assignOnMousePosDirect = false;
@@ -322,25 +316,6 @@ void FloatSliderUI::rangeChanged(Parameter*) {
 	shouldRepaint = true;
 }
 
-void FloatSliderUI::visibilityChanged()
-{
-	if (isVisible())
-	{
-		startTimerHz(updateRate); //30 fps for slider
-	}
-	else
-	{
-		//DBG(parameter->niceName << " stop Timer");
-		stopTimer();
-	}
-}
-
-void FloatSliderUI::timerCallback()
-{
-	if (!shouldRepaint) return;
-	shouldRepaint = false;
-	repaint();
-}
 
 void FloatSliderUI::focusGained(FocusChangeType cause)
 {

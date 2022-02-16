@@ -9,8 +9,7 @@
 */
 
 BoolToggleUI::BoolToggleUI(Array<BoolParameter *> parameters, Image _onImage, Image _offImage) :
-    ParameterUI(Inspectable::getArrayAs<BoolParameter, Parameter>(parameters)),
-	shouldRepaint(false),
+    ParameterUI(Inspectable::getArrayAs<BoolParameter, Parameter>(parameters), PARAMETERUI_DEFAULT_TIMER),
 	momentaryMode(false)
 {
 	usingCustomImages = _onImage.isValid();
@@ -31,13 +30,6 @@ BoolToggleUI::BoolToggleUI(Array<BoolParameter *> parameters, Image _onImage, Im
 
 	setSize(200, GlobalSettings::getInstance()->fontSize->floatValue() + 4);//default size
 
-    
-#if JUCE_MAC
-    startTimerHz(20); //20 fps for slider on mac because of bad UI handling
-#else
-    startTimerHz(30); //30 fps for slider
-#endif
-    
 }
 
 BoolToggleUI::~BoolToggleUI()
@@ -141,14 +133,6 @@ void BoolToggleUI::updateUIParamsInternal()
 void BoolToggleUI::valueChanged(const var & )
 {
     shouldRepaint = true;
-}
-
-void BoolToggleUI::timerCallback()
-{
-    if (!shouldRepaint) return;
-    shouldRepaint = false;
-    repaint();
-    
 }
 
 BoolButtonToggleUI::BoolButtonToggleUI(BoolParameter* parameter) :

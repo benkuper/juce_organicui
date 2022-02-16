@@ -8,16 +8,20 @@
   ==============================================================================
 */
 
+juce_ImplementSingleton(ParameterUITimers)
+
 bool ParameterUI::showAlwaysNotifyOption = true;
 bool ParameterUI::showControlModeOption = true;
 
 int ParameterUI::currentFocusOrderIndex = 0;
 std::function<void(ParameterUI*)> ParameterUI::customShowEditRangeWindowFunction = nullptr;
 
-ParameterUI::ParameterUI(Array<Parameter*> parameters) :
+ParameterUI::ParameterUI(Array<Parameter*> parameters, int paintTimerID) :
 	ControllableUI(Inspectable::getArrayAs<Parameter, Controllable>(parameters)),
 	parameters(Inspectable::getWeakArray(parameters)),
 	parameter(parameters[0]),
+	paintTimerID(paintTimerID),
+	shouldRepaint(false),
 	setUndoableValueOnMouseUp(true),
 	showEditWindowOnDoubleClick(true),
 	showValue(true),
@@ -26,15 +30,24 @@ ParameterUI::ParameterUI(Array<Parameter*> parameters) :
 {
 	parameter->addAsyncCoalescedParameterListener(this);
 
+	if (paintTimerID != -1) ParameterUITimers::getInstance()->registerParameter(paintTimerID, this);
+
 	//setSize(100, 16);
 }
 
 ParameterUI::~ParameterUI()
 {
+	if (paintTimerID != -1 && ParameterUITimers::getInstanceWithoutCreating() != nullptr)
+	{
+		ParameterUITimers::getInstance()->unregisterParameter(paintTimerID, this);
+	}
+
 	if (!parameter.wasObjectDeleted() && parameter != nullptr) {
 		parameter->removeAsyncParameterListener(this);
 		parameter = nullptr;
 	}
+
+	masterReference.clear();
 }
 
 void ParameterUI::showEditWindowInternal()
@@ -133,6 +146,18 @@ void ParameterUI::paintOverChildren(Graphics& g)
 	}
 }
 
+void ParameterUI::handlePaintTimer()
+{
+	if (!shouldRepaint) return;
+	if (!parameter.wasObjectDeleted()) handlePaintTimerInternal();
+	shouldRepaint = false;
+}
+
+void ParameterUI::handlePaintTimerInternal()
+{
+	repaint();
+}
+
 void ParameterUI::addPopupMenuItems(PopupMenu* p)
 {
 	if (parameter.wasObjectDeleted()) return;
@@ -169,8 +194,8 @@ void ParameterUI::addPopupMenuItems(PopupMenu* p)
 				rangeMenu.addItem(-54, "-180 : 180");
 				rangeMenu.addItem(-55, "0 : 360");
 			}
-			
-			p->addSubMenu("Set Range...",rangeMenu);
+
+			p->addSubMenu("Set Range...", rangeMenu);
 			if (parameter->hasRange()) p->addItem(-5, "Clear Range");
 		}
 	}
@@ -254,6 +279,14 @@ double ParameterUI::textToValue(const String& text)
 	return e.evaluate();
 }
 
+void ParameterUI::visibilityChanged()
+{
+	if (paintTimerID == -1 || ParameterUITimers::getInstanceWithoutCreating() == nullptr) return;
+
+	if (isVisible()) ParameterUITimers::getInstance()->registerParameter(paintTimerID, this);
+	else ParameterUITimers::getInstance()->registerParameter(paintTimerID, this);
+}
+
 bool ParameterUI::shouldBailOut() {
 	bool bailOut = parameter.wasObjectDeleted() || parameter == nullptr;
 	// we want a clean deletion no?
@@ -285,8 +318,8 @@ void ParameterUI::newMessage(const Parameter::ParameterEvent& e) {
 		controlModeChanged(e.parameter);
 		repaint();
 		break;
-    default:
-        break;
+	default:
+		break;
 	}
 }
 
@@ -367,7 +400,7 @@ void ParameterUI::ValueEditCalloutComponent::editorHidden(Label* l, TextEditor&)
 	if (b != nullptr)
 	{
 		if (l == labels[labels.size() - 1]) b->dismiss();
-	}
+}
 }
 
 void ParameterUI::ValueEditCalloutComponent::parentHierarchyChanged()
@@ -376,9 +409,53 @@ void ParameterUI::ValueEditCalloutComponent::parentHierarchyChanged()
 	{
 		labels[0]->grabKeyboardFocus();
 #if JUCE_MAC
-        if(getCurrentlyModalComponent() == nullptr) labels[0]->showEditor();
+		if (getCurrentlyModalComponent() == nullptr) labels[0]->showEditor();
 #else
-        labels[0]->showEditor();
+		labels[0]->showEditor();
 #endif
+	}
+}
+
+ParameterUITimers::ParameterUITimers()
+{
+#if JUCE_MAC
+	startTimer(PARAMETERUI_DEFAULT_TIMER, 1000 / 20); //20 fps drawing on mac
+	startTimer(PARAMETERUI_SLOW_TIMER, 1000 / 15); //15 fps drawing on mac
+#else
+	startTimer(PARAMETERUI_DEFAULT_TIMER, 1000 / 30); //30 fps drawing
+	startTimer(PARAMETERUI_SLOW_TIMER, 1000 / 20); //20 fps drawing
+#endif
+
+	paramsTimerMap.set(PARAMETERUI_DEFAULT_TIMER, {});
+	paramsTimerMap.set(PARAMETERUI_SLOW_TIMER, {});
+
+}
+
+void ParameterUITimers::registerParameter(int timerID, ParameterUI* ui)
+{
+	if (paramsTimerMap.contains(timerID)) paramsTimerMap.getReference(timerID).addIfNotAlreadyThere(ui);
+}
+
+void ParameterUITimers::unregisterParameter(int timerID, ParameterUI* ui)
+{
+	if (paramsTimerMap.contains(timerID)) paramsTimerMap.getReference(timerID).removeAllInstancesOf(ui);
+}
+
+void ParameterUITimers::timerCallback(int timerID)
+{
+	if (paramsTimerMap.contains(timerID))
+	{
+		Array<WeakReference<ParameterUI>> params = paramsTimerMap[timerID];
+
+		for (auto& p : params)
+		{
+			if (p.wasObjectDeleted())
+			{
+				jassertfalse;
+				continue;
+			}
+
+			p->handlePaintTimer();
+		}
 	}
 }
