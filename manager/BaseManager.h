@@ -1339,7 +1339,7 @@ bool BaseManager<T>::AddItemsAction::perform()
 	if (!iList.isEmpty()) m->addItems(iList, this->data, false);
 	else if (!this->data.isVoid())
 	{
-		Array<T*> newList = m->addItemsFromData(data, false);
+		Array<T*> newList = m->addItemsFromData(this->data, false);
 		this->itemsRef.clear();
 		for (auto& i : newList) this->itemsRef.add(i);
 	}
