@@ -1337,7 +1337,7 @@ bool BaseManager<T>::AddItemsAction::perform()
 
 	Array<T*> iList = this->getItems();
 	if (!iList.isEmpty()) m->addItems(iList, this->data, false);
-	else if (!data.isVoid())
+	else if (!this->data.isVoid())
 	{
 		Array<T*> newList = m->addItemsFromData(data, false);
 		this->itemsRef.clear();
