@@ -130,10 +130,10 @@ public:
 	virtual void resizedInternalFooter(juce::Rectangle<int>& r);
 
 	virtual void updateItemsVisibility();
-	virtual void updateItemVisibility(U * bui);
+	virtual void updateItemVisibility(U* bui);
 
 	virtual bool hasFiltering();
-	virtual Array<U *> getFilteredItems();
+	virtual Array<U*> getFilteredItems();
 	virtual bool checkFilterForItem(U* item);
 
 	virtual void childBoundsChanged(Component*) override;
@@ -321,7 +321,7 @@ void BaseManagerUI<M, T, U>::setShowAddButton(bool value)
 template<class M, class T, class U>
 void BaseManagerUI<M, T, U>::setShowSearchBar(bool value)
 {
-	if (value) 
+	if (value)
 	{
 		searchBar.reset(new Label("SearchBar"));
 		searchBar->setJustificationType(Justification::topLeft);
@@ -334,7 +334,7 @@ void BaseManagerUI<M, T, U>::setShowSearchBar(bool value)
 		searchBar->addListener(this);
 		addAndMakeVisible(searchBar.get());
 	}
-	else if(searchBar != nullptr)
+	else if (searchBar != nullptr)
 	{
 		removeChildComponent(searchBar.get());
 		searchBar.reset();
@@ -600,7 +600,7 @@ void BaseManagerUI<M, T, U>::updateItemsVisibility()
 }
 
 template<class M, class T, class U>
-void BaseManagerUI<M, T, U>::updateItemVisibility(U * bui)
+void BaseManagerUI<M, T, U>::updateItemVisibility(U* bui)
 {
 	if (!checkFilterForItem(bui)) return;
 
@@ -625,7 +625,7 @@ bool BaseManagerUI<M, T, U>::hasFiltering()
 template<class M, class T, class U>
 Array<U*> BaseManagerUI<M, T, U>::getFilteredItems()
 {
-	if (!this->hasFiltering()) return Array<U *>(this->itemsUI.getRawDataPointer(), this->itemsUI.size());
+	if (!this->hasFiltering()) return Array<U*>(this->itemsUI.getRawDataPointer(), this->itemsUI.size());
 
 	Array<U*> result;
 	for (auto& ui : this->itemsUI) if (checkFilterForItem(ui)) result.add(ui);
@@ -931,25 +931,32 @@ void BaseManagerUI<M, T, U>::itemDropped(const SourceDetails& dragSourceDetails)
 
 	if (defaultLayout == HORIZONTAL || defaultLayout == VERTICAL)
 	{
-		BaseItemMinimalUI<T>* bui = dynamic_cast<BaseItemMinimalUI<T>*>(dragSourceDetails.sourceComponent.get());
-		if (bui != nullptr)
+		if (BaseItemMinimalUI<T>* bui = dynamic_cast<BaseItemMinimalUI<T>*>(dragSourceDetails.sourceComponent.get()))
 		{
-			int droppingIndex = getDropIndexForPosition(dragSourceDetails.localPosition);
-			if (itemsUI.contains((U*)bui))
+			if (T* item = bui->item)
 			{
-				if (itemsUI.indexOf((U*)bui) < droppingIndex) droppingIndex--;
-				if (droppingIndex == -1) droppingIndex = itemsUI.size() - 1;
-				this->manager->setItemIndex(bui->item, droppingIndex);
-			}
-			else
-			{
-				var data = bui->item->getJSONData();
-				T* newItem = manager->addItemFromData(data);
-				if (newItem != nullptr)
+				int droppingIndex = getDropIndexForPosition(dragSourceDetails.localPosition);
+				if (itemsUI.contains((U*)bui))
 				{
+					if (itemsUI.indexOf((U*)bui) < droppingIndex) droppingIndex--;
 					if (droppingIndex == -1) droppingIndex = itemsUI.size() - 1;
-					this->manager->setItemIndex(newItem, droppingIndex);
-					bui->item->remove();
+					this->manager->setItemIndex(item, droppingIndex);
+				}
+				else
+				{
+					var data = item->getJSONData();
+					if (droppingIndex != -1) data.getDynamicObject()->setProperty("index", droppingIndex);
+
+					if (T* newItem = this->manager->createItemFromData(data))
+					{
+						Array<UndoableAction*> actions;
+						actions.add(this->manager->getAddItemUndoableAction(newItem, data));
+						if (BaseManager<T>* sourceManager = dynamic_cast<BaseManager<T> *>(item->parentContainer.get()))
+						{
+							actions.addArray(sourceManager->getRemoveItemUndoableAction(item));
+						}
+						UndoMaster::getInstance()->performActions("Move " + item->niceName, actions);
+					}
 				}
 			}
 		}

@@ -38,6 +38,7 @@ public:
 	float viewZoom;
 
 	virtual T* createItem(); //to override if special constructor to use
+	virtual T* createItemFromData(var data); //to be overriden for specific item creation (from data)
 	virtual T* addItemFromData(var data, bool addToUndo = true); //to be overriden for specific item creation (from data)
 	virtual Array<T*> addItemsFromData(var data, bool addToUndo = true); //to be overriden for specific item creation (from data)
 	virtual Array<T*> addItemsFromClipboard(bool showWarning = true);
@@ -61,7 +62,9 @@ public:
 	void removeItems(Array<T*> items, bool addToUndo = true);
 	T* removeItem(T* item, bool addToUndo = true, bool notify = true, bool returnItem = false);
 
-	virtual void setItemIndex(T* item, int newIndex);
+	virtual void setItemIndex(T* item, int newIndex, bool addToUndo = true);
+	virtual Array<UndoableAction*> getSetItemIndexUndoableAction(T* item, int newIndex);
+
 	virtual void reorderItems(); //to be overriden if needed
 
 
@@ -179,6 +182,19 @@ public:
 		bool undo() override;
 	};
 
+	class MoveItemAction :
+		public ItemBaseAction
+	{
+	public:
+		MoveItemAction(BaseManager* m, T* i, int prevIndex, int newIndex);
+
+		int prevIndex;
+		int newIndex;
+
+		bool perform() override;
+		bool undo() override;
+	};
+
 	//Multi add/remove items actions
 	class ItemsBaseAction :
 		public ManagerBaseAction
@@ -198,6 +214,7 @@ public:
 	public:
 		AddItemsAction(BaseManager* m, Array<T*> iList, var data = var());
 
+		int startIndex;
 		bool perform() override;
 		bool undo() override;
 	};
@@ -303,6 +320,19 @@ T* BaseManager<T>::createItem()
 {
 	if (managerFactory != nullptr && managerFactory->defs.size() == 1) return managerFactory->create(managerFactory->defs[0]);
 	return new T();
+}
+
+template<class T>
+T* BaseManager<T>::createItemFromData(var data)
+{
+	if (managerFactory != nullptr)
+	{
+		String type = data.getProperty("type", "");
+		if (type.isEmpty()) return nullptr;
+		return managerFactory->create(type);
+	}
+	
+	return createItem();
 }
 
 template<class T>
@@ -431,19 +461,9 @@ Array<T*> BaseManager<T>::addItems(Array<T*> itemsToAdd, var data, bool addToUnd
 template<class T>
 T* BaseManager<T>::addItemFromData(var data, bool addToUndo)
 {
-	if (managerFactory != nullptr)
-	{
-		String type = data.getProperty("type", "");
-		if (type.isEmpty()) return nullptr;
-		T* i = managerFactory->create(type);
-		if (i != nullptr) return addItem(i, data, addToUndo);
-	}
-	else
-	{
-		return addItem(createItem(), data, addToUndo);
-	}
-
-	return nullptr;
+	T* item = createItemFromData(data);
+	if (item == nullptr) return nullptr;
+	return addItem(item, data, addToUndo);
 }
 
 template<class T>
@@ -617,8 +637,21 @@ T* BaseManager<T>::removeItem(T* item, bool addToUndo, bool notify, bool returnI
 }
 
 template<class T>
-void BaseManager<T>::setItemIndex(T* item, int newIndex)
+void BaseManager<T>::setItemIndex(T* item, int newIndex, bool addToUndo)
 {
+	if (item == nullptr) return;
+
+	if (addToUndo && !UndoMaster::getInstance()->isPerforming)
+	{
+		if (Engine::mainEngine != nullptr && !Engine::mainEngine->isLoadingFile)
+		{
+			BaseItem* bi = static_cast<BaseItem*>(item);
+			UndoMaster::getInstance()->performActions("Move " + bi->getTypeString(), getSetItemIndexUndoableAction(item, newIndex));
+			return;
+		}
+	}
+
+
 	newIndex = jlimit(0, items.size() - 1, newIndex);
 	int index = items.indexOf(item);
 	if (index == -1 || index == newIndex) return;
@@ -630,6 +663,16 @@ void BaseManager<T>::setItemIndex(T* item, int newIndex)
 
 	baseManagerListeners.call(&BaseManagerListener<T>::itemsReordered);
 	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_REORDERED));
+}
+
+template<class T>
+Array<UndoableAction*> BaseManager<T>::getSetItemIndexUndoableAction(T* item, int newIndex)
+{
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile) return nullptr;
+
+	Array<UndoableAction*> a;
+	a.add(new MoveItemAction(this, item, this->items.indexOf(item), newIndex));
+	return a;
 }
 
 template<class T>
@@ -1106,7 +1149,7 @@ BaseManager<T>::ItemBaseAction::ItemBaseAction(BaseManager* m, T* i, var data) :
 	if (s != nullptr)
 	{
 		this->itemShortName = dynamic_cast<BaseItem*>(s)->shortName;
-		this->itemIndex = m->items.indexOf(s);
+		this->itemIndex = data.getProperty("index", m->items.indexOf(s));
 
 	}
 }
@@ -1167,7 +1210,9 @@ bool BaseManager<T>::AddItemAction::undo()
 }
 
 template<class T>
-BaseManager<T>::RemoveItemAction::RemoveItemAction(BaseManager* m, T* i, var data) : ItemBaseAction(m, i, data) {
+BaseManager<T>::RemoveItemAction::RemoveItemAction(BaseManager* m, T* i, var data) : ItemBaseAction(m, i, data)
+{
+
 }
 
 template<class T>
@@ -1197,10 +1242,52 @@ bool BaseManager<T>::RemoveItemAction::undo()
 	return true;
 }
 
+
+template<class T>
+BaseManager<T>::MoveItemAction::MoveItemAction(BaseManager* m, T* i, int prevIndex, int newIndex) :
+	ItemBaseAction(m, i),
+	prevIndex(prevIndex),
+	newIndex(newIndex)
+{
+
+}
+
+template<class T>
+bool BaseManager<T>::MoveItemAction::perform()
+{
+	BaseManager* m = this->getManager();
+	if (m == nullptr) return false;
+
+	T* item = this->getItem();
+	if (item == nullptr) return false;
+
+	m->setItemIndex(item, newIndex, false);
+	return true;
+}
+
+template<class T>
+bool BaseManager<T>::MoveItemAction::undo()
+{
+	BaseManager* m = this->getManager();
+	if (m == nullptr) return false;
+
+	T* item = this->getItem();
+	if (item == nullptr) return false;
+
+	m->setItemIndex(item, prevIndex, false);
+	return true;
+}
+
+
 template<class T>
 BaseManager<T>::ItemsBaseAction::ItemsBaseAction(BaseManager* m, Array<T*> iList, var data) :
 	ManagerBaseAction(m, data)
 {
+	if (data.isVoid())
+	{
+		std::sort(iList.begin(), iList.end(),
+			[m](const auto& lhs, const auto& rhs) { return m->items.indexOf(lhs) < m->items.indexOf(rhs); });
+	}
 
 	for (auto& i : iList)
 	{
@@ -1238,7 +1325,8 @@ Array<T*> BaseManager<T>::ItemsBaseAction::getItems()
 }
 
 template<class T>
-BaseManager<T>::AddItemsAction::AddItemsAction(BaseManager* m, Array<T*> iList, var data) : ItemsBaseAction(m, iList, data) {
+BaseManager<T>::AddItemsAction::AddItemsAction(BaseManager* m, Array<T*> iList, var data) : ItemsBaseAction(m, iList, data)
+{
 }
 
 template<class T>
@@ -1248,7 +1336,14 @@ bool BaseManager<T>::AddItemsAction::perform()
 	if (m == nullptr) return false;
 
 	Array<T*> iList = this->getItems();
-	m->addItems(iList, this->data, false);
+	if (!iList.isEmpty()) m->addItems(iList, this->data, false);
+	else if (!data.isVoid())
+	{
+		Array<T*> newList = m->addItemsFromData(data, false);
+		this->itemsRef.clear();
+		for (auto& i : newList) this->itemsRef.add(i);
+	}
+
 
 	this->itemsShortName.clear();
 	for (auto& i : iList) this->itemsShortName.add(i != nullptr ? i->shortName : "");
@@ -1258,12 +1353,25 @@ bool BaseManager<T>::AddItemsAction::perform()
 template<class T>
 bool BaseManager<T>::AddItemsAction::undo()
 {
+	BaseManager* m = this->getManager();
+	if (m == nullptr)
+	{
+		this->itemsRef.clear();
+		return false;
+	}
+
 	Array<T*> iList = this->getItems();
 	this->data = var();
-	for (auto& i : iList) if (i != nullptr) this->data.append(i->getJSONData());
-	BaseManager* m = this->getManager();
-	if (m != nullptr) m->removeItems(iList, false);
-	this->itemsRef.clear();
+	for (auto& i : iList)
+	{
+		if (i != nullptr)
+		{
+			var d = i->getJSONData();
+			d.getDynamicObject()->setProperty("index", m->items.indexOf(i));
+			this->data.append(d);
+		}
+	}
+	m->removeItems(iList, false);
 	return true;
 }
 
@@ -1274,12 +1382,26 @@ BaseManager<T>::RemoveItemsAction::RemoveItemsAction(BaseManager* m, Array<T*> i
 template<class T>
 bool BaseManager<T>::RemoveItemsAction::perform()
 {
+	BaseManager* m = this->getManager();
+	if (m == nullptr)
+	{
+		this->itemsRef.clear();
+		return false;
+	}
+
 	Array<T*> iList = this->getItems();
 	this->data = var();
-	for (auto& i : iList) if (i != nullptr) this->data.append(i->getJSONData());
-	BaseManager* m = this->getManager();
-	if (m != nullptr) m->removeItems(iList, false);
-	this->itemsRef.clear();
+	for (auto& i : iList)
+	{
+		if (i != nullptr)
+		{
+			var d = i->getJSONData();
+			d.getDynamicObject()->setProperty("index", m->items.indexOf(i));
+			this->data.append(d);
+		}
+	}
+
+	m->removeItems(iList, false);
 	return true;
 }
 
