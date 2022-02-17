@@ -68,9 +68,13 @@ AutomationKey* Automation::addKey(const float& _position, const float& _value, b
 {
 	AutomationKey* key = new AutomationKey(_position, _value);
 	var params = new DynamicObject();
-	if (items.size() > 0 && items[0]->position->floatValue() > _position) params.getDynamicObject()->setProperty("index", 0);
-	else if (AutomationKey* k = getKeyForPosition(_position)) params.getDynamicObject()->setProperty("index", items.indexOf(k) + 1);
+	int index = 0;
+	if (items.size() > 0 && items[0]->position->floatValue() > _position) index = 0;
+	else if (AutomationKey* k = getKeyForPosition(_position)) index = items.indexOf(k) + 1;
+	params.getDynamicObject()->setProperty("index", index);
+
 	return addItem(key, params, addToUndo);
+
 }
 
 void Automation::addKeys(const Array<AutomationKey*>& keys, bool addToUndo, bool removeExistingKeys)
