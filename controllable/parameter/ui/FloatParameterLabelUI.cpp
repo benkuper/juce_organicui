@@ -133,7 +133,7 @@ void FloatParameterLabelUI::mouseUpInternal(const MouseEvent& e)
 
 void FloatParameterLabelUI::updateUIParamsInternal()
 {
-	valueLabel.setEditable(false, isInteractable(), false, true);
+	valueLabel.setEditable(false, isInteractable());
 	valueLabel.setEnabled(isInteractable());
 
 	valueLabel.setJustificationType(Justification::centred);

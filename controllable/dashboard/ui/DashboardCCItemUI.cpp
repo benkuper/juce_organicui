@@ -5,7 +5,7 @@ DashboardCCItemUI::DashboardCCItemUI(DashboardCCItem* ccItem) :
 	itemUI(nullptr)
 {
 	vp.setScrollBarsShown(true, false);
-	vp.setScrollOnDragEnabled(false);
+	vp.setScrollOnDragMode(Viewport::ScrollOnDragMode::never);
 	vp.setScrollBarThickness(10);
 	addAndMakeVisible(vp);
 

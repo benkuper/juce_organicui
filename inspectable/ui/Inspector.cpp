@@ -20,7 +20,7 @@ Inspector::Inspector(InspectableSelectionManager* _selectionManager) :
 	setSelectionManager(_selectionManager);
 
 	vp.setScrollBarsShown(true, false);
-	vp.setScrollOnDragEnabled(false);
+	vp.setScrollOnDragMode(Viewport::ScrollOnDragMode::never);
 	vp.setScrollBarThickness(10);
 	addAndMakeVisible(vp);
 
