@@ -21,7 +21,6 @@ public:
 
     std::unique_ptr<BetterStepper> slider;
 
-    bool shouldUpdateStepper;
     float valueAtDragStart;
     
 	void paint(Graphics& g) override;

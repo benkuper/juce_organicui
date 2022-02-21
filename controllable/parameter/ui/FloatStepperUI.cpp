@@ -9,7 +9,7 @@
 */
 
 FloatStepperUI::FloatStepperUI(Array<Parameter*> parameters) :
-	ParameterUI(parameters),
+	ParameterUI(parameters, PARAMETERUI_DEFAULT_TIMER),
 	valueAtDragStart(parameters[0]->floatValue())
 {
 	showEditWindowOnDoubleClick = false;
@@ -107,7 +107,7 @@ void FloatStepperUI::updateUIParamsInternal()
 void FloatStepperUI::valueChanged(const var& value)
 {
 	if ((float)value == slider->getValue()) return;
-	shouldUpdateStepper = true;
+	shouldRepaint = true;
 }
 
 void FloatStepperUI::sliderValueChanged(Slider* _slider)
