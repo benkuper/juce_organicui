@@ -168,7 +168,7 @@ void OSCRemoteControl::processMessage(const OSCMessage& m, const String& sourceI
 		{
 			File f = File::getSpecialLocation(File::userDocumentsDirectory).getNonexistentChildFile(getApp().getApplicationName() + "/" + m[0].getString(), Engine::mainEngine->fileExtension, true);
 
-			Engine::mainEngine->saveAsAsync(f, false, false, false, false);
+			Engine::mainEngine->saveAsAsync(f, false, false, false, [](int result) {});
 		}
 		else
 		{
@@ -176,7 +176,7 @@ void OSCRemoteControl::processMessage(const OSCMessage& m, const String& sourceI
 			else
 			{
 				File f = File::getSpecialLocation(File::userDocumentsDirectory).getNonexistentChildFile(getApp().getApplicationName() + "/default", Engine::mainEngine->fileExtension, true);
-				Engine::mainEngine->saveAsAsync(f, false, false, false, nullptr);
+				Engine::mainEngine->saveAsAsync(f, false, false, false, [](int result) {});
 			}
 		}
 	}
