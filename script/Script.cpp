@@ -99,28 +99,27 @@ void Script::setParamsContainer(ControllableContainer* cc)
 void Script::chooseFileScript()
 {
 	FileChooser chooser("Create or load a cacahuete", File::getCurrentWorkingDirectory(), "*.js");
-	bool result = chooser.browseForFileToSave(false);
-
-	if (result)
-	{
-		File f = chooser.getResult();
-		if (!f.exists())
+	chooser.launchAsync(FileBrowserComponent::FileChooserFlags::saveMode, [this](const FileChooser& fc)
 		{
-			f.create();
-
-			if (scriptTemplate != nullptr && scriptTemplate->isNotEmpty())
+			File f = fc.getResult();
+			if (!f.exists())
 			{
-				FileOutputStream fos(f);
-				if (fos.openedOk())
+				f.create();
+
+				if (scriptTemplate != nullptr && scriptTemplate->isNotEmpty())
 				{
-					fos.writeText(*scriptTemplate, false, false, "\n");
-					fos.flush();
+					FileOutputStream fos(f);
+					if (fos.openedOk())
+					{
+						fos.writeText(*scriptTemplate, false, false, "\n");
+						fos.flush();
+					}
 				}
 			}
-		}
 
-		filePath->setValue(chooser.getResult().getFullPathName());
-	}
+			filePath->setValue(fc.getResult().getFullPathName());
+		}
+	);
 }
 
 void Script::loadScript()

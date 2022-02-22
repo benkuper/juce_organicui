@@ -11,7 +11,7 @@
 
 //CONTROLLABLE
 
-ControllableChooserPopupMenu::ControllableChooserPopupMenu(ControllableContainer * rootContainer, int _indexOffset, int _maxDefaultSearchLevel, const StringArray & typesFilter, const StringArray& excludeTypesFilter, std::function<bool(Controllable *)> filterFunc) :
+ControllableChooserPopupMenu::ControllableChooserPopupMenu(ControllableContainer* rootContainer, int _indexOffset, int _maxDefaultSearchLevel, const StringArray& typesFilter, const StringArray& excludeTypesFilter, std::function<bool(Controllable*)> filterFunc) :
 	indexOffset(_indexOffset),
 	maxDefaultSearchLevel(_maxDefaultSearchLevel),
 	typesFilter(typesFilter),
@@ -29,7 +29,7 @@ ControllableChooserPopupMenu::~ControllableChooserPopupMenu()
 {
 }
 
-void ControllableChooserPopupMenu::populateMenu(PopupMenu * subMenu, ControllableContainer * container, int &currentId, int currentLevel)
+void ControllableChooserPopupMenu::populateMenu(PopupMenu* subMenu, ControllableContainer* container, int& currentId, int currentLevel)
 {
 	if (container == nullptr)
 	{
@@ -39,7 +39,7 @@ void ControllableChooserPopupMenu::populateMenu(PopupMenu * subMenu, Controllabl
 
 	if (maxDefaultSearchLevel == -1 || currentLevel < maxDefaultSearchLevel)
 	{
-		for (auto &cc : container->controllableContainers)
+		for (auto& cc : container->controllableContainers)
 		{
 			if (cc.wasObjectDeleted() || cc == nullptr)
 			{
@@ -56,7 +56,7 @@ void ControllableChooserPopupMenu::populateMenu(PopupMenu * subMenu, Controllabl
 		subMenu->addSeparator();
 	}
 
-	for (auto &c : container->controllables)
+	for (auto& c : container->controllables)
 	{
 		if (c == nullptr) continue;
 
@@ -71,13 +71,15 @@ void ControllableChooserPopupMenu::populateMenu(PopupMenu * subMenu, Controllabl
 
 }
 
-Controllable * ControllableChooserPopupMenu::showAndGetControllable()
+void ControllableChooserPopupMenu::showAndGetControllable(std::function<void(Controllable*)> returnFunc)
 {
-	int result = show();
-	return getControllableForResult(result);
+	showMenuAsync(PopupMenu::Options(), [this, returnFunc](int result) {
+		if (Controllable* c = this->getControllableForResult(result)) returnFunc(c);
+		}
+	);
 }
 
-Controllable * ControllableChooserPopupMenu::getControllableForResult(int result)
+Controllable* ControllableChooserPopupMenu::getControllableForResult(int result)
 {
 	if (result <= indexOffset || (result - 1 - indexOffset) >= controllableList.size()) return nullptr;
 	return controllableList[result - 1 - indexOffset];
@@ -86,7 +88,7 @@ Controllable * ControllableChooserPopupMenu::getControllableForResult(int result
 //CONTAINER
 
 
-ContainerChooserPopupMenu::ContainerChooserPopupMenu(ControllableContainer * rootContainer, int indexOffset, int maxSearchLevel, std::function<bool(ControllableContainer*)> typeCheckFunc, bool allowSelectAtAnyLevel) :
+ContainerChooserPopupMenu::ContainerChooserPopupMenu(ControllableContainer* rootContainer, int indexOffset, int maxSearchLevel, std::function<bool(ControllableContainer*)> typeCheckFunc, bool allowSelectAtAnyLevel) :
 	indexOffset(indexOffset),
 	maxDefaultSearchLevel(maxSearchLevel),
 	typeCheckFunc(typeCheckFunc),
@@ -104,15 +106,15 @@ ContainerChooserPopupMenu::~ContainerChooserPopupMenu()
 
 }
 
-void ContainerChooserPopupMenu::populateMenu(PopupMenu * subMenu, ControllableContainer * container, int & currentId, int currentLevel)
+void ContainerChooserPopupMenu::populateMenu(PopupMenu* subMenu, ControllableContainer* container, int& currentId, int currentLevel)
 {
-	for (auto &cc : container->controllableContainers)
+	for (auto& cc : container->controllableContainers)
 	{
 		bool isATarget = false;
 		bool lastLevel = currentLevel == maxDefaultSearchLevel || cc->controllableContainers.size() == 0;
 
 		if (typeCheckFunc != nullptr) isATarget = typeCheckFunc(cc);
-		else if(lastLevel) isATarget = true;
+		else if (lastLevel) isATarget = true;
 
 		if (isATarget)
 		{
@@ -128,31 +130,35 @@ void ContainerChooserPopupMenu::populateMenu(PopupMenu * subMenu, ControllableCo
 			}
 			else
 			{*/
-				PopupMenu p;
-				
-				if (allowSelectAtAnyLevel)
-				{
-					containerList.add(cc);
-					p.addItem(currentId, "Select");
-					currentId++;
-					p.addSeparator();
-				}
-				
-				populateMenu(&p, cc, currentId, currentLevel + 1);
-				if (typeCheckFunc == nullptr || p.containsAnyActiveItems()) subMenu->addSubMenu(cc->niceName, p);
+			PopupMenu p;
+
+			if (allowSelectAtAnyLevel)
+			{
+				containerList.add(cc);
+				p.addItem(currentId, "Select");
+				currentId++;
+				p.addSeparator();
+			}
+
+			populateMenu(&p, cc, currentId, currentLevel + 1);
+			if (typeCheckFunc == nullptr || p.containsAnyActiveItems()) subMenu->addSubMenu(cc->niceName, p);
 			//}
 
 		}
 	}
 }
 
-ControllableContainer * ContainerChooserPopupMenu::showAndGetContainer()
+void ContainerChooserPopupMenu::showAndGetContainer(std::function<void(ControllableContainer*)> returnFunc)
 {
-	int result = show();
-	return getContainerForResult(result);
+	showMenuAsync(PopupMenu::Options(), [this, returnFunc](int result)
+		{
+			if (ControllableContainer* cc = getContainerForResult(result)) returnFunc(cc);
+		}
+	);
+
 }
 
-ControllableContainer * ContainerChooserPopupMenu::getContainerForResult(int result)
+ControllableContainer* ContainerChooserPopupMenu::getContainerForResult(int result)
 {
 	if (result <= indexOffset || (result - 1 - indexOffset) >= containerList.size()) return nullptr;
 	return containerList[result - 1 - indexOffset];
@@ -162,7 +168,7 @@ ControllableContainer * ContainerChooserPopupMenu::getContainerForResult(int res
 
 //Other helpers
 
-int ControllableComparator::compareElements(Controllable * c1, Controllable * c2)
+int ControllableComparator::compareElements(Controllable* c1, Controllable* c2)
 {
 	return c1->niceName.compareIgnoreCase(c2->niceName);
 }

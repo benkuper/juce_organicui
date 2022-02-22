@@ -155,17 +155,18 @@ void DashboardItemManagerUI::showMenuAndAddItem(bool fromAddButton, Point<int> m
 	manager->managerFactory->buildPopupMenu();
 	menu.addSubMenu("Add Item", manager->managerFactory->getMenu());
 
-	if (int result = menu.show())
-	{
-		Point<float> p = getViewPos(mousePos);
-		if (result == -1) manager->addItem(new DashboardGroupItem(), p);
-		else if (result == -2) manager->addItem(new DashboardCommentItem(), p);
+	menu.showMenuAsync(PopupMenu::Options(), [this, mousePos](int result)
+		{
+			Point<float> p = getViewPos(mousePos);
+			if (result == -1) manager->addItem(new DashboardGroupItem(), p);
+			else if (result == -2) manager->addItem(new DashboardCommentItem(), p);
 #if ORGANICUI_USE_SHAREDTEXTURE
-		else if (result == -3) manager->addItem(new SharedTextureDashboardItem(), p);
+			else if (result == -3) manager->addItem(new SharedTextureDashboardItem(), p);
 #endif
-		else if (result < -1000) customHandleMenuResultFunc(result, -5000, this, p);
-		else manager->addItem(manager->managerFactory->createFromMenuResult(result), p);
-	}
+			else if (result < -1000) customHandleMenuResultFunc(result, -5000, this, p);
+			else manager->addItem(manager->managerFactory->createFromMenuResult(result), p);
+		}
+	);
 }
 
 BaseItemMinimalUI<DashboardItem>* DashboardItemManagerUI::createUIForItem(DashboardItem* item)

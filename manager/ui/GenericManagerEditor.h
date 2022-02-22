@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    GenericManagerEditor.h
-    Created: 19 Dec 2016 4:29:28pm
-    Author:  Ben
+	GenericManagerEditor.h
+	Created: 19 Dec 2016 4:29:28pm
+	Author:  Ben
 
   ==============================================================================
 */
@@ -19,10 +19,10 @@ class GenericManagerEditor :
 	public BaseManager<T>::AsyncListener
 {
 public:
-	GenericManagerEditor(BaseManager<T> * manager, bool isRoot);
+	GenericManagerEditor(BaseManager<T>* manager, bool isRoot);
 	virtual ~GenericManagerEditor();
 
-	BaseManager<T> * manager;
+	BaseManager<T>* manager;
 
 	String noItemText;
 
@@ -33,32 +33,32 @@ public:
 	void resetAndBuild() override;
 	void addExistingItems();
 
-	
+
 	//menu
 	std::unique_ptr<ImageButton> addItemBT;
 	String addItemText;
 
-	void paint(Graphics &g) override;
-	virtual void resizedInternalHeader(juce::Rectangle<int> &r) override;
+	void paint(Graphics& g) override;
+	virtual void resizedInternalHeader(juce::Rectangle<int>& r) override;
 
-	virtual void addPopupMenuItems(PopupMenu * p) override;
+	virtual void addPopupMenuItems(PopupMenu* p) override;
 	virtual void handleMenuSelectedID(int id) override;
 
 	virtual void showMenuAndAddItem(bool isFromAddButton);
-	virtual T * addItemFromMenu(bool isFromAddButton);
+	virtual T* addItemFromMenu(bool isFromAddButton);
 
-	void buttonClicked(Button *) override;
+	void buttonClicked(Button*) override;
 
-	void newMessage(const typename BaseManager<T>::ManagerEvent &e) override;
+	void newMessage(const typename BaseManager<T>::ManagerEvent& e) override;
 
-	virtual void itemAddedAsync(T * item) {}
-	virtual void itemRemovedAsync(T * item) {}
+	virtual void itemAddedAsync(T* item) {}
+	virtual void itemRemovedAsync(T* item) {}
 };
 
 
 
 template<class T>
-GenericManagerEditor<T>::GenericManagerEditor(BaseManager<T> * _manager, bool isRoot) :
+GenericManagerEditor<T>::GenericManagerEditor(BaseManager<T>* _manager, bool isRoot) :
 	EnablingControllableContainerEditor(_manager, isRoot, false),
 	manager(_manager),
 	addItemText("Add item")
@@ -73,7 +73,7 @@ GenericManagerEditor<T>::GenericManagerEditor(BaseManager<T> * _manager, bool is
 		addAndMakeVisible(addItemBT.get());
 		addItemBT->addListener(this);
 	}
-	
+
 	manager->addAsyncManagerListener(this);
 
 	resetAndBuild();
@@ -82,16 +82,16 @@ GenericManagerEditor<T>::GenericManagerEditor(BaseManager<T> * _manager, bool is
 template<class T>
 GenericManagerEditor<T>::~GenericManagerEditor()
 {
-	if(!inspectable.wasObjectDeleted()) manager->removeAsyncManagerListener(this);
+	if (!inspectable.wasObjectDeleted()) manager->removeAsyncManagerListener(this);
 }
 
 template<class T>
 void GenericManagerEditor<T>::resetAndBuild()
 {
-	GenericControllableContainerEditor::resetAndBuild(); 
+	GenericControllableContainerEditor::resetAndBuild();
 	resized();
 
-	for (auto &e : childEditors)
+	for (auto& e : childEditors)
 	{
 		if (e == nullptr)
 		{
@@ -99,10 +99,10 @@ void GenericManagerEditor<T>::resetAndBuild()
 			continue;
 		}
 
-		BaseItemEditor * be = dynamic_cast<BaseItemEditor *>(e);
+		BaseItemEditor* be = dynamic_cast<BaseItemEditor*>(e);
 		if (be == nullptr) continue;
-		
-		int index = manager->items.indexOf(static_cast<T *>(be->item));
+
+		int index = manager->items.indexOf(static_cast<T*>(be->item));
 		be->setIsFirst(index == 0);
 		be->setIsLast(index == manager->items.size() - 1);
 	}
@@ -115,7 +115,7 @@ void GenericManagerEditor<T>::addExistingItems()
 }
 
 template<class T>
-void GenericManagerEditor<T>::paint(Graphics & g)
+void GenericManagerEditor<T>::paint(Graphics& g)
 {
 	GenericControllableContainerEditor::paint(g);
 
@@ -140,9 +140,9 @@ void GenericManagerEditor<T>::resizedInternalHeader(juce::Rectangle<int>& r)
 }
 
 template<class T>
-void GenericManagerEditor<T>::addPopupMenuItems(PopupMenu * p)
+void GenericManagerEditor<T>::addPopupMenuItems(PopupMenu* p)
 {
-	if (manager->managerFactory != nullptr) p->addSubMenu("Add...",manager->managerFactory->getMenu());
+	if (manager->managerFactory != nullptr) p->addSubMenu("Add...", manager->managerFactory->getMenu());
 	else p->addItem(1, addItemText);
 }
 
@@ -151,12 +151,12 @@ void GenericManagerEditor<T>::handleMenuSelectedID(int id)
 {
 	if (manager->managerFactory != nullptr)
 	{
-		T * item = manager->managerFactory->createFromMenuResult(id);
+		T* item = manager->managerFactory->createFromMenuResult(id);
 		if (item != nullptr) manager->addItem(item);
 	}
 	else
 	{
-		if(id == 1) addItemFromMenu(true);
+		if (id == 1) addItemFromMenu(true);
 	}
 }
 
@@ -165,12 +165,16 @@ void GenericManagerEditor<T>::showMenuAndAddItem(bool isFromAddButton)
 {
 	if (manager->managerFactory != nullptr)
 	{
-		T * item = manager->managerFactory->showCreateMenu();
-		if (item != nullptr)
-		{
-			manager->addItem(item);
-		}
-	} else
+		manager->managerFactory->showCreateMenu([this](T* item)
+			{
+				if (item != nullptr)
+				{
+					this->manager->addItem(item);
+				}
+			}
+		);
+	}
+	else
 	{
 		if (isFromAddButton)
 		{
@@ -181,27 +185,30 @@ void GenericManagerEditor<T>::showMenuAndAddItem(bool isFromAddButton)
 		PopupMenu p;
 		p.addItem(1, addItemText);
 
-		int result = p.show();
-		switch (result)
-		{
-		case 1:
-			addItemFromMenu(isFromAddButton);
-			break;
-		}
+		p.showMenuAsync(PopupMenu::Options(), [this, isFromAddButton](int result)
+			{
+				switch (result)
+				{
+				case 1:
+					this->addItemFromMenu(isFromAddButton);
+					break;
+				}
+			}
+		);
 	}
 
-	
+
 }
 
 template<class T>
-T * GenericManagerEditor<T>::addItemFromMenu(bool /*isFromAddButton*/)
+T* GenericManagerEditor<T>::addItemFromMenu(bool /*isFromAddButton*/)
 {
-	T * item = manager->BaseManager<T>::addItem();
+	T* item = manager->BaseManager<T>::addItem();
 	return item;
 }
 
 template<class T>
-void GenericManagerEditor<T>::buttonClicked(Button * b)
+void GenericManagerEditor<T>::buttonClicked(Button* b)
 {
 	GenericControllableContainerEditor::buttonClicked(b);
 
@@ -209,11 +216,11 @@ void GenericManagerEditor<T>::buttonClicked(Button * b)
 	{
 		showMenuAndAddItem(true);
 	}
-} 
+}
 
 
 template<class T>
-void GenericManagerEditor<T>::newMessage(const typename BaseManager<T>::ManagerEvent & e)
+void GenericManagerEditor<T>::newMessage(const typename BaseManager<T>::ManagerEvent& e)
 {
 	switch (e.type)
 	{

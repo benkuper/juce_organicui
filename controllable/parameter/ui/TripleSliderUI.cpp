@@ -139,14 +139,17 @@ void TripleSliderUI::showEditWindowInternal()
 	nameWindow.addButton("OK", 1, KeyPress(KeyPress::returnKey));
 	nameWindow.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
 
-	int result = nameWindow.runModalLoop();
+	nameWindow.showAsync(MessageBoxOptions(), [this, &nameWindow](int result)
+		{
 
-	if (result)
-	{
-		float newVals[3];
-		for (int i = 0; i < 3; ++i) newVals[i] = nameWindow.getTextEditorContents("val" + String(i)).getFloatValue();
-		p3d->setUndoableVector(p3d->x, p3d->y, p3d->z, newVals[0], newVals[1], newVals[2]);
-	}
+			if (result)
+			{
+				float newVals[3];
+				for (int i = 0; i < 3; ++i) newVals[i] = nameWindow.getTextEditorContents("val" + String(i)).getFloatValue();
+				p3d->setUndoableVector(p3d->x, p3d->y, p3d->z, newVals[0], newVals[1], newVals[2]);
+			}
+		}
+	);
 }
 
 void TripleSliderUI::showEditRangeWindowInternal()
@@ -166,19 +169,22 @@ void TripleSliderUI::showEditRangeWindowInternal()
 	nameWindow.addButton("OK", 1, KeyPress(KeyPress::returnKey));
 	nameWindow.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
 
-	int result = nameWindow.runModalLoop();
-
-	if (result)
-	{
-		float newMins[3];
-		float newMaxs[3];
-		for (int i = 0; i < 3; ++i)
+	nameWindow.showAsync(MessageBoxOptions(), [this, &nameWindow](int result)
 		{
-			newMins[i] = nameWindow.getTextEditorContents("minVal" + String(i)).getFloatValue();
-			newMaxs[i] = nameWindow.getTextEditorContents("maxVal" + String(i)).getFloatValue();
+
+			if (result)
+			{
+				float newMins[3];
+				float newMaxs[3];
+				for (int i = 0; i < 3; ++i)
+				{
+					newMins[i] = nameWindow.getTextEditorContents("minVal" + String(i)).getFloatValue();
+					newMaxs[i] = nameWindow.getTextEditorContents("maxVal" + String(i)).getFloatValue();
+				}
+				p3d->setBounds(newMins[0], newMins[1], newMins[2], jmax(newMins[0], newMaxs[0]), jmax(newMins[1], newMaxs[1]), jmax(newMins[2], newMaxs[2]));
+			}
 		}
-		p3d->setBounds(newMins[0], newMins[1], newMins[2], jmax(newMins[0], newMaxs[0]), jmax(newMins[1], newMaxs[1]), jmax(newMins[2], newMaxs[2]));
-	}
+	);
 }
 
 

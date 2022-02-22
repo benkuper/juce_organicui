@@ -292,18 +292,20 @@ void CustomLoggerUI::mouseDown(const MouseEvent& me) {
 		p.addItem(1, "Copy this line (Content only)");
 		p.addItem(2, "Copy this line (All)");
 
-		int result = p.show();
+		p.showMenuAsync(PopupMenu::Options(), [this, rowUnderMouse](int result)
+			{
+				switch (result)
+				{
+				case 1:
+					SystemClipboard::copyTextToClipboard(logList.getTextAt(rowUnderMouse, 3));
+					break;
 
-		switch (result)
-		{
-		case 1:
-			SystemClipboard::copyTextToClipboard(logList.getTextAt(rowUnderMouse, 3));
-			break;
-
-		case 2:
-			SystemClipboard::copyTextToClipboard(logList.getTextAt(rowUnderMouse, 1) + "\t" + logList.getTextAt(rowUnderMouse, 2) + "\t" + logList.getTextAt(rowUnderMouse, 3));
-			break;
-		}
+				case 2:
+					SystemClipboard::copyTextToClipboard(logList.getTextAt(rowUnderMouse, 1) + "\t" + logList.getTextAt(rowUnderMouse, 2) + "\t" + logList.getTextAt(rowUnderMouse, 3));
+					break;
+				}
+			}
+		);
 	}
 };
 

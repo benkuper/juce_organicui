@@ -212,83 +212,84 @@ void ControllableUI::showContextMenu()
 
 	if (p->getNumItems() == 0) return;
 
-	int result = p->show();
-
-	if (result != 0)
-	{
-		if (controllable == nullptr || controllable.wasObjectDeleted()) return; //in cas it has been deleted while menu was out...
-
-		switch (result)
+	p->showMenuAsync(PopupMenu::Options(), [this](int result)
 		{
-		case -1:
-			SystemClipboard::copyTextToClipboard(controllable->controlAddress);
-			break;
-		case -2:
-			SystemClipboard::copyTextToClipboard("root" + controllable->controlAddress.replaceCharacter('/', '.'));
-			break;
+			if (result == 0) return;
 
-		case -3:
-			showEditWindow();
-			break;
+			if (controllable == nullptr || controllable.wasObjectDeleted()) return; //in cas it has been deleted while menu was out...
 
-		case -10:
-			Detective::getInstance()->watchControllable(controllable);
-			break;
-
-		case -11:
-		{
-			bool tVal = !controllable->isControllableFeedbackOnly;
-			for (auto& c : controllables) c->setControllableFeedbackOnly(tVal);
-		}
-		break;
-
-		case -12:
-		{
-
-			bool tVal = !controllable->enabled;
-			for (auto& c : controllables) c->setEnabled(tVal);
-		}
-		break;
-
-		case 9999:
-		{
-			Dashboard* d = new Dashboard();
-			d->itemManager.addItem(controllable->createDashboardItem());
-			DashboardManager::getInstance()->addItem(d);
-		}
-		break;
-
-		case 19999:
-		{
-			Parrot* pa = new Parrot();
-			pa->addTarget(controllable);
-			ParrotManager::getInstance()->addItem(pa);
-		}
-		break;
-
-		default:
-			if (result >= 10000 && result <= 10100)
+			switch (result)
 			{
-				DashboardManager::getInstance()->items[result - 10000]->itemManager.addItem(controllable->createDashboardItem());
-			}
-			else if (result >= 20000 && result <= 20100)
+			case -1:
+				SystemClipboard::copyTextToClipboard(controllable->controlAddress);
+				break;
+			case -2:
+				SystemClipboard::copyTextToClipboard("root" + controllable->controlAddress.replaceCharacter('/', '.'));
+				break;
+
+			case -3:
+				showEditWindow();
+				break;
+
+			case -10:
+				Detective::getInstance()->watchControllable(controllable);
+				break;
+
+			case -11:
 			{
-				Parrot* pa = ParrotManager::getInstance()->items[result - 20000];
-				bool isInParrot = pa->getTargetForControllable(controllable) != nullptr;
-				if (isInParrot) pa->removeTargetForControllable(controllable);
-				else pa->addTarget(controllable);
+				bool tVal = !controllable->isControllableFeedbackOnly;
+				for (auto& c : controllables) c->setControllableFeedbackOnly(tVal);
 			}
-			else if (ControllableUI::handleCustomContextMenuResultFunc != nullptr)
+			break;
+
+			case -12:
 			{
-				bool handled = ControllableUI::handleCustomContextMenuResultFunc(this, result);
-				if (!handled) handleMenuSelectedID(result);
+
+				bool tVal = !controllable->enabled;
+				for (auto& c : controllables) c->setEnabled(tVal);
 			}
-			else
+			break;
+
+			case 9999:
 			{
-				handleMenuSelectedID(result);
+				Dashboard* d = new Dashboard();
+				d->itemManager.addItem(controllable->createDashboardItem());
+				DashboardManager::getInstance()->addItem(d);
+			}
+			break;
+
+			case 19999:
+			{
+				Parrot* pa = new Parrot();
+				pa->addTarget(controllable);
+				ParrotManager::getInstance()->addItem(pa);
+			}
+			break;
+
+			default:
+				if (result >= 10000 && result <= 10100)
+				{
+					DashboardManager::getInstance()->items[result - 10000]->itemManager.addItem(controllable->createDashboardItem());
+				}
+				else if (result >= 20000 && result <= 20100)
+				{
+					Parrot* pa = ParrotManager::getInstance()->items[result - 20000];
+					bool isInParrot = pa->getTargetForControllable(controllable) != nullptr;
+					if (isInParrot) pa->removeTargetForControllable(controllable);
+					else pa->addTarget(controllable);
+				}
+				else if (ControllableUI::handleCustomContextMenuResultFunc != nullptr)
+				{
+					bool handled = ControllableUI::handleCustomContextMenuResultFunc(this, result);
+					if (!handled) handleMenuSelectedID(result);
+				}
+				else
+				{
+					handleMenuSelectedID(result);
+				}
 			}
 		}
-	}
+	);
 }
 
 void ControllableUI::updateUIParams()

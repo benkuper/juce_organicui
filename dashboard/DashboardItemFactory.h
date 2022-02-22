@@ -23,6 +23,6 @@ public:
 	Array<DashboardItemProvider *> specialProviders;
 
 	void buildPopupMenu() override;
-	DashboardItem * showCreateMenu() override;
+	void showCreateMenu(std::function<void(DashboardItem *)> returnFunc) override;
 	DashboardItem * createFromMenuResult(int result) override;
 };

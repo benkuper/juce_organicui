@@ -31,12 +31,14 @@ void DashboardItemFactory::buildPopupMenu()
 	}
 }
 
-DashboardItem * DashboardItemFactory::showCreateMenu()
+void DashboardItemFactory::showCreateMenu(std::function<void(DashboardItem*)> returnFunc)
 {
 	buildPopupMenu(); //force rebuild
-	int result = getMenu().show();
-	if (result != 0) return createFromMenuResult(result);
-	return nullptr;
+	menu.showMenuAsync(PopupMenu::Options(), [this](int result)
+		{
+			this->createFromMenuResult(result);
+		}
+	); 
 }
 
 DashboardItem * DashboardItemFactory::createFromMenuResult(int result)

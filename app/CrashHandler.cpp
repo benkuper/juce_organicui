@@ -119,7 +119,7 @@ void CrashDumpUploader::handleCrash(int e)
 		doUpload = true; //by default, unless hit cancel
 
 		w.reset(new UploadWindow());
-		DialogWindow::showModalDialog("Got crashed ?", w.get(), getMainWindow(), Colours::black, true);
+		DialogWindow::showDialog("Got crashed ?", w.get(), getMainWindow(), Colours::black, true);
 	}
 	else
 	{

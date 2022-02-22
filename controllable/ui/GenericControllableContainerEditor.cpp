@@ -11,7 +11,7 @@
 
 GenericControllableContainerEditor::GenericControllableContainerEditor(WeakReference<Inspectable> inspectable, bool isRoot, bool buildAtCreation) :
 	InspectableEditor(inspectable, isRoot),
-	headerHeight(GlobalSettings::getInstance()->fontSize->floatValue()+8),
+	headerHeight(GlobalSettings::getInstance()->fontSize->floatValue() + 8),
 	isRebuilding(false),
 	prepareToAnimate(false),
 	contourColor(BG_COLOR.brighter(.3f)),
@@ -22,7 +22,7 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(WeakRefer
 {
 	container->addAsyncContainerListener(this);
 	addAndMakeVisible(containerLabel);
-	
+
 	containerLabel.setFont(containerLabel.getFont().withHeight(GlobalSettings::getInstance()->fontSize->floatValue()));
 
 	containerLabel.setColour(containerLabel.backgroundWhenEditingColourId, Colours::black);
@@ -30,10 +30,10 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(WeakRefer
 	containerLabel.setColour(containerLabel.textColourId, contourColor.brighter(1));
 	containerLabel.setColour(CaretComponent::caretColourId, Colours::orange);
 
-	containerLabel.setEditable(false,container->nameCanBeChangedByUser);
+	containerLabel.setEditable(false, container->nameCanBeChangedByUser);
 	containerLabel.addListener(this);
 
-	if(!container->nameCanBeChangedByUser) containerLabel.setInterceptsMouseClicks(false, false);
+	if (!container->nameCanBeChangedByUser) containerLabel.setInterceptsMouseClicks(false, false);
 
 	if (container->userCanAddControllables)
 	{
@@ -62,14 +62,15 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(WeakRefer
 		addAndMakeVisible(headerSpacer);
 		headerSpacer.addMouseListener(this, false);
 
-		
+
 
 		collapseAnimator.addChangeListener(this);
 
 		setCollapsed(container->editorIsCollapsed, true, false, !buildAtCreation);
-	} else
+	}
+	else
 	{
-		if(buildAtCreation) resetAndBuild();
+		if (buildAtCreation) resetAndBuild();
 	}
 
 	if (container->isRemovableByUser)
@@ -92,11 +93,11 @@ GenericControllableContainerEditor::~GenericControllableContainerEditor()
 
 void GenericControllableContainerEditor::clear()
 {
-	for (auto &c : childEditors) removeChildComponent(c);
+	for (auto& c : childEditors) removeChildComponent(c);
 	childEditors.clear();
 }
 
-void GenericControllableContainerEditor::mouseDown(const MouseEvent & e)
+void GenericControllableContainerEditor::mouseDown(const MouseEvent& e)
 {
 	if (e.mods.isLeftButtonDown())
 	{
@@ -138,7 +139,7 @@ void GenericControllableContainerEditor::setDragAndDropEnabled(bool value)
 	{
 		GenericControllableContainerEditor* gce = dynamic_cast<GenericControllableContainerEditor*>(e);
 		if (gce != nullptr) setDragAndDropEnabled(value);
-		
+
 		ControllableEditor* ce = dynamic_cast<ControllableEditor*>(e);
 		if (ce != nullptr) ce->dragAndDropEnabled = value;
 	}
@@ -169,72 +170,74 @@ void GenericControllableContainerEditor::showContextMenu()
 
 		p.addSubMenu("Send to Dashboard", dashboardMenu);
 	}
-	
+
 
 	p.addSeparator();
 
-	if(ControllableUI::showOSCControlAddressOption) p.addItem(-1000, "Copy OSC Control Address");
-	if(ControllableUI::showScriptControlAddressOption) p.addItem(-1001, "Copy Script Control Address");
+	if (ControllableUI::showOSCControlAddressOption) p.addItem(-1000, "Copy OSC Control Address");
+	if (ControllableUI::showScriptControlAddressOption) p.addItem(-1001, "Copy Script Control Address");
 
-	int result = p.show();
-
-	if (result != 0)
-	{
-		switch (result)
+	p.showMenuAsync(PopupMenu::Options(), [this](int result)
 		{
-		case 1:
-			toggleCollapsedChildren();
-			break;
-
-		case 2:
-			SystemClipboard::copyTextToClipboard(JSON::toString(container->getJSONData()));
-			break;
-		
-		case 3:
-			container->loadJSONData(JSON::fromString(SystemClipboard::getTextFromClipboard()));
-			break;
-
-		case -1000:
-			SystemClipboard::copyTextToClipboard(container->getControlAddress());
-			break;
-		case -1001:
-			SystemClipboard::copyTextToClipboard("root" + container->getControlAddress().replaceCharacter('/', '.'));
-			break;
-
-		default:
-			if (result >= 10000)
+			if (result != 0)
 			{
-				DashboardManager::getInstance()->items[result - 10000]->itemManager.addItem(container->createDashboardItem());
+				switch (result)
+				{
+				case 1:
+					this->toggleCollapsedChildren();
+					break;
+
+				case 2:
+					SystemClipboard::copyTextToClipboard(JSON::toString(this->container->getJSONData()));
+					break;
+
+				case 3:
+					this->container->loadJSONData(JSON::fromString(SystemClipboard::getTextFromClipboard()));
+					break;
+
+				case -1000:
+					SystemClipboard::copyTextToClipboard(this->container->getControlAddress());
+					break;
+				case -1001:
+					SystemClipboard::copyTextToClipboard("root" + this->container->getControlAddress().replaceCharacter('/', '.'));
+					break;
+
+				default:
+					if (result >= 10000)
+					{
+						DashboardManager::getInstance()->items[result - 10000]->itemManager.addItem(this->container->createDashboardItem());
+					}
+					else
+					{
+						this->handleMenuSelectedID(result);
+					}
+					break;
+				}
 			}
-			else
-			{
-				handleMenuSelectedID(result);
-			}
-			break;
 		}
-	}
+	);
 }
 
 
 void GenericControllableContainerEditor::setCollapsed(bool value, bool force, bool animate, bool doNotRebuild)
 {
 	if (container->editorIsCollapsed == value && !force) return;
-	
+
 	if (isRoot || !container->editorCanBeCollapsed) return;
 
 	container->editorIsCollapsed = value;
-	
-	if(collapseBT != nullptr) collapseBT->setVisible(!container->editorIsCollapsed);
-	if(expandBT != nullptr) expandBT->setVisible(container->editorIsCollapsed);
 
-	if(animate) prepareToAnimate = true;
+	if (collapseBT != nullptr) collapseBT->setVisible(!container->editorIsCollapsed);
+	if (expandBT != nullptr) expandBT->setVisible(container->editorIsCollapsed);
+
+	if (animate) prepareToAnimate = true;
 	int targetHeight = headerHeight;
-	
+
 	if (!container->editorIsCollapsed)
 	{
-		if(!doNotRebuild) resetAndBuild();
+		if (!doNotRebuild) resetAndBuild();
 		juce::Rectangle<int> r = getLocalBounds();
-		
+
 		if (canBeCollapsed())
 		{
 			resizedInternal(r);
@@ -246,9 +249,10 @@ void GenericControllableContainerEditor::setCollapsed(bool value, bool force, bo
 	{
 		prepareToAnimate = false;
 		if (isVisible()) collapseAnimator.animateComponent(this, getBounds().withHeight(targetHeight), 1, 200, false, 1, 0);
-	} else
+	}
+	else
 	{
-		setSize(getWidth(),targetHeight);
+		setSize(getWidth(), targetHeight);
 	}
 
 }
@@ -274,19 +278,19 @@ void GenericControllableContainerEditor::resetAndBuild()
 	isRebuilding = true;
 
 	clear();
-	
+
 	if (container == nullptr)
 	{
 		LOGWARNING("An error has occured here (container null on ResetAndBuild");
 		return;
 	}
 	if (container->hideInEditor) return;
-	
+
 	if (!canBeCollapsed() || !container->editorIsCollapsed)
 	{
 		if (container->controllables.getLock().tryEnter())
 		{
-			for (auto &c : container->controllables)
+			for (auto& c : container->controllables)
 			{
 				if (c == nullptr)
 				{
@@ -299,13 +303,13 @@ void GenericControllableContainerEditor::resetAndBuild()
 			}
 			container->controllables.getLock().exit();
 		}
-		
-		
+
+
 		if (container->canInspectChildContainers)
 		{
 			if (container->controllableContainers.getLock().tryEnter())
 			{
-				for (auto &cc : container->controllableContainers)
+				for (auto& cc : container->controllableContainers)
 				{
 					if (cc.wasObjectDeleted() || cc == nullptr)
 					{
@@ -318,7 +322,7 @@ void GenericControllableContainerEditor::resetAndBuild()
 
 				container->controllableContainers.getLock().exit();
 			}
-			
+
 		}
 	}
 
@@ -328,28 +332,28 @@ void GenericControllableContainerEditor::resetAndBuild()
 	containerEditorListeners.call(&ContainerEditorListener::containerRebuilt, this);
 }
 
-InspectableEditor * GenericControllableContainerEditor::getEditorUIForContainer(ControllableContainer * cc)
+InspectableEditor* GenericControllableContainerEditor::getEditorUIForContainer(ControllableContainer* cc)
 {
 	return cc->getEditor(false);
 }
 
-InspectableEditor * GenericControllableContainerEditor::addEditorUI(ControllableContainer * cc, bool resize)
+InspectableEditor* GenericControllableContainerEditor::addEditorUI(ControllableContainer* cc, bool resize)
 {
 	if (cc == nullptr) return nullptr;
 
-	InspectableEditor * ccui = getEditorUIForContainer(cc);
-	
+	InspectableEditor* ccui = getEditorUIForContainer(cc);
+
 	GenericControllableContainerEditor* gce = dynamic_cast<GenericControllableContainerEditor*>(ccui);
 	if (gce != nullptr) gce->setDragAndDropEnabled(dragAndDropEnabled);
-	
+
 	int index = container->controllableContainers.indexOf(cc);
-	childEditors.insert(container->controllables.size()+index, ccui);
+	childEditors.insert(container->controllables.size() + index, ccui);
 	addAndMakeVisible(ccui);
 	if (resize) resized();
 	return ccui;
 }
 
-void GenericControllableContainerEditor::removeEditorUI(InspectableEditor * ccui, bool resize)
+void GenericControllableContainerEditor::removeEditorUI(InspectableEditor* ccui, bool resize)
 {
 	if (ccui == nullptr)
 	{
@@ -364,20 +368,22 @@ void GenericControllableContainerEditor::removeEditorUI(InspectableEditor * ccui
 
 void GenericControllableContainerEditor::showMenuAndAddControllable()
 {
-	Controllable * c = ControllableFactory::showFilteredCreateMenu(container->userAddControllablesFilters, true);
-	if (c != nullptr)
-	{
-		c->isCustomizableByUser = true;
-		c->isRemovableByUser = true;
-		c->isSavable = true;
-		c->saveValueOnly = false;
-		container->addControllable(c);
-	}
+	ControllableFactory::showFilteredCreateMenu(container->userAddControllablesFilters, [this](Controllable* c)
+		{
+			c->isCustomizableByUser = true;
+			c->isRemovableByUser = true;
+			c->isSavable = true;
+			c->saveValueOnly = false;
+			this->container->addControllable(c);
+		}
+		,true
+	);
+
 }
 
-InspectableEditor * GenericControllableContainerEditor::getEditorForInspectable(Inspectable * i)
+InspectableEditor* GenericControllableContainerEditor::getEditorForInspectable(Inspectable* i)
 {
-	for (auto &cui : childEditors)
+	for (auto& cui : childEditors)
 	{
 		if (cui->inspectable == i) return cui;
 	}
@@ -385,7 +391,7 @@ InspectableEditor * GenericControllableContainerEditor::getEditorForInspectable(
 	return nullptr;
 }
 
-void GenericControllableContainerEditor::buttonClicked(Button * b)
+void GenericControllableContainerEditor::buttonClicked(Button* b)
 {
 	if (b == expandBT.get()) setCollapsed(false);
 	else if (b == collapseBT.get()) setCollapsed(true);
@@ -393,13 +399,14 @@ void GenericControllableContainerEditor::buttonClicked(Button * b)
 	{
 		if (container->customUserCreateControllableFunc != nullptr) container->customUserCreateControllableFunc(container);
 		else showMenuAndAddControllable();
-	}else if (b == removeBT.get())
+	}
+	else if (b == removeBT.get())
 	{
-		if(container->parentContainer != nullptr) container->parentContainer->removeChildControllableContainer(container);
+		if (container->parentContainer != nullptr) container->parentContainer->removeChildControllableContainer(container);
 	}
 }
 
-void GenericControllableContainerEditor::labelTextChanged(Label * l)
+void GenericControllableContainerEditor::labelTextChanged(Label* l)
 {
 	if (l == &containerLabel) container->setUndoableNiceName(l->getText());
 }
@@ -410,17 +417,17 @@ void GenericControllableContainerEditor::componentVisibilityChanged(Component& c
 	if (&c == warningUI.get()) resized();
 }
 
-InspectableEditor * GenericControllableContainerEditor::getEditorUIForControllable(Controllable * c)
+InspectableEditor* GenericControllableContainerEditor::getEditorUIForControllable(Controllable* c)
 {
 	return c->getEditor(false);
 }
 
-InspectableEditor * GenericControllableContainerEditor::addControllableUI(Controllable * c, bool resize)
+InspectableEditor* GenericControllableContainerEditor::addControllableUI(Controllable* c, bool resize)
 {
 	if (c == nullptr || c->hideInEditor) return nullptr;
 
-	InspectableEditor * cui = getEditorUIForControllable(c);
-	
+	InspectableEditor* cui = getEditorUIForControllable(c);
+
 	ControllableEditor* ce = dynamic_cast<ControllableEditor*>(cui);
 	if (ce != nullptr) ce->dragAndDropEnabled = dragAndDropEnabled;
 
@@ -431,9 +438,9 @@ InspectableEditor * GenericControllableContainerEditor::addControllableUI(Contro
 	return nullptr;// cui;
 }
 
-void GenericControllableContainerEditor::removeControllableUI(Controllable * c, bool resize)
+void GenericControllableContainerEditor::removeControllableUI(Controllable* c, bool resize)
 {
-	InspectableEditor * cui = getEditorForInspectable(c);
+	InspectableEditor* cui = getEditorForInspectable(c);
 	if (cui == nullptr) return;
 
 	removeChildComponent(cui);
@@ -442,7 +449,7 @@ void GenericControllableContainerEditor::removeControllableUI(Controllable * c, 
 
 }
 
-void GenericControllableContainerEditor::newMessage(const ContainerAsyncEvent & p)
+void GenericControllableContainerEditor::newMessage(const ContainerAsyncEvent& p)
 {
 	switch (p.type)
 	{
@@ -503,7 +510,7 @@ void GenericControllableContainerEditor::newMessage(const ContainerAsyncEvent & 
 	}
 }
 
-void GenericControllableContainerEditor::childBoundsChanged(Component * c)
+void GenericControllableContainerEditor::childBoundsChanged(Component* c)
 {
 	if (isRebuilding) return;
 	if (getWidth() == 0 || getHeight() == 0) return;
@@ -512,7 +519,7 @@ void GenericControllableContainerEditor::childBoundsChanged(Component * c)
 
 }
 
-void GenericControllableContainerEditor::changeListenerCallback(ChangeBroadcaster * source)
+void GenericControllableContainerEditor::changeListenerCallback(ChangeBroadcaster* source)
 {
 	if (source == &collapseAnimator)
 	{
@@ -521,7 +528,7 @@ void GenericControllableContainerEditor::changeListenerCallback(ChangeBroadcaste
 }
 
 
-void GenericControllableContainerEditor::paint(Graphics & g)
+void GenericControllableContainerEditor::paint(Graphics& g)
 {
 	if (container == nullptr)
 	{
@@ -539,7 +546,7 @@ void GenericControllableContainerEditor::paint(Graphics & g)
 	}
 	*/
 
-	if(!isRoot && !container->hideEditorHeader)
+	if (!isRoot && !container->hideEditorHeader)
 	{
 		g.setColour(contourColor.withAlpha(.3f));
 		juce::Rectangle<int> r = getLocalBounds();
@@ -549,16 +556,16 @@ void GenericControllableContainerEditor::paint(Graphics & g)
 
 	if ((isRoot || canBeCollapsed()) && !container->hideEditorHeader)
 	{
-		g.setColour(contourColor.withAlpha(isRoot?.8f:.4f));
+		g.setColour(contourColor.withAlpha(isRoot ? .8f : .4f));
 		g.fillRoundedRectangle(getHeaderBounds().toFloat(), 4);
 	}
-	
+
 	if (!isRoot && !container->hideEditorHeader)
 	{
 		g.setColour(contourColor.brighter(.2f));
 		g.drawRoundedRectangle(getLocalBounds().toFloat(), 4, 2);
 	}
-	
+
 }
 
 void GenericControllableContainerEditor::resized()
@@ -567,7 +574,7 @@ void GenericControllableContainerEditor::resized()
 	isRebuilding = true;
 	resizedInternal(r);
 	isRebuilding = false;
-	if(!container.wasObjectDeleted() && !collapseAnimator.isAnimating() && !prepareToAnimate) setSize(getWidth(), (!isRoot && container->editorIsCollapsed)?headerHeight:jmax<int>(r.getY()+2, headerHeight));
+	if (!container.wasObjectDeleted() && !collapseAnimator.isAnimating() && !prepareToAnimate) setSize(getWidth(), (!isRoot && container->editorIsCollapsed) ? headerHeight : jmax<int>(r.getY() + 2, headerHeight));
 }
 
 void GenericControllableContainerEditor::resizedInternal(juce::Rectangle<int>& r)
@@ -600,9 +607,9 @@ void GenericControllableContainerEditor::resizedInternal(juce::Rectangle<int>& r
 		resizedInternalHeader(hr);
 		r.removeFromTop(headerGap);
 	}
-	
+
 	r.reduce(2, 2);
-	if(!isRoot && !container->hideEditorHeader) r.removeFromLeft(4);
+	if (!isRoot && !container->hideEditorHeader) r.removeFromLeft(4);
 	if (!canBeCollapsed() || !container->editorIsCollapsed) resizedInternalContent(r);
 }
 
@@ -620,13 +627,13 @@ void GenericControllableContainerEditor::resizedInternalHeader(juce::Rectangle<i
 		r.removeFromLeft(2);
 	}
 
-	containerLabel.setBounds(r.removeFromLeft(containerLabel.getFont().getStringWidth(containerLabel.getText())+20));
+	containerLabel.setBounds(r.removeFromLeft(containerLabel.getFont().getStringWidth(containerLabel.getText()) + 20));
 	headerSpacer.setBounds(r);
 }
 
 void GenericControllableContainerEditor::resizedInternalContent(juce::Rectangle<int>& r)
 {
-	for (auto &cui : childEditors)
+	for (auto& cui : childEditors)
 	{
 		if (cui->inspectable.wasObjectDeleted()) continue;
 		if (cui->isVisible() == cui->inspectable->hideInEditor) cui->setVisible(!cui->inspectable->hideInEditor);
@@ -634,10 +641,10 @@ void GenericControllableContainerEditor::resizedInternalContent(juce::Rectangle<
 
 		int th = cui->getHeight();
 		cui->setBounds(r.withHeight(th));
-		
+
 		float gap = 4;
-		if (isRoot && dynamic_cast<GenericControllableContainerEditor *>(cui) != nullptr) gap = 16;
-		
+		if (isRoot && dynamic_cast<GenericControllableContainerEditor*>(cui) != nullptr) gap = 16;
+
 		r.translate(0, th + gap);
 	}
 }
@@ -662,7 +669,7 @@ bool GenericControllableContainerEditor::canBeCollapsed()
 
 //EnablingControllableContainerEditor
 
-EnablingControllableContainerEditor::EnablingControllableContainerEditor(EnablingControllableContainer * cc, bool isRoot, bool buildAtCreation) :
+EnablingControllableContainerEditor::EnablingControllableContainerEditor(EnablingControllableContainer* cc, bool isRoot, bool buildAtCreation) :
 	GenericControllableContainerEditor(cc, isRoot, buildAtCreation),
 	ioContainer(cc)
 {
@@ -675,11 +682,11 @@ EnablingControllableContainerEditor::EnablingControllableContainerEditor(Enablin
 
 void EnablingControllableContainerEditor::resizedInternalHeader(juce::Rectangle<int>& r)
 {
-	if(((EnablingControllableContainer *)container.get())->canBeDisabled) enabledUI->setBounds(r.removeFromLeft(r.getHeight()).reduced(2));
+	if (((EnablingControllableContainer*)container.get())->canBeDisabled) enabledUI->setBounds(r.removeFromLeft(r.getHeight()).reduced(2));
 	GenericControllableContainerEditor::resizedInternalHeader(r);
 }
 
-void EnablingControllableContainerEditor::controllableFeedbackUpdate(Controllable * c)
+void EnablingControllableContainerEditor::controllableFeedbackUpdate(Controllable* c)
 {
 	if (c == nullptr) return;
 

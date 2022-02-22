@@ -14,7 +14,7 @@ juce_ImplementSingleton(Outliner)
 Outliner::Outliner(const String& contentName) :
 	ShapeShifterContentComponent(contentName),
 	hideShowState(false),
-    enabled(true)
+	enabled(true)
 {
 	if (Engine::mainEngine != nullptr)
 	{
@@ -139,7 +139,7 @@ void Outliner::buildTree(OutlinerItem* parentItem, ControllableContainer* parent
 				passed = true;
 				filteredContainers.removeAllInstancesOf(cc);
 			}
-			
+
 			if (parentsOfFiltered.contains(cc))
 			{
 				forceOpen = true;
@@ -152,8 +152,8 @@ void Outliner::buildTree(OutlinerItem* parentItem, ControllableContainer* parent
 				passed = true;
 				childOfFiltered.removeAllInstancesOf(cc);
 			}
-			
-			if(!passed) continue; //not found
+
+			if (!passed) continue; //not found
 		}
 
 		OutlinerItem* ccItem = createItem(cc, parentsHaveHideInRemote, isFiltered);
@@ -181,7 +181,7 @@ void Outliner::buildTree(OutlinerItem* parentItem, ControllableContainer* parent
 			}
 			else continue;
 		}
-		
+
 		OutlinerItem* cItem = createItem(c, parentsHaveHideInRemote, isFiltered);
 		parentItem->addSubItem(cItem);
 	}
@@ -202,7 +202,7 @@ void Outliner::updateFilteredList()
 	{
 		Array<WeakReference<Controllable>> cont = Engine::mainEngine->getAllControllables(true);
 		Array<WeakReference<ControllableContainer>> containers = Engine::mainEngine->getAllContainers(true);
-		
+
 		for (auto& c : cont)
 		{
 			if (c->niceName.toLowerCase().contains(searchFilter))
@@ -226,7 +226,7 @@ void Outliner::updateFilteredList()
 
 				Array<WeakReference<Controllable>> childControllables = cc->getAllControllables(true);
 				for (auto& ccc : childControllables) childOfFiltered.addIfNotAlreadyThere(ccc);
-				
+
 				Array<WeakReference<ControllableContainer>> childContainers = cc->getAllContainers(true);
 				for (auto& ccont : childContainers) childOfFiltered.addIfNotAlreadyThere(ccont);
 
@@ -327,9 +327,9 @@ OutlinerItem::OutlinerItem(WeakReference<ControllableContainer> _container, bool
 	isContainer(true),
 	itemName(_container->niceName),
 	parentsHaveHideInRemote(parentsHaveHideInRemote),
-    isFiltered(isFiltered),
-    container(_container),
-    controllable(nullptr)
+	isFiltered(isFiltered),
+	container(_container),
+	controllable(nullptr)
 {
 	container->addControllableContainerListener(this);
 }
@@ -339,9 +339,9 @@ OutlinerItem::OutlinerItem(WeakReference<Controllable> _controllable, bool paren
 	isContainer(false),
 	itemName(_controllable->niceName),
 	parentsHaveHideInRemote(parentsHaveHideInRemote),
-    isFiltered(isFiltered),
-    container(nullptr),
-    controllable(_controllable)
+	isFiltered(isFiltered),
+	container(nullptr),
+	controllable(_controllable)
 {
 }
 
@@ -566,30 +566,35 @@ void OutlinerItemComponent::mouseDown(const MouseEvent& e)
 		}
 		p.addSubMenu("Send to Dashboard", dashboardMenu);
 
-		int result = p.show();
-		switch (result)
-		{
-		case -1:
-			if (item->isContainer) SystemClipboard::copyTextToClipboard(item->container->getControlAddress());
-			else SystemClipboard::copyTextToClipboard(item->controllable->controlAddress);
-			break;
-		case -2:
-			if (item->isContainer)  SystemClipboard::copyTextToClipboard("root" + item->container->getControlAddress().replaceCharacter('/', '.'));
-			else SystemClipboard::copyTextToClipboard("root" + item->controllable->controlAddress.replaceCharacter('/', '.'));
-			break;
-
-		case -10:
-			Detective::getInstance()->watchControllable(item->controllable);
-			break;
-
-		default:
-			if (result >= 10000)
+		p.showMenuAsync(PopupMenu::Options(), [this](int result)
 			{
-				DashboardManager::getInstance()->items[result - 10000]->itemManager.addItem((item->isContainer ? item->container->createDashboardItem() : item->controllable->createDashboardItem()));
-			}
-			break;
+				OutlinerItem* item = this->item;
 
-		}
+				switch (result)
+				{
+				case -1:
+					if (item->isContainer) SystemClipboard::copyTextToClipboard(item->container->getControlAddress());
+					else SystemClipboard::copyTextToClipboard(item->controllable->controlAddress);
+					break;
+				case -2:
+					if (item->isContainer)  SystemClipboard::copyTextToClipboard("root" + item->container->getControlAddress().replaceCharacter('/', '.'));
+					else SystemClipboard::copyTextToClipboard("root" + item->controllable->controlAddress.replaceCharacter('/', '.'));
+					break;
+
+				case -10:
+					Detective::getInstance()->watchControllable(item->controllable);
+					break;
+
+				default:
+					if (result >= 10000)
+					{
+						DashboardManager::getInstance()->items[result - 10000]->itemManager.addItem((item->isContainer ? item->container->createDashboardItem() : item->controllable->createDashboardItem()));
+					}
+					break;
+
+				}
+			}
+		);
 	}
 }
 

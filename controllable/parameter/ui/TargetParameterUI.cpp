@@ -8,7 +8,7 @@
   ==============================================================================
 */
 
-TargetParameterUI::TargetParameterUI(Array<TargetParameter *> parameters, const String &_noTargetText) :
+TargetParameterUI::TargetParameterUI(Array<TargetParameter*> parameters, const String& _noTargetText) :
 	ParameterUI(Inspectable::getArrayAs<TargetParameter, Parameter>(parameters)),
 	noTargetText(_noTargetText),
 	targetParameters(parameters),
@@ -44,14 +44,14 @@ TargetParameterUI::TargetParameterUI(Array<TargetParameter *> parameters, const 
 TargetParameterUI::~TargetParameterUI()
 {
 	//in case we deleted with the listener still on
-	if(parameter != nullptr && !parameter.wasObjectDeleted() && targetParameter->rootContainer != nullptr) targetParameter->rootContainer->removeAsyncContainerListener(this);
+	if (parameter != nullptr && !parameter.wasObjectDeleted() && targetParameter->rootContainer != nullptr) targetParameter->rootContainer->removeAsyncContainerListener(this);
 }
 
-void TargetParameterUI::paint(Graphics & g)
+void TargetParameterUI::paint(Graphics& g)
 {
 	if (parameter.wasObjectDeleted()) return;
 
-	Colour c = targetParameter->target != nullptr || targetParameter->targetContainer != nullptr ? (isInteractable()?GREEN_COLOR:BLUE_COLOR) : NORMAL_COLOR;
+	Colour c = targetParameter->target != nullptr || targetParameter->targetContainer != nullptr ? (isInteractable() ? GREEN_COLOR : BLUE_COLOR) : NORMAL_COLOR;
 	if (isMouseOver() && isInteractable()) c = c.brighter();
 
 	g.setGradientFill(ColourGradient(c.brighter(.2f), (float)getLocalBounds().getCentreX(), (float)getLocalBounds().getCentreY(), c.darker(), 2.f, 2.f, true));
@@ -61,7 +61,7 @@ void TargetParameterUI::paint(Graphics & g)
 
 void TargetParameterUI::resized()
 {
- juce::Rectangle<int> r = getLocalBounds();
+	juce::Rectangle<int> r = getLocalBounds();
 	if (listeningToNextChangeBT != nullptr)
 	{
 		listeningToNextChangeBT->setBounds(r.removeFromRight(50));
@@ -89,13 +89,13 @@ void TargetParameterUI::updateLabel()
 					if (targetParameter->showParentNameInEditor)
 					{
 						int curPLevel = 0;
-						ControllableContainer * cc = targetParameter->target->parentContainer;
+						ControllableContainer* cc = targetParameter->target->parentContainer;
 						while (cc != nullptr && (curPLevel <= targetParameter->defaultParentLabelLevel || cc->skipLabelInTarget))
 						{
-							if(curPLevel > 0 || cc->skipLabelInTarget) cc = cc->parentContainer;
+							if (curPLevel > 0 || cc->skipLabelInTarget) cc = cc->parentContainer;
 							if (cc == nullptr || cc == Engine::mainEngine || cc == targetParameter->rootContainer) break;
 							if (cc->skipLabelInTarget) continue;
-							
+
 							newText = cc->niceName + " > " + newText;
 							curPLevel++;
 						}
@@ -105,7 +105,8 @@ void TargetParameterUI::updateLabel()
 				}
 			}
 		}
-	} else //TargetType::CONTAINER
+	}
+	else //TargetType::CONTAINER
 	{
 		if (targetParameter->targetContainer != nullptr)
 		{
@@ -118,7 +119,7 @@ void TargetParameterUI::updateLabel()
 					if (targetParameter->showParentNameInEditor)
 					{
 						int curPLevel = 0;
-						
+
 						ControllableContainer* cc = targetParameter->targetContainer->parentContainer;
 
 						while (cc != nullptr && (curPLevel < targetParameter->defaultParentLabelLevel || cc->skipLabelInTarget))
@@ -157,44 +158,52 @@ void TargetParameterUI::showPopupAndGetTarget()
 
 	if (targetParameter->targetType == TargetParameter::TargetType::CONTROLLABLE)
 	{
-		Controllable * c = nullptr;
-
 		if (targetParameter->customGetTargetFunc != nullptr)
 		{
-			c = targetParameter->customGetTargetFunc(targetParameter->typesFilter, targetParameter->excludeTypesFilter);
-		} else
+			targetParameter->customGetTargetFunc(targetParameter->typesFilter, targetParameter->excludeTypesFilter, [this](Controllable* c)
+				{
+					targetParameter->setValueFromTarget(c);
+				});
+		}
+		else
 		{
 			ControllableChooserPopupMenu p(targetParameter->rootContainer, 0, targetParameter->maxDefaultSearchLevel, targetParameter->typesFilter, targetParameter->excludeTypesFilter, targetParameter->customTargetFilterFunc);
-			c = p.showAndGetControllable();
+			p.showAndGetControllable([this](Controllable* c) { targetParameter->setValueFromTarget(c); });
 		}
-		if (c != nullptr) targetParameter->setValueFromTarget(c);
 
-	} else
+	}
+	else
 	{
-		ControllableContainer * cc = nullptr;
 		if (targetParameter->customGetTargetContainerFunc != nullptr)
 		{
-			cc = targetParameter->customGetTargetContainerFunc();
-		} else
+			targetParameter->customGetTargetContainerFunc([this](ControllableContainer* cc)
+				{
+					targetParameter->setValueFromTarget(cc);
+				});
+		}
+		else
 		{
 			ContainerChooserPopupMenu p(targetParameter->rootContainer, 0, targetParameter->maxDefaultSearchLevel, targetParameter->defaultContainerTypeCheckFunc);
-			cc = p.showAndGetContainer();
+			p.showAndGetContainer([this](ControllableContainer* cc)
+				{
+					targetParameter->setValueFromTarget(cc);
+				}
+			);
 		}
-		if (cc != nullptr) targetParameter->setValueFromTarget(cc);
 	}
 }
 
-void TargetParameterUI::mouseDownInternal(const MouseEvent &)
+void TargetParameterUI::mouseDownInternal(const MouseEvent&)
 {
-	if(isInteractable()) showPopupAndGetTarget();
+	if (isInteractable()) showPopupAndGetTarget();
 }
 
-void TargetParameterUI::buttonClicked(Button * b)
+void TargetParameterUI::buttonClicked(Button* b)
 {
 	if (b == targetBT.get()) {} // move code here ?
 }
 
-void TargetParameterUI::valueChanged(const var &)
+void TargetParameterUI::valueChanged(const var&)
 {
 	if (listeningToNextChange != nullptr) listeningToNextChange->setValue(false);
 
@@ -202,7 +211,7 @@ void TargetParameterUI::valueChanged(const var &)
 	repaint();
 }
 
-void TargetParameterUI::newMessage(const Parameter::ParameterEvent & e)
+void TargetParameterUI::newMessage(const Parameter::ParameterEvent& e)
 {
 
 	if (e.parameter == listeningToNextChange.get())
@@ -213,20 +222,22 @@ void TargetParameterUI::newMessage(const Parameter::ParameterEvent & e)
 				if (listeningToNextChange->boolValue())
 				{
 					targetParameter->rootContainer->addAsyncContainerListener(this);
-				} else 
+				}
+				else
 				{
 					targetParameter->rootContainer->removeAsyncContainerListener(this);
 				}
 			}
 		}
-	} else
+	}
+	else
 	{
 		ParameterUI::newMessage(e);
 	}
-	
+
 }
 
-void TargetParameterUI::newMessage(const ContainerAsyncEvent & e)
+void TargetParameterUI::newMessage(const ContainerAsyncEvent& e)
 {
 	if (e.type == ContainerAsyncEvent::ControllableFeedbackUpdate)
 	{
@@ -246,5 +257,5 @@ void TargetParameterUI::newMessage(const ContainerAsyncEvent & e)
 			}
 		}
 	}
-	
+
 }

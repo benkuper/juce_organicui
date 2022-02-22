@@ -74,7 +74,7 @@ void Curve2DKeyUI::updateEasingUI()
 void Curve2DKeyUI::mouseDown(const MouseEvent& e)
 {
 	BaseItemMinimalUI::mouseDown(e);
-	
+
 	if (e.eventComponent == easingUI.get())
 	{
 		if (e.mods.isRightButtonDown())
@@ -88,12 +88,16 @@ void Curve2DKeyUI::mouseDown(const MouseEvent& e)
 				kid++;
 			}
 
-			int result = ep.show();
-			if (result >= 1 && result <= keys.size())
-			{
-				item->easingType->setUndoableValue(item->easingType->value, keys[result - 1]);
-				item->easing->selectThis(); //reselect after changing easing
-			}
+			ep.showMenuAsync(PopupMenu::Options(), [this, keys](int result)
+				{
+					if (result >= 1 && result <= keys.size())
+					{
+						this->item->easingType->setUndoableValue(item->easingType->value, keys[result - 1]);
+						this->item->easing->selectThis(); //reselect after changing easing
+					}
+				}
+			);
+
 		}
 		else if (e.mods.isCommandDown())
 		{
@@ -101,7 +105,7 @@ void Curve2DKeyUI::mouseDown(const MouseEvent& e)
 			item->easing->selectThis(); //reselect after changing easing
 		}
 	}
-	
+
 }
 
 void Curve2DKeyUI::mouseDoubleClick(const MouseEvent& e)
@@ -112,7 +116,7 @@ void Curve2DKeyUI::mouseDoubleClick(const MouseEvent& e)
 		CallOutBox* box = &CallOutBox::launchAsynchronously(std::move(editComponent), localAreaToGlobal(getLocalBounds()), nullptr);
 		box->setArrowSize(8);
 	}
-	
+
 }
 
 bool Curve2DKeyUI::canStartDrag(const MouseEvent& e)

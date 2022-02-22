@@ -164,20 +164,24 @@ void StringParameterFileUI::buttonClicked(Button* b)
 {
 	if (b == &browseBT)
 	{
-		Component::BailOutChecker checker(this);
 		FileChooser chooser("Select a file", File(fp->getBasePath()), fp->fileTypeFilter);
-		bool result;
 
-		if (fp->directoryMode) result = chooser.browseForDirectory();
-		else result = chooser.browseForFileToOpen();
+		int flags = FileBrowserComponent::openMode;
+		if (fp->directoryMode) flags |= FileBrowserComponent::canSelectDirectories;
+		chooser.launchAsync(flags, [this](const FileChooser& fc)
+			{
+				if (!fc.getResult().exists()) return;
 
-		if (checker.shouldBailOut()) return;
+				Component::BailOutChecker checker(this);
+				if (checker.shouldBailOut()) return;
 
-		if (parameter.wasObjectDeleted()) return;
-		if (result && parameter != nullptr)
-		{
-			parameter->setUndoableValue(parameter->stringValue(), chooser.getResult().getFullPathName());
-		}
+				if (parameter.wasObjectDeleted()) return;
+				if (parameter != nullptr)
+				{
+					parameter->setUndoableValue(parameter->stringValue(), fc.getResult().getFullPathName());
+				}
+			}
+		);
 	}
 	else if (relativeBT != nullptr && b == relativeBT.get())
 	{

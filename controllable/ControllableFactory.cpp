@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    ControllableFactory.cpp
-    Created: 2 Nov 2016 1:44:15pm
-    Author:  bkupe
+	ControllableFactory.cpp
+	Created: 2 Nov 2016 1:44:15pm
+	Author:  bkupe
 
   ==============================================================================
 */
@@ -41,7 +41,7 @@ PopupMenu ControllableFactory::getFilteredPopupMenu(StringArray typeFilters, boo
 	PopupMenu result;
 	for (int i = 0; i < controllableDefs.size(); ++i)
 	{
-		if(typeFilters.contains(controllableDefs[i]->controllableType) && (!controllableDefs[i]->isSpecial || !excludeSpecials)) result.addItem(i + 1, controllableDefs[i]->controllableType);
+		if (typeFilters.contains(controllableDefs[i]->controllableType) && (!controllableDefs[i]->isSpecial || !excludeSpecials)) result.addItem(i + 1, controllableDefs[i]->controllableType);
 	}
 
 	return result;
@@ -50,60 +50,68 @@ PopupMenu ControllableFactory::getFilteredPopupMenu(StringArray typeFilters, boo
 StringArray ControllableFactory::getTypesWithout(StringArray typesToExclude, bool excludeSpecials)
 {
 	StringArray result;
-	for (auto &d : getInstance()->controllableDefs)
+	for (auto& d : getInstance()->controllableDefs)
 	{
 		if (!typesToExclude.contains(d->controllableType) && (!d->isSpecial || !excludeSpecials)) result.add(d->controllableType);
 	}
 	return result;
 }
 
-Controllable * ControllableFactory::showCreateMenu(bool excludeSpecials)
+void ControllableFactory::showCreateMenu(std::function<void(Controllable*)> returnFunc, bool excludeSpecials)
 {
 	getInstance()->buildPopupMenu(excludeSpecials);
-	int result = getInstance()->menu.show();
-	if (result == 0) return nullptr;
-	else
-	{
-		ControllableDefinition * d = getInstance()->controllableDefs[result - 1];//result 0 is no result
-		return d->createFunc();
-	}
+
+	getInstance()->menu.showMenuAsync(PopupMenu::Options(), [returnFunc](int result)
+		{
+			if (result == 0) return;
+
+			ControllableDefinition* d = ControllableFactory::getInstance()->controllableDefs[result - 1];//result 0 is no result
+			Controllable* c = d->createFunc();
+			returnFunc(c);
+		}
+	);
 }
 
-Controllable * ControllableFactory::showFilteredCreateMenu(StringArray typeFilters, bool excludeSpecials)
+void ControllableFactory::showFilteredCreateMenu(StringArray typeFilters, std::function<void(Controllable*)> returnFunc, bool excludeSpecials)
 {
-	if (typeFilters.isEmpty()) return showCreateMenu(excludeSpecials);
+	if (typeFilters.isEmpty()) showCreateMenu(returnFunc, excludeSpecials);
 
 	if (typeFilters.size() == 1)
 	{
-		for (auto &d : getInstance()->controllableDefs)
+		for (auto& d : getInstance()->controllableDefs)
 		{
-			if (d->controllableType == typeFilters[0]) return d->createFunc();
+			if (d->controllableType == typeFilters[0])
+			{
+				if (Controllable* c = d->createFunc()) returnFunc(c);
+			}
 		}
-		return nullptr;
+		return;
 	}
 
 	PopupMenu filteredMenu = getInstance()->getFilteredPopupMenu(typeFilters, excludeSpecials);
-	
-	if (filteredMenu.getNumItems() == 0) return nullptr;
-	int result = filteredMenu.show();
-	if (result == 0) return nullptr;
-	else
-	{
-		ControllableDefinition * d = getInstance()->controllableDefs[result - 1];//result 0 is no result
-		return d->createFunc();
-	}
+
+	if (filteredMenu.getNumItems() == 0) return;
+
+	filteredMenu.showMenuAsync(PopupMenu::Options(), [returnFunc](int result)
+		{
+			if (result == 0) return;
+
+			ControllableDefinition* d = ControllableFactory::getInstance()->controllableDefs[result - 1];//result 0 is no result
+			if (Controllable* c = d->createFunc()) returnFunc(c);
+		}
+	);
 }
 
-Controllable * ControllableFactory::createControllable(const String & controllableType)
+Controllable* ControllableFactory::createControllable(const String& controllableType)
 {
-	for (auto &d : getInstance()->controllableDefs)
+	for (auto& d : getInstance()->controllableDefs)
 	{
 		if (d->controllableType == controllableType) return d->createFunc();
 	}
 	return nullptr;
 }
 
-Controllable* ControllableFactory::createControllableFromJSON(const String &name, var data)
+Controllable* ControllableFactory::createControllableFromJSON(const String& name, var data)
 {
 	String valueType = data.getProperty("type", "").toString();
 	Controllable* c = ControllableFactory::createControllable(valueType);
@@ -115,25 +123,25 @@ Controllable* ControllableFactory::createControllableFromJSON(const String &name
 	return c;
 }
 
-Parameter * ControllableFactory::createParameterFrom(Controllable * source, bool copyName, bool copyValue)
+Parameter* ControllableFactory::createParameterFrom(Controllable* source, bool copyName, bool copyValue)
 {
-	Parameter * sourceP = dynamic_cast<Parameter *>(source);
+	Parameter* sourceP = dynamic_cast<Parameter*>(source);
 	if (sourceP == nullptr) return nullptr;
 
-	for (auto &d : getInstance()->controllableDefs)
+	for (auto& d : getInstance()->controllableDefs)
 	{
 		if (d->controllableType == sourceP->getTypeString())
 		{
-			Parameter * p = dynamic_cast<Parameter *>(d->createFunc());
+			Parameter* p = dynamic_cast<Parameter*>(d->createFunc());
 			if (copyName) p->setNiceName(source->niceName);
-			if(sourceP->hasRange()) p->setRange(sourceP->minimumValue, sourceP->maximumValue);
+			if (sourceP->hasRange()) p->setRange(sourceP->minimumValue, sourceP->maximumValue);
 
 			if (source->type == Controllable::ENUM)
 			{
-				EnumParameter * sourceEP = (EnumParameter *)source;
-				EnumParameter * ep = (EnumParameter *)p;
+				EnumParameter* sourceEP = (EnumParameter*)source;
+				EnumParameter* ep = (EnumParameter*)p;
 				ep->clearOptions();
-				for (auto &ev : sourceEP->enumValues) ep->addOption(ev->key, ev->value);
+				for (auto& ev : sourceEP->enumValues) ep->addOption(ev->key, ev->value);
 			}
 			else if (source->type == Controllable::TARGET)
 			{

@@ -83,19 +83,22 @@ void ParameterUI::showEditRangeWindowInternal()
 	nameWindow.addButton("OK", 1, KeyPress(KeyPress::returnKey));
 	nameWindow.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
 
-	int result = nameWindow.runModalLoop();
-
-	if (result)
-	{
-		if (parameter->type == Parameter::FLOAT || parameter->type == Parameter::INT)
+	nameWindow.showAsync(MessageBoxOptions(), [this, &nameWindow](int result)
 		{
-			String minRangeString = nameWindow.getTextEditorContents("minVal");
-			String maxRangeString = nameWindow.getTextEditorContents("maxVal");
-			float newMin = minRangeString.isNotEmpty() ? minRangeString.getFloatValue() : INT32_MIN;
-			float newMax = maxRangeString.isNotEmpty() ? maxRangeString.getFloatValue() : INT32_MAX;
-			parameter->setRange(newMin, jmax(newMin, newMax));
+
+			if (result)
+			{
+				if (parameter->type == Parameter::FLOAT || parameter->type == Parameter::INT)
+				{
+					String minRangeString = nameWindow.getTextEditorContents("minVal");
+					String maxRangeString = nameWindow.getTextEditorContents("maxVal");
+					float newMin = minRangeString.isNotEmpty() ? minRangeString.getFloatValue() : INT32_MIN;
+					float newMax = maxRangeString.isNotEmpty() ? maxRangeString.getFloatValue() : INT32_MAX;
+					parameter->setRange(newMin, jmax(newMin, newMax));
+				}
+			}
 		}
-	}
+	);
 }
 
 void ParameterUI::paintOverChildren(Graphics& g)
@@ -400,7 +403,7 @@ void ParameterUI::ValueEditCalloutComponent::editorHidden(Label* l, TextEditor&)
 	if (b != nullptr)
 	{
 		if (l == labels[labels.size() - 1]) b->dismiss();
-}
+	}
 }
 
 void ParameterUI::ValueEditCalloutComponent::parentHierarchyChanged()

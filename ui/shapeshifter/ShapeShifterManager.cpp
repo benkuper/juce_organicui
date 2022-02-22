@@ -24,7 +24,7 @@ ShapeShifterManager::ShapeShifterManager() :
 
 ShapeShifterManager::~ShapeShifterManager()
 {
-	saveCurrentLayoutToFile(layoutFolder.getChildFile(+ "_lastSession." + appLayoutExtension));
+	saveCurrentLayoutToFile(layoutFolder.getChildFile(+"_lastSession." + appLayoutExtension));
 	openedWindows.clear();
 	if (GlobalSettings::getInstanceWithoutCreating() != nullptr) GlobalSettings::getInstance()->fontSize->removeAsyncParameterListener(this);
 }
@@ -270,16 +270,21 @@ void ShapeShifterManager::loadLayoutFromFile(int fileIndexInLayoutFolder)
 	if (fileIndexInLayoutFolder == -1)
 	{
 		FileChooser fc("Load layout", layoutFolder, "*." + appLayoutExtension);
-		if (!fc.browseForFileToOpen()) return;
-		layoutFile = fc.getResult();
+		auto folderChooserFlags = FileBrowserComponent::openMode | FileBrowserComponent::canSelectDirectories;
+		fc.launchAsync(folderChooserFlags, [this](const FileChooser& fc)
+			{
+				loadLayoutFromFile(fc.getResult());
+				//layoutFile = fc.getResult();
+			}
+		);
 	}
 	else
 	{
 		Array<File> layoutFiles = getLayoutFiles();
 		layoutFile = layoutFiles[fileIndexInLayoutFolder];
+		loadLayoutFromFile(layoutFile);
 	}
 
-	loadLayoutFromFile(layoutFile);
 }
 
 void ShapeShifterManager::loadLayoutFromFile(const File& fromFile)
@@ -327,16 +332,17 @@ void ShapeShifterManager::saveCurrentLayout()
 	if (!layoutFolder.exists()) layoutFolder.createDirectory();
 
 	FileChooser fc("Save layout", layoutFolder, "*." + appLayoutExtension);
-	if (fc.browseForFileToSave(true))
-	{
-		saveCurrentLayoutToFile(fc.getResult().withFileExtension(appLayoutExtension));
-	}
+	fc.launchAsync(FileBrowserComponent::saveMode | FileBrowserComponent::FileChooserFlags::warnAboutOverwriting, [this](const FileChooser& fc)
+		{
+			saveCurrentLayoutToFile(fc.getResult().withFileExtension(appLayoutExtension));
+		}
+	);
 }
 
 void ShapeShifterManager::saveCurrentLayoutToFile(const File& toFile)
 {
 	if (!layoutFolder.exists()) layoutFolder.createDirectory();
-	
+
 	if (toFile.exists())
 	{
 		toFile.deleteFile();

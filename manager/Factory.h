@@ -162,10 +162,19 @@ public:
 		for (int i = 0; i < subMenus.size(); ++i) menu.addSubMenu(subMenuNames[i], *subMenus[i]);
 	}
 
-	virtual T* showCreateMenu()
+	virtual void showCreateMenu(std::function<void(T*)> returnFunc)
 	{
-		int result = defs.size() == 1 ? 1 : getMenu().show();
-		return createFromMenuResult(result);
+		if (defs.size() == 1)
+		{
+			if (T* r = this->createFromMenuResult(1)) returnFunc(r);
+			return;
+		}
+
+		getMenu().showMenuAsync(PopupMenu::Options(), [this, returnFunc](int result)
+			{
+				if (T* r = this->createFromMenuResult(result)) returnFunc(r);
+			}
+		);
 	}
 
 	virtual PopupMenu getMenu()

@@ -1,15 +1,15 @@
 /*
   ==============================================================================
 
-    GradientColorUI.cpp
-    Created: 11 Apr 2017 11:40:31am
-    Author:  Ben
+	GradientColorUI.cpp
+	Created: 11 Apr 2017 11:40:31am
+	Author:  Ben
 
   ==============================================================================
 */
 
 
-GradientColorUI::GradientColorUI(GradientColor * item) :
+GradientColorUI::GradientColorUI(GradientColor* item) :
 	BaseItemMinimalUI(item)
 {
 	dragAndDropEnabled = false;
@@ -23,15 +23,15 @@ GradientColorUI::GradientColorUI(GradientColor * item) :
 
 GradientColorUI::~GradientColorUI()
 {
-	
+
 }
 
-void GradientColorUI::paint(Graphics & g)
+void GradientColorUI::paint(Graphics& g)
 {
-	g.setColour(item->isSelected ? HIGHLIGHT_COLOR: (item->isPreselected?BLUE_COLOR:bgColor));
+	g.setColour(item->isSelected ? HIGHLIGHT_COLOR : (item->isPreselected ? BLUE_COLOR : bgColor));
 	g.fillPath(drawPath);
-	g.setColour(item->isSelected?HIGHLIGHT_COLOR.brighter():(item->isPreselected?BLUE_COLOR.brighter():bgColor.darker(.7f)));
-	g.strokePath(drawPath,PathStrokeType(1));
+	g.setColour(item->isSelected ? HIGHLIGHT_COLOR.brighter() : (item->isPreselected ? BLUE_COLOR.brighter() : bgColor.darker(.7f)));
+	g.strokePath(drawPath, PathStrokeType(1));
 }
 
 void GradientColorUI::resized()
@@ -45,13 +45,13 @@ void GradientColorUI::resized()
 	drawPath.closeSubPath();
 	drawPath = drawPath.createPathWithRoundedCorners(1);
 
-	colorUI->setBounds(getLocalBounds().reduced(2, getHeight()/4));
+	colorUI->setBounds(getLocalBounds().reduced(2, getHeight() / 4));
 }
 
-void GradientColorUI::mouseDown(const MouseEvent & e)
+void GradientColorUI::mouseDown(const MouseEvent& e)
 {
 	BaseItemMinimalUI::mouseDown(e);
-	
+
 	if (e.mods.isCommandDown())
 	{
 		item->interpolation->setNext(true, true);
@@ -59,18 +59,23 @@ void GradientColorUI::mouseDown(const MouseEvent & e)
 	else if (e.mods.isRightButtonDown())
 	{
 		//Need to fix multi level
-		
+
 		GradientColor::Interpolation i = item->interpolation->getValueDataAsEnum<GradientColor::Interpolation>();
 		PopupMenu p;
 		PopupMenu ip;
-		ip.addItem(1, "Linear",true, i == GradientColor::LINEAR);
+		ip.addItem(1, "Linear", true, i == GradientColor::LINEAR);
 		ip.addItem(2, "None", true, i == GradientColor::NONE);
 		p.addSubMenu("Interpolation", ip);
-		int result = p.show();
-		switch (result)
-		{
-		case 1: item->interpolation->setValueWithData(GradientColor::LINEAR); break;
-		case 2: item->interpolation->setValueWithData(GradientColor::NONE); break;
-		}
+
+		p.showMenuAsync(PopupMenu::Options(), [this](int result)
+			{
+				switch (result)
+				{
+				case 1: this->item->interpolation->setValueWithData(GradientColor::LINEAR); break;
+				case 2: this->item->interpolation->setValueWithData(GradientColor::NONE); break;
+				}
+			}
+		);
+
 	}
 }

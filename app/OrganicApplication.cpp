@@ -11,19 +11,19 @@
 
 static OrganicApplication& getApp() { return *dynamic_cast<OrganicApplication*>(JUCEApplication::getInstance()); }
 String getAppVersion() { return getApp().getApplicationVersion(); }
-ControllableContainer * getAppSettings() { return &(getApp().appSettings); }
+ControllableContainer* getAppSettings() { return &(getApp().appSettings); }
 ApplicationProperties& getAppProperties() { return *getApp().appProperties; }
-OpenGLContext * getOpenGLContext() { return getApp().mainComponent->openGLContext.get(); }
+OpenGLContext* getOpenGLContext() { return getApp().mainComponent->openGLContext.get(); }
 ApplicationCommandManager& getCommandManager() { return getApp().commandManager; }
-OrganicApplication::MainWindow * getMainWindow() { return getApp().mainWindow.get(); }
+OrganicApplication::MainWindow* getMainWindow() { return getApp().mainWindow.get(); }
 
 
-OrganicApplication::OrganicApplication(const String &appName, bool useWindow, const Image &trayIcon) :
+OrganicApplication::OrganicApplication(const String& appName, bool useWindow, const Image& trayIcon) :
 	appSettings("Other Settings"),
 	engine(nullptr),
 	mainComponent(nullptr),
 	useWindow(useWindow),
-    trayIconImage(trayIcon)
+	trayIconImage(trayIcon)
 {
 	PropertiesFile::Options options;
 	options.applicationName = appName;
@@ -36,7 +36,7 @@ OrganicApplication::OrganicApplication(const String &appName, bool useWindow, co
 const String OrganicApplication::getApplicationName() { return ProjectInfo::projectName; }
 const String OrganicApplication::getApplicationVersion() { return ProjectInfo::versionString; }
 
-void OrganicApplication::initialise(const String & commandLine)
+void OrganicApplication::initialise(const String& commandLine)
 {
 	initialiseInternal(commandLine);
 
@@ -49,12 +49,12 @@ void OrganicApplication::initialise(const String & commandLine)
 		if (c.command == "headless") useWindow = false;
 	}
 
-	GlobalSettings::getInstance()->addChildControllableContainer(&appSettings,false, GlobalSettings::getInstance()->controllableContainers.size()-1);
-	
+	GlobalSettings::getInstance()->addChildControllableContainer(&appSettings, false, GlobalSettings::getInstance()->controllableContainers.size() - 1);
+
 	var gs = JSON::fromString(getAppProperties().getUserSettings()->getValue("globalSettings", ""));
 	GlobalSettings::getInstance()->loadJSONData(gs);
 
-	
+
 	engine->addAsyncEngineListener(this);
 	WarningReporter::getInstance(); //force creation after engine creation
 	GlobalSettings::getInstance()->selectionManager = InspectableSelectionManager::mainSelectionManager;
@@ -63,17 +63,17 @@ void OrganicApplication::initialise(const String & commandLine)
 	{
 		jassert(engine != nullptr);
 		if (mainComponent == nullptr) mainComponent = std::make_unique<OrganicMainContentComponent>();
-		
+
 		mainWindow.reset(new MainWindow(getApplicationName(), mainComponent.get(), trayIconImage));
 		updateAppTitle();
 	}
 
 	AppUpdater::getInstance()->addAsyncUpdateListener(this);
 
-	if (GlobalSettings::getInstance()->checkUpdatesOnStartup->boolValue() 
+	if (GlobalSettings::getInstance()->checkUpdatesOnStartup->boolValue()
 		&& !GlobalSettings::getInstance()->launchMinimised->boolValue()
-		&& useWindow	
-	 ) //only checking updates if there is a UI and it's not minimised by default
+		&& useWindow
+		) //only checking updates if there is a UI and it's not minimised by default
 	{
 		AppUpdater::getInstance()->checkForUpdates();
 	}
@@ -103,7 +103,7 @@ void OrganicApplication::initialise(const String & commandLine)
 }
 
 void OrganicApplication::shutdown()
-{   
+{
 	saveGlobalSettings();
 
 	// Add your application's shutdown code here..
@@ -120,13 +120,16 @@ void OrganicApplication::shutdown()
 
 void OrganicApplication::systemRequestedQuit()
 {
-	FileBasedDocument::SaveResult result = Engine::mainEngine->saveIfNeededAndUserAgrees();
-	if (result == FileBasedDocument::SaveResult::userCancelledSave) return;
-	else if (result == FileBasedDocument::SaveResult::failedToWriteToFile)
-	{
-		LOGERROR("Could not save the document (Failed to write to file)\nCancelled loading of the new document");
-		return;
-	}
+	Engine::mainEngine->saveIfNeededAndUserAgreesAsync([](FileBasedDocument::SaveResult result)
+		{
+			if (result == FileBasedDocument::SaveResult::userCancelledSave) return;
+			else if (result == FileBasedDocument::SaveResult::failedToWriteToFile)
+			{
+				LOGERROR("Could not save the document (Failed to write to file)\nCancelled loading of the new document");
+				return;
+			}
+		}
+	);
 	// This is called when the app is being asked to quit: you can ignore this
 	// request and let the app carry on running, or call quit() to allow the app to close.
 	quit();
@@ -150,7 +153,7 @@ inline void OrganicApplication::anotherInstanceStarted(const String& commandLine
 }
 
 
-void OrganicApplication::newMessage(const Engine::EngineEvent & e)
+void OrganicApplication::newMessage(const Engine::EngineEvent& e)
 {
 	switch (e.type)
 	{
@@ -166,45 +169,46 @@ void OrganicApplication::newMessage(const Engine::EngineEvent & e)
 	}
 }
 
-void OrganicApplication::newMessage(const AppUpdateEvent & e)
+void OrganicApplication::newMessage(const AppUpdateEvent& e)
 {
 	switch (e.type)
 	{
-    case AppUpdateEvent::DOWNLOAD_STARTED:
-        ShapeShifterManager::getInstance()->showContent("Logger");
-        break;
-            
+	case AppUpdateEvent::DOWNLOAD_STARTED:
+		ShapeShifterManager::getInstance()->showContent("Logger");
+		break;
+
 	case AppUpdateEvent::UPDATE_FINISHED:
 	{
-        if(e.file.getFileExtension() == "zip")
-        {
-            File appFile = File::getSpecialLocation(File::currentApplicationFile);
-            File appDir = appFile.getParentDirectory();
-            File tempDir = appDir.getChildFile("temp");
-            tempDir.deleteRecursively();
-            
-            #if JUCE_MAC
-                chmod (File::getSpecialLocation(File::currentExecutableFile).getFullPathName().toUTF8(), S_IRWXO | S_IRWXU | S_IRWXG);
-            #endif
-        }else
-        {
-            File appFile = File::getSpecialLocation(File::tempDirectory).getChildFile(getApplicationName()+String("_install"+e.file.getFileExtension()));
-            e.file.copyFileTo(appFile);
-            appFile.startAsProcess();
-            
-            JUCEApplication::getInstance()->systemRequestedQuit();
-        }
-    }
-    break;
-    
-    default: break;
+		if (e.file.getFileExtension() == "zip")
+		{
+			File appFile = File::getSpecialLocation(File::currentApplicationFile);
+			File appDir = appFile.getParentDirectory();
+			File tempDir = appDir.getChildFile("temp");
+			tempDir.deleteRecursively();
+
+#if JUCE_MAC
+			chmod(File::getSpecialLocation(File::currentExecutableFile).getFullPathName().toUTF8(), S_IRWXO | S_IRWXU | S_IRWXG);
+#endif
+		}
+		else
+		{
+			File appFile = File::getSpecialLocation(File::tempDirectory).getChildFile(getApplicationName() + String("_install" + e.file.getFileExtension()));
+			e.file.copyFileTo(appFile);
+			appFile.startAsProcess();
+
+			JUCEApplication::getInstance()->systemRequestedQuit();
+		}
+	}
+	break;
+
+	default: break;
 	}
 }
 
 bool OrganicApplication::clearGlobalSettings()
 {
-	
-	bool result = AlertWindow::showOkCancelBox(AlertWindow::QuestionIcon, "So you want a fresh start", "Are you sure you want to delete the Preferences ? If so, you should definitely restart " + getApplicationName() + " after clearing in order to see changes.", "Yes", "No");
+
+	bool result = AlertWindow::showOkCancelBox(AlertWindow::QuestionIcon, "So you want a fresh start", "Are you sure you want to delete the Preferences ? If so, you should definitely restart " + getApplicationName() + " after clearing in order to see changes.", "Yes", "No", nullptr, nullptr);
 
 	if (result)
 	{
@@ -212,18 +216,18 @@ bool OrganicApplication::clearGlobalSettings()
 		getAppProperties().getUserSettings()->clear();
 		LOG("Preferences have been cleared.");
 	}
-	
+
 	return result;
 }
 
 void OrganicApplication::saveGlobalSettings()
 {
-    
+
 	if (useWindow && mainWindow != nullptr)
 	{
-        MessageManagerLock mmLock;
-        
-        var boundsVar = var(new DynamicObject());
+		MessageManagerLock mmLock;
+
+		var boundsVar = var(new DynamicObject());
 		juce::Rectangle<int> r = mainWindow->getScreenBounds();
 
 		getAppProperties().getUserSettings()->setValue("windowX", r.getPosition().x);
@@ -240,13 +244,13 @@ void OrganicApplication::saveGlobalSettings()
 
 void OrganicApplication::updateAppTitle()
 {
-	if(useWindow && mainWindow != nullptr && Engine::mainEngine != nullptr) mainWindow->setName(getApplicationName() + " " + getApplicationVersion() + " - " + Engine::mainEngine->getDocumentTitle()+(Engine::mainEngine->hasChangedSinceSaved()?" *":"")); 
+	if (useWindow && mainWindow != nullptr && Engine::mainEngine != nullptr) mainWindow->setName(getApplicationName() + " " + getApplicationVersion() + " - " + Engine::mainEngine->getDocumentTitle() + (Engine::mainEngine->hasChangedSinceSaved() ? " *" : ""));
 }
 
-inline OrganicApplication::MainWindow::MainWindow(String name, OrganicMainContentComponent* mainComponent, const Image &image) :
+inline OrganicApplication::MainWindow::MainWindow(String name, OrganicMainContentComponent* mainComponent, const Image& image) :
 	DocumentWindow(name,
-	Colours::lightgrey,
-	DocumentWindow::allButtons),
+		Colours::lightgrey,
+		DocumentWindow::allButtons),
 	mainComponent(mainComponent),
 	iconImage(image)
 {
@@ -267,7 +271,7 @@ inline OrganicApplication::MainWindow::MainWindow(String name, OrganicMainConten
 #endif
 
 	bool fs = getAppProperties().getUserSettings()->getBoolValue("fullscreen", fullScreenIsDefault);
-	
+
 	setBounds(jmax<int>(tx, 100), jmax<int>(ty, 100), jmax<int>(tw, 1200), jmax<int>(th, 800));
 
 #if !JUCE_LINUX
@@ -359,10 +363,14 @@ void OrganicApplication::MainWindow::showTrayMenu()
 	p.addSeparator();
 	p.addItem(-1, "Exit");
 
-	int result = p.show();
-	if (!result) return;
-	if (result == -1) OrganicApplication::quit();
-	else handlTrayMenuResult(result);
+	p.showMenuAsync(PopupMenu::Options(), [this](int result)
+		{
+			if (!result) return;
+			if (result == -1) OrganicApplication::quit();
+			else this->handlTrayMenuResult(result);
+		}
+	);
+
 }
 
 

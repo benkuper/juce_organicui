@@ -76,7 +76,8 @@ var ScriptUtil::delayThreadMS(const var::NativeFunctionArgs& a)
 	}
 	else
 	{
-		MessageManager::getInstance()->runDispatchLoopUntil((int)a.arguments[0]);
+		Thread::sleep((int)a.arguments[0]); //TO do better to avoid stopping UI thread
+		//MessageManager::getInstance()->runDispatchLoop((int)a.arguments[0]);
 	}
 
 	return true;
@@ -394,7 +395,7 @@ var ScriptUtil::showMessageBox(const var::NativeFunctionArgs& args)
 	String title = args.arguments[0].toString();
 	String message = args.arguments[1].toString();
 	String buttonText = args.numArguments >= 4 ? args.arguments[3].toString() : "";
-	AlertWindow::showMessageBox(iconType, title, message, buttonText);
+	AlertWindow::showMessageBoxAsync(iconType, title, message, buttonText);
 
 	return var();
 }
@@ -416,7 +417,7 @@ var ScriptUtil::showOkCancelBox(const var::NativeFunctionArgs& args)
 	String message = args.arguments[1].toString();
 	String button1Text = args.numArguments >= 4 ? args.arguments[3].toString() : "";
 	String button2Text = args.numArguments >= 5 ? args.arguments[4].toString() : "";
-	bool result = AlertWindow::showOkCancelBox(iconType, title, message, button1Text,button2Text);
+	bool result = AlertWindow::showOkCancelBox(iconType, title, message, button1Text,button2Text, nullptr, nullptr);
 
 	return result;
 }
@@ -439,7 +440,7 @@ var ScriptUtil::showYesNoCancelBox(const var::NativeFunctionArgs& args)
 	String button1Text = args.numArguments >= 4 ? args.arguments[3].toString() : "";
 	String button2Text = args.numArguments >= 5 ? args.arguments[4].toString() : "";
 	String button3Text = args.numArguments >= 6 ? args.arguments[5].toString() : "";
-	int result = AlertWindow::showYesNoCancelBox(iconType, title, message, button1Text, button2Text, button3Text);
+	int result = AlertWindow::showYesNoCancelBox(iconType, title, message, button1Text, button2Text, button3Text, nullptr, nullptr);
 
 	return result;
 }

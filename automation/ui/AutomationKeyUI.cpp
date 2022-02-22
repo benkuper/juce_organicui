@@ -87,12 +87,15 @@ void AutomationKeyUI::mouseDown(const MouseEvent& e)
 				kid++;
 			}
 
-			int result = ep.show();
-			if (result >= 1 && result <= keys.size())
-			{
-				item->easingType->setUndoableValue(item->easingType->value, keys[result - 1]);
-				item->easing->selectThis(); //reselect after changing easing
-			}
+			ep.showMenuAsync(PopupMenu::Options(), [this, keys](int result)
+				{
+					if (result >= 1 && result <= keys.size())
+					{
+						this->item->easingType->setUndoableValue(item->easingType->value, keys[result - 1]);
+						this->item->easing->selectThis(); //reselect after changing easing
+					}
+				}
+			);
 		}
 		else if (e.mods.isCommandDown())
 		{

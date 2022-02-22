@@ -678,8 +678,11 @@ void BaseManagerUI<M, T, U>::showMenuAndAddItem(bool isFromAddButton, Point<int>
 {
 	if (manager->managerFactory != nullptr)
 	{
-		T* item = manager->managerFactory->showCreateMenu();
-		if (item != nullptr) addItemFromMenu(item, isFromAddButton, mouseDownPos);
+		manager->managerFactory->showCreateMenu([this, isFromAddButton, mouseDownPos](T* item)
+			{
+				this->addItemFromMenu(item, isFromAddButton, mouseDownPos);
+			}
+		);
 	}
 	else
 	{
@@ -694,19 +697,22 @@ void BaseManagerUI<M, T, U>::showMenuAndAddItem(bool isFromAddButton, Point<int>
 
 		addMenuExtraItems(p, 2);
 
-		int result = p.show();
-		if (result == 0) return;
+		p.showMenuAsync(PopupMenu::Options(), [this, isFromAddButton, mouseDownPos](int result)
+			{
+				if (result == 0) return;
 
-		switch (result)
-		{
-		case 1:
-			addItemFromMenu(isFromAddButton, mouseDownPos);
-			break;
+				switch (result)
+				{
+				case 1:
+					this->addItemFromMenu(isFromAddButton, mouseDownPos);
+					break;
 
-		default:
-			handleMenuExtraItemsResult(result, 2);
-			break;
-		}
+				default:
+					this->handleMenuExtraItemsResult(result, 2);
+					break;
+				}
+			}
+		);
 	}
 
 }

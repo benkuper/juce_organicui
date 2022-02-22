@@ -114,7 +114,7 @@ void Engine::loadDocumentAsync(const File& file) {
 		{
 			LOGERROR("Error reading file :\n" << result.getErrorMessage());
 
-			AlertWindow::showMessageBox(AlertWindow::AlertIconType::WarningIcon, "File format error", "The file you want to open is not a valid noisette. Error :\n" + result.getErrorMessage(), "Ok, i guess");
+			AlertWindow::showMessageBoxAsync(AlertWindow::AlertIconType::WarningIcon, "File format error", "The file you want to open is not a valid noisette. Error :\n" + result.getErrorMessage(), "Ok, i guess");
 			setFile(File());
 			return;
 		}
@@ -176,7 +176,7 @@ Result Engine::saveDocument(const File& file) {
 	if (os == nullptr)
 	{
 		LOGERROR("Error saving document, please try again");
-		AlertWindow::showMessageBox(AlertWindow::AlertIconType::WarningIcon, "Session save error", "Damned ! Something went wrong when saving the file, you should definitely try to save it again.", "Gotcha");
+		AlertWindow::showMessageBoxAsync(AlertWindow::AlertIconType::WarningIcon, "Session save error", "Damned ! Something went wrong when saving the file, you should definitely try to save it again.", "Gotcha");
 		return Result::fail("Could not save the file : output stream is null");
 	}
 
@@ -285,7 +285,7 @@ void Engine::loadJSONData(var data, ProgressTask* loadingTask)
 	DynamicObject* dObject = data.getDynamicObject();
 	if (dObject == nullptr)
 	{
-		AlertWindow::showMessageBox(AlertWindow::AlertIconType::WarningIcon, "File format error", "The file you want to open is not a valid noisette.", "Ok, i guess");
+		AlertWindow::showMessageBoxAsync(AlertWindow::AlertIconType::WarningIcon, "File format error", "The file you want to open is not a valid noisette.", "Ok, i guess");
 		setFile(File());
 		return;
 	}
@@ -297,7 +297,7 @@ void Engine::loadJSONData(var data, ProgressTask* loadingTask)
 	String versionString = md->hasProperty("version") ? md->getProperty("version").toString() : "?";
 	if (!versionChecked)
 	{
-		AlertWindow::showMessageBox(AlertWindow::AlertIconType::WarningIcon, "You're old, dude !", "File version (" + versionString + ") is not supported anymore.\n(Minimum supported version : " + getMinimumRequiredFileVersion() + ")");
+		AlertWindow::showMessageBoxAsync(AlertWindow::AlertIconType::WarningIcon, "You're old, dude !", "File version (" + versionString + ") is not supported anymore.\n(Minimum supported version : " + getMinimumRequiredFileVersion() + ")");
 		setFile(File());
 		return;
 	}
@@ -314,103 +314,97 @@ void Engine::loadJSONData(var data, ProgressTask* loadingTask)
 
 			if (needsOnlineUpdate)
 			{
-				result = AlertWindow::showYesNoCancelBox(AlertWindow::QuestionIcon, "File compatibility check", "Your file has been save with an older version of " + OrganicApplication::getInstance()->getApplicationName() + " (" + versionString + "), some data may be lost if you load it directly. You can choose to update the file online, load it directly or cancel the operation.\nIn any case, your current file will be backed up with \"_backup\" appended to its name.", "Update", "Load directly", "Cancel");
-			}
-
-			if (result == 0)
-			{
-				setFile(File());
-				return;
-			}
+				result = AlertWindow::showYesNoCancelBox(AlertWindow::QuestionIcon, "File compatibility check", "Your file has been save with an older version of " + OrganicApplication::getInstance()->getApplicationName() + " (" + versionString + "), some data may be lost if you load it directly. You can choose to update the file online, load it directly or cancel the operation.\nIn any case, your current file will be backed up with \"_backup\" appended to its name.", "Update", "Load directly", "Cancel", nullptr, nullptr);
 
 
-			File f = getFile();
-			if (f.exists())
-			{
-				File backupF = f.getParentDirectory().getNonexistentChildFile(f.getFileNameWithoutExtension() + "_backup", f.getFileExtension(), true);
-				f.copyFileTo(backupF);
-				LOG("Your original file has been copied to " << backupF.getFullPathName());
-			}
-
-			switch (result)
-			{
-			case 1: //update
-			{
-				//var postData = new DynamicObject();
-				//postData.getDynamicObject()->setProperty("file", );
-				data.getDynamicObject()->setProperty("appVersion", getAppVersion());
-				URL url = URL(convertURL).withPOSTData(JSON::toString(data, true));
-				WebInputStream stream(url, true);
-
-				String convertedData = stream.withExtraHeaders("Content-Type: Text/plain").readEntireStreamAsString();
-				if (convertedData.isEmpty())
+				File f = getFile();
+				if (f.exists())
 				{
-					AlertWindow::showMessageBox(AlertWindow::AlertIconType::WarningIcon, "Update error", "Could not connect to the update server, please make sure you are connected to internet. You can still reload your file and not update it.", "Well, shit happens");
-					setFile(File());
-					return;
+					File backupF = f.getParentDirectory().getNonexistentChildFile(f.getFileNameWithoutExtension() + "_backup", f.getFileExtension(), true);
+					f.copyFileTo(backupF);
+					LOG("Your original file has been copied to " << backupF.getFullPathName());
 				}
 
-				data = JSON::parse(convertedData);
-
-				if (data.isVoid())
+				switch (result)
 				{
-					DBG(convertedData);
+				case 1: //update
+				{
+					//var postData = new DynamicObject();
+					//postData.getDynamicObject()->setProperty("file", );
+					data.getDynamicObject()->setProperty("appVersion", getAppVersion());
+					URL url = URL(convertURL).withPOSTData(JSON::toString(data, true));
+					WebInputStream stream(url, true);
 
-					AlertWindow::showMessageBox(AlertWindow::AlertIconType::WarningIcon, "Update error", "There is an error with the converted file, the data is badly formatted. I mean, real bad. You can still reload your file and not update it.", "Well, shit happens");
-					setFile(File());
-					return;
+					String convertedData = stream.withExtraHeaders("Content-Type: Text/plain").readEntireStreamAsString();
+					if (convertedData.isEmpty())
+					{
+						AlertWindow::showMessageBoxAsync(AlertWindow::AlertIconType::WarningIcon, "Update error", "Could not connect to the update server, please make sure you are connected to internet. You can still reload your file and not update it.", "Well, shit happens");
+						setFile(File());
+						return;
+					}
+
+					data = JSON::parse(convertedData);
+
+					if (data.isVoid())
+					{
+						DBG(convertedData);
+
+						AlertWindow::showMessageBoxAsync(AlertWindow::AlertIconType::WarningIcon, "Update error", "There is an error with the converted file, the data is badly formatted. I mean, real bad. You can still reload your file and not update it.", "Well, shit happens");
+						setFile(File());
+						return;
+					}
+
+					//continue loading with new data
 				}
-
-				//continue loading with new data
-			}
-			break;
-
-			case 2: //load directly
-					//do nothing
 				break;
+
+				case 2: //load directly
+						//do nothing
+					break;
+				}
 			}
 		}
+
+
+
+		//if (InspectableSelectionManager::mainSelectionManager != nullptr) InspectableSelectionManager::mainSelectionManager->setEnabled(false); //avoid creation of inspector editor while recreating all nodes, controllers, rules,etc. from file
+		if (Outliner::getInstanceWithoutCreating() != nullptr) Outliner::getInstance()->setEnabled(false);
+
+		DynamicObject* d = data.getDynamicObject();
+
+		ProgressTask* projectTask = loadingTask->addTask("Project Settings");
+		ProgressTask* dashboardTask = loadingTask->addTask("Dashboard");
+		ProgressTask* parrotTask = loadingTask->addTask("Parrot");
+
+
+		var layoutData = d->getProperty("layout");
+		if (layoutData.isVoid()) layoutData = ShapeShifterManager::getInstance()->getCurrentLayout();
+
+		ShapeShifterManager::getInstance()->clearAllPanelsAndWindows();
+
+		projectTask->start();
+		if (d->hasProperty("projectSettings")) ProjectSettings::getInstance()->loadJSONData(d->getProperty("projectSettings"));
+		projectTask->setProgress(1);
+		projectTask->end();
+
+		loadJSONDataInternalEngine(data, loadingTask);
+
+		parrotTask->start();
+		ParrotManager::getInstance()->loadJSONData(data.getProperty(ParrotManager::getInstance()->shortName, var()));
+		parrotTask->setProgress(1);
+		parrotTask->end();
+
+		dashboardTask->start();
+		if (d->hasProperty("dashboardManager")) DashboardManager::getInstance()->loadJSONData(d->getProperty("dashboardManager"));
+		dashboardTask->setProgress(1);
+		dashboardTask->end();
+
+		ShapeShifterManager::getInstance()->loadLayout(layoutData);
+
+
+		if (InspectableSelectionManager::mainSelectionManager != nullptr) InspectableSelectionManager::mainSelectionManager->setEnabled(true); //Re enable editor
+		if (Outliner::getInstanceWithoutCreating() != nullptr) Outliner::getInstance()->setEnabled(true);
 	}
-
-
-
-	//if (InspectableSelectionManager::mainSelectionManager != nullptr) InspectableSelectionManager::mainSelectionManager->setEnabled(false); //avoid creation of inspector editor while recreating all nodes, controllers, rules,etc. from file
-	if (Outliner::getInstanceWithoutCreating() != nullptr) Outliner::getInstance()->setEnabled(false);
-
-	DynamicObject* d = data.getDynamicObject();
-
-	ProgressTask* projectTask = loadingTask->addTask("Project Settings");
-	ProgressTask* dashboardTask = loadingTask->addTask("Dashboard");
-	ProgressTask* parrotTask = loadingTask->addTask("Parrot");
-
-
-	var layoutData = d->getProperty("layout");
-	if (layoutData.isVoid()) layoutData = ShapeShifterManager::getInstance()->getCurrentLayout();
-
-	ShapeShifterManager::getInstance()->clearAllPanelsAndWindows();
-
-	projectTask->start();
-	if (d->hasProperty("projectSettings")) ProjectSettings::getInstance()->loadJSONData(d->getProperty("projectSettings"));
-	projectTask->setProgress(1);
-	projectTask->end();
-
-	loadJSONDataInternalEngine(data, loadingTask);
-
-	parrotTask->start();
-	ParrotManager::getInstance()->loadJSONData(data.getProperty(ParrotManager::getInstance()->shortName, var()));
-	parrotTask->setProgress(1);
-	parrotTask->end();
-
-	dashboardTask->start();
-	if (d->hasProperty("dashboardManager")) DashboardManager::getInstance()->loadJSONData(d->getProperty("dashboardManager"));
-	dashboardTask->setProgress(1);
-	dashboardTask->end();
-
-	ShapeShifterManager::getInstance()->loadLayout(layoutData);
-
-
-	if (InspectableSelectionManager::mainSelectionManager != nullptr) InspectableSelectionManager::mainSelectionManager->setEnabled(true); //Re enable editor
-	if (Outliner::getInstanceWithoutCreating() != nullptr) Outliner::getInstance()->setEnabled(true);
 }
 
 bool Engine::checkFileVersion(DynamicObject* metaData, bool checkForNewerVersion)

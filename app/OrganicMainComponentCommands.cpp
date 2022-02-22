@@ -352,76 +352,93 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 
 	case CommandIDs::newFile:
 	{
-		FileBasedDocument::SaveResult result = Engine::mainEngine->saveIfNeededAndUserAgrees();
-		if (result == FileBasedDocument::SaveResult::userCancelledSave)
-		{
+		Engine::mainEngine->saveIfNeededAndUserAgreesAsync([](FileBasedDocument::SaveResult result)
+			{
+				if (result == FileBasedDocument::SaveResult::userCancelledSave)
+				{
 
-		}
-		else if (result == FileBasedDocument::SaveResult::failedToWriteToFile)
-		{
-			LOGERROR("Could not save the document (Failed to write to file)\nCancelled loading of the new document");
-		}
-		else
-		{
-			Engine::mainEngine->createNewGraph();
-		}
+				}
+				else if (result == FileBasedDocument::SaveResult::failedToWriteToFile)
+				{
+					LOGERROR("Could not save the document (Failed to write to file)\nCancelled loading of the new document");
+				}
+				else
+				{
+					Engine::mainEngine->createNewGraph();
+				}
+			}
+		);
 	}
 	break;
 
 	case CommandIDs::open:
 	{
-		FileBasedDocument::SaveResult result = Engine::mainEngine->saveIfNeededAndUserAgrees();
-		if (result == FileBasedDocument::SaveResult::userCancelledSave)
-		{
+		Engine::mainEngine->saveIfNeededAndUserAgreesAsync([](FileBasedDocument::SaveResult result)
+			{
+				if (result == FileBasedDocument::SaveResult::userCancelledSave)
+				{
 
-		}
-		else if (result == FileBasedDocument::SaveResult::failedToWriteToFile)
-		{
-			LOGERROR("Could not save the document (Failed to write to file)\nCancelled loading of the new document");
-		}
-		else
-		{
-			Engine::mainEngine->loadFromUserSpecifiedFile(true);
-		}
+				}
+				else if (result == FileBasedDocument::SaveResult::failedToWriteToFile)
+				{
+					LOGERROR("Could not save the document (Failed to write to file)\nCancelled loading of the new document");
+				}
+				else
+				{
+					Engine::mainEngine->loadFromUserSpecifiedFileAsync(true, [](Result r)
+						{
+							if (r.failed()) LOGERROR("Load failed :" + r.getErrorMessage());
+						}
+					);
+				}
+			}
+		);
 	}
 	break;
 
 	case CommandIDs::openLastDocument:
 	{
-		FileBasedDocument::SaveResult result = Engine::mainEngine->saveIfNeededAndUserAgrees();
-		if (result == FileBasedDocument::SaveResult::userCancelledSave)
-		{
-		}
-		else if (result == FileBasedDocument::SaveResult::failedToWriteToFile)
-		{
-			LOGERROR("Could not save the document (Failed to write to file)\nCancelled loading of the new document");
-		}
-		else
-		{
-			Engine::mainEngine->loadFrom(Engine::mainEngine->getLastDocumentOpened(), true);
-		}
+		Engine::mainEngine->saveIfNeededAndUserAgreesAsync([](FileBasedDocument::SaveResult result)
+			{
+				if (result == FileBasedDocument::SaveResult::userCancelledSave)
+				{
+				}
+				else if (result == FileBasedDocument::SaveResult::failedToWriteToFile)
+				{
+					LOGERROR("Could not save the document (Failed to write to file)\nCancelled loading of the new document");
+				}
+				else
+				{
+					Engine::mainEngine->loadFrom(Engine::mainEngine->getLastDocumentOpened(), true);
+				}
+			}
+		);
 	}
 	break;
 
 	case CommandIDs::save:
 	case CommandIDs::saveAs:
 	{
-		FileBasedDocument::SaveResult result = FileBasedDocument::SaveResult::savedOk;
-		if (info.commandID == CommandIDs::save) result = Engine::mainEngine->save(true, true);
-		else result = Engine::mainEngine->saveAs(File(), true, true, true);
 
-		if (result == FileBasedDocument::SaveResult::userCancelledSave)
+		std::function<void(FileBasedDocument::SaveResult)> rFunc = [](FileBasedDocument::SaveResult result)
 		{
+			if (result == FileBasedDocument::SaveResult::userCancelledSave)
+			{
 
-		}
-		else if (result == FileBasedDocument::SaveResult::failedToWriteToFile)
-		{
-			LOGERROR("Could not save the document (Failed to write to file)\nCancelled loading of the new document");
-		}
-		else if (result == FileBasedDocument::SaveResult::savedOk)
-		{
-			LOG("File saved.");
-		}
+			}
+			else if (result == FileBasedDocument::SaveResult::failedToWriteToFile)
+			{
+				LOGERROR("Could not save the document (Failed to write to file)\nCancelled loading of the new document");
+			}
+			else if (result == FileBasedDocument::SaveResult::savedOk)
+			{
+				LOG("File saved.");
+			}
+		};
+
+		if (info.commandID == CommandIDs::save) Engine::mainEngine->saveAsync(true, true, rFunc);
+		else Engine::mainEngine->saveAsAsync(File(), true, true, true, rFunc);
+
 	}
 	break;
 

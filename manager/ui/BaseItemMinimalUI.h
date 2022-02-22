@@ -220,11 +220,13 @@ void BaseItemMinimalUI<T>::mouseDown(const MouseEvent& e)
 
 		if (p.getNumItems() == 0) return;
 
-		int result = p.show();
+		p.showMenuAsync(PopupMenu::Options(), [this](int result)
+			{
+				if (result > 0) handleContextMenuResult(result);
+			}
+		);
 
-		if (result == 0) return;
-
-		handleContextMenuResult(result);
+		
 	}else
 	{
 		if (item->isUILocked->boolValue()) return;

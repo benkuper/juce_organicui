@@ -149,14 +149,17 @@ void DoubleSliderUI::showEditWindowInternal()
 	nameWindow.addButton("OK", 1, KeyPress(KeyPress::returnKey));
 	nameWindow.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
 
-	int result = nameWindow.runModalLoop();
+	nameWindow.showAsync(MessageBoxOptions(), [this, &nameWindow](int result)
+		{
 
-	if (result)
-	{
-		float newVals[2];
-		for (int i = 0; i < 2; ++i) newVals[i] = nameWindow.getTextEditorContents("val" + String(i)).getFloatValue();
-		p2d->setUndoablePoint(p2d->x, p2d->y, newVals[0], newVals[1]);
-	}
+			if (result)
+			{
+				float newVals[2];
+				for (int i = 0; i < 2; ++i) newVals[i] = nameWindow.getTextEditorContents("val" + String(i)).getFloatValue();
+				p2d->setUndoablePoint(p2d->x, p2d->y, newVals[0], newVals[1]);
+			}
+		}
+	);
 }
 
 void DoubleSliderUI::showEditRangeWindowInternal()
@@ -176,19 +179,18 @@ void DoubleSliderUI::showEditRangeWindowInternal()
 	nameWindow.addButton("OK", 1, KeyPress(KeyPress::returnKey));
 	nameWindow.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
 
-	int result = nameWindow.runModalLoop();
-
-	if (result)
-	{
-		float newMins[2];
-		float newMaxs[2];
-		for (int i = 0; i < 2; ++i)
+	nameWindow.showAsync(MessageBoxOptions(), [this, &nameWindow](int result)
 		{
-			newMins[i] = nameWindow.getTextEditorContents("minVal" + String(i)).getFloatValue();
-			newMaxs[i] = nameWindow.getTextEditorContents("maxVal" + String(i)).getFloatValue();
+			float newMins[2];
+			float newMaxs[2];
+			for (int i = 0; i < 2; ++i)
+			{
+				newMins[i] = nameWindow.getTextEditorContents("minVal" + String(i)).getFloatValue();
+				newMaxs[i] = nameWindow.getTextEditorContents("maxVal" + String(i)).getFloatValue();
+			}
+			p2d->setBounds(newMins[0], newMins[1], jmax(newMins[0], newMaxs[0]), jmax(newMins[1], newMaxs[1]));
 		}
-		p2d->setBounds(newMins[0], newMins[1], jmax(newMins[0], newMaxs[0]), jmax(newMins[1], newMaxs[1]));
-	}
+	);
 }
 
 void DoubleSliderUI::updateUseExtendedEditor()
