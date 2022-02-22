@@ -74,6 +74,7 @@ public:
 	// our Saving methods
 	var getJSONData() override;
 	void loadJSONData(var data, ProgressTask * loadingTask);
+	void loadJSONDataEngine(var data, ProgressTask* loadingTask);
 	virtual void loadJSONDataInternalEngine(var data, ProgressTask * loadingTask) {}
 
 	bool checkFileVersion(DynamicObject * metaData, bool checkForNewerVersion = false);

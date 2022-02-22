@@ -128,11 +128,13 @@ void OrganicApplication::systemRequestedQuit()
 				LOGERROR("Could not save the document (Failed to write to file)\nCancelled loading of the new document");
 				return;
 			}
+
+			// This is called when the app is being asked to quit: you can ignore this
+			// request and let the app carry on running, or call quit() to allow the app to close.
+			quit();
 		}
 	);
-	// This is called when the app is being asked to quit: you can ignore this
-	// request and let the app carry on running, or call quit() to allow the app to close.
-	quit();
+
 }
 
 inline void OrganicApplication::anotherInstanceStarted(const String& commandLine)
@@ -205,19 +207,25 @@ void OrganicApplication::newMessage(const AppUpdateEvent& e)
 	}
 }
 
-bool OrganicApplication::clearGlobalSettings()
+void OrganicApplication::clearGlobalSettings()
 {
 
-	bool result = AlertWindow::showOkCancelBox(AlertWindow::QuestionIcon, "So you want a fresh start", "Are you sure you want to delete the Preferences ? If so, you should definitely restart " + getApplicationName() + " after clearing in order to see changes.", "Yes", "No", nullptr, nullptr);
+	AlertWindow::showAsync(
+		MessageBoxOptions().withIconType(AlertWindow::QuestionIcon)
+		.withTitle("So you want a fresh start")
+		.withMessage("Are you sure you want to delete the Preferences ? If so, you should definitely restart " + getApplicationName() + " after clearing in order to see changes.")
+		.withButton("Yes")
+		.withButton("No"),
+		[](int result)
+		{
+			if (result)
+			{
+				getAppProperties().getUserSettings()->getFile().deleteFile();
+				getAppProperties().getUserSettings()->clear();
+				LOG("Preferences have been cleared.");
+			}
+		});
 
-	if (result)
-	{
-		getAppProperties().getUserSettings()->getFile().deleteFile();
-		getAppProperties().getUserSettings()->clear();
-		LOG("Preferences have been cleared.");
-	}
-
-	return result;
 }
 
 void OrganicApplication::saveGlobalSettings()

@@ -425,8 +425,17 @@ void BaseItemUI<T>::buttonClicked(Button* b)
 	{
 		if (this->baseItem->askConfirmationBeforeRemove && GlobalSettings::getInstance()->askBeforeRemovingItems->boolValue())
 		{
-			int result = AlertWindow::showOkCancelBox(AlertWindow::QuestionIcon, "Delete " + this->baseItem->niceName, "Are you sure you want to delete this ?", "Delete", "Cancel", nullptr, nullptr);
-			if (result != 0)this->baseItem->remove();
+			AlertWindow::showAsync(
+				MessageBoxOptions().withIconType(AlertWindow::QuestionIcon)
+				.withTitle("Delete " + this->baseItem->niceName)
+				.withMessage("Are you sure you want to delete this ?")
+				.withButton("Delete")
+				.withButton("Cancel"),
+				[this](int result)
+				{
+					if (result != 0) this->baseItem->remove();
+				}
+			);
 		}
 		else this->baseItem->remove();
 	}

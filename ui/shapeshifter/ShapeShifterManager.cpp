@@ -269,12 +269,14 @@ void ShapeShifterManager::loadLayoutFromFile(int fileIndexInLayoutFolder)
 	File layoutFile;
 	if (fileIndexInLayoutFolder == -1)
 	{
-		FileChooser fc("Load layout", layoutFolder, "*." + appLayoutExtension);
+		FileChooser* fc(new FileChooser("Load layout", layoutFolder, "*." + appLayoutExtension));
 		auto folderChooserFlags = FileBrowserComponent::openMode | FileBrowserComponent::canSelectDirectories;
-		fc.launchAsync(folderChooserFlags, [this](const FileChooser& fc)
+		fc->launchAsync(folderChooserFlags, [this](const FileChooser& fc)
 			{
-				loadLayoutFromFile(fc.getResult());
-				//layoutFile = fc.getResult();
+				File f = fc.getResult();
+				delete& fc;
+				if (f == File()) return;
+				loadLayoutFromFile(f);
 			}
 		);
 	}
@@ -331,10 +333,14 @@ void ShapeShifterManager::saveCurrentLayout()
 {
 	if (!layoutFolder.exists()) layoutFolder.createDirectory();
 
-	FileChooser fc("Save layout", layoutFolder, "*." + appLayoutExtension);
-	fc.launchAsync(FileBrowserComponent::saveMode | FileBrowserComponent::FileChooserFlags::warnAboutOverwriting, [this](const FileChooser& fc)
+	FileChooser* fc(new FileChooser("Save layout", layoutFolder, "*." + appLayoutExtension));
+	fc->launchAsync(FileBrowserComponent::saveMode | FileBrowserComponent::FileChooserFlags::warnAboutOverwriting, [this](const FileChooser& fc)
 		{
-			saveCurrentLayoutToFile(fc.getResult().withFileExtension(appLayoutExtension));
+			File f = fc.getResult();
+			delete& fc;
+			if (f == File()) return;
+
+			saveCurrentLayoutToFile(f.withFileExtension(appLayoutExtension));
 		}
 	);
 }

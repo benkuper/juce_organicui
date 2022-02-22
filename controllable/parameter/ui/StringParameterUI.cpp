@@ -164,13 +164,16 @@ void StringParameterFileUI::buttonClicked(Button* b)
 {
 	if (b == &browseBT)
 	{
-		FileChooser chooser("Select a file", File(fp->getBasePath()), fp->fileTypeFilter);
+		FileChooser * chooser(new FileChooser("Select a file", File(fp->getBasePath()), fp->fileTypeFilter));
 
 		int flags = FileBrowserComponent::openMode;
-		if (fp->directoryMode) flags |= FileBrowserComponent::canSelectDirectories;
-		chooser.launchAsync(flags, [this](const FileChooser& fc)
+		if (fp->directoryMode) flags = flags | FileBrowserComponent::canSelectDirectories;
+		chooser->launchAsync(FileBrowserComponent::openMode, [this](const FileChooser& fc)
 			{
-				if (!fc.getResult().exists()) return;
+				File f = fc.getResult();
+				delete& fc;
+
+				if (!f.exists()) return;
 
 				Component::BailOutChecker checker(this);
 				if (checker.shouldBailOut()) return;
@@ -178,8 +181,9 @@ void StringParameterFileUI::buttonClicked(Button* b)
 				if (parameter.wasObjectDeleted()) return;
 				if (parameter != nullptr)
 				{
-					parameter->setUndoableValue(parameter->stringValue(), fc.getResult().getFullPathName());
+					parameter->setUndoableValue(parameter->stringValue(), f.getFullPathName());
 				}
+
 			}
 		);
 	}

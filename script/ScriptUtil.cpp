@@ -417,8 +417,9 @@ var ScriptUtil::showOkCancelBox(const var::NativeFunctionArgs& args)
 	String message = args.arguments[1].toString();
 	String button1Text = args.numArguments >= 4 ? args.arguments[3].toString() : "";
 	String button2Text = args.numArguments >= 5 ? args.arguments[4].toString() : "";
-	bool result = AlertWindow::showOkCancelBox(iconType, title, message, button1Text,button2Text, nullptr, nullptr);
+	bool result = AlertWindow::showOkCancelBox(iconType, title, message, button1Text, button2Text, nullptr, nullptr);
 
+	//This will not work with async, need to find an alternative...
 	return result;
 }
 
@@ -442,6 +443,7 @@ var ScriptUtil::showYesNoCancelBox(const var::NativeFunctionArgs& args)
 	String button3Text = args.numArguments >= 6 ? args.arguments[5].toString() : "";
 	int result = AlertWindow::showYesNoCancelBox(iconType, title, message, button1Text, button2Text, button3Text, nullptr, nullptr);
 
+	//This will not work with async, need to find an alternative...
 	return result;
 }
 
