@@ -372,14 +372,13 @@ void Engine::loadJSONData(var data, ProgressTask* loadingTask)
 						loadJSONDataEngine(data, loadingTask);
 					}
 				);
-			}
-			else
-			{
-				loadJSONDataEngine(data, loadingTask);
-			}
 
+				return;
+			}
 		}
 	}
+
+	loadJSONDataEngine(data, loadingTask);
 }
 
 void Engine::loadJSONDataEngine(var data, ProgressTask* loadingTask)
