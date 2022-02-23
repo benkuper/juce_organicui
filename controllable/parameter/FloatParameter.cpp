@@ -89,7 +89,7 @@ void FloatParameter::setValueInternal(var& val)
 
 bool FloatParameter::hasRange()
 {
-	return (float)minimumValue != INT32_MIN || (float)maximumValue != INT32_MAX;
+	return (float)minimumValue != INT32_MIN && (float)maximumValue != INT32_MAX;
 }
 
 
