@@ -75,29 +75,29 @@ void ParameterUI::showEditRangeWindowInternal()
 {
 	if (!parameter->canHaveRange || !parameter->isCustomizableByUser) return;
 
-	AlertWindow nameWindow("Set the range", "Set a new range for this parameter", AlertWindow::AlertIconType::NoIcon, this);
+	AlertWindow* nameWindow = new AlertWindow("Set the range", "Set a new range for this parameter", AlertWindow::AlertIconType::NoIcon, this);
 
-	nameWindow.addTextEditor("minVal", parameter->hasRange() ? String((float)parameter->minimumValue) : "", "Minimum");
-	nameWindow.addTextEditor("maxVal", parameter->hasRange() ? String((float)parameter->maximumValue) : "", "Maximum");
+	nameWindow->addTextEditor("minVal", parameter->hasRange() ? String((float)parameter->minimumValue) : "", "Minimum");
+	nameWindow->addTextEditor("maxVal", parameter->hasRange() ? String((float)parameter->maximumValue) : "", "Maximum");
 
-	nameWindow.addButton("OK", 1, KeyPress(KeyPress::returnKey));
-	nameWindow.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
+	nameWindow->addButton("OK", 1, KeyPress(KeyPress::returnKey));
+	nameWindow->addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
 
-	nameWindow.showAsync(MessageBoxOptions(), [this, &nameWindow](int result)
+	nameWindow->enterModalState(true, ModalCallbackFunction::create([this, nameWindow](int result)
 		{
-
 			if (result)
 			{
 				if (parameter->type == Parameter::FLOAT || parameter->type == Parameter::INT)
 				{
-					String minRangeString = nameWindow.getTextEditorContents("minVal");
-					String maxRangeString = nameWindow.getTextEditorContents("maxVal");
+					String minRangeString = nameWindow->getTextEditorContents("minVal");
+					String maxRangeString = nameWindow->getTextEditorContents("maxVal");
 					float newMin = minRangeString.isNotEmpty() ? minRangeString.getFloatValue() : INT32_MIN;
 					float newMax = maxRangeString.isNotEmpty() ? maxRangeString.getFloatValue() : INT32_MAX;
 					parameter->setRange(newMin, jmax(newMin, newMax));
 				}
 			}
-		}
+		}),
+		true
 	);
 }
 

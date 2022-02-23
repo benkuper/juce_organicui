@@ -167,8 +167,12 @@ void TargetParameterUI::showPopupAndGetTarget()
 		}
 		else
 		{
-			ControllableChooserPopupMenu p(targetParameter->rootContainer, 0, targetParameter->maxDefaultSearchLevel, targetParameter->typesFilter, targetParameter->excludeTypesFilter, targetParameter->customTargetFilterFunc);
-			p.showAndGetControllable([this](Controllable* c) { targetParameter->setValueFromTarget(c); });
+			ControllableChooserPopupMenu* p(new ControllableChooserPopupMenu(targetParameter->rootContainer, 0, targetParameter->maxDefaultSearchLevel, targetParameter->typesFilter, targetParameter->excludeTypesFilter, targetParameter->customTargetFilterFunc));
+			p->showAndGetControllable([this, p](Controllable* c)
+				{
+					delete(p);
+					targetParameter->setValueFromTarget(c);
+				});
 		}
 
 	}
@@ -183,9 +187,10 @@ void TargetParameterUI::showPopupAndGetTarget()
 		}
 		else
 		{
-			ContainerChooserPopupMenu p(targetParameter->rootContainer, 0, targetParameter->maxDefaultSearchLevel, targetParameter->defaultContainerTypeCheckFunc);
-			p.showAndGetContainer([this](ControllableContainer* cc)
+			ContainerChooserPopupMenu* p(new ContainerChooserPopupMenu(targetParameter->rootContainer, 0, targetParameter->maxDefaultSearchLevel, targetParameter->defaultContainerTypeCheckFunc));
+			p->showAndGetContainer([this, p](ControllableContainer* cc)
 				{
+					delete p;
 					targetParameter->setValueFromTarget(cc);
 				}
 			);

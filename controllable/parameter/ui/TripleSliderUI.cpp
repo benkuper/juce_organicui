@@ -130,46 +130,46 @@ void TripleSliderUI::resized()
 
 void TripleSliderUI::showEditWindowInternal()
 {
-	AlertWindow nameWindow("Change point 3D values", "Set new values for this parameter", AlertWindow::AlertIconType::NoIcon, this);
+	AlertWindow* nameWindow = new AlertWindow("Change point 3D values", "Set new values for this parameter", AlertWindow::AlertIconType::NoIcon, this);
 
 	const String coordNames[3]{ "X","Y","Z" };
 
-	for (int i = 0; i < 3; ++i) nameWindow.addTextEditor("val" + String(i), String((float)p3d->value[i]), "Value " + coordNames[i]);
+	for (int i = 0; i < 3; ++i) nameWindow->addTextEditor("val" + String(i), String((float)p3d->value[i]), "Value " + coordNames[i]);
 
-	nameWindow.addButton("OK", 1, KeyPress(KeyPress::returnKey));
-	nameWindow.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
+	nameWindow->addButton("OK", 1, KeyPress(KeyPress::returnKey));
+	nameWindow->addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
 
-	nameWindow.showAsync(MessageBoxOptions(), [this, &nameWindow](int result)
+	nameWindow->enterModalState(true, ModalCallbackFunction::create([this, nameWindow](int result)
 		{
 
 			if (result)
 			{
 				float newVals[3];
-				for (int i = 0; i < 3; ++i) newVals[i] = nameWindow.getTextEditorContents("val" + String(i)).getFloatValue();
+				for (int i = 0; i < 3; ++i) newVals[i] = nameWindow->getTextEditorContents("val" + String(i)).getFloatValue();
 				p3d->setUndoableVector(p3d->x, p3d->y, p3d->z, newVals[0], newVals[1], newVals[2]);
 			}
 		}
-	);
+	), true);
 }
 
 void TripleSliderUI::showEditRangeWindowInternal()
 {
 	if (!parameter->isCustomizableByUser) return;
 
-	AlertWindow nameWindow("Change point 3D bounds", "Set new bounds for this parameter", AlertWindow::AlertIconType::NoIcon, this);
+	AlertWindow* nameWindow = new AlertWindow("Change point 3D bounds", "Set new bounds for this parameter", AlertWindow::AlertIconType::NoIcon, this);
 
 	const String coordNames[3]{ "X","Y","Z" };
 
 	for (int i = 0; i < 3; ++i)
 	{
-		nameWindow.addTextEditor("minVal" + String(i), String((float)p3d->minimumValue[i]), "Minimum " + coordNames[i]);
-		nameWindow.addTextEditor("maxVal" + String(i), String((float)p3d->maximumValue[i]), "Maximum " + coordNames[i]);
+		nameWindow->addTextEditor("minVal" + String(i), String((float)p3d->minimumValue[i]), "Minimum " + coordNames[i]);
+		nameWindow->addTextEditor("maxVal" + String(i), String((float)p3d->maximumValue[i]), "Maximum " + coordNames[i]);
 	}
 
-	nameWindow.addButton("OK", 1, KeyPress(KeyPress::returnKey));
-	nameWindow.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
+	nameWindow->addButton("OK", 1, KeyPress(KeyPress::returnKey));
+	nameWindow->addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
 
-	nameWindow.showAsync(MessageBoxOptions(), [this, &nameWindow](int result)
+	nameWindow->enterModalState(true, ModalCallbackFunction::create([this, nameWindow](int result)
 		{
 
 			if (result)
@@ -178,13 +178,13 @@ void TripleSliderUI::showEditRangeWindowInternal()
 				float newMaxs[3];
 				for (int i = 0; i < 3; ++i)
 				{
-					newMins[i] = nameWindow.getTextEditorContents("minVal" + String(i)).getFloatValue();
-					newMaxs[i] = nameWindow.getTextEditorContents("maxVal" + String(i)).getFloatValue();
+					newMins[i] = nameWindow->getTextEditorContents("minVal" + String(i)).getFloatValue();
+					newMaxs[i] = nameWindow->getTextEditorContents("maxVal" + String(i)).getFloatValue();
 				}
 				p3d->setBounds(newMins[0], newMins[1], newMins[2], jmax(newMins[0], newMaxs[0]), jmax(newMins[1], newMaxs[1]), jmax(newMins[2], newMaxs[2]));
 			}
 		}
-	);
+	), true);
 }
 
 

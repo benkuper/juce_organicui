@@ -73,8 +73,9 @@ void ControllableChooserPopupMenu::populateMenu(PopupMenu* subMenu, Controllable
 
 void ControllableChooserPopupMenu::showAndGetControllable(std::function<void(Controllable*)> returnFunc)
 {
-	showMenuAsync(PopupMenu::Options(), [this, returnFunc](int result) {
-		if (Controllable* c = this->getControllableForResult(result)) returnFunc(c);
+	showMenuAsync(PopupMenu::Options(), [this, returnFunc](int result)
+		{
+			returnFunc(getControllableForResult(result));
 		}
 	);
 }
@@ -152,7 +153,7 @@ void ContainerChooserPopupMenu::showAndGetContainer(std::function<void(Controlla
 {
 	showMenuAsync(PopupMenu::Options(), [this, returnFunc](int result)
 		{
-			if (ControllableContainer* cc = getContainerForResult(result)) returnFunc(cc);
+			returnFunc(getContainerForResult(result));
 		}
 	);
 

@@ -140,25 +140,27 @@ void DoubleSliderUI::resized()
 
 void DoubleSliderUI::showEditWindowInternal()
 {
-	AlertWindow nameWindow("Change point 2D values", "Set new values for this parameter", AlertWindow::AlertIconType::NoIcon, this);
+	AlertWindow* nameWindow = new AlertWindow("Change point 2D values", "Set new values for this parameter", AlertWindow::AlertIconType::NoIcon, this);
 
 	const String coordNames[2]{ "X","Y" };
 
-	for (int i = 0; i < 2; ++i) nameWindow.addTextEditor("val" + String(i), String((float)p2d->value[i]), "Value " + coordNames[i]);
+	for (int i = 0; i < 2; ++i) nameWindow->addTextEditor("val" + String(i), String((float)p2d->value[i]), "Value " + coordNames[i]);
 
-	nameWindow.addButton("OK", 1, KeyPress(KeyPress::returnKey));
-	nameWindow.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
+	nameWindow->addButton("OK", 1, KeyPress(KeyPress::returnKey));
+	nameWindow->addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
 
-	nameWindow.showAsync(MessageBoxOptions(), [this, &nameWindow](int result)
+	nameWindow->enterModalState(true, ModalCallbackFunction::create([this, &nameWindow](int result)
 		{
 
 			if (result)
 			{
 				float newVals[2];
-				for (int i = 0; i < 2; ++i) newVals[i] = nameWindow.getTextEditorContents("val" + String(i)).getFloatValue();
+				for (int i = 0; i < 2; ++i) newVals[i] = nameWindow->getTextEditorContents("val" + String(i)).getFloatValue();
 				p2d->setUndoablePoint(p2d->x, p2d->y, newVals[0], newVals[1]);
 			}
 		}
+	),
+	true
 	);
 }
 
@@ -166,31 +168,31 @@ void DoubleSliderUI::showEditRangeWindowInternal()
 {
 	if (!parameter->isCustomizableByUser) return;
 
-	AlertWindow nameWindow("Change point 2D bounds", "Set new bounds for this parameter", AlertWindow::AlertIconType::NoIcon, this);
+	AlertWindow* nameWindow = new AlertWindow("Change point 2D bounds", "Set new bounds for this parameter", AlertWindow::AlertIconType::NoIcon, this);
 
 	const String coordNames[2]{ "X","Y" };
 
 	for (int i = 0; i < 2; ++i)
 	{
-		nameWindow.addTextEditor("minVal" + String(i), String((float)p2d->minimumValue[i]), "Minimum " + coordNames[i]);
-		nameWindow.addTextEditor("maxVal" + String(i), String((float)p2d->maximumValue[i]), "Maximum " + coordNames[i]);
+		nameWindow->addTextEditor("minVal" + String(i), String((float)p2d->minimumValue[i]), "Minimum " + coordNames[i]);
+		nameWindow->addTextEditor("maxVal" + String(i), String((float)p2d->maximumValue[i]), "Maximum " + coordNames[i]);
 	}
 
-	nameWindow.addButton("OK", 1, KeyPress(KeyPress::returnKey));
-	nameWindow.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
+	nameWindow->addButton("OK", 1, KeyPress(KeyPress::returnKey));
+	nameWindow->addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
 
-	nameWindow.showAsync(MessageBoxOptions(), [this, &nameWindow](int result)
+	nameWindow->enterModalState(true, ModalCallbackFunction::create([this, &nameWindow](int result)
 		{
 			float newMins[2];
 			float newMaxs[2];
 			for (int i = 0; i < 2; ++i)
 			{
-				newMins[i] = nameWindow.getTextEditorContents("minVal" + String(i)).getFloatValue();
-				newMaxs[i] = nameWindow.getTextEditorContents("maxVal" + String(i)).getFloatValue();
+				newMins[i] = nameWindow->getTextEditorContents("minVal" + String(i)).getFloatValue();
+				newMaxs[i] = nameWindow->getTextEditorContents("maxVal" + String(i)).getFloatValue();
 			}
 			p2d->setBounds(newMins[0], newMins[1], jmax(newMins[0], newMaxs[0]), jmax(newMins[1], newMaxs[1]));
 		}
-	);
+	),true);
 }
 
 void DoubleSliderUI::updateUseExtendedEditor()
