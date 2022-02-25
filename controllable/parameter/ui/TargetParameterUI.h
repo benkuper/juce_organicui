@@ -29,6 +29,9 @@ public:
 	std::unique_ptr<BoolParameter> listeningToNextChange;
 	std::unique_ptr<BoolToggleUI> listeningToNextChangeBT;
 
+	std::unique_ptr<ControllableChooserPopupMenu> controllableChooser;
+	std::unique_ptr<ContainerChooserPopupMenu> containerChooser;
+
 	void paint(Graphics& g) override;
 	void resized() override;
 
