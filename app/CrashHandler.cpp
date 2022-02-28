@@ -120,6 +120,10 @@ void CrashDumpUploader::handleCrash(int e)
 
 		w.reset(new UploadWindow());
 		DialogWindow::showDialog("Got crashed ?", w.get(), getMainWindow(), Colours::black, true);
+
+		MessageManager::getInstance()->runDispatchLoop();
+		exitApp();
+
 	}
 	else
 	{
@@ -222,6 +226,8 @@ void CrashDumpUploader::uploadCrash()
 		w->removeFromDesktop();
 		w.reset();
 	}
+
+	MessageManager::getInstance()->stopDispatchLoop();
 }
 
 bool CrashDumpUploader::openStreamProgressCallback(int bytesDownloaded, int totalLength)
@@ -386,7 +392,7 @@ void CrashDumpUploader::UploadWindow::buttonClicked(Button* bt)
 	else if (bt == &cancelBT || bt == &recoverOnlyBT)
 	{
 		if (DialogWindow* dw = findParentComponentOfClass<DialogWindow>()) dw->exitModalState(0); 
-		CrashDumpUploader::getInstance()->exitApp();
+		MessageManager::getInstance()->stopDispatchLoop();
 	}
 
 	/*if (DialogWindow* dw = findParentComponentOfClass<DialogWindow>())
