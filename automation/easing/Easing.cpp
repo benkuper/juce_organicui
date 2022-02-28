@@ -8,8 +8,8 @@
   ==============================================================================
 */
 
-const String Easing::typeNames[Easing::TYPE_MAX]{"Linear", "Bezier", "Hold","Sine"};
- 
+const String Easing::typeNames[Easing::TYPE_MAX]{ "Linear", "Bezier", "Hold","Sine", "Elastic","Bounce" };
+
 Easing::Easing(Type type) :
 	ControllableContainer("Easing"),
 	type(type),
@@ -23,11 +23,12 @@ Easing::~Easing()
 	masterReference.clear();
 }
 
-void Easing::updateKeys(const Point<float>& _start, const Point<float>& _end)
+void Easing::updateKeys(const Point<float>& _start, const Point<float>& _end, bool stretch)
 {
 	if ((start == _start && end == _end) || (_start.x > _end.x)) return;
 	start = _start;
 	end = _end;
+	prevLength = length;
 	length = end.x - start.x;
 
 	updateKeysInternal();
@@ -53,7 +54,7 @@ LinearEasing::LinearEasing() : Easing(LINEAR) {}
 HoldEasing::HoldEasing() : Easing(HOLD) {}
 
 
-EasingUI * LinearEasing::createUI()
+EasingUI* LinearEasing::createUI()
 {
 	return new LinearEasingUI(this);
 }
@@ -70,7 +71,7 @@ EasingUI* CubicEasing::createUI()
 }
 
 
-float LinearEasing::getValue(const float & weight)
+float LinearEasing::getValue(const float& weight)
 {
 	return jmap(weight, start.y, end.y);
 }
@@ -81,7 +82,7 @@ Rectangle<float> LinearEasing::getBounds(bool includeHandles)
 }
 
 
-float HoldEasing::getValue(const float & weight)
+float HoldEasing::getValue(const float& weight)
 {
 	if (weight < 1) return  start.y;
 	return end.y;
@@ -140,7 +141,7 @@ Rectangle<float> CubicEasing::getBounds(bool includeHandles)
 }
 
 
-float CubicEasing::getValue(const float & weight)
+float CubicEasing::getValue(const float& weight)
 {
 	if (length == 0 || weight <= 0 || uniformLUT.size() == 0) return start.y;
 	if (weight >= 1) return end.y;
@@ -164,7 +165,7 @@ Point<float> CubicEasing::getRawValue(const float& weight)
 float CubicEasing::getBezierWeight(const float& pos)
 {
 	if (length == 0) return 0;
-	
+
 	const int precision = length * 30;
 	float closestT = getWeightForPos(pos);
 	float minDist = INT32_MAX;
@@ -183,7 +184,7 @@ float CubicEasing::getBezierWeight(const float& pos)
 	return closestT;
 }
 
-void CubicEasing::updateKeysInternal()
+void CubicEasing::updateKeysInternal(bool stretch)
 {
 	if (length == 0) return;
 	anchor1->setBounds(0, INT32_MIN, length, INT32_MAX);
@@ -195,13 +196,20 @@ void CubicEasing::updateKeysInternal()
 		anchor2->setPoint(-length * .3f, 0);
 	}
 
+	if (stretch && prevLength != 0)
+	{
+		float stretchFactor = length / prevLength;
+		anchor1->setPoint(anchor1->x * stretchFactor, anchor1->y * stretchFactor);
+		anchor2->setPoint(anchor2->x * stretchFactor, anchor2->y * stretchFactor);
+	}
+
 	updateBezier();
 }
 
 void CubicEasing::updateBezier()
 {
 	if (length == 0) return;
-	
+
 	Point<float> a1 = start + anchor1->getPoint();
 	Point<float> a2 = end + anchor2->getPoint();
 	bezier = Bezier::Bezier<3>({ {start.x, start.y},{a1.x, a1.y},{a2.x,a2.y},{end.x,end.y} });
@@ -258,17 +266,21 @@ SineEasing::SineEasing() :
 	Easing(SINE)
 {
 	freqAmp = addPoint2DParameter("Frequency Amplitude", "Frequency and amplitude of the sine wave");
-	//freqAmp->setBounds(.01f, -1, 1, 2);
 	freqAmp->setPoint(1.f, .25f);
 }
 
-void SineEasing::updateKeysInternal()
+void SineEasing::updateKeysInternal(bool stretch)
 {
 	if (length == 0) return;
-	//freqAmp->setBounds(0, INT32_MIN, length, INT32_MAX);
+
+	if (stretch && prevLength != 0)
+	{
+		float stretchFactor = length / prevLength;
+		freqAmp->setPoint(freqAmp->x * stretchFactor, freqAmp->y * stretchFactor);
+	}
 }
 
-float SineEasing::getValue(const float & weight)
+float SineEasing::getValue(const float& weight)
 {
 	return  start.y + (end.y - start.y) * weight + sinf(weight * length * MathConstants<float>::pi * 2 / freqAmp->x) * freqAmp->y;
 }
@@ -284,5 +296,90 @@ Rectangle<float> SineEasing::getBounds(bool includeHandles)
 EasingUI* SineEasing::createUI()
 {
 	return new SineEasingUI(this);
+}
+
+
+
+ElasticEasing::ElasticEasing() :
+	Easing(ELASTIC)
+{
+	param = addPoint2DParameter("Frequency Amplitude", "Frequency and amplitude of the sine wave");
+}
+
+
+void ElasticEasing::updateKeysInternal(bool stretch)
+{
+	if (length == 0) return;
+	if (!param->isOverriden) param->setPoint(length * .75f, 0);
+	param->setBounds(0, 0, length, 0);
+
+	if (prevLength == 0) return;
+	float stretchFactor = length / prevLength;
+	param->setPoint(param->x * stretchFactor, param->y * stretchFactor);
+}
+
+float ElasticEasing::getValue(const float& weight)
+{
+	const float c4 = jmap<float>(param->x / length, 10, 0);
+	float p = pow(2, -10 * weight) * sin((weight * 10 - 0.75) * c4) + 1;
+	return jmap<float>(p, start.y, end.y);
+}
+
+Rectangle<float> ElasticEasing::getBounds(bool includeHandles)
+{
+	return Rectangle<float>(Point<float>(start.x, jmin(start.y, end.y + (end.y - start.y))), Point<float>(end.x, jmax(start.y, end.y + (end.y - start.y))));
+}
+
+
+EasingUI* ElasticEasing::createUI()
+{
+	return new ElasticEasingUI(this);
+}
+
+
+BounceEasing::BounceEasing() :
+	Easing(BOUNCE)
+{
+}
+
+float BounceEasing::getValue(const float& weight)
+{
+	const float d1 = 7.5625f;
+	const float n1 = 2.75f;
+
+	float p = 0;
+	float x = weight;
+
+	if (x < 1 / n1) {
+		p = d1 * x * x;
+	}
+	else if (x < 2 / n1) {
+		p = d1 * (x -= 1.5 / n1) * x + 0.75;
+	}
+	else if (x < 2.5 / n1) {
+		p = d1 * (x -= 2.25 / n1) * x + 0.9375;
+	}
+	else {
+		p = d1 * (x -= 2.625 / n1) * x + 0.984375;
+	}
+
+	return jmap<float>(p, start.y, end.y);
+}
+
+Rectangle<float> BounceEasing::getBounds(bool includeHandles)
+{
+	return Rectangle<float>(Point<float>(start.x, jmin(start.y, end.y)), Point<float>(end.x, jmax(start.y, end.y)));
+
+}
+
+void BounceEasing::updateKeysInternal(bool stretch)
+{
+	if (length == 0) return;
+
+}
+
+EasingUI* BounceEasing::createUI()
+{
+	return new BounceEasingUI(this);
 }
 

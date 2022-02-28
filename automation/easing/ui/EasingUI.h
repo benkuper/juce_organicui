@@ -144,3 +144,41 @@ public:
 	void mouseDrag(const MouseEvent& e) override;
 	void mouseUp(const MouseEvent& e) override;
 };
+
+class ElasticEasingUI :
+	public EasingUI
+{
+public:
+	ElasticEasingUI(ElasticEasing* e);
+
+	ElasticEasing* se;
+
+	EasingHandle h1;
+	Point<float> h1ValueAtMouseDown;
+
+	bool hitTest(int tx, int ty) override;
+
+	void resized() override;
+
+	void paintInternal(Graphics& g) override;
+
+	void easingControllableFeedbackUpdate(Controllable*) override;
+
+	void setShowEasingHandles(bool showFirst, bool showLast) override;
+
+	void mouseDown(const MouseEvent& e) override;
+	void mouseDrag(const MouseEvent& e) override;
+	void mouseUp(const MouseEvent& e) override;
+};
+
+class BounceEasingUI :
+	public EasingUI
+{
+public:
+	BounceEasingUI(BounceEasing* e);
+
+	BounceEasing* se;
+
+	void resized() override;
+	void paintInternal(Graphics& g) override;
+};

@@ -17,7 +17,7 @@ class Easing :
 	public ControllableContainer
 {
 public:
-	enum Type { LINEAR, BEZIER, HOLD, SINE, TYPE_MAX };
+	enum Type { LINEAR, BEZIER, HOLD, SINE, ELASTIC, BOUNCE, TYPE_MAX };
 	static const String typeNames[TYPE_MAX];
 
 	Easing(Type type);
@@ -26,10 +26,11 @@ public:
 	Type type;
 	Point<float> start;
 	Point<float> end;
+	float prevLength;
 	float length;
 
-	virtual void updateKeys(const Point<float>& start, const Point<float>& end);
-	virtual void updateKeysInternal() {}
+	virtual void updateKeys(const Point<float>& start, const Point<float>& end, bool stretch = false);
+	virtual void updateKeysInternal(bool stretch = false) {}
 
 	virtual float getValue(const float& weight) = 0;//must be overriden
 	virtual Rectangle<float> getBounds(bool includeHandles = false) = 0;
@@ -86,7 +87,7 @@ public:
 
 	float getBezierWeight(const float& pos);
 
-	void updateKeysInternal() override;
+	void updateKeysInternal(bool stretch = false) override;
 	void updateBezier();
 
 	void updateUniformLUT(int precision);
@@ -111,7 +112,7 @@ public:
 	SineEasing();
 	Point2DParameter * freqAmp;
 
-	void updateKeysInternal() override;
+	void updateKeysInternal(bool stretch = false) override;
 
 	virtual float getValue(const float &weight) override;
 	Rectangle<float> getBounds(bool includeHandles) override;
@@ -119,3 +120,31 @@ public:
 	EasingUI * createUI() override;
 };
 
+class ElasticEasing :
+	public Easing
+{
+public:
+	ElasticEasing();
+	Point2DParameter* param;
+
+	void updateKeysInternal(bool stretch = false) override;
+
+	virtual float getValue(const float& weight) override;
+	Rectangle<float> getBounds(bool includeHandles) override;
+
+	EasingUI* createUI() override;
+};
+
+
+class BounceEasing :
+	public Easing
+{
+public:
+	BounceEasing();
+
+	void updateKeysInternal(bool stretch = false) override;
+
+	virtual float getValue(const float& weight) override;
+	Rectangle<float> getBounds(bool includeHandles) override;
+	EasingUI* createUI() override;
+};

@@ -537,3 +537,113 @@ void SineEasingUI::mouseUp(const MouseEvent& e)
 	se->freqAmp->setUndoablePoint(h1ValueAtMouseDown, se->freqAmp->getPoint());
 
 }
+
+
+ElasticEasingUI::ElasticEasingUI(ElasticEasing* e) :
+	EasingUI(e),
+	se(e),
+	h1(se->param)
+{
+	addChildComponent(h1);
+	h1.addMouseListener(this, false);
+}
+
+bool ElasticEasingUI::hitTest(int tx, int ty)
+{
+	bool result = EasingUI::hitTest(tx, ty);
+
+	if (showFirstHandle && showLastHandle) result |= h1.getLocalBounds().contains(h1.getMouseXYRelative());
+	return result;
+}
+
+void ElasticEasingUI::resized()
+{
+	if (inspectable.wasObjectDeleted()) return;
+	hitPathPrecision = getWidth() / 4;
+
+	//Point<int> p1 = Point<int>(getUIPosForValuePos(easing->start));
+	Point<int> a = getUIPosForValuePos(easing->start + se->param->getPoint());
+	h1.setBounds(juce::Rectangle<int>(0, 0, 16, 16).withCentre(a));
+
+	EasingUI::resized();
+}
+
+void ElasticEasingUI::paintInternal(Graphics& g)
+{
+	Point<int> p1 = Point<int>(getUIPosForValuePos(easing->start));
+
+	Colour c = LIGHTCONTOUR_COLOR;
+	if (isMouseOver()) c = c.brighter();
+	g.setColour(c);
+
+	if (showFirstHandle && showLastHandle) g.drawLine(p1.x, p1.y, h1.getBounds().getCentreX(), h1.getBounds().getCentreY());
+}
+
+void ElasticEasingUI::easingControllableFeedbackUpdate(Controllable* c)
+{
+	if (c == se->param)
+	{
+		resized();
+		repaint();
+	}
+}
+
+void ElasticEasingUI::setShowEasingHandles(bool showFirst, bool showLast)
+{
+	EasingUI::setShowEasingHandles(showFirst, showLast);
+	h1.setVisible(showFirstHandle && showLastHandle);
+	resized();
+	repaint();
+}
+
+void ElasticEasingUI::mouseDown(const MouseEvent& e)
+{
+	if (inspectable.wasObjectDeleted()) return;
+	EasingUI::mouseDown(e);
+
+	if (!e.mods.isCommandDown())
+	{
+		h1ValueAtMouseDown = se->param->getPoint();
+	}
+}
+
+void ElasticEasingUI::mouseDrag(const MouseEvent& e)
+{
+	if (inspectable.wasObjectDeleted()) return;
+
+	if (e.eventComponent == &h1)
+	{
+		Point<float> targetPoint = getValuePosForUIPos(e.getEventRelativeTo(this).getPosition()); //Point<float>(mp.x * 1.f / getWidth(), jmap<float>(mp.y, y1, y2, 0, 1));
+		se->param->setPoint(targetPoint - se->start);
+	}
+}
+
+void ElasticEasingUI::mouseUp(const MouseEvent& e)
+{
+	se->param->setUndoablePoint(h1ValueAtMouseDown, se->param->getPoint());
+
+}
+
+
+
+BounceEasingUI::BounceEasingUI(BounceEasing* e) :
+	EasingUI(e),
+	se(e)
+{
+}
+
+void BounceEasingUI::resized()
+{
+	if (inspectable.wasObjectDeleted()) return;
+	hitPathPrecision = getWidth() / 4;
+	EasingUI::resized();
+}
+
+void BounceEasingUI::paintInternal(Graphics& g)
+{
+	Point<int> p1 = Point<int>(getUIPosForValuePos(easing->start));
+
+	Colour c = LIGHTCONTOUR_COLOR;
+	if (isMouseOver()) c = c.brighter();
+	g.setColour(c);
+}
