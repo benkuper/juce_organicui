@@ -78,7 +78,7 @@ void  StringParameter::setValueInternal(var& newVal)
 	}
 	else
 	{
-		value = newVal.isString() ? newVal.toString() : String((float)newVal, 3);
+		value = newVal.isString() ? newVal.toString() : (newVal.isInt() || newVal.isInt64() ? String((int)newVal) : String((float)newVal, 3));
 	}
 }
 bool StringParameter::checkValueIsTheSame(var oldValue, var newValue)
