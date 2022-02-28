@@ -47,8 +47,24 @@ public:
 		public Component
 	{
 	public:
-		EasingHandle();
+		EasingHandle(Point2DParameter * parameter);
+		Point2DParameter* parameter;
+
+		void mouseDoubleClick(const MouseEvent &e) override;
 		void paint(Graphics& g) override;
+	};
+
+	class HandleEditCalloutComponent :
+		public Component
+	{
+	public:
+		HandleEditCalloutComponent(Point2DParameter * p);
+		~HandleEditCalloutComponent();
+
+		AutomationKey* k;
+		std::unique_ptr<DoubleSliderUI> paramEditor;
+
+		void resized() override;
 	};
 };
 

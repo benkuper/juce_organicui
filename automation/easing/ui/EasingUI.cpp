@@ -56,7 +56,7 @@ void EasingUI::paint(Graphics& g)
 	//	float t = easing->start.x + p * easing->length;
 	//	g.fillEllipse(Rectangle<int>(0, 0, 4, 4).withCentre(getUIPosForValuePos(Point<float>(t, easing->getValue(p)))).toFloat());
 	//}
-	
+
 	paintInternal(g);
 
 }
@@ -84,7 +84,7 @@ void EasingUI::generatePath()
 
 void EasingUI::generatePathInternal()
 {
-	autoGeneratePathWithPrecision(getWidth()/2);
+	autoGeneratePathWithPrecision(getWidth() / 2);
 }
 
 void EasingUI::autoGeneratePathWithPrecision(int precision)
@@ -188,7 +188,7 @@ void EasingUI::setShowEasingHandles(bool showFirst, bool showLast)
 
 void EasingUI::newMessage(const ContainerAsyncEvent& e)
 {
-	if (e.targetControllable.wasObjectDeleted()) return; 
+	if (e.targetControllable.wasObjectDeleted()) return;
 	if (e.type == ContainerAsyncEvent::ControllableFeedbackUpdate)
 	{
 		easingControllableFeedbackUpdate(e.targetControllable);
@@ -213,8 +213,32 @@ Point<int> EasingUI::getUIPosForValuePos(const Point<float>& valuePos) const
 Point<float> EasingUI::getValuePosForUIPos(const Point<int>& uiPos) const
 {
 	if (inspectable.wasObjectDeleted()) return Point<float>();
-	return valueBounds.getRelativePoint(uiPos.x * 1.0f / getWidth(), 1- (uiPos.y * 1.0f / getHeight()));
+	return valueBounds.getRelativePoint(uiPos.x * 1.0f / getWidth(), 1 - (uiPos.y * 1.0f / getHeight()));
 }
+
+//Callout
+
+
+EasingUI::HandleEditCalloutComponent::HandleEditCalloutComponent(Point2DParameter* param) :
+	k(k)
+{
+	paramEditor.reset(new DoubleSliderUI(param));
+	paramEditor->canShowExtendedEditor = false;
+	paramEditor->showLabel = false;
+	addAndMakeVisible(paramEditor.get());
+	setSize(160, 20);
+}
+
+EasingUI::HandleEditCalloutComponent::~HandleEditCalloutComponent()
+{
+}
+
+void EasingUI::HandleEditCalloutComponent::resized()
+{
+	juce::Rectangle<int> r = getLocalBounds();
+	paramEditor->setBounds(r.removeFromTop(25).reduced(2));
+}
+
 
 // EASINGS
 LinearEasingUI::LinearEasingUI(LinearEasing* e) :
@@ -231,7 +255,9 @@ void LinearEasingUI::generatePathInternal()
 CubicEasingUI::CubicEasingUI(CubicEasing* e) :
 	EasingUI(e),
 	ce(e),
-	syncHandles(false)
+	syncHandles(false),
+	h1(ce->anchor1),
+	h2(ce->anchor2)
 {
 	addChildComponent(h1);
 	addChildComponent(h2);
@@ -351,7 +377,7 @@ void CubicEasingUI::mouseDrag(const MouseEvent& e)
 		if (e.mods.isShiftDown())
 		{
 			syncHandles = false;
-			
+
 			if (e.mods.isAltDown())
 			{
 				//Point<int> p1 = getUIPosForValuePos(easing->start);
@@ -370,7 +396,8 @@ void CubicEasingUI::mouseDrag(const MouseEvent& e)
 				ce->anchor1->setPoint(tx, 0);
 				ce->anchor2->setPoint(-tx, 0);
 			}
-		}else
+		}
+		else
 		{
 			//Point<int> p1 = getUIPosForValuePos(easing->start);
 			//Point<int> p2 = getUIPosForValuePos(easing->end);
@@ -380,7 +407,7 @@ void CubicEasingUI::mouseDrag(const MouseEvent& e)
 			ce->anchor2->setPoint((mVal - easing->end) / 2);
 		}
 	}
-		
+
 }
 
 void CubicEasingUI::mouseUp(const MouseEvent& e)
@@ -394,9 +421,17 @@ void CubicEasingUI::mouseUp(const MouseEvent& e)
 }
 
 // HANDLES
-EasingUI::EasingHandle::EasingHandle()
+EasingUI::EasingHandle::EasingHandle(Point2DParameter* parameter) :
+	parameter(parameter)
 {
 	setRepaintsOnMouseActivity(true);
+}
+
+void EasingUI::EasingHandle::mouseDoubleClick(const MouseEvent& e)
+{
+	std::unique_ptr<Component> editComponent(new HandleEditCalloutComponent(parameter));
+	CallOutBox* box = &CallOutBox::launchAsynchronously(std::move(editComponent), localAreaToGlobal(getLocalBounds()), nullptr);
+	box->setArrowSize(8);
 }
 
 void EasingUI::EasingHandle::paint(Graphics& g)
@@ -420,7 +455,8 @@ void HoldEasingUI::generatePathInternal()
 
 SineEasingUI::SineEasingUI(SineEasing* e) :
 	EasingUI(e),
-	se(e)
+	se(e),
+	h1(se->freqAmp)
 {
 	addChildComponent(h1);
 	h1.addMouseListener(this, false);

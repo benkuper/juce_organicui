@@ -1,4 +1,3 @@
-#include "Easing.h"
 /*
   ==============================================================================
 
@@ -266,7 +265,7 @@ SineEasing::SineEasing() :
 void SineEasing::updateKeysInternal()
 {
 	if (length == 0) return;
-	freqAmp->setBounds(0, INT32_MIN, length, INT32_MAX);
+	//freqAmp->setBounds(0, INT32_MIN, length, INT32_MAX);
 }
 
 float SineEasing::getValue(const float & weight)

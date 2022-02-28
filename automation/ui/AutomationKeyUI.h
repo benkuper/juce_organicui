@@ -81,8 +81,6 @@ public:
 
         void resized() override;
        
-       // void editorHidden(Label* l, TextEditor&) override;
-        void parentHierarchyChanged() override;
     };
 
 };

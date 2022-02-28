@@ -218,26 +218,3 @@ void AutomationKeyUI::KeyEditCalloutComponent::resized()
 	valueEditor->setBounds(r.reduced(2));
 }
 
-
-/*
-void AutomationKeyUI::KeyEditCalloutComponent::editorHidden(Label* l, TextEditor&)
-{
-	CallOutBox* b = dynamic_cast<CallOutBox*>(getParentComponent());
-	if (b != nullptr)
-	{
-		if (l == labels[labels.size() - 1]) b->dismiss();
-	}
-	
-}
-*/
-
-void AutomationKeyUI::KeyEditCalloutComponent::parentHierarchyChanged()
-{
-	/*
-	if (labels[0]->isShowing())
-	{
-		labels[0]->grabKeyboardFocus();
-		labels[0]->showEditor();
-	}
-	*/
-}
