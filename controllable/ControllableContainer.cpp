@@ -137,7 +137,7 @@ UndoableAction* ControllableContainer::addUndoableControllable(Controllable* c, 
 	return a;
 }
 
-void ControllableContainer::addControllable(Controllable* c)
+void ControllableContainer::addControllable(Controllable* c, int index)
 {
 	if (c == nullptr)
 	{
@@ -145,17 +145,17 @@ void ControllableContainer::addControllable(Controllable* c)
 		return;
 	}
 
-	if (c->type == Controllable::TRIGGER) addTriggerInternal((Trigger*)c);
-	else addParameterInternal((Parameter*)c);
+	if (c->type == Controllable::TRIGGER) addTriggerInternal((Trigger*)c, index);
+	else addParameterInternal((Parameter*)c, index);
 
 	c->addControllableListener(this);
 	c->addAsyncWarningTargetListener(this);
 	c->warningResolveInspectable = this;
 }
 
-void ControllableContainer::addParameter(Parameter* p)
+void ControllableContainer::addParameter(Parameter* p, int index)
 {
-	addControllable(p);
+	addControllable(p, index);
 }
 
 FloatParameter* ControllableContainer::addFloatParameter(const String& _niceName, const String& description, const float& initialValue, const float& minValue, const float& maxValue, const bool& enabled)
@@ -238,18 +238,18 @@ FileParameter* ControllableContainer::addFileParameter(const String& _niceName, 
 	return p;
 }
 
-Trigger* ControllableContainer::addTrigger(const String& _niceName, const String& _description, const bool& enabled)
+Trigger* ControllableContainer::addTrigger(const String& _niceName, const String& _description, const bool& enabled, int index)
 {
 	String targetName = (Engine::mainEngine == nullptr || Engine::mainEngine->isLoadingFile) ? _niceName : getUniqueNameInContainer(_niceName);
 	Trigger* t = new Trigger(targetName, _description, enabled);
-	addControllable(t);
+	addControllable(t, index);
 	return t;
 }
 
 
-void ControllableContainer::addTriggerInternal(Trigger* t)
+void ControllableContainer::addTriggerInternal(Trigger* t, int index)
 {
-	controllables.add(t);
+	controllables.insert(index, t);
 
 	t->setParentContainer(this);
 	t->addTriggerListener(this);
@@ -259,11 +259,11 @@ void ControllableContainer::addTriggerInternal(Trigger* t)
 	notifyStructureChanged();
 }
 
-void ControllableContainer::addParameterInternal(Parameter* p)
+void ControllableContainer::addParameterInternal(Parameter* p, int index)
 {
 	p->setParentContainer(this);
 
-	controllables.add(p);
+	controllables.insert(index, p);
 
 	p->addParameterListener(this);
 	p->addAsyncParameterListener(this);

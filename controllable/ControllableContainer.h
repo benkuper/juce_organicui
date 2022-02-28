@@ -75,8 +75,8 @@ public:
 
 
 	UndoableAction * addUndoableControllable(Controllable * c, bool onlyReturnAction = false);
-	void addControllable(Controllable * c);
-	void addParameter(Parameter * p);
+	void addControllable(Controllable * c, int index = -1);
+	void addParameter(Parameter * p, int index = -1);
 	FloatParameter * addFloatParameter(const String &niceName, const String &description, const float &initialValue, const float &minValue = INT32_MIN, const float &maxValue = INT32_MAX, const bool &enabled = true);
 	IntParameter * addIntParameter(const String &niceName, const String &description, const int &initialValue, const int &minValue = INT32_MIN, const int &maxValue = INT32_MAX, const bool &enabled = true);
 	BoolParameter * addBoolParameter(const String &niceName, const String &description, const bool &value, const bool &enabled = true);
@@ -88,10 +88,10 @@ public:
 	TargetParameter * addTargetParameter(const String &niceName, const String &description, WeakReference<ControllableContainer> rootReference = nullptr, const bool &enabled = true);
 	FileParameter * addFileParameter(const String &niceName, const String &description, const String &initialValue = "");
 
-	Trigger * addTrigger(const String &niceName, const String &description, const bool &enabled = true);
+	Trigger * addTrigger(const String &niceName, const String &description, const bool &enabled = true, int index = -1);
 
-	void addTriggerInternal(Trigger * t);
-	void addParameterInternal(Parameter * p);
+	void addTriggerInternal(Trigger * t, int index = -1);
+	void addParameterInternal(Parameter * p, int index = -1);
 
 	UndoableAction * removeUndoableControllable(Controllable * c, bool onlyReturnAction = false);
 	void removeControllable(WeakReference<Controllable> c, bool deleteObject = true);
