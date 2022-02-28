@@ -259,7 +259,7 @@ SineEasing::SineEasing() :
 	Easing(SINE)
 {
 	freqAmp = addPoint2DParameter("Frequency Amplitude", "Frequency and amplitude of the sine wave");
-	freqAmp->setBounds(.01f, -1, 1, 2);
+	//freqAmp->setBounds(.01f, -1, 1, 2);
 	freqAmp->setPoint(1.f, .25f);
 }
 
