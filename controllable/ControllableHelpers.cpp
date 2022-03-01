@@ -89,10 +89,12 @@ Controllable* ControllableChooserPopupMenu::getControllableForResult(int result)
 //CONTAINER
 
 
-ContainerChooserPopupMenu::ContainerChooserPopupMenu(ControllableContainer* rootContainer, int indexOffset, int maxSearchLevel, std::function<bool(ControllableContainer*)> typeCheckFunc, bool allowSelectAtAnyLevel) :
+ContainerChooserPopupMenu::ContainerChooserPopupMenu(ControllableContainer* rootContainer, int indexOffset, int maxSearchLevel, std::function<bool(ControllableContainer*)> typeCheckFunc, const StringArray& typesFilter, const StringArray& excludeTypeFilters, bool allowSelectAtAnyLevel) :
 	indexOffset(indexOffset),
 	maxDefaultSearchLevel(maxSearchLevel),
 	typeCheckFunc(typeCheckFunc),
+	typesFilter(typesFilter),
+	excludeTypesFilter(excludeTypesFilter),
 	allowSelectAtAnyLevel(allowSelectAtAnyLevel)
 {
 	int id = indexOffset + 1;
@@ -119,6 +121,12 @@ void ContainerChooserPopupMenu::populateMenu(PopupMenu* subMenu, ControllableCon
 
 		if (isATarget)
 		{
+			if (BaseItem* bi = dynamic_cast<BaseItem*>(cc.get()))
+			{
+				if (excludeTypesFilter.contains(bi->getTypeString())) continue;
+				if (!typesFilter.isEmpty() && !typesFilter.contains(bi->getTypeString())) continue;
+			}
+			
 			containerList.add(cc);
 			subMenu->addItem(currentId, cc->niceName);
 			currentId++;

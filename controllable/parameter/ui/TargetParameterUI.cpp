@@ -188,7 +188,7 @@ void TargetParameterUI::showPopupAndGetTarget()
 		}
 		else
 		{
-			containerChooser.reset(new ContainerChooserPopupMenu(targetParameter->rootContainer, 0, targetParameter->maxDefaultSearchLevel, targetParameter->defaultContainerTypeCheckFunc));
+			containerChooser.reset(new ContainerChooserPopupMenu(targetParameter->rootContainer, 0, targetParameter->maxDefaultSearchLevel, targetParameter->defaultContainerTypeCheckFunc, targetParameter->typesFilter, targetParameter->excludeTypesFilter, targetParameter->maxDefaultSearchLevel == -1));
 			containerChooser->showAndGetContainer([this](ControllableContainer* cc)
 				{
 					if (cc == nullptr) return;
