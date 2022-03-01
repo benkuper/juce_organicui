@@ -301,7 +301,7 @@ void AutomationUI::placeKeyUI(AutomationKeyUI* ui)
 		pr = pr.getUnion(er);
 	}
 
-	pr = pr.expanded(5, 5).getIntersection(r);
+	pr = pr.expanded(5, 5).getIntersection(r).withY(0).withBottom(getHeight());
 	ui->setBounds(pr);
 	ui->setValueBounds(getViewBounds(pr));
 

@@ -58,6 +58,9 @@ void AutomationKey::setEasing(Easing::Type type)
     case Easing::SINE: e = new SineEasing(); break;
     case Easing::ELASTIC: e = new ElasticEasing(); break;
     case Easing::BOUNCE: e = new BounceEasing(); break;
+    case Easing::STEPS: e = new StepEasing(); break;
+    case Easing::NOISE: e = new NoiseEasing(); break;
+    case Easing::PERLIN: e = new PerlinEasing(); break;
     default:
         break;
     }

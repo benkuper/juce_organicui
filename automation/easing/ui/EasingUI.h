@@ -182,3 +182,31 @@ public:
 	void resized() override;
 	void paintInternal(Graphics& g) override;
 };
+
+class GenericEasingUI :
+	public EasingUI
+{
+public:
+	GenericEasingUI(Easing* e, Point2DParameter* a1 = nullptr, Point2DParameter* a2 = nullptr);
+	~GenericEasingUI() {}
+
+	std::unique_ptr<EasingHandle> h1;
+	std::unique_ptr<EasingHandle> h2;
+
+	Point<float> h1ValueAtMouseDown;
+	Point<float> h2ValueAtMouseDown;
+
+	bool hitTest(int tx, int ty) override;
+
+	void resized() override;
+
+	void paintInternal(Graphics& g) override;
+
+	void easingControllableFeedbackUpdate(Controllable*) override;
+
+	void setShowEasingHandles(bool showFirst, bool showLast) override;
+
+	void mouseDown(const MouseEvent& e) override;
+	void mouseDrag(const MouseEvent& e) override;
+	void mouseUp(const MouseEvent& e) override;
+};

@@ -17,7 +17,7 @@ class Easing :
 	public ControllableContainer
 {
 public:
-	enum Type { LINEAR, BEZIER, HOLD, SINE, ELASTIC, BOUNCE, TYPE_MAX };
+	enum Type { LINEAR, BEZIER, HOLD, SINE, ELASTIC, BOUNCE, STEPS, NOISE, PERLIN, TYPE_MAX };
 	static const String typeNames[TYPE_MAX];
 
 	Easing(Type type);
@@ -148,3 +148,54 @@ public:
 	Rectangle<float> getBounds(bool includeHandles) override;
 	EasingUI* createUI() override;
 };
+
+
+class StepEasing :
+	public Easing
+{
+public:
+	StepEasing();
+	Point2DParameter* param;
+
+	void updateKeysInternal(bool stretch = false) override;
+
+	virtual float getValue(const float& weight) override;
+	Rectangle<float> getBounds(bool includeHandles) override;
+
+	EasingUI* createUI() override;
+};
+
+class NoiseEasing:
+	public Easing
+{
+public:
+	NoiseEasing();
+	Point2DParameter* taper1;
+	Point2DParameter* taper2;
+	Random r;
+
+	void updateKeysInternal(bool stretch = false) override;
+
+	virtual float getValue(const float& weight) override;
+	Rectangle<float> getBounds(bool includeHandles) override;
+
+	EasingUI* createUI() override;
+};
+
+class PerlinEasing :
+	public Easing
+{
+public:
+	PerlinEasing();
+	Point2DParameter* taper1;
+	Point2DParameter* taper2;
+	siv::PerlinNoise perlin;
+
+	void updateKeysInternal(bool stretch = false) override;
+
+	virtual float getValue(const float& weight) override;
+	Rectangle<float> getBounds(bool includeHandles) override;
+
+	EasingUI* createUI() override;
+};
+

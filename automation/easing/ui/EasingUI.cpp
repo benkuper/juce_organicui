@@ -647,3 +647,133 @@ void BounceEasingUI::paintInternal(Graphics& g)
 	if (isMouseOver()) c = c.brighter();
 	g.setColour(c);
 }
+
+
+
+
+GenericEasingUI::GenericEasingUI(Easing * e, Point2DParameter * a1, Point2DParameter *a2) :
+	EasingUI(e)
+{
+	if (a1 != nullptr)
+	{
+		h1.reset(new EasingHandle(a1));
+		addChildComponent(h1.get());
+		h1->setVisible(showFirstHandle);
+		h1->addMouseListener(this, false);
+	}
+
+	if (a2 != nullptr)
+	{
+		h2.reset(new EasingHandle(a2));
+		addChildComponent(h2.get());
+		h2->setVisible(showLastHandle);
+		h2->addMouseListener(this, false);
+	}
+
+}
+
+bool GenericEasingUI::hitTest(int tx, int ty)
+{
+	bool result = EasingUI::hitTest(tx, ty);
+
+	if (showFirstHandle && h1 != nullptr)
+	{
+		result |= h1->getLocalBounds().contains(h1->getMouseXYRelative());
+	}
+
+	if (showLastHandle && h2 != nullptr)
+	{
+		result |= h2->getLocalBounds().contains(h2->getMouseXYRelative());
+	}
+
+	return result;
+}
+
+void GenericEasingUI::resized()
+{
+	if (inspectable.wasObjectDeleted()) return;
+
+	if (h1 != nullptr)
+	{
+		Point<int> a = getUIPosForValuePos(easing->start + h1->parameter->getPoint());
+		h1->setBounds(juce::Rectangle<int>(0, 0, 16, 16).withCentre(a));
+	}
+
+	if (h2 != nullptr)
+	{
+		Point<int> b = getUIPosForValuePos(easing->end + h2->parameter->getPoint());
+		h2->setBounds(juce::Rectangle<int>(0, 0, 16, 16).withCentre(b));
+	}
+
+	EasingUI::resized();
+}
+
+
+void GenericEasingUI::paintInternal(Graphics& g)
+{
+
+	if (!showFirstHandle && !showLastHandle) return;
+
+	Point<int> p1 = Point<int>(getUIPosForValuePos(easing->start));
+	Point<int> p2 = Point<int>(getUIPosForValuePos(easing->end));
+
+	Colour c = LIGHTCONTOUR_COLOR;
+	if (isMouseOver()) c = c.brighter();
+	g.setColour(c);
+
+	if (showFirstHandle && h1 != nullptr) g.drawLine(p1.x, p1.y, h1->getBounds().getCentreX(), h1->getBounds().getCentreY());
+	if (showLastHandle && h2 != nullptr) g.drawLine(p2.x, p2.y, h2->getBounds().getCentreX(), h2->getBounds().getCentreY());
+
+}
+
+void GenericEasingUI::easingControllableFeedbackUpdate(Controllable* c)
+{
+	if ((h1 != nullptr && c == h1->parameter) || (h2 != nullptr && c ==  h2->parameter))
+	{
+		resized();
+		repaint();
+	}
+}
+
+void GenericEasingUI::setShowEasingHandles(bool showFirst, bool showLast)
+{
+	EasingUI::setShowEasingHandles(showFirst, showLast);
+	if(h1 != nullptr) h1->setVisible(showFirstHandle);
+	if(h2 != nullptr) h2->setVisible(showLastHandle);
+	resized();
+	repaint();
+}
+
+void GenericEasingUI::mouseDown(const MouseEvent& e)
+{
+	if (inspectable.wasObjectDeleted()) return;
+	EasingUI::mouseDown(e);
+
+
+	if(h1 != nullptr) h1ValueAtMouseDown = h1->parameter->getPoint();
+	if(h2 != nullptr) h2ValueAtMouseDown = h2->parameter->getPoint();
+}
+
+void GenericEasingUI::mouseDrag(const MouseEvent& e)
+{
+	if (inspectable.wasObjectDeleted()) return;
+
+	if (e.eventComponent == h1.get() || e.eventComponent == h2.get())
+	{
+		Point2DParameter* targetAnchor = (e.eventComponent == h1.get()) ? h1->parameter : h2->parameter;
+		Point<float> targetRefPoint = (e.eventComponent == h1.get()) ? easing->start : easing->end;
+
+		Point<float> targetPoint = getValuePosForUIPos(e.getEventRelativeTo(this).getPosition()); //Point<float>(mp.x * 1.f / getWidth(), jmap<float>(mp.y, y1, y2, 0, 1));
+		targetAnchor->setPoint(targetPoint - targetRefPoint);
+	}
+}
+
+void GenericEasingUI::mouseUp(const MouseEvent& e)
+{
+	EasingUI::mouseUp(e);
+
+	Array<UndoableAction*> actions;
+	if(h1 != nullptr) actions.add(h1->parameter->setUndoablePoint(h1ValueAtMouseDown, h1->parameter->getPoint(), true));
+	if(h2 != nullptr) actions.add(h2->parameter->setUndoablePoint(h2ValueAtMouseDown, h2->parameter->getPoint(), true));
+	UndoMaster::getInstance()->performActions("Move anchors", actions);
+}

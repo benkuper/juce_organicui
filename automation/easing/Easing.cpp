@@ -8,7 +8,7 @@
   ==============================================================================
 */
 
-const String Easing::typeNames[Easing::TYPE_MAX]{ "Linear", "Bezier", "Hold","Sine", "Elastic","Bounce" };
+const String Easing::typeNames[Easing::TYPE_MAX]{ "Linear", "Bezier", "Hold","Sine", "Elastic","Bounce", "Steps", "Noise", "Perlin" };
 
 Easing::Easing(Type type) :
 	ControllableContainer("Easing"),
@@ -383,3 +383,179 @@ EasingUI* BounceEasing::createUI()
 	return new BounceEasingUI(this);
 }
 
+
+StepEasing::StepEasing() :
+	Easing(STEPS)
+{
+	param = addPoint2DParameter("Step Size", "Size of each step");
+}
+
+
+void StepEasing::updateKeysInternal(bool stretch)
+{
+	if (length == 0) return;
+	if (!param->isOverriden) param->setPoint(length * .75f, 0);
+	param->setBounds(0.01f, 0, length, 0);
+
+	if (prevLength == 0) return;
+	float stretchFactor = length / prevLength;
+	param->setPoint(param->x * stretchFactor, param->y * stretchFactor);
+}
+
+float StepEasing::getValue(const float& weight)
+{
+	int numSteps = ceil(length / param->x);
+	int curStep = floor(weight * numSteps);
+	return jmap<float>(curStep, 0, numSteps, start.y, end.y);
+}
+
+Rectangle<float> StepEasing::getBounds(bool includeHandles)
+{
+	return Rectangle<float>(Point<float>(start.x, jmin(start.y, end.y + (end.y - start.y))), Point<float>(end.x, jmax(start.y, end.y + (end.y - start.y))));
+}
+
+
+EasingUI* StepEasing::createUI()
+{
+	return new GenericEasingUI(this, param);
+}
+
+NoiseEasing::NoiseEasing() :
+	Easing(NOISE)
+{
+	taper1 = addPoint2DParameter("Taper 1", "Influence of the noise close to the start");
+	taper2 = addPoint2DParameter("Taper 2", "Influence of the noise close to the end");
+}
+
+
+void NoiseEasing::updateKeysInternal(bool stretch)
+{
+	if (length == 0) return;
+	if (!taper1->isOverriden)
+	{
+		taper1->setPoint(length * .25f, .2f);
+		taper2->setPoint(-.25f * length, 0);
+	}
+
+	taper1->setBounds(0, INT32_MIN, length, INT32_MAX);
+	taper2->setBounds(-length, 0, 0, 0);
+
+	if (stretch && prevLength > 0)
+	{
+		float stretchFactor = length / prevLength;
+		taper1->setPoint(taper1->x * stretchFactor, taper1->y * stretchFactor);
+		taper2->setPoint(taper2->x * stretchFactor, taper2->y * stretchFactor);
+	}
+}
+
+float NoiseEasing::getValue(const float& weight)
+{
+	float n = r.nextFloat();
+
+	float t1 = taper1->x / length;
+	float t2Diff = -taper2->x / length;
+	float t2 = 1 - t2Diff;
+
+	float amplitude = taper1->y;
+
+	if (weight < t1)
+	{
+		float w = (weight / t1);
+		float sineW = -(cosf(MathConstants<float>::pi * w) - 1) / 2;
+		amplitude *= sineW;
+	}
+
+	if (weight > t2)
+	{
+		float w = (weight - t2) / t2Diff;
+		float sineW = -(cosf(MathConstants<float>::pi * w) - 1) / 2;
+		amplitude *= 1 - sineW;
+	}
+
+
+	float baseVal = start.y + (end.y - start.y) * weight;
+	return baseVal + (n - .5f) * 2 * amplitude;
+}
+
+Rectangle<float> NoiseEasing::getBounds(bool includeHandles)
+{
+	return Rectangle<float>(Point<float>(start.x, jmin(start.y, end.y + (end.y - start.y))), Point<float>(end.x, jmax(start.y, end.y + (end.y - start.y))));
+}
+
+
+EasingUI* NoiseEasing::createUI()
+{
+	return new GenericEasingUI(this, taper1, taper2);
+}
+
+
+
+PerlinEasing::PerlinEasing() :
+	Easing(PERLIN)
+{
+	taper1 = addPoint2DParameter("Taper 1", "Influence of the noise close to the start. Vertical is the seed");
+	taper2 = addPoint2DParameter("Taper 2", "Influence of the noise close to the end. Vertical is octaves");
+}
+
+
+void PerlinEasing::updateKeysInternal(bool stretch)
+{
+	if (length == 0) return;
+
+	if (!taper1->isOverriden)
+	{
+		taper1->setPoint(length * .25f, .2f);
+		taper2->setPoint(-.25f * length, 0);
+	}
+
+	taper1->setBounds(0, INT32_MIN, length, INT32_MAX);
+	taper2->setBounds(-length, INT32_MIN, 0, INT32_MAX);
+
+
+	if (stretch && prevLength > 0)
+	{
+		float stretchFactor = length / prevLength;
+		taper1->setPoint(taper1->x * stretchFactor, taper1->y * stretchFactor);
+		taper2->setPoint(taper2->x * stretchFactor, taper2->y * stretchFactor);
+	}
+}
+
+float PerlinEasing::getValue(const float& weight)
+{
+	float n = perlin.octaveNoise0_1(weight * length, start.x, 1 + (int32_t)(abs(taper2->y) * 10));
+
+	float t1 = taper1->x / length;
+	float t2Diff = -taper2->x / length;
+	float t2 = 1 - t2Diff;
+
+	float amplitude = taper1->y;
+
+	if (weight < t1)
+	{
+		float w = (weight / t1);
+		float sineW = -(cosf(MathConstants<float>::pi * w) - 1) / 2;
+		amplitude *= sineW;
+	}
+
+	if (weight > t2)
+	{
+		float w = (weight - t2) / t2Diff;
+		float sineW = -(cosf(MathConstants<float>::pi * w) - 1) / 2;
+		amplitude *= 1-sineW;
+	}
+	
+
+	float baseVal = start.y + (end.y - start.y) * weight;
+	return baseVal + (n - .5f) * 2 * amplitude;
+}
+
+Rectangle<float> PerlinEasing::getBounds(bool includeHandles)
+{
+	return Rectangle<float>(Point<float>(start.x, jmin(start.y, end.y + taper2->y)), Point<float>(end.x, jmax(start.y, end.y - taper2->y)));
+}
+
+
+EasingUI* PerlinEasing::createUI()
+{
+	return new GenericEasingUI(this, taper1, taper2);
+}
