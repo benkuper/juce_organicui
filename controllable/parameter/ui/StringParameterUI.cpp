@@ -168,7 +168,7 @@ void StringParameterFileUI::buttonClicked(Button* b)
 
 		int flags = FileBrowserComponent::openMode;
 		if (fp->directoryMode) flags = flags | FileBrowserComponent::canSelectDirectories;
-		chooser->launchAsync(FileBrowserComponent::openMode, [this](const FileChooser& fc)
+		chooser->launchAsync(flags, [this](const FileChooser& fc)
 			{
 				File f = fc.getResult();
 				delete& fc;
