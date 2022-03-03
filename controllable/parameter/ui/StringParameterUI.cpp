@@ -164,7 +164,7 @@ void StringParameterFileUI::buttonClicked(Button* b)
 {
 	if (b == &browseBT)
 	{
-		FileChooser * chooser(new FileChooser("Select a file", File(fp->getBasePath()), fp->fileTypeFilter));
+		FileChooser * chooser(new FileChooser("Select a file", File(), fp->fileTypeFilter));
 
 		int flags = FileBrowserComponent::openMode;
 		if (fp->directoryMode) flags = flags | FileBrowserComponent::canSelectDirectories;
