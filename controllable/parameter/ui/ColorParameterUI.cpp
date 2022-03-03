@@ -23,6 +23,8 @@ ColorParameterUI::ColorParameterUI(Array<ColorParameter *> parameters) :
 
 ColorParameterUI::~ColorParameterUI()
 {
+	if(colorEditor != nullptr) colorEditor->removeComponentListener(this);
+
 }
 
 void ColorParameterUI::paint(Graphics & g)
