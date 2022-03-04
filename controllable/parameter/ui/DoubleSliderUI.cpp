@@ -160,8 +160,8 @@ void DoubleSliderUI::showEditWindowInternal()
 			}
 		}
 	),
-	true
-	);
+		true
+			);
 }
 
 void DoubleSliderUI::showEditRangeWindowInternal()
@@ -181,7 +181,7 @@ void DoubleSliderUI::showEditRangeWindowInternal()
 	nameWindow->addButton("OK", 1, KeyPress(KeyPress::returnKey));
 	nameWindow->addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
 
-	nameWindow->enterModalState(true, ModalCallbackFunction::create([this, &nameWindow](int result)
+	nameWindow->enterModalState(true, ModalCallbackFunction::create([this, nameWindow](int result)
 		{
 			float newMins[2];
 			float newMaxs[2];
@@ -191,8 +191,9 @@ void DoubleSliderUI::showEditRangeWindowInternal()
 				newMaxs[i] = nameWindow->getTextEditorContents("maxVal" + String(i)).getFloatValue();
 			}
 			p2d->setBounds(newMins[0], newMins[1], jmax(newMins[0], newMaxs[0]), jmax(newMins[1], newMaxs[1]));
+
 		}
-	),true);
+	), true);
 }
 
 void DoubleSliderUI::updateUseExtendedEditor()

@@ -98,7 +98,7 @@ void ParameterUI::showEditRangeWindowInternal()
 			}
 		}),
 		true
-	);
+			);
 }
 
 void ParameterUI::paintOverChildren(Graphics& g)
@@ -197,6 +197,13 @@ void ParameterUI::addPopupMenuItems(PopupMenu* p)
 				rangeMenu.addItem(-54, "-180 : 180");
 				rangeMenu.addItem(-55, "0 : 360");
 			}
+			else if (parameter->type == Parameter::POINT2D || parameter->type == Parameter::POINT3D)
+			{
+				rangeMenu.addItem(-70, "0 : 1");
+				rangeMenu.addItem(-71, "-1 : 1");
+				rangeMenu.addItem(-72, "0 : 100");
+				rangeMenu.addItem(-73, "-100 : 100");
+			}
 
 			p->addSubMenu("Set Range...", rangeMenu);
 			if (parameter->hasRange()) p->addItem(-5, "Clear Range");
@@ -250,6 +257,24 @@ void ParameterUI::handleMenuSelectedID(int id)
 	case -61: parameter->setRange(0, 127); break;
 	case -62: parameter->setRange(0, 255); break;
 	case -63: parameter->setRange(0, 65535); break;
+
+	case -70:
+		if (parameter->type == Parameter::POINT2D) ((Point2DParameter*)parameter.get())->setBounds(0, 0, 1, 1);
+		else ((Point3DParameter*)parameter.get())->setBounds(0, 0, 0, 1, 1, 1);
+		break;
+	case -71:
+		if (parameter->type == Parameter::POINT2D) ((Point2DParameter*)parameter.get())->setBounds(-1, -1, 1, 1);
+		else ((Point3DParameter*)parameter.get())->setBounds(-1, -1, -1, 1, 1, 1);
+		break;
+	case -72:
+		if (parameter->type == Parameter::POINT2D) ((Point2DParameter*)parameter.get())->setBounds(0, 0, 100, 100);
+		else ((Point3DParameter*)parameter.get())->setBounds(0, 0, 0, 100, 100, 100);
+		break;
+	case -73:
+		if (parameter->type == Parameter::POINT2D) ((Point2DParameter*)parameter.get())->setBounds(-100, -100, 100, 100);
+		else ((Point3DParameter*)parameter.get())->setBounds(-100, -100, -100, 100, 100, 100);
+		break;
+
 	}
 }
 
