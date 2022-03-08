@@ -20,7 +20,6 @@ ScriptUtil::ScriptUtil() :
 	scriptObject.setMethod("getTimestamp", ScriptUtil::getTimestamp);
 	scriptObject.setMethod("delayThreadMS", ScriptUtil::delayThreadMS);
 
-
 	scriptObject.setMethod("getFloatFromBytes", ScriptUtil::getFloatFromBytes);
 	scriptObject.setMethod("getInt32FromBytes", ScriptUtil::getInt32FromBytes);
 	scriptObject.setMethod("getInt64FromBytes", ScriptUtil::getInt32FromBytes);
@@ -395,55 +394,76 @@ var ScriptUtil::showMessageBox(const var::NativeFunctionArgs& args)
 	String title = args.arguments[0].toString();
 	String message = args.arguments[1].toString();
 	String buttonText = args.numArguments >= 4 ? args.arguments[3].toString() : "";
-	AlertWindow::showMessageBoxAsync(iconType, title, message, buttonText);
 
+	AlertWindow::showMessageBoxAsync(iconType, title, message, buttonText, nullptr);
 	return var();
 }
 
 var ScriptUtil::showOkCancelBox(const var::NativeFunctionArgs& args)
 {
-	if (args.numArguments < 2) return false;
+	if (args.numArguments < 3) return false;
 
 	AlertWindow::AlertIconType iconType = AlertWindow::NoIcon;
-	if (args.numArguments >= 3)
+	if (args.numArguments >= 4)
 	{
-		String s = args.arguments[2].toString();
+		String s = args.arguments[3].toString();
 		if (s == "warning") iconType = AlertWindow::WarningIcon;
 		if (s == "info") iconType = AlertWindow::AlertIconType::InfoIcon;
 		if (s == "question") iconType = AlertWindow::AlertIconType::QuestionIcon;
 	}
 
-	String title = args.arguments[0].toString();
-	String message = args.arguments[1].toString();
-	String button1Text = args.numArguments >= 4 ? args.arguments[3].toString() : "";
-	String button2Text = args.numArguments >= 5 ? args.arguments[4].toString() : "";
-	bool result = AlertWindow::showOkCancelBox(iconType, title, message, button1Text, button2Text, nullptr, nullptr);
+	String id = args.arguments[0].toString();
 
-	//This will not work with async, need to find an alternative...
-	return result;
+	String title = args.arguments[1].toString();
+	String message = args.arguments[2].toString();
+	String button1Text = args.numArguments >= 5 ? args.arguments[4].toString() : "";
+	String button2Text = args.numArguments >= 6 ? args.arguments[5].toString() : "";
+
+	DynamicObject* d = args.thisObject.getDynamicObject();
+	if (d == nullptr) return 0;
+	Script* script = dynamic_cast<Script*>((Script*)(int64)d->getProperty("_script"));
+	if (script == nullptr) return 0;
+
+	AlertWindow::showOkCancelBox(iconType, title, message, button1Text, button2Text, nullptr, ModalCallbackFunction::create([script, id](int result)
+		{
+			script->callFunction("messageBoxCallback", Array<var>{ id, result });
+		})
+	);
+
+	return 0;
 }
 
 var ScriptUtil::showYesNoCancelBox(const var::NativeFunctionArgs& args)
 {
-	if (args.numArguments < 2) return false;
+	if (args.numArguments < 3) return false;
 
 	AlertWindow::AlertIconType iconType = AlertWindow::NoIcon;
-	if (args.numArguments >= 3)
+	if (args.numArguments >= 4)
 	{
-		String s = args.arguments[2].toString();
+		String s = args.arguments[3].toString();
 		if (s == "warning") iconType = AlertWindow::WarningIcon;
 		if (s == "info") iconType = AlertWindow::AlertIconType::InfoIcon;
 		if (s == "question") iconType = AlertWindow::AlertIconType::QuestionIcon;
 	}
 
-	String title = args.arguments[0].toString();
-	String message = args.arguments[1].toString();
-	String button1Text = args.numArguments >= 4 ? args.arguments[3].toString() : "";
-	String button2Text = args.numArguments >= 5 ? args.arguments[4].toString() : "";
-	String button3Text = args.numArguments >= 6 ? args.arguments[5].toString() : "";
-	int result = AlertWindow::showYesNoCancelBox(iconType, title, message, button1Text, button2Text, button3Text, nullptr, nullptr);
+	String id = args.arguments[0].toString();
+	String title = args.arguments[1].toString();
+	String message = args.arguments[2].toString();
+	String button1Text = args.numArguments >= 5 ? args.arguments[4].toString() : "";
+	String button2Text = args.numArguments >= 6 ? args.arguments[5].toString() : "";
+	String button3Text = args.numArguments >= 7 ? args.arguments[6].toString() : "";
 
-	//This will not work with async, need to find an alternative...
+	DynamicObject* d = args.thisObject.getDynamicObject();
+	if (d == nullptr) return 0;
+	Script* script = dynamic_cast<Script*>((Script*)(int64)d->getProperty("_script"));
+	if (script == nullptr) return 0;
+
+	int result = AlertWindow::showYesNoCancelBox(iconType, title, message, button1Text, button2Text, button3Text, nullptr, ModalCallbackFunction::create([script, id](int result)
+		{
+			script->callFunction("messageBoxCallback", Array<var>{ id, result });
+		})
+	);
+
 	return result;
 }
 

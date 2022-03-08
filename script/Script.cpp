@@ -231,6 +231,7 @@ void Script::buildEnvironment()
 	if (ScriptUtil::getInstanceWithoutCreating() != nullptr)
 	{
 		DynamicObject* utilObject = ScriptUtil::getInstance()->getScriptObject();
+		utilObject->setProperty("_script", (int64)this);
 		utilObject->setProperty("scriptPath", filePath->getAbsolutePath());
 		scriptEngine->registerNativeObject(ScriptUtil::getInstance()->scriptTargetName, utilObject);
 	}
