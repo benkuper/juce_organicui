@@ -155,7 +155,7 @@ public:
 		PositionComparator(bool isVertical) : isVertical(isVertical) {}
 		bool isVertical;
 		int compareElements(T* i1, T* i2) {
-			return isVertical ? i1->viewUIPosition->y > i2->viewUIPosition->y : i1->viewUIPosition->x > i2->viewUIPosition->x;
+			return isVertical ? i2->viewUIPosition->y - i1->viewUIPosition->y : i2->viewUIPosition->x - i1->viewUIPosition->x;
 		}
 	};
 	virtual void distributeItems(bool isVertical);

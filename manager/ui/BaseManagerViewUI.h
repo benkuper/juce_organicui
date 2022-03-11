@@ -443,7 +443,7 @@ void BaseManagerViewUI<M, T, U>::updateItemsVisibility()
 		viewPane->toFront(false);
 	}
 
-	if (toolContainer.isVisible()) toolContainer.toFront(false);
+	if (this->toolContainer.isVisible()) this->toolContainer.toFront(false);
 }
 
 template<class M, class T, class U>
