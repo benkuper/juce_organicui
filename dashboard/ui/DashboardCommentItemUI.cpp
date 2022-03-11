@@ -27,9 +27,11 @@ DashboardCommentItemUI::DashboardCommentItemUI(DashboardCommentItem* comment) :
 	textUI.setFont(comment->size->floatValue());
 	addAndMakeVisible(&textUI);
 
-	setSize(textUI.getTextWidth(), textUI.getTextHeight() + 4);
-
+	setSize(item->viewUISize->x, item->viewUISize->y);
+	item->viewUISize->setPoint(getWidth(), getHeight());
 	removeChildComponent(&resizer);
+
+	resized();
 }
 
 DashboardCommentItemUI::~DashboardCommentItemUI()
@@ -131,7 +133,7 @@ void DashboardCommentItemUI::controllableFeedbackUpdateInternal(Controllable* c)
 	{
 		if (c == comment->text) textUI.setText(comment->text->stringValue(), dontSendNotification);
 		textUI.applyFontToAllText(comment->size->floatValue(), true);
-		setSize(textUI.getTextWidth(), textUI.getTextHeight() + 4);
+		item->viewUISize->setPoint(textUI.getTextWidth(), textUI.getTextHeight() + 4);
 	}
 	else if (c == comment->color || c == comment->bgAlpha)
 	{
