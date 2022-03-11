@@ -678,7 +678,7 @@ void BaseManagerUI<M, T, U>::alignItems(AlignMode alignMode)
 	Array<T*> inspectables = InspectableSelectionManager::activeSelectionManager->getInspectablesAs<T>();
 	if (inspectables.size() == 0) return;
 
-	float target = (alignMode == BaseManagerUI<M, T, U>::AlignMode::CENTER_V || alignMode == BaseManagerUI<M, T, U>::AlignMode::CENTER_H) ? 0 : ((alignMode == BaseManagerUI<M, T, U>::AlignMode::LEFT || alignMode == BaseManagerUI<M, T, U>::AlignMode::TOP) ? INT_MAX : INT_MIN);
+	float target = (alignMode == BaseManagerUI<M, T, U>::AlignMode::CENTER_V || alignMode == BaseManagerUI<M, T, U>::AlignMode::CENTER_H) ? 0 : ((alignMode == BaseManagerUI<M, T, U>::AlignMode::LEFT || alignMode == BaseManagerUI<M, T, U>::AlignMode::TOP) ? INT32_MAX : INT32_MIN);
 
 	Array<T*> goodInspectables;
 	for (auto& i : inspectables)
