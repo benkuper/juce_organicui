@@ -3,11 +3,20 @@
 <JUCERPROJECT id="nJCeN1" name="organicui_resources" projectType="guiapp" version="1.0.0"
               bundleIdentifier="com.benkuper.organicui_resources" includeBinaryInAppConfig="1"
               displaySplashScreen="1" reportAppUsage="1" splashScreenColour="Dark"
-              cppLanguageStandard="11" companyCopyright="" binaryDataNamespace="OrganicUIBinaryData"
+              companyCopyright="" binaryDataNamespace="OrganicUIBinaryData"
               jucerFormatVersion="1">
   <MAINGROUP id="gdPnjI" name="organicui_resources">
     <GROUP id="{471DD8BF-5339-7ED5-BF79-1FCB0A8A6B3D}" name="Resources">
       <FILE id="zCaAEj" name="add.png" compile="0" resource="1" file="Resources/add.png"/>
+      <FILE id="Fodrzo" name="align_bottom.png" compile="0" resource="1"
+            file="Resources/align_bottom.png"/>
+      <FILE id="I5EVXS" name="align_center_h.png" compile="0" resource="1"
+            file="Resources/align_center_h.png"/>
+      <FILE id="hH2fju" name="align_center_v.png" compile="0" resource="1"
+            file="Resources/align_center_v.png"/>
+      <FILE id="mnNvOx" name="align_left.png" compile="0" resource="1" file="Resources/align_left.png"/>
+      <FILE id="XiC4RV" name="align_right.png" compile="0" resource="1" file="Resources/align_right.png"/>
+      <FILE id="mhO9YL" name="align_top.png" compile="0" resource="1" file="Resources/align_top.png"/>
       <FILE id="aoTRXK" name="arrow-down.png" compile="0" resource="1" file="Resources/arrow-down.png"/>
       <FILE id="uBzQVv" name="arrow-right.png" compile="0" resource="1" file="Resources/arrow-right.png"/>
       <FILE id="AQujp8" name="cancel.png" compile="0" resource="1" file="Resources/cancel.png"/>
@@ -19,6 +28,10 @@
       <FILE id="dYEB6a" name="checkbox_on.png" compile="0" resource="1" file="Resources/checkbox_on.png"/>
       <FILE id="lFWTK3" name="checkbox_on_readonly.png" compile="0" resource="1"
             file="Resources/checkbox_on_readonly.png"/>
+      <FILE id="LR4MYG" name="distribute_h.png" compile="0" resource="1"
+            file="Resources/distribute_h.png"/>
+      <FILE id="khEw49" name="distribute_v.png" compile="0" resource="1"
+            file="Resources/distribute_v.png"/>
       <FILE id="yRr25C" name="down.png" compile="0" resource="1" file="Resources/down.png"/>
       <FILE id="UEC663" name="duplicate.png" compile="0" resource="1" file="Resources/duplicate.png"/>
       <FILE id="JhfeGX" name="edit.png" compile="0" resource="1" file="Resources/edit.png"/>
@@ -33,6 +46,8 @@
       <FILE id="avHafs" name="relative.png" compile="0" resource="1" file="Resources/relative.png"/>
       <FILE id="OR6cVw" name="reload.png" compile="0" resource="1" file="Resources/reload.png"/>
       <FILE id="K6dyge" name="settings.png" compile="0" resource="1" file="Resources/settings.png"/>
+      <FILE id="jyleTp" name="show_grid.png" compile="0" resource="1" file="Resources/show_grid.png"/>
+      <FILE id="XTAwXe" name="snap_grid.png" compile="0" resource="1" file="Resources/snap_grid.png"/>
       <FILE id="ZVsExK" name="target.png" compile="0" resource="1" file="Resources/target.png"/>
       <FILE id="FixPlj" name="trigger.png" compile="0" resource="1" file="Resources/trigger.png"/>
       <FILE id="utiCOQ" name="uncheck.png" compile="0" resource="1" file="Resources/uncheck.png"/>

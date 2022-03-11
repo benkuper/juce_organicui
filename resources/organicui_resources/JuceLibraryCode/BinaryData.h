@@ -11,6 +11,24 @@ namespace OrganicUIBinaryData
     extern const char*   add_png;
     const int            add_pngSize = 2799;
 
+    extern const char*   align_bottom_png;
+    const int            align_bottom_pngSize = 3257;
+
+    extern const char*   align_center_h_png;
+    const int            align_center_h_pngSize = 3355;
+
+    extern const char*   align_center_v_png;
+    const int            align_center_v_pngSize = 3400;
+
+    extern const char*   align_left_png;
+    const int            align_left_pngSize = 1866;
+
+    extern const char*   align_right_png;
+    const int            align_right_pngSize = 2095;
+
+    extern const char*   align_top_png;
+    const int            align_top_pngSize = 3258;
+
     extern const char*   arrowdown_png;
     const int            arrowdown_pngSize = 1797;
 
@@ -34,6 +52,12 @@ namespace OrganicUIBinaryData
 
     extern const char*   checkbox_on_readonly_png;
     const int            checkbox_on_readonly_pngSize = 2389;
+
+    extern const char*   distribute_h_png;
+    const int            distribute_h_pngSize = 3365;
+
+    extern const char*   distribute_v_png;
+    const int            distribute_v_pngSize = 3359;
 
     extern const char*   down_png;
     const int            down_pngSize = 543;
@@ -69,13 +93,19 @@ namespace OrganicUIBinaryData
     const int            power_pngSize = 15366;
 
     extern const char*   relative_png;
-    const int            relative_pngSize = 2344;
+    const int            relative_pngSize = 2158;
 
     extern const char*   reload_png;
     const int            reload_pngSize = 16303;
 
     extern const char*   settings_png;
     const int            settings_pngSize = 15919;
+
+    extern const char*   show_grid_png;
+    const int            show_grid_pngSize = 3298;
+
+    extern const char*   snap_grid_png;
+    const int            snap_grid_pngSize = 3163;
 
     extern const char*   target_png;
     const int            target_pngSize = 15244;
@@ -93,7 +123,7 @@ namespace OrganicUIBinaryData
     const int            warning_pngSize = 1153;
 
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 28;
+    const int namedResourceListSize = 38;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];

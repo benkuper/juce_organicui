@@ -34,6 +34,7 @@ DashboardItemManagerUI::DashboardItemManagerUI(DashboardItemManager* manager) :
 	addExistingItems(false);
 
 	setShowAddButton(false);
+	setShowTools(true);
 }
 
 DashboardItemManagerUI::~DashboardItemManagerUI()

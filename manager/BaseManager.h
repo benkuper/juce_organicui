@@ -37,6 +37,11 @@ public:
 						   //interaction
 	float viewZoom;
 
+	//grid
+	BoolParameter* snapGridMode;
+	BoolParameter* showSnapGrid;
+	IntParameter* snapGridSize;
+
 	virtual T* createItem(); //to override if special constructor to use
 	virtual T* createItemFromData(var data); //to be overriden for specific item creation (from data)
 	virtual T* addItemFromData(var data, bool addToUndo = true); //to be overriden for specific item creation (from data)
@@ -90,6 +95,8 @@ public:
 	void askForSelectPreviousItem(BaseItem* item, bool addToSelection = false) override;
 	void askForSelectNextItem(BaseItem* item, bool addToSelection = false) override;
 
+	void onContainerParameterChanged(Parameter* p) override;
+
 	virtual var getExportSelectionData();
 	virtual var getJSONData() override;
 	virtual void loadJSONDataInternal(var data) override;
@@ -112,7 +119,7 @@ public:
 	class ManagerEvent
 	{
 	public:
-		enum Type { ITEM_ADDED, ITEM_REMOVED, ITEMS_REORDERED, ITEMS_ADDED, ITEMS_REMOVED, MANAGER_CLEARED };
+		enum Type { ITEM_ADDED, ITEM_REMOVED, ITEMS_REORDERED, ITEMS_ADDED, ITEMS_REMOVED, MANAGER_CLEARED, NEEDS_UI_UPDATE };
 
 		ManagerEvent(Type t, T* i = nullptr);
 		ManagerEvent(Type t, Array<T*> iList);
@@ -280,6 +287,10 @@ BaseManager<T>::BaseManager(const String& name) :
 	//setCanHavePresets(false);
 	//hideInEditor = true;
 
+	snapGridMode = addBoolParameter("Snap Grid Mode", "If enabled, this will force moving objects snap to grid", false);
+	showSnapGrid = addBoolParameter("Show Snap Grid", "If checked, this will show the snap grid", false);
+	snapGridSize = addIntParameter("Snap Grid Size", "The size of the grid cells to snap to", 20, 4, 1000);
+
 	scriptObject.setMethod("addItem", &BaseManager<T>::addItemFromScript);
 	scriptObject.setMethod("removeItem", &BaseManager<T>::removeItemFromScript);
 	scriptObject.setMethod("removeAll", &BaseManager<T>::removeAllItemsFromScript);
@@ -293,6 +304,8 @@ BaseManager<T>::BaseManager(const String& name) :
 
 	skipLabelInTarget = true; //by default manager label in targetParameter UI are not interesting
 	nameCanBeChangedByUser = false;
+
+
 }
 
 template<class T>
@@ -331,7 +344,7 @@ T* BaseManager<T>::createItemFromData(var data)
 		if (type.isEmpty()) return nullptr;
 		return managerFactory->create(type);
 	}
-	
+
 	return createItem();
 }
 
@@ -794,6 +807,16 @@ void BaseManager<T>::askForSelectNextItem(BaseItem* item, bool addToSelection)
 	int index = items.indexOf(dynamic_cast<T*>(item));
 	if (index == -1 || index >= items.size() - 1) return;
 	items[index + 1]->selectThis(addToSelection);
+}
+
+template<class T>
+void BaseManager<T>::onContainerParameterChanged(Parameter* p)
+{
+	EnablingControllableContainer::onContainerParameterChanged(p);
+	if (p == showSnapGrid || p == snapGridSize)
+	{
+		managerNotifier.addMessage(new ManagerEvent(ManagerEvent::NEEDS_UI_UPDATE));
+	}
 }
 
 template<class T>

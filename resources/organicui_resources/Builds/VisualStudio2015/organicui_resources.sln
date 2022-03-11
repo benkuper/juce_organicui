@@ -1,5 +1,6 @@
+﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2015
+# Visual Studio 14
 
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "organicui_resources - App", "organicui_resources_App.vcxproj", "{4F884560-0A7A-7459-DA19-1E6803E87E7C}"
 EndProject
