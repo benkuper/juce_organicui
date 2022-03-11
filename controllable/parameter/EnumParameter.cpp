@@ -1,16 +1,16 @@
 /*
   ==============================================================================
 
-    EnumParameter.cpp
-    Created: 29 Sep 2016 5:34:59pm
-    Author:  bkupe
+	EnumParameter.cpp
+	Created: 29 Sep 2016 5:34:59pm
+	Author:  bkupe
 
   ==============================================================================
 */
 
 
-EnumParameter::EnumParameter(const String & niceName, const String &description, bool enabled) :
-	Parameter(Type::ENUM, niceName, description, "" ,var(),var(), enabled),
+EnumParameter::EnumParameter(const String& niceName, const String& description, bool enabled) :
+	Parameter(Type::ENUM, niceName, description, "", var(), var(), enabled),
 	enumParameterNotifier(5)
 {
 	lockManualControlMode = true;
@@ -23,7 +23,7 @@ EnumParameter::EnumParameter(const String & niceName, const String &description,
 	value = "";
 }
 
-EnumParameter::~EnumParameter() 
+EnumParameter::~EnumParameter()
 {
 	if (enumParameterNotifier.isUpdatePending())
 	{
@@ -33,13 +33,13 @@ EnumParameter::~EnumParameter()
 	}
 }
 
-EnumParameter * EnumParameter::addOption(String key, var data, bool selectIfFirstOption)
+EnumParameter* EnumParameter::addOption(String key, var data, bool selectIfFirstOption)
 {
 	enumValues.add(new EnumValue(key, data));
 	if (enumValues.size() == 1 && selectIfFirstOption)
 	{
 		defaultValue = key;
-		setValue(key, true, false,false);
+		setValue(key, true, false, false);
 	}
 
 	enumListeners.call(&Listener::enumOptionAdded, this, key);
@@ -48,9 +48,19 @@ EnumParameter * EnumParameter::addOption(String key, var data, bool selectIfFirs
 	return this;
 }
 
-void EnumParameter::updateOption(int index, String key, var data)
+void EnumParameter::updateOption(int index, String key, var data, bool addIfNotThere)
 {
+	if (index >= enumValues.size())
+	{
+		if (!addIfNotThere) return;
+		while(index > enumValues.size()) addOption("#"+String(enumValues.size()), var());
+		addOption(key, data);
+		return;
+	}
+
 	String k = enumValues[index]->key;
+	if (k == key && enumValues[index]->value == data) return;
+
 	enumValues.set(index, new EnumValue(key, data));
 	enumListeners.call(&Listener::enumOptionUpdated, this, index, k, key);
 	enumParameterNotifier.addMessage(new EnumParameterEvent(EnumParameterEvent::ENUM_OPTION_UPDATED, this));
@@ -67,11 +77,21 @@ void EnumParameter::removeOption(String key)
 	if (getValueKey() == key) setValue("");
 }
 
+void EnumParameter::setOptions(Array<EnumValue*> options)
+{
+	for (int i = 0; i < options.size(); i++)
+	{
+		updateOption(i, options[i]->key, options[i]->value, true);
+	}
+
+	while (enumValues.size() > options.size()) removeOption(enumValues[enumValues.size() - 1]->key);
+}
+
 void EnumParameter::clearOptions()
 {
 	StringArray keysToRemove;
-	for (auto &ev : enumValues) keysToRemove.add(ev->key);
-	for (auto &k : keysToRemove) removeOption(k);
+	for (auto& ev : enumValues) keysToRemove.add(ev->key);
+	for (auto& k : keysToRemove) removeOption(k);
 }
 
 void EnumParameter::updateArgDescription()
@@ -80,7 +100,7 @@ void EnumParameter::updateArgDescription()
 	for (int i = 0; i < enumValues.size(); ++i)
 	{
 		argumentsDescription += enumValues[i]->key;
-		if(i < enumValues.size()-1) argumentsDescription += " | ";
+		if (i < enumValues.size() - 1) argumentsDescription += " | ";
 	}
 }
 
@@ -90,7 +110,7 @@ var EnumParameter::getValue()
 }
 
 var EnumParameter::getValueData() {
-	EnumValue * ev = getEntryForKey(value.toString());
+	EnumValue* ev = getEntryForKey(value.toString());
 	if (ev == nullptr) return var();
 	return ev->value;
 }
@@ -106,7 +126,7 @@ int EnumParameter::getIndexForKey(StringRef key)
 	return -1;
 }
 
-EnumParameter::EnumValue * EnumParameter::getEntryForKey(StringRef key)
+EnumParameter::EnumValue* EnumParameter::getEntryForKey(StringRef key)
 {
 	int index = getIndexForKey(key);
 	if (index == -1) return nullptr;
@@ -116,13 +136,13 @@ EnumParameter::EnumValue * EnumParameter::getEntryForKey(StringRef key)
 StringArray EnumParameter::getAllKeys()
 {
 	StringArray result;
-	for(auto &ev: enumValues) result.add(ev->key);
+	for (auto& ev : enumValues) result.add(ev->key);
 	return result;
 }
 
 void EnumParameter::setValueWithData(var data)
 {
-	for (auto &ev : enumValues)
+	for (auto& ev : enumValues)
 	{
 		if (ev->value == data)
 		{
@@ -142,7 +162,7 @@ void EnumParameter::setPrev(bool loop, bool addToUndo)
 	int targetIndex = getIndexForKey(value.toString()) - 1;
 	if (targetIndex < 0)
 	{
-		if (loop) targetIndex = enumValues.size() -1;
+		if (loop) targetIndex = enumValues.size() - 1;
 		else return;
 	}
 
@@ -233,7 +253,7 @@ var EnumParameter::addOptionFromScript(const juce::var::NativeFunctionArgs& a)
 	WeakReference<Parameter> c = getObjectFromJS<Parameter>(a);
 	if (c == nullptr || c.wasObjectDeleted()) return var();
 	EnumParameter* ep = dynamic_cast<EnumParameter*>(c.get());
-	
+
 	if (a.numArguments < 2)
 	{
 		NLOGWARNING("Script", "EnumParameter addOption should at least have 2 arguments");
@@ -249,7 +269,7 @@ var EnumParameter::removeOptionsFromScript(const juce::var::NativeFunctionArgs& 
 {
 	WeakReference<Parameter> c = getObjectFromJS<Parameter>(a);
 	if (c == nullptr || c.wasObjectDeleted()) return var();
-	EnumParameter * ep = dynamic_cast<EnumParameter *>(c.get());
+	EnumParameter* ep = dynamic_cast<EnumParameter*>(c.get());
 	ep->clearOptions();
 	return var();
 }
@@ -267,11 +287,11 @@ var EnumParameter::setValueWithDataFromScript(const juce::var::NativeFunctionArg
 	}
 
 	ep->setValueWithData(a.arguments[0]);
-		
+
 	return var();
 }
 
-EnumParameterUI * EnumParameter::createUI(Array<EnumParameter *> parameters)
+EnumParameterUI* EnumParameter::createUI(Array<EnumParameter*> parameters)
 {
 	if (parameters.size() == 0) parameters = { this };
 	return new EnumParameterUI(parameters);
@@ -283,6 +303,6 @@ EnumParameterButtonBarUI* EnumParameter::createButtonBarUI(Array<EnumParameter*>
 	return new EnumParameterButtonBarUI(parameters);
 }
 
-ControllableUI * EnumParameter::createDefaultUI(Array<Controllable*> controllables) {
+ControllableUI* EnumParameter::createDefaultUI(Array<Controllable*> controllables) {
 	return createUI(getArrayAs<Controllable, EnumParameter>(controllables));
 }
