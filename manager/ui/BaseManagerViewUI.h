@@ -342,7 +342,7 @@ void BaseManagerViewUI<M, T, U>::paintBackground(Graphics& g)
 		g.setColour(BG_COLOR.darker(.7f));
 
 		juce::Rectangle<int> cr = this->tools[0]->getBounds();
-		juce::Rectangle<int> c2r = this->tools[tools.size() - 1]->getBounds();
+		juce::Rectangle<int> c2r = this->tools[this->tools.size() - 1]->getBounds();
 		juce::Rectangle<int> tr = cr.getUnion(c2r).expanded(2);
 
 		g.fillRoundedRectangle(tr.toFloat(), 2);
@@ -380,7 +380,7 @@ void BaseManagerViewUI<M, T, U>::resized()
 	//this->addItemBT->setBounds(r.withSize(24, 24).withX(r.getWidth() - 24));
 
 	juce::Rectangle<int> hr = r.removeFromTop(this->headerSize);
-	resizedInternalHeader(hr);
+	this->resizedInternalHeader(hr);
 
 	Array<U*> filteredItems = this->getFilteredItems();
 	for (auto& tui : filteredItems)
