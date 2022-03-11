@@ -90,6 +90,13 @@ public:
 	std::unique_ptr<ImageButton> addItemBT;
 	std::unique_ptr<Label> searchBar;
 
+	class ToolContainer : public Component
+	{
+	public:
+		ToolContainer() : Component("Tools") {}
+		void paint(Graphics& g) override { g.setColour(BG_COLOR.darker(.6f)); g.fillRoundedRectangle(getLocalBounds().toFloat(), 2); }
+	};
+	ToolContainer toolContainer;
 	OwnedArray<Component> tools;
 	HashMap<Button*, std::function<void()>> toolFuncMap;
 	bool showTools;
@@ -373,11 +380,12 @@ void BaseManagerUI<M, T, U>::setShowTools(bool value)
 	showTools = value;
 	if (value)
 	{
-		for (auto& c : tools) addAndMakeVisible(c);
+		addAndMakeVisible(&toolContainer);
 	}
 	else
 	{
-		for (auto& c : tools) removeChildComponent(c);
+		toolContainer.setVisible(false);
+		removeChildComponent(&toolContainer);
 	}
 
 	resized();
@@ -388,6 +396,7 @@ void BaseManagerUI<M, T, U>::addButtonTool(Button* c, std::function<void()> clic
 {
 	if (tools.contains(c)) return;
 	tools.add(c);
+	toolContainer.addAndMakeVisible(c);
 	if (clickFunc != nullptr) toolFuncMap.set(c, clickFunc);
 	c->addListener(this);
 }
@@ -395,6 +404,7 @@ void BaseManagerUI<M, T, U>::addButtonTool(Button* c, std::function<void()> clic
 template<class M, class T, class U>
 void BaseManagerUI<M, T, U>::addControllableTool(ControllableUI* c)
 {
+	toolContainer.addAndMakeVisible(c);
 	tools.add(c);
 }
 
@@ -588,7 +598,7 @@ template<class M, class T, class U>
 void BaseManagerUI<M, T, U>::resizedInternalHeaderTools(juce::Rectangle<int>& r)
 {
 	r.removeFromLeft(4);
-	
+
 	float rSize = 0;
 	for (auto& t : this->tools) rSize += jmax(t->getWidth(), r.getHeight());
 
@@ -596,10 +606,14 @@ void BaseManagerUI<M, T, U>::resizedInternalHeaderTools(juce::Rectangle<int>& r)
 
 	if (r.getWidth() == 0 || r.getHeight() == 0) return;
 
+	toolContainer.setBounds(r.withWidth(rSize));
+
+	Rectangle<int> toolR = toolContainer.getLocalBounds();
+
 	for (auto& t : this->tools)
 	{
-		juce::Rectangle<int> tr = r.removeFromLeft(jmax(t->getWidth(), r.getHeight()));
-		tr.reduce(tr.getWidth() == r.getHeight() ? 6 : 0, 6);
+		juce::Rectangle<int> tr = toolR.removeFromLeft(jmax(t->getWidth(), r.getHeight()));
+		tr.reduce(tr.getWidth() == toolR.getHeight() ? 6 : 0, 6);
 		t->setBounds(tr);
 	}
 }
@@ -764,6 +778,7 @@ template<class M, class T, class U>
 void BaseManagerUI<M, T, U>::updateItemsVisibility()
 {
 	for (auto& bui : itemsUI) updateItemVisibility(bui);
+
 }
 
 template<class M, class T, class U>

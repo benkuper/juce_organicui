@@ -42,6 +42,8 @@ public:
 	BoolParameter* showSnapGrid;
 	IntParameter* snapGridSize;
 
+	void setHasGridOptions(bool hasGridOptions);
+
 	virtual T* createItem(); //to override if special constructor to use
 	virtual T* createItemFromData(var data); //to be overriden for specific item creation (from data)
 	virtual T* addItemFromData(var data, bool addToUndo = true); //to be overriden for specific item creation (from data)
@@ -280,16 +282,12 @@ BaseManager<T>::BaseManager(const String& name) :
 	autoReorderOnAdd(true),
 	isManipulatingMultipleItems(false),
 	viewZoom(1),
+	snapGridMode(nullptr),
+	showSnapGrid(nullptr),
+	snapGridSize(nullptr),
 	managerNotifier(50),
 	comparator(this)
 {
-
-	//setCanHavePresets(false);
-	//hideInEditor = true;
-
-	snapGridMode = addBoolParameter("Snap Grid Mode", "If enabled, this will force moving objects snap to grid", false);
-	showSnapGrid = addBoolParameter("Show Snap Grid", "If checked, this will show the snap grid", false);
-	snapGridSize = addIntParameter("Snap Grid Size", "The size of the grid cells to snap to", 20, 4, 1000);
 
 	scriptObject.setMethod("addItem", &BaseManager<T>::addItemFromScript);
 	scriptObject.setMethod("removeItem", &BaseManager<T>::removeItemFromScript);
@@ -326,6 +324,33 @@ Array<IType*> BaseManager<T>::getItemsWithType()
 	}
 
 	return result;
+}
+
+template<class T>
+void BaseManager<T>::setHasGridOptions(bool hasGridOptions)
+{
+	if (hasGridOptions)
+	{
+		if (snapGridMode == nullptr)
+		{
+			snapGridMode = addBoolParameter("Snap Grid Mode", "If enabled, this will force moving objects snap to grid", false);
+			showSnapGrid = addBoolParameter("Show Snap Grid", "If checked, this will show the snap grid", false);
+			snapGridSize = addIntParameter("Snap Grid Size", "The size of the grid cells to snap to", 20, 4, 1000);
+		}
+	}
+	else
+	{
+		if (snapGridMode != nullptr)
+		{
+			removeControllable(snapGridMode);
+			removeControllable(showSnapGrid);
+			removeControllable(snapGridSize);
+
+			snapGridMode = nullptr;
+			showSnapGrid = nullptr;
+			snapGridSize = nullptr;
+		}
+	}
 }
 
 template<class T>

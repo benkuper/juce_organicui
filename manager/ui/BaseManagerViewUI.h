@@ -149,13 +149,20 @@ BaseManagerViewUI<M, T, U>::BaseManagerViewUI(const String& contentName, M* _man
 	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::distribute_h_png, OrganicUIBinaryData::distribute_h_pngSize)), [this]() { this->distributeItems(false); });
 	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::distribute_v_png, OrganicUIBinaryData::distribute_v_pngSize)), [this]() { this->distributeItems(true); });
 
-	this->addControllableTool(this->manager->snapGridMode->createToggle(ImageCache::getFromMemory(OrganicUIBinaryData::snap_grid_png, OrganicUIBinaryData::snap_grid_pngSize)));
-	this->addControllableTool(this->manager->showSnapGrid->createToggle(ImageCache::getFromMemory(OrganicUIBinaryData::show_grid_png, OrganicUIBinaryData::show_grid_pngSize)));
-
+	if (this->manager->snapGridMode != nullptr)
+	{
+		this->addControllableTool(this->manager->snapGridMode->createToggle(ImageCache::getFromMemory(OrganicUIBinaryData::snap_grid_png, OrganicUIBinaryData::snap_grid_pngSize)));
+		this->addControllableTool(this->manager->showSnapGrid->createToggle(ImageCache::getFromMemory(OrganicUIBinaryData::show_grid_png, OrganicUIBinaryData::show_grid_pngSize)));
+	}
+	
 	for (auto& t : this->tools)  t->setSize(16, 16);
-	ControllableUI* sizeUI = this->manager->snapGridSize->createDefaultUI();
-	sizeUI->setSize(60, 16);
-	this->addControllableTool(sizeUI);
+
+	if (this->manager->snapGridMode != nullptr)
+	{
+		ControllableUI* sizeUI = this->manager->snapGridSize->createDefaultUI();
+		sizeUI->setSize(60, 16);
+		this->addControllableTool(sizeUI);
+	}
 }
 
 
@@ -326,7 +333,7 @@ void BaseManagerViewUI<M, T, U>::paintBackground(Graphics& g)
 	g.drawLine(center.x, 0, center.x, this->getHeight(), 2);
 	g.drawLine(0, center.y, this->getWidth(), center.y, 2);
 
-	if (this->manager->showSnapGrid->boolValue())
+	if (this->manager->showSnapGrid != nullptr && this->manager->showSnapGrid->boolValue())
 	{
 		g.setColour(BG_COLOR.brighter(.1f));
 
@@ -335,17 +342,6 @@ void BaseManagerViewUI<M, T, U>::paintBackground(Graphics& g)
 		float startY = fmodf(this->getViewCenter().y, step) - step;
 		for (float i = startX; i <= this->getWidth(); i += step) g.drawVerticalLine(i, 0, this->getHeight());
 		for (float i = startY; i <= this->getHeight(); i += step) g.drawHorizontalLine(i, 0, this->getWidth());
-	}
-
-	if (this->showTools && this->tools.size() > 0)
-	{
-		g.setColour(BG_COLOR.darker(.7f));
-
-		juce::Rectangle<int> cr = this->tools[0]->getBounds();
-		juce::Rectangle<int> c2r = this->tools[this->tools.size() - 1]->getBounds();
-		juce::Rectangle<int> tr = cr.getUnion(c2r).expanded(2);
-
-		g.fillRoundedRectangle(tr.toFloat(), 2);
 	}
 }
 
@@ -446,6 +442,8 @@ void BaseManagerViewUI<M, T, U>::updateItemsVisibility()
 		viewPane->updateContent();
 		viewPane->toFront(false);
 	}
+
+	if (toolContainer.isVisible()) toolContainer.toFront(false);
 }
 
 template<class M, class T, class U>
@@ -615,7 +613,7 @@ void BaseManagerViewUI<M, T, U>::itemDragMove(const DragAndDropTarget::SourceDet
 
 	Point<int> snapPosition = realP;
 
-	if (this->manager->snapGridMode->boolValue())
+	if (this->manager->snapGridMode != nullptr && this->manager->snapGridMode->boolValue())
 	{
 		float snapGridSize = this->manager->snapGridSize->intValue() * this->manager->viewZoom;;
 		Point<float> gridOffset(fmodf(this->getViewCenter().x, snapGridSize), fmodf(this->getViewCenter().y, snapGridSize));
@@ -776,7 +774,7 @@ void BaseManagerViewUI<M, T, U>::itemUIResizeDrag(BaseItemMinimalUI<T>* itemUI, 
 
 	Point<float> snapPos = pos;
 
-	if (this->manager->snapGridMode->boolValue())
+	if (this->manager->snapGridMode != nullptr && this->manager->snapGridMode->boolValue())
 	{
 		float snapGridSize = this->manager->snapGridSize->intValue() * this->manager->viewZoom;;
 		Point<float> gridOffset(fmodf(this->getViewCenter().x, snapGridSize), fmodf(this->getViewCenter().y, snapGridSize));
