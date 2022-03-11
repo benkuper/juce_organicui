@@ -139,13 +139,13 @@ BaseManagerViewUI<M, T, U>::BaseManagerViewUI(const String& contentName, M* _man
 
 	this->headerSize = 28;
 
-	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_left_png, OrganicUIBinaryData::align_left_pngSize)), [this]() { this->alignItems(BaseManagerUI<M,T,U>::AlignMode::LEFT); });
+	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_left_png, OrganicUIBinaryData::align_left_pngSize)), [this]() { this->alignItems(BaseManagerUI<M, T, U>::AlignMode::LEFT); });
 
-	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_center_h_png, OrganicUIBinaryData::align_center_h_pngSize)), [this]() { this->alignItems(BaseManagerUI<M,T,U>::AlignMode::CENTER_H); });
-	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_right_png, OrganicUIBinaryData::align_right_pngSize)), [this]() { this->alignItems(BaseManagerUI<M,T,U>::AlignMode::RIGHT); });
-	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_top_png, OrganicUIBinaryData::align_top_pngSize)), [this]() { this->alignItems(BaseManagerUI<M,T,U>::AlignMode::TOP); });
-	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_center_v_png, OrganicUIBinaryData::align_center_v_pngSize)), [this]() { this->alignItems(BaseManagerUI<M,T,U>::AlignMode::CENTER_V); });
-	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_bottom_png, OrganicUIBinaryData::align_bottom_pngSize)), [this]() { this->alignItems(BaseManagerUI<M,T,U>::AlignMode::BOTTOM); });
+	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_center_h_png, OrganicUIBinaryData::align_center_h_pngSize)), [this]() { this->alignItems(BaseManagerUI<M, T, U>::AlignMode::CENTER_H); });
+	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_right_png, OrganicUIBinaryData::align_right_pngSize)), [this]() { this->alignItems(BaseManagerUI<M, T, U>::AlignMode::RIGHT); });
+	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_top_png, OrganicUIBinaryData::align_top_pngSize)), [this]() { this->alignItems(BaseManagerUI<M, T, U>::AlignMode::TOP); });
+	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_center_v_png, OrganicUIBinaryData::align_center_v_pngSize)), [this]() { this->alignItems(BaseManagerUI<M, T, U>::AlignMode::CENTER_V); });
+	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_bottom_png, OrganicUIBinaryData::align_bottom_pngSize)), [this]() { this->alignItems(BaseManagerUI<M, T, U>::AlignMode::BOTTOM); });
 	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::distribute_h_png, OrganicUIBinaryData::distribute_h_pngSize)), [this]() { this->distributeItems(false); });
 	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::distribute_v_png, OrganicUIBinaryData::distribute_v_pngSize)), [this]() { this->distributeItems(true); });
 
@@ -154,7 +154,7 @@ BaseManagerViewUI<M, T, U>::BaseManagerViewUI(const String& contentName, M* _man
 		this->addControllableTool(this->manager->snapGridMode->createToggle(ImageCache::getFromMemory(OrganicUIBinaryData::snap_grid_png, OrganicUIBinaryData::snap_grid_pngSize)));
 		this->addControllableTool(this->manager->showSnapGrid->createToggle(ImageCache::getFromMemory(OrganicUIBinaryData::show_grid_png, OrganicUIBinaryData::show_grid_pngSize)));
 	}
-	
+
 	for (auto& t : this->tools)  t->setSize(16, 16);
 
 	if (this->manager->snapGridMode != nullptr)
@@ -615,14 +615,10 @@ void BaseManagerViewUI<M, T, U>::itemDragMove(const DragAndDropTarget::SourceDet
 
 	if (this->manager->snapGridMode != nullptr && this->manager->snapGridMode->boolValue())
 	{
-		float snapGridSize = this->manager->snapGridSize->intValue() * this->manager->viewZoom;;
-		Point<float> gridOffset(fmodf(this->getViewCenter().x, snapGridSize), fmodf(this->getViewCenter().y, snapGridSize));
-
-		snapPosition.setXY(snapPosition.x - fmodf(snapPosition.x - gridOffset.x, snapGridSize),
-			snapPosition.y - fmodf(snapPosition.y - gridOffset.y, snapGridSize)
-		);
-
-		targetSnapViewPosition = this->getViewPos(snapPosition);
+		Point<float> vPos = this->getViewPos(snapPosition);
+		float snapViewSize = this->manager->snapGridSize->floatValue() / (useCheckersAsUnits ? checkerSize : 1);
+		targetSnapViewPosition.setXY(vPos.x - fmodf(vPos.x, snapViewSize), vPos.y - fmodf(vPos.y, snapViewSize));
+		snapPosition = this->getPosInView(targetSnapViewPosition);
 	}
 	else if (enableSnapping)
 	{
@@ -770,21 +766,14 @@ void BaseManagerViewUI<M, T, U>::askForSyncPosAndSize(BaseItemMinimalUI<T>* item
 template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::itemUIResizeDrag(BaseItemMinimalUI<T>* itemUI, const Point<int>& dragOffset)
 {
-	Point<float> pos = itemUI->baseItem->getPosition() + itemUI->baseItem->sizeReference + getViewOffset(dragOffset);
-
+	Point<float> pos = itemUI->baseItem->getPosition() + itemUI->baseItem->sizeReference + dragOffset.toFloat() / (useCheckersAsUnits ? checkerSize : 1);// getViewOffset(dragOffset);
+	
 	Point<float> snapPos = pos;
 
 	if (this->manager->snapGridMode != nullptr && this->manager->snapGridMode->boolValue())
 	{
-		float snapGridSize = this->manager->snapGridSize->intValue() * this->manager->viewZoom;;
-		Point<float> gridOffset(fmodf(this->getViewCenter().x, snapGridSize), fmodf(this->getViewCenter().y, snapGridSize));
-
-		Point<int> uiPos = getPosInView(pos);
-		Point<float> uiSnap(uiPos.x - fmodf(uiPos.x - gridOffset.x, snapGridSize),
-			uiPos.y - fmodf(uiPos.y - gridOffset.y, snapGridSize)
-		);
-
-		snapPos = getViewPos(uiSnap.toInt());
+		float snapViewSize = this->manager->snapGridSize->floatValue() / (useCheckersAsUnits ? checkerSize : 1);
+		snapPos.setXY(pos.x - fmodf(pos.x, snapViewSize), pos.y - fmodf(pos.y, snapViewSize));
 	}
 	else if (enableSnapping)
 	{
