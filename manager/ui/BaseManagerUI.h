@@ -678,7 +678,7 @@ void BaseManagerUI<M, T, U>::alignItems(AlignMode alignMode)
 	Array<T*> inspectables = InspectableSelectionManager::activeSelectionManager->getInspectablesAs<T>();
 	if (inspectables.size() == 0) return;
 
-	float target = (alignMode == CENTER_V || alignMode == CENTER_H) ? 0 : ((alignMode == LEFT || alignMode == TOP) ? INT_MAX : INT_MIN);
+	float target = (alignMode == BaseManagerUI<M, T, U>::AlignMode::CENTER_V || alignMode == BaseManagerUI<M, T, U>::AlignMode::CENTER_H) ? 0 : ((alignMode == BaseManagerUI<M, T, U>::AlignMode::LEFT || alignMode == BaseManagerUI<M, T, U>::AlignMode::TOP) ? INT_MAX : INT_MIN);
 
 	Array<T*> goodInspectables;
 	for (auto& i : inspectables)
@@ -686,12 +686,12 @@ void BaseManagerUI<M, T, U>::alignItems(AlignMode alignMode)
 		if (i == nullptr || !manager->items.contains(i)) continue;
 		switch (alignMode)
 		{
-		case LEFT: target = jmin(i->viewUIPosition->x, target); break;
-		case RIGHT: target = jmax(i->viewUIPosition->x + i->viewUISize->x, target); break;
-		case CENTER_H: target += i->viewUIPosition->x + i->viewUISize->x / 2; break;
-		case TOP: target = jmin(target, i->viewUIPosition->y); break;
-		case BOTTOM: target = jmax(target, i->viewUIPosition->y + i->viewUISize->y); break;
-		case CENTER_V: target += i->viewUIPosition->y + i->viewUISize->y / 2; break;
+		case BaseManagerUI<M, T, U>::AlignMode::LEFT: target = jmin(i->viewUIPosition->x, target); break;
+		case BaseManagerUI<M, T, U>::AlignMode::RIGHT: target = jmax(i->viewUIPosition->x + i->viewUISize->x, target); break;
+		case BaseManagerUI<M, T, U>::AlignMode::CENTER_H: target += i->viewUIPosition->x + i->viewUISize->x / 2; break;
+		case BaseManagerUI<M, T, U>::AlignMode::TOP: target = jmin(target, i->viewUIPosition->y); break;
+		case BaseManagerUI<M, T, U>::AlignMode::BOTTOM: target = jmax(target, i->viewUIPosition->y + i->viewUISize->y); break;
+		case BaseManagerUI<M, T, U>::AlignMode::CENTER_V: target += i->viewUIPosition->y + i->viewUISize->y / 2; break;
 		}
 		goodInspectables.add(i);
 	}
@@ -706,12 +706,12 @@ void BaseManagerUI<M, T, U>::alignItems(AlignMode alignMode)
 		Point<float> targetPoint;
 		switch (alignMode)
 		{
-		case LEFT: targetPoint = Point<float>(target, i->viewUIPosition->y); break;
-		case RIGHT: targetPoint = Point<float>(target - i->viewUISize->x, i->viewUIPosition->y); break;
-		case CENTER_H: targetPoint = Point<float>(target - i->viewUISize->x / 2, i->viewUIPosition->y);  break;
-		case TOP: targetPoint = Point<float>(i->viewUIPosition->x, target); break;
-		case BOTTOM:targetPoint = Point<float>(i->viewUIPosition->x, target - i->viewUISize->y); break;
-		case CENTER_V:targetPoint = Point<float>(i->viewUIPosition->x, target - i->viewUISize->y / 2); break;
+		case BaseManagerUI<M, T, U>::AlignMode::LEFT: targetPoint = Point<float>(target, i->viewUIPosition->y); break;
+		case BaseManagerUI<M, T, U>::AlignMode::RIGHT: targetPoint = Point<float>(target - i->viewUISize->x, i->viewUIPosition->y); break;
+		case BaseManagerUI<M, T, U>::AlignMode::CENTER_H: targetPoint = Point<float>(target - i->viewUISize->x / 2, i->viewUIPosition->y);  break;
+		case BaseManagerUI<M, T, U>::AlignMode::TOP: targetPoint = Point<float>(i->viewUIPosition->x, target); break;
+		case BaseManagerUI<M, T, U>::AlignMode::BOTTOM:targetPoint = Point<float>(i->viewUIPosition->x, target - i->viewUISize->y); break;
+		case BaseManagerUI<M, T, U>::AlignMode::CENTER_V:targetPoint = Point<float>(i->viewUIPosition->x, target - i->viewUISize->y / 2); break;
 		}
 		actions.add(i->viewUIPosition->setUndoablePoint(i->viewUIPosition->getPoint(), targetPoint, true));
 	}

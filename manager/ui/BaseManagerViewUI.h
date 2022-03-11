@@ -139,13 +139,13 @@ BaseManagerViewUI<M, T, U>::BaseManagerViewUI(const String& contentName, M* _man
 
 	this->headerSize = 28;
 
-	addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_left_png, OrganicUIBinaryData::align_left_pngSize)), [this]() { this->alignItems(LEFT); });
+	addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_left_png, OrganicUIBinaryData::align_left_pngSize)), [this]() { this->alignItems(BaseManagerUI<M,T,U>::AlignMode::LEFT); });
 
-	addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_center_h_png, OrganicUIBinaryData::align_center_h_pngSize)), [this]() { this->alignItems(CENTER_H); });
-	addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_right_png, OrganicUIBinaryData::align_right_pngSize)), [this]() { this->alignItems(RIGHT); });
-	addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_top_png, OrganicUIBinaryData::align_top_pngSize)), [this]() { this->alignItems(TOP); });
-	addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_center_v_png, OrganicUIBinaryData::align_center_v_pngSize)), [this]() { this->alignItems(CENTER_V); });
-	addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_bottom_png, OrganicUIBinaryData::align_bottom_pngSize)), [this]() { this->alignItems(BOTTOM); });
+	addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_center_h_png, OrganicUIBinaryData::align_center_h_pngSize)), [this]() { this->alignItems(BaseManagerUI<M,T,U>::AlignMode::CENTER_H); });
+	addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_right_png, OrganicUIBinaryData::align_right_pngSize)), [this]() { this->alignItems(BaseManagerUI<M,T,U>::AlignMode::RIGHT); });
+	addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_top_png, OrganicUIBinaryData::align_top_pngSize)), [this]() { this->alignItems(BaseManagerUI<M,T,U>::AlignMode::TOP); });
+	addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_center_v_png, OrganicUIBinaryData::align_center_v_pngSize)), [this]() { this->alignItems(BaseManagerUI<M,T,U>::AlignMode::CENTER_V); });
+	addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_bottom_png, OrganicUIBinaryData::align_bottom_pngSize)), [this]() { this->alignItems(BaseManagerUI<M,T,U>::AlignMode::BOTTOM); });
 	addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::distribute_h_png, OrganicUIBinaryData::distribute_h_pngSize)), [this]() { this->distributeItems(false); });
 	addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::distribute_v_png, OrganicUIBinaryData::distribute_v_pngSize)), [this]() { this->distributeItems(true); });
 
@@ -333,11 +333,11 @@ void BaseManagerViewUI<M, T, U>::paintBackground(Graphics& g)
 		float step = this->manager->snapGridSize->intValue() * this->manager->viewZoom;
 		float startX = fmodf(this->getViewCenter().x, step) - step;
 		float startY = fmodf(this->getViewCenter().y, step) - step;
-		for (float i = startX; i <= getWidth(); i += step) g.drawVerticalLine(i, 0, getHeight());
-		for (float i = startY; i <= getHeight(); i += step) g.drawHorizontalLine(i, 0, getWidth());
+		for (float i = startX; i <= this->getWidth(); i += step) g.drawVerticalLine(i, 0, this->getHeight());
+		for (float i = startY; i <= this->getHeight(); i += step) g.drawHorizontalLine(i, 0, this->getWidth());
 	}
 
-	if (this->showTools && tools.size() > 0)
+	if (this->showTools && this->tools.size() > 0)
 	{
 		g.setColour(BG_COLOR.darker(.7f));
 
@@ -379,7 +379,7 @@ void BaseManagerViewUI<M, T, U>::resized()
 	juce::Rectangle<int> r = this->getLocalBounds();
 	//this->addItemBT->setBounds(r.withSize(24, 24).withX(r.getWidth() - 24));
 
-	juce::Rectangle<int> hr = r.removeFromTop(headerSize);
+	juce::Rectangle<int> hr = r.removeFromTop(this->headerSize);
 	resizedInternalHeader(hr);
 
 	Array<U*> filteredItems = this->getFilteredItems();
