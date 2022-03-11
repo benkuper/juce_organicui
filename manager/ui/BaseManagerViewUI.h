@@ -139,15 +139,15 @@ BaseManagerViewUI<M, T, U>::BaseManagerViewUI(const String& contentName, M* _man
 
 	this->headerSize = 28;
 
-	addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_left_png, OrganicUIBinaryData::align_left_pngSize)), [this]() { this->alignItems(BaseManagerUI<M,T,U>::AlignMode::LEFT); });
+	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_left_png, OrganicUIBinaryData::align_left_pngSize)), [this]() { this->alignItems(BaseManagerUI<M,T,U>::AlignMode::LEFT); });
 
-	addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_center_h_png, OrganicUIBinaryData::align_center_h_pngSize)), [this]() { this->alignItems(BaseManagerUI<M,T,U>::AlignMode::CENTER_H); });
-	addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_right_png, OrganicUIBinaryData::align_right_pngSize)), [this]() { this->alignItems(BaseManagerUI<M,T,U>::AlignMode::RIGHT); });
-	addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_top_png, OrganicUIBinaryData::align_top_pngSize)), [this]() { this->alignItems(BaseManagerUI<M,T,U>::AlignMode::TOP); });
-	addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_center_v_png, OrganicUIBinaryData::align_center_v_pngSize)), [this]() { this->alignItems(BaseManagerUI<M,T,U>::AlignMode::CENTER_V); });
-	addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_bottom_png, OrganicUIBinaryData::align_bottom_pngSize)), [this]() { this->alignItems(BaseManagerUI<M,T,U>::AlignMode::BOTTOM); });
-	addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::distribute_h_png, OrganicUIBinaryData::distribute_h_pngSize)), [this]() { this->distributeItems(false); });
-	addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::distribute_v_png, OrganicUIBinaryData::distribute_v_pngSize)), [this]() { this->distributeItems(true); });
+	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_center_h_png, OrganicUIBinaryData::align_center_h_pngSize)), [this]() { this->alignItems(BaseManagerUI<M,T,U>::AlignMode::CENTER_H); });
+	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_right_png, OrganicUIBinaryData::align_right_pngSize)), [this]() { this->alignItems(BaseManagerUI<M,T,U>::AlignMode::RIGHT); });
+	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_top_png, OrganicUIBinaryData::align_top_pngSize)), [this]() { this->alignItems(BaseManagerUI<M,T,U>::AlignMode::TOP); });
+	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_center_v_png, OrganicUIBinaryData::align_center_v_pngSize)), [this]() { this->alignItems(BaseManagerUI<M,T,U>::AlignMode::CENTER_V); });
+	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_bottom_png, OrganicUIBinaryData::align_bottom_pngSize)), [this]() { this->alignItems(BaseManagerUI<M,T,U>::AlignMode::BOTTOM); });
+	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::distribute_h_png, OrganicUIBinaryData::distribute_h_pngSize)), [this]() { this->distributeItems(false); });
+	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::distribute_v_png, OrganicUIBinaryData::distribute_v_pngSize)), [this]() { this->distributeItems(true); });
 
 	this->addControllableTool(this->manager->snapGridMode->createToggle(ImageCache::getFromMemory(OrganicUIBinaryData::snap_grid_png, OrganicUIBinaryData::snap_grid_pngSize)));
 	this->addControllableTool(this->manager->showSnapGrid->createToggle(ImageCache::getFromMemory(OrganicUIBinaryData::show_grid_png, OrganicUIBinaryData::show_grid_pngSize)));

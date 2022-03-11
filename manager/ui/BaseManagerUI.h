@@ -716,7 +716,7 @@ void BaseManagerUI<M, T, U>::alignItems(AlignMode alignMode)
 		actions.add(i->viewUIPosition->setUndoablePoint(i->viewUIPosition->getPoint(), targetPoint, true));
 	}
 
-	UndoMaster::getInstance()->performActions("Align " + String(goodInspectables.size() + " items"), actions);
+	UndoMaster::getInstance()->performActions("Align " + String(goodInspectables.size()) + " items", actions);
 
 }
 
@@ -756,7 +756,7 @@ void BaseManagerUI<M, T, U>::distributeItems(bool isVertical)
 		actions.add(ti->viewUIPosition->setUndoablePoint(ti->viewUIPosition->getPoint(), targetPoint, true));
 	}
 
-	UndoMaster::getInstance()->performActions("Distribute " + String(goodInspectables.size() + " items"), actions);
+	UndoMaster::getInstance()->performActions("Distribute " + String(goodInspectables.size()) + " items", actions);
 }
 
 
