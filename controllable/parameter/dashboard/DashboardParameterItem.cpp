@@ -185,3 +185,32 @@ var DashboardParameterItem::getServerData()
 
 	return data;
 }
+
+DashboardTargetParameterItem::DashboardTargetParameterItem(TargetParameter* parameter) :
+	DashboardParameterItem(parameter)
+{
+	showFullAddress = addBoolParameter("Show Full Address", "If checked, this will force show the full address of the target", false, false);
+	showParentName = addBoolParameter("Show Parent Name", "If checked, this will force show the parent name of the target", false, false);
+	parentLabelLevel = addIntParameter("Parent Label Level", "If checked, this will force search through X level of parents", 2, 1, 20, false);
+	showLearnButton = addBoolParameter("Show Learn Button", "If checked, show learn function", false, false);
+
+	showFullAddress->canBeDisabledByUser = true;
+	showParentName->canBeDisabledByUser = true;
+	parentLabelLevel->canBeDisabledByUser = true;
+	showLearnButton->canBeDisabledByUser = true;
+}
+
+DashboardTargetParameterItem::~DashboardTargetParameterItem()
+{
+}
+
+var DashboardTargetParameterItem::getServerData()
+{
+	var data = DashboardParameterItem::getServerData();
+	if (showFullAddress->enabled) data.getDynamicObject()->setProperty("showFullAddress", showFullAddress->boolValue());
+	if (showParentName->enabled) data.getDynamicObject()->setProperty("showParentName", showParentName->boolValue());
+	if (parentLabelLevel->enabled) data.getDynamicObject()->setProperty("parentLabelLevel", parentLabelLevel->intValue());
+	if (showLearnButton->enabled) data.getDynamicObject()->setProperty("showLearnButton", showLearnButton->intValue());
+
+	return data;
+}

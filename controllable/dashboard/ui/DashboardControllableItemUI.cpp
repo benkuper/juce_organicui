@@ -103,6 +103,7 @@ void DashboardControllableItemUI::controllableFeedbackUpdateInternal(Controllabl
 		|| c == controllableItem->contourColor
 		|| c == controllableItem->contourThickness
 		|| c == controllableItem->forceReadOnly
+		|| c == controllableItem->textSize
 		)
 	{
 		updateUIParameters();
@@ -120,6 +121,7 @@ void DashboardControllableItemUI::controllableStateUpdateInternal(Controllable* 
 		|| c == controllableItem->opaqueBackground
 		|| c == controllableItem->contourColor
 		|| c == controllableItem->contourThickness
+		|| c == controllableItem->textSize
 		)
 	{
 		updateUIParameters();

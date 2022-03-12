@@ -20,7 +20,7 @@ GenericControllableItem::GenericControllableItem(var params) :
 	controllable->isCustomizableByUser = true;// controllable->type != Controllable::STRING;
 
 	editorCanBeCollapsed = false;
-	editorIsCollapsed = false;
+	editorIsCollapsed = true;
 
 	jassert(controllable != nullptr);
 
@@ -41,6 +41,12 @@ GenericControllableItem::~GenericControllableItem()
 void GenericControllableItem::onContainerNiceNameChanged()
 {
 	controllable->setNiceName(niceName);
+}
+
+void GenericControllableItem::controllableNameChanged(Controllable* c)
+{
+	BaseItem::controllableNameChanged(c);
+	if (c == controllable) setNiceName(controllable->niceName);
 }
 
 InspectableEditor * GenericControllableItem::getEditorInternal(bool isRoot)

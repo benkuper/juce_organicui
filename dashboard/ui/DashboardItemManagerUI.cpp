@@ -158,6 +158,8 @@ void DashboardItemManagerUI::showMenuAndAddItem(bool fromAddButton, Point<int> m
 
 	menu.showMenuAsync(PopupMenu::Options(), [this, mousePos](int result)
 		{
+			if (result == 0) return;
+
 			Point<float> p = getViewPos(mousePos);
 			if (result == -1) manager->addItem(new DashboardGroupItem(), p);
 			else if (result == -2) manager->addItem(new DashboardCommentItem(), p);

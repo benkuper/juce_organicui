@@ -388,6 +388,11 @@ ControllableUI* TargetParameter::createDefaultUI(Array<Controllable*> controllab
 	return createTargetUI(getArrayAs<Controllable, TargetParameter>(controllables));
 }
 
+DashboardItem* TargetParameter::createDashboardItem()
+{
+	return new DashboardTargetParameterItem(this);
+}
+
 var TargetParameter::getTargetFromScript(const juce::var::NativeFunctionArgs& a)
 {
 	TargetParameter* p = getObjectFromJS<TargetParameter>(a);

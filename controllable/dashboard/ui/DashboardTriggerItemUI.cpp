@@ -26,9 +26,16 @@ ControllableUI* DashboardTriggerItemUI::createControllableUI()
 void DashboardTriggerItemUI::updateUIParametersInternal()
 {
 	if (itemUI == nullptr) return;
+	
+	TriggerUI* tui = (TriggerUI*)itemUI.get();
 
-	((TriggerUI*)itemUI.get())->useCustomBGColor = triggerItem->bgColor->enabled;
-	if (triggerItem->bgColor->enabled) ((TriggerUI*)itemUI.get())->customBGColor = triggerItem->bgColor->getColor();
+	tui->useCustomBGColor = triggerItem->bgColor->enabled;
+	if (triggerItem->bgColor->enabled) tui->customBGColor = triggerItem->bgColor->getColor();
+
+	tui->useCustomTextColor = triggerItem->textColor->enabled;
+	if (triggerItem->textColor->enabled) tui->customTextColor = triggerItem->textColor->getColor();
+
+	tui->customTextSize = triggerItem->textSize->enabled ? triggerItem->textSize->intValue() : -1;
 }
 
 void DashboardTriggerItemUI::updateEditModeInternal(bool editMode)
@@ -40,7 +47,7 @@ void DashboardTriggerItemUI::controllableFeedbackUpdateInternal(Controllable* c)
 {
 	DashboardControllableItemUI::controllableFeedbackUpdateInternal(c);
 
-	if (c == triggerItem->customImagePath ||c == triggerItem->keepSaturation) rebuildUI();
+	if (c == triggerItem->customImagePath || c == triggerItem->keepSaturation) rebuildUI();
 	else if (c == triggerItem->bgColor) updateUIParameters();
 }
 

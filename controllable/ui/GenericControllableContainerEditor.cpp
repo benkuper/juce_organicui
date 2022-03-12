@@ -627,7 +627,8 @@ void GenericControllableContainerEditor::resizedInternalHeader(juce::Rectangle<i
 		r.removeFromLeft(2);
 	}
 
-	containerLabel.setBounds(r.removeFromLeft(containerLabel.getFont().getStringWidth(containerLabel.getText()) + 20));
+	if(containerLabel.isVisible()) containerLabel.setBounds(r.removeFromLeft(containerLabel.getFont().getStringWidth(containerLabel.getText()) + 20));
+	
 	headerSpacer.setBounds(r);
 }
 

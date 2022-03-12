@@ -1,3 +1,4 @@
+#include "GenericControllableItemEditor.h"
 /*
   ==============================================================================
 
@@ -8,27 +9,73 @@
   ==============================================================================
 */
 
-GenericControllableItemEditor::GenericControllableItemEditor(GenericControllableItem * gci, bool isRoot) :
+GenericControllableItemEditor::GenericControllableItemEditor(GenericControllableItem* gci, bool isRoot) :
 	BaseItemEditor(gci, isRoot)
 {
-	for (auto &ce : childEditors)
+	//containerLabel.setVisible(false);
+
+	if (gci->controllable != nullptr)
 	{
-		ControllableEditor * c = dynamic_cast<ControllableEditor *>(ce);
-		if (c != nullptr) c->setShowLabel(false);
+		controllableEditor.reset((ControllableEditor*)gci->controllable->getEditor(false));
+		controllableEditor->setShowLabel(false);
+		addAndMakeVisible(controllableEditor.get());
 	}
+
+	//containerLabel.setInterceptsMouseClicks(false, false);
+	containerLabel.addMouseListener(this, true);
+	
+	//for (auto &ce : childEditors)
+	//{
+	//	ControllableEditor * c = dynamic_cast<ControllableEditor *>(ce);
+	//	if (c != nullptr) c->setShowLabel(false);
+	//}
 }
 
 GenericControllableItemEditor::~GenericControllableItemEditor()
 {
 }
 
+void GenericControllableItemEditor::paint(Graphics& g)
+{
+	//nothing
+}
+
+void GenericControllableItemEditor::resizedInternalHeaderItemInternal(Rectangle<int>& r)
+{
+	controllableEditor->setBounds(r.reduced(1));
+}
+
 void GenericControllableItemEditor::resetAndBuild()
 {
-	BaseItemEditor::resetAndBuild();
+	
+	//BaseItemEditor::resetAndBuild();
 
-	for (auto &ce : childEditors)
+	//for (auto &ce : childEditors)
+	//{
+	//	ControllableEditor * c = dynamic_cast<ControllableEditor *>(ce);
+	//	if (c != nullptr) c->setShowLabel(false);
+	//}
+}
+
+void GenericControllableItemEditor::mouseDown(const MouseEvent& e)
+{
+	BaseItemEditor::mouseDown(e);
+}
+
+void GenericControllableItemEditor::mouseDrag(const MouseEvent& e)
+{
+	if (dragAndDropEnabled && e.eventComponent != controllableEditor.get())
 	{
-		ControllableEditor * c = dynamic_cast<ControllableEditor *>(ce);
-		if (c != nullptr) c->setShowLabel(false);
+		var desc = var(new DynamicObject());
+		desc.getDynamicObject()->setProperty("type", controllableEditor->controllable->getTypeString());
+		desc.getDynamicObject()->setProperty("dataType", "Controllable");
+		//Image dragImage = this->createComponentSnapshot(this->getLocalBounds()).convertedToFormat(Image::ARGB);
+		//dragImage.multiplyAllAlphas(.5f);
+		Point<int> offset = -getMouseXYRelative();
+		if (e.getDistanceFromDragStart() > 30) startDragging(desc, controllableEditor.get(), ScaledImage(), true, &offset);
+	}
+	else
+	{
+		BaseItemEditor::mouseDrag(e);
 	}
 }

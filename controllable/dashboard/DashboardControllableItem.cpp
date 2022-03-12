@@ -7,6 +7,7 @@ DashboardControllableItem::DashboardControllableItem(Controllable* item) :
 
 	showLabel = addBoolParameter("Show Label", "If checked, label is shown on controller", true);
 	textColor = addColorParameter("Text Color", "Color of the text", TEXT_COLOR, false);
+	textSize = addIntParameter("Text Size", "Size of the text. Auto size if disabled", 12, 2, 100, false);
 	contourColor = addColorParameter("Border Color", "Color of the contour", BG_COLOR.brighter(), false);
 	contourThickness = addFloatParameter("Border Width", "Thickness of the contour", 2, 1);
 	opaqueBackground = addBoolParameter("Opaque Background", "If checked, background is opaque", true);
@@ -15,6 +16,7 @@ DashboardControllableItem::DashboardControllableItem(Controllable* item) :
 	forceReadOnly = addBoolParameter("Read Only", "If not already read-only, this will force not being able to edit it from the dashboard", false);
 
 	textColor->canBeDisabledByUser = true;
+	textSize->canBeDisabledByUser = true;
 	contourColor->canBeDisabledByUser = true;
 	customLabel->canBeDisabledByUser = true;
 	customDescription->canBeDisabledByUser = true;
@@ -145,6 +147,7 @@ var DashboardControllableItem::getServerData()
 
 	o->setProperty("showLabel", showLabel->value);
 	if (textColor->enabled) o->setProperty("textColor", textColor->value);
+	if (textSize->enabled) o->setProperty("textSize", textSize->value);
 #
 	o->setProperty("borderColor", contourColor->value);
 	o->setProperty("borderWidth", contourThickness->value);

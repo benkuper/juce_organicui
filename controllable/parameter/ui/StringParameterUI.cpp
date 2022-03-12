@@ -63,6 +63,9 @@ void StringParameterUI::updateUIParamsInternal()
 	valueLabel.setColour(valueLabel.outlineColourId, useCustomBGColor ? customBGColor.brighter() : (opaqueBackground ? BG_COLOR.brighter(.1f) : Colours::transparentWhite));
 	valueLabel.setColour(valueLabel.textColourId, useCustomTextColor ? customTextColor : (isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f)));
 	valueLabel.setColour(CaretComponent::caretColourId, Colours::orange);
+
+	if (customTextSize > 0) valueLabel.setFont(customTextSize);
+	else valueLabel.setFont(Font());
 }
 
 void StringParameterUI::paint(Graphics& g)
@@ -120,7 +123,7 @@ void StringParameterUI::labelTextChanged(Label*)
 StringParameterFileUI::StringParameterFileUI(Array<StringParameter*> parameters) :
 	StringParameterUI(parameters),
 	fps(Inspectable::getArrayAs<StringParameter, FileParameter>(parameters)),
-	fp(dynamic_cast<FileParameter *>(parameters[0])),
+	fp(dynamic_cast<FileParameter*>(parameters[0])),
 	browseBT("Browse...")
 {
 	browseBT.addListener(this);
@@ -164,7 +167,7 @@ void StringParameterFileUI::buttonClicked(Button* b)
 {
 	if (b == &browseBT)
 	{
-		FileChooser * chooser(new FileChooser("Select a file", File(), fp->fileTypeFilter));
+		FileChooser* chooser(new FileChooser("Select a file", File(), fp->fileTypeFilter));
 
 		int flags = FileBrowserComponent::openMode;
 		if (fp->directoryMode) flags = flags | FileBrowserComponent::canSelectDirectories;

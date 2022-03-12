@@ -32,10 +32,19 @@ public:
 	std::unique_ptr<ControllableChooserPopupMenu> controllableChooser;
 	std::unique_ptr<ContainerChooserPopupMenu> containerChooser;
 
+	bool useCustomShowFullAddressInEditor;
+	bool customShowFullAddressInEditor;
+	bool useCustomShowParentNameInEditor;
+	bool customShowParentNameInEditor;
+	int customParentLabelSearch;
+	bool useCustomShowLearnButton;
+	bool customShowLearnButton;
+
 	void paint(Graphics& g) override;
 	void resized() override;
 
 	virtual void updateLabel();
+	virtual void updateUIParamsInternal() override;
 
 	virtual void showPopupAndGetTarget();//can be overriden to get specific PopupMenu
 	void mouseDownInternal(const MouseEvent& e) override;

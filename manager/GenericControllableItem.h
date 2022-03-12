@@ -20,6 +20,7 @@ public:
 	Controllable * controllable;
 
 	void onContainerNiceNameChanged() override;
+	void controllableNameChanged(Controllable* c) override;
 
 	String typeAtCreation;
 	virtual String getTypeString() const override { return typeAtCreation; }

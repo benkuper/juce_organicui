@@ -145,6 +145,9 @@ void FloatParameterLabelUI::updateUIParamsInternal()
 	valueLabel.setColour(valueLabel.textWhenEditingColourId, Colours::orange);
 	valueLabel.setTooltip(tooltip);
 
+	if (customTextSize > 0) valueLabel.setFont(customTextSize);
+	else valueLabel.setFont(Font());
+
 	repaint();
 }
 
