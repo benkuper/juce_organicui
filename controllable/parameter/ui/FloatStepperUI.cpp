@@ -100,8 +100,6 @@ void FloatStepperUI::updateUIParamsInternal()
 	slider->setIncDecButtonsMode((isInteractable()) ? Slider::IncDecButtonMode::incDecButtonsDraggable_AutoDirection : Slider::IncDecButtonMode::incDecButtonsNotDraggable);
 	slider->setColour(slider->textBoxTextColourId, useCustomTextColor ? customTextColor : (isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f)));
 	slider->setColour(slider->textBoxBackgroundColourId, useCustomFGColor ? customFGColor : BG_COLOR.darker(.1f).withAlpha(.8f));
-
-
 }
 
 
