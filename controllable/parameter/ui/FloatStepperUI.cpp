@@ -37,7 +37,7 @@ FloatStepperUI::FloatStepperUI(Array<Parameter*> parameters) :
 	slider->setNumDecimalPlacesToDisplay(0);
 	slider->setValue(parameter->floatValue(), dontSendNotification);
 
-	slider->setColour(slider->textBoxBackgroundColourId, useCustomFGColor?customFGColor:BG_COLOR.darker(.1f).withAlpha(.8f));
+	slider->setColour(slider->textBoxBackgroundColourId, useCustomFGColor ? customFGColor : BG_COLOR.darker(.1f).withAlpha(.8f));
 	slider->setColour(CaretComponent::caretColourId, Colours::orange);
 	slider->setScrollWheelEnabled(false);
 	slider->setColour(slider->textBoxTextColourId, useCustomTextColor ? customTextColor : (isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f)));
@@ -62,13 +62,13 @@ void FloatStepperUI::paint(Graphics& g)
 	ParameterUI::paint(g);
 
 	if (parameter == nullptr || parameter.wasObjectDeleted()) return;
-	
+
 	if (useCustomBGColor) g.fillAll(customBGColor);
-	
+
 	if (showLabel)
 	{
 		Rectangle<int> r = getLocalBounds();
-		g.setFont(jlimit(12, 40, jmin(r.getHeight() - 4, r.getWidth()) - 16));
+		g.setFont(customTextSize > 0 ? customTextSize : Font());
 		r = r.removeFromLeft(jmin(g.getCurrentFont().getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, r.getWidth() - 60));
 		g.setColour(useCustomTextColor ? customTextColor : TEXT_COLOR);
 		g.drawFittedText(customLabel.isNotEmpty() ? customLabel : parameter->niceName, r, Justification::centred, 1);
@@ -83,8 +83,7 @@ void FloatStepperUI::resized()
 
 	if (showLabel)
 	{
-		Font font(jlimit(12, 40, jmin(r.getHeight() - 4, r.getWidth()) - 16));
-
+		Font font(customTextSize > 0 ? customTextSize : jlimit(12, 40, jmin(r.getHeight() - 4, r.getWidth()) - 16));
 		r.removeFromLeft(jmin(font.getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName), r.getWidth() - 60));
 		slider->setBounds(r.removeFromRight(jmin(r.getWidth(), 120)));
 	}
@@ -101,6 +100,8 @@ void FloatStepperUI::updateUIParamsInternal()
 	slider->setIncDecButtonsMode((isInteractable()) ? Slider::IncDecButtonMode::incDecButtonsDraggable_AutoDirection : Slider::IncDecButtonMode::incDecButtonsNotDraggable);
 	slider->setColour(slider->textBoxTextColourId, useCustomTextColor ? customTextColor : (isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f)));
 	slider->setColour(slider->textBoxBackgroundColourId, useCustomFGColor ? customFGColor : BG_COLOR.darker(.1f).withAlpha(.8f));
+
+
 }
 
 

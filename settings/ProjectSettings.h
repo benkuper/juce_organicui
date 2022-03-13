@@ -25,6 +25,7 @@ public:
 	TargetParameter* showDashboardOnStartup;
 	BoolParameter* enableServer;
 	IntParameter* serverPort;
+	StringParameter* dashboardPassword;
 
 	void reset();
 

@@ -11,6 +11,7 @@
 DashboardItem::DashboardItem(Inspectable* _target, const String& name) :
 	BaseItem(name, false)
 {
+	hideInEditor = true;
 	viewUIPosition->hideInEditor = false;
 	viewUISize->hideInEditor = false;
 	isUILocked->hideInEditor = false;

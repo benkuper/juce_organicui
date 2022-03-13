@@ -55,9 +55,12 @@ var DashboardControllableItem::getJSONData()
 
 void DashboardControllableItem::loadJSONData(var data, bool createIfNotThere)
 {
-	String address = data.getProperty("controllable", inspectableGhostAddress);
-	setInspectable(Engine::mainEngine->getControllableForAddress(address));
-
+	if (inspectable == nullptr)
+	{
+		String address = data.getProperty("controllable", inspectableGhostAddress);
+		setInspectable(Engine::mainEngine->getControllableForAddress(address));
+	}
+	
 	DashboardInspectableItem::loadJSONData(data, createIfNotThere);
 }
 

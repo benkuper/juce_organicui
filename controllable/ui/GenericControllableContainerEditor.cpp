@@ -284,7 +284,7 @@ void GenericControllableContainerEditor::resetAndBuild()
 		LOGWARNING("An error has occured here (container null on ResetAndBuild");
 		return;
 	}
-	if (container->hideInEditor) return;
+	//if (container->hideInEditor) return;
 
 	if (!canBeCollapsed() || !container->editorIsCollapsed)
 	{

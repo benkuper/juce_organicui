@@ -1,3 +1,4 @@
+#include "DashboardManager.h"
 /*
   ==============================================================================
 
@@ -23,7 +24,7 @@ DashboardManager::DashboardManager() :
 	tabsLabelColor = addColorParameter("Tabs Label Color", "Color for the tabs in the web view", TEXT_COLOR);
 	tabsBorderColor = addColorParameter("Tabs Border Color", "Color for the tabs in the web view", Colours::black);
 	tabsBorderWidth = addFloatParameter("Tabs Border Width", "Width for the border of tabs in the web view", 0, 0);
-	tabsSelectedBGColor = addColorParameter("Tabs Selected BG Color", "Color for the tabs in the web view", GREEN_COLOR);
+	tabsSelectedBGColor = addColorParameter("Tabs Selected BG Color", "Color for the tabs in the web view", HIGHLIGHT_COLOR);
 	tabsSelectedLabelColor = addColorParameter("Tabs Selected Label Color", "Color for the tabs in the web view", Colours::black);
 	tabsSelectedBorderColor = addColorParameter("Tabs Selected Border Color", "Color for the tabs in the web view", Colours::black);
 	tabsSelectedBorderWidth = addFloatParameter("Tabs Selected Border Width", "Width for the border of tabs in the web view", 0, 0);
@@ -188,7 +189,10 @@ var DashboardManager::getServerData()
 	data.getDynamicObject()->setProperty("osType", SystemStats::getOperatingSystemType());
 	data.getDynamicObject()->setProperty("computerName", SystemStats::getComputerName());
 	data.getDynamicObject()->setProperty("userName", SystemStats::getFullUserName());
-	
+
+	String pass = ProjectSettings::getInstance()->dashboardPassword->stringValue();
+	if (pass.isNotEmpty()) data.getDynamicObject()->setProperty("password", pass);
+
 	var iData;
 	for (auto& d : items)
 	{
@@ -394,6 +398,22 @@ void DashboardManager::removeItemInternal(Dashboard* item)
 {
 	item->removeDashboardListener(this);
 	askForRefresh(nullptr);
+}
+
+void DashboardManager::setCurrentDashboard(Dashboard* d, bool setInClients)
+{
+	if (d == nullptr) return;
+	if (DashboardManagerView* v = ShapeShifterManager::getInstance()->getContentForType<DashboardManagerView>())
+	{
+		v->setCurrentDashboard(d);
+	}
+
+	if (setInClients)
+	{
+		var data(new DynamicObject());
+		data.getDynamicObject()->setProperty("setDashboard", d->shortName);
+		server->send(JSON::toString(data));
+	}
 }
 
 void DashboardManager::itemDataFeedback(var data)

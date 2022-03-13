@@ -150,6 +150,9 @@ void DashboardItemManagerUI::showMenuAndAddItem(bool fromAddButton, Point<int> m
 	menu.addItem(-3, "Add Shared Texture");
 #endif
 
+	menu.addItem(-4, "Add Dashboard Link");
+
+
 	if (customAddItemsToMenuFunc) customAddItemsToMenuFunc(&menu, -5000);
 	menu.addSeparator();
 
@@ -166,6 +169,7 @@ void DashboardItemManagerUI::showMenuAndAddItem(bool fromAddButton, Point<int> m
 #if ORGANICUI_USE_SHAREDTEXTURE
 			else if (result == -3) manager->addItem(new SharedTextureDashboardItem(), p);
 #endif
+			else if (result == -4) manager->addItem(new DashboardLinkItem(), p);
 			else if (result < -1000) customHandleMenuResultFunc(result, -5000, this, p);
 			else manager->addItem(manager->managerFactory->createFromMenuResult(result), p);
 		}

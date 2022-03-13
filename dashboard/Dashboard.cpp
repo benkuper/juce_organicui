@@ -11,15 +11,25 @@
 
 Dashboard::Dashboard() :
 	BaseItem("Dashboard", false),
-	isBeingEdited(false)
+	isBeingEdited(false),
+	dashboardNotifier(5)
 {
 	//itemManager.editorIsCollapsed = true;
+	password = addStringParameter("Password", "Password for web clients for this specific dashboard, leave empty public access", "");
 	addChildControllableContainer(&itemManager);
 	itemManager.addBaseManagerListener(this);
 }
 
 Dashboard::~Dashboard()
 {
+}
+
+void Dashboard::setIsBeingEdited(bool value)
+{
+	if (value == isBeingEdited) return;
+	isBeingEdited = value;
+	
+	dashboardNotifier.addMessage(new DashboardEvent(DashboardEvent::EDITING_UPDATE, this));
 }
 
 void Dashboard::itemAdded(DashboardItem* item)
@@ -31,7 +41,7 @@ void Dashboard::itemAdded(DashboardItem* item)
 
 void Dashboard::itemsAdded(Array<DashboardItem*> items)
 {
-	for(auto & i : items) i->addDashboardItemListener(this);
+	for (auto& i : items) i->addDashboardItemListener(this);
 	dashboardListeners.call(&DashboardListener::askForRefresh, this);
 }
 
@@ -81,7 +91,9 @@ var Dashboard::getServerData()
 		data.getDynamicObject()->setProperty("bgImageScale", itemManager.bgImageScale->getValue());
 		data.getDynamicObject()->setProperty("bgImageAlpha", itemManager.bgImageAlpha->getValue());
 	}
-	
+
+	if (password->stringValue().isNotEmpty()) data.getDynamicObject()->setProperty("password", password->stringValue());
+
 	itemManager.fillServerData(data);
 	return data;
 }

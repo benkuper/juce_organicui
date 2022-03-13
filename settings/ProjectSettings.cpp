@@ -26,6 +26,8 @@ ProjectSettings::ProjectSettings() :
 	showDashboardOnStartup->canBeDisabledByUser = true;
 	showDashboardOnStartup->maxDefaultSearchLevel = 0;
 
+	dashboardPassword = addStringParameter("Password", "Password for web clients to access the dashboard, leave empty public access", "");
+
 #if ORGANICUI_USE_WEBSERVER
 	enableServer = dashboardCC.addBoolParameter("Enable Dashboard Server", "Activates / Deactivates exposing Dashboard as a webserver", false);
 	serverPort = dashboardCC.addIntParameter("Server Port", "The port that the server binds to", 9999, 0, 65535, false);

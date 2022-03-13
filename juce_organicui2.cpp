@@ -9,6 +9,7 @@
 #include "dashboard/DashboardItem.cpp"
 #include "dashboard/DashboardCommentItem.cpp"
 #include "dashboard/DashboardGroupItem.cpp"
+#include "dashboard/DashboardLinkItem.cpp"
 #include "dashboard/DashboardItemFactory.cpp" 
 #include "dashboard/DashboardItemManager.cpp"
 #include "dashboard/DashboardManager.cpp"
