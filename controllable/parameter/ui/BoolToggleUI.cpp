@@ -187,5 +187,8 @@ void BoolButtonToggleUI::paint(Graphics& g)
 
 bool BoolButtonToggleUI::hitTest(int x, int y)
 {
+	bool allowClicks, allowChildClicks;
+	getInterceptsMouseClicks(allowClicks, allowChildClicks);
+	if (!allowClicks) return false;
 	return buttonRect.contains(x, y);;
 }
