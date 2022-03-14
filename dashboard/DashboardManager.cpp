@@ -1,4 +1,3 @@
-#include "DashboardManager.h"
 /*
   ==============================================================================
 
@@ -143,6 +142,16 @@ void DashboardManager::messageReceived(const String& id, const String& message)
 		return;
 	}
 
+
+	
+	if (data.hasProperty("setDashboard"))
+	{
+		if (Dashboard* d = getItemWithName(data.getProperty("setDashboard", ""), true))
+		{
+			setCurrentDashboard(d, true, id);
+		}
+		return;
+	}
 
 	String add = data.getProperty("controlAddress", "");
 	if (add.isNotEmpty())
@@ -400,7 +409,7 @@ void DashboardManager::removeItemInternal(Dashboard* item)
 	askForRefresh(nullptr);
 }
 
-void DashboardManager::setCurrentDashboard(Dashboard* d, bool setInClients)
+void DashboardManager::setCurrentDashboard(Dashboard* d, bool setInClients, StringArray excludeIds)
 {
 	if (d == nullptr) return;
 	if (DashboardManagerView* v = ShapeShifterManager::getInstance()->getContentForType<DashboardManagerView>())
@@ -412,7 +421,8 @@ void DashboardManager::setCurrentDashboard(Dashboard* d, bool setInClients)
 	{
 		var data(new DynamicObject());
 		data.getDynamicObject()->setProperty("setDashboard", d->shortName);
-		server->send(JSON::toString(data));
+		if (excludeIds.isEmpty()) server->send(JSON::toString(data));
+		else server->sendExclude(JSON::toString(data), excludeIds);
 	}
 }
 

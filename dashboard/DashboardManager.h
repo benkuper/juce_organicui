@@ -64,7 +64,7 @@ public:
 	void addItemInternal(Dashboard* item, var data) override;
 	void removeItemInternal(Dashboard* item) override;
 
-	void setCurrentDashboard(Dashboard* d, bool setInClients = false);
+	void setCurrentDashboard(Dashboard* d, bool setInClients = false, StringArray excludeIds = StringArray());
 
 	void itemDataFeedback(var data) override;
 	void askForRefresh(Dashboard *d) override;
