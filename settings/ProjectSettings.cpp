@@ -14,7 +14,9 @@ juce_ImplementSingleton(ProjectSettings)
 
 ProjectSettings::ProjectSettings() :
 	ControllableContainer("Project Settings"),
-	dashboardCC("Dashboard Settings")
+	dashboardCC("Dashboard Settings"),
+	customValuesCC("Custom Definitions"),
+	customRangesCC("Custom Ranges")
 {
 	saveAndLoadRecursiveData = true;
 	fullScreenOnStartup = addBoolParameter("Full Screen on load", "If checked, the app will go full screen when loading the file, otherwise it will go to window mode", false);
@@ -33,8 +35,15 @@ ProjectSettings::ProjectSettings() :
 	serverPort = dashboardCC.addIntParameter("Server Port", "The port that the server binds to", 9999, 0, 65535, false);
 #endif
 
+
+
 	addChildControllableContainer(&dashboardCC);
 
+	customRangesCC.userCanAddControllables = true;
+	customRangesCC.userAddControllablesFilters.add(Point2DParameter::getTypeStringStatic());
+
+	customValuesCC.addChildControllableContainer(&customRangesCC);
+	addChildControllableContainer(&customValuesCC);
 }
 
 ProjectSettings::~ProjectSettings()

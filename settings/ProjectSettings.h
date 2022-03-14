@@ -27,7 +27,9 @@ public:
 	IntParameter* serverPort;
 	StringParameter* dashboardPassword;
 
-	void reset();
+	ControllableContainer customValuesCC;
+	ControllableContainer customRangesCC;
 
+	void reset();
 	void onControllableFeedbackUpdate(ControllableContainer * cc, Controllable * c) override;
 };

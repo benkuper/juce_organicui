@@ -205,6 +205,20 @@ void ParameterUI::addPopupMenuItems(PopupMenu* p)
 				rangeMenu.addItem(-73, "-100 : 100");
 			}
 
+			if (parameter->type == Parameter::FLOAT || parameter->type == Parameter::INT)
+			{
+				int numCustomRanges = ProjectSettings::getInstance()->customRangesCC.controllables.size();
+				if (numCustomRanges > 0)
+				{
+					rangeMenu.addSeparator();
+					for (int i = 0; i < numCustomRanges; i++)
+					{
+						Point2DParameter* rp = dynamic_cast<Point2DParameter*>(ProjectSettings::getInstance()->customRangesCC.controllables[i]);
+						rangeMenu.addItem(-100 - i, String(rp->x) + " : " + String(rp->y));
+					}
+				}
+			}
+
 			p->addSubMenu("Set Range...", rangeMenu);
 			if (parameter->hasRange()) p->addItem(-5, "Clear Range");
 		}
@@ -275,6 +289,17 @@ void ParameterUI::handleMenuSelectedID(int id)
 		else ((Point3DParameter*)parameter.get())->setBounds(-100, -100, -100, 100, 100, 100);
 		break;
 
+	default:
+	{
+		int numCustomRanges = ProjectSettings::getInstance()->customRangesCC.controllables.size();
+		int cid = -(id + 100);
+		if (cid < numCustomRanges)
+		{
+			Point2DParameter* rp = dynamic_cast<Point2DParameter*>(ProjectSettings::getInstance()->customRangesCC.controllables[cid]);
+			parameter->setRange(rp->x, rp->y);
+		}
+		break;
+	}
 	}
 }
 
