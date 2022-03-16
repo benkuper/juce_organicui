@@ -164,7 +164,11 @@ void FloatParameterLabelUI::valueChanged(const var& v)
 
 void FloatParameterLabelUI::labelTextChanged(Label*)
 {
-	parameter->setValue(ParameterUI::textToValue(valueLabel.getText().replace(",", ".")));
+	String s = valueLabel.getText();
+	if (showLabel) s = s.substring(parameter->niceName.length() + 3); // including " : ";
+	s = s.substring(prefix.length(), s.length() - suffix.length());
+
+	parameter->setValue(ParameterUI::textToValue(s.replace(",", ".")));
 }
 
 
@@ -175,7 +179,9 @@ void FloatParameterLabelUI::handlePaintTimerInternal()
 	int newStyle = parameter->isOverriden ? Font::bold : Font::plain;
 	if (valueLabel.getFont().getStyleFlags() != newStyle) valueLabel.setFont(valueLabel.getFont().withStyle(newStyle));
 
-	valueLabel.setText(prefix + getValueString(parameter->value) + suffix, NotificationType::dontSendNotification);
+	String s = prefix + getValueString(parameter->value) + suffix;
+	if (showLabel) s = parameter->niceName + " : " + s;
+	valueLabel.setText(s, NotificationType::dontSendNotification);
 	if (autoSize)
 	{
 		int valueLabelWidth = valueLabel.getFont().getStringWidth(valueLabel.getText());
@@ -205,14 +211,17 @@ void TimeLabel::setShowStepsMode(bool stepsMode)
 
 void TimeLabel::valueChanged(const var& v)
 {
-	String timeString = showStepsMode ? String((float)v * ((FloatParameter*)parameter.get())->unitSteps) : StringUtil::valueToTimeString(v);
-	FloatParameterLabelUI::valueChanged(timeString);
-
+	//String timeString = showStepsMode ? String((float)v * ((FloatParameter*)parameter.get())->unitSteps) : StringUtil::valueToTimeString(v);
+	FloatParameterLabelUI::valueChanged(v);// timeString);
 }
 
 void TimeLabel::labelTextChanged(Label*)
 {
-	parameter->setValue(showStepsMode ? valueLabel.getText().getFloatValue() / ((FloatParameter*)parameter.get())->unitSteps : StringUtil::timeStringToValue(valueLabel.getText()));
+	String s = valueLabel.getText();
+	if (showLabel) s = s.substring(parameter->niceName.length() + 3);
+	s = s.substring(prefix.length(), s.length() - suffix.length());
+
+	parameter->setValue(showStepsMode ? s.getFloatValue() / ((FloatParameter*)parameter.get())->unitSteps : StringUtil::timeStringToValue(s));
 	shouldRepaint = true;
 }
 
