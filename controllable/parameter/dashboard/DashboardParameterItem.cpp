@@ -90,6 +90,26 @@ void DashboardParameterItem::updateStyleOptions()
 		{
 			style->addOption("2D Canvas", 12);
 		}
+
+		if (!style->isOverriden)
+		{
+			EnumParameter* ep = nullptr;
+			switch (parameter->type)
+			{
+			case Controllable::BOOL: ep = ProjectSettings::getInstance()->boolDefaultStyle; break;
+			case Controllable::FLOAT: ep = ProjectSettings::getInstance()->floatDefaultStyle; break;
+			case Controllable::INT: ep = ProjectSettings::getInstance()->intDefaultStyle; break;
+			case Controllable::ENUM: ep = ProjectSettings::getInstance()->enumDefaultStyle; break;
+			default:
+				break;
+			}
+
+			if (ep != nullptr && ep->enabled) val = ep->getValueData();
+		}
+		else
+		{
+			viewUISize->setPoint(100, 20);
+		}
 	}
 
 	if (!val.isVoid()) style->setValueWithData(val);
