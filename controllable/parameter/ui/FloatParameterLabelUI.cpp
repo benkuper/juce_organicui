@@ -148,7 +148,7 @@ void FloatParameterLabelUI::updateUIParamsInternal()
 	if (customTextSize > 0) valueLabel.setFont(customTextSize);
 	else valueLabel.setFont(Font());
 
-	repaint();
+	shouldRepaint = true;
 }
 
 
@@ -165,7 +165,11 @@ void FloatParameterLabelUI::valueChanged(const var& v)
 void FloatParameterLabelUI::labelTextChanged(Label*)
 {
 	String s = valueLabel.getText();
-	if (showLabel) s = s.substring(parameter->niceName.length() + 3); // including " : ";
+	if (showLabel)
+	{
+		String label = customLabel.isNotEmpty() ? customLabel : parameter->niceName;
+		s = s.substring(label.length() + 3); // including " : ";
+	}
 	s = s.substring(prefix.length(), s.length() - suffix.length());
 
 	parameter->setValue(ParameterUI::textToValue(s.replace(",", ".")));
@@ -180,7 +184,7 @@ void FloatParameterLabelUI::handlePaintTimerInternal()
 	if (valueLabel.getFont().getStyleFlags() != newStyle) valueLabel.setFont(valueLabel.getFont().withStyle(newStyle));
 
 	String s = prefix + getValueString(parameter->value) + suffix;
-	if (showLabel) s = parameter->niceName + " : " + s;
+	if (showLabel) s = (customLabel.isNotEmpty() ? customLabel : parameter->niceName) + " : " + s;
 	valueLabel.setText(s, NotificationType::dontSendNotification);
 	if (autoSize)
 	{
@@ -218,7 +222,11 @@ void TimeLabel::valueChanged(const var& v)
 void TimeLabel::labelTextChanged(Label*)
 {
 	String s = valueLabel.getText();
-	if (showLabel) s = s.substring(parameter->niceName.length() + 3);
+	if (showLabel)
+	{
+		String label = customLabel.isNotEmpty() ? customLabel : parameter->niceName;
+		s = s.substring(label.length() + 3);
+	}
 	s = s.substring(prefix.length(), s.length() - suffix.length());
 
 	parameter->setValue(showStepsMode ? s.getFloatValue() / ((FloatParameter*)parameter.get())->unitSteps : StringUtil::timeStringToValue(s));
