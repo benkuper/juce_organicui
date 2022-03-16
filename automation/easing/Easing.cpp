@@ -495,6 +495,7 @@ PerlinEasing::PerlinEasing() :
 {
 	taper1 = addPoint2DParameter("Taper 1", "Influence of the noise close to the start. Vertical is the seed");
 	taper2 = addPoint2DParameter("Taper 2", "Influence of the noise close to the end. Vertical is octaves");
+	offset = addFloatParameter("Offset", "Offset of the perlin", 0);
 }
 
 
@@ -522,7 +523,7 @@ void PerlinEasing::updateKeysInternal(bool stretch)
 
 float PerlinEasing::getValue(const float& weight)
 {
-	float n = perlin.octaveNoise0_1(weight * length, start.x, 1 + (int32_t)(abs(taper2->y) * 10));
+	float n = perlin.octaveNoise0_1(weight * length, offset->floatValue(), 1 + (int32_t)(abs(taper2->y) * 10));
 
 	float t1 = taper1->x / length;
 	float t2Diff = -taper2->x / length;
@@ -557,5 +558,5 @@ Rectangle<float> PerlinEasing::getBounds(bool includeHandles)
 
 EasingUI* PerlinEasing::createUI()
 {
-	return new GenericEasingUI(this, taper1, taper2);
+	return new GenericEasingUI(this, taper1, taper2, {offset} );
 }

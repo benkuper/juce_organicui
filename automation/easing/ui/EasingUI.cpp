@@ -651,7 +651,7 @@ void BounceEasingUI::paintInternal(Graphics& g)
 
 
 
-GenericEasingUI::GenericEasingUI(Easing * e, Point2DParameter * a1, Point2DParameter *a2) :
+GenericEasingUI::GenericEasingUI(Easing * e, Point2DParameter * a1, Point2DParameter *a2, Array<Parameter *> _extraParams) :
 	EasingUI(e)
 {
 	if (a1 != nullptr)
@@ -670,6 +670,12 @@ GenericEasingUI::GenericEasingUI(Easing * e, Point2DParameter * a1, Point2DParam
 		h2->addMouseListener(this, false);
 	}
 
+	for (auto& p : _extraParams)
+	{
+		ControllableUI* cui = p->createDefaultUI();
+		addChildComponent(cui);
+		extraParams.add(cui);
+	}
 }
 
 bool GenericEasingUI::hitTest(int tx, int ty)
@@ -678,12 +684,18 @@ bool GenericEasingUI::hitTest(int tx, int ty)
 
 	if (showFirstHandle && h1 != nullptr)
 	{
-		result |= h1->getLocalBounds().contains(h1->getMouseXYRelative());
+		if (h1->getLocalBounds().contains(h1->getMouseXYRelative())) return true;
 	}
 
 	if (showLastHandle && h2 != nullptr)
 	{
-		result |= h2->getLocalBounds().contains(h2->getMouseXYRelative());
+		if (h2->getLocalBounds().contains(h2->getMouseXYRelative())) return true;
+	}
+
+	for (auto& cui : extraParams)
+	{
+		Point<int> localPos = cui->getLocalPoint(this, Point<int>(tx, ty));
+		if (cui->isVisible() && cui->hitTest(localPos.x, localPos.y)) return true;
 	}
 
 	return result;
@@ -704,6 +716,9 @@ void GenericEasingUI::resized()
 		Point<int> b = getUIPosForValuePos(easing->end + h2->parameter->getPoint());
 		h2->setBounds(juce::Rectangle<int>(0, 0, 16, 16).withCentre(b));
 	}
+
+	Rectangle<int> r = getLocalBounds().removeFromTop(20);
+	for (auto& cui : extraParams) cui->setBounds(r.removeFromLeft(100).reduced(2));
 
 	EasingUI::resized();
 }
@@ -740,6 +755,9 @@ void GenericEasingUI::setShowEasingHandles(bool showFirst, bool showLast)
 	EasingUI::setShowEasingHandles(showFirst, showLast);
 	if(h1 != nullptr) h1->setVisible(showFirstHandle);
 	if(h2 != nullptr) h2->setVisible(showLastHandle);
+
+	for (auto& cui : extraParams) cui->setVisible(showFirst && showLast);
+
 	resized();
 	repaint();
 }
