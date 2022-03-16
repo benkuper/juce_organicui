@@ -49,7 +49,7 @@ void GenericControllableItem::controllableNameChanged(Controllable* c)
 	if (c == controllable) setNiceName(controllable->niceName);
 }
 
-InspectableEditor * GenericControllableItem::getEditorInternal(bool isRoot)
+InspectableEditor * GenericControllableItem::getEditorInternal(bool isRoot, Array<Inspectable*> inspectables)
 {
 	return new GenericControllableItemEditor(this, isRoot);
 }

@@ -430,7 +430,7 @@ void Parameter::parameterValueChanged(Parameter* p)
 	}
 }
 
-InspectableEditor* Parameter::getEditorInternal(bool isRoot)
+InspectableEditor* Parameter::getEditorInternal(bool isRoot, Array<Inspectable*> inspectables)
 {
 	return new ParameterEditor(this, isRoot);
 }

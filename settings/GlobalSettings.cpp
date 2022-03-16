@@ -160,7 +160,7 @@ void KeyMappingsContainer::loadJSONDataInternal(var data)
 	if (element != nullptr) kms->restoreFromXml(*element);
 }
 
-InspectableEditor* KeyMappingsContainer::getEditorInternal(bool isRoot)
+InspectableEditor* KeyMappingsContainer::getEditorInternal(bool isRoot, Array<Inspectable*> inspectables)
 {
 	return new KeyMappingsContainerEditor(this, isRoot);
 }

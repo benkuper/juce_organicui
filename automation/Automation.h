@@ -100,5 +100,5 @@ public:
 
     DECLARE_ASYNC_EVENT(Automation, Automation, automation, { INTERACTIVE_SIMPLIFICATION_CHANGED })
 
-    InspectableEditor* getEditorInternal(bool isRoot) override;
+    InspectableEditor* getEditorInternal(bool isRoot, Array<Inspectable*> inspectables = Array<Inspectable*>()) override;
 };

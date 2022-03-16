@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    Inspector.h
-    Created: 9 May 2016 6:41:38pm
-    Author:  bkupe
+	Inspector.h
+	Created: 9 May 2016 6:41:38pm
+	Author:  bkupe
 
   ==============================================================================
 */
@@ -21,37 +21,36 @@ class Inspector :
 	public InspectableSelectionManager::AsyncListener
 {
 public:
-	Inspector(InspectableSelectionManager * selectionManager = nullptr);
+	Inspector(InspectableSelectionManager* selectionManager = nullptr);
 	virtual ~Inspector();
 
-	InspectableSelectionManager * selectionManager;
-	WeakReference<Inspectable> currentInspectable;
+	InspectableSelectionManager* selectionManager;
+	Array<Inspectable*> currentInspectables;
 	Viewport vp;
 	std::unique_ptr<InspectableEditor> currentEditor;
 
 	bool curSelectionDoesNotAffectInspector;
-	bool showTextOnEmptyOrMulti;
+	bool showTextOnEmpty;
 
 	virtual void setSelectionManager(InspectableSelectionManager* newSM);
-	virtual void setCurrentInspectable(WeakReference<Inspectable> inspectable, bool setInspectableSelection = true);
-	
-	
+	virtual void setCurrentInspectables(Array<Inspectable*>inspectables = Array<Inspectable*>(), bool setInspectableSelection = true);
+
 	virtual void paint(Graphics& g) override;
 	virtual void resized() override;
 	virtual void resizedInternal(juce::Rectangle<int>& r);
 
 	virtual void clear();
 
-    void inspectableDestroyed(Inspectable * inspectable) override;
+	void inspectableDestroyed(Inspectable* inspectable) override;
 
 	//From InspectableSelectionManager
-	virtual void newMessage(const InspectableSelectionManager::SelectionEvent &e) override;
+	virtual void newMessage(const InspectableSelectionManager::SelectionEvent& e) override;
 
 	class  InspectorListener
 	{
 	public:
 		virtual ~InspectorListener() {}
-		virtual void currentInspectableChanged(Inspector *) {};
+		virtual void currentInspectableChanged(Inspector*) {};
 	};
 
 	ListenerList<InspectorListener> listeners;
@@ -68,7 +67,7 @@ class InspectorUI :
 	public ShapeShifterContentComponent
 {
 public:
-	InspectorUI(const String &name, InspectableSelectionManager * selectionManager = nullptr);
+	InspectorUI(const String& name, InspectableSelectionManager* selectionManager = nullptr);
 	~InspectorUI();
 
 	std::unique_ptr<Inspector> inspector;
@@ -76,5 +75,5 @@ public:
 
 	void resized() override;
 
-	static InspectorUI * create(const String &contentName) { return new InspectorUI(contentName); }
+	static InspectorUI* create(const String& contentName) { return new InspectorUI(contentName); }
 };

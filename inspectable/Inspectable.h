@@ -43,7 +43,7 @@ public:
 	bool saveCustomData;
 
 	//editor
-	std::function<InspectableEditor* (Inspectable*, bool)> customGetEditorFunc;
+	std::function<InspectableEditor* (bool, Array<Inspectable*>)> customGetEditorFunc;
 
 	//Help
 	String helpID;
@@ -96,8 +96,8 @@ public:
 		return result;
 	}
 
-	InspectableEditor* getEditor(bool isRoot);
-	virtual InspectableEditor* getEditorInternal(bool /*isRoot*/) { jassert(false);  return nullptr; } //to override !
+	InspectableEditor* getEditor(bool isRoot, Array<Inspectable*> inspectables = Array<Inspectable*>());
+	virtual InspectableEditor* getEditorInternal(bool /*isRoot*/, Array<Inspectable*> inspectables = Array<Inspectable*>()) { jassert(false);  return nullptr; } //to override !
 	//Listener
 	class  InspectableListener
 	{

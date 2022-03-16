@@ -94,7 +94,7 @@ public:
 	void loadJSONDataInternal(var data) override;
 	virtual void loadJSONDataItemInternal(var data) {} //happens before loading scripts
 
-	InspectableEditor * getEditorInternal(bool isRoot) override;
+	InspectableEditor * getEditorInternal(bool isRoot, Array<Inspectable*> inspectables = Array<Inspectable*>()) override;
 	virtual String getTypeString() const { return "BaseItem"; };
 	static var getTypeStringFromScript(const juce::var::NativeFunctionArgs& a);
 	String getScriptTargetString() override;

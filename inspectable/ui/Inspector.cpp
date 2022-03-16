@@ -12,9 +12,8 @@ std::function<Inspector* (InspectableSelectionManager*)> InspectorUI::customCrea
 
 Inspector::Inspector(InspectableSelectionManager* _selectionManager) :
 	selectionManager(nullptr),
-	currentInspectable(nullptr),
 	currentEditor(nullptr),
-	showTextOnEmptyOrMulti(true)
+	showTextOnEmpty(true)
 {
 
 	setSelectionManager(_selectionManager);
@@ -40,11 +39,11 @@ Inspector::~Inspector()
 
 void Inspector::paint(Graphics& g)
 {
-	if (showTextOnEmptyOrMulti && currentInspectable == nullptr && selectionManager != nullptr)
+	if (showTextOnEmpty && currentInspectables.size() == 0 && selectionManager != nullptr)
 	{
 		g.setColour(Colours::white.withAlpha(.4f));
 		g.setFont(jmin(getHeight() - 2, 14));
-		String text = selectionManager->currentInspectables.size() == 0 ? "Select an object to edit its parameters here" : "Multi Editing is not supported right now, but keep trying :)";
+		String text = "Select an object to edit its parameters here";
 		if (text.isNotEmpty()) g.drawFittedText(text, getLocalBounds(), Justification::centred, 3);
 	}
 }
@@ -77,42 +76,55 @@ void Inspector::setSelectionManager(InspectableSelectionManager* newSM)
 	if (selectionManager != nullptr) selectionManager->addAsyncSelectionManagerListener(this);
 }
 
-
-void Inspector::setCurrentInspectable(WeakReference<Inspectable> inspectable, bool setInspectableSelection)
+void Inspector::setCurrentInspectables(Array<Inspectable*> inspectables, bool setInspectableSelection)
 {
 	if (!isEnabled()) return;
 
-	if (inspectable == currentInspectable)
+	bool isSame = inspectables.size() == currentInspectables.size();
+	if (inspectables.size() == currentInspectables.size())
 	{
-		return;
+		bool isSame = true;
+		for (int i = 0; i < inspectables.size(); i++)
+		{
+			if (inspectables[i] != currentInspectables[i])
+			{
+				isSame = false;
+				break;
+			}
+		}
+		if (isSame) return;
 	}
 
 	MessageManagerLock mmLock;
 
-	if (currentInspectable != nullptr)
+	for (auto& i : currentInspectables)
 	{
-		if (!currentInspectable.wasObjectDeleted())
+		if (i != nullptr)
 		{
-			currentInspectable->removeInspectableListener(this);
-			if (setInspectableSelection) currentInspectable->setSelected(false);
-		}
-
-		if (currentEditor != nullptr)
-		{
-			vp.setViewedComponent(nullptr);
-			currentEditor = nullptr;
+			i->removeInspectableListener(this);
+			if (setInspectableSelection) i->setSelected(false);
 		}
 	}
-	currentInspectable = inspectable;
-
-	if (currentInspectable.get() != nullptr)
+	if (currentEditor != nullptr)
 	{
-		if (setInspectableSelection) currentInspectable->setSelected(true);
-		currentInspectable->addInspectableListener(this);
-		currentEditor.reset(currentInspectable->getEditor(true));
+		vp.setViewedComponent(nullptr);
+		currentEditor = nullptr;
 	}
 
-	vp.setViewedComponent(currentEditor.get(), false);
+	currentInspectables = inspectables;
+
+	for (auto& i : currentInspectables)
+	{
+		if (setInspectableSelection) i->setSelected(true);
+		i->addInspectableListener(this);
+	}
+
+	if (currentInspectables.size() > 0)
+	{
+		currentEditor.reset(currentInspectables[0]->getEditor(true, currentInspectables));
+
+		vp.setViewedComponent(currentEditor.get(), false);
+	}
 	resized();
 
 	listeners.call(&InspectorListener::currentInspectableChanged, this);
@@ -121,12 +133,17 @@ void Inspector::setCurrentInspectable(WeakReference<Inspectable> inspectable, bo
 
 void Inspector::clear()
 {
-	setCurrentInspectable(nullptr);
+	setCurrentInspectables();
 }
 
 void Inspector::inspectableDestroyed(Inspectable* i)
 {
-	if (currentInspectable == i) setCurrentInspectable(nullptr);
+	if (currentInspectables.contains(i))
+	{
+		Array<Inspectable*> newInspectables(currentInspectables.getRawDataPointer(), currentInspectables.size());
+		newInspectables.removeAllInstancesOf(i);
+		setCurrentInspectables(newInspectables);
+	}
 }
 
 void Inspector::newMessage(const InspectableSelectionManager::SelectionEvent& e)
@@ -136,7 +153,7 @@ void Inspector::newMessage(const InspectableSelectionManager::SelectionEvent& e)
 		if (selectionManager->isEmpty())
 		{
 			if (curSelectionDoesNotAffectInspector) return;
-			setCurrentInspectable(nullptr);
+			setCurrentInspectables();
 		}
 		else
 		{
@@ -144,8 +161,8 @@ void Inspector::newMessage(const InspectableSelectionManager::SelectionEvent& e)
 			curSelectionDoesNotAffectInspector = !newI->showInspectorOnSelect;
 			if (curSelectionDoesNotAffectInspector) return;
 
-			if (selectionManager->currentInspectables.size() == 1) setCurrentInspectable(newI);
-			else setCurrentInspectable(nullptr, false);
+			Array<Inspectable*> newInspectables = selectionManager->getInspectablesAs<Inspectable>();
+			if (newInspectables.size() > 0 && newInspectables[0] != nullptr && newInspectables[0]->showInspectorOnSelect) setCurrentInspectables(newInspectables);
 		}
 
 		repaint();

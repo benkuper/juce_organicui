@@ -142,7 +142,7 @@ public:
 	void removeAsyncManagerListener(AsyncListener* listener) { managerNotifier.removeListener(listener); }
 
 
-	InspectableEditor* getEditorInternal(bool /*isRoot*/) override;
+	InspectableEditor* getEditorInternal(bool isRoot, Array<Inspectable*> inspectables = Array<Inspectable*>()) override;
 
 	//UNDO MANAGER
 	class ManagerBaseAction :
@@ -935,7 +935,7 @@ String BaseManager<T>::getScriptTargetString()
 
 
 template<class T>
-InspectableEditor* BaseManager<T>::getEditorInternal(bool isRoot)
+InspectableEditor* BaseManager<T>::getEditorInternal(bool isRoot, Array<Inspectable*> inspectables)
 {
 	return new GenericManagerEditor<T>(this, isRoot);
 

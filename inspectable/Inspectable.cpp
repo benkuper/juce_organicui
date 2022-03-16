@@ -142,8 +142,9 @@ void Inspectable::setSelectedInternal(bool)
 	//to be overriden
 }
 
-InspectableEditor* Inspectable::getEditor(bool isRoot)
+InspectableEditor* Inspectable::getEditor(bool isRoot, Array<Inspectable *> inspectables)
 {
-	if (customGetEditorFunc != nullptr) return customGetEditorFunc(this, isRoot);
-	return getEditorInternal(isRoot);
+	if (inspectables.size() == 0) inspectables.add(this);
+	if (customGetEditorFunc != nullptr) return customGetEditorFunc(isRoot, inspectables);
+	return getEditorInternal(isRoot, inspectables);
 }

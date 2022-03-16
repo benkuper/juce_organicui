@@ -44,7 +44,7 @@ ControllableContainer::ControllableContainer(const String& niceName) :
 	scriptObject.setMethod("getParent", ControllableContainer::getParentFromScript);
 	scriptObject.setMethod("setName", ControllableContainer::setNameFromScript);
 	scriptObject.setMethod("setCollapsed", ControllableContainer::setCollapsedFromScript);
-	
+
 	scriptObject.setMethod("addTrigger", ControllableContainer::addTriggerFromScript);
 	scriptObject.setMethod("addBoolParameter", ControllableContainer::addBoolParameterFromScript);
 	scriptObject.setMethod("addIntParameter", ControllableContainer::addIntParameterFromScript);
@@ -77,14 +77,14 @@ ControllableContainer::~ControllableContainer()
 }
 
 
-void ControllableContainer::addControllableContainerListener(ControllableContainerListener* newListener) { 
+void ControllableContainer::addControllableContainerListener(ControllableContainerListener* newListener) {
 	/*
 	if (this == Engine::mainEngine)
 	{
 		DBG("ADD Engine Container Listener " << ((ControllableContainer*)newListener)->niceName);
 	}
 	*/
-	controllableContainerListeners.add(newListener); 
+	controllableContainerListeners.add(newListener);
 }
 
 void ControllableContainer::removeControllableContainerListener(ControllableContainerListener* listener) {
@@ -299,7 +299,7 @@ void ControllableContainer::removeControllable(WeakReference<Controllable> c, bo
 
 	controllableContainerListeners.call(&ControllableContainerListener::controllableRemoved, c);
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableRemoved, this, c));
-	
+
 	if (c != nullptr)
 	{
 		c->removeAsyncWarningTargetListener(this);
@@ -311,7 +311,7 @@ void ControllableContainer::removeControllable(WeakReference<Controllable> c, bo
 			p->removeAsyncParameterListener(this);
 		}
 	}
-	
+
 
 	onControllableRemoved(c);
 
@@ -342,7 +342,7 @@ void ControllableContainer::newMessage(const WarningTarget::WarningTargetEvent& 
 	switch (e.type)
 	{
 	case WarningTarget::WarningTargetEvent::WARNING_CHANGED:
-		if(!e.target.wasObjectDeleted()) warningChanged(e.target);
+		if (!e.target.wasObjectDeleted()) warningChanged(e.target);
 		break;
 	}
 }
@@ -362,11 +362,11 @@ UndoableAction* ControllableContainer::setUndoableNiceName(const String& newNice
 	UndoMaster::getInstance()->performAction("Rename " + niceName, a);
 	return a;
 }
-void ControllableContainer::setNiceName(const String& _niceName) 
+void ControllableContainer::setNiceName(const String& _niceName)
 {
 	if (niceName == _niceName) return;
 
-	if(_niceName.isEmpty())
+	if (_niceName.isEmpty())
 	{
 		LOGWARNING("Container cannot have an empty name");
 		if (niceName.isEmpty()) setNiceName("[NoName]");
@@ -380,9 +380,9 @@ void ControllableContainer::setNiceName(const String& _niceName)
 	onContainerNiceNameChanged();
 }
 
-void ControllableContainer::setCustomShortName(const String& _shortName) 
+void ControllableContainer::setCustomShortName(const String& _shortName)
 {
-	if(_shortName.isEmpty())
+	if (_shortName.isEmpty())
 	{
 		LOGWARNING("Container cannot have an empty shortName");
 		if (shortName.isEmpty()) setCustomShortName("NoName");
@@ -417,12 +417,12 @@ void ControllableContainer::setAutoShortName() {
 
 Controllable* ControllableContainer::getControllableByName(const String& name, bool searchNiceNameToo, bool searchLowerCaseToo)
 {
-	
+
 	for (auto& c : controllables)
 	{
 		if (c->shortName == name || (searchNiceNameToo && c->niceName == name) || (searchLowerCaseToo && c->shortName.toLowerCase() == name.toLowerCase())) return c;
 	}
-	
+
 
 	return nullptr;
 }
@@ -579,7 +579,7 @@ String ControllableContainer::getControlAddress(ControllableContainer* relativeT
 
 void ControllableContainer::sortControllables()
 {
-	controllables.sort(customControllableComparator != nullptr?*customControllableComparator:ControllableContainer::comparator, true);
+	controllables.sort(customControllableComparator != nullptr ? *customControllableComparator : ControllableContainer::comparator, true);
 
 	controllableContainerListeners.call(&ControllableContainerListener::controllableContainerReordered, this);
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableContainerReordered, this));
@@ -590,19 +590,19 @@ void ControllableContainer::setParentContainer(ControllableContainer* container)
 {
 	this->parentContainer = container;
 
-	
-	for (auto& c : controllables) if (c != nullptr) c->updateControlAddress();
-	
 
-	
+	for (auto& c : controllables) if (c != nullptr) c->updateControlAddress();
+
+
+
 	for (auto& cc : controllableContainers) if (!cc.wasObjectDeleted()) cc->updateChildrenControlAddress();
-	
+
 
 }
 
 void ControllableContainer::updateChildrenControlAddress()
 {
-	
+
 	for (auto& c : controllables)
 	{
 		if (c == nullptr)
@@ -612,10 +612,10 @@ void ControllableContainer::updateChildrenControlAddress()
 		}
 		c->updateControlAddress();
 	}
-	
 
 
-	
+
+
 	for (auto& cc : controllableContainers)
 	{
 		if (cc == nullptr)
@@ -625,14 +625,14 @@ void ControllableContainer::updateChildrenControlAddress()
 		}
 		cc->updateChildrenControlAddress();
 	}
-	
+
 
 }
 
 Array<WeakReference<Controllable>> ControllableContainer::getAllControllables(bool recursive)
 {
 	Array<WeakReference<Controllable>> result(controllables.getRawDataPointer(), controllables.size());
-	
+
 	if (recursive)
 	{
 		for (auto& cc : controllableContainers)
@@ -641,7 +641,7 @@ Array<WeakReference<Controllable>> ControllableContainer::getAllControllables(bo
 			result.addArray(cc->getAllControllables(true));
 		}
 	}
-	
+
 
 	return result;
 
@@ -654,12 +654,12 @@ Array<WeakReference<Parameter>> ControllableContainer::getAllParameters(bool rec
 	for (auto& c : controllables)
 	{
 		if (c->type == Controllable::Type::TRIGGER) continue;
-		result.add((Parameter *)c);
+		result.add((Parameter*)c);
 	}
 
 	if (recursive)
 	{
-		for (auto& cc : controllableContainers) result.addArray(cc->getAllParameters(true));	
+		for (auto& cc : controllableContainers) result.addArray(cc->getAllParameters(true));
 	}
 
 	return result;
@@ -669,14 +669,14 @@ Array<WeakReference<ControllableContainer>> ControllableContainer::getAllContain
 {
 	Array<WeakReference<ControllableContainer>> result;
 
-	
+
 	for (auto& cc : controllableContainers)
 	{
 		if (cc.wasObjectDeleted() || cc.get() == nullptr) continue;
 		result.add(cc);
 		if (recursive) result.addArray(cc->getAllContainers(true));
 	}
-	
+
 	return result;
 }
 
@@ -739,7 +739,7 @@ void ControllableContainer::dispatchFeedback(Controllable* c)
 {
 	controllableContainerListeners.call(&ControllableContainerListener::controllableFeedbackUpdate, this, c);
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableFeedbackUpdate, this, c));
-	
+
 	if (parentContainer != nullptr) { parentContainer->dispatchFeedback(c); }
 }
 
@@ -810,7 +810,7 @@ void ControllableContainer::controllableNameChanged(Controllable* c)
 	}
 	else
 	{
-		if(isNameTaken(c->niceName, true, c)) c->setNiceName(getUniqueNameInContainer(c->niceName, true));
+		if (isNameTaken(c->niceName, true, c)) c->setNiceName(getUniqueNameInContainer(c->niceName, true));
 	}
 
 	notifyStructureChanged();
@@ -847,7 +847,7 @@ String ControllableContainer::getWarningMessage() const
 		}
 		controllables.getLock().exit();
 	}
-	
+
 
 	controllableContainers.getLock().enter();
 	for (auto& cc : controllableContainers)
@@ -878,14 +878,14 @@ var ControllableContainer::getJSONData()
 
 	Array<WeakReference<Controllable>> cont = getAllControllables(false);
 
-	
+
 	for (auto& wc : cont) {
 		if (wc->type == Controllable::TRIGGER && !includeTriggersInSaveLoad) continue;
 		if (wc.wasObjectDeleted()) continue;
 		if (!wc->shouldBeSaved()) continue;
 		paramsData.append(wc->getJSONData(this));
 	}
-	
+
 
 	//data.getDynamicObject()->setProperty("uid", uid.toString());
 	if (paramsData.size() > 0) data.getDynamicObject()->setProperty("parameters", paramsData);
@@ -913,7 +913,7 @@ var ControllableContainer::getJSONData()
 	if (saveAndLoadRecursiveData)
 	{
 		var containersData = new DynamicObject();
-		
+
 		//ownedContainers.getLock().enter();
 		for (auto& cc : controllableContainers)
 		{
@@ -929,7 +929,7 @@ var ControllableContainer::getJSONData()
 			containersData.getDynamicObject()->setProperty(cc->shortName, ccData);
 		}
 		//ownedContainers.getLock().exit();
-		
+
 
 		if (containersData.getDynamicObject()->getProperties().size() > 0) data.getDynamicObject()->setProperty("containers", containersData);
 	}
@@ -946,11 +946,11 @@ void ControllableContainer::loadJSONData(var data, bool createIfNotThere)
 	//if (data.getDynamicObject()->hasProperty("uid")) uid = data.getDynamicObject()->getProperty("uid");
 	if (data.getDynamicObject()->hasProperty("niceName")) setNiceName(data.getDynamicObject()->getProperty("niceName"));
 	if (data.getDynamicObject()->hasProperty("shortName")) setCustomShortName(data.getDynamicObject()->getProperty("shortName"));
-	
+
 	editorIsCollapsed = data.getProperty("editorIsCollapsed", editorIsCollapsed);
 	isRemovableByUser = data.getProperty("removable", isRemovableByUser);
 	includeTriggersInSaveLoad = data.getProperty("includeTriggers", includeTriggersInSaveLoad);
-	
+
 	hideInEditor = data.getProperty("hideInEditor", hideInEditor);
 	hideInRemoteControl = data.getProperty("hideInRemoteControl", defaultHideInRemoteControl);
 
@@ -1066,7 +1066,7 @@ String ControllableContainer::getUniqueNameInContainer(const String& sourceName,
 	if (suffix > 0)
 	{
 		StringArray sa;
-		sa.addTokens(resultName, separator,"");
+		sa.addTokens(resultName, separator, "");
 		if (sa.size() > 1 && (sa[sa.size() - 1].getIntValue() != 0 || sa[sa.size() - 1].containsOnly("0")))
 		{
 			int num = sa[sa.size() - 1].getIntValue() + suffix;
@@ -1100,7 +1100,7 @@ void ControllableContainer::updateLiveScriptObjectInternal(DynamicObject* parent
 
 	bool transferToParent = parent != nullptr;
 
-	
+
 	for (auto& cc : controllableContainers)
 	{
 		if (cc == nullptr || cc.wasObjectDeleted() || cc->shortName.isEmpty()) continue;
@@ -1110,10 +1110,10 @@ void ControllableContainer::updateLiveScriptObjectInternal(DynamicObject* parent
 		else liveScriptObject->setProperty(cc->shortName, cc->getScriptObject());
 
 	}
-	
 
 
-	
+
+
 	for (auto& c : controllables)
 	{
 		if (c == nullptr || c->shortName.isEmpty()) return;
@@ -1121,7 +1121,7 @@ void ControllableContainer::updateLiveScriptObjectInternal(DynamicObject* parent
 		if (transferToParent) parent->setProperty(c->shortName, c->getScriptObject());
 		else liveScriptObject->setProperty(c->shortName, c->getScriptObject());
 	}
-	
+
 
 	liveScriptObject->setProperty("name", shortName);
 	liveScriptObject->setProperty("niceName", niceName);
@@ -1143,8 +1143,8 @@ var ControllableContainer::getChildFromScript(const var::NativeFunctionArgs& a)
 	if (cc != nullptr) return cc->getScriptObject();
 
 	Controllable* c = nullptr;
-	
-	
+
+
 	if (nameToFind.contains("/")) c = m->getControllableForAddress(nameToFind, true);
 	else  c = m->getControllableByName(nameToFind);
 	if (c != nullptr) return c->getScriptObject();
@@ -1189,78 +1189,78 @@ var ControllableContainer::setCollapsedFromScript(const juce::var::NativeFunctio
 	return var();
 }
 
-var ControllableContainer::addTriggerFromScript(const var::NativeFunctionArgs & args)
+var ControllableContainer::addTriggerFromScript(const var::NativeFunctionArgs& args)
 {
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(args);
 	if (!checkNumArgs(cc->niceName, args, 2)) return var();
-	
+
 	Controllable* c = cc->getControllableByName(args.arguments[0], true, false);
 	if (c != nullptr) return c->getScriptObject();
-	
+
 	return cc->addTrigger(args.arguments[0], args.arguments[1])->getScriptObject();
 }
 
-var ControllableContainer::addBoolParameterFromScript(const var::NativeFunctionArgs & args)
+var ControllableContainer::addBoolParameterFromScript(const var::NativeFunctionArgs& args)
 {
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(args);
 	if (!checkNumArgs(cc->niceName, args, 3)) return var();
-	
+
 	Controllable* c = cc->getControllableByName(args.arguments[0], true, false);
 	if (c != nullptr) return c->getScriptObject();
 
-	Parameter* p =  cc->addBoolParameter(args.arguments[0], args.arguments[1], (bool)args.arguments[2]);
+	Parameter* p = cc->addBoolParameter(args.arguments[0], args.arguments[1], (bool)args.arguments[2]);
 	p->isCustomizableByUser = true;
 	return p->getScriptObject();
 }
 
-var ControllableContainer::addIntParameterFromScript(const var::NativeFunctionArgs & args)
+var ControllableContainer::addIntParameterFromScript(const var::NativeFunctionArgs& args)
 {
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(args);
 	if (!checkNumArgs(cc->niceName, args, 3)) return var();
-	
+
 	Controllable* c = cc->getControllableByName(args.arguments[0], true, false);
 	if (c != nullptr) return c->getScriptObject();
 
-	Parameter *p = cc->addIntParameter(args.arguments[0], args.arguments[1], (int)args.arguments[2], args.numArguments >= 4?(int)args.arguments[3]:INT32_MIN, args.numArguments >= 5?(int)args.arguments[4]:INT32_MAX);
+	Parameter* p = cc->addIntParameter(args.arguments[0], args.arguments[1], (int)args.arguments[2], args.numArguments >= 4 ? (int)args.arguments[3] : INT32_MIN, args.numArguments >= 5 ? (int)args.arguments[4] : INT32_MAX);
 	p->isCustomizableByUser = true;
 	return p->getScriptObject();
 }
 
-var ControllableContainer::addFloatParameterFromScript(const var::NativeFunctionArgs & args)
+var ControllableContainer::addFloatParameterFromScript(const var::NativeFunctionArgs& args)
 {
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(args);
 	if (!checkNumArgs(cc->niceName, args, 3)) return var();
-	
+
 	Controllable* c = cc->getControllableByName(args.arguments[0], true, false);
 	if (c != nullptr) return c->getScriptObject();
 
-	Parameter *p = cc->addFloatParameter(args.arguments[0], args.arguments[1], (float)args.arguments[2], args.numArguments >= 4 ? (int)args.arguments[3] : INT32_MIN, args.numArguments >= 5 ? (int)args.arguments[4] : INT32_MAX);
+	Parameter* p = cc->addFloatParameter(args.arguments[0], args.arguments[1], (float)args.arguments[2], args.numArguments >= 4 ? (int)args.arguments[3] : INT32_MIN, args.numArguments >= 5 ? (int)args.arguments[4] : INT32_MAX);
 	p->isCustomizableByUser = true;
 	return p->getScriptObject();
 }
 
-var ControllableContainer::addStringParameterFromScript(const var::NativeFunctionArgs & args)
+var ControllableContainer::addStringParameterFromScript(const var::NativeFunctionArgs& args)
 {
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(args);
 	if (!checkNumArgs(cc->niceName, args, 3)) return var();
-	
+
 	Controllable* c = cc->getControllableByName(args.arguments[0], true, false);
 	if (c != nullptr) return c->getScriptObject();
 
-	Parameter *p = cc->addStringParameter(args.arguments[0], args.arguments[1], args.arguments[2]);
+	Parameter* p = cc->addStringParameter(args.arguments[0], args.arguments[1], args.arguments[2]);
 	p->isCustomizableByUser = true;
 	return p->getScriptObject();
 }
 
-var ControllableContainer::addEnumParameterFromScript(const var::NativeFunctionArgs & args)
+var ControllableContainer::addEnumParameterFromScript(const var::NativeFunctionArgs& args)
 {
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(args);
 	if (!checkNumArgs(cc->niceName, args, 2)) return var();
-	
+
 	Controllable* c = cc->getControllableByName(args.arguments[0], true, false);
 	if (c != nullptr) return c->getScriptObject();
 
-	EnumParameter * p = cc->addEnumParameter(args.arguments[0], args.arguments[1]);
+	EnumParameter* p = cc->addEnumParameter(args.arguments[0], args.arguments[1]);
 	int numOptions = (int)floor((args.numArguments - 2) / 2.0f);
 	for (int i = 0; i < numOptions; ++i)
 	{
@@ -1272,15 +1272,15 @@ var ControllableContainer::addEnumParameterFromScript(const var::NativeFunctionA
 	return p->getScriptObject();
 }
 
-var ControllableContainer::addTargetParameterFromScript(const var::NativeFunctionArgs & args)
+var ControllableContainer::addTargetParameterFromScript(const var::NativeFunctionArgs& args)
 {
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(args);
 	if (!checkNumArgs(cc->niceName, args, 2)) return var();
-	
+
 	Controllable* c = cc->getControllableByName(args.arguments[0], true, false);
 	if (c != nullptr) return c->getScriptObject();
 
-	TargetParameter * tp = cc->addTargetParameter(args.arguments[0], args.arguments[1]);
+	TargetParameter* tp = cc->addTargetParameter(args.arguments[0], args.arguments[1]);
 	if (args.numArguments >= 3)
 	{
 		bool isContainer = (int)args.arguments[2] > 0;
@@ -1291,7 +1291,7 @@ var ControllableContainer::addTargetParameterFromScript(const var::NativeFunctio
 	return tp->getScriptObject();
 }
 
-var ControllableContainer::addColorParameterFromScript(const var::NativeFunctionArgs & args)
+var ControllableContainer::addColorParameterFromScript(const var::NativeFunctionArgs& args)
 {
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(args);
 	if (!checkNumArgs(cc->niceName, args, 3)) return var();
@@ -1327,41 +1327,41 @@ var ControllableContainer::addColorParameterFromScript(const var::NativeFunction
 	return p->getScriptObject();
 }
 
-var ControllableContainer::addPoint2DParameterFromScript(const var::NativeFunctionArgs & args)
+var ControllableContainer::addPoint2DParameterFromScript(const var::NativeFunctionArgs& args)
 {
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(args);
 	if (!checkNumArgs(cc->niceName, args, 2)) return var();
-	
+
 	Controllable* c = cc->getControllableByName(args.arguments[0], true, false);
 	if (c != nullptr) return c->getScriptObject();
 
-	Parameter *p = cc->addPoint2DParameter(args.arguments[0], args.arguments[1]);
+	Parameter* p = cc->addPoint2DParameter(args.arguments[0], args.arguments[1]);
 	p->isCustomizableByUser = true;
 	return p->getScriptObject();
 }
 
-var ControllableContainer::addPoint3DParameterFromScript(const var::NativeFunctionArgs & args)
+var ControllableContainer::addPoint3DParameterFromScript(const var::NativeFunctionArgs& args)
 {
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(args);
 	if (!checkNumArgs(cc->niceName, args, 2)) return var();
-	
+
 	Controllable* c = cc->getControllableByName(args.arguments[0], true, false);
 	if (c != nullptr) return c->getScriptObject();
 
-	Parameter *p = cc->addPoint3DParameter(args.arguments[0], args.arguments[1]);
+	Parameter* p = cc->addPoint3DParameter(args.arguments[0], args.arguments[1]);
 	p->isCustomizableByUser = true;
 	return p->getScriptObject();
 }
 
-var ControllableContainer::addFileParameterFromScript(const var::NativeFunctionArgs & args)
+var ControllableContainer::addFileParameterFromScript(const var::NativeFunctionArgs& args)
 {
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(args);
 	if (!checkNumArgs(cc->niceName, args, 2)) return var();
-	
+
 	Controllable* c = cc->getControllableByName(args.arguments[0], true, false);
 	if (c != nullptr) return c->getScriptObject();
 
-	FileParameter * fp = cc->addFileParameter(args.arguments[0], args.arguments[1]);
+	FileParameter* fp = cc->addFileParameter(args.arguments[0], args.arguments[1]);
 	fp->directoryMode = args.numArguments > 2 ? ((int)args.arguments[2] > 0) : false;
 	fp->isCustomizableByUser = true;
 	return fp->getScriptObject();
@@ -1378,11 +1378,11 @@ var ControllableContainer::addAutomationFromScript(const var::NativeFunctionArgs
 	return a->getScriptObject();
 }
 
-var ControllableContainer::addContainerFromScript(const var::NativeFunctionArgs & args)
+var ControllableContainer::addContainerFromScript(const var::NativeFunctionArgs& args)
 {
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(args);
 	if (!checkNumArgs(cc->niceName, args, 1)) return var();
-	
+
 	ControllableContainer* newCC = cc->getControllableContainerByName(args.arguments[0], true, false);
 	if (newCC != nullptr) return newCC->getScriptObject();
 
@@ -1392,26 +1392,26 @@ var ControllableContainer::addContainerFromScript(const var::NativeFunctionArgs 
 	return newCC->getScriptObject();
 }
 
-var ControllableContainer::removeContainerFromScript(const var::NativeFunctionArgs & args)
+var ControllableContainer::removeContainerFromScript(const var::NativeFunctionArgs& args)
 {
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(args);
 	if (!checkNumArgs(cc->niceName, args, 1)) return var();
-	
+
 	ControllableContainer* removeCC = cc->getControllableContainerByName(args.arguments[0], true, false);
 	if (removeCC == nullptr) return var();
-	
+
 	cc->removeChildControllableContainer(removeCC);
 	return var();
 }
 
-var ControllableContainer::removeControllableFromScript(const var::NativeFunctionArgs & args)
+var ControllableContainer::removeControllableFromScript(const var::NativeFunctionArgs& args)
 {
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(args);
 	if (!checkNumArgs(cc->niceName, args, 1)) return var();
-	
+
 	Controllable* c = cc->getControllableByName(args.arguments[0], true, false);
 	if (c == nullptr) return var();
-	
+
 	cc->removeControllable(c);
 	return var();
 }
@@ -1453,7 +1453,7 @@ var ControllableContainer::loadJSONDataFromScript(const var::NativeFunctionArgs&
 	return true;
 }
 
-bool ControllableContainer::checkNumArgs(const String &logName, const var::NativeFunctionArgs & args, int expectedArgs)
+bool ControllableContainer::checkNumArgs(const String& logName, const var::NativeFunctionArgs& args, int expectedArgs)
 {
 	if (args.numArguments < expectedArgs)
 	{
@@ -1470,10 +1470,11 @@ String ControllableContainer::getScriptTargetString()
 	return "[" + niceName + ": Container]";
 }
 
-InspectableEditor* ControllableContainer::getEditorInternal(bool isRoot)
+InspectableEditor* ControllableContainer::getEditorInternal(bool isRoot, Array<Inspectable*> inspectables)
 {
-	if (customGetEditorFunc != nullptr) return customGetEditorFunc(this, isRoot);
-	return new GenericControllableContainerEditor(this, isRoot);
+	Array<ControllableContainer*> containers = Inspectable::getArrayAs<Inspectable, ControllableContainer>(inspectables);
+	if (customGetEditorFunc != nullptr) return customGetEditorFunc(isRoot, containers);
+	return new GenericControllableContainerEditor(containers, isRoot);
 }
 
 DashboardItem* ControllableContainer::createDashboardItem()
@@ -1508,10 +1509,12 @@ void EnablingControllableContainer::setCanBeDisabled(bool value)
 	}
 }
 
-InspectableEditor* EnablingControllableContainer::getEditorInternal(bool isRoot)
+InspectableEditor* EnablingControllableContainer::getEditorInternal(bool isRoot, Array<Inspectable*> inspectables)
 {
-	if (customGetEditorFunc != nullptr) return customGetEditorFunc(this, isRoot);
-	return new EnablingControllableContainerEditor(this, isRoot);
+	if (customGetEditorFunc != nullptr) return customGetEditorFunc(isRoot, Inspectable::getArrayAs<Inspectable, ControllableContainer>(inspectables));
+
+	Array<EnablingControllableContainer*> containers = Inspectable::getArrayAs<Inspectable, EnablingControllableContainer>(inspectables);
+	return new EnablingControllableContainerEditor(containers, isRoot);
 }
 
 ControllableContainer* ControllableContainer::ControllableContainerAction::getControllableContainer()
