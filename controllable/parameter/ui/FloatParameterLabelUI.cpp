@@ -28,7 +28,8 @@ FloatParameterLabelUI::FloatParameterLabelUI(Array<Parameter*> parameters) :
 	valueChanged(parameter->getValue());
 	feedbackStateChanged();
 
-	ParameterUI::setNextFocusOrder(&valueLabel);
+	setWantsKeyboardFocus(true);
+	ParameterUI::setNextFocusOrder(this);
 
 	addMouseListener(this, true);
 
@@ -128,6 +129,15 @@ void FloatParameterLabelUI::mouseUpInternal(const MouseEvent& e)
 	if (setUndoableValueOnMouseUp)
 	{
 		if (valueAtMouseDown != parameter->floatValue()) parameter->setUndoableValue(valueAtMouseDown, parameter->floatValue());
+	}
+}
+
+void FloatParameterLabelUI::focusGained(FocusChangeType cause)
+{
+	ParameterUI::focusGained(cause);
+	if (cause == FocusChangeType::focusChangedByTabKey)
+	{
+		valueLabel.showEditor();
 	}
 }
 

@@ -59,6 +59,11 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(WeakRefer
 		addChildComponent(expandBT.get());
 		addChildComponent(collapseBT.get());
 
+		expandBT->setWantsKeyboardFocus(false);
+		collapseBT->setWantsKeyboardFocus(false);
+		expandBT->setMouseClickGrabsKeyboardFocus(false);
+		collapseBT->setMouseClickGrabsKeyboardFocus(false);
+
 		addAndMakeVisible(headerSpacer);
 		headerSpacer.addMouseListener(this, false);
 
@@ -77,6 +82,9 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(WeakRefer
 	{
 		removeBT.reset(AssetManager::getInstance()->getRemoveBT());
 		removeBT->addListener(this);
+		removeBT->setWantsKeyboardFocus(false);
+		removeBT->setMouseClickGrabsKeyboardFocus(false);
+
 		addAndMakeVisible(removeBT.get());
 	}
 

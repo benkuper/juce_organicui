@@ -47,6 +47,8 @@ public:
 	void mouseDrag(const MouseEvent &e) override;
 	void mouseUpInternal(const MouseEvent &e) override;
 
+	virtual void focusGained(FocusChangeType cause) override;
+
 	void updateUIParamsInternal() override;
 
 	virtual void handlePaintTimerInternal() override;

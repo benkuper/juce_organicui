@@ -35,6 +35,8 @@ ControllableEditor::ControllableEditor(Array<Controllable*> controllables, bool 
 	{
 		removeBT.reset(AssetManager::getInstance()->getRemoveBT());
 		removeBT->addListener(this);
+		removeBT->setWantsKeyboardFocus(false);
+		removeBT->setMouseClickGrabsKeyboardFocus(false);
 		addAndMakeVisible(removeBT.get());
 	}
 
