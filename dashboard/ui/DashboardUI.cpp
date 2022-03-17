@@ -17,7 +17,7 @@ DashboardUI::DashboardUI(Dashboard* item) :
 
 DashboardUI::~DashboardUI()
 {
-	if(inspectable.wasObjectDeleted()) item->removeAsyncDashboardListener(this);
+	if(!inspectable.wasObjectDeleted()) item->removeAsyncDashboardListener(this);
 }
 
 void DashboardUI::paint(Graphics& g)
