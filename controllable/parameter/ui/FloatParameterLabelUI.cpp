@@ -33,6 +33,8 @@ FloatParameterLabelUI::FloatParameterLabelUI(Array<Parameter*> parameters) :
 
 	addMouseListener(this, true);
 
+	valueLabel.onEditorHide = [this]() {labelTextChanged(&valueLabel); };
+
 	handlePaintTimer(); //force update once
 }
 

@@ -80,7 +80,6 @@ void Inspector::setCurrentInspectables(Array<Inspectable*> inspectables, bool se
 {
 	if (!isEnabled()) return;
 
-	bool isSame = inspectables.size() == currentInspectables.size();
 	if (inspectables.size() == currentInspectables.size())
 	{
 		bool isSame = true;
