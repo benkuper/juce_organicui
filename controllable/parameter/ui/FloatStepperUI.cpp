@@ -51,6 +51,7 @@ FloatStepperUI::FloatStepperUI(Array<Parameter*> parameters) :
 
 	slider->addListener(this);
 	slider->addMouseListener(this, true);
+	slider->getTextbox()->onEditorHide = [this]() {sliderValueChanged(slider.get());  };
 }
 
 FloatStepperUI::~FloatStepperUI()
