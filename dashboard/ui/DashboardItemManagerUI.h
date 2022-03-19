@@ -20,6 +20,7 @@ public:
 	~DashboardItemManagerUI();
 
 	Image bgImage;
+	bool tmpShowTools;
 
 	static std::function<void(PopupMenu*, int)> customAddItemsToMenuFunc;
 	static std::function<void(int, int, DashboardItemManagerUI*, Point<float>)> customHandleMenuResultFunc;
