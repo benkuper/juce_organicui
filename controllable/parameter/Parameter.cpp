@@ -452,6 +452,7 @@ bool Parameter::shouldBeSaved()
 	if (forceSaveRange) return true;
 	if (isOverriden && !isControllableFeedbackOnly && isSavable) return true;
 	if (controlMode != MANUAL) return true;
+	if (colorStatusMap.size() > 0) return true;
 	return false;
 }
 
