@@ -972,7 +972,7 @@ void ControllableContainer::loadJSONData(var data, bool createIfNotThere)
 				}
 
 			}
-			else if (createIfNotThere)
+			else if (createIfNotThere || userCanAddControllables)
 			{
 				c = ControllableFactory::getInstance()->createControllable(o->getProperty("type"));
 				if (c != nullptr)
