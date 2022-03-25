@@ -16,6 +16,7 @@ Dashboard::Dashboard() :
 {
 	//itemManager.editorIsCollapsed = true;
 	password = addStringParameter("Password", "Password for web clients for this specific dashboard, leave empty public access", "");
+	unlockOnce = addBoolParameter("Unlock Only Once", "If checked, this will allow to only have to unlock once per session. Refreshing the page will reset the lock.", false);
 	addChildControllableContainer(&itemManager);
 	itemManager.addBaseManagerListener(this);
 }
@@ -92,7 +93,11 @@ var Dashboard::getServerData()
 		data.getDynamicObject()->setProperty("bgImageAlpha", itemManager.bgImageAlpha->getValue());
 	}
 
-	if (password->stringValue().isNotEmpty()) data.getDynamicObject()->setProperty("password", password->stringValue());
+	if (password->stringValue().isNotEmpty())
+	{
+		data.getDynamicObject()->setProperty("password", password->stringValue());
+		data.getDynamicObject()->setProperty("unlockOnce", unlockOnce->boolValue());
+	}
 
 	itemManager.fillServerData(data);
 	return data;

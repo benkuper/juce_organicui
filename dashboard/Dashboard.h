@@ -21,6 +21,7 @@ public:
 
 	bool isBeingEdited;
 	StringParameter* password;
+	BoolParameter* unlockOnce;
 	DashboardItemManager itemManager;
 
 	void setIsBeingEdited(bool value);
