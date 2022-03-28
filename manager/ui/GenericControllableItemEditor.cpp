@@ -35,12 +35,12 @@ GenericControllableItemEditor::~GenericControllableItemEditor()
 {
 }
 
-void GenericControllableItemEditor::paint(Graphics& g)
+void GenericControllableItemEditor::paint(juce::Graphics& g)
 {
 	//nothing
 }
 
-void GenericControllableItemEditor::resizedInternalHeaderItemInternal(Rectangle<int>& r)
+void GenericControllableItemEditor::resizedInternalHeaderItemInternal(juce::Rectangle<int>& r)
 {
 	controllableEditor->setBounds(r.reduced(1));
 }
