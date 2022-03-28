@@ -608,7 +608,7 @@ void BaseManagerUI<M, T, U>::resizedInternalHeaderTools(juce::Rectangle<int>& r)
 
 	toolContainer.setBounds(r.withWidth(rSize));
 
-	Rectangle<int> toolR = toolContainer.getLocalBounds();
+	juce::Rectangle<int> toolR = toolContainer.getLocalBounds();
 
 	for (auto& t : this->tools)
 	{
