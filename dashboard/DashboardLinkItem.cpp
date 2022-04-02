@@ -41,7 +41,7 @@ void DashboardLinkItem::onContainerTriggerTriggered(Trigger* t)
 
 var DashboardLinkItem::getServerData()
 {
-	var data = DashboardItem::getServerData();
+	var data = DashboardTriggerItem::getServerData();
 
 	String targetName;
 	if (Dashboard* d = dynamic_cast<Dashboard*>(dashboardTarget->targetContainer.get())) targetName = d->shortName;

@@ -18,7 +18,7 @@ public:
 	EnumParameter* style;
 	virtual DashboardItemUI* createUI() override;
 
-	InspectableEditor* getStyleEditor(Inspectable* c, bool isRoot);
+	InspectableEditor* getStyleEditor(bool isRoot, Array<Inspectable *> inspectables);
 
 	virtual void setInspectableInternal(Inspectable* i) override;
 	void onExternalParameterValueChanged(Parameter* p) override;

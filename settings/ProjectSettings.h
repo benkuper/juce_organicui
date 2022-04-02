@@ -26,6 +26,7 @@ public:
 	BoolParameter* enableServer;
 	IntParameter* serverPort;
 	StringParameter* dashboardPassword;
+	BoolParameter* unlockOnce;
 	ControllableContainer dashboardDefaults;
 
 	Point2DParameter* triggerDefaultSize;

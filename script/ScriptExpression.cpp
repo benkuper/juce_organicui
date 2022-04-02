@@ -132,8 +132,16 @@ void ScriptExpression::buildEnvironment()
 
 	//scriptEngine->registerNativeObject("script", getScriptObject()); //force "script" for this objet
 	//if (parentTarget != nullptr) scriptEngine->registerNativeObject("local", parentTarget->getScriptObject()); //force "local" for the related object
-	if (Engine::mainEngine != nullptr) scriptEngine->registerNativeObject(Engine::mainEngine->scriptTargetName, Engine::mainEngine->getScriptObject());
-	if (ScriptUtil::getInstanceWithoutCreating() != nullptr) scriptEngine->registerNativeObject(ScriptUtil::getInstance()->scriptTargetName, ScriptUtil::getInstance()->getScriptObject());
+	if (ScriptUtil::getInstanceWithoutCreating() != nullptr)
+	{
+		scriptEngine->registerNativeObject(ScriptUtil::getInstance()->scriptTargetName, ScriptUtil::getInstance()->getScriptObject());
+	}
+
+	if (Engine::mainEngine != nullptr)
+	{
+		DynamicObject* rootObj = Engine::mainEngine->getScriptObject();
+		scriptEngine->registerNativeObject(Engine::mainEngine->scriptTargetName, rootObj);
+	}
 }
 
 void ScriptExpression::setState(ExpressionState newState)

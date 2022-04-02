@@ -20,7 +20,7 @@ public:
 	var getJSONData() override;
 	void loadJSONDataInternal(var data) override;
 
-	InspectableEditor * getEditorInternal(bool isRoot) override;
+	InspectableEditor * getEditorInternal(bool isRoot, Array<Inspectable*> inspectables = Array<Inspectable*>()) override;
 };
 
 class GlobalSettings :
@@ -40,6 +40,7 @@ public:
 	BoolParameter * launchOnStartup;
 #endif
 	BoolParameter* launchMinimised;
+	BoolParameter* allowMultipleInstances;
 	BoolParameter * checkUpdatesOnStartup;
 	BoolParameter * checkBetaUpdates;
 	BoolParameter * updateHelpOnStartup;

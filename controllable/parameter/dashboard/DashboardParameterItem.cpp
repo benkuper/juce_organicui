@@ -29,7 +29,7 @@ DashboardItemUI* DashboardParameterItem::createUI()
 	return new DashboardParameterItemUI(this);
 }
 
-InspectableEditor* DashboardParameterItem::getStyleEditor(Inspectable* c, bool isRoot)
+InspectableEditor* DashboardParameterItem::getStyleEditor(bool isRoot, Array<Inspectable*> c)
 {
 	return new DashboardParameterStyleEditor(style, this, isRoot);
 }

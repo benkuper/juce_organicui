@@ -8,8 +8,6 @@
   ==============================================================================
 */
 
-#include "ProjectSettings.h"
-
 juce_ImplementSingleton(ProjectSettings)
 
 ProjectSettings::ProjectSettings() :
@@ -30,7 +28,7 @@ ProjectSettings::ProjectSettings() :
 	showDashboardOnStartup->maxDefaultSearchLevel = 0;
 
 	dashboardPassword = dashboardCC.addStringParameter("Password", "Password for web clients to access the dashboard, leave empty public access", "");
-
+	unlockOnce = addBoolParameter("Unlock Only Once", "If checked, this will allow to only have to unlock once per session. Refreshing the page will reset the lock.", false);
 
 	triggerDefaultSize = dashboardDefaults.addPoint2DParameter("Trigger Size", "Default Size for this type", false);
 	boolDefaultSize = dashboardDefaults.addPoint2DParameter("Bool Size", "Default Size for this type", false);

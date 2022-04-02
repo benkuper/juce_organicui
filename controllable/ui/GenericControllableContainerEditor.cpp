@@ -9,17 +9,20 @@
 */
 
 
-GenericControllableContainerEditor::GenericControllableContainerEditor(WeakReference<Inspectable> inspectable, bool isRoot, bool buildAtCreation) :
-	InspectableEditor(inspectable, isRoot),
+GenericControllableContainerEditor::GenericControllableContainerEditor(Array<ControllableContainer *> containers, bool isRoot, bool buildAtCreation) :
+	InspectableEditor(Inspectable::getArrayAs<ControllableContainer, Inspectable>(containers), isRoot),
 	headerHeight(GlobalSettings::getInstance()->fontSize->floatValue() + 8),
 	isRebuilding(false),
 	prepareToAnimate(false),
 	contourColor(BG_COLOR.brighter(.3f)),
 	containerLabel("containerLabel", dynamic_cast<ControllableContainer*>(inspectable.get())->niceName),
-	container(dynamic_cast<ControllableContainer*>(inspectable.get())),
+	containers(containers),
 	headerSpacer("headerSpacer"),
 	dragAndDropEnabled(true)
 {
+	jassert(containers.size() > 0);
+
+	container = containers[0];
 	container->addAsyncContainerListener(this);
 	addAndMakeVisible(containerLabel);
 
@@ -678,11 +681,15 @@ bool GenericControllableContainerEditor::canBeCollapsed()
 
 //EnablingControllableContainerEditor
 
-EnablingControllableContainerEditor::EnablingControllableContainerEditor(EnablingControllableContainer* cc, bool isRoot, bool buildAtCreation) :
-	GenericControllableContainerEditor(cc, isRoot, buildAtCreation),
-	ioContainer(cc)
+EnablingControllableContainerEditor::EnablingControllableContainerEditor(Array<EnablingControllableContainer*> cc, bool isRoot, bool buildAtCreation) :
+	GenericControllableContainerEditor(Inspectable::getArrayAs<EnablingControllableContainer, ControllableContainer>(cc), isRoot, buildAtCreation),
+	ioContainers(cc)
 {
-	if (cc->canBeDisabled)
+	jassert(ioContainers.size() > 0);
+
+	ioContainer = cc[0];
+
+	if (ioContainer->canBeDisabled)
 	{
 		enabledUI.reset(ioContainer->enabled->createToggle(ImageCache::getFromMemory(OrganicUIBinaryData::power_png, OrganicUIBinaryData::power_pngSize)));
 		addAndMakeVisible(enabledUI.get());

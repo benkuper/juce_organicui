@@ -70,7 +70,7 @@ public:
 
 	void endLoadFile() override;
 
-	InspectableEditor* getEditorInternal(bool isRoot) override;
+	InspectableEditor* getEditorInternal(bool isRoot, Array<Inspectable*> inspectables = Array<Inspectable*>()) override;
 
 
 	// Inherited via Timer

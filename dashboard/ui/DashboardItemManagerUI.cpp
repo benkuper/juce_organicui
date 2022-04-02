@@ -23,6 +23,7 @@ DashboardItemManagerUI::DashboardItemManagerUI(DashboardItemManager* manager) :
 
 	manager->addAsyncCoalescedContainerListener(this);
 	DashboardManager::getInstance()->snapping->addAsyncParameterListener(this);
+	DashboardManager::getInstance()->editMode->addAsyncParameterListener(this);
 
 	File f = manager->bgImage->getFile();
 	if (f.existsAsFile()) bgImage = ImageCache::getFromFile(f);
@@ -35,12 +36,17 @@ DashboardItemManagerUI::DashboardItemManagerUI(DashboardItemManager* manager) :
 
 	setShowAddButton(false);
 	setShowTools(true);
+	tmpShowTools = showTools;
 }
 
 DashboardItemManagerUI::~DashboardItemManagerUI()
 {
 	if (!inspectable.wasObjectDeleted()) manager->removeAsyncContainerListener(this);
-	if (DashboardManager::getInstanceWithoutCreating() != nullptr) DashboardManager::getInstance()->snapping->removeAsyncParameterListener(this);
+	if (DashboardManager::getInstanceWithoutCreating() != nullptr)
+	{
+		DashboardManager::getInstance()->snapping->removeAsyncParameterListener(this);
+		DashboardManager::getInstance()->editMode->removeAsyncParameterListener(this);
+	}
 }
 
 void DashboardItemManagerUI::resized()
@@ -159,6 +165,9 @@ void DashboardItemManagerUI::showMenuAndAddItem(bool fromAddButton, Point<int> m
 	manager->managerFactory->buildPopupMenu();
 	menu.addSubMenu("Add Item", manager->managerFactory->getMenu());
 
+	menu.addSeparator();
+	menu.addItem(-10, showTools ? "Hide Tools" : "Show Tools");
+
 	menu.showMenuAsync(PopupMenu::Options(), [this, mousePos](int result)
 		{
 			if (result == 0) return;
@@ -170,6 +179,7 @@ void DashboardItemManagerUI::showMenuAndAddItem(bool fromAddButton, Point<int> m
 			else if (result == -3) manager->addItem(new SharedTextureDashboardItem(), p);
 #endif
 			else if (result == -4) manager->addItem(new DashboardLinkItem(), p);
+			else if (result == -10) setShowTools(!showTools);
 			else if (result < -1000) customHandleMenuResultFunc(result, -5000, this, p);
 			else manager->addItem(manager->managerFactory->createFromMenuResult(result), p);
 		}
@@ -211,5 +221,11 @@ void DashboardItemManagerUI::newMessage(const Parameter::ParameterEvent& e)
 	if (e.parameter == DashboardManager::getInstance()->snapping)
 	{
 		enableSnapping = DashboardManager::getInstance()->snapping->boolValue();
+	}
+	else if (e.parameter == DashboardManager::getInstance()->editMode)
+	{
+		bool editMode = e.parameter->boolValue();
+		if (!editMode) tmpShowTools = showTools;
+		setShowTools(editMode ? tmpShowTools : false);
 	}
 }

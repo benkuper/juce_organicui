@@ -291,12 +291,15 @@ void ParameterUI::handleMenuSelectedID(int id)
 
 	default:
 	{
-		int numCustomRanges = ProjectSettings::getInstance()->customRangesCC.controllables.size();
-		int cid = -(id + 100);
-		if (cid < numCustomRanges)
+		if (id <= -100)
 		{
-			Point2DParameter* rp = dynamic_cast<Point2DParameter*>(ProjectSettings::getInstance()->customRangesCC.controllables[cid]);
-			parameter->setRange(rp->x, rp->y);
+			int numCustomRanges = ProjectSettings::getInstance()->customRangesCC.controllables.size();
+			int cid = -(id + 100);
+			if (cid < numCustomRanges)
+			{
+				Point2DParameter* rp = dynamic_cast<Point2DParameter*>(ProjectSettings::getInstance()->customRangesCC.controllables[cid]);
+				parameter->setRange(rp->x, rp->y);
+			}
 		}
 		break;
 	}

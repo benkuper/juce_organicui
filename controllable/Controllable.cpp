@@ -250,9 +250,10 @@ String Controllable::getControlAddress(ControllableContainer* relativeTo)
 	return parentContainer->getControlAddress(relativeTo) + "/" + shortName;
 }
 
-InspectableEditor* Controllable::getEditorInternal(bool isRootEditor) {
+InspectableEditor* Controllable::getEditorInternal(bool isRootEditor, Array<Inspectable*> inspectables) {
 
-	return new ControllableEditor(this, isRootEditor);
+	if (inspectables.size() == 0) inspectables.add(this);
+	return new ControllableEditor(Inspectable::getArrayAs<Inspectable, Controllable>(inspectables), isRootEditor);
 }
 
 ControllableDetectiveWatcher* Controllable::getDetectiveWatcher()

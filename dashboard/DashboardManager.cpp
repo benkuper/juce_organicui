@@ -200,7 +200,11 @@ var DashboardManager::getServerData()
 	data.getDynamicObject()->setProperty("userName", SystemStats::getFullUserName());
 
 	String pass = ProjectSettings::getInstance()->dashboardPassword->stringValue();
-	if (pass.isNotEmpty()) data.getDynamicObject()->setProperty("password", pass);
+	if (pass.isNotEmpty())
+	{
+		data.getDynamicObject()->setProperty("password", pass);
+		data.getDynamicObject()->setProperty("unlockOnce", ProjectSettings::getInstance()->unlockOnce->boolValue());
+	}
 
 	var iData;
 	for (auto& d : items)
@@ -417,6 +421,7 @@ void DashboardManager::setCurrentDashboard(Dashboard* d, bool setInClients, Stri
 		v->setCurrentDashboard(d);
 	}
 
+#if ORGANICUI_USE_WEBSERVER
 	if (setInClients)
 	{
 		var data(new DynamicObject());
@@ -424,6 +429,7 @@ void DashboardManager::setCurrentDashboard(Dashboard* d, bool setInClients, Stri
 		if (excludeIds.isEmpty()) server->send(JSON::toString(data));
 		else server->sendExclude(JSON::toString(data), excludeIds);
 	}
+#endif
 }
 
 void DashboardManager::itemDataFeedback(var data)

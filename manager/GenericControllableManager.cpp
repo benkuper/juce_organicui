@@ -51,7 +51,7 @@ void GenericControllableManager::addItemInternal(GenericControllableItem * item,
 	if(forceItemsFeedbackOnly) item->controllable->setControllableFeedbackOnly(true);
 }
 
-InspectableEditor * GenericControllableManager::getEditorInternal(bool isRoot)
+InspectableEditor * GenericControllableManager::getEditorInternal(bool isRoot, Array<Inspectable*> inspectables)
 {
 	return new GenericManagerEditor<GenericControllableItem>(this, isRoot);
 	/*

@@ -332,7 +332,7 @@ void Script::endLoadFile()
 	}
 }
 
-InspectableEditor* Script::getEditorInternal(bool isRoot)
+InspectableEditor* Script::getEditorInternal(bool isRoot, Array<Inspectable*> inspectables)
 {
 	return new ScriptEditor(this, isRoot);
 }

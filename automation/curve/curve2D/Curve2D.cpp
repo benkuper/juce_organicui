@@ -291,7 +291,7 @@ void Curve2D::afterLoadJSONDataInternal()
     updateCurve();
 }
 
-InspectableEditor* Curve2D::getEditorInternal(bool isRoot)
+InspectableEditor* Curve2D::getEditorInternal(bool isRoot, Array<Inspectable*> inspectables)
 {
     return new Curve2DEditor(this, isRoot);
 }

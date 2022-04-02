@@ -126,7 +126,7 @@ public:
 
 	virtual String getWarningTargetName() const override;
 
-	virtual InspectableEditor* getEditorInternal(bool /*isRootEditor*/) override;
+	virtual InspectableEditor* getEditorInternal(bool isRoot, Array<Inspectable *> inspectables = Array<Inspectable *>()) override;
 	virtual ControllableDetectiveWatcher* getDetectiveWatcher();
 	virtual String getTypeString() const { jassert(false); return ""; } //should be overriden
 
