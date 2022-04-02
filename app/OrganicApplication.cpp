@@ -36,6 +36,21 @@ OrganicApplication::OrganicApplication(const String& appName, bool useWindow, co
 const String OrganicApplication::getApplicationName() { return ProjectInfo::projectName; }
 const String OrganicApplication::getApplicationVersion() { return ProjectInfo::versionString; }
 
+bool OrganicApplication::moreThanOneInstanceAllowed()
+{
+	//global settings and engine are not initialized yet here, must check the value from the file itself.
+	var gs = JSON::fromString(getAppProperties().getUserSettings()->getValue("globalSettings", ""));
+	DBG(JSON::toString(gs));
+	var params = gs["containers"]["startupAndUpdate"]["parameters"];
+	for (int i = 0; i < params.size(); i++)
+	{
+		DBG(" >  " << params[i]["controlAddress"].toString());
+		if (params[i]["controlAddress"] == "/allowMultipleInstances") return (bool)params[i]["value"];
+	}
+
+	return false;// GlobalSettings::getInstance()->allowMultipleInstances->boolValue();
+}
+
 void OrganicApplication::initialise(const String& commandLine)
 {
 	initialiseInternal(commandLine);
@@ -137,7 +152,7 @@ void OrganicApplication::systemRequestedQuit()
 
 }
 
-inline void OrganicApplication::anotherInstanceStarted(const String& commandLine)
+void OrganicApplication::anotherInstanceStarted(const String& commandLine)
 {
 	engine->parseCommandline(commandLine);
 
@@ -152,6 +167,12 @@ inline void OrganicApplication::anotherInstanceStarted(const String& commandLine
 	{
 		mainWindow->setMinimised(false);
 	}
+
+	//hack because using toFront doesn't work
+	mainWindow->setAlwaysOnTop(true);
+	mainWindow->grabKeyboardFocus();
+	mainWindow->setAlwaysOnTop(false);
+	
 }
 
 

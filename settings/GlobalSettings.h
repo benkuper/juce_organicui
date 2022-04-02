@@ -40,6 +40,7 @@ public:
 	BoolParameter * launchOnStartup;
 #endif
 	BoolParameter* launchMinimised;
+	BoolParameter* allowMultipleInstances;
 	BoolParameter * checkUpdatesOnStartup;
 	BoolParameter * checkBetaUpdates;
 	BoolParameter * updateHelpOnStartup;
