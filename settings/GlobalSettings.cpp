@@ -29,6 +29,7 @@ GlobalSettings::GlobalSettings() :
 #endif
 
 	launchMinimised = startupCC.addBoolParameter("Launch minimized", "If checked, this app will automatically minimized it self when launched", false);
+	allowMultipleInstances = startupCC.addBoolParameter("Allow Multiple Instances", "If checked, it will be possible to launch multiple instances of this application at the same time (not working on Mac, you would have to actually duplicate the app)", false);
 	checkUpdatesOnStartup = startupCC.addBoolParameter("Check updates on startup", "If enabled, app will check if any updates are available", true);
 	checkBetaUpdates = startupCC.addBoolParameter("Check for beta updates", "If enabled the app will also check for beta versions of the software", false);
 	updateHelpOnStartup = startupCC.addBoolParameter("Update help on startup", "If enabled, app will try and download the last help file locally", true);
@@ -38,7 +39,7 @@ GlobalSettings::GlobalSettings() :
 	fileToOpenOnStartup = new FileParameter("File to load on startup", "File to load when start, if the option above is checked", "", false);
 	fileToOpenOnStartup->forceAbsolutePath = true;
 	startupCC.addParameter(fileToOpenOnStartup);
-	autoReopenFileOnCrash = startupCC.addBoolParameter("Auto Reopen crashed file", "If checked and a file was being edited while crashing, this will open Chataigne and a snapshot of the last session before the crash", false);
+	autoReopenFileOnCrash = startupCC.addBoolParameter("Auto Reopen crashed file", "If checked and a file was being edited while crashing, this will open the app and load a snapshot of the last session before the crash", false);
 
 	addChildControllableContainer(&startupCC);
 
