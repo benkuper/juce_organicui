@@ -319,7 +319,7 @@ void Engine::loadJSONData(var data, ProgressTask* loadingTask)
 					.withButton("Update")
 					.withButton("Load directly")
 					.withButton("Cancel"),
-					[this, &data, loadingTask](int result)
+					[this, data, loadingTask](int result)
 					{
 
 
@@ -349,9 +349,9 @@ void Engine::loadJSONData(var data, ProgressTask* loadingTask)
 								return;
 							}
 
-							data = JSON::parse(convertedData);
+							var cData = JSON::parse(convertedData);
 
-							if (data.isVoid())
+							if (cData.isVoid())
 							{
 								//DBG(convertedData);
 
@@ -361,15 +361,19 @@ void Engine::loadJSONData(var data, ProgressTask* loadingTask)
 							}
 
 							//continue loading with new data
+
+							loadJSONDataEngine(cData, loadingTask);
 						}
 						break;
 
 						case 2: //load directly
 								//do nothing
+
+							loadJSONDataEngine(data, loadingTask);
 							break;
 						}
 
-						loadJSONDataEngine(data, loadingTask);
+						
 					}
 				);
 
