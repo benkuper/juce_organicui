@@ -58,6 +58,7 @@ protected:
 
 	virtual void valueChanged(const var & v) override;
 	virtual void labelTextChanged(Label * labelThatHasChanged) override;
+	virtual void editorShown(Label* label, TextEditor&) override;
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(FloatParameterLabelUI)

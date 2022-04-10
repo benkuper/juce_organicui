@@ -177,14 +177,24 @@ void FloatParameterLabelUI::valueChanged(const var& v)
 void FloatParameterLabelUI::labelTextChanged(Label*)
 {
 	String s = valueLabel.getText();
-	if (showLabel)
-	{
-		String label = customLabel.isNotEmpty() ? customLabel : parameter->niceName;
-		s = s.substring(label.length() + 3); // including " : ";
-	}
-	s = s.substring(prefix.length(), s.length() - suffix.length());
+	double v = ParameterUI::textToValue(s.replace(",", "."));
 
-	parameter->setValue(ParameterUI::textToValue(s.replace(",", ".")));
+	//if (showLabel)
+	//{
+	//	String label = customLabel.isNotEmpty() ? customLabel : parameter->niceName;
+	//	s = s.substring(label.length() + 3); // including " : ";
+	//}
+	//s = s.substring(prefix.length(), s.length() - suffix.length());
+
+	if ((float)v == float(parameter->value)) valueLabel.setText(getValueString(v), dontSendNotification);
+	parameter->setValue(v);
+}
+
+void FloatParameterLabelUI::editorShown(Label* label, TextEditor& t)
+{
+	if (parameter.wasObjectDeleted()) return;
+	t.setText(getValueString(parameter->value), dontSendNotification);
+	//valueLabel.showEditor();
 }
 
 
