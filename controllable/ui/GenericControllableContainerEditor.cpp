@@ -232,6 +232,7 @@ void GenericControllableContainerEditor::showContextMenu()
 
 void GenericControllableContainerEditor::setCollapsed(bool value, bool force, bool animate, bool doNotRebuild)
 {
+	if (container.wasObjectDeleted()) return;
 	if (container->editorIsCollapsed == value && !force) return;
 
 	if (isRoot || !container->editorCanBeCollapsed) return;
