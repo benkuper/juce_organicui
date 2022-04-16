@@ -12,10 +12,10 @@ CommentUI::CommentUI(CommentItem * comment) :
 	BaseItemMinimalUI(comment),
 	resizer(this, nullptr)
 {
-	bgColor = item->color->getColor().darker().withAlpha(item->bgAlpha->floatValue());
+	bgColor = item->itemColor->getColor().darker().withAlpha(item->bgAlpha->floatValue());
 
 	//textUI.setEditable(false, true, false);
-	textUI.setColour(textUI.textColourId, item->color->getColor());
+	textUI.setColour(textUI.textColourId, item->itemColor->getColor());
 	textUI.setColour(textUI.backgroundColourId, Colours::transparentBlack);
 	textUI.setColour(TextEditor::outlineColourId, Colours::transparentBlack); // non-transparent red
 	textUI.setColour(TextEditor::shadowColourId, Colours::transparentBlack); // non-transparent red
@@ -159,10 +159,10 @@ void CommentUI::controllableFeedbackUpdateInternal(Controllable * c)
 		textUI.applyFontToAllText(item->size->floatValue(), true);
 		//setSize(textUI.getTextWidth(), textUI.getTextHeight()+4);
 	}
-	else if (c == item->color || c == item->bgAlpha)
+	else if (c == item->itemColor || c == item->bgAlpha)
 	{
-		bgColor = item->color->getColor().darker().withAlpha(item->bgAlpha->floatValue());
-		textUI.applyColourToAllText(item->color->getColor(), true);
+		bgColor = item->itemColor->getColor().darker().withAlpha(item->bgAlpha->floatValue());
+		textUI.applyColourToAllText(item->itemColor->getColor(), true);
 		repaint();
 	}
 }

@@ -17,7 +17,8 @@ DashboardCommentItem::DashboardCommentItem() :
 	size = addFloatParameter("Size", "The text size", 14, 0, 80);
 	size->customUI = FloatParameter::LABEL;
 
-	color = addColorParameter("Color", "The color of the text", TEXT_COLOR);
+	itemColor->setDefaultValue(TEXT_COLOR);
+
 	bgAlpha = addFloatParameter("Background Alpha", "The alpha", 0, 0, 1);
 }
 
@@ -30,7 +31,7 @@ var DashboardCommentItem::getServerData()
 	var data = DashboardItem::getServerData();
 	data.getDynamicObject()->setProperty("text", text->stringValue());
 	data.getDynamicObject()->setProperty("size", size->floatValue());
-	data.getDynamicObject()->setProperty("color", color->value);
+	data.getDynamicObject()->setProperty("color", itemColor->value);
 	data.getDynamicObject()->setProperty("backgroundAlpha", bgAlpha->floatValue());
 	return data;
 }

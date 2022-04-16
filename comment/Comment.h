@@ -19,7 +19,6 @@ public:
 
 	StringParameter * text;
 	FloatParameter * size;
-	ColorParameter * color;
 	FloatParameter * bgAlpha;
 
 	String getTypeString() const override { return "Comment"; }

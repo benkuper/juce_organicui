@@ -18,7 +18,6 @@ public:
 	virtual ~GradientColor();
 
 	enum Interpolation { LINEAR, NONE };
-	ColorParameter * color;
 	FloatParameter * position;
 	EnumParameter * interpolation;
 

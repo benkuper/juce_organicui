@@ -28,6 +28,8 @@ public:
 	Point2DParameter* viewUIPosition; //position in a view
 	Point2DParameter* viewUISize; //size in a view
 	BoolParameter* isUILocked; //lock in UI
+	ColorParameter* itemColor;
+
 	bool useCustomArrowKeysBehaviour; // to have custom manipulation with arrow keys instead of selection prev/next
 
 	bool canHaveScripts;

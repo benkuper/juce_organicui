@@ -101,8 +101,8 @@ void GradientColorManager::updateCurrentColor()
 Colour GradientColorManager::getColorForPosition(const float & time) const
 {
 	if (items.isEmpty()) return Colours::transparentBlack;
-	if (time <= items[0]->position->floatValue()) return items[0]->color->getColor();
-	if (time >= items[items.size() - 1]->position->floatValue()) return items[items.size() - 1]->color->getColor();
+	if (time <= items[0]->position->floatValue()) return items[0]->itemColor->getColor();
+	if (time >= items[items.size() - 1]->position->floatValue()) return items[items.size() - 1]->itemColor->getColor();
 
 	GradientColor * nearest = getItemAt(time, true);
 
@@ -113,14 +113,14 @@ Colour GradientColorManager::getColorForPosition(const float & time) const
 	switch (interpolation)
 	{
 	case GradientColor::NONE:
-		return nearest->color->getColor();
+		return nearest->itemColor->getColor();
 		break;
 
 	case GradientColor::LINEAR:
 	{
 		GradientColor * next = items[items.indexOf(nearest) + 1];
-		if (nearest == nullptr || next == nullptr || nearest->position->floatValue() == next->position->floatValue()) return nearest->color->getColor();
-		return nearest->color->getColor().interpolatedWith(next->color->getColor(), jmap<float>(time, nearest->position->floatValue(), next->position->floatValue(), 0, 1));
+		if (nearest == nullptr || next == nullptr || nearest->position->floatValue() == next->position->floatValue()) return nearest->itemColor->getColor();
+		return nearest->itemColor->getColor().interpolatedWith(next->itemColor->getColor(), jmap<float>(time, nearest->position->floatValue(), next->position->floatValue(), 0, 1));
 	}
 	break;
 	}
@@ -157,7 +157,7 @@ GradientColor * GradientColorManager::addColorAt(float time, Colour color)
 	}
 	else
 	{
-		t->color->setColor(color);
+		t->itemColor->setColor(color);
 	}
 	
 	reorderItems();
@@ -212,7 +212,7 @@ Array<UndoableAction*> GradientColorManager::getRemoveTimespan(float start, floa
 
 void GradientColorManager::addItemInternal(GradientColor * item, var data)
 {
-	//item->gradientIndex = gradient.addColour(item->position->floatValue() / length->floatValue(), item->color->getColor());
+	//item->gradientIndex = gradient.addColour(item->position->floatValue() / length->floatValue(), item->itemColor->getColor());
 	if(!allowKeysOutside) item->position->setRange(0, length->floatValue());
 	item->selectionManager = selectionManager;
 }
@@ -293,7 +293,7 @@ void GradientColorManager::onControllableFeedbackUpdate(ControllableContainer * 
 			}
 
 		}
-		else if (c == t->color) {
+		else if (c == t->itemColor) {
 			//gradient.setColour(t->gradientIndex, t->color->getColor());
 			colorManagerListeners.call(&GradientColorManagerListener::gradientUpdated);
 		}

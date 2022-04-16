@@ -1,14 +1,14 @@
 /*
   ==============================================================================
 
-    BaseItem.cpp
-    Created: 28 Oct 2016 8:04:25pm
-    Author:  bkupe
+	BaseItem.cpp
+	Created: 28 Oct 2016 8:04:25pm
+	Author:  bkupe
 
   ==============================================================================
 */
 
-BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts) :
+BaseItem::BaseItem(const String& name, bool _canBeDisabled, bool _canHaveScripts) :
 	EnablingControllableContainer(name.isEmpty() ? getTypeString() : name, _canBeDisabled),
 	useCustomArrowKeysBehaviour(false),
 	canHaveScripts(_canHaveScripts),
@@ -65,6 +65,9 @@ BaseItem::BaseItem(const String &name, bool _canBeDisabled, bool _canHaveScripts
 	isUILocked->hideInRemoteControl = true;
 	isUILocked->defaultHideInRemoteControl = true;
 
+	itemColor = addColorParameter("Color", "The color of the item", NORMAL_COLOR);
+	itemColor->hideInEditor = true;
+
 	scriptObject.setMethod("getType", BaseItem::getTypeStringFromScript);
 }
 
@@ -72,10 +75,10 @@ BaseItem::~BaseItem()
 {
 }
 
-void BaseItem::clearItem() 
+void BaseItem::clearItem()
 {
 	isClearing = true;
-	if(canHaveScripts && scriptManager != nullptr) scriptManager->clear();
+	if (canHaveScripts && scriptManager != nullptr) scriptManager->clear();
 }
 
 void BaseItem::duplicate()
@@ -209,7 +212,7 @@ void BaseItem::scalePosition(Point<float> positionOffset, bool moveOtherSelected
 
 		Point<float> anchorPosition = Point<float>((this == firstItemX) ? maxPosition.x : minPosition.x, (this == firstItemY) ? maxPosition.y : minPosition.y);
 		Point<float> anchorDiffToReference = movePositionReference - anchorPosition;
-		
+
 		if (anchorDiffToReference.isOrigin()) return;
 
 		for (auto& i : items)
@@ -254,10 +257,10 @@ void BaseItem::addMoveToUndoManager(bool addOtherSelectedItems)
 		numItems = items.size();
 	}
 
-	UndoMaster::getInstance()->performActions("Move " + String(numItems) + " item"+String(numItems > 1?"s":""), actions);
+	UndoMaster::getInstance()->performActions("Move " + String(numItems) + " item" + String(numItems > 1 ? "s" : ""), actions);
 }
 
-void BaseItem::addUndoableMoveAction(Array<UndoableAction *> &arrayToAdd)
+void BaseItem::addUndoableMoveAction(Array<UndoableAction*>& arrayToAdd)
 {
 	arrayToAdd.add(viewUIPosition->setUndoablePoint(movePositionReference, viewUIPosition->getPoint(), true));
 }
@@ -336,7 +339,7 @@ void BaseItem::addUndoableResizeAction(Array<UndoableAction*>& arrayToAdd)
 	arrayToAdd.add(viewUISize->setUndoablePoint(sizeReference, viewUISize->getPoint(), true));
 }
 
-void BaseItem::onContainerParameterChanged(Parameter * p)
+void BaseItem::onContainerParameterChanged(Parameter* p)
 {
 	if (canHaveScripts)
 	{
@@ -348,7 +351,7 @@ void BaseItem::onContainerParameterChanged(Parameter * p)
 	onContainerParameterChangedInternal(p);
 }
 
-void BaseItem::onContainerTriggerTriggered(Trigger * t)
+void BaseItem::onContainerTriggerTriggered(Trigger* t)
 {
 	if (canHaveScripts)
 	{
@@ -358,7 +361,7 @@ void BaseItem::onContainerTriggerTriggered(Trigger * t)
 	}
 }
 
-void BaseItem::onControllableFeedbackUpdate(ControllableContainer * cc, Controllable * c)
+void BaseItem::onControllableFeedbackUpdate(ControllableContainer* cc, Controllable* c)
 {
 	onControllableFeedbackUpdateInternal(cc, c);
 }
@@ -371,19 +374,19 @@ void BaseItem::itemAdded(Script* script)
 var BaseItem::getJSONData()
 {
 	var data = ControllableContainer::getJSONData();
-	if(saveType) data.getDynamicObject()->setProperty("type", getTypeString());
+	if (saveType) data.getDynamicObject()->setProperty("type", getTypeString());
 	if (canHaveScripts) data.getDynamicObject()->setProperty("scripts", scriptManager->getJSONData());
-	return data; 
+	return data;
 }
 
 void BaseItem::loadJSONDataInternal(var data)
 {
 	ControllableContainer::loadJSONDataInternal(data);
 	loadJSONDataItemInternal(data);
-	if (canHaveScripts) scriptManager->loadJSONData(data.getProperty("scripts",var()));
+	if (canHaveScripts) scriptManager->loadJSONData(data.getProperty("scripts", var()));
 }
 
-InspectableEditor * BaseItem::getEditorInternal(bool isRoot, Array<Inspectable*> inspectables)
+InspectableEditor* BaseItem::getEditorInternal(bool isRoot, Array<Inspectable*> inspectables)
 {
 	return new BaseItemEditor(this, isRoot);
 }

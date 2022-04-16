@@ -1,3 +1,4 @@
+#include "Parameter.h"
 /*
   ==============================================================================
 
@@ -137,6 +138,12 @@ var Parameter::getValue()
 var Parameter::getLerpValueTo(var targetValue, float weight)
 {
 	return getValue(); //to be overriden
+}
+
+void Parameter::setDefaultValue(var val, bool doResetValue)
+{
+	defaultValue = getCroppedValue(val);
+	if (doResetValue) resetValue();
 }
 
 void Parameter::resetValue(bool silentSet)
