@@ -40,11 +40,13 @@ Automation::Automation(const String& name, AutomationRecorder* recorder, bool al
 
 	viewValueRange = addPoint2DParameter("View Value Range", "The minimum and maximum values to view in editor");
 	viewValueRange->hideInEditor = true;
+	viewValueRange->canShowExtendedEditor = false;
 	viewValueRange->setPoint(0, 1);
 
 	valueRange = addPoint2DParameter("Range", "The range between allowed minimum value and maximum value");
 	valueRange->canBeDisabledByUser = true;
 	valueRange->hideInEditor = true;
+	valueRange->canShowExtendedEditor = false;
 	valueRange->setPoint(0, 1);
 
 	rangeRemapMode = addEnumParameter("Range Remap Mode", "The way of recaculating the key values when changing the range.\nAbsolute means no modification is done. Proportional means that the relative value of the key will be maintained.");
