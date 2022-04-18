@@ -438,6 +438,12 @@ OutlinerItemComponent::OutlinerItemComponent(OutlinerItem* _item) :
 	item(_item),
 	label("label", _item->itemName)
 {
+	if (item->isContainer && item->container == nullptr)
+	{
+		jassertfalse;
+		return;
+	}
+
 	item->addItemListener(this);
 	autoDrawContourWhenSelected = false;
 	setTooltip(item->isContainer ? item->container->getControlAddress() : item->controllable->description + "\nControl Address : " + item->controllable->controlAddress);
@@ -482,7 +488,7 @@ OutlinerItemComponent::~OutlinerItemComponent()
 
 void OutlinerItemComponent::paint(Graphics& g)
 {
-	if (inspectable.wasObjectDeleted()) return;
+	if (inspectable == nullptr || inspectable.wasObjectDeleted()) return;
 
 	juce::Rectangle<int> r = getLocalBounds();
 
@@ -509,6 +515,7 @@ void OutlinerItemComponent::resized()
 {
 	juce::Rectangle<int> r = getLocalBounds();
 	if (r.isEmpty()) return;
+	if (hideInRemoteBT == nullptr) return;
 	hideInRemoteBT->setBounds(r.removeFromRight(r.getHeight()).reduced(1));
 	r.removeFromLeft(3);
 	resizedInternal(r);
