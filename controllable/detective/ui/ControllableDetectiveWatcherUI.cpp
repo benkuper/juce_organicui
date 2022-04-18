@@ -38,7 +38,7 @@ void ControllableDetectiveWatcherUI::paint(Graphics& g)
 
 void ControllableDetectiveWatcherUI::resizedInternalHeader(juce::Rectangle<int>& r)
 {
-	watchTimeUI.setBounds(r.removeFromRight(100).reduced(2));
+	watchTimeUI.setBounds(r.removeFromRight(200).reduced(2));
 	targetUI.setBounds(r.removeFromRight(160).reduced(1));
 }
 
