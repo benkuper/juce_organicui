@@ -105,7 +105,7 @@ String StringUtil::valueToTimeString(float timeVal, int numDecimals)
 	int hours = floor(timeVal / 3600);
 	int minutes = floor(fmodf(timeVal, 3600) / 60);
 	float seconds = fmodf(timeVal, 60);
-	if (numDecimals > 0) return String::formatted("%02i:%02i:%0" + String(6 - numDecimals) + "." + String(numDecimals) + "f", hours, minutes, seconds);
+	if (numDecimals > 0) return String::formatted("%02i:%02i:%0" + String(6 - (numDecimals-3)) + "." + String(numDecimals) + "f", hours, minutes, seconds);
 	else return String::formatted("%02i:%02i:%02i", hours, minutes, (int)seconds);
 }
 
