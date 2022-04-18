@@ -8,8 +8,8 @@
   ==============================================================================
 */
 
-const Array<String> Controllable::typeNames = { 
-	"Custom", 
+const Array<String> Controllable::typeNames = {
+	"Custom",
 	Trigger::getTypeStringStatic(),
 	FloatParameter::getTypeStringStatic(),
 	IntParameter::getTypeStringStatic(),
@@ -22,7 +22,7 @@ const Array<String> Controllable::typeNames = {
 	ColorParameter::getTypeStringStatic()
 };
 
-Controllable::Controllable(const Type &type, const String & niceName, const String &description, bool enabled) :
+Controllable::Controllable(const Type& type, const String& niceName, const String& description, bool enabled) :
 	ScriptTarget("", this, "Controllable"),
 	type(type),
 	niceName(""),
@@ -42,7 +42,7 @@ Controllable::Controllable(const Type &type, const String & niceName, const Stri
 	isRemovableByUser(false),
 	userCanSetReadOnly(false),
 	replaceSlashesInShortName(true),
-	dashboardDefaultLabelParentLevel(0), 
+	dashboardDefaultLabelParentLevel(0),
 	dashboardDefaultAppendLabel(false),
 	parentContainer(nullptr),
 	queuedNotifier(10)
@@ -66,7 +66,7 @@ Controllable::~Controllable() {
 	Controllable::masterReference.clear();
 }
 
-UndoableAction * Controllable::setUndoableNiceName(const String & newNiceName, bool onlyReturnAction)
+UndoableAction* Controllable::setUndoableNiceName(const String& newNiceName, bool onlyReturnAction)
 {
 	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile)
 	{
@@ -74,17 +74,17 @@ UndoableAction * Controllable::setUndoableNiceName(const String & newNiceName, b
 		return nullptr;
 	}
 
-	UndoableAction * a = new ControllableChangeNameAction(this, niceName, newNiceName);
+	UndoableAction* a = new ControllableChangeNameAction(this, niceName, newNiceName);
 	if (onlyReturnAction) return a;
 
 	UndoMaster::getInstance()->performAction("Rename " + niceName, a);
 	return a;
 
 	//if Main Engine loading, just set the value without undo history
-	
+
 }
 
-void Controllable::setNiceName(const String & _niceName) {
+void Controllable::setNiceName(const String& _niceName) {
 	if (niceName == _niceName) return;
 
 	this->niceName = _niceName;
@@ -96,7 +96,7 @@ void Controllable::setNiceName(const String & _niceName) {
 	}
 }
 
-void Controllable::setCustomShortName(const String & _shortName)
+void Controllable::setCustomShortName(const String& _shortName)
 {
 	this->shortName = _shortName;
 	hasCustomShortName = true;
@@ -104,7 +104,7 @@ void Controllable::setCustomShortName(const String & _shortName)
 	updateControlAddress();
 	listeners.call(&Listener::controllableNameChanged, this);
 	queuedNotifier.addMessage(new ControllableEvent(ControllableEvent::NAME_CHANGED, this));
-	
+
 }
 
 void Controllable::setAutoShortName() {
@@ -139,7 +139,7 @@ void Controllable::notifyStateChanged()
 	queuedNotifier.addMessage(new ControllableEvent(ControllableEvent::STATE_CHANGED, this));
 }
 
-void Controllable::setParentContainer(ControllableContainer * container)
+void Controllable::setParentContainer(ControllableContainer* container)
 {
 	if (parentContainer == container) return;
 	if (parentContainer != nullptr) parentContainer->removeControllable(this, false);
@@ -165,7 +165,7 @@ void Controllable::remove(bool addToUndo)
 	listeners.call(&Controllable::Listener::askForRemoveControllable, this, addToUndo);
 }
 
-void Controllable::updateLiveScriptObjectInternal(DynamicObject * parent)
+void Controllable::updateLiveScriptObjectInternal(DynamicObject* parent)
 {
 	liveScriptObject->setProperty("name", shortName);
 	liveScriptObject->setProperty("niceName", niceName);
@@ -182,18 +182,18 @@ bool Controllable::shouldBeSaved()
 }
 
 
-var Controllable::getJSONData(ControllableContainer * relativeTo)
+var Controllable::getJSONData(ControllableContainer* relativeTo)
 {
 	var data = getJSONDataInternal();
 	data.getDynamicObject()->setProperty("controlAddress", getControlAddress(relativeTo));
-	
+
 	if (canBeDisabledByUser) data.getDynamicObject()->setProperty("enabled", enabled);
 	if (hideInRemoteControl != defaultHideInRemoteControl) data.getDynamicObject()->setProperty("hideInRemoteControl", hideInRemoteControl);
-	if(userCanSetReadOnly) data.getDynamicObject()->setProperty("feedbackOnly", isControllableFeedbackOnly);
+	if (userCanSetReadOnly) data.getDynamicObject()->setProperty("feedbackOnly", isControllableFeedbackOnly);
 	if (saveCustomData && !customData.isVoid()) data.getDynamicObject()->setProperty("customData", customData);
 
 	if (saveValueOnly) return data;
-	
+
 	data.getDynamicObject()->setProperty("type", getTypeString());
 	data.getDynamicObject()->setProperty("niceName", niceName);
 	if (canBeDisabledByUser) data.getDynamicObject()->setProperty("enabled", enabled);
@@ -211,9 +211,9 @@ var Controllable::getJSONData(ControllableContainer * relativeTo)
 void Controllable::loadJSONData(var data)
 {
 	if (data.isVoid() || !data.isObject()) return;
-	
+
 	isLoadingData = true;
-	
+
 	if (data.getDynamicObject()->hasProperty("type")) saveValueOnly = false;
 	if (data.getDynamicObject()->hasProperty("niceName")) setNiceName(data.getProperty("niceName", ""));
 	if (data.getDynamicObject()->hasProperty("shortName")) setCustomShortName(data.getProperty("shortName", ""));
@@ -223,7 +223,7 @@ void Controllable::loadJSONData(var data)
 	description = data.getProperty("description", description);
 	hideInEditor = data.getProperty("hideInEditor", hideInEditor);
 	hideInRemoteControl = data.getProperty("hideInRemoteControl", defaultHideInRemoteControl);
-	if (data.getDynamicObject()->hasProperty("feedbackOnly")) setControllableFeedbackOnly(data.getProperty("feedbackOnly",false));
+	if (data.getDynamicObject()->hasProperty("feedbackOnly")) setControllableFeedbackOnly(data.getProperty("feedbackOnly", false));
 	customData = data.getProperty("customData", customData);
 
 	loadJSONDataInternal(data);
@@ -235,6 +235,8 @@ void Controllable::setupFromJSONData(var data)
 {
 	if (data.hasProperty("shortName")) setCustomShortName(data.getProperty("shortName", "[error]").toString());
 	if (data.hasProperty("description")) description = data.getProperty("description", "[no description]").toString();
+	if (data.hasProperty("readOnly")) setControllableFeedbackOnly(data.getProperty("readOnly", false));
+	else if (data.hasProperty("feedbackOnly")) setControllableFeedbackOnly(data.getProperty("feedbackOnly", false));
 
 	StringArray attributes = getValidAttributes();
 	for (auto& a : attributes)
@@ -243,14 +245,15 @@ void Controllable::setupFromJSONData(var data)
 	}
 }
 
-String Controllable::getControlAddress(ControllableContainer * relativeTo)
+String Controllable::getControlAddress(ControllableContainer* relativeTo)
 {
 	return parentContainer->getControlAddress(relativeTo) + "/" + shortName;
 }
 
-InspectableEditor * Controllable::getEditorInternal(bool isRootEditor) {
+InspectableEditor* Controllable::getEditorInternal(bool isRootEditor, Array<Inspectable*> inspectables) {
 
-	return new ControllableEditor(this, isRootEditor);
+	if (inspectables.size() == 0) inspectables.add(this);
+	return new ControllableEditor(Inspectable::getArrayAs<Inspectable, Controllable>(inspectables), isRootEditor);
 }
 
 ControllableDetectiveWatcher* Controllable::getDetectiveWatcher()
@@ -258,7 +261,7 @@ ControllableDetectiveWatcher* Controllable::getDetectiveWatcher()
 	return new ControllableDetectiveWatcher();
 }
 
-DashboardItem * Controllable::createDashboardItem()
+DashboardItem* Controllable::createDashboardItem()
 {
 	return new DashboardControllableItem(this);
 }
@@ -268,7 +271,7 @@ String Controllable::getDefaultDashboardLabel() const
 	if (dashboardDefaultLabelParentLevel == 0) return niceName;
 	String s = "";
 	ControllableContainer* cParent = parentContainer;
-	for (int i = 0; i < dashboardDefaultLabelParentLevel-1; i++)
+	for (int i = 0; i < dashboardDefaultLabelParentLevel - 1; i++)
 	{
 		if (cParent != nullptr) cParent = cParent->parentContainer;
 	}
@@ -294,7 +297,7 @@ StringArray Controllable::getValidAttributes() const
 //SCRIPT
 var Controllable::setValueFromScript(const juce::var::NativeFunctionArgs& a) {
 
-	Controllable * c = getObjectFromJS<Controllable>(a);
+	Controllable* c = getObjectFromJS<Controllable>(a);
 	bool success = false;
 
 	if (c != nullptr)
@@ -320,35 +323,36 @@ var Controllable::setValueFromScript(const juce::var::NativeFunctionArgs& a) {
 			case Controllable::Type::TRIGGER:
 				if (valueIsABool)
 				{
-					if ((bool)value) ((Trigger *)c)->trigger();
-				} else if (valueIsANumber)
+					if ((bool)value) ((Trigger*)c)->trigger();
+				}
+				else if (valueIsANumber)
 				{
-					if ((float)value >= 1) ((Trigger *)c)->trigger();
+					if ((float)value >= 1) ((Trigger*)c)->trigger();
 				}
 
 				break;
 
 			case Controllable::Type::BOOL:
 
-				if (valueIsABool) ((BoolParameter *)c)->setValue((bool)value);
-				else if (valueIsANumber) ((BoolParameter *)c)->setValue((float)value > .5);
+				if (valueIsABool) ((BoolParameter*)c)->setValue((bool)value);
+				else if (valueIsANumber) ((BoolParameter*)c)->setValue((float)value > .5);
 				break;
 
 			case Controllable::Type::FLOAT:
-				if (valueIsABool || valueIsANumber) ((FloatParameter *)c)->setValue(value);
+				if (valueIsABool || valueIsANumber) ((FloatParameter*)c)->setValue(value);
 				break;
 			case Controllable::Type::INT:
-				if (valueIsABool || valueIsANumber) ((IntParameter *)c)->setValue(value);
+				if (valueIsABool || valueIsANumber) ((IntParameter*)c)->setValue(value);
 				break;
 
 			case Controllable::Type::STRING:
-				if (value.isString()) ((StringParameter *)c)->setValue(value);
+				if (value.isString()) ((StringParameter*)c)->setValue(value);
 				break;
 
 			case Controllable::Type::COLOR:
 				if (value.isArray() && value.size() >= 3)
 				{
-					((ColorParameter *)c)->setColor(Colour::fromFloatRGBA((float)(value[0]), 
+					((ColorParameter*)c)->setColor(Colour::fromFloatRGBA((float)(value[0]),
 						(float)(value[1]),
 						(float)(value[2]),
 						value.size() > 3 ? (float)(value[3]) : 1));
@@ -367,12 +371,12 @@ var Controllable::setValueFromScript(const juce::var::NativeFunctionArgs& a) {
 				break;
 
 			case Controllable::Type::POINT2D:
-				if (value.isArray() && value.size() >= 2) ((Point2DParameter *)c)->setPoint((float)value[0], (float)value[1]);
+				if (value.isArray() && value.size() >= 2) ((Point2DParameter*)c)->setPoint((float)value[0], (float)value[1]);
 				else if (a.numArguments >= 2) ((Point2DParameter*)c)->setPoint((float)a.arguments[0], (float)a.arguments[1]);
 				break;
 
 			case Controllable::Type::POINT3D:
-				if (value.isArray() && value.size() >= 3) ((Point3DParameter *)c)->setVector((float)value[0], (float)value[1], (float)value[2]);
+				if (value.isArray() && value.size() >= 3) ((Point3DParameter*)c)->setVector((float)value[0], (float)value[1], (float)value[2]);
 				else if (a.numArguments >= 3) ((Point3DParameter*)c)->setVector((float)a.arguments[0], (float)a.arguments[1], (float)a.arguments[2]);
 				break;
 
@@ -386,17 +390,18 @@ var Controllable::setValueFromScript(const juce::var::NativeFunctionArgs& a) {
 					TargetParameter* tp = (TargetParameter*)c;
 					if (tp->targetType == TargetParameter::CONTROLLABLE)
 					{
-						Controllable * target = static_cast<Controllable *>((Controllable*)(int64)value.getDynamicObject()->getProperty(scriptPtrIdentifier));
+						Controllable* target = static_cast<Controllable*>((Controllable*)(int64)value.getDynamicObject()->getProperty(scriptPtrIdentifier));
 						if (target != nullptr) tp->setTarget(target);
 						else LOGWARNING("Set target from script, Target not found");
-					}else
+					}
+					else
 					{
-						ControllableContainer * target = static_cast<ControllableContainer*>((ControllableContainer*)(int64)value.getDynamicObject()->getProperty(scriptPtrIdentifier));
+						ControllableContainer* target = static_cast<ControllableContainer*>((ControllableContainer*)(int64)value.getDynamicObject()->getProperty(scriptPtrIdentifier));
 						if (target != nullptr) tp->setTarget(target);
 						else LOGWARNING("Set target from script, Target not found");
 					}
 				}
-				else if(value.isString())
+				else if (value.isString())
 				{
 					TargetParameter* tp = (TargetParameter*)c;
 					if (tp->targetType == TargetParameter::CONTROLLABLE)
@@ -415,7 +420,7 @@ var Controllable::setValueFromScript(const juce::var::NativeFunctionArgs& a) {
 				}
 				else
 				{
-					LOGWARNING("Set target from script, value is bad format : "+value.toString());
+					LOGWARNING("Set target from script, value is bad format : " + value.toString());
 				}
 				break;
 
@@ -433,13 +438,13 @@ var Controllable::setValueFromScript(const juce::var::NativeFunctionArgs& a) {
 
 var Controllable::checkIsParameterFromScript(const juce::var::NativeFunctionArgs& a) {
 
-	Controllable * c = getObjectFromJS<Controllable>(a);
+	Controllable* c = getObjectFromJS<Controllable>(a);
 	return c->type != TRIGGER;
 }
 
-var Controllable::getParentFromScript(const juce::var::NativeFunctionArgs & a)
+var Controllable::getParentFromScript(const juce::var::NativeFunctionArgs& a)
 {
-	Controllable * c = getObjectFromJS<Controllable>(a);
+	Controllable* c = getObjectFromJS<Controllable>(a);
 	int level = a.numArguments > 0 ? (int)a.arguments[0] : 1;
 	ControllableContainer* target = c->parentContainer;
 	if (target == nullptr) return var();
@@ -455,12 +460,12 @@ var Controllable::getParentFromScript(const juce::var::NativeFunctionArgs & a)
 var Controllable::setNameFromScript(const juce::var::NativeFunctionArgs& a)
 {
 	if (a.numArguments == 0) return var();
-	Controllable * c = getObjectFromJS<Controllable>(a);
+	Controllable* c = getObjectFromJS<Controllable>(a);
 	c->setNiceName(a.arguments[0].toString());
 	if (a.numArguments >= 2) c->setCustomShortName(a.arguments[1].toString());
 	else c->setAutoShortName();
-	
-	return var(); 
+
+	return var();
 }
 
 var Controllable::setAttributeFromScript(const juce::var::NativeFunctionArgs& a)
@@ -515,8 +520,8 @@ String Controllable::getScriptTargetString()
 	return "[" + niceName + " : " + getTypeString() + "]";
 }
 
-String Controllable::getWarningTargetName() const 
-{ 
+String Controllable::getWarningTargetName() const
+{
 	if (warningResolveInspectable != nullptr)
 	{
 		ControllableContainer* cc = dynamic_cast<ControllableContainer*>(warningResolveInspectable);
@@ -527,12 +532,12 @@ String Controllable::getWarningTargetName() const
 	return niceName;
 }
 
-Controllable * Controllable::ControllableAction::getControllable()
+Controllable* Controllable::ControllableAction::getControllable()
 {
 	if (controllableRef != nullptr && !controllableRef.wasObjectDeleted()) return controllableRef.get();
-	else if(Engine::mainEngine != nullptr)
+	else if (Engine::mainEngine != nullptr)
 	{
-		Controllable * c = Engine::mainEngine->getControllableForAddress(controlAddress, true);
+		Controllable* c = Engine::mainEngine->getControllableForAddress(controlAddress, true);
 		return c;
 	}
 
@@ -541,7 +546,7 @@ Controllable * Controllable::ControllableAction::getControllable()
 
 bool Controllable::ControllableChangeNameAction::perform()
 {
-	Controllable * c = getControllable();
+	Controllable* c = getControllable();
 	if (c != nullptr)
 	{
 		c->setNiceName(newName);
@@ -552,10 +557,10 @@ bool Controllable::ControllableChangeNameAction::perform()
 
 bool Controllable::ControllableChangeNameAction::undo()
 {
-	Controllable * c = getControllable();
+	Controllable* c = getControllable();
 	if (c != nullptr)
 	{
-		c->setNiceName(oldName); 
+		c->setNiceName(oldName);
 		return true;
 	}
 	return false;

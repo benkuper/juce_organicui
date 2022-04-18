@@ -20,11 +20,12 @@ public:
 	Controllable * controllable;
 
 	void onContainerNiceNameChanged() override;
+	void controllableNameChanged(Controllable* c) override;
 
 	String typeAtCreation;
 	virtual String getTypeString() const override { return typeAtCreation; }
 
 	static GenericControllableItem * create(var params) { return new GenericControllableItem(params); }
 
-	InspectableEditor * getEditorInternal(bool isRoot) override;
+	InspectableEditor * getEditorInternal(bool isRoot, Array<Inspectable*> inspectables = Array<Inspectable*>()) override;
 };

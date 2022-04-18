@@ -52,7 +52,7 @@ public:
 
 	const String getApplicationName() override;
 	const String getApplicationVersion() override;
-	virtual bool moreThanOneInstanceAllowed() override { return true; }
+	virtual bool moreThanOneInstanceAllowed() override;
 
 	void initialise(const String& /*commandLine*/) override;
 	virtual void initialiseInternal(const String&) = 0;

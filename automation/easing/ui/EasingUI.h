@@ -187,11 +187,12 @@ class GenericEasingUI :
 	public EasingUI
 {
 public:
-	GenericEasingUI(Easing* e, Point2DParameter* a1 = nullptr, Point2DParameter* a2 = nullptr);
+	GenericEasingUI(Easing* e, Point2DParameter* a1 = nullptr, Point2DParameter* a2 = nullptr, Array<Parameter*> extraParams = Array<Parameter *>());
 	~GenericEasingUI() {}
 
 	std::unique_ptr<EasingHandle> h1;
 	std::unique_ptr<EasingHandle> h2;
+	OwnedArray<ControllableUI> extraParams;
 
 	Point<float> h1ValueAtMouseDown;
 	Point<float> h2ValueAtMouseDown;

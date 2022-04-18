@@ -22,13 +22,13 @@ String StringUtil::toShortName(const String& niceName, bool replaceSlashes) {
 	if (replaceSlashes) res = res.replaceCharacter('/', '_');
 
 	res = res.replaceCharacter('\"', '_');
-	
+
 	String specials = "+-()[]{}<>^'@#*$~";// ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ÙÚÛÜÝßàáâãäåæçèéêëìíîïðñòóôõöùúûüýÿ";
 	String replaces = "_____________#___";//AAAAAAECEEEEIIIIDNOOOOOxUUUUYsaaaaaaeceeeeiiiiOnooooouuuuyy";
 	res = res.replaceCharacters(specials, replaces);
 
 #if !JUCE_MAC
-    res = res.replaceCharacter('â', 'a').replaceCharacter('é', 'e').replaceCharacter('è', 'e').replaceCharacter('ê', 'e')
+	res = res.replaceCharacter('â', 'a').replaceCharacter('é', 'e').replaceCharacter('è', 'e').replaceCharacter('ê', 'e')
 		.replaceCharacter('à', 'a').replaceCharacter('ô', 'o')
 		.replaceCharacter('ç', 'c').replaceCharacter('ü', 'u');
 #endif
@@ -100,12 +100,13 @@ CommandLineElements StringUtil::parseCommandLine(const String& commandLine) {
 
 #pragma warning (push)
 #pragma warning(disable:4244)
-String StringUtil::valueToTimeString(float timeVal)
+String StringUtil::valueToTimeString(float timeVal, int numDecimals)
 {
 	int hours = floor(timeVal / 3600);
 	int minutes = floor(fmodf(timeVal, 3600) / 60);
 	float seconds = fmodf(timeVal, 60);
-	return String::formatted("%02i:%02i:%06.3f", hours, minutes, seconds);
+	if (numDecimals > 0) return String::formatted("%02i:%02i:%0" + String(6 - numDecimals) + "." + String(numDecimals) + "f", hours, minutes, seconds);
+	else return String::formatted("%02i:%02i:%02i", hours, minutes, (int)seconds);
 }
 
 float StringUtil::timeStringToValue(String str)

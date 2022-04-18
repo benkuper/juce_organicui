@@ -14,7 +14,7 @@ DoubleSliderUI::DoubleSliderUI(Array<Point2DParameter*> parameters) :
 	p2d(parameters[0]),
 	xParam("X", "xParam", p2d->x, p2d->minimumValue[0], p2d->maximumValue[0]),
 	yParam("Y", "yParam", p2d->y, p2d->minimumValue[1], p2d->maximumValue[1]),
-	canShowExtendedEditor(true),
+	canShowExtendedEditor(p2d->hasRange()),
 	isUpdatingFromParam(false)
 
 {
@@ -149,18 +149,16 @@ void DoubleSliderUI::showEditWindowInternal()
 	nameWindow->addButton("OK", 1, KeyPress(KeyPress::returnKey));
 	nameWindow->addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
 
-	nameWindow->enterModalState(true, ModalCallbackFunction::create([this, &nameWindow](int result)
+	nameWindow->enterModalState(true, ModalCallbackFunction::create([this, nameWindow](int result)
 		{
-
 			if (result)
 			{
 				float newVals[2];
 				for (int i = 0; i < 2; ++i) newVals[i] = nameWindow->getTextEditorContents("val" + String(i)).getFloatValue();
 				p2d->setUndoablePoint(p2d->x, p2d->y, newVals[0], newVals[1]);
 			}
-		}
-	),
-	true
+		}),
+		true
 	);
 }
 
@@ -181,7 +179,7 @@ void DoubleSliderUI::showEditRangeWindowInternal()
 	nameWindow->addButton("OK", 1, KeyPress(KeyPress::returnKey));
 	nameWindow->addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
 
-	nameWindow->enterModalState(true, ModalCallbackFunction::create([this, &nameWindow](int result)
+	nameWindow->enterModalState(true, ModalCallbackFunction::create([this, nameWindow](int result)
 		{
 			float newMins[2];
 			float newMaxs[2];
@@ -191,8 +189,9 @@ void DoubleSliderUI::showEditRangeWindowInternal()
 				newMaxs[i] = nameWindow->getTextEditorContents("maxVal" + String(i)).getFloatValue();
 			}
 			p2d->setBounds(newMins[0], newMins[1], jmax(newMins[0], newMaxs[0]), jmax(newMins[1], newMaxs[1]));
+
 		}
-	),true);
+	), true);
 }
 
 void DoubleSliderUI::updateUseExtendedEditor()

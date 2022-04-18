@@ -28,9 +28,12 @@ FloatParameterLabelUI::FloatParameterLabelUI(Array<Parameter*> parameters) :
 	valueChanged(parameter->getValue());
 	feedbackStateChanged();
 
-	ParameterUI::setNextFocusOrder(&valueLabel);
+	setWantsKeyboardFocus(true);
+	ParameterUI::setNextFocusOrder(this);
 
 	addMouseListener(this, true);
+
+	valueLabel.onEditorHide = [this]() {labelTextChanged(&valueLabel); };
 
 	handlePaintTimer(); //force update once
 }
@@ -72,7 +75,7 @@ void FloatParameterLabelUI::resized()
 {
 	juce::Rectangle<int> r = getLocalBounds();
 
-	float fontHeight = jmin<float>((float)r.getHeight(), maxFontHeight);
+	float fontHeight = customTextSize > 0 ? customTextSize : jmin<float>((float)r.getHeight(), maxFontHeight);
 	if (showLabel)
 	{
 		nameLabel.setFont(valueLabel.getFont().withHeight(fontHeight));
@@ -131,6 +134,15 @@ void FloatParameterLabelUI::mouseUpInternal(const MouseEvent& e)
 	}
 }
 
+void FloatParameterLabelUI::focusGained(FocusChangeType cause)
+{
+	ParameterUI::focusGained(cause);
+	if (cause == FocusChangeType::focusChangedByTabKey)
+	{
+		valueLabel.showEditor();
+	}
+}
+
 void FloatParameterLabelUI::updateUIParamsInternal()
 {
 	valueLabel.setEditable(false, isInteractable());
@@ -145,7 +157,10 @@ void FloatParameterLabelUI::updateUIParamsInternal()
 	valueLabel.setColour(valueLabel.textWhenEditingColourId, Colours::orange);
 	valueLabel.setTooltip(tooltip);
 
-	repaint();
+	if (customTextSize > 0) valueLabel.setFont(customTextSize);
+	else valueLabel.setFont(Font());
+
+	shouldRepaint = true;
 }
 
 
@@ -161,7 +176,25 @@ void FloatParameterLabelUI::valueChanged(const var& v)
 
 void FloatParameterLabelUI::labelTextChanged(Label*)
 {
-	parameter->setValue(ParameterUI::textToValue(valueLabel.getText().replace(",", ".")));
+	String s = valueLabel.getText();
+	double v = ParameterUI::textToValue(s.replace(",", "."));
+
+	//if (showLabel)
+	//{
+	//	String label = customLabel.isNotEmpty() ? customLabel : parameter->niceName;
+	//	s = s.substring(label.length() + 3); // including " : ";
+	//}
+	//s = s.substring(prefix.length(), s.length() - suffix.length());
+
+	if ((float)v == float(parameter->value)) valueLabel.setText(getValueString(v), dontSendNotification);
+	parameter->setValue(v);
+}
+
+void FloatParameterLabelUI::editorShown(Label* label, TextEditor& t)
+{
+	if (parameter.wasObjectDeleted()) return;
+	t.setText(getValueString(parameter->value), dontSendNotification);
+	//valueLabel.showEditor();
 }
 
 
@@ -172,7 +205,9 @@ void FloatParameterLabelUI::handlePaintTimerInternal()
 	int newStyle = parameter->isOverriden ? Font::bold : Font::plain;
 	if (valueLabel.getFont().getStyleFlags() != newStyle) valueLabel.setFont(valueLabel.getFont().withStyle(newStyle));
 
-	valueLabel.setText(prefix + getValueString(parameter->value) + suffix, NotificationType::dontSendNotification);
+	String s = prefix + getValueString(parameter->value) + suffix;
+	if (showLabel) s = (customLabel.isNotEmpty() ? customLabel : parameter->niceName) + " : " + s;
+	valueLabel.setText(s, NotificationType::dontSendNotification);
 	if (autoSize)
 	{
 		int valueLabelWidth = valueLabel.getFont().getStringWidth(valueLabel.getText());
@@ -202,14 +237,21 @@ void TimeLabel::setShowStepsMode(bool stepsMode)
 
 void TimeLabel::valueChanged(const var& v)
 {
-	String timeString = showStepsMode ? String((float)v * ((FloatParameter*)parameter.get())->unitSteps) : StringUtil::valueToTimeString(v);
-	FloatParameterLabelUI::valueChanged(timeString);
-
+	//String timeString = showStepsMode ? String((float)v * ((FloatParameter*)parameter.get())->unitSteps) : StringUtil::valueToTimeString(v);
+	FloatParameterLabelUI::valueChanged(v);// timeString);
 }
 
 void TimeLabel::labelTextChanged(Label*)
 {
-	parameter->setValue(showStepsMode ? valueLabel.getText().getFloatValue() / ((FloatParameter*)parameter.get())->unitSteps : StringUtil::timeStringToValue(valueLabel.getText()));
+	String s = valueLabel.getText();
+	if (showLabel)
+	{
+		String label = customLabel.isNotEmpty() ? customLabel : parameter->niceName;
+		s = s.substring(label.length() + 3);
+	}
+	s = s.substring(prefix.length(), s.length() - suffix.length());
+
+	parameter->setValue(showStepsMode ? s.getFloatValue() / ((FloatParameter*)parameter.get())->unitSteps : StringUtil::timeStringToValue(s));
 	shouldRepaint = true;
 }
 

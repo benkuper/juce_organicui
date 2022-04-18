@@ -4,6 +4,7 @@
 #include "dashboard/ui/DashboardItemUI.cpp"
 #include "dashboard/ui/DashboardCommentItemUI.cpp"
 #include "dashboard/ui/DashboardGroupItemUI.cpp"
+#include "dashboard/ui/DashboardLinkItemUI.cpp"
 #include "dashboard/ui/DashboardManagerUI.cpp"
 #include "dashboard/ui/DashboardManagerView.cpp"
 #include "dashboard/ui/DashboardUI.cpp"

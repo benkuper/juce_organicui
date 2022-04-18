@@ -10,7 +10,6 @@ public:
 
 	StringParameter* text;
 	FloatParameter* size;
-	ColorParameter* color;
 	FloatParameter* bgAlpha;
 
 	var getServerData() override;

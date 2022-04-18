@@ -113,6 +113,7 @@ public:
 	};
 
 	virtual SnapResult getClosestSnapUI(Point<float> pos, bool isX, float spacingBefore, float spacingAfter);
+
 };
 
 template<class M, class T, class U>
@@ -135,6 +136,33 @@ BaseManagerViewUI<M, T, U>::BaseManagerViewUI(const String& contentName, M* _man
 	this->bgColor = BG_COLOR.darker(.3f);
 
 	this->setWantsKeyboardFocus(true);
+
+	this->headerSize = 28;
+
+	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_left_png, OrganicUIBinaryData::align_left_pngSize)), [this]() { this->alignItems(BaseManagerUI<M, T, U>::AlignMode::LEFT); });
+
+	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_center_h_png, OrganicUIBinaryData::align_center_h_pngSize)), [this]() { this->alignItems(BaseManagerUI<M, T, U>::AlignMode::CENTER_H); });
+	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_right_png, OrganicUIBinaryData::align_right_pngSize)), [this]() { this->alignItems(BaseManagerUI<M, T, U>::AlignMode::RIGHT); });
+	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_top_png, OrganicUIBinaryData::align_top_pngSize)), [this]() { this->alignItems(BaseManagerUI<M, T, U>::AlignMode::TOP); });
+	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_center_v_png, OrganicUIBinaryData::align_center_v_pngSize)), [this]() { this->alignItems(BaseManagerUI<M, T, U>::AlignMode::CENTER_V); });
+	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::align_bottom_png, OrganicUIBinaryData::align_bottom_pngSize)), [this]() { this->alignItems(BaseManagerUI<M, T, U>::AlignMode::BOTTOM); });
+	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::distribute_h_png, OrganicUIBinaryData::distribute_h_pngSize)), [this]() { this->distributeItems(false); });
+	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::distribute_v_png, OrganicUIBinaryData::distribute_v_pngSize)), [this]() { this->distributeItems(true); });
+
+	if (this->manager->snapGridMode != nullptr)
+	{
+		this->addControllableTool(this->manager->snapGridMode->createToggle(ImageCache::getFromMemory(OrganicUIBinaryData::snap_grid_png, OrganicUIBinaryData::snap_grid_pngSize)));
+		this->addControllableTool(this->manager->showSnapGrid->createToggle(ImageCache::getFromMemory(OrganicUIBinaryData::show_grid_png, OrganicUIBinaryData::show_grid_pngSize)));
+	}
+
+	for (auto& t : this->tools)  t->setSize(16, 16);
+
+	if (this->manager->snapGridMode != nullptr)
+	{
+		ControllableUI* sizeUI = this->manager->snapGridSize->createDefaultUI();
+		sizeUI->setSize(60, 16);
+		this->addControllableTool(sizeUI);
+	}
 }
 
 
@@ -305,6 +333,16 @@ void BaseManagerViewUI<M, T, U>::paintBackground(Graphics& g)
 	g.drawLine(center.x, 0, center.x, this->getHeight(), 2);
 	g.drawLine(0, center.y, this->getWidth(), center.y, 2);
 
+	if (this->manager->showSnapGrid != nullptr && this->manager->showSnapGrid->boolValue())
+	{
+		g.setColour(BG_COLOR.brighter(.1f));
+
+		float step = this->manager->snapGridSize->intValue() * this->manager->viewZoom;
+		float startX = fmodf(this->getViewCenter().x, step) - step;
+		float startY = fmodf(this->getViewCenter().y, step) - step;
+		for (float i = startX; i <= this->getWidth(); i += step) g.drawVerticalLine(i, 0, this->getHeight());
+		for (float i = startY; i <= this->getHeight(); i += step) g.drawHorizontalLine(i, 0, this->getWidth());
+	}
 }
 
 template<class M, class T, class U>
@@ -335,7 +373,10 @@ void BaseManagerViewUI<M, T, U>::resized()
 	if (this->inspectable.wasObjectDeleted()) return;
 
 	juce::Rectangle<int> r = this->getLocalBounds();
-	this->addItemBT->setBounds(r.withSize(24, 24).withX(r.getWidth() - 24));
+	//this->addItemBT->setBounds(r.withSize(24, 24).withX(r.getWidth() - 24));
+
+	juce::Rectangle<int> hr = r.removeFromTop(this->headerSize);
+	this->resizedInternalHeader(hr);
 
 	Array<U*> filteredItems = this->getFilteredItems();
 	for (auto& tui : filteredItems)
@@ -401,6 +442,8 @@ void BaseManagerViewUI<M, T, U>::updateItemsVisibility()
 		viewPane->updateContent();
 		viewPane->toFront(false);
 	}
+
+	if (this->toolContainer.isVisible()) this->toolContainer.toFront(false);
 }
 
 template<class M, class T, class U>
@@ -570,7 +613,14 @@ void BaseManagerViewUI<M, T, U>::itemDragMove(const DragAndDropTarget::SourceDet
 
 	Point<int> snapPosition = realP;
 
-	if (enableSnapping)
+	if (this->manager->snapGridMode != nullptr && this->manager->snapGridMode->boolValue())
+	{
+		Point<float> vPos = this->getViewPos(snapPosition);
+		float snapViewSize = this->manager->snapGridSize->floatValue() / (useCheckersAsUnits ? checkerSize : 1);
+		targetSnapViewPosition.setXY(vPos.x - fmodf(vPos.x, snapViewSize), vPos.y - fmodf(vPos.y, snapViewSize));
+		snapPosition = this->getPosInView(targetSnapViewPosition);
+	}
+	else if (enableSnapping)
 	{
 
 		int distX = snappingThreshold;
@@ -716,33 +766,42 @@ void BaseManagerViewUI<M, T, U>::askForSyncPosAndSize(BaseItemMinimalUI<T>* item
 template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::itemUIResizeDrag(BaseItemMinimalUI<T>* itemUI, const Point<int>& dragOffset)
 {
-
-	Point<float> pos = itemUI->baseItem->getPosition() + itemUI->baseItem->sizeReference + getViewOffset(dragOffset);
-
+	Point<float> pos = itemUI->baseItem->getPosition() + itemUI->baseItem->sizeReference + dragOffset.toFloat() / (useCheckersAsUnits ? checkerSize : 1);// getViewOffset(dragOffset);
+	
 	Point<float> snapPos = pos;
 
-	SnapResult snapX = getClosestSnapUI(pos, true, snappingSpacing, 0);
-	SnapResult snapY = getClosestSnapUI(pos, false, snappingSpacing, 0);
-
-	Point<int> snapInView = getPosInView(Point<float>(snapX.pos, snapY.pos));
-
-	snapLineX = Line<int>();
-	if (snapX.targetUI != nullptr)
+	if (this->manager->snapGridMode != nullptr && this->manager->snapGridMode->boolValue())
 	{
-		snapLineX.setStart(Point<int>(snapInView.x, jmin<int>(itemUI->getBounds().getY(), snapX.targetUI->getBounds().getY()) - 20));
-		snapLineX.setEnd(Point<int>(snapInView.x, jmax<int>(itemUI->getBounds().getBottom(), snapX.targetUI->getBounds().getBottom()) + 20));
-		snapPos.x = snapX.pos;
+		float snapViewSize = this->manager->snapGridSize->floatValue() / (useCheckersAsUnits ? checkerSize : 1);
+		snapPos.setXY(pos.x - fmodf(pos.x, snapViewSize), pos.y - fmodf(pos.y, snapViewSize));
+	}
+	else if (enableSnapping)
+	{
+
+		SnapResult snapX = getClosestSnapUI(pos, true, snappingSpacing, 0);
+		SnapResult snapY = getClosestSnapUI(pos, false, snappingSpacing, 0);
+
+		Point<int> snapInView = getPosInView(Point<float>(snapX.pos, snapY.pos));
+
+		snapLineX = Line<int>();
+		if (snapX.targetUI != nullptr)
+		{
+			snapLineX.setStart(Point<int>(snapInView.x, jmin<int>(itemUI->getBounds().getY(), snapX.targetUI->getBounds().getY()) - 20));
+			snapLineX.setEnd(Point<int>(snapInView.x, jmax<int>(itemUI->getBounds().getBottom(), snapX.targetUI->getBounds().getBottom()) + 20));
+			snapPos.x = snapX.pos;
+		}
+
+		snapLineY = Line<int>();
+		if (snapY.targetUI != nullptr)
+		{
+			snapLineY.setStart(Point<int>(jmin<int>(itemUI->getBounds().getX(), snapY.targetUI->getBounds().getX()) - 20, snapInView.y));
+			snapLineY.setEnd(Point<int>(jmax<int>(itemUI->getBounds().getRight(), snapY.targetUI->getBounds().getRight()) + 20, snapInView.y));
+			snapPos.y = snapY.pos;
+		}
+
+		this->repaint();
 	}
 
-	snapLineY = Line<int>();
-	if (snapY.targetUI != nullptr)
-	{
-		snapLineY.setStart(Point<int>(jmin<int>(itemUI->getBounds().getX(), snapY.targetUI->getBounds().getX()) - 20, snapInView.y));
-		snapLineY.setEnd(Point<int>(jmax<int>(itemUI->getBounds().getRight(), snapY.targetUI->getBounds().getRight()) + 20, snapInView.y));
-		snapPos.y = snapY.pos;
-	}
-
-	this->repaint();
 
 	Point<float> offset = snapPos - (itemUI->baseItem->getPosition() + itemUI->baseItem->sizeReference);
 	itemUI->baseItem->resizeItem(offset, true);
@@ -782,9 +841,9 @@ typename BaseManagerViewUI<M, T, U>::SnapResult BaseManagerViewUI<M, T, U>::getC
 		float distBefore = fabsf(initPos - posBefore);
 		float distAfter = fabsf(initPos - posAfter);
 
-		if (distBefore < curDist) { curDist = distBefore; target = posBefore;  }
+		if (distBefore < curDist) { curDist = distBefore; target = posBefore; }
 		if (distAfter < curDist) { curDist = distAfter; target = posAfter; }
-		
+
 		if (curDist < dist)
 		{
 			targetUI = dynamic_cast<BaseItemMinimalUI<T>*>(ui);

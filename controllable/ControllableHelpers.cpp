@@ -126,7 +126,7 @@ void ContainerChooserPopupMenu::populateMenu(PopupMenu* subMenu, ControllableCon
 				if (excludeTypesFilter.contains(bi->getTypeString())) continue;
 				if (!typesFilter.isEmpty() && !typesFilter.contains(bi->getTypeString())) continue;
 			}
-			
+
 			containerList.add(cc);
 			subMenu->addItem(currentId, cc->niceName);
 			currentId++;
@@ -182,3 +182,93 @@ int ControllableComparator::compareElements(Controllable* c1, Controllable* c2)
 	return c1->niceName.compareIgnoreCase(c2->niceName);
 }
 
+void ControllableParser::createControllablesFromJSONObject(var data, ControllableContainer* container)
+{
+	if (!data.isObject()) return;
+
+	DynamicObject* dataObject = data.getDynamicObject();
+	if (dataObject == nullptr) return;
+
+	NamedValueSet props = dataObject->getProperties();
+
+	for (auto& p : props)
+	{
+		if (!p.name.isValid()) continue;
+
+		if (p.value.isArray() && p.value.size() > 0 && p.value[0].isObject())
+		{
+			for (int i = 0; i < p.value.size(); ++i)
+			{
+				ControllableContainer* cc = container->getControllableContainerByName(String(i), true);
+				if (cc == nullptr)
+				{
+					cc = new ControllableContainer(String(i));
+					container->addChildControllableContainer(cc, true);
+					cc->userCanAddControllables = true;
+					cc->saveAndLoadRecursiveData = true;
+					cc->saveAndLoadName = true;
+				}
+
+				createControllablesFromJSONObject(p.value[i], cc);
+			}
+		}
+		else if (p.value.isObject() && !p.value.isArray())
+		{
+			ControllableContainer* cc = container->getControllableContainerByName(p.name.toString(), true);
+			if (cc == nullptr)
+			{
+				cc = new ControllableContainer(p.name.toString());
+				container->addChildControllableContainer(cc, true);
+				cc->userCanAddControllables = true;
+				cc->saveAndLoadRecursiveData = true;
+				cc->saveAndLoadName = true;
+			}
+
+			createControllablesFromJSONObject(p.value, cc);
+		}
+		else
+		{
+			createControllableFromJSONObject(p.name.toString(), p.value, container);
+		}
+	}
+}
+
+void ControllableParser::createControllableFromJSONObject(StringRef cName, var data, ControllableContainer* container)
+{
+	Controllable* newC = container->getControllableByName(cName, true);
+	if (newC == nullptr)
+	{
+		if (data.isBool()) newC = new BoolParameter(cName, cName, false);
+		else if (data.isDouble()) newC = new FloatParameter(cName, cName, 0);
+		else if (data.isInt()) newC = new IntParameter(cName, cName, 0);
+		else if (data.isString() || data.isVoid()) newC = new StringParameter(cName, cName, "");
+		else if (data.isArray())
+		{
+			if (data.size() == 1) newC = new FloatParameter(cName, cName, 0);
+			else if (data.size() == 2) newC = new Point2DParameter(cName, cName);
+			else if (data.size() == 3) newC = new Point3DParameter(cName, cName);
+			else if (data.size() == 3) newC = new ColorParameter(cName, cName);
+		}
+
+
+		if (newC != nullptr)
+		{
+			newC->isCustomizableByUser = true;
+			newC->isRemovableByUser = true;
+			newC->isSavable = true;
+			newC->saveValueOnly = false;
+			container->addControllable(newC);
+		}
+	}
+
+	if (newC != nullptr)
+	{
+		if (newC->type == Controllable::TRIGGER && (int)data != 0) ((Trigger*)newC)->trigger();
+		else
+		{
+			Parameter* param = dynamic_cast<Parameter*>(newC);
+			if (param != nullptr) param->setValue(data.isVoid() ? "" : data, false, true);
+		}
+	}
+
+}

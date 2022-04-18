@@ -14,10 +14,11 @@ class BaseItemEditor :
 	public EnablingControllableContainerEditor
 {
 public:
-	BaseItemEditor(BaseItem * bi, bool isRoot);
+	BaseItemEditor(Array<BaseItem *> bi, bool isRoot);
 	~BaseItemEditor();
 
-	BaseItem * item;
+	Array<BaseItem *> items;
+	BaseItem* item;
 
 	bool isFirst;
 	bool isLast;
@@ -33,5 +34,4 @@ public:
 	virtual void resizedInternalHeader(juce::Rectangle<int> & r) override;
 	virtual void resizedInternalHeaderItemInternal(juce::Rectangle<int> &) {}
 	virtual void buttonClicked(Button *b) override;
-
 };

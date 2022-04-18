@@ -9,17 +9,20 @@
 */
 
 
-GenericControllableContainerEditor::GenericControllableContainerEditor(WeakReference<Inspectable> inspectable, bool isRoot, bool buildAtCreation) :
-	InspectableEditor(inspectable, isRoot),
+GenericControllableContainerEditor::GenericControllableContainerEditor(Array<ControllableContainer *> containers, bool isRoot, bool buildAtCreation) :
+	InspectableEditor(Inspectable::getArrayAs<ControllableContainer, Inspectable>(containers), isRoot),
 	headerHeight(GlobalSettings::getInstance()->fontSize->floatValue() + 8),
 	isRebuilding(false),
 	prepareToAnimate(false),
 	contourColor(BG_COLOR.brighter(.3f)),
 	containerLabel("containerLabel", dynamic_cast<ControllableContainer*>(inspectable.get())->niceName),
-	container(dynamic_cast<ControllableContainer*>(inspectable.get())),
+	containers(containers),
 	headerSpacer("headerSpacer"),
 	dragAndDropEnabled(true)
 {
+	jassert(containers.size() > 0);
+
+	container = containers[0];
 	container->addAsyncContainerListener(this);
 	addAndMakeVisible(containerLabel);
 
@@ -59,6 +62,11 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(WeakRefer
 		addChildComponent(expandBT.get());
 		addChildComponent(collapseBT.get());
 
+		expandBT->setWantsKeyboardFocus(false);
+		collapseBT->setWantsKeyboardFocus(false);
+		expandBT->setMouseClickGrabsKeyboardFocus(false);
+		collapseBT->setMouseClickGrabsKeyboardFocus(false);
+
 		addAndMakeVisible(headerSpacer);
 		headerSpacer.addMouseListener(this, false);
 
@@ -77,6 +85,9 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(WeakRefer
 	{
 		removeBT.reset(AssetManager::getInstance()->getRemoveBT());
 		removeBT->addListener(this);
+		removeBT->setWantsKeyboardFocus(false);
+		removeBT->setMouseClickGrabsKeyboardFocus(false);
+
 		addAndMakeVisible(removeBT.get());
 	}
 
@@ -221,6 +232,7 @@ void GenericControllableContainerEditor::showContextMenu()
 
 void GenericControllableContainerEditor::setCollapsed(bool value, bool force, bool animate, bool doNotRebuild)
 {
+	if (container.wasObjectDeleted()) return;
 	if (container->editorIsCollapsed == value && !force) return;
 
 	if (isRoot || !container->editorCanBeCollapsed) return;
@@ -284,7 +296,7 @@ void GenericControllableContainerEditor::resetAndBuild()
 		LOGWARNING("An error has occured here (container null on ResetAndBuild");
 		return;
 	}
-	if (container->hideInEditor) return;
+	//if (container->hideInEditor) return;
 
 	if (!canBeCollapsed() || !container->editorIsCollapsed)
 	{
@@ -627,7 +639,8 @@ void GenericControllableContainerEditor::resizedInternalHeader(juce::Rectangle<i
 		r.removeFromLeft(2);
 	}
 
-	containerLabel.setBounds(r.removeFromLeft(containerLabel.getFont().getStringWidth(containerLabel.getText()) + 20));
+	if(containerLabel.isVisible()) containerLabel.setBounds(r.removeFromLeft(containerLabel.getFont().getStringWidth(containerLabel.getText()) + 20));
+	
 	headerSpacer.setBounds(r);
 }
 
@@ -669,11 +682,15 @@ bool GenericControllableContainerEditor::canBeCollapsed()
 
 //EnablingControllableContainerEditor
 
-EnablingControllableContainerEditor::EnablingControllableContainerEditor(EnablingControllableContainer* cc, bool isRoot, bool buildAtCreation) :
-	GenericControllableContainerEditor(cc, isRoot, buildAtCreation),
-	ioContainer(cc)
+EnablingControllableContainerEditor::EnablingControllableContainerEditor(Array<EnablingControllableContainer*> cc, bool isRoot, bool buildAtCreation) :
+	GenericControllableContainerEditor(Inspectable::getArrayAs<EnablingControllableContainer, ControllableContainer>(cc), isRoot, buildAtCreation),
+	ioContainers(cc)
 {
-	if (cc->canBeDisabled)
+	jassert(ioContainers.size() > 0);
+
+	ioContainer = cc[0];
+
+	if (ioContainer->canBeDisabled)
 	{
 		enabledUI.reset(ioContainer->enabled->createToggle(ImageCache::getFromMemory(OrganicUIBinaryData::power_png, OrganicUIBinaryData::power_pngSize)));
 		addAndMakeVisible(enabledUI.get());

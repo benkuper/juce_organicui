@@ -101,6 +101,7 @@ public:
 	virtual void setWeightedValue(Array<var> values, Array<float> weights) {} // to be overriden
 	virtual var getCroppedValue(var originalValue);
 
+	virtual void setDefaultValue(var val, bool doResetValue = true);
     virtual void resetValue(bool silentSet = false);
 	virtual UndoableAction * setUndoableValue(var oldValue, var newValue, bool onlyReturnAction = false);
     virtual void setValue(var _value, bool silentSet = false, bool force = false, bool forceOverride = true);
@@ -134,7 +135,7 @@ public:
 	virtual void parameterValueChanged(Parameter * p) override;
 
 
-	InspectableEditor* getEditorInternal(bool isRoot) override;
+	InspectableEditor* getEditorInternal(bool isRoot, Array<Inspectable*> inspectables = Array<Inspectable*>()) override;
 	virtual ControllableDetectiveWatcher* getDetectiveWatcher() override;
 
 	virtual DashboardItem* createDashboardItem() override;

@@ -46,7 +46,7 @@ public:
 	StringArray userAddControllablesFilters;
 	
 
-	std::function<InspectableEditor *(ControllableContainer *, bool)> customGetEditorFunc;
+	std::function<InspectableEditor *(bool, Array<ControllableContainer*>)> customGetEditorFunc;
 
 	//save / load
 	bool saveAndLoadRecursiveData;
@@ -300,7 +300,7 @@ public:
 
 
 
-	virtual InspectableEditor * getEditorInternal(bool /*isRootEditor*/) override;
+	virtual InspectableEditor * getEditorInternal(bool isRoot, Array<Inspectable*> inspectables = Array<Inspectable*>()) override;
 	virtual DashboardItem * createDashboardItem() override;
 
 	private:
@@ -320,5 +320,5 @@ public:
 	bool canBeDisabled;
 	void setCanBeDisabled(bool value);
 
-	virtual InspectableEditor * getEditorInternal(bool isRoot) override;
+	virtual InspectableEditor * getEditorInternal(bool isRoot, Array<Inspectable*> inspectables = Array<Inspectable*>()) override;
 };

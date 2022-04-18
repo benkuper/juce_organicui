@@ -12,6 +12,7 @@ public:
 
 	BoolParameter * showLabel;
 	ColorParameter* textColor;
+	IntParameter* textSize;
 	BoolParameter * opaqueBackground;
 	ColorParameter* contourColor;
 	FloatParameter* contourThickness;

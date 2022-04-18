@@ -21,19 +21,22 @@ public:
 	EnumParameter(const String &niceName, const String &description, bool enabled = true);
 	~EnumParameter();
 
-	EnumParameter * addOption(String key, var data, bool selectIfFirstOption = true); //daisy chain
-	void updateOption(int index, String key, var data);
-	void removeOption(String key);
-	void clearOptions();
-
-	void updateArgDescription();
-
 	struct EnumValue
 	{
 		EnumValue(String key, var value) : key(key), value(value) {}
 		String key;
 		var value;
 	};
+
+	EnumParameter * addOption(String key, var data, bool selectIfFirstOption = true); //daisy chain
+	void updateOption(int index, String key, var data, bool addIfNotThere = false);
+	void removeOption(String key);
+	void setOptions(Array<EnumValue *> options);
+	void clearOptions();
+
+	void updateArgDescription();
+
+	
 
 	OwnedArray<EnumValue> enumValues;
 

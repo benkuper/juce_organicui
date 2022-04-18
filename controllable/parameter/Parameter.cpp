@@ -1,3 +1,4 @@
+#include "Parameter.h"
 /*
   ==============================================================================
 
@@ -139,6 +140,12 @@ var Parameter::getLerpValueTo(var targetValue, float weight)
 	return getValue(); //to be overriden
 }
 
+void Parameter::setDefaultValue(var val, bool doResetValue)
+{
+	defaultValue = getCroppedValue(val);
+	if (doResetValue) resetValue();
+}
+
 void Parameter::resetValue(bool silentSet)
 {
 	isOverriden = false;
@@ -252,17 +259,17 @@ bool Parameter::hasRange()
 		GenericScopedLock<SpinLock> lock(valueSetLock);
 		if (isComplex())
 		{
-			for (int i = 0; i < value.size(); ++i) if ((float)minimumValue[i] != INT32_MIN || (float)maximumValue[i] != INT32_MAX) return true;
+			for (int i = 0; i < value.size(); ++i) if ((float)minimumValue[i] != INT32_MIN && (float)maximumValue[i] != INT32_MAX) return true;
 		}
 		else
 		{
 			if (minimumValue.isInt())
 			{
-				if ((int)minimumValue != INT32_MIN || (int)maximumValue != INT32_MAX) return true;
+				if ((int)minimumValue != INT32_MIN && (int)maximumValue != INT32_MAX) return true;
 			}
 			else if (minimumValue.isDouble())
 			{
-				if ((float)minimumValue != INT32_MIN || (float)maximumValue != INT32_MAX) return true;
+				if ((float)minimumValue != INT32_MIN && (float)maximumValue != INT32_MAX) return true;
 
 			}
 		}
@@ -430,7 +437,7 @@ void Parameter::parameterValueChanged(Parameter* p)
 	}
 }
 
-InspectableEditor* Parameter::getEditorInternal(bool isRoot)
+InspectableEditor* Parameter::getEditorInternal(bool isRoot, Array<Inspectable*> inspectables)
 {
 	return new ParameterEditor(this, isRoot);
 }
@@ -452,6 +459,7 @@ bool Parameter::shouldBeSaved()
 	if (forceSaveRange) return true;
 	if (isOverriden && !isControllableFeedbackOnly && isSavable) return true;
 	if (controlMode != MANUAL) return true;
+	if (colorStatusMap.size() > 0) return true;
 	return false;
 }
 

@@ -73,3 +73,12 @@ public:
 	virtual ~ControllableComparator() {}
 	virtual int compareElements(Controllable* c1, Controllable* c2);
 };
+
+
+
+class ControllableParser
+{
+public:
+	static void createControllablesFromJSONObject(var data, ControllableContainer* container);
+	static void createControllableFromJSONObject(StringRef name, var data, ControllableContainer *container);
+};

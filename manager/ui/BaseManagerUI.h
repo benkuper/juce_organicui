@@ -90,6 +90,17 @@ public:
 	std::unique_ptr<ImageButton> addItemBT;
 	std::unique_ptr<Label> searchBar;
 
+	class ToolContainer : public Component
+	{
+	public:
+		ToolContainer() : Component("Tools") {}
+		void paint(Graphics& g) override { g.setColour(BG_COLOR.darker(.6f)); g.fillRoundedRectangle(getLocalBounds().toFloat(), 2); }
+	};
+	ToolContainer toolContainer;
+	OwnedArray<Component> tools;
+	HashMap<Button*, std::function<void()>> toolFuncMap;
+	bool showTools;
+
 	//ui
 	String noItemText;
 
@@ -120,14 +131,34 @@ public:
 	void setShowAddButton(bool value);
 	void setShowSearchBar(bool value);
 
+	//tools
+	void setShowTools(bool value);
+	void addButtonTool(Button* c, std::function<void()> clickFunc = nullptr);
+	void addControllableTool(ControllableUI* c);
+
 	virtual void paint(Graphics& g) override;
 
 	virtual void resized() override;
 	virtual juce::Rectangle<int> setHeaderBounds(juce::Rectangle<int>& r);
 	virtual void resizedInternalHeader(juce::Rectangle<int>& r);
+	virtual void resizedInternalHeaderTools(juce::Rectangle<int>& r);
 	virtual void resizedInternalContent(juce::Rectangle<int>& r);
 	virtual void placeItems(juce::Rectangle<int>& r);
 	virtual void resizedInternalFooter(juce::Rectangle<int>& r);
+
+	enum AlignMode { LEFT, RIGHT, TOP, BOTTOM, CENTER_H, CENTER_V };
+	virtual void alignItems(AlignMode alignMode);
+
+	class PositionComparator
+	{
+	public:
+		PositionComparator(bool isVertical) : isVertical(isVertical) {}
+		bool isVertical;
+		int compareElements(T* i1, T* i2) {
+			return isVertical ? i2->viewUIPosition->y - i1->viewUIPosition->y : i2->viewUIPosition->x - i1->viewUIPosition->x;
+		}
+	};
+	virtual void distributeItems(bool isVertical);
 
 	virtual void updateItemsVisibility();
 	virtual void updateItemVisibility(U* bui);
@@ -231,6 +262,7 @@ BaseManagerUI<M, T, U>::BaseManagerUI(const String& contentName, M* _manager, bo
 	resizeOnChildBoundsChanged(true),
 	autoFilterHitTestOnItems(false),
 	validateHitTestOnNoItem(true),
+	showTools(false),
 	animateItemOnAdd(true),
 	useDedicatedSelector(true),
 	selectingItems(false),
@@ -266,7 +298,6 @@ BaseManagerUI<M, T, U>::BaseManagerUI(const String& contentName, M* _manager, bo
 	addItemBT->addListener(this);
 
 	setShowAddButton(baseM->userCanAddItemsManually);
-
 
 	acceptedDropTypes.add(baseM->itemDataType);
 
@@ -339,6 +370,42 @@ void BaseManagerUI<M, T, U>::setShowSearchBar(bool value)
 		removeChildComponent(searchBar.get());
 		searchBar.reset();
 	}
+}
+
+template<class M, class T, class U>
+void BaseManagerUI<M, T, U>::setShowTools(bool value)
+{
+	if (value == showTools) return;
+
+	showTools = value;
+	if (value)
+	{
+		addAndMakeVisible(&toolContainer);
+	}
+	else
+	{
+		toolContainer.setVisible(false);
+		removeChildComponent(&toolContainer);
+	}
+
+	resized();
+}
+
+template<class M, class T, class U>
+void BaseManagerUI<M, T, U>::addButtonTool(Button* c, std::function<void()> clickFunc)
+{
+	if (tools.contains(c)) return;
+	tools.add(c);
+	toolContainer.addAndMakeVisible(c);
+	if (clickFunc != nullptr) toolFuncMap.set(c, clickFunc);
+	c->addListener(this);
+}
+
+template<class M, class T, class U>
+void BaseManagerUI<M, T, U>::addControllableTool(ControllableUI* c)
+{
+	toolContainer.addAndMakeVisible(c);
+	tools.add(c);
 }
 
 template<class M, class T, class U>
@@ -514,14 +581,40 @@ void BaseManagerUI<M, T, U>::resizedInternalHeader(juce::Rectangle<int>& hr)
 {
 	if (addItemBT != nullptr && addItemBT->isVisible() && addItemBT->getParentComponent() == this)
 	{
-		if (defaultLayout == VERTICAL) addItemBT->setBounds(hr.removeFromRight(hr.getHeight()).reduced(2));
+		if (defaultLayout == VERTICAL || defaultLayout == FREE) addItemBT->setBounds(hr.removeFromRight(hr.getHeight()).reduced(2));
 		else addItemBT->setBounds(hr.removeFromTop(24).removeFromRight(24).reduced(2));
 	}
 
 	if (searchBar != nullptr && searchBar->isVisible() && searchBar->getParentComponent() == this)
 	{
-		if (defaultLayout == VERTICAL) searchBar->setBounds(hr.removeFromLeft(150).reduced(2));
+		if (defaultLayout == VERTICAL || defaultLayout == FREE) searchBar->setBounds(hr.removeFromLeft(150).reduced(2));
 		else searchBar->setBounds(hr.removeFromTop(20).reduced(2));
+	}
+
+	if (showTools) resizedInternalHeaderTools(hr);
+}
+
+template<class M, class T, class U>
+void BaseManagerUI<M, T, U>::resizedInternalHeaderTools(juce::Rectangle<int>& r)
+{
+	r.removeFromLeft(4);
+
+	float rSize = 0;
+	for (auto& t : this->tools) rSize += jmax(t->getWidth(), r.getHeight());
+
+	r.removeFromLeft((r.getWidth() - rSize) / 2);
+
+	if (r.getWidth() == 0 || r.getHeight() == 0) return;
+
+	toolContainer.setBounds(r.withWidth(rSize));
+
+	juce::Rectangle<int> toolR = toolContainer.getLocalBounds();
+
+	for (auto& t : this->tools)
+	{
+		juce::Rectangle<int> tr = toolR.removeFromLeft(jmax(t->getWidth(), r.getHeight()));
+		tr.reduce(tr.getWidth() == toolR.getHeight() ? 6 : 0, 6);
+		t->setBounds(tr);
 	}
 }
 
@@ -594,9 +687,98 @@ void BaseManagerUI<M, T, U>::resizedInternalFooter(juce::Rectangle<int>& r)
 }
 
 template<class M, class T, class U>
+void BaseManagerUI<M, T, U>::alignItems(AlignMode alignMode)
+{
+	Array<T*> inspectables = InspectableSelectionManager::activeSelectionManager->getInspectablesAs<T>();
+	if (inspectables.size() == 0) return;
+
+	float target = (alignMode == BaseManagerUI<M, T, U>::AlignMode::CENTER_V || alignMode == BaseManagerUI<M, T, U>::AlignMode::CENTER_H) ? 0 : ((alignMode == BaseManagerUI<M, T, U>::AlignMode::LEFT || alignMode == BaseManagerUI<M, T, U>::AlignMode::TOP) ? INT32_MAX : INT32_MIN);
+
+	Array<T*> goodInspectables;
+	for (auto& i : inspectables)
+	{
+		if (i == nullptr || !manager->items.contains(i)) continue;
+		switch (alignMode)
+		{
+		case BaseManagerUI<M, T, U>::AlignMode::LEFT: target = jmin(i->viewUIPosition->x, target); break;
+		case BaseManagerUI<M, T, U>::AlignMode::RIGHT: target = jmax(i->viewUIPosition->x + i->viewUISize->x, target); break;
+		case BaseManagerUI<M, T, U>::AlignMode::CENTER_H: target += i->viewUIPosition->x + i->viewUISize->x / 2; break;
+		case BaseManagerUI<M, T, U>::AlignMode::TOP: target = jmin(target, i->viewUIPosition->y); break;
+		case BaseManagerUI<M, T, U>::AlignMode::BOTTOM: target = jmax(target, i->viewUIPosition->y + i->viewUISize->y); break;
+		case BaseManagerUI<M, T, U>::AlignMode::CENTER_V: target += i->viewUIPosition->y + i->viewUISize->y / 2; break;
+		}
+		goodInspectables.add(i);
+	}
+
+	if (goodInspectables.size() == 0) return;
+
+	if (alignMode == CENTER_H || alignMode == CENTER_V) target /= goodInspectables.size();
+
+	Array<UndoableAction*> actions;
+	for (auto& i : goodInspectables)
+	{
+		Point<float> targetPoint;
+		switch (alignMode)
+		{
+		case BaseManagerUI<M, T, U>::AlignMode::LEFT: targetPoint = Point<float>(target, i->viewUIPosition->y); break;
+		case BaseManagerUI<M, T, U>::AlignMode::RIGHT: targetPoint = Point<float>(target - i->viewUISize->x, i->viewUIPosition->y); break;
+		case BaseManagerUI<M, T, U>::AlignMode::CENTER_H: targetPoint = Point<float>(target - i->viewUISize->x / 2, i->viewUIPosition->y);  break;
+		case BaseManagerUI<M, T, U>::AlignMode::TOP: targetPoint = Point<float>(i->viewUIPosition->x, target); break;
+		case BaseManagerUI<M, T, U>::AlignMode::BOTTOM:targetPoint = Point<float>(i->viewUIPosition->x, target - i->viewUISize->y); break;
+		case BaseManagerUI<M, T, U>::AlignMode::CENTER_V:targetPoint = Point<float>(i->viewUIPosition->x, target - i->viewUISize->y / 2); break;
+		}
+		actions.add(i->viewUIPosition->setUndoablePoint(i->viewUIPosition->getPoint(), targetPoint, true));
+	}
+
+	UndoMaster::getInstance()->performActions("Align " + String(goodInspectables.size()) + " items", actions);
+
+}
+
+template<class M, class T, class U>
+void BaseManagerUI<M, T, U>::distributeItems(bool isVertical)
+{
+	Array<T*> inspectables = InspectableSelectionManager::activeSelectionManager->getInspectablesAs<T>();
+	if (inspectables.size() < 3) return;
+
+
+	Array<T*> goodInspectables;
+	for (auto& i : inspectables)
+	{
+		if (i == nullptr || !manager->items.contains(i)) continue;
+
+		goodInspectables.add(i);
+	}
+
+	if (goodInspectables.size() < 3) return;
+
+
+	PositionComparator comp(isVertical);
+	goodInspectables.sort(comp);
+
+	Point<float> center0 = goodInspectables[0]->viewUIPosition->getPoint() + goodInspectables[0]->viewUISize->getPoint() / 2;
+	Point<float> center1 = goodInspectables[goodInspectables.size() - 1]->viewUIPosition->getPoint() + goodInspectables[goodInspectables.size() - 1]->viewUISize->getPoint() / 2;
+	float tMin = isVertical ? center0.y : center0.x;
+	float tMax = isVertical ? center1.y : center1.x;
+
+	Array<UndoableAction*> actions;
+	for (int i = 0; i < goodInspectables.size(); i++)
+	{
+		float rel = i * 1.0f / (goodInspectables.size() - 1);
+		float target = jmap(rel, tMin, tMax);
+		T* ti = goodInspectables[i];
+		Point<float> targetPoint(isVertical ? ti->viewUIPosition->x : target - ti->viewUISize->x / 2, isVertical ? target - ti->viewUISize->y / 2 : ti->viewUIPosition->y);
+		actions.add(ti->viewUIPosition->setUndoablePoint(ti->viewUIPosition->getPoint(), targetPoint, true));
+	}
+
+	UndoMaster::getInstance()->performActions("Distribute " + String(goodInspectables.size()) + " items", actions);
+}
+
+
+template<class M, class T, class U>
 void BaseManagerUI<M, T, U>::updateItemsVisibility()
 {
 	for (auto& bui : itemsUI) updateItemVisibility(bui);
+
 }
 
 template<class M, class T, class U>
@@ -890,6 +1072,11 @@ void BaseManagerUI<M, T, U>::newMessage(const typename BaseManager<T>::ManagerEv
 		itemsAddedAsync(e.getItems());
 		break;
 
+	case BaseManager<T>::ManagerEvent::NEEDS_UI_UPDATE:
+		repaint();
+		//resized();
+		break;
+
 	default:
 		break;
 	}
@@ -1014,6 +1201,10 @@ void BaseManagerUI<M, T, U>::buttonClicked(Button* b)
 	if (b == addItemBT.get())
 	{
 		showMenuAndAddItem(true, Point<int>());
+	}
+	else if (this->toolFuncMap.contains(b))
+	{
+		this->toolFuncMap[b]();
 	}
 }
 

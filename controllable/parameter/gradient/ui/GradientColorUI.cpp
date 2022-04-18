@@ -15,7 +15,7 @@ GradientColorUI::GradientColorUI(GradientColor* item) :
 	dragAndDropEnabled = false;
 
 	autoDrawContourWhenSelected = false;
-	colorUI.reset(item->color->createColorParamUI());
+	colorUI.reset(item->itemColor->createColorParamUI());
 	addAndMakeVisible(colorUI.get());
 	//colorUI->addMouseListener(this, false); //why ??
 	colorUI->showMenuOnRightClick = false;

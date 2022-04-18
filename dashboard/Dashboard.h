@@ -20,7 +20,11 @@ public:
 	~Dashboard();
 
 	bool isBeingEdited;
+	StringParameter* password;
+	BoolParameter* unlockOnce;
 	DashboardItemManager itemManager;
+
+	void setIsBeingEdited(bool value);
 
 	void itemAdded(DashboardItem*) override;
 	void itemsAdded(Array<DashboardItem*>) override;
@@ -45,4 +49,6 @@ public:
 	ListenerList<DashboardListener> dashboardListeners;
 	void addDashboardListener(DashboardListener* newListener) { dashboardListeners.add(newListener); }
 	void removeDashboardListener(DashboardListener* listener) { dashboardListeners.remove(listener); }
+
+	DECLARE_ASYNC_EVENT(Dashboard, Dashboard, dashboard, { EDITING_UPDATE });
 };

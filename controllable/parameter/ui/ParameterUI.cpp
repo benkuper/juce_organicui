@@ -98,7 +98,7 @@ void ParameterUI::showEditRangeWindowInternal()
 			}
 		}),
 		true
-	);
+			);
 }
 
 void ParameterUI::paintOverChildren(Graphics& g)
@@ -197,6 +197,27 @@ void ParameterUI::addPopupMenuItems(PopupMenu* p)
 				rangeMenu.addItem(-54, "-180 : 180");
 				rangeMenu.addItem(-55, "0 : 360");
 			}
+			else if (parameter->type == Parameter::POINT2D || parameter->type == Parameter::POINT3D)
+			{
+				rangeMenu.addItem(-70, "0 : 1");
+				rangeMenu.addItem(-71, "-1 : 1");
+				rangeMenu.addItem(-72, "0 : 100");
+				rangeMenu.addItem(-73, "-100 : 100");
+			}
+
+			if (parameter->type == Parameter::FLOAT || parameter->type == Parameter::INT)
+			{
+				int numCustomRanges = ProjectSettings::getInstance()->customRangesCC.controllables.size();
+				if (numCustomRanges > 0)
+				{
+					rangeMenu.addSeparator();
+					for (int i = 0; i < numCustomRanges; i++)
+					{
+						Point2DParameter* rp = dynamic_cast<Point2DParameter*>(ProjectSettings::getInstance()->customRangesCC.controllables[i]);
+						rangeMenu.addItem(-100 - i, String(rp->x) + " : " + String(rp->y));
+					}
+				}
+			}
 
 			p->addSubMenu("Set Range...", rangeMenu);
 			if (parameter->hasRange()) p->addItem(-5, "Clear Range");
@@ -250,6 +271,38 @@ void ParameterUI::handleMenuSelectedID(int id)
 	case -61: parameter->setRange(0, 127); break;
 	case -62: parameter->setRange(0, 255); break;
 	case -63: parameter->setRange(0, 65535); break;
+
+	case -70:
+		if (parameter->type == Parameter::POINT2D) ((Point2DParameter*)parameter.get())->setBounds(0, 0, 1, 1);
+		else ((Point3DParameter*)parameter.get())->setBounds(0, 0, 0, 1, 1, 1);
+		break;
+	case -71:
+		if (parameter->type == Parameter::POINT2D) ((Point2DParameter*)parameter.get())->setBounds(-1, -1, 1, 1);
+		else ((Point3DParameter*)parameter.get())->setBounds(-1, -1, -1, 1, 1, 1);
+		break;
+	case -72:
+		if (parameter->type == Parameter::POINT2D) ((Point2DParameter*)parameter.get())->setBounds(0, 0, 100, 100);
+		else ((Point3DParameter*)parameter.get())->setBounds(0, 0, 0, 100, 100, 100);
+		break;
+	case -73:
+		if (parameter->type == Parameter::POINT2D) ((Point2DParameter*)parameter.get())->setBounds(-100, -100, 100, 100);
+		else ((Point3DParameter*)parameter.get())->setBounds(-100, -100, -100, 100, 100, 100);
+		break;
+
+	default:
+	{
+		if (id <= -100)
+		{
+			int numCustomRanges = ProjectSettings::getInstance()->customRangesCC.controllables.size();
+			int cid = -(id + 100);
+			if (cid < numCustomRanges)
+			{
+				Point2DParameter* rp = dynamic_cast<Point2DParameter*>(ProjectSettings::getInstance()->customRangesCC.controllables[cid]);
+				parameter->setRange(rp->x, rp->y);
+			}
+		}
+		break;
+	}
 	}
 }
 

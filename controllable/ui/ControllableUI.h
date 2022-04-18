@@ -38,6 +38,7 @@ public:
 
 	bool useCustomTextColor;
 	Colour customTextColor;
+	int customTextSize;
 
 	bool useCustomContour;
 	Colour customContourColor;

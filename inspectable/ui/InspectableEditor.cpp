@@ -46,10 +46,13 @@ void InspectableEditor::updateVisibility()
 	bool shouldBeVisible = isInsideInspectorBounds;
 
 	//Too hacky ? parent should handle children visibility
-	if (GenericControllableContainerEditor* pe = dynamic_cast<GenericControllableContainerEditor*>(getParentComponent()))
-	{
-		if (!pe->isRoot && !pe->container.wasObjectDeleted() && pe->container->editorIsCollapsed) shouldBeVisible = false;
-	}
+	//if (GenericControllableContainerEditor* pe = dynamic_cast<GenericControllableContainerEditor*>(getParentComponent()))
+	//{
+	//	if (GenericControllableContainerEditor* gce = dynamic_cast<GenericControllableContainerEditor*>(pe->getParentComponent()))
+	//	{
+	//		if (!pe->isRoot && !pe->container.wasObjectDeleted() && pe->container->editorIsCollapsed && gce->childEditors.contains(pe)) shouldBeVisible = false;
+	//	}
+	//}
 
 	setVisible(shouldBeVisible);
 

@@ -3,18 +3,48 @@ DashboardControllableItem::DashboardControllableItem(Controllable* item) :
 	controllable(item),
 	dashboardItemNotifier(5)
 {
-	viewUISize->setPoint(200, 50);
+	if (item != nullptr)
+	{
+		Point2DParameter* dp = nullptr;
+		switch (item->type)
+		{
+		case Controllable::TRIGGER: dp = ProjectSettings::getInstance()->triggerDefaultSize; break;
+		case Controllable::BOOL: dp = ProjectSettings::getInstance()->boolDefaultSize; break;
+		case Controllable::FLOAT: dp = ProjectSettings::getInstance()->floatDefautSize; break;
+		case Controllable::INT: dp = ProjectSettings::getInstance()->intDefautSize; break;
+		case Controllable::STRING: dp = ProjectSettings::getInstance()->stringDefaultSize; break;
+		case Controllable::COLOR: dp = ProjectSettings::getInstance()->colorDefaultSize; break;
+		case Controllable::ENUM: dp = ProjectSettings::getInstance()->enumDefaultSize; break;
+		case Controllable::TARGET: dp = ProjectSettings::getInstance()->targetDefaultSize; break;
+		case Controllable::POINT2D: dp = ProjectSettings::getInstance()->p2dDefaultSize; break;
+		case Controllable::POINT3D: dp = ProjectSettings::getInstance()->p3dDefaultSize; break;
+		default:
+			break;
+		}
+
+		if (dp != nullptr && dp->enabled) viewUISize->setPoint(dp->getPoint());
+		else viewUISize->setPoint(100, 20);
+	}
+	else
+	{
+		viewUISize->setPoint(100, 20);
+	}
+
 
 	showLabel = addBoolParameter("Show Label", "If checked, label is shown on controller", true);
+	customLabel = addStringParameter("Custom text", "If not empty, will override the label of this control", "", false);
+
 	textColor = addColorParameter("Text Color", "Color of the text", TEXT_COLOR, false);
+	textSize = addIntParameter("Text Size", "Size of the text. Auto size if disabled", 12, 2, 500, false);
 	contourColor = addColorParameter("Border Color", "Color of the contour", BG_COLOR.brighter(), false);
 	contourThickness = addFloatParameter("Border Width", "Thickness of the contour", 2, 1);
 	opaqueBackground = addBoolParameter("Opaque Background", "If checked, background is opaque", true);
-	customLabel = addStringParameter("Custom text", "If not empty, will override the label of this control", "", false);
 	customDescription = addStringParameter("Custom description", "If not empty, will override the description of this control", "", false);
+
 	forceReadOnly = addBoolParameter("Read Only", "If not already read-only, this will force not being able to edit it from the dashboard", false);
 
 	textColor->canBeDisabledByUser = true;
+	textSize->canBeDisabledByUser = true;
 	contourColor->canBeDisabledByUser = true;
 	customLabel->canBeDisabledByUser = true;
 	customDescription->canBeDisabledByUser = true;
@@ -53,8 +83,11 @@ var DashboardControllableItem::getJSONData()
 
 void DashboardControllableItem::loadJSONData(var data, bool createIfNotThere)
 {
-	String address = data.getProperty("controllable", inspectableGhostAddress);
-	setInspectable(Engine::mainEngine->getControllableForAddress(address));
+	if (inspectable == nullptr)
+	{
+		String address = data.getProperty("controllable", inspectableGhostAddress);
+		setInspectable(Engine::mainEngine->getControllableForAddress(address));
+	}
 
 	DashboardInspectableItem::loadJSONData(data, createIfNotThere);
 }
@@ -145,6 +178,7 @@ var DashboardControllableItem::getServerData()
 
 	o->setProperty("showLabel", showLabel->value);
 	if (textColor->enabled) o->setProperty("textColor", textColor->value);
+	if (textSize->enabled) o->setProperty("textSize", textSize->value);
 #
 	o->setProperty("borderColor", contourColor->value);
 	o->setProperty("borderWidth", contourThickness->value);

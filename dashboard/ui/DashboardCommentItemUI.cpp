@@ -2,10 +2,10 @@ DashboardCommentItemUI::DashboardCommentItemUI(DashboardCommentItem* comment) :
 	DashboardItemUI(comment),
 	comment(comment)
 {
-	bgColor = comment->color->getColor().darker().withAlpha(comment->bgAlpha->floatValue());
+	bgColor = comment->itemColor->getColor().darker().withAlpha(comment->bgAlpha->floatValue());
 
 	//textUI.setEditable(false, true, false);
-	textUI.setColour(textUI.textColourId, comment->color->getColor());
+	textUI.setColour(textUI.textColourId, comment->itemColor->getColor());
 	textUI.setColour(textUI.backgroundColourId, Colours::transparentBlack);
 	textUI.setColour(TextEditor::outlineColourId, Colours::transparentBlack); // non-transparent red
 	textUI.setColour(TextEditor::shadowColourId, Colours::transparentBlack); // non-transparent red
@@ -27,9 +27,11 @@ DashboardCommentItemUI::DashboardCommentItemUI(DashboardCommentItem* comment) :
 	textUI.setFont(comment->size->floatValue());
 	addAndMakeVisible(&textUI);
 
-	setSize(textUI.getTextWidth(), textUI.getTextHeight() + 4);
-
+	setSize(item->viewUISize->x, item->viewUISize->y);
+	item->viewUISize->setPoint(getWidth(), getHeight());
 	removeChildComponent(&resizer);
+
+	resized();
 }
 
 DashboardCommentItemUI::~DashboardCommentItemUI()
@@ -131,12 +133,12 @@ void DashboardCommentItemUI::controllableFeedbackUpdateInternal(Controllable* c)
 	{
 		if (c == comment->text) textUI.setText(comment->text->stringValue(), dontSendNotification);
 		textUI.applyFontToAllText(comment->size->floatValue(), true);
-		setSize(textUI.getTextWidth(), textUI.getTextHeight() + 4);
+		item->viewUISize->setPoint(textUI.getTextWidth(), textUI.getTextHeight() + 4);
 	}
-	else if (c == comment->color || c == comment->bgAlpha)
+	else if (c == comment->itemColor || c == comment->bgAlpha)
 	{
-		bgColor = comment->color->getColor().darker().withAlpha(comment->bgAlpha->floatValue());
-		textUI.applyColourToAllText(comment->color->getColor(), true);
+		bgColor = comment->itemColor->getColor().darker().withAlpha(comment->bgAlpha->floatValue());
+		textUI.applyColourToAllText(comment->itemColor->getColor(), true);
 		repaint();
 	}
 }

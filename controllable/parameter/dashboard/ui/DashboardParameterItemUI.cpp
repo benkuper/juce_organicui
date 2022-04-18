@@ -136,8 +136,7 @@ void DashboardParameterItemUI::updateUIParametersInternal()
 {
 	if (parameterItem == nullptr || parameterItem->inspectable.wasObjectDeleted()) return;
 
-	ParameterUI* pui = dynamic_cast<ParameterUI*>(itemUI.get());
-	if (pui != nullptr)
+	if (ParameterUI* pui = dynamic_cast<ParameterUI*>(itemUI.get()))
 	{
 		pui->showValue = parameterItem->showValue->boolValue();
 
@@ -152,6 +151,25 @@ void DashboardParameterItemUI::updateUIParametersInternal()
 			pui->useCustomFGColor = parameterItem->fgColor->enabled;
 			pui->customFGColor = parameterItem->fgColor->getColor();
 		}
+
+		pui->customTextSize = parameterItem->textSize->enabled ? parameterItem->textSize->intValue() : -1;
+
+		if (TargetParameterUI* tpui = dynamic_cast<TargetParameterUI*>(pui))
+		{
+			if (DashboardTargetParameterItem* tpItem = dynamic_cast<DashboardTargetParameterItem*>(parameterItem))
+			{
+				tpui->useCustomShowFullAddressInEditor = tpItem->showFullAddress->enabled;
+				if (tpItem->showFullAddress->enabled) tpui->customShowFullAddressInEditor = tpItem->showFullAddress->boolValue();
+
+				tpui->useCustomShowParentNameInEditor = tpItem->showParentName->enabled;
+				if (tpItem->showParentName->enabled) tpui->customShowParentNameInEditor = tpItem->showParentName->boolValue();
+
+				tpui->customParentLabelSearch = tpItem->parentLabelLevel->enabled ? tpItem->parentLabelLevel->intValue() : -1;
+				
+				tpui->useCustomShowLearnButton = tpItem->showLearnButton->enabled;
+				if (tpItem->showLearnButton->enabled) tpui->customShowLearnButton = tpItem->showLearnButton->boolValue();
+			}
+		}
 	}
 }
 
@@ -161,6 +179,10 @@ void DashboardParameterItemUI::controllableFeedbackUpdateInternal(Controllable* 
 
 	if (c == parameterItem->showValue || c == parameterItem->bgColor || c == parameterItem->fgColor) updateUIParameters();
 	else if (c == parameterItem->btImage || c == parameterItem->style) rebuildUI();
+	else if (DashboardTargetParameterItem* tpItem = dynamic_cast<DashboardTargetParameterItem*>(parameterItem))
+	{
+		if (c == tpItem->showFullAddress || c == tpItem->showParentName || c == tpItem->parentLabelLevel || c == tpItem->showLearnButton) updateUIParameters();
+	}
 }
 
 void DashboardParameterItemUI::controllableStateUpdateInternal(Controllable* c)
@@ -169,6 +191,10 @@ void DashboardParameterItemUI::controllableStateUpdateInternal(Controllable* c)
 
 	if (c == parameterItem->showValue || c == parameterItem->bgColor || c == parameterItem->fgColor) updateUIParameters();
 	else if (c == parameterItem->btImage || c == parameterItem->style) rebuildUI();
+	else if (DashboardTargetParameterItem * tpItem = dynamic_cast<DashboardTargetParameterItem*>(parameterItem))
+	{
+		if (c == tpItem->showFullAddress || c == tpItem->showParentName || c == tpItem->parentLabelLevel || c == tpItem->showLearnButton) updateUIParameters();
+	}
 }
 
 DashboardParameterStyleEditor::DashboardParameterStyleEditor(Parameter* p, DashboardParameterItem* dpi, bool isRoot) :

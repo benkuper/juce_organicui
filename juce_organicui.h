@@ -289,6 +289,9 @@ using namespace juce;
 #include "controllable/parameter/dashboard/DashboardParameterItem.h"
 #include "controllable/parameter/dashboard/ui/DashboardParameterItemUI.h"
 
+#include "dashboard/DashboardLinkItem.h"
+#include "dashboard/ui/DashboardLinkItemUI.h"
+
 #include "parrot/ParrotRecord.h"
 #include "parrot/ParrotRecordManager.h"
 #include "parrot/Parrot.h"

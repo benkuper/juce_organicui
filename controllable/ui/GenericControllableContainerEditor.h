@@ -20,7 +20,7 @@ class GenericControllableContainerEditor :
 	public DragAndDropContainer
 {
 public:
-	GenericControllableContainerEditor(WeakReference<Inspectable> _inspectable, bool isRoot, bool buildAtCreation = true);
+	GenericControllableContainerEditor(Array<ControllableContainer *> containers, bool isRoot, bool buildAtCreation = true);
 	virtual ~GenericControllableContainerEditor();
 
 	
@@ -35,6 +35,7 @@ public:
 	Colour contourColor;
 	Label containerLabel;
 
+	Array<ControllableContainer *> containers;
 	WeakReference<ControllableContainer> container;
 	OwnedArray<InspectableEditor> childEditors;
 
@@ -121,9 +122,10 @@ class EnablingControllableContainerEditor :
 	public GenericControllableContainerEditor
 {
 public:
-	EnablingControllableContainerEditor(EnablingControllableContainer * cc, bool isRoot, bool buildAtCreation = true);
+	EnablingControllableContainerEditor(Array<EnablingControllableContainer *> cc, bool isRoot, bool buildAtCreation = true);
 	~EnablingControllableContainerEditor() {}
 
+	Array<EnablingControllableContainer*> ioContainers;
 	EnablingControllableContainer * ioContainer;
 	std::unique_ptr<BoolToggleUI> enabledUI;
 

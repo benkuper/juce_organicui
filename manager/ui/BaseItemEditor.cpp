@@ -1,7 +1,10 @@
-BaseItemEditor::BaseItemEditor(BaseItem * bi, bool isRoot) :
-	EnablingControllableContainerEditor(bi, isRoot),
-	item(bi)
+BaseItemEditor::BaseItemEditor(Array<BaseItem *> bi, bool isRoot) :
+	EnablingControllableContainerEditor(Inspectable::getArrayAs<BaseItem,EnablingControllableContainer>(bi), isRoot),
+	items(bi)
 {
+	jassert(items.size() > 0);
+	item = items[0];
+
 	if (!isRoot)
 	{
 		if (item->userCanRemove)
@@ -33,7 +36,6 @@ BaseItemEditor::BaseItemEditor(BaseItem * bi, bool isRoot) :
 			downBT->addListener(this);
 		}
 	}
-	
 }
 
 BaseItemEditor::~BaseItemEditor()

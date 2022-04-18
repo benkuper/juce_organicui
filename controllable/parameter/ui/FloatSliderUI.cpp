@@ -123,10 +123,11 @@ void FloatSliderUI::paint(Graphics& g)
 		}
 
 		float fontSizeLimit = orientation == HORIZONTAL ? destRect.getHeight() : (orientation == VERTICAL ? destRect.getWidth() : destRect.getHeight() / 3);
-		g.setFont((float)jmin<int>(fontSizeLimit - 6, 16));
+		float fontSize = customTextSize > 0 ? customTextSize : (float)jmin<int>(fontSizeLimit - 6, 16);
+		g.setFont(fontSize);
 
 		if (parameter->isOverriden) g.setFont(g.getCurrentFont().boldened());
-		g.drawFittedText(text, destRect, Justification::centred, orientation == ROTARY ? 2 : 1);
+		g.drawFittedText(text, customTextSize > 0 ? getLocalBounds().reduced(2) : destRect, Justification::centred, orientation == ROTARY ? 2 : 1);
 	}
 }
 

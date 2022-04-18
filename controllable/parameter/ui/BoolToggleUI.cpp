@@ -1,21 +1,21 @@
 /*
   ==============================================================================
 
-    BoolToggleUI.cpp
-    Created: 8 Mar 2016 3:47:01pm
-    Author:  bkupe
+	BoolToggleUI.cpp
+	Created: 8 Mar 2016 3:47:01pm
+	Author:  bkupe
 
   ==============================================================================
 */
 
-BoolToggleUI::BoolToggleUI(Array<BoolParameter *> parameters, Image _onImage, Image _offImage) :
-    ParameterUI(Inspectable::getArrayAs<BoolParameter, Parameter>(parameters), PARAMETERUI_DEFAULT_TIMER),
+BoolToggleUI::BoolToggleUI(Array<BoolParameter*> parameters, Image _onImage, Image _offImage) :
+	ParameterUI(Inspectable::getArrayAs<BoolParameter, Parameter>(parameters), PARAMETERUI_DEFAULT_TIMER),
 	momentaryMode(false)
 {
 	usingCustomImages = _onImage.isValid();
-	
 
-	if(usingCustomImages)
+
+	if (usingCustomImages)
 	{
 		setImages(_onImage, _offImage);
 		showLabel = false;
@@ -48,14 +48,14 @@ void BoolToggleUI::setImages(Image _onImage, Image _offImage)
 	}
 }
 
-void BoolToggleUI::paint(Graphics & g)
+void BoolToggleUI::paint(Graphics& g)
 {
-    // we are on component deletion
-    if(shouldBailOut())return;
+	// we are on component deletion
+	if (shouldBailOut())return;
 
 	bool valCheck = parameter->boolValue();
 	Image m = valCheck ? onImage : offImage;
-	
+
 	juce::Rectangle<int> r = getLocalBounds();
 	//g.setColour(Colours::white.withAlpha(isMouseOver() ? 1 : .8f));
 
@@ -64,7 +64,8 @@ void BoolToggleUI::paint(Graphics & g)
 
 	if (showLabel)
 	{
-		g.setFont(jlimit(12, 40, jmin(r.getHeight(), r.getWidth()) - 16));
+		int fontSize = customTextSize > 0 ? customTextSize : jlimit(12, 40, jmin(r.getHeight(), r.getWidth()) - 16);
+		g.setFont(fontSize);
 		labelWidth = g.getCurrentFont().getStringWidth(parameter->niceName) + 10;
 		/*if (r.getHeight() > r.getWidth())
 		{
@@ -77,15 +78,16 @@ void BoolToggleUI::paint(Graphics & g)
 		}
 
 		r.removeFromRight(2);
-	}else
+	}
+	else
 	{
 		cr = r.removeFromLeft(r.getHeight());
 	}
 
 	if (showLabel)
 	{
-		g.setColour(useCustomTextColor?customTextColor: (isInteractable() ? TEXT_COLOR : FEEDBACK_COLOR));
-		g.drawFittedText(customLabel.isNotEmpty()?customLabel:parameter->niceName, r, Justification::left,1);
+		g.setColour(useCustomTextColor ? customTextColor : (isInteractable() ? TEXT_COLOR : FEEDBACK_COLOR));
+		g.drawFittedText(customLabel.isNotEmpty() ? customLabel : parameter->niceName, r, Justification::left, 1);
 	}
 
 	if (m.isValid()) g.drawImage(m, cr.toFloat());
@@ -102,7 +104,7 @@ void BoolToggleUI::mouseDownInternal(const MouseEvent& e)
 	}
 }
 
-void BoolToggleUI::mouseUpInternal(const MouseEvent & e)
+void BoolToggleUI::mouseUpInternal(const MouseEvent& e)
 {
 	if (!isInteractable()) return;
 	if (e.mods.isLeftButtonDown())
@@ -114,7 +116,7 @@ void BoolToggleUI::mouseUpInternal(const MouseEvent & e)
 void BoolToggleUI::updateUIParamsInternal()
 {
 	ParameterUI::updateUIParamsInternal();
-	
+
 	if (!usingCustomImages)
 	{
 		if (!isInteractable())
@@ -130,9 +132,9 @@ void BoolToggleUI::updateUIParamsInternal()
 }
 
 
-void BoolToggleUI::valueChanged(const var & )
+void BoolToggleUI::valueChanged(const var&)
 {
-    shouldRepaint = true;
+	shouldRepaint = true;
 }
 
 BoolButtonToggleUI::BoolButtonToggleUI(BoolParameter* parameter) :
@@ -152,7 +154,7 @@ void BoolButtonToggleUI::paint(Graphics& g)
 	if (!showLabel) buttonRect.setWidth(jmin<float>(buttonRect.getWidth(), buttonRect.getHeight() * 3));
 
 	bool isOn = parameter->boolValue();
-	
+
 	Point<float> center = buttonRect.getCentre();
 
 	Colour bgColor = useCustomBGColor ? customBGColor : NORMAL_COLOR;
@@ -185,5 +187,8 @@ void BoolButtonToggleUI::paint(Graphics& g)
 
 bool BoolButtonToggleUI::hitTest(int x, int y)
 {
+	bool allowClicks, allowChildClicks;
+	getInterceptsMouseClicks(allowClicks, allowChildClicks);
+	if (!allowClicks) return false;
 	return buttonRect.contains(x, y);;
 }

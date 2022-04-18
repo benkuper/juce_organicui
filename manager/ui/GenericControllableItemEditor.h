@@ -19,6 +19,11 @@ public:
 	~GenericControllableItemEditor();
 
 	std::unique_ptr<ControllableEditor> controllableEditor;
-
+	
+	void paint(Graphics& g) override;
+	void resizedInternalHeaderItemInternal(Rectangle<int>& r) override;
 	void resetAndBuild() override;
+
+	void mouseDown(const MouseEvent& e) override;
+	void mouseDrag(const MouseEvent &e) override;
 };

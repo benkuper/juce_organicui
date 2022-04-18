@@ -47,7 +47,7 @@ void DashboardManagerView::setCurrentDashboard(Dashboard * d)
 
 	if (currentDashboard != nullptr)
 	{
-		currentDashboard->isBeingEdited = false;
+		currentDashboard->setIsBeingEdited(false);
 	}
 
 	if (currentItemManagerUI != nullptr)
@@ -60,7 +60,7 @@ void DashboardManagerView::setCurrentDashboard(Dashboard * d)
 
 	if (currentDashboard != nullptr)
 	{
-		currentDashboard->isBeingEdited = true;
+		currentDashboard->setIsBeingEdited(true);
 		currentItemManagerUI.reset(new DashboardItemManagerUI(&currentDashboard->itemManager));
 		addAndMakeVisible(currentItemManagerUI.get());
 	}

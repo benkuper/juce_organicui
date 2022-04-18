@@ -189,6 +189,7 @@ public:
 	PerlinEasing();
 	Point2DParameter* taper1;
 	Point2DParameter* taper2;
+	FloatParameter* offset;
 	siv::PerlinNoise perlin;
 
 	void updateKeysInternal(bool stretch = false) override;

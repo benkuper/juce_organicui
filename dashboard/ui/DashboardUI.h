@@ -11,9 +11,14 @@
 #pragma once
 
 class DashboardUI :
-	public BaseItemUI<Dashboard>
+	public BaseItemUI<Dashboard>,
+	public Dashboard::AsyncListener
 {
 public:
 	DashboardUI(Dashboard * item);
 	~DashboardUI();
+
+	void paint(Graphics& g) override;
+
+	void newMessage(const Dashboard::DashboardEvent& e) override;
 };

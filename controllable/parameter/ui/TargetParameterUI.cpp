@@ -12,7 +12,14 @@ TargetParameterUI::TargetParameterUI(Array<TargetParameter*> parameters, const S
 	ParameterUI(Inspectable::getArrayAs<TargetParameter, Parameter>(parameters)),
 	noTargetText(_noTargetText),
 	targetParameters(parameters),
-	targetParameter(parameters[0])
+	targetParameter(parameters[0]),
+	useCustomShowFullAddressInEditor(false),
+	customShowFullAddressInEditor(false),
+	useCustomShowParentNameInEditor(false),
+	customShowParentNameInEditor(false),
+	customParentLabelSearch(-1),
+	useCustomShowLearnButton(false),
+	customShowLearnButton(false)
 {
 	setInterceptsMouseClicks(true, true);
 	showEditWindowOnDoubleClick = false;
@@ -62,7 +69,7 @@ void TargetParameterUI::paint(Graphics& g)
 void TargetParameterUI::resized()
 {
 	juce::Rectangle<int> r = getLocalBounds();
-	if (listeningToNextChangeBT != nullptr)
+	if (listeningToNextChangeBT != nullptr && listeningToNextChangeBT->isVisible())
 	{
 		listeningToNextChangeBT->setBounds(r.removeFromRight(50));
 		r.removeFromRight(2);
@@ -75,22 +82,29 @@ void TargetParameterUI::resized()
 
 void TargetParameterUI::updateLabel()
 {
+
+	bool bShowFullAddress = useCustomShowFullAddressInEditor ? customShowFullAddressInEditor : targetParameter->showFullAddressInEditor;
+	bool bShowParentName = useCustomShowParentNameInEditor ? customShowParentNameInEditor : targetParameter->showParentNameInEditor;
+	int defaultLevel = customParentLabelSearch >= 0 ? customParentLabelSearch : targetParameter->defaultParentLabelLevel;
+
+	bool forceNoCustomFunc = useCustomShowFullAddressInEditor || useCustomShowParentNameInEditor || (customParentLabelSearch >= 0);
+
 	String newText;
 	if (targetParameter->targetType == TargetParameter::TargetType::CONTROLLABLE)
 	{
 		if (targetParameter->target != nullptr)
 		{
-			if (targetParameter->customGetControllableLabelFunc != nullptr) newText = targetParameter->customGetControllableLabelFunc(targetParameter->target);
+			if (!forceNoCustomFunc && targetParameter->customGetControllableLabelFunc != nullptr) newText = targetParameter->customGetControllableLabelFunc(targetParameter->target);
 			else
 			{
-				if (targetParameter->showFullAddressInEditor) targetParameter->target->getControlAddress();
+				if (bShowFullAddress) targetParameter->target->getControlAddress();
 				else
 				{
-					if (targetParameter->showParentNameInEditor)
+					if (bShowParentName)
 					{
 						int curPLevel = 0;
 						ControllableContainer* cc = targetParameter->target->parentContainer;
-						while (cc != nullptr && (curPLevel <= targetParameter->defaultParentLabelLevel || cc->skipLabelInTarget))
+						while (cc != nullptr && (curPLevel <= defaultLevel || cc->skipLabelInTarget))
 						{
 							if (curPLevel > 0 || cc->skipLabelInTarget) cc = cc->parentContainer;
 							if (cc == nullptr || cc == Engine::mainEngine || cc == targetParameter->rootContainer) break;
@@ -110,19 +124,19 @@ void TargetParameterUI::updateLabel()
 	{
 		if (targetParameter->targetContainer != nullptr)
 		{
-			if (targetParameter->customGetContainerLabelFunc != nullptr) newText = targetParameter->customGetContainerLabelFunc(targetParameter->targetContainer);
+			if (!forceNoCustomFunc && targetParameter->customGetContainerLabelFunc != nullptr) newText = targetParameter->customGetContainerLabelFunc(targetParameter->targetContainer);
 			else
 			{
-				if (targetParameter->showFullAddressInEditor) targetParameter->target->getControlAddress();
+				if (bShowFullAddress) targetParameter->target->getControlAddress();
 				else
 				{
-					if (targetParameter->showParentNameInEditor)
+					if (bShowParentName)
 					{
 						int curPLevel = 0;
 
 						ControllableContainer* cc = targetParameter->targetContainer->parentContainer;
 
-						while (cc != nullptr && (curPLevel < targetParameter->defaultParentLabelLevel || cc->skipLabelInTarget))
+						while (cc != nullptr && (curPLevel < defaultLevel || cc->skipLabelInTarget))
 						{
 							if (curPLevel > 0 || cc->skipLabelInTarget) cc = cc->parentContainer;
 							if (cc == nullptr || cc == Engine::mainEngine) break;
@@ -152,6 +166,22 @@ void TargetParameterUI::updateLabel()
 	label.setText(newText, dontSendNotification);
 }
 
+void TargetParameterUI::updateUIParamsInternal()
+{
+	if (customTextSize > 0) label.setFont(customTextSize);
+	else label.setFont(label.getFont().withHeight(14));
+	if (useCustomShowLearnButton)
+	{
+		if (listeningToNextChangeBT != nullptr) listeningToNextChangeBT->setVisible(customShowLearnButton);
+	}
+	else
+	{
+		if (listeningToNextChangeBT != nullptr) listeningToNextChangeBT->setVisible(true);
+	}
+
+	updateLabel();
+}
+
 void TargetParameterUI::showPopupAndGetTarget()
 {
 	if (!parameter->enabled) return;
@@ -162,6 +192,8 @@ void TargetParameterUI::showPopupAndGetTarget()
 		{
 			targetParameter->customGetTargetFunc(targetParameter->typesFilter, targetParameter->excludeTypesFilter, [this](Controllable* c)
 				{
+					if (c == nullptr) return;
+					if (shouldBailOut()) return; 
 					targetParameter->setValueFromTarget(c);
 				});
 		}
@@ -183,6 +215,8 @@ void TargetParameterUI::showPopupAndGetTarget()
 		{
 			targetParameter->customGetTargetContainerFunc([this](ControllableContainer* cc)
 				{
+					if (cc == nullptr) return;
+					if (shouldBailOut()) return; 
 					targetParameter->setValueFromTarget(cc);
 				});
 		}

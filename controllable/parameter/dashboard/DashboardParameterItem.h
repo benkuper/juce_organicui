@@ -6,7 +6,7 @@ class DashboardParameterItem :
 {
 public:
 	DashboardParameterItem(Parameter* parameter = nullptr);
-	~DashboardParameterItem();
+	virtual ~DashboardParameterItem();
 
 	WeakReference<Parameter> parameter;
 	
@@ -18,15 +18,34 @@ public:
 	EnumParameter* style;
 	virtual DashboardItemUI* createUI() override;
 
-	InspectableEditor* getStyleEditor(Inspectable* c, bool isRoot);
+	InspectableEditor* getStyleEditor(bool isRoot, Array<Inspectable *> inspectables);
 
 	virtual void setInspectableInternal(Inspectable* i) override;
 	void onExternalParameterValueChanged(Parameter* p) override;
 
 	virtual void updateStyleOptions();
 
-	var getServerData() override;
+	virtual var getServerData() override;
 
 	static DashboardParameterItem* create(var) { return new DashboardParameterItem(); }
 	virtual String getTypeString() const override { return "DashboardParameterItem"; }
 };
+
+class DashboardTargetParameterItem :
+	public DashboardParameterItem
+{
+public:
+	DashboardTargetParameterItem(TargetParameter* parameter = nullptr);
+	virtual ~DashboardTargetParameterItem();
+
+	BoolParameter* showFullAddress;
+	BoolParameter* showParentName;
+	IntParameter* parentLabelLevel;
+	BoolParameter* showLearnButton;
+
+	virtual var getServerData() override;
+
+	static DashboardParameterItem* create(var) { return new DashboardTargetParameterItem(); }
+	virtual String getTypeString() const override { return "DashboardTargetParameterItem"; }
+};
+

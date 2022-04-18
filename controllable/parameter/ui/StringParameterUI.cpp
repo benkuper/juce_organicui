@@ -63,6 +63,9 @@ void StringParameterUI::updateUIParamsInternal()
 	valueLabel.setColour(valueLabel.outlineColourId, useCustomBGColor ? customBGColor.brighter() : (opaqueBackground ? BG_COLOR.brighter(.1f) : Colours::transparentWhite));
 	valueLabel.setColour(valueLabel.textColourId, useCustomTextColor ? customTextColor : (isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f)));
 	valueLabel.setColour(CaretComponent::caretColourId, Colours::orange);
+
+	if (customTextSize > 0) valueLabel.setFont(customTextSize);
+	else valueLabel.setFont(Font());
 }
 
 void StringParameterUI::paint(Graphics& g)
@@ -72,7 +75,8 @@ void StringParameterUI::paint(Graphics& g)
 	if (showLabel)
 	{
 		Rectangle<int> r = getLocalBounds();
-		g.setFont(jlimit(12, 40, jmin(r.getHeight() - 2, r.getWidth()) - 16));
+		float fontHeight = customTextSize > 0 ? customTextSize : jlimit(12, 40, jmin(r.getHeight() - 2, r.getWidth()) - 16);
+		g.setFont(fontHeight);
 		r = r.removeFromLeft(jmin(g.getCurrentFont().getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, r.getWidth() - 60));
 		g.setColour(useCustomTextColor ? customTextColor : TEXT_COLOR);
 		g.drawFittedText(customLabel.isNotEmpty() ? customLabel : parameter->niceName, r, Justification::centred, 1);
@@ -83,9 +87,11 @@ void StringParameterUI::resized()
 {
 	juce::Rectangle<int> r = getLocalBounds();
 
+	float fontHeight = customTextSize > 0 ? customTextSize : jlimit(12, 40, jmin(r.getHeight() - 2, r.getWidth()) - 16);
+
 	if (showLabel)
 	{
-		Font font(jlimit(12, 40, jmin(r.getHeight() - 2, r.getWidth()) - 16));
+		Font font(fontHeight);
 		r.removeFromLeft(jmin(font.getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, r.getWidth() - 60));
 		r.removeFromLeft(2);
 		valueLabel.setJustificationType(Justification::centred);
@@ -94,7 +100,7 @@ void StringParameterUI::resized()
 	resizedInternal(r);
 
 	valueLabel.setBounds(r);
-	valueLabel.setFont(valueLabel.getFont().withHeight(jmin<float>((float)r.getHeight() - 4, maxFontHeight)));
+	//valueLabel.setFont(valueLabel.getFont().withHeight(jmin<float>((float)r.getHeight() - 4, maxFontHeight)));
 }
 
 void StringParameterUI::valueChanged(const var& v)
@@ -120,7 +126,7 @@ void StringParameterUI::labelTextChanged(Label*)
 StringParameterFileUI::StringParameterFileUI(Array<StringParameter*> parameters) :
 	StringParameterUI(parameters),
 	fps(Inspectable::getArrayAs<StringParameter, FileParameter>(parameters)),
-	fp(dynamic_cast<FileParameter *>(parameters[0])),
+	fp(dynamic_cast<FileParameter*>(parameters[0])),
 	browseBT("Browse...")
 {
 	browseBT.addListener(this);
@@ -164,11 +170,11 @@ void StringParameterFileUI::buttonClicked(Button* b)
 {
 	if (b == &browseBT)
 	{
-		FileChooser * chooser(new FileChooser("Select a file", File(), fp->fileTypeFilter));
+		FileChooser* chooser(new FileChooser("Select a file", File(), fp->fileTypeFilter));
 
-		int flags = FileBrowserComponent::openMode;
-		if (fp->directoryMode) flags = flags | FileBrowserComponent::canSelectDirectories;
-		chooser->launchAsync(flags, [this](const FileChooser& fc)
+		int openFlags = FileBrowserComponent::openMode;
+		if (fp->directoryMode) openFlags = openFlags | FileBrowserComponent::canSelectDirectories;
+		chooser->launchAsync(openFlags, [this](const FileChooser& fc)
 			{
 				File f = fc.getResult();
 				delete& fc;

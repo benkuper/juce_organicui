@@ -29,6 +29,7 @@ ControllableUI::ControllableUI(Array<Controllable*> controllables) :
 	showMenuOnRightClick(true),
 	forceFeedbackOnly(false),
 	useCustomTextColor(false),
+	customTextSize(-1),
 	customContourThickness(1)
 {
 	jassert(controllable != nullptr);

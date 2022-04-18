@@ -92,6 +92,27 @@ void ColorParameter::setColor(const Colour &_color, bool silentSet, bool force)
 	setValue(colorVar, silentSet, force);
 }
 
+void ColorParameter::setDefaultValue(const Colour& _color, bool doResetValue)
+{
+	var cVal = var();
+	if (mode == FLOAT)
+	{
+		cVal.append(_color.getFloatRed());
+		cVal.append(_color.getFloatGreen());
+		cVal.append(_color.getFloatBlue());
+		cVal.append(_color.getFloatAlpha());
+	}
+	else
+	{
+		cVal.append(_color.getRed());
+		cVal.append(_color.getGreen());
+		cVal.append(_color.getBlue());
+		cVal.append(_color.getAlpha());
+	}
+
+	Parameter::setDefaultValue(cVal, doResetValue);
+}
+
 StringArray ColorParameter::getValuesNames()
 {
 	return StringArray("Red", "Green", "Blue", "Alpha");

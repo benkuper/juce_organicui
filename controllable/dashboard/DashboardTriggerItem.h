@@ -6,7 +6,7 @@ class DashboardTriggerItem :
 {
 public:
 	DashboardTriggerItem(Trigger* item = nullptr);
-	~DashboardTriggerItem();
+	virtual ~DashboardTriggerItem();
 
 	Trigger* trigger;
 
@@ -20,7 +20,7 @@ public:
 
 	virtual void onExternalTriggerTriggered(Trigger* t) override;
 
-	var getServerData() override;
+	virtual var getServerData() override;
 
 	static DashboardTriggerItem* create(var) { return new DashboardTriggerItem(); }
 	virtual String getTypeString() const override { return "DashboardTriggerItem"; }

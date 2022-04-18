@@ -29,7 +29,7 @@ DashboardItemUI* DashboardParameterItem::createUI()
 	return new DashboardParameterItemUI(this);
 }
 
-InspectableEditor* DashboardParameterItem::getStyleEditor(Inspectable* c, bool isRoot)
+InspectableEditor* DashboardParameterItem::getStyleEditor(bool isRoot, Array<Inspectable*> c)
 {
 	return new DashboardParameterStyleEditor(style, this, isRoot);
 }
@@ -89,6 +89,26 @@ void DashboardParameterItem::updateStyleOptions()
 		else if (parameter->type == Controllable::POINT2D)
 		{
 			style->addOption("2D Canvas", 12);
+		}
+
+		if (!style->isOverriden)
+		{
+			EnumParameter* ep = nullptr;
+			switch (parameter->type)
+			{
+			case Controllable::BOOL: ep = ProjectSettings::getInstance()->boolDefaultStyle; break;
+			case Controllable::FLOAT: ep = ProjectSettings::getInstance()->floatDefaultStyle; break;
+			case Controllable::INT: ep = ProjectSettings::getInstance()->intDefaultStyle; break;
+			case Controllable::ENUM: ep = ProjectSettings::getInstance()->enumDefaultStyle; break;
+			default:
+				break;
+			}
+
+			if (ep != nullptr && ep->enabled) val = ep->getValueData();
+		}
+		else
+		{
+			viewUISize->setPoint(100, 20);
 		}
 	}
 
@@ -182,6 +202,35 @@ var DashboardParameterItem::getServerData()
 	default:
 		break;
 	}
+
+	return data;
+}
+
+DashboardTargetParameterItem::DashboardTargetParameterItem(TargetParameter* parameter) :
+	DashboardParameterItem(parameter)
+{
+	showFullAddress = addBoolParameter("Show Full Address", "If checked, this will force show the full address of the target", false, false);
+	showParentName = addBoolParameter("Show Parent Name", "If checked, this will force show the parent name of the target", false, false);
+	parentLabelLevel = addIntParameter("Parent Label Level", "If checked, this will force search through X level of parents", 2, 1, 20, false);
+	showLearnButton = addBoolParameter("Show Learn Button", "If checked, show learn function", false, false);
+
+	showFullAddress->canBeDisabledByUser = true;
+	showParentName->canBeDisabledByUser = true;
+	parentLabelLevel->canBeDisabledByUser = true;
+	showLearnButton->canBeDisabledByUser = true;
+}
+
+DashboardTargetParameterItem::~DashboardTargetParameterItem()
+{
+}
+
+var DashboardTargetParameterItem::getServerData()
+{
+	var data = DashboardParameterItem::getServerData();
+	if (showFullAddress->enabled) data.getDynamicObject()->setProperty("showFullAddress", showFullAddress->boolValue());
+	if (showParentName->enabled) data.getDynamicObject()->setProperty("showParentName", showParentName->boolValue());
+	if (parentLabelLevel->enabled) data.getDynamicObject()->setProperty("parentLabelLevel", parentLabelLevel->intValue());
+	if (showLearnButton->enabled) data.getDynamicObject()->setProperty("showLearnButton", showLearnButton->intValue());
 
 	return data;
 }

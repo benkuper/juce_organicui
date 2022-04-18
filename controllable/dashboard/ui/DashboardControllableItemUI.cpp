@@ -61,6 +61,7 @@ void DashboardControllableItemUI::updateUIParameters()
 
 	String customLabel = controllableItem->customLabel->stringValue();
 	if (customLabel.isNotEmpty() && controllableItem->customLabel->enabled) itemUI->customLabel = customLabel;
+	else itemUI->customLabel = "";
 
 	itemUI->customDescription = controllableItem->customDescription->enabled ? controllableItem->customDescription->stringValue() : "";
 
@@ -103,6 +104,7 @@ void DashboardControllableItemUI::controllableFeedbackUpdateInternal(Controllabl
 		|| c == controllableItem->contourColor
 		|| c == controllableItem->contourThickness
 		|| c == controllableItem->forceReadOnly
+		|| c == controllableItem->textSize
 		)
 	{
 		updateUIParameters();
@@ -120,6 +122,7 @@ void DashboardControllableItemUI::controllableStateUpdateInternal(Controllable* 
 		|| c == controllableItem->opaqueBackground
 		|| c == controllableItem->contourColor
 		|| c == controllableItem->contourThickness
+		|| c == controllableItem->textSize
 		)
 	{
 		updateUIParameters();

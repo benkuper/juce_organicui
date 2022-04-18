@@ -83,6 +83,8 @@ public:
 	TargetParameterUI* createTargetUI(Array<TargetParameter*> parameters = {});
 	ControllableUI* createDefaultUI(Array<Controllable*> controllables = {}) override;
 
+	virtual DashboardItem* createDashboardItem() override;
+
 
 	static var getTargetFromScript(const juce::var::NativeFunctionArgs& a);
 
