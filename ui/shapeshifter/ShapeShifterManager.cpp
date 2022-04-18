@@ -123,6 +123,8 @@ ShapeShifterWindow* ShapeShifterManager::showPanelWindowForContent(const String&
 
 ShapeShifterContent* ShapeShifterManager::showContent(String contentName)
 {
+	if (!getApp().useWindow)  return nullptr;
+
 	//DBG("Show content " << contentName);
 	ShapeShifterPanel* p = getPanelForContentName(contentName);
 

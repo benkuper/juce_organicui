@@ -75,7 +75,8 @@ void StringParameterUI::paint(Graphics& g)
 	if (showLabel)
 	{
 		Rectangle<int> r = getLocalBounds();
-		g.setFont(jlimit(12, 40, jmin(r.getHeight() - 2, r.getWidth()) - 16));
+		float fontHeight = customTextSize > 0 ? customTextSize : jlimit(12, 40, jmin(r.getHeight() - 2, r.getWidth()) - 16);
+		g.setFont(fontHeight);
 		r = r.removeFromLeft(jmin(g.getCurrentFont().getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, r.getWidth() - 60));
 		g.setColour(useCustomTextColor ? customTextColor : TEXT_COLOR);
 		g.drawFittedText(customLabel.isNotEmpty() ? customLabel : parameter->niceName, r, Justification::centred, 1);
@@ -86,9 +87,11 @@ void StringParameterUI::resized()
 {
 	juce::Rectangle<int> r = getLocalBounds();
 
+	float fontHeight = customTextSize > 0 ? customTextSize : jlimit(12, 40, jmin(r.getHeight() - 2, r.getWidth()) - 16);
+
 	if (showLabel)
 	{
-		Font font(jlimit(12, 40, jmin(r.getHeight() - 2, r.getWidth()) - 16));
+		Font font(fontHeight);
 		r.removeFromLeft(jmin(font.getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, r.getWidth() - 60));
 		r.removeFromLeft(2);
 		valueLabel.setJustificationType(Justification::centred);
@@ -97,7 +100,7 @@ void StringParameterUI::resized()
 	resizedInternal(r);
 
 	valueLabel.setBounds(r);
-	valueLabel.setFont(valueLabel.getFont().withHeight(jmin<float>((float)r.getHeight() - 4, maxFontHeight)));
+	//valueLabel.setFont(valueLabel.getFont().withHeight(jmin<float>((float)r.getHeight() - 4, maxFontHeight)));
 }
 
 void StringParameterUI::valueChanged(const var& v)
