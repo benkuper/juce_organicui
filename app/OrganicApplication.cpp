@@ -64,7 +64,7 @@ void OrganicApplication::initialise(const String& commandLine)
 		if (c.command == "headless") useWindow = false;
 	}
 
-	if (!Desktop::getInstance().isHeadless()) useWindow = false;
+	if (Desktop::getInstance().isHeadless()) useWindow = false;
 
 	GlobalSettings::getInstance()->addChildControllableContainer(&appSettings, false, GlobalSettings::getInstance()->controllableContainers.size() - 1);
 
