@@ -35,7 +35,7 @@ DashboardControllableItem::DashboardControllableItem(Controllable* item) :
 	customLabel = addStringParameter("Custom text", "If not empty, will override the label of this control", "", false);
 
 	textColor = addColorParameter("Text Color", "Color of the text", TEXT_COLOR, false);
-	textSize = addIntParameter("Text Size", "Size of the text. Auto size if disabled", 12, 2, 100, false);
+	textSize = addIntParameter("Text Size", "Size of the text. Auto size if disabled", 12, 2, 500, false);
 	contourColor = addColorParameter("Border Color", "Color of the contour", BG_COLOR.brighter(), false);
 	contourThickness = addFloatParameter("Border Width", "Thickness of the contour", 2, 1);
 	opaqueBackground = addBoolParameter("Opaque Background", "If checked, background is opaque", true);

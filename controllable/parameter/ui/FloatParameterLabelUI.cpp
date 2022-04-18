@@ -75,7 +75,7 @@ void FloatParameterLabelUI::resized()
 {
 	juce::Rectangle<int> r = getLocalBounds();
 
-	float fontHeight = jmin<float>((float)r.getHeight(), maxFontHeight);
+	float fontHeight = customTextSize > 0 ? customTextSize : jmin<float>((float)r.getHeight(), maxFontHeight);
 	if (showLabel)
 	{
 		nameLabel.setFont(valueLabel.getFont().withHeight(fontHeight));
