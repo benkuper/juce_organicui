@@ -62,6 +62,6 @@ public:
 	static CommandLineElements parseCommandLine(const String& commandLine);
 
 
-	static String valueToTimeString(float val);
+	static String valueToTimeString(float val, int numDecimals= 3);
 	static float timeStringToValue(String str);
 };
