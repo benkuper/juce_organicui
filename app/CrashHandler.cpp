@@ -24,8 +24,6 @@ void handleCrashStatic(int signum);
 void createDumpAndStrackTrace(int signum, File dumpFile, File traceFile);
 #endif
 
-
-
 juce_ImplementSingleton(CrashDumpUploader)
 OrganicApplication::MainWindow* getMainWindow();
 
@@ -94,7 +92,7 @@ void CrashDumpUploader::handleCrash(int e)
 	autoReopen = GlobalSettings::getInstance()->autoReopenFileOnCrash->boolValue();
 
 
-	if (GlobalSettings::getInstance()->enableCrashUpload->boolValue())
+	if (getApp().useWindow && GlobalSettings::getInstance()->enableCrashUpload->boolValue())
 	{
 		traceFile = recoveredFile.getParentDirectory().getChildFile("crashlog.txt");
 
@@ -117,11 +115,7 @@ void CrashDumpUploader::handleCrash(int e)
 		*/
 
 		doUpload = true; //by default, unless hit cancel
-
-		w.reset(new UploadWindow());
-		DialogWindow::showDialog("Got crashed ?", w.get(), getMainWindow(), Colours::black, true);
-
-		MessageManager::getInstance()->runDispatchLoop();
+		
 		exitApp();
 
 	}
