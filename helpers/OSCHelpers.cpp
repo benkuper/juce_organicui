@@ -89,6 +89,19 @@ void OSCHelpers::addArgumentsForParameter(OSCMessage& m, Parameter* p)
 	}
 }
 
+
+void OSCHelpers::addColorArgumentToMessage(OSCMessage& m, const Colour& c, ColorMode colorMode)
+{
+	if (colorMode == ColorRGBA) m.addColour(OSCHelpers::getOSCColour(c));
+	else
+	{
+		m.addFloat32(c.getFloatRed());
+		m.addFloat32(c.getFloatGreen());
+		m.addFloat32(c.getFloatBlue());
+		if (colorMode == Float4) m.addFloat32(c.getFloatAlpha());
+	}
+}
+
 float OSCHelpers::getFloatArg(OSCArgument a)
 {
 	if (a.isFloat32()) return a.getFloat32();

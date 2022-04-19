@@ -9,7 +9,8 @@ class Parameter;
 class OSCHelpers
 {
 public:
-	 
+	enum ColorMode { ColorRGBA, Float3, Float4 };
+
 	static void logOSCFormatError(const char* message, int length);
 	
 	static OSCArgument varToArgument(const var& v);
@@ -17,6 +18,7 @@ public:
 	static var argumentToVar(const OSCArgument& a);
 
 	static void addArgumentsForParameter(OSCMessage& m, Parameter* p);
+	static void addColorArgumentToMessage(OSCMessage& m, const Colour& c, ColorMode colorMode);
 
 	static float getFloatArg(OSCArgument a);
 	static int getIntArg(OSCArgument a);
