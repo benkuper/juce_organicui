@@ -34,8 +34,8 @@ void ParameterDetectiveWatcherUI::paintWatcherInternal(Graphics& g, const juce::
 				{
 					ControllableDetectiveWatcher::WatcherData* d = parameterWatcher->data[i];
 					float val = numParamValues > 1 ? d->val[pi] : d->val;
-					minV = jmin<float>(minV, d->val);
-					maxV = jmax<float>(maxV, d->val);
+					minV = jmin<float>(minV, val);
+					maxV = jmax<float>(maxV, val);
 				}
 			}
 			else

@@ -197,6 +197,11 @@ void FloatParameterLabelUI::editorShown(Label* label, TextEditor& t)
 	//valueLabel.showEditor();
 }
 
+void FloatParameterLabelUI::editorHidden(Label* label, TextEditor&)
+{
+	shouldRepaint = true;
+}
+
 
 void FloatParameterLabelUI::handlePaintTimerInternal()
 {
