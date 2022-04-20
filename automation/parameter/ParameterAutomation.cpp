@@ -111,18 +111,21 @@ void ParameterAutomation::run()
 		double t = Time::getMillisecondCounter() / 1000.0;
 		double delta = t - lastUpdateTime;
 
-		Mode m = mode->getValueDataAsEnum<Mode>();
-		if (m == LOOP) timeParamRef->setValue(fmodf(timeParamRef->floatValue() + delta, lengthParamRef->floatValue()));
-		else if (m == PING_PONG)
+		if (!manualMode)
 		{
-			float ft = timeParamRef->floatValue() + delta * (reversePlay ? -1 : 1);
-			if (ft < 0 || ft > lengthParamRef->floatValue())
+			Mode m = mode->getValueDataAsEnum<Mode>();
+			if (m == LOOP) timeParamRef->setValue(fmodf(timeParamRef->floatValue() + delta, lengthParamRef->floatValue()));
+			else if (m == PING_PONG)
 			{
-				reversePlay = !reversePlay;
-				ft = timeParamRef->floatValue() + delta * (reversePlay ? -1 : 1);
-			}
+				float ft = timeParamRef->floatValue() + delta * (reversePlay ? -1 : 1);
+				if (ft < 0 || ft > lengthParamRef->floatValue())
+				{
+					reversePlay = !reversePlay;
+					ft = timeParamRef->floatValue() + delta * (reversePlay ? -1 : 1);
+				}
 
-			timeParamRef->setValue(ft);
+				timeParamRef->setValue(ft);
+			}
 		}
 
 		lastUpdateTime = Time::getMillisecondCounter() / 1000.0;
