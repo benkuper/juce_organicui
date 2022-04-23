@@ -121,6 +121,8 @@ void OrganicApplication::initialise(const String& commandLine)
 
 void OrganicApplication::shutdown()
 {
+	if (mainComponent == nullptr) return;
+
 	saveGlobalSettings();
 
 	// Add your application's shutdown code here..
