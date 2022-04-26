@@ -311,7 +311,7 @@ void TargetParameter::inspectableDestroyed(Inspectable* i)
 {
 	if ((targetType == CONTAINER && targetContainer == nullptr) || (targetType == CONTROLLABLE && target == nullptr))
 	{
-		DBG("Inspectable destroyed, ghost value : " << ghostValue);
+		//DBG("Inspectable destroyed, ghost value : " << ghostValue);
 		//String oldValue = stringValue();
 		setValue("");
 		//setGhostValue(oldValue);
