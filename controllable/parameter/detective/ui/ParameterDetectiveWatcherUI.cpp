@@ -18,7 +18,7 @@ void ParameterDetectiveWatcherUI::paintWatcherInternal(Graphics& g, const juce::
 	int numParamValues = parameterWatcher->parameter->isComplex() ? parameterWatcher->parameter->value.size() : 1;
 
 	{
-		GenericScopedLock lock(parameterWatcher->data.getLock());
+		GenericScopedLock<CriticalSection> lock(parameterWatcher->data.getLock());
 
 		float curTime = Time::getMillisecondCounter() / 1000.0f;
 		float watchWindow = parameterWatcher->watchTime->floatValue();
