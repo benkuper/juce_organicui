@@ -174,6 +174,8 @@ void StringParameterFileUI::buttonClicked(Button* b)
 
 		int openFlags = FileBrowserComponent::openMode;
 		if (fp->directoryMode) openFlags = openFlags | FileBrowserComponent::canSelectDirectories;
+		else openFlags = openFlags | FileBrowserComponent::FileChooserFlags::canSelectFiles;
+
 		chooser->launchAsync(openFlags, [this](const FileChooser& fc)
 			{
 				File f = fc.getResult();
