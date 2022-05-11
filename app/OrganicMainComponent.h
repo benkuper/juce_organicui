@@ -23,7 +23,7 @@ public:
 	std::unique_ptr<ProgressWindow> fileProgressWindow;
 	
 	virtual void init();
-	void setupOpenGL();
+	virtual void setupOpenGL();
 	virtual void setupOpenGLInternal() {}
 	virtual void clear();
 
