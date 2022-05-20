@@ -85,6 +85,9 @@ void CrashDumpUploader::handleCrash(int e)
 	}
 
 
+	LOGERROR("A Crash happened !");
+	LOGERROR(SystemStats::getStackBacktrace());
+
 	//Let the app handle app-specific actions for crash
 	getApp().handleCrashed();
 
