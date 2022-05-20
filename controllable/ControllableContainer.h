@@ -135,7 +135,7 @@ public:
 	virtual void askForRemoveControllable(Controllable * c, bool addToUndo = false) override;
 
 	void warningChanged(WarningTarget*);
-	virtual String getWarningMessage() const override;
+	virtual String getWarningMessage(const String& id = WarningTarget::warningAllId) const override;
 	virtual String getWarningTargetName() const override;
 
 	virtual var getJSONData();
