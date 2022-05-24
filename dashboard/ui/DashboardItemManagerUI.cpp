@@ -35,7 +35,7 @@ DashboardItemManagerUI::DashboardItemManagerUI(DashboardItemManager* manager) :
 	addExistingItems(false);
 
 	setShowAddButton(false);
-	setShowTools(true);
+	setShowTools(DashboardManager::getInstance()->editMode->boolValue());
 	tmpShowTools = showTools;
 }
 
