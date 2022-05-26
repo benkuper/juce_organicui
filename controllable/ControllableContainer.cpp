@@ -829,17 +829,17 @@ void ControllableContainer::warningChanged(WarningTarget* target)
 	if (parentContainer != nullptr) parentContainer->warningChanged(target);
 }
 
-String ControllableContainer::getWarningMessage() const
+String ControllableContainer::getWarningMessage(const String& id) const
 {
 	StringArray s;
-	if (WarningTarget::getWarningMessage().isNotEmpty()) s.add(WarningTarget::getWarningMessage());
+	if (WarningTarget::getWarningMessage(id).isNotEmpty()) s.add(WarningTarget::getWarningMessage());
 
 	if (controllables.getLock().tryEnter())
 	{
 		for (auto& c : controllables)
 		{
 			if (c == nullptr) continue;
-			String cs = c->getWarningMessage();
+			String cs = c->getWarningMessage(id);
 			if (cs.isNotEmpty())
 			{
 				s.add(c->parentContainer->niceName + " > " + c->niceName + " : " + cs);

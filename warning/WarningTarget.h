@@ -21,22 +21,23 @@ public:
 	bool showWarningInUI;
 	Inspectable* warningResolveInspectable;
 
-	void setWarningMessage(StringRef message = String());
-	void clearWarning() { setWarningMessage(); }
+	static String warningNoId;
+	static String warningAllId;
+
+	HashMap<String, String> warningMessage;
+
+	void setWarningMessage(const String& message = String(), const String& id = warningNoId);
+	void clearWarning(const String& id = warningNoId);
 
 	void notifyWarningChanged();
 
 	virtual void resolveWarning();
-	virtual String getWarningMessage() const;
+	virtual String getWarningMessage(const String& id = warningAllId) const;
 	virtual String getWarningTargetName() const;
 
 
 	WeakReference<WarningTarget>::Master masterReference;
 
-private:
-	String warningMessage;
-
-public:
 	// ASYNC
 	class  WarningTargetEvent
 	{

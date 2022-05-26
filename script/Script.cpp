@@ -100,7 +100,7 @@ void Script::chooseFileScript()
 {
 	FileChooser* chooser(new FileChooser("Create or load a cacahuete", File::getCurrentWorkingDirectory(), "*.js"));
 
-	chooser->launchAsync(FileBrowserComponent::FileChooserFlags::saveMode, [this](const FileChooser& fc)
+	chooser->launchAsync(FileBrowserComponent::FileChooserFlags::saveMode | FileBrowserComponent::FileChooserFlags::canSelectFiles, [this](const FileChooser& fc)
 		{
 			File f = fc.getResult();
 			delete& fc;
