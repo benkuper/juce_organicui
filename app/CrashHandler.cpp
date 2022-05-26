@@ -117,6 +117,11 @@ void CrashDumpUploader::handleCrash(int e)
 		}
 		*/
 
+		w.reset(new UploadWindow());
+		DialogWindow::showDialog("Got crashed ?", w.get(), getMainWindow(), Colours::black, true);
+
+		MessageManager::getInstance()->runDispatchLoop();
+
 		doUpload = true; //by default, unless hit cancel
 		
 		exitApp();
