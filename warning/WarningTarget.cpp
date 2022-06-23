@@ -1,4 +1,3 @@
-#include "WarningTarget.h"
 String WarningTarget::warningNoId = "";
 String WarningTarget::warningAllId = "*";
 
