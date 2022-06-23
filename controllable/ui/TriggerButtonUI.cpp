@@ -33,7 +33,13 @@ void TriggerButtonUI::triggerTriggered(const Trigger *)
 
 void TriggerButtonUI::mouseDownInternal(const MouseEvent & e)
 {
-	for(auto & t : triggers) t->trigger();
+	if (trigger.wasObjectDeleted()) return;
+
+	for (auto& t : triggers)
+	{
+		if (t == nullptr) continue;
+		t->trigger();
+	}
 }
 
 bool TriggerButtonUI::hitTest(int x, int y)
