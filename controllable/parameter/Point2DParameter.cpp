@@ -209,7 +209,7 @@ void Point2DParameter::loadJSONDataInternal(var data)
 var Point2DParameter::getCroppedValue(var originalValue)
 {
 	jassert(originalValue.isArray() && minimumValue.isArray() && maximumValue.isArray());
-	if (!originalValue.isArray())
+	if (!originalValue.isArray() || originalValue.size() < 2)
 	{
 		var val;
 		val.append((int)originalValue);
