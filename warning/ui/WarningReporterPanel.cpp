@@ -54,6 +54,8 @@ int WarningReporterContainer::getContentHeight()
 
 void WarningReporterContainer::addTarget(WeakReference<WarningTarget> t)
 {
+	if (t == nullptr || t.wasObjectDeleted()) return;
+
 	WarningReporterItem * item = getUIForTarget(t); 
 	if (item != nullptr) return;
 	item = new WarningReporterItem(t);
@@ -106,8 +108,8 @@ void WarningReporterContainer::newMessage(const WarningReporter::WarningReporter
 }
 
 WarningReporterItem::WarningReporterItem(WeakReference<WarningTarget> target) :
-	itemLabel("ItemLabel", target->getWarningTargetName()),
-	warningLabel("WarningLabel", target->getWarningMessage()),
+	itemLabel("ItemLabel", target != nullptr?target->getWarningTargetName():""),
+	warningLabel("WarningLabel", target != nullptr?target->getWarningMessage():""),
 	resolveBT("Resolve"),
 	target(target)
 {
@@ -137,5 +139,5 @@ void WarningReporterItem::resized()
 
 void WarningReporterItem::buttonClicked(Button* b)
 {
-	if (b == &resolveBT) target->resolveWarning();
+	if (b == &resolveBT && target != nullptr) target->resolveWarning();
 }
