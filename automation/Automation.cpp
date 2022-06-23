@@ -103,7 +103,7 @@ void Automation::addKeys(const Array<AutomationKey*>& keys, bool addToUndo, bool
 void Automation::insertKeyAt(const float& pos, bool addToUndo)
 {
 	AutomationKey* startKey = getKeyForPosition(pos);// ((AutomationKeyUI*)eui->getParentComponent())->item;
-	if (startKey == nullptr) return;
+	if (startKey == nullptr || startKey->easing == nullptr) return;
 
 	Point<float> p = startKey->easing->getClosestPointForPos(pos);
 
@@ -115,12 +115,16 @@ void Automation::insertKeyAt(const float& pos, bool addToUndo)
 	}
 
 	AutomationKey* k = addKey(p.x, p.y, addToUndo);
+	if (k == nullptr) return;
+
 	k->easingType->setValueWithData(startKey->easingType->getValueData());
 
 	if (startKey->easing->type == Easing::BEZIER)
 	{
 		CubicEasing* ce1 = (CubicEasing*)startKey->easing.get();
 		CubicEasing* ce2 = (CubicEasing*)k->easing.get();
+
+		if (ce1 == nullptr || ce2 == nullptr) return;
 
 		ce1->anchor1->setPoint(controlPoints[0] - ce1->start);
 		ce1->anchor2->setPoint(controlPoints[1] - ce1->end);
