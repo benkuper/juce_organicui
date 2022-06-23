@@ -56,6 +56,8 @@ void ParameterEditor::resized()
 
 void ParameterEditor::updateUI()
 {
+	if (inspectable.wasObjectDeleted()) return;
+
 	baseHeight = ui->getHeight();
 	if (baseHeight == 0) baseHeight = GlobalSettings::getInstance()->fontSize->floatValue() + 4;
 	subContentHeight = 0;
@@ -171,5 +173,6 @@ void ParameterEditor::parameterControlModeChanged(Parameter*)
 
 void ParameterEditor::labelTextChanged(Label* labelThatHasChanged)
 {
+	if (inspectable.wasObjectDeleted()) return;
 	parameter->setControlExpression(expressionText->getText());
 }
