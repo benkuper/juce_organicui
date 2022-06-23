@@ -223,13 +223,18 @@ void OrganicMainContentComponent::getCommandInfo(CommandID commandID, Applicatio
 #endif
 
 	default:
+		ShapeShifterManager::getInstance()->getCommandInfo(commandID, result);
+
+#if TIMELINE_ADD_MENU_ITEMS
+		TimelineAppCommands::getCommandInfo(commandID, result);
+#endif
+
 		JUCEApplication::getInstance()->getCommandInfo(commandID, result);
 		break;
 	}
 
-#if TIMELINE_ADD_MENU_ITEMS
-	TimelineAppCommands::getCommandInfo(commandID, result);
-#endif
+
+
 
 }
 
@@ -265,6 +270,9 @@ void OrganicMainContentComponent::getAllCommands(Array<CommandID>& commands) {
 	};
 
 	commands.addArray(ids, numElementsInArray(ids));
+
+	Array<CommandID> shapeShifterCommands = ShapeShifterManager::getInstance()->getCommandIDs();
+	commands.addArray(shapeShifterCommands);
 
 #if TIMELINE_ADD_MENU_ITEMS
 	TimelineAppCommands::getAllCommands(commands);
@@ -659,6 +667,7 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 #endif
 
 	default:
+		if (ShapeShifterManager::getInstance()->handleCommandID(info.commandID)) return true;
 		return JUCEApplication::getInstance()->perform(info);
 	}
 

@@ -89,7 +89,10 @@ public:
 	const int baseSpecialMenuCommandID = 0x32000;
 	PopupMenu getPanelsMenu();
 
+	Array<CommandID> getCommandIDs();
+	void getCommandInfo(CommandID commandID, ApplicationCommandInfo& result);
 	void handleMenuPanelCommand(int commandID);
+	bool handleCommandID(int commandID);
 
 	void newMessage(const Parameter::ParameterEvent& e) override;
 

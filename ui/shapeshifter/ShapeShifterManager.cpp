@@ -11,6 +11,8 @@
 juce_ImplementSingleton(ShapeShifterManager);
 
 static OrganicApplication& getApp();
+ApplicationCommandManager& getCommandManager();// { return getApp().commandManager; }
+
 
 ShapeShifterManager::ShapeShifterManager() :
 	mainContainer(ShapeShifterContainer::Direction::VERTICAL),
@@ -246,6 +248,7 @@ void ShapeShifterManager::loadLayout(var layout)
 			showPanelWindow(p, bounds);
 		}
 	}
+
 }
 
 var ShapeShifterManager::getCurrentLayout()
@@ -439,11 +442,12 @@ PopupMenu ShapeShifterManager::getPanelsMenu()
 
 	Array<File> layoutFiles = getLayoutFiles();
 
-	int specialIndex = layoutP.getNumItems() + 2; //+2 to have lockPanels
+	//int specialIndex = layoutP.getNumItems() + 2; //+2 to have lockPanels
+	int i = 0;
 	for (auto& f : layoutFiles)
 	{
-		layoutP.addItem(baseSpecialMenuCommandID + specialIndex, f.getFileNameWithoutExtension());
-		specialIndex++;
+		layoutP.addCommandItem(&getCommandManager(),0x9000 + i, f.getFileNameWithoutExtension());
+		i++;
 	}
 
 	p.addSubMenu("Layout", layoutP);
@@ -461,9 +465,33 @@ PopupMenu ShapeShifterManager::getPanelsMenu()
 	return p;
 }
 
+Array<CommandID> ShapeShifterManager::getCommandIDs()
+{
+	Array<CommandID> result;
+	for (int i = 0; i < 10; i++) result.add(0x9000 + i); //10 layouts load
+	return result;
+}
+
+void ShapeShifterManager::getCommandInfo(CommandID commandID, ApplicationCommandInfo& result)
+{
+
+	if (commandID >= 0x9000 && commandID < 0x9000 + 10)
+	{
+		int cid = commandID - 0x9000;
+		Array<File> layouts = getLayoutFiles();
+		//if (cid >= layouts.size()) return;
+		String fName = layouts.size() > cid ? layouts[cid].getFileNameWithoutExtension() : "empty";
+
+		result.setInfo("Load Layout " + String(cid + 1) + " (" + fName + ")", "", "View", 0);
+		result.addDefaultKeypress(KeyPress::createFromDescription(String(cid)).getKeyCode(), ModifierKeys::commandModifier);
+	}
+}
+
 void ShapeShifterManager::handleMenuPanelCommand(int commandID)
 {
 	//DBG("Handle command " << commandID);
+
+
 
 	bool isSpecial = ((commandID & 0xff000) == 0x32000);
 
@@ -500,6 +528,20 @@ void ShapeShifterManager::handleMenuPanelCommand(int commandID)
 
 	String contentName = ShapeShifterFactory::getInstance()->defs[relCommandID]->contentName;
 	showContent(contentName);
+}
+
+bool ShapeShifterManager::handleCommandID(int commandID)
+{
+	if (commandID >= 0x9000 && commandID < 0x9000 + 10)
+	{
+		int cid = commandID - 0x9000;
+		Array<File> layouts = getLayoutFiles();
+		//if (cid >= layouts.size()) return;
+		if (layouts.size() > cid) loadLayoutFromFile(layouts[cid]);
+		return true;
+	}
+
+	return false;
 }
 
 void ShapeShifterManager::newMessage(const Parameter::ParameterEvent& e)
