@@ -170,6 +170,8 @@ void ParameterUI::addPopupMenuItems(PopupMenu* p)
 		p->addItem(1, "Reset value");
 		p->addSeparator();
 		p->addItem(-3, "Show Edit Window");
+		p->addItem(-20, "Copy Value");
+		p->addItem(-21, "Paste Value");
 
 		if (parameter->canHaveRange && parameter->isCustomizableByUser)
 		{
@@ -260,7 +262,8 @@ void ParameterUI::handleMenuSelectedID(int id)
 	case -4: showEditRangeWindow(); break;
 	case -5: parameter->clearRange(); break;
 	case -6: parameter->alwaysNotify = !parameter->alwaysNotify; break;
-
+	case -20: SystemClipboard::copyTextToClipboard(parameter->stringValue()); break;
+	case -21: parameter->setValue(SystemClipboard::getTextFromClipboard()); break;
 	case -50: parameter->setRange(0, 1); break;
 	case -51: parameter->setRange(-1, 1); break;
 	case -52: parameter->setRange(-90, 90); break;
