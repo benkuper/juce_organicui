@@ -252,8 +252,8 @@ void TimeLabel::labelTextChanged(Label*)
 	String s = valueLabel.getText();
 	if (showLabel)
 	{
-		String label = customLabel.isNotEmpty() ? customLabel : parameter->niceName;
-		s = s.substring(label.length() + 3);
+		//String label = customLabel.isNotEmpty() ? customLabel : parameter->niceName;
+		//s = s.substring(label.length() + 3);
 	}
 	s = s.substring(prefix.length(), s.length() - suffix.length());
 
