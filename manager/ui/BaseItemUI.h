@@ -209,7 +209,7 @@ BaseItemUI<T>::BaseItemUI(T* _item, Direction _resizeDirection, bool showMiniMod
 
 	if (this->baseItem->itemColor != nullptr)
 	{
-		itemColorUI.reset(item->itemColor->createColorParamUI());
+		itemColorUI.reset(this->baseItem->itemColor->createColorParamUI());
 		this->addAndMakeVisible(itemColorUI.get());
 	}
 
