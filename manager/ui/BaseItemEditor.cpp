@@ -5,16 +5,16 @@ BaseItemEditor::BaseItemEditor(Array<BaseItem *> bi, bool isRoot) :
 	jassert(items.size() > 0);
 	item = items[0];
 
+	if (item->userCanRemove)
+	{
+		removeBT.reset(AssetManager::getInstance()->getRemoveBT());
+		removeBT->setWantsKeyboardFocus(false);
+		addAndMakeVisible(removeBT.get());
+		removeBT->addListener(this);
+	}
+
 	if (!isRoot)
 	{
-		if (item->userCanRemove)
-		{
-			removeBT.reset(AssetManager::getInstance()->getRemoveBT());
-			removeBT->setWantsKeyboardFocus(false);
-			addAndMakeVisible(removeBT.get());
-			removeBT->addListener(this);
-		}
-
 		if(item->userCanDuplicate)
 		{
 			duplicateBT.reset(AssetManager::getInstance()->getDuplicateBT());
@@ -35,6 +35,15 @@ BaseItemEditor::BaseItemEditor(Array<BaseItem *> bi, bool isRoot) :
 			upBT->addListener(this);
 			downBT->addListener(this);
 		}
+	}
+	else
+	{
+		if (item->itemColor != nullptr)
+		{
+			itemColorUI.reset(item->itemColor->createColorParamUI());
+			addAndMakeVisible(itemColorUI.get());
+		}
+
 	}
 }
 
@@ -72,6 +81,11 @@ void BaseItemEditor::resizedInternalHeader(juce::Rectangle<int>& r)
 		r.removeFromRight(2);
 	}
 
+	if (itemColorUI != nullptr)
+	{
+		itemColorUI->setBounds(r.removeFromRight(targetHeight).reduced(2));
+	}
+
 	if (upBT != nullptr)
 	{
 		upBT->setBounds(r.removeFromRight(targetHeight).reduced(4));
@@ -81,6 +95,8 @@ void BaseItemEditor::resizedInternalHeader(juce::Rectangle<int>& r)
 	{
 		downBT->setBounds(r.removeFromRight(targetHeight).reduced(4));
 	}
+
+
 
 	EnablingControllableContainerEditor::resizedInternalHeader(r);
 	

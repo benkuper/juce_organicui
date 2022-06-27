@@ -51,8 +51,10 @@ public:
 
 	ControllableContainer interfaceCC;
 	BoolParameter* closeToSystemTray;
+	BoolParameter* enableTooltips;
 	IntParameter* fontSize;
 	EnumParameter* helpLanguage;
+
 
 	ControllableContainer saveLoadCC;
 	BoolParameter * enableAutoSave;

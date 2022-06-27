@@ -63,6 +63,7 @@ public:
 
 	void remove();
 
+
 	void setMovePositionReference(bool setOtherSelectedItems = false);
 	virtual void setMovePositionReferenceInternal();
 	void movePosition(Point<float> positionOffset, bool moveOtherSelectedItems = false);
@@ -82,6 +83,7 @@ public:
 	virtual void addUndoableResizeAction(Array<UndoableAction*>& arrayToAdd);
 
 
+
 	//listeners
 	virtual void onContainerParameterChanged(Parameter *) override;
 	virtual void onContainerTriggerTriggered(Trigger *) override;
@@ -91,6 +93,7 @@ public:
 
 	void itemAdded(Script* script) override;
 
+	void setHasCustomColor(bool value);
 
 	var getJSONData() override;
 	void loadJSONDataInternal(var data) override;

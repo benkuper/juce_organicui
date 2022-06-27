@@ -27,6 +27,7 @@ public:
 	std::unique_ptr<ImageButton> duplicateBT;
 	std::unique_ptr<ImageButton> upBT;
 	std::unique_ptr<ImageButton> downBT;
+	std::unique_ptr<ColorParameterUI> itemColorUI;
 
 	void setIsFirst(bool value);
 	void setIsLast(bool value);

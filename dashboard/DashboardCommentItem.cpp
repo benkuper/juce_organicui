@@ -17,6 +17,7 @@ DashboardCommentItem::DashboardCommentItem() :
 	size = addFloatParameter("Size", "The text size", 14, 0, 80);
 	size->customUI = FloatParameter::LABEL;
 
+	setHasCustomColor(true);
 	itemColor->setDefaultValue(TEXT_COLOR);
 
 	bgAlpha = addFloatParameter("Background Alpha", "The alpha", 0, 0, 1);

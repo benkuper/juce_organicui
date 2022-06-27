@@ -380,6 +380,13 @@ void ControllableUI::updateTooltip()
 {
 	if (controllable == nullptr || controllable.wasObjectDeleted()) return;
 
+	bool showTip = GlobalSettings::getInstanceWithoutCreating() == nullptr || GlobalSettings::getInstance()->enableTooltips->boolValue();
+	if (!showTip)
+	{
+		tooltip = "";
+		return;
+	}
+
 	if (customDescription.isNotEmpty())
 	{
 		tooltip = customDescription;

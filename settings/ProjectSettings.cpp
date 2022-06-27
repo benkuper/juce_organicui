@@ -15,7 +15,9 @@ ProjectSettings::ProjectSettings() :
 	dashboardCC("Dashboard Settings"),
 	customValuesCC("Custom Definitions"),
 	customRangesCC("Custom Ranges"),
-	dashboardDefaults("Defaults Values")
+	dashboardDefaults("Defaults Values"),
+	unlockOnce(nullptr),
+	dashboardPassword(nullptr)
 {
 	saveAndLoadRecursiveData = true;
 	fullScreenOnStartup = addBoolParameter("Full Screen on load", "If checked, the app will go full screen when loading the file, otherwise it will go to window mode", false);
@@ -27,8 +29,7 @@ ProjectSettings::ProjectSettings() :
 	showDashboardOnStartup->canBeDisabledByUser = true;
 	showDashboardOnStartup->maxDefaultSearchLevel = 0;
 
-	dashboardPassword = dashboardCC.addStringParameter("Password", "Password for web clients to access the dashboard, leave empty public access", "");
-	unlockOnce = addBoolParameter("Unlock Only Once", "If checked, this will allow to only have to unlock once per session. Refreshing the page will reset the lock.", false);
+
 
 	triggerDefaultSize = dashboardDefaults.addPoint2DParameter("Trigger Size", "Default Size for this type", false);
 	boolDefaultSize = dashboardDefaults.addPoint2DParameter("Bool Size", "Default Size for this type", false);
@@ -81,6 +82,8 @@ ProjectSettings::ProjectSettings() :
 #if ORGANICUI_USE_WEBSERVER
 	enableServer = dashboardCC.addBoolParameter("Enable Dashboard Server", "Activates / Deactivates exposing Dashboard as a webserver", false);
 	serverPort = dashboardCC.addIntParameter("Server Port", "The port that the server binds to", 9999, 0, 65535, false);
+	dashboardPassword = dashboardCC.addStringParameter("Password", "Password for web clients to access the dashboard, leave empty public access", "");
+	unlockOnce = dashboardCC.addBoolParameter("Unlock Only Once", "If checked, this will allow to only have to unlock once per session. Refreshing the page will reset the lock.", false);
 #endif
 
 

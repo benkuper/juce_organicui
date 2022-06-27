@@ -199,11 +199,14 @@ var DashboardManager::getServerData()
 	data.getDynamicObject()->setProperty("computerName", SystemStats::getComputerName());
 	data.getDynamicObject()->setProperty("userName", SystemStats::getFullUserName());
 
-	String pass = ProjectSettings::getInstance()->dashboardPassword->stringValue();
-	if (pass.isNotEmpty())
+	if (ProjectSettings::getInstance()->dashboardPassword != nullptr)
 	{
-		data.getDynamicObject()->setProperty("password", pass);
-		data.getDynamicObject()->setProperty("unlockOnce", ProjectSettings::getInstance()->unlockOnce->boolValue());
+		String pass = ProjectSettings::getInstance()->dashboardPassword->stringValue();
+		if (pass.isNotEmpty())
+		{
+			data.getDynamicObject()->setProperty("password", pass);
+			data.getDynamicObject()->setProperty("unlockOnce", ProjectSettings::getInstance()->unlockOnce->boolValue());
+		}
 	}
 
 	var iData;

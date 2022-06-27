@@ -52,7 +52,7 @@ EnumParameterUI::EnumParameterUI(Array<EnumParameter*> parameters) :
 	cb.addListener(this);
 	cb.setTextWhenNoChoicesAvailable("");
 	cb.setTextWhenNothingSelected("Select an element");
-	cb.setTooltip(ep->description);
+	cb.setTooltip(tooltip);
 	addAndMakeVisible(cb);
 
 	cb.addMouseListener(this, true);

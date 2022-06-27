@@ -15,6 +15,8 @@ CommentItem::CommentItem() :
 	text = addStringParameter("Text", "The comment text", "I Love "+ OrganicApplication::getInstance()->getApplicationName()+ " !");
 	text->multiline = true;
 
+	setHasCustomColor(true);
+	itemColor->hideInEditor = false;
 	itemColor->setDefaultValue(TEXT_COLOR);
 
 	size = addFloatParameter("Size", "The text size", 14, 0,80);

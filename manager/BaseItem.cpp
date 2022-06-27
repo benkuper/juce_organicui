@@ -10,6 +10,7 @@
 
 BaseItem::BaseItem(const String& name, bool _canBeDisabled, bool _canHaveScripts) :
 	EnablingControllableContainer(name.isEmpty() ? getTypeString() : name, _canBeDisabled),
+	itemColor(nullptr),
 	useCustomArrowKeysBehaviour(false),
 	canHaveScripts(_canHaveScripts),
 	userCanRemove(true),
@@ -64,9 +65,6 @@ BaseItem::BaseItem(const String& name, bool _canBeDisabled, bool _canHaveScripts
 	isUILocked->hideInEditor = true;
 	isUILocked->hideInRemoteControl = true;
 	isUILocked->defaultHideInRemoteControl = true;
-
-	itemColor = addColorParameter("Color", "The color of the item", NORMAL_COLOR);
-	itemColor->hideInEditor = true;
 
 	scriptObject.setMethod("getType", BaseItem::getTypeStringFromScript);
 }
@@ -369,6 +367,26 @@ void BaseItem::onControllableFeedbackUpdate(ControllableContainer* cc, Controlla
 void BaseItem::itemAdded(Script* script)
 {
 	script->warningResolveInspectable = this;
+}
+
+void BaseItem::setHasCustomColor(bool value)
+{
+	if (value)
+	{
+		if (itemColor == nullptr)
+		{
+			itemColor = addColorParameter("Color", "The color of the item", NORMAL_COLOR);
+			itemColor->hideInEditor = true;
+		}
+	}
+	else
+	{
+		if (itemColor != nullptr)
+		{
+			removeControllable(itemColor);
+			itemColor = nullptr;
+		}
+	}
 }
 
 var BaseItem::getJSONData()

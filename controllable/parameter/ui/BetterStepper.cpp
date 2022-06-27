@@ -11,7 +11,8 @@
 BetterStepper::BetterStepper(const String& tooltip) :
 	Slider(SliderStyle::IncDecButtons, TextEntryBoxPosition::TextBoxLeft)
 {
-	setTooltip(tooltip);
+	bool showTip = GlobalSettings::getInstanceWithoutCreating() == nullptr && GlobalSettings::getInstance()->enableTooltips->boolValue();
+	if(showTip) setTooltip(tooltip);
 	setIncDecButtonsMode(IncDecButtonMode::incDecButtonsDraggable_Horizontal);
 
 	valueFromTextFunction = &ParameterUI::textToValue;

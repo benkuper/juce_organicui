@@ -155,6 +155,7 @@ void FloatParameterLabelUI::updateUIParamsInternal()
 	valueLabel.setColour(valueLabel.backgroundWhenEditingColourId, Colours::black);
 	valueLabel.setColour(CaretComponent::caretColourId, Colours::orange);
 	valueLabel.setColour(valueLabel.textWhenEditingColourId, Colours::orange);
+	updateTooltip();
 	valueLabel.setTooltip(tooltip);
 
 	if (customTextSize > 0) valueLabel.setFont(customTextSize);

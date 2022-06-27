@@ -36,7 +36,8 @@ public:
 	int headerGap;
 	bool showEnableBT;
 	bool showRemoveBT;
-
+	bool showColorUI;
+	
 	//Resize
 	Direction resizeDirection;
 	int resizerWidth;
@@ -70,6 +71,7 @@ public:
 	Label itemLabel;
 	std::unique_ptr<BoolToggleUI> enabledBT;
 	std::unique_ptr<ImageButton> removeBT;
+	std::unique_ptr<ColorParameterUI> itemColorUI;
 	std::unique_ptr<WarningTargetUI> warningUI;
 	std::unique_ptr<BoolToggleUI> miniModeBT;
 
@@ -138,6 +140,7 @@ BaseItemUI<T>::BaseItemUI(T* _item, Direction _resizeDirection, bool showMiniMod
 	headerGap(2),
 	showEnableBT(true),
 	showRemoveBT(true),
+	showColorUI(true),
 	resizeDirection(_resizeDirection),
 	resizerWidth(0),
 	resizerHeight(0),
@@ -202,6 +205,12 @@ BaseItemUI<T>::BaseItemUI(T* _item, Direction _resizeDirection, bool showMiniMod
 		removeBT.reset(AssetManager::getInstance()->getRemoveBT());
 		this->addAndMakeVisible(removeBT.get());
 		removeBT->addListener(this);
+	}
+
+	if (this->baseItem->itemColor != nullptr)
+	{
+		itemColorUI.reset(item->itemColor->createColorParamUI());
+		this->addAndMakeVisible(itemColorUI.get());
 	}
 
 	if (this->baseItem->showWarningInUI)
@@ -345,6 +354,12 @@ void BaseItemUI<T>::resized()
 	if (removeBT != nullptr && showRemoveBT)
 	{
 		removeBT->setBounds(h.removeFromRight(h.getHeight()));
+		h.removeFromRight(2);
+	}
+
+	if (itemColorUI != nullptr && showColorUI)
+	{
+		itemColorUI->setBounds(h.removeFromRight(h.getHeight()).reduced(2));
 		h.removeFromRight(2);
 	}
 

@@ -159,7 +159,7 @@ void CommentUI::controllableFeedbackUpdateInternal(Controllable * c)
 		textUI.applyFontToAllText(item->size->floatValue(), true);
 		//setSize(textUI.getTextWidth(), textUI.getTextHeight()+4);
 	}
-	else if (c == item->itemColor || c == item->bgAlpha)
+	else if (c == item->bgAlpha || c == item->itemColor)
 	{
 		bgColor = item->itemColor->getColor().darker().withAlpha(item->bgAlpha->floatValue());
 		textUI.applyColourToAllText(item->itemColor->getColor(), true);
