@@ -14,6 +14,7 @@
  //Listener
 class Parameter;
 class TargetParameter;
+class Automation;
 class ParameterAutomation;
 
 class ParameterListener
@@ -220,6 +221,40 @@ public:
 		
 		bool perform() override;
 		bool undo() override;
+	};
+
+	class ValueInterpolator :
+		public Thread,
+		public ChangeBroadcaster
+	{
+	public:
+		ValueInterpolator(WeakReference<Parameter> p, var targetValue, float time, Automation* a, float frequency = 50);
+		~ValueInterpolator();
+
+		WeakReference<Parameter> parameter;
+		var valueAtStart;
+		var targetValue;
+		float time;
+		float sleepMS;
+		Automation* automation;
+
+		void run() override;
+
+		class Manager :
+			public ChangeListener
+		{
+		public:
+			juce_DeclareSingleton(Manager, true);
+
+			void interpolate(WeakReference<Parameter> p, var targetValue, float time, Automation* a);
+			void changeListenerCallback(ChangeBroadcaster* source) override;
+
+			void removeInterpolationWith(Parameter* p);
+
+			HashMap<Parameter*, ValueInterpolator*> interpolatorMap;
+			OwnedArray<ValueInterpolator> interpolators;
+		};
+
 	};
 
 	private:
