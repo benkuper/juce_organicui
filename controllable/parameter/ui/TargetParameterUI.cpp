@@ -251,7 +251,7 @@ void TargetParameterUI::showPopupAndGetTarget(ControllableContainer* startFromCC
 		else
 		{
 
-			ControllableContainer* rContainer = startFromCC != nullptr ? startFromCC : targetParameter->rootContainer;
+			ControllableContainer* rContainer = startFromCC != nullptr ? startFromCC : targetParameter->rootContainer.get();
 
 			int levelOffset = 0;
 			ControllableContainer* pc = startFromCC;
@@ -286,7 +286,7 @@ void TargetParameterUI::showPopupAndGetTarget(ControllableContainer* startFromCC
 		}
 		else
 		{
-			ControllableContainer* rContainer = startFromCC != nullptr ? startFromCC : targetParameter->rootContainer;
+			ControllableContainer* rContainer = startFromCC != nullptr ? startFromCC : targetParameter->rootContainer.get();
 
 			int levelOffset = 0;
 			ControllableContainer* pc = startFromCC;
