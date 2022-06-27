@@ -71,11 +71,12 @@ void ControllableChooserPopupMenu::populateMenu(PopupMenu* subMenu, Controllable
 
 }
 
-void ControllableChooserPopupMenu::showAndGetControllable(std::function<void(Controllable*)> returnFunc)
+void ControllableChooserPopupMenu::showAndGetControllable(std::function<void(Controllable*)> returnFunc, bool deleteAfter)
 {
-	showMenuAsync(PopupMenu::Options(), [this, returnFunc](int result)
+	showMenuAsync(PopupMenu::Options(), [this, returnFunc, deleteAfter](int result)
 		{
 			returnFunc(getControllableForResult(result));
+			if(deleteAfter) delete this;
 		}
 	);
 }

@@ -28,7 +28,7 @@ public:
 	Array<Controllable *> controllableList;
 	void populateMenu(PopupMenu *subMenu, ControllableContainer * container, int &currentId, int currentLevel = 0);
 
-	void showAndGetControllable(std::function<void(Controllable *)> returnFunc);
+	void showAndGetControllable(std::function<void(Controllable *)> returnFunc, bool deleteAfter = false);
 	Controllable * getControllableForResult(int result);
 };
 
