@@ -25,7 +25,7 @@ TargetParameterUI::TargetParameterUI(Array<TargetParameter*> parameters, const S
 	showEditWindowOnDoubleClick = false;
 
 	targetBT.reset(AssetManager::getInstance()->getTargetBT());
-	targetBT->setInterceptsMouseClicks(false, false);
+	//targetBT->setInterceptsMouseClicks(false, false);
 
 	if (targetParameter->customCheckAssignOnNextChangeFunc != nullptr)
 	{
@@ -77,11 +77,25 @@ void TargetParameterUI::resized()
 
 	targetBT->setBounds(r.removeFromLeft(r.getHeight()).reduced(3));
 	r.removeFromLeft(2);
-	label.setBounds(r.reduced(0, 2));
+
+	if (label.isVisible()) label.setBounds(r.reduced(0, 2));
+	else
+	{
+		for (auto& s : stepsUI)
+		{
+			s->bt.setBounds(r.removeFromLeft(80));// s->bt.getWidth()));
+			r.removeFromLeft(2);
+		}
+	}
 }
 
 void TargetParameterUI::updateLabel()
 {
+	for (auto& s : stepsUI) removeChildComponent(&s->bt);
+	stepsUI.clear();
+
+	bool shouldShowLabel = parameter->isControllableFeedbackOnly || forceFeedbackOnly;
+	;
 
 	bool bShowFullAddress = useCustomShowFullAddressInEditor ? customShowFullAddressInEditor : targetParameter->showFullAddressInEditor;
 	bool bShowParentName = useCustomShowParentNameInEditor ? customShowParentNameInEditor : targetParameter->showParentNameInEditor;
@@ -110,9 +124,26 @@ void TargetParameterUI::updateLabel()
 							if (cc == nullptr || cc == Engine::mainEngine || cc == targetParameter->rootContainer) break;
 							if (cc->skipLabelInTarget) continue;
 
+							if (!shouldShowLabel)
+							{
+								StepButton* bt = new StepButton(cc->niceName + " >", cc);
+								addAndMakeVisible(bt->bt);
+								bt->bt.addListener(this);
+								stepsUI.insert(0, bt);
+							}
+							
+
 							newText = cc->niceName + " > " + newText;
 							curPLevel++;
 						}
+					}
+
+					if (!shouldShowLabel)
+					{
+						StepButton* bt = new StepButton(targetParameter->target->niceName, nullptr);
+						addAndMakeVisible(bt->bt);
+						bt->bt.addListener(this);
+						stepsUI.add(bt);
 					}
 
 					newText += targetParameter->target->niceName;
@@ -142,9 +173,25 @@ void TargetParameterUI::updateLabel()
 							if (cc == nullptr || cc == Engine::mainEngine) break;
 							if (cc->skipLabelInTarget) continue;
 
+							if (!shouldShowLabel)
+							{
+								StepButton* bt = new StepButton(cc->niceName + " >", cc);
+								addAndMakeVisible(bt->bt);
+								bt->bt.addListener(this);
+								stepsUI.insert(0, bt);
+							}
+
 							newText = cc->niceName + " > " + newText;
 							curPLevel++;
 						}
+					}
+
+					if (!shouldShowLabel)
+					{
+						StepButton* bt = new StepButton(targetParameter->targetContainer->niceName, nullptr);
+						addAndMakeVisible(bt->bt);
+						bt->bt.addListener(this);
+						stepsUI.add(bt);
 					}
 
 					newText += targetParameter->targetContainer->niceName;
@@ -152,6 +199,7 @@ void TargetParameterUI::updateLabel()
 			}
 		}
 	}
+
 
 	if (newText.isEmpty())
 	{
@@ -161,9 +209,12 @@ void TargetParameterUI::updateLabel()
 
 		if (ghostName.isNotEmpty()) newText = "### " + ghostName;
 		else newText = noTargetText;
+		shouldShowLabel = true;
 	}
 
 	label.setText(newText, dontSendNotification);
+	label.setVisible(shouldShowLabel);
+	resized();
 }
 
 void TargetParameterUI::updateUIParamsInternal()
@@ -182,7 +233,7 @@ void TargetParameterUI::updateUIParamsInternal()
 	updateLabel();
 }
 
-void TargetParameterUI::showPopupAndGetTarget()
+void TargetParameterUI::showPopupAndGetTarget(ControllableContainer* startFromCC)
 {
 	if (!parameter->enabled) return;
 
@@ -190,16 +241,29 @@ void TargetParameterUI::showPopupAndGetTarget()
 	{
 		if (targetParameter->customGetTargetFunc != nullptr)
 		{
-			targetParameter->customGetTargetFunc(targetParameter->typesFilter, targetParameter->excludeTypesFilter, [this](Controllable* c)
+			targetParameter->customGetTargetFunc(targetParameter->typesFilter, targetParameter->excludeTypesFilter, startFromCC, [this](Controllable* c)
 				{
 					if (c == nullptr) return;
-					if (shouldBailOut()) return; 
+					if (shouldBailOut()) return;
 					targetParameter->setValueFromTarget(c);
 				});
 		}
 		else
 		{
-			controllableChooser.reset(new ControllableChooserPopupMenu(targetParameter->rootContainer, 0, targetParameter->maxDefaultSearchLevel, targetParameter->typesFilter, targetParameter->excludeTypesFilter, targetParameter->customTargetFilterFunc));
+
+			ControllableContainer* rContainer = startFromCC != nullptr ? startFromCC : targetParameter->rootContainer;
+
+			int levelOffset = 0;
+			ControllableContainer* pc = startFromCC;
+			while (pc != nullptr && pc != targetParameter->rootContainer)
+			{
+				levelOffset++;
+				pc = pc->parentContainer;
+			}
+
+			int maxSearchLevel = targetParameter->maxDefaultSearchLevel == -1 ? -1 : targetParameter->maxDefaultSearchLevel - levelOffset;
+
+			controllableChooser.reset(new ControllableChooserPopupMenu(rContainer, 0, maxSearchLevel, targetParameter->typesFilter, targetParameter->excludeTypesFilter, targetParameter->customTargetFilterFunc));
 			controllableChooser->showAndGetControllable([this](Controllable* c)
 				{
 					if (c == nullptr) return;
@@ -213,16 +277,29 @@ void TargetParameterUI::showPopupAndGetTarget()
 	{
 		if (targetParameter->customGetTargetContainerFunc != nullptr)
 		{
-			targetParameter->customGetTargetContainerFunc([this](ControllableContainer* cc)
+			targetParameter->customGetTargetContainerFunc(startFromCC, [this](ControllableContainer* cc)
 				{
 					if (cc == nullptr) return;
-					if (shouldBailOut()) return; 
+					if (shouldBailOut()) return;
 					targetParameter->setValueFromTarget(cc);
 				});
 		}
 		else
 		{
-			containerChooser.reset(new ContainerChooserPopupMenu(targetParameter->rootContainer, 0, targetParameter->maxDefaultSearchLevel, targetParameter->defaultContainerTypeCheckFunc, targetParameter->typesFilter, targetParameter->excludeTypesFilter, targetParameter->maxDefaultSearchLevel == -1));
+			ControllableContainer* rContainer = startFromCC != nullptr ? startFromCC : targetParameter->rootContainer;
+
+			int levelOffset = 0;
+			ControllableContainer* pc = startFromCC;
+			while (pc != nullptr && pc != targetParameter->rootContainer)
+			{
+				levelOffset++;
+				pc = pc->parentContainer;
+			}
+
+			int maxSearchLevel = targetParameter->maxDefaultSearchLevel == -1 ? -1 : targetParameter->maxDefaultSearchLevel - levelOffset;
+
+			containerChooser.reset(new ContainerChooserPopupMenu(rContainer, 0, maxSearchLevel, targetParameter->defaultContainerTypeCheckFunc, targetParameter->typesFilter, targetParameter->excludeTypesFilter, maxSearchLevel));
+
 			containerChooser->showAndGetContainer([this](ControllableContainer* cc)
 				{
 					if (cc == nullptr) return;
@@ -234,14 +311,25 @@ void TargetParameterUI::showPopupAndGetTarget()
 	}
 }
 
-void TargetParameterUI::mouseDownInternal(const MouseEvent&)
+void TargetParameterUI::mouseDownInternal(const MouseEvent& e)
 {
-	if (isInteractable()) showPopupAndGetTarget();
+	if (e.eventComponent == this && isInteractable() && label.isVisible()) showPopupAndGetTarget();
 }
 
 void TargetParameterUI::buttonClicked(Button* b)
 {
-	if (b == targetBT.get()) {} // move code here ?
+	if (b == targetBT.get()) showPopupAndGetTarget();
+	else if (TextButton* tb = dynamic_cast<TextButton*>(b))
+	{
+		for (int i = 0; i < stepsUI.size(); i++)
+		{
+			if (tb == &stepsUI[i]->bt)
+			{
+				ControllableContainer* startCC = i > 0 ? stepsUI[i - 1]->reference : nullptr;
+				showPopupAndGetTarget(startCC);
+			}
+		}
+	}
 }
 
 void TargetParameterUI::valueChanged(const var&)
@@ -299,4 +387,10 @@ void TargetParameterUI::newMessage(const ContainerAsyncEvent& e)
 		}
 	}
 
+}
+
+TargetParameterUI::StepButton::StepButton(const String& name, WeakReference<ControllableContainer> reference) :
+	bt(name),
+	reference(reference)
+{
 }

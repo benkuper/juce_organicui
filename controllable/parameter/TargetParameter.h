@@ -44,13 +44,13 @@ public:
 	WeakReference<ControllableContainer> targetContainer;
 	
 	std::function<bool(Controllable*)> customTargetFilterFunc;
-	std::function<void(const StringArray &, const StringArray &, std::function<void(Controllable *)>)> customGetTargetFunc;
+	std::function<void(const StringArray &, const StringArray &, ControllableContainer*, std::function<void(Controllable *)>)> customGetTargetFunc;
 	std::function<String(Controllable*)> customGetControllableLabelFunc;
 	std::function<bool(Controllable*)> customCheckAssignOnNextChangeFunc;
 
 	std::function<bool(ControllableContainer *)> defaultContainerTypeCheckFunc;
 	std::function<String(ControllableContainer*)> customGetContainerLabelFunc;
-	std::function<void(std::function<void(ControllableContainer*)>)> customGetTargetContainerFunc;
+	std::function<void(ControllableContainer*, std::function<void(ControllableContainer*)>)> customGetTargetContainerFunc;
 
 	void resetValue(bool silentSet = false) override;
 	void setGhostValue(const String &ghostVal);

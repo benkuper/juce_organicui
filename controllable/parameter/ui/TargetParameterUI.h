@@ -40,13 +40,22 @@ public:
 	bool useCustomShowLearnButton;
 	bool customShowLearnButton;
 
+	class StepButton
+	{
+	public:
+		StepButton(const String& name, WeakReference<ControllableContainer> reference);
+		TextButton bt;
+		WeakReference<ControllableContainer> reference;
+	};
+	OwnedArray<StepButton> stepsUI;
+
 	void paint(Graphics& g) override;
 	void resized() override;
 
 	virtual void updateLabel();
 	virtual void updateUIParamsInternal() override;
 
-	virtual void showPopupAndGetTarget();//can be overriden to get specific PopupMenu
+	virtual void showPopupAndGetTarget(ControllableContainer* startFromCC = nullptr);//can be overriden to get specific PopupMenu
 	void mouseDownInternal(const MouseEvent& e) override;
 
 	virtual void buttonClicked(Button* b) override;
