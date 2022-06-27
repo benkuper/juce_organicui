@@ -108,7 +108,11 @@ void TargetParameterUI::updateLabel()
 	{
 		if (targetParameter->target != nullptr)
 		{
-			if (!forceNoCustomFunc && targetParameter->customGetControllableLabelFunc != nullptr) newText = targetParameter->customGetControllableLabelFunc(targetParameter->target);
+			if (!forceNoCustomFunc && targetParameter->customGetControllableLabelFunc != nullptr)
+			{
+				newText = targetParameter->target->getControlAddress();
+				stepsUI.addArray(targetParameter->customGetControllableLabelFunc(targetParameter->target));
+			}
 			else
 			{
 				if (bShowFullAddress) targetParameter->target->getControlAddress();
@@ -124,14 +128,7 @@ void TargetParameterUI::updateLabel()
 							if (cc == nullptr || cc == Engine::mainEngine || cc == targetParameter->rootContainer) break;
 							if (cc->skipLabelInTarget) continue;
 
-							if (!shouldShowLabel)
-							{
-								StepButton* bt = new StepButton(cc->niceName + " >", cc);
-								addAndMakeVisible(bt->bt);
-								bt->bt.addListener(this);
-								stepsUI.insert(0, bt);
-							}
-							
+							if (!shouldShowLabel) stepsUI.insert(0, new TargetStepButton(cc->niceName + " >", cc));
 
 							newText = cc->niceName + " > " + newText;
 							curPLevel++;
@@ -139,12 +136,7 @@ void TargetParameterUI::updateLabel()
 					}
 
 					if (!shouldShowLabel)
-					{
-						StepButton* bt = new StepButton(targetParameter->target->niceName, nullptr);
-						addAndMakeVisible(bt->bt);
-						bt->bt.addListener(this);
-						stepsUI.add(bt);
-					}
+						stepsUI.add(new TargetStepButton(targetParameter->target->niceName, nullptr));
 
 					newText += targetParameter->target->niceName;
 				}
@@ -155,7 +147,12 @@ void TargetParameterUI::updateLabel()
 	{
 		if (targetParameter->targetContainer != nullptr)
 		{
-			if (!forceNoCustomFunc && targetParameter->customGetContainerLabelFunc != nullptr) newText = targetParameter->customGetContainerLabelFunc(targetParameter->targetContainer);
+			if (!forceNoCustomFunc && targetParameter->customGetContainerLabelFunc != nullptr)
+			{
+				newText = targetParameter->targetContainer->getControlAddress();
+				stepsUI.addArray(targetParameter->customGetContainerLabelFunc(targetParameter->targetContainer));
+
+			}
 			else
 			{
 				if (bShowFullAddress) targetParameter->target->getControlAddress();
@@ -173,26 +170,14 @@ void TargetParameterUI::updateLabel()
 							if (cc == nullptr || cc == Engine::mainEngine) break;
 							if (cc->skipLabelInTarget) continue;
 
-							if (!shouldShowLabel)
-							{
-								StepButton* bt = new StepButton(cc->niceName + " >", cc);
-								addAndMakeVisible(bt->bt);
-								bt->bt.addListener(this);
-								stepsUI.insert(0, bt);
-							}
+							if (!shouldShowLabel) stepsUI.insert(0, new TargetStepButton(cc->niceName + " >", cc));
 
 							newText = cc->niceName + " > " + newText;
 							curPLevel++;
 						}
 					}
 
-					if (!shouldShowLabel)
-					{
-						StepButton* bt = new StepButton(targetParameter->targetContainer->niceName, nullptr);
-						addAndMakeVisible(bt->bt);
-						bt->bt.addListener(this);
-						stepsUI.add(bt);
-					}
+					if (!shouldShowLabel) stepsUI.add(new TargetStepButton(targetParameter->targetContainer->niceName, nullptr));
 
 					newText += targetParameter->targetContainer->niceName;
 				}
@@ -200,20 +185,29 @@ void TargetParameterUI::updateLabel()
 		}
 	}
 
-
-	if (newText.isEmpty())
+	if (stepsUI.isEmpty())
 	{
-		String ghostName = "";
-		if (targetParameter->value.toString().isNotEmpty()) ghostName = targetParameter->value.toString();
-		else if (targetParameter->ghostValue.isNotEmpty()) ghostName = targetParameter->ghostValue;
+		if (newText.isEmpty())
+		{
+			String ghostName = "";
+			if (targetParameter->value.toString().isNotEmpty()) ghostName = targetParameter->value.toString();
+			else if (targetParameter->ghostValue.isNotEmpty()) ghostName = targetParameter->ghostValue;
 
-		if (ghostName.isNotEmpty()) newText = "### " + ghostName;
-		else newText = noTargetText;
+			if (ghostName.isNotEmpty()) newText = "### " + ghostName;
+			else newText = noTargetText;
+		}
 		shouldShowLabel = true;
 	}
 
 	label.setText(newText, dontSendNotification);
 	label.setVisible(shouldShowLabel);
+
+	for (auto& s : stepsUI)
+	{
+		s->bt.addListener(this);
+		addAndMakeVisible(s->bt);
+	}
+
 	resized();
 }
 
@@ -389,8 +383,11 @@ void TargetParameterUI::newMessage(const ContainerAsyncEvent& e)
 
 }
 
-TargetParameterUI::StepButton::StepButton(const String& name, WeakReference<ControllableContainer> reference) :
+TargetStepButton::TargetStepButton(const String& name, WeakReference<ControllableContainer> reference) :
 	bt(name),
 	reference(reference)
 {
+
+	bt.setColour(bt.buttonColourId, NORMAL_COLOR.withAlpha(.3f));
+	bt.setColour(bt.buttonOnColourId, NORMAL_COLOR);
 }

@@ -10,6 +10,14 @@
 
 #pragma once
 
+class TargetStepButton
+{
+public:
+	TargetStepButton(const String& name, WeakReference<ControllableContainer> reference);
+	TextButton bt;
+	WeakReference<ControllableContainer> reference;
+};
+
 class TargetParameterUI :
 	public ParameterUI,
 	public Button::Listener,
@@ -40,14 +48,8 @@ public:
 	bool useCustomShowLearnButton;
 	bool customShowLearnButton;
 
-	class StepButton
-	{
-	public:
-		StepButton(const String& name, WeakReference<ControllableContainer> reference);
-		TextButton bt;
-		WeakReference<ControllableContainer> reference;
-	};
-	OwnedArray<StepButton> stepsUI;
+	
+	OwnedArray<TargetStepButton> stepsUI;
 
 	void paint(Graphics& g) override;
 	void resized() override;

@@ -11,6 +11,7 @@
 #pragma once
 
 class TargetParameterUI;
+class TargetStepButton;
 
 class TargetParameter :
 	public StringParameter,
@@ -45,11 +46,11 @@ public:
 	
 	std::function<bool(Controllable*)> customTargetFilterFunc;
 	std::function<void(const StringArray &, const StringArray &, ControllableContainer*, std::function<void(Controllable *)>)> customGetTargetFunc;
-	std::function<String(Controllable*)> customGetControllableLabelFunc;
+	std::function<Array<TargetStepButton*>(Controllable*)> customGetControllableLabelFunc;
 	std::function<bool(Controllable*)> customCheckAssignOnNextChangeFunc;
 
 	std::function<bool(ControllableContainer *)> defaultContainerTypeCheckFunc;
-	std::function<String(ControllableContainer*)> customGetContainerLabelFunc;
+	std::function<Array<TargetStepButton*>(ControllableContainer*)> customGetContainerLabelFunc;
 	std::function<void(ControllableContainer*, std::function<void(ControllableContainer*)>)> customGetTargetContainerFunc;
 
 	void resetValue(bool silentSet = false) override;
