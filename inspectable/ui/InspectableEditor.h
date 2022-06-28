@@ -35,7 +35,7 @@ public:
 
 	void componentMovedOrResized(Component & c, bool wasMoved, bool wasResized) override;
 	
-	void updateVisibility();
+	virtual void updateVisibility();
 
 	virtual void parentHierarchyChanged() override;
 
