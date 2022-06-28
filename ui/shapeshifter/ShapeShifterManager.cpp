@@ -249,6 +249,10 @@ void ShapeShifterManager::loadLayout(var layout)
 		}
 	}
 
+	if (openedPanels.size() > 0)
+	{
+		if(openedPanels[0]->isShowing()) openedPanels[0]->grabKeyboardFocus();
+	}
 }
 
 var ShapeShifterManager::getCurrentLayout()
@@ -304,8 +308,11 @@ void ShapeShifterManager::loadLayoutFromFile(const File& fromFile)
 		LOGERROR("Error loading layout");
 		return;
 	}
+
 	var data = JSON::parse(*is);
 	loadLayout(data);
+
+
 }
 
 void ShapeShifterManager::loadLastSessionLayoutFile()
@@ -518,7 +525,7 @@ void ShapeShifterManager::handleMenuPanelCommand(int commandID)
 			break;
 
 		default:
-			loadLayoutFromFile(sCommandID - 5);
+			//loadLayoutFromFile(sCommandID - 5);
 			break;
 		}
 		return;
@@ -526,8 +533,12 @@ void ShapeShifterManager::handleMenuPanelCommand(int commandID)
 
 	int relCommandID = commandID - baseMenuCommandID - 1;
 
-	String contentName = ShapeShifterFactory::getInstance()->defs[relCommandID]->contentName;
-	showContent(contentName);
+	if (relCommandID >= 0 && relCommandID < ShapeShifterFactory::getInstance()->defs.size())
+	{
+
+		String contentName = ShapeShifterFactory::getInstance()->defs[relCommandID]->contentName;
+		showContent(contentName);
+	}
 }
 
 bool ShapeShifterManager::handleCommandID(int commandID)
