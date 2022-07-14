@@ -435,7 +435,7 @@ void DashboardManager::setCurrentDashboard(Dashboard* d, bool setInClients, Stri
 #endif
 }
 
-void DashboardManager::itemDataFeedback(var data)
+void DashboardManager::parameterFeedback(var data)
 {
 #if ORGANICUI_USE_WEBSERVER
 	if (server != nullptr)

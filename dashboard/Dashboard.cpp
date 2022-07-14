@@ -19,10 +19,12 @@ Dashboard::Dashboard() :
 	unlockOnce = addBoolParameter("Unlock Only Once", "If checked, this will allow to only have to unlock once per session. Refreshing the page will reset the lock.", false);
 	addChildControllableContainer(&itemManager);
 	itemManager.addBaseManagerListener(this);
+	itemManager.addDashboardFeedbackListener(this);
 }
 
 Dashboard::~Dashboard()
 {
+	itemManager.removeDashboardFeedbackListener(this);
 }
 
 void Dashboard::setIsBeingEdited(bool value)
@@ -35,32 +37,32 @@ void Dashboard::setIsBeingEdited(bool value)
 
 void Dashboard::itemAdded(DashboardItem* item)
 {
-	item->addDashboardItemListener(this);
+	item->addDashboardFeedbackListener(this);
 	dashboardListeners.call(&DashboardListener::askForRefresh, this);
 
 }
 
 void Dashboard::itemsAdded(Array<DashboardItem*> items)
 {
-	for (auto& i : items) i->addDashboardItemListener(this);
+	for (auto& i : items) i->addDashboardFeedbackListener(this);
 	dashboardListeners.call(&DashboardListener::askForRefresh, this);
 }
 
 void Dashboard::itemRemoved(DashboardItem* item)
 {
-	item->removeDashboardItemListener(this);
+	item->removeDashboardFeedbackListener(this);
 	dashboardListeners.call(&DashboardListener::askForRefresh, this);
 }
 
 void Dashboard::itemsRemoved(Array<DashboardItem*> items)
 {
-	for (auto& i : items) i->removeDashboardItemListener(this);
+	for (auto& i : items) i->removeDashboardFeedbackListener(this);
 	dashboardListeners.call(&DashboardListener::askForRefresh, this);
 }
 
-void Dashboard::itemDataFeedback(var data)
+void Dashboard::parameterFeedback(var data)
 {
-	dashboardListeners.call(&DashboardListener::itemDataFeedback, data);
+	dashboardListeners.call(&DashboardListener::parameterFeedback, data);
 }
 
 var Dashboard::getJSONData()

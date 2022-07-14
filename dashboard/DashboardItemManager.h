@@ -11,7 +11,8 @@
 #pragma once
 
 class DashboardItemManager :
-	public BaseManager<DashboardItem>
+	public BaseManager<DashboardItem>,
+	public DashboardFeedbackBroadcaster
 {
 public:
 	DashboardItemManager();
@@ -24,6 +25,7 @@ public:
 	FloatParameter* bgImageAlpha;
 
 	void clear() override;
-
 	void fillServerData(var & data);
+
+	void onContainerParameterChanged(Parameter* p) override;
 };

@@ -1,3 +1,4 @@
+#include "DashboardParameterItem.h"
 DashboardParameterItem::DashboardParameterItem(Parameter* parameter) :
 	DashboardControllableItem(parameter),
 	parameter(nullptr),
@@ -233,4 +234,34 @@ var DashboardTargetParameterItem::getServerData()
 	if (showLearnButton->enabled) data.getDynamicObject()->setProperty("showLearnButton", showLearnButton->intValue());
 
 	return data;
+}
+
+DashboardEnumParameterItem::DashboardEnumParameterItem(EnumParameter* parameter) :
+	DashboardParameterItem(parameter)
+{
+	if (parameter == nullptr) return;
+	((EnumParameter*)parameter)->addEnumParameterListener(this);
+}
+
+DashboardEnumParameterItem::~DashboardEnumParameterItem()
+{
+	if (parameter == nullptr || parameter.wasObjectDeleted()) return;
+	
+	((EnumParameter*)parameter.get())->removeEnumParameterListener(this);
+
+}
+
+void DashboardEnumParameterItem::enumOptionAdded(EnumParameter*, const String&)
+{
+	notifyParameterFeedback(parameter);
+}
+
+void DashboardEnumParameterItem::enumOptionUpdated(EnumParameter*, int index, const String& prevKey, const String& newKey)
+{
+	notifyParameterFeedback(parameter);
+}
+
+void DashboardEnumParameterItem::enumOptionRemoved(EnumParameter*, const String&)
+{
+	notifyParameterFeedback(parameter);
 }

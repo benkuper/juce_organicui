@@ -66,7 +66,7 @@ public:
 
 	void setCurrentDashboard(Dashboard* d, bool setInClients = false, StringArray excludeIds = StringArray());
 
-	void itemDataFeedback(var data) override;
+	void parameterFeedback(var data) override;
 	void askForRefresh(Dashboard *d) override;
 
 	void endLoadFile() override;

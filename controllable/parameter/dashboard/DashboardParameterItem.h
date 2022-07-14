@@ -49,3 +49,23 @@ public:
 	virtual String getTypeString() const override { return "DashboardTargetParameterItem"; }
 };
 
+class DashboardEnumParameterItem :
+	public DashboardParameterItem,
+	public EnumParameter::Listener
+{
+public:
+	DashboardEnumParameterItem(EnumParameter* parameter = nullptr);
+	virtual ~DashboardEnumParameterItem();
+
+	// Inherited via Listener
+	virtual void enumOptionAdded(EnumParameter*, const String&) override;
+	virtual void enumOptionUpdated(EnumParameter*, int index, const String& prevKey, const String& newKey) override;
+	virtual void enumOptionRemoved(EnumParameter*, const String&) override;
+
+	static DashboardParameterItem* create(var) { return new DashboardEnumParameterItem(); }
+	virtual String getTypeString() const override { return "DashboardEnumParameterItem"; }
+};
+
+
+
+

@@ -5,6 +5,7 @@
 #include "comment/ui/CommentUI.cpp"
 #include "comment/ui/CommentManagerViewUI.cpp"
 
+#include "dashboard/DashboardFeedbackBroadcaster.cpp"
 #include "dashboard/Dashboard.cpp"
 #include "dashboard/DashboardItem.cpp"
 #include "dashboard/DashboardCommentItem.cpp"

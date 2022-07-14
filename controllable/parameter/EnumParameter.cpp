@@ -306,3 +306,8 @@ EnumParameterButtonBarUI* EnumParameter::createButtonBarUI(Array<EnumParameter*>
 ControllableUI* EnumParameter::createDefaultUI(Array<Controllable*> controllables) {
 	return createUI(getArrayAs<Controllable, EnumParameter>(controllables));
 }
+
+DashboardItem* EnumParameter::createDashboardItem()
+{
+	return new DashboardEnumParameterItem(this);
+}

@@ -5,6 +5,7 @@ DashboardItemFactory::DashboardItemFactory()
 	defs.add(Definition::createDef("", "DashboardTriggerItem",&DashboardTriggerItem::create));
 	defs.add(Definition::createDef("", "DashboardParameterItem", &DashboardParameterItem::create));
 	defs.add(Definition::createDef("", "DashboardTargetParameterItem", &DashboardTargetParameterItem::create));
+	defs.add(Definition::createDef("", "DashboardEnumParameterItem", &DashboardEnumParameterItem::create));
 	defs.add(Definition::createDef("", "DashboardCCItem", &DashboardCCItem::create));
 	defs.add(Definition::createDef("", "DashboardGroupItem", &DashboardGroupItem::create));
 	defs.add(Definition::createDef("", "DashboardCommentItem", &DashboardCommentItem::create));

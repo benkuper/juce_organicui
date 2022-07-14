@@ -79,6 +79,8 @@ public:
 	EnumParameterButtonBarUI* createButtonBarUI(Array<EnumParameter*> parameters = {});
 	ControllableUI * createDefaultUI(Array<Controllable*> controllables = {}) override;
 
+	virtual DashboardItem* createDashboardItem() override;
+
 
 	//Listener
 	class  Listener

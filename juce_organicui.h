@@ -262,6 +262,7 @@ using namespace juce;
 #include "comment/ui/CommentUI.h"
 #include "comment/ui/CommentManagerViewUI.h"
 
+#include "dashboard/DashboardFeedbackBroadcaster.h"
 #include "dashboard/DashboardItem.h"
 #include "dashboard/DashboardItemFactory.h"
 #include "dashboard/DashboardItemManager.h"

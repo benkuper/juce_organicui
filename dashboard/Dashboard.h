@@ -13,7 +13,7 @@
 class Dashboard :
 	public BaseItem,
 	public DashboardItemManager::ManagerListener,
-	public DashboardItem::DashboardItemListener
+	public DashboardFeedbackBroadcaster::FeedbackListener
 {
 public:
 	Dashboard();
@@ -30,7 +30,8 @@ public:
 	void itemsAdded(Array<DashboardItem*>) override;
 	void itemRemoved(DashboardItem*) override;
 	void itemsRemoved(Array<DashboardItem*>) override;
-	void itemDataFeedback(var data) override; //from DashboardItemListener
+	void parameterFeedback(var data) override; //from DashboardItemListener
+
 
 	var getJSONData() override;
 	void loadJSONDataInternal(var data) override;
@@ -42,7 +43,7 @@ public:
 	public:
 		/** Destructor. */
 		virtual ~DashboardListener() {}
-		virtual void itemDataFeedback(var data) = 0;
+		virtual void parameterFeedback(var data) = 0;
 		virtual void askForRefresh(Dashboard * d) = 0;
 	};
 

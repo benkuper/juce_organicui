@@ -41,3 +41,8 @@ void DashboardItemManager::fillServerData(var &data)
 	for (auto& i : items) iData.append(i->getServerData());
 	data.getDynamicObject()->setProperty("items", iData);
 }
+
+void DashboardItemManager::onContainerParameterChanged(Parameter* p)
+{
+	notifyParameterFeedback(p);
+}
