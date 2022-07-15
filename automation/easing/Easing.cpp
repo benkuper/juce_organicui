@@ -214,7 +214,7 @@ void CubicEasing::updateBezier()
 	Point<float> a2 = end + anchor2->getPoint();
 	bezier = Bezier::Bezier<3>({ {start.x, start.y},{a1.x, a1.y},{a2.x,a2.y},{end.x,end.y} });
 
-	updateUniformLUT(1 + length * 50);
+	updateUniformLUT(1 + length * 20);
 }
 
 void CubicEasing::updateUniformLUT(int precision)
