@@ -7,6 +7,7 @@ public:
 
 	void notifyParameterFeedback(WeakReference<Parameter> p);
 	void notifyDataFeedback(var data);
+	void notifyDashboardFeedback(var data);
 
 	class FeedbackListener
 	{
@@ -14,6 +15,7 @@ public:
 		/** Destructor. */
 		virtual ~FeedbackListener() {}
 		virtual void parameterFeedback(var data) = 0;
+		virtual void dashboardFeedback(var data) = 0;
 	};
 
 	ListenerList<FeedbackListener> feedbackListeners;

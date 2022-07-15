@@ -1,4 +1,3 @@
-
 var DashboardFeedbackBroadcaster::getItemParameterFeedback(Parameter* p)
 {
 	var data(new DynamicObject());
@@ -30,4 +29,9 @@ void DashboardFeedbackBroadcaster::notifyParameterFeedback(WeakReference<Paramet
 void DashboardFeedbackBroadcaster::notifyDataFeedback(var data)
 {
 	feedbackListeners.call(&FeedbackListener::parameterFeedback, data);
+}
+
+void DashboardFeedbackBroadcaster::notifyDashboardFeedback(var data)
+{
+	feedbackListeners.call(&FeedbackListener::dashboardFeedback, data);
 }

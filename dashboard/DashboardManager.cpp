@@ -446,6 +446,18 @@ void DashboardManager::parameterFeedback(var data)
 #endif
 }
 
+void DashboardManager::dashboardFeedback(var data)
+{
+#if ORGANICUI_USE_WEBSERVER
+	if (server != nullptr)
+	{
+		data.getDynamicObject()->setProperty("dataType", "dashboardFeedback");
+		server->send(JSON::toString(data));
+	}
+#endif
+}
+
+
 void DashboardManager::askForRefresh(Dashboard* d)
 {
 #if ORGANICUI_USE_WEBSERVER

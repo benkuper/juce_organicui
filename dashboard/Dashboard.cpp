@@ -1,3 +1,4 @@
+#include "Dashboard.h"
 /*
   ==============================================================================
 
@@ -63,6 +64,11 @@ void Dashboard::itemsRemoved(Array<DashboardItem*> items)
 void Dashboard::parameterFeedback(var data)
 {
 	dashboardListeners.call(&DashboardListener::parameterFeedback, data);
+}
+
+void Dashboard::dashboardFeedback(var data)
+{
+	dashboardListeners.call(&DashboardListener::dashboardFeedback, data);
 }
 
 var Dashboard::getJSONData()

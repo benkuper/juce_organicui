@@ -31,6 +31,7 @@ public:
 	void itemRemoved(DashboardItem*) override;
 	void itemsRemoved(Array<DashboardItem*>) override;
 	void parameterFeedback(var data) override; //from DashboardItemListener
+	void dashboardFeedback(var data) override; //from DashboardItemListener
 
 
 	var getJSONData() override;
@@ -44,6 +45,7 @@ public:
 		/** Destructor. */
 		virtual ~DashboardListener() {}
 		virtual void parameterFeedback(var data) = 0;
+		virtual void dashboardFeedback(var data) = 0;
 		virtual void askForRefresh(Dashboard * d) = 0;
 	};
 
