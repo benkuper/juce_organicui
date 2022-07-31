@@ -10,11 +10,18 @@
 
 
 GenericControllableItem::GenericControllableItem(var params) :
-	BaseItem("Item",true)
+	GenericControllableItem(nullptr, params)
+{
+}
+
+GenericControllableItem::GenericControllableItem(Controllable* c, var params) :
+	BaseItem("Item", true),
+	controllable(c)
 {
 	typeAtCreation = params.getProperty("type", "");
+	
+	if (controllable == nullptr) controllable = ControllableFactory::createControllable(params.getProperty("controllableType", ""));
 
-	controllable = ControllableFactory::createControllable(params.getProperty("controllableType",""));
 	controllable->description = "Custom control of type " + controllable->getTypeString();
 	controllable->saveValueOnly = false;
 	controllable->isCustomizableByUser = true;// controllable->type != Controllable::STRING;

@@ -15,9 +15,10 @@ class GenericControllableItem :
 {
 public:
 	GenericControllableItem(var params = var());
+	GenericControllableItem(Controllable* c, var params = var());
 	~GenericControllableItem();
 
-	Controllable * controllable;
+	Controllable * controllable = nullptr;
 
 	void onContainerNiceNameChanged() override;
 	void controllableNameChanged(Controllable* c) override;

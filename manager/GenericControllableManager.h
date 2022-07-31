@@ -21,7 +21,12 @@ public:
 
 	void setForceItemsFeedbackOnly(bool value);
 
+	String getTypeForControllableType(const String& type);
+
 	Factory<GenericControllableItem> factory;
+
+	GenericControllableItem* addItemFrom(Controllable* c, bool copyValue = true);
+
 	void addItemInternal(GenericControllableItem* item, var data) override;
 	virtual InspectableEditor* getEditorInternal(bool isRoot, Array<Inspectable*> inspectables = Array<Inspectable*>()) override;
 
