@@ -34,6 +34,7 @@ public:
 	static var getIPs(const var::NativeFunctionArgs& a);
 
 	static var encodeHMAC_SHA1(const var::NativeFunctionArgs& a);
+	static var encodeSHA256(const var::NativeFunctionArgs& a);
 	static var encodeSHA512(const var::NativeFunctionArgs& a);
 
 	static var toBase64(const var::NativeFunctionArgs& a);

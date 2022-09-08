@@ -8,7 +8,6 @@
   ==============================================================================
 */
 
-
 juce_ImplementSingleton(ScriptUtil)
 
 String getAppVersion();
@@ -28,6 +27,7 @@ ScriptUtil::ScriptUtil() :
 
 	scriptObject.setMethod("getIPs", ScriptUtil::getIPs);
 	scriptObject.setMethod("encodeHMAC_SHA1", ScriptUtil::encodeHMAC_SHA1);
+	scriptObject.setMethod("encodeSHA256", ScriptUtil::encodeSHA256);
 	scriptObject.setMethod("encodeSHA512", ScriptUtil::encodeSHA512);
 	scriptObject.setMethod("toBase64", ScriptUtil::toBase64);
 	scriptObject.setMethod("fromBase64", ScriptUtil::fromBase64);
@@ -181,6 +181,13 @@ var ScriptUtil::encodeHMAC_SHA1(const var::NativeFunctionArgs& a)
 		dbgHex += String::toHexString(data[i]) + " ";
 	}
 	return Base64::toBase64(b.getData(), b.getSize());
+}
+
+var ScriptUtil::encodeSHA256(const var::NativeFunctionArgs& a)
+{
+	if (a.numArguments < 1) return "";
+	String s = a.arguments[0].toString();
+	return juce::SHA256(s.toStdString().c_str(), s.length()).toHexString();
 }
 
 var ScriptUtil::encodeSHA512(const var::NativeFunctionArgs& a)
