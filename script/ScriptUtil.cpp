@@ -202,7 +202,7 @@ var ScriptUtil::toBase64(const var::NativeFunctionArgs& a)
 	if (a.arguments[0].isString())
 	{
 		std::string result = base64_encode((const unsigned char*)a.arguments[0].toString().toStdString().c_str(), a.arguments[0].toString().length());
-		return result;
+		return String(result);
 	}
 	else if (a.arguments[0].isArray())
 	{
