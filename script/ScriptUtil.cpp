@@ -56,14 +56,14 @@ ScriptUtil::ScriptUtil() :
 	scriptObject.setMethod("getSelectedObjectsCount", ScriptUtil::getSelectedObjectsCountFromScript);
 }
 
-var ScriptUtil::getTime(const var::NativeFunctionArgs &)
+var ScriptUtil::getTime(const var::NativeFunctionArgs&)
 {
 	return (float)(Time::getMillisecondCounter() / 1000.);
 }
 
 var ScriptUtil::getTimestamp(const var::NativeFunctionArgs&)
 {
-	return Time::currentTimeMillis()/1000;
+	return Time::currentTimeMillis() / 1000;
 }
 
 var ScriptUtil::delayThreadMS(const var::NativeFunctionArgs& a)
@@ -82,7 +82,7 @@ var ScriptUtil::delayThreadMS(const var::NativeFunctionArgs& a)
 	return true;
 }
 
-var ScriptUtil::getFloatFromBytes(const var::NativeFunctionArgs & a)
+var ScriptUtil::getFloatFromBytes(const var::NativeFunctionArgs& a)
 {
 	if (a.numArguments < 4) return 0;
 	uint8_t bytes[4];
@@ -174,12 +174,12 @@ var ScriptUtil::encodeHMAC_SHA1(const var::NativeFunctionArgs& a)
 
 	MemoryBlock b = HMAC_SHA1::encode(a.arguments[0].toString(), a.arguments[1].toString());
 
-	uint8_t* data = (uint8_t*)b.getData();
-	String dbgHex = "";
-	for (int i = 0; i < b.getSize(); ++i)
-	{
-		dbgHex += String::toHexString(data[i]) + " ";
-	}
+	//uint8_t* data = (uint8_t*)b.getData();
+	//String dbgHex = "";
+	//for (int i = 0; i < b.getSize(); ++i)
+	//{
+	//	dbgHex += String::toHexString(data[i]) + " ";
+	//}
 	return Base64::toBase64(b.getData(), b.getSize());
 }
 
@@ -196,13 +196,24 @@ var ScriptUtil::encodeSHA512(const var::NativeFunctionArgs& a)
 	String result = OrganicCrypto::detail::basic_sha512<char>::calculate(a.arguments[0].toString().toStdString());
 	return result;
 }
-
 var ScriptUtil::toBase64(const var::NativeFunctionArgs& a)
 {
 	if (a.numArguments < 1) return 0;
-	std::string result = base64_encode((const unsigned char *)a.arguments[0].toString().toStdString().c_str(), a.arguments[0].toString().length());
-	return String(result);
+	if (a.arguments[0].isString())
+	{
+		std::string result = base64_encode((const unsigned char*)a.arguments[0].toString().toStdString().c_str(), a.arguments[0].toString().length());
+		return result;
+	}
+	else if (a.arguments[0].isArray())
+	{
+		Array<uint8> bytes;
+		for (int i = 0; i < a.arguments[0].size(); i++) bytes.add((uint8)(int)a.arguments[0][i]);
+		String result = Base64::toBase64(bytes.getRawDataPointer(), bytes.size());
+		return result;
+	}
+	return "[type not handled]";
 }
+
 
 var ScriptUtil::fromBase64(const var::NativeFunctionArgs& a)
 {
@@ -556,6 +567,7 @@ inline std::string ScriptUtil::base64_encode(unsigned char const* src, unsigned 
 
 }
 
+
 inline std::string ScriptUtil::base64_decode(std::string const& data)
 {
 	const int B64index[256] = { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
@@ -602,7 +614,7 @@ var ScriptUtil::base64_decode_bytes(const String& data)
 		7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,  0,
 		0,  0,  0, 63,  0, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
 		41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51 };
-	
+
 	CharPointer_UTF8 p = data.getCharPointer();
 	//unsigned char* p = (unsigned char*)data.toStdString().c_str();
 	int len = data.length();
@@ -655,7 +667,7 @@ var ScriptUtil::getSelectedObjectFromScript(const var::NativeFunctionArgs& args)
 		item = InspectableSelectionManager::activeSelectionManager->getInspectableAs<BaseItem>();
 	}
 
-	if(item) return item->getScriptObject();
+	if (item) return item->getScriptObject();
 
 	return var();
 }
