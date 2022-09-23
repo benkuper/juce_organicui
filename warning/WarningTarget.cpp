@@ -39,7 +39,7 @@ void WarningTarget::setWarningMessage(const String& message, const String& id)
 	}
 	else
 	{
-		warningMessage[id] = message;
+		warningMessage.set(id, message);
 		WarningReporter::getInstance()->registerWarning(this);
 	}
 
