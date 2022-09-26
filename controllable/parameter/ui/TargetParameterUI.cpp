@@ -8,6 +8,8 @@
   ==============================================================================
 */
 
+#include "juce_organicui/juce_organicui.h"
+
 TargetParameterUI::TargetParameterUI(Array<TargetParameter*> parameters, const String& _noTargetText) :
 	ParameterUI(Inspectable::getArrayAs<TargetParameter, Parameter>(parameters)),
 	noTargetText(_noTargetText),
@@ -257,7 +259,7 @@ void TargetParameterUI::showPopupAndGetTarget(ControllableContainer* startFromCC
 
 			int maxSearchLevel = targetParameter->maxDefaultSearchLevel == -1 ? -1 : targetParameter->maxDefaultSearchLevel - levelOffset;
 
-			controllableChooser.reset(new ControllableChooserPopupMenu(rContainer, 0, maxSearchLevel, targetParameter->typesFilter, targetParameter->excludeTypesFilter, targetParameter->customTargetFilterFunc));
+			controllableChooser.reset(new ControllableChooserPopupMenu(rContainer, 0, maxSearchLevel, targetParameter->typesFilter, targetParameter->excludeTypesFilter, targetParameter->customTargetFilterFunc, targetParameter->target.get()));
 			controllableChooser->showAndGetControllable([this](Controllable* c)
 				{
 					if (c == nullptr) return;
@@ -292,7 +294,7 @@ void TargetParameterUI::showPopupAndGetTarget(ControllableContainer* startFromCC
 
 			int maxSearchLevel = targetParameter->maxDefaultSearchLevel == -1 ? -1 : targetParameter->maxDefaultSearchLevel - levelOffset;
 
-			containerChooser.reset(new ContainerChooserPopupMenu(rContainer, 0, maxSearchLevel, targetParameter->defaultContainerTypeCheckFunc, targetParameter->typesFilter, targetParameter->excludeTypesFilter, maxSearchLevel));
+			containerChooser.reset(new ContainerChooserPopupMenu(rContainer, 0, maxSearchLevel, targetParameter->defaultContainerTypeCheckFunc, targetParameter->typesFilter, targetParameter->excludeTypesFilter, maxSearchLevel, targetParameter->targetContainer.get()));
 
 			containerChooser->showAndGetContainer([this](ControllableContainer* cc)
 				{
@@ -307,7 +309,11 @@ void TargetParameterUI::showPopupAndGetTarget(ControllableContainer* startFromCC
 
 void TargetParameterUI::mouseDownInternal(const MouseEvent& e)
 {
-	if (e.eventComponent == this && isInteractable() && label.isVisible()) showPopupAndGetTarget();
+	if (e.eventComponent == this && isInteractable() && label.isVisible())
+	{
+		if (e.mods.isRightButtonDown()) ParameterUI::mouseDownInternal(e);
+		else if(e.mods.isLeftButtonDown()) showPopupAndGetTarget();
+	}
 }
 
 void TargetParameterUI::buttonClicked(Button* b)
