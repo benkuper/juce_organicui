@@ -8,15 +8,16 @@
   ==============================================================================
 */
 
+#include "juce_organicui/juce_organicui.h"
 
 //CONTROLLABLE
-
-ControllableChooserPopupMenu::ControllableChooserPopupMenu(ControllableContainer* rootContainer, int _indexOffset, int _maxDefaultSearchLevel, const StringArray& typesFilter, const StringArray& excludeTypesFilter, std::function<bool(Controllable*)> filterFunc) :
+ControllableChooserPopupMenu::ControllableChooserPopupMenu(ControllableContainer* rootContainer, int _indexOffset, int _maxDefaultSearchLevel, const StringArray& typesFilter, const StringArray& excludeTypesFilter, std::function<bool(Controllable*)> filterFunc, Controllable * currentSelection) :
 	indexOffset(_indexOffset),
 	maxDefaultSearchLevel(_maxDefaultSearchLevel),
 	typesFilter(typesFilter),
 	excludeTypesFilter(excludeTypesFilter),
-	filterFunc(filterFunc)
+	filterFunc(filterFunc),
+	currentSelection(currentSelection)
 {
 	int id = indexOffset + 1;
 
@@ -64,7 +65,7 @@ void ControllableChooserPopupMenu::populateMenu(PopupMenu* subMenu, Controllable
 		if (!typesFilter.isEmpty() && !typesFilter.contains(c->getTypeString())) continue;
 		if (filterFunc != nullptr && !filterFunc(c)) continue;
 
-		subMenu->addItem(currentId, c->niceName);
+		subMenu->addItem(currentId, c->niceName, true, c == currentSelection);
 		controllableList.add(c);
 		currentId++;
 	}
@@ -90,13 +91,14 @@ Controllable* ControllableChooserPopupMenu::getControllableForResult(int result)
 //CONTAINER
 
 
-ContainerChooserPopupMenu::ContainerChooserPopupMenu(ControllableContainer* rootContainer, int indexOffset, int maxSearchLevel, std::function<bool(ControllableContainer*)> typeCheckFunc, const StringArray& typesFilter, const StringArray& excludeTypeFilters, bool allowSelectAtAnyLevel) :
+ContainerChooserPopupMenu::ContainerChooserPopupMenu(ControllableContainer* rootContainer, int indexOffset, int maxSearchLevel, std::function<bool(ControllableContainer*)> typeCheckFunc, const StringArray& typesFilter, const StringArray& excludeTypeFilters, bool allowSelectAtAnyLevel, ControllableContainer * currentSelection) :
 	indexOffset(indexOffset),
 	maxDefaultSearchLevel(maxSearchLevel),
 	typeCheckFunc(typeCheckFunc),
 	typesFilter(typesFilter),
 	excludeTypesFilter(excludeTypesFilter),
-	allowSelectAtAnyLevel(allowSelectAtAnyLevel)
+	allowSelectAtAnyLevel(allowSelectAtAnyLevel),
+	currentSelection(currentSelection)
 {
 	int id = indexOffset + 1;
 
@@ -129,7 +131,7 @@ void ContainerChooserPopupMenu::populateMenu(PopupMenu* subMenu, ControllableCon
 			}
 
 			containerList.add(cc);
-			subMenu->addItem(currentId, cc->niceName);
+			subMenu->addItem(currentId, cc->niceName, true, cc == currentSelection);
 			currentId++;
 		}
 		else if (maxDefaultSearchLevel == -1 || currentLevel < maxDefaultSearchLevel)
@@ -145,13 +147,13 @@ void ContainerChooserPopupMenu::populateMenu(PopupMenu* subMenu, ControllableCon
 			if (allowSelectAtAnyLevel)
 			{
 				containerList.add(cc);
-				p.addItem(currentId, "Select");
+				p.addItem(currentId, "Select", cc == currentSelection);
 				currentId++;
 				p.addSeparator();
 			}
 
 			populateMenu(&p, cc, currentId, currentLevel + 1);
-			if (typeCheckFunc == nullptr || p.containsAnyActiveItems()) subMenu->addSubMenu(cc->niceName, p);
+			if (typeCheckFunc == nullptr || p.containsAnyActiveItems()) subMenu->addSubMenu(cc->niceName, p, true, nullptr, cc == currentSelection);
 			//}
 
 		}
