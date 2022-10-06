@@ -46,5 +46,6 @@ void DashboardIFrameItemUI::updateEditModeInternal(bool editMode)
 
 void DashboardIFrameItemUI::controllableFeedbackUpdateInternal(Controllable* c)
 {
+	DashboardItemUI::controllableFeedbackUpdateInternal(c);
 	if(c == iFrameItem->url) web.goToURL(iFrameItem->url->stringValue());
 }

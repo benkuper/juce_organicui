@@ -54,6 +54,7 @@ public:
 	BoolParameter* enableTooltips;
 	IntParameter* fontSize;
 	EnumParameter* helpLanguage;
+	BoolParameter* useGLRenderer;
 
 
 	ControllableContainer saveLoadCC;
