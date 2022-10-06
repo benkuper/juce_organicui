@@ -35,6 +35,7 @@ void DashboardIFrameItemUI::paint(Graphics& g)
 
 void DashboardIFrameItemUI::resized()
 {
+	DashboardItemUI::resized();
 	web.setBounds(getLocalBounds());
 }
 
