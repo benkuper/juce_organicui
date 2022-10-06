@@ -11,6 +11,7 @@
 DashboardIFrameItem::DashboardIFrameItem(var params) :
 	DashboardItem(this, getTypeString())
 {
+	showWarningInUI = true;
 	url = addStringParameter("URL", "URL of the iFrame to show", "https://pointerpointer.com/");
 }
 

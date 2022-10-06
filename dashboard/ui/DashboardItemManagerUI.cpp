@@ -8,6 +8,7 @@
   ==============================================================================
 */
 
+#include "JuceHeader.h"
 
 std::function<void(PopupMenu*, int)> DashboardItemManagerUI::customAddItemsToMenuFunc = nullptr;
 std::function<void(int, int, DashboardItemManagerUI*, Point<float>)> DashboardItemManagerUI::customHandleMenuResultFunc = nullptr;

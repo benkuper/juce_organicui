@@ -17,10 +17,22 @@ DashboardIFrameItemUI::DashboardIFrameItemUI(DashboardIFrameItem* item) :
 	, web(false, File(), File::getSpecialLocation(File::windowsLocalAppData).getChildFile("Chataigne"))
 #endif
 {
+#if JUCE_WINDOWS
+	if (!GlobalSettings::getInstance()->useGLRenderer->boolValue())
+	{
+		addChildComponent(web);
+	}
+	else
+	{
+		NLOGWARNING(item->niceName, "This app is using OpenGL renderer.\nIf you want to see the webpage inside the app, please disable OpenGL Renderer in the Preferences and restart the app.");
+		item->setWarningMessage("Webpage on windows needs to not use OpenGL. Change it in Preferences.");
+	}
+#else
 	addChildComponent(web);
-	web.goToURL(iFrameItem->url->stringValue());
+#endif
 
 	web.setVisible(!DashboardManager::getInstance()->editMode->boolValue());
+	web.goToURL(iFrameItem->url->stringValue());
 }
 
 DashboardIFrameItemUI::~DashboardIFrameItemUI()
@@ -50,5 +62,5 @@ void DashboardIFrameItemUI::updateEditModeInternal(bool editMode)
 void DashboardIFrameItemUI::controllableFeedbackUpdateInternal(Controllable* c)
 {
 	DashboardItemUI::controllableFeedbackUpdateInternal(c);
-	if(c == iFrameItem->url) web.goToURL(iFrameItem->url->stringValue());
+	if (c == iFrameItem->url) web.goToURL(iFrameItem->url->stringValue());
 }
