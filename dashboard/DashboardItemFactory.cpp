@@ -14,6 +14,8 @@ DashboardItemFactory::DashboardItemFactory()
 #if ORGANICUI_USE_SHAREDTEXTURE
 	defs.add(Factory<DashboardItem>::Definition::createDef<SharedTextureDashboardItem>("", "Shared Texture"));
 #endif
+
+	defs.add(Factory<DashboardItem>::Definition::createDef<DashboardIFrameItem>("", "IFrame"));
 }
 
 void DashboardItemFactory::buildPopupMenu()

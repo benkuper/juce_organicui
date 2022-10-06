@@ -157,6 +157,7 @@ void DashboardItemManagerUI::showMenuAndAddItem(bool fromAddButton, Point<int> m
 #endif
 
 	menu.addItem(-4, "Add Dashboard Link");
+	menu.addItem(-5, "Add IFrame");
 
 
 	if (customAddItemsToMenuFunc) customAddItemsToMenuFunc(&menu, -5000);
@@ -179,6 +180,7 @@ void DashboardItemManagerUI::showMenuAndAddItem(bool fromAddButton, Point<int> m
 			else if (result == -3) manager->addItem(new SharedTextureDashboardItem(), p);
 #endif
 			else if (result == -4) manager->addItem(new DashboardLinkItem(), p);
+			else if (result == -5) manager->addItem(new DashboardIFrameItem(), p);
 			else if (result == -10) setShowTools(!showTools);
 			else if (result < -1000) customHandleMenuResultFunc(result, -5000, this, p);
 			else manager->addItem(manager->managerFactory->createFromMenuResult(result), p);

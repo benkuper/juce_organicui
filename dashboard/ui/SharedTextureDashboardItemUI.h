@@ -9,7 +9,6 @@
 */
 
 #pragma once
-#include "../SharedTextureDashboardItem.h"
 
 class SharedTextureDashboardItemUI :
     public DashboardItemUI,
