@@ -8,11 +8,13 @@
   ==============================================================================
 */
 
+#include "JuceHeader.h"
+
 DashboardIFrameItemUI::DashboardIFrameItemUI(DashboardIFrameItem* item) :
 	DashboardItemUI(item),
 	iFrameItem(item)
 #if JUCE_WINDOWS
-	, web(false, WebView2Preferences())
+	, web(false, File(), File::getSpecialLocation(File::windowsLocalAppData).getChildFile("Chataigne"))
 #endif
 {
 	addChildComponent(web);
