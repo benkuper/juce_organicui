@@ -80,7 +80,6 @@ public:
 	void buttonClicked(Button*) override;
 
 
-	OwnedArray<LogElement> logElements;
 	void newMessage(const String&) override;
 
 

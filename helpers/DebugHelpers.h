@@ -75,7 +75,7 @@ inline String getLogContent(const String & logString) {
 class LogElement
 {
 public:
-	LogElement(const String& log) :
+	LogElement(String log) :
 		content(getLogContent(log)),
         source(getLogSource(log))
 		

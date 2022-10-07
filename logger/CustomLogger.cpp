@@ -1,3 +1,5 @@
+#include "JuceHeader.h"
+
 juce_ImplementSingleton(CustomLogger);
 
 CustomLogger::CustomLogger() :
@@ -14,6 +16,8 @@ const String & CustomLogger::getWelcomeMessage() {
 
 void CustomLogger::logMessage(const String& message)
 {
+	LogElement* el = new LogElement(message);
+	logElements.add(el);
 	notifier.addMessage(new String(message));
 	DBG(message);
 }

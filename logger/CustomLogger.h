@@ -9,6 +9,8 @@ public:
 
 	CustomLogger();
 
+	OwnedArray<LogElement, CriticalSection> logElements;
+
 	void logMessage(const String& message) override;
 
 	QueuedNotifier<String> notifier;

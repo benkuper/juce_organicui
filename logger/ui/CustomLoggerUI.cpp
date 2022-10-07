@@ -1,72 +1,7 @@
 
+#include "JuceHeader.h"
+
 static String EmptyString;
-void CustomLoggerUI::newMessage(const String& s)
-{
-	if (LogElement* el = new LogElement(s))
-	{
-
-		logElements.add(el);
-		totalLogRow += el->getNumLines();
-
-
-		//bool overFlow = false;
-
-		//coalesce messages
-		if (!Timer::isTimerRunning()) {
-			startTimer(100);
-		}
-	}
-}
-
-void CustomLoggerUI::timerCallback()
-{
-	stopTimer();
-	if (totalLogRow.get() > maxNumElement)
-	{
-		int curCount = 0;
-		int idxToRemove = -1;
-
-		for (int i = logElements.size() - 1; i >= 0; i--)
-		{
-			curCount += logElements[i]->getNumLines();
-
-			if (curCount >= maxNumElement)
-			{
-				if (curCount != maxNumElement)
-				{
-					logElements[i]->trimToFit(logElements[i]->getNumLines() - (curCount - maxNumElement));
-				}
-
-				idxToRemove = i - 1;
-				break;
-			}
-
-		}
-
-		if (idxToRemove >= 0)logElements.removeRange(0, idxToRemove + 1);
-
-		totalLogRow = maxNumElement;
-
-
-	}
-	//DBG("Handle Async Update");
-//    auto cTime = Time::getMillisecondCounter();
-//    if(cTime - lastUpdateTime < 500 ){
-//        triggerAsyncUpdate();
-//    }
-//    else{
-//        lastUpdateTime = cTime;
-
-	logListComponent->updateContent();
-	if (autoScrollB.getToggleState()) logListComponent->scrollToEnsureRowIsOnscreen(totalLogRow.get() - 1);
-#if USE_CACHED_GLYPH
-	logList.cleanUnusedGlyphs();
-#endif
-	repaint();
-
-
-	//    }
-}
 
 CustomLoggerUI::CustomLoggerUI(const String& contentName, CustomLogger* l) :
 	ShapeShifterContentComponent(contentName),
@@ -118,6 +53,9 @@ CustomLoggerUI::CustomLoggerUI(const String& contentName, CustomLogger* l) :
 	setInterceptsMouseClicks(true, false);
 	addMouseListener(this, true);
 
+	updateTotalLogRow();
+	logListComponent->updateContent();
+
 }
 
 
@@ -162,7 +100,8 @@ void CustomLoggerUI::updateTotalLogRow()
 {
 	totalLogRow = 0;
 
-	for (auto& l : logElements)
+	GenericScopedLock lock(logger->logElements.getLock());
+	for (auto& l : logger->logElements)
 	{
 		totalLogRow += l->getNumLines();
 	}
@@ -180,13 +119,13 @@ const bool CustomLoggerUI::isPrimaryRow(const int r) const
 	int count = 0;
 	int idx = 0;
 
-	while (count <= r && idx < logElements.size())
+	while (count <= r && idx < logger->logElements.size())
 	{
 		if (count == r)
 		{
 			return true;
 		}
-		count += logElements.getUnchecked(idx)->getNumLines();
+		count += logger->logElements.getUnchecked(idx)->getNumLines();
 		idx++;
 
 	}
@@ -199,14 +138,14 @@ const String& CustomLoggerUI::getContentForRow(const int r) const
 	int count = 0;
 	int idx = 0;
 
-	while (idx < logElements.size())
+	while (idx < logger->logElements.size())
 	{
 
-		int nl = logElements.getUnchecked(idx)->getNumLines();
+		int nl = logger->logElements.getUnchecked(idx)->getNumLines();
 
 		if (count + nl > r)
 		{
-			return logElements.getUnchecked(idx)->getLine(r - count);
+			return logger->logElements.getUnchecked(idx)->getLine(r - count);
 		}
 
 		count += nl;
@@ -220,9 +159,10 @@ const LogElement* CustomLoggerUI::getElementForRow(const int r) const {
 	int count = 0;
 	int idx = 0;
 
-	while (idx < logElements.size())
+	GenericScopedLock lock(logger->logElements.getLock());
+	while (idx < logger->logElements.size())
 	{
-		auto el = logElements.getUnchecked(idx);
+		auto el = logger->logElements.getUnchecked(idx);
 
 		int nl = el->getNumLines();
 
@@ -319,6 +259,69 @@ void CustomLoggerUI::mouseDrag(const MouseEvent& me) {
 
 MouseCursor  CustomLoggerUI::getMouseCursor() {
 	return MouseCursor::IBeamCursor;
+}
+
+void CustomLoggerUI::newMessage(const String& message)
+{
+	LogElement* el = logger->logElements[logger->logElements.size() - 1];
+	totalLogRow += el->getNumLines();
+	//bool overFlow = false;
+
+	//coalesce messages
+	if (!Timer::isTimerRunning()) {
+		startTimer(100);
+	}
+
+}
+
+void CustomLoggerUI::timerCallback()
+{
+	stopTimer();
+	if (totalLogRow.get() > maxNumElement)
+	{
+		int curCount = 0;
+		int idxToRemove = -1;
+
+		for (int i = logger->logElements.size() - 1; i >= 0; i--)
+		{
+			curCount += logger->logElements[i]->getNumLines();
+
+			if (curCount >= maxNumElement)
+			{
+				if (curCount != maxNumElement)
+				{
+					logger->logElements[i]->trimToFit(logger->logElements[i]->getNumLines() - (curCount - maxNumElement));
+				}
+
+				idxToRemove = i - 1;
+				break;
+			}
+
+		}
+
+		if (idxToRemove >= 0)logger->logElements.removeRange(0, idxToRemove + 1);
+
+		totalLogRow = maxNumElement;
+
+
+	}
+	//DBG("Handle Async Update");
+//    auto cTime = Time::getMillisecondCounter();
+//    if(cTime - lastUpdateTime < 500 ){
+//        triggerAsyncUpdate();
+//    }
+//    else{
+//        lastUpdateTime = cTime;
+
+	logListComponent->updateContent();
+	if (autoScrollB.getToggleState()) logListComponent->scrollToEnsureRowIsOnscreen(totalLogRow.get() - 1);
+#if USE_CACHED_GLYPH
+	logList.cleanUnusedGlyphs();
+#endif
+	repaint();
+
+
+	//    }
 }
 
 
@@ -483,7 +486,7 @@ void CustomLoggerUI::buttonClicked(Button* b)
 
 	if (b == &clearB)
 	{
-		logElements.clear();
+		logger->logElements.clear();
 		totalLogRow = 0;
 		logListComponent->updateContent();
 		LOG(juce::translate("Cleared."));
@@ -491,7 +494,7 @@ void CustomLoggerUI::buttonClicked(Button* b)
 
 	else if (b == &copyB) {
 		String s;
-		for (auto& el : logElements) {
+		for (auto& el : logger->logElements) {
 			int leftS = el->source.length() + 3;
 			s += el->source + " : ";
 			for (int i = 0; i < el->getNumLines(); ++i) {
