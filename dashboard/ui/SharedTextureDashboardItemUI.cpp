@@ -12,7 +12,9 @@ SharedTextureDashboardItemUI::SharedTextureDashboardItemUI(SharedTextureDashboar
 	DashboardItemUI(item),
 	st(item)
 {
+
 	st->addAsyncSTListener(this);
+
 }
 
 SharedTextureDashboardItemUI::~SharedTextureDashboardItemUI()

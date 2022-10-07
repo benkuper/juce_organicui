@@ -8,6 +8,8 @@
   ==============================================================================
 */
 
+#include "JuceHeader.h"
+
 juce_ImplementSingleton(DashboardManager)
 
 ApplicationProperties& getAppProperties();
@@ -143,7 +145,7 @@ void DashboardManager::messageReceived(const String& id, const String& message)
 	}
 
 
-	
+
 	if (data.hasProperty("setDashboard"))
 	{
 		if (Dashboard* d = getItemWithName(data.getProperty("setDashboard", ""), true))
@@ -421,11 +423,12 @@ void DashboardManager::setCurrentDashboard(Dashboard* d, bool setInClients, Stri
 	if (d == nullptr) return;
 	if (DashboardManagerView* v = ShapeShifterManager::getInstance()->getContentForType<DashboardManagerView>())
 	{
-		v->setCurrentDashboard(d);
+		MessageManager::getInstance()->callAsync([v, d]() {v->setCurrentDashboard(d); });
+			
 	}
 
 #if ORGANICUI_USE_WEBSERVER
-	if (setInClients)
+	if (setInClients && server != nullptr)
 	{
 		var data(new DynamicObject());
 		data.getDynamicObject()->setProperty("setDashboard", d->shortName);

@@ -30,7 +30,8 @@ DashboardIFrameItemUI::DashboardIFrameItemUI(DashboardIFrameItem* item) :
 #else
 	addChildComponent(web);
 #endif
-
+	
+	MessageManagerLock mmLock;
 	web.setVisible(!DashboardManager::getInstance()->editMode->boolValue());
 	web.goToURL(iFrameItem->url->stringValue());
 }

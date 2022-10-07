@@ -13,11 +13,23 @@ SharedTextureDashboardItem::SharedTextureDashboardItem(var params) :
 	receiver(nullptr),
 	stNotifier(5)
 {
+	showWarningInUI = true;
+
 	textureName = addStringParameter("Texture Name", "The Spout / Syphon name of the texture", "");
 	exposeOnWeb = addBoolParameter("Expose on Web", "If checked, this will convert the GPU texture to a CPU rescaled one, and feed it to the web clients. The downside is that is will slow the UI on larger images.", false);
+
+
+#if JUCE_WINDOWS
+	if (!GlobalSettings::getInstance()->useGLRenderer->boolValue())
+	{
+		NLOGWARNING(niceName, "This app is not using OpenGL renderer.\nIf you want to see the shared texture, you need to enable OpenGL Renderer in Preferences.");
+		setWarningMessage("Shared Texture needs OpenGL Renderer. Change it in Preferences.");
+		return;
+	}
+#endif
+
 	if (!Engine::mainEngine->isLoadingFile) setupReceiver();
 	else Engine::mainEngine->addEngineListener(this);
-
 	SharedTextureManager::getInstance()->addListener(this);
 }
 

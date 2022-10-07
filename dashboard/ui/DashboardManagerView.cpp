@@ -8,6 +8,7 @@
   ==============================================================================
 */
 
+#include "JuceHeader.h"
 
 DashboardManagerView::DashboardManagerView(const String &contentName, DashboardManager * manager) :
 	ShapeShifterContentComponent(contentName),
