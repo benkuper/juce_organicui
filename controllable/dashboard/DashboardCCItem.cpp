@@ -1,3 +1,5 @@
+#include "JuceHeader.h"
+
 DashboardCCItem::DashboardCCItem(ControllableContainer* container) :
 	DashboardInspectableItem(container),
 	container(container)
@@ -19,7 +21,7 @@ DashboardItemUI* DashboardCCItem::createUI()
 }
 void DashboardCCItem::ghostInspectable()
 {
-	if (!inspectable.wasObjectDeleted() && inspectable != nullptr) inspectableGhostAddress = dynamic_cast<ControllableContainer *>(inspectable.get())->getControlAddress();
+	if (!inspectable.wasObjectDeleted() && inspectable != nullptr) inspectableGhostAddress = dynamic_cast<ControllableContainer*>(inspectable.get())->getControlAddress();
 }
 
 void DashboardCCItem::checkGhost()
@@ -30,14 +32,97 @@ void DashboardCCItem::checkGhost()
 var DashboardCCItem::getServerData()
 {
 	var data = DashboardInspectableItem::getServerData();
-	if (container != nullptr) data.getDynamicObject()->setProperty("container", container->getJSONData());
+	if (container != nullptr) data.getDynamicObject()->setProperty("container", getServerDataForContainer(container));
+	return data;
+}
+
+var DashboardCCItem::getServerDataForContainer(ControllableContainer* cc)
+{
+	var data(new DynamicObject());
+
+	data.getDynamicObject()->setProperty("name", cc->niceName);
+	data.getDynamicObject()->setProperty("id", cc->shortName);
+	data.getDynamicObject()->setProperty("type", "container");
+	data.getDynamicObject()->setProperty("controlAddress", cc->getControlAddress());
+
+	var contentData(new DynamicObject());
+
+	for (auto& childC : cc->controllables)
+	{
+		if (childC->hideInRemoteControl) continue;
+		contentData.getDynamicObject()->setProperty(childC->shortName, getServerDataForControllable(childC));
+	}
+
+	for (auto& childCC : cc->controllableContainers)
+	{
+		if (childCC->hideInRemoteControl) continue;
+		contentData.getDynamicObject()->setProperty(childCC->shortName, getServerDataForContainer(childCC));
+	}
+
+	data.getDynamicObject()->setProperty("children", contentData);
+
+	return data;
+}
+
+var DashboardCCItem::getServerDataForControllable(Controllable* c)
+{
+	var data(new DynamicObject());
+
+	data.getDynamicObject()->setProperty("name", c->niceName);
+	data.getDynamicObject()->setProperty("id", c->shortName);
+	data.getDynamicObject()->setProperty("controlAddress", c->getControlAddress());
+	data.getDynamicObject()->setProperty("type", c->getTypeString());
+	data.getDynamicObject()->setProperty("readOnly", c->isControllableFeedbackOnly);
+
+	if (Parameter* p = dynamic_cast<Parameter*>(c))
+	{
+		data.getDynamicObject()->setProperty("value", p->value);
+
+		if (p->hasRange())
+		{
+			data.getDynamicObject()->setProperty("minVal", p->minimumValue);
+			data.getDynamicObject()->setProperty("maxVal", p->maximumValue);
+		}
+
+		switch (p->type)
+		{
+		case Parameter::ENUM:
+		{
+			var epOptions;
+			EnumParameter* ep = (EnumParameter*)p;
+			for (auto& ev : ep->enumValues)
+			{
+				var epData(new DynamicObject());
+				epData.getDynamicObject()->setProperty("key", ev->key);
+				epData.getDynamicObject()->setProperty("id", ev->value);
+				epOptions.append(epData);
+			}
+
+			data.getDynamicObject()->setProperty("options", epOptions);
+		}
+		break;
+		case Parameter::POINT2D:
+		{
+			Point2DParameter* p2d = (Point2DParameter*)p;
+			data.getDynamicObject()->setProperty("stretchMode", p2d->extendedEditorStretchMode);
+			data.getDynamicObject()->setProperty("invertX", p2d->extendedEditorInvertX);
+			data.getDynamicObject()->setProperty("invertY", p2d->extendedEditorInvertY);
+		}
+		break;
+
+
+		default:
+			break;
+		}
+	}
+
 	return data;
 }
 
 var DashboardCCItem::getJSONData()
 {
 	var data = DashboardInspectableItem::getJSONData();
-	if(container != nullptr) data.getDynamicObject()->setProperty("container", container->getControlAddress());
+	if (container != nullptr) data.getDynamicObject()->setProperty("container", container->getControlAddress());
 	return data;
 }
 
@@ -45,7 +130,7 @@ void DashboardCCItem::loadJSONDataItemInternal(var data)
 {
 
 	String address = data.getProperty("container", inspectableGhostAddress);
-	if(address.isNotEmpty()) setInspectable(Engine::mainEngine->getControllableContainerForAddress(address));
+	if (address.isNotEmpty()) setInspectable(Engine::mainEngine->getControllableContainerForAddress(address));
 
 	DashboardInspectableItem::loadJSONDataItemInternal(data);
 }

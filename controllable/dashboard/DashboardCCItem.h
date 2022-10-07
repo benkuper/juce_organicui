@@ -12,6 +12,9 @@ public:
 
 	virtual var getServerData() override;
 
+	virtual var getServerDataForContainer(ControllableContainer* cc);
+	virtual var getServerDataForControllable(Controllable* c);
+
     virtual var getJSONData() override;
 	virtual void loadJSONDataItemInternal(var data) override;
 
