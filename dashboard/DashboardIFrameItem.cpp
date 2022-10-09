@@ -27,6 +27,14 @@ var DashboardIFrameItem::getServerData()
 	return data;
 }
 
+var DashboardIFrameItem::getItemParameterFeedback(Parameter* p)
+{
+	var data = DashboardItem::getItemParameterFeedback(p);
+	data.getDynamicObject()->setProperty("targetType", this->getTypeString());
+
+	return data;
+}
+
 
 DashboardItemUI* DashboardIFrameItem::createUI()
 {

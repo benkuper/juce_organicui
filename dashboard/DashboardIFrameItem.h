@@ -22,5 +22,7 @@ public:
 
 	DashboardItemUI* createUI() override;
 
+	virtual var getItemParameterFeedback(Parameter* p) override;
+
 	String getTypeString() const override { return "IFrame"; }
 };
