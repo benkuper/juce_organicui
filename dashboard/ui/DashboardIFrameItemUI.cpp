@@ -34,6 +34,8 @@ DashboardIFrameItemUI::DashboardIFrameItemUI(DashboardIFrameItem* item) :
 	MessageManagerLock mmLock;
 	web.setVisible(!DashboardManager::getInstance()->editMode->boolValue());
 	web.goToURL(iFrameItem->url->stringValue());
+
+	resized();
 }
 
 DashboardIFrameItemUI::~DashboardIFrameItemUI()
