@@ -19,10 +19,14 @@ public:
 	~ColorStatusUI();
 
 	bool isCircle;
+	bool momentaryMode;
 
 	void paint(Graphics& g) override;
 
 	Colour getCurrentColor() const;
+
+	void mouseDownInternal(const MouseEvent& e) override;
+	void mouseUpInternal(const MouseEvent& e) override;
 
 	class ColorOptionManager :
 		public Component,
@@ -37,6 +41,7 @@ public:
 		Parameter* parameter;
 		Viewport viewport;
 		Component container;
+
 
 		class ColorOptionUI :
 			public Component,
@@ -57,6 +62,11 @@ public:
 
 		OwnedArray<ColorOptionUI> optionsUI;
 
+
+		void setImages(Image onImage, Image offImage = Image());
+
+		
+
 		void addOptionUI(const var& key);
 
 		void paint(Graphics& g) override;
@@ -69,6 +79,8 @@ public:
 
 		static void show(Parameter* p, Component* c);
 	};
+
+
 
 protected:
 	// Inherited via ChangeListener

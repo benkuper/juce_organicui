@@ -11,7 +11,8 @@
 
 ColorStatusUI::ColorStatusUI(Array<Parameter*> parameters, bool isCircle) :
 	ParameterUI(parameters, PARAMETERUI_DEFAULT_TIMER),
-	isCircle(isCircle)
+	isCircle(isCircle),
+	momentaryMode(false)
 {
 	setSize(32, 32);
 }
@@ -25,7 +26,7 @@ void ColorStatusUI::paint(Graphics& g)
 	int size = jmin(getWidth(), getHeight());
 	Colour c = getCurrentColor();
 
-	juce::Rectangle<float> r = getLocalBounds().withSizeKeepingCentre(size, size).reduced(2).toFloat();
+	juce::Rectangle<float> r = (isCircle ? getLocalBounds().withSizeKeepingCentre(size, size) :getLocalBounds()).reduced(2).toFloat();
 
 	g.setColour(c);
 	if (isCircle) g.fillEllipse(r);
@@ -37,7 +38,7 @@ void ColorStatusUI::paint(Graphics& g)
 
 	if (showLabel)
 	{
-		if(customTextSize > 0) g.setFont(customTextSize);
+		if (customTextSize > 0) g.setFont(customTextSize);
 		g.setColour(useCustomTextColor ? customTextColor : (isInteractable() ? TEXT_COLOR : FEEDBACK_COLOR));
 		g.drawFittedText(customLabel.isNotEmpty() ? customLabel : parameter->niceName, getLocalBounds().reduced(2), Justification::centred, 3);
 	}
@@ -76,6 +77,29 @@ Colour ColorStatusUI::getCurrentColor() const
 	return Colours::black.withAlpha(.4f);
 }
 
+void ColorStatusUI::mouseDownInternal(const MouseEvent& e)
+{
+	if (!isInteractable()) return;
+	if (parameter->type != Parameter::BOOL) return;
+
+	if (e.mods.isLeftButtonDown())
+	{
+		if (e.mods.isAltDown() || momentaryMode) parameter->setValue(!parameter->boolValue());
+		else parameter->setUndoableValue(parameter->boolValue(), !parameter->boolValue()); //only undoable when from left button, real toggle behaviour
+	}
+}
+
+void ColorStatusUI::mouseUpInternal(const MouseEvent& e)
+{
+	if (!isInteractable()) return;
+	if (parameter->type != Parameter::BOOL) return;
+
+	if (e.mods.isLeftButtonDown())
+	{
+		if (e.mods.isAltDown() || momentaryMode) parameter->setValue(!parameter->boolValue());
+	}
+}
+
 void ColorStatusUI::valueChanged(const var&)
 {
 	shouldRepaint = true;
@@ -96,7 +120,8 @@ ColorStatusUI::ColorOptionManager::ColorOptionManager(Parameter* parameter) :
 	if (parameter->type == Controllable::FLOAT || parameter->type == Controllable::INT)
 	{
 		for (int i = 0; i < 5; i++) addOptionUI("");
-	}else if (parameter->type == Controllable::BOOL)
+	}
+	else if (parameter->type == Controllable::BOOL)
 	{
 		addOptionUI(0);
 		addOptionUI(1);
@@ -167,7 +192,7 @@ void ColorStatusUI::ColorOptionManager::updateColorOptions()
 		String kt = o->keyLabel.getText();
 		if (kt.isEmpty()) continue;
 
-		var k = parameter->type == Parameter::ENUM ? var(kt) : parameter->type == Parameter::BOOL?var(kt.getIntValue()) : var(kt.getFloatValue());
+		var k = parameter->type == Parameter::ENUM ? var(kt) : parameter->type == Parameter::BOOL ? var(kt.getIntValue()) : var(kt.getFloatValue());
 		Colour v = o->cp.getColor();
 
 		parameter->colorStatusMap.set(k, v);
@@ -183,7 +208,7 @@ void ColorStatusUI::ColorOptionManager::show(Parameter* p, Component* c)
 
 ColorStatusUI::ColorOptionManager::ColorOptionUI::ColorOptionUI(Parameter* p, const var& key) :
 	parameter(p),
-    keyLabel("label", key.toString()),
+	keyLabel("label", key.toString()),
 	cp("Color", "Color for this key")
 {
 	if (p->colorStatusMap.contains(key)) cp.setColor(p->colorStatusMap[key]);
