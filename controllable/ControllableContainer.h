@@ -104,8 +104,8 @@ public:
 	
 
 	ControllableContainer * getControllableContainerByName(const String &name, bool searchNiceNameToo = false, bool searchLowerCaseToo = true);
-	ControllableContainer * getControllableContainerForAddress(const String &address, bool recursive = false, bool getNotExposed = false);
-	ControllableContainer * getControllableContainerForAddress(StringArray  addressSplit, bool recursive = false, bool getNotExposed = false);
+	ControllableContainer * getControllableContainerForAddress(const String &address, bool recursive = false, bool getNotExposed = false, bool searchNiceNameToo = false, bool searchLowerCaseToo = true);
+	ControllableContainer * getControllableContainerForAddress(StringArray  addressSplit, bool recursive = false, bool getNotExposed = false, bool searchNiceNameToo = false, bool searchLowerCaseToo = true);
 
 	virtual void setParentContainer(ControllableContainer * container);
 	void updateChildrenControlAddress();

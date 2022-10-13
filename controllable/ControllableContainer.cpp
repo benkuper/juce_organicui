@@ -514,16 +514,16 @@ ControllableContainer* ControllableContainer::getControllableContainerByName(con
 
 }
 
-ControllableContainer* ControllableContainer::getControllableContainerForAddress(const String& address, bool recursive, bool getNotExposed)
+ControllableContainer* ControllableContainer::getControllableContainerForAddress(const String& address, bool recursive, bool getNotExposed, bool searchNiceNameToo, bool searchLowerCaseToo)
 {
 	StringArray addrArray;
 	addrArray.addTokens(address, juce::StringRef("/"), juce::StringRef("\""));
 	addrArray.remove(0);
 
-	return getControllableContainerForAddress(addrArray, recursive, getNotExposed);
+	return getControllableContainerForAddress(addrArray, recursive, getNotExposed, searchNiceNameToo, searchLowerCaseToo);
 }
 
-ControllableContainer* ControllableContainer::getControllableContainerForAddress(StringArray  addressSplit, bool recursive, bool getNotExposed)
+ControllableContainer* ControllableContainer::getControllableContainerForAddress(StringArray  addressSplit, bool recursive, bool getNotExposed, bool searchNiceNameToo, bool searchLowerCaseToo)
 {
 
 	if (addressSplit.size() == 0) jassertfalse; // SHOULD NEVER BE THERE !
@@ -533,7 +533,7 @@ ControllableContainer* ControllableContainer::getControllableContainerForAddress
 	if (isTargetFinal)
 	{
 
-		if (ControllableContainer* res = getControllableContainerByName(addressSplit[0], true))   //get not exposed here here ?
+		if (ControllableContainer* res = getControllableContainerByName(addressSplit[0], searchNiceNameToo, searchLowerCaseToo))   //get not exposed here here ?
 			return res;
 
 	}
@@ -549,7 +549,7 @@ ControllableContainer* ControllableContainer::getControllableContainerForAddress
 			if (cc->shortName == addressSplit[0])
 			{
 				addressSplit.remove(0);
-				result = cc->getControllableContainerForAddress(addressSplit, recursive, getNotExposed);
+				result = cc->getControllableContainerForAddress(addressSplit, recursive, getNotExposed, searchNiceNameToo, searchLowerCaseToo);
 			}
 
 			if (result != nullptr) break;
