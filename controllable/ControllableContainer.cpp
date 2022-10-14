@@ -546,7 +546,10 @@ ControllableContainer* ControllableContainer::getControllableContainerForAddress
 		{
 			if (cc == nullptr || cc.wasObjectDeleted()) continue;
 
-			if (cc->shortName == addressSplit[0])
+			if (cc->shortName == addressSplit[0]
+				|| (searchNiceNameToo && cc->niceName == addressSplit[0])
+				|| (searchLowerCaseToo && cc->shortName.toLowerCase() == addressSplit[0].toLowerCase())
+				)
 			{
 				addressSplit.remove(0);
 				result = cc->getControllableContainerForAddress(addressSplit, recursive, getNotExposed, searchNiceNameToo, searchLowerCaseToo);
