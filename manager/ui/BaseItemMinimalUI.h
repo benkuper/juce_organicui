@@ -258,11 +258,11 @@ void BaseItemMinimalUI<T>::mouseDrag(const MouseEvent& e)
 			desc.getDynamicObject()->setProperty("offsetX", offset.x);
 			desc.getDynamicObject()->setProperty("offsetY", offset.y);
 
-			Image dragImage = drawEmptyDragIcon ? Image(Image::PixelFormat::ARGB, 1, 1, true) : this->createComponentSnapshot(this->getLocalBounds()).convertedToFormat(Image::ARGB).rescaled(this->getWidth() * this->viewZoom, this->getHeight() * this->viewZoom);
+			Image dragImage = drawEmptyDragIcon ? Image(Image::PixelFormat::ARGB, 1, 1, true) : ScaledImage();// this->createComponentSnapshot(this->getLocalBounds()).convertedToFormat(Image::ARGB).rescaled(this->getWidth() * this->viewZoom, this->getHeight() * this->viewZoom);
 			//dragImage.multiplyAllAlphas(drawEmptyDragIcon ? 0 : .5f);
 
 			Point<int> imageOffset = -offset;
-			startDragging(desc, this, ScaledImage(dragImage), true, &imageOffset);
+			startDragging(desc, this, dragImage, true, &imageOffset);
 		}
 	}
 }
