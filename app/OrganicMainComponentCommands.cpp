@@ -8,6 +8,8 @@
  ==============================================================================
  */
 
+#include "JuceHeader.h"
+
 ApplicationProperties& getAppProperties();
 OrganicApplication::MainWindow* getMainWindow();
 
@@ -41,6 +43,8 @@ namespace CommandIDs
 	//navigation
 	static const int selectPreviousItem = 0x70001;
 	static const int selectNextItem = 0x70002;
+	static const int moveToPrevious = 0x70003;
+	static const int moveToNext = 0x70004;
 
 	// range ids
 	static const int lastFileStartID = 100; // 100 to 200 max
@@ -206,6 +210,30 @@ void OrganicMainContentComponent::getCommandInfo(CommandID commandID, Applicatio
 	}
 	break;
 
+	case CommandIDs::moveToPrevious:
+	{
+		result.setInfo("Move to previous", "Swap this item with the previous one", category, 0);
+		result.defaultKeypresses.add(KeyPress(KeyPress::upKey, ModifierKeys::altModifier, 0));
+
+		InspectableSelectionManager* selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
+		Array<BaseItem*> items = selectionManager == nullptr ? Array<BaseItem*>() : selectionManager->getInspectablesAs<BaseItem>();
+
+
+		result.setActive(items.size() > 0);
+	}
+	break;
+
+	case CommandIDs::moveToNext:
+	{
+		result.setInfo("Move to next", "Swap this item with the next one", category, 0);
+		result.defaultKeypresses.add(KeyPress(KeyPress::downKey, ModifierKeys::altModifier, 0));
+
+		InspectableSelectionManager* selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
+		Array<BaseItem*> items = selectionManager == nullptr ? Array<BaseItem*>() : selectionManager->getInspectablesAs<BaseItem>();
+
+		result.setActive(items.size() > 0);
+	}
+	break;
 
 	case CommandIDs::switchDashboardEditMode:
 	{
@@ -265,6 +293,8 @@ void OrganicMainContentComponent::getAllCommands(Array<CommandID>& commands) {
 	  CommandIDs::toggleKioskMode,
 	  CommandIDs::selectPreviousItem,
 	  CommandIDs::selectNextItem,
+	  CommandIDs::moveToPrevious,
+	  CommandIDs::moveToNext,
 	  CommandIDs::undo,
 	  CommandIDs::redo
 	};
@@ -614,25 +644,25 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 	break;
 
 	case CommandIDs::selectPreviousItem:
-	{
-		InspectableSelectionManager* selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
-		Array<BaseItem*> items = selectionManager->getInspectablesAs<BaseItem>();
-		for (auto& i : items)
-		{
-			if (i == nullptr) continue;
-			if (!i->useCustomArrowKeysBehaviour) i->selectPrevious(info.keyPress.getModifiers().isShiftDown());
-		}
-	}
-	break;
-
 	case CommandIDs::selectNextItem:
+	case CommandIDs::moveToPrevious:
+	case CommandIDs::moveToNext:
 	{
 		InspectableSelectionManager* selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
 		Array<BaseItem*> items = selectionManager->getInspectablesAs<BaseItem>();
 		for (auto& i : items)
 		{
 			if (i == nullptr) continue;
-			if (!i->useCustomArrowKeysBehaviour)i->selectNext(info.keyPress.getModifiers().isShiftDown());
+			if (!i->useCustomArrowKeysBehaviour)
+			{
+				switch (info.commandID)
+				{
+				case CommandIDs::selectPreviousItem: i->selectPrevious(info.keyPress.getModifiers().isShiftDown()); break;
+				case CommandIDs::selectNextItem: i->selectNext(info.keyPress.getModifiers().isShiftDown()); break;
+				case CommandIDs::moveToPrevious: i->moveBefore(); break;
+				case CommandIDs::moveToNext: i->moveAfter(); break;
+				}
+			}
 		}
 	}
 	break;
