@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    DashboardUI.h
-    Created: 19 Apr 2017 11:06:43pm
-    Author:  Ben
+	DashboardUI.h
+	Created: 19 Apr 2017 11:06:43pm
+	Author:  Ben
 
   ==============================================================================
 */
@@ -16,7 +16,7 @@ class DashboardItemUI :
 	public SettableTooltipClient
 {
 public:
-	DashboardItemUI(DashboardItem * item);
+	DashboardItemUI(DashboardItem* item);
 	~DashboardItemUI();
 
 	virtual void paint(Graphics& g) override;
@@ -28,6 +28,7 @@ public:
 	virtual void mouseEnter(const MouseEvent& e) override;
 	virtual void mouseDrag(const MouseEvent& e) override;
 	virtual void mouseUp(const MouseEvent& e) override;
+	virtual bool keyPressed(const KeyPress& e) override;
 
 	virtual void updateEditMode();
 	virtual void updateEditModeInternal(bool editMode) {}

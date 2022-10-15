@@ -1,3 +1,5 @@
+#include "JuceHeader.h"
+
 DashboardItemUI::DashboardItemUI(DashboardItem* item) :
 	BaseItemMinimalUI(item),
 	resizer()
@@ -111,6 +113,27 @@ void DashboardItemUI::mouseUp(const MouseEvent& e)
 		itemMinimalUIListeners.call(&ItemMinimalUIListener::itemUIResizeEnd, this);
 		//itemMinimalUIListeners.call(&ItemMinimalUIListener::askForSyncPosAndSize, this);
 	}
+}
+
+bool DashboardItemUI::keyPressed(const KeyPress& e)
+{
+	Point<float> posOffset;
+	if (e.getKeyCode() == KeyPress::rightKey) posOffset.setX(1);
+	else if (e.getKeyCode() == KeyPress::leftKey) posOffset.setX(-1);
+	else if (e.getKeyCode() == KeyPress::downKey) posOffset.setY(1);
+	else if (e.getKeyCode() == KeyPress::upKey) posOffset.setY(-1);
+
+	if (!posOffset.isOrigin())
+	{
+		if (e.getModifiers().isShiftDown()) posOffset *= 10;
+		else if (e.getModifiers().isAltDown()) posOffset *= 1;
+		else  posOffset *= 2;
+
+		item->viewUIPosition->setUndoablePoint(item->viewUIPosition->getPoint(), item->viewUIPosition->getPoint() + posOffset);
+		return true;
+	}
+
+	return BaseItemMinimalUI::keyPressed(e);
 }
 
 void DashboardItemUI::updateEditMode()
