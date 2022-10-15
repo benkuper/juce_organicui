@@ -45,6 +45,8 @@ public:
 	std::unique_ptr<WarningTargetUI> warningUI;
 	std::unique_ptr<ImageButton> removeBT;
 
+	Rectangle<int> dragRect;
+
 	Component headerSpacer;
 
 	bool dragAndDropEnabled;
@@ -62,8 +64,10 @@ public:
 
 	virtual void clear();
 
-	void mouseDown(const MouseEvent &e) override;
+	void mouseDown(const MouseEvent& e) override;
+	void mouseUp(const MouseEvent &e) override;
 	void mouseDrag(const MouseEvent& e) override;
+	virtual void setDragDetails(var&) {}
 
 	virtual void setDragAndDropEnabled(bool value);
 

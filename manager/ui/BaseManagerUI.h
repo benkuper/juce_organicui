@@ -524,12 +524,12 @@ void BaseManagerUI<M, T, U>::paint(Graphics& g)
 					if (defaultLayout == HORIZONTAL)
 					{
 						int tx = currentDropIndex >= 0 ? buiBounds.getX() - 1 : buiBounds.getRight() + 1;
-						g.drawLine(tx, 0, tx, getHeight(), 2);
+						g.drawLine(tx, getHeight()*.25f, tx, getHeight()*.75f, 2);
 					}
 					else if (defaultLayout == VERTICAL)
 					{
 						int ty = currentDropIndex >= 0 ? buiBounds.getY() - 1 : buiBounds.getBottom() + 1;
-						g.drawLine(0, ty, getWidth(), ty, 2);
+						g.drawLine(getWidth()*.25f, ty, getWidth()*.75f, ty, 2);
 					}
 				}
 			}

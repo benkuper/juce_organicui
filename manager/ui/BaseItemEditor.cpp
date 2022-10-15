@@ -1,5 +1,7 @@
-BaseItemEditor::BaseItemEditor(Array<BaseItem *> bi, bool isRoot) :
-	EnablingControllableContainerEditor(Inspectable::getArrayAs<BaseItem,EnablingControllableContainer>(bi), isRoot),
+#include "JuceHeader.h"
+
+BaseItemEditor::BaseItemEditor(Array<BaseItem*> bi, bool isRoot) :
+	EnablingControllableContainerEditor(Inspectable::getArrayAs<BaseItem, EnablingControllableContainer>(bi), isRoot),
 	items(bi)
 {
 	jassert(items.size() > 0);
@@ -15,7 +17,7 @@ BaseItemEditor::BaseItemEditor(Array<BaseItem *> bi, bool isRoot) :
 
 	if (!isRoot)
 	{
-		if(item->userCanDuplicate)
+		if (item->userCanDuplicate)
 		{
 			duplicateBT.reset(AssetManager::getInstance()->getDuplicateBT());
 			duplicateBT->setWantsKeyboardFocus(false);
@@ -23,18 +25,18 @@ BaseItemEditor::BaseItemEditor(Array<BaseItem *> bi, bool isRoot) :
 			duplicateBT->addListener(this);
 		}
 
-		if (item->canBeReorderedInEditor)
-		{
-			upBT.reset(AssetManager::getInstance()->getUpBT());
-			downBT.reset(AssetManager::getInstance()->getDownBT());
-			upBT->setWantsKeyboardFocus(false);
-			downBT->setWantsKeyboardFocus(false);
+		//if (item->canBeReorderedInEditor)
+		//{
+			//	upBT.reset(AssetManager::getInstance()->getUpBT());
+			//	downBT.reset(AssetManager::getInstance()->getDownBT());
+			//	upBT->setWantsKeyboardFocus(false);
+			//	downBT->setWantsKeyboardFocus(false);
 
-			addAndMakeVisible(upBT.get());
-			addAndMakeVisible(downBT.get());
-			upBT->addListener(this);
-			downBT->addListener(this);
-		}
+			//	addAndMakeVisible(upBT.get());
+			//	addAndMakeVisible(downBT.get());
+			//	upBT->addListener(this);
+			//	downBT->addListener(this);
+		//}
 	}
 	else
 	{
@@ -52,17 +54,17 @@ BaseItemEditor::~BaseItemEditor()
 	if (!inspectable.wasObjectDeleted()) item->removeAsyncContainerListener(this);
 }
 
-void BaseItemEditor::setIsFirst(bool value)
-{
-	isFirst = value;
-	if (upBT != nullptr) upBT->setVisible(!isFirst);
-}
-
-void BaseItemEditor::setIsLast(bool value)
-{
-	isLast = value;
-	if (downBT != nullptr) downBT->setVisible(!isLast);
-}
+//void BaseItemEditor::setIsFirst(bool value)
+//{
+//	isFirst = value;
+//	if (upBT != nullptr) upBT->setVisible(!isFirst);
+//}
+//
+//void BaseItemEditor::setIsLast(bool value)
+//{
+//	isLast = value;
+//	if (downBT != nullptr) downBT->setVisible(!isLast);
+//}
 
 void BaseItemEditor::resizedInternalHeader(juce::Rectangle<int>& r)
 {
@@ -86,24 +88,13 @@ void BaseItemEditor::resizedInternalHeader(juce::Rectangle<int>& r)
 		itemColorUI->setBounds(r.removeFromRight(targetHeight).reduced(2));
 	}
 
-	if (upBT != nullptr)
-	{
-		upBT->setBounds(r.removeFromRight(targetHeight).reduced(4));
-	}
-
-	if (downBT != nullptr)
-	{
-		downBT->setBounds(r.removeFromRight(targetHeight).reduced(4));
-	}
-
-
 
 	EnablingControllableContainerEditor::resizedInternalHeader(r);
-	
+
 	resizedInternalHeaderItemInternal(r);
 }
 
-void BaseItemEditor::buttonClicked(Button * b)
+void BaseItemEditor::buttonClicked(Button* b)
 {
 	EnablingControllableContainerEditor::buttonClicked(b);
 
@@ -125,15 +116,22 @@ void BaseItemEditor::buttonClicked(Button * b)
 		}
 		else this->item->remove();
 		return;
-	}else if(b == duplicateBT.get())
+	}
+	else if (b == duplicateBT.get())
 	{
 		item->duplicate();
-	} else if (b == upBT.get())
-	{
-		item->moveBefore();
-	} else if (b == downBT.get())
-	{
-		item->moveAfter();
 	}
+	//else if (b == upBT.get())
+	//{
+	//	item->moveBefore();
+	//} else if (b == downBT.get())
+	//{
+	//	item->moveAfter();
+	//}
 }
 
+void BaseItemEditor::setDragDetails(var& details)
+{
+	details.getDynamicObject()->setProperty("type", item->getTypeString());
+	details.getDynamicObject()->setProperty("dataType", item->itemDataType);
+}

@@ -16,7 +16,8 @@ class BaseManager;
 template<class T>
 class GenericManagerEditor :
 	public EnablingControllableContainerEditor,
-	public BaseManager<T>::AsyncListener
+	public BaseManager<T>::AsyncListener,
+	public DragAndDropTarget
 {
 public:
 	GenericManagerEditor(BaseManager<T>* manager, bool isRoot);
@@ -24,7 +25,15 @@ public:
 
 	BaseManager<T>* manager;
 
+	Array<BaseItemEditor*> itemEditors;
+
 	String noItemText;
+
+	//drag and drop
+	StringArray acceptedDropTypes;
+	bool isDraggingOver;
+	bool highlightOnDragOver;
+	int currentDropIndex;
 
 	//layout
 	bool fixedItemHeight;
@@ -53,6 +62,16 @@ public:
 
 	virtual void itemAddedAsync(T* item) {}
 	virtual void itemRemovedAsync(T* item) {}
+
+	//Drag drop target
+	virtual bool isInterestedInDragSource(const SourceDetails& dragSourceDetails) override;
+
+	virtual void itemDragEnter(const SourceDetails&) override;
+	virtual void itemDragMove(const SourceDetails& dragSourceDetails) override;
+	virtual void itemDragExit(const SourceDetails&) override;
+	virtual void itemDropped(const SourceDetails& dragSourceDetails) override;
+	virtual int getDropIndexForPosition(Point<int> localPosition);
+
 };
 
 
@@ -61,7 +80,9 @@ template<class T>
 GenericManagerEditor<T>::GenericManagerEditor(BaseManager<T>* _manager, bool isRoot) :
 	EnablingControllableContainerEditor(_manager, isRoot, false),
 	manager(_manager),
-	addItemText("Add item")
+	addItemText("Add item"),
+	isDraggingOver(false),
+	highlightOnDragOver(true)
 {
 	headerHeight = 20;
 	setInterceptsMouseClicks(true, true);
@@ -91,6 +112,7 @@ void GenericManagerEditor<T>::resetAndBuild()
 	GenericControllableContainerEditor::resetAndBuild();
 	resized();
 
+	itemEditors.clear();
 	for (auto& e : childEditors)
 	{
 		if (e == nullptr)
@@ -102,9 +124,11 @@ void GenericManagerEditor<T>::resetAndBuild()
 		BaseItemEditor* be = dynamic_cast<BaseItemEditor*>(e);
 		if (be == nullptr) continue;
 
-		int index = manager->items.indexOf(static_cast<T*>(be->item));
-		be->setIsFirst(index == 0);
-		be->setIsLast(index == manager->items.size() - 1);
+		itemEditors.add(be);
+
+		//int index = manager->items.indexOf(static_cast<T*>(be->item));
+		//be->setIsFirst(index == 0);
+		//be->setIsLast(index == manager->items.size() - 1);
 	}
 }
 
@@ -123,6 +147,23 @@ void GenericManagerEditor<T>::paint(Graphics& g)
 	{
 		g.setColour(PANEL_COLOR.brighter(.1f));
 		g.drawFittedText(this->noItemText, this->getContentBounds().reduced(10), Justification::centred, 4);
+	}
+
+	if (isDraggingOver && highlightOnDragOver)
+	{
+		g.setColour(BLUE_COLOR);
+
+		if (itemEditors.size() > 0)
+		{
+			BaseItemEditor* bui = itemEditors[currentDropIndex >= 0 ? currentDropIndex : itemEditors.size() - 1];
+			if (bui != nullptr)
+			{
+				juce::Rectangle<int> buiBounds = getLocalArea(bui, bui->getLocalBounds());
+
+				int ty = currentDropIndex >= 0 ? buiBounds.getY() - 1 : buiBounds.getBottom() + 1;
+				g.drawLine(getWidth()*.25f, ty, getWidth()*.75f, ty, 2);
+			}
+		}
 	}
 }
 
@@ -242,4 +283,95 @@ void GenericManagerEditor<T>::newMessage(const typename BaseManager<T>::ManagerE
 	default:
 		break;
 	}
+}
+
+
+template<class T>
+bool GenericManagerEditor<T>::isInterestedInDragSource(const SourceDetails& dragSourceDetails)
+{
+	if (acceptedDropTypes.contains(dragSourceDetails.description.getProperty("dataType", "").toString())) return true;
+
+	BaseItemEditor* itemUI = dynamic_cast<BaseItemEditor*>(dragSourceDetails.sourceComponent.get());
+	if (itemEditors.contains(itemUI)) return true;
+
+	return false;
+}
+
+
+template<class T>
+void GenericManagerEditor<T>::itemDragEnter(const SourceDetails&)
+{
+	isDraggingOver = true;
+	repaint();
+}
+
+
+template<class T>
+void GenericManagerEditor<T>::itemDragMove(const SourceDetails& dragSourceDetails)
+{
+	currentDropIndex = getDropIndexForPosition(dragSourceDetails.localPosition);
+	repaint();
+}
+
+
+
+template<class T>
+void GenericManagerEditor<T>::itemDragExit(const SourceDetails&)
+{
+	isDraggingOver = false;
+	repaint();
+}
+
+
+template<class T>
+void GenericManagerEditor<T>::itemDropped(const SourceDetails& dragSourceDetails)
+{
+	if (BaseItemEditor* bui = dynamic_cast<BaseItemEditor*>(dragSourceDetails.sourceComponent.get()))
+	{
+		if (BaseItem* item = bui->item)
+		{
+			int droppingIndex = getDropIndexForPosition(dragSourceDetails.localPosition);
+			if (itemEditors.contains(bui))
+			{
+				T* tItem = static_cast<T*>(item);
+				if (itemEditors.indexOf(bui) < droppingIndex) droppingIndex--;
+				if (droppingIndex == -1) droppingIndex = itemEditors.size() - 1;
+				this->manager->setItemIndex(tItem, droppingIndex);
+			}
+			//else
+			//{
+			//	var data = item->getJSONData();
+			//	if (droppingIndex != -1) data.getDynamicObject()->setProperty("index", droppingIndex);
+
+			//	if (T* newItem = this->manager->createItemFromData(data))
+			//	{
+			//		Array<UndoableAction*> actions;
+			//		actions.add(this->manager->getAddItemUndoableAction(newItem, data));
+			//		if (BaseManager<T>* sourceManager = dynamic_cast<BaseManager<T> *>(item->parentContainer.get()))
+			//		{
+			//			actions.addArray(sourceManager->getRemoveItemUndoableAction(item));
+			//		}
+			//		UndoMaster::getInstance()->performActions("Move " + item->niceName, actions);
+			//	}
+			//}
+		}
+	}
+
+	this->isDraggingOver = false;
+	repaint();
+}
+
+
+
+template<class T>
+int GenericManagerEditor<T>::getDropIndexForPosition(Point<int> localPosition)
+{
+	for (int i = 0; i < itemEditors.size(); ++i)
+	{
+		BaseItemEditor* iui = itemEditors[i];
+		Point<int> p = getLocalArea(iui, iui->getLocalBounds()).getCentre();
+		if (localPosition.y < p.y) return i;
+	}
+
+	return -1;
 }

@@ -8,8 +8,9 @@
   ==============================================================================
 */
 
+#include "JuceHeader.h"
 
-GenericControllableContainerEditor::GenericControllableContainerEditor(Array<ControllableContainer *> containers, bool isRoot, bool buildAtCreation) :
+GenericControllableContainerEditor::GenericControllableContainerEditor(Array<ControllableContainer*> containers, bool isRoot, bool buildAtCreation) :
 	InspectableEditor(Inspectable::getArrayAs<ControllableContainer, Inspectable>(containers), isRoot),
 	headerHeight(GlobalSettings::getInstance()->fontSize->floatValue() + 8),
 	isRebuilding(false),
@@ -18,7 +19,7 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(Array<Con
 	containerLabel("containerLabel", dynamic_cast<ControllableContainer*>(inspectable.get())->niceName),
 	containers(containers),
 	headerSpacer("headerSpacer"),
-	dragAndDropEnabled(true)
+	dragAndDropEnabled(false)
 {
 	jassert(containers.size() > 0);
 
@@ -52,6 +53,18 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(Array<Con
 		warningUI->addComponentListener(this);
 	}
 
+	if (container->isRemovableByUser)
+	{
+		removeBT.reset(AssetManager::getInstance()->getRemoveBT());
+		removeBT->addListener(this);
+		removeBT->setWantsKeyboardFocus(false);
+		removeBT->setMouseClickGrabsKeyboardFocus(false);
+
+		addAndMakeVisible(removeBT.get());
+	}
+
+	setDragAndDropEnabled(true);
+
 	if (canBeCollapsed())
 	{
 		expandBT.reset(AssetManager::getInstance()->getRightArrowBT());
@@ -81,15 +94,7 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(Array<Con
 		if (buildAtCreation) resetAndBuild();
 	}
 
-	if (container->isRemovableByUser)
-	{
-		removeBT.reset(AssetManager::getInstance()->getRemoveBT());
-		removeBT->addListener(this);
-		removeBT->setWantsKeyboardFocus(false);
-		removeBT->setMouseClickGrabsKeyboardFocus(false);
 
-		addAndMakeVisible(removeBT.get());
-	}
 
 }
 
@@ -110,6 +115,22 @@ void GenericControllableContainerEditor::clear()
 
 void GenericControllableContainerEditor::mouseDown(const MouseEvent& e)
 {
+	//if (e.mods.isLeftButtonDown())
+	//{
+	//	if (e.originalComponent == &headerSpacer || (isRoot && e.eventComponent == this && e.getMouseDownY() < headerHeight))
+	//	{
+	//		if (e.mods.isShiftDown()) toggleCollapsedChildren();
+	//		else setCollapsed(!container->editorIsCollapsed);
+	//	}
+	//}
+	//else if (e.mods.isRightButtonDown())
+	//{
+	//	showContextMenu();
+	//}
+}
+
+void GenericControllableContainerEditor::mouseUp(const MouseEvent& e)
+{
 	if (e.mods.isLeftButtonDown())
 	{
 		if (e.originalComponent == &headerSpacer || (isRoot && e.eventComponent == this && e.getMouseDownY() < headerHeight))
@@ -128,15 +149,17 @@ void GenericControllableContainerEditor::mouseDrag(const MouseEvent& e)
 {
 	InspectableEditor::mouseDrag(e);
 
-	if (dragAndDropEnabled && e.eventComponent->getY() < headerHeight)
+	if (dragAndDropEnabled && (e.eventComponent->getY() < headerHeight || dragRect.contains(e.getMouseDownPosition())))
 	{
-		var desc = var(new DynamicObject());
-		desc.getDynamicObject()->setProperty("type", "ControllableContainer");
-		desc.getDynamicObject()->setProperty("dataType", "Container");
-		//Image dragImage = this->createComponentSnapshot(this->getLocalBounds()).convertedToFormat(Image::ARGB);
-		//dragImage.multiplyAllAlphas(.5f);
-		Point<int> offset = -getMouseXYRelative();
-		if (e.getDistanceFromDragStart() > 30) startDragging(desc, this, ScaledImage(), true, &offset);
+		if (e.getDistanceFromDragStart() > 30)
+		{
+			Point<int> offset = -getMouseXYRelative();
+			var desc = var(new DynamicObject());
+			desc.getDynamicObject()->setProperty("type", "ControllableContainer");
+			desc.getDynamicObject()->setProperty("dataType", "Container");
+			setDragDetails(desc);
+			startDragging(desc, this, ScaledImage(), true, &offset);
+		}
 	}
 }
 
@@ -388,8 +411,8 @@ void GenericControllableContainerEditor::showMenuAndAddControllable()
 			c->saveValueOnly = false;
 			this->container->addControllable(c);
 		}
-		,true
-	);
+		, true
+			);
 
 }
 
@@ -560,7 +583,7 @@ void GenericControllableContainerEditor::paint(Graphics& g)
 
 	if (!isRoot && !container->hideEditorHeader)
 	{
-		g.setColour(contourColor.withAlpha(.3f));
+		g.setColour(contourColor.withMultipliedAlpha(.3f));
 		juce::Rectangle<int> r = getLocalBounds();
 		if (container->editorIsCollapsed && container->editorCanBeCollapsed) r.setHeight(headerHeight);
 		g.fillRoundedRectangle(r.toFloat(), 4);
@@ -568,7 +591,7 @@ void GenericControllableContainerEditor::paint(Graphics& g)
 
 	if ((isRoot || canBeCollapsed()) && !container->hideEditorHeader)
 	{
-		g.setColour(contourColor.withAlpha(isRoot ? .8f : .4f));
+		g.setColour(contourColor.withMultipliedAlpha(isRoot ? .8f : .4f));
 		g.fillRoundedRectangle(getHeaderBounds().toFloat(), 4);
 	}
 
@@ -576,6 +599,12 @@ void GenericControllableContainerEditor::paint(Graphics& g)
 	{
 		g.setColour(contourColor.brighter(.2f));
 		g.drawRoundedRectangle(getLocalBounds().toFloat(), 4, 2);
+	}
+
+	if (dragAndDropEnabled)
+	{
+		g.setColour(Colours::white);
+		g.drawImage(AssetManager::getInstance()->drag, dragRect.toFloat());
 	}
 
 }
@@ -633,14 +662,19 @@ void GenericControllableContainerEditor::resizedInternalHeader(juce::Rectangle<i
 		r.removeFromRight(2);
 	}
 
+	if (dragAndDropEnabled)
+	{
+		dragRect = r.removeFromRight(r.getHeight()).reduced(4);
+	}
+
 	if (warningUI != nullptr && warningUI->isVisible())
 	{
 		warningUI->setBounds(r.removeFromLeft(r.getHeight()).reduced(2));
 		r.removeFromLeft(2);
 	}
 
-	if(containerLabel.isVisible()) containerLabel.setBounds(r.removeFromLeft(containerLabel.getFont().getStringWidth(containerLabel.getText()) + 20));
-	
+	if (containerLabel.isVisible()) containerLabel.setBounds(r.removeFromLeft(containerLabel.getFont().getStringWidth(containerLabel.getText()) + 20));
+
 	headerSpacer.setBounds(r);
 }
 

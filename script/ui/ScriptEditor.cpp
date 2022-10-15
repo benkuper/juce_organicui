@@ -15,7 +15,7 @@ ScriptEditor::ScriptEditor(Script * _script, bool isRoot) :
 {
 	script->addAsyncScriptListener(this);
 
-	reloadBT.reset(script->reload->createImageUI(AssetManager::getInstance()->getReloadImage()));
+	reloadBT.reset(script->reload->createImageUI(AssetManager::getInstance()->reloadImage));
 	
 	if (!script->filePath->isControllableFeedbackOnly)
 	{

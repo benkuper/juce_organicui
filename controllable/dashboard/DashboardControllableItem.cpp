@@ -23,11 +23,11 @@ DashboardControllableItem::DashboardControllableItem(Controllable* item) :
 		}
 
 		if (dp != nullptr && dp->enabled) viewUISize->setPoint(dp->getPoint());
-		else viewUISize->setPoint(100, 20);
+		else viewUISize->setPoint(200, 40);
 	}
 	else
 	{
-		viewUISize->setPoint(100, 20);
+		viewUISize->setPoint(200, 40);
 	}
 
 

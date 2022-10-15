@@ -61,20 +61,20 @@ ProjectSettings::ProjectSettings() :
 	p2dDefaultSize->canBeDisabledByUser = true;
 	p3dDefaultSize->canBeDisabledByUser = true;
 
-	triggerDefaultSize->setPoint(100, 20);
-	boolDefaultSize->setPoint(100, 20);
+	triggerDefaultSize->setPoint(200, 40);
+	boolDefaultSize->setPoint(200, 40);
 	boolDefaultStyle->addOption("Default", -1)->addOption("Toggle Checkbox", 22)->addOption("Toggle Button", 23)->addOption("Momentary Checkbox", 24)->addOption("Momentary Button", 25)->addOption("Color Circle", 10)->addOption("Color Square", 11);
-	floatDefautSize->setPoint(100, 20);
+	floatDefautSize->setPoint(200, 40);
 	floatDefaultStyle->addOption("Default", -1)->addOption("Horizontal Slider", 0)->addOption("Vertical Slider", 1)->addOption("Rotary Slider", 5)->addOption("Text", 2)->addOption("Time", 3)->addOption("Color Circle", 10)->addOption("Color Square", 11);
-	intDefautSize->setPoint(100, 20);
+	intDefautSize->setPoint(200, 40);
 	intDefaultStyle->addOption("Default", -1)->addOption("Horizontal Slider", 0)->addOption("Vertical Slider", 1)->addOption("Rotary Slider", 5)->addOption("Text", 2)->addOption("Time", 3);
-	stringDefaultSize->setPoint(100, 20);
-	enumDefaultSize->setPoint(100, 20);
+	stringDefaultSize->setPoint(200, 40);
+	enumDefaultSize->setPoint(200, 40);
 	enumDefaultStyle->addOption("Default", -1)->addOption("Horizontal Bar", 20)->addOption("Vertical Bar", 21);
-	colorDefaultSize->setPoint(100, 20);
-	targetDefaultSize->setPoint(100, 20);
-	p2dDefaultSize->setPoint(100, 20);
-	p3dDefaultSize->setPoint(100, 20);
+	colorDefaultSize->setPoint(200, 40);
+	targetDefaultSize->setPoint(200, 40);
+	p2dDefaultSize->setPoint(200, 40);
+	p3dDefaultSize->setPoint(200, 40);
 
 	dashboardDefaults.editorIsCollapsed = true;
 	dashboardCC.addChildControllableContainer(&dashboardDefaults);

@@ -62,6 +62,9 @@ namespace OrganicUIBinaryData
     extern const char*   down_png;
     const int            down_pngSize = 543;
 
+    extern const char*   drag_png;
+    const int            drag_pngSize = 604;
+
     extern const char*   duplicate_png;
     const int            duplicate_pngSize = 2770;
 
@@ -123,7 +126,7 @@ namespace OrganicUIBinaryData
     const int            warning_pngSize = 1153;
 
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 38;
+    const int namedResourceListSize = 39;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];

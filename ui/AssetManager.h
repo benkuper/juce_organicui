@@ -23,6 +23,15 @@ public:
 	Image eyeImage;
 	Image powerOn;
 	Image powerOff;
+	Image drag;
+	Image cancel;
+
+	Image inImage;
+	Image outImage;
+	Image reloadImage;
+	Image triggerImage;
+	Image relativeImage;
+	Image minusImage;
 
 	ImageButton * getRemoveBT();
 	ImageButton * getConfigBT();
@@ -35,14 +44,7 @@ public:
 	ImageButton * getRightArrowBT();
 	ImageButton * getDownArrowImageBT();
 	ImageButton * getUpBT();
-	ImageButton * getDownBT();
 
-	Image getInImage();
-	Image getOutImage();
-	Image getReloadImage();
-	Image getTriggerImage();
-	Image getRelativeImage();
-	Image getMinusImage();
 
 	ImageButton * getSetupBTImage(const Image & image);
 	ImageButton * getToggleBTImage(const Image &image);

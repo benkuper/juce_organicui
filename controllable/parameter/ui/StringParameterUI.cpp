@@ -135,7 +135,7 @@ StringParameterFileUI::StringParameterFileUI(Array<StringParameter*> parameters)
 
 	if (!fp->forceRelativePath)
 	{
-		relativeBT.reset(AssetManager::getInstance()->getToggleBTImage(AssetManager::getInstance()->getRelativeImage()));
+		relativeBT.reset(AssetManager::getInstance()->getToggleBTImage(AssetManager::getInstance()->relativeImage));
 		relativeBT->addListener(this);
 		relativeBT->setToggleState(fp->forceRelativePath, dontSendNotification);
 		relativeBT->setEnabled(isInteractable());
