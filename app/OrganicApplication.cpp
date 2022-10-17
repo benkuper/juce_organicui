@@ -1,4 +1,6 @@
 
+#include "JuceHeader.h"
+
 #if JUCE_MAC //for chmod
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -38,6 +40,10 @@ const String OrganicApplication::getApplicationVersion() { return ProjectInfo::v
 
 bool OrganicApplication::moreThanOneInstanceAllowed()
 {
+	String commandline = getCommandLineParameters();
+	bool fromCrash = commandline.contains("-c ");
+	if (fromCrash) return true;
+
 	//global settings and engine are not initialized yet here, must check the value from the file itself.
 	var gs = JSON::fromString(getAppProperties().getUserSettings()->getValue("globalSettings", ""));
 	DBG(JSON::toString(gs));
