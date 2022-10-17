@@ -76,6 +76,8 @@ void WarningTarget::resolveWarning()
 
 String WarningTarget::getWarningMessage(const String& id) const
 {
+	if (warningMessage.size() == 0) return "";
+
 	String result;
 	if (id == warningAllId)
 	{
