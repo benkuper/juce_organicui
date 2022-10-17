@@ -131,7 +131,7 @@ TargetParameter* Parrot::addTarget(Controllable* c)
 
 	if (TargetParameter* t = getTargetForControllable(c)) return t;
 
-	TargetParameter* t = targetsCC.addTargetParameter(targetsCC.getUniqueNameInContainer("Target"), "");
+	TargetParameter* t = targetsCC.addTargetParameter(targetsCC.getUniqueNameInContainer("Target " + String(targetsCC.controllables.size())), "");
 	t->isRemovableByUser = true;
 	t->setValueFromTarget(c);
 	return t;
