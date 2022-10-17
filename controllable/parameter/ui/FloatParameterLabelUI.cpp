@@ -7,6 +7,8 @@
 
   ==============================================================================
 */
+	
+#include "JuceHeader.h"
 
 FloatParameterLabelUI::FloatParameterLabelUI(Array<Parameter*> parameters) :
 	ParameterUI(parameters, PARAMETERUI_SLOW_TIMER),
@@ -33,8 +35,6 @@ FloatParameterLabelUI::FloatParameterLabelUI(Array<Parameter*> parameters) :
 
 	addMouseListener(this, true);
 
-	valueLabel.onEditorHide = [this]() {labelTextChanged(&valueLabel); };
-
 	handlePaintTimer(); //force update once
 }
 
@@ -58,18 +58,20 @@ void FloatParameterLabelUI::setSuffix(const String& _suffix)
 	valueChanged(parameter->stringValue());
 }
 
+void FloatParameterLabelUI::updateLabelFromValue()
+{
+	String s = valueLabel.getText();
+	double v = ParameterUI::textToValue(s.replace(",", "."));
+
+	if ((float)v == float(parameter->value)) valueLabel.setText(getValueString(v), dontSendNotification);
+	parameter->setValue(v);
+}
+
 void FloatParameterLabelUI::updateTooltip()
 {
 	ParameterUI::updateTooltip();
 	valueLabel.setTooltip(tooltip);
 }
-
-/*
-void FloatParameterLabelUI::paint(Graphics & g)
-{
-g.fillAll(Colours::purple.withAlpha(.2f));
-}
-*/
 
 void FloatParameterLabelUI::resized()
 {
@@ -95,7 +97,7 @@ void FloatParameterLabelUI::mouseDownInternal(const MouseEvent& e)
 		parameter->resetValue();
 	}
 
-	valueAtMouseDown = parameter->floatValue();
+	valueAtMouseDown = parameter->doubleValue();
 	valueOffsetSinceMouseDown = 0;
 	lastMouseX = e.getMouseDownX();
 }
@@ -112,7 +114,9 @@ void FloatParameterLabelUI::mouseDrag(const MouseEvent& e)
 		valueLabel.updateMouseCursor();
 	}
 
-	float sensitivity = e.mods.isShiftDown() ? 10 : (e.mods.isAltDown() ? .1f : 1);
+	float sensitivity = 1;
+	if (e.mods.isShiftDown()) sensitivity *= 10;
+	if (e.mods.isAltDown()) sensitivity /= 100;
 
 	valueOffsetSinceMouseDown += (e.getPosition().x - lastMouseX) * sensitivity / pixelsPerUnit;
 	lastMouseX = e.getPosition().x;
@@ -137,10 +141,7 @@ void FloatParameterLabelUI::mouseUpInternal(const MouseEvent& e)
 void FloatParameterLabelUI::focusGained(FocusChangeType cause)
 {
 	ParameterUI::focusGained(cause);
-	if (cause == FocusChangeType::focusChangedByTabKey)
-	{
-		valueLabel.showEditor();
-	}
+	if (cause == FocusChangeType::focusChangedByTabKey) valueLabel.showEditor();
 }
 
 void FloatParameterLabelUI::updateUIParamsInternal()
@@ -177,29 +178,19 @@ void FloatParameterLabelUI::valueChanged(const var& v)
 
 void FloatParameterLabelUI::labelTextChanged(Label*)
 {
-	String s = valueLabel.getText();
-	double v = ParameterUI::textToValue(s.replace(",", "."));
-
-	//if (showLabel)
-	//{
-	//	String label = customLabel.isNotEmpty() ? customLabel : parameter->niceName;
-	//	s = s.substring(label.length() + 3); // including " : ";
-	//}
-	//s = s.substring(prefix.length(), s.length() - suffix.length());
-
-	if ((float)v == float(parameter->value)) valueLabel.setText(getValueString(v), dontSendNotification);
-	parameter->setValue(v);
+	//nothing here
 }
 
 void FloatParameterLabelUI::editorShown(Label* label, TextEditor& t)
 {
 	if (parameter.wasObjectDeleted()) return;
-	t.setText(getValueString(parameter->value), dontSendNotification);
+	t.setText(parameter->stringValue(), dontSendNotification);
 	//valueLabel.showEditor();
 }
 
 void FloatParameterLabelUI::editorHidden(Label* label, TextEditor&)
 {
+	updateLabelFromValue(); 
 	shouldRepaint = true;
 }
 

@@ -37,7 +37,7 @@ public:
 	void setPrefix(const String &_prefix);
 	void setSuffix(const String &_suffix);
 
-
+	virtual void updateLabelFromValue();
 	virtual void updateTooltip() override;
 
 	//void paint(Graphics &g) override;
