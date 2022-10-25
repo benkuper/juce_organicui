@@ -10,6 +10,11 @@
 
 #pragma once
 
+
+#define DECLARE_TYPE(type) String getTypeString() const override { return getTypeStringStatic() ; } \
+static String getTypeStringStatic() { return type; }
+
+
 template <class T>
 class BaseManager :
 	public EnablingControllableContainer,
@@ -106,6 +111,8 @@ public:
 
 	PopupMenu getItemsMenu(int startID);
 	T* getItemForMenuResultID(int id, int startID);
+
+	T* getFirstSelectedItem();
 
 	String getScriptTargetString() override;
 
@@ -925,6 +932,13 @@ template<class T>
 T* BaseManager<T>::getItemForMenuResultID(int id, int startID)
 {
 	return items[id - startID];
+}
+
+template<class T>
+T* BaseManager<T>::getFirstSelectedItem()
+{
+	for (auto& i : items) if (i->isSelected) return i;
+	return nullptr;
 }
 
 template<class T>
