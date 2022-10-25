@@ -69,7 +69,7 @@ void Curve2D::removeItemInternal(Curve2DKey*)
     if(!isManipulatingMultipleItems && !isCurrentlyLoadingData) updateCurve(false);
 }
 
-void Curve2D::removeItemsInternal()
+void Curve2D::removeItemsInternal(Array<Curve2DKey*>)
 {
     if (!isCurrentlyLoadingData) updateCurve(false);
 }

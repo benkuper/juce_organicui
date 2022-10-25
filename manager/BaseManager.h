@@ -84,7 +84,7 @@ public:
 	virtual void addItemInternal(T*, var data) {}
 	virtual void addItemsInternal(Array<T*>, var data) {}
 	virtual void removeItemInternal(T*) {}
-	virtual void removeItemsInternal() {}
+	virtual void removeItemsInternal(Array<T*>) {}
 
 
 	T* getItemWithName(const String& itemShortName, bool searchNiceNameToo = false, bool searchWithLowerCaseIfNotFound = true);
@@ -627,7 +627,7 @@ void BaseManager<T>::removeItems(Array<T*> itemsToRemove, bool addToUndo)
 	Array<T*> itemsRemoved;
 	for (auto& i : itemsToRemove) itemsRemoved.add(removeItem(i, false, false, true));
 
-	removeItemsInternal();
+	removeItemsInternal(itemsRemoved);
 
 	baseManagerListeners.call(&BaseManagerListener<T>::itemsRemoved, itemsRemoved);
 	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_REMOVED));
