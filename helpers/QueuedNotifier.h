@@ -45,10 +45,11 @@ public:
 	bool dropMessageOnOverflow;
 
     virtual ~QueuedNotifier() {
+        cancelPendingUpdate();
 		listeners.clear();
 		lastListeners.clear();
 		messageQueue.clear();
-		cancelPendingUpdate();
+		//cancelPendingUpdate();
 	}
 
 
