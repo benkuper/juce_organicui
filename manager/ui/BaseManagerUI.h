@@ -543,7 +543,7 @@ void BaseManagerUI<M, T, U>::paint(Graphics& g)
 	}
 
 
-	if (this->manager->items.size() == 0 && noItemText.isNotEmpty())
+	if (!this->inspectable.wasObjectDeleted() && this->manager->items.size() == 0 && noItemText.isNotEmpty())
 	{
 		g.setColour(Colours::white.withAlpha(.4f));
 		g.setFont(jmin(getHeight() - 2, 14));
