@@ -8,7 +8,10 @@
   ==============================================================================
 */
 
+#include "JuceHeader.h"
+
 juce_ImplementSingleton(ParameterUITimers)
+
 
 bool ParameterUI::showAlwaysNotifyOption = true;
 bool ParameterUI::showControlModeOption = true;
@@ -263,7 +266,27 @@ void ParameterUI::handleMenuSelectedID(int id)
 	case -5: parameter->clearRange(); break;
 	case -6: parameter->alwaysNotify = !parameter->alwaysNotify; break;
 	case -20: SystemClipboard::copyTextToClipboard(parameter->stringValue()); break;
-	case -21: parameter->setValue(SystemClipboard::getTextFromClipboard()); break;
+	case -21:
+	{
+		var v = SystemClipboard::getTextFromClipboard();
+		if (parameter->isComplex())
+		{
+			String vStr = v;
+			if (vStr.startsWithChar('[') && vStr.endsWithChar(']'))
+			{
+				StringArray vals;
+				vals.addTokens(vStr.substring(1, vStr.length() - 2), ",", "");
+
+				if (vals.size() >= parameter->value.size())
+				{
+					v = var();
+					for (int i = 0; i < parameter->value.size(); i++) v.append(vals[i].getFloatValue());
+				}
+			}
+		}
+
+		parameter->setValue(v); break;
+	}
 	case -50: parameter->setRange(0, 1); break;
 	case -51: parameter->setRange(-1, 1); break;
 	case -52: parameter->setRange(-90, 90); break;
@@ -459,7 +482,7 @@ void ParameterUI::ValueEditCalloutComponent::editorHidden(Label* l, TextEditor&)
 	if (b != nullptr)
 	{
 		if (l == labels[labels.size() - 1]) b->dismiss();
-	}
+}
 }
 
 void ParameterUI::ValueEditCalloutComponent::parentHierarchyChanged()
