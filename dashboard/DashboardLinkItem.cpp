@@ -7,6 +7,7 @@
 
   ==============================================================================
 */
+#include "JuceHeader.h"
 
 DashboardLinkItem::DashboardLinkItem() :
 	DashboardTriggerItem()
@@ -48,6 +49,9 @@ var DashboardLinkItem::getServerData()
 
 	String targetName;
 	if (Dashboard* d = dynamic_cast<Dashboard*>(dashboardTarget->targetContainer.get())) targetName = d->shortName;
+
+	data.getDynamicObject()->setProperty("type", getTypeString()); //force DashboardLinkItem type
+
 	data.getDynamicObject()->setProperty("target", targetName);
 	data.getDynamicObject()->setProperty("setInNative", setInNative->boolValue());
 	data.getDynamicObject()->setProperty("setInClients", setInClients->boolValue());
