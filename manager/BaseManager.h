@@ -10,6 +10,11 @@
 
 #pragma once
 
+
+#define DECLARE_TYPE(type) String getTypeString() const override { return getTypeStringStatic() ; } \
+static String getTypeStringStatic() { return type; }
+
+
 template <class T>
 class BaseManager :
 	public EnablingControllableContainer,
@@ -79,7 +84,7 @@ public:
 	virtual void addItemInternal(T*, var data) {}
 	virtual void addItemsInternal(Array<T*>, var data) {}
 	virtual void removeItemInternal(T*) {}
-	virtual void removeItemsInternal() {}
+	virtual void removeItemsInternal(Array<T*>) {}
 
 
 	T* getItemWithName(const String& itemShortName, bool searchNiceNameToo = false, bool searchWithLowerCaseIfNotFound = true);
@@ -106,6 +111,8 @@ public:
 
 	PopupMenu getItemsMenu(int startID);
 	T* getItemForMenuResultID(int id, int startID);
+
+	T* getFirstSelectedItem();
 
 	String getScriptTargetString() override;
 
@@ -620,7 +627,7 @@ void BaseManager<T>::removeItems(Array<T*> itemsToRemove, bool addToUndo)
 	Array<T*> itemsRemoved;
 	for (auto& i : itemsToRemove) itemsRemoved.add(removeItem(i, false, false, true));
 
-	removeItemsInternal();
+	removeItemsInternal(itemsRemoved);
 
 	baseManagerListeners.call(&BaseManagerListener<T>::itemsRemoved, itemsRemoved);
 	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_REMOVED));
@@ -925,6 +932,13 @@ template<class T>
 T* BaseManager<T>::getItemForMenuResultID(int id, int startID)
 {
 	return items[id - startID];
+}
+
+template<class T>
+T* BaseManager<T>::getFirstSelectedItem()
+{
+	for (auto& i : items) if (i->isSelected) return i;
+	return nullptr;
 }
 
 template<class T>

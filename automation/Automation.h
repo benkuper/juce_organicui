@@ -56,7 +56,7 @@ public:
     void addItemInternal(AutomationKey* k, var params) override;
     void addItemsInternal(Array<AutomationKey*>, var params) override;
     void removeItemInternal(AutomationKey* k) override;
-    void removeItemsInternal() override;
+    void removeItemsInternal(Array<AutomationKey*> keys) override;
 
     Array<AutomationKey*> addItemsFromClipboard(bool showWarning = false) override;
 

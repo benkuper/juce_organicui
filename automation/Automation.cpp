@@ -355,7 +355,7 @@ void Automation::removeItemInternal(AutomationKey* k)
 	if (!isManipulatingMultipleItems) updateNextKeys();
 }
 
-void Automation::removeItemsInternal()
+void Automation::removeItemsInternal(Array<AutomationKey*>)
 {
 	updateNextKeys();
 }

@@ -38,7 +38,7 @@ public:
     void addItemInternal(Curve2DKey* k, var params) override;
     void addItemsInternal(Array<Curve2DKey*> keys, var) override;
     void removeItemInternal(Curve2DKey* k) override;
-    void removeItemsInternal() override;
+    void removeItemsInternal(Array<Curve2DKey*> keys) override;
 
     virtual float addFromPointsAndSimplify(Array<Point<float>> points, bool clearBeforeAdd = false, Array<float> pointTimes = Array<float>());
 

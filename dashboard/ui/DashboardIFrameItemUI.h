@@ -21,7 +21,7 @@ public:
 
 #if JUCE_WINDOWS
     WindowsWebView2WebBrowserComponent web;
-#else
+#elif !JUCE_LINUX
     WebBrowserComponent web;
 #endif
 

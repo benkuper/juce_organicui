@@ -17,6 +17,8 @@ DashboardIFrameItemUI::DashboardIFrameItemUI(DashboardIFrameItem* item) :
 	, web(false, File(), File::getSpecialLocation(File::windowsLocalAppData).getChildFile("Chataigne"))
 #endif
 {
+
+#if !JUCE_LINUX
 #if JUCE_WINDOWS
 	if (!GlobalSettings::getInstance()->useGLRenderer->boolValue())
 	{
@@ -34,7 +36,7 @@ DashboardIFrameItemUI::DashboardIFrameItemUI(DashboardIFrameItem* item) :
 	MessageManagerLock mmLock;
 	web.setVisible(!DashboardManager::getInstance()->editMode->boolValue());
 	web.goToURL(iFrameItem->url->stringValue());
-
+#endif
 	resized();
 }
 
@@ -53,17 +55,23 @@ void DashboardIFrameItemUI::paint(Graphics& g)
 void DashboardIFrameItemUI::resized()
 {
 	DashboardItemUI::resized();
+#if !JUCE_LINUX	
 	web.setBounds(getLocalBounds());
+#endif
 }
 
 void DashboardIFrameItemUI::updateEditModeInternal(bool editMode)
 {
+#if !JUCE_LINUX	
 	web.setVisible(!editMode);
+#endif
 }
 
 
 void DashboardIFrameItemUI::controllableFeedbackUpdateInternal(Controllable* c)
 {
 	DashboardItemUI::controllableFeedbackUpdateInternal(c);
+#if !JUCE_LINUX	
 	if (c == iFrameItem->url) web.goToURL(iFrameItem->url->stringValue());
+#endif
 }
