@@ -150,7 +150,9 @@ void DashboardManager::messageReceived(const String& id, const String& message)
 	{
 		if (Dashboard* d = getItemWithName(data.getProperty("setDashboard", ""), true))
 		{
-			setCurrentDashboard(d, true, id);
+			bool sClients = data.getProperty("setInClients", true);
+			bool sNative = data.getProperty("setInNative", true);
+			setCurrentDashboard(d, sClients, sNative, id);
 		}
 		return;
 	}
@@ -418,13 +420,16 @@ void DashboardManager::removeItemInternal(Dashboard* item)
 	askForRefresh(nullptr);
 }
 
-void DashboardManager::setCurrentDashboard(Dashboard* d, bool setInClients, StringArray excludeIds)
+void DashboardManager::setCurrentDashboard(Dashboard* d, bool setInClients, bool setInNative, StringArray excludeIds)
 {
 	if (d == nullptr) return;
-	if (DashboardManagerView* v = ShapeShifterManager::getInstance()->getContentForType<DashboardManagerView>())
+
+	if (setInNative)
 	{
-		MessageManager::getInstance()->callAsync([v, d]() {v->setCurrentDashboard(d); });
-			
+		if (DashboardManagerView* v = ShapeShifterManager::getInstance()->getContentForType<DashboardManagerView>())
+		{
+			MessageManager::getInstance()->callAsync([v, d]() {v->setCurrentDashboard(d); });
+		}
 	}
 
 #if ORGANICUI_USE_WEBSERVER

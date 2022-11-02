@@ -64,7 +64,7 @@ public:
 	void addItemInternal(Dashboard* item, var data) override;
 	void removeItemInternal(Dashboard* item) override;
 
-	void setCurrentDashboard(Dashboard* d, bool setInClients = false, StringArray excludeIds = StringArray());
+	void setCurrentDashboard(Dashboard* d, bool setInClients = false, bool setInNative = false, StringArray excludeIds = StringArray());
 
 	void parameterFeedback(var data) override;
 	void dashboardFeedback(var data) override;

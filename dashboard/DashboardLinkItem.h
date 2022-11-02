@@ -9,6 +9,7 @@ public:
 	virtual ~DashboardLinkItem();
 
 	TargetParameter * dashboardTarget;
+	BoolParameter* setInNative;
 	BoolParameter* setInClients;
 	Trigger* launchTrigger;
 
