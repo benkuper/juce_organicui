@@ -5,7 +5,9 @@ DashboardTriggerItem::DashboardTriggerItem(Trigger * item) :
 	bgColor = addColorParameter("Background Color", "Color of the background", BG_COLOR.brighter(), false);
 	bgColor->canBeDisabledByUser = true;
 	customImagePath = addFileParameter("Custom Image", "Choose a custom image instead of the default button");
+	customImagePath->setEnabled(false);
 	customImagePath->fileTypeFilter = "*.png;*.jpg;*.jpeg;*.gif";
+
 	customImagePath->canBeDisabledByUser = true;
 	keepSaturation = addBoolParameter("Keep Saturation", "If checked, this will keep saturation on the background image", false);
 

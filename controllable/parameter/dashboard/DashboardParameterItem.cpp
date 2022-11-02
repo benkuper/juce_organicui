@@ -17,6 +17,7 @@ DashboardParameterItem::DashboardParameterItem(Parameter* parameter) :
 
 	btImage = addFileParameter("Toggle image", "The image of the toggle");
 	btImage->canBeDisabledByUser = true;
+	btImage->setEnabled(false);
 
 	setInspectable(parameter);
 	ghostInspectable();
