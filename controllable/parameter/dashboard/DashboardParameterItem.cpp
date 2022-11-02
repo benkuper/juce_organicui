@@ -1,3 +1,5 @@
+#include "JuceHeader.h"
+
 
 DashboardParameterItem::DashboardParameterItem(Parameter* parameter) :
 	DashboardControllableItem(parameter),
@@ -53,6 +55,8 @@ void DashboardParameterItem::setInspectableInternal(Inspectable* i)
 	if (parameter != nullptr)
 	{
 		parameter->addParameterListener(this);
+		target->typesFilter.clear();
+		target->typesFilter.add(parameter->getTypeString());
 	}
 
 	updateStyleOptions();
@@ -70,7 +74,7 @@ void DashboardParameterItem::onExternalParameterValueChanged(Parameter* p)
 		data.getDynamicObject()->setProperty("type", parameter->getTypeString());
 
 		var val = parameter->value;
-		if (parameter->type == Parameter::FILE) val = parameter->getControlAddress();
+		if (parameter->getTypeString() == FileParameter::getTypeStringStatic()) val = parameter->getControlAddress();
 		data.getDynamicObject()->setProperty("value", val);
 
 		notifyDataFeedback(data);

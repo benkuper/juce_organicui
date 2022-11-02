@@ -1,10 +1,12 @@
+#include "JuceHeader.h"
+
 DashboardInspectableItem::DashboardInspectableItem(Inspectable* item) :
 	DashboardItem(item),
 	inspectable(nullptr),
+	settingInspectable(false),
 	inspectableItemNotifier(20)
 {
 	target = addTargetParameter("Target", "The target for this dashboard item");
-	target->setControllableFeedbackOnly(true);
 }
 
 DashboardInspectableItem::~DashboardInspectableItem()
@@ -22,7 +24,9 @@ void DashboardInspectableItem::clearItem()
 void DashboardInspectableItem::setInspectable(Inspectable* i)
 {
 	if (inspectable == i) return;
-	
+
+	settingInspectable = true;
+
 	if (!inspectable.wasObjectDeleted() && inspectable != nullptr)
 	{
 		inspectable->removeInspectableListener(this);
@@ -38,8 +42,23 @@ void DashboardInspectableItem::setInspectable(Inspectable* i)
 	}
 
 	setInspectableInternal(inspectable);
-	
+
 	inspectableItemNotifier.addMessage(new InspectableItemEvent(InspectableItemEvent::INSPECTABLE_CHANGED, inspectable));
+
+	settingInspectable = false;
+}
+
+void DashboardInspectableItem::onContainerParameterChangedInternal(Parameter* p)
+{
+	DashboardItem::onContainerParameterChangedInternal(p);
+	if (p == target)
+	{
+		if (!isCurrentlyLoadingData && !settingInspectable)
+		{
+			setInspectable(target->target.get());
+		}
+	}
+
 }
 
 void DashboardInspectableItem::inspectableDestroyed(Inspectable* i)
@@ -64,9 +83,10 @@ void DashboardInspectableItem::childStructureChanged(ControllableContainer* cc)
 
 		return;
 	}
-	
+
 	DashboardItem::childStructureChanged(cc);
 }
+
 
 var DashboardInspectableItem::getJSONData()
 {

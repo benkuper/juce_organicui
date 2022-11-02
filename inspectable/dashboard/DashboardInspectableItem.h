@@ -11,6 +11,7 @@ public:
 	WeakReference<Inspectable> inspectable;
 	String inspectableGhostAddress;
 	TargetParameter* target;
+	bool settingInspectable;
 
 	virtual void clearItem() override;
 
@@ -25,6 +26,8 @@ public:
 
 	virtual var getJSONData() override;
 	virtual void loadJSONDataItemInternal(var data) override;
+
+	void onContainerParameterChangedInternal(Parameter* p) override;
 
 	virtual String getTypeString() const override { return "DashboardControllableItem"; }
 
