@@ -119,7 +119,7 @@ void DashboardParameterItem::updateStyleOptions()
 		}
 		else
 		{
-			viewUISize->setPoint(100, 20);
+			//viewUISize->setPoint(100, 20);
 		}
 	}
 
