@@ -68,7 +68,11 @@ void DashboardParameterItem::onExternalParameterValueChanged(Parameter* p)
 		data.getDynamicObject()->setProperty("feedbackType", "targetFeedback");
 		data.getDynamicObject()->setProperty("controlAddress", parameter->getControlAddress());
 		data.getDynamicObject()->setProperty("type", parameter->getTypeString());
-		data.getDynamicObject()->setProperty("value", parameter->value);
+
+		var val = parameter->value;
+		if (parameter->type == Parameter::FILE) val = parameter->getControlAddress();
+		data.getDynamicObject()->setProperty("value", val);
+
 		notifyDataFeedback(data);
 	}
 }
@@ -248,7 +252,7 @@ DashboardEnumParameterItem::DashboardEnumParameterItem(EnumParameter* parameter)
 DashboardEnumParameterItem::~DashboardEnumParameterItem()
 {
 	if (parameter == nullptr || parameter.wasObjectDeleted()) return;
-	
+
 	((EnumParameter*)parameter.get())->removeEnumParameterListener(this);
 
 }
