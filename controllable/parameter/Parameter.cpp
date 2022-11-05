@@ -8,6 +8,8 @@
   ==============================================================================
 */
 
+#include "JuceHeader.h"
+
 juce_ImplementSingleton(Parameter::ValueInterpolator::Manager);
 
 
@@ -34,6 +36,7 @@ Parameter::Parameter(const Type& type, const String& niceName, const String& des
 
 	scriptObject.setMethod("get", Parameter::getValueFromScript);
 	scriptObject.setMethod("set", Controllable::setValueFromScript);
+	scriptObject.setMethod("resetValue", Parameter::resetValueFromScript);
 	scriptObject.setMethod("getRange", Parameter::getRangeFromScript);
 	scriptObject.setMethod("setRange", Parameter::setRangeFromScript);
 	scriptObject.setMethod("hasRange", Parameter::hasRangeFromScript);
@@ -530,9 +533,9 @@ void Parameter::loadJSONDataInternal(var data)
 	else if (data.getDynamicObject()->hasProperty("reference") && referenceTarget != nullptr) referenceTarget->loadJSONData(data.getProperty("reference", var()));
 
 	var cMapData = data.getProperty("colorStatusMap", var());
-	for (int i = 0; i < cMapData.size(); i+=2)
+	for (int i = 0; i < cMapData.size(); i += 2)
 	{
-		var cData = cMapData[i+1];
+		var cData = cMapData[i + 1];
 		Colour c = Colour::fromFloatRGBA((float)cData[0], (float)cData[1], (float)cData[2], (float)cData[3]);
 		colorStatusMap.set(cMapData[i], c);
 	}
@@ -548,7 +551,7 @@ void Parameter::setupFromJSONData(var data)
 
 	if (data.hasProperty("default"))
 	{
-		defaultValue = data.getProperty("default",defaultValue);
+		defaultValue = data.getProperty("default", defaultValue);
 		setValue(data.getProperty("default", defaultValue));
 	}
 }
@@ -560,6 +563,18 @@ var Parameter::getValueFromScript(const juce::var::NativeFunctionArgs& a)
 	WeakReference<Parameter> pRef(p);
 	if (pRef == nullptr || pRef.wasObjectDeleted()) return var();
 	return p->getValue();
+}
+
+var Parameter::resetValueFromScript(const juce::var::NativeFunctionArgs& a)
+{
+	Parameter* p = getObjectFromJS<Parameter>(a);
+	if (p == nullptr) return var();
+	WeakReference<Parameter> pRef(p);
+	if (pRef == nullptr || pRef.wasObjectDeleted()) return var();
+
+	pRef->resetValue();
+
+	return var();
 }
 
 var Parameter::getRangeFromScript(const juce::var::NativeFunctionArgs& a)

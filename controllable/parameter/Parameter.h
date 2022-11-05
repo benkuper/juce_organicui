@@ -147,6 +147,7 @@ public:
 	virtual void setupFromJSONData(var data) override;
 	
 	static var getValueFromScript(const juce::var::NativeFunctionArgs& a);
+	static var resetValueFromScript(const juce::var::NativeFunctionArgs& a);
 	static var getRangeFromScript(const juce::var::NativeFunctionArgs& a);
 	static var setRangeFromScript(const juce::var::NativeFunctionArgs& a);
 	static var hasRangeFromScript(const juce::var::NativeFunctionArgs &a);

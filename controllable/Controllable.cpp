@@ -8,6 +8,9 @@
   ==============================================================================
 */
 
+
+#include "JuceHeader.h"
+
 const Array<String> Controllable::typeNames = {
 	"Custom",
 	Trigger::getTypeStringStatic(),
@@ -432,7 +435,7 @@ var Controllable::setValueFromScript(const juce::var::NativeFunctionArgs& a) {
 		}
 	}
 
-	return var();
+	return success;
 }
 
 
