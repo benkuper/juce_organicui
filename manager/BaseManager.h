@@ -39,13 +39,15 @@ public:
 
 	//ui
 	Point<int> viewOffset; //in pixels, viewOffset of 0 means zeroPos is at the center of the window
-						   //interaction
+	//interaction
 	float viewZoom;
 
 	//grid
 	BoolParameter* snapGridMode;
 	BoolParameter* showSnapGrid;
 	IntParameter* snapGridSize;
+
+	std::function<T* ()> customCreateItemFunc;
 
 	void setHasGridOptions(bool hasGridOptions);
 
@@ -292,6 +294,7 @@ BaseManager<T>::BaseManager(const String& name) :
 	snapGridMode(nullptr),
 	showSnapGrid(nullptr),
 	snapGridSize(nullptr),
+	customCreateItemFunc(nullptr),
 	managerNotifier(50),
 	comparator(this)
 {
@@ -364,6 +367,7 @@ template<class T>
 T* BaseManager<T>::createItem()
 {
 	if (managerFactory != nullptr && managerFactory->defs.size() == 1) return managerFactory->create(managerFactory->defs[0]);
+	if (customCreateItemFunc != nullptr) return customCreateItemFunc();
 	return new T();
 }
 
