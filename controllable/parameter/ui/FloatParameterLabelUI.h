@@ -77,7 +77,9 @@ public:
 	void setShowStepsMode(bool stepsMode);
 
 protected:
+
 	void valueChanged(const var &) override;
+	virtual void editorShown(Label* label, TextEditor&) override;
 	void labelTextChanged(Label * l) override;
 
 	String getValueString(const var &val) const override;

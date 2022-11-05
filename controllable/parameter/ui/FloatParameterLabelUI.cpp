@@ -185,6 +185,7 @@ void FloatParameterLabelUI::editorShown(Label* label, TextEditor& t)
 {
 	if (parameter.wasObjectDeleted()) return;
 	t.setText(parameter->stringValue(), dontSendNotification);
+	t.selectAll();
 	//valueLabel.showEditor();
 }
 
@@ -231,6 +232,13 @@ void TimeLabel::setShowStepsMode(bool stepsMode)
 	showStepsMode = stepsMode;
 	shouldRepaint = true;
 }
+
+void TimeLabel::editorShown(Label* label, TextEditor& t)
+{
+	if (parameter.wasObjectDeleted()) return;
+	t.selectAll(); //only select, no change
+}
+
 
 void TimeLabel::valueChanged(const var& v)
 {
