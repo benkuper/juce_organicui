@@ -16,8 +16,6 @@ juce_ImplementSingleton(OSCRemoteControl)
 #include "OSCRemoteControl.h"
 #endif
 
-static OrganicApplication& getApp() { return *dynamic_cast<OrganicApplication*>(JUCEApplication::getInstance()); }
-
 OSCRemoteControl::OSCRemoteControl() :
 	EnablingControllableContainer("OSC Remote Control")
 #if ORGANICUI_USE_SERVUS

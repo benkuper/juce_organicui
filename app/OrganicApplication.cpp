@@ -11,7 +11,6 @@
 //LONG WINAPI createMiniDump(LPEXCEPTION_POINTERS exceptionPointers);
 //#endif
 
-static OrganicApplication& getApp() { return *dynamic_cast<OrganicApplication*>(JUCEApplication::getInstance()); }
 String getAppVersion() { return getApp().getApplicationVersion(); }
 ControllableContainer* getAppSettings() { return &(getApp().appSettings); }
 ApplicationProperties& getAppProperties() { return *getApp().appProperties; }
