@@ -589,7 +589,7 @@ void GenericControllableContainerEditor::paint(Graphics& g)
 		g.fillRoundedRectangle(r.toFloat(), 4);
 	}
 
-	if ((isRoot || canBeCollapsed()) && !container->hideEditorHeader)
+	if ((isRoot || canBeCollapsed()) /*&& !container->hideEditorHeader*/)
 	{
 		g.setColour(contourColor.withMultipliedAlpha(isRoot ? .8f : .4f));
 		g.fillRoundedRectangle(getHeaderBounds().toFloat(), 4);
@@ -627,7 +627,7 @@ void GenericControllableContainerEditor::resizedInternal(juce::Rectangle<int>& r
 		return;
 	}
 
-	if (!container->hideEditorHeader)
+	if (isRoot || !container->hideEditorHeader)
 	{
 		juce::Rectangle<int> hr = r.removeFromTop(headerHeight);
 
