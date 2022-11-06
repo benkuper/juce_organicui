@@ -47,7 +47,6 @@ public:
 	BoolParameter * openLastDocumentOnStartup;
 	BoolParameter * openSpecificFileOnStartup;
 	FileParameter * fileToOpenOnStartup;
-	BoolParameter* autoReopenFileOnCrash;
 
 	ControllableContainer interfaceCC;
 	BoolParameter* closeToSystemTray;
@@ -63,7 +62,8 @@ public:
 	IntParameter* autoSaveTime;
 
 	BoolParameter* compressOnSave;
-	BoolParameter* enableCrashUpload;
+	enum CrashAction { REPORT, KILL, REOPEN, RECOVER };
+	EnumParameter* actionOnCrash;
 	BoolParameter* saveLogsToFile;
 
 	ControllableContainer editingCC;

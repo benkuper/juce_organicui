@@ -14,7 +14,7 @@ public:
 
 	bool doUpload;
 	bool uploadFile;
-	bool autoReopen;
+	GlobalSettings::CrashAction crashAction;
 
 	File traceFile;
 	File dumpFile;

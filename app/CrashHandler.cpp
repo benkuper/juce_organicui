@@ -1,13 +1,14 @@
 /*
   ==============================================================================
 
-    CrashHandler.cpp
-    Created: 29 Oct 2017 1:40:04pm
-    Author:  Ben
+	CrashHandler.cpp
+	Created: 29 Oct 2017 1:40:04pm
+	Author:  Ben
 
   ==============================================================================
 */
 
+#include "JuceHeader.h"
 #include "CrashHandler.h"
 
 #if JUCE_WINDOWS
@@ -64,7 +65,7 @@ void handleCrashStatic(int e)
 }
 
 #if JUCE_WINDOWS
-void CrashDumpUploader::handleCrash(void * e)
+void CrashDumpUploader::handleCrash(void* e)
 #else
 void CrashDumpUploader::handleCrash(int e)
 #endif
@@ -92,10 +93,9 @@ void CrashDumpUploader::handleCrash(int e)
 	getApp().handleCrashed();
 
 
-	autoReopen = GlobalSettings::getInstance()->autoReopenFileOnCrash->boolValue();
+	crashAction = GlobalSettings::getInstance()->actionOnCrash->getValueDataAsEnum<GlobalSettings::CrashAction>();
 
-
-	if (getApp().useWindow && GlobalSettings::getInstance()->enableCrashUpload->boolValue())
+	if (getApp().useWindow && crashAction == GlobalSettings::REPORT)
 	{
 		traceFile = recoveredFile.getParentDirectory().getChildFile("crashlog.txt");
 
@@ -110,12 +110,6 @@ void CrashDumpUploader::handleCrash(int e)
 
 		createDumpAndStrackTrace(e, dumpFile, traceFile);
 
-		/*
-		if (shoudShowWindowOnCrash)
-		{
-			autoReopen = AlertWindow::showOkCancelBox(AlertWindow::WarningIcon, "Oops, I did it again...", "Well, I crashed.\nIt was bound to happen at some point, right ?\nMaybe time to think about the meaning of all this, the meaning of life, make yourself a smoothie...\nYou can even start exactly where you left if you click the \"Yes\" button.\nDon't worry, in any case I will keep your baby safe and create a crash backup file.", "Yes", "No");
-		}
-		*/
 
 		w.reset(new UploadWindow());
 		DialogWindow::showDialog("Got crashed ?", w.get(), getMainWindow(), Colours::black, true);
@@ -123,7 +117,7 @@ void CrashDumpUploader::handleCrash(int e)
 		MessageManager::getInstance()->runDispatchLoop();
 
 		doUpload = true; //by default, unless hit cancel
-		
+
 		exitApp();
 
 	}
@@ -241,13 +235,23 @@ bool CrashDumpUploader::openStreamProgressCallback(int bytesDownloaded, int tota
 
 void CrashDumpUploader::exitApp()
 {
-	Engine::mainEngine->clear();
+	File curFile;
 
-	if (autoReopen && recoveredFile.exists())
+	if (Engine::mainEngine != nullptr)
+	{
+		curFile = Engine::mainEngine->getFile();
+		Engine::mainEngine->clear();
+	}
+
+	if (crashAction == GlobalSettings::RECOVER && recoveredFile.exists())
 	{
 		File::getSpecialLocation(File::currentApplicationFile).startAsProcess("-c \"" + recoveredFile.getFullPathName() + "\"");
 	}
-    
+	else if (crashAction == GlobalSettings::REOPEN && curFile.exists())
+	{
+		File::getSpecialLocation(File::currentApplicationFile).startAsProcess("-c \"" + curFile.getFullPathName() + "\"");
+	}
+
 	getApp().quit();
 }
 
@@ -304,10 +308,10 @@ void createDumpAndStrackTrace(int signum, File dumpFile, File traceFile)
 
 	//Stack trace
 
-    DBG("Create Stack trace here !");
-    String stackTrace = SystemStats::getStackBacktrace();
-    
-    FileOutputStream fos(traceFile);
+	DBG("Create Stack trace here !");
+	String stackTrace = SystemStats::getStackBacktrace();
+
+	FileOutputStream fos(traceFile);
 	if (fos.openedOk())
 	{
 		fos.writeText(stackTrace, false, false, "\n");
@@ -318,8 +322,8 @@ void createDumpAndStrackTrace(int signum, File dumpFile, File traceFile)
 
 CrashDumpUploader::UploadWindow::UploadWindow() :
 	okBT("Send and close"),
-    cancelBT("Close only"),
-    autoReopenBT("Send and recover"),
+	cancelBT("Close only"),
+	autoReopenBT("Send and recover"),
 	recoverOnlyBT("Recover Only"),
 	progressUI(&CrashDumpUploader::getInstance()->progress)
 {
@@ -345,7 +349,7 @@ CrashDumpUploader::UploadWindow::UploadWindow() :
 	editor.setMultiLine(true);
 	editor.setReturnKeyStartsNewLine(true);
 
-	
+
 	setSize(800, 600);
 
 }
@@ -357,7 +361,7 @@ CrashDumpUploader::UploadWindow::~UploadWindow()
 
 void CrashDumpUploader::UploadWindow::paint(Graphics& g)
 {
-	g.drawImage(CrashDumpUploader::getInstance()->crashImage,getLocalBounds().toFloat());
+	g.drawImage(CrashDumpUploader::getInstance()->crashImage, getLocalBounds().toFloat());
 }
 
 void CrashDumpUploader::UploadWindow::resized()
@@ -365,14 +369,14 @@ void CrashDumpUploader::UploadWindow::resized()
 	juce::Rectangle<int> r = getLocalBounds().removeFromBottom(getHeight() / 2);
 	juce::Rectangle<int> br = r.removeFromBottom(30).reduced(2);
 	autoReopenBT.setBounds(br.removeFromRight(100));
-	br.removeFromRight(8); 
+	br.removeFromRight(8);
 	recoverOnlyBT.setBounds(br.removeFromRight(100));
 	br.removeFromRight(8);
 	okBT.setBounds(br.removeFromRight(100));
 	br.removeFromRight(8);
 	cancelBT.setBounds(br.removeFromRight(100));
 
-	progressUI.setBounds(r.removeFromBottom(30).reduced(20,5));
+	progressUI.setBounds(r.removeFromBottom(30).reduced(20, 5));
 
 	editor.setBounds(r.reduced(20));
 }
@@ -382,18 +386,18 @@ void CrashDumpUploader::UploadWindow::buttonClicked(Button* bt)
 	okBT.setEnabled(false);
 	autoReopenBT.setEnabled(false);
 	cancelBT.setEnabled(false);
-	
+
 	CrashDumpUploader::getInstance()->uploadFile = bt == &autoReopenBT || bt == &okBT;
 	CrashDumpUploader::getInstance()->crashMessage = editor.getText();
-	CrashDumpUploader::getInstance()->autoReopen = bt == &autoReopenBT || bt == &recoverOnlyBT;
+	CrashDumpUploader::getInstance()->crashAction = (bt == &autoReopenBT || bt == &recoverOnlyBT) ? GlobalSettings::RECOVER : GlobalSettings::KILL;
 
-	if (bt == &autoReopenBT || bt == &okBT) 
+	if (bt == &autoReopenBT || bt == &okBT)
 	{
 		CrashDumpUploader::getInstance()->startThread();
 	}
 	else if (bt == &cancelBT || bt == &recoverOnlyBT)
 	{
-		if (DialogWindow* dw = findParentComponentOfClass<DialogWindow>()) dw->exitModalState(0); 
+		if (DialogWindow* dw = findParentComponentOfClass<DialogWindow>()) dw->exitModalState(0);
 		MessageManager::getInstance()->stopDispatchLoop();
 	}
 

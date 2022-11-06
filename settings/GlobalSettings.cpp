@@ -8,6 +8,8 @@
   ==============================================================================
 */
 
+#include "JuceHeader.h"
+
 juce_ImplementSingleton(GlobalSettings)
 
 ApplicationCommandManager& getCommandManager();
@@ -39,7 +41,7 @@ GlobalSettings::GlobalSettings() :
 	fileToOpenOnStartup = new FileParameter("File to load on startup", "File to load when start, if the option above is checked", "", false);
 	fileToOpenOnStartup->forceAbsolutePath = true;
 	startupCC.addParameter(fileToOpenOnStartup);
-	autoReopenFileOnCrash = startupCC.addBoolParameter("Auto Reopen crashed file", "If checked and a file was being edited while crashing, this will open the app and load a snapshot of the last session before the crash", false);
+
 
 	addChildControllableContainer(&startupCC);
 
@@ -48,13 +50,13 @@ GlobalSettings::GlobalSettings() :
 	enableTooltips = interfaceCC.addBoolParameter("Enable Tooltips", "If checked, this will show tooltips when mouse is over a parameter", true);
 	helpLanguage = interfaceCC.addEnumParameter("Help language", "What language to download ? You will need to restart the software to see changes");
 	helpLanguage->addOption("English", "en")->addOption("French", "fr")->addOption("Chinese", "cn");
-	useGLRenderer = interfaceCC.addBoolParameter("Use OpenGL Renderer", "If checked, this will use hardware acceleration to render the interface. You may want to NOT use this on some platform or when using the IFrame Dashboard item. You need to restart if you change it.", 
+	useGLRenderer = interfaceCC.addBoolParameter("Use OpenGL Renderer", "If checked, this will use hardware acceleration to render the interface. You may want to NOT use this on some platform or when using the IFrame Dashboard item. You need to restart if you change it.",
 #if JUCE_WINDOWS
-true
+		true
 #else
-false
+		false
 #endif
-);
+	);
 
 	addChildControllableContainer(&interfaceCC);
 
@@ -62,7 +64,10 @@ false
 	autoSaveCount = saveLoadCC.addIntParameter("Auto-save count", "The number of different files to auto-save", 10, 1, 100);
 	autoSaveTime = saveLoadCC.addIntParameter("Auto-save time", "The time in minutes between two auto-saves (will)", 5, 1, 100);
 	compressOnSave = saveLoadCC.addBoolParameter("Compress file", "If checked, the JSON content will be minified, otherwise it will be human-readable but larger size as well", true);
-	enableCrashUpload = saveLoadCC.addBoolParameter("Enable Crash Upload", "If checked and a crashlog is found at startup, it will automatically upload it.\nThis crash log is a very small file but is immensely helpful for me, so please leave this option enabled unless you strongly feel like not helping me :)", true);
+
+	actionOnCrash = saveLoadCC.addEnumParameter("Action On Crash", "This determines what to do on a crash. Default shows the crash report window");
+	actionOnCrash->addOption("Report", REPORT)->addOption("Kill", KILL)->addOption("Reopen", REOPEN)->addOption("Recover", RECOVER);
+
 	testCrash = saveLoadCC.addTrigger("Test crash", "This will cause a crash, allowing for testing crashes. Don't push this unless you REALLY want to !!!");
 	saveLogsToFile = saveLoadCC.addBoolParameter("Save logs", "If checked, the content of the Logger will be automatically saved to a file", false);
 	addChildControllableContainer(&saveLoadCC);
