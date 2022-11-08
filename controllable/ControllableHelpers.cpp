@@ -246,7 +246,7 @@ void ControllableParser::createControllableFromJSONObject(StringRef cName, var d
 		else if (data.isDouble()) newC = new FloatParameter(cName, cName, 0);
 		else if (data.isInt()) newC = new IntParameter(cName, cName, 0);
 		else if (data.isString() || data.isVoid()) newC = new StringParameter(cName, cName, "");
-		else if (data.isArray())
+		else if (data.isArray() && data.size() > 0)
 		{
 			if (data.size() <= 4 && (data[0].isDouble() || data[0].isInt()))
 			{
