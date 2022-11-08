@@ -496,7 +496,7 @@ void CustomLoggerUI::buttonClicked(Button* b)
 		String s;
 		for (auto& el : logger->logElements) {
 			int leftS = el->source.length() + 3;
-			s += el->source + " : ";
+			s += el->time.toString(false, true, true, true) + "\t" + el->source + "\t";
 			for (int i = 0; i < el->getNumLines(); ++i) {
 				if (i != 0)for (int j = 0; j < leftS; j++) s += " ";
 				s += el->getLine(i) + "\n";
