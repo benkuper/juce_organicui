@@ -18,6 +18,7 @@ void WarningReporter::clear()
 
 void WarningReporter::registerWarning(WeakReference<WarningTarget> target)
 {
+	if (Engine::mainEngine->isClearing) return;
 	if (target == nullptr || target.wasObjectDeleted() || targets.contains(target)) return;
 	targets.addIfNotAlreadyThere(target);
 	warningReporterNotifier.addMessage(new WarningReporterEvent(WarningReporterEvent::WARNING_REGISTERED, target));
@@ -25,6 +26,7 @@ void WarningReporter::registerWarning(WeakReference<WarningTarget> target)
 
 void WarningReporter::unregisterWarning(WeakReference<WarningTarget> target)
 {
+	if (Engine::mainEngine->isClearing) return;
 	if (target == nullptr || target.wasObjectDeleted() || !targets.contains(target)) return;
 	targets.removeAllInstancesOf(target);
 	warningReporterNotifier.addMessage(new WarningReporterEvent(WarningReporterEvent::WARNING_UNREGISTERED, target));
