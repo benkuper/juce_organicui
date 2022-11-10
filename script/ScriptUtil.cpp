@@ -337,7 +337,7 @@ var ScriptUtil::listFilesFromScript(const var::NativeFunctionArgs& args)
 
 	if (!f.isDirectory()) return var();
 
-	bool recursive = args.numArguments > 1 ? args.arguments[1] : false;
+	bool recursive = args.numArguments > 1 ? (bool)(int)args.arguments[1] : false;
 
 	Array<File> files = f.findChildFiles(File::TypesOfFileToFind::findFiles, recursive);
 
@@ -354,7 +354,7 @@ var ScriptUtil::listDirectoriesFromScript(const var::NativeFunctionArgs& args)
 
 	if (!f.isDirectory()) return var();
 
-	bool recursive = args.numArguments > 1 ? args.arguments[1] : false;
+	bool recursive = args.numArguments > 1 ? (bool)(int)args.arguments[1] : false;
 
 	Array<File> files = f.findChildFiles(File::TypesOfFileToFind::findDirectories, recursive);
 
