@@ -47,6 +47,8 @@ public:
 	static var writeBytesFromScript(const var::NativeFunctionArgs& args);
 	static var directoryExistsFromScript(const var::NativeFunctionArgs& args);
 	static var createDirectoryFromScript(const var::NativeFunctionArgs& args);
+	static var listFilesFromScript(const var::NativeFunctionArgs& args);
+	static var listDirectoriesFromScript(const var::NativeFunctionArgs& args);
 	static var launchFileFromScript(const var::NativeFunctionArgs& args);
 	static var killAppFromScript(const var::NativeFunctionArgs& args);
 	static var getOSInfosFromScript(const var::NativeFunctionArgs& args);

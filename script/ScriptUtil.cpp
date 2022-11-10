@@ -8,6 +8,9 @@
   ==============================================================================
 */
 
+#include "JuceHeader.h"
+
+
 juce_ImplementSingleton(ScriptUtil)
 
 String getAppVersion();
@@ -39,6 +42,8 @@ ScriptUtil::ScriptUtil() :
 	scriptObject.setMethod("writeBytes", ScriptUtil::writeBytesFromScript);
 	scriptObject.setMethod("directoryExists", ScriptUtil::directoryExistsFromScript);
 	scriptObject.setMethod("createDirectory", ScriptUtil::createDirectoryFromScript);
+	scriptObject.setMethod("listFiles", ScriptUtil::listFilesFromScript);
+	scriptObject.setMethod("listDirectories", ScriptUtil::listDirectoriesFromScript);
 	scriptObject.setMethod("launchFile", ScriptUtil::launchFileFromScript);
 	scriptObject.setMethod("killApp", ScriptUtil::killAppFromScript);
 	scriptObject.setMethod("getOSInfos", ScriptUtil::getOSInfosFromScript);
@@ -322,6 +327,40 @@ var ScriptUtil::createDirectoryFromScript(const var::NativeFunctionArgs& args)
 		f.createDirectory();
 		return true;
 	}
+}
+
+var ScriptUtil::listFilesFromScript(const var::NativeFunctionArgs& args)
+{
+	if (args.numArguments == 0) return var();
+
+	File f = getFileFromArgs(args);
+
+	if (!f.isDirectory()) return var();
+
+	bool recursive = args.numArguments > 1 ? args.arguments[1] : false;
+
+	Array<File> files = f.findChildFiles(File::TypesOfFileToFind::findFiles, recursive);
+
+	var result;
+	for (auto& f : files) result.append(f.getFullPathName());
+	return result;
+}
+
+var ScriptUtil::listDirectoriesFromScript(const var::NativeFunctionArgs& args)
+{
+	if (args.numArguments == 0) return var();
+
+	File f = getFileFromArgs(args);
+
+	if (!f.isDirectory()) return var();
+
+	bool recursive = args.numArguments > 1 ? args.arguments[1] : false;
+
+	Array<File> files = f.findChildFiles(File::TypesOfFileToFind::findDirectories, recursive);
+
+	var result;
+	for (auto& f : files) result.append(f.getFullPathName());
+	return result;
 }
 
 var ScriptUtil::launchFileFromScript(const var::NativeFunctionArgs& args)
