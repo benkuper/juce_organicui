@@ -229,6 +229,8 @@ void Parameter::setRange(var min, var max)
 
 	if (isOverriden) setValue(value); //if value is outside range, this will change the value
 	else resetValue();
+
+	if (isCustomizableByUser) isOverriden = true;
 }
 
 void Parameter::clearRange()
