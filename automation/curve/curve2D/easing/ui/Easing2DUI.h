@@ -27,12 +27,16 @@ public:
 	bool showLastHandle;
 
 	int hitPathPrecision = 10;
-
 	Rectangle<float> valueBounds;
+
+	float focusPos = 0;
+	float focusRange = 0;
 
 	void paint(Graphics& g) override;
 	virtual void paintInternal(Graphics&) {}
 	void resized() override;
+
+	void setFocus(float relPos, float range);
 
 	void generatePath();
 	virtual void generatePathInternal();

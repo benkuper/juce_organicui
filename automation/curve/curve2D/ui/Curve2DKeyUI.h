@@ -42,6 +42,8 @@ public:
 
     void setShowEasingHandles(bool showFirst, bool showLast);
 
+    void setFocus(float relPos, float range);
+
     void updateEasingUI();
 
     void mouseDown(const MouseEvent& e) override;

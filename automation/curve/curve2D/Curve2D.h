@@ -32,6 +32,7 @@ public:
 
     //ui
     bool showUIInEditor;
+    FloatParameter* focusRange;
 
     void setControlMode(ControlMode mode);
     

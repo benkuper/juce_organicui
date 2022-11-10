@@ -65,6 +65,7 @@ public:
 	virtual AffineTransform getUITransform(U* se);
 
 	virtual void updateItemsVisibility() override;
+	virtual bool checkItemShouldBeVisible(U* se) { return true; } //to be overriden
 
 	virtual void parentHierarchyChanged() override;
 
@@ -437,7 +438,13 @@ void BaseManagerViewUI<M, T, U>::updateItemsVisibility()
 			iui->setVisible(false);
 			continue;
 		};
-		
+
+		if (!this->checkItemShouldBeVisible(iui))
+		{
+			iui->setVisible(false);
+			continue;
+		}
+
 		juce::Rectangle<int> iuiB = iui->getBoundsInParent();
 		juce::Rectangle<int> ir = iuiB.getIntersection(r);
 		bool isInsideInspectorBounds = !ir.isEmpty();
@@ -774,7 +781,7 @@ template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::itemUIResizeDrag(BaseItemMinimalUI<T>* itemUI, const Point<int>& dragOffset)
 {
 	Point<float> pos = itemUI->baseItem->getPosition() + itemUI->baseItem->sizeReference + dragOffset.toFloat() / (useCheckersAsUnits ? checkerSize : 1);// getViewOffset(dragOffset);
-	
+
 	Point<float> snapPos = pos;
 
 	if (this->manager->snapGridMode != nullptr && this->manager->snapGridMode->boolValue())

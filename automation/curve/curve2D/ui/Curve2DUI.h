@@ -29,6 +29,8 @@ public:
     void updateViewUIPosition(Curve2DKeyUI * ui) override;
     void updateHandlesForUI(Curve2DKeyUI* ui, bool checkSideItems);
 
+    bool checkItemShouldBeVisible(Curve2DKeyUI* ui) override;
+
     void addItemUIInternal(Curve2DKeyUI* ui) override;
     void removeItemUIInternal(Curve2DKeyUI* ui) override;
 

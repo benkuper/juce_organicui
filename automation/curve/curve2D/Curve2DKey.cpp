@@ -1,4 +1,3 @@
-#include "Curve2DKey.h"
 /*
   ==============================================================================
 
@@ -8,6 +7,8 @@
 
   ==============================================================================
 */
+
+#include "JuceHeader.h"
 
 Curve2DKey::Curve2DKey() :
     BaseItem(getTypeString(), false, false),
@@ -30,10 +31,17 @@ Curve2DKey::Curve2DKey() :
 
 Curve2DKey::~Curve2DKey()
 {
+    clearItem();
+}
+
+void Curve2DKey::clearItem()
+{
     setNextKey(nullptr);
     if (easing != nullptr) easing->removeInspectableListener(this);
     easing.reset();
     masterReference.clear();
+    
+    BaseItem::clearItem();
 }
 
 void Curve2DKey::updateEasing(bool forceRecreate)
@@ -79,7 +87,7 @@ void Curve2DKey::setNextKey(Curve2DKey* key)
 {
     if (nextKey == key) return;
 
-    if (nextKey != nullptr)
+    if (nextKey != nullptr && !nextKey.wasObjectDeleted())
     {
         nextKey->viewUIPosition->removeParameterListener(this);
         nextKey->removeInspectableListener(this);

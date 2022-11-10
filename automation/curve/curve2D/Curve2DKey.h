@@ -20,10 +20,11 @@ public:
 
     EnumParameter* easingType;
     std::unique_ptr<Easing2D> easing;
-    Curve2DKey* nextKey;
+    WeakReference<Curve2DKey> nextKey;
     bool isFirst;
     float curvePosition; //position on the curve, calculated by the curve to distribute evenly the points
 
+    void clearItem() override;
 
     void updateEasing(bool forceRecreate = false);
     virtual Easing2D* createEasingForType(int type);

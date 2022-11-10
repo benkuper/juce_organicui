@@ -1,12 +1,15 @@
 /*
   ==============================================================================
 
-	Curve2DKeyUI.cpp
+	fKeyUI.cpp
 	Created: 21 Mar 2020 4:06:36pm
 	Author:  bkupe
 
   ==============================================================================
 */
+
+#include "JuceHeader.h"
+
 
 Curve2DKeyUI::Curve2DKeyUI(Curve2DKey* key) :
 	BaseItemMinimalUI(key),
@@ -45,6 +48,20 @@ void Curve2DKeyUI::setShowEasingHandles(bool showFirst, bool showLast)
 {
 	if (inspectable.wasObjectDeleted()) return;
 	if (easingUI != nullptr) easingUI->setShowEasingHandles(showFirst && item->nextKey != nullptr, showLast && item->nextKey != nullptr);
+}
+
+void Curve2DKeyUI::setFocus(float relPos, float range)
+{
+	if (range == 0)
+	{
+		handle.setAlpha(1);
+		if (easingUI != nullptr) easingUI->setFocus(0, 0);
+		return;
+	}
+
+	float d = jlimit<float>(0, 1, 1 - (fabsf(relPos) / (range / 2)));
+	handle.setAlpha(d);
+	if (easingUI != nullptr) easingUI->setFocus(relPos, range);
 }
 
 void Curve2DKeyUI::updateEasingUI()

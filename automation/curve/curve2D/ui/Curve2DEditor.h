@@ -19,7 +19,7 @@ public:
 
 	Curve2D * curve;
 	std::unique_ptr<Curve2DUI> curveUI;
-	std::unique_ptr<FloatSliderUI> positionUI;
+	std::unique_ptr<ParameterUI> focusUI;
 	std::unique_ptr<ParameterUI> valueUI;
 
 	void resizedInternalHeader(juce::Rectangle<int>& r) override;

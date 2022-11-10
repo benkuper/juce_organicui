@@ -8,6 +8,8 @@
   ==============================================================================
 */
 
+#include "JuceHeader.h"
+
 #pragma warning(disable:4244)
 
 Easing2DUI::Easing2DUI(Easing2D* e) :
@@ -39,12 +41,31 @@ void Easing2DUI::paint(Graphics& g)
 	if (easing->isSelected) c = HIGHLIGHT_COLOR;
 	if (isMouseOver()) c = c.brighter();
 
-	ColourGradient gr;
-	//const int precision = 10;
+	if (focusRange == 0)
+	{
+		g.setColour(c);
+		g.strokePath(drawPath, PathStrokeType(isMouseOver() ? 2 : 1));
+	}
+	else
+	{
+		float prevPos = 0;
+		for (int i = 0; i <= 50; i++)
+		{
 
-	g.setColour(c);
-	g.strokePath(drawPath, PathStrokeType(isMouseOver() ? 2 : 1));
-	
+			float pos = (i*1.0f / 50) * drawPath.getLength();
+			float curvePos = (i*1.0f / 50) * easing->length;
+
+			float d = jlimit<float>(0, 1, 1 - fabsf(curvePos - focusPos) / (focusRange / 2));
+
+			//in-out for better fading
+			float sqt = d * d;
+			float td = sqt / (2.0f * (sqt - d) + 1.0f);
+			g.setColour(c.withAlpha(td));
+
+			if (pos != prevPos) g.drawLine(Line<float>(drawPath.getPointAlongPath(prevPos), drawPath.getPointAlongPath(pos)), isMouseOver() ? 2 : 1);
+			prevPos = pos;
+		}
+	}
 	//g.setColour(Colours::purple);
 	//g.strokePath(hitPath, PathStrokeType(2));
 
@@ -57,6 +78,14 @@ void Easing2DUI::resized()
 {
 	if (inspectable.wasObjectDeleted()) return;
 	generatePath();
+}
+
+void Easing2DUI::setFocus(float relPos, float range)
+{
+	if (focusPos == relPos && focusRange == range) return;
+	focusPos = relPos;
+	focusRange = range;
+	repaint();
 }
 
 void Easing2DUI::generatePath()
@@ -85,7 +114,7 @@ void Easing2DUI::autoGeneratePathWithPrecision(int precision)
 	{
 		float t = i * 1.f / precision;
 		Point<float> v = easing->getValue(t);
-		
+
 		Point<int> pv = getUIPosForValuePos(v);
 		drawPath.lineTo(pv.toFloat());
 	}
@@ -162,7 +191,7 @@ bool Easing2DUI::hitTest(int tx, int ty)
 	Point<int> p(tx, ty);
 	Point<int> p1 = Point<int>(getUIPosForValuePos(easing->start));
 	Point<int> p2 = Point<int>(getUIPosForValuePos(easing->end));
-	
+
 	return p.getDistanceFrom(p1) > 16 && p.getDistanceFrom(p2) > 16 && hitPath.contains((float)tx, (float)ty);
 }
 
@@ -200,7 +229,7 @@ Point<int> Easing2DUI::getUIPosForValuePos(const Point<float>& valuePos) const
 Point<float> Easing2DUI::getValuePosForUIPos(const Point<int>& uiPos) const
 {
 	if (inspectable.wasObjectDeleted()) return Point<float>();
-	return valueBounds.getRelativePoint(uiPos.x * 1.0f / getWidth(), uiPos.y*1.0f / getHeight());
+	return valueBounds.getRelativePoint(uiPos.x * 1.0f / getWidth(), uiPos.y * 1.0f / getHeight());
 }
 
 // EASINGS
@@ -271,18 +300,18 @@ void CubicEasing2DUI::generatePathInternal()
 
 	Point<int> a = getUIPosForValuePos(easing->start + ce->anchor1->getPoint());
 	Point<int> b = getUIPosForValuePos(easing->end + ce->anchor2->getPoint());
-	
+
 	drawPath.cubicTo(a.toFloat(), b.toFloat(), p2.toFloat());
 }
 
 void CubicEasing2DUI::paintInternal(Graphics& g)
 {
-/*	g.setColour(Colours::lightpink);
-	for (int i = 0; i < ce->uniformLUT.size(); ++i)
-	{
-		g.fillEllipse(Rectangle<int>(0, 0, 4, 4).withCentre(getUIPosForValuePos(ce->uniformLUT[i])).toFloat());
-	}
-	*/
+	/*	g.setColour(Colours::lightpink);
+		for (int i = 0; i < ce->uniformLUT.size(); ++i)
+		{
+			g.fillEllipse(Rectangle<int>(0, 0, 4, 4).withCentre(getUIPosForValuePos(ce->uniformLUT[i])).toFloat());
+		}
+		*/
 
 	if (!showFirstHandle && !showLastHandle) return;
 
@@ -293,8 +322,8 @@ void CubicEasing2DUI::paintInternal(Graphics& g)
 	if (isMouseOver()) c = c.brighter();
 	g.setColour(c);
 
-	if(showFirstHandle) g.drawLine(p1.x, p1.y, h1.getBounds().getCentreX(), h1.getBounds().getCentreY());
-	if(showLastHandle) g.drawLine(p2.x, p2.y, h2.getBounds().getCentreX(), h2.getBounds().getCentreY());
+	if (showFirstHandle) g.drawLine(p1.x, p1.y, h1.getBounds().getCentreX(), h1.getBounds().getCentreY());
+	if (showLastHandle) g.drawLine(p2.x, p2.y, h2.getBounds().getCentreX(), h2.getBounds().getCentreY());
 
 }
 
@@ -346,7 +375,7 @@ void CubicEasing2DUI::mouseDrag(const MouseEvent& e)
 		//Point<int> p1 = getUIPosForValuePos(easing->start);
 		//Point<int> p2 = getUIPosForValuePos(easing->end);
 		Point<float> mVal = getValuePosForUIPos(e.getEventRelativeTo(this).getPosition());
-		
+
 		ce->anchor1->setPoint((mVal - easing->start) / 2);
 		ce->anchor2->setPoint((mVal - easing->end) / 2);
 	}
