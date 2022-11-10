@@ -17,6 +17,8 @@ EnumParameter::EnumParameter(const String& niceName, const String& description, 
 
 	scriptObject.setMethod("getKey", EnumParameter::getValueKeyFromScript);
 	scriptObject.setMethod("setData", EnumParameter::setValueWithDataFromScript);
+	scriptObject.setMethod("setNext", EnumParameter::setNextFromScript);
+	scriptObject.setMethod("setPrevious", EnumParameter::setPreviousFromScript);
 	scriptObject.setMethod("addOption", EnumParameter::addOptionFromScript);
 	scriptObject.setMethod("removeOptions", EnumParameter::removeOptionsFromScript);
 
@@ -288,6 +290,24 @@ var EnumParameter::setValueWithDataFromScript(const juce::var::NativeFunctionArg
 
 	ep->setValueWithData(a.arguments[0]);
 
+	return var();
+}
+
+var EnumParameter::setNextFromScript(const juce::var::NativeFunctionArgs& a)
+{
+	WeakReference<Parameter> c = getObjectFromJS<Parameter>(a);
+	if (c == nullptr || c.wasObjectDeleted()) return var();
+	EnumParameter* ep = dynamic_cast<EnumParameter*>(c.get());
+	ep->setNext(a.numArguments >= 1 ? (bool)(int)a.arguments[0] : false);
+	return var();
+}
+
+var EnumParameter::setPreviousFromScript(const juce::var::NativeFunctionArgs& a)
+{
+	WeakReference<Parameter> c = getObjectFromJS<Parameter>(a);
+	if (c == nullptr || c.wasObjectDeleted()) return var();
+	EnumParameter* ep = dynamic_cast<EnumParameter*>(c.get());
+	ep->setPrev(a.numArguments >= 1 ? (bool)(int)a.arguments[0] : false);
 	return var();
 }
 

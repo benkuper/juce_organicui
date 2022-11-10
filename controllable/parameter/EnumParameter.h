@@ -73,6 +73,8 @@ public:
 	static var addOptionFromScript(const juce::var::NativeFunctionArgs &a);
 	static var removeOptionsFromScript(const juce::var::NativeFunctionArgs &a);
 	static var setValueWithDataFromScript(const juce::var::NativeFunctionArgs& a);
+	static var setNextFromScript(const juce::var::NativeFunctionArgs& a);
+	static var setPreviousFromScript(const juce::var::NativeFunctionArgs& a);
 
 
 	EnumParameterUI* createUI(Array<EnumParameter*> parameters = {});
