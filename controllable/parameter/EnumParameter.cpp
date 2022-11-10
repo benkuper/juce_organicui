@@ -8,6 +8,8 @@
   ==============================================================================
 */
 
+#include "JuceHeader.h"
+
 
 EnumParameter::EnumParameter(const String& niceName, const String& description, bool enabled) :
 	Parameter(Type::ENUM, niceName, description, "", var(), var(), enabled),
@@ -21,6 +23,9 @@ EnumParameter::EnumParameter(const String& niceName, const String& description, 
 	scriptObject.setMethod("setPrevious", EnumParameter::setPreviousFromScript);
 	scriptObject.setMethod("addOption", EnumParameter::addOptionFromScript);
 	scriptObject.setMethod("removeOptions", EnumParameter::removeOptionsFromScript);
+	scriptObject.setMethod("getAllOptions", EnumParameter::getAllOptionsFromScript);
+	scriptObject.setMethod("getOptionAt", EnumParameter::getOptionAtFromScript);
+	scriptObject.setMethod("getIndex", EnumParameter::getIndexFromScript);
 
 	value = "";
 }
@@ -55,7 +60,7 @@ void EnumParameter::updateOption(int index, String key, var data, bool addIfNotT
 	if (index >= enumValues.size())
 	{
 		if (!addIfNotThere) return;
-		while(index > enumValues.size()) addOption("#"+String(enumValues.size()), var());
+		while (index > enumValues.size()) addOption("#" + String(enumValues.size()), var());
 		addOption(key, data);
 		return;
 	}
@@ -291,6 +296,60 @@ var EnumParameter::setValueWithDataFromScript(const juce::var::NativeFunctionArg
 	ep->setValueWithData(a.arguments[0]);
 
 	return var();
+}
+
+var EnumParameter::getAllOptionsFromScript(const juce::var::NativeFunctionArgs& a)
+{
+	WeakReference<Parameter> c = getObjectFromJS<Parameter>(a);
+	if (c == nullptr || c.wasObjectDeleted()) return var();
+	EnumParameter* ep = dynamic_cast<EnumParameter*>(c.get());
+
+	var result;
+
+	for (auto& ev : ep->enumValues)
+	{
+		var eData(new DynamicObject());
+		eData.getDynamicObject()->setProperty("key", ev->key);
+		eData.getDynamicObject()->setProperty("value", ev->value);
+		result.append(eData);
+	}
+
+	return result;
+}
+
+var EnumParameter::getOptionAtFromScript(const juce::var::NativeFunctionArgs& a)
+{
+	WeakReference<Parameter> c = getObjectFromJS<Parameter>(a);
+	if (c == nullptr || c.wasObjectDeleted()) return var();
+	EnumParameter* ep = dynamic_cast<EnumParameter*>(c.get());
+
+	if (a.numArguments < 1)
+	{
+		LOGWARNING("getOptionAt needs one argument");
+		return var();
+	}
+
+	int index = a.arguments[0];
+
+	if (index < 0 || index >= ep->enumValues.size())
+	{
+		LOGWARNING("getOptionAt, index  " << index << " out of range. (" << ep->enumValues.size() << " values)");
+		return var();
+	}
+
+	var eData(new DynamicObject());
+	eData.getDynamicObject()->setProperty("key", ep->enumValues[index]->key);
+	eData.getDynamicObject()->setProperty("value", ep->enumValues[index]->value);
+
+	return eData;
+}
+
+var EnumParameter::getIndexFromScript(const juce::var::NativeFunctionArgs& a)
+{
+	WeakReference<Parameter> c = getObjectFromJS<Parameter>(a);
+	if (c == nullptr || c.wasObjectDeleted()) return var();
+	EnumParameter* ep = dynamic_cast<EnumParameter*>(c.get());
+	return ep->getIndexForKey(ep->getValueKey());
 }
 
 var EnumParameter::setNextFromScript(const juce::var::NativeFunctionArgs& a)
