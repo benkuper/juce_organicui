@@ -43,6 +43,7 @@ Controllable::Controllable(const Type& type, const String& niceName, const Strin
 	isControlledByParrot(false),
 	isCustomizableByUser(false),
 	isRemovableByUser(false),
+	userCanChangeName(false),
 	userCanSetReadOnly(false),
 	replaceSlashesInShortName(true),
 	dashboardDefaultLabelParentLevel(0),

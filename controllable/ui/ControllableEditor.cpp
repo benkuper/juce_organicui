@@ -8,6 +8,7 @@
   ==============================================================================
 */
 
+#include "JuceHeader.h"
 
 ControllableEditor::ControllableEditor(Array<Controllable*> controllables, bool isRoot) :
 	InspectableEditor(Inspectable::getArrayAs<Controllable, Inspectable>(controllables), isRoot),
@@ -28,7 +29,9 @@ ControllableEditor::ControllableEditor(Array<Controllable*> controllables, bool 
 	label.setFont(label.getFont().withHeight(GlobalSettings::getInstance()->fontSize->floatValue()));
 	label.setText(controllable->niceName, dontSendNotification);
 	label.setTooltip(ui->tooltip);
-	if (!isMultiEditing())label.addMouseListener(this, false);
+	label.setEditable(controllable->userCanChangeName);
+	label.addListener(this);
+	if (!isMultiEditing()) label.addMouseListener(this, false);
 
 	bool isAllRemovable = multiHasAllOf([](Inspectable* i) {return ((Controllable*)i)->isRemovableByUser; });
 	if (isAllRemovable)
@@ -175,6 +178,7 @@ void ControllableEditor::mouseDrag(const MouseEvent& e)
 
 }
 
+
 void ControllableEditor::newMessage(const Controllable::ControllableEvent& e)
 {
 	switch (e.type)
@@ -213,5 +217,16 @@ void ControllableEditor::buttonClicked(Button* b)
 	{
 		bool targetEnabled = controllables.size() > 0 ? !controllables[0]->enabled : false;
 		for (auto& c : controllables) c->setEnabled(targetEnabled);
+	}
+}
+
+void ControllableEditor::labelTextChanged(Label* labelThatHasChanged)
+{
+	if (controllable == nullptr || controllable.wasObjectDeleted()) return;
+
+	if (labelThatHasChanged == &label)
+	{
+		if (!controllable->userCanChangeName) return;
+		controllable->setNiceName(label.getText());
 	}
 }

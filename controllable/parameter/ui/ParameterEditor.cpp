@@ -173,6 +173,8 @@ void ParameterEditor::parameterControlModeChanged(Parameter*)
 
 void ParameterEditor::labelTextChanged(Label* labelThatHasChanged)
 {
+	ControllableEditor::labelTextChanged(labelThatHasChanged);
+
 	if (inspectable.wasObjectDeleted()) return;
-	parameter->setControlExpression(expressionText->getText());
+	if (labelThatHasChanged == expressionText.get()) parameter->setControlExpression(expressionText->getText());
 }

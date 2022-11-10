@@ -16,7 +16,6 @@ class TargetParameterUI;
 class ParameterEditor : 
 	public ControllableEditor,
 	public ParameterListener,
-	public Label::Listener,
 	public Parameter::AsyncListener
 {
 public:

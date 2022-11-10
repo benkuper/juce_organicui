@@ -405,6 +405,7 @@ void GenericControllableContainerEditor::showMenuAndAddControllable()
 {
 	ControllableFactory::showFilteredCreateMenu(container->userAddControllablesFilters, [this](Controllable* c)
 		{
+			c->userCanChangeName = true;
 			c->isCustomizableByUser = true;
 			c->isRemovableByUser = true;
 			c->isSavable = true;

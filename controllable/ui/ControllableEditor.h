@@ -14,7 +14,8 @@ class ControllableEditor :
 	public InspectableEditor,
 	public Button::Listener,
 	public Controllable::AsyncListener,
-	public DragAndDropContainer
+	public DragAndDropContainer,
+	public Label::Listener
 {
 public:
 	ControllableEditor(Array<Controllable*> controllables, bool isRoot);  //Todo : handle full feedback if is root
@@ -53,6 +54,9 @@ public:
 	void componentVisibilityChanged(Component& c) override;
 
     virtual void buttonClicked(Button * b) override;
+
+	// Inherited via Listener
+	virtual void labelTextChanged(Label* labelThatHasChanged) override;
 };
 
 
