@@ -6,7 +6,9 @@
 	Author:  bkupe
 
   ==============================================================================
-*/
+ */
+
+#include "JuceHeader.h"
 
 juce_ImplementSingleton(ShapeShifterManager);
 
@@ -251,7 +253,7 @@ void ShapeShifterManager::loadLayout(var layout)
 
 	if (openedPanels.size() > 0)
 	{
-		if(openedPanels[0]->isShowing()) openedPanels[0]->grabKeyboardFocus();
+		if (openedPanels[0]->isShowing()) openedPanels[0]->grabKeyboardFocus();
 	}
 }
 
@@ -453,7 +455,7 @@ PopupMenu ShapeShifterManager::getPanelsMenu()
 	int i = 0;
 	for (auto& f : layoutFiles)
 	{
-		layoutP.addCommandItem(&getCommandManager(),0x9000 + i, f.getFileNameWithoutExtension());
+		layoutP.addCommandItem(&getCommandManager(), 0x9000 + i, f.getFileNameWithoutExtension());
 		i++;
 	}
 
@@ -482,6 +484,8 @@ Array<CommandID> ShapeShifterManager::getCommandIDs()
 void ShapeShifterManager::getCommandInfo(CommandID commandID, ApplicationCommandInfo& result)
 {
 
+	const int keysArr[10]{ 38, 233, 34, 39, 40, 45, 232, 95, 231, 224 }; //for azerty keyboards
+
 	if (commandID >= 0x9000 && commandID < 0x9000 + 10)
 	{
 		int cid = commandID - 0x9000;
@@ -491,6 +495,8 @@ void ShapeShifterManager::getCommandInfo(CommandID commandID, ApplicationCommand
 
 		result.setInfo("Load Layout " + String(cid + 1) + " (" + fName + ")", "", "View", 0);
 		result.addDefaultKeypress(KeyPress::createFromDescription(String(cid)).getKeyCode(), ModifierKeys::commandModifier);
+		result.addDefaultKeypress(keysArr[cid], ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
+
 	}
 }
 
