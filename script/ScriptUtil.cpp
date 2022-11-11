@@ -9,6 +9,7 @@
 */
 
 #include "JuceHeader.h"
+#include "ScriptUtil.h"
 
 
 juce_ImplementSingleton(ScriptUtil)
@@ -49,6 +50,9 @@ ScriptUtil::ScriptUtil() :
 	scriptObject.setMethod("getOSInfos", ScriptUtil::getOSInfosFromScript);
 	scriptObject.setMethod("getAppVersion", ScriptUtil::getAppVersionFromScript);
 	scriptObject.setMethod("getEnvironmentVariable", ScriptUtil::getEnvironmentVariableFromScript);
+
+	scriptObject.setMethod("gotoURL", ScriptUtil::gotoURLFromScript);
+
 
 	scriptObject.setMethod("copyToClipboard", ScriptUtil::copyToClipboardFromScript);
 	scriptObject.setMethod("getFromClipboard", ScriptUtil::getFromClipboardFromScript);
@@ -417,6 +421,13 @@ var ScriptUtil::getEnvironmentVariableFromScript(const var::NativeFunctionArgs& 
 {
 	if (a.numArguments == 0) return var();
 	return SystemStats::getEnvironmentVariable(a.arguments[0], "");
+}
+
+var ScriptUtil::gotoURLFromScript(const var::NativeFunctionArgs& args)
+{
+	if (args.numArguments == 0) return var();
+	bool result = URL(args.arguments[0].toString()).launchInDefaultBrowser();
+	return result;
 }
 
 var ScriptUtil::copyToClipboardFromScript(const var::NativeFunctionArgs& args)

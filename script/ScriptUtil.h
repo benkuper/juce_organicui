@@ -55,6 +55,8 @@ public:
 	static var getAppVersionFromScript(const var::NativeFunctionArgs& args);
 	static var getEnvironmentVariableFromScript(const var::NativeFunctionArgs& args);
 
+	static var gotoURLFromScript(const var::NativeFunctionArgs& args);
+
 	static var copyToClipboardFromScript(const var::NativeFunctionArgs& args);
 	static var getFromClipboardFromScript(const var::NativeFunctionArgs& args);
 
