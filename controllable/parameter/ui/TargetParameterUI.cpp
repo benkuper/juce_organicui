@@ -138,7 +138,9 @@ void TargetParameterUI::updateLabel()
 					}
 
 					if (!shouldShowLabel)
+					{
 						stepsUI.add(new TargetStepButton(targetParameter->target->niceName, nullptr));
+					}
 
 					newText += targetParameter->target->niceName;
 				}
@@ -179,7 +181,7 @@ void TargetParameterUI::updateLabel()
 						}
 					}
 
-					if (!shouldShowLabel) stepsUI.add(new TargetStepButton(targetParameter->targetContainer->niceName, nullptr));
+					if (!shouldShowLabel) stepsUI.add(new TargetStepButton(targetParameter->targetContainer->niceName, targetParameter->targetContainer));
 
 					newText += targetParameter->targetContainer->niceName;
 				}
@@ -312,7 +314,7 @@ void TargetParameterUI::mouseDownInternal(const MouseEvent& e)
 	if (e.eventComponent == this && isInteractable() && label.isVisible())
 	{
 		if (e.mods.isRightButtonDown()) ParameterUI::mouseDownInternal(e);
-		else if(e.mods.isLeftButtonDown()) showPopupAndGetTarget();
+		else if (e.mods.isLeftButtonDown()) showPopupAndGetTarget();
 	}
 }
 
@@ -325,8 +327,11 @@ void TargetParameterUI::buttonClicked(Button* b)
 		{
 			if (tb == &stepsUI[i]->bt)
 			{
-				ControllableContainer* startCC = i > 0 ? stepsUI[i - 1]->reference : nullptr;
-				showPopupAndGetTarget(startCC);
+
+				ControllableContainer* ref = stepsUI[i]->reference != nullptr ? stepsUI[i]->reference->parentContainer : nullptr;
+				if (ref == nullptr && targetParameter->target != nullptr) ref = targetParameter->target->parentContainer;
+				while (ref != nullptr && ref->skipLabelInTarget) ref = ref->parentContainer;
+				showPopupAndGetTarget(ref);
 			}
 		}
 	}
