@@ -16,6 +16,8 @@ DashboardItemUI::DashboardItemUI(DashboardItem* item) :
 	addChildComponent(resizer);
 	setInterceptsMouseClicks(true, true);
 
+	setWantsKeyboardFocus(true);
+
 	updateEditMode();
 
 	DashboardManager::getInstance()->editMode->addAsyncParameterListener(this);
