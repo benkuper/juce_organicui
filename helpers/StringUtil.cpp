@@ -13,6 +13,7 @@
 #pragma warning(push)
 #pragma warning(disable:4245)
 
+#include "JuceHeader.h"
 
 String StringUtil::toShortName(const String& niceName, bool replaceSlashes) {
 	if (niceName.isEmpty()) return "";
@@ -100,23 +101,23 @@ CommandLineElements StringUtil::parseCommandLine(const String& commandLine) {
 
 #pragma warning (push)
 #pragma warning(disable:4244)
-String StringUtil::valueToTimeString(float timeVal, int numDecimals)
+String StringUtil::valueToTimeString(double timeVal, int numDecimals)
 {
 	int hours = floor(timeVal / 3600);
-	int minutes = floor(fmodf(timeVal, 3600) / 60);
-	float seconds = fmodf(timeVal, 60);
-	if (numDecimals > 0) return String::formatted("%02i:%02i:%0" + String(6 - (numDecimals-3)) + "." + String(numDecimals) + "f", hours, minutes, seconds);
+	int minutes = floor(fmod(timeVal, 3600) / 60);
+	double seconds = fmod(timeVal, 60);
+	if (numDecimals > 0) return String::formatted("%02i:%02i:%0" + String(6 - (numDecimals - 3)) + "." + String(numDecimals) + "f", hours, minutes, seconds);
 	else return String::formatted("%02i:%02i:%02i", hours, minutes, (int)seconds);
 }
 
-float StringUtil::timeStringToValue(String str)
+double StringUtil::timeStringToValue(String str)
 {
 	StringArray sa;
 	str = str.retainCharacters("0123456789.:;,");
 	if (str.endsWithChar(':')) str += "0";
 	sa.addTokens(str.replace(",", "."), ":", "");
 
-	float value = 0;
+	double value = 0;
 
 	value += sa.strings[sa.strings.size() - 1].getFloatValue();
 

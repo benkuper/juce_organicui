@@ -81,6 +81,7 @@ protected:
 	void valueChanged(const var &) override;
 	virtual void editorShown(Label* label, TextEditor&) override;
 	void labelTextChanged(Label * l) override;
+	virtual void updateLabelFromValue() override;
 
 	String getValueString(const var &val) const override;
 private:

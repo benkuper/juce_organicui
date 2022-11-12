@@ -7,7 +7,7 @@
 
   ==============================================================================
 */
-	
+
 #include "JuceHeader.h"
 
 FloatParameterLabelUI::FloatParameterLabelUI(Array<Parameter*> parameters) :
@@ -64,7 +64,7 @@ void FloatParameterLabelUI::updateLabelFromValue()
 	double v = ParameterUI::textToValue(s.replace(",", "."));
 
 	if ((float)v == float(parameter->value)) valueLabel.setText(getValueString(v), dontSendNotification);
-	parameter->setValue(v);
+	//parameter->setValue(v);
 }
 
 void FloatParameterLabelUI::updateTooltip()
@@ -189,9 +189,9 @@ void FloatParameterLabelUI::editorShown(Label* label, TextEditor& t)
 	//valueLabel.showEditor();
 }
 
-void FloatParameterLabelUI::editorHidden(Label* label, TextEditor&)
+void FloatParameterLabelUI::editorHidden(Label* label, TextEditor& ed)
 {
-	updateLabelFromValue(); 
+	updateLabelFromValue();
 	shouldRepaint = true;
 }
 
@@ -258,6 +258,13 @@ void TimeLabel::labelTextChanged(Label*)
 
 	parameter->setValue(showStepsMode ? s.getFloatValue() / ((FloatParameter*)parameter.get())->unitSteps : StringUtil::timeStringToValue(s));
 	shouldRepaint = true;
+}
+
+void TimeLabel::updateLabelFromValue()
+{
+	String s = valueLabel.getText();
+	double v = StringUtil::timeStringToValue(s);
+	if (v == parameter->doubleValue()) valueLabel.setText(StringUtil::valueToTimeString(v), dontSendNotification);
 }
 
 String TimeLabel::getValueString(const var& val) const
