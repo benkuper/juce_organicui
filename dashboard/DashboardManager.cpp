@@ -433,7 +433,7 @@ void DashboardManager::setCurrentDashboard(Dashboard* d, bool setInClients, bool
 	}
 
 #if ORGANICUI_USE_WEBSERVER
-	if (setInClients && server != nullptr)
+	if (setInClients && server != nullptr && server->getNumActiveConnections() > 0)
 	{
 		var data(new DynamicObject());
 		data.getDynamicObject()->setProperty("setDashboard", d->shortName);
@@ -446,7 +446,7 @@ void DashboardManager::setCurrentDashboard(Dashboard* d, bool setInClients, bool
 void DashboardManager::parameterFeedback(var data)
 {
 #if ORGANICUI_USE_WEBSERVER
-	if (server != nullptr)
+	if (server != nullptr && server->getNumActiveConnections() > 0)
 	{
 		data.getDynamicObject()->setProperty("dataType", "feedback");
 		server->send(JSON::toString(data));
@@ -457,7 +457,7 @@ void DashboardManager::parameterFeedback(var data)
 void DashboardManager::dashboardFeedback(var data)
 {
 #if ORGANICUI_USE_WEBSERVER
-	if (server != nullptr)
+	if (server != nullptr && server->getNumActiveConnections() > 0)
 	{
 		data.getDynamicObject()->setProperty("dataType", "dashboardFeedback");
 		server->send(JSON::toString(data));
@@ -469,7 +469,7 @@ void DashboardManager::dashboardFeedback(var data)
 void DashboardManager::askForRefresh(Dashboard* d)
 {
 #if ORGANICUI_USE_WEBSERVER
-	if (server != nullptr)
+	if (server != nullptr && server->getNumActiveConnections() > 0)
 	{
 		var data(new DynamicObject());
 		data.getDynamicObject()->setProperty("refresh", d != nullptr ? d->shortName : "*");
