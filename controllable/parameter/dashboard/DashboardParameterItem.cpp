@@ -73,7 +73,7 @@ void DashboardParameterItem::onExternalParameterValueChanged(Parameter* p)
 		data.getDynamicObject()->setProperty("controlAddress", parameter->getControlAddress());
 		data.getDynamicObject()->setProperty("type", parameter->getTypeString());
 
-		var val = parameter->value;
+		var val = parameter->getValue().clone();
 		if (parameter->getTypeString() == FileParameter::getTypeStringStatic())
 		{
 			val = parameter->getControlAddress();
