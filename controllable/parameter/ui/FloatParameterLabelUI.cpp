@@ -64,7 +64,7 @@ void FloatParameterLabelUI::updateLabelFromValue()
 	double v = ParameterUI::textToValue(s.replace(",", "."));
 
 	if ((float)v == float(parameter->value)) valueLabel.setText(getValueString(v), dontSendNotification);
-	//parameter->setValue(v);
+	parameter->setValue(v);
 }
 
 void FloatParameterLabelUI::updateTooltip()
