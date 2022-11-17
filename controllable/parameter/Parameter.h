@@ -225,8 +225,7 @@ public:
 	};
 
 	class ValueInterpolator :
-		public Thread,
-		public ChangeBroadcaster
+		public Thread
 	{
 	public:
 		ValueInterpolator(WeakReference<Parameter> p, var targetValue, float time, Automation* a, float frequency = 50);
@@ -237,25 +236,52 @@ public:
 		var targetValue;
 		float time;
 		float sleepMS;
+		double timeAtStart;
 		Automation* automation;
+
+		SpinLock updateLock;
 
 		void run() override;
 
+		void updateParams(var targetValue, float time, Automation* a);
+
+		class InterpolatorListener
+		{
+		public:
+			/** Destructor. */
+			virtual ~InterpolatorListener() {}
+			virtual void interpolationFinished(WeakReference<ValueInterpolator> interp) {};
+		};
+
+		ListenerList<InterpolatorListener> listeners;
+		void addInterpolatorListener(InterpolatorListener* newListener) { listeners.add(newListener); }
+		void removeInterpolatorListener(InterpolatorListener* listener) { listeners.remove(listener); }
+
+		DECLARE_ASYNC_EVENT(ValueInterpolator, Interpolator, interpolator, ENUM_LIST(INTERPOLATION_FINISHED));
+
 		class Manager :
-			public ChangeListener
+			public ValueInterpolator::InterpolatorListener,
+			public ValueInterpolator::AsyncListener
 		{
 		public:
 			juce_DeclareSingleton(Manager, true);
 
-			void interpolate(WeakReference<Parameter> p, var targetValue, float time, Automation* a);
-			void changeListenerCallback(ChangeBroadcaster* source) override;
+			CriticalSection interpLock;
 
+			void interpolate(WeakReference<Parameter> p, var targetValue, float time, Automation* a);
+			void interpolationFinished(WeakReference<ValueInterpolator> source) override;
+			void newMessage(const ValueInterpolator::InterpolatorEvent& e) override;
+
+			WeakReference<ValueInterpolator> getInterpolationWith(Parameter* p);
 			void removeInterpolationWith(Parameter* p);
 
-			HashMap<Parameter*, ValueInterpolator*> interpolatorMap;
+			HashMap<Parameter*, WeakReference<ValueInterpolator>, DefaultHashFunctions, CriticalSection> interpolatorMap;
 			OwnedArray<ValueInterpolator> interpolators;
 		};
 
+		WeakReference<ValueInterpolator>::Master masterReference;
+		friend class WeakReference<ValueInterpolator>;
+		
 	};
 
 	private:
