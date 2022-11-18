@@ -224,59 +224,42 @@ public:
 		bool undo() override;
 	};
 
-	class ValueInterpolator :
-		public Thread
+	class ValueInterpolator
 	{
 	public:
-		ValueInterpolator(WeakReference<Parameter> p, var targetValue, float time, Automation* a, float frequency = 50);
+		ValueInterpolator(WeakReference<Parameter> p, var targetValue, float time, Automation* a);
 		~ValueInterpolator();
 
 		WeakReference<Parameter> parameter;
 		var valueAtStart;
 		var targetValue;
 		float time;
-		float sleepMS;
 		double timeAtStart;
 		Automation* automation;
-
-		SpinLock updateLock;
-
-		void run() override;
-
 		void updateParams(var targetValue, float time, Automation* a);
-
-		class InterpolatorListener
-		{
-		public:
-			/** Destructor. */
-			virtual ~InterpolatorListener() {}
-			virtual void interpolationFinished(WeakReference<ValueInterpolator> interp) {};
-		};
-
-		ListenerList<InterpolatorListener> listeners;
-		void addInterpolatorListener(InterpolatorListener* newListener) { listeners.add(newListener); }
-		void removeInterpolatorListener(InterpolatorListener* listener) { listeners.remove(listener); }
-
-		DECLARE_ASYNC_EVENT(ValueInterpolator, Interpolator, interpolator, ENUM_LIST(INTERPOLATION_FINISHED));
+		bool update();
 
 		class Manager :
-			public ValueInterpolator::InterpolatorListener,
-			public ValueInterpolator::AsyncListener
+			public Thread
 		{
 		public:
 			juce_DeclareSingleton(Manager, true);
 
+			Manager();
+			~Manager();
+
 			CriticalSection interpLock;
 
 			void interpolate(WeakReference<Parameter> p, var targetValue, float time, Automation* a);
-			void interpolationFinished(WeakReference<ValueInterpolator> source) override;
-			void newMessage(const ValueInterpolator::InterpolatorEvent& e) override;
 
 			WeakReference<ValueInterpolator> getInterpolationWith(Parameter* p);
 			void removeInterpolationWith(Parameter* p);
 
 			HashMap<Parameter*, WeakReference<ValueInterpolator>, DefaultHashFunctions, CriticalSection> interpolatorMap;
-			OwnedArray<ValueInterpolator> interpolators;
+			OwnedArray<ValueInterpolator, CriticalSection> interpolators;
+
+			void run() override;
+
 		};
 
 		WeakReference<ValueInterpolator>::Master masterReference;

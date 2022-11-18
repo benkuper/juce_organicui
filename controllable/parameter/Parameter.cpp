@@ -661,80 +661,68 @@ bool Parameter::ParameterSetValueAction::undo()
 
 //Value Interpolator
 
-Parameter::ValueInterpolator::ValueInterpolator(WeakReference<Parameter> p, var targetValue, float time, Automation* a, float frequency) :
-	Thread("Value Interpolator"),
+Parameter::ValueInterpolator::ValueInterpolator(WeakReference<Parameter> p, var targetValue, float time, Automation* a) :
 	parameter(p),
 	targetValue(targetValue),
 	time(time),
-	timeAtStart(0),
-	automation(a),
-	interpolatorNotifier(1)
+	timeAtStart(Time::getMillisecondCounterHiRes() / 1000.0),
+	valueAtStart(parameter->getValue()),
+	automation(a)
 {
-
-	sleepMS = 1000.0 / frequency;
-	startThread();
 }
 
 Parameter::ValueInterpolator::~ValueInterpolator()
 {
-	if (Thread::getCurrentThreadId() != getThreadId()) stopThread(100);
-
-	if (interpolatorNotifier.isUpdatePending())
-	{
-		MessageManagerLock mmLock(Thread::getCurrentThread());
-		if (mmLock.lockWasGained()) interpolatorNotifier.handleUpdateNowIfNeeded();
-		interpolatorNotifier.cancelPendingUpdate();
-	}
-
 	masterReference.clear();
 }
 
-void Parameter::ValueInterpolator::run()
+bool Parameter::ValueInterpolator::update()
 {
-	timeAtStart = Time::getMillisecondCounterHiRes() / 1000.0;
-	valueAtStart = parameter->getValue();
+	if (parameter == nullptr || parameter.wasObjectDeleted()) return false;
 
-	jassert(valueAtStart.size() == targetValue.size());
+	double t = Time::getMillisecondCounterHiRes() / 1000.0;
+	double relT = (t - timeAtStart) / time;
 
-	while (!threadShouldExit() && !parameter.wasObjectDeleted())
+	if (relT >= 1)
 	{
+		parameter->setValue(targetValue);
+		return false;
+	}
+	else
+	{
+		var tVal;
 
-		GenericScopedLock lock(updateLock);
+		float pos = automation->getValueAtPosition(relT);
 
-		double t = Time::getMillisecondCounterHiRes() / 1000.0;
-		double relT = (t - timeAtStart) / time;
-
-		if (relT >= 1)
+		if (targetValue.isArray())
 		{
-			parameter->setValue(targetValue);
-			listeners.call(&InterpolatorListener::interpolationFinished, this);
-			interpolatorNotifier.addMessage(new InterpolatorEvent(InterpolatorEvent::INTERPOLATION_FINISHED, this));
-			return;
+			for (int i = 0; i < targetValue.size(); i++)
+			{
+				tVal.append(jmap<float>(pos, (float)valueAtStart[i], (float)targetValue[i]));
+			}
 		}
 		else
 		{
-			var tVal;
-
-			float pos = automation->getValueAtPosition(relT);
-
-			if (targetValue.isArray())
-			{
-				for (int i = 0; i < targetValue.size(); i++)
-				{
-					tVal.append(jmap<float>(pos, (float)valueAtStart[i], (float)targetValue[i]));
-				}
-			}
-			else
-			{
-				tVal = jmap<float>(pos, (float)valueAtStart, (float)targetValue);
-			}
-
-			parameter->setValue(tVal);
+			tVal = jmap<float>(pos, (float)valueAtStart, (float)targetValue);
 		}
 
-		sleep(sleepMS);
+		parameter->setValue(tVal);
 	}
+
+	return true;
 }
+
+Parameter::ValueInterpolator::Manager::Manager() :
+	Thread("Value Interpolator")
+{
+	startThread();
+}
+
+Parameter::ValueInterpolator::Manager::~Manager()
+{
+	stopThread(1000);
+}
+
 
 void Parameter::ValueInterpolator::updateParams(var newTargetValue, float newTime, Automation* newAutomation)
 {
@@ -749,9 +737,7 @@ void Parameter::ValueInterpolator::updateParams(var newTargetValue, float newTim
 
 void Parameter::ValueInterpolator::Manager::interpolate(WeakReference<Parameter> p, var targetValue, float time, Automation* a)
 {
-
-	//removeInterpolationWith(p);
-	//GenericScopedLock lock(interpLock);
+	jassert(p->getValue().size() == targetValue.size());
 
 	WeakReference<ValueInterpolator> interp = getInterpolationWith(p);
 	if (interp != nullptr && !interp.wasObjectDeleted())
@@ -766,44 +752,8 @@ void Parameter::ValueInterpolator::Manager::interpolate(WeakReference<Parameter>
 
 	//MessageManagerLock mmLock;
 	if (interp.wasObjectDeleted()) return;
-	interp->addAsyncInterpolatorListener(this);
-
-
 	interpolators.add(interp);
 	interpolatorMap.set(p, interp);
-}
-
-
-void Parameter::ValueInterpolator::Manager::interpolationFinished(WeakReference<ValueInterpolator> source)
-{
-	//not used now, using async to avoid same thread deletion
-	if (source.wasObjectDeleted()) return;
-	if (source->parameter != nullptr && !source->parameter.wasObjectDeleted()) removeInterpolationWith(source->parameter);
-	else
-	{
-		source->removeInterpolatorListener(this);
-		interpolatorMap.removeValue(source);
-		interpolators.removeObject(source);
-	}
-}
-
-void Parameter::ValueInterpolator::Manager::newMessage(const ValueInterpolator::InterpolatorEvent& e)
-{
-	e.item->removeInterpolatorListener(this);
-
-	if (interpolatorMap.contains(e.item->parameter))
-	{
-		//GenericScopedLock lock(interpLock);
-		WeakReference<ValueInterpolator> interp = interpolatorMap[e.item->parameter];
-		if (interp.wasObjectDeleted()) return;
-		interpolatorMap.remove(e.item->parameter);
-		interpolators.removeObject(interp);
-	}
-	else
-	{
-		interpolatorMap.removeValue(e.item);
-		interpolators.removeObject(e.item);
-	}
 }
 
 WeakReference<Parameter::ValueInterpolator> Parameter::ValueInterpolator::Manager::getInterpolationWith(Parameter* p)
@@ -821,5 +771,42 @@ void Parameter::ValueInterpolator::Manager::removeInterpolationWith(Parameter* p
 		if (interp.wasObjectDeleted()) return;
 		interpolatorMap.remove(p);
 		interpolators.removeObject(interp);
+	}
+}
+
+
+void Parameter::ValueInterpolator::Manager::run()
+{
+	const int targetSleepMS = 20; //50fps
+
+	Array<WeakReference<ValueInterpolator>> interpToRemove;
+
+
+	while (!threadShouldExit())
+	{
+		int timeToWait = targetSleepMS;
+
+		{
+			GenericScopedLock lock(interpLock);
+			double t = Time::getMillisecondCounter();
+			for (auto& i : interpolators)
+			{
+				if (i == nullptr) continue;
+				bool result = i->update();
+				if (!result) interpToRemove.add(i);
+			}
+
+
+			for (auto& i : interpToRemove)
+			{
+				interpolatorMap.removeValue(i);
+				interpolators.removeObject(i);
+			}
+
+			double diff = Time::getMillisecondCounter() - t;
+			timeToWait = targetSleepMS - diff;
+		}
+
+		if (timeToWait > 0) wait(timeToWait);
 	}
 }
