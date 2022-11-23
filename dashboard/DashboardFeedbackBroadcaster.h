@@ -3,8 +3,9 @@
 class DashboardFeedbackBroadcaster
 {
 public:
-	virtual var getItemParameterFeedback(Parameter* p);
-
+    virtual ~DashboardFeedbackBroadcaster(){}
+    virtual var getItemParameterFeedback(Parameter* p);
+    
 	void notifyParameterFeedback(WeakReference<Parameter> p);
 	void notifyDataFeedback(var data);
 	void notifyDashboardFeedback(var data);
