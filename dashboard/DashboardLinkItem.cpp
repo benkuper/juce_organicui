@@ -37,7 +37,7 @@ void DashboardLinkItem::onContainerTriggerTriggered(Trigger* t)
 	{
 		if (Dashboard* d = dynamic_cast<Dashboard*>(dashboardTarget->targetContainer.get()))
 		{
-			DashboardManager::getInstance()->setCurrentDashboard(d, setInClients->boolValue());
+			DashboardManager::getInstance()->setCurrentDashboard(d, setInClients->boolValue(), true);
 		}
 
 	}
