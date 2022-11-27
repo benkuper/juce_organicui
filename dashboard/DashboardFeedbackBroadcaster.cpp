@@ -8,11 +8,11 @@ var DashboardFeedbackBroadcaster::getItemParameterFeedback(Parameter* p)
 	if (p->type == Parameter::ENUM)
 	{
 		EnumParameter* ep = (EnumParameter*)p;
-		data.getDynamicObject()->setProperty("value", p->enabled ? ep->getValueData() : var());
+		data.getDynamicObject()->setProperty("value", p->enabled ? ep->getValueData().clone() : var());
 	}
 	else
 	{
-		data.getDynamicObject()->setProperty("value", p->enabled ? p->value : var());
+		data.getDynamicObject()->setProperty("value", p->enabled ? p->getValue().clone() : var());
 	}
 
 	if (p->canBeDisabledByUser) data.getDynamicObject()->setProperty("enabled", p->enabled);
