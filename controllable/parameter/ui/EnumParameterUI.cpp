@@ -78,6 +78,12 @@ void EnumParameterUI::updateFromParameter()
 	int id = 1;
 	for (auto& ev : ep->enumValues)
 	{
+		if (ev == nullptr)
+		{
+			jassertfalse;
+			continue;
+		}
+
 		cb.addItem(ev->key, id);
 		idKeyMap.set(id, ev->key);
 		keyIdMap.set(ev->key, id);
