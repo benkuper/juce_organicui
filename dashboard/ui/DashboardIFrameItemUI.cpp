@@ -12,9 +12,11 @@
 
 DashboardIFrameItemUI::DashboardIFrameItemUI(DashboardIFrameItem* item) :
 	DashboardItemUI(item),
-	iFrameItem(item),
-	web(WebBrowserComponent::Options().withBackend(WebBrowserComponent::Options::Backend::webview2).withWinWebView2Options(
+	iFrameItem(item)
+#if JUCE_WINDOWS 
+	,web(WebBrowserComponent::Options().withBackend(WebBrowserComponent::Options::Backend::webview2).withWinWebView2Options(
 		WebBrowserComponent::Options::WinWebView2().withUserDataFolder(File::getSpecialLocation(File::windowsLocalAppData).getChildFile("Chataigne")).withStatusBarDisabled()))
+#endif
 {
 
 #if JUCE_WINDOWS
