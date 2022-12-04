@@ -12,13 +12,11 @@
 
 DashboardIFrameItemUI::DashboardIFrameItemUI(DashboardIFrameItem* item) :
 	DashboardItemUI(item),
-	iFrameItem(item)
-#if JUCE_WINDOWS
-	, web(false, File(), File::getSpecialLocation(File::windowsLocalAppData).getChildFile("Chataigne"))
-#endif
+	iFrameItem(item),
+	web(WebBrowserComponent::Options().withBackend(WebBrowserComponent::Options::Backend::webview2).withWinWebView2Options(
+		WebBrowserComponent::Options::WinWebView2().withUserDataFolder(File::getSpecialLocation(File::windowsLocalAppData).getChildFile("Chataigne")).withStatusBarDisabled()))
 {
 
-#if !JUCE_LINUX
 #if JUCE_WINDOWS
 	if (!GlobalSettings::getInstance()->useGLRenderer->boolValue())
 	{
@@ -32,11 +30,10 @@ DashboardIFrameItemUI::DashboardIFrameItemUI(DashboardIFrameItem* item) :
 #else
 	addChildComponent(web);
 #endif
-	
+
 	MessageManagerLock mmLock;
 	web.setVisible(!DashboardManager::getInstance()->editMode->boolValue());
 	web.goToURL(iFrameItem->url->stringValue());
-#endif
 	resized();
 }
 
