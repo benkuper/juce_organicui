@@ -1,4 +1,4 @@
-#include "OSCHelpers.h"
+#include "Common/CommonIncludes.h"
 
 void OSCHelpers::logOSCFormatError(const char* message, int length)
 {
@@ -60,17 +60,17 @@ var OSCHelpers::argumentToVar(const OSCArgument& a)
 	return var("error");
 }
 
-void OSCHelpers::addArgumentsForParameter(OSCMessage& m, Parameter* p)
+void OSCHelpers::addArgumentsForParameter(OSCMessage& m, Parameter* p, BoolMode bm, ColorMode cm)
 {
 	switch (p->type)
 	{
 
-	case Controllable::BOOL: m.addInt32(p->intValue()); break;
+	case Controllable::BOOL: OSCHelpers::addBoolArgumentToMessage(m, p->boolValue(), bm); break;
 	case Controllable::INT: m.addInt32(p->intValue()); break;
 	case Controllable::FLOAT: m.addFloat32(p->floatValue()); break;
 	case Controllable::STRING: m.addString(p->stringValue()); break;
-	case Controllable::COLOR: m.addColour(OSCHelpers::getOSCColour(((ColorParameter*)p)->getColor())); break;
-	case Controllable::POINT2D: 
+	case Controllable::COLOR: OSCHelpers::addColorArgumentToMessage(m, ((ColorParameter*)p)->getColor(), cm); break;
+	case Controllable::POINT2D:
 		m.addFloat32(((Point2DParameter*)p)->x);
 		m.addFloat32(((Point2DParameter*)p)->y);
 		break;
@@ -90,6 +90,16 @@ void OSCHelpers::addArgumentsForParameter(OSCMessage& m, Parameter* p)
 	}
 }
 
+void OSCHelpers::addBoolArgumentToMessage(OSCMessage& m, bool val, BoolMode boolMode)
+{
+	switch (boolMode)
+	{
+	case Int: m.addInt32(val ? 1 : 0); break;
+	case Float: m.addFloat32(val ? 1 : 0); break;
+	case TF: m.addBool(val); break;
+	}
+}
+
 
 void OSCHelpers::addColorArgumentToMessage(OSCMessage& m, const Colour& c, ColorMode colorMode)
 {
@@ -103,14 +113,26 @@ void OSCHelpers::addColorArgumentToMessage(OSCMessage& m, const Colour& c, Color
 	}
 }
 
+bool OSCHelpers::getBoolArg(OSCArgument a)
+{
+	if (a.isFloat32()) return a.getFloat32() >= 1;
+	if (a.isInt32()) return (float)a.getInt32() >= 1;
+	if (a.isInt64()) return (float)a.getInt64() >= 1;
+	if (a.isString()) return a.getString().getIntValue() >= 1;
+	if (a.isTorF()) return a.getBool();
+	if (a.isImpulse()) return true;
+	return false;
+}
+
+
 float OSCHelpers::getFloatArg(OSCArgument a)
 {
 	if (a.isFloat32()) return a.getFloat32();
 	if (a.isInt32()) return (float)a.getInt32();
 	if (a.isInt64()) return (float)a.getInt64();
 	if (a.isString()) return a.getString().getFloatValue();
-	if (a.isTorF()) return var(a.getBool()?1.0f:0.0f);
-	if (a.isImpulse()) return var();
+	if (a.isTorF()) return a.getBool() ? 1.0f : 0.0f;
+	if (a.isImpulse()) return 1;
 	return 0;
 }
 
@@ -120,8 +142,8 @@ int OSCHelpers::getIntArg(OSCArgument a)
 	if (a.isInt64()) return (int)a.getInt64();
 	if (a.isFloat32()) return (int)roundf(a.getFloat32());
 	if (a.isString()) return a.getString().getIntValue();
-	if (a.isTorF()) return var(a.getBool()?1:0);
-	if (a.isImpulse()) return var(); 
+	if (a.isTorF()) return a.getBool() ? 1 : 0;
+	if (a.isImpulse()) return 1;
 	return 0;
 }
 
@@ -131,7 +153,7 @@ String OSCHelpers::getStringArg(OSCArgument a)
 	if (a.isInt32()) return String(a.getInt32());
 	if (a.isInt64()) return String(a.getInt64());
 	if (a.isFloat32()) return String(a.getFloat32());
-	if (a.isTorF()) return var(a.getBool() ? "True" : "False");
+	if (a.isTorF()) return a.getBool() ? "True" : "False";
 	if (a.isImpulse()) return var("");
 	return "";
 }
@@ -144,7 +166,7 @@ OSCColour OSCHelpers::getOSCColour(Colour c)
 Point<float> OSCHelpers::getP2DArg(const OSCMessage& m, int startIndex)
 {
 	if (m.size() <= startIndex + 1) return Point<float>();
-	return Point<float>(getFloatArg(m[startIndex]), getFloatArg(m[startIndex+1]));
+	return Point<float>(getFloatArg(m[startIndex]), getFloatArg(m[startIndex + 1]));
 }
 
 Vector3D<float> OSCHelpers::getP3DArg(const OSCMessage& m, int startIndex)
@@ -159,14 +181,14 @@ Colour OSCHelpers::getColourFromOSC(OSCColour c)
 	return Colour(c.red, c.green, c.blue, c.alpha);
 }
 
-OSCMessage OSCHelpers::getOSCMessageForControllable(Controllable* c, ControllableContainer* addressRelativeTo)
+OSCMessage OSCHelpers::getOSCMessageForControllable(Controllable* c, ControllableContainer* addressRelativeTo, BoolMode bm, ColorMode cm)
 {
 	OSCMessage m(c->getControlAddress(addressRelativeTo));
-	if(c->type != c->TRIGGER) addArgumentsForParameter(m, (Parameter *)c);
+	if (c->type != c->TRIGGER) addArgumentsForParameter(m, (Parameter*)c, bm, cm);
 	return m;
 }
 
-Controllable * OSCHelpers::findControllableAndHandleMessage(ControllableContainer* root, const OSCMessage& m, int dataOffset)
+Controllable* OSCHelpers::findControllableAndHandleMessage(ControllableContainer* root, const OSCMessage& m, int dataOffset)
 {
 	Controllable* c = findControllable(root, m, dataOffset);
 	if (c == nullptr)
@@ -207,7 +229,7 @@ void OSCHelpers::handleControllableForOSCMessage(Controllable* c, const OSCMessa
 	{
 		if (m.size() <= dataOffset || (m.size() > dataOffset && OSCHelpers::getIntArg(m[dataOffset]) > 0)) static_cast<Trigger*>(c)->trigger();
 	}
-	else if(Parameter* p = dynamic_cast<Parameter*>(c))
+	else if (Parameter* p = dynamic_cast<Parameter*>(c))
 	{
 		switch (p->type)
 		{
@@ -234,18 +256,18 @@ void OSCHelpers::handleControllableForOSCMessage(Controllable* c, const OSCMessa
 
 		case Controllable::COLOR:
 			if (m[dataOffset].isColour()) static_cast<ColorParameter*>(p)->setColor(getColourFromOSC(m[dataOffset].getColour()));
-			else if (m.size() < dataOffset+3) LOG("Parameter " << p->niceName << " requires at least 3 arguments");
-			else static_cast<ColorParameter*>(p)->setColor(Colour::fromFloatRGBA(getFloatArg(m[dataOffset]), getFloatArg(m[dataOffset+1]), getFloatArg(m[dataOffset+2]), m.size() >= 4 ? getFloatArg(m[dataOffset+3]) : 1));
+			else if (m.size() < dataOffset + 3) LOG("Parameter " << p->niceName << " requires at least 3 arguments");
+			else static_cast<ColorParameter*>(p)->setColor(Colour::fromFloatRGBA(getFloatArg(m[dataOffset]), getFloatArg(m[dataOffset + 1]), getFloatArg(m[dataOffset + 2]), m.size() >= 4 ? getFloatArg(m[dataOffset + 3]) : 1));
 			break;
 
 		case Controllable::POINT2D:
 			if (m.size() < dataOffset + 2) LOG("Parameter " << p->niceName << " requires at least 2 arguments");
-			else static_cast<Point2DParameter*>(p)->setPoint(getFloatArg(m[dataOffset]), getFloatArg(m[dataOffset+1]));
+			else static_cast<Point2DParameter*>(p)->setPoint(getFloatArg(m[dataOffset]), getFloatArg(m[dataOffset + 1]));
 			break;
 
 		case Controllable::POINT3D:
 			if (m.size() < dataOffset + 3) LOG("Parameter " << p->niceName << " requires at least 3 arguments");
-			else static_cast<Point3DParameter*>(p)->setVector(getFloatArg(m[dataOffset]), getFloatArg(m[dataOffset+1]), getFloatArg(m[dataOffset+2]));
+			else static_cast<Point3DParameter*>(p)->setVector(getFloatArg(m[dataOffset]), getFloatArg(m[dataOffset + 1]), getFloatArg(m[dataOffset + 2]));
 			break;
 
 		case Controllable::ENUM:

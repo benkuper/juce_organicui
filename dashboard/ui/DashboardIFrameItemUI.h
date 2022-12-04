@@ -19,11 +19,7 @@ public:
 
     DashboardIFrameItem* iFrameItem;
 
-#if JUCE_WINDOWS
-    WindowsWebView2WebBrowserComponent web;
-#elif !JUCE_LINUX
     WebBrowserComponent web;
-#endif
 
     void paint(Graphics& g) override;
     void resized() override;
