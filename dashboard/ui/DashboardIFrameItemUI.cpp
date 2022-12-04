@@ -52,23 +52,17 @@ void DashboardIFrameItemUI::paint(Graphics& g)
 void DashboardIFrameItemUI::resized()
 {
 	DashboardItemUI::resized();
-#if !JUCE_LINUX	
 	web.setBounds(getLocalBounds());
-#endif
 }
 
 void DashboardIFrameItemUI::updateEditModeInternal(bool editMode)
 {
-#if !JUCE_LINUX	
 	web.setVisible(!editMode);
-#endif
 }
 
 
 void DashboardIFrameItemUI::controllableFeedbackUpdateInternal(Controllable* c)
 {
 	DashboardItemUI::controllableFeedbackUpdateInternal(c);
-#if !JUCE_LINUX	
 	if (c == iFrameItem->url) web.goToURL(iFrameItem->url->stringValue());
-#endif
 }
