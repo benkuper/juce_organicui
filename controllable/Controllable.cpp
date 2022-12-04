@@ -289,12 +289,13 @@ void Controllable::setAttribute(String param, var value)
 	if (param == "description") description = value;
 	else if (param == "readonly" || param == "readOnly") setControllableFeedbackOnly(value);
 	else if (param == "enabled") setEnabled(value);
+	else if (param == "canBeDisabled") canBeDisabledByUser = (bool)(int)value;
 	else if (param == "saveValueOnly") saveValueOnly = value;
 }
 
 StringArray Controllable::getValidAttributes() const
 {
-	return { "targetType", "searchLevel", "allowedTypes", "excludedTypes","root", "labelLevel", "saveValueOnly" };
+	return {"enabled", "canBeDisabled", "targetType", "searchLevel", "allowedTypes", "excludedTypes","root", "labelLevel", "saveValueOnly" };
 }
 
 
