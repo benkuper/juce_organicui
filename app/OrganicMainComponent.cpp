@@ -1,3 +1,5 @@
+#include "JuceHeader.h"
+
 ApplicationProperties& getAppProperties();
 ApplicationCommandManager& getCommandManager();
 OrganicApplication::MainWindow* getMainWindow();
