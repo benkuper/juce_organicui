@@ -68,6 +68,8 @@ GlobalSettings::GlobalSettings() :
 	actionOnCrash = saveLoadCC.addEnumParameter("Action On Crash", "This determines what to do on a crash. Default shows the crash report window");
 	actionOnCrash->addOption("Report", REPORT)->addOption("Kill", KILL)->addOption("Reopen", REOPEN)->addOption("Recover", RECOVER);
 
+	crashContactEmail = saveLoadCC.addStringParameter("Crash Contact Mail", "A mail address to use if you wish to be contacted by the developer team", "");
+
 	testCrash = saveLoadCC.addTrigger("Test crash", "This will cause a crash, allowing for testing crashes. Don't push this unless you REALLY want to !!!");
 	saveLogsToFile = saveLoadCC.addBoolParameter("Save logs", "If checked, the content of the Logger will be automatically saved to a file", false);
 	addChildControllableContainer(&saveLoadCC);

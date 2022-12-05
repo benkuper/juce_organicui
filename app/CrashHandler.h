@@ -19,6 +19,7 @@ public:
 	File traceFile;
 	File dumpFile;
 	File recoveredFile;
+	String contactEmail;
 	String crashMessage;
 	FloatParameter progress;
 
@@ -45,6 +46,7 @@ public:
 		UploadWindow();
 		~UploadWindow();
 
+		TextEditor mail;
 		TextEditor editor;
 		Image* image;
 		TextButton okBT;

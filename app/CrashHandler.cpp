@@ -141,6 +141,7 @@ void CrashDumpUploader::uploadCrash()
 		.withParameter("os", SystemStats::getOperatingSystemName().replace(" ", "-"))
 		.withParameter("version", getAppVersion())
 		.withParameter("message", crashMessage.isNotEmpty() ? crashMessage : "No message")
+		.withParameter("email", contactEmail.isNotEmpty() ? contactEmail : "")
 #if JUCE_DEBUG
 		.withParameter("branch", "debug")
 #else
@@ -341,6 +342,15 @@ CrashDumpUploader::UploadWindow::UploadWindow() :
 
 	addAndMakeVisible(&progressUI);
 
+	mail.setMultiLine(false);
+	mail.setColour(mail.backgroundColourId, BG_COLOR.brighter(.3f));
+	mail.setColour(mail.textColourId, TEXT_COLOR.brighter());
+	mail.setColour(mail.outlineColourId, BG_COLOR.brighter(.6f));
+	mail.setText(GlobalSettings::getInstance()->crashContactEmail->stringValue(), dontSendNotification);
+	mail.setTextToShowWhenEmpty("Your contact email if you accept to be contacted to help fix the problem (and only that !).", TEXT_COLOR);
+
+	addAndMakeVisible(mail);
+
 	addAndMakeVisible(&editor);
 	editor.setColour(editor.backgroundColourId, BG_COLOR.brighter(.3f));
 	editor.setColour(editor.textColourId, TEXT_COLOR.brighter());
@@ -378,6 +388,8 @@ void CrashDumpUploader::UploadWindow::resized()
 
 	progressUI.setBounds(r.removeFromBottom(30).reduced(20, 5));
 
+	mail.setBounds(r.removeFromTop(30).reduced(20, 0));
+
 	editor.setBounds(r.reduced(20));
 }
 
@@ -389,7 +401,15 @@ void CrashDumpUploader::UploadWindow::buttonClicked(Button* bt)
 
 	CrashDumpUploader::getInstance()->uploadFile = bt == &autoReopenBT || bt == &okBT;
 	CrashDumpUploader::getInstance()->crashMessage = editor.getText();
+	CrashDumpUploader::getInstance()->contactEmail = mail.getText();
 	CrashDumpUploader::getInstance()->crashAction = (bt == &autoReopenBT || bt == &recoverOnlyBT) ? GlobalSettings::RECOVER : GlobalSettings::KILL;
+
+
+	if (mail.getText().isNotEmpty() && mail.getText() != GlobalSettings::getInstance()->crashContactEmail->stringValue())
+	{
+		GlobalSettings::getInstance()->crashContactEmail->setValue(mail.getText());
+		getApp().saveGlobalSettings();
+	}
 
 	if (bt == &autoReopenBT || bt == &okBT)
 	{
@@ -400,6 +420,7 @@ void CrashDumpUploader::UploadWindow::buttonClicked(Button* bt)
 		if (DialogWindow* dw = findParentComponentOfClass<DialogWindow>()) dw->exitModalState(0);
 		MessageManager::getInstance()->stopDispatchLoop();
 	}
+
 
 	/*if (DialogWindow* dw = findParentComponentOfClass<DialogWindow>())
 		dw->exitModalState(0);

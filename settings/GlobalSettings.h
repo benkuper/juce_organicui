@@ -64,6 +64,7 @@ public:
 	BoolParameter* compressOnSave;
 	enum CrashAction { REPORT, KILL, REOPEN, RECOVER };
 	EnumParameter* actionOnCrash;
+	StringParameter* crashContactEmail;
 	BoolParameter* saveLogsToFile;
 
 	ControllableContainer editingCC;
