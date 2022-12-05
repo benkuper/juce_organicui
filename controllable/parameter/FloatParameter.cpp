@@ -8,7 +8,7 @@
   ==============================================================================
 */
 
-FloatParameter::FloatParameter(const String& niceName, const String& description, const float& initialValue, const float& minValue, const float& maxValue, bool enabled) :
+FloatParameter::FloatParameter(const String& niceName, const String& description, const double& initialValue, const double& minValue, const double& maxValue, bool enabled) :
 	Parameter(Type::FLOAT, niceName, description, (float)initialValue, (float)minValue, (float)maxValue, enabled),
 	unitSteps(0),
 	defaultUI(NONE),
@@ -47,7 +47,7 @@ TimeLabel* FloatParameter::createTimeLabelParameter(Array<Parameter*> parameters
 ControllableUI* FloatParameter::createDefaultUI(Array<Controllable*> controllables) {
 	UIType t = customUI != NONE ? customUI : defaultUI;
 
-	bool hasFullRange = ((float)minimumValue != INT32_MIN && (float)maximumValue != INT32_MAX);
+	bool hasFullRange = ((double)minimumValue != INT32_MIN && (double)maximumValue != INT32_MAX);
 	if (t == NONE) t = hasFullRange ? SLIDER : LABEL;
 
 	Array<Parameter*> parameters = getArrayAs<Controllable, Parameter>(controllables);
@@ -77,7 +77,7 @@ ControllableUI* FloatParameter::createDefaultUI(Array<Controllable*> controllabl
 
 bool FloatParameter::checkValueIsTheSame(var oldValue, var newValue)
 {
-	return jlimit<float>(minimumValue, maximumValue, newValue) == (float)oldValue;
+	return jlimit<double>(minimumValue, maximumValue, newValue) == (double)oldValue;
 }
 
 
@@ -89,30 +89,30 @@ void FloatParameter::setValueInternal(var& val)
 
 bool FloatParameter::hasRange()
 {
-	return (float)minimumValue != INT32_MIN && (float)maximumValue != INT32_MAX;
+	return (double)minimumValue != INT32_MIN && (double)maximumValue != INT32_MAX;
 }
 
 
 var FloatParameter::getLerpValueTo(var targetValue, float weight)
 {
-	return jmap(weight, floatValue(), (float)targetValue);
+	return jmap<double>(weight, doubleValue(), (double)targetValue);
 }
 
 void FloatParameter::setWeightedValue(Array<var> values, Array<float> weights)
 {
 	jassert(values.size() == weights.size());
 
-	float tValue = 0;
+	double tValue = 0;
 
 	for (int i = 0; i < values.size(); ++i)
 	{
-		tValue += (float)values[i] * weights[i];
+		tValue += (double)values[i] * weights[i];
 	}
 
 	setValue(tValue);
 }
 
-float FloatParameter::getStepSnappedValueFor(float originalValue)
+float FloatParameter::getStepSnappedValueFor(double originalValue)
 {
 	return unitSteps == 0 ? originalValue : round(originalValue * unitSteps) / unitSteps;
 }
@@ -134,7 +134,7 @@ void FloatParameter::setAttribute(String attribute, var val)
 	}
 	else if (attribute == "unitSteps")
 	{
-		unitSteps = (float)val;
+		unitSteps = (double)val;
 	}
 }
 
@@ -161,7 +161,7 @@ void FloatParameter::loadJSONDataInternal(var data)
 
 var FloatParameter::getCroppedValue(var originalValue)
 {
-	float v = isnan((float)originalValue) ? 0.0f : (float)originalValue;
-	return jlimit<float>(minimumValue, maximumValue, v);
+	double v = isnan((double)originalValue) ? 0.0f : (double)originalValue;
+	return jlimit<double>(minimumValue, maximumValue, v);
 }
 

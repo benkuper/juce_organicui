@@ -18,7 +18,7 @@ class TimeLabel;
 class FloatParameter : public Parameter
 {
 public:
-	FloatParameter(const String& niceName, const String& description, const float& initialValue, const float& minValue = (float)INT32_MIN, const float& maxValue = (float)INT32_MAX, bool enabled = true);
+	FloatParameter(const String& niceName, const String& description, const double& initialValue, const double& minValue = (double)INT32_MIN, const double& maxValue = (double)INT32_MAX, bool enabled = true);
 	virtual ~FloatParameter() {}
 
 	float unitSteps;
@@ -42,7 +42,7 @@ public:
 
 	virtual var getLerpValueTo(var targetValue, float weight) override;
 	virtual void setWeightedValue(Array<var> values, Array<float> weights) override;
-	virtual float getStepSnappedValueFor(float originalValue);
+	virtual float getStepSnappedValueFor(double originalValue);
 
 	void setControlAutomation() override;
 
