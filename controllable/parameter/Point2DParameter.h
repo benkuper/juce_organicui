@@ -31,7 +31,7 @@ public:
 	void setValueInternal(var  &_value) override;
 	void setBounds(float _minX, float _minY, float _maxX, float _maxY);
 	
-	virtual void setAttribute(String name, var val) override;
+	virtual bool setAttributeInternal(String name, var val) override;
 	virtual StringArray getValidAttributes() const override;
 
 	virtual StringArray getValuesNames() override;

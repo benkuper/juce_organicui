@@ -59,7 +59,7 @@ public:
 	//dashboard
 	int dashboardDefaultLabelParentLevel; //used to show another 
 	bool dashboardDefaultAppendLabel;		//if default parent level is not 0 and this this will 
-										   //decide if this controllable's label will be added at the end
+	//decide if this controllable's label will be added at the end
 
 
 	WeakReference<ControllableContainer> parentContainer;
@@ -108,6 +108,7 @@ public:
 	virtual String getDefaultDashboardLabel() const;
 
 	virtual void setAttribute(String param, var value);
+	virtual bool setAttributeInternal(String param, var value);
 	virtual StringArray getValidAttributes() const;
 
 	static var setValueFromScript(const juce::var::NativeFunctionArgs& a);
@@ -127,7 +128,7 @@ public:
 
 	virtual String getWarningTargetName() const override;
 
-	virtual InspectableEditor* getEditorInternal(bool isRoot, Array<Inspectable *> inspectables = Array<Inspectable *>()) override;
+	virtual InspectableEditor* getEditorInternal(bool isRoot, Array<Inspectable*> inspectables = Array<Inspectable*>()) override;
 	virtual ControllableDetectiveWatcher* getDetectiveWatcher();
 	virtual String getTypeString() const { jassert(false); return ""; } //should be overriden
 
@@ -141,6 +142,7 @@ public:
 		virtual void controllableFeedbackStateChanged(Controllable*) {}
 		virtual void controllableControlAddressChanged(Controllable*) {}
 		virtual void controllableNameChanged(Controllable*) {}
+		virtual void controllableAttributeChanged(Controllable*, const String&) {}
 		virtual void askForRemoveControllable(Controllable*, bool /*addToUndo*/ = false) {}
 	};
 
@@ -152,7 +154,7 @@ public:
 	class  ControllableEvent
 	{
 	public:
-		enum Type { STATE_CHANGED, FEEDBACK_STATE_CHANGED, CONTROLADDRESS_CHANGED, NAME_CHANGED, CONTROLLABLE_REMOVED };
+		enum Type { ATTRIBUTE_CHANGED, STATE_CHANGED, FEEDBACK_STATE_CHANGED, CONTROLADDRESS_CHANGED, NAME_CHANGED, CONTROLLABLE_REMOVED };
 
 		ControllableEvent(Type t, Controllable* c) : type(t), controllable(c) {}
 

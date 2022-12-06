@@ -101,9 +101,8 @@ void Point2DParameter::setBounds(float _minX, float _minY, float _maxX, float _m
 	setRange(minRange, maxRange);
 }
 
-void Point2DParameter::setAttribute(String name, var val)
+bool Point2DParameter::setAttributeInternal(String name, var val)
 {
-	Parameter::setAttribute(name, val);
 	if (name == "ui")
 	{
 		if (val == "time") defaultUI = FloatParameter::TIME;
@@ -114,6 +113,12 @@ void Point2DParameter::setAttribute(String name, var val)
 	else if (name == "canvasInvertX") extendedEditorInvertX = (bool)val;
 	else if (name == "canvasInvertY") extendedEditorInvertY = (bool)val;
 	else if (name == "canvasStretchMode") extendedEditorStretchMode = (bool)val;
+	else
+	{
+		return Parameter::setAttributeInternal(name, val);
+	}
+
+	return true;
 }
 
 StringArray Point2DParameter::getValidAttributes() const

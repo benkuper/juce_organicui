@@ -122,9 +122,8 @@ void FloatParameter::setControlAutomation()
 	automation.reset(new ParameterNumberAutomation(this, !isLoadingData));
 }
 
-void FloatParameter::setAttribute(String attribute, var val)
+bool FloatParameter::setAttributeInternal(String attribute, var val)
 {
-	Parameter::setAttribute(attribute, val);
 	if (attribute == "ui")
 	{
 		if (val == "time") defaultUI = TIME;
@@ -136,6 +135,12 @@ void FloatParameter::setAttribute(String attribute, var val)
 	{
 		unitSteps = (double)val;
 	}
+	else
+	{
+		return Parameter::setAttributeInternal(attribute, val);
+	}
+
+	return true;
 }
 
 StringArray FloatParameter::getValidAttributes() const

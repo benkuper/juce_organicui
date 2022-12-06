@@ -56,10 +56,15 @@ void IntParameter::setControlAutomation()
 	automation.reset(new ParameterNumberAutomation(this, !isLoadingData));
 }
 
-void IntParameter::setAttribute(String attribute, var val)
+bool IntParameter::setAttributeInternal(String attribute, var val)
 {
-	Parameter::setAttribute(attribute, val);
 	if (attribute == "hexMode") hexMode = val;
+	else
+	{
+		return Parameter::setAttributeInternal(attribute, val);
+	}
+
+	return true;
 }
 
 

@@ -32,7 +32,7 @@ public:
 
 	void setControlAutomation() override;
 
-	void setAttribute(String attribute, var val) override;
+	bool setAttributeInternal(String attribute, var val) override;
 	virtual StringArray getValidAttributes() const override;
 
 	var getJSONDataInternal() override;

@@ -48,7 +48,7 @@ public:
 	static var launchFileFromScript(const juce::var::NativeFunctionArgs& a);
 	static var listFilesFromScript(const juce::var::NativeFunctionArgs& a);
 
-	virtual void setAttribute(String param, var paramVal) override;
+	virtual bool setAttributeInternal(String param, var paramVal) override;
 	virtual StringArray getValidAttributes() const override;
 
 	static StringParameter * create() { return new FileParameter("New FileParameter", "",""); }
