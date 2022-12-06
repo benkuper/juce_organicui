@@ -13,10 +13,12 @@
 DashboardIFrameItemUI::DashboardIFrameItemUI(DashboardIFrameItem* item) :
 	DashboardItemUI(item),
 	iFrameItem(item)
-#if JUCE_WINDOWS 
+#if JUCE_WINDOWS
+	, web(false, File(), File::getSpecialLocation(File::windowsLocalAppData).getChildFile("Chataigne"))
+#endif
+
 	//,web(WebBrowserComponent::Options().withBackend(WebBrowserComponent::Options::Backend::webview2).withWinWebView2Options(
 	//	WebBrowserComponent::Options::WinWebView2().withUserDataFolder(File::getSpecialLocation(File::windowsLocalAppData).getChildFile("Chataigne")).withStatusBarDisabled())) //7.0.3
-#endif
 {
 
 #if JUCE_WINDOWS
