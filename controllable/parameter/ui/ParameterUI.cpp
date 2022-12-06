@@ -264,7 +264,7 @@ void ParameterUI::handleMenuSelectedID(int id)
 
 	case -4: showEditRangeWindow(); break;
 	case -5: parameter->clearRange(); break;
-	case -6: parameter->alwaysNotify = !parameter->alwaysNotify; break;
+	case -6: parameter->setAttribute("alwaysNotify", !parameter->alwaysNotify); break;
 	case -20: SystemClipboard::copyTextToClipboard(parameter->stringValue()); break;
 	case -21:
 	{
@@ -482,7 +482,7 @@ void ParameterUI::ValueEditCalloutComponent::editorHidden(Label* l, TextEditor&)
 	if (b != nullptr)
 	{
 		if (l == labels[labels.size() - 1]) b->dismiss();
-}
+	}
 }
 
 void ParameterUI::ValueEditCalloutComponent::parentHierarchyChanged()

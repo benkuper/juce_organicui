@@ -48,7 +48,7 @@ public:
 
 	virtual String stringValue() override { return String(floatValue()); }
 
-	void setAttribute(String name, var val) override;
+	bool setAttributeInternal(String name, var val) override;
 	virtual StringArray getValidAttributes() const override;
 
 	var getJSONDataInternal() override;

@@ -318,10 +318,8 @@ void TargetParameter::inspectableDestroyed(Inspectable* i)
 	}
 }
 
-void TargetParameter::setAttribute(String param, var attributeValue)
+bool TargetParameter::setAttributeInternal(String param, var attributeValue)
 {
-	Parameter::setAttribute(param, attributeValue);
-
 	if (param == "targetType") targetType = (attributeValue.toString().toLowerCase() == "container") ? CONTAINER : CONTROLLABLE;
 	else if (param == "searchLevel") maxDefaultSearchLevel = jmax<int>(attributeValue, -1);
 	else if (param == "allowedTypes")
@@ -350,7 +348,16 @@ void TargetParameter::setAttribute(String param, var attributeValue)
 			if (cc != nullptr) setRootContainer(cc);
 		}
 	}
-	else if (param == "labelLevel") defaultParentLabelLevel = jmax<int>(attributeValue, 1);
+	else if (param == "labelLevel")
+	{
+		defaultParentLabelLevel = jmax<int>(attributeValue, 1);
+	}
+	else
+	{
+		return Parameter::setAttributeInternal(param, attributeValue);
+	}
+
+	return true;
 }
 
 StringArray TargetParameter::getValidAttributes() const

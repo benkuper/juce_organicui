@@ -86,13 +86,18 @@ bool StringParameter::checkValueIsTheSame(var oldValue, var newValue)
 	return oldValue.toString() == newValue.toString();
 }
 
-void StringParameter::setAttribute(String param, var paramVal)
+bool StringParameter::setAttributeInternal(String param, var paramVal)
 {
-	Parameter::setAttribute(param, paramVal);
 
 	if (param == "multiline") multiline = paramVal;
 	else if (param == "prefix") prefix = paramVal;
 	else if (param == "suffix") suffix = paramVal;
+	else
+	{
+		return Parameter::setAttributeInternal(param, paramVal);
+	}
+
+	return true;
 }
 
 StringArray StringParameter::getValidAttributes() const

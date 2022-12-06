@@ -35,7 +35,7 @@ public:
 
 	virtual bool checkValueIsTheSame(var oldValue, var newValue) override;
 
-	virtual void setAttribute(String param, var paramVal) override;
+	virtual bool setAttributeInternal(String param, var paramVal) override;
 	virtual StringArray getValidAttributes() const override;
 
 	StringParameterUI* createStringParameterUI(Array<StringParameter*> parameters = {});

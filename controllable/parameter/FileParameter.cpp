@@ -232,10 +232,15 @@ var FileParameter::listFilesFromScript(const juce::var::NativeFunctionArgs& a)
 }
 
 
-void FileParameter::setAttribute(String param, var paramVal)
+bool FileParameter::setAttributeInternal(String param, var paramVal)
 {
-	StringParameter::setAttribute(param, paramVal);
 	if (param == "directoryMode") directoryMode = paramVal;
+	else
+	{
+		return StringParameter::setAttributeInternal(param, paramVal);
+	}
+
+	return true;
 }
 
 StringArray FileParameter::getValidAttributes() const

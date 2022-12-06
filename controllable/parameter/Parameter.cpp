@@ -382,11 +382,15 @@ var Parameter::getNormalizedValue()
 	}
 }
 
-void Parameter::setAttribute(String param, var val)
+bool Parameter::setAttributeInternal(String param, var val)
 {
-	Controllable::setAttribute(param, val);
-
 	if (param == "alwaysNotify") alwaysNotify = val;
+	else
+	{
+		return Controllable::setAttributeInternal(param, val);
+	}
+
+	return true;
 }
 
 StringArray Parameter::getValidAttributes() const
