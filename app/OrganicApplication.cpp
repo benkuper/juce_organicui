@@ -62,11 +62,15 @@ void OrganicApplication::initialise(const String& commandLine)
 
 	CommandLineElements commands = StringUtil::parseCommandLine(commandLine);
 
+	bool forceGL = false;
+	bool forceNoGL = false;
 	for (auto& c : commands)
 	{
 		if (c.command == "r") clearGlobalSettings();
 		else if (c.command == "c") launchedFromCrash = true;
 		if (c.command == "headless") useWindow = false;
+		if (c.command == "forceGL") forceGL = true;
+		else if (c.command == "forceNoGL") forceNoGL = true;
 	}
 
 	if (Desktop::getInstance().isHeadless()) useWindow = false;
@@ -75,6 +79,9 @@ void OrganicApplication::initialise(const String& commandLine)
 
 	var gs = JSON::fromString(getAppProperties().getUserSettings()->getValue("globalSettings", ""));
 	GlobalSettings::getInstance()->loadJSONData(gs);
+
+	if (forceGL) GlobalSettings::getInstance()->useGLRenderer->setValue(true);
+	else if (forceNoGL) GlobalSettings::getInstance()->useGLRenderer->setValue(false);
 
 
 	engine->addAsyncEngineListener(this);
@@ -181,7 +188,7 @@ void OrganicApplication::anotherInstanceStarted(const String& commandLine)
 	mainWindow->setAlwaysOnTop(true);
 	mainWindow->grabKeyboardFocus();
 	mainWindow->setAlwaysOnTop(false);
-	
+
 }
 
 
@@ -221,7 +228,7 @@ void OrganicApplication::newMessage(const AppUpdateEvent& e)
 #if JUCE_MAC
 			chmod(File::getSpecialLocation(File::currentExecutableFile).getFullPathName().toUTF8(), S_IRWXO | S_IRWXU | S_IRWXG);
 #endif
-		}
+	}
 		else
 		{
 			File appFile = File::getSpecialLocation(File::tempDirectory).getChildFile(getApplicationName() + String("_install" + e.file.getFileExtension()));
@@ -234,7 +241,7 @@ void OrganicApplication::newMessage(const AppUpdateEvent& e)
 	break;
 
 	default: break;
-	}
+}
 }
 
 void OrganicApplication::clearGlobalSettings()
