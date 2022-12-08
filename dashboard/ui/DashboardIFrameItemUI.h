@@ -19,7 +19,8 @@ public:
 
     DashboardIFrameItem* iFrameItem;
 
-#if JUCE_WINDOWS
+
+#if JUCE_WINDOWS && RPI_SAFEMODE
     WindowsWebView2WebBrowserComponent web;
 #else
     WebBrowserComponent web;
