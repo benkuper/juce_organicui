@@ -111,8 +111,10 @@ void BaseManagerViewMiniPane<M, T, U>::paintItem(juce::Graphics &g, U* ui)
 
 	juce::Rectangle<float> uiPaneBounds(bTopLeft, bBottomRight);
 
-	g.setColour(Colours::white.withAlpha(.3f));
+	g.setColour(ui->item->itemColor->getColor().brighter(.2f).withAlpha(.6f));
 	g.fillRect(uiPaneBounds);
+	g.setColour(ui->item->itemColor->getColor().brighter(.5f).withAlpha(.8f));
+	g.drawRect(uiPaneBounds);
 }
 
 template<class M, class T, class U>

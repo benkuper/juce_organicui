@@ -15,6 +15,8 @@ DashboardItem::DashboardItem(Inspectable* _target, const String& name) :
 {
 	useCustomArrowKeysBehaviour = true;
 
+	isVisible = addBoolParameter("Is Visible", "Should this item be visible", true);
+
 	hideInEditor = true;
 	viewUIPosition->hideInEditor = false;
 	viewUISize->hideInEditor = false;

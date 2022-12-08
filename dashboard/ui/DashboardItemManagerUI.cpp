@@ -105,6 +105,16 @@ void DashboardItemManagerUI::paintOverChildren(Graphics& g)
 	}
 }
 
+
+bool DashboardItemManagerUI::checkItemShouldBeVisible(BaseItemMinimalUI<DashboardItem>* ui)
+{
+	if (ui == nullptr) return false;
+	if (ui->item == nullptr) return false;
+	if (!ui->item->isVisible->boolValue()) return false;
+
+	return BaseManagerViewUI::checkItemShouldBeVisible(ui);
+}
+
 bool DashboardItemManagerUI::isInterestedInDragSource(const SourceDetails& dragSourceDetails)
 {
 	return true;
@@ -211,6 +221,13 @@ void DashboardItemManagerUI::newMessage(const ContainerAsyncEvent& e)
 		else if (e.targetControllable == manager->bgColor || e.targetControllable == manager->bgImageAlpha || e.targetControllable == manager->bgImageScale || e.targetControllable == manager->canvasSize)
 		{
 			repaint();
+		}
+		else if (DashboardItem* i = dynamic_cast<DashboardItem*>(e.targetControllable->parentContainer.get()))
+		{
+			if (e.targetControllable == i->isVisible)
+			{
+				updateItemVisibility(getUIForItem(i));
+			}
 		}
 
 		break;

@@ -30,6 +30,8 @@ public:
 	virtual void paint(Graphics& g) override;
 	virtual void paintOverChildren(Graphics& g) override;
 
+	virtual bool checkItemShouldBeVisible(BaseItemMinimalUI<DashboardItem>* se) override;
+
 	bool isInterestedInDragSource(const SourceDetails & dragSourceDetails) override;
 	void itemDropped(const SourceDetails &details) override;
 
