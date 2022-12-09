@@ -7,6 +7,8 @@ BaseItemEditor::BaseItemEditor(Array<BaseItem*> bi, bool isRoot) :
 	jassert(items.size() > 0);
 	item = items[0];
 
+
+
 	if (item->userCanRemove)
 	{
 		removeBT.reset(AssetManager::getInstance()->getRemoveBT());
@@ -47,6 +49,12 @@ BaseItemEditor::BaseItemEditor(Array<BaseItem*> bi, bool isRoot) :
 		}
 
 	}
+
+	if (item->canBeReorderedInEditor && !isRoot)
+	{
+		setDragAndDropEnabled(true);
+	}
+
 }
 
 BaseItemEditor::~BaseItemEditor()
@@ -68,6 +76,8 @@ BaseItemEditor::~BaseItemEditor()
 
 void BaseItemEditor::resizedInternalHeader(juce::Rectangle<int>& r)
 {
+	if (r.getWidth() == 0) return;
+
 	int targetHeight = jmin<int>(r.getHeight(), 20);
 
 	if (item->userCanRemove && removeBT != nullptr)

@@ -27,4 +27,6 @@ public:
 	void addUndoableMoveAction(Array<UndoableAction*>& actions) override;
 
 	int gradientIndex;
+
+	DECLARE_TYPE("GradientColor");
 };

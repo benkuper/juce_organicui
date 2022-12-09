@@ -27,5 +27,7 @@ public:
 	void mouseDown(const MouseEvent& e) override;
 	void mouseDrag(const MouseEvent &e) override;
 
+	virtual void setDragDetails(var& details) override;
+
 	void childBoundsChanged(Component* c) override;
 };

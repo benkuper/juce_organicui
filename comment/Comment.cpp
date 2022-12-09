@@ -11,7 +11,6 @@
 CommentItem::CommentItem() :
 	BaseItem("Comment", false)
 {
-	itemDataType = "Comment";
 	text = addStringParameter("Text", "The comment text", "I Love "+ OrganicApplication::getInstance()->getApplicationName()+ " !");
 	text->multiline = true;
 

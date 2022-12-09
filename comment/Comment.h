@@ -21,5 +21,5 @@ public:
 	FloatParameter * size;
 	FloatParameter * bgAlpha;
 
-	String getTypeString() const override { return "Comment"; }
+	DECLARE_TYPE("Comment");
 };

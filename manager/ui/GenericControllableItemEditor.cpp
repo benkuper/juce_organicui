@@ -15,10 +15,12 @@ GenericControllableItemEditor::GenericControllableItemEditor(GenericControllable
 {
 	contourColor = Colours::transparentBlack;
 
+	containerLabel.setVisible(false);
+
 	if (gci->controllable != nullptr)
 	{
 		controllableEditor.reset((ControllableEditor*)gci->controllable->getEditor(false));
-		controllableEditor->setShowLabel(false);
+		//controllableEditor->setShowLabel(false);
 		addAndMakeVisible(controllableEditor.get());
 	}
 
@@ -49,10 +51,10 @@ void GenericControllableItemEditor::paint(juce::Graphics& g)
 
 void GenericControllableItemEditor::resizedInternalHeaderItemInternal(juce::Rectangle<int>& r)
 {
-	int labelWidth = containerLabel.getWidth();
-	r.removeFromLeft(jmax(160 - labelWidth, 0));
-	r.translate(0, 1);
-	controllableEditor->setBounds(r.withHeight(controllableEditor->getHeight()).reduced(1, 0));
+	//int labelWidth = containerLabel.getWidth();
+	//r.removeFromLeft(jmax(160 - labelWidth, 0));
+	//r.translate(0, 1);
+	controllableEditor->setBounds(r);// .withHeight(controllableEditor->getHeight()).reduced(1, 0));
 }
 
 void GenericControllableItemEditor::resetAndBuild()
@@ -90,6 +92,12 @@ void GenericControllableItemEditor::mouseDrag(const MouseEvent& e)
 	//{
 	//	BaseItemEditor::mouseDrag(e);
 	//}
+}
+
+void GenericControllableItemEditor::setDragDetails(var& details)
+{
+	details.getDynamicObject()->setProperty("type", controllableEditor->controllable->getTypeString());
+	details.getDynamicObject()->setProperty("dataType", "Controllable");// item->itemDataType);
 }
 
 void GenericControllableItemEditor::childBoundsChanged(Component* c)

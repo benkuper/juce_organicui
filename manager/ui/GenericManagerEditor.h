@@ -58,6 +58,9 @@ public:
 
 	void buttonClicked(Button*) override;
 
+	virtual InspectableEditor* addEditorUI(ControllableContainer* cc, bool resize = false) override;
+	virtual void removeEditorUI(InspectableEditor* i, bool resize = false) override;
+
 	void newMessage(const typename BaseManager<T>::ManagerEvent& e) override;
 
 	virtual void itemAddedAsync(T* item) {}
@@ -161,8 +164,13 @@ void GenericManagerEditor<T>::paint(Graphics& g)
 				juce::Rectangle<int> buiBounds = getLocalArea(bui, bui->getLocalBounds());
 
 				int ty = currentDropIndex >= 0 ? buiBounds.getY() - 1 : buiBounds.getBottom() + 1;
-				g.drawLine(getWidth()*.25f, ty, getWidth()*.75f, ty, 2);
+				g.drawLine(getWidth() * .25f, ty, getWidth() * .75f, ty, 2);
 			}
+		}
+		else
+		{
+			int ty = this->getContentBounds().getY();
+			g.drawLine(getWidth() * .25f, ty, getWidth() * .75f, ty, 2);
 		}
 	}
 }
@@ -259,6 +267,21 @@ void GenericManagerEditor<T>::buttonClicked(Button* b)
 	}
 }
 
+template<class T>
+InspectableEditor* GenericManagerEditor<T>::addEditorUI(ControllableContainer* cc, bool resize)
+{
+	InspectableEditor* ui = EnablingControllableContainerEditor::addEditorUI(cc, resize);
+	if (BaseItemEditor* bui = dynamic_cast<BaseItemEditor*>(ui)) itemEditors.addIfNotAlreadyThere(bui);
+	return ui;
+}
+
+template<class T>
+void GenericManagerEditor<T>::removeEditorUI(InspectableEditor* ui, bool resize)
+{
+	if (BaseItemEditor* bui = dynamic_cast<BaseItemEditor*>(ui)) itemEditors.removeAllInstancesOf(bui);
+	EnablingControllableContainerEditor::removeEditorUI(ui, resize);
+}
+
 
 template<class T>
 void GenericManagerEditor<T>::newMessage(const typename BaseManager<T>::ManagerEvent& e)
@@ -268,14 +291,18 @@ void GenericManagerEditor<T>::newMessage(const typename BaseManager<T>::ManagerE
 	case BaseManager<T>::ManagerEvent::ITEM_ADDED:
 		setCollapsed(false, true);
 		itemAddedAsync(e.getItem());
+		if (BaseItemEditor* bui = dynamic_cast<BaseItemEditor*>(getEditorForInspectable(e.getItem()))) itemEditors.addIfNotAlreadyThere(bui);
 		resized();
 		break;
 
 	case BaseManager<T>::ManagerEvent::ITEM_REMOVED:
 		itemRemovedAsync(e.getItem());
+		if (BaseItemEditor* bui = dynamic_cast<BaseItemEditor*>(getEditorForInspectable(e.getItem()))) itemEditors.removeAllInstancesOf(bui);
 		resized();
 		break;
 
+	case BaseManager<T>::ManagerEvent::ITEMS_ADDED:
+	case BaseManager<T>::ManagerEvent::ITEMS_REMOVED:
 	case BaseManager<T>::ManagerEvent::ITEMS_REORDERED:
 		resetAndBuild();
 		break;
@@ -289,7 +316,9 @@ void GenericManagerEditor<T>::newMessage(const typename BaseManager<T>::ManagerE
 template<class T>
 bool GenericManagerEditor<T>::isInterestedInDragSource(const SourceDetails& dragSourceDetails)
 {
-	if (acceptedDropTypes.contains(dragSourceDetails.description.getProperty("dataType", "").toString())) return true;
+	String dataType = dragSourceDetails.description.getProperty("dataType", "").toString();
+	String type = dragSourceDetails.description.getProperty("type", "").toString();
+	if (acceptedDropTypes.contains(dataType) || acceptedDropTypes.contains(type)) return true;
 
 	BaseItemEditor* itemUI = dynamic_cast<BaseItemEditor*>(dragSourceDetails.sourceComponent.get());
 	if (itemEditors.contains(itemUI)) return true;
@@ -330,30 +359,32 @@ void GenericManagerEditor<T>::itemDropped(const SourceDetails& dragSourceDetails
 	{
 		if (BaseItem* item = bui->item)
 		{
+			T* tItem = static_cast<T*>(item);
 			int droppingIndex = getDropIndexForPosition(dragSourceDetails.localPosition);
+
 			if (itemEditors.contains(bui))
 			{
-				T* tItem = static_cast<T*>(item);
 				if (itemEditors.indexOf(bui) < droppingIndex) droppingIndex--;
 				if (droppingIndex == -1) droppingIndex = itemEditors.size() - 1;
 				this->manager->setItemIndex(tItem, droppingIndex);
 			}
-			//else
-			//{
-			//	var data = item->getJSONData();
-			//	if (droppingIndex != -1) data.getDynamicObject()->setProperty("index", droppingIndex);
+			else
+			{
+				var data = item->getJSONData();
+				if (droppingIndex != -1) data.getDynamicObject()->setProperty("index", droppingIndex);
 
-			//	if (T* newItem = this->manager->createItemFromData(data))
-			//	{
-			//		Array<UndoableAction*> actions;
-			//		actions.add(this->manager->getAddItemUndoableAction(newItem, data));
-			//		if (BaseManager<T>* sourceManager = dynamic_cast<BaseManager<T> *>(item->parentContainer.get()))
-			//		{
-			//			actions.addArray(sourceManager->getRemoveItemUndoableAction(item));
-			//		}
-			//		UndoMaster::getInstance()->performActions("Move " + item->niceName, actions);
-			//	}
-			//}
+				if (T* newItem = this->manager->createItemFromData(data))
+				{
+					Array<UndoableAction*> actions;
+					actions.add(this->manager->getAddItemUndoableAction(newItem, data));
+					if (BaseManager<T>* sourceManager = dynamic_cast<BaseManager<T> *>(tItem->parentContainer.get()))
+					{
+						actions.addArray(sourceManager->getRemoveItemUndoableAction(tItem));
+					}
+
+					UndoMaster::getInstance()->performActions("Move " + item->niceName, actions);
+				}
+			}
 		}
 	}
 

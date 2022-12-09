@@ -18,7 +18,6 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(Array<Con
 	contourColor(BG_COLOR.brighter(.3f)),
 	containerLabel("containerLabel", dynamic_cast<ControllableContainer*>(inspectable.get())->niceName),
 	containers(containers),
-	headerSpacer("headerSpacer"),
 	dragAndDropEnabled(false)
 {
 	jassert(containers.size() > 0);
@@ -63,7 +62,7 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(Array<Con
 		addAndMakeVisible(removeBT.get());
 	}
 
-	setDragAndDropEnabled(true);
+	//setDragAndDropEnabled(true);
 
 	if (canBeCollapsed())
 	{
@@ -79,11 +78,6 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(Array<Con
 		collapseBT->setWantsKeyboardFocus(false);
 		expandBT->setMouseClickGrabsKeyboardFocus(false);
 		collapseBT->setMouseClickGrabsKeyboardFocus(false);
-
-		addAndMakeVisible(headerSpacer);
-		headerSpacer.addMouseListener(this, false);
-
-
 
 		collapseAnimator.addChangeListener(this);
 
@@ -133,7 +127,7 @@ void GenericControllableContainerEditor::mouseUp(const MouseEvent& e)
 {
 	if (e.mods.isLeftButtonDown())
 	{
-		if (e.originalComponent == &headerSpacer || (isRoot && e.eventComponent == this && e.getMouseDownY() < headerHeight))
+		if ((e.eventComponent == this && !dragRect.contains(e.getMouseDownPosition())) || (isRoot && e.eventComponent == this && e.getMouseDownY() < headerHeight))
 		{
 			if (e.mods.isShiftDown()) toggleCollapsedChildren();
 			else setCollapsed(!container->editorIsCollapsed);
@@ -149,7 +143,9 @@ void GenericControllableContainerEditor::mouseDrag(const MouseEvent& e)
 {
 	InspectableEditor::mouseDrag(e);
 
-	if (dragAndDropEnabled && (e.eventComponent->getY() < headerHeight || dragRect.contains(e.getMouseDownPosition())))
+	if (!dragAndDropEnabled) return;
+
+	if (dragRect.contains(e.getMouseDownPosition()) || (e.eventComponent == this && e.getMouseDownPosition().y < headerHeight))
 	{
 		if (e.getDistanceFromDragStart() > 30)
 		{
@@ -169,14 +165,16 @@ void GenericControllableContainerEditor::setDragAndDropEnabled(bool value)
 
 	dragAndDropEnabled = value;
 
-	for (auto& e : childEditors)
-	{
-		GenericControllableContainerEditor* gce = dynamic_cast<GenericControllableContainerEditor*>(e);
-		if (gce != nullptr) setDragAndDropEnabled(value);
+	//for (auto& e : childEditors)
+	//{
+	//	GenericControllableContainerEditor* gce = dynamic_cast<GenericControllableContainerEditor*>(e);
+	//	if (gce != nullptr) setDragAndDropEnabled(value);
 
-		ControllableEditor* ce = dynamic_cast<ControllableEditor*>(e);
-		if (ce != nullptr) ce->dragAndDropEnabled = value;
-	}
+	//	ControllableEditor* ce = dynamic_cast<ControllableEditor*>(e);
+	//	if (ce != nullptr) ce->dragAndDropEnabled = value;
+	//}
+
+	resized();
 }
 
 void GenericControllableContainerEditor::showContextMenu()
@@ -378,8 +376,8 @@ InspectableEditor* GenericControllableContainerEditor::addEditorUI(ControllableC
 
 	InspectableEditor* ccui = getEditorUIForContainer(cc);
 
-	GenericControllableContainerEditor* gce = dynamic_cast<GenericControllableContainerEditor*>(ccui);
-	if (gce != nullptr) gce->setDragAndDropEnabled(dragAndDropEnabled);
+	//GenericControllableContainerEditor* gce = dynamic_cast<GenericControllableContainerEditor*>(ccui);
+	//if (gce != nullptr) gce->setDragAndDropEnabled(dragAndDropEnabled);
 
 	int index = container->controllableContainers.indexOf(cc);
 	childEditors.insert(container->controllables.size() + index, ccui);
@@ -613,6 +611,7 @@ void GenericControllableContainerEditor::paint(Graphics& g)
 void GenericControllableContainerEditor::resized()
 {
 	juce::Rectangle<int> r = getLocalBounds();
+
 	isRebuilding = true;
 	resizedInternal(r);
 	isRebuilding = false;
@@ -675,8 +674,6 @@ void GenericControllableContainerEditor::resizedInternalHeader(juce::Rectangle<i
 	}
 
 	if (containerLabel.isVisible()) containerLabel.setBounds(r.removeFromLeft(containerLabel.getFont().getStringWidth(containerLabel.getText()) + 20));
-
-	headerSpacer.setBounds(r);
 }
 
 void GenericControllableContainerEditor::resizedInternalContent(juce::Rectangle<int>& r)

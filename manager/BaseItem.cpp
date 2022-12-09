@@ -24,6 +24,8 @@ BaseItem::BaseItem(const String& name, bool _canBeDisabled, bool _canHaveScripts
 	itemDataType(""),
 	isClearing(false)
 {
+	itemDataType = getTypeString();
+
 	saveAndLoadName = true;
 	nameCanBeChangedByUser = true;
 
