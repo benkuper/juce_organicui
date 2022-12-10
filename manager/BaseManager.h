@@ -579,7 +579,10 @@ Array<T*> BaseManager<T>::addItemsFromClipboard(bool showWarning)
 template<class T>
 bool BaseManager<T>::canAddItemOfType(const String& typeToCheck)
 {
-	return typeToCheck == itemDataType;
+	if (typeToCheck == itemDataType) return true;
+	if (this->managerFactory != nullptr && this->managerFactory->hasDefinitionWithType(typeToCheck)) return true;
+
+	return false;
 }
 
 template<class T>

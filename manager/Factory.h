@@ -209,5 +209,15 @@ public:
 		return def->create();
 	}
 
+	bool hasDefinitionWithType(const String& type)
+	{
+		for (auto& d : defs)
+		{
+			if (d->type == type) return true;
+		}
+
+		return false;
+	}
+
 	typedef FactorySimpleParametricDefinition<T> Definition;
 };

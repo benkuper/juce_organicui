@@ -24,7 +24,7 @@ BaseItem::BaseItem(const String& name, bool _canBeDisabled, bool _canHaveScripts
 	itemDataType(""),
 	isClearing(false)
 {
-	itemDataType = getTypeString();
+	//itemDataType = getTypeString();
 
 	saveAndLoadName = true;
 	nameCanBeChangedByUser = true;
@@ -91,7 +91,7 @@ void BaseItem::duplicate()
 void BaseItem::copy()
 {
 	var data = getJSONData();
-	data.getDynamicObject()->setProperty("itemType", itemDataType);
+	data.getDynamicObject()->setProperty("itemType", itemDataType.isNotEmpty() ? itemDataType : getTypeString());
 	SystemClipboard::copyTextToClipboard(JSON::toString(data));
 	NLOG(niceName, "Copied to clipboard");
 }

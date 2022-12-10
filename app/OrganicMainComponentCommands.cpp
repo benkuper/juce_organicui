@@ -500,7 +500,7 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 		if (!items.isEmpty())
 		{
 			var data = new DynamicObject();
-			data.getDynamicObject()->setProperty("itemType", items[0]->itemDataType);
+			data.getDynamicObject()->setProperty("itemType", items[0]->itemDataType.isNotEmpty() ? items[0]->itemDataType : items[0]->getTypeString());
 
 			var itemsData = var();
 			for (auto& i : items)
