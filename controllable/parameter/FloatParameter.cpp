@@ -47,7 +47,7 @@ TimeLabel* FloatParameter::createTimeLabelParameter(Array<Parameter*> parameters
 ControllableUI* FloatParameter::createDefaultUI(Array<Controllable*> controllables) {
 	UIType t = customUI != NONE ? customUI : defaultUI;
 
-	bool hasFullRange = ((double)minimumValue != INT32_MIN && (double)maximumValue != INT32_MAX);
+	bool hasFullRange = ((float)minimumValue != INT32_MIN && (float)maximumValue != INT32_MAX);
 	if (t == NONE) t = hasFullRange ? SLIDER : LABEL;
 
 	Array<Parameter*> parameters = getArrayAs<Controllable, Parameter>(controllables);
