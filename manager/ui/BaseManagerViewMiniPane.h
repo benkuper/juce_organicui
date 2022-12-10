@@ -1,16 +1,16 @@
 ﻿template<class M, class T, class U>
 class BaseManagerViewUI;
-	
+
 template<class M, class T, class U>
 class BaseManagerViewMiniPane :
-		public Component,
-		public Timer
+	public Component,
+	public Timer
 {
 public:
-	BaseManagerViewMiniPane(BaseManagerViewUI<M,T,U> * managerUI);
+	BaseManagerViewMiniPane(BaseManagerViewUI<M, T, U>* managerUI);
 	virtual ~BaseManagerViewMiniPane() {}
 
-	BaseManagerViewUI<M, T, U> * managerUI;
+	BaseManagerViewUI<M, T, U>* managerUI;
 	ComponentAnimator ca;
 
 	juce::Rectangle<float> paneViewBounds;
@@ -20,10 +20,18 @@ public:
 
 	virtual void paint(juce::Graphics& g) override;
 	virtual void paintInternal(juce::Graphics& g) {}
-	virtual void paintItem(juce::Graphics&g, U * ui);
-	
+	virtual void paintItem(juce::Graphics& g, U* ui);
+
+	virtual void mouseEnter(const MouseEvent& e) override;
+	virtual void mouseExit(const MouseEvent& e) override;
+	virtual void mouseDown(const MouseEvent& e) override;
+	virtual void mouseDrag(const MouseEvent& e) override;
+
+	void updatePositionFromMouse();
+
 	juce::Point<float> getPanePosForUIPos(Point<int> viewPoint);
 	juce::Point<float> getPanePosForViewPos(Point<float> viewPoint);
+	juce::Point<float> getViewPosForPanePos(Point<float> panePoint);
 
 	virtual void resized() override;
 	virtual void updateContent();
@@ -33,11 +41,11 @@ public:
 };
 
 template<class M, class T, class U>
-BaseManagerViewMiniPane<M, T, U>::BaseManagerViewMiniPane(BaseManagerViewUI<M, T, U> * managerUI) :
+BaseManagerViewMiniPane<M, T, U>::BaseManagerViewMiniPane(BaseManagerViewUI<M, T, U>* managerUI) :
 	managerUI(managerUI),
 	showTime(1.5f)
 {
-	setAlpha(0);
+	setAlpha(.1f);
 	setOpaque(false);
 	setInterceptsMouseClicks(true, true);
 }
@@ -66,8 +74,8 @@ void BaseManagerViewMiniPane<M, T, U>::paint(juce::Graphics& g)
 
 	juce::Rectangle<int> r = getLocalBounds();
 
-	float itemsRatio = paneViewBounds.getWidth()*1.0f / paneViewBounds.getHeight();
-	float ratio = r.getWidth()*1.0f / r.getHeight();
+	float itemsRatio = paneViewBounds.getWidth() * 1.0f / paneViewBounds.getHeight();
+	float ratio = r.getWidth() * 1.0f / r.getHeight();
 
 	if (itemsRatio > ratio)
 	{
@@ -102,7 +110,44 @@ void BaseManagerViewMiniPane<M, T, U>::paint(juce::Graphics& g)
 }
 
 template<class M, class T, class U>
-void BaseManagerViewMiniPane<M, T, U>::paintItem(juce::Graphics &g, U* ui)
+void BaseManagerViewMiniPane<M, T, U>::mouseEnter(const juce::MouseEvent& e)
+{
+	updateContent();
+	stopTimer();
+}
+
+template<class M, class T, class U>
+void BaseManagerViewMiniPane<M, T, U>::mouseExit(const juce::MouseEvent& e)
+{
+	startTimer(showTime * 1000);
+}
+
+template<class M, class T, class U>
+void BaseManagerViewMiniPane<M, T, U>::mouseDown(const juce::MouseEvent& e)
+{
+	updatePositionFromMouse();
+}
+
+
+template<class M, class T, class U>
+void BaseManagerViewMiniPane<M, T, U>::mouseDrag(const juce::MouseEvent& e)
+{
+	updatePositionFromMouse();
+}
+
+template<class M, class T, class U>
+void BaseManagerViewMiniPane<M, T, U>::updatePositionFromMouse()
+{
+	Point<float> p = this->getViewPosForPanePos(this->getMouseXYRelative().toFloat());
+	this->managerUI->manager->viewOffset = -p.toInt();
+	this->managerUI->resized();
+	this->managerUI->repaint();
+}
+
+
+
+template<class M, class T, class U>
+void BaseManagerViewMiniPane<M, T, U>::paintItem(juce::Graphics& g, U* ui)
 {
 	juce::Rectangle<int> b = ui->getBoundsInParent();
 
@@ -124,17 +169,31 @@ juce::Point<float> BaseManagerViewMiniPane<M, T, U>::getPanePosForUIPos(Point<in
 
 	return juce::Point<float>(
 		jmap<float>(uiPos.x, paneRealBounds.getX(), paneRealBounds.getRight(), r.getX(), r.getRight()),
-		jmap<float>(uiPos.y, paneRealBounds.getY(), paneRealBounds.getBottom(), r.getY(), r.getBottom()));
+		jmap<float>(uiPos.y, paneRealBounds.getY(), paneRealBounds.getBottom(), r.getY(), r.getBottom())
+		);
 }
 
 template<class M, class T, class U>
 juce::Point<float> BaseManagerViewMiniPane<M, T, U>::getPanePosForViewPos(Point<float> viewPos)
 {
 	juce::Rectangle<float> r = getLocalBounds().toFloat();
-	
+
 	return juce::Point<float>(
 		jmap<float>(viewPos.x, paneViewBounds.getX(), paneViewBounds.getRight(), r.getX(), r.getRight()),
-		jmap<float>(viewPos.y, paneViewBounds.getY(), paneViewBounds.getBottom(), r.getY(), r.getBottom()));
+		jmap<float>(viewPos.y, paneViewBounds.getY(), paneViewBounds.getBottom(), r.getY(), r.getBottom())
+		);
+
+}
+
+template<class M, class T, class U>
+juce::Point<float> BaseManagerViewMiniPane<M, T, U>::getViewPosForPanePos(Point<float> panePos)
+{
+	juce::Rectangle<float> r = getLocalBounds().toFloat();
+
+	return juce::Point<float>(
+		jmap<float>(panePos.x, r.getX(), r.getRight(), paneViewBounds.getX(), paneViewBounds.getRight()),
+		jmap<float>(panePos.y, r.getY(), r.getBottom(), paneViewBounds.getY(), paneViewBounds.getBottom())
+		);
 
 }
 
@@ -152,14 +211,12 @@ void BaseManagerViewMiniPane<M, T, U>::updateContent()
 		ca.fadeIn(this, 200);
 	}
 
-	stopTimer();
-	startTimer(showTime*1000);
-
+	if(!isMouseOverOrDragging()) startTimer(showTime * 1000);
 	repaint();
 }
 template<class M, class T, class U>
 void BaseManagerViewMiniPane<M, T, U>::timerCallback()
 {
-	ca.fadeOut(this, 200);
+	ca.animateComponent(this, getBounds(), .1f, 200, false, 1, 1);
 	stopTimer();
 }

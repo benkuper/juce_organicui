@@ -198,8 +198,16 @@ void BaseManagerViewUI<M, T, U>::mouseDrag(const MouseEvent& e)
 	{
 		this->manager->viewOffset = initViewOffset + e.getOffsetFromDragStart();
 		updateItemsVisibility();
+
 		this->resized();
 		this->repaint();
+
+		if (viewPane != nullptr)
+		{
+			viewPane->updateContent();
+			viewPane->toFront(false);
+		}
+
 	}
 	else if (ResizableCornerComponent* r = dynamic_cast<ResizableCornerComponent*>(e.eventComponent))
 	{
@@ -387,7 +395,7 @@ void BaseManagerViewUI<M, T, U>::resized()
 
 	if (viewPane != nullptr)
 	{
-		int size = jlimit(50, 200, jmin(r.getWidth() / 5, r.getHeight() / 5) - 20);
+		int size = jlimit(50, 300, jmax(r.getWidth() / 5, r.getHeight() / 5) - 20);
 		viewPane->setBounds(r.translated(-10, -10).removeFromRight(size).removeFromBottom(size));
 	}
 
@@ -430,28 +438,42 @@ void BaseManagerViewUI<M, T, U>::updateItemsVisibility()
 {
 	//BaseManagerUI::updateItemsVisibility();
 
+	bool hasChanged = false;
+
 	juce::Rectangle<int> r = this->getLocalBounds();
 	for (auto& iui : this->itemsUI)
 	{
 		if (!this->checkFilterForItem(iui))
 		{
-			iui->setVisible(false);
+			if (iui->isVisible())
+			{
+				iui->setVisible(false);
+				hasChanged = true;
+			}
 			continue;
 		};
 
 		if (!this->checkItemShouldBeVisible(iui))
 		{
-			iui->setVisible(false);
+			if (iui->isVisible())
+			{
+				iui->setVisible(false);
+				hasChanged = true;
+			}
 			continue;
 		}
 
 		juce::Rectangle<int> iuiB = iui->getBoundsInParent();
 		juce::Rectangle<int> ir = iuiB.getIntersection(r);
 		bool isInsideInspectorBounds = !ir.isEmpty();
-		iui->setVisible(isInsideInspectorBounds);
+		if (iui->isVisible() != isInsideInspectorBounds)
+		{
+			iui->setVisible(isInsideInspectorBounds);
+			hasChanged = true;
+		}
 	}
 
-	if (viewPane != nullptr)
+	if (hasChanged && viewPane != nullptr)
 	{
 		viewPane->updateContent();
 		viewPane->toFront(false);
