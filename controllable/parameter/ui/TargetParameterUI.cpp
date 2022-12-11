@@ -8,7 +8,7 @@
   ==============================================================================
 */
 
-#include "juce_organicui/juce_organicui.h"
+#include "JuceHeader.h"
 
 TargetParameterUI::TargetParameterUI(Array<TargetParameter*> parameters, const String& _noTargetText) :
 	ParameterUI(Inspectable::getArrayAs<TargetParameter, Parameter>(parameters)),
@@ -139,7 +139,7 @@ void TargetParameterUI::updateLabel()
 
 					if (!shouldShowLabel)
 					{
-						stepsUI.add(new TargetStepButton(targetParameter->target->niceName, nullptr));
+						stepsUI.add(new TargetStepButton(targetParameter->target->niceName, targetParameter->target->parentContainer));
 					}
 
 					newText += targetParameter->target->niceName;
@@ -171,7 +171,7 @@ void TargetParameterUI::updateLabel()
 						while (cc != nullptr && (curPLevel < defaultLevel || cc->skipLabelInTarget))
 						{
 							if (curPLevel > 0 || cc->skipLabelInTarget) cc = cc->parentContainer;
-							if (cc == nullptr || cc == Engine::mainEngine) break;
+							if (cc == nullptr || cc == Engine::mainEngine || cc == targetParameter->rootContainer) break;
 							if (cc->skipLabelInTarget) continue;
 
 							if (!shouldShowLabel) stepsUI.insert(0, new TargetStepButton(cc->niceName + " >", cc));
@@ -329,8 +329,13 @@ void TargetParameterUI::buttonClicked(Button* b)
 			{
 
 				ControllableContainer* ref = stepsUI[i]->reference != nullptr ? stepsUI[i]->reference->parentContainer : nullptr;
-				if (ref == nullptr && targetParameter->target != nullptr) ref = targetParameter->target->parentContainer;
-				while (ref != nullptr && ref->skipLabelInTarget) ref = ref->parentContainer;
+				if (ref == nullptr)
+				{
+					if (targetParameter->target != nullptr) ref = targetParameter->target->parentContainer;
+					else if (targetParameter->targetContainer != nullptr) ref = targetParameter->targetContainer->parentContainer;
+				}
+
+				//while (ref != nullptr && /*ref->skipLabelInTarget &&*/ ref != targetParameter->rootContainer) ref = ref->parentContainer;
 				showPopupAndGetTarget(ref);
 			}
 		}
