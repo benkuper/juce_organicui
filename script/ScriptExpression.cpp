@@ -8,12 +8,13 @@ Author:  Ben
 ==============================================================================
 */
 
+#include "JuceHeader.h"
 
 ScriptExpression::ScriptExpression() :
 	Thread("ScriptExpression"),
-    state(EXPRESSION_EMPTY)
+	state(EXPRESSION_EMPTY)
 {
-	if(Engine::mainEngine != nullptr) Engine::mainEngine->addScriptTargetListener(this);
+	if (Engine::mainEngine != nullptr) Engine::mainEngine->addScriptTargetListener(this);
 }
 
 ScriptExpression::~ScriptExpression()
@@ -26,7 +27,7 @@ ScriptExpression::~ScriptExpression()
 		Engine::mainEngine->removeScriptTargetListener(this);
 	}
 
-	for (auto &p : linkedParameters)
+	for (auto& p : linkedParameters)
 	{
 		if (p.wasObjectDeleted()) continue;
 		p->removeInspectableListener(this);
@@ -35,7 +36,7 @@ ScriptExpression::~ScriptExpression()
 	linkedParameters.clear();
 }
 
-void ScriptExpression::setExpression(const String & newExpression)
+void ScriptExpression::setExpression(const String& newExpression)
 {
 	if (Engine::mainEngine == nullptr)
 	{
@@ -49,7 +50,7 @@ void ScriptExpression::setExpression(const String & newExpression)
 		state = EXPRESSION_EMPTY;
 		return;
 	}
-	
+
 	expression = newExpression;
 
 	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile)
@@ -68,7 +69,7 @@ void ScriptExpression::setExpression(const String & newExpression)
 		if (expression.contains("getTime()"))
 		{
 			DBG("Start expression timer because expression uses getTime()");
-			startThread(); 
+			startThread();
 		}
 
 	}
@@ -76,11 +77,11 @@ void ScriptExpression::setExpression(const String & newExpression)
 
 void ScriptExpression::evaluate(bool resetListeners)
 {
-	Result result = Result::ok();
+	juce::Result result = juce::Result::ok();
 
 	if (resetListeners)
 	{
-		for (auto &p : linkedParameters)
+		for (auto& p : linkedParameters)
 		{
 			if (p.wasObjectDeleted()) continue;
 			p->removeInspectableListener(this);
@@ -89,7 +90,7 @@ void ScriptExpression::evaluate(bool resetListeners)
 		linkedParameters.clear();
 	}
 
-	var resultValue = scriptEngine->evaluate(expression,&result);
+	var resultValue = scriptEngine->evaluate(expression, &result);
 
 	if (result.getErrorMessage().isEmpty())
 	{
@@ -99,8 +100,8 @@ void ScriptExpression::evaluate(bool resetListeners)
 
 			if (resetListeners)
 			{
-				Array<Parameter *> pList = getParameterReferencesInExpression();
-				for (auto &p : pList)
+				Array<Parameter*> pList = getParameterReferencesInExpression();
+				for (auto& p : pList)
 				{
 					p->addParameterListener(this);
 					p->addInspectableListener(this);
@@ -108,10 +109,11 @@ void ScriptExpression::evaluate(bool resetListeners)
 					LOG("Detected reference in expression to parameter : " << p->niceName);
 				}
 			}
-			
+
 			expressionListeners.call(&ExpressionListener::expressionValueChanged, this);
- 		}
-	} else
+		}
+	}
+	else
 	{
 		LOG("Expression error :\n" + result.getErrorMessage());
 		setState(EXPRESSION_ERROR);
@@ -151,7 +153,7 @@ void ScriptExpression::setState(ExpressionState newState)
 	//scriptAsyncNotifier.addMessage(new ScriptEvent(ScriptEvent::STATE_CHANGE));
 }
 
-void ScriptExpression::scriptObjectUpdated(ScriptTarget *)
+void ScriptExpression::scriptObjectUpdated(ScriptTarget*)
 {
 	//if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile) return;
 
@@ -171,29 +173,29 @@ void ScriptExpression::endLoadFile()
 Array<Parameter*> ScriptExpression::getParameterReferencesInExpression()
 {
 	Array<Parameter*> result;
-	
+
 	String remainingText = expression;
-	Array<StringArray> matches = RegexFunctions::findSubstringsThatMatchWildcard("(?:root|local)\\.([0-9a-zA-Z\\.]+)\\.get\\(\\)", expression); 
-	
+	Array<StringArray> matches = RegexFunctions::findSubstringsThatMatchWildcard("(?:root|local)\\.([0-9a-zA-Z\\.]+)\\.get\\(\\)", expression);
+
 	for (int i = 0; i < matches.size(); ++i)
 	{
-		
-		String scriptToAddress = "/"+matches[i][1].replaceCharacter('.', '/');
-		Controllable * c = Engine::mainEngine != nullptr ? Engine::mainEngine->getControllableForAddress(scriptToAddress) : nullptr;
-		Parameter * p = dynamic_cast<Parameter *>(c);
+
+		String scriptToAddress = "/" + matches[i][1].replaceCharacter('.', '/');
+		Controllable* c = Engine::mainEngine != nullptr ? Engine::mainEngine->getControllableForAddress(scriptToAddress) : nullptr;
+		Parameter* p = dynamic_cast<Parameter*>(c);
 		if (p != nullptr) result.add(p);
 	}
 
 	return result;
 }
 
-void ScriptExpression::inspectableDestroyed(Inspectable * i)
+void ScriptExpression::inspectableDestroyed(Inspectable* i)
 {
 	buildEnvironment();
 	//evaluate(true);
 }
 
-void ScriptExpression::parameterValueChanged(Parameter * p)
+void ScriptExpression::parameterValueChanged(Parameter* p)
 {
 	evaluate();
 }
