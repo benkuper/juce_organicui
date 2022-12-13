@@ -8,6 +8,7 @@
   ==============================================================================
 */
 
+#include "CustomVariables/CustomVariablesIncludes.h"
 
 GenericControllableItem::GenericControllableItem(var params) :
 	GenericControllableItem(nullptr, params)
@@ -25,6 +26,7 @@ GenericControllableItem::GenericControllableItem(Controllable* c, var params) :
 	controllable->description = "Custom control of type " + controllable->getTypeString();
 	controllable->saveValueOnly = false;
 	controllable->isCustomizableByUser = true;// controllable->type != Controllable::STRING;
+	controllable->userCanChangeName = true;
 
 	editorCanBeCollapsed = false;
 	editorIsCollapsed = true;
@@ -33,7 +35,7 @@ GenericControllableItem::GenericControllableItem(Controllable* c, var params) :
 
 	isSelectable = false;
 
-	//skipControllableNameInAddress = true; 
+	//skipControllableNameInAddress = true
 	addControllable(controllable);
 	setNiceName(controllable->niceName);
 
