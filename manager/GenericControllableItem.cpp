@@ -8,7 +8,7 @@
   ==============================================================================
 */
 
-#include "CustomVariables/CustomVariablesIncludes.h"
+#include "JuceHeader.h"
 
 GenericControllableItem::GenericControllableItem(var params) :
 	GenericControllableItem(nullptr, params)
