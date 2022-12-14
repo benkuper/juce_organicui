@@ -1,4 +1,4 @@
-#include "Common/CommonIncludes.h"
+#include "JuceHeader.h"
 
 void OSCHelpers::logOSCFormatError(const char* message, int length)
 {
