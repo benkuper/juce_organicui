@@ -1,22 +1,23 @@
 /*
   ==============================================================================
 
-    FileParameter.cpp
-    Created: 9 Mar 2016 12:29:30am
-    Author:  bkupe
+	FileParameter.cpp
+	Created: 9 Mar 2016 12:29:30am
+	Author:  bkupe
 
   ==============================================================================
 */
 
 
-FileParameter::FileParameter(const String & niceName, const String &description, const String & initialValue, bool enabled) :
-    StringParameter(niceName, description, initialValue, enabled),
+FileParameter::FileParameter(const String& niceName, const String& description, const String& initialValue, bool enabled) :
+	StringParameter(niceName, description, initialValue, enabled),
 	customBasePath(""),
 	directoryMode(false),
-    forceAbsolutePath(false),
+	saveMode(false),
+	forceAbsolutePath(false),
 	forceRelativePath(false)
 {
-	defaultUI = FILE; 
+	defaultUI = FILE;
 
 	scriptObject.setMethod("readFile", FileParameter::readFileFromScript);
 	scriptObject.setMethod("writeFile", FileParameter::writeFileFromScript);
@@ -25,21 +26,21 @@ FileParameter::FileParameter(const String & niceName, const String &description,
 	scriptObject.setMethod("launchFile", FileParameter::launchFileFromScript);
 	scriptObject.setMethod("listFiles", FileParameter::listFilesFromScript);
 
-	if(Engine::mainEngine != nullptr) Engine::mainEngine->addEngineListener(this);
+	if (Engine::mainEngine != nullptr) Engine::mainEngine->addEngineListener(this);
 }
 
 FileParameter::~FileParameter()
 {
-	if(Engine::mainEngine != nullptr) Engine::mainEngine->removeEngineListener(this);
+	if (Engine::mainEngine != nullptr) Engine::mainEngine->removeEngineListener(this);
 }
 
-void FileParameter::setValueInternal(var &newVal)
+void FileParameter::setValueInternal(var& newVal)
 {
 	StringParameter::setValueInternal(newVal);
 
 	if (newVal.toString().isNotEmpty())
 	{
-		if(File::isAbsolutePath(newVal.toString())) absolutePath = newVal.toString();
+		if (File::isAbsolutePath(newVal.toString())) absolutePath = newVal.toString();
 		else absolutePath = getBasePath().getChildFile(value.toString()).getFullPathName();
 
 		File f = File::createFileWithoutCheckingPath(absolutePath);
@@ -48,7 +49,7 @@ void FileParameter::setValueInternal(var &newVal)
 			value = File(absolutePath).getRelativePathFrom(getBasePath()).replace("\\", "/");
 		}
 	}
-	
+
 	value = value.toString().replace("\\", "/");
 }
 
@@ -58,7 +59,7 @@ void FileParameter::setForceRelativePath(bool force)
 	setValue(absolutePath, false, true);
 }
 
-bool FileParameter::isRelativePath(const String & p)
+bool FileParameter::isRelativePath(const String& p)
 {
 	if (p.isEmpty()) return false;
 	if (Engine::mainEngine == nullptr) return false;
@@ -77,7 +78,7 @@ String FileParameter::getAbsolutePath() const
 File FileParameter::getBasePath() const
 {
 	if (File(customBasePath).exists()) return File(customBasePath);
-	if(Engine::mainEngine->getFile().exists()) return Engine::mainEngine->getFile().getParentDirectory();
+	if (Engine::mainEngine->getFile().exists()) return Engine::mainEngine->getFile().getParentDirectory();
 	return File::getCurrentWorkingDirectory();
 }
 
@@ -86,13 +87,13 @@ File FileParameter::getFile()
 	String p = getAbsolutePath();
 	if (p.isEmpty()) return File();
 
-	return File(p); 
+	return File(p);
 }
 
 var FileParameter::getJSONDataInternal()
 {
 	var data = StringParameter::getJSONDataInternal();
-	if(forceRelativePath) data.getDynamicObject()->setProperty("relative", true);
+	if (forceRelativePath) data.getDynamicObject()->setProperty("relative", true);
 
 	if (!saveValueOnly)
 	{
@@ -105,14 +106,14 @@ var FileParameter::getJSONDataInternal()
 void FileParameter::loadJSONDataInternal(var data)
 {
 	if (!saveValueOnly) directoryMode = data.getProperty("directoryMode", directoryMode);
-	
+
 	setForceRelativePath(data.getProperty("relative", false));
 	StringParameter::loadJSONDataInternal(data);
 }
 
 void FileParameter::fileSaved(bool savedAs)
 {
-	if(savedAs && !forceAbsolutePath) setValue(absolutePath, false, true); //force re-evaluate relative path if changed
+	if (savedAs && !forceAbsolutePath) setValue(absolutePath, false, true); //force re-evaluate relative path if changed
 }
 
 var FileParameter::readFileFromScript(const juce::var::NativeFunctionArgs& a)
@@ -149,14 +150,14 @@ var FileParameter::writeFileFromScript(const juce::var::NativeFunctionArgs& a)
 			return false;
 		}
 	}
-	
+
 	FileOutputStream fs(f);
 	if (a.arguments[0].isObject())
 	{
 		JSON::writeToStream(fs, a.arguments[0]);
 		return true;
 	}
-	
+
 	return fs.writeText(a.arguments[0].toString(), false, false, "\n");
 }
 
@@ -235,6 +236,7 @@ var FileParameter::listFilesFromScript(const juce::var::NativeFunctionArgs& a)
 bool FileParameter::setAttributeInternal(String param, var paramVal)
 {
 	if (param == "directoryMode") directoryMode = paramVal;
+	else if (param == "saveMode") saveMode = paramVal;
 	else
 	{
 		return StringParameter::setAttributeInternal(param, paramVal);
@@ -247,5 +249,6 @@ StringArray FileParameter::getValidAttributes() const
 {
 	StringArray att = StringParameter::getValidAttributes();
 	att.add("directoryMode");
+	att.add("saveMode");
 	return att;
 }

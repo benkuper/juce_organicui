@@ -8,6 +8,7 @@
   ==============================================================================
 */
 
+#include "JuceHeader.h"
 
 
 StringParameterUI::StringParameterUI(Array<StringParameter*> parameters) :
@@ -172,7 +173,7 @@ void StringParameterFileUI::buttonClicked(Button* b)
 	{
 		FileChooser* chooser(new FileChooser("Select a file", File(), fp->fileTypeFilter));
 
-		int openFlags = FileBrowserComponent::openMode;
+		int openFlags = fp->saveMode ? FileBrowserComponent::saveMode : FileBrowserComponent::openMode;
 		if (fp->directoryMode) openFlags = openFlags | FileBrowserComponent::canSelectDirectories;
 		else openFlags = openFlags | FileBrowserComponent::FileChooserFlags::canSelectFiles;
 
@@ -181,7 +182,7 @@ void StringParameterFileUI::buttonClicked(Button* b)
 				File f = fc.getResult();
 				delete& fc;
 
-				if (!f.exists()) return;
+				if (!f.exists() && !fp->saveMode) return;
 
 				Component::BailOutChecker checker(this);
 				if (checker.shouldBailOut()) return;
