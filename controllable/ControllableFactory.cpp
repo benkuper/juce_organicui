@@ -9,6 +9,8 @@
 */
 
 
+#include "JuceHeader.h"
+
 juce_ImplementSingleton(ControllableFactory)
 
 ControllableFactory::ControllableFactory() {
@@ -145,9 +147,27 @@ Parameter* ControllableFactory::createParameterFrom(Controllable* source, bool c
 			}
 			else if (source->type == Controllable::TARGET)
 			{
-				TargetParameter* sourceEP = (TargetParameter*)source;
+				TargetParameter* sourceTP = (TargetParameter*)source;
 				TargetParameter* tp = (TargetParameter*)p;
-				tp->targetType = sourceEP->targetType;
+
+				tp->targetType = sourceTP->targetType;
+				tp->setRootContainer(sourceTP->rootContainer);
+
+				tp->maxDefaultSearchLevel = sourceTP->maxDefaultSearchLevel;
+				tp->showFullAddressInEditor = sourceTP->showFullAddressInEditor;
+				tp->showParentNameInEditor = sourceTP->showParentNameInEditor;
+				tp->maxDefaultSearchLevel = sourceTP->maxDefaultSearchLevel;
+				tp->defaultParentLabelLevel = sourceTP->defaultParentLabelLevel;
+				tp->typesFilter = sourceTP->typesFilter;
+				tp->excludeTypesFilter = sourceTP->excludeTypesFilter;
+				tp->customTargetFilterFunc = sourceTP->customTargetFilterFunc;
+				tp->customGetTargetFunc = sourceTP->customGetTargetFunc;
+				tp->customGetControllableLabelFunc = sourceTP->customGetControllableLabelFunc;
+				tp->customCheckAssignOnNextChangeFunc = sourceTP->customCheckAssignOnNextChangeFunc;
+
+				tp->defaultContainerTypeCheckFunc = sourceTP->defaultContainerTypeCheckFunc;
+				tp->customGetContainerLabelFunc = sourceTP->customGetContainerLabelFunc;
+				tp->customGetTargetContainerFunc = sourceTP->customGetTargetContainerFunc;
 			}
 
 			if (copyValue)
