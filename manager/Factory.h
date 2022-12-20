@@ -102,9 +102,9 @@ public:
 	}
 
 	template<class S>
-	static FactorySimpleParametricDefinition* createDef(StringRef menu, StringRef type, var params = new DynamicObject())
+	static FactorySimpleParametricDefinition* createDef(StringRef menu, var params = new DynamicObject())
 	{
-		return createDef(menu, type, &FactorySimpleParametricDefinition<T>::createTemplated<S>, params);
+		return createDef(menu, S::getTypeStringStatic(), &FactorySimpleParametricDefinition<T>::createTemplated<S>, params);
 	}
 
 	template<class S>
