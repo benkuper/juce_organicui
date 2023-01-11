@@ -252,7 +252,7 @@ void BaseItemMinimalUI<T>::mouseDrag(const MouseEvent& e)
 
 			var desc = var(new DynamicObject());
 			desc.getDynamicObject()->setProperty("type", baseItem->getTypeString());
-			desc.getDynamicObject()->setProperty("dataType", baseItem->itemDataType);
+			desc.getDynamicObject()->setProperty("dataType", baseItem->itemDataType.isNotEmpty()?baseItem->itemDataType:baseItem->getTypeString());
 			desc.getDynamicObject()->setProperty("initX", baseItem->viewUIPosition->x);
 			desc.getDynamicObject()->setProperty("initY", baseItem->viewUIPosition->y);
 			desc.getDynamicObject()->setProperty("offsetX", offset.x);

@@ -849,7 +849,15 @@ void BaseManagerViewUI<M, T, U>::itemUIResizeEnd(BaseItemMinimalUI<T>* itemUI)
 	snapLineX = Line<int>();
 	snapLineY = Line<int>();
 
-	itemUI->baseItem->addResizeToUndoManager(true);
+	if (itemUI->baseItem->viewUISize->x <= 0 || itemUI->baseItem->viewUISize->y <= 0)
+	{
+		itemUI->baseItem->viewUISize->setPoint(itemUI->baseItem->sizeReference);
+	}
+	else
+	{
+		itemUI->baseItem->addResizeToUndoManager(true);
+	}
+
 
 	this->repaint();
 }
