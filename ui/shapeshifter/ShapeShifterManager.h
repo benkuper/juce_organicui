@@ -41,7 +41,7 @@ public:
 	ShapeShifterContent* temporaryFullContent;
 
 	bool lockMode;
-
+	HashMap<String, String> isInViewSubMenu;
 
 	void setDefaultFileData(const char *data);
 	void setLayoutInformations(const String &appLayoutExtension, const String &appSubLayoutFolder = "layouts");
