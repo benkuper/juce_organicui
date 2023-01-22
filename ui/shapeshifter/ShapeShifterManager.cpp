@@ -487,7 +487,9 @@ PopupMenu ShapeShifterManager::getPanelsMenu()
 	}
 
 	for (int i = 0; i < subMenuNames.size(); i++) {
-		p.addSubMenu(subMenuNames[i], subMenus.getReference(subMenuNames[i]));
+		if (subMenuNames[i] != "") {
+			p.addSubMenu(subMenuNames[i], subMenus.getReference(subMenuNames[i]));
+		}
 	}
 	return p;
 }
