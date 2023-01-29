@@ -8,6 +8,8 @@
   ==============================================================================
 */
 
+#include "JuceHeader.h"
+
 juce_ImplementSingleton(ProjectSettings)
 
 ProjectSettings::ProjectSettings() :
