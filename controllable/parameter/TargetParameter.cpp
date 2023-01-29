@@ -252,7 +252,7 @@ void TargetParameter::setRootContainer(WeakReference<ControllableContainer> newR
 	rootContainer = newRootContainer;
 
 	ghostValue = "";
-	setValue("");
+	setValue(getValue(), false, true);
 }
 
 void TargetParameter::childStructureChanged(ControllableContainer*)

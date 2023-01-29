@@ -8,6 +8,7 @@ Author:  Ben
 ==============================================================================
 */
 
+#include "JuceHeader.h"
 #include "../engine/Engine.h"
 #include "Script.h"
 
@@ -96,11 +97,11 @@ void Script::setParamsContainer(ControllableContainer* cc)
 	addChildControllableContainer(scriptParamsContainer.get());
 }
 
-void Script::chooseFileScript()
+void Script::chooseFileScript(bool openAfter)
 {
 	FileChooser* chooser(new FileChooser("Create or load a cacahuete", File::getCurrentWorkingDirectory(), "*.js"));
 
-	chooser->launchAsync(FileBrowserComponent::FileChooserFlags::saveMode | FileBrowserComponent::FileChooserFlags::canSelectFiles, [this](const FileChooser& fc)
+	chooser->launchAsync(FileBrowserComponent::FileChooserFlags::saveMode | FileBrowserComponent::FileChooserFlags::canSelectFiles, [&](const FileChooser& fc)
 		{
 			File f = fc.getResult();
 			delete& fc;
@@ -121,6 +122,11 @@ void Script::chooseFileScript()
 			}
 
 			filePath->setValue(f.getFullPathName());
+
+			if (f.existsAsFile() && openAfter)
+			{
+				f.startAsProcess();
+			}
 		}
 	);
 }
