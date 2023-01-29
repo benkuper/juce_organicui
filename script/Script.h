@@ -49,7 +49,7 @@ public:
 
 
 	void setParamsContainer(ControllableContainer* cc);
-	void chooseFileScript();
+	void chooseFileScript(bool openAfter = false);
 
 	void loadScript();
 	void buildEnvironment();
