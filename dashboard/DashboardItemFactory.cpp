@@ -2,7 +2,7 @@ juce_ImplementSingleton(DashboardItemFactory)
 
 DashboardItemFactory::DashboardItemFactory()
 {
-	defs.add(Definition::createDef("", "DashboardTriggerItem",&DashboardTriggerItem::create));
+	defs.add(Definition::createDef("", "DashboardTriggerItem", &DashboardTriggerItem::create));
 	defs.add(Definition::createDef("", "DashboardParameterItem", &DashboardParameterItem::create));
 	defs.add(Definition::createDef("", "DashboardTargetParameterItem", &DashboardTargetParameterItem::create));
 	defs.add(Definition::createDef("", "DashboardEnumParameterItem", &DashboardEnumParameterItem::create));
@@ -15,7 +15,7 @@ DashboardItemFactory::DashboardItemFactory()
 	defs.add(Factory<DashboardItem>::Definition::createDef<SharedTextureDashboardItem>("", "Shared Texture"));
 #endif
 
-	defs.add(Factory<DashboardItem>::Definition::createDef<DashboardIFrameItem>("", "IFrame"));
+	defs.add(Factory<DashboardItem>::Definition::createDef<DashboardIFrameItem>(""));
 }
 
 void DashboardItemFactory::buildPopupMenu()
@@ -23,13 +23,13 @@ void DashboardItemFactory::buildPopupMenu()
 	menu.clear();
 
 	int indexOffset = 0;
-	for (auto &p : providers)
+	for (auto& p : providers)
 	{
 		menu.addSubMenu(p->getProviderName(), p->getDashboardCreateMenu(indexOffset));
 		indexOffset += 10000;
 	}
-	menu.addSeparator(); 
-	for (auto &p : specialProviders)
+	menu.addSeparator();
+	for (auto& p : specialProviders)
 	{
 		menu.addSubMenu(p->getProviderName(), p->getDashboardCreateMenu(indexOffset));
 		indexOffset += 10000;
@@ -43,16 +43,16 @@ void DashboardItemFactory::showCreateMenu(std::function<void(DashboardItem*)> re
 		{
 			this->createFromMenuResult(result);
 		}
-	); 
+	);
 }
 
-DashboardItem * DashboardItemFactory::createFromMenuResult(int result)
+DashboardItem* DashboardItemFactory::createFromMenuResult(int result)
 {
 	if (result < 0) return nullptr;
 
 	int providerId = (int)floorf(result / 10000);
 	if (providerId < providers.size()) return providers[providerId]->getDashboardItemFromMenuResult(result - providerId * 10000);
 	else if (providerId - providers.size() < specialProviders.size()) return specialProviders[providerId - providers.size()]->getDashboardItemFromMenuResult(result - providerId * 10000);
-	
+
 	return nullptr;
 }

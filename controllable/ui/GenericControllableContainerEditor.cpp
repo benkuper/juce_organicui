@@ -127,10 +127,13 @@ void GenericControllableContainerEditor::mouseUp(const MouseEvent& e)
 {
 	if (e.mods.isLeftButtonDown())
 	{
-		if ((e.eventComponent == this && e.getMouseDownPosition().y < headerHeight && !dragRect.contains(e.getMouseDownPosition())) || (isRoot && e.eventComponent == this && e.getMouseDownY() < headerHeight))
+		if (canBeCollapsed())
 		{
-			if (e.mods.isShiftDown()) toggleCollapsedChildren();
-			else setCollapsed(!container->editorIsCollapsed);
+			if ((e.eventComponent == this && e.getMouseDownPosition().y < headerHeight && !dragRect.contains(e.getMouseDownPosition())) || (isRoot && e.eventComponent == this && e.getMouseDownY() < headerHeight))
+			{
+				if (e.mods.isShiftDown()) toggleCollapsedChildren();
+				else setCollapsed(!container->editorIsCollapsed);
+			}
 		}
 	}
 	else if (e.mods.isRightButtonDown())

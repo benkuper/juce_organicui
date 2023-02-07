@@ -22,6 +22,8 @@ GenericControllableItemEditor::GenericControllableItemEditor(GenericControllable
 		controllableEditor.reset((ControllableEditor*)gci->controllable->getEditor(false));
 		//controllableEditor->setShowLabel(false);
 		addAndMakeVisible(controllableEditor.get());
+
+		headerHeight = controllableEditor->getHeight() + 2;
 	}
 
 	//containerLabel.setInterceptsMouseClicks(false, false);
