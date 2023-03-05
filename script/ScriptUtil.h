@@ -25,8 +25,11 @@ public:
 
 
 	static var getFloatFromBytes(const var::NativeFunctionArgs& a);
+	static var floatToHexSeq(const var::NativeFunctionArgs& a);	
 	static var getInt32FromBytes(const var::NativeFunctionArgs& a);
 	static var getInt64FromBytes(const var::NativeFunctionArgs& a);
+	static var doubleToHexSeq(const var::NativeFunctionArgs& a);
+	static var hexStringToInt(const var::NativeFunctionArgs& a);	
 
 	static var getObjectProperties(const var::NativeFunctionArgs& a);
 	static var getObjectMethods(const var::NativeFunctionArgs& a);
