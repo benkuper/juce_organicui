@@ -24,8 +24,11 @@ ScriptUtil::ScriptUtil() :
 	scriptObject.setMethod("delayThreadMS", ScriptUtil::delayThreadMS);
 
 	scriptObject.setMethod("getFloatFromBytes", ScriptUtil::getFloatFromBytes);
+	scriptObject.setMethod("floatToHexSeq", ScriptUtil::floatToHexSeq);
 	scriptObject.setMethod("getInt32FromBytes", ScriptUtil::getInt32FromBytes);
 	scriptObject.setMethod("getInt64FromBytes", ScriptUtil::getInt32FromBytes);
+	scriptObject.setMethod("doubleToHexSeq", ScriptUtil::doubleToHexSeq);
+	scriptObject.setMethod("hexStringToInt", ScriptUtil::hexStringToInt);		
 	scriptObject.setMethod("getObjectProperties", ScriptUtil::getObjectProperties);
 	scriptObject.setMethod("getObjectMethods", ScriptUtil::getObjectMethods);
 
@@ -101,6 +104,41 @@ var ScriptUtil::getFloatFromBytes(const var::NativeFunctionArgs& a)
 	return result;
 }
 
+// Convert float to Hex
+var ScriptUtil::floatToHexSeq(const var::NativeFunctionArgs& a) 
+{
+	if (a.numArguments < 2) return 0;
+	float value = a.arguments[0];
+	bool isLittleEndian = a.arguments[1];
+
+	unsigned char* bytes = reinterpret_cast<unsigned char*>(&value);
+	int numBytes = sizeof(float);
+
+	std::vector<int> result;
+	result.reserve(numBytes);
+
+	if (isLittleEndian) {
+		// Little-endian
+		for (int i = numBytes - 1; i >= 0; i--) {
+			result.push_back(bytes[i]);
+		}
+	}
+	else {
+		// Big-endian
+		for (int i = 0; i < numBytes; i++) {
+			result.push_back(bytes[i]);
+		}
+	}
+
+	std::ostringstream oss;
+
+	for (int i : result) {
+			oss << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << i;
+		}
+
+	return oss.str();
+}
+
 var ScriptUtil::getInt32FromBytes(const var::NativeFunctionArgs& a)
 {
 	if (a.numArguments < 4) return 0;
@@ -119,6 +157,55 @@ var ScriptUtil::getInt64FromBytes(const var::NativeFunctionArgs& a)
 	for (int i = 0; i < 8; ++i) bytes[i] = (uint8_t)(int)a.arguments[i];
 	int64 result;
 	memcpy(&result, &bytes, 8);
+	return result;
+}
+
+// Convert double to Hex
+var ScriptUtil::doubleToHexSeq(const var::NativeFunctionArgs& a) 
+{
+	if (a.numArguments < 2) return 0;
+	double value = a.arguments[0];
+	bool isLittleEndian = a.arguments[1];
+
+	unsigned char* bytes = reinterpret_cast<unsigned char*>(&value);
+	int numBytes = sizeof(double);
+
+	std::vector<int> result;
+	result.reserve(numBytes);
+
+	if (isLittleEndian) {
+		// Little-endian
+		for (int i = numBytes - 1; i >= 0; i--) {
+			result.push_back(bytes[i]);
+		}
+	}
+	else {
+		// Big-endian
+		for (int i = 0; i < numBytes; i++) {
+			result.push_back(bytes[i]);
+		}
+	}
+
+	std::ostringstream oss;
+
+	for (int i : result) {
+		oss << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << i;
+	}
+
+	return oss.str();
+}
+
+
+// Convert Str Hex to Int
+var ScriptUtil::hexStringToInt(const var::NativeFunctionArgs& a) 
+{
+	if (a.numArguments == 0) return 0;
+	String hexString = a.arguments[0];
+
+	std::stringstream ss;
+	ss << std::hex << hexString;
+	int result;
+	ss >> result;
 	return result;
 }
 
