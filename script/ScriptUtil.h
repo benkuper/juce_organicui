@@ -35,6 +35,7 @@ public:
 	static var getObjectMethods(const var::NativeFunctionArgs& a);
 
 	static var getIPs(const var::NativeFunctionArgs& a);
+	static var sendMulticastMessage(const var::NativeFunctionArgs& a);	
 
 	static var encodeHMAC_SHA1(const var::NativeFunctionArgs& a);
 	static var encodeSHA256(const var::NativeFunctionArgs& a);
