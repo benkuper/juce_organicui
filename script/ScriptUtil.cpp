@@ -33,6 +33,7 @@ ScriptUtil::ScriptUtil() :
 	scriptObject.setMethod("getObjectMethods", ScriptUtil::getObjectMethods);
 
 	scriptObject.setMethod("getIPs", ScriptUtil::getIPs);
+	scriptObject.setMethod("sendMulticastMessage", ScriptUtil::sendMulticastMessage);		
 	scriptObject.setMethod("encodeHMAC_SHA1", ScriptUtil::encodeHMAC_SHA1);
 	scriptObject.setMethod("encodeSHA256", ScriptUtil::encodeSHA256);
 	scriptObject.setMethod("encodeSHA512", ScriptUtil::encodeSHA512);
@@ -813,3 +814,26 @@ var ScriptUtil::getSelectedObjectsCountFromScript(const var::NativeFunctionArgs&
 {
 	return InspectableSelectionManager::activeSelectionManager->getInspectablesAs<BaseItem>().size();
 }
+
+var ScriptUtil::sendMulticastMessage(const var::NativeFunctionArgs& a)
+{
+
+	DatagramSocket socket; // Crée un nouveau socket JUCE DatagramSocket
+
+	socket.setEnablePortReuse(true);
+
+	socket.bindToPort(a.arguments[0], a.arguments[1]);
+	bool joinMulticast = socket.joinMulticast(a.arguments[2]); // Rejoint le groupe multicast correspondant à l'adresse IP spécifiée
+
+	socket.setMulticastLoopbackEnabled(true); // Active la boucle locale pour recevoir des messages multicast
+
+	String message = a.arguments[3]; // Le message à envoyer
+
+	socket.write(a.arguments[0], a.arguments[1], message.getCharPointer(), message.length()); // Envoie le message au port spécifié
+
+	NLOG("test", "Message sent : " << message);
+
+	return joinMulticast;
+	
+}
+
