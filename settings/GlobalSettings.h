@@ -54,7 +54,7 @@ public:
 	IntParameter* fontSize;
 	EnumParameter* helpLanguage;
 	BoolParameter* useGLRenderer;
-
+	FloatParameter* altScaleFactor;
 
 	ControllableContainer saveLoadCC;
 	BoolParameter * enableAutoSave;
