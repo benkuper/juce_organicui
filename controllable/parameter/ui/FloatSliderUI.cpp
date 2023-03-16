@@ -8,7 +8,7 @@
  ==============================================================================
  */
 
-
+ #include "JuceHeader.h"
  //==============================================================================
 FloatSliderUI::FloatSliderUI(Array<Parameter*> parameters) :
 	ParameterUI(parameters, PARAMETERUI_DEFAULT_TIMER),
@@ -224,10 +224,13 @@ float FloatSliderUI::getNormalizedValueFromMouse()
 
 float FloatSliderUI::getNormalizedValueFromMouseDrag(const MouseEvent& e)
 {
-	float scaleFactor = e.mods.isAltDown() ? .5f : 1;
-	Point<int> relPos = e.getOffsetFromDragStart() * scaleFactor;
+	Point<int> relPos = e.getOffsetFromDragStart();
 	float normRelVal = getNormalizedValueFromPosition(relPos);
 	if (orientation == VERTICAL) normRelVal = -(1 - normRelVal);
+
+	float scaleFactor = e.mods.isAltDown() ? GlobalSettings::getInstance()->altScaleFactor->floatValue() : 1;
+	normRelVal *= scaleFactor;
+
 	return initNormalizedValue + normRelVal;
 }
 
