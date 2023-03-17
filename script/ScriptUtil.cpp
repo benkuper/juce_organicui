@@ -191,7 +191,7 @@ var ScriptUtil::doubleToHexSeq(const var::NativeFunctionArgs& a)
 		oss << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << i;
 	}
 
-	return oss.str();
+	return String(oss.str());
 }
 
 
