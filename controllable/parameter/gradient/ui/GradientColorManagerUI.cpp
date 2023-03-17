@@ -34,7 +34,7 @@ GradientColorManagerUI::GradientColorManagerUI(GradientColorManager* manager) :
 
 GradientColorManagerUI::~GradientColorManagerUI()
 {
-	manager->removeAsyncContainerListener(this);
+	if(!inspectable.wasObjectDeleted()) manager->removeAsyncContainerListener(this);
 	stopThread(1000);
 	//stopThread(100);
 }
