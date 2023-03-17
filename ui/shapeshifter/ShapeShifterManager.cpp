@@ -465,12 +465,32 @@ PopupMenu ShapeShifterManager::getPanelsMenu()
 	p.addSeparator();
 
 	int currentID = 1;
+	HashMap<String, PopupMenu> subMenus;
+	Array<String> subMenuNames;
 	for (auto& n : ShapeShifterFactory::getInstance()->defs)
 	{
-		p.addItem(baseMenuCommandID + currentID, n->contentName, true);
+		if (isInViewSubMenu.contains(n->contentName)) {
+			String subMenuName = isInViewSubMenu.getReference(n->contentName);
+			if (!subMenus.contains(subMenuName)) {
+				PopupMenu temp;
+				subMenus.set(subMenuName, temp);
+				subMenuNames.add(subMenuName);
+
+			}
+			subMenus.getReference(subMenuName).addItem(baseMenuCommandID + currentID, n->contentName, true);
+		}
+		else 
+		{
+			p.addItem(baseMenuCommandID + currentID, n->contentName, true);
+		}
 		currentID++;
 	}
 
+	for (int i = 0; i < subMenuNames.size(); i++) {
+		if (subMenuNames[i] != "") {
+			p.addSubMenu(subMenuNames[i], subMenus.getReference(subMenuNames[i]));
+		}
+	}
 	return p;
 }
 
