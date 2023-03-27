@@ -156,9 +156,10 @@ void BaseManagerViewMiniPane<M, T, U>::paintItem(juce::Graphics& g, U* ui)
 
 	juce::Rectangle<float> uiPaneBounds(bTopLeft, bBottomRight);
 
-	g.setColour(ui->item->itemColor->getColor().brighter(.2f).withAlpha(.6f));
+	Colour ic = ui->item->itemColor != nullptr ? ui->item->itemColor->getColor() : Colours::white;
+	g.setColour(ic.brighter(.2f).withAlpha(.6f));
 	g.fillRect(uiPaneBounds);
-	g.setColour(ui->item->itemColor->getColor().brighter(.5f).withAlpha(.8f));
+	g.setColour(ic.brighter(.5f).withAlpha(.8f));
 	g.drawRect(uiPaneBounds);
 }
 
@@ -170,7 +171,7 @@ juce::Point<float> BaseManagerViewMiniPane<M, T, U>::getPanePosForUIPos(Point<in
 	return juce::Point<float>(
 		jmap<float>(uiPos.x, paneRealBounds.getX(), paneRealBounds.getRight(), r.getX(), r.getRight()),
 		jmap<float>(uiPos.y, paneRealBounds.getY(), paneRealBounds.getBottom(), r.getY(), r.getBottom())
-		);
+	);
 }
 
 template<class M, class T, class U>
@@ -181,7 +182,7 @@ juce::Point<float> BaseManagerViewMiniPane<M, T, U>::getPanePosForViewPos(Point<
 	return juce::Point<float>(
 		jmap<float>(viewPos.x, paneViewBounds.getX(), paneViewBounds.getRight(), r.getX(), r.getRight()),
 		jmap<float>(viewPos.y, paneViewBounds.getY(), paneViewBounds.getBottom(), r.getY(), r.getBottom())
-		);
+	);
 
 }
 
@@ -193,7 +194,7 @@ juce::Point<float> BaseManagerViewMiniPane<M, T, U>::getViewPosForPanePos(Point<
 	return juce::Point<float>(
 		jmap<float>(panePos.x, r.getX(), r.getRight(), paneViewBounds.getX(), paneViewBounds.getRight()),
 		jmap<float>(panePos.y, r.getY(), r.getBottom(), paneViewBounds.getY(), paneViewBounds.getBottom())
-		);
+	);
 
 }
 
@@ -211,7 +212,7 @@ void BaseManagerViewMiniPane<M, T, U>::updateContent()
 		ca.fadeIn(this, 200);
 	}
 
-	if(!isMouseOverOrDragging()) startTimer(showTime * 1000);
+	if (!isMouseOverOrDragging()) startTimer(showTime * 1000);
 	repaint();
 }
 template<class M, class T, class U>
