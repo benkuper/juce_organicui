@@ -8,6 +8,7 @@
   ==============================================================================
 */
 
+#include "JuceHeader.h"
 
 TargetParameter::TargetParameter(const String& niceName, const String& description, const String& initialValue, WeakReference<ControllableContainer> rootReference, bool enabled) :
 	StringParameter(niceName, description, initialValue, enabled),
@@ -43,7 +44,7 @@ TargetParameter::TargetParameter(const String& niceName, const String& descripti
 TargetParameter::~TargetParameter()
 {
 	if (rootContainer != nullptr && !rootContainer.wasObjectDeleted()) rootContainer->removeControllableContainerListener(this);
-	setRootContainer(nullptr);
+	setRootContainer(nullptr, false, false);
 	ghostValue = ""; //force not ghost to avoid launching a warning
 	setTarget((ControllableContainer*)nullptr);
 	setTarget((Controllable*)nullptr);
@@ -195,11 +196,11 @@ void TargetParameter::setTarget(WeakReference<Controllable> c)
 	}
 	else
 	{
-
+		if (value.toString().isNotEmpty()) setGhostValue(value.toString());
 		if (ghostValue.isNotEmpty())
 		{
 			setWarningMessage("Link is broken : " + ghostValue);
-			if (rootContainer != nullptr && !rootContainer.wasObjectDeleted()) rootContainer->addControllableContainerListener(this);
+			if (!Engine::mainEngine->isClearing && rootContainer != nullptr && !rootContainer.wasObjectDeleted()) rootContainer->addControllableContainerListener(this);
 		}
 		else clearWarning();
 	}
@@ -230,16 +231,17 @@ void TargetParameter::setTarget(WeakReference<ControllableContainer> cc)
 	}
 	else
 	{
+		if (value.toString().isNotEmpty()) setGhostValue(value.toString());
 		if (ghostValue.isNotEmpty())
 		{
 			setWarningMessage("Link is broken : " + ghostValue);
-			if (rootContainer != nullptr && !rootContainer.wasObjectDeleted()) rootContainer->addControllableContainerListener(this);
+			if (!Engine::mainEngine->isClearing && rootContainer != nullptr && !rootContainer.wasObjectDeleted()) rootContainer->addControllableContainerListener(this);
 		}
 		else clearWarning();
 	}
 }
 
-void TargetParameter::setRootContainer(WeakReference<ControllableContainer> newRootContainer)
+void TargetParameter::setRootContainer(WeakReference<ControllableContainer> newRootContainer, bool engineIfNull, bool forceSetValue)
 {
 	if (rootContainer == newRootContainer) return;
 
@@ -248,11 +250,14 @@ void TargetParameter::setRootContainer(WeakReference<ControllableContainer> newR
 		rootContainer->removeControllableContainerListener(this);
 	}
 
-	if (newRootContainer == nullptr) newRootContainer = Engine::mainEngine;
+	if (newRootContainer == nullptr && engineIfNull) newRootContainer = Engine::mainEngine;
 	rootContainer = newRootContainer;
 
-	ghostValue = "";
-	setValue(getValue(), false, true);
+    if(forceSetValue)
+    {
+        ghostValue = "";
+        setValue(getValue(), false, true);
+    }
 }
 
 void TargetParameter::childStructureChanged(ControllableContainer*)
