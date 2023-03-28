@@ -19,6 +19,8 @@ OSCArgument OSCHelpers::varToArgument(const var& v)
 
 		return OSCArgument(OSCColour::fromInt32(col));
 	}
+	else if(v.isUndefined()) return OSCArgument();
+	else if (v.isVoid()) return OSCArgument();
 
 	jassert(false);
 
