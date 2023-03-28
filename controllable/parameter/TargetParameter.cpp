@@ -44,7 +44,7 @@ TargetParameter::TargetParameter(const String& niceName, const String& descripti
 TargetParameter::~TargetParameter()
 {
 	if (rootContainer != nullptr && !rootContainer.wasObjectDeleted()) rootContainer->removeControllableContainerListener(this);
-	setRootContainer(nullptr);
+	setRootContainer(nullptr, false, false);
 	ghostValue = ""; //force not ghost to avoid launching a warning
 	setTarget((ControllableContainer*)nullptr);
 	setTarget((Controllable*)nullptr);
@@ -241,7 +241,7 @@ void TargetParameter::setTarget(WeakReference<ControllableContainer> cc)
 	}
 }
 
-void TargetParameter::setRootContainer(WeakReference<ControllableContainer> newRootContainer)
+void TargetParameter::setRootContainer(WeakReference<ControllableContainer> newRootContainer, bool engineIfNull, bool forceSetValue)
 {
 	if (rootContainer == newRootContainer) return;
 
@@ -250,11 +250,14 @@ void TargetParameter::setRootContainer(WeakReference<ControllableContainer> newR
 		rootContainer->removeControllableContainerListener(this);
 	}
 
-	if (newRootContainer == nullptr) newRootContainer = Engine::mainEngine;
+	if (newRootContainer == nullptr && engineIfNull) newRootContainer = Engine::mainEngine;
 	rootContainer = newRootContainer;
 
-	ghostValue = "";
-	setValue(getValue(), false, true);
+    if(forceSetValue)
+    {
+        ghostValue = "";
+        setValue(getValue(), false, true);
+    }
 }
 
 void TargetParameter::childStructureChanged(ControllableContainer*)
