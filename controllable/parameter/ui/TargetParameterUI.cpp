@@ -296,7 +296,7 @@ void TargetParameterUI::showPopupAndGetTarget(ControllableContainer* startFromCC
 
 			int maxSearchLevel = targetParameter->maxDefaultSearchLevel == -1 ? -1 : targetParameter->maxDefaultSearchLevel - levelOffset;
 
-			containerChooser.reset(new ContainerChooserPopupMenu(rContainer, 0, maxSearchLevel, targetParameter->defaultContainerTypeCheckFunc, targetParameter->typesFilter, targetParameter->excludeTypesFilter, maxSearchLevel, targetParameter->targetContainer.get()));
+			containerChooser.reset(new ContainerChooserPopupMenu(rContainer, 0, maxSearchLevel, targetParameter->defaultContainerTypeCheckFunc, targetParameter->typesFilter, targetParameter->excludeTypesFilter, maxSearchLevel != 0, targetParameter->targetContainer.get()));
 
 			containerChooser->showAndGetContainer([this](ControllableContainer* cc)
 				{

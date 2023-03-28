@@ -8,6 +8,7 @@
   ==============================================================================
 */
 
+#include "JuceHeader.h"
 
 TargetParameter::TargetParameter(const String& niceName, const String& description, const String& initialValue, WeakReference<ControllableContainer> rootReference, bool enabled) :
 	StringParameter(niceName, description, initialValue, enabled),
@@ -195,11 +196,11 @@ void TargetParameter::setTarget(WeakReference<Controllable> c)
 	}
 	else
 	{
-
+		if (value.toString().isNotEmpty()) setGhostValue(value.toString());
 		if (ghostValue.isNotEmpty())
 		{
 			setWarningMessage("Link is broken : " + ghostValue);
-			if (rootContainer != nullptr && !rootContainer.wasObjectDeleted()) rootContainer->addControllableContainerListener(this);
+			if (!Engine::mainEngine->isClearing && rootContainer != nullptr && !rootContainer.wasObjectDeleted()) rootContainer->addControllableContainerListener(this);
 		}
 		else clearWarning();
 	}
@@ -230,10 +231,11 @@ void TargetParameter::setTarget(WeakReference<ControllableContainer> cc)
 	}
 	else
 	{
+		if (value.toString().isNotEmpty()) setGhostValue(value.toString());
 		if (ghostValue.isNotEmpty())
 		{
 			setWarningMessage("Link is broken : " + ghostValue);
-			if (rootContainer != nullptr && !rootContainer.wasObjectDeleted()) rootContainer->addControllableContainerListener(this);
+			if (!Engine::mainEngine->isClearing && rootContainer != nullptr && !rootContainer.wasObjectDeleted()) rootContainer->addControllableContainerListener(this);
 		}
 		else clearWarning();
 	}
