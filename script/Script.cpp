@@ -387,36 +387,7 @@ void Script::logFromArgs(const var::NativeFunctionArgs& args, int logLevel)
 	for (int i = 0; i < args.numArguments; ++i)
 	{
 		var a = args.arguments[i];
-		String as = "";
-		if (a.isObject())
-		{
-			if (a.hasProperty(scriptPtrIdentifier))
-			{
-				String st = a.getProperty("_type", "").toString();
-				if (st.isNotEmpty())
-				{
-					int64 ptr = (int64)a.getDynamicObject()->getProperty(scriptPtrIdentifier);
-
-					if (st == "Container")
-					{
-						as += dynamic_cast<ControllableContainer*>((ControllableContainer*)ptr)->getScriptTargetString();
-					}
-					else if (st == "Controllable")
-					{
-						as += dynamic_cast<Controllable*>((Controllable*)ptr)->getScriptTargetString();
-					}
-				}
-			}
-			else
-			{
-				as += a.toString();
-			}
-		}
-		else
-		{
-			as = a.toString();
-		}
-
+		String as = ScriptUtil::getLogStringForVar(a);
 		logS += (i > 0 ? "\n" : "") + as;
 	}
 

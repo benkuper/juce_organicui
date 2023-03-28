@@ -71,6 +71,8 @@ public:
 
 	//Helpers
 
+	static String getLogStringForVar(const var & v);
+
 	static File getFileFromArgs(const var::NativeFunctionArgs& args, int deleteIfExistFromArg = -1);
 
 	static std::string base64_encode(unsigned char const* src, unsigned int len);
