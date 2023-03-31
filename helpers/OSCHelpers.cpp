@@ -81,6 +81,7 @@ void OSCHelpers::addArgumentsForParameter(OSCMessage& m, Parameter* p, BoolMode 
 		break;
 
 	case Controllable::ENUM: m.addString(((EnumParameter*)p)->getValueKey()); break;
+	case Controllable::TARGET: m.addString(p->stringValue()); break;
 
 	default:
 		jassertfalse;
