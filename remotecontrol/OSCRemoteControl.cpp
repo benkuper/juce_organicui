@@ -627,7 +627,7 @@ void OSCRemoteControl::sendAllManualFeedback()
 void OSCRemoteControl::sendManualFeedbackForControllable(Controllable* c)
 {
 	if (!manualSendCC.enabled->boolValue()) return;
-	if (c->hideInRemoteControl) return;
+	if (c == nullptr || c->hideInRemoteControl) return;
 	OSCMessage m = OSCHelpers::getOSCMessageForControllable(c);
 
 	manualSender.send(m);
