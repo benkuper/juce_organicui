@@ -273,8 +273,8 @@ void OSCRemoteControl::processMessage(const OSCMessage& m, const String& sourceI
 			remoteControlListeners.call(&RemoteControlListener::processMessage, m);
 			return;
 		}
-		}
 	}
+}
 
 void OSCRemoteControl::onContainerParameterChanged(Parameter* p)
 {
@@ -561,25 +561,6 @@ void OSCRemoteControl::connectionError(const String& id, const String& message)
 	feedbackMap.remove(id);
 }
 
-void OSCRemoteControl::sendAllManualFeedback()
-{
-	if (!manualSendCC.enabled->boolValue()) return;
-
-	Array<WeakReference<Controllable>> allControllables = Engine::mainEngine->getAllControllables(true);
-	for (auto& c : allControllables)
-	{
-		sendManualFeedbackForControllable(c);
-	}
-}
-
-void OSCRemoteControl::sendManualFeedbackForControllable(Controllable* c)
-{
-	if (!manualSendCC.enabled->boolValue()) return;
-	if (c->hideInRemoteControl) return;
-	OSCMessage m = OSCHelpers::getOSCMessageForControllable(c);
-
-	manualSender.send(m);
-}
 
 void OSCRemoteControl::onControllableFeedbackUpdate(ControllableContainer* cc, Controllable* c)
 {
@@ -607,6 +588,7 @@ void OSCRemoteControl::newMessage(const ContainerAsyncEvent& e)
 
 		//Manual
 		sendManualFeedbackForControllable(e.targetControllable);
+
 	}
 
 }
@@ -626,15 +608,29 @@ void OSCRemoteControl::sendOSCQueryFeedback(Controllable* c, const String& exclu
 		server->sendExclude(b, ex);
 	}
 
-	if (logOutgoing->boolValue())
-	{
-		String s = m.getAddressPattern().toString();
-		for (auto& a : m)
-		{
-			s += "\n" + OSCHelpers::getStringArg(a);
-		}
+	if (logOutgoing->boolValue()) NLOG(niceName, "Sent to OSCQuery : " << OSCHelpers::messageToString(m));
 
-		NLOG(niceName, "Sent : " << s);
-	}
 }
 #endif
+
+void OSCRemoteControl::sendAllManualFeedback()
+{
+	if (!manualSendCC.enabled->boolValue()) return;
+
+	Array<WeakReference<Controllable>> allControllables = Engine::mainEngine->getAllControllables(true);
+	for (auto& c : allControllables)
+	{
+		sendManualFeedbackForControllable(c);
+	}
+}
+
+void OSCRemoteControl::sendManualFeedbackForControllable(Controllable* c)
+{
+	if (!manualSendCC.enabled->boolValue()) return;
+	if (c->hideInRemoteControl) return;
+	OSCMessage m = OSCHelpers::getOSCMessageForControllable(c);
+
+	manualSender.send(m);
+
+	if (logOutgoing->boolValue()) NLOG(niceName, "Sent to manual OSC  : " << OSCHelpers::messageToString(m));
+}

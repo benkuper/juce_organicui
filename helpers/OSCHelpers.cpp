@@ -1,4 +1,5 @@
 #include "JuceHeader.h"
+#include "OSCHelpers.h"
 
 void OSCHelpers::logOSCFormatError(const char* message, int length)
 {
@@ -283,4 +284,15 @@ void OSCHelpers::handleControllableForOSCMessage(Controllable* c, const OSCMessa
 			break;
 		}
 	}
+}
+
+String OSCHelpers::messageToString(const OSCMessage& m)
+{
+	String s = m.getAddressPattern().toString();
+	for (auto& a : m)
+	{
+		s += "\n" + OSCHelpers::getStringArg(a);
+	}
+
+	return s;
 }
