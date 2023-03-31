@@ -21,7 +21,7 @@ Automation::Automation(const String& name, AutomationRecorder* recorder, bool al
 {
 	itemDataType = "AutomationKey";
 
-	hideInRemoteControl = true; //Avoid sending automation data to remote control by default, keys can be a lot !
+	defaultHideInRemoteControl = true; //Avoid sending automation data to remote control by default, keys can be a lot !
 
 	comparator.compareFunc = &Automation::compareKeys;
 
