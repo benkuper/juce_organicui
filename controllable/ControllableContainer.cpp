@@ -974,7 +974,7 @@ void ControllableContainer::loadJSONData(var data, bool createIfNotThere)
 			{
 				if (c->type == Controllable::TRIGGER)
 				{
-					if (includeTriggersInSaveLoad) c->loadJSONData(pData);
+					/*if (includeTriggersInSaveLoad) */c->loadJSONData(pData);
 				}
 				else if (Parameter* p = dynamic_cast<Parameter*>(c))
 				{
