@@ -885,7 +885,7 @@ var ControllableContainer::getJSONData()
 
 
 	for (auto& wc : cont) {
-		if (wc->type == Controllable::TRIGGER && !includeTriggersInSaveLoad) continue;
+		if (wc->type == Controllable::TRIGGER && !includeTriggersInSaveLoad && wc->hideInRemoteControl != wc->defaultHideInRemoteControl) continue;
 		if (wc.wasObjectDeleted()) continue;
 		if (!wc->shouldBeSaved()) continue;
 		paramsData.append(wc->getJSONData(this));
