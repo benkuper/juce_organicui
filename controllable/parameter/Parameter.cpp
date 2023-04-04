@@ -90,7 +90,7 @@ void Parameter::setControlMode(ControlMode _mode)
 		break;
 
 	case EXPRESSION:
-		expression.reset(new ScriptExpression());
+		expression.reset(new ScriptExpression(this));
 		expression->setExpression(controlExpression);
 		expression->addExpressionListener(this);
 		break;

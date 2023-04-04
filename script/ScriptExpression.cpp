@@ -10,9 +10,10 @@ Author:  Ben
 
 #include "JuceHeader.h"
 
-ScriptExpression::ScriptExpression() :
+ScriptExpression::ScriptExpression(Parameter* attachedParam) :
 	Thread("ScriptExpression"),
-	state(EXPRESSION_EMPTY)
+	state(EXPRESSION_EMPTY),
+	attachedParam(attachedParam)
 {
 	if (Engine::mainEngine != nullptr) Engine::mainEngine->addScriptTargetListener(this);
 }
@@ -134,6 +135,12 @@ void ScriptExpression::buildEnvironment()
 
 	//scriptEngine->registerNativeObject("script", getScriptObject()); //force "script" for this objet
 	//if (parentTarget != nullptr) scriptEngine->registerNativeObject("local", parentTarget->getScriptObject()); //force "local" for the related object
+
+	if (attachedParam != nullptr)
+	{
+		scriptEngine->registerNativeObject("parent", attachedParam->parentContainer->getScriptObject());
+	}
+
 	if (ScriptUtil::getInstanceWithoutCreating() != nullptr)
 	{
 		scriptEngine->registerNativeObject(ScriptUtil::getInstance()->scriptTargetName, ScriptUtil::getInstance()->getScriptObject());
@@ -175,12 +182,20 @@ Array<Parameter*> ScriptExpression::getParameterReferencesInExpression()
 	Array<Parameter*> result;
 
 	String remainingText = expression;
-	Array<StringArray> matches = RegexFunctions::findSubstringsThatMatchWildcard("(?:root|local)\\.([0-9a-zA-Z\\.]+)\\.get\\(\\)", expression);
+	Array<StringArray> matches = RegexFunctions::findSubstringsThatMatchWildcard("(root|parent)\\.([0-9a-zA-Z\\.]+)\\.get\\(\\)", expression);
 
 	for (int i = 0; i < matches.size(); ++i)
 	{
+		String firstAccess = matches[i][1];
+		String scriptToAddress = matches[i][2].replaceCharacter('.', '/');
+		if (firstAccess == "root")
+		{
+			scriptToAddress = "/" + scriptToAddress;
+		}else if (firstAccess == "parent" && attachedParam != nullptr)
+		{
+			scriptToAddress = attachedParam->parentContainer->getControlAddress() + "/" + scriptToAddress;
+		}
 
-		String scriptToAddress = "/" + matches[i][1].replaceCharacter('.', '/');
 		Controllable* c = Engine::mainEngine != nullptr ? Engine::mainEngine->getControllableForAddress(scriptToAddress) : nullptr;
 		Parameter* p = dynamic_cast<Parameter*>(c);
 		if (p != nullptr) result.add(p);
