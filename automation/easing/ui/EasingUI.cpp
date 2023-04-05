@@ -219,8 +219,7 @@ Point<float> EasingUI::getValuePosForUIPos(const Point<int>& uiPos) const
 //Callout
 
 
-EasingUI::HandleEditCalloutComponent::HandleEditCalloutComponent(Point2DParameter* param) :
-	k(k)
+EasingUI::HandleEditCalloutComponent::HandleEditCalloutComponent(Point2DParameter* param)
 {
 	paramEditor.reset(new DoubleSliderUI(param));
 	paramEditor->canShowExtendedEditor = false;
@@ -255,9 +254,10 @@ void LinearEasingUI::generatePathInternal()
 CubicEasingUI::CubicEasingUI(CubicEasing* e) :
 	EasingUI(e),
 	ce(e),
-	syncHandles(false),
-	h1(ce->anchor1),
-	h2(ce->anchor2)
+    h1(ce->anchor1),
+    h2(ce->anchor2),
+	syncHandles(false)
+
 {
 	addChildComponent(h1);
 	addChildComponent(h2);

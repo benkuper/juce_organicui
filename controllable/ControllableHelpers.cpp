@@ -96,7 +96,7 @@ ContainerChooserPopupMenu::ContainerChooserPopupMenu(ControllableContainer* root
 	maxDefaultSearchLevel(maxSearchLevel),
 	typeCheckFunc(typeCheckFunc),
 	typesFilter(typesFilter),
-	excludeTypesFilter(excludeTypesFilter),
+	excludeTypesFilter(excludeTypeFilters),
 	allowSelectAtAnyLevel(allowSelectAtAnyLevel),
 	currentSelection(currentSelection)
 {

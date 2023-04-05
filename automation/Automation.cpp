@@ -13,9 +13,9 @@
 Automation::Automation(const String& name, AutomationRecorder* recorder, bool allowKeysOutside) :
 	BaseManager(name),
 	valueRange(nullptr),
-	rangeRemapMode(nullptr),
 	allowKeysOutside(allowKeysOutside),
 	positionUnitSteps(0),
+    rangeRemapMode(nullptr),
 	recorder(recorder),
 	automationNotifier(5)
 {

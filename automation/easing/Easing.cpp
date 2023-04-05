@@ -354,13 +354,13 @@ float BounceEasing::getValue(const float& weight)
 		p = d1 * x * x;
 	}
 	else if (x < 2 / n1) {
-		p = d1 * (x -= 1.5 / n1) * x + 0.75;
+		p = d1 * (x - 1.5 / n1) * x + 0.75;
 	}
 	else if (x < 2.5 / n1) {
-		p = d1 * (x -= 2.25 / n1) * x + 0.9375;
+		p = d1 * (x - 2.25 / n1) * x + 0.9375;
 	}
 	else {
-		p = d1 * (x -= 2.625 / n1) * x + 0.984375;
+		p = d1 * (x - 2.625 / n1) * x + 0.984375;
 	}
 
 	return jmap<float>(p, start.y, end.y);

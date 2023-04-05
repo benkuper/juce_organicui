@@ -83,9 +83,9 @@ template<class T>
 GenericManagerEditor<T>::GenericManagerEditor(BaseManager<T>* _manager, bool isRoot) :
 	EnablingControllableContainerEditor(_manager, isRoot, false),
 	manager(_manager),
-	addItemText("Add item"),
 	isDraggingOver(false),
-	highlightOnDragOver(true)
+	highlightOnDragOver(true),
+    addItemText("Add item")
 {
 	headerHeight = 20;
 	setInterceptsMouseClicks(true, true);

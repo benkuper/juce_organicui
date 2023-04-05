@@ -15,11 +15,11 @@ juce_ImplementSingleton(ProjectSettings)
 ProjectSettings::ProjectSettings() :
 	ControllableContainer("Project Settings"),
 	dashboardCC("Dashboard Settings"),
+    dashboardPassword(nullptr),
+    unlockOnce(nullptr),
+    dashboardDefaults("Defaults Values"),
 	customValuesCC("Custom Definitions"),
-	customRangesCC("Custom Ranges"),
-	dashboardDefaults("Defaults Values"),
-	unlockOnce(nullptr),
-	dashboardPassword(nullptr)
+	customRangesCC("Custom Ranges")
 {
 	saveAndLoadRecursiveData = true;
 	fullScreenOnStartup = addBoolParameter("Full Screen on load", "If checked, the app will go full screen when loading the file, otherwise it will go to window mode", false);

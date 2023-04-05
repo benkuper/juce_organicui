@@ -18,9 +18,9 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(Array<Con
 	contourColor(BG_COLOR.brighter(.3f)),
 	containerLabel("containerLabel", dynamic_cast<ControllableContainer*>(inspectable.get())->niceName),
 	containers(containers),
-	dragAndDropEnabled(false),
 	customCreateEditorForControllableFunc(nullptr),
-	customCreateEditorForContainerFunc(nullptr)
+	customCreateEditorForContainerFunc(nullptr),
+    dragAndDropEnabled(false)
 {
 	jassert(containers.size() > 0);
 

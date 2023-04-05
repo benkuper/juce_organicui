@@ -14,8 +14,8 @@ ColorParameterUI::ColorParameterUI(Array<ColorParameter *> parameters) :
     colorParams(parameters),
 	colorParam(parameters[0]),
     dispatchOnDoubleClick(true),
-	dispatchOnSingleClick(false),
-	colorEditor(nullptr)
+	colorEditor(nullptr),
+    dispatchOnSingleClick(false)
 {
 	setSize(200, GlobalSettings::getInstance()->fontSize->floatValue() + 4);//default size
 	showLabel = false;
