@@ -44,7 +44,13 @@ String AppUpdater::getDownloadFileName(StringRef version, bool beta, StringRef _
 #if JUCE_WINDOWS
 	fileURL += "win-x64";
 #elif JUCE_MAC
-	fileURL += "osx";
+    
+#if TARGET_CPU_ARM64
+    fileURL += "osx-silicon";
+#else
+    fileURL += "osx-intel";
+#endif
+	
 #elif JUCE_LINUX
 	fileURL += "linux-x64";
 #endif
