@@ -18,7 +18,9 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(Array<Con
 	contourColor(BG_COLOR.brighter(.3f)),
 	containerLabel("containerLabel", dynamic_cast<ControllableContainer*>(inspectable.get())->niceName),
 	containers(containers),
-	dragAndDropEnabled(false)
+	dragAndDropEnabled(false),
+	customCreateEditorForControllableFunc(nullptr),
+	customCreateEditorForContainerFunc(nullptr)
 {
 	jassert(containers.size() > 0);
 
@@ -370,6 +372,7 @@ void GenericControllableContainerEditor::resetAndBuild()
 
 InspectableEditor* GenericControllableContainerEditor::getEditorUIForContainer(ControllableContainer* cc)
 {
+	if(customCreateEditorForContainerFunc != nullptr) return customCreateEditorForContainerFunc(container, cc);
 	return cc->getEditor(false);
 }
 
@@ -456,6 +459,7 @@ void GenericControllableContainerEditor::componentVisibilityChanged(Component& c
 
 InspectableEditor* GenericControllableContainerEditor::getEditorUIForControllable(Controllable* c)
 {
+	if (customCreateEditorForControllableFunc != nullptr) return customCreateEditorForControllableFunc(container, c);
 	return c->getEditor(false);
 }
 
