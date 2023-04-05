@@ -34,9 +34,9 @@
 
 //==============================================================================
 #ifdef _MSC_VER
- #pragma warning (push)
- // Disable warnings for long class names, padding, and undefined preprocessor definitions.
- #pragma warning (disable: 4251 4786 4668 4820)
+#pragma warning (push)
+// Disable warnings for long class names, padding, and undefined preprocessor definitions.
+#pragma warning (disable: 4251 4786 4668 4820)
 #endif
 
 
@@ -64,6 +64,10 @@
 */
 #ifndef ORGANICUI_USE_WEBSERVER
 #define ORGANICUI_USE_WEBSERVER 0
+#endif
+
+#ifndef OSC_REMOTE_CONTROL_PORT
+#define OSC_REMOTE_CONTROL_PORT 42000
 #endif
 
 

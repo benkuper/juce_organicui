@@ -1,4 +1,5 @@
 #include "JuceHeader.h"
+#include "OSCHelpers.h"
 
 void OSCHelpers::logOSCFormatError(const char* message, int length)
 {
@@ -19,6 +20,8 @@ OSCArgument OSCHelpers::varToArgument(const var& v)
 
 		return OSCArgument(OSCColour::fromInt32(col));
 	}
+	else if(v.isUndefined()) return OSCArgument();
+	else if (v.isVoid()) return OSCArgument();
 
 	jassert(false);
 
@@ -81,6 +84,7 @@ void OSCHelpers::addArgumentsForParameter(OSCMessage& m, Parameter* p, BoolMode 
 		break;
 
 	case Controllable::ENUM: m.addString(((EnumParameter*)p)->getValueKey()); break;
+	case Controllable::TARGET: m.addString(p->stringValue()); break;
 
 	default:
 		jassertfalse;
@@ -280,4 +284,15 @@ void OSCHelpers::handleControllableForOSCMessage(Controllable* c, const OSCMessa
 			break;
 		}
 	}
+}
+
+String OSCHelpers::messageToString(const OSCMessage& m)
+{
+	String s = m.getAddressPattern().toString();
+	for (auto& a : m)
+	{
+		s += "\n" + OSCHelpers::getStringArg(a);
+	}
+
+	return s;
 }

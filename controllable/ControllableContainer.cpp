@@ -8,6 +8,8 @@
  ==============================================================================
  */
 
+#include "JuceHeader.h"
+
 ControllableComparator ControllableContainer::comparator;
 
 ControllableContainer::ControllableContainer(const String& niceName) :
@@ -35,7 +37,7 @@ ControllableContainer::ControllableContainer(const String& niceName) :
 	customControllableComparator(nullptr),
 	parentContainer(nullptr),
 	queuedNotifier(500) //what to put in max size ??
-						//500 seems ok on my computer, but if too low, generates leaks when closing app while heavy use of async (like  parameter update from audio signal)
+	//500 seems ok on my computer, but if too low, generates leaks when closing app while heavy use of async (like  parameter update from audio signal)
 {
 	setNiceName(niceName);
 
@@ -883,7 +885,7 @@ var ControllableContainer::getJSONData()
 
 
 	for (auto& wc : cont) {
-		if (wc->type == Controllable::TRIGGER && !includeTriggersInSaveLoad) continue;
+		if (wc->type == Controllable::TRIGGER && !includeTriggersInSaveLoad && wc->hideInRemoteControl != wc->defaultHideInRemoteControl) continue;
 		if (wc.wasObjectDeleted()) continue;
 		if (!wc->shouldBeSaved()) continue;
 		paramsData.append(wc->getJSONData(this));
@@ -970,10 +972,14 @@ void ControllableContainer::loadJSONData(var data, bool createIfNotThere)
 
 			if (c != nullptr)
 			{
-				if (Parameter* p = dynamic_cast<Parameter*>(c)) {
-					if (p->isSavable) p->loadJSONData(pData.getDynamicObject());
+				if (c->type == Controllable::TRIGGER)
+				{
+					/*if (includeTriggersInSaveLoad) */c->loadJSONData(pData);
 				}
-
+				else if (Parameter* p = dynamic_cast<Parameter*>(c))
+				{
+					if (p->isSavable) p->loadJSONData(pData);
+				}
 			}
 			else if (createIfNotThere || userCanAddControllables)
 			{

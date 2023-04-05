@@ -11,7 +11,7 @@
 #include "juce_organicui/juce_organicui.h"
 
 //CONTROLLABLE
-ControllableChooserPopupMenu::ControllableChooserPopupMenu(ControllableContainer* rootContainer, int _indexOffset, int _maxDefaultSearchLevel, const StringArray& typesFilter, const StringArray& excludeTypesFilter, std::function<bool(Controllable*)> filterFunc, Controllable * currentSelection) :
+ControllableChooserPopupMenu::ControllableChooserPopupMenu(ControllableContainer* rootContainer, int _indexOffset, int _maxDefaultSearchLevel, const StringArray& typesFilter, const StringArray& excludeTypesFilter, std::function<bool(Controllable*)> filterFunc, Controllable* currentSelection) :
 	indexOffset(_indexOffset),
 	maxDefaultSearchLevel(_maxDefaultSearchLevel),
 	typesFilter(typesFilter),
@@ -77,7 +77,7 @@ void ControllableChooserPopupMenu::showAndGetControllable(std::function<void(Con
 	showMenuAsync(PopupMenu::Options(), [this, returnFunc, deleteAfter](int result)
 		{
 			returnFunc(getControllableForResult(result));
-			if(deleteAfter) delete this;
+			if (deleteAfter) delete this;
 		}
 	);
 }
@@ -91,7 +91,7 @@ Controllable* ControllableChooserPopupMenu::getControllableForResult(int result)
 //CONTAINER
 
 
-ContainerChooserPopupMenu::ContainerChooserPopupMenu(ControllableContainer* rootContainer, int indexOffset, int maxSearchLevel, std::function<bool(ControllableContainer*)> typeCheckFunc, const StringArray& typesFilter, const StringArray& excludeTypeFilters, bool allowSelectAtAnyLevel, ControllableContainer * currentSelection) :
+ContainerChooserPopupMenu::ContainerChooserPopupMenu(ControllableContainer* rootContainer, int indexOffset, int maxSearchLevel, std::function<bool(ControllableContainer*)> typeCheckFunc, const StringArray& typesFilter, const StringArray& excludeTypeFilters, bool allowSelectAtAnyLevel, ControllableContainer* currentSelection) :
 	indexOffset(indexOffset),
 	maxDefaultSearchLevel(maxSearchLevel),
 	typeCheckFunc(typeCheckFunc),
@@ -122,14 +122,17 @@ void ContainerChooserPopupMenu::populateMenu(PopupMenu* subMenu, ControllableCon
 		if (typeCheckFunc != nullptr) isATarget = typeCheckFunc(cc);
 		else if (lastLevel) isATarget = true;
 
+		bool isSelectable = true;
+		if (BaseItem* bi = dynamic_cast<BaseItem*>(cc.get()))
+		{
+			if (excludeTypesFilter.contains(bi->getTypeString())) isSelectable = false;
+			if (!typesFilter.isEmpty() && !typesFilter.contains(bi->getTypeString())) isSelectable = false;
+		}
+		else if (typesFilter.size() > 0) isSelectable = false; //if there are filtered types, then anything not a BaseItem is not a target
+
 		if (isATarget)
 		{
-			if (BaseItem* bi = dynamic_cast<BaseItem*>(cc.get()))
-			{
-				if (excludeTypesFilter.contains(bi->getTypeString())) continue;
-				if (!typesFilter.isEmpty() && !typesFilter.contains(bi->getTypeString())) continue;
-			}
-
+			if (!isSelectable) continue;
 			containerList.add(cc);
 			subMenu->addItem(currentId, cc->niceName, true, cc == currentSelection);
 			currentId++;
@@ -144,16 +147,20 @@ void ContainerChooserPopupMenu::populateMenu(PopupMenu* subMenu, ControllableCon
 			{*/
 			PopupMenu p;
 
-			if (allowSelectAtAnyLevel)
+			int numItemsToCheck = 1; //if only precreated items, do not add to menu
+
+			if (allowSelectAtAnyLevel && isSelectable)
 			{
 				containerList.add(cc);
-				p.addItem(currentId, "Select", cc == currentSelection);
+				p.addItem(currentId, "Select", true, cc == currentSelection);
 				currentId++;
 				p.addSeparator();
+
+				numItemsToCheck++;
 			}
 
 			populateMenu(&p, cc, currentId, currentLevel + 1);
-			if (typeCheckFunc == nullptr || p.containsAnyActiveItems()) subMenu->addSubMenu(cc->niceName, p, true, nullptr, cc == currentSelection);
+			if (typeCheckFunc == nullptr || (p.containsAnyActiveItems() && p.getNumItems() >= numItemsToCheck)) subMenu->addSubMenu(cc->niceName, p, true, nullptr, cc == currentSelection);
 			//}
 
 		}

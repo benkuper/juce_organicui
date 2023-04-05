@@ -8,12 +8,16 @@
   ==============================================================================
 */
 
+#include "JuceHeader.h"
+
+
 std::function<Inspector* (InspectableSelectionManager*)> InspectorUI::customCreateInspectorFunc = nullptr;
 
 Inspector::Inspector(InspectableSelectionManager* _selectionManager) :
 	selectionManager(nullptr),
 	currentEditor(nullptr),
-	showTextOnEmpty(true)
+	showTextOnEmpty(true),
+	tempScrollPosition(0)
 {
 
 	setSelectionManager(_selectionManager);
@@ -129,6 +133,16 @@ void Inspector::setCurrentInspectables(Array<Inspectable*> inspectables, bool se
 	listeners.call(&InspectorListener::currentInspectableChanged, this);
 }
 
+
+void Inspector::storeScrollPosition()
+{
+	tempScrollPosition = vp.getViewPositionY();
+}
+
+void Inspector::restoreScrollPosition()
+{
+	vp.setViewPosition(Point<int>(vp.getViewPositionX(), tempScrollPosition));
+}
 
 void Inspector::clear()
 {

@@ -9,6 +9,8 @@
  ==============================================================================
  */
 
+#include "JuceHeader.h"
+
 Engine * Engine::mainEngine = nullptr;
 
 static OrganicApplication& getApp();

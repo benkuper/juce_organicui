@@ -18,13 +18,15 @@ class ScriptExpression :
 	public ParameterListener
 {
 public:
-	ScriptExpression();
+	ScriptExpression(Parameter* attachedParam = nullptr);
 	~ScriptExpression();
 
 	enum ExpressionState { EXPRESSION_LOADED, EXPRESSION_ERROR, EXPRESSION_EMPTY, EXPRESSION_CLEAR };
 
 	ExpressionState state;
 	std::unique_ptr<JavascriptEngine> scriptEngine;
+
+	Parameter* attachedParam;
 
 	String expression;
 	var currentValue;

@@ -8,16 +8,20 @@
   ==============================================================================
 */
 
+#include "JuceHeader.h"
+
 Automation::Automation(const String& name, AutomationRecorder* recorder, bool allowKeysOutside) :
 	BaseManager(name),
 	valueRange(nullptr),
 	rangeRemapMode(nullptr),
 	allowKeysOutside(allowKeysOutside),
-    positionUnitSteps(0),
-    recorder(recorder),
+	positionUnitSteps(0),
+	recorder(recorder),
 	automationNotifier(5)
 {
 	itemDataType = "AutomationKey";
+
+	defaultHideInRemoteControl = true; //Avoid sending automation data to remote control by default, keys can be a lot !
 
 	comparator.compareFunc = &Automation::compareKeys;
 

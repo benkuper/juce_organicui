@@ -27,18 +27,25 @@ OSCRemoteControl::OSCRemoteControl() :
 #endif
 
 #endif
+	, manualSendCC("Manual OSC Send")
 {
 
 	saveAndLoadRecursiveData = true; //can be useful when app include other settings there
 
 	enabled->setValue(false);
 
-	localPort = addIntParameter("Local Port", "Local port to connect to for global control over the application", 42000, 1024, 65535);
+	localPort = addIntParameter("Local Port", "Local port to connect to for global control over the application", OSC_REMOTE_CONTROL_PORT, 1, 65535);
 	logIncoming = addBoolParameter("Log Incoming", "If checked, this will log incoming messages", false);
 	logOutgoing = addBoolParameter("Log Outgoing", "If checked, this will log outgoing messages", false);
 
 	receiver.addListener(this);
 	receiver.registerFormatErrorHandler(&OSCHelpers::logOSCFormatError);
+
+	manualAddress = manualSendCC.addStringParameter("Address", "Address to send to", "127.0.0.1");
+	manualPort = manualSendCC.addIntParameter("Port", "Port to send to", OSC_REMOTE_CONTROL_PORT + 1, 1, 65535);
+
+	manualSendCC.enabled->setDefaultValue(false);
+	addChildControllableContainer(&manualSendCC);
 
 }
 
@@ -64,23 +71,24 @@ void OSCRemoteControl::setupReceiver()
 	//if (receiveCC == nullptr) return;
 
 	receiver.disconnect();
+	receiverIsConnected = false;
 
 #if ORGANICUI_USE_WEBSERVER
-	Engine::mainEngine->removeAsyncContainerListener(this);
+	updateEngineListener();
 #endif
 
 	if (!enabled->boolValue()) return;
 
 	//if (!receiveCC->enabled->boolValue()) return;
-	bool result = receiver.connect(localPort->intValue());
+	receiverIsConnected = receiver.connect(localPort->intValue());
 
 
-	if (result)
+	if (receiverIsConnected)
 	{
 
 #if ORGANICUI_USE_WEBSERVER
 		setupServer();
-		Engine::mainEngine->addAsyncContainerListener(this);
+		updateEngineListener();
 #endif
 
 		NLOG(niceName, "Now receiving on port : " + localPort->stringValue());
@@ -106,6 +114,17 @@ void OSCRemoteControl::setupReceiver()
 	NLOG(niceName, s);
 }
 
+void OSCRemoteControl::setupManualSender()
+{
+	manualSender.disconnect();
+	updateEngineListener();
+
+	if (!manualSendCC.enabled->boolValue()) return;
+
+	manualSender.connect(manualAddress->stringValue(), manualPort->intValue());
+	updateEngineListener();
+}
+
 #if ORGANICUI_USE_SERVUS
 void OSCRemoteControl::setupZeroconf()
 {
@@ -113,6 +132,19 @@ void OSCRemoteControl::setupZeroconf()
 	if (!isThreadRunning()) startThread();
 }
 #endif
+
+void OSCRemoteControl::updateEngineListener()
+{
+	Engine::mainEngine->removeAsyncContainerListener(this);
+
+	bool shouldListen = false;
+	if (!enabled->boolValue()) return;
+	if (manualSendCC.enabled->boolValue()) shouldListen = true;
+	if (receiverIsConnected) shouldListen = true;
+
+	if (shouldListen) Engine::mainEngine->addAsyncContainerListener(this);
+}
+
 
 void OSCRemoteControl::processMessage(const OSCMessage& m, const String& sourceId)
 {
@@ -198,7 +230,11 @@ void OSCRemoteControl::processMessage(const OSCMessage& m, const String& sourceI
 		MessageManager::callAsync([]() {
 			((OrganicApplication*)OrganicApplication::getInstance())->mainWindow->setMinimised(false);
 			((OrganicApplication*)OrganicApplication::getInstance())->mainWindow->openFromTray();
-		});
+			});
+	}
+	else if (add == "/syncAll")
+	{
+		sendAllManualFeedback();
 	}
 	else
 	{
@@ -219,7 +255,7 @@ void OSCRemoteControl::processMessage(const OSCMessage& m, const String& sourceI
 						break;
 					}
 				}
-					}
+			}
 			else
 			{
 				noFeedbackMap.set(c, sourceId);
@@ -232,7 +268,7 @@ void OSCRemoteControl::processMessage(const OSCMessage& m, const String& sourceI
 		Controllable* c = OSCHelpers::findControllableAndHandleMessage(Engine::mainEngine, m);
 #endif
 
-		if(c == nullptr)
+		if (c == nullptr)
 		{
 			remoteControlListeners.call(&RemoteControlListener::processMessage, m);
 			return;
@@ -402,7 +438,7 @@ var OSCRemoteControl::getOSCQueryDataForControllable(Controllable* c)
 				rData.getDynamicObject()->setProperty("MAX", p->maximumValue);
 				range.append(rData);
 			}
-			
+
 		}
 
 		switch (p->type)
@@ -481,7 +517,7 @@ var OSCRemoteControl::getOSCQueryDataForControllable(Controllable* c)
 void OSCRemoteControl::connectionOpened(const String& id)
 {
 	NLOG(niceName, "Got a connection from " << id);
-	feedbackMap.set(id, Array<Controllable *>()); //Reset feedbacks
+	feedbackMap.set(id, Array<Controllable*>()); //Reset feedbacks
 }
 
 void OSCRemoteControl::messageReceived(const String& id, const String& message)
@@ -525,12 +561,22 @@ void OSCRemoteControl::connectionError(const String& id, const String& message)
 	feedbackMap.remove(id);
 }
 
+
+void OSCRemoteControl::onControllableFeedbackUpdate(ControllableContainer* cc, Controllable* c)
+{
+	if (cc == &manualSendCC)
+	{
+		setupManualSender();
+	}
+}
+
 void OSCRemoteControl::newMessage(const ContainerAsyncEvent& e)
 {
 	if (Engine::mainEngine->isLoadingFile || Engine::mainEngine->isClearing) return;
 
 	if (e.type == ContainerAsyncEvent::ControllableFeedbackUpdate)
 	{
+		//OSCQuery
 		HashMap<String, Array<Controllable*>, DefaultHashFunctions, CriticalSection>::Iterator it(feedbackMap);
 		while (it.next())
 		{
@@ -539,8 +585,12 @@ void OSCRemoteControl::newMessage(const ContainerAsyncEvent& e)
 				sendOSCQueryFeedback(e.targetControllable);
 			}
 		}
+
+		//Manual
+		sendManualFeedbackForControllable(e.targetControllable);
+
 	}
-	
+
 }
 
 void OSCRemoteControl::sendOSCQueryFeedback(Controllable* c, const String& excludeId)
@@ -558,15 +608,29 @@ void OSCRemoteControl::sendOSCQueryFeedback(Controllable* c, const String& exclu
 		server->sendExclude(b, ex);
 	}
 
-	if (logOutgoing->boolValue())
-	{
-		String s = m.getAddressPattern().toString();
-		for (auto& a : m)
-		{
-			s += "\n" + OSCHelpers::getStringArg(a);
-		}
+	if (logOutgoing->boolValue()) NLOG(niceName, "Sent to OSCQuery : " << OSCHelpers::messageToString(m));
 
-		NLOG(niceName, "Sent : " << s);
-	}
 }
 #endif
+
+void OSCRemoteControl::sendAllManualFeedback()
+{
+	if (!manualSendCC.enabled->boolValue()) return;
+
+	Array<WeakReference<Controllable>> allControllables = Engine::mainEngine->getAllControllables(true);
+	for (auto& c : allControllables)
+	{
+		sendManualFeedbackForControllable(c);
+	}
+}
+
+void OSCRemoteControl::sendManualFeedbackForControllable(Controllable* c)
+{
+	if (!manualSendCC.enabled->boolValue()) return;
+	if (c == nullptr || c->hideInRemoteControl) return;
+	OSCMessage m = OSCHelpers::getOSCMessageForControllable(c);
+
+	manualSender.send(m);
+
+	if (logOutgoing->boolValue()) NLOG(niceName, "Sent to manual OSC  : " << OSCHelpers::messageToString(m));
+}

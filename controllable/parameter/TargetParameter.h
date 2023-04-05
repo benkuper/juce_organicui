@@ -66,7 +66,7 @@ public:
 	void setTarget(WeakReference<Controllable>);
 	void setTarget(WeakReference<ControllableContainer>);
 
-	void setRootContainer(WeakReference<ControllableContainer> newRootContainer);
+	void setRootContainer(WeakReference<ControllableContainer> newRootContainer, bool engineIfNull = true, bool forceSetValue = true);
 
 	void childStructureChanged(ControllableContainer *) override;
 

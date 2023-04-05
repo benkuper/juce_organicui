@@ -249,7 +249,7 @@ void Engine::setLastDocumentOpened(const File& file) {
 
 var Engine::getJSONData()
 {
-	var data(new DynamicObject());
+	var data = ControllableContainer::getJSONData();
 	var metaData(new DynamicObject());
 
 	metaData.getDynamicObject()->setProperty("version", ProjectInfo::versionString);
@@ -281,6 +281,7 @@ var Engine::getJSONData()
 void Engine::loadJSONData(var data, ProgressTask* loadingTask)
 {
 	clear();
+
 
 	DynamicObject* dObject = data.getDynamicObject();
 	if (dObject == nullptr)
@@ -387,7 +388,10 @@ void Engine::loadJSONData(var data, ProgressTask* loadingTask)
 
 void Engine::loadJSONDataEngine(var data, ProgressTask* loadingTask)
 {
+	ControllableContainer::loadJSONData(data);
+	
 	//if (InspectableSelectionManager::mainSelectionManager != nullptr) InspectableSelectionManager::mainSelectionManager->setEnabled(false); //avoid creation of inspector editor while recreating all nodes, controllers, rules,etc. from file
+
 	if (Outliner::getInstanceWithoutCreating() != nullptr) Outliner::getInstance()->setEnabled(false);
 
 	DynamicObject* d = data.getDynamicObject();

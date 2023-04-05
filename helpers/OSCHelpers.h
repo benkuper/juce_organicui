@@ -54,4 +54,6 @@ public:
 
 		return manager->getItemWithName(getStringArg(m[0]), true, true);
 	}
+
+	static String messageToString(const OSCMessage& m);
 };

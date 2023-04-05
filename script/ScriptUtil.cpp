@@ -9,8 +9,6 @@
 */
 
 #include "JuceHeader.h"
-#include "ScriptUtil.h"
-
 
 juce_ImplementSingleton(ScriptUtil)
 
@@ -31,7 +29,7 @@ ScriptUtil::ScriptUtil() :
 	scriptObject.setMethod("hexStringToInt", ScriptUtil::hexStringToInt);
 	scriptObject.setMethod("getObjectProperties", ScriptUtil::getObjectProperties);
 	scriptObject.setMethod("getObjectMethods", ScriptUtil::getObjectMethods);
-		
+
 	scriptObject.setMethod("getIPs", ScriptUtil::getIPs);
 	scriptObject.setMethod("encodeHMAC_SHA1", ScriptUtil::encodeHMAC_SHA1);
 	scriptObject.setMethod("encodeSHA256", ScriptUtil::encodeSHA256);
@@ -105,7 +103,7 @@ var ScriptUtil::getFloatFromBytes(const var::NativeFunctionArgs& a)
 }
 
 // Convert float to Hex
-var ScriptUtil::floatToHexSeq(const var::NativeFunctionArgs& a) 
+var ScriptUtil::floatToHexSeq(const var::NativeFunctionArgs& a)
 {
 	if (a.numArguments < 2) return 0;
 	float value = a.arguments[0];
@@ -133,8 +131,8 @@ var ScriptUtil::floatToHexSeq(const var::NativeFunctionArgs& a)
 	std::ostringstream oss;
 
 	for (int i : result) {
-			oss << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << i;
-		}
+		oss << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << i;
+	}
 
 	return String(oss.str());
 }
@@ -160,7 +158,7 @@ var ScriptUtil::getInt64FromBytes(const var::NativeFunctionArgs& a)
 }
 
 // Convert double to Hex
-var ScriptUtil::doubleToHexSeq(const var::NativeFunctionArgs& a) 
+var ScriptUtil::doubleToHexSeq(const var::NativeFunctionArgs& a)
 {
 	if (a.numArguments < 2) return 0;
 	double value = a.arguments[0];
@@ -196,7 +194,7 @@ var ScriptUtil::doubleToHexSeq(const var::NativeFunctionArgs& a)
 
 
 // Convert Str Hex to Int
-var ScriptUtil::hexStringToInt(const var::NativeFunctionArgs& a) 
+var ScriptUtil::hexStringToInt(const var::NativeFunctionArgs& a)
 {
 	if (a.numArguments == 0) return 0;
 	String hexString = a.arguments[0];
@@ -617,6 +615,60 @@ var ScriptUtil::showYesNoCancelBox(const var::NativeFunctionArgs& args)
 			script->callFunction("messageBoxCallback", Array<var>{ id, result });
 		})
 	);
+
+	return result;
+}
+
+String ScriptUtil::getLogStringForVar(const var& v)
+{
+	String result;
+	if (v.isObject())
+	{
+		if (v.hasProperty(scriptPtrIdentifier))
+		{
+			String st = v.getProperty("_type", "").toString();
+			if (st.isNotEmpty())
+			{
+				int64 ptr = (int64)v.getDynamicObject()->getProperty(scriptPtrIdentifier);
+
+				if (st == "Container")
+				{
+					result += dynamic_cast<ControllableContainer*>((ControllableContainer*)ptr)->getScriptTargetString();
+				}
+				else if (st == "Controllable")
+				{
+					result += dynamic_cast<Controllable*>((Controllable*)ptr)->getScriptTargetString();
+				}
+			}
+		}
+		else if (v.isArray())
+		{
+			result += "[";
+			for (int i = 0; i < v.size(); i++)
+			{
+				if (i > 0) result += ", ";
+				result += getLogStringForVar(v[i]);
+			}
+			result += "]";
+		}
+		else
+		{
+			result += "{";
+			NamedValueSet props = v.getDynamicObject()->getProperties();
+			for (int i = 0; i < props.size(); i++)
+			{
+				if (i > 0) result += ", ";
+				result += props.getName(i) + ":" + getLogStringForVar(props.getValueAt(i));
+			}
+
+			result += "}";
+
+		}
+	}
+	else
+	{
+		result = v.toString();
+	}
 
 	return result;
 }

@@ -32,12 +32,17 @@ public:
 	bool curSelectionDoesNotAffectInspector;
 	bool showTextOnEmpty;
 
+	int tempScrollPosition;
+
 	virtual void setSelectionManager(InspectableSelectionManager* newSM);
 	virtual void setCurrentInspectables(Array<Inspectable*>inspectables = Array<Inspectable*>(), bool setInspectableSelection = true);
 
 	virtual void paint(Graphics& g) override;
 	virtual void resized() override;
 	virtual void resizedInternal(juce::Rectangle<int>& r);
+
+	void storeScrollPosition();
+	void restoreScrollPosition();
 
 	virtual void clear();
 

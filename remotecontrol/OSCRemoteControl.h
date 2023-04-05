@@ -41,10 +41,17 @@ public:
 
 	IntParameter * localPort;
 	OSCReceiver receiver;
+	bool receiverIsConnected;
 	BoolParameter* logIncoming;
 	BoolParameter* logOutgoing;
 
+	EnablingControllableContainer manualSendCC;
+	OSCSender manualSender;
+	StringParameter * manualAddress;
+	IntParameter* manualPort;
+
 	void setupReceiver();
+	void setupManualSender();
 
 #if ORGANICUI_USE_SERVUS
 	servus::Servus servus;
@@ -55,6 +62,8 @@ public:
 
 	void setupZeroconf();
 #endif
+
+	void updateEngineListener();
 
 	void processMessage(const OSCMessage &m, const String &sourceId = "");
 
@@ -85,6 +94,11 @@ public:
 	void connectionError(const String& id, const String& message) override;
 
 	void sendOSCQueryFeedback(Controllable* c, const String & excludeId = "");
+
+	void sendAllManualFeedback();
+	void sendManualFeedbackForControllable(Controllable* c);
+
+	void onControllableFeedbackUpdate(ControllableContainer * cc, Controllable *c) override;
 
 	void newMessage(const ContainerAsyncEvent& e) override;
 #endif

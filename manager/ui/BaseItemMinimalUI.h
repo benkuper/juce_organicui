@@ -144,7 +144,7 @@ BaseItemMinimalUI<T>::BaseItemMinimalUI(T* _item) :
 template<class T>
 BaseItemMinimalUI<T>::~BaseItemMinimalUI()
 {
-	if (baseItem != nullptr) baseItem->removeAsyncContainerListener(this);
+	if (baseItem != nullptr && !inspectable.wasObjectDeleted()) baseItem->removeAsyncContainerListener(this);
 }
 
 

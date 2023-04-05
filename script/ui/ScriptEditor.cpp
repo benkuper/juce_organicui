@@ -8,6 +8,8 @@
   ==============================================================================
 */
 
+#include "JuceHeader.h"
+
 ScriptEditor::ScriptEditor(Script * _script, bool isRoot) :
 	BaseItemEditor(_script, isRoot),
 	script(_script),
@@ -103,7 +105,12 @@ void ScriptEditor::buttonClicked(Button * b)
 		if (script->filePath->stringValue().isEmpty())
 		{
 			script->chooseFileScript(true);
-		} 
+		}
+		else
+		{
+			File f = script->filePath->getFile();
+			if(f.existsAsFile()) f.startAsProcess();
+		}
 	}
 }
 
