@@ -465,8 +465,8 @@ InspectableEditor* GenericControllableContainerEditor::addControllableUI(Control
 
 	InspectableEditor* cui = getEditorUIForControllable(c);
 
-	ControllableEditor* ce = dynamic_cast<ControllableEditor*>(cui);
-	if (ce != nullptr) ce->dragAndDropEnabled = dragAndDropEnabled;
+	//ControllableEditor* ce = dynamic_cast<ControllableEditor*>(cui);
+	//if (ce != nullptr) ce->dragAndDropEnabled = dragAndDropEnabled;
 
 	int index = container->controllables.indexOf(c);
 	childEditors.insert(index, cui);
