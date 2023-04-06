@@ -1,3 +1,5 @@
+#include "JuceHeader.h"
+
 String WarningTarget::warningNoId = "";
 String WarningTarget::warningAllId = "*";
 
@@ -27,7 +29,7 @@ WarningTarget::~WarningTarget()
 
 }
 
-void WarningTarget::setWarningMessage(const String& message, const String& id)
+void WarningTarget::setWarningMessage(const String& message, const String& id, bool log)
 {
 	if (WarningReporter::getInstanceWithoutCreating() == nullptr) return;
 	if (message.isNotEmpty() && warningMessage.contains(id) && warningMessage[id] == message) return;
@@ -39,6 +41,7 @@ void WarningTarget::setWarningMessage(const String& message, const String& id)
 	}
 	else
 	{
+		if (log) LOGWARNING(message);
 		warningMessage.set(id, message);
 		WarningReporter::getInstance()->registerWarning(this);
 	}

@@ -26,7 +26,7 @@ public:
 
 	HashMap<String, String> warningMessage;
 
-	void setWarningMessage(const String& message = String(), const String& id = warningNoId);
+	void setWarningMessage(const String& message = String(), const String& id = warningNoId, bool log = true);
 	void clearWarning(const String& id = warningNoId);
 
 	void notifyWarningChanged();
