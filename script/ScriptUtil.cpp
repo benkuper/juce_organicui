@@ -9,6 +9,7 @@
 */
 
 #include "JuceHeader.h"
+#include "ScriptUtil.h"
 
 juce_ImplementSingleton(ScriptUtil)
 
@@ -27,6 +28,7 @@ ScriptUtil::ScriptUtil() :
 	scriptObject.setMethod("getInt64FromBytes", ScriptUtil::getInt32FromBytes);
 	scriptObject.setMethod("doubleToHexSeq", ScriptUtil::doubleToHexSeq);
 	scriptObject.setMethod("hexStringToInt", ScriptUtil::hexStringToInt);
+	scriptObject.setMethod("toStringFixed", ScriptUtil::toStringFixed);
 	scriptObject.setMethod("getObjectProperties", ScriptUtil::getObjectProperties);
 	scriptObject.setMethod("getObjectMethods", ScriptUtil::getObjectMethods);
 
@@ -204,6 +206,14 @@ var ScriptUtil::hexStringToInt(const var::NativeFunctionArgs& a)
 	int result;
 	ss >> result;
 	return result;
+}
+
+var ScriptUtil::toStringFixed(const var::NativeFunctionArgs& a)
+{
+	if (a.numArguments == 0) return 0;
+	if (!a.arguments[0].isDouble()) return a.arguments[0].toString();
+	int numDecimals = (a.numArguments > 1) ? (int)a.arguments[1] : 3;
+	return String((double)a.arguments[0], numDecimals, false);
 }
 
 var ScriptUtil::getObjectMethods(const var::NativeFunctionArgs& a)

@@ -30,6 +30,7 @@ public:
 	static var getInt64FromBytes(const var::NativeFunctionArgs& a);
 	static var doubleToHexSeq(const var::NativeFunctionArgs& a);
 	static var hexStringToInt(const var::NativeFunctionArgs& a);
+	static var toStringFixed(const var::NativeFunctionArgs& a);
 
 	static var getObjectProperties(const var::NativeFunctionArgs& a);
 	static var getObjectMethods(const var::NativeFunctionArgs& a);
