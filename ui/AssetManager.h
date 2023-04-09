@@ -32,6 +32,8 @@ public:
 	Image triggerImage;
 	Image relativeImage;
 	Image minusImage;
+	Image explorerImage;
+
 
 	ImageButton * getRemoveBT();
 	ImageButton * getConfigBT();

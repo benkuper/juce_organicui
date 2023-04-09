@@ -8,6 +8,8 @@
   ==============================================================================
 */
 
+#include "JuceHeader.h"
+
 EnumParameterUIBase::EnumParameterUIBase(Array<EnumParameter*> parameters) :
 	ParameterUI(Inspectable::getArrayAs<EnumParameter, Parameter>(parameters)),
 	eps(parameters),
@@ -19,7 +21,7 @@ EnumParameterUIBase::EnumParameterUIBase(Array<EnumParameter*> parameters) :
 
 EnumParameterUIBase::~EnumParameterUIBase()
 {
-	if (!parameter.wasObjectDeleted()) ep->removeAsyncEnumParameterListener(this);
+	if (parameter != nullptr && !parameter.wasObjectDeleted()) ep->removeAsyncEnumParameterListener(this);
 }
 
 void EnumParameterUIBase::addPopupMenuItemsInternal(PopupMenu* p)
@@ -65,7 +67,7 @@ EnumParameterUI::EnumParameterUI(Array<EnumParameter*> parameters) :
 
 EnumParameterUI::~EnumParameterUI()
 {
-	cb.removeListener(this);
+	//cb.removeListener(this);
 }
 
 void EnumParameterUI::updateFromParameter()
@@ -103,11 +105,13 @@ String EnumParameterUI::getSelectedKey()
 
 void EnumParameterUI::resized()
 {
+	if (shouldBailOut()) return;
 	cb.setBounds(getLocalBounds());
 }
 
 void EnumParameterUI::updateUIParamsInternal()
 {
+	if (shouldBailOut()) return;
 	Colour bgColor = useCustomBGColor ? customBGColor : BG_COLOR;
 	Colour fgColor = useCustomTextColor ? customTextColor : TEXT_COLOR;
 

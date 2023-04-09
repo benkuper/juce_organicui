@@ -124,6 +124,9 @@ void StringParameterUI::labelTextChanged(Label*)
 	parameter->setUndoableValue(parameter->stringValue(), valueLabel.getText());
 }
 
+
+File StringParameterFileUI::lastSearchedFolder = File::getSpecialLocation(File::userDocumentsDirectory);
+
 StringParameterFileUI::StringParameterFileUI(Array<StringParameter*> parameters) :
 	StringParameterUI(parameters),
 	fps(Inspectable::getArrayAs<StringParameter, FileParameter>(parameters)),
@@ -134,14 +137,9 @@ StringParameterFileUI::StringParameterFileUI(Array<StringParameter*> parameters)
 	browseBT.setEnabled(isInteractable());
 	addAndMakeVisible(&browseBT);
 
-	if (!fp->forceRelativePath)
-	{
-		relativeBT.reset(AssetManager::getInstance()->getToggleBTImage(AssetManager::getInstance()->relativeImage));
-		relativeBT->addListener(this);
-		relativeBT->setToggleState(fp->forceRelativePath, dontSendNotification);
-		relativeBT->setEnabled(isInteractable());
-		addAndMakeVisible(relativeBT.get());
-	}
+	explorerBT.reset(AssetManager::getInstance()->getSetupBTImage(AssetManager::getInstance()->explorerImage));
+	addAndMakeVisible(explorerBT.get());
+	explorerBT->addListener(this);
 
 }
 
@@ -149,13 +147,38 @@ StringParameterFileUI::~StringParameterFileUI()
 {
 }
 
+void StringParameterFileUI::addPopupMenuItemsInternal(PopupMenu* p)
+{
+	StringParameterUI::addPopupMenuItemsInternal(p);
+	p->addSeparator();
+	p->addItem(30, "Force Relative Path", true, fp->forceRelativePath);
+	p->addItem(31, "Force Absolute Path", true, fp->forceAbsolutePath);
+	p->addItem(32, "Show in Explorer");
+}
+
+void StringParameterFileUI::handleMenuSelectedID(int result)
+{
+	StringParameterUI::handleMenuSelectedID(result);
+	switch (result)
+	{
+	case 30:
+		fp->setForceRelativePath(!fp->forceRelativePath);
+		break;
+
+	case 31:
+		fp->setForceAbsolutePath(!fp->forceAbsolutePath);
+		break;
+
+	case 32:
+		if (fp->getFile().exists()) fp->getFile().revealToUser();
+		break;
+	}
+}
+
 void StringParameterFileUI::resizedInternal(juce::Rectangle<int>& r)
 {
-	if (relativeBT != nullptr)
-	{
-		relativeBT->setBounds(r.removeFromRight(r.getHeight()));
-		r.removeFromRight(2);
-	}
+	explorerBT->setBounds(r.removeFromRight(r.getHeight()));
+	r.removeFromRight(2);
 
 	browseBT.setBounds(r.removeFromRight(60));
 }
@@ -164,14 +187,16 @@ void StringParameterFileUI::feedbackStateChanged()
 {
 	StringParameterUI::feedbackStateChanged();
 	browseBT.setEnabled(isInteractable());
-	if (relativeBT != nullptr) relativeBT->setEnabled(isInteractable());
+	//explorerBT.setEnabled(isInteractable());
 }
 
 void StringParameterFileUI::buttonClicked(Button* b)
 {
 	if (b == &browseBT)
 	{
-		FileChooser* chooser(new FileChooser("Select a file", File(), fp->fileTypeFilter));
+		File of = fp->getFile().exists() ? fp->getFile().getParentDirectory() : lastSearchedFolder;
+
+		FileChooser* chooser(new FileChooser("Select a file", of, fp->fileTypeFilter));
 
 		int openFlags = fp->saveMode ? FileBrowserComponent::saveMode : FileBrowserComponent::openMode;
 		if (fp->directoryMode) openFlags = openFlags | FileBrowserComponent::canSelectDirectories;
@@ -183,6 +208,8 @@ void StringParameterFileUI::buttonClicked(Button* b)
 				delete& fc;
 
 				if (!f.exists() && !fp->saveMode) return;
+
+				lastSearchedFolder = f.getParentDirectory();
 
 				Component::BailOutChecker checker(this);
 				if (checker.shouldBailOut()) return;
@@ -196,9 +223,9 @@ void StringParameterFileUI::buttonClicked(Button* b)
 			}
 		);
 	}
-	else if (relativeBT != nullptr && b == relativeBT.get())
+	else if (b == explorerBT.get())
 	{
-		fp->setForceRelativePath(!fp->forceRelativePath);
+		if (fp->getFile().existsAsFile()) fp->getFile().revealToUser();
 	}
 }
 

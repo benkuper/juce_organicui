@@ -324,8 +324,8 @@ void createDumpAndStrackTrace(int signum, File dumpFile, File traceFile)
 CrashDumpUploader::UploadWindow::UploadWindow() :
 	okBT("Send and close"),
 	cancelBT("Close only"),
-	autoReopenBT("Send and recover"),
-	recoverOnlyBT("Recover Only"),
+	//autoReopenBT("Send and recover"),
+	//recoverOnlyBT("Recover Only"),
 	progressUI(&CrashDumpUploader::getInstance()->progress)
 {
 	okBT.addListener(this);
@@ -334,11 +334,11 @@ CrashDumpUploader::UploadWindow::UploadWindow() :
 	cancelBT.addListener(this);
 	addAndMakeVisible(&cancelBT);
 
-	recoverOnlyBT.addListener(this);
-	addAndMakeVisible(&recoverOnlyBT);
+	//recoverOnlyBT.addListener(this);
+	//addAndMakeVisible(&recoverOnlyBT);
 
-	autoReopenBT.addListener(this);
-	addAndMakeVisible(&autoReopenBT);
+	//autoReopenBT.addListener(this);
+	//addAndMakeVisible(&autoReopenBT);
 
 	addAndMakeVisible(&progressUI);
 
@@ -378,10 +378,10 @@ void CrashDumpUploader::UploadWindow::resized()
 {
 	juce::Rectangle<int> r = getLocalBounds().removeFromBottom(getHeight() / 2);
 	juce::Rectangle<int> br = r.removeFromBottom(30).reduced(2);
-	autoReopenBT.setBounds(br.removeFromRight(100));
-	br.removeFromRight(8);
-	recoverOnlyBT.setBounds(br.removeFromRight(100));
-	br.removeFromRight(8);
+	//autoReopenBT.setBounds(br.removeFromRight(100));
+	//br.removeFromRight(8);
+	//recoverOnlyBT.setBounds(br.removeFromRight(100));
+	//br.removeFromRight(8);
 	okBT.setBounds(br.removeFromRight(100));
 	br.removeFromRight(8);
 	cancelBT.setBounds(br.removeFromRight(100));

@@ -19,6 +19,7 @@ AssetManager::AssetManager()
 	triggerImage = ImageCache::getFromMemory(OrganicUIBinaryData::trigger_png, OrganicUIBinaryData::trigger_pngSize);
 	relativeImage = ImageCache::getFromMemory(OrganicUIBinaryData::relative_png, OrganicUIBinaryData::relative_pngSize);
 	minusImage = ImageCache::getFromMemory(OrganicUIBinaryData::minus_png, OrganicUIBinaryData::minus_pngSize);
+	explorerImage = ImageCache::getFromMemory(OrganicUIBinaryData::explorer_png, OrganicUIBinaryData::explorer_pngSize);
 }
 
 AssetManager::~AssetManager()

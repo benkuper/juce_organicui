@@ -60,7 +60,12 @@ public:
 	Array<FileParameter*> fps;
 	FileParameter* fp;
 	TextButton browseBT;
-	std::unique_ptr<ImageButton> relativeBT;
+	std::unique_ptr<ImageButton> explorerBT;
+	
+	static File lastSearchedFolder;
+
+	virtual void addPopupMenuItemsInternal(PopupMenu* p) override;
+	virtual void handleMenuSelectedID(int result) override;
 
 	void resizedInternal(juce::Rectangle<int>& r) override;
 	virtual void feedbackStateChanged() override;

@@ -31,6 +31,7 @@ public:
     virtual void setValueInternal(var&) override;
 	
 	void setForceRelativePath(bool value);
+	void setForceAbsolutePath(bool value);
 
 	bool isRelativePath(const String &p);
 	String getAbsolutePath() const;
