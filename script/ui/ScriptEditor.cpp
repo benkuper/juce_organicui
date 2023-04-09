@@ -23,11 +23,11 @@ ScriptEditor::ScriptEditor(Script * _script, bool isRoot) :
 	{
 		editBT.reset(AssetManager::getInstance()->getEditBT());
 		editBT->addListener(this);
+		editBT->setTooltip("Edit this script in an external editor");
 		addAndMakeVisible(editBT.get());
 	}
 
 	logUI.reset(script->logParam->createToggle());
-
 
 	paramsEditor.reset(script->scriptParamsContainer->getEditor(false));
 	addChildComponent(paramsEditor.get());
