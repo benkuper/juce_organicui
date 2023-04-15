@@ -12,6 +12,7 @@
 #pragma warning(disable:4244)
 
 
+
 template<class IT>
 class BaseManagerItemComparator
 {
@@ -53,10 +54,11 @@ class BaseManagerUI :
 	public Button::Listener,
 	public BaseItemUI<T>::ItemUIListener,
 	public BaseItemMinimalUI<T>::ItemMinimalUIListener,
+	public InspectableSelectionManager::AsyncListener,
 	public ComponentListener,
 	public Engine::AsyncListener,
 	public DragAndDropTarget,
-	public Label::Listener
+	public TextEditor::Listener
 {
 public:
 	BaseManagerUI<M, T, U>(const String& contentName, M* _manager, bool _useViewport = true);
@@ -88,7 +90,7 @@ public:
 	bool validateHitTestOnNoItem;
 
 	std::unique_ptr<ImageButton> addItemBT;
-	std::unique_ptr<Label> searchBar;
+	std::unique_ptr<TextEditor> searchBar;
 
 	class ToolContainer : public Component
 	{
@@ -222,8 +224,12 @@ public:
 
 	void newMessage(const typename BaseManager<T>::ManagerEvent& e) override;
 
+	virtual void newMessage(const InspectableSelectionManager::SelectionEvent& e) override;
+
 	void buttonClicked(Button* b) override;
-	void labelTextChanged(Label* l) override;
+	void textEditorTextChanged(TextEditor& e) override;
+	void textEditorReturnKeyPressed(TextEditor& e) override;
+	//void labelTextChanged(Label* l) override;
 
 	virtual void inspectableDestroyed(Inspectable*) override;
 
@@ -303,6 +309,7 @@ BaseManagerUI<M, T, U>::BaseManagerUI(const String& contentName, M* _manager, bo
 
 	Engine::mainEngine->addAsyncEngineListener(this);
 
+	InspectableSelectionManager::mainSelectionManager->addAsyncSelectionManagerListener(this);
 	//must call addExistingItems from child class to get overrides
 }
 
@@ -317,6 +324,8 @@ BaseManagerUI<M, T, U>::~BaseManagerUI()
 	}
 
 	Engine::mainEngine->removeAsyncEngineListener(this);
+	if (InspectableSelectionManager::mainSelectionManager != nullptr) InspectableSelectionManager::mainSelectionManager->removeAsyncSelectionManagerListener(this);
+
 }
 
 template<class M, class T, class U>
@@ -354,15 +363,17 @@ void BaseManagerUI<M, T, U>::setShowSearchBar(bool value)
 {
 	if (value)
 	{
-		searchBar.reset(new Label("SearchBar"));
-		searchBar->setJustificationType(Justification::topLeft);
+		searchBar.reset(new TextEditor("SearchBar"));
+		//searchBar->setJustificationType(Justification::topLeft);
 		searchBar->setColour(searchBar->backgroundColourId, BG_COLOR.darker(.1f).withAlpha(.7f));
 		searchBar->setColour(searchBar->outlineColourId, BG_COLOR.brighter(.1f));
 		searchBar->setColour(searchBar->textColourId, TEXT_COLOR.darker(.3f));
 		searchBar->setFont(10);
+		searchBar->setMultiLine(false);
 		searchBar->setColour(CaretComponent::caretColourId, Colours::orange);
-		searchBar->setEditable(true);
+		//searchBar->edit(true);
 		searchBar->addListener(this);
+		searchBar->setTextToShowWhenEmpty("Search...", TEXT_COLOR.withAlpha(.6f));
 		addAndMakeVisible(searchBar.get());
 	}
 	else if (searchBar != nullptr)
@@ -524,12 +535,12 @@ void BaseManagerUI<M, T, U>::paint(Graphics& g)
 					if (defaultLayout == HORIZONTAL)
 					{
 						int tx = currentDropIndex >= 0 ? buiBounds.getX() - 1 : buiBounds.getRight() + 1;
-						g.drawLine(tx, getHeight()*.25f, tx, getHeight()*.75f, 2);
+						g.drawLine(tx, getHeight() * .25f, tx, getHeight() * .75f, 2);
 					}
 					else if (defaultLayout == VERTICAL)
 					{
 						int ty = currentDropIndex >= 0 ? buiBounds.getY() - 1 : buiBounds.getBottom() + 1;
-						g.drawLine(getWidth()*.25f, ty, getWidth()*.75f, ty, 2);
+						g.drawLine(getWidth() * .25f, ty, getWidth() * .75f, ty, 2);
 					}
 				}
 			}
@@ -1021,7 +1032,6 @@ void BaseManagerUI<M, T, U>::itemsAddedAsync(Array<T*> items)
 
 	resized();
 	repaint();
-
 }
 
 template<class M, class T, class U>
@@ -1079,6 +1089,25 @@ void BaseManagerUI<M, T, U>::newMessage(const typename BaseManager<T>::ManagerEv
 
 	default:
 		break;
+	}
+}
+
+template<class M, class T, class U>
+void BaseManagerUI<M, T, U>::newMessage(const InspectableSelectionManager::SelectionEvent& e)
+{
+	if (e.type == e.SELECTION_CHANGED)
+	{
+		if (useViewport)
+		{
+			if (T* item = InspectableSelectionManager::activeSelectionManager->getInspectableAs<T>())
+			{
+				if (U* ui = getUIForItem(item))
+				{
+					if (defaultLayout == HORIZONTAL) viewport.setViewPosition(ui->getX() + this->getWidth() / 2, 0);
+					else if (defaultLayout == VERTICAL) viewport.setViewPosition(0, ui->getY() + this->getHeight() / 2);
+				}
+			}
+		}
 	}
 }
 
@@ -1209,13 +1238,31 @@ void BaseManagerUI<M, T, U>::buttonClicked(Button* b)
 }
 
 template<class M, class T, class U>
-void BaseManagerUI<M, T, U>::labelTextChanged(Label* l)
+void BaseManagerUI<M, T, U>::textEditorTextChanged(TextEditor& e)
 {
-	if (l == searchBar.get())
+	if (&e == searchBar.get())
 	{
 		resized();
 	}
 }
+
+template<class M, class T, class U>
+void BaseManagerUI<M, T, U>::textEditorReturnKeyPressed(TextEditor& e)
+{
+	if (&e == searchBar.get())
+	{
+		searchBar->unfocusAllComponents();
+	}
+}
+
+//template<class M, class T, class U>
+//void BaseManagerUI<M, T, U>::labelTextChanged(Label* l)
+//{
+//	if (l == searchBar.get())
+//	{
+//		resized();
+//	}
+//}
 
 template<class M, class T, class U>
 void BaseManagerUI<M, T, U>::inspectableDestroyed(Inspectable*)
