@@ -6,9 +6,19 @@ void OSCHelpers::logOSCFormatError(const char* message, int length)
 	LOGERROR("OSC Error : " << String(message, length));
 }
 
-OSCArgument OSCHelpers::varToArgument(const var& v)
+
+
+OSCArgument OSCHelpers::varToArgument(const var& v, BoolMode bm)
 {
-	if (v.isBool()) return OSCArgument(((bool)v) ? 1 : 0);
+	if (v.isBool())
+	{
+		switch (bm)
+		{
+		case TF: return OSCArgument((bool)v); break;
+		case Int: return OSCArgument((int)v); break;
+		case Float: return OSCArgument((float)v); break;
+		}
+	}
 	else if (v.isInt()) return OSCArgument((int)v);
 	else if (v.isInt64()) return OSCArgument((int)v);
 	else if (v.isDouble()) return OSCArgument((float)v);
@@ -20,7 +30,7 @@ OSCArgument OSCHelpers::varToArgument(const var& v)
 
 		return OSCArgument(OSCColour::fromInt32(col));
 	}
-	else if(v.isUndefined()) return OSCArgument();
+	else if (v.isUndefined()) return OSCArgument();
 	else if (v.isVoid()) return OSCArgument();
 
 	jassert(false);
@@ -63,33 +73,42 @@ var OSCHelpers::argumentToVar(const OSCArgument& a)
 	return var("error");
 }
 
-void OSCHelpers::addArgumentsForParameter(OSCMessage& m, Parameter* p, BoolMode bm, ColorMode cm)
+void OSCHelpers::addArgumentsForParameter(OSCMessage& m, Parameter* p, BoolMode bm, ColorMode cm, var forceVar)
 {
+	var val = forceVar.isVoid() ? p->getValue() : forceVar;
+
 	switch (p->type)
 	{
 
-	case Controllable::BOOL: OSCHelpers::addBoolArgumentToMessage(m, p->boolValue(), bm); break;
-	case Controllable::INT: m.addInt32(p->intValue()); break;
-	case Controllable::FLOAT: m.addFloat32(p->floatValue()); break;
-	case Controllable::STRING: m.addString(p->stringValue()); break;
-	case Controllable::COLOR: OSCHelpers::addColorArgumentToMessage(m, ((ColorParameter*)p)->getColor(), cm); break;
-	case Controllable::POINT2D:
-		m.addFloat32(((Point2DParameter*)p)->x);
-		m.addFloat32(((Point2DParameter*)p)->y);
+	case Controllable::BOOL: OSCHelpers::addBoolArgumentToMessage(m, (bool)val, bm); break;
+	case Controllable::INT: m.addInt32((int)val); break;
+	case Controllable::FLOAT: m.addFloat32((float)val); break;
+	case Controllable::STRING: m.addString(val.toString()); break;
+	case Controllable::COLOR:
+	{
+		Colour c = Colour::fromFloatRGBA(val[0], val[1], val[2], val[3]);
+		OSCHelpers::addColorArgumentToMessage(m, c, cm);
 		break;
+	}
+	case Controllable::POINT2D:
 	case Controllable::POINT3D:
-		m.addFloat32(((Point3DParameter*)p)->x);
-		m.addFloat32(((Point3DParameter*)p)->y);
-		m.addFloat32(((Point3DParameter*)p)->z);
+		for (int i = 0; i < val.size(); i++) m.addFloat32(val[i]);
 		break;
 
-	case Controllable::ENUM: m.addString(((EnumParameter*)p)->getValueKey()); break;
-	case Controllable::TARGET: m.addString(p->stringValue()); break;
+	case Controllable::ENUM:
+	{
+		m.addString(val.toString());
+	}
+	break;
+
+	case Controllable::TARGET:
+		m.addString(val.toString());
+		break;
 
 	default:
 		jassertfalse;
-		if (p->isComplex()) for (int i = 0; i < p->value.size(); i++) m.addArgument(varToArgument(p->value[i]));
-		else m.addArgument(varToArgument(p->value));
+		if (p->isComplex()) for (int i = 0; i < val.size(); i++) m.addArgument(varToArgument(val[i], bm));
+		else m.addArgument(varToArgument(p->getValue(), bm));
 		break;
 	}
 }

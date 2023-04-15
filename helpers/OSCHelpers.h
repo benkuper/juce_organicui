@@ -14,11 +14,11 @@ public:
 
 	static void logOSCFormatError(const char* message, int length);
 
-	static OSCArgument varToArgument(const var& v);
+	static OSCArgument varToArgument(const var& v,BoolMode bm);
 	static OSCArgument varToColorArgument(const var& v);
 	static var argumentToVar(const OSCArgument& a);
 
-	static void addArgumentsForParameter(OSCMessage& m, Parameter* p, BoolMode bm = Int, ColorMode cm = ColorRGBA);
+	static void addArgumentsForParameter(OSCMessage& m, Parameter* p, BoolMode bm = Int, ColorMode cm = ColorRGBA, var forceVar = var());
 	static void addBoolArgumentToMessage(OSCMessage& m, bool value, BoolMode boolMode);
 	static void addColorArgumentToMessage(OSCMessage& m, const Colour& c, ColorMode colorMode);
 
