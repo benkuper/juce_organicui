@@ -31,15 +31,16 @@ Parameter::Parameter(const Type& type, const String& niceName, const String& des
 	isOverriden(false),
 	forceSaveValue(false),
 	forceSaveRange(false),
-	queuedNotifier(100)
+	queuedNotifier(100),
+	colorStatusMap(1)
 {
 
-	scriptObject.setMethod("get", Parameter::getValueFromScript);
-	scriptObject.setMethod("set", Controllable::setValueFromScript);
-	scriptObject.setMethod("resetValue", Parameter::resetValueFromScript);
-	scriptObject.setMethod("getRange", Parameter::getRangeFromScript);
-	scriptObject.setMethod("setRange", Parameter::setRangeFromScript);
-	scriptObject.setMethod("hasRange", Parameter::hasRangeFromScript);
+	scriptObject.getDynamicObject()->setMethod("get", Parameter::getValueFromScript);
+	scriptObject.getDynamicObject()->setMethod("set", Controllable::setValueFromScript);
+	scriptObject.getDynamicObject()->setMethod("resetValue", Parameter::resetValueFromScript);
+	scriptObject.getDynamicObject()->setMethod("getRange", Parameter::getRangeFromScript);
+	scriptObject.getDynamicObject()->setMethod("setRange", Parameter::setRangeFromScript);
+	scriptObject.getDynamicObject()->setMethod("hasRange", Parameter::hasRangeFromScript);
 }
 
 Parameter::~Parameter()

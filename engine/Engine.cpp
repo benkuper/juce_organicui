@@ -138,7 +138,7 @@ void Engine::childStructureChanged(ControllableContainer * cc)
 	ControllableContainer::childStructureChanged(cc);
 
 	if (isLoadingFile || isClearing) return;
-	updateLiveScriptObject();
+	scriptObjectIsDirty = true;
 }
 
 PopupMenu Engine::getDashboardCreateMenu(int idOffset)
@@ -180,6 +180,8 @@ void Engine::clear() {
 
 	clearInternal();
 
+	WarningReporter::getInstance()->clear();
+
 	if (Outliner::getInstanceWithoutCreating()) Outliner::getInstanceWithoutCreating()->enabled = true;
 	if (InspectableSelectionManager::mainSelectionManager != nullptr) InspectableSelectionManager::mainSelectionManager->setEnabled(true);
 
@@ -190,6 +192,7 @@ void Engine::clear() {
 	changed();    //fileDocument	
 	engineListeners.call(&EngineListener::engineCleared);
 	engineNotifier.addMessage(new EngineEvent(EngineEvent::ENGINE_CLEARED, this));
+
 
 
 }

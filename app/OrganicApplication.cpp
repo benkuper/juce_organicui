@@ -45,7 +45,6 @@ bool OrganicApplication::moreThanOneInstanceAllowed()
 
 	//global settings and engine are not initialized yet here, must check the value from the file itself.
 	var gs = JSON::fromString(getAppProperties().getUserSettings()->getValue("globalSettings", ""));
-	DBG(JSON::toString(gs));
 	var params = gs["containers"]["startupAndUpdate"]["parameters"];
 	for (int i = 0; i < params.size(); i++)
 	{

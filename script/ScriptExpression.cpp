@@ -138,17 +138,17 @@ void ScriptExpression::buildEnvironment()
 
 	if (attachedParam != nullptr)
 	{
-		scriptEngine->registerNativeObject("parent", attachedParam->parentContainer->getScriptObject());
+		scriptEngine->registerNativeObject("parent", attachedParam->parentContainer->getScriptObject().getDynamicObject());
 	}
 
 	if (ScriptUtil::getInstanceWithoutCreating() != nullptr)
 	{
-		scriptEngine->registerNativeObject(ScriptUtil::getInstance()->scriptTargetName, ScriptUtil::getInstance()->getScriptObject());
+		scriptEngine->registerNativeObject(ScriptUtil::getInstance()->scriptTargetName, ScriptUtil::getInstance()->getScriptObject().getDynamicObject());
 	}
 
 	if (Engine::mainEngine != nullptr)
 	{
-		DynamicObject* rootObj = Engine::mainEngine->getScriptObject();
+		DynamicObject* rootObj = Engine::mainEngine->getScriptObject().getDynamicObject();
 		scriptEngine->registerNativeObject(Engine::mainEngine->scriptTargetName, rootObj);
 	}
 }
@@ -191,7 +191,8 @@ Array<Parameter*> ScriptExpression::getParameterReferencesInExpression()
 		if (firstAccess == "root")
 		{
 			scriptToAddress = "/" + scriptToAddress;
-		}else if (firstAccess == "parent" && attachedParam != nullptr)
+		}
+		else if (firstAccess == "parent" && attachedParam != nullptr)
 		{
 			scriptToAddress = attachedParam->parentContainer->getControlAddress() + "/" + scriptToAddress;
 		}

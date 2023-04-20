@@ -299,16 +299,16 @@ BaseManager<T>::BaseManager(const String& name) :
 	comparator(this)
 {
 
-	scriptObject.setMethod("addItem", &BaseManager<T>::addItemFromScript);
-	scriptObject.setMethod("removeItem", &BaseManager<T>::removeItemFromScript);
-	scriptObject.setMethod("removeAll", &BaseManager<T>::removeAllItemsFromScript);
-	scriptObject.setMethod("getItems", &BaseManager<T>::getItemsFromScript);
-	scriptObject.setMethod("getItemWithName", &BaseManager<T>::getItemWithNameFromScript);
-	scriptObject.setMethod("getItemAt", &BaseManager<T>::getItemAtFromScript);
-	scriptObject.setMethod("getItemIndex", &BaseManager<T>::getItemIndexFromScript);
-	scriptObject.setMethod("getItemBefore", &BaseManager<T>::getItemBeforeFromScript);
-	scriptObject.setMethod("getItemAfter", &BaseManager<T>::getItemAfterFromScript);
-	scriptObject.setMethod("reorderItems", &BaseManager<T>::reorderItemsFromScript);
+	scriptObject.getDynamicObject()->setMethod("addItem", &BaseManager<T>::addItemFromScript);
+	scriptObject.getDynamicObject()->setMethod("removeItem", &BaseManager<T>::removeItemFromScript);
+	scriptObject.getDynamicObject()->setMethod("removeAll", &BaseManager<T>::removeAllItemsFromScript);
+	scriptObject.getDynamicObject()->setMethod("getItems", &BaseManager<T>::getItemsFromScript);
+	scriptObject.getDynamicObject()->setMethod("getItemWithName", &BaseManager<T>::getItemWithNameFromScript);
+	scriptObject.getDynamicObject()->setMethod("getItemAt", &BaseManager<T>::getItemAtFromScript);
+	scriptObject.getDynamicObject()->setMethod("getItemIndex", &BaseManager<T>::getItemIndexFromScript);
+	scriptObject.getDynamicObject()->setMethod("getItemBefore", &BaseManager<T>::getItemBeforeFromScript);
+	scriptObject.getDynamicObject()->setMethod("getItemAfter", &BaseManager<T>::getItemAfterFromScript);
+	scriptObject.getDynamicObject()->setMethod("reorderItems", &BaseManager<T>::reorderItemsFromScript);
 
 	skipLabelInTarget = true; //by default manager label in targetParameter UI are not interesting
 	nameCanBeChangedByUser = false;

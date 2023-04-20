@@ -18,54 +18,54 @@ String getAppVersion();
 ScriptUtil::ScriptUtil() :
 	ScriptTarget("util", this)
 {
-	scriptObject.setMethod("getTime", ScriptUtil::getTime);
-	scriptObject.setMethod("getTimestamp", ScriptUtil::getTimestamp);
-	scriptObject.setMethod("delayThreadMS", ScriptUtil::delayThreadMS);
+	scriptObject.getDynamicObject()->setMethod("getTime", ScriptUtil::getTime);
+	scriptObject.getDynamicObject()->setMethod("getTimestamp", ScriptUtil::getTimestamp);
+	scriptObject.getDynamicObject()->setMethod("delayThreadMS", ScriptUtil::delayThreadMS);
 
-	scriptObject.setMethod("getFloatFromBytes", ScriptUtil::getFloatFromBytes);
-	scriptObject.setMethod("floatToHexSeq", ScriptUtil::floatToHexSeq);
-	scriptObject.setMethod("getInt32FromBytes", ScriptUtil::getInt32FromBytes);
-	scriptObject.setMethod("getInt64FromBytes", ScriptUtil::getInt32FromBytes);
-	scriptObject.setMethod("doubleToHexSeq", ScriptUtil::doubleToHexSeq);
-	scriptObject.setMethod("hexStringToInt", ScriptUtil::hexStringToInt);
-	scriptObject.setMethod("toStringFixed", ScriptUtil::toStringFixed);
-	scriptObject.setMethod("getObjectProperties", ScriptUtil::getObjectProperties);
-	scriptObject.setMethod("getObjectMethods", ScriptUtil::getObjectMethods);
+	scriptObject.getDynamicObject()->setMethod("getFloatFromBytes", ScriptUtil::getFloatFromBytes);
+	scriptObject.getDynamicObject()->setMethod("floatToHexSeq", ScriptUtil::floatToHexSeq);
+	scriptObject.getDynamicObject()->setMethod("getInt32FromBytes", ScriptUtil::getInt32FromBytes);
+	scriptObject.getDynamicObject()->setMethod("getInt64FromBytes", ScriptUtil::getInt32FromBytes);
+	scriptObject.getDynamicObject()->setMethod("doubleToHexSeq", ScriptUtil::doubleToHexSeq);
+	scriptObject.getDynamicObject()->setMethod("hexStringToInt", ScriptUtil::hexStringToInt);
+	scriptObject.getDynamicObject()->setMethod("toStringFixed", ScriptUtil::toStringFixed);
+	scriptObject.getDynamicObject()->setMethod("getObjectProperties", ScriptUtil::getObjectProperties);
+	scriptObject.getDynamicObject()->setMethod("getObjectMethods", ScriptUtil::getObjectMethods);
 
-	scriptObject.setMethod("getIPs", ScriptUtil::getIPs);
-	scriptObject.setMethod("encodeHMAC_SHA1", ScriptUtil::encodeHMAC_SHA1);
-	scriptObject.setMethod("encodeSHA256", ScriptUtil::encodeSHA256);
-	scriptObject.setMethod("encodeSHA512", ScriptUtil::encodeSHA512);
-	scriptObject.setMethod("toBase64", ScriptUtil::toBase64);
-	scriptObject.setMethod("fromBase64", ScriptUtil::fromBase64);
-	scriptObject.setMethod("fromBase64Bytes", ScriptUtil::fromBase64Bytes);
+	scriptObject.getDynamicObject()->setMethod("getIPs", ScriptUtil::getIPs);
+	scriptObject.getDynamicObject()->setMethod("encodeHMAC_SHA1", ScriptUtil::encodeHMAC_SHA1);
+	scriptObject.getDynamicObject()->setMethod("encodeSHA256", ScriptUtil::encodeSHA256);
+	scriptObject.getDynamicObject()->setMethod("encodeSHA512", ScriptUtil::encodeSHA512);
+	scriptObject.getDynamicObject()->setMethod("toBase64", ScriptUtil::toBase64);
+	scriptObject.getDynamicObject()->setMethod("fromBase64", ScriptUtil::fromBase64);
+	scriptObject.getDynamicObject()->setMethod("fromBase64Bytes", ScriptUtil::fromBase64Bytes);
 
-	scriptObject.setMethod("fileExists", ScriptUtil::fileExistsFromScript);
-	scriptObject.setMethod("readFile", ScriptUtil::readFileFromScript);
-	scriptObject.setMethod("writeFile", ScriptUtil::writeFileFromScript);
-	scriptObject.setMethod("writeBytes", ScriptUtil::writeBytesFromScript);
-	scriptObject.setMethod("directoryExists", ScriptUtil::directoryExistsFromScript);
-	scriptObject.setMethod("createDirectory", ScriptUtil::createDirectoryFromScript);
-	scriptObject.setMethod("listFiles", ScriptUtil::listFilesFromScript);
-	scriptObject.setMethod("listDirectories", ScriptUtil::listDirectoriesFromScript);
-	scriptObject.setMethod("launchFile", ScriptUtil::launchFileFromScript);
-	scriptObject.setMethod("killApp", ScriptUtil::killAppFromScript);
-	scriptObject.setMethod("getOSInfos", ScriptUtil::getOSInfosFromScript);
-	scriptObject.setMethod("getAppVersion", ScriptUtil::getAppVersionFromScript);
-	scriptObject.setMethod("getEnvironmentVariable", ScriptUtil::getEnvironmentVariableFromScript);
+	scriptObject.getDynamicObject()->setMethod("fileExists", ScriptUtil::fileExistsFromScript);
+	scriptObject.getDynamicObject()->setMethod("readFile", ScriptUtil::readFileFromScript);
+	scriptObject.getDynamicObject()->setMethod("writeFile", ScriptUtil::writeFileFromScript);
+	scriptObject.getDynamicObject()->setMethod("writeBytes", ScriptUtil::writeBytesFromScript);
+	scriptObject.getDynamicObject()->setMethod("directoryExists", ScriptUtil::directoryExistsFromScript);
+	scriptObject.getDynamicObject()->setMethod("createDirectory", ScriptUtil::createDirectoryFromScript);
+	scriptObject.getDynamicObject()->setMethod("listFiles", ScriptUtil::listFilesFromScript);
+	scriptObject.getDynamicObject()->setMethod("listDirectories", ScriptUtil::listDirectoriesFromScript);
+	scriptObject.getDynamicObject()->setMethod("launchFile", ScriptUtil::launchFileFromScript);
+	scriptObject.getDynamicObject()->setMethod("killApp", ScriptUtil::killAppFromScript);
+	scriptObject.getDynamicObject()->setMethod("getOSInfos", ScriptUtil::getOSInfosFromScript);
+	scriptObject.getDynamicObject()->setMethod("getAppVersion", ScriptUtil::getAppVersionFromScript);
+	scriptObject.getDynamicObject()->setMethod("getEnvironmentVariable", ScriptUtil::getEnvironmentVariableFromScript);
 
-	scriptObject.setMethod("gotoURL", ScriptUtil::gotoURLFromScript);
+	scriptObject.getDynamicObject()->setMethod("gotoURL", ScriptUtil::gotoURLFromScript);
 
 
-	scriptObject.setMethod("copyToClipboard", ScriptUtil::copyToClipboardFromScript);
-	scriptObject.setMethod("getFromClipboard", ScriptUtil::getFromClipboardFromScript);
+	scriptObject.getDynamicObject()->setMethod("copyToClipboard", ScriptUtil::copyToClipboardFromScript);
+	scriptObject.getDynamicObject()->setMethod("getFromClipboard", ScriptUtil::getFromClipboardFromScript);
 
-	scriptObject.setMethod("showMessageBox", ScriptUtil::showMessageBox);
-	scriptObject.setMethod("showOkCancelBox", ScriptUtil::showOkCancelBox);
-	scriptObject.setMethod("showYesNoCancelBox", ScriptUtil::showYesNoCancelBox);
+	scriptObject.getDynamicObject()->setMethod("showMessageBox", ScriptUtil::showMessageBox);
+	scriptObject.getDynamicObject()->setMethod("showOkCancelBox", ScriptUtil::showOkCancelBox);
+	scriptObject.getDynamicObject()->setMethod("showYesNoCancelBox", ScriptUtil::showYesNoCancelBox);
 
-	scriptObject.setMethod("getSelectedObject", ScriptUtil::getSelectedObjectFromScript);
-	scriptObject.setMethod("getSelectedObjectsCount", ScriptUtil::getSelectedObjectsCountFromScript);
+	scriptObject.getDynamicObject()->setMethod("getSelectedObject", ScriptUtil::getSelectedObjectFromScript);
+	scriptObject.getDynamicObject()->setMethod("getSelectedObjectsCount", ScriptUtil::getSelectedObjectsCountFromScript);
 }
 
 var ScriptUtil::getTime(const var::NativeFunctionArgs&)
