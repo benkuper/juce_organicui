@@ -20,12 +20,12 @@ FileParameter::FileParameter(const String& niceName, const String& description, 
 {
 	defaultUI = FILE;
 
-	scriptObject.setMethod("readFile", FileParameter::readFileFromScript);
-	scriptObject.setMethod("writeFile", FileParameter::writeFileFromScript);
-	scriptObject.setMethod("writeBytes", FileParameter::writeBytesFromScript);
-	scriptObject.setMethod("getAbsolutePath", FileParameter::getAbsolutePathFromScript);
-	scriptObject.setMethod("launchFile", FileParameter::launchFileFromScript);
-	scriptObject.setMethod("listFiles", FileParameter::listFilesFromScript);
+	scriptObject.getDynamicObject()->setMethod("readFile", FileParameter::readFileFromScript);
+	scriptObject.getDynamicObject()->setMethod("writeFile", FileParameter::writeFileFromScript);
+	scriptObject.getDynamicObject()->setMethod("writeBytes", FileParameter::writeBytesFromScript);
+	scriptObject.getDynamicObject()->setMethod("getAbsolutePath", FileParameter::getAbsolutePathFromScript);
+	scriptObject.getDynamicObject()->setMethod("launchFile", FileParameter::launchFileFromScript);
+	scriptObject.getDynamicObject()->setMethod("listFiles", FileParameter::listFilesFromScript);
 
 	if (Engine::mainEngine != nullptr) Engine::mainEngine->addEngineListener(this);
 }
@@ -41,7 +41,7 @@ void FileParameter::setValueInternal(var& newVal)
 
 	if (newVal.toString().isNotEmpty())
 	{
-		if (File::isAbsolutePath(newVal.toString())) absolutePath = newVal.toString();
+		if (File::isAbsolutePath(newVal.toString()) || newVal.toString().startsWithChar('/')) absolutePath = newVal.toString();
 		else absolutePath = getBasePath().getChildFile(value.toString()).getFullPathName();
 
 		File f = File::createFileWithoutCheckingPath(absolutePath);
@@ -81,6 +81,9 @@ String FileParameter::getAbsolutePath() const
 	if (value.toString().isEmpty()) return "";
 	if (File::isAbsolutePath(value.toString())) return value.toString();
 	if (Engine::mainEngine == nullptr) return value.toString();
+#if JUCE_WINDOWS
+	if (value.toString().startsWithChar('/')) return value.toString(); //unix formatted url, no need to try and check it
+#endif
 	return getBasePath().getChildFile(value.toString()).getFullPathName();
 }
 
@@ -96,6 +99,9 @@ File FileParameter::getFile()
 	String p = getAbsolutePath();
 	if (p.isEmpty()) return File();
 
+#if JUCE_WINDOWS
+	if (absolutePath.startsWithChar('/')) return File(); //on windows, if the path starts with a /, it's a unix formatted url, not a windows path
+#endif
 	return File(p);
 }
 

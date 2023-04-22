@@ -16,7 +16,7 @@ Trigger::Trigger(const String& niceName, const String& description, bool enabled
 	isTriggering(false),
 	queuedNotifier(5)
 {
-	scriptObject.setMethod("trigger", Controllable::setValueFromScript);
+	scriptObject.getDynamicObject()->setMethod("trigger", Controllable::setValueFromScript);
 }
 
 TriggerButtonUI* Trigger::createButtonUI(Array<Trigger *> triggers)

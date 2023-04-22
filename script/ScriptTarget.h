@@ -23,16 +23,16 @@ public:
 
 	int64 thisPtr;
 	String scriptTargetName;
-	juce::DynamicObject scriptObject;
-	std::unique_ptr<juce::DynamicObject> liveScriptObject;
-	bool liveScriptObjectIsDirty;
+	var scriptObject;
+	//var liveScriptObject;
+	bool scriptObjectIsDirty;
 
 	SpinLock scriptObjectLock;
 
-	juce::DynamicObject * getScriptObject();
-	void updateLiveScriptObject(juce::DynamicObject * parent = nullptr);
+	var getScriptObject();
+	void updateScriptObject(var parent = var());
 
-	virtual void updateLiveScriptObjectInternal(juce::DynamicObject * /*parent*/ = nullptr) {}
+	virtual void updateScriptObjectInternal(var /*parent*/ = var()) {}
 
 	static var checkTargetsAreTheSameFromScript(const var::NativeFunctionArgs &args);
 

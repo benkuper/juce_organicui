@@ -311,6 +311,8 @@ BaseManagerUI<M, T, U>::BaseManagerUI(const String& contentName, M* _manager, bo
 
 	InspectableSelectionManager::mainSelectionManager->addAsyncSelectionManagerListener(this);
 	//must call addExistingItems from child class to get overrides
+
+	setWantsKeyboardFocus(true);
 }
 
 
@@ -364,6 +366,8 @@ void BaseManagerUI<M, T, U>::setShowSearchBar(bool value)
 	if (value)
 	{
 		searchBar.reset(new TextEditor("SearchBar"));
+		searchBar->setSelectAllWhenFocused(true);
+
 		//searchBar->setJustificationType(Justification::topLeft);
 		searchBar->setColour(searchBar->backgroundColourId, BG_COLOR.darker(.1f).withAlpha(.7f));
 		searchBar->setColour(searchBar->outlineColourId, BG_COLOR.brighter(.1f));

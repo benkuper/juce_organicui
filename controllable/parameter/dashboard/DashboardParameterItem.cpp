@@ -73,11 +73,12 @@ void DashboardParameterItem::onExternalParameterValueChanged(Parameter* p)
 		data.getDynamicObject()->setProperty("controlAddress", parameter->getControlAddress());
 		data.getDynamicObject()->setProperty("type", parameter->getTypeString());
 
-		var val = parameter->getValue().clone();
-		if (parameter->getTypeString() == FileParameter::getTypeStringStatic())
-		{
-			val = parameter->getControlAddress();
-		}
+		var val = var();
+
+		if (parameter->getTypeString() == FileParameter::getTypeStringStatic()) val = parameter->getControlAddress();
+		else if (parameter->type == Controllable::ENUM) val = ((EnumParameter*)parameter.get())->getValueKey();
+		else val = parameter->getValue().clone();
+
 		data.getDynamicObject()->setProperty("value", val);
 
 		notifyDataFeedback(data);

@@ -35,7 +35,7 @@ TargetParameter::TargetParameter(const String& niceName, const String& descripti
 
 	setRootContainer(rootReference != nullptr ? rootReference : Engine::mainEngine);
 
-	scriptObject.setMethod("getTarget", TargetParameter::getTargetFromScript);
+	scriptObject.getDynamicObject()->setMethod("getTarget", TargetParameter::getTargetFromScript);
 
 	defaultValue = "";
 	argumentsDescription = "target";

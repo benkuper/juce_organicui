@@ -42,32 +42,32 @@ ControllableContainer::ControllableContainer(const String& niceName) :
 	setNiceName(niceName);
 
 	//script
-	scriptObject.setMethod("getChild", ControllableContainer::getChildFromScript);
-	scriptObject.setMethod("getParent", ControllableContainer::getParentFromScript);
-	scriptObject.setMethod("setName", ControllableContainer::setNameFromScript);
-	scriptObject.setMethod("setCollapsed", ControllableContainer::setCollapsedFromScript);
+	scriptObject.getDynamicObject()->setMethod("getChild", ControllableContainer::getChildFromScript);
+	scriptObject.getDynamicObject()->setMethod("getParent", ControllableContainer::getParentFromScript);
+	scriptObject.getDynamicObject()->setMethod("setName", ControllableContainer::setNameFromScript);
+	scriptObject.getDynamicObject()->setMethod("setCollapsed", ControllableContainer::setCollapsedFromScript);
 
-	scriptObject.setMethod("addTrigger", ControllableContainer::addTriggerFromScript);
-	scriptObject.setMethod("addBoolParameter", ControllableContainer::addBoolParameterFromScript);
-	scriptObject.setMethod("addIntParameter", ControllableContainer::addIntParameterFromScript);
-	scriptObject.setMethod("addFloatParameter", ControllableContainer::addFloatParameterFromScript);
-	scriptObject.setMethod("addStringParameter", ControllableContainer::addStringParameterFromScript);
-	scriptObject.setMethod("addEnumParameter", ControllableContainer::addEnumParameterFromScript);
-	scriptObject.setMethod("addTargetParameter", ControllableContainer::addTargetParameterFromScript);
-	scriptObject.setMethod("addPoint2DParameter", ControllableContainer::addPoint2DParameterFromScript);
-	scriptObject.setMethod("addPoint3DParameter", ControllableContainer::addPoint3DParameterFromScript);
-	scriptObject.setMethod("addColorParameter", ControllableContainer::addColorParameterFromScript);
-	scriptObject.setMethod("addFileParameter", ControllableContainer::addFileParameterFromScript);
-	scriptObject.setMethod("addContainer", ControllableContainer::addContainerFromScript);
-	scriptObject.setMethod("addAutomation", ControllableContainer::addAutomationFromScript);
-	scriptObject.setMethod("removeContainer", ControllableContainer::removeContainerFromScript);
-	scriptObject.setMethod("removeParameter", ControllableContainer::removeControllableFromScript);
+	scriptObject.getDynamicObject()->setMethod("addTrigger", ControllableContainer::addTriggerFromScript);
+	scriptObject.getDynamicObject()->setMethod("addBoolParameter", ControllableContainer::addBoolParameterFromScript);
+	scriptObject.getDynamicObject()->setMethod("addIntParameter", ControllableContainer::addIntParameterFromScript);
+	scriptObject.getDynamicObject()->setMethod("addFloatParameter", ControllableContainer::addFloatParameterFromScript);
+	scriptObject.getDynamicObject()->setMethod("addStringParameter", ControllableContainer::addStringParameterFromScript);
+	scriptObject.getDynamicObject()->setMethod("addEnumParameter", ControllableContainer::addEnumParameterFromScript);
+	scriptObject.getDynamicObject()->setMethod("addTargetParameter", ControllableContainer::addTargetParameterFromScript);
+	scriptObject.getDynamicObject()->setMethod("addPoint2DParameter", ControllableContainer::addPoint2DParameterFromScript);
+	scriptObject.getDynamicObject()->setMethod("addPoint3DParameter", ControllableContainer::addPoint3DParameterFromScript);
+	scriptObject.getDynamicObject()->setMethod("addColorParameter", ControllableContainer::addColorParameterFromScript);
+	scriptObject.getDynamicObject()->setMethod("addFileParameter", ControllableContainer::addFileParameterFromScript);
+	scriptObject.getDynamicObject()->setMethod("addContainer", ControllableContainer::addContainerFromScript);
+	scriptObject.getDynamicObject()->setMethod("addAutomation", ControllableContainer::addAutomationFromScript);
+	scriptObject.getDynamicObject()->setMethod("removeContainer", ControllableContainer::removeContainerFromScript);
+	scriptObject.getDynamicObject()->setMethod("removeParameter", ControllableContainer::removeControllableFromScript);
 
-	scriptObject.setMethod("getControlAddress", ControllableContainer::getControlAddressFromScript);
-	scriptObject.setMethod("getScriptControlAdress", ControllableContainer::getScriptControlAddressFromScript);
+	scriptObject.getDynamicObject()->setMethod("getControlAddress", ControllableContainer::getControlAddressFromScript);
+	scriptObject.getDynamicObject()->setMethod("getScriptControlAdress", ControllableContainer::getScriptControlAddressFromScript);
 
-	scriptObject.setMethod("getJSONData", ControllableContainer::getJSONDataFromScript);
-	scriptObject.setMethod("loadJSONData", ControllableContainer::loadJSONDataFromScript);
+	scriptObject.getDynamicObject()->setMethod("getJSONData", ControllableContainer::getJSONDataFromScript);
+	scriptObject.getDynamicObject()->setMethod("loadJSONData", ControllableContainer::loadJSONDataFromScript);
 }
 
 ControllableContainer::~ControllableContainer()
@@ -325,8 +325,9 @@ void ControllableContainer::removeControllable(WeakReference<Controllable> c, bo
 void ControllableContainer::notifyStructureChanged()
 {
 	if (isCurrentlyLoadingData && !notifyStructureChangeWhenLoadingData) return;
+	if (Engine::mainEngine != nullptr && (Engine::mainEngine->isLoadingFile || Engine::mainEngine->isClearing)) return;
 
-	liveScriptObjectIsDirty = true;
+	scriptObjectIsDirty = true;
 
 	controllableContainerListeners.call(&ControllableContainerListener::childStructureChanged, this);
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ChildStructureChanged, this));
@@ -377,7 +378,7 @@ void ControllableContainer::setNiceName(const String& _niceName)
 
 	niceName = _niceName;
 	if (!hasCustomShortName) setAutoShortName();
-	liveScriptObjectIsDirty = true;
+	scriptObjectIsDirty = true;
 	controllableContainerListeners.call(&ControllableContainerListener::controllableContainerNameChanged, this);
 	onContainerNiceNameChanged();
 }
@@ -394,7 +395,7 @@ void ControllableContainer::setCustomShortName(const String& _shortName)
 	shortName = _shortName;
 	hasCustomShortName = true;
 	scriptTargetName = shortName;
-	liveScriptObjectIsDirty = true;
+	scriptObjectIsDirty = true;
 	updateChildrenControlAddress();
 	onContainerShortNameChanged();
 
@@ -407,7 +408,7 @@ void ControllableContainer::setAutoShortName() {
 	hasCustomShortName = false;
 	shortName = StringUtil::toShortName(niceName, true);
 	scriptTargetName = shortName;
-	liveScriptObjectIsDirty = true;
+	scriptObjectIsDirty = true;
 	updateChildrenControlAddress();
 	onContainerShortNameChanged();
 
@@ -483,11 +484,15 @@ void ControllableContainer::removeChildControllableContainer(ControllableContain
 		warningChanged(container);
 	}
 
-	controllableContainerListeners.call(&ControllableContainerListener::controllableContainerRemoved, container);
-	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableContainerRemoved, this, container));
+	if (!Engine::mainEngine->isClearing)
+	{
+		controllableContainerListeners.call(&ControllableContainerListener::controllableContainerRemoved, container);
+		queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableContainerRemoved, this, container));
 
-	notifyStructureChanged();
-	container->setParentContainer(nullptr);
+		notifyStructureChanged();
+		container->setParentContainer(nullptr);
+	}
+	
 	if (ownedContainers.contains(container)) ownedContainers.removeObject(container);
 }
 
@@ -704,7 +709,7 @@ Controllable* ControllableContainer::getControllableForAddress(StringArray addre
 
 	if (isTargetAControllable)
 	{
-		if (Controllable* c = getControllableByName(addressSplit[0], false, true)) return c;
+		if (Controllable* c = getControllableByName(addressSplit[0], false, false)) return c;
 
 	}
 	else  //if recursive here ?
@@ -1102,39 +1107,33 @@ String ControllableContainer::getUniqueNameInContainer(const String& sourceName,
 	return resultName;
 }
 
-void ControllableContainer::updateLiveScriptObjectInternal(DynamicObject* parent)
+void ControllableContainer::updateScriptObjectInternal(var parent)
 {
-	ScriptTarget::updateLiveScriptObjectInternal(parent);
+	ScriptTarget::updateScriptObjectInternal(parent);
 
-
-	bool transferToParent = parent != nullptr;
-
+	bool transferToParent = !parent.isVoid();
 
 	for (auto& cc : controllableContainers)
 	{
 		if (cc == nullptr || cc.wasObjectDeleted() || cc->shortName.isEmpty()) continue;
 		if (!cc->includeInScriptObject) continue;
 
-		if (transferToParent) parent->setProperty(cc->shortName, cc->getScriptObject());
-		else liveScriptObject->setProperty(cc->shortName, cc->getScriptObject());
+		if (transferToParent) parent.getDynamicObject()->setProperty(cc->shortName, cc->getScriptObject());
+		else scriptObject.getDynamicObject()->setProperty(cc->shortName, cc->getScriptObject());
 
 	}
-
-
-
 
 	for (auto& c : controllables)
 	{
 		if (c == nullptr || c->shortName.isEmpty()) return;
 		if (!c->includeInScriptObject) continue;
-		if (transferToParent) parent->setProperty(c->shortName, c->getScriptObject());
-		else liveScriptObject->setProperty(c->shortName, c->getScriptObject());
+		if (transferToParent) parent.getDynamicObject()->setProperty(c->shortName, c->getScriptObject());
+		else scriptObject.getDynamicObject()->setProperty(c->shortName, c->getScriptObject());
 	}
 
 
-	liveScriptObject->setProperty("name", shortName);
-	liveScriptObject->setProperty("niceName", niceName);
-
+	scriptObject.getDynamicObject()->setProperty("name", shortName);
+	scriptObject.getDynamicObject()->setProperty("niceName", niceName);
 
 }
 

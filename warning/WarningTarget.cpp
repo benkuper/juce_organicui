@@ -6,8 +6,10 @@ String WarningTarget::warningAllId = "*";
 WarningTarget::WarningTarget() :
 	showWarningInUI(false),
 	warningResolveInspectable(nullptr),
-	warningTargetNotifier(10)
+	warningTargetNotifier(10),
+	warningMessage(1)
 {
+
 }
 
 WarningTarget::~WarningTarget()
@@ -31,6 +33,7 @@ WarningTarget::~WarningTarget()
 
 void WarningTarget::setWarningMessage(const String& message, const String& id, bool log)
 {
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->isClearing) return;
 	if (WarningReporter::getInstanceWithoutCreating() == nullptr) return;
 	if (message.isNotEmpty() && warningMessage.contains(id) && warningMessage[id] == message) return;
 
@@ -41,7 +44,7 @@ void WarningTarget::setWarningMessage(const String& message, const String& id, b
 	}
 	else
 	{
-		if (log) LOGWARNING(message);
+		if (log && Engine::mainEngine != nullptr && !Engine::mainEngine->isLoadingFile && Engine::mainEngine->isClearing) LOGWARNING(message);
 		warningMessage.set(id, message);
 		WarningReporter::getInstance()->registerWarning(this);
 	}

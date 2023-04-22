@@ -17,15 +17,15 @@ EnumParameter::EnumParameter(const String& niceName, const String& description, 
 {
 	lockManualControlMode = true;
 
-	scriptObject.setMethod("getKey", EnumParameter::getValueKeyFromScript);
-	scriptObject.setMethod("setData", EnumParameter::setValueWithDataFromScript);
-	scriptObject.setMethod("setNext", EnumParameter::setNextFromScript);
-	scriptObject.setMethod("setPrevious", EnumParameter::setPreviousFromScript);
-	scriptObject.setMethod("addOption", EnumParameter::addOptionFromScript);
-	scriptObject.setMethod("removeOptions", EnumParameter::removeOptionsFromScript);
-	scriptObject.setMethod("getAllOptions", EnumParameter::getAllOptionsFromScript);
-	scriptObject.setMethod("getOptionAt", EnumParameter::getOptionAtFromScript);
-	scriptObject.setMethod("getIndex", EnumParameter::getIndexFromScript);
+	scriptObject.getDynamicObject()->setMethod("getKey", EnumParameter::getValueKeyFromScript);
+	scriptObject.getDynamicObject()->setMethod("setData", EnumParameter::setValueWithDataFromScript);
+	scriptObject.getDynamicObject()->setMethod("setNext", EnumParameter::setNextFromScript);
+	scriptObject.getDynamicObject()->setMethod("setPrevious", EnumParameter::setPreviousFromScript);
+	scriptObject.getDynamicObject()->setMethod("addOption", EnumParameter::addOptionFromScript);
+	scriptObject.getDynamicObject()->setMethod("removeOptions", EnumParameter::removeOptionsFromScript);
+	scriptObject.getDynamicObject()->setMethod("getAllOptions", EnumParameter::getAllOptionsFromScript);
+	scriptObject.getDynamicObject()->setMethod("getOptionAt", EnumParameter::getOptionAtFromScript);
+	scriptObject.getDynamicObject()->setMethod("getIndex", EnumParameter::getIndexFromScript);
 
 	value = "";
 }

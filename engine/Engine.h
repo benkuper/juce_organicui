@@ -168,4 +168,4 @@ public:
 
 };
 
-static String lastFileListKey = "recentFiles";
+static const String lastFileListKey = "recentFiles";

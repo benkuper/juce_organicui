@@ -85,7 +85,7 @@ public:
 
 	void remove(bool addToUndo = false); // called from external to make this object ask for remove
 
-	virtual void updateLiveScriptObjectInternal(DynamicObject* parent = nullptr) override;
+	virtual void updateScriptObjectInternal(var parent = var()) override;
 
 	virtual bool shouldBeSaved();
 

@@ -51,15 +51,15 @@ Controllable::Controllable(const Type& type, const String& niceName, const Strin
 	parentContainer(nullptr),
 	queuedNotifier(10)
 {
-	scriptObject.setMethod("isParameter", Controllable::checkIsParameterFromScript);
-	scriptObject.setMethod("getParent", Controllable::getParentFromScript);
-	scriptObject.setMethod("setName", Controllable::setNameFromScript);
-	scriptObject.setMethod("setAttribute", Controllable::setAttributeFromScript);
-	scriptObject.setMethod("getControlAddress", Controllable::getControlAddressFromScript);
-	scriptObject.setMethod("getScriptControlAdress", Controllable::getScriptControlAddressFromScript);
+	scriptObject.getDynamicObject()->setMethod("isParameter", Controllable::checkIsParameterFromScript);
+	scriptObject.getDynamicObject()->setMethod("getParent", Controllable::getParentFromScript);
+	scriptObject.getDynamicObject()->setMethod("setName", Controllable::setNameFromScript);
+	scriptObject.getDynamicObject()->setMethod("setAttribute", Controllable::setAttributeFromScript);
+	scriptObject.getDynamicObject()->setMethod("getControlAddress", Controllable::getControlAddressFromScript);
+	scriptObject.getDynamicObject()->setMethod("getScriptControlAdress", Controllable::getScriptControlAddressFromScript);
 
-	scriptObject.setMethod("getJSONData", ControllableContainer::getJSONDataFromScript);
-	scriptObject.setMethod("loadJSONData", ControllableContainer::loadJSONDataFromScript);
+	scriptObject.getDynamicObject()->setMethod("getJSONData", ControllableContainer::getJSONDataFromScript);
+	scriptObject.getDynamicObject()->setMethod("loadJSONData", ControllableContainer::loadJSONDataFromScript);
 
 	setEnabled(enabled);
 	setNiceName(niceName);
@@ -155,7 +155,7 @@ void Controllable::setParentContainer(ControllableContainer* container)
 void Controllable::updateControlAddress()
 {
 	this->controlAddress = getControlAddress();
-	this->liveScriptObjectIsDirty = true;
+	this->scriptObjectIsDirty = true;
 
 	if (Engine::mainEngine != nullptr && !Engine::mainEngine->isClearing)
 	{
@@ -169,10 +169,10 @@ void Controllable::remove(bool addToUndo)
 	listeners.call(&Controllable::Listener::askForRemoveControllable, this, addToUndo);
 }
 
-void Controllable::updateLiveScriptObjectInternal(DynamicObject* parent)
+void Controllable::updateScriptObjectInternal(var parent)
 {
-	liveScriptObject->setProperty("name", shortName);
-	liveScriptObject->setProperty("niceName", niceName);
+	scriptObject.getDynamicObject()->setProperty("name", shortName);
+	scriptObject.getDynamicObject()->setProperty("niceName", niceName);
 }
 
 bool Controllable::shouldBeSaved()

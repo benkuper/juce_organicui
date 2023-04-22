@@ -151,7 +151,7 @@ public:
 	String getUniqueNameInContainer(const String &sourceName, bool searchNiceName = true, int suffix = 0);
 
 	//SCRIPT
-	virtual void updateLiveScriptObjectInternal(DynamicObject * parent = nullptr) override;
+	virtual void updateScriptObjectInternal(var parent = var()) override;
 	static var getChildFromScript(const var::NativeFunctionArgs &a);
 	static var getParentFromScript(const juce::var::NativeFunctionArgs& a);
 	static var setNameFromScript(const juce::var::NativeFunctionArgs& a);

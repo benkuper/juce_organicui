@@ -70,7 +70,7 @@ BaseItem::BaseItem(const String& name, bool _canBeDisabled, bool _canHaveScripts
 	isUILocked->hideInRemoteControl = true;
 	isUILocked->defaultHideInRemoteControl = true;
 
-	scriptObject.setMethod("getType", BaseItem::getTypeStringFromScript);
+	scriptObject.getDynamicObject()->setMethod("getType", BaseItem::getTypeStringFromScript);
 }
 
 BaseItem::~BaseItem()

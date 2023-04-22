@@ -47,9 +47,9 @@ GradientColorManager::GradientColorManager(float maxPosition, bool addDefaultCol
 
 	updateCurrentColor();
 
-	scriptObject.setMethod("getColorAtPosition", &GradientColorManager::getColorAtPositionFromScript);
-	scriptObject.setMethod("getKeyAtPosition", &GradientColorManager::getKeyAtPositionFromScript);
-	scriptObject.setMethod("getKeysBetween", &GradientColorManager::getKeysBetweenFromScript);
+	scriptObject.getDynamicObject()->setMethod("getColorAtPosition", &GradientColorManager::getColorAtPositionFromScript);
+	scriptObject.getDynamicObject()->setMethod("getKeyAtPosition", &GradientColorManager::getKeyAtPositionFromScript);
+	scriptObject.getDynamicObject()->setMethod("getKeysBetween", &GradientColorManager::getKeysBetweenFromScript);
 }
 
 GradientColorManager::~GradientColorManager()

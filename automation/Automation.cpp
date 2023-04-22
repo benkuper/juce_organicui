@@ -57,12 +57,12 @@ Automation::Automation(const String& name, AutomationRecorder* recorder, bool al
 	rangeRemapMode->addOption("Absolute", ABSOLUTE)->addOption("Proportional", PROPORTIONAL);
 	rangeRemapMode->hideInEditor = true;
 
-	scriptObject.setMethod("setLength", &Automation::setLengthFromScript);
-	scriptObject.setMethod("addKey", &Automation::addKeyFromScript);
-	scriptObject.setMethod("getValueAtPosition", &Automation::getValueAtPositionFromScript);
-	scriptObject.setMethod("getValueAtPosition", &Automation::getValueAtPositionFromScript);
-	scriptObject.setMethod("getKeyAtPosition", &Automation::getKeyAtPositionFromScript);
-	scriptObject.setMethod("getKeysBetween", &Automation::getKeysBetweenFromScript);
+	scriptObject.getDynamicObject()->setMethod("setLength", &Automation::setLengthFromScript);
+	scriptObject.getDynamicObject()->setMethod("addKey", &Automation::addKeyFromScript);
+	scriptObject.getDynamicObject()->setMethod("getValueAtPosition", &Automation::getValueAtPositionFromScript);
+	scriptObject.getDynamicObject()->setMethod("getValueAtPosition", &Automation::getValueAtPositionFromScript);
+	scriptObject.getDynamicObject()->setMethod("getKeyAtPosition", &Automation::getKeyAtPositionFromScript);
+	scriptObject.getDynamicObject()->setMethod("getKeysBetween", &Automation::getKeysBetweenFromScript);
 }
 
 Automation::~Automation()
