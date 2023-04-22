@@ -10,7 +10,7 @@ var DashboardFeedbackBroadcaster::getItemParameterFeedback(Parameter* p)
 	if (p->type == Parameter::ENUM)
 	{
 		EnumParameter* ep = (EnumParameter*)p;
-		data.getDynamicObject()->setProperty("value", p->enabled ? ep->getValueKey() : var());
+		data.getDynamicObject()->setProperty("value", p->enabled ? ep->getValueKey() : "");
 	}
 	else
 	{
