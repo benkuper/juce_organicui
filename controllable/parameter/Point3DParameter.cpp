@@ -8,6 +8,8 @@ Author:  bkupe
 ==============================================================================
 */
 
+#include "JuceHeader.h"
+
 Point3DParameter::Point3DParameter(const String& niceName, const String& description, bool enabled) :
 	Parameter(POINT3D, niceName, description, 0, 0, 1, enabled),
 	x(0), y(0), z(0),
@@ -107,12 +109,16 @@ void Point3DParameter::setBounds(float _minX, float _minY, float _minZ, float _m
 }
 
 Vector3D<float> Point3DParameter::getVector() {
+	GenericScopedLock lock(valueSetLock);
 	return Vector3D<float>(x, y, z);
 }
 
 var Point3DParameter::getLerpValueTo(var targetValue, float weight)
 {
-	if (!targetValue.isArray()) return value;
+	if (!targetValue.isArray()) return getValue();
+
+	GenericScopedLock lock(valueSetLock);
+
 	var result;
 	result.append(jmap(weight, x, (float)targetValue[0]));
 	result.append(jmap(weight, y, (float)targetValue[1]));
