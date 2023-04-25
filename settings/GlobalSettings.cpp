@@ -51,7 +51,8 @@ GlobalSettings::GlobalSettings() :
 	helpLanguage = interfaceCC.addEnumParameter("Help language", "What language to download ? You will need to restart the software to see changes");
 	helpLanguage->addOption("English", "en")->addOption("French", "fr")->addOption("Chinese", "cn");
 	useGLRenderer = interfaceCC.addBoolParameter("Use OpenGL Renderer", "If checked, this will use hardware acceleration to render the interface. You may want to NOT use this on some platform or when using the IFrame Dashboard item. You need to restart if you change it.", true);
-	altScaleFactor = interfaceCC.addFloatParameter("Alt Scale factor", "Scale factor for editing sliders with alt", 0.5,0,1);
+
+	loggerRefreshRate = interfaceCC.addIntParameter("Logger Refresh Rate", "The refresh rate of the logger in hz", 20, 1, 1000);
 
 	addChildControllableContainer(&interfaceCC);
 
@@ -70,6 +71,9 @@ GlobalSettings::GlobalSettings() :
 	addChildControllableContainer(&saveLoadCC);
 
 	askBeforeRemovingItems = editingCC.addBoolParameter("Ask before removing items", "If enabled, you will get a confirmation prompt before removing any item", false);
+
+	altScaleFactor = editingCC.addFloatParameter("Alt Scale factor", "Scale factor for editing sliders with alt", 0.5, 0, 1);
+
 	defaultEasing = editingCC.addEnumParameter("Default Easing", "Easing that is set by default when creating new automation keys");
 	for (int i = 0; i < Easing::TYPE_MAX; i++) defaultEasing->addOption(Easing::typeNames[i], (Easing::Type)i, false);
 	defaultEasing->defaultValue = Easing::typeNames[(int)Easing::BEZIER];
@@ -125,7 +129,7 @@ void GlobalSettings::onControllableFeedbackUpdate(ControllableContainer* cc, Con
 		Controllable* crashC = nullptr;
 		crashC->getJSONData(); //this will crash
 #endif
-	}
+}
 	else if (c == saveLogsToFile)
 	{
 		CustomLogger::getInstance()->setFileLogging(saveLogsToFile->boolValue());

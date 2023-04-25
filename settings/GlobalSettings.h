@@ -54,7 +54,7 @@ public:
 	IntParameter* fontSize;
 	EnumParameter* helpLanguage;
 	BoolParameter* useGLRenderer;
-	FloatParameter* altScaleFactor;
+	IntParameter* loggerRefreshRate;
 
 	ControllableContainer saveLoadCC;
 	BoolParameter * enableAutoSave;
@@ -69,6 +69,7 @@ public:
 
 	ControllableContainer editingCC;
 	BoolParameter * askBeforeRemovingItems;
+	FloatParameter* altScaleFactor;
 	EnumParameter* defaultEasing;
 
 	KeyMappingsContainer keyMappingsCC;

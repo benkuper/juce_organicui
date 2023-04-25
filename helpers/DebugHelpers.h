@@ -82,8 +82,8 @@ public:
 	{
 		_arr.reset(new StringArray());
 		time = Time::getCurrentTime();
-		_arr->addTokens(content, StringRef("\r\n"), StringRef("\""));
-
+		//_arr->addTokens(content, StringRef("\r\n"), StringRef("\""));
+		_arr->addLines(content);
 		if (_arr->size())
 		{
 			String* s = &_arr->getReference(0);

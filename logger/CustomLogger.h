@@ -1,6 +1,8 @@
 
 #pragma once
 
+#define MAX_LOGS 1000
+
 class CustomLogger : public Logger
 {
 public:
