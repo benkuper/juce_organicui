@@ -8,6 +8,8 @@
   ==============================================================================
 */
 
+#include "JuceHeader.h"
+
 
 ColorParameter::ColorParameter(const String & niceName, const String & description, const Colour & initialColor, bool enabled) :
 	Parameter(COLOR,niceName,description,var(),var(),var(),enabled),
@@ -165,6 +167,11 @@ void ColorParameter::setWeightedValue(Array<var> values, Array<float> weights)
 void ColorParameter::setControlAutomation()
 {
 	automation.reset(new ParameterColorAutomation(this, !isLoadingData));
+}
+
+var ColorParameter::getRemoteControlValue()
+{
+	return getColor().toString();
 }
 
 ColorParameterUI * ColorParameter::createColorParamUI(Array<ColorParameter *> parameters)

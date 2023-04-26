@@ -10,7 +10,6 @@
 
 #include "JuceHeader.h"
 
-
 EnumParameter::EnumParameter(const String& niceName, const String& description, bool enabled) :
 	Parameter(Type::ENUM, niceName, description, "", var(), var(), enabled),
 	enumParameterNotifier(5)
@@ -245,6 +244,23 @@ void EnumParameter::setupFromJSONData(var data)
 	{
 		LOGWARNING("Options property is not valid : " << optionsData.toString());
 	}
+}
+
+var EnumParameter::getRemoteControlValue()
+{
+	return getValueKey();
+}
+
+var EnumParameter::getRemoteControlRange()
+{
+	var range = var();
+	StringArray keys = getAllKeys();
+	var enumRange;
+	for (auto& k : keys) enumRange.append(k);
+	var rData(new DynamicObject());
+	rData.getDynamicObject()->setProperty("VALS", enumRange);
+	range.append(rData);
+	return range;
 }
 
 var EnumParameter::getValueKeyFromScript(const juce::var::NativeFunctionArgs& a)

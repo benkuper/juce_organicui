@@ -39,6 +39,8 @@ public:
 
 	void setControlAutomation() override;
 
+	var getRemoteControlValue() override;
+
 	ColorParameterUI* createColorParamUI(Array<ColorParameter*> colorParameters = {});
 	ControllableUI * createDefaultUI(Array<Controllable*> controllables = {}) override;
 

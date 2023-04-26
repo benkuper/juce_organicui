@@ -9,6 +9,7 @@
 */
 
 #include "JuceHeader.h"
+#include "TargetParameter.h"
 
 TargetParameter::TargetParameter(const String& niceName, const String& description, const String& initialValue, WeakReference<ControllableContainer> rootReference, bool enabled) :
 	StringParameter(niceName, description, initialValue, enabled),

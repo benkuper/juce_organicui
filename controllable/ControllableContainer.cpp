@@ -9,6 +9,7 @@
  */
 
 #include "JuceHeader.h"
+#include "ControllableContainer.h"
 
 ControllableComparator ControllableContainer::comparator;
 
@@ -492,7 +493,7 @@ void ControllableContainer::removeChildControllableContainer(ControllableContain
 		notifyStructureChanged();
 		container->setParentContainer(nullptr);
 	}
-	
+
 	if (ownedContainers.contains(container)) ownedContainers.removeObject(container);
 }
 
@@ -1023,6 +1024,44 @@ void ControllableContainer::loadJSONData(var data, bool createIfNotThere)
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableContainerFinishedLoading, this));
 
 	afterLoadJSONDataInternal();
+}
+
+var ControllableContainer::getRemoteControlData()
+{
+	var data(new DynamicObject());
+
+	data.getDynamicObject()->setProperty("DESCRIPTION", niceName);
+	data.getDynamicObject()->setProperty("FULL_PATH", getControlAddress());
+	data.getDynamicObject()->setProperty("ACCESS", 0); //container, no value directly associated
+
+	var contentData(new DynamicObject());
+
+	for (auto& childC : controllables)
+	{
+		if (childC->hideInRemoteControl) continue;
+		contentData.getDynamicObject()->setProperty(childC->shortName, childC->getRemoteControlData());
+	}
+
+	for (auto& childCC : controllableContainers)
+	{
+		if (childCC->hideInRemoteControl) continue;
+		contentData.getDynamicObject()->setProperty(childCC->shortName, childCC->getRemoteControlData());
+	}
+
+	data.getDynamicObject()->setProperty("CONTENTS", contentData);
+	data.getDynamicObject()->setProperty("TYPE", "Container");
+
+	getRemoteControlDataInternal(data);
+
+	return data;
+}
+
+void ControllableContainer::handleRemoteControlData(var data)
+{
+}
+
+void ControllableContainer::handleRemoteControlData(const OSCMessage& m)
+{
 }
 
 void ControllableContainer::controllableContainerNameChanged(ControllableContainer* cc)

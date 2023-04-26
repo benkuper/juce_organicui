@@ -408,6 +408,12 @@ void BaseItem::loadJSONDataInternal(var data)
 	if (canHaveScripts) scriptManager->loadJSONData(data.getProperty("scripts", var()));
 }
 
+void BaseItem::getRemoteControlDataInternal(var& data)
+{
+	ControllableContainer::getRemoteControlDataInternal(data);
+	data.getDynamicObject()->setProperty("TYPE", getTypeString());
+}
+
 InspectableEditor* BaseItem::getEditorInternal(bool isRoot, Array<Inspectable*> inspectables)
 {
 	return new BaseItemEditor(this, isRoot);

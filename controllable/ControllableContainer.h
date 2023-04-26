@@ -143,6 +143,12 @@ public:
 	virtual void loadJSONDataInternal(var /*data*/) { /* to be overriden by child classes */ }
 	virtual void afterLoadJSONDataInternal() {} //allow for calling methods after isCurrentlyLoadingData is set to false
 
+	//Remote control
+	virtual var getRemoteControlData();
+	virtual void getRemoteControlDataInternal(var& data) {}
+	virtual void handleRemoteControlData(var data);
+	virtual void handleRemoteControlData(const OSCMessage& m);
+
 	virtual void controllableContainerNameChanged(ControllableContainer *) override;
 	virtual void childStructureChanged(ControllableContainer *)override;
 	virtual void childAddressChanged(ControllableContainer *) override;

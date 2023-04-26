@@ -84,8 +84,6 @@ public:
 
 	void setupServer();
 	bool handleHTTPRequest(std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request) override;
-	var getOSCQueryDataForContainer(ControllableContainer* cc);
-	var getOSCQueryDataForControllable(Controllable* c);
 
 	void connectionOpened(const String& id) override;
 	void messageReceived(const String& id, const String& message) override;

@@ -145,7 +145,11 @@ public:
 	virtual var getJSONDataInternal() override;
 	virtual void loadJSONDataInternal(var data) override;
 	virtual void setupFromJSONData(var data) override;
-
+	
+	virtual void getRemoteControlDataInternal(var& data) override;
+	virtual var getRemoteControlValue();
+	virtual var getRemoteControlRange();
+	
 	static var getValueFromScript(const juce::var::NativeFunctionArgs& a);
 	static var resetValueFromScript(const juce::var::NativeFunctionArgs& a);
 	static var getRangeFromScript(const juce::var::NativeFunctionArgs& a);

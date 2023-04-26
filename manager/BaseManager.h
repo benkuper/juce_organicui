@@ -111,6 +111,8 @@ public:
 	virtual void loadJSONDataInternal(var data) override;
 	virtual void loadJSONDataManagerInternal(var data);
 
+	virtual void getRemoteControlDataInternal(var& data) override;
+
 	PopupMenu getItemsMenu(int startID);
 	T* getItemForMenuResultID(int id, int startID);
 
@@ -920,6 +922,22 @@ void BaseManager<T>::loadJSONDataManagerInternal(var data)
 	{
 		addItemFromData(td, false);
 	}
+}
+
+template<class T>
+void BaseManager<T>::getRemoteControlDataInternal(var& data)
+{
+	ControllableContainer::getRemoteControlDataInternal(data);
+	data.getDynamicObject()->setProperty("TYPE", "Manager");
+
+	var extType = var();
+	if (managerFactory != nullptr)
+	{
+		for (auto& d : managerFactory->defs) extType.append(d->menuPath + "/" + d->type);
+	}
+	else extType.append(itemDataType);
+
+	data.getDynamicObject()->setProperty("EXTENDED_TYPE", extType);
 }
 
 template<class T>

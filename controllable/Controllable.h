@@ -23,6 +23,7 @@ class Controllable :
 public:
 	enum Type { CUSTOM, TRIGGER, FLOAT, INT, BOOL, STRING, ENUM, POINT2D, POINT3D, TARGET, COLOR, TYPE_MAX };
 	static const Array<String> typeNames;
+	static const Array<String> remoteControlTypeNames;
 
 	Controllable(const Type& type, const String& niceName, const String& description, bool enabled = true);
 	virtual ~Controllable();
@@ -95,6 +96,12 @@ public:
 	virtual void loadJSONDataInternal(var data) {} //to be overriden
 
 	virtual void setupFromJSONData(var data);
+
+	//Remote control
+	virtual var getRemoteControlData();
+	virtual void getRemoteControlDataInternal(var &data) {}
+	virtual void handleRemoteControlData(var data);
+	virtual void handleRemoteControlData(const OSCMessage& m);
 
 	String getControlAddress(ControllableContainer* relativeTo = nullptr);
 

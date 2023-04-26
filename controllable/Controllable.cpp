@@ -10,6 +10,7 @@
 
 
 #include "JuceHeader.h"
+#include "Controllable.h"
 
 const Array<String> Controllable::typeNames = {
 	"Custom",
@@ -23,6 +24,20 @@ const Array<String> Controllable::typeNames = {
 	Point3DParameter::getTypeStringStatic(),
 	TargetParameter::getTypeStringStatic(),
 	ColorParameter::getTypeStringStatic()
+};
+
+const Array<String> Controllable::remoteControlTypeNames = {
+	"?",
+	"N",
+	"f",
+	"i",
+	"T",
+	"s",
+	"s",
+	"ff",
+	"fff",
+	"s",
+	"r"
 };
 
 Controllable::Controllable(const Type& type, const String& niceName, const String& description, bool enabled) :
@@ -247,6 +262,32 @@ void Controllable::setupFromJSONData(var data)
 	{
 		if (data.hasProperty(a)) setAttribute(a, data.getDynamicObject()->getProperty(a));
 	}
+}
+
+var Controllable::getRemoteControlData()
+{
+	var data(new DynamicObject());
+
+	data.getDynamicObject()->setProperty("DESCRIPTION", niceName);
+	data.getDynamicObject()->setProperty("FULL_PATH", getControlAddress());
+	data.getDynamicObject()->setProperty("ACCESS", isControllableFeedbackOnly ? 1 : 3);
+
+	String typeString = "";
+
+	typeString = remoteControlTypeNames[(int)type];
+	data.getDynamicObject()->setProperty("TYPE", typeString);
+
+	getRemoteControlDataInternal(data);
+
+	return data;
+}
+
+void Controllable::handleRemoteControlData(var data)
+{
+}
+
+void Controllable::handleRemoteControlData(const OSCMessage& m)
+{
 }
 
 String Controllable::getControlAddress(ControllableContainer* relativeTo)

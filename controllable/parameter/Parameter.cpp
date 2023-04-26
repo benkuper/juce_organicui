@@ -9,6 +9,7 @@
 */
 
 #include "JuceHeader.h"
+#include "Parameter.h"
 
 juce_ImplementSingleton(Parameter::ValueInterpolator::Manager);
 
@@ -561,6 +562,55 @@ void Parameter::setupFromJSONData(var data)
 		defaultValue = data.getProperty("default", defaultValue);
 		setValue(data.getProperty("default", defaultValue));
 	}
+}
+
+void Parameter::getRemoteControlDataInternal(var& data)
+{
+	Controllable::getRemoteControlDataInternal(data);
+
+	var v = getRemoteControlValue();
+	var valueData = var();
+	if (v.isArray()) valueData = v;
+	else valueData.append(v); //always need to be an array
+	if (!valueData.isVoid()) data.getDynamicObject()->setProperty("VALUE", valueData);
+
+	var rangeData = getRemoteControlRange();
+	if (!rangeData.isVoid()) data.getDynamicObject()->setProperty("RANGE", rangeData);
+
+	var extType = var();
+	extType.append(getTypeString());
+	data.getDynamicObject()->setProperty("EXTENDED_TYPE", extType);
+}
+
+var Parameter::getRemoteControlValue()
+{
+	return getValue();
+}
+
+var Parameter::getRemoteControlRange()
+{
+	if (!hasRange()) return var();
+	var range = var();
+
+	if (isComplex())
+	{
+		for (int i = 0; i < minimumValue.size(); i++)
+		{
+			var rData(new DynamicObject());
+			rData.getDynamicObject()->setProperty("MIN", minimumValue[i]);
+			rData.getDynamicObject()->setProperty("MAX", maximumValue[i]);
+			range.append(rData);
+		}
+	}
+	else
+	{
+		var rData(new DynamicObject());
+		rData.getDynamicObject()->setProperty("MIN", minimumValue);
+		rData.getDynamicObject()->setProperty("MAX", maximumValue);
+		range.append(rData);
+	}
+
+	return range;
 }
 
 var Parameter::getValueFromScript(const juce::var::NativeFunctionArgs& a)
