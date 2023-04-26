@@ -71,7 +71,7 @@ UndoableAction* Point3DParameter::setUndoableVector(float oldX, float oldY, floa
 	d.append(newY);
 	d.append(newZ);
 
-	if (checkValueIsTheSame(od, d) && !alwaysNotify) return;
+	if (checkValueIsTheSame(od, d) && !alwaysNotify) return nullptr;
 
 	return setUndoableValue(od, d, onlyReturnAction);
 }
