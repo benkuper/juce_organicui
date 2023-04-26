@@ -22,8 +22,8 @@ public:
 
 	void setVector(Vector3D<float> value);
 	void setVector(float x, float y, float z);
-	void setUndoableVector(Vector3D<float> oldVector, Vector3D<float> newVector);
-	void setUndoableVector(float oldX, float oldY, float oldZ, float newX, float newY, float newZ);
+	UndoableAction* setUndoableVector(Vector3D<float> oldVector, Vector3D<float> newVector, bool onlyReturnAction = false);
+	UndoableAction* setUndoableVector(float oldX, float oldY, float oldZ, float newX, float newY, float newZ, bool onlyReturnAction = false);
 	
 	void setValueInternal(var& _value) override;
 	void setBounds(float _minX, float _minY, float _minZ, float _maxX, float _maxY, float _maxZ);

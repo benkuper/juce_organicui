@@ -55,12 +55,12 @@ void Point3DParameter::setVector(float _x, float _y, float _z)
 	setValue(d);
 }
 
-void Point3DParameter::setUndoableVector(Vector3D<float> oldVector, Vector3D<float> newVector)
+UndoableAction* Point3DParameter::setUndoableVector(Vector3D<float> oldVector, Vector3D<float> newVector, bool onlyReturnAction)
 {
-	setUndoableVector(oldVector.x, oldVector.y, oldVector.z, newVector.x, newVector.y, newVector.z);
+	return setUndoableVector(oldVector.x, oldVector.y, oldVector.z, newVector.x, newVector.y, newVector.z, onlyReturnAction);
 }
 
-void Point3DParameter::setUndoableVector(float oldX, float oldY, float oldZ, float newX, float newY, float newZ)
+UndoableAction* Point3DParameter::setUndoableVector(float oldX, float oldY, float oldZ, float newX, float newY, float newZ, bool onlyReturnAction)
 {
 	var od;
 	od.append(oldX);
@@ -73,7 +73,7 @@ void Point3DParameter::setUndoableVector(float oldX, float oldY, float oldZ, flo
 
 	if (checkValueIsTheSame(od, d) && !alwaysNotify) return;
 
-	setUndoableValue(od, d);
+	return setUndoableValue(od, d, onlyReturnAction);
 }
 
 void Point3DParameter::setValueInternal(var& _value)
