@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    OSCRemoteControl.h
-    Created: 23 Apr 2018 5:00:30pm
-    Author:  Ben
+	OSCRemoteControl.h
+	Created: 23 Apr 2018 5:00:30pm
+	Author:  Ben
 
   ==============================================================================
 */
@@ -33,13 +33,13 @@ class OSCRemoteControl :
 #endif
 	public OSCReceiver::Listener<OSCReceiver::RealtimeCallback>
 {
-public: 
+public:
 	juce_DeclareSingleton(OSCRemoteControl, true);
 
 	OSCRemoteControl();
 	~OSCRemoteControl();
 
-	IntParameter * localPort;
+	IntParameter* localPort;
 	OSCReceiver receiver;
 	bool receiverIsConnected;
 	BoolParameter* logIncoming;
@@ -47,7 +47,7 @@ public:
 
 	EnablingControllableContainer manualSendCC;
 	OSCSender manualSender;
-	StringParameter * manualAddress;
+	StringParameter* manualAddress;
 	IntParameter* manualPort;
 
 	void setupReceiver();
@@ -65,12 +65,12 @@ public:
 
 	void updateEngineListener();
 
-	void processMessage(const OSCMessage &m, const String &sourceId = "");
+	void processMessage(const OSCMessage& m, const String& sourceId = "");
 
-	void onContainerParameterChanged(Parameter * p) override;
-	
-	void oscMessageReceived(const OSCMessage &m) override;
-	void oscBundleReceived(const OSCBundle &b) override;
+	void onContainerParameterChanged(Parameter* p) override;
+
+	void oscMessageReceived(const OSCMessage& m) override;
+	void oscBundleReceived(const OSCBundle& b) override;
 
 #if ORGANICUI_USE_SERVUS
 	void run() override;
@@ -87,26 +87,27 @@ public:
 
 	void connectionOpened(const String& id) override;
 	void messageReceived(const String& id, const String& message) override;
-	void dataReceived(const String& id, const MemoryBlock &data) override;
+	void dataReceived(const String& id, const MemoryBlock& data) override;
 	void connectionClosed(const String& id, int status, const String& reason) override;
 	void connectionError(const String& id, const String& message) override;
 
-	void sendOSCQueryFeedback(Controllable* c, const String & excludeId = "");
+	void sendOSCQueryFeedback(Controllable* c, const String& excludeId = "");
+	void sendOSCQueryFeedback(const OSCMessage& m, StringArray excludes = StringArray());
 
 	void sendAllManualFeedback();
 	void sendManualFeedbackForControllable(Controllable* c);
+#endif
 
-	void onControllableFeedbackUpdate(ControllableContainer * cc, Controllable *c) override;
+	void onControllableFeedbackUpdate(ControllableContainer* cc, Controllable* c) override;
 
 	void newMessage(const ContainerAsyncEvent& e) override;
-#endif
 
 
 	class RemoteControlListener
 	{
 	public:
-        virtual ~RemoteControlListener(){}
-		virtual void processMessage(const OSCMessage &m) {}
+		virtual ~RemoteControlListener() {}
+		virtual void processMessage(const OSCMessage& m) {}
 	};
 
 	ListenerList<RemoteControlListener> remoteControlListeners;

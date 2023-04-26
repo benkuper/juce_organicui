@@ -357,10 +357,10 @@ bool OSCRemoteControl::handleHTTPRequest(std::shared_ptr<HttpServer::Response> r
 	}
 	else
 	{
-		ControllableContainer* cc =  Engine::mainEngine;
+		ControllableContainer* cc = Engine::mainEngine;
 		String addr = request->path;
 		if (addr.length() > 1) cc = Engine::mainEngine->getControllableContainerForAddress(addr, true, false, false);
-		if(cc != nullptr) data = cc->getRemoteControlData();
+		if (cc != nullptr) data = cc->getRemoteControlData();
 	}
 
 
@@ -463,20 +463,23 @@ void OSCRemoteControl::sendOSCQueryFeedback(Controllable* c, const String& exclu
 	if (c == nullptr) return;
 
 	OSCMessage m = OSCHelpers::getOSCMessageForControllable(c);
+	StringArray ex = excludeId;
+	if (noFeedbackMap.contains(c)) ex.add(noFeedbackMap[c]);
+	sendOSCQueryFeedback(m, ex);
+
+}
+
+void OSCRemoteControl::sendOSCQueryFeedback(const OSCMessage& m, StringArray excludes)
+{
 	OSCPacketPacker packer;
 	if (packer.writeMessage(m))
 	{
 		MemoryBlock b(packer.getData(), packer.getDataSize());
-
-		StringArray ex = excludeId;
-		if (noFeedbackMap.contains(c)) ex.add(noFeedbackMap[c]);
-		server->sendExclude(b, ex);
+		server->sendExclude(b, excludes);
 	}
 
 	if (logOutgoing->boolValue()) NLOG(niceName, "Sent to OSCQuery : " << OSCHelpers::messageToString(m));
-
 }
-#endif
 
 void OSCRemoteControl::sendAllManualFeedback()
 {
@@ -499,3 +502,4 @@ void OSCRemoteControl::sendManualFeedbackForControllable(Controllable* c)
 
 	if (logOutgoing->boolValue()) NLOG(niceName, "Sent to manual OSC  : " << OSCHelpers::messageToString(m));
 }
+#endif

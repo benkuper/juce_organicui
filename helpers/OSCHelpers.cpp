@@ -177,6 +177,7 @@ String OSCHelpers::getStringArg(OSCArgument a)
 	if (a.isInt64()) return String(a.getInt64());
 	if (a.isFloat32()) return String(a.getFloat32());
 	if (a.isTorF()) return a.getBool() ? "True" : "False";
+	if (a.isBlob()) return "[Blob : " + String(a.getBlob().getSize()) + " bytes]";
 	if (a.isImpulse()) return var("");
 	return "";
 }
