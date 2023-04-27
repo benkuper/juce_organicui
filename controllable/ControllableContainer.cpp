@@ -600,15 +600,8 @@ void ControllableContainer::sortControllables()
 void ControllableContainer::setParentContainer(ControllableContainer* container)
 {
 	this->parentContainer = container;
-
-
 	for (auto& c : controllables) if (c != nullptr) c->updateControlAddress();
-
-
-
 	for (auto& cc : controllableContainers) if (!cc.wasObjectDeleted()) cc->updateChildrenControlAddress();
-
-
 }
 
 void ControllableContainer::updateChildrenControlAddress()
