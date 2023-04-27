@@ -96,11 +96,11 @@ public:
 
 	void sendAllManualFeedback();
 	void sendManualFeedbackForControllable(Controllable* c);
-#endif
-
-	void onControllableFeedbackUpdate(ControllableContainer* cc, Controllable* c) override;
 
 	void newMessage(const ContainerAsyncEvent& e) override;
+	void onControllableFeedbackUpdate(ControllableContainer* cc, Controllable* c) override;
+
+#endif
 
 
 	class RemoteControlListener
