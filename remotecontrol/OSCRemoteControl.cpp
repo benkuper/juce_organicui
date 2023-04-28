@@ -482,6 +482,7 @@ void OSCRemoteControl::sendOSCQueryFeedback(const OSCMessage& m, StringArray exc
 
 	if (logOutgoing->boolValue()) NLOG(niceName, "Sent to OSCQuery : " << OSCHelpers::messageToString(m));
 }
+#endif
 
 void OSCRemoteControl::sendAllManualFeedback()
 {
@@ -504,4 +505,3 @@ void OSCRemoteControl::sendManualFeedbackForControllable(Controllable* c)
 
 	if (logOutgoing->boolValue()) NLOG(niceName, "Sent to manual OSC  : " << OSCHelpers::messageToString(m));
 }
-#endif
