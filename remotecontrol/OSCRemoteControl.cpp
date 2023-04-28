@@ -135,6 +135,7 @@ void OSCRemoteControl::setupZeroconf()
 
 void OSCRemoteControl::updateEngineListener()
 {
+#if ORGANICUI_USE_WEBSERVER
 	Engine::mainEngine->removeAsyncContainerListener(this);
 
 	bool shouldListen = false;
@@ -143,6 +144,7 @@ void OSCRemoteControl::updateEngineListener()
 	if (receiverIsConnected) shouldListen = true;
 
 	if (shouldListen) Engine::mainEngine->addAsyncContainerListener(this);
+#endif
 }
 
 
