@@ -145,7 +145,7 @@ public:
 
 	//Remote control
 	virtual var getRemoteControlData();
-	virtual void getRemoteControlDataInternal(var& data) {}
+	virtual void getRemoteControlDataInternal(var& /*data*/) {}
 	virtual void handleRemoteControlData(var data);
 	virtual void handleRemoteControlData(const OSCMessage& m);
 
