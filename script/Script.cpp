@@ -303,6 +303,8 @@ void Script::onControllableFeedbackUpdateInternal(ControllableContainer* cc, Con
 
 void Script::childStructureChanged(ControllableContainer* cc)
 {
+	if(cc != Engine::mainEngine) BaseItem::childStructureChanged(cc);
+
 	if (state == ScriptState::SCRIPT_LOADED && Engine::mainEngine != nullptr && cc == Engine::mainEngine)
 	{
 		if (!Engine::mainEngine->isLoadingFile && !Engine::mainEngine->isClearing)

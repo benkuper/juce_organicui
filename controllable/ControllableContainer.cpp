@@ -326,7 +326,7 @@ void ControllableContainer::removeControllable(WeakReference<Controllable> c, bo
 void ControllableContainer::notifyStructureChanged()
 {
 	if (isCurrentlyLoadingData && !notifyStructureChangeWhenLoadingData) return;
-	if (Engine::mainEngine != nullptr && (Engine::mainEngine->isLoadingFile || Engine::mainEngine->isClearing)) return;
+	if (Engine::mainEngine != nullptr && (/*Engine::mainEngine->isLoadingFile ||*/ Engine::mainEngine->isClearing)) return;
 
 	scriptObjectIsDirty = true;
 

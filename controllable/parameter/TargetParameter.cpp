@@ -67,10 +67,10 @@ void TargetParameter::setGhostValue(const String& ghostVal)
 {
 	if (ghostVal == ghostValue) return;
 	ghostValue = ghostVal;
-	if (ghostValue.isNotEmpty() && target == nullptr && targetContainer == nullptr)
-	{
-		setWarningMessage("Link is broken !");
-	}
+	//if (ghostValue.isNotEmpty() && target == nullptr && targetContainer == nullptr)
+	//{
+	//	setWarningMessage("Link is broken !");
+	//}
 
 }
 
@@ -200,8 +200,12 @@ void TargetParameter::setTarget(WeakReference<Controllable> c)
 		if (value.toString().isNotEmpty()) setGhostValue(value.toString());
 		if (ghostValue.isNotEmpty())
 		{
-			setWarningMessage("Link is broken : " + ghostValue);
-			if (!Engine::mainEngine->isClearing && rootContainer != nullptr && !rootContainer.wasObjectDeleted()) rootContainer->addControllableContainerListener(this);
+			
+			if (!Engine::mainEngine->isClearing && rootContainer != nullptr && !rootContainer.wasObjectDeleted())
+			{
+				setWarningMessage("Link is broken : " + ghostValue);
+				rootContainer->addControllableContainerListener(this);
+			}
 		}
 		else clearWarning();
 	}
@@ -236,7 +240,10 @@ void TargetParameter::setTarget(WeakReference<ControllableContainer> cc)
 		if (ghostValue.isNotEmpty())
 		{
 			setWarningMessage("Link is broken : " + ghostValue);
-			if (!Engine::mainEngine->isClearing && rootContainer != nullptr && !rootContainer.wasObjectDeleted()) rootContainer->addControllableContainerListener(this);
+			if (!Engine::mainEngine->isClearing && rootContainer != nullptr && !rootContainer.wasObjectDeleted())
+			{
+				rootContainer->addControllableContainerListener(this);
+			}
 		}
 		else clearWarning();
 	}
