@@ -178,6 +178,7 @@ public:
 
 
 	virtual void showMenuAndAddItem(bool isFromAddButton, Point<int> mouseDownPos);
+	virtual void showMenuAndAddItem(bool isFromAddButton, Point<int> mouseDownPos, std::function<void(T*)> callback);
 	virtual void addMenuExtraItems(PopupMenu& p, int startIndex) {}
 	virtual void handleMenuExtraItemsResult(int result, int startIndex) {}
 	virtual void addItemFromMenu(bool isFromAddButton, Point<int> mouseDownPos);
@@ -873,11 +874,19 @@ void BaseManagerUI<M, T, U>::componentMovedOrResized(Component& c, bool wasMoved
 template<class M, class T, class U>
 void BaseManagerUI<M, T, U>::showMenuAndAddItem(bool isFromAddButton, Point<int> mouseDownPos)
 {
+	showMenuAndAddItem(isFromAddButton, mouseDownPos, nullptr);
+}
+
+template<class M, class T, class U>
+void BaseManagerUI<M, T, U>::showMenuAndAddItem(bool isFromAddButton, Point<int> mouseDownPos, std::function<void(T*)> callback)
+{
 	if (manager->managerFactory != nullptr)
 	{
-		manager->managerFactory->showCreateMenu([this, isFromAddButton, mouseDownPos](T* item)
+		manager->managerFactory->showCreateMenu([this, isFromAddButton, mouseDownPos, callback](T* item)
 			{
 				this->addItemFromMenu(item, isFromAddButton, mouseDownPos);
+				if (callback != nullptr) callback(item);
+
 			}
 		);
 	}
@@ -885,7 +894,8 @@ void BaseManagerUI<M, T, U>::showMenuAndAddItem(bool isFromAddButton, Point<int>
 	{
 		if (isFromAddButton)
 		{
-			manager->BaseManager<T>::addItem();
+			T* item = manager->BaseManager<T>::addItem();
+			if (callback != nullptr) callback(item);
 			return;
 		}
 
@@ -894,7 +904,7 @@ void BaseManagerUI<M, T, U>::showMenuAndAddItem(bool isFromAddButton, Point<int>
 
 		addMenuExtraItems(p, 2);
 
-		p.showMenuAsync(PopupMenu::Options(), [this, isFromAddButton, mouseDownPos](int result)
+		p.showMenuAsync(PopupMenu::Options(), [this, isFromAddButton, mouseDownPos, callback](int result)
 			{
 				if (result == 0) return;
 
@@ -908,6 +918,8 @@ void BaseManagerUI<M, T, U>::showMenuAndAddItem(bool isFromAddButton, Point<int>
 					this->handleMenuExtraItemsResult(result, 2);
 					break;
 				}
+
+				//if (callback != nullptr) callback(item);
 			}
 		);
 	}
@@ -930,6 +942,7 @@ template<class M, class T, class U>
 U* BaseManagerUI<M, T, U>::addItemUI(T* item, bool animate, bool resizeAndRepaint)
 {
 	U* tui = createUIForItem(item);
+	jassert(tui != nullptr);
 
 	BaseItemMinimalUI<T>* bui = static_cast<BaseItemMinimalUI<T>*>(tui);
 
