@@ -8,6 +8,7 @@
   ==============================================================================
 */
 
+#include "JuceHeader.h"
 
 ColorParameterUI::ColorParameterUI(Array<ColorParameter *> parameters) :
 	ParameterUI(Inspectable::getArrayAs<ColorParameter, Parameter>(parameters), PARAMETERUI_DEFAULT_TIMER),
@@ -71,6 +72,7 @@ void ColorParameterUI::mouseDownInternal(const MouseEvent & e)
 void ColorParameterUI::showEditWindowInternal()
 {
 	if (!isInteractable()) return;
+	if (shouldBailOut()) return;
 
 	std::unique_ptr<ColourSelector> selector(new ColourSelector(ColourSelector::showAlphaChannel | ColourSelector::showSliders | ColourSelector::showHexColorValue | ColourSelector::showColourspace));
 	selector->addChangeListener(this);
@@ -102,7 +104,7 @@ void ColorParameterUI::valueChanged(const var &)
 void ColorParameterUI::changeListenerCallback(ChangeBroadcaster * source)
 {
 	ColourSelector * s = dynamic_cast<ColourSelector *>(source);
-	if (s == nullptr) return;
+	if (s == nullptr || shouldBailOut()) return;
 	colorParam->setColor(s->getCurrentColour());
 
 }

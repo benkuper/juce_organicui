@@ -56,7 +56,7 @@ ParameterUI::~ParameterUI()
 void ParameterUI::showEditWindowInternal()
 {
 	//if (parameter->isControllableFeedbackOnly) return;
-	if (parameter == nullptr || parameter.wasObjectDeleted()) return;
+	if (shouldBailOut()) return;
 	std::unique_ptr<Component> editComponent(getEditValueComponent());
 	CallOutBox* box = &CallOutBox::launchAsynchronously(std::move(editComponent), localAreaToGlobal(getLocalBounds()), nullptr);
 	box->setArrowSize(8);
@@ -339,7 +339,7 @@ void ParameterUI::mouseDoubleClick(const MouseEvent& e)
 
 bool ParameterUI::isInteractable(bool falseIfFeedbackOnly)
 {
-	if (parameter == nullptr || parameter.wasObjectDeleted()) return false;
+	if (shouldBailOut()) return false;
 	return ControllableUI::isInteractable(falseIfFeedbackOnly) || parameter->controlMode != Parameter::ControlMode::MANUAL;
 }
 

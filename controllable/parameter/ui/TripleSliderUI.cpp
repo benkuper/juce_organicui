@@ -8,6 +8,8 @@
   ==============================================================================
 */
 
+#include "JuceHeader.h"
+
 TripleSliderUI::TripleSliderUI(Array<Point3DParameter*> parameters) :
 	ParameterUI(Inspectable::getArrayAs<Point3DParameter, Parameter>(parameters)),
 	p3ds(parameters),
@@ -139,14 +141,16 @@ void TripleSliderUI::showEditWindowInternal()
 	nameWindow->addButton("OK", 1, KeyPress(KeyPress::returnKey));
 	nameWindow->addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
 
-	nameWindow->enterModalState(true, ModalCallbackFunction::create([this, nameWindow](int result)
+	Point2DParameter* param = p3d;
+
+	nameWindow->enterModalState(true, ModalCallbackFunction::create([param, nameWindow](int result)
 		{
 
 			if (result)
 			{
 				float newVals[3];
 				for (int i = 0; i < 3; ++i) newVals[i] = nameWindow->getTextEditorContents("val" + String(i)).getFloatValue();
-				p3d->setUndoableVector(p3d->x, p3d->y, p3d->z, newVals[0], newVals[1], newVals[2]);
+				param->setUndoableVector(param->x, param->y, param->z, newVals[0], newVals[1], newVals[2]);
 			}
 		}
 	), true);
