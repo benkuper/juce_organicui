@@ -141,7 +141,7 @@ void TripleSliderUI::showEditWindowInternal()
 	nameWindow->addButton("OK", 1, KeyPress(KeyPress::returnKey));
 	nameWindow->addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
 
-	Point2DParameter* param = p3d;
+	Point3DParameter* param = p3d;
 
 	nameWindow->enterModalState(true, ModalCallbackFunction::create([param, nameWindow](int result)
 		{
