@@ -20,7 +20,7 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(Array<Con
 	containers(containers),
 	customCreateEditorForControllableFunc(nullptr),
 	customCreateEditorForContainerFunc(nullptr),
-    dragAndDropEnabled(false)
+	dragAndDropEnabled(false)
 {
 	jassert(containers.size() > 0);
 
@@ -189,7 +189,7 @@ void GenericControllableContainerEditor::showContextMenu()
 	if (container->canBeCopiedAndPasted)
 	{
 		p.addItem(2, "Copy");
-		p.addItem(3, "Paste (replace data)");
+		p.addItem(3, "Paste (replace)");
 	}
 
 	addPopupMenuItems(&p);
@@ -231,6 +231,8 @@ void GenericControllableContainerEditor::showContextMenu()
 				case 3:
 					this->container->loadJSONData(JSON::fromString(SystemClipboard::getTextFromClipboard()));
 					break;
+
+
 
 				case -1000:
 					SystemClipboard::copyTextToClipboard(this->container->getControlAddress());
@@ -372,7 +374,7 @@ void GenericControllableContainerEditor::resetAndBuild()
 
 InspectableEditor* GenericControllableContainerEditor::getEditorUIForContainer(ControllableContainer* cc)
 {
-	if(customCreateEditorForContainerFunc != nullptr) return customCreateEditorForContainerFunc(container, cc);
+	if (customCreateEditorForContainerFunc != nullptr) return customCreateEditorForContainerFunc(container, cc);
 	return cc->getEditor(false);
 }
 

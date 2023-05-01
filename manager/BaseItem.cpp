@@ -29,6 +29,8 @@ BaseItem::BaseItem(const String& name, bool _canBeDisabled, bool _canHaveScripts
 	saveAndLoadName = true;
 	nameCanBeChangedByUser = true;
 
+	canBeCopiedAndPasted = true;
+
 	if (canHaveScripts)
 	{
 		scriptManager.reset(new ScriptManager(this));

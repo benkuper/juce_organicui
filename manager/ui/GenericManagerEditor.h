@@ -85,7 +85,7 @@ GenericManagerEditor<T>::GenericManagerEditor(BaseManager<T>* _manager, bool isR
 	manager(_manager),
 	isDraggingOver(false),
 	highlightOnDragOver(true),
-    addItemText("Add item")
+	addItemText("Add item")
 {
 	headerHeight = 20;
 	setInterceptsMouseClicks(true, true);
@@ -191,21 +191,38 @@ void GenericManagerEditor<T>::resizedInternalHeader(juce::Rectangle<int>& r)
 template<class T>
 void GenericManagerEditor<T>::addPopupMenuItems(PopupMenu* p)
 {
-	if (manager->managerFactory != nullptr) p->addSubMenu("Add...", manager->managerFactory->getMenu());
-	else p->addItem(1, addItemText);
+	p->addItem(1001, "Paste (add)");
+
+	if (manager->managerFactory != nullptr) p->addSubMenu("Add...", manager->managerFactory->getMenu(1101));
+	else p->addItem(1101, addItemText);
+
 }
 
 template<class T>
 void GenericManagerEditor<T>::handleMenuSelectedID(int id)
 {
-	if (manager->managerFactory != nullptr)
+	if (id > 1000 && id < 2000)
 	{
-		T* item = manager->managerFactory->createFromMenuResult(id);
-		if (item != nullptr) manager->addItem(item);
-	}
-	else
-	{
-		if (id == 1) addItemFromMenu(true);
+		switch (id)
+		{
+		case 1001:
+			manager->addItemsFromClipboard();
+			break;
+
+		default:
+		{
+			if (manager->managerFactory != nullptr)
+			{
+				T* item = manager->managerFactory->createFromMenuResult(id - 1100);
+				if (item != nullptr) manager->addItem(item);
+			}
+			else
+			{
+				if (id == 1100) addItemFromMenu(true);
+			}
+		}
+		break;
+		}
 	}
 }
 

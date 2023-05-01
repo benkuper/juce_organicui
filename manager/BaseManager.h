@@ -503,6 +503,13 @@ Array<T*> BaseManager<T>::addItems(Array<T*> itemsToAdd, var data, bool addToUnd
 	isCurrentlyLoadingData = false;
 	isManipulatingMultipleItems = false;
 
+	if (selectItemWhenCreated && !isCurrentlyLoadingData)
+	{
+		Array<Inspectable*> select;
+		for (auto& i : itemsToAdd) select.add(i);
+		selectionManager->selectInspectables(select);
+	}
+
 	addItemsInternal(itemsToAdd, data);
 
 	return itemsToAdd;
@@ -546,6 +553,13 @@ Array<T*> BaseManager<T>::addItemsFromClipboard(bool showWarning)
 	String s = SystemClipboard::getTextFromClipboard();
 	var data = JSON::parse(s);
 	if (data.isVoid()) return Array<T*>();
+
+	if (!data.hasProperty("itemType"))
+	{
+		Array<T*> result;
+		result.add(this->addItemFromData(data));
+		return result;
+	}
 
 	String t = data.getProperty("itemType", "");
 	if (!canAddItemOfType(t))
