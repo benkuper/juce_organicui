@@ -77,7 +77,11 @@ void OSCRemoteControl::setupReceiver()
 	updateEngineListener();
 #endif
 
-	if (!enabled->boolValue()) return;
+	if (!enabled->boolValue())
+	{
+		setupZeroconf();
+		return;
+	}
 
 	//if (!receiveCC->enabled->boolValue()) return;
 	receiverIsConnected = receiver.connect(localPort->intValue());
@@ -303,16 +307,21 @@ void OSCRemoteControl::run()
 {
 	String nameToAdvertise = OrganicApplication::getInstance()->getApplicationName() + " - Remote Control";
 	int portToAdvertise = 0;
-	while (portToAdvertise != localPort->intValue() && !threadShouldExit())
+	bool isEnabled = enabled->boolValue();
+
+	while ((portToAdvertise != localPort->intValue() || isEnabled != enabled->boolValue()) && !threadShouldExit())
 	{
 		portToAdvertise = localPort->intValue();
+		isEnabled = enabled->boolValue();
+
 		servus.withdraw();
-		servus.announce(portToAdvertise, nameToAdvertise.toStdString());
+		
+		if(isEnabled) servus.announce(portToAdvertise, nameToAdvertise.toStdString());
 
 
 #if ORGANICUI_USE_WEBSERVER
 		oscQueryServus.withdraw();
-		oscQueryServus.announce(portToAdvertise, nameToAdvertise.toStdString());
+		if (isEnabled) oscQueryServus.announce(portToAdvertise, nameToAdvertise.toStdString());
 #endif
 
 		if (localPort->intValue() != portToAdvertise)
