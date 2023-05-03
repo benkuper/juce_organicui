@@ -35,7 +35,14 @@ void WarningTarget::setWarningMessage(const String& message, const String& id, b
 {
 	if (Engine::mainEngine != nullptr && Engine::mainEngine->isClearing) return;
 	if (WarningReporter::getInstanceWithoutCreating() == nullptr) return;
-	if (message.isNotEmpty() && warningMessage.contains(id) && warningMessage[id] == message) return;
+    
+	if (warningMessage.contains(id))
+    {
+        if(warningMessage[id] == message) return;
+    }else
+    {
+        if(message.isEmpty()) return;
+    }
 
 	if (message.isEmpty())
 	{
@@ -45,8 +52,12 @@ void WarningTarget::setWarningMessage(const String& message, const String& id, b
 	else
 	{
 		if (log && Engine::mainEngine != nullptr && !Engine::mainEngine->isLoadingFile && Engine::mainEngine->isClearing) LOGWARNING(message);
-		warningMessage.set(id, message);
-		WarningReporter::getInstance()->registerWarning(this);
+        
+        if(warningMessage.contains(id))
+        {
+            warningMessage.set(id, message);
+            WarningReporter::getInstance()->registerWarning(this);
+        }
 	}
 
 	notifyWarningChanged();
