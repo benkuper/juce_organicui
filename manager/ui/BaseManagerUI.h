@@ -1116,14 +1116,14 @@ void BaseManagerUI<M, T, U>::newMessage(const InspectableSelectionManager::Selec
 	{
 		if (useViewport)
 		{
-			if (T* item = InspectableSelectionManager::activeSelectionManager->getInspectableAs<T>())
-			{
-				if (U* ui = getUIForItem(item))
-				{
-					if (defaultLayout == HORIZONTAL) viewport.setViewPosition(ui->getX() + this->getWidth() / 2, 0);
-					else if (defaultLayout == VERTICAL) viewport.setViewPosition(0, ui->getY() + this->getHeight() / 2);
-				}
-			}
+//			if (T* item = InspectableSelectionManager::activeSelectionManager->getInspectableAs<T>())
+//			{
+//				if (U* ui = getUIForItem(item))
+//				{
+//					if (defaultLayout == HORIZONTAL) viewport.setViewPosition(ui->getX() + this->getWidth() / 2, 0);
+//					else if (defaultLayout == VERTICAL) viewport.setViewPosition(0, ui->getY() + this->getHeight() / 2);
+//				}
+//			}
 		}
 	}
 }
