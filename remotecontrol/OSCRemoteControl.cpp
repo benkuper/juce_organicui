@@ -79,7 +79,9 @@ void OSCRemoteControl::setupReceiver()
 
 	if (!enabled->boolValue())
 	{
+#if ORGANICUI_USE_SERVUS
 		setupZeroconf();
+#endif
 		return;
 	}
 
