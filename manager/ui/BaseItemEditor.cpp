@@ -40,15 +40,14 @@ BaseItemEditor::BaseItemEditor(Array<BaseItem*> bi, bool isRoot) :
 			//	downBT->addListener(this);
 		//}
 	}
-	else
-	{
-		if (item->itemColor != nullptr)
-		{
-			itemColorUI.reset(item->itemColor->createColorParamUI());
-			addAndMakeVisible(itemColorUI.get());
-		}
 
+	if (item->itemColor != nullptr)
+	{
+		itemColorUI.reset(item->itemColor->createColorParamUI());
+		addAndMakeVisible(itemColorUI.get());
 	}
+
+	
 
 	if (item->canBeReorderedInEditor && !isRoot)
 	{
