@@ -13,7 +13,7 @@
 FloatParameter::FloatParameter(const String& niceName, const String& description, const double& initialValue, const double& minValue, const double& maxValue, bool enabled) :
 	Parameter(Type::FLOAT, niceName, description, (double)initialValue, (double)minValue, (double)maxValue, enabled),
 	unitSteps(0),
-	stringDecimals(5),
+	stringDecimals(DEFAULT_STRING_DECIMALS),
 	defaultUI(NONE),
 	customUI(NONE)
 {
@@ -166,6 +166,7 @@ var FloatParameter::getJSONDataInternal()
 {
 	var data = Parameter::getJSONDataInternal();
 	if (customUI != NONE) data.getDynamicObject()->setProperty("customUI", customUI);
+ 	if(stringDecimals != DEFAULT_STRING_DECIMALS) data.getDynamicObject()->setProperty("stringDecimals", stringDecimals);
 	return data;
 }
 
@@ -174,6 +175,7 @@ void FloatParameter::loadJSONDataInternal(var data)
 	Parameter::loadJSONDataInternal(data);
 	if (data.getDynamicObject()->hasProperty("defaultUI")) defaultUI = (UIType)(int)data.getProperty("defaultUI", SLIDER);
 	customUI = (UIType)(int)data.getProperty("customUI", NONE);
+	stringDecimals = (int)data.getProperty("stringDecimals", DEFAULT_STRING_DECIMALS);
 }
 
 var FloatParameter::getCroppedValue(var originalValue)

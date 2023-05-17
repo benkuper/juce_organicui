@@ -15,6 +15,8 @@ class FloatStepperUI;
 class FloatParameterLabelUI;
 class TimeLabel;
 
+#define DEFAULT_STRING_DECIMALS 5
+
 class FloatParameter : public Parameter
 {
 public:
