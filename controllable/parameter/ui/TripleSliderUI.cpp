@@ -38,6 +38,9 @@ TripleSliderUI::TripleSliderUI(Array<Point3DParameter*> parameters) :
 	yParam.defaultUI = p3d->defaultUI;
 	zParam.defaultUI = p3d->defaultUI;
 
+	xParam.stringDecimals = p3d->stringDecimals;
+	yParam.stringDecimals = p3d->stringDecimals;
+	zParam.stringDecimals = p3d->stringDecimals;
 
 	xParam.addAsyncParameterListener(this);
 	yParam.addAsyncParameterListener(this);

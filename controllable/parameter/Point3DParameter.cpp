@@ -13,7 +13,8 @@ Author:  bkupe
 Point3DParameter::Point3DParameter(const String& niceName, const String& description, bool enabled) :
 	Parameter(POINT3D, niceName, description, 0, 0, 1, enabled),
 	x(0), y(0), z(0),
-	defaultUI(FloatParameter::NONE)
+	defaultUI(FloatParameter::NONE),
+	stringDecimals(3)
 {
 	canHaveRange = true;
 
@@ -162,6 +163,32 @@ bool Point3DParameter::checkValueIsTheSame(var newValue, var oldValue)
 StringArray Point3DParameter::getValuesNames()
 {
 	return StringArray("X", "Y", "Z");
+}
+
+
+bool Point3DParameter::setAttributeInternal(String name, var val)
+{
+	if (name == "ui")
+	{
+		if (val == "time") defaultUI = FloatParameter::TIME;
+		else if (val == "slider") defaultUI = FloatParameter::SLIDER;
+		else if (val == "stepper") defaultUI = FloatParameter::STEPPER;
+		else if (val == "label") defaultUI = FloatParameter::LABEL;
+	}
+	else if (name == "stringDecimals") stringDecimals = (int)val;
+	else
+	{
+		return Parameter::setAttributeInternal(name, val);
+	}
+
+	return true;
+}
+
+StringArray Point3DParameter::getValidAttributes() const
+{
+	StringArray att = Parameter::getValidAttributes();
+	att.addArray({ "ui","stringDecimals" });
+	return att;
 }
 
 ControllableUI* Point3DParameter::createDefaultUI(Array<Controllable*> controllables)

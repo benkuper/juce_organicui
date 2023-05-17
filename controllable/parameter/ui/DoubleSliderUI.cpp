@@ -35,6 +35,8 @@ DoubleSliderUI::DoubleSliderUI(Array<Point2DParameter*> parameters) :
 
 	xParam.addAsyncParameterListener(this);
 	yParam.addAsyncParameterListener(this);
+	xParam.stringDecimals = p2d->stringDecimals;
+	yParam.stringDecimals = p2d->stringDecimals;
 
 	xSlider.reset((ParameterUI*)xParam.createDefaultUI());
 	ySlider.reset((ParameterUI*)yParam.createDefaultUI());
