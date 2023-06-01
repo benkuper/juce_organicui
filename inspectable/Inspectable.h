@@ -119,7 +119,7 @@ public:
 	class  InspectableEvent
 	{
 	public:
-		enum Type { SELECTION_CHANGED, PRESELECTION_CHANGED, HIGHLIGHT_CHANGED, DESTROYED };
+		enum Type { SELECTION_CHANGED, PRESELECTION_CHANGED, HIGHLIGHT_CHANGED };
 
 		InspectableEvent(Type t, Inspectable * inspectable) :
 			type(t), inspectable(inspectable) {}
