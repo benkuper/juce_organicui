@@ -69,6 +69,10 @@ public:
 	static var showOkCancelBox(const var::NativeFunctionArgs& args);
 	static var showYesNoCancelBox(const var::NativeFunctionArgs& args);
 
+	static var loadDynamicLibrary(const var::NativeFunctionArgs& args);
+	static var unloadDynamicLibrary(const var::NativeFunctionArgs& args);
+	static var findFunctionInDynamicLibrary(const var::NativeFunctionArgs& args);
+
 
 	//Helpers
 
