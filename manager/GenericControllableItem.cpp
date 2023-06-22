@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    GenericControllableItem.cpp
-    Created: 13 May 2017 2:43:46pm
-    Author:  Ben
+	GenericControllableItem.cpp
+	Created: 13 May 2017 2:43:46pm
+	Author:  Ben
 
   ==============================================================================
 */
@@ -20,8 +20,25 @@ GenericControllableItem::GenericControllableItem(Controllable* c, var params) :
 	controllable(c)
 {
 	typeAtCreation = params.getProperty("type", "");
-	
-	if (controllable == nullptr) controllable = ControllableFactory::createControllable(params.getProperty("controllableType", ""));
+	String cType = params.getProperty("controllableType", "");
+
+	if (controllable == nullptr)
+	{
+		if (cType.isEmpty())
+		{
+			LOGERROR("Controllable item constuctor, type should not be empty");
+			return;
+		}
+
+		controllable = ControllableFactory::createControllable(cType);
+	}
+
+
+	if (controllable == nullptr)
+	{
+		LOGERROR("Error creating controllable from type " << cType);
+		return;
+	}
 
 	controllable->description = "Custom control of type " + controllable->getTypeString();
 	controllable->saveValueOnly = false;
@@ -49,16 +66,19 @@ GenericControllableItem::~GenericControllableItem()
 
 void GenericControllableItem::onContainerNiceNameChanged()
 {
+	if (controllable == nullptr) return;
 	controllable->setNiceName(niceName);
 }
 
 void GenericControllableItem::controllableNameChanged(Controllable* c)
 {
 	BaseItem::controllableNameChanged(c);
+
+	if (controllable == nullptr) return;
 	if (c == controllable) setNiceName(controllable->niceName);
 }
 
-InspectableEditor * GenericControllableItem::getEditorInternal(bool isRoot, Array<Inspectable*> inspectables)
+InspectableEditor* GenericControllableItem::getEditorInternal(bool isRoot, Array<Inspectable*> inspectables)
 {
 	return new GenericControllableItemEditor(this, isRoot);
 }
