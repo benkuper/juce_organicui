@@ -140,12 +140,12 @@ UndoableAction* ControllableContainer::addUndoableControllable(Controllable* c, 
 	return a;
 }
 
-void ControllableContainer::addControllable(Controllable* c, int index)
+Controllable* ControllableContainer::addControllable(Controllable* c, int index)
 {
 	if (c == nullptr)
 	{
 		DBG("Controllable is null !");
-		return;
+		return nullptr;
 	}
 
 	if (c->type == Controllable::TRIGGER) addTriggerInternal((Trigger*)c, index);
@@ -154,11 +154,14 @@ void ControllableContainer::addControllable(Controllable* c, int index)
 	c->addControllableListener(this);
 	c->addAsyncWarningTargetListener(this);
 	c->warningResolveInspectable = this;
+
+	return c;
 }
 
-void ControllableContainer::addParameter(Parameter* p, int index)
+Parameter* ControllableContainer::addParameter(Parameter* p, int index)
 {
 	addControllable(p, index);
+	return p;
 }
 
 FloatParameter* ControllableContainer::addFloatParameter(const String& _niceName, const String& description, const float& initialValue, const float& minValue, const float& maxValue, const bool& enabled)
