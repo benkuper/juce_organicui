@@ -8,10 +8,13 @@
   ==============================================================================
 */
 
+#include "JuceHeader.h"
+
 Point2DParameter::Point2DParameter(const String& niceName, const String& description, bool _enabled) :
 	Parameter(POINT2D, niceName, description, 0, 0, 1, _enabled),
 	x(0), y(0),
 	defaultUI(FloatParameter::NONE),
+	stringDecimals(3),
 	showExtendedEditor(false),
 	extendedEditorInvertX(false),
 	extendedEditorInvertY(false),
@@ -113,6 +116,7 @@ bool Point2DParameter::setAttributeInternal(String name, var val)
 	else if (name == "canvasInvertX") extendedEditorInvertX = (bool)val;
 	else if (name == "canvasInvertY") extendedEditorInvertY = (bool)val;
 	else if (name == "canvasStretchMode") extendedEditorStretchMode = (bool)val;
+	else if(name == "stringDecimals") stringDecimals = (int)val;
 	else
 	{
 		return Parameter::setAttributeInternal(name, val);
@@ -124,7 +128,7 @@ bool Point2DParameter::setAttributeInternal(String name, var val)
 StringArray Point2DParameter::getValidAttributes() const
 {
 	StringArray att = Parameter::getValidAttributes();
-	att.addArray({ "ui", "canvasInvertX","canvasInvertY","canvasStretchMode" });
+	att.addArray({ "ui", "canvasInvertX","canvasInvertY","canvasStretchMode", "stringDecimals"});
 	return att;
 }
 

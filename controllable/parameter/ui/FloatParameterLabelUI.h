@@ -18,6 +18,8 @@ public:
 	FloatParameterLabelUI(Array<Parameter *> parameters);
 	virtual ~FloatParameterLabelUI() {};
 
+	FloatParameter* floatParam;
+
 	Label nameLabel;
 	Label valueLabel;
 
@@ -37,7 +39,7 @@ public:
 	void setPrefix(const String &_prefix);
 	void setSuffix(const String &_suffix);
 
-	virtual void updateLabelFromValue();
+	virtual void updateValueFromLabel();
 	virtual void updateTooltip() override;
 
 	//void paint(Graphics &g) override;
@@ -81,7 +83,7 @@ protected:
 	void valueChanged(const var &) override;
 	virtual void editorShown(Label* label, TextEditor&) override;
 	void labelTextChanged(Label * l) override;
-	virtual void updateLabelFromValue() override;
+	virtual void updateValueFromLabel() override;
 
 	String getValueString(const var &val) const override;
 private:

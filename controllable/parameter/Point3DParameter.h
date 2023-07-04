@@ -18,6 +18,7 @@ public:
 
 	float x, y, z;
 	FloatParameter::UIType defaultUI;
+	int stringDecimals;
 
 
 	void setVector(Vector3D<float> value);
@@ -33,6 +34,9 @@ public:
 	virtual void setWeightedValue(Array<var> values, Array<float> weights) override;
 
 	bool checkValueIsTheSame(var newValue, var oldValue) override;
+
+	virtual bool setAttributeInternal(String name, var val) override;
+	virtual StringArray getValidAttributes() const override;
 
 	virtual StringArray getValuesNames() override;
 

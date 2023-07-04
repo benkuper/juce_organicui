@@ -452,11 +452,11 @@ PopupMenu ShapeShifterManager::getPanelsMenu()
 	Array<File> layoutFiles = getLayoutFiles();
 
 	//int specialIndex = layoutP.getNumItems() + 2; //+2 to have lockPanels
-	int i = 0;
+	int li = 0;
 	for (auto& f : layoutFiles)
 	{
-		layoutP.addCommandItem(&getCommandManager(), 0x9000 + i, f.getFileNameWithoutExtension());
-		i++;
+		layoutP.addCommandItem(&getCommandManager(), 0x9000 + li, f.getFileNameWithoutExtension());
+		li++;
 	}
 
 	p.addSubMenu("Layout", layoutP);

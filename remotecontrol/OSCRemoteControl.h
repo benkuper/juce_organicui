@@ -94,13 +94,13 @@ public:
 	void sendOSCQueryFeedback(Controllable* c, const String& excludeId = "");
 	void sendOSCQueryFeedback(const OSCMessage& m, StringArray excludes = StringArray());
 
-	void sendAllManualFeedback();
-	void sendManualFeedbackForControllable(Controllable* c);
-
 	void newMessage(const ContainerAsyncEvent& e) override;
 	void onControllableFeedbackUpdate(ControllableContainer* cc, Controllable* c) override;
 
 #endif
+
+	void sendAllManualFeedback();
+	void sendManualFeedbackForControllable(Controllable* c);
 
 
 	class RemoteControlListener

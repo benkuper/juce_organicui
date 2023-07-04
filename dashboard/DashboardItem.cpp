@@ -42,6 +42,8 @@ var DashboardItem::getServerData()
 	data.getDynamicObject()->setProperty("type", getTypeString());
 	data.getDynamicObject()->setProperty("position", viewUIPosition->value);
 	data.getDynamicObject()->setProperty("size", viewUISize->value);
+	data.getDynamicObject()->setProperty("isVisible", isVisible->value);
+
 	return data;
 }
 

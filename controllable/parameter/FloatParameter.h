@@ -15,13 +15,16 @@ class FloatStepperUI;
 class FloatParameterLabelUI;
 class TimeLabel;
 
+#define DEFAULT_STRING_DECIMALS 3
+
 class FloatParameter : public Parameter
 {
 public:
 	FloatParameter(const String& niceName, const String& description, const double& initialValue, const double& minValue = (double)INT32_MIN, const double& maxValue = (double)INT32_MAX, bool enabled = true);
 	virtual ~FloatParameter() {}
 
-	float unitSteps;
+	double unitSteps;
+	int stringDecimals;
 
 	enum UIType { NONE, SLIDER, STEPPER, LABEL, TIME };
 	UIType defaultUI;
@@ -42,11 +45,11 @@ public:
 
 	virtual var getLerpValueTo(var targetValue, float weight) override;
 	virtual void setWeightedValue(Array<var> values, Array<float> weights) override;
-	virtual float getStepSnappedValueFor(double originalValue);
+	virtual double getStepSnappedValueFor(double originalValue);
 
 	void setControlAutomation() override;
 
-	virtual String stringValue() override { return String(floatValue()); }
+	virtual String stringValue() override;
 
 	bool setAttributeInternal(String name, var val) override;
 	virtual StringArray getValidAttributes() const override;

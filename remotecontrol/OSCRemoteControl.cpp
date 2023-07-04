@@ -77,7 +77,13 @@ void OSCRemoteControl::setupReceiver()
 	updateEngineListener();
 #endif
 
-	if (!enabled->boolValue()) return;
+	if (!enabled->boolValue())
+	{
+#if ORGANICUI_USE_SERVUS
+		setupZeroconf();
+#endif
+		return;
+	}
 
 	//if (!receiveCC->enabled->boolValue()) return;
 	receiverIsConnected = receiver.connect(localPort->intValue());
@@ -135,6 +141,7 @@ void OSCRemoteControl::setupZeroconf()
 
 void OSCRemoteControl::updateEngineListener()
 {
+#if ORGANICUI_USE_WEBSERVER
 	Engine::mainEngine->removeAsyncContainerListener(this);
 
 	bool shouldListen = false;
@@ -143,6 +150,7 @@ void OSCRemoteControl::updateEngineListener()
 	if (receiverIsConnected) shouldListen = true;
 
 	if (shouldListen) Engine::mainEngine->addAsyncContainerListener(this);
+#endif
 }
 
 
@@ -301,16 +309,21 @@ void OSCRemoteControl::run()
 {
 	String nameToAdvertise = OrganicApplication::getInstance()->getApplicationName() + " - Remote Control";
 	int portToAdvertise = 0;
-	while (portToAdvertise != localPort->intValue() && !threadShouldExit())
+	bool isEnabled = enabled->boolValue();
+
+	while ((portToAdvertise != localPort->intValue() || isEnabled != enabled->boolValue()) && !threadShouldExit())
 	{
 		portToAdvertise = localPort->intValue();
+		isEnabled = enabled->boolValue();
+
 		servus.withdraw();
-		servus.announce(portToAdvertise, nameToAdvertise.toStdString());
+		
+		if(isEnabled) servus.announce(portToAdvertise, nameToAdvertise.toStdString());
 
 
 #if ORGANICUI_USE_WEBSERVER
 		oscQueryServus.withdraw();
-		oscQueryServus.announce(portToAdvertise, nameToAdvertise.toStdString());
+		if (isEnabled) oscQueryServus.announce(portToAdvertise, nameToAdvertise.toStdString());
 #endif
 
 		if (localPort->intValue() != portToAdvertise)
@@ -480,6 +493,7 @@ void OSCRemoteControl::sendOSCQueryFeedback(const OSCMessage& m, StringArray exc
 
 	if (logOutgoing->boolValue()) NLOG(niceName, "Sent to OSCQuery : " << OSCHelpers::messageToString(m));
 }
+#endif
 
 void OSCRemoteControl::sendAllManualFeedback()
 {
@@ -502,4 +516,3 @@ void OSCRemoteControl::sendManualFeedbackForControllable(Controllable* c)
 
 	if (logOutgoing->boolValue()) NLOG(niceName, "Sent to manual OSC  : " << OSCHelpers::messageToString(m));
 }
-#endif

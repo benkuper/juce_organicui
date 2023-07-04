@@ -97,7 +97,7 @@ void OSCHelpers::addArgumentsForParameter(OSCMessage& m, Parameter* p, BoolMode 
 
 	case Controllable::ENUM:
 	{
-		m.addString(val.toString());
+		m.addString(((EnumParameter*)p)->getValueKey());
 	}
 	break;
 

@@ -324,8 +324,8 @@ void createDumpAndStrackTrace(int signum, File dumpFile, File traceFile)
 CrashDumpUploader::UploadWindow::UploadWindow() :
 	okBT("Send and close"),
 	cancelBT("Close only"),
-	//autoReopenBT("Send and recover"),
-	//recoverOnlyBT("Recover Only"),
+	autoReopenBT("Send and recover"),
+	recoverOnlyBT("Recover Only"),
 	progressUI(&CrashDumpUploader::getInstance()->progress)
 {
 	okBT.addListener(this);
@@ -334,11 +334,13 @@ CrashDumpUploader::UploadWindow::UploadWindow() :
 	cancelBT.addListener(this);
 	addAndMakeVisible(&cancelBT);
 
-	//recoverOnlyBT.addListener(this);
-	//addAndMakeVisible(&recoverOnlyBT);
+#if !JUCE_MAC
+	recoverOnlyBT.addListener(this);
+	addAndMakeVisible(&recoverOnlyBT);
 
-	//autoReopenBT.addListener(this);
-	//addAndMakeVisible(&autoReopenBT);
+	autoReopenBT.addListener(this);
+	addAndMakeVisible(&autoReopenBT);
+#endif
 
 	addAndMakeVisible(&progressUI);
 
@@ -378,10 +380,12 @@ void CrashDumpUploader::UploadWindow::resized()
 {
 	juce::Rectangle<int> r = getLocalBounds().removeFromBottom(getHeight() / 2);
 	juce::Rectangle<int> br = r.removeFromBottom(30).reduced(2);
-	//autoReopenBT.setBounds(br.removeFromRight(100));
-	//br.removeFromRight(8);
-	//recoverOnlyBT.setBounds(br.removeFromRight(100));
-	//br.removeFromRight(8);
+#if !JUCE_MAC
+	autoReopenBT.setBounds(br.removeFromRight(100));
+	br.removeFromRight(8);
+	recoverOnlyBT.setBounds(br.removeFromRight(100));
+	br.removeFromRight(8);
+#endif
 	okBT.setBounds(br.removeFromRight(100));
 	br.removeFromRight(8);
 	cancelBT.setBounds(br.removeFromRight(100));
@@ -396,8 +400,12 @@ void CrashDumpUploader::UploadWindow::resized()
 void CrashDumpUploader::UploadWindow::buttonClicked(Button* bt)
 {
 	okBT.setEnabled(false);
-	autoReopenBT.setEnabled(false);
 	cancelBT.setEnabled(false);
+
+#if !JUCE_MAC
+	autoReopenBT.setEnabled(false);
+	recoverOnlyBT.setEnabled(false);
+#endif
 
 	CrashDumpUploader::getInstance()->uploadFile = bt == &autoReopenBT || bt == &okBT;
 	CrashDumpUploader::getInstance()->crashMessage = editor.getText();

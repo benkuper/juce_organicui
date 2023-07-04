@@ -8,9 +8,12 @@
   ==============================================================================
 */
 
+#include "JuceHeader.h"
+
 FloatParameter::FloatParameter(const String& niceName, const String& description, const double& initialValue, const double& minValue, const double& maxValue, bool enabled) :
-	Parameter(Type::FLOAT, niceName, description, (float)initialValue, (float)minValue, (float)maxValue, enabled),
+	Parameter(Type::FLOAT, niceName, description, (double)initialValue, (double)minValue, (double)maxValue, enabled),
 	unitSteps(0),
+	stringDecimals(DEFAULT_STRING_DECIMALS),
 	defaultUI(NONE),
 	customUI(NONE)
 {
@@ -47,7 +50,7 @@ TimeLabel* FloatParameter::createTimeLabelParameter(Array<Parameter*> parameters
 ControllableUI* FloatParameter::createDefaultUI(Array<Controllable*> controllables) {
 	UIType t = customUI != NONE ? customUI : defaultUI;
 
-	bool hasFullRange = ((float)minimumValue != INT32_MIN && (float)maximumValue != INT32_MAX);
+	bool hasFullRange = ((double)minimumValue != INT32_MIN && (double)maximumValue != INT32_MAX);
 	if (t == NONE) t = hasFullRange ? SLIDER : LABEL;
 
 	Array<Parameter*> parameters = getArrayAs<Controllable, Parameter>(controllables);
@@ -112,7 +115,7 @@ void FloatParameter::setWeightedValue(Array<var> values, Array<float> weights)
 	setValue(tValue);
 }
 
-float FloatParameter::getStepSnappedValueFor(double originalValue)
+double FloatParameter::getStepSnappedValueFor(double originalValue)
 {
 	return unitSteps == 0 ? originalValue : round(originalValue * unitSteps) / unitSteps;
 }
@@ -120,6 +123,11 @@ float FloatParameter::getStepSnappedValueFor(double originalValue)
 void FloatParameter::setControlAutomation()
 {
 	automation.reset(new ParameterNumberAutomation(this, !isLoadingData));
+}
+
+String FloatParameter::stringValue()
+{
+	return String(doubleValue(), stringDecimals);
 }
 
 bool FloatParameter::setAttributeInternal(String attribute, var val)
@@ -135,6 +143,10 @@ bool FloatParameter::setAttributeInternal(String attribute, var val)
 	{
 		unitSteps = (double)val;
 	}
+	else if (attribute == "stringDecimals")
+	{
+		stringDecimals = (int)val;
+	}
 	else
 	{
 		return Parameter::setAttributeInternal(attribute, val);
@@ -146,7 +158,7 @@ bool FloatParameter::setAttributeInternal(String attribute, var val)
 StringArray FloatParameter::getValidAttributes() const
 {
 	StringArray att = Parameter::getValidAttributes();
-	att.addArray({ "ui", "unitSteps" });
+	att.addArray({ "ui", "unitSteps", "stringDecimals" });
 	return att;
 }
 
@@ -154,6 +166,7 @@ var FloatParameter::getJSONDataInternal()
 {
 	var data = Parameter::getJSONDataInternal();
 	if (customUI != NONE) data.getDynamicObject()->setProperty("customUI", customUI);
+ 	if(stringDecimals != DEFAULT_STRING_DECIMALS) data.getDynamicObject()->setProperty("stringDecimals", stringDecimals);
 	return data;
 }
 
@@ -162,6 +175,7 @@ void FloatParameter::loadJSONDataInternal(var data)
 	Parameter::loadJSONDataInternal(data);
 	if (data.getDynamicObject()->hasProperty("defaultUI")) defaultUI = (UIType)(int)data.getProperty("defaultUI", SLIDER);
 	customUI = (UIType)(int)data.getProperty("customUI", NONE);
+	stringDecimals = (int)data.getProperty("stringDecimals", DEFAULT_STRING_DECIMALS);
 }
 
 var FloatParameter::getCroppedValue(var originalValue)

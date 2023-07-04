@@ -66,6 +66,10 @@ ScriptUtil::ScriptUtil() :
 
 	scriptObject.getDynamicObject()->setMethod("getSelectedObject", ScriptUtil::getSelectedObjectFromScript);
 	scriptObject.getDynamicObject()->setMethod("getSelectedObjectsCount", ScriptUtil::getSelectedObjectsCountFromScript);
+
+	scriptObject.getDynamicObject()->setMethod("loadDynamicLibrary", ScriptUtil::loadDynamicLibrary);
+	scriptObject.getDynamicObject()->setMethod("unloadDynamicLibrary", ScriptUtil::unloadDynamicLibrary);
+	scriptObject.getDynamicObject()->setMethod("findFunctionInDynamicLibrary", ScriptUtil::findFunctionInDynamicLibrary);
 }
 
 var ScriptUtil::getTime(const var::NativeFunctionArgs&)
@@ -873,4 +877,98 @@ var ScriptUtil::getSelectedObjectFromScript(const var::NativeFunctionArgs& args)
 var ScriptUtil::getSelectedObjectsCountFromScript(const var::NativeFunctionArgs& args)
 {
 	return InspectableSelectionManager::activeSelectionManager->getInspectablesAs<BaseItem>().size();
+}
+
+namespace
+{
+	/// <summary>
+	/// A dynamic library object that can be stored in Javascript.
+	/// </summary>
+	struct ReferenceCountedDynamicLibrary : juce::DynamicLibrary, ReferenceCountedObject
+	{
+		using Ptr = ReferenceCountedObjectPtr<ReferenceCountedDynamicLibrary>;
+		String path;
+	};
+}
+
+var ScriptUtil::loadDynamicLibrary(const var::NativeFunctionArgs& args)
+{
+	if (args.numArguments != 1 || !args.arguments[0].isString())
+	{
+		LOGERROR("Load dynamic library failed: it requires a string argument.");
+		return {};
+	}
+
+	const String& path = args.arguments[0].toString();
+	ReferenceCountedDynamicLibrary::Ptr dynamicLibrary = new ReferenceCountedDynamicLibrary();
+	if (!dynamicLibrary->open(path))
+	{
+		LOGERROR("Load dynamic library failed: could not open " << path);
+		return {};
+	}
+
+	dynamicLibrary->path = path;
+	LOG("Dynamic library loaded: " << path);
+	return dynamicLibrary.get();
+}
+
+var ScriptUtil::unloadDynamicLibrary(const var::NativeFunctionArgs& args)
+{
+	if (args.numArguments != 1)
+	{
+		LOGERROR("Unload dynamic library failed: it requires a library object argument.");
+		return false;
+	}
+
+	ReferenceCountedDynamicLibrary::Ptr dynamicLibrary = dynamic_cast<ReferenceCountedDynamicLibrary*>(args.arguments[0].getObject());
+	if (!dynamicLibrary)
+	{
+		LOGERROR("Unload dynamic library failed: it requires a library object argument.");
+		return false;
+	}
+
+	dynamicLibrary->close();
+	LOG("Dynamic library unloaded: " << dynamicLibrary->path);
+	return {};
+}
+
+var ScriptUtil::findFunctionInDynamicLibrary(const var::NativeFunctionArgs& args)
+{
+	if (args.numArguments != 2)
+	{
+		LOGERROR("Find function in dynamic library failed: it requires a library object and a function name arguments.");
+		return {};
+	}
+
+	ReferenceCountedDynamicLibrary::Ptr dynamicLibrary = dynamic_cast<ReferenceCountedDynamicLibrary*>(args.arguments[0].getObject());
+	if (!dynamicLibrary || !args.arguments[1].isString())
+	{
+		LOGERROR("Find function in dynamic library failed: it requires a library object and a function name arguments.");
+		return {};
+	}
+
+	const String functionName = args.arguments[1].toString();
+	void* function = dynamicLibrary->getFunction(functionName);
+	if (!function)
+	{
+		LOGERROR("Find function in dynamic library failed: " << functionName << " not found.\nMake sure that your function is exported and enclosed in a extern\"C\" scope.");
+		return {};
+	}
+
+	// The dynamic library has its own copy of global/static variables.
+	// e.g. the current custom logger registered in Chataigne won't be accessible from the library code.
+	// To mitigate the issue, we pass the most important globals to the library so that it could copy them to its globals.
+	//
+	// StringPool::getGlobalPool() is absolutely required to read/write properties of JS objects. Indeed, property
+	// lookups use identifiers that won't compare string content but pointers. Strings are stored in the global pool
+	// so that a given identifier always uses the same string pointer.
+	// The library receives the pointer of Chataigne's global pool to (partially) copy it to its own. Unfortunately, there
+	// is no way to copy all missing entries from a pool to another one. It's the library developer responsability to copy the
+	// property names that his library uses.
+	using PluginFunctionType = var(*)(const var::NativeFunctionArgs&, Logger*, StringPool&);
+	const auto wrapper = [function](const var::NativeFunctionArgs& args) -> var
+	{
+		return ((PluginFunctionType)function)(args, Logger::getCurrentLogger(), StringPool::getGlobalPool());
+	};
+	return var::NativeFunction{ wrapper };
 }

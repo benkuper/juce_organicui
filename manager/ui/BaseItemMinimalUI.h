@@ -215,18 +215,20 @@ void BaseItemMinimalUI<T>::mouseDown(const MouseEvent& e)
 
 	if (e.mods.isRightButtonDown())
 	{
-		PopupMenu p;
-		addContextMenuItems(p);
+		if (getMainBounds().contains(e.getPosition()))
+		{
 
-		if (p.getNumItems() == 0) return;
+			PopupMenu p;
+				addContextMenuItems(p);
 
-		p.showMenuAsync(PopupMenu::Options(), [this](int result)
-			{
-				if (result > 0) handleContextMenuResult(result);
-			}
-		);
+				if (p.getNumItems() == 0) return;
 
-
+				p.showMenuAsync(PopupMenu::Options(), [this](int result)
+					{
+						if (result > 0) handleContextMenuResult(result);
+					}
+			);
+		}
 	}
 	else
 	{
@@ -252,7 +254,7 @@ void BaseItemMinimalUI<T>::mouseDrag(const MouseEvent& e)
 
 			var desc = var(new DynamicObject());
 			desc.getDynamicObject()->setProperty("type", baseItem->getTypeString());
-			desc.getDynamicObject()->setProperty("dataType", baseItem->itemDataType.isNotEmpty()?baseItem->itemDataType:baseItem->getTypeString());
+			desc.getDynamicObject()->setProperty("dataType", baseItem->itemDataType.isNotEmpty() ? baseItem->itemDataType : baseItem->getTypeString());
 			desc.getDynamicObject()->setProperty("initX", baseItem->viewUIPosition->x);
 			desc.getDynamicObject()->setProperty("initY", baseItem->viewUIPosition->y);
 			desc.getDynamicObject()->setProperty("offsetX", offset.x);

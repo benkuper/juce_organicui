@@ -17,6 +17,7 @@ public:
 
 	float x, y;
 	FloatParameter::UIType defaultUI;
+	int stringDecimals;
 	bool showExtendedEditor;
 	bool extendedEditorInvertX;
 	bool extendedEditorInvertY;

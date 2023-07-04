@@ -129,7 +129,7 @@ public:
 	OwnedArray<BaseFactoryDefinition<T>> defs;
 	PopupMenu menu;
 
-	virtual void buildPopupMenu()
+	virtual void buildPopupMenu(int startOffset = 0)
 	{
 		menu.clear();
 		OwnedArray<PopupMenu> subMenus;
@@ -137,7 +137,7 @@ public:
 
 		for (auto& d : defs)
 		{
-			int itemID = defs.indexOf(d) + 1;//start at 1 for menu
+			int itemID = defs.indexOf(d) + 1 + startOffset;//start at 1+offset for menu
 
 			if (d->menuPath.isEmpty())
 			{
@@ -183,9 +183,9 @@ public:
 		);
 	}
 
-	virtual PopupMenu getMenu()
+	virtual PopupMenu getMenu(int startOffset = 0)
 	{
-		if (menu.getNumItems() == 0) buildPopupMenu();
+		if (menu.getNumItems() == 0) buildPopupMenu(startOffset);
 		return menu;
 	}
 

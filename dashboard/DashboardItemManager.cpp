@@ -12,7 +12,7 @@ DashboardItemManager::DashboardItemManager() :
 	BaseManager("Dashboard")
 {
 	managerFactory = DashboardItemFactory::getInstance();
-	selectItemWhenCreated = false;
+	selectItemWhenCreated = true;
 
 	canvasSize = addPoint2DParameter("Canvas Size", "If enabled, this will limit the canvas to this size", false);
 	canvasSize->canBeDisabledByUser = true;

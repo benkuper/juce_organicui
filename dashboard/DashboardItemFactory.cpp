@@ -1,3 +1,5 @@
+#include "JuceHeader.h"
+
 juce_ImplementSingleton(DashboardItemFactory)
 
 DashboardItemFactory::DashboardItemFactory()
@@ -18,11 +20,11 @@ DashboardItemFactory::DashboardItemFactory()
 	defs.add(Factory<DashboardItem>::Definition::createDef<DashboardIFrameItem>(""));
 }
 
-void DashboardItemFactory::buildPopupMenu()
+void DashboardItemFactory::buildPopupMenu(int startOffset)
 {
 	menu.clear();
 
-	int indexOffset = 0;
+	int indexOffset = startOffset;
 	for (auto& p : providers)
 	{
 		menu.addSubMenu(p->getProviderName(), p->getDashboardCreateMenu(indexOffset));

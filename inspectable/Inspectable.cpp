@@ -25,7 +25,7 @@ Inspectable::~Inspectable()
 	}
 
 	listeners.call(&InspectableListener::inspectableDestroyed, this);
-	inspectableNotifier.addMessage(new InspectableEvent(InspectableEvent::DESTROYED, this));
+	//inspectableNotifier.addMessage(new InspectableEvent(InspectableEvent::DESTROYED, this));
 
 	masterReference.clear();
 } 
