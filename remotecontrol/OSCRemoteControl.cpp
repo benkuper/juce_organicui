@@ -360,6 +360,10 @@ bool OSCRemoteControl::handleHTTPRequest(std::shared_ptr<HttpServer::Response> r
 		extensionData.getDynamicObject()->setProperty("UNIT", false);
 		extensionData.getDynamicObject()->setProperty("VALUE", true);
 		extensionData.getDynamicObject()->setProperty("LISTEN", true);
+		extensionData.getDynamicObject()->setProperty("PATH_ADDED", true);
+		extensionData.getDynamicObject()->setProperty("PATH_REMOVED", true);
+		extensionData.getDynamicObject()->setProperty("PATH_RENAMED", true);
+		extensionData.getDynamicObject()->setProperty("PATH_CHANGED", false);
 
 		data = new DynamicObject();
 		data.getDynamicObject()->setProperty("EXTENSIONS", extensionData);
