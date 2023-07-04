@@ -186,7 +186,7 @@ void CrashDumpUploader::uploadCrash()
 
 		if (w != nullptr)
 		{
-			w->findParentComponentOfClass<DialogWindow>()->exitModalState(0);
+			if (DialogWindow* dw = w->findParentComponentOfClass<DialogWindow>()) dw->exitModalState(0);
 			MessageManagerLock mmLock;
 			w->removeFromDesktop();
 			w.reset();
@@ -218,7 +218,7 @@ void CrashDumpUploader::uploadCrash()
 
 	if (w != nullptr)
 	{
-		w->findParentComponentOfClass<DialogWindow>()->exitModalState(0);
+		if (DialogWindow* dw = w->findParentComponentOfClass<DialogWindow>()) dw->exitModalState(0);
 		MessageManagerLock mmLock;
 		w->removeFromDesktop();
 		w.reset();
