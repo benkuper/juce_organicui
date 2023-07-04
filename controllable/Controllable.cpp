@@ -106,6 +106,7 @@ UndoableAction* Controllable::setUndoableNiceName(const String& newNiceName, boo
 void Controllable::setNiceName(const String& _niceName) {
 	if (niceName == _niceName) return;
 
+	String oldControlAddress = getControlAddress();
 	this->niceName = _niceName;
 	if (!hasCustomShortName) setAutoShortName();
 	else
@@ -113,6 +114,8 @@ void Controllable::setNiceName(const String& _niceName) {
 		listeners.call(&Listener::controllableNameChanged, this);
 		queuedNotifier.addMessage(new ControllableEvent(ControllableEvent::NAME_CHANGED, this));
 	}
+
+	if (OSCRemoteControl::getInstanceWithoutCreating() != nullptr && parentContainer != nullptr) OSCRemoteControl::getInstance()->sendPathNameChangedFeedback(oldControlAddress, getControlAddress());
 }
 
 void Controllable::setCustomShortName(const String& _shortName)

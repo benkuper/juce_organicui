@@ -94,6 +94,12 @@ public:
 	void sendOSCQueryFeedback(Controllable* c, const String& excludeId = "");
 	void sendOSCQueryFeedback(const OSCMessage& m, StringArray excludes = StringArray());
 
+	void sendPathAddedFeedback(const String& path);
+	void sendPathRemovedFeedback(const String& path);
+	void sendPathNameChangedFeedback(const String& oldPath, const String& newPath);
+
+
+
 	void newMessage(const ContainerAsyncEvent& e) override;
 	void onControllableFeedbackUpdate(ControllableContainer* cc, Controllable* c) override;
 

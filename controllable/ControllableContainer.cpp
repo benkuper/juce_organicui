@@ -155,6 +155,8 @@ Controllable* ControllableContainer::addControllable(Controllable* c, int index)
 	c->addAsyncWarningTargetListener(this);
 	c->warningResolveInspectable = this;
 
+	if (OSCRemoteControl::getInstanceWithoutCreating() != nullptr && parentContainer != nullptr) OSCRemoteControl::getInstance()->sendPathAddedFeedback(c->getControlAddress());
+
 	return c;
 }
 
@@ -305,6 +307,7 @@ void ControllableContainer::removeControllable(WeakReference<Controllable> c, bo
 
 	controllableContainerListeners.call(&ControllableContainerListener::controllableRemoved, c);
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableRemoved, this, c));
+	if (OSCRemoteControl::getInstanceWithoutCreating() != nullptr && parentContainer != nullptr) OSCRemoteControl::getInstance()->sendPathRemovedFeedback(c->getControlAddress());
 
 	if (c != nullptr)
 	{
@@ -317,6 +320,7 @@ void ControllableContainer::removeControllable(WeakReference<Controllable> c, bo
 			p->removeAsyncParameterListener(this);
 		}
 	}
+
 
 
 	onControllableRemoved(c);
@@ -373,6 +377,7 @@ void ControllableContainer::setNiceName(const String& _niceName)
 {
 	if (niceName == _niceName) return;
 
+
 	if (_niceName.isEmpty())
 	{
 		LOGWARNING("Container cannot have an empty name");
@@ -380,10 +385,15 @@ void ControllableContainer::setNiceName(const String& _niceName)
 		return;
 	}
 
+	String oldControlAddress = getControlAddress();
+
 	niceName = _niceName;
 	if (!hasCustomShortName) setAutoShortName();
 	scriptObjectIsDirty = true;
 	controllableContainerListeners.call(&ControllableContainerListener::controllableContainerNameChanged, this);
+
+	if (OSCRemoteControl::getInstanceWithoutCreating() != nullptr && parentContainer != nullptr) OSCRemoteControl::getInstance()->sendPathNameChangedFeedback(oldControlAddress, getControlAddress());
+
 	onContainerNiceNameChanged();
 }
 
@@ -460,6 +470,8 @@ void ControllableContainer::addChildControllableContainer(ControllableContainer*
 	controllableContainerListeners.call(&ControllableContainerListener::controllableContainerAdded, container);
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableContainerAdded, this, container));
 
+	if (OSCRemoteControl::getInstanceWithoutCreating() != nullptr && parentContainer != nullptr) OSCRemoteControl::getInstance()->sendPathAddedFeedback(container->getControlAddress());
+
 	if (notify) notifyStructureChanged();
 }
 
@@ -492,6 +504,8 @@ void ControllableContainer::removeChildControllableContainer(ControllableContain
 	{
 		controllableContainerListeners.call(&ControllableContainerListener::controllableContainerRemoved, container);
 		queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableContainerRemoved, this, container));
+
+		if (OSCRemoteControl::getInstanceWithoutCreating() != nullptr && parentContainer != nullptr) OSCRemoteControl::getInstance()->sendPathRemovedFeedback(container->getControlAddress());
 
 		notifyStructureChanged();
 		container->setParentContainer(nullptr);

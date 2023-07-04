@@ -317,8 +317,8 @@ void OSCRemoteControl::run()
 		isEnabled = enabled->boolValue();
 
 		servus.withdraw();
-		
-		if(isEnabled) servus.announce(portToAdvertise, nameToAdvertise.toStdString());
+
+		if (isEnabled) servus.announce(portToAdvertise, nameToAdvertise.toStdString());
 
 
 #if ORGANICUI_USE_WEBSERVER
@@ -448,9 +448,46 @@ void OSCRemoteControl::onControllableFeedbackUpdate(ControllableContainer* cc, C
 	}
 }
 
+void OSCRemoteControl::sendPathAddedFeedback(const String& path)
+{
+	if (server == nullptr) return;
+	if (Engine::mainEngine != nullptr && (Engine::mainEngine->isLoadingFile || Engine::mainEngine->isClearing)) return;
+
+	var msg(new DynamicObject());
+	msg.getDynamicObject()->setProperty("COMMAND", "PATH_ADDED");
+	msg.getDynamicObject()->setProperty("DATA", path);
+	server->send(JSON::toString(msg));
+}
+
+void OSCRemoteControl::sendPathRemovedFeedback(const String& path)
+{
+	if (server == nullptr) return;
+	if (Engine::mainEngine != nullptr && (Engine::mainEngine->isLoadingFile || Engine::mainEngine->isClearing)) return;
+
+	var msg(new DynamicObject());
+	msg.getDynamicObject()->setProperty("COMMAND", "PATH_REMOVED");
+	msg.getDynamicObject()->setProperty("DATA", path);
+	server->send(JSON::toString(msg));
+}
+
+void OSCRemoteControl::sendPathNameChangedFeedback(const String& oldPath, const String& newPath)
+{
+	if (server == nullptr) return;
+	if (Engine::mainEngine != nullptr && (Engine::mainEngine->isLoadingFile || Engine::mainEngine->isClearing)) return;
+
+	var msg(new DynamicObject());
+	msg.getDynamicObject()->setProperty("COMMAND", "PATH_RENAMED");
+	var data(new DynamicObject());
+	data.getDynamicObject()->setProperty("OLD", oldPath);
+	data.getDynamicObject()->setProperty("NEW", newPath);
+	msg.getDynamicObject()->setProperty("DATA", data);
+	server->send(JSON::toString(msg));
+
+}
+
 void OSCRemoteControl::newMessage(const ContainerAsyncEvent& e)
 {
-	if (Engine::mainEngine->isLoadingFile || Engine::mainEngine->isClearing) return;
+	if (Engine::mainEngine != nullptr && (Engine::mainEngine->isLoadingFile || Engine::mainEngine->isClearing)) return;
 
 	if (e.type == ContainerAsyncEvent::ControllableFeedbackUpdate)
 	{
@@ -484,6 +521,8 @@ void OSCRemoteControl::sendOSCQueryFeedback(Controllable* c, const String& exclu
 
 void OSCRemoteControl::sendOSCQueryFeedback(const OSCMessage& m, StringArray excludes)
 {
+	if (server == nullptr) return;
+
 	OSCPacketPacker packer;
 	if (packer.writeMessage(m))
 	{
