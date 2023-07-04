@@ -8,8 +8,7 @@
  ==============================================================================
  */
 
-
- //#include "JsHelpers.h"
+#include "JuceHeader.h"
 
 Trigger::Trigger(const String& niceName, const String& description, bool enabled) :
 	Controllable(TRIGGER, niceName, description, enabled),
