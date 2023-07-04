@@ -411,7 +411,7 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 void OSCRemoteControl::dataReceived(const String& id, const MemoryBlock& data)
 {
 	OSCMessage m = OSCPacketParser(data.getData(), data.getSize()).readMessage();
-	if (!m.isEmpty()) processMessage(m);
+	if (!m.isEmpty()) processMessage(m, id);
 }
 
 void OSCRemoteControl::connectionClosed(const String& id, int status, const String& reason)
