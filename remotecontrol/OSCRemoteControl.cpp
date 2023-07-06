@@ -408,9 +408,31 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 	if (o.isObject())
 	{
 		String command = o["COMMAND"];
-		String data = o["DATA"];
+		var data = o["DATA"];
 
-		if (Controllable* c = Engine::mainEngine->getControllableForAddress(data))
+		if (command == "ADD")
+		{
+			if (ControllableContainer* cc = Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true))
+			{
+				cc->handleAddFromRemoteControl(data);
+			}
+		}
+		else if (command == "REMOVE")
+		{
+			if (ControllableContainer* cc = Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true))
+			{
+			}
+
+		}
+		else if (command == "RENAME")
+		{
+			if (ControllableContainer* cc = Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true))
+			{
+				cc->setUndoableNiceName(data["name"]);
+			}
+		}
+
+		if (Controllable* c = Engine::mainEngine->getControllableForAddress(data.toString()))
 		{
 			if (command == "LISTEN")
 			{

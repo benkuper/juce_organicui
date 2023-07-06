@@ -119,6 +119,12 @@ public:
 	bool containsControllable(Controllable * c, int maxSearchLevels = -1);
 	String getControlAddress(ControllableContainer * relativeTo = nullptr);
 
+
+	//Remote Control
+	virtual void handleAddFromRemoteControl(var data) {}
+	virtual void handleRemoveFromRemoteControl() {}
+
+
 	void sortControllables();
 
 	void dispatchFeedback(Controllable* c);

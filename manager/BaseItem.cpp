@@ -9,6 +9,7 @@
 */
 
 #include "JuceHeader.h"
+#include "BaseItem.h"
 
 BaseItem::BaseItem(const String& name, bool _canBeDisabled, bool _canHaveScripts) :
 	EnablingControllableContainer(name.isEmpty() ? getTypeString() : name, _canBeDisabled),
@@ -135,6 +136,10 @@ void BaseItem::remove()
 	baseItemListeners.call(&BaseItemListener::askForRemoveBaseItem, this);
 }
 
+void BaseItem::handleRemoveFromRemoteControl()
+{
+	if(userCanRemove) remove();
+}
 
 void BaseItem::setMovePositionReference(bool setOtherSelectedItems)
 {

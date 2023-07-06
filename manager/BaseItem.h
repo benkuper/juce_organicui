@@ -63,6 +63,7 @@ public:
 
 	void remove();
 
+	virtual void handleRemoveFromRemoteControl() override;
 
 	void setMovePositionReference(bool setOtherSelectedItems = false);
 	virtual void setMovePositionReferenceInternal();

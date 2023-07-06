@@ -94,6 +94,10 @@ public:
 	template<class IType>
 	Array<IType*> getItemsWithType();
 
+
+	virtual void handleAddFromRemoteControl(var data) override;
+
+
 	virtual void clear() override;
 	void askForRemoveBaseItem(BaseItem* item) override;
 	void askForDuplicateItem(BaseItem* item) override;
@@ -778,6 +782,13 @@ T* BaseManager<T>::getItemWithName(const String& itemShortName, bool searchItemW
 	}
 
 	return nullptr;
+}
+
+template<class T>
+void BaseManager<T>::handleAddFromRemoteControl(var data)
+{
+	if (!userCanAddItemsManually) return;
+	addItemFromData(data);
 }
 
 template<class T>
