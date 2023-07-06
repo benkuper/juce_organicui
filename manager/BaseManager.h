@@ -456,7 +456,10 @@ T* BaseManager<T>::addItem(T* item, var data, bool addToUndo, bool notify)
 
 	}
 
-	if (selectItemWhenCreated && !isCurrentlyLoadingData && !isManipulatingMultipleItems) bi->selectThis();
+	if (MessageManager::getInstance()->existsAndIsLockedByCurrentThread())
+	{
+		if (selectItemWhenCreated && !isCurrentlyLoadingData && !isManipulatingMultipleItems) bi->selectThis();
+	}
 
 	return item;
 }
