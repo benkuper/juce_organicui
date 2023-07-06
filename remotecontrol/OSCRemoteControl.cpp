@@ -421,6 +421,7 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 		{
 			if (ControllableContainer* cc = Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true))
 			{
+				cc->handleRemoveFromRemoteControl();
 			}
 
 		}
