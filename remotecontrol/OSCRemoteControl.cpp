@@ -407,42 +407,58 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 	var o = JSON::parse(message);
 	if (o.isObject())
 	{
-		String command = o["COMMAND"];
-		var data = o["DATA"];
-
-		if (command == "ADD")
+		if (o.hasProperty("COMMAND"))
 		{
-			if (ControllableContainer* cc = Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true))
+
+			String command = o["COMMAND"];
+			var data = o["DATA"];
+
+			if (command == "ADD")
 			{
-				cc->handleAddFromRemoteControl(data);
+				if (ControllableContainer* cc = Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true))
+				{
+					cc->handleAddFromRemoteControl(data);
+				}
+			}
+			else if (command == "REMOVE")
+			{
+				if (ControllableContainer* cc = Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true))
+				{
+					cc->handleRemoveFromRemoteControl();
+				}
+
+			}
+			else if (command == "RENAME")
+			{
+				if (ControllableContainer* cc = Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true))
+				{
+					cc->setUndoableNiceName(data["name"]);
+				}
+			}
+
+			if (Controllable* c = Engine::mainEngine->getControllableForAddress(data.toString()))
+			{
+				if (command == "LISTEN")
+				{
+					if (!feedbackMap.contains(id)) feedbackMap.set(id, Array<Controllable*>());
+					(&(feedbackMap.getReference(id)))->addIfNotAlreadyThere(c);
+				}
+				else if (command == "IGNORE")
+				{
+					if (feedbackMap.contains(id)) (&(feedbackMap.getReference(id)))->removeAllInstancesOf(c);
+				}
 			}
 		}
-		else if (command == "REMOVE")
+		else
 		{
-			if (ControllableContainer* cc = Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true))
+			NamedValueSet nvs = o.getDynamicObject()->getProperties();
+			for (auto& nv : nvs)
 			{
-				cc->handleRemoveFromRemoteControl();
-			}
-
-		}
-		else if (command == "RENAME")
-		{
-			if (ControllableContainer* cc = Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true))
-			{
-				cc->setUndoableNiceName(data["name"]);
-			}
-		}
-
-		if (Controllable* c = Engine::mainEngine->getControllableForAddress(data.toString()))
-		{
-			if (command == "LISTEN")
-			{
-				if (!feedbackMap.contains(id)) feedbackMap.set(id, Array<Controllable*>());
-				(&(feedbackMap.getReference(id)))->addIfNotAlreadyThere(c);
-			}
-			else if (command == "IGNORE")
-			{
-				if (feedbackMap.contains(id)) (&(feedbackMap.getReference(id)))->removeAllInstancesOf(c);
+				if (Controllable* c = Engine::mainEngine->getControllableForAddress(nv.name.toString()))
+				{
+					if (c->type == Controllable::TRIGGER) ((Trigger*)c)->trigger();
+					else ((Parameter*)c)->setValue(nv.value);
+				}
 			}
 		}
 	}
