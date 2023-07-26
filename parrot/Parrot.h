@@ -13,7 +13,7 @@
 class Parrot :
     public BaseItem,
     public ParrotRecordManager::ManagerListener,
-    public Thread
+    public juce::Thread
 {
 public:
     Parrot();
@@ -25,7 +25,7 @@ public:
     EnumParameter* currentRecordEnum;
     ParrotRecord* currentRecord;
 
-    HashMap<WeakReference<Controllable>, int> dataMapPlayIndex;
+    juce::HashMap<juce::WeakReference<Controllable>, int> dataMapPlayIndex;
 
     Trigger* startRecordTrigger;
     Trigger* stopRecordTrigger;
@@ -49,7 +49,7 @@ public:
 
     double getRelativeRecordTime();
 
-    Array<Controllable*> getAllTargets();
+    juce::Array<Controllable*> getAllTargets();
 
     void resetDataPlayIndices();
 
@@ -76,10 +76,10 @@ public:
     void run() override;
     
     void processControllables();
-    void processControllable(Controllable* c, var val);
+    void processControllable(Controllable* c, juce::var val);
 
-    var getJSONData() override;
-    void loadJSONDataItemInternal(var data) override;
+    juce::var getJSONData() override;
+    void loadJSONDataItemInternal(juce::var data) override;
 
-    String getTypeString() const override { return "Parrot"; }
+    juce::String getTypeString() const override { return "Parrot"; }
 };

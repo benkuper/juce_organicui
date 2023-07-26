@@ -17,5 +17,5 @@ public:
     ParrotManagerUI();
     ~ParrotManagerUI();
 
-    static ParrotManagerUI* create(const String& name) { return new ParrotManagerUI(); }
+    static ParrotManagerUI* create(const juce::String& name) { return new ParrotManagerUI(); }
 };

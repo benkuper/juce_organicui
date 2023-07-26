@@ -13,5 +13,5 @@
 class WakeOnLan
 {
 public:
-    static int wake(MACAddress* macAddress);
+    static int wake(juce::MACAddress* macAddress);
 };

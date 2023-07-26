@@ -13,8 +13,8 @@ Author:  Ben
 
 class Script :
 	public BaseItem,
-	public Timer,
-	public Thread,
+	public juce::Timer,
+	public juce::Thread,
 	public EngineListener
 {
 public:
@@ -25,26 +25,26 @@ public:
 
 	bool forceDisabled; //for scripts that can not be disabled by users directly
 
-	String* scriptTemplate;
+	juce::String* scriptTemplate;
 	FileParameter* filePath;
 	BoolParameter* logParam;
 	Trigger* reload;
 	IntParameter* updateRate;
 
 	ScriptState state;
-	String fileName;
-	Time fileLastModTime;
-	var paramsContainerData; //for keeping overriden values
+	juce::String fileName;
+	juce::Time fileLastModTime;
+	juce::var paramsContainerData; //for keeping overriden values
 
 	bool updateEnabled; //When loading the script, checks if the update function is present
-	const Identifier updateIdentifier = "update";
+	const juce::Identifier updateIdentifier = "update";
 
 	std::unique_ptr<ControllableContainer> scriptParamsContainer;
 
 	ScriptTarget* parentTarget;
 
-	std::unique_ptr<JavascriptEngine> scriptEngine;
-	CriticalSection engineLock;
+	std::unique_ptr<juce::JavascriptEngine> scriptEngine;
+	juce::CriticalSection engineLock;
 	float executionTimeout;
 
 
@@ -57,7 +57,7 @@ public:
 	void setState(ScriptState newState);
 
 
-	var callFunction(const Identifier& function, const Array<var> args, juce::Result* result = (juce::Result*)nullptr);
+	juce::var callFunction(const juce::Identifier& function, const juce::Array<juce::var> args, juce::Result* result = (juce::Result*)nullptr);
 
 	void onContainerParameterChangedInternal(Parameter*) override;
 	void onContainerTriggerTriggered(Trigger*) override;
@@ -65,12 +65,12 @@ public:
 	void onControllableFeedbackUpdateInternal(ControllableContainer* cc, Controllable* c) override;
 	void childStructureChanged(ControllableContainer* cc) override;
 
-	var getJSONData() override;
-	void loadJSONDataInternal(var data) override;
+	juce::var getJSONData() override;
+	void loadJSONDataInternal(juce::var data) override;
 
 	void endLoadFile() override;
 
-	InspectableEditor* getEditorInternal(bool isRoot, Array<Inspectable*> inspectables = Array<Inspectable*>()) override;
+	InspectableEditor* getEditorInternal(bool isRoot, juce::Array<Inspectable*> inspectables = juce::Array<Inspectable*>()) override;
 
 
 	// Inherited via Timer
@@ -95,27 +95,27 @@ public:
 	void removeAsyncScriptListener(AsyncListener* listener) { scriptAsyncNotifier.removeListener(listener); }
 
 	//Script functions
-	static void logFromArgs(const var::NativeFunctionArgs& args, int logLevel);
-	static var logFromScript(const var::NativeFunctionArgs& args);
-	static var logWarningFromScript(const var::NativeFunctionArgs& args);
-	static var logErrorFromScript(const var::NativeFunctionArgs& args);
+	static void logFromArgs(const juce::var::NativeFunctionArgs& args, int logLevel);
+	static juce::var logFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var logWarningFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var logErrorFromScript(const juce::var::NativeFunctionArgs& args);
 
-	static var addTriggerFromScript(const var::NativeFunctionArgs& args);
-	static var addBoolParameterFromScript(const var::NativeFunctionArgs& args);
-	static var addIntParameterFromScript(const var::NativeFunctionArgs& args);
-	static var addFloatParameterFromScript(const var::NativeFunctionArgs& args);
-	static var addStringParameterFromScript(const var::NativeFunctionArgs& args);
-	static var addEnumParameterFromScript(const var::NativeFunctionArgs& args);
-	static var addTargetParameterFromScript(const var::NativeFunctionArgs& args);
-	static var addColorParameterFromScript(const var::NativeFunctionArgs& args);
-	static var addPoint2DParameterFromScript(const var::NativeFunctionArgs& args);
-	static var addPoint3DParameterFromScript(const var::NativeFunctionArgs& args);
-	static var addFileParameterFromScript(const var::NativeFunctionArgs& args);
+	static juce::var addTriggerFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var addBoolParameterFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var addIntParameterFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var addFloatParameterFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var addStringParameterFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var addEnumParameterFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var addTargetParameterFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var addColorParameterFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var addPoint2DParameterFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var addPoint3DParameterFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var addFileParameterFromScript(const juce::var::NativeFunctionArgs& args);
 
-	static var setUpdateRateFromScript(const var::NativeFunctionArgs& args);
-	static var setExecutionTimeoutFromScript(const var::NativeFunctionArgs& args);
+	static juce::var setUpdateRateFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var setExecutionTimeoutFromScript(const juce::var::NativeFunctionArgs& args);
 
-	static bool checkNumArgs(const String& logName, const var::NativeFunctionArgs& args, int expectedArgs);
+	static bool checkNumArgs(const juce::String& logName, const juce::var::NativeFunctionArgs& args, int expectedArgs);
 
 
 };

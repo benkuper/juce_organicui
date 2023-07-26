@@ -10,6 +10,8 @@
 
 #include "JuceHeader.h"
 
+using namespace juce;
+
 CommentUI::CommentUI(CommentItem* comment) :
 	BaseItemMinimalUI(comment),
 	resizer(this, nullptr)

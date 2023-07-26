@@ -21,18 +21,18 @@ public:
 	Script * script;
 	bool editMode;
 
-	std::unique_ptr<ImageButton> fileBT;
+	std::unique_ptr<juce::ImageButton> fileBT;
 	std::unique_ptr<TriggerImageUI> reloadBT;
-	std::unique_ptr<ImageButton> editBT;
+	std::unique_ptr<juce::ImageButton> editBT;
 	std::unique_ptr<BoolToggleUI> logUI;
 
 	std::unique_ptr<InspectableEditor> paramsEditor;
 
 	 juce::Rectangle<int> statusBounds;
 
-	void paint(Graphics &g) override;
+	void paint(juce::Graphics &g) override;
 	void resizedInternalHeaderItemInternal(juce::Rectangle<int> &r) override;
 	void newMessage(const Script::ScriptEvent &e) override;
 
-	void buttonClicked(Button * b) override;
+	void buttonClicked(juce::Button * b) override;
 };

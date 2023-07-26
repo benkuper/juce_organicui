@@ -8,6 +8,7 @@
   ==============================================================================
 */
 
+using namespace juce;
 
 ParrotRecord::ParrotRecord() :
     BaseItem(getTypeString()),

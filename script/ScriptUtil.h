@@ -19,71 +19,71 @@ public:
 	ScriptUtil();
 	~ScriptUtil() {}
 
-	static var getTime(const var::NativeFunctionArgs& a);
-	static var getTimestamp(const var::NativeFunctionArgs& a);
-	static var delayThreadMS(const var::NativeFunctionArgs& a);
+	static juce::var getTime(const juce::var::NativeFunctionArgs& a);
+	static juce::var getTimestamp(const juce::var::NativeFunctionArgs& a);
+	static juce::var delayThreadMS(const juce::var::NativeFunctionArgs& a);
 
 
-	static var getFloatFromBytes(const var::NativeFunctionArgs& a);
-	static var floatToHexSeq(const var::NativeFunctionArgs& a);
-	static var getInt32FromBytes(const var::NativeFunctionArgs& a);
-	static var getInt64FromBytes(const var::NativeFunctionArgs& a);
-	static var doubleToHexSeq(const var::NativeFunctionArgs& a);
-	static var hexStringToInt(const var::NativeFunctionArgs& a);
-	static var toStringFixed(const var::NativeFunctionArgs& a);
+	static juce::var getFloatFromBytes(const juce::var::NativeFunctionArgs& a);
+	static juce::var floatToHexSeq(const juce::var::NativeFunctionArgs& a);
+	static juce::var getInt32FromBytes(const juce::var::NativeFunctionArgs& a);
+	static juce::var getInt64FromBytes(const juce::var::NativeFunctionArgs& a);
+	static juce::var doubleToHexSeq(const juce::var::NativeFunctionArgs& a);
+	static juce::var hexStringToInt(const juce::var::NativeFunctionArgs& a);
+	static juce::var toStringFixed(const juce::var::NativeFunctionArgs& a);
 
-	static var getObjectProperties(const var::NativeFunctionArgs& a);
-	static var getObjectMethods(const var::NativeFunctionArgs& a);
+	static juce::var getObjectProperties(const juce::var::NativeFunctionArgs& a);
+	static juce::var getObjectMethods(const juce::var::NativeFunctionArgs& a);
 
-	static var getIPs(const var::NativeFunctionArgs& a);
+	static juce::var getIPs(const juce::var::NativeFunctionArgs& a);
 
-	static var encodeHMAC_SHA1(const var::NativeFunctionArgs& a);
-	static var encodeSHA256(const var::NativeFunctionArgs& a);
-	static var encodeSHA512(const var::NativeFunctionArgs& a);
+	static juce::var encodeHMAC_SHA1(const juce::var::NativeFunctionArgs& a);
+	static juce::var encodeSHA256(const juce::var::NativeFunctionArgs& a);
+	static juce::var encodeSHA512(const juce::var::NativeFunctionArgs& a);
 
-	static var toBase64(const var::NativeFunctionArgs& a);
-	static var fromBase64(const var::NativeFunctionArgs& a);
-	static var fromBase64Bytes(const var::NativeFunctionArgs& a);
+	static juce::var toBase64(const juce::var::NativeFunctionArgs& a);
+	static juce::var fromBase64(const juce::var::NativeFunctionArgs& a);
+	static juce::var fromBase64Bytes(const juce::var::NativeFunctionArgs& a);
 
-	static var fileExistsFromScript(const var::NativeFunctionArgs& args);
-	static var readFileFromScript(const var::NativeFunctionArgs& args);
-	static var writeFileFromScript(const var::NativeFunctionArgs& args);
-	static var writeBytesFromScript(const var::NativeFunctionArgs& args);
-	static var directoryExistsFromScript(const var::NativeFunctionArgs& args);
-	static var createDirectoryFromScript(const var::NativeFunctionArgs& args);
-	static var listFilesFromScript(const var::NativeFunctionArgs& args);
-	static var listDirectoriesFromScript(const var::NativeFunctionArgs& args);
-	static var launchFileFromScript(const var::NativeFunctionArgs& args);
-	static var killAppFromScript(const var::NativeFunctionArgs& args);
-	static var getOSInfosFromScript(const var::NativeFunctionArgs& args);
-	static var getAppVersionFromScript(const var::NativeFunctionArgs& args);
-	static var getEnvironmentVariableFromScript(const var::NativeFunctionArgs& args);
+	static juce::var fileExistsFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var readFileFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var writeFileFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var writeBytesFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var directoryExistsFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var createDirectoryFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var listFilesFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var listDirectoriesFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var launchFileFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var killAppFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var getOSInfosFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var getAppVersionFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var getEnvironmentVariableFromScript(const juce::var::NativeFunctionArgs& args);
 
-	static var gotoURLFromScript(const var::NativeFunctionArgs& args);
+	static juce::var gotoURLFromScript(const juce::var::NativeFunctionArgs& args);
 
-	static var copyToClipboardFromScript(const var::NativeFunctionArgs& args);
-	static var getFromClipboardFromScript(const var::NativeFunctionArgs& args);
+	static juce::var copyToClipboardFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var getFromClipboardFromScript(const juce::var::NativeFunctionArgs& args);
 
 
-	static var showMessageBox(const var::NativeFunctionArgs& args);
-	static var showOkCancelBox(const var::NativeFunctionArgs& args);
-	static var showYesNoCancelBox(const var::NativeFunctionArgs& args);
+	static juce::var showMessageBox(const juce::var::NativeFunctionArgs& args);
+	static juce::var showOkCancelBox(const juce::var::NativeFunctionArgs& args);
+	static juce::var showYesNoCancelBox(const juce::var::NativeFunctionArgs& args);
 
-	static var loadDynamicLibrary(const var::NativeFunctionArgs& args);
-	static var unloadDynamicLibrary(const var::NativeFunctionArgs& args);
-	static var findFunctionInDynamicLibrary(const var::NativeFunctionArgs& args);
+	static juce::var loadDynamicLibrary(const juce::var::NativeFunctionArgs& args);
+	static juce::var unloadDynamicLibrary(const juce::var::NativeFunctionArgs& args);
+	static juce::var findFunctionInDynamicLibrary(const juce::var::NativeFunctionArgs& args);
 
 
 	//Helpers
 
-	static String getLogStringForVar(const var & v);
+	static juce::String getLogStringForVar(const juce::var & v);
 
-	static File getFileFromArgs(const var::NativeFunctionArgs& args, int deleteIfExistFromArg = -1);
+	static juce::File getFileFromArgs(const juce::var::NativeFunctionArgs& args, int deleteIfExistFromArg = -1);
 
 	static std::string base64_encode(unsigned char const* src, unsigned int len);
 	static std::string base64_decode(std::string const& data);
-	static var base64_decode_bytes(const String & data);
+	static juce::var base64_decode_bytes(const juce::String & data);
 	
-	static var getSelectedObjectFromScript(const var::NativeFunctionArgs& args);
-	static var getSelectedObjectsCountFromScript(const var::NativeFunctionArgs& args);
+	static juce::var getSelectedObjectFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var getSelectedObjectsCountFromScript(const juce::var::NativeFunctionArgs& args);
 };
