@@ -12,22 +12,22 @@
 
 class ControllableEditor : 
 	public InspectableEditor,
-	public Button::Listener,
+	public juce::Button::Listener,
 	public Controllable::AsyncListener,
-	public DragAndDropContainer,
-	public Label::Listener
+	public juce::DragAndDropContainer,
+	public juce::Label::Listener
 {
 public:
-	ControllableEditor(Array<Controllable*> controllables, bool isRoot);  //Todo : handle full feedback if is root
+	ControllableEditor(juce::Array<Controllable*> controllables, bool isRoot);  //Todo : handle full feedback if is root
 	virtual ~ControllableEditor();
 
-	Array<WeakReference<Controllable>> controllables;
-	WeakReference<Controllable> controllable;
+	juce::Array<juce::WeakReference<Controllable>> controllables;
+	juce::WeakReference<Controllable> controllable;
 	
-	Label label;
+	juce::Label label;
 	std::unique_ptr<ControllableUI> ui;
-	std::unique_ptr<ImageButton> removeBT;
-	std::unique_ptr<ImageButton> enableBT;
+	std::unique_ptr<juce::ImageButton> removeBT;
+	std::unique_ptr<juce::ImageButton> enableBT;
 	std::unique_ptr<WarningTargetUI> warningUI;
 	
 	int baseHeight; //height at init
@@ -43,20 +43,20 @@ public:
 	virtual void buildControllableUI(bool resizeAfter = false);
 
 	virtual void resized() override;
-	virtual void resizedInternal(Rectangle<int>&) {}
+	virtual void resizedInternal(juce::Rectangle<int>&) {}
 
-	void mouseDown(const MouseEvent &e) override;
-	void mouseDrag(const MouseEvent& e) override;
+	void mouseDown(const juce::MouseEvent &e) override;
+	void mouseDrag(const juce::MouseEvent& e) override;
 
 
 	void newMessage(const Controllable::ControllableEvent &e) override;
 
-	void componentVisibilityChanged(Component& c) override;
+	void componentVisibilityChanged(juce::Component& c) override;
 
-    virtual void buttonClicked(Button * b) override;
+    virtual void buttonClicked(juce::Button * b) override;
 
 	// Inherited via Listener
-	virtual void labelTextChanged(Label* labelThatHasChanged) override;
+	virtual void labelTextChanged(juce::Label* labelThatHasChanged) override;
 };
 
 

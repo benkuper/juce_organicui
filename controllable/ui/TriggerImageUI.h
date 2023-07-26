@@ -12,22 +12,22 @@
 
 class TriggerImageUI :
 	public TriggerUI,
-	public Timer
+	public juce::Timer
 {
 public:
-	TriggerImageUI(Array<Trigger *>, const Image &image, bool keepSaturation = false);
+	TriggerImageUI(juce::Array<Trigger *>, const juce::Image &image, bool keepSaturation = false);
 	~TriggerImageUI();
 
-	Image onImage;
-	Image offImage;
+	juce::Image onImage;
+	juce::Image offImage;
 
 	bool drawTriggering;
 	bool forceDrawTriggering;
 
-	void paint(Graphics &g) override;
+	void paint(juce::Graphics &g) override;
 	void triggerTriggered(const Trigger * p) override;
 
-	void mouseDownInternal(const MouseEvent &e) override;
+	void mouseDownInternal(const juce::MouseEvent &e) override;
 
 
 	virtual void timerCallback() override;

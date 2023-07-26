@@ -33,15 +33,15 @@ public:
     void setValueRange(float minVal, float maxVal, bool proportional = false);
     void clearValueRange();
 
-    Point<float> getPosAndValue();
-    void setPosAndValue(Point<float> posAndValue, bool addToUndo = false);
+    juce::Point<float> getPosAndValue();
+    void setPosAndValue(juce::Point<float> posAndValue, bool addToUndo = false);
 
 
     //UI manipulation
     void setMovePositionReferenceInternal() override;
-    void setPosition(Point<float> targetTime) override;
-    Point<float> getPosition() override;
-    void addUndoableMoveAction(Array<UndoableAction*>& actions) override;
+    void setPosition(juce::Point<float> targetTime) override;
+    juce::Point<float> getPosition() override;
+    void addUndoableMoveAction(juce::Array<juce::UndoableAction*>& actions) override;
 
     void onContainerParameterChangedInternal(Parameter* p) override;
     void onExternalParameterValueChanged(Parameter* p) override;
@@ -58,7 +58,7 @@ public:
     void notifyKeyUpdated();
 
 
-    String getTypeString() const override { return "Key"; }
+    juce::String getTypeString() const override { return "Key"; }
 
     
 
@@ -71,7 +71,7 @@ public:
         AutomationKeyEvent(Type t, AutomationKey* key) : type(t), key(key) {}
 
         Type type;
-        WeakReference<AutomationKey> key;
+        juce::WeakReference<AutomationKey> key;
     };
 
     QueuedNotifier<AutomationKeyEvent> keyNotifier;
@@ -83,8 +83,8 @@ public:
     void removeAsyncKeyListener(AsyncListener* listener) { keyNotifier.removeListener(listener); }
 
 private:
-    WeakReference<AutomationKey>::Master masterReference;
-    friend class WeakReference<AutomationKey>;
+    juce::WeakReference<AutomationKey>::Master masterReference;
+    friend class juce::WeakReference<AutomationKey>;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AutomationKey)
 };

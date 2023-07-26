@@ -10,10 +10,10 @@ public:
 	~DashboardCCItemUI();
 
 	DashboardCCItem* ccItem;
-	Viewport vp;
-	Component * itemUI;
+	juce::Viewport vp;
+	juce::Component * itemUI;
 
-	virtual void paint(Graphics& g) override;
+	virtual void paint(juce::Graphics& g) override;
 	virtual void resizedDashboardItemInternal() override;
 
 	virtual void updateEditModeInternal(bool editMode) override;

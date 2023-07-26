@@ -13,7 +13,7 @@
 
 class ShapeShifterContainer;
 
-class ShapeShifter : public Component
+class ShapeShifter : public juce::Component
 {
 public :
 	enum Type {PANEL, CONTAINER};
@@ -38,9 +38,9 @@ public :
 
 	virtual bool isFlexible();
 
-	virtual var getCurrentLayout();
-	virtual void loadLayout(var layout);
-	virtual void loadLayoutInternal(var /*layout*/) {}
+	virtual juce::var getCurrentLayout();
+	virtual void loadLayout(juce::var layout);
+	virtual void loadLayoutInternal(juce::var /*layout*/) {}
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ShapeShifter)

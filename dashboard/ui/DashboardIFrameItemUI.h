@@ -23,10 +23,10 @@ public:
 #if JUCE_WINDOWS && RPI_SAFEMODE
     WindowsWebView2WebBrowserComponent web;
 #else
-    WebBrowserComponent web;
+    juce::WebBrowserComponent web;
 #endif
 
-    void paint(Graphics& g) override;
+    void paint(juce::Graphics& g) override;
     void resized() override;
     virtual void updateEditModeInternal(bool editMode) override;
 

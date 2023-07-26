@@ -24,21 +24,21 @@ public:
 	virtual ~Easing2D();
 
 	int type; //must be int to be able to extend
-	Point<float> start;
-	Point<float> end;
+	juce::Point<float> start;
+	juce::Point<float> end;
 	float length;
 
-	virtual void updateKeys(const Point<float>& start, const Point<float>& end, bool updateLength = true);
+	virtual void updateKeys(const juce::Point<float>& start, const juce::Point<float>& end, bool updateLength = true);
 
-	virtual Point<float> getValue(const float& weight) = 0;//must be overriden
+	virtual juce::Point<float> getValue(const float& weight) = 0;//must be overriden
 	virtual void updateLength() = 0;
-	virtual Rectangle<float> getBounds(bool includeHandles = false) = 0;
-	virtual Point<float> getClosestPointForPos(Point<float> pos) = 0;
+	virtual juce::Rectangle<float> getBounds(bool includeHandles = false) = 0;
+	virtual juce::Point<float> getClosestPointForPos(juce::Point<float> pos) = 0;
 	virtual Easing2DUI* createUI() = 0; //must be overriden
 
 private:
-	WeakReference<Easing2D>::Master masterReference;
-	friend class WeakReference<Easing2D>;
+	juce::WeakReference<Easing2D>::Master masterReference;
+	friend class juce::WeakReference<Easing2D>;
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Easing2D)
 
 };
@@ -49,10 +49,10 @@ class LinearEasing2D :
 public:
 	LinearEasing2D();
 	virtual ~LinearEasing2D() {}
-	Point<float> getValue(const float& weight) override;
+	juce::Point<float> getValue(const float& weight) override;
 	void updateLength() override;
-	Rectangle<float> getBounds(bool includeHandles) override;
-	Point<float> getClosestPointForPos(Point<float> pos) override;
+	juce::Rectangle<float> getBounds(bool includeHandles) override;
+	juce::Point<float> getClosestPointForPos(juce::Point<float> pos) override;
 
 	
 	Easing2DUI* createUI() override;
@@ -69,24 +69,24 @@ public:
 	Point2DParameter* anchor2;
 
 	Bezier::Bezier<3> bezier;
-	Array<Point<float>, CriticalSection> uniformLUT;
+	juce::Array<juce::Point<float>, juce::CriticalSection> uniformLUT;
 
-	void updateKeys(const Point<float>& start, const Point<float>& end, bool updateKeys = true) override;
+	void updateKeys(const juce::Point<float>& start, const juce::Point<float>& end, bool updateKeys = true) override;
 	void updateBezier();
 	void updateUniformLUT(int precision);
 
-	Point<float> getValue(const float& weight) override;
-	Point<float> getRawValue(const float& weight);
+	juce::Point<float> getValue(const float& weight) override;
+	juce::Point<float> getRawValue(const float& weight);
 
 	void updateLength() override;
-	void getBezierLength(Point<float> a, Point<float> b, Point<float> c, Point<float> d, int precision, float& length);
+	void getBezierLength(juce::Point<float> a, juce::Point<float> b, juce::Point<float> c, juce::Point<float> d, int precision, float& length);
 	
-	Array<Point<float>> getSplitControlPoints(const Point<float> & pos);
+	juce::Array<juce::Point<float>> getSplitControlPoints(const juce::Point<float> & pos);
 
-	Rectangle<float> getBounds(bool includeHandles) override;
+	juce::Rectangle<float> getBounds(bool includeHandles) override;
 
-    Point<float> getClosestPointForPos(Point<float> pos) override;
-	float getBezierWeight(const Point<float>& pos);
+	juce::Point<float> getClosestPointForPos(juce::Point<float> pos) override;
+	float getBezierWeight(const juce::Point<float>& pos);
 
 	void onContainerParameterChanged(Parameter* p) override;
 

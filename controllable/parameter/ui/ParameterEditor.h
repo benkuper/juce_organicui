@@ -19,16 +19,16 @@ class ParameterEditor :
 	public Parameter::AsyncListener
 {
 public:
-	ParameterEditor(Array<Parameter *> parameters, bool isRoot);  //Todo : handle full feedback if is root
+	ParameterEditor(juce::Array<Parameter *> parameters, bool isRoot);  //Todo : handle full feedback if is root
 	~ParameterEditor();
 
-	Array<WeakReference<Parameter>> parameters;
-	WeakReference<Parameter> parameter;
+	juce::Array<juce::WeakReference<Parameter>> parameters;
+	juce::WeakReference<Parameter> parameter;
 	bool currentUIHasRange;
 
 	//Expression
-	std::unique_ptr<Label> expressionLabel;
-	std::unique_ptr<Label> expressionText;
+	std::unique_ptr<juce::Label> expressionLabel;
+	std::unique_ptr<juce::Label> expressionText;
 
 
 	//Target
@@ -42,10 +42,10 @@ public:
 
 	void newMessage(const Parameter::ParameterEvent &e) override;
 
-	virtual void childBoundsChanged(Component* c) override;
+	virtual void childBoundsChanged(juce::Component* c) override;
 
 	virtual void parameterControlModeChanged(Parameter *) override;
 
 	// Inherited via Listener
-	virtual void labelTextChanged(Label * labelThatHasChanged) override;
+	virtual void labelTextChanged(juce::Label * labelThatHasChanged) override;
 };

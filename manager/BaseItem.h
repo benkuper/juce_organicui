@@ -19,7 +19,7 @@ class BaseItem :
 	public BaseManagerListener<Script>
 {
 public:
-	BaseItem(const String& name = "", bool canBeDisabled = true, bool canHaveScript = false);
+	BaseItem(const juce::String& name = "", bool canBeDisabled = true, bool canHaveScript = false);
 	virtual ~BaseItem();
 
 	//UI - should move outside data class ? how to save/load if not there 
@@ -42,12 +42,12 @@ public:
 
 	std::unique_ptr<ScriptManager> scriptManager;
 
-	String itemDataType;
+	juce::String itemDataType;
 	bool isClearing;
 
 	//UI moving X/Y
-	Point<float> movePositionReference;
-	Point<float> sizeReference;
+	juce::Point<float> movePositionReference;
+	juce::Point<float> sizeReference;
 
 	virtual void clearItem();
 
@@ -67,21 +67,21 @@ public:
 
 	void setMovePositionReference(bool setOtherSelectedItems = false);
 	virtual void setMovePositionReferenceInternal();
-	void movePosition(Point<float> positionOffset, bool moveOtherSelectedItems = false);
-	void scalePosition(Point<float> positionOffset, bool moveOtherSelectedItems = false);
-	virtual void setPosition(Point<float> position);
-	virtual Point<float> getPosition();
+	void movePosition(juce::Point<float> positionOffset, bool moveOtherSelectedItems = false);
+	void scalePosition(juce::Point<float> positionOffset, bool moveOtherSelectedItems = false);
+	virtual void setPosition(juce::Point<float> position);
+	virtual juce::Point<float> getPosition();
 	void addMoveToUndoManager(bool addOtherSelectedItems = false);
-	virtual void addUndoableMoveAction(Array<UndoableAction *> &arrayToAdd);
+	virtual void addUndoableMoveAction(juce::Array<juce::UndoableAction *> &arrayToAdd);
 
 	void setSizeReference(bool setOtherSelectedItems = false);
 	virtual void setSizeReferenceInternal();
-	void resizeItem(Point<float> sizeOffset, bool resizeOtherSelectedItems = false);
-	virtual void setItemSize(Point<float> size);
-	virtual Point<float> getItemSize();
+	void resizeItem(juce::Point<float> sizeOffset, bool resizeOtherSelectedItems = false);
+	virtual void setItemSize(juce::Point<float> size);
+	virtual juce::Point<float> getItemSize();
 
 	void addResizeToUndoManager(bool addOtherSelectedItems = false);
-	virtual void addUndoableResizeAction(Array<UndoableAction*>& arrayToAdd);
+	virtual void addUndoableResizeAction(juce::Array<juce::UndoableAction*>& arrayToAdd);
 
 
 
@@ -96,18 +96,18 @@ public:
 
 	void setHasCustomColor(bool value);
 
-	var getJSONData() override;
-	void loadJSONDataInternal(var data) override;
-	virtual void loadJSONDataItemInternal(var data) {} //happens before loading scripts
+	juce::var getJSONData() override;
+	void loadJSONDataInternal(juce::var data) override;
+	virtual void loadJSONDataItemInternal(juce::var data) {} //happens before loading scripts
 
-	virtual void getRemoteControlDataInternal(var& data) override;
+	virtual void getRemoteControlDataInternal(juce::var& data) override;
 
-	InspectableEditor * getEditorInternal(bool isRoot, Array<Inspectable*> inspectables = Array<Inspectable*>()) override;
-	virtual String getTypeString() const { return "BaseItem"; };
-	static var getTypeStringFromScript(const juce::var::NativeFunctionArgs& a);
-	String getScriptTargetString() override;
+	InspectableEditor * getEditorInternal(bool isRoot, juce::Array<Inspectable*> inspectables = juce::Array<Inspectable*>()) override;
+	virtual juce::String getTypeString() const { return "BaseItem"; };
+	static juce::var getTypeStringFromScript(const juce::var::NativeFunctionArgs& a);
+	juce::String getScriptTargetString() override;
 
-	ListenerList<BaseItemListener> baseItemListeners;
+	juce::ListenerList<BaseItemListener> baseItemListeners;
 	void addBaseItemListener(BaseItemListener* newListener) { baseItemListeners.add(newListener); }
 	void removeBaseItemListener(BaseItemListener* listener) { baseItemListeners.remove(listener); }
 

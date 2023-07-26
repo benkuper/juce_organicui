@@ -30,7 +30,7 @@ public:
 	~GradientColorManager();
 
 	ColorParameter * currentColor;
-	SpinLock gradientLock;
+	juce::SpinLock gradientLock;
 
 	FloatParameter * position;
 	FloatParameter * length;
@@ -46,23 +46,23 @@ public:
 	static GradientColorComparator comparator;
 
 	void updateCurrentColor();
-	Colour getColorForPosition(const float & time) const;
+	juce::Colour getColorForPosition(const float & time) const;
 	
 	//void rebuildGradient();
 	
-	GradientColor * addColorAt(float time, Colour color);
+	GradientColor * addColorAt(float time, juce::Colour color);
 	GradientColor * getItemAt(float time, bool getNearestPreviousKeyIfNotFound = false) const;
 
-	Array<GradientColor*> getItemsInTimespan(float startTime, float endTime);
+	juce::Array<GradientColor*> getItemsInTimespan(float startTime, float endTime);
 
-	Array<UndoableAction*> getMoveKeysBy(float start, float offset);
-	Array<UndoableAction*> getRemoveTimespan(float start, float end);
+	juce::Array<juce::UndoableAction*> getMoveKeysBy(float start, float offset);
+	juce::Array<juce::UndoableAction*> getRemoveTimespan(float start, float end);
 
 
-    void addItemInternal(GradientColor * item, var data) override;
+    void addItemInternal(GradientColor * item, juce::var data) override;
 	void removeItemInternal(GradientColor * item) override;
 
-	Array<GradientColor*> addItemsFromClipboard(bool showWarning = false) override;
+	juce::Array<GradientColor*> addItemsFromClipboard(bool showWarning = false) override;
 
 	
 	void reorderItems() override;
@@ -70,13 +70,13 @@ public:
 	void onContainerParameterChanged(Parameter *) override;
 	void onControllableFeedbackUpdate(ControllableContainer * cc, Controllable * c) override;
 
-	static var getColorAtPositionFromScript(const juce::var::NativeFunctionArgs& a);
-	static var getKeyAtPositionFromScript(const juce::var::NativeFunctionArgs& a);
-	static var getKeysBetweenFromScript(const juce::var::NativeFunctionArgs& a);
+	static juce::var getColorAtPositionFromScript(const juce::var::NativeFunctionArgs& a);
+	static juce::var getKeyAtPositionFromScript(const juce::var::NativeFunctionArgs& a);
+	static juce::var getKeysBetweenFromScript(const juce::var::NativeFunctionArgs& a);
 
-	void loadJSONDataInternal(var data) override;
+	void loadJSONDataInternal(juce::var data) override;
 
-	InspectableEditor* getEditorInternal(bool isRoot, Array<Inspectable*> inspectables = Array<Inspectable*>()) override;
+	InspectableEditor* getEditorInternal(bool isRoot, juce::Array<Inspectable*> inspectables = juce::Array<Inspectable*>()) override;
 
 	class GradientColorManagerListener
 	{
@@ -85,7 +85,7 @@ public:
 		virtual void gradientUpdated() {}
 	};
 
-	ListenerList<GradientColorManagerListener> colorManagerListeners;
+	juce::ListenerList<GradientColorManagerListener> colorManagerListeners;
 	void addColorManagerListener(GradientColorManagerListener* newListener) { colorManagerListeners.add(newListener); }
 	void removeColorManagerListener(GradientColorManagerListener* listener) { colorManagerListeners.remove(listener); }
 

@@ -2,7 +2,7 @@
 
 class ControllableDetectiveWatcherUI :
 	public BaseItemUI<ControllableDetectiveWatcher>,
-	public Timer
+	public juce::Timer
 {
 public:
 	ControllableDetectiveWatcherUI(ControllableDetectiveWatcher* watcher);
@@ -11,11 +11,11 @@ public:
 	juce::Rectangle<int> canvasRect;
 	TargetParameterUI targetUI;
 	TimeLabel watchTimeUI;
-	Image canvasSnapshot;
+	juce::Image canvasSnapshot;
 	bool snapshotMode;
 
-	virtual void paint(Graphics& g) override;
-	virtual void paintWatcherInternal(Graphics& g, const juce::Rectangle<int>& r) {}
+	virtual void paint(juce::Graphics& g) override;
+	virtual void paintWatcherInternal(juce::Graphics& g, const juce::Rectangle<int>& r) {}
 
 	virtual void resizedInternalHeader(juce::Rectangle<int>& r) override;
 	virtual void resizedInternalContent(juce::Rectangle<int>& r) override;

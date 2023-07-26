@@ -28,7 +28,7 @@ public:
 	static String getStringArg(OSCArgument a);
 	static OSCColour getOSCColour(Colour c);
 	static Point<float> getP2DArg(const OSCMessage& m, int startIndex = 0);
-	static Vector3D<float> getP3DArg(const OSCMessage& m, int startIndex = 0);
+	static juce::Vector3D<float> getP3DArg(const OSCMessage& m, int startIndex = 0);
 
 	static Colour getColourFromOSC(OSCColour c);
 

@@ -14,7 +14,7 @@ class GradientColor :
 	public BaseItem
 {
 public:
-	GradientColor(float time = 0, const Colour & color = Colours::black, const String &name = "Color");
+	GradientColor(float time = 0, const juce::Colour & color = juce::Colours::black, const juce::String &name = "Color");
 	virtual ~GradientColor();
 
 	enum Interpolation { LINEAR, NONE };
@@ -22,9 +22,9 @@ public:
 	EnumParameter * interpolation;
 
 	void setMovePositionReferenceInternal() override;
-	void setPosition(Point<float> targetTime) override;
-	Point<float> getPosition() override;
-	void addUndoableMoveAction(Array<UndoableAction*>& actions) override;
+	void setPosition(juce::Point<float> targetTime) override;
+	juce::Point<float> getPosition() override;
+	void addUndoableMoveAction(juce::Array<juce::UndoableAction*>& actions) override;
 
 	int gradientIndex;
 

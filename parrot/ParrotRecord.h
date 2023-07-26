@@ -21,19 +21,19 @@ public:
 
     struct RecordValue
     {
-        RecordValue(double time = 0.0, var value = var()) : time(time), value(value) {}
+        RecordValue(double time = 0.0, juce::var value = juce::var()) : time(time), value(value) {}
         double time;
-        var value;
+        juce::var value;
     };
 
     void clearRecord();
 
-    void addData(Controllable* c, double time, var value = var());
+    void addData(Controllable* c, double time, juce::var value = juce::var());
 
-    HashMap<WeakReference<Controllable>, Array<RecordValue>> dataMap;
+    juce::HashMap<juce::WeakReference<Controllable>, juce::Array<RecordValue>> dataMap;
 
-    var getJSONData() override;
-    void loadJSONDataItemInternal(var data) override;
+    juce::var getJSONData() override;
+    void loadJSONDataItemInternal(juce::var data) override;
 
-    String getTypeString() const override { return "Record"; }
+    juce::String getTypeString() const override { return "Record"; }
 };

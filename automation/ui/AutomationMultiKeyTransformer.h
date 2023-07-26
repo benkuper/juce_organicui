@@ -12,21 +12,21 @@
 class AutomationUI;
 
 class AutomationMultiKeyTransformer :
-	public Component
+	public juce::Component
 {
 public:
-	AutomationMultiKeyTransformer(AutomationUI * aui, Array<AutomationKeyUI *> keysUI);
+	AutomationMultiKeyTransformer(AutomationUI * aui, juce::Array<AutomationKeyUI *> keysUI);
 	~AutomationMultiKeyTransformer();
 
 	AutomationUI * aui;
-	Array<AutomationKeyUI *> keysUI;
-	Array<Point<float>> keysRelativePositions;
-	Array<Point<float>> keysTimesAndValuesPositions;
+	juce::Array<AutomationKeyUI *> keysUI;
+	juce::Array<juce::Point<float>> keysRelativePositions;
+	juce::Array<juce::Point<float>> keysTimesAndValuesPositions;
 
-	ResizableBorderComponent resizer;
+	juce::ResizableBorderComponent resizer;
 	
-	Rectangle<int> keyBounds;
-	Point<int> posAtMouseDown;
+	juce::Rectangle<int> keyBounds;
+	juce::Point<int> posAtMouseDown;
 
 	void updateBoundsFromKeys();
 	void updateKeysFromBounds();
@@ -34,10 +34,10 @@ public:
 	void parentHierarchyChanged() override;
 
 	void resized() override;
-	void paint(Graphics &g) override;
+	void paint(juce::Graphics &g) override;
 
-	void mouseDown(const MouseEvent &e) override;
-	void mouseDrag(const MouseEvent &e) override;
-	void mouseUp(const MouseEvent &e) override;
+	void mouseDown(const juce::MouseEvent &e) override;
+	void mouseDrag(const juce::MouseEvent &e) override;
+	void mouseUp(const juce::MouseEvent &e) override;
 };
 

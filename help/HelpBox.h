@@ -2,7 +2,7 @@
 
 
 class HelpBox :
-	public Thread
+	public juce::Thread
 {
 public:
 	juce_DeclareSingleton(HelpBox, true);
@@ -10,24 +10,24 @@ public:
 	HelpBox();
 	~HelpBox();
 
-	var helpData;
+	juce::var helpData;
 	
-	String persistentDataID;
-	String overDataID; 
+	juce::String persistentDataID;
+	juce::String overDataID;
 
-	URL helpURL;
+	juce::URL helpURL;
 
 	void loadHelp();
 	void loadLocalHelp();
 
-	void setOverData(String dataID);
-	void clearOverData(String dataID);
+	void setOverData(juce::String dataID);
+	void clearOverData(juce::String dataID);
 
-	void setPersistentData(String dataID);
-	void clearPersistentData(String dataID);
+	void setPersistentData(juce::String dataID);
+	void clearPersistentData(juce::String dataID);
 
-	const String getContentForID(String dataID);
-	const String getCurrentData();
+	const juce::String getContentForID(juce::String dataID);
+	const juce::String getCurrentData();
 
 	class HelpListener
 	{
@@ -36,7 +36,7 @@ public:
 		virtual void helpContentChanged() {}
 	};
 
-	ListenerList<HelpListener> helpListeners;
+	juce::ListenerList<HelpListener> helpListeners;
 	void addHelpListener(HelpListener* newListener) { helpListeners.add(newListener); }
 	void removeHelpListener(HelpListener* listener) { helpListeners.remove(listener); }
 

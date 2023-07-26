@@ -7,7 +7,7 @@ public:
 	ParameterDetectiveWatcher();
 	virtual ~ParameterDetectiveWatcher();
 
-	WeakReference<Parameter> parameter;
+	juce::WeakReference<Parameter> parameter;
 
 	virtual void setControllable(Controllable* c) override;
 

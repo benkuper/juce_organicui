@@ -1,16 +1,16 @@
 #pragma once
 
 class WarningTargetUI :
-	public Component,
-	public SettableTooltipClient,
+	public juce::Component,
+	public juce::SettableTooltipClient,
 	public WarningTarget::AsyncListener
 {
 public:
 	WarningTargetUI(WarningTarget * target);
 	~WarningTargetUI();
 
-	WeakReference<WarningTarget> target;
-	void paint(Graphics& g) override;
+	juce::WeakReference<WarningTarget> target;
+	void paint(juce::Graphics& g) override;
 
 
 	void newMessage(const WarningTarget::WarningTargetEvent& e) override;

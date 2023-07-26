@@ -15,15 +15,15 @@ public:
 
 	DashboardItemManager itemManager;
 
-	var getServerData() override;
+	juce::var getServerData() override;
 
-	var getJSONData() override;
-	void loadJSONDataItemInternal(var data) override;
+	juce::var getJSONData() override;
+	void loadJSONDataItemInternal(juce::var data) override;
 
 	bool paste() override;
 	
 	virtual DashboardItemUI* createUI() override;
 
-	String getTypeString() const override { return "DashboardGroupItem"; }
-	static DashboardGroupItem* create(var) { return new DashboardGroupItem(); }
+	juce::String getTypeString() const override { return "DashboardGroupItem"; }
+	static DashboardGroupItem* create(juce::var) { return new DashboardGroupItem(); }
 };

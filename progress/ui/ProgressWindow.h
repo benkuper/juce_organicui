@@ -10,22 +10,22 @@
 
 #pragma once
 
-class ProgressWindow : public Component,public ProgressNotifier::ProgressListener
+class ProgressWindow : public juce::Component,public ProgressNotifier::ProgressListener
 {
 public:
 
-	ProgressWindow(const String &title,ProgressNotifier * notifier=nullptr);
+	ProgressWindow(const juce::String &title,ProgressNotifier * notifier=nullptr);
 	~ProgressWindow();
 	
 
 	const int windowWidth = 300;
 	const int windowHeight = 100;
 
-	Label titleLabel;
+	juce::Label titleLabel;
 	FloatParameter progressParam;
 	std::unique_ptr<FloatSliderUI> progressUI;
 	
-	void paint(Graphics & g) override;
+	void paint(juce::Graphics & g) override;
 	void resized() override;
 
   void startedProgress(ProgressTask *  task)override;

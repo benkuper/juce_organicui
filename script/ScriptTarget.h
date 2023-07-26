@@ -11,32 +11,32 @@
 
 #pragma once
 
-const Identifier scriptPtrIdentifier = "_ptr";
-const Identifier scriptTargetTypeIdentifier = "_type";
-const Identifier ptrCompareIdentifier = "is";
+const juce::Identifier scriptPtrIdentifier = "_ptr";
+const juce::Identifier scriptTargetTypeIdentifier = "_type";
+const juce::Identifier ptrCompareIdentifier = "is";
 
 class ScriptTarget
 {
 public:
-	ScriptTarget(const String &name, void * ptr, const String &targetType = "");
+	ScriptTarget(const juce::String &name, void * ptr, const juce::String &targetType = "");
 	virtual ~ScriptTarget();
 
-	int64 thisPtr;
-	String scriptTargetName;
-	var scriptObject;
+	juce::int64 thisPtr;
+	juce::String scriptTargetName;
+	juce::var scriptObject;
 	//var liveScriptObject;
 	bool scriptObjectIsDirty;
 
-	SpinLock scriptObjectLock;
+	juce::SpinLock scriptObjectLock;
 
-	var getScriptObject();
-	void updateScriptObject(var parent = var());
+	juce::var getScriptObject();
+	void updateScriptObject(juce::var parent = juce::var());
 
-	virtual void updateScriptObjectInternal(var /*parent*/ = var()) {}
+	virtual void updateScriptObjectInternal(juce::var /*parent*/ = juce::var()) {}
 
-	static var checkTargetsAreTheSameFromScript(const var::NativeFunctionArgs &args);
+	static juce::var checkTargetsAreTheSameFromScript(const juce::var::NativeFunctionArgs &args);
 
-	virtual String getScriptTargetString();
+	virtual juce::String getScriptTargetString();
 
 	class ScriptTargetListener
 	{
@@ -45,19 +45,19 @@ public:
 		virtual void scriptObjectUpdated(ScriptTarget *) {};
 	};
 
-	ListenerList<ScriptTargetListener> scriptTargetListeners;
+	juce::ListenerList<ScriptTargetListener> scriptTargetListeners;
 	void addScriptTargetListener(ScriptTargetListener * l) { scriptTargetListeners.add(l); }
 	void removeScriptTargetListener(ScriptTargetListener * l) { scriptTargetListeners.remove(l); }
 
 
 
 	template<class T>
-	static T* getObjectFromJS(const var::NativeFunctionArgs & a);
+	static T* getObjectFromJS(const juce::var::NativeFunctionArgs & a);
 };
 
 template<class T>
-T * ScriptTarget::getObjectFromJS(const var::NativeFunctionArgs & a) {
-	DynamicObject * d = a.thisObject.getDynamicObject();
+T * ScriptTarget::getObjectFromJS(const juce::var::NativeFunctionArgs & a) {
+	juce::DynamicObject * d = a.thisObject.getDynamicObject();
 	if (d == nullptr) return nullptr;
-	return dynamic_cast<T*>((T*)(int64)d->getProperty(scriptPtrIdentifier));
+	return dynamic_cast<T*>((T*)(juce::int64)d->getProperty(scriptPtrIdentifier));
 }

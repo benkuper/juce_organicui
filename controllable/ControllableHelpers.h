@@ -11,23 +11,23 @@
 #pragma once
 
 class ControllableChooserPopupMenu : 
-	public PopupMenu
+	public juce::PopupMenu
 {
 public:
 	ControllableChooserPopupMenu(ControllableContainer* rootContainer, 
 		int indexOffset = 0, int maxSearchLevel = -1, 
-		const StringArray & typesFilter = StringArray(), const StringArray & excludeTypeFilters = StringArray(), std::function<bool(Controllable *)> filterFunc = nullptr,  Controllable* currentSelection = nullptr);
+		const juce::StringArray & typesFilter = juce::StringArray(), const juce::StringArray & excludeTypeFilters = juce::StringArray(), std::function<bool(Controllable *)> filterFunc = nullptr,  Controllable* currentSelection = nullptr);
 	virtual ~ControllableChooserPopupMenu();
 
 	int indexOffset;
 	int maxDefaultSearchLevel;
-	StringArray typesFilter;
-	StringArray excludeTypesFilter;
+	juce::StringArray typesFilter;
+	juce::StringArray excludeTypesFilter;
 	std::function<bool(Controllable*)> filterFunc;
 	Controllable* currentSelection;
 
-	Array<Controllable *> controllableList;
-	void populateMenu(PopupMenu *subMenu, ControllableContainer * container, int &currentId, int currentLevel = 0);
+	juce::Array<Controllable *> controllableList;
+	void populateMenu(juce::PopupMenu *subMenu, ControllableContainer * container, int &currentId, int currentLevel = 0);
 
 	void showAndGetControllable(std::function<void(Controllable *)> returnFunc, bool deleteAfter = false);
 	Controllable * getControllableForResult(int result);
@@ -45,23 +45,23 @@ public:
 };
 
 class ContainerChooserPopupMenu :
-	public PopupMenu
+	public juce::PopupMenu
 {
 public:
-	ContainerChooserPopupMenu(ControllableContainer * rootContainer, int indexOffset = 0, int maxSearchLevel = -1, std::function<bool(ControllableContainer *)> typeCheckFunc = nullptr, const StringArray& typesFilter = StringArray(), const StringArray& excludeTypeFilters = StringArray(),bool allowSelectAtAnylevel = false, ControllableContainer* currentSelection = nullptr);
+	ContainerChooserPopupMenu(ControllableContainer * rootContainer, int indexOffset = 0, int maxSearchLevel = -1, std::function<bool(ControllableContainer *)> typeCheckFunc = nullptr, const juce::StringArray& typesFilter = juce::StringArray(), const juce::StringArray& excludeTypeFilters = juce::StringArray(),bool allowSelectAtAnylevel = false, ControllableContainer* currentSelection = nullptr);
 
 	virtual ~ContainerChooserPopupMenu();
 
 	int indexOffset;
 	int maxDefaultSearchLevel;
 	std::function<bool(ControllableContainer *)> typeCheckFunc;
-	StringArray typesFilter;
-	StringArray excludeTypesFilter;
+	juce::StringArray typesFilter;
+	juce::StringArray excludeTypesFilter;
 	bool allowSelectAtAnyLevel;
 	ControllableContainer* currentSelection;
 
-	Array<ControllableContainer *> containerList;
-	void populateMenu(PopupMenu *subMenu, ControllableContainer * container, int &currentId, int currentLevel = 0);
+	juce::Array<ControllableContainer *> containerList;
+	void populateMenu(juce::PopupMenu *subMenu, ControllableContainer * container, int &currentId, int currentLevel = 0);
 
 	void showAndGetContainer(std::function<void(ControllableContainer *)> returnFunc);
 	ControllableContainer * getContainerForResult(int result);
@@ -82,6 +82,6 @@ public:
 class ControllableParser
 {
 public:
-	static void createControllablesFromJSONObject(var data, ControllableContainer* container);
-	static void createControllableFromJSONObject(StringRef name, var data, ControllableContainer *container);
+	static void createControllablesFromJSONObject(juce::var data, ControllableContainer* container);
+	static void createControllableFromJSONObject(juce::StringRef name, juce::var data, ControllableContainer *container);
 };

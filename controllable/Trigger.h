@@ -17,14 +17,14 @@ class TriggerBlinkUI;
 class Trigger : public Controllable
 {
 public:
-	Trigger(const String& niceName, const String& description, bool enabled = true);
+	Trigger(const juce::String& niceName, const juce::String& description, bool enabled = true);
 	~Trigger() { masterReference.clear(); }
 
 
-	TriggerButtonUI* createButtonUI(Array<Trigger *> triggers = {});
-	TriggerImageUI* createImageUI(const Image& image, bool keepSaturation = false, Array<Trigger *> triggers = {});
-	TriggerBlinkUI * createBlinkUI(Array<Trigger *> triggers = {});
-	ControllableUI * createDefaultUI(Array<Controllable *> controllables = {}) override;
+	TriggerButtonUI* createButtonUI(juce::Array<Trigger *> triggers = {});
+	TriggerImageUI* createImageUI(const juce::Image& image, bool keepSaturation = false, juce::Array<Trigger *> triggers = {});
+	TriggerBlinkUI * createBlinkUI(juce::Array<Trigger *> triggers = {});
+	ControllableUI * createDefaultUI(juce::Array<Controllable *> controllables = {}) override;
 	
 	virtual void trigger();
 	
@@ -42,25 +42,25 @@ public:
 		virtual void triggerTriggered(Trigger * p) = 0;
 	};
 	
-	ListenerList<Listener> listeners;
+	juce::ListenerList<Listener> listeners;
 	void addTriggerListener(Trigger::Listener* newListener) { listeners.add(newListener); }
 	void removeTriggerListener(Trigger::Listener* listener) { listeners.remove(listener); }
 	
 
 	
-	QueuedNotifier<WeakReference<Trigger>> queuedNotifier;
-	typedef QueuedNotifier<WeakReference<Trigger>>::Listener AsyncListener;
+	QueuedNotifier<juce::WeakReference<Trigger>> queuedNotifier;
+	typedef QueuedNotifier<juce::WeakReference<Trigger>>::Listener AsyncListener;
 	void addAsyncTriggerListener(AsyncListener * l){queuedNotifier.addListener(l);}
 	void removeAsyncTriggerListener(AsyncListener * l){queuedNotifier.removeListener(l);}
 	
 
 	static Trigger * create() { return new Trigger("New Trigger",""); }
-	virtual String getTypeString() const override { return getTypeStringStatic(); }
-	static String getTypeStringStatic() { return "Trigger"; }
+	virtual juce::String getTypeString() const override { return getTypeStringStatic(); }
+	static juce::String getTypeStringStatic() { return "Trigger"; }
 
 private:
-	WeakReference<Trigger>::Master masterReference;
-	friend class WeakReference<Trigger>;
+	juce::WeakReference<Trigger>::Master masterReference;
+	friend class juce::WeakReference<Trigger>;
 	
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Trigger)
 };

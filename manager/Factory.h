@@ -14,7 +14,7 @@ template<class T>
 class BaseFactoryDefinition
 {
 public:
-	BaseFactoryDefinition(StringRef menuPath, StringRef type) :
+	BaseFactoryDefinition(juce::StringRef menuPath, juce::StringRef type) :
 		type(type),
 		menuPath(menuPath)
 	{
@@ -22,11 +22,11 @@ public:
 
 	virtual ~BaseFactoryDefinition() {}
 
-	String type;
-	String menuPath;
-	Image icon;
+	juce::String type;
+	juce::String menuPath;
+	juce::Image icon;
 
-	BaseFactoryDefinition* addIcon(Image icon)
+	BaseFactoryDefinition* addIcon(juce::Image icon)
 	{
 		this->icon = icon;
 		return this;
@@ -40,7 +40,7 @@ class FactoryDefinition :
 	public BaseFactoryDefinition<T>
 {
 public:
-	FactoryDefinition(StringRef menuPath, StringRef type, CreateFunc createFunc) :
+	FactoryDefinition(juce::StringRef menuPath, juce::StringRef type, CreateFunc createFunc) :
 		BaseFactoryDefinition<T>(menuPath, type),
 		createFunc(createFunc)
 	{}
@@ -49,7 +49,7 @@ public:
 
 	CreateFunc createFunc;
 
-	static FactoryDefinition* createDef(StringRef menu, StringRef type, CreateFunc createFunc)
+	static FactoryDefinition* createDef(juce::StringRef menu, juce::StringRef type, CreateFunc createFunc)
 	{
 		FactoryDefinition* d = new FactoryDefinition(menu, type, createFunc);
 		return d;
@@ -61,18 +61,18 @@ class FactoryParametricDefinition :
 	public FactoryDefinition<T, CreateFunc>
 {
 public:
-	FactoryParametricDefinition(StringRef menuPath, StringRef type, CreateFunc createFunc, var params = new DynamicObject()) :
+	FactoryParametricDefinition(juce::StringRef menuPath, juce::StringRef type, CreateFunc createFunc, juce::var params = new juce::DynamicObject()) :
 		FactoryDefinition<T, CreateFunc>(menuPath, type, createFunc),
 		params(params)
 	{
-		this->params.getDynamicObject()->setProperty("type", String(type));
+		this->params.getDynamicObject()->setProperty("type", juce::String(type));
 	}
 
 	virtual ~FactoryParametricDefinition() {}
 
-	var params;
+	juce::var params;
 
-	FactoryParametricDefinition* addParam(const String& paramName, const var& value)
+	FactoryParametricDefinition* addParam(const juce::String& paramName, const juce::var& value)
 	{
 		params.getDynamicObject()->setProperty(paramName, value);
 		return this; //daisy-chain
@@ -81,11 +81,11 @@ public:
 
 template<class T>
 class FactorySimpleParametricDefinition :
-	public FactoryParametricDefinition<T, std::function<T *(var)>>
+	public FactoryParametricDefinition<T, std::function<T *(juce::var)>>
 {
 public:
-	FactorySimpleParametricDefinition(StringRef menuPath, StringRef type, std::function<T *(var)> createFunc, var params = new DynamicObject()) :
-		FactoryParametricDefinition<T, std::function<T *(var)>>(menuPath, type, createFunc, params)
+	FactorySimpleParametricDefinition(juce::StringRef menuPath, juce::StringRef type, std::function<T* (juce::var)> createFunc, juce::var params = new juce::DynamicObject()) :
+		FactoryParametricDefinition<T, std::function<T* (juce::var)>>(menuPath, type, createFunc, params)
 	{
 	}
 
@@ -95,26 +95,26 @@ public:
 		return this->createFunc(this->params);
 	}
 
-	
-	static FactorySimpleParametricDefinition* createDef(StringRef menu, StringRef type, std::function<T* (var)> createFunc, var params = new DynamicObject())
+
+	static FactorySimpleParametricDefinition* createDef(juce::StringRef menu, juce::StringRef type, std::function<T* (juce::var)> createFunc, juce::var params = new juce::DynamicObject())
 	{
 		return new FactorySimpleParametricDefinition(menu, type, createFunc, params);
 	}
 
 	template<class S>
-	static FactorySimpleParametricDefinition* createDef(StringRef menu)
+	static FactorySimpleParametricDefinition* createDef(juce::StringRef menu)
 	{
-		return createDef(menu, S::getTypeStringStatic(), &FactorySimpleParametricDefinition<T>::createTemplated<S>, new DynamicObject());
+		return createDef(menu, S::getTypeStringStatic(), &FactorySimpleParametricDefinition<T>::createTemplated<S>, new juce::DynamicObject());
 	}
 
 	template<class S>
-	static FactorySimpleParametricDefinition* createDef(StringRef menu, StringRef type, var params = new DynamicObject())
+	static FactorySimpleParametricDefinition* createDef(juce::StringRef menu, juce::StringRef type, juce::var params = new juce::DynamicObject())
 	{
 		return createDef(menu, type, &FactorySimpleParametricDefinition<T>::createTemplated<S>, params);
 	}
 
 	template<class S>
-	static T* createTemplated(var params = new DynamicObject()) { return new S(params); }
+	static T* createTemplated(juce::var params = new juce::DynamicObject()) { return new S(params); }
 
 };
 
@@ -126,14 +126,14 @@ public:
 	Factory() {}
 	virtual ~Factory() {}
 
-	OwnedArray<BaseFactoryDefinition<T>> defs;
-	PopupMenu menu;
+	juce::OwnedArray<BaseFactoryDefinition<T>> defs;
+	juce::PopupMenu menu;
 
 	virtual void buildPopupMenu(int startOffset = 0)
 	{
 		menu.clear();
-		OwnedArray<PopupMenu> subMenus;
-		Array<String> subMenuNames;
+		juce::OwnedArray<juce::PopupMenu> subMenus;
+		juce::Array<juce::String> subMenuNames;
 
 		for (auto& d : defs)
 		{
@@ -176,14 +176,14 @@ public:
 			return;
 		}
 
-		getMenu().showMenuAsync(PopupMenu::Options(), [this, returnFunc](int result)
+		getMenu().showMenuAsync(juce::PopupMenu::Options(), [this, returnFunc](int result)
 			{
 				if (T* r = this->createFromMenuResult(result)) returnFunc(r);
 			}
 		);
 	}
 
-	virtual PopupMenu getMenu(int startOffset = 0)
+	virtual juce::PopupMenu getMenu(int startOffset = 0)
 	{
 		if (menu.getNumItems() == 0) buildPopupMenu(startOffset);
 		return menu;
@@ -199,7 +199,7 @@ public:
 		}
 	}
 
-	virtual T* create(const String& type)
+	virtual T* create(const juce::String& type)
 	{
 		for (auto& d : defs)
 		{
@@ -215,7 +215,7 @@ public:
 		return def->create();
 	}
 
-	bool hasDefinitionWithType(const String& type)
+	bool hasDefinitionWithType(const juce::String& type)
 	{
 		for (auto& d : defs)
 		{

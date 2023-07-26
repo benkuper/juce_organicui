@@ -129,8 +129,8 @@ public:
 	void buildTree(OutlinerItem * parentItem, ControllableContainer * parentContainer, bool parentsHaveHideInRemote);
 	void updateFilteredList();
 
-	virtual OutlinerItem* createItem(WeakReference<ControllableContainer> container, bool parentsHaveHideInRemote, bool isFiltered);
-	virtual OutlinerItem* createItem(WeakReference<Controllable> controllable, bool parentsHaveHideInRemote, bool isFiltered);
+	virtual OutlinerItem* createItem(juce::WeakReference<ControllableContainer> container, bool parentsHaveHideInRemote, bool isFiltered);
+	virtual OutlinerItem* createItem(juce::juce::WeakReference<Controllable> controllable, bool parentsHaveHideInRemote, bool isFiltered);
 
 	void endLoadFile() override;
 	void engineCleared() override;

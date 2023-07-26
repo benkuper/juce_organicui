@@ -1,6 +1,6 @@
 #pragma once
 
-class Grabber : public Component
+class Grabber : public juce::Component
 {
 public:
 
@@ -11,5 +11,5 @@ public:
 
 	Direction dir;
 
-	void paint(Graphics &g) override;
+	void paint(juce::Graphics &g) override;
 };

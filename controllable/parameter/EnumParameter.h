@@ -18,30 +18,30 @@ class EnumParameter : public Parameter
 {
 public:
 
-	EnumParameter(const String &niceName, const String &description, bool enabled = true);
+	EnumParameter(const juce::String &niceName, const juce::String &description, bool enabled = true);
 	~EnumParameter();
 
 	struct EnumValue
 	{
-		EnumValue(String key, var value) : key(key), value(value) {}
-		String key;
-		var value;
+		EnumValue(juce::String key, juce::var value) : key(key), value(value) {}
+		juce::String key;
+		juce::var value;
 	};
 
-	EnumParameter * addOption(String key, var data, bool selectIfFirstOption = true); //daisy chain
-	void updateOption(int index, String key, var data, bool addIfNotThere = false);
-	void removeOption(String key);
-	void setOptions(Array<EnumValue *> options);
+	EnumParameter * addOption(juce::String key, juce::var data, bool selectIfFirstOption = true); //daisy chain
+	void updateOption(int index, juce::String key, juce::var data, bool addIfNotThere = false);
+	void removeOption(juce::String key);
+	void setOptions(juce::Array<EnumValue *> options);
 	void clearOptions();
 
 	void updateArgDescription();
 
 	
 
-	OwnedArray<EnumValue> enumValues;
+	juce::OwnedArray<EnumValue> enumValues;
 
-	var getValue() override;
-	var getValueData();
+	juce::var getValue() override;
+	juce::var getValueData();
 
 	template<class T>
 	T getValueDataAsEnum() {
@@ -50,41 +50,41 @@ public:
 		return (T)(int)ev->value; 
 	}
 
-	String getValueKey();
+	juce::String getValueKey();
 
-	int getIndexForKey(StringRef key);
-	EnumValue * getEntryForKey(StringRef key);
+	int getIndexForKey(juce::StringRef key);
+	EnumValue * getEntryForKey(juce::StringRef key);
 
-	StringArray getAllKeys();
+	juce::StringArray getAllKeys();
 
-	void setValueWithData(var data);
-	void setValueWithKey(String data);
+	void setValueWithData(juce::var data);
+	void setValueWithKey(juce::String data);
 	void setPrev(bool loop = true, bool addToUndo = false);
 	void setNext(bool loop = true, bool addToUndo = false);
 
-	bool checkValueIsTheSame(var oldValue, var newValue) override;
+	bool checkValueIsTheSame(juce::var oldValue, juce::var newValue) override;
 
-	var getJSONDataInternal() override;
-	void loadJSONDataInternal(var data) override;
-	virtual void setupFromJSONData(var data) override;
+	juce::var getJSONDataInternal() override;
+	void loadJSONDataInternal(juce::var data) override;
+	virtual void setupFromJSONData(juce::var data) override;
 
-	var getRemoteControlValue() override;
-	var getRemoteControlRange() override;
+	juce::var getRemoteControlValue() override;
+	juce::var getRemoteControlRange() override;
 
-	static var getValueKeyFromScript(const juce::var::NativeFunctionArgs& a);
-	static var addOptionFromScript(const juce::var::NativeFunctionArgs &a);
-	static var removeOptionsFromScript(const juce::var::NativeFunctionArgs &a);
-	static var setValueWithDataFromScript(const juce::var::NativeFunctionArgs& a);
-	static var getAllOptionsFromScript(const juce::var::NativeFunctionArgs& a);
-	static var getOptionAtFromScript(const juce::var::NativeFunctionArgs& a);
-	static var getIndexFromScript(const juce::var::NativeFunctionArgs& a);
-	static var setNextFromScript(const juce::var::NativeFunctionArgs& a);
-	static var setPreviousFromScript(const juce::var::NativeFunctionArgs& a);
+	static juce::var getValueKeyFromScript(const juce::var::NativeFunctionArgs& a);
+	static juce::var addOptionFromScript(const juce::var::NativeFunctionArgs &a);
+	static juce::var removeOptionsFromScript(const juce::var::NativeFunctionArgs &a);
+	static juce::var setValueWithDataFromScript(const juce::var::NativeFunctionArgs& a);
+	static juce::var getAllOptionsFromScript(const juce::var::NativeFunctionArgs& a);
+	static juce::var getOptionAtFromScript(const juce::var::NativeFunctionArgs& a);
+	static juce::var getIndexFromScript(const juce::var::NativeFunctionArgs& a);
+	static juce::var setNextFromScript(const juce::var::NativeFunctionArgs& a);
+	static juce::var setPreviousFromScript(const juce::var::NativeFunctionArgs& a);
 
 
-	EnumParameterUI* createUI(Array<EnumParameter*> parameters = {});
-	EnumParameterButtonBarUI* createButtonBarUI(Array<EnumParameter*> parameters = {});
-	ControllableUI * createDefaultUI(Array<Controllable*> controllables = {}) override;
+	EnumParameterUI* createUI(juce::Array<EnumParameter*> parameters = {});
+	EnumParameterButtonBarUI* createButtonBarUI(juce::Array<EnumParameter*> parameters = {});
+	ControllableUI * createDefaultUI(juce::Array<Controllable*> controllables = {}) override;
 
 	virtual DashboardItem* createDashboardItem() override;
 
@@ -95,20 +95,20 @@ public:
 	public:
 		/** Destructor. */
 		virtual ~Listener() {}
-		virtual void enumOptionAdded(EnumParameter*, const String&) = 0;
-		virtual void enumOptionUpdated(EnumParameter *, int index, const String & prevKey, const String &newKey) = 0;
-		virtual void enumOptionRemoved(EnumParameter *, const String &) = 0;
+		virtual void enumOptionAdded(EnumParameter*, const juce::String&) = 0;
+		virtual void enumOptionUpdated(EnumParameter *, int index, const juce::String & prevKey, const juce::String &newKey) = 0;
+		virtual void enumOptionRemoved(EnumParameter *, const juce::String &) = 0;
 	};
 
-	ListenerList<Listener> enumListeners;
+	juce::ListenerList<Listener> enumListeners;
 	void addEnumParameterListener(Listener* newListener) { enumListeners.add(newListener); }
 	void removeEnumParameterListener(Listener* listener) { enumListeners.remove(listener); }
 
 	DECLARE_ASYNC_EVENT(EnumParameter, EnumParameter, enumParameter, ENUM_LIST(ENUM_OPTION_ADDED, ENUM_OPTION_UPDATED, ENUM_OPTION_REMOVED))
 
 	static EnumParameter * create() { return new EnumParameter("new Enum Parameter",""); }
-	virtual String getTypeString() const override { return getTypeStringStatic(); }
-	static String getTypeStringStatic() { return "Enum"; }
+	virtual juce::String getTypeString() const override { return getTypeStringStatic(); }
+	static juce::String getTypeStringStatic() { return "Enum"; }
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(EnumParameter)

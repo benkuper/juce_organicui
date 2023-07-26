@@ -21,22 +21,22 @@ public:
 	bool showWarningInUI;
 	Inspectable* warningResolveInspectable;
 
-	static String warningNoId;
-	static String warningAllId;
+	static juce::String warningNoId;
+	static juce::String warningAllId;
 
-	HashMap<String, String> warningMessage;
+	juce::HashMap<juce::String, juce::String> warningMessage;
 
-	void setWarningMessage(const String& message = String(), const String& id = warningNoId, bool log = true);
-	void clearWarning(const String& id = warningNoId);
+	void setWarningMessage(const juce::String& message = juce::String(), const juce::String& id = warningNoId, bool log = true);
+	void clearWarning(const juce::String& id = warningNoId);
 
 	void notifyWarningChanged();
 
 	virtual void resolveWarning();
-	virtual String getWarningMessage(const String& id = warningAllId) const;
-	virtual String getWarningTargetName() const;
+	virtual juce::String getWarningMessage(const juce::String& id = warningAllId) const;
+	virtual juce::String getWarningTargetName() const;
 
 
-	WeakReference<WarningTarget>::Master masterReference;
+	juce::WeakReference<WarningTarget>::Master masterReference;
 
 	// ASYNC
 	class  WarningTargetEvent
@@ -48,7 +48,7 @@ public:
 			type(t), target(target) {}
 
 		Type type;
-		WeakReference<WarningTarget> target;
+		juce::WeakReference<WarningTarget> target;
 	};
 
 	QueuedNotifier<WarningTargetEvent> warningTargetNotifier;

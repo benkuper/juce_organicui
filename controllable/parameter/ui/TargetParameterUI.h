@@ -13,25 +13,25 @@
 class TargetStepButton
 {
 public:
-	TargetStepButton(const String& name, WeakReference<ControllableContainer> reference);
-	TextButton bt;
-	WeakReference<ControllableContainer> reference;
+	TargetStepButton(const juce::String& name, juce::WeakReference<ControllableContainer> reference);
+	juce::TextButton bt;
+	juce::WeakReference<ControllableContainer> reference;
 };
 
 class TargetParameterUI :
 	public ParameterUI,
-	public Button::Listener,
+	public juce::Button::Listener,
 	public ContainerAsyncListener
 {
 public:
-	TargetParameterUI(Array<TargetParameter*> parameters, const String& noTargetText = "[Click to select an element]");
+	TargetParameterUI(juce::Array<TargetParameter*> parameters, const juce::String& noTargetText = "[Click to select an element]");
 	virtual ~TargetParameterUI();
 
-	String noTargetText;
-	Label label;
-	std::unique_ptr<ImageButton> targetBT;
+	juce::String noTargetText;
+	juce::Label label;
+	std::unique_ptr<juce::ImageButton> targetBT;
 
-	Array<TargetParameter*> targetParameters;
+	juce::Array<TargetParameter*> targetParameters;
 	TargetParameter* targetParameter;
 
 	std::unique_ptr<BoolParameter> listeningToNextChange;
@@ -49,21 +49,21 @@ public:
 	bool customShowLearnButton;
 
 	
-	OwnedArray<TargetStepButton> stepsUI;
+	juce::OwnedArray<TargetStepButton> stepsUI;
 
-	void paint(Graphics& g) override;
+	void paint(juce::Graphics& g) override;
 	void resized() override;
 
 	virtual void updateLabel();
 	virtual void updateUIParamsInternal() override;
 
 	virtual void showPopupAndGetTarget(ControllableContainer* startFromCC = nullptr);//can be overriden to get specific PopupMenu
-	void mouseDownInternal(const MouseEvent& e) override;
+	void mouseDownInternal(const juce::MouseEvent& e) override;
 
-	virtual void buttonClicked(Button* b) override;
+	virtual void buttonClicked(juce::Button* b) override;
 
 protected:
-	void valueChanged(const var& v) override;
+	void valueChanged(const juce::var& v) override;
 	void newMessage(const Parameter::ParameterEvent& e) override;
 	void newMessage(const ContainerAsyncEvent& e) override;
 

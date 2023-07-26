@@ -27,29 +27,29 @@ public:
 	void setIsBeingEdited(bool value);
 
 	void itemAdded(DashboardItem*) override;
-	void itemsAdded(Array<DashboardItem*>) override;
+	void itemsAdded(juce::Array<DashboardItem*>) override;
 	void itemRemoved(DashboardItem*) override;
-	void itemsRemoved(Array<DashboardItem*>) override;
-	void parameterFeedback(var data) override; //from DashboardItemListener
-	void dashboardFeedback(var data) override; //from DashboardItemListener
+	void itemsRemoved(juce::Array<DashboardItem*>) override;
+	void parameterFeedback(juce::var data) override; //from DashboardItemListener
+	void dashboardFeedback(juce::var data) override; //from DashboardItemListener
 
 
-	var getJSONData() override;
-	void loadJSONDataInternal(var data) override;
+	juce::var getJSONData() override;
+	void loadJSONDataInternal(juce::var data) override;
 
-	var getServerData();
+	juce::var getServerData();
 
 	class  DashboardListener
 	{
 	public:
 		/** Destructor. */
 		virtual ~DashboardListener() {}
-		virtual void parameterFeedback(var data) = 0;
-		virtual void dashboardFeedback(var data) = 0;
+		virtual void parameterFeedback(juce::var data) = 0;
+		virtual void dashboardFeedback(juce::var data) = 0;
 		virtual void askForRefresh(Dashboard * d) = 0;
 	};
 
-	ListenerList<DashboardListener> dashboardListeners;
+	juce::ListenerList<DashboardListener> dashboardListeners;
 	void addDashboardListener(DashboardListener* newListener) { dashboardListeners.add(newListener); }
 	void removeDashboardListener(DashboardListener* listener) { dashboardListeners.remove(listener); }
 

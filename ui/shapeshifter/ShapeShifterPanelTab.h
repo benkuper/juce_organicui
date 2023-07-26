@@ -12,28 +12,28 @@
 
 #include "ShapeShifterContent.h"//keep
 class ShapeShifterPanelTab :
-	public Component,
-	public Button::Listener
+	public juce::Component,
+	public juce::Button::Listener
 {
 public:
 	ShapeShifterPanelTab(ShapeShifterContent * _content);
 	~ShapeShifterPanelTab();
 
 	ShapeShifterContent * content;
-	Label panelLabel;
-	std::unique_ptr<ImageButton> closePanelBT;
+	juce::Label panelLabel;
+	std::unique_ptr<juce::ImageButton> closePanelBT;
 
 	bool selected;
 	void setSelected(bool value);
 
-	void paint(Graphics &g) override;
+	void paint(juce::Graphics &g) override;
 	void resized()override;
 
 	int getLabelWidth();
 
-	void buttonClicked(Button * b) override;
+	void buttonClicked(juce::Button * b) override;
 
-	void mouseDoubleClick(const MouseEvent& e) override;
+	void mouseDoubleClick(const juce::MouseEvent& e) override;
 
 
 	//Listener
@@ -44,7 +44,7 @@ public:
 		virtual void askForRemoveTab(ShapeShifterPanelTab *) {};
 	};
 
-	ListenerList<TabListener> tabListeners;
+	juce::ListenerList<TabListener> tabListeners;
 	void addShapeShifterTabListener(TabListener* newListener) { tabListeners.add(newListener); }
 	void removeShapeShifterTabListener(TabListener* listener) { tabListeners.remove(listener); }
 

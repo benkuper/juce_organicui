@@ -17,121 +17,121 @@ namespace LookAndFeelHelpers {
 
 
     // initialise the standard set of colours..
-    static const uint32 textButtonColour = NORMAL_COLOR.getARGB();
-    static const uint32 textHighlightColour = TEXT_COLOR.getARGB();
-    static const uint32 standardOutlineColour = 0xb2808080;
+    static const juce::uint32 textButtonColour = NORMAL_COLOR.getARGB();
+    static const juce::uint32 textHighlightColour = TEXT_COLOR.getARGB();
+    static const juce::uint32 standardOutlineColour = 0xb2808080;
 
-	static const uint32 standardColours[] =
+	static const juce::uint32 standardColours[] =
 	{
-		TextButton::buttonColourId,                 textButtonColour,
-		TextButton::buttonOnColourId,               HIGHLIGHT_COLOR.darker().getARGB(),
-		TextButton::textColourOnId,                 textHighlightColour,
-		TextButton::textColourOffId,                TEXT_COLOR.getARGB(),
+        juce::TextButton::buttonColourId,                 textButtonColour,
+        juce::TextButton::buttonOnColourId,               HIGHLIGHT_COLOR.darker().getARGB(),
+        juce::TextButton::textColourOnId,                 textHighlightColour,
+        juce::TextButton::textColourOffId,                TEXT_COLOR.getARGB(),
 
-		ToggleButton::textColourId,                 TEXT_COLOR.getARGB(),
+        juce::ToggleButton::textColourId,                 TEXT_COLOR.getARGB(),
 
-		TextEditor::backgroundColourId,             0xffffffff,
-		TextEditor::textColourId,                   0xff000000,
-		TextEditor::highlightColourId,              textHighlightColour,
-		TextEditor::highlightedTextColourId,        0xff000000,
-		TextEditor::outlineColourId,                0x00000000,
-		TextEditor::focusedOutlineColourId,         textButtonColour,
-		TextEditor::shadowColourId,                 0x38000000,
+        juce::TextEditor::backgroundColourId,             0xffffffff,
+        juce::TextEditor::textColourId,                   0xff000000,
+        juce::TextEditor::highlightColourId,              textHighlightColour,
+        juce::TextEditor::highlightedTextColourId,        0xff000000,
+        juce::TextEditor::outlineColourId,                0x00000000,
+        juce::TextEditor::focusedOutlineColourId,         textButtonColour,
+        juce::TextEditor::shadowColourId,                 0x38000000,
 
-		CaretComponent::caretColourId,              0xff000000,
+        juce::CaretComponent::caretColourId,              0xff000000,
 
-		Label::backgroundColourId,                  0x00000000,
-		Label::textColourId,                        TEXT_COLOR.getARGB(),
-		Label::outlineColourId,                     0x00000000,
+        juce::Label::backgroundColourId,                  0x00000000,
+        juce::Label::textColourId,                        TEXT_COLOR.getARGB(),
+        juce::Label::outlineColourId,                     0x00000000,
 
-		ScrollBar::backgroundColourId,              BG_COLOR.brighter(.2f).getARGB(),
-		ScrollBar::thumbColourId,                   BG_COLOR.brighter(.6f).getARGB(),
-		ScrollBar::trackColourId,                   Colours::red.getARGB(),
+        juce::ScrollBar::backgroundColourId,              BG_COLOR.brighter(.2f).getARGB(),
+        juce::ScrollBar::thumbColourId,                   BG_COLOR.brighter(.6f).getARGB(),
+        juce::ScrollBar::trackColourId,                   juce::Colours::red.getARGB(),
 
-		TreeView::linesColourId,                    0x4c000000,
-		TreeView::backgroundColourId,               0x00000000,
-		TreeView::dragAndDropIndicatorColourId,     0x80ff0000,
-		TreeView::selectedItemBackgroundColourId,   0x00000000,
-		TreeView::oddItemsColourId,					0,
-		TreeView::evenItemsColourId,				0,
+        juce::TreeView::linesColourId,                    0x4c000000,
+        juce::TreeView::backgroundColourId,               0x00000000,
+        juce::TreeView::dragAndDropIndicatorColourId,     0x80ff0000,
+        juce::TreeView::selectedItemBackgroundColourId,   0x00000000,
+        juce::TreeView::oddItemsColourId,					0,
+        juce::TreeView::evenItemsColourId,				0,
 
-		PopupMenu::backgroundColourId,              BG_COLOR.getARGB(),
-		PopupMenu::textColourId,                    TEXT_COLOR.getARGB(),
-		PopupMenu::headerTextColourId,              TEXT_COLOR.darker().getARGB(),
-		PopupMenu::highlightedTextColourId,         BG_COLOR.getARGB(),
-		PopupMenu::highlightedBackgroundColourId,   HIGHLIGHT_COLOR.getARGB(),
+        juce::PopupMenu::backgroundColourId,              BG_COLOR.getARGB(),
+        juce::PopupMenu::textColourId,                    TEXT_COLOR.getARGB(),
+        juce::PopupMenu::headerTextColourId,              TEXT_COLOR.darker().getARGB(),
+        juce::PopupMenu::highlightedTextColourId,         BG_COLOR.getARGB(),
+        juce::PopupMenu::highlightedBackgroundColourId,   HIGHLIGHT_COLOR.getARGB(),
 
-		ComboBox::buttonColourId,                   0xffCCCCCC,
-		ComboBox::outlineColourId,                  standardOutlineColour,
-		ComboBox::textColourId,                     0xff666666,
-		ComboBox::backgroundColourId,               0xffCCCCCC,
-		ComboBox::arrowColourId,                    0x99000000,
+        juce::ComboBox::buttonColourId,                   0xffCCCCCC,
+        juce::ComboBox::outlineColourId,                  standardOutlineColour,
+        juce::ComboBox::textColourId,                     0xff666666,
+        juce::ComboBox::backgroundColourId,               0xffCCCCCC,
+        juce::ComboBox::arrowColourId,                    0x99000000,
 
-		PropertyComponent::backgroundColourId,      0x66ffffff,
-		PropertyComponent::labelTextColourId,       0xff000000,
+        juce::PropertyComponent::backgroundColourId,      0x66ffffff,
+        juce::PropertyComponent::labelTextColourId,       0xff000000,
 
-		TextPropertyComponent::backgroundColourId,  0xffffffff,
-		TextPropertyComponent::textColourId,        0xff000000,
-		TextPropertyComponent::outlineColourId,     standardOutlineColour,
+        juce::TextPropertyComponent::backgroundColourId,  0xffffffff,
+        juce::TextPropertyComponent::textColourId,        0xff000000,
+        juce::TextPropertyComponent::outlineColourId,     standardOutlineColour,
 
-		BooleanPropertyComponent::backgroundColourId, 0xffffffff,
-		BooleanPropertyComponent::outlineColourId,  standardOutlineColour,
+        juce::BooleanPropertyComponent::backgroundColourId, 0xffffffff,
+        juce::BooleanPropertyComponent::outlineColourId,  standardOutlineColour,
 
-		ListBox::backgroundColourId,                0xffffffff,
-		ListBox::outlineColourId,                   standardOutlineColour,
-		ListBox::textColourId,                      0xff000000,
+        juce::ListBox::backgroundColourId,                0xffffffff,
+        juce::ListBox::outlineColourId,                   standardOutlineColour,
+        juce::ListBox::textColourId,                      0xff000000,
 
-		Slider::backgroundColourId,                 0x00000000,
-		Slider::thumbColourId,                      textButtonColour,
-		Slider::trackColourId,                      0x7fffffff,
-		Slider::rotarySliderFillColourId,           0x7f0000ff,
-		Slider::rotarySliderOutlineColourId,        0x66000000,
-		Slider::textBoxTextColourId,                TEXT_COLOR.getARGB(),
-		Slider::textBoxBackgroundColourId,          BG_COLOR.darker(.1f).getARGB(),
-		Slider::textBoxHighlightColourId,           textHighlightColour,
-		Slider::textBoxOutlineColourId,             BG_COLOR.brighter(.1f).getARGB() ,
+		juce::Slider::backgroundColourId,                 0x00000000,
+		juce::Slider::thumbColourId,                      textButtonColour,
+		juce::Slider::trackColourId,                      0x7fffffff,
+		juce::Slider::rotarySliderFillColourId,           0x7f0000ff,
+		juce::Slider::rotarySliderOutlineColourId,        0x66000000,
+		juce::Slider::textBoxTextColourId,                TEXT_COLOR.getARGB(),
+		juce::Slider::textBoxBackgroundColourId,          BG_COLOR.darker(.1f).getARGB(),
+		juce::Slider::textBoxHighlightColourId,           textHighlightColour,
+		juce::Slider::textBoxOutlineColourId,             BG_COLOR.brighter(.1f).getARGB() ,
 
-        ResizableWindow::backgroundColourId,        BG_COLOR.brighter(.1f).getARGB(),
+        juce::ResizableWindow::backgroundColourId,        BG_COLOR.brighter(.1f).getARGB(),
         //DocumentWindow::textColourId,               0xff000000, // (this is deliberately not set)
 
-        AlertWindow::backgroundColourId,            BG_COLOR.getARGB(),
-        AlertWindow::textColourId,                  TEXT_COLOR.getARGB(),
-        AlertWindow::outlineColourId,               BG_COLOR.brighter(.2f).getARGB(),
+        juce::AlertWindow::backgroundColourId,            BG_COLOR.getARGB(),
+        juce::AlertWindow::textColourId,                  TEXT_COLOR.getARGB(),
+        juce::AlertWindow::outlineColourId,               BG_COLOR.brighter(.2f).getARGB(),
 
-        ProgressBar::backgroundColourId,            0xffeeeeee,
-        ProgressBar::foregroundColourId,            0xffaaaaee,
+        juce::ProgressBar::backgroundColourId,            0xffeeeeee,
+        juce::ProgressBar::foregroundColourId,            0xffaaaaee,
 
-        TooltipWindow::backgroundColourId,          0xffeeeebb,
-        TooltipWindow::textColourId,                0xff000000,
-        TooltipWindow::outlineColourId,             0x4c000000,
+        juce::TooltipWindow::backgroundColourId,          0xffeeeebb,
+        juce::TooltipWindow::textColourId,                0xff000000,
+        juce::TooltipWindow::outlineColourId,             0x4c000000,
 
-        TabbedComponent::backgroundColourId,        0x00000000,
-        TabbedComponent::outlineColourId,           0xff777777,
-        TabbedButtonBar::tabOutlineColourId,        0x80000000,
-        TabbedButtonBar::frontOutlineColourId,      0x90000000,
+        juce::TabbedComponent::backgroundColourId,        0x00000000,
+        juce::TabbedComponent::outlineColourId,           0xff777777,
+        juce::TabbedButtonBar::tabOutlineColourId,        0x80000000,
+        juce::TabbedButtonBar::frontOutlineColourId,      0x90000000,
 
-        Toolbar::backgroundColourId,                0xfff6f8f9,
-        Toolbar::separatorColourId,                 0x4c000000,
-        Toolbar::buttonMouseOverBackgroundColourId, 0x4c0000ff,
-        Toolbar::buttonMouseDownBackgroundColourId, 0x800000ff,
-        Toolbar::labelTextColourId,                 0xff000000,
-        Toolbar::editingModeOutlineColourId,        0xffff0000,
+        juce::Toolbar::backgroundColourId,                0xfff6f8f9,
+        juce::Toolbar::separatorColourId,                 0x4c000000,
+        juce::Toolbar::buttonMouseOverBackgroundColourId, 0x4c0000ff,
+        juce::Toolbar::buttonMouseDownBackgroundColourId, 0x800000ff,
+        juce::Toolbar::labelTextColourId,                 0xff000000,
+        juce::Toolbar::editingModeOutlineColourId,        0xffff0000,
 
-        DrawableButton::textColourId,               0xff000000,
-        DrawableButton::textColourOnId,             0xff000000,
-        DrawableButton::backgroundColourId,         0x00000000,
-        DrawableButton::backgroundOnColourId,       0xaabbbbff,
+        juce::DrawableButton::textColourId,               0xff000000,
+        juce::DrawableButton::textColourOnId,             0xff000000,
+        juce::DrawableButton::backgroundColourId,         0x00000000,
+        juce::DrawableButton::backgroundOnColourId,       0xaabbbbff,
 
-        HyperlinkButton::textColourId,              0xcc1111ee,
+        juce::HyperlinkButton::textColourId,              0xcc1111ee,
 
-        GroupComponent::outlineColourId,            0x66000000,
-        GroupComponent::textColourId,               0xff000000,
+        juce::GroupComponent::outlineColourId,            0x66000000,
+        juce::GroupComponent::textColourId,               0xff000000,
 
-        BubbleComponent::backgroundColourId,        0xeeeeeebb,
-        BubbleComponent::outlineColourId,           0x77000000,
+        juce::BubbleComponent::backgroundColourId,        0xeeeeeebb,
+        juce::BubbleComponent::outlineColourId,           0x77000000,
 
-        DirectoryContentsDisplayComponent::highlightColourId,   textHighlightColour,
-        DirectoryContentsDisplayComponent::textColourId,        0xff000000,
+        juce::DirectoryContentsDisplayComponent::highlightColourId,   textHighlightColour,
+        juce::DirectoryContentsDisplayComponent::textColourId,        0xff000000,
 
         0x1000440, /*LassoComponent::lassoFillColourId*/        0x66dddddd,
         0x1000441, /*LassoComponent::lassoOutlineColourId*/     0x99111111,
@@ -158,9 +158,9 @@ namespace LookAndFeelHelpers {
         0x100ad00, /*KeyMappingEditorComponent::backgroundColourId*/          0x00000000,
         0x100ad01, /*KeyMappingEditorComponent::textColourId*/                0xff000000,
 
-        FileSearchPathListComponent::backgroundColourId,        0xffffffff,
+        juce::FileSearchPathListComponent::backgroundColourId,        0xffffffff,
 
-        FileChooserDialogBox::titleTextColourId,                0xff000000,
+        juce::FileChooserDialogBox::titleTextColourId,                0xff000000,
     };
 
 
@@ -180,16 +180,16 @@ namespace LookAndFeelHelpers {
         return baseColour;
     }
 
-    static inline TextLayout layoutTooltipText(const String& text, juce::Colour colour) noexcept
+    static inline juce::TextLayout layoutTooltipText(const juce::String& text, juce::Colour colour) noexcept
     {
         const float tooltipFontSize = 13.0f;
         const int maxToolTipWidth = 400;
 
-        AttributedString s;
-        s.setJustification(Justification::centred);
-        s.append(text, Font(tooltipFontSize, Font::bold), colour);
+        juce::AttributedString s;
+        s.setJustification(juce::Justification::centred);
+        s.append(text, juce::Font(tooltipFontSize, juce::Font::bold), colour);
 
-        TextLayout tl;
+        juce::TextLayout tl;
         tl.createLayoutWithBalancedLineLengths(s, (float)maxToolTipWidth);
         return tl;
     }
@@ -199,49 +199,49 @@ namespace LookAndFeelHelpers {
 
 
 class LookAndFeelOO:
-	public LookAndFeel_V4
+	public juce::LookAndFeel_V4
 {
 public:
 //  juce_DeclareSingleton(LookAndFeelOO, true);
     LookAndFeelOO();
     ~LookAndFeelOO();
     //==============================================================================
-    void drawButtonBackground (Graphics&, juce::Button&, const Colour& backgroundColour,
+    void drawButtonBackground (juce::Graphics&, juce::Button&, const juce::Colour& backgroundColour,
                                bool isMouseOverButton, bool isButtonDown) override;
-    Font getTextButtonFont (TextButton&, int buttonHeight) override;
+    juce::Font getTextButtonFont (juce::TextButton&, int buttonHeight) override;
 
-    void drawButtonText (Graphics&, TextButton&, bool isMouseOverButton, bool isButtonDown) override;
-    int getTextButtonWidthToFitText (TextButton&, int buttonHeight) override;
+    void drawButtonText (juce::Graphics&, juce::TextButton&, bool isMouseOverButton, bool isButtonDown) override;
+    int getTextButtonWidthToFitText (juce::TextButton&, int buttonHeight) override;
 
-    void drawToggleButton (Graphics&, ToggleButton&, bool isMouseOverButton, bool isButtonDown) override;
+    void drawToggleButton (juce::Graphics&, juce::ToggleButton&, bool isMouseOverButton, bool isButtonDown) override;
 
-    void changeToggleButtonWidthToFitText (ToggleButton&) override;
+    void changeToggleButtonWidthToFitText (juce::ToggleButton&) override;
 
-    void drawTickBox (Graphics&, juce::Component&,
+    void drawTickBox (juce::Graphics&, juce::Component&,
                       float x, float y, float w, float h,
                       bool ticked, bool isEnabled, bool isMouseOverButton, bool isButtonDown) override;
 
-    void drawDrawableButton (Graphics&, DrawableButton&, bool isMouseOverButton, bool isButtonDown) override;
+    void drawDrawableButton (juce::Graphics&, juce::DrawableButton&, bool isMouseOverButton, bool isButtonDown) override;
 
     //==============================================================================
-    AlertWindow* createAlertWindow (const String& title, const String& message,
-                                    const String& button1,
-                                    const String& button2,
-                                    const String& button3,
-                                    AlertWindow::AlertIconType iconType,
+    juce::AlertWindow* createAlertWindow (const juce::String& title, const juce::String& message,
+                                    const juce::String& button1,
+                                    const juce::String& button2,
+                                    const juce::String& button3,
+                                    juce::AlertWindow::AlertIconType iconType,
                                     int numButtons, juce::Component* associatedComponent) override;
 
-    void drawAlertBox (Graphics&, AlertWindow&, const juce::Rectangle<int>& textArea, TextLayout&) override;
+    void drawAlertBox (juce::Graphics&, juce::AlertWindow&, const juce::Rectangle<int>& textArea, juce::TextLayout&) override;
     int getAlertBoxWindowFlags() override;
 
 
-	Array<int> getWidthsForTextButtons(AlertWindow &, const Array<TextButton *> & buttons) override
+    juce::Array<int> getWidthsForTextButtons(juce::AlertWindow &, const juce::Array<juce::TextButton *> & buttons) override
 	{
-		Array<int> w;
+        juce::Array<int> w;
 		
 		for (int i = 0; i<buttons.size(); ++i)
 		{
-			w.add(jmax<int>(buttons.getUnchecked(i)->getWidth(),60));
+			w.add(juce::jmax<int>(buttons.getUnchecked(i)->getWidth(),60));
 		}
 
 		return w;
@@ -255,168 +255,168 @@ public:
 
      @see getAlertWindowMessageFont.
      */
-    Font getAlertWindowTitleFont() override;
+    juce::Font getAlertWindowTitleFont() override;
 
     /** Override this function to supply a custom font for the alert window message.
      This default implementation will use the default font with height set to 15.0f.
 
      @see getAlertWindowTitleFont
      */
-    Font getAlertWindowMessageFont() override;
+    juce::Font getAlertWindowMessageFont() override;
 
-    Font getAlertWindowFont() override;
+    juce::Font getAlertWindowFont() override;
 
     //==============================================================================
-    void drawProgressBar (Graphics&, ProgressBar&, int width, int height, double progress, const String& textToShow) override;
-    void drawSpinningWaitAnimation (Graphics&, const Colour& colour, int x, int y, int w, int h) override;
+    void drawProgressBar (juce::Graphics&, juce::ProgressBar&, int width, int height, double progress, const juce::String& textToShow) override;
+    void drawSpinningWaitAnimation (juce::Graphics&, const juce::Colour& colour, int x, int y, int w, int h) override;
 
     //==============================================================================
     bool areScrollbarButtonsVisible() override;
-    void drawScrollbarButton (Graphics&, ScrollBar&, int width, int height, int buttonDirection,
+    void drawScrollbarButton (juce::Graphics&, juce::ScrollBar&, int width, int height, int buttonDirection,
                               bool isScrollbarVertical, bool isMouseOverButton, bool isButtonDown) override;
 
-    void drawScrollbar (Graphics&, ScrollBar&, int x, int y, int width, int height,
+    void drawScrollbar (juce::Graphics&, juce::ScrollBar&, int x, int y, int width, int height,
                         bool isScrollbarVertical, int thumbStartPosition, int thumbSize,
                         bool isMouseOver, bool isMouseDown) override;
 
-    ImageEffectFilter* getScrollbarEffect() override;
-    int getMinimumScrollbarThumbSize (ScrollBar&) override;
+    juce::ImageEffectFilter* getScrollbarEffect() override;
+    int getMinimumScrollbarThumbSize (juce::ScrollBar&) override;
     int getDefaultScrollbarWidth() override;
-    int getScrollbarButtonSize (ScrollBar&) override;
+    int getScrollbarButtonSize (juce::ScrollBar&) override;
 
     //==============================================================================
-    Path getTickShape (float height) override;
-    Path getCrossShape (float height) override;
+    juce::Path getTickShape (float height) override;
+    juce::Path getCrossShape (float height) override;
 
     //==============================================================================
-    void drawTreeviewPlusMinusBox (Graphics&, const juce::Rectangle<float>& area,
-                                   Colour backgroundColour, bool isOpen, bool isMouseOver) override;
-    bool areLinesDrawnForTreeView (TreeView&) override;
-    int getTreeViewIndentSize (TreeView&) override;
+    void drawTreeviewPlusMinusBox (juce::Graphics&, const juce::Rectangle<float>& area,
+                                   juce::Colour backgroundColour, bool isOpen, bool isMouseOver) override;
+    bool areLinesDrawnForTreeView (juce::TreeView&) override;
+    int getTreeViewIndentSize (juce::TreeView&) override;
 
     //==============================================================================
-    void fillTextEditorBackground (Graphics&, int width, int height, TextEditor&) override;
-    void drawTextEditorOutline (Graphics&, int width, int height, TextEditor&) override;
-    CaretComponent* createCaretComponent (juce::Component* keyFocusOwner) override;
+    void fillTextEditorBackground (juce::Graphics&, int width, int height, juce::TextEditor&) override;
+    void drawTextEditorOutline (juce::Graphics&, int width, int height, juce::TextEditor&) override;
+    juce::CaretComponent* createCaretComponent (juce::Component* keyFocusOwner) override;
 
 
-    AttributedString createFileChooserHeaderText (const String& title, const String& instructions) override;
+    juce::AttributedString createFileChooserHeaderText (const juce::String& title, const juce::String& instructions) override;
 
 	// Inherited via LookAndFeel
-	virtual void drawFileBrowserRow(Graphics &, int width, int height, const File & file, const String & filename, Image * optionalIcon, const String & fileSizeDescription, const String & fileTimeDescription, bool isDirectory, bool isItemSelected, int itemIndex, DirectoryContentsDisplayComponent &) override;
+	virtual void drawFileBrowserRow(juce::Graphics &, int width, int height, const juce::File & file, const juce::String & filename, juce::Image * optionalIcon, const juce::String & fileSizeDescription, const juce::String & fileTimeDescription, bool isDirectory, bool isItemSelected, int itemIndex, juce::DirectoryContentsDisplayComponent &) override;
 
     juce::Button* createFileBrowserGoUpButton() override;
 
-    void layoutFileBrowserComponent (FileBrowserComponent&,
-                                     DirectoryContentsDisplayComponent*,
-                                     FilePreviewComponent*,
-                                     ComboBox* currentPathBox,
-                                     TextEditor* filenameBox,
+    void layoutFileBrowserComponent (juce::FileBrowserComponent&,
+                                     juce::DirectoryContentsDisplayComponent*,
+                                     juce::FilePreviewComponent*,
+                                     juce::ComboBox* currentPathBox,
+                                     juce::TextEditor* filenameBox,
                                      juce::Button* goUpButton) override;
 
     //==============================================================================
-    void drawBubble (Graphics&, BubbleComponent&, const Point<float>& tip, const juce::Rectangle<float>& body) override;
+    void drawBubble (juce::Graphics&, juce::BubbleComponent&, const juce::Point<float>& tip, const juce::Rectangle<float>& body) override;
 
-    void drawLasso (Graphics&, juce::Component&) override;
+    void drawLasso (juce::Graphics&, juce::Component&) override;
 
     //==============================================================================
 
     void preparePopupMenuWindow (juce::Component& newWindow) override ;
-    void drawPopupMenuBackground (Graphics&, int width, int height) override;
+    void drawPopupMenuBackground (juce::Graphics&, int width, int height) override;
 
-    void drawPopupMenuItem (Graphics&, const juce::Rectangle<int>& area,
+    void drawPopupMenuItem (juce::Graphics&, const juce::Rectangle<int>& area,
                             bool isSeparator, bool isActive, bool isHighlighted, bool isTicked, bool hasSubMenu,
-                            const String& text, const String& shortcutKeyText,
-                            const Drawable* icon, const Colour* textColour) override;
+                            const juce::String& text, const juce::String& shortcutKeyText,
+                            const juce::Drawable* icon, const juce::Colour* textColour) override;
 
-    void drawPopupMenuSectionHeader (Graphics&, const juce::Rectangle<int>& area,
-                                     const String& sectionName) override;
+    void drawPopupMenuSectionHeader (juce::Graphics&, const juce::Rectangle<int>& area,
+                                     const juce::String& sectionName) override;
 
-    Font getPopupMenuFont() override;
+    juce::Font getPopupMenuFont() override;
 
-    void drawPopupMenuUpDownArrow (Graphics&, int width, int height, bool isScrollUpArrow) override;
+    void drawPopupMenuUpDownArrow (juce::Graphics&, int width, int height, bool isScrollUpArrow) override;
 
-    void getIdealPopupMenuItemSize (const String& text, bool isSeparator, int standardMenuItemHeight,
+    void getIdealPopupMenuItemSize (const juce::String& text, bool isSeparator, int standardMenuItemHeight,
                                     int& idealWidth, int& idealHeight) override;
     int getMenuWindowFlags() override;
 
-    void drawMenuBarBackground (Graphics&, int width, int height, bool isMouseOverBar, MenuBarComponent&) override;
-    int getMenuBarItemWidth (MenuBarComponent&, int itemIndex, const String& itemText) override;
-    Font getMenuBarFont (MenuBarComponent&, int itemIndex, const String& itemText) override;
+    void drawMenuBarBackground (juce::Graphics&, int width, int height, bool isMouseOverBar, juce::MenuBarComponent&) override;
+    int getMenuBarItemWidth (juce::MenuBarComponent&, int itemIndex, const juce::String& itemText) override;
+    juce::Font getMenuBarFont (juce::MenuBarComponent&, int itemIndex, const juce::String& itemText) override;
     int getDefaultMenuBarHeight() override;
 
-    void drawMenuBarItem (Graphics&, int width, int height,
-                          int itemIndex, const String& itemText,
+    void drawMenuBarItem (juce::Graphics&, int width, int height,
+                          int itemIndex, const juce::String& itemText,
                           bool isMouseOverItem, bool isMenuOpen, bool isMouseOverBar,
-                          MenuBarComponent&) override;
+                          juce::MenuBarComponent&) override;
 
-    juce::Component* getParentComponentForMenuOptions (const PopupMenu::Options& options) override;
+    juce::Component* getParentComponentForMenuOptions (const juce::PopupMenu::Options& options) override;
     //==============================================================================
-    void drawComboBox (Graphics&, int width, int height, bool isButtonDown,
+    void drawComboBox (juce::Graphics&, int width, int height, bool isButtonDown,
                        int buttonX, int buttonY, int buttonW, int buttonH,
-                       ComboBox&) override;
-    Font getComboBoxFont (ComboBox&) override;
-    Label* createComboBoxTextBox (ComboBox&) override;
-    void positionComboBoxText (ComboBox&, Label&) override;
+                       juce::ComboBox&) override;
+    juce::Font getComboBoxFont (juce::ComboBox&) override;
+    juce::Label* createComboBoxTextBox (juce::ComboBox&) override;
+    void positionComboBoxText (juce::ComboBox&, juce::Label&) override;
 
     //==============================================================================
-    void drawLabel (Graphics&, Label&) override;
-    Font getLabelFont (Label&) override;
+    void drawLabel (juce::Graphics&, juce::Label&) override;
+    juce::Font getLabelFont (juce::Label&) override;
 
     //==============================================================================
-    void drawLinearSlider (Graphics&, int x, int y, int width, int height,
+    void drawLinearSlider (juce::Graphics&, int x, int y, int width, int height,
                            float sliderPos, float minSliderPos, float maxSliderPos,
-                           const Slider::SliderStyle, Slider&) override;
+                           const juce::Slider::SliderStyle, juce::Slider&) override;
 
-    void drawLinearSliderBackground (Graphics&, int x, int y, int width, int height,
+    void drawLinearSliderBackground (juce::Graphics&, int x, int y, int width, int height,
                                      float sliderPos, float minSliderPos, float maxSliderPos,
-                                     const Slider::SliderStyle, Slider&) override;
+                                     const juce::Slider::SliderStyle, juce::Slider&) override;
 
-    void drawLinearSliderThumb (Graphics&, int x, int y, int width, int height,
+    void drawLinearSliderThumb (juce::Graphics&, int x, int y, int width, int height,
                                 float sliderPos, float minSliderPos, float maxSliderPos,
-                                const Slider::SliderStyle, Slider&) override;
+                                const juce::Slider::SliderStyle, juce::Slider&) override;
 
-    void drawRotarySlider (Graphics&, int x, int y, int width, int height,
+    void drawRotarySlider (juce::Graphics&, int x, int y, int width, int height,
                            float sliderPosProportional, float rotaryStartAngle, float rotaryEndAngle,
-                           Slider&) override;
+                           juce::Slider&) override;
 
-    int getSliderThumbRadius (Slider&) override;
-    juce::Button* createSliderButton (Slider&, bool isIncrement) override;
-    Label* createSliderTextBox (Slider&) override;
-    ImageEffectFilter* getSliderEffect (Slider&) override;
-    Font getSliderPopupFont (Slider&) override;
-    int getSliderPopupPlacement (Slider&) override;
-    Slider::SliderLayout getSliderLayout (Slider&) override;
-
-    //==============================================================================
-    juce::Rectangle<int> getTooltipBounds (const String& tipText, Point<int> screenPos, juce::Rectangle<int> parentArea) override;
-    void drawTooltip (Graphics&, const String& text, int width, int height) override;
+    int getSliderThumbRadius (juce::Slider&) override;
+    juce::Button* createSliderButton(juce::Slider&, bool isIncrement) override;
+    juce::Label* createSliderTextBox(juce::Slider&) override;
+    juce::ImageEffectFilter* getSliderEffect(juce::Slider&) override;
+    juce::Font getSliderPopupFont(juce::Slider&) override;
+    int getSliderPopupPlacement(juce::Slider&) override;
+    juce::Slider::SliderLayout getSliderLayout(juce::Slider&) override;
 
     //==============================================================================
-    juce::Button* createFilenameComponentBrowseButton (const String& text) override;
-    void layoutFilenameComponent (FilenameComponent&, ComboBox* filenameBox, juce::Button* browseButton) override;
+    juce::Rectangle<int> getTooltipBounds (const juce::String& tipText, juce::Point<int> screenPos, juce::Rectangle<int> parentArea) override;
+    void drawTooltip (juce::Graphics&, const juce::String& text, int width, int height) override;
 
     //==============================================================================
-    void drawConcertinaPanelHeader (Graphics&, const juce::Rectangle<int>& area,
+    juce::Button* createFilenameComponentBrowseButton (const juce::String& text) override;
+    void layoutFilenameComponent (juce::FilenameComponent&, juce::ComboBox* filenameBox, juce::Button* browseButton) override;
+
+    //==============================================================================
+    void drawConcertinaPanelHeader (juce::Graphics&, const juce::Rectangle<int>& area,
                                     bool isMouseOver, bool isMouseDown,
-                                    ConcertinaPanel&, juce::Component& panel) override;
+                                    juce::ConcertinaPanel&, juce::Component& panel) override;
 
     //==============================================================================
-    void drawCornerResizer (Graphics&, int w, int h, bool isMouseOver, bool isMouseDragging) override;
-    void drawResizableFrame (Graphics&, int w, int h, const BorderSize<int>&) override;
+    void drawCornerResizer (juce::Graphics&, int w, int h, bool isMouseOver, bool isMouseDragging) override;
+    void drawResizableFrame (juce::Graphics&, int w, int h, const juce::BorderSize<int>&) override;
 
     //==============================================================================
-    void fillResizableWindowBackground (Graphics&, int w, int h, const BorderSize<int>&, ResizableWindow&) override;
-    void drawResizableWindowBorder (Graphics&, int w, int h, const BorderSize<int>& border, ResizableWindow&) override;
+    void fillResizableWindowBackground (juce::Graphics&, int w, int h, const juce::BorderSize<int>&, juce::ResizableWindow&) override;
+    void drawResizableWindowBorder(juce::Graphics&, int w, int h, const juce::BorderSize<int>& border, juce::ResizableWindow&) override;
 
     //==============================================================================
-    void drawDocumentWindowTitleBar (DocumentWindow&, Graphics&, int w, int h,
+    void drawDocumentWindowTitleBar (juce::DocumentWindow&, juce::Graphics&, int w, int h,
                                      int titleSpaceX, int titleSpaceW,
-                                     const Image* icon, bool drawTitleTextOnLeft) override;
+                                     const juce::Image* icon, bool drawTitleTextOnLeft) override;
 
     juce::Button* createDocumentWindowButton (int buttonType) override;
 
-    void positionDocumentWindowButtons (DocumentWindow&,
+    void positionDocumentWindowButtons (juce::DocumentWindow&,
                                         int titleBarX, int titleBarY, int titleBarW, int titleBarH,
                                         juce::Button* minimiseButton,
                                         juce::Button* maximiseButton,
@@ -426,66 +426,66 @@ public:
     //==============================================================================
 
     //==============================================================================
-    void drawStretchableLayoutResizerBar (Graphics&, int w, int h, bool isVerticalBar,
+    void drawStretchableLayoutResizerBar (juce::Graphics&, int w, int h, bool isVerticalBar,
                                           bool isMouseOver, bool isMouseDragging) override;
 
     //==============================================================================
-    void drawGroupComponentOutline (Graphics&, int w, int h, const String& text,
-                                    const Justification&, GroupComponent&) override;
+    void drawGroupComponentOutline (juce::Graphics&, int w, int h, const juce::String& text,
+                                    const juce::Justification&, juce::GroupComponent&) override;
 
     //==============================================================================
     int getTabButtonSpaceAroundImage() override;
     int getTabButtonOverlap (int tabDepth) override;
-    int getTabButtonBestWidth (TabBarButton&, int tabDepth) override;
-    juce::Rectangle<int> getTabButtonExtraComponentBounds (const TabBarButton&, juce::Rectangle<int>& textArea, juce::Component& extraComp) override;
+    int getTabButtonBestWidth (juce::TabBarButton&, int tabDepth) override;
+    juce::Rectangle<int> getTabButtonExtraComponentBounds (const juce::TabBarButton&, juce::Rectangle<int>& textArea, juce::Component& extraComp) override;
 
-    void drawTabButton (TabBarButton&, Graphics&, bool isMouseOver, bool isMouseDown) override;
-    void drawTabButtonText (TabBarButton&, Graphics&, bool isMouseOver, bool isMouseDown) override;
-    void drawTabbedButtonBarBackground (TabbedButtonBar&, Graphics&) override;
-    void drawTabAreaBehindFrontButton (TabbedButtonBar&, Graphics&, int w, int h) override;
+    void drawTabButton (juce::TabBarButton&, juce::Graphics&, bool isMouseOver, bool isMouseDown) override;
+    void drawTabButtonText (juce::TabBarButton&, juce::Graphics&, bool isMouseOver, bool isMouseDown) override;
+    void drawTabbedButtonBarBackground (juce::TabbedButtonBar&, juce::Graphics&) override;
+    void drawTabAreaBehindFrontButton (juce::TabbedButtonBar&, juce::Graphics&, int w, int h) override;
 
-    void createTabButtonShape (TabBarButton&, Path&,  bool isMouseOver, bool isMouseDown) override;
-    void fillTabButtonShape (TabBarButton&, Graphics&, const Path&, bool isMouseOver, bool isMouseDown) override;
+    void createTabButtonShape (juce::TabBarButton&, juce::Path&,  bool isMouseOver, bool isMouseDown) override;
+    void fillTabButtonShape (juce::TabBarButton&, juce::Graphics&, const juce::Path&, bool isMouseOver, bool isMouseDown) override;
 
     juce::Button* createTabBarExtrasButton() override;
 
     //==============================================================================
-    void drawImageButton (Graphics&, Image*,
+    void drawImageButton (juce::Graphics&, juce::Image*,
                           int imageX, int imageY, int imageW, int imageH,
-                          const Colour& overlayColour, float imageOpacity, ImageButton&) override;
+                          const juce::Colour& overlayColour, float imageOpacity, juce::ImageButton&) override;
 
     //==============================================================================
-    void drawTableHeaderBackground (Graphics&, TableHeaderComponent&) override;
+    void drawTableHeaderBackground (juce::Graphics&, juce::TableHeaderComponent&) override;
 
 
-	void drawTableHeaderColumn(Graphics &, TableHeaderComponent &, const String & columnName, int columnId, int width, int height, bool isMouseOver, bool isMouseDown, int columnFlags) override;
+	void drawTableHeaderColumn(juce::Graphics &, juce::TableHeaderComponent &, const juce::String & columnName, int columnId, int width, int height, bool isMouseOver, bool isMouseDown, int columnFlags) override;
 
     //==============================================================================
-    void paintToolbarBackground (Graphics&, int width, int height, Toolbar&) override;
+    void paintToolbarBackground (juce::Graphics&, int width, int height, juce::Toolbar&) override;
 
-    juce::Button* createToolbarMissingItemsButton (Toolbar&) override;
+    juce::Button* createToolbarMissingItemsButton (juce::Toolbar&) override;
 
-    void paintToolbarButtonBackground (Graphics&, int width, int height,
+    void paintToolbarButtonBackground (juce::Graphics&, int width, int height,
                                        bool isMouseOver, bool isMouseDown,
-                                       ToolbarItemComponent&) override;
+                                       juce::ToolbarItemComponent&) override;
 
-    void paintToolbarButtonLabel (Graphics&, int x, int y, int width, int height,
-                                  const String& text, ToolbarItemComponent&) override;
-
-    //==============================================================================
-    void drawPropertyPanelSectionHeader (Graphics&, const String& name, bool isOpen, int width, int height) override;
-    void drawPropertyComponentBackground (Graphics&, int width, int height, PropertyComponent&) override;
-    void drawPropertyComponentLabel (Graphics&, int width, int height, PropertyComponent&) override;
-    juce::Rectangle<int> getPropertyComponentContentPosition (PropertyComponent&) override;
+    void paintToolbarButtonLabel (juce::Graphics&, int x, int y, int width, int height,
+                                  const juce::String& text, juce::ToolbarItemComponent&) override;
 
     //==============================================================================
-    void drawCallOutBoxBackground (CallOutBox&, Graphics&, const Path& path, Image& cachedImage) override;
-    int getCallOutBoxBorderSize (const CallOutBox&) override;
+    void drawPropertyPanelSectionHeader (juce::Graphics&, const juce::String& name, bool isOpen, int width, int height) override;
+    void drawPropertyComponentBackground (juce::Graphics&, int width, int height, juce::PropertyComponent&) override;
+    void drawPropertyComponentLabel (juce::Graphics&, int width, int height, juce::PropertyComponent&) override;
+    juce::Rectangle<int> getPropertyComponentContentPosition (juce::PropertyComponent&) override;
 
     //==============================================================================
-    void drawLevelMeter (Graphics&, int width, int height, float level) override;
+    void drawCallOutBoxBackground (juce::CallOutBox&, juce::Graphics&, const juce::Path& path, juce::Image& cachedImage) override;
+    int getCallOutBoxBorderSize (const juce::CallOutBox&) override;
 
-    void drawKeymapChangeButton (Graphics&, int width, int height, juce::Button&, const String& keyDescription) override;
+    //==============================================================================
+    void drawLevelMeter (juce::Graphics&, int width, int height, float level) override;
+
+    void drawKeymapChangeButton (juce::Graphics&, int width, int height, juce::Button&, const juce::String& keyDescription) override;
 
     //==============================================================================
     /** Draws a 3D raised (or indented) bevel using two colours.
@@ -502,34 +502,34 @@ public:
      sharp, and it fades towards the centre; if sharpEdgeOnOutside is false, then
      the centre edges are sharp and it fades towards the outside.
      */
-    static void drawBevel (Graphics&,
+    static void drawBevel (juce::Graphics&,
                            int x, int y, int width, int height,
                            int bevelThickness,
-                           const Colour& topLeftColour = Colours::white,
-                           const Colour& bottomRightColour = Colours::black,
+                           const juce::Colour& topLeftColour = juce::Colours::white,
+                           const juce::Colour& bottomRightColour = juce::Colours::black,
                            bool useGradient = true,
                            bool sharpEdgeOnOutside = true);
 
     /** Utility function to draw a shiny, glassy circle (for round LED-type buttons). */
-    static void drawGlassSphere (Graphics&, float x, float y, float diameter,
-                                 const Colour&, float outlineThickness) noexcept;
+    static void drawGlassSphere (juce::Graphics&, float x, float y, float diameter,
+                                 const juce::Colour&, float outlineThickness) noexcept;
 
-    static void drawGlassPointer (Graphics&, float x, float y, float diameter,
-                                  const Colour&, float outlineThickness, int direction) noexcept;
+    static void drawGlassPointer (juce::Graphics&, float x, float y, float diameter,
+                                  const juce::Colour&, float outlineThickness, int direction) noexcept;
 
     /** Utility function to draw a shiny, glassy oblong (for text buttons). */
-    static void drawGlassLozenge (Graphics&,
+    static void drawGlassLozenge (juce::Graphics&,
                                   float x, float y, float width, float height,
-                                  const Colour&, float outlineThickness, float cornerSize,
+                                  const juce::Colour&, float outlineThickness, float cornerSize,
                                   bool flatOnLeft, bool flatOnRight, bool flatOnTop, bool flatOnBottom) noexcept;
 
 private:
     //==============================================================================
-    std::unique_ptr<Drawable> folderImage, documentImage;
+    std::unique_ptr<juce::Drawable> folderImage, documentImage;
 
-    void drawShinyButtonShape (Graphics&,
+    void drawShinyButtonShape (juce::Graphics&,
                                float x, float y, float w, float h, float maxCornerSize,
-                               const Colour&, float strokeWidth,
+                               const juce::Colour&, float strokeWidth,
                                bool flatOnLeft, bool flatOnRight, bool flatOnTop, bool flatOnBottom) noexcept;
 
     class GlassWindowButton;
@@ -537,7 +537,7 @@ private:
 
 	// Inherited via LookAndFeel
 #if JUCE_MAJOR_VERSION >= 5
-	virtual bool isProgressBarOpaque(ProgressBar &) override;
+	virtual bool isProgressBarOpaque(juce::ProgressBar &) override;
 #endif
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LookAndFeelOO)
 
@@ -546,12 +546,12 @@ private:
 
 
 		
-	virtual bool shouldPopupMenuScaleWithTargetComponent(const PopupMenu::Options & options) override;
+	virtual bool shouldPopupMenuScaleWithTargetComponent(const juce::PopupMenu::Options & options) override;
 
 
 	// Inherited via LookAndFeel
 	virtual int getPopupMenuBorderSize() override;
 
-	virtual Font getTabButtonFont(TabBarButton &, float height) override;
+	virtual juce::Font getTabButtonFont(juce::TabBarButton &, float height) override;
 
 };

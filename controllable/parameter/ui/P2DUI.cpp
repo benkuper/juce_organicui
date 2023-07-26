@@ -1,3 +1,5 @@
+using namespace juce;
+
 P2DUI::P2DUI(Array<Point2DParameter*>parameters) :
 	ParameterUI(Inspectable::getArrayAs<Point2DParameter, Parameter>(parameters), PARAMETERUI_DEFAULT_TIMER),
 	p2ds(parameters),

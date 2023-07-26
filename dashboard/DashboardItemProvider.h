@@ -3,15 +3,15 @@ class DashboardItem;
 class DashboardItemProvider
 {
 public:
-	DashboardItemProvider(StringRef name) : providerName(name) {}
+	DashboardItemProvider(juce::StringRef name) : providerName(name) {}
 	virtual ~DashboardItemProvider() {}
 
 private:
-	String providerName;
+	juce::String providerName;
 
 public:
-	String getProviderName() { return providerName; }
-	virtual PopupMenu getDashboardCreateMenu(int idOffset) = 0;
+	juce::String getProviderName() { return providerName; }
+	virtual juce::PopupMenu getDashboardCreateMenu(int idOffset) = 0;
 	virtual DashboardItem * getDashboardItemFromMenuResult(int result) = 0;
 };
 

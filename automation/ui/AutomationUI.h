@@ -16,38 +16,38 @@ class AutomationUI :
     public AutomationKeyUI::KeyUIListener,
     public ContainerAsyncListener,
     public Automation::AsyncListener,
-    public Timer
+    public juce::Timer
 {
 public:
     AutomationUI(Automation* manager);
     ~AutomationUI();
 
-    Point<float> viewPosRange;
+    juce::Point<float> viewPosRange;
     float viewLength;
     bool autoAdaptViewRange;
 
     bool shouldRepaint;
 
     bool paintingMode;
-    Array<Point<float>> paintingPoints;
-    Point<float> lastPaintingPoint;
+    juce::Array<juce::Point<float>> paintingPoints;
+    juce::Point<float> lastPaintingPoint;
 
     bool previewMode; //avoid repainting everything
     bool showNumberLines;
     bool showMenuOnRightClick;
 
-    Point<float> viewValueRangeAtMouseDown;
+    juce::Point<float> viewValueRangeAtMouseDown;
 
     std::unique_ptr<FloatSliderUI> interactiveSimplificationUI;
-    std::unique_ptr<TextButton> validInteractiveBT;
+    std::unique_ptr<juce::TextButton> validInteractiveBT;
 
-    Array<float> snapTimes;
-    std::function<void(Array<float>*, AutomationKey * k)> getSnapTimesFunc;
+    juce::Array<float> snapTimes;
+    std::function<void(juce::Array<float>*, AutomationKey * k)> getSnapTimesFunc;
 
-    void paint(Graphics& g) override;
-    void drawLinesBackground(Graphics& g);
+    void paint(juce::Graphics& g) override;
+    void drawLinesBackground(juce::Graphics& g);
 
-    void paintOverChildren(Graphics& g) override;
+    void paintOverChildren(juce::Graphics& g) override;
 
     void resized() override;
     void placeKeyUI(AutomationKeyUI* ui);
@@ -61,22 +61,22 @@ public:
     void addItemUIInternal(AutomationKeyUI* ui) override;
     void removeItemUIInternal(AutomationKeyUI* ui) override;
 
-    void mouseDown(const MouseEvent& e) override;
-    void mouseDrag(const MouseEvent& e) override;
-    void mouseUp(const MouseEvent& e) override;
-    void mouseDoubleClick(const MouseEvent& e) override;
+    void mouseDown(const juce::MouseEvent& e) override;
+    void mouseDrag(const juce::MouseEvent& e) override;
+    void mouseUp(const juce::MouseEvent& e) override;
+    void mouseDoubleClick(const juce::MouseEvent& e) override;
 
-    void addItemFromMenu(AutomationKey* k, bool fromAddbutton, Point<int> pos) override;
+    void addItemFromMenu(AutomationKey* k, bool fromAddbutton, juce::Point<int> pos) override;
 
-    void addMenuExtraItems(PopupMenu &p, int startIndex) override;
+    void addMenuExtraItems(juce::PopupMenu &p, int startIndex) override;
     void handleMenuExtraItemsResult(int result, int startIndex) override;
 
-    Component* getSelectableComponentForItemUI(AutomationKeyUI* ui) override;
+    juce::Component* getSelectableComponentForItemUI(AutomationKeyUI* ui) override;
 
-    Point<float> getViewPos(Point<int> pos, bool relative = false);
-    Rectangle<float> getViewBounds(Rectangle<int> pos, bool relative = false);
-    Point<int> getPosInView(Point<float> pos, bool relative = false);
-    Rectangle<int> getBoundsInView(Rectangle<float> pos, bool relative = false);
+    juce::Point<float> getViewPos(juce::Point<int> pos, bool relative = false);
+    juce::Rectangle<float> getViewBounds(juce::Rectangle<int> pos, bool relative = false);
+    juce::Point<int> getPosInView(juce::Point<float> pos, bool relative = false);
+    juce::Rectangle<int> getBoundsInView(juce::Rectangle<float> pos, bool relative = false);
 
     float getPosForX(int x, bool relative = false);
     int getXForPos(float x, bool relative = false);
@@ -91,5 +91,5 @@ public:
 
     void timerCallback() override;
 
-    void buttonClicked(Button* b) override;
+    void buttonClicked(juce::Button* b) override;
 };

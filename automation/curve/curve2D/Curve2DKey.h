@@ -20,7 +20,7 @@ public:
 
     EnumParameter* easingType;
     std::unique_ptr<Easing2D> easing;
-    WeakReference<Curve2DKey> nextKey;
+    juce::WeakReference<Curve2DKey> nextKey;
     bool isFirst;
     float curvePosition; //position on the curve, calculated by the curve to distribute evenly the points
 
@@ -30,7 +30,7 @@ public:
     virtual Easing2D* createEasingForType(int type);
     void setNextKey(Curve2DKey* key);
 
-    Point<float> getValueAt(const float &position);
+    juce::Point<float> getValueAt(const float &position);
     float getLength() const;
 
     void onContainerParameterChangedInternal(Parameter* p) override;
@@ -48,7 +48,7 @@ public:
     void notifyKeyUpdated();
 
 
-    String getTypeString() const override { return "2DKey"; }
+    juce::String getTypeString() const override { return "2DKey"; }
 
 
     class  Curve2DKeyEvent
@@ -59,7 +59,7 @@ public:
         Curve2DKeyEvent(Type t, Curve2DKey* key) : type(t), key(key) {}
 
         Type type;
-        WeakReference<Curve2DKey> key;
+        juce::WeakReference<Curve2DKey> key;
     };
 
     QueuedNotifier<Curve2DKeyEvent> keyNotifier;
@@ -71,8 +71,8 @@ public:
     void removeAsyncKeyListener(AsyncListener* listener) { keyNotifier.removeListener(listener); }
 
 private:
-    WeakReference<Curve2DKey>::Master masterReference;
-    friend class WeakReference<Curve2DKey>;
+    juce::WeakReference<Curve2DKey>::Master masterReference;
+    friend class juce::WeakReference<Curve2DKey>;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Curve2DKey)
 };

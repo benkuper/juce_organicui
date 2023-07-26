@@ -13,11 +13,11 @@
 class ShapeShifterContent
 {
 public:
-	ShapeShifterContent(Component * contentComponent, const String &_contentName);
+	ShapeShifterContent(juce::Component * contentComponent, const juce::String &_contentName);
 	virtual ~ShapeShifterContent();
 
-	Component * contentComponent;
-	String contentName;
+	juce::Component * contentComponent;
+	juce::String contentName;
 
 	bool contentIsFlexible;
 
@@ -29,14 +29,14 @@ private:
 
 //Helper class if child class doesn't need to inherit a subclass of Component
 class ShapeShifterContentComponent :
-	public Component,
+	public juce::Component,
 	public ShapeShifterContent
 {
 public:
-	ShapeShifterContentComponent(const String &contentName);
+	ShapeShifterContentComponent(const juce::String &contentName);
 
-	String helpID;
+	juce::String helpID;
 
-	void mouseEnter(const MouseEvent &e) override;
-	void mouseExit(const MouseEvent &e) override;
+	void mouseEnter(const juce::MouseEvent &e) override;
+	void mouseExit(const juce::MouseEvent &e) override;
 };

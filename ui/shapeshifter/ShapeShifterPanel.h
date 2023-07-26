@@ -27,22 +27,22 @@ public:
 	const int headerHeight = 24;
 	ShapeShifterPanelHeader header;
 
-	OwnedArray<ShapeShifterContent> contents;
+	juce::OwnedArray<ShapeShifterContent> contents;
 
 	bool transparentBackground;
 	bool targetMode;
 
-	Point<float> candidateTargetPoint;
+	juce::Point<float> candidateTargetPoint;
 	AttachZone candidateZone;
 
 
 	ShapeShifterContent * currentContent;
 	void setCurrentContent(ShapeShifterContent * content);
-	void setCurrentContent(const String &name);
+	void setCurrentContent(const juce::String &name);
 
 
-	void paint(Graphics & g) override;
-	void paintOverChildren(Graphics & g) override;
+	void paint(juce::Graphics & g) override;
+	void paintOverChildren(juce::Graphics & g) override;
 	void resized() override;
 
 
@@ -59,8 +59,8 @@ public:
 	void addContent(ShapeShifterContent * content, bool setCurrent = true);
 
 	bool hasContent(ShapeShifterContent * content);
-	bool hasContent(const String & name);
-	ShapeShifterContent * getContentForName(const String &name);
+	bool hasContent(const juce::String & name);
+	ShapeShifterContent * getContentForName(const juce::String &name);
 
 	bool isFlexible() override;
 
@@ -69,8 +69,8 @@ public:
 	AttachZone checkAttachZone(ShapeShifterPanel * source);
 	void setCandidateZone(AttachZone zone);
 
-	virtual var getCurrentLayout() override;
-	virtual void loadLayoutInternal(var layout) override;
+	virtual juce::var getCurrentLayout() override;
+	virtual void loadLayoutInternal(juce::var layout) override;
 
 	virtual void tabDrag(ShapeShifterPanelTab *) override;
 	virtual void tabSelect(ShapeShifterPanelTab *) override;
@@ -91,7 +91,7 @@ public:
 		virtual void contentRemoved(ShapeShifterContent *) {}
 	};
 
-	ListenerList<Listener> listeners;
+	juce::ListenerList<Listener> listeners;
     void addShapeShifterPanelListener(Listener* newListener) {
         //if(header.tabs.size() > 0) DBG("Panel, addListener (" << header.tabs[0]->content->contentName<< ")");
         listeners.add(newListener);
@@ -104,7 +104,7 @@ private:
 
 
 private:
-	WeakReference<ShapeShifterPanel>::Master masterReference;
-	friend class WeakReference<ShapeShifterPanel>;
+	juce::WeakReference<ShapeShifterPanel>::Master masterReference;
+	friend class juce::WeakReference<ShapeShifterPanel>;
 
 };

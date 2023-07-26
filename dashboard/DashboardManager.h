@@ -19,7 +19,7 @@
 #include "servus/servus.h"
 
 class ServusThread :
-	public Thread
+	public juce::Thread
 {
 public:
 	ServusThread();
@@ -37,7 +37,7 @@ class DashboardManager :
 #if ORGANICUI_USE_WEBSERVER
 	,public SimpleWebSocketServer::RequestHandler
 	,public SimpleWebSocketServer::Listener
-	,public URL::DownloadTask::Listener
+	,public juce::URL::DownloadTask::Listener
 #endif
 {
 public:
@@ -61,13 +61,13 @@ public:
 	CommentManager commentManager;
 
 
-	void addItemInternal(Dashboard* item, var data) override;
+	void addItemInternal(Dashboard* item, juce::var data) override;
 	void removeItemInternal(Dashboard* item) override;
 
-	void setCurrentDashboard(Dashboard* d, bool setInClients = false, bool setInNative = false, StringArray excludeIds = StringArray());
+	void setCurrentDashboard(Dashboard* d, bool setInClients = false, bool setInNative = false, juce::StringArray excludeIds = juce::StringArray());
 
-	void parameterFeedback(var data) override;
-	void dashboardFeedback(var data) override;
+	void parameterFeedback(juce::var data) override;
+	void dashboardFeedback(juce::var data) override;
 	void askForRefresh(Dashboard *d) override;
 
 	void endLoadFile() override;
@@ -75,24 +75,24 @@ public:
 #if ORGANICUI_USE_WEBSERVER
 	std::unique_ptr<SimpleWebSocketServerBase> server;
 
-	String downloadURL;
-	File serverRootPath;
-	File downloadedFileZip;
-	std::unique_ptr<URL::DownloadTask> downloadTask;
+	juce::String downloadURL;
+	juce::File serverRootPath;
+	juce::File downloadedFileZip;
+	std::unique_ptr<juce::URL::DownloadTask> downloadTask;
 
-	std::function<String(std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request, SimpleWeb::CaseInsensitiveMultimap &header)> customHandleHTTPRequestFunc;
-	void setupDownloadURL(const String& downloadURL);
+	std::function<juce::String(std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request, SimpleWeb::CaseInsensitiveMultimap &header)> customHandleHTTPRequestFunc;
+	void setupDownloadURL(const juce::String& downloadURL);
 
 	void downloadDashboardFiles();
-	void progress(URL::DownloadTask* task, int64 bytesDownloaded, int64 bytesTotal) override;
-	void finished(URL::DownloadTask* task, bool success) override;
+	void progress(juce::URL::DownloadTask* task, juce::int64 bytesDownloaded, juce::int64 bytesTotal) override;
+	void finished(juce::URL::DownloadTask* task, bool success) override;
 
 	void setupServer();
-	void connectionOpened(const String& id) override;
-	void messageReceived(const String& id, const String& message) override;
-	void connectionClosed(const String& id, int status, const String& reason) override;
+	void connectionOpened(const juce::String& id) override;
+	void messageReceived(const juce::String& id, const juce::String& message) override;
+	void connectionClosed(const juce::String& id, int status, const juce::String& reason) override;
 
-	var getServerData();
+	juce::var getServerData();
 
 	// Inherited via RequestHandler
 	virtual bool handleHTTPRequest(std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request) override;

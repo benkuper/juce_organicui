@@ -25,8 +25,8 @@ public:
 	~DashboardParameterStyleEditor();
 
 	DashboardParameterItem* dpi;
-	TextButton bt;
+	juce::TextButton bt;
 
 	void resizedInternal(juce::Rectangle<int>& r) override;
-	void buttonClicked(Button* b) override;
+	void buttonClicked(juce::Button* b) override;
 };

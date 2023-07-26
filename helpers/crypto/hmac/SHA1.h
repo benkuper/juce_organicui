@@ -25,13 +25,13 @@ namespace OrganicCrypto
         void reset();
 
         // Update the hash value
-        void update(const void* data, uint32 len);
-        void update(MemoryBlock& data);
+        void update(const void* data, juce::uint32 len);
+        void update(juce::MemoryBlock& data);
 
         // Finalize hash and report
-        MemoryBlock finalize();
+        juce::MemoryBlock finalize();
 
-        static String convert(const String& input);
+        static juce::String convert(const juce::String& input);
 
         //==============================================================================
         enum {
@@ -42,23 +42,23 @@ namespace OrganicCrypto
 
     private:
         //==============================================================================
-        uint32 m_state[5];
-        uint32 m_count[2];
-        uint8  m_buffer[SHA1_BLOCK_SIZE];
-        uint8  m_digest[SHA1_DIGEST_SIZE];
+        juce::uint32 m_state[5];
+        juce::uint32 m_count[2];
+        juce::uint8  m_buffer[SHA1_BLOCK_SIZE];
+        juce::uint8  m_digest[SHA1_DIGEST_SIZE];
 
         //==============================================================================
         typedef union
         {
-            uint8  c[SHA1_BLOCK_SIZE];
-            uint32 l[SHA1_BLOCK_SIZE / sizeof(uint32)];
+            juce::uint8  c[SHA1_BLOCK_SIZE];
+            juce::uint32 l[SHA1_BLOCK_SIZE / sizeof(juce::uint32)];
         } SHA1_WORKSPACE_BLOCK;
 
         // Private SHA-1 transformation
-        void transform(uint32* state, const uint8* buffer);
+        void transform(juce::uint32* state, const juce::uint8* buffer);
 
         // Member variables
-        uint8 m_workspace[SHA1_BLOCK_SIZE];
+        juce::uint8 m_workspace[SHA1_BLOCK_SIZE];
         SHA1_WORKSPACE_BLOCK* m_block; // SHA1 pointer to the byte array above
 
         //==============================================================================

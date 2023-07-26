@@ -12,29 +12,29 @@
 
 class FloatStepperUI : 
 	public ParameterUI, 
-	public Slider::Listener
+	public juce::Slider::Listener
 {
 
 public:
-    FloatStepperUI(Array<Parameter *> parameters);
+    FloatStepperUI(juce::Array<Parameter *> parameters);
     virtual ~FloatStepperUI();
 
     std::unique_ptr<BetterStepper> slider;
 
     float valueAtDragStart;
     
-	void paint(Graphics& g) override;
+	void paint(juce::Graphics& g) override;
     void resized() override;
 
     void updateUIParamsInternal() override;
     void handlePaintTimerInternal() override;
     
 protected:
-    void valueChanged(const var &) override;
+    void valueChanged(const juce::var &) override;
     void rangeChanged(Parameter * p) override;
 
     // Inherited via Listener
-    virtual void sliderValueChanged(Slider * slider) override;
-    virtual void sliderDragStarted(Slider* slider) override;
-    virtual void sliderDragEnded(Slider* slider) override;
+    virtual void sliderValueChanged(juce::Slider * slider) override;
+    virtual void sliderDragStarted(juce::Slider* slider) override;
+    virtual void sliderDragEnded(juce::Slider* slider) override;
 };

@@ -36,18 +36,18 @@ public:
 	bool isPreselected;
 
 	bool highlightLinkedInspectableOnSelect;
-	Array<WeakReference<Inspectable>> linkedInspectables;
+	juce::Array<juce::WeakReference<Inspectable>> linkedInspectables;
 
 	//For storing arbitraty data
-	var customData;
+	juce::var customData;
 	bool saveCustomData;
 
 	//editor
-	std::function<InspectableEditor* (bool, Array<Inspectable*>)> customGetEditorFunc;
+	std::function<InspectableEditor* (bool, juce::Array<Inspectable*>)> customGetEditorFunc;
 
 	//Help
-	String helpID;
-	virtual String getHelpID();
+	juce::String helpID;
+	virtual juce::String getHelpID();
 
 
 	virtual void selectThis(bool addToSelection = false, bool notify = true);
@@ -57,8 +57,8 @@ public:
 	virtual void setHighlighted(bool value);
 	virtual void highlightLinkedInspectables(bool value);
 
-	virtual void registerLinkedInspectable(WeakReference<Inspectable> i, bool setAlsoInOtherInspectable = true);
-	virtual void unregisterLinkedInspectable(WeakReference<Inspectable> i, bool setAlsoInOtherInspectable = true);
+	virtual void registerLinkedInspectable(juce::WeakReference<Inspectable> i, bool setAlsoInOtherInspectable = true);
+	virtual void unregisterLinkedInspectable(juce::WeakReference<Inspectable> i, bool setAlsoInOtherInspectable = true);
 	virtual void cleanLinkedInspectables();
 
 	template<class T>
@@ -73,31 +73,31 @@ public:
 
 	//Helper
 	template<class S, class T>
-	static Array<T*> getArrayAs(Array<S*> source)
+	static juce::Array<T*> getArrayAs(juce::Array<S*> source)
 	{
-		Array<T*> result;
+		juce::Array<T*> result;
 		for (auto& i : source) result.add(static_cast<T *>(i));
 		return result;
 	}
 
 	template<class T>
-	static Array<WeakReference<T>> getWeakArray(Array<T*> source)
+	static juce::Array<juce::WeakReference<T>> getWeakArray(juce::Array<T*> source)
 	{
-		Array<WeakReference<T>> result;
+		juce::Array<juce::WeakReference<T>> result;
 		for (auto& i : source) result.add(i);
 		return result;
 	}
 
 	template<class T>
-	static Array<T *> getArrayFromWeak(Array<WeakReference<T>> source)
+	static juce::Array<T *> getArrayFromWeak(juce::Array<juce::WeakReference<T>> source)
 	{
-		Array<T *> result;
+		juce::Array<T *> result;
 		for (auto& i : source) result.add(i.get());
 		return result;
 	}
 
-	InspectableEditor* getEditor(bool isRoot, Array<Inspectable*> inspectables = Array<Inspectable*>());
-	virtual InspectableEditor* getEditorInternal(bool /*isRoot*/, Array<Inspectable*> inspectables = Array<Inspectable*>()) { jassert(false);  return nullptr; } //to override !
+	InspectableEditor* getEditor(bool isRoot, juce::Array<Inspectable*> inspectables = juce::Array<Inspectable*>());
+	virtual InspectableEditor* getEditorInternal(bool /*isRoot*/, juce::Array<Inspectable*> inspectables = juce::Array<Inspectable*>()) { jassert(false);  return nullptr; } //to override !
 	//Listener
 	class  InspectableListener
 	{
@@ -111,7 +111,7 @@ public:
 		virtual void inspectableDestroyed(Inspectable *) {};
 	};
 
-	ListenerList<InspectableListener> listeners;
+	juce::ListenerList<InspectableListener> listeners;
 	void addInspectableListener(InspectableListener* newListener) { listeners.add(newListener); }
 	void removeInspectableListener(InspectableListener* listener) { listeners.remove(listener); }
 
@@ -135,7 +135,7 @@ public:
 	void addAsyncCoalescedInspectableListener(AsyncListener* newListener) { inspectableNotifier.addAsyncCoalescedListener(newListener); }
 	void removeAsyncInspectableListener(AsyncListener* listener) { inspectableNotifier.removeListener(listener); }
 
-	WeakReference<Inspectable>::Master masterReference;
+	juce::WeakReference<Inspectable>::Master masterReference;
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Inspectable)
 };
@@ -144,7 +144,7 @@ private:
 template<class T>
 void Inspectable::unregisterLinkedInspectablesOfType()
 {
-	Array<Inspectable *> unregisterList;
+	juce::Array<Inspectable *> unregisterList;
 	for (auto &i : linkedInspectables)
 	{
 		if (dynamic_cast<T *>(i.get()) != nullptr) unregisterList.add(i);

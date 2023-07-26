@@ -3,15 +3,15 @@ class BaseManagerViewUI;
 
 template<class M, class T, class U>
 class BaseManagerViewMiniPane :
-	public Component,
-	public Timer
+	public juce::Component,
+	public juce::Timer
 {
 public:
 	BaseManagerViewMiniPane(BaseManagerViewUI<M, T, U>* managerUI);
 	virtual ~BaseManagerViewMiniPane() {}
 
 	BaseManagerViewUI<M, T, U>* managerUI;
-	ComponentAnimator ca;
+	juce::ComponentAnimator ca;
 
 	juce::Rectangle<float> paneViewBounds;
 	juce::Rectangle<float> paneRealBounds;
@@ -22,16 +22,16 @@ public:
 	virtual void paintInternal(juce::Graphics& g) {}
 	virtual void paintItem(juce::Graphics& g, U* ui);
 
-	virtual void mouseEnter(const MouseEvent& e) override;
-	virtual void mouseExit(const MouseEvent& e) override;
-	virtual void mouseDown(const MouseEvent& e) override;
-	virtual void mouseDrag(const MouseEvent& e) override;
+	virtual void mouseEnter(const juce::MouseEvent& e) override;
+	virtual void mouseExit(const juce::MouseEvent& e) override;
+	virtual void mouseDown(const juce::MouseEvent& e) override;
+	virtual void mouseDrag(const juce::MouseEvent& e) override;
 
 	void updatePositionFromMouse();
 
-	juce::Point<float> getPanePosForUIPos(Point<int> viewPoint);
-	juce::Point<float> getPanePosForViewPos(Point<float> viewPoint);
-	juce::Point<float> getViewPosForPanePos(Point<float> panePoint);
+	juce::Point<float> getPanePosForUIPos(juce::Point<int> viewPoint);
+	juce::Point<float> getPanePosForViewPos(juce::Point<float> viewPoint);
+	juce::Point<float> getViewPosForPanePos(juce::Point<float> panePoint);
 
 	virtual void resized() override;
 	virtual void updateContent();
@@ -164,7 +164,7 @@ void BaseManagerViewMiniPane<M, T, U>::paintItem(juce::Graphics& g, U* ui)
 }
 
 template<class M, class T, class U>
-juce::Point<float> BaseManagerViewMiniPane<M, T, U>::getPanePosForUIPos(Point<int> uiPos)
+juce::Point<float> BaseManagerViewMiniPane<M, T, U>::getPanePosForUIPos(juce::Point<int> uiPos)
 {
 	juce::Rectangle<float> r = getLocalBounds().toFloat();
 
@@ -175,7 +175,7 @@ juce::Point<float> BaseManagerViewMiniPane<M, T, U>::getPanePosForUIPos(Point<in
 }
 
 template<class M, class T, class U>
-juce::Point<float> BaseManagerViewMiniPane<M, T, U>::getPanePosForViewPos(Point<float> viewPos)
+juce::Point<float> BaseManagerViewMiniPane<M, T, U>::getPanePosForViewPos(juce::Point<float> viewPos)
 {
 	juce::Rectangle<float> r = getLocalBounds().toFloat();
 
@@ -187,7 +187,7 @@ juce::Point<float> BaseManagerViewMiniPane<M, T, U>::getPanePosForViewPos(Point<
 }
 
 template<class M, class T, class U>
-juce::Point<float> BaseManagerViewMiniPane<M, T, U>::getViewPosForPanePos(Point<float> panePos)
+juce::Point<float> BaseManagerViewMiniPane<M, T, U>::getViewPosForPanePos(juce::Point<float> panePos)
 {
 	juce::Rectangle<float> r = getLocalBounds().toFloat();
 

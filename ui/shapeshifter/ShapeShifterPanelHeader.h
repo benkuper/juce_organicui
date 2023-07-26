@@ -14,14 +14,14 @@
 
 
 class ShapeShifterPanelHeader :
-	public Component,
+	public juce::Component,
 	public ShapeShifterPanelTab::TabListener
 {
 public:
 	ShapeShifterPanelHeader();
 	virtual ~ShapeShifterPanelHeader();
 
-	OwnedArray<ShapeShifterPanelTab> tabs;
+	juce::OwnedArray<ShapeShifterPanelTab> tabs;
 
 	void addTab(ShapeShifterContent * content);
 	void removeTab(ShapeShifterPanelTab * tab, bool doRemove = true);
@@ -30,11 +30,11 @@ public:
 	ShapeShifterPanelTab * getTabForContent(ShapeShifterContent * content);
 
 
-	void mouseDown(const MouseEvent &e) override;
-	void mouseDrag(const MouseEvent &e) override;
+	void mouseDown(const juce::MouseEvent& e) override;
+	void mouseDrag(const juce::MouseEvent &e) override;
 
 
-	void paint(Graphics &g) override;
+	void paint(juce::Graphics &g) override;
 	void resized()override;
 
 	void askForRemoveTab(ShapeShifterPanelTab *) override;
@@ -52,7 +52,7 @@ public:
 
 	};
 
-	ListenerList<Listener> listeners;
+	juce::ListenerList<Listener> listeners;
 	void addHeaderListener(Listener* newListener) { listeners.add(newListener); }
 	void removeHeaderListener(Listener* listener) { listeners.remove(listener); }
 

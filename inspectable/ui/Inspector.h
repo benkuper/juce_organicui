@@ -16,7 +16,7 @@
 #include "../InspectableSelectionManager.h"
 
 class Inspector :
-	public Component,
+	public juce::Component,
 	public Inspectable::InspectableListener,
 	public InspectableSelectionManager::AsyncListener
 {
@@ -25,8 +25,8 @@ public:
 	virtual ~Inspector();
 
 	InspectableSelectionManager* selectionManager;
-	Array<Inspectable*> currentInspectables;
-	Viewport vp;
+	juce::Array<Inspectable*> currentInspectables;
+	juce::Viewport vp;
 	std::unique_ptr<InspectableEditor> currentEditor;
 
 	bool curSelectionDoesNotAffectInspector;
@@ -35,9 +35,9 @@ public:
 	int tempScrollPosition;
 
 	virtual void setSelectionManager(InspectableSelectionManager* newSM);
-	virtual void setCurrentInspectables(Array<Inspectable*>inspectables = Array<Inspectable*>(), bool setInspectableSelection = true);
+	virtual void setCurrentInspectables(juce::Array<Inspectable*>inspectables = juce::Array<Inspectable*>(), bool setInspectableSelection = true);
 
-	virtual void paint(Graphics& g) override;
+	virtual void paint(juce::Graphics& g) override;
 	virtual void resized() override;
 	virtual void resizedInternal(juce::Rectangle<int>& r);
 
@@ -58,7 +58,7 @@ public:
 		virtual void currentInspectableChanged(Inspector*) {};
 	};
 
-	ListenerList<InspectorListener> listeners;
+	juce::ListenerList<InspectorListener> listeners;
 	void addInspectorListener(InspectorListener* newListener) { listeners.add(newListener); }
 	void removeInspectorListener(InspectorListener* listener) { listeners.remove(listener); }
 
@@ -72,7 +72,7 @@ class InspectorUI :
 	public ShapeShifterContentComponent
 {
 public:
-	InspectorUI(const String& name, InspectableSelectionManager* selectionManager = nullptr);
+	InspectorUI(const juce::String& name, InspectableSelectionManager* selectionManager = nullptr);
 	~InspectorUI();
 
 	std::unique_ptr<Inspector> inspector;
@@ -80,5 +80,5 @@ public:
 
 	void resized() override;
 
-	static InspectorUI* create(const String& contentName) { return new InspectorUI(contentName); }
+	static InspectorUI* create(const juce::String& contentName) { return new InspectorUI(contentName); }
 };

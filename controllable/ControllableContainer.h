@@ -23,11 +23,11 @@ class ControllableContainer :
 
 {
 public:
-	ControllableContainer(const String &niceName);
+	ControllableContainer(const juce::String &niceName);
 	virtual ~ControllableContainer();
 
-	String niceName;
-	String shortName;
+	juce::String niceName;
+	juce::String shortName;
 	bool hasCustomShortName;
 	bool allowSameChildrenNiceNames;
 
@@ -43,10 +43,10 @@ public:
 	bool isRemovableByUser;
 
 	std::function<void(ControllableContainer *)> customUserCreateControllableFunc; 
-	StringArray userAddControllablesFilters;
+	juce::StringArray userAddControllablesFilters;
 	
 
-	std::function<InspectableEditor *(bool, Array<ControllableContainer*>)> customGetEditorFunc;
+	std::function<InspectableEditor *(bool, juce::Array<ControllableContainer*>)> customGetEditorFunc;
 
 	//save / load
 	bool saveAndLoadRecursiveData;
@@ -63,65 +63,65 @@ public:
 	static ControllableComparator comparator;
 	ControllableComparator* customControllableComparator;
 
-	OwnedArray<Controllable, CriticalSection> controllables;
-	Array<WeakReference<ControllableContainer>, CriticalSection> controllableContainers;
-	OwnedArray<ControllableContainer, CriticalSection> ownedContainers;
-	WeakReference<ControllableContainer> parentContainer;
+	juce::OwnedArray<Controllable, juce::CriticalSection> controllables;
+	juce::Array<juce::WeakReference<ControllableContainer>, juce::CriticalSection> controllableContainers;
+	juce::OwnedArray<ControllableContainer, juce::CriticalSection> ownedContainers;
+	juce::WeakReference<ControllableContainer> parentContainer;
 
-	UndoableAction * setUndoableNiceName(const String &_niceName, bool onlyReturnAction = false);
-	void setNiceName(const String &_niceName);
-	void setCustomShortName(const String &_shortName);
+	juce::UndoableAction * setUndoableNiceName(const juce::String &_niceName, bool onlyReturnAction = false);
+	void setNiceName(const juce::String& _niceName);
+	void setCustomShortName(const juce::String& _shortName);
 	void setAutoShortName();
 
 
-	UndoableAction * addUndoableControllable(Controllable * c, bool onlyReturnAction = false);
-	Controllable* addControllable(Controllable * c, int index = -1);
-	Parameter* addParameter(Parameter * p, int index = -1);
-	FloatParameter * addFloatParameter(const String &niceName, const String &description, const float &initialValue, const float &minValue = INT32_MIN, const float &maxValue = INT32_MAX, const bool &enabled = true);
-	IntParameter * addIntParameter(const String &niceName, const String &description, const int &initialValue, const int &minValue = INT32_MIN, const int &maxValue = INT32_MAX, const bool &enabled = true);
-	BoolParameter * addBoolParameter(const String &niceName, const String &description, const bool &value, const bool &enabled = true);
-	StringParameter * addStringParameter(const String &niceName, const String &description, const String &value, const bool &enabled = true);
-	EnumParameter * addEnumParameter(const String &niceName, const String &description, const bool &enabled = true);
-	Point2DParameter * addPoint2DParameter(const String &niceName, const String &description, const bool &enabled = true);
-	Point3DParameter * addPoint3DParameter(const String &niceName, const String &description, const bool &enabled = true);
-	ColorParameter * addColorParameter(const String &niceName, const String &description, const Colour &initialColor, const bool &enabled = true);
-	TargetParameter * addTargetParameter(const String &niceName, const String &description, WeakReference<ControllableContainer> rootReference = nullptr, const bool &enabled = true);
-	FileParameter * addFileParameter(const String &niceName, const String &description, const String &initialValue = "");
+	juce::UndoableAction* addUndoableControllable(Controllable* c, bool onlyReturnAction = false);
+	Controllable* addControllable(Controllable* c, int index = -1);
+	Parameter* addParameter(Parameter* p, int index = -1);
+	FloatParameter* addFloatParameter(const juce::String& niceName, const juce::String& description, const float& initialValue, const float& minValue = INT32_MIN, const float& maxValue = INT32_MAX, const bool& enabled = true);
+	IntParameter* addIntParameter(const juce::String& niceName, const juce::String& description, const int& initialValue, const int& minValue = INT32_MIN, const int& maxValue = INT32_MAX, const bool& enabled = true);
+	BoolParameter* addBoolParameter(const juce::String& niceName, const juce::String& description, const bool& value, const bool& enabled = true);
+	StringParameter* addStringParameter(const juce::String& niceName, const juce::String& description, const juce::String& value, const bool& enabled = true);
+	EnumParameter* addEnumParameter(const juce::String& niceName, const juce::String& description, const bool& enabled = true);
+	Point2DParameter* addPoint2DParameter(const juce::String& niceName, const juce::String& description, const bool& enabled = true);
+	Point3DParameter* addPoint3DParameter(const juce::String& niceName, const juce::String& description, const bool& enabled = true);
+	ColorParameter* addColorParameter(const juce::String& niceName, const juce::String& description, const juce::Colour& initialColor, const bool& enabled = true);
+	TargetParameter* addTargetParameter(const juce::String& niceName, const juce::String& description, juce::WeakReference<ControllableContainer> rootReference = nullptr, const bool& enabled = true);
+	FileParameter* addFileParameter(const juce::String& niceName, const juce::String& description, const juce::String& initialValue = "");
 
-	Trigger * addTrigger(const String &niceName, const String &description, const bool &enabled = true, int index = -1);
+	Trigger* addTrigger(const juce::String& niceName, const juce::String &description, const bool &enabled = true, int index = -1);
 
 	void addTriggerInternal(Trigger * t, int index = -1);
 	void addParameterInternal(Parameter * p, int index = -1);
 
-	UndoableAction * removeUndoableControllable(Controllable * c, bool onlyReturnAction = false);
-	void removeControllable(WeakReference<Controllable> c, bool deleteObject = true);
-	Controllable * getControllableByName(const String &name, bool searchNiceNameToo = false, bool searchLowerCaseToo = true);
-	Parameter * getParameterByName(const String &name, bool searchNiceNameToo = false, bool searchLowerCaseToo = true);
+	juce::UndoableAction * removeUndoableControllable(Controllable * c, bool onlyReturnAction = false);
+	void removeControllable(juce::WeakReference<Controllable> c, bool deleteObject = true);
+	Controllable * getControllableByName(const juce::String& name, bool searchNiceNameToo = false, bool searchLowerCaseToo = true);
+	Parameter* getParameterByName(const juce::String &name, bool searchNiceNameToo = false, bool searchLowerCaseToo = true);
 
 	void addChildControllableContainer(ControllableContainer* container, bool owned = false, int index = -1, bool notify = true);
-	void addChildControllableContainers(Array<ControllableContainer *> containers, bool owned = false, int index = -1, bool notify = true);
+	void addChildControllableContainers(juce::Array<ControllableContainer *> containers, bool owned = false, int index = -1, bool notify = true);
 	void removeChildControllableContainer(ControllableContainer *container);
 	
 
-	ControllableContainer * getControllableContainerByName(const String &name, bool searchNiceNameToo = false, bool searchLowerCaseToo = true);
-	ControllableContainer * getControllableContainerForAddress(const String &address, bool recursive = false, bool getNotExposed = false, bool searchNiceNameToo = false, bool searchLowerCaseToo = true);
-	ControllableContainer * getControllableContainerForAddress(StringArray  addressSplit, bool recursive = false, bool getNotExposed = false, bool searchNiceNameToo = false, bool searchLowerCaseToo = true);
+	ControllableContainer * getControllableContainerByName(const juce::String &name, bool searchNiceNameToo = false, bool searchLowerCaseToo = true);
+	ControllableContainer * getControllableContainerForAddress(const juce::String &address, bool recursive = false, bool getNotExposed = false, bool searchNiceNameToo = false, bool searchLowerCaseToo = true);
+	ControllableContainer * getControllableContainerForAddress(juce::StringArray  addressSplit, bool recursive = false, bool getNotExposed = false, bool searchNiceNameToo = false, bool searchLowerCaseToo = true);
 
 	virtual void setParentContainer(ControllableContainer * container);
 	void updateChildrenControlAddress();
 
 
-	virtual Array<WeakReference<Controllable>> getAllControllables(bool recursive = false);
-	virtual Array<WeakReference<Parameter>> getAllParameters(bool recursive = false);
-	virtual Array<WeakReference<ControllableContainer>> getAllContainers(bool recursive = false);
-	virtual Controllable * getControllableForAddress(const String &address, bool recursive = true);
-	virtual Controllable * getControllableForAddress(StringArray addressSplit, bool recursive = true);
+	virtual juce::Array<juce::WeakReference<Controllable>> getAllControllables(bool recursive = false);
+	virtual juce::Array<juce::WeakReference<Parameter>> getAllParameters(bool recursive = false);
+	virtual juce::Array<juce::WeakReference<ControllableContainer>> getAllContainers(bool recursive = false);
+	virtual Controllable * getControllableForAddress(const juce::String &address, bool recursive = true);
+	virtual Controllable * getControllableForAddress(juce::StringArray addressSplit, bool recursive = true);
 	bool containsControllable(Controllable * c, int maxSearchLevels = -1);
-	String getControlAddress(ControllableContainer * relativeTo = nullptr);
+	juce::String getControlAddress(ControllableContainer * relativeTo = nullptr);
 
 
 	//Remote Control
-	virtual void handleAddFromRemoteControl(var data) {}
+	virtual void handleAddFromRemoteControl(juce::var data) {}
 	virtual void handleRemoveFromRemoteControl() {}
 
 
@@ -141,60 +141,60 @@ public:
 	virtual void askForRemoveControllable(Controllable * c, bool addToUndo = false) override;
 
 	void warningChanged(WarningTarget*);
-	virtual String getWarningMessage(const String& id = WarningTarget::warningAllId) const override;
-	virtual String getWarningTargetName() const override;
+	virtual juce::String getWarningMessage(const juce::String& id = WarningTarget::warningAllId) const override;
+	virtual juce::String getWarningTargetName() const override;
 
-	virtual var getJSONData();
-	virtual void loadJSONData(var data, bool createIfNotThere = false);
-	virtual void loadJSONDataInternal(var /*data*/) { /* to be overriden by child classes */ }
+	virtual juce::var getJSONData();
+	virtual void loadJSONData(juce::var data, bool createIfNotThere = false);
+	virtual void loadJSONDataInternal(juce::var /*data*/) { /* to be overriden by child classes */ }
 	virtual void afterLoadJSONDataInternal() {} //allow for calling methods after isCurrentlyLoadingData is set to false
 
 	//Remote control
-	virtual var getRemoteControlData();
-	virtual void getRemoteControlDataInternal(var& /*data*/) {}
-	virtual void handleRemoteControlData(var data);
-	virtual void handleRemoteControlData(const OSCMessage& m);
+	virtual juce::var getRemoteControlData();
+	virtual void getRemoteControlDataInternal(juce::var& /*data*/) {}
+	virtual void handleRemoteControlData(juce::var data);
+	virtual void handleRemoteControlData(const juce::OSCMessage& m);
 
 	virtual void controllableContainerNameChanged(ControllableContainer *) override;
 	virtual void childStructureChanged(ControllableContainer *)override;
 	virtual void childAddressChanged(ControllableContainer *) override;
 	
-	bool isNameTaken(const String& name, bool searchNiceName = true, Controllable* excludeC = nullptr, ControllableContainer* excludeCC = nullptr);
-	String getUniqueNameInContainer(const String &sourceName, bool searchNiceName = true, int suffix = 0);
+	bool isNameTaken(const juce::String& name, bool searchNiceName = true, Controllable* excludeC = nullptr, ControllableContainer* excludeCC = nullptr);
+	juce::String getUniqueNameInContainer(const juce::String &sourceName, bool searchNiceName = true, int suffix = 0);
 
 	//SCRIPT
-	virtual void updateScriptObjectInternal(var parent = var()) override;
-	static var getChildFromScript(const var::NativeFunctionArgs &a);
-	static var getParentFromScript(const juce::var::NativeFunctionArgs& a);
-	static var setNameFromScript(const juce::var::NativeFunctionArgs& a);
-	static var setCollapsedFromScript(const juce::var::NativeFunctionArgs& a);
+	virtual void updateScriptObjectInternal(juce::var parent = juce::var()) override;
+	static juce::var getChildFromScript(const juce::var::NativeFunctionArgs &a);
+	static juce::var getParentFromScript(const juce::var::NativeFunctionArgs& a);
+	static juce::var setNameFromScript(const juce::var::NativeFunctionArgs& a);
+	static juce::var setCollapsedFromScript(const juce::var::NativeFunctionArgs& a);
 	
-	static var addTriggerFromScript(const var::NativeFunctionArgs &args);
-	static var addBoolParameterFromScript(const var::NativeFunctionArgs &args);
-	static var addIntParameterFromScript(const var::NativeFunctionArgs &args);
-	static var addFloatParameterFromScript(const var::NativeFunctionArgs &args);
-	static var addStringParameterFromScript(const var::NativeFunctionArgs &args);
-	static var addEnumParameterFromScript(const var::NativeFunctionArgs &args);
-	static var addTargetParameterFromScript(const var::NativeFunctionArgs &args);
-	static var addColorParameterFromScript(const var::NativeFunctionArgs &args);
-	static var addPoint2DParameterFromScript(const var::NativeFunctionArgs &args);
-	static var addPoint3DParameterFromScript(const var::NativeFunctionArgs &args);
-	static var addFileParameterFromScript(const var::NativeFunctionArgs &args);
-	static var addAutomationFromScript(const var::NativeFunctionArgs& args);
+	static juce::var addTriggerFromScript(const juce::var::NativeFunctionArgs &args);
+	static juce::var addBoolParameterFromScript(const juce::var::NativeFunctionArgs &args);
+	static juce::var addIntParameterFromScript(const juce::var::NativeFunctionArgs &args);
+	static juce::var addFloatParameterFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var addStringParameterFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var addEnumParameterFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var addTargetParameterFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var addColorParameterFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var addPoint2DParameterFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var addPoint3DParameterFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var addFileParameterFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var addAutomationFromScript(const juce::var::NativeFunctionArgs& args);
 	
-	static var addContainerFromScript(const var::NativeFunctionArgs &args);
-	static var removeContainerFromScript(const var::NativeFunctionArgs &args);
-	static var removeControllableFromScript(const var::NativeFunctionArgs& args);
+	static juce::var addContainerFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var removeContainerFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var removeControllableFromScript(const juce::var::NativeFunctionArgs& args);
 
-	static var getControlAddressFromScript(const var::NativeFunctionArgs& args);
-	static var getScriptControlAddressFromScript(const var::NativeFunctionArgs& args);
+	static juce::var getControlAddressFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var getScriptControlAddressFromScript(const juce::var::NativeFunctionArgs& args);
 
-	static var getJSONDataFromScript(const var::NativeFunctionArgs& args);
-	static var loadJSONDataFromScript(const var::NativeFunctionArgs &args);
+	static juce::var getJSONDataFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var loadJSONDataFromScript(const juce::var::NativeFunctionArgs &args);
 	
-	static bool checkNumArgs(const String &logName, const var::NativeFunctionArgs &args, int expectedArgs);
+	static bool checkNumArgs(const juce::String &logName, const juce::var::NativeFunctionArgs &args, int expectedArgs);
 	
-	String getScriptTargetString() override;
+	juce::String getScriptTargetString() override;
 
 
 
@@ -210,11 +210,11 @@ protected:
 	virtual void onExternalTriggerTriggered(Trigger *) {}; //When listening to other child controllable than this container's children
 	virtual void onControllableAdded(Controllable *) {}; 
 	virtual void onControllableRemoved(Controllable *) {};
-    virtual void onContainerParameterChangedAsync(Parameter *,const var & /*value*/){};
+    virtual void onContainerParameterChangedAsync(Parameter *,const juce::var & /*value*/){};
 	virtual void onWarningChanged(WarningTarget*) {}
 
 public:
-    ListenerList<ControllableContainerListener> controllableContainerListeners;
+	juce::ListenerList<ControllableContainerListener> controllableContainerListeners;
 	void addControllableContainerListener(ControllableContainerListener* newListener);
 	void removeControllableContainerListener(ControllableContainerListener* listener);
     
@@ -228,8 +228,8 @@ public:
 
 
 
-	WeakReference<ControllableContainer>::Master masterReference;
-	friend class WeakReference<ControllableContainer>;
+	juce::WeakReference<ControllableContainer>::Master masterReference;
+	friend class juce::WeakReference<ControllableContainer>;
 
 protected:
 	virtual void notifyStructureChanged();
@@ -239,7 +239,7 @@ protected:
 
 public:
 	class ControllableContainerAction :
-		public UndoableAction
+		public juce::UndoableAction
 	{
 	public:
 		ControllableContainerAction(ControllableContainer * cc) :
@@ -248,8 +248,8 @@ public:
 			controlAddress = cc->getControlAddress();
 		}
 
-		WeakReference<ControllableContainer> containerRef;
-		String controlAddress;
+		juce::WeakReference<ControllableContainer> containerRef;
+		juce::String controlAddress;
 
 		ControllableContainer * getControllableContainer();
 	};
@@ -258,15 +258,15 @@ public:
 		public ControllableContainerAction 
 	{
 	public:
-		ControllableContainerChangeNameAction(ControllableContainer * cc, String oldName, String newName) :
+		ControllableContainerChangeNameAction(ControllableContainer * cc, juce::String oldName, juce::String newName) :
 			ControllableContainerAction(cc),
 			oldName(oldName),
 			newName(newName)
 		{
 		}
 
-		String oldName;
-		String newName;
+		juce::String oldName;
+		juce::String newName;
 
 		bool perform() override;
 		bool undo() override;
@@ -279,10 +279,10 @@ public:
 		ControllableContainerControllableAction(ControllableContainer * cc, Controllable * c);
 
 		
-		WeakReference<Inspectable> cRef;
-		String cShortName;
-		var data; 
-		String cType;
+		juce::WeakReference<Inspectable> cRef;
+		juce::String cShortName;
+		juce::var data; 
+		juce::String cType;
 
 		Controllable * getItem();
 	};
@@ -312,7 +312,7 @@ public:
 
 
 
-	virtual InspectableEditor * getEditorInternal(bool isRoot, Array<Inspectable*> inspectables = Array<Inspectable*>()) override;
+	virtual InspectableEditor * getEditorInternal(bool isRoot, juce::Array<Inspectable*> inspectables = juce::Array<Inspectable*>()) override;
 	virtual DashboardItem * createDashboardItem() override;
 
 	private:
@@ -326,11 +326,11 @@ class EnablingControllableContainer :
 	public ControllableContainer
 {
 public:
-	EnablingControllableContainer(const String &n, bool canBeDisabled = true);
+	EnablingControllableContainer(const juce::String &n, bool canBeDisabled = true);
 	BoolParameter * enabled;
 
 	bool canBeDisabled;
 	void setCanBeDisabled(bool value);
 
-	virtual InspectableEditor * getEditorInternal(bool isRoot, Array<Inspectable*> inspectables = Array<Inspectable*>()) override;
+	virtual InspectableEditor * getEditorInternal(bool isRoot, juce::Array<Inspectable*> inspectables = juce::Array<Inspectable*>()) override;
 };
