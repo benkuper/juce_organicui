@@ -13,7 +13,6 @@
 //  header (build and link-time cheap) to include everywhere we need specific debug macros
 
 
-using namespace juce;
 
 // slower but safe log (avoid flooding
 #define SLOG(textToWrite) JUCE_BLOCK_WITH_FORCED_SEMICOLON (juce::String tempDbgBuf;\

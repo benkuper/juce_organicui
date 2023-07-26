@@ -87,7 +87,6 @@
 #include <juce_simpleweb/juce_simpleweb.h>
 #endif
 
-using namespace juce;
 
 #include "resources/BinaryData.h"
 

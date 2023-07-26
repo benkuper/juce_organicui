@@ -10,7 +10,6 @@
 
 #pragma once
 
-using namespace juce;
 
 class AssetManager
 {
