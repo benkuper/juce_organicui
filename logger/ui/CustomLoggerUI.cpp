@@ -278,6 +278,14 @@ void CustomLoggerUI::newMessage(const String& message)
 
 }
 
+void CustomLoggerUI::clearLogger()
+{
+	logger->logElements.clear();
+	totalLogRow = 0;
+	logListComponent->updateContent();
+	LOG(juce::translate("Cleared."));
+}
+
 void CustomLoggerUI::timerCallback()
 {
 	stopTimer();
@@ -464,10 +472,7 @@ void CustomLoggerUI::buttonClicked(Button* b)
 
 	if (b == &clearB)
 	{
-		logger->logElements.clear();
-		totalLogRow = 0;
-		logListComponent->updateContent();
-		LOG(juce::translate("Cleared."));
+		clearLogger();
 	}
 
 	else if (b == &copyB) {

@@ -82,6 +82,7 @@ public:
 
 	void newMessage(const String&) override;
 
+	void clearLogger();
 
 	static CustomLoggerUI * create(const String &contentName) { return new CustomLoggerUI(contentName, CustomLogger::getInstance()); }
 
