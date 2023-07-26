@@ -53,9 +53,9 @@ TargetParameter::~TargetParameter()
 
 void TargetParameter::resetValue(bool silentSet)
 {
-	setGhostValue("");
 	if (targetType == CONTAINER) setTarget((ControllableContainer*)nullptr);
 	else setTarget((Controllable*)nullptr);
+	setGhostValue("");
 	setUndoableValue(value, "");
 
 	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::VALUE_CHANGED, this, getValue()));
