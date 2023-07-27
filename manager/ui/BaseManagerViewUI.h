@@ -178,11 +178,11 @@ void BaseManagerViewUI<M, T, U>::mouseDown(const juce::MouseEvent& e)
 	BaseManagerUI<M, T, U>::mouseDown(e);
 	if (canNavigate && ((e.mods.isLeftButtonDown() && e.mods.isAltDown()) || e.mods.isMiddleButtonDown()))
 	{
-		this->setMouseCursor(MouseCursor::UpDownLeftRightResizeCursor);
+		this->setMouseCursor(juce::MouseCursor::UpDownLeftRightResizeCursor);
 		this->updateMouseCursor();
-		initViewOffset = Point<int>(this->manager->viewOffset.x, this->manager->viewOffset.y);
+		initViewOffset = juce::Point<int>(this->manager->viewOffset.x, this->manager->viewOffset.y);
 	}
-	else if (ResizableCornerComponent* r = dynamic_cast<ResizableCornerComponent*>(e.eventComponent))
+	else if (juce::ResizableCornerComponent* r = dynamic_cast<juce::ResizableCornerComponent*>(e.eventComponent))
 	{
 		BaseItemUI<T>* ui = (BaseItemUI<T>*)r->getParentComponent();
 		ui->item->setSizeReference(true);
@@ -209,7 +209,7 @@ void BaseManagerViewUI<M, T, U>::mouseDrag(const juce::MouseEvent& e)
 		}
 
 	}
-	else if (ResizableCornerComponent* r = dynamic_cast<ResizableCornerComponent*>(e.eventComponent))
+	else if (juce::ResizableCornerComponent* r = dynamic_cast<juce::ResizableCornerComponent*>(e.eventComponent))
 	{
 		BaseItemUI<T>* ui = (BaseItemUI<T>*)r->getParentComponent();
 		juce::Point<float> sizeOffset = ui->item->getItemSize() - ui->item->sizeReference;
@@ -228,7 +228,7 @@ void BaseManagerViewUI<M, T, U>::mouseUp(const juce::MouseEvent& e)
 	this->setMouseCursor(juce::MouseCursor::NormalCursor);
 	this->updateMouseCursor();
 
-	if (ResizableCornerComponent* r = dynamic_cast<ResizableCornerComponent*>(e.eventComponent))
+	if (juce::ResizableCornerComponent* r = dynamic_cast<juce::ResizableCornerComponent*>(e.eventComponent))
 	{
 		BaseItemUI<T>* ui = (BaseItemUI<T>*)r->getParentComponent();
 		juce::Point<float> sizeOffset = ui->item->getItemSize() - ui->item->sizeReference;
@@ -320,7 +320,7 @@ void BaseManagerViewUI<M, T, U>::paint(juce::Graphics& g)
 	if (!this->transparentBG) paintBackground(g);
 	if (this->manager->items.size() == 0 && this->noItemText.isNotEmpty())
 	{
-		g.setColour(Colours::white.withAlpha(.4f));
+		g.setColour(juce::Colours::white.withAlpha(.4f));
 		g.setFont(16);
 		g.drawFittedText(this->noItemText, this->getLocalBounds(), juce::Justification::centred, 6);
 	}
@@ -395,7 +395,7 @@ void BaseManagerViewUI<M, T, U>::resized()
 
 	if (viewPane != nullptr)
 	{
-		int size = jlimit(50, 300, jmax(r.getWidth() / 5, r.getHeight() / 5) - 20);
+		int size = juce::jlimit(50, 300, juce::jmax(r.getWidth() / 5, r.getHeight() / 5) - 20);
 		viewPane->setBounds(r.translated(-10, -10).removeFromRight(size).removeFromBottom(size));
 	}
 
@@ -497,7 +497,7 @@ void BaseManagerViewUI<M, T, U>::addItemFromMenu(bool isFromAddButton, juce::Poi
 template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::addItemFromMenu(T* item, bool isFromAddButton, juce::Point<int> mouseDownPos)
 {
-	this->manager->addItem(item, isFromAddButton ? Point<float>(0, 0) : getViewPos(mouseDownPos).toFloat());
+	this->manager->addItem(item, isFromAddButton ? juce::Point<float>(0, 0) : getViewPos(mouseDownPos).toFloat());
 }
 
 template<class M, class T, class U>
@@ -596,7 +596,7 @@ template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::setViewZoom(float value)
 {
 	if (this->manager->viewZoom == value) return;
-	this->manager->viewZoom = jlimit<float>(minZoom, maxZoom, value);
+	this->manager->viewZoom = juce::jlimit<float>(minZoom, maxZoom, value);
 	for (auto& tui : this->itemsUI) tui->setViewZoom(this->manager->viewZoom);
 
 	updateItemsVisibility();
@@ -719,16 +719,16 @@ void BaseManagerViewUI<M, T, U>::itemDragMove(const juce::DragAndDropTarget::Sou
 		snapLineX = juce::Line<int>();
 		if (targetUIX != nullptr)
 		{
-			snapLineX.setStart(juce::Point<int>(targetX, jmin<int>(sb.getY(), targetUIX->getBounds().getY()) - 20));
-			snapLineX.setEnd(juce::Point<int>(targetX, jmax<int>(sb.getBottom(), targetUIX->getBounds().getBottom()) + 20));
+			snapLineX.setStart(juce::Point<int>(targetX, juce::jmin<int>(sb.getY(), targetUIX->getBounds().getY()) - 20));
+			snapLineX.setEnd(juce::Point<int>(targetX, juce::jmax<int>(sb.getBottom(), targetUIX->getBounds().getBottom()) + 20));
 			snapPosition.setX(snapIsLeft ? targetX : targetX - bui->getWidth());
 		}
 
 		snapLineY = juce::Line<int>();
 		if (targetUIY != nullptr)
 		{
-			snapLineY.setStart(juce::Point<int>(jmin<int>(sb.getX(), targetUIY->getBounds().getX()) - 20, targetY));
-			snapLineY.setEnd(juce::Point<int>(jmax<int>(sb.getRight(), targetUIY->getBounds().getRight()) + 20, targetY));
+			snapLineY.setStart(juce::Point<int>(juce::jmin<int>(sb.getX(), targetUIY->getBounds().getX()) - 20, targetY));
+			snapLineY.setEnd(juce::Point<int>(juce::jmax<int>(sb.getRight(), targetUIY->getBounds().getRight()) + 20, targetY));
 			snapPosition.setY(snapIsTop ? targetY : targetY - bui->getHeight());
 		}
 
@@ -794,7 +794,7 @@ void BaseManagerViewUI<M, T, U>::askForSyncPosAndSize(BaseItemMinimalUI<T>* item
 {
 	juce::Array<juce::UndoableAction*> actions;
 	actions.add(itemUI->baseItem->viewUIPosition->setUndoablePoint(itemUI->baseItem->viewUIPosition->getPoint(), getViewPos(itemUI->getPosition()).toFloat(), true));
-	actions.add(itemUI->baseItem->viewUISize->setUndoablePoint(itemUI->baseItem->viewUISize->getPoint(), Point<float>(itemUI->getWidth(), itemUI->getHeight()), true));
+	actions.add(itemUI->baseItem->viewUISize->setUndoablePoint(itemUI->baseItem->viewUISize->getPoint(), juce::Point<float>(itemUI->getWidth(), itemUI->getHeight()), true));
 	UndoMaster::getInstance()->performActions("Move / Resize " + itemUI->baseItem->niceName, actions);
 }
 
@@ -822,16 +822,16 @@ void BaseManagerViewUI<M, T, U>::itemUIResizeDrag(BaseItemMinimalUI<T>* itemUI, 
 		snapLineX = juce::Line<int>();
 		if (snapX.targetUI != nullptr)
 		{
-			snapLineX.setStart(juce::Point<int>(snapInView.x, jmin<int>(itemUI->getBounds().getY(), snapX.targetUI->getBounds().getY()) - 20));
-			snapLineX.setEnd(juce::Point<int>(snapInView.x, jmax<int>(itemUI->getBounds().getBottom(), snapX.targetUI->getBounds().getBottom()) + 20));
+			snapLineX.setStart(juce::Point<int>(snapInView.x, juce::jmin<int>(itemUI->getBounds().getY(), snapX.targetUI->getBounds().getY()) - 20));
+			snapLineX.setEnd(juce::Point<int>(snapInView.x, juce::jmax<int>(itemUI->getBounds().getBottom(), snapX.targetUI->getBounds().getBottom()) + 20));
 			snapPos.x = snapX.pos;
 		}
 
 		snapLineY = juce::Line<int>();
 		if (snapY.targetUI != nullptr)
 		{
-			snapLineY.setStart(juce::Point<int>(jmin<int>(itemUI->getBounds().getX(), snapY.targetUI->getBounds().getX()) - 20, snapInView.y));
-			snapLineY.setEnd(juce::Point<int>(jmax<int>(itemUI->getBounds().getRight(), snapY.targetUI->getBounds().getRight()) + 20, snapInView.y));
+			snapLineY.setStart(juce::Point<int>(juce::jmin<int>(itemUI->getBounds().getX(), snapY.targetUI->getBounds().getX()) - 20, snapInView.y));
+			snapLineY.setEnd(juce::Point<int>(juce::jmax<int>(itemUI->getBounds().getRight(), snapY.targetUI->getBounds().getRight()) + 20, snapInView.y));
 			snapPos.y = snapY.pos;
 		}
 

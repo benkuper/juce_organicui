@@ -57,7 +57,7 @@ public:
 
 		void paint(juce::Graphics& g)
 		{
-			g.setColour(isMouseOverOrDragging() ? HIGHLIGHT_COLOR : Colours::lightgrey.withAlpha(.3f));
+			g.setColour(isMouseOverOrDragging() ? HIGHLIGHT_COLOR : juce::Colours::lightgrey.withAlpha(.3f));
 			for (int i = 0; i < 3; i++) g.drawLine(getWidth() * i / 3, getHeight(), getWidth(), getHeight() * i / 3);
 		}
 	};
@@ -150,12 +150,12 @@ BaseItemUI<T>::BaseItemUI(T* _item, Direction _resizeDirection, bool showMiniMod
 
 	this->setName(this->baseItem->niceName);
 
-	itemLabel.setColour(itemLabel.backgroundColourId, Colours::transparentWhite);
+	itemLabel.setColour(itemLabel.backgroundColourId, juce::Colours::transparentWhite);
 	itemLabel.setColour(itemLabel.textColourId, TEXT_COLOR);
 
-	itemLabel.setColour(itemLabel.backgroundWhenEditingColourId, Colours::black);
-	itemLabel.setColour(itemLabel.textWhenEditingColourId, Colours::white);
-	itemLabel.setColour(juce::CaretComponent::caretColourId, Colours::orange);
+	itemLabel.setColour(itemLabel.backgroundWhenEditingColourId, juce::Colours::black);
+	itemLabel.setColour(itemLabel.textWhenEditingColourId, juce::Colours::white);
+	itemLabel.setColour(juce::CaretComponent::caretColourId, juce::Colours::orange);
 
 	itemLabel.setFont(GlobalSettings::getInstance()->fontSize->floatValue());
 	itemLabel.setJustificationType(juce::Justification::centredLeft);
@@ -294,7 +294,7 @@ void BaseItemUI<T>::updateItemUISize()
 	{
 		if (resizer != nullptr) this->addAndMakeVisible(resizer);
 
-		int targetHeight = this->getHeight() > 0 ? jmax(minContentHeight, this->getHeight()) : 24;//Default size if zero
+		int targetHeight = this->getHeight() > 0 ? juce::jmax(minContentHeight, this->getHeight()) : 24;//Default size if zero
 		int targetWidth = this->getWidth() > 0 ? this->getWidth() : 100;//default size if zero
 
 		switch (resizeDirection)
@@ -426,7 +426,7 @@ void BaseItemUI<T>::resized()
 template<class T>
 void BaseItemUI<T>::resizedHeader(juce::Rectangle<int>& r)
 {
-	int labelWidth = jmax(itemLabel.getFont().getStringWidth(this->baseItem->niceName) + 10, 30);
+	int labelWidth = juce::jmax(itemLabel.getFont().getStringWidth(this->baseItem->niceName) + 10, 30);
 	itemLabel.setBounds(r.removeFromLeft(labelWidth).reduced(0, 1));
 	r.removeFromLeft(2);
 
@@ -440,8 +440,8 @@ void BaseItemUI<T>::buttonClicked(juce::Button* b)
 	{
 		if (this->baseItem->askConfirmationBeforeRemove && GlobalSettings::getInstance()->askBeforeRemovingItems->boolValue())
 		{
-			AlertWindow::showAsync(
-				MessageBoxOptions().withIconType(AlertWindow::QuestionIcon)
+			juce::AlertWindow::showAsync(
+				juce::MessageBoxOptions().withIconType(juce::AlertWindow::QuestionIcon)
 				.withTitle("Delete " + this->baseItem->niceName)
 				.withMessage("Are you sure you want to delete this ?")
 				.withButton("Delete")
@@ -461,7 +461,7 @@ template<class T>
 void BaseItemUI<T>::mouseDown(const juce::MouseEvent& e)
 {
 	//if ((removeBT != nullptr && e.eventComponent == removeBT) || (enabledBT != nullptr && e.eventComponent == enabledBT->bt)) return;
-	if (dynamic_cast<Button*>(e.eventComponent) != nullptr) return;
+	if (dynamic_cast<juce::Button*>(e.eventComponent) != nullptr) return;
 	else if (dynamic_cast<ControllableUI*>(e.eventComponent) != nullptr) return;
 	else if (e.eventComponent == cornerResizer.get())
 	{
@@ -496,7 +496,7 @@ void BaseItemUI<T>::labelTextChanged(juce::Label* l)
 {
 	if (l == &itemLabel)
 	{
-		if (l->getText().isEmpty()) itemLabel.setText(this->baseItem->niceName, dontSendNotification); //avoid setting empty names
+		if (l->getText().isEmpty()) itemLabel.setText(this->baseItem->niceName, juce::dontSendNotification); //avoid setting empty names
 		else this->baseItem->setUndoableNiceName(l->getText());
 		resized();
 	}
@@ -529,7 +529,7 @@ template<class T>
 void BaseItemUI<T>::containerChildAddressChangedAsync(ControllableContainer*)
 {
 
-	itemLabel.setText(this->baseItem->niceName, dontSendNotification);
+	itemLabel.setText(this->baseItem->niceName, juce::dontSendNotification);
 }
 
 template<class T>

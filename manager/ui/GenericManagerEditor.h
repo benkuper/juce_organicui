@@ -149,7 +149,7 @@ void GenericManagerEditor<T>::paint(juce::Graphics& g)
 	if (this->manager->items.size() == 0 && this->noItemText.isNotEmpty())
 	{
 		g.setColour(PANEL_COLOR.brighter(.1f));
-		g.drawFittedText(this->noItemText, this->getContentBounds().reduced(10), Justification::centred, 4);
+		g.drawFittedText(this->noItemText, this->getContentBounds().reduced(10), juce::Justification::centred, 4);
 	}
 
 	if (isDraggingOver && highlightOnDragOver)
@@ -392,7 +392,7 @@ void GenericManagerEditor<T>::itemDropped(const SourceDetails& dragSourceDetails
 
 				if (T* newItem = this->manager->createItemFromData(data))
 				{
-					juce::Array<UndoableAction*> actions;
+					juce::Array<juce::UndoableAction*> actions;
 					actions.add(this->manager->getAddItemUndoableAction(newItem, data));
 					if (BaseManager<T>* sourceManager = dynamic_cast<BaseManager<T> *>(tItem->parentContainer.get()))
 					{
@@ -417,7 +417,7 @@ int GenericManagerEditor<T>::getDropIndexForPosition(juce::Point<int> localPosit
 	for (int i = 0; i < itemEditors.size(); ++i)
 	{
 		BaseItemEditor* iui = itemEditors[i];
-		Point<int> p = getLocalArea(iui, iui->getLocalBounds()).getCentre();
+		juce::Point<int> p = getLocalArea(iui, iui->getLocalBounds()).getCentre();
 		if (localPosition.y < p.y) return i;
 	}
 

@@ -16,43 +16,43 @@
 
 // slower but safe log (avoid flooding
 #define SLOG(textToWrite) JUCE_BLOCK_WITH_FORCED_SEMICOLON (juce::String tempDbgBuf;\
-static uint32 lastTime =  Time::getMillisecondCounter(); \
+static uint32 lastTime =  juce::Time::getMillisecondCounter(); \
 static bool runningUnderDebugger = juce_isRunningUnderDebugger();\
-uint32 now = Time::getMillisecondCounter();\
+uint32 now = juce::Time::getMillisecondCounter();\
 if( (now - lastTime>300 )|| runningUnderDebugger){ \
-String fullPath = String(__FILE__);\
-tempDbgBuf << fullPath.substring (fullPath.lastIndexOfChar (File::getSeparatorChar()) + 1 ,fullPath.lastIndexOfChar('.') ) << "::" <<  textToWrite;\
+juce::String fullPath = juce::String(__FILE__);\
+tempDbgBuf << fullPath.substring (fullPath.lastIndexOfChar (juce::File::getSeparatorChar()) + 1 ,fullPath.lastIndexOfChar('.') ) << "::" <<  textToWrite;\
 juce::Logger::writeToLog(tempDbgBuf);\
 lastTime = now;})
 
 // log informing file from where it was outputed
 #define LOG(textToWrite) JUCE_BLOCK_WITH_FORCED_SEMICOLON (juce::String tempDbgBuf;\
-String fullPath = String(__FILE__);\
+juce::String fullPath = juce::String(__FILE__);\
 tempDbgBuf << fullPath.substring (fullPath.lastIndexOfChar (juce::File::getSeparatorChar()) + 1 ,fullPath.lastIndexOfChar('.') ) << "::" <<  textToWrite;\
 juce::Logger::writeToLog(tempDbgBuf);)
 
 #define LOGWARNING(textToWrite) JUCE_BLOCK_WITH_FORCED_SEMICOLON (juce::String tempDbgBuf;\
-String fullPath = String(__FILE__);\
+juce::String fullPath = juce::String(__FILE__);\
 tempDbgBuf << fullPath.substring (fullPath.lastIndexOfChar (juce::File::getSeparatorChar()) + 1 ,fullPath.lastIndexOfChar('.') ) << "::!!" <<  textToWrite;\
 juce::Logger::writeToLog(tempDbgBuf);)
 
 #define LOGERROR(textToWrite) JUCE_BLOCK_WITH_FORCED_SEMICOLON (juce::String tempDbgBuf;\
-String fullPath = String(__FILE__);\
+juce::String fullPath = juce::String(__FILE__);\
 tempDbgBuf<< fullPath.substring (fullPath.lastIndexOfChar (juce::File::getSeparatorChar()) + 1 ,fullPath.lastIndexOfChar('.') ) << "::!!!"  <<  textToWrite;\
 juce::Logger::writeToLog(tempDbgBuf);)
 
 
 // named version where source name is user defined
 #define NLOG(__name,textToWrite) JUCE_BLOCK_WITH_FORCED_SEMICOLON (juce::String tempDbgBuf;\
-tempDbgBuf << __name << StringRef("::") << textToWrite;\
+tempDbgBuf << __name << juce::StringRef("::") << textToWrite;\
 juce::Logger::writeToLog(tempDbgBuf);)
 
 #define NLOGWARNING(__name,textToWrite) JUCE_BLOCK_WITH_FORCED_SEMICOLON (juce::String tempDbgBuf;\
-tempDbgBuf << __name << StringRef("::!!") << textToWrite;\
+tempDbgBuf << __name << juce::StringRef("::!!") << textToWrite;\
 juce::Logger::writeToLog(tempDbgBuf);)
 
 #define NLOGERROR(__name,textToWrite) JUCE_BLOCK_WITH_FORCED_SEMICOLON (juce::String tempDbgBuf;\
-tempDbgBuf << __name << StringRef("::!!!") << textToWrite;\
+tempDbgBuf << __name << juce::StringRef("::!!!") << textToWrite;\
 juce::Logger::writeToLog(tempDbgBuf);)
 
 

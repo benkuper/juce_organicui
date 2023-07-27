@@ -158,7 +158,7 @@ public:
 			if (subMenuIndex == -1)
 			{
 				subMenuNames.add(d->menuPath);
-				subMenus.add(new PopupMenu());
+				subMenus.add(new juce::PopupMenu());
 				subMenuIndex = subMenus.size() - 1;
 			}
 

@@ -561,8 +561,8 @@ void BaseManagerUI<M, T, U>::paint(juce::Graphics& g)
 
 	if (!this->inspectable.wasObjectDeleted() && this->manager->items.size() == 0 && noItemText.isNotEmpty())
 	{
-		g.setColour(Colours::white.withAlpha(.4f));
-		g.setFont(jmin(getHeight() - 2, 14));
+		g.setColour(juce::Colours::white.withAlpha(.4f));
+		g.setFont(juce::jmin(getHeight() - 2, 14));
 		g.drawFittedText(noItemText, getLocalBounds().reduced(5), juce::Justification::centred, 6);
 	}
 }
@@ -616,7 +616,7 @@ void BaseManagerUI<M, T, U>::resizedInternalHeaderTools(juce::Rectangle<int>& r)
 	r.removeFromLeft(4);
 
 	float rSize = 0;
-	for (auto& t : this->tools) rSize += jmax(t->getWidth(), r.getHeight());
+	for (auto& t : this->tools) rSize += juce::jmax(t->getWidth(), r.getHeight());
 
 	r.removeFromLeft((r.getWidth() - rSize) / 2);
 
@@ -628,7 +628,7 @@ void BaseManagerUI<M, T, U>::resizedInternalHeaderTools(juce::Rectangle<int>& r)
 
 	for (auto& t : this->tools)
 	{
-		juce::Rectangle<int> tr = toolR.removeFromLeft(jmax(t->getWidth(), r.getHeight()));
+		juce::Rectangle<int> tr = toolR.removeFromLeft(juce::jmax(t->getWidth(), r.getHeight()));
 		tr.reduce(tr.getWidth() == toolR.getHeight() ? 6 : 0, 6);
 		t->setBounds(tr);
 	}
@@ -657,7 +657,7 @@ void BaseManagerUI<M, T, U>::resizedInternalContent(juce::Rectangle<int>& r)
 			//if (grabbingItem != nullptr) th = jmax<int>(th + grabbingItem->getHeight(), viewport.getHeight());
 
 			if (useViewport) container.setSize(getWidth(), th);
-			else this->setSize(getWidth(), jmax<int>(th + 10, minHeight));
+			else this->setSize(getWidth(), juce::jmax<int>(th + 10, minHeight));
 		}
 		else if (defaultLayout == HORIZONTAL)
 		{
@@ -716,11 +716,11 @@ void BaseManagerUI<M, T, U>::alignItems(AlignMode alignMode)
 		if (i == nullptr || !manager->items.contains(i)) continue;
 		switch (alignMode)
 		{
-		case BaseManagerUI<M, T, U>::AlignMode::LEFT: target = jmin(i->viewUIPosition->x, target); break;
-		case BaseManagerUI<M, T, U>::AlignMode::RIGHT: target = jmax(i->viewUIPosition->x + i->viewUISize->x, target); break;
+		case BaseManagerUI<M, T, U>::AlignMode::LEFT: target = juce::jmin(i->viewUIPosition->x, target); break;
+		case BaseManagerUI<M, T, U>::AlignMode::RIGHT: target = juce::jmax(i->viewUIPosition->x + i->viewUISize->x, target); break;
 		case BaseManagerUI<M, T, U>::AlignMode::CENTER_H: target += i->viewUIPosition->x + i->viewUISize->x / 2; break;
-		case BaseManagerUI<M, T, U>::AlignMode::TOP: target = jmin(target, i->viewUIPosition->y); break;
-		case BaseManagerUI<M, T, U>::AlignMode::BOTTOM: target = jmax(target, i->viewUIPosition->y + i->viewUISize->y); break;
+		case BaseManagerUI<M, T, U>::AlignMode::TOP: target = juce::jmin(target, i->viewUIPosition->y); break;
+		case BaseManagerUI<M, T, U>::AlignMode::BOTTOM: target = juce::jmax(target, i->viewUIPosition->y + i->viewUISize->y); break;
 		case BaseManagerUI<M, T, U>::AlignMode::CENTER_V: target += i->viewUIPosition->y + i->viewUISize->y / 2; break;
 		}
 		goodInspectables.add(i);
@@ -730,23 +730,23 @@ void BaseManagerUI<M, T, U>::alignItems(AlignMode alignMode)
 
 	if (alignMode == CENTER_H || alignMode == CENTER_V) target /= goodInspectables.size();
 
-	juce::Array<UndoableAction*> actions;
+	juce::Array<juce::UndoableAction*> actions;
 	for (auto& i : goodInspectables)
 	{
-		Point<float> targetPoint;
+		juce::Point<float> targetPoint;
 		switch (alignMode)
 		{
-		case BaseManagerUI<M, T, U>::AlignMode::LEFT: targetPoint = Point<float>(target, i->viewUIPosition->y); break;
-		case BaseManagerUI<M, T, U>::AlignMode::RIGHT: targetPoint = Point<float>(target - i->viewUISize->x, i->viewUIPosition->y); break;
-		case BaseManagerUI<M, T, U>::AlignMode::CENTER_H: targetPoint = Point<float>(target - i->viewUISize->x / 2, i->viewUIPosition->y);  break;
-		case BaseManagerUI<M, T, U>::AlignMode::TOP: targetPoint = Point<float>(i->viewUIPosition->x, target); break;
-		case BaseManagerUI<M, T, U>::AlignMode::BOTTOM:targetPoint = Point<float>(i->viewUIPosition->x, target - i->viewUISize->y); break;
-		case BaseManagerUI<M, T, U>::AlignMode::CENTER_V:targetPoint = Point<float>(i->viewUIPosition->x, target - i->viewUISize->y / 2); break;
+		case BaseManagerUI<M, T, U>::AlignMode::LEFT: targetPoint = juce::Point<float>(target, i->viewUIPosition->y); break;
+		case BaseManagerUI<M, T, U>::AlignMode::RIGHT: targetPoint = juce::Point<float>(target - i->viewUISize->x, i->viewUIPosition->y); break;
+		case BaseManagerUI<M, T, U>::AlignMode::CENTER_H: targetPoint = juce::Point<float>(target - i->viewUISize->x / 2, i->viewUIPosition->y);  break;
+		case BaseManagerUI<M, T, U>::AlignMode::TOP: targetPoint = juce::Point<float>(i->viewUIPosition->x, target); break;
+		case BaseManagerUI<M, T, U>::AlignMode::BOTTOM:targetPoint = juce::Point<float>(i->viewUIPosition->x, target - i->viewUISize->y); break;
+		case BaseManagerUI<M, T, U>::AlignMode::CENTER_V:targetPoint = juce::Point<float>(i->viewUIPosition->x, target - i->viewUISize->y / 2); break;
 		}
 		actions.add(i->viewUIPosition->setUndoablePoint(i->viewUIPosition->getPoint(), targetPoint, true));
 	}
 
-	UndoMaster::getInstance()->performActions("Align " + String(goodInspectables.size()) + " items", actions);
+	UndoMaster::getInstance()->performActions("Align " + juce::String(goodInspectables.size()) + " items", actions);
 
 }
 
@@ -780,7 +780,7 @@ void BaseManagerUI<M, T, U>::distributeItems(bool isVertical)
 	for (int i = 0; i < goodInspectables.size(); i++)
 	{
 		float rel = i * 1.0f / (goodInspectables.size() - 1);
-		float target = jmap(rel, tMin, tMax);
+		float target = juce::jmap(rel, tMin, tMax);
 		T* ti = goodInspectables[i];
 		juce::Point<float> targetPoint(isVertical ? ti->viewUIPosition->x : target - ti->viewUISize->x / 2, isVertical ? target - ti->viewUISize->y / 2 : ti->viewUIPosition->y);
 		actions.add(ti->viewUIPosition->setUndoablePoint(ti->viewUIPosition->getPoint(), targetPoint, true));

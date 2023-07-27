@@ -161,7 +161,7 @@ public:
 
 	//UNDO MANAGER
 	class ManagerBaseAction :
-		public UndoableAction
+		public juce::UndoableAction
 	{
 	public:
 		ManagerBaseAction(BaseManager* manager, juce::var _data = juce::var());
@@ -456,7 +456,7 @@ T* BaseManager<T>::addItem(T* item, juce::var data, bool addToUndo, bool notify)
 
 	}
 
-	if (MessageManager::getInstance()->existsAndIsLockedByCurrentThread())
+	if (juce::MessageManager::getInstance()->existsAndIsLockedByCurrentThread())
 	{
 		if (selectItemWhenCreated && !isCurrentlyLoadingData && !isManipulatingMultipleItems) bi->selectThis();
 	}
@@ -498,7 +498,7 @@ juce::Array<T*> BaseManager<T>::addItems(juce::Array<T*> itemsToAdd, juce::var d
 
 	for (int i = 0; i < itemsToAdd.size(); ++i)
 	{
-		addItem(itemsToAdd[i], data.isArray() ? data[i] : var(), false, false);
+		addItem(itemsToAdd[i], data.isArray() ? data[i] : juce::var(), false, false);
 	}
 
 	notifyStructureChanged();
@@ -557,8 +557,8 @@ template<class T>
 juce::Array<T*> BaseManager<T>::addItemsFromClipboard(bool showWarning)
 {
 	if (!userCanAddItemsManually) return juce::Array<T*>();
-	juce::String s = SystemClipboard::getTextFromClipboard();
-	juce::var data = JSON::parse(s);
+	juce::String s = juce::SystemClipboard::getTextFromClipboard();
+	juce::var data = juce::JSON::parse(s);
 	if (data.isVoid()) return juce::Array<T*>();
 
 	if (!data.hasProperty("itemType"))
@@ -575,7 +575,7 @@ juce::Array<T*> BaseManager<T>::addItemsFromClipboard(bool showWarning)
 		return juce::Array<T*>();
 	}
 
-	juce::var itemsData = data.getProperty("items", var());
+	juce::var itemsData = data.getProperty("items", juce::var());
 	int sIndex = items.indexOf(InspectableSelectionManager::activeSelectionManager->getInspectableAs<T>());
 	if (sIndex >= 0)
 	{
@@ -612,7 +612,7 @@ template<class T>
 void BaseManager<T>::loadItemsData(juce::var data)
 {
 	if (data == juce::var()) return;
-	juce::Array<var>* itemsData = data.getProperty("items", juce::var()).getArray();
+	juce::Array<juce::var>* itemsData = data.getProperty("items", juce::var()).getArray();
 	if (itemsData == nullptr) return;
 
 	for (auto& td : *itemsData)
@@ -627,7 +627,7 @@ template<class T>
 juce::Array<juce::UndoableAction*> BaseManager<T>::getRemoveItemUndoableAction(T* item)
 {
 	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile) return nullptr;
-	juce::Array<UndoableAction*> a;
+	juce::Array<juce::UndoableAction*> a;
 	a.add(new RemoveItemAction(this, item));
 	return a;
 }
@@ -727,7 +727,7 @@ void BaseManager<T>::setItemIndex(T* item, int newIndex, bool addToUndo)
 	}
 
 
-	newIndex = jlimit(0, items.size() - 1, newIndex);
+	newIndex = juce::jlimit(0, items.size() - 1, newIndex);
 	int index = items.indexOf(item);
 	if (index == -1 || index == newIndex) return;
 
@@ -827,7 +827,7 @@ template<class T>
 void BaseManager<T>::askForMoveBefore(BaseItem* i)
 {
 	T* item = static_cast<T*>(i);
-	setItemIndex(item, jmax(items.indexOf(item) - 1, 0));
+	setItemIndex(item, juce::jmax(items.indexOf(item) - 1, 0));
 	//	int index = items.indexOf(static_cast<T *>(i));
 	//	if (index == 0) return;
 	//	items.swap(index, index - 1);
@@ -841,7 +841,7 @@ template<class T>
 void BaseManager<T>::askForMoveAfter(BaseItem* i)
 {
 	T* item = static_cast<T*>(i);
-	setItemIndex(item, jmin(items.indexOf(item) + 1, items.size() - 1));
+	setItemIndex(item, juce::jmin(items.indexOf(item) + 1, items.size() - 1));
 	//int index = items.indexOf(static_cast<T *>(i));
 	//if (index == items.size() -1) return;
 	//items.swap(index, index + 1);
