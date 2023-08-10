@@ -278,7 +278,7 @@ bool Parameter::hasRange()
 			}
 			else if (minimumValue.isDouble())
 			{
-				if ((float)minimumValue != INT32_MIN && (float)maximumValue != INT32_MAX) return true;
+				if ((float)minimumValue != (float)INT32_MIN && (float)maximumValue != (float)INT32_MAX) return true;
 
 			}
 		}

@@ -166,7 +166,7 @@ Parameter* ControllableContainer::addParameter(Parameter* p, int index)
 	return p;
 }
 
-FloatParameter* ControllableContainer::addFloatParameter(const String& _niceName, const String& description, const float& initialValue, const float& minValue, const float& maxValue, const bool& enabled)
+FloatParameter* ControllableContainer::addFloatParameter(const String& _niceName, const String& description, const double& initialValue, const double& minValue, const double& maxValue, const bool& enabled)
 {
 	String targetName = (Engine::mainEngine == nullptr || Engine::mainEngine->isLoadingFile) ? _niceName : getUniqueNameInContainer(_niceName);
 	FloatParameter* p = new FloatParameter(targetName, description, initialValue, minValue, maxValue, enabled);

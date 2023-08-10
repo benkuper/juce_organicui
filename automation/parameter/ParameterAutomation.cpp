@@ -8,6 +8,7 @@
   ==============================================================================
 */
 
+#include "JuceHeader.h"
 
 ParameterAutomation::ParameterAutomation(Parameter* _parameter) :
 	BaseItem(_parameter->niceName +" automation", false),

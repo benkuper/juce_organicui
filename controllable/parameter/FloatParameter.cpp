@@ -11,7 +11,7 @@
 #include "JuceHeader.h"
 
 FloatParameter::FloatParameter(const String& niceName, const String& description, const double& initialValue, const double& minValue, const double& maxValue, bool enabled) :
-	Parameter(Type::FLOAT, niceName, description, (double)initialValue, (double)minValue, (double)maxValue, enabled),
+	Parameter(Type::FLOAT, niceName, description, initialValue, minValue, maxValue, enabled),
 	unitSteps(0),
 	stringDecimals(DEFAULT_STRING_DECIMALS),
 	defaultUI(NONE),
@@ -50,8 +50,7 @@ TimeLabel* FloatParameter::createTimeLabelParameter(Array<Parameter*> parameters
 ControllableUI* FloatParameter::createDefaultUI(Array<Controllable*> controllables) {
 	UIType t = customUI != NONE ? customUI : defaultUI;
 
-	bool hasFullRange = ((double)minimumValue != INT32_MIN && (double)maximumValue != INT32_MAX);
-	if (t == NONE) t = hasFullRange ? SLIDER : LABEL;
+	if (t == NONE) t = hasRange() ? SLIDER : LABEL;
 
 	Array<Parameter*> parameters = getArrayAs<Controllable, Parameter>(controllables);
 
@@ -92,7 +91,7 @@ void FloatParameter::setValueInternal(var& val)
 
 bool FloatParameter::hasRange()
 {
-	return (double)minimumValue != INT32_MIN && (double)maximumValue != INT32_MAX;
+	return (double)minimumValue != (double)INT32_MIN && (double)maximumValue != (double)INT32_MAX;
 }
 
 
