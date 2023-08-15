@@ -76,7 +76,18 @@ public:
 	Layout defaultLayout;
 
 	ManagerUIItemContainer<M, T, U> container;
-	Viewport viewport;
+
+	class ManagerViewport :
+		public Viewport
+	{
+	public:
+		bool useMouseWheelMoveIfNeeded(const MouseEvent& e, const MouseWheelDetails& d) override
+		{ 
+			if (e.mods.isShiftDown()) return false;
+			return Viewport::useMouseWheelMoveIfNeeded(e, d);
+		}
+	};
+	ManagerViewport viewport;
 
 	int headerSize;
 	Colour bgColor;
