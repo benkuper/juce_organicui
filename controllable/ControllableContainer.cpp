@@ -9,7 +9,6 @@
  */
 
 #include "JuceHeader.h"
-#include "ControllableContainer.h"
 
 ControllableComparator ControllableContainer::comparator;
 
@@ -230,18 +229,18 @@ ColorParameter* ControllableContainer::addColorParameter(const String& _niceName
 	return p;
 }
 
-TargetParameter* ControllableContainer::addTargetParameter(const String& _niceName, const String& _description, WeakReference<ControllableContainer> rootReference, const bool& enabled)
+TargetParameter* ControllableContainer::addTargetParameter(const String& _niceName, const String& _description, WeakReference<ControllableContainer> rootReference, const bool& _enabled)
 {
 	String targetName = (Engine::mainEngine == nullptr || Engine::mainEngine->isLoadingFile) ? _niceName : getUniqueNameInContainer(_niceName);
-	TargetParameter* p = new TargetParameter(targetName, _description, "", rootReference, enabled);
+	TargetParameter* p = new TargetParameter(targetName, _description, "", rootReference, _enabled);
 	addControllable(p);
 	return p;
 }
 
-FileParameter* ControllableContainer::addFileParameter(const String& _niceName, const String& _description, const String& _initialValue)
+FileParameter* ControllableContainer::addFileParameter(const String& _niceName, const String& _description, const String& _initialValue, const bool& _enabled)
 {
 	String targetName = (Engine::mainEngine == nullptr || Engine::mainEngine->isLoadingFile) ? _niceName : getUniqueNameInContainer(_niceName);
-	FileParameter* p = new FileParameter(targetName, _description, _initialValue);
+	FileParameter* p = new FileParameter(targetName, _description, _initialValue, _enabled);
 	addControllable(p);
 	return p;
 }

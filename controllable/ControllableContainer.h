@@ -86,7 +86,7 @@ public:
 	Point3DParameter * addPoint3DParameter(const String &niceName, const String &description, const bool &enabled = true);
 	ColorParameter * addColorParameter(const String &niceName, const String &description, const Colour &initialColor, const bool &enabled = true);
 	TargetParameter * addTargetParameter(const String &niceName, const String &description, WeakReference<ControllableContainer> rootReference = nullptr, const bool &enabled = true);
-	FileParameter * addFileParameter(const String &niceName, const String &description, const String &initialValue = "");
+	FileParameter * addFileParameter(const String &niceName, const String &description, const String &initialValue = "", const bool &enabled = true);
 
 	Trigger * addTrigger(const String &niceName, const String &description, const bool &enabled = true, int index = -1);
 
