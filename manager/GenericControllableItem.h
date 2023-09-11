@@ -14,8 +14,8 @@ class GenericControllableItem :
 	public BaseItem
 {
 public:
-	GenericControllableItem(var params = var());
-	GenericControllableItem(Controllable* c, var params = var());
+	GenericControllableItem(juce::var params = juce::var());
+	GenericControllableItem(Controllable* c, juce::var params = juce::var());
 	~GenericControllableItem();
 
 	Controllable * controllable = nullptr;
@@ -23,10 +23,10 @@ public:
 	void onContainerNiceNameChanged() override;
 	void controllableNameChanged(Controllable* c) override;
 
-	String typeAtCreation;
-	virtual String getTypeString() const override { return typeAtCreation; }
+	juce::String typeAtCreation;
+	virtual juce::String getTypeString() const override { return typeAtCreation; }
 
-	static GenericControllableItem * create(var params) { return new GenericControllableItem(params); }
+	static GenericControllableItem * create(juce::var params) { return new GenericControllableItem(params); }
 
-	InspectableEditor * getEditorInternal(bool isRoot, Array<Inspectable*> inspectables = Array<Inspectable*>()) override;
+	InspectableEditor * getEditorInternal(bool isRoot, juce::Array<Inspectable*> inspectables = juce::Array<Inspectable*>()) override;
 };

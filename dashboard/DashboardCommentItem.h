@@ -12,11 +12,11 @@ public:
 	FloatParameter* size;
 	FloatParameter* bgAlpha;
 
-	var getServerData() override;
+	juce::var getServerData() override;
 	
 	virtual DashboardItemUI* createUI() override;
-	virtual var getItemParameterFeedback(Parameter* p) override;
+	virtual juce::var getItemParameterFeedback(Parameter* p) override;
 
-	String getTypeString() const override { return "DashboardCommentItem"; }
-	static DashboardCommentItem* create(var) { return new DashboardCommentItem(); }
+	juce::String getTypeString() const override { return "DashboardCommentItem"; }
+	static DashboardCommentItem* create(juce::var) { return new DashboardCommentItem(); }
 };

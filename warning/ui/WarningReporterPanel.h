@@ -3,42 +3,42 @@
 #include "../WarningReporter.h"
 
 class WarningReporterItem :
-	public Component,
-	public Button::Listener
+	public juce::Component,
+	public juce::Button::Listener
 {
 public:
-	WarningReporterItem(WeakReference<WarningTarget> target);
+	WarningReporterItem(juce::WeakReference<WarningTarget> target);
 	~WarningReporterItem();
 
-	Label itemLabel;
-	Label warningLabel;
-	TextButton resolveBT;
+	juce::Label itemLabel;
+	juce::Label warningLabel;
+	juce::TextButton resolveBT;
 
-	WeakReference<WarningTarget> target;
+	juce::WeakReference<WarningTarget> target;
 
 	void resized() override;
-	virtual void buttonClicked(Button*) override;
+	virtual void buttonClicked(juce::Button*) override;
 };
 
 class WarningReporterContainer :
-	public Component,
+	public juce::Component,
 	public WarningReporter::AsyncListener
 {
 public:
 	WarningReporterContainer();
 	~WarningReporterContainer();
 
-	OwnedArray<WarningReporterItem> items;
+	juce::OwnedArray<WarningReporterItem> items;
 
 	const int lineHeight = 20;
 
 	void resized() override;
 	int getContentHeight();
 
-	void addTarget(WeakReference<WarningTarget> t);
-	void removeTarget(WeakReference<WarningTarget> t);
+	void addTarget(juce::WeakReference<WarningTarget> t);
+	void removeTarget(juce::WeakReference<WarningTarget> t);
 
-	WarningReporterItem * getUIForTarget(WeakReference<WarningTarget> t);
+	WarningReporterItem * getUIForTarget(juce::WeakReference<WarningTarget> t);
 
 	void newMessage(const WarningReporter::WarningReporterEvent& e) override;
 
@@ -48,14 +48,14 @@ class WarningReporterPanel :
 	public ShapeShifterContentComponent
 {
 public:
-	WarningReporterPanel(StringRef name);
+	WarningReporterPanel(juce::StringRef name);
 	~WarningReporterPanel();
 
-	Viewport viewport;
+	juce::Viewport viewport;
 	WarningReporterContainer container;
 
 	void resized() override;
 
-	static WarningReporterPanel * create(const String& name) { return new WarningReporterPanel(name); }
+	static WarningReporterPanel * create(const juce::String& name) { return new WarningReporterPanel(name); }
 };
 

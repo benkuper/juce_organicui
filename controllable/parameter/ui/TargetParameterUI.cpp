@@ -399,7 +399,7 @@ void TargetParameterUI::newMessage(const ContainerAsyncEvent& e)
 
 }
 
-TargetStepButton::TargetStepButton(const String& name, WeakReference<ControllableContainer> reference) :
+TargetStepButton::TargetStepButton(const String& name, juce::WeakReference<ControllableContainer> reference) :
 	bt(name),
 	reference(reference)
 {

@@ -28,9 +28,9 @@ void removeAsync ## EventPrefix ## Listener(AsyncListener* listener) { NotifierP
 ;
 
 
-template<typename MessageClass,class CriticalSectionToUse = CriticalSection>
+template<typename MessageClass,class CriticalSectionToUse = juce::CriticalSection>
 class QueuedNotifier:
-	public  AsyncUpdater
+	public  juce::AsyncUpdater
 {
 public:
 
@@ -65,7 +65,7 @@ public:
             delete msg;
             return;
         }
-        forceSendNow |= MessageManager::getInstance()->isThisTheMessageThread();
+        forceSendNow |= juce::MessageManager::getInstance()->isThisTheMessageThread();
         if(forceSendNow){
             listeners.call(&Listener::newMessage,*msg);
             lastListeners.call(&Listener::newMessage,*msg);
@@ -96,7 +96,7 @@ public:
 					while (size1 == 0)
 					{
 						fifo.prepareToWrite(1, start1, size1, start2, size2);
-						Thread::sleep(10);
+                        juce::Thread::sleep(10);
 					}
 				}
 			}else {
@@ -143,10 +143,10 @@ private:
 
 
 
-    AbstractFifo fifo;
+    juce::AbstractFifo fifo;
     int maxSize;
-    OwnedArray<MessageClass,CriticalSectionToUse> messageQueue;
+    juce::OwnedArray<MessageClass,CriticalSectionToUse> messageQueue;
 
-    ListenerList<Listener > listeners;
-    ListenerList<Listener > lastListeners;
+    juce::ListenerList<Listener > listeners;
+    juce::ListenerList<Listener > lastListeners;
 };

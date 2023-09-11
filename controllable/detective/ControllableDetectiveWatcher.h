@@ -4,7 +4,7 @@ class ControllableDetectiveWatcherUI;
 
 class ControllableDetectiveWatcher :
 	public BaseItem,
-	public Thread
+	public juce::Thread
 {
 public:
 	ControllableDetectiveWatcher();
@@ -12,26 +12,26 @@ public:
 
 	virtual void clearItem() override;
 
-	WeakReference<Controllable> controllable;
+	juce::WeakReference<Controllable> controllable;
 
 	TargetParameter* target;
 	FloatParameter* watchTime;
 
 	struct WatcherData
 	{
-		WatcherData(double time, var val) : time(time), val(val) {}
+		WatcherData(double time, juce::var val) : time(time), val(val) {}
 		double time;
-		var val;
+		juce::var val;
 	};
 
-	OwnedArray<WatcherData, CriticalSection> data;
-	var oldestVal;
+	juce::OwnedArray<WatcherData, juce::CriticalSection> data;
+	juce::var oldestVal;
 
 	virtual void setControllable(Controllable* c);
 
 	void onContainerParameterChangedInternal(Parameter* p) override;
 
-	void addValue(var data);
+	void addValue(juce::var data);
 	void run() override;
 
 	virtual ControllableDetectiveWatcherUI* getUI();

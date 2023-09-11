@@ -17,10 +17,10 @@ public:
 	KeyMappingsContainer();
 	~KeyMappingsContainer();
 
-	var getJSONData() override;
-	void loadJSONDataInternal(var data) override;
+	juce::var getJSONData() override;
+	void loadJSONDataInternal(juce::var data) override;
 
-	InspectableEditor * getEditorInternal(bool isRoot, Array<Inspectable*> inspectables = Array<Inspectable*>()) override;
+	InspectableEditor * getEditorInternal(bool isRoot, juce::Array<Inspectable*> inspectables = juce::Array<Inspectable*>()) override;
 };
 
 class GlobalSettings :
@@ -77,6 +77,6 @@ public:
 	Trigger * testCrash;
 
 	void onControllableFeedbackUpdate(ControllableContainer *, Controllable * c) override;
-	void loadJSONDataInternal(var data) override;
+	void loadJSONDataInternal(juce::var data) override;
 
 };

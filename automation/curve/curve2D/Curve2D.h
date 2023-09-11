@@ -14,7 +14,7 @@ class Curve2D :
     public BaseManager<Curve2DKey>
 {
 public:
-    Curve2D(const String &name = "Curve 2D");
+    Curve2D(const juce::String &name = "Curve 2D");
     ~Curve2D();
 
     FloatParameter* position;
@@ -36,19 +36,19 @@ public:
 
     void setControlMode(ControlMode mode);
     
-    void addItemInternal(Curve2DKey* k, var params) override;
-    void addItemsInternal(Array<Curve2DKey*> keys, var) override;
+    void addItemInternal(Curve2DKey* k, juce::var params) override;
+    void addItemsInternal(juce::Array<Curve2DKey*> keys, juce::var) override;
     void removeItemInternal(Curve2DKey* k) override;
-    void removeItemsInternal(Array<Curve2DKey*> keys) override;
+    void removeItemsInternal(juce::Array<Curve2DKey*> keys) override;
 
-    virtual float addFromPointsAndSimplify(Array<Point<float>> points, bool clearBeforeAdd = false, Array<float> pointTimes = Array<float>());
+    virtual float addFromPointsAndSimplify(juce::Array<juce::Point<float>> points, bool clearBeforeAdd = false, juce::Array<float> pointTimes = juce::Array<float>());
 
     void updateCurve(bool relativeAutomationKeySyncMode = true);
     void computeValue();
 
     Curve2DKey* getKeyForPosition(float pos);
-    Point<float> getValueAtNormalizedPosition(float pos);
-    Point<float> getValueAtPosition(float pos);
+    juce::Point<float> getValueAtNormalizedPosition(float pos);
+    juce::Point<float> getValueAtPosition(float pos);
 
 
     void onContainerParameterChanged(Parameter* p) override;
@@ -56,5 +56,5 @@ public:
     
     void afterLoadJSONDataInternal() override;
 
-    InspectableEditor* getEditorInternal(bool isRoot, Array<Inspectable*> inspectables = Array<Inspectable*>()) override;
+    InspectableEditor* getEditorInternal(bool isRoot, juce::Array<Inspectable*> inspectables = juce::Array<Inspectable*>()) override;
 };

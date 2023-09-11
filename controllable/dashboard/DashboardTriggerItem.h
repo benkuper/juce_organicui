@@ -20,9 +20,9 @@ public:
 
 	virtual void onExternalTriggerTriggered(Trigger* t) override;
 
-	virtual var getServerData() override;
+	virtual juce::var getServerData() override;
 
-	static DashboardTriggerItem* create(var) { return new DashboardTriggerItem(); }
-	virtual String getTypeString() const override { return "DashboardTriggerItem"; }
+	static DashboardTriggerItem* create(juce::var) { return new DashboardTriggerItem(); }
+	virtual juce::String getTypeString() const override { return "DashboardTriggerItem"; }
 
 };

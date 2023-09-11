@@ -24,18 +24,18 @@ public:
 	static InspectableSelectionManager * activeSelectionManager; //The last one having selected something, useful for key events like delete
 
 	bool enabled;
-	Array<WeakReference<Inspectable>> currentInspectables;
+	juce::Array<juce::WeakReference<Inspectable>> currentInspectables;
 	
 	template<class T>
 	T * getInspectableAs();
 	template<class T>
-	Array<T *> getInspectablesAs();
+	juce::Array<T *> getInspectablesAs();
 
 	void setEnabled(bool value);
 
-	void selectInspectables(Array<Inspectable *> inspectables, bool clearSelection = true, bool notify = true);
-	void selectInspectable(WeakReference<Inspectable> inspectable, bool clearSelection = true, bool notify = true);
-	void deselectInspectable(WeakReference<Inspectable> inspectable, bool notify = true);
+	void selectInspectables(juce::Array<Inspectable *> inspectables, bool clearSelection = true, bool notify = true);
+	void selectInspectable(juce::WeakReference<Inspectable> inspectable, bool clearSelection = true, bool notify = true);
+	void deselectInspectable(juce::WeakReference<Inspectable> inspectable, bool notify = true);
 
 	void clearSelection(bool notify = true);
 
@@ -53,7 +53,7 @@ public:
 		virtual void inspectablesSelectionChanged() {};
 	};
 
-	ListenerList<Listener> listeners;
+	juce::ListenerList<Listener> listeners;
 	void addSelectionListener(Listener* newListener) { listeners.add(newListener); }
 	void removeSelectionListener(Listener* listener) { listeners.remove(listener); }
 
@@ -86,9 +86,9 @@ T * InspectableSelectionManager::getInspectableAs()
 }
 
 template<class T>
-Array<T*> InspectableSelectionManager::getInspectablesAs()
+juce::Array<T*> InspectableSelectionManager::getInspectablesAs()
 {
-	Array<T *> result;
+	juce::Array<T *> result;
 	for (auto &i : currentInspectables)
 	{
 		if (i == nullptr || i.wasObjectDeleted()) continue;

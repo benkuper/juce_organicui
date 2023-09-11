@@ -10,6 +10,8 @@
 
 #include "JuceHeader.h"
 
+using namespace juce;
+
 DoubleSliderUI::DoubleSliderUI(Array<Point2DParameter*> parameters) :
 	ParameterUI(Inspectable::getArrayAs<Point2DParameter, Parameter>(parameters)),
 	p2ds(parameters),

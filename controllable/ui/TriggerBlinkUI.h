@@ -10,13 +10,13 @@ Author:  bkupe
 
 #pragma once
 
-class TriggerBlinkUI : public TriggerUI, public Timer
+class TriggerBlinkUI : public TriggerUI, public juce::Timer
 {
 public:
-    TriggerBlinkUI(Array<Trigger *> t);
+    TriggerBlinkUI(juce::Array<Trigger *> t);
     virtual ~TriggerBlinkUI();
 
-    void paint(Graphics&)override;
+    void paint(juce::Graphics&)override;
     void triggerTriggered(const Trigger * p) override;
     void startBlink();
     void timerCallback()override;
@@ -25,8 +25,8 @@ public:
 
 	bool animateIntensity;
 	int blinkTime;
-	Colour offColor;
-	Colour onColor;
+    juce::Colour offColor;
+    juce::Colour onColor;
 
 private:
     int refreshPeriod;

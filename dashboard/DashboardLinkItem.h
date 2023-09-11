@@ -15,10 +15,10 @@ public:
 
 	void onContainerTriggerTriggered(Trigger * t) override;
 
-	var getServerData() override;
+	juce::var getServerData() override;
 
 	virtual DashboardItemUI* createUI() override;
 
-	String getTypeString() const override { return "DashboardLinkItem"; }
-	static DashboardLinkItem* create(var) { return new DashboardLinkItem(); }
+	juce::String getTypeString() const override { return "DashboardLinkItem"; }
+	static DashboardLinkItem* create(juce::var) { return new DashboardLinkItem(); }
 };

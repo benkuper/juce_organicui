@@ -3,7 +3,7 @@
 
 #define MAX_LOGS 1000
 
-class CustomLogger : public Logger
+class CustomLogger : public juce::Logger
 {
 public:
 
@@ -11,14 +11,14 @@ public:
 
 	CustomLogger();
 
-	OwnedArray<LogElement, CriticalSection> logElements;
+	juce::OwnedArray<LogElement, juce::CriticalSection> logElements;
 
-	void logMessage(const String& message) override;
+	void logMessage(const juce::String& message) override;
 
-	QueuedNotifier<String> notifier;
-	typedef QueuedNotifier<String>::Listener Listener;
+	QueuedNotifier<juce::String> notifier;
+	typedef QueuedNotifier<juce::String>::Listener Listener;
 
-	const String & getWelcomeMessage();
+	const juce::String & getWelcomeMessage();
 	void addLogListener(Listener* l) { notifier.addListener(l); }
 	void removeLogListener(Listener* l) { notifier.removeListener(l); }
 
@@ -29,13 +29,13 @@ public:
 	public:
 		FileWriter();
 
-		void newMessage(const String& s) override { if (fileLog && !s.isEmpty()) { fileLog->logMessage(s); } }
-		String getFilePath() { return fileLog->getLogFile().getFullPathName(); }
-		std::unique_ptr<FileLogger> fileLog;
+		void newMessage(const juce::String& s) override { if (fileLog && !s.isEmpty()) { fileLog->logMessage(s); } }
+		juce::String getFilePath() { return fileLog->getLogFile().getFullPathName(); }
+		std::unique_ptr<juce::FileLogger> fileLog;
 	};
 
 	std::unique_ptr<FileWriter> fileWriter;
 
 private:
-	const String welcomeMessage;
+	const juce::String welcomeMessage;
 };

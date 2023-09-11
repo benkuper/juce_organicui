@@ -14,18 +14,18 @@ class BaseItemEditor :
 	public EnablingControllableContainerEditor
 {
 public:
-	BaseItemEditor(Array<BaseItem *> bi, bool isRoot);
+	BaseItemEditor(juce::Array<BaseItem *> bi, bool isRoot);
 	~BaseItemEditor();
 
-	Array<BaseItem *> items;
+	juce::Array<BaseItem *> items;
 	BaseItem* item;
 
 	//bool isFirst;
 	//bool isLast;
 
 
-	std::unique_ptr<ImageButton> removeBT;
-	std::unique_ptr<ImageButton> duplicateBT;
+	std::unique_ptr<juce::ImageButton> removeBT;
+	std::unique_ptr<juce::ImageButton> duplicateBT;
 	//std::unique_ptr<ImageButton> upBT;
 	//std::unique_ptr<ImageButton> downBT;
 	std::unique_ptr<ColorParameterUI> itemColorUI;
@@ -35,7 +35,7 @@ public:
 
 	virtual void resizedInternalHeader(juce::Rectangle<int> & r) override;
 	virtual void resizedInternalHeaderItemInternal(juce::Rectangle<int> &) {}
-	virtual void buttonClicked(Button *b) override;
+	virtual void buttonClicked(juce::Button *b) override;
 
-	virtual void setDragDetails(var &details) override;
+	virtual void setDragDetails(juce::var &details) override;
 };

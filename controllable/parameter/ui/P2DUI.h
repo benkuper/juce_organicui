@@ -15,28 +15,28 @@ class P2DUI :
 {
 
 public:
-	P2DUI(Array<Point2DParameter*> parameters);
+	P2DUI(juce::Array<Point2DParameter*> parameters);
 	virtual ~P2DUI();
 
-	Array<Point2DParameter*> p2ds;
+	juce::Array<Point2DParameter*> p2ds;
 	Point2DParameter* p2d;
 
-	var mouseDownNormalizedValue;
-	var mouseDownValue;
+	juce::var mouseDownNormalizedValue;
+	juce::var mouseDownValue;
 
-	Rectangle<float> canvasRect;
+	juce::Rectangle<float> canvasRect;
 
-	void mouseDownInternal(const MouseEvent&) override;
-	void mouseDrag(const MouseEvent& e) override;
-	void mouseUpInternal(const MouseEvent&) override;
+	void mouseDownInternal(const juce::MouseEvent&) override;
+	void mouseDrag(const juce::MouseEvent& e) override;
+	void mouseUpInternal(const juce::MouseEvent&) override;
 
-	void paint(Graphics& g) override;
+	void paint(juce::Graphics& g) override;
 	void resized() override;
 
-	virtual void valueChanged(const var& v) override;
+	virtual void valueChanged(const juce::var& v) override;
 	virtual void rangeChanged(Parameter* p) override;
 
-	void addPopupMenuItemsInternal(PopupMenu* m) override;
+	void addPopupMenuItemsInternal(juce::PopupMenu* m) override;
 	void handleMenuSelectedID(int result) override;
 
 	void showEditWindowInternal() override;

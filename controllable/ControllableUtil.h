@@ -3,9 +3,9 @@
 class ControllableUtil
 {
 public:
-	static var  createDataForParam(const String & type, const String & name, const String & description, var value, var minVal = INT32_MIN, var maxVal = INT32_MAX, bool editable = true, bool hiddenInEditor = false)
+	static juce::var  createDataForParam(const juce::String& type, const juce::String& name, const juce::String & description, juce::var value, juce::var minVal = INT32_MIN, juce::var maxVal = INT32_MAX, bool editable = true, bool hiddenInEditor = false)
 	{
-		var v = var(new DynamicObject());
+		juce::var v = juce::var(new juce::DynamicObject());
 		v.getDynamicObject()->setProperty("type", type);
 		v.getDynamicObject()->setProperty("niceName", name);
 		v.getDynamicObject()->setProperty("description", description);
@@ -19,12 +19,12 @@ public:
 
 	//Helpers
 	template<class T>
-	static T * findParentAs(WeakReference<Controllable> c, int maxLevel = -1)
+	static T * findParentAs(juce::WeakReference<Controllable> c, int maxLevel = -1)
 	{
 		int curLevel = 0;
 		if (c == nullptr || c.wasObjectDeleted()) return nullptr;
 
-		WeakReference<ControllableContainer> cc = c->parentContainer;
+		juce::WeakReference<ControllableContainer> cc = c->parentContainer;
 
 		if (cc == nullptr || cc.wasObjectDeleted()) return nullptr;
 		T * result = dynamic_cast<T *>(cc.get());
@@ -44,12 +44,12 @@ public:
 	}
 
 	template<class T>
-	static T* findParentAs(WeakReference<ControllableContainer> _cc, int maxLevel = -1)
+	static T* findParentAs(juce::WeakReference<ControllableContainer> _cc, int maxLevel = -1)
 	{
 		int curLevel = 0;
 		if (_cc == nullptr || _cc.wasObjectDeleted()) return nullptr;
 
-		WeakReference<ControllableContainer> cc = _cc->parentContainer;
+		juce::WeakReference<ControllableContainer> cc = _cc->parentContainer;
 
 		if (cc == nullptr || cc.wasObjectDeleted()) return nullptr;
 		T* result = dynamic_cast<T*>(cc.get());

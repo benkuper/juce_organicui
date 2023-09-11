@@ -44,9 +44,9 @@ public:
 	virtual ~ShapeShifterContainer();
 
 	Direction direction;
-	OwnedArray<GapGrabber> grabbers;
+	juce::OwnedArray<GapGrabber> grabbers;
 
-	Array<ShapeShifter *> shifters;
+	juce::Array<ShapeShifter *> shifters;
 
 	const int gap = 6;
 
@@ -68,8 +68,8 @@ public:
 
 	void clear();
 
-	virtual var getCurrentLayout() override;
-	virtual void loadLayoutInternal(var layout) override;
+	virtual juce::var getCurrentLayout() override;
+	virtual void loadLayoutInternal(juce::var layout) override;
 
 	virtual void grabberGrabUpdate(GapGrabber * gg, int dist) override;
 	virtual void panelDetach(ShapeShifterPanel *) override;
@@ -79,7 +79,7 @@ public:
 	virtual void containerEmptied(ShapeShifterContainer *) override;
 	virtual void oneShifterRemaining(ShapeShifterContainer * container, ShapeShifter * lastShifter) override;
 
-	ListenerList<ShapeShifterContainerListener> containerListeners;
+	juce::ListenerList<ShapeShifterContainerListener> containerListeners;
 	void addShapeShifterContainerListener(ShapeShifterContainerListener* newListener) { containerListeners.add(newListener); }
 	void removeShapeShifterContainerListener(ShapeShifterContainerListener* listener) { containerListeners.remove(listener); }
 

@@ -20,11 +20,11 @@ class ParameterUI :
 	public Parameter::AsyncListener
 {
 public:
-	ParameterUI(Array<Parameter*> parameter, int paintTimerID = -1);
+	ParameterUI(juce::Array<Parameter*> parameter, int paintTimerID = -1);
 	virtual ~ParameterUI();
 
-	Array<WeakReference<Parameter>> parameters;
-	WeakReference<Parameter> parameter;
+	juce::Array<juce::WeakReference<Parameter>> parameters;
+	juce::WeakReference<Parameter> parameter;
 
 	//painting
 	int paintTimerID;
@@ -35,9 +35,9 @@ public:
 	bool showValue;
 
 	bool useCustomBGColor;
-	Colour customBGColor;
+	juce::Colour customBGColor;
 	bool useCustomFGColor;
-	Colour customFGColor;
+	juce::Colour customFGColor;
 
 	//popupMenuFilters
 	static bool showAlwaysNotifyOption;
@@ -47,48 +47,48 @@ public:
 
 
 	virtual void showEditWindowInternal() override;
-	virtual Component* getEditValueComponent();
+	virtual juce::Component* getEditValueComponent();
 
 	void showEditRangeWindow();
 	virtual void showEditRangeWindowInternal();
 
-	void paintOverChildren(Graphics& g) override;
+	void paintOverChildren(juce::Graphics& g) override;
 
 	virtual void handlePaintTimer();
 	virtual void handlePaintTimerInternal();
 
-	virtual void addPopupMenuItems(PopupMenu* p) override;
-	virtual void addPopupMenuItemsInternal(PopupMenu*) {}
+	virtual void addPopupMenuItems(juce::PopupMenu* p) override;
+	virtual void addPopupMenuItemsInternal(juce::PopupMenu*) {}
 	virtual void handleMenuSelectedID(int id) override;
 
-	virtual void mouseDoubleClick(const MouseEvent& e) override;
+	virtual void mouseDoubleClick(const juce::MouseEvent& e) override;
 	virtual bool isInteractable(bool falseIfFeedbackOnly = true) override;
 
 	//focus
 	static int currentFocusOrderIndex;
-	static void setNextFocusOrder(Component* focusComponent);
+	static void setNextFocusOrder(juce::Component* focusComponent);
 
 	class ValueEditCalloutComponent :
-		public Component,
-		public Label::Listener
+		public juce::Component,
+		public juce::Label::Listener
 	{
 	public:
-		ValueEditCalloutComponent(WeakReference<Parameter> pui);
+		ValueEditCalloutComponent(juce::WeakReference<Parameter> pui);
 		~ValueEditCalloutComponent();
 
-		WeakReference<Parameter> p;
-		OwnedArray<Label> labels;
+		juce::WeakReference<Parameter> p;
+		juce::OwnedArray<juce::Label> labels;
 
 		void resized() override;
-		void paint(Graphics& g) override;
-		void labelTextChanged(Label* l) override;
-		void editorHidden(Label* l, TextEditor&) override;
+		void paint(juce::Graphics& g) override;
+		void labelTextChanged(juce::Label* l) override;
+		void editorHidden(juce::Label* l, juce::TextEditor&) override;
 		void parentHierarchyChanged() override;
 	};
 
-	static double textToValue(const String& text);
+	static double textToValue(const juce::String& text);
 
-	WeakReference<ParameterUI>::Master masterReference;
+	juce::WeakReference<ParameterUI>::Master masterReference;
 
 protected:
 
@@ -99,7 +99,7 @@ protected:
 
 	// here we are bound to only one parameter so no need to pass parameter*
 	// for general behaviour see AsyncListener
-	virtual void valueChanged(const var&) {};
+	virtual void valueChanged(const juce::var&) {};
 	virtual void rangeChanged(Parameter*) {};
 	virtual void controlModeChanged(Parameter*);
 
@@ -109,14 +109,14 @@ protected:
 
 
 class ParameterUITimers :
-	public MultiTimer
+	public juce::MultiTimer
 {
 public:
 	juce_DeclareSingleton(ParameterUITimers, true);
 	ParameterUITimers();
 	~ParameterUITimers() {}
 
-	HashMap<int, Array<WeakReference<ParameterUI>>> paramsTimerMap;
+	juce::HashMap<int, juce::Array<juce::WeakReference<ParameterUI>>> paramsTimerMap;
 
 	void registerParameter(int timerID, ParameterUI* ui);
 	void unregisterParameter(int timerID, ParameterUI* ui);

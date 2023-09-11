@@ -15,6 +15,8 @@
 
 #include "JuceHeader.h"
 
+using namespace juce;
+
 String StringUtil::toShortName(const String& niceName, bool replaceSlashes) {
 	if (niceName.isEmpty()) return "";
 

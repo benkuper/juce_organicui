@@ -40,20 +40,20 @@ public:
 		AUTOMATION
 	};
 
-	Parameter(const Type& type, const String& niceName, const String& description, var initialValue, var minValue, var maxValue, bool enabled = true);
+	Parameter(const Type& type, const juce::String& niceName, const juce::String& description, juce::var initialValue, juce::var minValue, juce::var maxValue, bool enabled = true);
 	virtual ~Parameter();
 
-	var defaultValue;
-	var value;
-	var lastValue;
+	juce::var defaultValue;
+	juce::var value;
+	juce::var lastValue;
 
-	SpinLock valueSetLock;
+	juce::SpinLock valueSetLock;
 
 	//Range
 	bool canHaveRange;
 	bool rebuildUIOnRangeChange;
-	var minimumValue;
-	var maximumValue;
+	juce::var minimumValue;
+	juce::var maximumValue;
 
 	//Control Mode
 	bool lockManualControlMode;
@@ -63,9 +63,9 @@ public:
 	bool alwaysNotify; //if true, will always notify of value change even if value is the same
 
 	//Expression
-	String controlExpression;
+	juce::String controlExpression;
 	std::unique_ptr<ScriptExpression> expression;
-	WeakReference<Controllable> controlReference;
+	juce::WeakReference<Controllable> controlReference;
 
 	//Reference
 	std::unique_ptr<TargetParameter> referenceTarget;
@@ -76,12 +76,12 @@ public:
 	bool canBeAutomated;
 
 	//ColorStatus
-	HashMap<var, Colour> colorStatusMap;
+	juce::HashMap<juce::var, juce::Colour> colorStatusMap;
 
 	bool isComplex();
-	virtual StringArray getValuesNames();
+	virtual juce::StringArray getValuesNames();
 
-	virtual void setRange(var min, var max);
+	virtual void setRange(juce::var min, juce::var max);
 	virtual void clearRange();
 	virtual bool hasRange();
 
@@ -93,37 +93,37 @@ public:
 	virtual void setEnabled(bool value, bool silentSet = false, bool force = false) override;
 
 	void setControlMode(ControlMode _mode);
-	void setControlExpression(const String&);
+	void setControlExpression(const juce::String&);
 	void setReferenceParameter(Parameter* tp);
 	virtual void setControlAutomation();
 
-	virtual var getValue(); //may be useful, or testing expression or references (for now, forward update from expression timer)
-	virtual var getLerpValueTo(var targetValue, float weight);
-	virtual void setWeightedValue(Array<var> values, Array<float> weights) {} // to be overriden
-	virtual var getCroppedValue(var originalValue);
+	virtual juce::var getValue(); //may be useful, or testing expression or references (for now, forward update from expression timer)
+	virtual juce::var getLerpValueTo(juce::var targetValue, float weight);
+	virtual void setWeightedValue(juce::Array<juce::var> values, juce::Array<float> weights) {} // to be overriden
+	virtual juce::var getCroppedValue(juce::var originalValue);
 
-	virtual void setDefaultValue(var val, bool doResetValue = true);
+	virtual void setDefaultValue(juce::var val, bool doResetValue = true);
 	virtual void resetValue(bool silentSet = false);
-	virtual UndoableAction* setUndoableValue(var oldValue, var newValue, bool onlyReturnAction = false);
-	virtual void setValue(var _value, bool silentSet = false, bool force = false, bool forceOverride = true);
-	virtual void setValueInternal(var& _value);
+	virtual juce::UndoableAction* setUndoableValue(juce::var oldValue, juce::var newValue, bool onlyReturnAction = false);
+	virtual void setValue(juce::var _value, bool silentSet = false, bool force = false, bool forceOverride = true);
+	virtual void setValueInternal(juce::var& _value);
 
-	virtual bool checkValueIsTheSame(var newValue, var oldValue); //can be overriden to modify check behavior
+	virtual bool checkValueIsTheSame(juce::var newValue, juce::var oldValue); //can be overriden to modify check behavior
 
 	//For Number type parameters
-	void setUndoableNormalizedValue(const var& oldNormalizedValue, const var& newNormalizedValue);
-	void setNormalizedValue(const var& normalizedValue, bool silentSet = false, bool force = false);
-	var getNormalizedValue();
+	void setUndoableNormalizedValue(const juce::var& oldNormalizedValue, const juce::var& newNormalizedValue);
+	void setNormalizedValue(const juce::var& normalizedValue, bool silentSet = false, bool force = false);
+	juce::var getNormalizedValue();
 
-	virtual bool setAttributeInternal(String param, var value) override;
-	virtual StringArray getValidAttributes() const override;
+	virtual bool setAttributeInternal(juce::String param, juce::var value) override;
+	virtual juce::StringArray getValidAttributes() const override;
 
 	//helpers for fast typing
 	virtual float floatValue();
 	virtual double doubleValue();
 	virtual int intValue();
 	virtual bool boolValue();
-	virtual String stringValue();
+	virtual juce::String stringValue();
 
 	void notifyValueChanged();
 
@@ -136,29 +136,29 @@ public:
 	virtual void parameterValueChanged(Parameter* p) override;
 
 
-	InspectableEditor* getEditorInternal(bool isRoot, Array<Inspectable*> inspectables = Array<Inspectable*>()) override;
+	InspectableEditor* getEditorInternal(bool isRoot, juce::Array<Inspectable*> inspectables = juce::Array<Inspectable*>()) override;
 	virtual ControllableDetectiveWatcher* getDetectiveWatcher() override;
 
 	virtual DashboardItem* createDashboardItem() override;
 
 	virtual bool shouldBeSaved() override;
-	virtual var getJSONDataInternal() override;
-	virtual void loadJSONDataInternal(var data) override;
-	virtual void setupFromJSONData(var data) override;
-	
-	virtual void getRemoteControlDataInternal(var& data) override;
-	virtual var getRemoteControlValue();
-	virtual var getRemoteControlRange();
-	
-	static var getValueFromScript(const juce::var::NativeFunctionArgs& a);
-	static var resetValueFromScript(const juce::var::NativeFunctionArgs& a);
-	static var getRangeFromScript(const juce::var::NativeFunctionArgs& a);
-	static var setRangeFromScript(const juce::var::NativeFunctionArgs& a);
-	static var hasRangeFromScript(const juce::var::NativeFunctionArgs& a);
+	virtual juce::var getJSONDataInternal() override;
+	virtual void loadJSONDataInternal(juce::var data) override;
+	virtual void setupFromJSONData(juce::var data) override;
 
-	String getScriptTargetString() override;
+	virtual void getRemoteControlDataInternal(juce::var& data) override;
+	virtual juce::var getRemoteControlValue();
+	virtual juce::var getRemoteControlRange();
+	
+	static juce::var getValueFromScript(const juce::var::NativeFunctionArgs& a);
+	static juce::var resetValueFromScript(const juce::var::NativeFunctionArgs& a);
+	static juce::var getRangeFromScript(const juce::var::NativeFunctionArgs& a);
+	static juce::var setRangeFromScript(const juce::var::NativeFunctionArgs& a);
+	static juce::var hasRangeFromScript(const juce::var::NativeFunctionArgs& a);
 
-	ListenerList<ParameterListener> listeners;
+	juce::String getScriptTargetString() override;
+
+	juce::ListenerList<ParameterListener> listeners;
 	void addParameterListener(ParameterListener* newListener) { listeners.add(newListener); }
 	void removeParameterListener(ParameterListener* listener) { listeners.remove(listener); }
 
@@ -168,14 +168,14 @@ public:
 	public:
 		enum Type { VALUE_CHANGED, BOUNDS_CHANGED, CONTROLMODE_CHANGED, EXPRESSION_STATE_CHANGED, UI_PARAMS_CHANGED };
 
-		ParameterEvent(Type t, Parameter* p, var v = var()) :
+		ParameterEvent(Type t, Parameter* p, juce::var v = juce::var()) :
 			type(t), parameter(p), value(v)
 		{
 		}
 
 		Type type;
 		Parameter* parameter;
-		var value;
+		juce::var value;
 	};
 
 	QueuedNotifier<ParameterEvent> queuedNotifier;
@@ -189,8 +189,8 @@ public:
 
 
 	bool checkVarIsConsistentWithType();
-	WeakReference<Parameter>::Master masterReference;
-	friend class WeakReference<Parameter>;
+	juce::WeakReference<Parameter>::Master masterReference;
+	friend class juce::WeakReference<Parameter>;
 
 	class ParameterAction :
 		public ControllableAction
@@ -203,8 +203,8 @@ public:
 			controlAddress = param->getControlAddress();
 		}
 
-		WeakReference<Parameter> parameterRef;
-		String controlAddress;
+		juce::WeakReference<Parameter> parameterRef;
+		juce::String controlAddress;
 
 		Parameter* getParameter();
 	};
@@ -213,7 +213,7 @@ public:
 		public ParameterAction
 	{
 	public:
-		ParameterSetValueAction(Parameter* param, var oldValue, var newValue) :
+		ParameterSetValueAction(Parameter* param, juce::var oldValue, juce::var newValue) :
 			ParameterAction(param),
 			oldValue(oldValue),
 			newValue(newValue)
@@ -221,8 +221,8 @@ public:
 			//DBG("New Parameter Set Value Action");
 		}
 
-		var oldValue;
-		var newValue;
+		juce::var oldValue;
+		juce::var newValue;
 
 		bool perform() override;
 		bool undo() override;
@@ -231,20 +231,20 @@ public:
 	class ValueInterpolator
 	{
 	public:
-		ValueInterpolator(WeakReference<Parameter> p, var targetValue, float time, Automation* a);
+		ValueInterpolator(juce::WeakReference<Parameter> p, juce::var targetValue, float time, Automation* a);
 		~ValueInterpolator();
 
-		WeakReference<Parameter> parameter;
-		var valueAtStart;
-		var targetValue;
+		juce::WeakReference<Parameter> parameter;
+		juce::var valueAtStart;
+		juce::var targetValue;
 		float time;
 		double timeAtStart;
 		Automation* automation;
-		void updateParams(var targetValue, float time, Automation* a);
+		void updateParams(juce::var targetValue, float time, Automation* a);
 		bool update();
 
 		class Manager :
-			public Thread
+			public juce::Thread
 		{
 		public:
 			juce_DeclareSingleton(Manager, true);
@@ -252,22 +252,22 @@ public:
 			Manager();
 			~Manager();
 
-			CriticalSection interpLock;
+			juce::CriticalSection interpLock;
 
-			void interpolate(WeakReference<Parameter> p, var targetValue, float time, Automation* a);
+			void interpolate(juce::WeakReference<Parameter> p, juce::var targetValue, float time, Automation* a);
 
-			WeakReference<ValueInterpolator> getInterpolationWith(Parameter* p);
+			juce::WeakReference<ValueInterpolator> getInterpolationWith(Parameter* p);
 			void removeInterpolationWith(Parameter* p);
 
-			HashMap<Parameter*, WeakReference<ValueInterpolator>, DefaultHashFunctions, CriticalSection> interpolatorMap;
-			OwnedArray<ValueInterpolator, CriticalSection> interpolators;
+			juce::HashMap<Parameter*, juce::WeakReference<ValueInterpolator>, juce::DefaultHashFunctions, juce::CriticalSection> interpolatorMap;
+			juce::OwnedArray<ValueInterpolator, juce::CriticalSection> interpolators;
 
 			void run() override;
 
 		};
 
-		WeakReference<ValueInterpolator>::Master masterReference;
-		friend class WeakReference<ValueInterpolator>;
+		juce::WeakReference<ValueInterpolator>::Master masterReference;
+		friend class juce::WeakReference<ValueInterpolator>;
 
 	};
 

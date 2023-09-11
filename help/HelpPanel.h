@@ -15,14 +15,14 @@ class HelpPanel :
 	public HelpBox::HelpListener
 {
 public:
-	HelpPanel(const String &name);
+	HelpPanel(const juce::String &name);
 	~HelpPanel();
 
-	Label helpLabel;
+	juce::Label helpLabel;
 
 	void resized() override;
 
 	void helpContentChanged() override;
 
-	static HelpPanel * create(const String &contentName) { return new HelpPanel(contentName); }
+	static HelpPanel * create(const juce::String &contentName) { return new HelpPanel(contentName); }
 };

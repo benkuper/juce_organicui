@@ -11,7 +11,7 @@ Author:  Ben
 #pragma once
 
 class ScriptExpression :
-	public Thread,
+	public juce::Thread,
 	public EngineListener,
 	public ScriptTarget::ScriptTargetListener,
 	public Inspectable::InspectableListener,
@@ -24,16 +24,16 @@ public:
 	enum ExpressionState { EXPRESSION_LOADED, EXPRESSION_ERROR, EXPRESSION_EMPTY, EXPRESSION_CLEAR };
 
 	ExpressionState state;
-	std::unique_ptr<JavascriptEngine> scriptEngine;
+	std::unique_ptr<juce::JavascriptEngine> scriptEngine;
 
 	Parameter* attachedParam;
 
-	String expression;
-	var currentValue;
+	juce::String expression;
+	juce::var currentValue;
 
-	Array<WeakReference<Parameter>> linkedParameters;
+	juce::Array<juce::WeakReference<Parameter>> linkedParameters;
 
-	void setExpression(const String &expression);
+	void setExpression(const juce::String &expression);
 	void evaluate(bool resetListeners = false);
 	void buildEnvironment();
 	void setState(ExpressionState newState);
@@ -42,12 +42,12 @@ public:
 
 	void endLoadFile() override;
 
-	Array<Parameter *> getParameterReferencesInExpression();
+	juce::Array<Parameter *> getParameterReferencesInExpression();
 
 	void inspectableDestroyed(Inspectable * i) override;
 	void parameterValueChanged(Parameter * p) override;
 
-	ListenerList<ExpressionListener> expressionListeners;
+	juce::ListenerList<ExpressionListener> expressionListeners;
 	void addExpressionListener(ExpressionListener* newListener) { expressionListeners.add(newListener); }
 	void removeExpressionListener(ExpressionListener* listener) { expressionListeners.remove(listener); }
 

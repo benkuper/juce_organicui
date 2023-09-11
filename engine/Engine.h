@@ -16,14 +16,14 @@
 
 class Engine :
 	public ControllableContainer,
-	public FileBasedDocument,
-	public AsyncUpdater,
+	public juce::FileBasedDocument,
+	public juce::AsyncUpdater,
 	public ProgressNotifier,
 	public DashboardItemProvider,
-	public MultiTimer //for auto save and CPU
+	public juce::MultiTimer //for auto save and CPU
 {
 public:
-	Engine(const String& fileName = "File", const String& fileExtension = ".file");
+	Engine(const juce::String& fileName = "File", const juce::String& fileExtension = ".file");
 	virtual ~Engine();
 
 	static Engine* mainEngine;
@@ -34,14 +34,14 @@ public:
 	bool isBetaVersion;
 	int betaVersion;
 
-	StringArray breakingChangesVersions;
-	String convertURL = ""; //for file conversion
+	juce::StringArray breakingChangesVersions;
+	juce::String convertURL = ""; //for file conversion
 
-	String fileName = "File";
-	String fileExtension = ".file";
-	String fileWildcard = "*" + fileExtension;
+	juce::String fileName = "File";
+	juce::String fileExtension = ".file";
+	juce::String fileWildcard = "*" + fileExtension;
 
-	String lastFileAbsolutePath; //Used for checking in saveDocument if new file is different
+	juce::String lastFileAbsolutePath; //Used for checking in saveDocument if new file is different
 
 	int autoSaveIndex;
 
@@ -53,48 +53,48 @@ public:
     void clear() override;
 	virtual void clearInternal() {}; //to override to clear specific application classes
 
-	virtual void parseCommandline(const String &);
+	virtual void parseCommandline(const juce::String &);
 
 	//==============================================================================
 	// see EngineFileDocument.cpp
 
 	//  inherited from FileBasedDocument
-	String getDocumentTitle()override;
-	Result loadDocument(const File& file) override;
-	Result saveDocument(const File& file) override;
-	Result saveBackupDocument(int index);
+	juce::String getDocumentTitle()override;
+	juce::Result loadDocument(const juce::File& file) override;
+	juce::Result saveDocument(const juce::File& file) override;
+	juce::Result saveBackupDocument(int index);
 
-	File getLastDocumentOpened() override;
-	void setLastDocumentOpened(const File& file) override;
+	juce::File getLastDocumentOpened() override;
+	void setLastDocumentOpened(const juce::File& file) override;
 
 	//    #if JUCE_MODAL_LOOPS_PERMITTED
 	//     File getSuggestedSaveAsFile (const File& defaultFile)override;
 	//    #endif
 
 	// our Saving methods
-	var getJSONData() override;
-	void loadJSONData(var data, ProgressTask * loadingTask);
-	void loadJSONDataEngine(var data, ProgressTask* loadingTask);
-	virtual void loadJSONDataInternalEngine(var data, ProgressTask * loadingTask) {}
+	juce::var getJSONData() override;
+	void loadJSONData(juce::var data, ProgressTask * loadingTask);
+	void loadJSONDataEngine(juce::var data, ProgressTask* loadingTask);
+	virtual void loadJSONDataInternalEngine(juce::var data, ProgressTask * loadingTask) {}
 
-	bool checkFileVersion(DynamicObject * metaData, bool checkForNewerVersion = false);
-	bool versionIsNewerThan(String versionToCheck, String referenceVersion);
-	int getBetaVersion(String version);
-	bool versionNeedsOnlineUpdate(String version);
-	virtual String getMinimumRequiredFileVersion();
+	bool checkFileVersion(juce::DynamicObject * metaData, bool checkForNewerVersion = false);
+	bool versionIsNewerThan(juce::String versionToCheck, juce::String referenceVersion);
+	int getBetaVersion(juce::String version);
+	bool versionNeedsOnlineUpdate(juce::String version);
+	virtual juce::String getMinimumRequiredFileVersion();
 
-	int64 loadingStartTime;
+	juce::int64 loadingStartTime;
 
 	void fileLoaderEnded();
 	bool allLoadingThreadsAreEnded();
-	void loadDocumentAsync(const File & file);
+	void loadDocumentAsync(const juce::File & file);
 
 	virtual void timerCallback(int timerID) override;
 
 
-	class FileLoader : public Thread, public Timer {
+	class FileLoader : public juce::Thread, public juce::Timer {
 	public:
-		FileLoader(Engine * e, File f) :Thread("EngineLoader"), owner(e), fileToLoad(f) {
+		FileLoader(Engine * e, juce::File f) :juce::Thread("EngineLoader"), owner(e), fileToLoad(f) {
 			//startTimerHz(4);
 			//fakeProgress = 0;
 			isEnded = false;
@@ -117,7 +117,7 @@ public:
 
 		//float fakeProgress ;
 		Engine * owner;
-		File fileToLoad;
+		juce::File fileToLoad;
 		bool isEnded;
 
 
@@ -125,7 +125,7 @@ public:
 
 	std::unique_ptr<FileLoader> fileLoader;
 
-	ListenerList<EngineListener> engineListeners;
+	juce::ListenerList<EngineListener> engineListeners;
 	void addEngineListener(EngineListener* e) { engineListeners.add(e); }
 	void removeEngineListener(EngineListener* e) { engineListeners.remove(e); }
 
@@ -154,7 +154,7 @@ public:
 
 	bool isLoadingFile;
 	bool isClearing;
-	var jsonData;
+	juce::var jsonData;
 
 	virtual void handleAsyncUpdate() override;
 
@@ -163,9 +163,9 @@ public:
 
 
 	// Inherited via DashboardItemProvider
-	virtual PopupMenu getDashboardCreateMenu(int idOffset) override;
+	virtual juce::PopupMenu getDashboardCreateMenu(int idOffset) override;
 	virtual DashboardItem * getDashboardItemFromMenuResult(int result) override;
 
 };
 
-static const String lastFileListKey = "recentFiles";
+static const juce::String lastFileListKey = "recentFiles";

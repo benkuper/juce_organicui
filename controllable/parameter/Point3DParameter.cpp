@@ -10,6 +10,8 @@ Author:  bkupe
 
 #include "JuceHeader.h"
 
+using namespace juce;
+
 Point3DParameter::Point3DParameter(const String& niceName, const String& description, bool enabled) :
 	Parameter(POINT3D, niceName, description, 0, 0, 1, enabled),
 	x(0), y(0), z(0),

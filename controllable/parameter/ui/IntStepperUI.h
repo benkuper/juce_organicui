@@ -13,18 +13,18 @@
 class IntStepperUI : public FloatStepperUI 
 {
 public:
-    IntStepperUI(Array<Parameter*> parameters);
+    IntStepperUI(juce::Array<Parameter*> parameters);
     virtual ~IntStepperUI();
 
-	Array<IntParameter*> intParams;
+	juce::Array<IntParameter*> intParams;
 	IntParameter* intParam;
 
 	static bool showHexModeOption;
 
-	static String hexValueToText(double v);
-	static double textToHexValue(String t);
+	static juce::String hexValueToText(double v);
+	static double textToHexValue(juce::String t);
 
-	void addPopupMenuItemsInternal(PopupMenu* p) override;
+	void addPopupMenuItemsInternal(juce::PopupMenu* p) override;
 	void handleMenuSelectedID(int result) override;
 
 protected:

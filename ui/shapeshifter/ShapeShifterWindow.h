@@ -13,9 +13,9 @@
 #include "ShapeShifterPanel.h"
 
 class ShapeShifterWindow :
-	public ResizableWindow,
+	public juce::ResizableWindow,
 	public ShapeShifterPanel::Listener,
-	public Button::Listener
+	public juce::Button::Listener
 {
 public:
 	ShapeShifterWindow(ShapeShifterPanel* _panel, juce::Rectangle<int> bounds);
@@ -25,15 +25,15 @@ public:
 	enum DragMode { NONE, TAB, PANEL };
 
 	ShapeShifterPanel* panel;
-	std::unique_ptr<ImageButton> pinBT;
+	std::unique_ptr<juce::ImageButton> pinBT;
 
-	void paintOverChildren(Graphics& g)override;
+	void paintOverChildren(juce::Graphics& g)override;
 	void resized() override;
 
-	ComponentDragger dragger;
-	void mouseDown(const MouseEvent& e) override;
-	void mouseDrag(const MouseEvent& e) override;
-	void mouseUp(const MouseEvent& e) override;
+	juce::ComponentDragger dragger;
+	void mouseDown(const juce::MouseEvent& e) override;
+	void mouseDrag(const juce::MouseEvent& e) override;
+	void mouseUp(const juce::MouseEvent& e) override;
 
 	DragMode dragMode;
 
@@ -41,9 +41,9 @@ public:
 
 	void userTriedToCloseWindow() override;
 
-	virtual var getCurrentLayout();
+	virtual juce::var getCurrentLayout();
 
-	void buttonClicked(Button* b) override;
+	void buttonClicked(juce::Button* b) override;
 
 	void panelEmptied(ShapeShifterPanel*) override;
 

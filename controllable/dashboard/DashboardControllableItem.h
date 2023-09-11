@@ -8,7 +8,7 @@ public:
 	DashboardControllableItem(Controllable* item = nullptr);
 	~DashboardControllableItem();
 
-	WeakReference<Controllable> controllable;
+	juce::WeakReference<Controllable> controllable;
 
 	BoolParameter * showLabel;
 	ColorParameter* textColor;
@@ -21,10 +21,10 @@ public:
 	BoolParameter* forceReadOnly;
 
 
-	virtual var getItemParameterFeedback(Parameter* p) override;
+	virtual juce::var getItemParameterFeedback(Parameter* p) override;
 
-    virtual var getJSONData() override;
-	virtual void loadJSONData(var data, bool createIfNotThere = false) override; //needs to not override ItemInternal to force loading data after set inspectable
+    virtual juce::var getJSONData() override;
+	virtual void loadJSONData(juce::var data, bool createIfNotThere = false) override; //needs to not override ItemInternal to force loading data after set inspectable
 
 	virtual void setInspectableInternal(Inspectable * i) override;
 
@@ -38,9 +38,9 @@ public:
 	virtual void controllableNameChanged(Controllable*) override;
 	virtual void askForRemoveControllable(Controllable*, bool /*addToUndo*/ = false) override;
 
-	virtual var getServerData() override;
+	virtual juce::var getServerData() override;
 
-	virtual String getTypeString() const override { return "DashboardControllableItem"; }
+	virtual juce::String getTypeString() const override { return "DashboardControllableItem"; }
 
 	DECLARE_ASYNC_EVENT(DashboardControllableItem, DashboardControllableItem, dashboardItem, ENUM_LIST(NEEDS_UI_UPDATE))
 };

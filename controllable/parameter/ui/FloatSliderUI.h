@@ -15,7 +15,7 @@ class FloatSliderUI :
 {
 
 public:
-    FloatSliderUI(Array<Parameter *> parameters);
+    FloatSliderUI(juce::Array<Parameter *> parameters);
     virtual ~FloatSliderUI();
 
     enum Direction { HORIZONTAL, VERTICAL, ROTARY };
@@ -30,30 +30,30 @@ public:
     bool assignOnMousePosDirect;
 
     int fixedDecimals;
-    String prefix;
-    String suffix;
+    juce::String prefix;
+    juce::String suffix;
 
     //interaction
     float initValue;
     float initNormalizedValue;
 
     int lastDrawPos;
-    String lastValueText;
+    juce::String lastValueText;
 
-    virtual void paint(Graphics &g) override;
-    virtual void drawBG(Graphics &g);
-    virtual void mouseDownInternal(const MouseEvent &e) override;
-    virtual void mouseDrag(const MouseEvent &e) override;
-    virtual void mouseUpInternal(const MouseEvent &e) override;
+    virtual void paint(juce::Graphics& g) override;
+    virtual void drawBG(juce::Graphics &g);
+    virtual void mouseDownInternal(const juce::MouseEvent& e) override;
+    virtual void mouseDrag(const juce::MouseEvent& e) override;
+    virtual void mouseUpInternal(const juce::MouseEvent &e) override;
 
     virtual float getNormalizedValueFromMouse();
-    virtual float getNormalizedValueFromMouseDrag(const MouseEvent &e);
-    virtual float getNormalizedValueFromPosition(const Point<int> &pos);
+    virtual float getNormalizedValueFromMouseDrag(const juce::MouseEvent &e);
+    virtual float getNormalizedValueFromPosition(const juce::Point<int> &pos);
     virtual int getDrawPos();
-    virtual String getValueText() const;
+    virtual juce::String getValueText() const;
 
     virtual float getAngleForValue(float val, float angleReduction);
-    void drawRotary(Graphics &g, Colour c, float startPos, float endPos, float reduction = 0);
+    void drawRotary(juce::Graphics &g, juce::Colour c, float startPos, float endPos, float reduction = 0);
 
     virtual void setParamNormalizedValueUndoable(float oldValue, float newValue);
     virtual void setParamNormalizedValue(float value);
@@ -63,7 +63,7 @@ public:
 	virtual void focusGained(FocusChangeType cause) override;
 
 protected:
-    virtual void valueChanged(const var &) override;
+    virtual void valueChanged(const juce::var &) override;
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FloatSliderUI)

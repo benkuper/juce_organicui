@@ -14,12 +14,12 @@ class TripleSliderUI : public ParameterUI
 {
 
 public:
-	TripleSliderUI(Array<Point3DParameter*>parameters);
+	TripleSliderUI(juce::Array<Point3DParameter*>parameters);
 	virtual ~TripleSliderUI();
 
 	enum Direction { HORIZONTAL, VERTICAL };
 
-	Array<Point3DParameter*> p3ds;
+	juce::Array<Point3DParameter*> p3ds;
 	Point3DParameter* p3d;
 
 	FloatParameter xParam;
@@ -30,14 +30,14 @@ public:
 	std::unique_ptr<ParameterUI> ySlider;
 	std::unique_ptr<ParameterUI> zSlider;
 
-	var mouseDownValue;
+	juce::var mouseDownValue;
 
 	bool isUpdatingFromParam;
 
-	void mouseDownInternal(const MouseEvent&) override;
-	void mouseUpInternal(const MouseEvent&) override;
+	void mouseDownInternal(const juce::MouseEvent&) override;
+	void mouseUpInternal(const juce::MouseEvent&) override;
 
-	void paint(Graphics& g) override;
+	void paint(juce::Graphics& g) override;
 	void resized() override;
 	void showEditWindowInternal() override;
 	void showEditRangeWindowInternal() override;

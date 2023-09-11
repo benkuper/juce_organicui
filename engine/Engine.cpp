@@ -11,6 +11,8 @@
 
 #include "JuceHeader.h"
 
+using namespace juce;
+
 Engine * Engine::mainEngine = nullptr;
 
 static OrganicApplication& getApp();

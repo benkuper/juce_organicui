@@ -18,10 +18,10 @@ public:
 	~GradientColorUI();
 
 	std::unique_ptr<ColorParameterUI> colorUI;
-	Path drawPath;
+	juce::Path drawPath;
 
-	void paint(Graphics &g) override;
+	void paint(juce::Graphics &g) override;
 	void resized() override;
 
-	void mouseDown(const MouseEvent &e) override;
+	void mouseDown(const juce::MouseEvent &e) override;
 };

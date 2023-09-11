@@ -20,8 +20,8 @@ public:
     ~HMAC_SHA1() {}
     
     //==============================================================================
-    static MemoryBlock encode (const char* text, int textLen, const char* key, int keyLen);
-    static MemoryBlock encode (const String& text, const String& key);
+    static juce::MemoryBlock encode (const char* text, int textLen, const char* key, int keyLen);
+    static juce::MemoryBlock encode (const juce::String& text, const juce::String& key);
     
 private:
     //==============================================================================

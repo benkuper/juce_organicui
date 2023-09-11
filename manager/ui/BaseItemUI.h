@@ -13,9 +13,9 @@
 template<class T>
 class BaseItemUI :
 	public BaseItemMinimalUI<T>,
-	public Button::Listener,
-	public Label::Listener,
-	public ComponentListener,
+	public juce::Button::Listener,
+	public juce::Label::Listener,
+	public juce::ComponentListener,
 	public Parameter::AsyncListener
 {
 public:
@@ -29,7 +29,7 @@ public:
 	int minContentHeight;
 
 
-	Point<float> sizeAtMouseDown;
+	juce::Point<float> sizeAtMouseDown;
 
 	//header
 	int headerHeight;
@@ -45,39 +45,39 @@ public:
 
 
 	class ItemResizerComponent :
-		public Component
+		public juce::Component
 	{
 	public:
 		ItemResizerComponent() 
 		{
-			setMouseCursor(MouseCursor::BottomRightCornerResizeCursor);
+			setMouseCursor(juce::MouseCursor::BottomRightCornerResizeCursor);
 		}
 
 		~ItemResizerComponent() {}
 
-		void paint(Graphics& g)
+		void paint(juce::Graphics& g)
 		{
-			g.setColour(isMouseOverOrDragging() ? HIGHLIGHT_COLOR : Colours::lightgrey.withAlpha(.3f));
+			g.setColour(isMouseOverOrDragging() ? HIGHLIGHT_COLOR : juce::Colours::lightgrey.withAlpha(.3f));
 			for (int i = 0; i < 3; i++) g.drawLine(getWidth() * i / 3, getHeight(), getWidth(), getHeight() * i / 3);
 		}
 	};
 
 	std::unique_ptr<ItemResizerComponent> cornerResizer;
-	std::unique_ptr<ResizableEdgeComponent> edgeResizer;
-	ComponentBoundsConstrainer constrainer;
+	std::unique_ptr<juce::ResizableEdgeComponent> edgeResizer;
+	juce::ComponentBoundsConstrainer constrainer;
 
-	Component* resizer;
+	juce::Component* resizer;
 
-	Label itemLabel;
+	juce::Label itemLabel;
 	std::unique_ptr<BoolToggleUI> enabledBT;
-	std::unique_ptr<ImageButton> removeBT;
+	std::unique_ptr<juce::ImageButton> removeBT;
 	std::unique_ptr<ColorParameterUI> itemColorUI;
 	std::unique_ptr<WarningTargetUI> warningUI;
 	std::unique_ptr<BoolToggleUI> miniModeBT;
 
 	//std::unique_ptr<Grabber> grabber;
 
-	Array<Component*> contentComponents;
+	juce::Array<juce::Component*> contentComponents;
 
 	void setContentSize(int contentWidth, int contentHeight);
 
@@ -94,16 +94,16 @@ public:
 	virtual void resizedInternalHeader(juce::Rectangle<int>&) {}
 	virtual void resizedInternalContent(juce::Rectangle<int>&) {}
 	virtual void resizedInternalFooter(juce::Rectangle<int>&) {}
-	virtual void buttonClicked(Button* b) override;
+	virtual void buttonClicked(juce::Button* b) override;
 
-	virtual void mouseDown(const MouseEvent& e) override;
-	virtual void mouseDrag(const MouseEvent& e) override;
-	virtual void mouseUp(const MouseEvent& e) override;
+	virtual void mouseDown(const juce::MouseEvent& e) override;
+	virtual void mouseDrag(const juce::MouseEvent& e) override;
+	virtual void mouseUp(const juce::MouseEvent& e) override;
 
-	virtual void labelTextChanged(Label* l) override;
-	virtual bool keyPressed(const KeyPress& e) override;
+	virtual void labelTextChanged(juce::Label* l) override;
+	virtual bool keyPressed(const juce::KeyPress& e) override;
 
-	virtual bool canStartDrag(const MouseEvent& e) override;
+	virtual bool canStartDrag(const juce::MouseEvent& e) override;
 
 	virtual void containerChildAddressChangedAsync(ControllableContainer*) override;
 	virtual void controllableFeedbackUpdateInternal(Controllable*) override;
@@ -112,7 +112,7 @@ public:
 
 	virtual void visibilityChanged() override;
 
-	virtual void componentVisibilityChanged(Component& c) override;
+	virtual void componentVisibilityChanged(juce::Component& c) override;
 
 	class ItemUIListener
 	{
@@ -121,7 +121,7 @@ public:
 		virtual void itemUIMiniModeChanged(BaseItemUI<T>*) {}
 	};
 
-	ListenerList<ItemUIListener> itemUIListeners;
+	juce::ListenerList<ItemUIListener> itemUIListeners;
 	void addItemUIListener(ItemUIListener* newListener) { itemUIListeners.add(newListener); }
 	void removeItemUIListener(ItemUIListener* listener) { itemUIListeners.remove(listener); }
 
@@ -150,15 +150,15 @@ BaseItemUI<T>::BaseItemUI(T* _item, Direction _resizeDirection, bool showMiniMod
 
 	this->setName(this->baseItem->niceName);
 
-	itemLabel.setColour(itemLabel.backgroundColourId, Colours::transparentWhite);
+	itemLabel.setColour(itemLabel.backgroundColourId, juce::Colours::transparentWhite);
 	itemLabel.setColour(itemLabel.textColourId, TEXT_COLOR);
 
-	itemLabel.setColour(itemLabel.backgroundWhenEditingColourId, Colours::black);
-	itemLabel.setColour(itemLabel.textWhenEditingColourId, Colours::white);
-	itemLabel.setColour(CaretComponent::caretColourId, Colours::orange);
+	itemLabel.setColour(itemLabel.backgroundWhenEditingColourId, juce::Colours::black);
+	itemLabel.setColour(itemLabel.textWhenEditingColourId, juce::Colours::white);
+	itemLabel.setColour(juce::CaretComponent::caretColourId, juce::Colours::orange);
 
 	itemLabel.setFont(GlobalSettings::getInstance()->fontSize->floatValue());
-	itemLabel.setJustificationType(Justification::centredLeft);
+	itemLabel.setJustificationType(juce::Justification::centredLeft);
 
 	itemLabel.setEditable(false, this->baseItem->nameCanBeChangedByUser);
 	itemLabel.addListener(this);
@@ -196,7 +196,7 @@ BaseItemUI<T>::BaseItemUI(T* _item, Direction _resizeDirection, bool showMiniMod
 
 	if (this->baseItem->canBeDisabled)
 	{
-		enabledBT.reset(this->baseItem->enabled->createToggle(ImageCache::getFromMemory(OrganicUIBinaryData::power_png, OrganicUIBinaryData::power_pngSize)));
+		enabledBT.reset(this->baseItem->enabled->createToggle(juce::ImageCache::getFromMemory(OrganicUIBinaryData::power_png, OrganicUIBinaryData::power_pngSize)));
 		this->addAndMakeVisible(enabledBT.get());
 	}
 
@@ -222,7 +222,7 @@ BaseItemUI<T>::BaseItemUI(T* _item, Direction _resizeDirection, bool showMiniMod
 
 	if (showMiniModeBT)
 	{
-		miniModeBT.reset(this->baseItem->miniMode->createToggle(ImageCache::getFromMemory(OrganicUIBinaryData::minus_png, OrganicUIBinaryData::minus_pngSize)));
+		miniModeBT.reset(this->baseItem->miniMode->createToggle(juce::ImageCache::getFromMemory(OrganicUIBinaryData::minus_png, OrganicUIBinaryData::minus_pngSize)));
 		this->addAndMakeVisible(miniModeBT.get());
 	}
 
@@ -294,7 +294,7 @@ void BaseItemUI<T>::updateItemUISize()
 	{
 		if (resizer != nullptr) this->addAndMakeVisible(resizer);
 
-		int targetHeight = this->getHeight() > 0 ? jmax(minContentHeight, this->getHeight()) : 24;//Default size if zero
+		int targetHeight = this->getHeight() > 0 ? juce::jmax(minContentHeight, this->getHeight()) : 24;//Default size if zero
 		int targetWidth = this->getWidth() > 0 ? this->getWidth() : 100;//default size if zero
 
 		switch (resizeDirection)
@@ -426,7 +426,7 @@ void BaseItemUI<T>::resized()
 template<class T>
 void BaseItemUI<T>::resizedHeader(juce::Rectangle<int>& r)
 {
-	int labelWidth = jmax(itemLabel.getFont().getStringWidth(this->baseItem->niceName) + 10, 30);
+	int labelWidth = juce::jmax(itemLabel.getFont().getStringWidth(this->baseItem->niceName) + 10, 30);
 	itemLabel.setBounds(r.removeFromLeft(labelWidth).reduced(0, 1));
 	r.removeFromLeft(2);
 
@@ -434,14 +434,14 @@ void BaseItemUI<T>::resizedHeader(juce::Rectangle<int>& r)
 }
 
 template<class T>
-void BaseItemUI<T>::buttonClicked(Button* b)
+void BaseItemUI<T>::buttonClicked(juce::Button* b)
 {
 	if (b == removeBT.get())
 	{
 		if (this->baseItem->askConfirmationBeforeRemove && GlobalSettings::getInstance()->askBeforeRemovingItems->boolValue())
 		{
-			AlertWindow::showAsync(
-				MessageBoxOptions().withIconType(AlertWindow::QuestionIcon)
+			juce::AlertWindow::showAsync(
+				juce::MessageBoxOptions().withIconType(juce::AlertWindow::QuestionIcon)
 				.withTitle("Delete " + this->baseItem->niceName)
 				.withMessage("Are you sure you want to delete this ?")
 				.withButton("Delete")
@@ -458,10 +458,10 @@ void BaseItemUI<T>::buttonClicked(Button* b)
 
 
 template<class T>
-void BaseItemUI<T>::mouseDown(const MouseEvent& e)
+void BaseItemUI<T>::mouseDown(const juce::MouseEvent& e)
 {
 	//if ((removeBT != nullptr && e.eventComponent == removeBT) || (enabledBT != nullptr && e.eventComponent == enabledBT->bt)) return;
-	if (dynamic_cast<Button*>(e.eventComponent) != nullptr) return;
+	if (dynamic_cast<juce::Button*>(e.eventComponent) != nullptr) return;
 	else if (dynamic_cast<ControllableUI*>(e.eventComponent) != nullptr) return;
 	else if (e.eventComponent == cornerResizer.get())
 	{
@@ -472,7 +472,7 @@ void BaseItemUI<T>::mouseDown(const MouseEvent& e)
 }
 
 template<class T>
-void BaseItemUI<T>::mouseDrag(const MouseEvent& e)
+void BaseItemUI<T>::mouseDrag(const juce::MouseEvent& e)
 {
 	if (e.eventComponent == cornerResizer.get())
 	{
@@ -483,7 +483,7 @@ void BaseItemUI<T>::mouseDrag(const MouseEvent& e)
 }
 
 template<class T>
-void BaseItemUI<T>::mouseUp(const MouseEvent& e)
+void BaseItemUI<T>::mouseUp(const juce::MouseEvent& e)
 {
 	if (e.eventComponent == cornerResizer.get())
 	{
@@ -492,22 +492,22 @@ void BaseItemUI<T>::mouseUp(const MouseEvent& e)
 }
 
 template<class T>
-void BaseItemUI<T>::labelTextChanged(Label* l)
+void BaseItemUI<T>::labelTextChanged(juce::Label* l)
 {
 	if (l == &itemLabel)
 	{
-		if (l->getText().isEmpty()) itemLabel.setText(this->baseItem->niceName, dontSendNotification); //avoid setting empty names
+		if (l->getText().isEmpty()) itemLabel.setText(this->baseItem->niceName, juce::dontSendNotification); //avoid setting empty names
 		else this->baseItem->setUndoableNiceName(l->getText());
 		resized();
 	}
 }
 
 template<class T>
-bool BaseItemUI<T>::keyPressed(const KeyPress& e)
+bool BaseItemUI<T>::keyPressed(const juce::KeyPress& e)
 {
 	if (!this->inspectable.wasObjectDeleted() && this->item->isSelected)
 	{
-		if (e.getKeyCode() == KeyPress::F2Key)
+		if (e.getKeyCode() == juce::KeyPress::F2Key)
 		{
 			this->itemLabel.showEditor();
 			return true;
@@ -519,7 +519,7 @@ bool BaseItemUI<T>::keyPressed(const KeyPress& e)
 }
 
 template<class T>
-bool BaseItemUI<T>::canStartDrag(const MouseEvent& e)
+bool BaseItemUI<T>::canStartDrag(const juce::MouseEvent& e)
 {
 	return e.eventComponent == this || (e.eventComponent == &itemLabel && !itemLabel.isBeingEdited());
 }
@@ -529,7 +529,7 @@ template<class T>
 void BaseItemUI<T>::containerChildAddressChangedAsync(ControllableContainer*)
 {
 
-	itemLabel.setText(this->baseItem->niceName, dontSendNotification);
+	itemLabel.setText(this->baseItem->niceName, juce::dontSendNotification);
 }
 
 template<class T>
@@ -560,7 +560,7 @@ void BaseItemUI<T>::visibilityChanged()
 }
 
 template<class T>
-void BaseItemUI<T>::componentVisibilityChanged(Component& c)
+void BaseItemUI<T>::componentVisibilityChanged(juce::Component& c)
 {
 	if (&c == warningUI.get()) resized();
 }

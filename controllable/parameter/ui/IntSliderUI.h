@@ -13,14 +13,14 @@
 class IntSliderUI : public FloatSliderUI
 {
 public:
-    IntSliderUI(Array<Parameter*> parameters);
+    IntSliderUI(juce::Array<Parameter*> parameters);
     virtual ~IntSliderUI();
 
     void setParamNormalizedValue(float value) override;
     float getParamNormalizedValue() override;
 
 protected:
-    void valueChanged(const var&) override { repaint(); };
+    void valueChanged(const juce::var&) override { repaint(); };
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(IntSliderUI)

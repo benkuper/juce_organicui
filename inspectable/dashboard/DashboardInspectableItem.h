@@ -8,8 +8,8 @@ public:
 	DashboardInspectableItem(Inspectable * item);
 	~DashboardInspectableItem();
 
-	WeakReference<Inspectable> inspectable;
-	String inspectableGhostAddress;
+	juce::WeakReference<Inspectable> inspectable;
+	juce::String inspectableGhostAddress;
 	TargetParameter* target;
 	bool settingInspectable;
 
@@ -24,12 +24,12 @@ public:
 	virtual void ghostInspectable() {}
 	virtual void checkGhost() {}
 
-	virtual var getJSONData() override;
-	virtual void loadJSONDataItemInternal(var data) override;
+	virtual juce::var getJSONData() override;
+	virtual void loadJSONDataItemInternal(juce::var data) override;
 
 	void onContainerParameterChangedInternal(Parameter* p) override;
 
-	virtual String getTypeString() const override { return "DashboardControllableItem"; }
+	virtual juce::String getTypeString() const override { return "DashboardControllableItem"; }
 
 	class  InspectableItemEvent
 	{
@@ -39,7 +39,7 @@ public:
 		InspectableItemEvent(Type type, Inspectable* i) : type(type), inspectable(i) {}
 
 		Type type;
-		WeakReference<Inspectable> inspectable;
+		juce::WeakReference<Inspectable> inspectable;
 	};
 
 

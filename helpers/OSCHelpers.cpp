@@ -1,6 +1,8 @@
 #include "JuceHeader.h"
 #include "OSCHelpers.h"
 
+using namespace juce;
+
 void OSCHelpers::logOSCFormatError(const char* message, int length)
 {
 	LOGERROR("OSC Error : " << String(message, length));

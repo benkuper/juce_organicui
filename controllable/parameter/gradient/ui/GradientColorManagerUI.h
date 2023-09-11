@@ -13,8 +13,8 @@
 class GradientColorManagerUI :
 	public BaseManagerUI<GradientColorManager, GradientColor, GradientColorUI>,
 	public ContainerAsyncListener,
-	public Timer,
-	public Thread
+	public juce::Timer,
+	public juce::Thread
 
 {
 public:
@@ -28,19 +28,19 @@ public:
 	float viewEndPos;
 	bool autoResetViewRangeOnLengthUpdate;
 
-	Image viewImage;
-	SpinLock imageLock;
+	juce::Image viewImage;
+	juce::SpinLock imageLock;
 
 	bool miniMode;
 
-	Array<float> snapTimes;
-	std::function<void(Array<float>*)> getSnapTimesFunc;
+	juce::Array<float> snapTimes;
+	std::function<void(juce::Array<float>*)> getSnapTimesFunc;
 	
 	void setViewRange(float start, float end);
 
 	void setMiniMode(bool value);
 
-	void paint(Graphics &g) override;
+	void paint(juce::Graphics &g) override;
 
 	void resized() override;
 
@@ -49,9 +49,9 @@ public:
     void addItemUIInternal(GradientColorUI * item) override;
     void removeItemUIInternal(GradientColorUI * item) override;
 
-	void mouseDown(const MouseEvent& e) override;
-	void mouseDoubleClick(const MouseEvent &e) override;
-	void mouseDrag(const MouseEvent &e) override;
+	void mouseDown(const juce::MouseEvent& e) override;
+	void mouseDoubleClick(const juce::MouseEvent &e) override;
+	void mouseDrag(const juce::MouseEvent &e) override;
 
 	void placeItemUI(GradientColorUI * tui);
 

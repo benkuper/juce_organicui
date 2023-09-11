@@ -10,6 +10,8 @@
 
 #include "JuceHeader.h"
 
+using namespace juce;
+
 Automation::Automation(const String& name, AutomationRecorder* recorder, bool allowKeysOutside) :
 	BaseManager(name),
 	valueRange(nullptr),

@@ -19,8 +19,8 @@ public:
 	DashboardItemFactory();
 	virtual ~DashboardItemFactory() {}
 
-	Array<DashboardItemProvider *> providers;
-	Array<DashboardItemProvider *> specialProviders;
+	juce::Array<DashboardItemProvider *> providers;
+	juce::Array<DashboardItemProvider *> specialProviders;
 
 	void buildPopupMenu(int startOffset = 0) override;
 	void showCreateMenu(std::function<void(DashboardItem *)> returnFunc) override;

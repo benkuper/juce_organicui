@@ -12,9 +12,9 @@
 
 class CommandLineElement{
 public:
-  CommandLineElement(const String & name = ""):command(name){}
-  String command;
-  StringArray args;
+  CommandLineElement(const juce::String& name = "") :command(name) {}
+  juce::String command;
+  juce::StringArray args;
 
   bool isEmpty(){return (command == "") && (args.size()==0);}
   CommandLineElement & operator=(const CommandLineElement & rhs)
@@ -32,10 +32,10 @@ public:
 };
 
 //typedef Array<CommandLineElement> CommandLineElements;
-class CommandLineElements: public Array<CommandLineElement>{
+class CommandLineElements: public juce::Array<CommandLineElement>{
 public:
 
-  CommandLineElement  getCommandLineElement(const String command){
+  CommandLineElement  getCommandLineElement(const juce::String command){
     for(auto & e:*this ){
       if(e.command == command){
         return e;
@@ -44,7 +44,7 @@ public:
     return CommandLineElement();
   }
 
-  CommandLineElement  getCommandLineElement(const String command, const String command2 ){
+  CommandLineElement  getCommandLineElement(const juce::String command, const juce::String command2 ){
     for(auto & e:*this ){
       if((e.command == command) || (e.command==command2)){
         return e;
@@ -58,10 +58,10 @@ public:
 class StringUtil
 {
 public:
-	static String toShortName(const String& niceName, bool replaceSlashes = false);
-	static CommandLineElements parseCommandLine(const String& commandLine);
+	static juce::String toShortName(const juce::String& niceName, bool replaceSlashes = false);
+	static CommandLineElements parseCommandLine(const juce::String& commandLine);
 
 
-	static String valueToTimeString(double val, int numDecimals= 3);
-	static double timeStringToValue(String str);
+	static juce::String valueToTimeString(double val, int numDecimals= 3);
+	static double timeStringToValue(juce::String str);
 };

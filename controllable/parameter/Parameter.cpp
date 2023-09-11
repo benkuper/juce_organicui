@@ -11,6 +11,8 @@
 #include "JuceHeader.h"
 #include "Parameter.h"
 
+using namespace juce;
+
 juce_ImplementSingleton(Parameter::ValueInterpolator::Manager);
 
 

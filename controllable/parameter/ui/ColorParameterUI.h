@@ -12,34 +12,34 @@
 
 class ColorParameterUI :
 	public ParameterUI,
-	public ChangeListener,
-	public ComponentListener
+	public juce::ChangeListener,
+	public juce::ComponentListener
 {
 
 public:
-	ColorParameterUI(Array<ColorParameter*> parameters);
+	ColorParameterUI(juce::Array<ColorParameter*> parameters);
 	~ColorParameterUI();
 
-	Array<ColorParameter*> colorParams;
-	var valueOnEditorOpen;
+	juce::Array<ColorParameter*> colorParams;
+	juce::var valueOnEditorOpen;
 	ColorParameter * colorParam;
-	CallOutBox* colorEditor;
+	juce::CallOutBox* colorEditor;
 
 	bool dispatchOnDoubleClick;
 	bool dispatchOnSingleClick;
 
-	void paint(Graphics &g) override;
+	void paint(juce::Graphics &g) override;
 	void resized() override;
-	void mouseDownInternal(const MouseEvent &e) override;
+	void mouseDownInternal(const juce::MouseEvent &e) override;
 
 	void showEditWindowInternal() override;
 
-	void componentBeingDeleted(Component &) override;
+	void componentBeingDeleted(juce::Component &) override;
 
 protected:
 	// Inherited via ChangeListener
-	virtual void changeListenerCallback(ChangeBroadcaster * source) override;
-	void valueChanged(const var &) override;
+	virtual void changeListenerCallback(juce::ChangeBroadcaster * source) override;
+	void valueChanged(const juce::var &) override;
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ColorParameterUI)

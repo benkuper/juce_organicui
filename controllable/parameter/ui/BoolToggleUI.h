@@ -14,25 +14,25 @@ class BoolToggleUI :
 	public ParameterUI
 {
 public:
-    BoolToggleUI(Array<BoolParameter *> parameters, Image onImage = Image(), Image offImage = Image());
+    BoolToggleUI(juce::Array<BoolParameter *> parameters, juce::Image onImage = juce::Image(), juce::Image offImage = juce::Image());
     virtual ~BoolToggleUI();
 
-	Image offImage;
-	Image onImage;
+    juce::Image offImage;
+    juce::Image onImage;
 
     bool usingCustomImages;
     bool momentaryMode;
 
-    void setImages(Image onImage, Image offImage = Image());
+    void setImages(juce::Image onImage, juce::Image offImage = juce::Image());
 
-    void paint(Graphics &g) override;
-    void mouseDownInternal(const MouseEvent &e) override;
-    void mouseUpInternal(const MouseEvent &e) override;
+    void paint(juce::Graphics &g) override;
+    void mouseDownInternal(const juce::MouseEvent &e) override;
+    void mouseUpInternal(const juce::MouseEvent &e) override;
 
     virtual void updateUIParamsInternal() override;
 
 protected:
-    void valueChanged(const var & ) override;
+    void valueChanged(const juce::var & ) override;
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BoolToggleUI)
@@ -47,9 +47,9 @@ public:
     virtual ~BoolButtonToggleUI();
     
 
-    Rectangle<float> buttonRect;
+    juce::Rectangle<float> buttonRect;
 
-    void paint(Graphics& g) override;
+    void paint(juce::Graphics& g) override;
     bool hitTest(int x, int y) override;
 
 private:

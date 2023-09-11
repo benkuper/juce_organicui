@@ -1,7 +1,7 @@
 #pragma once
 
 class CrashDumpUploader : 
-	public Thread
+	public juce::Thread
 {
 public:
 	juce_DeclareSingleton(CrashDumpUploader, true);
@@ -9,21 +9,21 @@ public:
 	CrashDumpUploader();
 	~CrashDumpUploader();
 
-	URL remoteURL;
-	Image crashImage;
+	juce::URL remoteURL;
+	juce::Image crashImage;
 
 	bool doUpload;
 	bool uploadFile;
 	GlobalSettings::CrashAction crashAction;
 
-	File traceFile;
-	File dumpFile;
-	File recoveredFile;
-	String contactEmail;
-	String crashMessage;
+	juce::File traceFile;
+	juce::File dumpFile;
+	juce::File recoveredFile;
+	juce::String contactEmail;
+	juce::String crashMessage;
 	FloatParameter progress;
 
-	void init(const String& url, Image image);
+	void init(const juce::String& url, juce::Image image);
 
 #if JUCE_WINDOWS
 	void handleCrash(void * e);
@@ -39,28 +39,28 @@ public:
 	void exitApp();
 
 	class UploadWindow :
-		public Component,
-		public Button::Listener
+		public juce::Component,
+		public juce::Button::Listener
 	{
 	public:
 		UploadWindow();
 		~UploadWindow();
 
-		TextEditor mail;
-		TextEditor editor;
-		Image* image;
-		TextButton okBT;
-		TextButton cancelBT;
-		TextButton autoReopenBT;
-		TextButton recoverOnlyBT;
+		juce::TextEditor mail;
+		juce::TextEditor editor;
+		juce::Image* image;
+		juce::TextButton okBT;
+		juce::TextButton cancelBT;
+		juce::TextButton autoReopenBT;
+		juce::TextButton recoverOnlyBT;
 		FloatSliderUI progressUI;
 
 		juce::Rectangle<int> imageRect;
 
-		void paint(Graphics& g) override;
+		void paint(juce::Graphics& g) override;
 		void resized() override;
 		
-		void buttonClicked(Button* bt) override;
+		void buttonClicked(juce::Button* bt) override;
 
 		JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(UploadWindow)
 	};
