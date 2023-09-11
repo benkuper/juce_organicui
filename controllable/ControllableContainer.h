@@ -77,7 +77,7 @@ public:
 	juce::UndoableAction* addUndoableControllable(Controllable* c, bool onlyReturnAction = false);
 	Controllable* addControllable(Controllable* c, int index = -1);
 	Parameter* addParameter(Parameter* p, int index = -1);
-	FloatParameter* addFloatParameter(const juce::String& niceName, const juce::String& description, const float& initialValue, const float& minValue = INT32_MIN, const float& maxValue = INT32_MAX, const bool& enabled = true);
+	FloatParameter* addFloatParameter(const juce::String& niceName, const juce::String& description, const double& initialValue, const double& minValue = INT32_MIN, const double& maxValue = INT32_MAX, const bool& enabled = true);
 	IntParameter* addIntParameter(const juce::String& niceName, const juce::String& description, const int& initialValue, const int& minValue = INT32_MIN, const int& maxValue = INT32_MAX, const bool& enabled = true);
 	BoolParameter* addBoolParameter(const juce::String& niceName, const juce::String& description, const bool& value, const bool& enabled = true);
 	StringParameter* addStringParameter(const juce::String& niceName, const juce::String& description, const juce::String& value, const bool& enabled = true);
