@@ -81,7 +81,7 @@ public:
 		public juce::Viewport
 	{
 	public:
-		bool useMouseWheelMoveIfNeeded(const MouseEvent& e, const MouseWheelDetails& d) override
+		bool useMouseWheelMoveIfNeeded(const juce::MouseEvent& e, const juce::MouseWheelDetails& d) override
 		{ 
 			if (e.mods.isShiftDown()) return false;
 			return juce::Viewport::useMouseWheelMoveIfNeeded(e, d);
