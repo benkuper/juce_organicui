@@ -131,11 +131,14 @@ void DashboardItemManagerUI::itemDropped(const SourceDetails& details)
 	if (details.sourceComponent->getParentComponent() == this) return;
 
 	InspectableContentComponent* icc = dynamic_cast<InspectableContentComponent*>(details.sourceComponent.get());
+
 	if (icc != nullptr && icc->inspectable != nullptr)
 	{
 		BaseItem* bi = dynamic_cast<BaseItem*>(icc->inspectable.get());
 		if (bi != nullptr)
 		{
+			if (bi == manager->parentContainer.get()) return;
+
 			manager->selectItemWhenCreated = false; // remove auto selection to allow multi drag/drop flow
 			manager->addItem(bi->createDashboardItem(), getViewMousePosition().toFloat());
 			manager->selectItemWhenCreated = true;
