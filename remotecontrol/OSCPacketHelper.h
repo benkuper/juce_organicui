@@ -157,7 +157,8 @@ public:
 		case 's':      return juce::OSCArgument(readString());
 		case 'b':        return juce::OSCArgument(readBlob());
 		case 'r':      return juce::OSCArgument(readColour());
-
+		case 'T': 	           return juce::OSCArgument(true);
+		case 'F':		      return juce::OSCArgument(false);
 		default:
 			// You supplied an invalid OSCType when calling readArgument! This should never happen.
 			jassertfalse;
