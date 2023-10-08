@@ -943,13 +943,18 @@ void BaseManager<T>::loadJSONDataInternal(juce::var data)
 template<class T>
 void BaseManager<T>::loadJSONDataManagerInternal(juce::var data)
 {
-	juce::Array<juce::var>* itemsData = data.getProperty("items", juce::var()).getArray();
-	if (itemsData == nullptr) return;
+	var itemsData = data.getProperty("items", juce::var());
+	if (itemsData.isVoid()) return;
 
-	for (auto& td : *itemsData)
-	{
-		addItemFromData(td, false);
-	}
+	addItemsFromData(itemsData, false);
+
+	//juce::Array<juce::var>* itemsData = data.getProperty("items", juce::var()).getArray();
+	//if (itemsData == nullptr) return;
+
+	//for (auto& td : *itemsData)
+	//{
+	//	addItemFromData(td, false);
+	//}
 }
 
 template<class T>
