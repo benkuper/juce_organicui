@@ -535,21 +535,7 @@ template<class T>
 juce::Array<T*> BaseManager<T>::addItemsFromData(juce::var data, bool addToUndo)
 {
 	juce::Array<T*> itemsToAdd;
-	if (managerFactory != nullptr)
-	{
-		for (int i = 0; i < data.size(); ++i)
-		{
-			juce::String type = data[i].getProperty("type", "");
-			if (type.isEmpty()) return nullptr;
-			T* it = managerFactory->create(type);
-			if (it != nullptr) itemsToAdd.add(it);
-		}
-	}
-	else
-	{
-		for (int i = 0; i < data.size(); ++i)  itemsToAdd.add(createItem());
-	}
-
+	for (int i = 0; i < data.size(); i++) itemsToAdd.add(createItemFromData(data[i]));
 	return addItems(itemsToAdd, data, addToUndo);
 }
 
@@ -947,14 +933,6 @@ void BaseManager<T>::loadJSONDataManagerInternal(juce::var data)
 	if (itemsData.isVoid()) return;
 
 	addItemsFromData(itemsData, false);
-
-	//juce::Array<juce::var>* itemsData = data.getProperty("items", juce::var()).getArray();
-	//if (itemsData == nullptr) return;
-
-	//for (auto& td : *itemsData)
-	//{
-	//	addItemFromData(td, false);
-	//}
 }
 
 template<class T>
