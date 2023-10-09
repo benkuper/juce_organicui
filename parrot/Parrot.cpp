@@ -8,6 +8,8 @@
   ==============================================================================
 */
 
+#include "JuceHeader.h"
+
 Parrot::Parrot() :
 	BaseItem(getTypeString()),
 	Thread("Parrot"),
@@ -236,9 +238,33 @@ void Parrot::itemAdded(ParrotRecord* r)
 	updateRecordOptions();
 }
 
+void Parrot::itemsAdded(Array<ParrotRecord*> records)
+{
+	if (isCurrentlyLoadingData) return;
+	for (auto& r : records)
+	{
+		if (recordManager.items.size() == 1) setCurrentRecord(r);
+	}
+	updateRecordOptions();
+}
+
 void Parrot::itemRemoved(ParrotRecord* r)
 {
 	if (currentRecord == r) setCurrentRecord(nullptr);
+	updateRecordOptions();
+}
+
+void Parrot::itemsRemoved(Array<ParrotRecord*> records)
+{
+	for (auto& r : records)
+	{
+		if (currentRecord == r)
+		{
+			setCurrentRecord(nullptr);
+			break;
+		}
+	}
+
 	updateRecordOptions();
 }
 
@@ -260,7 +286,7 @@ void Parrot::startRecording()
 	Array<Controllable*> targets = getAllTargets();
 	if (forceValueAtStartRecord->boolValue())
 	{
-		for (auto& c : targets) if(c->type != Controllable::TRIGGER) currentRecord->addData(c, 0, ((Parameter*)c)->value);
+		for (auto& c : targets) if (c->type != Controllable::TRIGGER) currentRecord->addData(c, 0, ((Parameter*)c)->value);
 	}
 }
 

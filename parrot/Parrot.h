@@ -65,7 +65,9 @@ public:
     void onExternalParameterValueChanged(Parameter* p) override;
 
     void itemAdded(ParrotRecord* r) override;
+    void itemsAdded(Array<ParrotRecord*> records) override;
     void itemRemoved(ParrotRecord* r) override;
+    void itemsRemoved(Array<ParrotRecord*> records) override;
 
     void startRecording();
     void stopRecording();

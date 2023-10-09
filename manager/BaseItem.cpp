@@ -138,7 +138,7 @@ void BaseItem::remove()
 
 void BaseItem::handleRemoveFromRemoteControl()
 {
-	if(userCanRemove) remove();
+	if (userCanRemove) remove();
 }
 
 void BaseItem::setMovePositionReference(bool setOtherSelectedItems)
@@ -378,6 +378,12 @@ void BaseItem::onControllableFeedbackUpdate(ControllableContainer* cc, Controlla
 void BaseItem::itemAdded(Script* script)
 {
 	script->warningResolveInspectable = this;
+}
+
+void BaseItem::itemsAdded(Array<Script*> scripts)
+{
+	for (auto& script : scripts) script->warningResolveInspectable = this;
+
 }
 
 void BaseItem::setHasCustomColor(bool value)

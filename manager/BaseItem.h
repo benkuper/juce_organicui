@@ -93,6 +93,7 @@ public:
 	virtual void onControllableFeedbackUpdateInternal(ControllableContainer * cc, Controllable * c) {};
 
 	void itemAdded(Script* script) override;
+	void itemsAdded(Array<Script*> scripts) override;
 
 	void setHasCustomColor(bool value);
 
