@@ -51,7 +51,7 @@ void Engine::createNewGraph() {
 	engineNotifier.addMessage(new EngineEvent(EngineEvent::END_LOAD_FILE, this));
 
 
-	ShapeShifterManager::getInstance()->loadDefaultLayoutFile();
+	//ShapeShifterManager::getInstance()->loadDefaultLayoutFile();
 
 	handleAsyncUpdate();
 
