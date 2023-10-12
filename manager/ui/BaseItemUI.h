@@ -172,7 +172,7 @@ BaseItemUI<T>::BaseItemUI(T* _item, Direction _resizeDirection, bool showMiniMod
 	case VERTICAL:
 		resizerHeight = 8;
 		constrainer.setMinimumHeight(headerHeight + headerGap + minContentHeight + resizerHeight);
-		edgeResizer.reset(new ResizableEdgeComponent(this, &constrainer, ResizableEdgeComponent::bottomEdge));
+		edgeResizer.reset(new juce::ResizableEdgeComponent(this, &constrainer, juce::ResizableEdgeComponent::bottomEdge));
 		edgeResizer->setAlwaysOnTop(true);
 		this->addAndMakeVisible(edgeResizer.get());
 		break;
