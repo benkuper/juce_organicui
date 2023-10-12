@@ -384,7 +384,7 @@ void DashboardManager::downloadDashboardFiles()
 	}
 }
 
-void DashboardManager::progress(URL::DownloadTask* task, int64 bytesDownloaded, int64 bytesTotal)
+void DashboardManager::progress(URL::DownloadTask* task, juce::int64 bytesDownloaded, int64 bytesTotal)
 {
 }
 

@@ -366,7 +366,7 @@ bool TargetParameter::setAttributeInternal(String param, var attributeValue)
 	{
 		if (attributeValue.isObject())
 		{
-			ControllableContainer* cc = dynamic_cast<ControllableContainer*>((ControllableContainer*)(int64)attributeValue.getDynamicObject()->getProperty(scriptPtrIdentifier));
+			ControllableContainer* cc = dynamic_cast<ControllableContainer*>((ControllableContainer*)(juce::int64)attributeValue.getDynamicObject()->getProperty(scriptPtrIdentifier));
 			if (cc != nullptr) setRootContainer(cc);
 		}
 	}

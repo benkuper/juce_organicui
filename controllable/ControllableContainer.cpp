@@ -1481,7 +1481,7 @@ var ControllableContainer::getControlAddressFromScript(const juce::var::NativeFu
 	{
 		if (DynamicObject* d = a.arguments[0].getDynamicObject())
 		{
-			ref = dynamic_cast<ControllableContainer*>((ControllableContainer*)(int64)d->getProperty(scriptPtrIdentifier));
+			ref = dynamic_cast<ControllableContainer*>((ControllableContainer*)(juce::int64)d->getProperty(scriptPtrIdentifier));
 		}
 	}
 

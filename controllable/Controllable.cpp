@@ -451,13 +451,13 @@ var Controllable::setValueFromScript(const juce::var::NativeFunctionArgs& a) {
 					TargetParameter* tp = (TargetParameter*)c;
 					if (tp->targetType == TargetParameter::CONTROLLABLE)
 					{
-						Controllable* target = static_cast<Controllable*>((Controllable*)(int64)value.getDynamicObject()->getProperty(scriptPtrIdentifier));
+						Controllable* target = static_cast<Controllable*>((Controllable*)(juce::int64)value.getDynamicObject()->getProperty(scriptPtrIdentifier));
 						if (target != nullptr) tp->setTarget(target);
 						else LOGWARNING("Set target from script, Target not found");
 					}
 					else
 					{
-						ControllableContainer* target = static_cast<ControllableContainer*>((ControllableContainer*)(int64)value.getDynamicObject()->getProperty(scriptPtrIdentifier));
+						ControllableContainer* target = static_cast<ControllableContainer*>((ControllableContainer*)(juce::int64)value.getDynamicObject()->getProperty(scriptPtrIdentifier));
 						if (target != nullptr) tp->setTarget(target);
 						else LOGWARNING("Set target from script, Target not found");
 					}
@@ -547,7 +547,7 @@ var Controllable::getControlAddressFromScript(const juce::var::NativeFunctionArg
 	{
 		if (DynamicObject* d = a.thisObject.getDynamicObject())
 		{
-			ref = dynamic_cast<ControllableContainer*>((ControllableContainer*)(int64)d->getProperty(scriptPtrIdentifier));
+			ref = dynamic_cast<ControllableContainer*>((ControllableContainer*)(juce::int64)d->getProperty(scriptPtrIdentifier));
 		}
 	}
 
