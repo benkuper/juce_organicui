@@ -4,8 +4,6 @@ class Controllable;
 class ControllableContainer;
 class Parameter;
 
-#include "../manager/BaseManager.h"
-
 class OSCHelpers
 {
 public:
@@ -56,4 +54,38 @@ public:
 	}
 
 	static juce::String messageToString(const juce::OSCMessage& m);
+};
+
+
+class OSCQueryHelpers
+{
+public:
+	static void updateContainerFromData(ControllableContainer* cc, juce::var data, bool useAddressForNaming = false);
+	static void createOrUpdateControllableFromData(ControllableContainer* parentCC, Controllable* c, juce::StringRef name, juce::var data, bool useAddresForNaming = false);
+
+	class OSCQueryValueContainer :
+		public ControllableContainer
+	{
+	public:
+		OSCQueryValueContainer(const juce::String& name);
+		~OSCQueryValueContainer();
+
+		BoolParameter* enableListen;
+		BoolParameter* syncContent;
+
+		InspectableEditor* getEditorInternal(bool isRoot, juce::Array<Inspectable*> inspectables = juce::Array<Inspectable*>()) override;
+	};
+
+	class OSCQueryValueContainerEditor :
+		public GenericControllableContainerEditor
+	{
+	public:
+		OSCQueryValueContainerEditor(OSCQueryValueContainer* cc, bool isRoot);
+		~OSCQueryValueContainerEditor();
+
+		std::unique_ptr<BoolToggleUI> enableListenUI;
+		std::unique_ptr<BoolToggleUI> syncUI;
+
+		void resizedInternalHeader(juce::Rectangle<int>& r) override;
+	};
 };
