@@ -180,7 +180,7 @@ BaseItemUI<T>::BaseItemUI(T* _item, Direction _resizeDirection, bool showMiniMod
 	case HORIZONTAL:
 		resizerWidth = 4;
 		constrainer.setMinimumWidth(20 + resizerWidth); // ??
-		edgeResizer.reset(new ResizableEdgeComponent(this, &constrainer, ResizableEdgeComponent::rightEdge));
+		edgeResizer.reset(new juce::ResizableEdgeComponent(this, &constrainer, juce::ResizableEdgeComponent::rightEdge));
 		edgeResizer->setAlwaysOnTop(true);
 		this->addAndMakeVisible(edgeResizer.get());
 		break;
