@@ -228,7 +228,8 @@ float FloatSliderUI::getNormalizedValueFromMouseDrag(const MouseEvent& e)
 	float normRelVal = getNormalizedValueFromPosition(relPos);
 	if (orientation == VERTICAL) normRelVal = -(1 - normRelVal);
 
-	float scaleFactor = e.mods.isAltDown() ? GlobalSettings::getInstance()->altScaleFactor->floatValue() : 1;
+	float scaleFactor = customScaleFactor;
+	scaleFactor *= e.mods.isAltDown() ? GlobalSettings::getInstance()->altScaleFactor->floatValue() : 1;
 	normRelVal *= scaleFactor;
 
 	return initNormalizedValue + normRelVal;

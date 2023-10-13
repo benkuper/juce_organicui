@@ -33,6 +33,8 @@ public:
     String prefix;
     String suffix;
 
+    float customScaleFactor = 1;
+
     //interaction
     float initValue;
     float initNormalizedValue;
