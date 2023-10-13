@@ -105,7 +105,7 @@ float Curve2D::addFromPointsAndSimplify(Array<Point<float>> sourcePoints, bool c
 	const float errorThreshold = 0.02f;
 
 	curve_fit_corners_detect_fl(points.getRawDataPointer(), points.size() / 2, 2,
-		errorThreshold / 4, errorThreshold * 4, 32, M_PI / 8,
+		errorThreshold / 4, errorThreshold * 4, 32, MathConstants<double>::pi / 8,
 		&corners, &cornersLength);
 	if (cornersLength == 0) corners = nullptr;
 
