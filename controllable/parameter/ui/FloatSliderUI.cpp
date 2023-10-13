@@ -236,8 +236,18 @@ float FloatSliderUI::getNormalizedValueFromMouseDrag(const MouseEvent& e)
 
 float FloatSliderUI::getNormalizedValueFromPosition(const Point<int>& pos)
 {
-	if (orientation == HORIZONTAL || orientation == ROTARY) return (pos.x * 1.0f / getWidth());
-	else return 1 - (pos.y * 1.0f / getHeight());
+	if (orientation == HORIZONTAL) 
+	{
+		return (pos.x * 1.0f / getWidth());
+	}
+	else if (orientation == ROTARY) 
+	{
+		return (pos.x * 1.0f / getWidth()) - (pos.y * 1.0f / getHeight());
+	}
+	else 
+	{
+		return 1 - (pos.y * 1.0f / getHeight());
+	}
 }
 
 int FloatSliderUI::getDrawPos()
