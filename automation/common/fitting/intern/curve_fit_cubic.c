@@ -30,7 +30,6 @@
  */
 
 #ifdef _MSC_VER
-#define LOCAL_MATH_DEFINED
 #define _USE_MATH_DEFINES
 #endif
 
@@ -465,7 +464,7 @@ static double points_calc_circumference_factor(
 		 * We could try support this but will likely cause extreme >1 scales which could cause other issues. */
 		// assert(angle >= len_tangent);
 		double factor = (angle / len_tangent);
-		assert(factor < (MathConstants<double>::pi / 2) + 1e-6);
+		assert(factor < (M_PI / 2) + 1e-6);
 		return factor;
 	}
 	else {
@@ -1553,8 +1552,5 @@ int curve_fit_cubic_to_points_single_fl(
 	return result;
 }
 
-#ifdef LOCAL_MATH_DEFINED
-#undef _USE_MATH_DEFINES
-#endif
 
 /** \} */
