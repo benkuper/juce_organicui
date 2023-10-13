@@ -929,7 +929,7 @@ void BaseManager<T>::loadJSONDataInternal(juce::var data)
 template<class T>
 void BaseManager<T>::loadJSONDataManagerInternal(juce::var data)
 {
-	var itemsData = data.getProperty("items", juce::var());
+	juce::var itemsData = data.getProperty("items", juce::var());
 	if (itemsData.isVoid()) return;
 
 	addItemsFromData(itemsData, false);
@@ -999,7 +999,7 @@ juce::var BaseManager<T>::addItemFromScript(const juce::var::NativeFunctionArgs&
 {
 	BaseManager<T>* m = getObjectFromJS<BaseManager<T>>(args);
 
-	//if (args.numArguments) return var(); 
+	//if (args.numArguments) return juce::var(); 
 	if (m->managerFactory == nullptr || m->managerFactory->defs.size() == 1)
 	{
 		T* item = m->addItem(nullptr, args.numArguments > 1 && args.arguments[1].isObject() ? args.arguments[1] : juce::var());
@@ -1042,7 +1042,7 @@ juce::var BaseManager<T>::removeItemFromScript(const juce::var::NativeFunctionAr
 
 	if (args.arguments[0].isObject())
 	{
-		T* item = dynamic_cast<T*>((T*)(int64)(args.arguments[0].getDynamicObject()->getProperty(scriptPtrIdentifier)));
+		T* item = dynamic_cast<T*>((T*)(juce::int64)(args.arguments[0].getDynamicObject()->getProperty(scriptPtrIdentifier)));
 		if (item != nullptr)
 		{
 			m->removeItem(item);
@@ -1121,7 +1121,7 @@ juce::var BaseManager<T>::getItemIndexFromScript(const juce::var::NativeFunction
 	{
 		if (!checkNumArgs(m->niceName, args, 1)) return juce::var();
 		if (!args.arguments[0].isObject()) return juce::var();
-		T* item = dynamic_cast<T*>((T*)(int64)args.arguments[0].getDynamicObject()->getProperty(scriptPtrIdentifier));
+		T* item = dynamic_cast<T*>((T*)(juce::int64)args.arguments[0].getDynamicObject()->getProperty(scriptPtrIdentifier));
 		if (item == nullptr) return juce::var();
 		return m->items.indexOf(item);
 	}
@@ -1136,7 +1136,7 @@ juce::var BaseManager<T>::getItemBeforeFromScript(const juce::var::NativeFunctio
 	{
 		if (!checkNumArgs(m->niceName, args, 1)) return juce::var();
 		if (!args.arguments[0].isObject()) return juce::var();
-		T* item = dynamic_cast<T*>((T*)(int64)args.arguments[0].getDynamicObject()->getProperty(scriptPtrIdentifier));
+		T* item = dynamic_cast<T*>((T*)(juce::int64)args.arguments[0].getDynamicObject()->getProperty(scriptPtrIdentifier));
 		if (item == nullptr) return juce::var();
 		int index = m->items.indexOf(item);
 		if (index <= 0) return juce::var();
@@ -1153,7 +1153,7 @@ juce::var BaseManager<T>::getItemAfterFromScript(const juce::var::NativeFunction
 	{
 		if (!checkNumArgs(m->niceName, args, 1)) return juce::var();
 		if (!args.arguments[0].isObject()) return juce::var();
-		T* item = dynamic_cast<T*>((T*)(int64)args.arguments[0].getDynamicObject()->getProperty(scriptPtrIdentifier));
+		T* item = dynamic_cast<T*>((T*)(juce::int64)args.arguments[0].getDynamicObject()->getProperty(scriptPtrIdentifier));
 		if (item == nullptr) return juce::var();
 		int index = m->items.indexOf(item);
 		if (index >= m->items.size() - 1) return juce::var();

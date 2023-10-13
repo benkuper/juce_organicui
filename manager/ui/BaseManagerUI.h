@@ -386,7 +386,7 @@ void BaseManagerUI<M, T, U>::setShowSearchBar(bool value)
 		searchBar->setColour(searchBar->textColourId, TEXT_COLOR.darker(.3f));
 		searchBar->setFont(10);
 		searchBar->setMultiLine(false);
-		searchBar->setColour(juce::CaretComponent::caretColourId, Colours::orange);
+		searchBar->setColour(juce::CaretComponent::caretColourId, juce::Colours::orange);
 		//searchBar->edit(true);
 		searchBar->addListener(this);
 		searchBar->setTextToShowWhenEmpty("Search...", TEXT_COLOR.withAlpha(.6f));
