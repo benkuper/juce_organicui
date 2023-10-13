@@ -6,7 +6,7 @@ class OrganicMainContentComponent   :
 	public juce::MenuBarModel, 
 	public EngineListener
 #if ORGANICUI_USE_SHAREDTEXTURE
-	,public OpenGLRenderer
+	,public juce::OpenGLRenderer
 #endif
 {
 public:
