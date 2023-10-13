@@ -237,7 +237,7 @@ namespace Bezier
 
         float angleDeg() const
         {
-            return angle() * 180.0 / MathConstants<float>::pi;
+            return angle() * 180.0 / juce::MathConstants<float>::pi;
         }
 
         float operator[](size_t axis) const

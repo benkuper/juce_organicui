@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    TargetParameter.h
-    Created: 2 Nov 2016 5:00:04pm
-    Author:  bkupe
+	TargetParameter.h
+	Created: 2 Nov 2016 5:00:04pm
+	Author:  bkupe
 
   ==============================================================================
 */
@@ -12,6 +12,7 @@
 
 class TargetParameterUI;
 class TargetStepButton;
+class Trigger;
 
 class TargetParameter :
 	public StringParameter,
@@ -20,78 +21,87 @@ class TargetParameter :
 	public Inspectable::InspectableListener
 {
 public:
-	
-	TargetParameter(const String &niceName, const String &description, const String &initialValue,  WeakReference<ControllableContainer> rootReference = nullptr, bool enabled = true);
+
+	TargetParameter(const juce::String& niceName, const juce::String& description, const juce::String& initialValue, juce::WeakReference<ControllableContainer> rootReference = nullptr, bool enabled = true);
 	~TargetParameter();
 
-	enum TargetType {CONTAINER, CONTROLLABLE};
+	enum TargetType { CONTAINER, CONTROLLABLE };
 	TargetType targetType;
 
 
 	bool useGhosting;
-	String ghostValue;
+	juce::String ghostValue;
 
 	bool showFullAddressInEditor;
 	bool showParentNameInEditor;
 	int maxDefaultSearchLevel;
 	int defaultParentLabelLevel;
 
-	StringArray typesFilter; //leave empty to allow all when not using custom functions
-	StringArray excludeTypesFilter; //leave empty to allow all when not using custom functions
+	juce::StringArray typesFilter; //leave empty to allow all when not using custom functions
+	juce::StringArray excludeTypesFilter; //leave empty to allow all when not using custom functions
 
-	WeakReference<ControllableContainer> rootContainer;
-	
-	WeakReference<Controllable> target;
-	WeakReference<ControllableContainer> targetContainer;
-	
+	juce::WeakReference<ControllableContainer> rootContainer;
+
+	juce::WeakReference<Controllable> target;
+	juce::WeakReference<ControllableContainer> targetContainer;
+
 	std::function<bool(Controllable*)> customTargetFilterFunc;
-	std::function<void(const StringArray &, const StringArray &, ControllableContainer*, std::function<void(Controllable *)>)> customGetTargetFunc;
-	std::function<Array<TargetStepButton*>(Controllable*)> customGetControllableLabelFunc;
+	std::function<void(const juce::StringArray&, const juce::StringArray&, ControllableContainer*, std::function<void(Controllable*)>)> customGetTargetFunc;
+	std::function<juce::Array<TargetStepButton*>(Controllable*)> customGetControllableLabelFunc;
 	std::function<bool(Controllable*)> customCheckAssignOnNextChangeFunc;
 
-	std::function<bool(ControllableContainer *)> defaultContainerTypeCheckFunc;
-	std::function<Array<TargetStepButton*>(ControllableContainer*)> customGetContainerLabelFunc;
+	std::function<bool(ControllableContainer*)> defaultContainerTypeCheckFunc;
+	std::function<juce::Array<TargetStepButton*>(ControllableContainer*)> customGetContainerLabelFunc;
 	std::function<void(ControllableContainer*, std::function<void(ControllableContainer*)>)> customGetTargetContainerFunc;
 
 	void resetValue(bool silentSet = false) override;
-	void setGhostValue(const String &ghostVal);
+	void setGhostValue(const juce::String& ghostVal);
 
-	void setValueFromTarget(Controllable *, bool addToUndo = false);
-	void setValueFromTarget(ControllableContainer *, bool addToUndo = false);
+	void setValueFromTarget(Controllable*, bool addToUndo = false);
+	void setValueFromTarget(ControllableContainer*, bool addToUndo = false);
 
-	void setValueInternal(var &) override;
+	void setValueInternal(juce::var&) override;
 
-	var getCroppedValue(var val) override;
+	juce::var getCroppedValue(juce::var val) override;
 
-	void setTarget(WeakReference<Controllable>);
-	void setTarget(WeakReference<ControllableContainer>);
+	Controllable* getTargetControllable();
+	Trigger* getTargetTrigger();
+	Parameter* getTargetParameter();
+	ControllableContainer* getTargetContainer();
+	template<class T>
+	T* getTargetAs() { return dynamic_cast<T*>(target.get()); }
+	template<class T>
+	T* getTargetContainerAs() { return dynamic_cast<T*>(targetContainer.get()); }
 
-	void setRootContainer(WeakReference<ControllableContainer> newRootContainer, bool engineIfNull = true, bool forceSetValue = true);
+	void setTarget(juce::WeakReference<Controllable>);
+	void setTarget(juce::WeakReference<ControllableContainer>);
 
-	void childStructureChanged(ControllableContainer *) override;
+	void setRootContainer(juce::WeakReference<ControllableContainer> newRootContainer, bool engineIfNull = true, bool forceSetValue = true);
+
+	void childStructureChanged(ControllableContainer*) override;
 
 	void controllableControlAddressChanged(Controllable* c) override; //for target Controllable
 	void childAddressChanged(ControllableContainer* cc) override;
 
-	void inspectableDestroyed(Inspectable * i) override;
+	void inspectableDestroyed(Inspectable* i) override;
 
-	bool setAttributeInternal(String param, var value) override;
-	virtual StringArray getValidAttributes() const override;
+	bool setAttributeInternal(juce::String param, juce::var value) override;
+	virtual juce::StringArray getValidAttributes() const override;
 
-	var getJSONDataInternal() override;
-	void loadJSONDataInternal(var data) override;
+	juce::var getJSONDataInternal() override;
+	void loadJSONDataInternal(juce::var data) override;
 
-	TargetParameterUI* createTargetUI(Array<TargetParameter*> parameters = {});
-	ControllableUI* createDefaultUI(Array<Controllable*> controllables = {}) override;
+	TargetParameterUI* createTargetUI(juce::Array<TargetParameter*> parameters = {});
+	ControllableUI* createDefaultUI(juce::Array<Controllable*> controllables = {}) override;
 
 	virtual DashboardItem* createDashboardItem() override;
 
 
-	static var getTargetFromScript(const juce::var::NativeFunctionArgs& a);
+	static juce::var getTargetFromScript(const juce::var::NativeFunctionArgs& a);
 
 
-	static StringParameter * create() { return new TargetParameter("New TargetParameter", "", ""); }
-	virtual String getTypeString() const override { return getTypeStringStatic(); }
-	static String getTypeStringStatic() { return "Target"; }
+	static StringParameter* create() { return new TargetParameter("New TargetParameter", "", ""); }
+	virtual juce::String getTypeString() const override { return getTypeStringStatic(); }
+	static juce::String getTypeStringStatic() { return "Target"; }
 
 };

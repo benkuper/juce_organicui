@@ -11,7 +11,7 @@
 #pragma once
 
 class ParameterAutomationEditor :
-	public Component
+	public juce::Component
 {
 public:
 	ParameterAutomationEditor(ParameterAutomation * ppa);

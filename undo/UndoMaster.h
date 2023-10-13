@@ -11,7 +11,7 @@
 #pragma once
 
 class UndoMaster :
-	public UndoManager
+	public juce::UndoManager
 {
 public:
 	juce_DeclareSingleton(UndoMaster,true);
@@ -20,6 +20,6 @@ public:
 
 	bool isPerforming;
 
-	void performAction(const String &name, UndoableAction *action);
-	void performActions(const String &name, Array<UndoableAction *> actions);
+	void performAction(const juce::String &name, juce::UndoableAction *action);
+	void performActions(const juce::String &name, juce::Array<juce::UndoableAction *> actions);
 };

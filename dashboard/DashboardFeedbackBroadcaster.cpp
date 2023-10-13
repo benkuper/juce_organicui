@@ -1,3 +1,5 @@
+#include "JuceHeader.h"
+
 var DashboardFeedbackBroadcaster::getItemParameterFeedback(Parameter* p)
 {
 	var data(new DynamicObject());
@@ -8,7 +10,7 @@ var DashboardFeedbackBroadcaster::getItemParameterFeedback(Parameter* p)
 	if (p->type == Parameter::ENUM)
 	{
 		EnumParameter* ep = (EnumParameter*)p;
-		data.getDynamicObject()->setProperty("value", p->enabled ? ep->getValueData().clone() : var());
+		data.getDynamicObject()->setProperty("value", p->enabled ? ep->getValueKey() : "");
 	}
 	else
 	{

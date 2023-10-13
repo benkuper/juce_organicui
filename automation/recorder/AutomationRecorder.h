@@ -29,18 +29,18 @@ public:
 	EnumParameter* simplificationMethod;
 	FloatParameter* simplificationTolerance;
 
-	WeakReference<Parameter> currentInput;
+	juce::WeakReference<Parameter> currentInput;
 
 	BoolParameter * isRecording;
 
 	struct RecordValue
 	{
-		RecordValue(float t = 0, var v = var()) : time(t), value(v) {}
+		RecordValue(float t = 0, juce::var v = juce::var()) : time(t), value(v) {}
 		float time;
-		var value;
+		juce::var value;
 	};
 
-	Array<RecordValue> keys;
+	juce::Array<RecordValue> keys;
 
 	void setCurrentInput(Parameter * input);
 
@@ -50,7 +50,7 @@ public:
 
 	void startRecording();
 	void cancelRecording();
-	Array<RecordValue> stopRecordingAndGetKeys();
+	juce::Array<RecordValue> stopRecordingAndGetKeys();
 
 	bool shouldRecord();
 
@@ -74,6 +74,6 @@ public:
 	void addAsyncCoalescedRecorderListener(AsyncListener* newListener) { recorderNotifier.addAsyncCoalescedListener(newListener); }
 	void removeAsyncRecorderListener(AsyncListener* listener) { recorderNotifier.removeListener(listener); }
 
-	InspectableEditor * getEditorInternal(bool isRoot, Array<Inspectable*> inspectables = Array<Inspectable*>()) override;
+	InspectableEditor * getEditorInternal(bool isRoot, juce::Array<Inspectable*> inspectables = juce::Array<Inspectable*>()) override;
 };
 

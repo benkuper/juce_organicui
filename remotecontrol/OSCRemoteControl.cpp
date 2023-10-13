@@ -77,7 +77,13 @@ void OSCRemoteControl::setupReceiver()
 	updateEngineListener();
 #endif
 
-	if (!enabled->boolValue()) return;
+	if (!enabled->boolValue())
+	{
+#if ORGANICUI_USE_SERVUS
+		setupZeroconf();
+#endif
+		return;
+	}
 
 	//if (!receiveCC->enabled->boolValue()) return;
 	receiverIsConnected = receiver.connect(localPort->intValue());
@@ -135,6 +141,7 @@ void OSCRemoteControl::setupZeroconf()
 
 void OSCRemoteControl::updateEngineListener()
 {
+#if ORGANICUI_USE_WEBSERVER
 	Engine::mainEngine->removeAsyncContainerListener(this);
 
 	bool shouldListen = false;
@@ -143,6 +150,7 @@ void OSCRemoteControl::updateEngineListener()
 	if (receiverIsConnected) shouldListen = true;
 
 	if (shouldListen) Engine::mainEngine->addAsyncContainerListener(this);
+#endif
 }
 
 
@@ -301,16 +309,21 @@ void OSCRemoteControl::run()
 {
 	String nameToAdvertise = OrganicApplication::getInstance()->getApplicationName() + " - Remote Control";
 	int portToAdvertise = 0;
-	while (portToAdvertise != localPort->intValue() && !threadShouldExit())
+	bool isEnabled = enabled->boolValue();
+
+	while ((portToAdvertise != localPort->intValue() || isEnabled != enabled->boolValue()) && !threadShouldExit())
 	{
 		portToAdvertise = localPort->intValue();
+		isEnabled = enabled->boolValue();
+
 		servus.withdraw();
-		servus.announce(portToAdvertise, nameToAdvertise.toStdString());
+
+		if (isEnabled) servus.announce(portToAdvertise, nameToAdvertise.toStdString());
 
 
 #if ORGANICUI_USE_WEBSERVER
 		oscQueryServus.withdraw();
-		oscQueryServus.announce(portToAdvertise, nameToAdvertise.toStdString());
+		if (isEnabled) oscQueryServus.announce(portToAdvertise, nameToAdvertise.toStdString());
 #endif
 
 		if (localPort->intValue() != portToAdvertise)
@@ -347,6 +360,10 @@ bool OSCRemoteControl::handleHTTPRequest(std::shared_ptr<HttpServer::Response> r
 		extensionData.getDynamicObject()->setProperty("UNIT", false);
 		extensionData.getDynamicObject()->setProperty("VALUE", true);
 		extensionData.getDynamicObject()->setProperty("LISTEN", true);
+		extensionData.getDynamicObject()->setProperty("PATH_ADDED", true);
+		extensionData.getDynamicObject()->setProperty("PATH_REMOVED", true);
+		extensionData.getDynamicObject()->setProperty("PATH_RENAMED", true);
+		extensionData.getDynamicObject()->setProperty("PATH_CHANGED", false);
 
 		data = new DynamicObject();
 		data.getDynamicObject()->setProperty("EXTENSIONS", extensionData);
@@ -357,7 +374,10 @@ bool OSCRemoteControl::handleHTTPRequest(std::shared_ptr<HttpServer::Response> r
 	}
 	else
 	{
-		data = getOSCQueryDataForContainer(Engine::mainEngine);
+		ControllableContainer* cc = Engine::mainEngine;
+		String addr = request->path;
+		if (addr.length() > 1) cc = Engine::mainEngine->getControllableContainerForAddress(addr, true, false, false);
+		if (cc != nullptr) data = cc->getRemoteControlData();
 	}
 
 
@@ -375,144 +395,6 @@ bool OSCRemoteControl::handleHTTPRequest(std::shared_ptr<HttpServer::Response> r
 	return true;
 }
 
-var OSCRemoteControl::getOSCQueryDataForContainer(ControllableContainer* cc)
-{
-	var data(new DynamicObject());
-
-	data.getDynamicObject()->setProperty("DESCRIPTION", cc->niceName);
-	data.getDynamicObject()->setProperty("FULL_PATH", cc->getControlAddress());
-	data.getDynamicObject()->setProperty("ACCESS", 0); //container, no value directly associated
-
-	var contentData(new DynamicObject());
-
-	for (auto& childC : cc->controllables)
-	{
-		if (childC->hideInRemoteControl) continue;
-		contentData.getDynamicObject()->setProperty(childC->shortName, getOSCQueryDataForControllable(childC));
-	}
-
-	for (auto& childCC : cc->controllableContainers)
-	{
-		if (childCC->hideInRemoteControl) continue;
-		contentData.getDynamicObject()->setProperty(childCC->shortName, getOSCQueryDataForContainer(childCC));
-	}
-
-	data.getDynamicObject()->setProperty("CONTENTS", contentData);
-
-	return data;
-}
-
-var OSCRemoteControl::getOSCQueryDataForControllable(Controllable* c)
-{
-	var data(new DynamicObject());
-
-	data.getDynamicObject()->setProperty("DESCRIPTION", c->niceName);
-	data.getDynamicObject()->setProperty("FULL_PATH", c->getControlAddress());
-	data.getDynamicObject()->setProperty("ACCESS", c->isControllableFeedbackOnly ? 1 : 3);
-
-	String typeString = "";
-	var value;
-	var range;
-
-	if (c->type == Controllable::TRIGGER) typeString = "N";
-	else
-	{
-		Parameter* p = (Parameter*)c;
-
-		if (p->hasRange())
-		{
-			if (p->isComplex())
-			{
-				for (int i = 0; i < p->minimumValue.size(); i++)
-				{
-					var rData(new DynamicObject());
-					rData.getDynamicObject()->setProperty("MIN", p->minimumValue[i]);
-					rData.getDynamicObject()->setProperty("MAX", p->maximumValue[i]);
-					range.append(rData);
-				}
-			}
-			else
-			{
-				var rData(new DynamicObject());
-				rData.getDynamicObject()->setProperty("MIN", p->minimumValue);
-				rData.getDynamicObject()->setProperty("MAX", p->maximumValue);
-				range.append(rData);
-			}
-
-		}
-
-		switch (p->type)
-		{
-		case Parameter::BOOL:
-			value.append(p->boolValue());
-			typeString = "T";
-			break;
-
-		case Parameter::INT:
-		{
-			//add range
-			value.append(p->intValue());
-
-			typeString = "i";
-		}
-		break;
-
-		case Parameter::FLOAT:
-			value.append(p->floatValue());
-			typeString = "f";
-			break;
-
-		case Parameter::STRING:
-			typeString = "s";
-			value.append(p->stringValue());
-			break;
-
-		case Parameter::POINT2D:
-			value.append(((Point2DParameter*)p)->x);
-			value.append(((Point2DParameter*)p)->y);
-			typeString = "ff";
-			break;
-
-		case Parameter::POINT3D:
-			value.append(((Point3DParameter*)p)->x);
-			value.append(((Point3DParameter*)p)->y);
-			value.append(((Point3DParameter*)p)->z);
-			typeString = "fff";
-			break;
-
-		case Parameter::COLOR:
-			value.append(((ColorParameter*)p)->getColor().toString());
-			typeString = "r";
-			break;
-
-
-		case Parameter::ENUM:
-		{
-			typeString = "s";
-
-			EnumParameter* ep = (EnumParameter*)p;
-			value.append(ep->getValueKey());
-
-			StringArray keys = ep->getAllKeys();
-			var enumRange;
-			for (auto& k : keys) enumRange.append(k);
-			var rData(new DynamicObject());
-			rData.getDynamicObject()->setProperty("VALS", enumRange);
-			range.append(rData);
-		}
-		break;
-
-		default:
-			break;
-		}
-	}
-
-	data.getDynamicObject()->setProperty("TYPE", typeString);
-	if (!value.isVoid()) data.getDynamicObject()->setProperty("VALUE", value);
-	if (!range.isVoid()) data.getDynamicObject()->setProperty("RANGE", range);
-
-	return data;
-}
 
 void OSCRemoteControl::connectionOpened(const String& id)
 {
@@ -525,19 +407,58 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 	var o = JSON::parse(message);
 	if (o.isObject())
 	{
-		String command = o["COMMAND"];
-		String data = o["DATA"];
-
-		if (Controllable* c = Engine::mainEngine->getControllableForAddress(data))
+		if (o.hasProperty("COMMAND"))
 		{
-			if (command == "LISTEN")
+
+			String command = o["COMMAND"];
+			var data = o["DATA"];
+
+			if (command == "ADD")
 			{
-				if (!feedbackMap.contains(id)) feedbackMap.set(id, Array<Controllable*>());
-				(&(feedbackMap.getReference(id)))->addIfNotAlreadyThere(c);
+				if (ControllableContainer* cc = Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true))
+				{
+					cc->handleAddFromRemoteControl(data);
+				}
 			}
-			else if (command == "IGNORE")
+			else if (command == "REMOVE")
 			{
-				if (feedbackMap.contains(id)) (&(feedbackMap.getReference(id)))->removeAllInstancesOf(c);
+				if (ControllableContainer* cc = Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true))
+				{
+					cc->handleRemoveFromRemoteControl();
+				}
+
+			}
+			else if (command == "RENAME")
+			{
+				if (ControllableContainer* cc = Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true))
+				{
+					cc->setUndoableNiceName(data["name"]);
+				}
+			}
+
+			if (Controllable* c = Engine::mainEngine->getControllableForAddress(data.toString()))
+			{
+				if (command == "LISTEN")
+				{
+					if (!feedbackMap.contains(id)) feedbackMap.set(id, Array<Controllable*>());
+					(&(feedbackMap.getReference(id)))->addIfNotAlreadyThere(c);
+				}
+				else if (command == "IGNORE")
+				{
+					if (feedbackMap.contains(id)) (&(feedbackMap.getReference(id)))->removeAllInstancesOf(c);
+				}
+			}
+		}
+		else
+		{
+			NamedValueSet nvs = o.getDynamicObject()->getProperties();
+			for (auto& nv : nvs)
+			{
+				if (Controllable* c = Engine::mainEngine->getControllableForAddress(nv.name.toString()))
+				{
+					if (c->type == Controllable::TRIGGER) ((Trigger*)c)->trigger();
+					else ((Parameter*)c)->setValue(nv.value);
+				}
 			}
 		}
 	}
@@ -546,7 +467,7 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 void OSCRemoteControl::dataReceived(const String& id, const MemoryBlock& data)
 {
 	OSCMessage m = OSCPacketParser(data.getData(), data.getSize()).readMessage();
-	if (!m.isEmpty()) processMessage(m);
+	if (!m.isEmpty()) processMessage(m, id);
 }
 
 void OSCRemoteControl::connectionClosed(const String& id, int status, const String& reason)
@@ -570,9 +491,46 @@ void OSCRemoteControl::onControllableFeedbackUpdate(ControllableContainer* cc, C
 	}
 }
 
+void OSCRemoteControl::sendPathAddedFeedback(const String& path)
+{
+	if (server == nullptr) return;
+	if (Engine::mainEngine != nullptr && (Engine::mainEngine->isLoadingFile || Engine::mainEngine->isClearing)) return;
+
+	var msg(new DynamicObject());
+	msg.getDynamicObject()->setProperty("COMMAND", "PATH_ADDED");
+	msg.getDynamicObject()->setProperty("DATA", path);
+	server->send(JSON::toString(msg));
+}
+
+void OSCRemoteControl::sendPathRemovedFeedback(const String& path)
+{
+	if (server == nullptr) return;
+	if (Engine::mainEngine != nullptr && (Engine::mainEngine->isLoadingFile || Engine::mainEngine->isClearing)) return;
+
+	var msg(new DynamicObject());
+	msg.getDynamicObject()->setProperty("COMMAND", "PATH_REMOVED");
+	msg.getDynamicObject()->setProperty("DATA", path);
+	server->send(JSON::toString(msg));
+}
+
+void OSCRemoteControl::sendPathNameChangedFeedback(const String& oldPath, const String& newPath)
+{
+	if (server == nullptr) return;
+	if (Engine::mainEngine != nullptr && (Engine::mainEngine->isLoadingFile || Engine::mainEngine->isClearing)) return;
+
+	var msg(new DynamicObject());
+	msg.getDynamicObject()->setProperty("COMMAND", "PATH_RENAMED");
+	var data(new DynamicObject());
+	data.getDynamicObject()->setProperty("OLD", oldPath);
+	data.getDynamicObject()->setProperty("NEW", newPath);
+	msg.getDynamicObject()->setProperty("DATA", data);
+	server->send(JSON::toString(msg));
+
+}
+
 void OSCRemoteControl::newMessage(const ContainerAsyncEvent& e)
 {
-	if (Engine::mainEngine->isLoadingFile || Engine::mainEngine->isClearing) return;
+	if (Engine::mainEngine != nullptr && (Engine::mainEngine->isLoadingFile || Engine::mainEngine->isClearing)) return;
 
 	if (e.type == ContainerAsyncEvent::ControllableFeedbackUpdate)
 	{
@@ -598,18 +556,24 @@ void OSCRemoteControl::sendOSCQueryFeedback(Controllable* c, const String& exclu
 	if (c == nullptr) return;
 
 	OSCMessage m = OSCHelpers::getOSCMessageForControllable(c);
+	StringArray ex = excludeId;
+	if (noFeedbackMap.contains(c)) ex.add(noFeedbackMap[c]);
+	sendOSCQueryFeedback(m, ex);
+
+}
+
+void OSCRemoteControl::sendOSCQueryFeedback(const OSCMessage& m, StringArray excludes)
+{
+	if (server == nullptr) return;
+
 	OSCPacketPacker packer;
 	if (packer.writeMessage(m))
 	{
 		MemoryBlock b(packer.getData(), packer.getDataSize());
-
-		StringArray ex = excludeId;
-		if (noFeedbackMap.contains(c)) ex.add(noFeedbackMap[c]);
-		server->sendExclude(b, ex);
+		server->sendExclude(b, excludes);
 	}
 
 	if (logOutgoing->boolValue()) NLOG(niceName, "Sent to OSCQuery : " << OSCHelpers::messageToString(m));
-
 }
 #endif
 

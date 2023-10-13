@@ -12,31 +12,31 @@
 
 class CommentUI :
 	public BaseItemMinimalUI<CommentItem>,
-	public TextEditor::Listener
+	public juce::TextEditor::Listener
 {
 public:
 	CommentUI(CommentItem * comment);
 	~CommentUI();
 
-	TextEditor textUI;
-	ResizableBorderComponent resizer;
+	juce::TextEditor textUI;
+	juce::ResizableBorderComponent resizer;
 
-	void paint(Graphics &g) override;
+	void paint(juce::Graphics &g) override;
 	void resized() override;
 
-	void mouseDown(const MouseEvent& e) override;
-	void mouseDrag(const MouseEvent& e) override;
-	void mouseUp(const MouseEvent& e) override;
-	void mouseDoubleClick(const MouseEvent& e) override;
+	void mouseDown(const juce::MouseEvent& e) override;
+	void mouseDrag(const juce::MouseEvent& e) override;
+	void mouseUp(const juce::MouseEvent& e) override;
+	void mouseDoubleClick(const juce::MouseEvent& e) override;
 
-	void textEditorTextChanged(TextEditor&) override;
-	void textEditorEscapeKeyPressed(TextEditor&) override;
-	void textEditorReturnKeyPressed(TextEditor&) override;
-	void textEditorFocusLost(TextEditor&) override;
+	void textEditorTextChanged(juce::TextEditor&) override;
+	void textEditorEscapeKeyPressed(juce::TextEditor&) override;
+	void textEditorReturnKeyPressed(juce::TextEditor&) override;
+	void textEditorFocusLost(juce::TextEditor&) override;
 
 	void focusLost(FocusChangeType type) override;
 
-	bool canStartDrag(const MouseEvent &e) override;
+	bool canStartDrag(const juce::MouseEvent &e) override;
 
 	void inspectableSelectionChanged(Inspectable* i) override;
 

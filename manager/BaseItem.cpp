@@ -9,6 +9,7 @@
 */
 
 #include "JuceHeader.h"
+#include "BaseItem.h"
 
 BaseItem::BaseItem(const String& name, bool _canBeDisabled, bool _canHaveScripts) :
 	EnablingControllableContainer(name.isEmpty() ? getTypeString() : name, _canBeDisabled),
@@ -28,6 +29,8 @@ BaseItem::BaseItem(const String& name, bool _canBeDisabled, bool _canHaveScripts
 
 	saveAndLoadName = true;
 	nameCanBeChangedByUser = true;
+
+	canBeCopiedAndPasted = true;
 
 	if (canHaveScripts)
 	{
@@ -70,7 +73,7 @@ BaseItem::BaseItem(const String& name, bool _canBeDisabled, bool _canHaveScripts
 	isUILocked->hideInRemoteControl = true;
 	isUILocked->defaultHideInRemoteControl = true;
 
-	scriptObject.setMethod("getType", BaseItem::getTypeStringFromScript);
+	scriptObject.getDynamicObject()->setMethod("getType", BaseItem::getTypeStringFromScript);
 }
 
 BaseItem::~BaseItem()
@@ -133,6 +136,10 @@ void BaseItem::remove()
 	baseItemListeners.call(&BaseItemListener::askForRemoveBaseItem, this);
 }
 
+void BaseItem::handleRemoveFromRemoteControl()
+{
+	if (userCanRemove) remove();
+}
 
 void BaseItem::setMovePositionReference(bool setOtherSelectedItems)
 {
@@ -373,6 +380,12 @@ void BaseItem::itemAdded(Script* script)
 	script->warningResolveInspectable = this;
 }
 
+void BaseItem::itemsAdded(Array<Script*> scripts)
+{
+	for (auto& script : scripts) script->warningResolveInspectable = this;
+
+}
+
 void BaseItem::setHasCustomColor(bool value)
 {
 	if (value)
@@ -406,6 +419,12 @@ void BaseItem::loadJSONDataInternal(var data)
 	ControllableContainer::loadJSONDataInternal(data);
 	loadJSONDataItemInternal(data);
 	if (canHaveScripts) scriptManager->loadJSONData(data.getProperty("scripts", var()));
+}
+
+void BaseItem::getRemoteControlDataInternal(var& data)
+{
+	ControllableContainer::getRemoteControlDataInternal(data);
+	data.getDynamicObject()->setProperty("TYPE", getTypeString());
 }
 
 InspectableEditor* BaseItem::getEditorInternal(bool isRoot, Array<Inspectable*> inspectables)

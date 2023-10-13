@@ -8,15 +8,15 @@ public:
 	DashboardCCItem(ControllableContainer* container = nullptr);
 	~DashboardCCItem();
 
-	WeakReference<ControllableContainer> container;
+	juce::WeakReference<ControllableContainer> container;
 
-	virtual var getServerData() override;
+	virtual juce::var getServerData() override;
 
-	virtual var getServerDataForContainer(ControllableContainer* cc);
-	virtual var getServerDataForControllable(Controllable* c);
+	virtual juce::var getServerDataForContainer(ControllableContainer* cc);
+	virtual juce::var getServerDataForControllable(Controllable* c);
 
-    virtual var getJSONData() override;
-	virtual void loadJSONDataItemInternal(var data) override;
+	virtual juce::var getJSONData() override;
+	virtual void loadJSONDataItemInternal(juce::var data) override;
 
 	virtual void setInspectableInternal(Inspectable* i) override;
 
@@ -27,6 +27,6 @@ public:
 	virtual void ghostInspectable() override;
 	virtual void checkGhost() override;
 
-	static DashboardCCItem* create(var) { return new DashboardCCItem(); }
-	virtual String getTypeString() const override { return "DashboardCCItem"; }
+	static DashboardCCItem* create(juce::var) { return new DashboardCCItem(); }
+	virtual juce::String getTypeString() const override { return "DashboardCCItem"; }
 };

@@ -7,6 +7,6 @@ public:
 	KeyMappingsContainerEditor(KeyMappingsContainer * settings, bool isRoot);
 	~KeyMappingsContainerEditor();
 
-	KeyMappingEditorComponent keyMappingEditor;
+	juce::KeyMappingEditorComponent keyMappingEditor;
 	void resizedInternalContent(juce::Rectangle<int> &r) override;
 };

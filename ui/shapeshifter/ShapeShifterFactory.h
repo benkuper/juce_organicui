@@ -14,10 +14,10 @@
 class ShapeShifterDefinition
 {
 public:
-	String contentName;
-	std::function<ShapeShifterContent*(const String &)> createFunc;
+	juce::String contentName;
+	std::function<ShapeShifterContent*(const juce::String &)> createFunc;
 
-	ShapeShifterDefinition(const String &_contentName, std::function<ShapeShifterContent*(const String &)> createFunc) :
+	ShapeShifterDefinition(const juce::String &_contentName, std::function<ShapeShifterContent*(const juce::String &)> createFunc) :
 		contentName(_contentName),
 		createFunc(createFunc)
 	{
@@ -31,11 +31,10 @@ public:
 
 	ShapeShifterFactory();
 	~ShapeShifterFactory(){};
-	OwnedArray<ShapeShifterDefinition> defs;
+	juce::OwnedArray<ShapeShifterDefinition> defs;
 
-	static ShapeShifterContent * createContent(const String &contentName)
+	static ShapeShifterContent * createContent(const juce::String &contentName)
 	{
-		DBG("Create content : " << contentName);
 		for (auto &d : getInstance()->defs)
 		{
 			if (d->contentName == contentName) return d->createFunc(contentName);

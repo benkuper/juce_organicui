@@ -4,8 +4,6 @@ class Controllable;
 class ControllableContainer;
 class Parameter;
 
-#include "../manager/BaseManager.h"
-
 class OSCHelpers
 {
 public:
@@ -14,34 +12,34 @@ public:
 
 	static void logOSCFormatError(const char* message, int length);
 
-	static OSCArgument varToArgument(const var& v);
-	static OSCArgument varToColorArgument(const var& v);
-	static var argumentToVar(const OSCArgument& a);
+	static juce::OSCArgument varToArgument(const juce::var& v, BoolMode bm);
+	static juce::OSCArgument varToColorArgument(const juce::var& v);
+	static juce::var argumentToVar(const juce::OSCArgument& a);
 
-	static void addArgumentsForParameter(OSCMessage& m, Parameter* p, BoolMode bm = Int, ColorMode cm = ColorRGBA);
-	static void addBoolArgumentToMessage(OSCMessage& m, bool value, BoolMode boolMode);
-	static void addColorArgumentToMessage(OSCMessage& m, const Colour& c, ColorMode colorMode);
+	static void addArgumentsForParameter(juce::OSCMessage& m, Parameter* p, BoolMode bm = Int, ColorMode cm = ColorRGBA, juce::var forceVar = juce::var());
+	static void addBoolArgumentToMessage(juce::OSCMessage& m, bool value, BoolMode boolMode);
+	static void addColorArgumentToMessage(juce::OSCMessage& m, const juce::Colour& c, ColorMode colorMode);
 
-	static bool getBoolArg(OSCArgument a);
-	static float getFloatArg(OSCArgument a);
-	static int getIntArg(OSCArgument a);
-	static String getStringArg(OSCArgument a);
-	static OSCColour getOSCColour(Colour c);
-	static Point<float> getP2DArg(const OSCMessage& m, int startIndex = 0);
-	static Vector3D<float> getP3DArg(const OSCMessage& m, int startIndex = 0);
+	static bool getBoolArg(juce::OSCArgument a);
+	static float getFloatArg(juce::OSCArgument a);
+	static int getIntArg(juce::OSCArgument a);
+	static juce::String getStringArg(juce::OSCArgument a);
+	static juce::OSCColour getOSCColour(juce::Colour c);
+	static juce::Point<float> getP2DArg(const juce::OSCMessage& m, int startIndex = 0);
+	static juce::Vector3D<float> getP3DArg(const juce::OSCMessage& m, int startIndex = 0);
 
-	static Colour getColourFromOSC(OSCColour c);
+	static juce::Colour getColourFromOSC(juce::OSCColour c);
 
 
-	static OSCMessage getOSCMessageForControllable(Controllable* p, ControllableContainer* addressRelativeTo = nullptr, BoolMode bm = Int, ColorMode cm = ColorRGBA);
+	static juce::OSCMessage getOSCMessageForControllable(Controllable* p, ControllableContainer* addressRelativeTo = nullptr, BoolMode bm = Int, ColorMode cm = ColorRGBA);
 
-	static Controllable* findControllableAndHandleMessage(ControllableContainer* root, const OSCMessage& m, int dataOffset = 0);
-	static Controllable* findControllable(ControllableContainer* root, const OSCMessage& m, int dataOffset = 0);
+	static Controllable* findControllableAndHandleMessage(ControllableContainer* root, const juce::OSCMessage& m, int dataOffset = 0);
+	static Controllable* findControllable(ControllableContainer* root, const juce::OSCMessage& m, int dataOffset = 0);
 
-	static void handleControllableForOSCMessage(Controllable* c, const OSCMessage& m, int dataOffset = 0);
+	static void handleControllableForOSCMessage(Controllable* c, const juce::OSCMessage& m, int dataOffset = 0);
 
 	template<class T>
-	static T* getItemForArgument(BaseManager<T>* manager, const OSCMessage& m, int argIndex)
+	static T* getItemForArgument(BaseManager<T>* manager, const juce::OSCMessage& m, int argIndex)
 	{
 		if (m.size() <= argIndex) return nullptr;
 
@@ -55,5 +53,39 @@ public:
 		return manager->getItemWithName(getStringArg(m[0]), true, true);
 	}
 
-	static String messageToString(const OSCMessage& m);
+	static juce::String messageToString(const juce::OSCMessage& m);
+};
+
+
+class OSCQueryHelpers
+{
+public:
+	static void updateContainerFromData(ControllableContainer* cc, juce::var data, bool useAddressForNaming = false);
+	static void createOrUpdateControllableFromData(ControllableContainer* parentCC, Controllable* c, juce::StringRef name, juce::var data, bool useAddresForNaming = false);
+
+	class OSCQueryValueContainer :
+		public ControllableContainer
+	{
+	public:
+		OSCQueryValueContainer(const juce::String& name);
+		~OSCQueryValueContainer();
+
+		BoolParameter* enableListen;
+		BoolParameter* syncContent;
+
+		InspectableEditor* getEditorInternal(bool isRoot, juce::Array<Inspectable*> inspectables = juce::Array<Inspectable*>()) override;
+	};
+
+	class OSCQueryValueContainerEditor :
+		public GenericControllableContainerEditor
+	{
+	public:
+		OSCQueryValueContainerEditor(OSCQueryValueContainer* cc, bool isRoot);
+		~OSCQueryValueContainerEditor();
+
+		std::unique_ptr<BoolToggleUI> enableListenUI;
+		std::unique_ptr<BoolToggleUI> syncUI;
+
+		void resizedInternalHeader(juce::Rectangle<int>& r) override;
+	};
 };

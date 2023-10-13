@@ -18,22 +18,22 @@ public:
 	Easing2DUI(Easing2D* e);
 	virtual ~Easing2DUI();
 
-	WeakReference<Easing2D> easing;
+	juce::WeakReference<Easing2D> easing;
 
-	Path drawPath;
-	Path hitPath;
+	juce::Path drawPath;
+	juce::Path hitPath;
 
 	bool showFirstHandle;
 	bool showLastHandle;
 
 	int hitPathPrecision = 10;
-	Rectangle<float> valueBounds;
+	juce::Rectangle<float> valueBounds;
 
 	float focusPos = 0;
 	float focusRange = 0;
 
-	void paint(Graphics& g) override;
-	virtual void paintInternal(Graphics&) {}
+	void paint(juce::Graphics& g) override;
+	virtual void paintInternal(juce::Graphics&) {}
 	void resized() override;
 
 	void setFocus(float relPos, float range);
@@ -52,16 +52,16 @@ public:
 	virtual void newMessage(const ContainerAsyncEvent& e) override;
 	virtual void easingControllableFeedbackUpdate(Controllable*) {}
 
-	void setValueBounds(const Rectangle<float> valueBounds);
-	Point<int> getUIPosForValuePos(const Point<float>& valuePos) const;
-	Point<float> getValuePosForUIPos(const Point<int>& uiPos) const;
+	void setValueBounds(const juce::Rectangle<float> valueBounds);
+	juce::Point<int> getUIPosForValuePos(const juce::Point<float>& valuePos) const;
+	juce::Point<float> getValuePosForUIPos(const juce::Point<int>& uiPos) const;
 
 	class Easing2DHandle :
-		public Component
+		public juce::Component
 	{
 	public:
 		Easing2DHandle();
-		void paint(Graphics& g) override;
+		void paint(juce::Graphics& g) override;
 	};
 };
 
@@ -88,21 +88,21 @@ public:
 	Easing2DHandle h2;
 	bool syncHandles;
 
-	Point<float> h1ValueAtMouseDown;
-	Point<float> h2ValueAtMouseDown;
+	juce::Point<float> h1ValueAtMouseDown;
+	juce::Point<float> h2ValueAtMouseDown;
 
 	bool hitTest(int tx, int ty) override;
 
 	void resized() override;
 
 	void generatePathInternal() override;
-	void paintInternal(Graphics& g) override;
+	void paintInternal(juce::Graphics& g) override;
 
 	void easingControllableFeedbackUpdate(Controllable*) override;
 
 	void setShowEasingHandles(bool showFirst, bool showLast) override;
 
-	void mouseDown(const MouseEvent& e) override;
-	void mouseDrag(const MouseEvent& e) override;
-	void mouseUp(const MouseEvent& e) override;
+	void mouseDown(const juce::MouseEvent& e) override;
+	void mouseDrag(const juce::MouseEvent& e) override;
+	void mouseUp(const juce::MouseEvent& e) override;
 };

@@ -19,7 +19,7 @@ public:
 	InspectableContent(Inspectable * inspectable);
 	virtual ~InspectableContent();
 
-	WeakReference<Inspectable> inspectable;
+	juce::WeakReference<Inspectable> inspectable;
 
 	virtual void setInspectable(Inspectable* i);
 

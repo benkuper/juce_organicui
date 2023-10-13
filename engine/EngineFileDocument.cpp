@@ -51,6 +51,8 @@ void Engine::createNewGraph() {
 	engineNotifier.addMessage(new EngineEvent(EngineEvent::END_LOAD_FILE, this));
 
 
+	//ShapeShifterManager::getInstance()->loadDefaultLayoutFile();
+
 	handleAsyncUpdate();
 
 }
@@ -73,7 +75,7 @@ Result Engine::loadDocument(const File& file) {
 	fileLoader->startThread(10);
 #else
 	loadDocumentAsync(file);
-	updateLiveScriptObject();
+	updateScriptObject();
 	triggerAsyncUpdate();
 #endif
 
@@ -388,23 +390,25 @@ void Engine::loadJSONData(var data, ProgressTask* loadingTask)
 
 void Engine::loadJSONDataEngine(var data, ProgressTask* loadingTask)
 {
+	DynamicObject* d = data.getDynamicObject();
+	var layoutData = d->getProperty("layout");
+	if (layoutData.isVoid()) layoutData = ShapeShifterManager::getInstance()->getCurrentLayout();
+
+	ShapeShifterManager::getInstance()->clearAllPanelsAndWindows();
+
 	ControllableContainer::loadJSONData(data);
 	
 	//if (InspectableSelectionManager::mainSelectionManager != nullptr) InspectableSelectionManager::mainSelectionManager->setEnabled(false); //avoid creation of inspector editor while recreating all nodes, controllers, rules,etc. from file
 
 	if (Outliner::getInstanceWithoutCreating() != nullptr) Outliner::getInstance()->setEnabled(false);
 
-	DynamicObject* d = data.getDynamicObject();
 
 	ProgressTask* projectTask = loadingTask->addTask("Project Settings");
 	ProgressTask* dashboardTask = loadingTask->addTask("Dashboard");
 	ProgressTask* parrotTask = loadingTask->addTask("Parrot");
 
 
-	var layoutData = d->getProperty("layout");
-	if (layoutData.isVoid()) layoutData = ShapeShifterManager::getInstance()->getCurrentLayout();
-
-	ShapeShifterManager::getInstance()->clearAllPanelsAndWindows();
+	
 
 	projectTask->start();
 	if (d->hasProperty("projectSettings")) ProjectSettings::getInstance()->loadJSONData(d->getProperty("projectSettings"));

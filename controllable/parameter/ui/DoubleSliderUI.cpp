@@ -8,6 +8,10 @@
   ==============================================================================
 */
 
+#include "JuceHeader.h"
+
+using namespace juce;
+
 DoubleSliderUI::DoubleSliderUI(Array<Point2DParameter*> parameters) :
 	ParameterUI(Inspectable::getArrayAs<Point2DParameter, Parameter>(parameters)),
 	p2ds(parameters),
@@ -33,6 +37,8 @@ DoubleSliderUI::DoubleSliderUI(Array<Point2DParameter*> parameters) :
 
 	xParam.addAsyncParameterListener(this);
 	yParam.addAsyncParameterListener(this);
+	xParam.stringDecimals = p2d->stringDecimals;
+	yParam.stringDecimals = p2d->stringDecimals;
 
 	xSlider.reset((ParameterUI*)xParam.createDefaultUI());
 	ySlider.reset((ParameterUI*)yParam.createDefaultUI());
@@ -149,17 +155,19 @@ void DoubleSliderUI::showEditWindowInternal()
 	nameWindow->addButton("OK", 1, KeyPress(KeyPress::returnKey));
 	nameWindow->addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
 
-	nameWindow->enterModalState(true, ModalCallbackFunction::create([this, nameWindow](int result)
+	Point2DParameter* param = p2d;
+
+	nameWindow->enterModalState(true, ModalCallbackFunction::create([param, nameWindow](int result)
 		{
 			if (result)
 			{
 				float newVals[2];
 				for (int i = 0; i < 2; ++i) newVals[i] = nameWindow->getTextEditorContents("val" + String(i)).getFloatValue();
-				p2d->setUndoablePoint(p2d->x, p2d->y, newVals[0], newVals[1]);
+				param->setUndoablePoint(param->x, param->y, newVals[0], newVals[1]);
 			}
 		}),
 		true
-	);
+			);
 }
 
 void DoubleSliderUI::showEditRangeWindowInternal()

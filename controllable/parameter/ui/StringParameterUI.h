@@ -12,16 +12,16 @@
 
 class StringParameterUI :
 	public ParameterUI,
-	public Label::Listener
+	public juce::Label::Listener
 {
 public:
-	StringParameterUI(Array<StringParameter*> parameters);
+	StringParameterUI(juce::Array<StringParameter*> parameters);
 	virtual ~StringParameterUI();
 
-	Array<StringParameter*> stringParams;
+	juce::Array<StringParameter*> stringParams;
 	StringParameter* stringParam;
 
-	Label valueLabel;
+	juce::Label valueLabel;
 
 	float maxFontHeight;
 
@@ -33,13 +33,13 @@ public:
 	virtual void updateTooltip() override;
 	virtual void updateUIParamsInternal() override;
 
-	void paint(Graphics& g) override;
+	void paint(juce::Graphics& g) override;
 	void resized() override;
 	virtual void resizedInternal(juce::Rectangle<int>&) {} //to be overriden
 
 protected:
-	void valueChanged(const var& v) override;
-	virtual void labelTextChanged(Label* labelThatHasChanged) override;
+	void valueChanged(const juce::var& v) override;
+	virtual void labelTextChanged(juce::Label* labelThatHasChanged) override;
 
 
 private:
@@ -50,53 +50,53 @@ private:
 
 class StringParameterFileUI :
 	public StringParameterUI,
-	public Button::Listener,
+	public juce::Button::Listener,
 	public ParameterListener
 {
 public:
-	StringParameterFileUI(Array<StringParameter*> parameters);
+	StringParameterFileUI(juce::Array<StringParameter*> parameters);
 	virtual ~StringParameterFileUI();
 
-	Array<FileParameter*> fps;
+	juce::Array<FileParameter*> fps;
 	FileParameter* fp;
-	TextButton browseBT;
-	std::unique_ptr<ImageButton> explorerBT;
+	juce::TextButton browseBT;
+	std::unique_ptr<juce::ImageButton> explorerBT;
 	
-	static File lastSearchedFolder;
+	static juce::File lastSearchedFolder;
 
-	virtual void addPopupMenuItemsInternal(PopupMenu* p) override;
+	virtual void addPopupMenuItemsInternal(juce::PopupMenu* p) override;
 	virtual void handleMenuSelectedID(int result) override;
 
 	void resizedInternal(juce::Rectangle<int>& r) override;
 	virtual void feedbackStateChanged() override;
 
-	void buttonClicked(Button* b) override;
+	void buttonClicked(juce::Button* b) override;
 };
 
 
 
 class StringParameterTextUI :
 	public ParameterUI,
-	public TextEditor::Listener
+	public juce::TextEditor::Listener
 {
 public:
-	StringParameterTextUI(Array<StringParameter*> parameters);
+	StringParameterTextUI(juce::Array<StringParameter*> parameters);
 	virtual ~StringParameterTextUI() {};
 
-	Array<StringParameter*> stringParams;
+	juce::Array<StringParameter*> stringParams;
 	StringParameter* stringParam;
 
-	TextEditor editor;
+	juce::TextEditor editor;
 	virtual void feedbackStateChanged() override;
 
 	//void paint(Graphics &g) override;
 	void resized() override;
 
 protected:
-	void valueChanged(const var& v) override;
-	virtual void textEditorTextChanged(TextEditor&) override;
-	virtual void textEditorFocusLost(TextEditor&) override;
-	virtual void textEditorReturnKeyPressed(TextEditor&) override;
+	void valueChanged(const juce::var& v) override;
+	virtual void textEditorTextChanged(juce::TextEditor&) override;
+	virtual void textEditorFocusLost(juce::TextEditor&) override;
+	virtual void textEditorReturnKeyPressed(juce::TextEditor&) override;
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(StringParameterTextUI)
 };

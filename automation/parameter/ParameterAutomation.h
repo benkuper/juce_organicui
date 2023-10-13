@@ -14,7 +14,7 @@
 
 class ParameterAutomation :
 	public BaseItem,
-	public Thread
+	public juce::Thread
 {
 public:
 	enum Mode { LOOP, PING_PONG };
@@ -33,7 +33,7 @@ public:
 
 	void setup();
 
-	WeakReference<Parameter> parameter;
+	juce::WeakReference<Parameter> parameter;
 
 	EnumParameter* mode;
 
@@ -51,8 +51,8 @@ public:
 
 	void run() override;
 
-	var getJSONData() override;
-	void loadJSONDataInternal(var data) override;
+	juce::var getJSONData() override;
+	void loadJSONDataInternal(juce::var data) override;
 };
 
 class ParameterNumberAutomation :

@@ -14,17 +14,17 @@ class Inspectable;
 class Inspector;
 
 class InspectableEditor : 
-	public Component,
-	public ComponentListener
+	public juce::Component,
+	public juce::ComponentListener
 {
 public:
-	InspectableEditor(Array<Inspectable *> inspectables, bool isRoot);
+	InspectableEditor(juce::Array<Inspectable *> inspectables, bool isRoot);
 	InspectableEditor(Inspectable * inspectable, bool isRoot);
 
 	virtual ~InspectableEditor();
 
-	Array<WeakReference<Inspectable>> inspectables;
-	WeakReference<Inspectable> inspectable;
+	juce::Array<juce::WeakReference<Inspectable>> inspectables;
+	juce::WeakReference<Inspectable> inspectable;
     
     Inspector * parentInspector;
 
@@ -33,7 +33,7 @@ public:
 	bool isInsideInspectorBounds;
 
 
-	void componentMovedOrResized(Component & c, bool wasMoved, bool wasResized) override;
+	void componentMovedOrResized(juce::Component & c, bool wasMoved, bool wasResized) override;
 	
 	virtual void updateVisibility();
 
@@ -65,11 +65,11 @@ class GenericComponentEditor :
 	public InspectableEditor
 {
 public:
-	GenericComponentEditor(WeakReference<Inspectable> inspectable, Component * c, bool isRoot);
+	GenericComponentEditor(juce::WeakReference<Inspectable> inspectable, juce::Component * c, bool isRoot);
 	~GenericComponentEditor();
 
-	std::unique_ptr<Component> child;
+	std::unique_ptr<juce::Component> child;
 
 	void resized() override;
-	void childBoundsChanged(Component * c) override;
+	void childBoundsChanged(juce::Component * c) override;
 };

@@ -8,7 +8,7 @@ public:
 	DashboardParameterItem(Parameter* parameter = nullptr);
 	virtual ~DashboardParameterItem();
 
-	WeakReference<Parameter> parameter;
+	juce::WeakReference<Parameter> parameter;
 	
 	BoolParameter* showValue;
 	ColorParameter* bgColor;
@@ -18,17 +18,17 @@ public:
 	EnumParameter* style;
 	virtual DashboardItemUI* createUI() override;
 
-	InspectableEditor* getStyleEditor(bool isRoot, Array<Inspectable *> inspectables);
+	InspectableEditor* getStyleEditor(bool isRoot, juce::Array<Inspectable *> inspectables);
 
 	virtual void setInspectableInternal(Inspectable* i) override;
 	void onExternalParameterValueChanged(Parameter* p) override;
 
 	virtual void updateStyleOptions();
 
-	virtual var getServerData() override;
+	virtual juce::var getServerData() override;
 
-	static DashboardParameterItem* create(var) { return new DashboardParameterItem(); }
-	virtual String getTypeString() const override { return "DashboardParameterItem"; }
+	static DashboardParameterItem* create(juce::var) { return new DashboardParameterItem(); }
+	virtual juce::String getTypeString() const override { return "DashboardParameterItem"; }
 };
 
 class DashboardTargetParameterItem :
@@ -43,10 +43,10 @@ public:
 	IntParameter* parentLabelLevel;
 	BoolParameter* showLearnButton;
 
-	virtual var getServerData() override;
+	virtual juce::var getServerData() override;
 
-	static DashboardParameterItem* create(var) { return new DashboardTargetParameterItem(); }
-	virtual String getTypeString() const override { return "DashboardTargetParameterItem"; }
+	static DashboardParameterItem* create(juce::var) { return new DashboardTargetParameterItem(); }
+	virtual juce::String getTypeString() const override { return "DashboardTargetParameterItem"; }
 };
 
 class DashboardEnumParameterItem :
@@ -58,12 +58,12 @@ public:
 	virtual ~DashboardEnumParameterItem();
 
 	// Inherited via Listener
-	virtual void enumOptionAdded(EnumParameter*, const String&) override;
-	virtual void enumOptionUpdated(EnumParameter*, int index, const String& prevKey, const String& newKey) override;
-	virtual void enumOptionRemoved(EnumParameter*, const String&) override;
+	virtual void enumOptionAdded(EnumParameter*, const juce::String&) override;
+	virtual void enumOptionUpdated(EnumParameter*, int index, const juce::String& prevKey, const juce::String& newKey) override;
+	virtual void enumOptionRemoved(EnumParameter*, const juce::String&) override;
 
-	static DashboardParameterItem* create(var) { return new DashboardEnumParameterItem(); }
-	virtual String getTypeString() const override { return "DashboardEnumParameterItem"; }
+	static DashboardParameterItem* create(juce::var) { return new DashboardEnumParameterItem(); }
+	virtual juce::String getTypeString() const override { return "DashboardEnumParameterItem"; }
 };
 
 

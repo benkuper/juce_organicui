@@ -11,42 +11,42 @@
 #pragma once
 
 class InspectableSelector : 
-	public Component
+	public juce::Component
 {
 public:
 	juce_DeclareSingleton(InspectableSelector, false);
 	InspectableSelector();
 	~InspectableSelector();
 
-	Component * selectablesParent;
+	juce::Component* selectablesParent;
 
-	Array<Component *> selectables;
-	Array<Inspectable * > inspectables;
+	juce::Array<juce::Component*> selectables;
+	juce::Array<Inspectable* > inspectables;
 
-	 juce::Rectangle<int> selectionBounds;
+	juce::Rectangle<int> selectionBounds;
 
 	//memory of current Selection
-	InspectableSelectionManager * currentSelectionManager;
+	InspectableSelectionManager* currentSelectionManager;
 	bool clearSelectionAtEnd;
 
-	void startSelection(Component * parent, Array<Component *> selectables, InspectableSelectionManager * manager = nullptr, bool clearSelection = true);
-	void startSelection(Component * parent, Array<Component *> selectables, Array<Inspectable *> relatedInspectables, InspectableSelectionManager * manager = nullptr, bool clearSelection = true); //If custom UI needed, use that function to provide different set of ui and inspectables (must be the same size !!)
+	void startSelection(juce::Component* parent, juce::Array<juce::Component*> selectables, InspectableSelectionManager* manager = nullptr, bool clearSelection = true);
+	void startSelection(juce::Component* parent, juce::Array<juce::Component*> selectables, juce::Array<Inspectable*> relatedInspectables, InspectableSelectionManager* manager = nullptr, bool clearSelection = true); //If custom UI needed, use that function to provide different set of ui and inspectables (must be the same size !!)
 	void endSelection(bool confirmSelection = true);
 
-	void paint(Graphics &g) override;
+	void paint(juce::Graphics& g) override;
 
-	void mouseDrag(const MouseEvent &e) override;
-	void mouseUp(const MouseEvent &e) override;
+	void mouseDrag(const juce::MouseEvent& e) override;
+	void mouseUp(const juce::MouseEvent& e) override;
 
-	
+
 	class  SelectorListener
 	{
 	public:
 		virtual ~SelectorListener() {}
-		virtual void selectionEnded(Array<Component *> selectedComponents) {};
+		virtual void selectionEnded(juce::Array<juce::Component *> selectedComponents) {};
 	};
 
-	ListenerList<SelectorListener> listeners;
+	juce::ListenerList<SelectorListener> listeners;
 	void addSelectorListener(SelectorListener* newListener) { listeners.add(newListener); }
 	void removeSelectorListener(SelectorListener* listener) { listeners.remove(listener); }
 	

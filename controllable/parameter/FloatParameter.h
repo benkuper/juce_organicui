@@ -15,48 +15,51 @@ class FloatStepperUI;
 class FloatParameterLabelUI;
 class TimeLabel;
 
+#define DEFAULT_STRING_DECIMALS 3
+
 class FloatParameter : public Parameter
 {
 public:
-	FloatParameter(const String& niceName, const String& description, const double& initialValue, const double& minValue = (double)INT32_MIN, const double& maxValue = (double)INT32_MAX, bool enabled = true);
+	FloatParameter(const juce::String& niceName, const juce::String& description, const double& initialValue, const double& minValue = (double)INT32_MIN, const double& maxValue = (double)INT32_MAX, bool enabled = true);
 	virtual ~FloatParameter() {}
 
-	float unitSteps;
+	double unitSteps;
+	int stringDecimals;
 
 	enum UIType { NONE, SLIDER, STEPPER, LABEL, TIME };
 	UIType defaultUI;
 	UIType customUI;
 
-	FloatSliderUI* createSlider(Array<Parameter*> parameters = {});
-	FloatStepperUI* createStepper(Array<Parameter *> parameters = {});
-	FloatParameterLabelUI* createLabelParameter(Array<Parameter *> parameters = {});
-	TimeLabel* createTimeLabelParameter(Array<Parameter *> parameters = {});
+	FloatSliderUI* createSlider(juce::Array<Parameter*> parameters = {});
+	FloatStepperUI* createStepper(juce::Array<Parameter*> parameters = {});
+	FloatParameterLabelUI* createLabelParameter(juce::Array<Parameter*> parameters = {});
+	TimeLabel* createTimeLabelParameter(juce::Array<Parameter*> parameters = {});
 
-	virtual ControllableUI* createDefaultUI(Array<Controllable*> controllables = {}) override;
+	virtual ControllableUI* createDefaultUI(juce::Array<Controllable*> controllables = {}) override;
 
-	bool checkValueIsTheSame(var oldValue, var newValue) override;
+	bool checkValueIsTheSame(juce::var oldValue, juce::var newValue) override;
 
-	virtual void setValueInternal(var& value) override;
+	virtual void setValueInternal(juce::var& value) override;
 
 	virtual bool hasRange() override;
 
-	virtual var getLerpValueTo(var targetValue, float weight) override;
-	virtual void setWeightedValue(Array<var> values, Array<float> weights) override;
-	virtual float getStepSnappedValueFor(double originalValue);
+	virtual juce::var getLerpValueTo(juce::var targetValue, float weight) override;
+	virtual void setWeightedValue(juce::Array<juce::var> values, juce::Array<float> weights) override;
+	virtual double getStepSnappedValueFor(double originalValue);
 
 	void setControlAutomation() override;
 
-	virtual String stringValue() override { return String(floatValue()); }
+	virtual juce::String stringValue() override;
 
-	bool setAttributeInternal(String name, var val) override;
-	virtual StringArray getValidAttributes() const override;
+	bool setAttributeInternal(juce::String name, juce::var val) override;
+	virtual juce::StringArray getValidAttributes() const override;
 
-	var getJSONDataInternal() override;
-	void loadJSONDataInternal(var data) override;
+	juce::var getJSONDataInternal() override;
+	void loadJSONDataInternal(juce::var data) override;
 
 	static FloatParameter* create() { return new FloatParameter("New Float Parameter", "", 0); }
-	virtual String getTypeString() const override { return getTypeStringStatic(); }
-	static String getTypeStringStatic() { return "Float"; }
+	virtual juce::String getTypeString() const override { return getTypeStringStatic(); }
+	static juce::String getTypeStringStatic() { return "Float"; }
 
-	virtual var getCroppedValue(var originalValue) override;
+	virtual juce::var getCroppedValue(juce::var originalValue) override;
 };

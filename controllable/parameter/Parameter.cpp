@@ -9,6 +9,9 @@
 */
 
 #include "JuceHeader.h"
+#include "Parameter.h"
+
+using namespace juce;
 
 juce_ImplementSingleton(Parameter::ValueInterpolator::Manager);
 
@@ -31,15 +34,16 @@ Parameter::Parameter(const Type& type, const String& niceName, const String& des
 	isOverriden(false),
 	forceSaveValue(false),
 	forceSaveRange(false),
-	queuedNotifier(100)
+	queuedNotifier(100),
+	colorStatusMap(1)
 {
 
-	scriptObject.setMethod("get", Parameter::getValueFromScript);
-	scriptObject.setMethod("set", Controllable::setValueFromScript);
-	scriptObject.setMethod("resetValue", Parameter::resetValueFromScript);
-	scriptObject.setMethod("getRange", Parameter::getRangeFromScript);
-	scriptObject.setMethod("setRange", Parameter::setRangeFromScript);
-	scriptObject.setMethod("hasRange", Parameter::hasRangeFromScript);
+	scriptObject.getDynamicObject()->setMethod("get", Parameter::getValueFromScript);
+	scriptObject.getDynamicObject()->setMethod("set", Controllable::setValueFromScript);
+	scriptObject.getDynamicObject()->setMethod("resetValue", Parameter::resetValueFromScript);
+	scriptObject.getDynamicObject()->setMethod("getRange", Parameter::getRangeFromScript);
+	scriptObject.getDynamicObject()->setMethod("setRange", Parameter::setRangeFromScript);
+	scriptObject.getDynamicObject()->setMethod("hasRange", Parameter::hasRangeFromScript);
 }
 
 Parameter::~Parameter()
@@ -276,7 +280,7 @@ bool Parameter::hasRange()
 			}
 			else if (minimumValue.isDouble())
 			{
-				if ((float)minimumValue != INT32_MIN && (float)maximumValue != INT32_MAX) return true;
+				if ((float)minimumValue != (float)INT32_MIN && (float)maximumValue != (float)INT32_MAX) return true;
 
 			}
 		}
@@ -560,6 +564,55 @@ void Parameter::setupFromJSONData(var data)
 		defaultValue = data.getProperty("default", defaultValue);
 		setValue(data.getProperty("default", defaultValue));
 	}
+}
+
+void Parameter::getRemoteControlDataInternal(var& data)
+{
+	Controllable::getRemoteControlDataInternal(data);
+
+	var v = getRemoteControlValue();
+	var valueData = var();
+	if (v.isArray()) valueData = v;
+	else valueData.append(v); //always need to be an array
+	if (!valueData.isVoid()) data.getDynamicObject()->setProperty("VALUE", valueData);
+
+	var rangeData = getRemoteControlRange();
+	if (!rangeData.isVoid()) data.getDynamicObject()->setProperty("RANGE", rangeData);
+
+	var extType = var();
+	extType.append(getTypeString());
+	data.getDynamicObject()->setProperty("EXTENDED_TYPE", extType);
+}
+
+var Parameter::getRemoteControlValue()
+{
+	return getValue();
+}
+
+var Parameter::getRemoteControlRange()
+{
+	if (!hasRange()) return var();
+	var range = var();
+
+	if (isComplex())
+	{
+		for (int i = 0; i < minimumValue.size(); i++)
+		{
+			var rData(new DynamicObject());
+			rData.getDynamicObject()->setProperty("MIN", minimumValue[i]);
+			rData.getDynamicObject()->setProperty("MAX", maximumValue[i]);
+			range.append(rData);
+		}
+	}
+	else
+	{
+		var rData(new DynamicObject());
+		rData.getDynamicObject()->setProperty("MIN", minimumValue);
+		rData.getDynamicObject()->setProperty("MAX", maximumValue);
+		range.append(rData);
+	}
+
+	return range;
 }
 
 var Parameter::getValueFromScript(const juce::var::NativeFunctionArgs& a)

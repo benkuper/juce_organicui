@@ -15,7 +15,7 @@
 class InspectableContentComponent : 
 	public InspectableContent,
 	public Inspectable::AsyncListener,
-	public Component
+	public juce::Component
 {
 public:
 	InspectableContentComponent(Inspectable * inspectable);
@@ -27,24 +27,24 @@ public:
 	bool autoDrawContourWhenSelected;
 	bool highlightLinkedInspectablesOnOver;
 
-	Colour selectionContourColor;
+	juce::Colour selectionContourColor;
 
 	bool autoSelectWithChildRespect;
-	Colour highlightColor;
+	juce::Colour highlightColor;
 
 	bool bringToFrontOnSelect;
 
 	virtual void setInspectable(Inspectable* i) override;
 
 
-	void mouseEnter(const MouseEvent &e) override;
-	void mouseExit(const MouseEvent &e) override;
+	void mouseEnter(const juce::MouseEvent &e) override;
+	void mouseExit(const juce::MouseEvent &e) override;
 
-	void mouseDown(const MouseEvent &e) override;
+	void mouseDown(const juce::MouseEvent &e) override;
 
 	virtual void selectToThis();
 
-	virtual void paintOverChildren(Graphics &g) override;
+	virtual void paintOverChildren(juce::Graphics &g) override;
 
 	virtual juce::Rectangle<int> getMainBounds();
 	virtual int getExtraWidth();

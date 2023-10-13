@@ -14,13 +14,13 @@ class FileParameter :
 	public EngineListener
 {
 public:
-    FileParameter(const String &niceName, const String &description, const String &initialValue, bool enabled=true);
+    FileParameter(const juce::String &niceName, const juce::String &description, const juce::String &initialValue, bool enabled=true);
 	virtual ~FileParameter();
 
-	String customBasePath;
+	juce::String customBasePath;
 
-	String absolutePath;
-	String fileTypeFilter;
+	juce::String absolutePath;
+	juce::String fileTypeFilter;
     bool directoryMode;
 	bool saveMode;
 
@@ -28,34 +28,34 @@ public:
     bool forceRelativePath;
     
     // need to override this function because var Strings comparison  is based on pointer (we need full string comp)
-    virtual void setValueInternal(var&) override;
+    virtual void setValueInternal(juce::var&) override;
 	
 	void setForceRelativePath(bool value);
 	void setForceAbsolutePath(bool value);
 
-	bool isRelativePath(const String &p);
-	String getAbsolutePath() const;
-	File getBasePath() const;
-	File getFile();
+	bool isRelativePath(const juce::String &p);
+	juce::String getAbsolutePath() const;
+	juce::File getBasePath() const;
+	juce::File getFile();
 
-	var getJSONDataInternal() override;
-	void loadJSONDataInternal(var data) override;
+	juce::var getJSONDataInternal() override;
+	void loadJSONDataInternal(juce::var data) override;
 
 	void fileSaved(bool savedAs) override;
 
-	static var readFileFromScript(const juce::var::NativeFunctionArgs& a);
-	static var writeFileFromScript(const juce::var::NativeFunctionArgs& a);
-	static var writeBytesFromScript(const juce::var::NativeFunctionArgs& a);
-	static var getAbsolutePathFromScript(const juce::var::NativeFunctionArgs& a);
-	static var launchFileFromScript(const juce::var::NativeFunctionArgs& a);
-	static var listFilesFromScript(const juce::var::NativeFunctionArgs& a);
+	static juce::var readFileFromScript(const juce::var::NativeFunctionArgs& a);
+	static juce::var writeFileFromScript(const juce::var::NativeFunctionArgs& a);
+	static juce::var writeBytesFromScript(const juce::var::NativeFunctionArgs& a);
+	static juce::var getAbsolutePathFromScript(const juce::var::NativeFunctionArgs& a);
+	static juce::var launchFileFromScript(const juce::var::NativeFunctionArgs& a);
+	static juce::var listFilesFromScript(const juce::var::NativeFunctionArgs& a);
 
-	virtual bool setAttributeInternal(String param, var paramVal) override;
-	virtual StringArray getValidAttributes() const override;
+	virtual bool setAttributeInternal(juce::String param, juce::var paramVal) override;
+	virtual juce::StringArray getValidAttributes() const override;
 
 	static StringParameter * create() { return new FileParameter("New FileParameter", "",""); }
-	virtual String getTypeString() const override { return getTypeStringStatic(); }
-	static String getTypeStringStatic() { return "File"; }
+	virtual juce::String getTypeString() const override { return getTypeStringStatic(); }
+	static juce::String getTypeStringStatic() { return "File"; }
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(FileParameter)

@@ -12,19 +12,19 @@
 
 class TriggerButtonUI : 
 	public TriggerUI,
-	public Timer
+	public juce::Timer
 {
 public:
-    TriggerButtonUI(Array<Trigger *> t);
+    TriggerButtonUI(juce::Array<Trigger *> t);
     ~TriggerButtonUI();
 
 	bool drawTriggering;
-    Rectangle<float> hitRect;
+    juce::Rectangle<float> hitRect;
 
-    void paint (Graphics&) override;
+    void paint (juce::Graphics&) override;
     void triggerTriggered(const Trigger * p) override ;
 
-	void mouseDownInternal(const MouseEvent &e) override;
+	void mouseDownInternal(const juce::MouseEvent &e) override;
 
     bool hitTest(int x, int y) override;
 

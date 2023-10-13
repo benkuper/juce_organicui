@@ -16,20 +16,20 @@ class BoolButtonToggleUI;
 class BoolParameter : public Parameter
 {
 public:
-    BoolParameter(const String &niceName, const String &description, bool initialValue, bool enabled = true);
+    BoolParameter(const juce::String &niceName, const juce::String &description, bool initialValue, bool enabled = true);
     ~BoolParameter() {}
 
     //ui creation
 
-    void setValueInternal(var& value) override;
+    void setValueInternal(juce::var& value) override;
 
-    BoolToggleUI * createToggle(Image onImage = Image(), Image offImage = Image(), Array<BoolParameter*> c = {});
-	BoolButtonToggleUI* createButtonToggle(Array<BoolParameter *> c = {});
-    ControllableUI* createDefaultUI(Array<Controllable*> c = {}) override;
+    BoolToggleUI * createToggle(juce::Image onImage = juce::Image(), juce::Image offImage = juce::Image(), juce::Array<BoolParameter*> c = {});
+	BoolButtonToggleUI* createButtonToggle(juce::Array<BoolParameter *> c = {});
+    ControllableUI* createDefaultUI(juce::Array<Controllable*> c = {}) override;
 
 	static BoolParameter * create() { return new BoolParameter("New Bool Parameter", "", false); }
-	virtual String getTypeString() const override { return getTypeStringStatic(); }
-	static String getTypeStringStatic() { return "Boolean"; }
+	virtual juce::String getTypeString() const override { return getTypeStringStatic(); }
+	static juce::String getTypeStringStatic() { return "Boolean"; }
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BoolParameter)

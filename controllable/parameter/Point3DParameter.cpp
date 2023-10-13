@@ -8,10 +8,15 @@ Author:  bkupe
 ==============================================================================
 */
 
+#include "JuceHeader.h"
+
+using namespace juce;
+
 Point3DParameter::Point3DParameter(const String& niceName, const String& description, bool enabled) :
 	Parameter(POINT3D, niceName, description, 0, 0, 1, enabled),
 	x(0), y(0), z(0),
-	defaultUI(FloatParameter::NONE)
+	defaultUI(FloatParameter::NONE),
+	stringDecimals(3)
 {
 	canHaveRange = true;
 
@@ -53,12 +58,12 @@ void Point3DParameter::setVector(float _x, float _y, float _z)
 	setValue(d);
 }
 
-void Point3DParameter::setUndoableVector(Vector3D<float> oldVector, Vector3D<float> newVector)
+UndoableAction* Point3DParameter::setUndoableVector(Vector3D<float> oldVector, Vector3D<float> newVector, bool onlyReturnAction)
 {
-	setUndoableVector(oldVector.x, oldVector.y, oldVector.z, newVector.x, newVector.y, newVector.z);
+	return setUndoableVector(oldVector.x, oldVector.y, oldVector.z, newVector.x, newVector.y, newVector.z, onlyReturnAction);
 }
 
-void Point3DParameter::setUndoableVector(float oldX, float oldY, float oldZ, float newX, float newY, float newZ)
+UndoableAction* Point3DParameter::setUndoableVector(float oldX, float oldY, float oldZ, float newX, float newY, float newZ, bool onlyReturnAction)
 {
 	var od;
 	od.append(oldX);
@@ -69,9 +74,9 @@ void Point3DParameter::setUndoableVector(float oldX, float oldY, float oldZ, flo
 	d.append(newY);
 	d.append(newZ);
 
-	if (checkValueIsTheSame(od, d) && !alwaysNotify) return;
+	if (checkValueIsTheSame(od, d) && !alwaysNotify) return nullptr;
 
-	setUndoableValue(od, d);
+	return setUndoableValue(od, d, onlyReturnAction);
 }
 
 void Point3DParameter::setValueInternal(var& _value)
@@ -107,12 +112,16 @@ void Point3DParameter::setBounds(float _minX, float _minY, float _minZ, float _m
 }
 
 Vector3D<float> Point3DParameter::getVector() {
+	GenericScopedLock lock(valueSetLock);
 	return Vector3D<float>(x, y, z);
 }
 
 var Point3DParameter::getLerpValueTo(var targetValue, float weight)
 {
-	if (!targetValue.isArray()) return value;
+	if (!targetValue.isArray()) return getValue();
+
+	GenericScopedLock lock(valueSetLock);
+
 	var result;
 	result.append(jmap(weight, x, (float)targetValue[0]));
 	result.append(jmap(weight, y, (float)targetValue[1]));
@@ -156,6 +165,32 @@ bool Point3DParameter::checkValueIsTheSame(var newValue, var oldValue)
 StringArray Point3DParameter::getValuesNames()
 {
 	return StringArray("X", "Y", "Z");
+}
+
+
+bool Point3DParameter::setAttributeInternal(String name, var val)
+{
+	if (name == "ui")
+	{
+		if (val == "time") defaultUI = FloatParameter::TIME;
+		else if (val == "slider") defaultUI = FloatParameter::SLIDER;
+		else if (val == "stepper") defaultUI = FloatParameter::STEPPER;
+		else if (val == "label") defaultUI = FloatParameter::LABEL;
+	}
+	else if (name == "stringDecimals") stringDecimals = (int)val;
+	else
+	{
+		return Parameter::setAttributeInternal(name, val);
+	}
+
+	return true;
+}
+
+StringArray Point3DParameter::getValidAttributes() const
+{
+	StringArray att = Parameter::getValidAttributes();
+	att.addArray({ "ui","stringDecimals" });
+	return att;
 }
 
 ControllableUI* Point3DParameter::createDefaultUI(Array<Controllable*> controllables)

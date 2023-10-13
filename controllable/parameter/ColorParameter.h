@@ -18,32 +18,34 @@ class ColorParameter :
 public:
 
 	enum Mode { UINT, FLOAT };
-	ColorParameter(const String& niceName, const String& description, const Colour& initialColor = Colours::black, bool enabled = true);
+	ColorParameter(const juce::String& niceName, const juce::String& description, const juce::Colour& initialColor = juce::Colours::black, bool enabled = true);
 	~ColorParameter();
 
 	Mode mode;
 
-	const Colour getColor();
+	const juce::Colour getColor();
 	void setFloatRGBA(const float& r, const float& g, const float& b, const float& a);
-	void setColor(const uint32& _color, bool silentSet = false, bool force = false);
-	void setColor(const Colour& _color, bool silentSet = false, bool force = false);
+	void setColor(const juce::uint32& _color, bool silentSet = false, bool force = false);
+	void setColor(const juce::Colour& _color, bool silentSet = false, bool force = false);
 
-	void setDefaultValue(const Colour& _color, bool doResetValue = true);
+	void setDefaultValue(const juce::Colour& _color, bool doResetValue = true);
 
-	virtual StringArray getValuesNames() override;
+	virtual juce::StringArray getValuesNames() override;
 
-	bool checkValueIsTheSame(var oldValue, var newValue) override;
+	bool checkValueIsTheSame(juce::var oldValue, juce::var newValue) override;
 
-	virtual var getLerpValueTo(var targetValue, float weight) override;
-	virtual void setWeightedValue(Array<var> values, Array<float> weights) override;
+	virtual juce::var getLerpValueTo(juce::var targetValue, float weight) override;
+	virtual void setWeightedValue(juce::Array<juce::var> values, juce::Array<float> weights) override;
 
 	void setControlAutomation() override;
 
-	ColorParameterUI* createColorParamUI(Array<ColorParameter*> colorParameters = {});
-	ControllableUI * createDefaultUI(Array<Controllable*> controllables = {}) override;
+	juce::var getRemoteControlValue() override;
+
+	ColorParameterUI* createColorParamUI(juce::Array<ColorParameter*> colorParameters = {});
+	ControllableUI* createDefaultUI(juce::Array<Controllable*> controllables = {}) override;
 
 	static ColorParameter * create() { return new ColorParameter("New Color Parameter", ""); }
-	virtual String getTypeString() const override { return getTypeStringStatic(); }
-	static String getTypeStringStatic() { return "Color"; }
+	virtual juce::String getTypeString() const override { return getTypeStringStatic(); }
+	static juce::String getTypeStringStatic() { return "Color"; }
 
 };

@@ -3,15 +3,15 @@ class BaseManagerViewUI;
 
 template<class M, class T, class U>
 class BaseManagerViewMiniPane :
-	public Component,
-	public Timer
+	public juce::Component,
+	public juce::Timer
 {
 public:
 	BaseManagerViewMiniPane(BaseManagerViewUI<M, T, U>* managerUI);
 	virtual ~BaseManagerViewMiniPane() {}
 
 	BaseManagerViewUI<M, T, U>* managerUI;
-	ComponentAnimator ca;
+	juce::ComponentAnimator ca;
 
 	juce::Rectangle<float> paneViewBounds;
 	juce::Rectangle<float> paneRealBounds;
@@ -22,16 +22,16 @@ public:
 	virtual void paintInternal(juce::Graphics& g) {}
 	virtual void paintItem(juce::Graphics& g, U* ui);
 
-	virtual void mouseEnter(const MouseEvent& e) override;
-	virtual void mouseExit(const MouseEvent& e) override;
-	virtual void mouseDown(const MouseEvent& e) override;
-	virtual void mouseDrag(const MouseEvent& e) override;
+	virtual void mouseEnter(const juce::MouseEvent& e) override;
+	virtual void mouseExit(const juce::MouseEvent& e) override;
+	virtual void mouseDown(const juce::MouseEvent& e) override;
+	virtual void mouseDrag(const juce::MouseEvent& e) override;
 
 	void updatePositionFromMouse();
 
-	juce::Point<float> getPanePosForUIPos(Point<int> viewPoint);
-	juce::Point<float> getPanePosForViewPos(Point<float> viewPoint);
-	juce::Point<float> getViewPosForPanePos(Point<float> panePoint);
+	juce::Point<float> getPanePosForUIPos(juce::Point<int> viewPoint);
+	juce::Point<float> getPanePosForViewPos(juce::Point<float> viewPoint);
+	juce::Point<float> getViewPosForPanePos(juce::Point<float> panePoint);
 
 	virtual void resized() override;
 	virtual void updateContent();
@@ -53,8 +53,8 @@ BaseManagerViewMiniPane<M, T, U>::BaseManagerViewMiniPane(BaseManagerViewUI<M, T
 template<class M, class T, class U>
 void BaseManagerViewMiniPane<M, T, U>::paint(juce::Graphics& g)
 {
-	g.fillAll(Colours::white.withAlpha(.05f));
-	g.setColour(Colours::white.withAlpha(.2f));
+	g.fillAll(juce::Colours::white.withAlpha(.05f));
+	g.setColour(juce::Colours::white.withAlpha(.2f));
 	g.drawRect(getLocalBounds());
 
 	if (managerUI->itemsUI.size() == 0) return;
@@ -66,10 +66,10 @@ void BaseManagerViewMiniPane<M, T, U>::paint(juce::Graphics& g)
 
 	for (auto& ui : managerUI->itemsUI)
 	{
-		paneViewBounds.setLeft(jmin<float>(ui->item->viewUIPosition->x, paneViewBounds.getX()));
-		paneViewBounds.setTop(jmin<float>(ui->item->viewUIPosition->y, paneViewBounds.getY()));
-		paneViewBounds.setRight(jmax<float>(ui->item->viewUIPosition->x + ui->item->viewUISize->x, paneViewBounds.getRight()));
-		paneViewBounds.setBottom(jmax<float>(ui->item->viewUIPosition->y + ui->item->viewUISize->y, paneViewBounds.getBottom()));
+		paneViewBounds.setLeft(juce::jmin<float>(ui->item->viewUIPosition->x, paneViewBounds.getX()));
+		paneViewBounds.setTop(juce::jmin<float>(ui->item->viewUIPosition->y, paneViewBounds.getY()));
+		paneViewBounds.setRight(juce::jmax<float>(ui->item->viewUIPosition->x + ui->item->viewUISize->x, paneViewBounds.getRight()));
+		paneViewBounds.setBottom(juce::jmax<float>(ui->item->viewUIPosition->y + ui->item->viewUISize->y, paneViewBounds.getBottom()));
 	}
 
 	juce::Rectangle<int> r = getLocalBounds();
@@ -97,8 +97,8 @@ void BaseManagerViewMiniPane<M, T, U>::paint(juce::Graphics& g)
 		paintItem(g, ui);
 	}
 
-	float fx = jmap<float>(focusRect.getX(), paneViewBounds.getX(), paneViewBounds.getRight(), r.getX(), r.getRight());
-	float fy = jmap<float>(focusRect.getY(), paneViewBounds.getY(), paneViewBounds.getBottom(), r.getY(), r.getBottom());
+	float fx = juce::jmap<float>(focusRect.getX(), paneViewBounds.getX(), paneViewBounds.getRight(), r.getX(), r.getRight());
+	float fy = juce::jmap<float>(focusRect.getY(), paneViewBounds.getY(), paneViewBounds.getBottom(), r.getY(), r.getBottom());
 	float fw = focusRect.getWidth() * r.getWidth() / paneViewBounds.getWidth();
 	float fh = focusRect.getHeight() * r.getHeight() / paneViewBounds.getHeight();
 	juce::Rectangle<int> focusPaneRect(fx, fy, fw, fh);
@@ -138,7 +138,7 @@ void BaseManagerViewMiniPane<M, T, U>::mouseDrag(const juce::MouseEvent& e)
 template<class M, class T, class U>
 void BaseManagerViewMiniPane<M, T, U>::updatePositionFromMouse()
 {
-	Point<float> p = this->getViewPosForPanePos(this->getMouseXYRelative().toFloat());
+	juce::Point<float> p = this->getViewPosForPanePos(this->getMouseXYRelative().toFloat());
 	this->managerUI->manager->viewOffset = -p.toInt();
 	this->managerUI->resized();
 	this->managerUI->repaint();
@@ -151,12 +151,12 @@ void BaseManagerViewMiniPane<M, T, U>::paintItem(juce::Graphics& g, U* ui)
 {
 	juce::Rectangle<int> b = ui->getBoundsInParent();
 
-	Point<float> bTopLeft = getPanePosForUIPos(b.getTopLeft());
-	Point<float> bBottomRight = getPanePosForUIPos(b.getBottomRight());
+	juce::Point<float> bTopLeft = getPanePosForUIPos(b.getTopLeft());
+	juce::Point<float> bBottomRight = getPanePosForUIPos(b.getBottomRight());
 
 	juce::Rectangle<float> uiPaneBounds(bTopLeft, bBottomRight);
 
-	Colour ic = ui->item->itemColor != nullptr ? ui->item->itemColor->getColor() : Colours::white;
+	juce::Colour ic = ui->item->itemColor != nullptr ? ui->item->itemColor->getColor() : juce::Colours::white;
 	g.setColour(ic.brighter(.2f).withAlpha(.6f));
 	g.fillRect(uiPaneBounds);
 	g.setColour(ic.brighter(.5f).withAlpha(.8f));
@@ -164,36 +164,36 @@ void BaseManagerViewMiniPane<M, T, U>::paintItem(juce::Graphics& g, U* ui)
 }
 
 template<class M, class T, class U>
-juce::Point<float> BaseManagerViewMiniPane<M, T, U>::getPanePosForUIPos(Point<int> uiPos)
+juce::Point<float> BaseManagerViewMiniPane<M, T, U>::getPanePosForUIPos(juce::Point<int> uiPos)
 {
 	juce::Rectangle<float> r = getLocalBounds().toFloat();
 
 	return juce::Point<float>(
-		jmap<float>(uiPos.x, paneRealBounds.getX(), paneRealBounds.getRight(), r.getX(), r.getRight()),
-		jmap<float>(uiPos.y, paneRealBounds.getY(), paneRealBounds.getBottom(), r.getY(), r.getBottom())
+		juce::jmap<float>(uiPos.x, paneRealBounds.getX(), paneRealBounds.getRight(), r.getX(), r.getRight()),
+		juce::jmap<float>(uiPos.y, paneRealBounds.getY(), paneRealBounds.getBottom(), r.getY(), r.getBottom())
 	);
 }
 
 template<class M, class T, class U>
-juce::Point<float> BaseManagerViewMiniPane<M, T, U>::getPanePosForViewPos(Point<float> viewPos)
+juce::Point<float> BaseManagerViewMiniPane<M, T, U>::getPanePosForViewPos(juce::Point<float> viewPos)
 {
 	juce::Rectangle<float> r = getLocalBounds().toFloat();
 
 	return juce::Point<float>(
-		jmap<float>(viewPos.x, paneViewBounds.getX(), paneViewBounds.getRight(), r.getX(), r.getRight()),
-		jmap<float>(viewPos.y, paneViewBounds.getY(), paneViewBounds.getBottom(), r.getY(), r.getBottom())
+		juce::jmap<float>(viewPos.x, paneViewBounds.getX(), paneViewBounds.getRight(), r.getX(), r.getRight()),
+		juce::jmap<float>(viewPos.y, paneViewBounds.getY(), paneViewBounds.getBottom(), r.getY(), r.getBottom())
 	);
 
 }
 
 template<class M, class T, class U>
-juce::Point<float> BaseManagerViewMiniPane<M, T, U>::getViewPosForPanePos(Point<float> panePos)
+juce::Point<float> BaseManagerViewMiniPane<M, T, U>::getViewPosForPanePos(juce::Point<float> panePos)
 {
 	juce::Rectangle<float> r = getLocalBounds().toFloat();
 
 	return juce::Point<float>(
-		jmap<float>(panePos.x, r.getX(), r.getRight(), paneViewBounds.getX(), paneViewBounds.getRight()),
-		jmap<float>(panePos.y, r.getY(), r.getBottom(), paneViewBounds.getY(), paneViewBounds.getBottom())
+		juce::jmap<float>(panePos.x, r.getX(), r.getRight(), paneViewBounds.getX(), paneViewBounds.getRight()),
+		juce::jmap<float>(panePos.y, r.getY(), r.getBottom(), paneViewBounds.getY(), paneViewBounds.getBottom())
 	);
 
 }

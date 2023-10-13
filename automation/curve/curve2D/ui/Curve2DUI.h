@@ -22,9 +22,9 @@ public:
     ~Curve2DUI();
 
     bool paintingMode;
-    Array<Point<float>> paintingPoints;
+    juce::Array<juce::Point<float>> paintingPoints;
 
-    void paintOverChildren(Graphics& g) override;
+    void paintOverChildren(juce::Graphics& g) override;
 
     void updateViewUIPosition(Curve2DKeyUI * ui) override;
     void updateHandlesForUI(Curve2DKeyUI* ui, bool checkSideItems);
@@ -34,11 +34,11 @@ public:
     void addItemUIInternal(Curve2DKeyUI* ui) override;
     void removeItemUIInternal(Curve2DKeyUI* ui) override;
 
-    void mouseDown(const MouseEvent& e) override;
-    void mouseDrag(const MouseEvent& e) override;
-    void mouseUp(const MouseEvent& e) override;
+    void mouseDown(const juce::MouseEvent& e) override;
+    void mouseDrag(const juce::MouseEvent& e) override;
+    void mouseUp(const juce::MouseEvent& e) override;
 
-    void mouseDoubleClick(const MouseEvent& e) override;
+    void mouseDoubleClick(const juce::MouseEvent& e) override;
 
     Component* getSelectableComponentForItemUI(Curve2DKeyUI* ui) override;
 

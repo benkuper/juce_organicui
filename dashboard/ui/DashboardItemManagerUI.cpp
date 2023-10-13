@@ -10,6 +10,8 @@
 
 #include "JuceHeader.h"
 
+using namespace juce;
+
 std::function<void(PopupMenu*, int)> DashboardItemManagerUI::customAddItemsToMenuFunc = nullptr;
 std::function<void(int, int, DashboardItemManagerUI*, Point<float>)> DashboardItemManagerUI::customHandleMenuResultFunc = nullptr;
 
@@ -129,12 +131,17 @@ void DashboardItemManagerUI::itemDropped(const SourceDetails& details)
 	if (details.sourceComponent->getParentComponent() == this) return;
 
 	InspectableContentComponent* icc = dynamic_cast<InspectableContentComponent*>(details.sourceComponent.get());
+
 	if (icc != nullptr && icc->inspectable != nullptr)
 	{
 		BaseItem* bi = dynamic_cast<BaseItem*>(icc->inspectable.get());
 		if (bi != nullptr)
 		{
+			if (bi == manager->parentContainer.get()) return;
+
+			manager->selectItemWhenCreated = false; // remove auto selection to allow multi drag/drop flow
 			manager->addItem(bi->createDashboardItem(), getViewMousePosition().toFloat());
+			manager->selectItemWhenCreated = true;
 		}
 		return;
 	}
@@ -142,14 +149,18 @@ void DashboardItemManagerUI::itemDropped(const SourceDetails& details)
 	ControllableEditor* e = dynamic_cast<ControllableEditor*>(details.sourceComponent.get());
 	if (e != nullptr)
 	{
+		manager->selectItemWhenCreated = false; // remove auto selection to allow multi drag/drop flow
 		manager->addItem(e->controllable->createDashboardItem(), getViewMousePosition().toFloat());
+		manager->selectItemWhenCreated = true;
 		return;
 	}
 
 	GenericControllableContainerEditor* ge = dynamic_cast<GenericControllableContainerEditor*>(details.sourceComponent.get());
 	if (ge != nullptr)
 	{
+		manager->selectItemWhenCreated = false; // remove auto selection to allow multi drag/drop flow
 		manager->addItem(ge->container->createDashboardItem(), getViewMousePosition().toFloat());
+		manager->selectItemWhenCreated = true;
 		return;
 	}
 }
@@ -184,6 +195,8 @@ void DashboardItemManagerUI::showMenuAndAddItem(bool fromAddButton, Point<int> m
 		{
 			if (result == 0) return;
 
+
+
 			Point<float> p = getViewPos(mousePos);
 			if (result == -1) manager->addItem(new DashboardGroupItem(), p);
 			else if (result == -2) manager->addItem(new DashboardCommentItem(), p);
@@ -195,6 +208,8 @@ void DashboardItemManagerUI::showMenuAndAddItem(bool fromAddButton, Point<int> m
 			else if (result == -10) setShowTools(!showTools);
 			else if (result < -1000) customHandleMenuResultFunc(result, -5000, this, p);
 			else manager->addItem(manager->managerFactory->createFromMenuResult(result), p);
+
+
 		}
 	);
 }

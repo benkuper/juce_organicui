@@ -15,17 +15,17 @@ class TriggerUI :
 	public Trigger::AsyncListener
 {
 public :
-    TriggerUI(Array<Trigger *> triggers);
+    TriggerUI(juce::Array<Trigger *> triggers);
     virtual ~TriggerUI();
 
-    Array<WeakReference<Trigger>> triggers;
-	WeakReference<Trigger> trigger;
+	juce::Array<juce::WeakReference<Trigger>> triggers;
+	juce::WeakReference<Trigger> trigger;
 
 	bool useCustomBGColor;
-	Colour customBGColor;
+	juce::Colour customBGColor;
 
     // Inherited via AsyncListener
-	void newMessage(const WeakReference<Trigger> &) override;
+	void newMessage(const juce::WeakReference<Trigger> &) override;
 	
 	// should be inherited
     virtual void triggerTriggered(const Trigger * p) =0;

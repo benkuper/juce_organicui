@@ -14,12 +14,12 @@ class DoubleSliderUI : public ParameterUI
 {
 
 public:
-	DoubleSliderUI(Array<Point2DParameter*> parameters);
+	DoubleSliderUI(juce::Array<Point2DParameter*> parameters);
 	virtual ~DoubleSliderUI();
 
 	enum Direction { HORIZONTAL, VERTICAL };
 	
-	Array<Point2DParameter*> p2ds;
+	juce::Array<Point2DParameter*> p2ds;
 	Point2DParameter * p2d;
 
 	FloatParameter xParam;
@@ -32,14 +32,14 @@ public:
 	juce::Rectangle<float> canvasSwitchRect;
 	bool canShowExtendedEditor;
 
-	var mouseDownValue;
+	juce::var mouseDownValue;
 
 	bool isUpdatingFromParam;
 
-	void mouseDownInternal(const MouseEvent &) override;
-	void mouseUpInternal(const MouseEvent &) override;
+	void mouseDownInternal(const juce::MouseEvent &) override;
+	void mouseUpInternal(const juce::MouseEvent &) override;
 
-	void paint(Graphics& g) override;
+	void paint(juce::Graphics& g) override;
     void resized() override;
 	void showEditWindowInternal() override;
 	void showEditRangeWindowInternal() override;

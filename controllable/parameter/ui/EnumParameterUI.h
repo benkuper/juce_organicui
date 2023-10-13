@@ -12,19 +12,19 @@
 #pragma once
 
 class EnumOptionManager :
-	public Component,
-	public Label::Listener
+	public juce::Component,
+	public juce::Label::Listener
 {
 public:
 	EnumOptionManager(EnumParameter* ep);
 	~EnumOptionManager();
 
 	EnumParameter* ep;
-	Viewport viewport;
-	Component container;
+	juce::Viewport viewport;
+	juce::Component container;
 
 	class EnumOptionUI :
-		public Component
+		public juce::Component
 	{
 	public:
 		EnumOptionUI(EnumParameter* ui, int index);
@@ -32,17 +32,17 @@ public:
 		EnumParameter* ep;
 		int index;
 
-		Label keyLabel;
-		Label valueLabel;
+		juce::Label keyLabel;
+		juce::Label valueLabel;
 
 		void resized() override;
 	};
 
-	OwnedArray<EnumOptionUI> optionsUI;
+	juce::OwnedArray<EnumOptionUI> optionsUI;
 
-	void paint(Graphics& g) override;
+	void paint(juce::Graphics& g) override;
 	void resized() override;
-	void labelTextChanged(Label* l) override;
+	void labelTextChanged(juce::Label* l) override;
 };
 
 class EnumParameterUIBase :
@@ -50,15 +50,15 @@ class EnumParameterUIBase :
 	public EnumParameter::AsyncListener
 {
 public:
-	EnumParameterUIBase(Array<EnumParameter*> parameters);
+	EnumParameterUIBase(juce::Array<EnumParameter*> parameters);
 	virtual ~EnumParameterUIBase();
 
-	Array<EnumParameter*> eps;
+	juce::Array<EnumParameter*> eps;
 	EnumParameter* ep;
 
 	virtual void updateFromParameter() {}
 
-	virtual void addPopupMenuItemsInternal(PopupMenu* p) override;
+	virtual void addPopupMenuItemsInternal(juce::PopupMenu* p) override;
 	virtual void handleMenuSelectedID(int result) override;
 
 	void newMessage(const EnumParameter::EnumParameterEvent& e) override;
@@ -66,32 +66,32 @@ public:
 
 class EnumParameterUI :
 	public EnumParameterUIBase,
-	public ComboBox::Listener
+	public juce::ComboBox::Listener
 {
 public:
-    EnumParameterUI(Array<EnumParameter *> parameters);
+    EnumParameterUI(juce::Array<EnumParameter *> parameters);
     virtual ~EnumParameterUI();
 
-	ComboBox cb;
+	juce::ComboBox cb;
 
 	void updateFromParameter() override;
-	String getSelectedKey();
+	juce::String getSelectedKey();
 
-	var prevValue;
+	juce::var prevValue;
 
 	void resized() override;
 
 	// Inherited via Listener
-	virtual void comboBoxChanged(ComboBox *) override;
+	virtual void comboBoxChanged(juce::ComboBox *) override;
 
 
 private:
-	HashMap<int, String> idKeyMap;
-	HashMap<String,int> keyIdMap;
+	juce::HashMap<int, juce::String> idKeyMap;
+	juce::HashMap<juce::String,int> keyIdMap;
 
 protected:
 	void updateUIParamsInternal() override;
-    void valueChanged(const var &) override;
+    void valueChanged(const juce::var &) override;
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EnumParameterUI)
@@ -101,13 +101,13 @@ private:
 
 class EnumParameterButtonBarUI :
 	public EnumParameterUIBase,
-	public TextButton::Listener
+	public juce::TextButton::Listener
 {
 public:
-	EnumParameterButtonBarUI(Array<EnumParameter*> parameters);
+	EnumParameterButtonBarUI(juce::Array<EnumParameter*> parameters);
 	~EnumParameterButtonBarUI();
 
-	OwnedArray<TextButton> buttons;
+	juce::OwnedArray<juce::TextButton> buttons;
 	bool isVertical;
 
 	void updateFromParameter() override;
@@ -115,7 +115,7 @@ public:
 
 protected:
 	void updateUIParamsInternal() override;
-	void valueChanged(const var&) override;
+	void valueChanged(const juce::var&) override;
 
-	void buttonClicked(Button* b) override;
+	void buttonClicked(juce::Button* b) override;
 };

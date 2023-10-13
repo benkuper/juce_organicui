@@ -17,7 +17,7 @@ class Automation :
     public BaseManager<AutomationKey>
 {
 public:
-    Automation(const String& name = "Automation", AutomationRecorder * recorder = nullptr, bool allowKeysOutside = false);
+    Automation(const juce::String& name = "Automation", AutomationRecorder * recorder = nullptr, bool allowKeysOutside = false);
     ~Automation();
 
     FloatParameter* position;
@@ -35,47 +35,47 @@ public:
     EnumParameter * rangeRemapMode;
 
     //Interactive simplification
-    Array<Point<float>> interactiveSourcePoints;
-    Array<Point<float>> interactiveSimplifiedPoints;
+    juce::Array<juce::Point<float>> interactiveSourcePoints;
+    juce::Array<juce::Point<float>> interactiveSimplifiedPoints;
 
 
-    AutomationKey * addKey(const float& position, const float& value, bool addToUndo = false);
-    void addKeys(const Array<AutomationKey *> & keys, bool addToUndo = true, bool removeExistingKeys = true);
+    AutomationKey* addKey(const float& position, const float& value, bool addToUndo = false);
+    void addKeys(const juce::Array<AutomationKey*>& keys, bool addToUndo = true, bool removeExistingKeys = true);
     void insertKeyAt(const float& position, bool addToUndo = true);
 
-    void addFromPointsAndSimplifyBezier(const Array<Point<float>>& sourcePoints, bool addToUndo = true, bool removeExistingKeys = true);
-    
-    void addFromPointsAndSimplifyLinear(const Array<Point<float>>& sourcePoints, float tolerance, bool addToUndo = true, bool removeExistingKeys = true);
-    Array<Point<float>> getLinearSimplifiedPointsFrom(const Array<Point<float>>& sourcePoints, float tolerance, int start = 0, int end = -1);
+    void addFromPointsAndSimplifyBezier(const juce::Array<juce::Point<float>>& sourcePoints, bool addToUndo = true, bool removeExistingKeys = true);
 
-    void launchInteractiveSimplification(const Array<Point<float>>& sourcePoints);
+    void addFromPointsAndSimplifyLinear(const juce::Array<juce::Point<float>>& sourcePoints, float tolerance, bool addToUndo = true, bool removeExistingKeys = true);
+    juce::Array<juce::Point<float>> getLinearSimplifiedPointsFrom(const juce::Array<juce::Point<float>>& sourcePoints, float tolerance, int start = 0, int end = -1);
+
+    void launchInteractiveSimplification(const juce::Array<juce::Point<float>>& sourcePoints);
     void finishInteractiveSimplification();
 
     void setUnitSteps(float unitSteps);
 
-    void addItemInternal(AutomationKey* k, var params) override;
-    void addItemsInternal(Array<AutomationKey*>, var params) override;
+    void addItemInternal(AutomationKey* k, juce::var params) override;
+    void addItemsInternal(juce::Array<AutomationKey*>, juce::var params) override;
     void removeItemInternal(AutomationKey* k) override;
-    void removeItemsInternal(Array<AutomationKey*> keys) override;
+    void removeItemsInternal(juce::Array<AutomationKey*> keys) override;
 
-    Array<AutomationKey*> addItemsFromClipboard(bool showWarning = false) override;
+    juce::Array<AutomationKey*> addItemsFromClipboard(bool showWarning = false) override;
 
-    Array<UndoableAction*> getMoveKeysBy(float start, float offset);
-    Array<UndoableAction*> getRemoveTimespan(float start, float end);
+    juce::Array<juce::UndoableAction*> getMoveKeysBy(float start, float offset);
+    juce::Array<juce::UndoableAction*> getRemoveTimespan(float start, float end);
 
     void updateNextKeys(int start = 0, int end = -1);
     void computeValue();
 
     void setLength(float newLength, bool stretch = false, bool stickToEnd = false);
 
-    Point<float> getPosAndValue();
+    juce::Point<float> getPosAndValue();
     juce::Rectangle<float> getBounds();
 
     void updateRange();
 
     AutomationKey* getKeyForPosition(float pos, bool trueIfEqual = true); //to make binary search instead
     AutomationKey* getNextKeyForPosition(float pos, bool trueIfEqual = true); //to make binary search instead
-    Array<AutomationKey *> getKeysBetweenPositions(float startPos, float endPos); //to make binary search instead
+    juce::Array<AutomationKey*> getKeysBetweenPositions(float startPos, float endPos); //to make binary search instead
 
     float getValueAtNormalizedPosition(float pos);
     float getValueAtPosition(float pos);
@@ -92,13 +92,13 @@ public:
 
     static int compareKeys(AutomationKey* k1, AutomationKey* k2);
 
-    static var setLengthFromScript(const juce::var::NativeFunctionArgs& a);
-    static var addKeyFromScript(const juce::var::NativeFunctionArgs& a);
-    static var getValueAtPositionFromScript(const juce::var::NativeFunctionArgs& a);
-    static var getKeyAtPositionFromScript(const juce::var::NativeFunctionArgs& a);
-    static var getKeysBetweenFromScript(const juce::var::NativeFunctionArgs& a);
+    static juce::var setLengthFromScript(const juce::var::NativeFunctionArgs& a);
+    static juce::var addKeyFromScript(const juce::var::NativeFunctionArgs& a);
+    static juce::var getValueAtPositionFromScript(const juce::var::NativeFunctionArgs& a);
+    static juce::var getKeyAtPositionFromScript(const juce::var::NativeFunctionArgs& a);
+    static juce::var getKeysBetweenFromScript(const juce::var::NativeFunctionArgs& a);
 
     DECLARE_ASYNC_EVENT(Automation, Automation, automation, { INTERACTIVE_SIMPLIFICATION_CHANGED })
 
-    InspectableEditor* getEditorInternal(bool isRoot, Array<Inspectable*> inspectables = Array<Inspectable*>()) override;
+    InspectableEditor* getEditorInternal(bool isRoot, juce::Array<Inspectable*> inspectables = juce::Array<Inspectable*>()) override;
 };

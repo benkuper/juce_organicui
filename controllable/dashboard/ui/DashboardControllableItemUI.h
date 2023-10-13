@@ -12,7 +12,7 @@ public:
 	DashboardControllableItem* controllableItem;
 	std::unique_ptr<ControllableUI> itemUI;
 
-	virtual void paint(Graphics& g) override;
+	virtual void paint(juce::Graphics& g) override;
 	virtual void resizedDashboardItemInternal() override;
 
 	virtual ControllableUI* createControllableUI();

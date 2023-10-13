@@ -30,7 +30,7 @@
  */
 
 #ifdef _MSC_VER
-#  define _USE_MATH_DEFINES
+#define _USE_MATH_DEFINES
 #endif
 
 #include <math.h>
@@ -1551,5 +1551,6 @@ int curve_fit_cubic_to_points_single_fl(
 
 	return result;
 }
+
 
 /** \} */

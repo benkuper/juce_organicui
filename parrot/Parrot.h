@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    Parrot.h
-    Created: 4 Oct 2021 12:51:30pm
-    Author:  bkupe
+	Parrot.h
+	Created: 4 Oct 2021 12:51:30pm
+	Author:  bkupe
 
   ==============================================================================
 */
@@ -11,75 +11,77 @@
 #pragma once
 
 class Parrot :
-    public BaseItem,
-    public ParrotRecordManager::ManagerListener,
-    public Thread
+	public BaseItem,
+	public ParrotRecordManager::ManagerListener,
+	public juce::Thread
 {
 public:
-    Parrot();
-    ~Parrot();
+	Parrot();
+	~Parrot();
 
-    ControllableContainer targetsCC;
-    ParrotRecordManager recordManager;
+	ControllableContainer targetsCC;
+	ParrotRecordManager recordManager;
 
-    EnumParameter* currentRecordEnum;
-    ParrotRecord* currentRecord;
+	EnumParameter* currentRecordEnum;
+	ParrotRecord* currentRecord;
 
-    HashMap<WeakReference<Controllable>, int> dataMapPlayIndex;
+	juce::HashMap<juce::WeakReference<Controllable>, int> dataMapPlayIndex;
 
-    Trigger* startRecordTrigger;
-    Trigger* stopRecordTrigger;
-    Trigger* playTrigger;
-    Trigger* pauseTrigger;
-    Trigger* stopTrigger;
+	Trigger* startRecordTrigger;
+	Trigger* stopRecordTrigger;
+	Trigger* playTrigger;
+	Trigger* pauseTrigger;
+	Trigger* stopTrigger;
 
-    BoolParameter* forceValueAtStartRecord;
-    BoolParameter* trimToFirstData;
-    BoolParameter* trimToLastData;
+	BoolParameter* forceValueAtStartRecord;
+	BoolParameter* trimToFirstData;
+	BoolParameter* trimToLastData;
 
-    enum Status { IDLE, RECORDING, PLAYING };
-    EnumParameter* status;
-    FloatParameter* playProgression;
-    BoolParameter* loop;
+	enum Status { IDLE, RECORDING, PLAYING };
+	EnumParameter* status;
+	FloatParameter* playProgression;
+	BoolParameter* loop;
 
-    double timeAtRecord;
+	double timeAtRecord;
 
-    void setCurrentRecord(ParrotRecord* r);
-    void updateRecordOptions();
+	void setCurrentRecord(ParrotRecord* r);
+	void updateRecordOptions();
 
-    double getRelativeRecordTime();
+	double getRelativeRecordTime();
 
-    Array<Controllable*> getAllTargets();
+	juce::Array<Controllable*> getAllTargets();
 
-    void resetDataPlayIndices();
+	void resetDataPlayIndices();
 
-    void updateControls();
+	void updateControls();
 
-    TargetParameter * addTarget(Controllable *c);
-    TargetParameter* getTargetForControllable(Controllable* c);
-    void removeTargetForControllable(Controllable* c);
+	TargetParameter* addTarget(Controllable* c);
+	TargetParameter* getTargetForControllable(Controllable* c);
+	void removeTargetForControllable(Controllable* c);
 
-    void onContainerParameterChangedInternal(Parameter* p) override;
-    void onContainerTriggerTriggered(Trigger* t) override;
-    void onExternalTriggerTriggered(Trigger* t) override;
-    void onExternalParameterValueChanged(Parameter* p) override;
+	void onContainerParameterChangedInternal(Parameter* p) override;
+	void onContainerTriggerTriggered(Trigger* t) override;
+	void onExternalTriggerTriggered(Trigger* t) override;
+	void onExternalParameterValueChanged(Parameter* p) override;
 
-    void itemAdded(ParrotRecord* r) override;
-    void itemRemoved(ParrotRecord* r) override;
+	void itemAdded(ParrotRecord* r) override;
+	void itemsAdded(juce::Array<ParrotRecord*> records) override;
+	void itemRemoved(ParrotRecord* r) override;
+	void itemsRemoved(juce::Array<ParrotRecord*> records) override;
 
-    void startRecording();
-    void stopRecording();
-    void startPlaying();
-    void pausePlaying();
-    void stopPlaying();
+	void startRecording();
+	void stopRecording();
+	void startPlaying();
+	void pausePlaying();
+	void stopPlaying();
 
-    void run() override;
-    
-    void processControllables();
-    void processControllable(Controllable* c, var val);
+	void run() override;
 
-    var getJSONData() override;
-    void loadJSONDataItemInternal(var data) override;
+	void processControllables();
+	void processControllable(Controllable* c, juce::var val);
 
-    String getTypeString() const override { return "Parrot"; }
+	juce::var getJSONData() override;
+	void loadJSONDataItemInternal(juce::var data) override;
+
+	juce::String getTypeString() const override { return "Parrot"; }
 };

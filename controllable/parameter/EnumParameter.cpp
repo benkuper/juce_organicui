@@ -10,22 +10,21 @@
 
 #include "JuceHeader.h"
 
-
 EnumParameter::EnumParameter(const String& niceName, const String& description, bool enabled) :
 	Parameter(Type::ENUM, niceName, description, "", var(), var(), enabled),
 	enumParameterNotifier(5)
 {
 	lockManualControlMode = true;
 
-	scriptObject.setMethod("getKey", EnumParameter::getValueKeyFromScript);
-	scriptObject.setMethod("setData", EnumParameter::setValueWithDataFromScript);
-	scriptObject.setMethod("setNext", EnumParameter::setNextFromScript);
-	scriptObject.setMethod("setPrevious", EnumParameter::setPreviousFromScript);
-	scriptObject.setMethod("addOption", EnumParameter::addOptionFromScript);
-	scriptObject.setMethod("removeOptions", EnumParameter::removeOptionsFromScript);
-	scriptObject.setMethod("getAllOptions", EnumParameter::getAllOptionsFromScript);
-	scriptObject.setMethod("getOptionAt", EnumParameter::getOptionAtFromScript);
-	scriptObject.setMethod("getIndex", EnumParameter::getIndexFromScript);
+	scriptObject.getDynamicObject()->setMethod("getKey", EnumParameter::getValueKeyFromScript);
+	scriptObject.getDynamicObject()->setMethod("setData", EnumParameter::setValueWithDataFromScript);
+	scriptObject.getDynamicObject()->setMethod("setNext", EnumParameter::setNextFromScript);
+	scriptObject.getDynamicObject()->setMethod("setPrevious", EnumParameter::setPreviousFromScript);
+	scriptObject.getDynamicObject()->setMethod("addOption", EnumParameter::addOptionFromScript);
+	scriptObject.getDynamicObject()->setMethod("removeOptions", EnumParameter::removeOptionsFromScript);
+	scriptObject.getDynamicObject()->setMethod("getAllOptions", EnumParameter::getAllOptionsFromScript);
+	scriptObject.getDynamicObject()->setMethod("getOptionAt", EnumParameter::getOptionAtFromScript);
+	scriptObject.getDynamicObject()->setMethod("getIndex", EnumParameter::getIndexFromScript);
 
 	value = "";
 }
@@ -245,6 +244,23 @@ void EnumParameter::setupFromJSONData(var data)
 	{
 		LOGWARNING("Options property is not valid : " << optionsData.toString());
 	}
+}
+
+var EnumParameter::getRemoteControlValue()
+{
+	return getValueKey();
+}
+
+var EnumParameter::getRemoteControlRange()
+{
+	var range = var();
+	StringArray keys = getAllKeys();
+	var enumRange;
+	for (auto& k : keys) enumRange.append(k);
+	var rData(new DynamicObject());
+	rData.getDynamicObject()->setProperty("VALS", enumRange);
+	range.append(rData);
+	return range;
 }
 
 var EnumParameter::getValueKeyFromScript(const juce::var::NativeFunctionArgs& a)

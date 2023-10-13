@@ -25,11 +25,11 @@
 
 class CustomLoggerUI : public ShapeShifterContentComponent,
 	public CustomLogger::Listener,
-	public TextButton::Listener,
-	public Timer
+	public juce::TextButton::Listener,
+	public juce::Timer
 {
 public:
-	CustomLoggerUI(const String& contentName, CustomLogger * l);
+	CustomLoggerUI(const juce::String& contentName, CustomLogger * l);
 	~CustomLoggerUI();
 
 	class LogList : public juce::TableListBoxModel
@@ -39,7 +39,7 @@ public:
 		virtual ~LogList() {};
 		int getNumRows() override;
 
-		void paintRowBackground(Graphics&,
+		void paintRowBackground(juce::Graphics&,
 			int rowNumber,
 			int width, int height,
 			bool rowIsSelected) override;
@@ -47,19 +47,19 @@ public:
 		Component * refreshComponentForCell(int rowNumber, int columnId, bool isRowSelected,
 			Component* existingComponentToUpdate) override;
 #endif
-		void paintCell(Graphics&,
+		void paintCell(juce::Graphics&,
 			int rowNumber,
 			int columnId,
 			int width, int height,
 			bool rowIsSelected) override;
 
-		String getTextAt(int rowNumber, int columnId);
+		juce::String getTextAt(int rowNumber, int columnId);
 
-		String getCellTooltip(int /*rowNumber*/, int /*columnId*/)    override;
+		juce::String getCellTooltip(int /*rowNumber*/, int /*columnId*/)    override;
 
 	private:
 #if USE_CACHED_GLYPH
-		HashMap<String, CachedGlyph > cachedG;
+		juce::HashMap<juce::String, juce::LowLevelGraphicsSoftwareRenderer::CachedGlyph > cachedG;
 		void cleanUnusedGlyphs();
 #endif
 
@@ -73,37 +73,38 @@ public:
 
 	void resized()override;
 	LogList logList;
-	TextButton clearB, copyB, autoScrollB;
-	std::unique_ptr<TableListBox> logListComponent;
+	juce::TextButton clearB, copyB, autoScrollB;
+	std::unique_ptr<juce::TableListBox> logListComponent;
 	int maxNumElement;
 
-	void buttonClicked(Button*) override;
+	void buttonClicked(juce::Button*) override;
 
 
-	void newMessage(const String&) override;
+	void newMessage(const juce::String&) override;
 
+	void clearLogger();
 
-	static CustomLoggerUI * create(const String &contentName) { return new CustomLoggerUI(contentName, CustomLogger::getInstance()); }
+	static CustomLoggerUI * create(const juce::String &contentName) { return new CustomLoggerUI(contentName, CustomLogger::getInstance()); }
 
 private:
-	MouseCursor  getMouseCursor() override;
-	void mouseDown(const MouseEvent&) override;
-	void mouseDrag(const MouseEvent&) override;
+	juce::MouseCursor  getMouseCursor() override;
+	void mouseDown(const juce::MouseEvent&) override;
+	void mouseDrag(const juce::MouseEvent&) override;
 
-	const Colour logNoneColor = TEXTNAME_COLOR;
-	const Colour logDbgColor = BLUE_COLOR.withSaturation(.2f).darker(.3f);
+	const juce::Colour logNoneColor = TEXTNAME_COLOR;
+	const juce::Colour logDbgColor = BLUE_COLOR.withSaturation(.2f).darker(.3f);
 
-	Atomic<int> totalLogRow;
+	juce::Atomic<int> totalLogRow;
 	void updateTotalLogRow();
 	const LogElement * getElementForRow(const int r) const;
-	const String& getSourceForRow(const int r) const;
+	const juce::String& getSourceForRow(const int r) const;
 	const bool isPrimaryRow(const int r) const;
-	const String& getContentForRow(const int r) const;
-	const Colour& getSeverityColourForRow(const int r)const;
-	const String getTimeStringForRow(const int r) const;
+	const juce::String& getContentForRow(const int r) const;
+	const juce::Colour& getSeverityColourForRow(const int r)const;
+	const juce::String getTimeStringForRow(const int r) const;
 	friend class LogList;
 
-	int64 lastUpdateTime;
+	juce::int64 lastUpdateTime;
 	void timerCallback()override;
 	   
 };

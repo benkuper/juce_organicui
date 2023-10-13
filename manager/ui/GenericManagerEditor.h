@@ -17,7 +17,7 @@ template<class T>
 class GenericManagerEditor :
 	public EnablingControllableContainerEditor,
 	public BaseManager<T>::AsyncListener,
-	public DragAndDropTarget
+	public juce::DragAndDropTarget
 {
 public:
 	GenericManagerEditor(BaseManager<T>* manager, bool isRoot);
@@ -25,12 +25,12 @@ public:
 
 	BaseManager<T>* manager;
 
-	Array<BaseItemEditor*> itemEditors;
+	juce::Array<BaseItemEditor*> itemEditors;
 
-	String noItemText;
+	juce::String noItemText;
 
 	//drag and drop
-	StringArray acceptedDropTypes;
+	juce::StringArray acceptedDropTypes;
 	bool isDraggingOver;
 	bool highlightOnDragOver;
 	int currentDropIndex;
@@ -44,19 +44,19 @@ public:
 
 
 	//menu
-	std::unique_ptr<ImageButton> addItemBT;
-	String addItemText;
+	std::unique_ptr<juce::ImageButton> addItemBT;
+	juce::String addItemText;
 
-	void paint(Graphics& g) override;
+	void paint(juce::Graphics& g) override;
 	virtual void resizedInternalHeader(juce::Rectangle<int>& r) override;
 
-	virtual void addPopupMenuItems(PopupMenu* p) override;
+	virtual void addPopupMenuItems(juce::PopupMenu* p) override;
 	virtual void handleMenuSelectedID(int id) override;
 
 	virtual void showMenuAndAddItem(bool isFromAddButton);
 	virtual T* addItemFromMenu(bool isFromAddButton);
 
-	void buttonClicked(Button*) override;
+	void buttonClicked(juce::Button*) override;
 
 	virtual InspectableEditor* addEditorUI(ControllableContainer* cc, bool resize = false) override;
 	virtual void removeEditorUI(InspectableEditor* i, bool resize = false) override;
@@ -73,7 +73,7 @@ public:
 	virtual void itemDragMove(const SourceDetails& dragSourceDetails) override;
 	virtual void itemDragExit(const SourceDetails&) override;
 	virtual void itemDropped(const SourceDetails& dragSourceDetails) override;
-	virtual int getDropIndexForPosition(Point<int> localPosition);
+	virtual int getDropIndexForPosition(juce::Point<int> localPosition);
 
 };
 
@@ -85,7 +85,7 @@ GenericManagerEditor<T>::GenericManagerEditor(BaseManager<T>* _manager, bool isR
 	manager(_manager),
 	isDraggingOver(false),
 	highlightOnDragOver(true),
-    addItemText("Add item")
+	addItemText("Add item")
 {
 	headerHeight = 20;
 	setInterceptsMouseClicks(true, true);
@@ -142,14 +142,14 @@ void GenericManagerEditor<T>::addExistingItems()
 }
 
 template<class T>
-void GenericManagerEditor<T>::paint(Graphics& g)
+void GenericManagerEditor<T>::paint(juce::Graphics& g)
 {
 	GenericControllableContainerEditor::paint(g);
 
 	if (this->manager->items.size() == 0 && this->noItemText.isNotEmpty())
 	{
 		g.setColour(PANEL_COLOR.brighter(.1f));
-		g.drawFittedText(this->noItemText, this->getContentBounds().reduced(10), Justification::centred, 4);
+		g.drawFittedText(this->noItemText, this->getContentBounds().reduced(10), juce::Justification::centred, 4);
 	}
 
 	if (isDraggingOver && highlightOnDragOver)
@@ -189,23 +189,40 @@ void GenericManagerEditor<T>::resizedInternalHeader(juce::Rectangle<int>& r)
 }
 
 template<class T>
-void GenericManagerEditor<T>::addPopupMenuItems(PopupMenu* p)
+void GenericManagerEditor<T>::addPopupMenuItems(juce::PopupMenu* p)
 {
-	if (manager->managerFactory != nullptr) p->addSubMenu("Add...", manager->managerFactory->getMenu());
-	else p->addItem(1, addItemText);
+	p->addItem(1001, "Paste (add)");
+
+	if (manager->managerFactory != nullptr) p->addSubMenu("Add...", manager->managerFactory->getMenu(1101));
+	else p->addItem(1101, addItemText);
+
 }
 
 template<class T>
 void GenericManagerEditor<T>::handleMenuSelectedID(int id)
 {
-	if (manager->managerFactory != nullptr)
+	if (id > 1000 && id < 2000)
 	{
-		T* item = manager->managerFactory->createFromMenuResult(id);
-		if (item != nullptr) manager->addItem(item);
-	}
-	else
-	{
-		if (id == 1) addItemFromMenu(true);
+		switch (id)
+		{
+		case 1001:
+			manager->addItemsFromClipboard();
+			break;
+
+		default:
+		{
+			if (manager->managerFactory != nullptr)
+			{
+				T* item = manager->managerFactory->createFromMenuResult(id - 1100);
+				if (item != nullptr) manager->addItem(item);
+			}
+			else
+			{
+				if (id == 1100) addItemFromMenu(true);
+			}
+		}
+		break;
+		}
 	}
 }
 
@@ -231,10 +248,10 @@ void GenericManagerEditor<T>::showMenuAndAddItem(bool isFromAddButton)
 			return;
 		}
 
-		PopupMenu p;
+		juce::PopupMenu p;
 		p.addItem(1, addItemText);
 
-		p.showMenuAsync(PopupMenu::Options(), [this, isFromAddButton](int result)
+		p.showMenuAsync(juce::PopupMenu::Options(), [this, isFromAddButton](int result)
 			{
 				switch (result)
 				{
@@ -257,7 +274,7 @@ T* GenericManagerEditor<T>::addItemFromMenu(bool /*isFromAddButton*/)
 }
 
 template<class T>
-void GenericManagerEditor<T>::buttonClicked(Button* b)
+void GenericManagerEditor<T>::buttonClicked(juce::Button* b)
 {
 	GenericControllableContainerEditor::buttonClicked(b);
 
@@ -316,8 +333,8 @@ void GenericManagerEditor<T>::newMessage(const typename BaseManager<T>::ManagerE
 template<class T>
 bool GenericManagerEditor<T>::isInterestedInDragSource(const SourceDetails& dragSourceDetails)
 {
-	String dataType = dragSourceDetails.description.getProperty("dataType", "").toString();
-	String type = dragSourceDetails.description.getProperty("type", "").toString();
+	juce::String dataType = dragSourceDetails.description.getProperty("dataType", "").toString();
+	juce::String type = dragSourceDetails.description.getProperty("type", "").toString();
 	if (acceptedDropTypes.contains(dataType) || acceptedDropTypes.contains(type)) return true;
 
 	BaseItemEditor* itemUI = dynamic_cast<BaseItemEditor*>(dragSourceDetails.sourceComponent.get());
@@ -370,12 +387,12 @@ void GenericManagerEditor<T>::itemDropped(const SourceDetails& dragSourceDetails
 			}
 			else
 			{
-				var data = item->getJSONData();
+				juce::var data = item->getJSONData();
 				if (droppingIndex != -1) data.getDynamicObject()->setProperty("index", droppingIndex);
 
 				if (T* newItem = this->manager->createItemFromData(data))
 				{
-					Array<UndoableAction*> actions;
+					juce::Array<juce::UndoableAction*> actions;
 					actions.add(this->manager->getAddItemUndoableAction(newItem, data));
 					if (BaseManager<T>* sourceManager = dynamic_cast<BaseManager<T> *>(tItem->parentContainer.get()))
 					{
@@ -395,12 +412,12 @@ void GenericManagerEditor<T>::itemDropped(const SourceDetails& dragSourceDetails
 
 
 template<class T>
-int GenericManagerEditor<T>::getDropIndexForPosition(Point<int> localPosition)
+int GenericManagerEditor<T>::getDropIndexForPosition(juce::Point<int> localPosition)
 {
 	for (int i = 0; i < itemEditors.size(); ++i)
 	{
 		BaseItemEditor* iui = itemEditors[i];
-		Point<int> p = getLocalArea(iui, iui->getLocalBounds()).getCentre();
+		juce::Point<int> p = getLocalArea(iui, iui->getLocalBounds()).getCentre();
 		if (localPosition.y < p.y) return i;
 	}
 

@@ -43,23 +43,23 @@ Script::Script(ScriptTarget* _parentTarget, bool canBeDisabled, bool canBeRemove
 	reload->hideInEditor = true;
 
 
-	scriptObject.setMethod("log", Script::logFromScript);
-	scriptObject.setMethod("logWarning", Script::logWarningFromScript);
-	scriptObject.setMethod("logError", Script::logErrorFromScript);
-	scriptObject.setMethod("setUpdateRate", Script::setUpdateRateFromScript);
-	scriptObject.setMethod("setExecutionTimeout", Script::setExecutionTimeoutFromScript);
+	scriptObject.getDynamicObject()->setMethod("log", Script::logFromScript);
+	scriptObject.getDynamicObject()->setMethod("logWarning", Script::logWarningFromScript);
+	scriptObject.getDynamicObject()->setMethod("logError", Script::logErrorFromScript);
+	scriptObject.getDynamicObject()->setMethod("setUpdateRate", Script::setUpdateRateFromScript);
+	scriptObject.getDynamicObject()->setMethod("setExecutionTimeout", Script::setExecutionTimeoutFromScript);
 
-	scriptObject.setMethod("addTrigger", Script::addTriggerFromScript);
-	scriptObject.setMethod("addBoolParameter", Script::addBoolParameterFromScript);
-	scriptObject.setMethod("addIntParameter", Script::addIntParameterFromScript);
-	scriptObject.setMethod("addFloatParameter", Script::addFloatParameterFromScript);
-	scriptObject.setMethod("addStringParameter", Script::addStringParameterFromScript);
-	scriptObject.setMethod("addEnumParameter", Script::addEnumParameterFromScript);
-	scriptObject.setMethod("addTargetParameter", Script::addTargetParameterFromScript);
-	scriptObject.setMethod("addPoint2DParameter", Script::addPoint2DParameterFromScript);
-	scriptObject.setMethod("addPoint3DParameter", Script::addPoint3DParameterFromScript);
-	scriptObject.setMethod("addColorParameter", Script::addColorParameterFromScript);
-	scriptObject.setMethod("addFileParameter", Script::addFileParameterFromScript);
+	scriptObject.getDynamicObject()->setMethod("addTrigger", Script::addTriggerFromScript);
+	scriptObject.getDynamicObject()->setMethod("addBoolParameter", Script::addBoolParameterFromScript);
+	scriptObject.getDynamicObject()->setMethod("addIntParameter", Script::addIntParameterFromScript);
+	scriptObject.getDynamicObject()->setMethod("addFloatParameter", Script::addFloatParameterFromScript);
+	scriptObject.getDynamicObject()->setMethod("addStringParameter", Script::addStringParameterFromScript);
+	scriptObject.getDynamicObject()->setMethod("addEnumParameter", Script::addEnumParameterFromScript);
+	scriptObject.getDynamicObject()->setMethod("addTargetParameter", Script::addTargetParameterFromScript);
+	scriptObject.getDynamicObject()->setMethod("addPoint2DParameter", Script::addPoint2DParameterFromScript);
+	scriptObject.getDynamicObject()->setMethod("addPoint3DParameter", Script::addPoint3DParameterFromScript);
+	scriptObject.getDynamicObject()->setMethod("addColorParameter", Script::addColorParameterFromScript);
+	scriptObject.getDynamicObject()->setMethod("addFileParameter", Script::addFileParameterFromScript);
 
 	setParamsContainer(nullptr); //default
 
@@ -231,12 +231,12 @@ void Script::buildEnvironment()
 	while (scriptParamsContainer->controllables.size() > 0) scriptParamsContainer->removeControllable(scriptParamsContainer->controllables[0]);
 	scriptParamsContainer->clear();
 
-	scriptEngine->registerNativeObject("script", getScriptObject()); //force "script" for this object
-	if (parentTarget != nullptr) scriptEngine->registerNativeObject("local", parentTarget->getScriptObject()); //force "local" for the related object
-	if (Engine::mainEngine != nullptr) scriptEngine->registerNativeObject(Engine::mainEngine->scriptTargetName, Engine::mainEngine->getScriptObject());
+	scriptEngine->registerNativeObject("script", getScriptObject().getDynamicObject()); //force "script" for this object
+	if (parentTarget != nullptr) scriptEngine->registerNativeObject("local", parentTarget->getScriptObject().getDynamicObject()); //force "local" for the related object
+	if (Engine::mainEngine != nullptr) scriptEngine->registerNativeObject(Engine::mainEngine->scriptTargetName, Engine::mainEngine->getScriptObject().getDynamicObject());
 	if (ScriptUtil::getInstanceWithoutCreating() != nullptr)
 	{
-		DynamicObject* utilObject = ScriptUtil::getInstance()->getScriptObject();
+		DynamicObject* utilObject = ScriptUtil::getInstance()->getScriptObject().getDynamicObject();
 		utilObject->setProperty("_script", (int64)this);
 		utilObject->setProperty("scriptPath", filePath->getAbsolutePath());
 		scriptEngine->registerNativeObject(ScriptUtil::getInstance()->scriptTargetName, utilObject);
@@ -303,12 +303,14 @@ void Script::onControllableFeedbackUpdateInternal(ControllableContainer* cc, Con
 
 void Script::childStructureChanged(ControllableContainer* cc)
 {
+	if(cc != Engine::mainEngine) BaseItem::childStructureChanged(cc);
+
 	if (state == ScriptState::SCRIPT_LOADED && Engine::mainEngine != nullptr && cc == Engine::mainEngine)
 	{
 		if (!Engine::mainEngine->isLoadingFile && !Engine::mainEngine->isClearing)
 		{
 			const ScopedLock sl(engineLock); //need to check null MainEngine again after lock
-			if (Engine::mainEngine != nullptr && scriptEngine != nullptr) scriptEngine->registerNativeObject(Engine::mainEngine->scriptTargetName, Engine::mainEngine->getScriptObject());
+			if (Engine::mainEngine != nullptr && scriptEngine != nullptr) scriptEngine->registerNativeObject(Engine::mainEngine->scriptTargetName, Engine::mainEngine->getScriptObject().getDynamicObject());
 		}
 	}
 }

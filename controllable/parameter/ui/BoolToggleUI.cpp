@@ -8,6 +8,8 @@
   ==============================================================================
 */
 
+#include "JuceHeader.h"
+
 BoolToggleUI::BoolToggleUI(Array<BoolParameter*> parameters, Image _onImage, Image _offImage) :
 	ParameterUI(Inspectable::getArrayAs<BoolParameter, Parameter>(parameters), PARAMETERUI_DEFAULT_TIMER),
 	momentaryMode(false)
@@ -90,8 +92,11 @@ void BoolToggleUI::paint(Graphics& g)
 		g.drawFittedText(customLabel.isNotEmpty() ? customLabel : parameter->niceName, r, Justification::left, 1);
 	}
 
-	if (m.isValid()) g.drawImage(m, cr.toFloat());
-
+	if (m.isValid())
+	{
+		g.setOpacity(isMouseOverOrDragging() ? 1.0f : .8f);
+		g.drawImage(m, cr.toFloat(), RectanglePlacement::stretchToFit);
+	}
 }
 
 void BoolToggleUI::mouseDownInternal(const MouseEvent& e)

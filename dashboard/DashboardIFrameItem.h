@@ -14,15 +14,15 @@ class DashboardIFrameItem :
 	public DashboardItem
 {
 public:
-	DashboardIFrameItem(var params = var());
+	DashboardIFrameItem(juce::var params = juce::var());
 	~DashboardIFrameItem();
 
 	StringParameter* url;
-	var getServerData() override;
+	juce::var getServerData() override;
 
 	DashboardItemUI* createUI() override;
 
-	virtual var getItemParameterFeedback(Parameter* p) override;
+	virtual juce::var getItemParameterFeedback(Parameter* p) override;
 
 	DECLARE_TYPE("IFrame")
 };

@@ -7,7 +7,6 @@ CustomLoggerUI::CustomLoggerUI(const String& contentName, CustomLogger* l) :
 	ShapeShifterContentComponent(contentName),
 	logger(l),
 	logList(this),
-	maxNumElement(2000),
 	totalLogRow(0),
 	lastUpdateTime(0)
 {
@@ -263,48 +262,36 @@ MouseCursor  CustomLoggerUI::getMouseCursor() {
 
 void CustomLoggerUI::newMessage(const String& message)
 {
-	LogElement* el = logger->logElements[logger->logElements.size() - 1];
-	totalLogRow += el->getNumLines();
+	//LogElement* el = logger->logElements[logger->logElements.size() - 1];
+	//totalLogRow += el->getNumLines();
 	//bool overFlow = false;
 
 	//coalesce messages
-	if (!Timer::isTimerRunning()) {
-		startTimer(100);
+	if (!Timer::isTimerRunning())
+	{
+		if (GlobalSettings::getInstanceWithoutCreating() != nullptr)
+		{
+			int ms = 1000 / GlobalSettings::getInstance()->loggerRefreshRate->intValue();
+			startTimer(ms);
+		}
 	}
 
+}
+
+void CustomLoggerUI::clearLogger()
+{
+	logger->logElements.clear();
+	totalLogRow = 0;
+	logListComponent->updateContent();
+	LOG(juce::translate("Cleared."));
 }
 
 void CustomLoggerUI::timerCallback()
 {
 	stopTimer();
-	if (totalLogRow.get() > maxNumElement)
-	{
-		int curCount = 0;
-		int idxToRemove = -1;
 
-		for (int i = logger->logElements.size() - 1; i >= 0; i--)
-		{
-			curCount += logger->logElements[i]->getNumLines();
-
-			if (curCount >= maxNumElement)
-			{
-				if (curCount != maxNumElement)
-				{
-					logger->logElements[i]->trimToFit(logger->logElements[i]->getNumLines() - (curCount - maxNumElement));
-				}
-
-				idxToRemove = i - 1;
-				break;
-			}
-
-		}
-
-		if (idxToRemove >= 0)logger->logElements.removeRange(0, idxToRemove + 1);
-
-		totalLogRow = maxNumElement;
-
-
-	}
+	updateTotalLogRow();
+	
 	//DBG("Handle Async Update");
 //    auto cTime = Time::getMillisecondCounter();
 //    if(cTime - lastUpdateTime < 500 ){
@@ -319,7 +306,6 @@ void CustomLoggerUI::timerCallback()
 	logList.cleanUnusedGlyphs();
 #endif
 	repaint();
-
 
 	//    }
 }
@@ -486,10 +472,7 @@ void CustomLoggerUI::buttonClicked(Button* b)
 
 	if (b == &clearB)
 	{
-		logger->logElements.clear();
-		totalLogRow = 0;
-		logListComponent->updateContent();
-		LOG(juce::translate("Cleared."));
+		clearLogger();
 	}
 
 	else if (b == &copyB) {

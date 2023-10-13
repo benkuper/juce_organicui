@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    OSCRemoteControl.h
-    Created: 23 Apr 2018 5:00:30pm
-    Author:  Ben
+	OSCRemoteControl.h
+	Created: 23 Apr 2018 5:00:30pm
+	Author:  Ben
 
   ==============================================================================
 */
@@ -23,7 +23,7 @@
 class OSCRemoteControl :
 	public EnablingControllableContainer,
 #if ORGANICUI_USE_SERVUS
-	public Thread,
+	public juce::Thread,
 #endif
 
 #if ORGANICUI_USE_WEBSERVER
@@ -31,23 +31,23 @@ class OSCRemoteControl :
 	public SimpleWebSocketServer::RequestHandler,
 	public ContainerAsyncListener,
 #endif
-	public OSCReceiver::Listener<OSCReceiver::RealtimeCallback>
+	public juce::OSCReceiver::Listener<juce::OSCReceiver::RealtimeCallback>
 {
-public: 
+public:
 	juce_DeclareSingleton(OSCRemoteControl, true);
 
 	OSCRemoteControl();
 	~OSCRemoteControl();
 
-	IntParameter * localPort;
-	OSCReceiver receiver;
+	IntParameter* localPort;
+	juce::OSCReceiver receiver;
 	bool receiverIsConnected;
 	BoolParameter* logIncoming;
 	BoolParameter* logOutgoing;
 
 	EnablingControllableContainer manualSendCC;
-	OSCSender manualSender;
-	StringParameter * manualAddress;
+	juce::OSCSender manualSender;
+	StringParameter* manualAddress;
 	IntParameter* manualPort;
 
 	void setupReceiver();
@@ -65,12 +65,12 @@ public:
 
 	void updateEngineListener();
 
-	void processMessage(const OSCMessage &m, const String &sourceId = "");
+	void processMessage(const juce::OSCMessage& m, const juce::String& sourceId = "");
 
-	void onContainerParameterChanged(Parameter * p) override;
-	
-	void oscMessageReceived(const OSCMessage &m) override;
-	void oscBundleReceived(const OSCBundle &b) override;
+	void onContainerParameterChanged(Parameter* p) override;
+
+	void oscMessageReceived(const juce::OSCMessage& m) override;
+	void oscBundleReceived(const juce::OSCBundle& b) override;
 
 #if ORGANICUI_USE_SERVUS
 	void run() override;
@@ -79,39 +79,44 @@ public:
 #if ORGANICUI_USE_WEBSERVER
 	std::unique_ptr<SimpleWebSocketServer> server;
 
-	HashMap<String, Array<Controllable*>, DefaultHashFunctions, CriticalSection> feedbackMap;
-	HashMap<Controllable*, String> noFeedbackMap;
+	juce::HashMap<juce::String, juce::Array<Controllable*>, juce::DefaultHashFunctions, juce::CriticalSection> feedbackMap;
+	juce::HashMap<Controllable*, juce::String> noFeedbackMap;
 
 	void setupServer();
 	bool handleHTTPRequest(std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request) override;
-	var getOSCQueryDataForContainer(ControllableContainer* cc);
-	var getOSCQueryDataForControllable(Controllable* c);
 
-	void connectionOpened(const String& id) override;
-	void messageReceived(const String& id, const String& message) override;
-	void dataReceived(const String& id, const MemoryBlock &data) override;
-	void connectionClosed(const String& id, int status, const String& reason) override;
-	void connectionError(const String& id, const String& message) override;
+	void connectionOpened(const juce::String& id) override;
+	void messageReceived(const juce::String& id, const juce::String& message) override;
+	void dataReceived(const juce::String& id, const juce::MemoryBlock& data) override;
+	void connectionClosed(const juce::String& id, int status, const juce::String& reason) override;
+	void connectionError(const juce::String& id, const juce::String& message) override;
 
-	void sendOSCQueryFeedback(Controllable* c, const String & excludeId = "");
+	void sendOSCQueryFeedback(Controllable* c, const juce::String& excludeId = "");
+	void sendOSCQueryFeedback(const juce::OSCMessage& m, juce::StringArray excludes = juce::StringArray());
+
+	void sendPathAddedFeedback(const juce::String& path);
+	void sendPathRemovedFeedback(const juce::String& path);
+	void sendPathNameChangedFeedback(const juce::String& oldPath, const juce::String& newPath);
+
+
+
+	void newMessage(const ContainerAsyncEvent& e) override;
+	void onControllableFeedbackUpdate(ControllableContainer* cc, Controllable* c) override;
+
+#endif
 
 	void sendAllManualFeedback();
 	void sendManualFeedbackForControllable(Controllable* c);
-
-	void onControllableFeedbackUpdate(ControllableContainer * cc, Controllable *c) override;
-
-	void newMessage(const ContainerAsyncEvent& e) override;
-#endif
 
 
 	class RemoteControlListener
 	{
 	public:
-        virtual ~RemoteControlListener(){}
-		virtual void processMessage(const OSCMessage &m) {}
+		virtual ~RemoteControlListener() {}
+		virtual void processMessage(const juce::OSCMessage& m) {}
 	};
 
-	ListenerList<RemoteControlListener> remoteControlListeners;
+	juce::ListenerList<RemoteControlListener> remoteControlListeners;
 	void addRemoteControlListener(RemoteControlListener* e) { remoteControlListeners.add(e); }
 	void removeRemoteControlListener(RemoteControlListener* e) { remoteControlListeners.remove(e); }
 

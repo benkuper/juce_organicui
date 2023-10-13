@@ -12,17 +12,19 @@
 
 class FloatParameterLabelUI :
 	public ParameterUI, 
-	public Label::Listener
+	public juce::Label::Listener
 {
 public:
-	FloatParameterLabelUI(Array<Parameter *> parameters);
+	FloatParameterLabelUI(juce::Array<Parameter *> parameters);
 	virtual ~FloatParameterLabelUI() {};
 
-	Label nameLabel;
-	Label valueLabel;
+	FloatParameter* floatParam;
 
-	String prefix;
-	String suffix;
+	juce::Label nameLabel;
+	juce::Label valueLabel;
+
+	juce::String prefix;
+	juce::String suffix;
 
 	float maxFontHeight;
     
@@ -34,18 +36,18 @@ public:
 	bool autoSize;
 	void setAutoSize(bool value);
 
-	void setPrefix(const String &_prefix);
-	void setSuffix(const String &_suffix);
+	void setPrefix(const juce::String &_prefix);
+	void setSuffix(const juce::String &_suffix);
 
-	virtual void updateLabelFromValue();
+	virtual void updateValueFromLabel();
 	virtual void updateTooltip() override;
 
 	//void paint(Graphics &g) override;
 	void resized() override;
 
-	void mouseDownInternal(const MouseEvent &e) override;
-	void mouseDrag(const MouseEvent &e) override;
-	void mouseUpInternal(const MouseEvent &e) override;
+	void mouseDownInternal(const juce::MouseEvent& e) override;
+	void mouseDrag(const juce::MouseEvent& e) override;
+	void mouseUpInternal(const juce::MouseEvent &e) override;
 
 	virtual void focusGained(FocusChangeType cause) override;
 
@@ -54,12 +56,12 @@ public:
 	virtual void handlePaintTimerInternal() override;
 
 protected:
-	virtual String getValueString(const var &val) const;
+	virtual juce::String getValueString(const juce::var &val) const;
 
-	virtual void valueChanged(const var & v) override;
-	virtual void labelTextChanged(Label * labelThatHasChanged) override;
-	virtual void editorShown(Label* label, TextEditor&) override;
-	virtual void editorHidden(Label* label, TextEditor&) override;
+	virtual void valueChanged(const juce::var & v) override;
+	virtual void labelTextChanged(juce::Label* labelThatHasChanged) override;
+	virtual void editorShown(juce::Label* label, juce::TextEditor&) override;
+	virtual void editorHidden(juce::Label* label, juce::TextEditor&) override;
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(FloatParameterLabelUI)
@@ -70,7 +72,7 @@ class TimeLabel :
 	public FloatParameterLabelUI
 {
 public:
-	TimeLabel(Array<Parameter *> parameters);
+	TimeLabel(juce::Array<Parameter *> parameters);
 	~TimeLabel();
 
 	bool showStepsMode;
@@ -78,12 +80,12 @@ public:
 
 protected:
 
-	void valueChanged(const var &) override;
-	virtual void editorShown(Label* label, TextEditor&) override;
-	void labelTextChanged(Label * l) override;
-	virtual void updateLabelFromValue() override;
+	void valueChanged(const juce::var &) override;
+	virtual void editorShown(juce::Label* label, juce::TextEditor&) override;
+	void labelTextChanged(juce::Label * l) override;
+	virtual void updateValueFromLabel() override;
 
-	String getValueString(const var &val) const override;
+	juce::String getValueString(const juce::var &val) const override;
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TimeLabel)
 };

@@ -11,26 +11,26 @@
 #pragma once
 
 class UpdateDialogWindow :
-	public Component,
-	public Button::Listener
+	public juce::Component,
+	public juce::Button::Listener
 {
 public:
-	UpdateDialogWindow(const String &msg, const String &version, const String &changelog, FloatParameter * progression);
+	UpdateDialogWindow(const juce::String& msg, const juce::String& version, const juce::String &changelog, FloatParameter * progression);
 	~UpdateDialogWindow() {}
 
-	String version;
-	Label msgLabel;
-	TextEditor changelogLabel;
+	juce::String version;
+	juce::Label msgLabel;
+	juce::TextEditor changelogLabel;
 
-	TextButton okButton;
-	TextButton cancelButton;
-	TextButton skipThisVersionButton;
+	juce::TextButton okButton;
+	juce::TextButton cancelButton;
+	juce::TextButton skipThisVersionButton;
 
 	std::unique_ptr<FloatSliderUI> progressionUI;
 
 	void resized() override;
 
-	void buttonClicked(Button * b) override;
+	void buttonClicked(juce::Button * b) override;
 };
 
 
@@ -39,25 +39,25 @@ class  AppUpdateEvent
 public:
 	enum Type { UPDATE_AVAILABLE, DOWNLOAD_STARTED, DOWNLOAD_PROGRESS, DOWNLOAD_ERROR, UPDATE_FINISHED };
 
-	AppUpdateEvent(Type t, File f = File()) : type(t), file(f) {}
-	AppUpdateEvent(Type t, String version, bool beta, String title, String msg, String changelog) : type(t), version(version), beta(beta), title(title), msg(msg), changelog(changelog) {}
+	AppUpdateEvent(Type t, juce::File f = juce::File()) : type(t), file(f) {}
+	AppUpdateEvent(Type t, juce::String version, bool beta, juce::String title, juce::String msg, juce::String changelog) : type(t), version(version), beta(beta), title(title), msg(msg), changelog(changelog) {}
 	
 	Type type;
-	File file;
+	juce::File file;
 
-	String version;
+	juce::String version;
 	bool beta;
-	String title;
-	String msg;
-	String changelog;
+	juce::String title;
+	juce::String msg;
+	juce::String changelog;
 };
 
 typedef QueuedNotifier<AppUpdateEvent>::Listener AppUpdaterAsyncListener;
 
 
 class AppUpdater :
-	public Thread,
-	public URL::DownloadTask::Listener,
+	public juce::Thread,
+	public juce::URL::DownloadTask::Listener,
 	public AppUpdaterAsyncListener
 {
 public:
@@ -66,26 +66,26 @@ public:
 	AppUpdater();
 	~AppUpdater();
 
-	String updateURL;
-	String downloadURLBase;
-	String downloadingFileName;
-    String extension;
-	String filePrefix;
-	File targetDir;
+	juce::String updateURL;
+	juce::String downloadURLBase;
+	juce::String downloadingFileName;
+    juce::String extension;
+	juce::String filePrefix;
+	juce::File targetDir;
 
 	std::unique_ptr<UpdateDialogWindow> updateWindow;
 	std::unique_ptr<FloatParameter> progression;
 
-	std::unique_ptr<URL::DownloadTask> downloadTask;
+	std::unique_ptr<juce::URL::DownloadTask> downloadTask;
 
-	void setURLs(StringRef _updateURL, StringRef _downloadURLBase, StringRef filePrefix);
+	void setURLs(juce::StringRef _updateURL, juce::StringRef _downloadURLBase, juce::StringRef filePrefix);
 
-	String getDownloadFileName(StringRef version, bool beta, StringRef extension); 
+	juce::String getDownloadFileName(juce::StringRef version, bool beta, juce::StringRef extension);
 	void checkForUpdates(bool includeSkippedVersion = false);
 
-	void setSkipThisVersion(String version);
+	void setSkipThisVersion(juce::String version);
 
-	void showDialog(StringRef version, bool beta, StringRef title, StringRef msg, StringRef changelog);
+	void showDialog(juce::StringRef version, bool beta, juce::StringRef title, juce::StringRef msg, juce::StringRef changelog);
 	void downloadUpdate();
 
 
@@ -93,8 +93,8 @@ public:
 	virtual void run() override;
 
 	// Inherited via Listener
-	virtual void finished(URL::DownloadTask * task, bool success) override;
-	virtual void progress(URL::DownloadTask* task, int64 bytesDownloaded, int64 totalLength) override;
+	virtual void finished(juce::URL::DownloadTask * task, bool success) override;
+	virtual void progress(juce::URL::DownloadTask* task, juce::int64 bytesDownloaded, juce::int64 totalLength) override;
 
 	bool openStreamProgressCallback(int /*bytesSent*/, int /*totalBytes*/);
 

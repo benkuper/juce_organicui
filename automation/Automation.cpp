@@ -10,6 +10,8 @@
 
 #include "JuceHeader.h"
 
+using namespace juce;
+
 Automation::Automation(const String& name, AutomationRecorder* recorder, bool allowKeysOutside) :
 	BaseManager(name),
 	valueRange(nullptr),
@@ -57,12 +59,12 @@ Automation::Automation(const String& name, AutomationRecorder* recorder, bool al
 	rangeRemapMode->addOption("Absolute", ABSOLUTE)->addOption("Proportional", PROPORTIONAL);
 	rangeRemapMode->hideInEditor = true;
 
-	scriptObject.setMethod("setLength", &Automation::setLengthFromScript);
-	scriptObject.setMethod("addKey", &Automation::addKeyFromScript);
-	scriptObject.setMethod("getValueAtPosition", &Automation::getValueAtPositionFromScript);
-	scriptObject.setMethod("getValueAtPosition", &Automation::getValueAtPositionFromScript);
-	scriptObject.setMethod("getKeyAtPosition", &Automation::getKeyAtPositionFromScript);
-	scriptObject.setMethod("getKeysBetween", &Automation::getKeysBetweenFromScript);
+	scriptObject.getDynamicObject()->setMethod("setLength", &Automation::setLengthFromScript);
+	scriptObject.getDynamicObject()->setMethod("addKey", &Automation::addKeyFromScript);
+	scriptObject.getDynamicObject()->setMethod("getValueAtPosition", &Automation::getValueAtPositionFromScript);
+	scriptObject.getDynamicObject()->setMethod("getValueAtPosition", &Automation::getValueAtPositionFromScript);
+	scriptObject.getDynamicObject()->setMethod("getKeyAtPosition", &Automation::getKeyAtPositionFromScript);
+	scriptObject.getDynamicObject()->setMethod("getKeysBetween", &Automation::getKeysBetweenFromScript);
 }
 
 Automation::~Automation()
@@ -161,7 +163,7 @@ void Automation::addFromPointsAndSimplifyBezier(const Array<Point<float>>& sourc
 	const float errorThreshold = 0.03f;// 0.02f;
 
 	curve_fit_corners_detect_fl(points.getRawDataPointer(), points.size() / 2, 2,
-		errorThreshold / 4, errorThreshold * 4, 32, M_PI / 8,
+		errorThreshold / 4, errorThreshold * 4, 32, MathConstants<double>::pi / 8,
 		&corners, &cornersLength);
 	if (cornersLength == 0) corners = nullptr;
 

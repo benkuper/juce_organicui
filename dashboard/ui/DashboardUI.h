@@ -18,7 +18,7 @@ public:
 	DashboardUI(Dashboard * item);
 	~DashboardUI();
 
-	void paint(Graphics& g) override;
+	void paint(juce::Graphics& g) override;
 
 	void newMessage(const Dashboard::DashboardEvent& e) override;
 };

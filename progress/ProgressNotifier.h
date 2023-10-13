@@ -15,16 +15,16 @@ class StartCallbackMessage;
 
 class ProgressTask {
   public :
-  ProgressTask(String _taskName,ProgressTask * _parentTask = nullptr);
+  ProgressTask(juce::String _taskName,ProgressTask * _parentTask = nullptr);
   virtual ~ProgressTask();
 
   int getTaskPositionInParent();
 
   float progress;
-  String taskName;
+  juce::String taskName;
 
-  StringArray getAddress();
-  ProgressTask * addTask(String taskName);
+  juce::StringArray getAddress();
+  ProgressTask * addTask(juce::String taskName);
   void start();
   void end();
   void setProgress(float _progress);
@@ -46,7 +46,7 @@ class ProgressTask {
   bool isLeaf();
 
   ProgressTask * parentTask ;
-  OwnedArray<ProgressTask> subTasks;
+  juce::OwnedArray<ProgressTask> subTasks;
 
   class TaskListener{
   public:
@@ -56,14 +56,14 @@ class ProgressTask {
     virtual void taskStarted(ProgressTask *){};
     virtual void taskEnded(ProgressTask *){};
   };
-  ListenerList<TaskListener> taskListeners;
+  juce::ListenerList<TaskListener> taskListeners;
   void addTaskListener(TaskListener * l){taskListeners.add(l);}
   void removeTaskListener(TaskListener * l){taskListeners.remove(l);}
 
 
 
-  friend class WeakReference<ProgressTask>;
-  WeakReference<ProgressTask>::Master masterReference;
+  friend class juce::WeakReference<ProgressTask>;
+  juce::WeakReference<ProgressTask>::Master masterReference;
 };
 
 // this defer calls from ProgressTask for safe notification
@@ -101,7 +101,7 @@ public:
   };
 
 
-  ListenerList<ProgressListener> progressListeners;
+  juce::ListenerList<ProgressListener> progressListeners;
   void addListener(ProgressListener* l){progressListeners.add(l);}
   void removeListener(ProgressListener* l){progressListeners.remove(l);}
 

@@ -10,7 +10,6 @@
 
 #pragma once
 
-using namespace juce;
 
 class AssetManager
 {
@@ -19,37 +18,37 @@ public:
 	AssetManager();
 	virtual ~AssetManager();
 
-	Image warningImage;
-	Image eyeImage;
-	Image powerOn;
-	Image powerOff;
-	Image drag;
-	Image cancel;
+	juce::Image warningImage;
+	juce::Image eyeImage;
+	juce::Image powerOn;
+	juce::Image powerOff;
+	juce::Image drag;
+	juce::Image cancel;
 
-	Image inImage;
-	Image outImage;
-	Image reloadImage;
-	Image triggerImage;
-	Image relativeImage;
-	Image minusImage;
-	Image explorerImage;
-
-
-	ImageButton * getRemoveBT();
-	ImageButton * getConfigBT();
-	ImageButton * getTargetBT();
-	ImageButton * getPowerBT();  
-	ImageButton * getAddBT();
-	ImageButton * getDuplicateBT();
-	ImageButton * getFileBT();
-	ImageButton * getEditBT();
-	ImageButton * getRightArrowBT();
-	ImageButton * getDownArrowImageBT();
-	ImageButton * getUpBT();
+	juce::Image inImage;
+	juce::Image outImage;
+	juce::Image reloadImage;
+	juce::Image triggerImage;
+	juce::Image relativeImage;
+	juce::Image minusImage;
+	juce::Image explorerImage;
 
 
-	ImageButton * getSetupBTImage(const Image & image);
-	ImageButton * getToggleBTImage(const Image &image);
-	ImageButton* getBTDoubleImage(const Image& onImage, const Image& offImage);
+	juce::ImageButton * getRemoveBT();
+	juce::ImageButton * getConfigBT();
+	juce::ImageButton * getTargetBT();
+	juce::ImageButton * getPowerBT();  
+	juce::ImageButton * getAddBT();
+	juce::ImageButton * getDuplicateBT();
+	juce::ImageButton * getFileBT();
+	juce::ImageButton * getEditBT();
+	juce::ImageButton * getRightArrowBT();
+	juce::ImageButton * getDownArrowImageBT();
+	juce::ImageButton * getUpBT();
+
+
+	juce::ImageButton * getSetupBTImage(const juce::Image & image);
+	juce::ImageButton * getToggleBTImage(const juce::Image &image);
+	juce::ImageButton* getBTDoubleImage(const juce::Image& onImage, const juce::Image& offImage);
 
 };

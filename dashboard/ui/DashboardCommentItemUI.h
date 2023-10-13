@@ -12,7 +12,7 @@
 
 class DashboardCommentItemUI :
 	public DashboardItemUI,
-	public TextEditor::Listener
+	public juce::TextEditor::Listener
 {
 public:
 	DashboardCommentItemUI(DashboardCommentItem * comment);
@@ -20,24 +20,24 @@ public:
 
 	DashboardCommentItem* comment;
 
-	TextEditor textUI;
+	juce::TextEditor textUI;
 	
 	void resizedDashboardItemInternal() override;
 
 	void updateEditModeInternal(bool editMode) override;
 
-	void mouseDown(const MouseEvent& e) override;
-	void mouseDrag(const MouseEvent& e) override;
-	void mouseDoubleClick(const MouseEvent& e) override;
+	void mouseDown(const juce::MouseEvent& e) override;
+	void mouseDrag(const juce::MouseEvent& e) override;
+	void mouseDoubleClick(const juce::MouseEvent& e) override;
 
-	void textEditorTextChanged(TextEditor&) override;
-	void textEditorEscapeKeyPressed(TextEditor&) override;
-	void textEditorReturnKeyPressed(TextEditor&) override;
-	void textEditorFocusLost(TextEditor&) override;
+	void textEditorTextChanged(juce::TextEditor&) override;
+	void textEditorEscapeKeyPressed(juce::TextEditor&) override;
+	void textEditorReturnKeyPressed(juce::TextEditor&) override;
+	void textEditorFocusLost(juce::TextEditor&) override;
 
 	void focusLost(FocusChangeType type) override;
 
-	bool canStartDrag(const MouseEvent& e) override;
+	bool canStartDrag(const juce::MouseEvent& e) override;
 
 	void inspectableSelectionChanged(Inspectable* i) override;
 

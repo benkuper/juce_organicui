@@ -1,14 +1,25 @@
 #include "JuceHeader.h"
-#include "OSCHelpers.h"
+
+using namespace juce;
 
 void OSCHelpers::logOSCFormatError(const char* message, int length)
 {
 	LOGERROR("OSC Error : " << String(message, length));
 }
 
-OSCArgument OSCHelpers::varToArgument(const var& v)
+
+
+OSCArgument OSCHelpers::varToArgument(const var& v, BoolMode bm)
 {
-	if (v.isBool()) return OSCArgument(((bool)v) ? 1 : 0);
+	if (v.isBool())
+	{
+		switch (bm)
+		{
+		case TF: return OSCArgument((bool)v); break;
+		case Int: return OSCArgument((int)v); break;
+		case Float: return OSCArgument((float)v); break;
+		}
+	}
 	else if (v.isInt()) return OSCArgument((int)v);
 	else if (v.isInt64()) return OSCArgument((int)v);
 	else if (v.isDouble()) return OSCArgument((float)v);
@@ -20,7 +31,7 @@ OSCArgument OSCHelpers::varToArgument(const var& v)
 
 		return OSCArgument(OSCColour::fromInt32(col));
 	}
-	else if(v.isUndefined()) return OSCArgument();
+	else if (v.isUndefined()) return OSCArgument();
 	else if (v.isVoid()) return OSCArgument();
 
 	jassert(false);
@@ -63,33 +74,42 @@ var OSCHelpers::argumentToVar(const OSCArgument& a)
 	return var("error");
 }
 
-void OSCHelpers::addArgumentsForParameter(OSCMessage& m, Parameter* p, BoolMode bm, ColorMode cm)
+void OSCHelpers::addArgumentsForParameter(OSCMessage& m, Parameter* p, BoolMode bm, ColorMode cm, var forceVar)
 {
+	var val = forceVar.isVoid() ? p->getValue() : forceVar;
+
 	switch (p->type)
 	{
 
-	case Controllable::BOOL: OSCHelpers::addBoolArgumentToMessage(m, p->boolValue(), bm); break;
-	case Controllable::INT: m.addInt32(p->intValue()); break;
-	case Controllable::FLOAT: m.addFloat32(p->floatValue()); break;
-	case Controllable::STRING: m.addString(p->stringValue()); break;
-	case Controllable::COLOR: OSCHelpers::addColorArgumentToMessage(m, ((ColorParameter*)p)->getColor(), cm); break;
-	case Controllable::POINT2D:
-		m.addFloat32(((Point2DParameter*)p)->x);
-		m.addFloat32(((Point2DParameter*)p)->y);
+	case Controllable::BOOL: OSCHelpers::addBoolArgumentToMessage(m, (bool)val, bm); break;
+	case Controllable::INT: m.addInt32((int)val); break;
+	case Controllable::FLOAT: m.addFloat32((float)val); break;
+	case Controllable::STRING: m.addString(val.toString()); break;
+	case Controllable::COLOR:
+	{
+		Colour c = Colour::fromFloatRGBA(val[0], val[1], val[2], val[3]);
+		OSCHelpers::addColorArgumentToMessage(m, c, cm);
 		break;
+	}
+	case Controllable::POINT2D:
 	case Controllable::POINT3D:
-		m.addFloat32(((Point3DParameter*)p)->x);
-		m.addFloat32(((Point3DParameter*)p)->y);
-		m.addFloat32(((Point3DParameter*)p)->z);
+		for (int i = 0; i < val.size(); i++) m.addFloat32(val[i]);
 		break;
 
-	case Controllable::ENUM: m.addString(((EnumParameter*)p)->getValueKey()); break;
-	case Controllable::TARGET: m.addString(p->stringValue()); break;
+	case Controllable::ENUM:
+	{
+		m.addString(((EnumParameter*)p)->getValueKey());
+	}
+	break;
+
+	case Controllable::TARGET:
+		m.addString(val.toString());
+		break;
 
 	default:
 		jassertfalse;
-		if (p->isComplex()) for (int i = 0; i < p->value.size(); i++) m.addArgument(varToArgument(p->value[i]));
-		else m.addArgument(varToArgument(p->value));
+		if (p->isComplex()) for (int i = 0; i < val.size(); i++) m.addArgument(varToArgument(val[i], bm));
+		else m.addArgument(varToArgument(p->getValue(), bm));
 		break;
 	}
 }
@@ -158,6 +178,7 @@ String OSCHelpers::getStringArg(OSCArgument a)
 	if (a.isInt64()) return String(a.getInt64());
 	if (a.isFloat32()) return String(a.getFloat32());
 	if (a.isTorF()) return a.getBool() ? "True" : "False";
+	if (a.isBlob()) return "[Blob : " + String(a.getBlob().getSize()) + " bytes]";
 	if (a.isImpulse()) return var("");
 	return "";
 }
@@ -295,4 +316,271 @@ String OSCHelpers::messageToString(const OSCMessage& m)
 	}
 
 	return s;
+}
+
+
+// OSCQUERY
+
+void OSCQueryHelpers::updateContainerFromData(ControllableContainer* cc, var data, bool useAddressForNaming)
+{
+	DynamicObject* dataObject = data.getProperty("CONTENTS", var()).getDynamicObject();
+
+	Array<WeakReference<ControllableContainer>> containersToDelete = cc->getAllContainers();
+	Array<WeakReference<Controllable>> controllablesToDelete = cc->getAllControllables();
+
+	bool syncContent = true;
+	if (OSCQueryHelpers::OSCQueryValueContainer* vc = dynamic_cast<OSCQueryHelpers::OSCQueryValueContainer*>(cc))
+	{
+		controllablesToDelete.removeAllInstancesOf(vc->enableListen);
+		controllablesToDelete.removeAllInstancesOf(vc->syncContent);
+		syncContent = vc->syncContent->boolValue();
+	}
+
+	if (syncContent && dataObject != nullptr)
+	{
+		NamedValueSet nvSet = dataObject->getProperties();
+		for (auto& nv : nvSet)
+		{
+			//int access = nv.value.getProperty("ACCESS", 1);
+			bool isGroup = /*access == 0 || */nv.value.hasProperty("CONTENTS");
+			if (isGroup) //group
+			{
+				String ccNiceName;
+				if (!useAddressForNaming) ccNiceName = nv.value.getProperty("DESCRIPTION", "");
+				if (ccNiceName.isEmpty()) ccNiceName = nv.name.toString();
+
+				OSCQueryHelpers::OSCQueryValueContainer* childCC = dynamic_cast<OSCQueryHelpers::OSCQueryValueContainer*>(cc->getControllableContainerByName(ccNiceName, true));
+
+				if (childCC == nullptr)
+				{
+					childCC = new OSCQueryHelpers::OSCQueryValueContainer(ccNiceName);
+					childCC->saveAndLoadRecursiveData = true;
+					childCC->setCustomShortName(nv.name.toString());
+					childCC->editorIsCollapsed = true;
+				}
+				else
+				{
+					containersToDelete.removeAllInstancesOf(childCC);
+					childCC->setNiceName(ccNiceName);
+				}
+
+				updateContainerFromData(childCC, nv.value);
+
+				if (childCC->parentContainer != cc) cc->addChildControllableContainer(childCC, true);
+			}
+			else
+			{
+				Controllable* c = cc->getControllableByName(nv.name.toString());
+				if (c != nullptr) controllablesToDelete.removeAllInstancesOf(c);
+				createOrUpdateControllableFromData(cc, c, nv.name, nv.value, useAddressForNaming);
+			}
+		}
+	}
+
+	for (auto& cd : controllablesToDelete) cc->removeControllable(cd);
+	for (auto& ccd : containersToDelete) cc->removeChildControllableContainer(ccd);
+}
+
+void OSCQueryHelpers::createOrUpdateControllableFromData(ControllableContainer* parentCC, Controllable* sourceC, StringRef name, var data, bool useAddressForNaming)
+{
+	Controllable* c = sourceC;
+
+	String cNiceName;
+	if (!useAddressForNaming) cNiceName = data.getProperty("DESCRIPTION", "");
+	if (cNiceName.isEmpty()) cNiceName = name;
+
+	String type = data.getProperty("TYPE", "").toString();
+	var valRange = data.hasProperty("RANGE") ? data.getProperty("RANGE", var()) : var();
+	var val = data.getProperty("VALUE", var());
+	int access = data.getProperty("ACCESS", 3);
+
+	var value;
+	var range;
+
+	if (val.isArray()) value = val;
+	else value.append(val);
+	if (valRange.isArray()) range = valRange;
+	else range.append(valRange);
+
+	if (range.size() != value.size())
+	{
+		//DBG("Not the same : " << range.size() << " / " << value.size() << "\n" << data.toString());
+		//NLOGWARNING(niceName, "RANGE and VALUE fields don't have the same size, skipping : " << cNiceName);
+	}
+	var minVal;
+	var maxVal;
+	for (int i = 0; i < range.size(); ++i)
+	{
+		minVal.append(range[i].getProperty("MIN", INT32_MIN));
+		maxVal.append(range[i].getProperty("MAX", INT32_MAX));
+	}
+
+	Controllable::Type targetType = Controllable::Type::CUSTOM;
+
+	if (type == "N" || type == "I") targetType = Controllable::TRIGGER;
+	else if (type == "i" || type == "h") targetType = Controllable::INT;
+	else if (type == "f" || type == "d") targetType = Controllable::FLOAT;
+	else if (type == "ii" || type == "ff" || type == "hh" || type == "dd") targetType = Controllable::POINT2D;
+	else if (type == "iii" || type == "fff" || type == "hhh" || type == "ddd") targetType = Controllable::POINT3D;
+	else if (type == "ffff" || type == "dddd" || type == "iiii" || type == "hhhh" || type == "r") targetType = Controllable::COLOR;
+	else if (type == "s" || type == "S" || type == "c")
+	{
+		if (range[0].isObject()) targetType = Controllable::ENUM;
+		else targetType = Controllable::STRING;
+	}
+	else if (type == "T" || type == "F") targetType = Controllable::BOOL;
+
+
+	if (c != nullptr && targetType != c->type)
+	{
+		parentCC->removeControllable(c);
+		c = nullptr;
+	}
+
+	bool addToContainer = c == nullptr;
+
+	switch (targetType)
+	{
+	case Controllable::TRIGGER:
+	{
+		if (c == nullptr) c = new Trigger(cNiceName, cNiceName);
+	}
+	break;
+
+	case Controllable::INT:
+	{
+		if (c == nullptr) c = new IntParameter(cNiceName, cNiceName, value[0], minVal[0], maxVal[0]);
+		else
+		{
+			((Parameter*)c)->setValue(value[0]);
+			((Parameter*)c)->setRange(minVal[0], maxVal[0]);
+		}
+	}
+	break;
+
+	case Controllable::FLOAT:
+	{
+		if (c == nullptr) c = new FloatParameter(cNiceName, cNiceName, value[0], minVal[0], maxVal[0]);
+		else
+		{
+			((Parameter*)c)->setValue(value[0]);
+			((Parameter*)c)->setRange(minVal[0], maxVal[0]);
+		}
+	}
+	break;
+
+	case Controllable::POINT2D:
+	{
+		if (value.isVoid()) for (int i = 0; i < 2; ++i) value.append(0);
+		if (c == nullptr) c = new Point2DParameter(cNiceName, cNiceName);
+		if (value.size() >= 2) ((Point2DParameter*)c)->setValue(value);
+		if (range.size() >= 2) ((Point2DParameter*)c)->setRange(minVal, maxVal);
+	}
+	break;
+
+	case Controllable::POINT3D:
+	{
+		if (value.isVoid()) for (int i = 0; i < 3; ++i) value.append(0);
+		if (c == nullptr) c = new Point3DParameter(cNiceName, cNiceName);
+		if (value.size() >= 3) ((Point3DParameter*)c)->setValue(value);
+		if (range.size() >= 3) ((Point3DParameter*)c)->setRange(minVal, maxVal);
+	}
+	break;
+
+	case Controllable::COLOR:
+	{
+		Colour col = Colours::black;
+		if (type == "ffff" || type == "dddd") col = value.size() >= 4 ? Colour::fromFloatRGBA(value[0], value[1], value[2], value[3]) : Colours::black;
+		else if (type == "iiii" || type == "hhhh") col = value.size() >= 4 ? Colour::fromRGBA((int)value[0], (int)value[1], (int)value[2], (int)value[3]) : Colours::black;
+		else if (type == "r") col = Colour::fromString(value[0].toString());
+
+		if (c == nullptr)  c = new ColorParameter(cNiceName, cNiceName, col);
+		else ((ColorParameter*)c)->setColor(col);
+	}
+	break;
+
+	case Controllable::STRING:
+	{
+		if (c == nullptr) c = new StringParameter(cNiceName, cNiceName, value[0]);
+		else ((StringParameter*)c)->setValue(value[0]);
+	}
+	break;
+
+	case Controllable::ENUM:
+	{
+		var options = range[0].getProperty("VALS", var());
+		if (options.isArray())
+		{
+			if (c == nullptr) c = new EnumParameter(cNiceName, cNiceName);
+			EnumParameter* ep = (EnumParameter*)c;
+			ep->clearOptions();
+			for (int i = 0; i < options.size(); ++i) ep->addOption(options[i], options[i], false);
+			ep->setValueWithKey(value[0]);
+		}
+	}
+	break;
+
+	case Controllable::BOOL:
+	{
+		if (c == nullptr) c = new BoolParameter(cNiceName, cNiceName, value[0]);
+		else ((BoolParameter*)c)->setValue(value[0]);
+	}
+	break;
+	default:
+		break;
+	}
+
+	if (c != nullptr)
+	{
+		c->setNiceName(cNiceName);
+		c->setCustomShortName(name);
+		if (access == 1) c->setControllableFeedbackOnly(true);
+		if (addToContainer) parentCC->addControllable(c);
+	}
+
+}
+
+
+OSCQueryHelpers::OSCQueryValueContainer::OSCQueryValueContainer(const String& name) :
+	ControllableContainer(name)
+{
+	enableListen = addBoolParameter("Listen", "This will activate listening to this container", false);
+	enableListen->hideInEditor = true;
+
+	syncContent = addBoolParameter("Sync", "This will activate syncing on this container", true);
+	syncContent->hideInEditor = true;
+}
+
+OSCQueryHelpers::OSCQueryValueContainer::~OSCQueryValueContainer()
+{
+}
+
+InspectableEditor* OSCQueryHelpers::OSCQueryValueContainer::getEditorInternal(bool isRoot, Array<Inspectable*> inspectables)
+{
+	return new OSCQueryValueContainerEditor(this, isRoot);
+}
+
+
+OSCQueryHelpers::OSCQueryValueContainerEditor::OSCQueryValueContainerEditor(OSCQueryValueContainer* cc, bool isRoot) :
+	GenericControllableContainerEditor(cc, isRoot)
+{
+	enableListenUI.reset(cc->enableListen->createToggle());
+	addAndMakeVisible(enableListenUI.get());
+
+	syncUI.reset(cc->syncContent->createToggle());
+	addAndMakeVisible(syncUI.get());
+}
+
+OSCQueryHelpers::OSCQueryValueContainerEditor::~OSCQueryValueContainerEditor()
+{
+}
+
+void OSCQueryHelpers::OSCQueryValueContainerEditor::resizedInternalHeader(Rectangle<int>& r)
+{
+	GenericControllableContainerEditor::resizedInternalHeader(r);
+	enableListenUI->setVisible(container->controllables.size() > 1);
+	enableListenUI->setBounds(r.removeFromRight(60).reduced(3));
+	r.removeFromRight(16);
+	syncUI->setVisible(container->controllables.size() > 1);
+	syncUI->setBounds(r.removeFromRight(60).reduced(3));
 }

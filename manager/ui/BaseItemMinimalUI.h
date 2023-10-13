@@ -14,8 +14,8 @@ template<class T>
 class BaseItemMinimalUI :
 	public InspectableContentComponent,
 	public ContainerAsyncListener,
-	public DragAndDropContainer,
-	public DragAndDropTarget
+	public juce::DragAndDropContainer,
+	public juce::DragAndDropTarget
 {
 public:
 	BaseItemMinimalUI<T>(T* _item);
@@ -25,8 +25,8 @@ public:
 	BaseItem* baseItem;
 
 	//ui
-	Colour bgColor;
-	Colour selectedColor;
+	juce::Colour bgColor;
+	juce::Colour selectedColor;
 
 	bool syncWithItemSize;
 
@@ -44,30 +44,30 @@ public:
 	bool drawEmptyDragIcon;
 
 	//dropping
-	StringArray acceptedDropTypes;
+	juce::StringArray acceptedDropTypes;
 	bool isDraggingOver;
 	bool highlightOnDragOver;
 
 
 	void setHighlightOnMouseOver(bool highlight);
-	void paint(Graphics& g) override;
+	void paint(juce::Graphics& g) override;
 	void setViewZoom(float value);
 	void setViewCheckerSize(float value);
 
 	void setViewSize(float x, float y);
-	void setViewSize(Point<float> size);
+	void setViewSize(juce::Point<float> size);
 
 	virtual void updateItemUISize();
 
-	virtual void mouseDown(const MouseEvent& e) override;
-	virtual void mouseDrag(const MouseEvent& e) override;
-	virtual void mouseExit(const MouseEvent& e) override;
+	virtual void mouseDown(const juce::MouseEvent& e) override;
+	virtual void mouseDrag(const juce::MouseEvent& e) override;
+	virtual void mouseExit(const juce::MouseEvent& e) override;
 
 	virtual bool isUsingMouseWheel();
 
 	virtual void selectToThis() override;
 
-	virtual void addContextMenuItems(PopupMenu& p) {}
+	virtual void addContextMenuItems(juce::PopupMenu& p) {}
 	virtual void handleContextMenuResult(int result) {}
 
 	virtual void newMessage(const ContainerAsyncEvent& e) override;
@@ -77,9 +77,9 @@ public:
 	virtual void controllableStateUpdateInternal(Controllable*) {}
 
 	//Drag drop container
-	virtual bool canStartDrag(const MouseEvent& e);
-	virtual void dragOperationStarted(const DragAndDropTarget::SourceDetails&) override;
-	virtual void dragOperationEnded(const DragAndDropTarget::SourceDetails&) override;
+	virtual bool canStartDrag(const juce::MouseEvent& e);
+	virtual void dragOperationStarted(const juce::DragAndDropTarget::SourceDetails&) override;
+	virtual void dragOperationEnded(const juce::DragAndDropTarget::SourceDetails&) override;
 
 	//Drag drop target
 	virtual bool isInterestedInDragSource(const SourceDetails& dragSourceDetails) override;
@@ -87,7 +87,7 @@ public:
 	virtual void itemDragEnter(const SourceDetails&) override;
 	virtual void itemDragExit(const SourceDetails&) override;
 	virtual void itemDropped(const SourceDetails& dragSourceDetails) override; //to be overriden
-	virtual Point<int> getDragOffset();
+	virtual juce::Point<int> getDragOffset();
 
 	class ItemMinimalUIListener
 	{
@@ -96,14 +96,14 @@ public:
 
 		virtual void itemUIViewPositionChanged(BaseItemMinimalUI<T>*) {}
 
-		virtual void itemUIResizeDrag(BaseItemMinimalUI<T>*, const Point<int>& dragOffset) {}
+		virtual void itemUIResizeDrag(BaseItemMinimalUI<T>*, const juce::Point<int>& dragOffset) {}
 		virtual void itemUIResizeEnd(BaseItemMinimalUI<T>*) {}
 
 		virtual void askForSyncPosAndSize(BaseItemMinimalUI<T>*) {}
 		virtual void askSelectToThis(BaseItemMinimalUI<T>*) {}
 	};
 
-	ListenerList<ItemMinimalUIListener> itemMinimalUIListeners;
+	juce::ListenerList<ItemMinimalUIListener> itemMinimalUIListeners;
 	void addItemMinimalUIListener(ItemMinimalUIListener* newListener) { itemMinimalUIListeners.add(newListener); }
 	void removeItemMinimalUIListener(ItemMinimalUIListener* listener) { itemMinimalUIListeners.remove(listener); }
 };
@@ -156,14 +156,14 @@ void BaseItemMinimalUI<T>::setHighlightOnMouseOver(bool highlight)
 }
 
 template<class T>
-void BaseItemMinimalUI<T>::paint(Graphics& g)
+void BaseItemMinimalUI<T>::paint(juce::Graphics& g)
 {
 	if (inspectable.wasObjectDeleted()) return;
 
 	juce::Rectangle<float> r = this->getMainBounds().toFloat();
 	bool isItemEnabled = baseItem->canBeDisabled ? baseItem->enabled->boolValue() : true;
 
-	Colour c = (fillColorOnSelected && baseItem->isSelected) ? selectedColor : bgColor;
+	juce::Colour c = (fillColorOnSelected && baseItem->isSelected) ? selectedColor : bgColor;
 	if (isItemEnabled) c = c.darker(.3f);
 	if (highlightOnMouseOver && isMouseOverOrDragging(true)) c = c.brighter(.1f);
 	g.setColour(c);
@@ -197,7 +197,7 @@ void BaseItemMinimalUI<T>::setViewSize(float x, float y)
 }
 
 template<class T>
-void BaseItemMinimalUI<T>::setViewSize(Point<float> size)
+void BaseItemMinimalUI<T>::setViewSize(juce::Point<float> size)
 {
 	setSize(size.x * viewCheckerSize, size.y * viewCheckerSize);
 }
@@ -209,24 +209,26 @@ void BaseItemMinimalUI<T>::updateItemUISize()
 }
 
 template<class T>
-void BaseItemMinimalUI<T>::mouseDown(const MouseEvent& e)
+void BaseItemMinimalUI<T>::mouseDown(const juce::MouseEvent& e)
 {
 	InspectableContentComponent::mouseDown(e);
 
 	if (e.mods.isRightButtonDown())
 	{
-		PopupMenu p;
-		addContextMenuItems(p);
+		if (getMainBounds().contains(e.getPosition()))
+		{
 
-		if (p.getNumItems() == 0) return;
+			juce::PopupMenu p;
+				addContextMenuItems(p);
 
-		p.showMenuAsync(PopupMenu::Options(), [this](int result)
-			{
-				if (result > 0) handleContextMenuResult(result);
-			}
-		);
+				if (p.getNumItems() == 0) return;
 
-
+				p.showMenuAsync(juce::PopupMenu::Options(), [this](int result)
+					{
+						if (result > 0) handleContextMenuResult(result);
+					}
+			);
+		}
 	}
 	else
 	{
@@ -237,7 +239,7 @@ void BaseItemMinimalUI<T>::mouseDown(const MouseEvent& e)
 
 
 template<class T>
-void BaseItemMinimalUI<T>::mouseDrag(const MouseEvent& e)
+void BaseItemMinimalUI<T>::mouseDrag(const juce::MouseEvent& e)
 {
 	InspectableContentComponent::mouseDrag(e);
 
@@ -248,21 +250,21 @@ void BaseItemMinimalUI<T>::mouseDrag(const MouseEvent& e)
 
 		if (e.getDistanceFromDragStart() > dragStartDistance)
 		{
-			Point<int> offset = getDragOffset();
+			juce::Point<int> offset = getDragOffset();
 
-			var desc = var(new DynamicObject());
+			juce::var desc = juce::var(new juce::DynamicObject());
 			desc.getDynamicObject()->setProperty("type", baseItem->getTypeString());
-			desc.getDynamicObject()->setProperty("dataType", baseItem->itemDataType.isNotEmpty()?baseItem->itemDataType:baseItem->getTypeString());
+			desc.getDynamicObject()->setProperty("dataType", baseItem->itemDataType.isNotEmpty() ? baseItem->itemDataType : baseItem->getTypeString());
 			desc.getDynamicObject()->setProperty("initX", baseItem->viewUIPosition->x);
 			desc.getDynamicObject()->setProperty("initY", baseItem->viewUIPosition->y);
 			desc.getDynamicObject()->setProperty("offsetX", offset.x);
 			desc.getDynamicObject()->setProperty("offsetY", offset.y);
 
-			Image dragImage = drawEmptyDragIcon ? Image(Image::PixelFormat::ARGB, 1, 1, true) : Image();// this->createComponentSnapshot(this->getLocalBounds()).convertedToFormat(Image::ARGB).rescaled(this->getWidth() * this->viewZoom, this->getHeight() * this->viewZoom);
+			juce::Image dragImage = drawEmptyDragIcon ? juce::Image(juce::Image::PixelFormat::ARGB, 1, 1, true) : juce::Image();// this->createComponentSnapshot(this->getLocalBounds()).convertedToFormat(Image::ARGB).rescaled(this->getWidth() * this->viewZoom, this->getHeight() * this->viewZoom);
 			//dragImage.multiplyAllAlphas(drawEmptyDragIcon ? 0 : .5f);
 
-			Point<int> imageOffset = -offset;
-			startDragging(desc, this, ScaledImage(dragImage), true, &imageOffset);
+			juce::Point<int> imageOffset = -offset;
+			startDragging(desc, this, juce::ScaledImage(dragImage), true, &imageOffset);
 		}
 	}
 }
@@ -270,7 +272,7 @@ void BaseItemMinimalUI<T>::mouseDrag(const MouseEvent& e)
 
 
 template<class T>
-void BaseItemMinimalUI<T>::mouseExit(const MouseEvent& e)
+void BaseItemMinimalUI<T>::mouseExit(const juce::MouseEvent& e)
 {
 	InspectableContentComponent::mouseExit(e);
 	repaint();
@@ -349,19 +351,19 @@ void BaseItemMinimalUI<T>::controllableFeedbackUpdateInternal(Controllable* c)
 }
 
 template<class T>
-bool BaseItemMinimalUI<T>::canStartDrag(const MouseEvent& e)
+bool BaseItemMinimalUI<T>::canStartDrag(const juce::MouseEvent& e)
 {
 	return e.eventComponent == this && !e.mods.isAltDown() && !e.mods.isCommandDown() && !e.mods.isShiftDown();
 }
 
 template<class T>
-void BaseItemMinimalUI<T>::dragOperationStarted(const DragAndDropTarget::SourceDetails&)
+void BaseItemMinimalUI<T>::dragOperationStarted(const juce::DragAndDropTarget::SourceDetails&)
 {
 	if (autoHideWhenDragging) setVisible(false);
 }
 
 template<class T>
-void BaseItemMinimalUI<T>::dragOperationEnded(const DragAndDropTarget::SourceDetails&)
+void BaseItemMinimalUI<T>::dragOperationEnded(const juce::DragAndDropTarget::SourceDetails&)
 {
 	if (autoHideWhenDragging) setVisible(true);
 }
@@ -397,7 +399,7 @@ void BaseItemMinimalUI<T>::itemDropped(const SourceDetails& dragSourceDetails)
 }
 
 template<class T>
-Point<int> BaseItemMinimalUI<T>::getDragOffset()
+juce::Point<int> BaseItemMinimalUI<T>::getDragOffset()
 {
 	return getMouseXYRelative() * viewZoom;
 }

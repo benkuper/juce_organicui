@@ -10,6 +10,7 @@
 
 
 #include "JuceHeader.h"
+#include "Controllable.h"
 
 const Array<String> Controllable::typeNames = {
 	"Custom",
@@ -23,6 +24,20 @@ const Array<String> Controllable::typeNames = {
 	Point3DParameter::getTypeStringStatic(),
 	TargetParameter::getTypeStringStatic(),
 	ColorParameter::getTypeStringStatic()
+};
+
+const Array<String> Controllable::remoteControlTypeNames = {
+	"?",
+	"N",
+	"f",
+	"i",
+	"T",
+	"s",
+	"s",
+	"ff",
+	"fff",
+	"s",
+	"r"
 };
 
 Controllable::Controllable(const Type& type, const String& niceName, const String& description, bool enabled) :
@@ -51,15 +66,15 @@ Controllable::Controllable(const Type& type, const String& niceName, const Strin
 	parentContainer(nullptr),
 	queuedNotifier(10)
 {
-	scriptObject.setMethod("isParameter", Controllable::checkIsParameterFromScript);
-	scriptObject.setMethod("getParent", Controllable::getParentFromScript);
-	scriptObject.setMethod("setName", Controllable::setNameFromScript);
-	scriptObject.setMethod("setAttribute", Controllable::setAttributeFromScript);
-	scriptObject.setMethod("getControlAddress", Controllable::getControlAddressFromScript);
-	scriptObject.setMethod("getScriptControlAdress", Controllable::getScriptControlAddressFromScript);
+	scriptObject.getDynamicObject()->setMethod("isParameter", Controllable::checkIsParameterFromScript);
+	scriptObject.getDynamicObject()->setMethod("getParent", Controllable::getParentFromScript);
+	scriptObject.getDynamicObject()->setMethod("setName", Controllable::setNameFromScript);
+	scriptObject.getDynamicObject()->setMethod("setAttribute", Controllable::setAttributeFromScript);
+	scriptObject.getDynamicObject()->setMethod("getControlAddress", Controllable::getControlAddressFromScript);
+	scriptObject.getDynamicObject()->setMethod("getScriptControlAdress", Controllable::getScriptControlAddressFromScript);
 
-	scriptObject.setMethod("getJSONData", ControllableContainer::getJSONDataFromScript);
-	scriptObject.setMethod("loadJSONData", ControllableContainer::loadJSONDataFromScript);
+	scriptObject.getDynamicObject()->setMethod("getJSONData", ControllableContainer::getJSONDataFromScript);
+	scriptObject.getDynamicObject()->setMethod("loadJSONData", ControllableContainer::loadJSONDataFromScript);
 
 	setEnabled(enabled);
 	setNiceName(niceName);
@@ -91,6 +106,7 @@ UndoableAction* Controllable::setUndoableNiceName(const String& newNiceName, boo
 void Controllable::setNiceName(const String& _niceName) {
 	if (niceName == _niceName) return;
 
+	String oldControlAddress = getControlAddress();
 	this->niceName = _niceName;
 	if (!hasCustomShortName) setAutoShortName();
 	else
@@ -98,6 +114,8 @@ void Controllable::setNiceName(const String& _niceName) {
 		listeners.call(&Listener::controllableNameChanged, this);
 		queuedNotifier.addMessage(new ControllableEvent(ControllableEvent::NAME_CHANGED, this));
 	}
+
+	if (OSCRemoteControl::getInstanceWithoutCreating() != nullptr && parentContainer != nullptr) OSCRemoteControl::getInstance()->sendPathNameChangedFeedback(oldControlAddress, getControlAddress());
 }
 
 void Controllable::setCustomShortName(const String& _shortName)
@@ -155,7 +173,7 @@ void Controllable::setParentContainer(ControllableContainer* container)
 void Controllable::updateControlAddress()
 {
 	this->controlAddress = getControlAddress();
-	this->liveScriptObjectIsDirty = true;
+	this->scriptObjectIsDirty = true;
 
 	if (Engine::mainEngine != nullptr && !Engine::mainEngine->isClearing)
 	{
@@ -169,10 +187,10 @@ void Controllable::remove(bool addToUndo)
 	listeners.call(&Controllable::Listener::askForRemoveControllable, this, addToUndo);
 }
 
-void Controllable::updateLiveScriptObjectInternal(DynamicObject* parent)
+void Controllable::updateScriptObjectInternal(var parent)
 {
-	liveScriptObject->setProperty("name", shortName);
-	liveScriptObject->setProperty("niceName", niceName);
+	scriptObject.getDynamicObject()->setProperty("name", shortName);
+	scriptObject.getDynamicObject()->setProperty("niceName", niceName);
 }
 
 bool Controllable::shouldBeSaved()
@@ -247,6 +265,32 @@ void Controllable::setupFromJSONData(var data)
 	{
 		if (data.hasProperty(a)) setAttribute(a, data.getDynamicObject()->getProperty(a));
 	}
+}
+
+var Controllable::getRemoteControlData()
+{
+	var data(new DynamicObject());
+
+	data.getDynamicObject()->setProperty("DESCRIPTION", niceName);
+	data.getDynamicObject()->setProperty("FULL_PATH", getControlAddress());
+	data.getDynamicObject()->setProperty("ACCESS", isControllableFeedbackOnly ? 1 : 3);
+
+	String typeString = "";
+
+	typeString = remoteControlTypeNames[(int)type];
+	data.getDynamicObject()->setProperty("TYPE", typeString);
+
+	getRemoteControlDataInternal(data);
+
+	return data;
+}
+
+void Controllable::handleRemoteControlData(var data)
+{
+}
+
+void Controllable::handleRemoteControlData(const OSCMessage& m)
+{
 }
 
 String Controllable::getControlAddress(ControllableContainer* relativeTo)
@@ -407,13 +451,13 @@ var Controllable::setValueFromScript(const juce::var::NativeFunctionArgs& a) {
 					TargetParameter* tp = (TargetParameter*)c;
 					if (tp->targetType == TargetParameter::CONTROLLABLE)
 					{
-						Controllable* target = static_cast<Controllable*>((Controllable*)(int64)value.getDynamicObject()->getProperty(scriptPtrIdentifier));
+						Controllable* target = static_cast<Controllable*>((Controllable*)(juce::int64)value.getDynamicObject()->getProperty(scriptPtrIdentifier));
 						if (target != nullptr) tp->setTarget(target);
 						else LOGWARNING("Set target from script, Target not found");
 					}
 					else
 					{
-						ControllableContainer* target = static_cast<ControllableContainer*>((ControllableContainer*)(int64)value.getDynamicObject()->getProperty(scriptPtrIdentifier));
+						ControllableContainer* target = static_cast<ControllableContainer*>((ControllableContainer*)(juce::int64)value.getDynamicObject()->getProperty(scriptPtrIdentifier));
 						if (target != nullptr) tp->setTarget(target);
 						else LOGWARNING("Set target from script, Target not found");
 					}
@@ -503,7 +547,7 @@ var Controllable::getControlAddressFromScript(const juce::var::NativeFunctionArg
 	{
 		if (DynamicObject* d = a.thisObject.getDynamicObject())
 		{
-			ref = dynamic_cast<ControllableContainer*>((ControllableContainer*)(int64)d->getProperty(scriptPtrIdentifier));
+			ref = dynamic_cast<ControllableContainer*>((ControllableContainer*)(juce::int64)d->getProperty(scriptPtrIdentifier));
 		}
 	}
 

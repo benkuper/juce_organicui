@@ -12,6 +12,7 @@
 
 FloatParameterLabelUI::FloatParameterLabelUI(Array<Parameter*> parameters) :
 	ParameterUI(parameters, PARAMETERUI_SLOW_TIMER),
+	floatParam((FloatParameter*)parameters[0]),
 	valueLabel(parameters[0]->niceName + "_ValueLabel"),
 	maxFontHeight(GlobalSettings::getInstance()->fontSize->floatValue()),
 	autoSize(false)
@@ -58,13 +59,15 @@ void FloatParameterLabelUI::setSuffix(const String& _suffix)
 	valueChanged(parameter->stringValue());
 }
 
-void FloatParameterLabelUI::updateLabelFromValue()
+void FloatParameterLabelUI::updateValueFromLabel()
 {
-	String s = valueLabel.getText();
-	double v = ParameterUI::textToValue(s.replace(",", "."));
-
-	if ((float)v == float(parameter->value)) valueLabel.setText(getValueString(v), dontSendNotification);
+	String s = valueLabel.getText().replace(",", ".");
+	double v = ParameterUI::textToValue(s);
 	parameter->setValue(v);
+
+	valueLabel.setText(getValueString(v), dontSendNotification);
+
+	LOG("Update value from label : " << s << " : " << parameter->doubleValue() << " / " << parameter->stringValue());
 }
 
 void FloatParameterLabelUI::updateTooltip()
@@ -114,7 +117,7 @@ void FloatParameterLabelUI::mouseDrag(const MouseEvent& e)
 		valueLabel.updateMouseCursor();
 	}
 
-	float sensitivity = 1;
+	double sensitivity = 1;
 	if (e.mods.isShiftDown()) sensitivity *= 10;
 	if (e.mods.isAltDown()) sensitivity /= 100;
 
@@ -134,7 +137,7 @@ void FloatParameterLabelUI::mouseUpInternal(const MouseEvent& e)
 
 	if (setUndoableValueOnMouseUp)
 	{
-		if (valueAtMouseDown != parameter->floatValue()) parameter->setUndoableValue(valueAtMouseDown, parameter->floatValue());
+		if (valueAtMouseDown != parameter->floatValue()) parameter->setUndoableValue(valueAtMouseDown, parameter->doubleValue());
 	}
 }
 
@@ -168,7 +171,7 @@ void FloatParameterLabelUI::updateUIParamsInternal()
 
 String FloatParameterLabelUI::getValueString(const var& val) const
 {
-	return val.isDouble() ? String(parameter->floatValue(), 3) : val.toString();
+	return val.isDouble() ? String((double)val, floatParam->stringDecimals) : val.toString();
 }
 
 void FloatParameterLabelUI::valueChanged(const var& v)
@@ -191,7 +194,7 @@ void FloatParameterLabelUI::editorShown(Label* label, TextEditor& t)
 
 void FloatParameterLabelUI::editorHidden(Label* label, TextEditor& ed)
 {
-	updateLabelFromValue();
+	updateValueFromLabel();
 	shouldRepaint = true;
 }
 
@@ -236,6 +239,7 @@ void TimeLabel::setShowStepsMode(bool stepsMode)
 void TimeLabel::editorShown(Label* label, TextEditor& t)
 {
 	if (parameter.wasObjectDeleted()) return;
+
 	t.selectAll(); //only select, no change
 }
 
@@ -256,11 +260,11 @@ void TimeLabel::labelTextChanged(Label*)
 	}
 	s = s.substring(prefix.length(), s.length() - suffix.length());
 
-	parameter->setValue(showStepsMode ? s.getFloatValue() / ((FloatParameter*)parameter.get())->unitSteps : StringUtil::timeStringToValue(s));
+	parameter->setValue(showStepsMode ? s.getDoubleValue() / ((FloatParameter*)parameter.get())->unitSteps : StringUtil::timeStringToValue(s));
 	shouldRepaint = true;
 }
 
-void TimeLabel::updateLabelFromValue()
+void TimeLabel::updateValueFromLabel()
 {
 	String s = valueLabel.getText();
 	double v = StringUtil::timeStringToValue(s);

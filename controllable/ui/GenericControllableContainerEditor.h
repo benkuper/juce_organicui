@@ -14,13 +14,13 @@
 class GenericControllableContainerEditor :
 	public InspectableEditor,
 	public ContainerAsyncListener,
-	public Button::Listener,
-	public ChangeListener,
-	public Label::Listener,
-	public DragAndDropContainer
+	public juce::Button::Listener,
+	public juce::ChangeListener,
+	public juce::Label::Listener,
+	public juce::DragAndDropContainer
 {
 public:
-	GenericControllableContainerEditor(Array<ControllableContainer*> containers, bool isRoot, bool buildAtCreation = true);
+	GenericControllableContainerEditor(juce::Array<ControllableContainer*> containers, bool isRoot, bool buildAtCreation = true);
 	virtual ~GenericControllableContainerEditor();
 
 
@@ -30,25 +30,25 @@ public:
 	bool isRebuilding; //to avoid constant resizing when rebuilding/adding items
 
 	bool prepareToAnimate;
-	ComponentAnimator collapseAnimator;
+	juce::ComponentAnimator collapseAnimator;
 
-	Colour contourColor;
-	Label containerLabel;
+	juce::Colour contourColor;
+	juce::Label containerLabel;
 
-	Array<ControllableContainer*> containers;
-	WeakReference<ControllableContainer> container;
-	OwnedArray<InspectableEditor> childEditors;
+	juce::Array<ControllableContainer*> containers;
+	juce::WeakReference<ControllableContainer> container;
+	juce::OwnedArray<InspectableEditor> childEditors;
 
-	std::unique_ptr<ImageButton> expandBT;
-	std::unique_ptr<ImageButton> collapseBT;
-	std::unique_ptr<ImageButton> addBT;
+	std::unique_ptr<juce::ImageButton> expandBT;
+	std::unique_ptr<juce::ImageButton> collapseBT;
+	std::unique_ptr<juce::ImageButton> addBT;
 	std::unique_ptr<WarningTargetUI> warningUI;
-	std::unique_ptr<ImageButton> removeBT;
+	std::unique_ptr<juce::ImageButton> removeBT;
 
 	std::function<InspectableEditor* (ControllableContainer* parent, Controllable* c)> customCreateEditorForControllableFunc;
 	std::function<InspectableEditor* (ControllableContainer* parent, ControllableContainer* cc)> customCreateEditorForContainerFunc;
 
-	Rectangle<int> dragRect;
+	juce::Rectangle<int> dragRect;
 
 	bool dragAndDropEnabled;
 
@@ -57,7 +57,7 @@ public:
 	virtual void resetAndBuild();
 
 
-	void paint(Graphics& g) override;
+	void paint(juce::Graphics& g) override;
 	void resized() override;
 	virtual void resizedInternal(juce::Rectangle<int>& r);
 	virtual void resizedInternalHeader(juce::Rectangle<int>& r);
@@ -65,16 +65,16 @@ public:
 
 	virtual void clear();
 
-	void mouseDown(const MouseEvent& e) override;
-	void mouseUp(const MouseEvent& e) override;
-	void mouseDrag(const MouseEvent& e) override;
-	virtual void setDragDetails(var&) {}
+	void mouseDown(const juce::MouseEvent& e) override;
+	void mouseUp(const juce::MouseEvent& e) override;
+	void mouseDrag(const juce::MouseEvent& e) override;
+	virtual void setDragDetails(juce::var&) {}
 
 	virtual void setDragAndDropEnabled(bool value);
 
 
 	virtual void showContextMenu();
-	virtual void addPopupMenuItems(PopupMenu*) {} //for child classes
+	virtual void addPopupMenuItems(juce::PopupMenu*) {} //for child classes
 	virtual void handleMenuSelectedID(int) {} // to override
 
 
@@ -95,19 +95,19 @@ public:
 
 	InspectableEditor* getEditorForInspectable(Inspectable* i);
 
-	virtual void buttonClicked(Button* b) override;
-	virtual void labelTextChanged(Label* l) override;
+	virtual void buttonClicked(juce::Button* b) override;
+	virtual void labelTextChanged(juce::Label* l) override;
 
-	virtual void componentVisibilityChanged(Component& c) override;
+	virtual void componentVisibilityChanged(juce::Component& c) override;
 
 	void newMessage(const ContainerAsyncEvent& p) override;
 	virtual void controllableFeedbackUpdate(Controllable*) {};
-	void childBoundsChanged(Component*) override;
+	void childBoundsChanged(juce::Component*) override;
 
 
 
 	// Inherited via ChangeListener
-	virtual void changeListenerCallback(ChangeBroadcaster* source) override;
+	virtual void changeListenerCallback(juce::ChangeBroadcaster* source) override;
 
 	class  ContainerEditorListener
 	{
@@ -117,7 +117,7 @@ public:
 		virtual void containerRebuilt(GenericControllableContainerEditor*) {}
 	};
 
-	ListenerList<ContainerEditorListener> containerEditorListeners;
+	juce::ListenerList<ContainerEditorListener> containerEditorListeners;
 	void addContainerEditorListener(ContainerEditorListener* newListener) { containerEditorListeners.add(newListener); }
 	void removeContainerEditorListener(ContainerEditorListener* listener) { containerEditorListeners.remove(listener); }
 };
@@ -127,10 +127,10 @@ class EnablingControllableContainerEditor :
 	public GenericControllableContainerEditor
 {
 public:
-	EnablingControllableContainerEditor(Array<EnablingControllableContainer*> cc, bool isRoot, bool buildAtCreation = true);
+	EnablingControllableContainerEditor(juce::Array<EnablingControllableContainer*> cc, bool isRoot, bool buildAtCreation = true);
 	~EnablingControllableContainerEditor() {}
 
-	Array<EnablingControllableContainer*> ioContainers;
+	juce::Array<EnablingControllableContainer*> ioContainers;
 	EnablingControllableContainer* ioContainer;
 	std::unique_ptr<BoolToggleUI> enabledUI;
 

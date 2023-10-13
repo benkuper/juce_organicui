@@ -20,14 +20,14 @@ public:
 
 	std::unique_ptr<ControllableEditor> controllableEditor;
 	
-	void paint(Graphics& g) override;
-	void resizedInternalHeaderItemInternal(Rectangle<int>& r) override;
+	void paint(juce::Graphics& g) override;
+	void resizedInternalHeaderItemInternal(juce::Rectangle<int>& r) override;
 	void resetAndBuild() override;
 
-	void mouseDown(const MouseEvent& e) override;
-	void mouseDrag(const MouseEvent &e) override;
+	void mouseDown(const juce::MouseEvent& e) override;
+	void mouseDrag(const juce::MouseEvent &e) override;
 
-	virtual void setDragDetails(var& details) override;
+	virtual void setDragDetails(juce::var& details) override;
 
-	void childBoundsChanged(Component* c) override;
+	void childBoundsChanged(juce::Component* c) override;
 };

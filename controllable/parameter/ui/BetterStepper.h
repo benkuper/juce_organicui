@@ -10,11 +10,11 @@
 
 #pragma once
 
-class BetterStepper : public Slider
+class BetterStepper : public juce::Slider
 {
 public:
-	BetterStepper(const String &tooltip);
+	BetterStepper(const juce::String &tooltip);
 	virtual ~BetterStepper();
 
-	virtual void setTooltip(const String &tooltip) override;
+	virtual void setTooltip(const juce::String &tooltip) override;
 };

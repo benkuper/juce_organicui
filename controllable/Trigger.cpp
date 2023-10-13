@@ -8,15 +8,14 @@
  ==============================================================================
  */
 
-
- //#include "JsHelpers.h"
+#include "JuceHeader.h"
 
 Trigger::Trigger(const String& niceName, const String& description, bool enabled) :
 	Controllable(TRIGGER, niceName, description, enabled),
 	isTriggering(false),
 	queuedNotifier(5)
 {
-	scriptObject.setMethod("trigger", Controllable::setValueFromScript);
+	scriptObject.getDynamicObject()->setMethod("trigger", Controllable::setValueFromScript);
 }
 
 TriggerButtonUI* Trigger::createButtonUI(Array<Trigger *> triggers)

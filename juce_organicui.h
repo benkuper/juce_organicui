@@ -79,7 +79,14 @@
 #include <juce_osc/juce_osc.h>
 #include <juce_cryptography/juce_cryptography.h>
 
-using namespace juce;
+#if ORGANICUI_USE_SERVUS
+#include "servus/servus.h"
+#endif
+
+#if ORGANICUI_USE_WEBSERVER
+#include <juce_simpleweb/juce_simpleweb.h>
+#endif
+
 
 #include "resources/BinaryData.h"
 

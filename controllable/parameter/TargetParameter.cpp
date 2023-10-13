@@ -10,6 +10,8 @@
 
 #include "JuceHeader.h"
 
+using namespace juce;
+
 TargetParameter::TargetParameter(const String& niceName, const String& description, const String& initialValue, WeakReference<ControllableContainer> rootReference, bool enabled) :
 	StringParameter(niceName, description, initialValue, enabled),
 	targetType(CONTROLLABLE),
@@ -35,7 +37,7 @@ TargetParameter::TargetParameter(const String& niceName, const String& descripti
 
 	setRootContainer(rootReference != nullptr ? rootReference : Engine::mainEngine);
 
-	scriptObject.setMethod("getTarget", TargetParameter::getTargetFromScript);
+	scriptObject.getDynamicObject()->setMethod("getTarget", TargetParameter::getTargetFromScript);
 
 	defaultValue = "";
 	argumentsDescription = "target";
@@ -53,9 +55,9 @@ TargetParameter::~TargetParameter()
 
 void TargetParameter::resetValue(bool silentSet)
 {
-	setGhostValue("");
 	if (targetType == CONTAINER) setTarget((ControllableContainer*)nullptr);
 	else setTarget((Controllable*)nullptr);
+	setGhostValue("");
 	setUndoableValue(value, "");
 
 	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::VALUE_CHANGED, this, getValue()));
@@ -66,10 +68,10 @@ void TargetParameter::setGhostValue(const String& ghostVal)
 {
 	if (ghostVal == ghostValue) return;
 	ghostValue = ghostVal;
-	if (ghostValue.isNotEmpty() && target == nullptr && targetContainer == nullptr)
-	{
-		setWarningMessage("Link is broken !");
-	}
+	//if (ghostValue.isNotEmpty() && target == nullptr && targetContainer == nullptr)
+	//{
+	//	setWarningMessage("Link is broken !");
+	//}
 
 }
 
@@ -173,6 +175,14 @@ var TargetParameter::getCroppedValue(var val)
 	return val.isString() ? val : "";
 }
 
+Controllable* TargetParameter::getTargetControllable() { return target.get(); }
+
+Trigger* TargetParameter::getTargetTrigger() { return dynamic_cast<Trigger*>(target.get()); }
+
+Parameter* TargetParameter::getTargetParameter() { return dynamic_cast<Parameter*>(target.get()); }
+
+ControllableContainer* TargetParameter::getTargetContainer() { return targetContainer.get(); }
+
 void TargetParameter::setTarget(WeakReference<Controllable> c)
 {
 	if (target != nullptr)
@@ -199,8 +209,12 @@ void TargetParameter::setTarget(WeakReference<Controllable> c)
 		if (value.toString().isNotEmpty()) setGhostValue(value.toString());
 		if (ghostValue.isNotEmpty())
 		{
-			setWarningMessage("Link is broken : " + ghostValue);
-			if (!Engine::mainEngine->isClearing && rootContainer != nullptr && !rootContainer.wasObjectDeleted()) rootContainer->addControllableContainerListener(this);
+			
+			if (!Engine::mainEngine->isClearing && rootContainer != nullptr && !rootContainer.wasObjectDeleted())
+			{
+				setWarningMessage("Link is broken : " + ghostValue);
+				rootContainer->addControllableContainerListener(this);
+			}
 		}
 		else clearWarning();
 	}
@@ -235,7 +249,10 @@ void TargetParameter::setTarget(WeakReference<ControllableContainer> cc)
 		if (ghostValue.isNotEmpty())
 		{
 			setWarningMessage("Link is broken : " + ghostValue);
-			if (!Engine::mainEngine->isClearing && rootContainer != nullptr && !rootContainer.wasObjectDeleted()) rootContainer->addControllableContainerListener(this);
+			if (!Engine::mainEngine->isClearing && rootContainer != nullptr && !rootContainer.wasObjectDeleted())
+			{
+				rootContainer->addControllableContainerListener(this);
+			}
 		}
 		else clearWarning();
 	}
@@ -349,7 +366,7 @@ bool TargetParameter::setAttributeInternal(String param, var attributeValue)
 	{
 		if (attributeValue.isObject())
 		{
-			ControllableContainer* cc = dynamic_cast<ControllableContainer*>((ControllableContainer*)(int64)attributeValue.getDynamicObject()->getProperty(scriptPtrIdentifier));
+			ControllableContainer* cc = dynamic_cast<ControllableContainer*>((ControllableContainer*)(juce::int64)attributeValue.getDynamicObject()->getProperty(scriptPtrIdentifier));
 			if (cc != nullptr) setRootContainer(cc);
 		}
 	}

@@ -404,7 +404,10 @@ void StepEasing::updateKeysInternal(bool stretch)
 
 float StepEasing::getValue(const float& weight)
 {
+	if(param->x == 0) return start.y;
 	int numSteps = ceil(length / param->x);
+	if(numSteps == 0 || start.y == end.y) return start.y;
+
 	int curStep = floor(weight * numSteps);
 	return jmap<float>(curStep, 0, numSteps, start.y, end.y);
 }

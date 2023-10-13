@@ -13,35 +13,39 @@ Author:  bkupe
 class Point3DParameter : public Parameter
 {
 public:
-	Point3DParameter(const String& niceName, const String& description, bool enabled = true);
+	Point3DParameter(const juce::String& niceName, const juce::String& description, bool enabled = true);
 	~Point3DParameter() {}
 
 	float x, y, z;
 	FloatParameter::UIType defaultUI;
+	int stringDecimals;
 
 
-	void setVector(Vector3D<float> value);
+	void setVector(juce::Vector3D<float> value);
 	void setVector(float x, float y, float z);
-	void setUndoableVector(Vector3D<float> oldVector, Vector3D<float> newVector);
-	void setUndoableVector(float oldX, float oldY, float oldZ, float newX, float newY, float newZ);
+	juce::UndoableAction* setUndoableVector(juce::Vector3D<float> oldVector, juce::Vector3D<float> newVector, bool onlyReturnAction = false);
+	juce::UndoableAction* setUndoableVector(float oldX, float oldY, float oldZ, float newX, float newY, float newZ, bool onlyReturnAction = false);
 	
-	void setValueInternal(var& _value) override;
+	void setValueInternal(juce::var& _value) override;
 	void setBounds(float _minX, float _minY, float _minZ, float _maxX, float _maxY, float _maxZ);
 
-	Vector3D<float> getVector();
-	virtual var getLerpValueTo(var targetValue, float weight) override;
-	virtual void setWeightedValue(Array<var> values, Array<float> weights) override;
+	juce::Vector3D<float> getVector();
+	virtual juce::var getLerpValueTo(juce::var targetValue, float weight) override;
+	virtual void setWeightedValue(juce::Array<juce::var> values, juce::Array<float> weights) override;
 
-	bool checkValueIsTheSame(var newValue, var oldValue) override;
+	bool checkValueIsTheSame(juce::var newValue, juce::var oldValue) override;
 
-	virtual StringArray getValuesNames() override;
+	virtual bool setAttributeInternal(juce::String name, juce::var val) override;
+	virtual juce::StringArray getValidAttributes() const override;
 
-	ControllableUI* createDefaultUI(Array<Controllable*> controllables = {}) override;
+	virtual juce::StringArray getValuesNames() override;
+
+	ControllableUI* createDefaultUI(juce::Array<Controllable*> controllables = {}) override;
 
 	static Point3DParameter* create() { return new Point3DParameter("New Point3D Parameter", ""); }
-	virtual String getTypeString() const override { return getTypeStringStatic(); }
-	static String getTypeStringStatic() { return "Point3D"; }
+	virtual juce::String getTypeString() const override { return getTypeStringStatic(); }
+	static juce::String getTypeStringStatic() { return "Point3D"; }
 
 protected:
-	var getCroppedValue(var originalValue) override;
+	juce::var getCroppedValue(juce::var originalValue) override;
 };

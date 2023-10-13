@@ -11,7 +11,7 @@
 
 #pragma once
 
-class GapGrabber : public Component
+class GapGrabber : public juce::Component
 {
 public:
 	enum Direction { HORIZONTAL, VERTICAL };
@@ -19,8 +19,8 @@ public:
 	GapGrabber(Direction _direction);
 	virtual ~GapGrabber();
 
-	void paint(Graphics & g) override;
-	void mouseDrag(const MouseEvent &e) override;
+	void paint(juce::Graphics & g) override;
+	void mouseDrag(const juce::MouseEvent &e) override;
 
 	Direction direction;
 
@@ -32,7 +32,7 @@ public:
 		virtual void grabberGrabUpdate(GapGrabber *, int relativeDist) = 0;
 	};
 
-	ListenerList<Listener> listeners;
+	juce::ListenerList<Listener> listeners;
 	void addGrabberListener(Listener* newListener) { listeners.add(newListener); }
 	void removeGrabberListener(Listener* listener) { listeners.remove(listener); }
 

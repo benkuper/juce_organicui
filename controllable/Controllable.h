@@ -22,16 +22,17 @@ class Controllable :
 {
 public:
 	enum Type { CUSTOM, TRIGGER, FLOAT, INT, BOOL, STRING, ENUM, POINT2D, POINT3D, TARGET, COLOR, TYPE_MAX };
-	static const Array<String> typeNames;
+	static const juce::Array<juce::String> typeNames;
+	static const juce::Array<juce::String> remoteControlTypeNames;
 
-	Controllable(const Type& type, const String& niceName, const String& description, bool enabled = true);
+	Controllable(const Type& type, const juce::String& niceName, const juce::String& description, bool enabled = true);
 	virtual ~Controllable();
 
 	Type type;
-	String niceName;
-	String shortName;
-	String description;
-	String argumentsDescription;
+	juce::String niceName;
+	juce::String shortName;
+	juce::String description;
+	juce::String argumentsDescription;
 
 	bool enabled;
 	bool canBeDisabledByUser;
@@ -40,7 +41,7 @@ public:
 	bool isControllableFeedbackOnly;
 	bool includeInScriptObject;
 
-	String controlAddress;
+	juce::String controlAddress;
 
 	//save & load
 	bool isSavable;
@@ -62,11 +63,11 @@ public:
 	//decide if this controllable's label will be added at the end
 
 
-	WeakReference<ControllableContainer> parentContainer;
+	juce::WeakReference<ControllableContainer> parentContainer;
 
-	UndoableAction* setUndoableNiceName(const String& _niceName, bool onlyReturnAction = false);
-	void setNiceName(const String& _niceName);
-	void setCustomShortName(const String& _shortName);
+	juce::UndoableAction* setUndoableNiceName(const juce::String& _niceName, bool onlyReturnAction = false);
+	void setNiceName(const juce::String& _niceName);
+	void setCustomShortName(const juce::String& _shortName);
 	void setAutoShortName();
 
 	virtual void setEnabled(bool value, bool silentSet = false, bool force = false);
@@ -85,52 +86,58 @@ public:
 
 	void remove(bool addToUndo = false); // called from external to make this object ask for remove
 
-	virtual void updateLiveScriptObjectInternal(DynamicObject* parent = nullptr) override;
+	virtual void updateScriptObjectInternal(juce::var parent = juce::var()) override;
 
 	virtual bool shouldBeSaved();
 
-	virtual var getJSONData(ControllableContainer* relativeTo = nullptr);
-	virtual var getJSONDataInternal() { return var(new DynamicObject()); } // to be overriden
-	virtual void loadJSONData(var data);
-	virtual void loadJSONDataInternal(var data) {} //to be overriden
+	virtual juce::var getJSONData(ControllableContainer* relativeTo = nullptr);
+	virtual juce::var getJSONDataInternal() { return juce::var(new juce::DynamicObject()); } // to be overriden
+	virtual void loadJSONData(juce::var data);
+	virtual void loadJSONDataInternal(juce::var data) {} //to be overriden
 
-	virtual void setupFromJSONData(var data);
+	virtual void setupFromJSONData(juce::var data);
 
-	String getControlAddress(ControllableContainer* relativeTo = nullptr);
+	//Remote control
+	virtual juce::var getRemoteControlData();
+	virtual void getRemoteControlDataInternal(juce::var&/*data*/) {}
+	virtual void handleRemoteControlData(juce::var data);
+	virtual void handleRemoteControlData(const juce::OSCMessage& m);
+
+	juce::String getControlAddress(ControllableContainer* relativeTo = nullptr);
 
 	// used for generating editor
-	virtual ControllableUI* createDefaultUI(Array<Controllable*> = {}) {
+	virtual ControllableUI* createDefaultUI(juce::Array<Controllable*> = {}) {
 		jassertfalse;
 		return nullptr;
 	}
 
 	virtual DashboardItem* createDashboardItem() override;
-	virtual String getDefaultDashboardLabel() const;
+	virtual juce::String getDefaultDashboardLabel() const;
 
-	virtual void setAttribute(String param, var value);
-	virtual bool setAttributeInternal(String param, var value);
-	virtual StringArray getValidAttributes() const;
+	virtual void setAttribute(juce::String param, juce::var value);
+	virtual bool setAttributeInternal(juce::String param, juce::var value);
+	virtual juce::StringArray getValidAttributes() const;
 
-	static var setValueFromScript(const juce::var::NativeFunctionArgs& a);
-	static var checkIsParameterFromScript(const juce::var::NativeFunctionArgs& a);
-	static var getParentFromScript(const juce::var::NativeFunctionArgs& a);
-	static var setNameFromScript(const juce::var::NativeFunctionArgs& a);
-	static var setAttributeFromScript(const juce::var::NativeFunctionArgs& a);
+	static juce::var setValueFromScript(const juce::var::NativeFunctionArgs& a);
+	static juce::var checkIsParameterFromScript(const juce::var::NativeFunctionArgs& a);
+	static juce::var getParentFromScript(const juce::var::NativeFunctionArgs& a);
+	static juce::var setNameFromScript(const juce::var::NativeFunctionArgs& a);
+	static juce::var setAttributeFromScript(const juce::var::NativeFunctionArgs& a);
 
-	static var getControlAddressFromScript(const juce::var::NativeFunctionArgs& a);
-	static var getScriptControlAddressFromScript(const juce::var::NativeFunctionArgs& a);
+	static juce::var getControlAddressFromScript(const juce::var::NativeFunctionArgs& a);
+	static juce::var getScriptControlAddressFromScript(const juce::var::NativeFunctionArgs& a);
 
-	static var getJSONDataFromScript(const var::NativeFunctionArgs& args);
-	static var loadJSONDataFromScript(const var::NativeFunctionArgs& args);
+	static juce::var getJSONDataFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var loadJSONDataFromScript(const juce::var::NativeFunctionArgs& args);
 
 
-	String getScriptTargetString() override;
+	juce::String getScriptTargetString() override;
 
-	virtual String getWarningTargetName() const override;
+	virtual juce::String getWarningTargetName() const override;
 
-	virtual InspectableEditor* getEditorInternal(bool isRoot, Array<Inspectable*> inspectables = Array<Inspectable*>()) override;
+	virtual InspectableEditor* getEditorInternal(bool isRoot, juce::Array<Inspectable*> inspectables = juce::Array<Inspectable*>()) override;
 	virtual ControllableDetectiveWatcher* getDetectiveWatcher();
-	virtual String getTypeString() const { jassert(false); return ""; } //should be overriden
+	virtual juce::String getTypeString() const { jassert(false); return ""; } //should be overriden
 
 
 	class  Listener
@@ -142,11 +149,11 @@ public:
 		virtual void controllableFeedbackStateChanged(Controllable*) {}
 		virtual void controllableControlAddressChanged(Controllable*) {}
 		virtual void controllableNameChanged(Controllable*) {}
-		virtual void controllableAttributeChanged(Controllable*, const String&) {}
+		virtual void controllableAttributeChanged(Controllable*, const juce::String&) {}
 		virtual void askForRemoveControllable(Controllable*, bool /*addToUndo*/ = false) {}
 	};
 
-	ListenerList<Listener> listeners;
+	juce::ListenerList<Listener> listeners;
 	void addControllableListener(Listener* newListener) { listeners.add(newListener); }
 	void removeControllableListener(Listener* listener) { listeners.remove(listener); }
 
@@ -172,13 +179,13 @@ public:
 
 
 private:
-	WeakReference<Controllable>::Master masterReference;
-	friend class WeakReference<Controllable>;
+	juce::WeakReference<Controllable>::Master masterReference;
+	friend class juce::WeakReference<Controllable>;
 
 
 public:
 	class ControllableAction :
-		public UndoableAction
+		public juce::UndoableAction
 	{
 	public:
 		ControllableAction(Controllable* c) :
@@ -187,8 +194,8 @@ public:
 			controlAddress = c->getControlAddress();
 		}
 
-		WeakReference<Controllable> controllableRef;
-		String controlAddress;
+		juce::WeakReference<Controllable> controllableRef;
+		juce::String controlAddress;
 
 		Controllable* getControllable();
 	};
@@ -197,15 +204,15 @@ public:
 		public ControllableAction
 	{
 	public:
-		ControllableChangeNameAction(Controllable* c, String oldName, String newName) :
+		ControllableChangeNameAction(Controllable* c, juce::String oldName, juce::String newName) :
 			ControllableAction(c),
 			oldName(oldName),
 			newName(newName)
 		{
 		}
 
-		String oldName;
-		String newName;
+		juce::String oldName;
+		juce::String newName;
 
 		bool perform() override;
 		bool undo() override;

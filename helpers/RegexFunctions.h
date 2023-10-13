@@ -8,11 +8,11 @@ class RegexFunctions
 {
 public:
     
-    static Array<StringArray> findSubstringsThatMatchWildcard(const String &regexWildCard, const String &stringToTest)
+    static juce::Array<juce::StringArray> findSubstringsThatMatchWildcard(const juce::String &regexWildCard, const juce::String &stringToTest)
     {
-        Array<StringArray> matches;
-        String remainingText = stringToTest;
-        StringArray m = getFirstMatch(regexWildCard, remainingText);
+        juce::Array<juce::StringArray> matches;
+        juce::String remainingText = stringToTest;
+        juce::StringArray m = getFirstMatch(regexWildCard, remainingText);
 
         while (m.size() != 0 && m[0].length() != 0)
         {
@@ -26,11 +26,11 @@ public:
 
     /** Searches a string and returns a StringArray with all matches. 
     *    You can specify and index of a capture group (if not, the entire match will be used). */
-    static StringArray search(const String& wildcard, const String &stringToTest, int indexInMatch=0)
+    static juce::StringArray search(const juce::String& wildcard, const juce::String &stringToTest, int indexInMatch=0)
     {
         try
         {
-            StringArray searchResults;
+            juce::StringArray searchResults;
 
             std::regex includeRegex(wildcard.toStdString());
             std::string xAsStd = stringToTest.toStdString();
@@ -41,10 +41,10 @@ public:
             {
                 std::smatch result = *it;
 
-                StringArray matches;
+                juce::StringArray matches;
                 for (auto x : result)
                 {
-                    matches.add(String(x));
+                    matches.add(juce::String(x));
                 }
 
                 if (indexInMatch < matches.size()) searchResults.add(matches[indexInMatch]);
@@ -57,12 +57,12 @@ public:
         catch (std::regex_error e)
         {
             DBG(e.what());
-            return StringArray();
+            return juce::StringArray();
         }
     }
 
     /** Returns the first match of the given wildcard in the test string. The first entry will be the whole match, followed by capture groups. */
-    static StringArray getFirstMatch(const String &wildcard, const String &stringToTest)
+    static juce::StringArray getFirstMatch(const juce::String &wildcard, const juce::String &stringToTest)
     {
         try
         {
@@ -73,29 +73,29 @@ public:
 
             if (std::regex_search(s, match, reg))
             {
-                StringArray sa;
+                juce::StringArray sa;
 
                 for (auto x:match)
                 {
-                    sa.add(String(x));
+                    sa.add(juce::String(x));
                 }
                 
                 return sa;
             }
             
-            return StringArray();
+            return juce::StringArray();
         }
         catch (std::regex_error e)
         {
             jassertfalse;
 
             DBG(e.what());
-            return StringArray();
+            return juce::StringArray();
         }
     }
     
     /** Checks if the given string matches the regex wildcard. */
-    static bool matchesWildcard(const String &wildcard, const String &stringToTest)
+    static bool matchesWildcard(const juce::String &wildcard, const juce::String &stringToTest)
     {        
         try
         {

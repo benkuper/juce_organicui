@@ -25,7 +25,7 @@ public:
 	FloatParameter* bgImageAlpha;
 
 	void clear() override;
-	void fillServerData(var & data);
+	void fillServerData(juce::var & data);
 
 	void onContainerParameterChanged(Parameter* p) override;
 };

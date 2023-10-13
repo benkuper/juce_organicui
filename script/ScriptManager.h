@@ -19,12 +19,12 @@ public:
 	~ScriptManager();
 
 	ScriptTarget * parentTarget;
-	String scriptTemplate;
+	juce::String scriptTemplate;
 
 	Script * createItem() override;
 
-	virtual InspectableEditor * getEditorInternal(bool isRoot, Array<Inspectable*> inspectables = Array<Inspectable*>()) override;
+	virtual InspectableEditor * getEditorInternal(bool isRoot, juce::Array<Inspectable*> inspectables = juce::Array<Inspectable*>()) override;
 
-	bool callFunctionOnAllItems(const Identifier &function, var a = var());
-	bool callFunctionOnAllItems(const Identifier &function, Array<var> args);
+	bool callFunctionOnAllItems(const juce::Identifier &function, juce::var a = juce::var());
+	bool callFunctionOnAllItems(const juce::Identifier &function, juce::Array<juce::var> args);
 };
