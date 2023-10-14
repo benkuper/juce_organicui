@@ -33,6 +33,8 @@ public:
     juce::String prefix;
     juce::String suffix;
 
+    float customScaleFactor = 1;
+
     //interaction
     float initValue;
     float initNormalizedValue;
