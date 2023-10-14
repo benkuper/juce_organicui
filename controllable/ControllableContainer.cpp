@@ -515,8 +515,10 @@ void ControllableContainer::removeChildControllableContainer(ControllableContain
 		controllableContainerListeners.call(&ControllableContainerListener::controllableContainerRemoved, container);
 		queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableContainerRemoved, this, container));
 
+#if ORGANICUI_USE_WEBSERVER
 		if (OSCRemoteControl::getInstanceWithoutCreating() != nullptr && parentContainer != nullptr) OSCRemoteControl::getInstance()->sendPathRemovedFeedback(container->getControlAddress());
-
+#endif
+		
 		notifyStructureChanged();
 		container->setParentContainer(nullptr);
 	}
