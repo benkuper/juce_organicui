@@ -164,7 +164,7 @@ public:
 
 	//SCRIPT
 	virtual void updateScriptObjectInternal(juce::var parent = juce::var()) override;
-	static juce::var getChildFromScript(const var::NativeFunctionArgs &a);
+	static juce::var getChildFromScript(const juce::var::NativeFunctionArgs &a);
 	static juce::var getParentFromScript(const juce::var::NativeFunctionArgs& a);
 	static juce::var setNameFromScript(const juce::var::NativeFunctionArgs& a);
 	static juce::var setCollapsedFromScript(const juce::var::NativeFunctionArgs& a);
