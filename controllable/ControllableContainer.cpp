@@ -46,6 +46,7 @@ ControllableContainer::ControllableContainer(const String& niceName) :
 	scriptObject.getDynamicObject()->setMethod("getParent", ControllableContainer::getParentFromScript);
 	scriptObject.getDynamicObject()->setMethod("setName", ControllableContainer::setNameFromScript);
 	scriptObject.getDynamicObject()->setMethod("setCollapsed", ControllableContainer::setCollapsedFromScript);
+	scriptObject.getDynamicObject()->setMethod("select", ControllableContainer::selectFromScript);
 
 	scriptObject.getDynamicObject()->setMethod("addTrigger", ControllableContainer::addTriggerFromScript);
 	scriptObject.getDynamicObject()->setMethod("addBoolParameter", ControllableContainer::addBoolParameterFromScript);
@@ -154,7 +155,9 @@ Controllable* ControllableContainer::addControllable(Controllable* c, int index)
 	c->addAsyncWarningTargetListener(this);
 	c->warningResolveInspectable = this;
 
+#if ORGANICUI_USE_WEBSERVER
 	if (OSCRemoteControl::getInstanceWithoutCreating() != nullptr && parentContainer != nullptr) OSCRemoteControl::getInstance()->sendPathAddedFeedback(c->getControlAddress());
+#endif
 
 	return c;
 }
@@ -306,7 +309,10 @@ void ControllableContainer::removeControllable(WeakReference<Controllable> c, bo
 
 	controllableContainerListeners.call(&ControllableContainerListener::controllableRemoved, c);
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableRemoved, this, c));
+
+#if ORGANICUI_USE_WEBSERVER
 	if (OSCRemoteControl::getInstanceWithoutCreating() != nullptr && parentContainer != nullptr) OSCRemoteControl::getInstance()->sendPathRemovedFeedback(c->getControlAddress());
+#endif
 
 	if (c != nullptr)
 	{
@@ -391,7 +397,10 @@ void ControllableContainer::setNiceName(const String& _niceName)
 	scriptObjectIsDirty = true;
 	controllableContainerListeners.call(&ControllableContainerListener::controllableContainerNameChanged, this);
 
+#if ORGANICUI_USE_WEBSERVER
 	if (OSCRemoteControl::getInstanceWithoutCreating() != nullptr && parentContainer != nullptr) OSCRemoteControl::getInstance()->sendPathNameChangedFeedback(oldControlAddress, getControlAddress());
+#endif
+
 
 	onContainerNiceNameChanged();
 }
@@ -469,7 +478,9 @@ void ControllableContainer::addChildControllableContainer(ControllableContainer*
 	controllableContainerListeners.call(&ControllableContainerListener::controllableContainerAdded, container);
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableContainerAdded, this, container));
 
+#if ORGANICUI_USE_WEBSERVER
 	if (OSCRemoteControl::getInstanceWithoutCreating() != nullptr && parentContainer != nullptr) OSCRemoteControl::getInstance()->sendPathAddedFeedback(container->getControlAddress());
+#endif
 
 	if (notify) notifyStructureChanged();
 }
@@ -1242,6 +1253,14 @@ var ControllableContainer::setCollapsedFromScript(const juce::var::NativeFunctio
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(a);
 	cc->editorIsCollapsed = (int)a.arguments[0] > 0;
 	cc->queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableContainerCollapsedChanged, cc));
+	return var();
+}
+
+var ControllableContainer::selectFromScript(const juce::var::NativeFunctionArgs& a)
+{
+	if (a.numArguments == 0) return var();
+	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(a);
+	cc->selectThis();
 	return var();
 }
 
