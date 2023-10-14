@@ -60,14 +60,12 @@ public:
 class OSCQueryHelpers
 {
 public:
-	static void updateContainerFromData(ControllableContainer* cc, juce::var data, bool useAddressForNaming = false);
-	static void createOrUpdateControllableFromData(ControllableContainer* parentCC, Controllable* c, juce::StringRef name, juce::var data, bool useAddresForNaming = false);
 
 	class OSCQueryValueContainer :
-		public ControllableContainer
+		public EnablingControllableContainer
 	{
 	public:
-		OSCQueryValueContainer(const juce::String& name);
+		OSCQueryValueContainer(const juce::String& name, bool canListen = true, bool canSync = true);
 		~OSCQueryValueContainer();
 
 		BoolParameter* enableListen;
@@ -76,8 +74,14 @@ public:
 		InspectableEditor* getEditorInternal(bool isRoot, juce::Array<Inspectable*> inspectables = juce::Array<Inspectable*>()) override;
 	};
 
+	static void updateContainerFromData(ControllableContainer* cc, juce::var data, bool useAddressForNaming = false, std::function<OSCQueryValueContainer* (const juce::String& name)> createContainerFunc = nullptr);
+	
+	static void createOrUpdateControllableFromData(ControllableContainer* parentCC, Controllable* c, juce::StringRef name, juce::var data, bool useAddresForNaming = false);
+
+
+
 	class OSCQueryValueContainerEditor :
-		public GenericControllableContainerEditor
+		public EnablingControllableContainerEditor
 	{
 	public:
 		OSCQueryValueContainerEditor(OSCQueryValueContainer* cc, bool isRoot);
