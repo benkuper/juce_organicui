@@ -163,12 +163,12 @@ public:
 	juce::String getUniqueNameInContainer(const juce::String &sourceName, bool searchNiceName = true, int suffix = 0);
 
 	//SCRIPT
-	virtual void updateScriptObjectInternal(var parent = var()) override;
-	static var getChildFromScript(const var::NativeFunctionArgs &a);
-	static var getParentFromScript(const juce::var::NativeFunctionArgs& a);
-	static var setNameFromScript(const juce::var::NativeFunctionArgs& a);
-	static var setCollapsedFromScript(const juce::var::NativeFunctionArgs& a);
-	static var selectFromScript(const juce::var::NativeFunctionArgs& a);
+	virtual void updateScriptObjectInternal(juce::var parent = juce::var()) override;
+	static juce::var getChildFromScript(const var::NativeFunctionArgs &a);
+	static juce::var getParentFromScript(const juce::var::NativeFunctionArgs& a);
+	static juce::var setNameFromScript(const juce::var::NativeFunctionArgs& a);
+	static juce::var setCollapsedFromScript(const juce::var::NativeFunctionArgs& a);
+	static juce::var selectFromScript(const juce::var::NativeFunctionArgs& a);
 	
 	static juce::var addTriggerFromScript(const juce::var::NativeFunctionArgs &args);
 	static juce::var addBoolParameterFromScript(const juce::var::NativeFunctionArgs &args);
