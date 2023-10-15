@@ -482,6 +482,8 @@ T* BaseManager<T>::addItem(T* item, const juce::Point<float> initialPosition, bo
 template<class T>
 juce::Array<T*> BaseManager<T>::addItems(juce::Array<T*> itemsToAdd, juce::var data, bool addToUndo)
 {
+	bool curIsLoadingData = isCurrentlyLoadingData;
+	bool curIsManipulatingMultipleItems = isManipulatingMultipleItems;
 
 	isCurrentlyLoadingData = true;
 	isManipulatingMultipleItems = true;
@@ -490,11 +492,10 @@ juce::Array<T*> BaseManager<T>::addItems(juce::Array<T*> itemsToAdd, juce::var d
 	{
 		AddItemsAction* a = new AddItemsAction(this, itemsToAdd, data);
 		UndoMaster::getInstance()->performAction("Add " + juce::String(itemsToAdd.size()) + " items", a);
-		isCurrentlyLoadingData = false;
-		isManipulatingMultipleItems = false;
+		isCurrentlyLoadingData = curIsLoadingData;
+		isManipulatingMultipleItems = curIsManipulatingMultipleItems;
 		return itemsToAdd;
 	}
-
 
 	for (int i = 0; i < itemsToAdd.size(); ++i)
 	{
@@ -507,8 +508,8 @@ juce::Array<T*> BaseManager<T>::addItems(juce::Array<T*> itemsToAdd, juce::var d
 	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_ADDED, itemsToAdd));
 
 	reorderItems();
-	isCurrentlyLoadingData = false;
-	isManipulatingMultipleItems = false;
+	isCurrentlyLoadingData = curIsLoadingData;
+	isManipulatingMultipleItems = curIsManipulatingMultipleItems;
 
 	if (selectItemWhenCreated && !isCurrentlyLoadingData)
 	{
