@@ -787,6 +787,7 @@ void BaseManager<T>::clear()
 	isClearing = true;
 	//const ScopedLock lock(items.getLock());
 	while (items.size() > 0) removeItem(items[0], false);
+	isClearing = false;
 }
 
 template<class T>
