@@ -413,6 +413,8 @@ T* BaseManager<T>::addItem(T* item, juce::var data, bool addToUndo, bool notify)
 
 	jassert(items.indexOf(item) == -1); //be sure item is no here already
 	if (item == nullptr) item = createItem();
+	if (item == nullptr) return nullptr; //could not create here
+
 	BaseItem* bi = static_cast<BaseItem*>(item);
 
 	if (addToUndo && !UndoMaster::getInstance()->isPerforming)
@@ -1005,7 +1007,7 @@ juce::var BaseManager<T>::addItemFromScript(const juce::var::NativeFunctionArgs&
 	if (m->managerFactory == nullptr || m->managerFactory->defs.size() == 1)
 	{
 		T* item = m->addItem(nullptr, args.numArguments > 1 && args.arguments[1].isObject() ? args.arguments[1] : juce::var());
-		return item->getScriptObject();
+		if (item != nullptr) return item->getScriptObject();
 	}
 	else
 	{
@@ -1025,9 +1027,9 @@ juce::var BaseManager<T>::addItemFromScript(const juce::var::NativeFunctionArgs&
 			m->addItem(item, args.numArguments > 1 && args.arguments[1].isObject() ? args.arguments[1] : juce::var());
 			if (item != nullptr) return item->getScriptObject();
 		}
-
-		return juce::var();
 	}
+
+	return juce::var();
 }
 
 
