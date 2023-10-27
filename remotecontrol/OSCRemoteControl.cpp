@@ -16,6 +16,10 @@ juce_ImplementSingleton(OSCRemoteControl)
 #include "OSCRemoteControl.h"
 #endif
 
+#ifndef ORGANIC_REMOTE_CONTROL_PORT
+#define ORGANIC_REMOTE_CONTROL_PORT 42000
+#endif
+
 OSCRemoteControl::OSCRemoteControl() :
 	EnablingControllableContainer("OSC Remote Control")
 #if ORGANICUI_USE_SERVUS
@@ -34,7 +38,7 @@ OSCRemoteControl::OSCRemoteControl() :
 
 	enabled->setValue(false);
 
-	localPort = addIntParameter("Local Port", "Local port to connect to for global control over the application", OSC_REMOTE_CONTROL_PORT, 1, 65535);
+	localPort = addIntParameter("Local Port", "Local port to connect to for global control over the application", ORGANIC_REMOTE_CONTROL_PORT, 1, 65535);
 	logIncoming = addBoolParameter("Log Incoming", "If checked, this will log incoming messages", false);
 	logOutgoing = addBoolParameter("Log Outgoing", "If checked, this will log outgoing messages", false);
 
@@ -42,7 +46,7 @@ OSCRemoteControl::OSCRemoteControl() :
 	receiver.registerFormatErrorHandler(&OSCHelpers::logOSCFormatError);
 
 	manualAddress = manualSendCC.addStringParameter("Address", "Address to send to", "127.0.0.1");
-	manualPort = manualSendCC.addIntParameter("Port", "Port to send to", OSC_REMOTE_CONTROL_PORT + 1, 1, 65535);
+	manualPort = manualSendCC.addIntParameter("Port", "Port to send to", ORGANIC_REMOTE_CONTROL_PORT + 1, 1, 65535);
 
 	manualSendCC.enabled->setDefaultValue(false);
 	addChildControllableContainer(&manualSendCC);
@@ -347,10 +351,10 @@ void OSCRemoteControl::setupServer()
 
 bool OSCRemoteControl::handleHTTPRequest(std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request)
 {
-	var data;
-	if (String(request->query_string).contains("HOST_INFO"))
+	juce::var data;
+	if (juce::String(request->query_string).contains("HOST_INFO"))
 	{
-		var extensionData(new DynamicObject());
+		juce::var extensionData(new juce::DynamicObject());
 		extensionData.getDynamicObject()->setProperty("ACCESS", true);
 		extensionData.getDynamicObject()->setProperty("CLIPMODE", false);
 		extensionData.getDynamicObject()->setProperty("CRITICAL", false);
@@ -365,26 +369,33 @@ bool OSCRemoteControl::handleHTTPRequest(std::shared_ptr<HttpServer::Response> r
 		extensionData.getDynamicObject()->setProperty("PATH_RENAMED", true);
 		extensionData.getDynamicObject()->setProperty("PATH_CHANGED", false);
 
-		data = new DynamicObject();
+		data = new juce::DynamicObject();
 		data.getDynamicObject()->setProperty("EXTENSIONS", extensionData);
-		String s = String(ProjectInfo::projectName) + " - " + Engine::mainEngine->getDocumentTitle();
+		juce::String s = juce::String(ProjectInfo::projectName) + " - " + Engine::mainEngine->getDocumentTitle();
 		data.getDynamicObject()->setProperty("NAME", s);
 		data.getDynamicObject()->setProperty("OSC_PORT", localPort->intValue());
 		data.getDynamicObject()->setProperty("OSC_TRANSPORT", "UDP");
+
+		juce::var metaData(new juce::DynamicObject());
+		data.getDynamicObject()->setProperty("METADATA", metaData);
+		metaData.getDynamicObject()->setProperty("os", juce::SystemStats::getOperatingSystemName());
+		metaData.getDynamicObject()->setProperty("version", ProjectInfo::versionString);
+		metaData.getDynamicObject()->setProperty("versionNumber", ProjectInfo::versionNumber);
+		if (fillHostInfoMetaDataFunc != nullptr) fillHostInfoMetaDataFunc(metaData);
 	}
 	else
 	{
 		ControllableContainer* cc = Engine::mainEngine;
-		String addr = request->path;
+		juce::String addr = request->path;
 		if (addr.length() > 1) cc = Engine::mainEngine->getControllableContainerForAddress(addr, true, false, false);
 		if (cc != nullptr) data = cc->getRemoteControlData();
 	}
 
 
-	String dataStr = JSON::toString(data);
+	juce::String dataStr = juce::JSON::toString(data);
 
 	SimpleWeb::CaseInsensitiveMultimap header;
-	header.emplace("Content-Length", String(dataStr.length()).toStdString());
+	header.emplace("Content-Length", juce::String(dataStr.length()).toStdString());
 	header.emplace("Content-Type", "application/json");
 	header.emplace("Accept-range", "bytes");
 	header.emplace("Access-Control-Allow-Origin", "*");

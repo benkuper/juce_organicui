@@ -82,8 +82,11 @@ public:
 	juce::HashMap<juce::String, juce::Array<Controllable*>, juce::DefaultHashFunctions, juce::CriticalSection> feedbackMap;
 	juce::HashMap<Controllable*, juce::String> noFeedbackMap;
 
+	std::function<void(juce::var& metaData)> fillHostInfoMetaDataFunc;
+
 	void setupServer();
 	bool handleHTTPRequest(std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request) override;
+
 
 	void connectionOpened(const juce::String& id) override;
 	void messageReceived(const juce::String& id, const juce::String& message) override;
@@ -97,8 +100,6 @@ public:
 	void sendPathAddedFeedback(const juce::String& path);
 	void sendPathRemovedFeedback(const juce::String& path);
 	void sendPathNameChangedFeedback(const juce::String& oldPath, const juce::String& newPath);
-
-
 
 	void newMessage(const ContainerAsyncEvent& e) override;
 	void onControllableFeedbackUpdate(ControllableContainer* cc, Controllable* c) override;

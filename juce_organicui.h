@@ -66,10 +66,6 @@
 #define ORGANICUI_USE_WEBSERVER 0
 #endif
 
-#ifndef OSC_REMOTE_CONTROL_PORT
-#define OSC_REMOTE_CONTROL_PORT 42000
-#endif
-
 
 #include <juce_core/juce_core.h>
 #include <juce_events/juce_events.h>
