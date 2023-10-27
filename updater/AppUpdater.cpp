@@ -8,11 +8,10 @@
   ==============================================================================
 */
 
-
 juce_ImplementSingleton(AppUpdater)
 
-String getAppVersion();
-ApplicationProperties& getAppProperties();// { return *getApp().appProperties; }
+juce::String getAppVersion();
+juce::ApplicationProperties& getAppProperties();// { return *getApp().appProperties; }
 
 #define FORCE_UPDATE 0 //to test
 
@@ -44,13 +43,13 @@ String AppUpdater::getDownloadFileName(StringRef version, bool beta, StringRef _
 #if JUCE_WINDOWS
 	fileURL += "win-x64";
 #elif JUCE_MAC
-    
+
 #if TARGET_CPU_ARM64
-    fileURL += "osx-silicon";
+	fileURL += "osx-silicon";
 #else
-    fileURL += "osx-intel";
+	fileURL += "osx-intel";
 #endif
-	
+
 #elif JUCE_LINUX
 	fileURL += "linux-x64";
 #endif
@@ -131,8 +130,8 @@ void AppUpdater::run()
 	std::function<bool(int, int)> callbackFunc = std::bind(&AppUpdater::openStreamProgressCallback, this, std::placeholders::_1, std::placeholders::_2);
 
 	StringPairArray responseHeaders;
-	int statusCode = 0; 
-	
+	int statusCode = 0;
+
 	URL::InputStreamOptions options = URL::InputStreamOptions(URL::ParameterHandling::inAddress)
 		.withExtraHeaders("Cache-Control: no-cache")
 		.withProgressCallback(callbackFunc)
@@ -141,7 +140,7 @@ void AppUpdater::run()
 		.withConnectionTimeoutMs(2000)
 		;
 
-	
+
 	std::unique_ptr<InputStream> stream(URL(updateURL).createInputStream(options));
 
 #if JUCE_WINDOWS
@@ -157,19 +156,19 @@ void AppUpdater::run()
 	if (stream != nullptr)
 	{
 		String content = stream->readEntireStreamAsString();
-		var data = JSON::parse(content);
+		updateData = JSON::parse(content);
 
-		if (data.isObject())
+		if (updateData.isObject())
 		{
 
 #if !JUCE_DEBUG
-			if (data.getProperty("testing", false)) return;
+			if (updateData.getProperty("testing", false)) return;
 #endif
 
 			bool shouldCheckForBeta = Engine::mainEngine->isBetaVersion || GlobalSettings::getInstance()->checkBetaUpdates->boolValue();
 
-			var betaData = data.getProperty("betaversion", var());
-			var stableData = data.getProperty("stableversion", var());
+			var betaData = updateData.getProperty("betaversion", var());
+			var stableData = updateData.getProperty("stableversion", var());
 
 			String betaVersion = betaData.getProperty("version", "");
 			String stableVersion = stableData.getProperty("version", "");
@@ -213,7 +212,7 @@ void AppUpdater::run()
 				for (auto& c : *changelog) changelogString += c.toString() + "\n";
 				changelogString += "\n\n";
 
-				Array<var>* oldChangelogs = data.getProperty("archives", var()).getArray();
+				Array<var>* oldChangelogs = updateData.getProperty("archives", var()).getArray();
 				for (int i = oldChangelogs->size() - 1; i >= 0; i--)
 				{
 					var ch = oldChangelogs->getUnchecked(i);
@@ -232,11 +231,11 @@ void AppUpdater::run()
 				extension = "zip";
 
 #if JUCE_WINDOWS
-				extension = data.getProperty("winExtension", "zip");
+				extension = updateData.getProperty("winExtension", "zip");
 #elif JUCE_MAC
-				extension = data.getProperty("osxExtension", "zip");
+				extension = updateData.getProperty("osxExtension", "zip");
 #elif JUCE_LINUX
-				extension = data.getProperty("linuxExtension", "zip");
+				extension = updateData.getProperty("linuxExtension", "zip");
 #endif
 
 				downloadingFileName = getDownloadFileName(version, dataIsBeta, extension);
@@ -356,9 +355,9 @@ void AppUpdater::newMessage(const AppUpdateEvent& e)
 	}
 }
 
-UpdateDialogWindow::UpdateDialogWindow(const String& msg, const String &version, const String& changelog, FloatParameter* progression) :
+UpdateDialogWindow::UpdateDialogWindow(const String& msg, const String& version, const String& changelog, FloatParameter* progression) :
 	version(version),
-	okButton("Update to "+version),
+	okButton("Update to " + version),
 	cancelButton("Not now"),
 	skipThisVersionButton("Skip this version")
 {
@@ -405,7 +404,7 @@ void UpdateDialogWindow::resized()
 	r.removeFromTop(10);
 	changelogLabel.setBounds(r);
 
-	
+
 	cancelButton.setBounds(br.removeFromRight(100));
 	br.removeFromRight(10);
 	okButton.setBounds(br.removeFromRight(100));

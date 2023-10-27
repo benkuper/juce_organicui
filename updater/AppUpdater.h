@@ -72,6 +72,7 @@ public:
     juce::String extension;
 	juce::String filePrefix;
 	juce::File targetDir;
+	juce::var updateData;
 
 	std::unique_ptr<UpdateDialogWindow> updateWindow;
 	std::unique_ptr<FloatParameter> progression;
