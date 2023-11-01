@@ -29,7 +29,6 @@ class OSCRemoteControl :
 #if ORGANICUI_USE_WEBSERVER
 	public SimpleWebSocketServer::Listener,
 	public SimpleWebSocketServer::RequestHandler,
-	public ContainerAsyncListener,
 #endif
 	public juce::OSCReceiver::Listener<juce::OSCReceiver::RealtimeCallback>
 {
@@ -101,7 +100,9 @@ public:
 	void sendPathRemovedFeedback(const juce::String& path);
 	void sendPathNameChangedFeedback(const juce::String& oldPath, const juce::String& newPath);
 
-	void newMessage(const ContainerAsyncEvent& e) override;
+	void controllableFeedbackUpdate(ControllableContainer* cc, Controllable* c) override;
+
+	//void newMessage(const ContainerAsyncEvent& e) override;
 	void onControllableFeedbackUpdate(ControllableContainer* cc, Controllable* c) override;
 
 #endif

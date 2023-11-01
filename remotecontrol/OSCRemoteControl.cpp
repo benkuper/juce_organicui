@@ -146,14 +146,16 @@ void OSCRemoteControl::setupZeroconf()
 void OSCRemoteControl::updateEngineListener()
 {
 #if ORGANICUI_USE_WEBSERVER
-	Engine::mainEngine->removeAsyncContainerListener(this);
+	//Engine::mainEngine->removeAsyncContainerListener(this);
+	Engine::mainEngine->removeControllableContainerListener(this);
 
 	bool shouldListen = false;
 	if (!enabled->boolValue()) return;
 	if (manualSendCC.enabled->boolValue()) shouldListen = true;
 	if (receiverIsConnected) shouldListen = true;
 
-	if (shouldListen) Engine::mainEngine->addAsyncContainerListener(this);
+	//if (shouldListen) Engine::mainEngine->addAsyncContainerListener(this);
+	if (shouldListen) Engine::mainEngine->addControllableContainerListener(this);
 #endif
 }
 
@@ -285,8 +287,8 @@ void OSCRemoteControl::processMessage(const OSCMessage& m, const String& sourceI
 			remoteControlListeners.call(&RemoteControlListener::processMessage, m);
 			return;
 		}
+		}
 	}
-}
 
 void OSCRemoteControl::onContainerParameterChanged(Parameter* p)
 {
@@ -539,28 +541,49 @@ void OSCRemoteControl::sendPathNameChangedFeedback(const String& oldPath, const 
 
 }
 
-void OSCRemoteControl::newMessage(const ContainerAsyncEvent& e)
+void OSCRemoteControl::controllableFeedbackUpdate(ControllableContainer* cc, Controllable* c)
 {
+	EnablingControllableContainer::controllableFeedbackUpdate(cc, c);
+
 	if (Engine::mainEngine != nullptr && (Engine::mainEngine->isLoadingFile || Engine::mainEngine->isClearing)) return;
 
-	if (e.type == ContainerAsyncEvent::ControllableFeedbackUpdate)
+	//OSCQuery
+	juce::HashMap<String, Array<Controllable*>, DefaultHashFunctions, CriticalSection>::Iterator it(feedbackMap);
+	while (it.next())
 	{
-		//OSCQuery
-		HashMap<String, Array<Controllable*>, DefaultHashFunctions, CriticalSection>::Iterator it(feedbackMap);
-		while (it.next())
+		if (it.getValue().contains(c))
 		{
-			if (it.getValue().contains(e.targetControllable))
-			{
-				sendOSCQueryFeedback(e.targetControllable);
-			}
+			sendOSCQueryFeedback(c);
 		}
-
-		//Manual
-		sendManualFeedbackForControllable(e.targetControllable);
-
 	}
 
+	//Manual
+	sendManualFeedbackForControllable(c);
+
 }
+
+//void OSCRemoteControl::newMessage(const ContainerAsyncEvent& e)
+//{
+//	if (Engine::mainEngine != nullptr && (Engine::mainEngine->isLoadingFile || Engine::mainEngine->isClearing)) return;
+//
+//	if (e.type == ContainerAsyncEvent::ControllableFeedbackUpdate)
+//	{
+//		//OSCQuery
+//		HashMap<String, Array<Controllable*>, DefaultHashFunctions, CriticalSection>::Iterator it(feedbackMap);
+//		while (it.next())
+//		{
+//			if (it.getValue().contains(e.targetControllable))
+//			{
+//				sendOSCQueryFeedback(e.targetControllable);
+//			}
+//		}
+//
+//		//Manual
+//		sendManualFeedbackForControllable(e.targetControllable);
+//
+//	}
+//
+//}
 
 void OSCRemoteControl::sendOSCQueryFeedback(Controllable* c, const String& excludeId)
 {
