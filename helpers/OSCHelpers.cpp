@@ -206,6 +206,12 @@ Colour OSCHelpers::getColourFromOSC(OSCColour c)
 	return Colour(c.red, c.green, c.blue, c.alpha);
 }
 
+juce::String OSCHelpers::getLastAddressPart(const juce::OSCMessage& m)
+{
+	StringArray arr = StringArray::fromTokens(m.getAddressPattern().toString(), "/", "\"");
+	return arr.isEmpty() ? "" : arr[arr.size() - 1];
+}
+
 OSCMessage OSCHelpers::getOSCMessageForControllable(Controllable* c, ControllableContainer* addressRelativeTo, BoolMode bm, ColorMode cm)
 {
 	OSCMessage m(c->getControlAddress(addressRelativeTo));
@@ -244,6 +250,20 @@ Controllable* OSCHelpers::findControllable(ControllableContainer* root, const OS
 	if (root == nullptr) return nullptr;
 	String address = m.getAddressPattern().toString();
 	return root->getControllableForAddress(address);
+}
+
+ControllableContainer* OSCHelpers::findParentContainer(ControllableContainer* root, const juce::OSCMessage& m, int dataOffset)
+{
+
+	if (root == nullptr) return nullptr;
+	String address = m.getAddressPattern().toString();
+	StringArray addSplit;
+	addSplit.addTokens(address, "/", "\"");
+	addSplit.remove(addSplit.size() - 1);
+	
+	if (addSplit.isEmpty()) return Engine::mainEngine;
+
+	return root->getControllableContainerForAddress(addSplit, true);
 }
 
 void OSCHelpers::handleControllableForOSCMessage(Controllable* c, const OSCMessage& m, int dataOffset)
@@ -384,7 +404,7 @@ void OSCQueryHelpers::updateContainerFromData(ControllableContainer* cc, var dat
 void OSCQueryHelpers::createOrUpdateControllableFromData(ControllableContainer* parentCC, Controllable* sourceC, StringRef name, var data, bool useAddressForNaming)
 {
 	var val = data.getProperty("VALUE", var());
-	
+
 	if (name == StringRef("enabled"))
 	{
 		if (EnablingControllableContainer* ecc = dynamic_cast<EnablingControllableContainer*>(parentCC))

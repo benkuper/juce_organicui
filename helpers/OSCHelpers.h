@@ -30,11 +30,13 @@ public:
 
 	static juce::Colour getColourFromOSC(juce::OSCColour c);
 
+	static juce::String getLastAddressPart(const juce::OSCMessage& m);
 
 	static juce::OSCMessage getOSCMessageForControllable(Controllable* p, ControllableContainer* addressRelativeTo = nullptr, BoolMode bm = Int, ColorMode cm = ColorRGBA);
 
 	static Controllable* findControllableAndHandleMessage(ControllableContainer* root, const juce::OSCMessage& m, int dataOffset = 0);
 	static Controllable* findControllable(ControllableContainer* root, const juce::OSCMessage& m, int dataOffset = 0);
+	static ControllableContainer* findParentContainer(ControllableContainer* root, const juce::OSCMessage& m, int dataOffset = 0);
 
 	static void handleControllableForOSCMessage(Controllable* c, const juce::OSCMessage& m, int dataOffset = 0);
 

@@ -152,8 +152,7 @@ public:
 	//Remote control
 	virtual juce::var getRemoteControlData();
 	virtual void getRemoteControlDataInternal(juce::var& /*data*/) {}
-	virtual void handleRemoteControlData(juce::var data);
-	virtual void handleRemoteControlData(const juce::OSCMessage& m);
+	virtual bool handleRemoteControlData(const juce::OSCMessage& m) { return false; }
 
 	virtual void controllableContainerNameChanged(ControllableContainer *) override;
 	virtual void childStructureChanged(ControllableContainer *)override;

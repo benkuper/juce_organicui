@@ -1078,13 +1078,6 @@ var ControllableContainer::getRemoteControlData()
 	return data;
 }
 
-void ControllableContainer::handleRemoteControlData(var data)
-{
-}
-
-void ControllableContainer::handleRemoteControlData(const OSCMessage& m)
-{
-}
 
 void ControllableContainer::controllableContainerNameChanged(ControllableContainer* cc)
 {

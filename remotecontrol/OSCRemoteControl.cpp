@@ -284,11 +284,17 @@ void OSCRemoteControl::processMessage(const OSCMessage& m, const String& sourceI
 
 		if (c == nullptr)
 		{
-			remoteControlListeners.call(&RemoteControlListener::processMessage, m);
-			return;
-		}
+			bool handled = false;
+			if (ControllableContainer* cc = OSCHelpers::findParentContainer(Engine::mainEngine, m))
+			{
+				handled = cc->handleRemoteControlData(m);
+			}
+
+			if (!handled) remoteControlListeners.call(&RemoteControlListener::processMessage, m);
+
 		}
 	}
+}
 
 void OSCRemoteControl::onContainerParameterChanged(Parameter* p)
 {
