@@ -16,7 +16,7 @@ class WarningReporter :
 public:
 	juce_DeclareSingleton(WarningReporter, true);
 
-	juce::Array<juce::WeakReference<WarningTarget>> targets;
+	juce::Array<juce::WeakReference<WarningTarget>, juce::CriticalSection> targets;
 
 	WarningReporter();
 	~WarningReporter();

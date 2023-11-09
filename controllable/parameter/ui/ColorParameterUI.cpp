@@ -45,7 +45,7 @@ void ColorParameterUI::paint(Graphics & g)
 
 	if (isInteractable())
 	{
-		g.setColour(c.brighter(.5f));
+		g.setColour(c.brighter(.5f).withAlpha(1.0f));
 		g.drawRoundedRectangle(r.reduced(1).toFloat(), 2, 2);
 	}
 

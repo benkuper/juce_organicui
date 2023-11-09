@@ -287,14 +287,6 @@ var Controllable::getRemoteControlData()
 	return data;
 }
 
-void Controllable::handleRemoteControlData(var data)
-{
-}
-
-void Controllable::handleRemoteControlData(const OSCMessage& m)
-{
-}
-
 String Controllable::getControlAddress(ControllableContainer* relativeTo)
 {
 	return parentContainer->getControlAddress(relativeTo) + "/" + shortName;

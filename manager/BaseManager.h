@@ -413,6 +413,8 @@ T* BaseManager<T>::addItem(T* item, juce::var data, bool addToUndo, bool notify)
 
 	jassert(items.indexOf(item) == -1); //be sure item is no here already
 	if (item == nullptr) item = createItem();
+	if (item == nullptr) return nullptr; //could not create here
+
 	BaseItem* bi = static_cast<BaseItem*>(item);
 
 	if (addToUndo && !UndoMaster::getInstance()->isPerforming)
@@ -482,6 +484,8 @@ T* BaseManager<T>::addItem(T* item, const juce::Point<float> initialPosition, bo
 template<class T>
 juce::Array<T*> BaseManager<T>::addItems(juce::Array<T*> itemsToAdd, juce::var data, bool addToUndo)
 {
+	bool curIsLoadingData = isCurrentlyLoadingData;
+	bool curIsManipulatingMultipleItems = isManipulatingMultipleItems;
 
 	isCurrentlyLoadingData = true;
 	isManipulatingMultipleItems = true;
@@ -490,11 +494,10 @@ juce::Array<T*> BaseManager<T>::addItems(juce::Array<T*> itemsToAdd, juce::var d
 	{
 		AddItemsAction* a = new AddItemsAction(this, itemsToAdd, data);
 		UndoMaster::getInstance()->performAction("Add " + juce::String(itemsToAdd.size()) + " items", a);
-		isCurrentlyLoadingData = false;
-		isManipulatingMultipleItems = false;
+		isCurrentlyLoadingData = curIsLoadingData;
+		isManipulatingMultipleItems = curIsManipulatingMultipleItems;
 		return itemsToAdd;
 	}
-
 
 	for (int i = 0; i < itemsToAdd.size(); ++i)
 	{
@@ -507,8 +510,8 @@ juce::Array<T*> BaseManager<T>::addItems(juce::Array<T*> itemsToAdd, juce::var d
 	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_ADDED, itemsToAdd));
 
 	reorderItems();
-	isCurrentlyLoadingData = false;
-	isManipulatingMultipleItems = false;
+	isCurrentlyLoadingData = curIsLoadingData;
+	isManipulatingMultipleItems = curIsManipulatingMultipleItems;
 
 	if (selectItemWhenCreated && !isCurrentlyLoadingData)
 	{
@@ -786,6 +789,7 @@ void BaseManager<T>::clear()
 	isClearing = true;
 	//const ScopedLock lock(items.getLock());
 	while (items.size() > 0) removeItem(items[0], false);
+	isClearing = false;
 }
 
 template<class T>
@@ -1003,7 +1007,7 @@ juce::var BaseManager<T>::addItemFromScript(const juce::var::NativeFunctionArgs&
 	if (m->managerFactory == nullptr || m->managerFactory->defs.size() == 1)
 	{
 		T* item = m->addItem(nullptr, args.numArguments > 1 && args.arguments[1].isObject() ? args.arguments[1] : juce::var());
-		return item->getScriptObject();
+		if (item != nullptr) return item->getScriptObject();
 	}
 	else
 	{
@@ -1023,9 +1027,9 @@ juce::var BaseManager<T>::addItemFromScript(const juce::var::NativeFunctionArgs&
 			m->addItem(item, args.numArguments > 1 && args.arguments[1].isObject() ? args.arguments[1] : juce::var());
 			if (item != nullptr) return item->getScriptObject();
 		}
-
-		return juce::var();
 	}
+
+	return juce::var();
 }
 
 

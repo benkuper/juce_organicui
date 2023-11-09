@@ -206,6 +206,12 @@ Colour OSCHelpers::getColourFromOSC(OSCColour c)
 	return Colour(c.red, c.green, c.blue, c.alpha);
 }
 
+juce::String OSCHelpers::getLastAddressPart(const juce::OSCMessage& m)
+{
+	StringArray arr = StringArray::fromTokens(m.getAddressPattern().toString(), "/", "\"");
+	return arr.isEmpty() ? "" : arr[arr.size() - 1];
+}
+
 OSCMessage OSCHelpers::getOSCMessageForControllable(Controllable* c, ControllableContainer* addressRelativeTo, BoolMode bm, ColorMode cm)
 {
 	OSCMessage m(c->getControlAddress(addressRelativeTo));
@@ -244,6 +250,20 @@ Controllable* OSCHelpers::findControllable(ControllableContainer* root, const OS
 	if (root == nullptr) return nullptr;
 	String address = m.getAddressPattern().toString();
 	return root->getControllableForAddress(address);
+}
+
+ControllableContainer* OSCHelpers::findParentContainer(ControllableContainer* root, const juce::OSCMessage& m, int dataOffset)
+{
+
+	if (root == nullptr) return nullptr;
+	String address = m.getAddressPattern().toString();
+	StringArray addSplit;
+	addSplit.addTokens(address, "/", "\"");
+	addSplit.remove(addSplit.size() - 1);
+	
+	if (addSplit.isEmpty()) return Engine::mainEngine;
+
+	return root->getControllableContainerForAddress(addSplit, true);
 }
 
 void OSCHelpers::handleControllableForOSCMessage(Controllable* c, const OSCMessage& m, int dataOffset)
@@ -321,7 +341,7 @@ String OSCHelpers::messageToString(const OSCMessage& m)
 
 // OSCQUERY
 
-void OSCQueryHelpers::updateContainerFromData(ControllableContainer* cc, var data, bool useAddressForNaming)
+void OSCQueryHelpers::updateContainerFromData(ControllableContainer* cc, var data, bool useAddressForNaming, std::function<OSCQueryValueContainer* (const String& name)> createContainerFunc)
 {
 	DynamicObject* dataObject = data.getProperty("CONTENTS", var()).getDynamicObject();
 
@@ -333,7 +353,7 @@ void OSCQueryHelpers::updateContainerFromData(ControllableContainer* cc, var dat
 	{
 		controllablesToDelete.removeAllInstancesOf(vc->enableListen);
 		controllablesToDelete.removeAllInstancesOf(vc->syncContent);
-		syncContent = vc->syncContent->boolValue();
+		syncContent = vc->syncContent != nullptr ? vc->syncContent->boolValue() : true;
 	}
 
 	if (syncContent && dataObject != nullptr)
@@ -353,7 +373,7 @@ void OSCQueryHelpers::updateContainerFromData(ControllableContainer* cc, var dat
 
 				if (childCC == nullptr)
 				{
-					childCC = new OSCQueryHelpers::OSCQueryValueContainer(ccNiceName);
+					childCC = createContainerFunc != nullptr ? createContainerFunc(ccNiceName) : new OSCQueryHelpers::OSCQueryValueContainer(ccNiceName);
 					childCC->saveAndLoadRecursiveData = true;
 					childCC->setCustomShortName(nv.name.toString());
 					childCC->editorIsCollapsed = true;
@@ -364,7 +384,7 @@ void OSCQueryHelpers::updateContainerFromData(ControllableContainer* cc, var dat
 					childCC->setNiceName(ccNiceName);
 				}
 
-				updateContainerFromData(childCC, nv.value);
+				updateContainerFromData(childCC, nv.value, useAddressForNaming, createContainerFunc);
 
 				if (childCC->parentContainer != cc) cc->addChildControllableContainer(childCC, true);
 			}
@@ -383,6 +403,18 @@ void OSCQueryHelpers::updateContainerFromData(ControllableContainer* cc, var dat
 
 void OSCQueryHelpers::createOrUpdateControllableFromData(ControllableContainer* parentCC, Controllable* sourceC, StringRef name, var data, bool useAddressForNaming)
 {
+	var val = data.getProperty("VALUE", var());
+
+	if (name == StringRef("enabled"))
+	{
+		if (EnablingControllableContainer* ecc = dynamic_cast<EnablingControllableContainer*>(parentCC))
+		{
+			ecc->setCanBeDisabled(true);
+			if (val.size() > 0) ecc->enabled->setValue(val[0]);
+			return;
+		}
+	}
+
 	Controllable* c = sourceC;
 
 	String cNiceName;
@@ -391,7 +423,6 @@ void OSCQueryHelpers::createOrUpdateControllableFromData(ControllableContainer* 
 
 	String type = data.getProperty("TYPE", "").toString();
 	var valRange = data.hasProperty("RANGE") ? data.getProperty("RANGE", var()) : var();
-	var val = data.getProperty("VALUE", var());
 	int access = data.getProperty("ACCESS", 3);
 
 	var value;
@@ -541,14 +572,23 @@ void OSCQueryHelpers::createOrUpdateControllableFromData(ControllableContainer* 
 }
 
 
-OSCQueryHelpers::OSCQueryValueContainer::OSCQueryValueContainer(const String& name) :
-	ControllableContainer(name)
+OSCQueryHelpers::OSCQueryValueContainer::OSCQueryValueContainer(const String& name, bool canListen, bool canSync) :
+	EnablingControllableContainer(name, false),
+	enableListen(nullptr),
+	syncContent(nullptr)
 {
-	enableListen = addBoolParameter("Listen", "This will activate listening to this container", false);
-	enableListen->hideInEditor = true;
+	if (canListen)
+	{
+		enableListen = addBoolParameter("Listen", "This will activate listening to this container", false);
+		enableListen->hideInEditor = true;
+	}
 
-	syncContent = addBoolParameter("Sync", "This will activate syncing on this container", true);
-	syncContent->hideInEditor = true;
+	if (canSync)
+	{
+
+		syncContent = addBoolParameter("Sync", "This will activate syncing on this container", true);
+		syncContent->hideInEditor = true;
+	}
 }
 
 OSCQueryHelpers::OSCQueryValueContainer::~OSCQueryValueContainer()
@@ -562,13 +602,19 @@ InspectableEditor* OSCQueryHelpers::OSCQueryValueContainer::getEditorInternal(bo
 
 
 OSCQueryHelpers::OSCQueryValueContainerEditor::OSCQueryValueContainerEditor(OSCQueryValueContainer* cc, bool isRoot) :
-	GenericControllableContainerEditor(cc, isRoot)
+	EnablingControllableContainerEditor(cc, isRoot)
 {
-	enableListenUI.reset(cc->enableListen->createToggle());
-	addAndMakeVisible(enableListenUI.get());
+	if (cc->enableListen != nullptr)
+	{
+		enableListenUI.reset(cc->enableListen->createToggle());
+		addAndMakeVisible(enableListenUI.get());
+	}
 
-	syncUI.reset(cc->syncContent->createToggle());
-	addAndMakeVisible(syncUI.get());
+	if (cc->syncContent != nullptr)
+	{
+		syncUI.reset(cc->syncContent->createToggle());
+		addAndMakeVisible(syncUI.get());
+	}
 }
 
 OSCQueryHelpers::OSCQueryValueContainerEditor::~OSCQueryValueContainerEditor()
@@ -577,10 +623,18 @@ OSCQueryHelpers::OSCQueryValueContainerEditor::~OSCQueryValueContainerEditor()
 
 void OSCQueryHelpers::OSCQueryValueContainerEditor::resizedInternalHeader(Rectangle<int>& r)
 {
-	GenericControllableContainerEditor::resizedInternalHeader(r);
-	enableListenUI->setVisible(container->controllables.size() > 1);
-	enableListenUI->setBounds(r.removeFromRight(60).reduced(3));
-	r.removeFromRight(16);
-	syncUI->setVisible(container->controllables.size() > 1);
-	syncUI->setBounds(r.removeFromRight(60).reduced(3));
+	EnablingControllableContainerEditor::resizedInternalHeader(r);
+	if (enableListenUI != nullptr)
+	{
+
+		enableListenUI->setVisible(container->controllables.size() > 1);
+		enableListenUI->setBounds(r.removeFromRight(60).reduced(3));
+	}
+
+	if (syncUI != nullptr)
+	{
+		if (enableListenUI != nullptr) r.removeFromRight(16);
+		syncUI->setVisible(container->controllables.size() > 1);
+		syncUI->setBounds(r.removeFromRight(60).reduced(3));
+	}
 }
