@@ -53,9 +53,8 @@ Parameter::~Parameter()
 
 	if (queuedNotifier.isUpdatePending())
 	{
-		//MessageManagerLock mmLock(Thread::getCurrentThread()); //WE NEED TO CHECK IF THIS SHOULD GO BACK !!
-		//if (mmLock.lockWasGained()) queuedNotifier.handleUpdateNowIfNeeded(); //try without forcing updates on destroy
-
+		MessageManagerLock mmLock(Thread::getCurrentThread());
+		if (mmLock.lockWasGained()) queuedNotifier.handleUpdateNowIfNeeded();
 		queuedNotifier.cancelPendingUpdate();
 	}
 
