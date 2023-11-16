@@ -8,7 +8,7 @@
   ==============================================================================
 */
 
-#include "juce_organicui/juce_organicui.h"
+#include "JuceHeader.h"
 
 //CONTROLLABLE
 ControllableChooserPopupMenu::ControllableChooserPopupMenu(ControllableContainer* rootContainer, int _indexOffset, int _maxDefaultSearchLevel, const StringArray& typesFilter, const StringArray& excludeTypesFilter, std::function<bool(Controllable*)> filterFunc, Controllable* currentSelection) :
@@ -203,6 +203,7 @@ void ControllableParser::createControllablesFromJSONObject(var data, Controllabl
 			{
 				cc = new ControllableContainer(String(i));
 				container->addChildControllableContainer(cc, true);
+				cc->isRemovableByUser = true;
 				cc->userCanAddControllables = true;
 				cc->saveAndLoadRecursiveData = true;
 				cc->saveAndLoadName = true;

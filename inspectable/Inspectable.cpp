@@ -1,3 +1,5 @@
+#include "JuceHeader.h"
+
 Inspectable::Inspectable() :
 	selectionManager(nullptr), //default nullptr will target main selectionManager
 	isSelected(false),
