@@ -111,7 +111,7 @@ namespace OrganicCrypto {
 				n = 128 - sz_;
 				n_tail = size < n ? (int)size : n;
 				memcpy(&block_[sz_], data, n_tail);
-				if (sz_ + size < 128) { sz_ += size; return; }
+				if (sz_ + size < 128) { sz_ += (int)size; return; }
 				n = (int)size - n_tail;
 				nb = n >> 7;
 				p = (const uint8_t*)data + n_tail;
