@@ -539,7 +539,7 @@ juce::Array<T*> BaseManager<T>::addItemsFromData(juce::var data, bool addToUndo)
 {
 	juce::Array<T*> itemsToAdd;
 
-	var itemsData; //avoid offset between items array and data array if items are skipped because they're null
+	juce::var itemsData; //avoid offset between items array and data array if items are skipped because they're null
 	for (int i = 0; i < data.size(); i++)
 	{
 		if (T* item = createItemFromData(data[i]))
