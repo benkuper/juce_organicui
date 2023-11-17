@@ -77,16 +77,16 @@ UndoableAction* Point2DParameter::setUndoablePoint(float oldX, float oldY, float
 	return setUndoableValue(od, d, onlyReturnAction);
 }
 
-void Point2DParameter::setDefaultPoint(juce::Point<float> value, bool doResetValue)
+void Point2DParameter::setDefaultPoint(juce::Point<float> p, bool doResetValue)
 {
-	setDefaultPoint(value.x, value.y, doResetValue);
+	setDefaultPoint(p.x, p.y, doResetValue);
 }
 
-void Point2DParameter::setDefaultPoint(float x, float y, bool doResetValue)
+void Point2DParameter::setDefaultPoint(float _x, float _y, bool doResetValue)
 {
 	var val;
-	val.append(x);
-	val.append(y);
+	val.append(_x);
+	val.append(_y);
 	setDefaultValue(val, doResetValue);
 }
 
