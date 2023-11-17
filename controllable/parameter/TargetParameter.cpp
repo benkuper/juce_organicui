@@ -185,10 +185,10 @@ ControllableContainer* TargetParameter::getTargetContainer() { return targetCont
 
 void TargetParameter::setTarget(WeakReference<Controllable> c)
 {
-	if (target == c) return;
-
 	if (target != nullptr)
 	{
+		if (target == c) return;
+
 		if (!target.wasObjectDeleted())
 		{
 			target->removeInspectableListener(this);
@@ -230,10 +230,11 @@ void TargetParameter::setTarget(WeakReference<Controllable> c)
 
 void TargetParameter::setTarget(WeakReference<ControllableContainer> cc)
 {
-	if (targetContainer == cc) return;
 
 	if (targetContainer != nullptr)
 	{
+		if (targetContainer == cc) return;
+		
 		if (!targetContainer.wasObjectDeleted())
 		{
 			targetContainer->removeInspectableListener(this);
@@ -431,10 +432,7 @@ void TargetParameter::loadJSONDataInternal(var data)
 void TargetParameter::endLoadFile()
 {
 	Engine::mainEngine->removeEngineListener(this);
-	if (target == nullptr && targetContainer == nullptr)
-	{
-		tryFixBrokenLink();
-	}
+	if (target == nullptr && targetContainer == nullptr) tryFixBrokenLink();
 }
 
 TargetParameterUI* TargetParameter::createTargetUI(Array<TargetParameter*> parameters)
