@@ -187,6 +187,8 @@ void TargetParameter::setTarget(WeakReference<Controllable> c)
 {
 	if (target != nullptr)
 	{
+		if (target == c) return;
+
 		if (!target.wasObjectDeleted())
 		{
 			target->removeInspectableListener(this);
@@ -209,11 +211,17 @@ void TargetParameter::setTarget(WeakReference<Controllable> c)
 		if (value.toString().isNotEmpty()) setGhostValue(value.toString());
 		if (ghostValue.isNotEmpty())
 		{
-			
-			if (!Engine::mainEngine->isClearing && rootContainer != nullptr && !rootContainer.wasObjectDeleted())
+			if (Engine::mainEngine->isLoadingFile)
 			{
-				setWarningMessage("Link is broken : " + ghostValue);
-				rootContainer->addControllableContainerListener(this);
+				Engine::mainEngine->addEngineListener(this);
+			}
+			else
+			{
+				if (!Engine::mainEngine->isClearing && rootContainer != nullptr && !rootContainer.wasObjectDeleted())
+				{
+					setWarningMessage("Link is broken : " + ghostValue);
+					rootContainer->addControllableContainerListener(this);
+				}
 			}
 		}
 		else clearWarning();
@@ -222,8 +230,11 @@ void TargetParameter::setTarget(WeakReference<Controllable> c)
 
 void TargetParameter::setTarget(WeakReference<ControllableContainer> cc)
 {
+
 	if (targetContainer != nullptr)
 	{
+		if (targetContainer == cc) return;
+		
 		if (!targetContainer.wasObjectDeleted())
 		{
 			targetContainer->removeInspectableListener(this);
@@ -248,38 +259,26 @@ void TargetParameter::setTarget(WeakReference<ControllableContainer> cc)
 		if (value.toString().isNotEmpty()) setGhostValue(value.toString());
 		if (ghostValue.isNotEmpty())
 		{
-			setWarningMessage("Link is broken : " + ghostValue);
-			if (!Engine::mainEngine->isClearing && rootContainer != nullptr && !rootContainer.wasObjectDeleted())
+			if (Engine::mainEngine->isLoadingFile)
 			{
-				rootContainer->addControllableContainerListener(this);
+				Engine::mainEngine->addEngineListener(this);
+			}
+			else
+			{
+				setWarningMessage("Link is broken : " + ghostValue);
+				if (!Engine::mainEngine->isClearing && rootContainer != nullptr && !rootContainer.wasObjectDeleted())
+				{
+					rootContainer->addControllableContainerListener(this);
+				}
 			}
 		}
 		else clearWarning();
 	}
 }
 
-void TargetParameter::setRootContainer(WeakReference<ControllableContainer> newRootContainer, bool engineIfNull, bool forceSetValue)
+void TargetParameter::tryFixBrokenLink()
 {
-	if (rootContainer == newRootContainer) return;
-
-	if (rootContainer != nullptr && !rootContainer.wasObjectDeleted())
-	{
-		rootContainer->removeControllableContainerListener(this);
-	}
-
-	if (newRootContainer == nullptr && engineIfNull) newRootContainer = Engine::mainEngine;
-	rootContainer = newRootContainer;
-
-    if(forceSetValue)
-    {
-        ghostValue = "";
-        setValue(getValue(), false, true);
-    }
-}
-
-void TargetParameter::childStructureChanged(ControllableContainer*)
-{
-	if (Engine::mainEngine != nullptr && (Engine::mainEngine->isClearing /*|| Engine::mainEngine->isLoadingFile > Not sure?*/)) return;
+	if (Engine::mainEngine != nullptr && (Engine::mainEngine->isClearing || Engine::mainEngine->isLoadingFile)) return;
 
 	if (targetType == CONTROLLABLE)
 	{
@@ -311,6 +310,30 @@ void TargetParameter::childStructureChanged(ControllableContainer*)
 			setValueFromTarget(targetContainer);
 		}
 	}
+}
+
+void TargetParameter::setRootContainer(WeakReference<ControllableContainer> newRootContainer, bool engineIfNull, bool forceSetValue)
+{
+	if (rootContainer == newRootContainer) return;
+
+	if (rootContainer != nullptr && !rootContainer.wasObjectDeleted())
+	{
+		rootContainer->removeControllableContainerListener(this);
+	}
+
+	if (newRootContainer == nullptr && engineIfNull) newRootContainer = Engine::mainEngine;
+	rootContainer = newRootContainer;
+
+    if(forceSetValue)
+    {
+        ghostValue = "";
+        setValue(getValue(), false, true);
+    }
+}
+
+void TargetParameter::childStructureChanged(ControllableContainer*)
+{
+	tryFixBrokenLink();
 }
 
 void TargetParameter::controllableControlAddressChanged(Controllable* c)
@@ -404,6 +427,12 @@ void TargetParameter::loadJSONDataInternal(var data)
 {
 	ghostValue = data.getProperty("ghostValue", data.getProperty("value", ""));
 	StringParameter::loadJSONDataInternal(data);
+}
+
+void TargetParameter::endLoadFile()
+{
+	Engine::mainEngine->removeEngineListener(this);
+	if (target == nullptr && targetContainer == nullptr) tryFixBrokenLink();
 }
 
 TargetParameterUI* TargetParameter::createTargetUI(Array<TargetParameter*> parameters)
