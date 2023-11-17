@@ -18,7 +18,8 @@ class TargetParameter :
 	public StringParameter,
 	public ControllableContainerListener,
 	public Controllable::Listener,
-	public Inspectable::InspectableListener
+	public Inspectable::InspectableListener,
+	public EngineListener
 {
 public:
 
@@ -76,6 +77,8 @@ public:
 	void setTarget(juce::WeakReference<Controllable>);
 	void setTarget(juce::WeakReference<ControllableContainer>);
 
+	void tryFixBrokenLink();
+
 	void setRootContainer(juce::WeakReference<ControllableContainer> newRootContainer, bool engineIfNull = true, bool forceSetValue = true);
 
 	void childStructureChanged(ControllableContainer*) override;
@@ -90,6 +93,8 @@ public:
 
 	juce::var getJSONDataInternal() override;
 	void loadJSONDataInternal(juce::var data) override;
+
+	void endLoadFile() override;
 
 	TargetParameterUI* createTargetUI(juce::Array<TargetParameter*> parameters = {});
 	ControllableUI* createDefaultUI(juce::Array<Controllable*> controllables = {}) override;

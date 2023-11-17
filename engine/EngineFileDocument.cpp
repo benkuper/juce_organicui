@@ -76,7 +76,6 @@ Result Engine::loadDocument(const File& file) {
 #else
 	loadDocumentAsync(file);
 	updateScriptObject();
-	triggerAsyncUpdate();
 #endif
 
 	lastFileAbsolutePath = getFile().getFullPathName();
@@ -390,6 +389,8 @@ void Engine::loadJSONData(var data, ProgressTask* loadingTask)
 
 void Engine::loadJSONDataEngine(var data, ProgressTask* loadingTask)
 {
+	isLoadingFile = true;
+
 	DynamicObject* d = data.getDynamicObject();
 	var layoutData = d->getProperty("layout");
 	if (layoutData.isVoid()) layoutData = ShapeShifterManager::getInstance()->getCurrentLayout();
@@ -432,6 +433,13 @@ void Engine::loadJSONDataEngine(var data, ProgressTask* loadingTask)
 
 	if (InspectableSelectionManager::mainSelectionManager != nullptr) InspectableSelectionManager::mainSelectionManager->setEnabled(true); //Re enable editor
 	if (Outliner::getInstanceWithoutCreating() != nullptr) Outliner::getInstance()->setEnabled(true);
+
+	isLoadingFile = false;
+
+#if !MULTITHREADED_LOADING
+	triggerAsyncUpdate();
+#endif
+
 }
 
 bool Engine::checkFileVersion(DynamicObject* metaData, bool checkForNewerVersion)
