@@ -37,6 +37,8 @@ public:
 
 	juce::String helpID;
 
+	void paint(juce::Graphics& g) override;
+
 	void mouseEnter(const juce::MouseEvent &e) override;
 	void mouseExit(const juce::MouseEvent &e) override;
 };

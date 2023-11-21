@@ -8,13 +8,15 @@
   ==============================================================================
 */
 
+#include "JuceHeader.h"
+
 ShapeShifterWindow::ShapeShifterWindow(ShapeShifterPanel* _panel, juce::Rectangle<int> bounds) :
 	ResizableWindow(_panel->currentContent != nullptr ? _panel->currentContent->contentName : "", true),
 	panel(_panel),
 	dragMode(PANEL)
 {
 	setTopLeftPosition(bounds.getTopLeft());
-	_panel->setBounds(bounds);
+	panel->setBounds(bounds);
 
 	panel->setPreferredWidth(getWidth());
 	panel->setPreferredHeight(getHeight());
@@ -29,7 +31,7 @@ ShapeShifterWindow::ShapeShifterWindow(ShapeShifterPanel* _panel, juce::Rectangl
 	pinBT->addListener(this);
 	panel->addAndMakeVisible(pinBT.get());
 
-	setContentNonOwned(_panel, true);
+	setContentNonOwned(panel, true);
 
 	setBackgroundColour(BG_COLOR.darker(.1f).withAlpha(.3f));
 
@@ -38,8 +40,6 @@ ShapeShifterWindow::ShapeShifterWindow(ShapeShifterPanel* _panel, juce::Rectangl
 
 	setVisible(true);
 	toFront(true);
-
-
 
 	addMouseListener(this,true);
 
