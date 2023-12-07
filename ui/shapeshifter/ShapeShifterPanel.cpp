@@ -1,14 +1,16 @@
 /*
   ==============================================================================
 
-    MovablePanel.cpp
-    Created: 2 May 2016 3:08:37pm
-    Author:  bkupe
+	MovablePanel.cpp
+	Created: 2 May 2016 3:08:37pm
+	Author:  bkupe
 
   ==============================================================================
 */
 
-ShapeShifterPanel::ShapeShifterPanel(ShapeShifterContent *_content, ShapeShifterPanelTab * sourceTab) :
+#include "JuceHeader.h"
+
+ShapeShifterPanel::ShapeShifterPanel(ShapeShifterContent* _content, ShapeShifterPanelTab* sourceTab) :
 	ShapeShifter(ShapeShifter::PANEL),
 	transparentBackground(false),
 	targetMode(false),
@@ -36,21 +38,21 @@ ShapeShifterPanel::ShapeShifterPanel(ShapeShifterContent *_content, ShapeShifter
 ShapeShifterPanel::~ShapeShifterPanel()
 {
 
-	for (auto &c : contents) c->contentIsShown = false;
+	for (auto& c : contents) c->contentIsShown = false;
 	header.removeHeaderListener(this);
 	listeners.call(&Listener::panelDestroyed, this);
 	masterReference.clear();
 }
 
 
-void ShapeShifterPanel::setCurrentContent(ShapeShifterContent * _content)
+void ShapeShifterPanel::setCurrentContent(ShapeShifterContent* _content)
 {
 	if (_content == currentContent) return;
 
 	if (currentContent != nullptr)
 	{
-		ShapeShifterPanelTab * tab = header.getTabForContent(currentContent);
-		if(tab != nullptr) tab->setSelected(false);
+		ShapeShifterPanelTab* tab = header.getTabForContent(currentContent);
+		if (tab != nullptr) tab->setSelected(false);
 		removeChildComponent(currentContent->contentComponent);
 		currentContent->contentIsShown = false;
 	}
@@ -60,7 +62,7 @@ void ShapeShifterPanel::setCurrentContent(ShapeShifterContent * _content)
 
 	if (currentContent != nullptr)
 	{
-		ShapeShifterPanelTab * tab = header.getTabForContent(currentContent);
+		ShapeShifterPanelTab* tab = header.getTabForContent(currentContent);
 		if (tab != nullptr) tab->setSelected(true);
 
 		currentContent->contentIsShown = true;
@@ -72,9 +74,9 @@ void ShapeShifterPanel::setCurrentContent(ShapeShifterContent * _content)
 	//after resized
 }
 
-void ShapeShifterPanel::setCurrentContent(const String & name)
+void ShapeShifterPanel::setCurrentContent(const String& name)
 {
-	ShapeShifterContent * c = getContentForName(name);
+	ShapeShifterContent* c = getContentForName(name);
 	if (c != nullptr) setCurrentContent(c);
 }
 
@@ -85,16 +87,19 @@ void ShapeShifterPanel::setTargetMode(bool value)
 	repaint();
 }
 
-void ShapeShifterPanel::paint(Graphics & g)
+void ShapeShifterPanel::paint(Graphics& g)
 {
-	g.setColour(BG_COLOR.withAlpha(transparentBackground?.3f:1));
-	g.fillRect(getLocalBounds().withTrimmedTop(headerHeight));
+	if (isDetached())
+	{
+		g.setColour(BG_COLOR.withAlpha(transparentBackground ? .3f : 1));
+		g.fillRect(getLocalBounds().withTrimmedTop(headerHeight));
+	}
 }
 
-void ShapeShifterPanel::paintOverChildren(Graphics & g)
+void ShapeShifterPanel::paintOverChildren(Graphics& g)
 {
 	if (!targetMode) return;
- juce::Rectangle<int> r = getLocalBounds();
+	juce::Rectangle<int> r = getLocalBounds();
 
 	Colour hc = HIGHLIGHT_COLOR.withAlpha(.5f);
 	Colour nc = NORMAL_COLOR.withAlpha(.3f);
@@ -136,7 +141,7 @@ void ShapeShifterPanel::setTransparentBackground(bool value)
 	repaint();
 }
 
-void ShapeShifterPanel::attachTab(ShapeShifterPanelTab * tab)
+void ShapeShifterPanel::attachTab(ShapeShifterPanelTab* tab)
 {
 
 	header.attachTab(tab);
@@ -146,17 +151,17 @@ void ShapeShifterPanel::attachTab(ShapeShifterPanelTab * tab)
 
 }
 
-void ShapeShifterPanel::detachTab(ShapeShifterPanelTab * tab, bool createNewPanel)
+void ShapeShifterPanel::detachTab(ShapeShifterPanelTab* tab, bool createNewPanel)
 {
-	ShapeShifterContent * content = tab->content;
+	ShapeShifterContent* content = tab->content;
 
 	header.removeTab(tab, false);
 	contents.removeObject(content, false);
 
 	if (createNewPanel)
 	{
-	 juce::Rectangle<int> r = getScreenBounds();
-		ShapeShifterPanel * newPanel = ShapeShifterManager::getInstance()->createPanel(content, tab);
+		juce::Rectangle<int> r = getScreenBounds();
+		ShapeShifterPanel* newPanel = ShapeShifterManager::getInstance()->createPanel(content, tab);
 		ShapeShifterManager::getInstance()->showPanelWindow(newPanel, r);
 	}
 
@@ -164,8 +169,9 @@ void ShapeShifterPanel::detachTab(ShapeShifterPanelTab * tab, bool createNewPane
 	{
 		if (contents.size() > 0)
 		{
-			setCurrentContent(contents[juce::jlimit<int>(0,contents.size()-1, contents.indexOf(content))]);
-		}else
+			setCurrentContent(contents[juce::jlimit<int>(0, contents.size() - 1, contents.indexOf(content))]);
+		}
+		else
 		{
 			DBG("panel emptied, num listeners " << listeners.size());
 			listeners.call(&Listener::panelEmptied, this);
@@ -174,16 +180,16 @@ void ShapeShifterPanel::detachTab(ShapeShifterPanelTab * tab, bool createNewPane
 	}
 }
 
-void ShapeShifterPanel::addContent(ShapeShifterContent * content, bool setCurrent)
+void ShapeShifterPanel::addContent(ShapeShifterContent* content, bool setCurrent)
 {
 	header.addTab(content);
 	contents.add(content);
-	if(setCurrent) setCurrentContent(content);
+	if (setCurrent) setCurrentContent(content);
 }
 
-bool ShapeShifterPanel::hasContent(ShapeShifterContent * content)
+bool ShapeShifterPanel::hasContent(ShapeShifterContent* content)
 {
-	for (auto &c : contents)
+	for (auto& c : contents)
 	{
 		if (c == content) return true;
 	}
@@ -192,14 +198,14 @@ bool ShapeShifterPanel::hasContent(ShapeShifterContent * content)
 }
 
 
-bool ShapeShifterPanel::hasContent(const String &name)
+bool ShapeShifterPanel::hasContent(const String& name)
 {
 	return getContentForName(name) != nullptr;
 }
 
-ShapeShifterContent * ShapeShifterPanel::getContentForName(const String & name)
+ShapeShifterContent* ShapeShifterPanel::getContentForName(const String& name)
 {
-	for (auto &c : contents)
+	for (auto& c : contents)
 	{
 		if (c == nullptr) continue;
 		if (c->contentName == name) return c;
@@ -210,20 +216,20 @@ ShapeShifterContent * ShapeShifterPanel::getContentForName(const String & name)
 
 bool ShapeShifterPanel::isFlexible()
 {
-	if(currentContent == nullptr) return false;
+	if (currentContent == nullptr) return false;
 	return currentContent->contentIsFlexible;
 }
 
-void ShapeShifterPanel::removeTab(ShapeShifterPanelTab * tab)
+void ShapeShifterPanel::removeTab(ShapeShifterPanelTab* tab)
 {
-	ShapeShifterContent * content = tab->content;
+	ShapeShifterContent* content = tab->content;
 	contents.removeObject(content, false);
 	header.removeTab(tab, true);
 	if (currentContent == content)
 	{
 		if (contents.size() > 0)
 		{
-			setCurrentContent(contents[juce::jlimit<int>(0, contents.size() - 1, contents.indexOf(content)-1)]);
+			setCurrentContent(contents[juce::jlimit<int>(0, contents.size() - 1, contents.indexOf(content) - 1)]);
 		}
 		else
 		{
@@ -238,9 +244,9 @@ void ShapeShifterPanel::removeTab(ShapeShifterPanelTab * tab)
 		ShapeShifterManager::getInstance()->removePanel(this);
 }
 
-bool ShapeShifterPanel::attachPanel(ShapeShifterPanel * panel)
+bool ShapeShifterPanel::attachPanel(ShapeShifterPanel* panel)
 {
-	ShapeShifterPanel *newPanelForTabs = nullptr;
+	ShapeShifterPanel* newPanelForTabs = nullptr;
 
 	switch (candidateZone)
 	{
@@ -251,29 +257,29 @@ bool ShapeShifterPanel::attachPanel(ShapeShifterPanel * panel)
 	case RIGHT:
 	case TOP:
 	case BOTTOM:
-		if (parentContainer == nullptr) 
+		if (parentContainer == nullptr)
 			return false;
 		else
 		{
 			newPanelForTabs = ShapeShifterManager::getInstance()->createPanel(nullptr);
-			parentContainer->insertPanelRelative(newPanelForTabs,this,candidateZone);
+			parentContainer->insertPanelRelative(newPanelForTabs, this, candidateZone);
 		}
 		break;
 
 	case CENTER:
-		{
-			newPanelForTabs = this;
-			break;
-		}
+	{
+		newPanelForTabs = this;
+		break;
+	}
 	}
 
 	if (newPanelForTabs != nullptr)
 	{
 		int numTabs = panel->header.tabs.size();
-		while(numTabs > 0)
+		while (numTabs > 0)
 		{
-			ShapeShifterPanelTab * t = panel->header.tabs[0];
-			panel->detachTab(t,false);
+			ShapeShifterPanelTab* t = panel->header.tabs[0];
+			panel->detachTab(t, false);
 			newPanelForTabs->attachTab(t);
 			numTabs--;
 		}
@@ -283,7 +289,7 @@ bool ShapeShifterPanel::attachPanel(ShapeShifterPanel * panel)
 
 
 
-ShapeShifterPanel::AttachZone ShapeShifterPanel::checkAttachZone(ShapeShifterPanel * source)
+ShapeShifterPanel::AttachZone ShapeShifterPanel::checkAttachZone(ShapeShifterPanel* source)
 {
 	AttachZone z = AttachZone::NONE;
 
@@ -295,7 +301,8 @@ ShapeShifterPanel::AttachZone ShapeShifterPanel::checkAttachZone(ShapeShifterPan
 	if (rx < 0 || rx > 1 || ry < 0 || ry > 1)
 	{
 		//keep none
-	}else
+	}
+	else
 	{
 		if (rx < .2f) z = AttachZone::LEFT;
 		else if (rx > .8f) z = AttachZone::RIGHT;
@@ -322,31 +329,31 @@ var ShapeShifterPanel::getCurrentLayout()
 {
 	var layout = ShapeShifter::getCurrentLayout();
 	var tabData;
-	for (auto &t : header.tabs)
+	for (auto& t : header.tabs)
 	{
-		if (t->content == nullptr) continue; 
+		if (t->content == nullptr) continue;
 		var tData(new DynamicObject());
 		tData.getDynamicObject()->setProperty("name", t->content->contentName);
 		tabData.append(tData);
 	}
 
 	if (currentContent != nullptr) layout.getDynamicObject()->setProperty("currentContent", currentContent->contentName);
- 	layout.getDynamicObject()->setProperty("tabs", tabData);
+	layout.getDynamicObject()->setProperty("tabs", tabData);
 
 	return layout;
 }
 
 void ShapeShifterPanel::loadLayoutInternal(var layout)
 {
-	juce::Array<var> * tabData = layout.getDynamicObject()->getProperty("tabs").getArray();
+	juce::Array<var>* tabData = layout.getDynamicObject()->getProperty("tabs").getArray();
 
 	if (tabData != nullptr)
 	{
-		for (auto &tData : *tabData)
+		for (auto& tData : *tabData)
 		{
 			String t = tData.getDynamicObject()->getProperty("name").toString();
-			ShapeShifterContent * c = ShapeShifterFactory::createContent(tData.getDynamicObject()->getProperty("name"));
-			if(c != nullptr) addContent(c);
+			ShapeShifterContent* c = ShapeShifterFactory::createContent(tData.getDynamicObject()->getProperty("name"));
+			if (c != nullptr) addContent(c);
 		}
 	}
 	if (layout.getDynamicObject()->hasProperty("currentContent"))
@@ -355,18 +362,18 @@ void ShapeShifterPanel::loadLayoutInternal(var layout)
 	}
 }
 
-void ShapeShifterPanel::tabDrag(ShapeShifterPanelTab * tab)
+void ShapeShifterPanel::tabDrag(ShapeShifterPanelTab* tab)
 {
-	if(!isDetached() || contents.size() > 1) detachTab(tab,true);
+	if (!isDetached() || contents.size() > 1) detachTab(tab, true);
 	else listeners.call(&Listener::tabDrag, this);
 }
 
-void ShapeShifterPanel::tabSelect(ShapeShifterPanelTab * tab)
+void ShapeShifterPanel::tabSelect(ShapeShifterPanelTab* tab)
 {
 	setCurrentContent(tab->content);
 }
 
-void ShapeShifterPanel::askForRemoveTab(ShapeShifterPanelTab * tab)
+void ShapeShifterPanel::askForRemoveTab(ShapeShifterPanelTab* tab)
 {
 	removeTab(tab);
 }

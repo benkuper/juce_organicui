@@ -444,7 +444,7 @@ var ScriptUtil::listFilesFromScript(const var::NativeFunctionArgs& args)
 	Array<File> files = f.findChildFiles(File::TypesOfFileToFind::findFiles, recursive);
 
 	var result;
-	for (auto& f : files) result.append(f.getFullPathName());
+	for (auto& ff : files) result.append(ff.getFullPathName());
 	return result;
 }
 
@@ -461,7 +461,7 @@ var ScriptUtil::listDirectoriesFromScript(const var::NativeFunctionArgs& args)
 	Array<File> files = f.findChildFiles(File::TypesOfFileToFind::findDirectories, recursive);
 
 	var result;
-	for (auto& f : files) result.append(f.getFullPathName());
+	for (auto& ff : files) result.append(ff.getFullPathName());
 	return result;
 }
 

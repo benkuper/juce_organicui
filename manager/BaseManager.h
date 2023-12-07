@@ -538,8 +538,17 @@ template<class T>
 juce::Array<T*> BaseManager<T>::addItemsFromData(juce::var data, bool addToUndo)
 {
 	juce::Array<T*> itemsToAdd;
-	for (int i = 0; i < data.size(); i++) itemsToAdd.add(createItemFromData(data[i]));
-	return addItems(itemsToAdd, data, addToUndo);
+
+	juce::var itemsData; //avoid offset between items array and data array if items are skipped because they're null
+	for (int i = 0; i < data.size(); i++)
+	{
+		if (T* item = createItemFromData(data[i]))
+		{
+			itemsToAdd.add(item);
+			itemsData.append(data[i]);
+		}
+	}
+	return addItems(itemsToAdd, itemsData, addToUndo);
 }
 
 template<class T>

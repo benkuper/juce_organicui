@@ -41,8 +41,8 @@ public:
 	void setCurrentContent(const juce::String &name);
 
 
-	void paint(juce::Graphics & g) override;
-	void paintOverChildren(juce::Graphics & g) override;
+	virtual void paint(juce::Graphics & g) override;
+	virtual void paintOverChildren(juce::Graphics & g) override;
 	void resized() override;
 
 

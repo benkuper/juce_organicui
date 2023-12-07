@@ -9,6 +9,7 @@
 */
 
 #include "JuceHeader.h"
+#include "Point2DParameter.h"
 
 Point2DParameter::Point2DParameter(const String& niceName, const String& description, bool _enabled) :
 	Parameter(POINT2D, niceName, description, 0, 0, 1, _enabled),
@@ -74,6 +75,19 @@ UndoableAction* Point2DParameter::setUndoablePoint(float oldX, float oldY, float
 	if (checkValueIsTheSame(od, d) && !alwaysNotify) return nullptr;
 
 	return setUndoableValue(od, d, onlyReturnAction);
+}
+
+void Point2DParameter::setDefaultPoint(juce::Point<float> p, bool doResetValue)
+{
+	setDefaultPoint(p.x, p.y, doResetValue);
+}
+
+void Point2DParameter::setDefaultPoint(float _x, float _y, bool doResetValue)
+{
+	var val;
+	val.append(_x);
+	val.append(_y);
+	setDefaultValue(val, doResetValue);
 }
 
 void Point2DParameter::setValueInternal(var& _value)

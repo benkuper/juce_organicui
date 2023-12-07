@@ -8,6 +8,8 @@
   ==============================================================================
 */
 
+#include  "JuceHeader.h"
+
 FloatStepperUI::FloatStepperUI(Array<Parameter*> parameters) :
 	ParameterUI(parameters, PARAMETERUI_DEFAULT_TIMER),
 	valueAtDragStart(parameters[0]->floatValue())
@@ -70,7 +72,8 @@ void FloatStepperUI::paint(Graphics& g)
 	{
 		Rectangle<int> r = getLocalBounds();
 		g.setFont(customTextSize > 0 ? customTextSize : Font());
-		r = r.removeFromLeft(jmin(g.getCurrentFont().getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, r.getWidth() - 60));
+		r = r.removeFromLeft(jmin(g.getCurrentFont().getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, r.getWidth() - 
+		 60));
 		g.setColour(useCustomTextColor ? customTextColor : TEXT_COLOR);
 		g.drawFittedText(customLabel.isNotEmpty() ? customLabel : parameter->niceName, r, Justification::centred, 1);
 	}
@@ -86,7 +89,7 @@ void FloatStepperUI::resized()
 	{
 		Font font(customTextSize > 0 ? customTextSize : jlimit(12, 40, jmin(r.getHeight() - 4, r.getWidth()) - 16));
 		r.removeFromLeft(jmin(font.getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName), r.getWidth() - 60));
-		slider->setBounds(r.removeFromRight(jmin(r.getWidth(), 120)));
+		slider->setBounds(r.removeFromRight(jmin(r.getWidth(), 60)));
 	}
 	else
 	{

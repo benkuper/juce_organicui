@@ -43,6 +43,10 @@ OrganicMainContentComponent::~OrganicMainContentComponent()
 	//ShapeShifterManager::getInstance()->toggleTemporaryFullContent(nullptr);
 	ShapeShifterManager::deleteInstance();
 	ParameterUITimers::deleteInstance();
+
+#if ORGANICUI_USE_SHAREDTEXTURE
+	SharedTextureManager::deleteInstance();
+#endif
 }
 
 void OrganicMainContentComponent::init()

@@ -29,6 +29,9 @@ public:
 	juce::UndoableAction * setUndoablePoint(juce::Point<float> oldPoint, juce::Point<float> newPoint, bool onlyReturnAction = false);
 	juce::UndoableAction* setUndoablePoint(float oldX, float oldY, float newX, float newY, bool onlyReturnAction = false);
 
+	void setDefaultPoint(juce::Point<float> value, bool doResetValue = true);
+	void setDefaultPoint(float x, float y, bool doResetValue = true);
+
 	void setValueInternal(juce::var  &_value) override;
 	void setBounds(float _minX, float _minY, float _maxX, float _maxY);
 	
