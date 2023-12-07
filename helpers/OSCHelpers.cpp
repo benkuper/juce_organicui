@@ -252,13 +252,13 @@ Controllable* OSCHelpers::findControllable(ControllableContainer* root, const OS
 	return root->getControllableForAddress(address);
 }
 
-ControllableContainer* OSCHelpers::findParentContainer(ControllableContainer* root, const juce::OSCMessage& m, int dataOffset)
+ControllableContainer* OSCHelpers::findParentContainer(ControllableContainer* root, const juce::String &address, int dataOffset)
 {
 
 	if (root == nullptr) return nullptr;
-	String address = m.getAddressPattern().toString();
 	StringArray addSplit;
 	addSplit.addTokens(address, "/", "\"");
+	if(address.startsWith("/")) addSplit.remove(0); //remove first empty string
 	addSplit.remove(addSplit.size() - 1);
 	
 	if (addSplit.isEmpty()) return Engine::mainEngine;

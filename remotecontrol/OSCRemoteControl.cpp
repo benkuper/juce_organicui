@@ -20,6 +20,8 @@ juce_ImplementSingleton(OSCRemoteControl)
 #define ORGANIC_REMOTE_CONTROL_PORT 42000
 #endif
 
+using namespace juce;
+
 OSCRemoteControl::OSCRemoteControl() :
 	EnablingControllableContainer("OSC Remote Control")
 #if ORGANICUI_USE_SERVUS
@@ -285,12 +287,12 @@ void OSCRemoteControl::processMessage(const OSCMessage& m, const String& sourceI
 		if (c == nullptr)
 		{
 			bool handled = false;
-			if (ControllableContainer* cc = OSCHelpers::findParentContainer(Engine::mainEngine, m))
+			if (ControllableContainer* cc = OSCHelpers::findParentContainer(Engine::mainEngine, m.getAddressPattern().toString()))
 			{
-				handled = cc->handleRemoteControlData(m);
+				handled = cc->handleRemoteControlData(m, sourceId);
 			}
 
-			if (!handled) remoteControlListeners.call(&RemoteControlListener::processMessage, m);
+			if (!handled) remoteControlListeners.call(&RemoteControlListener::processMessage, m, sourceId);
 
 		}
 	}
@@ -615,6 +617,22 @@ void OSCRemoteControl::sendOSCQueryFeedback(const OSCMessage& m, StringArray exc
 
 	if (logOutgoing->boolValue()) NLOG(niceName, "Sent to OSCQuery : " << OSCHelpers::messageToString(m));
 }
+
+void OSCRemoteControl::sendOSCQueryFeedbackTo(const juce::OSCMessage& m, juce::StringArray ids)
+{
+	if (server == nullptr) return;
+
+	OSCPacketPacker packer;
+	if (packer.writeMessage(m))
+	{
+		MemoryBlock b(packer.getData(), packer.getDataSize());
+		for (auto& id : ids) server->sendTo(b, id);
+	}
+
+	if (logOutgoing->boolValue()) NLOG(niceName, "Sent to OSCQuery : " << OSCHelpers::messageToString(m));
+
+}
+
 #endif
 
 void OSCRemoteControl::sendAllManualFeedback()

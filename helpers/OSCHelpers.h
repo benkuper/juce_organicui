@@ -36,7 +36,7 @@ public:
 
 	static Controllable* findControllableAndHandleMessage(ControllableContainer* root, const juce::OSCMessage& m, int dataOffset = 0);
 	static Controllable* findControllable(ControllableContainer* root, const juce::OSCMessage& m, int dataOffset = 0);
-	static ControllableContainer* findParentContainer(ControllableContainer* root, const juce::OSCMessage& m, int dataOffset = 0);
+	static ControllableContainer* findParentContainer(ControllableContainer* root, const juce::String& address, int dataOffset = 0);
 
 	static void handleControllableForOSCMessage(Controllable* c, const juce::OSCMessage& m, int dataOffset = 0);
 

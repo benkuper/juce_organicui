@@ -95,6 +95,7 @@ public:
 
 	void sendOSCQueryFeedback(Controllable* c, const juce::String& excludeId = "");
 	void sendOSCQueryFeedback(const juce::OSCMessage& m, juce::StringArray excludes = juce::StringArray());
+	void sendOSCQueryFeedbackTo(const juce::OSCMessage& m, juce::StringArray ids = juce::StringArray());
 
 	void sendPathAddedFeedback(const juce::String& path);
 	void sendPathRemovedFeedback(const juce::String& path);
@@ -115,7 +116,7 @@ public:
 	{
 	public:
 		virtual ~RemoteControlListener() {}
-		virtual void processMessage(const juce::OSCMessage& m) {}
+		virtual void processMessage(const juce::OSCMessage& m, const juce::String& clientId) {}
 	};
 
 	juce::ListenerList<RemoteControlListener> remoteControlListeners;
