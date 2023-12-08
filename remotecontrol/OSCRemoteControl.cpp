@@ -449,6 +449,35 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 				}
 
 			}
+			else if (command == "LOAD")
+			{
+				var fileData = JSON::parse(data["data"]);
+
+				if (fileData.isObject())
+				{
+					if (ControllableContainer* cc = data["address"] == "/" ? Engine::mainEngine : Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true))
+					{
+						MessageManager::callAsync([cc, fileData]() { cc->handleLoadFromRemoteControl(fileData); });
+					}
+				}
+			}
+			else if (command == "SAVE")
+			{
+				if (ControllableContainer* cc = data["address"] == "/" ? Engine::mainEngine : Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true))
+				{
+					var saveData = cc->handleSaveFromRemoteControl();
+					if (saveData.isObject())
+					{
+						var msg(new DynamicObject());
+						msg.getDynamicObject()->setProperty("COMMAND", "SAVE");
+						var datamsg(new DynamicObject());
+						datamsg.getDynamicObject()->setProperty("address", data["address"]);
+						datamsg.getDynamicObject()->setProperty("data", saveData);
+						msg.getDynamicObject()->setProperty("DATA", datamsg);
+						server->sendTo(JSON::toString(msg), id);
+					}
+				}
+			}
 			else if (command == "RENAME")
 			{
 				if (ControllableContainer* cc = Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true))
