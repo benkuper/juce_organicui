@@ -1391,7 +1391,7 @@ var ControllableContainer::addColorParameterFromScript(const var::NativeFunction
 	}
 
 
-	Parameter* p = cc->addColorParameter(args.arguments[0], args.arguments[1], Colour((float)color[0], (float)color[1], (float)color[2], (float)color[3]));
+	Parameter* p = cc->addColorParameter(args.arguments[0], args.arguments[1], Colour::fromFloatRGBA((float)color[0], (float)color[1], (float)color[2], (float)color[3]));
 	p->isCustomizableByUser = true;
 	return p->getScriptObject();
 }

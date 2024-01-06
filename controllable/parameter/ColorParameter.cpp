@@ -48,7 +48,7 @@ const Colour ColorParameter::getColor()
 	if (!value.isArray()) return Colours::black;
 	while (value.size() < 4) value.append(0);
 
-	return Colour((uint8)((float)value[0]*255), (uint8)((float)value[1]*255), (uint8)((float)value[2]*255), (uint8)((float)value[3]*255));
+	return Colour::fromFloatRGBA((float)value[0], (float)value[1], (float)value[2], (float)value[3]);
 }
 
 void ColorParameter::setFloatRGBA(const float & r, const float & g, const float & b, const float & a)
