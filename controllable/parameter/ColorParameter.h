@@ -17,11 +17,8 @@ class ColorParameter :
 {
 public:
 
-	enum Mode { UINT, FLOAT };
 	ColorParameter(const juce::String& niceName, const juce::String& description, const juce::Colour& initialColor = juce::Colours::black, bool enabled = true);
 	~ColorParameter();
-
-	Mode mode;
 
 	const juce::Colour getColor();
 	void setFloatRGBA(const float& r, const float& g, const float& b, const float& a);

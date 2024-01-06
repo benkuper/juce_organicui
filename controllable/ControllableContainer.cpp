@@ -1373,26 +1373,25 @@ var ControllableContainer::addColorParameterFromScript(const var::NativeFunction
 	if (args.arguments[2].isArray())
 	{
 		color = args.arguments[2];
-		while (color.size() < 4) color.append(color.size() < 3 ? 0 : 1);
-		for (int i = 0; i < color.size(); ++i) color[i] = (float)color[i] * 255;
+		while (color.size() < 4) color.append(color.size() < 3 ? 0.f : 1.f);
 	}
 	else if (args.numArguments >= 5)
 	{
-		color.append((float)args.arguments[2] * 255);
-		color.append((float)args.arguments[3] * 255);
-		color.append((float)args.arguments[4] * 255);
-		color.append((float)args.numArguments >= 6 ? (float)args.arguments[5] * 255 : 255);
+		color.append((float)args.arguments[2]);
+		color.append((float)args.arguments[3]);
+		color.append((float)args.arguments[4]);
+		color.append((float)args.numArguments >= 6 ? (float)args.arguments[5] : 1.f);
 	}
 	else if (args.arguments[2].isInt() || args.arguments[2].isInt64())
 	{
-		color.append(((int)args.arguments[2] >> 24) & 0xFF);
-		color.append(((int)args.arguments[2] >> 16) & 0xFF);
-		color.append(((int)args.arguments[2] >> 8) & 0xFF);
-		color.append(((int)args.arguments[2]) & 0xFF);
+		color.append((float)(((int)args.arguments[2] >> 24) & 0xFF) / 255.f);
+		color.append((float)(((int)args.arguments[2] >> 16) & 0xFF) / 255.f);
+		color.append((float)(((int)args.arguments[2] >> 8) & 0xFF) / 255.f);
+		color.append((float)(((int)args.arguments[2]) & 0xFF) / 255.f);
 	}
 
 
-	Parameter* p = cc->addColorParameter(args.arguments[0], args.arguments[1], Colour((uint8)(int)color[0], (uint8)(int)color[1], (uint8)(int)color[2], (uint8)(int)color[3]));
+	Parameter* p = cc->addColorParameter(args.arguments[0], args.arguments[1], Colour((float)color[0], (float)color[1], (float)color[2], (float)color[3]));
 	p->isCustomizableByUser = true;
 	return p->getScriptObject();
 }
