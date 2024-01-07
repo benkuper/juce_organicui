@@ -12,8 +12,7 @@
 
 
 ColorParameter::ColorParameter(const String & niceName, const String & description, const Colour & initialColor, bool enabled) :
-	Parameter(COLOR,niceName,description,var(),var(),var(),enabled),
-	mode(FLOAT)
+	Parameter(COLOR,niceName,description,var(),var(),var(),enabled)
 {
 	//lockManualControlMode = true;
 
@@ -24,27 +23,17 @@ ColorParameter::ColorParameter(const String & niceName, const String & descripti
 	for (int i = 0; i < 4; ++i)
 	{
 		minVal.append(0);
-		maxVal.append(mode == FLOAT ? 1.0f : 255);
+		maxVal.append(1.0f);
 	}
 
 	minimumValue = minVal;
 	maximumValue = maxVal;
 
 	defaultValue = var();
-	if (mode == FLOAT)
-	{
-		defaultValue.append(initialColor.getFloatRed());
-		defaultValue.append(initialColor.getFloatGreen());
-		defaultValue.append(initialColor.getFloatBlue());
-		defaultValue.append(initialColor.getFloatAlpha());
-	}
-	else
-	{
-		defaultValue.append(initialColor.getRed());
-		defaultValue.append(initialColor.getGreen());
-		defaultValue.append(initialColor.getBlue());
-		defaultValue.append(initialColor.getAlpha());
-	}
+	defaultValue.append(initialColor.getFloatRed());
+	defaultValue.append(initialColor.getFloatGreen());
+	defaultValue.append(initialColor.getFloatBlue());
+	defaultValue.append(initialColor.getFloatAlpha());
 
 	value = defaultValue.clone();
 
@@ -59,8 +48,7 @@ const Colour ColorParameter::getColor()
 	if (!value.isArray()) return Colours::black;
 	while (value.size() < 4) value.append(0);
 
-	if (mode == FLOAT) return Colour((uint8)((float)value[0]*255), (uint8)((float)value[1]*255), (uint8)((float)value[2]*255), (uint8)((float)value[3]*255));
-	else return Colour((uint8)(int)value[0], (uint8)(int)value[1], (uint8)(int)value[2], (uint8)(int)value[3]);
+	return Colour::fromFloatRGBA((float)value[0], (float)value[1], (float)value[2], (float)value[3]);
 }
 
 void ColorParameter::setFloatRGBA(const float & r, const float & g, const float & b, const float & a)
@@ -76,20 +64,10 @@ void ColorParameter::setColor(const uint32 & _color, bool silentSet, bool force)
 void ColorParameter::setColor(const Colour &_color, bool silentSet, bool force)
 {
 	var colorVar;
-	if (mode == FLOAT)
-	{
-		colorVar.append(_color.getFloatRed());
-		colorVar.append(_color.getFloatGreen());
-		colorVar.append(_color.getFloatBlue());
-		colorVar.append(_color.getFloatAlpha());
-	}
-	else
-	{
-		colorVar.append(_color.getRed());
-		colorVar.append(_color.getGreen());
-		colorVar.append(_color.getBlue());
-		colorVar.append(_color.getAlpha());
-	}
+	colorVar.append(_color.getFloatRed());
+	colorVar.append(_color.getFloatGreen());
+	colorVar.append(_color.getFloatBlue());
+	colorVar.append(_color.getFloatAlpha());
 	
 	setValue(colorVar, silentSet, force);
 }
@@ -97,20 +75,10 @@ void ColorParameter::setColor(const Colour &_color, bool silentSet, bool force)
 void ColorParameter::setDefaultValue(const Colour& _color, bool doResetValue)
 {
 	var cVal = var();
-	if (mode == FLOAT)
-	{
-		cVal.append(_color.getFloatRed());
-		cVal.append(_color.getFloatGreen());
-		cVal.append(_color.getFloatBlue());
-		cVal.append(_color.getFloatAlpha());
-	}
-	else
-	{
-		cVal.append(_color.getRed());
-		cVal.append(_color.getGreen());
-		cVal.append(_color.getBlue());
-		cVal.append(_color.getAlpha());
-	}
+	cVal.append(_color.getFloatRed());
+	cVal.append(_color.getFloatGreen());
+	cVal.append(_color.getFloatBlue());
+	cVal.append(_color.getFloatAlpha());
 
 	Parameter::setDefaultValue(cVal, doResetValue);
 }
