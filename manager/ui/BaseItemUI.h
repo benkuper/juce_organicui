@@ -21,8 +21,8 @@ class BaseItemUI :
 public:
 	enum Direction { NONE, VERTICAL, HORIZONTAL, ALL };
 
-	BaseItemUI<T>(T* _item, Direction resizeDirection = NONE, bool showMiniModeBT = false);
-	virtual ~BaseItemUI<T>();
+	BaseItemUI(T* _item, Direction resizeDirection = NONE, bool showMiniModeBT = false);
+	virtual ~BaseItemUI();
 
 	//LAYOUT
 	int margin;
@@ -127,7 +127,7 @@ public:
 
 
 private:
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BaseItemUI<T>)
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BaseItemUI)
 };
 
 

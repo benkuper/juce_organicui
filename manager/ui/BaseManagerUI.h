@@ -36,7 +36,7 @@ class ManagerUIItemContainer :
 	public juce::Component
 {
 public:
-	ManagerUIItemContainer<M, T, U>(BaseManagerUI<M, T, U>* _mui) : mui(_mui) {};
+	ManagerUIItemContainer(BaseManagerUI<M, T, U>* _mui) : mui(_mui) {};
 	~ManagerUIItemContainer() {}
 
 	BaseManagerUI<M, T, U>* mui;
@@ -61,7 +61,7 @@ class BaseManagerUI :
 	public juce::TextEditor::Listener
 {
 public:
-	BaseManagerUI<M, T, U>(const juce::String& contentName, M* _manager, bool _useViewport = true);
+	BaseManagerUI(const juce::String& contentName, M* _manager, bool _useViewport = true);
 	virtual ~BaseManagerUI();
 
 	enum Layout { HORIZONTAL, VERTICAL, FREE };
