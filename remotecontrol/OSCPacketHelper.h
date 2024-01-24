@@ -87,7 +87,7 @@ public:
 		checkBytesAvailable((blobDataSize + 3) % 4, "OSC input stream exhausted before reaching end of blob");
 
 		juce::MemoryBlock blob;
-		auto bytesRead = input.readIntoMemoryBlock(blob, (juce::ssize_t)blobDataSize);
+		auto bytesRead = input.readIntoMemoryBlock(blob, blobDataSize);
 		readPaddingZeros(bytesRead);
 
 		return blob;
