@@ -382,6 +382,10 @@ T* BaseManager<T>::createItemFromData(juce::var data)
 {
 	if (managerFactory != nullptr)
 	{
+		juce::String extendedType = data.getProperty("extendedType", "");
+		if (extendedType != "") {
+			return managerFactory->create(managerFactory->getDefFromExtendedType(extendedType));
+		}
 		juce::String type = data.getProperty("type", "");
 		if (type.isEmpty()) return nullptr;
 		return managerFactory->create(type);
