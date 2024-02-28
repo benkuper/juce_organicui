@@ -210,6 +210,20 @@ public:
 		return nullptr;
 	}
 
+	virtual BaseFactoryDefinition<T>* getDefFromExtendedType(const juce::String& extendedType)
+	{
+		if (!extendedType.matchesWildcard("*/*", true)) return nullptr;
+
+		juce::String menuPath = extendedType.substring(0, extendedType.indexOf("/"));
+		juce::String type = extendedType.substring(extendedType.indexOf("/") + 1, extendedType.length());
+
+		for (auto& d : defs)
+		{
+			if (d->menuPath == menuPath && d->type == type) return d;
+		}
+		return nullptr;
+	}
+
 	virtual T* create(BaseFactoryDefinition<T> * def)
 	{
 		return def->create();

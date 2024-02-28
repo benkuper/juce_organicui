@@ -523,8 +523,13 @@ void OSCQueryHelpers::createOrUpdateControllableFromData(ControllableContainer* 
 		Colour col = Colours::black;
 		if (type == "ffff" || type == "dddd") col = value.size() >= 4 ? Colour::fromFloatRGBA(value[0], value[1], value[2], value[3]) : Colours::black;
 		else if (type == "iiii" || type == "hhhh") col = value.size() >= 4 ? Colour::fromRGBA((int)value[0], (int)value[1], (int)value[2], (int)value[3]) : Colours::black;
-		else if (type == "r") col = Colour::fromString(value[0].toString());
-
+		else if (type == "r")
+		{
+			// do not use Colour::fromString that parses a #ARGB color string while OSC "r" type is a RGBA format.
+			const uint32 intValue = CharacterFunctions::HexParser<uint32>::parse(value[0].toString().getCharPointer());
+			const OSCColour oscColor = OSCColour::fromInt32(intValue);
+			col = Colour::fromRGBA(oscColor.red, oscColor.green, oscColor.blue, oscColor.alpha);
+		}
 		if (c == nullptr)  c = new ColorParameter(cNiceName, cNiceName, col);
 		else ((ColorParameter*)c)->setColor(col);
 	}

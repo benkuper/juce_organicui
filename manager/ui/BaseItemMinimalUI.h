@@ -18,8 +18,8 @@ class BaseItemMinimalUI :
 	public juce::DragAndDropTarget
 {
 public:
-	BaseItemMinimalUI<T>(T* _item);
-	virtual ~BaseItemMinimalUI<T>();
+	BaseItemMinimalUI(T* _item);
+	virtual ~BaseItemMinimalUI();
 
 	T* item;
 	BaseItem* baseItem;

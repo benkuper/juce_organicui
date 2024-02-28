@@ -15,7 +15,7 @@ class BaseManagerViewUI :
 	public BaseManagerUI<M, T, U>
 {
 public:
-	BaseManagerViewUI<M, T, U>(const juce::String& contentName, M* _manager);
+	BaseManagerViewUI(const juce::String& contentName, M* _manager);
 	virtual ~BaseManagerViewUI();
 
 	bool canNavigate;

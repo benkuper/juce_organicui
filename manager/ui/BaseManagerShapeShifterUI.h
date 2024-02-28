@@ -16,7 +16,7 @@ class BaseManagerShapeShifterUI :
 	public ShapeShifterContent
 {
 public:
-	BaseManagerShapeShifterUI<M, T, U>(const juce::String &contentName, M * _manager, bool useViewport = true) :
+	BaseManagerShapeShifterUI(const juce::String &contentName, M * _manager, bool useViewport = true) :
 		BaseManagerUI<M, T, U>(contentName, _manager, useViewport),
 		ShapeShifterContent(this,contentName)
 	{
@@ -30,7 +30,7 @@ class BaseManagerShapeShifterViewUI :
 	public ShapeShifterContent
 {
 public:
-	BaseManagerShapeShifterViewUI<M, T, U>(const juce::String &contentName, M * _manager) :
+	BaseManagerShapeShifterViewUI(const juce::String &contentName, M * _manager) :
 		BaseManagerViewUI<M, T, U>(contentName, _manager),
 		ShapeShifterContent(this, contentName)
 	{

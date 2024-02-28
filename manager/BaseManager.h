@@ -21,8 +21,8 @@ class BaseManager :
 	public BaseItemListener
 {
 public:
-	BaseManager<T>(const juce::String& name);
-	virtual ~BaseManager<T>();
+	BaseManager(const juce::String& name);
+	virtual ~BaseManager();
 
 	juce::OwnedArray<T, juce::CriticalSection> items;
 	bool isClearing;
@@ -282,7 +282,7 @@ public:
 	static juce::var reorderItemsFromScript(const juce::var::NativeFunctionArgs& args);
 
 private:
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BaseManager<T>)
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BaseManager)
 };
 
 
@@ -382,6 +382,10 @@ T* BaseManager<T>::createItemFromData(juce::var data)
 {
 	if (managerFactory != nullptr)
 	{
+		juce::String extendedType = data.getProperty("extendedType", "");
+		if (extendedType != "") {
+			return managerFactory->create(managerFactory->getDefFromExtendedType(extendedType));
+		}
 		juce::String type = data.getProperty("type", "");
 		if (type.isEmpty()) return nullptr;
 		return managerFactory->create(type);
