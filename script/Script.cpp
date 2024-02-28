@@ -146,6 +146,8 @@ void Script::loadScript()
 
 	setState(SCRIPT_LOADING);
 
+	availableFunctions.clear();
+
 	String path = filePath->getAbsolutePath();
 
 	if (path.isEmpty())
@@ -205,8 +207,9 @@ void Script::loadScript()
 		return;
 	}
 
-	const NamedValueSet props = scriptEngine->getRootObjectProperties();
-	updateEnabled = props.contains(updateIdentifier);
+	availableFunctions = scriptEngine->getRootObjectFunctionNames();
+
+	updateEnabled = availableFunctions.contains(updateIdentifier);
 	updateRate->hideInEditor = !updateEnabled;
 
 	callFunction("init", Array<var>());
@@ -254,6 +257,12 @@ var Script::callFunction(const Identifier& function, const Array<var> args, Resu
 	if (canBeDisabled && (!enabled->boolValue() || forceDisabled)) return false;
 
 	if (scriptEngine == nullptr) return false;
+
+	if (!availableFunctions.contains(function.toString()))
+	{
+		//NLOGERROR(niceName, "Function " + function.toString() + " not found in script");
+		return var();
+	}
 
 	Result tmpResult = Result::ok();
 	if (result == nullptr) result = &tmpResult;

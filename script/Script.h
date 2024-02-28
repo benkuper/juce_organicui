@@ -43,6 +43,8 @@ public:
 
 	ScriptTarget* parentTarget;
 
+	juce::StringArray availableFunctions;
+
 	std::unique_ptr<juce::JavascriptEngine> scriptEngine;
 	juce::CriticalSection engineLock;
 	float executionTimeout;
