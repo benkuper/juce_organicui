@@ -52,13 +52,13 @@ void Dashboard::itemsAdded(Array<DashboardItem*> items)
 void Dashboard::itemRemoved(DashboardItem* item)
 {
 	item->removeDashboardFeedbackListener(this);
-	dashboardListeners.call(&DashboardListener::askForRefresh, this);
+	if(!Engine::mainEngine->isClearing)	dashboardListeners.call(&DashboardListener::askForRefresh, this);
 }
 
 void Dashboard::itemsRemoved(Array<DashboardItem*> items)
 {
 	for (auto& i : items) i->removeDashboardFeedbackListener(this);
-	dashboardListeners.call(&DashboardListener::askForRefresh, this);
+	if (!Engine::mainEngine->isClearing) dashboardListeners.call(&DashboardListener::askForRefresh, this);
 }
 
 void Dashboard::parameterFeedback(var data)

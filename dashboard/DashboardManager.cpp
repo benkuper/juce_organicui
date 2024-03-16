@@ -37,6 +37,8 @@ DashboardManager::DashboardManager() :
 
 DashboardManager::~DashboardManager()
 {
+	for (auto& i : items) i->removeDashboardListener(this);
+
 #if ORGANICUI_USE_WEBSERVER
 	if (server != nullptr)
 	{
