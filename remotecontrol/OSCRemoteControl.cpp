@@ -34,6 +34,7 @@ OSCRemoteControl::OSCRemoteControl() :
 
 #endif
 	, manualSendCC("Manual OSC Send")
+	,localPort(nullptr)
 {
 
 	saveAndLoadRecursiveData = true; //can be useful when app include other settings there
@@ -323,7 +324,7 @@ void OSCRemoteControl::run()
 {
 	String nameToAdvertise = OrganicApplication::getInstance()->getApplicationName() + " - Remote Control";
 	int portToAdvertise = 0;
-	bool isEnabled = enabled->boolValue();
+	bool isEnabled = enabled->boolValue() && !Engine::mainEngine->isClearing;
 
 	while ((portToAdvertise != localPort->intValue() || isEnabled != enabled->boolValue()) && !threadShouldExit())
 	{
