@@ -45,6 +45,8 @@ OSCRemoteControl::OSCRemoteControl() :
 	logIncoming = addBoolParameter("Log Incoming", "If checked, this will log incoming messages", false);
 	logOutgoing = addBoolParameter("Log Outgoing", "If checked, this will log outgoing messages", false);
 
+	sendFeedbackOnListen = addBoolParameter("Send update on listen", "Sends feedback with the current controllable value when a client sends a LISTEN command", false);
+
 	receiver.addListener(this);
 	receiver.registerFormatErrorHandler(&OSCHelpers::logOSCFormatError);
 
@@ -493,6 +495,7 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 				{
 					if (!feedbackMap.contains(id)) feedbackMap.set(id, Array<Controllable*>());
 					(&(feedbackMap.getReference(id)))->addIfNotAlreadyThere(c);
+					if (sendFeedbackOnListen->boolValue()) sendOSCQueryFeedback(c);
 				}
 				else if (command == "IGNORE")
 				{

@@ -43,6 +43,7 @@ public:
 	bool receiverIsConnected;
 	BoolParameter* logIncoming;
 	BoolParameter* logOutgoing;
+	BoolParameter* sendFeedbackOnListen;
 
 	EnablingControllableContainer manualSendCC;
 	juce::OSCSender manualSender;
