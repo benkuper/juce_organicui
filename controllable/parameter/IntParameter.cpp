@@ -45,7 +45,7 @@ void IntParameter::setWeightedValue(Array<var> values, Array<float> weights)
 }
 
 
-bool IntParameter::hasRange()
+bool IntParameter::hasRange() const
 {
 	return (float)minimumValue != INT32_MIN || (float)maximumValue != INT32_MAX;
 

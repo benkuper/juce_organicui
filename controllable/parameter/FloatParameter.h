@@ -41,7 +41,7 @@ public:
 
 	virtual void setValueInternal(juce::var& value) override;
 
-	virtual bool hasRange() override;
+	virtual bool hasRange() const override;
 
 	virtual juce::var getLerpValueTo(juce::var targetValue, float weight) override;
 	virtual void setWeightedValue(juce::Array<juce::var> values, juce::Array<float> weights) override;

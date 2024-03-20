@@ -78,12 +78,12 @@ public:
 	//ColorStatus
 	juce::HashMap<juce::var, juce::Colour> colorStatusMap;
 
-	bool isComplex();
+	bool isComplex() const;
 	virtual juce::StringArray getValuesNames();
 
 	virtual void setRange(juce::var min, juce::var max);
 	virtual void clearRange();
-	virtual bool hasRange();
+	virtual bool hasRange() const;
 
 	bool isPresettable;
 	bool isOverriden;
@@ -112,8 +112,8 @@ public:
 
 	//For Number type parameters
 	void setUndoableNormalizedValue(const juce::var& oldNormalizedValue, const juce::var& newNormalizedValue);
-	void setNormalizedValue(const juce::var& normalizedValue, bool silentSet = false, bool force = false);
-	juce::var getNormalizedValue();
+	virtual void setNormalizedValue(const juce::var& normalizedValue, bool silentSet = false, bool force = false);
+	virtual juce::var getNormalizedValue() const;
 
 	virtual bool setAttributeInternal(juce::String param, juce::var value) override;
 	virtual juce::StringArray getValidAttributes() const override;

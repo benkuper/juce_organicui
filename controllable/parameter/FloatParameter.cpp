@@ -89,7 +89,7 @@ void FloatParameter::setValueInternal(var& val)
 	else Parameter::setValueInternal(val);
 }
 
-bool FloatParameter::hasRange()
+bool FloatParameter::hasRange() const
 {
 	return (double)minimumValue != (double)INT32_MIN && (double)maximumValue != (double)INT32_MAX;
 }
