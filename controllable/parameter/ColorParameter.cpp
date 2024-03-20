@@ -16,18 +16,8 @@ ColorParameter::ColorParameter(const String & niceName, const String & descripti
 {
 	//lockManualControlMode = true;
 
+	canHaveRange = true;
 	canBeAutomated = true;
-
-	var minVal;
-	var maxVal;
-	for (int i = 0; i < 4; ++i)
-	{
-		minVal.append(0);
-		maxVal.append(1.0f);
-	}
-
-	minimumValue = minVal;
-	maximumValue = maxVal;
 
 	defaultValue = var();
 	defaultValue.append(initialColor.getFloatRed());
@@ -37,18 +27,21 @@ ColorParameter::ColorParameter(const String & niceName, const String & descripti
 
 	value = defaultValue.clone();
 
+	clearRange();
 }
 
 ColorParameter::~ColorParameter() {}
 
-const Colour ColorParameter::getColor()
+Colour ColorParameter::getColor() const
 {
 	GenericScopedLock<SpinLock> lock(valueSetLock);
 
 	if (!value.isArray()) return Colours::black;
-	while (value.size() < 4) value.append(0);
 
-	return Colour::fromFloatRGBA((float)value[0], (float)value[1], (float)value[2], (float)value[3]);
+	return Colour::fromFloatRGBA(value.size() > 0 ? (float)value[0] : 0.f,
+								 value.size() > 1 ? (float)value[1] : 0.f,
+								 value.size() > 2 ? (float)value[2] : 0.f,
+								 value.size() > 3 ? (float)value[3] : 0.f);
 }
 
 void ColorParameter::setFloatRGBA(const float & r, const float & g, const float & b, const float & a)
@@ -70,6 +63,58 @@ void ColorParameter::setColor(const Colour &_color, bool silentSet, bool force)
 	colorVar.append(_color.getFloatAlpha());
 	
 	setValue(colorVar, silentSet, force);
+}
+
+bool ColorParameter::hasRange() const
+{
+	GenericScopedLock<SpinLock> lock(valueSetLock);
+	for (int i = 0; i < value.size(); ++i)
+	{
+		if ((float)minimumValue[i] != 0.f || (float)maximumValue[i] != 1.f)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+void ColorParameter::clearRange()
+{
+	var minVal;
+	var maxVal;
+	for (int i = 0; i < 4; ++i)
+	{
+		minVal.append(0);
+		maxVal.append(1.0f);
+	}
+	setRange(minVal, maxVal);
+}
+
+void ColorParameter::setBounds(float _minR, float _minG, float _minB, float _minA, float _maxR, float _maxG, float _maxB, float _maxA)
+{
+	var minRange;
+	var maxRange;
+	minRange.append(jlimit(0.f, 1.f, _minR));
+	minRange.append(jlimit(0.f, 1.f, _minG));
+	minRange.append(jlimit(0.f, 1.f, _minB));
+	minRange.append(jlimit(0.f, 1.f, _minA));
+	maxRange.append(jlimit(0.f, 1.f, _maxR));
+	maxRange.append(jlimit(0.f, 1.f, _maxG));
+	maxRange.append(jlimit(0.f, 1.f, _maxB));
+	maxRange.append(jlimit(0.f, 1.f, _maxA));
+	setRange(minRange, maxRange);
+}
+
+var ColorParameter::getCroppedValue(var originalValue)
+{
+	jassert(originalValue.isArray() && minimumValue.isArray() && maximumValue.isArray());
+	if (!originalValue.isArray() || originalValue.size() < 4) return originalValue;
+
+	if (minimumValue.size() < 4 || maximumValue.size() < 4) return originalValue;
+
+	var val;
+	for (int i = 0; i < 4; ++i) val.append(jlimit(minimumValue[i], maximumValue[i], originalValue[i]));
+	return val;
 }
 
 void ColorParameter::setDefaultValue(const Colour& _color, bool doResetValue)

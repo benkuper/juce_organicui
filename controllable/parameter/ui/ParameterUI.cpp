@@ -209,6 +209,10 @@ void ParameterUI::addPopupMenuItems(PopupMenu* p)
 				rangeMenu.addItem(-72, "0 : 100");
 				rangeMenu.addItem(-73, "-100 : 100");
 			}
+			else if (parameter->type == Parameter::COLOR)
+			{
+				rangeMenu.addItem(-80, "Opaque");
+			}
 
 			if (parameter->type == Parameter::FLOAT || parameter->type == Parameter::INT)
 			{
@@ -313,6 +317,9 @@ void ParameterUI::handleMenuSelectedID(int id)
 	case -73:
 		if (parameter->type == Parameter::POINT2D) ((Point2DParameter*)parameter.get())->setBounds(-100, -100, 100, 100);
 		else ((Point3DParameter*)parameter.get())->setBounds(-100, -100, -100, 100, 100, 100);
+		break;
+	case -80:
+		((ColorParameter*)parameter.get())->setBounds(0.f, 0.f, 0.f, 1.f, 1.f, 1.f, 1.f, 1.f);
 		break;
 
 	default:

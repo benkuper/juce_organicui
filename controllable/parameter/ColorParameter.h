@@ -20,10 +20,14 @@ public:
 	ColorParameter(const juce::String& niceName, const juce::String& description, const juce::Colour& initialColor = juce::Colours::black, bool enabled = true);
 	~ColorParameter();
 
-	const juce::Colour getColor();
+	juce::Colour getColor() const;
 	void setFloatRGBA(const float& r, const float& g, const float& b, const float& a);
 	void setColor(const juce::uint32& _color, bool silentSet = false, bool force = false);
 	void setColor(const juce::Colour& _color, bool silentSet = false, bool force = false);
+
+	void setBounds(float _minR, float _minG, float _minB, float _minA, float _maxR, float _maxG, float _maxB, float _maxA);
+	void clearRange() override;
+	bool hasRange() const override;
 
 	void setDefaultValue(const juce::Colour& _color, bool doResetValue = true);
 
@@ -45,4 +49,6 @@ public:
 	virtual juce::String getTypeString() const override { return getTypeStringStatic(); }
 	static juce::String getTypeStringStatic() { return "Color"; }
 
+protected:
+	juce::var getCroppedValue(juce::var originalValue) override;
 };

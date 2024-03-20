@@ -87,6 +87,43 @@ void ColorParameterUI::showEditWindowInternal()
 	colorEditor->addComponentListener(this);
 }
 
+void ColorParameterUI::showEditRangeWindowInternal()
+{
+	if (!parameter->isCustomizableByUser) return;
+
+	AlertWindow* nameWindow = new AlertWindow("Change color bounds", "Set new bounds for this parameter", AlertWindow::AlertIconType::NoIcon, this);
+
+	const String coordNames[4]{ "Red", "Green", "Blue", "Alpha" };
+
+	for (int i = 0; i < 4; ++i)
+	{
+		nameWindow->addTextEditor("minVal" + String(i), String((float)colorParam->minimumValue[i]), "Minimum " + coordNames[i]);
+		nameWindow->addTextEditor("maxVal" + String(i), String((float)colorParam->maximumValue[i]), "Maximum " + coordNames[i]);
+	}
+
+	nameWindow->addButton("OK", 1, KeyPress(KeyPress::returnKey));
+	nameWindow->addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
+
+	nameWindow->enterModalState(true, ModalCallbackFunction::create([this, nameWindow](int result)
+		{
+			if (result != 1) return;
+
+			float newMins[4];
+			float newMaxs[4];
+			for (int i = 0; i < 4; ++i)
+			{
+				newMins[i] = nameWindow->getTextEditorContents("minVal" + String(i)).getFloatValue();
+				newMaxs[i] = nameWindow->getTextEditorContents("maxVal" + String(i)).getFloatValue();
+			}
+			colorParam->setBounds(newMins[0], newMins[1], newMins[2], newMins[3],
+								  jmax(newMins[0], newMaxs[0]),
+								  jmax(newMins[1], newMaxs[1]),
+								  jmax(newMins[2], newMaxs[2]),
+								  jmax(newMins[3], newMaxs[3]));
+		}
+	), true);
+}
+
 void ColorParameterUI::componentBeingDeleted(Component& c)
 {
 	if (&c == colorEditor)
