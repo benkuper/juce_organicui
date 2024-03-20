@@ -194,7 +194,7 @@ void Parameter::setValue(var _value, bool silentSet, bool force, bool forceOverr
 }
 
 
-bool Parameter::isComplex()
+bool Parameter::isComplex() const
 {
 	return value.isArray();
 }
@@ -263,7 +263,7 @@ void Parameter::clearRange()
 	}
 }
 
-bool Parameter::hasRange()
+bool Parameter::hasRange() const
 {
 	if (!canHaveRange) return false;
 	{
@@ -359,7 +359,7 @@ void Parameter::setNormalizedValue(const var& normalizedValue, bool silentSet, b
 	}
 }
 
-var Parameter::getNormalizedValue()
+var Parameter::getNormalizedValue() const
 {
 	if (type == BOOL) return (float)value;
 
