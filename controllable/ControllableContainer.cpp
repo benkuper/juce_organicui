@@ -507,7 +507,7 @@ void ControllableContainer::removeChildControllableContainer(ControllableContain
 
 	if (Engine::mainEngine != nullptr && !Engine::mainEngine->isClearing)
 	{
-		warningChanged(container);
+		if(container->getWarningMessage().isNotEmpty()) warningChanged(container);
 	}
 
 	if (!Engine::mainEngine->isClearing)
