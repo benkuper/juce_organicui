@@ -28,7 +28,7 @@ ShapeShifterManager::ShapeShifterManager() :
 
 ShapeShifterManager::~ShapeShifterManager()
 {
-	saveCurrentLayoutToFile(layoutFolder.getChildFile(+"_lastSession." + appLayoutExtension));
+	if(layoutFolder.exists()) saveCurrentLayoutToFile(layoutFolder.getChildFile(+"_lastSession." + appLayoutExtension));
 	openedWindows.clear();
 	if (GlobalSettings::getInstanceWithoutCreating() != nullptr) GlobalSettings::getInstance()->fontSize->removeAsyncParameterListener(this);
 }

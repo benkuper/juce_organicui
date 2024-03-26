@@ -41,7 +41,7 @@ OrganicMainContentComponent::~OrganicMainContentComponent()
 	if (Engine::mainEngine != nullptr) Engine::mainEngine->removeEngineListener(this);
 
 	//ShapeShifterManager::getInstance()->toggleTemporaryFullContent(nullptr);
-	ShapeShifterManager::deleteInstance();
+	if(ShapeShifterManager::getInstanceWithoutCreating() != nullptr) ShapeShifterManager::deleteInstance();
 	ParameterUITimers::deleteInstance();
 
 #if ORGANICUI_USE_SHAREDTEXTURE
