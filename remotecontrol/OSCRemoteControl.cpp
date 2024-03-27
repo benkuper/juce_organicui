@@ -265,7 +265,8 @@ void OSCRemoteControl::processMessage(const OSCMessage& m, const String& sourceI
 			String addr = m.getAddressPattern().toString();
 			if (addr.contains("/attributes/"))
 			{
-				StringArray split = StringArray::fromTokens(addr, "/attributes/", "\"");
+				String splitString = addr.replace("/attributes/", " ");
+				StringArray split = StringArray::fromTokens(splitString, true);
 				if (split.size() == 2)
 				{
 					if (Controllable* c = Engine::mainEngine->getControllableForAddress(split[0]))
