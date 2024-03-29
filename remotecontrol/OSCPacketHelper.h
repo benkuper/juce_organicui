@@ -386,6 +386,8 @@ public:
 		case 's':      return writeString(arg.getString());
 		case 'b':        return writeBlob(arg.getBlob());
 		case 'r':      return writeColour(arg.getColour());
+		case 'T':
+		case 'F':		return true;	// value is encoded in the type tag, nothing to do !
 
 		default:
 			// In this very unlikely case you supplied an invalid OSCType!

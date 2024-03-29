@@ -282,6 +282,14 @@ var Controllable::getRemoteControlData()
 	typeString = remoteControlTypeNames[(int)type];
 	data.getDynamicObject()->setProperty("TYPE", typeString);
 
+	bool hasAttributes = canBeDisabledByUser;
+	if (canBeDisabledByUser)
+	{
+		var attributesData(new DynamicObject());
+		attributesData.getDynamicObject()->setProperty("enabled", enabled);
+		data.getDynamicObject()->setProperty("ATTRIBUTES", attributesData);
+	}
+
 	getRemoteControlDataInternal(data);
 
 	return data;

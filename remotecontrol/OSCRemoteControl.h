@@ -95,6 +95,7 @@ public:
 	void connectionError(const juce::String& id, const juce::String& message) override;
 
 	void sendOSCQueryFeedback(Controllable* c, const juce::String& excludeId = "");
+	void sendOSCQueryStateFeedback(Controllable* c, const juce::String& excludeId = "");
 	void sendOSCQueryFeedback(const juce::OSCMessage& m, juce::StringArray excludes = juce::StringArray());
 	void sendOSCQueryFeedbackTo(const juce::OSCMessage& m, juce::StringArray ids = juce::StringArray());
 
@@ -103,6 +104,7 @@ public:
 	void sendPathNameChangedFeedback(const juce::String& oldPath, const juce::String& newPath);
 
 	void controllableFeedbackUpdate(ControllableContainer* cc, Controllable* c) override;
+	void controllableStateUpdate(ControllableContainer* cc, Controllable* c) override;
 
 	//void newMessage(const ContainerAsyncEvent& e) override;
 	void onControllableFeedbackUpdate(ControllableContainer* cc, Controllable* c) override;
