@@ -23,6 +23,7 @@ ScriptUtil::ScriptUtil() :
 	scriptObject.getDynamicObject()->setMethod("delayThreadMS", ScriptUtil::delayThreadMS);
 
 	scriptObject.getDynamicObject()->setMethod("getFloatFromBytes", ScriptUtil::getFloatFromBytes);
+	scriptObject.getDynamicObject()->setMethod("getDoubleFromBytes", ScriptUtil::getDoubleFromBytes);
 	scriptObject.getDynamicObject()->setMethod("floatToHexSeq", ScriptUtil::floatToHexSeq);
 	scriptObject.getDynamicObject()->setMethod("getInt32FromBytes", ScriptUtil::getInt32FromBytes);
 	scriptObject.getDynamicObject()->setMethod("getInt64FromBytes", ScriptUtil::getInt32FromBytes);
@@ -105,6 +106,16 @@ var ScriptUtil::getFloatFromBytes(const var::NativeFunctionArgs& a)
 	for (int i = 0; i < 4; ++i) bytes[i] = (uint8_t)(int)a.arguments[i];
 	float result;
 	memcpy(&result, &bytes, 4);
+	return result;
+}
+
+var ScriptUtil::getDoubleFromBytes(const var::NativeFunctionArgs& a)
+{
+	if (a.numArguments < 8) return 0;
+	uint8_t bytes[8];
+	for (int i = 0; i < 8; ++i) bytes[i] = (uint8_t)(int)a.arguments[i];
+	double result;
+	memcpy(&result, &bytes, 8);
 	return result;
 }
 

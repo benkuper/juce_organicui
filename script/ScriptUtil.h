@@ -25,6 +25,7 @@ public:
 
 
 	static juce::var getFloatFromBytes(const juce::var::NativeFunctionArgs& a);
+	static juce::var getDoubleFromBytes(const juce::var::NativeFunctionArgs& a);
 	static juce::var floatToHexSeq(const juce::var::NativeFunctionArgs& a);
 	static juce::var getInt32FromBytes(const juce::var::NativeFunctionArgs& a);
 	static juce::var getInt64FromBytes(const juce::var::NativeFunctionArgs& a);
