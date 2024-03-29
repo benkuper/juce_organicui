@@ -211,13 +211,15 @@ void BaseItemMinimalUI<T>::updateItemUISize()
 template<class T>
 void BaseItemMinimalUI<T>::mouseDown(const juce::MouseEvent& e)
 {
+
 	InspectableContentComponent::mouseDown(e);
+
+	if (e.eventComponent != this) return;
 
 	if (e.mods.isRightButtonDown())
 	{
 		if (getMainBounds().contains(e.getPosition()))
 		{
-
 			juce::PopupMenu p;
 				addContextMenuItems(p);
 
