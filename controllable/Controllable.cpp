@@ -454,13 +454,13 @@ var Controllable::setValueFromScript(const juce::var::NativeFunctionArgs& a) {
 					if (tp->targetType == TargetParameter::CONTROLLABLE)
 					{
 						Controllable* target = static_cast<Controllable*>((Controllable*)(juce::int64)value.getDynamicObject()->getProperty(scriptPtrIdentifier));
-						if (target != nullptr) tp->setTarget(target);
+						if (target != nullptr) tp->setValueFromTarget(target);
 						else LOGWARNING("Set target from script, Target not found");
 					}
 					else
 					{
 						ControllableContainer* target = static_cast<ControllableContainer*>((ControllableContainer*)(juce::int64)value.getDynamicObject()->getProperty(scriptPtrIdentifier));
-						if (target != nullptr) tp->setTarget(target);
+						if (target != nullptr) tp->setValueFromTarget(target);
 						else LOGWARNING("Set target from script, Target not found");
 					}
 				}
