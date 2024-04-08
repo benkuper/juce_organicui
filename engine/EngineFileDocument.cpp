@@ -173,6 +173,7 @@ Result Engine::saveDocument(const File& file) {
 	var data = getJSONData();
 
 	if (file.exists()) file.deleteFile();
+	file.create();	// recursively create parents create + empty file, beacause next line will not create parent dirs
 	std::unique_ptr<OutputStream> os(file.createOutputStream());
 	if (os == nullptr)
 	{
