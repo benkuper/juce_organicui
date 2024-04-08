@@ -194,7 +194,7 @@ void Parameter::setValue(var _value, bool silentSet, bool force, bool forceOverr
 }
 
 
-bool Parameter::isComplex()
+bool Parameter::isComplex() const
 {
 	return value.isArray();
 }
@@ -243,19 +243,15 @@ void Parameter::clearRange()
 
 	if (isComplex())
 	{
+		GenericScopedLock<SpinLock> lock(valueSetLock);
+		var minVal = var();
+		var maxVal = var();
+		for (int i = 0; i < value.size(); ++i)
 		{
-			GenericScopedLock<SpinLock> lock(valueSetLock);
-			var minVal = var();
-			var maxVal = var();
-			for (int i = 0; i < value.size(); ++i)
-			{
-				minVal.append(INT32_MIN);
-				maxVal.append(INT32_MAX);
-			}
-			minimumValue = minVal;
-			maximumValue = maxVal;
+			minVal.append(INT32_MIN);
+			maxVal.append(INT32_MAX);
 		}
-
+		setRange(minVal, maxVal);
 	}
 	else
 	{
@@ -263,7 +259,7 @@ void Parameter::clearRange()
 	}
 }
 
-bool Parameter::hasRange()
+bool Parameter::hasRange() const
 {
 	if (!canHaveRange) return false;
 	{
@@ -359,7 +355,7 @@ void Parameter::setNormalizedValue(const var& normalizedValue, bool silentSet, b
 	}
 }
 
-var Parameter::getNormalizedValue()
+var Parameter::getNormalizedValue() const
 {
 	if (type == BOOL) return (float)value;
 

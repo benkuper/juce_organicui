@@ -33,6 +33,7 @@ public:
 	void mouseDownInternal(const juce::MouseEvent &e) override;
 
 	void showEditWindowInternal() override;
+	void showEditRangeWindowInternal() override;
 
 	void componentBeingDeleted(juce::Component &) override;
 

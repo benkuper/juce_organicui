@@ -28,7 +28,7 @@ public:
 	virtual void setWeightedValue(juce::Array<juce::var> values, juce::Array<float> weights) override;
 	juce::var getCroppedValue(juce::var originalValue) override;
 
-	virtual bool hasRange() override;
+	virtual bool hasRange() const override;
 
 	void setControlAutomation() override;
 
