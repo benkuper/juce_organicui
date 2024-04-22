@@ -13,6 +13,7 @@ juce_ImplementSingleton(OSCRemoteControl)
 
 #if ORGANIC_USE_WEBSERVER
 #include "OSCPacketHelper.h"
+#include "OSCRemoteControl.h"
 #endif
 
 #ifndef ORGANIC_REMOTE_CONTROL_PORT
@@ -206,8 +207,7 @@ void OSCRemoteControl::processMessage(const OSCMessage& m, const String& sourceI
 	}
 	else if (add == "/newFile")
 	{
-		MessageManagerLock mmLock;
-		Engine::mainEngine->createNewGraph();
+		MessageManager::getInstance()->callAsync([]() { Engine::mainEngine->createNewGraph(); });
 	}
 	else if (add == "/saveFile")
 	{
@@ -259,44 +259,6 @@ void OSCRemoteControl::processMessage(const OSCMessage& m, const String& sourceI
 
 #if ORGANICUI_USE_WEBSERVER
 		Controllable* c = OSCHelpers::findControllable(Engine::mainEngine, m);
-
-		if (c == nullptr)
-		{
-			String addr = m.getAddressPattern().toString();
-			if (addr.contains("/attributes/"))
-			{
-				String splitString = addr.replace("/attributes/", " ");
-				StringArray split = StringArray::fromTokens(splitString, true);
-				if (split.size() == 2)
-				{
-					if (Controllable* c = Engine::mainEngine->getControllableForAddress(split[0]))
-					{
-						
-						if (sourceId.isEmpty())
-						{
-							HashMap<String, Array<Controllable*>, DefaultHashFunctions, CriticalSection>::Iterator it(feedbackMap);
-							while (it.next())
-							{
-								if (it.getKey().contains(m.getSenderIPAddress()))
-								{
-									noFeedbackMap.set(c, it.getKey());
-									break;
-								}
-							}
-						}
-						else
-						{
-							noFeedbackMap.set(c, sourceId);
-						}
-
-						c->setAttribute(split[1], OSCHelpers::getBoolArg(m[0]));
-
-						noFeedbackMap.remove(c);
-
-					}
-				}
-			}
-		}
 
 		if (c != nullptr)
 		{
@@ -550,17 +512,6 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 					if (c->type == Controllable::TRIGGER) ((Trigger*)c)->trigger();
 					else ((Parameter*)c)->setValue(nv.value);
 				}
-				else if(nv.name.toString().contains("/attributes/"))
-				{
-					StringArray split = StringArray::fromTokens(nv.name.toString(), "/attributes/", "\"");
-					if (split.size() == 2)
-					{
-						if (Controllable* c = Engine::mainEngine->getControllableForAddress(split[0]))
-						{
-							c->setAttribute(split[1], nv.value);
-						}
-					}
-				}
 			}
 		}
 	}
@@ -651,23 +602,28 @@ void OSCRemoteControl::controllableFeedbackUpdate(ControllableContainer* cc, Con
 
 }
 
-void OSCRemoteControl::controllableStateUpdate(ControllableContainer* cc, Controllable* c)
-{
-	EnablingControllableContainer::controllableStateUpdate(cc, c);
-
-	if (Engine::mainEngine != nullptr && (Engine::mainEngine->isLoadingFile || Engine::mainEngine->isClearing)) return;
-
-	//OSCQuery
-	juce::HashMap<String, Array<Controllable*>, DefaultHashFunctions, CriticalSection>::Iterator it(feedbackMap);
-	while (it.next())
-	{
-		if (it.getValue().contains(c))
-		{
-			sendOSCQueryStateFeedback(c);
-		}
-	}
-
-}
+//void OSCRemoteControl::newMessage(const ContainerAsyncEvent& e)
+//{
+//	if (Engine::mainEngine != nullptr && (Engine::mainEngine->isLoadingFile || Engine::mainEngine->isClearing)) return;
+//
+//	if (e.type == ContainerAsyncEvent::ControllableFeedbackUpdate)
+//	{
+//		//OSCQuery
+//		HashMap<String, Array<Controllable*>, DefaultHashFunctions, CriticalSection>::Iterator it(feedbackMap);
+//		while (it.next())
+//		{
+//			if (it.getValue().contains(e.targetControllable))
+//			{
+//				sendOSCQueryFeedback(e.targetControllable);
+//			}
+//		}
+//
+//		//Manual
+//		sendManualFeedbackForControllable(e.targetControllable);
+//
+//	}
+//
+//}
 
 void OSCRemoteControl::sendOSCQueryFeedback(Controllable* c, const String& excludeId)
 {
@@ -678,17 +634,6 @@ void OSCRemoteControl::sendOSCQueryFeedback(Controllable* c, const String& exclu
 	if (noFeedbackMap.contains(c)) ex.add(noFeedbackMap[c]);
 	sendOSCQueryFeedback(m, ex);
 
-}
-
-void OSCRemoteControl::sendOSCQueryStateFeedback(Controllable* c, const juce::String& excludeId)
-{
-	if (c == nullptr) return;
-
-	OSCMessage m(c->getControlAddress() + "/attributes/enabled");
-	m.addBool(c->enabled);
-	StringArray ex = excludeId;
-	if (noFeedbackMap.contains(c)) ex.add(noFeedbackMap[c]);
-	sendOSCQueryFeedback(m, ex);
 }
 
 void OSCRemoteControl::sendOSCQueryFeedback(const OSCMessage& m, StringArray excludes)
