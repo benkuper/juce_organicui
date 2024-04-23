@@ -1,4 +1,5 @@
 #include "JuceHeader.h"
+#include "OrganicMainComponent.h"
 
 ApplicationProperties& getAppProperties();
 ApplicationCommandManager& getCommandManager();
@@ -64,18 +65,29 @@ void OrganicMainContentComponent::init()
 	ShapeShifterFactory::getInstance()->defs.add(new ShapeShifterDefinition("Warnings", &WarningReporterPanel::create));
 	ShapeShifterFactory::getInstance()->defs.add(new ShapeShifterDefinition("Help", &HelpPanel::create));
 
-	String lastVersion = getAppProperties().getUserSettings()->getValue("lastVersion", "0");
-	if (lastVersion != getAppVersion())
-	{
-		ShapeShifterManager::getInstance()->loadDefaultLayoutFile(true);
-	}
-	else
-	{
-		ShapeShifterManager::getInstance()->loadLastSessionLayoutFile();
-	}
-
 
 	addAndMakeVisible(&ShapeShifterManager::getInstance()->mainContainer);
+
+
+}
+
+void OrganicMainContentComponent::afterInit()
+{
+	if (ShapeShifterManager::getInstance()->openedPanels.isEmpty())
+	{
+
+		String lastVersion = getAppProperties().getUserSettings()->getValue("lastVersion", "0");
+		if (lastVersion != getAppVersion())
+		{
+			ShapeShifterManager::getInstance()->loadDefaultLayoutFile(true);
+		}
+		else
+		{
+			ShapeShifterManager::getInstance()->loadLastSessionLayoutFile();
+		}
+	}
+
+
 	if (isShowing()) grabKeyboardFocus();
 }
 

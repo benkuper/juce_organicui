@@ -128,6 +128,8 @@ void OrganicApplication::initialise(const String& commandLine)
 			}
 		}
 	}
+
+	mainComponent->afterInit();
 }
 
 void OrganicApplication::shutdown()
@@ -328,7 +330,6 @@ inline OrganicApplication::MainWindow::MainWindow(String name, OrganicMainConten
 
 
 
-	mainComponent->init();
 
 	if (GlobalSettings::getInstance()->launchMinimised->boolValue())
 	{
@@ -347,6 +348,8 @@ inline OrganicApplication::MainWindow::MainWindow(String name, OrganicMainConten
 	{
 		setVisible(true);
 	}
+
+	mainComponent->init();
 
 }
 
