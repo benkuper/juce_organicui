@@ -517,6 +517,14 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 					}
 				}
 			}
+			else if (command == "UNDO")
+			{
+				UndoMaster::getInstance()->undo();
+			}
+			else if (command == "REDO")
+			{
+				UndoMaster::getInstance()->redo();
+			}
 			else if (command == "RENAME")
 			{
 				if (ControllableContainer* cc = Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true))
@@ -548,6 +556,17 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 				{
 					if (c->type == Controllable::TRIGGER) ((Trigger*)c)->trigger();
 					else ((Parameter*)c)->setValue(nv.value);
+				}
+				else if (nv.name.toString().startsWith("undoable:") && nv.value.size() == 2)
+				{
+					String cName = cName.fromFirstOccurrenceOf(":", false, false);
+					if (Parameter* p = dynamic_cast<Parameter*>(Engine::mainEngine->getControllableForAddress(cName)))
+					{
+						if (nv.value.size() == 2)
+						{
+							p->setUndoableValue(nv.value[0], nv.value[1]);
+						}
+					}
 				}
 				else if (nv.name.toString().contains("/attributes/"))
 				{
