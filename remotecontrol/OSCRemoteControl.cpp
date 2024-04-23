@@ -559,7 +559,7 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 				}
 				else if (nv.name.toString().startsWith("undoable:") && nv.value.size() == 2)
 				{
-					String cName = cName.fromFirstOccurrenceOf(":", false, false);
+					String cName = nv.name.toString().fromFirstOccurrenceOf(":", false, false);
 					if (Parameter* p = dynamic_cast<Parameter*>(Engine::mainEngine->getControllableForAddress(cName)))
 					{
 						if (nv.value.size() == 2)
