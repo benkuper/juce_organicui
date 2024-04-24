@@ -24,7 +24,7 @@
 #define LOGGER_USE_LABEL 0
 
 class CustomLoggerUI : public ShapeShifterContentComponent,
-	public CustomLogger::Listener,
+	public CustomLogger::LoggerListener,
 	public juce::TextButton::Listener,
 	public juce::Timer
 {
@@ -80,7 +80,7 @@ public:
 	void buttonClicked(juce::Button*) override;
 
 
-	void newMessage(const juce::String&) override;
+	void newMessage(const CustomLogger::LogEvent&) override;
 
 	void clearLogger();
 

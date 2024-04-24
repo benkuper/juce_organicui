@@ -15,21 +15,25 @@ public:
 
 	void logMessage(const juce::String& message) override;
 
-	QueuedNotifier<juce::String> notifier;
-	typedef QueuedNotifier<juce::String>::Listener Listener;
+	struct LogEvent
+	{
+		LogElement* log;
+	};
+	QueuedNotifier<LogEvent> notifier;
+	typedef QueuedNotifier<LogEvent>::Listener LoggerListener;
 
-	const juce::String & getWelcomeMessage();
-	void addLogListener(Listener* l) { notifier.addListener(l); }
-	void removeLogListener(Listener* l) { notifier.removeListener(l); }
+	const juce::String& getWelcomeMessage();
+	void addLogListener(LoggerListener* l) { notifier.addListener(l); }
+	void removeLogListener(LoggerListener* l) { notifier.removeListener(l); }
 
 	void setFileLogging(bool enabled);
 
-	class FileWriter : public Listener
+	class FileWriter : public LoggerListener
 	{
 	public:
 		FileWriter();
 
-		void newMessage(const juce::String& s) override { if (fileLog && !s.isEmpty()) { fileLog->logMessage(s); } }
+		void newMessage(const LogEvent& e) override { if (fileLog && !e.log->content.isEmpty()) { fileLog->logMessage(e.log->getFullLog()); } }
 		juce::String getFilePath() { return fileLog->getLogFile().getFullPathName(); }
 		std::unique_ptr<juce::FileLogger> fileLog;
 	};

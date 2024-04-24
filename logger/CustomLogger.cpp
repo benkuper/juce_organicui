@@ -19,7 +19,7 @@ void CustomLogger::logMessage(const String& message)
 	LogElement* el = new LogElement(message);
 	if (logElements.size() >= MAX_LOGS) logElements.remove(0, true);
 	logElements.add(el);
-	notifier.addMessage(new String(message));
+	notifier.addMessage(new LogEvent({ el }));
 	DBG(message);
 }
 

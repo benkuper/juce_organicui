@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    DebugHelpers.h
-    Created: 6 May 2016 2:10:12pm
-    Author:  Martin Hermant
+	DebugHelpers.h
+	Created: 6 May 2016 2:10:12pm
+	Author:  Martin Hermant
 
   ==============================================================================
 */
@@ -58,16 +58,16 @@ juce::Logger::writeToLog(tempDbgBuf);)
 
 
 
-inline juce::String getLogSource(const juce::String & logString) {
+inline juce::String getLogSource(const juce::String& logString) {
 	return logString.substring(0, logString.indexOf("::"));// .trim();
 }
 
 
-inline juce::String getLogContent(const juce::String & logString) {
-  int startString = logString.indexOf("::");
-  if (startString>=0)startString+=2;
-  else startString=0;
-    return logString.substring( startString,logString.length());//.trim();
+inline juce::String getLogContent(const juce::String& logString) {
+	int startString = logString.indexOf("::");
+	if (startString >= 0)startString += 2;
+	else startString = 0;
+	return logString.substring(startString, logString.length());//.trim();
 }
 
 
@@ -76,8 +76,8 @@ class LogElement
 public:
 	LogElement(juce::String log) :
 		content(getLogContent(log)),
-        source(getLogSource(log))
-		
+		source(getLogSource(log))
+
 	{
 		_arr.reset(new juce::StringArray());
 		time = juce::Time::getCurrentTime();
@@ -113,7 +113,13 @@ public:
 	juce::String content;
 	juce::String source;
 	enum Severity { LOG_NONE = -1, LOG_DBG = 0, LOG_WARN = 1, LOG_ERR = 2 };
+	const String severityNames[4] = { "info","debug","warning","error" };
 	Severity severity;
+	juce::String getSeverityName() const { return severityNames[severity + 1]; }
+
+	String getContent() const { return _arr->joinIntoString("\n"); }
+	String getFullLog() const { return "[" + severityNames[severity + 1] + "] " + source + " : " + getContent(); }
+
 	int getNumLines() const { return  _arr->size(); }
 	void trimToFit(int num) { if (_arr->size() > num)_arr->removeRange(0, _arr->size() - num); }
 	const juce::String& getLine(int i) const { return _arr->getReference(i); }

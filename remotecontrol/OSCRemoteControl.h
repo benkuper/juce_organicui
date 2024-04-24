@@ -30,7 +30,8 @@ class OSCRemoteControl :
 	public SimpleWebSocketServer::Listener,
 	public SimpleWebSocketServer::RequestHandler,
 #endif
-	public juce::OSCReceiver::Listener<juce::OSCReceiver::RealtimeCallback>
+	public juce::OSCReceiver::Listener<juce::OSCReceiver::RealtimeCallback>,
+	public CustomLogger::LoggerListener
 {
 public:
 	juce_DeclareSingleton(OSCRemoteControl, true);
@@ -44,6 +45,7 @@ public:
 	BoolParameter* logIncoming;
 	BoolParameter* logOutgoing;
 	BoolParameter* sendFeedbackOnListen;
+	BoolParameter* enableSendLogFeedback;
 
 	EnablingControllableContainer manualSendCC;
 	juce::OSCSender manualSender;
@@ -108,6 +110,9 @@ public:
 
 	//void newMessage(const ContainerAsyncEvent& e) override;
 	void onControllableFeedbackUpdate(ControllableContainer* cc, Controllable* c) override;
+
+	void newMessage(const CustomLogger::LogEvent& e) override;
+	void sendLogFeedback(const juce::String& type, const juce::String& source, const juce::String& message);
 
 #endif
 

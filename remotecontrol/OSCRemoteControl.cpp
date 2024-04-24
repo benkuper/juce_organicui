@@ -13,6 +13,7 @@ juce_ImplementSingleton(OSCRemoteControl)
 
 #if ORGANIC_USE_WEBSERVER
 #include "OSCPacketHelper.h"
+#include "OSCRemoteControl.h"
 #endif
 
 #ifndef ORGANIC_REMOTE_CONTROL_PORT
@@ -45,6 +46,7 @@ OSCRemoteControl::OSCRemoteControl() :
 	logOutgoing = addBoolParameter("Log Outgoing", "If checked, this will log outgoing messages", false);
 
 	sendFeedbackOnListen = addBoolParameter("Send update on listen", "Sends feedback with the current controllable value when a client sends a LISTEN command", false);
+	enableSendLogFeedback = addBoolParameter("Send Log Feedback", "If checked, this will send log messages to connected clients", false);
 
 	receiver.addListener(this);
 	receiver.registerFormatErrorHandler(&OSCHelpers::logOSCFormatError);
@@ -226,6 +228,7 @@ void OSCRemoteControl::processMessage(const OSCMessage& m, const String& sourceI
 				Engine::mainEngine->saveAsAsync(f, false, false, false, [](int result) {});
 			}
 		}
+		LOG("File saved.");
 	}
 	else if (add == "/closeApp")
 	{
@@ -340,6 +343,11 @@ void OSCRemoteControl::processMessage(const OSCMessage& m, const String& sourceI
 void OSCRemoteControl::onContainerParameterChanged(Parameter* p)
 {
 	if (p == enabled || p == localPort) setupReceiver();
+	else if (p == enableSendLogFeedback)
+	{
+		if (enableSendLogFeedback->boolValue())  CustomLogger::getInstance()->addLogListener(this);
+		else CustomLogger::getInstance()->removeLogListener(this);
+	}
 }
 
 void OSCRemoteControl::oscMessageReceived(const OSCMessage& m)
@@ -488,6 +496,13 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 				}
 
 			}
+			else if (command == "RENAME")
+			{
+				if (ControllableContainer* cc = Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true))
+				{
+					cc->setUndoableNiceName(data["name"]);
+				}
+			}
 			else if (command == "LOAD")
 			{
 				var fileData = JSON::parse(data["data"]);
@@ -525,12 +540,17 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 			{
 				UndoMaster::getInstance()->redo();
 			}
-			else if (command == "RENAME")
+			else if (command == "LOG")
 			{
-				if (ControllableContainer* cc = Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true))
+				if (data.hasProperty("type"))
 				{
-					cc->setUndoableNiceName(data["name"]);
+					if (data["type"] == "info") NLOG(niceName, data["message"].toString());
+					else if (data["type"] == "warning") NLOGWARNING(niceName, data["message"].toString());
+					else if (data["type"] == "error") NLOGERROR(niceName, data["message"].toString());
+					else NLOG(niceName, data["message"].toString());
 				}
+				else NLOG(niceName, data.toString());
+
 			}
 
 			if (Controllable* c = Engine::mainEngine->getControllableForAddress(data.toString()))
@@ -559,7 +579,7 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 				}
 				else if (nv.name.toString().startsWith("undoable:") && nv.value.size() == 2)
 				{
-					String cName = cName.fromFirstOccurrenceOf(":", false, false);
+					String cName = nv.name.toString().fromFirstOccurrenceOf(":", false, false);
 					if (Parameter* p = dynamic_cast<Parameter*>(Engine::mainEngine->getControllableForAddress(cName)))
 					{
 						if (nv.value.size() == 2)
@@ -646,6 +666,24 @@ void OSCRemoteControl::sendPathNameChangedFeedback(const String& oldPath, const 
 	msg.getDynamicObject()->setProperty("DATA", data);
 	server->send(JSON::toString(msg));
 
+}
+
+void OSCRemoteControl::newMessage(const CustomLogger::LogEvent& e)
+{
+	if (!enableSendLogFeedback->boolValue()) return;
+	sendLogFeedback(e.log->getSeverityName(), e.log->source, e.log->getContent());
+}
+
+void OSCRemoteControl::sendLogFeedback(const String& type, const String& source, const String& message)
+{
+	var msg(new DynamicObject());
+	msg.getDynamicObject()->setProperty("COMMAND", "LOG");
+	var data(new DynamicObject());
+	data.getDynamicObject()->setProperty("type", type);
+	data.getDynamicObject()->setProperty("source", source);
+	data.getDynamicObject()->setProperty("message", message);
+	msg.getDynamicObject()->setProperty("DATA", data);
+	server->send(JSON::toString(msg));
 }
 
 void OSCRemoteControl::controllableFeedbackUpdate(ControllableContainer* cc, Controllable* c)

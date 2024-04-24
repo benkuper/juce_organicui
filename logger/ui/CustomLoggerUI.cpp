@@ -260,7 +260,7 @@ MouseCursor  CustomLoggerUI::getMouseCursor() {
 	return MouseCursor::IBeamCursor;
 }
 
-void CustomLoggerUI::newMessage(const String& message)
+void CustomLoggerUI::newMessage(const CustomLogger::LogEvent& message)
 {
 	//LogElement* el = logger->logElements[logger->logElements.size() - 1];
 	//totalLogRow += el->getNumLines();
