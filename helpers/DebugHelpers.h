@@ -113,12 +113,12 @@ public:
 	juce::String content;
 	juce::String source;
 	enum Severity { LOG_NONE = -1, LOG_DBG = 0, LOG_WARN = 1, LOG_ERR = 2 };
-	const String severityNames[4] = { "info","debug","warning","error" };
+	const juce::String severityNames[4] = { "info","debug","warning","error" };
 	Severity severity;
 	juce::String getSeverityName() const { return severityNames[severity + 1]; }
 
-	String getContent() const { return _arr->joinIntoString("\n"); }
-	String getFullLog() const { return "[" + severityNames[severity + 1] + "] " + source + " : " + getContent(); }
+	juce::String getContent() const { return _arr->joinIntoString("\n"); }
+	juce::String getFullLog() const { return "[" + severityNames[severity + 1] + "] " + source + " : " + getContent(); }
 
 	int getNumLines() const { return  _arr->size(); }
 	void trimToFit(int num) { if (_arr->size() > num)_arr->removeRange(0, _arr->size() - num); }
