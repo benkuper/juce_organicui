@@ -588,6 +588,27 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 						}
 					}
 				}
+				else if (nv.name.toString().startsWith("undoables:"))
+				{
+					String actionName = nv.name.toString().fromFirstOccurrenceOf(":", false, false);
+					if (nv.value.isObject())
+					{
+						NamedValueSet paramVS = nv.value.getDynamicObject()->getProperties();
+						Array<UndoableAction*> actions;
+						for (auto& pnv : paramVS)
+						{
+							if (Parameter* p = dynamic_cast<Parameter*>(Engine::mainEngine->getControllableForAddress(pnv.name.toString())))
+							{
+								if (pnv.value.size() == 2)
+								{
+									actions.add(p->setUndoableValue(pnv.value[0], pnv.value[1], true));
+								}
+							}
+						}
+						UndoMaster::getInstance()->performActions(actionName.isEmpty() ? "Set " + String(actions.size()) + " values from remote" : actionName, actions);
+					}
+
+				}
 				else if (nv.name.toString().contains("/attributes/"))
 				{
 					StringArray split = StringArray::fromTokens(nv.name.toString(), "/attributes/", "\"");
