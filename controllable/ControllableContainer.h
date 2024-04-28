@@ -216,7 +216,7 @@ protected:
 	virtual void onWarningChanged(WarningTarget*) {}
 
 public:
-	juce::ListenerList<ControllableContainerListener> controllableContainerListeners;
+	juce::ListenerList<ControllableContainerListener, juce::Array<ControllableContainerListener*, juce::CriticalSection>> controllableContainerListeners;
 	void addControllableContainerListener(ControllableContainerListener* newListener);
 	void removeControllableContainerListener(ControllableContainerListener* listener);
 
