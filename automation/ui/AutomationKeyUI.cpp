@@ -191,7 +191,7 @@ void AutomationKeyHandle::paint(Graphics& g)
 
 void AutomationKeyHandle::inspectableSelectionChanged(Inspectable* i)
 {
-	repaint();
+	if(MessageManager::getInstance()->isThisTheMessageThread()) repaint();
 }
 
 
