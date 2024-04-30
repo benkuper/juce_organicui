@@ -29,9 +29,9 @@ class OSCRemoteControl :
 #if ORGANICUI_USE_WEBSERVER
 	public SimpleWebSocketServer::Listener,
 	public SimpleWebSocketServer::RequestHandler,
+	public CustomLogger::LoggerListener,
 #endif
-	public juce::OSCReceiver::Listener<juce::OSCReceiver::RealtimeCallback>,
-	public CustomLogger::LoggerListener
+	public juce::OSCReceiver::Listener<juce::OSCReceiver::RealtimeCallback>
 {
 public:
 	juce_DeclareSingleton(OSCRemoteControl, true);
