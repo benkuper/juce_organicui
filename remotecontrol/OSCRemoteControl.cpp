@@ -343,11 +343,13 @@ void OSCRemoteControl::processMessage(const OSCMessage& m, const String& sourceI
 void OSCRemoteControl::onContainerParameterChanged(Parameter* p)
 {
 	if (p == enabled || p == localPort) setupReceiver();
+#if ORGANICUI_USE_WEBSERVER
 	else if (p == enableSendLogFeedback)
 	{
 		if (enableSendLogFeedback->boolValue())  CustomLogger::getInstance()->addLogListener(this);
 		else CustomLogger::getInstance()->removeLogListener(this);
 	}
+#endif
 }
 
 void OSCRemoteControl::oscMessageReceived(const OSCMessage& m)
