@@ -140,7 +140,7 @@ void Parameter::setControlAutomation()
 
 var Parameter::getValue()
 {
-	GenericScopedLock<SpinLock> lock(valueSetLock);
+	GenericScopedLock lock(valueSetLock);
 	return value;
 }
 
@@ -180,7 +180,7 @@ UndoableAction* Parameter::setUndoableValue(var oldValue, var newValue, bool onl
 void Parameter::setValue(var _value, bool silentSet, bool force, bool forceOverride)
 {
 	{
-		GenericScopedLock<SpinLock> lock(valueSetLock);
+		GenericScopedLock lock(valueSetLock);
 
 		var croppedValue = getCroppedValue(_value.clone());
 
@@ -214,7 +214,7 @@ void Parameter::setRange(var min, var max)
 {
 	if (!canHaveRange) return;
 	{
-		GenericScopedLock<SpinLock> lock(valueSetLock);
+		GenericScopedLock lock(valueSetLock);
 		if (isComplex())
 		{
 			if (!min.isArray() || min.size() != value.size()) return;
@@ -243,14 +243,19 @@ void Parameter::clearRange()
 
 	if (isComplex())
 	{
-		GenericScopedLock<SpinLock> lock(valueSetLock);
 		var minVal = var();
-		var maxVal = var();
-		for (int i = 0; i < value.size(); ++i)
+		var maxVal = var(); 
+		
 		{
-			minVal.append(INT32_MIN);
-			maxVal.append(INT32_MAX);
+			GenericScopedLock lock(valueSetLock);
+			
+			for (int i = 0; i < value.size(); ++i)
+			{
+				minVal.append(INT32_MIN);
+				maxVal.append(INT32_MAX);
+			}
 		}
+
 		setRange(minVal, maxVal);
 	}
 	else
@@ -263,7 +268,7 @@ bool Parameter::hasRange() const
 {
 	if (!canHaveRange) return false;
 	{
-		GenericScopedLock<SpinLock> lock(valueSetLock);
+		GenericScopedLock lock(valueSetLock);
 		if (isComplex())
 		{
 			for (int i = 0; i < value.size(); ++i) if ((float)minimumValue[i] != INT32_MIN && (float)maximumValue[i] != INT32_MAX) return true;

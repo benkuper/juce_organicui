@@ -34,7 +34,7 @@ ColorParameter::~ColorParameter() {}
 
 Colour ColorParameter::getColor() const
 {
-	GenericScopedLock<SpinLock> lock(valueSetLock);
+	GenericScopedLock lock(valueSetLock);
 
 	if (!value.isArray()) return Colours::black;
 
@@ -67,7 +67,7 @@ void ColorParameter::setColor(const Colour &_color, bool silentSet, bool force)
 
 bool ColorParameter::hasRange() const
 {
-	GenericScopedLock<SpinLock> lock(valueSetLock);
+	GenericScopedLock lock(valueSetLock);
 	for (int i = 0; i < value.size(); ++i)
 	{
 		if ((float)minimumValue[i] != 0.f || (float)maximumValue[i] != 1.f)
@@ -146,7 +146,7 @@ bool ColorParameter::checkValueIsTheSame(var oldValue, var newValue)
 var ColorParameter::getLerpValueTo(var targetValue, float weight)
 {
 	if (!targetValue.isArray()) return value;
-	GenericScopedLock<SpinLock> lock(valueSetLock);
+	GenericScopedLock lock(valueSetLock);
 	var result;
 	result.append(jmap(weight, (float)value[0], (float)targetValue[0]));
 	result.append(jmap(weight, (float)value[1], (float)targetValue[1]));
@@ -163,7 +163,7 @@ void ColorParameter::setWeightedValue(Array<var> values, Array<float> weights)
 	tValues[0] = tValues[1] = tValues[2] = tValues[3] = 0;
 
 	{
-		GenericScopedLock<SpinLock> lock(valueSetLock);
+		GenericScopedLock lock(valueSetLock);
 		for (int i = 0; i < values.size(); ++i)
 		{
 			jassert(values[i].size() == 4);
