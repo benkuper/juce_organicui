@@ -158,7 +158,7 @@ public:
 
 	juce::String getScriptTargetString() override;
 
-	juce::ListenerList<ParameterListener> listeners;
+	juce::ListenerList<ParameterListener, juce::Array<ParameterListener*,juce::CriticalSection>> listeners;
 	void addParameterListener(ParameterListener* newListener) { listeners.add(newListener); }
 	void removeParameterListener(ParameterListener* listener) { listeners.remove(listener); }
 
