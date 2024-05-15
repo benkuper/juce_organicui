@@ -196,6 +196,8 @@ void TargetParameter::setTarget(WeakReference<Controllable> c)
 		}
 	}
 
+	previousTarget = target;
+
 	target = c;
 
 	if (target != nullptr)
@@ -241,6 +243,8 @@ void TargetParameter::setTarget(WeakReference<ControllableContainer> cc)
 			targetContainer->removeControllableContainerListener(this);
 		}
 	}
+
+	previousTargetContainer = targetContainer;
 
 	targetContainer = cc;
 

@@ -46,6 +46,9 @@ public:
 	juce::WeakReference<Controllable> target;
 	juce::WeakReference<ControllableContainer> targetContainer;
 
+	juce::WeakReference<Controllable> previousTarget; //temporary to keep the previous target when changing it
+	juce::WeakReference<ControllableContainer> previousTargetContainer; //temporary to keep the previous target when changing it
+
 	std::function<bool(Controllable*)> customTargetFilterFunc;
 	std::function<void(const juce::StringArray&, const juce::StringArray&, ControllableContainer*, std::function<void(Controllable*)>)> customGetTargetFunc;
 	std::function<juce::Array<TargetStepButton*>(Controllable*)> customGetControllableLabelFunc;
