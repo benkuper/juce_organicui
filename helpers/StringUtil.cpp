@@ -26,14 +26,14 @@ String StringUtil::toShortName(const String& niceName, bool replaceSlashes) {
 
 	res = res.replaceCharacter('\"', '_');
 
-	String specials = "+-()[]{}<>^'@#*$~";// ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏĞÑÒÓÔÕÖ×ÙÚÛÜİßàáâãäåæçèéêëìíîïğñòóôõöùúûüıÿ";
+	String specials = "+-()[]{}<>^'@#*$~";// Ã€ÃÃ‚ÃƒÃ„Ã…Ã†Ã‡ÃˆÃ‰ÃŠÃ‹ÃŒÃÃÃÃÃ‘Ã’Ã“Ã”Ã•Ã–Ã—Ã™ÃšÃ›ÃœÃÃŸÃ Ã¡Ã¢Ã£Ã¤Ã¥Ã¦Ã§Ã¨Ã©ÃªÃ«Ã¬Ã­Ã®Ã¯Ã°Ã±Ã²Ã³Ã´ÃµÃ¶Ã¹ÃºÃ»Ã¼Ã½Ã¿";
 	String replaces = "_____________#___";//AAAAAAECEEEEIIIIDNOOOOOxUUUUYsaaaaaaeceeeeiiiiOnooooouuuuyy";
 	res = res.replaceCharacters(specials, replaces);
 
 #if !JUCE_MAC
-	res = res.replaceCharacter('â', 'a').replaceCharacter('é', 'e').replaceCharacter('è', 'e').replaceCharacter('ê', 'e')
-		.replaceCharacter('à', 'a').replaceCharacter('ô', 'o')
-		.replaceCharacter('ç', 'c').replaceCharacter('ü', 'u');
+	res = res.replaceCharacter('Ã¢', 'a').replaceCharacter('Ã©', 'e').replaceCharacter('Ã¨', 'e').replaceCharacter('Ãª', 'e')
+		.replaceCharacter('Ã ', 'a').replaceCharacter('Ã´', 'o')
+		.replaceCharacter('Ã§', 'c').replaceCharacter('Ã¼', 'u');
 #endif
 
 	//for (int i = 0; i < specials.length(); ++i) res = res.replaceCharacter(specials[i], replaces[i]);
@@ -105,9 +105,9 @@ CommandLineElements StringUtil::parseCommandLine(const String& commandLine) {
 #pragma warning(disable:4244)
 String StringUtil::valueToTimeString(double timeVal, int numDecimals)
 {
-	int hours = floor(timeVal / 3600);
-	int minutes = floor(fmod(timeVal, 3600) / 60);
-	double seconds = fmod(timeVal, 60);
+	int hours = trunc(timeVal / 3600);
+	int minutes = abs(trunc(fmod(timeVal, 3600) / 60));
+	double seconds = abs(fmod(timeVal, 60));
 	if (numDecimals > 0) return String::formatted("%02i:%02i:%0" + String(6 - (numDecimals - 3)) + "." + String(numDecimals) + "f", hours, minutes, seconds);
 	else return String::formatted("%02i:%02i:%02i", hours, minutes, (int)seconds);
 }
