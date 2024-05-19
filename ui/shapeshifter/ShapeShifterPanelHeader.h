@@ -26,6 +26,7 @@ public:
 	void addTab(ShapeShifterContent * content);
 	void removeTab(ShapeShifterPanelTab * tab, bool doRemove = true);
 	void attachTab(ShapeShifterPanelTab * tab);
+	void clearTabs();
 
 	ShapeShifterPanelTab * getTabForContent(ShapeShifterContent * content);
 
@@ -38,6 +39,7 @@ public:
 	void resized()override;
 
 	void askForRemoveTab(ShapeShifterPanelTab *) override;
+	void nameChanged(ShapeShifterPanelTab *) override;
 
 	class Listener
 	{

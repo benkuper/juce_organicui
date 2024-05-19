@@ -9,17 +9,27 @@
 */
 
 #include "JuceHeader.h"
+#include "ShapeShifterContent.h"
 
 ShapeShifterContent::ShapeShifterContent(Component* _contentComponent, const String& _contentName) :
 	contentComponent(_contentComponent),
 	contentName(_contentName),
 	contentIsFlexible(false),
-	contentIsShown(false)
+	contentIsShown(false),
+	sscNotifier(5)
 {
+	customName = "";
 }
 
 ShapeShifterContent::~ShapeShifterContent()
 {
+	DBG("here");
+}
+
+void ShapeShifterContent::setCustomName(const juce::String& newName)
+{
+	customName = newName;
+	sscNotifier.addMessage(new ShapeShifterContentEvent(ShapeShifterContentEvent::NAME_CHANGED, this));
 }
 
 ShapeShifterContentComponent::ShapeShifterContentComponent(const String& contentName) :

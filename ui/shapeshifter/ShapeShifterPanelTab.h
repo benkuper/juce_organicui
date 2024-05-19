@@ -13,7 +13,8 @@
 #include "ShapeShifterContent.h"//keep
 class ShapeShifterPanelTab :
 	public juce::Component,
-	public juce::Button::Listener
+	public juce::Button::Listener,
+	public ShapeShifterContent::AsyncListener
 {
 public:
 	ShapeShifterPanelTab(ShapeShifterContent * _content);
@@ -26,6 +27,8 @@ public:
 	bool selected;
 	void setSelected(bool value);
 
+	void clear();
+
 	void paint(juce::Graphics &g) override;
 	void resized()override;
 
@@ -35,6 +38,7 @@ public:
 
 	void mouseDoubleClick(const juce::MouseEvent& e) override;
 
+	void newMessage(const ShapeShifterContent::ShapeShifterContentEvent& e) override;
 
 	//Listener
 	class TabListener
@@ -42,6 +46,7 @@ public:
 	public:
 		virtual ~TabListener() {};
 		virtual void askForRemoveTab(ShapeShifterPanelTab *) {};
+		virtual void nameChanged(ShapeShifterPanelTab *) {};
 	};
 
 	juce::ListenerList<TabListener> tabListeners;

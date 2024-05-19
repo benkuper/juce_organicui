@@ -40,6 +40,17 @@ void ShapeShifterPanelHeader::attachTab(ShapeShifterPanelTab * tab)
 	resized();
 }
 
+void ShapeShifterPanelHeader::clearTabs()
+{
+	for (auto& t : tabs)
+	{ 
+		t->removeShapeShifterTabListener(this);
+		t->clear();
+		removeChildComponent(t);
+	}
+	tabs.clear();
+}
+
 ShapeShifterPanelTab * ShapeShifterPanelHeader::getTabForContent(ShapeShifterContent * content)
 {
 	for (auto &t : tabs)
@@ -96,4 +107,9 @@ void ShapeShifterPanelHeader::resized()
 void ShapeShifterPanelHeader::askForRemoveTab(ShapeShifterPanelTab * tab)
 {
 	listeners.call(&Listener::askForRemoveTab, tab);
+}
+
+void ShapeShifterPanelHeader::nameChanged(ShapeShifterPanelTab*)
+{
+	resized();
 }

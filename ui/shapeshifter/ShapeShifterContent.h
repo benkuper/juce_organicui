@@ -18,10 +18,14 @@ public:
 
 	juce::Component * contentComponent;
 	juce::String contentName;
+	juce::String customName;
 
 	bool contentIsFlexible;
-
 	bool contentIsShown;
+
+	void setCustomName(const juce::String &newName);
+
+	DECLARE_ASYNC_EVENT(ShapeShifterContent, ShapeShifterContent, ssc, { NAME_CHANGED });
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ShapeShifterContent)
