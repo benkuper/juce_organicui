@@ -10,13 +10,17 @@
 
 #include "JuceHeader.h"
 
+juce_ImplementSingleton(FileCheckTimer);
+
+
 FileParameter::FileParameter(const String& niceName, const String& description, const String& initialValue, bool enabled) :
 	StringParameter(niceName, description, initialValue, enabled),
 	customBasePath(""),
 	directoryMode(false),
 	saveMode(false),
 	forceAbsolutePath(false),
-	forceRelativePath(false)
+	forceRelativePath(false),
+	autoReload(false)
 {
 	defaultUI = FILE;
 
@@ -32,6 +36,7 @@ FileParameter::FileParameter(const String& niceName, const String& description, 
 
 FileParameter::~FileParameter()
 {
+	if(FileCheckTimer::getInstanceWithoutCreating()) FileCheckTimer::getInstance()->unregisterParam(this);
 	if (Engine::mainEngine != nullptr) Engine::mainEngine->removeEngineListener(this);
 }
 
@@ -45,9 +50,13 @@ void FileParameter::setValueInternal(var& newVal)
 		else absolutePath = getBasePath().getChildFile(value.toString()).getFullPathName();
 
 		File f = File::createFileWithoutCheckingPath(absolutePath);
-		if (f.exists() && !forceAbsolutePath && (isRelativePath(newVal.toString()) || forceRelativePath))
+		if (f.exists())
 		{
-			value = File(absolutePath).getRelativePathFrom(getBasePath()).replace("\\", "/");
+			lastModificationTime = f.getLastModificationTime();
+			if (!forceAbsolutePath && (isRelativePath(newVal.toString()) || forceRelativePath))
+			{
+				value = File(absolutePath).getRelativePathFrom(getBasePath()).replace("\\", "/");
+			}
 		}
 	}
 
@@ -103,6 +112,27 @@ File FileParameter::getFile()
 	if (absolutePath.startsWithChar('/')) return File(); //on windows, if the path starts with a /, it's a unix formatted url, not a windows path
 #endif
 	return File(p);
+}
+
+void FileParameter::setAutoReload(bool value)
+{
+	if (autoReload == value) return;
+	autoReload = value;
+	if (autoReload) FileCheckTimer::getInstance()->registerParam(this);
+	else FileCheckTimer::getInstance()->unregisterParam(this);
+}
+
+void FileParameter::checkForHotReload()
+{
+	if (!enabled || saveMode) return;
+
+	File f = getFile();
+	if (!f.existsAsFile()) return;
+	if (f.getLastModificationTime() != lastModificationTime)
+	{
+		lastModificationTime = f.getLastModificationTime();
+		setValue(f.getFullPathName(), false, true);
+	}
 }
 
 var FileParameter::getJSONDataInternal()
@@ -252,6 +282,7 @@ bool FileParameter::setAttributeInternal(String param, var paramVal)
 {
 	if (param == "directoryMode") directoryMode = paramVal;
 	else if (param == "saveMode") saveMode = paramVal;
+	else if (param == "autoReload") setAutoReload(paramVal);
 	else
 	{
 		return StringParameter::setAttributeInternal(param, paramVal);
@@ -265,5 +296,25 @@ StringArray FileParameter::getValidAttributes() const
 	StringArray att = StringParameter::getValidAttributes();
 	att.add("directoryMode");
 	att.add("saveMode");
+	att.add("autoReload");
 	return att;
+}
+
+void FileCheckTimer::registerParam(FileParameter* fp)
+{
+	params.addIfNotAlreadyThere(fp);
+}
+
+void FileCheckTimer::unregisterParam(FileParameter* fp)
+{
+	params.removeAllInstancesOf(fp);
+}
+
+//Timer
+void FileCheckTimer::timerCallback()
+{
+	for (auto& fp : params)
+	{
+		fp->checkForHotReload();
+	}
 }

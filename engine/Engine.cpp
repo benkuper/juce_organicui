@@ -67,6 +67,7 @@ Engine::~Engine() {
 	selectionManager = nullptr; //delete selection manager
 
 	Parameter::ValueInterpolator::Manager::deleteInstance();
+	FileCheckTimer::deleteInstance();
 
 	Detective::deleteInstance();
 	ParrotManager::deleteInstance();
