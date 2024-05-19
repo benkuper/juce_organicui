@@ -66,8 +66,6 @@ void FloatParameterLabelUI::updateValueFromLabel()
 	parameter->setValue(v);
 
 	valueLabel.setText(getValueString(v), dontSendNotification);
-
-	LOG("Update value from label : " << s << " : " << parameter->doubleValue() << " / " << parameter->stringValue());
 }
 
 void FloatParameterLabelUI::updateTooltip()
