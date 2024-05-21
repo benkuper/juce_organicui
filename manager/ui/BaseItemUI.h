@@ -203,6 +203,8 @@ BaseItemUI<T>::BaseItemUI(T* _item, Direction _resizeDirection, bool showMiniMod
 	if (this->baseItem->userCanRemove)
 	{
 		removeBT.reset(AssetManager::getInstance()->getRemoveBT());
+		removeBT->setWantsKeyboardFocus(false);
+		removeBT->setMouseClickGrabsKeyboardFocus(false);
 		this->addAndMakeVisible(removeBT.get());
 		removeBT->addListener(this);
 	}
