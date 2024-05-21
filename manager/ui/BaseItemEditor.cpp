@@ -13,6 +13,7 @@ BaseItemEditor::BaseItemEditor(Array<BaseItem*> bi, bool isRoot) :
 	{
 		removeBT.reset(AssetManager::getInstance()->getRemoveBT());
 		removeBT->setWantsKeyboardFocus(false);
+		removeBT->setMouseClickGrabsKeyboardFocus(false);
 		addAndMakeVisible(removeBT.get());
 		removeBT->addListener(this);
 	}
@@ -23,6 +24,7 @@ BaseItemEditor::BaseItemEditor(Array<BaseItem*> bi, bool isRoot) :
 		{
 			duplicateBT.reset(AssetManager::getInstance()->getDuplicateBT());
 			duplicateBT->setWantsKeyboardFocus(false);
+			duplicateBT->setMouseClickGrabsKeyboardFocus(false);
 			addAndMakeVisible(duplicateBT.get());
 			duplicateBT->addListener(this);
 		}
