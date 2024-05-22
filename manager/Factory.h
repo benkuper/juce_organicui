@@ -81,7 +81,7 @@ public:
 
 template<class T>
 class FactorySimpleParametricDefinition :
-	public FactoryParametricDefinition<T, std::function<T *(juce::var)>>
+	public FactoryParametricDefinition<T, std::function<T* (juce::var)>>
 {
 public:
 	FactorySimpleParametricDefinition(juce::StringRef menuPath, juce::StringRef type, std::function<T* (juce::var)> createFunc, juce::var params = new juce::DynamicObject()) :
@@ -90,6 +90,18 @@ public:
 	}
 
 	virtual ~FactorySimpleParametricDefinition() {}
+
+	virtual T* createWithExtramParams(juce::var extraParams) {
+
+		if (!extraParams.isObject()) return this->createFunc(this->params);
+
+		juce::var mergedParams = this->params.clone();
+
+		juce::NamedValueSet& props = extraParams.getDynamicObject()->getProperties();
+		for (auto& p : props) mergedParams.getDynamicObject()->setProperty(p.name, p.value);
+
+		return this->createFunc(mergedParams);
+	}
 
 	virtual T* create() override {
 		return this->createFunc(this->params);
@@ -194,7 +206,7 @@ public:
 		if (result <= 0 || result > defs.size()) return nullptr;
 		else
 		{
-			BaseFactoryDefinition<T> * d = defs[result - 1];//result 0 is no result
+			BaseFactoryDefinition<T>* d = defs[result - 1];//result 0 is no result
 			return create(d);
 		}
 	}
@@ -204,6 +216,17 @@ public:
 		for (auto& d : defs)
 		{
 			if (d->type == type) return create(d);
+		}
+
+		LOGERROR("Type " << type << " does not exist for this manager.");
+		return nullptr;
+	}
+
+	virtual T* createWithExtraParams(const juce::String& type, juce::var extraParams)
+	{
+		for (auto& d : defs)
+		{
+			if (d->type == type) return createWithExtraParams(d, extraParams);
 		}
 
 		LOGERROR("Type " << type << " does not exist for this manager.");
@@ -224,9 +247,14 @@ public:
 		return nullptr;
 	}
 
-	virtual T* create(BaseFactoryDefinition<T> * def)
+	virtual T* create(BaseFactoryDefinition<T>* def)
 	{
 		return def->create();
+	}
+
+	virtual T* createWithExtraParams(BaseFactoryDefinition<T>* def, juce::var extraParams)
+	{
+		return dynamic_cast<FactorySimpleParametricDefinition<T>*>(def)->createWithExtramParams(extraParams);
 	}
 
 	bool hasDefinitionWithType(const juce::String& type)

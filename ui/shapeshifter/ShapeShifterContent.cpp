@@ -23,7 +23,6 @@ ShapeShifterContent::ShapeShifterContent(Component* _contentComponent, const Str
 
 ShapeShifterContent::~ShapeShifterContent()
 {
-	DBG("here");
 }
 
 void ShapeShifterContent::setCustomName(const juce::String& newName)
