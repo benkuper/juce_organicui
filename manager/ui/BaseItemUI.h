@@ -58,7 +58,7 @@ public:
 		void paint(juce::Graphics& g)
 		{
 			g.setColour(isMouseOverOrDragging() ? HIGHLIGHT_COLOR : juce::Colours::lightgrey.withAlpha(.3f));
-			for (int i = 0; i < 3; i++) g.drawLine(getWidth() * i / 3, getHeight(), getWidth(), getHeight() * i / 3);
+			for (int i = 0; i < 3; i++) g.drawLine(getWidth() * i / 3.f, (float)getHeight(), (float)getWidth(), getHeight() * i / 3.f);
 		}
 	};
 
@@ -203,6 +203,8 @@ BaseItemUI<T>::BaseItemUI(T* _item, Direction _resizeDirection, bool showMiniMod
 	if (this->baseItem->userCanRemove)
 	{
 		removeBT.reset(AssetManager::getInstance()->getRemoveBT());
+		removeBT->setWantsKeyboardFocus(false);
+		removeBT->setMouseClickGrabsKeyboardFocus(false);
 		this->addAndMakeVisible(removeBT.get());
 		removeBT->addListener(this);
 	}

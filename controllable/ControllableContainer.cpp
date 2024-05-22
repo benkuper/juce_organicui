@@ -307,8 +307,7 @@ void ControllableContainer::removeControllable(WeakReference<Controllable> c, bo
 		return;
 	}
 
-	controllableContainerListeners.call(&ControllableContainerListener::controllableRemoved, c);
-	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableRemoved, this, c));
+
 
 #if ORGANICUI_USE_WEBSERVER
 	if (OSCRemoteControl::getInstanceWithoutCreating() != nullptr && parentContainer != nullptr) OSCRemoteControl::getInstance()->sendPathRemovedFeedback(c->getControlAddress());
@@ -327,10 +326,14 @@ void ControllableContainer::removeControllable(WeakReference<Controllable> c, bo
 	}
 
 
+	controllables.removeObject(c, false);
 
 	onControllableRemoved(c);
+	controllableContainerListeners.call(&ControllableContainerListener::controllableRemoved, c);
+	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableRemoved, this, c));
 
-	controllables.removeObject(c, deleteObject);
+	if (deleteObject) delete c;
+
 	notifyStructureChanged();
 }
 
@@ -507,7 +510,7 @@ void ControllableContainer::removeChildControllableContainer(ControllableContain
 
 	if (Engine::mainEngine != nullptr && !Engine::mainEngine->isClearing)
 	{
-		if(container->getWarningMessage().isNotEmpty()) warningChanged(container);
+		if (container->getWarningMessage().isNotEmpty()) warningChanged(container);
 	}
 
 	if (!Engine::mainEngine->isClearing)
@@ -518,10 +521,10 @@ void ControllableContainer::removeChildControllableContainer(ControllableContain
 #if ORGANICUI_USE_WEBSERVER
 		if (OSCRemoteControl::getInstanceWithoutCreating() != nullptr && parentContainer != nullptr) OSCRemoteControl::getInstance()->sendPathRemovedFeedback(container->getControlAddress());
 #endif
-		
+
 		notifyStructureChanged();
 		container->setParentContainer(nullptr);
-	}
+}
 
 	if (ownedContainers.contains(container)) ownedContainers.removeObject(container);
 }
