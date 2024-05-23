@@ -228,7 +228,8 @@ public:
 		bool undo() override;
 	};
 
-	class ValueInterpolator
+	class ValueInterpolator :
+		public InspectableListener
 	{
 	public:
 		ValueInterpolator(juce::WeakReference<Parameter> p, juce::var targetValue, float time, Automation* a);
@@ -242,6 +243,8 @@ public:
 		Automation* automation;
 		void updateParams(juce::var targetValue, float time, Automation* a);
 		bool update();
+
+		void inspectableDestroyed(Inspectable*) override;
 
 		class Manager :
 			public juce::Thread

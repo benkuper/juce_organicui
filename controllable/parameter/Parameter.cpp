@@ -9,7 +9,6 @@
 */
 
 #include "JuceHeader.h"
-#include "Parameter.h"
 
 using namespace juce;
 
@@ -727,10 +726,13 @@ Parameter::ValueInterpolator::ValueInterpolator(WeakReference<Parameter> p, var 
 	valueAtStart(parameter->getValue()),
 	automation(a)
 {
+	parameter->addInspectableListener(this);
 }
 
 Parameter::ValueInterpolator::~ValueInterpolator()
 {
+	if(parameter != nullptr && !parameter.wasObjectDeleted()) parameter->removeInspectableListener(this);
+
 	masterReference.clear();
 }
 
@@ -768,6 +770,14 @@ bool Parameter::ValueInterpolator::update()
 	}
 
 	return true;
+}
+
+void Parameter::ValueInterpolator::inspectableDestroyed(Inspectable* i)
+{
+	if (i == parameter || parameter.wasObjectDeleted())
+	{
+		parameter = nullptr;
+	}
 }
 
 Parameter::ValueInterpolator::Manager::Manager() :
