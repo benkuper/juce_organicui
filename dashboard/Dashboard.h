@@ -49,7 +49,7 @@ public:
 		virtual void askForRefresh(Dashboard * d) = 0;
 	};
 
-	juce::ListenerList<DashboardListener> dashboardListeners;
+	juce::ListenerList<DashboardListener, juce::Array<DashboardListener*, juce::CriticalSection>> dashboardListeners;
 	void addDashboardListener(DashboardListener* newListener) { dashboardListeners.add(newListener); }
 	void removeDashboardListener(DashboardListener* listener) { dashboardListeners.remove(listener); }
 
