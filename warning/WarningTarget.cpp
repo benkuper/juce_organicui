@@ -51,7 +51,7 @@ void WarningTarget::setWarningMessage(const String& message, const String& id, b
 	}
 	else
 	{
-		if (log && Engine::mainEngine != nullptr && !Engine::mainEngine->isLoadingFile && Engine::mainEngine->isClearing) LOGWARNING(message);
+		if (log && Engine::mainEngine != nullptr && !Engine::mainEngine->isLoadingFile && !Engine::mainEngine->isClearing) LOGWARNING(message);
         
         if(!warningMessage.contains(id))
         {
