@@ -30,6 +30,7 @@ ScriptUtil::ScriptUtil() :
 	scriptObject.getDynamicObject()->setMethod("doubleToHexSeq", ScriptUtil::doubleToHexSeq);
 	scriptObject.getDynamicObject()->setMethod("hexStringToInt", ScriptUtil::hexStringToInt);
 	scriptObject.getDynamicObject()->setMethod("toStringFixed", ScriptUtil::toStringFixed);
+	scriptObject.getDynamicObject()->setMethod("colorToHex", ScriptUtil::colorToHex);
 	scriptObject.getDynamicObject()->setMethod("getObjectProperties", ScriptUtil::getObjectProperties);
 	scriptObject.getDynamicObject()->setMethod("getObjectMethods", ScriptUtil::getObjectMethods);
 
@@ -229,6 +230,21 @@ var ScriptUtil::toStringFixed(const var::NativeFunctionArgs& a)
 	if (!a.arguments[0].isDouble()) return a.arguments[0].toString();
 	int numDecimals = (a.numArguments > 1) ? (int)a.arguments[1] : 3;
 	return String((double)a.arguments[0], numDecimals, false);
+}
+
+juce::var ScriptUtil::colorToHex(const juce::var::NativeFunctionArgs& a)
+{
+	if (a.arguments[0].isArray() && a.arguments[0].size() >= 3)
+	{
+		return Colour((float)a.arguments[0][0] * 255, (float)a.arguments[0][1] * 255, (float)a.arguments[0][2] * 255, a.arguments[0].size() > 3 ? (float)a.arguments[0][3] * 255 : 1).toDisplayString(a.arguments[0].size() > 3);
+	}
+	else if (a.numArguments >= 3)
+	{
+		return Colour((float)a.arguments[0] * 255, (float)a.arguments[1] * 255, (int)a.arguments[2] * 255, a.numArguments > 3 ? (float)a.arguments[3] * 255 : 1).toDisplayString(a.numArguments > 3);
+	}
+
+	LOGWARNING("Color conversion failed, needs either an array with 3 or 4 values (0-1) or directly 3 or 4 values as arguments");
+	return "";
 }
 
 var ScriptUtil::getObjectMethods(const var::NativeFunctionArgs& a)
@@ -978,8 +994,8 @@ var ScriptUtil::findFunctionInDynamicLibrary(const var::NativeFunctionArgs& args
 	// property names that his library uses.
 	using PluginFunctionType = var(*)(const var::NativeFunctionArgs&, Logger*, StringPool&);
 	const auto wrapper = [function](const var::NativeFunctionArgs& args) -> var
-	{
-		return ((PluginFunctionType)function)(args, Logger::getCurrentLogger(), StringPool::getGlobalPool());
-	};
+		{
+			return ((PluginFunctionType)function)(args, Logger::getCurrentLogger(), StringPool::getGlobalPool());
+		};
 	return var::NativeFunction{ wrapper };
 }

@@ -32,6 +32,7 @@ public:
 	static juce::var doubleToHexSeq(const juce::var::NativeFunctionArgs& a);
 	static juce::var hexStringToInt(const juce::var::NativeFunctionArgs& a);
 	static juce::var toStringFixed(const juce::var::NativeFunctionArgs& a);
+	static juce::var colorToHex(const juce::var::NativeFunctionArgs& a);
 
 	static juce::var getObjectProperties(const juce::var::NativeFunctionArgs& a);
 	static juce::var getObjectMethods(const juce::var::NativeFunctionArgs& a);
