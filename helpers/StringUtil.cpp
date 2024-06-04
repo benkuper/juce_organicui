@@ -105,11 +105,12 @@ CommandLineElements StringUtil::parseCommandLine(const String& commandLine) {
 #pragma warning(disable:4244)
 String StringUtil::valueToTimeString(double timeVal, int numDecimals)
 {
-	int hours = trunc(timeVal / 3600);
+	String sign = timeVal < 0 ? "-" : "";
+	int hours = abs(trunc(timeVal / 3600));
 	int minutes = abs(trunc(fmod(timeVal, 3600) / 60));
 	double seconds = abs(fmod(timeVal, 60));
-	if (numDecimals > 0) return String::formatted("%02i:%02i:%0" + String(6 - (numDecimals - 3)) + "." + String(numDecimals) + "f", hours, minutes, seconds);
-	else return String::formatted("%02i:%02i:%02i", hours, minutes, (int)seconds);
+	if (numDecimals > 0) return String::formatted("{}%02i:%02i:%0" + String(3 + numDecimals) + "." + String(numDecimals) + "f", sign, hours, minutes, seconds);
+	else return String::formatted("{}%02i:%02i:%02i", sign, hours, minutes, (int)seconds);
 }
 
 double StringUtil::timeStringToValue(String str)
