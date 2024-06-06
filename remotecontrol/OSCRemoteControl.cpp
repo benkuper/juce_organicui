@@ -319,7 +319,10 @@ void OSCRemoteControl::processMessage(const OSCMessage& m, const String& sourceI
 				noFeedbackMap.set(c, sourceId);
 			}
 
-			OSCHelpers::handleControllableForOSCMessage(c, m);
+			bool handled = false;
+			if (c->parentContainer != nullptr) handled = c->parentContainer->handleRemoteControlData(c, m, sourceId);
+			if (!handled) OSCHelpers::handleControllableForOSCMessage(c, m);
+
 			noFeedbackMap.remove(c);
 		}
 #else
@@ -331,7 +334,7 @@ void OSCRemoteControl::processMessage(const OSCMessage& m, const String& sourceI
 			bool handled = false;
 			if (ControllableContainer* cc = OSCHelpers::findParentContainer(Engine::mainEngine, m.getAddressPattern().toString()))
 			{
-				handled = cc->handleRemoteControlData(m, sourceId);
+				handled = cc->handleRemoteControlData(c, m, sourceId);
 			}
 
 			if (!handled) remoteControlListeners.call(&RemoteControlListener::processMessage, m, sourceId);
