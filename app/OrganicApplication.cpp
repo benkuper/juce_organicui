@@ -110,13 +110,13 @@ void OrganicApplication::initialise(const String& commandLine)
 
 	afterInit();
 
-	engine->parseCommandline(commandLine);
+	bool fileIsLoaded = engine->parseCommandline(commandLine);
 
 	if (launchedFromCrash)
 	{
 		engine->setChangedFlag(true);
 	}
-	else
+	else if(!fileIsLoaded)
 	{
 		if (!engine->getFile().existsAsFile()) {
 			if (GlobalSettings::getInstance()->openLastDocumentOnStartup->boolValue())  Engine::mainEngine->loadFrom(Engine::mainEngine->getLastDocumentOpened(), true);

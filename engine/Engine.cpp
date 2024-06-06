@@ -13,13 +13,13 @@
 
 using namespace juce;
 
-Engine * Engine::mainEngine = nullptr;
+Engine* Engine::mainEngine = nullptr;
 
 static OrganicApplication& getApp();
 String getAppVersion();
 ApplicationProperties& getAppProperties();
 
-Engine::Engine(const String & fileName, const String & fileExtension) :
+Engine::Engine(const String& fileName, const String& fileExtension) :
 	ControllableContainer("Root"),
 	FileBasedDocument(fileExtension,
 		"*" + fileExtension,
@@ -78,7 +78,7 @@ Engine::~Engine() {
 	//PresetManager::deleteInstance();
 	Logger::setCurrentLogger(nullptr);
 	CustomLogger::deleteInstance();
-	
+
 	ControllableFactory::deleteInstance();
 	ScriptUtil::deleteInstance();
 	ShapeShifterFactory::deleteInstance();
@@ -94,16 +94,17 @@ Engine::~Engine() {
 	Engine::mainEngine = nullptr;
 }
 
-void Engine::parseCommandline(const String & commandLine) {
+bool Engine::parseCommandline(const String& commandLine) {
 
-	for (auto & c : StringUtil::parseCommandLine(commandLine)) {
+	bool fileIsLoaded = false;
+	for (auto& c : StringUtil::parseCommandLine(commandLine)) {
 
 		if (c.command == "f" || c.command == "" || c.command == "c") {
 			if (c.args.size() == 0) {
 				LOG("no file provided for command : " + c.command);
 				jassertfalse;
 				continue;
-			} 
+			}
 
 			bool fromCrash = c.command == "c";
 
@@ -121,22 +122,26 @@ void Engine::parseCommandline(const String & commandLine) {
 							e->loadDocument(f);
 							e->setFile(File()); //from crash : force other file to force saving again, but also keep working directory
 							f.setAsCurrentWorkingDirectory();
-						});
+							});
 					}
 					else
 					{
 						loadDocument(f);
 					}
+
+					fileIsLoaded = true;
 				}
-			} else {
+			}
+			else {
 				NLOG("Engine", "File : " << fileArg << " not found.");
 			}
 		}
 	}
+	return fileIsLoaded;
 }
 
 
-void Engine::childStructureChanged(ControllableContainer * cc)
+void Engine::childStructureChanged(ControllableContainer* cc)
 {
 	ControllableContainer::childStructureChanged(cc);
 
@@ -149,10 +154,10 @@ PopupMenu Engine::getDashboardCreateMenu(int idOffset)
 	return ControllableChooserPopupMenu(this, idOffset);
 }
 
-DashboardItem * Engine::getDashboardItemFromMenuResult(int result)
+DashboardItem* Engine::getDashboardItemFromMenuResult(int result)
 {
 	ControllableChooserPopupMenu chooser(this, 0);
-	Controllable * c = chooser.getControllableForResult(result);
+	Controllable* c = chooser.getControllableForResult(result);
 	if (c == nullptr) return nullptr;
 	return c->createDashboardItem();
 }
@@ -213,7 +218,7 @@ void Engine::timerCallback(int timerID)
 		{
 			saveBackupDocument(autoSaveIndex);
 			autoSaveIndex = (autoSaveIndex + 1) % GlobalSettings::getInstance()->autoSaveCount->intValue();
-			startTimer(1,  60000 * GlobalSettings::getInstance()->autoSaveTime->intValue());
+			startTimer(1, 60000 * GlobalSettings::getInstance()->autoSaveTime->intValue());
 		}
 	}
 	break;
