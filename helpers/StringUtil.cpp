@@ -109,12 +109,15 @@ String StringUtil::valueToTimeString(double timeVal, int numDecimals)
 	int hours = abs(trunc(timeVal / 3600));
 	int minutes = abs(trunc(fmod(timeVal, 3600) / 60));
 	double seconds = abs(fmod(timeVal, 60));
-	if (numDecimals > 0) return String::formatted("{}%02i:%02i:%0" + String(3 + numDecimals) + "." + String(numDecimals) + "f", sign, hours, minutes, seconds);
-	else return String::formatted("{}%02i:%02i:%02i", sign, hours, minutes, (int)seconds);
+	String result = sign;
+	if (numDecimals > 0) result += String::formatted("%02i:%02i:%0" + String(3 + numDecimals) + "." + String(numDecimals) + "f", hours, minutes, seconds);
+	else result += String::formatted("%02i:%02i:%02i", hours, minutes, (int)seconds);
+	return result;
 }
 
 double StringUtil::timeStringToValue(String str)
 {
+	bool negative = str.startsWith("-");
 	StringArray sa;
 	str = str.retainCharacters("0123456789.:;,");
 	if (str.endsWithChar(':')) str += "0";
@@ -135,6 +138,7 @@ double StringUtil::timeStringToValue(String str)
 		}
 	}
 
+	if (negative) value = -value;
 	return value;
 }
 
