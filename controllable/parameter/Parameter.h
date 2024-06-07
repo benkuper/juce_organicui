@@ -149,7 +149,7 @@ public:
 	virtual void getRemoteControlDataInternal(juce::var& data) override;
 	virtual juce::var getRemoteControlValue();
 	virtual juce::var getRemoteControlRange();
-	
+
 	static juce::var getValueFromScript(const juce::var::NativeFunctionArgs& a);
 	static juce::var resetValueFromScript(const juce::var::NativeFunctionArgs& a);
 	static juce::var getRangeFromScript(const juce::var::NativeFunctionArgs& a);
@@ -158,9 +158,12 @@ public:
 
 	juce::String getScriptTargetString() override;
 
-	juce::ListenerList<ParameterListener, juce::Array<ParameterListener*,juce::CriticalSection>> listeners;
+	juce::ListenerList<ParameterListener, juce::Array<ParameterListener*, juce::CriticalSection>> listeners;
 	void addParameterListener(ParameterListener* newListener) { listeners.add(newListener); }
-	void removeParameterListener(ParameterListener* listener) { listeners.remove(listener); }
+	void removeParameterListener(ParameterListener* listener) {
+		if (isBeingDestroyed) return;
+		listeners.remove(listener);
+	}
 
 	// ASYNC
 	class  ParameterEvent

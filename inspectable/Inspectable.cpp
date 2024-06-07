@@ -10,6 +10,7 @@ Inspectable::Inspectable() :
 	defaultHideInRemoteControl(false),
 	isHighlighted(false),
 	isPreselected(false),
+	isBeingDestroyed(false),
     highlightLinkedInspectableOnSelect(true),
 	saveCustomData(true),
     inspectableNotifier(10)
@@ -19,12 +20,14 @@ Inspectable::Inspectable() :
 
 Inspectable::~Inspectable()
 {
+	isBeingDestroyed = true;
 	for (auto &i : linkedInspectables)
 	{
 		if (i.wasObjectDeleted()) continue;
 		if (isHighlighted) i->setHighlighted(false);
 		i->unregisterLinkedInspectable(this, false);
 	}
+
 
 	listeners.call(&InspectableListener::inspectableDestroyed, this);
 	//inspectableNotifier.addMessage(new InspectableEvent(InspectableEvent::DESTROYED, this));

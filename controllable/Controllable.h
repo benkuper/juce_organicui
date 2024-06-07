@@ -151,9 +151,12 @@ public:
 		virtual void askForRemoveControllable(Controllable*, bool /*addToUndo*/ = false) {}
 	};
 
-	juce::ListenerList<Listener> listeners;
+	juce::ListenerList<Listener, juce::Array < Listener*, juce::CriticalSection >> listeners;
 	void addControllableListener(Listener* newListener) { listeners.add(newListener); }
-	void removeControllableListener(Listener* listener) { listeners.remove(listener); }
+	void removeControllableListener(Listener* listener) {
+		if (isBeingDestroyed) return;
+		listeners.remove(listener);
+	}
 
 	// ASYNC
 	class  ControllableEvent

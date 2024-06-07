@@ -118,7 +118,7 @@ void Parameter::setReferenceParameter(Parameter* tp)
 {
 	if (tp == referenceParameter) return;
 
-	if (referenceParameter != nullptr)
+	if (referenceParameter != nullptr && !referenceParameter->isBeingDestroyed)
 	{
 		referenceParameter->removeParameterListener(this);
 	}

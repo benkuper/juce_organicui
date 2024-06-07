@@ -44,7 +44,10 @@ public:
 
 	juce::ListenerList<Listener, juce::Array<Listener*, juce::CriticalSection>> listeners;
 	void addTriggerListener(Trigger::Listener* newListener) { listeners.add(newListener); }
-	void removeTriggerListener(Trigger::Listener* listener) { listeners.remove(listener); }
+	void removeTriggerListener(Trigger::Listener* listener) {
+		if (isBeingDestroyed) return;
+		listeners.remove(listener); 
+	}
 
 
 
