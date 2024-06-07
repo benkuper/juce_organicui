@@ -51,5 +51,5 @@ public:
 
 	DECLARE_INSPECTACLE_CRITICAL_LISTENER(Dashboard, dashboard);
 
-	DECLARE_ITEM_ASYNC_EVENT(Dashboard, Dashboard, dashboard, { EDITING_UPDATE });
+	DECLARE_ASYNC_EVENT(Dashboard, Dashboard, dashboard, { EDITING_UPDATE }, EVENT_ITEM_CHECK);
 };

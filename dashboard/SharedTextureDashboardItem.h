@@ -44,7 +44,7 @@ public:
 	DashboardItemUI* createUI() override;
 	virtual var getItemParameterFeedback(Parameter* p) override;
 
-	DECLARE_ITEM_ASYNC_EVENT(SharedTextureDashboardItem, ST, st, { TEXTURE_UPDATED });
+	DECLARE_ASYNC_EVENT(SharedTextureDashboardItem, ST, st, { TEXTURE_UPDATED }, EVENT_ITEM_CHECK);
 
 	String getTypeString() const override { return "Shared Texture"; }
 };

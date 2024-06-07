@@ -102,7 +102,7 @@ public:
 
 	DECLARE_INSPECTACLE_CRITICAL_LISTENER(EnumParameter, enum);
 
-	DECLARE_INSPECTABLE_ASYNC_EVENT(EnumParameter, EnumParameter, enumParameter, ENUM_LIST(ENUM_OPTION_ADDED, ENUM_OPTION_UPDATED, ENUM_OPTION_REMOVED))
+	DECLARE_ASYNC_EVENT(EnumParameter, EnumParameter, enumParameter, ENUM_LIST(ENUM_OPTION_ADDED, ENUM_OPTION_UPDATED, ENUM_OPTION_REMOVED), EVENT_INSPECTABLE_CHECK)
 
 	static EnumParameter* create() { return new EnumParameter("new Enum Parameter", ""); }
 	virtual juce::String getTypeString() const override { return getTypeStringStatic(); }

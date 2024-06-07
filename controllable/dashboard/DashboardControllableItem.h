@@ -42,5 +42,5 @@ public:
 
 	virtual juce::String getTypeString() const override { return "DashboardControllableItem"; }
 
-	DECLARE_ITEM_ASYNC_EVENT(DashboardControllableItem, DashboardControllableItem, dashboardItem, ENUM_LIST(NEEDS_UI_UPDATE))
+	DECLARE_ASYNC_EVENT(DashboardControllableItem, DashboardControllableItem, dashboardItem, ENUM_LIST(NEEDS_UI_UPDATE), EVENT_ITEM_CHECK)
 };

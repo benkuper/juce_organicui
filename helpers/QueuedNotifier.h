@@ -11,49 +11,25 @@
 
 #define ENUM_LIST(...) {__VA_ARGS__}
 
+#define EVENT_NO_CHECK true
+#define EVENT_ITEM_CHECK !isClearing && !isBeingDestroyed
+#define EVENT_INSPECTABLE_CHECK !isBeingDestroyed
 ;
-#define DECLARE_ASYNC_EVENT_BASE(BaseClass, EventPrefix, NotifierPrefix, Types) \
+#define DECLARE_ASYNC_EVENT(BaseClass, EventPrefix, NotifierPrefix, Types, RemoveCheck) \
+class  EventPrefix ## Event \
+{ \
+public: \
+	enum Type Types; \
+	 EventPrefix ## Event(Type t, BaseClass * item) : type(t), item(item) {} \
+	Type type; \
+	BaseClass* item; \
+}; \
 QueuedNotifier<EventPrefix ## Event> NotifierPrefix ## Notifier; \
 typedef QueuedNotifier<EventPrefix ## Event>::Listener AsyncListener; \
 void addAsync ## EventPrefix ## Listener(AsyncListener* newListener) { NotifierPrefix ## Notifier.addListener(newListener); } \
 void addAsyncCoalesced ## EventPrefix ## Listener(AsyncListener* newListener) { NotifierPrefix ## Notifier.addAsyncCoalescedListener(newListener); } \
+void removeAsync ## EventPrefix ## Listener(AsyncListener* listener) { if(RemoveCheck) NotifierPrefix ## Notifier.removeListener(listener); };
 
-
-#define DECLARE_ASYNC_EVENT(BaseClass, EventPrefix, NotifierPrefix, Types) \
-class  EventPrefix ## Event \
-{ \
-public: \
-	enum Type Types; \
-	 EventPrefix ## Event(Type t, BaseClass * item) : type(t), item(item) {} \
-	Type type; \
-	BaseClass* item; \
-}; \
-DECLARE_ASYNC_EVENT_BASE(BaseClass, EventPrefix, NotifierPrefix, Types ## ) \
-void removeAsync ## EventPrefix ## Listener(AsyncListener* listener) { NotifierPrefix ## Notifier.removeListener(listener); }
-
-#define DECLARE_INSPECTABLE_ASYNC_EVENT(BaseClass, EventPrefix, NotifierPrefix, Types)  \
-class  EventPrefix ## Event \
-{ \
-public: \
-	enum Type Types; \
-	 EventPrefix ## Event(Type t, BaseClass * item) : type(t), item(item) {} \
-	Type type; \
-	BaseClass* item; \
-}; \
-DECLARE_ASYNC_EVENT_BASE(BaseClass, EventPrefix, NotifierPrefix, Types ## ) \
-void removeAsync ## EventPrefix ## Listener(AsyncListener* listener) { if(!isBeingDestroyed) NotifierPrefix ## Notifier.removeListener(listener); }
-
-#define DECLARE_ITEM_ASYNC_EVENT(BaseClass, EventPrefix, NotifierPrefix, Types)  \
-class  EventPrefix ## Event \
-{ \
-public: \
-	enum Type Types; \
-	 EventPrefix ## Event(Type t, BaseClass * item) : type(t), item(item) {} \
-	Type type; \
-	BaseClass* item; \
-}; \
-DECLARE_ASYNC_EVENT_BASE(BaseClass, EventPrefix, NotifierPrefix, Types ## ) \
-void removeAsync ## EventPrefix ## Listener(AsyncListener* listener) { if(!isClearing && !isBeingDestroyed) NotifierPrefix ## Notifier.removeListener(listener); }
 
 
 template<typename MessageClass,class CriticalSectionToUse = juce::CriticalSection>
