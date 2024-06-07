@@ -13,7 +13,7 @@
 Trigger::Trigger(const String& niceName, const String& description, bool enabled) :
 	Controllable(TRIGGER, niceName, description, enabled),
 	isTriggering(false),
-	queuedNotifier(5)
+	triggerNotifier(5)
 {
 	scriptObject.getDynamicObject()->setMethod("trigger", Controllable::setValueFromScript);
 }
@@ -46,8 +46,8 @@ void Trigger::trigger()
 {
 	if (enabled && !isTriggering) {
 		isTriggering = true;
-		listeners.call(&Listener::triggerTriggered, this);
-		queuedNotifier.addMessage(new WeakReference<Trigger>(this));
+		triggerListeners.call(&TriggerListener::triggerTriggered, this);
+		triggerNotifier.addMessage(new TriggerEvent(TriggerEvent::TRIGGER_TRIGGERED, this));
 		isTriggering = false;
 	}
 }

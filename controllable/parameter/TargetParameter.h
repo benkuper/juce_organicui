@@ -17,7 +17,7 @@ class Trigger;
 class TargetParameter :
 	public StringParameter,
 	public ControllableContainerListener,
-	public Controllable::Listener,
+	public Controllable::ControllableListener,
 	public Inspectable::InspectableListener,
 	public EngineListener
 {

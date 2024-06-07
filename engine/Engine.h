@@ -9,7 +9,7 @@
  */
 #pragma once
 
-//#define MULTITHREADED_LOADING
+ //#define MULTITHREADED_LOADING
 
 #pragma warning (disable : 4100)
 
@@ -50,10 +50,10 @@ public:
 	virtual void createNewGraphInternal() {}
 	virtual void afterLoadFileInternal() {}
 
-    void clear() override;
+	void clear() override;
 	virtual void clearInternal() {}; //to override to clear specific application classes
 
-	virtual bool parseCommandline(const juce::String &);
+	virtual bool parseCommandline(const juce::String&);
 
 	//==============================================================================
 	// see EngineFileDocument.cpp
@@ -73,11 +73,11 @@ public:
 
 	// our Saving methods
 	juce::var getJSONData() override;
-	void loadJSONData(juce::var data, ProgressTask * loadingTask);
+	void loadJSONData(juce::var data, ProgressTask* loadingTask);
 	void loadJSONDataEngine(juce::var data, ProgressTask* loadingTask);
-	virtual void loadJSONDataInternalEngine(juce::var data, ProgressTask * loadingTask) {}
+	virtual void loadJSONDataInternalEngine(juce::var data, ProgressTask* loadingTask) {}
 
-	bool checkFileVersion(juce::DynamicObject * metaData, bool checkForNewerVersion = false);
+	bool checkFileVersion(juce::DynamicObject* metaData, bool checkForNewerVersion = false);
 	bool versionIsNewerThan(juce::String versionToCheck, juce::String referenceVersion);
 	int getBetaVersion(juce::String version);
 	bool versionNeedsOnlineUpdate(juce::String version);
@@ -87,14 +87,14 @@ public:
 
 	void fileLoaderEnded();
 	bool allLoadingThreadsAreEnded();
-	void loadDocumentAsync(const juce::File & file);
+	void loadDocumentAsync(const juce::File& file);
 
 	virtual void timerCallback(int timerID) override;
 
 
 	class FileLoader : public juce::Thread, public juce::Timer {
 	public:
-		FileLoader(Engine * e, juce::File f) :juce::Thread("EngineLoader"), owner(e), fileToLoad(f) {
+		FileLoader(Engine* e, juce::File f) :juce::Thread("EngineLoader"), owner(e), fileToLoad(f) {
 			//startTimerHz(4);
 			//fakeProgress = 0;
 			isEnded = false;
@@ -116,7 +116,7 @@ public:
 		}
 
 		//float fakeProgress ;
-		Engine * owner;
+		Engine* owner;
 		juce::File fileToLoad;
 		bool isEnded;
 
@@ -125,35 +125,8 @@ public:
 
 	std::unique_ptr<FileLoader> fileLoader;
 
-	juce::ListenerList<EngineListener> engineListeners;
-	void addEngineListener(EngineListener* e) { engineListeners.add(e); }
-	void removeEngineListener(EngineListener* e) { 
-		if (isBeingDestroyed) return;
-		engineListeners.remove(e); 
-	}
-
-	// ASYNC
-	class  EngineEvent
-	{
-	public:
-		enum Type { START_LOAD_FILE, FILE_PROGRESS, END_LOAD_FILE, FILE_SAVED, ENGINE_CLEARED , FILE_CHANGED };
-
-		EngineEvent(Type t, Engine * engine) :
-			type(t),
-			engine(engine)
-		{
-		}
-
-		Type type;
-		Engine * engine;
-	};
-
-	QueuedNotifier<EngineEvent> engineNotifier;
-	typedef QueuedNotifier<EngineEvent>::Listener AsyncListener;
-
-	void addAsyncEngineListener(AsyncListener* newListener) { engineNotifier.addListener(newListener); }
-	void addAsyncCoalescedEngineListener(AsyncListener* newListener) { engineNotifier.addAsyncCoalescedListener(newListener); }
-	void removeAsyncEngineListener(AsyncListener* listener) { engineNotifier.removeListener(listener); }
+	DECLARE_INSPECTACLE_CRITICAL_LISTENER(Engine, engine);
+	DECLARE_INSPECTABLE_ASYNC_EVENT(Engine, Engine, engine, ENUM_LIST(START_LOAD_FILE, FILE_PROGRESS, END_LOAD_FILE, FILE_SAVED, ENGINE_CLEARED, FILE_CHANGED));
 
 	bool isLoadingFile;
 	bool isClearing;
@@ -161,13 +134,13 @@ public:
 
 	virtual void handleAsyncUpdate() override;
 
-	void childStructureChanged(ControllableContainer *) override;
+	void childStructureChanged(ControllableContainer*) override;
 
 
 
 	// Inherited via DashboardItemProvider
 	virtual juce::PopupMenu getDashboardCreateMenu(int idOffset) override;
-	virtual DashboardItem * getDashboardItemFromMenuResult(int result) override;
+	virtual DashboardItem* getDashboardItemFromMenuResult(int result) override;
 
 };
 

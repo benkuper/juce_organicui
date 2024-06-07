@@ -158,12 +158,7 @@ public:
 
 	juce::String getScriptTargetString() override;
 
-	juce::ListenerList<ParameterListener, juce::Array<ParameterListener*, juce::CriticalSection>> listeners;
-	void addParameterListener(ParameterListener* newListener) { listeners.add(newListener); }
-	void removeParameterListener(ParameterListener* listener) {
-		if (isBeingDestroyed) return;
-		listeners.remove(listener);
-	}
+	DECLARE_INSPECTACLE_CRITICAL_LISTENER(Parameter, parameter);
 
 	// ASYNC
 	class  ParameterEvent

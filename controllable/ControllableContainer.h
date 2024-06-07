@@ -12,9 +12,9 @@
 
 class ControllableContainer :
 	public ParameterListener,
-	public Controllable::Listener,
+	public Controllable::ControllableListener,
 	public Parameter::AsyncListener,
-	public Trigger::Listener,
+	public Trigger::TriggerListener,
 	public ControllableContainerListener,
 	public Inspectable,
 	public ScriptTarget,
@@ -217,9 +217,7 @@ protected:
 	virtual void onWarningChanged(WarningTarget*) {}
 
 public:
-	juce::ListenerList<ControllableContainerListener, juce::Array<ControllableContainerListener*, juce::CriticalSection>> controllableContainerListeners;
-	void addControllableContainerListener(ControllableContainerListener* newListener);
-	void removeControllableContainerListener(ControllableContainerListener* listener);
+	DECLARE_INSPECTACLE_CRITICAL_LISTENER(ControllableContainer, controllableContainer);
 
 	QueuedNotifier<ContainerAsyncEvent> queuedNotifier;
 

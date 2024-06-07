@@ -25,7 +25,7 @@ public :
 	juce::Colour customBGColor;
 
     // Inherited via AsyncListener
-	void newMessage(const juce::WeakReference<Trigger> &) override;
+	void newMessage(const Trigger::TriggerEvent &) override;
 	
 	// should be inherited
     virtual void triggerTriggered(const Trigger * p) =0;

@@ -51,7 +51,7 @@ public:
 
 class DashboardEnumParameterItem :
 	public DashboardParameterItem,
-	public EnumParameter::Listener
+	public EnumParameter::EnumParameterListener
 {
 public:
 	DashboardEnumParameterItem(EnumParameter* parameter = nullptr);

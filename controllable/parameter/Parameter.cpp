@@ -104,7 +104,7 @@ void Parameter::setControlMode(ControlMode _mode)
 
 	}
 
-	listeners.call(&ParameterListener::parameterControlModeChanged, this);
+	parameterListeners.call(&ParameterListener::parameterControlModeChanged, this);
 	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::CONTROLMODE_CHANGED, this));
 }
 
@@ -225,7 +225,7 @@ void Parameter::setRange(var min, var max)
 		maximumValue = max;
 	}
 
-	listeners.call(&ParameterListener::parameterRangeChanged, this);
+	parameterListeners.call(&ParameterListener::parameterRangeChanged, this);
 	var arr;
 	arr.append(minimumValue); arr.append(maximumValue);
 	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::BOUNDS_CHANGED, this, arr));
@@ -426,7 +426,7 @@ String Parameter::stringValue() {
 }
 
 void Parameter::notifyValueChanged() {
-	listeners.call(&ParameterListener::parameterValueChanged, this);
+	parameterListeners.call(&ParameterListener::parameterValueChanged, this);
 	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::VALUE_CHANGED, this, getValue()));
 }
 

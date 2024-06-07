@@ -48,7 +48,7 @@ EnumParameter* EnumParameter::addOption(String key, var data, bool selectIfFirst
 		setValue(key, true, false, false);
 	}
 
-	enumListeners.call(&Listener::enumOptionAdded, this, key);
+	enumListeners.call(&EnumParameterListener::enumOptionAdded, this, key);
 	enumParameterNotifier.addMessage(new EnumParameterEvent(EnumParameterEvent::ENUM_OPTION_ADDED, this));
 	updateArgDescription();
 	return this;
@@ -68,7 +68,7 @@ void EnumParameter::updateOption(int index, String key, var data, bool addIfNotT
 	if (k == key && enumValues[index]->value == data) return;
 
 	enumValues.set(index, new EnumValue(key, data));
-	enumListeners.call(&Listener::enumOptionUpdated, this, index, k, key);
+	enumListeners.call(&EnumParameterListener::enumOptionUpdated, this, index, k, key);
 	enumParameterNotifier.addMessage(new EnumParameterEvent(EnumParameterEvent::ENUM_OPTION_UPDATED, this));
 	updateArgDescription();
 }
@@ -76,7 +76,7 @@ void EnumParameter::updateOption(int index, String key, var data, bool addIfNotT
 void EnumParameter::removeOption(String key)
 {
 	enumValues.remove(getIndexForKey(key));
-	enumListeners.call(&Listener::enumOptionRemoved, this, key);
+	enumListeners.call(&EnumParameterListener::enumOptionRemoved, this, key);
 	enumParameterNotifier.addMessage(new EnumParameterEvent(EnumParameterEvent::ENUM_OPTION_REMOVED, this));
 	updateArgDescription();
 

@@ -13,6 +13,11 @@
 class InspectableEditor;
 class InspectableSelectionManager;
 
+#define DECLARE_INSPECTACLE_CRITICAL_LISTENER(ClassName, listenerName) juce::ListenerList<ClassName ## Listener, juce::Array<ClassName ## Listener*, juce::CriticalSection>> listenerName ## Listeners; \
+void add ## ClassName ## Listener(ClassName ## Listener* newListener) { listenerName ## Listeners.add(newListener); } \
+void remove ## ClassName ## Listener(ClassName ## Listener* listener) { if (isBeingDestroyed) return; listenerName ## Listeners.remove(listener); }
+
+
 class Inspectable :
 	public WarningTarget
 {
@@ -112,33 +117,9 @@ public:
 		virtual void inspectableDestroyed(Inspectable *) {};
 	};
 
-	juce::ListenerList<InspectableListener> listeners;
-	void addInspectableListener(InspectableListener* newListener) { listeners.add(newListener); }
-	void removeInspectableListener(InspectableListener* listener) { 
-		if (isBeingDestroyed) return;
-		listeners.remove(listener); 
-	}
-
-	// ASYNC
-	class  InspectableEvent
-	{
-	public:
-		enum Type { SELECTION_CHANGED, PRESELECTION_CHANGED, HIGHLIGHT_CHANGED };
-
-		InspectableEvent(Type t, Inspectable * inspectable) :
-			type(t), inspectable(inspectable) {}
-
-		Type type;
-		Inspectable * inspectable;
-	};
-
-	QueuedNotifier<InspectableEvent> inspectableNotifier;
-	typedef QueuedNotifier<InspectableEvent>::Listener AsyncListener;
-
-	void addAsyncInspectableListener(AsyncListener* newListener) { inspectableNotifier.addListener(newListener); }
-	void addAsyncCoalescedInspectableListener(AsyncListener* newListener) { inspectableNotifier.addAsyncCoalescedListener(newListener); }
-	void removeAsyncInspectableListener(AsyncListener* listener) { inspectableNotifier.removeListener(listener); }
-
+	DECLARE_INSPECTACLE_CRITICAL_LISTENER(Inspectable, inspectable);
+	DECLARE_INSPECTABLE_ASYNC_EVENT(Inspectable, Inspectable, inspectable, ENUM_LIST(SELECTION_CHANGED, PRESELECTION_CHANGED, HIGHLIGHT_CHANGED))
+	
 	juce::WeakReference<Inspectable>::Master masterReference;
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Inspectable)

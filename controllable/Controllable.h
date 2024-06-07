@@ -138,11 +138,11 @@ public:
 	virtual juce::String getTypeString() const { jassert(false); return ""; } //should be overriden
 
 
-	class  Listener
+	class ControllableListener
 	{
 	public:
 		/** Destructor. */
-		virtual ~Listener() {}
+		virtual ~ControllableListener() {}
 		virtual void controllableStateChanged(Controllable*) {}
 		virtual void controllableFeedbackStateChanged(Controllable*) {}
 		virtual void controllableControlAddressChanged(Controllable*) {}
@@ -151,33 +151,8 @@ public:
 		virtual void askForRemoveControllable(Controllable*, bool /*addToUndo*/ = false) {}
 	};
 
-	juce::ListenerList<Listener, juce::Array < Listener*, juce::CriticalSection >> listeners;
-	void addControllableListener(Listener* newListener) { listeners.add(newListener); }
-	void removeControllableListener(Listener* listener) {
-		if (isBeingDestroyed) return;
-		listeners.remove(listener);
-	}
-
-	// ASYNC
-	class  ControllableEvent
-	{
-	public:
-		enum Type { ATTRIBUTE_CHANGED, STATE_CHANGED, FEEDBACK_STATE_CHANGED, CONTROLADDRESS_CHANGED, NAME_CHANGED, CONTROLLABLE_REMOVED };
-
-		ControllableEvent(Type t, Controllable* c) : type(t), controllable(c) {}
-
-		Type type;
-		Controllable* controllable;
-	};
-
-	QueuedNotifier<ControllableEvent> queuedNotifier;
-	typedef QueuedNotifier<ControllableEvent>::Listener AsyncListener;
-
-
-	void addAsyncControllableListener(AsyncListener* newListener) { queuedNotifier.addListener(newListener); }
-	void addAsyncCoalescedControllableListener(AsyncListener* newListener) { queuedNotifier.addAsyncCoalescedListener(newListener); }
-	void removeAsyncControllableListener(AsyncListener* listener) { queuedNotifier.removeListener(listener); }
-
+	DECLARE_INSPECTACLE_CRITICAL_LISTENER(Controllable, controllable);
+	DECLARE_INSPECTABLE_ASYNC_EVENT(Controllable, Controllable, controllable, ENUM_LIST(STATE_CHANGED, FEEDBACK_STATE_CHANGED, CONTROLADDRESS_CHANGED, NAME_CHANGED, ATTRIBUTE_CHANGED, ASK_FOR_REMOVE, CONTROLLABLE_REMOVED));
 
 private:
 	juce::WeakReference<Controllable>::Master masterReference;

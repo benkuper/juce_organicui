@@ -98,7 +98,7 @@ public:
     static juce::var getKeyAtPositionFromScript(const juce::var::NativeFunctionArgs& a);
     static juce::var getKeysBetweenFromScript(const juce::var::NativeFunctionArgs& a);
 
-    DECLARE_ASYNC_EVENT(Automation, Automation, automation, { INTERACTIVE_SIMPLIFICATION_CHANGED })
+    DECLARE_INSPECTABLE_ASYNC_EVENT(Automation, Automation, automation, { INTERACTIVE_SIMPLIFICATION_CHANGED })
 
     InspectableEditor* getEditorInternal(bool isRoot, juce::Array<Inspectable*> inspectables = juce::Array<Inspectable*>()) override;
 };

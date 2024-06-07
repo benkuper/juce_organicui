@@ -85,12 +85,7 @@ public:
 		virtual void gradientUpdated() {}
 	};
 
-	juce::ListenerList<GradientColorManagerListener> colorManagerListeners;
-	void addColorManagerListener(GradientColorManagerListener* newListener) { colorManagerListeners.add(newListener); }
-	void removeColorManagerListener(GradientColorManagerListener* listener) { 
-		if (isBeingDestroyed) return;
-		colorManagerListeners.remove(listener); 
-	}
+	DECLARE_INSPECTACLE_CRITICAL_LISTENER(GradientColorManager, colorManager)
 
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(GradientColorManager)

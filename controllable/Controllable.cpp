@@ -64,7 +64,7 @@ Controllable::Controllable(const Type& type, const String& niceName, const Strin
 	dashboardDefaultLabelParentLevel(0),
 	dashboardDefaultAppendLabel(false),
 	parentContainer(nullptr),
-	queuedNotifier(10)
+	controllableNotifier(10)
 {
 	scriptObject.getDynamicObject()->setMethod("isParameter", Controllable::checkIsParameterFromScript);
 	scriptObject.getDynamicObject()->setMethod("getParent", Controllable::getParentFromScript);
@@ -81,7 +81,7 @@ Controllable::Controllable(const Type& type, const String& niceName, const Strin
 }
 
 Controllable::~Controllable() {
-	queuedNotifier.cancelPendingUpdate();
+	controllableNotifier.cancelPendingUpdate();
 	Controllable::masterReference.clear();
 }
 
@@ -111,8 +111,8 @@ void Controllable::setNiceName(const String& _niceName) {
 	if (!hasCustomShortName) setAutoShortName();
 	else
 	{
-		listeners.call(&Listener::controllableNameChanged, this);
-		queuedNotifier.addMessage(new ControllableEvent(ControllableEvent::NAME_CHANGED, this));
+		controllableListeners.call(&ControllableListener::controllableNameChanged, this);
+		controllableNotifier.addMessage(new ControllableEvent(ControllableEvent::NAME_CHANGED, this));
 	}
 
 #if ORGANICUI_USE_WEBSERVEr
@@ -126,8 +126,8 @@ void Controllable::setCustomShortName(const String& _shortName)
 	hasCustomShortName = true;
 	scriptTargetName = shortName;
 	updateControlAddress();
-	listeners.call(&Listener::controllableNameChanged, this);
-	queuedNotifier.addMessage(new ControllableEvent(ControllableEvent::NAME_CHANGED, this));
+	controllableListeners.call(&ControllableListener::controllableNameChanged, this);
+	controllableNotifier.addMessage(new ControllableEvent(ControllableEvent::NAME_CHANGED, this));
 
 }
 
@@ -137,8 +137,8 @@ void Controllable::setAutoShortName() {
 	if (shortName.isEmpty()) shortName = "***";
 	scriptTargetName = shortName;
 	updateControlAddress();
-	listeners.call(&Listener::controllableNameChanged, this);
-	queuedNotifier.addMessage(new ControllableEvent(ControllableEvent::NAME_CHANGED, this));
+	controllableListeners.call(&ControllableListener::controllableNameChanged, this);
+	controllableNotifier.addMessage(new ControllableEvent(ControllableEvent::NAME_CHANGED, this));
 }
 
 
@@ -153,14 +153,14 @@ void Controllable::setControllableFeedbackOnly(bool value)
 {
 	if (isControllableFeedbackOnly == value) return;
 	isControllableFeedbackOnly = value;
-	listeners.call(&Listener::controllableFeedbackStateChanged, this);
-	queuedNotifier.addMessage(new ControllableEvent(ControllableEvent::FEEDBACK_STATE_CHANGED, this));
+	controllableListeners.call(&ControllableListener::controllableFeedbackStateChanged, this);
+	controllableNotifier.addMessage(new ControllableEvent(ControllableEvent::FEEDBACK_STATE_CHANGED, this));
 }
 
 void Controllable::notifyStateChanged()
 {
-	listeners.call(&Listener::controllableStateChanged, this);
-	queuedNotifier.addMessage(new ControllableEvent(ControllableEvent::STATE_CHANGED, this));
+	controllableListeners.call(&ControllableListener::controllableStateChanged, this);
+	controllableNotifier.addMessage(new ControllableEvent(ControllableEvent::STATE_CHANGED, this));
 }
 
 void Controllable::setParentContainer(ControllableContainer* container)
@@ -179,14 +179,14 @@ void Controllable::updateControlAddress()
 
 	if (Engine::mainEngine != nullptr && !Engine::mainEngine->isClearing)
 	{
-		listeners.call(&Listener::controllableControlAddressChanged, this);
-		queuedNotifier.addMessage(new ControllableEvent(ControllableEvent::CONTROLADDRESS_CHANGED, this));
+		controllableListeners.call(&ControllableListener::controllableControlAddressChanged, this);
+		controllableNotifier.addMessage(new ControllableEvent(ControllableEvent::CONTROLADDRESS_CHANGED, this));
 	}
 }
 
 void Controllable::remove(bool addToUndo)
 {
-	listeners.call(&Controllable::Listener::askForRemoveControllable, this, addToUndo);
+	controllableListeners.call(&ControllableListener::askForRemoveControllable, this, addToUndo);
 }
 
 void Controllable::updateScriptObjectInternal(var parent)
@@ -334,8 +334,8 @@ void Controllable::setAttribute(String param, var value)
 {
 	if (setAttributeInternal(param, value))
 	{
-		listeners.call(&Listener::controllableAttributeChanged, this, param);
-		queuedNotifier.addMessage(new ControllableEvent(ControllableEvent::ATTRIBUTE_CHANGED, this));
+		controllableListeners.call(&ControllableListener::controllableAttributeChanged, this, param);
+		controllableNotifier.addMessage(new ControllableEvent(ControllableEvent::ATTRIBUTE_CHANGED, this));
 	}
 }
 

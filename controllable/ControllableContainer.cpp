@@ -80,27 +80,6 @@ ControllableContainer::~ControllableContainer()
 }
 
 
-void ControllableContainer::addControllableContainerListener(ControllableContainerListener* newListener) {
-	/*
-	if (this == Engine::mainEngine)
-	{
-		DBG("ADD Engine Container Listener " << ((ControllableContainer*)newListener)->niceName);
-	}
-	*/
-	controllableContainerListeners.add(newListener);
-}
-
-void ControllableContainer::removeControllableContainerListener(ControllableContainerListener* listener) {
-	/*
-	if (this == Engine::mainEngine)
-	{
-		DBG("REMOVE Engine Container Listener " << ((ControllableContainer*)listener)->niceName);
-	}
-	*/
-	if (isBeingDestroyed) return;
-	controllableContainerListeners.remove(listener);
-}
-
 void ControllableContainer::clear() {
 
 	queuedNotifier.cancelPendingUpdate();

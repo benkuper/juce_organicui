@@ -26,7 +26,7 @@ TriggerUI::~TriggerUI()
 	}
 }
 
-void TriggerUI::newMessage(const WeakReference<Trigger>& t)
+void TriggerUI::newMessage(const Trigger::TriggerEvent&e)
 {
-	triggerTriggered(t.get());
+	triggerTriggered(e.item);
 }

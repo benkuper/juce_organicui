@@ -34,32 +34,21 @@ public:
 	bool isTriggering;
 public:
 	//Listener
-	class  Listener
+	class  TriggerListener
 	{
 	public:
 		/** Destructor. */
-		virtual ~Listener() {}
+		virtual ~TriggerListener() {}
 		virtual void triggerTriggered(Trigger* p) = 0;
 	};
 
-	juce::ListenerList<Listener, juce::Array<Listener*, juce::CriticalSection>> listeners;
-	void addTriggerListener(Trigger::Listener* newListener) { listeners.add(newListener); }
-	void removeTriggerListener(Trigger::Listener* listener) {
-		if (isBeingDestroyed) return;
-		listeners.remove(listener); 
-	}
-
-
-
-	QueuedNotifier<juce::WeakReference<Trigger>> queuedNotifier;
-	typedef QueuedNotifier<juce::WeakReference<Trigger>>::Listener AsyncListener;
-	void addAsyncTriggerListener(AsyncListener* l) { queuedNotifier.addListener(l); }
-	void removeAsyncTriggerListener(AsyncListener* l) { queuedNotifier.removeListener(l); }
-
+	DECLARE_INSPECTACLE_CRITICAL_LISTENER(Trigger, trigger);
+	DECLARE_INSPECTABLE_ASYNC_EVENT(Trigger, Trigger, trigger, { TRIGGER_TRIGGERED });
 
 	static Trigger* create() { return new Trigger("New Trigger", ""); }
 	virtual juce::String getTypeString() const override { return getTypeStringStatic(); }
 	static juce::String getTypeStringStatic() { return "Trigger"; }
+
 
 private:
 	juce::WeakReference<Trigger>::Master masterReference;

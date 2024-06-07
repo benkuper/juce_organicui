@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    EnumParameter.h
-    Created: 29 Sep 2016 5:34:59pm
-    Author:  bkupe
+	EnumParameter.h
+	Created: 29 Sep 2016 5:34:59pm
+	Author:  bkupe
 
   ==============================================================================
 */
@@ -18,7 +18,7 @@ class EnumParameter : public Parameter
 {
 public:
 
-	EnumParameter(const juce::String &niceName, const juce::String &description, bool enabled = true);
+	EnumParameter(const juce::String& niceName, const juce::String& description, bool enabled = true);
 	~EnumParameter();
 
 	struct EnumValue
@@ -28,15 +28,15 @@ public:
 		juce::var value;
 	};
 
-	EnumParameter * addOption(juce::String key, juce::var data, bool selectIfFirstOption = true); //daisy chain
+	EnumParameter* addOption(juce::String key, juce::var data, bool selectIfFirstOption = true); //daisy chain
 	void updateOption(int index, juce::String key, juce::var data, bool addIfNotThere = false);
 	void removeOption(juce::String key);
-	void setOptions(juce::Array<EnumValue *> options);
+	void setOptions(juce::Array<EnumValue*> options);
 	void clearOptions();
 
 	void updateArgDescription();
 
-	
+
 
 	juce::OwnedArray<EnumValue> enumValues;
 
@@ -45,15 +45,15 @@ public:
 
 	template<class T>
 	T getValueDataAsEnum() {
-		EnumValue * ev = getEntryForKey(value.toString());
+		EnumValue* ev = getEntryForKey(value.toString());
 		if (ev == nullptr) return (T)0;
-		return (T)(int)ev->value; 
+		return (T)(int)ev->value;
 	}
 
 	juce::String getValueKey();
 
 	int getIndexForKey(juce::StringRef key);
-	EnumValue * getEntryForKey(juce::StringRef key);
+	EnumValue* getEntryForKey(juce::StringRef key);
 
 	juce::StringArray getAllKeys();
 
@@ -72,8 +72,8 @@ public:
 	juce::var getRemoteControlRange() override;
 
 	static juce::var getValueKeyFromScript(const juce::var::NativeFunctionArgs& a);
-	static juce::var addOptionFromScript(const juce::var::NativeFunctionArgs &a);
-	static juce::var removeOptionsFromScript(const juce::var::NativeFunctionArgs &a);
+	static juce::var addOptionFromScript(const juce::var::NativeFunctionArgs& a);
+	static juce::var removeOptionsFromScript(const juce::var::NativeFunctionArgs& a);
 	static juce::var setValueWithDataFromScript(const juce::var::NativeFunctionArgs& a);
 	static juce::var getAllOptionsFromScript(const juce::var::NativeFunctionArgs& a);
 	static juce::var getOptionAtFromScript(const juce::var::NativeFunctionArgs& a);
@@ -84,29 +84,27 @@ public:
 
 	EnumParameterUI* createUI(juce::Array<EnumParameter*> parameters = {});
 	EnumParameterButtonBarUI* createButtonBarUI(juce::Array<EnumParameter*> parameters = {});
-	ControllableUI * createDefaultUI(juce::Array<Controllable*> controllables = {}) override;
+	ControllableUI* createDefaultUI(juce::Array<Controllable*> controllables = {}) override;
 
 	virtual DashboardItem* createDashboardItem() override;
 
 
 	//Listener
-	class  Listener
+	class  EnumParameterListener
 	{
 	public:
 		/** Destructor. */
-		virtual ~Listener() {}
+		virtual ~EnumParameterListener() {}
 		virtual void enumOptionAdded(EnumParameter*, const juce::String&) = 0;
-		virtual void enumOptionUpdated(EnumParameter *, int index, const juce::String & prevKey, const juce::String &newKey) = 0;
-		virtual void enumOptionRemoved(EnumParameter *, const juce::String &) = 0;
+		virtual void enumOptionUpdated(EnumParameter*, int index, const juce::String& prevKey, const juce::String& newKey) = 0;
+		virtual void enumOptionRemoved(EnumParameter*, const juce::String&) = 0;
 	};
 
-	juce::ListenerList<Listener> enumListeners;
-	void addEnumParameterListener(Listener* newListener) { enumListeners.add(newListener); }
-	void removeEnumParameterListener(Listener* listener) { enumListeners.remove(listener); }
+	DECLARE_INSPECTACLE_CRITICAL_LISTENER(EnumParameter, enum);
 
-	DECLARE_ASYNC_EVENT(EnumParameter, EnumParameter, enumParameter, ENUM_LIST(ENUM_OPTION_ADDED, ENUM_OPTION_UPDATED, ENUM_OPTION_REMOVED))
+	DECLARE_INSPECTABLE_ASYNC_EVENT(EnumParameter, EnumParameter, enumParameter, ENUM_LIST(ENUM_OPTION_ADDED, ENUM_OPTION_UPDATED, ENUM_OPTION_REMOVED))
 
-	static EnumParameter * create() { return new EnumParameter("new Enum Parameter",""); }
+	static EnumParameter* create() { return new EnumParameter("new Enum Parameter", ""); }
 	virtual juce::String getTypeString() const override { return getTypeStringStatic(); }
 	static juce::String getTypeStringStatic() { return "Enum"; }
 

@@ -127,12 +127,7 @@ public:
 		virtual void processMessage(const juce::OSCMessage& m, const juce::String& clientId) {}
 	};
 
-	juce::ListenerList<RemoteControlListener> remoteControlListeners;
-	void addRemoteControlListener(RemoteControlListener* e) { remoteControlListeners.add(e); }
-	void removeRemoteControlListener(RemoteControlListener* e) { 
-		if (isBeingDestroyed) return;
-		remoteControlListeners.remove(e);
-	}
+	DECLARE_INSPECTACLE_CRITICAL_LISTENER(RemoteControl, remoteControl)
 
 };
 

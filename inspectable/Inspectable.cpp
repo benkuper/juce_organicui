@@ -29,7 +29,7 @@ Inspectable::~Inspectable()
 	}
 
 
-	listeners.call(&InspectableListener::inspectableDestroyed, this);
+	inspectableListeners.call(&InspectableListener::inspectableDestroyed, this);
 	//inspectableNotifier.addMessage(new InspectableEvent(InspectableEvent::DESTROYED, this));
 
 	masterReference.clear();
@@ -72,7 +72,7 @@ void Inspectable::setSelected(bool value)
 
 	setSelectedInternal(value);
 
-	listeners.call(&InspectableListener::inspectableSelectionChanged, this);
+	inspectableListeners.call(&InspectableListener::inspectableSelectionChanged, this);
 	inspectableNotifier.addMessage(new InspectableEvent(InspectableEvent::SELECTION_CHANGED, this));
 }
 
@@ -80,7 +80,7 @@ void Inspectable::setHighlighted(bool value)
 {
 	if (value == isHighlighted) return;
 	isHighlighted = value;
-	listeners.call(&InspectableListener::inspectableHighlightChanged, this);
+	inspectableListeners.call(&InspectableListener::inspectableHighlightChanged, this);
 	inspectableNotifier.addMessage(new InspectableEvent(InspectableEvent::HIGHLIGHT_CHANGED, this));
 }
 
@@ -138,7 +138,7 @@ void Inspectable::setPreselected(bool value)
 
 	isPreselected = value;
 
-	listeners.call(&InspectableListener::inspectablePreselectionChanged, this);
+	inspectableListeners.call(&InspectableListener::inspectablePreselectionChanged, this);
 	inspectableNotifier.addMessage(new InspectableEvent(InspectableEvent::PRESELECTION_CHANGED, this));
 }
 

@@ -49,12 +49,7 @@ public:
 		virtual void askForRefresh(Dashboard * d) = 0;
 	};
 
-	juce::ListenerList<DashboardListener, juce::Array<DashboardListener*, juce::CriticalSection>> dashboardListeners;
-	void addDashboardListener(DashboardListener* newListener) { dashboardListeners.add(newListener); }
-	void removeDashboardListener(DashboardListener* listener) { 
-		if (isBeingDestroyed) return;
-		dashboardListeners.remove(listener);
-	}
+	DECLARE_INSPECTACLE_CRITICAL_LISTENER(Dashboard, dashboard);
 
-	DECLARE_ASYNC_EVENT(Dashboard, Dashboard, dashboard, { EDITING_UPDATE });
+	DECLARE_ITEM_ASYNC_EVENT(Dashboard, Dashboard, dashboard, { EDITING_UPDATE });
 };
