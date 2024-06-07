@@ -114,7 +114,10 @@ public:
 
 	juce::ListenerList<InspectableListener> listeners;
 	void addInspectableListener(InspectableListener* newListener) { listeners.add(newListener); }
-	void removeInspectableListener(InspectableListener* listener) { listeners.remove(listener); }
+	void removeInspectableListener(InspectableListener* listener) { 
+		if (isBeingDestroyed) return;
+		listeners.remove(listener); 
+	}
 
 	// ASYNC
 	class  InspectableEvent

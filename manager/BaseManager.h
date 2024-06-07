@@ -131,7 +131,10 @@ public:
 
 	juce::ListenerList<ManagerListener> baseManagerListeners;
 	void addBaseManagerListener(ManagerListener* newListener) { baseManagerListeners.add(newListener); }
-	void removeBaseManagerListener(ManagerListener* listener) { baseManagerListeners.remove(listener); }
+	void removeBaseManagerListener(ManagerListener* listener) {
+		if (isBeingDestroyed) return;
+		baseManagerListeners.remove(listener);
+	}
 
 	class ManagerEvent
 	{

@@ -110,7 +110,10 @@ public:
 
 	juce::ListenerList<BaseItemListener> baseItemListeners;
 	void addBaseItemListener(BaseItemListener* newListener) { baseItemListeners.add(newListener); }
-	void removeBaseItemListener(BaseItemListener* listener) { baseItemListeners.remove(listener); }
+	void removeBaseItemListener(BaseItemListener* listener) {
+		if (isClearing || isBeingDestroyed) return;
+		baseItemListeners.remove(listener);
+	}
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BaseItem)

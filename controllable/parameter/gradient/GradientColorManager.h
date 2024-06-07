@@ -87,7 +87,10 @@ public:
 
 	juce::ListenerList<GradientColorManagerListener> colorManagerListeners;
 	void addColorManagerListener(GradientColorManagerListener* newListener) { colorManagerListeners.add(newListener); }
-	void removeColorManagerListener(GradientColorManagerListener* listener) { colorManagerListeners.remove(listener); }
+	void removeColorManagerListener(GradientColorManagerListener* listener) { 
+		if (isBeingDestroyed) return;
+		colorManagerListeners.remove(listener); 
+	}
 
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(GradientColorManager)

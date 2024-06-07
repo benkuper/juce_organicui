@@ -147,6 +147,6 @@ private:
     int maxSize;
     juce::OwnedArray<MessageClass,CriticalSectionToUse> messageQueue;
 
-    juce::ListenerList<Listener, juce::Array<Listener*, juce::CriticalSection>> listeners;
-    juce::ListenerList<Listener, juce::Array<Listener*, juce::CriticalSection>> lastListeners;
+    juce::ListenerList<Listener/*, juce::Array<Listener*, juce::CriticalSection>*/> listeners;
+    juce::ListenerList<Listener/*, juce::Array<Listener*, juce::CriticalSection>*/> lastListeners;
 };

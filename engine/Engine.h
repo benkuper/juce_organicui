@@ -127,7 +127,10 @@ public:
 
 	juce::ListenerList<EngineListener> engineListeners;
 	void addEngineListener(EngineListener* e) { engineListeners.add(e); }
-	void removeEngineListener(EngineListener* e) { engineListeners.remove(e); }
+	void removeEngineListener(EngineListener* e) { 
+		if (isBeingDestroyed) return;
+		engineListeners.remove(e); 
+	}
 
 	// ASYNC
 	class  EngineEvent

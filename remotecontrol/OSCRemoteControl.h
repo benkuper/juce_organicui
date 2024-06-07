@@ -129,7 +129,10 @@ public:
 
 	juce::ListenerList<RemoteControlListener> remoteControlListeners;
 	void addRemoteControlListener(RemoteControlListener* e) { remoteControlListeners.add(e); }
-	void removeRemoteControlListener(RemoteControlListener* e) { remoteControlListeners.remove(e); }
+	void removeRemoteControlListener(RemoteControlListener* e) { 
+		if (isBeingDestroyed) return;
+		remoteControlListeners.remove(e);
+	}
 
 };
 

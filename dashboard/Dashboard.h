@@ -51,7 +51,10 @@ public:
 
 	juce::ListenerList<DashboardListener, juce::Array<DashboardListener*, juce::CriticalSection>> dashboardListeners;
 	void addDashboardListener(DashboardListener* newListener) { dashboardListeners.add(newListener); }
-	void removeDashboardListener(DashboardListener* listener) { dashboardListeners.remove(listener); }
+	void removeDashboardListener(DashboardListener* listener) { 
+		if (isBeingDestroyed) return;
+		dashboardListeners.remove(listener);
+	}
 
 	DECLARE_ASYNC_EVENT(Dashboard, Dashboard, dashboard, { EDITING_UPDATE });
 };

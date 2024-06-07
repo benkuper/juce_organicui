@@ -97,6 +97,7 @@ void ControllableContainer::removeControllableContainerListener(ControllableCont
 		DBG("REMOVE Engine Container Listener " << ((ControllableContainer*)listener)->niceName);
 	}
 	*/
+	if (isBeingDestroyed) return;
 	controllableContainerListeners.remove(listener);
 }
 

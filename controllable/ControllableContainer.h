@@ -225,7 +225,10 @@ public:
 
 	void addAsyncContainerListener(ContainerAsyncListener* newListener) { queuedNotifier.addListener(newListener); }
 	void addAsyncCoalescedContainerListener(ContainerAsyncListener* newListener) { queuedNotifier.addAsyncCoalescedListener(newListener); }
-	void removeAsyncContainerListener(ContainerAsyncListener* listener) { queuedNotifier.removeListener(listener); }
+	void removeAsyncContainerListener(ContainerAsyncListener* listener) {
+		if (isBeingDestroyed) return;
+		queuedNotifier.removeListener(listener);
+	}
 
 	virtual void clear();
 
