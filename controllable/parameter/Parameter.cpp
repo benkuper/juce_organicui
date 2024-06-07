@@ -870,6 +870,8 @@ void Parameter::ValueInterpolator::Manager::run()
 				interpolatorMap.removeValue(i);
 				interpolators.removeObject(i);
 			}
+			
+			interpToRemove.clear();
 
 			double diff = Time::getMillisecondCounter() - t;
 			timeToWait = targetSleepMS - diff;
