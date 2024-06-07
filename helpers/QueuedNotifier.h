@@ -10,6 +10,7 @@
 #pragma once
 
 #define ENUM_LIST(...) {__VA_ARGS__}
+#define ENUM_LIST2(...) ENUM_LIST(__VA_ARGS__)
 
 
 ;
