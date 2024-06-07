@@ -38,6 +38,7 @@ void Dashboard::setIsBeingEdited(bool value)
 
 void Dashboard::itemAdded(DashboardItem* item)
 {
+	if (Engine::mainEngine->isClearing || isClearing) return;
 	item->addDashboardFeedbackListener(this);
 	dashboardListeners.call(&DashboardListener::askForRefresh, this);
 
@@ -45,29 +46,34 @@ void Dashboard::itemAdded(DashboardItem* item)
 
 void Dashboard::itemsAdded(Array<DashboardItem*> items)
 {
+	if (Engine::mainEngine->isClearing || isClearing) return;
 	for (auto& i : items) i->addDashboardFeedbackListener(this);
 	dashboardListeners.call(&DashboardListener::askForRefresh, this);
 }
 
 void Dashboard::itemRemoved(DashboardItem* item)
 {
+	if (Engine::mainEngine->isClearing || isClearing) return;
 	item->removeDashboardFeedbackListener(this);
-	if(!Engine::mainEngine->isClearing)	dashboardListeners.call(&DashboardListener::askForRefresh, this);
+	dashboardListeners.call(&DashboardListener::askForRefresh, this);
 }
 
 void Dashboard::itemsRemoved(Array<DashboardItem*> items)
 {
+	if (Engine::mainEngine->isClearing || isClearing) return;
 	for (auto& i : items) i->removeDashboardFeedbackListener(this);
-	if (!Engine::mainEngine->isClearing) dashboardListeners.call(&DashboardListener::askForRefresh, this);
+	dashboardListeners.call(&DashboardListener::askForRefresh, this);
 }
 
 void Dashboard::parameterFeedback(var data)
 {
+	if (Engine::mainEngine->isClearing || isClearing) return;
 	dashboardListeners.call(&DashboardListener::parameterFeedback, data);
 }
 
 void Dashboard::dashboardFeedback(var data)
 {
+	if (Engine::mainEngine->isClearing || isClearing) return;
 	dashboardListeners.call(&DashboardListener::dashboardFeedback, data);
 }
 
