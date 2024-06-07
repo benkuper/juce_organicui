@@ -10,8 +10,6 @@
 #pragma once
 
 #define ENUM_LIST(...) {__VA_ARGS__}
-#define ENUM_LIST2(...) ENUM_LIST(__VA_ARGS__)
-
 
 ;
 #define DECLARE_ASYNC_EVENT_BASE(BaseClass, EventPrefix, NotifierPrefix, Types) \
@@ -29,13 +27,13 @@ void addAsync ## EventPrefix ## Listener(AsyncListener* newListener) { NotifierP
 void addAsyncCoalesced ## EventPrefix ## Listener(AsyncListener* newListener) { NotifierPrefix ## Notifier.addAsyncCoalescedListener(newListener); } \
 
 
-#define DECLARE_ASYNC_EVENT(BaseClass, EventPrefix, NotifierPrefix, Types) DECLARE_ASYNC_EVENT_BASE(BaseClass, EventPrefix, NotifierPrefix, Types) \
+#define DECLARE_ASYNC_EVENT(BaseClass, EventPrefix, NotifierPrefix, Types) DECLARE_ASYNC_EVENT_BASE(BaseClass, EventPrefix, NotifierPrefix, Types ## ) \
 void removeAsync ## EventPrefix ## Listener(AsyncListener* listener) { NotifierPrefix ## Notifier.removeListener(listener); }
 
-#define DECLARE_INSPECTABLE_ASYNC_EVENT(BaseClass, EventPrefix, NotifierPrefix, Types) DECLARE_ASYNC_EVENT_BASE(BaseClass, EventPrefix, NotifierPrefix, Types) \
+#define DECLARE_INSPECTABLE_ASYNC_EVENT(BaseClass, EventPrefix, NotifierPrefix, Types) DECLARE_ASYNC_EVENT_BASE(BaseClass, EventPrefix, NotifierPrefix, Types ## ) \
 void removeAsync ## EventPrefix ## Listener(AsyncListener* listener) { if(!isBeingDestroyed) NotifierPrefix ## Notifier.removeListener(listener); }
 
-#define DECLARE_ITEM_ASYNC_EVENT(BaseClass, EventPrefix, NotifierPrefix, Types) DECLARE_ASYNC_EVENT_BASE(BaseClass, EventPrefix, NotifierPrefix, Types) \
+#define DECLARE_ITEM_ASYNC_EVENT(BaseClass, EventPrefix, NotifierPrefix, Types) DECLARE_ASYNC_EVENT_BASE(BaseClass, EventPrefix, NotifierPrefix, Types ## ) \
 void removeAsync ## EventPrefix ## Listener(AsyncListener* listener) { if(!isClearing && !isBeingDestroyed) NotifierPrefix ## Notifier.removeListener(listener); }
 
 template<typename MessageClass,class CriticalSectionToUse = juce::CriticalSection>
