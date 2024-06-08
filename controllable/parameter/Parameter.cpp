@@ -33,6 +33,7 @@ Parameter::Parameter(const Type& type, const String& niceName, const String& des
 	isOverriden(false),
 	forceSaveValue(false),
 	forceSaveRange(false),
+	isNotifyingChange(false),
 	queuedNotifier(100),
 	colorStatusMap(1)
 {
@@ -426,8 +427,12 @@ String Parameter::stringValue() {
 }
 
 void Parameter::notifyValueChanged() {
+
+	if(isNotifyingChange) return; //not sure about this, it may cause unsynced value changes
+	isNotifyingChange = true;
 	parameterListeners.call(&ParameterListener::parameterValueChanged, this);
 	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::VALUE_CHANGED, this, getValue()));
+	isNotifyingChange = false;
 }
 
 void Parameter::expressionValueChanged(ScriptExpression*)

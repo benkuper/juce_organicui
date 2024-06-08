@@ -3,12 +3,19 @@
 class DashboardFeedbackBroadcaster
 {
 public:
-    virtual ~DashboardFeedbackBroadcaster(){}
+	DashboardFeedbackBroadcaster() : isBroadcasterBeingDestroyed(false) {}
+    virtual ~DashboardFeedbackBroadcaster() 
+	{
+		isBroadcasterBeingDestroyed = true;
+	}
+
     virtual juce::var getItemParameterFeedback(Parameter* p);
     
 	void notifyParameterFeedback(juce::WeakReference<Parameter> p);
 	void notifyDataFeedback(juce::var data);
 	void notifyDashboardFeedback(juce::var data);
+
+	bool isBroadcasterBeingDestroyed = false;
 
 	class FeedbackListener
 	{
@@ -19,7 +26,7 @@ public:
 		virtual void dashboardFeedback(juce::var data) = 0;
 	};
 
-	juce::ListenerList<FeedbackListener> feedbackListeners;
+	juce::ListenerList<FeedbackListener, juce::Array<FeedbackListener*, juce::CriticalSection>> feedbackListeners;
 	void addDashboardFeedbackListener(FeedbackListener* newListener) { feedbackListeners.add(newListener); }
-	void removeDashboardFeedbackListener(FeedbackListener* listener) { feedbackListeners.remove(listener); }
+	void removeDashboardFeedbackListener(FeedbackListener* listener) { if(!isBroadcasterBeingDestroyed) feedbackListeners.remove(listener); }
 };

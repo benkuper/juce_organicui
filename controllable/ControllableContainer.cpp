@@ -32,6 +32,7 @@ ControllableContainer::ControllableContainer(const String& niceName) :
 	includeTriggersInSaveLoad(false),
 	isCurrentlyLoadingData(false),
 	notifyStructureChangeWhenLoadingData(true),
+	isNotifyingStructureChange(false),
 	canBeCopiedAndPasted(false),
 	includeInScriptObject(true),
 	customControllableComparator(nullptr),
@@ -325,8 +326,11 @@ void ControllableContainer::notifyStructureChanged()
 
 	scriptObjectIsDirty = true;
 
+	if (isNotifyingStructureChange) return;  //this may cause further problem when chain-reactions are actually wanted (links being recovered and so on)
+	isNotifyingStructureChange = true;
 	controllableContainerListeners.call(&ControllableContainerListener::childStructureChanged, this);
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ChildStructureChanged, this));
+	isNotifyingStructureChange = false;
 
 }
 
@@ -504,7 +508,7 @@ void ControllableContainer::removeChildControllableContainer(ControllableContain
 
 		notifyStructureChanged();
 		container->setParentContainer(nullptr);
-}
+	}
 
 	if (ownedContainers.contains(container)) ownedContainers.removeObject(container);
 }

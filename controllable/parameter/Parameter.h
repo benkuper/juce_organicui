@@ -90,6 +90,8 @@ public:
 	bool forceSaveValue; //if true, will save value even if not overriden
 	bool forceSaveRange; //will save range even if saveValueOnly is true
 
+	bool isNotifyingChange;
+
 	virtual void setEnabled(bool value, bool silentSet = false, bool force = false) override;
 
 	void setControlMode(ControlMode _mode);
@@ -158,7 +160,7 @@ public:
 
 	juce::String getScriptTargetString() override;
 
-	DECLARE_INSPECTACLE_CRITICAL_LISTENER(Parameter, parameter);
+	DECLARE_INSPECTACLE_LISTENER(Parameter, parameter);
 
 	// ASYNC
 	class  ParameterEvent
@@ -182,7 +184,7 @@ public:
 
 	void addAsyncParameterListener(AsyncListener* newListener) { queuedNotifier.addListener(newListener); }
 	void addAsyncCoalescedParameterListener(AsyncListener* newListener) { queuedNotifier.addAsyncCoalescedListener(newListener); }
-	void removeAsyncParameterListener(AsyncListener* listener) { queuedNotifier.removeListener(listener); }
+	void removeAsyncParameterListener(AsyncListener* listener) { if(!isBeingDestroyed) queuedNotifier.removeListener(listener); }
 
 
 

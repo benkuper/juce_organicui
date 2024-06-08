@@ -13,9 +13,17 @@
 class InspectableEditor;
 class InspectableSelectionManager;
 
-#define DECLARE_INSPECTACLE_CRITICAL_LISTENER(ClassName, listenerName) juce::ListenerList<ClassName ## Listener, juce::Array<ClassName ## Listener*, juce::CriticalSection>> listenerName ## Listeners; \
+#ifndef COMMA
+#define COMMA ,
+#endif
+
+#define DECLARE_INSPECTACLE_LISTENER_BASE(ClassName, listenerName, Section) juce::ListenerList<ClassName ## Listener Section> listenerName ## Listeners; \
 void add ## ClassName ## Listener(ClassName ## Listener* newListener) { listenerName ## Listeners.add(newListener); } \
 void remove ## ClassName ## Listener(ClassName ## Listener* listener) { if (isBeingDestroyed) return; listenerName ## Listeners.remove(listener); }
+
+#define DECLARE_INSPECTACLE_CRITICAL_LISTENER(ClassName, listenerName) DECLARE_INSPECTACLE_LISTENER_BASE(ClassName, listenerName, COMMA juce::Array<ClassName ## Listener* COMMA juce::CriticalSection>)
+
+#define DECLARE_INSPECTACLE_LISTENER(ClassName, listenerName) DECLARE_INSPECTACLE_LISTENER_BASE(ClassName, listenerName,  )
 
 
 class Inspectable :

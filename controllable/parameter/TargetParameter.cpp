@@ -48,9 +48,9 @@ TargetParameter::~TargetParameter()
 	if (rootContainer != nullptr && !rootContainer.wasObjectDeleted()) rootContainer->removeControllableContainerListener(this);
 	setRootContainer(nullptr, false, false);
 	ghostValue = ""; //force not ghost to avoid launching a warning
+	setValue("", true, false);
 	setTarget((ControllableContainer*)nullptr);
 	setTarget((Controllable*)nullptr);
-	setValue("", true, false);
 }
 
 void TargetParameter::resetValue(bool silentSet)
@@ -205,13 +205,18 @@ void TargetParameter::setTarget(WeakReference<Controllable> c)
 		target->addInspectableListener(this);
 		target->addControllableListener(this);
 		setGhostValue(target->getControlAddress(rootContainer.get()));
+
+		if (getWarningMessage().isNotEmpty() && !isBeingDestroyed && !Engine::mainEngine->isLoadingFile && !Engine::mainEngine->isClearing)
+		{
+			LOG("Link is recovered " + ghostValue);
+		}
 		clearWarning();
 		if (rootContainer != nullptr && !rootContainer.wasObjectDeleted()) rootContainer->removeControllableContainerListener(this);
 	}
 	else
 	{
 		if (value.toString().isNotEmpty()) setGhostValue(value.toString());
-		if (ghostValue.isNotEmpty())
+		if (ghostValue.isNotEmpty() && !isBeingDestroyed)
 		{
 			if (Engine::mainEngine->isLoadingFile)
 			{
@@ -236,7 +241,7 @@ void TargetParameter::setTarget(WeakReference<ControllableContainer> cc)
 	if (targetContainer != nullptr)
 	{
 		if (targetContainer == cc) return;
-		
+
 		if (!targetContainer.wasObjectDeleted())
 		{
 			targetContainer->removeInspectableListener(this);
@@ -261,7 +266,7 @@ void TargetParameter::setTarget(WeakReference<ControllableContainer> cc)
 	else
 	{
 		if (value.toString().isNotEmpty()) setGhostValue(value.toString());
-		if (ghostValue.isNotEmpty())
+		if (ghostValue.isNotEmpty() && !isBeingDestroyed)
 		{
 			if (Engine::mainEngine->isLoadingFile)
 			{
@@ -328,11 +333,11 @@ void TargetParameter::setRootContainer(WeakReference<ControllableContainer> newR
 	if (newRootContainer == nullptr && engineIfNull) newRootContainer = Engine::mainEngine;
 	rootContainer = newRootContainer;
 
-    if(forceSetValue)
-    {
-        ghostValue = "";
-        setValue(getValue(), false, true);
-    }
+	if (forceSetValue)
+	{
+		ghostValue = "";
+		setValue(getValue(), false, true);
+	}
 }
 
 void TargetParameter::childStructureChanged(ControllableContainer*)
