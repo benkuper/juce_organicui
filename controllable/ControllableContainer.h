@@ -55,10 +55,12 @@ public:
 	bool includeTriggersInSaveLoad;
 	bool isCurrentlyLoadingData;
 	bool notifyStructureChangeWhenLoadingData;
+	bool isNotifyingStructureChange;
 	bool canBeCopiedAndPasted;
 
 	//Script
 	bool includeInScriptObject;
+
 
 	static ControllableComparator comparator;
 	ControllableComparator* customControllableComparator;

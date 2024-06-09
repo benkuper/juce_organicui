@@ -20,7 +20,6 @@ Inspectable::Inspectable() :
 
 Inspectable::~Inspectable()
 {
-	isBeingDestroyed = true;
 	for (auto &i : linkedInspectables)
 	{
 		if (i.wasObjectDeleted()) continue;
@@ -29,7 +28,9 @@ Inspectable::~Inspectable()
 	}
 
 
+	isBeingDestroyed = true;
 	inspectableListeners.call(&InspectableListener::inspectableDestroyed, this);
+	
 	//inspectableNotifier.addMessage(new InspectableEvent(InspectableEvent::DESTROYED, this));
 
 	masterReference.clear();

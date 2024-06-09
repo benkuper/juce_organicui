@@ -25,7 +25,7 @@ Dashboard::Dashboard() :
 
 Dashboard::~Dashboard()
 {
-	itemManager.removeDashboardFeedbackListener(this);
+	if(!itemManager.isBeingDestroyed) itemManager.removeDashboardFeedbackListener(this);
 }
 
 void Dashboard::setIsBeingEdited(bool value)
@@ -61,7 +61,11 @@ void Dashboard::itemRemoved(DashboardItem* item)
 void Dashboard::itemsRemoved(Array<DashboardItem*> items)
 {
 	if (Engine::mainEngine->isClearing || isClearing) return;
-	for (auto& i : items) i->removeDashboardFeedbackListener(this);
+	for (auto& i : items)
+	{
+		if (i->isClearing || i->isBeingDestroyed) continue;
+		i->removeDashboardFeedbackListener(this);
+	}
 	dashboardListeners.call(&DashboardListener::askForRefresh, this);
 }
 
