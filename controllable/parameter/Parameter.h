@@ -87,6 +87,7 @@ public:
 
 	bool isPresettable;
 	bool isOverriden;
+	bool isBeingDestroyed;
 	bool forceSaveValue; //if true, will save value even if not overriden
 	bool forceSaveRange; //will save range even if saveValueOnly is true
 

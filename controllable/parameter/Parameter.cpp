@@ -31,6 +31,7 @@ Parameter::Parameter(const Type& type, const String& niceName, const String& des
 	canBeAutomated(false),
 	isPresettable(true),
 	isOverriden(false),
+	isBeingDestroyed(false),
 	forceSaveValue(false),
 	forceSaveRange(false),
 	queuedNotifier(100),
@@ -47,6 +48,7 @@ Parameter::Parameter(const Type& type, const String& niceName, const String& des
 
 Parameter::~Parameter()
 {
+	isBeingDestroyed = true;
 	if (referenceTarget != nullptr) referenceTarget->removeParameterListener(this); //avoid reassigning on deletion
 	setReferenceParameter(nullptr);
 

@@ -45,6 +45,7 @@ TargetParameter::TargetParameter(const String& niceName, const String& descripti
 
 TargetParameter::~TargetParameter()
 {
+	isBeingDestroyed = true;
 	if (rootContainer != nullptr && !rootContainer.wasObjectDeleted()) rootContainer->removeControllableContainerListener(this);
 	setRootContainer(nullptr, false, false);
 	ghostValue = ""; //force not ghost to avoid launching a warning
@@ -269,7 +270,7 @@ void TargetParameter::setTarget(WeakReference<ControllableContainer> cc)
 			}
 			else
 			{
-				setWarningMessage("Link is broken : " + ghostValue);
+				if (!isBeingDestroyed) setWarningMessage("Link is broken : " + ghostValue);
 				if (!Engine::mainEngine->isClearing && rootContainer != nullptr && !rootContainer.wasObjectDeleted())
 				{
 					rootContainer->addControllableContainerListener(this);
