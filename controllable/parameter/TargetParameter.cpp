@@ -45,7 +45,6 @@ TargetParameter::TargetParameter(const String& niceName, const String& descripti
 
 TargetParameter::~TargetParameter()
 {
-	isBeingDestroyed = true;
 	if (rootContainer != nullptr && !rootContainer.wasObjectDeleted()) rootContainer->removeControllableContainerListener(this);
 	setRootContainer(nullptr, false, false);
 	ghostValue = ""; //force not ghost to avoid launching a warning

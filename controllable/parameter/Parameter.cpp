@@ -31,7 +31,6 @@ Parameter::Parameter(const Type& type, const String& niceName, const String& des
 	canBeAutomated(false),
 	isPresettable(true),
 	isOverriden(false),
-	isBeingDestroyed(false),
 	forceSaveValue(false),
 	forceSaveRange(false),
 	isNotifyingChange(false),
