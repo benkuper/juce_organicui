@@ -274,7 +274,7 @@ void TargetParameter::setTarget(WeakReference<ControllableContainer> cc)
 			}
 			else
 			{
-				setWarningMessage("Link is broken : " + ghostValue);
+				if (!isBeingDestroyed) setWarningMessage("Link is broken : " + ghostValue);
 				if (!Engine::mainEngine->isClearing && rootContainer != nullptr && !rootContainer.wasObjectDeleted())
 				{
 					rootContainer->addControllableContainerListener(this);
