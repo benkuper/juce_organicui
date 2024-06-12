@@ -9,6 +9,7 @@
  */
 
 #include "JuceHeader.h"
+#include "ControllableContainer.h"
 
 ControllableComparator ControllableContainer::comparator;
 
@@ -64,6 +65,10 @@ ControllableContainer::ControllableContainer(const String& niceName) :
 	scriptObject.getDynamicObject()->setMethod("addAutomation", ControllableContainer::addAutomationFromScript);
 	scriptObject.getDynamicObject()->setMethod("removeContainer", ControllableContainer::removeContainerFromScript);
 	scriptObject.getDynamicObject()->setMethod("removeParameter", ControllableContainer::removeControllableFromScript);
+
+	scriptObject.getDynamicObject()->setMethod("clear", ControllableContainer::clearFromScript);
+	scriptObject.getDynamicObject()->setMethod("getContainers", ControllableContainer::getContainersFromScript);
+	scriptObject.getDynamicObject()->setMethod("getControllables", ControllableContainer::getControllablesFromScript);
 
 	scriptObject.getDynamicObject()->setMethod("getControlAddress", ControllableContainer::getControlAddressFromScript);
 	scriptObject.getDynamicObject()->setMethod("getScriptControlAdress", ControllableContainer::getScriptControlAddressFromScript);
@@ -541,7 +546,7 @@ ControllableContainer* ControllableContainer::getControllableContainerByName(con
 ControllableContainer* ControllableContainer::getControllableContainerForAddress(const String& address, bool recursive, bool getNotExposed, bool searchNiceNameToo, bool searchLowerCaseToo)
 {
 	StringArray addrArray;
-	addrArray.addTokens(address, juce::StringRef("/"), juce::StringRef("\""));
+	addrArray.addTokens(address, StringRef("/"), StringRef("\""));
 	addrArray.remove(0);
 
 	return getControllableContainerForAddress(addrArray, recursive, getNotExposed, searchNiceNameToo, searchLowerCaseToo);
@@ -705,7 +710,7 @@ Array<WeakReference<ControllableContainer>> ControllableContainer::getAllContain
 Controllable* ControllableContainer::getControllableForAddress(const String& address, bool recursive)
 {
 	StringArray addrArray;
-	addrArray.addTokens(address.startsWith("/") ? address : "/" + address, juce::StringRef("/"), juce::StringRef("\""));
+	addrArray.addTokens(address.startsWith("/") ? address : "/" + address, StringRef("/"), StringRef("\""));
 	addrArray.remove(0);
 
 	return getControllableForAddress(addrArray, recursive);
@@ -1202,7 +1207,7 @@ var ControllableContainer::getChildFromScript(const var::NativeFunctionArgs& a)
 	return var();
 }
 
-var ControllableContainer::getParentFromScript(const juce::var::NativeFunctionArgs& a)
+var ControllableContainer::getParentFromScript(const var::NativeFunctionArgs& a)
 {
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(a);
 
@@ -1218,7 +1223,7 @@ var ControllableContainer::getParentFromScript(const juce::var::NativeFunctionAr
 	return target->getScriptObject();
 }
 
-var ControllableContainer::setNameFromScript(const juce::var::NativeFunctionArgs& a)
+var ControllableContainer::setNameFromScript(const var::NativeFunctionArgs& a)
 {
 	if (a.numArguments == 0) return var();
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(a);
@@ -1229,7 +1234,7 @@ var ControllableContainer::setNameFromScript(const juce::var::NativeFunctionArgs
 	return var();
 }
 
-var ControllableContainer::setCollapsedFromScript(const juce::var::NativeFunctionArgs& a)
+var ControllableContainer::setCollapsedFromScript(const var::NativeFunctionArgs& a)
 {
 	if (a.numArguments == 0) return var();
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(a);
@@ -1238,7 +1243,7 @@ var ControllableContainer::setCollapsedFromScript(const juce::var::NativeFunctio
 	return var();
 }
 
-var ControllableContainer::selectFromScript(const juce::var::NativeFunctionArgs& a)
+var ControllableContainer::selectFromScript(const var::NativeFunctionArgs& a)
 {
 	if (a.numArguments == 0) return var();
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(a);
@@ -1472,7 +1477,26 @@ var ControllableContainer::removeControllableFromScript(const var::NativeFunctio
 	return var();
 }
 
-var ControllableContainer::getControlAddressFromScript(const juce::var::NativeFunctionArgs& a)
+var ControllableContainer::clearFromScript(const var::NativeFunctionArgs& args)
+{
+	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(args);
+	bool clearContainers = args.numArguments >= 1 ? (int)args.arguments[0] > 0 : true;
+	bool clearControllables = args.numArguments >= 2 ? (int)args.arguments[1] > 0 : true;
+
+	if (clearContainers)
+	{
+		while (cc->controllableContainers.size() > 0) cc->removeChildControllableContainer(cc->controllableContainers.getLast());
+	}
+
+	if (clearControllables)
+	{
+		while (cc->controllables.size() > 0) cc->removeControllable(cc->controllables.getLast());
+	}
+
+	return var();
+}
+
+var ControllableContainer::getControlAddressFromScript(const var::NativeFunctionArgs& a)
 {
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(a);
 	if (cc == nullptr) return var();
@@ -1481,17 +1505,48 @@ var ControllableContainer::getControlAddressFromScript(const juce::var::NativeFu
 	{
 		if (DynamicObject* d = a.arguments[0].getDynamicObject())
 		{
-			ref = dynamic_cast<ControllableContainer*>((ControllableContainer*)(juce::int64)d->getProperty(scriptPtrIdentifier));
+			ref = dynamic_cast<ControllableContainer*>((ControllableContainer*)(int64)d->getProperty(scriptPtrIdentifier));
 		}
 	}
 
 	return cc->getControlAddress(ref);
 }
 
-var ControllableContainer::getScriptControlAddressFromScript(const juce::var::NativeFunctionArgs& a)
+var ControllableContainer::getScriptControlAddressFromScript(const var::NativeFunctionArgs& a)
 {
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(a);
 	return "root" + cc->getControlAddress().replaceCharacter('/', '.');
+}
+
+var ControllableContainer::getContainersFromScript(const var::NativeFunctionArgs& args)
+{
+	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(args);
+	var result;
+	for (auto& c : cc->controllableContainers)
+	{
+		if (c == nullptr || c.wasObjectDeleted()) continue;
+		result.append(c->getScriptObject());
+	}
+	return result;
+}
+
+var ControllableContainer::getControllablesFromScript(const var::NativeFunctionArgs& args)
+{
+	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(args);
+	var result;
+
+	bool includeParameters = args.numArguments > 0 ? (int)args.arguments[0] > 0 : true;
+	bool includeTriggers = args.numArguments > 1 ? (int)args.arguments[1] > 0 : true;
+
+	for (auto& c : cc->controllables)
+	{
+		if (c == nullptr) continue;
+		if(c->type == Controllable::TRIGGER && !includeTriggers) continue;
+		if(c->type != Controllable::TRIGGER && !includeParameters) continue;
+		result.append(c->getScriptObject());
+	}
+
+	return result;
 }
 
 

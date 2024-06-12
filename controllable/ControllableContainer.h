@@ -191,8 +191,13 @@ public:
 	static juce::var removeContainerFromScript(const juce::var::NativeFunctionArgs& args);
 	static juce::var removeControllableFromScript(const juce::var::NativeFunctionArgs& args);
 
+	static juce::var clearFromScript(const juce::var::NativeFunctionArgs& args);
+
 	static juce::var getControlAddressFromScript(const juce::var::NativeFunctionArgs& args);
 	static juce::var getScriptControlAddressFromScript(const juce::var::NativeFunctionArgs& args);
+
+	static juce::var getContainersFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var getControllablesFromScript(const juce::var::NativeFunctionArgs& args);
 
 	static juce::var getJSONDataFromScript(const juce::var::NativeFunctionArgs& args);
 	static juce::var loadJSONDataFromScript(const juce::var::NativeFunctionArgs& args);

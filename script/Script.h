@@ -56,6 +56,8 @@ public:
 	void loadScript();
 	void buildEnvironment();
 
+	void refreshVariables();
+
 	void setState(ScriptState newState);
 
 
@@ -116,6 +118,8 @@ public:
 
 	static juce::var setUpdateRateFromScript(const juce::var::NativeFunctionArgs& args);
 	static juce::var setExecutionTimeoutFromScript(const juce::var::NativeFunctionArgs& args);
+
+	static juce::var refreshVariablesFromScript(const juce::var::NativeFunctionArgs& args);
 
 	static bool checkNumArgs(const juce::String& logName, const juce::var::NativeFunctionArgs& args, int expectedArgs);
 

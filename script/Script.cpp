@@ -48,6 +48,7 @@ Script::Script(ScriptTarget* _parentTarget, bool canBeDisabled, bool canBeRemove
 	scriptObject.getDynamicObject()->setMethod("logError", Script::logErrorFromScript);
 	scriptObject.getDynamicObject()->setMethod("setUpdateRate", Script::setUpdateRateFromScript);
 	scriptObject.getDynamicObject()->setMethod("setExecutionTimeout", Script::setExecutionTimeoutFromScript);
+	scriptObject.getDynamicObject()->setMethod("refreshEnvironment", Script::refreshVariablesFromScript);
 
 	scriptObject.getDynamicObject()->setMethod("addTrigger", Script::addTriggerFromScript);
 	scriptObject.getDynamicObject()->setMethod("addBoolParameter", Script::addBoolParameterFromScript);
@@ -234,6 +235,11 @@ void Script::buildEnvironment()
 	while (scriptParamsContainer->controllables.size() > 0) scriptParamsContainer->removeControllable(scriptParamsContainer->controllables[0]);
 	scriptParamsContainer->clear();
 
+	refreshVariables();
+}
+
+void Script::refreshVariables()
+{
 	scriptEngine->registerNativeObject("script", getScriptObject().getDynamicObject()); //force "script" for this object
 	if (parentTarget != nullptr) scriptEngine->registerNativeObject("local", parentTarget->getScriptObject().getDynamicObject()); //force "local" for the related object
 	if (Engine::mainEngine != nullptr) scriptEngine->registerNativeObject(Engine::mainEngine->scriptTargetName, Engine::mainEngine->getScriptObject().getDynamicObject());
@@ -312,7 +318,7 @@ void Script::onControllableFeedbackUpdateInternal(ControllableContainer* cc, Con
 
 void Script::childStructureChanged(ControllableContainer* cc)
 {
-	if(cc != Engine::mainEngine) BaseItem::childStructureChanged(cc);
+	if (cc != Engine::mainEngine) BaseItem::childStructureChanged(cc);
 
 	if (state == ScriptState::SCRIPT_LOADED && Engine::mainEngine != nullptr && cc == Engine::mainEngine)
 	{
@@ -576,6 +582,13 @@ var Script::setExecutionTimeoutFromScript(const var::NativeFunctionArgs& args)
 	s->executionTimeout = (float)args.arguments[0];
 	if (s->scriptEngine != nullptr) s->scriptEngine->maximumExecutionTime = RelativeTime::seconds(s->executionTimeout);
 
+	return var();
+}
+
+var Script::refreshVariablesFromScript(const juce::var::NativeFunctionArgs& args)
+{
+	Script* s = getObjectFromJS<Script>(args);
+	s->refreshVariables();
 	return var();
 }
 
