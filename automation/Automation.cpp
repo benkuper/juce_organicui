@@ -17,7 +17,7 @@ Automation::Automation(const String& name, AutomationRecorder* recorder, bool al
 	valueRange(nullptr),
 	allowKeysOutside(allowKeysOutside),
 	positionUnitSteps(0),
-    rangeRemapMode(nullptr),
+	rangeRemapMode(nullptr),
 	recorder(recorder),
 	automationNotifier(5)
 {
@@ -124,6 +124,8 @@ void Automation::insertKeyAt(const float& pos, bool addToUndo)
 	if (k == nullptr) return;
 
 	k->easingType->setValueWithData(startKey->easingType->getValueData());
+
+	if (controlPoints.size() < 4) return;
 
 	if (startKey->easing->type == Easing::BEZIER)
 	{
