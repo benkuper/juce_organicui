@@ -419,7 +419,7 @@ void GenericControllableContainerEditor::showMenuAndAddControllable()
 			this->container->addControllable(c);
 		}
 		, true
-			);
+	);
 
 }
 
@@ -740,7 +740,11 @@ EnablingControllableContainerEditor::EnablingControllableContainerEditor(Array<E
 
 void EnablingControllableContainerEditor::resizedInternalHeader(juce::Rectangle<int>& r)
 {
-	if (((EnablingControllableContainer*)container.get())->canBeDisabled) enabledUI->setBounds(r.removeFromLeft(r.getHeight()).reduced(2));
+	if (container == nullptr || container.wasObjectDeleted()) return;
+	if (((EnablingControllableContainer*)container.get())->canBeDisabled)
+	{
+		if (enabledUI != nullptr) enabledUI->setBounds(r.removeFromLeft(r.getHeight()).reduced(2));
+	}
 	GenericControllableContainerEditor::resizedInternalHeader(r);
 }
 
