@@ -14,13 +14,6 @@ OrganicMainContentComponent::OrganicMainContentComponent()
 	lookAndFeelOO.reset(new LookAndFeelOO());
 	LookAndFeel::setDefaultLookAndFeel(lookAndFeelOO.get());
 
-	(&getCommandManager())->registerAllCommandsForTarget(this);
-	(&getCommandManager())->setFirstCommandTarget(this);
-
-	(&getCommandManager())->getKeyMappings()->resetToDefaultMappings();
-	addKeyListener((&getCommandManager())->getKeyMappings());
-
-
 #if JUCE_MAC
 	setMacMainMenu(this, nullptr, "");
 #else
@@ -52,6 +45,12 @@ OrganicMainContentComponent::~OrganicMainContentComponent()
 
 void OrganicMainContentComponent::init()
 {
+	(&getCommandManager())->registerAllCommandsForTarget(this);
+	(&getCommandManager())->setFirstCommandTarget(this);
+
+	(&getCommandManager())->getKeyMappings()->resetToDefaultMappings();
+	addKeyListener((&getCommandManager())->getKeyMappings());
+
 	setupOpenGL();
 
 	ShapeShifterFactory::getInstance()->defs.add(new ShapeShifterDefinition("Inspector", &InspectorUI::create));
