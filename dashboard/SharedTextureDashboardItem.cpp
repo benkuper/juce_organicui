@@ -71,33 +71,37 @@ void SharedTextureDashboardItem::textureUpdated(SharedTextureReceiver*)
 	if (exposeOnWeb->boolValue())
 	{
 		Image img = getImage();
-		float sourceRatio = img.getWidth() * 1.0f / img.getHeight();
-		float tRatio = viewUISize->x / viewUISize->y;
-		float tWidth = 0, tHeight = 0;
-		if (sourceRatio > tRatio)
+		if (img.isValid())
 		{
-			tWidth = viewUISize->x;
-			tHeight = tWidth / sourceRatio;
-		}
-		else
-		{
-			tHeight = viewUISize->y;
-			tWidth = tHeight * sourceRatio;
-		}
 
-		Image tImage = img.rescaled(tWidth, tHeight);
-		MemoryOutputStream os;
-		JPEGImageFormat fmt;
-		fmt.writeImageToStream(tImage, os);
-		String s = base64_encode((const unsigned char*)os.getData(), (int)os.getDataSize());
+			float sourceRatio = img.getWidth() * 1.0f / img.getHeight();
+			float tRatio = viewUISize->x / viewUISize->y;
+			float tWidth = 0, tHeight = 0;
+			if (sourceRatio > tRatio)
+			{
+				tWidth = viewUISize->x;
+				tHeight = tWidth / sourceRatio;
+			}
+			else
+			{
+				tHeight = viewUISize->y;
+				tWidth = tHeight * sourceRatio;
+			}
 
-		var data(new DynamicObject());
-		data.getDynamicObject()->setProperty("feedbackType", "sharedTextureFeedback");
-		data.getDynamicObject()->setProperty("controlAddress", this->getControlAddress(DashboardManager::getInstance()));
-		data.getDynamicObject()->setProperty("value", s);
-		data.getDynamicObject()->setProperty("ratio", sourceRatio);
-		data.getDynamicObject()->setProperty("type", getTypeString());
-		notifyDataFeedback(data);
+			Image tImage = img.rescaled(tWidth, tHeight);
+			MemoryOutputStream os;
+			JPEGImageFormat fmt;
+			fmt.writeImageToStream(tImage, os);
+			String s = base64_encode((const unsigned char*)os.getData(), (int)os.getDataSize());
+
+			var data(new DynamicObject());
+			data.getDynamicObject()->setProperty("feedbackType", "sharedTextureFeedback");
+			data.getDynamicObject()->setProperty("controlAddress", this->getControlAddress(DashboardManager::getInstance()));
+			data.getDynamicObject()->setProperty("value", s);
+			data.getDynamicObject()->setProperty("ratio", sourceRatio);
+			data.getDynamicObject()->setProperty("type", getTypeString());
+			notifyDataFeedback(data);
+		}
 	}
 
 	stNotifier.addMessage(new STEvent(STEvent::TEXTURE_UPDATED, this));
