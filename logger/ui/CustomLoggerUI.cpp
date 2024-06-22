@@ -339,7 +339,7 @@ void CustomLoggerUI::LogList::paintRowBackground(Graphics& g,
 
 // use as function to prevent juce leak detection
 const Font  getLogFont() {
-	static Font  f(12);
+	static Font  f(FontOptions(12));
 	return f;
 }
 

@@ -74,7 +74,7 @@ void ColorParameterUI::showEditWindowInternal()
 	if (!isInteractable()) return;
 	if (shouldBailOut()) return;
 
-	std::unique_ptr<ColourSelector> selector(new ColourSelector(ColourSelector::showAlphaChannel | ColourSelector::showSliders | ColourSelector::showHexColorValue | ColourSelector::showColourspace));
+	std::unique_ptr<ColourSelector> selector(new ColourSelector(ColourSelector::showAlphaChannel | ColourSelector::showSliders/* | ColourSelector::showHexColorValue*/ | ColourSelector::showColourspace));
 	selector->addChangeListener(this);
 	selector->setName("Color for " + parameter->niceName);
 	selector->setCurrentColour(colorParam->getColor());

@@ -66,7 +66,7 @@ void StringParameterUI::updateUIParamsInternal()
 	valueLabel.setColour(CaretComponent::caretColourId, Colours::orange);
 
 	if (customTextSize > 0) valueLabel.setFont(FontOptions(customTextSize));
-	else valueLabel.setFont(Font());
+	else valueLabel.setFont(FontOptions());
 }
 
 void StringParameterUI::paint(Graphics& g)
@@ -92,8 +92,8 @@ void StringParameterUI::resized()
 
 	if (showLabel)
 	{
-		Font font(fontHeight);
-		r.removeFromLeft(jmin(font.getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, r.getWidth() - 60));
+		Font font(FontOptions(fontHeight));
+		r.removeFromLeft(FontOptions(jmin(font.getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, r.getWidth() - 60)));
 		r.removeFromLeft(2);
 		valueLabel.setJustificationType(Justification::centred);
 	}

@@ -127,7 +127,7 @@ void DoubleSliderUI::resized()
 	juce::Rectangle<int> sr = canvasUI == nullptr ? r : r.removeFromTop(baseHeight);
 	if (showLabel)
 	{
-		Font font(jlimit(12, 40, jmin(sr.getHeight(), sr.getWidth()) - 16));
+		Font font(FontOptions(jlimit(12, 40, jmin(sr.getHeight(), sr.getWidth()) - 16)));
 		sr.removeFromLeft(jmin(font.getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, sr.getWidth() - 60));
 		sr.removeFromLeft(2);
 	}

@@ -208,7 +208,12 @@ void Script::loadScript()
 		return;
 	}
 
-	availableFunctions = scriptEngine->getRootObjectFunctionNames();
+	NamedValueSet nvSet = scriptEngine->getRootObjectProperties();
+	for (auto& nv : nvSet)
+	{
+		if(nv.value.isMethod())
+			availableFunctions.add(nv.name.toString());
+	}
 
 	updateEnabled = availableFunctions.contains(updateIdentifier);
 	updateRate->hideInEditor = !updateEnabled;

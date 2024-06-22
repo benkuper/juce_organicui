@@ -31,8 +31,8 @@ OSCArgument OSCHelpers::varToArgument(const var& v, BoolMode bm)
 
 		return OSCArgument(OSCColour::fromInt32(col));
 	}
-	else if (v.isUndefined()) return OSCArgument();
-	else if (v.isVoid()) return OSCArgument();
+	else if (v.isUndefined()) return OSCArgument(OSCTypes::nil);
+	else if (v.isVoid()) return OSCArgument(OSCTypes::nil);
 
 	jassert(false);
 
@@ -68,9 +68,10 @@ var OSCHelpers::argumentToVar(const OSCArgument& a)
 	if (a.isFloat32()) return var(a.getFloat32());
 	if (a.isInt32()) return var(a.getInt32());
 	if (a.isInt64()) return var((int)a.getInt64());
+	if (a.isDouble()) return var(a.getDouble());
 	if (a.isString()) return var(a.getString());
-	if (a.isTorF()) return var(a.getBool());
-	if (a.isImpulse()) return var();
+	if (a.isBool()) return var(a.getBool());
+	if (a.isImpulse() || a.isNil()) return var();
 	return var("error");
 }
 
@@ -143,7 +144,7 @@ bool OSCHelpers::getBoolArg(OSCArgument a)
 	if (a.isInt32()) return (float)a.getInt32() >= 1;
 	if (a.isInt64()) return (float)a.getInt64() >= 1;
 	if (a.isString()) return a.getString().getIntValue() >= 1;
-	if (a.isTorF()) return a.getBool();
+	if (a.isBool()) return a.getBool();
 	if (a.isImpulse()) return true;
 	return false;
 }
@@ -155,7 +156,7 @@ float OSCHelpers::getFloatArg(OSCArgument a)
 	if (a.isInt32()) return (float)a.getInt32();
 	if (a.isInt64()) return (float)a.getInt64();
 	if (a.isString()) return a.getString().getFloatValue();
-	if (a.isTorF()) return a.getBool() ? 1.0f : 0.0f;
+	if (a.isBool()) return a.getBool() ? 1.0f : 0.0f;
 	if (a.isImpulse()) return 1;
 	return 0;
 }
@@ -166,7 +167,7 @@ int OSCHelpers::getIntArg(OSCArgument a)
 	if (a.isInt64()) return (int)a.getInt64();
 	if (a.isFloat32()) return (int)roundf(a.getFloat32());
 	if (a.isString()) return a.getString().getIntValue();
-	if (a.isTorF()) return a.getBool() ? 1 : 0;
+	if (a.isBool()) return a.getBool() ? 1 : 0;
 	if (a.isImpulse()) return 1;
 	return 0;
 }
@@ -177,7 +178,7 @@ String OSCHelpers::getStringArg(OSCArgument a)
 	if (a.isInt32()) return String(a.getInt32());
 	if (a.isInt64()) return String(a.getInt64());
 	if (a.isFloat32()) return String(a.getFloat32());
-	if (a.isTorF()) return a.getBool() ? "True" : "False";
+	if (a.isBool()) return a.getBool() ? "True" : "False";
 	if (a.isBlob()) return "[Blob : " + String(a.getBlob().getSize()) + " bytes]";
 	if (a.isImpulse()) return var("");
 	return "";
@@ -252,15 +253,15 @@ Controllable* OSCHelpers::findControllable(ControllableContainer* root, const OS
 	return root->getControllableForAddress(address);
 }
 
-ControllableContainer* OSCHelpers::findParentContainer(ControllableContainer* root, const juce::String &address, int dataOffset)
+ControllableContainer* OSCHelpers::findParentContainer(ControllableContainer* root, const juce::String& address, int dataOffset)
 {
 
 	if (root == nullptr) return nullptr;
 	StringArray addSplit;
 	addSplit.addTokens(address, "/", "\"");
-	if(address.startsWith("/")) addSplit.remove(0); //remove first empty string
+	if (address.startsWith("/")) addSplit.remove(0); //remove first empty string
 	addSplit.remove(addSplit.size() - 1);
-	
+
 	if (addSplit.isEmpty()) return Engine::mainEngine;
 
 	return root->getControllableContainerForAddress(addSplit, true);

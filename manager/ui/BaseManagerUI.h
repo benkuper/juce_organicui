@@ -301,7 +301,7 @@ BaseManagerUI<M, T, U>::BaseManagerUI(const juce::String& contentName, M* _manag
 		viewport.setScrollBarsShown(true, false);
 		viewport.setScrollOnDragMode(juce::Viewport::ScrollOnDragMode::never);
 		viewport.setScrollBarThickness(10);
-		viewport.setEnableKeyPressEvents(false);
+		//viewport.setEnableKeyPressEvents(false);
 		this->addAndMakeVisible(viewport);
 	}
 

@@ -53,7 +53,7 @@ FloatStepperUI::FloatStepperUI(Array<Parameter*> parameters) :
 
 	slider->addListener(this);
 	slider->addMouseListener(this, true);
-	slider->getTextbox()->onEditorHide = [this]() {sliderValueChanged(slider.get());  };
+	//slider->getTextbox()->onEditorHide = [this]() {sliderValueChanged(slider.get());  };
 }
 
 FloatStepperUI::~FloatStepperUI()
@@ -71,7 +71,7 @@ void FloatStepperUI::paint(Graphics& g)
 	if (showLabel)
 	{
 		Rectangle<int> r = getLocalBounds();
-		g.setFont(customTextSize > 0 ? customTextSize : Font());
+		if(customTextSize > 0) g.setFont(FontOptions(customTextSize));
 		r = r.removeFromLeft(jmin(g.getCurrentFont().getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, r.getWidth() - 
 		 60));
 		g.setColour(useCustomTextColor ? customTextColor : TEXT_COLOR);
@@ -87,7 +87,7 @@ void FloatStepperUI::resized()
 
 	if (showLabel)
 	{
-		Font font(customTextSize > 0 ? customTextSize : jlimit(12, 40, jmin(r.getHeight() - 4, r.getWidth()) - 16));
+		Font font(FontOptions(customTextSize > 0 ? customTextSize : jlimit(12, 40, jmin(r.getHeight() - 4, r.getWidth()) - 16)));
 		r.removeFromLeft(jmin(font.getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName), r.getWidth() - 60));
 		slider->setBounds(r.removeFromRight(jmin(r.getWidth(), 60)));
 	}

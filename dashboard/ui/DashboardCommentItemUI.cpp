@@ -17,7 +17,7 @@ DashboardCommentItemUI::DashboardCommentItemUI(DashboardCommentItem* comment) :
 	textUI.setMultiLine(true, false);
 	textUI.setText(comment->text->stringValue(), dontSendNotification);
 	textUI.setReturnKeyStartsNewLine(false);
-	textUI.setShiftReturnKeyStartsNewLine(true);
+	//textUI.setShiftReturnKeyStartsNewLine(true);
 	textUI.setScrollbarsShown(false);
 
 	textUI.addListener(this);
@@ -132,7 +132,7 @@ void DashboardCommentItemUI::controllableFeedbackUpdateInternal(Controllable* c)
 	if (c == comment->size || c == comment->text)
 	{
 		if (c == comment->text) textUI.setText(comment->text->stringValue(), dontSendNotification);
-		textUI.applyFontToAllText(comment->size->floatValue(), true);
+		textUI.applyFontToAllText(FontOptions(comment->size->floatValue()), true);
 		item->viewUISize->setPoint(textUI.getTextWidth(), textUI.getTextHeight() + 4);
 	}
 	else if (c == comment->itemColor || c == comment->bgAlpha)

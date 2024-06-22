@@ -89,7 +89,7 @@ void LookAndFeelOO::drawButtonBackground(Graphics& g,
 
 Font LookAndFeelOO::getTextButtonFont(TextButton&, int buttonHeight)
 {
-	return Font(jmin(15.0f, buttonHeight * 0.6f));
+	return Font(FontOptions(jmin(15.0f, buttonHeight * 0.6f)));
 }
 
 int LookAndFeelOO::getTextButtonWidthToFitText(TextButton& b, int buttonHeight)
@@ -170,7 +170,7 @@ void LookAndFeelOO::drawToggleButton(Graphics& g, ToggleButton& button,
 		isButtonDown);
 
 	g.setColour(button.findColour(ToggleButton::textColourId));
-	g.setFont(FontOptions(fontSize));
+	g.setFont(FontOptions(FontOptions(fontSize)));
 
 	if (!button.isEnabled())
 		g.setOpacity(0.5f);
@@ -185,7 +185,7 @@ void LookAndFeelOO::drawToggleButton(Graphics& g, ToggleButton& button,
 
 void LookAndFeelOO::changeToggleButtonWidthToFitText(ToggleButton& button)
 {
-	Font font(jmin(15.0f, button.getHeight() * 0.6f));
+	Font font(FontOptions(jmin(15.0f, button.getHeight() * 0.6f)));
 
 	const int tickWidth = jmin(24, button.getHeight());
 
@@ -207,7 +207,7 @@ void LookAndFeelOO::drawDrawableButton(Graphics& g, DrawableButton& button,
 
 	if (textH > 0)
 	{
-		g.setFont(FontOptions((float)textH));
+		g.setFont(FontOptions(FontOptions((float)textH)));
 
 		g.setColour(button.findColour(toggleState ? DrawableButton::textColourOnId
 			: DrawableButton::textColourId)
@@ -299,7 +299,7 @@ void LookAndFeelOO::drawAlertBox(Graphics& g, AlertWindow& alert,
 		}
 
 		GlyphArrangement ga;
-		ga.addFittedText(Font(iconRect.getHeight() * 0.9f, Font::bold),
+		ga.addFittedText(FontOptions(iconRect.getHeight() * 0.9f, Font::bold),
 			String::charToString((juce_wchar)(uint8)character),
 			(float)iconRect.getX(), (float)iconRect.getY(),
 			(float)iconRect.getWidth(), (float)iconRect.getHeight(),
@@ -343,12 +343,12 @@ Font LookAndFeelOO::getAlertWindowTitleFont()
 
 Font LookAndFeelOO::getAlertWindowMessageFont()
 {
-	return Font(15.0f);
+	return Font(FontOptions(15.0f));
 }
 
 Font LookAndFeelOO::getAlertWindowFont()
 {
-	return Font(12.0f);
+	return Font(FontOptions(12.0f));
 }
 
 //==============================================================================
@@ -405,7 +405,7 @@ void LookAndFeelOO::drawProgressBar(Graphics& g, ProgressBar& progressBar,
 	if (textToShow.isNotEmpty())
 	{
 		g.setColour(Colour::contrasting(background, foreground));
-		g.setFont(FontOptions(height * 0.6f));
+		g.setFont(FontOptions(FontOptions(height * 0.6f)));
 
 		g.drawText(textToShow, 0, 0, width, height, Justification::centred, false);
 	}
@@ -728,7 +728,7 @@ void LookAndFeelOO::drawBubble(Graphics& g, BubbleComponent& comp,
 void LookAndFeelOO::preparePopupMenuWindow(Component& /*newWindow*/) {};
 Font LookAndFeelOO::getPopupMenuFont()
 {
-	return Font(16.0f);
+	return Font(FontOptions(16.0f));
 }
 
 void LookAndFeelOO::getIdealPopupMenuItemSize(const String& text, const bool isSeparator,
@@ -1053,7 +1053,7 @@ void LookAndFeelOO::drawComboBox(Graphics& g, int width, int height, const bool 
 
 Font LookAndFeelOO::getComboBoxFont(ComboBox& box)
 {
-	return Font(jmin(15.0f, box.getHeight() * 0.85f));
+	return Font(FontOptions(jmin(15.0f, box.getHeight() * 0.85f)));
 }
 
 Label* LookAndFeelOO::createComboBoxTextBox(ComboBox&)
@@ -1381,7 +1381,7 @@ ImageEffectFilter* LookAndFeelOO::getSliderEffect(Slider&)
 
 Font LookAndFeelOO::getSliderPopupFont(Slider&)
 {
-	return Font(15.0f, Font::bold);
+	return Font(FontOptions(15.0f, Font::bold));
 }
 
 int LookAndFeelOO::getSliderPopupPlacement(Slider&)
@@ -1517,7 +1517,7 @@ void LookAndFeelOO::drawConcertinaPanelHeader(Graphics& g, const juce::Rectangle
 	g.drawRect(area);
 
 	g.setColour(Colours::white);
-	g.setFont(Font(area.getHeight() * 0.7f).boldened());
+	g.setFont(Font(FontOptions(area.getHeight() * 0.7f)).boldened());
 	g.drawFittedText(panel.getName(), 4, 0, area.getWidth() - 6, area.getHeight(), Justification::centredLeft, 1);
 }
 
@@ -2217,7 +2217,7 @@ void LookAndFeelOO::drawTableHeaderColumn(Graphics& g, TableHeaderComponent&, co
 	}
 
 	g.setColour(FRONT_COLOR);
-	g.setFont(Font(height * 0.5f, Font::bold));
+	g.setFont(FontOptions(height * 0.5f, Font::bold));
 	g.drawFittedText(columnName, area, Justification::centredLeft, 1);
 }
 
@@ -2267,7 +2267,7 @@ void LookAndFeelOO::paintToolbarButtonLabel(Graphics& g, int x, int y, int width
 		.withAlpha(component.isEnabled() ? 1.0f : 0.25f));
 
 	const float fontHeight = jmin(14.0f, height * 0.85f);
-	g.setFont(FontOptions(fontHeight));
+	g.setFont(FontOptions(FontOptions(fontHeight)));
 
 	g.drawFittedText(text,
 		x, y, width, height,
@@ -2287,7 +2287,7 @@ void LookAndFeelOO::drawPropertyPanelSectionHeader(Graphics& g, const String& na
 	const int textX = (int)(buttonIndent * 2.0f + buttonSize + 2.0f);
 
 	g.setColour(Colours::black);
-	g.setFont(Font(height * 0.7f, Font::bold));
+	g.setFont(FontOptions(height * 0.7f, Font::bold));
 	g.drawText(name, textX, 0, width - textX - 4, height, Justification::centredLeft, true);
 }
 
@@ -2302,7 +2302,7 @@ void LookAndFeelOO::drawPropertyComponentLabel(Graphics& g, int, int height, Pro
 	g.setColour(component.findColour(PropertyComponent::labelTextColourId)
 		.withMultipliedAlpha(component.isEnabled() ? 1.0f : 0.6f));
 
-	g.setFont(FontOptions(jmin(height, 24) * 0.65f));
+	g.setFont(FontOptions(FontOptions(jmin(height, 24) * 0.65f)));
 
 	const juce::Rectangle<int> r(getPropertyComponentContentPosition(component));
 
@@ -2352,8 +2352,8 @@ AttributedString LookAndFeelOO::createFileChooserHeaderText(const String& title,
 	s.setJustification(Justification::centred);
 
 	const Colour colour(findColour(FileChooserDialogBox::titleTextColourId));
-	s.append(title + "\n\n", Font(17.0f, Font::bold), colour);
-	s.append(instructions, Font(14.0f), colour);
+	s.append(title + "\n\n", FontOptions(17.0f, Font::bold), colour);
+	s.append(instructions, FontOptions(14.0f), colour);
 
 	return s;
 }
@@ -2386,7 +2386,7 @@ void LookAndFeelOO::drawFileBrowserRow(Graphics& g, int width, int height, const
 
 	g.setColour(fileListComp != nullptr ? fileListComp->findColour(DirectoryContentsDisplayComponent::textColourId)
 		: findColour(DirectoryContentsDisplayComponent::textColourId));
-	g.setFont(FontOptions(height * 0.7f));
+	g.setFont(FontOptions(FontOptions(height * 0.7f)));
 
 	if (width > 450 && !isDirectory)
 	{
@@ -2397,7 +2397,7 @@ void LookAndFeelOO::drawFileBrowserRow(Graphics& g, int width, int height, const
 			x, 0, sizeX - x, height,
 			Justification::centredLeft, 1);
 
-		g.setFont(FontOptions(height * 0.5f));
+		g.setFont(FontOptions(FontOptions(height * 0.5f)));
 		g.setColour(Colours::darkgrey);
 
 		if (!isDirectory)
@@ -2509,7 +2509,7 @@ void LookAndFeelOO::drawKeymapChangeButton(Graphics& g, int width, int height, B
 	g.drawRoundedRectangle(0, 0, width, height, 4, 1);
 
 	g.setColour(TEXT_COLOR);
-	g.setFont(FontOptions(height * 0.6f));
+	g.setFont(FontOptions(FontOptions(height * 0.6f)));
 	g.drawFittedText(keyDescription.isNotEmpty() ? keyDescription : "+",
 		3, 0, width - 6, height,
 		Justification::centred, 1);
@@ -2597,7 +2597,7 @@ int LookAndFeelOO::getPopupMenuBorderSize()
 }
 Font LookAndFeelOO::getTabButtonFont(TabBarButton&, float height)
 {
-	return Font(height);
+	return Font(FontOptions(height));
 }
 #endif
 

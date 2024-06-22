@@ -31,14 +31,14 @@ CommentUI::CommentUI(CommentItem* comment) :
 	textUI.setMultiLine(true, true);
 	textUI.setText(item->text->stringValue(), dontSendNotification);
 	textUI.setReturnKeyStartsNewLine(false);
-	textUI.setShiftReturnKeyStartsNewLine(true);
+	//textUI.setShiftReturnKeyStartsNewLine(true);
 	textUI.setScrollbarsShown(false);
 
 	textUI.addListener(this);
 
 	disableTextEditor();
 
-	textUI.setFont(item->size->floatValue());
+	textUI.setFont(FontOptions(item->size->floatValue()));
 	addAndMakeVisible(&textUI);
 
 	addAndMakeVisible(&resizer);
@@ -183,7 +183,7 @@ void CommentUI::controllableFeedbackUpdateInternal(Controllable* c)
 	if (c == item->size || c == item->text)
 	{
 		if (c == item->text) textUI.setText(item->text->stringValue(), dontSendNotification);
-		textUI.applyFontToAllText(item->size->floatValue(), true);
+		textUI.applyFontToAllText(FontOptions(item->size->floatValue()), true);
 		//setSize(textUI.getTextWidth(), textUI.getTextHeight()+4);
 	}
 	else if (c == item->bgAlpha || c == item->itemColor)

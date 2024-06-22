@@ -121,7 +121,7 @@ void TripleSliderUI::resized()
 
 	if (showLabel)
 	{
-		Font font(jlimit(12, 40, jmin(r.getHeight(), r.getWidth()) - 16));
+		Font font(FontOptions(jlimit(12, 40, jmin(r.getHeight(), r.getWidth()) - 16)));
 		r.removeFromLeft(jmin(font.getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, r.getWidth() - 60));
 		r.removeFromLeft(2);
 	}

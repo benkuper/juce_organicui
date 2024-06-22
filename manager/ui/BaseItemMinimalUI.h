@@ -129,8 +129,8 @@ BaseItemMinimalUI<T>::BaseItemMinimalUI(T* _item) :
 {
 	baseItem = static_cast<BaseItem*>(item);
 
-	setDisableDefaultMouseEvents(true);
-	addMouseListener(this, true); //needs fixing, this is called twice on the component
+	//setDisableDefaultMouseEvents(true);
+	//addMouseListener(this, true); //needs fixing, this is called twice on the component
 
 	if (baseItem != nullptr)
 	{

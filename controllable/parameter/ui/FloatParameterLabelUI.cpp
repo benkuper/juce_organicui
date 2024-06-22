@@ -161,7 +161,7 @@ void FloatParameterLabelUI::updateUIParamsInternal()
 	valueLabel.setTooltip(tooltip);
 
 	if (customTextSize > 0) valueLabel.setFont(FontOptions(customTextSize));
-	else valueLabel.setFont(Font());
+	else valueLabel.setFont(FontOptions());
 
 	shouldRepaint = true;
 }
