@@ -921,7 +921,7 @@ void LookAndFeelOO::drawMenuBarBackground(Graphics& g, int width, int height, bo
 
 Font LookAndFeelOO::getMenuBarFont(MenuBarComponent& menuBar, int /*itemIndex*/, const String& /*itemText*/)
 {
-	return Font(menuBar.getHeight() * 0.7f);
+	return Font(FontOptions(menuBar.getHeight() * 0.7f));
 }
 
 int LookAndFeelOO::getMenuBarItemWidth(MenuBarComponent& menuBar, int itemIndex, const String& itemText)
@@ -1624,7 +1624,7 @@ void LookAndFeelOO::drawDocumentWindowTitleBar(DocumentWindow& window, Graphics&
 	*/
 	g.fillAll();
 
-	Font font(h * 0.65f, Font::bold);
+	Font font(FontOptions(h * 0.65f, Font::bold));
 	g.setFont(font);
 
 	int textW = font.getStringWidth(window.getName());
@@ -1839,7 +1839,7 @@ void LookAndFeelOO::drawGroupComponentOutline(Graphics& g, int width, int height
 	const float textEdgeGap = 4.0f;
 	float cs = 5.0f;
 
-	Font f(textH);
+	Font f = Font(FontOptions(textH));
 
 	Path p;
 	float x = indent;
@@ -1902,7 +1902,7 @@ int LookAndFeelOO::getTabButtonSpaceAroundImage()
 
 int LookAndFeelOO::getTabButtonBestWidth(TabBarButton& button, int tabDepth)
 {
-	int width = Font(tabDepth * 0.6f).getStringWidth(button.getButtonText().trim())
+	int width = Font(FontOptions(tabDepth * 0.6f)).getStringWidth(button.getButtonText().trim())
 		+ getTabButtonOverlap(tabDepth) * 2;
 
 	if (Component* const extraComponent = button.getExtraComponent())
@@ -2031,7 +2031,7 @@ void LookAndFeelOO::drawTabButtonText(TabBarButton& button, Graphics& g, bool is
 	if (button.getTabbedButtonBar().isVertical())
 		std::swap(length, depth);
 
-	Font font(depth * 0.6f);
+	Font font(FontOptions(depth * 0.6f));
 	font.setUnderline(button.hasKeyboardFocus(false));
 
 	AffineTransform t;

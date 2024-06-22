@@ -92,8 +92,8 @@ void StringParameterUI::resized()
 
 	if (showLabel)
 	{
-		Font font(FontOptions(fontHeight));
-		r.removeFromLeft(FontOptions(jmin(font.getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, r.getWidth() - 60)));
+		Font font = Font(FontOptions(fontHeight));
+		r.removeFromLeft(jmin<float>(font.getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, r.getWidth() - 60));
 		r.removeFromLeft(2);
 		valueLabel.setJustificationType(Justification::centred);
 	}
