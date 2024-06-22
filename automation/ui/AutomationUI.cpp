@@ -137,7 +137,7 @@ void AutomationUI::drawLinesBackground(Graphics& g)
 	int unitStart = floor((start / unitSteps)) * unitSteps;
 	int unitEndTime = jmax<int>(ceil((end / unitSteps)) * unitSteps, unitStart + 1);
 
-	g.setFont(12);
+	g.setFont(FontOptions(12));
 	float unitFadeAlpha = jlimit<float>(0, 1, jmap<float>(unitGap, minGap, fadeGap, 0, 1));
 	float fadeAlpha = jlimit<float>(0, 1, jmap<float>(decimalGap, minGap, fadeGap, 0, 1));
 

@@ -384,7 +384,7 @@ void BaseManagerUI<M, T, U>::setShowSearchBar(bool value)
 		searchBar->setColour(searchBar->backgroundColourId, BG_COLOR.darker(.1f).withAlpha(.7f));
 		searchBar->setColour(searchBar->outlineColourId, BG_COLOR.brighter(.1f));
 		searchBar->setColour(searchBar->textColourId, TEXT_COLOR.darker(.3f));
-		searchBar->setFont(10);
+		searchBar->setFont(FontOptions(10));
 		searchBar->setMultiLine(false);
 		searchBar->setColour(juce::CaretComponent::caretColourId, juce::Colours::orange);
 		//searchBar->edit(true);
@@ -573,7 +573,7 @@ void BaseManagerUI<M, T, U>::paint(juce::Graphics& g)
 	if (!this->inspectable.wasObjectDeleted() && this->manager->items.size() == 0 && noItemText.isNotEmpty())
 	{
 		g.setColour(juce::Colours::white.withAlpha(.4f));
-		g.setFont(juce::jmin(getHeight() - 2, 14));
+		g.setFont(FontOptions(juce::jmin(getHeight() - 2, 14)));
 		g.drawFittedText(noItemText, getLocalBounds().reduced(5), juce::Justification::centred, 6);
 	}
 }

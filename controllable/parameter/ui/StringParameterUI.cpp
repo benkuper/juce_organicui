@@ -65,7 +65,7 @@ void StringParameterUI::updateUIParamsInternal()
 	valueLabel.setColour(valueLabel.textColourId, useCustomTextColor ? customTextColor : (isInteractable() ? TEXT_COLOR : BLUE_COLOR.brighter(.2f)));
 	valueLabel.setColour(CaretComponent::caretColourId, Colours::orange);
 
-	if (customTextSize > 0) valueLabel.setFont(customTextSize);
+	if (customTextSize > 0) valueLabel.setFont(FontOptions(customTextSize));
 	else valueLabel.setFont(Font());
 }
 

@@ -36,7 +36,7 @@ Outliner::Outliner(const String& contentName) :
 	searchBar.setColour(searchBar.backgroundColourId, BG_COLOR.darker(.1f).withAlpha(.7f));
 	searchBar.setColour(searchBar.outlineColourId, BG_COLOR.brighter(.1f));
 	searchBar.setColour(searchBar.textColourId, TEXT_COLOR.darker(.3f));
-	searchBar.setFont(10);
+	searchBar.setFont(FontOptions(10));
 	searchBar.setColour(CaretComponent::caretColourId, Colours::orange);
 	searchBar.setEditable(true);
 	searchBar.addListener(this);

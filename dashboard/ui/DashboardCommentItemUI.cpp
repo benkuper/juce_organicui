@@ -13,7 +13,7 @@ DashboardCommentItemUI::DashboardCommentItemUI(DashboardCommentItem* comment) :
 
 	//textUI.setColour(textUI.backgroundWhenEditingColourId, Colours::darkgrey.withAlpha(.2f));
 
-	textUI.setFont(comment->size->floatValue());
+	textUI.setFont(FontOptions(comment->size->floatValue()));
 	textUI.setMultiLine(true, false);
 	textUI.setText(comment->text->stringValue(), dontSendNotification);
 	textUI.setReturnKeyStartsNewLine(false);
@@ -24,7 +24,7 @@ DashboardCommentItemUI::DashboardCommentItemUI(DashboardCommentItem* comment) :
 
 	disableTextEditor();
 
-	textUI.setFont(comment->size->floatValue());
+	textUI.setFont(FontOptions(comment->size->floatValue()));
 	addAndMakeVisible(&textUI);
 
 	setSize(item->viewUISize->x, item->viewUISize->y);

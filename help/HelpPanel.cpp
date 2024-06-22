@@ -15,11 +15,11 @@ HelpPanel::HelpPanel(const String &name) :
 	helpLabel("HelpLabel")
 {
 	helpLabel.setJustificationType(Justification::topLeft);
-	helpLabel.setFont(14);
+	helpLabel.setFont(FontOptions(14));
 
 	if (GlobalSettings::getInstance()->helpLanguage->getValueData().toString() == "cn")
 	{
-		helpLabel.setFont(16);
+		helpLabel.setFont(FontOptions(16));
 
 		Font font = helpLabel.getFont();
 		String fontName;

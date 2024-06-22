@@ -19,7 +19,7 @@ void DashboardInspectableItemUI::paint(Graphics& g)
 	{
 		g.fillAll(Colours::white.withAlpha(.1f));
 		g.setColour(RED_COLOR);
-		g.setFont(14);
+		g.setFont(FontOptions(14));
 		g.drawFittedText("#Missing : " + inspectableItem->inspectableGhostAddress, getLocalBounds(), Justification::centred, 3);
 	}
 }

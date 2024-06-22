@@ -590,7 +590,7 @@ void ShapeShifterManager::newMessage(const Parameter::ParameterEvent& e)
 		{
 			for (auto& t : p->header.tabs)
 			{
-				t->panelLabel.setFont(GlobalSettings::getInstance()->fontSize->floatValue());
+				t->panelLabel.setFont(FontOptions(GlobalSettings::getInstance()->fontSize->floatValue()));
 			}
 			p->header.resized();
 		}

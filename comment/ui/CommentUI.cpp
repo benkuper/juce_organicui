@@ -27,7 +27,7 @@ CommentUI::CommentUI(CommentItem* comment) :
 
 	//textUI.setColour(textUI.backgroundWhenEditingColourId, Colours::darkgrey.withAlpha(.2f));
 
-	textUI.setFont(item->size->floatValue());
+	textUI.setFont(FontOptions(item->size->floatValue()));
 	textUI.setMultiLine(true, true);
 	textUI.setText(item->text->stringValue(), dontSendNotification);
 	textUI.setReturnKeyStartsNewLine(false);

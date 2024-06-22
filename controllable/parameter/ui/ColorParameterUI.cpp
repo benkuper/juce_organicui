@@ -52,7 +52,7 @@ void ColorParameterUI::paint(Graphics & g)
 	if (showLabel)
 	{
 		Rectangle<int> tr = r.reduced(2);
-		g.setFont(jlimit(12, 40, jmin(tr.getHeight(), tr.getWidth()) - 16));
+		g.setFont(FontOptions(jlimit(12, 40, jmin(tr.getHeight(), tr.getWidth()) - 16)));
 		g.setColour(useCustomTextColor ? customTextColor : TEXT_COLOR);
 		g.drawFittedText(customLabel.isNotEmpty() ? customLabel : colorParam->niceName, tr, Justification::centred, 1);
 	}

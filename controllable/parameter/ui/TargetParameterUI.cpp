@@ -217,7 +217,7 @@ void TargetParameterUI::updateLabel()
 
 void TargetParameterUI::updateUIParamsInternal()
 {
-	if (customTextSize > 0) label.setFont(customTextSize);
+	if (customTextSize > 0) label.setFont(FontOptions(customTextSize));
 	else label.setFont(label.getFont().withHeight(14));
 	if (useCustomShowLearnButton)
 	{

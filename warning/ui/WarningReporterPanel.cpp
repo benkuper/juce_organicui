@@ -113,8 +113,8 @@ WarningReporterItem::WarningReporterItem(WeakReference<WarningTarget> target) :
 	resolveBT("Resolve"),
 	target(target)
 {
-	itemLabel.setFont(12);
-	warningLabel.setFont(12);
+	itemLabel.setFont(FontOptions(12));
+	warningLabel.setFont(FontOptions(12));
 
 	addAndMakeVisible(&itemLabel);
 	addAndMakeVisible(&warningLabel);

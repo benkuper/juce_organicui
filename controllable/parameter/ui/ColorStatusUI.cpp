@@ -38,7 +38,7 @@ void ColorStatusUI::paint(Graphics& g)
 
 	if (showLabel)
 	{
-		if (customTextSize > 0) g.setFont(customTextSize);
+		if (customTextSize > 0) g.setFont(FontOptions(customTextSize));
 		g.setColour(useCustomTextColor ? customTextColor : (isInteractable() ? TEXT_COLOR : FEEDBACK_COLOR));
 		g.drawFittedText(customLabel.isNotEmpty() ? customLabel : parameter->niceName, getLocalBounds().reduced(2), Justification::centred, 3);
 	}

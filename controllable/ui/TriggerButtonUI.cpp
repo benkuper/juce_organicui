@@ -82,7 +82,7 @@ void TriggerButtonUI::paint(Graphics& g)
 	{
 		Rectangle<int> tr = getLocalBounds().reduced(2);
 		float fontSize = customTextSize > 0 ? customTextSize : jlimit(10, 40, jmin(tr.getHeight() - 4, tr.getWidth()) - 16);
-		g.setFont(fontSize);
+		g.setFont(FontOptions(fontSize));
 		g.setColour(useCustomTextColor ? customTextColor : TEXT_COLOR);
 		g.drawFittedText(customLabel.isNotEmpty() ? customLabel : trigger->niceName, tr, Justification::centred, 1);
 	}

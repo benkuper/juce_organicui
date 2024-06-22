@@ -186,7 +186,7 @@ namespace LookAndFeelHelpers {
 
         juce::AttributedString s;
         s.setJustification(juce::Justification::centred);
-        s.append(text, juce::Font(tooltipFontSize, juce::Font::bold), colour);
+        s.append(text, juce::Font(juce::FontOptions(tooltipFontSize, juce::Font::bold)), colour);
 
         juce::TextLayout tl;
         tl.createLayoutWithBalancedLineLengths(s, (float)maxToolTipWidth);
