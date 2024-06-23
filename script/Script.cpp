@@ -211,9 +211,14 @@ void Script::loadScript()
 	NamedValueSet nvSet = scriptEngine->getRootObjectProperties();
 	for (auto& nv : nvSet)
 	{
-		if(nv.value.isMethod())
-			availableFunctions.add(nv.name.toString());
+		String n = nv.name.toString();
+		if(n == "script" || n == "local" || n == "util" || n == "root") continue; //reserved names
+
+		if(nv.value.isMethod() || nv.value.isObject())
+			availableFunctions.add(n);
 	}
+
+	//LOG("available functions : " << availableFunctions.joinIntoString(","));
 
 	updateEnabled = availableFunctions.contains(updateIdentifier);
 	updateRate->hideInEditor = !updateEnabled;
@@ -280,7 +285,7 @@ var Script::callFunction(const Identifier& function, const Array<var> args, Resu
 
 	const ScopedLock sl(engineLock);
 
-	var returnData = scriptEngine->callFunction(function, var::NativeFunctionArgs(var::undefined(), (const var*)args.begin(), args.size()), result);
+	var returnData = scriptEngine->callFunction(function, var::NativeFunctionArgs(getScriptObject(), (const var*)args.begin(), args.size()), result);
 
 	if (result->getErrorMessage().isNotEmpty())
 	{
