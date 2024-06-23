@@ -129,8 +129,10 @@ BaseItemMinimalUI<T>::BaseItemMinimalUI(T* _item) :
 {
 	baseItem = static_cast<BaseItem*>(item);
 
+	setName(baseItem->niceName);
+
 	//setDisableDefaultMouseEvents(true);
-	//addMouseListener(this, true); //needs fixing, this is called twice on the component
+	addMouseListener(this, true); //needs fixing, this is called twice on the component
 
 	if (baseItem != nullptr)
 	{
@@ -211,7 +213,7 @@ void BaseItemMinimalUI<T>::updateItemUISize()
 template<class T>
 void BaseItemMinimalUI<T>::mouseDown(const juce::MouseEvent& e)
 {
-
+	//LOG("BaseItemMinimalUI::mouseDown " << e.eventComponent->getName() << " / " << e.originalComponent->getName());
 	InspectableContentComponent::mouseDown(e);
 
 	if (e.eventComponent != this) return;
