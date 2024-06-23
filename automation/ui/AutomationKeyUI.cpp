@@ -116,7 +116,7 @@ void AutomationKeyUI::mouseDoubleClick(const MouseEvent& e)
 	if (e.eventComponent == this || e.eventComponent == &handle)
 	{
 		std::unique_ptr<Component> editComponent(new KeyEditCalloutComponent(item));
-		CallOutBox* box = &CallOutBox::launchAsynchronously(std::move(editComponent), localAreaToGlobal(getLocalBounds()), nullptr);
+		CallOutBox* box = &CallOutBox::launchAsynchronously(std::move(editComponent), localAreaToGlobal(handle.getBounds()), nullptr);
 		box->setArrowSize(8);
 	}
 }

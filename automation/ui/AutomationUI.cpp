@@ -426,6 +426,7 @@ void AutomationUI::mouseDown(const MouseEvent& e)
 
 void AutomationUI::mouseDrag(const MouseEvent& e)
 {
+
 	if (AutomationKeyHandle* handle = dynamic_cast<AutomationKeyHandle*>(e.eventComponent))
 	{
 		AutomationKey* k = handle->key;
@@ -466,6 +467,9 @@ void AutomationUI::mouseDrag(const MouseEvent& e)
 		}
 
 		else if (e.mods.isRightButtonDown()) k->scalePosition(offset, true);
+
+		repaint();
+
 	}
 	else if (e.eventComponent == this)
 	{

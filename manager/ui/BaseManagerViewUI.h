@@ -734,7 +734,6 @@ void BaseManagerViewUI<M, T, U>::itemDragMove(const juce::DragAndDropTarget::Sou
 
 		targetSnapViewPosition = this->getViewPos(snapPosition);
 
-		this->repaint();
 	}
 
 	if (updatePositionOnDragMove)
@@ -743,6 +742,9 @@ void BaseManagerViewUI<M, T, U>::itemDragMove(const juce::DragAndDropTarget::Sou
 		if (juce::Desktop::getInstance().getMainMouseSource().getCurrentModifiers().isAltDown()) bui->baseItem->scalePosition(targetPosition - bui->baseItem->movePositionReference, true);
 		else bui->baseItem->movePosition(targetPosition - bui->baseItem->movePositionReference, true);
 	}
+	
+	this->repaint();
+
 }
 
 template<class M, class T, class U>

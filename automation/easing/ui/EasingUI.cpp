@@ -366,6 +366,7 @@ void CubicEasingUI::mouseDrag(const MouseEvent& e)
 
 	if (e.eventComponent == &h1 || e.eventComponent == &h2)
 	{
+
 		Point2DParameter* targetAnchor = (e.eventComponent == &h1) ? ce->anchor1 : ce->anchor2;
 		Point<float> targetRefPoint = (e.eventComponent == &h1) ? ce->start : ce->end;
 
@@ -413,6 +414,8 @@ void CubicEasingUI::mouseDrag(const MouseEvent& e)
 void CubicEasingUI::mouseUp(const MouseEvent& e)
 {
 	EasingUI::mouseUp(e);
+
+	syncHandles = false;
 
 	Array<UndoableAction*> actions;
 	actions.add(ce->anchor1->setUndoablePoint(h1ValueAtMouseDown, ce->anchor1->getPoint(), true));
