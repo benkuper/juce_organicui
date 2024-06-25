@@ -32,4 +32,6 @@ public:
 	void itemRemoved(Dashboard *) override;
 
 	static DashboardManagerView * create(const juce::String &contentName) { return new DashboardManagerView(contentName, DashboardManager::getInstance()); }
+
+	static const juce::String getPanelName() { return "Dashboard"; }
 };

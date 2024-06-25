@@ -28,7 +28,7 @@ ShapeShifterManager::ShapeShifterManager() :
 
 ShapeShifterManager::~ShapeShifterManager()
 {
-	if(layoutFolder.exists()) saveCurrentLayoutToFile(layoutFolder.getChildFile(+"_lastSession." + appLayoutExtension));
+	if (layoutFolder.exists()) saveCurrentLayoutToFile(layoutFolder.getChildFile(+"_lastSession." + appLayoutExtension));
 	openedWindows.clear();
 	if (GlobalSettings::getInstanceWithoutCreating() != nullptr) GlobalSettings::getInstance()->fontSize->removeAsyncParameterListener(this);
 }
@@ -125,7 +125,7 @@ ShapeShifterWindow* ShapeShifterManager::showPanelWindowForContent(const String&
 	return w;
 }
 
-ShapeShifterContent* ShapeShifterManager::showContent(String contentName)
+ShapeShifterContent* ShapeShifterManager::showContent(String contentName, String attachToContent)
 {
 	if (!getApp().useWindow)  return nullptr;
 
@@ -146,16 +146,22 @@ ShapeShifterContent* ShapeShifterManager::showContent(String contentName)
 
 		if (c == nullptr) return nullptr;
 
-		ShapeShifterPanel* newP = createPanel(c);
-
-		if (mainContainer.shifters.size() == 0)
-		{
-			mainContainer.insertPanelAt(newP, 0);
-		}
+		ShapeShifterPanel* targetPanel = getPanelForContentName(attachToContent);
+		 
+		if (targetPanel != nullptr) targetPanel->addContent(c);
 		else
 		{
-			juce::Rectangle<int> r(100, 100, 300, 500);
-			showPanelWindow(newP, r);
+			ShapeShifterPanel* newPanel = createPanel(c);
+
+			if (mainContainer.shifters.size() == 0)
+			{
+				mainContainer.insertPanelAt(newPanel, 0);
+			}
+			else
+			{
+				juce::Rectangle<int> r(100, 100, 300, 500);
+				showPanelWindow(newPanel, r);
+			}
 		}
 
 		return c;
@@ -479,7 +485,7 @@ PopupMenu ShapeShifterManager::getPanelsMenu()
 			}
 			subMenus.getReference(subMenuName).addItem(baseMenuCommandID + currentID, n->contentName, true);
 		}
-		else 
+		else
 		{
 			p.addItem(baseMenuCommandID + currentID, n->contentName, true);
 		}
@@ -563,7 +569,8 @@ void ShapeShifterManager::handleMenuPanelCommand(int commandID)
 	{
 
 		String contentName = ShapeShifterFactory::getInstance()->defs[relCommandID]->contentName;
-		showContent(contentName);
+		String attachTo = ShapeShifterFactory::getInstance()->defs[relCommandID]->attachToContentName;
+		showContent(contentName, attachTo);
 	}
 }
 

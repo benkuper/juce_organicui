@@ -56,7 +56,7 @@ public:
 
 	ShapeShifterWindow * showPanelWindow(ShapeShifterPanel * _panel, juce::Rectangle<int> bounds);
 	ShapeShifterWindow * showPanelWindowForContent(const juce::String &panelName);
-	ShapeShifterContent * showContent(juce::String contentName);
+	ShapeShifterContent * showContent(juce::String contentName, juce::String attachToContent = juce::String());
 	
 
 	void closePanelWindow(ShapeShifterWindow * window, bool doRemovePanel);
