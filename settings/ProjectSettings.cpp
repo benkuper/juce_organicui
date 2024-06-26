@@ -22,6 +22,9 @@ ProjectSettings::ProjectSettings() :
 	customRangesCC("Custom Ranges")
 {
 	saveAndLoadRecursiveData = true;
+	hideInRemoteControl = true;
+	defaultHideInRemoteControl = true;
+
 	fullScreenOnStartup = addBoolParameter("Full Screen on load", "If checked, the app will go full screen when loading the file, otherwise it will go to window mode", false);
 
 	saveLayoutReference = addBoolParameter("Save Layout in file", "If checked, this will save the layout in the .noisette file", true);
