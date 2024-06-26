@@ -25,6 +25,8 @@ GlobalSettings::GlobalSettings() :
 	jassert(Engine::mainEngine != nullptr); //Must not call GlobalSettings::getInstance() before creating the engine !
 
 	saveAndLoadRecursiveData = true;
+	hideInRemoteControl = true;
+	defaultHideInRemoteControl = true;
 
 #if JUCE_WINDOWS
 	launchOnStartup = startupCC.addBoolParameter("Launch on system startup", "If checked, this app will automatically launch on system startup", false);

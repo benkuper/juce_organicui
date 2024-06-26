@@ -18,6 +18,9 @@ String getAppVersion();
 DashboardManager::DashboardManager() :
 	BaseManager("Dashboards")
 {
+	hideInRemoteControl = true;
+	defaultHideInRemoteControl = true;
+
 	editMode = addBoolParameter("Edit Mode", "If checked, items are editable. If not, items are normally usable", true);
 	snapping = addBoolParameter("Snapping", "If checked, items are automatically aligned when dragging them closed to other ones", true);
 
