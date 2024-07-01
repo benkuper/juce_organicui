@@ -142,7 +142,9 @@ void OrganicMainContentComponent::resized()
 #if ORGANICUI_USE_SHAREDTEXTURE
 void OrganicMainContentComponent::newOpenGLContextCreated()
 {
-	juce::gl::glDisable(juce::gl::GL_DEBUG_OUTPUT);
+#if JUCE_WINDOWS
+    juce::gl::glDisable(juce::gl::GL_DEBUG_OUTPUT);
+#endif
 	if (SharedTextureManager::getInstanceWithoutCreating() != nullptr) SharedTextureManager::getInstance()->initGL();
 }
 
