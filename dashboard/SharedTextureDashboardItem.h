@@ -17,17 +17,18 @@ class SharedTextureDashboardItem :
 	public EngineListener
 {
 public:
-    SharedTextureDashboardItem(var params = var());
+    SharedTextureDashboardItem(juce::var params = juce::var());
     ~SharedTextureDashboardItem();
 
 	StringParameter* textureName;
+    StringParameter* appName;
 	SharedTextureReceiver* receiver;
 	BoolParameter* exposeOnWeb;
 
-	Image outImage;
+	juce::Image outImage;
 
 	void setupReceiver();
-	Image getImage();
+	juce::Image getImage();
 
 	void onContainerParameterChangedInternal(Parameter* p) override;
 
@@ -42,9 +43,9 @@ public:
 	static std::string base64_encode(unsigned char const* src, unsigned int len);
 
 	DashboardItemUI* createUI() override;
-	virtual var getItemParameterFeedback(Parameter* p) override;
+	virtual juce::var getItemParameterFeedback(Parameter* p) override;
 
-	DECLARE_ASYNC_EVENT(SharedTextureDashboardItem, ST, st, { TEXTURE_UPDATED }, EVENT_ITEM_CHECK);
+	DECLARE_ASYNC_EVENT(SharedTextureDashboardItem, ST, st, ENUM_LIST(TEXTURE_UPDATED), EVENT_ITEM_CHECK);
 
-	String getTypeString() const override { return "Shared Texture"; }
+	juce::String getTypeString() const override { return "Shared Texture"; }
 };

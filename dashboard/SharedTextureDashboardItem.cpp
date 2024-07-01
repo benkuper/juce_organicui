@@ -16,6 +16,7 @@ SharedTextureDashboardItem::SharedTextureDashboardItem(var params) :
 	showWarningInUI = true;
 
 	textureName = addStringParameter("Texture Name", "The Spout / Syphon name of the texture", "");
+    appName = addStringParameter("App Name", "The Syphon App Name. Only for Mac", "");
 	exposeOnWeb = addBoolParameter("Expose on Web", "If checked, this will convert the GPU texture to a CPU rescaled one, and feed it to the web clients. The downside is that is will slow the UI on larger images.", false);
 
 
@@ -26,6 +27,8 @@ SharedTextureDashboardItem::SharedTextureDashboardItem(var params) :
 		setWarningMessage("Shared Texture needs OpenGL Renderer. Change it in Preferences.");
 		return;
 	}
+#elif JUCE_MAC
+    LOG(SharedTextureManager::getInstance()->getAvailableSenders().joinIntoString(","));
 #endif
 
 	if (!Engine::mainEngine->isLoadingFile) setupReceiver();
@@ -53,11 +56,11 @@ void SharedTextureDashboardItem::setupReceiver()
 {
 	if (receiver == nullptr)
 	{
-		receiver = SharedTextureManager::getInstance()->addReceiver(textureName->stringValue());
+		receiver = SharedTextureManager::getInstance()->addReceiver(textureName->stringValue(), appName->stringValue());
 		receiver->addListener(this);
 	}
 
-	receiver->setSharingName(textureName->stringValue());
+	receiver->setSharingName(textureName->stringValue(), appName->stringValue());
 }
 
 Image SharedTextureDashboardItem::getImage()
@@ -122,7 +125,7 @@ void SharedTextureDashboardItem::receiverRemoved(SharedTextureReceiver* r)
 void SharedTextureDashboardItem::onContainerParameterChangedInternal(Parameter* p)
 {
 	DashboardItem::onContainerParameterChangedInternal(p);
-	if (p == textureName && !isCurrentlyLoadingData) setupReceiver();
+	if ((p == textureName || p == appName) && !isCurrentlyLoadingData) setupReceiver();
 }
 
 

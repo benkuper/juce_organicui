@@ -20,7 +20,7 @@ public:
 
     SharedTextureDashboardItem* st;
 
-    void paint(Graphics& g) override;
+    void paint(juce::Graphics& g) override;
 
     void newMessage(const SharedTextureDashboardItem::STEvent& e) override;
 };
