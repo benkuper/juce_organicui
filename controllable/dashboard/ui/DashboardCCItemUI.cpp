@@ -59,7 +59,6 @@ void DashboardCCItemUI::inspectableChanged()
 		if (gce != nullptr) gce->setDragAndDropEnabled(false);
 
 		itemUI = e;
-		DBG(itemUI->getWidth() << " / " << itemUI->getHeight());
 		vp.setViewedComponent(itemUI);
 		
 		if (getWidth() == 0 || getHeight() == 0) setSize(itemUI->getWidth(), itemUI->getHeight());
