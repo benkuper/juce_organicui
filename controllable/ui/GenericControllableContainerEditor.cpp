@@ -134,7 +134,10 @@ void GenericControllableContainerEditor::mouseUp(const MouseEvent& e)
 			if ((e.eventComponent == this && e.getMouseDownPosition().y < headerHeight && !dragRect.contains(e.getMouseDownPosition())) || (isRoot && e.eventComponent == this && e.getMouseDownY() < headerHeight))
 			{
 				if (e.mods.isShiftDown()) toggleCollapsedChildren();
-				else setCollapsed(!container->editorIsCollapsed);
+				else
+				{
+					if (!e.mouseWasDraggedSinceMouseDown()) setCollapsed(!container->editorIsCollapsed);
+				}
 			}
 		}
 	}

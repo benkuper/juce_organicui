@@ -137,7 +137,7 @@ void AppUpdater::run()
 		.withProgressCallback(callbackFunc)
 		.withResponseHeaders(&responseHeaders)
 		.withStatusCode(&statusCode)
-		.withConnectionTimeoutMs(2000)
+		.withConnectionTimeoutMs(5000)
 		;
 
 
