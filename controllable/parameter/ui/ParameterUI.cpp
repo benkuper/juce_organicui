@@ -9,8 +9,7 @@
 */
 
 #include "JuceHeader.h"
-
-juce_ImplementSingleton(ParameterUITimers)
+#include "ParameterUI.h"
 
 
 bool ParameterUI::showAlwaysNotifyOption = true;
@@ -21,10 +20,9 @@ std::function<void(ParameterUI*)> ParameterUI::customShowEditRangeWindowFunction
 
 ParameterUI::ParameterUI(Array<Parameter*> parameters, int paintTimerID) :
 	ControllableUI(Inspectable::getArrayAs<Parameter, Controllable>(parameters)),
+	UITimerTarget(paintTimerID),
 	parameters(Inspectable::getWeakArray(parameters)),
 	parameter(parameters[0]),
-	paintTimerID(paintTimerID),
-	shouldRepaint(false),
 	setUndoableValueOnMouseUp(true),
 	showEditWindowOnDoubleClick(true),
 	showValue(true),
@@ -33,18 +31,11 @@ ParameterUI::ParameterUI(Array<Parameter*> parameters, int paintTimerID) :
 {
 	parameter->addAsyncCoalescedParameterListener(this);
 
-	if (paintTimerID != -1) ParameterUITimers::getInstance()->registerParameter(paintTimerID, this);
-
 	//setSize(100, 16);
 }
 
 ParameterUI::~ParameterUI()
 {
-	if (paintTimerID != -1 && ParameterUITimers::getInstanceWithoutCreating() != nullptr)
-	{
-		ParameterUITimers::getInstance()->unregisterParameter(paintTimerID, this);
-	}
-
 	if (!parameter.wasObjectDeleted() && parameter != nullptr) {
 		parameter->removeAsyncParameterListener(this);
 		parameter = nullptr;
@@ -101,7 +92,7 @@ void ParameterUI::showEditRangeWindowInternal()
 			}
 		}),
 		true
-			);
+	);
 }
 
 void ParameterUI::paintOverChildren(Graphics& g)
@@ -154,9 +145,8 @@ void ParameterUI::paintOverChildren(Graphics& g)
 
 void ParameterUI::handlePaintTimer()
 {
-	if (!shouldRepaint || parameter.wasObjectDeleted() || !isShowing()) return;
-	handlePaintTimerInternal();
-	shouldRepaint = false;
+	if (parameter.wasObjectDeleted() || !isShowing()) return;
+	UITimerTarget::handlePaintTimer();
 }
 
 void ParameterUI::handlePaintTimerInternal()
@@ -370,10 +360,10 @@ double ParameterUI::textToValue(const String& text)
 
 void ParameterUI::visibilityChanged()
 {
-	if (paintTimerID == -1 || ParameterUITimers::getInstanceWithoutCreating() == nullptr) return;
+	if (paintTimerID == -1 || OrganicUITimers::getInstanceWithoutCreating() == nullptr) return;
 
-	if (isVisible()) ParameterUITimers::getInstance()->registerParameter(paintTimerID, this);
-	else ParameterUITimers::getInstance()->unregisterParameter(paintTimerID, this);
+	if (isVisible()) OrganicUITimers::getInstance()->registerTarget(paintTimerID, this);
+	else OrganicUITimers::getInstance()->unregisterTarget(paintTimerID, this);
 }
 
 bool ParameterUI::shouldBailOut() {
@@ -502,49 +492,5 @@ void ParameterUI::ValueEditCalloutComponent::parentHierarchyChanged()
 #else
 		labels[0]->showEditor();
 #endif
-	}
 }
-
-ParameterUITimers::ParameterUITimers()
-{
-#if JUCE_MAC
-	startTimer(PARAMETERUI_DEFAULT_TIMER, 1000 / 20); //20 fps drawing on mac
-	startTimer(PARAMETERUI_SLOW_TIMER, 1000 / 15); //15 fps drawing on mac
-#else
-	startTimer(PARAMETERUI_DEFAULT_TIMER, 1000 / 30); //30 fps drawing
-	startTimer(PARAMETERUI_SLOW_TIMER, 1000 / 20); //20 fps drawing
-#endif
-
-	paramsTimerMap.set(PARAMETERUI_DEFAULT_TIMER, {});
-	paramsTimerMap.set(PARAMETERUI_SLOW_TIMER, {});
-
-}
-
-void ParameterUITimers::registerParameter(int timerID, ParameterUI* ui)
-{
-	if (paramsTimerMap.contains(timerID)) paramsTimerMap.getReference(timerID).addIfNotAlreadyThere(ui);
-}
-
-void ParameterUITimers::unregisterParameter(int timerID, ParameterUI* ui)
-{
-	if (paramsTimerMap.contains(timerID)) paramsTimerMap.getReference(timerID).removeAllInstancesOf(ui);
-}
-
-void ParameterUITimers::timerCallback(int timerID)
-{
-	if (paramsTimerMap.contains(timerID))
-	{
-		Array<WeakReference<ParameterUI>> params = paramsTimerMap[timerID];
-
-		for (auto& p : params)
-		{
-			if (p.wasObjectDeleted())
-			{
-				jassertfalse;
-				continue;
-			}
-
-			p->handlePaintTimer();
-		}
-	}
 }

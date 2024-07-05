@@ -10,14 +10,10 @@
 
 #pragma once
 
-#define PARAMETERUI_DEFAULT_TIMER 0
-#define PARAMETERUI_SLOW_TIMER 1
-
-
-
 class ParameterUI :
 	public ControllableUI,
-	public Parameter::AsyncListener
+	public Parameter::AsyncListener,
+	public UITimerTarget	
 {
 public:
 	ParameterUI(juce::Array<Parameter*> parameter, int paintTimerID = -1);
@@ -25,10 +21,6 @@ public:
 
 	juce::Array<juce::WeakReference<Parameter>> parameters;
 	juce::WeakReference<Parameter> parameter;
-
-	//painting
-	int paintTimerID;
-	bool shouldRepaint;
 
 	bool setUndoableValueOnMouseUp; //for slidable uis like floatSlider and floatLabelUIs
 	bool showEditWindowOnDoubleClick;
@@ -54,8 +46,8 @@ public:
 
 	void paintOverChildren(juce::Graphics& g) override;
 
-	virtual void handlePaintTimer();
-	virtual void handlePaintTimerInternal();
+	virtual void handlePaintTimer() override;
+	virtual void handlePaintTimerInternal() override;
 
 	virtual void addPopupMenuItems(juce::PopupMenu* p) override;
 	virtual void addPopupMenuItemsInternal(juce::PopupMenu*) {}
@@ -108,17 +100,3 @@ protected:
 };
 
 
-class ParameterUITimers :
-	public juce::MultiTimer
-{
-public:
-	juce_DeclareSingleton(ParameterUITimers, true);
-	ParameterUITimers();
-	~ParameterUITimers() {}
-
-	juce::HashMap<int, juce::Array<juce::WeakReference<ParameterUI>>> paramsTimerMap;
-
-	void registerParameter(int timerID, ParameterUI* ui);
-	void unregisterParameter(int timerID, ParameterUI* ui);
-	void timerCallback(int timerID);
-};

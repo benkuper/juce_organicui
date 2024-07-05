@@ -91,6 +91,7 @@
 #include "ui/AssetManager.h"
 #include "ui/LookAndFeelOO.h"
 #include "ui/Grabber.h"
+#include "ui/UITimers.h"
 
 #include "helpers/RegexFunctions.h"
 #include "engine/EngineListener.h"

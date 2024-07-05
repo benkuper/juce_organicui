@@ -10,7 +10,7 @@
 
 
 ColorStatusUI::ColorStatusUI(Array<Parameter*> parameters, bool isCircle) :
-	ParameterUI(parameters, PARAMETERUI_DEFAULT_TIMER),
+	ParameterUI(parameters, ORGANICUI_DEFAULT_TIMER),
 	isCircle(isCircle),
 	momentaryMode(false)
 {

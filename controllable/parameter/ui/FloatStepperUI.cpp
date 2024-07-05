@@ -11,7 +11,7 @@
 #include  "JuceHeader.h"
 
 FloatStepperUI::FloatStepperUI(Array<Parameter*> parameters) :
-	ParameterUI(parameters, PARAMETERUI_DEFAULT_TIMER),
+	ParameterUI(parameters, ORGANICUI_DEFAULT_TIMER),
 	valueAtDragStart(parameters[0]->floatValue())
 {
 	showEditWindowOnDoubleClick = false;

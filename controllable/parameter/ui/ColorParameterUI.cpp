@@ -11,7 +11,7 @@
 #include "JuceHeader.h"
 
 ColorParameterUI::ColorParameterUI(Array<ColorParameter *> parameters) :
-	ParameterUI(Inspectable::getArrayAs<ColorParameter, Parameter>(parameters), PARAMETERUI_DEFAULT_TIMER),
+	ParameterUI(Inspectable::getArrayAs<ColorParameter, Parameter>(parameters), ORGANICUI_DEFAULT_TIMER),
     colorParams(parameters),
 	colorParam(parameters[0]),
     dispatchOnDoubleClick(true),
