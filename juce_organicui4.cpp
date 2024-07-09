@@ -24,6 +24,8 @@
 #include "ui/shapeshifter/ShapeShifterPanelTab.cpp"
 #include "ui/shapeshifter/ShapeShifterWindow.cpp"
 
+#include "ui/UITimers.cpp"
+
 #include "help/HelpPanel.cpp"
 #include "undo/UndoMaster.cpp"
 

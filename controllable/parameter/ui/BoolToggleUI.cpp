@@ -11,7 +11,7 @@
 #include "JuceHeader.h"
 
 BoolToggleUI::BoolToggleUI(Array<BoolParameter*> parameters, Image _onImage, Image _offImage) :
-	ParameterUI(Inspectable::getArrayAs<BoolParameter, Parameter>(parameters), PARAMETERUI_DEFAULT_TIMER),
+	ParameterUI(Inspectable::getArrayAs<BoolParameter, Parameter>(parameters), ORGANICUI_DEFAULT_TIMER),
 	momentaryMode(false)
 {
 	usingCustomImages = _onImage.isValid();

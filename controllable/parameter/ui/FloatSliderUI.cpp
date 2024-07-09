@@ -11,7 +11,7 @@
  #include "JuceHeader.h"
  //==============================================================================
 FloatSliderUI::FloatSliderUI(Array<Parameter*> parameters) :
-	ParameterUI(parameters, PARAMETERUI_DEFAULT_TIMER),
+	ParameterUI(parameters, ORGANICUI_DEFAULT_TIMER),
 	addToUndoOnMouseUp(true),
 	fixedDecimals(3),
 	initValue(0),

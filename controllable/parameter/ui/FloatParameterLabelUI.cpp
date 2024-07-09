@@ -11,7 +11,7 @@
 #include "JuceHeader.h"
 
 FloatParameterLabelUI::FloatParameterLabelUI(Array<Parameter*> parameters) :
-	ParameterUI(parameters, PARAMETERUI_SLOW_TIMER),
+	ParameterUI(parameters, ORGANICUI_SLOW_TIMER),
 	floatParam((FloatParameter*)parameters[0]),
 	valueLabel(parameters[0]->niceName + "_ValueLabel"),
 	maxFontHeight(GlobalSettings::getInstance()->fontSize->floatValue()),
