@@ -157,7 +157,7 @@ BaseItemUI<T>::BaseItemUI(T* _item, Direction _resizeDirection, bool showMiniMod
 	itemLabel.setColour(itemLabel.textWhenEditingColourId, juce::Colours::white);
 	itemLabel.setColour(juce::CaretComponent::caretColourId, juce::Colours::orange);
 
-	itemLabel.setFont(FontOptions(GlobalSettings::getInstance()->fontSize->floatValue()));
+	itemLabel.setFont(juce::FontOptions(GlobalSettings::getInstance()->fontSize->floatValue()));
 	itemLabel.setJustificationType(juce::Justification::centredLeft);
 
 	itemLabel.setEditable(false, this->baseItem->nameCanBeChangedByUser);
@@ -549,7 +549,7 @@ void BaseItemUI<T>::newMessage(const Parameter::ParameterEvent& e)
 		if (Engine::mainEngine->isLoadingFile || Engine::mainEngine->isClearing) return;
 
 		bool isDefaultHeight = headerHeight == itemLabel.getFont().getHeight() + 2;
-		itemLabel.setFont(FontOptions(GlobalSettings::getInstance()->fontSize->floatValue()));
+		itemLabel.setFont(juce::FontOptions(GlobalSettings::getInstance()->fontSize->floatValue()));
 		if (isDefaultHeight) headerHeight = GlobalSettings::getInstance()->fontSize->floatValue() + 2;
 		resized();
 	}
