@@ -17,7 +17,7 @@ class InspectableSelectionManager;
 #define COMMA ,
 #endif
 
-#define DECLARE_INSPECTACLE_LISTENER_BASE(ClassName, ListenerClass, listenerName, Section) ListenerClass ## <ClassName ## Listener Section> listenerName ## Listeners; \
+#define DECLARE_INSPECTACLE_LISTENER_BASE(ClassName, ListenerClass, listenerName, Section) ListenerClass<ClassName ## Listener Section> listenerName ## Listeners; \
 void add ## ClassName ## Listener(ClassName ## Listener* newListener) { listenerName ## Listeners.add(newListener); } \
 void remove ## ClassName ## Listener(ClassName ## Listener* listener) { if (isBeingDestroyed) return; listenerName ## Listeners.remove(listener); }
 
