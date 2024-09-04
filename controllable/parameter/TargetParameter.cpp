@@ -20,6 +20,7 @@ TargetParameter::TargetParameter(const String& niceName, const String& descripti
 	showParentNameInEditor(true),
 	maxDefaultSearchLevel(-1),
 	defaultParentLabelLevel(3),
+	isTryingFixingLink(false),
 	rootContainer(nullptr),
 	target(nullptr),
 	targetContainer(nullptr),
@@ -218,7 +219,7 @@ void TargetParameter::setTarget(WeakReference<Controllable> c)
 		if (value.toString().isNotEmpty()) setGhostValue(value.toString());
 		if (ghostValue.isNotEmpty() && !isBeingDestroyed)
 		{
-			if (Engine::mainEngine->isLoadingFile)
+			if (Engine::mainEngine->isLoadingFile && !isTryingFixingLink)
 			{
 				Engine::mainEngine->addEngineListener(this);
 			}
@@ -268,7 +269,7 @@ void TargetParameter::setTarget(WeakReference<ControllableContainer> cc)
 		if (value.toString().isNotEmpty()) setGhostValue(value.toString());
 		if (ghostValue.isNotEmpty() && !isBeingDestroyed)
 		{
-			if (Engine::mainEngine->isLoadingFile)
+			if (Engine::mainEngine->isLoadingFile && !isTryingFixingLink)
 			{
 				Engine::mainEngine->addEngineListener(this);
 			}
@@ -287,7 +288,9 @@ void TargetParameter::setTarget(WeakReference<ControllableContainer> cc)
 
 void TargetParameter::tryFixBrokenLink()
 {
-	if (Engine::mainEngine != nullptr && (Engine::mainEngine->isClearing || Engine::mainEngine->isLoadingFile)) return;
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->isClearing) return;
+
+	isTryingFixingLink = true;
 
 	if (targetType == CONTROLLABLE)
 	{
@@ -297,6 +300,11 @@ void TargetParameter::tryFixBrokenLink()
 			{
 				WeakReference<Controllable> c = rootContainer->getControllableForAddress(ghostValue);
 				if (c != nullptr) setValueFromTarget(c);
+				else
+				{
+					//NLOGWARNING(niceName, "Link is broken on load : " + ghostValue);
+					setTarget((Controllable*)nullptr);
+				}
 			}
 		}
 		else
@@ -319,6 +327,8 @@ void TargetParameter::tryFixBrokenLink()
 			setValueFromTarget(targetContainer);
 		}
 	}
+
+	isTryingFixingLink = false;
 }
 
 void TargetParameter::setRootContainer(WeakReference<ControllableContainer> newRootContainer, bool engineIfNull, bool forceSetValue)

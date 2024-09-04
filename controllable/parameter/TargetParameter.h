@@ -37,9 +37,11 @@ public:
 	bool showParentNameInEditor;
 	int maxDefaultSearchLevel;
 	int defaultParentLabelLevel;
+	bool isTryingFixingLink;
 
 	juce::StringArray typesFilter; //leave empty to allow all when not using custom functions
 	juce::StringArray excludeTypesFilter; //leave empty to allow all when not using custom functions
+	
 
 	juce::WeakReference<ControllableContainer> rootContainer;
 
