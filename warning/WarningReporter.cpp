@@ -39,7 +39,7 @@ void WarningReporter::unregisterWarning(WeakReference<WarningTarget> target)
 
 }
 
-void WarningReporter::endLoadFile()
+void WarningReporter::fileLoaded()
 {
 	if (targets.size() > 0)
 	{

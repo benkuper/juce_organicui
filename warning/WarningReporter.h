@@ -26,7 +26,7 @@ public:
 	void registerWarning(juce::WeakReference<WarningTarget>);
 	void unregisterWarning(juce::WeakReference<WarningTarget>);
 
-	void endLoadFile() override;
+	void fileLoaded() override;
 
 	// ASYNC
 	class  WarningReporterEvent
