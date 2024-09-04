@@ -42,19 +42,24 @@ void Engine::createNewGraph() {
 	engineListeners.call(&EngineListener::startLoadFile);
 	engineNotifier.addMessage(new EngineEvent(EngineEvent::START_LOAD_FILE, this));
 
-	isLoadingFile = false;
-	setChangedFlag(false);
+	
 
 	afterLoadFileInternal();
 
 	engineListeners.call(&EngineListener::endLoadFile);
 	engineNotifier.addMessage(new EngineEvent(EngineEvent::END_LOAD_FILE, this));
 
+	//maybe dangerous to swap here with all things that check for loading, was before the listener before
+	isLoadingFile = false;
+	setChangedFlag(false);
 
 	//ShapeShifterManager::getInstance()->loadDefaultLayoutFile();
 
 	handleAsyncUpdate();
 
+
+	engineListeners.call(&EngineListener::fileLoaded);
+	engineNotifier.addMessage(new EngineEvent(EngineEvent::FILE_LOADED, this));
 }
 
 Result Engine::loadDocument(const File& file) {
@@ -146,7 +151,6 @@ void Engine::fileLoaderEnded() {
 
 void Engine::handleAsyncUpdate()
 {
-	isLoadingFile = false;
 
 	if (getFile().exists()) {
 		setLastDocumentOpened(getFile());
@@ -162,7 +166,12 @@ void Engine::handleAsyncUpdate()
 	engineListeners.call(&EngineListener::endLoadFile);
 	engineNotifier.addMessage(new EngineEvent(EngineEvent::END_LOAD_FILE, this));
 
+	isLoadingFile = false;
+
 	NLOG("Engine", "Session loaded in " << timeForLoading / 1000.0 << "s");
+
+	engineListeners.call(&EngineListener::fileLoaded);
+	engineNotifier.addMessage(new EngineEvent(EngineEvent::FILE_LOADED, this));
 }
 
 
@@ -435,7 +444,7 @@ void Engine::loadJSONDataEngine(var data, ProgressTask* loadingTask)
 	if (InspectableSelectionManager::mainSelectionManager != nullptr) InspectableSelectionManager::mainSelectionManager->setEnabled(true); //Re enable editor
 	if (Outliner::getInstanceWithoutCreating() != nullptr) Outliner::getInstance()->setEnabled(true);
 
-	isLoadingFile = false;
+	//isLoadingFile = false;
 
 #if !MULTITHREADED_LOADING
 	triggerAsyncUpdate();
