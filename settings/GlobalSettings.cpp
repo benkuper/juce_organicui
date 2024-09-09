@@ -9,6 +9,7 @@
 */
 
 #include "JuceHeader.h"
+#include "GlobalSettings.h"
 
 juce_ImplementSingleton(GlobalSettings)
 
@@ -19,7 +20,8 @@ GlobalSettings::GlobalSettings() :
 	startupCC("Startup and Update"),
 	interfaceCC("Interface"),
 	saveLoadCC("Save and Load"),
-	editingCC("Editing")
+	editingCC("Editing"),
+	launchArguments("Launch Arguments")
 {
 
 	jassert(Engine::mainEngine != nullptr); //Must not call GlobalSettings::getInstance() before creating the engine !
@@ -87,6 +89,9 @@ GlobalSettings::GlobalSettings() :
 	addChildControllableContainer(&editingCC);
 	addChildControllableContainer(OSCRemoteControl::getInstance());
 	addChildControllableContainer(&keyMappingsCC);
+
+	launchArguments.includeInRecursiveSave = false;
+	addChildControllableContainer(&launchArguments);
 }
 
 GlobalSettings::~GlobalSettings()
@@ -134,7 +139,7 @@ void GlobalSettings::onControllableFeedbackUpdate(ControllableContainer* cc, Con
 		Controllable* crashC = nullptr;
 		crashC->getJSONData(); //this will crash
 #endif
-}
+	}
 	else if (c == saveLogsToFile)
 	{
 		CustomLogger::getInstance()->setFileLogging(saveLogsToFile->boolValue());
@@ -147,6 +152,29 @@ void GlobalSettings::loadJSONDataInternal(var data)
 {
 	openSpecificFileOnStartup->setEnabled(!openLastDocumentOnStartup->boolValue());
 	fileToOpenOnStartup->setEnabled(openSpecificFileOnStartup->boolValue());
+}
+
+void GlobalSettings::addLaunchArguments(const String& commandLine, const CommandLineElements& elements)
+{
+	launchArguments.addStringParameter("Command Line", "Full commandline", commandLine);
+
+	for (auto& c : elements)
+	{
+		if (c.args.size() < 2) launchArguments.addStringParameter(c.command, "Argument for this command", c.args.isEmpty() ? "" : c.args[0]);
+		else
+		{
+			for (int i = 0; i < c.args.size(); i++)
+			{
+				launchArguments.addStringParameter(c.command + " " + String(i + 1), "Argument #" + String(i + 1) + " for this command", c.args[i]);
+			}
+		}
+
+	}
+
+	for (auto& c : launchArguments.controllables)
+	{
+		c->setControllableFeedbackOnly(true);
+	}
 }
 
 

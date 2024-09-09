@@ -72,6 +72,8 @@ public:
 	FloatParameter* altScaleFactor;
 	EnumParameter* defaultEasing;
 
+	ControllableContainer launchArguments;
+
 	KeyMappingsContainer keyMappingsCC;
 
 	Trigger * testCrash;
@@ -79,4 +81,5 @@ public:
 	void onControllableFeedbackUpdate(ControllableContainer *, Controllable * c) override;
 	void loadJSONDataInternal(juce::var data) override;
 
+	void addLaunchArguments(const juce::String& commandLine, const CommandLineElements& elements);
 };
