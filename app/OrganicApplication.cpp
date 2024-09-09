@@ -82,6 +82,8 @@ void OrganicApplication::initialise(const String& commandLine)
 	if (forceGL) GlobalSettings::getInstance()->useGLRenderer->setValue(true);
 	else if (forceNoGL) GlobalSettings::getInstance()->useGLRenderer->setValue(false);
 
+	GlobalSettings::getInstance()->addLaunchArguments(commandLine, commands);
+
 
 	engine->addAsyncEngineListener(this);
 	WarningReporter::getInstance(); //force creation after engine creation
