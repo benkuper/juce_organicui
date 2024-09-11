@@ -83,20 +83,20 @@ void BaseItemEditor::resizedInternalHeader(juce::Rectangle<int>& r)
 
 	if (item->userCanRemove && removeBT != nullptr)
 	{
-		removeBT->setBounds(r.removeFromRight(targetHeight).reduced(2));
+		removeBT->setBounds(r.removeFromRight(targetHeight).withHeight(targetHeight).reduced(2));
 		r.removeFromRight(2);
 
 	}
 
 	if (item->userCanDuplicate && duplicateBT != nullptr)
 	{
-		duplicateBT->setBounds(r.removeFromRight(targetHeight).reduced(2));
+		duplicateBT->setBounds(r.removeFromRight(targetHeight).withHeight(targetHeight).reduced(2));
 		r.removeFromRight(2);
 	}
 
 	if (itemColorUI != nullptr)
 	{
-		itemColorUI->setBounds(r.removeFromRight(targetHeight).reduced(2));
+		itemColorUI->setBounds(r.removeFromRight(targetHeight).withHeight(targetHeight).reduced(2));
 	}
 
 
