@@ -668,24 +668,27 @@ void GenericControllableContainerEditor::resizedInternal(juce::Rectangle<int>& r
 
 void GenericControllableContainerEditor::resizedInternalHeader(juce::Rectangle<int>& r)
 {
+	int forcedHeaderHeight = jmin(r.getHeight(), 20);
+
 	if (container->isRemovableByUser && removeBT != nullptr)
 	{
-		removeBT->setBounds(r.removeFromRight(r.getHeight()).reduced(2));
+		removeBT->setBounds(r.removeFromRight(forcedHeaderHeight).withHeight(forcedHeaderHeight).reduced(2));
 		r.removeFromRight(2);
 	}
 
+
 	if (dragAndDropEnabled)
 	{
-		dragRect = r.removeFromRight(r.getHeight()).reduced(4);
+		dragRect = r.removeFromRight(forcedHeaderHeight).withHeight(forcedHeaderHeight).reduced(4);
 	}
 
 	if (warningUI != nullptr && warningUI->isVisible())
 	{
-		warningUI->setBounds(r.removeFromLeft(r.getHeight()).reduced(2));
+		warningUI->setBounds(r.removeFromLeft(forcedHeaderHeight).withHeight(forcedHeaderHeight).reduced(2));
 		r.removeFromLeft(2);
 	}
 
-	if (containerLabel.isVisible()) containerLabel.setBounds(r.removeFromLeft(containerLabel.getFont().getStringWidth(containerLabel.getText()) + 20));
+	if (containerLabel.isVisible()) containerLabel.setBounds(r.removeFromLeft(containerLabel.getFont().getStringWidth(containerLabel.getText()) + 20).withHeight(forcedHeaderHeight));
 }
 
 void GenericControllableContainerEditor::resizedInternalContent(juce::Rectangle<int>& r)
