@@ -50,7 +50,10 @@ void GradientColorUI::resized()
 
 void GradientColorUI::mouseDown(const MouseEvent& e)
 {
+
 	BaseItemMinimalUI::mouseDown(e);
+
+
 
 	if (e.mods.isCommandDown())
 	{
@@ -76,6 +79,10 @@ void GradientColorUI::mouseDown(const MouseEvent& e)
 				}
 			}
 		);
-
+	}
+	else if (e.eventComponent != this)
+	{
+		if (item->isUILocked->boolValue()) return;
+		item->setMovePositionReference(true);
 	}
 }
