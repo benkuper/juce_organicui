@@ -428,11 +428,11 @@ String Parameter::stringValue() {
 
 void Parameter::notifyValueChanged() {
 
-	if(isNotifyingChange) return; //not sure about this, it may cause unsynced value changes
-	isNotifyingChange = true;
+	//if(isNotifyingChange) return; //not sure about this, it may cause unsynced value changes
+	//isNotifyingChange = true;
 	parameterListeners.call(&ParameterListener::parameterValueChanged, this);
 	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::VALUE_CHANGED, this, getValue()));
-	isNotifyingChange = false;
+	//isNotifyingChange = false;
 }
 
 void Parameter::expressionValueChanged(ScriptExpression*)
