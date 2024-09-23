@@ -334,7 +334,7 @@ void OSCRemoteControl::processMessage(const OSCMessage& m, const String& sourceI
 			bool handled = false;
 			if (ControllableContainer* cc = OSCHelpers::findParentContainer(Engine::mainEngine, m.getAddressPattern().toString()))
 			{
-				handled = cc->handleRemoteControlData(c, m, sourceId);
+				handled = cc->handleRemoteControlData(m, sourceId);
 			}
 
 			if (!handled) remoteControlListeners.call(&RemoteControlListener::processMessage, m, sourceId);
