@@ -171,7 +171,7 @@ void ScriptExpression::scriptObjectUpdated(ScriptTarget*)
 	//setExpression(expression);
 }
 
-void ScriptExpression::endLoadFile()
+void ScriptExpression::fileLoaded()
 {
 	if (Engine::mainEngine != nullptr) Engine::mainEngine->removeEngineListener(this);
 	setExpression(expression);

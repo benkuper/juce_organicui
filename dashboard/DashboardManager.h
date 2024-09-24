@@ -70,7 +70,7 @@ public:
 	void dashboardFeedback(juce::var data) override;
 	void askForRefresh(Dashboard *d) override;
 
-	void endLoadFile() override;
+	void fileLoaded() override;
 
 #if ORGANICUI_USE_WEBSERVER
 	std::unique_ptr<SimpleWebSocketServerBase> server;

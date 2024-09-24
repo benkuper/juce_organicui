@@ -40,7 +40,7 @@ public:
 
 	void scriptObjectUpdated(ScriptTarget *) override;
 
-	void endLoadFile() override;
+	void fileLoaded() override;
 
 	juce::Array<Parameter *> getParameterReferencesInExpression();
 
