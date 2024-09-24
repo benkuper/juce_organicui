@@ -483,7 +483,7 @@ void DashboardManager::askForRefresh(Dashboard* d)
 #endif
 }
 
-void DashboardManager::endLoadFile()
+void DashboardManager::fileLoaded()
 {
 	Engine::mainEngine->removeEngineListener(this);
 

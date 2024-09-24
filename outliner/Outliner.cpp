@@ -251,7 +251,7 @@ OutlinerItem* Outliner::createItem(WeakReference<Controllable> controllable, boo
 	return new OutlinerItem(controllable, parentsHaveHideInRemote, isFiltered);
 }
 
-void Outliner::endLoadFile()
+void Outliner::fileLoaded()
 {
 	MessageManagerLock mmLock;
 	rebuildTree();

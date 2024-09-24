@@ -134,7 +134,7 @@ void SharedTextureDashboardItem::afterLoadJSONDataInternal()
 	setupReceiver();
 }
 
-void SharedTextureDashboardItem::endLoadFile()
+void SharedTextureDashboardItem::fileLoaded()
 {
 	Engine::mainEngine->removeEngineListener(this);
 	setupReceiver();

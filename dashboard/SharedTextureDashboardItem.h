@@ -38,7 +38,7 @@ public:
 	virtual void receiverRemoved(SharedTextureReceiver* r) override;
 
 	virtual void afterLoadJSONDataInternal() override;
-	virtual void endLoadFile() override;
+	virtual void fileLoaded() override;
 
 	static std::string base64_encode(unsigned char const* src, unsigned int len);
 

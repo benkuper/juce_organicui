@@ -132,7 +132,7 @@ public:
 	virtual OutlinerItem* createItem(juce::WeakReference<ControllableContainer> container, bool parentsHaveHideInRemote, bool isFiltered);
 	virtual OutlinerItem* createItem(juce::WeakReference<Controllable> controllable, bool parentsHaveHideInRemote, bool isFiltered);
 
-	void endLoadFile() override;
+	void fileLoaded() override;
 	void engineCleared() override;
 
 	OutlinerItem* getItemForContainer(ControllableContainer* cc);
