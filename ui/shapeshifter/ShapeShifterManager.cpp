@@ -21,6 +21,7 @@ ShapeShifterManager::ShapeShifterManager() :
 	currentCandidatePanel(nullptr),
 	defaultFileData(nullptr),
 	temporaryFullContent(nullptr),
+	saveLastLayout(true),
 	lockMode(false)
 {
 	GlobalSettings::getInstance()->fontSize->addAsyncParameterListener(this);
@@ -28,7 +29,7 @@ ShapeShifterManager::ShapeShifterManager() :
 
 ShapeShifterManager::~ShapeShifterManager()
 {
-	if(layoutFolder.exists()) saveCurrentLayoutToFile(layoutFolder.getChildFile(+"_lastSession." + appLayoutExtension));
+	if(layoutFolder.exists() && saveLastLayout) saveCurrentLayoutToFile(layoutFolder.getChildFile(+"_lastSession." + appLayoutExtension));
 	openedWindows.clear();
 	if (GlobalSettings::getInstanceWithoutCreating() != nullptr) GlobalSettings::getInstance()->fontSize->removeAsyncParameterListener(this);
 }

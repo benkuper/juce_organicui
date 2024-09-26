@@ -39,6 +39,7 @@ public:
 
 	juce::var ghostLayout; //for temporary full panels
 	ShapeShifterContent* temporaryFullContent;
+	bool saveLastLayout;
 
 	bool lockMode;
 	juce::HashMap<juce::String, juce::String> isInViewSubMenu;
