@@ -1,4 +1,5 @@
 #include "JuceHeader.h"
+#include "WarningTarget.h"
 
 String WarningTarget::warningNoId = "";
 String WarningTarget::warningAllId = "*";
@@ -14,19 +15,7 @@ WarningTarget::WarningTarget() :
 
 WarningTarget::~WarningTarget()
 {
-	if (warningMessage.size() > 0)
-	{
-		MessageManagerLock mmLock;
-		WarningReporter::getInstance()->unregisterWarning(this);
-	}
-
-	if (warningTargetNotifier.isUpdatePending())
-	{
-		MessageManagerLock mmLock;
-		warningTargetNotifier.handleUpdateNowIfNeeded();
-		warningTargetNotifier.cancelPendingUpdate();
-	}
-
+	unregisterWarningNow();
 	masterReference.clear();
 
 }
@@ -73,6 +62,25 @@ void WarningTarget::clearWarning(const String& id)
 	}
 
 	setWarningMessage(String(), id);
+}
+
+void WarningTarget::unregisterWarningNow()
+{
+	if (warningMessage.size() > 0)
+	{
+		if (!WarningReporter::getInstance()->targets.contains(this)) return;
+		MessageManagerLock mmLock;
+		WarningReporter::getInstance()->unregisterWarning(this);
+	}
+
+	if (warningTargetNotifier.isUpdatePending())
+	{
+		MessageManagerLock mmLock;
+		warningTargetNotifier.handleUpdateNowIfNeeded();
+		warningTargetNotifier.cancelPendingUpdate();
+	}
+
+	warningMessage.clear();
 }
 
 

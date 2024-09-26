@@ -111,8 +111,7 @@
 
 
 #include "warning/WarningTarget.h"
-#include "warning/WarningReporter.h"
-#include "warning/ui/WarningTargetUI.h"
+
 
 #include "inspectable/Inspectable.h"
 #include "inspectable/InspectableContent.h"
@@ -121,6 +120,9 @@
 #include "inspectable/ui/InspectableEditor.h"
 #include "inspectable/ui/InspectableSelector.h"
 #include "inspectable/ui/Inspector.h"
+
+#include "warning/WarningReporter.h"
+#include "warning/ui/WarningTargetUI.h"
 
 #include "help/HelpBox.h"
 

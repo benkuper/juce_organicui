@@ -1,4 +1,5 @@
 #include "JuceHeader.h"
+#include "WarningReporter.h"
 
 juce_ImplementSingleton(WarningReporter)
 
@@ -25,7 +26,12 @@ void WarningReporter::registerWarning(WeakReference<WarningTarget> target)
 
 	if (target == nullptr || target.wasObjectDeleted() || targets.contains(target)) return;
 	targets.addIfNotAlreadyThere(target);
-	warningReporterNotifier.addMessage(new WarningReporterEvent(WarningReporterEvent::WARNING_REGISTERED, target));
+	
+	if(Controllable* c = dynamic_cast<Controllable*>(target.get())) targetAddressMap.set(target, c->getControlAddress());
+	else if (ControllableContainer* cc = dynamic_cast<ControllableContainer*>(target.get())) targetAddressMap.set(target, cc->getControlAddress());
+
+	if (Inspectable* i = dynamic_cast<Inspectable*>(target.get())) i->addInspectableListener(this);
+	warningReporterNotifier.addMessage(new WarningReporterEvent(WarningReporterEvent::WARNING_REGISTERED, target, targetAddressMap[target]));
 }
 
 void WarningReporter::unregisterWarning(WeakReference<WarningTarget> target)
@@ -35,7 +41,10 @@ void WarningReporter::unregisterWarning(WeakReference<WarningTarget> target)
 
 	if (target == nullptr || target.wasObjectDeleted() || !targets.contains(target)) return;
 	targets.removeAllInstancesOf(target);
-	warningReporterNotifier.addMessage(new WarningReporterEvent(WarningReporterEvent::WARNING_UNREGISTERED, target));
+	String address = targetAddressMap.contains(target) ? targetAddressMap[target] : String();
+	warningReporterNotifier.addMessage(new WarningReporterEvent(WarningReporterEvent::WARNING_UNREGISTERED, target, targetAddressMap[target]));
+
+	targetAddressMap.remove(target);
 
 }
 
@@ -45,4 +54,9 @@ void WarningReporter::fileLoaded()
 	{
 		LOGWARNING("You have " << targets.size() << " warnings after loading the file,\nplease check the Warnings windows to resolve them.");
 	}
+}
+
+void WarningReporter::inspectableDestroyed(Inspectable* i)
+{
+	unregisterWarning(i);
 }
