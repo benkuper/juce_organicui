@@ -38,7 +38,7 @@ public:
 
 	
 
-	juce::OwnedArray<EnumValue> enumValues;
+	juce::OwnedArray<EnumValue, juce::CriticalSection> enumValues;
 
 	juce::var getValue() override;
 	juce::var getValueData();
