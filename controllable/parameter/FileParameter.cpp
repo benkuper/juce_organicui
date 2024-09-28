@@ -114,10 +114,10 @@ File FileParameter::getFile()
 	return File(p);
 }
 
-void FileParameter::setAutoReload(bool value)
+void FileParameter::setAutoReload(bool doAutoReload)
 {
-	if (autoReload == value) return;
-	autoReload = value;
+	if (autoReload == doAutoReload) return;
+	autoReload = doAutoReload;
 	if (autoReload) FileCheckTimer::getInstance()->registerParam(this);
 	else FileCheckTimer::getInstance()->unregisterParam(this);
 }
