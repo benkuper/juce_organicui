@@ -66,6 +66,49 @@
 #define ORGANICUI_USE_WEBSERVER 0
 #endif
 
+/** Config: ORGANICUI_USE_DASHBOARDPANEL
+	Enables the use of the DashboardPanel
+*/
+#ifndef ORGANICUI_USE_DASHBOARDPANEL
+#define ORGANICUI_USE_DASHBOARDPANEL 1
+#endif
+
+
+/** Config: ORGANICUI_USE_PARROTPANEL
+	Enables the use of the ParrotPanel
+*/
+#ifndef ORGANICUI_USE_PARROTPANEL
+#define ORGANICUI_USE_PARROTPANEL 1
+#endif
+
+/** Config: ORGANICUI_USE_DETECTIVEPANEL
+	Enables the use of the DetectivePanel
+*/
+#ifndef ORGANICUI_USE_DETECTIVEPANEL
+#define ORGANICUI_USE_DETECTIVEPANEL 1
+#endif
+
+/** Config: ORGANICUI_USE_HELPPANEL
+	Enables the use of the HelpPanel
+*/
+#ifndef ORGANICUI_USE_HELPPANEL
+#define ORGANICUI_USE_HELPPANEL 1
+#endif
+
+/** Config: ORGANICUI_USE_LOGGERPANEL
+	Enables the use of the LoggerReporterPanel
+*/
+#ifndef ORGANICUI_USE_LOGGERPANEL
+#define ORGANICUI_USE_LOGGERPANEL 1
+#endif
+
+/** Config: ORGANICUI_USE_WARNINGPANEL
+	Enables the use of the WarningReporterPanel
+*/
+#ifndef ORGANICUI_USE_WARNINGPANEL
+#define ORGANICUI_USE_WARNINGPANEL 1
+#endif
+
 
 #include <juce_core/juce_core.h>
 #include <juce_events/juce_events.h>
