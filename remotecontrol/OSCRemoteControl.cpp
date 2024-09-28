@@ -56,7 +56,9 @@ OSCRemoteControl::OSCRemoteControl() :
 	manualSendCC.enabled->setDefaultValue(false);
 	addChildControllableContainer(&manualSendCC);
 
+#if ORGANICUI_USE_WEBSERVER
 	WarningReporter::getInstance()->addAsyncWarningReporterListener(this);
+#endif
 }
 
 OSCRemoteControl::~OSCRemoteControl()
@@ -72,10 +74,11 @@ OSCRemoteControl::~OSCRemoteControl()
 		server.reset();
 	}
 
-#endif
-
 	if (WarningReporter::getInstanceWithoutCreating() != nullptr) WarningReporter::getInstance()->removeAsyncWarningReporterListener(this);
 }
+#endif
+}
+
 
 void OSCRemoteControl::setupReceiver()
 {
@@ -840,12 +843,14 @@ void OSCRemoteControl::sendOSCQueryFeedbackTo(const juce::OSCMessage& m, juce::S
 
 }
 
-#endif
 
 void OSCRemoteControl::newMessage(const WarningReporter::WarningReporterEvent& e)
 {
 	sendPersistentWarningFeedback(e.target, e.targetAddress, e.type);
 }
+
+
+#endif
 
 void OSCRemoteControl::sendAllManualFeedback()
 {

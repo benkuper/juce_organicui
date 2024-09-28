@@ -115,10 +115,10 @@ public:
 	void newMessage(const CustomLogger::LogEvent& e) override;
 	void sendLogFeedback(const juce::String& type, const juce::String& source, const juce::String& message);
 	void sendPersistentWarningFeedback(juce::WeakReference<WarningTarget> wt, juce::String address = juce::String(), WarningReporter::WarningReporterEvent::Type type = WarningReporter::WarningReporterEvent::WARNING_REGISTERED);
+	void newMessage(const WarningReporter::WarningReporterEvent& e) override;
 
 #endif
 
-	void newMessage(const WarningReporter::WarningReporterEvent& e) override;
 
 	void sendAllManualFeedback();
 	void sendManualFeedbackForControllable(Controllable* c);
