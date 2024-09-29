@@ -75,7 +75,6 @@ OSCRemoteControl::~OSCRemoteControl()
 	}
 
 	if (WarningReporter::getInstanceWithoutCreating() != nullptr) WarningReporter::getInstance()->removeAsyncWarningReporterListener(this);
-}
 #endif
 }
 
