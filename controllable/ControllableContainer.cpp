@@ -1521,6 +1521,13 @@ var ControllableContainer::getScriptControlAddressFromScript(const var::NativeFu
 var ControllableContainer::getContainersFromScript(const var::NativeFunctionArgs& args)
 {
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(args);
+
+	if (cc->isBeingDestroyed)
+	{
+		LOGWARNING("Get containers from script, container is being destroyed or badly referenced");
+		return var();
+	}
+
 	var result;
 	for (auto& c : cc->controllableContainers)
 	{
@@ -1533,6 +1540,13 @@ var ControllableContainer::getContainersFromScript(const var::NativeFunctionArgs
 var ControllableContainer::getControllablesFromScript(const var::NativeFunctionArgs& args)
 {
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(args);
+
+	if (cc->isBeingDestroyed)
+	{
+		LOGWARNING("Get containers from script, container is being destroyed or badly referenced");
+		return var();
+	}
+
 	var result;
 
 	bool includeParameters = args.numArguments > 0 ? (int)args.arguments[0] > 0 : true;
