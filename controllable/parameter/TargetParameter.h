@@ -38,6 +38,7 @@ public:
 	int maxDefaultSearchLevel;
 	int defaultParentLabelLevel;
 	bool isTryingFixingLink;
+	bool manuallySettingNull;
 
 	juce::StringArray typesFilter; //leave empty to allow all when not using custom functions
 	juce::StringArray excludeTypesFilter; //leave empty to allow all when not using custom functions
