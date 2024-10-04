@@ -705,7 +705,9 @@ void OSCRemoteControl::sendPathNameChangedFeedback(const String& oldPath, const 
 
 void OSCRemoteControl::newMessage(const CustomLogger::LogEvent& e)
 {
-	if (!enableSendLogFeedback->boolValue()) return;
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->isClearing) return;
+	if (e.log == nullptr) return;
+	if (enableSendLogFeedback != nullptr && !enableSendLogFeedback->boolValue()) return;
 	sendLogFeedback(e.log->getSeverityName(), e.log->source, e.log->getContent());
 }
 
@@ -723,7 +725,8 @@ void OSCRemoteControl::sendLogFeedback(const String& type, const String& source,
 
 void OSCRemoteControl::sendPersistentWarningFeedback(WeakReference<WarningTarget> wt, String address, WarningReporter::WarningReporterEvent::Type type)
 {
-	if (wt.wasObjectDeleted()) return;
+	if (wt == nullptr || wt.wasObjectDeleted()) return;
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->isClearing) return;
 
 	String path = address;
 	String name;
