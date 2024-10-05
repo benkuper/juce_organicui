@@ -110,6 +110,14 @@
 #endif
 
 
+/** Config: ORGANICUI_USE_OUTLINERPANEL
+* Enables the use of the Outliner
+*/
+#ifndef ORGANICUI_USE_OUTLINERPANEL
+#define ORGANICUI_USE_OUTLINERPANEL 1
+#endif
+
+
 #include <juce_core/juce_core.h>
 #include <juce_events/juce_events.h>
 #include <juce_gui_basics/juce_gui_basics.h>
