@@ -57,7 +57,6 @@ OSCRemoteControl::OSCRemoteControl() :
 	addChildControllableContainer(&manualSendCC);
 
 #if ORGANICUI_USE_WEBSERVER
-	WarningReporter::getInstance()->addAsyncWarningReporterListener(this);
 #endif
 }
 
@@ -73,7 +72,6 @@ OSCRemoteControl::~OSCRemoteControl()
 		server->stop();
 		server.reset();
 	}
-
 	if (WarningReporter::getInstanceWithoutCreating() != nullptr) WarningReporter::getInstance()->removeAsyncWarningReporterListener(this);
 #endif
 }
@@ -157,6 +155,7 @@ void OSCRemoteControl::updateEngineListener()
 #if ORGANICUI_USE_WEBSERVER
 	//Engine::mainEngine->removeAsyncContainerListener(this);
 	Engine::mainEngine->removeControllableContainerListener(this);
+	WarningReporter::getInstance()->removeAsyncWarningReporterListener(this);
 
 	bool shouldListen = false;
 	if (!enabled->boolValue()) return;
@@ -164,7 +163,11 @@ void OSCRemoteControl::updateEngineListener()
 	if (receiverIsConnected) shouldListen = true;
 
 	//if (shouldListen) Engine::mainEngine->addAsyncContainerListener(this);
-	if (shouldListen) Engine::mainEngine->addControllableContainerListener(this);
+	if (shouldListen)
+	{
+		Engine::mainEngine->addControllableContainerListener(this);
+		WarningReporter::getInstance()->addAsyncWarningReporterListener(this);
+	}
 #endif
 }
 
@@ -725,6 +728,7 @@ void OSCRemoteControl::sendLogFeedback(const String& type, const String& source,
 
 void OSCRemoteControl::sendPersistentWarningFeedback(WeakReference<WarningTarget> wt, String address, WarningReporter::WarningReporterEvent::Type type)
 {
+	if (server == nullptr) return;
 	if (wt == nullptr || wt.wasObjectDeleted()) return;
 	if (Engine::mainEngine != nullptr && Engine::mainEngine->isClearing) return;
 
