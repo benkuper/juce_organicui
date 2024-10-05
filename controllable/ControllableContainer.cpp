@@ -1191,20 +1191,18 @@ var ControllableContainer::getChildFromScript(const var::NativeFunctionArgs& a)
 
 	ControllableContainer* cc = nullptr;
 
-	bool recursive = a.numArguments >= 2 ? (bool)(int)a.arguments[1] : true;
-	bool searchNiceName = a.numArguments >= 3 ? (bool)(int)a.arguments[2] : false;
+	bool searchNiceName = a.numArguments >= 2 ? (bool)(int)a.arguments[1] : true;
+	bool searchLowerCase = a.numArguments >= 3 ? (bool)(int)a.arguments[2] : true;
 
 	String nameToFind = a.arguments[0].toString();
-	if (nameToFind.contains("/")) cc = m->getControllableContainerForAddress(nameToFind, recursive, false, searchNiceName);
-	else  cc = m->getControllableContainerByName(nameToFind, searchNiceName);
+	if (nameToFind.contains("/")) cc = m->getControllableContainerForAddress(nameToFind, true, false, searchNiceName, searchLowerCase);
+	else  cc = m->getControllableContainerByName(nameToFind, searchNiceName, searchLowerCase);
 	if (cc != nullptr) return cc->getScriptObject();
 
 	Controllable* c = nullptr;
 
-	bool controllableSearchNiceName = a.numArguments >= 2 ? (bool)(int)a.arguments[1] : true;
-
-	if (nameToFind.contains("/")) c = m->getControllableForAddress(nameToFind);
-	else  c = m->getControllableByName(nameToFind, searchNiceName);
+	if (nameToFind.contains("/")) c = m->getControllableForAddress(nameToFind, true);
+	else  c = m->getControllableByName(nameToFind, searchNiceName, searchLowerCase);
 	if (c != nullptr) return c->getScriptObject();
 
 	LOG("Child not found from script " + a.arguments[0].toString());
