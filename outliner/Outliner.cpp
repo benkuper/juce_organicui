@@ -492,7 +492,7 @@ void OutlinerItemComponent::paint(Graphics& g)
 
 	juce::Rectangle<int> r = getLocalBounds();
 
-	int labelWidth = label.getFont().getStringWidth(label.getText());
+	int labelWidth = TextLayout::getStringWidth(label.getFont(), label.getText());
 
 	juce::Rectangle<float> lr = r.withSize(labelWidth + 20, r.getHeight()).toFloat();
 	if (inspectable->isSelected)

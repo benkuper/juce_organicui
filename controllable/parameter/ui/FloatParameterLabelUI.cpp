@@ -79,10 +79,10 @@ void FloatParameterLabelUI::resized()
 	juce::Rectangle<int> r = getLocalBounds();
 
 	float fontHeight = customTextSize > 0 ? customTextSize : jmin<float>((float)r.getHeight(), maxFontHeight);
-	if (showLabel)
+	if (showLabel && nameLabel.getText().isNotEmpty())
 	{
 		nameLabel.setFont(valueLabel.getFont().withHeight(fontHeight));
-		nameLabel.setBounds(r.removeFromLeft(nameLabel.getFont().getStringWidth(nameLabel.getText())));
+		nameLabel.setBounds(r.removeFromLeft(TextLayout::getStringWidth(nameLabel.getFont(), nameLabel.getText())));
 		r.removeFromLeft(4);
 	}
 
@@ -209,7 +209,7 @@ void FloatParameterLabelUI::handlePaintTimerInternal()
 	valueLabel.setText(s, NotificationType::dontSendNotification);
 	if (autoSize)
 	{
-		int valueLabelWidth = valueLabel.getFont().getStringWidth(valueLabel.getText());
+		int valueLabelWidth = TextLayout::getStringWidth(valueLabel.getFont(), valueLabel.getText());
 		int tw = valueLabelWidth;
 		setSize(tw + 10, (int)valueLabel.getFont().getHeight());
 	}

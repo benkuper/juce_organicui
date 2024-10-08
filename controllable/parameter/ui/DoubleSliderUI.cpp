@@ -103,7 +103,8 @@ void DoubleSliderUI::paint(Graphics& g)
 	if (showLabel)
 	{
 		g.setFont(jlimit(12, 40, jmin(sr.getHeight(), sr.getWidth()) - 16));
-		juce::Rectangle<int> tr = sr.removeFromLeft(jmin(g.getCurrentFont().getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, sr.getWidth() - 60));
+		int textSize = (int)TextLayout::getStringWidth(g.getCurrentFont(), customLabel.isNotEmpty() ? customLabel : parameter->niceName);
+		juce::Rectangle<int> tr = sr.removeFromLeft(jmin(textSize + 10, sr.getWidth() - 60));
 		g.setColour(useCustomTextColor ? customTextColor : TEXT_COLOR);
 		g.drawFittedText(customLabel.isNotEmpty() ? customLabel : parameter->niceName, tr, Justification::centred, 1);
 		sr.removeFromLeft(2);
@@ -128,7 +129,7 @@ void DoubleSliderUI::resized()
 	if (showLabel)
 	{
 		Font font(FontOptions(jlimit(12, 40, jmin(sr.getHeight(), sr.getWidth()) - 16)));
-		sr.removeFromLeft(jmin(font.getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, sr.getWidth() - 60));
+		sr.removeFromLeft(jmin((int)TextLayout::getStringWidth(font, customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, sr.getWidth() - 60));
 		sr.removeFromLeft(2);
 	}
 

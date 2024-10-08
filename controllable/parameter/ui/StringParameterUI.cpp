@@ -78,7 +78,7 @@ void StringParameterUI::paint(Graphics& g)
 		Rectangle<int> r = getLocalBounds();
 		float fontHeight = customTextSize > 0 ? customTextSize : jlimit(12, 40, jmin(r.getHeight() - 2, r.getWidth()) - 16);
 		g.setFont(fontHeight);
-		r = r.removeFromLeft(jmin(g.getCurrentFont().getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, r.getWidth() - 60));
+		r = r.removeFromLeft(jmin((int)TextLayout::getStringWidth(g.getCurrentFont(), customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, r.getWidth() - 60));
 		g.setColour(useCustomTextColor ? customTextColor : TEXT_COLOR);
 		g.drawFittedText(customLabel.isNotEmpty() ? customLabel : parameter->niceName, r, Justification::centred, 1);
 	}
@@ -93,7 +93,7 @@ void StringParameterUI::resized()
 	if (showLabel)
 	{
 		Font font = Font(FontOptions(fontHeight));
-		r.removeFromLeft(jmin<float>(font.getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, r.getWidth() - 60));
+		r.removeFromLeft(jmin<float>((int)TextLayout::getStringWidth(font,customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, r.getWidth() - 60));
 		r.removeFromLeft(2);
 		valueLabel.setJustificationType(Justification::centred);
 	}
@@ -110,7 +110,7 @@ void StringParameterUI::valueChanged(const var& v)
 
 	if (autoSize)
 	{
-		int valueLabelWidth = valueLabel.getFont().getStringWidth(valueLabel.getText());
+		int valueLabelWidth = TextLayout::getStringWidth(valueLabel.getFont(), valueLabel.getText());
 		int tw = valueLabelWidth;
 		setSize(tw + 10, (int)valueLabel.getFont().getHeight());
 	}

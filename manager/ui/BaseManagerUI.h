@@ -82,7 +82,7 @@ public:
 	{
 	public:
 		bool useMouseWheelMoveIfNeeded(const juce::MouseEvent& e, const juce::MouseWheelDetails& d) override
-		{ 
+		{
 			if (e.mods.isShiftDown()) return false;
 			return juce::Viewport::useMouseWheelMoveIfNeeded(e, d);
 		}
@@ -520,7 +520,7 @@ void BaseManagerUI<M, T, U>::paint(juce::Graphics& g)
 		g.drawRoundedRectangle(r.toFloat(), 4, 2);
 
 		g.setFont(g.getCurrentFont().withHeight(labelHeight));
-		float textWidth = g.getCurrentFont().getStringWidth(managerUIName);
+		float textWidth = (int)TextLayout::getStringWidth(g.getCurrentFont(), managerUIName);
 		juce::Rectangle<int> tr = r.removeFromTop(labelHeight + 2).reduced((r.getWidth() - textWidth) / 2, 0).expanded(4, 0);
 		g.fillRect(tr);
 		juce::Colour textColor = contourColor.withBrightness(contourColor.getBrightness() > .5f ? .1f : .9f).withAlpha(1.f);
@@ -1127,14 +1127,14 @@ void BaseManagerUI<M, T, U>::newMessage(const InspectableSelectionManager::Selec
 	{
 		if (useViewport)
 		{
-//			if (T* item = InspectableSelectionManager::activeSelectionManager->getInspectableAs<T>())
-//			{
-//				if (U* ui = getUIForItem(item))
-//				{
-//					if (defaultLayout == HORIZONTAL) viewport.setViewPosition(ui->getX() + this->getWidth() / 2, 0);
-//					else if (defaultLayout == VERTICAL) viewport.setViewPosition(0, ui->getY() + this->getHeight() / 2);
-//				}
-//			}
+			//			if (T* item = InspectableSelectionManager::activeSelectionManager->getInspectableAs<T>())
+			//			{
+			//				if (U* ui = getUIForItem(item))
+			//				{
+			//					if (defaultLayout == HORIZONTAL) viewport.setViewPosition(ui->getX() + this->getWidth() / 2, 0);
+			//					else if (defaultLayout == VERTICAL) viewport.setViewPosition(0, ui->getY() + this->getHeight() / 2);
+			//				}
+			//			}
 		}
 	}
 }

@@ -428,7 +428,8 @@ void BaseItemUI<T>::resized()
 template<class T>
 void BaseItemUI<T>::resizedHeader(juce::Rectangle<int>& r)
 {
-	int labelWidth = juce::jmax(itemLabel.getFont().getStringWidth(this->baseItem->niceName) + 10, 30);
+	int textWidth = (int)juce::TextLayout::getStringWidth(itemLabel.getFont(), this->baseItem->niceName);
+	int labelWidth = juce::jmax(textWidth + 10, 30);
 	itemLabel.setBounds(r.removeFromLeft(labelWidth).reduced(0, 1));
 	r.removeFromLeft(2);
 

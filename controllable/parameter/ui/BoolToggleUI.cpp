@@ -68,7 +68,7 @@ void BoolToggleUI::paint(Graphics& g)
 	{
 		int fontSize = customTextSize > 0 ? customTextSize : jlimit(12, 40, jmin(r.getHeight(), r.getWidth()) - 16);
 		g.setFont(fontSize);
-		labelWidth = g.getCurrentFont().getStringWidth(parameter->niceName) + 10;
+		labelWidth = (int)TextLayout::getStringWidth(g.getCurrentFont(),parameter->niceName) + 10;
 		/*if (r.getHeight() > r.getWidth())
 		{
 			cr = r.removeFromRight(jmin<float>(r.getHeight(), r.getWidth() - labelWidth));

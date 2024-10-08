@@ -70,7 +70,7 @@ void ShapeShifterPanelTab::resized()
 
 int ShapeShifterPanelTab::getLabelWidth()
 {
-	return panelLabel.getFont().getStringWidth(panelLabel.getText()) + 30;
+	return TextLayout::getStringWidth(panelLabel.getFont(), panelLabel.getText()) + 30;
 }
 
 void ShapeShifterPanelTab::buttonClicked(Button* b)

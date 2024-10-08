@@ -94,7 +94,7 @@ Font LookAndFeelOO::getTextButtonFont(TextButton&, int buttonHeight)
 
 int LookAndFeelOO::getTextButtonWidthToFitText(TextButton& b, int buttonHeight)
 {
-	return getTextButtonFont(b, buttonHeight).getStringWidth(b.getButtonText()) + buttonHeight;
+	return TextLayout::getStringWidth(getTextButtonFont(b, buttonHeight), b.getButtonText()) + buttonHeight;
 }
 
 void LookAndFeelOO::drawButtonText(Graphics& g, TextButton& button, bool /*isMouseOverButton*/, bool /*isButtonDown*/)
@@ -189,7 +189,7 @@ void LookAndFeelOO::changeToggleButtonWidthToFitText(ToggleButton& button)
 
 	const int tickWidth = jmin(24, button.getHeight());
 
-	button.setSize(font.getStringWidth(button.getButtonText()) + tickWidth + 8,
+	button.setSize((int)TextLayout::getStringWidth(font, button.getButtonText()) + tickWidth + 8,
 		button.getHeight());
 }
 
@@ -747,7 +747,7 @@ void LookAndFeelOO::getIdealPopupMenuItemSize(const String& text, const bool isS
 			font.setHeight(standardMenuItemHeight / 1.3f);
 
 		idealHeight = standardMenuItemHeight > 0 ? standardMenuItemHeight : roundToInt(font.getHeight() * 1.3f);
-		idealWidth = font.getStringWidth(text) + idealHeight * 2;
+		idealWidth = (int)TextLayout::getStringWidth(font, text) + idealHeight * 2;
 	}
 }
 
@@ -926,8 +926,7 @@ Font LookAndFeelOO::getMenuBarFont(MenuBarComponent& menuBar, int /*itemIndex*/,
 
 int LookAndFeelOO::getMenuBarItemWidth(MenuBarComponent& menuBar, int itemIndex, const String& itemText)
 {
-	return getMenuBarFont(menuBar, itemIndex, itemText)
-		.getStringWidth(itemText) + menuBar.getHeight();
+	return TextLayout::getStringWidth(getMenuBarFont(menuBar, itemIndex, itemText), itemText) + menuBar.getHeight();
 }
 
 void LookAndFeelOO::drawMenuBarItem(Graphics& g, int width, int height,
@@ -1627,7 +1626,7 @@ void LookAndFeelOO::drawDocumentWindowTitleBar(DocumentWindow& window, Graphics&
 	Font font(FontOptions(h * 0.65f, Font::bold));
 	g.setFont(font);
 
-	int textW = font.getStringWidth(window.getName());
+	int textW = (int)TextLayout::getStringWidth(font, window.getName());
 	int iconW = 0;
 	int iconH = 0;
 
@@ -1849,7 +1848,7 @@ void LookAndFeelOO::drawGroupComponentOutline(Graphics& g, int width, int height
 	cs = jmin(cs, w * 0.5f, h * 0.5f);
 	const float cs2 = 2.0f * cs;
 
-	float textW = text.isEmpty() ? 0 : jlimit(0.0f, jmax(0.0f, w - cs2 - textEdgeGap * 2), f.getStringWidth(text) + textEdgeGap * 2.0f);
+	float textW = text.isEmpty() ? 0 : jlimit(0.0f, jmax(0.0f, w - cs2 - textEdgeGap * 2), TextLayout::getStringWidth(f, text) + textEdgeGap * 2.0f);
 	float textX = cs + textEdgeGap;
 
 	if (position.testFlags(Justification::horizontallyCentred))
@@ -1902,7 +1901,7 @@ int LookAndFeelOO::getTabButtonSpaceAroundImage()
 
 int LookAndFeelOO::getTabButtonBestWidth(TabBarButton& button, int tabDepth)
 {
-	int width = Font(FontOptions(tabDepth * 0.6f)).getStringWidth(button.getButtonText().trim())
+	int width = TextLayout::getStringWidth(Font(FontOptions(tabDepth * 0.6f)), button.getButtonText().trim())
 		+ getTabButtonOverlap(tabDepth) * 2;
 
 	if (Component* const extraComponent = button.getExtraComponent())

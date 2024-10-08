@@ -688,7 +688,7 @@ void GenericControllableContainerEditor::resizedInternalHeader(juce::Rectangle<i
 		r.removeFromLeft(2);
 	}
 
-	if (containerLabel.isVisible()) containerLabel.setBounds(r.removeFromLeft(containerLabel.getFont().getStringWidth(containerLabel.getText()) + 20).withHeight(forcedHeaderHeight));
+	if (containerLabel.isVisible()) containerLabel.setBounds(r.removeFromLeft(TextLayout::getStringWidth(containerLabel.getFont(), containerLabel.getText()) + 20).withHeight(forcedHeaderHeight));
 }
 
 void GenericControllableContainerEditor::resizedInternalContent(juce::Rectangle<int>& r)

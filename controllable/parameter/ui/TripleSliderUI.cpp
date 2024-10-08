@@ -109,7 +109,7 @@ void TripleSliderUI::paint(Graphics& g)
 	{
 		Rectangle<int> r = getLocalBounds();
 		g.setFont(FontOptions(jlimit(12, 40, jmin(r.getHeight(), r.getWidth()) - 16)));
-		r = r.removeFromLeft(jmin(g.getCurrentFont().getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, r.getWidth() - 60));
+		r = r.removeFromLeft(jmin((int)TextLayout::getStringWidth(g.getCurrentFont(), customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, r.getWidth() - 60));
 		g.setColour(useCustomTextColor ? customTextColor : TEXT_COLOR);
 		g.drawFittedText(customLabel.isNotEmpty() ? customLabel : parameter->niceName, r, Justification::centred, 1);
 	}
@@ -122,7 +122,7 @@ void TripleSliderUI::resized()
 	if (showLabel)
 	{
 		Font font(FontOptions(jlimit(12, 40, jmin(r.getHeight(), r.getWidth()) - 16)));
-		r.removeFromLeft(jmin(font.getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, r.getWidth() - 60));
+		r.removeFromLeft(jmin((int)TextLayout::getStringWidth(font, customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, r.getWidth() - 60));
 		r.removeFromLeft(2);
 	}
 
