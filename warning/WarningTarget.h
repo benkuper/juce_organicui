@@ -29,6 +29,8 @@ public:
 	void setWarningMessage(const juce::String& message = juce::String(), const juce::String& id = warningNoId, bool log = true);
 	void clearWarning(const juce::String& id = warningNoId);
 
+	void unregisterWarningNow();
+
 	void notifyWarningChanged();
 
 	virtual void resolveWarning();

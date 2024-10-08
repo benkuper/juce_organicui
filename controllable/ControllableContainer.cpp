@@ -1191,16 +1191,18 @@ var ControllableContainer::getChildFromScript(const var::NativeFunctionArgs& a)
 
 	ControllableContainer* cc = nullptr;
 
+	bool searchNiceName = a.numArguments >= 2 ? (bool)(int)a.arguments[1] : true;
+	bool searchLowerCase = a.numArguments >= 3 ? (bool)(int)a.arguments[2] : true;
+
 	String nameToFind = a.arguments[0].toString();
-	if (nameToFind.contains("/")) cc = m->getControllableContainerForAddress(nameToFind, true);
-	else  cc = m->getControllableContainerByName(nameToFind, a.numArguments >= 2 ? (bool)(int)a.arguments[1] : true);
+	if (nameToFind.contains("/")) cc = m->getControllableContainerForAddress(nameToFind, true, false, searchNiceName, searchLowerCase);
+	else  cc = m->getControllableContainerByName(nameToFind, searchNiceName, searchLowerCase);
 	if (cc != nullptr) return cc->getScriptObject();
 
 	Controllable* c = nullptr;
 
-
 	if (nameToFind.contains("/")) c = m->getControllableForAddress(nameToFind, true);
-	else  c = m->getControllableByName(nameToFind);
+	else  c = m->getControllableByName(nameToFind, searchNiceName, searchLowerCase);
 	if (c != nullptr) return c->getScriptObject();
 
 	LOG("Child not found from script " + a.arguments[0].toString());
@@ -1521,6 +1523,13 @@ var ControllableContainer::getScriptControlAddressFromScript(const var::NativeFu
 var ControllableContainer::getContainersFromScript(const var::NativeFunctionArgs& args)
 {
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(args);
+
+	if (cc->isBeingDestroyed)
+	{
+		LOGWARNING("Get containers from script, container is being destroyed or badly referenced");
+		return var();
+	}
+
 	var result;
 	for (auto& c : cc->controllableContainers)
 	{
@@ -1533,6 +1542,13 @@ var ControllableContainer::getContainersFromScript(const var::NativeFunctionArgs
 var ControllableContainer::getControllablesFromScript(const var::NativeFunctionArgs& args)
 {
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(args);
+
+	if (cc->isBeingDestroyed)
+	{
+		LOGWARNING("Get containers from script, container is being destroyed or badly referenced");
+		return var();
+	}
+
 	var result;
 
 	bool includeParameters = args.numArguments > 0 ? (int)args.arguments[0] > 0 : true;

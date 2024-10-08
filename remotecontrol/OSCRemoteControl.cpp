@@ -11,9 +11,8 @@
 #include "JuceHeader.h"
 juce_ImplementSingleton(OSCRemoteControl)
 
-#if ORGANIC_USE_WEBSERVER
+#if ORGANICUI_USE_WEBSERVER
 #include "OSCPacketHelper.h"
-#include "OSCRemoteControl.h"
 #endif
 
 #ifndef ORGANIC_REMOTE_CONTROL_PORT
@@ -57,6 +56,8 @@ OSCRemoteControl::OSCRemoteControl() :
 	manualSendCC.enabled->setDefaultValue(false);
 	addChildControllableContainer(&manualSendCC);
 
+#if ORGANICUI_USE_WEBSERVER
+#endif
 }
 
 OSCRemoteControl::~OSCRemoteControl()
@@ -71,10 +72,10 @@ OSCRemoteControl::~OSCRemoteControl()
 		server->stop();
 		server.reset();
 	}
-
+	if (WarningReporter::getInstanceWithoutCreating() != nullptr) WarningReporter::getInstance()->removeAsyncWarningReporterListener(this);
 #endif
-
 }
+
 
 void OSCRemoteControl::setupReceiver()
 {
@@ -154,6 +155,7 @@ void OSCRemoteControl::updateEngineListener()
 #if ORGANICUI_USE_WEBSERVER
 	//Engine::mainEngine->removeAsyncContainerListener(this);
 	Engine::mainEngine->removeControllableContainerListener(this);
+	WarningReporter::getInstance()->removeAsyncWarningReporterListener(this);
 
 	bool shouldListen = false;
 	if (!enabled->boolValue()) return;
@@ -161,7 +163,11 @@ void OSCRemoteControl::updateEngineListener()
 	if (receiverIsConnected) shouldListen = true;
 
 	//if (shouldListen) Engine::mainEngine->addAsyncContainerListener(this);
-	if (shouldListen) Engine::mainEngine->addControllableContainerListener(this);
+	if (shouldListen)
+	{
+		Engine::mainEngine->addControllableContainerListener(this);
+		WarningReporter::getInstance()->addAsyncWarningReporterListener(this);
+	}
 #endif
 }
 
@@ -334,7 +340,7 @@ void OSCRemoteControl::processMessage(const OSCMessage& m, const String& sourceI
 			bool handled = false;
 			if (ControllableContainer* cc = OSCHelpers::findParentContainer(Engine::mainEngine, m.getAddressPattern().toString()))
 			{
-				handled = cc->handleRemoteControlData(c, m, sourceId);
+				handled = cc->handleRemoteControlData(m, sourceId);
 			}
 
 			if (!handled) remoteControlListeners.call(&RemoteControlListener::processMessage, m, sourceId);
@@ -473,6 +479,12 @@ void OSCRemoteControl::connectionOpened(const String& id)
 {
 	NLOG(niceName, "Got a connection from " << id);
 	feedbackMap.set(id, Array<Controllable*>()); //Reset feedbacks
+
+	for (auto& wt : WarningReporter::getInstance()->targets)
+	{
+		if (wt == nullptr || wt.wasObjectDeleted()) continue;
+		sendPersistentWarningFeedback(wt);
+	}
 }
 
 void OSCRemoteControl::messageReceived(const String& id, const String& message)
@@ -696,7 +708,9 @@ void OSCRemoteControl::sendPathNameChangedFeedback(const String& oldPath, const 
 
 void OSCRemoteControl::newMessage(const CustomLogger::LogEvent& e)
 {
-	if (!enableSendLogFeedback->boolValue()) return;
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->isClearing) return;
+	if (e.log == nullptr) return;
+	if (enableSendLogFeedback != nullptr && !enableSendLogFeedback->boolValue()) return;
 	sendLogFeedback(e.log->getSeverityName(), e.log->source, e.log->getContent());
 }
 
@@ -708,6 +722,39 @@ void OSCRemoteControl::sendLogFeedback(const String& type, const String& source,
 	data.getDynamicObject()->setProperty("type", type);
 	data.getDynamicObject()->setProperty("source", source);
 	data.getDynamicObject()->setProperty("message", message);
+	msg.getDynamicObject()->setProperty("DATA", data);
+	server->send(JSON::toString(msg));
+}
+
+void OSCRemoteControl::sendPersistentWarningFeedback(WeakReference<WarningTarget> wt, String address, WarningReporter::WarningReporterEvent::Type type)
+{
+	if (server == nullptr) return;
+	if (wt == nullptr || wt.wasObjectDeleted()) return;
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->isClearing) return;
+
+	String path = address;
+	String name;
+	if (Controllable* c = dynamic_cast<Controllable*>(wt.get()))
+	{
+		name = c->niceName;
+		if (path.isEmpty()) path = c->getControlAddress();
+	}
+	else if (ControllableContainer* cc = dynamic_cast<ControllableContainer*>(wt.get()))
+	{
+		name = cc->niceName;
+		if (path.isEmpty()) path = cc->getControlAddress();
+	}
+
+	if (path.isEmpty()) return;
+
+	String wMessage = type == WarningReporter::WarningReporterEvent::Type::WARNING_REGISTERED ? wt->getWarningMessage() : "";
+
+	var msg(new DynamicObject());
+	msg.getDynamicObject()->setProperty("COMMAND", "WARNING");
+	var data(new DynamicObject());
+	data.getDynamicObject()->setProperty("source", path);
+	if (name.isNotEmpty()) data.getDynamicObject()->setProperty("name", name);
+	data.getDynamicObject()->setProperty("message", wMessage);
 	msg.getDynamicObject()->setProperty("DATA", data);
 	server->send(JSON::toString(msg));
 }
@@ -801,6 +848,13 @@ void OSCRemoteControl::sendOSCQueryFeedbackTo(const juce::OSCMessage& m, juce::S
 	if (logOutgoing->boolValue()) NLOG(niceName, "Sent to OSCQuery : " << OSCHelpers::messageToString(m));
 
 }
+
+
+void OSCRemoteControl::newMessage(const WarningReporter::WarningReporterEvent& e)
+{
+	sendPersistentWarningFeedback(e.target, e.targetAddress, e.type);
+}
+
 
 #endif
 

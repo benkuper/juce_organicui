@@ -56,18 +56,36 @@ void OrganicMainContentComponent::init()
 	ShapeShifterFactory::getInstance()->defs.add(new ShapeShifterDefinition("Inspector", &InspectorUI::create));
 
 	std::function<ShapeShifterContent* (const String&)> outlinerFunc = std::bind(&OrganicMainContentComponent::createOutliner, this, std::placeholders::_1);
-	ShapeShifterFactory::getInstance()->defs.add(new ShapeShifterDefinition("Outliner", outlinerFunc));
-	ShapeShifterFactory::getInstance()->defs.add(new ShapeShifterDefinition(DashboardManagerView::getPanelName(), &DashboardManagerView::create));
-	ShapeShifterFactory::getInstance()->defs.add(new ShapeShifterDefinition("Logger", &CustomLoggerUI::create));
-	ShapeShifterFactory::getInstance()->defs.add(new ShapeShifterDefinition("Parrots", &ParrotManagerUI::create));
-	ShapeShifterFactory::getInstance()->defs.add(new ShapeShifterDefinition("The Detective", &DetectivePanel::create));
-	ShapeShifterFactory::getInstance()->defs.add(new ShapeShifterDefinition("Warnings", &WarningReporterPanel::create, "Logger"));
-	ShapeShifterFactory::getInstance()->defs.add(new ShapeShifterDefinition("Help", &HelpPanel::create, "Logger"));
 
+#if ORGANICUI_USE_OUTLINERPANEL
+	ShapeShifterFactory::getInstance()->defs.add(new ShapeShifterDefinition("Outliner", outlinerFunc));
+#endif
+
+#if ORGANICUI_USE_DASHBOARDPANEL
+	ShapeShifterFactory::getInstance()->defs.add(new ShapeShifterDefinition("Dashboard", &DashboardManagerView::create));
+#endif
+
+#if ORGANICUI_USE_PARROTPANEL
+	ShapeShifterFactory::getInstance()->defs.add(new ShapeShifterDefinition("Parrots", &ParrotManagerUI::create));
+#endif
+
+#if ORGANICUI_USE_DETECTIVEPANEL
+	ShapeShifterFactory::getInstance()->defs.add(new ShapeShifterDefinition("The Detective", &DetectivePanel::create));
+#endif
+
+#if ORGANICUI_USE_HELPPANEL
+	ShapeShifterFactory::getInstance()->defs.add(new ShapeShifterDefinition("Help", &HelpPanel::create));
+#endif
+
+#if ORGANICUI_USE_WARNINGPANEL
+	ShapeShifterFactory::getInstance()->defs.add(new ShapeShifterDefinition("Warnings", &WarningReporterPanel::create));
+#endif
+
+#if ORGANICUI_USE_LOGGERPANEL
+	ShapeShifterFactory::getInstance()->defs.add(new ShapeShifterDefinition("Logger", &CustomLoggerUI::create));
+#endif
 
 	addAndMakeVisible(&ShapeShifterManager::getInstance()->mainContainer);
-
-
 }
 
 void OrganicMainContentComponent::afterInit()

@@ -76,7 +76,7 @@ Script::~Script()
 		Engine::mainEngine->removeControllableContainerListener(this);
 	}
 
-	stopThread(1000);
+	stopThread(5000);
 
 	scriptParamsContainer->clear();
 }
@@ -283,7 +283,7 @@ var Script::callFunction(const Identifier& function, const Array<var> args, Resu
 	Result tmpResult = Result::ok();
 	if (result == nullptr) result = &tmpResult;
 
-	const ScopedLock sl(engineLock);
+	//const ScopedLock sl(engineLock); //TODO : This is causing deadlock when multiple scripts are triggering controllableFeedbackUpdate. Need to find a better way to handle feedback update, maybe with the new ThreadSafe and Lightweight listeners
 
 	var returnData = scriptEngine->callFunction(function, var::NativeFunctionArgs(getScriptObject(), (const var*)args.begin(), args.size()), result);
 

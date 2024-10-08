@@ -21,6 +21,7 @@ TargetParameter::TargetParameter(const String& niceName, const String& descripti
 	maxDefaultSearchLevel(-1),
 	defaultParentLabelLevel(3),
 	isTryingFixingLink(false),
+	manuallySettingNull(false),
 	rootContainer(nullptr),
 	target(nullptr),
 	targetContainer(nullptr),
@@ -56,6 +57,7 @@ TargetParameter::~TargetParameter()
 
 void TargetParameter::resetValue(bool silentSet)
 {
+	manuallySettingNull = true;
 	if (targetType == CONTAINER) setTarget((ControllableContainer*)nullptr);
 	else setTarget((Controllable*)nullptr);
 	setGhostValue("");
@@ -63,6 +65,8 @@ void TargetParameter::resetValue(bool silentSet)
 
 	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::VALUE_CHANGED, this, getValue()));
 	clearWarning();
+
+	manuallySettingNull = false;
 }
 
 void TargetParameter::setGhostValue(const String& ghostVal)
@@ -109,9 +113,15 @@ void TargetParameter::setValueFromTarget(Controllable* c, bool addToUndo)
 
 		newValue = c->getControlAddress(rootContainer);
 	}
+	else
+	{
+		manuallySettingNull = true;
+	}
 
 	if (addToUndo) setUndoableValue(stringValue(), newValue);
 	else setValue(newValue, false, true);
+
+	manuallySettingNull = false;
 }
 
 void TargetParameter::setValueFromTarget(ControllableContainer* cc, bool addToUndo)
@@ -131,8 +141,15 @@ void TargetParameter::setValueFromTarget(ControllableContainer* cc, bool addToUn
 		}
 	}
 
+	if (cc == nullptr)
+	{
+		manuallySettingNull = true;
+	}
+
 	if (addToUndo) setUndoableValue(stringValue(), cc->getControlAddress(rootContainer));
 	else setValue(cc->getControlAddress(rootContainer), false, true);
+
+	manuallySettingNull = false;
 }
 
 void TargetParameter::setValueInternal(var& newVal)
@@ -227,7 +244,7 @@ void TargetParameter::setTarget(WeakReference<Controllable> c)
 			{
 				if (!Engine::mainEngine->isClearing && rootContainer != nullptr && !rootContainer.wasObjectDeleted())
 				{
-					setWarningMessage("Link is broken : " + ghostValue);
+					if(!isBeingDestroyed && !manuallySettingNull) setWarningMessage("Link is broken : " + ghostValue);
 					rootContainer->addControllableContainerListener(this);
 				}
 			}
@@ -275,7 +292,7 @@ void TargetParameter::setTarget(WeakReference<ControllableContainer> cc)
 			}
 			else
 			{
-				if (!isBeingDestroyed) setWarningMessage("Link is broken : " + ghostValue);
+				if (!isBeingDestroyed && !manuallySettingNull) setWarningMessage("Link is broken : " + ghostValue);
 				if (!Engine::mainEngine->isClearing && rootContainer != nullptr && !rootContainer.wasObjectDeleted())
 				{
 					rootContainer->addControllableContainerListener(this);
