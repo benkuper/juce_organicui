@@ -1530,7 +1530,7 @@ var ControllableContainer::getContainersFromScript(const var::NativeFunctionArgs
 		return var();
 	}
 
-	var result;
+	var result = var(Array<var>());
 	for (auto& c : cc->controllableContainers)
 	{
 		if (c == nullptr || c.wasObjectDeleted()) continue;
@@ -1549,7 +1549,7 @@ var ControllableContainer::getControllablesFromScript(const var::NativeFunctionA
 		return var();
 	}
 
-	var result;
+	var result = var(Array<var>());
 
 	bool includeParameters = args.numArguments > 0 ? (int)args.arguments[0] > 0 : true;
 	bool includeTriggers = args.numArguments > 1 ? (int)args.arguments[1] > 0 : true;
