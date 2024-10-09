@@ -520,7 +520,7 @@ void BaseManagerUI<M, T, U>::paint(juce::Graphics& g)
 		g.drawRoundedRectangle(r.toFloat(), 4, 2);
 
 		g.setFont(g.getCurrentFont().withHeight(labelHeight));
-		float textWidth = (int)TextLayout::getStringWidth(g.getCurrentFont(), managerUIName);
+		float textWidth = (int)juce::TextLayout::getStringWidth(g.getCurrentFont(), managerUIName);
 		juce::Rectangle<int> tr = r.removeFromTop(labelHeight + 2).reduced((r.getWidth() - textWidth) / 2, 0).expanded(4, 0);
 		g.fillRect(tr);
 		juce::Colour textColor = contourColor.withBrightness(contourColor.getBrightness() > .5f ? .1f : .9f).withAlpha(1.f);
