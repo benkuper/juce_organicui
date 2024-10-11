@@ -128,7 +128,7 @@ public:
 		virtual void inspectableDestroyed(Inspectable *) {};
 	};
 
-	DECLARE_INSPECTACLE_CRITICAL_LISTENER(Inspectable, inspectable);
+	DECLARE_INSPECTACLE_SAFE_LISTENER(Inspectable, inspectable);
 	DECLARE_ASYNC_EVENT(Inspectable, Inspectable, inspectable, ENUM_LIST(SELECTION_CHANGED, PRESELECTION_CHANGED, HIGHLIGHT_CHANGED), EVENT_INSPECTABLE_CHECK)
 	
 	juce::WeakReference<Inspectable>::Master masterReference;
