@@ -26,7 +26,7 @@ public:
 
     /** Searches a string and returns a StringArray with all matches. 
     *    You can specify and index of a capture group (if not, the entire match will be used). */
-    static juce::StringArray search(const juce::String& wildcard, const juce::String &stringToTest, int indexInMatch=0)
+    static juce::StringArray search(const juce::String& wildcard, const juce::String &stringToTest, int indexInMatch = 0)
     {
         try
         {
@@ -58,6 +58,38 @@ public:
         {
             DBG(e.what());
             return juce::StringArray();
+        }
+    }
+
+    static juce::Array<juce::StringArray> getAllMatches(const juce::String& wildcard, const juce::String& stringToTest)
+    {
+        try
+        {
+            juce::Array<juce::StringArray> searchResults;
+
+            std::regex includeRegex(wildcard.toStdString());
+            std::string xAsStd = stringToTest.toStdString();
+            std::sregex_iterator it(xAsStd.begin(), xAsStd.end(), includeRegex);
+            std::sregex_iterator it_end;
+
+            while (it != it_end)
+            {
+                std::smatch result = *it;
+
+                juce::StringArray matches;
+                for (auto x : result) matches.add(juce::String(x));
+
+                searchResults.add(matches);
+
+                ++it;
+            }
+
+            return searchResults;
+        }
+        catch (std::regex_error e)
+        {
+            DBG(e.what());
+            return juce::Array<juce::StringArray>();
         }
     }
 
