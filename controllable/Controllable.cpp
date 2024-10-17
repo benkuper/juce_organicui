@@ -106,12 +106,17 @@ UndoableAction* Controllable::setUndoableNiceName(const String& newNiceName, boo
 void Controllable::setNiceName(const String& _niceName) {
 	if (niceName == _niceName) return;
 
+	scriptObject.getDynamicObject()->setProperty("niceName", niceName);
+
 	String oldControlAddress = getControlAddress();
-	this->niceName = _niceName;
+
+	String prevShortName = shortName;
+
+	niceName = _niceName;
 	if (!hasCustomShortName) setAutoShortName();
 	else
 	{
-		controllableListeners.call(&ControllableListener::controllableNameChanged, this);
+		controllableListeners.call(&ControllableListener::controllableNameChanged, this, prevShortName);
 		controllableNotifier.addMessage(new ControllableEvent(ControllableEvent::NAME_CHANGED, this));
 	}
 
@@ -122,22 +127,28 @@ void Controllable::setNiceName(const String& _niceName) {
 
 void Controllable::setCustomShortName(const String& _shortName)
 {
-	this->shortName = _shortName;
+	String prevShortName = shortName;
+	shortName = _shortName;
 	hasCustomShortName = true;
 	scriptTargetName = shortName;
+	scriptObject.getDynamicObject()->setProperty("name", shortName);
+
 	updateControlAddress();
-	controllableListeners.call(&ControllableListener::controllableNameChanged, this);
+	controllableListeners.call(&ControllableListener::controllableNameChanged, this, prevShortName);
 	controllableNotifier.addMessage(new ControllableEvent(ControllableEvent::NAME_CHANGED, this));
 
 }
 
 void Controllable::setAutoShortName() {
+	
+	String prevShortName = shortName;
 	hasCustomShortName = false;
 	shortName = StringUtil::toShortName(niceName, replaceSlashesInShortName);
 	if (shortName.isEmpty()) shortName = "***";
 	scriptTargetName = shortName;
+	scriptObject.getDynamicObject()->setProperty("name", shortName);
 	updateControlAddress();
-	controllableListeners.call(&ControllableListener::controllableNameChanged, this);
+	controllableListeners.call(&ControllableListener::controllableNameChanged, this, prevShortName);
 	controllableNotifier.addMessage(new ControllableEvent(ControllableEvent::NAME_CHANGED, this));
 }
 
@@ -175,7 +186,7 @@ void Controllable::setParentContainer(ControllableContainer* container)
 void Controllable::updateControlAddress()
 {
 	this->controlAddress = getControlAddress();
-	this->scriptObjectIsDirty = true;
+	//this->scriptObjectIsDirty = true;
 
 	if (Engine::mainEngine != nullptr && !Engine::mainEngine->isClearing)
 	{
@@ -189,11 +200,11 @@ void Controllable::remove(bool addToUndo)
 	controllableListeners.call(&ControllableListener::askForRemoveControllable, this, addToUndo);
 }
 
-void Controllable::updateScriptObjectInternal(var parent)
-{
-	scriptObject.getDynamicObject()->setProperty("name", shortName);
-	scriptObject.getDynamicObject()->setProperty("niceName", niceName);
-}
+//void Controllable::updateScriptObjectInternal()
+//{
+	//scriptObject.getDynamicObject()->setProperty("name", shortName);
+	//scriptObject.getDynamicObject()->setProperty("niceName", niceName);
+//}
 
 bool Controllable::shouldBeSaved()
 {

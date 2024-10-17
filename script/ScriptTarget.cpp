@@ -8,7 +8,7 @@ ScriptTarget::ScriptTarget(const String& name, void* ptr, const String& targetTy
 	scriptObject.getDynamicObject()->setProperty(scriptPtrIdentifier, thisPtr);
 	scriptObject.getDynamicObject()->setProperty(scriptTargetTypeIdentifier, targetType);
 	scriptObject.getDynamicObject()->setMethod(ptrCompareIdentifier, ScriptTarget::checkTargetsAreTheSameFromScript);
-	scriptObjectIsDirty = true;
+	//scriptObjectIsDirty = true;
 }
 
 ScriptTarget::~ScriptTarget()
@@ -17,20 +17,20 @@ ScriptTarget::~ScriptTarget()
 
 var ScriptTarget::getScriptObject()
 {
-	if (scriptObjectIsDirty) updateScriptObject();
+	//if (scriptObjectIsDirty) updateScriptObject();
 	return scriptObject;
 }
 
-void ScriptTarget::updateScriptObject(var parent)
-{
-	scriptObjectLock.enter();
+//void ScriptTarget::updateScriptObject()
+//{
+	//scriptObjectLock.enter();
 	//liveScriptObject = scriptObject.clone(); //is there a bettery way to deal with updating without recreating an object each time ?
-	updateScriptObjectInternal(parent);
-	scriptObjectLock.exit();
+	//updateScriptObjectInternal();
+	//scriptObjectLock.exit();
 
-	scriptObjectIsDirty = false;
-	scriptTargetListeners.call(&ScriptTargetListener::scriptObjectUpdated, this);
-}
+	//scriptObjectIsDirty = false;
+	//scriptTargetListeners.call(&ScriptTargetListener::scriptObjectUpdated, this);
+//}
 
 var ScriptTarget::checkTargetsAreTheSameFromScript(const var::NativeFunctionArgs& args)
 {

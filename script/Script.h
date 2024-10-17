@@ -48,6 +48,7 @@ public:
 	std::unique_ptr<juce::JavascriptEngine> scriptEngine;
 	juce::CriticalSection engineLock;
 	float executionTimeout;
+	bool autoRefreshEnvironment;
 
 
 	void setParamsContainer(ControllableContainer* cc);

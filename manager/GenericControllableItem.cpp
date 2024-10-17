@@ -70,9 +70,9 @@ void GenericControllableItem::onContainerNiceNameChanged()
 	controllable->setNiceName(niceName);
 }
 
-void GenericControllableItem::controllableNameChanged(Controllable* c)
+void GenericControllableItem::controllableNameChanged(Controllable* c, const String& prevName)
 {
-	BaseItem::controllableNameChanged(c);
+	BaseItem::controllableNameChanged(c, prevName);
 
 	if (controllable == nullptr) return;
 	if (c == controllable) setNiceName(controllable->niceName);

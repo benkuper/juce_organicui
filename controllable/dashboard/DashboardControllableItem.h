@@ -35,7 +35,7 @@ public:
 	virtual void controllableStateChanged(Controllable*) override;
 	virtual void controllableFeedbackStateChanged(Controllable*) override;
 	virtual void controllableControlAddressChanged(Controllable* c) override;
-	virtual void controllableNameChanged(Controllable*) override;
+	virtual void controllableNameChanged(Controllable*, const juce::String&) override;
 	virtual void askForRemoveControllable(Controllable*, bool /*addToUndo*/ = false) override;
 
 	virtual juce::var getServerData() override;

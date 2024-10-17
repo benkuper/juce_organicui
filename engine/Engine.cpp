@@ -146,7 +146,7 @@ void Engine::childStructureChanged(ControllableContainer* cc)
 	ControllableContainer::childStructureChanged(cc);
 
 	if (isLoadingFile || isClearing) return;
-	scriptObjectIsDirty = true;
+	//scriptObjectIsDirty = true;
 }
 
 PopupMenu Engine::getDashboardCreateMenu(int idOffset)

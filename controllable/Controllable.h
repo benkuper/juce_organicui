@@ -86,7 +86,7 @@ public:
 
 	void remove(bool addToUndo = false); // called from external to make this object ask for remove
 
-	virtual void updateScriptObjectInternal(juce::var parent = juce::var()) override;
+	//virtual void updateScriptObjectInternal() override;
 
 	virtual bool shouldBeSaved();
 
@@ -146,7 +146,7 @@ public:
 		virtual void controllableStateChanged(Controllable*) {}
 		virtual void controllableFeedbackStateChanged(Controllable*) {}
 		virtual void controllableControlAddressChanged(Controllable*) {}
-		virtual void controllableNameChanged(Controllable*) {}
+		virtual void controllableNameChanged(Controllable*, const juce::String&) {}
 		virtual void controllableAttributeChanged(Controllable*, const juce::String&) {}
 		virtual void askForRemoveControllable(Controllable*, bool /*addToUndo*/ = false) {}
 	};

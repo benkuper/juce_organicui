@@ -160,7 +160,7 @@ public:
 
 	juce::String getScriptTargetString() override;
 
-	DECLARE_INSPECTACLE_LIGHT_LISTENER(Parameter, parameter);
+	DECLARE_INSPECTACLE_SAFE_LISTENER(Parameter, parameter);
 
 	// ASYNC
 	class  ParameterEvent

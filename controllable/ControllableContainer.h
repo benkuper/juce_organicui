@@ -141,7 +141,7 @@ public:
 
 	void controllableFeedbackUpdate(ControllableContainer* cc, Controllable* c) override;
 
-	virtual void controllableNameChanged(Controllable* c) override;
+	virtual void controllableNameChanged(Controllable* c, const juce::String &prevName) override;
 	virtual void askForRemoveControllable(Controllable* c, bool addToUndo = false) override;
 
 	void warningChanged(WarningTarget*);
@@ -159,7 +159,7 @@ public:
 	virtual bool handleRemoteControlData(const juce::OSCMessage&, const juce::String & = juce::String()) { return false; }
 	virtual bool handleRemoteControlData(Controllable*, const juce::OSCMessage& , const juce::String&  = juce::String()) { return false; }
 
-	virtual void controllableContainerNameChanged(ControllableContainer*) override;
+	virtual void controllableContainerNameChanged(ControllableContainer*, const juce::String& prevName) override;
 	virtual void childStructureChanged(ControllableContainer*)override;
 	virtual void childAddressChanged(ControllableContainer*) override;
 
@@ -167,7 +167,7 @@ public:
 	juce::String getUniqueNameInContainer(const juce::String& sourceName, bool searchNiceName = true, int suffix = 0);
 
 	//SCRIPT
-	virtual void updateScriptObjectInternal(juce::var parent = juce::var()) override;
+	//virtual void updateScriptObjectInternal() override;
 	static juce::var getChildFromScript(const juce::var::NativeFunctionArgs& a);
 	static juce::var getParentFromScript(const juce::var::NativeFunctionArgs& a);
 	static juce::var setNameFromScript(const juce::var::NativeFunctionArgs& a);
@@ -210,7 +210,7 @@ public:
 
 protected:
 	virtual void onContainerNiceNameChanged() {};
-	virtual void onContainerShortNameChanged() {};
+	virtual void onContainerShortNameChanged(const juce::String&) {};
 	virtual void onContainerParameterChanged(Parameter*) {};
 	virtual void onControllableStateChanged(Controllable*) {};
 	virtual void onExternalParameterValueChanged(Parameter*) {}; //When listening to other child controllable than this container's children
@@ -224,7 +224,7 @@ protected:
 	virtual void onWarningChanged(WarningTarget*) {}
 
 public:
-	DECLARE_INSPECTACLE_LIGHT_LISTENER(ControllableContainer, controllableContainer);
+	DECLARE_INSPECTACLE_SAFE_LISTENER(ControllableContainer, controllableContainer);
 
 	QueuedNotifier<ContainerAsyncEvent> queuedNotifier;
 

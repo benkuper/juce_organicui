@@ -150,9 +150,9 @@ void DashboardControllableItem::controllableControlAddressChanged(Controllable* 
 	}
 }
 
-void DashboardControllableItem::controllableNameChanged(Controllable* c)
+void DashboardControllableItem::controllableNameChanged(Controllable* c, const String& prevName)
 {
-	if (c != controllable) ControllableContainer::controllableNameChanged(c);
+	if (c != controllable) ControllableContainer::controllableNameChanged(c, prevName);
 }
 
 void DashboardControllableItem::askForRemoveControllable(Controllable* c, bool addToUndo)

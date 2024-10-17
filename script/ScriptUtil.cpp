@@ -670,15 +670,21 @@ String ScriptUtil::getLogStringForVar(const var& v)
 			String st = v.getProperty("_type", "").toString();
 			if (st.isNotEmpty())
 			{
-				int64 ptr = (int64)v.getDynamicObject()->getProperty(scriptPtrIdentifier);
+				int64 ptr = (int64)v.getProperty(scriptPtrIdentifier, 0);
 
 				if (st == "Container")
 				{
-					result += dynamic_cast<ControllableContainer*>((ControllableContainer*)ptr)->getScriptTargetString();
+					if (ControllableContainer* cc = dynamic_cast<ControllableContainer*>(reinterpret_cast<ControllableContainer*>(ptr)))
+						result += cc->getScriptTargetString();
+					else
+						result += "[Inaccessible Container > " + v.getProperty("name", "").toString() + "]";
 				}
 				else if (st == "Controllable")
 				{
-					result += dynamic_cast<Controllable*>((Controllable*)ptr)->getScriptTargetString();
+					if (Controllable* c = reinterpret_cast<Controllable*>(ptr))
+						result += c->getScriptTargetString();
+					else
+						result += "[Inaccessible Controllable > " + v.getProperty("name", "").toString() + "]";
 				}
 			}
 		}

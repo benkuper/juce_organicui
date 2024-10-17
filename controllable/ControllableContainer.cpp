@@ -134,12 +134,15 @@ Controllable* ControllableContainer::addControllable(Controllable* c, int index)
 		return nullptr;
 	}
 
+	scriptObject.getDynamicObject()->setProperty(c->shortName, c->getScriptObject());
+
 	if (c->type == Controllable::TRIGGER) addTriggerInternal((Trigger*)c, index);
 	else addParameterInternal((Parameter*)c, index);
 
 	c->addControllableListener(this);
 	c->addAsyncWarningTargetListener(this);
 	c->warningResolveInspectable = this;
+
 
 #if ORGANICUI_USE_WEBSERVER
 	if (OSCRemoteControl::getInstanceWithoutCreating() != nullptr && parentContainer != nullptr) OSCRemoteControl::getInstance()->sendPathAddedFeedback(c->getControlAddress());
@@ -293,6 +296,7 @@ void ControllableContainer::removeControllable(WeakReference<Controllable> c, bo
 		return;
 	}
 
+	scriptObject.getDynamicObject()->removeProperty(c->shortName);
 
 
 #if ORGANICUI_USE_WEBSERVER
@@ -329,7 +333,7 @@ void ControllableContainer::notifyStructureChanged()
 	if (isCurrentlyLoadingData && !notifyStructureChangeWhenLoadingData) return;
 	if (Engine::mainEngine != nullptr && (/*Engine::mainEngine->isLoadingFile ||*/ Engine::mainEngine->isClearing)) return;
 
-	scriptObjectIsDirty = true;
+	//scriptObjectIsDirty = true;
 
 	if (isNotifyingStructureChange) return;  //this may cause further problem when chain-reactions are actually wanted (links being recovered and so on)
 	isNotifyingStructureChange = true;
@@ -384,10 +388,12 @@ void ControllableContainer::setNiceName(const String& _niceName)
 
 	String oldControlAddress = getControlAddress();
 
+	String prevShortName = shortName;
 	niceName = _niceName;
 	if (!hasCustomShortName) setAutoShortName();
-	scriptObjectIsDirty = true;
-	controllableContainerListeners.call(&ControllableContainerListener::controllableContainerNameChanged, this);
+	scriptObject.getDynamicObject()->setProperty("niceName", niceName);
+	//scriptObjectIsDirty = true;
+	controllableContainerListeners.call(&ControllableContainerListener::controllableContainerNameChanged, this, prevShortName);
 
 #if ORGANICUI_USE_WEBSERVER
 	if (OSCRemoteControl::getInstanceWithoutCreating() != nullptr && parentContainer != nullptr) OSCRemoteControl::getInstance()->sendPathNameChangedFeedback(oldControlAddress, getControlAddress());
@@ -406,12 +412,15 @@ void ControllableContainer::setCustomShortName(const String& _shortName)
 		return;
 	}
 
+	String prevShortName = shortName;
 	shortName = _shortName;
 	hasCustomShortName = true;
 	scriptTargetName = shortName;
-	scriptObjectIsDirty = true;
+
+	scriptObject.getDynamicObject()->setProperty("name", shortName);
+	//scriptObjectIsDirty = true;
 	updateChildrenControlAddress();
-	onContainerShortNameChanged();
+	onContainerShortNameChanged(prevShortName);
 
 	controllableContainerListeners.call(&ControllableContainerListener::childAddressChanged, this);
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ChildAddressChanged, this));
@@ -420,11 +429,14 @@ void ControllableContainer::setCustomShortName(const String& _shortName)
 
 void ControllableContainer::setAutoShortName() {
 	hasCustomShortName = false;
+	String prevShortName = shortName;
 	shortName = StringUtil::toShortName(niceName, true);
 	scriptTargetName = shortName;
-	scriptObjectIsDirty = true;
+	scriptObject.getDynamicObject()->setProperty("name", shortName);
+
+	//scriptObjectIsDirty = true;
 	updateChildrenControlAddress();
-	onContainerShortNameChanged();
+	onContainerShortNameChanged(prevShortName);
 
 	controllableContainerListeners.call(&ControllableContainerListener::childAddressChanged, this);
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ChildAddressChanged, this));
@@ -462,6 +474,8 @@ void ControllableContainer::addChildControllableContainer(ControllableContainer*
 	container->addAsyncWarningTargetListener(this);
 	container->setParentContainer(this);
 
+	scriptObject.getDynamicObject()->setProperty(container->shortName, container->getScriptObject());
+
 	if (Engine::mainEngine != nullptr && !Engine::mainEngine->isLoadingFile)
 	{
 		if (container->getWarningMessage().isNotEmpty()) warningChanged(container);
@@ -484,6 +498,7 @@ void ControllableContainer::addChildControllableContainers(Array<ControllableCon
 	for (auto& c : containers)
 	{
 		addChildControllableContainer(c, owned, i, false);
+
 		++i;
 	}
 
@@ -494,8 +509,11 @@ void ControllableContainer::removeChildControllableContainer(ControllableContain
 {
 	this->controllableContainers.removeAllInstancesOf(container);
 
+
 	container->removeControllableContainerListener(this);
 	container->removeAsyncWarningTargetListener(this);
+
+	scriptObject.getDynamicObject()->removeProperty(container->shortName);
 
 	if (Engine::mainEngine != nullptr && !Engine::mainEngine->isClearing)
 	{
@@ -826,8 +844,10 @@ void ControllableContainer::controllableFeedbackUpdate(ControllableContainer* cc
 	onControllableFeedbackUpdate(cc, c); //This is the function to override from child classes
 }
 
-void ControllableContainer::controllableNameChanged(Controllable* c)
+void ControllableContainer::controllableNameChanged(Controllable* c, const String& prevName)
 {
+	if (c->parentContainer.get() != this) return;
+
 	if (allowSameChildrenNiceNames)
 	{
 		if (!isNameTaken(c->niceName, true, c)) c->setAutoShortName();
@@ -837,6 +857,10 @@ void ControllableContainer::controllableNameChanged(Controllable* c)
 	{
 		if (isNameTaken(c->niceName, true, c)) c->setNiceName(getUniqueNameInContainer(c->niceName, true));
 	}
+
+	scriptObject.getDynamicObject()->removeProperty(prevName);
+	scriptObject.getDynamicObject()->setProperty(c->shortName, c->getScriptObject());
+
 
 	notifyStructureChanged();
 }
@@ -1071,8 +1095,10 @@ var ControllableContainer::getRemoteControlData()
 }
 
 
-void ControllableContainer::controllableContainerNameChanged(ControllableContainer* cc)
+void ControllableContainer::controllableContainerNameChanged(ControllableContainer* cc, const String& prevName)
 {
+	if (cc->parentContainer != this) return;
+
 	if (allowSameChildrenNiceNames)
 	{
 		if (!isNameTaken(cc->niceName, true, nullptr, cc)) cc->setAutoShortName();
@@ -1084,6 +1110,8 @@ void ControllableContainer::controllableContainerNameChanged(ControllableContain
 
 	}
 
+	scriptObject.getDynamicObject()->removeProperty(prevName);
+	scriptObject.getDynamicObject()->setProperty(cc->shortName, cc->getScriptObject());
 }
 
 void ControllableContainer::childStructureChanged(ControllableContainer* cc)
@@ -1153,41 +1181,45 @@ String ControllableContainer::getUniqueNameInContainer(const String& sourceName,
 	return resultName;
 }
 
-void ControllableContainer::updateScriptObjectInternal(var parent)
-{
-	ScriptTarget::updateScriptObjectInternal(parent);
+//void ControllableContainer::updateScriptObjectInternal()
+//{
+	//ScriptTarget::updateScriptObjectInternal(parent);
 
-	bool transferToParent = !parent.isVoid();
+	//bool transferToParent = !parent.isVoid();
 
-	for (auto& cc : controllableContainers)
-	{
-		if (cc == nullptr || cc.wasObjectDeleted() || cc->shortName.isEmpty()) continue;
-		if (!cc->includeInScriptObject) continue;
+	//for (auto& cc : controllableContainers)
+	//{
+	//	if (cc == nullptr || cc.wasObjectDeleted() || cc->shortName.isEmpty()) continue;
+	//	if (!cc->includeInScriptObject) continue;
 
-		if (transferToParent) parent.getDynamicObject()->setProperty(cc->shortName, cc->getScriptObject());
-		else scriptObject.getDynamicObject()->setProperty(cc->shortName, cc->getScriptObject());
+	//	if (transferToParent) parent.getDynamicObject()->setProperty(cc->shortName, cc->getScriptObject());
+	//	else scriptObject.getDynamicObject()->setProperty(cc->shortName, cc->getScriptObject());
 
-	}
+	//}
 
-	for (auto& c : controllables)
-	{
-		if (c == nullptr || c->shortName.isEmpty()) return;
-		if (!c->includeInScriptObject) continue;
-		if (transferToParent) parent.getDynamicObject()->setProperty(c->shortName, c->getScriptObject());
-		else scriptObject.getDynamicObject()->setProperty(c->shortName, c->getScriptObject());
-	}
+	//for (auto& c : controllables)
+	//{
+	//	if (c == nullptr || c->shortName.isEmpty()) return;
+	//	if (!c->includeInScriptObject) continue;
+	//	if (transferToParent) parent.getDynamicObject()->setProperty(c->shortName, c->getScriptObject());
+	//	else scriptObject.getDynamicObject()->setProperty(c->shortName, c->getScriptObject());
+	//}
 
 
-	scriptObject.getDynamicObject()->setProperty("name", shortName);
-	scriptObject.getDynamicObject()->setProperty("niceName", niceName);
+	//scriptObject.getDynamicObject()->setProperty("name", shortName);
+	//scriptObject.getDynamicObject()->setProperty("niceName", niceName);
 
-}
+//}
 
 var ControllableContainer::getChildFromScript(const var::NativeFunctionArgs& a)
 {
 	if (a.numArguments == 0) return var();
 	ControllableContainer* m = getObjectFromJS<ControllableContainer>(a);
-	if (m == nullptr) return var();
+	if (m == nullptr)
+	{
+		LOGWARNING("getChild() calling object is null");
+		return var();
+	}
 
 	ControllableContainer* cc = nullptr;
 
@@ -1212,6 +1244,12 @@ var ControllableContainer::getChildFromScript(const var::NativeFunctionArgs& a)
 var ControllableContainer::getParentFromScript(const var::NativeFunctionArgs& a)
 {
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(a);
+
+	if (cc == nullptr)
+	{
+		LOGWARNING("getParent() calling object is null");
+		return var();
+	}
 
 	int level = a.numArguments > 0 ? (int)a.arguments[0] : 1;
 	ControllableContainer* target = cc->parentContainer;
@@ -1419,6 +1457,7 @@ var ControllableContainer::addPoint3DParameterFromScript(const var::NativeFuncti
 var ControllableContainer::addFileParameterFromScript(const var::NativeFunctionArgs& args)
 {
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(args);
+
 	if (!checkNumArgs(cc->niceName, args, 2)) return var();
 
 	Controllable* c = cc->getControllableByName(args.arguments[0], true, false);
@@ -1444,6 +1483,13 @@ var ControllableContainer::addAutomationFromScript(const var::NativeFunctionArgs
 var ControllableContainer::addContainerFromScript(const var::NativeFunctionArgs& args)
 {
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(args);
+
+	if (cc == nullptr)
+	{
+		LOGWARNING("Add container from script, container is being destroyed or badly referenced");
+		return var();
+	}
+
 	if (!checkNumArgs(cc->niceName, args, 1)) return var();
 
 	ControllableContainer* newCC = cc->getControllableContainerByName(args.arguments[0], true, false);
@@ -1458,6 +1504,13 @@ var ControllableContainer::addContainerFromScript(const var::NativeFunctionArgs&
 var ControllableContainer::removeContainerFromScript(const var::NativeFunctionArgs& args)
 {
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(args);
+
+	if (cc == nullptr)
+	{
+		LOGWARNING("Remove container from script, container is being destroyed or badly referenced");
+		return var();
+	}
+
 	if (!checkNumArgs(cc->niceName, args, 1)) return var();
 
 	ControllableContainer* removeCC = cc->getControllableContainerByName(args.arguments[0], true, false);
@@ -1470,6 +1523,12 @@ var ControllableContainer::removeContainerFromScript(const var::NativeFunctionAr
 var ControllableContainer::removeControllableFromScript(const var::NativeFunctionArgs& args)
 {
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(args);
+	if (cc == nullptr)
+	{
+		LOGWARNING("Remove controllable from script, container is being destroyed or badly referenced");
+		return var();
+	}
+
 	if (!checkNumArgs(cc->niceName, args, 1)) return var();
 
 	Controllable* c = cc->getControllableByName(args.arguments[0], true, false);
@@ -1501,6 +1560,13 @@ var ControllableContainer::clearFromScript(const var::NativeFunctionArgs& args)
 var ControllableContainer::getControlAddressFromScript(const var::NativeFunctionArgs& a)
 {
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(a);
+
+	if (cc == nullptr)
+	{
+		LOGWARNING("Get control address from script, container is being destroyed or badly referenced");
+		return var();
+	}
+
 	if (cc == nullptr) return var();
 	ControllableContainer* ref = nullptr;
 	if (a.numArguments > 0 && a.arguments[0].isObject())
@@ -1524,7 +1590,7 @@ var ControllableContainer::getContainersFromScript(const var::NativeFunctionArgs
 {
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(args);
 
-	if (cc->isBeingDestroyed)
+	if (cc == nullptr || cc->isBeingDestroyed)
 	{
 		LOGWARNING("Get containers from script, container is being destroyed or badly referenced");
 		return var();
@@ -1543,7 +1609,7 @@ var ControllableContainer::getControllablesFromScript(const var::NativeFunctionA
 {
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(args);
 
-	if (cc->isBeingDestroyed)
+	if (cc == nullptr || cc->isBeingDestroyed)
 	{
 		LOGWARNING("Get containers from script, container is being destroyed or badly referenced");
 		return var();
@@ -1557,8 +1623,8 @@ var ControllableContainer::getControllablesFromScript(const var::NativeFunctionA
 	for (auto& c : cc->controllables)
 	{
 		if (c == nullptr) continue;
-		if(c->type == Controllable::TRIGGER && !includeTriggers) continue;
-		if(c->type != Controllable::TRIGGER && !includeParameters) continue;
+		if (c->type == Controllable::TRIGGER && !includeTriggers) continue;
+		if (c->type != Controllable::TRIGGER && !includeParameters) continue;
 		result.append(c->getScriptObject());
 	}
 
@@ -1569,12 +1635,26 @@ var ControllableContainer::getControllablesFromScript(const var::NativeFunctionA
 var ControllableContainer::getJSONDataFromScript(const var::NativeFunctionArgs& a)
 {
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(a);
+
+	if (cc == nullptr)
+	{
+		LOGWARNING("Get JSON data from script, container is being destroyed or badly referenced");
+		return var();
+	}
+
 	return cc->getJSONData();
 }
 
 var ControllableContainer::loadJSONDataFromScript(const var::NativeFunctionArgs& a)
 {
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(a);
+
+	if (cc == nullptr)
+	{
+		LOGWARNING("Load JSON data from script, container is being destroyed or badly referenced");
+		return var();
+	}
+
 	if (!checkNumArgs(cc->niceName, a, 1)) return false;
 	cc->loadJSONData(a.arguments[0], a.numArguments > 1 ? (bool)(int)a.arguments[1] : false);
 	return true;

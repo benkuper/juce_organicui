@@ -21,7 +21,7 @@ public:
 	Controllable * controllable = nullptr;
 
 	void onContainerNiceNameChanged() override;
-	void controllableNameChanged(Controllable* c) override;
+	void controllableNameChanged(Controllable* cn, const juce::String&) override;
 
 	juce::String typeAtCreation;
 	virtual juce::String getTypeString() const override { return typeAtCreation; }

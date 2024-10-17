@@ -18,6 +18,7 @@ Script::Script(ScriptTarget* _parentTarget, bool canBeDisabled, bool canBeRemove
 	forceDisabled(false),
 	scriptTemplate(nullptr),
 	updateEnabled(false),
+	autoRefreshEnvironment(false),
 	parentTarget(_parentTarget),
 	executionTimeout(5),
 	scriptAsyncNotifier(10)
@@ -62,6 +63,14 @@ Script::Script(ScriptTarget* _parentTarget, bool canBeDisabled, bool canBeRemove
 	scriptObject.getDynamicObject()->setMethod("addColorParameter", Script::addColorParameterFromScript);
 	scriptObject.getDynamicObject()->setMethod("addFileParameter", Script::addFileParameterFromScript);
 
+	scriptObject.getDynamicObject()->setMethod("setAutoRefreshEnvironment", [](const var::NativeFunctionArgs& args)
+		{
+			Script* s = getObjectFromJS<Script>(args);
+			if (!checkNumArgs(s->niceName, args, 1)) return var();
+			s->autoRefreshEnvironment = (bool)args.arguments[0];
+			return var();
+		});
+
 	setParamsContainer(nullptr); //default
 
 	Engine::mainEngine->addControllableContainerListener(this);
@@ -75,6 +84,8 @@ Script::~Script()
 	{
 		Engine::mainEngine->removeControllableContainerListener(this);
 	}
+
+	if (scriptEngine != nullptr) scriptEngine->stop();
 
 	stopThread(5000);
 
@@ -240,8 +251,16 @@ void Script::buildEnvironment()
 	//clear phase
 	setState(SCRIPT_CLEAR);
 
-	scriptEngine.reset(new JavascriptEngine());
-	scriptEngine->maximumExecutionTime = RelativeTime::seconds(executionTimeout);
+	//if (scriptEngine == nullptr)
+	//{
+		scriptEngine.reset(new JavascriptEngine());
+		scriptEngine->maximumExecutionTime = RelativeTime::seconds(executionTimeout);
+	//}
+	//else
+	//{
+		//scriptEngine->stop();
+	//}
+
 	while (scriptParamsContainer->controllables.size() > 0) scriptParamsContainer->removeControllable(scriptParamsContainer->controllables[0]);
 	scriptParamsContainer->clear();
 
@@ -334,9 +353,11 @@ void Script::childStructureChanged(ControllableContainer* cc)
 	{
 		if (!Engine::mainEngine->isLoadingFile && !Engine::mainEngine->isClearing)
 		{
-			const ScopedLock sl(engineLock); //need to check null MainEngine again after lock
-			if (Engine::mainEngine != nullptr && scriptEngine != nullptr)
-				Engine::mainEngine->getScriptObject(); //force update if needed
+			//const ScopedLock sl(engineLock); //need to check null MainEngine again after lock
+			//if (Engine::mainEngine != nullptr && scriptEngine != nullptr)
+			//	Engine::mainEngine->getScriptObject(); //force update if needed
+
+			if(autoRefreshEnvironment) refreshVariables();
 		}
 	}
 }

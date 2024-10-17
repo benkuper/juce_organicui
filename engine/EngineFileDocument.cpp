@@ -80,7 +80,7 @@ Result Engine::loadDocument(const File& file) {
 	fileLoader->startThread(10);
 #else
 	loadDocumentAsync(file);
-	updateScriptObject();
+	//updateScriptObject();
 #endif
 
 	lastFileAbsolutePath = getFile().getFullPathName();

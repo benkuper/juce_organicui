@@ -25,14 +25,14 @@ public:
 	juce::String scriptTargetName;
 	juce::var scriptObject;
 	//var liveScriptObject;
-	bool scriptObjectIsDirty;
+	//bool scriptObjectIsDirty;
 
 	juce::SpinLock scriptObjectLock;
 
 	juce::var getScriptObject();
-	void updateScriptObject(juce::var parent = juce::var());
+	//void updateScriptObject();
 
-	virtual void updateScriptObjectInternal(juce::var /*parent*/ = juce::var()) {}
+	//virtual void updateScriptObjectInternal() {}
 
 	static juce::var checkTargetsAreTheSameFromScript(const juce::var::NativeFunctionArgs &args);
 
