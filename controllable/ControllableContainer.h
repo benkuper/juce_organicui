@@ -224,7 +224,7 @@ protected:
 	virtual void onWarningChanged(WarningTarget*) {}
 
 public:
-	DECLARE_INSPECTACLE_LIGHT_LISTENER(ControllableContainer, controllableContainer);
+	DECLARE_INSPECTACLE_SAFE_LISTENER(ControllableContainer, controllableContainer);
 
 	QueuedNotifier<ContainerAsyncEvent> queuedNotifier;
 
