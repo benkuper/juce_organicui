@@ -49,7 +49,7 @@ public:
 		virtual void askForRefresh(Dashboard * d) = 0;
 	};
 
-	DECLARE_INSPECTACLE_CRITICAL_LISTENER(Dashboard, dashboard);
+	DECLARE_INSPECTACLE_SAFE_LISTENER(Dashboard, dashboard);
 
 	DECLARE_ASYNC_EVENT(Dashboard, Dashboard, dashboard, { EDITING_UPDATE }, EVENT_ITEM_CHECK);
 };

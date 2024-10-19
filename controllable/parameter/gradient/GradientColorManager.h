@@ -85,7 +85,7 @@ public:
 		virtual void gradientUpdated() {}
 	};
 
-	DECLARE_INSPECTACLE_CRITICAL_LISTENER(GradientColorManager, colorManager)
+	DECLARE_INSPECTACLE_SAFE_LISTENER(GradientColorManager, colorManager)
 
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(GradientColorManager)

@@ -108,7 +108,7 @@ public:
 	static juce::var getTypeStringFromScript(const juce::var::NativeFunctionArgs& a);
 	juce::String getScriptTargetString() override;
 
-	DECLARE_INSPECTACLE_CRITICAL_LISTENER(BaseItem, baseItem)
+	DECLARE_INSPECTACLE_SAFE_LISTENER(BaseItem, baseItem)
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BaseItem)

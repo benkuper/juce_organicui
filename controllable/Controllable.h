@@ -151,7 +151,7 @@ public:
 		virtual void askForRemoveControllable(Controllable*, bool /*addToUndo*/ = false) {}
 	};
 
-	DECLARE_INSPECTACLE_CRITICAL_LISTENER(Controllable, controllable);
+	DECLARE_INSPECTACLE_SAFE_LISTENER(Controllable, controllable);
 	DECLARE_ASYNC_EVENT(Controllable, Controllable, controllable, ENUM_LIST(STATE_CHANGED, FEEDBACK_STATE_CHANGED, CONTROLADDRESS_CHANGED, NAME_CHANGED, ATTRIBUTE_CHANGED, ASK_FOR_REMOVE, CONTROLLABLE_REMOVED), EVENT_INSPECTABLE_CHECK);
 
 private:

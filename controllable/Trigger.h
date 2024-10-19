@@ -42,7 +42,7 @@ public:
 		virtual void triggerTriggered(Trigger* p) = 0;
 	};
 
-	DECLARE_INSPECTACLE_CRITICAL_LISTENER(Trigger, trigger);
+	DECLARE_INSPECTACLE_SAFE_LISTENER(Trigger, trigger);
 	DECLARE_ASYNC_EVENT(Trigger, Trigger, trigger, { TRIGGER_TRIGGERED }, EVENT_INSPECTABLE_CHECK);
 
 	static Trigger* create() { return new Trigger("New Trigger", ""); }

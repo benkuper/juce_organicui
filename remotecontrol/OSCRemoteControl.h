@@ -131,7 +131,7 @@ public:
 		virtual void processMessage(const juce::OSCMessage& m, const juce::String& clientId) {}
 	};
 
-	DECLARE_INSPECTACLE_CRITICAL_LISTENER(RemoteControl, remoteControl)
+	DECLARE_INSPECTACLE_SAFE_LISTENER(RemoteControl, remoteControl)
 
 };
 

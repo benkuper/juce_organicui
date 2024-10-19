@@ -100,7 +100,7 @@ public:
 		virtual void enumOptionRemoved(EnumParameter*, const juce::String&) = 0;
 	};
 
-	DECLARE_INSPECTACLE_CRITICAL_LISTENER(EnumParameter, enum);
+	DECLARE_INSPECTACLE_SAFE_LISTENER(EnumParameter, enum);
 
 	DECLARE_ASYNC_EVENT(EnumParameter, EnumParameter, enumParameter, ENUM_LIST(ENUM_OPTION_ADDED, ENUM_OPTION_UPDATED, ENUM_OPTION_REMOVED), EVENT_INSPECTABLE_CHECK)
 
