@@ -39,6 +39,7 @@ ShapeShifterPanel::~ShapeShifterPanel()
 {
 
 	for (auto& c : contents) c->contentIsShown = false;
+	setCurrentContent(nullptr);
 	header.clearTabs();
 	header.removeHeaderListener(this);
 	listeners.call(&Listener::panelDestroyed, this);
