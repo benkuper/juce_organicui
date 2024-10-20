@@ -39,5 +39,5 @@ void InspectableContent::setInspectable(Inspectable* i)
 
 void InspectableContent::inspectableDestroyed(Inspectable *)
 {
-	inspectable->removeInspectableListener(this);
+	if(inspectable != nullptr) inspectable->removeInspectableListener(this);
 }
