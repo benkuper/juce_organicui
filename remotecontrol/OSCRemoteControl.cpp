@@ -478,6 +478,7 @@ bool OSCRemoteControl::handleHTTPRequest(std::shared_ptr<HttpServer::Response> r
 void OSCRemoteControl::connectionOpened(const String& id)
 {
 	NLOG(niceName, "Got a connection from " << id);
+	remoteControlListeners.call(&RemoteControlListener::clientConnected, id);
 	feedbackMap.set(id, Array<Controllable*>()); //Reset feedbacks
 
 	for (auto& wt : WarningReporter::getInstance()->targets)
@@ -485,6 +486,7 @@ void OSCRemoteControl::connectionOpened(const String& id)
 		if (wt == nullptr || wt.wasObjectDeleted()) continue;
 		sendPersistentWarningFeedback(wt);
 	}
+
 }
 
 void OSCRemoteControl::messageReceived(const String& id, const String& message)
@@ -650,12 +652,14 @@ void OSCRemoteControl::dataReceived(const String& id, const MemoryBlock& data)
 
 void OSCRemoteControl::connectionClosed(const String& id, int status, const String& reason)
 {
+	remoteControlListeners.call(&RemoteControlListener::clientDisconnected, id, reason);
 	NLOG(niceName, "Connection close from " << id << " : " << status << " (" << reason << ")");
 	feedbackMap.remove(id);
 }
 
 void OSCRemoteControl::connectionError(const String& id, const String& message)
 {
+	remoteControlListeners.call(&RemoteControlListener::clientDisconnected, id, message);
 	NLOGERROR(niceName, "Connection error from " << id << " : " << message);
 	feedbackMap.remove(id);
 }
@@ -704,6 +708,12 @@ void OSCRemoteControl::sendPathNameChangedFeedback(const String& oldPath, const 
 	msg.getDynamicObject()->setProperty("DATA", data);
 	server->send(JSON::toString(msg));
 
+}
+
+bool OSCRemoteControl::hasClient(const String& id)
+{
+	if (server == nullptr) return false;
+	return server->connectionMap.contains(id);
 }
 
 void OSCRemoteControl::newMessage(const CustomLogger::LogEvent& e)
