@@ -1074,16 +1074,22 @@ var ControllableContainer::getRemoteControlData()
 
 	var contentData(new DynamicObject());
 
-	for (auto& childC : controllables)
 	{
-		if (childC->hideInRemoteControl) continue;
-		contentData.getDynamicObject()->setProperty(childC->shortName, childC->getRemoteControlData());
+		GenericScopedLock controllablesLock(controllables.getLock());
+		for (auto& childC : controllables)
+		{
+			if (childC->hideInRemoteControl) continue;
+			contentData.getDynamicObject()->setProperty(childC->shortName, childC->getRemoteControlData());
+		}
 	}
 
-	for (auto& childCC : controllableContainers)
 	{
-		if (childCC->hideInRemoteControl) continue;
-		contentData.getDynamicObject()->setProperty(childCC->shortName, childCC->getRemoteControlData());
+		GenericScopedLock containersLock(controllableContainers.getLock());
+		for (auto& childCC : controllableContainers)
+		{
+			if (childCC->hideInRemoteControl) continue;
+			contentData.getDynamicObject()->setProperty(childCC->shortName, childCC->getRemoteControlData());
+		}
 	}
 
 	data.getDynamicObject()->setProperty("CONTENTS", contentData);
