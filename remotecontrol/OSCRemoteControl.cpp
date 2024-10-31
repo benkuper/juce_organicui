@@ -505,14 +505,14 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 			{
 				if (ControllableContainer* cc = Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true))
 				{
-					cc->handleAddFromRemoteControl(data);
+					MessageManager::callAsync([cc, data]() {cc->handleAddFromRemoteControl(data); });
 				}
 			}
 			else if (command == "REMOVE")
 			{
 				if (ControllableContainer* cc = Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true))
 				{
-					cc->handleRemoveFromRemoteControl();
+					MessageManager::callAsync([cc]() {cc->handleRemoveFromRemoteControl(); });
 				}
 
 			}
@@ -520,7 +520,7 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 			{
 				if (ControllableContainer* cc = Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true))
 				{
-					cc->setUndoableNiceName(data["name"]);
+					MessageManager::callAsync([cc, data]() {cc->setUndoableNiceName(data["name"]); });
 				}
 			}
 			else if (command == "LOAD")
@@ -554,11 +554,11 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 			}
 			else if (command == "UNDO")
 			{
-				UndoMaster::getInstance()->undo();
+				MessageManager::callAsync([]() {UndoMaster::getInstance()->undo(); });
 			}
 			else if (command == "REDO")
 			{
-				UndoMaster::getInstance()->redo();
+				MessageManager::callAsync([]() {UndoMaster::getInstance()->redo(); });
 			}
 			else if (command == "LOG")
 			{
