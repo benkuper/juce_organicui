@@ -298,12 +298,12 @@ bool BaseManagerViewUI<M, T, U>::keyPressed(const juce::KeyPress& e)
 {
 	if (BaseManagerUI<M, T, U>::keyPressed(e)) return true;
 
-	if (e.getKeyCode() == juce::KeyPress::createFromDescription("f").getKeyCode())
+	if (e.getTextDescription() == juce::KeyPress::createFromDescription("f").getTextDescription())
 	{
 		frameView();
 		return true;
 	}
-	else if (e.getKeyCode() == juce::KeyPress::createFromDescription("h").getKeyCode())
+	else if (e.getTextDescription() == juce::KeyPress::createFromDescription("h").getTextDescription())
 	{
 		homeView();
 		return true;
