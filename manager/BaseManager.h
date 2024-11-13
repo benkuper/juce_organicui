@@ -763,7 +763,7 @@ void BaseManager<T>::reorderItems()
 		//items.getLock().enter();
 		items.sort(comparator);
 		//items.getLock().exit();
-		controllableContainers.clear();
+		controllableContainers.removeIf([this](ControllableContainer* c) { return items.contains((T*)c); }); //remove if not in items
 		controllableContainers.addArray(items);
 	}
 
