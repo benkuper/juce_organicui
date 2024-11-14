@@ -46,6 +46,7 @@ public:
 	juce::var defaultValue;
 	juce::var value;
 	juce::var lastValue;
+	juce::var lastUndoValue;
 
 	juce::SpinLock valueSetLock;
 
@@ -106,15 +107,16 @@ public:
 
 	virtual void setDefaultValue(juce::var val, bool doResetValue = true);
 	virtual void resetValue(bool silentSet = false);
-	virtual juce::UndoableAction* setUndoableValue(juce::var oldValue, juce::var newValue, bool onlyReturnAction = false);
-	virtual void setValue(juce::var _value, bool silentSet = false, bool force = false, bool forceOverride = true);
+	virtual juce::Array<juce::UndoableAction*> setUndoableValue(juce::var oldValue, juce::var newValue, bool onlyReturnAction = false, bool setSimilarSelected = false);
+	virtual juce::Array<juce::UndoableAction*> setUndoableValue(juce::var newValue, bool onlyReturnAction = false, bool setSimilarSelected = false);
+	virtual void setValue(juce::var _value, bool silentSet = false, bool force = false, bool forceOverride = true, bool setSimilarSelected = false);
 	virtual void setValueInternal(juce::var& _value);
 
 	virtual bool checkValueIsTheSame(juce::var newValue, juce::var oldValue); //can be overriden to modify check behavior
 
 	//For Number type parameters
-	void setUndoableNormalizedValue(const juce::var& oldNormalizedValue, const juce::var& newNormalizedValue);
-	void setNormalizedValue(const juce::var& normalizedValue, bool silentSet = false, bool force = false);
+	void setUndoableNormalizedValue(const juce::var& newNormalizedValue, bool setSimilarSelected = false);
+	void setNormalizedValue(const juce::var& normalizedValue, bool silentSet = false, bool force = false, bool setSimilarSelected = false);
 	juce::var getNormalizedValue() const;
 
 	virtual bool setAttributeInternal(juce::String param, juce::var value) override;

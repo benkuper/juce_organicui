@@ -135,7 +135,7 @@ void FloatParameterLabelUI::mouseUpInternal(const MouseEvent& e)
 
 	if (setUndoableValueOnMouseUp)
 	{
-		if (valueAtMouseDown != parameter->floatValue()) parameter->setUndoableValue(valueAtMouseDown, parameter->doubleValue());
+		if (valueAtMouseDown != parameter->floatValue()) parameter->setUndoableValue(parameter->doubleValue());
 	}
 }
 

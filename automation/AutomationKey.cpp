@@ -134,8 +134,8 @@ void AutomationKey::setPosAndValue(Point<float> posAndValue, bool addToUndo)
     if (addToUndo)
     {
         Array<UndoableAction*> actions;
-        actions.add(position->setUndoableValue(position->floatValue(), posAndValue.x, true));
-        actions.add(value->setUndoableValue(value->floatValue(), posAndValue.y, true));
+        actions.addArray(position->setUndoableValue(position->floatValue(), posAndValue.x, true));
+        actions.addArray(value->setUndoableValue(value->floatValue(), posAndValue.y, true));
         UndoMaster::getInstance()->performActions("Set key position and value", actions);
     }
     else
@@ -163,8 +163,8 @@ Point<float> AutomationKey::getPosition()
 
 void AutomationKey::addUndoableMoveAction(Array<UndoableAction*>& actions)
 {
-    actions.add(position->setUndoableValue(movePositionReference.x, position->floatValue(), true));
-    actions.add(value->setUndoableValue(movePositionReference.y, value->floatValue(), true));
+    actions.addArray(position->setUndoableValue(movePositionReference.x, position->floatValue(), true));
+    actions.addArray(value->setUndoableValue(movePositionReference.y, value->floatValue(), true));
 }
 
 void AutomationKey::onContainerParameterChangedInternal(Parameter* p)

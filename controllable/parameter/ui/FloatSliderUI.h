@@ -57,7 +57,7 @@ public:
     virtual float getAngleForValue(float val, float angleReduction);
     void drawRotary(juce::Graphics &g, juce::Colour c, float startPos, float endPos, float reduction = 0);
 
-    virtual void setParamNormalizedValueUndoable(float oldValue, float newValue);
+    virtual void setParamNormalizedValueUndoable(float newValue);
     virtual void setParamNormalizedValue(float value);
     virtual float getParamNormalizedValue();
     virtual void rangeChanged(Parameter *)override;

@@ -606,7 +606,7 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 					{
 						if (nv.value.size() == 2)
 						{
-							p->setUndoableValue(nv.value[0], nv.value[1]);
+							p->setUndoableValue(nv.value[0], nv.value[1], false);
 						}
 					}
 				}
@@ -623,7 +623,7 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 							{
 								if (pnv.value.size() == 2)
 								{
-									actions.add(p->setUndoableValue(pnv.value[0], pnv.value[1], true));
+									actions.addArray(p->setUndoableValue(pnv.value[0], pnv.value[1], true, false));
 								}
 							}
 						}

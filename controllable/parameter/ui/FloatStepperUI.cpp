@@ -71,9 +71,9 @@ void FloatStepperUI::paint(Graphics& g)
 	if (showLabel)
 	{
 		Rectangle<int> r = getLocalBounds();
-		if(customTextSize > 0) g.setFont(FontOptions(customTextSize));
+		if (customTextSize > 0) g.setFont(FontOptions(customTextSize));
 		int textSize = (int)TextLayout::getStringWidth(g.getCurrentFont(), customLabel.isNotEmpty() ? customLabel : parameter->niceName);
-		r = r.removeFromLeft(jmin(textSize + 10, r.getWidth() -  60));
+		r = r.removeFromLeft(jmin(textSize + 10, r.getWidth() - 60));
 		g.setColour(useCustomTextColor ? customTextColor : TEXT_COLOR);
 		g.drawFittedText(customLabel.isNotEmpty() ? customLabel : parameter->niceName, r, Justification::centred, 1);
 	}
@@ -88,7 +88,7 @@ void FloatStepperUI::resized()
 	if (showLabel)
 	{
 		Font font(FontOptions(customTextSize > 0 ? customTextSize : jlimit(12, 40, jmin(r.getHeight() - 4, r.getWidth()) - 16)));
-		r.removeFromLeft(jmin((int)TextLayout::getStringWidth(font,customLabel.isNotEmpty() ? customLabel : parameter->niceName), r.getWidth() - 60));
+		r.removeFromLeft(jmin((int)TextLayout::getStringWidth(font, customLabel.isNotEmpty() ? customLabel : parameter->niceName), r.getWidth() - 60));
 		slider->setBounds(r.removeFromRight(jmin(r.getWidth(), 60)));
 	}
 	else
@@ -116,7 +116,7 @@ void FloatStepperUI::valueChanged(const var& value)
 void FloatStepperUI::sliderValueChanged(Slider* _slider)
 {
 	if (parameter.wasObjectDeleted()) return;
-	parameter->setValue(slider->getValue());
+	parameter->setValue(slider->getValue(), false, false, true, true);
 }
 
 void FloatStepperUI::sliderDragStarted(Slider* _slider)
@@ -128,7 +128,7 @@ void FloatStepperUI::sliderDragStarted(Slider* _slider)
 void FloatStepperUI::sliderDragEnded(Slider* _slider)
 {
 	if (parameter.wasObjectDeleted()) return;
-	parameter->setUndoableValue(valueAtDragStart, parameter->floatValue());
+	parameter->setUndoableValue(parameter->floatValue(), false, true);
 }
 
 void FloatStepperUI::rangeChanged(Parameter*) {

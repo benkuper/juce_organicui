@@ -8,7 +8,8 @@
  ==============================================================================
  */
 
- #include "JuceHeader.h"
+#include "JuceHeader.h"
+#include "FloatSliderUI.h"
  //==============================================================================
 FloatSliderUI::FloatSliderUI(Array<Parameter*> parameters) :
 	ParameterUI(parameters, ORGANICUI_DEFAULT_TIMER),
@@ -202,11 +203,11 @@ void FloatSliderUI::mouseUpInternal(const MouseEvent& e)
 	{
 		if (changeParamOnMouseUpOnly)
 		{
-			if (initNormalizedValue != getNormalizedValueFromMouse()) setParamNormalizedValueUndoable(initNormalizedValue, getNormalizedValueFromMouse());
+			if (initNormalizedValue != getNormalizedValueFromMouse()) setParamNormalizedValueUndoable(getNormalizedValueFromMouse());
 		}
 		else
 		{
-			if (initNormalizedValue != getNormalizedValueFromMouse()) setParamNormalizedValueUndoable(initNormalizedValue, parameter->getNormalizedValue());
+			if (initNormalizedValue != getNormalizedValueFromMouse()) setParamNormalizedValueUndoable(parameter->getNormalizedValue());
 		}
 	}
 
@@ -237,15 +238,15 @@ float FloatSliderUI::getNormalizedValueFromMouseDrag(const MouseEvent& e)
 
 float FloatSliderUI::getNormalizedValueFromPosition(const Point<int>& pos)
 {
-	if (orientation == HORIZONTAL) 
+	if (orientation == HORIZONTAL)
 	{
 		return (pos.x * 1.0f / getWidth());
 	}
-	else if (orientation == ROTARY) 
+	else if (orientation == ROTARY)
 	{
 		return (pos.x * 1.0f / getWidth()) - (pos.y * 1.0f / getHeight());
 	}
-	else 
+	else
 	{
 		return 1 - (pos.y * 1.0f / getHeight());
 	}
@@ -298,14 +299,14 @@ void FloatSliderUI::drawRotary(Graphics& g, Colour c, float startPos, float endP
 	g.strokePath(p, PathStrokeType(1));
 }
 
-void FloatSliderUI::setParamNormalizedValueUndoable(float oldValue, float newValue)
+void FloatSliderUI::setParamNormalizedValueUndoable(float newValue)
 {
-	parameter->setUndoableNormalizedValue(oldValue, newValue);
+	parameter->setUndoableNormalizedValue(newValue, true);
 }
 
 void FloatSliderUI::setParamNormalizedValue(float value)
 {
-	parameter->setNormalizedValue(value);
+	parameter->setNormalizedValue(value, false, false, true);
 }
 
 float FloatSliderUI::getParamNormalizedValue()

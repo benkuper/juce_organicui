@@ -195,6 +195,18 @@ void Controllable::updateControlAddress()
 	}
 }
 
+ControllableContainer* Controllable::getSelectedParentInHierarchy()
+{
+	ControllableContainer* c = parentContainer;
+	while (c != nullptr)
+	{
+		if (c->isSelected) return c;
+		c = c->parentContainer;
+	}
+
+	return nullptr;
+}
+
 void Controllable::remove(bool addToUndo)
 {
 	controllableListeners.call(&ControllableListener::askForRemoveControllable, this, addToUndo);

@@ -68,7 +68,7 @@ void BoolToggleUI::paint(Graphics& g)
 	{
 		int fontSize = customTextSize > 0 ? customTextSize : jlimit(12, 40, jmin(r.getHeight(), r.getWidth()) - 16);
 		g.setFont(fontSize);
-		labelWidth = (int)TextLayout::getStringWidth(g.getCurrentFont(),parameter->niceName) + 10;
+		labelWidth = (int)TextLayout::getStringWidth(g.getCurrentFont(), parameter->niceName) + 10;
 		/*if (r.getHeight() > r.getWidth())
 		{
 			cr = r.removeFromRight(jmin<float>(r.getHeight(), r.getWidth() - labelWidth));
@@ -104,8 +104,8 @@ void BoolToggleUI::mouseDownInternal(const MouseEvent& e)
 	if (!isInteractable()) return;
 	if (e.mods.isLeftButtonDown())
 	{
-		if (e.mods.isAltDown() || momentaryMode) parameter->setValue(!parameter->boolValue());
-		else parameter->setUndoableValue(parameter->boolValue(), !parameter->boolValue()); //only undoable when from left button, real toggle behaviour
+		if (e.mods.isAltDown() || momentaryMode) parameter->setValue(!parameter->boolValue(), false, false, true, true);
+		else parameter->setUndoableValue(var(!parameter->boolValue()), false, true); //only undoable when from left button, real toggle behaviour
 	}
 }
 
@@ -114,7 +114,7 @@ void BoolToggleUI::mouseUpInternal(const MouseEvent& e)
 	if (!isInteractable()) return;
 	if (e.mods.isLeftButtonDown())
 	{
-		if (e.mods.isAltDown() || momentaryMode) parameter->setValue(!parameter->boolValue());
+		if (e.mods.isAltDown() || momentaryMode) parameter->setValue(!parameter->boolValue(), false, false, true, true);
 	}
 }
 

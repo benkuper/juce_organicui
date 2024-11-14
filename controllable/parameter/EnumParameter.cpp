@@ -174,7 +174,7 @@ void EnumParameter::setPrev(bool loop, bool addToUndo)
 
 	String newValue = enumValues[targetIndex]->key;
 
-	if (addToUndo) setUndoableValue(value, newValue);
+	if (addToUndo) setUndoableValue(newValue, false, true);
 	else setValueWithKey(newValue);
 }
 
@@ -190,7 +190,7 @@ void EnumParameter::setNext(bool loop, bool addToUndo)
 
 	String newValue = enumValues[targetIndex]->key;
 
-	if (addToUndo) setUndoableValue(value, newValue);
+	if (addToUndo) setUndoableValue(newValue, false, true);
 	else setValueWithKey(newValue);
 }
 

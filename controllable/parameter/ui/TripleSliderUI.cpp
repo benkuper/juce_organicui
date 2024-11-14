@@ -96,7 +96,7 @@ void TripleSliderUI::mouseUpInternal(const MouseEvent&)
 			|| (float)mouseDownValue[2] != zParam.floatValue())
 		{
 
-			p3d->setUndoableVector((float)mouseDownValue[0], (float)mouseDownValue[1], (float)mouseDownValue[2], xParam.floatValue(), yParam.floatValue(), zParam.floatValue());
+			p3d->setUndoableVector((float)mouseDownValue[0], (float)mouseDownValue[1], (float)mouseDownValue[2], xParam.floatValue(), yParam.floatValue(), zParam.floatValue(), false, true);
 		}
 	}
 }
@@ -245,7 +245,7 @@ void TripleSliderUI::newMessage(const Parameter::ParameterEvent& e)
 		{
 			if (xParam.floatValue() != p3d->x || yParam.floatValue() != p3d->y || zParam.floatValue() != p3d->z)
 			{
-				if (!isMouseButtonDown(true) && !UndoMaster::getInstance()->isPerformingUndoRedo()) p3d->setUndoableVector(p3d->x, p3d->y, p3d->z, xParam.floatValue(), yParam.floatValue(), zParam.floatValue());
+				if (!isMouseButtonDown(true) && !UndoMaster::getInstance()->isPerformingUndoRedo()) p3d->setUndoableVector(p3d->x, p3d->y, p3d->z, xParam.floatValue(), yParam.floatValue(), zParam.floatValue(), false, true);
 				else p3d->setVector(xParam.floatValue(), yParam.floatValue(), zParam.floatValue());
 			}
 		}

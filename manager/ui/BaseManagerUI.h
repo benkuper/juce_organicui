@@ -754,7 +754,7 @@ void BaseManagerUI<M, T, U>::alignItems(AlignMode alignMode)
 		case BaseManagerUI<M, T, U>::AlignMode::BOTTOM:targetPoint = juce::Point<float>(i->viewUIPosition->x, target - i->viewUISize->y); break;
 		case BaseManagerUI<M, T, U>::AlignMode::CENTER_V:targetPoint = juce::Point<float>(i->viewUIPosition->x, target - i->viewUISize->y / 2); break;
 		}
-		actions.add(i->viewUIPosition->setUndoablePoint(i->viewUIPosition->getPoint(), targetPoint, true));
+		actions.addArray(i->viewUIPosition->setUndoablePoint(i->viewUIPosition->getPoint(), targetPoint, true));
 	}
 
 	UndoMaster::getInstance()->performActions("Align " + juce::String(goodInspectables.size()) + " items", actions);
@@ -794,7 +794,7 @@ void BaseManagerUI<M, T, U>::distributeItems(bool isVertical)
 		float target = juce::jmap(rel, tMin, tMax);
 		T* ti = goodInspectables[i];
 		juce::Point<float> targetPoint(isVertical ? ti->viewUIPosition->x : target - ti->viewUISize->x / 2, isVertical ? target - ti->viewUISize->y / 2 : ti->viewUIPosition->y);
-		actions.add(ti->viewUIPosition->setUndoablePoint(ti->viewUIPosition->getPoint(), targetPoint, true));
+		actions.addArray(ti->viewUIPosition->setUndoablePoint(ti->viewUIPosition->getPoint(), targetPoint, true));
 	}
 
 	UndoMaster::getInstance()->performActions("Distribute " + juce::String(goodInspectables.size()) + " items", actions);

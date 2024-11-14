@@ -84,6 +84,8 @@ public:
 	}
 	void updateControlAddress();
 
+	ControllableContainer* getSelectedParentInHierarchy();
+
 	void remove(bool addToUndo = false); // called from external to make this object ask for remove
 
 	//virtual void updateScriptObjectInternal() override;

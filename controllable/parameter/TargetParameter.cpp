@@ -118,7 +118,7 @@ void TargetParameter::setValueFromTarget(Controllable* c, bool addToUndo)
 		manuallySettingNull = true;
 	}
 
-	if (addToUndo) setUndoableValue(stringValue(), newValue);
+	if (addToUndo) setUndoableValue(stringValue(), var(newValue));
 	else setValue(newValue, false, true);
 
 	manuallySettingNull = false;
@@ -146,7 +146,7 @@ void TargetParameter::setValueFromTarget(ControllableContainer* cc, bool addToUn
 		manuallySettingNull = true;
 	}
 
-	if (addToUndo) setUndoableValue(stringValue(), cc->getControlAddress(rootContainer));
+	if (addToUndo) setUndoableValue(stringValue(), var(cc->getControlAddress(rootContainer)));
 	else setValue(cc->getControlAddress(rootContainer), false, true);
 
 	manuallySettingNull = false;
@@ -244,7 +244,7 @@ void TargetParameter::setTarget(WeakReference<Controllable> c)
 			{
 				if (!Engine::mainEngine->isClearing && rootContainer != nullptr && !rootContainer.wasObjectDeleted())
 				{
-					if(!isBeingDestroyed && !manuallySettingNull) setWarningMessage("Link is broken : " + ghostValue);
+					if (!isBeingDestroyed && !manuallySettingNull) setWarningMessage("Link is broken : " + ghostValue);
 					rootContainer->addControllableContainerListener(this);
 				}
 			}

@@ -58,12 +58,12 @@ void Point3DParameter::setVector(float _x, float _y, float _z)
 	setValue(d);
 }
 
-UndoableAction* Point3DParameter::setUndoableVector(Vector3D<float> oldVector, Vector3D<float> newVector, bool onlyReturnAction)
+juce::Array<UndoableAction*> Point3DParameter::setUndoableVector(Vector3D<float> oldVector, Vector3D<float> newVector, bool onlyReturnAction, bool setSimilarSelected)
 {
-	return setUndoableVector(oldVector.x, oldVector.y, oldVector.z, newVector.x, newVector.y, newVector.z, onlyReturnAction);
+	return setUndoableVector(oldVector.x, oldVector.y, oldVector.z, newVector.x, newVector.y, newVector.z, onlyReturnAction, setSimilarSelected);
 }
 
-UndoableAction* Point3DParameter::setUndoableVector(float oldX, float oldY, float oldZ, float newX, float newY, float newZ, bool onlyReturnAction)
+juce::Array<UndoableAction*> Point3DParameter::setUndoableVector(float oldX, float oldY, float oldZ, float newX, float newY, float newZ, bool onlyReturnAction, bool setSimilarSelected)
 {
 	var od;
 	od.append(oldX);
@@ -76,7 +76,7 @@ UndoableAction* Point3DParameter::setUndoableVector(float oldX, float oldY, floa
 
 	if (checkValueIsTheSame(od, d) && !alwaysNotify) return nullptr;
 
-	return setUndoableValue(od, d, onlyReturnAction);
+	return setUndoableValue(od, d, onlyReturnAction, setSimilarSelected);
 }
 
 void Point3DParameter::setValueInternal(var& _value)

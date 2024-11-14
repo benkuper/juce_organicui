@@ -514,24 +514,24 @@ void AutomationUI::mouseDrag(const MouseEvent& e)
 		{
 			//if (!manager->valueRange->enabled)
 			//{
-				if (e.mods.isShiftDown())
+			if (e.mods.isShiftDown())
+			{
+				float pRel = 1 - (e.getMouseDownPosition().y * 1.0f / getHeight());
+				float rangeAtMouseDown = (viewValueRangeAtMouseDown.y - viewValueRangeAtMouseDown.x);
+				float tRange = rangeAtMouseDown + (e.getOffsetFromDragStart().y / 10.0f);
+				if (tRange > .2f)
 				{
-					float pRel = 1 - (e.getMouseDownPosition().y * 1.0f / getHeight());
-					float rangeAtMouseDown = (viewValueRangeAtMouseDown.y - viewValueRangeAtMouseDown.x);
-					float tRange = rangeAtMouseDown + (e.getOffsetFromDragStart().y / 10.0f);
-					if (tRange > .2f)
-					{
-						float rangeDiff = tRange - rangeAtMouseDown;
-						float tMin = viewValueRangeAtMouseDown.x - rangeDiff * pRel;
-						float tMax = viewValueRangeAtMouseDown.y + rangeDiff * (1 - pRel);
-						manager->viewValueRange->setPoint(tMin, tMax);
-					}
+					float rangeDiff = tRange - rangeAtMouseDown;
+					float tMin = viewValueRangeAtMouseDown.x - rangeDiff * pRel;
+					float tMax = viewValueRangeAtMouseDown.y + rangeDiff * (1 - pRel);
+					manager->viewValueRange->setPoint(tMin, tMax);
 				}
-				else
-				{
-					float deltaVal = getValueForY(e.getDistanceFromDragStartY(), true);
-					manager->viewValueRange->setPoint(viewValueRangeAtMouseDown.x + deltaVal, viewValueRangeAtMouseDown.y + deltaVal);
-				}
+			}
+			else
+			{
+				float deltaVal = getValueForY(e.getDistanceFromDragStartY(), true);
+				manager->viewValueRange->setPoint(viewValueRangeAtMouseDown.x + deltaVal, viewValueRangeAtMouseDown.y + deltaVal);
+			}
 			//}
 		}
 		{
@@ -594,7 +594,7 @@ void AutomationUI::handleMenuExtraItemsResult(int result, int startIndex)
 	Array<UndoableAction*> actions;
 	for (auto& i : manager->items)
 	{
-		actions.add(i->easingType->setUndoableValue(i->easingType->getValueKey(), typeName, true));
+		actions.addArray(i->easingType->setUndoableValue(i->easingType->getValueKey(), var(typeName), true));
 	}
 
 	UndoMaster::getInstance()->performActions("Change all easings", actions);

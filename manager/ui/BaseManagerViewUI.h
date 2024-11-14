@@ -742,7 +742,7 @@ void BaseManagerViewUI<M, T, U>::itemDragMove(const juce::DragAndDropTarget::Sou
 		if (juce::Desktop::getInstance().getMainMouseSource().getCurrentModifiers().isAltDown()) bui->baseItem->scalePosition(targetPosition - bui->baseItem->movePositionReference, true);
 		else bui->baseItem->movePosition(targetPosition - bui->baseItem->movePositionReference, true);
 	}
-	
+
 	this->repaint();
 
 }
@@ -795,8 +795,8 @@ template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::askForSyncPosAndSize(BaseItemMinimalUI<T>* itemUI)
 {
 	juce::Array<juce::UndoableAction*> actions;
-	actions.add(itemUI->baseItem->viewUIPosition->setUndoablePoint(itemUI->baseItem->viewUIPosition->getPoint(), getViewPos(itemUI->getPosition()).toFloat(), true));
-	actions.add(itemUI->baseItem->viewUISize->setUndoablePoint(itemUI->baseItem->viewUISize->getPoint(), juce::Point<float>(itemUI->getWidth(), itemUI->getHeight()), true));
+	actions.addArray(itemUI->baseItem->viewUIPosition->setUndoablePoint(itemUI->baseItem->viewUIPosition->getPoint(), getViewPos(itemUI->getPosition()).toFloat(), true));
+	actions.addArray(itemUI->baseItem->viewUISize->setUndoablePoint(itemUI->baseItem->viewUISize->getPoint(), juce::Point<float>(itemUI->getWidth(), itemUI->getHeight()), true));
 	UndoMaster::getInstance()->performActions("Move / Resize " + itemUI->baseItem->niceName, actions);
 }
 

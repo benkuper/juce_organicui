@@ -128,7 +128,7 @@ void ColorParameterUI::componentBeingDeleted(Component& c)
 {
 	if (&c == colorEditor)
 	{
-		colorParam->setUndoableValue(valueOnEditorOpen, colorParam->value);
+		colorParam->setUndoableValue(colorParam->value);
 		colorEditor = nullptr;
 	}
 }
