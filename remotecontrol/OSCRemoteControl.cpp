@@ -461,7 +461,9 @@ bool OSCRemoteControl::handleHTTPRequest(std::shared_ptr<HttpServer::Response> r
 	}
 
 
-	juce::String dataStr = juce::JSON::toString(data);
+	juce::String dataStr = juce::JSON::toString(data, JSON::FormatOptions().withEncoding(JSON::Encoding::ascii));
+
+	DBG(dataStr);
 
 	SimpleWeb::CaseInsensitiveMultimap header;
 	header.emplace("Content-Length", juce::String(dataStr.length()).toStdString());
@@ -548,7 +550,7 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 						datamsg.getDynamicObject()->setProperty("address", data["address"]);
 						datamsg.getDynamicObject()->setProperty("data", saveData);
 						msg.getDynamicObject()->setProperty("DATA", datamsg);
-						server->sendTo(JSON::toString(msg), id);
+						server->sendTo(JSON::toString(msg, JSON::FormatOptions().withEncoding(JSON::Encoding::ascii)), id);
 					}
 				}
 			}
@@ -682,7 +684,7 @@ void OSCRemoteControl::sendPathAddedFeedback(const String& path)
 	var msg(new DynamicObject());
 	msg.getDynamicObject()->setProperty("COMMAND", "PATH_ADDED");
 	msg.getDynamicObject()->setProperty("DATA", path);
-	server->send(JSON::toString(msg));
+	server->send(JSON::toString(msg, JSON::FormatOptions().withEncoding(JSON::Encoding::ascii)));
 }
 
 void OSCRemoteControl::sendPathRemovedFeedback(const String& path)
@@ -693,7 +695,7 @@ void OSCRemoteControl::sendPathRemovedFeedback(const String& path)
 	var msg(new DynamicObject());
 	msg.getDynamicObject()->setProperty("COMMAND", "PATH_REMOVED");
 	msg.getDynamicObject()->setProperty("DATA", path);
-	server->send(JSON::toString(msg));
+	server->send(JSON::toString(msg, JSON::FormatOptions().withEncoding(JSON::Encoding::ascii)));
 }
 
 void OSCRemoteControl::sendPathNameChangedFeedback(const String& oldPath, const String& newPath)
@@ -707,7 +709,7 @@ void OSCRemoteControl::sendPathNameChangedFeedback(const String& oldPath, const 
 	data.getDynamicObject()->setProperty("OLD", oldPath);
 	data.getDynamicObject()->setProperty("NEW", newPath);
 	msg.getDynamicObject()->setProperty("DATA", data);
-	server->send(JSON::toString(msg));
+	server->send(JSON::toString(msg, JSON::FormatOptions().withEncoding(JSON::Encoding::ascii)));
 
 }
 
@@ -734,7 +736,7 @@ void OSCRemoteControl::sendLogFeedback(const String& type, const String& source,
 	data.getDynamicObject()->setProperty("source", source);
 	data.getDynamicObject()->setProperty("message", message);
 	msg.getDynamicObject()->setProperty("DATA", data);
-	server->send(JSON::toString(msg));
+	server->send(JSON::toString(msg, JSON::FormatOptions().withEncoding(JSON::Encoding::ascii)));
 }
 
 void OSCRemoteControl::sendPersistentWarningFeedback(WeakReference<WarningTarget> wt, String address, WarningReporter::WarningReporterEvent::Type type)
@@ -767,7 +769,7 @@ void OSCRemoteControl::sendPersistentWarningFeedback(WeakReference<WarningTarget
 	if (name.isNotEmpty()) data.getDynamicObject()->setProperty("name", name);
 	data.getDynamicObject()->setProperty("message", wMessage);
 	msg.getDynamicObject()->setProperty("DATA", data);
-	server->send(JSON::toString(msg));
+	server->send(JSON::toString(msg, JSON::FormatOptions().withEncoding(JSON::Encoding::ascii)));
 }
 
 void OSCRemoteControl::controllableFeedbackUpdate(ControllableContainer* cc, Controllable* c)
@@ -865,8 +867,6 @@ void OSCRemoteControl::newMessage(const WarningReporter::WarningReporterEvent& e
 {
 	sendPersistentWarningFeedback(e.target, e.targetAddress, e.type);
 }
-
-
 #endif
 
 void OSCRemoteControl::sendAllManualFeedback()
