@@ -36,6 +36,8 @@ public:
 	juce::Time fileLastModTime;
 	juce::var paramsContainerData; //for keeping overriden values
 
+	juce::CriticalSection scriptCallLock;
+
 	bool updateEnabled; //When loading the script, checks if the update function is present
 	const juce::Identifier updateIdentifier = "update";
 
@@ -62,7 +64,7 @@ public:
 	void setState(ScriptState newState);
 
 
-	juce::var callFunction(const juce::Identifier& function, const juce::Array<juce::var> args, juce::Result* result = (juce::Result*)nullptr);
+	juce::var callFunction(const juce::Identifier& function, const juce::Array<juce::var> args, juce::Result* result = (juce::Result*)nullptr, bool skipIfAlreadyCalling = false);
 
 	void onContainerParameterChangedInternal(Parameter*) override;
 	void onContainerTriggerTriggered(Trigger*) override;
