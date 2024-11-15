@@ -13,7 +13,7 @@ Author:  bkupe
 using namespace juce;
 
 Point3DParameter::Point3DParameter(const String& niceName, const String& description, bool enabled) :
-	Parameter(POINT3D, niceName, description, 0, 0, 1, enabled),
+	Parameter(POINT3D, niceName, description, var(), var(), var(), enabled),
 	x(0), y(0), z(0),
 	defaultUI(FloatParameter::NONE),
 	stringDecimals(3)

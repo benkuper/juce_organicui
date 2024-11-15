@@ -12,7 +12,7 @@
 #include "Point2DParameter.h"
 
 Point2DParameter::Point2DParameter(const String& niceName, const String& description, bool _enabled) :
-	Parameter(POINT2D, niceName, description, 0, 0, 1, _enabled),
+	Parameter(POINT2D, niceName, description, var(), var(), var(), _enabled),
 	x(0), y(0),
 	defaultUI(FloatParameter::NONE),
 	stringDecimals(3),
@@ -66,6 +66,7 @@ Array<UndoableAction*> Point2DParameter::setUndoablePoint(Point<float> newPoint,
 
 Array<UndoableAction*> Point2DParameter::setUndoablePoint(float newX, float newY, bool onlyReturnAction, bool setSimilarSelected)
 {
+	DBG("Set undoable point :" << (float)lastUndoValue[0] << " / " << (float)lastUndoValue[1]);
 	var d;
 	d.append(newX);
 	d.append(newY);

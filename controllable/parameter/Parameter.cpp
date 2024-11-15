@@ -160,7 +160,7 @@ void Parameter::setDefaultValue(var val, bool doResetValue)
 void Parameter::resetValue(bool silentSet)
 {
 	isOverriden = false;
-	setValue(defaultValue, silentSet, true, false);
+	setValue(defaultValue, silentSet, false, false);
 }
 
 Array<UndoableAction*> Parameter::setUndoableValue(var newValue, bool onlyReturnAction, bool setSimilarSelected)
@@ -210,7 +210,8 @@ void Parameter::setValue(juce::var _value, bool silentSet, bool force, bool forc
 		var croppedValue = getCroppedValue(_value.clone());
 		if (!alwaysNotify && !force && checkValueIsTheSame(value, croppedValue)) return;
 
-		lastValue = var(value.clone());
+		lastValue = value.clone();
+		if (lastUndoValue.isVoid()) lastUndoValue = _value.clone();
 		setValueInternal(croppedValue);
 		if (!isOverriden /*&& !isControllableFeedbackOnly*/) isOverriden = croppedValue != defaultValue || forceOverride;
 	}
