@@ -10,7 +10,6 @@ Author:  Ben
 
 #include "JuceHeader.h"
 #include "../engine/Engine.h"
-#include "Script.h"
 
 Script::Script(ScriptTarget* _parentTarget, bool canBeDisabled, bool canBeRemoved) :
 	BaseItem("Script", canBeDisabled, false),
@@ -31,6 +30,7 @@ Script::Script(ScriptTarget* _parentTarget, bool canBeDisabled, bool canBeRemove
 	canBeReorderedInEditor = canBeRemoved;
 
 	filePath = new FileParameter("File Path", "Path to the script file", "");
+	filePath->setAutoReload(true);
 	addParameter(filePath);
 
 	updateRate = addIntParameter("Update Rate", "The Rate at which the \"update()\" function is called", 50, 1, 1000);
@@ -75,7 +75,6 @@ Script::Script(ScriptTarget* _parentTarget, bool canBeDisabled, bool canBeRemove
 
 	Engine::mainEngine->addControllableContainerListener(this);
 
-	startTimer(1000); //modification check timer
 }
 
 Script::~Script()
@@ -402,7 +401,7 @@ InspectableEditor* Script::getEditorInternal(bool isRoot, Array<Inspectable*> in
 	return new ScriptEditor(this, isRoot);
 }
 
-void Script::timerCallback()
+void Script::checkScriptFile()
 {
 	//check for modifications
 

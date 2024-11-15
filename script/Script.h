@@ -11,9 +11,9 @@ Author:  Ben
 #pragma once
 
 
+
 class Script :
 	public BaseItem,
-	public juce::Timer,
 	public juce::Thread,
 	public EngineListener
 {
@@ -81,7 +81,7 @@ public:
 
 
 	// Inherited via Timer
-	virtual void timerCallback() override;
+	virtual void checkScriptFile();
 
 	virtual void run() override;
 

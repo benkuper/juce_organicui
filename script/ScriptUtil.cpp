@@ -9,7 +9,6 @@
 */
 
 #include "JuceHeader.h"
-#include "ScriptUtil.h"
 
 juce_ImplementSingleton(ScriptUtil)
 
