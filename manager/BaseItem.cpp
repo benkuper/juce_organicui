@@ -271,7 +271,7 @@ void BaseItem::addMoveToUndoManager(bool addOtherSelectedItems)
 
 void BaseItem::addUndoableMoveAction(Array<UndoableAction*>& arrayToAdd)
 {
-	arrayToAdd.addArray(viewUIPosition->setUndoablePoint(movePositionReference, viewUIPosition->getPoint(), true));
+	arrayToAdd.addArray(viewUIPosition->setUndoablePoint(viewUIPosition->getPoint(), true));
 }
 
 void BaseItem::setSizeReference(bool setOtherSelectedItems)
@@ -345,7 +345,7 @@ void BaseItem::addResizeToUndoManager(bool addOtherSelectedItems)
 
 void BaseItem::addUndoableResizeAction(Array<UndoableAction*>& arrayToAdd)
 {
-	arrayToAdd.addArray(viewUISize->setUndoablePoint(sizeReference, viewUISize->getPoint(), true));
+	arrayToAdd.addArray(viewUISize->setUndoablePoint(viewUISize->getPoint(), true));
 }
 
 void BaseItem::onContainerParameterChanged(Parameter* p)

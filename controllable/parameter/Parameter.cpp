@@ -163,12 +163,6 @@ void Parameter::resetValue(bool silentSet)
 	setValue(defaultValue, silentSet, true, false);
 }
 
-juce::Array<juce::UndoableAction*> Parameter::setUndoableValue(juce::var oldValue, juce::var newValue, bool onlyReturnAction, bool setSimilarSelected)
-{
-	lastUndoValue = oldValue;
-	return setUndoableValue(newValue, onlyReturnAction, setSimilarSelected);
-}
-
 Array<UndoableAction*> Parameter::setUndoableValue(var newValue, bool onlyReturnAction, bool setSimilarSelected)
 {
 	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile)

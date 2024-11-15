@@ -189,7 +189,7 @@ void P2DUI::showEditWindowInternal()
 			{
 				float newVals[2];
 				for (int i = 0; i < 2; ++i) newVals[i] = nameWindow->getTextEditorContents("val" + String(i)).getFloatValue();
-				p2d->setUndoablePoint(p2d->x, p2d->y, newVals[0], newVals[1], false, true);
+				p2d->setUndoablePoint(newVals[0], newVals[1], false, true);
 			}
 		}
 	),

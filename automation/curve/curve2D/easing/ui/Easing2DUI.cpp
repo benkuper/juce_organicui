@@ -386,8 +386,8 @@ void CubicEasing2DUI::mouseUp(const MouseEvent& e)
 	Easing2DUI::mouseUp(e);
 
 	Array<UndoableAction*> actions;
-	actions.addArray(ce->anchor1->setUndoablePoint(h1ValueAtMouseDown, ce->anchor1->getPoint(), true));
-	actions.addArray(ce->anchor2->setUndoablePoint(h2ValueAtMouseDown, ce->anchor2->getPoint(), true));
+	actions.addArray(ce->anchor1->setUndoablePoint(ce->anchor1->getPoint(), true));
+	actions.addArray(ce->anchor2->setUndoablePoint(ce->anchor2->getPoint(), true));
 	UndoMaster::getInstance()->performActions("Move anchors", actions);
 }
 

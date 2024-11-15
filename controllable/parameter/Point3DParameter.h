@@ -23,8 +23,8 @@ public:
 
 	void setVector(juce::Vector3D<float> value);
 	void setVector(float x, float y, float z);
-	juce::Array<juce::UndoableAction*> setUndoableVector(juce::Vector3D<float> oldVector, juce::Vector3D<float> newVector, bool onlyReturnAction = false, bool setSimilarSelected = false);
-	juce::Array<juce::UndoableAction*> setUndoableVector(float oldX, float oldY, float oldZ, float newX, float newY, float newZ, bool onlyReturnAction = false, bool setSimilarSelected = false);
+	juce::Array<juce::UndoableAction*> setUndoableVector(juce::Vector3D<float> newVector, bool onlyReturnAction = false, bool setSimilarSelected = false);
+	juce::Array<juce::UndoableAction*> setUndoableVector(float newX, float newY, float newZ, bool onlyReturnAction = false, bool setSimilarSelected = false);
 	
 	void setValueInternal(juce::var& _value) override;
 	void setBounds(float _minX, float _minY, float _minZ, float _maxX, float _maxY, float _maxZ);

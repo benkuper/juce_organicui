@@ -105,7 +105,7 @@ void BoolToggleUI::mouseDownInternal(const MouseEvent& e)
 	if (e.mods.isLeftButtonDown())
 	{
 		if (e.mods.isAltDown() || momentaryMode) parameter->setValue(!parameter->boolValue(), false, false, true, true);
-		else parameter->setUndoableValue(var(!parameter->boolValue()), false, true); //only undoable when from left button, real toggle behaviour
+		else parameter->setUndoableValue(!parameter->boolValue(), false, true); //only undoable when from left button, real toggle behaviour
 	}
 }
 

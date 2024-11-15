@@ -418,8 +418,8 @@ void CubicEasingUI::mouseUp(const MouseEvent& e)
 	syncHandles = false;
 
 	Array<UndoableAction*> actions;
-	actions.addArray(ce->anchor1->setUndoablePoint(h1ValueAtMouseDown, ce->anchor1->getPoint(), true));
-	actions.addArray(ce->anchor2->setUndoablePoint(h2ValueAtMouseDown, ce->anchor2->getPoint(), true));
+	actions.addArray(ce->anchor1->setUndoablePoint(ce->anchor1->getPoint(), true));
+	actions.addArray(ce->anchor2->setUndoablePoint(ce->anchor2->getPoint(), true));
 	UndoMaster::getInstance()->performActions("Move anchors", actions);
 }
 
@@ -537,7 +537,7 @@ void SineEasingUI::mouseDrag(const MouseEvent& e)
 
 void SineEasingUI::mouseUp(const MouseEvent& e)
 {
-	se->freqAmp->setUndoablePoint(h1ValueAtMouseDown, se->freqAmp->getPoint());
+	se->freqAmp->setUndoablePoint(se->freqAmp->getPoint());
 
 }
 
@@ -623,7 +623,7 @@ void ElasticEasingUI::mouseDrag(const MouseEvent& e)
 
 void ElasticEasingUI::mouseUp(const MouseEvent& e)
 {
-	se->param->setUndoablePoint(h1ValueAtMouseDown, se->param->getPoint());
+	se->param->setUndoablePoint(se->param->getPoint());
 
 }
 
@@ -794,7 +794,7 @@ void GenericEasingUI::mouseUp(const MouseEvent& e)
 	EasingUI::mouseUp(e);
 
 	Array<UndoableAction*> actions;
-	if (h1 != nullptr) actions.addArray(h1->parameter->setUndoablePoint(h1ValueAtMouseDown, h1->parameter->getPoint(), true));
-	if (h2 != nullptr) actions.addArray(h2->parameter->setUndoablePoint(h2ValueAtMouseDown, h2->parameter->getPoint(), true));
+	if (h1 != nullptr) actions.addArray(h1->parameter->setUndoablePoint(h1->parameter->getPoint(), true));
+	if (h2 != nullptr) actions.addArray(h2->parameter->setUndoablePoint(h2->parameter->getPoint(), true));
 	UndoMaster::getInstance()->performActions("Move anchors", actions);
 }

@@ -107,7 +107,6 @@ public:
 
 	virtual void setDefaultValue(juce::var val, bool doResetValue = true);
 	virtual void resetValue(bool silentSet = false);
-	virtual juce::Array<juce::UndoableAction*> setUndoableValue(juce::var oldValue, juce::var newValue, bool onlyReturnAction = false, bool setSimilarSelected = false);
 	virtual juce::Array<juce::UndoableAction*> setUndoableValue(juce::var newValue, bool onlyReturnAction = false, bool setSimilarSelected = false);
 	virtual void setValue(juce::var _value, bool silentSet = false, bool force = false, bool forceOverride = true, bool setSimilarSelected = false);
 	virtual void setValueInternal(juce::var& _value);

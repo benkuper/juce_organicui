@@ -88,7 +88,7 @@ void DoubleSliderUI::mouseUpInternal(const MouseEvent&)
 {
 	if (setUndoableValueOnMouseUp)
 	{
-		if ((float)mouseDownValue[0] != xParam.floatValue() || (float)mouseDownValue[1] != yParam.floatValue()) p2d->setUndoablePoint((float)mouseDownValue[0], (float)mouseDownValue[1], xParam.floatValue(), yParam.floatValue());
+		if ((float)mouseDownValue[0] != xParam.floatValue() || (float)mouseDownValue[1] != yParam.floatValue()) p2d->setUndoablePoint(xParam.floatValue(), yParam.floatValue());
 	}
 }
 
@@ -164,7 +164,7 @@ void DoubleSliderUI::showEditWindowInternal()
 			{
 				float newVals[2];
 				for (int i = 0; i < 2; ++i) newVals[i] = nameWindow->getTextEditorContents("val" + String(i)).getFloatValue();
-				param->setUndoablePoint(param->x, param->y, newVals[0], newVals[1]);
+				param->setUndoablePoint(newVals[0], newVals[1]);
 			}
 		}),
 		true
@@ -282,7 +282,7 @@ void DoubleSliderUI::newMessage(const Parameter::ParameterEvent& e)
 		{
 			if (xParam.floatValue() != p2d->x || yParam.floatValue() != p2d->y)
 			{
-				if (!isMouseButtonDown(true) && !UndoMaster::getInstance()->isPerformingUndoRedo()) p2d->setUndoablePoint(p2d->x, p2d->y, xParam.floatValue(), yParam.floatValue());
+				if (!isMouseButtonDown(true) && !UndoMaster::getInstance()->isPerformingUndoRedo()) p2d->setUndoablePoint(xParam.floatValue(), yParam.floatValue());
 				else p2d->setPoint(xParam.floatValue(), yParam.floatValue());
 			}
 		}

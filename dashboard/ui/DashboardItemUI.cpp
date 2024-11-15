@@ -131,7 +131,7 @@ bool DashboardItemUI::keyPressed(const KeyPress& e)
 		else if (e.getModifiers().isAltDown()) posOffset *= 1;
 		else  posOffset *= 2;
 
-		item->viewUIPosition->setUndoablePoint(item->viewUIPosition->getPoint(), item->viewUIPosition->getPoint() + posOffset, false, false);
+		item->viewUIPosition->setUndoablePoint(item->viewUIPosition->getPoint() + posOffset, false, false);
 		return true;
 	}
 

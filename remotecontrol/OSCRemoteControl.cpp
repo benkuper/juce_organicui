@@ -599,15 +599,12 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 					if (c->type == Controllable::TRIGGER) ((Trigger*)c)->trigger();
 					else ((Parameter*)c)->setValue(nv.value);
 				}
-				else if (nv.name.toString().startsWith("undoable:") && nv.value.size() == 2)
+				else if (nv.name.toString().startsWith("undoable:") && nv.value.size() >= 1)
 				{
 					String cName = nv.name.toString().fromFirstOccurrenceOf(":", false, false);
 					if (Parameter* p = dynamic_cast<Parameter*>(Engine::mainEngine->getControllableForAddress(cName)))
 					{
-						if (nv.value.size() == 2)
-						{
-							p->setUndoableValue(nv.value[0], nv.value[1], false);
-						}
+						p->setUndoableValue(nv.value[0], false);
 					}
 				}
 				else if (nv.name.toString().startsWith("undoables:"))
@@ -621,9 +618,9 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 						{
 							if (Parameter* p = dynamic_cast<Parameter*>(Engine::mainEngine->getControllableForAddress(pnv.name.toString())))
 							{
-								if (pnv.value.size() == 2)
+								if (pnv.value.size() >= 1)
 								{
-									actions.addArray(p->setUndoableValue(pnv.value[0], pnv.value[1], true, false));
+									actions.addArray(p->setUndoableValue(pnv.value[0], true, false));
 								}
 							}
 						}

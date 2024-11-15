@@ -59,23 +59,18 @@ void Point2DParameter::setPoint(float _x, float _y)
 }
 
 
-Array<UndoableAction*> Point2DParameter::setUndoablePoint(Point<float> oldPoint, Point<float> newPoint, bool onlyReturnAction, bool setSimilarSelected)
+Array<UndoableAction*> Point2DParameter::setUndoablePoint(Point<float> newPoint, bool onlyReturnAction, bool setSimilarSelected)
 {
-	return setUndoablePoint(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y, onlyReturnAction, setSimilarSelected);
+	return setUndoablePoint(newPoint.x, newPoint.y, onlyReturnAction, setSimilarSelected);
 }
 
-Array<UndoableAction*> Point2DParameter::setUndoablePoint(float oldX, float oldY, float newX, float newY, bool onlyReturnAction, bool setSimilarSelected)
+Array<UndoableAction*> Point2DParameter::setUndoablePoint(float newX, float newY, bool onlyReturnAction, bool setSimilarSelected)
 {
-	var od;
-	od.append(oldX);
-	od.append(oldY);
 	var d;
 	d.append(newX);
 	d.append(newY);
 
-	if (checkValueIsTheSame(od, d) && !alwaysNotify) return nullptr;
-
-	return setUndoableValue(od, d, onlyReturnAction, setSimilarSelected);
+	return setUndoableValue(d, onlyReturnAction, setSimilarSelected);
 }
 
 void Point2DParameter::setDefaultPoint(Point<float> p, bool doResetValue)

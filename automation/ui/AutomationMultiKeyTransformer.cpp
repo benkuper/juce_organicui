@@ -128,8 +128,8 @@ void AutomationMultiKeyTransformer::mouseUp(const MouseEvent & e)
 	int numKeys = keysUI.size();
 	for (int i = 0; i < numKeys; ++i)
 	{
-		actions.addArray(keysUI[i]->item->position->setUndoableValue(keysTimesAndValuesPositions[i].x, keysUI[i]->item->position->floatValue(), true));
-		actions.addArray(keysUI[i]->item->value->setUndoableValue(keysTimesAndValuesPositions[i].y, keysUI[i]->item->value->floatValue(), true));
+		actions.addArray(keysUI[i]->item->position->setUndoableValue(keysUI[i]->item->position->floatValue(), true));
+		actions.addArray(keysUI[i]->item->value->setUndoableValue(keysUI[i]->item->value->floatValue(), true));
 	}
 	UndoMaster::getInstance()->performActions("Move " + String(numKeys) + " keys", actions);
 }

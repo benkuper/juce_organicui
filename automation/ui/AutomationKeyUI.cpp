@@ -91,7 +91,7 @@ void AutomationKeyUI::mouseDown(const MouseEvent& e)
 				{
 					if (result >= 1 && result <= keys.size())
 					{
-						this->item->easingType->setUndoableValue(item->easingType->value, var(keys[result - 1]));
+						this->item->easingType->setUndoableValue(keys[result - 1]);
 						this->item->easing->selectThis(); //reselect after changing easing
 					}
 				}

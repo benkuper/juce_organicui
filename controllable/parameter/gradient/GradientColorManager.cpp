@@ -194,7 +194,7 @@ Array<UndoableAction*> GradientColorManager::getMoveKeysBy(float start, float of
 {
 	Array<UndoableAction*> actions;
 	Array<GradientColor*> triggers = getItemsInTimespan(start, length->floatValue());
-	for (auto& t : triggers) actions.addArray(t->position->setUndoableValue(t->position->floatValue(), t->position->floatValue() + offset, true));
+	for (auto& t : triggers) actions.addArray(t->position->setUndoableValue(t->position->floatValue() + offset, true));
 	return actions;
 }
 

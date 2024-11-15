@@ -61,7 +61,7 @@ void TargetParameter::resetValue(bool silentSet)
 	if (targetType == CONTAINER) setTarget((ControllableContainer*)nullptr);
 	else setTarget((Controllable*)nullptr);
 	setGhostValue("");
-	setUndoableValue(value, "");
+	setUndoableValue("");
 
 	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::VALUE_CHANGED, this, getValue()));
 	clearWarning();
@@ -118,7 +118,7 @@ void TargetParameter::setValueFromTarget(Controllable* c, bool addToUndo)
 		manuallySettingNull = true;
 	}
 
-	if (addToUndo) setUndoableValue(stringValue(), var(newValue));
+	if (addToUndo) setUndoableValue(newValue);
 	else setValue(newValue, false, true);
 
 	manuallySettingNull = false;
@@ -146,7 +146,7 @@ void TargetParameter::setValueFromTarget(ControllableContainer* cc, bool addToUn
 		manuallySettingNull = true;
 	}
 
-	if (addToUndo) setUndoableValue(stringValue(), var(cc->getControlAddress(rootContainer)));
+	if (addToUndo) setUndoableValue(cc->getControlAddress(rootContainer));
 	else setValue(cc->getControlAddress(rootContainer), false, true);
 
 	manuallySettingNull = false;
