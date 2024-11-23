@@ -24,8 +24,8 @@ public:
 	bool extendedEditorStretchMode;
 	bool canShowExtendedEditor;
 
-	void setPoint(juce::Point<float> value);
-	void setPoint(float x, float y);
+	void setPoint(juce::Point<float> value, bool setSimilarSelected = false);
+	void setPoint(float x, float y, bool setSimilarSelected = false);
 	juce::Array<juce::UndoableAction*> setUndoablePoint(juce::Point<float> newPoint, bool onlyReturnAction = false, bool setSimilarSelected = false);
 	juce::Array<juce::UndoableAction*> setUndoablePoint(float newX, float newY, bool onlyReturnAction = false, bool setSimilarSelected = false);
 

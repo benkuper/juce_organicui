@@ -45,17 +45,17 @@ Point2DParameter::Point2DParameter(const String& niceName, const String& descrip
 }
 
 
-void Point2DParameter::setPoint(Point<float> point)
+void Point2DParameter::setPoint(Point<float> point, bool setSimilarSelected)
 {
-	setPoint(point.x, point.y);
+	setPoint(point.x, point.y, setSimilarSelected);
 }
 
-void Point2DParameter::setPoint(float _x, float _y)
+void Point2DParameter::setPoint(float _x, float _y, bool setSimilarSelected)
 {
 	var d;
 	d.append(_x);
 	d.append(_y);
-	setValue(d);
+	setValue(d, setSimilarSelected);
 }
 
 
