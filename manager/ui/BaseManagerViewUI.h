@@ -842,6 +842,8 @@ void BaseManagerViewUI<M, T, U>::itemUIResizeDrag(BaseItemMinimalUI<T>* itemUI, 
 
 
 	juce::Point<float> offset = snapPos - (itemUI->baseItem->getPosition() + itemUI->baseItem->sizeReference);
+	offset.x = juce::jmax<float>(offset.x, 50 - itemUI->baseItem->sizeReference.x);
+	offset.y = juce::jmax<float>(offset.y, 40 - itemUI->baseItem->sizeReference.y);
 	itemUI->baseItem->resizeItem(offset, true);
 }
 
