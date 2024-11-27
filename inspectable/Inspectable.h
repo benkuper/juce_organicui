@@ -36,7 +36,7 @@ public:
 	Inspectable();
 	virtual ~Inspectable();
 
-	InspectableSelectionManager * selectionManager;
+	InspectableSelectionManager* selectionManager;
 
 	bool isSelected;
 	bool isSelectable;
@@ -71,7 +71,7 @@ public:
 	virtual void deselectThis(bool notify = true);
 	virtual void setSelected(bool value);
 
-	virtual void setHighlighted(bool value);
+	virtual void setHighlighted(bool value, Inspectable* source = nullptr);
 	virtual void highlightLinkedInspectables(bool value);
 
 	virtual void registerLinkedInspectable(juce::WeakReference<Inspectable> i, bool setAlsoInOtherInspectable = true);
@@ -81,7 +81,7 @@ public:
 	template<class T>
 	void unregisterLinkedInspectablesOfType();
 
-	virtual void setSelectionManager(InspectableSelectionManager * selectionManager);
+	virtual void setSelectionManager(InspectableSelectionManager* selectionManager);
 
 	void setPreselected(bool value);
 
@@ -93,7 +93,7 @@ public:
 	static juce::Array<T*> getArrayAs(juce::Array<S*> source)
 	{
 		juce::Array<T*> result;
-		for (auto& i : source) result.add(static_cast<T *>(i));
+		for (auto& i : source) result.add(static_cast<T*>(i));
 		return result;
 	}
 
@@ -106,9 +106,9 @@ public:
 	}
 
 	template<class T>
-	static juce::Array<T *> getArrayFromWeak(juce::Array<juce::WeakReference<T>> source)
+	static juce::Array<T*> getArrayFromWeak(juce::Array<juce::WeakReference<T>> source)
 	{
-		juce::Array<T *> result;
+		juce::Array<T*> result;
 		for (auto& i : source) result.add(i.get());
 		return result;
 	}
@@ -121,16 +121,36 @@ public:
 	public:
 		/** Destructor. */
 		virtual ~InspectableListener() {}
-		virtual void inspectableSelectionChanged(Inspectable *) {};
-		virtual void inspectablePreselectionChanged(Inspectable *) {};
-		virtual void inspectableHighlightChanged(Inspectable *) {};
+		virtual void inspectableSelectionChanged(Inspectable*) {};
+		virtual void inspectablePreselectionChanged(Inspectable*) {};
+		virtual void inspectableHighlightChanged(Inspectable*, Inspectable* /*source*/) {};
 
-		virtual void inspectableDestroyed(Inspectable *) {};
+		virtual void inspectableDestroyed(Inspectable*) {};
 	};
 
 	DECLARE_INSPECTACLE_SAFE_LISTENER(Inspectable, inspectable);
-	DECLARE_ASYNC_EVENT(Inspectable, Inspectable, inspectable, ENUM_LIST(SELECTION_CHANGED, PRESELECTION_CHANGED, HIGHLIGHT_CHANGED), EVENT_INSPECTABLE_CHECK)
-	
+
+	class InspectableEvent {
+	public:
+		enum Type { SELECTION_CHANGED, PRESELECTION_CHANGED, HIGHLIGHT_CHANGED };
+		InspectableEvent(Type t, Inspectable* item, Inspectable* source = nullptr) : type(t), item(item), source(source) {}
+		Type type;
+		Inspectable* item;
+		Inspectable* source;
+	};
+
+	QueuedNotifier<InspectableEvent> inspectableNotifier;
+
+	typedef QueuedNotifier<InspectableEvent>::Listener AsyncListener; void addAsyncInspectableListener(AsyncListener* newListener) {
+		inspectableNotifier.addListener(newListener);
+	}
+	void addAsyncCoalescedInspectableListener(AsyncListener* newListener) {
+		inspectableNotifier.addAsyncCoalescedListener(newListener);
+	}
+	void removeAsyncInspectableListener(AsyncListener* listener) {
+		if (!isBeingDestroyed) inspectableNotifier.removeListener(listener);
+	};
+
 	juce::WeakReference<Inspectable>::Master masterReference;
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Inspectable)
@@ -140,12 +160,12 @@ private:
 template<class T>
 void Inspectable::unregisterLinkedInspectablesOfType()
 {
-	juce::Array<Inspectable *> unregisterList;
-	for (auto &i : linkedInspectables)
+	juce::Array<Inspectable*> unregisterList;
+	for (auto& i : linkedInspectables)
 	{
-		if (dynamic_cast<T *>(i.get()) != nullptr) unregisterList.add(i);
+		if (dynamic_cast<T*>(i.get()) != nullptr) unregisterList.add(i);
 	}
 
-	for (auto &i : unregisterList) unregisterLinkedInspectable(i);
+	for (auto& i : unregisterList) unregisterLinkedInspectable(i);
 	cleanLinkedInspectables();
 }
