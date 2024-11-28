@@ -31,12 +31,12 @@ public:
 	bool useCustomFGColor;
 	juce::Colour customFGColor;
 
+
 	//popupMenuFilters
 	static bool showAlwaysNotifyOption;
 	static bool showControlModeOption;
 
 	static std::function<void(ParameterUI*)> customShowEditRangeWindowFunction;
-
 
 	virtual void showEditWindowInternal() override;
 	virtual juce::Component* getEditValueComponent();

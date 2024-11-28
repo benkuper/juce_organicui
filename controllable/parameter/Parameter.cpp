@@ -402,9 +402,13 @@ void Parameter::setNormalizedValue(const var& normalizedValue, bool silentSet, b
 	}
 }
 
-var Parameter::getNormalizedValue() const
+var Parameter::getNormalizedValue(var forceVal) const
 {
-	if (type == BOOL) return (float)value;
+	var val = forceVal.isVoid() ? value : forceVal;
+
+	if (type == BOOL) return (float)val;
+
+	jassert(val.size() == value.size());
 
 	if (!canHaveRange) return 0;
 
@@ -414,15 +418,15 @@ var Parameter::getNormalizedValue() const
 			return 0.0;
 		}
 		else
-			return jmap<float>((float)value, (float)minimumValue, (float)maximumValue, 0.f, 1.f);
+			return jmap<float>((float)val, (float)minimumValue, (float)maximumValue, 0.f, 1.f);
 	}
 	else
 	{
 		var normVal;
-		for (int i = 0; i < value.size(); i++)
+		for (int i = 0; i < val.size(); i++)
 		{
 			if ((float)minimumValue[i] == (float)maximumValue[i]) normVal.append(0.f);
-			else normVal.append(jmap<float>((float)value[i], (float)minimumValue[i], (float)maximumValue[i], 0.f, 1.f));
+			else normVal.append(jmap<float>((float)val[i], (float)minimumValue[i], (float)maximumValue[i], 0.f, 1.f));
 		}
 
 		return normVal;

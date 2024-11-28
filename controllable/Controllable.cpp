@@ -140,7 +140,7 @@ void Controllable::setCustomShortName(const String& _shortName)
 }
 
 void Controllable::setAutoShortName() {
-	
+
 	String prevShortName = shortName;
 	hasCustomShortName = false;
 	shortName = StringUtil::toShortName(niceName, replaceSlashesInShortName);
@@ -166,6 +166,13 @@ void Controllable::setControllableFeedbackOnly(bool value)
 	isControllableFeedbackOnly = value;
 	controllableListeners.call(&ControllableListener::controllableFeedbackStateChanged, this);
 	controllableNotifier.addMessage(new ControllableEvent(ControllableEvent::FEEDBACK_STATE_CHANGED, this));
+}
+
+void Controllable::setPreviewValue(juce::var value)
+{
+	previewValue = value;
+	controllableListeners.call(&ControllableListener::controllablePreviewValueChanged, this);
+	controllableNotifier.addMessage(new ControllableEvent(ControllableEvent::PREVIEW_VALUE_CHANGED, this));
 }
 
 void Controllable::notifyStateChanged()

@@ -293,6 +293,7 @@ void ControllableUI::showContextMenu()
 	);
 }
 
+
 void ControllableUI::updateUIParams()
 {
 	setInterceptsMouseClicks(isInteractable(false), isInteractable(false));
@@ -351,6 +352,11 @@ void ControllableUI::newMessage(const Controllable::ControllableEvent& e)
 	}
 	break;
 
+	case Controllable::ControllableEvent::PREVIEW_VALUE_CHANGED:
+		updatePreview();
+		repaint();
+		break;
+
 	default:
 		//NOT HANDLED
 		break;
@@ -363,6 +369,7 @@ void ControllableUI::newMessage(const Inspectable::InspectableEvent& e)
 	if (e.type == Inspectable::InspectableEvent::HIGHLIGHT_CHANGED)
 	{
 		if (drawContourOnInspectableHighlighted) repaint();
+		if (customHighlightFunc != nullptr) customHighlightFunc(this, e.source);
 	}
 }
 

@@ -116,7 +116,7 @@ public:
 	//For Number type parameters
 	void setUndoableNormalizedValue(const juce::var& newNormalizedValue, bool setSimilarSelected = false);
 	void setNormalizedValue(const juce::var& normalizedValue, bool silentSet = false, bool force = false, bool setSimilarSelected = false);
-	juce::var getNormalizedValue() const;
+	juce::var getNormalizedValue(juce::var forceVal = juce::var()) const;
 
 	virtual bool setAttributeInternal(juce::String param, juce::var value) override;
 	virtual juce::StringArray getValidAttributes() const override;

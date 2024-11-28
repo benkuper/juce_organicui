@@ -44,9 +44,14 @@ void FloatSliderUI::paint(Graphics& g)
 
 	if (parameter.wasObjectDeleted()) return;
 
+	bool previewMode = !parameter->previewValue.isVoid();
+	var valueToShow = previewMode ? parameter->previewValue : parameter->getValue();
+
+
 	juce::Rectangle<int> sliderBounds = getLocalBounds();
 
 	Colour baseColor = useCustomFGColor ? customFGColor : (isInteractable() ? PARAMETER_FRONT_COLOR.darker() : FEEDBACK_COLOR);
+	if (previewMode) baseColor = Colours::rebeccapurple.brighter(.2f);
 	drawBG(g);
 
 	Colour c = (isMouseButtonDown() && changeParamOnMouseUpOnly) ? HIGHLIGHT_COLOR : baseColor;
@@ -74,12 +79,12 @@ void FloatSliderUI::paint(Graphics& g)
 	{
 		if ((float)parameter->minimumValue < 0 && (float)parameter->maximumValue >= 0)
 		{
-			if (parameter->floatValue() != 0) drawRotary(g, c, jmin<float>(parameter->value, 0), jmax<float>(parameter->value, 0), 2);
+			if (parameter->floatValue() != 0) drawRotary(g, c, jmin<float>(valueToShow, 0), jmax<float>(valueToShow, 0), 2);
 			else drawRotary(g, c, -.01f, .01f, 2);
 		}
 		else
 		{
-			drawRotary(g, c, parameter->minimumValue, parameter->value, 2);
+			drawRotary(g, c, parameter->minimumValue, valueToShow, 2);
 		}
 	}
 
@@ -261,7 +266,8 @@ int FloatSliderUI::getDrawPos()
 
 String FloatSliderUI::getValueText() const
 {
-	String v = fixedDecimals == -1 ? String(parameter->intValue()) : (fixedDecimals == 0 ? parameter->stringValue() : String::formatted("%." + String(fixedDecimals + 1) + "f", parameter->floatValue()).dropLastCharacters(1));
+	var valueToShow = parameter->previewValue.isVoid() ? parameter->getValue() : parameter->previewValue;
+	String v = fixedDecimals == -1 ? String(parameter->intValue()) : (fixedDecimals == 0 ? valueToShow.toString() : String::formatted("%." + String(fixedDecimals + 1) + "f", (float)valueToShow).dropLastCharacters(1));
 	return prefix + v + suffix;
 }
 
@@ -311,7 +317,7 @@ void FloatSliderUI::setParamNormalizedValue(float value)
 
 float FloatSliderUI::getParamNormalizedValue()
 {
-	return (float)parameter->getNormalizedValue();
+	return (float)parameter->getNormalizedValue(parameter->previewValue.isVoid() ? var() : parameter->previewValue);
 }
 
 
