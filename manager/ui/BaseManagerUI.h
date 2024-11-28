@@ -1001,7 +1001,16 @@ template<class M, class T, class U>
 void BaseManagerUI<M, T, U>::removeItemUI(T* item, bool resizeAndRepaint)
 {
 	{
-		juce::MessageManagerLock mmLock; //Ensure this method can be called from another thread than the UI one
+		if (!MessageManager::getInstance()->isThisTheMessageThread())
+		{
+			MessageManager::getInstance()->callAsync([this, item, resizeAndRepaint]()
+				{
+					removeItemUI(item, resizeAndRepaint);
+				});
+			return;
+		}
+
+		//juce::MessageManagerLock mmLock; //Ensure this method can be called from another thread than the UI one
 
 		U* tui = getUIForItem(item, false);
 		if (tui == nullptr) return;
@@ -1075,9 +1084,11 @@ void BaseManagerUI<M, T, U>::itemsRemoved(juce::Array<T*> items)
 
 	for (auto& i : items) removeItemUI(i, false);
 
-	juce::MessageManagerLock mmLock;
-	resized();
-	repaint();
+	MessageManager::getInstance()->callAsync([this]()
+		{
+			resized();
+			repaint();
+		});
 
 }
 
