@@ -55,7 +55,7 @@ void BoolToggleUI::paint(Graphics& g)
 	// we are on component deletion
 	if (shouldBailOut())return;
 
-	bool valCheck = parameter->boolValue();
+	bool valCheck = parameter->previewValue.isVoid() ? parameter->boolValue() : (bool)parameter->previewValue;
 	Image m = valCheck ? onImage : offImage;
 
 	juce::Rectangle<int> r = getLocalBounds();
@@ -158,13 +158,15 @@ void BoolButtonToggleUI::paint(Graphics& g)
 	buttonRect = getLocalBounds().toFloat();
 	if (!showLabel) buttonRect.setWidth(jmin<float>(buttonRect.getWidth(), buttonRect.getHeight() * 3));
 
-	bool isOn = parameter->boolValue();
+	bool previewMode = !parameter->previewValue.isVoid();
+	bool isOn = previewMode ? (bool)parameter->previewValue : parameter->boolValue();
 
 	Point<float> center = buttonRect.getCentre();
 
 	Colour bgColor = useCustomBGColor ? customBGColor : NORMAL_COLOR;
 	Colour c = bgColor.darker();
 	Colour hc = useCustomFGColor ? customFGColor : HIGHLIGHT_COLOR;
+	if (previewMode) hc = Colours::rebeccapurple.brighter(.2f);
 
 	if (isInteractable())
 	{
