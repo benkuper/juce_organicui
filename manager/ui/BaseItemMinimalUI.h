@@ -215,8 +215,6 @@ void BaseItemMinimalUI<T>::mouseDown(const juce::MouseEvent& e)
 	//LOG("BaseItemMinimalUI::mouseDown " << e.eventComponent->getName() << " / " << e.originalComponent->getName());
 	InspectableContentComponent::mouseDown(e);
 
-	if (e.eventComponent != this) return;
-
 	if (e.mods.isRightButtonDown())
 	{
 		if (getMainBounds().contains(e.getPosition()))

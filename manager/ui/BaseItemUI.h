@@ -470,7 +470,7 @@ void BaseItemUI<T>::mouseDown(const juce::MouseEvent& e)
 		this->baseItem->setSizeReference(true);
 	}
 
-	BaseItemMinimalUI<T>::mouseDown(e);
+	if (e.eventComponent == this || e.eventComponent == &itemLabel) BaseItemMinimalUI<T>::mouseDown(e);
 }
 
 template<class T>
