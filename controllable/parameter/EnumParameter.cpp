@@ -14,7 +14,7 @@ EnumParameter::EnumParameter(const String& niceName, const String& description, 
 	Parameter(Type::ENUM, niceName, description, "", var(), var(), enabled),
 	enumParameterNotifier(5)
 {
-	lockManualControlMode = true;
+	//lockManualControlMode = true;
 
 	scriptObject.getDynamicObject()->setMethod("getKey", EnumParameter::getValueKeyFromScript);
 	scriptObject.getDynamicObject()->setMethod("setData", EnumParameter::setValueWithDataFromScript);
