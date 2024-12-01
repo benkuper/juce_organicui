@@ -133,7 +133,7 @@ void EnumParameterUI::valueChanged(const var& value)
 void EnumParameterUI::comboBoxChanged(ComboBox*)
 {
 	if (shouldBailOut()) return;
-	ep->setUndoableValue(getSelectedKey());
+	ep->setUndoableValue(getSelectedKey(), false, true);
 
 }
 
