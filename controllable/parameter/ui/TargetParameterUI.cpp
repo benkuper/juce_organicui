@@ -243,7 +243,7 @@ void TargetParameterUI::showPopupAndGetTarget(ControllableContainer* startFromCC
 				{
 					if (c == nullptr) return;
 					if (shouldBailOut()) return;
-					targetParameter->setValueFromTarget(c);
+					targetParameter->setValueFromTarget(c, true, true);
 				});
 		}
 		else
@@ -266,7 +266,7 @@ void TargetParameterUI::showPopupAndGetTarget(ControllableContainer* startFromCC
 				{
 					if (c == nullptr) return;
 					if (shouldBailOut()) return;
-					targetParameter->setValueFromTarget(c);
+					targetParameter->setValueFromTarget(c, true, true);
 				});
 		}
 
@@ -279,7 +279,7 @@ void TargetParameterUI::showPopupAndGetTarget(ControllableContainer* startFromCC
 				{
 					if (cc == nullptr) return;
 					if (shouldBailOut()) return;
-					targetParameter->setValueFromTarget(cc);
+					targetParameter->setValueFromTarget(cc, true, true);
 				});
 		}
 		else
@@ -302,7 +302,7 @@ void TargetParameterUI::showPopupAndGetTarget(ControllableContainer* startFromCC
 				{
 					if (cc == nullptr) return;
 					if (shouldBailOut()) return;
-					targetParameter->setValueFromTarget(cc);
+					targetParameter->setValueFromTarget(cc, true, true);
 				}
 			);
 		}
