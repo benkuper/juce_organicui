@@ -42,7 +42,7 @@ void Engine::createNewGraph() {
 	engineListeners.call(&EngineListener::startLoadFile);
 	engineNotifier.addMessage(new EngineEvent(EngineEvent::START_LOAD_FILE, this));
 
-	
+
 
 	afterLoadFileInternal();
 
@@ -206,6 +206,31 @@ Result Engine::saveDocument(const File& file) {
 	return Result::ok();
 }
 
+juce::Result Engine::saveCopy()
+{
+	if (!getFile().existsAsFile()) return Result::ok();
+
+	String curFileName = getFile().getFileNameWithoutExtension();
+	File copyFile = getFile().getParentDirectory().getNonexistentChildFile(curFileName + " copy" + getFile().getFileExtension(), "", false);
+	var data = getJSONData();
+
+	if (copyFile.exists()) copyFile.deleteFile();
+	std::unique_ptr<OutputStream> os(copyFile.createOutputStream());
+
+	if (os == nullptr)
+	{
+		LOGERROR("Error saving the document");
+		return Result::fail("Error saving the document, maybe you don't have write access ?");
+	}
+
+	JSON::writeToStream(*os, data);
+	os->flush();
+
+	LOG("Saved copy to " << copyFile.getFullPathName());
+
+	return Result::ok();
+}
+
 Result Engine::saveBackupDocument(int index)
 {
 
@@ -231,6 +256,41 @@ Result Engine::saveBackupDocument(int index)
 	os->flush();
 
 	return Result::ok();
+}
+
+void Engine::loadDocumentFromJSON(var data)
+{
+	if (!data.isObject()) return;
+
+	clearTasks();
+	taskName = "Loading File";
+
+	ProgressTask* clearTask = addTask("clearing");
+	ProgressTask* parseTask = addTask("parsing");
+	ProgressTask* loadTask = addTask("loading");
+
+	clearTask->start();
+	clear();
+	clearTask->end();
+
+	//  {
+	//    MessageManagerLock ml;
+	//  }
+
+	loadingStartTime = Time::currentTimeMillis();
+	setFile(File());
+
+	{
+
+		loadTask->start();
+		loadJSONData(data, loadTask);
+		loadTask->end();
+
+
+	}// deletes data before launching audio, (data not needed after loaded)
+
+	jsonData = var();
+	setChangedFlag(false);
 }
 
 
@@ -379,13 +439,13 @@ void Engine::loadJSONData(var data, ProgressTask* loadingTask)
 						break;
 
 						case 2: //load directly
-								//do nothing
+							//do nothing
 
 							loadJSONDataEngine(data, loadingTask);
 							break;
 						}
 
-						
+
 					}
 				);
 
@@ -408,7 +468,7 @@ void Engine::loadJSONDataEngine(var data, ProgressTask* loadingTask)
 	ShapeShifterManager::getInstance()->clearAllPanelsAndWindows();
 
 	ControllableContainer::loadJSONData(data);
-	
+
 	//if (InspectableSelectionManager::mainSelectionManager != nullptr) InspectableSelectionManager::mainSelectionManager->setEnabled(false); //avoid creation of inspector editor while recreating all nodes, controllers, rules,etc. from file
 
 	if (Outliner::getInstanceWithoutCreating() != nullptr) Outliner::getInstance()->setEnabled(false);
@@ -419,7 +479,7 @@ void Engine::loadJSONDataEngine(var data, ProgressTask* loadingTask)
 	ProgressTask* parrotTask = loadingTask->addTask("Parrot");
 
 
-	
+
 
 	projectTask->start();
 	if (d->hasProperty("projectSettings")) ProjectSettings::getInstance()->loadJSONData(d->getProperty("projectSettings"));

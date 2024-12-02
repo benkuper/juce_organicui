@@ -18,6 +18,7 @@ namespace CommandIDs
 	static const int open = 0x30000;
 	static const int save = 0x30001;
 	static const int saveAs = 0x30002;
+	static const int saveCopy = 0x30008;
 	static const int newFile = 0x30003;
 	static const int openLastDocument = 0x30004;
 	static const int checkForUpdates = 0x30005;
@@ -81,6 +82,14 @@ void OrganicMainContentComponent::getCommandInfo(CommandID commandID, Applicatio
 			"Saves a copy of the current graph to a file",
 			category, 0);
 		result.defaultKeypresses.add(KeyPress('s', ModifierKeys::shiftModifier | ModifierKeys::commandModifier, 0));
+		break;
+
+	case CommandIDs::saveCopy:
+		result.setInfo("Save Copy",
+			"Saves a copy of the current graph to a file",
+			category, 0);
+
+		result.defaultKeypresses.add(KeyPress('s', ModifierKeys::commandModifier | ModifierKeys::altModifier, 0));
 		break;
 
 	case CommandIDs::checkForUpdates:
@@ -275,6 +284,7 @@ void OrganicMainContentComponent::getAllCommands(Array<CommandID>& commands) {
 	  CommandIDs::openLastDocument,
 	  CommandIDs::save,
 	  CommandIDs::saveAs,
+	  CommandIDs::saveCopy,
 	  CommandIDs::checkForUpdates,
 #if ORGANICUI_USE_WEBSERVER
 	  CommandIDs::updateDashboardFiles,
@@ -331,6 +341,7 @@ PopupMenu OrganicMainContentComponent::getMenuForIndex(int /*topLevelMenuIndex*/
 
 		menu.addCommandItem(&getCommandManager(), CommandIDs::save);
 		menu.addCommandItem(&getCommandManager(), CommandIDs::saveAs);
+		menu.addCommandItem(&getCommandManager(), CommandIDs::saveCopy);
 		menu.addSeparator();
 		menu.addCommandItem(&getCommandManager(), CommandIDs::editProjectSettings);
 		menu.addCommandItem(&getCommandManager(), CommandIDs::editGlobalSettings);
@@ -479,6 +490,10 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 
 	}
 	break;
+
+	case CommandIDs::saveCopy:
+		Engine::mainEngine->saveCopy();
+		break;
 
 	case CommandIDs::checkForUpdates:
 		AppUpdater::getInstance()->checkForUpdates(true);

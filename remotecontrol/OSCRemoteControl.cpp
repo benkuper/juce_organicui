@@ -208,8 +208,30 @@ void OSCRemoteControl::processMessage(const OSCMessage& m, const String& sourceI
 				return;
 			}
 
-			MessageManagerLock mmLock;
-			Engine::mainEngine->loadDocument(f);
+			MessageManager::getInstance()->callAsync([f]() { Engine::mainEngine->loadDocument(f); });
+		}
+	}
+	else if (add == "/loadFile")
+	{
+		if (m.size() < 1) LOGWARNING("Cannot load file, no argument provided");
+		else
+		{
+			if (!m[0].isString())
+			{
+				LOGWARNING("Cannot load file, argument #0 is not a string");
+				return;
+			}
+
+			var data = JSON::parse(m[0].getString());
+			if (!data.isObject())
+			{
+				LOGWARNING("Cannot load file, argument #0 is not a valid JSON object");
+				return;
+			}
+
+			MessageManager::getInstance()->callAsync([data]() {
+				Engine::mainEngine->loadJSONData(data, nullptr);
+				});
 		}
 	}
 	else if (add == "/newFile")
@@ -218,12 +240,11 @@ void OSCRemoteControl::processMessage(const OSCMessage& m, const String& sourceI
 	}
 	else if (add == "/saveFile")
 	{
-		MessageManagerLock mmLock;
 		if (m.size() >= 1 && m[0].isString())
 		{
 			File f = File::getSpecialLocation(File::userDocumentsDirectory).getNonexistentChildFile(getApp().getApplicationName() + "/" + m[0].getString(), Engine::mainEngine->fileExtension, true);
 
-			Engine::mainEngine->saveAsAsync(f, false, false, false, [](int result) {});
+			MessageManager::callAsync([f]() { Engine::mainEngine->saveAsAsync(f, false, false, false, [](int result) {}); });
 		}
 		else
 		{
@@ -231,15 +252,15 @@ void OSCRemoteControl::processMessage(const OSCMessage& m, const String& sourceI
 			else
 			{
 				File f = File::getSpecialLocation(File::userDocumentsDirectory).getNonexistentChildFile(getApp().getApplicationName() + "/default", Engine::mainEngine->fileExtension, true);
-				Engine::mainEngine->saveAsAsync(f, false, false, false, [](int result) {});
+
+				MessageManager::getInstance()->callAsync([f]() { Engine::mainEngine->saveAsAsync(f, false, false, false, [](int result) {}); });
 			}
 		}
 		LOG("File saved.");
 	}
 	else if (add == "/closeApp")
 	{
-		MessageManagerLock mmLock;
-		OrganicApplication::quit();
+		MessageManager::callAsync([]() {OrganicApplication::quit(); });
 	}
 	else if (add == "/toTray")
 	{
@@ -450,6 +471,10 @@ bool OSCRemoteControl::handleHTTPRequest(std::shared_ptr<HttpServer::Response> r
 		metaData.getDynamicObject()->setProperty("version", ProjectInfo::versionString);
 		metaData.getDynamicObject()->setProperty("versionNumber", ProjectInfo::versionNumber);
 		if (fillHostInfoMetaDataFunc != nullptr) fillHostInfoMetaDataFunc(metaData);
+	}
+	else if (juce::String(request->path) == "/sessionFile")
+	{
+		data = Engine::mainEngine->getJSONData();
 	}
 	else
 	{
