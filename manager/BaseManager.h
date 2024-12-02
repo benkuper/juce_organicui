@@ -321,8 +321,6 @@ BaseManager<T>::BaseManager(const juce::String& name) :
 
 	skipLabelInTarget = true; //by default manager label in targetParameter UI are not interesting
 	nameCanBeChangedByUser = false;
-
-
 }
 
 template<class T>
@@ -387,7 +385,13 @@ T* BaseManager<T>::createItemFromData(juce::var data)
 	{
 		juce::String extendedType = data.getProperty("extendedType", "");
 		if (extendedType != "") {
-			return managerFactory->create(managerFactory->getDefFromExtendedType(extendedType));
+			BaseFactoryDefinition<T>* def = managerFactory->getDefFromExtendedType(extendedType);
+			if (def == nullptr)
+			{
+				NLOGWARNING(niceName, "Could not find definition for extendedType \"" + extendedType + "\" in factory.");
+				return nullptr;
+			}
+			return managerFactory->create(def);
 		}
 		juce::String type = data.getProperty("type", "");
 		if (type.isEmpty()) return nullptr;
@@ -969,6 +973,7 @@ void BaseManager<T>::getRemoteControlDataInternal(juce::var& data)
 	else extType.append(itemDataType);
 
 	data.getDynamicObject()->setProperty("EXTENDED_TYPE", extType);
+	data.getDynamicObject()->setProperty("BASE_TYPE", itemDataType);
 }
 
 template<class T>
