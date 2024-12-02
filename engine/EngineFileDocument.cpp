@@ -266,7 +266,6 @@ void Engine::loadDocumentFromJSON(var data)
 	taskName = "Loading File";
 
 	ProgressTask* clearTask = addTask("clearing");
-	ProgressTask* parseTask = addTask("parsing");
 	ProgressTask* loadTask = addTask("loading");
 
 	clearTask->start();
