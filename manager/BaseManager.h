@@ -41,7 +41,10 @@ public:
 	juce::Point<int> viewOffset; //in pixels, viewOffset of 0 means zeroPos is at the center of the window
 	//interaction
 	float viewZoom;
-
+	
+	//editor
+	bool showItemsInEditor;
+	// 
 	//grid
 	BoolParameter* snapGridMode;
 	BoolParameter* showSnapGrid;
@@ -300,6 +303,7 @@ BaseManager<T>::BaseManager(const juce::String& name) :
 	autoReorderOnAdd(true),
 	isManipulatingMultipleItems(false),
 	viewZoom(1),
+	showItemsInEditor(true),
 	snapGridMode(nullptr),
 	showSnapGrid(nullptr),
 	snapGridSize(nullptr),
