@@ -22,8 +22,7 @@ BaseItem::BaseItem(const String& name, bool _canBeDisabled, bool _canHaveScripts
 	isSavable(true),
 	saveType(true),
 	canBeReorderedInEditor(true),
-	itemDataType(""),
-	isClearing(false)
+	itemDataType("")
 {
 	//itemDataType = getTypeString();
 

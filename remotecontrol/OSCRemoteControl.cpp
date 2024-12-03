@@ -13,6 +13,7 @@ juce_ImplementSingleton(OSCRemoteControl)
 
 #if ORGANICUI_USE_WEBSERVER
 #include "OSCPacketHelper.h"
+#include "OSCRemoteControl.h"
 #endif
 
 #ifndef ORGANIC_REMOTE_CONTROL_PORT
@@ -733,6 +734,17 @@ void OSCRemoteControl::sendPathNameChangedFeedback(const String& oldPath, const 
 	msg.getDynamicObject()->setProperty("DATA", data);
 	server->send(JSON::toString(msg));
 
+}
+
+void OSCRemoteControl::sendPathChangedFeedback(const juce::String& path)
+{
+	if (server == nullptr) return;
+	if (Engine::mainEngine != nullptr && (Engine::mainEngine->isLoadingFile || Engine::mainEngine->isClearing)) return;
+
+	var msg(new DynamicObject());
+	msg.getDynamicObject()->setProperty("COMMAND", "PATH_RENAMED");
+	msg.getDynamicObject()->setProperty("DATA", path);
+	server->send(JSON::toString(msg));
 }
 
 bool OSCRemoteControl::hasClient(const String& id)
