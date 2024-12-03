@@ -137,7 +137,7 @@ void BaseItem::remove()
 
 void BaseItem::handleRemoveFromRemoteControl()
 {
-	if (userCanRemove) remove();
+	if (userCanRemove) MessageManager::callAsync([this]() {remove(); });
 }
 
 void BaseItem::setMovePositionReference(bool setOtherSelectedItems)
