@@ -597,14 +597,21 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 				else NLOG(niceName, data.toString());
 
 			}
+			String cAddress = "";
+			if (data.isString()) cAddress = data.toString();
+			else if (data.isArray() && data.size() > 0) cAddress = data[0].toString();
+			else if (data.isObject() && data.hasProperty("address")) cAddress = data["address"].toString();
 
-			if (Controllable* c = Engine::mainEngine->getControllableForAddress(data.toString()))
+			if (Controllable* c = Engine::mainEngine->getControllableForAddress(cAddress))
 			{
 				if (command == "LISTEN")
 				{
 					if (!feedbackMap.contains(id)) feedbackMap.set(id, Array<Controllable*>());
 					(&(feedbackMap.getReference(id)))->addIfNotAlreadyThere(c);
-					if (sendFeedbackOnListen->boolValue()) sendOSCQueryFeedback(c);
+					bool sendFeedback = sendFeedbackOnListen->boolValue();
+					if (data.isArray() && data.size() > 1) sendFeedback = data[1];
+					else if (data.isObject() && data.hasProperty("sendFeedback")) sendFeedback = data["sendFeedback"];
+					if (sendFeedback) sendOSCQueryFeedback(c);
 				}
 				else if (command == "IGNORE")
 				{
