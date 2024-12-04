@@ -18,6 +18,7 @@ ControllableContainer::ControllableContainer(const String& niceName) :
 	hasCustomShortName(false),
 	allowSameChildrenNiceNames(false),
 	nameCanBeChangedByUser(false),
+	isClearing(false),
 	canInspectChildContainers(true),
 	editorIsCollapsed(false),
 	editorCanBeCollapsed(true),
@@ -88,6 +89,7 @@ ControllableContainer::~ControllableContainer()
 
 void ControllableContainer::clear() {
 
+	isClearing = true;
 	queuedNotifier.cancelPendingUpdate();
 
 	for (auto& c : controllables)
@@ -104,9 +106,13 @@ void ControllableContainer::clear() {
 		if (cc.wasObjectDeleted() || cc == nullptr) continue;
 		cc->removeControllableContainerListener(this);
 	}
-
+	
 	controllableContainers.clear();
 	ownedContainers.clear();
+
+	isClearing = false;
+
+	if (parentContainer != nullptr && !Engine::mainEngine->isClearing) OSCRemoteControl::getInstance()->sendPathChangedFeedback(getControlAddress());
 }
 
 
@@ -471,7 +477,7 @@ void ControllableContainer::addChildControllableContainer(ControllableContainer*
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableContainerAdded, this, container));
 
 #if ORGANICUI_USE_WEBSERVER
-	if (OSCRemoteControl::getInstanceWithoutCreating() != nullptr && parentContainer != nullptr) OSCRemoteControl::getInstance()->sendPathAddedFeedback(container->getControlAddress());
+	if (OSCRemoteControl::getInstanceWithoutCreating() != nullptr && parentContainer != nullptr && !isCurrentlyLoadingData) OSCRemoteControl::getInstance()->sendPathAddedFeedback(container->getControlAddress());
 #endif
 
 	if (notify) notifyStructureChanged();
@@ -508,7 +514,7 @@ void ControllableContainer::removeChildControllableContainer(ControllableContain
 		queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableContainerRemoved, this, container));
 
 #if ORGANICUI_USE_WEBSERVER
-		if (OSCRemoteControl::getInstanceWithoutCreating() != nullptr && parentContainer != nullptr) OSCRemoteControl::getInstance()->sendPathRemovedFeedback(container->getControlAddress());
+		if (OSCRemoteControl::getInstanceWithoutCreating() != nullptr && parentContainer != nullptr && !isClearing) OSCRemoteControl::getInstance()->sendPathRemovedFeedback(container->getControlAddress());
 #endif
 
 		notifyStructureChanged();
@@ -1038,11 +1044,14 @@ void ControllableContainer::loadJSONData(var data, bool createIfNotThere)
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableContainerFinishedLoading, this));
 
 	afterLoadJSONDataInternal();
+
+	if (parentContainer != nullptr) OSCRemoteControl::getInstance()->sendPathChangedFeedback(getControlAddress());
 }
 
 var ControllableContainer::getRemoteControlData()
 {
 	var data(new DynamicObject());
+	if (isCurrentlyLoadingData || isClearing) return data;
 
 	data.getDynamicObject()->setProperty("DESCRIPTION", niceName);
 	data.getDynamicObject()->setProperty("FULL_PATH", getControlAddress());
@@ -1557,8 +1566,8 @@ var ControllableContainer::getControllablesFromScript(const var::NativeFunctionA
 	for (auto& c : cc->controllables)
 	{
 		if (c == nullptr) continue;
-		if(c->type == Controllable::TRIGGER && !includeTriggers) continue;
-		if(c->type != Controllable::TRIGGER && !includeParameters) continue;
+		if (c->type == Controllable::TRIGGER && !includeTriggers) continue;
+		if (c->type != Controllable::TRIGGER && !includeParameters) continue;
 		result.append(c->getScriptObject());
 	}
 

@@ -43,7 +43,6 @@ public:
 	std::unique_ptr<ScriptManager> scriptManager;
 
 	juce::String itemDataType;
-	bool isClearing;
 
 	//UI moving X/Y
 	juce::Point<float> movePositionReference;

@@ -22,8 +22,7 @@ BaseItem::BaseItem(const String& name, bool _canBeDisabled, bool _canHaveScripts
 	isSavable(true),
 	saveType(true),
 	canBeReorderedInEditor(true),
-	itemDataType(""),
-	isClearing(false)
+	itemDataType("")
 {
 	//itemDataType = getTypeString();
 
@@ -138,7 +137,7 @@ void BaseItem::remove()
 
 void BaseItem::handleRemoveFromRemoteControl()
 {
-	if (userCanRemove) remove();
+	if (userCanRemove) MessageManager::callAsync([this]() {remove(); });
 }
 
 void BaseItem::setMovePositionReference(bool setOtherSelectedItems)

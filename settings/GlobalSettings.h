@@ -58,6 +58,7 @@ public:
 
 	ControllableContainer saveLoadCC;
 	BoolParameter * enableAutoSave;
+	BoolParameter* autoSaveCurrentFile;
 	IntParameter * autoSaveCount;
 	IntParameter* autoSaveTime;
 

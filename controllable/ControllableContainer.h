@@ -33,6 +33,8 @@ public:
 
 	bool nameCanBeChangedByUser;
 
+	bool isClearing;
+
 	//Editor
 	bool canInspectChildContainers;
 	bool editorIsCollapsed;

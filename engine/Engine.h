@@ -62,7 +62,10 @@ public:
 	juce::String getDocumentTitle()override;
 	juce::Result loadDocument(const juce::File& file) override;
 	juce::Result saveDocument(const juce::File& file) override;
+	juce::Result saveCopy();
 	juce::Result saveBackupDocument(int index);
+
+	void loadDocumentFromJSON(juce::var data);
 
 	juce::File getLastDocumentOpened() override;
 	void setLastDocumentOpened(const juce::File& file) override;

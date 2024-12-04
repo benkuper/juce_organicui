@@ -13,6 +13,7 @@ juce_ImplementSingleton(OSCRemoteControl)
 
 #if ORGANICUI_USE_WEBSERVER
 #include "OSCPacketHelper.h"
+#include "OSCRemoteControl.h"
 #endif
 
 #ifndef ORGANIC_REMOTE_CONTROL_PORT
@@ -208,8 +209,30 @@ void OSCRemoteControl::processMessage(const OSCMessage& m, const String& sourceI
 				return;
 			}
 
-			MessageManagerLock mmLock;
-			Engine::mainEngine->loadDocument(f);
+			MessageManager::getInstance()->callAsync([f]() { Engine::mainEngine->loadDocument(f); });
+		}
+	}
+	else if (add == "/loadFile")
+	{
+		if (m.size() < 1) LOGWARNING("Cannot load file, no argument provided");
+		else
+		{
+			if (!m[0].isString())
+			{
+				LOGWARNING("Cannot load file, argument #0 is not a string");
+				return;
+			}
+
+			var data = JSON::parse(m[0].getString());
+			if (!data.isObject())
+			{
+				LOGWARNING("Cannot load file, argument #0 is not a valid JSON object");
+				return;
+			}
+
+			MessageManager::getInstance()->callAsync([data]() {
+				Engine::mainEngine->loadJSONData(data, nullptr);
+				});
 		}
 	}
 	else if (add == "/newFile")
@@ -218,12 +241,11 @@ void OSCRemoteControl::processMessage(const OSCMessage& m, const String& sourceI
 	}
 	else if (add == "/saveFile")
 	{
-		MessageManagerLock mmLock;
 		if (m.size() >= 1 && m[0].isString())
 		{
 			File f = File::getSpecialLocation(File::userDocumentsDirectory).getNonexistentChildFile(getApp().getApplicationName() + "/" + m[0].getString(), Engine::mainEngine->fileExtension, true);
 
-			Engine::mainEngine->saveAsAsync(f, false, false, false, [](int result) {});
+			MessageManager::callAsync([f]() { Engine::mainEngine->saveAsAsync(f, false, false, false, [](int result) {}); });
 		}
 		else
 		{
@@ -231,15 +253,15 @@ void OSCRemoteControl::processMessage(const OSCMessage& m, const String& sourceI
 			else
 			{
 				File f = File::getSpecialLocation(File::userDocumentsDirectory).getNonexistentChildFile(getApp().getApplicationName() + "/default", Engine::mainEngine->fileExtension, true);
-				Engine::mainEngine->saveAsAsync(f, false, false, false, [](int result) {});
+
+				MessageManager::getInstance()->callAsync([f]() { Engine::mainEngine->saveAsAsync(f, false, false, false, [](int result) {}); });
 			}
 		}
 		LOG("File saved.");
 	}
 	else if (add == "/closeApp")
 	{
-		MessageManagerLock mmLock;
-		OrganicApplication::quit();
+		MessageManager::callAsync([]() {OrganicApplication::quit(); });
 	}
 	else if (add == "/toTray")
 	{
@@ -451,6 +473,10 @@ bool OSCRemoteControl::handleHTTPRequest(std::shared_ptr<HttpServer::Response> r
 		metaData.getDynamicObject()->setProperty("versionNumber", ProjectInfo::versionNumber);
 		if (fillHostInfoMetaDataFunc != nullptr) fillHostInfoMetaDataFunc(metaData);
 	}
+	else if (juce::String(request->path) == "/sessionFile")
+	{
+		data = Engine::mainEngine->getJSONData();
+	}
 	else
 	{
 		ControllableContainer* cc = Engine::mainEngine;
@@ -571,14 +597,21 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 				else NLOG(niceName, data.toString());
 
 			}
+			String cAddress = "";
+			if (data.isString()) cAddress = data.toString();
+			else if (data.isArray() && data.size() > 0) cAddress = data[0].toString();
+			else if (data.isObject() && data.hasProperty("address")) cAddress = data["address"].toString();
 
-			if (Controllable* c = Engine::mainEngine->getControllableForAddress(data.toString()))
+			if (Controllable* c = Engine::mainEngine->getControllableForAddress(cAddress))
 			{
 				if (command == "LISTEN")
 				{
 					if (!feedbackMap.contains(id)) feedbackMap.set(id, Array<Controllable*>());
 					(&(feedbackMap.getReference(id)))->addIfNotAlreadyThere(c);
-					if (sendFeedbackOnListen->boolValue()) sendOSCQueryFeedback(c);
+					bool sendFeedback = sendFeedbackOnListen->boolValue();
+					if (data.isArray() && data.size() > 1) sendFeedback = data[1];
+					else if (data.isObject() && data.hasProperty("sendFeedback")) sendFeedback = data["sendFeedback"];
+					if (sendFeedback) sendOSCQueryFeedback(c);
 				}
 				else if (command == "IGNORE")
 				{
@@ -708,6 +741,17 @@ void OSCRemoteControl::sendPathNameChangedFeedback(const String& oldPath, const 
 	msg.getDynamicObject()->setProperty("DATA", data);
 	server->send(JSON::toString(msg));
 
+}
+
+void OSCRemoteControl::sendPathChangedFeedback(const juce::String& path)
+{
+	if (server == nullptr) return;
+	if (Engine::mainEngine != nullptr && (Engine::mainEngine->isLoadingFile || Engine::mainEngine->isClearing)) return;
+
+	var msg(new DynamicObject());
+	msg.getDynamicObject()->setProperty("COMMAND", "PATH_RENAMED");
+	msg.getDynamicObject()->setProperty("DATA", path);
+	server->send(JSON::toString(msg));
 }
 
 bool OSCRemoteControl::hasClient(const String& id)

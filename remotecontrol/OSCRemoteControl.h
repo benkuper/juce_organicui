@@ -106,6 +106,7 @@ public:
 	void sendPathAddedFeedback(const juce::String& path);
 	void sendPathRemovedFeedback(const juce::String& path);
 	void sendPathNameChangedFeedback(const juce::String& oldPath, const juce::String& newPath);
+	void sendPathChangedFeedback(const juce::String& path);
 
 	bool hasClient(const juce::String& id);
 
