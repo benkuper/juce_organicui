@@ -363,13 +363,13 @@ void OSCRemoteControl::onContainerParameterChanged(Parameter* p)
 
 void OSCRemoteControl::oscMessageReceived(const OSCMessage& m)
 {
-	if (!enabled->boolValue()) return;
+	if (!enabled->boolValue() || Engine::mainEngine->isClearing) return;
 	processMessage(m);
 }
 
 void OSCRemoteControl::oscBundleReceived(const OSCBundle& b)
 {
-	if (!enabled->boolValue()) return;
+	if (!enabled->boolValue() || Engine::mainEngine->isClearing) return;
 	for (auto& m : b)
 	{
 		processMessage(m.getMessage());
