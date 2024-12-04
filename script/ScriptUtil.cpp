@@ -366,8 +366,7 @@ var ScriptUtil::fromBase64Bytes(const var::NativeFunctionArgs& a)
 
 var ScriptUtil::fileExistsFromScript(const var::NativeFunctionArgs& args)
 {
-	if (args.numArguments == 0) return false;
-	return File(args.arguments[0]).existsAsFile();
+	return getFileFromArgs(args).existsAsFile();
 }
 
 var ScriptUtil::readFileFromScript(const var::NativeFunctionArgs& args)
@@ -716,6 +715,7 @@ String ScriptUtil::getLogStringForVar(const var& v)
 
 File ScriptUtil::getFileFromArgs(const var::NativeFunctionArgs& args, int deleteIfExistsFromArg)
 {
+	if (args.numArguments == 0) return File();
 	String path = args.arguments[0].toString();
 
 	if (!File::isAbsolutePath(path))

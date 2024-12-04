@@ -442,10 +442,13 @@ void OSCRemoteControl::setupServer()
 
 bool OSCRemoteControl::handleHTTPRequest(std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request)
 {
-	juce::var data;
-	if (juce::String(request->query_string).contains("HOST_INFO"))
+	bool downloadMode = false;
+	String downloadFileName = "sessionFile.json";
+
+	var data;
+	if (String(request->query_string).contains("HOST_INFO"))
 	{
-		juce::var extensionData(new juce::DynamicObject());
+		var extensionData(new DynamicObject());
 		extensionData.getDynamicObject()->setProperty("ACCESS", true);
 		extensionData.getDynamicObject()->setProperty("CLIPMODE", false);
 		extensionData.getDynamicObject()->setProperty("CRITICAL", false);
@@ -460,38 +463,41 @@ bool OSCRemoteControl::handleHTTPRequest(std::shared_ptr<HttpServer::Response> r
 		extensionData.getDynamicObject()->setProperty("PATH_RENAMED", true);
 		extensionData.getDynamicObject()->setProperty("PATH_CHANGED", false);
 
-		data = new juce::DynamicObject();
+		data = new DynamicObject();
 		data.getDynamicObject()->setProperty("EXTENSIONS", extensionData);
-		juce::String s = juce::String(ProjectInfo::projectName) + " - " + Engine::mainEngine->getDocumentTitle();
+		String s = String(ProjectInfo::projectName) + " - " + Engine::mainEngine->getDocumentTitle();
 		data.getDynamicObject()->setProperty("NAME", s);
 		data.getDynamicObject()->setProperty("OSC_PORT", localPort->intValue());
 		data.getDynamicObject()->setProperty("OSC_TRANSPORT", "UDP");
 
-		juce::var metaData(new juce::DynamicObject());
+		var metaData(new DynamicObject());
 		data.getDynamicObject()->setProperty("METADATA", metaData);
-		metaData.getDynamicObject()->setProperty("os", juce::SystemStats::getOperatingSystemName());
+		metaData.getDynamicObject()->setProperty("os", SystemStats::getOperatingSystemName());
 		metaData.getDynamicObject()->setProperty("version", ProjectInfo::versionString);
 		metaData.getDynamicObject()->setProperty("versionNumber", ProjectInfo::versionNumber);
 		if (fillHostInfoMetaDataFunc != nullptr) fillHostInfoMetaDataFunc(metaData);
 	}
-	else if (juce::String(request->path) == "/sessionFile")
+	else if (String(request->path) == "/sessionFile")
 	{
 		data = Engine::mainEngine->getJSONData();
+		downloadMode = true;
+		if (Engine::mainEngine->getFile().existsAsFile()) downloadFileName = Engine::mainEngine->getFile().getFileName();
 	}
 	else
 	{
 		ControllableContainer* cc = Engine::mainEngine;
-		juce::String addr = request->path;
+		String addr = request->path;
 		if (addr.length() > 1) cc = Engine::mainEngine->getControllableContainerForAddress(addr, true, false, false);
 		if (cc != nullptr) data = cc->getRemoteControlData();
 	}
 
 
-	juce::String dataStr = juce::JSON::toString(data);
+	String dataStr = JSON::toString(data);
 
 	SimpleWeb::CaseInsensitiveMultimap header;
-	header.emplace("Content-Length", juce::String(dataStr.length()).toStdString());
-	header.emplace("Content-Type", "application/json");
+	header.emplace("Content-Length", String(dataStr.length()).toStdString());
+	header.emplace("Content-Type", downloadMode ? "force-download" : "application/json");
+	if (downloadMode) header.emplace("Content-Disposition", (String("attachment; filename=\"") + downloadFileName + "\"").toStdString());
 	header.emplace("Accept-range", "bytes");
 	header.emplace("Access-Control-Allow-Origin", "*");
 
@@ -744,7 +750,7 @@ void OSCRemoteControl::sendPathNameChangedFeedback(const String& oldPath, const 
 
 }
 
-void OSCRemoteControl::sendPathChangedFeedback(const juce::String& path)
+void OSCRemoteControl::sendPathChangedFeedback(const String& path)
 {
 	if (server == nullptr) return;
 	if (Engine::mainEngine != nullptr && (Engine::mainEngine->isLoadingFile || Engine::mainEngine->isClearing)) return;
@@ -821,7 +827,7 @@ void OSCRemoteControl::controllableFeedbackUpdate(ControllableContainer* cc, Con
 	if (Engine::mainEngine != nullptr && (Engine::mainEngine->isLoadingFile || Engine::mainEngine->isClearing)) return;
 
 	//OSCQuery
-	juce::HashMap<String, Array<Controllable*>, DefaultHashFunctions, CriticalSection>::Iterator it(feedbackMap);
+	HashMap<String, Array<Controllable*>, DefaultHashFunctions, CriticalSection>::Iterator it(feedbackMap);
 	while (it.next())
 	{
 		if (it.getValue().contains(c))
@@ -842,7 +848,7 @@ void OSCRemoteControl::controllableStateUpdate(ControllableContainer* cc, Contro
 	if (Engine::mainEngine != nullptr && (Engine::mainEngine->isLoadingFile || Engine::mainEngine->isClearing)) return;
 
 	//OSCQuery
-	juce::HashMap<String, Array<Controllable*>, DefaultHashFunctions, CriticalSection>::Iterator it(feedbackMap);
+	HashMap<String, Array<Controllable*>, DefaultHashFunctions, CriticalSection>::Iterator it(feedbackMap);
 	while (it.next())
 	{
 		if (it.getValue().contains(c))
@@ -864,7 +870,7 @@ void OSCRemoteControl::sendOSCQueryFeedback(Controllable* c, const String& exclu
 
 }
 
-void OSCRemoteControl::sendOSCQueryStateFeedback(Controllable* c, const juce::String& excludeId)
+void OSCRemoteControl::sendOSCQueryStateFeedback(Controllable* c, const String& excludeId)
 {
 	if (c == nullptr) return;
 
@@ -889,7 +895,7 @@ void OSCRemoteControl::sendOSCQueryFeedback(const OSCMessage& m, StringArray exc
 	if (logOutgoing->boolValue()) NLOG(niceName, "Sent to OSCQuery : " << OSCHelpers::messageToString(m));
 }
 
-void OSCRemoteControl::sendOSCQueryFeedbackTo(const juce::OSCMessage& m, juce::StringArray ids)
+void OSCRemoteControl::sendOSCQueryFeedbackTo(const OSCMessage& m, StringArray ids)
 {
 	if (server == nullptr) return;
 
