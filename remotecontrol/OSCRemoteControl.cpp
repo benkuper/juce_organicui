@@ -232,6 +232,7 @@ void OSCRemoteControl::processMessage(const OSCMessage& m, const String& sourceI
 
 			MessageManager::getInstance()->callAsync([data]() {
 				Engine::mainEngine->loadJSONData(data, nullptr);
+				Engine::mainEngine->setFile(File());
 				});
 		}
 	}
