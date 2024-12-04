@@ -303,28 +303,21 @@ void OSCRemoteControl::processMessage(const OSCMessage& m, const String& sourceI
 					if (Controllable* c = Engine::mainEngine->getControllableForAddress(split[0]))
 					{
 
-						if (sourceId.isEmpty())
-						{
-							HashMap<String, Array<Controllable*>, DefaultHashFunctions, CriticalSection>::Iterator it(feedbackMap);
-							while (it.next())
-							{
-								if (it.getKey().contains(m.getSenderIPAddress()))
-								{
-									noFeedbackMap.set(c, it.getKey());
-									break;
-								}
-							}
-						}
-						else
-						{
-							noFeedbackMap.set(c, sourceId);
-						}
-
-						c->setAttribute(split[1], OSCHelpers::getBoolArg(m[0]));
-
+						addControllableToNoFeedbackMap(c, sourceId, m.getSenderIPAddress());
+						c->setAttribute(split[1], OSCHelpers::argumentToVar(m[0]));
 						noFeedbackMap.remove(c);
 
 					}
+				}
+			}
+			else if (addr.endsWith("/resetValue"))
+			{
+				String cAddress = addr.dropLastCharacters(11);
+				if (Controllable* c = Engine::mainEngine->getControllableForAddress(cAddress))
+				{
+					//addControllableToNoFeedbackMap(c, sourceId, m.getSenderIPAddress());
+					if (Parameter* p = dynamic_cast<Parameter*>(c)) p->resetValue();
+					//noFeedbackMap.remove(c);
 				}
 			}
 		}
@@ -857,6 +850,26 @@ void OSCRemoteControl::controllableStateUpdate(ControllableContainer* cc, Contro
 		}
 	}
 
+}
+
+void OSCRemoteControl::addControllableToNoFeedbackMap(Controllable* c, const juce::String& id, const juce::String& fallbackId)
+{
+	if (id.isEmpty())
+	{
+		HashMap<String, Array<Controllable*>, DefaultHashFunctions, CriticalSection>::Iterator it(feedbackMap);
+		while (it.next())
+		{
+			if (it.getKey().contains(fallbackId))
+			{
+				noFeedbackMap.set(c, it.getKey());
+				break;
+			}
+		}
+	}
+	else
+	{
+		noFeedbackMap.set(c, id);
+	}
 }
 
 void OSCRemoteControl::sendOSCQueryFeedback(Controllable* c, const String& excludeId)
