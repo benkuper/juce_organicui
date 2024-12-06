@@ -813,7 +813,9 @@ void BaseManager<T>::clear()
 	while (items.size() > 0) removeItem(items[0], false);
 	isClearing = false;
 
+#if ORGANICUI_USE_WEBSERVER
 	if (parentContainer != nullptr) OSCRemoteControl::getInstance()->sendPathChangedFeedback(getControlAddress());
+#endif
 }
 
 template<class T>

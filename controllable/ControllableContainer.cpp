@@ -112,7 +112,9 @@ void ControllableContainer::clear() {
 
 	isClearing = false;
 
+#if ORGANICUI_USE_WEBSERVER
 	if (parentContainer != nullptr && !Engine::mainEngine->isClearing) OSCRemoteControl::getInstance()->sendPathChangedFeedback(getControlAddress());
+#endif
 }
 
 
@@ -1045,7 +1047,9 @@ void ControllableContainer::loadJSONData(var data, bool createIfNotThere)
 
 	afterLoadJSONDataInternal();
 
+#if ORGANICUI_USE_WEBSERVER
 	if (parentContainer != nullptr) OSCRemoteControl::getInstance()->sendPathChangedFeedback(getControlAddress());
+#endif
 }
 
 var ControllableContainer::getRemoteControlData()
