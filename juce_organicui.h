@@ -262,6 +262,8 @@
 #include "ui/shapeshifter/ShapeShifterPanelTab.h"
 #include "ui/shapeshifter/ShapeShifterWindow.h"
 
+#include "remotecontrol/OSCRemoteControl.h"
+
 
 #include "manager/BaseItemListener.h"
 #include "manager/BaseManagerListener.h"
@@ -382,7 +384,6 @@
 #include "app/OrganicMainComponent.h"
 #include "app/OrganicApplication.h"
 
-#include "remotecontrol/OSCRemoteControl.h"
 
 #include "helpers/WakeOnLan.h"
 #include "helpers/OSCHelpers.h"
