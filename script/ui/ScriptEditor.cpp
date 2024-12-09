@@ -39,6 +39,7 @@ ScriptEditor::ScriptEditor(Script * _script, bool isRoot) :
 
 ScriptEditor::~ScriptEditor()
 {
+	if (inspectable.wasObjectDeleted()) return;
 	script->removeAsyncScriptListener(this);
 }
 
