@@ -41,6 +41,7 @@ EnumParameter::~EnumParameter()
 
 EnumParameter* EnumParameter::addOption(String key, var data, bool selectIfFirstOption)
 {
+	GenericScopedLock lock(enumValues.getLock());
 	enumValues.add(new EnumValue(key, data));
 	if (enumValues.size() == 1 && selectIfFirstOption)
 	{
@@ -56,6 +57,7 @@ EnumParameter* EnumParameter::addOption(String key, var data, bool selectIfFirst
 
 void EnumParameter::updateOption(int index, String key, var data, bool addIfNotThere)
 {
+	GenericScopedLock lock(enumValues.getLock());
 	if (index >= enumValues.size())
 	{
 		if (!addIfNotThere) return;
@@ -75,6 +77,7 @@ void EnumParameter::updateOption(int index, String key, var data, bool addIfNotT
 
 void EnumParameter::removeOption(String key)
 {
+	GenericScopedLock lock(enumValues.getLock());
 	enumValues.remove(getIndexForKey(key));
 	enumListeners.call(&EnumParameterListener::enumOptionRemoved, this, key);
 	enumParameterNotifier.addMessage(new EnumParameterEvent(EnumParameterEvent::ENUM_OPTION_REMOVED, this));
@@ -85,6 +88,7 @@ void EnumParameter::removeOption(String key)
 
 void EnumParameter::setOptions(Array<EnumValue*> options)
 {
+	GenericScopedLock lock(enumValues.getLock());
 	for (int i = 0; i < options.size(); i++)
 	{
 		updateOption(i, options[i]->key, options[i]->value, true);
@@ -95,6 +99,7 @@ void EnumParameter::setOptions(Array<EnumValue*> options)
 
 void EnumParameter::clearOptions()
 {
+	GenericScopedLock lock(enumValues.getLock());
 	StringArray keysToRemove;
 	for (auto& ev : enumValues) keysToRemove.add(ev->key);
 	for (auto& k : keysToRemove) removeOption(k);
@@ -116,6 +121,7 @@ var EnumParameter::getValue()
 }
 
 var EnumParameter::getValueData() {
+	GenericScopedLock lock(enumValues.getLock());
 	EnumValue* ev = getEntryForKey(value.toString());
 	if (ev == nullptr) return var();
 	return ev->value;
@@ -127,6 +133,7 @@ String EnumParameter::getValueKey() {
 
 int EnumParameter::getIndexForKey(StringRef key)
 {
+	GenericScopedLock lock(enumValues.getLock());
 	int numValues = enumValues.size();
 	for (int i = 0; i < numValues; ++i) if (enumValues[i]->key == key) return i;
 	return -1;
@@ -148,6 +155,7 @@ StringArray EnumParameter::getAllKeys()
 
 void EnumParameter::setValueWithData(var data)
 {
+	GenericScopedLock lock(enumValues.getLock());
 	for (auto& ev : enumValues)
 	{
 		if (ev->value == data)
@@ -165,6 +173,7 @@ void EnumParameter::setValueWithKey(String key)
 
 void EnumParameter::setPrev(bool loop, bool addToUndo)
 {
+	GenericScopedLock lock(enumValues.getLock());
 	int targetIndex = getIndexForKey(value.toString()) - 1;
 	if (targetIndex < 0)
 	{
@@ -181,6 +190,7 @@ void EnumParameter::setPrev(bool loop, bool addToUndo)
 void EnumParameter::setNext(bool loop, bool addToUndo)
 {
 
+	GenericScopedLock lock(enumValues.getLock());
 	int targetIndex = getIndexForKey(value.toString()) + 1;
 	if (targetIndex >= enumValues.size())
 	{
