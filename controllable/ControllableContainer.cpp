@@ -83,6 +83,7 @@ ControllableContainer::~ControllableContainer()
 	//controllables.clear();
 	//DBG("CLEAR CONTROLLABLE CONTAINER");
 	clear();
+	isClearing = true; // because CC clear() can be called without destructor, so force isClearing true here
 	masterReference.clear();
 }
 
