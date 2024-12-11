@@ -43,6 +43,9 @@ ScriptUtil::ScriptUtil() :
 	scriptObject.getDynamicObject()->setMethod("fromBase64Bytes", ScriptUtil::fromBase64Bytes);
 
 	scriptObject.getDynamicObject()->setMethod("fileExists", ScriptUtil::fileExistsFromScript);
+	scriptObject.getDynamicObject()->setMethod("getNonExistentFile", ScriptUtil::getNonExistentFileFromScript);
+	scriptObject.getDynamicObject()->setMethod("getFileName", ScriptUtil::getFileName);
+	scriptObject.getDynamicObject()->setMethod("getFilePath", ScriptUtil::getFilePath);
 	scriptObject.getDynamicObject()->setMethod("readFile", ScriptUtil::readFileFromScript);
 	scriptObject.getDynamicObject()->setMethod("writeFile", ScriptUtil::writeFileFromScript);
 	scriptObject.getDynamicObject()->setMethod("writeBytes", ScriptUtil::writeBytesFromScript);
@@ -369,6 +372,39 @@ var ScriptUtil::fileExistsFromScript(const var::NativeFunctionArgs& args)
 	return getFileFromArgs(args).existsAsFile();
 }
 
+juce::var ScriptUtil::getNonExistentFileFromScript(const juce::var::NativeFunctionArgs& args)
+{
+	if (args.numArguments < 2) return "";
+	File folder = getFileFromArgs(args);
+	File f = folder.getChildFile(args.arguments[1].toString());
+	if (f.existsAsFile())
+	{
+		return folder.getNonexistentChildFile(f.getFileNameWithoutExtension(), f.getFileExtension(), false).getFullPathName();
+	}
+
+	return f.getFullPathName();
+}
+
+juce::var ScriptUtil::getFileName(const juce::var::NativeFunctionArgs& args)
+{
+	File f = getFileFromArgs(args);
+	if (!f.exists()) return var();
+	
+	bool withExt = args.numArguments > 1 ? (bool)(int)args.arguments[1] : true;
+	if (withExt) return f.getFileName();
+	return f.getFileNameWithoutExtension();
+
+	return juce::var();
+}
+
+juce::var ScriptUtil::getFilePath(const juce::var::NativeFunctionArgs& args)
+{
+	File f = getFileFromArgs(args);
+	if (!f.exists()) return var();
+
+	return f.getFullPathName();
+}
+
 var ScriptUtil::readFileFromScript(const var::NativeFunctionArgs& args)
 {
 	File f = getFileFromArgs(args);
@@ -432,7 +468,7 @@ var ScriptUtil::writeBytesFromScript(const var::NativeFunctionArgs& args)
 var ScriptUtil::directoryExistsFromScript(const var::NativeFunctionArgs& args)
 {
 	if (args.numArguments == 0) return false;
-	File f(args.arguments[0]);
+	File f = getFileFromArgs(args);
 	return f.exists() && f.isDirectory();
 }
 
@@ -440,11 +476,8 @@ var ScriptUtil::createDirectoryFromScript(const var::NativeFunctionArgs& args)
 {
 	if (args.numArguments == 0) return false;
 
-	String path = args.arguments[0].toString();
+	File f = getFileFromArgs(args);
 
-	if (!File::isAbsolutePath(path)) path = Engine::mainEngine->getFile().getParentDirectory().getChildFile(path).getFullPathName();
-
-	File f(path);
 
 	if (f.exists())
 	{
@@ -469,8 +502,10 @@ var ScriptUtil::listFilesFromScript(const var::NativeFunctionArgs& args)
 
 	Array<File> files = f.findChildFiles(File::TypesOfFileToFind::findFiles, recursive);
 
+	bool returnFileNameOnly = args.numArguments > 2 ? (bool)(int)args.arguments[2] : false;
+
 	var result;
-	for (auto& ff : files) result.append(ff.getFullPathName());
+	for (auto& ff : files) result.append(returnFileNameOnly ? ff.getFileName() : ff.getFullPathName());
 	return result;
 }
 
@@ -486,8 +521,10 @@ var ScriptUtil::listDirectoriesFromScript(const var::NativeFunctionArgs& args)
 
 	Array<File> files = f.findChildFiles(File::TypesOfFileToFind::findDirectories, recursive);
 
+	bool returnFileNameOnly = args.numArguments > 2 ? (bool)(int)args.arguments[2] : false;
+
 	var result;
-	for (auto& ff : files) result.append(ff.getFullPathName());
+	for (auto& ff : files) result.append(returnFileNameOnly ? ff.getFileName() : ff.getFullPathName());
 	return result;
 }
 

@@ -21,6 +21,7 @@ EnumParameter::EnumParameter(const String& niceName, const String& description, 
 	scriptObject.getDynamicObject()->setMethod("setNext", EnumParameter::setNextFromScript);
 	scriptObject.getDynamicObject()->setMethod("setPrevious", EnumParameter::setPreviousFromScript);
 	scriptObject.getDynamicObject()->setMethod("addOption", EnumParameter::addOptionFromScript);
+	scriptObject.getDynamicObject()->setMethod("setOptions", EnumParameter::setOptionsFromScript);
 	scriptObject.getDynamicObject()->setMethod("removeOptions", EnumParameter::removeOptionsFromScript);
 	scriptObject.getDynamicObject()->setMethod("getAllOptions", EnumParameter::getAllOptionsFromScript);
 	scriptObject.getDynamicObject()->setMethod("getOptionAt", EnumParameter::getOptionAtFromScript);
@@ -86,12 +87,12 @@ void EnumParameter::removeOption(String key)
 	if (getValueKey() == key) setValue("");
 }
 
-void EnumParameter::setOptions(Array<EnumValue*> options)
+void EnumParameter::setOptions(Array<EnumValue> options)
 {
 	GenericScopedLock lock(enumValues.getLock());
 	for (int i = 0; i < options.size(); i++)
 	{
-		updateOption(i, options[i]->key, options[i]->value, true);
+		updateOption(i, options[i].key, options[i].value, true);
 	}
 
 	while (enumValues.size() > options.size()) removeOption(enumValues[enumValues.size() - 1]->key);
@@ -294,6 +295,38 @@ var EnumParameter::addOptionFromScript(const juce::var::NativeFunctionArgs& a)
 	}
 
 	ep->addOption(a.arguments[0].toString(), a.arguments[1]);
+
+	return var();
+}
+
+juce::var EnumParameter::setOptionsFromScript(const juce::var::NativeFunctionArgs& a)
+{
+	WeakReference<Parameter> c = getObjectFromJS<Parameter>(a);
+	if (c == nullptr || c.wasObjectDeleted()) return var();
+	EnumParameter* ep = dynamic_cast<EnumParameter*>(c.get());
+
+	if (a.numArguments == 0)
+	{
+		NLOGWARNING("Script", "EnumParameter setOption should have at least 1 argument");
+		return var();
+	}
+
+	if (a.arguments[0].isObject())
+	{
+		NamedValueSet nvSet = a.arguments[0].getDynamicObject()->getProperties();
+		Array<EnumValue> newOptions;
+
+		for (auto& nv : nvSet)
+		{
+			newOptions.add(EnumValue(nv.name.toString(), nv.value));
+		}
+
+		ep->setOptions(newOptions);
+	}
+	else
+	{
+		NLOGWARNING("Script", "EnumParameter setOption should have an object as first argument");
+	}
 
 	return var();
 }
