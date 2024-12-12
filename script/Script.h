@@ -69,7 +69,7 @@ public:
 	void onControllableFeedbackUpdateInternal(ControllableContainer* cc, Controllable* c) override;
 	void childStructureChanged(ControllableContainer* cc) override;
 
-	juce::var getJSONData() override;
+	juce::var getJSONData(bool includeNonOverriden = false) override;
 	void loadJSONDataInternal(juce::var data) override;
 
 	void endLoadFile() override;

@@ -113,7 +113,7 @@ public:
 	void onContainerParameterChanged(Parameter* p) override;
 
 	virtual juce::var getExportSelectionData();
-	virtual juce::var getJSONData() override;
+	virtual juce::var getJSONData(bool includeNonOverriden = false) override;
 	virtual void loadJSONDataInternal(juce::var data) override;
 	virtual void loadJSONDataManagerInternal(juce::var data);
 
@@ -918,14 +918,14 @@ juce::var BaseManager<T>::getExportSelectionData()
 }
 
 template<class T>
-juce::var BaseManager<T>::getJSONData()
+juce::var BaseManager<T>::getJSONData(bool includeNonOverriden)
 {
-	juce::var data = ControllableContainer::getJSONData();
+	juce::var data = ControllableContainer::getJSONData(includeNonOverriden);
 	juce::var itemsData = juce::var();
 	//items.getLock().enter();
 	for (auto& t : items)
 	{
-		if (t->isSavable) itemsData.append(t->getJSONData());
+		if (t->isSavable) itemsData.append(t->getJSONData(includeNonOverriden));
 	}
 	//items.getLock().exit();
 

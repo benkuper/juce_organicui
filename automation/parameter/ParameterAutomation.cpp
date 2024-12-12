@@ -134,9 +134,9 @@ void ParameterAutomation::run()
 	}
 }
 
-var ParameterAutomation::getJSONData()
+var ParameterAutomation::getJSONData(bool includeNonOverriden)
 {
-	var data = BaseItem::getJSONData();
+	var data = BaseItem::getJSONData(includeNonOverriden);
 	data.getDynamicObject()->setProperty("automation", automationContainer->getJSONData());
 	return data;
 }

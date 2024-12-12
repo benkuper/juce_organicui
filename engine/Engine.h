@@ -75,7 +75,7 @@ public:
 	//    #endif
 
 	// our Saving methods
-	juce::var getJSONData() override;
+	juce::var getJSONData(bool includeNonOverriden = false) override;
 	void loadJSONData(juce::var data, ProgressTask* loadingTask);
 	void loadJSONDataEngine(juce::var data, ProgressTask* loadingTask);
 	virtual void loadJSONDataInternalEngine(juce::var data, ProgressTask* loadingTask) {}

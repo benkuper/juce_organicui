@@ -107,7 +107,7 @@ void ControllableContainer::clear() {
 		if (cc.wasObjectDeleted() || cc == nullptr) continue;
 		cc->removeControllableContainerListener(this);
 	}
-	
+
 	controllableContainers.clear();
 	ownedContainers.clear();
 
@@ -903,7 +903,7 @@ String ControllableContainer::getWarningTargetName() const
 	return niceName;
 }
 
-var ControllableContainer::getJSONData()
+var ControllableContainer::getJSONData(bool includeNonOverriden)
 {
 	var data(new DynamicObject());
 
@@ -1583,7 +1583,7 @@ var ControllableContainer::getControllablesFromScript(const var::NativeFunctionA
 var ControllableContainer::getJSONDataFromScript(const var::NativeFunctionArgs& a)
 {
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(a);
-	return cc->getJSONData();
+	return cc->getJSONData(a.numArguments > 0 ? (bool)(int)a.arguments[0] : false);
 }
 
 var ControllableContainer::loadJSONDataFromScript(const var::NativeFunctionArgs& a)
