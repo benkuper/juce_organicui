@@ -18,6 +18,7 @@ namespace CommandIDs
 	static const int open = 0x30000;
 	static const int save = 0x30001;
 	static const int saveAs = 0x30002;
+	static const int saveCopy = 0x30008;
 	static const int newFile = 0x30003;
 	static const int openLastDocument = 0x30004;
 	static const int checkForUpdates = 0x30005;
@@ -83,6 +84,14 @@ void OrganicMainContentComponent::getCommandInfo(CommandID commandID, Applicatio
 		result.defaultKeypresses.add(KeyPress('s', ModifierKeys::shiftModifier | ModifierKeys::commandModifier, 0));
 		break;
 
+	case CommandIDs::saveCopy:
+		result.setInfo("Save Copy",
+			"Saves a copy of the current graph to a file",
+			category, 0);
+
+		result.defaultKeypresses.add(KeyPress('s', ModifierKeys::commandModifier | ModifierKeys::altModifier, 0));
+		break;
+
 	case CommandIDs::checkForUpdates:
 		result.setInfo("Check for updates", "Check if updates are available and download latest software", category, 0);
 		break;
@@ -127,7 +136,7 @@ void OrganicMainContentComponent::getCommandInfo(CommandID commandID, Applicatio
 	case StandardApplicationCommandIDs::copy:
 	{
 		InspectableSelectionManager* selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
-		Array<BaseItem*> items = selectionManager == nullptr ? Array<BaseItem*>() : selectionManager->getInspectablesAs<BaseItem>();
+		Array<ControllableContainer*> items = selectionManager == nullptr ? Array<ControllableContainer*>() : selectionManager->getInspectablesAs<ControllableContainer>();
 		String s = items.size() > 0 && items[0] != nullptr ? "Copy " + (items.size() > 1 ? String(items.size()) + " items" : items[0]->niceName) : "Nothing to duplicate";
 		result.setInfo(s, "Copy the selected items", category, 0);
 		result.defaultKeypresses.add(KeyPress('c', ModifierKeys::commandModifier, 0));
@@ -275,6 +284,7 @@ void OrganicMainContentComponent::getAllCommands(Array<CommandID>& commands) {
 	  CommandIDs::openLastDocument,
 	  CommandIDs::save,
 	  CommandIDs::saveAs,
+	  CommandIDs::saveCopy,
 	  CommandIDs::checkForUpdates,
 #if ORGANICUI_USE_WEBSERVER
 	  CommandIDs::updateDashboardFiles,
@@ -331,6 +341,7 @@ PopupMenu OrganicMainContentComponent::getMenuForIndex(int /*topLevelMenuIndex*/
 
 		menu.addCommandItem(&getCommandManager(), CommandIDs::save);
 		menu.addCommandItem(&getCommandManager(), CommandIDs::saveAs);
+		menu.addCommandItem(&getCommandManager(), CommandIDs::saveCopy);
 		menu.addSeparator();
 		menu.addCommandItem(&getCommandManager(), CommandIDs::editProjectSettings);
 		menu.addCommandItem(&getCommandManager(), CommandIDs::editGlobalSettings);
@@ -459,26 +470,30 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 	{
 
 		std::function<void(FileBasedDocument::SaveResult)> rFunc = [](FileBasedDocument::SaveResult result)
-		{
-			if (result == FileBasedDocument::SaveResult::userCancelledSave)
 			{
+				if (result == FileBasedDocument::SaveResult::userCancelledSave)
+				{
 
-			}
-			else if (result == FileBasedDocument::SaveResult::failedToWriteToFile)
-			{
-				LOGERROR("Could not save the document (Failed to write to file)\nCancelled loading of the new document");
-			}
-			else if (result == FileBasedDocument::SaveResult::savedOk)
-			{
-				LOG("File saved.");
-			}
-		};
+				}
+				else if (result == FileBasedDocument::SaveResult::failedToWriteToFile)
+				{
+					LOGERROR("Could not save the document (Failed to write to file)\nCancelled loading of the new document");
+				}
+				else if (result == FileBasedDocument::SaveResult::savedOk)
+				{
+					LOG("File saved.");
+				}
+			};
 
 		if (info.commandID == CommandIDs::save) Engine::mainEngine->saveAsync(true, true, rFunc);
 		else Engine::mainEngine->saveAsAsync(File(), true, true, true, rFunc);
 
 	}
 	break;
+
+	case CommandIDs::saveCopy:
+		Engine::mainEngine->saveCopy();
+		break;
 
 	case CommandIDs::checkForUpdates:
 		AppUpdater::getInstance()->checkForUpdates(true);
@@ -513,7 +528,24 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 
 			data.getDynamicObject()->setProperty("items", itemsData);
 			SystemClipboard::copyTextToClipboard(JSON::toString(data));
-			LOG(items.size() << "items copied to clipboard");
+			LOG(items.size() << " items copied to clipboard");
+			break;
+		}
+
+		Array<ControllableContainer*> containers = InspectableSelectionManager::activeSelectionManager->getInspectablesAs<ControllableContainer>();
+		if (!containers.isEmpty())
+		{
+
+			var ccData = var();
+			for (auto& i : containers)
+			{
+				if (i == nullptr) continue;
+				ccData.append(i->getJSONData());
+			}
+
+			SystemClipboard::copyTextToClipboard(JSON::toString(ccData.size() > 1 ? ccData : ccData[0]));
+			LOG(ccData.size() << " containers copied to clipboard");
+			break;
 		}
 	}
 

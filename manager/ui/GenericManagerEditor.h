@@ -58,6 +58,8 @@ public:
 
 	void buttonClicked(juce::Button*) override;
 
+	virtual bool shouldShowContainer(ControllableContainer* cc) override;
+
 	virtual InspectableEditor* addEditorUI(ControllableContainer* cc, bool resize = false) override;
 	virtual void removeEditorUI(InspectableEditor* i, bool resize = false) override;
 
@@ -116,6 +118,8 @@ void GenericManagerEditor<T>::resetAndBuild()
 	resized();
 
 	itemEditors.clear();
+
+
 	for (auto& e : childEditors)
 	{
 		if (e == nullptr)
@@ -282,6 +286,16 @@ void GenericManagerEditor<T>::buttonClicked(juce::Button* b)
 	{
 		showMenuAndAddItem(true);
 	}
+}
+
+template<class T>
+bool GenericManagerEditor<T>::shouldShowContainer(ControllableContainer* cc)
+{
+	if (!manager->showItemsInEditor)
+	{
+		if (dynamic_cast<T*>(cc) != nullptr) return false;
+	}
+	return GenericControllableContainerEditor::shouldShowContainer(cc);
 }
 
 template<class T>

@@ -78,6 +78,7 @@ void EnumParameterUI::updateFromParameter()
 	if (parameter.wasObjectDeleted()) return;
 
 	int id = 1;
+	GenericScopedLock lock(ep->enumValues.getLock());
 	for (auto& ev : ep->enumValues)
 	{
 		if (ev == nullptr)

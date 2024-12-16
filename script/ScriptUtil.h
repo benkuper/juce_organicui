@@ -48,6 +48,9 @@ public:
 	static juce::var fromBase64Bytes(const juce::var::NativeFunctionArgs& a);
 
 	static juce::var fileExistsFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var getNonExistentFileFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var getFileName(const juce::var::NativeFunctionArgs& args);
+	static juce::var getFilePath(const juce::var::NativeFunctionArgs& args);
 	static juce::var readFileFromScript(const juce::var::NativeFunctionArgs& args);
 	static juce::var writeFileFromScript(const juce::var::NativeFunctionArgs& args);
 	static juce::var writeBytesFromScript(const juce::var::NativeFunctionArgs& args);

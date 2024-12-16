@@ -80,7 +80,7 @@ public:
 	void processControllables();
 	void processControllable(Controllable* c, juce::var val);
 
-	juce::var getJSONData() override;
+	juce::var getJSONData(bool includeNonOverriden = false) override;
 	void loadJSONDataItemInternal(juce::var data) override;
 
 	juce::String getTypeString() const override { return "Parrot"; }

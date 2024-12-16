@@ -34,7 +34,7 @@ public:
 	void dashboardFeedback(juce::var data) override; //from DashboardItemListener
 
 
-	juce::var getJSONData() override;
+	juce::var getJSONData(bool includeNonOverriden = false) override;
 	void loadJSONDataInternal(juce::var data) override;
 
 	juce::var getServerData();

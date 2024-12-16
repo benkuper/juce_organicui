@@ -18,6 +18,7 @@ ControllableContainer::ControllableContainer(const String& niceName) :
 	hasCustomShortName(false),
 	allowSameChildrenNiceNames(false),
 	nameCanBeChangedByUser(false),
+	isClearing(false),
 	canInspectChildContainers(true),
 	editorIsCollapsed(false),
 	editorCanBeCollapsed(true),
@@ -82,12 +83,14 @@ ControllableContainer::~ControllableContainer()
 	//controllables.clear();
 	//DBG("CLEAR CONTROLLABLE CONTAINER");
 	clear();
+	isClearing = true; // because CC clear() can be called without destructor, so force isClearing true here
 	masterReference.clear();
 }
 
 
 void ControllableContainer::clear() {
 
+	isClearing = true;
 	queuedNotifier.cancelPendingUpdate();
 
 	for (auto& c : controllables)
@@ -107,6 +110,12 @@ void ControllableContainer::clear() {
 
 	controllableContainers.clear();
 	ownedContainers.clear();
+
+	isClearing = false;
+
+#if ORGANICUI_USE_WEBSERVER
+	if (parentContainer != nullptr && !Engine::mainEngine->isClearing) OSCRemoteControl::getInstance()->sendPathChangedFeedback(getControlAddress());
+#endif
 }
 
 
@@ -485,7 +494,7 @@ void ControllableContainer::addChildControllableContainer(ControllableContainer*
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableContainerAdded, this, container));
 
 #if ORGANICUI_USE_WEBSERVER
-	if (OSCRemoteControl::getInstanceWithoutCreating() != nullptr && parentContainer != nullptr) OSCRemoteControl::getInstance()->sendPathAddedFeedback(container->getControlAddress());
+	if (OSCRemoteControl::getInstanceWithoutCreating() != nullptr && parentContainer != nullptr && !isCurrentlyLoadingData) OSCRemoteControl::getInstance()->sendPathAddedFeedback(container->getControlAddress());
 #endif
 
 	if (notify) notifyStructureChanged();
@@ -526,7 +535,7 @@ void ControllableContainer::removeChildControllableContainer(ControllableContain
 		queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableContainerRemoved, this, container));
 
 #if ORGANICUI_USE_WEBSERVER
-		if (OSCRemoteControl::getInstanceWithoutCreating() != nullptr && parentContainer != nullptr) OSCRemoteControl::getInstance()->sendPathRemovedFeedback(container->getControlAddress());
+		if (OSCRemoteControl::getInstanceWithoutCreating() != nullptr && parentContainer != nullptr && !isClearing) OSCRemoteControl::getInstance()->sendPathRemovedFeedback(container->getControlAddress());
 #endif
 
 		notifyStructureChanged();
@@ -918,7 +927,7 @@ String ControllableContainer::getWarningTargetName() const
 	return niceName;
 }
 
-var ControllableContainer::getJSONData()
+var ControllableContainer::getJSONData(bool includeNonOverriden)
 {
 	var data(new DynamicObject());
 
@@ -1062,11 +1071,16 @@ void ControllableContainer::loadJSONData(var data, bool createIfNotThere)
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableContainerFinishedLoading, this));
 
 	afterLoadJSONDataInternal();
+
+#if ORGANICUI_USE_WEBSERVER
+	if (parentContainer != nullptr) OSCRemoteControl::getInstance()->sendPathChangedFeedback(getControlAddress());
+#endif
 }
 
 var ControllableContainer::getRemoteControlData()
 {
 	var data(new DynamicObject());
+	if (isCurrentlyLoadingData || isClearing) return data;
 
 	data.getDynamicObject()->setProperty("DESCRIPTION", niceName);
 	data.getDynamicObject()->setProperty("FULL_PATH", getControlAddress());
@@ -1648,7 +1662,7 @@ var ControllableContainer::getJSONDataFromScript(const var::NativeFunctionArgs& 
 		return var();
 	}
 
-	return cc->getJSONData();
+	return cc->getJSONData(a.numArguments > 0 ? (bool)(int)a.arguments[0] : false);
 }
 
 var ControllableContainer::loadJSONDataFromScript(const var::NativeFunctionArgs& a)

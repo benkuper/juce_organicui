@@ -15,7 +15,7 @@ public:
 	virtual juce::var getServerDataForContainer(ControllableContainer* cc);
 	virtual juce::var getServerDataForControllable(Controllable* c);
 
-	virtual juce::var getJSONData() override;
+	virtual juce::var getJSONData(bool includeNonOverriden = false) override;
 	virtual void loadJSONDataItemInternal(juce::var data) override;
 
 	virtual void setInspectableInternal(Inspectable* i) override;

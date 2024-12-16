@@ -120,7 +120,7 @@ void Controllable::setNiceName(const String& _niceName) {
 		controllableNotifier.addMessage(new ControllableEvent(ControllableEvent::NAME_CHANGED, this));
 	}
 
-#if ORGANICUI_USE_WEBSERVEr
+#if ORGANICUI_USE_WEBSERVER
 	if (OSCRemoteControl::getInstanceWithoutCreating() != nullptr && parentContainer != nullptr) OSCRemoteControl::getInstance()->sendPathNameChangedFeedback(oldControlAddress, getControlAddress());
 #endif
 }

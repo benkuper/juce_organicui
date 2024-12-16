@@ -602,6 +602,8 @@ void Parameter::loadJSONDataInternal(var data)
 	}
 
 	alwaysNotify = data.getProperty("alwaysNotify", alwaysNotify);
+
+	isOverriden = true;
 }
 
 void Parameter::setupFromJSONData(var data)

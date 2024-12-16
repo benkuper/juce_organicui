@@ -43,7 +43,6 @@ public:
 	std::unique_ptr<ScriptManager> scriptManager;
 
 	juce::String itemDataType;
-	bool isClearing;
 
 	//UI moving X/Y
 	juce::Point<float> movePositionReference;
@@ -97,7 +96,7 @@ public:
 
 	void setHasCustomColor(bool value);
 
-	juce::var getJSONData() override;
+	juce::var getJSONData(bool includeNonOverriden = false) override;
 	void loadJSONDataInternal(juce::var data) override;
 	virtual void loadJSONDataItemInternal(juce::var data) {} //happens before loading scripts
 

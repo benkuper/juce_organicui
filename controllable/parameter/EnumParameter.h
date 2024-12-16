@@ -23,7 +23,7 @@ public:
 
 	struct EnumValue
 	{
-		EnumValue(juce::String key, juce::var value) : key(key), value(value) {}
+		EnumValue(juce::String key = "", juce::var value = juce::var()) : key(key), value(value) {}
 		juce::String key;
 		juce::var value;
 	};
@@ -31,14 +31,14 @@ public:
 	EnumParameter* addOption(juce::String key, juce::var data, bool selectIfFirstOption = true); //daisy chain
 	void updateOption(int index, juce::String key, juce::var data, bool addIfNotThere = false);
 	void removeOption(juce::String key);
-	void setOptions(juce::Array<EnumValue*> options);
+	void setOptions(juce::Array<EnumValue> options);
 	void clearOptions();
 
 	void updateArgDescription();
 
 
 
-	juce::OwnedArray<EnumValue> enumValues;
+	juce::OwnedArray<EnumValue, juce::CriticalSection> enumValues;
 
 	juce::var getValue() override;
 	juce::var getValueData();
@@ -73,6 +73,7 @@ public:
 
 	static juce::var getValueKeyFromScript(const juce::var::NativeFunctionArgs& a);
 	static juce::var addOptionFromScript(const juce::var::NativeFunctionArgs& a);
+	static juce::var setOptionsFromScript(const juce::var::NativeFunctionArgs& a);
 	static juce::var removeOptionsFromScript(const juce::var::NativeFunctionArgs& a);
 	static juce::var setValueWithDataFromScript(const juce::var::NativeFunctionArgs& a);
 	static juce::var getAllOptionsFromScript(const juce::var::NativeFunctionArgs& a);

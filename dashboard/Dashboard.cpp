@@ -81,9 +81,9 @@ void Dashboard::dashboardFeedback(var data)
 	dashboardListeners.call(&DashboardListener::dashboardFeedback, data);
 }
 
-var Dashboard::getJSONData()
+var Dashboard::getJSONData(bool includeNonOverriden)
 {
-	var data = BaseItem::getJSONData();
+	var data = BaseItem::getJSONData(includeNonOverriden);
 	data.getDynamicObject()->setProperty("itemManager", itemManager.getJSONData());
 	if (isBeingEdited) data.getDynamicObject()->setProperty("editing", true);
 	return data;

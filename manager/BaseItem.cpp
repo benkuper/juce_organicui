@@ -22,8 +22,7 @@ BaseItem::BaseItem(const String& name, bool _canBeDisabled, bool _canHaveScripts
 	isSavable(true),
 	saveType(true),
 	canBeReorderedInEditor(true),
-	itemDataType(""),
-	isClearing(false)
+	itemDataType("")
 {
 	//itemDataType = getTypeString();
 
@@ -138,7 +137,7 @@ void BaseItem::remove()
 
 void BaseItem::handleRemoveFromRemoteControl()
 {
-	if (userCanRemove) remove();
+	if (userCanRemove) MessageManager::callAsync([this]() {remove(); });
 }
 
 void BaseItem::setMovePositionReference(bool setOtherSelectedItems)
@@ -406,9 +405,9 @@ void BaseItem::setHasCustomColor(bool value)
 	}
 }
 
-var BaseItem::getJSONData()
+var BaseItem::getJSONData(bool includeNonOverriden)
 {
-	var data = ControllableContainer::getJSONData();
+	var data = ControllableContainer::getJSONData(includeNonOverriden);
 	if (saveType) data.getDynamicObject()->setProperty("type", getTypeString());
 	if (canHaveScripts) data.getDynamicObject()->setProperty("scripts", scriptManager->getJSONData());
 	return data;

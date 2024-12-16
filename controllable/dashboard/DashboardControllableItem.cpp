@@ -74,9 +74,9 @@ var DashboardControllableItem::getItemParameterFeedback(Parameter* p)
 	return data;
 }
 
-var DashboardControllableItem::getJSONData()
+var DashboardControllableItem::getJSONData(bool includeNonOverriden)
 {
-	var data = DashboardInspectableItem::getJSONData();
+	var data = DashboardInspectableItem::getJSONData(includeNonOverriden);
 	if (controllable != nullptr) data.getDynamicObject()->setProperty("controllable", controllable->getControlAddress());
 	return data;
 }

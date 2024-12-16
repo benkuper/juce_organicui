@@ -106,11 +106,14 @@ public:
 	void sendPathAddedFeedback(const juce::String& path);
 	void sendPathRemovedFeedback(const juce::String& path);
 	void sendPathNameChangedFeedback(const juce::String& oldPath, const juce::String& newPath);
+	void sendPathChangedFeedback(const juce::String& path);
 
 	bool hasClient(const juce::String& id);
 
 	void controllableFeedbackUpdate(ControllableContainer* cc, Controllable* c) override;
 	void controllableStateUpdate(ControllableContainer* cc, Controllable* c) override;
+
+	void addControllableToNoFeedbackMap(Controllable* c, const juce::String& id, const juce::String& fallbackId);
 
 	//void newMessage(const ContainerAsyncEvent& e) override;
 	void onControllableFeedbackUpdate(ControllableContainer* cc, Controllable* c) override;

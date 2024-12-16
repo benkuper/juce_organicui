@@ -9,6 +9,7 @@
 */
 
 #include "JuceHeader.h"
+#include "GenericControllableContainerEditor.h"
 
 GenericControllableContainerEditor::GenericControllableContainerEditor(Array<ControllableContainer*> containers, bool isRoot, bool buildAtCreation) :
 	InspectableEditor(Inspectable::getArrayAs<ControllableContainer, Inspectable>(containers), isRoot),
@@ -342,7 +343,7 @@ void GenericControllableContainerEditor::resetAndBuild()
 
 				}
 
-				if (!c->hideInEditor) addControllableUI(c);
+				if (shouldShowControllable(c)) addControllableUI(c);
 			}
 			container->controllables.getLock().exit();
 		}
@@ -360,7 +361,7 @@ void GenericControllableContainerEditor::resetAndBuild()
 						continue;
 					}
 
-					if (!cc->hideInEditor) addEditorUI(cc);
+					if (shouldShowContainer(cc)) addEditorUI(cc);
 				}
 
 				container->controllableContainers.getLock().exit();
@@ -460,6 +461,16 @@ void GenericControllableContainerEditor::componentVisibilityChanged(Component& c
 {
 	if (container.wasObjectDeleted()) return;
 	if (&c == warningUI.get()) resized();
+}
+
+bool GenericControllableContainerEditor::shouldShowControllable(Controllable* c)
+{
+	return !c->hideInEditor;
+}
+
+bool GenericControllableContainerEditor::shouldShowContainer(ControllableContainer* cc)
+{
+	return !cc->hideInEditor;
 }
 
 InspectableEditor* GenericControllableContainerEditor::getEditorUIForControllable(Controllable* c)

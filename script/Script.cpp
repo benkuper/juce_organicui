@@ -371,9 +371,9 @@ void Script::childStructureChanged(ControllableContainer* cc)
 	}
 }
 
-var Script::getJSONData()
+var Script::getJSONData(bool includeNonOverriden)
 {
-	var data = BaseItem::getJSONData();
+	var data = BaseItem::getJSONData(includeNonOverriden);
 	var pData = scriptParamsContainer->getJSONData();
 	if (!pData.isVoid()) data.getDynamicObject()->setProperty("scriptParams", pData);
 	return data;

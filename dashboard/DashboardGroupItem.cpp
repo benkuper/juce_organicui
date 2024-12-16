@@ -38,9 +38,9 @@ var DashboardGroupItem::getServerData()
 }
 
 
-var DashboardGroupItem::getJSONData()
+var DashboardGroupItem::getJSONData(bool includeNonOverriden)
 {
-	var data = DashboardItem::getJSONData();
+	var data = DashboardItem::getJSONData(includeNonOverriden);
 	data.getDynamicObject()->setProperty("itemManager", itemManager.getJSONData());
 	return data;
 }

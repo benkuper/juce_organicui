@@ -17,7 +17,7 @@ public:
 	KeyMappingsContainer();
 	~KeyMappingsContainer();
 
-	juce::var getJSONData() override;
+	juce::var getJSONData(bool includeNonOverriden = false) override;
 	void loadJSONDataInternal(juce::var data) override;
 
 	InspectableEditor * getEditorInternal(bool isRoot, juce::Array<Inspectable*> inspectables = juce::Array<Inspectable*>()) override;
@@ -58,6 +58,7 @@ public:
 
 	ControllableContainer saveLoadCC;
 	BoolParameter * enableAutoSave;
+	BoolParameter* autoSaveCurrentFile;
 	IntParameter * autoSaveCount;
 	IntParameter* autoSaveTime;
 
