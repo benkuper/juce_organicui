@@ -393,8 +393,6 @@ juce::var ScriptUtil::getFileName(const juce::var::NativeFunctionArgs& args)
 	bool withExt = args.numArguments > 1 ? (bool)(int)args.arguments[1] : true;
 	if (withExt) return f.getFileName();
 	return f.getFileNameWithoutExtension();
-
-	return juce::var();
 }
 
 juce::var ScriptUtil::getFilePath(const juce::var::NativeFunctionArgs& args)
