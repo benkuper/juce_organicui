@@ -26,6 +26,7 @@ void remove ## ClassName ## Listener(ClassName ## Listener* listener) { if (isBe
 #define DECLARE_INSPECTACLE_LISTENER(ClassName, listenerName) DECLARE_INSPECTACLE_LISTENER_BASE(ClassName, juce::ListenerList, listenerName,  )
 
 #define DECLARE_INSPECTACLE_SAFE_LISTENER(ClassName, listenerName) DECLARE_INSPECTACLE_LISTENER_BASE(ClassName, juce::ThreadSafeBlockingListenerList, listenerName,)
+#define DECLARE_INSPECTACLE_SAFE_NONBLOCKING_LISTENER(ClassName, listenerName) DECLARE_INSPECTACLE_LISTENER_BASE(ClassName, juce::ThreadSafeListenerList, listenerName,)
 
 #define DECLARE_INSPECTACLE_LIGHT_LISTENER(ClassName, listenerName) DECLARE_INSPECTACLE_LISTENER_BASE(ClassName, juce::LightweightListenerList, listenerName,)
 
