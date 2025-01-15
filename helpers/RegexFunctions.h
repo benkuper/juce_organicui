@@ -56,7 +56,7 @@ public:
         }
         catch (std::regex_error e)
         {
-            DBG(e.what());
+            DBG("Regex error : " << e.what());
             return juce::StringArray();
         }
     }
@@ -88,7 +88,7 @@ public:
         }
         catch (std::regex_error e)
         {
-            DBG(e.what());
+            DBG("Regex error : " << e.what());
             return juce::Array<juce::StringArray>();
         }
     }
@@ -121,7 +121,7 @@ public:
         {
             jassertfalse;
 
-            DBG(e.what());
+            DBG("Regex error : " << e.what());
             return juce::StringArray();
         }
     }
@@ -137,7 +137,7 @@ public:
         }
         catch (std::regex_error e)
         {
-            DBG(e.what());
+            DBG("Regex error : " << e.what());
             
             return false;
         }
