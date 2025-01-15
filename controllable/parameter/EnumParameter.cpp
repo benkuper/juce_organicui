@@ -176,15 +176,22 @@ void EnumParameter::setValueInternal(juce::var& newValue)
 
 void EnumParameter::setValueWithData(var data)
 {
-	GenericScopedLock lock(enumValues.getLock());
-	for (auto& ev : enumValues)
+	String key = "";
+
 	{
-		if (ev->value == data)
+		GenericScopedLock lock(enumValues.getLock());
+		for (auto& ev : enumValues)
 		{
-			setValueWithKey(ev->key);
-			break;
+			if (ev->value == data)
+			{
+				key = ev->key;
+				break;
+			}
 		}
 	}
+
+	setValue(key);
+
 }
 
 void EnumParameter::setValueWithKey(String key)
