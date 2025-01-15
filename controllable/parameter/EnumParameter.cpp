@@ -122,13 +122,12 @@ var EnumParameter::getValue()
 }
 
 var EnumParameter::getValueData() {
-	GenericScopedLock lock(enumValues.getLock());
-	EnumValue* ev = getEntryForKey(value.toString());
-	if (ev == nullptr) return var();
-	return ev->value;
+	GenericScopedLock lock(valueSetLock);
+	return curEnumValue.value;
 }
 
 String EnumParameter::getValueKey() {
+	GenericScopedLock lock(valueSetLock);
 	return value.toString();
 }
 
@@ -152,6 +151,27 @@ StringArray EnumParameter::getAllKeys()
 	StringArray result;
 	for (auto& ev : enumValues) result.add(ev->key);
 	return result;
+}
+
+void EnumParameter::setValueInternal(juce::var& newValue)
+{
+	Parameter::setValueInternal(newValue);
+
+	EnumValue* ev = getEntryForKey(value.toString());
+
+	{
+		GenericScopedLock lock(enumValues.getLock());
+		if (ev == nullptr)
+		{
+			curEnumValue.key = "";
+			curEnumValue.value = var();
+		}
+		else
+		{
+			curEnumValue.key = ev->key;
+			curEnumValue.value = ev->value;
+		}
+	}
 }
 
 void EnumParameter::setValueWithData(var data)

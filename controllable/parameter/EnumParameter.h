@@ -37,17 +37,16 @@ public:
 	void updateArgDescription();
 
 
-
 	juce::OwnedArray<EnumValue, juce::CriticalSection> enumValues;
+	EnumValue curEnumValue;
 
 	juce::var getValue() override;
 	juce::var getValueData();
 
 	template<class T>
 	T getValueDataAsEnum() {
-		EnumValue* ev = getEntryForKey(value.toString());
-		if (ev == nullptr) return (T)0;
-		return (T)(int)ev->value;
+		GenericScopedLock lock(valueSetLock);
+		return (T)(int)curEnumValue.value;
 	}
 
 	juce::String getValueKey();
@@ -56,6 +55,8 @@ public:
 	EnumValue* getEntryForKey(juce::StringRef key);
 
 	juce::StringArray getAllKeys();
+
+	void setValueInternal(juce::var& newValue) override;
 
 	void setValueWithData(juce::var data);
 	void setValueWithKey(juce::String data);
