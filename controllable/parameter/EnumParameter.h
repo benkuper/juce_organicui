@@ -45,7 +45,7 @@ public:
 
 	template<class T>
 	T getValueDataAsEnum() {
-		GenericScopedLock lock(valueSetLock);
+		juce::GenericScopedLock lock(valueSetLock);
 		return (T)(int)curEnumValue.value;
 	}
 
