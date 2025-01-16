@@ -1041,6 +1041,7 @@ void ControllableContainer::loadJSONData(var data, bool createIfNotThere)
 				{
 					c->saveValueOnly = false; //auto set here because it will likely need that if it has been created from data
 					c->loadJSONData(pData);
+					if (userCanAddControllables) c->isCustomizableByUser = true;
 					addControllable(c);
 				}
 			}
