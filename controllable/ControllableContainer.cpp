@@ -116,7 +116,7 @@ void ControllableContainer::clear() {
 	isClearing = false;
 
 #if ORGANICUI_USE_WEBSERVER
-	if (notifyRemoteControlOnClear && !Engine::mainEngine->isClearing && isAttachedToRoot()) OSCRemoteControl::getInstance()->sendPathChangedFeedback(getControlAddress());
+	if (notifyRemoteControlOnClear && Engine::mainEngine != nullptr && Engine::mainEngine->isClearing && isAttachedToRoot()) OSCRemoteControl::getInstance()->sendPathChangedFeedback(getControlAddress());
 #endif
 }
 
@@ -1074,7 +1074,7 @@ var ControllableContainer::getRemoteControlData()
 
 	for (auto& childCC : controllableContainers)
 	{
-		if (childCC->hideInRemoteControl) continue;
+		if (childCC == nullptr || childCC.wasObjectDeleted() || childCC->hideInRemoteControl) continue;
 		contentData.getDynamicObject()->setProperty(childCC->shortName, childCC->getRemoteControlData());
 	}
 
