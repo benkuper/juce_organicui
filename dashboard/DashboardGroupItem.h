@@ -17,7 +17,7 @@ public:
 
 	juce::var getServerData() override;
 
-	juce::var getJSONData() override;
+	juce::var getJSONData(bool includeNonOverriden = false) override;
 	void loadJSONDataItemInternal(juce::var data) override;
 
 	bool paste() override;

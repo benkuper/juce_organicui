@@ -405,9 +405,9 @@ void BaseItem::setHasCustomColor(bool value)
 	}
 }
 
-var BaseItem::getJSONData()
+var BaseItem::getJSONData(bool includeNonOverriden)
 {
-	var data = ControllableContainer::getJSONData();
+	var data = ControllableContainer::getJSONData(includeNonOverriden);
 	if (saveType) data.getDynamicObject()->setProperty("type", getTypeString());
 	if (canHaveScripts) data.getDynamicObject()->setProperty("scripts", scriptManager->getJSONData());
 	return data;

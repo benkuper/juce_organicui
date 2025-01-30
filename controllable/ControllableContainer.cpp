@@ -85,6 +85,7 @@ ControllableContainer::~ControllableContainer()
 	//controllables.clear();
 	//DBG("CLEAR CONTROLLABLE CONTAINER");
 	clear();
+	isClearing = true; // because CC clear() can be called without destructor, so force isClearing true here
 	masterReference.clear();
 }
 
@@ -904,7 +905,7 @@ String ControllableContainer::getWarningTargetName() const
 	return niceName;
 }
 
-var ControllableContainer::getJSONData()
+var ControllableContainer::getJSONData(bool includeNonOverriden)
 {
 	var data(new DynamicObject());
 
@@ -1584,7 +1585,7 @@ var ControllableContainer::getControllablesFromScript(const var::NativeFunctionA
 var ControllableContainer::getJSONDataFromScript(const var::NativeFunctionArgs& a)
 {
 	ControllableContainer* cc = getObjectFromJS<ControllableContainer>(a);
-	return cc->getJSONData();
+	return cc->getJSONData(a.numArguments > 0 ? (bool)(int)a.arguments[0] : false);
 }
 
 var ControllableContainer::loadJSONDataFromScript(const var::NativeFunctionArgs& a)

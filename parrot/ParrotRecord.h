@@ -32,7 +32,7 @@ public:
 
     juce::HashMap<juce::WeakReference<Controllable>, juce::Array<RecordValue>> dataMap;
 
-    juce::var getJSONData() override;
+    juce::var getJSONData(bool includeNonOverriden = false) override;
     void loadJSONDataItemInternal(juce::var data) override;
 
     juce::String getTypeString() const override { return "Record"; }

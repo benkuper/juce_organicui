@@ -50,6 +50,9 @@ Script::Script(ScriptTarget* _parentTarget, bool canBeDisabled, bool canBeRemove
 	scriptObject.getDynamicObject()->setMethod("setExecutionTimeout", Script::setExecutionTimeoutFromScript);
 	scriptObject.getDynamicObject()->setMethod("refreshEnvironment", Script::refreshVariablesFromScript);
 
+	scriptObject.getDynamicObject()->setMethod("getScriptDirectory", Script::getScriptDirectoryFromScript);
+	scriptObject.getDynamicObject()->setMethod("getScriptPath", Script::getScriptPathFromScript);
+
 	scriptObject.getDynamicObject()->setMethod("addTrigger", Script::addTriggerFromScript);
 	scriptObject.getDynamicObject()->setMethod("addBoolParameter", Script::addBoolParameterFromScript);
 	scriptObject.getDynamicObject()->setMethod("addIntParameter", Script::addIntParameterFromScript);
@@ -330,9 +333,9 @@ void Script::childStructureChanged(ControllableContainer* cc)
 	}
 }
 
-var Script::getJSONData()
+var Script::getJSONData(bool includeNonOverriden)
 {
-	var data = BaseItem::getJSONData();
+	var data = BaseItem::getJSONData(includeNonOverriden);
 	var pData = scriptParamsContainer->getJSONData();
 	if (!pData.isVoid()) data.getDynamicObject()->setProperty("scriptParams", pData);
 	return data;
@@ -592,6 +595,18 @@ var Script::refreshVariablesFromScript(const juce::var::NativeFunctionArgs& args
 	return var();
 }
 
+
+juce::var Script::getScriptDirectoryFromScript(const juce::var::NativeFunctionArgs& args)
+{
+	Script* s = getObjectFromJS<Script>(args);
+	return s->filePath->getFile().getParentDirectory().getFullPathName();
+}
+
+juce::var Script::getScriptPathFromScript(const juce::var::NativeFunctionArgs& args)
+{
+	Script* s = getObjectFromJS<Script>(args);
+	return s->filePath->getAbsolutePath();
+}
 
 bool Script::checkNumArgs(const String& logName, const var::NativeFunctionArgs& args, int expectedArgs)
 {

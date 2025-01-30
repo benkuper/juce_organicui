@@ -193,9 +193,9 @@ KeyMappingsContainer::~KeyMappingsContainer()
 
 }
 
-var KeyMappingsContainer::getJSONData()
+var KeyMappingsContainer::getJSONData(bool includeNonOverriden)
 {
-	var data = ControllableContainer::getJSONData();
+	var data = ControllableContainer::getJSONData(includeNonOverriden);
 	KeyPressMappingSet* kms = getCommandManager().getKeyMappings();
 	std::unique_ptr<XmlElement> xmlElement(kms->createXml(true));
 	String xmlData = xmlElement->toString();

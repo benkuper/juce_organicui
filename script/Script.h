@@ -69,7 +69,7 @@ public:
 	void onControllableFeedbackUpdateInternal(ControllableContainer* cc, Controllable* c) override;
 	void childStructureChanged(ControllableContainer* cc) override;
 
-	juce::var getJSONData() override;
+	juce::var getJSONData(bool includeNonOverriden = false) override;
 	void loadJSONDataInternal(juce::var data) override;
 
 	void endLoadFile() override;
@@ -120,6 +120,9 @@ public:
 	static juce::var setExecutionTimeoutFromScript(const juce::var::NativeFunctionArgs& args);
 
 	static juce::var refreshVariablesFromScript(const juce::var::NativeFunctionArgs& args);
+
+	static juce::var getScriptDirectoryFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var getScriptPathFromScript(const juce::var::NativeFunctionArgs& args);
 
 	static bool checkNumArgs(const juce::String& logName, const juce::var::NativeFunctionArgs& args, int expectedArgs);
 

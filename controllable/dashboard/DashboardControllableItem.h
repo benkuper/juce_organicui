@@ -23,7 +23,7 @@ public:
 
 	virtual juce::var getItemParameterFeedback(Parameter* p) override;
 
-    virtual juce::var getJSONData() override;
+    virtual juce::var getJSONData(bool includeNonOverriden = false) override;
 	virtual void loadJSONData(juce::var data, bool createIfNotThere = false) override; //needs to not override ItemInternal to force loading data after set inspectable
 
 	virtual void setInspectableInternal(Inspectable * i) override;

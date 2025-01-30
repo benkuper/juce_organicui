@@ -317,9 +317,9 @@ void Engine::setLastDocumentOpened(const File& file) {
 
 }
 
-var Engine::getJSONData()
+var Engine::getJSONData(bool includeNonOverriden)
 {
-	var data = ControllableContainer::getJSONData();
+	var data = ControllableContainer::getJSONData(includeNonOverriden);
 	var metaData(new DynamicObject());
 
 	metaData.getDynamicObject()->setProperty("version", ProjectInfo::versionString);

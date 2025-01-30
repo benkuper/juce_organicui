@@ -404,9 +404,9 @@ void Parrot::processControllable(Controllable* c, var val)
 	else ((Parameter*)c)->setValue(val);
 }
 
-var Parrot::getJSONData()
+var Parrot::getJSONData(bool includeNonOverriden)
 {
-	var data = BaseItem::getJSONData();
+	var data = BaseItem::getJSONData(includeNonOverriden);
 
 	var targetData;
 	for (auto& c : targetsCC.controllables)
