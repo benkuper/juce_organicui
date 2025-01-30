@@ -814,7 +814,7 @@ void BaseManager<T>::clear()
 	isClearing = false;
 
 #if ORGANICUI_USE_WEBSERVER
-	if (parentContainer != nullptr) OSCRemoteControl::getInstance()->sendPathChangedFeedback(getControlAddress());
+	if (notifyRemoteControlOnClear && !isCurrentlyLoadingData && isAttachedToRoot()) OSCRemoteControl::getInstance()->sendPathChangedFeedback(getControlAddress());
 #endif
 }
 
