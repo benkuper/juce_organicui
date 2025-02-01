@@ -118,6 +118,7 @@ const bool CustomLoggerUI::isPrimaryRow(const int r) const
 	int count = 0;
 	int idx = 0;
 
+	GenericScopedLock lock(logger->logElements.getLock());
 	while (count <= r && idx < logger->logElements.size())
 	{
 		if (count == r)
