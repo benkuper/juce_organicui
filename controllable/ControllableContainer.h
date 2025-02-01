@@ -63,6 +63,10 @@ public:
 	//Script
 	bool includeInScriptObject;
 
+	//Remote control
+	bool notifyRemoteControlOnLoad;
+	bool notifyRemoteControlOnClear;
+
 
 	static ControllableComparator comparator;
 	ControllableComparator* customControllableComparator;
@@ -208,7 +212,7 @@ public:
 
 	juce::String getScriptTargetString() override;
 
-
+	bool isAttachedToRoot();
 
 protected:
 	virtual void onContainerNiceNameChanged() {};

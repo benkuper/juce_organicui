@@ -106,17 +106,25 @@ UndoableAction* Controllable::setUndoableNiceName(const String& newNiceName, boo
 void Controllable::setNiceName(const String& _niceName) {
 	if (niceName == _niceName) return;
 
+	bool isFirstSetup = niceName.isEmpty();
+
 	String oldControlAddress = getControlAddress();
 	this->niceName = _niceName;
 	if (!hasCustomShortName) setAutoShortName();
 	else
 	{
-		controllableListeners.call(&ControllableListener::controllableNameChanged, this);
-		controllableNotifier.addMessage(new ControllableEvent(ControllableEvent::NAME_CHANGED, this));
+		if (!isFirstSetup)
+		{
+			controllableListeners.call(&ControllableListener::controllableNameChanged, this);
+			controllableNotifier.addMessage(new ControllableEvent(ControllableEvent::NAME_CHANGED, this));
+		}
 	}
 
 #if ORGANICUI_USE_WEBSERVER
-	if (OSCRemoteControl::getInstanceWithoutCreating() != nullptr && parentContainer != nullptr) OSCRemoteControl::getInstance()->sendPathNameChangedFeedback(oldControlAddress, getControlAddress());
+	if (!isFirstSetup)
+	{
+		if (OSCRemoteControl::getInstanceWithoutCreating() != nullptr && isAttachedToRoot()) OSCRemoteControl::getInstance()->sendPathNameChangedFeedback(oldControlAddress, getControlAddress());
+	}
 #endif
 }
 
@@ -593,6 +601,13 @@ String Controllable::getWarningTargetName() const
 	}
 
 	return niceName;
+}
+
+bool Controllable::isAttachedToRoot()
+{
+	ControllableContainer* pc = parentContainer;
+	while (pc != Engine::mainEngine && pc != nullptr) pc = pc->parentContainer;
+	return pc == Engine::mainEngine;
 }
 
 Controllable* Controllable::ControllableAction::getControllable()

@@ -85,11 +85,12 @@ Engine::~Engine() {
 	HelpBox::deleteInstance();
 	UndoMaster::deleteInstance();
 	GlobalSettings::deleteInstance();
-	OSCRemoteControl::deleteInstance();
 	AssetManager::deleteInstance();
 	ProjectSettings::deleteInstance();
 
 	WarningReporter::deleteInstance();
+
+	OSCRemoteControl::deleteInstance();
 
 	Engine::mainEngine = nullptr;
 }

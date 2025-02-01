@@ -133,6 +133,8 @@ public:
 
 	virtual juce::String getWarningTargetName() const override;
 
+	bool isAttachedToRoot();
+
 	virtual InspectableEditor* getEditorInternal(bool isRoot, juce::Array<Inspectable*> inspectables = juce::Array<Inspectable*>()) override;
 	virtual ControllableDetectiveWatcher* getDetectiveWatcher();
 	virtual juce::String getTypeString() const { jassert(false); return ""; } //should be overriden
