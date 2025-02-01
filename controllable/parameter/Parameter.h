@@ -93,6 +93,8 @@ public:
 
 	bool isNotifyingChange;
 
+	juce::CriticalSection notifyLock;
+
 	virtual void setEnabled(bool value, bool silentSet = false, bool force = false) override;
 
 	void setControlMode(ControlMode _mode);
