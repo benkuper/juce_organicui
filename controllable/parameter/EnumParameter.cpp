@@ -9,6 +9,7 @@
 */
 
 #include "JuceHeader.h"
+#include "EnumParameter.h"
 
 EnumParameter::EnumParameter(const String& niceName, const String& description, bool enabled) :
 	Parameter(Type::ENUM, niceName, description, "", var(), var(), enabled),
@@ -154,7 +155,7 @@ StringArray EnumParameter::getAllKeys()
 	return result;
 }
 
-void EnumParameter::setValueWithData(var data)
+bool EnumParameter::setValueWithData(var data)
 {
 	GenericScopedLock lock(enumValues.getLock());
 	for (auto& ev : enumValues)
@@ -162,14 +163,25 @@ void EnumParameter::setValueWithData(var data)
 		if (ev->value == data)
 		{
 			setValueWithKey(ev->key);
-			break;
+			return true;
 		}
 	}
+
+	return false;
 }
 
-void EnumParameter::setValueWithKey(String key)
+bool EnumParameter::setValueWithKey(String key)
 {
+	if (getEntryForKey(key) == nullptr) return false;
 	setValue(key);
+	return true;
+}
+
+bool EnumParameter::setValueAtIndex(int index)
+{
+	if (index >= enumValues.size()) return false;
+	setValueWithKey(enumValues[index]->key);
+	return true;
 }
 
 void EnumParameter::setPrev(bool loop, bool addToUndo)
