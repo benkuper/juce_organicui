@@ -56,10 +56,10 @@ public:
 
 	juce::StringArray getAllKeys();
 
+	bool setValueWithData(juce::var data);
+	bool setValueWithKey(juce::String data);
+	bool setValueAtIndex(int index);
 	void setValueInternal(juce::var& newValue) override;
-
-	void setValueWithData(juce::var data);
-	void setValueWithKey(juce::String data);
 	void setPrev(bool loop = true, bool addToUndo = false);
 	void setNext(bool loop = true, bool addToUndo = false);
 
