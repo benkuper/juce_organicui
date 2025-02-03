@@ -125,6 +125,7 @@
 #include <juce_opengl/juce_opengl.h>
 #include <juce_osc/juce_osc.h>
 #include <juce_cryptography/juce_cryptography.h>
+#include <juce_javascript/juce_javascript.h>
 
 #if ORGANICUI_USE_SERVUS
 #include "servus/servus.h"
