@@ -64,8 +64,8 @@ public:
 	void resetValue(bool silentSet = false) override;
 	void setGhostValue(const juce::String& ghostVal);
 
-	void setValueFromTarget(Controllable*, bool addToUndo = false);
-	void setValueFromTarget(ControllableContainer*, bool addToUndo = false);
+	void setValueFromTarget(Controllable*, bool addToUndo = false, bool setSimilarSelected = false);
+	void setValueFromTarget(ControllableContainer*, bool addToUndo = false, bool setSimilarSelected = false);
 
 	void setValueInternal(juce::var&) override;
 

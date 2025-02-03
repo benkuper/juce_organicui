@@ -8,10 +8,6 @@
   ==============================================================================
 */
 
-#include "JuceHeader.h"
-#include "ParameterUI.h"
-
-
 bool ParameterUI::showAlwaysNotifyOption = true;
 bool ParameterUI::showControlModeOption = true;
 
@@ -465,7 +461,7 @@ void ParameterUI::ValueEditCalloutComponent::labelTextChanged(Label* l)
 			else newVal.append(ParameterUI::textToValue(labels[i]->getText().replace(",", ".")));
 		}
 
-		p->setUndoableValue(oldVal, p->isComplex() ? newVal : newVal[0]);
+		p->setUndoableValue(p->isComplex() ? newVal : newVal[0], false, true);
 	}
 	else
 	{

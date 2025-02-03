@@ -77,19 +77,19 @@ void Inspectable::setSelected(bool value)
 	inspectableNotifier.addMessage(new InspectableEvent(InspectableEvent::SELECTION_CHANGED, this));
 }
 
-void Inspectable::setHighlighted(bool value)
+void Inspectable::setHighlighted(bool value, Inspectable* source)
 {
 	if (value == isHighlighted) return;
 	isHighlighted = value;
-	inspectableListeners.call(&InspectableListener::inspectableHighlightChanged, this);
-	inspectableNotifier.addMessage(new InspectableEvent(InspectableEvent::HIGHLIGHT_CHANGED, this));
+	inspectableListeners.call(&InspectableListener::inspectableHighlightChanged, this, source);
+	inspectableNotifier.addMessage(new InspectableEvent(InspectableEvent::HIGHLIGHT_CHANGED, this, source));
 }
 
 void Inspectable::highlightLinkedInspectables(bool value)
 {
 	for (auto &i : linkedInspectables)
 	{
-		if (!i.wasObjectDeleted()) i->setHighlighted(value);
+		if (!i.wasObjectDeleted()) i->setHighlighted(value, this);
 	}
 }
 

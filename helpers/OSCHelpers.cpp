@@ -108,7 +108,7 @@ void OSCHelpers::addArgumentsForParameter(OSCMessage& m, Parameter* p, BoolMode 
 		break;
 
 	default:
-		jassertfalse;
+		//jassertfalse;
 		if (p->isComplex()) for (int i = 0; i < val.size(); i++) m.addArgument(varToArgument(val[i], bm));
 		else m.addArgument(varToArgument(p->getValue(), bm));
 		break;

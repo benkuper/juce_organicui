@@ -85,7 +85,7 @@ void ColorStatusUI::mouseDownInternal(const MouseEvent& e)
 	if (e.mods.isLeftButtonDown())
 	{
 		if (e.mods.isAltDown() || momentaryMode) parameter->setValue(!parameter->boolValue());
-		else parameter->setUndoableValue(parameter->boolValue(), !parameter->boolValue()); //only undoable when from left button, real toggle behaviour
+		else parameter->setUndoableValue(!parameter->boolValue()); //only undoable when from left button, real toggle behaviour
 	}
 }
 

@@ -129,13 +129,12 @@ BaseItemMinimalUI<T>::BaseItemMinimalUI(T* _item) :
 {
 	baseItem = static_cast<BaseItem*>(item);
 
-	setName(baseItem->niceName);
-
-	//setDisableDefaultMouseEvents(true);
+	setDisableInternalMouseEvents(true);
 	addMouseListener(this, true); //needs fixing, this is called twice on the component
 
 	if (baseItem != nullptr)
 	{
+		setName(baseItem->niceName);
 		baseItem->addAsyncContainerListener(this);
 		if (baseItem->canBeDisabled && dimAlphaOnDisabled) setAlpha(baseItem->enabled->boolValue() ? 1 : .5f);
 	}
@@ -215,8 +214,6 @@ void BaseItemMinimalUI<T>::mouseDown(const juce::MouseEvent& e)
 {
 	//LOG("BaseItemMinimalUI::mouseDown " << e.eventComponent->getName() << " / " << e.originalComponent->getName());
 	InspectableContentComponent::mouseDown(e);
-
-	if (e.eventComponent != this) return;
 
 	if (e.mods.isRightButtonDown())
 	{

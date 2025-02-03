@@ -22,8 +22,7 @@ BaseItem::BaseItem(const String& name, bool _canBeDisabled, bool _canHaveScripts
 	isSavable(true),
 	saveType(true),
 	canBeReorderedInEditor(true),
-	itemDataType(""),
-	isClearing(false)
+	itemDataType("")
 {
 	//itemDataType = getTypeString();
 
@@ -138,7 +137,7 @@ void BaseItem::remove()
 
 void BaseItem::handleRemoveFromRemoteControl()
 {
-	if (userCanRemove) remove();
+	if (userCanRemove) MessageManager::callAsync([this]() {remove(); });
 }
 
 void BaseItem::setMovePositionReference(bool setOtherSelectedItems)
@@ -271,7 +270,7 @@ void BaseItem::addMoveToUndoManager(bool addOtherSelectedItems)
 
 void BaseItem::addUndoableMoveAction(Array<UndoableAction*>& arrayToAdd)
 {
-	arrayToAdd.add(viewUIPosition->setUndoablePoint(movePositionReference, viewUIPosition->getPoint(), true));
+	arrayToAdd.addArray(viewUIPosition->setUndoablePoint(viewUIPosition->getPoint(), true));
 }
 
 void BaseItem::setSizeReference(bool setOtherSelectedItems)
@@ -345,7 +344,7 @@ void BaseItem::addResizeToUndoManager(bool addOtherSelectedItems)
 
 void BaseItem::addUndoableResizeAction(Array<UndoableAction*>& arrayToAdd)
 {
-	arrayToAdd.add(viewUISize->setUndoablePoint(sizeReference, viewUISize->getPoint(), true));
+	arrayToAdd.addArray(viewUISize->setUndoablePoint(viewUISize->getPoint(), true));
 }
 
 void BaseItem::onContainerParameterChanged(Parameter* p)
@@ -406,9 +405,9 @@ void BaseItem::setHasCustomColor(bool value)
 	}
 }
 
-var BaseItem::getJSONData()
+var BaseItem::getJSONData(bool includeNonOverriden)
 {
-	var data = ControllableContainer::getJSONData();
+	var data = ControllableContainer::getJSONData(includeNonOverriden);
 	if (saveType) data.getDynamicObject()->setProperty("type", getTypeString());
 	if (canHaveScripts) data.getDynamicObject()->setProperty("scripts", scriptManager->getJSONData());
 	return data;

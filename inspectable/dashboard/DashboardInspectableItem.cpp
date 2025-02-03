@@ -88,9 +88,9 @@ void DashboardInspectableItem::childStructureChanged(ControllableContainer* cc)
 }
 
 
-var DashboardInspectableItem::getJSONData()
+var DashboardInspectableItem::getJSONData(bool includeNonOverriden)
 {
-	var data = DashboardItem::getJSONData();
+	var data = DashboardItem::getJSONData(includeNonOverriden);
 	if (inspectableGhostAddress.isNotEmpty()) data.getDynamicObject()->setProperty("ghostAddress", inspectableGhostAddress);
 	return data;
 }

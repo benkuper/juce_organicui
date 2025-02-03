@@ -50,5 +50,5 @@ Point<float> GradientColor::getPosition()
 
 void GradientColor::addUndoableMoveAction(Array<UndoableAction*>& actions)
 {
-	actions.add(position->setUndoableValue(movePositionReference.x, position->floatValue(), true));
+	actions.addArray(position->setUndoableValue(position->floatValue(), true));
 }

@@ -13,7 +13,7 @@ Author:  bkupe
 using namespace juce;
 
 Point3DParameter::Point3DParameter(const String& niceName, const String& description, bool enabled) :
-	Parameter(POINT3D, niceName, description, 0, 0, 1, enabled),
+	Parameter(POINT3D, niceName, description, var(), var(), var(), enabled),
 	x(0), y(0), z(0),
 	defaultUI(FloatParameter::NONE),
 	stringDecimals(3)
@@ -58,25 +58,19 @@ void Point3DParameter::setVector(float _x, float _y, float _z)
 	setValue(d);
 }
 
-UndoableAction* Point3DParameter::setUndoableVector(Vector3D<float> oldVector, Vector3D<float> newVector, bool onlyReturnAction)
+juce::Array<UndoableAction*> Point3DParameter::setUndoableVector(Vector3D<float> newVector, bool onlyReturnAction, bool setSimilarSelected)
 {
-	return setUndoableVector(oldVector.x, oldVector.y, oldVector.z, newVector.x, newVector.y, newVector.z, onlyReturnAction);
+	return setUndoableVector(newVector.x, newVector.y, newVector.z, onlyReturnAction, setSimilarSelected);
 }
 
-UndoableAction* Point3DParameter::setUndoableVector(float oldX, float oldY, float oldZ, float newX, float newY, float newZ, bool onlyReturnAction)
+juce::Array<UndoableAction*> Point3DParameter::setUndoableVector(float newX, float newY, float newZ, bool onlyReturnAction, bool setSimilarSelected)
 {
-	var od;
-	od.append(oldX);
-	od.append(oldY);
-	od.append(oldZ);
 	var d;
 	d.append(newX);
 	d.append(newY);
 	d.append(newZ);
 
-	if (checkValueIsTheSame(od, d) && !alwaysNotify) return nullptr;
-
-	return setUndoableValue(od, d, onlyReturnAction);
+	return setUndoableValue(d, onlyReturnAction, setSimilarSelected);
 }
 
 void Point3DParameter::setValueInternal(var& _value)

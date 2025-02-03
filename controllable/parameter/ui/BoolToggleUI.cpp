@@ -55,7 +55,7 @@ void BoolToggleUI::paint(Graphics& g)
 	// we are on component deletion
 	if (shouldBailOut())return;
 
-	bool valCheck = parameter->boolValue();
+	bool valCheck = parameter->previewValue.isVoid() ? parameter->boolValue() : (bool)parameter->previewValue;
 	Image m = valCheck ? onImage : offImage;
 
 	juce::Rectangle<int> r = getLocalBounds();
@@ -68,7 +68,7 @@ void BoolToggleUI::paint(Graphics& g)
 	{
 		int fontSize = customTextSize > 0 ? customTextSize : jlimit(12, 40, jmin(r.getHeight(), r.getWidth()) - 16);
 		g.setFont(fontSize);
-		labelWidth = (int)TextLayout::getStringWidth(g.getCurrentFont(),parameter->niceName) + 10;
+		labelWidth = (int)TextLayout::getStringWidth(g.getCurrentFont(), parameter->niceName) + 10;
 		/*if (r.getHeight() > r.getWidth())
 		{
 			cr = r.removeFromRight(jmin<float>(r.getHeight(), r.getWidth() - labelWidth));
@@ -104,8 +104,8 @@ void BoolToggleUI::mouseDownInternal(const MouseEvent& e)
 	if (!isInteractable()) return;
 	if (e.mods.isLeftButtonDown())
 	{
-		if (e.mods.isAltDown() || momentaryMode) parameter->setValue(!parameter->boolValue());
-		else parameter->setUndoableValue(parameter->boolValue(), !parameter->boolValue()); //only undoable when from left button, real toggle behaviour
+		if (e.mods.isAltDown() || momentaryMode) parameter->setValue(!parameter->boolValue(), false, false, true, true);
+		else parameter->setUndoableValue(!parameter->boolValue(), false, true); //only undoable when from left button, real toggle behaviour
 	}
 }
 
@@ -114,7 +114,7 @@ void BoolToggleUI::mouseUpInternal(const MouseEvent& e)
 	if (!isInteractable()) return;
 	if (e.mods.isLeftButtonDown())
 	{
-		if (e.mods.isAltDown() || momentaryMode) parameter->setValue(!parameter->boolValue());
+		if (e.mods.isAltDown() || momentaryMode) parameter->setValue(!parameter->boolValue(), false, false, true, true);
 	}
 }
 
@@ -158,13 +158,15 @@ void BoolButtonToggleUI::paint(Graphics& g)
 	buttonRect = getLocalBounds().toFloat();
 	if (!showLabel) buttonRect.setWidth(jmin<float>(buttonRect.getWidth(), buttonRect.getHeight() * 3));
 
-	bool isOn = parameter->boolValue();
+	bool previewMode = !parameter->previewValue.isVoid();
+	bool isOn = previewMode ? (bool)parameter->previewValue : parameter->boolValue();
 
 	Point<float> center = buttonRect.getCentre();
 
 	Colour bgColor = useCustomBGColor ? customBGColor : NORMAL_COLOR;
 	Colour c = bgColor.darker();
 	Colour hc = useCustomFGColor ? customFGColor : HIGHLIGHT_COLOR;
+	if (previewMode) hc = Colours::rebeccapurple.brighter(.2f);
 
 	if (isInteractable())
 	{

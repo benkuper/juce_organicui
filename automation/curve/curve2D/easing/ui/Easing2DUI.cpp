@@ -52,8 +52,8 @@ void Easing2DUI::paint(Graphics& g)
 		for (int i = 0; i <= 50; i++)
 		{
 
-			float pos = (i*1.0f / 50) * drawPath.getLength();
-			float curvePos = (i*1.0f / 50) * easing->length;
+			float pos = (i * 1.0f / 50) * drawPath.getLength();
+			float curvePos = (i * 1.0f / 50) * easing->length;
 
 			float d = jlimit<float>(0, 1, 1 - fabsf(curvePos - focusPos) / (focusRange / 2));
 
@@ -386,8 +386,8 @@ void CubicEasing2DUI::mouseUp(const MouseEvent& e)
 	Easing2DUI::mouseUp(e);
 
 	Array<UndoableAction*> actions;
-	actions.add(ce->anchor1->setUndoablePoint(h1ValueAtMouseDown, ce->anchor1->getPoint(), true));
-	actions.add(ce->anchor2->setUndoablePoint(h2ValueAtMouseDown, ce->anchor2->getPoint(), true));
+	actions.addArray(ce->anchor1->setUndoablePoint(ce->anchor1->getPoint(), true));
+	actions.addArray(ce->anchor2->setUndoablePoint(ce->anchor2->getPoint(), true));
 	UndoMaster::getInstance()->performActions("Move anchors", actions);
 }
 

@@ -64,7 +64,8 @@ GlobalSettings::GlobalSettings() :
 	addChildControllableContainer(&interfaceCC);
 
 	enableAutoSave = saveLoadCC.addBoolParameter("Enable auto-save", "When enabled, a backup file will be saved every 5 min", true);
-	autoSaveCount = saveLoadCC.addIntParameter("Auto-save count", "The number of different files to auto-save", 10, 1, 100);
+	autoSaveCurrentFile = saveLoadCC.addBoolParameter("Auto-save current file", "If checked, the current file will be saved as well when auto-saving", false);
+	autoSaveCount = saveLoadCC.addIntParameter("Auto-save count", "The number of backup files to auto-save", 10, 1, 100);
 	autoSaveTime = saveLoadCC.addIntParameter("Auto-save time", "The time in minutes between two auto-saves (will)", 5, 1, 100);
 	compressOnSave = saveLoadCC.addBoolParameter("Compress file", "If checked, the JSON content will be minified, otherwise it will be human-readable but larger size as well", true);
 
@@ -189,9 +190,9 @@ KeyMappingsContainer::~KeyMappingsContainer()
 
 }
 
-var KeyMappingsContainer::getJSONData()
+var KeyMappingsContainer::getJSONData(bool includeNonOverriden)
 {
-	var data = ControllableContainer::getJSONData();
+	var data = ControllableContainer::getJSONData(includeNonOverriden);
 	KeyPressMappingSet* kms = getCommandManager().getKeyMappings();
 	std::unique_ptr<XmlElement> xmlElement(kms->createXml(true));
 	String xmlData = xmlElement->toString();

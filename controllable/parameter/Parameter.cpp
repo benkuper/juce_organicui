@@ -9,6 +9,7 @@
 */
 
 #include "JuceHeader.h"
+#include "Parameter.h"
 
 using namespace juce;
 
@@ -19,6 +20,7 @@ Parameter::Parameter(const Type& type, const String& niceName, const String& des
 	Controllable(type, niceName, description, enabled),
 	defaultValue(initialValue),
 	value(initialValue),
+	lastUndoValue(initialValue),
 	canHaveRange(false),
 	rebuildUIOnRangeChange(true),
 	minimumValue(minValue),
@@ -158,38 +160,80 @@ void Parameter::setDefaultValue(var val, bool doResetValue)
 void Parameter::resetValue(bool silentSet)
 {
 	isOverriden = false;
-	setValue(defaultValue, silentSet, true, false);
+	setValue(defaultValue, silentSet, false, false);
 }
 
-UndoableAction* Parameter::setUndoableValue(var oldValue, var newValue, bool onlyReturnAction)
+Array<UndoableAction*> Parameter::setUndoableValue(var newValue, bool onlyReturnAction, bool setSimilarSelected)
 {
 	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile)
 	{
 		//if Main Engine loading, just set the value without undo history
 		setValue(newValue);
-		return nullptr;
+		return Array<UndoableAction*>();
 	}
 
-	UndoableAction* a = new ParameterSetValueAction(this, oldValue, newValue);
-	if (onlyReturnAction) return a;
+	if (lastUndoValue.isVoid()) lastUndoValue = newValue.clone();
+	Array<UndoableAction*> actions;
+	UndoableAction* a = new ParameterSetValueAction(this, lastUndoValue, newValue);
+	actions.add(a);
+	lastUndoValue = newValue.clone();
 
-	UndoMaster::getInstance()->performAction("Set " + niceName + " value", a);
-	return a;
+	if (setSimilarSelected && InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 1)
+	{
+		if (ControllableContainer* cc = getSelectedParentInHierarchy())
+		{
+			String relativeAddress = getControlAddress(cc);
+			Array<ControllableContainer*> containers = InspectableSelectionManager::activeSelectionManager->getInspectablesAs<ControllableContainer>();
+			containers.removeAllInstancesOf(cc);
+
+			for (ControllableContainer* c : containers)
+			{
+				if (Parameter* t = dynamic_cast<Parameter*>(c->getControllableForAddress(relativeAddress)))
+				{
+					actions.addArray(t->setUndoableValue(newValue, true, false));
+				}
+			}
+		}
+	}
+
+	if (onlyReturnAction) return actions;
+
+	UndoMaster::getInstance()->performActions("Set " + niceName + " value", actions);
+	return actions;
 }
 
-void Parameter::setValue(var _value, bool silentSet, bool force, bool forceOverride)
+void Parameter::setValue(juce::var _value, bool silentSet, bool force, bool forceOverride, bool setSimilarSelected)
 {
 	{
 		GenericScopedLock lock(valueSetLock);
 
 		var croppedValue = getCroppedValue(_value.clone());
-
 		if (!alwaysNotify && !force && checkValueIsTheSame(value, croppedValue)) return;
 
-		lastValue = var(value.clone());
+		lastValue = value.clone();
+		if (lastUndoValue.isVoid()) lastUndoValue = _value.clone();
 		setValueInternal(croppedValue);
 		if (!isOverriden /*&& !isControllableFeedbackOnly*/) isOverriden = croppedValue != defaultValue || forceOverride;
 	}
+
+	if (setSimilarSelected && InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 1)
+	{
+		if (ControllableContainer* cc = getSelectedParentInHierarchy())
+		{
+			String relativeAddress = getControlAddress(cc);
+			Array<ControllableContainer*> containers = InspectableSelectionManager::activeSelectionManager->getInspectablesAs<ControllableContainer>();
+			containers.removeAllInstancesOf(cc);
+
+			for (ControllableContainer* c : containers)
+			{
+				if (Parameter* t = dynamic_cast<Parameter*>(c->getControllableForAddress(relativeAddress)))
+				{
+					t->setValue(value, silentSet, force, forceOverride, false);
+				}
+			}
+		}
+	}
+
 	if (!silentSet) notifyValueChanged();
 }
 
@@ -244,11 +288,11 @@ void Parameter::clearRange()
 	if (isComplex())
 	{
 		var minVal = var();
-		var maxVal = var(); 
-		
+		var maxVal = var();
+
 		{
 			GenericScopedLock lock(valueSetLock);
-			
+
 			for (int i = 0; i < value.size(); ++i)
 			{
 				minVal.append(INT32_MIN);
@@ -325,44 +369,46 @@ var Parameter::getCroppedValue(var originalValue)
 	return originalValue;
 }
 
-void Parameter::setUndoableNormalizedValue(const var& oldNormalizedValue, const var& newNormalizedValue)
+void Parameter::setUndoableNormalizedValue(const var& newNormalizedValue, bool setSimilarSelected)
 {
 	if (!isComplex())
 	{
-		setUndoableValue(jmap<float>(oldNormalizedValue, (float)minimumValue, (float)maximumValue), jmap<float>(newNormalizedValue, (float)minimumValue, (float)maximumValue));
+		setUndoableValue(jmap<float>(newNormalizedValue, (float)minimumValue, (float)maximumValue), false, setSimilarSelected);
 	}
 	else
 	{
-		var oldVal;
 		var newVal;
 		for (int i = 0; i < value.size(); i++)
 		{
-			oldVal.append(jmap<float>(oldNormalizedValue[i], minimumValue[i], maximumValue[i]));
-			newVal.append(jmap<float>(oldNormalizedValue[i], minimumValue[i], maximumValue[i]));
+			newVal.append(jmap<float>(newNormalizedValue[i], minimumValue[i], maximumValue[i]));
 		}
-		setUndoableValue(oldVal, newVal);
+		setUndoableValue(newVal, false, setSimilarSelected);
 	}
 
 }
 
-void Parameter::setNormalizedValue(const var& normalizedValue, bool silentSet, bool force)
+void Parameter::setNormalizedValue(const var& normalizedValue, bool silentSet, bool force, bool setSimilarSelected)
 {
 	if (!isComplex())
 	{
-		setValue(jmap<float>(normalizedValue, (float)minimumValue, (float)maximumValue), silentSet, force);
+		setValue(jmap<float>(normalizedValue, (float)minimumValue, (float)maximumValue), silentSet, force, false, setSimilarSelected);
 
 	}
 	else
 	{
 		var targetVal;
 		for (int i = 0; i < value.size(); i++) targetVal.append(jmap<float>(normalizedValue[i], minimumValue[i], maximumValue[i]));
-		setValue(targetVal, silentSet, force);
+		setValue(targetVal, silentSet, force, false, setSimilarSelected);
 	}
 }
 
-var Parameter::getNormalizedValue() const
+var Parameter::getNormalizedValue(var forceVal) const
 {
-	if (type == BOOL) return (float)value;
+	var val = forceVal.isVoid() ? value : forceVal;
+
+	if (type == BOOL) return (float)val;
+
+	jassert(val.size() == value.size());
 
 	if (!canHaveRange) return 0;
 
@@ -372,15 +418,15 @@ var Parameter::getNormalizedValue() const
 			return 0.0;
 		}
 		else
-			return jmap<float>((float)value, (float)minimumValue, (float)maximumValue, 0.f, 1.f);
+			return jmap<float>((float)val, (float)minimumValue, (float)maximumValue, 0.f, 1.f);
 	}
 	else
 	{
 		var normVal;
-		for (int i = 0; i < value.size(); i++)
+		for (int i = 0; i < val.size(); i++)
 		{
 			if ((float)minimumValue[i] == (float)maximumValue[i]) normVal.append(0.f);
-			else normVal.append(jmap<float>((float)value[i], (float)minimumValue[i], (float)maximumValue[i], 0.f, 1.f));
+			else normVal.append(jmap<float>((float)val[i], (float)minimumValue[i], (float)maximumValue[i], 0.f, 1.f));
 		}
 
 		return normVal;
@@ -556,6 +602,8 @@ void Parameter::loadJSONDataInternal(var data)
 	}
 
 	alwaysNotify = data.getProperty("alwaysNotify", alwaysNotify);
+
+	isOverriden = true;
 }
 
 void Parameter::setupFromJSONData(var data)
@@ -736,7 +784,7 @@ Parameter::ValueInterpolator::ValueInterpolator(WeakReference<Parameter> p, var 
 
 Parameter::ValueInterpolator::~ValueInterpolator()
 {
-	if(parameter != nullptr && !parameter.wasObjectDeleted()) parameter->removeInspectableListener(this);
+	if (parameter != nullptr && !parameter.wasObjectDeleted()) parameter->removeInspectableListener(this);
 
 	masterReference.clear();
 }
@@ -875,7 +923,7 @@ void Parameter::ValueInterpolator::Manager::run()
 				interpolatorMap.removeValue(i);
 				interpolators.removeObject(i);
 			}
-			
+
 			interpToRemove.clear();
 
 			double diff = Time::getMillisecondCounter() - t;

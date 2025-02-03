@@ -106,22 +106,33 @@ UndoableAction* Controllable::setUndoableNiceName(const String& newNiceName, boo
 void Controllable::setNiceName(const String& _niceName) {
 	if (niceName == _niceName) return;
 
-	scriptObject.getDynamicObject()->setProperty("niceName", niceName);
+	
+
+	bool isFirstSetup = niceName.isEmpty();
 
 	String oldControlAddress = getControlAddress();
 
 	String prevShortName = shortName;
 
 	niceName = _niceName;
+
+    scriptObject.getDynamicObject()->setProperty("niceName", niceName);
+    
 	if (!hasCustomShortName) setAutoShortName();
 	else
 	{
-		controllableListeners.call(&ControllableListener::controllableNameChanged, this, prevShortName);
-		controllableNotifier.addMessage(new ControllableEvent(ControllableEvent::NAME_CHANGED, this));
+		if (!isFirstSetup)
+		{
+		    controllableListeners.call(&ControllableListener::controllableNameChanged, this, prevShortName);
+            controllableNotifier.addMessage(new ControllableEvent(ControllableEvent::NAME_CHANGED, this));
+		}
 	}
 
-#if ORGANICUI_USE_WEBSERVEr
-	if (OSCRemoteControl::getInstanceWithoutCreating() != nullptr && parentContainer != nullptr) OSCRemoteControl::getInstance()->sendPathNameChangedFeedback(oldControlAddress, getControlAddress());
+#if ORGANICUI_USE_WEBSERVER
+	if (!isFirstSetup)
+	{
+		if (OSCRemoteControl::getInstanceWithoutCreating() != nullptr && isAttachedToRoot()) OSCRemoteControl::getInstance()->sendPathNameChangedFeedback(oldControlAddress, getControlAddress());
+	}
 #endif
 }
 
@@ -140,7 +151,7 @@ void Controllable::setCustomShortName(const String& _shortName)
 }
 
 void Controllable::setAutoShortName() {
-	
+
 	String prevShortName = shortName;
 	hasCustomShortName = false;
 	shortName = StringUtil::toShortName(niceName, replaceSlashesInShortName);
@@ -168,6 +179,13 @@ void Controllable::setControllableFeedbackOnly(bool value)
 	controllableNotifier.addMessage(new ControllableEvent(ControllableEvent::FEEDBACK_STATE_CHANGED, this));
 }
 
+void Controllable::setPreviewValue(juce::var value)
+{
+	previewValue = value;
+	controllableListeners.call(&ControllableListener::controllablePreviewValueChanged, this);
+	controllableNotifier.addMessage(new ControllableEvent(ControllableEvent::PREVIEW_VALUE_CHANGED, this));
+}
+
 void Controllable::notifyStateChanged()
 {
 	controllableListeners.call(&ControllableListener::controllableStateChanged, this);
@@ -193,6 +211,18 @@ void Controllable::updateControlAddress()
 		controllableListeners.call(&ControllableListener::controllableControlAddressChanged, this);
 		controllableNotifier.addMessage(new ControllableEvent(ControllableEvent::CONTROLADDRESS_CHANGED, this));
 	}
+}
+
+ControllableContainer* Controllable::getSelectedParentInHierarchy()
+{
+	ControllableContainer* c = parentContainer;
+	while (c != nullptr)
+	{
+		if (c->isSelected) return c;
+		c = c->parentContainer;
+	}
+
+	return nullptr;
 }
 
 void Controllable::remove(bool addToUndo)
@@ -604,6 +634,13 @@ String Controllable::getWarningTargetName() const
 	}
 
 	return niceName;
+}
+
+bool Controllable::isAttachedToRoot()
+{
+	ControllableContainer* pc = parentContainer;
+	while (pc != Engine::mainEngine && pc != nullptr) pc = pc->parentContainer;
+	return pc == Engine::mainEngine;
 }
 
 Controllable* Controllable::ControllableAction::getControllable()

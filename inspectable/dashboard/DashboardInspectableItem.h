@@ -24,7 +24,7 @@ public:
 	virtual void ghostInspectable() {}
 	virtual void checkGhost() {}
 
-	virtual juce::var getJSONData() override;
+	virtual juce::var getJSONData(bool includeNonOverriden = false) override;
 	virtual void loadJSONDataItemInternal(juce::var data) override;
 
 	void onContainerParameterChangedInternal(Parameter* p) override;

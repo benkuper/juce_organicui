@@ -14,13 +14,14 @@ EnumParameter::EnumParameter(const String& niceName, const String& description, 
 	Parameter(Type::ENUM, niceName, description, "", var(), var(), enabled),
 	enumParameterNotifier(5)
 {
-	lockManualControlMode = true;
+	//lockManualControlMode = true;
 
 	scriptObject.getDynamicObject()->setMethod("getKey", EnumParameter::getValueKeyFromScript);
 	scriptObject.getDynamicObject()->setMethod("setData", EnumParameter::setValueWithDataFromScript);
 	scriptObject.getDynamicObject()->setMethod("setNext", EnumParameter::setNextFromScript);
 	scriptObject.getDynamicObject()->setMethod("setPrevious", EnumParameter::setPreviousFromScript);
 	scriptObject.getDynamicObject()->setMethod("addOption", EnumParameter::addOptionFromScript);
+	scriptObject.getDynamicObject()->setMethod("setOptions", EnumParameter::setOptionsFromScript);
 	scriptObject.getDynamicObject()->setMethod("removeOptions", EnumParameter::removeOptionsFromScript);
 	scriptObject.getDynamicObject()->setMethod("getAllOptions", EnumParameter::getAllOptionsFromScript);
 	scriptObject.getDynamicObject()->setMethod("getOptionAt", EnumParameter::getOptionAtFromScript);
@@ -41,6 +42,7 @@ EnumParameter::~EnumParameter()
 
 EnumParameter* EnumParameter::addOption(String key, var data, bool selectIfFirstOption)
 {
+	GenericScopedLock lock(enumValues.getLock());
 	enumValues.add(new EnumValue(key, data));
 	if (enumValues.size() == 1 && selectIfFirstOption)
 	{
@@ -56,6 +58,7 @@ EnumParameter* EnumParameter::addOption(String key, var data, bool selectIfFirst
 
 void EnumParameter::updateOption(int index, String key, var data, bool addIfNotThere)
 {
+	GenericScopedLock lock(enumValues.getLock());
 	if (index >= enumValues.size())
 	{
 		if (!addIfNotThere) return;
@@ -75,6 +78,7 @@ void EnumParameter::updateOption(int index, String key, var data, bool addIfNotT
 
 void EnumParameter::removeOption(String key)
 {
+	GenericScopedLock lock(enumValues.getLock());
 	enumValues.remove(getIndexForKey(key));
 	enumListeners.call(&EnumParameterListener::enumOptionRemoved, this, key);
 	enumParameterNotifier.addMessage(new EnumParameterEvent(EnumParameterEvent::ENUM_OPTION_REMOVED, this));
@@ -83,11 +87,12 @@ void EnumParameter::removeOption(String key)
 	if (getValueKey() == key) setValue("");
 }
 
-void EnumParameter::setOptions(Array<EnumValue*> options)
+void EnumParameter::setOptions(Array<EnumValue> options)
 {
+	GenericScopedLock lock(enumValues.getLock());
 	for (int i = 0; i < options.size(); i++)
 	{
-		updateOption(i, options[i]->key, options[i]->value, true);
+		updateOption(i, options[i].key, options[i].value, true);
 	}
 
 	while (enumValues.size() > options.size()) removeOption(enumValues[enumValues.size() - 1]->key);
@@ -95,6 +100,7 @@ void EnumParameter::setOptions(Array<EnumValue*> options)
 
 void EnumParameter::clearOptions()
 {
+	GenericScopedLock lock(enumValues.getLock());
 	StringArray keysToRemove;
 	for (auto& ev : enumValues) keysToRemove.add(ev->key);
 	for (auto& k : keysToRemove) removeOption(k);
@@ -116,17 +122,18 @@ var EnumParameter::getValue()
 }
 
 var EnumParameter::getValueData() {
-	EnumValue* ev = getEntryForKey(value.toString());
-	if (ev == nullptr) return var();
-	return ev->value;
+	GenericScopedLock lock(valueSetLock);
+	return curEnumValue.value;
 }
 
 String EnumParameter::getValueKey() {
+	GenericScopedLock lock(valueSetLock);
 	return value.toString();
 }
 
 int EnumParameter::getIndexForKey(StringRef key)
 {
+	GenericScopedLock lock(enumValues.getLock());
 	int numValues = enumValues.size();
 	for (int i = 0; i < numValues; ++i) if (enumValues[i]->key == key) return i;
 	return -1;
@@ -146,16 +153,45 @@ StringArray EnumParameter::getAllKeys()
 	return result;
 }
 
-void EnumParameter::setValueWithData(var data)
+void EnumParameter::setValueInternal(juce::var& newValue)
 {
-	for (auto& ev : enumValues)
+	Parameter::setValueInternal(newValue);
+
+	EnumValue* ev = getEntryForKey(value.toString());
+
 	{
-		if (ev->value == data)
+		GenericScopedLock lock(enumValues.getLock());
+		if (ev == nullptr)
 		{
-			setValueWithKey(ev->key);
-			break;
+			curEnumValue.key = "";
+			curEnumValue.value = var();
+		}
+		else
+		{
+			curEnumValue.key = ev->key;
+			curEnumValue.value = ev->value;
 		}
 	}
+}
+
+void EnumParameter::setValueWithData(var data)
+{
+	String key = "";
+
+	{
+		GenericScopedLock lock(enumValues.getLock());
+		for (auto& ev : enumValues)
+		{
+			if (ev->value == data)
+			{
+				key = ev->key;
+				break;
+			}
+		}
+	}
+
+	setValue(key);
+
 }
 
 void EnumParameter::setValueWithKey(String key)
@@ -165,6 +201,7 @@ void EnumParameter::setValueWithKey(String key)
 
 void EnumParameter::setPrev(bool loop, bool addToUndo)
 {
+	GenericScopedLock lock(enumValues.getLock());
 	int targetIndex = getIndexForKey(value.toString()) - 1;
 	if (targetIndex < 0)
 	{
@@ -174,13 +211,14 @@ void EnumParameter::setPrev(bool loop, bool addToUndo)
 
 	String newValue = enumValues[targetIndex]->key;
 
-	if (addToUndo) setUndoableValue(value, newValue);
+	if (addToUndo) setUndoableValue(newValue, false, true);
 	else setValueWithKey(newValue);
 }
 
 void EnumParameter::setNext(bool loop, bool addToUndo)
 {
 
+	GenericScopedLock lock(enumValues.getLock());
 	int targetIndex = getIndexForKey(value.toString()) + 1;
 	if (targetIndex >= enumValues.size())
 	{
@@ -190,7 +228,7 @@ void EnumParameter::setNext(bool loop, bool addToUndo)
 
 	String newValue = enumValues[targetIndex]->key;
 
-	if (addToUndo) setUndoableValue(value, newValue);
+	if (addToUndo) setUndoableValue(newValue, false, true);
 	else setValueWithKey(newValue);
 }
 
@@ -284,6 +322,38 @@ var EnumParameter::addOptionFromScript(const juce::var::NativeFunctionArgs& a)
 	}
 
 	ep->addOption(a.arguments[0].toString(), a.arguments[1]);
+
+	return var();
+}
+
+juce::var EnumParameter::setOptionsFromScript(const juce::var::NativeFunctionArgs& a)
+{
+	WeakReference<Parameter> c = getObjectFromJS<Parameter>(a);
+	if (c == nullptr || c.wasObjectDeleted()) return var();
+	EnumParameter* ep = dynamic_cast<EnumParameter*>(c.get());
+
+	if (a.numArguments == 0)
+	{
+		NLOGWARNING("Script", "EnumParameter setOption should have at least 1 argument");
+		return var();
+	}
+
+	if (a.arguments[0].isObject())
+	{
+		NamedValueSet nvSet = a.arguments[0].getDynamicObject()->getProperties();
+		Array<EnumValue> newOptions;
+
+		for (auto& nv : nvSet)
+		{
+			newOptions.add(EnumValue(nv.name.toString(), nv.value));
+		}
+
+		ep->setOptions(newOptions);
+	}
+	else
+	{
+		NLOGWARNING("Script", "EnumParameter setOption should have an object as first argument");
+	}
 
 	return var();
 }

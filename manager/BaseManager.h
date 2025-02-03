@@ -25,7 +25,6 @@ public:
 	virtual ~BaseManager();
 
 	juce::OwnedArray<T, juce::CriticalSection> items;
-	bool isClearing;
 
 	//Factory
 	Factory<T>* managerFactory;
@@ -42,6 +41,9 @@ public:
 	//interaction
 	float viewZoom;
 
+	//editor
+	bool showItemsInEditor;
+	// 
 	//grid
 	BoolParameter* snapGridMode;
 	BoolParameter* showSnapGrid;
@@ -111,10 +113,11 @@ public:
 	void onContainerParameterChanged(Parameter* p) override;
 
 	virtual juce::var getExportSelectionData();
-	virtual juce::var getJSONData() override;
+	virtual juce::var getJSONData(bool includeNonOverriden = false) override;
 	virtual void loadJSONDataInternal(juce::var data) override;
 	virtual void loadJSONDataManagerInternal(juce::var data);
 
+	virtual juce::var getRemoteControlData() override;
 	virtual void getRemoteControlDataInternal(juce::var& data) override;
 
 	juce::PopupMenu getItemsMenu(int startID);
@@ -292,7 +295,6 @@ private:
 template<class T>
 BaseManager<T>::BaseManager(const juce::String& name) :
 	EnablingControllableContainer(name, false),
-	isClearing(false),
 	managerFactory(nullptr),
 	itemDataType(""),
 	userCanAddItemsManually(true),
@@ -300,6 +302,7 @@ BaseManager<T>::BaseManager(const juce::String& name) :
 	autoReorderOnAdd(true),
 	isManipulatingMultipleItems(false),
 	viewZoom(1),
+	showItemsInEditor(true),
 	snapGridMode(nullptr),
 	showSnapGrid(nullptr),
 	snapGridSize(nullptr),
@@ -321,14 +324,11 @@ BaseManager<T>::BaseManager(const juce::String& name) :
 
 	skipLabelInTarget = true; //by default manager label in targetParameter UI are not interesting
 	nameCanBeChangedByUser = false;
-
-
 }
 
 template<class T>
 BaseManager<T>::~BaseManager()
 {
-
 	clear();
 }
 
@@ -387,7 +387,13 @@ T* BaseManager<T>::createItemFromData(juce::var data)
 	{
 		juce::String extendedType = data.getProperty("extendedType", "");
 		if (extendedType != "") {
-			return managerFactory->create(managerFactory->getDefFromExtendedType(extendedType));
+			BaseFactoryDefinition<T>* def = managerFactory->getDefFromExtendedType(extendedType);
+			if (def == nullptr)
+			{
+				NLOGWARNING(niceName, "Could not find definition for extendedType \"" + extendedType + "\" in factory.");
+				return nullptr;
+			}
+			return managerFactory->create(def);
 		}
 		juce::String type = data.getProperty("type", "");
 		if (type.isEmpty()) return nullptr;
@@ -763,7 +769,7 @@ void BaseManager<T>::reorderItems()
 		//items.getLock().enter();
 		items.sort(comparator);
 		//items.getLock().exit();
-		controllableContainers.clear();
+		controllableContainers.removeIf([this](ControllableContainer* c) { return items.contains((T*)c); }); //remove if not in items
 		controllableContainers.addArray(items);
 	}
 
@@ -806,6 +812,10 @@ void BaseManager<T>::clear()
 	//const ScopedLock lock(items.getLock());
 	while (items.size() > 0) removeItem(items[0], false);
 	isClearing = false;
+
+#if ORGANICUI_USE_WEBSERVER
+	if (notifyRemoteControlOnClear && !isCurrentlyLoadingData && isAttachedToRoot()) OSCRemoteControl::getInstance()->sendPathChangedFeedback(getControlAddress());
+#endif
 }
 
 template<class T>
@@ -908,14 +918,14 @@ juce::var BaseManager<T>::getExportSelectionData()
 }
 
 template<class T>
-juce::var BaseManager<T>::getJSONData()
+juce::var BaseManager<T>::getJSONData(bool includeNonOverriden)
 {
-	juce::var data = ControllableContainer::getJSONData();
+	juce::var data = ControllableContainer::getJSONData(includeNonOverriden);
 	juce::var itemsData = juce::var();
 	//items.getLock().enter();
 	for (auto& t : items)
 	{
-		if (t->isSavable) itemsData.append(t->getJSONData());
+		if (t->isSavable) itemsData.append(t->getJSONData(includeNonOverriden));
 	}
 	//items.getLock().exit();
 
@@ -956,9 +966,15 @@ void BaseManager<T>::loadJSONDataManagerInternal(juce::var data)
 }
 
 template<class T>
+juce::var BaseManager<T>::getRemoteControlData()
+{
+	if (isClearing || isCurrentlyLoadingData) return juce::var(new juce::DynamicObject());
+	return ControllableContainer::getRemoteControlData();
+}
+
+template<class T>
 void BaseManager<T>::getRemoteControlDataInternal(juce::var& data)
 {
-	ControllableContainer::getRemoteControlDataInternal(data);
 	data.getDynamicObject()->setProperty("TYPE", "Manager");
 
 	juce::var extType = juce::var();
@@ -969,6 +985,7 @@ void BaseManager<T>::getRemoteControlDataInternal(juce::var& data)
 	else extType.append(itemDataType);
 
 	data.getDynamicObject()->setProperty("EXTENDED_TYPE", extType);
+	data.getDynamicObject()->setProperty("BASE_TYPE", itemDataType);
 }
 
 template<class T>

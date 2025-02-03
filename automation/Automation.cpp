@@ -416,7 +416,7 @@ Array<UndoableAction*> Automation::getMoveKeysBy(float start, float offset)
 
 	while (k != nullptr)
 	{
-		actions.add(k->position->setUndoableValue(k->position->floatValue(), k->position->floatValue() + offset, true));
+		actions.addArray(k->position->setUndoableValue(k->position->floatValue() + offset, true));
 		k = k->nextKey;
 	}
 

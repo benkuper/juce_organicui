@@ -78,6 +78,7 @@ void EnumParameterUI::updateFromParameter()
 	if (parameter.wasObjectDeleted()) return;
 
 	int id = 1;
+	GenericScopedLock lock(ep->enumValues.getLock());
 	for (auto& ev : ep->enumValues)
 	{
 		if (ev == nullptr)
@@ -133,7 +134,7 @@ void EnumParameterUI::valueChanged(const var& value)
 void EnumParameterUI::comboBoxChanged(ComboBox*)
 {
 	if (shouldBailOut()) return;
-	ep->setUndoableValue(prevValue, getSelectedKey());
+	ep->setUndoableValue(getSelectedKey(), false, true);
 
 }
 

@@ -37,7 +37,7 @@ public:
 	bool showEnableBT;
 	bool showRemoveBT;
 	bool showColorUI;
-	
+
 	//Resize
 	Direction resizeDirection;
 	int resizerWidth;
@@ -48,7 +48,7 @@ public:
 		public juce::Component
 	{
 	public:
-		ItemResizerComponent() 
+		ItemResizerComponent()
 		{
 			setMouseCursor(juce::MouseCursor::BottomRightCornerResizeCursor);
 		}
@@ -187,7 +187,6 @@ BaseItemUI<T>::BaseItemUI(T* _item, Direction _resizeDirection, bool showMiniMod
 
 	case ALL:
 		resizerHeight = 10;
-		//constrainer.setMinimumSize(resizerWidth + 20, headerHeight + headerGap + minContentHeight + resizerHeight);
 		cornerResizer.reset(new ItemResizerComponent());
 		cornerResizer->setAlwaysOnTop(true);
 		this->addAndMakeVisible(cornerResizer.get());
@@ -471,7 +470,7 @@ void BaseItemUI<T>::mouseDown(const juce::MouseEvent& e)
 		this->baseItem->setSizeReference(true);
 	}
 
-	BaseItemMinimalUI<T>::mouseDown(e);
+	if (e.eventComponent == this || e.eventComponent == &itemLabel) BaseItemMinimalUI<T>::mouseDown(e);
 }
 
 template<class T>

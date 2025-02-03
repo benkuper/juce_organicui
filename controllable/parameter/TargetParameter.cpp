@@ -61,7 +61,7 @@ void TargetParameter::resetValue(bool silentSet)
 	if (targetType == CONTAINER) setTarget((ControllableContainer*)nullptr);
 	else setTarget((Controllable*)nullptr);
 	setGhostValue("");
-	setUndoableValue(value, "");
+	setUndoableValue("");
 
 	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::VALUE_CHANGED, this, getValue()));
 	clearWarning();
@@ -80,7 +80,7 @@ void TargetParameter::setGhostValue(const String& ghostVal)
 
 }
 
-void TargetParameter::setValueFromTarget(Controllable* c, bool addToUndo)
+void TargetParameter::setValueFromTarget(Controllable* c, bool addToUndo, bool setSimilarSelected)
 {
 	String newValue;
 
@@ -118,13 +118,13 @@ void TargetParameter::setValueFromTarget(Controllable* c, bool addToUndo)
 		manuallySettingNull = true;
 	}
 
-	if (addToUndo) setUndoableValue(stringValue(), newValue);
-	else setValue(newValue, false, true);
+	if (addToUndo) setUndoableValue(newValue, false, setSimilarSelected);
+	else setValue(newValue, false, true, true, setSimilarSelected);
 
 	manuallySettingNull = false;
 }
 
-void TargetParameter::setValueFromTarget(ControllableContainer* cc, bool addToUndo)
+void TargetParameter::setValueFromTarget(ControllableContainer* cc, bool addToUndo, bool setSimilarSelected)
 {
 	if (targetContainer != nullptr && cc == targetContainer.get())
 	{
@@ -146,8 +146,8 @@ void TargetParameter::setValueFromTarget(ControllableContainer* cc, bool addToUn
 		manuallySettingNull = true;
 	}
 
-	if (addToUndo) setUndoableValue(stringValue(), cc->getControlAddress(rootContainer));
-	else setValue(cc->getControlAddress(rootContainer), false, true);
+	if (addToUndo) setUndoableValue(cc->getControlAddress(rootContainer), false, setSimilarSelected);
+	else setValue(cc->getControlAddress(rootContainer), false, true, true, setSimilarSelected);
 
 	manuallySettingNull = false;
 }
@@ -244,7 +244,7 @@ void TargetParameter::setTarget(WeakReference<Controllable> c)
 			{
 				if (!Engine::mainEngine->isClearing && rootContainer != nullptr && !rootContainer.wasObjectDeleted())
 				{
-					if(!isBeingDestroyed && !manuallySettingNull) setWarningMessage("Link is broken : " + ghostValue);
+					if (!isBeingDestroyed && !manuallySettingNull) setWarningMessage("Link is broken : " + ghostValue);
 					rootContainer->addControllableContainerListener(this);
 				}
 			}

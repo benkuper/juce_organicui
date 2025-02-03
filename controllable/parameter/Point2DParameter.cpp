@@ -12,7 +12,7 @@
 #include "Point2DParameter.h"
 
 Point2DParameter::Point2DParameter(const String& niceName, const String& description, bool _enabled) :
-	Parameter(POINT2D, niceName, description, 0, 0, 1, _enabled),
+	Parameter(POINT2D, niceName, description, var(), var(), var(), _enabled),
 	x(0), y(0),
 	defaultUI(FloatParameter::NONE),
 	stringDecimals(3),
@@ -45,39 +45,36 @@ Point2DParameter::Point2DParameter(const String& niceName, const String& descrip
 }
 
 
-void Point2DParameter::setPoint(Point<float> point)
+void Point2DParameter::setPoint(Point<float> point, bool setSimilarSelected)
 {
-	setPoint(point.x, point.y);
+	setPoint(point.x, point.y, setSimilarSelected);
 }
 
-void Point2DParameter::setPoint(float _x, float _y)
+void Point2DParameter::setPoint(float _x, float _y, bool setSimilarSelected)
 {
 	var d;
 	d.append(_x);
 	d.append(_y);
-	setValue(d);
+	setValue(d, setSimilarSelected);
 }
 
-UndoableAction* Point2DParameter::setUndoablePoint(Point<float> oldPoint, Point<float> newPoint, bool onlyReturnAction)
+
+Array<UndoableAction*> Point2DParameter::setUndoablePoint(Point<float> newPoint, bool onlyReturnAction, bool setSimilarSelected)
 {
-	return setUndoablePoint(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y, onlyReturnAction);
+	return setUndoablePoint(newPoint.x, newPoint.y, onlyReturnAction, setSimilarSelected);
 }
 
-UndoableAction* Point2DParameter::setUndoablePoint(float oldX, float oldY, float newX, float newY, bool onlyReturnAction)
+Array<UndoableAction*> Point2DParameter::setUndoablePoint(float newX, float newY, bool onlyReturnAction, bool setSimilarSelected)
 {
-	var od;
-	od.append(oldX);
-	od.append(oldY);
+	DBG("Set undoable point :" << (float)lastUndoValue[0] << " / " << (float)lastUndoValue[1]);
 	var d;
 	d.append(newX);
 	d.append(newY);
 
-	if (checkValueIsTheSame(od, d) && !alwaysNotify) return nullptr;
-
-	return setUndoableValue(od, d, onlyReturnAction);
+	return setUndoableValue(d, onlyReturnAction, setSimilarSelected);
 }
 
-void Point2DParameter::setDefaultPoint(juce::Point<float> p, bool doResetValue)
+void Point2DParameter::setDefaultPoint(Point<float> p, bool doResetValue)
 {
 	setDefaultPoint(p.x, p.y, doResetValue);
 }
@@ -130,7 +127,7 @@ bool Point2DParameter::setAttributeInternal(String name, var val)
 	else if (name == "canvasInvertX") extendedEditorInvertX = (bool)val;
 	else if (name == "canvasInvertY") extendedEditorInvertY = (bool)val;
 	else if (name == "canvasStretchMode") extendedEditorStretchMode = (bool)val;
-	else if(name == "stringDecimals") stringDecimals = (int)val;
+	else if (name == "stringDecimals") stringDecimals = (int)val;
 	else
 	{
 		return Parameter::setAttributeInternal(name, val);
@@ -142,7 +139,7 @@ bool Point2DParameter::setAttributeInternal(String name, var val)
 StringArray Point2DParameter::getValidAttributes() const
 {
 	StringArray att = Parameter::getValidAttributes();
-	att.addArray({ "ui", "canvasInvertX","canvasInvertY","canvasStretchMode", "stringDecimals"});
+	att.addArray({ "ui", "canvasInvertX","canvasInvertY","canvasStretchMode", "stringDecimals" });
 	return att;
 }
 

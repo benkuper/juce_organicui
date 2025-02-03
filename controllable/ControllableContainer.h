@@ -33,6 +33,8 @@ public:
 
 	bool nameCanBeChangedByUser;
 
+	bool isClearing;
+
 	//Editor
 	bool canInspectChildContainers;
 	bool editorIsCollapsed;
@@ -60,6 +62,10 @@ public:
 
 	//Script
 	bool includeInScriptObject;
+
+	//Remote control
+	bool notifyRemoteControlOnLoad;
+	bool notifyRemoteControlOnClear;
 
 
 	static ControllableComparator comparator;
@@ -148,7 +154,7 @@ public:
 	virtual juce::String getWarningMessage(const juce::String& id = WarningTarget::warningAllId) const override;
 	virtual juce::String getWarningTargetName() const override;
 
-	virtual juce::var getJSONData();
+	virtual juce::var getJSONData(bool includeNonOverriden = false);
 	virtual void loadJSONData(juce::var data, bool createIfNotThere = false);
 	virtual void loadJSONDataInternal(juce::var /*data*/) { /* to be overriden by child classes */ }
 	virtual void afterLoadJSONDataInternal() {} //allow for calling methods after isCurrentlyLoadingData is set to false
@@ -206,7 +212,7 @@ public:
 
 	juce::String getScriptTargetString() override;
 
-
+	bool isAttachedToRoot();
 
 protected:
 	virtual void onContainerNiceNameChanged() {};

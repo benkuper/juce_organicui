@@ -83,6 +83,9 @@ public:
 
 	bool canBeCollapsed();
 
+	virtual bool shouldShowControllable(Controllable* c);
+	virtual bool shouldShowContainer(ControllableContainer* cc);
+
 	virtual InspectableEditor* getEditorUIForControllable(Controllable* c);
 	virtual InspectableEditor* addControllableUI(Controllable* c, bool resize = false);
 	virtual void removeControllableUI(Controllable* c, bool resize = false);

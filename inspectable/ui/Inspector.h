@@ -40,6 +40,7 @@ public:
 	virtual void paint(juce::Graphics& g) override;
 	virtual void resized() override;
 	virtual void resizedInternal(juce::Rectangle<int>& r);
+	virtual void mouseDrag(const juce::MouseEvent& e) override;
 
 	void storeScrollPosition();
 	void restoreScrollPosition();

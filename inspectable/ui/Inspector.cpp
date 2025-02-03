@@ -9,6 +9,7 @@
 */
 
 #include "JuceHeader.h"
+#include "Inspector.h"
 
 
 std::function<Inspector* (InspectableSelectionManager*)> InspectorUI::customCreateInspectorFunc = nullptr;
@@ -23,9 +24,13 @@ Inspector::Inspector(InspectableSelectionManager* _selectionManager) :
 	setSelectionManager(_selectionManager);
 
 	vp.setScrollBarsShown(true, false);
-	vp.setScrollOnDragMode(Viewport::ScrollOnDragMode::never);
 	vp.setScrollBarThickness(10);
+	vp.setScrollOnDragMode(Viewport::ScrollOnDragMode::never);
+
 	addAndMakeVisible(vp);
+
+	setDisableInternalMouseEvents(true);
+	addMouseListener(this, true);
 
 	resized();
 }
@@ -68,6 +73,11 @@ void Inspector::resizedInternal(juce::Rectangle<int>& r)
 		if (!currentEditor->fitToContent) r.setHeight(currentEditor->getHeight());
 		currentEditor->setSize(r.getWidth(), r.getHeight());
 	}
+}
+
+void Inspector::mouseDrag(const juce::MouseEvent& e)
+{
+	vp.autoScroll(vp.getMouseXYRelative().x, vp.getMouseXYRelative().y, 20, 20);
 }
 
 void Inspector::setSelectionManager(InspectableSelectionManager* newSM)

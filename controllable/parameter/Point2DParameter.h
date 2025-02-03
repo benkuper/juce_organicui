@@ -24,10 +24,10 @@ public:
 	bool extendedEditorStretchMode;
 	bool canShowExtendedEditor;
 
-	void setPoint(juce::Point<float> value);
-	void setPoint(float x, float y);
-	juce::UndoableAction * setUndoablePoint(juce::Point<float> oldPoint, juce::Point<float> newPoint, bool onlyReturnAction = false);
-	juce::UndoableAction* setUndoablePoint(float oldX, float oldY, float newX, float newY, bool onlyReturnAction = false);
+	void setPoint(juce::Point<float> value, bool setSimilarSelected = false);
+	void setPoint(float x, float y, bool setSimilarSelected = false);
+	juce::Array<juce::UndoableAction*> setUndoablePoint(juce::Point<float> newPoint, bool onlyReturnAction = false, bool setSimilarSelected = false);
+	juce::Array<juce::UndoableAction*> setUndoablePoint(float newX, float newY, bool onlyReturnAction = false, bool setSimilarSelected = false);
 
 	void setDefaultPoint(juce::Point<float> value, bool doResetValue = true);
 	void setDefaultPoint(float x, float y, bool doResetValue = true);

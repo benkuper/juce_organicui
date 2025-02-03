@@ -10,7 +10,6 @@ Author:  Ben
 
 #include "JuceHeader.h"
 #include "../engine/Engine.h"
-#include "Script.h"
 
 Script::Script(ScriptTarget* _parentTarget, bool canBeDisabled, bool canBeRemoved) :
 	BaseItem("Script", canBeDisabled, false),
@@ -31,6 +30,7 @@ Script::Script(ScriptTarget* _parentTarget, bool canBeDisabled, bool canBeRemove
 	canBeReorderedInEditor = canBeRemoved;
 
 	filePath = new FileParameter("File Path", "Path to the script file", "");
+	filePath->setAutoReload(true);
 	addParameter(filePath);
 
 	updateRate = addIntParameter("Update Rate", "The Rate at which the \"update()\" function is called", 50, 1, 1000);
@@ -50,6 +50,9 @@ Script::Script(ScriptTarget* _parentTarget, bool canBeDisabled, bool canBeRemove
 	scriptObject.getDynamicObject()->setMethod("setUpdateRate", Script::setUpdateRateFromScript);
 	scriptObject.getDynamicObject()->setMethod("setExecutionTimeout", Script::setExecutionTimeoutFromScript);
 	scriptObject.getDynamicObject()->setMethod("refreshEnvironment", Script::refreshVariablesFromScript);
+
+	scriptObject.getDynamicObject()->setMethod("getScriptDirectory", Script::getScriptDirectoryFromScript);
+	scriptObject.getDynamicObject()->setMethod("getScriptPath", Script::getScriptPathFromScript);
 
 	scriptObject.getDynamicObject()->setMethod("addTrigger", Script::addTriggerFromScript);
 	scriptObject.getDynamicObject()->setMethod("addBoolParameter", Script::addBoolParameterFromScript);
@@ -75,7 +78,6 @@ Script::Script(ScriptTarget* _parentTarget, bool canBeDisabled, bool canBeRemove
 
 	Engine::mainEngine->addControllableContainerListener(this);
 
-	startTimer(1000); //modification check timer
 }
 
 Script::~Script()
@@ -223,9 +225,9 @@ void Script::loadScript()
 	for (auto& nv : nvSet)
 	{
 		String n = nv.name.toString();
-		if(n == "script" || n == "local" || n == "util" || n == "root") continue; //reserved names
+		if (n == "script" || n == "local" || n == "util" || n == "root") continue; //reserved names
 
-		if(nv.value.isMethod() || nv.value.isObject())
+		if (nv.value.isMethod() || nv.value.isObject())
 			availableFunctions.add(n);
 	}
 
@@ -253,8 +255,8 @@ void Script::buildEnvironment()
 
 	//if (scriptEngine == nullptr)
 	//{
-		scriptEngine.reset(new JavascriptEngine());
-		scriptEngine->maximumExecutionTime = RelativeTime::seconds(executionTimeout);
+	scriptEngine.reset(new JavascriptEngine());
+	scriptEngine->maximumExecutionTime = RelativeTime::seconds(executionTimeout);
 	//}
 	//else
 	//{
@@ -287,10 +289,9 @@ void Script::setState(ScriptState newState)
 	scriptAsyncNotifier.addMessage(new ScriptEvent(ScriptEvent::STATE_CHANGE));
 }
 
-var Script::callFunction(const Identifier& function, const Array<var> args, Result* result)
+var Script::callFunction(const Identifier& function, const Array<var> args, Result* result, bool skipIfAlreadyCalling)
 {
 	if (canBeDisabled && (!enabled->boolValue() || forceDisabled)) return false;
-
 	if (scriptEngine == nullptr) return false;
 
 	if (!availableFunctions.contains(function.toString()))
@@ -304,7 +305,18 @@ var Script::callFunction(const Identifier& function, const Array<var> args, Resu
 
 	//const ScopedLock sl(engineLock); //TODO : This is causing deadlock when multiple scripts are triggering controllableFeedbackUpdate. Need to find a better way to handle feedback update, maybe with the new ThreadSafe and Lightweight listeners
 
-	var returnData = scriptEngine->callFunction(function, var::NativeFunctionArgs(getScriptObject(), (const var*)args.begin(), args.size()), result);
+	var returnData;
+	if (skipIfAlreadyCalling)
+	{
+		ScopedTryLock lock(scriptCallLock);
+		if (!lock.isLocked()) return var();
+		returnData = scriptEngine->callFunction(function, var::NativeFunctionArgs(getScriptObject(), (const var*)args.begin(), args.size()), result);
+	}
+	else
+	{
+		GenericScopedLock lock(scriptCallLock);
+		returnData = scriptEngine->callFunction(function, var::NativeFunctionArgs(getScriptObject(), (const var*)args.begin(), args.size()), result);
+	}
 
 	if (result->getErrorMessage().isNotEmpty())
 	{
@@ -357,14 +369,14 @@ void Script::childStructureChanged(ControllableContainer* cc)
 			//if (Engine::mainEngine != nullptr && scriptEngine != nullptr)
 			//	Engine::mainEngine->getScriptObject(); //force update if needed
 
-			if(autoRefreshEnvironment) refreshVariables();
+			if (autoRefreshEnvironment) refreshVariables();
 		}
 	}
 }
 
-var Script::getJSONData()
+var Script::getJSONData(bool includeNonOverriden)
 {
-	var data = BaseItem::getJSONData();
+	var data = BaseItem::getJSONData(includeNonOverriden);
 	var pData = scriptParamsContainer->getJSONData();
 	if (!pData.isVoid()) data.getDynamicObject()->setProperty("scriptParams", pData);
 	return data;
@@ -392,7 +404,7 @@ InspectableEditor* Script::getEditorInternal(bool isRoot, Array<Inspectable*> in
 	return new ScriptEditor(this, isRoot);
 }
 
-void Script::timerCallback()
+void Script::checkScriptFile()
 {
 	//check for modifications
 
@@ -417,7 +429,7 @@ void Script::run()
 		args.add(deltaMillis / 1000.0);
 
 		Result r = Result::ok();
-		callFunction(updateIdentifier, args, &r);
+		callFunction(updateIdentifier, args, &r, true);
 		if (r != Result::ok()) return;
 
 		double afterProcessMillis = Time::getMillisecondCounterHiRes();
@@ -624,6 +636,18 @@ var Script::refreshVariablesFromScript(const juce::var::NativeFunctionArgs& args
 	return var();
 }
 
+
+juce::var Script::getScriptDirectoryFromScript(const juce::var::NativeFunctionArgs& args)
+{
+	Script* s = getObjectFromJS<Script>(args);
+	return s->filePath->getFile().getParentDirectory().getFullPathName();
+}
+
+juce::var Script::getScriptPathFromScript(const juce::var::NativeFunctionArgs& args)
+{
+	Script* s = getObjectFromJS<Script>(args);
+	return s->filePath->getAbsolutePath();
+}
 
 bool Script::checkNumArgs(const String& logName, const var::NativeFunctionArgs& args, int expectedArgs)
 {

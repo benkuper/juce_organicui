@@ -93,7 +93,7 @@ void StringParameterUI::resized()
 	if (showLabel)
 	{
 		Font font = Font(FontOptions(fontHeight));
-		r.removeFromLeft(jmin<float>((int)TextLayout::getStringWidth(font,customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, r.getWidth() - 60));
+		r.removeFromLeft(jmin<float>((int)TextLayout::getStringWidth(font, customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, r.getWidth() - 60));
 		r.removeFromLeft(2);
 		valueLabel.setJustificationType(Justification::centred);
 	}
@@ -121,7 +121,7 @@ void StringParameterUI::labelTextChanged(Label*)
 {
 	//String  originalString = valueLabel.getText().substring(prefix.length(), valueLabel.getText().length() - suffix.length());
 	if (stringParam->autoTrim) valueLabel.setText(valueLabel.getText().trim(), dontSendNotification);
-	parameter->setUndoableValue(parameter->stringValue(), valueLabel.getText());
+	parameter->setUndoableValue(valueLabel.getText(), false, true);
 }
 
 
@@ -217,7 +217,7 @@ void StringParameterFileUI::buttonClicked(Button* b)
 				if (parameter.wasObjectDeleted()) return;
 				if (parameter != nullptr)
 				{
-					parameter->setUndoableValue(parameter->stringValue(), f.getFullPathName());
+					parameter->setUndoableValue(f.getFullPathName(), false, true);
 				}
 
 			}

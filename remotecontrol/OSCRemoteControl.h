@@ -97,6 +97,7 @@ public:
 	void connectionClosed(const juce::String& id, int status, const juce::String& reason) override;
 	void connectionError(const juce::String& id, const juce::String& message) override;
 
+
 	void sendOSCQueryFeedback(Controllable* c, const juce::String& excludeId = "");
 	void sendOSCQueryStateFeedback(Controllable* c, const juce::String& excludeId = "");
 	void sendOSCQueryFeedback(const juce::OSCMessage& m, juce::StringArray excludes = juce::StringArray());
@@ -105,9 +106,14 @@ public:
 	void sendPathAddedFeedback(const juce::String& path);
 	void sendPathRemovedFeedback(const juce::String& path);
 	void sendPathNameChangedFeedback(const juce::String& oldPath, const juce::String& newPath);
+	void sendPathChangedFeedback(const juce::String& path);
+
+	bool hasClient(const juce::String& id);
 
 	void controllableFeedbackUpdate(ControllableContainer* cc, Controllable* c) override;
 	void controllableStateUpdate(ControllableContainer* cc, Controllable* c) override;
+
+	void addControllableToNoFeedbackMap(Controllable* c, const juce::String& id, const juce::String& fallbackId);
 
 	//void newMessage(const ContainerAsyncEvent& e) override;
 	void onControllableFeedbackUpdate(ControllableContainer* cc, Controllable* c) override;
@@ -129,6 +135,8 @@ public:
 	public:
 		virtual ~RemoteControlListener() {}
 		virtual void processMessage(const juce::OSCMessage& m, const juce::String& clientId) {}
+		virtual void clientConnected(const juce::String& clientId) {}
+		virtual void clientDisconnected(const juce::String& clientId, const juce::String& message = "") {}
 	};
 
 	DECLARE_INSPECTACLE_SAFE_LISTENER(RemoteControl, remoteControl)

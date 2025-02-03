@@ -34,9 +34,9 @@ void ParrotRecord::addData(Controllable* c, double time, var value)
     totalTime = jmax(time, totalTime);
 }
 
-var ParrotRecord::getJSONData()
+var ParrotRecord::getJSONData(bool includeNonOverriden)
 {
-    var data = BaseItem::getJSONData();
+    var data = BaseItem::getJSONData(includeNonOverriden);
     var vData = new DynamicObject();
     HashMap<WeakReference<Controllable>, Array<RecordValue>>::Iterator it(dataMap);
     while (it.next())

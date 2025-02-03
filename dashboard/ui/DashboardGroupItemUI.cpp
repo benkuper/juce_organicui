@@ -7,7 +7,7 @@ DashboardGroupItemUI::DashboardGroupItemUI(DashboardGroupItem* group) :
 	managerUI->canNavigate = false;
 	managerUI->canZoom = false;
 	managerUI->transparentBG = true;
-	//managerUI->setDisableDefaultMouseEvents(true);
+	managerUI->setDisableInternalMouseEvents(true);
 	managerUI->autoSelectWithChildRespect = DashboardManager::getInstance()->editMode->boolValue();
 	addAndMakeVisible(managerUI.get(), 0);
 }

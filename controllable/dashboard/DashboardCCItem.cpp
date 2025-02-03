@@ -119,9 +119,9 @@ var DashboardCCItem::getServerDataForControllable(Controllable* c)
 	return data;
 }
 
-var DashboardCCItem::getJSONData()
+var DashboardCCItem::getJSONData(bool includeNonOverriden)
 {
-	var data = DashboardInspectableItem::getJSONData();
+	var data = DashboardInspectableItem::getJSONData(includeNonOverriden);
 	if (container != nullptr) data.getDynamicObject()->setProperty("container", container->getControlAddress());
 	return data;
 }

@@ -10,13 +10,13 @@
 
 #include "JuceHeader.h"
 
-ColorParameterUI::ColorParameterUI(Array<ColorParameter *> parameters) :
+ColorParameterUI::ColorParameterUI(Array<ColorParameter*> parameters) :
 	ParameterUI(Inspectable::getArrayAs<ColorParameter, Parameter>(parameters), ORGANICUI_DEFAULT_TIMER),
-    colorParams(parameters),
+	colorParams(parameters),
 	colorParam(parameters[0]),
-    dispatchOnDoubleClick(true),
+	dispatchOnDoubleClick(true),
 	colorEditor(nullptr),
-    dispatchOnSingleClick(false)
+	dispatchOnSingleClick(false)
 {
 	setSize(200, GlobalSettings::getInstance()->fontSize->floatValue() + 4);//default size
 	showLabel = false;
@@ -24,11 +24,11 @@ ColorParameterUI::ColorParameterUI(Array<ColorParameter *> parameters) :
 
 ColorParameterUI::~ColorParameterUI()
 {
-	if(colorEditor != nullptr) colorEditor->removeComponentListener(this);
+	if (colorEditor != nullptr) colorEditor->removeComponentListener(this);
 
 }
 
-void ColorParameterUI::paint(Graphics & g)
+void ColorParameterUI::paint(Graphics& g)
 {
 	if (shouldBailOut()) return;
 
@@ -39,7 +39,7 @@ void ColorParameterUI::paint(Graphics & g)
 	Colour c = colorParam->getColor();
 	int size = jmin(getWidth(), getHeight()) / 2;
 	if (!c.isOpaque()) g.fillCheckerBoard(r.reduced(1).toFloat(), size, size, Colours::white, Colours::white.darker(.2f));
-	
+
 	g.setColour(c);
 	g.fillRoundedRectangle(r.toFloat(), 2);
 
@@ -56,7 +56,7 @@ void ColorParameterUI::paint(Graphics & g)
 		g.setColour(useCustomTextColor ? customTextColor : TEXT_COLOR);
 		g.drawFittedText(customLabel.isNotEmpty() ? customLabel : colorParam->niceName, tr, Justification::centred, 1);
 	}
-	
+
 }
 
 void ColorParameterUI::resized()
@@ -64,7 +64,7 @@ void ColorParameterUI::resized()
 
 }
 
-void ColorParameterUI::mouseDownInternal(const MouseEvent & e)
+void ColorParameterUI::mouseDownInternal(const MouseEvent& e)
 {
 	if (dispatchOnSingleClick) showEditWindow();
 }
@@ -116,10 +116,10 @@ void ColorParameterUI::showEditRangeWindowInternal()
 				newMaxs[i] = nameWindow->getTextEditorContents("maxVal" + String(i)).getFloatValue();
 			}
 			colorParam->setBounds(newMins[0], newMins[1], newMins[2], newMins[3],
-								  jmax(newMins[0], newMaxs[0]),
-								  jmax(newMins[1], newMaxs[1]),
-								  jmax(newMins[2], newMaxs[2]),
-								  jmax(newMins[3], newMaxs[3]));
+				jmax(newMins[0], newMaxs[0]),
+				jmax(newMins[1], newMaxs[1]),
+				jmax(newMins[2], newMaxs[2]),
+				jmax(newMins[3], newMaxs[3]));
 		}
 	), true);
 }
@@ -128,21 +128,21 @@ void ColorParameterUI::componentBeingDeleted(Component& c)
 {
 	if (&c == colorEditor)
 	{
-		colorParam->setUndoableValue(valueOnEditorOpen, colorParam->value);
+		colorParam->setUndoableValue(colorParam->value, false, true);
 		colorEditor = nullptr;
 	}
 }
 
-void ColorParameterUI::valueChanged(const var &)
+void ColorParameterUI::valueChanged(const var&)
 {
 	shouldRepaint = true;
 }
 
-void ColorParameterUI::changeListenerCallback(ChangeBroadcaster * source)
+void ColorParameterUI::changeListenerCallback(ChangeBroadcaster* source)
 {
-	ColourSelector * s = dynamic_cast<ColourSelector *>(source);
+	ColourSelector* s = dynamic_cast<ColourSelector*>(source);
 	if (s == nullptr || shouldBailOut()) return;
-	colorParam->setColor(s->getCurrentColour());
+	colorParam->setColor(s->getCurrentColour(), false, false, true);
 
 }
 

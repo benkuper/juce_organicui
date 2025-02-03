@@ -26,7 +26,7 @@ public:
 	TriggerBlinkUI* createBlinkUI(juce::Array<Trigger*> triggers = {});
 	ControllableUI* createDefaultUI(juce::Array<Controllable*> controllables = {}) override;
 
-	virtual void trigger();
+	virtual void trigger(bool triggerSimilarSelected = true);
 
 	virtual DashboardItem* createDashboardItem() override;
 

@@ -62,6 +62,7 @@ public:
 	bool dashboardDefaultAppendLabel;		//if default parent level is not 0 and this this will 
 	//decide if this controllable's label will be added at the end
 
+	juce::var previewValue;
 
 	juce::WeakReference<ControllableContainer> parentContainer;
 
@@ -73,6 +74,8 @@ public:
 	virtual void setEnabled(bool value, bool silentSet = false, bool force = false);
 	virtual void setControllableFeedbackOnly(bool value);
 
+	void setPreviewValue(juce::var value);
+
 	void notifyStateChanged();
 
 	void setParentContainer(ControllableContainer* container);
@@ -83,6 +86,8 @@ public:
 		return dynamic_cast<T*>(parentContainer.get());
 	}
 	void updateControlAddress();
+
+	ControllableContainer* getSelectedParentInHierarchy();
 
 	void remove(bool addToUndo = false); // called from external to make this object ask for remove
 
@@ -133,6 +138,8 @@ public:
 
 	virtual juce::String getWarningTargetName() const override;
 
+	bool isAttachedToRoot();
+
 	virtual InspectableEditor* getEditorInternal(bool isRoot, juce::Array<Inspectable*> inspectables = juce::Array<Inspectable*>()) override;
 	virtual ControllableDetectiveWatcher* getDetectiveWatcher();
 	virtual juce::String getTypeString() const { jassert(false); return ""; } //should be overriden
@@ -148,11 +155,12 @@ public:
 		virtual void controllableControlAddressChanged(Controllable*) {}
 		virtual void controllableNameChanged(Controllable*, const juce::String&) {}
 		virtual void controllableAttributeChanged(Controllable*, const juce::String&) {}
+		virtual void controllablePreviewValueChanged(Controllable*) {}
 		virtual void askForRemoveControllable(Controllable*, bool /*addToUndo*/ = false) {}
 	};
 
 	DECLARE_INSPECTACLE_SAFE_LISTENER(Controllable, controllable);
-	DECLARE_ASYNC_EVENT(Controllable, Controllable, controllable, ENUM_LIST(STATE_CHANGED, FEEDBACK_STATE_CHANGED, CONTROLADDRESS_CHANGED, NAME_CHANGED, ATTRIBUTE_CHANGED, ASK_FOR_REMOVE, CONTROLLABLE_REMOVED), EVENT_INSPECTABLE_CHECK);
+	DECLARE_ASYNC_EVENT(Controllable, Controllable, controllable, ENUM_LIST(STATE_CHANGED, FEEDBACK_STATE_CHANGED, CONTROLADDRESS_CHANGED, NAME_CHANGED, ATTRIBUTE_CHANGED, ASK_FOR_REMOVE, CONTROLLABLE_REMOVED, PREVIEW_VALUE_CHANGED), EVENT_INSPECTABLE_CHECK);
 
 private:
 	juce::WeakReference<Controllable>::Master masterReference;

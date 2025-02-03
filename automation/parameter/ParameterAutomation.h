@@ -51,7 +51,7 @@ public:
 
 	void run() override;
 
-	juce::var getJSONData() override;
+	juce::var getJSONData(bool includeNonOverriden = false) override;
 	void loadJSONDataInternal(juce::var data) override;
 };
 

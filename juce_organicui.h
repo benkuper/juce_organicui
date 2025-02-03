@@ -119,6 +119,7 @@
 
 
 #include <juce_core/juce_core.h>
+#include <juce_javascript/juce_javascript.h>
 #include <juce_events/juce_events.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_gui_extra/juce_gui_extra.h>
@@ -159,10 +160,13 @@
 #include "undo/UndoMaster.h"
 #include "manager/Factory.h"
 
+
 #include "script/ScriptTarget.h"
 
 
 #include "warning/WarningTarget.h"
+
+
 
 
 #include "inspectable/Inspectable.h"
@@ -262,6 +266,13 @@
 #include "ui/shapeshifter/ShapeShifterPanelHeader.h"
 #include "ui/shapeshifter/ShapeShifterPanelTab.h"
 #include "ui/shapeshifter/ShapeShifterWindow.h"
+
+#include "logger/CustomLogger.h"
+#include "logger/ui/CustomLoggerUI.h"
+#include "helpers/WakeOnLan.h"
+#include "helpers/NetworkHelpers.h"
+
+#include "remotecontrol/OSCRemoteControl.h"
 
 
 #include "manager/BaseItemListener.h"
@@ -372,8 +383,7 @@
 #include "script/ui/ScriptManagerEditor.h"
 
 
-#include "logger/CustomLogger.h"
-#include "logger/ui/CustomLoggerUI.h"
+#include "helpers/OSCHelpers.h"
 
 #include "outliner/Outliner.h"
 
@@ -383,11 +393,8 @@
 #include "app/OrganicMainComponent.h"
 #include "app/OrganicApplication.h"
 
-#include "remotecontrol/OSCRemoteControl.h"
 
-#include "helpers/WakeOnLan.h"
-#include "helpers/OSCHelpers.h"
-#include "helpers/NetworkHelpers.h"
+
 
 #if ORGANICUI_USE_SHAREDTEXTURE
 #include <juce_sharedtexture/juce_sharedtexture.h>

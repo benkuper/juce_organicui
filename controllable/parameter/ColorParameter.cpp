@@ -44,17 +44,17 @@ Colour ColorParameter::getColor() const
 								 value.size() > 3 ? (float)value[3] : 0.f);
 }
 
-void ColorParameter::setFloatRGBA(const float & r, const float & g, const float & b, const float & a)
+void ColorParameter::setFloatRGBA(const float & r, const float & g, const float & b, const float & a, bool setSimilarSelected)
 {
-	setColor(Colour::fromFloatRGBA(r, g, b, a));
+	setColor(Colour::fromFloatRGBA(r, g, b, a), setSimilarSelected);
 }
 
-void ColorParameter::setColor(const uint32 & _color, bool silentSet, bool force)
+void ColorParameter::setColor(const uint32 & _color, bool silentSet, bool force, bool setSimilarSelected)
 {
-	setColor(Colour(_color),silentSet,force);
+	setColor(Colour(_color),silentSet,force, setSimilarSelected);
 }
 
-void ColorParameter::setColor(const Colour &_color, bool silentSet, bool force)
+void ColorParameter::setColor(const Colour &_color, bool silentSet, bool force, bool setSimilarSelected)
 {
 	var colorVar;
 	colorVar.append(_color.getFloatRed());
@@ -62,7 +62,7 @@ void ColorParameter::setColor(const Colour &_color, bool silentSet, bool force)
 	colorVar.append(_color.getFloatBlue());
 	colorVar.append(_color.getFloatAlpha());
 	
-	setValue(colorVar, silentSet, force);
+	setValue(colorVar, silentSet, force, true, setSimilarSelected);
 }
 
 bool ColorParameter::hasRange() const

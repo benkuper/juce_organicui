@@ -11,9 +11,9 @@ Author:  Ben
 #pragma once
 
 
+
 class Script :
 	public BaseItem,
-	public juce::Timer,
 	public juce::Thread,
 	public EngineListener
 {
@@ -35,6 +35,8 @@ public:
 	juce::String fileName;
 	juce::Time fileLastModTime;
 	juce::var paramsContainerData; //for keeping overriden values
+
+	juce::CriticalSection scriptCallLock;
 
 	bool updateEnabled; //When loading the script, checks if the update function is present
 	const juce::Identifier updateIdentifier = "update";
@@ -62,7 +64,7 @@ public:
 	void setState(ScriptState newState);
 
 
-	juce::var callFunction(const juce::Identifier& function, const juce::Array<juce::var> args, juce::Result* result = (juce::Result*)nullptr);
+	juce::var callFunction(const juce::Identifier& function, const juce::Array<juce::var> args, juce::Result* result = (juce::Result*)nullptr, bool skipIfAlreadyCalling = false);
 
 	void onContainerParameterChangedInternal(Parameter*) override;
 	void onContainerTriggerTriggered(Trigger*) override;
@@ -70,7 +72,7 @@ public:
 	void onControllableFeedbackUpdateInternal(ControllableContainer* cc, Controllable* c) override;
 	void childStructureChanged(ControllableContainer* cc) override;
 
-	juce::var getJSONData() override;
+	juce::var getJSONData(bool includeNonOverriden = false) override;
 	void loadJSONDataInternal(juce::var data) override;
 
 	void endLoadFile() override;
@@ -79,7 +81,7 @@ public:
 
 
 	// Inherited via Timer
-	virtual void timerCallback() override;
+	virtual void checkScriptFile();
 
 	virtual void run() override;
 
@@ -121,6 +123,9 @@ public:
 	static juce::var setExecutionTimeoutFromScript(const juce::var::NativeFunctionArgs& args);
 
 	static juce::var refreshVariablesFromScript(const juce::var::NativeFunctionArgs& args);
+
+	static juce::var getScriptDirectoryFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var getScriptPathFromScript(const juce::var::NativeFunctionArgs& args);
 
 	static bool checkNumArgs(const juce::String& logName, const juce::var::NativeFunctionArgs& args, int expectedArgs);
 

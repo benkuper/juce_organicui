@@ -54,6 +54,8 @@ public:
 	static bool showDashboardOption;
 	static bool showParrotOption;
 
+	std::function<void(ControllableUI* i, Inspectable* source)> customHighlightFunc;
+
 	static std::function<void(ControllableUI*)> customShowEditWindowFunction;
 
 	virtual void paintOverChildren(juce::Graphics& g) override;
@@ -74,6 +76,8 @@ public:
 	virtual void showContextMenu();
 	virtual void addPopupMenuItems(juce::PopupMenu*) {} //for child classes
 	virtual void handleMenuSelectedID(int) {} // to override
+
+	virtual void updatePreview() {}
 
 	virtual void updateUIParams(); //to override to update colors and stuff depending on custom flags
 	virtual void updateUIParamsInternal() {} //to override to update colors and stuff depending on custom flags
