@@ -185,9 +185,9 @@ bool EnumParameter::setValueWithData(var data)
 			setValueWithKey(ev->key);
 			return true;
 		}
-
-		return false;
 	}
+	
+	return false;
 }
 
 bool EnumParameter::setValueWithKey(String key)
