@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    ColorParameter.h
-    Created: 11 Apr 2017 9:33:55am
-    Author:  Ben
+	ColorParameter.h
+	Created: 11 Apr 2017 9:33:55am
+	Author:  Ben
 
   ==============================================================================
 */
@@ -24,6 +24,7 @@ public:
 	void setFloatRGBA(const float& r, const float& g, const float& b, const float& a, bool setSimilarSelected = false);
 	void setColor(const juce::uint32& _color, bool silentSet = false, bool force = false, bool setSimilarSelected = false);
 	void setColor(const juce::Colour& _color, bool silentSet = false, bool force = false, bool setSimilarSelected = false);
+	juce::Array<juce::UndoableAction*> setUndoableColor(const juce::Colour& _color, bool setSimilarSelected = false, bool onlyReturnAction = false);
 
 	void setBounds(float _minR, float _minG, float _minB, float _minA, float _maxR, float _maxG, float _maxB, float _maxA);
 	void clearRange() override;
@@ -45,7 +46,7 @@ public:
 	ColorParameterUI* createColorParamUI(juce::Array<ColorParameter*> colorParameters = {});
 	ControllableUI* createDefaultUI(juce::Array<Controllable*> controllables = {}) override;
 
-	static ColorParameter * create() { return new ColorParameter("New Color Parameter", ""); }
+	static ColorParameter* create() { return new ColorParameter("New Color Parameter", ""); }
 	virtual juce::String getTypeString() const override { return getTypeStringStatic(); }
 	static juce::String getTypeStringStatic() { return "Color"; }
 

@@ -11,8 +11,8 @@
 #include "JuceHeader.h"
 
 
-ColorParameter::ColorParameter(const String & niceName, const String & description, const Colour & initialColor, bool enabled) :
-	Parameter(COLOR,niceName,description,var(),var(),var(),enabled)
+ColorParameter::ColorParameter(const String& niceName, const String& description, const Colour& initialColor, bool enabled) :
+	Parameter(COLOR, niceName, description, var(), var(), var(), enabled)
 {
 	//lockManualControlMode = true;
 
@@ -50,30 +50,41 @@ Colour ColorParameter::getColor() const
 	if (!value.isArray()) return Colours::black;
 
 	return Colour::fromFloatRGBA(value.size() > 0 ? (float)value[0] : 0.f,
-								 value.size() > 1 ? (float)value[1] : 0.f,
-								 value.size() > 2 ? (float)value[2] : 0.f,
-								 value.size() > 3 ? (float)value[3] : 0.f);
+		value.size() > 1 ? (float)value[1] : 0.f,
+		value.size() > 2 ? (float)value[2] : 0.f,
+		value.size() > 3 ? (float)value[3] : 0.f);
 }
 
-void ColorParameter::setFloatRGBA(const float & r, const float & g, const float & b, const float & a, bool setSimilarSelected)
+void ColorParameter::setFloatRGBA(const float& r, const float& g, const float& b, const float& a, bool setSimilarSelected)
 {
 	setColor(Colour::fromFloatRGBA(r, g, b, a), setSimilarSelected);
 }
 
-void ColorParameter::setColor(const uint32 & _color, bool silentSet, bool force, bool setSimilarSelected)
+void ColorParameter::setColor(const uint32& _color, bool silentSet, bool force, bool setSimilarSelected)
 {
-	setColor(Colour(_color),silentSet,force, setSimilarSelected);
+	setColor(Colour(_color), silentSet, force, setSimilarSelected);
 }
 
-void ColorParameter::setColor(const Colour &_color, bool silentSet, bool force, bool setSimilarSelected)
+void ColorParameter::setColor(const Colour& _color, bool silentSet, bool force, bool setSimilarSelected)
 {
 	var colorVar;
 	colorVar.append(_color.getFloatRed());
 	colorVar.append(_color.getFloatGreen());
 	colorVar.append(_color.getFloatBlue());
 	colorVar.append(_color.getFloatAlpha());
-	
+
 	setValue(colorVar, silentSet, force, true, setSimilarSelected);
+}
+
+Array<juce::UndoableAction*> ColorParameter::setUndoableColor(const juce::Colour& _color, bool setSimilarSelected, bool onlyReturnAction)
+{
+	var colorVar;
+	colorVar.append(_color.getFloatRed());
+	colorVar.append(_color.getFloatGreen());
+	colorVar.append(_color.getFloatBlue());
+	colorVar.append(_color.getFloatAlpha());
+
+	return setUndoableValue(colorVar, onlyReturnAction, setSimilarSelected);
 }
 
 bool ColorParameter::hasRange() const
@@ -198,13 +209,13 @@ var ColorParameter::getRemoteControlValue()
 	return getColor().toString();
 }
 
-ColorParameterUI * ColorParameter::createColorParamUI(Array<ColorParameter *> parameters)
+ColorParameterUI* ColorParameter::createColorParamUI(Array<ColorParameter*> parameters)
 {
 	if (parameters.size() == 0) parameters = { this };
 	return new ColorParameterUI(parameters);
 }
 
-ControllableUI * ColorParameter::createDefaultUI(Array<Controllable*> controllables)
+ControllableUI* ColorParameter::createDefaultUI(Array<Controllable*> controllables)
 {
 	return createColorParamUI(getArrayAs<Controllable, ColorParameter>(controllables));
 }
