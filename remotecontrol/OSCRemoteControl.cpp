@@ -748,7 +748,7 @@ void OSCRemoteControl::sendPathChangedFeedback(const String& path)
 	if (Engine::mainEngine != nullptr && (Engine::mainEngine->isLoadingFile || Engine::mainEngine->isClearing)) return;
 
 	var msg(new DynamicObject());
-	msg.getDynamicObject()->setProperty("COMMAND", "PATH_RENAMED");
+	msg.getDynamicObject()->setProperty("COMMAND", "PATH_CHANGED");
 	msg.getDynamicObject()->setProperty("DATA", path);
 	server->send(JSON::toString(msg));
 }

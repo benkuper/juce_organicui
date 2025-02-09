@@ -476,6 +476,11 @@ void Parameter::notifyValueChanged() {
 
 	//if(isNotifyingChange) return; //not sure about this, it may cause unsynced value changes
 	//isNotifyingChange = true;
+
+	GenericScopedTryLock lock(notifyLock);
+
+	if (!lock.isLocked()) return;
+
 	parameterListeners.call(&ParameterListener::parameterValueChanged, this);
 	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::VALUE_CHANGED, this, getValue()));
 	//isNotifyingChange = false;

@@ -124,6 +124,9 @@ public:
 
 	static juce::var refreshVariablesFromScript(const juce::var::NativeFunctionArgs& args);
 
+	static juce::var getScriptDirectoryFromScript(const juce::var::NativeFunctionArgs& args);
+	static juce::var getScriptPathFromScript(const juce::var::NativeFunctionArgs& args);
+
 	static bool checkNumArgs(const juce::String& logName, const juce::var::NativeFunctionArgs& args, int expectedArgs);
 
 

@@ -41,6 +41,11 @@ ScriptUtil::ScriptUtil() :
 	scriptObject.getDynamicObject()->setMethod("fromBase64", ScriptUtil::fromBase64);
 	scriptObject.getDynamicObject()->setMethod("fromBase64Bytes", ScriptUtil::fromBase64Bytes);
 
+	scriptObject.getDynamicObject()->setMethod("getDocumentsDirectory", ScriptUtil::getDocumentsDirectoryFromScript);
+	scriptObject.getDynamicObject()->setMethod("getDesktopDirectory", ScriptUtil::getDesktopDirectoryFromScript);
+	scriptObject.getDynamicObject()->setMethod("getCurrentFileDirectory", ScriptUtil::getCurrentFileDirectoryFromScript);
+	scriptObject.getDynamicObject()->setMethod("getCurrentFilePath", ScriptUtil::getCurrentFilePathFromScript);
+	scriptObject.getDynamicObject()->setMethod("getParentDirectory", ScriptUtil::getParentDirectory);
 	scriptObject.getDynamicObject()->setMethod("fileExists", ScriptUtil::fileExistsFromScript);
 	scriptObject.getDynamicObject()->setMethod("getNonExistentFile", ScriptUtil::getNonExistentFileFromScript);
 	scriptObject.getDynamicObject()->setMethod("getFileName", ScriptUtil::getFileName);
@@ -366,6 +371,27 @@ var ScriptUtil::fromBase64Bytes(const var::NativeFunctionArgs& a)
 	return base64_decode_bytes(a.arguments[0].toString());
 }
 
+juce::var ScriptUtil::getDocumentsDirectoryFromScript(const juce::var::NativeFunctionArgs& args)
+{
+	return File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory).getFullPathName();
+}
+
+juce::var ScriptUtil::getDesktopDirectoryFromScript(const juce::var::NativeFunctionArgs& args)
+{
+	return File::getSpecialLocation(File::SpecialLocationType::userDesktopDirectory).getFullPathName();
+}
+
+juce::var ScriptUtil::getCurrentFileDirectoryFromScript(const juce::var::NativeFunctionArgs& args)
+{
+	return Engine::mainEngine->getFile().getParentDirectory().getFullPathName();
+}
+
+juce::var ScriptUtil::getCurrentFilePathFromScript(const juce::var::NativeFunctionArgs& args)
+{
+	return Engine::mainEngine->getFile().getFullPathName();
+}
+
+
 var ScriptUtil::fileExistsFromScript(const var::NativeFunctionArgs& args)
 {
 	return getFileFromArgs(args).existsAsFile();
@@ -400,6 +426,14 @@ juce::var ScriptUtil::getFilePath(const juce::var::NativeFunctionArgs& args)
 	if (!f.exists()) return var();
 
 	return f.getFullPathName();
+}
+
+juce::var ScriptUtil::getParentDirectory(const juce::var::NativeFunctionArgs& args)
+{
+	File f = getFileFromArgs(args);
+	if (!f.exists()) return var();
+
+	return f.getParentDirectory().getFullPathName();
 }
 
 var ScriptUtil::readFileFromScript(const var::NativeFunctionArgs& args)

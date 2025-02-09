@@ -66,7 +66,6 @@ Array<UndoableAction*> Point2DParameter::setUndoablePoint(Point<float> newPoint,
 
 Array<UndoableAction*> Point2DParameter::setUndoablePoint(float newX, float newY, bool onlyReturnAction, bool setSimilarSelected)
 {
-	DBG("Set undoable point :" << (float)lastUndoValue[0] << " / " << (float)lastUndoValue[1]);
 	var d;
 	d.append(newX);
 	d.append(newY);
