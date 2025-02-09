@@ -39,7 +39,7 @@ void ColorParameterUI::paint(Graphics& g)
 
 	Colour c = colorParam->getColor();
 	int size = jmin(getWidth(), getHeight()) / 2;
-	if (!c.isOpaque()) g.fillCheckerBoard(r.reduced(1).toFloat(), size, size, Colours::white, Colours::white.darker(.2f));
+	if (!c.isOpaque()) g.fillCheckerBoard(r.reduced(1).toFloat(), size, size, Colours::white, Colours::white.darker(.4f));
 
 	g.setColour(c);
 	g.fillRoundedRectangle(r.toFloat(), 2);
@@ -145,7 +145,7 @@ OrganicColorPicker::OrganicColorPicker(ColorParameterUI* colorParamUI) :
 	a("A", "Alpha", 0, 0, 1),
 	h("H", "Hue", 0, 0, 1),
 	s("S", "Saturation", 0, 0, 1),
-	bri("B", "Brightness", 0, 0, 1),
+	bri("V", "Value", 0, 0, 1),
 	hex("Hex", "Hex", "#"),
 	isUpdatingColor(false),
 	isDraggingHueSat(false)
@@ -182,9 +182,32 @@ OrganicColorPicker::OrganicColorPicker(ColorParameterUI* colorParamUI) :
 
 
 	aUI->useCustomBGColor = true;
-	aUI->customBGColor = Colours::lightgrey;
+	aUI->customBGColor = Colours::darkgrey;
+	aUI->useCustomFGColor = true;
+	aUI->customFGColor = Colours::grey.brighter(.4f);
 	aUI->useCustomTextColor = true;
 	aUI->customTextColor = Colours::white;
+
+	hUI->useCustomBGColor = true;
+	hUI->customBGColor = Colours::transparentBlack;
+	hUI->useCustomFGColor = true;
+	hUI->customFGColor = Colours::white.withAlpha(.5f);
+	hUI->useCustomTextColor = true;
+	hUI->customTextColor = BG_COLOR;
+
+	sUI->useCustomBGColor = true;
+	sUI->customBGColor = Colours::transparentBlack;
+	sUI->useCustomFGColor = true;
+	sUI->customFGColor = Colours::white.withAlpha(.5f);
+	sUI->useCustomTextColor = true;
+	sUI->customTextColor = BG_COLOR;
+
+	briUI->useCustomBGColor = true;
+	briUI->customBGColor = Colours::transparentBlack;
+	briUI->useCustomFGColor = true;
+	briUI->customFGColor = Colours::white.withAlpha(.5f);
+	briUI->useCustomTextColor = true;
+	briUI->customTextColor = BG_COLOR;
 
 
 	addAndMakeVisible(rUI.get());
@@ -229,32 +252,66 @@ OrganicColorPicker::~OrganicColorPicker()
 
 void OrganicColorPicker::paint(Graphics& g)
 {
-	g.fillAll(Colours::transparentBlack);
-
-	g.fillRect(hueSatRect);
+	g.setColour(Colours::black);
+	g.fillRoundedRectangle(hueSatRect.toFloat(), 2.f);
+	g.setColour(Colours::white.withAlpha(bri.floatValue()));
+	g.drawImageAt(hueSatImage, hueSatRect.getX(), hueSatRect.getY());
 	g.setColour(Colours::white.withAlpha(.5f));
 	g.drawRoundedRectangle(hueSatRect.toFloat(), 2.f, 2.f);
-	g.drawImageAt(hueSatImage, hueSatRect.getX(), hueSatRect.getY());
+
+	//draw hue gradient behing the hUi slider
+	Rectangle<int> r = hUI->getBounds().reduced(2);
+	for (int x = r.getX(); x < r.getRight(); ++x)
+	{
+		float hue = static_cast<float>(x - r.getX()) / r.getWidth();
+		g.setColour(Colour::fromHSV(hue, 1.0f, 1.0f, 1.0f));
+		g.drawLine(x, r.getY(), x, r.getBottom(), 2);
+	}
+
+	//draw saturation gradient behing the sUi slider
+	r = sUI->getBounds().reduced(2);
+	for (int x = r.getX(); x < r.getRight(); ++x)
+	{
+		float sat = static_cast<float>(x - r.getX()) / r.getWidth();
+		g.setColour(Colour::fromHSV(h.floatValue(), sat, 1.0f, 1.0f));
+		g.drawLine(x, r.getY(), x, r.getBottom(), 2);
+	}
+
+	//draw brightness gradient behing the briUi slider
+	r = briUI->getBounds().reduced(2);
+	for (int x = r.getX(); x < r.getRight(); ++x)
+	{
+		float bri = static_cast<float>(x - r.getX()) / r.getWidth();
+		g.setColour(Colour::fromHSV(h.floatValue(), s.floatValue(), bri, 1.0f));
+		g.drawLine(x, r.getY(), x, r.getBottom(), 2);
+	}
+
 }
 
 void OrganicColorPicker::resized()
 {
 	Rectangle<int> r = getLocalBounds().reduced(2);
 	hueSatRect = r.removeFromTop(r.getHeight() / 2);
+
+	const float sliderHeight = 18;
+
 	r.removeFromTop(4);
-	rUI->setBounds(r.removeFromTop(15));
+	rUI->setBounds(r.removeFromTop(sliderHeight));
 	r.removeFromTop(4);
-	gUI->setBounds(r.removeFromTop(15));
+	gUI->setBounds(r.removeFromTop(sliderHeight));
 	r.removeFromTop(4);
-	bUI->setBounds(r.removeFromTop(15));
+	bUI->setBounds(r.removeFromTop(sliderHeight));
+
+	r.removeFromTop(12);
+	hUI->setBounds(r.removeFromTop(sliderHeight));
 	r.removeFromTop(4);
-	aUI->setBounds(r.removeFromTop(15));
+	sUI->setBounds(r.removeFromTop(sliderHeight));
 	r.removeFromTop(4);
-	hUI->setBounds(r.removeFromTop(15));
-	r.removeFromTop(4);
-	sUI->setBounds(r.removeFromTop(15));
-	r.removeFromTop(4);
-	briUI->setBounds(r.removeFromTop(15));
+	briUI->setBounds(r.removeFromTop(sliderHeight));
+
+
+	r.removeFromTop(12);
+	aUI->setBounds(r.removeFromTop(sliderHeight));
 
 	hexUI->setBounds(getLocalBounds().removeFromBottom(20));
 
