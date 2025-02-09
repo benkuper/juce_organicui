@@ -75,7 +75,7 @@ void ColorParameterUI::showEditWindowInternal()
 	if (!isInteractable()) return;
 	if (shouldBailOut()) return;
 
-	std::unique_ptr<OrganicColorPicker> selector(new OrganicColorPicker(this));
+	std::unique_ptr<OrganicColorPicker> selector(new OrganicColorPicker(colorParam));
 	selector->setName("Color for " + parameter->niceName);
 	selector->setColour(ColourSelector::backgroundColourId, Colours::transparentBlack);
 	selector->setColour(ColourSelector::labelTextColourId, TEXT_COLOR);
@@ -136,9 +136,10 @@ void ColorParameterUI::valueChanged(const var&)
 }
 
 
-OrganicColorPicker::OrganicColorPicker(ColorParameterUI* colorParamUI) :
+OrganicColorPicker::OrganicColorPicker(ColorParameter* colorParam) :
 	Component("ColorPicker"),
-	colorParamUI(colorParamUI),
+	colorParam(colorParam),
+	paramRef(colorParam),
 	r("R", "Red", 0, 0, 1),
 	g("G", "Green", 0, 0, 1),
 	b("B", "Blue", 0, 0, 1),
@@ -150,7 +151,7 @@ OrganicColorPicker::OrganicColorPicker(ColorParameterUI* colorParamUI) :
 	isUpdatingColor(false),
 	isDraggingHueSat(false)
 {
-	colorParamUI->parameter->addAsyncParameterListener(this);
+	colorParam->addAsyncParameterListener(this);
 
 	hueSatHandle.reset(new HueSatHandle(this));
 	addAndMakeVisible(hueSatHandle.get());
@@ -246,8 +247,8 @@ OrganicColorPicker::OrganicColorPicker(ColorParameterUI* colorParamUI) :
 
 OrganicColorPicker::~OrganicColorPicker()
 {
-	if (colorParamUI->colorParam == nullptr) return;
-	colorParamUI->colorParam->removeAsyncParameterListener(this);
+	if (paramRef == nullptr || paramRef.wasObjectDeleted()) return;
+	colorParam->removeAsyncParameterListener(this);
 }
 
 void OrganicColorPicker::paint(Graphics& g)
@@ -404,14 +405,15 @@ void OrganicColorPicker::setEditingColor(const juce::Colour& c, bool setRGB, boo
 	hex.setValue(c.toDisplayString(true));
 	a.setValue(c.getFloatAlpha());
 
-	if (setParam) colorParamUI->colorParam->setColor(c, false, false, true);
+	if (setParam) colorParam->setColor(c, false, false, true);
 
 	isUpdatingColor = false;
 }
 
 void OrganicColorPicker::setUndoableParam()
 {
-	colorParamUI->colorParam->setUndoableColor(colorParamUI->colorParam->getColor(), true);
+	if (paramRef == nullptr || paramRef.wasObjectDeleted()) return;
+	colorParam->setUndoableColor(colorParam->getColor(), true);
 }
 
 void OrganicColorPicker::updateFromRGB(float _r, float _g, float _b)
@@ -461,14 +463,14 @@ void OrganicColorPicker::updateHueSatHandle()
 void OrganicColorPicker::updateFromParameter()
 {
 	if (isUpdatingColor) return;
-	setEditingColor(colorParamUI->colorParam->getColor());
+	setEditingColor(colorParam->getColor());
 }
 
 void OrganicColorPicker::newMessage(const Parameter::ParameterEvent& e)
 {
 	if (isUpdatingColor) return;
 
-	if (e.parameter == colorParamUI->parameter)
+	if (e.parameter == colorParam)
 	{
 		updateFromParameter();
 	}
@@ -504,9 +506,10 @@ OrganicColorPicker::HueSatHandle::~HueSatHandle()
 
 void OrganicColorPicker::HueSatHandle::paint(Graphics& g)
 {
-	//draw circle
+	if (picker->paramRef.wasObjectDeleted()) return;
+
 	Rectangle<float> r = getLocalBounds().toFloat().reduced(4);
-	Colour c = picker->colorParamUI->colorParam->getColor();
+	Colour c = picker->colorParam->getColor();
 	g.setColour(c);
 	g.fillEllipse(r);
 	g.setColour(c.darker(.8f).withAlpha(.9f));

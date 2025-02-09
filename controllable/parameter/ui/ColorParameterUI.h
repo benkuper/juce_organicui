@@ -15,10 +15,11 @@ class OrganicColorPicker :
 	public Parameter::AsyncListener
 {
 public:
-	OrganicColorPicker(ColorParameterUI* colorParamUI);
+	OrganicColorPicker(ColorParameter* colorParam);
 	~OrganicColorPicker();
 
-	ColorParameterUI* colorParamUI;
+	ColorParameter* colorParam;
+	juce::WeakReference<Parameter> paramRef;
 
 	FloatParameter r;
 	std::unique_ptr<FloatSliderUI> rUI;
