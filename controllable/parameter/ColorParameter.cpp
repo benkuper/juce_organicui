@@ -19,6 +19,17 @@ ColorParameter::ColorParameter(const String & niceName, const String & descripti
 	canHaveRange = true;
 	canBeAutomated = true;
 
+	var minVal;
+	var maxVal;
+	for (int i = 0; i < 4; ++i)
+	{
+		minVal.append(0);
+		maxVal.append(1.0f);
+	}
+
+	minimumValue = minVal;
+	maximumValue = maxVal;
+
 	defaultValue = var();
 	defaultValue.append(initialColor.getFloatRed());
 	defaultValue.append(initialColor.getFloatGreen());
