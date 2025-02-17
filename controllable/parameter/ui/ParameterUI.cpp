@@ -20,7 +20,7 @@ std::function<void(ParameterUI*)> ParameterUI::customShowEditRangeWindowFunction
 
 ParameterUI::ParameterUI(Array<Parameter*> parameters, int paintTimerID) :
 	ControllableUI(Inspectable::getArrayAs<Parameter, Controllable>(parameters)),
-	UITimerTarget(paintTimerID),
+	UITimerTarget(paintTimerID, "ParameterUI"),
 	parameters(Inspectable::getWeakArray(parameters)),
 	parameter(parameters[0]),
 	setUndoableValueOnMouseUp(true),
@@ -141,6 +141,8 @@ void ParameterUI::paintOverChildren(Graphics& g)
 	}
 	break;
 	}
+
+	validatePaint();
 }
 
 void ParameterUI::handlePaintTimer()

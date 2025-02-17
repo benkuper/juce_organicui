@@ -11,8 +11,8 @@
 
 GradientColorManagerUI::GradientColorManagerUI(GradientColorManager* manager) :
 	BaseManagerUI(manager->niceName, manager, false),
+	UITimerTarget(ORGANICUI_SLOW_TIMER, "GradientColorManagerUI"),
 	Thread("Colors " + String(manager->niceName)),
-	shouldRepaint(true),
 	shouldUpdateImage(true),
 	autoResetViewRangeOnLengthUpdate(false),
 	miniMode(false)
@@ -28,7 +28,6 @@ GradientColorManagerUI::GradientColorManagerUI(GradientColorManager* manager) :
 	manager->addAsyncCoalescedContainerListener(this);
 	addExistingItems();
 
-	startTimerHz(20);
 	startThread();
 }
 
@@ -88,6 +87,11 @@ void GradientColorManagerUI::paint(Graphics& g)
 		g.fillRect(r);
 	}
 	*/
+}
+
+void GradientColorManagerUI::paintOverChildren(Graphics& g)
+{
+	validatePaint();
 }
 
 void GradientColorManagerUI::resized()
@@ -300,11 +304,7 @@ void GradientColorManagerUI::run()
 
 }
 
-void GradientColorManagerUI::timerCallback()
+void GradientColorManagerUI::handlePaintTimerInternal()
 {
-	if (shouldRepaint)
-	{
-		repaint();
-		shouldRepaint = false;
-	}
+	repaint();
 }
