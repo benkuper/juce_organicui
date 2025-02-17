@@ -53,7 +53,7 @@ void AutomationMultiKeyTransformer::updateKeysFromBounds()
 	{
 		Point<int> localPos = getLocalBounds().getRelativePoint(keysRelativePositions[i].x, keysRelativePositions[i].y);
 		Point<int> timelinePos = aui->getLocalPoint(this, localPos);
-		float targetPos = aui->getPosForX(timelinePos.x);
+		float targetPos = aui->keysUI.getPosForX(timelinePos.x);
 		float targetVal = 1 - (timelinePos.y*1.f / aui->getHeight());
 		keysUI[i]->item->position->setValue(targetPos);
 		keysUI[i]->item->value->setValue(targetVal);

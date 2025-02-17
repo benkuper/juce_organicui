@@ -16,7 +16,7 @@ ParameterAutomationEditor::ParameterAutomationEditor(ParameterAutomation * ppa) 
 
 	if (AutomationEditor * ae = dynamic_cast<AutomationEditor *>(automationEditor.get()))
 	{
-		ae->automationUI->autoAdaptViewRange = true;
+		ae->automationUI->keysUI.autoAdaptViewRange = true;
 	}
 	
 	setSize(100, automationEditor->getHeight());
