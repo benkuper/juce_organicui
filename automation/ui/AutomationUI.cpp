@@ -350,9 +350,7 @@ void AutomationUIKeys::setPreviewMode(bool value)
 	}
 	
 	resized();
-	autoUI->background.repaint();
-	autoUI->shouldRepaint = true;
-	autoUI->shouldRepaintOverlay = true;
+	autoUI->setRepaint(true, true, true);
 }
 
 void AutomationUIKeys::setViewRange(float start, float end)
@@ -362,7 +360,7 @@ void AutomationUIKeys::setViewRange(float start, float end)
 	viewLength = viewPosRange.y - viewPosRange.x;
 
 	resized();
-	autoUI->shouldRepaint = true;
+	autoUI->setRepaint(true, true, false);
 }
 
 void AutomationUIKeys::updateItemsVisibility()
@@ -674,20 +672,20 @@ void AutomationUIKeys::newMessage(const ContainerAsyncEvent& e)
 	if (e.targetControllable == nullptr || e.targetControllable.wasObjectDeleted() || inspectable.wasObjectDeleted()) return;
 	if (e.type == ContainerAsyncEvent::ControllableFeedbackUpdate)
 	{
-		// if (e.targetControllable == manager->value || e.targetControllable == manager->position)
-		// {
-		// 	autoUI->repaintOverlayPoint = Point<int>(getXForPos(manager->position->floatValue()), getYForValue(manager->value->floatValue()));
-		// }
+		if (e.targetControllable == manager->value || e.targetControllable == manager->position)
+		{
+			bool refreshOverlay = !manager->interactiveSimplifiedPoints.isEmpty() || (manager->recorder != nullptr && manager->recorder->isRecording->boolValue()) || (paintingMode && paintingPoints.size() > 0);
+
+			autoUI->setRepaint(false,refreshOverlay,false);
+		}
 		if (manager->items.size() > 0 && (e.targetControllable->parentContainer == manager->items[0] || e.targetControllable->parentContainer == manager->items[manager->items.size() - 1]))
 		{
-			autoUI->shouldRepaint = true;
+			autoUI->setRepaint(true, false, false);
 		}
 		else if (e.targetControllable == manager->viewValueRange)
 		{
 			resized();
-			autoUI->shouldRepaint = true;
-			autoUI->shouldRepaintOverlay = true;
-			autoUI->background.repaint();
+			autoUI->setRepaint(true, true, true);
 		}
 		else if (e.targetControllable == manager->length)
 		{
@@ -789,7 +787,7 @@ AutomationUILayer::AutomationUILayer(AutomationUI* _ui, int _id) :
 	id(_id)
 {
 	setInterceptsMouseClicks(false,false);
-	if(id != 0)
+	if(id == 1)
 		setBufferedToImage(true);
 }
 
@@ -804,6 +802,7 @@ void AutomationUILayer::paint(juce::Graphics& g)
 		g.setColour(BLUE_COLOR);
 		g.fillEllipse(Rectangle<float>(0, 0, 6, 6));
 	}
+	//ui->validatePaint();
 }
 
 void AutomationUILayer::resized()
@@ -814,6 +813,7 @@ void AutomationUILayer::resized()
 
 
 AutomationUI::AutomationUI(Automation* manager) :
+	UITimerTarget(ORGANICUI_DEFAULT_TIMER, "AutomationUI"),
 	keysUI(manager, this),
 	overlay(this, 0),
 	background(this, 1),
@@ -828,8 +828,6 @@ AutomationUI::AutomationUI(Automation* manager) :
 	addAndMakeVisible(&keysUI);
 	addAndMakeVisible(&overlay);
 	addAndMakeVisible(&cursor);
-
-	startTimerHz(30);
 }
 
 void AutomationUI::paint(juce::Graphics& g)
@@ -843,17 +841,31 @@ void AutomationUI::resized()
 	background.setBounds(getLocalBounds());
 }
 
-void AutomationUI::timerCallback()
+void AutomationUI::setRepaint(bool _keys, bool _overlay, bool _background)
+{
+	if(_background) background.repaint();
+
+	shouldRepaint = true;
+	shouldRepaintKeys = _keys;
+	shouldRepaintOverlay = _overlay;
+}
+
+void AutomationUI::paintOverChildren(Graphics& g)
+{
+	validatePaint();
+}
+
+void AutomationUI::handlePaintTimerInternal()
 {
 	if(!isShowing()){
-		shouldRepaint = true;
+		shouldRepaintKeys = true;
 		shouldRepaintOverlay = true;
 		return;
 	}
 
-	if(shouldRepaint){
+	if(shouldRepaintKeys){
 		keysUI.repaint();
-		shouldRepaint = false;
+		shouldRepaintKeys = false;
 	}
 
 	repaintOverlayPoint = Point<int>(keysUI.getXForPos(keysUI.manager->position->floatValue()), keysUI.getYForValue(keysUI.manager->value->floatValue()));

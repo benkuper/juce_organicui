@@ -106,7 +106,7 @@ public:
 
 class AutomationUI :
     public juce::Component,
-    public juce::Timer
+    public UITimerTarget
 {
 public:
     AutomationUI(Automation* manager);
@@ -117,7 +117,7 @@ public:
     AutomationUILayer overlay;
     AutomationUILayer background;
 
-    bool shouldRepaint;
+    bool shouldRepaintKeys;
     bool shouldRepaintOverlay;
 
     bool disableOverlayFill;
@@ -132,7 +132,10 @@ public:
     void paint(juce::Graphics& g) override;
     void resized() override;
 
-    void timerCallback() override;
+    void setRepaint(bool keys, bool overlay, bool background);
+
+    void paintOverChildren(juce::Graphics& g) override;
+    virtual void handlePaintTimerInternal() override;
 
     inline void setPreviewMode(bool value){keysUI.setPreviewMode(value);}
     inline void setViewRange(float start, float end){keysUI.setViewRange(start,end);}

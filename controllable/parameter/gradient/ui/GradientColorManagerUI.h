@@ -13,7 +13,7 @@
 class GradientColorManagerUI :
 	public BaseManagerUI<GradientColorManager, GradientColor, GradientColorUI>,
 	public ContainerAsyncListener,
-	public juce::Timer,
+	public UITimerTarget,
 	public juce::Thread
 
 {
@@ -21,7 +21,6 @@ public:
 	GradientColorManagerUI(GradientColorManager * manager);
 	~GradientColorManagerUI();
 
-	bool shouldRepaint;
 	bool shouldUpdateImage;
 
 	float viewStartPos;
@@ -41,6 +40,7 @@ public:
 	void setMiniMode(bool value);
 
 	void paint(juce::Graphics &g) override;
+	void paintOverChildren(juce::Graphics& g) override;
 
 	void resized() override;
 
@@ -64,5 +64,5 @@ public:
 
 	void run() override;
 	
-	void timerCallback() override;
+	void handlePaintTimerInternal() override;
 };
