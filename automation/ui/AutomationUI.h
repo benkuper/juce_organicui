@@ -10,31 +10,44 @@
 
 #pragma once
 
-class AutomationUI :
+class AutomationUILayer :
+    public juce::Component
+{
+public:
+    AutomationUILayer(AutomationUI* _ui, int _id);
+    ~AutomationUILayer() {}
+
+    AutomationUI* ui;
+    int id;
+
+    void paint(juce::Graphics& g) override;
+    void resized() override;
+};
+
+class AutomationUI;
+
+class AutomationUIKeys :
     public BaseManagerUI<Automation, AutomationKey, AutomationKeyUI>,
     public AutomationKey::AsyncListener,
     public AutomationKeyUI::KeyUIListener,
     public ContainerAsyncListener,
-    public Automation::AsyncListener,
-    public juce::Timer
+    public Automation::AsyncListener
 {
 public:
-    AutomationUI(Automation* manager);
-    ~AutomationUI();
+    AutomationUIKeys(Automation* manager, AutomationUI* _autoUI);
+    ~AutomationUIKeys();
+
+    AutomationUI* autoUI;
 
     juce::Point<float> viewPosRange;
     float viewLength;
     bool autoAdaptViewRange;
-
-    bool shouldRepaint;
 
     bool paintingMode;
     juce::Array<juce::Point<float>> paintingPoints;
     juce::Point<float> lastPaintingPoint;
 
     bool previewMode; //avoid repainting everything
-    bool showNumberLines;
-    bool showMenuOnRightClick;
 
     juce::Point<float> viewValueRangeAtMouseDown;
 
@@ -42,12 +55,11 @@ public:
     std::unique_ptr<juce::TextButton> validInteractiveBT;
 
     juce::Array<float> snapTimes;
-    std::function<void(juce::Array<float>*, AutomationKey * k)> getSnapTimesFunc;
 
     void paint(juce::Graphics& g) override;
     void drawLinesBackground(juce::Graphics& g);
-
-    void paintOverChildren(juce::Graphics& g) override;
+    void paintOverlay(juce::Graphics& g);
+    void paintBackground(juce::Graphics& g);
 
     void resized() override;
     void placeKeyUI(AutomationKeyUI* ui);
@@ -89,7 +101,41 @@ public:
 
     void keyEasingHandleMoved(AutomationKeyUI* ui, bool syncOtherHandle, bool isFirst) override;
 
+    void buttonClicked(juce::Button* b) override;
+};
+
+class AutomationUI :
+    public juce::Component,
+    public juce::Timer
+{
+public:
+    AutomationUI(Automation* manager);
+    ~AutomationUI() {}
+
+    AutomationUIKeys keysUI;
+    AutomationUILayer cursor;
+    AutomationUILayer overlay;
+    AutomationUILayer background;
+
+    bool shouldRepaint;
+    bool shouldRepaintOverlay;
+
+    bool disableOverlayFill;
+
+    juce::Point<int> repaintOverlayPoint;
+    juce::Point<int> lastRepaintOverlayPoint;
+
+    bool showNumberLines;
+    bool showMenuOnRightClick;
+    std::function<void(juce::Array<float>*, AutomationKey * k)> getSnapTimesFunc;
+
+    void paint(juce::Graphics& g) override;
+    void resized() override;
+
     void timerCallback() override;
 
-    void buttonClicked(juce::Button* b) override;
+    inline void setPreviewMode(bool value){keysUI.setPreviewMode(value);}
+    inline void setViewRange(float start, float end){keysUI.setViewRange(start,end);}
+
+    inline void addSelectableComponentsAndInspectables(juce::Array<juce::Component*>& selectables, juce::Array<Inspectable*>& inspectables){keysUI.addSelectableComponentsAndInspectables(selectables, inspectables);}
 };
