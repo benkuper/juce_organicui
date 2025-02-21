@@ -585,13 +585,12 @@ void AutomationUIKeys::addMenuExtraItems(PopupMenu& p, int startIndex)
 
 void AutomationUIKeys::handleMenuExtraItemsResult(int result, int startIndex)
 {
-	//Easing::Type t = (Easing::Type)(result - startIndex);
 	String typeName = Easing::typeNames[result - startIndex];
 
 	Array<UndoableAction*> actions;
 	for (auto& i : manager->items)
 	{
-		actions.add(i->easingType->setUndoableValue(i->easingType->getValueKey(), typeName, true));
+		actions.add(i->easingType->setUndoableValue(i->easingType->value, typeName, true));
 	}
 
 	UndoMaster::getInstance()->performActions("Change all easings", actions);
