@@ -119,11 +119,12 @@ public:
 
     bool shouldRepaintKeys;
     bool shouldRepaintOverlay;
+    bool shouldResize;
 
     bool disableOverlayFill;
 
-    juce::Point<int> repaintOverlayPoint;
     juce::Point<int> lastRepaintOverlayPoint;
+    int overlayStartY;
 
     bool showNumberLines;
     bool showMenuOnRightClick;
