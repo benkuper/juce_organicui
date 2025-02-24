@@ -90,7 +90,7 @@ void AutomationUIKeys::paint(Graphics& g)
 
 void AutomationUIKeys::paintBackground(juce::Graphics& g)
 {
-	if (getWidth() == 0 || !isShowing()) return;
+	if (getWidth() == 0) return;
 
 	if (!transparentBG) g.fillAll(bgColor);
 
@@ -194,11 +194,11 @@ void AutomationUIKeys::drawLinesBackground(Graphics& g)
 
 void AutomationUIKeys::paintOverlay(juce::Graphics& g)
 {
-	if (previewMode || !isShowing()) return;
+	if (previewMode) return;
 
 	if(!autoUI->disableOverlayFill){
 		g.setColour(Colours::white.withAlpha(.04f));
-		float ty = getYForValue(manager->value->floatValue());
+		float ty = autoUI->overlayStartY;
 		float t0 = getYForValue(0);
 		g.fillRect(getLocalBounds().withTop(jmin(ty, t0)).withBottom(jmax(ty, t0)));
 	}
@@ -585,13 +585,12 @@ void AutomationUIKeys::addMenuExtraItems(PopupMenu& p, int startIndex)
 
 void AutomationUIKeys::handleMenuExtraItemsResult(int result, int startIndex)
 {
-	//Easing::Type t = (Easing::Type)(result - startIndex);
 	String typeName = Easing::typeNames[result - startIndex];
 
 	Array<UndoableAction*> actions;
 	for (auto& i : manager->items)
 	{
-		actions.add(i->easingType->setUndoableValue(i->easingType->getValueKey(), typeName, true));
+		actions.add(i->easingType->setUndoableValue(i->easingType->value, typeName, true));
 	}
 
 	UndoMaster::getInstance()->performActions("Change all easings", actions);
@@ -793,6 +792,8 @@ AutomationUILayer::AutomationUILayer(AutomationUI* _ui, int _id) :
 
 void AutomationUILayer::paint(juce::Graphics& g)
 {
+	if(!isShowing()) return;
+
 	if(id == 0){
 		ui->keysUI.paintOverlay(g);
 	}else if(id == 1){
@@ -820,7 +821,8 @@ AutomationUI::AutomationUI(Automation* manager) :
 	cursor(this, 2),
 	showNumberLines(true),
 	showMenuOnRightClick(true),
-	repaintOverlayPoint(-1,-1)
+	lastRepaintOverlayPoint(-1,-1),
+	overlayStartY(0)
 {
 	setInterceptsMouseClicks(false,true);
 
@@ -836,9 +838,8 @@ void AutomationUI::paint(juce::Graphics& g)
 
 void AutomationUI::resized()
 {
-	keysUI.setBounds(getLocalBounds());
-	overlay.setBounds(getLocalBounds());
-	background.setBounds(getLocalBounds());
+	shouldResize = true;
+	shouldRepaint = true;
 }
 
 void AutomationUI::setRepaint(bool _keys, bool _overlay, bool _background)
@@ -857,37 +858,48 @@ void AutomationUI::paintOverChildren(Graphics& g)
 
 void AutomationUI::handlePaintTimerInternal()
 {
-	if(!isShowing()){
-		shouldRepaintKeys = true;
-		shouldRepaintOverlay = true;
+	bool display = isShowing();
+
+	int lastOverlayY = lastRepaintOverlayPoint.getY();
+	overlayStartY = keysUI.getYForValue(keysUI.manager->value->floatValue());
+	int newXpos = keysUI.getXForPos(keysUI.manager->position->floatValue());
+
+	if(overlayStartY != lastOverlayY || lastRepaintOverlayPoint.getX() != newXpos){
+		cursor.setBounds(newXpos - 3, overlayStartY - 3, 6, 6);
+
+		lastRepaintOverlayPoint.setXY(newXpos, overlayStartY);
+	}
+
+	if(shouldResize)
+	{
+		keysUI.setBounds(getLocalBounds());
+		overlay.setBounds(getLocalBounds());
+		background.setBounds(getLocalBounds());
+		lastRepaintOverlayPoint = Point<int>(0,0);
+		shouldResize = false;
 		return;
 	}
+
+	if(!display) return;
 
 	if(shouldRepaintKeys){
 		keysUI.repaint();
 		shouldRepaintKeys = false;
 	}
 
-	repaintOverlayPoint = Point<int>(keysUI.getXForPos(keysUI.manager->position->floatValue()), keysUI.getYForValue(keysUI.manager->value->floatValue()));
-	
-	if(repaintOverlayPoint.getY() != lastRepaintOverlayPoint.getY() || repaintOverlayPoint.getX() != lastRepaintOverlayPoint.getX()){
-		cursor.setBounds(Rectangle<int>(0, 0, 6, 6).withCentre(repaintOverlayPoint));
-
-		if(repaintOverlayPoint.getY() != lastRepaintOverlayPoint.getY() && !shouldRepaintOverlay){
-			int startX,width,startY,height;
-			startX = overlay.getX();
-			width = overlay.getWidth();
-			startY = jmin(repaintOverlayPoint.getY(), lastRepaintOverlayPoint.getY()) - 3;
-			height = abs(repaintOverlayPoint.getY() - lastRepaintOverlayPoint.getY()) + 6;
-
-			overlay.repaint(startX, startY, width, height);
-		}
-
-		lastRepaintOverlayPoint = repaintOverlayPoint;
-	}
-
 	if(shouldRepaintOverlay){
 		overlay.repaint();
 		shouldRepaintOverlay = false;
+		return;
+	}
+
+	if(!disableOverlayFill && overlayStartY != lastOverlayY){
+		int startX,width,startY,height;
+		startX = overlay.getX();
+		width = overlay.getWidth();
+		startY = jmin(overlayStartY, lastOverlayY);
+		height = abs(overlayStartY - lastOverlayY);
+
+		overlay.repaint(startX, startY, width, height);
 	}
 }

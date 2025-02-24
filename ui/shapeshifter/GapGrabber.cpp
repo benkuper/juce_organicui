@@ -8,7 +8,9 @@
   ==============================================================================
 */
 
-GapGrabber::GapGrabber(Direction _direction) : direction(_direction)
+GapGrabber::GapGrabber(Direction _direction) :
+	UITimerTarget(ORGANICUI_DEFAULT_TIMER, "GapGrabber"),
+	direction(_direction)
 {
 	setRepaintsOnMouseActivity(true);
 	setMouseCursor(direction == HORIZONTAL ? MouseCursor::LeftRightResizeCursor : MouseCursor::UpDownResizeCursor);
@@ -34,5 +36,22 @@ void GapGrabber::paint(Graphics & g)
 
 void GapGrabber::mouseDrag(const MouseEvent &e)
 {
-	listeners.call(&Listener::grabberGrabUpdate, this, direction == HORIZONTAL?e.getPosition().x:e.getPosition().y);
+	position = direction == HORIZONTAL?e.getPosition().x:e.getPosition().y;
+	shouldRepaint = true;
+}
+
+void GapGrabber::mouseUp(const MouseEvent &e)
+{
+	listeners.call(&Listener::grabberGrabEvent, this, false);
+}
+
+void GapGrabber::mouseDown(const MouseEvent &e)
+{
+	listeners.call(&Listener::grabberGrabEvent, this, true);
+}
+
+void GapGrabber::handlePaintTimerInternal()
+{
+	listeners.call(&Listener::grabberGrabUpdate, this, position);
+	validatePaint();
 }
