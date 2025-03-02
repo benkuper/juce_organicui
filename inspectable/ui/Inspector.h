@@ -51,6 +51,8 @@ public:
 	//From InspectableSelectionManager
 	virtual void newMessage(const InspectableSelectionManager::SelectionEvent& e) override;
 
+	virtual void onSelectionChanged();
+
 	class  InspectorListener
 	{
 	public:
