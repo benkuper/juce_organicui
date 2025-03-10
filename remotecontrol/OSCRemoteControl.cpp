@@ -35,6 +35,7 @@ OSCRemoteControl::OSCRemoteControl() :
 #endif
 	, manualSendCC("Manual OSC Send")
 	, localPort(nullptr)
+	, portIncrement(0)
 {
 
 	saveAndLoadRecursiveData = true; //can be useful when app include other settings there
@@ -53,6 +54,13 @@ OSCRemoteControl::OSCRemoteControl() :
 
 	manualAddress = manualSendCC.addStringParameter("Address", "Address to send to", "127.0.0.1");
 	manualPort = manualSendCC.addIntParameter("Port", "Port to send to", ORGANIC_REMOTE_CONTROL_PORT + 1, 1, 65535);
+
+	bool defaultAllowAddr = false;
+#if JUCE_LINUX
+	defaultAllowAddr = true;
+#endif
+	allowAddressReuse = addBoolParameter("Allow Address Reuse", "Allow multiple binding on the same port. This can be useful on linux when auto relaunching.", defaultAllowAddr);
+	autoIncrementOnServerFail = addBoolParameter("Auto Increment on Fail Binding", "If the binding of the server port fails, auto increment the port and retry", false);
 
 	manualSendCC.enabled->setDefaultValue(false);
 	addChildControllableContainer(&manualSendCC);
@@ -430,7 +438,7 @@ void OSCRemoteControl::setupServer()
 	server.reset(new SimpleWebSocketServer());
 	server->handler = this;
 	server->addWebSocketListener(this);
-	server->start(localPort->intValue(), "");
+	server->start(localPort->intValue() + portIncrement, "", "", allowAddressReuse->boolValue());
 }
 
 bool OSCRemoteControl::handleHTTPRequest(std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request)
@@ -500,6 +508,26 @@ bool OSCRemoteControl::handleHTTPRequest(std::shared_ptr<HttpServer::Response> r
 	return true;
 }
 
+
+void OSCRemoteControl::serverInitSuccess()
+{
+	LOG("Server started on port " << server->port);
+}
+
+void OSCRemoteControl::serverInitError(const String &message)
+{
+	bool failed = !autoIncrementOnServerFail->boolValue() || portIncrement >= 50;
+
+	if (failed)
+	{
+		LOGERROR("Error starting server on port " << server->port);
+		return;
+	}
+
+	LOGWARNING("Error starting server on port " << server->port << ", trying next port...");
+	portIncrement++;
+	setupServer();
+}
 
 void OSCRemoteControl::connectionOpened(const String& id)
 {
