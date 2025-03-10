@@ -186,7 +186,7 @@ bool EnumParameter::setValueWithData(var data)
 			return true;
 		}
 	}
-	
+
 	return false;
 }
 

@@ -11,7 +11,9 @@
 
 #pragma once
 
-class GapGrabber : public juce::Component
+class GapGrabber :
+	public UITimerTarget,
+	public juce::Component
 {
 public:
 	enum Direction { HORIZONTAL, VERTICAL };
@@ -21,8 +23,12 @@ public:
 
 	void paint(juce::Graphics & g) override;
 	void mouseDrag(const juce::MouseEvent &e) override;
+	void mouseUp(const juce::MouseEvent &e) override;
+	void mouseDown(const juce::MouseEvent &e) override;
+	void handlePaintTimerInternal() override;
 
 	Direction direction;
+	int position;
 
 	//Listener
 	class Listener
@@ -30,6 +36,7 @@ public:
 	public:
 		virtual ~Listener() {}
 		virtual void grabberGrabUpdate(GapGrabber *, int relativeDist) = 0;
+		virtual void grabberGrabEvent(GapGrabber *, bool isGrabbing) {}
 	};
 
 	juce::ListenerList<Listener> listeners;

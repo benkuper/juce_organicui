@@ -87,7 +87,10 @@ void Inspector::setSelectionManager(InspectableSelectionManager* newSM)
 	selectionManager = newSM;
 
 	if (selectionManager == nullptr) selectionManager = InspectableSelectionManager::mainSelectionManager;
-	if (selectionManager != nullptr) selectionManager->addAsyncSelectionManagerListener(this);
+	if (selectionManager != nullptr) {
+		selectionManager->addAsyncSelectionManagerListener(this);
+		onSelectionChanged();
+	}
 }
 
 void Inspector::setCurrentInspectables(Array<Inspectable*> inspectables, bool setInspectableSelection)
@@ -173,23 +176,28 @@ void Inspector::newMessage(const InspectableSelectionManager::SelectionEvent& e)
 {
 	if (e.type == InspectableSelectionManager::SelectionEvent::SELECTION_CHANGED)
 	{
-		if (selectionManager->isEmpty())
-		{
-			if (curSelectionDoesNotAffectInspector) return;
-			setCurrentInspectables();
-		}
-		else
-		{
-			Inspectable* newI = selectionManager->currentInspectables[0];
-			curSelectionDoesNotAffectInspector = !newI->showInspectorOnSelect;
-			if (curSelectionDoesNotAffectInspector) return;
-
-			Array<Inspectable*> newInspectables = selectionManager->getInspectablesAs<Inspectable>();
-			if (newInspectables.size() > 0 && newInspectables[0] != nullptr && newInspectables[0]->showInspectorOnSelect) setCurrentInspectables(newInspectables);
-		}
-
-		repaint();
+		onSelectionChanged();
 	}
+}
+
+void Inspector::onSelectionChanged()
+{
+	if (selectionManager->isEmpty())
+	{
+		if (curSelectionDoesNotAffectInspector) return;
+		setCurrentInspectables();
+	}
+	else
+	{
+		Inspectable* newI = selectionManager->currentInspectables[0];
+		curSelectionDoesNotAffectInspector = !newI->showInspectorOnSelect;
+		if (curSelectionDoesNotAffectInspector) return;
+
+		Array<Inspectable*> newInspectables = selectionManager->getInspectablesAs<Inspectable>();
+		if (newInspectables.size() > 0 && newInspectables[0] != nullptr && newInspectables[0]->showInspectorOnSelect) setCurrentInspectables(newInspectables);
+	}
+
+	repaint();
 }
 
 InspectorUI::InspectorUI(const String& name, InspectableSelectionManager* selectionManager) :

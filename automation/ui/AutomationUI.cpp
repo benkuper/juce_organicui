@@ -8,13 +8,12 @@
   ==============================================================================
 */
 
-AutomationUI::AutomationUI(Automation* manager) :
+AutomationUIKeys::AutomationUIKeys(Automation* manager, AutomationUI* _autoUI) :
+	autoUI(_autoUI),
 	BaseManagerUI(manager->niceName, manager, false),
 	autoAdaptViewRange(false),
 	paintingMode(false),
-	previewMode(false),
-	showNumberLines(true),
-	showMenuOnRightClick(true)
+	previewMode(false)
 {
 	//autoSelectWithChildRespect = false;
 	resizeOnChildBoundsChanged = false;
@@ -24,17 +23,16 @@ AutomationUI::AutomationUI(Automation* manager) :
 	manager->addAsyncContainerListener(this);
 	manager->addAsyncAutomationListener(this);
 
+	setBufferedToImage(true);
 	transparentBG = true;
 
 	setViewRange(0, manager->length->floatValue());
-
-	startTimerHz(30);
 
 	addExistingItems(false);
 	setSize(100, 100);
 }
 
-AutomationUI::~AutomationUI()
+AutomationUIKeys::~AutomationUIKeys()
 {
 	if (!inspectable.wasObjectDeleted())
 	{
@@ -52,11 +50,9 @@ AutomationUI::~AutomationUI()
 	}
 }
 
-void AutomationUI::paint(Graphics& g)
+void AutomationUIKeys::paint(Graphics& g)
 {
 	if (getWidth() == 0 || !isShowing()) return;
-
-	if (!transparentBG) g.fillAll(bgColor);
 
 	if (previewMode)
 	{
@@ -71,13 +67,6 @@ void AutomationUI::paint(Graphics& g)
 		g.strokePath(p, PathStrokeType(1));
 		return;
 	}
-
-	if (showNumberLines) drawLinesBackground(g);
-
-	g.setColour(Colours::white.withAlpha(.04f));
-	float ty = getYForValue(manager->value->floatValue());
-	float t0 = getYForValue(0);
-	g.fillRect(getLocalBounds().withTop(jmin(ty, t0)).withBottom(jmax(ty, t0)));
 
 	if (manager->items.size() > 0)
 	{
@@ -99,7 +88,18 @@ void AutomationUI::paint(Graphics& g)
 	}
 }
 
-void AutomationUI::drawLinesBackground(Graphics& g)
+void AutomationUIKeys::paintBackground(juce::Graphics& g)
+{
+	if (getWidth() == 0) return;
+
+	if (!transparentBG) g.fillAll(bgColor);
+
+	if (previewMode) return;
+
+	if (autoUI->showNumberLines) drawLinesBackground(g);
+}
+
+void AutomationUIKeys::drawLinesBackground(Graphics& g)
 {
 	float start = manager->viewValueRange->x;
 	float end = manager->viewValueRange->y;
@@ -192,9 +192,16 @@ void AutomationUI::drawLinesBackground(Graphics& g)
 	}
 }
 
-void AutomationUI::paintOverChildren(Graphics& g)
+void AutomationUIKeys::paintOverlay(juce::Graphics& g)
 {
-	if (previewMode || !isShowing()) return;
+	if (previewMode) return;
+
+	if(!autoUI->disableOverlayFill){
+		g.setColour(Colours::white.withAlpha(.04f));
+		float ty = autoUI->overlayStartY;
+		float t0 = getYForValue(0);
+		g.fillRect(getLocalBounds().withTop(jmin(ty, t0)).withBottom(jmax(ty, t0)));
+	}
 
 	//recorder
 	bool interactiveMode = !manager->interactiveSimplifiedPoints.isEmpty();
@@ -264,17 +271,14 @@ void AutomationUI::paintOverChildren(Graphics& g)
 		g.setColour(YELLOW_COLOR.withAlpha(.5f));
 		g.strokePath(p, PathStrokeType(1));
 	}
-
-	//draw current point
-	g.setColour(BLUE_COLOR);
-	Point<float> p(getXForPos(manager->position->floatValue()), getYForValue(manager->value->floatValue()));
-	g.fillEllipse(Rectangle<float>(0, 0, 6, 6).withCentre(p));
 }
 
-
-void AutomationUI::resized()
+void AutomationUIKeys::resized()
 {
-	if (previewMode || !isVisible()) return;
+	if (previewMode) return;
+
+	updateItemsVisibility();
+
 	for (auto& kui : itemsUI) placeKeyUI(kui);
 
 	if (interactiveSimplificationUI != nullptr)
@@ -286,7 +290,7 @@ void AutomationUI::resized()
 	}
 }
 
-void AutomationUI::placeKeyUI(AutomationKeyUI* ui)
+void AutomationUIKeys::placeKeyUI(AutomationKeyUI* ui)
 {
 	if (ui == nullptr || !ui->isVisible()) return;
 
@@ -307,7 +311,7 @@ void AutomationUI::placeKeyUI(AutomationKeyUI* ui)
 
 }
 
-void AutomationUI::updateHandlesForUI(AutomationKeyUI* ui, bool checkSideItems)
+void AutomationUIKeys::updateHandlesForUI(AutomationKeyUI* ui, bool checkSideItems)
 {
 	if (ui == nullptr) return;
 
@@ -337,32 +341,29 @@ void AutomationUI::updateHandlesForUI(AutomationKeyUI* ui, bool checkSideItems)
 
 }
 
-void AutomationUI::setPreviewMode(bool value)
+void AutomationUIKeys::setPreviewMode(bool value)
 {
 	previewMode = value;
 	if (previewMode)
 	{
 		for (auto& kui : itemsUI) kui->setVisible(false);
 	}
-	else
-	{
-		updateItemsVisibility();
-	}
-
+	
 	resized();
-	repaint();
+	autoUI->setRepaint(true, true, true);
 }
 
-void AutomationUI::setViewRange(float start, float end)
+void AutomationUIKeys::setViewRange(float start, float end)
 {
+	if(viewPosRange.getX() == start && viewPosRange.getY() == end) return;
 	viewPosRange.setXY(start, end);
 	viewLength = viewPosRange.y - viewPosRange.x;
 
 	resized();
-	shouldRepaint = true;
+	autoUI->setRepaint(true, true, false);
 }
 
-void AutomationUI::updateItemsVisibility()
+void AutomationUIKeys::updateItemsVisibility()
 {
 	if (itemsUI.size() == 0) return;
 	if (previewMode) return;
@@ -376,14 +377,14 @@ void AutomationUI::updateItemsVisibility()
 	}
 }
 
-void AutomationUI::addItemUIInternal(AutomationKeyUI* ui)
+void AutomationUIKeys::addItemUIInternal(AutomationKeyUI* ui)
 {
 	ui->addMouseListener(this, true);
 	ui->item->addAsyncKeyListener(this);
 	ui->addKeyUIListener(this);
 }
 
-void AutomationUI::removeItemUIInternal(AutomationKeyUI* ui)
+void AutomationUIKeys::removeItemUIInternal(AutomationKeyUI* ui)
 {
 	ui->removeMouseListener(this);
 	if (!ui->inspectable.wasObjectDeleted())
@@ -393,7 +394,7 @@ void AutomationUI::removeItemUIInternal(AutomationKeyUI* ui)
 	}
 }
 
-void AutomationUI::mouseDown(const MouseEvent& e)
+void AutomationUIKeys::mouseDown(const MouseEvent& e)
 {
 	if (e.eventComponent == this)
 	{
@@ -410,7 +411,7 @@ void AutomationUI::mouseDown(const MouseEvent& e)
 		}
 		else
 		{
-			if (!e.mods.isRightButtonDown() || showMenuOnRightClick)
+			if (!e.mods.isRightButtonDown() || autoUI->showMenuOnRightClick)
 			{
 				BaseManagerUI::mouseDown(e);
 			}
@@ -419,12 +420,12 @@ void AutomationUI::mouseDown(const MouseEvent& e)
 	else if (AutomationKeyHandle* handle = dynamic_cast<AutomationKeyHandle*>(e.eventComponent))
 	{
 		snapTimes.clear();
-		if (getSnapTimesFunc != nullptr) getSnapTimesFunc(&snapTimes, handle->key);
+		if (autoUI->getSnapTimesFunc != nullptr) autoUI->getSnapTimesFunc(&snapTimes, handle->key);
 		//snapTimes.removeAllInstancesOf(handle->key->position->floatValue());
 	}
 }
 
-void AutomationUI::mouseDrag(const MouseEvent& e)
+void AutomationUIKeys::mouseDrag(const MouseEvent& e)
 {
 
 	if (AutomationKeyHandle* handle = dynamic_cast<AutomationKeyHandle*>(e.eventComponent))
@@ -540,7 +541,7 @@ void AutomationUI::mouseDrag(const MouseEvent& e)
 	}
 }
 
-void AutomationUI::mouseUp(const MouseEvent& e)
+void AutomationUIKeys::mouseUp(const MouseEvent& e)
 {
 	if (paintingMode)
 	{
@@ -555,7 +556,7 @@ void AutomationUI::mouseUp(const MouseEvent& e)
 	}
 }
 
-void AutomationUI::mouseDoubleClick(const MouseEvent& e)
+void AutomationUIKeys::mouseDoubleClick(const MouseEvent& e)
 {
 	if (e.eventComponent == this)
 	{
@@ -569,12 +570,12 @@ void AutomationUI::mouseDoubleClick(const MouseEvent& e)
 	}
 }
 
-void AutomationUI::addItemFromMenu(AutomationKey* k, bool fromAddbutton, Point<int> pos)
+void AutomationUIKeys::addItemFromMenu(AutomationKey* k, bool fromAddbutton, Point<int> pos)
 {
 	manager->addKey(getPosForX(pos.x), getValueForY(pos.y), true);
 }
 
-void AutomationUI::addMenuExtraItems(PopupMenu& p, int startIndex)
+void AutomationUIKeys::addMenuExtraItems(PopupMenu& p, int startIndex)
 {
 	//p.addSeparator();
 	PopupMenu em;
@@ -586,9 +587,8 @@ void AutomationUI::addMenuExtraItems(PopupMenu& p, int startIndex)
 	p.addSubMenu("Change all easings", em);
 }
 
-void AutomationUI::handleMenuExtraItemsResult(int result, int startIndex)
+void AutomationUIKeys::handleMenuExtraItemsResult(int result, int startIndex)
 {
-	//Easing::Type t = (Easing::Type)(result - startIndex);
 	String typeName = Easing::typeNames[result - startIndex];
 
 	Array<UndoableAction*> actions;
@@ -600,59 +600,59 @@ void AutomationUI::handleMenuExtraItemsResult(int result, int startIndex)
 	UndoMaster::getInstance()->performActions("Change all easings", actions);
 }
 
-Component* AutomationUI::getSelectableComponentForItemUI(AutomationKeyUI* ui)
+Component* AutomationUIKeys::getSelectableComponentForItemUI(AutomationKeyUI* ui)
 {
 	return &ui->handle;
 }
 
-Point<float> AutomationUI::getViewPos(Point<int> pos, bool relative)
+Point<float> AutomationUIKeys::getViewPos(Point<int> pos, bool relative)
 {
 	return Point<float>(getPosForX(pos.x, relative), getValueForY(pos.y, relative));
 }
 
-Rectangle<float> AutomationUI::getViewBounds(Rectangle<int> pos, bool relative)
+Rectangle<float> AutomationUIKeys::getViewBounds(Rectangle<int> pos, bool relative)
 {
 	Rectangle<float> r = Rectangle<float>(getViewPos(pos.getBottomLeft()), getViewPos(pos.getTopRight()));
 	if (relative) r.setPosition(0, 0);
 	return r;
 }
 
-Point<int> AutomationUI::getPosInView(Point<float> pos, bool relative)
+Point<int> AutomationUIKeys::getPosInView(Point<float> pos, bool relative)
 {
 	return Point<int>(getXForPos(pos.x, relative), getYForValue(pos.y, relative));
 }
 
-Rectangle<int> AutomationUI::getBoundsInView(Rectangle<float> pos, bool relative)
+Rectangle<int> AutomationUIKeys::getBoundsInView(Rectangle<float> pos, bool relative)
 {
 	Rectangle<int> r = Rectangle<int>(getPosInView(pos.getTopLeft()), getPosInView(pos.getBottomRight()));
 	if (relative) r.setPosition(0, 0);
 	return r;
 }
 
-float AutomationUI::getPosForX(int x, bool relative)
+float AutomationUIKeys::getPosForX(int x, bool relative)
 {
 	float rel = (x * 1.0f / getWidth()) * viewLength;
 	return relative ? rel : viewPosRange.x + rel;
 }
 
-int AutomationUI::getXForPos(float x, bool relative)
+int AutomationUIKeys::getXForPos(float x, bool relative)
 {
 	return ((relative ? x : x - viewPosRange.x) / viewLength) * getWidth();
 }
 
-float AutomationUI::getValueForY(int y, bool relative)
+float AutomationUIKeys::getValueForY(int y, bool relative)
 {
 	float valRange = (manager->viewValueRange->y - manager->viewValueRange->x);
 	float rel = (1 - y * 1.0f / getHeight());
 	return relative ? (1 - rel) * valRange : manager->viewValueRange->x + rel * valRange;
 }
 
-int AutomationUI::getYForValue(float x, bool relative)
+int AutomationUIKeys::getYForValue(float x, bool relative)
 {
 	return (1 - (relative ? x : x - manager->viewValueRange->x) / (manager->viewValueRange->y - manager->viewValueRange->x)) * getHeight();
 }
 
-void AutomationUI::newMessage(const AutomationKey::AutomationKeyEvent& e)
+void AutomationUIKeys::newMessage(const AutomationKey::AutomationKeyEvent& e)
 {
 	switch (e.type)
 	{
@@ -670,23 +670,25 @@ void AutomationUI::newMessage(const AutomationKey::AutomationKeyEvent& e)
 	}
 }
 
-void AutomationUI::newMessage(const ContainerAsyncEvent& e)
+void AutomationUIKeys::newMessage(const ContainerAsyncEvent& e)
 {
 	if (e.targetControllable == nullptr || e.targetControllable.wasObjectDeleted() || inspectable.wasObjectDeleted()) return;
 	if (e.type == ContainerAsyncEvent::ControllableFeedbackUpdate)
 	{
 		if (e.targetControllable == manager->value || e.targetControllable == manager->position)
 		{
-			shouldRepaint = true;
+			bool refreshOverlay = !manager->interactiveSimplifiedPoints.isEmpty() || (manager->recorder != nullptr && manager->recorder->isRecording->boolValue()) || (paintingMode && paintingPoints.size() > 0);
+
+			autoUI->setRepaint(false,refreshOverlay,false);
 		}
-		else if (manager->items.size() > 0 && (e.targetControllable->parentContainer == manager->items[0] || e.targetControllable->parentContainer == manager->items[manager->items.size() - 1]))
+		if (manager->items.size() > 0 && (e.targetControllable->parentContainer == manager->items[0] || e.targetControllable->parentContainer == manager->items[manager->items.size() - 1]))
 		{
-			shouldRepaint = true;
+			autoUI->setRepaint(true, false, false);
 		}
 		else if (e.targetControllable == manager->viewValueRange)
 		{
 			resized();
-			shouldRepaint = true;
+			autoUI->setRepaint(true, true, true);
 		}
 		else if (e.targetControllable == manager->length)
 		{
@@ -698,7 +700,7 @@ void AutomationUI::newMessage(const ContainerAsyncEvent& e)
 	}
 }
 
-void AutomationUI::newMessage(const Automation::AutomationEvent& e)
+void AutomationUIKeys::newMessage(const Automation::AutomationEvent& e)
 {
 	if (e.type == e.INTERACTIVE_SIMPLIFICATION_CHANGED)
 	{
@@ -733,7 +735,7 @@ void AutomationUI::newMessage(const Automation::AutomationEvent& e)
 	}
 }
 
-void AutomationUI::keyEasingHandleMoved(AutomationKeyUI* ui, bool syncOtherHandle, bool isFirst)
+void AutomationUIKeys::keyEasingHandleMoved(AutomationKeyUI* ui, bool syncOtherHandle, bool isFirst)
 {
 	if (syncOtherHandle)
 	{
@@ -769,16 +771,7 @@ void AutomationUI::keyEasingHandleMoved(AutomationKeyUI* ui, bool syncOtherHandl
 	}
 }
 
-void AutomationUI::timerCallback()
-{
-	if (shouldRepaint)
-	{
-		repaint();
-		shouldRepaint = false;
-	}
-}
-
-void AutomationUI::buttonClicked(Button* b)
+void AutomationUIKeys::buttonClicked(Button* b)
 {
 	if (b == validInteractiveBT.get())
 	{
@@ -790,3 +783,127 @@ void AutomationUI::buttonClicked(Button* b)
 	}
 }
 
+
+
+AutomationUILayer::AutomationUILayer(AutomationUI* _ui, int _id) :
+	ui(_ui),
+	id(_id)
+{
+	setInterceptsMouseClicks(false,false);
+	if(id == 1)
+		setBufferedToImage(true);
+}
+
+void AutomationUILayer::paint(juce::Graphics& g)
+{
+	if(!isShowing()) return;
+
+	if(id == 0){
+		ui->keysUI.paintOverlay(g);
+	}else if(id == 1){
+		ui->keysUI.paintBackground(g);
+	}else{
+		//draw current point
+		g.setColour(BLUE_COLOR);
+		g.fillEllipse(Rectangle<float>(0, 0, 6, 6));
+	}
+	//ui->validatePaint();
+}
+
+void AutomationUILayer::resized()
+{
+}
+
+
+
+
+AutomationUI::AutomationUI(Automation* manager) :
+	UITimerTarget(ORGANICUI_DEFAULT_TIMER, "AutomationUI"),
+	keysUI(manager, this),
+	overlay(this, 0),
+	background(this, 1),
+	cursor(this, 2),
+	showNumberLines(true),
+	showMenuOnRightClick(true),
+	lastRepaintOverlayPoint(-1,-1),
+	overlayStartY(0)
+{
+	setInterceptsMouseClicks(false,true);
+
+	addAndMakeVisible(&background);
+	addAndMakeVisible(&keysUI);
+	addAndMakeVisible(&overlay);
+	addAndMakeVisible(&cursor);
+}
+
+void AutomationUI::paint(juce::Graphics& g)
+{
+}
+
+void AutomationUI::resized()
+{
+	shouldResize = true;
+	shouldRepaint = true;
+}
+
+void AutomationUI::setRepaint(bool _keys, bool _overlay, bool _background)
+{
+	if(_background) background.repaint();
+
+	shouldRepaint = true;
+	shouldRepaintKeys = _keys;
+	shouldRepaintOverlay = _overlay;
+}
+
+void AutomationUI::paintOverChildren(Graphics& g)
+{
+	validatePaint();
+}
+
+void AutomationUI::handlePaintTimerInternal()
+{
+	bool display = isShowing();
+
+	int lastOverlayY = lastRepaintOverlayPoint.getY();
+	overlayStartY = keysUI.getYForValue(keysUI.manager->value->floatValue());
+	int newXpos = keysUI.getXForPos(keysUI.manager->position->floatValue());
+
+	if(overlayStartY != lastOverlayY || lastRepaintOverlayPoint.getX() != newXpos){
+		cursor.setBounds(newXpos - 3, overlayStartY - 3, 6, 6);
+
+		lastRepaintOverlayPoint.setXY(newXpos, overlayStartY);
+	}
+
+	if(shouldResize)
+	{
+		keysUI.setBounds(getLocalBounds());
+		overlay.setBounds(getLocalBounds());
+		background.setBounds(getLocalBounds());
+		lastRepaintOverlayPoint = Point<int>(0,0);
+		shouldResize = false;
+		return;
+	}
+
+	if(!display) return;
+
+	if(shouldRepaintKeys){
+		keysUI.repaint();
+		shouldRepaintKeys = false;
+	}
+
+	if(shouldRepaintOverlay){
+		overlay.repaint();
+		shouldRepaintOverlay = false;
+		return;
+	}
+
+	if(!disableOverlayFill && overlayStartY != lastOverlayY){
+		int startX,width,startY,height;
+		startX = overlay.getX();
+		width = overlay.getWidth();
+		startY = jmin(overlayStartY, lastOverlayY);
+		height = abs(overlayStartY - lastOverlayY);
+
+		overlay.repaint(startX, startY, width, height);
+	}
+}

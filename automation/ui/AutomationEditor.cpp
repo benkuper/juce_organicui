@@ -50,9 +50,9 @@ void AutomationEditor::resetAndBuild()
 		{
 			automationUI.reset(new AutomationUI(automation));
 
-			automationUI->bgColor = BG_COLOR;
-			automationUI->transparentBG = false;
-			automationUI->autoAdaptViewRange = true;
+			automationUI->keysUI.bgColor = BG_COLOR;
+			automationUI->keysUI.transparentBG = false;
+			automationUI->keysUI.autoAdaptViewRange = true;
 			addAndMakeVisible(automationUI.get());
 			automationUI->setViewRange(0, automation->length->floatValue());
 		}

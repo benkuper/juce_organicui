@@ -125,7 +125,9 @@ const bool CustomLoggerUI::isPrimaryRow(const int r) const
 		{
 			return true;
 		}
-		count += logger->logElements.getUnchecked(idx)->getNumLines();
+		if (logger->logElements.size() <= idx) return false;
+
+		count += logger->logElements[idx]->getNumLines();
 		idx++;
 
 	}
@@ -182,7 +184,7 @@ const LogElement* CustomLoggerUI::getElementForRow(const int r) const {
 const String  CustomLoggerUI::getTimeStringForRow(const int r) const
 {
 	if (auto el = getElementForRow(r)) {
-		return String(el->time.toString(false, true, true, true) + "." + String::formatted("%03d",el->time.getMilliseconds()));
+		return String(el->time.toString(false, true, true, true) + "." + String::formatted("%03d", el->time.getMilliseconds()));
 	}
 
 	return "";
@@ -292,7 +294,7 @@ void CustomLoggerUI::timerCallback()
 	stopTimer();
 
 	updateTotalLogRow();
-	
+
 	//DBG("Handle Async Update");
 //    auto cTime = Time::getMillisecondCounter();
 //    if(cTime - lastUpdateTime < 500 ){

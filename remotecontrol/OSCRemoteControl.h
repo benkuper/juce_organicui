@@ -47,6 +47,9 @@ public:
 	BoolParameter* logOutgoing;
 	BoolParameter* sendFeedbackOnListen;
 	BoolParameter* enableSendLogFeedback;
+	BoolParameter* allowAddressReuse;
+	BoolParameter* autoIncrementOnServerFail;
+	int portIncrement;
 
 	EnablingControllableContainer manualSendCC;
 	juce::OSCSender manualSender;
@@ -90,7 +93,8 @@ public:
 	void setupServer();
 	bool handleHTTPRequest(std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request) override;
 
-
+	void serverInitSuccess() override;
+	void serverInitError(const juce::String& message) override;
 	void connectionOpened(const juce::String& id) override;
 	void messageReceived(const juce::String& id, const juce::String& message) override;
 	void dataReceived(const juce::String& id, const juce::MemoryBlock& data) override;
