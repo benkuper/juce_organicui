@@ -107,7 +107,7 @@ String WarningTarget::getWarningMessage(const String& id) const
 	if (id == warningAllId)
 	{
 		HashMap<String, String>::Iterator it(warningMessage);
-		while (it.next()) result += (it.getKey() != warningNoId ? "[" + it.getKey() + "] " : "") + it.getValue();
+		while (it.next()) result += (result.isNotEmpty()?"\n":"") + (it.getKey() != warningNoId ? "[" + it.getKey() + "] " : "") + it.getValue();
 	}
 	else if (warningMessage.contains(id))
 	{
