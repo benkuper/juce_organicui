@@ -584,7 +584,9 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 
 				if (fileData.isObject())
 				{
-					if (ControllableContainer* cc = data["address"] == "/" ? Engine::mainEngine : Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true))
+					String addr = data.getProperty("address", "/");
+					ControllableContainer* cc = addr == "/" ? Engine::mainEngine : Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true);
+					if (cc != nullptr)
 					{
 						MessageManager::callAsync([cc, fileData]() { cc->handleLoadFromRemoteControl(fileData); });
 					}
@@ -592,7 +594,9 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 			}
 			else if (command == "SAVE")
 			{
-				if (ControllableContainer* cc = data["address"] == "/" ? Engine::mainEngine : Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true))
+				String addr = data.getProperty("address", "/");
+				ControllableContainer* cc = addr == "/" ? Engine::mainEngine : Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true);
+				if (cc != nullptr)
 				{
 					var saveData = cc->handleSaveFromRemoteControl();
 					if (saveData.isObject())
