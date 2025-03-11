@@ -38,7 +38,7 @@ public:
 	~OrganicUITimers() {}
 
 	juce::HashMap<int, juce::Array<juce::WeakReference<UITimerTarget>>> timerMap;
-	juce::HashMap<int, juce::uint32> lastRepaintTimes;
+	juce::HashMap<int, int> lastRepaintTimes;
 #ifdef ORGANICUI_LOG_FPS_DEBUG
 	juce::HashMap<int, int> fps;
 #endif
