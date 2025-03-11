@@ -42,8 +42,7 @@ void OrganicUITimers::timerCallback(int timerID)
 		Array<WeakReference<UITimerTarget>> params = timerMap[timerID];
 
 		if(lastRepaintTimes.contains(timerID)){
-			juce::uint32 timeDiff = juce::Time::getMillisecondCounter() - lastRepaintTimes[timerID];
-
+			int timeDiff = juce::Time::getMillisecondCounter() - lastRepaintTimes[timerID];
 			if(timeDiff < (getTimerInterval(timerID) * 13 / 10)) return;
 		}
 
