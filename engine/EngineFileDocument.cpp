@@ -15,6 +15,7 @@
 static OrganicApplication& getApp();
 String getAppVersion();
 ApplicationProperties& getAppProperties();
+OrganicApplication::MainWindow* getMainWindow();
 
 String Engine::getDocumentTitle() {
 	if (!getFile().exists())
@@ -26,6 +27,7 @@ String Engine::getDocumentTitle() {
 void Engine::changed()
 {
 	FileBasedDocument::changed();
+	lastChangeTime = Time::getCurrentTime();
 	engineListeners.call(&EngineListener::fileChanged);
 	engineNotifier.addMessage(new EngineEvent(EngineEvent::FILE_CHANGED, this));
 }
@@ -41,7 +43,6 @@ void Engine::createNewGraph() {
 
 	engineListeners.call(&EngineListener::startLoadFile);
 	engineNotifier.addMessage(new EngineEvent(EngineEvent::START_LOAD_FILE, this));
-
 
 
 	afterLoadFileInternal();
@@ -64,6 +65,12 @@ void Engine::createNewGraph() {
 
 Result Engine::loadDocument(const File& file) {
 
+	if (checkAutoRestoreAutosave(file, [this](const juce::File& f) { loadDocumentNoCheck(f); })) return Result::ok();
+	return loadDocumentNoCheck(file);
+}
+
+juce::Result Engine::loadDocumentNoCheck(const juce::File& file)
+{
 	if (isLoadingFile) {
 		// TODO handle quick reloading of file
 		return Result::fail("engine already loading");
@@ -134,6 +141,7 @@ void Engine::loadDocumentAsync(const File& file) {
 
 	jsonData = var();
 	setChangedFlag(false);
+	lastChangeTime = file.getLastModificationTime();
 }
 
 
@@ -198,6 +206,8 @@ Result Engine::saveDocument(const File& file) {
 	setChangedFlag(false);
 	file.setAsCurrentWorkingDirectory();
 
+	lastChangeTime = Time::getCurrentTime();
+
 	engineListeners.call(&EngineListener::fileSaved, !sameFile);
 	engineNotifier.addMessage(new EngineEvent(EngineEvent::FILE_SAVED, this));
 
@@ -233,6 +243,7 @@ juce::Result Engine::saveCopy()
 
 Result Engine::saveBackupDocument(int index)
 {
+	if (GlobalSettings::getInstance()->autoSaveOnChangeOnly->boolValue() && !hasChangedSinceSaved()) return Result::ok();
 
 	if (!getFile().existsAsFile()) return Result::ok();
 
@@ -240,7 +251,6 @@ Result Engine::saveBackupDocument(int index)
 	File autoSaveDir = getFile().getParentDirectory().getChildFile(curFileName + "_autosave");
 	autoSaveDir.createDirectory();
 	File backupFile = autoSaveDir.getChildFile(curFileName + "_autosave_" + String(index) + fileExtension);
-	//DBG(backupFile.getFullPathName() << " : " << (int)backupFile.exists());
 	var data = getJSONData();
 
 	if (backupFile.exists()) backupFile.deleteFile();
@@ -254,6 +264,10 @@ Result Engine::saveBackupDocument(int index)
 
 	JSON::writeToStream(*os, data);
 	os->flush();
+
+	if (GlobalSettings::getInstance()->logAutosave->boolValue()) LOG("Saved backup to " << backupFile.getFullPathName());
+
+	lastChangeTime = Time::getCurrentTime(); //needed to avoid detecting latest autosave as more recent than current file
 
 	return Result::ok();
 }
@@ -302,9 +316,6 @@ File Engine::getLastDocumentOpened() {
 	return recentFiles.getFile(0);
 }
 
-
-
-
 void Engine::setLastDocumentOpened(const File& file) {
 
 	RecentlyOpenedFilesList recentFiles;
@@ -316,6 +327,61 @@ void Engine::setLastDocumentOpened(const File& file) {
 	getAppProperties().getUserSettings()->setValue(lastFileListKey, recentFiles.toString());
 
 }
+
+bool Engine::checkAutoRestoreAutosave(const juce::File& originalFile, std::function<void(const juce::File&)> cancelCallback)
+{
+	if (!GlobalSettings::getInstance()->autoAskRestore->boolValue()) return false;
+	if (getMainWindow() == nullptr) return false; //only ask if there is a window
+
+	String curFileName = originalFile.getFileNameWithoutExtension();
+	File autoSaveDir = originalFile.getParentDirectory().getChildFile(curFileName + "_autosave");
+	autoSaveDir.createDirectory();
+	Array<File> files = autoSaveDir.findChildFiles(File::findFiles, false, "*" + fileExtension);
+	std::sort(files.begin(), files.end(), [](const File& a, const File& b) { return a.getLastModificationTime() > b.getLastModificationTime(); });
+
+	if (files.isEmpty()) return false;
+
+	File lastAutoSave = files.getFirst();
+	if (lastAutoSave.getLastModificationTime() <= originalFile.getLastModificationTime()) return false;
+
+	AlertWindow::showOkCancelBox(
+		AlertWindow::AlertIconType::QuestionIcon, "Restore autosave ?", "A more recent autosave file has been found, do you want to restore it ?", "Yes", "No", nullptr,
+		ModalCallbackFunction::create([this, originalFile, lastAutoSave, cancelCallback](int result)
+			{
+				if (result == 1)
+				{
+					this->restoreAutosave(originalFile, lastAutoSave);
+				}
+				else if (cancelCallback != nullptr)
+				{
+					cancelCallback(originalFile);
+				}
+			}));
+
+	return true;
+}
+
+void Engine::restoreAutosave(const juce::File& originalFile, const juce::File& autosaveFile)
+{
+	if (!autosaveFile.existsAsFile())
+	{
+		LOGERROR("Autosave file does not exist");
+		return;
+	}
+	// Copy autosave file to current file
+	if (originalFile.existsAsFile())
+	{
+		originalFile.deleteFile();
+	}
+	if (!autosaveFile.copyFileTo(originalFile))
+	{
+		LOGERROR("Failed to copy autosave file to current file");
+		return;
+	}
+	// Reload the document
+	loadDocument(originalFile);
+}
+
 
 var Engine::getJSONData(bool includeNonOverriden)
 {

@@ -68,9 +68,12 @@ GlobalSettings::GlobalSettings() :
 
 	enableAutoSave = saveLoadCC.addBoolParameter("Enable auto-save", "When enabled, a backup file will be saved every 5 min", true);
 	autoSaveCurrentFile = saveLoadCC.addBoolParameter("Auto-save current file", "If checked, the current file will be saved as well when auto-saving", false);
+	autoSaveOnChangeOnly = saveLoadCC.addBoolParameter("Auto-save on change only", "If checked, the auto-save will only save when a change is detected", true);
+	autoAskRestore = saveLoadCC.addBoolParameter("Ask to restore on startup", "If checked, the app will ask to restore the auto-saved file on startup if a more recent auto-saved file has been found", true);
 	autoSaveCount = saveLoadCC.addIntParameter("Auto-save count", "The number of backup files to auto-save", 10, 1, 100);
 	autoSaveTime = saveLoadCC.addIntParameter("Auto-save time", "The time in minutes between two auto-saves (will)", 5, 1, 100);
 	compressOnSave = saveLoadCC.addBoolParameter("Compress file", "If checked, the JSON content will be minified, otherwise it will be human-readable but larger size as well", true);
+	logAutosave = saveLoadCC.addBoolParameter("Log auto-save", "If checked, the auto-save will be logged in the logger", true);
 
 	actionOnCrash = saveLoadCC.addEnumParameter("Action On Crash", "This determines what to do on a crash. Default shows the crash report window");
 	actionOnCrash->addOption("Report", REPORT)->addOption("Kill", KILL)->addOption("Reopen", REOPEN)->addOption("Recover", RECOVER);
