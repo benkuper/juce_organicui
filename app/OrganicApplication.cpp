@@ -89,6 +89,8 @@ void OrganicApplication::initialise(const String& commandLine)
 	WarningReporter::getInstance(); //force creation after engine creation
 	GlobalSettings::getInstance()->selectionManager = InspectableSelectionManager::mainSelectionManager;
 
+	afterSettingsLoaded();
+
 	if (useWindow)
 	{
 		jassert(engine != nullptr);
