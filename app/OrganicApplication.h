@@ -56,6 +56,7 @@ public:
 
 	void initialise(const juce::String& /*commandLine*/) override;
 	virtual void initialiseInternal(const juce::String&) = 0;
+	virtual void afterSettingsLoaded() {}
 	virtual void afterInit() {}
 
 	virtual void shutdown() override;
