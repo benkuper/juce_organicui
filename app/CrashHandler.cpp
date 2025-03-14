@@ -95,34 +95,39 @@ void CrashDumpUploader::handleCrash(int e)
 
 	crashAction = GlobalSettings::getInstance()->actionOnCrash->getValueDataAsEnum<GlobalSettings::CrashAction>();
 
-	if (getApp().useWindow && crashAction == GlobalSettings::REPORT)
-	{
-		traceFile = recoveredFile.getParentDirectory().getChildFile("crashlog.txt");
+
+	traceFile = recoveredFile.getParentDirectory().getChildFile("crashlog.txt");
 
 #if JUCE_WINDOWS
-		dumpFile = recoveredFile.getParentDirectory().getChildFile("crashlog.dmp");
+	dumpFile = recoveredFile.getParentDirectory().getChildFile("crashlog.dmp");
 #else
-		dumpFile = File();
+	dumpFile = File();
 #endif
 
-		if (traceFile.existsAsFile()) traceFile.deleteFile();
-		if (dumpFile.existsAsFile()) dumpFile.deleteFile();
+	if (traceFile.existsAsFile()) traceFile.deleteFile();
+	if (dumpFile.existsAsFile()) dumpFile.deleteFile();
 
-		createDumpAndStrackTrace(e, dumpFile, traceFile);
+	createDumpAndStrackTrace(e, dumpFile, traceFile);
 
 
+	if (getApp().useWindow && crashAction == GlobalSettings::REPORT)
+	{
 		w.reset(new UploadWindow());
 		DialogWindow::showDialog("Got crashed ?", w.get(), getMainWindow(), Colours::black, true);
 
 		MessageManager::getInstance()->runDispatchLoop();
-
-		doUpload = true; //by default, unless hit cancel
 
 		exitApp();
 
 	}
 	else
 	{
+		if (GlobalSettings::getInstance()->autoSendCrashLog->boolValue())
+		{
+			LOG("Uploading crash...");
+			uploadCrash();
+		}
+
 		exitApp();
 	}
 }
@@ -224,7 +229,6 @@ void CrashDumpUploader::uploadCrash()
 		w.reset();
 	}
 
-	MessageManager::getInstance()->stopDispatchLoop();
 }
 
 bool CrashDumpUploader::openStreamProgressCallback(int bytesDownloaded, int totalLength)
@@ -259,6 +263,7 @@ void CrashDumpUploader::exitApp()
 void CrashDumpUploader::run()
 {
 	uploadCrash();
+	MessageManager::getInstance()->stopDispatchLoop();
 }
 
 #if JUCE_WINDOWS
