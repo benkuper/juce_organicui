@@ -29,8 +29,7 @@ juce_ImplementSingleton(CrashDumpUploader)
 OrganicApplication::MainWindow* getMainWindow();
 
 CrashDumpUploader::CrashDumpUploader() :
-	Thread("Crashdump")
-	uploadFile(true),
+	Thread("Crashdump"),
 	progress("Upload Progress", "", 0, 0, 1)
 {
 
