@@ -472,13 +472,16 @@ void Engine::loadJSONData(var data, ProgressTask* loadingTask)
 						{
 						case 1: //update
 						{
-							//var postData = new DynamicObject();
-							//postData.getDynamicObject()->setProperty("file", );
 							data.getDynamicObject()->setProperty("appVersion", getAppVersion());
 							URL url = URL(convertURL).withPOSTData(JSON::toString(data, true));
 							WebInputStream stream(url, true);
 
-							String convertedData = stream.withExtraHeaders("Content-Type: Text/plain").readEntireStreamAsString();
+							StringArray headers;
+							headers.add("Content-Type : application/json");
+							headers.add("Accept : application/json");
+							headers.add("User-Agent : " + String(ProjectInfo::projectName) + "/1.0");
+
+							String convertedData = stream.withExtraHeaders(headers.joinIntoString("\r\n")).readEntireStreamAsString();
 							if (convertedData.isEmpty())
 							{
 								AlertWindow::showMessageBoxAsync(AlertWindow::AlertIconType::WarningIcon, "Update error", "Could not connect to the update server, please make sure you are connected to internet. You can still reload your file and not update it.", "Well, shit happens");
@@ -486,6 +489,7 @@ void Engine::loadJSONData(var data, ProgressTask* loadingTask)
 								return;
 							}
 
+							LOG(convertedData);
 							var cData = JSON::parse(convertedData);
 
 							if (cData.isVoid())
