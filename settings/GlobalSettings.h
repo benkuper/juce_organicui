@@ -59,12 +59,16 @@ public:
 	ControllableContainer saveLoadCC;
 	BoolParameter * enableAutoSave;
 	BoolParameter* autoSaveCurrentFile;
+	BoolParameter* autoSaveOnChangeOnly;
+	BoolParameter* autoAskRestore;
 	IntParameter * autoSaveCount;
 	IntParameter* autoSaveTime;
+	BoolParameter* logAutosave;
 
 	BoolParameter* compressOnSave;
 	enum CrashAction { REPORT, KILL, REOPEN, RECOVER };
 	EnumParameter* actionOnCrash;
+	BoolParameter* autoSendCrashLog;
 	StringParameter* crashContactEmail;
 	BoolParameter* saveLogsToFile;
 

@@ -44,6 +44,7 @@ public:
 	juce::String lastFileAbsolutePath; //Used for checking in saveDocument if new file is different
 
 	int autoSaveIndex;
+	juce::Time lastChangeTime;
 
 	virtual void changed() override;
 	void createNewGraph();
@@ -61,6 +62,7 @@ public:
 	//  inherited from FileBasedDocument
 	juce::String getDocumentTitle()override;
 	juce::Result loadDocument(const juce::File& file) override;
+	juce::Result loadDocumentNoCheck(const juce::File& file);
 	juce::Result saveDocument(const juce::File& file) override;
 	juce::Result saveCopy();
 	juce::Result saveBackupDocument(int index);
@@ -69,6 +71,9 @@ public:
 
 	juce::File getLastDocumentOpened() override;
 	void setLastDocumentOpened(const juce::File& file) override;
+
+	bool checkAutoRestoreAutosave(const juce::File& originalFile, std::function<void(const juce::File&)> cancelCallback);
+	void restoreAutosave(const juce::File& originalFile, const juce::File& autosaveFile);
 
 	//    #if JUCE_MODAL_LOOPS_PERMITTED
 	//     File getSuggestedSaveAsFile (const File& defaultFile)override;

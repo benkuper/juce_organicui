@@ -89,6 +89,8 @@ void OrganicApplication::initialise(const String& commandLine)
 	WarningReporter::getInstance(); //force creation after engine creation
 	GlobalSettings::getInstance()->selectionManager = InspectableSelectionManager::mainSelectionManager;
 
+	afterSettingsLoaded();
+
 	if (useWindow)
 	{
 		jassert(engine != nullptr);
@@ -136,6 +138,9 @@ void OrganicApplication::initialise(const String& commandLine)
 
 void OrganicApplication::shutdown()
 {
+	CrashDumpUploader::deleteInstance();
+	AppUpdater::deleteInstance();
+
 	if (mainComponent == nullptr) return;
 
 	saveGlobalSettings();
@@ -143,9 +148,6 @@ void OrganicApplication::shutdown()
 	// Add your application's shutdown code here..
 	mainComponent->clear();
 	mainWindow = nullptr; // (deletes our window)
-
-	CrashDumpUploader::deleteInstance();
-	AppUpdater::deleteInstance();
 
 }
 
