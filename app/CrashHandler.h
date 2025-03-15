@@ -12,7 +12,6 @@ public:
 	juce::URL remoteURL;
 	juce::Image crashImage;
 
-	bool doUpload;
 	bool uploadFile;
 	GlobalSettings::CrashAction crashAction;
 

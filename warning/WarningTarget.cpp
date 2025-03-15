@@ -24,30 +24,23 @@ void WarningTarget::setWarningMessage(const String& message, const String& id, b
 {
 	if (Engine::mainEngine != nullptr && Engine::mainEngine->isClearing) return;
 	if (WarningReporter::getInstanceWithoutCreating() == nullptr) return;
-    
-	if (warningMessage.contains(id))
-    {
-        if(warningMessage[id] == message) return;
-    }else
-    {
-        if(message.isEmpty()) return;
-    }
 
-	if (message.isEmpty())
+	if (warningMessage.contains(id))
 	{
+		if (warningMessage[id] == message) return;
 		warningMessage.remove(id);
-		if (warningMessage.size() == 0) WarningReporter::getInstance()->unregisterWarning(this);
 	}
 	else
 	{
-		if (log && Engine::mainEngine != nullptr && !Engine::mainEngine->isLoadingFile && !Engine::mainEngine->isClearing) LOGWARNING(message);
-        
-        if(!warningMessage.contains(id))
-        {
-            warningMessage.set(id, message);
-            WarningReporter::getInstance()->registerWarning(this);
-        }
+		if (message.isEmpty()) return;
 	}
+
+	if (warningMessage.size() == 0) WarningReporter::getInstance()->unregisterWarning(this);
+
+	if (log && Engine::mainEngine != nullptr && !Engine::mainEngine->isLoadingFile && !Engine::mainEngine->isClearing) LOGWARNING(message);
+
+	warningMessage.set(id, message);
+	WarningReporter::getInstance()->registerWarning(this);
 
 	notifyWarningChanged();
 }
@@ -107,7 +100,7 @@ String WarningTarget::getWarningMessage(const String& id) const
 	if (id == warningAllId)
 	{
 		HashMap<String, String>::Iterator it(warningMessage);
-		while (it.next()) result += (result.isNotEmpty()?"\n":"") + (it.getKey() != warningNoId ? "[" + it.getKey() + "] " : "") + it.getValue();
+		while (it.next()) result += (result.isNotEmpty() ? "\n" : "") + (it.getKey() != warningNoId ? "[" + it.getKey() + "] " : "") + it.getValue();
 	}
 	else if (warningMessage.contains(id))
 	{

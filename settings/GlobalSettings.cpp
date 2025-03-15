@@ -77,6 +77,7 @@ GlobalSettings::GlobalSettings() :
 
 	actionOnCrash = saveLoadCC.addEnumParameter("Action On Crash", "This determines what to do on a crash. Default shows the crash report window");
 	actionOnCrash->addOption("Report", REPORT)->addOption("Kill", KILL)->addOption("Reopen", REOPEN)->addOption("Recover", RECOVER);
+	autoSendCrashLog = saveLoadCC.addBoolParameter("Auto send crash log", "If checked and action on crash is not Report, the crash log will be automatically sent to the developer team", true);
 
 	crashContactEmail = saveLoadCC.addStringParameter("Crash Contact Mail", "A mail address to use if you wish to be contacted by the developer team", "");
 
