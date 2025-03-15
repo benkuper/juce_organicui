@@ -162,8 +162,6 @@ void BaseItem::setMovePositionReferenceInternal()
 
 void BaseItem::movePosition(Point<float> positionOffset, bool moveOtherSelectedItems)
 {
-	if (positionOffset.x == 0 && positionOffset.y == 0) return;
-
 	setPosition(movePositionReference + positionOffset);
 	if (moveOtherSelectedItems)
 	{
