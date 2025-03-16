@@ -13,7 +13,6 @@ juce_ImplementSingleton(OSCRemoteControl)
 
 #if ORGANICUI_USE_WEBSERVER
 #include "OSCPacketHelper.h"
-#include "OSCRemoteControl.h"
 #endif
 
 #ifndef ORGANIC_REMOTE_CONTROL_PORT
@@ -1015,11 +1014,6 @@ void OSCRemoteControl::newMessage(const WarningReporter::WarningReporterEvent& e
 	sendPersistentWarningFeedback(e.target, e.targetAddress, e.type);
 }
 
-
-void OSCRemoteControl::newMessage(const WarningReporter::WarningReporterEvent& e)
-{
-	sendPersistentWarningFeedback(e.target, e.targetAddress, e.type);
-}
 #endif
 
 void OSCRemoteControl::sendAllManualFeedback()
