@@ -237,6 +237,11 @@ void Parameter::setValue(juce::var _value, bool silentSet, bool force, bool forc
 	if (!silentSet) notifyValueChanged();
 }
 
+void Parameter::resetLastUndoValue()
+{
+	lastUndoValue = getValue().clone();
+}
+
 
 bool Parameter::isComplex() const
 {
@@ -770,6 +775,7 @@ bool Parameter::ParameterSetValueAction::undo()
 	}
 
 	p->setValue(oldValue);
+	p->lastUndoValue = oldValue;
 	return true;
 }
 

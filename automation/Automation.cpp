@@ -343,7 +343,11 @@ void Automation::setUnitSteps(float unitSteps)
 void Automation::addItemInternal(AutomationKey* k, var)
 {
 	k->position->unitSteps = positionUnitSteps;
-	if (positionUnitSteps > 0) k->position->setValue(k->position->getStepSnappedValueFor(k->position->floatValue()));
+	if (positionUnitSteps > 0)
+	{
+		k->position->setValue(k->position->getStepSnappedValueFor(k->position->floatValue()));
+		k->position->resetLastUndoValue();
+	}
 
 	if (!allowKeysOutside) k->position->setRange(0, length->floatValue());
 
