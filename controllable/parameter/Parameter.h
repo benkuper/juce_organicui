@@ -111,6 +111,7 @@ public:
 	virtual void resetValue(bool silentSet = false);
 	virtual juce::Array<juce::UndoableAction*> setUndoableValue(juce::var newValue, bool onlyReturnAction = false, bool setSimilarSelected = false);
 	virtual void setValue(juce::var _value, bool silentSet = false, bool force = false, bool forceOverride = true, bool setSimilarSelected = false);
+	virtual void resetLastUndoValue();
 	virtual void setValueInternal(juce::var& _value);
 
 	virtual bool checkValueIsTheSame(juce::var newValue, juce::var oldValue); //can be overriden to modify check behavior
