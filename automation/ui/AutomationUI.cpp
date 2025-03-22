@@ -29,7 +29,6 @@ AutomationUIKeys::AutomationUIKeys(Automation* manager, AutomationUI* _autoUI) :
 	setViewRange(0, manager->length->floatValue());
 
 	addExistingItems(false);
-	setSize(100, 100);
 	setInterceptsMouseClicks(false, true);
 	autoUI->addMouseListener(this, false);
 }
@@ -830,6 +829,8 @@ AutomationUI::AutomationUI(Automation* manager) :
 	addAndMakeVisible(&keysUI);
 	addAndMakeVisible(&overlay);
 	addAndMakeVisible(&cursor);
+
+	setSize(100, 100);
 }
 
 void AutomationUI::paint(juce::Graphics& g)
