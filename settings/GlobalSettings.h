@@ -80,11 +80,13 @@ public:
 	ControllableContainer launchArguments;
 
 	KeyMappingsContainer keyMappingsCC;
+	juce::var keyMappingsData; //ghosting to load after commands are set up
 
 	Trigger * testCrash;
 
 	void onControllableFeedbackUpdate(ControllableContainer *, Controllable * c) override;
 	void loadJSONDataInternal(juce::var data) override;
 
+	void loadKeyMappingsFromData();
 	void addLaunchArguments(const juce::String& commandLine, const CommandLineElements& elements);
 };

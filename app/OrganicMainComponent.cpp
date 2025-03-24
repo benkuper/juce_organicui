@@ -50,6 +50,7 @@ void OrganicMainContentComponent::init()
 
 	(&getCommandManager())->getKeyMappings()->resetToDefaultMappings();
 	addKeyListener((&getCommandManager())->getKeyMappings());
+	GlobalSettings::getInstance()->loadKeyMappingsFromData();
 
 	setupOpenGL();
 

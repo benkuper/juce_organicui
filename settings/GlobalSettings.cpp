@@ -159,6 +159,14 @@ void GlobalSettings::loadJSONDataInternal(var data)
 	fileToOpenOnStartup->setEnabled(openSpecificFileOnStartup->boolValue());
 }
 
+void GlobalSettings::loadKeyMappingsFromData()
+{
+
+	KeyPressMappingSet* kms = getCommandManager().getKeyMappings();
+	std::unique_ptr<XmlElement> element = XmlDocument::parse(keyMappingsData.toString());
+	if (element != nullptr) kms->restoreFromXml(*element);
+}
+
 void GlobalSettings::addLaunchArguments(const String& commandLine, const CommandLineElements& elements)
 {
 	launchArguments.addStringParameter("Command Line", "Full commandline", commandLine);
@@ -207,10 +215,7 @@ var KeyMappingsContainer::getJSONData(bool includeNonOverriden)
 void KeyMappingsContainer::loadJSONDataInternal(var data)
 {
 	ControllableContainer::loadJSONDataInternal(data);
-
-	KeyPressMappingSet* kms = getCommandManager().getKeyMappings();
-	std::unique_ptr<XmlElement> element = XmlDocument::parse(data.getProperty("keyMappings", "").toString());
-	if (element != nullptr) kms->restoreFromXml(*element);
+	var keyMappingsData = data.getProperty("keyMappings", "");
 }
 
 InspectableEditor* KeyMappingsContainer::getEditorInternal(bool isRoot, Array<Inspectable*> inspectables)
