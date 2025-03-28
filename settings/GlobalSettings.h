@@ -54,6 +54,7 @@ public:
 	IntParameter* fontSize;
 	EnumParameter* helpLanguage;
 	BoolParameter* useGLRenderer;
+	IntParameter* uiRefreshRate;
 	IntParameter* loggerRefreshRate;
 
 	ControllableContainer saveLoadCC;

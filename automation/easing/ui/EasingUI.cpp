@@ -8,10 +8,13 @@
   ==============================================================================
 */
 
+#include "JuceHeader.h"
+
 #pragma warning(disable:4244)
 
 EasingUI::EasingUI(Easing* e) :
 	InspectableContentComponent(e),
+	UITimerTarget(ORGANICUI_DEFAULT_TIMER, "EasingUI"),
 	easing(e),
 	showFirstHandle(false),
 	showLastHandle(false)
@@ -27,6 +30,11 @@ EasingUI::EasingUI(Easing* e) :
 EasingUI::~EasingUI()
 {
 	if (!easing.wasObjectDeleted()) easing->removeAsyncContainerListener(this);
+}
+
+void EasingUI::handlePaintTimerInternal()
+{
+	repaint();
 }
 
 void EasingUI::paint(Graphics& g)
@@ -192,7 +200,7 @@ void EasingUI::newMessage(const ContainerAsyncEvent& e)
 	if (e.type == ContainerAsyncEvent::ControllableFeedbackUpdate)
 	{
 		easingControllableFeedbackUpdate(e.targetControllable);
-		repaint();
+		shouldRepaint = true;
 	}
 }
 
@@ -334,7 +342,7 @@ void CubicEasingUI::easingControllableFeedbackUpdate(Controllable* c)
 	if (c == ce->anchor1 || c == ce->anchor2)
 	{
 		resized();
-		repaint();
+		shouldRepaint = true;
 	}
 }
 
@@ -344,7 +352,7 @@ void CubicEasingUI::setShowEasingHandles(bool showFirst, bool showLast)
 	h1.setVisible(showFirstHandle);
 	h2.setVisible(showLastHandle);
 	resized();
-	repaint();
+	shouldRepaint = true;
 }
 
 void CubicEasingUI::mouseDown(const MouseEvent& e)
@@ -501,7 +509,7 @@ void SineEasingUI::easingControllableFeedbackUpdate(Controllable* c)
 	if (c == se->freqAmp)
 	{
 		resized();
-		repaint();
+		shouldRepaint = true;
 	}
 }
 
@@ -510,7 +518,7 @@ void SineEasingUI::setShowEasingHandles(bool showFirst, bool showLast)
 	EasingUI::setShowEasingHandles(showFirst, showLast);
 	h1.setVisible(showFirstHandle && showLastHandle);
 	resized();
-	repaint();
+	shouldRepaint = true;
 }
 
 void SineEasingUI::mouseDown(const MouseEvent& e)
@@ -587,7 +595,7 @@ void ElasticEasingUI::easingControllableFeedbackUpdate(Controllable* c)
 	if (c == se->param)
 	{
 		resized();
-		repaint();
+		shouldRepaint = true;
 	}
 }
 
@@ -596,7 +604,7 @@ void ElasticEasingUI::setShowEasingHandles(bool showFirst, bool showLast)
 	EasingUI::setShowEasingHandles(showFirst, showLast);
 	h1.setVisible(showFirstHandle && showLastHandle);
 	resized();
-	repaint();
+	shouldRepaint = true;
 }
 
 void ElasticEasingUI::mouseDown(const MouseEvent& e)
@@ -749,7 +757,7 @@ void GenericEasingUI::easingControllableFeedbackUpdate(Controllable* c)
 	if ((h1 != nullptr && c == h1->parameter) || (h2 != nullptr && c == h2->parameter))
 	{
 		resized();
-		repaint();
+		shouldRepaint = true;
 	}
 }
 
@@ -762,7 +770,7 @@ void GenericEasingUI::setShowEasingHandles(bool showFirst, bool showLast)
 	for (auto& cui : extraParams) cui->setVisible(showFirst && showLast);
 
 	resized();
-	repaint();
+	shouldRepaint = true;
 }
 
 void GenericEasingUI::mouseDown(const MouseEvent& e)

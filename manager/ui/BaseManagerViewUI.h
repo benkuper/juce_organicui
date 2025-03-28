@@ -81,6 +81,7 @@ public:
 	juce::Point<int> getPosInView(const juce::Point<float>& viewPos);
 	juce::Rectangle<int> getBoundsInView(const juce::Rectangle<float>& r);
 	juce::Point<float> getItemsCenter();
+	juce::Rectangle<float> getItemsViewBounds();
 
 	virtual void homeView();
 	virtual void frameView(U* item = nullptr);
@@ -566,6 +567,22 @@ juce::Point<float> BaseManagerViewUI<M, T, U>::getItemsCenter()
 	}
 
 	return bounds.getCentre();
+}
+
+template<class M, class T, class U>
+juce::Rectangle<float> BaseManagerViewUI<M, T, U>::getItemsViewBounds()
+{
+	juce::Rectangle<float> bounds;
+	for (auto& i : this->manager->items)
+	{
+		juce::Point<float> p1 = i->viewUIPosition->getPoint();
+		juce::Point<float> p2 = p1 + i->viewUISize->getPoint();
+		juce::Rectangle<float> r(p1, p2);
+		if (bounds.isEmpty()) bounds = r;
+		else bounds = bounds.getUnion(r);
+	}
+
+	return bounds;
 }
 
 template<class M, class T, class U>

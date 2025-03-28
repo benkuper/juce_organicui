@@ -23,15 +23,15 @@ AutomationUIKeys::AutomationUIKeys(Automation* manager, AutomationUI* _autoUI) :
 	manager->addAsyncContainerListener(this);
 	manager->addAsyncAutomationListener(this);
 
+	
 	setBufferedToImage(true);
 	transparentBG = true;
 
 	setViewRange(0, manager->length->floatValue());
 
 	addExistingItems(false);
-	setSize(100, 100);
-	setInterceptsMouseClicks(false, true);
-	autoUI->addMouseListener(this, false);
+	
+	setInterceptsMouseClicks(true, true);
 }
 
 AutomationUIKeys::~AutomationUIKeys()
@@ -398,7 +398,7 @@ void AutomationUIKeys::removeItemUIInternal(AutomationKeyUI* ui)
 
 void AutomationUIKeys::mouseDown(const MouseEvent& e)
 {
-	if (e.eventComponent == autoUI)
+	if (e.eventComponent == this)
 	{
 		if (e.mods.isLeftButtonDown() && e.mods.isCommandDown() && e.mods.isShiftDown())
 		{
@@ -474,7 +474,7 @@ void AutomationUIKeys::mouseDrag(const MouseEvent& e)
 		repaint();
 
 	}
-	else if (e.eventComponent == autoUI)
+	else if (e.eventComponent == this)
 	{
 		if (paintingMode)
 		{
@@ -560,7 +560,7 @@ void AutomationUIKeys::mouseUp(const MouseEvent& e)
 
 void AutomationUIKeys::mouseDoubleClick(const MouseEvent& e)
 {
-	if (e.eventComponent == autoUI)
+	if (e.eventComponent == this)
 	{
 		Point<float> p = getViewPos(e.getPosition());
 		manager->addKey(p.x, p.y, true);
@@ -820,7 +820,7 @@ void AutomationUILayer::resized()
 
 
 AutomationUI::AutomationUI(Automation* manager) :
-	UITimerTarget(ORGANICUI_DEFAULT_TIMER, "AutomationUI"),
+	UITimerTarget(ORGANICUI_DEFAULT_TIMER, "AutomationUI", true),
 	keysUI(manager, this),
 	overlay(this, 0),
 	background(this, 1),
@@ -834,6 +834,10 @@ AutomationUI::AutomationUI(Automation* manager) :
 	addAndMakeVisible(&keysUI);
 	addAndMakeVisible(&overlay);
 	addAndMakeVisible(&cursor);
+
+	setSize(100, 100);
+
+	setInterceptsMouseClicks(false, true);
 }
 
 void AutomationUI::paint(juce::Graphics& g)

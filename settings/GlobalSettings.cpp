@@ -56,9 +56,9 @@ GlobalSettings::GlobalSettings() :
 	helpLanguage->addOption("English", "en")->addOption("French", "fr")->addOption("Chinese", "cn");
 
 
-
-	useGLRenderer = interfaceCC.addBoolParameter("Use OpenGL Renderer", "If checked, this will use hardware acceleration to render the interface. You may want to NOT use this on some platform or when using the IFrame Dashboard item. You need to restart if you change it.", false);
-
+	useGLRenderer = interfaceCC.addBoolParameter("Use OpenGL Renderer", "If checked, this will use hardware acceleration to render the interface. You may want to NOT use this on some platform or when using the IFrame Dashboard item. You need to restart if you change it.", useGL);
+	
+	uiRefreshRate = interfaceCC.addIntParameter("UI Refresh Rate", "The refresh rate of the UI in hz", 30, 1, 100);
 	loggerRefreshRate = interfaceCC.addIntParameter("Logger Refresh Rate", "The refresh rate of the logger in hz", 20, 1, 1000);
 
 	addChildControllableContainer(&interfaceCC);
@@ -149,6 +149,11 @@ void GlobalSettings::onControllableFeedbackUpdate(ControllableContainer* cc, Con
 	{
 		CustomLogger::getInstance()->setFileLogging(saveLogsToFile->boolValue());
 	}
+	else if (c == uiRefreshRate)
+	{
+		OrganicUITimers::getInstance()->setupTimers();
+	}
+
 
 	if (Engine::mainEngine != nullptr) Engine::mainEngine->setChangedFlag(false); //force no need to save when changing something in global settings
 }

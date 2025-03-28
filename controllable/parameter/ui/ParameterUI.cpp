@@ -137,8 +137,6 @@ void ParameterUI::paintOverChildren(Graphics& g)
 	}
 	break;
 	}
-
-	validatePaint();
 }
 
 void ParameterUI::handlePaintTimer()

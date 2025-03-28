@@ -53,5 +53,4 @@ void GapGrabber::mouseDown(const MouseEvent &e)
 void GapGrabber::handlePaintTimerInternal()
 {
 	listeners.call(&Listener::grabberGrabUpdate, this, position);
-	validatePaint();
 }
