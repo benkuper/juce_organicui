@@ -815,7 +815,7 @@ void AutomationUILayer::resized()
 
 
 AutomationUI::AutomationUI(Automation* manager) :
-	UITimerTarget(ORGANICUI_DEFAULT_TIMER, "AutomationUI"),
+	UITimerTarget(ORGANICUI_DEFAULT_TIMER, "AutomationUI", true),
 	keysUI(manager, this),
 	overlay(this, 0),
 	background(this, 1),

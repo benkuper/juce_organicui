@@ -11,14 +11,17 @@
 class UITimerTarget
 {
 public:
-	UITimerTarget(int timerID = -1, juce::String _name = "");
+	UITimerTarget(int timerID = -1, juce::String _name = "", bool safeRepaintCheck = false);
 	virtual ~UITimerTarget();
 
 	int paintTimerID;
 	bool shouldRepaint;
 	bool paintingAsked;
+	bool safeRepaintCheck;
+	int lastRepaintTime;
 
 	juce::String name;
+
 
 	virtual void handlePaintTimer();
 	virtual void handlePaintTimerInternal() = 0;
@@ -38,10 +41,11 @@ public:
 	~OrganicUITimers() {}
 
 	juce::HashMap<int, juce::Array<juce::WeakReference<UITimerTarget>>> timerMap;
-	juce::HashMap<int, int> lastRepaintTimes;
-#ifdef ORGANICUI_LOG_FPS_DEBUG
+#ifdef ORGANICUI_LOG_FPS_DEBUGs
 	juce::HashMap<int, int> fps;
 #endif
+
+	void setupTimers();
 
 	void registerTarget(int timerID, UITimerTarget* ui);
 	void unregisterTarget(int timerID, UITimerTarget* ui);

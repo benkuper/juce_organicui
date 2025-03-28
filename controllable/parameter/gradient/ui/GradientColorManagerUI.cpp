@@ -11,7 +11,7 @@
 
 GradientColorManagerUI::GradientColorManagerUI(GradientColorManager* manager) :
 	BaseManagerUI(manager->niceName, manager, false),
-	UITimerTarget(ORGANICUI_SLOW_TIMER, "GradientColorManagerUI"),
+	UITimerTarget(ORGANICUI_SLOW_TIMER, "GradientColorManagerUI", true),
 	Thread("Colors " + String(manager->niceName)),
 	shouldUpdateImage(true),
 	autoResetViewRangeOnLengthUpdate(false),

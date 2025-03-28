@@ -3,7 +3,8 @@
 
 class EasingUI :
 	public InspectableContentComponent,
-	public ContainerAsyncListener
+	public ContainerAsyncListener,
+	public UITimerTarget
 {
 public:
 	EasingUI(Easing* e);
@@ -21,6 +22,7 @@ public:
 
 	juce::Rectangle<float> valueBounds;
 
+	virtual void handlePaintTimerInternal() override;
 	void paint(juce::Graphics& g) override;
 	virtual void paintInternal(juce::Graphics&) {}
 	void resized() override;
