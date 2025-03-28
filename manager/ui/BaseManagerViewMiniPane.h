@@ -139,7 +139,9 @@ template<class M, class T, class U>
 void BaseManagerViewMiniPane<M, T, U>::updatePositionFromMouse()
 {
 	juce::Point<float> p = this->getViewPosForPanePos(this->getMouseXYRelative().toFloat());
-	this->managerUI->manager->viewOffset = -p.toInt();
+	juce::Rectangle<float> itemBounds = this->managerUI->getItemsViewBounds();
+	juce::Point<float> cp = itemBounds.getConstrainedPoint(p);
+	this->managerUI->manager->viewOffset = -cp.toInt();
 	this->managerUI->resized();
 	this->managerUI->repaint();
 }
