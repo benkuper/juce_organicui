@@ -478,7 +478,7 @@ void ControllableContainer::addChildControllableContainer(ControllableContainer*
 		if (container->getWarningMessage().isNotEmpty()) warningChanged(container);
 	}
 
-	onChildContainerAdded();
+	onChildContainerAdded(container);
 
 	controllableContainerListeners.call(&ControllableContainerListener::controllableContainerAdded, container);
 	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableContainerAdded, this, container));
@@ -515,7 +515,7 @@ void ControllableContainer::removeChildControllableContainer(ControllableContain
 		if (container->getWarningMessage().isNotEmpty()) warningChanged(container);
 	}
 
-	onChildContainerRemoved();
+	onChildContainerRemoved(container);
 
 	if (!Engine::mainEngine->isClearing)
 	{
