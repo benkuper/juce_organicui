@@ -96,7 +96,7 @@ class Outliner : public ShapeShifterContentComponent,
 	public juce::Label::Listener,
 	public juce::Button::Listener,
 	public EngineListener,
-	public Timer
+	public juce::Timer
 {
 public:
 	juce_DeclareSingleton(Outliner, true)
