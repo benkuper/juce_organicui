@@ -55,6 +55,10 @@ GlobalSettings::GlobalSettings() :
 	helpLanguage = interfaceCC.addEnumParameter("Help language", "What language to download ? You will need to restart the software to see changes");
 	helpLanguage->addOption("English", "en")->addOption("French", "fr")->addOption("Chinese", "cn");
 
+	bool useGL = true;
+#if JUCE_MAC || JUCE_LINUX //OpenGL is not working so well on mac and linux
+	useGL = false;
+#endif
 
 	useGLRenderer = interfaceCC.addBoolParameter("Use OpenGL Renderer", "If checked, this will use hardware acceleration to render the interface. You may want to NOT use this on some platform or when using the IFrame Dashboard item. You need to restart if you change it.", useGL);
 	
