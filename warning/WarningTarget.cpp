@@ -54,7 +54,7 @@ void WarningTarget::clearWarning(const String& id)
 		return;
 	}
 
-	setWarningMessage(String(), id);
+	setWarningMessage(String(), id, false);
 }
 
 void WarningTarget::unregisterWarningNow()
