@@ -83,6 +83,7 @@ public:
 	
 	void childAddressChanged(ControllableContainer *) override;
 
+
 	juce::ListenerList<OutlinerItemListener> itemListeners;
 	void addItemListener(OutlinerItemListener* newListener) { itemListeners.add(newListener); }
 	void removeItemListener(OutlinerItemListener* listener) { itemListeners.remove(listener); }
@@ -94,7 +95,8 @@ class Outliner : public ShapeShifterContentComponent,
 	public ControllableContainerListener,
 	public juce::Label::Listener,
 	public juce::Button::Listener,
-	public EngineListener
+	public EngineListener,
+	public juce::Timer
 {
 public:
 	juce_DeclareSingleton(Outliner, true)
@@ -111,6 +113,7 @@ public:
 	juce::TreeView treeView;
 	std::unique_ptr<OutlinerItem> rootItem;
 	bool enabled; //update or not
+	bool shouldRebuild;
 
 	juce::Array<ControllableContainer*> parentsOfFiltered;
 	juce::Array<ControllableContainer*> filteredContainers;
@@ -138,6 +141,8 @@ public:
 	OutlinerItem* getItemForContainer(ControllableContainer* cc);
 
 	void childStructureChanged(ControllableContainer *) override;
+
+	void timerCallback() override;
 
 
 private:

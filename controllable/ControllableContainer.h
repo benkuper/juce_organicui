@@ -228,8 +228,8 @@ protected:
 	virtual void onControllableRemoved(Controllable*) {};
 	virtual void onContainerParameterChangedAsync(Parameter*, const juce::var& /*value*/) {};
 	virtual void onWarningChanged(WarningTarget*) {};
-	virtual void onChildContainerAdded() {};
-  virtual void onChildContainerRemoved() {};
+	virtual void onChildContainerAdded(ControllableContainer*) {};
+  virtual void onChildContainerRemoved(ControllableContainer*) {};
 
 public:
 	DECLARE_INSPECTACLE_SAFE_LISTENER(ControllableContainer, controllableContainer);

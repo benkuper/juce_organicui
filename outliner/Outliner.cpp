@@ -8,13 +8,15 @@
   ==============================================================================
 */
 
+#include "JuceHeader.h"
 
 juce_ImplementSingleton(Outliner)
 
 Outliner::Outliner(const String& contentName) :
 	ShapeShifterContentComponent(contentName),
 	hideShowState(false),
-	enabled(true)
+	enabled(true),
+	shouldRebuild(true)
 {
 	if (Engine::mainEngine != nullptr)
 	{
@@ -43,6 +45,7 @@ Outliner::Outliner(const String& contentName) :
 	addAndMakeVisible(searchBar);
 
 	rebuildTree();
+	startTimerHz(2);
 
 
 	helpID = "Outliner";
@@ -101,7 +104,11 @@ void Outliner::paint(Graphics& g)
 
 void Outliner::rebuildTree(ControllableContainer* fromContainer)
 {
-	if (Engine::mainEngine == nullptr) return;
+	if (Engine::mainEngine == nullptr)
+	{
+		shouldRebuild = false;
+		return;
+	}
 
 	if (fromContainer == nullptr) fromContainer = Engine::mainEngine;
 
@@ -116,6 +123,8 @@ void Outliner::rebuildTree(ControllableContainer* fromContainer)
 	rootItem->setOpen(true);
 
 	if (!listIsFiltered) treeView.restoreOpennessState(*os, true);
+
+	shouldRebuild = false;
 }
 
 void Outliner::buildTree(OutlinerItem* parentItem, ControllableContainer* parentContainer, bool parentsHaveHideInRemote)
@@ -253,14 +262,12 @@ OutlinerItem* Outliner::createItem(WeakReference<Controllable> controllable, boo
 
 void Outliner::fileLoaded()
 {
-	MessageManagerLock mmLock;
-	rebuildTree();
+	shouldRebuild = true;
 }
 
 void Outliner::engineCleared()
 {
-	MessageManagerLock mmLock;
-	rebuildTree();
+	shouldRebuild = true;
 }
 
 OutlinerItem* Outliner::getItemForContainer(ControllableContainer* cc)
@@ -290,10 +297,14 @@ void Outliner::childStructureChanged(ControllableContainer*)
 {
 	if (enabled && !Engine::mainEngine->isClearing && !Engine::mainEngine->isLoadingFile)
 	{
-		MessageManagerLock mmLock;
-		rebuildTree();
+		shouldRebuild = true;
 	}
 
+}
+
+void Outliner::timerCallback()
+{
+	if (shouldRebuild) rebuildTree();
 }
 
 void Outliner::labelTextChanged(Label* label)
@@ -380,7 +391,6 @@ void OutlinerItem::childAddressChanged(ControllableContainer*)
 		itemListeners.call(&OutlinerItemListener::itemNameChanged);
 	}
 }
-
 
 void OutlinerItem::inspectableSelectionChanged(Inspectable* i)
 {
