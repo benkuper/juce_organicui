@@ -517,7 +517,7 @@ void ControllableContainer::removeChildControllableContainer(ControllableContain
 
 	onChildContainerRemoved(container);
 
-	if (!Engine::mainEngine->isClearing)
+	if (Engine::mainEngine != nullptr && !Engine::mainEngine->isClearing)
 	{
 		controllableContainerListeners.call(&ControllableContainerListener::controllableContainerRemoved, container);
 		queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableContainerRemoved, this, container));
