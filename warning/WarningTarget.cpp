@@ -34,12 +34,16 @@ void WarningTarget::setWarningMessage(const String& message, const String& id, b
 	{
 		if (message.isEmpty()) return;
 	}
-
+	
 	if (warningMessage.size() == 0) WarningReporter::getInstance()->unregisterWarning(this);
 
 	if (log && Engine::mainEngine != nullptr && !Engine::mainEngine->isLoadingFile && !Engine::mainEngine->isClearing) LOGWARNING(message);
 
-	warningMessage.set(id, message);
+	if (!message.isEmpty())
+	{
+		warningMessage.set(id, message);
+	}
+
 	WarningReporter::getInstance()->registerWarning(this);
 
 	notifyWarningChanged();
