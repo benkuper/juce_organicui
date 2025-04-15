@@ -42,9 +42,8 @@ void WarningTarget::setWarningMessage(const String& message, const String& id, b
 	if (!message.isEmpty())
 	{
 		warningMessage.set(id, message);
+		WarningReporter::getInstance()->registerWarning(this);
 	}
-
-	WarningReporter::getInstance()->registerWarning(this);
 
 	notifyWarningChanged();
 }
