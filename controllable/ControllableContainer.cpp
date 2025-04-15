@@ -611,10 +611,10 @@ ControllableContainer* ControllableContainer::getControllableContainerForAddress
 
 }
 
-String ControllableContainer::getControlAddress(ControllableContainer* relativeTo) {
+String ControllableContainer::getControlAddress(const ControllableContainer* relativeTo) const {
 
 	StringArray addressArray;
-	ControllableContainer* pc = this;
+	const ControllableContainer* pc = this;
 	while (pc != relativeTo && pc != nullptr && pc != Engine::mainEngine)
 	{
 		addressArray.insert(0, pc->shortName);
