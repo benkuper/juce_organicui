@@ -10,7 +10,7 @@
 
 
 GradientColorManagerUI::GradientColorManagerUI(GradientColorManager* manager) :
-	BaseManagerUI(manager->niceName, manager, false),
+	ManagerUI(manager->niceName, manager, false),
 	UITimerTarget(ORGANICUI_SLOW_TIMER, "GradientColorManagerUI", true),
 	Thread("Colors " + String(manager->niceName)),
 	shouldUpdateImage(true),
@@ -57,7 +57,7 @@ void GradientColorManagerUI::setMiniMode(bool value)
 
 void GradientColorManagerUI::paint(Graphics& g)
 {
-	BaseManagerUI::paint(g);
+	ManagerUI::paint(g);
 
 	Rectangle<int> r = getLocalBounds();
 
@@ -112,7 +112,7 @@ void GradientColorManagerUI::resized()
 
 void GradientColorManagerUI::updateItemsVisibility()
 {
-	BaseManagerUI::updateItemsVisibility();
+	ManagerUI::updateItemsVisibility();
 }
 
 void GradientColorManagerUI::addItemUIInternal(GradientColorUI* item)
@@ -128,7 +128,7 @@ void GradientColorManagerUI::removeItemUIInternal(GradientColorUI* item)
 
 void GradientColorManagerUI::mouseDown(const MouseEvent& e)
 {
-	BaseManagerUI::mouseDown(e);
+	ManagerUI::mouseDown(e);
 
 	if (GradientColorUI* handle = dynamic_cast<GradientColorUI*>(e.eventComponent))
 	{
@@ -153,7 +153,7 @@ void GradientColorManagerUI::mouseDrag(const MouseEvent& e)
 
 	if (e.originalComponent == this)
 	{
-		BaseManagerUI::mouseDrag(e);
+		ManagerUI::mouseDrag(e);
 	}
 	else
 	{

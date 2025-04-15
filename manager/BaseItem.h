@@ -16,7 +16,7 @@ class Script;
 
 class BaseItem :
 	public EnablingControllableContainer,
-	public BaseManagerListener<Script>
+	public ManagerTListener<Script>
 {
 public:
 	BaseItem(const juce::String& name = "", bool canBeDisabled = true, bool canHaveScript = false);

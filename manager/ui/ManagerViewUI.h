@@ -1,7 +1,7 @@
 /*
   ==============================================================================
 
-	BaseManagerViewUI.h
+	ManagerViewUI.h
 	Created: 23 Apr 2017 2:48:02pm
 	Author:  Ben
 
@@ -11,12 +11,12 @@
 #pragma once
 
 template<class M, class T, class U>
-class BaseManagerViewUI :
-	public BaseManagerUI<M, T, U>
+class ManagerViewUI :
+	public ManagerUI<M, T, U>
 {
 public:
-	BaseManagerViewUI(const juce::String& contentName, M* _manager);
-	virtual ~BaseManagerViewUI();
+	ManagerViewUI(const juce::String& contentName, M* _manager);
+	virtual ~ManagerViewUI();
 
 	bool canNavigate;
 
@@ -45,7 +45,7 @@ public:
 
 	juce::Point<int> initViewOffset;
 
-	std::unique_ptr<BaseManagerViewMiniPane<M, T, U>> viewPane;
+	std::unique_ptr<ManagerViewMiniPane<M, T, U>> viewPane;
 
 	virtual void mouseDown(const juce::MouseEvent& e) override;
 	virtual void mouseDrag(const juce::MouseEvent& e) override;
@@ -88,7 +88,7 @@ public:
 
 	virtual void setViewZoom(float newZoom);
 	virtual void setShowPane(bool val);
-	virtual BaseManagerViewMiniPane<M, T, U>* createViewPane();
+	virtual ManagerViewMiniPane<M, T, U>* createViewPane();
 
 	virtual void addItemUIInternal(U* se) override;
 
@@ -119,8 +119,8 @@ public:
 };
 
 template<class M, class T, class U>
-BaseManagerViewUI<M, T, U>::BaseManagerViewUI(const juce::String& contentName, M* _manager) :
-	BaseManagerUI<M, T, U>(contentName, _manager, false),
+ManagerViewUI<M, T, U>::ManagerViewUI(const juce::String& contentName, M* _manager) :
+	ManagerUI<M, T, U>(contentName, _manager, false),
 	canNavigate(true),
 	centerUIAroundPosition(false),
 	updatePositionOnDragMove(false),
@@ -141,13 +141,13 @@ BaseManagerViewUI<M, T, U>::BaseManagerViewUI(const juce::String& contentName, M
 
 	this->headerSize = 28;
 
-	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(juce::ImageCache::getFromMemory(OrganicUIBinaryData::align_left_png, OrganicUIBinaryData::align_left_pngSize)), [this]() { this->alignItems(BaseManagerUI<M, T, U>::AlignMode::LEFT); });
+	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(juce::ImageCache::getFromMemory(OrganicUIBinaryData::align_left_png, OrganicUIBinaryData::align_left_pngSize)), [this]() { this->alignItems(ManagerUI<M, T, U>::AlignMode::LEFT); });
 
-	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(juce::ImageCache::getFromMemory(OrganicUIBinaryData::align_center_h_png, OrganicUIBinaryData::align_center_h_pngSize)), [this]() { this->alignItems(BaseManagerUI<M, T, U>::AlignMode::CENTER_H); });
-	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(juce::ImageCache::getFromMemory(OrganicUIBinaryData::align_right_png, OrganicUIBinaryData::align_right_pngSize)), [this]() { this->alignItems(BaseManagerUI<M, T, U>::AlignMode::RIGHT); });
-	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(juce::ImageCache::getFromMemory(OrganicUIBinaryData::align_top_png, OrganicUIBinaryData::align_top_pngSize)), [this]() { this->alignItems(BaseManagerUI<M, T, U>::AlignMode::TOP); });
-	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(juce::ImageCache::getFromMemory(OrganicUIBinaryData::align_center_v_png, OrganicUIBinaryData::align_center_v_pngSize)), [this]() { this->alignItems(BaseManagerUI<M, T, U>::AlignMode::CENTER_V); });
-	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(juce::ImageCache::getFromMemory(OrganicUIBinaryData::align_bottom_png, OrganicUIBinaryData::align_bottom_pngSize)), [this]() { this->alignItems(BaseManagerUI<M, T, U>::AlignMode::BOTTOM); });
+	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(juce::ImageCache::getFromMemory(OrganicUIBinaryData::align_center_h_png, OrganicUIBinaryData::align_center_h_pngSize)), [this]() { this->alignItems(ManagerUI<M, T, U>::AlignMode::CENTER_H); });
+	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(juce::ImageCache::getFromMemory(OrganicUIBinaryData::align_right_png, OrganicUIBinaryData::align_right_pngSize)), [this]() { this->alignItems(ManagerUI<M, T, U>::AlignMode::RIGHT); });
+	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(juce::ImageCache::getFromMemory(OrganicUIBinaryData::align_top_png, OrganicUIBinaryData::align_top_pngSize)), [this]() { this->alignItems(ManagerUI<M, T, U>::AlignMode::TOP); });
+	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(juce::ImageCache::getFromMemory(OrganicUIBinaryData::align_center_v_png, OrganicUIBinaryData::align_center_v_pngSize)), [this]() { this->alignItems(ManagerUI<M, T, U>::AlignMode::CENTER_V); });
+	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(juce::ImageCache::getFromMemory(OrganicUIBinaryData::align_bottom_png, OrganicUIBinaryData::align_bottom_pngSize)), [this]() { this->alignItems(ManagerUI<M, T, U>::AlignMode::BOTTOM); });
 	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(juce::ImageCache::getFromMemory(OrganicUIBinaryData::distribute_h_png, OrganicUIBinaryData::distribute_h_pngSize)), [this]() { this->distributeItems(false); });
 	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(juce::ImageCache::getFromMemory(OrganicUIBinaryData::distribute_v_png, OrganicUIBinaryData::distribute_v_pngSize)), [this]() { this->distributeItems(true); });
 
@@ -169,14 +169,14 @@ BaseManagerViewUI<M, T, U>::BaseManagerViewUI(const juce::String& contentName, M
 
 
 template<class M, class T, class U>
-BaseManagerViewUI<M, T, U>::~BaseManagerViewUI()
+ManagerViewUI<M, T, U>::~ManagerViewUI()
 {
 }
 
 template<class M, class T, class U>
-void BaseManagerViewUI<M, T, U>::mouseDown(const juce::MouseEvent& e)
+void ManagerViewUI<M, T, U>::mouseDown(const juce::MouseEvent& e)
 {
-	BaseManagerUI<M, T, U>::mouseDown(e);
+	ManagerUI<M, T, U>::mouseDown(e);
 	if (canNavigate && ((e.mods.isLeftButtonDown() && e.mods.isAltDown()) || e.mods.isMiddleButtonDown()))
 	{
 		this->setMouseCursor(juce::MouseCursor::UpDownLeftRightResizeCursor);
@@ -191,9 +191,9 @@ void BaseManagerViewUI<M, T, U>::mouseDown(const juce::MouseEvent& e)
 }
 
 template<class M, class T, class U>
-void BaseManagerViewUI<M, T, U>::mouseDrag(const juce::MouseEvent& e)
+void ManagerViewUI<M, T, U>::mouseDrag(const juce::MouseEvent& e)
 {
-	BaseManagerUI<M, T, U>::mouseDrag(e);
+	ManagerUI<M, T, U>::mouseDrag(e);
 
 	if (canNavigate && ((e.mods.isLeftButtonDown() && e.mods.isAltDown()) || e.mods.isMiddleButtonDown()))
 	{
@@ -219,9 +219,9 @@ void BaseManagerViewUI<M, T, U>::mouseDrag(const juce::MouseEvent& e)
 }
 
 template<class M, class T, class U>
-void BaseManagerViewUI<M, T, U>::mouseUp(const juce::MouseEvent& e)
+void ManagerViewUI<M, T, U>::mouseUp(const juce::MouseEvent& e)
 {
-	BaseManagerUI<M, T, U>::mouseUp(e);
+	ManagerUI<M, T, U>::mouseUp(e);
 
 	snapLineX = juce::Line<int>();
 	snapLineY = juce::Line<int>();
@@ -238,7 +238,7 @@ void BaseManagerViewUI<M, T, U>::mouseUp(const juce::MouseEvent& e)
 }
 
 template<class M, class T, class U>
-void BaseManagerViewUI<M, T, U>::mouseWheelMove(const juce::MouseEvent& e, const juce::MouseWheelDetails& d)
+void ManagerViewUI<M, T, U>::mouseWheelMove(const juce::MouseEvent& e, const juce::MouseWheelDetails& d)
 {
 
 	if (e.mods.isShiftDown())
@@ -280,7 +280,7 @@ void BaseManagerViewUI<M, T, U>::mouseWheelMove(const juce::MouseEvent& e, const
 }
 
 template<class M, class T, class U>
-void BaseManagerViewUI<M, T, U>::mouseMagnify(const juce::MouseEvent& e, float scaleFactor)
+void ManagerViewUI<M, T, U>::mouseMagnify(const juce::MouseEvent& e, float scaleFactor)
 {
 	if (canZoom)
 	{
@@ -295,9 +295,9 @@ void BaseManagerViewUI<M, T, U>::mouseMagnify(const juce::MouseEvent& e, float s
 }
 
 template<class M, class T, class U>
-bool BaseManagerViewUI<M, T, U>::keyPressed(const juce::KeyPress& e)
+bool ManagerViewUI<M, T, U>::keyPressed(const juce::KeyPress& e)
 {
-	if (BaseManagerUI<M, T, U>::keyPressed(e)) return true;
+	if (ManagerUI<M, T, U>::keyPressed(e)) return true;
 
 	if (e.getTextDescription() == juce::KeyPress::createFromDescription("f").getTextDescription())
 	{
@@ -314,7 +314,7 @@ bool BaseManagerViewUI<M, T, U>::keyPressed(const juce::KeyPress& e)
 }
 
 template<class M, class T, class U>
-void BaseManagerViewUI<M, T, U>::paint(juce::Graphics& g)
+void ManagerViewUI<M, T, U>::paint(juce::Graphics& g)
 {
 	if (this->inspectable.wasObjectDeleted()) return;
 
@@ -328,7 +328,7 @@ void BaseManagerViewUI<M, T, U>::paint(juce::Graphics& g)
 }
 
 template<class M, class T, class U>
-void BaseManagerViewUI<M, T, U>::paintBackground(juce::Graphics& g)
+void ManagerViewUI<M, T, U>::paintBackground(juce::Graphics& g)
 {
 	int zoomedCheckerSize = checkerSize * this->manager->viewZoom;
 
@@ -356,11 +356,11 @@ void BaseManagerViewUI<M, T, U>::paintBackground(juce::Graphics& g)
 }
 
 template<class M, class T, class U>
-inline void BaseManagerViewUI<M, T, U>::paintOverChildren(juce::Graphics& g)
+inline void ManagerViewUI<M, T, U>::paintOverChildren(juce::Graphics& g)
 {
 	if (this->inspectable.wasObjectDeleted()) return;
 
-	BaseManagerUI<M, T, U>::paintOverChildren(g);
+	ManagerUI<M, T, U>::paintOverChildren(g);
 
 	if (snapLineX.getLength() > 0)
 	{
@@ -378,7 +378,7 @@ inline void BaseManagerViewUI<M, T, U>::paintOverChildren(juce::Graphics& g)
 }
 
 template<class M, class T, class U>
-void BaseManagerViewUI<M, T, U>::resized()
+void ManagerViewUI<M, T, U>::resized()
 {
 	if (this->inspectable.wasObjectDeleted()) return;
 
@@ -404,14 +404,14 @@ void BaseManagerViewUI<M, T, U>::resized()
 }
 
 template<class M, class T, class U>
-void BaseManagerViewUI<M, T, U>::updateViewUIPosition(U* itemUI)
+void ManagerViewUI<M, T, U>::updateViewUIPosition(U* itemUI)
 {
 	if (itemUI == nullptr) return;
 	updateComponentViewPosition((juce::Component*)itemUI, itemUI->item->viewUIPosition->getPoint(), getUITransform(itemUI));
 }
 
 template<class M, class T, class U>
-void BaseManagerViewUI<M, T, U>::updateComponentViewPosition(juce::Component* c, juce::Point<float> position, const juce::AffineTransform& af)
+void ManagerViewUI<M, T, U>::updateComponentViewPosition(juce::Component* c, juce::Point<float> position, const juce::AffineTransform& af)
 {
 	if (c == nullptr) return;
 
@@ -429,15 +429,15 @@ void BaseManagerViewUI<M, T, U>::updateComponentViewPosition(juce::Component* c,
 }
 
 template<class M, class T, class U>
-inline juce::AffineTransform BaseManagerViewUI<M, T, U>::getUITransform(U* itemUI)
+inline juce::AffineTransform ManagerViewUI<M, T, U>::getUITransform(U* itemUI)
 {
 	return juce::AffineTransform();
 }
 
 template<class M, class T, class U>
-void BaseManagerViewUI<M, T, U>::updateItemsVisibility()
+void ManagerViewUI<M, T, U>::updateItemsVisibility()
 {
-	//BaseManagerUI::updateItemsVisibility();
+	//ManagerUI::updateItemsVisibility();
 
 	bool hasChanged = false;
 
@@ -484,75 +484,75 @@ void BaseManagerViewUI<M, T, U>::updateItemsVisibility()
 }
 
 template<class M, class T, class U>
-void BaseManagerViewUI<M, T, U>::parentHierarchyChanged()
+void ManagerViewUI<M, T, U>::parentHierarchyChanged()
 {
 	updateItemsVisibility();
 }
 
 template<class M, class T, class U>
-void BaseManagerViewUI<M, T, U>::addItemFromMenu(bool isFromAddButton, juce::Point<int> mouseDownPos)
+void ManagerViewUI<M, T, U>::addItemFromMenu(bool isFromAddButton, juce::Point<int> mouseDownPos)
 {
 	addItemFromMenu(nullptr, isFromAddButton, mouseDownPos);
 }
 
 template<class M, class T, class U>
-void BaseManagerViewUI<M, T, U>::addItemFromMenu(T* item, bool isFromAddButton, juce::Point<int> mouseDownPos)
+void ManagerViewUI<M, T, U>::addItemFromMenu(T* item, bool isFromAddButton, juce::Point<int> mouseDownPos)
 {
 	this->manager->addItem(item, isFromAddButton ? juce::Point<float>(0, 0) : getViewPos(mouseDownPos).toFloat());
 }
 
 template<class M, class T, class U>
-juce::Point<int> BaseManagerViewUI<M, T, U>::getSize()
+juce::Point<int> ManagerViewUI<M, T, U>::getSize()
 {
 	return juce::Point<int>(this->getWidth(), this->getHeight());
 }
 
 template<class M, class T, class U>
-juce::Point<float> BaseManagerViewUI<M, T, U>::getViewMousePosition()
+juce::Point<float> ManagerViewUI<M, T, U>::getViewMousePosition()
 {
 	return getViewPos(this->getMouseXYRelative());
 }
 
 template<class M, class T, class U>
-juce::Point<float> BaseManagerViewUI<M, T, U>::getViewPos(const juce::Point<int>& originalPos)
+juce::Point<float> ManagerViewUI<M, T, U>::getViewPos(const juce::Point<int>& originalPos)
 {
 	return (originalPos - getViewCenter()).toFloat() / (this->manager->viewZoom * (float)(useCheckersAsUnits ? checkerSize : 1));
 }
 
 template<class M, class T, class U>
-inline juce::Point<float> BaseManagerViewUI<M, T, U>::getViewOffset(const juce::Point<int>& offsetInView)
+inline juce::Point<float> ManagerViewUI<M, T, U>::getViewOffset(const juce::Point<int>& offsetInView)
 {
 	return offsetInView.toFloat() / (this->manager->viewZoom * (useCheckersAsUnits ? checkerSize : 1));
 }
 
 template<class M, class T, class U>
-juce::Rectangle<float> BaseManagerViewUI<M, T, U>::getViewBounds(const juce::Rectangle<int>& r)
+juce::Rectangle<float> ManagerViewUI<M, T, U>::getViewBounds(const juce::Rectangle<int>& r)
 {
 	const float checkerMultiplier = useCheckersAsUnits ? checkerSize : 1;
 	return juce::Rectangle<float>().withPosition(getViewPos(r.getPosition())).withSize(r.getWidth() / (this->manager->viewZoom * checkerMultiplier), r.getHeight() / (this->manager->viewZoom * checkerMultiplier));
 }
 
 template<class M, class T, class U>
-juce::Point<int> BaseManagerViewUI<M, T, U>::getViewCenter()
+juce::Point<int> ManagerViewUI<M, T, U>::getViewCenter()
 {
 	return this->manager->viewOffset + (getSize() / 2);
 }
 
 template<class M, class T, class U>
-juce::Point<int> BaseManagerViewUI<M, T, U>::getPosInView(const juce::Point<float>& viewPos)
+juce::Point<int> ManagerViewUI<M, T, U>::getPosInView(const juce::Point<float>& viewPos)
 {
 	return (viewPos * this->manager->viewZoom * (float)(useCheckersAsUnits ? checkerSize : 1)).toInt() + getViewCenter();
 }
 
 template<class M, class T, class U>
-juce::Rectangle<int> BaseManagerViewUI<M, T, U>::getBoundsInView(const juce::Rectangle<float>& r)
+juce::Rectangle<int> ManagerViewUI<M, T, U>::getBoundsInView(const juce::Rectangle<float>& r)
 {
 	const float checkerMultiplier = useCheckersAsUnits ? checkerSize : 1;
 	return juce::Rectangle<int>().withPosition(getPosInView(r.getPosition())).withSize(r.getWidth() * this->manager->viewZoom * checkerMultiplier, r.getHeight() * this->manager->viewZoom * checkerMultiplier);
 }
 
 template<class M, class T, class U>
-juce::Point<float> BaseManagerViewUI<M, T, U>::getItemsCenter()
+juce::Point<float> ManagerViewUI<M, T, U>::getItemsCenter()
 {
 	if (this->manager->items.size() == 0) return juce::Point<float>(0, 0);
 
@@ -570,7 +570,7 @@ juce::Point<float> BaseManagerViewUI<M, T, U>::getItemsCenter()
 }
 
 template<class M, class T, class U>
-juce::Rectangle<float> BaseManagerViewUI<M, T, U>::getItemsViewBounds()
+juce::Rectangle<float> ManagerViewUI<M, T, U>::getItemsViewBounds()
 {
 	juce::Rectangle<float> bounds;
 	for (auto& i : this->manager->items)
@@ -586,7 +586,7 @@ juce::Rectangle<float> BaseManagerViewUI<M, T, U>::getItemsViewBounds()
 }
 
 template<class M, class T, class U>
-void BaseManagerViewUI<M, T, U>::homeView()
+void ManagerViewUI<M, T, U>::homeView()
 {
 	this->manager->viewOffset = juce::Point<int>();
 
@@ -597,7 +597,7 @@ void BaseManagerViewUI<M, T, U>::homeView()
 }
 
 template<class M, class T, class U>
-void BaseManagerViewUI<M, T, U>::frameView(U* se)
+void ManagerViewUI<M, T, U>::frameView(U* se)
 {
 	if (se == nullptr) this->manager->viewOffset = -getItemsCenter().toInt() * this->manager->viewZoom;
 	else this->manager->viewOffset = -(se->item->viewUIPosition->getPoint() + se->item->viewUISize->getPoint() / 2).toInt() * this->manager->viewZoom;
@@ -610,7 +610,7 @@ void BaseManagerViewUI<M, T, U>::frameView(U* se)
 }
 
 template<class M, class T, class U>
-void BaseManagerViewUI<M, T, U>::setViewZoom(float value)
+void ManagerViewUI<M, T, U>::setViewZoom(float value)
 {
 	if (this->manager->viewZoom == value) return;
 	this->manager->viewZoom = juce::jlimit<float>(minZoom, maxZoom, value);
@@ -622,7 +622,7 @@ void BaseManagerViewUI<M, T, U>::setViewZoom(float value)
 }
 
 template<class M, class T, class U>
-void BaseManagerViewUI<M, T, U>::setShowPane(bool val)
+void ManagerViewUI<M, T, U>::setShowPane(bool val)
 {
 	bool showingPane = viewPane != nullptr;
 	if (val == showingPane) return;
@@ -639,13 +639,13 @@ void BaseManagerViewUI<M, T, U>::setShowPane(bool val)
 }
 
 template<class M, class T, class U>
-BaseManagerViewMiniPane<M, T, U>* BaseManagerViewUI<M, T, U>::createViewPane()
+ManagerViewMiniPane<M, T, U>* ManagerViewUI<M, T, U>::createViewPane()
 {
-	return new BaseManagerViewMiniPane<M, T, U>(this);
+	return new ManagerViewMiniPane<M, T, U>(this);
 }
 
 template<class M, class T, class U>
-void BaseManagerViewUI<M, T, U>::addItemUIInternal(U* se)
+void ManagerViewUI<M, T, U>::addItemUIInternal(U* se)
 {
 	se->setViewZoom(this->manager->viewZoom);
 	if (useCheckersAsUnits) se->setViewCheckerSize(checkerSize);
@@ -653,9 +653,9 @@ void BaseManagerViewUI<M, T, U>::addItemUIInternal(U* se)
 }
 
 template<class M, class T, class U>
-void BaseManagerViewUI<M, T, U>::itemDragMove(const juce::DragAndDropTarget::SourceDetails& dragSourceDetails)
+void ManagerViewUI<M, T, U>::itemDragMove(const juce::DragAndDropTarget::SourceDetails& dragSourceDetails)
 {
-	BaseManagerUI<M, T, U>::itemDragMove(dragSourceDetails);
+	ManagerUI<M, T, U>::itemDragMove(dragSourceDetails);
 
 	BaseItemMinimalUI<T>* bui = dynamic_cast<BaseItemMinimalUI<T>*>(dragSourceDetails.sourceComponent.get());
 	if (bui == nullptr) return;
@@ -765,9 +765,9 @@ void BaseManagerViewUI<M, T, U>::itemDragMove(const juce::DragAndDropTarget::Sou
 }
 
 template<class M, class T, class U>
-void BaseManagerViewUI<M, T, U>::itemDropped(const juce::DragAndDropTarget::SourceDetails& dragSourceDetails)
+void ManagerViewUI<M, T, U>::itemDropped(const juce::DragAndDropTarget::SourceDetails& dragSourceDetails)
 {
-	BaseManagerUI<M, T, U>::itemDropped(dragSourceDetails);
+	ManagerUI<M, T, U>::itemDropped(dragSourceDetails);
 
 	BaseItemMinimalUI<T>* bui = dynamic_cast<BaseItemMinimalUI<T> *>(dragSourceDetails.sourceComponent.get());
 
@@ -785,7 +785,7 @@ void BaseManagerViewUI<M, T, U>::itemDropped(const juce::DragAndDropTarget::Sour
 }
 
 template<class M, class T, class U>
-juce::Point<float> BaseManagerViewUI<M, T, U>::getPositionFromDrag(juce::Component* c, const juce::DragAndDropTarget::SourceDetails& dragSourceDetails)
+juce::Point<float> ManagerViewUI<M, T, U>::getPositionFromDrag(juce::Component* c, const juce::DragAndDropTarget::SourceDetails& dragSourceDetails)
 {
 	juce::Point<int> relOffset = juce::Point<int>((int)dragSourceDetails.description.getProperty("offsetX", 0), (int)dragSourceDetails.description.getProperty("offsetY", 0));
 	juce::Point<int> realP = this->getMouseXYRelative() - (this->getLocalPoint(c, relOffset) - c->getPosition()) * 1.0f / this->manager->viewZoom;
@@ -794,7 +794,7 @@ juce::Point<float> BaseManagerViewUI<M, T, U>::getPositionFromDrag(juce::Compone
 }
 
 template<class M, class T, class U>
-void BaseManagerViewUI<M, T, U>::itemUIMiniModeChanged(BaseItemUI<T>* itemUI)
+void ManagerViewUI<M, T, U>::itemUIMiniModeChanged(BaseItemUI<T>* itemUI)
 {
 	updateViewUIPosition(dynamic_cast<U*>(itemUI));
 }
@@ -803,13 +803,13 @@ void BaseManagerViewUI<M, T, U>::itemUIMiniModeChanged(BaseItemUI<T>* itemUI)
 
 
 template<class M, class T, class U>
-void BaseManagerViewUI<M, T, U>::itemUIViewPositionChanged(BaseItemMinimalUI<T>* itemUI)
+void ManagerViewUI<M, T, U>::itemUIViewPositionChanged(BaseItemMinimalUI<T>* itemUI)
 {
 	updateViewUIPosition(dynamic_cast<U*>(itemUI));
 }
 
 template<class M, class T, class U>
-void BaseManagerViewUI<M, T, U>::askForSyncPosAndSize(BaseItemMinimalUI<T>* itemUI)
+void ManagerViewUI<M, T, U>::askForSyncPosAndSize(BaseItemMinimalUI<T>* itemUI)
 {
 	juce::Array<juce::UndoableAction*> actions;
 	actions.addArray(itemUI->baseItem->viewUIPosition->setUndoablePoint(getViewPos(itemUI->getPosition()).toFloat(), true));
@@ -819,7 +819,7 @@ void BaseManagerViewUI<M, T, U>::askForSyncPosAndSize(BaseItemMinimalUI<T>* item
 
 
 template<class M, class T, class U>
-void BaseManagerViewUI<M, T, U>::itemUIResizeDrag(BaseItemMinimalUI<T>* itemUI, const juce::Point<int>& dragOffset)
+void ManagerViewUI<M, T, U>::itemUIResizeDrag(BaseItemMinimalUI<T>* itemUI, const juce::Point<int>& dragOffset)
 {
 	juce::Point<float> pos = itemUI->baseItem->getPosition() + itemUI->baseItem->sizeReference + dragOffset.toFloat() / (useCheckersAsUnits ? checkerSize : 1);// getViewOffset(dragOffset);
 
@@ -865,7 +865,7 @@ void BaseManagerViewUI<M, T, U>::itemUIResizeDrag(BaseItemMinimalUI<T>* itemUI, 
 }
 
 template<class M, class T, class U>
-void BaseManagerViewUI<M, T, U>::itemUIResizeEnd(BaseItemMinimalUI<T>* itemUI)
+void ManagerViewUI<M, T, U>::itemUIResizeEnd(BaseItemMinimalUI<T>* itemUI)
 {
 	snapLineX = juce::Line<int>();
 	snapLineY = juce::Line<int>();
@@ -884,7 +884,7 @@ void BaseManagerViewUI<M, T, U>::itemUIResizeEnd(BaseItemMinimalUI<T>* itemUI)
 }
 
 template<class M, class T, class U>
-typename BaseManagerViewUI<M, T, U>::SnapResult BaseManagerViewUI<M, T, U>::getClosestSnapUI(juce::Point<float> pos, bool isX, float spacingBefore, float spacingAfter)
+typename ManagerViewUI<M, T, U>::SnapResult ManagerViewUI<M, T, U>::getClosestSnapUI(juce::Point<float> pos, bool isX, float spacingBefore, float spacingAfter)
 {
 	int dist = snappingThreshold;
 	int target = 0;

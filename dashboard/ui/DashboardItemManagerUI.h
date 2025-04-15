@@ -11,7 +11,7 @@
 #pragma once
 
 class DashboardItemManagerUI :
-	public BaseManagerViewUI<DashboardItemManager, DashboardItem, BaseItemMinimalUI<DashboardItem>>,
+	public ManagerViewUI<DashboardItemManager, DashboardItem, BaseItemMinimalUI<DashboardItem>>,
 	public ContainerAsyncListener,
 	public Parameter::AsyncListener
 {

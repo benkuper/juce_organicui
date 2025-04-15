@@ -12,7 +12,7 @@
 #include "GenericControllableManager.h"
 
 GenericControllableManager::GenericControllableManager(const String& name, bool itemsCanBeDisabled, bool canAddTriggers, bool canAddTargets, bool canAddEnums) :
-	BaseManager(name),
+	Manager(name),
 	itemsCanBeDisabled(itemsCanBeDisabled),
 	forceItemsFeedbackOnly(false)
 {
@@ -88,7 +88,7 @@ InspectableEditor* GenericControllableManager::getEditorInternal(bool isRoot, Ar
 {
 	return new GenericManagerEditor<GenericControllableItem>(this, isRoot);
 	/*
-	BaseManagerUI<GenericControllableManager, GenericControllableItem,GenericControllableItemUI> * ui = new BaseManagerUI<GenericControllableManager, GenericControllableItem, GenericControllableItemUI>(niceName, this, false);
+	ManagerUI<GenericControllableManager, GenericControllableItem,GenericControllableItemUI> * ui = new ManagerUI<GenericControllableManager, GenericControllableItem, GenericControllableItemUI>(niceName, this, false);
 	ui->drawContour = true;
 	ui->addExistingItems();
 	ui->setSize(100, 100);

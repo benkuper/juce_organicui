@@ -11,7 +11,7 @@
 #pragma once
 
 class ParrotManager :
-    public BaseManager<Parrot>
+    public Manager<Parrot>
 {
 public:
     juce_DeclareSingleton(ParrotManager, true);

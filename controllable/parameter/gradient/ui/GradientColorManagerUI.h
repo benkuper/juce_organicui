@@ -11,7 +11,7 @@
 #pragma once
 
 class GradientColorManagerUI :
-	public BaseManagerUI<GradientColorManager, GradientColor, GradientColorUI>,
+	public ManagerUI<GradientColorManager, GradientColor, GradientColorUI>,
 	public ContainerAsyncListener,
 	public UITimerTarget,
 	public juce::Thread

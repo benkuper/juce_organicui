@@ -10,7 +10,7 @@
 
 AutomationUIKeys::AutomationUIKeys(Automation* manager, AutomationUI* _autoUI) :
 	autoUI(_autoUI),
-	BaseManagerUI(manager->niceName, manager, false),
+	ManagerUI(manager->niceName, manager, false),
 	autoAdaptViewRange(false),
 	paintingMode(false),
 	previewMode(false)
@@ -415,7 +415,7 @@ void AutomationUIKeys::mouseDown(const MouseEvent& e)
 		{
 			if (!e.mods.isRightButtonDown() || autoUI->showMenuOnRightClick)
 			{
-				BaseManagerUI::mouseDown(e);
+				ManagerUI::mouseDown(e);
 			}
 		}
 	}
@@ -538,7 +538,7 @@ void AutomationUIKeys::mouseDrag(const MouseEvent& e)
 			//}
 		}
 		{
-			BaseManagerUI::mouseDrag(e);
+			ManagerUI::mouseDrag(e);
 		}
 	}
 }
@@ -554,7 +554,7 @@ void AutomationUIKeys::mouseUp(const MouseEvent& e)
 	}
 	else
 	{
-		BaseManagerUI::mouseUp(e);
+		ManagerUI::mouseUp(e);
 	}
 }
 
@@ -781,7 +781,7 @@ void AutomationUIKeys::buttonClicked(Button* b)
 	}
 	else
 	{
-		BaseManagerUI::buttonClicked(b);
+		ManagerUI::buttonClicked(b);
 	}
 }
 

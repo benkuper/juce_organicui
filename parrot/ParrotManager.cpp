@@ -11,7 +11,7 @@
 juce_ImplementSingleton(ParrotManager)
 
 ParrotManager::ParrotManager() :
-    BaseManager("Parrots")
+    Manager("Parrots")
 {
     hideInRemoteControl = true;
     defaultHideInRemoteControl = true;

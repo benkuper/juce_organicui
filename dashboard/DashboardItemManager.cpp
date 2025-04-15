@@ -9,7 +9,7 @@
 */
 
 DashboardItemManager::DashboardItemManager() :
-	BaseManager("Dashboard")
+	Manager("Dashboard")
 {
 	managerFactory = DashboardItemFactory::getInstance();
 	selectItemWhenCreated = true;
@@ -32,7 +32,7 @@ DashboardItemManager::~DashboardItemManager()
 
 void DashboardItemManager::clear()
 {
-	BaseManager::clear();
+	Manager::clear();
 }
 
 void DashboardItemManager::fillServerData(var &data)

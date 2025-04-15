@@ -2,7 +2,7 @@
 juce_ImplementSingleton(Detective);
 
 Detective::Detective() :
-	BaseManager("The Detective")
+	Manager("The Detective")
 {
 	userCanAddItemsManually = false;
 	isSelectable = false;

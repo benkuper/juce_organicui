@@ -27,7 +27,7 @@ public:
 class AutomationUI;
 
 class AutomationUIKeys :
-    public BaseManagerUI<Automation, AutomationKey, AutomationKeyUI>,
+    public ManagerUI<Automation, AutomationKey, AutomationKeyUI>,
     public AutomationKey::AsyncListener,
     public AutomationKeyUI::KeyUIListener,
     public ContainerAsyncListener,

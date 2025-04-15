@@ -19,7 +19,7 @@ Dashboard::Dashboard() :
 	password = addStringParameter("Password", "Password for web clients for this specific dashboard, leave empty public access", "");
 	unlockOnce = addBoolParameter("Unlock Only Once", "If checked, this will allow to only have to unlock once per session. Refreshing the page will reset the lock.", false);
 	addChildControllableContainer(&itemManager);
-	itemManager.addBaseManagerListener(this);
+	itemManager.addManagerListener(this);
 	itemManager.addDashboardFeedbackListener(this);
 }
 

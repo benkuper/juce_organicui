@@ -32,6 +32,8 @@
 
 #include "manager/Factory.h"
 #include "manager/BaseItem.cpp"
+#include "manager/ItemGroup.cpp"
+
 #include "manager/GenericControllableManager.cpp"
 #include "manager/GenericControllableItem.cpp"
 #include "manager/ui/GenericControllableItemEditor.cpp" 

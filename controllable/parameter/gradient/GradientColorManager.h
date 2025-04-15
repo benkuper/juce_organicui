@@ -23,7 +23,7 @@ public:
 };
 
 class GradientColorManager :
-	public BaseManager<GradientColor>
+	public Manager<GradientColor>
 {
 public:
 	GradientColorManager(float maxPosition = 10, bool addDefaultColors = false, bool dedicatedSelectionManager = true);

@@ -31,7 +31,7 @@ public:
 
 
 class DashboardManager :
-	public BaseManager<Dashboard>,
+	public Manager<Dashboard>,
 	public Dashboard::DashboardListener,
 	public EngineListener
 #if ORGANICUI_USE_WEBSERVER

@@ -11,7 +11,7 @@
 #pragma once
 
 class ParrotRecordManager :
-    public BaseManager<ParrotRecord>
+    public Manager<ParrotRecord>
 {
 public:
     ParrotRecordManager();

@@ -1,7 +1,7 @@
 #pragma once
 
 class Detective :
-	public BaseManager<ControllableDetectiveWatcher>
+	public Manager<ControllableDetectiveWatcher>
 {
 public:
 	juce_DeclareSingleton(Detective, true);

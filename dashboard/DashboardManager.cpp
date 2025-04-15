@@ -16,7 +16,7 @@ ApplicationProperties& getAppProperties();
 String getAppVersion();
 
 DashboardManager::DashboardManager() :
-	BaseManager("Dashboards")
+	Manager("Dashboards")
 {
 	hideInRemoteControl = true;
 	defaultHideInRemoteControl = true;

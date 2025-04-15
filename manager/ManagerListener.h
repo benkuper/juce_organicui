@@ -1,11 +1,11 @@
 #pragma once
 
 template<typename T>
-class  BaseManagerListener
+class ManagerTListener
 {
 public:
 	/** Destructor. */
-	virtual ~BaseManagerListener() {}
+	virtual ~ManagerTListener() {}
 	virtual void itemAdded(T*) {}
 	virtual void itemsAdded(juce::Array<T*>) {}
 	virtual void itemRemoved(T*) {}

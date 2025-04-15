@@ -1,19 +1,10 @@
 /*
   ==============================================================================
 
-    CommentManager.cpp
-    Created: 4 Apr 2019 9:39:03am
+    BaseGroup.cpp
+    Created: 15 Apr 2025 2:07:26pm
     Author:  bkupe
 
   ==============================================================================
 */
 
-CommentManager::CommentManager() :
-	Manager("Comments")
-{
-	hideInEditor = true;
-}
-
-CommentManager::~CommentManager()
-  {
-  }

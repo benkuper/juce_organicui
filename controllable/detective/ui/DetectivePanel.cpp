@@ -1,5 +1,5 @@
 DetectivePanel::DetectivePanel(const String& name) :
-	BaseManagerShapeShifterUI(name, Detective::getInstance())
+	ManagerShapeShifterUI(name, Detective::getInstance())
 {
 	addExistingItems();
 }

@@ -10,7 +10,7 @@
 
 
 DashboardManagerUI::DashboardManagerUI(DashboardManager* manager) :
-	BaseManagerUI("Dashboards", manager)
+	ManagerUI("Dashboards", manager)
 {
 	setDefaultLayout(Layout::HORIZONTAL);
 
@@ -37,5 +37,5 @@ void DashboardManagerUI::resizedInternalContent(Rectangle<int>& r)
 	Rectangle<int> br = r.removeFromRight(100).reduced(4);
 	editModeUI->setBounds(br.removeFromTop(br.getHeight() / 2).reduced(1));
 	snappingUI->setBounds(br.reduced(1));
-	BaseManagerUI::resizedInternalContent(r);
+	ManagerUI::resizedInternalContent(r);
 }

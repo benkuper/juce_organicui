@@ -569,7 +569,7 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 	{
 		InspectableSelectionManager* selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
 		Array<BaseItem*> items = selectionManager->getInspectablesAs<BaseItem>();
-		HashMap<BaseManager<BaseItem>*, Array<BaseItem*>*> managerItemMap;
+		HashMap<Manager<BaseItem>*, Array<BaseItem*>*> managerItemMap;
 
 		if (items.size() == 1)
 		{
@@ -583,14 +583,14 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 				if (i == nullptr) continue;
 				if (!i->userCanDuplicate) continue;
 
-				if (BaseManager<BaseItem>* managerContainer = (BaseManager<BaseItem>*)(i->parentContainer.get()))
+				if (Manager<BaseItem>* managerContainer = (Manager<BaseItem>*)(i->parentContainer.get()))
 				{
 					if (!managerItemMap.contains(managerContainer)) managerItemMap.set(managerContainer, new Array<BaseItem*>());
 					managerItemMap[managerContainer]->addIfNotAlreadyThere(i);
 				}
 			}
 
-			HashMap<BaseManager<BaseItem>*, Array<BaseItem*>*>::Iterator it(managerItemMap);
+			HashMap<Manager<BaseItem>*, Array<BaseItem*>*>::Iterator it(managerItemMap);
 			while (it.next())
 			{
 				if (it.getKey() == nullptr)
@@ -630,20 +630,20 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 	{
 		InspectableSelectionManager* selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
 		Array<BaseItem*> items = selectionManager->getInspectablesAs<BaseItem>();
-		HashMap<BaseManager<BaseItem>*, Array<BaseItem*>*> managerItemMap;
+		HashMap<Manager<BaseItem>*, Array<BaseItem*>*> managerItemMap;
 		for (auto& i : items)
 		{
 			if (i == nullptr) continue;
 			if (!i->userCanRemove) continue;
 
-			if (BaseManager<BaseItem>* managerContainer = (BaseManager<BaseItem>*)(i->parentContainer.get()))
+			if (Manager<BaseItem>* managerContainer = (Manager<BaseItem>*)(i->parentContainer.get()))
 			{
 				if (!managerItemMap.contains(managerContainer)) managerItemMap.set(managerContainer, new Array<BaseItem*>());
 				managerItemMap[managerContainer]->addIfNotAlreadyThere(i);
 			}
 		}
 
-		HashMap<BaseManager<BaseItem>*, Array<BaseItem*>*>::Iterator it(managerItemMap);
+		HashMap<Manager<BaseItem>*, Array<BaseItem*>*>::Iterator it(managerItemMap);
 		while (it.next())
 		{
 			if (it.getKey() == nullptr)

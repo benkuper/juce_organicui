@@ -34,7 +34,7 @@ BaseItem::BaseItem(const String& name, bool _canBeDisabled, bool _canHaveScripts
 	if (canHaveScripts)
 	{
 		scriptManager.reset(new ScriptManager(this));
-		scriptManager->addBaseManagerListener(this);
+		scriptManager->addManagerListener(this);
 		addChildControllableContainer(scriptManager.get());
 	}
 

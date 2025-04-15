@@ -10,7 +10,7 @@
 
 
 ParrotManagerUI::ParrotManagerUI() :
-    BaseManagerShapeShifterUI(ParrotManager::getInstance()->niceName, ParrotManager::getInstance())
+    ManagerShapeShifterUI(ParrotManager::getInstance()->niceName, ParrotManager::getInstance())
 {
     addExistingItems();
 }

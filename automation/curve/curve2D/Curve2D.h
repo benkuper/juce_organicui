@@ -11,7 +11,7 @@
 #pragma once
 
 class Curve2D :
-    public BaseManager<Curve2DKey>
+    public Manager<Curve2DKey>
 {
 public:
     Curve2D(const juce::String &name = "Curve 2D");

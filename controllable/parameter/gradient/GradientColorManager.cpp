@@ -11,7 +11,7 @@
 GradientColorComparator GradientColorManager::comparator;
 
 GradientColorManager::GradientColorManager(float maxPosition, bool addDefaultColors, bool dedicatedSelectionManager) :
-	BaseManager("Colors"),
+	Manager("Colors"),
 	allowKeysOutside(true)
 {
 
@@ -152,7 +152,7 @@ GradientColor * GradientColorManager::addColorAt(float time, Colour color)
 	if (t == nullptr)
 	{
 		t = new GradientColor(time, color);
-		BaseManager::addItem(t);
+		Manager::addItem(t);
 	}
 	else
 	{
@@ -224,7 +224,7 @@ void GradientColorManager::removeItemInternal(GradientColor *)
 
 Array<GradientColor*> GradientColorManager::addItemsFromClipboard(bool showWarning)
 {
-	Array<GradientColor*> keys = BaseManager::addItemsFromClipboard(showWarning);
+	Array<GradientColor*> keys = Manager::addItemsFromClipboard(showWarning);
 
 	if (keys.isEmpty()) return keys;
 	if (keys[0] == nullptr) return Array<GradientColor*>();
@@ -261,7 +261,7 @@ Array<GradientColor*> GradientColorManager::addItemsFromClipboard(bool showWarni
 void GradientColorManager::reorderItems()
 {
 	items.sort(GradientColorManager::comparator, true);
-	BaseManager::reorderItems();
+	Manager::reorderItems();
 }
 
 void GradientColorManager::onContainerParameterChanged(Parameter * p)
@@ -283,12 +283,12 @@ void GradientColorManager::onControllableFeedbackUpdate(ControllableContainer * 
 			if (index > 0 && t->position->floatValue() < items[index - 1]->position->floatValue())
 			{
 				items.swap(index, index - 1);
-				baseManagerListeners.call(&ManagerListener::itemsReordered);
+				managerListeners.call(&ManagerListener::itemsReordered);
 			}
 			else if (index < items.size() - 1 && t->position->floatValue() > items[index + 1]->position->floatValue())
 			{
 				items.swap(index, index + 1);
-				baseManagerListeners.call(&ManagerListener::itemsReordered);
+				managerListeners.call(&ManagerListener::itemsReordered);
 			}
 
 		}
@@ -340,7 +340,7 @@ var GradientColorManager::getKeysBetweenFromScript(const juce::var::NativeFuncti
 
 void GradientColorManager::loadJSONDataInternal(var data)
 {
-	BaseManager::loadJSONDataInternal(data);
+	Manager::loadJSONDataInternal(data);
 	//updateKeyRanges();
 	//rebuildGradient();
 }

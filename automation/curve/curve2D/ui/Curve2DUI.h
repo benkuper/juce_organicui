@@ -11,7 +11,7 @@
 #pragma once
 
 class Curve2DUI :
-    public BaseManagerViewUI<Curve2D, Curve2DKey, Curve2DKeyUI>,
+    public ManagerViewUI<Curve2D, Curve2DKey, Curve2DKeyUI>,
     public Curve2DKey::AsyncListener,
     public Curve2DKeyUI::KeyUIListener,
     public ContainerAsyncListener,

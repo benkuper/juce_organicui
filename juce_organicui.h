@@ -276,20 +276,21 @@
 
 
 #include "manager/BaseItemListener.h"
-#include "manager/BaseManagerListener.h"
+#include "manager/ManagerListener.h"
 #include "manager/BaseItem.h"
+#include "manager/ItemGroup.h"
 
 #include "manager/ui/BaseItemMinimalUI.h"
 #include "manager/ui/BaseItemUI.h"
 #include "manager/ui/BaseItemEditor.h"
 #include "manager/ui/GenericManagerEditor.h"
 
-#include "manager/BaseManager.h"
+#include "manager/Manager.h"
 
-#include "manager/ui/BaseManagerUI.h"
-#include "manager/ui/BaseManagerViewMiniPane.h"
-#include "manager/ui/BaseManagerViewUI.h"
-#include "manager/ui/BaseManagerShapeShifterUI.h"
+#include "manager/ui/ManagerUI.h"
+#include "manager/ui/ManagerViewMiniPane.h"
+#include "manager/ui/ManagerViewUI.h"
+#include "manager/ui/ManagerShapeShifterUI.h"
 
 #include "manager/GenericControllableItem.h"
 #include "manager/GenericControllableManager.h"

@@ -11,7 +11,7 @@
 #pragma once
 
 class DashboardItemManager :
-	public BaseManager<DashboardItem>,
+	public Manager<DashboardItem>,
 	public DashboardFeedbackBroadcaster
 {
 public:

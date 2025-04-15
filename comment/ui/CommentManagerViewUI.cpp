@@ -9,7 +9,7 @@
 */
 
 CommentManagerViewUI::CommentManagerViewUI(CommentManager * manager) :
-	BaseManagerViewUI(manager->niceName, manager)
+	ManagerViewUI(manager->niceName, manager)
 {
 	//animateItemOnAdd = false;
 	setShowAddButton(false);
@@ -33,6 +33,6 @@ void CommentManagerViewUI::mouseWheelMove(const MouseEvent& e, const MouseWheelD
 bool CommentManagerViewUI::keyPressed(const KeyPress &e)
 {
 	// skip manager handling (frame, home view)
-	return BaseManagerUI<CommentManager, CommentItem, CommentUI>::keyPressed(e);
+	return ManagerUI<CommentManager, CommentItem, CommentUI>::keyPressed(e);
 }
 

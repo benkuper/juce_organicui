@@ -20,7 +20,7 @@ DashboardManagerView::DashboardManagerView(const String &contentName, DashboardM
 	
 	addAndMakeVisible(&managerUI);
 	InspectableSelectionManager::mainSelectionManager->addSelectionListener(this);
-	DashboardManager::getInstance()->addBaseManagerListener(this);
+	DashboardManager::getInstance()->addManagerListener(this);
 	
 	helpID = "Dashboard";
 	
@@ -38,7 +38,7 @@ DashboardManagerView::DashboardManagerView(const String &contentName, DashboardM
 
 DashboardManagerView::~DashboardManagerView()
 {
-	if(DashboardManager::getInstanceWithoutCreating() != nullptr) DashboardManager::getInstance()->removeBaseManagerListener(this);
+	if(DashboardManager::getInstanceWithoutCreating() != nullptr) DashboardManager::getInstance()->removeManagerListener(this);
 	if (InspectableSelectionManager::mainSelectionManager != nullptr) InspectableSelectionManager::mainSelectionManager->removeSelectionListener(this);
 }
 

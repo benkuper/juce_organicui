@@ -46,7 +46,6 @@ GlobalSettings::GlobalSettings() :
 	fileToOpenOnStartup->forceAbsolutePath = true;
 	startupCC.addParameter(fileToOpenOnStartup);
 
-
 	addChildControllableContainer(&startupCC);
 
 	closeToSystemTray = interfaceCC.addBoolParameter("Close to system tray", "If checked, closing the main window will remove the window from desktop and put it on the system tray, but the app will still be running", false);
@@ -55,12 +54,7 @@ GlobalSettings::GlobalSettings() :
 	helpLanguage = interfaceCC.addEnumParameter("Help language", "What language to download ? You will need to restart the software to see changes");
 	helpLanguage->addOption("English", "en")->addOption("French", "fr")->addOption("Chinese", "cn");
 
-	bool useGL = true;
-#if JUCE_MAC || JUCE_LINUX //OpenGL is not working so well on mac and linux
-	useGL = false;
-#endif
-
-	useGLRenderer = interfaceCC.addBoolParameter("Use OpenGL Renderer", "If checked, this will use hardware acceleration to render the interface. You may want to NOT use this on some platform or when using the IFrame Dashboard item. You need to restart if you change it.", useGL);
+	useGLRenderer = interfaceCC.addBoolParameter("Use OpenGL Renderer", "If checked, this will use hardware acceleration to render the interface. You may want to NOT use this on some platform or when using the IFrame Dashboard item. You need to restart if you change it.", false);
 	
 	uiRefreshRate = interfaceCC.addIntParameter("UI Refresh Rate", "The refresh rate of the UI in hz", 30, 1, 100);
 	loggerRefreshRate = interfaceCC.addIntParameter("Logger Refresh Rate", "The refresh rate of the logger in hz", 20, 1, 1000);

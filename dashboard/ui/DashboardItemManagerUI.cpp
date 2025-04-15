@@ -16,7 +16,7 @@ std::function<void(PopupMenu*, int)> DashboardItemManagerUI::customAddItemsToMen
 std::function<void(int, int, DashboardItemManagerUI*, Point<float>)> DashboardItemManagerUI::customHandleMenuResultFunc = nullptr;
 
 DashboardItemManagerUI::DashboardItemManagerUI(DashboardItemManager* manager) :
-	BaseManagerViewUI("Dashboard", manager)
+	ManagerViewUI("Dashboard", manager)
 {
 	maxZoom = 2.0f;
 
@@ -54,13 +54,13 @@ DashboardItemManagerUI::~DashboardItemManagerUI()
 
 void DashboardItemManagerUI::resized()
 {
-	BaseManagerViewUI::resized();
+	ManagerViewUI::resized();
 	addItemBT->setBounds(Rectangle<int>(0, 0, 50, 50));
 }
 
 void DashboardItemManagerUI::paint(Graphics& g)
 {
-	BaseManagerViewUI::paint(g);
+	ManagerViewUI::paint(g);
 
 	if (manager == nullptr || inspectable.wasObjectDeleted()) return;
 
@@ -82,7 +82,7 @@ void DashboardItemManagerUI::paint(Graphics& g)
 
 void DashboardItemManagerUI::paintOverChildren(Graphics& g)
 {
-	BaseManagerViewUI::paintOverChildren(g);
+	ManagerViewUI::paintOverChildren(g);
 
 	if (manager == nullptr || inspectable.wasObjectDeleted()) return;
 	if (manager->canvasSize->enabled && manager->canvasSize->x > 0 && manager->canvasSize->y > 0)
@@ -114,7 +114,7 @@ bool DashboardItemManagerUI::checkItemShouldBeVisible(BaseItemMinimalUI<Dashboar
 	if (ui->item == nullptr) return false;
 	if (!ui->item->isVisible->boolValue()) return false;
 
-	return BaseManagerViewUI::checkItemShouldBeVisible(ui);
+	return ManagerViewUI::checkItemShouldBeVisible(ui);
 }
 
 bool DashboardItemManagerUI::isInterestedInDragSource(const SourceDetails& dragSourceDetails)
@@ -126,7 +126,7 @@ void DashboardItemManagerUI::itemDropped(const SourceDetails& details)
 {
 	String type = details.description.getProperty("type", "").toString();
 
-	BaseManagerViewUI::itemDropped(details);
+	ManagerViewUI::itemDropped(details);
 
 	if (details.sourceComponent->getParentComponent() == this) return;
 
@@ -168,7 +168,7 @@ void DashboardItemManagerUI::itemDropped(const SourceDetails& details)
 void DashboardItemManagerUI::showMenuAndAddItem(bool fromAddButton, Point<int> mousePos)
 {
 	if (!DashboardManager::getInstance()->editMode->boolValue()) return;
-	//BaseManagerViewUI::showMenuAndAddItem(fromAddButton, mousePos);
+	//ManagerViewUI::showMenuAndAddItem(fromAddButton, mousePos);
 
 	PopupMenu menu;
 	menu.addItem(-1, "Add Group");

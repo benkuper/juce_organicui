@@ -14,7 +14,7 @@
 #pragma once
 
 class Automation :
-	public BaseManager<AutomationKey>
+	public Manager<AutomationKey>
 {
 public:
 	Automation(const juce::String& name = "Automation", AutomationRecorder* recorder = nullptr, bool allowKeysOutside = false);

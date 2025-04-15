@@ -11,7 +11,7 @@
 #include "JuceHeader.h"
 
 Curve2D::Curve2D(const String& name) :
-	BaseManager(name),
+	Manager(name),
 	recorder(nullptr),
 	showUIInEditor(true)
 {
@@ -275,7 +275,7 @@ Point<float> Curve2D::getValueAtPosition(float pos)
 
 void Curve2D::onContainerParameterChanged(Parameter* p)
 {
-	BaseManager::onContainerParameterChanged(p);
+	Manager::onContainerParameterChanged(p);
 	if (p == position)
 	{
 		computeValue();
@@ -285,7 +285,7 @@ void Curve2D::onContainerParameterChanged(Parameter* p)
 
 void Curve2D::onControllableFeedbackUpdate(ControllableContainer* cc, Controllable* c)
 {
-	BaseManager::onControllableFeedbackUpdate(cc, c);
+	Manager::onControllableFeedbackUpdate(cc, c);
 
 	if (Curve2DKey* k = dynamic_cast<Curve2DKey*>(cc))
 	{

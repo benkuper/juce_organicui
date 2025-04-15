@@ -2,7 +2,7 @@
 
 
 class DetectivePanel :
-	public BaseManagerShapeShifterUI<Detective,ControllableDetectiveWatcher,ControllableDetectiveWatcherUI>
+	public ManagerShapeShifterUI<Detective,ControllableDetectiveWatcher,ControllableDetectiveWatcherUI>
 {
 public:
 	DetectivePanel(const juce::String& name);

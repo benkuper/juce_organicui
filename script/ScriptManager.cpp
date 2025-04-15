@@ -9,7 +9,7 @@
 */
 
 ScriptManager::ScriptManager(ScriptTarget * _parentTarget):
-	BaseManager("Scripts"),
+	Manager("Scripts"),
 	parentTarget(_parentTarget),
 	scriptTemplate("generic")
 {

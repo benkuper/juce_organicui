@@ -12,7 +12,7 @@
 
 
 class ScriptManager :
-	public BaseManager<Script>
+	public Manager<Script>
 {
 public:
 	ScriptManager(ScriptTarget * parentTarget);

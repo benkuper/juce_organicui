@@ -41,7 +41,7 @@ public:
 	static void handleControllableForOSCMessage(Controllable* c, const juce::OSCMessage& m, int dataOffset = 0);
 
 	template<class T>
-	static T* getItemForArgument(BaseManager<T>* manager, const juce::OSCMessage& m, int argIndex)
+	static T* getItemForArgument(Manager<T>* manager, const juce::OSCMessage& m, int argIndex)
 	{
 		if (m.size() <= argIndex) return nullptr;
 

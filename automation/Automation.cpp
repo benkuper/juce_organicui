@@ -13,7 +13,7 @@
 using namespace juce;
 
 Automation::Automation(const String& name, AutomationRecorder* recorder, bool allowKeysOutside) :
-	BaseManager(name),
+	Manager(name),
 	valueRange(nullptr),
 	allowKeysOutside(allowKeysOutside),
 	positionUnitSteps(0),
@@ -374,7 +374,7 @@ void Automation::removeItemsInternal(Array<AutomationKey*>)
 
 Array<AutomationKey*> Automation::addItemsFromClipboard(bool showWarning)
 {
-	Array<AutomationKey*> keys = BaseManager::addItemsFromClipboard(showWarning);
+	Array<AutomationKey*> keys = Manager::addItemsFromClipboard(showWarning);
 
 	if (keys.isEmpty()) return keys;
 	if (keys[0] == nullptr) return Array<AutomationKey*>();
@@ -624,7 +624,7 @@ float Automation::getNormalizedValueAtPosition(float pos)
 
 void Automation::onContainerParameterChanged(Parameter* p)
 {
-	BaseManager::onContainerParameterChanged(p);
+	Manager::onContainerParameterChanged(p);
 	if (p == position)
 	{
 		computeValue();
@@ -662,7 +662,7 @@ void Automation::onControllableStateChanged(Controllable* c)
 
 void Automation::onExternalParameterValueChanged(Parameter* p)
 {
-	BaseManager::onExternalParameterValueChanged(p);
+	Manager::onExternalParameterValueChanged(p);
 	if (recorder != nullptr && p == recorder->simplificationTolerance)
 	{
 		if (!interactiveSourcePoints.isEmpty())
@@ -675,7 +675,7 @@ void Automation::onExternalParameterValueChanged(Parameter* p)
 
 void Automation::reorderItems()
 {
-	BaseManager::reorderItems();
+	Manager::reorderItems();
 	updateNextKeys();
 }
 

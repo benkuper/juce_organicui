@@ -11,19 +11,19 @@
 #pragma once
 
 template<class T>
-class BaseManager;
+class Manager;
 
 template<class T>
 class GenericManagerEditor :
 	public EnablingControllableContainerEditor,
-	public BaseManager<T>::AsyncListener,
+	public Manager<T>::AsyncListener,
 	public juce::DragAndDropTarget
 {
 public:
-	GenericManagerEditor(BaseManager<T>* manager, bool isRoot);
+	GenericManagerEditor(Manager<T>* manager, bool isRoot);
 	virtual ~GenericManagerEditor();
 
-	BaseManager<T>* manager;
+	Manager<T>* manager;
 
 	juce::Array<BaseItemEditor*> itemEditors;
 
@@ -63,7 +63,7 @@ public:
 	virtual InspectableEditor* addEditorUI(ControllableContainer* cc, bool resize = false) override;
 	virtual void removeEditorUI(InspectableEditor* i, bool resize = false) override;
 
-	void newMessage(const typename BaseManager<T>::ManagerEvent& e) override;
+	void newMessage(const typename Manager<T>::ManagerEvent& e) override;
 
 	virtual void itemAddedAsync(T* item) {}
 	virtual void itemRemovedAsync(T* item) {}
@@ -82,7 +82,7 @@ public:
 
 
 template<class T>
-GenericManagerEditor<T>::GenericManagerEditor(BaseManager<T>* _manager, bool isRoot) :
+GenericManagerEditor<T>::GenericManagerEditor(Manager<T>* _manager, bool isRoot) :
 	EnablingControllableContainerEditor(_manager, isRoot, false),
 	manager(_manager),
 	isDraggingOver(false),
@@ -273,7 +273,7 @@ void GenericManagerEditor<T>::showMenuAndAddItem(bool isFromAddButton)
 template<class T>
 T* GenericManagerEditor<T>::addItemFromMenu(bool /*isFromAddButton*/)
 {
-	T* item = manager->BaseManager<T>::addItem();
+	T* item = manager->Manager<T>::addItem();
 	return item;
 }
 
@@ -315,26 +315,26 @@ void GenericManagerEditor<T>::removeEditorUI(InspectableEditor* ui, bool resize)
 
 
 template<class T>
-void GenericManagerEditor<T>::newMessage(const typename BaseManager<T>::ManagerEvent& e)
+void GenericManagerEditor<T>::newMessage(const typename Manager<T>::ManagerEvent& e)
 {
 	switch (e.type)
 	{
-	case BaseManager<T>::ManagerEvent::ITEM_ADDED:
+	case Manager<T>::ManagerEvent::ITEM_ADDED:
 		setCollapsed(false, true);
 		itemAddedAsync(e.getItem());
 		if (BaseItemEditor* bui = dynamic_cast<BaseItemEditor*>(getEditorForInspectable(e.getItem()))) itemEditors.addIfNotAlreadyThere(bui);
 		resized();
 		break;
 
-	case BaseManager<T>::ManagerEvent::ITEM_REMOVED:
+	case Manager<T>::ManagerEvent::ITEM_REMOVED:
 		itemRemovedAsync(e.getItem());
 		if (BaseItemEditor* bui = dynamic_cast<BaseItemEditor*>(getEditorForInspectable(e.getItem()))) itemEditors.removeAllInstancesOf(bui);
 		resized();
 		break;
 
-	case BaseManager<T>::ManagerEvent::ITEMS_ADDED:
-	case BaseManager<T>::ManagerEvent::ITEMS_REMOVED:
-	case BaseManager<T>::ManagerEvent::ITEMS_REORDERED:
+	case Manager<T>::ManagerEvent::ITEMS_ADDED:
+	case Manager<T>::ManagerEvent::ITEMS_REMOVED:
+	case Manager<T>::ManagerEvent::ITEMS_REORDERED:
 		resetAndBuild();
 		break;
 
@@ -408,7 +408,7 @@ void GenericManagerEditor<T>::itemDropped(const SourceDetails& dragSourceDetails
 				{
 					juce::Array<juce::UndoableAction*> actions;
 					actions.add(this->manager->getAddItemUndoableAction(newItem, data));
-					if (BaseManager<T>* sourceManager = dynamic_cast<BaseManager<T> *>(tItem->parentContainer.get()))
+					if (Manager<T>* sourceManager = dynamic_cast<Manager<T> *>(tItem->parentContainer.get()))
 					{
 						actions.addArray(sourceManager->getRemoveItemUndoableAction(tItem));
 					}

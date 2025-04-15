@@ -13,7 +13,7 @@
 
 
 Curve2DUI::Curve2DUI(Curve2D* manager) :
-	BaseManagerViewUI(manager->niceName, manager),
+	ManagerViewUI(manager->niceName, manager),
 	paintingMode(false)
 {
 	useCheckersAsUnits = true;
@@ -173,7 +173,7 @@ bool Curve2DUI::checkItemShouldBeVisible(Curve2DKeyUI* ui)
 
 void Curve2DUI::addItemUIInternal(Curve2DKeyUI* ui)
 {
-	BaseManagerViewUI::addItemUIInternal(ui);
+	ManagerViewUI::addItemUIInternal(ui);
 	ui->addMouseListener(this, true);
 	ui->item->addAsyncKeyListener(this);
 	ui->addKeyUIListener(this);
@@ -181,7 +181,7 @@ void Curve2DUI::addItemUIInternal(Curve2DKeyUI* ui)
 
 void Curve2DUI::removeItemUIInternal(Curve2DKeyUI* ui)
 {
-	BaseManagerViewUI::removeItemUIInternal(ui);
+	ManagerViewUI::removeItemUIInternal(ui);
 
 	ui->removeMouseListener(this);
 	if (!ui->inspectable.wasObjectDeleted())
@@ -201,7 +201,7 @@ void Curve2DUI::mouseDown(const MouseEvent& e)
 	}
 	else
 	{
-		BaseManagerViewUI::mouseDown(e);
+		ManagerViewUI::mouseDown(e);
 	}
 }
 
@@ -223,7 +223,7 @@ void Curve2DUI::mouseDrag(const MouseEvent& e)
 		 if (e.mods.isShiftDown()) offset.setY(0);
 		 if (e.mods.isAltDown()) k->scalePosition(offset, true);
 		 else k->movePosition(offset, true);*/
-		BaseManagerViewUI::mouseDrag(e);
+		ManagerViewUI::mouseDrag(e);
 	}
 	else if (e.eventComponent == this)
 	{
@@ -234,7 +234,7 @@ void Curve2DUI::mouseDrag(const MouseEvent& e)
 		}
 		else
 		{
-			BaseManagerViewUI::mouseDrag(e);
+			ManagerViewUI::mouseDrag(e);
 		}
 	}
 }
@@ -251,7 +251,7 @@ void Curve2DUI::mouseUp(const MouseEvent& e)
 	}
 	else
 	{
-		BaseManagerViewUI::mouseUp(e);
+		ManagerViewUI::mouseUp(e);
 	}
 }
 

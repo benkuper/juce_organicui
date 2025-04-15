@@ -11,7 +11,7 @@
 #pragma once
 
 class CommentManager :
-	public BaseManager<CommentItem>
+	public Manager<CommentItem>
 {
 public:
 	CommentManager();

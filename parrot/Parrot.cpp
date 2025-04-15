@@ -42,7 +42,7 @@ Parrot::Parrot() :
 	addChildControllableContainer(&targetsCC);
 	addChildControllableContainer(&recordManager);
 
-	recordManager.addBaseManagerListener(this);
+	recordManager.addManagerListener(this);
 
 	updateControls();
 }
@@ -50,7 +50,7 @@ Parrot::Parrot() :
 Parrot::~Parrot()
 {
 	stopThread(1000);
-	recordManager.removeBaseManagerListener(this);
+	recordManager.removeManagerListener(this);
 }
 
 void Parrot::setCurrentRecord(ParrotRecord* r)

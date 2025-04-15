@@ -9,7 +9,7 @@
 */
 
 ParrotRecordManager::ParrotRecordManager() :
-    BaseManager("Records")
+    Manager("Records")
 {
     selectItemWhenCreated = false;
 }
