@@ -133,9 +133,9 @@ void GenericManagerEditor<T>::resetAndBuild()
 
 		itemEditors.add(be);
 
-		//int index = manager->items.indexOf(static_cast<T*>(be->item));
+		//int index = manager->getItemIndex(static_cast<T*>(be->item));
 		//be->setIsFirst(index == 0);
-		//be->setIsLast(index == manager->items.size() - 1);
+		//be->setIsLast(index == manager->getNumItems() - 1);
 	}
 }
 
@@ -150,7 +150,7 @@ void GenericManagerEditor<T>::paint(juce::Graphics& g)
 {
 	GenericControllableContainerEditor::paint(g);
 
-	if (this->manager->items.size() == 0 && this->noItemText.isNotEmpty())
+	if (this->manager->getNumItems() == 0 && this->noItemText.isNotEmpty())
 	{
 		g.setColour(PANEL_COLOR.brighter(.1f));
 		g.drawFittedText(this->noItemText, this->getContentBounds().reduced(10), juce::Justification::centred, 4);

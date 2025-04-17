@@ -180,12 +180,12 @@ void ControllableUI::showContextMenu()
 	{
 		PopupMenu parrotMenu;
 		int index = 0;
-		for (auto& pa : ParrotManager::getInstance()->items)
-		{
-			bool isInParrot = pa->getTargetForControllable(controllable) != nullptr;
-			parrotMenu.addItem(index + 20000, pa->niceName, true, isInParrot);
-			index++;
-		}
+		ParrotManager::getInstance()->callFunctionOnItems([&](auto pa)
+			{
+				bool isInParrot = pa->getTargetForControllable(controllable) != nullptr;
+				parrotMenu.addItem(index + 20000, pa->niceName, true, isInParrot);
+				index++;
+			});
 
 		if (index > 0) parrotMenu.addSeparator();
 		parrotMenu.addItem(19999, "Create new Parrot");
@@ -198,11 +198,11 @@ void ControllableUI::showContextMenu()
 	{
 		PopupMenu dashboardMenu;
 		int index = 0;
-		for (auto& di : DashboardManager::getInstance()->items)
-		{
-			dashboardMenu.addItem(index + 10000, di->niceName);
-			index++;
-		}
+		DashboardManager::getInstance()->callFunctionOnItems([&](auto d)
+			{
+				dashboardMenu.addItem(index + 10000, d->niceName);
+				index++;
+			});
 
 		if (index > 0) dashboardMenu.addSeparator();
 		dashboardMenu.addItem(9999, "Create new Dashboard");
@@ -270,11 +270,11 @@ void ControllableUI::showContextMenu()
 			default:
 				if (result >= 10000 && result <= 10100)
 				{
-					DashboardManager::getInstance()->items[result - 10000]->itemManager.addItem(controllable->createDashboardItem());
+					DashboardManager::getInstance()->getItemAt(result - 10000)->itemManager.addItem(controllable->createDashboardItem());
 				}
 				else if (result >= 20000 && result <= 20100)
 				{
-					Parrot* pa = ParrotManager::getInstance()->items[result - 20000];
+					Parrot* pa = ParrotManager::getInstance()->getItemAt(result - 20000);
 					bool isInParrot = pa->getTargetForControllable(controllable) != nullptr;
 					if (isInParrot) pa->removeTargetForControllable(controllable);
 					else pa->addTarget(controllable);

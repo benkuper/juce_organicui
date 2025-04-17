@@ -23,7 +23,7 @@ public:
 
 	int compareElements(BaseItemMinimalUI<IT>* u1, BaseItemMinimalUI<IT>* u2)
 	{
-		return (manager->items.indexOf(u1->item) < manager->items.indexOf(u2->item)) ? -1 : 1;
+		return (manager->getItemIndex(u1->item) < manager->getItemIndex(u2->item)) ? -1 : 1;
 	}
 };
 
@@ -357,9 +357,8 @@ void ManagerUI<M, T, U>::setDefaultLayout(Layout l)
 template<class M, class T, class U>
 void ManagerUI<M, T, U>::addExistingItems(bool resizeAfter)
 {
-
 	//add existing items
-	for (auto& t : manager->items) addItemUI(t, false);
+	this->manager->callFunctionOnItems([&](auto t) { addItemUI(t, false); });
 	if (resizeAfter) resized();
 }
 
@@ -482,8 +481,8 @@ template<class M, class T, class U>
 void ManagerUI<M, T, U>::askSelectToThis(BaseItemMinimalUI<T>* itemUI)
 {
 	T* firstItem = InspectableSelectionManager::activeSelectionManager->getInspectableAs<T>();
-	int firstIndex = manager->items.indexOf(firstItem);
-	int itemIndex = manager->items.indexOf(itemUI->item);
+	int firstIndex = manager->getItemIndex(firstItem);
+	int itemIndex = manager->getItemIndex(itemUI->item);
 
 	if (firstIndex == itemIndex) return;
 
@@ -493,12 +492,12 @@ void ManagerUI<M, T, U>::askSelectToThis(BaseItemMinimalUI<T>* itemUI)
 
 		for (int index = firstIndex; index != itemIndex; index += step)
 		{
-			manager->items[index]->selectThis(true);
+			manager->getItemAt(index)->selectThis(true);
 		}
 
 	}
 
-	if (itemIndex >= 0) manager->items[itemIndex]->selectThis(true);
+	if (itemIndex >= 0) manager->getItemAt(itemIndex)->selectThis(true);
 }
 
 
@@ -570,7 +569,7 @@ void ManagerUI<M, T, U>::paint(juce::Graphics& g)
 	}
 
 
-	if (!this->inspectable.wasObjectDeleted() && this->manager->items.size() == 0 && noItemText.isNotEmpty())
+	if (!this->inspectable.wasObjectDeleted() && this->manager->getNumItems() == 0 && noItemText.isNotEmpty())
 	{
 		g.setColour(juce::Colours::white.withAlpha(.4f));
 		g.setFont(juce::FontOptions(juce::jmin(getHeight() - 2, 14)));
@@ -724,7 +723,7 @@ void ManagerUI<M, T, U>::alignItems(AlignMode alignMode)
 	juce::Array<T*> goodInspectables;
 	for (auto& i : inspectables)
 	{
-		if (i == nullptr || !manager->items.contains(i)) continue;
+		if (i == nullptr || !manager->hasItem(i)) continue;
 		switch (alignMode)
 		{
 		case ManagerUI<M, T, U>::AlignMode::LEFT: target = juce::jmin(i->viewUIPosition->x, target); break;
@@ -771,7 +770,7 @@ void ManagerUI<M, T, U>::distributeItems(bool isVertical)
 	juce::Array<T*> goodInspectables;
 	for (auto& i : inspectables)
 	{
-		if (i == nullptr || !manager->items.contains(i)) continue;
+		if (i == nullptr || !manager->hasItem(i)) continue;
 
 		goodInspectables.add(i);
 	}
@@ -960,7 +959,7 @@ U* ManagerUI<M, T, U>::addItemUI(T* item, bool animate, bool resizeAndRepaint)
 	if (useViewport) container.addAndMakeVisible(bui);
 	else addAndMakeVisible(bui);
 
-	int index = manager->items.indexOf(item);
+	int index = manager->getItemIndex(item);
 	itemsUI.insert(index, tui);
 
 	bui->addItemMinimalUIListener(this);
@@ -1043,7 +1042,7 @@ void ManagerUI<M, T, U>::removeItemUI(T* item, bool resizeAndRepaint)
 template<class M, class T, class U>
 U* ManagerUI<M, T, U>::getUIForItem(T* item, bool directIndexAccess)
 {
-	if (directIndexAccess) return itemsUI[static_cast<Manager<T>*>(manager)->items.indexOf(item)];
+	if (directIndexAccess) return itemsUI[static_cast<Manager<T>*>(manager)->getItemIndex(item)];
 
 	for (auto& ui : itemsUI) if (static_cast<BaseItemMinimalUI<T>*>(ui)->item == item) return ui; //brute search, not needed if ui/items are synchronized
 	return nullptr;

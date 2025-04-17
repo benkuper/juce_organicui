@@ -40,7 +40,7 @@ DashboardManager::DashboardManager() :
 
 DashboardManager::~DashboardManager()
 {
-	for (auto& i : items) i->removeDashboardListener(this);
+	callFunctionOnItems([this](auto i) { i->removeDashboardListener(this); });
 
 #if ORGANICUI_USE_WEBSERVER
 	if (server != nullptr)
@@ -219,10 +219,8 @@ var DashboardManager::getServerData()
 	}
 
 	var iData;
-	for (auto& d : items)
-	{
-		iData.append(d->getServerData());
-	}
+	callFunctionOnItems([&iData](auto i) { iData.append(i->getServerData()); });
+
 	data.getDynamicObject()->setProperty("items", iData);
 	return data;
 }

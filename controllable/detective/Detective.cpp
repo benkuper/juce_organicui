@@ -26,6 +26,7 @@ void Detective::watchControllable(Controllable* c)
 
 ControllableDetectiveWatcher * Detective::getItemForControllable(Controllable* c)
 {
+	auto items = getItems();
 	for (auto& i : items) if (i->controllable == c) return i;
 	return nullptr;
 }

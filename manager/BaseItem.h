@@ -10,6 +10,9 @@
 
 #pragma once
 
+#define DECLARE_TYPE(type) juce::String getTypeString() const override { return getTypeStringStatic() ; } \
+static juce::String getTypeStringStatic() { return type; }
+
 class GenericControllableManager;
 class ScriptManager;
 class Script;

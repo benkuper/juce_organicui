@@ -172,7 +172,7 @@ ParameterNumberAutomation::ParameterNumberAutomation(Parameter* parameter, bool 
 	if (addDefaultItems)
 	{
 		automation.addItem(0, parameter->floatValue(), false);
-		automation.items[0]->setEasing(Easing::BEZIER);
+		automation.getFirstItem()->setEasing(Easing::BEZIER);
 		automation.addKey(automation.length->floatValue(), parameter->floatValue() , false);
 	}
 

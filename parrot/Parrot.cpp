@@ -86,7 +86,7 @@ void Parrot::updateRecordOptions()
 {
 	currentRecordEnum->clearOptions();
 	int index = 0;
-	for (auto& i : recordManager.items) currentRecordEnum->addOption(i->niceName, index++, false);
+	recordManager.callFunctionOnItems([&](auto i) { currentRecordEnum->addOption(i->niceName, index++, false); });
 	if (currentRecord != nullptr) currentRecordEnum->setValueWithKey(currentRecord->niceName);
 }
 
@@ -172,7 +172,7 @@ void Parrot::onContainerParameterChangedInternal(Parameter* p)
 	else if (p == currentRecordEnum)
 	{
 		int rIndex = (int)currentRecordEnum->getValue();
-		if (rIndex >= 0 && rIndex < recordManager.items.size()) setCurrentRecord(recordManager.items[rIndex]);
+		if (rIndex >= 0 && rIndex < recordManager.getNumItems()) setCurrentRecord(recordManager.getItemAt(rIndex));
 		else setCurrentRecord(nullptr);
 	}
 	else if (p == status)
@@ -234,7 +234,7 @@ void Parrot::onExternalParameterValueChanged(Parameter* p)
 void Parrot::itemAdded(ParrotRecord* r)
 {
 	if (isCurrentlyLoadingData) return;
-	if (recordManager.items.size() == 1) setCurrentRecord(r);
+	if (recordManager.getNumItems() == 1) setCurrentRecord(r);
 	updateRecordOptions();
 }
 
@@ -243,7 +243,7 @@ void Parrot::itemsAdded(Array<ParrotRecord*> records)
 	if (isCurrentlyLoadingData) return;
 	for (auto& r : records)
 	{
-		if (recordManager.items.size() == 1) setCurrentRecord(r);
+		if (recordManager.getNumItems() == 1) setCurrentRecord(r);
 	}
 	updateRecordOptions();
 }
@@ -272,7 +272,7 @@ void Parrot::startRecording()
 {
 	if (currentRecord == nullptr)
 	{
-		if (recordManager.items.size() == 0) recordManager.addItem();
+		if (recordManager.getNumItems() == 0) recordManager.addItem();
 		else
 		{
 			NLOGWARNING(niceName, "Can't start recording, Current Record is not set");
@@ -434,6 +434,6 @@ void Parrot::loadJSONDataItemInternal(var data)
 
 	updateRecordOptions();
 	int rIndex = (int)currentRecordEnum->getValue();
-	if (rIndex >= 0 && rIndex < recordManager.items.size()) setCurrentRecord(recordManager.items[rIndex]);
+	if (rIndex >= 0 && rIndex < recordManager.getNumItems()) setCurrentRecord(recordManager.getItemAt(rIndex));
 	else setCurrentRecord(nullptr);
 }

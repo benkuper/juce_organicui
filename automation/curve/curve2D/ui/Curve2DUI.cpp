@@ -210,14 +210,14 @@ void Curve2DUI::mouseDrag(const MouseEvent& e)
 	if (Curve2DKeyHandle* handle = dynamic_cast<Curve2DKeyHandle*>(e.eventComponent))
 	{
 		/* Curve2DKey * k = handle->key;
-		 int index = manager->items.indexOf(k);
+		 int index = manager->getItemIndex(k);
 
 		 Point<float> offset = getViewOffset(e.getEventRelativeTo(this).getOffsetFromDragStart());
 		 offset.setY(-offset.y);
 
 
 		 if (k->nextKey != nullptr) offset.setX(jmin(offset.x, k->nextKey->viewUIPosition->floatValue() - k->movePositionReference.x));
-		 if (index > 0) offset.setX(jmax(offset.x, manager->items[index - 1]->viewUIPosition->floatValue() - k->movePositionReference.x));
+		 if (index > 0) offset.setX(jmax(offset.x, manager->getItemAt(index - 1)->viewUIPosition->floatValue() - k->movePositionReference.x));
 
 
 		 if (e.mods.isShiftDown()) offset.setY(0);

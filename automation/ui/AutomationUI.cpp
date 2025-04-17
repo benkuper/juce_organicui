@@ -70,20 +70,20 @@ void AutomationUIKeys::paint(Graphics& g)
 		return;
 	}
 
-	if (manager->items.size() > 0)
+	if (manager->getNumItems() > 0)
 	{
-		if (manager->items[0] != nullptr && manager->items[0]->position->floatValue() > 0)
+		if (manager->getFirstItem() != nullptr && manager->getFirstItem()->position->floatValue() > 0)
 		{
 			g.setColour(NORMAL_COLOR);
-			Point<int> p = getPosInView(manager->items[0]->getPosAndValue());
+			Point<int> p = getPosInView(manager->getFirstItem()->getPosAndValue());
 			const float dashLengths[] = { 5, 5 };
 			g.drawDashedLine(Line<int>(Point<int>(0, p.y), p).toFloat(), dashLengths, 2);
 		}
 
-		if (manager->items[manager->items.size() - 1] != nullptr && manager->items[manager->items.size() - 1]->position->floatValue() < manager->length->floatValue())
+		if (manager->getLastItem() != nullptr && manager->getLastItem()->position->floatValue() < manager->length->floatValue())
 		{
 			g.setColour(NORMAL_COLOR);
-			Point<int> p = getPosInView(manager->items[manager->items.size() - 1]->getPosAndValue());
+			Point<int> p = getPosInView(manager->getLastItem()->getPosAndValue());
 			const float dashLengths[] = { 5, 5 };
 			g.drawDashedLine(Line<int>(p, Point<int>(getWidth(), p.y)).toFloat(), dashLengths, 2);
 		}
@@ -370,8 +370,8 @@ void AutomationUIKeys::updateItemsVisibility()
 	if (itemsUI.size() == 0) return;
 	if (previewMode) return;
 
-	int firstIndex = jmax(manager->items.indexOf(manager->getKeyForPosition(viewPosRange.x)), 0);
-	int lastIndex = jmax(manager->items.indexOf(manager->getKeyForPosition(viewPosRange.y)) + 1, firstIndex);
+	int firstIndex = jmax(manager->getItemIndex(manager->getKeyForPosition(viewPosRange.x)), 0);
+	int lastIndex = jmax(manager->getItemIndex(manager->getKeyForPosition(viewPosRange.y)) + 1, firstIndex);
 
 	for (int i = 0; i < itemsUI.size(); ++i)
 	{
@@ -433,13 +433,13 @@ void AutomationUIKeys::mouseDrag(const MouseEvent& e)
 	if (AutomationKeyHandle* handle = dynamic_cast<AutomationKeyHandle*>(e.eventComponent))
 	{
 		AutomationKey* k = handle->key;
-		int index = manager->items.indexOf(k);
+		int index = manager->getItemIndex(k);
 
 		Point<float> offset = getViewPos(e.getEventRelativeTo(this).getOffsetFromDragStart(), true);
 		offset.setY(-offset.y);
 
 		if (k->nextKey != nullptr) offset.setX(jmin(offset.x, k->nextKey->position->floatValue() - k->movePositionReference.x));
-		if (index > 0) offset.setX(jmax(offset.x, manager->items[index - 1]->position->floatValue() - k->movePositionReference.x));
+		if (index > 0) offset.setX(jmax(offset.x, manager->getItemAt(index - 1)->position->floatValue() - k->movePositionReference.x));
 
 
 		if (e.mods.isShiftDown()) offset.setY(0);
@@ -594,10 +594,10 @@ void AutomationUIKeys::handleMenuExtraItemsResult(int result, int startIndex)
 	String typeName = Easing::typeNames[result - startIndex];
 
 	Array<UndoableAction*> actions;
-	for (auto& i : manager->items)
+	manager->callFunctionOnItems([&] (auto i)
 	{
 		actions.addArray(i->easingType->setUndoableValue(i->easingType->getValueKey(), var(typeName), true));
-	}
+	});
 
 	UndoMaster::getInstance()->performActions("Change all easings", actions);
 }
@@ -683,7 +683,7 @@ void AutomationUIKeys::newMessage(const ContainerAsyncEvent& e)
 
 			autoUI->setRepaint(false,refreshOverlay,false);
 		}
-		if (manager->items.size() > 0 && (e.targetControllable->parentContainer == manager->items[0] || e.targetControllable->parentContainer == manager->items[manager->items.size() - 1]))
+		if (manager->getNumItems() > 0 && (e.targetControllable->parentContainer == manager->getFirstItem() || e.targetControllable->parentContainer == manager->getLastItem()))
 		{
 			autoUI->setRepaint(true, false, false);
 		}

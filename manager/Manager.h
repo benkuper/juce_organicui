@@ -10,21 +10,18 @@
 
 #pragma once
 
+template <typename T> class ItemGroup;
 
-#define DECLARE_TYPE(type) juce::String getTypeString() const override { return getTypeStringStatic() ; } \
-static juce::String getTypeStringStatic() { return type; }
-
-
-template <class T>
+template <typename T>
 class Manager :
-	public EnablingControllableContainer,
-	public BaseItemListener
+	public BaseManager
 {
 public:
+
+	static_assert(std::is_base_of<BaseItem, T>::value, "T must be derived from BaseItem");
+
 	Manager(const juce::String& name);
 	virtual ~Manager();
-
-	juce::OwnedArray<T, juce::CriticalSection> items;
 
 	//Factory
 	Factory<T>* managerFactory;
@@ -62,7 +59,6 @@ public:
 
 	virtual void loadItemsData(juce::var data);
 
-
 	virtual juce::UndoableAction* getAddItemUndoableAction(T* item = nullptr, juce::var data = juce::var());
 	virtual juce::UndoableAction* getAddItemsUndoableAction(juce::Array<T*> item = nullptr, juce::var data = juce::var());
 
@@ -91,11 +87,22 @@ public:
 	virtual void removeItemsInternal(juce::Array<T*>) {}
 
 
-	T* getItemWithName(const juce::String& itemShortName, bool searchNiceNameToo = false, bool searchWithLowerCaseIfNotFound = true);
+	virtual T* getItemAt(int index) const;
+	virtual T* getFirstItem(bool recursive = false) const;
+	virtual T* getLastItem(bool recursive = false) const;
+
+	virtual T* getItemBefore(T* item) const;
+	virtual T* getItemAfter(T* item) const;
+
+	virtual juce::Array<T*> getItems(bool recursive = false) const;
+	virtual juce::Array<ItemGroup<T>*> getItemGroups(bool recursive = true) const;
+	T* getItemWithName(const juce::String& itemShortName, bool searchNiceNameToo = false, bool searchWithLowerCaseIfNotFound = true, bool recursive = true);
 
 	template<class IType>
-	juce::Array<IType*> getItemsWithType();
+	juce::Array<IType*> getItemsWithType(bool recursive = true);
 
+	void callFunctionOnItems(std::function<void(T*)> func, bool recursive = false);
+	bool callStoppingFunctionOnItems(std::function<bool(T*)> func, bool recursive = false);
 
 	virtual void handleAddFromRemoteControl(juce::var data) override;
 
@@ -285,13 +292,16 @@ public:
 	static juce::var reorderItemsFromScript(const juce::var::NativeFunctionArgs& args);
 
 private:
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Manager)
+	juce::Array<T*, juce::CriticalSection> items;
+	juce::Array<ItemGroup<T>*, juce::CriticalSection> itemGroups;
+
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Manager);
 };
 
 
 template<class T>
 Manager<T>::Manager(const juce::String& name) :
-	EnablingControllableContainer(name, false),
+	BaseManager(name),
 	managerFactory(nullptr),
 	itemDataType(""),
 	userCanAddItemsManually(true),
@@ -329,18 +339,6 @@ Manager<T>::~Manager()
 	clear();
 }
 
-template<class T>
-template<class IType>
-juce::Array<IType*> Manager<T>::getItemsWithType()
-{
-	juce::Array<IType*> result;
-	for (auto& i : items)
-	{
-		if (IType* it = dynamic_cast<IType*>(i)) result.add(it);
-	}
-
-	return result;
-}
 
 template<class T>
 void Manager<T>::setHasGridOptions(bool hasGridOptions)
@@ -420,44 +418,43 @@ juce::UndoableAction* Manager<T>::getAddItemsUndoableAction(juce::Array<T*> _ite
 template<class T>
 T* Manager<T>::addItem(T* item, juce::var data, bool addToUndo, bool notify)
 {
-
 	jassert(items.indexOf(item) == -1); //be sure item is no here already
 	if (item == nullptr) item = createItem();
 	if (item == nullptr) return nullptr; //could not create here
-
-	BaseItem* bi = static_cast<BaseItem*>(item);
 
 	if (addToUndo && !UndoMaster::getInstance()->isPerforming)
 	{
 		if (Engine::mainEngine != nullptr && !Engine::mainEngine->isLoadingFile)
 		{
-			UndoMaster::getInstance()->performAction("Add " + bi->niceName, new AddItemAction(this, item, data));
+			UndoMaster::getInstance()->performAction("Add " + item->niceName, new AddItemAction(this, item, data));
 			return item;
 		}
 	}
 
 	int targetIndex = data.getProperty("index", -1);
-	if (targetIndex != -1) items.insert(targetIndex, item);
+	if (targetIndex != -1)
+	{
+		baseItems.insert(targetIndex, item);
+		items.insert(targetIndex, item);
+	}
 	else
 	{
-		//items.getLock().enter();
-		if (autoReorderOnAdd && !isCurrentlyLoadingData && comparator.compareFunc != nullptr) items.addSorted(comparator, item);
-		else items.add(item);
-		//items.getLock().exit();
+		if (autoReorderOnAdd && !isCurrentlyLoadingData && comparator.compareFunc != nullptr) baseItems.addSorted(comparator, item);
+		else
+		{
+			baseItems.add(item);
+			items.add(item);
+		}
 	}
 
-	bi->addBaseItemListener(this);
+	item->addBaseItemListener(this);
 
 	if (!data.isVoid())
 	{
-		bi->loadJSONData(data);
+		item->loadJSONData(data);
 	}
 
-	//bi->setNiceName(bi->niceName); //force setting a unique name if already taken, after load data so if name is the same as another, will change here
-
-	addChildControllableContainer(bi, false, items.indexOf(item), notify);
-
-	//if(autoReorderOnAdd) reorderItems();
+	addChildControllableContainer(item, false, baseItems.indexOf(item), notify);
 
 	addItemInternal(item, data);
 
@@ -470,7 +467,7 @@ T* Manager<T>::addItem(T* item, juce::var data, bool addToUndo, bool notify)
 
 	if (juce::MessageManager::getInstance()->existsAndIsLockedByCurrentThread())
 	{
-		if (selectItemWhenCreated && !isCurrentlyLoadingData && !isManipulatingMultipleItems) bi->selectThis();
+		if (selectItemWhenCreated && !isCurrentlyLoadingData && !isManipulatingMultipleItems) item->selectThis();
 	}
 
 	return item;
@@ -584,7 +581,7 @@ juce::Array<T*> Manager<T>::addItemsFromClipboard(bool showWarning)
 	}
 
 	juce::var itemsData = data.getProperty("items", juce::var());
-	int sIndex = items.indexOf(InspectableSelectionManager::activeSelectionManager->getInspectableAs<T>());
+	int sIndex = baseItems.indexOf(InspectableSelectionManager::activeSelectionManager->getInspectableAs<T>());
 	if (sIndex >= 0)
 	{
 		sIndex++;
@@ -695,9 +692,10 @@ T* Manager<T>::removeItem(T* item, bool addToUndo, bool notify, bool returnItem)
 	}
 
 
-	//items.getLock().enter();
-	items.removeObject(item, false);
-	//items.getLock().exit();
+	//baseItems.getLock().enter();
+	items.removeAllInstancesOf(item);
+	baseItems.removeObject(item, false);
+	//baseItems.getLock().exit();
 
 	removeItemInternal(item);
 
@@ -735,14 +733,14 @@ void Manager<T>::setItemIndex(T* item, int newIndex, bool addToUndo)
 	}
 
 
-	newIndex = juce::jlimit(0, items.size() - 1, newIndex);
-	int index = items.indexOf(item);
+	newIndex = juce::jlimit(0, baseItems.size() - 1, newIndex);
+	int index = baseItems.indexOf(item);
 	if (index == -1 || index == newIndex) return;
 
-	//items.getLock().enter();
-	items.move(index, newIndex);
+	//baseItems.getLock().enter();
+	baseItems.move(index, newIndex);
 	controllableContainers.move(index, newIndex);
-	//items.getLock().exit();
+	//baseItems.getLock().exit();
 
 	managerListeners.call(&ManagerListener::itemsReordered);
 	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_REORDERED));
@@ -754,7 +752,7 @@ juce::Array<juce::UndoableAction*> Manager<T>::getSetItemIndexUndoableAction(T* 
 	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile) return nullptr;
 
 	juce::Array<juce::UndoableAction*> a;
-	a.add(new MoveItemAction(this, item, this->items.indexOf(item), newIndex));
+	a.add(new MoveItemAction(this, item, this->baseItems.indexOf(item), newIndex));
 	return a;
 }
 
@@ -763,36 +761,247 @@ void Manager<T>::reorderItems()
 {
 	if (comparator.compareFunc != nullptr)
 	{
-		//items.getLock().enter();
-		items.sort(comparator);
-		//items.getLock().exit();
-		controllableContainers.removeIf([this](ControllableContainer* c) { return items.contains((T*)c); }); //remove if not in items
-		controllableContainers.addArray(items);
+		//baseItems.getLock().enter();
+		baseItems.sort(comparator);
+		//baseItems.getLock().exit();
+		controllableContainers.removeIf([this](ControllableContainer* c) { return baseItems.contains((T*)c); }); //remove if not in items
+		controllableContainers.addArray(getItems(false));
 	}
 
 	managerListeners.call(&ManagerListener::itemsReordered);
 	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_REORDERED));
 }
 
-template<class T>
-T* Manager<T>::getItemWithName(const juce::String& itemShortName, bool searchItemWithNiceNameToo, bool searchWithLowerCaseIfNotFound)
+
+template<typename T>
+T* Manager<T>::getItemAt(int index) const
 {
-	//const ScopedLock lock(items.getLock());
+	if (baseItems.size() == 0) return nullptr;
+	if (index < 0 || index >= baseItems.size()) return nullptr;
+	if (T* it = dynamic_cast<T*>(baseItems[index])) return it;
+	return nullptr;
+}
+
+template<typename T>
+T* Manager<T>::getFirstItem(bool recursive) const
+{
+	if (baseItems.size() == 0) return nullptr;
+
+	for (auto& i : baseItems)
+	{
+		if (ItemGroup<T>* g = dynamic_cast<ItemGroup<T>*>(i))
+		{
+			if (recursive)
+			{
+				T* result = g->manager.getFirstItem(true);
+				if (result != nullptr) return result;
+			}
+		}
+		else if (T* it = dynamic_cast<T*>(i))
+		{
+			return it;
+		}
+	}
+
+	return nullptr;
+}
+
+template<typename T>
+T* Manager<T>::getLastItem(bool recursive) const
+{
+	if (baseItems.size() == 0) return nullptr;
+	for (int i = baseItems.size() - 1; i >= 0; --i)
+	{
+		if (ItemGroup<T>* g = dynamic_cast<ItemGroup<T>*>(baseItems[i]))
+		{
+			if (recursive)
+			{
+				T* result = g->manager.getLastItem(true);
+				if (result != nullptr) return result;
+			}
+		}
+		else if (T* it = dynamic_cast<T*>(baseItems[i]))
+		{
+			return it;
+		}
+	}
+	return nullptr;
+}
+
+
+
+template<typename T>
+T* Manager<T>::getItemBefore(T* item) const
+{
+	if (item == nullptr) return nullptr;
+	int index = baseItems.indexOf(item);
+	if (index == -1) return nullptr;
+	if (index - 1 >= 0)
+	{
+		if (ItemGroup<T>* g = dynamic_cast<ItemGroup<T>*>(baseItems[index - 1]))
+		{
+			return g->manager.getLastItem(true);
+		}
+		else
+		{
+			return dynamic_cast<T*>(baseItems[index - 1]);
+		}
+	}
+
+	return nullptr;
+}
+
+template<typename T>
+T* Manager<T>::getItemAfter(T* item) const
+{
+	if (item == nullptr) return nullptr;
+	int index = baseItems.indexOf(item);
+	if (index == -1) return nullptr;
+	if (index + 1 < baseItems.size())
+	{
+		if (ItemGroup<T>* g = dynamic_cast<ItemGroup<T>*>(baseItems[index + 1]))
+		{
+			return g->manager.getFirstItem(true);
+		}
+		else
+		{
+			return dynamic_cast<T*>(baseItems[index + 1]);
+		}
+	}
+
+	return nullptr;
+}
+
+template<class T>
+juce::Array<T*> Manager<T>::getItems(bool recursive) const
+{
+	juce::Array<T*> result;
+	for (auto& i : baseItems)
+	{
+
+		if (ItemGroup<T>* g = dynamic_cast<ItemGroup<T>*>(i))
+		{
+			if (recursive) result.addArray(g->manager.getItems(true));
+			continue;
+		}
+		else
+		{
+			result.add(static_cast<T*>(i));
+		}
+	}
+
+	return result;
+}
+
+template<typename T>
+juce::Array<ItemGroup<T>*> Manager<T>::getItemGroups(bool recursive) const
+{
+	juce::Array<ItemGroup<T>*> result;
+	for (auto& i : baseItems)
+	{
+		if (ItemGroup<T>* g = dynamic_cast<ItemGroup<T>*>(i))
+		{
+			result.add(g);
+			if (recursive) result.addArray(g->manager.getItemGroups(true));
+		}
+	}
+
+	return result;
+}
+
+
+template<class T>
+T* Manager<T>::getItemWithName(const juce::String& itemShortName, bool searchItemWithNiceNameToo, bool searchWithLowerCaseIfNotFound, bool recursive)
+{
+	//const ScopedLock lock(baseItems.getLock());
 	for (auto& t : items)
 	{
-		if (((BaseItem*)t)->shortName == itemShortName) return t;
-		else if (searchItemWithNiceNameToo && ((BaseItem*)t)->niceName == itemShortName) return t;
+		if (t->shortName == itemShortName) return t;
+		if (searchItemWithNiceNameToo && t->niceName == itemShortName) return t;
+		if (recursive)
+		{
+			if (ItemGroup<T>* g = dynamic_cast<ItemGroup<T>*>(t))
+			{
+				if (T* it = g->manager.getItemWithName(itemShortName, searchItemWithNiceNameToo, searchWithLowerCaseIfNotFound, true)) return it;
+			}
+		}
 	}
 
 	if (searchWithLowerCaseIfNotFound)
 	{
 		for (auto& t : items)
 		{
-			if (((BaseItem*)t)->shortName.toLowerCase() == itemShortName.toLowerCase()) return t;
+			if (t->shortName.toLowerCase() == itemShortName.toLowerCase()) return t;
+			if (searchItemWithNiceNameToo && t->niceName.toLowerCase() == itemShortName.toLowerCase()) return t;
+			if (recursive)
+			{
+
+				if (ItemGroup<T>* g = dynamic_cast<ItemGroup<T>*>(t))
+				{
+					if (T* it = g->manager.getItemWithName(itemShortName, searchItemWithNiceNameToo, searchWithLowerCaseIfNotFound, true)) return it;
+				}
+			}
 		}
 	}
 
 	return nullptr;
+}
+
+
+template<class T>
+template<class IType>
+juce::Array<IType*> Manager<T>::getItemsWithType(bool recursive)
+{
+	juce::Array<IType*> result;
+	for (auto& i : baseItems)
+	{
+		if (ItemGroup<T>* g = dynamic_cast<ItemGroup<T>*>(i))
+		{
+			if (recursive) result.addArray(g->manager.getItemsWithType<IType>(true));
+			continue;
+		}
+
+		if (IType* it = dynamic_cast<IType*>(i)) result.add(it);
+	}
+
+	return result;
+}
+
+
+template<typename T>
+void Manager<T>::callFunctionOnItems(std::function<void(T*)> func, bool recursive)
+{
+	if (func == nullptr) return;
+
+	for (auto& i : baseItems)
+	{
+		if (ItemGroup<T>* g = dynamic_cast<ItemGroup<T>*>(i))
+		{
+			if (recursive) g->manager.callFunctionOnItems(func, true);
+			continue;
+		}
+
+		func(static_cast<T*>(i));
+	}
+}
+
+template<typename T>
+bool Manager<T>::callStoppingFunctionOnItems(std::function<bool(T*)> func, bool recursive)
+{
+	if (func == nullptr) return false;
+
+	for (auto& i : baseItems)
+	{
+		if (ItemGroup<T>* g = dynamic_cast<ItemGroup<T>*>(i))
+		{
+			if (recursive) if (!g->manager.callStoppingFunctionOnItems(func, true)) return false;
+			continue;
+		}
+
+		if (!func(static_cast<T*>(i))) return false;
+	}
+
+	return true;
 }
 
 template<class T>
@@ -806,8 +1015,8 @@ template<class T>
 void Manager<T>::clear()
 {
 	isClearing = true;
-	//const ScopedLock lock(items.getLock());
-	while (items.size() > 0) removeItem(items[0], false);
+	//const ScopedLock lock(baseItems.getLock());
+	while (baseItems.size() > 0) removeItem(static_cast<T*>(baseItems[0]), false);
 	isClearing = false;
 
 #if ORGANICUI_USE_WEBSERVER
@@ -826,7 +1035,7 @@ void Manager<T>::askForDuplicateItem(BaseItem* item)
 {
 	if (!userCanAddItemsManually) return;
 	juce::var data = item->getJSONData();
-	data.getDynamicObject()->setProperty("index", items.indexOf(static_cast<T*>(item)) + 1);
+	data.getDynamicObject()->setProperty("index", baseItems.indexOf(static_cast<T*>(item)) + 1);
 	addItemFromData(data);
 }
 
@@ -840,10 +1049,10 @@ template<class T>
 void Manager<T>::askForMoveBefore(BaseItem* i)
 {
 	T* item = static_cast<T*>(i);
-	setItemIndex(item, juce::jmax(items.indexOf(item) - 1, 0));
-	//	int index = items.indexOf(static_cast<T *>(i));
+	setItemIndex(item, juce::jmax(baseItems.indexOf(item) - 1, 0));
+	//	int index = baseItems.indexOf(static_cast<T *>(i));
 	//	if (index == 0) return;
-	//	items.swap(index, index - 1);
+	//	baseItems.swap(index, index - 1);
 	//	controllableContainers.swap(index, index - 1);
 	//
 	//	managerListeners.call(&ManagerListener::itemsReordered);
@@ -854,10 +1063,10 @@ template<class T>
 void Manager<T>::askForMoveAfter(BaseItem* i)
 {
 	T* item = static_cast<T*>(i);
-	setItemIndex(item, juce::jmin(items.indexOf(item) + 1, items.size() - 1));
-	//int index = items.indexOf(static_cast<T *>(i));
-	//if (index == items.size() -1) return;
-	//items.swap(index, index + 1);
+	setItemIndex(item, juce::jmin(baseItems.indexOf(item) + 1, baseItems.size() - 1));
+	//int index = baseItems.indexOf(static_cast<T *>(i));
+	//if (index == baseItems.size() -1) return;
+	//baseItems.swap(index, index + 1);
 	//controllableContainers.swap(index, index+1);
 
 	//managerListeners.call(&ManagerListener::itemsReordered);
@@ -867,27 +1076,27 @@ void Manager<T>::askForMoveAfter(BaseItem* i)
 template<class T>
 void Manager<T>::askForSelectAllItems(bool addToSelection)
 {
-	int numItems = items.size();
+	int numItems = baseItems.size();
 	if (!addToSelection) selectionManager->clearSelection(numItems == 0);
 	else deselectThis(numItems == 0);
 
-	if (numItems > 1) for (int i = 0; i < numItems; ++i) items[i]->selectThis(true, i == numItems - 1); //only notify on last
-	else if (numItems > 0) items[0]->selectThis(addToSelection, true);
+	if (numItems > 1) for (int i = 0; i < numItems; ++i) getItemAt(i)->selectThis(true, i == numItems - 1); //only notify on last
+	else if (numItems > 0) getFirstItem()->selectThis(addToSelection, true);
 }
 
 template<class T>
 void Manager<T>::askForSelectPreviousItem(BaseItem* item, bool addToSelection)
 {
-	int index = items.indexOf(dynamic_cast<T*>(item));
+	int index = baseItems.indexOf(dynamic_cast<T*>(item));
 	if (index <= 0) return;
-	items[index - 1]->selectThis(addToSelection);
+	getItemAt(index - 1)->selectThis(addToSelection);
 }
 
 template<class T>
 void Manager<T>::askForSelectNextItem(BaseItem* item, bool addToSelection)
 {
-	int index = items.indexOf(dynamic_cast<T*>(item));
-	if (index == -1 || index >= items.size() - 1) return;
+	int index = baseItems.indexOf(dynamic_cast<T*>(item));
+	if (index == -1 || index >= baseItems.size() - 1) return;
 	items[index + 1]->selectThis(addToSelection);
 }
 
@@ -919,12 +1128,12 @@ juce::var Manager<T>::getJSONData(bool includeNonOverriden)
 {
 	juce::var data = ControllableContainer::getJSONData(includeNonOverriden);
 	juce::var itemsData = juce::var();
-	//items.getLock().enter();
-	for (auto& t : items)
+	//baseItems.getLock().enter();
+	for (auto& t : baseItems)
 	{
 		if (t->isSavable) itemsData.append(t->getJSONData(includeNonOverriden));
 	}
-	//items.getLock().exit();
+	//baseItems.getLock().exit();
 
 	if (itemsData.size() > 0) data.getDynamicObject()->setProperty("items", itemsData);
 
@@ -989,7 +1198,7 @@ template<class T>
 juce::PopupMenu Manager<T>::getItemsMenu(int startID)
 {
 	juce::PopupMenu menu;
-	int numValues = items.size();
+	int numValues = baseItems.size();
 	for (int j = 0; j < numValues; j++)
 	{
 		T* c = items[j];
@@ -1007,7 +1216,7 @@ T* Manager<T>::getItemForMenuResultID(int id, int startID)
 template<class T>
 T* Manager<T>::getFirstSelectedItem()
 {
-	for (auto& i : items) if (i->isSelected) return i;
+	for (auto& i : baseItems) if (i->isSelected) return i;
 	return nullptr;
 }
 
@@ -1140,8 +1349,8 @@ juce::var Manager<T>::getItemAtFromScript(const juce::var::NativeFunctionArgs& a
 	{
 		if (!checkNumArgs(m->niceName, args, 1)) return juce::var();
 		int index = args.arguments[0];
-		if (index < 0 || index >= m->items.size()) return juce::var();
-		T* i = m->items[index];
+		if (index < 0 || index >= m->baseItems.size()) return juce::var();
+		T* i = m->getItemAt(index);
 		if (i != nullptr) return i->getScriptObject();
 	}
 
@@ -1157,7 +1366,7 @@ juce::var Manager<T>::getItemIndexFromScript(const juce::var::NativeFunctionArgs
 		if (!args.arguments[0].isObject()) return juce::var();
 		T* item = dynamic_cast<T*>((T*)(juce::int64)args.arguments[0].getDynamicObject()->getProperty(scriptPtrIdentifier));
 		if (item == nullptr) return juce::var();
-		return m->items.indexOf(item);
+		return m->baseItems.indexOf(item);
 	}
 
 	return juce::var();
@@ -1172,9 +1381,9 @@ juce::var Manager<T>::getItemBeforeFromScript(const juce::var::NativeFunctionArg
 		if (!args.arguments[0].isObject()) return juce::var();
 		T* item = dynamic_cast<T*>((T*)(juce::int64)args.arguments[0].getDynamicObject()->getProperty(scriptPtrIdentifier));
 		if (item == nullptr) return juce::var();
-		int index = m->items.indexOf(item);
+		int index = m->baseItems.indexOf(item);
 		if (index <= 0) return juce::var();
-		return m->items[index - 1]->getScriptObject();
+		return m->getItemAt(index - 1)->getScriptObject();
 	}
 
 	return juce::var();
@@ -1189,8 +1398,8 @@ juce::var Manager<T>::getItemAfterFromScript(const juce::var::NativeFunctionArgs
 		if (!args.arguments[0].isObject()) return juce::var();
 		T* item = dynamic_cast<T*>((T*)(juce::int64)args.arguments[0].getDynamicObject()->getProperty(scriptPtrIdentifier));
 		if (item == nullptr) return juce::var();
-		int index = m->items.indexOf(item);
-		if (index >= m->items.size() - 1) return juce::var();
+		int index = m->baseItems.indexOf(item);
+		if (index >= m->baseItems.size() - 1) return juce::var();
 		return m->items[index + 1]->getScriptObject();
 	}
 
@@ -1257,7 +1466,8 @@ Manager<T>::ManagerBaseAction::ManagerBaseAction(Manager* manager, juce::var _da
 	managerControlAddress(manager->getControlAddress()),
 	data(_data),
 	managerRef(manager)
-{}
+{
+}
 
 template<class T>
 Manager<T>* Manager<T>::ManagerBaseAction::getManager() {
@@ -1281,7 +1491,7 @@ Manager<T>::ItemBaseAction::ItemBaseAction(Manager* m, T* i, juce::var data) :
 	if (s != nullptr)
 	{
 		this->itemShortName = dynamic_cast<BaseItem*>(s)->shortName;
-		this->itemIndex = data.getProperty("index", m->items.indexOf(s));
+		this->itemIndex = data.getProperty("index", m->baseItems.indexOf(s));
 
 	}
 }
@@ -1418,7 +1628,7 @@ Manager<T>::ItemsBaseAction::ItemsBaseAction(Manager* m, juce::Array<T*> iList, 
 	if (data.isVoid())
 	{
 		std::sort(iList.begin(), iList.end(),
-			[m](const auto& lhs, const auto& rhs) { return m->items.indexOf(lhs) < m->items.indexOf(rhs); });
+			[m](const auto& lhs, const auto& rhs) { return m->baseItems.indexOf(lhs) < m->baseItems.indexOf(rhs); });
 	}
 
 	for (auto& i : iList)
@@ -1499,7 +1709,7 @@ bool Manager<T>::AddItemsAction::undo()
 		if (i != nullptr)
 		{
 			juce::var d = i->getJSONData();
-			d.getDynamicObject()->setProperty("index", m->items.indexOf(i));
+			d.getDynamicObject()->setProperty("index", m->baseItems.indexOf(i));
 			this->data.append(d);
 		}
 	}
@@ -1528,7 +1738,7 @@ bool Manager<T>::RemoveItemsAction::perform()
 		if (i != nullptr)
 		{
 			juce::var d = i->getJSONData();
-			d.getDynamicObject()->setProperty("index", m->items.indexOf(i));
+			d.getDynamicObject()->setProperty("index", m->baseItems.indexOf(i));
 			this->data.append(d);
 		}
 	}

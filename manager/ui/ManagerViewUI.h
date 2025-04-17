@@ -319,7 +319,7 @@ void ManagerViewUI<M, T, U>::paint(juce::Graphics& g)
 	if (this->inspectable.wasObjectDeleted()) return;
 
 	if (!this->transparentBG) paintBackground(g);
-	if (this->manager->items.size() == 0 && this->noItemText.isNotEmpty())
+	if (this->manager->getNumItems() == 0 && this->noItemText.isNotEmpty())
 	{
 		g.setColour(juce::Colours::white.withAlpha(.4f));
 		g.setFont(16);
@@ -554,17 +554,17 @@ juce::Rectangle<int> ManagerViewUI<M, T, U>::getBoundsInView(const juce::Rectang
 template<class M, class T, class U>
 juce::Point<float> ManagerViewUI<M, T, U>::getItemsCenter()
 {
-	if (this->manager->items.size() == 0) return juce::Point<float>(0, 0);
+	if (this->manager->getNumItems() == 0) return juce::Point<float>(0, 0);
 
 	juce::Rectangle<float> bounds;
-	for (auto& i : this->manager->items)
-	{
-		juce::Point<float> p1 = i->viewUIPosition->getPoint();
-		juce::Point<float> p2 = p1 + i->viewUISize->getPoint();
-		juce::Rectangle<float> r(p1, p2);
-		if (bounds.isEmpty()) bounds = r;
-		else bounds = bounds.getUnion(r);
-	}
+	this->manager->callFunctionOnItems([&](auto i)
+		{
+			juce::Point<float> p1 = i->viewUIPosition->getPoint();
+			juce::Point<float> p2 = p1 + i->viewUISize->getPoint();
+			juce::Rectangle<float> r(p1, p2);
+			if (bounds.isEmpty()) bounds = r;
+			else bounds = bounds.getUnion(r);
+		});
 
 	return bounds.getCentre();
 }
@@ -573,14 +573,14 @@ template<class M, class T, class U>
 juce::Rectangle<float> ManagerViewUI<M, T, U>::getItemsViewBounds()
 {
 	juce::Rectangle<float> bounds;
-	for (auto& i : this->manager->items)
-	{
-		juce::Point<float> p1 = i->viewUIPosition->getPoint();
-		juce::Point<float> p2 = p1 + i->viewUISize->getPoint();
-		juce::Rectangle<float> r(p1, p2);
-		if (bounds.isEmpty()) bounds = r;
-		else bounds = bounds.getUnion(r);
-	}
+	this->manager->callFunctionOnItems([&](auto i)
+		{
+			juce::Point<float> p1 = i->viewUIPosition->getPoint();
+			juce::Point<float> p2 = p1 + i->viewUISize->getPoint();
+			juce::Rectangle<float> r(p1, p2);
+			if (bounds.isEmpty()) bounds = r;
+			else bounds = bounds.getUnion(r);
+		});
 
 	return bounds;
 }

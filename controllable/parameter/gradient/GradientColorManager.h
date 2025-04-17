@@ -14,8 +14,12 @@
 class GradientColorComparator
 {
 public:
-	int compareElements(GradientColor * t1, GradientColor * t2)
+	int compareElements(BaseItem * b1, BaseItem * b2)
 	{
+		auto t1 = dynamic_cast<GradientColor*>(b1);
+		auto t2 = dynamic_cast<GradientColor*>(b2);
+		if (t1 == nullptr || t2 == nullptr) return 0;
+
 		if (t1->position->floatValue() < t2->position->floatValue()) return -1;
 		else if (t1->position->floatValue() > t2->position->floatValue()) return 1;
 		return 0;

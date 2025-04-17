@@ -43,7 +43,7 @@ GenericControllableManager::~GenericControllableManager()
 void GenericControllableManager::setForceItemsFeedbackOnly(bool value)
 {
 	forceItemsFeedbackOnly = value;
-	for (auto& i : items) i->controllable->setControllableFeedbackOnly(forceItemsFeedbackOnly);
+	callFunctionOnItems([&](auto i) { i->controllable->setControllableFeedbackOnly(value); });
 }
 
 GenericControllableItem* GenericControllableManager::addItemFrom(Controllable* sourceC, bool copyValue)

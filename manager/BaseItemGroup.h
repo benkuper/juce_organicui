@@ -10,19 +10,14 @@
 
 #pragma once
 
+class BaseManager;
 
-template<typename T>
-class ItemGroup :
-	public BaseItemGroup
+class BaseItemGroup :
+	public BaseItem
 {
 public:
-	ItemGroup(const juce::String& name) :
-		manager("Items"),
-		BaseItemGroup(name, &manager)
-	{
-	}
+	BaseItemGroup(const juce::String& name = "Group", BaseManager* manager = nullptr);
+	virtual ~BaseItemGroup();
 
-	virtual ~ItemGroup() {}
-
-	Manager<T> manager;
+	BaseManager* baseManager;
 };

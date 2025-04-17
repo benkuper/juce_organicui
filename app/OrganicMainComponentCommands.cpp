@@ -137,10 +137,10 @@ void OrganicMainContentComponent::getCommandInfo(CommandID commandID, Applicatio
 	{
 		InspectableSelectionManager* selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
 		Array<ControllableContainer*> items = selectionManager == nullptr ? Array<ControllableContainer*>() : selectionManager->getInspectablesAs<ControllableContainer>();
-		String s = items.size() > 0 && items[0] != nullptr ? "Copy " + (items.size() > 1 ? String(items.size()) + " items" : items[0]->niceName) : "Nothing to duplicate";
+		String s = items.size() > 0 && items.getFirst() != nullptr ? "Copy " + (items.size() > 1 ? String(items.size()) + " items" : items.getFirst()->niceName) : "Nothing to duplicate";
 		result.setInfo(s, "Copy the selected items", category, 0);
 		result.defaultKeypresses.add(KeyPress('c', ModifierKeys::commandModifier, 0));
-		result.setActive(items.size() > 0 && items[0] != nullptr);
+		result.setActive(items.size() > 0 && items.getFirst() != nullptr);
 	}
 	break;
 
@@ -148,10 +148,10 @@ void OrganicMainContentComponent::getCommandInfo(CommandID commandID, Applicatio
 	{
 		InspectableSelectionManager* selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
 		Array<BaseItem*> items = selectionManager == nullptr ? Array<BaseItem*>() : selectionManager->getInspectablesAs<BaseItem>();
-		String s = items.size() > 0 && items[0] != nullptr ? "Cut " + (items.size() > 1 ? String(items.size()) + " items" : items[0]->niceName) : "Nothing to duplicate";
+		String s = items.size() > 0 && items.getFirst() != nullptr ? "Cut " + (items.size() > 1 ? String(items.size()) + " items" : items.getFirst()->niceName) : "Nothing to duplicate";
 		result.setInfo(s, "Cut the selected items", category, 0);
 		result.defaultKeypresses.add(KeyPress('x', ModifierKeys::commandModifier, 0));
-		result.setActive(items.size() > 0 && items[0] != nullptr);
+		result.setActive(items.size() > 0 && items.getFirst() != nullptr);
 	}
 	break;
 
@@ -168,10 +168,10 @@ void OrganicMainContentComponent::getCommandInfo(CommandID commandID, Applicatio
 	{
 		InspectableSelectionManager* selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
 		Array<BaseItem*> items = selectionManager == nullptr ? Array<BaseItem*>() : selectionManager->getInspectablesAs<BaseItem>();
-		String s = items.size() > 0 && items[0] != nullptr ? "Duplicate " + (items.size() > 1 ? String(items.size()) + " items" : items[0]->niceName) : "Nothing to duplicate";
+		String s = items.size() > 0 && items.getFirst() != nullptr ? "Duplicate " + (items.size() > 1 ? String(items.size()) + " items" : items.getFirst()->niceName) : "Nothing to duplicate";
 		result.setInfo(s, "Duplicate the selected items", category, 0);
 		result.defaultKeypresses.add(KeyPress('d', ModifierKeys::commandModifier, 0));
-		result.setActive(items.size() > 0 && items[0] != nullptr);
+		result.setActive(items.size() > 0 && items.getFirst() != nullptr);
 	}
 	break;
 
@@ -179,10 +179,10 @@ void OrganicMainContentComponent::getCommandInfo(CommandID commandID, Applicatio
 	{
 		InspectableSelectionManager* selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
 		Array<BaseItem*> items = selectionManager == nullptr ? Array<BaseItem*>() : selectionManager->getInspectablesAs<BaseItem>();
-		String s = items.size() > 0 && items[0] != nullptr ? "Delete " + (items.size() > 1 ? String(items.size()) + " items" : items[0]->niceName) : "Nothing to delete";
+		String s = items.size() > 0 && items.getFirst() != nullptr ? "Delete " + (items.size() > 1 ? String(items.size()) + " items" : items.getFirst()->niceName) : "Nothing to delete";
 		result.setInfo(s, "Delete the selected items", category, 0);
 		result.defaultKeypresses.add(KeyPress(KeyPress::deleteKey), KeyPress(KeyPress::backspaceKey));
-		result.setActive(items.size() > 0 && items[0] != nullptr);
+		result.setActive(items.size() > 0 && items.getFirst() != nullptr);
 	}
 	break;
 
@@ -515,7 +515,7 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 		if (!items.isEmpty())
 		{
 			var data = new DynamicObject();
-			data.getDynamicObject()->setProperty("itemType", items[0]->itemDataType.isNotEmpty() ? items[0]->itemDataType : items[0]->getTypeString());
+			data.getDynamicObject()->setProperty("itemType", items.getFirst()->itemDataType.isNotEmpty() ? items.getFirst()->itemDataType : items.getFirst()->getTypeString());
 
 			var itemsData = var();
 			for (auto& i : items)
@@ -573,7 +573,7 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 
 		if (items.size() == 1)
 		{
-			if (items[0] != nullptr && items[0]->userCanDuplicate) items[0]->duplicate();
+			if (items.getFirst() != nullptr && items.getFirst()->userCanDuplicate) items.getFirst()->duplicate();
 		}
 		else
 		{
@@ -608,7 +608,7 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 					for (auto& i : *it.getValue())
 					{
 						var iData = i->getJSONData();
-						maxIndex = jmax(it.getKey()->items.indexOf(i), maxIndex);
+						maxIndex = jmax(it.getKey()->getItemIndex(i), maxIndex);
 						data.append(iData);
 					}
 

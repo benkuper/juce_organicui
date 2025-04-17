@@ -576,11 +576,12 @@ void OutlinerItemComponent::mouseDown(const MouseEvent& e)
 
 		PopupMenu dashboardMenu;
 		int index = 0;
-		for (auto& di : DashboardManager::getInstance()->items)
-		{
-			dashboardMenu.addItem(index + 10000, di->niceName);
-			index++;
-		}
+		DashboardManager::getInstance()->callFunctionOnItems([&](auto di)
+			{
+				dashboardMenu.addItem(index + 10000, di->niceName);
+				index++;
+			});
+
 		p.addSubMenu("Send to Dashboard", dashboardMenu);
 
 		p.showMenuAsync(PopupMenu::Options(), [this](int result)
@@ -605,7 +606,7 @@ void OutlinerItemComponent::mouseDown(const MouseEvent& e)
 				default:
 					if (result >= 10000)
 					{
-						DashboardManager::getInstance()->items[result - 10000]->itemManager.addItem((item->isContainer ? item->container->createDashboardItem() : item->controllable->createDashboardItem()));
+						DashboardManager::getInstance()->getItemAt(result - 10000)->itemManager.addItem((item->isContainer ? item->container->createDashboardItem() : item->controllable->createDashboardItem()));
 					}
 					break;
 

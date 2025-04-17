@@ -59,19 +59,20 @@ GradientColorManager::~GradientColorManager()
 void GradientColorManager::setLength(float val, bool stretch, bool stickToEnd)
 {
 	updateKeyRanges();
-	
+
 	if (stretch)
 	{
 		float stretchFactor = val / length->floatValue();
 		if (stretchFactor > 1) length->setValue(val); //if stretching, we have first to expand the length in case keys are not allowed outside
-		for (auto& k : items) k->position->setValue(k->position->floatValue() * stretchFactor);
+		callFunctionOnItems([&](auto k) { k->position->setValue(k->position->floatValue() * stretchFactor); });
+
 		if (stretchFactor < 1) length->setValue(val); //if reducing, we have to first reduce keys and then we can reduce the length, in case keys are not allowed outside
 	}
 	else
 	{
 		float lengthDiff = val - length->floatValue();
 		length->setValue(val); // just change the value, nothing unusual
-		if (stickToEnd) for (auto& k : items) k->position->setValue(k->position->floatValue() + lengthDiff);
+		if (stickToEnd) callFunctionOnItems([&](auto k) { k->position->setValue(k->position->floatValue() + lengthDiff); });
 	}
 
 }
@@ -85,11 +86,11 @@ void GradientColorManager::setAllowKeysOutside(bool value)
 
 void GradientColorManager::updateKeyRanges()
 {
-	for (auto& i : items)
-	{
-		if (!allowKeysOutside) i->position->setRange(0, length->floatValue());
-		else i->position->clearRange();
-	}
+	callFunctionOnItems([&](auto i)
+		{
+			if (!allowKeysOutside) i->position->setRange(0, length->floatValue());
+			else i->position->clearRange();
+		});
 }
 
 void GradientColorManager::updateCurrentColor()
@@ -97,13 +98,13 @@ void GradientColorManager::updateCurrentColor()
 	currentColor->setColor(getColorForPosition(position->floatValue()));
 }
 
-Colour GradientColorManager::getColorForPosition(const float & time) const
+Colour GradientColorManager::getColorForPosition(const float& time) const
 {
-	if (items.isEmpty()) return Colours::transparentBlack;
-	if (time <= items[0]->position->floatValue()) return items[0]->itemColor->getColor();
-	if (time >= items[items.size() - 1]->position->floatValue()) return items[items.size() - 1]->itemColor->getColor();
+	if (!hasItems()) return Colours::transparentBlack;
+	if (time <= getFirstItem()->position->floatValue()) return getFirstItem()->itemColor->getColor();
+	if (time >= getLastItem()->position->floatValue()) return getLastItem()->itemColor->getColor();
 
-	GradientColor * nearest = getItemAt(time, true);
+	GradientColor* nearest = getItemAt(time, true);
 
 	if (nearest == nullptr) return Colours::purple;
 
@@ -117,7 +118,7 @@ Colour GradientColorManager::getColorForPosition(const float & time) const
 
 	case GradientColor::LINEAR:
 	{
-		GradientColor * next = items[items.indexOf(nearest) + 1];
+		GradientColor* next = getItemAfter(nearest);
 		if (nearest == nullptr || next == nullptr || nearest->position->floatValue() == next->position->floatValue()) return nearest->itemColor->getColor();
 		return nearest->itemColor->getColor().interpolatedWith(next->itemColor->getColor(), jmap<float>(time, nearest->position->floatValue(), next->position->floatValue(), 0, 1));
 	}
@@ -132,7 +133,7 @@ void GradientColorManager::rebuildGradient()
 {
 	gradientLock.enter();
 	gradient.clearColours();
-	if (items.size() > 0 && items[0]->position->floatValue() > 0) gradient.addColour(0, items[0]->color->getColor(), items[0]->interpolation->getValueDataAsEnum<ColourGradient::Interpolation>());
+	if (items.size() > 0 && getFirstItem()->position->floatValue() > 0) gradient.addColour(0, getFirstItem()->color->getColor(), getFirstItem()->interpolation->getValueDataAsEnum<ColourGradient::Interpolation>());
 
 	for (auto &i : items)
 	{
@@ -145,10 +146,10 @@ void GradientColorManager::rebuildGradient()
 }
 */
 
-GradientColor * GradientColorManager::addColorAt(float time, Colour color)
+GradientColor* GradientColorManager::addColorAt(float time, Colour color)
 {
-	if (items.isEmpty())  color = color.withAlpha(1.0f); //if only one color, force a non-transparent one to avoid confusion
-	GradientColor * t = getItemAt(time);
+	if (!hasItems())  color = color.withAlpha(1.0f); //if only one color, force a non-transparent one to avoid confusion
+	GradientColor* t = getItemAt(time);
 	if (t == nullptr)
 	{
 		t = new GradientColor(time, color);
@@ -158,16 +159,17 @@ GradientColor * GradientColorManager::addColorAt(float time, Colour color)
 	{
 		t->itemColor->setColor(color);
 	}
-	
+
 	reorderItems();
 	//rebuildGradient();
 	return t;
 }
 
-GradientColor * GradientColorManager::getItemAt(float time, bool getNearestPreviousKeyIfNotFound) const
+GradientColor* GradientColorManager::getItemAt(float time, bool getNearestPreviousKeyIfNotFound) const
 {
-	GradientColor * nearestPrevious = nullptr;
-	for (auto &t : items)
+	GradientColor* nearestPrevious = nullptr;
+	auto items = getItems();
+	for (auto& t : items)
 	{
 		if (t->position->floatValue() == time) return t;
 		if (t->position->floatValue() > time) break; //avoid looking for further keys, todo : implement dichotomy mechanism
@@ -180,13 +182,13 @@ Array<GradientColor*> GradientColorManager::getItemsInTimespan(float startTime, 
 {
 	Array<GradientColor*> result;
 
-	for (auto& gc : items)
-	{
-		if (gc->position->floatValue() >= startTime && gc->position->floatValue() <= endTime)
+	callFunctionOnItems([&](auto gc)
 		{
-			result.add(gc);
-		}
-	}
+			if (gc->position->floatValue() >= startTime && gc->position->floatValue() <= endTime)
+			{
+				result.add(gc);
+			}
+		});
 	return result;
 }
 
@@ -209,14 +211,14 @@ Array<UndoableAction*> GradientColorManager::getRemoveTimespan(float start, floa
 
 
 
-void GradientColorManager::addItemInternal(GradientColor * item, var data)
+void GradientColorManager::addItemInternal(GradientColor* item, var data)
 {
 	//item->gradientIndex = gradient.addColour(item->position->floatValue() / length->floatValue(), item->itemColor->getColor());
-	if(!allowKeysOutside) item->position->setRange(0, length->floatValue());
+	if (!allowKeysOutside) item->position->setRange(0, length->floatValue());
 	item->selectionManager = selectionManager;
 }
 
-void GradientColorManager::removeItemInternal(GradientColor *)
+void GradientColorManager::removeItemInternal(GradientColor*)
 {
 	//rebuildGradient();
 	updateCurrentColor();
@@ -260,11 +262,11 @@ Array<GradientColor*> GradientColorManager::addItemsFromClipboard(bool showWarni
 
 void GradientColorManager::reorderItems()
 {
-	items.sort(GradientColorManager::comparator, true);
+	baseItems.sort(GradientColorManager::comparator, true);
 	Manager::reorderItems();
 }
 
-void GradientColorManager::onContainerParameterChanged(Parameter * p)
+void GradientColorManager::onContainerParameterChanged(Parameter* p)
 {
 	if (p == position)
 	{
@@ -272,22 +274,22 @@ void GradientColorManager::onContainerParameterChanged(Parameter * p)
 	}
 }
 
-void GradientColorManager::onControllableFeedbackUpdate(ControllableContainer * cc, Controllable * c)
+void GradientColorManager::onControllableFeedbackUpdate(ControllableContainer* cc, Controllable* c)
 {
-	GradientColor * t = static_cast<GradientColor *>(cc);
+	GradientColor* t = static_cast<GradientColor*>(cc);
 	if (t != nullptr)
 	{
 		if (c == t->position)
 		{
-			int index = items.indexOf(t);
-			if (index > 0 && t->position->floatValue() < items[index - 1]->position->floatValue())
+			int index = getItemIndex(t);
+			if (index > 0 && t->position->floatValue() < getLastItem()->position->floatValue())
 			{
-				items.swap(index, index - 1);
+				baseItems.swap(index, index - 1);
 				managerListeners.call(&ManagerListener::itemsReordered);
 			}
-			else if (index < items.size() - 1 && t->position->floatValue() > items[index + 1]->position->floatValue())
+			else if (index < getNumItems() - 1 && t->position->floatValue() > getItemAfter(t)->position->floatValue())
 			{
-				items.swap(index, index + 1);
+				baseItems.swap(index, index + 1);
 				managerListeners.call(&ManagerListener::itemsReordered);
 			}
 

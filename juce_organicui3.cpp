@@ -32,7 +32,8 @@
 
 #include "manager/Factory.h"
 #include "manager/BaseItem.cpp"
-#include "manager/ItemGroup.cpp"
+#include "manager/BaseItemGroup.cpp"
+#include "manager/BaseManager.cpp"
 
 #include "manager/GenericControllableManager.cpp"
 #include "manager/GenericControllableItem.cpp"

@@ -186,8 +186,8 @@ void BaseItem::scalePosition(Point<float> positionOffset, bool moveOtherSelected
 		BaseItem* firstItemY = items[0];
 		BaseItem* lastItemY = items[0];
 
-		Point<float> minPosition = items[0]->movePositionReference;
-		Point<float> maxPosition = items[0]->movePositionReference;
+		Point<float> minPosition = items.getFirst()->movePositionReference;
+		Point<float> maxPosition = items.getFirst()->movePositionReference;
 		for (auto& i : items)
 		{
 			if (i->isUILocked->boolValue()) continue;
