@@ -90,7 +90,7 @@ public:
 
 	void afterLoadJSONDataInternal() override;
 
-	static int compareKeys(AutomationKey* k1, AutomationKey* k2);
+	static int compareKeys(BaseItem* k1, BaseItem* k2);
 
 	static juce::var setLengthFromScript(const juce::var::NativeFunctionArgs& a);
 	static juce::var addKeyFromScript(const juce::var::NativeFunctionArgs& a);

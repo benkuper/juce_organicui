@@ -76,7 +76,7 @@ void DashboardItemUI::mouseDown(const MouseEvent& e)
 
 	if (e.eventComponent == &resizer)
 	{
-		this->baseItem->setSizeReference(true);
+		item->setSizeReference(true);
 	}
 
 	BaseItemMinimalUI::mouseDown(e);

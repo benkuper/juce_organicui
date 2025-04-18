@@ -19,6 +19,9 @@ class BaseItemUI :
 	public Parameter::AsyncListener
 {
 public:
+	
+	static_assert(std::is_base_of<BaseItem, T>::value, "T must be derived from BaseItem");
+
 	enum Direction { NONE, VERTICAL, HORIZONTAL, ALL };
 
 	BaseItemUI(T* _item, Direction resizeDirection = NONE, bool showMiniModeBT = false);
@@ -148,7 +151,7 @@ BaseItemUI<T>::BaseItemUI(T* _item, Direction _resizeDirection, bool showMiniMod
 	itemLabel("itemLabel", dynamic_cast<BaseItem*>(this->inspectable.get())->niceName)
 {
 
-	this->setName(this->baseItem->niceName);
+	this->setName(this->item->niceName);
 
 	itemLabel.setColour(itemLabel.backgroundColourId, juce::Colours::transparentWhite);
 	itemLabel.setColour(itemLabel.textColourId, TEXT_COLOR);
@@ -160,7 +163,7 @@ BaseItemUI<T>::BaseItemUI(T* _item, Direction _resizeDirection, bool showMiniMod
 	itemLabel.setFont(juce::FontOptions(GlobalSettings::getInstance()->fontSize->floatValue()));
 	itemLabel.setJustificationType(juce::Justification::centredLeft);
 
-	itemLabel.setEditable(false, this->baseItem->nameCanBeChangedByUser);
+	itemLabel.setEditable(false, this->item->nameCanBeChangedByUser);
 	itemLabel.addListener(this);
 	this->addAndMakeVisible(&itemLabel);
 
@@ -193,13 +196,13 @@ BaseItemUI<T>::BaseItemUI(T* _item, Direction _resizeDirection, bool showMiniMod
 		break;
 	}
 
-	if (this->baseItem->canBeDisabled)
+	if (this->item->canBeDisabled)
 	{
-		enabledBT.reset(this->baseItem->enabled->createToggle(juce::ImageCache::getFromMemory(OrganicUIBinaryData::power_png, OrganicUIBinaryData::power_pngSize)));
+		enabledBT.reset(this->item->enabled->createToggle(juce::ImageCache::getFromMemory(OrganicUIBinaryData::power_png, OrganicUIBinaryData::power_pngSize)));
 		this->addAndMakeVisible(enabledBT.get());
 	}
 
-	if (this->baseItem->userCanRemove)
+	if (this->item->userCanRemove)
 	{
 		removeBT.reset(AssetManager::getInstance()->getRemoveBT());
 		removeBT->setWantsKeyboardFocus(false);
@@ -208,22 +211,22 @@ BaseItemUI<T>::BaseItemUI(T* _item, Direction _resizeDirection, bool showMiniMod
 		removeBT->addListener(this);
 	}
 
-	if (this->baseItem->itemColor != nullptr)
+	if (this->item->itemColor != nullptr)
 	{
-		itemColorUI.reset(this->baseItem->itemColor->createColorParamUI());
+		itemColorUI.reset(this->item->itemColor->createColorParamUI());
 		this->addAndMakeVisible(itemColorUI.get());
 	}
 
-	if (this->baseItem->showWarningInUI)
+	if (this->item->showWarningInUI)
 	{
-		warningUI.reset(new WarningTargetUI(this->baseItem));
+		warningUI.reset(new WarningTargetUI(this->item));
 		warningUI->addComponentListener(this);
 		this->addChildComponent(warningUI.get());
 	}
 
 	if (showMiniModeBT)
 	{
-		miniModeBT.reset(this->baseItem->miniMode->createToggle(juce::ImageCache::getFromMemory(OrganicUIBinaryData::minus_png, OrganicUIBinaryData::minus_pngSize)));
+		miniModeBT.reset(this->item->miniMode->createToggle(juce::ImageCache::getFromMemory(OrganicUIBinaryData::minus_png, OrganicUIBinaryData::minus_pngSize)));
 		this->addAndMakeVisible(miniModeBT.get());
 	}
 
@@ -254,14 +257,14 @@ void BaseItemUI<T>::setContentSize(int contentWidth, int contentHeight)
 template<class T>
 int BaseItemUI<T>::getHeightWithoutContent()
 {
-	return headerHeight + margin * 2 + (this->baseItem->miniMode->boolValue() ? 0 : headerGap + resizerHeight);
+	return headerHeight + margin * 2 + (this->item->miniMode->boolValue() ? 0 : headerGap + resizerHeight);
 }
 
 template<class T>
 void BaseItemUI<T>::updateMiniModeUI()
 {
 	//auto hide/show component in content section
-	for (auto& c : contentComponents) c->setVisible(!this->baseItem->miniMode->boolValue());
+	for (auto& c : contentComponents) c->setVisible(!this->item->miniMode->boolValue());
 
 	updateItemUISize();
 
@@ -271,22 +274,22 @@ void BaseItemUI<T>::updateMiniModeUI()
 template<class T>
 void BaseItemUI<T>::updateItemUISize()
 {
-	if (this->baseItem->miniMode->boolValue())
+	if (this->item->miniMode->boolValue())
 	{
 		if (resizer != nullptr) this->removeChildComponent(resizer);
 
 		int targetWidth = this->getWidth();
 		if (targetWidth == 0)
 		{
-			if (resizeDirection == ALL) targetWidth = this->baseItem->viewUISize->x;
-			else if (resizeDirection == HORIZONTAL) targetWidth = this->baseItem->listUISize->floatValue();
+			if (resizeDirection == ALL) targetWidth = this->item->viewUISize->x;
+			else if (resizeDirection == HORIZONTAL) targetWidth = this->item->listUISize->floatValue();
 		}
 
 		int targetHeight = getHeightWithoutContent();
 		if (targetHeight == 0)
 		{
-			if (resizeDirection == ALL) targetHeight = this->baseItem->viewUISize->y;
-			else if (resizeDirection == VERTICAL) targetHeight = this->baseItem->listUISize->floatValue();
+			if (resizeDirection == ALL) targetHeight = this->item->viewUISize->y;
+			else if (resizeDirection == VERTICAL) targetHeight = this->item->listUISize->floatValue();
 		}
 
 		this->setSize(targetWidth, targetHeight);
@@ -301,21 +304,21 @@ void BaseItemUI<T>::updateItemUISize()
 		switch (resizeDirection)
 		{
 		case ALL:
-			targetWidth = (int)this->baseItem->viewUISize->x;
-			targetHeight = (int)this->baseItem->viewUISize->y;
+			targetWidth = (int)this->item->viewUISize->x;
+			targetHeight = (int)this->item->viewUISize->y;
 			break;
 
 		case VERTICAL:
-			targetHeight = (int)this->baseItem->listUISize->floatValue();
+			targetHeight = (int)this->item->listUISize->floatValue();
 			break;
 
 		case HORIZONTAL:
-			targetWidth = (int)this->baseItem->listUISize->floatValue();
+			targetWidth = (int)this->item->listUISize->floatValue();
 			break;
 
 		case NONE:
-			targetWidth = (int)this->baseItem->listUISize->floatValue();
-			targetHeight = (int)this->baseItem->listUISize->floatValue();
+			targetWidth = (int)this->item->listUISize->floatValue();
+			targetHeight = (int)this->item->listUISize->floatValue();
 			break;
 		}
 
@@ -374,7 +377,7 @@ void BaseItemUI<T>::resized()
 
 	r.removeFromTop(headerGap);
 
-	if (!this->baseItem->miniMode->boolValue())
+	if (!this->item->miniMode->boolValue())
 	{
 		if (resizeDirection == NONE)
 		{
@@ -392,7 +395,7 @@ void BaseItemUI<T>::resized()
 				juce::Rectangle<int> fr = r.removeFromBottom(resizerHeight);
 				resizedInternalFooter(fr);
 				edgeResizer->setBounds(fr);
-				this->baseItem->listUISize->setValue(this->getHeight());
+				this->item->listUISize->setValue(this->getHeight());
 
 			}
 			break;
@@ -400,7 +403,7 @@ void BaseItemUI<T>::resized()
 			case HORIZONTAL:
 			{
 				edgeResizer->setBounds(r.removeFromRight(resizerWidth));
-				this->baseItem->listUISize->setValue(this->getWidth());
+				this->item->listUISize->setValue(this->getWidth());
 			}
 			break;
 
@@ -410,7 +413,7 @@ void BaseItemUI<T>::resized()
 				resizedInternalFooter(fr);
 				cornerResizer->setBounds(fr.withLeft(r.getWidth() - resizerHeight));
 
-				//this->baseItem->viewUISize->setPoint(this->getWidth(), this->getHeight());
+				//this->item->viewUISize->setPoint(this->getWidth(), this->getHeight());
 
 			}
 			break;
@@ -427,7 +430,7 @@ void BaseItemUI<T>::resized()
 template<class T>
 void BaseItemUI<T>::resizedHeader(juce::Rectangle<int>& r)
 {
-	int textWidth = (int)juce::TextLayout::getStringWidth(itemLabel.getFont(), this->baseItem->niceName);
+	int textWidth = (int)juce::TextLayout::getStringWidth(itemLabel.getFont(), this->item->niceName);
 	int labelWidth = juce::jmax(textWidth + 10, 30);
 	itemLabel.setBounds(r.removeFromLeft(labelWidth).reduced(0, 1));
 	r.removeFromLeft(2);
@@ -440,21 +443,21 @@ void BaseItemUI<T>::buttonClicked(juce::Button* b)
 {
 	if (b == removeBT.get())
 	{
-		if (this->baseItem->askConfirmationBeforeRemove && GlobalSettings::getInstance()->askBeforeRemovingItems->boolValue())
+		if (this->item->askConfirmationBeforeRemove && GlobalSettings::getInstance()->askBeforeRemovingItems->boolValue())
 		{
 			juce::AlertWindow::showAsync(
 				juce::MessageBoxOptions().withIconType(juce::AlertWindow::QuestionIcon)
-				.withTitle("Delete " + this->baseItem->niceName)
+				.withTitle("Delete " + this->item->niceName)
 				.withMessage("Are you sure you want to delete this ?")
 				.withButton("Delete")
 				.withButton("Cancel"),
 				[this](int result)
 				{
-					if (result != 0) this->baseItem->remove();
+					if (result != 0) this->item->remove();
 				}
 			);
 		}
-		else this->baseItem->remove();
+		else this->item->remove();
 	}
 }
 
@@ -467,7 +470,7 @@ void BaseItemUI<T>::mouseDown(const juce::MouseEvent& e)
 	else if (dynamic_cast<ControllableUI*>(e.eventComponent) != nullptr) return;
 	else if (e.eventComponent == cornerResizer.get())
 	{
-		this->baseItem->setSizeReference(true);
+		this->item->setSizeReference(true);
 	}
 
 	if (e.eventComponent == this || e.eventComponent == &itemLabel) BaseItemMinimalUI<T>::mouseDown(e);
@@ -498,8 +501,8 @@ void BaseItemUI<T>::labelTextChanged(juce::Label* l)
 {
 	if (l == &itemLabel)
 	{
-		if (l->getText().isEmpty()) itemLabel.setText(this->baseItem->niceName, juce::dontSendNotification); //avoid setting empty names
-		else this->baseItem->setUndoableNiceName(l->getText());
+		if (l->getText().isEmpty()) itemLabel.setText(this->item->niceName, juce::dontSendNotification); //avoid setting empty names
+		else this->item->setUndoableNiceName(l->getText());
 		resized();
 	}
 }
@@ -531,14 +534,14 @@ template<class T>
 void BaseItemUI<T>::containerChildAddressChangedAsync(ControllableContainer*)
 {
 
-	itemLabel.setText(this->baseItem->niceName, juce::dontSendNotification);
+	itemLabel.setText(this->item->niceName, juce::dontSendNotification);
 }
 
 template<class T>
 void BaseItemUI<T>::controllableFeedbackUpdateInternal(Controllable* c)
 {
 	BaseItemMinimalUI<T>::controllableFeedbackUpdateInternal(c);
-	if (c == this->baseItem->miniMode) updateMiniModeUI();
+	if (c == this->item->miniMode) updateMiniModeUI();
 }
 
 template<class T>

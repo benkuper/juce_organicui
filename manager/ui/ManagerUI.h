@@ -12,41 +12,28 @@
 #pragma warning(disable:4244)
 
 
+template <typename U> class BaseItemMinimalUI;
+template <typename T> class ItemGroup;
 
-template<class IT>
-class ManagerItemComparator
-{
-public:
-	ManagerItemComparator(Manager<IT>* _manager) :manager(_manager) {}
-
-	Manager<IT>* manager;
-
-	int compareElements(BaseItemMinimalUI<IT>* u1, BaseItemMinimalUI<IT>* u2)
-	{
-		return (manager->getItemIndex(u1->item) < manager->getItemIndex(u2->item)) ? -1 : 1;
-	}
-};
-
-
-template<class M, class T, class U>
+template<typename M, typename T, typename U = BaseItemMinimalUI<T>, typename G = ItemGroup<T>, typename GU = BaseItemMinimalUI<G>>
 class ManagerUI;
 
-template<class M, class T, class U>
+template<typename M, typename T, typename U, typename G, typename GU>
 class ManagerUIItemContainer :
 	public juce::Component
 {
 public:
-	ManagerUIItemContainer(ManagerUI<M, T, U>* _mui) : mui(_mui) {};
+
+	ManagerUIItemContainer(ManagerUI<M, T, U, G, GU>* _mui) : mui(_mui) {};
 	~ManagerUIItemContainer() {}
 
-	ManagerUI<M, T, U>* mui;
+	ManagerUI<M, T, U, G, GU>* mui;
 
 	void childBoundsChanged(juce::Component* c) { mui->childBoundsChanged(c); }
 };
 
 
-
-template<class M, class T, class U>
+template<typename M, typename T, typename U, typename G, typename GU>
 class ManagerUI :
 	public InspectableContentComponent,
 	public Manager<T>::ManagerListener,
@@ -61,6 +48,13 @@ class ManagerUI :
 	public juce::TextEditor::Listener
 {
 public:
+
+	static_assert(std::is_base_of<BaseItem, T>::value, "T must be derived from BaseItem");
+	static_assert(std::is_base_of<BaseItemMinimalUI<T>, U>::value, "U must be derived from BaseItemUI<T>");
+	static_assert(std::is_base_of<ItemGroup<T>, G>::value, "G must be derived from ItemGroup<T>");
+	static_assert(std::is_base_of<BaseItemMinimalUI<G>, GU>::value, "GU must be derived from BaseItemUI<G>");
+	static_assert(std::is_base_of<Manager<T>, M>::value, "M must be derived from Manager<T>");
+
 	ManagerUI(const juce::String& contentName, M* _manager, bool _useViewport = true);
 	virtual ~ManagerUI();
 
@@ -68,14 +62,13 @@ public:
 
 	M* manager;
 	juce::OwnedArray<U> itemsUI;
-	ManagerItemComparator<T> managerComparator;
 
 	//ui
 	bool useViewport; //TODO, create a ManagerViewportUI
 
 	Layout defaultLayout;
 
-	ManagerUIItemContainer<M, T, U> container;
+	ManagerUIItemContainer<M, T, U, G, GU> container;
 
 	class ManagerViewport :
 		public juce::Viewport
@@ -247,6 +240,22 @@ public:
 
 	virtual void newMessage(const Engine::EngineEvent& e) override;
 
+	class ManagerItemUIComparator
+	{
+	public:
+		ManagerItemUIComparator(BaseManager* manager) { m = manager; }
+
+		BaseManager* m;
+
+		int compareElements(BaseItemMinimalUI<T>* i1, BaseItemMinimalUI<T>* i2)
+		{
+			return m->getItemIndex(i1->item) - m->getItemIndex(i2->item);
+		}
+
+	};
+
+	ManagerItemUIComparator managerComparator;
+
 	class  ManagerUIListener
 	{
 	public:
@@ -262,8 +271,8 @@ public:
 };
 
 
-template<class M, class T, class U>
-ManagerUI<M, T, U>::ManagerUI(const juce::String& contentName, M* _manager, bool _useViewport) :
+template<typename M, typename T, typename U, typename G, typename GU>
+ManagerUI<M, T, U, G, GU>::ManagerUI(const juce::String& contentName, M* _manager, bool _useViewport) :
 	InspectableContentComponent(_manager),
 	manager(_manager),
 	managerComparator(_manager),
@@ -305,7 +314,7 @@ ManagerUI<M, T, U>::ManagerUI(const juce::String& contentName, M* _manager, bool
 		this->addAndMakeVisible(viewport);
 	}
 
-	Manager<T>* baseM = static_cast<Manager<T>*>(manager);
+	Manager<T, ItemGroup<T>>* baseM = static_cast<Manager<T>*>(manager);
 	baseM->addManagerListener(this);
 	baseM->addAsyncManagerListener(this);
 
@@ -322,14 +331,14 @@ ManagerUI<M, T, U>::ManagerUI(const juce::String& contentName, M* _manager, bool
 	Engine::mainEngine->addAsyncEngineListener(this);
 
 	InspectableSelectionManager::mainSelectionManager->addAsyncSelectionManagerListener(this);
-	//must call addExistingItems from child class to get overrides
+	//must call addExistingItems from child typename to get overrides
 
 	setWantsKeyboardFocus(true);
 }
 
 
-template<class M, class T, class U>
-ManagerUI<M, T, U>::~ManagerUI()
+template<typename M, typename T, typename U, typename G, typename GU>
+ManagerUI<M, T, U, G, GU>::~ManagerUI()
 {
 	if (!inspectable.wasObjectDeleted())
 	{
@@ -342,8 +351,8 @@ ManagerUI<M, T, U>::~ManagerUI()
 
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::setDefaultLayout(Layout l)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::setDefaultLayout(Layout l)
 {
 	defaultLayout = l;
 	if (useViewport)
@@ -354,16 +363,16 @@ void ManagerUI<M, T, U>::setDefaultLayout(Layout l)
 
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::addExistingItems(bool resizeAfter)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::addExistingItems(bool resizeAfter)
 {
 	//add existing items
 	this->manager->callFunctionOnItems([&](auto t) { addItemUI(t, false); });
 	if (resizeAfter) resized();
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::setShowAddButton(bool value)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::setShowAddButton(bool value)
 {
 	addItemBT->setVisible(value);
 
@@ -371,8 +380,8 @@ void ManagerUI<M, T, U>::setShowAddButton(bool value)
 	else removeChildComponent(addItemBT.get());
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::setShowSearchBar(bool value)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::setShowSearchBar(bool value)
 {
 	if (value)
 	{
@@ -398,8 +407,8 @@ void ManagerUI<M, T, U>::setShowSearchBar(bool value)
 	}
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::setShowTools(bool value)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::setShowTools(bool value)
 {
 	if (value == showTools) return;
 
@@ -417,8 +426,8 @@ void ManagerUI<M, T, U>::setShowTools(bool value)
 	resized();
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::addButtonTool(juce::Button* c, std::function<void()> clickFunc)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::addButtonTool(juce::Button* c, std::function<void()> clickFunc)
 {
 	if (tools.contains(c)) return;
 	tools.add(c);
@@ -427,15 +436,15 @@ void ManagerUI<M, T, U>::addButtonTool(juce::Button* c, std::function<void()> cl
 	c->addListener(this);
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::addControllableTool(ControllableUI* c)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::addControllableTool(ControllableUI* c)
 {
 	toolContainer.addAndMakeVisible(c);
 	tools.add(c);
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::mouseDown(const juce::MouseEvent& e)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::mouseDown(const juce::MouseEvent& e)
 {
 	InspectableContentComponent::mouseDown(e);
 
@@ -464,8 +473,8 @@ void ManagerUI<M, T, U>::mouseDown(const juce::MouseEvent& e)
 
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::mouseUp(const juce::MouseEvent& e)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::mouseUp(const juce::MouseEvent& e)
 {
 	if (e.eventComponent == this)
 	{
@@ -477,8 +486,8 @@ void ManagerUI<M, T, U>::mouseUp(const juce::MouseEvent& e)
 	}
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::askSelectToThis(BaseItemMinimalUI<T>* itemUI)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::askSelectToThis(BaseItemMinimalUI<T>* itemUI)
 {
 	T* firstItem = InspectableSelectionManager::activeSelectionManager->getInspectableAs<T>();
 	int firstIndex = manager->getItemIndex(firstItem);
@@ -501,8 +510,8 @@ void ManagerUI<M, T, U>::askSelectToThis(BaseItemMinimalUI<T>* itemUI)
 }
 
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::paint(juce::Graphics& g)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::paint(juce::Graphics& g)
 {
 	juce::Rectangle<int> r = getLocalBounds();
 
@@ -577,8 +586,8 @@ void ManagerUI<M, T, U>::paint(juce::Graphics& g)
 	}
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::resized()
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::resized()
 {
 	if (getWidth() == 0 || getHeight() == 0) return;
 
@@ -596,14 +605,14 @@ void ManagerUI<M, T, U>::resized()
 	//resizeOnChildBoundsChanged = resizeOnChange;
 }
 
-template<class M, class T, class U>
-juce::Rectangle<int> ManagerUI<M, T, U>::setHeaderBounds(juce::Rectangle<int>& r)
+template<typename M, typename T, typename U, typename G, typename GU>
+juce::Rectangle<int> ManagerUI<M, T, U, G, GU>::setHeaderBounds(juce::Rectangle<int>& r)
 {
 	return defaultLayout == VERTICAL ? r.removeFromTop(headerSize) : r.removeFromRight(headerSize);
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::resizedInternalHeader(juce::Rectangle<int>& hr)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::resizedInternalHeader(juce::Rectangle<int>& hr)
 {
 	if (addItemBT != nullptr && addItemBT->isVisible() && addItemBT->getParentComponent() == this)
 	{
@@ -620,8 +629,8 @@ void ManagerUI<M, T, U>::resizedInternalHeader(juce::Rectangle<int>& hr)
 	if (showTools) resizedInternalHeaderTools(hr);
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::resizedInternalHeaderTools(juce::Rectangle<int>& r)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::resizedInternalHeaderTools(juce::Rectangle<int>& r)
 {
 	r.removeFromLeft(4);
 
@@ -644,8 +653,8 @@ void ManagerUI<M, T, U>::resizedInternalHeaderTools(juce::Rectangle<int>& r)
 	}
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::resizedInternalContent(juce::Rectangle<int>& r)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::resizedInternalContent(juce::Rectangle<int>& r)
 {
 	if (useViewport)
 	{
@@ -680,8 +689,8 @@ void ManagerUI<M, T, U>::resizedInternalContent(juce::Rectangle<int>& r)
 	}
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::placeItems(juce::Rectangle<int>& r)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::placeItems(juce::Rectangle<int>& r)
 {
 	int i = 0;
 	for (auto& ui : itemsUI)
@@ -707,18 +716,18 @@ void ManagerUI<M, T, U>::placeItems(juce::Rectangle<int>& r)
 	}
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::resizedInternalFooter(juce::Rectangle<int>& r)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::resizedInternalFooter(juce::Rectangle<int>& r)
 {
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::alignItems(AlignMode alignMode)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::alignItems(AlignMode alignMode)
 {
 	juce::Array<T*> inspectables = InspectableSelectionManager::activeSelectionManager->getInspectablesAs<T>();
 	if (inspectables.size() == 0) return;
 
-	float target = (alignMode == ManagerUI<M, T, U>::AlignMode::CENTER_V || alignMode == ManagerUI<M, T, U>::AlignMode::CENTER_H) ? 0 : ((alignMode == ManagerUI<M, T, U>::AlignMode::LEFT || alignMode == ManagerUI<M, T, U>::AlignMode::TOP) ? INT32_MAX : INT32_MIN);
+	float target = (alignMode == ManagerUI<M, T, U, G, GU>::AlignMode::CENTER_V || alignMode == ManagerUI<M, T, U, G, GU>::AlignMode::CENTER_H) ? 0 : ((alignMode == ManagerUI<M, T, U, G, GU>::AlignMode::LEFT || alignMode == ManagerUI<M, T, U, G, GU>::AlignMode::TOP) ? INT32_MAX : INT32_MIN);
 
 	juce::Array<T*> goodInspectables;
 	for (auto& i : inspectables)
@@ -726,12 +735,12 @@ void ManagerUI<M, T, U>::alignItems(AlignMode alignMode)
 		if (i == nullptr || !manager->hasItem(i)) continue;
 		switch (alignMode)
 		{
-		case ManagerUI<M, T, U>::AlignMode::LEFT: target = juce::jmin(i->viewUIPosition->x, target); break;
-		case ManagerUI<M, T, U>::AlignMode::RIGHT: target = juce::jmax(i->viewUIPosition->x + i->viewUISize->x, target); break;
-		case ManagerUI<M, T, U>::AlignMode::CENTER_H: target += i->viewUIPosition->x + i->viewUISize->x / 2; break;
-		case ManagerUI<M, T, U>::AlignMode::TOP: target = juce::jmin(target, i->viewUIPosition->y); break;
-		case ManagerUI<M, T, U>::AlignMode::BOTTOM: target = juce::jmax(target, i->viewUIPosition->y + i->viewUISize->y); break;
-		case ManagerUI<M, T, U>::AlignMode::CENTER_V: target += i->viewUIPosition->y + i->viewUISize->y / 2; break;
+		case ManagerUI<M, T, U, G, GU>::AlignMode::LEFT: target = juce::jmin(i->viewUIPosition->x, target); break;
+		case ManagerUI<M, T, U, G, GU>::AlignMode::RIGHT: target = juce::jmax(i->viewUIPosition->x + i->viewUISize->x, target); break;
+		case ManagerUI<M, T, U, G, GU>::AlignMode::CENTER_H: target += i->viewUIPosition->x + i->viewUISize->x / 2; break;
+		case ManagerUI<M, T, U, G, GU>::AlignMode::TOP: target = juce::jmin(target, i->viewUIPosition->y); break;
+		case ManagerUI<M, T, U, G, GU>::AlignMode::BOTTOM: target = juce::jmax(target, i->viewUIPosition->y + i->viewUISize->y); break;
+		case ManagerUI<M, T, U, G, GU>::AlignMode::CENTER_V: target += i->viewUIPosition->y + i->viewUISize->y / 2; break;
 		}
 		goodInspectables.add(i);
 	}
@@ -746,12 +755,12 @@ void ManagerUI<M, T, U>::alignItems(AlignMode alignMode)
 		juce::Point<float> targetPoint;
 		switch (alignMode)
 		{
-		case ManagerUI<M, T, U>::AlignMode::LEFT: targetPoint = juce::Point<float>(target, i->viewUIPosition->y); break;
-		case ManagerUI<M, T, U>::AlignMode::RIGHT: targetPoint = juce::Point<float>(target - i->viewUISize->x, i->viewUIPosition->y); break;
-		case ManagerUI<M, T, U>::AlignMode::CENTER_H: targetPoint = juce::Point<float>(target - i->viewUISize->x / 2, i->viewUIPosition->y);  break;
-		case ManagerUI<M, T, U>::AlignMode::TOP: targetPoint = juce::Point<float>(i->viewUIPosition->x, target); break;
-		case ManagerUI<M, T, U>::AlignMode::BOTTOM:targetPoint = juce::Point<float>(i->viewUIPosition->x, target - i->viewUISize->y); break;
-		case ManagerUI<M, T, U>::AlignMode::CENTER_V:targetPoint = juce::Point<float>(i->viewUIPosition->x, target - i->viewUISize->y / 2); break;
+		case ManagerUI<M, T, U, G, GU>::AlignMode::LEFT: targetPoint = juce::Point<float>(target, i->viewUIPosition->y); break;
+		case ManagerUI<M, T, U, G, GU>::AlignMode::RIGHT: targetPoint = juce::Point<float>(target - i->viewUISize->x, i->viewUIPosition->y); break;
+		case ManagerUI<M, T, U, G, GU>::AlignMode::CENTER_H: targetPoint = juce::Point<float>(target - i->viewUISize->x / 2, i->viewUIPosition->y);  break;
+		case ManagerUI<M, T, U, G, GU>::AlignMode::TOP: targetPoint = juce::Point<float>(i->viewUIPosition->x, target); break;
+		case ManagerUI<M, T, U, G, GU>::AlignMode::BOTTOM:targetPoint = juce::Point<float>(i->viewUIPosition->x, target - i->viewUISize->y); break;
+		case ManagerUI<M, T, U, G, GU>::AlignMode::CENTER_V:targetPoint = juce::Point<float>(i->viewUIPosition->x, target - i->viewUISize->y / 2); break;
 		}
 		actions.addArray(i->viewUIPosition->setUndoablePoint(targetPoint, true));
 	}
@@ -760,8 +769,8 @@ void ManagerUI<M, T, U>::alignItems(AlignMode alignMode)
 
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::distributeItems(bool isVertical)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::distributeItems(bool isVertical)
 {
 	juce::Array<T*> inspectables = InspectableSelectionManager::activeSelectionManager->getInspectablesAs<T>();
 	if (inspectables.size() < 3) return;
@@ -800,15 +809,15 @@ void ManagerUI<M, T, U>::distributeItems(bool isVertical)
 }
 
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::updateItemsVisibility()
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::updateItemsVisibility()
 {
 	for (auto& bui : itemsUI) updateItemVisibility(bui);
 
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::updateItemVisibility(U* bui)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::updateItemVisibility(U* bui)
 {
 	if (!checkFilterForItem(bui)) return;
 
@@ -824,14 +833,14 @@ void ManagerUI<M, T, U>::updateItemVisibility(U* bui)
 	}
 }
 
-template<class M, class T, class U>
-bool ManagerUI<M, T, U>::hasFiltering()
+template<typename M, typename T, typename U, typename G, typename GU>
+bool ManagerUI<M, T, U, G, GU>::hasFiltering()
 {
 	return searchBar != nullptr && searchBar->getText().isNotEmpty();
 }
 
-template<class M, class T, class U>
-juce::Array<U*> ManagerUI<M, T, U>::getFilteredItems()
+template<typename M, typename T, typename U, typename G, typename GU>
+juce::Array<U*> ManagerUI<M, T, U, G, GU>::getFilteredItems()
 {
 	if (!this->hasFiltering()) return juce::Array<U*>(this->itemsUI.getRawDataPointer(), this->itemsUI.size());
 
@@ -840,21 +849,21 @@ juce::Array<U*> ManagerUI<M, T, U>::getFilteredItems()
 	return result;
 }
 
-template<class M, class T, class U>
-bool ManagerUI<M, T, U>::checkFilterForItem(U* ui)
+template<typename M, typename T, typename U, typename G, typename GU>
+bool ManagerUI<M, T, U, G, GU>::checkFilterForItem(U* ui)
 {
 	if (!this->hasFiltering() || searchBar == nullptr) return true;
 	return ui->item->niceName.toLowerCase().contains(searchBar->getText().toLowerCase());
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::childBoundsChanged(juce::Component* c)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::childBoundsChanged(juce::Component* c)
 {
 	if (resizeOnChildBoundsChanged && c != &viewport) resized();
 }
 
-template<class M, class T, class U>
-bool ManagerUI<M, T, U>::hitTest(int x, int y)
+template<typename M, typename T, typename U, typename G, typename GU>
+bool ManagerUI<M, T, U, G, GU>::hitTest(int x, int y)
 {
 	if (!autoFilterHitTestOnItems) return InspectableContentComponent::hitTest(x, y);
 	if (itemsUI.size() == 0) return validateHitTestOnNoItem;
@@ -872,8 +881,8 @@ bool ManagerUI<M, T, U>::hitTest(int x, int y)
 	return false;
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::componentMovedOrResized(juce::Component& c, bool wasMoved, bool wasResized)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::componentMovedOrResized(juce::Component& c, bool wasMoved, bool wasResized)
 {
 	if (&c == &container && useViewport && !itemAnimator.isAnimating())
 	{
@@ -881,14 +890,14 @@ void ManagerUI<M, T, U>::componentMovedOrResized(juce::Component& c, bool wasMov
 	}
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::showMenuAndAddItem(bool isFromAddButton, juce::Point<int> mouseDownPos)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::showMenuAndAddItem(bool isFromAddButton, juce::Point<int> mouseDownPos)
 {
 	showMenuAndAddItem(isFromAddButton, mouseDownPos, nullptr);
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::showMenuAndAddItem(bool isFromAddButton, juce::Point<int> mouseDownPos, std::function<void(T*)> callback)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::showMenuAndAddItem(bool isFromAddButton, juce::Point<int> mouseDownPos, std::function<void(T*)> callback)
 {
 	if (manager->managerFactory != nullptr)
 	{
@@ -936,20 +945,20 @@ void ManagerUI<M, T, U>::showMenuAndAddItem(bool isFromAddButton, juce::Point<in
 
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::addItemFromMenu(bool fromAddButton, juce::Point<int> pos)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::addItemFromMenu(bool fromAddButton, juce::Point<int> pos)
 {
 	addItemFromMenu(nullptr, fromAddButton, pos);
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::addItemFromMenu(T* item, bool, juce::Point<int>)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::addItemFromMenu(T* item, bool, juce::Point<int>)
 {
 	manager->Manager<T>::addItem(item);
 }
 
-template<class M, class T, class U>
-U* ManagerUI<M, T, U>::addItemUI(T* item, bool animate, bool resizeAndRepaint)
+template<typename M, typename T, typename U, typename G, typename GU>
+U* ManagerUI<M, T, U, G, GU>::addItemUI(T* item, bool animate, bool resizeAndRepaint)
 {
 	U* tui = createUIForItem(item);
 	jassert(tui != nullptr);
@@ -978,7 +987,7 @@ U* ManagerUI<M, T, U>::addItemUI(T* item, bool animate, bool resizeAndRepaint)
 	}
 	else
 	{
-		if (biui != nullptr && biui->baseItem->miniMode->boolValue()) biui->updateMiniModeUI();
+		if (biui != nullptr && biui->item->miniMode->boolValue()) biui->updateMiniModeUI();
 		//DBG("resized");  
 		//resized();
 	}
@@ -990,14 +999,14 @@ U* ManagerUI<M, T, U>::addItemUI(T* item, bool animate, bool resizeAndRepaint)
 	return tui;
 }
 
-template<class M, class T, class U>
-U* ManagerUI<M, T, U>::createUIForItem(T* item)
+template<typename M, typename T, typename U, typename G, typename GU>
+U* ManagerUI<M, T, U, G, GU>::createUIForItem(T* item)
 {
 	return new U(item);
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::removeItemUI(T* item, bool resizeAndRepaint)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::removeItemUI(T* item, bool resizeAndRepaint)
 {
 	{
 		if (!juce::MessageManager::getInstance()->isThisTheMessageThread())
@@ -1039,8 +1048,8 @@ void ManagerUI<M, T, U>::removeItemUI(T* item, bool resizeAndRepaint)
 	}
 }
 
-template<class M, class T, class U>
-U* ManagerUI<M, T, U>::getUIForItem(T* item, bool directIndexAccess)
+template<typename M, typename T, typename U, typename G, typename GU>
+U* ManagerUI<M, T, U, G, GU>::getUIForItem(T* item, bool directIndexAccess)
 {
 	if (directIndexAccess) return itemsUI[static_cast<Manager<T>*>(manager)->getItemIndex(item)];
 
@@ -1048,21 +1057,21 @@ U* ManagerUI<M, T, U>::getUIForItem(T* item, bool directIndexAccess)
 	return nullptr;
 }
 
-template<class M, class T, class U>
-int ManagerUI<M, T, U>::getContentHeight()
+template<typename M, typename T, typename U, typename G, typename GU>
+int ManagerUI<M, T, U, G, GU>::getContentHeight()
 {
 	return container.getHeight() + 20;
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::itemAddedAsync(T* item)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::itemAddedAsync(T* item)
 {
 	addItemUI(item, animateItemOnAdd);
 	if (!animateItemOnAdd) resized();
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::itemsAddedAsync(juce::Array<T*> items)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::itemsAddedAsync(juce::Array<T*> items)
 {
 	for (auto& i : items) addItemUI(i, false, false);
 
@@ -1070,14 +1079,14 @@ void ManagerUI<M, T, U>::itemsAddedAsync(juce::Array<T*> items)
 	repaint();
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::itemRemoved(T* item)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::itemRemoved(T* item)
 {
 	removeItemUI(item);
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::itemsRemoved(juce::Array<T*> items)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::itemsRemoved(juce::Array<T*> items)
 {
 	if (items.size() == 0) return;
 
@@ -1091,15 +1100,15 @@ void ManagerUI<M, T, U>::itemsRemoved(juce::Array<T*> items)
 
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::itemsReorderedAsync()
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::itemsReorderedAsync()
 {
 	itemsUI.sort(managerComparator);
 	resized();
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::newMessage(const typename Manager<T>::ManagerEvent& e)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::newMessage(const typename Manager<T>::ManagerEvent& e)
 {
 	switch (e.type)
 	{
@@ -1130,8 +1139,8 @@ void ManagerUI<M, T, U>::newMessage(const typename Manager<T>::ManagerEvent& e)
 	}
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::newMessage(const InspectableSelectionManager::SelectionEvent& e)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::newMessage(const InspectableSelectionManager::SelectionEvent& e)
 {
 	if (e.type == e.SELECTION_CHANGED)
 	{
@@ -1149,8 +1158,8 @@ void ManagerUI<M, T, U>::newMessage(const InspectableSelectionManager::Selection
 	}
 }
 
-template<class M, class T, class U>
-bool ManagerUI<M, T, U>::isInterestedInDragSource(const SourceDetails& dragSourceDetails)
+template<typename M, typename T, typename U, typename G, typename GU>
+bool ManagerUI<M, T, U, G, GU>::isInterestedInDragSource(const SourceDetails& dragSourceDetails)
 {
 	if (acceptedDropTypes.contains(dragSourceDetails.description.getProperty("dataType", "").toString())) return true;
 
@@ -1160,15 +1169,15 @@ bool ManagerUI<M, T, U>::isInterestedInDragSource(const SourceDetails& dragSourc
 	return false;
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::itemDragEnter(const SourceDetails&)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::itemDragEnter(const SourceDetails&)
 {
 	isDraggingOver = true;
 	repaint();
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::itemDragMove(const SourceDetails& dragSourceDetails)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::itemDragMove(const SourceDetails& dragSourceDetails)
 {
 	if (defaultLayout == HORIZONTAL || defaultLayout == VERTICAL)
 	{
@@ -1178,15 +1187,15 @@ void ManagerUI<M, T, U>::itemDragMove(const SourceDetails& dragSourceDetails)
 }
 
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::itemDragExit(const SourceDetails&)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::itemDragExit(const SourceDetails&)
 {
 	isDraggingOver = false;
 	repaint();
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::itemDropped(const SourceDetails& dragSourceDetails)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::itemDropped(const SourceDetails& dragSourceDetails)
 {
 
 	if (defaultLayout == HORIZONTAL || defaultLayout == VERTICAL)
@@ -1226,8 +1235,8 @@ void ManagerUI<M, T, U>::itemDropped(const SourceDetails& dragSourceDetails)
 	repaint();
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::addSelectableComponentsAndInspectables(juce::Array<juce::Component*>& selectables, juce::Array<Inspectable*>& inspectables)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::addSelectableComponentsAndInspectables(juce::Array<juce::Component*>& selectables, juce::Array<Inspectable*>& inspectables)
 {
 	for (auto& i : itemsUI)
 	{
@@ -1240,14 +1249,14 @@ void ManagerUI<M, T, U>::addSelectableComponentsAndInspectables(juce::Array<juce
 
 }
 
-template<class M, class T, class U>
-juce::Component* ManagerUI<M, T, U>::getSelectableComponentForItemUI(U* itemUI)
+template<typename M, typename T, typename U, typename G, typename GU>
+juce::Component* ManagerUI<M, T, U, G, GU>::getSelectableComponentForItemUI(U* itemUI)
 {
 	return itemUI;
 }
 
-template<class M, class T, class U>
-int ManagerUI<M, T, U>::getDropIndexForPosition(juce::Point<int> localPosition)
+template<typename M, typename T, typename U, typename G, typename GU>
+int ManagerUI<M, T, U, G, GU>::getDropIndexForPosition(juce::Point<int> localPosition)
 {
 	for (int i = 0; i < itemsUI.size(); ++i)
 	{
@@ -1262,8 +1271,8 @@ int ManagerUI<M, T, U>::getDropIndexForPosition(juce::Point<int> localPosition)
 }
 
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::buttonClicked(juce::Button* b)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::buttonClicked(juce::Button* b)
 {
 	if (b == addItemBT.get())
 	{
@@ -1275,8 +1284,8 @@ void ManagerUI<M, T, U>::buttonClicked(juce::Button* b)
 	}
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::textEditorTextChanged(juce::TextEditor& e)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::textEditorTextChanged(juce::TextEditor& e)
 {
 	if (&e == searchBar.get())
 	{
@@ -1284,8 +1293,8 @@ void ManagerUI<M, T, U>::textEditorTextChanged(juce::TextEditor& e)
 	}
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::textEditorReturnKeyPressed(juce::TextEditor& e)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::textEditorReturnKeyPressed(juce::TextEditor& e)
 {
 	if (&e == searchBar.get())
 	{
@@ -1293,8 +1302,8 @@ void ManagerUI<M, T, U>::textEditorReturnKeyPressed(juce::TextEditor& e)
 	}
 }
 
-//template<class M, class T, class U>
-//void ManagerUI<M, T, U>::labelTextChanged(Label* l)
+//template<typename M, typename T, typename U, typename G, typename GU>
+//void ManagerUI<M, T, U, G, GU>::labelTextChanged(Label* l)
 //{
 //	if (l == searchBar.get())
 //	{
@@ -1302,15 +1311,15 @@ void ManagerUI<M, T, U>::textEditorReturnKeyPressed(juce::TextEditor& e)
 //	}
 //}
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::inspectableDestroyed(Inspectable*)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::inspectableDestroyed(Inspectable*)
 {
 	if (manager != nullptr && !manager->isClearing)
 		static_cast<Manager<T>*>(manager)->removeManagerListener(this);
 }
 
-template<class M, class T, class U>
-void ManagerUI<M, T, U>::newMessage(const Engine::EngineEvent& e)
+template<typename M, typename T, typename U, typename G, typename GU>
+void ManagerUI<M, T, U, G, GU>::newMessage(const Engine::EngineEvent& e)
 {
 	resized();
 }

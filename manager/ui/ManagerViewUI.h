@@ -692,7 +692,7 @@ void ManagerViewUI<M, T, U>::itemDragMove(const juce::DragAndDropTarget::SourceD
 
 		for (auto& ui : this->itemsUI)
 		{
-			if (ui->baseItem->isSelected) continue;
+			if (ui->item->isSelected) continue;
 			juce::Rectangle<int> ib = ui->getBounds();
 
 			int curDistX = distX;
@@ -756,8 +756,8 @@ void ManagerViewUI<M, T, U>::itemDragMove(const juce::DragAndDropTarget::SourceD
 	if (updatePositionOnDragMove)
 	{
 		juce::Point<float> targetPosition = (snapPosition != realP) ? targetSnapViewPosition : this->getPositionFromDrag(bui, dragSourceDetails);
-		if (juce::Desktop::getInstance().getMainMouseSource().getCurrentModifiers().isAltDown()) bui->baseItem->scalePosition(targetPosition - bui->baseItem->movePositionReference, true);
-		else bui->baseItem->movePosition(targetPosition - bui->baseItem->movePositionReference, true);
+		if (juce::Desktop::getInstance().getMainMouseSource().getCurrentModifiers().isAltDown()) bui->item->scalePosition(targetPosition - bui->item->movePositionReference, true);
+		else bui->item->movePosition(targetPosition - bui->item->movePositionReference, true);
 	}
 
 	this->repaint();
@@ -774,9 +774,9 @@ void ManagerViewUI<M, T, U>::itemDropped(const juce::DragAndDropTarget::SourceDe
 	if (bui != nullptr && this->itemsUI.contains((U*)bui))
 	{
 		juce::Point<float> p = enableSnapping ? targetSnapViewPosition : this->getPositionFromDrag(bui, dragSourceDetails);
-		if (juce::Desktop::getInstance().getMainMouseSource().getCurrentModifiers().isAltDown()) bui->baseItem->scalePosition(p - bui->baseItem->movePositionReference, true);
-		else bui->baseItem->movePosition(p - bui->baseItem->movePositionReference, true);
-		bui->baseItem->addMoveToUndoManager(true);
+		if (juce::Desktop::getInstance().getMainMouseSource().getCurrentModifiers().isAltDown()) bui->item->scalePosition(p - bui->item->movePositionReference, true);
+		else bui->item->movePosition(p - bui->item->movePositionReference, true);
+		bui->item->addMoveToUndoManager(true);
 	}
 
 	snapLineX = juce::Line<int>();
@@ -812,16 +812,16 @@ template<class M, class T, class U>
 void ManagerViewUI<M, T, U>::askForSyncPosAndSize(BaseItemMinimalUI<T>* itemUI)
 {
 	juce::Array<juce::UndoableAction*> actions;
-	actions.addArray(itemUI->baseItem->viewUIPosition->setUndoablePoint(getViewPos(itemUI->getPosition()).toFloat(), true));
-	actions.addArray(itemUI->baseItem->viewUISize->setUndoablePoint(juce::Point<float>(itemUI->getWidth(), itemUI->getHeight()), true));
-	UndoMaster::getInstance()->performActions("Move / Resize " + itemUI->baseItem->niceName, actions);
+	actions.addArray(itemUI->item->viewUIPosition->setUndoablePoint(getViewPos(itemUI->getPosition()).toFloat(), true));
+	actions.addArray(itemUI->item->viewUISize->setUndoablePoint(juce::Point<float>(itemUI->getWidth(), itemUI->getHeight()), true));
+	UndoMaster::getInstance()->performActions("Move / Resize " + itemUI->item->niceName, actions);
 }
 
 
 template<class M, class T, class U>
 void ManagerViewUI<M, T, U>::itemUIResizeDrag(BaseItemMinimalUI<T>* itemUI, const juce::Point<int>& dragOffset)
 {
-	juce::Point<float> pos = itemUI->baseItem->getPosition() + itemUI->baseItem->sizeReference + dragOffset.toFloat() / (useCheckersAsUnits ? checkerSize : 1);// getViewOffset(dragOffset);
+	juce::Point<float> pos = itemUI->item->getPosition() + itemUI->item->sizeReference + dragOffset.toFloat() / (useCheckersAsUnits ? checkerSize : 1);// getViewOffset(dragOffset);
 
 	juce::Point<float> snapPos = pos;
 
@@ -858,10 +858,10 @@ void ManagerViewUI<M, T, U>::itemUIResizeDrag(BaseItemMinimalUI<T>* itemUI, cons
 	}
 
 
-	juce::Point<float> offset = snapPos - (itemUI->baseItem->getPosition() + itemUI->baseItem->sizeReference);
-	offset.x = juce::jmax<float>(offset.x, 50 - itemUI->baseItem->sizeReference.x);
-	offset.y = juce::jmax<float>(offset.y, 40 - itemUI->baseItem->sizeReference.y);
-	itemUI->baseItem->resizeItem(offset, true);
+	juce::Point<float> offset = snapPos - (itemUI->item->getPosition() + itemUI->item->sizeReference);
+	offset.x = juce::jmax<float>(offset.x, 50 - itemUI->item->sizeReference.x);
+	offset.y = juce::jmax<float>(offset.y, 40 - itemUI->item->sizeReference.y);
+	itemUI->item->resizeItem(offset, true);
 }
 
 template<class M, class T, class U>
@@ -870,13 +870,13 @@ void ManagerViewUI<M, T, U>::itemUIResizeEnd(BaseItemMinimalUI<T>* itemUI)
 	snapLineX = juce::Line<int>();
 	snapLineY = juce::Line<int>();
 
-	if (itemUI->baseItem->viewUISize->x <= 0 || itemUI->baseItem->viewUISize->y <= 0)
+	if (itemUI->item->viewUISize->x <= 0 || itemUI->item->viewUISize->y <= 0)
 	{
-		itemUI->baseItem->viewUISize->setPoint(itemUI->baseItem->sizeReference);
+		itemUI->item->viewUISize->setPoint(itemUI->item->sizeReference);
 	}
 	else
 	{
-		itemUI->baseItem->addResizeToUndoManager(true);
+		itemUI->item->addResizeToUndoManager(true);
 	}
 
 
@@ -895,7 +895,7 @@ typename ManagerViewUI<M, T, U>::SnapResult ManagerViewUI<M, T, U>::getClosestSn
 
 	for (auto& ui : this->itemsUI)
 	{
-		if (ui->baseItem->isSelected) continue;
+		if (ui->item->isSelected) continue;
 		juce::Rectangle<float> ib = getViewBounds(ui->getBounds());
 
 		int curDist = dist;

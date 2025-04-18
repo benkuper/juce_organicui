@@ -686,8 +686,11 @@ void Automation::afterLoadJSONDataInternal()
 	reorderItems();
 }
 
-int Automation::compareKeys(AutomationKey* k1, AutomationKey* k2)
+int Automation::compareKeys(BaseItem* c1, BaseItem* c2)
 {
+	AutomationKey* k1 = static_cast<AutomationKey*>(c1);
+	AutomationKey* k2 = static_cast<AutomationKey*>(c2);
+
 	return k2->position->floatValue() < k1->position->floatValue() ? 1 : k2->position->floatValue() > k1->position->floatValue() ? -1 : 0;
 }
 

@@ -18,11 +18,13 @@ class BaseItemMinimalUI :
 	public juce::DragAndDropTarget
 {
 public:
+
+	static_assert(std::is_base_of<BaseItem, T>::value, "T must be derived from BaseItem");
+
 	BaseItemMinimalUI(T* _item);
 	virtual ~BaseItemMinimalUI();
 
 	T* item;
-	BaseItem* baseItem;
 
 	//ui
 	juce::Colour bgColor;
@@ -127,16 +129,14 @@ BaseItemMinimalUI<T>::BaseItemMinimalUI(T* _item) :
 	isDraggingOver(false),
 	highlightOnDragOver(true)
 {
-	baseItem = static_cast<BaseItem*>(item);
-
 	setDisableInternalMouseEvents(true);
 	addMouseListener(this, true); //needs fixing, this is called twice on the component
 
-	if (baseItem != nullptr)
+	if (item != nullptr)
 	{
-		setName(baseItem->niceName);
-		baseItem->addAsyncContainerListener(this);
-		if (baseItem->canBeDisabled && dimAlphaOnDisabled) setAlpha(baseItem->enabled->boolValue() ? 1 : .5f);
+		setName(item->niceName);
+		item->addAsyncContainerListener(this);
+		if (item->canBeDisabled && dimAlphaOnDisabled) setAlpha(item->enabled->boolValue() ? 1 : .5f);
 	}
 
 }
@@ -145,7 +145,7 @@ BaseItemMinimalUI<T>::BaseItemMinimalUI(T* _item) :
 template<class T>
 BaseItemMinimalUI<T>::~BaseItemMinimalUI()
 {
-	if (baseItem != nullptr && !inspectable.wasObjectDeleted()) baseItem->removeAsyncContainerListener(this);
+	if (item != nullptr && !inspectable.wasObjectDeleted()) item->removeAsyncContainerListener(this);
 }
 
 
@@ -162,9 +162,9 @@ void BaseItemMinimalUI<T>::paint(juce::Graphics& g)
 	if (inspectable.wasObjectDeleted()) return;
 
 	juce::Rectangle<float> r = this->getMainBounds().toFloat();
-	bool isItemEnabled = baseItem->canBeDisabled ? baseItem->enabled->boolValue() : true;
+	bool isItemEnabled = item->canBeDisabled ? item->enabled->boolValue() : true;
 
-	juce::Colour c = (fillColorOnSelected && baseItem->isSelected) ? selectedColor : bgColor;
+	juce::Colour c = (fillColorOnSelected && item->isSelected) ? selectedColor : bgColor;
 	if (isItemEnabled) c = c.darker(.3f);
 	if (highlightOnMouseOver && isMouseOverOrDragging(true)) c = c.brighter(.1f);
 	g.setColour(c);
@@ -206,7 +206,7 @@ void BaseItemMinimalUI<T>::setViewSize(juce::Point<float> size)
 template<class T>
 void BaseItemMinimalUI<T>::updateItemUISize()
 {
-	setViewSize(baseItem->viewUISize->getPoint());
+	setViewSize(item->viewUISize->getPoint());
 }
 
 template<class T>
@@ -234,7 +234,7 @@ void BaseItemMinimalUI<T>::mouseDown(const juce::MouseEvent& e)
 	else
 	{
 		if (item->isUILocked->boolValue()) return;
-		baseItem->setMovePositionReference(true);
+		item->setMovePositionReference(true);
 	}
 }
 
@@ -254,10 +254,10 @@ void BaseItemMinimalUI<T>::mouseDrag(const juce::MouseEvent& e)
 			juce::Point<int> offset = getDragOffset();
 
 			juce::var desc = juce::var(new juce::DynamicObject());
-			desc.getDynamicObject()->setProperty("type", baseItem->getTypeString());
-			desc.getDynamicObject()->setProperty("dataType", baseItem->itemDataType.isNotEmpty() ? baseItem->itemDataType : baseItem->getTypeString());
-			desc.getDynamicObject()->setProperty("initX", baseItem->viewUIPosition->x);
-			desc.getDynamicObject()->setProperty("initY", baseItem->viewUIPosition->y);
+			desc.getDynamicObject()->setProperty("type", item->getTypeString());
+			desc.getDynamicObject()->setProperty("dataType", item->itemDataType.isNotEmpty() ? item->itemDataType : item->getTypeString());
+			desc.getDynamicObject()->setProperty("initX", item->viewUIPosition->x);
+			desc.getDynamicObject()->setProperty("initY", item->viewUIPosition->y);
 			desc.getDynamicObject()->setProperty("offsetX", offset.x);
 			desc.getDynamicObject()->setProperty("offsetY", offset.y);
 
@@ -300,22 +300,22 @@ void BaseItemMinimalUI<T>::newMessage(const ContainerAsyncEvent& e)
 	{
 		if (e.targetControllable.wasObjectDeleted()) return;
 
-		if (e.targetControllable == baseItem->enabled)
+		if (e.targetControllable == item->enabled)
 		{
-			if (baseItem->canBeDisabled && dimAlphaOnDisabled) setAlpha(baseItem->enabled->boolValue() ? 1 : .5f);
+			if (item->canBeDisabled && dimAlphaOnDisabled) setAlpha(item->enabled->boolValue() ? 1 : .5f);
 			repaint();
 		}
-		else if (e.targetControllable == baseItem->viewUIPosition)
+		else if (e.targetControllable == item->viewUIPosition)
 		{
 			itemMinimalUIListeners.call(&ItemMinimalUIListener::itemUIViewPositionChanged, this);
 		}
-		else if (e.targetControllable == baseItem->viewUISize && syncWithItemSize)
+		else if (e.targetControllable == item->viewUISize && syncWithItemSize)
 		{
 			setViewSize(item->viewUISize->getPoint());
 		}
-		else if (e.targetControllable == baseItem->itemColor)
+		else if (e.targetControllable == item->itemColor)
 		{
-			bgColor = baseItem->itemColor->getColor();
+			bgColor = item->itemColor->getColor();
 			repaint();
 		}
 
@@ -345,7 +345,7 @@ void BaseItemMinimalUI<T>::newMessage(const ContainerAsyncEvent& e)
 template<class T>
 void BaseItemMinimalUI<T>::controllableFeedbackUpdateInternal(Controllable* c)
 {
-	if (c == this->baseItem->viewUISize)
+	if (c == this->item->viewUISize)
 	{
 		updateItemUISize();
 	}
