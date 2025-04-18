@@ -882,7 +882,7 @@ juce::Array<IType*> Manager<T, G>::getItemsWithType(bool recursive)
 	{
 		if (G* g = dynamic_cast<G*>(i))
 		{
-			if (recursive) result.addArray(g->manager.getItemsWithType<IType>(true));
+			if (recursive) result.addArray(g->manager.template getItemsWithType<IType>(true));
 			continue;
 		}
 
