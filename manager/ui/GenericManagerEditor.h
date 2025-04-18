@@ -18,6 +18,7 @@ class GenericManagerEditor :
 	public juce::DragAndDropTarget
 {
 public:
+
 	GenericManagerEditor(Manager<T, ItemGroup<T>>* manager, bool isRoot);
 	virtual ~GenericManagerEditor();
 

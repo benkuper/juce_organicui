@@ -10,6 +10,7 @@
 
 #pragma once
 
+template <typename T> class GenericManagerEditor;
 template <typename T> class ItemGroup;
 
 template <typename T, typename G = ItemGroup<T>>
@@ -77,7 +78,7 @@ public:
 	virtual juce::Array<G*> getItemGroups(bool recursive = true) const;
 	T* getItemWithName(const juce::String& itemShortName, bool searchNiceNameToo = false, bool searchWithLowerCaseIfNotFound = true, bool recursive = true);
 
-	template<class IType>
+	template<typename IType>
 	juce::Array<IType*> getItemsWithType(bool recursive = true);
 
 	void callFunctionOnItems(std::function<void(T*)> func, bool recursive = false);
@@ -871,9 +872,11 @@ T* Manager<T, G>::getItemWithName(const juce::String& itemShortName, bool search
 
 
 template<typename T, typename G>
-template<class IType>
+template<typename IType>
 juce::Array<IType*> Manager<T, G>::getItemsWithType(bool recursive)
 {
+	static_assert(std::is_base_of<T, IType>::value, "IType must be derived from T");
+
 	juce::Array<IType*> result;
 	for (auto& i : baseItems)
 	{

@@ -24,5 +24,5 @@ public:
 
 	virtual ~ItemGroup() {}
 
-	Manager<T> manager;
+	Manager<T, ItemGroup<T>> manager;
 };
