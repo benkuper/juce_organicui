@@ -43,10 +43,10 @@ public:
 	juce::var getValue() override;
 	juce::var getValueData();
 
-	template<class T>
-	T getValueDataAsEnum() {
+	template<typename ET>
+	ET getValueDataAsEnum() {
 		juce::GenericScopedLock lock(valueSetLock);
-		return (T)(int)curEnumValue.value;
+		return (ET)(int)curEnumValue.value;
 	}
 
 	juce::String getValueKey();
