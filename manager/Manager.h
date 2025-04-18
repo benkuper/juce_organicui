@@ -10,8 +10,6 @@
 
 #pragma once
 
-template <typename T> class GenericManagerEditor;
-template <typename T> class ItemGroup;
 
 template <typename T, typename G = ItemGroup<T>>
 class Manager :

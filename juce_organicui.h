@@ -282,8 +282,8 @@
 #include "manager/BaseItemGroup.h"
 #include "manager/BaseManager.h"
 
-#include "manager/Manager.h"
 #include "manager/ItemGroup.h"
+#include "manager/Manager.h"
 
 #include "manager/ui/BaseItemMinimalUI.h"
 #include "manager/ui/BaseItemUI.h"
