@@ -10,6 +10,8 @@
 
 #pragma once
 
+template<class T> class Manager;
+
 template<class T>
 class ItemGroup : 
 	public BaseItem
@@ -24,4 +26,6 @@ public:
 	}
 
 	virtual ~ItemGroup() {}
+
+	Manager<T> manager;
 };
