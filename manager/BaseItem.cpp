@@ -34,7 +34,7 @@ BaseItem::BaseItem(const String& name, bool _canBeDisabled, bool _canHaveScripts
 	if (canHaveScripts)
 	{
 		scriptManager.reset(new ScriptManager(this));
-		scriptManager->addManagerListener(this);
+		//scriptManager->addManagerListener(this);
 		addChildControllableContainer(scriptManager.get());
 	}
 
@@ -372,16 +372,16 @@ void BaseItem::onControllableFeedbackUpdate(ControllableContainer* cc, Controlla
 	onControllableFeedbackUpdateInternal(cc, c);
 }
 
-void BaseItem::itemAdded(Script* script)
-{
-	script->warningResolveInspectable = this;
-}
-
-void BaseItem::itemsAdded(Array<Script*> scripts)
-{
-	for (auto& script : scripts) script->warningResolveInspectable = this;
-
-}
+//void BaseItem::itemAdded(Script* script)
+//{
+//	script->warningResolveInspectable = this;
+//}
+//
+//void BaseItem::itemsAdded(Array<Script*> scripts)
+//{
+//	for (auto& script : scripts) script->warningResolveInspectable = this;
+//
+//}
 
 void BaseItem::setHasCustomColor(bool value)
 {

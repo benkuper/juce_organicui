@@ -21,10 +21,14 @@ class Manager :
 	public BaseItemListener
 {
 public:
+
+	static_assert(std::is_base_of<BaseItem, T>::value, "T must be derived from BaseItem");
+
 	Manager(const juce::String& name);
 	virtual ~Manager();
 
 	juce::OwnedArray<T, juce::CriticalSection> items;
+	juce::OwnedArray<ItemGroup<T>, juce::CriticalSection> groups;
 
 	//Factory
 	Factory<T>* managerFactory;

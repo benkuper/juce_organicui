@@ -10,18 +10,18 @@
 
 #pragma once
 
-//class ItemGroup<class T> : 
-//	public BaseItem
-//{
-//public:
-//	
-//	BaseGroup(const String& name, const String& id, const String& type, const String& groupType, const String& groupId)
-//		: BaseItem(name, id, type), groupType(groupType), groupId(groupId)
-//	{
-//	}
-//
-//	virtual ~BaseGroup() {}
-//	
-//	const String& getGroupType() const { return groupType; }
-//	const String& getGroupId() const { return groupId; }
-//};
+template<class T>
+class ItemGroup : 
+	public BaseItem
+{
+public:
+	
+	static_assert(std::is_base_of<BaseItem, T>::value, "T must be derived from BaseItem");
+
+	ItemGroup(const juce::String& name)
+		: BaseItem(name)
+	{
+	}
+
+	virtual ~ItemGroup() {}
+};
