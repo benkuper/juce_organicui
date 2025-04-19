@@ -20,8 +20,9 @@ public:
 	
 	static_assert(std::is_base_of<BaseItem, T>::value, "T must be derived from BaseItem");
 
-	ItemGroup(const juce::String& name)
-		: BaseItem(name)
+	ItemGroup(const juce::String& name = "Group")
+		: BaseItem(name),
+		manager("Items")
 	{
 	}
 

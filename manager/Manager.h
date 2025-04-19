@@ -58,6 +58,7 @@ public:
 	void setHasGridOptions(bool hasGridOptions);
 
 	virtual T* createItem(); //to override if special constructor to use
+	virtual ItemGroup<T>* createGroup(); //to override if special constructor to use
 	virtual T* createItemFromData(juce::var data); //to be overriden for specific item creation (from data)
 	virtual T* addItemFromData(juce::var data, bool addToUndo = true); //to be overriden for specific item creation (from data)
 	virtual juce::Array<T*> addItemsFromData(juce::var data, bool addToUndo = true); //to be overriden for specific item creation (from data)
@@ -379,6 +380,12 @@ T* Manager<T>::createItem()
 	if (managerFactory != nullptr && managerFactory->defs.size() == 1) return managerFactory->create(managerFactory->defs[0]);
 	if (customCreateItemFunc != nullptr) return customCreateItemFunc();
 	return new T();
+}
+
+template<class T>
+ItemGroup<T>* Manager<T>::createGroup()
+{
+	return new ItemGroup<T>("Group");
 }
 
 template<class T>
