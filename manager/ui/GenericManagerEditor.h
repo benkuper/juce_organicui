@@ -10,7 +10,7 @@
 
 #pragma once
 
-template<class T>
+template<class T, class G>
 class Manager;
 
 template<class T>

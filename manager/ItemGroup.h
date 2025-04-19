@@ -10,7 +10,8 @@
 
 #pragma once
 
-template<class T> class Manager;
+template<class T> class ItemGroup;
+template<class T, class G = ItemGroup<T>> class Manager;
 
 template<class T>
 class ItemGroup : 
@@ -20,13 +21,13 @@ public:
 	
 	static_assert(std::is_base_of<BaseItem, T>::value, "T must be derived from BaseItem");
 
-	ItemGroup(const juce::String& name = "Group")
-		: BaseItem(name),
-		manager("Items")
+	ItemGroup(Manager<T, ItemGroup>* _manager, const juce::String& name = "Group")
+		: BaseItem(name)
 	{
+		manager.reset(_manager);
 	}
 
 	virtual ~ItemGroup() {}
 
-	Manager<T> manager;
+	std::unique_ptr<Manager<T, ItemGroup>> manager;
 };
