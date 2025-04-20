@@ -278,7 +278,6 @@
 #include "manager/BaseItemListener.h"
 #include "manager/ManagerListener.h"
 #include "manager/BaseItem.h"
-#include "manager/ItemGroup.h"
 
 #include "manager/ui/BaseItemMinimalUI.h"
 #include "manager/ui/BaseItemUI.h"
@@ -286,6 +285,9 @@
 #include "manager/ui/GenericManagerEditor.h"
 
 #include "manager/Manager.h"
+
+#include "manager/ItemGroup.h"
+#include "manager/NestingManager.h"
 
 #include "manager/ui/ManagerUI.h"
 #include "manager/ui/ManagerViewMiniPane.h"

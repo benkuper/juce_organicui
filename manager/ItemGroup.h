@@ -11,7 +11,7 @@
 #pragma once
 
 template<class T> class ItemGroup;
-template<class T, class G = ItemGroup<T>> class Manager;
+template<class T, class G = ItemGroup<T>> class NestingManager;
 
 template<class T>
 class ItemGroup : 
@@ -21,7 +21,7 @@ public:
 	
 	static_assert(std::is_base_of<BaseItem, T>::value, "T must be derived from BaseItem");
 
-	ItemGroup(Manager<T, ItemGroup>* _manager, const juce::String& name = "Group")
+	ItemGroup(NestingManager<T, ItemGroup>* _manager, const juce::String& name = "Group")
 		: BaseItem(name)
 	{
 		manager.reset(_manager);
@@ -29,5 +29,5 @@ public:
 
 	virtual ~ItemGroup() {}
 
-	std::unique_ptr<Manager<T, ItemGroup>> manager;
+	std::unique_ptr<NestingManager<T, ItemGroup>> manager;
 };
