@@ -33,14 +33,14 @@ InspectableEditor * ScriptManager::getEditorInternal(bool isRoot, Array<Inspecta
 	return new ScriptManagerEditor(this, isRoot);
 }
 
-bool ScriptManager::callFunctionOnAllItems(const Identifier & function, var a)
+bool ScriptManager::callFunctionOnAllScripts(const Identifier & function, var a)
 {
 	Array<var> args;
 	args.add(a);
-	return callFunctionOnAllItems(function, args);
+	return callFunctionOnAllScripts(function, args);
 }
 
-bool ScriptManager::callFunctionOnAllItems(const Identifier & function, Array<var> args)
+bool ScriptManager::callFunctionOnAllScripts(const Identifier & function, Array<var> args)
 {
 	bool result = true;
 	for (auto &i : items)

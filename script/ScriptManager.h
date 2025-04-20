@@ -25,6 +25,6 @@ public:
 
 	virtual InspectableEditor * getEditorInternal(bool isRoot, juce::Array<Inspectable*> inspectables = juce::Array<Inspectable*>()) override;
 
-	bool callFunctionOnAllItems(const juce::Identifier &function, juce::var a = juce::var());
-	bool callFunctionOnAllItems(const juce::Identifier &function, juce::Array<juce::var> args);
+	bool callFunctionOnAllScripts(const juce::Identifier &function, juce::var a = juce::var());
+	bool callFunctionOnAllScripts(const juce::Identifier &function, juce::Array<juce::var> args);
 };

@@ -353,7 +353,7 @@ void BaseItem::onContainerParameterChanged(Parameter* p)
 	{
 		Array<var> args;
 		args.add(p->getScriptObject());
-		scriptManager->callFunctionOnAllItems("localParamChanged", args);
+		scriptManager->callFunctionOnAllScripts("localParamChanged", args);
 	}
 
 	onContainerParameterChangedInternal(p);
@@ -365,7 +365,7 @@ void BaseItem::onContainerTriggerTriggered(Trigger* t)
 	{
 		Array<var> args;
 		args.add(t->getScriptObject());
-		scriptManager->callFunctionOnAllItems("localParamChanged", args);
+		scriptManager->callFunctionOnAllScripts("localParamChanged", args);
 	}
 }
 
