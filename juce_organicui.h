@@ -285,9 +285,8 @@
 #include "manager/ui/GenericManagerEditor.h"
 
 #include "manager/Manager.h"
-
 #include "manager/ItemGroup.h"
-#include "manager/NestingManager.h"
+//#include "manager/NestingManager.h"
 
 #include "manager/ui/ManagerUI.h"
 #include "manager/ui/ManagerViewMiniPane.h"

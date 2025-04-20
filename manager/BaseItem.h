@@ -28,6 +28,7 @@ public:
 	BoolParameter* isUILocked; //lock in UI
 	ColorParameter* itemColor;
 
+	bool isGroup;
 	bool useCustomArrowKeysBehaviour; // to have custom manipulation with arrow keys instead of selection prev/next
 
 	bool canHaveScripts;
