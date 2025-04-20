@@ -14,11 +14,25 @@
 #define DECLARE_TYPE(type) juce::String getTypeString() const override { return getTypeStringStatic() ; } \
 static juce::String getTypeStringStatic() { return type; }
 
+class BaseManager :
+	public EnablingControllableContainer,
+	public BaseItemListener
+{
+public:
+	BaseManager(const juce::String& name) :
+		EnablingControllableContainer(name, false)
+	{
+	}
+
+	virtual ~BaseManager() {}
+
+	juce::OwnedArray<BaseItem, juce::CriticalSection> baseItems;
+};
+
 
 template <class T>
 class Manager :
-	public EnablingControllableContainer,
-	public BaseItemListener
+	public BaseManager
 {
 public:
 
@@ -27,7 +41,7 @@ public:
 	Manager(const juce::String& name);
 	virtual ~Manager();
 
-	juce::OwnedArray<T, juce::CriticalSection> items;
+	juce::Array<T*, juce::CriticalSection> items;
 
 	//Factory
 	Factory<T>* managerFactory;
@@ -294,7 +308,7 @@ private:
 
 template<class T>
 Manager<T>::Manager(const juce::String& name) :
-	EnablingControllableContainer(name, false),
+	BaseManager(name),
 	managerFactory(nullptr),
 	itemDataType(""),
 	userCanAddItemsManually(true),
@@ -440,12 +454,24 @@ T* Manager<T>::addItem(T* item, juce::var data, bool addToUndo, bool notify)
 	}
 
 	int targetIndex = data.getProperty("index", -1);
-	if (targetIndex != -1) items.insert(targetIndex, item);
+	if (targetIndex != -1)
+	{
+		baseItems.insert(targetIndex, item);
+		items.insert(targetIndex, item);
+	}
 	else
 	{
 		//items.getLock().enter();
-		if (autoReorderOnAdd && !isCurrentlyLoadingData && comparator.compareFunc != nullptr) items.addSorted(comparator, item);
-		else items.add(item);
+		if (autoReorderOnAdd && !isCurrentlyLoadingData && comparator.compareFunc != nullptr)
+		{
+			baseItems.addSorted(comparator, item);
+			items.addSorted(comparator, item);
+		}
+		else
+		{
+			baseItems.add(item);
+			items.add(item);
+		}
 		//items.getLock().exit();
 	}
 
@@ -458,7 +484,7 @@ T* Manager<T>::addItem(T* item, juce::var data, bool addToUndo, bool notify)
 
 	//bi->setNiceName(bi->niceName); //force setting a unique name if already taken, after load data so if name is the same as another, will change here
 
-	addChildControllableContainer(bi, false, items.indexOf(item), notify);
+	addChildControllableContainer(bi, false, baseItems.indexOf(item), notify);
 
 	//if(autoReorderOnAdd) reorderItems();
 
@@ -699,7 +725,8 @@ T* Manager<T>::removeItem(T* item, bool addToUndo, bool notify, bool returnItem)
 
 
 	//items.getLock().enter();
-	items.removeObject(item, false);
+	items.removeAllInstancesOf(item);
+	baseItems.removeObject(item, false);
 	//items.getLock().exit();
 
 	removeItemInternal(item);
