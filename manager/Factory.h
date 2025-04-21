@@ -287,7 +287,7 @@ public:
 	static_assert(std::is_base_of<ItemBaseGroup<T>, G>::value, "G must be derived from ItemGroup<T>");
 
 	Factory() :
-		BaseFactory(),
+		BaseFactory<T>(),
 		canHaveGroups(canHaveGroups)
 	{
 	}
@@ -304,7 +304,7 @@ public:
 			return;
 		}
 
-		PopupMenu tmpMenu = getMenu();
+		juce::PopupMenu tmpMenu = getMenu();
 		if (canHaveGroups && manager != nullptr)
 		{
 			tmpMenu.addSeparator();
