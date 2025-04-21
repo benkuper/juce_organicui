@@ -305,10 +305,10 @@ public:
 		}
 
 		juce::PopupMenu tmpMenu = BaseFactory<T>::getMenu();
-		if (this->canHaveGroups && this->manager != nullptr)
+		if (this->canHaveGroups && manager != nullptr)
 		{
 			tmpMenu.addSeparator();
-			tmpMenu.addItem("Group", [&]() { this->manager->addGroup(); });
+			tmpMenu.addItem("Group", [&]() { manager->addGroup(); });
 		}
 
 		tmpMenu.showMenuAsync(juce::PopupMenu::Options(), [this, returnFunc](int result)

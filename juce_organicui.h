@@ -160,14 +160,9 @@
 #include "undo/UndoMaster.h"
 #include "manager/Factory.h"
 
-
 #include "script/ScriptTarget.h"
 
-
 #include "warning/WarningTarget.h"
-
-
-
 
 #include "inspectable/Inspectable.h"
 #include "inspectable/InspectableContent.h"
@@ -241,8 +236,6 @@
 
 #include "controllable/ControllableUtil.h"
 
-
-
 #include "updater/AppUpdater.h"
 
 #include "progress/ProgressNotifier.h"
@@ -274,12 +267,16 @@
 
 #include "remotecontrol/OSCRemoteControl.h"
 
+
 template<class T> class ItemBaseGroup;
 template<class T, class G = ItemBaseGroup<T>> class Manager;
+#define DECLARE_TYPE(type) juce::String getTypeString() const override { return getTypeStringStatic() ; } \
+static juce::String getTypeStringStatic() { return type; }
 
 #include "manager/BaseItemListener.h"
 #include "manager/ManagerListener.h"
 #include "manager/BaseItem.h"
+#include "manager/BaseManager.h"
 
 #include "manager/ui/BaseItemMinimalUI.h"
 #include "manager/ui/BaseItemUI.h"
@@ -288,7 +285,6 @@ template<class T, class G = ItemBaseGroup<T>> class Manager;
 
 #include "manager/Manager.h"
 #include "manager/ItemGroup.h"
-//#include "manager/NestingManager.h"
 
 #include "manager/ui/ManagerUI.h"
 #include "manager/ui/ManagerViewMiniPane.h"

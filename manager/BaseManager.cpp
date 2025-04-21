@@ -1,6 +1,21 @@
 #include "JuceHeader.h"
 
-juce::Array<BaseItem*> BaseManager::getAllItems(bool recursive, bool includeGroups, bool includeDisabled) const
+BaseManager::BaseManager(const juce::String& name, bool canHaveGroups) :
+	EnablingControllableContainer(name, true),
+	canHaveGroups(canHaveGroups),
+	userCanAddItemsManually(true),
+	selectItemWhenCreated(false),
+	autoReorderOnAdd(false),
+	isManipulatingMultipleItems(false),
+	clipboardCopyOffset(0, 0),
+	viewOffset(0, 0),
+	viewZoom(1.0f),
+	showItemsInEditor(true)
+{
+	canBeCopiedAndPasted = true;
+}
+
+juce::Array<BaseItem*> BaseManager::getBaseItems(bool recursive, bool includeDisabled, bool includeGroups) const
 {
 	juce::Array<BaseItem*> result;
 	for (auto& i : baseItems)
@@ -13,7 +28,7 @@ juce::Array<BaseItem*> BaseManager::getAllItems(bool recursive, bool includeGrou
 			if (recursive)
 			{
 				auto* group = (BaseItemGroup*)i;
-				if (group) group->baseManager->getAllItems(recursive, includeGroups);
+				if (group) group->baseManager->getBaseItems(recursive, includeGroups);
 			}
 		}
 		else
@@ -24,6 +39,7 @@ juce::Array<BaseItem*> BaseManager::getAllItems(bool recursive, bool includeGrou
 
 	return result;
 }
+
 
 void BaseManager::callFunctionOnAllItems(bool recursive, bool includeGroups, bool includeDisabled, std::function<void(BaseItem*)> func)
 {

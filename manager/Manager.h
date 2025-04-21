@@ -10,31 +10,6 @@
 
 #pragma once
 
-
-#define DECLARE_TYPE(type) juce::String getTypeString() const override { return getTypeStringStatic() ; } \
-static juce::String getTypeStringStatic() { return type; }
-
-class BaseItemGroup;
-
-class BaseManager :
-	public EnablingControllableContainer,
-	public BaseItemListener
-{
-public:
-	BaseManager(const juce::String& name) :
-		EnablingControllableContainer(name, false)
-	{
-	}
-
-	virtual ~BaseManager() {}
-
-
-	juce::OwnedArray<BaseItem, juce::CriticalSection> baseItems;
-
-	juce::Array<BaseItem*> getAllItems(bool recursive = true, bool includeGroups = true, bool includeDisabled = true) const;
-	void callFunctionOnAllItems(bool recursive, bool includeGroups, bool includeDisabled, std::function<void(BaseItem*)> func);
-};
-
 template<class T> class ItemGroup;
 
 template <class T, class G>
@@ -58,28 +33,6 @@ public:
 	Factory<T, G>* managerFactory;
 	juce::String itemDataType;
 	
-	bool canHaveGroups;
-	bool userCanAddItemsManually;
-	bool selectItemWhenCreated;
-	bool autoReorderOnAdd;
-	bool isManipulatingMultipleItems;
-	juce::Point<float> clipboardCopyOffset;
-
-	//ui
-	juce::Point<int> viewOffset; //in pixels, viewOffset of 0 means zeroPos is at the center of the window
-	//interaction
-	float viewZoom;
-
-	//editor
-	bool showItemsInEditor;
-	// 
-	//grid
-	BoolParameter* snapGridMode;
-	BoolParameter* showSnapGrid;
-	IntParameter* snapGridSize;
-
-	std::function<T* ()> customCreateItemFunc;
-
 	void setHasGridOptions(bool hasGridOptions);
 
 	virtual T* createItem(); //to override if special constructor to use
@@ -325,19 +278,8 @@ private:
 
 template<class T, class G>
 Manager<T, G>::Manager(const juce::String& name, bool canHaveGroups) :
-	BaseManager(name),
+	BaseManager(name, canHaveGroups),
 	managerFactory(nullptr),
-	itemDataType(""),
-	canHaveGroups(canHaveGroups),
-	userCanAddItemsManually(true),
-	selectItemWhenCreated(true),
-	autoReorderOnAdd(true),
-	isManipulatingMultipleItems(false),
-	viewZoom(1),
-	showItemsInEditor(true),
-	snapGridMode(nullptr),
-	showSnapGrid(nullptr),
-	snapGridSize(nullptr),
 	customCreateItemFunc(nullptr),
 	managerNotifier(50),
 	comparator(this)
@@ -408,7 +350,6 @@ template<class T, class G>
 T* Manager<T, G>::createItem()
 {
 	if (managerFactory != nullptr && managerFactory->defs.size() == 1) return managerFactory->create(managerFactory->defs[0]);
-	if (customCreateItemFunc != nullptr) return customCreateItemFunc();
 	return new T();
 }
 
