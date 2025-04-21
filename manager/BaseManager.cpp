@@ -42,7 +42,7 @@ BaseItem* BaseManager::addItem(BaseItem* item, var data, bool addToUndo, bool no
 	{
 		if (Engine::mainEngine != nullptr && !Engine::mainEngine->isLoadingFile)
 		{
-			//UndoMaster::getInstance()->performAction("Add " + item->niceName, new AddItemAction(this, item, data));
+			UndoMaster::getInstance()->performAction("Add " + item->niceName, new AddItemAction(this, item, data));
 			return item;
 		}
 	}
@@ -56,10 +56,11 @@ BaseItem* BaseManager::addItem(BaseItem* item, var data, bool addToUndo, bool no
 
 	addItemManagerInternal(item, data);
 
-	if (notify) notifyItemAdded(item);
-	//to move to notify
-	//managerListeners.call(&ManagerListener::itemAdded, item);
-	//managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEM_ADDED, item));
+	if (notify)
+	{
+		notifyItemAdded(item);
+		notifyAsync(BaseManagerEvent::ITEM_ADDED, item);
+	}
 
 	if (MessageManager::getInstance()->existsAndIsLockedByCurrentThread())
 	{
@@ -79,8 +80,8 @@ Array<BaseItem*> BaseManager::addItems(Array<BaseItem*> itemsToAdd, var data, bo
 
 	if (addToUndo && !UndoMaster::getInstance()->isPerforming)
 	{
-		//AddItemsAction* a = ;new AddItemsAction(this, itemsToAdd, data);
-		//UndoMaster::getInstance()->performAction("Add " + String(itemsToAdd.size()) + " items", a);
+		AddItemsAction* a = new AddItemsAction(this, itemsToAdd, data);
+		UndoMaster::getInstance()->performAction("Add " + String(itemsToAdd.size()) + " items", a);
 		isCurrentlyLoadingData = curIsLoadingData;
 		isManipulatingMultipleItems = curIsManipulatingMultipleItems;
 		return itemsToAdd;
@@ -92,10 +93,6 @@ Array<BaseItem*> BaseManager::addItems(Array<BaseItem*> itemsToAdd, var data, bo
 	}
 
 	notifyStructureChanged();
-
-	//notify
-	//managerListeners.call(&ManagerListener::itemsAdded, itemsToAdd);
-	//managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_ADDED, itemsToAdd));
 
 	reorderItems();
 	isCurrentlyLoadingData = curIsLoadingData;
@@ -215,7 +212,7 @@ BaseItem* BaseManager::removeItem(BaseItem* item, bool addToUndo, bool notify, b
 	{
 		if (Engine::mainEngine != nullptr && !Engine::mainEngine->isLoadingFile)
 		{
-			//UndoMaster::getInstance()->performActions("Remove " + item->getTypeString(), getRemoveItemUndoableAction(item));
+			UndoMaster::getInstance()->performActions("Remove " + item->getTypeString(), getRemoveItemUndoableAction(item));
 			return nullptr;
 		}
 	}
@@ -247,8 +244,8 @@ void BaseManager::removeItems(Array<BaseItem*> itemsToRemove, bool addToUndo, bo
 	isManipulatingMultipleItems = true;
 	if (addToUndo)
 	{
-		//Array<UndoableAction*> a = getRemoveItemsUndoableAction(itemsToRemove);
-		//UndoMaster::getInstance()->performActions("Remove " + String(itemsToRemove.size()) + " items", a);
+		Array<UndoableAction*> a = getRemoveItemsUndoableAction(itemsToRemove);
+		UndoMaster::getInstance()->performActions("Remove " + String(itemsToRemove.size()) + " items", a);
 		isManipulatingMultipleItems = false;
 		return;
 	}
@@ -338,7 +335,7 @@ Array<UndoableAction*> BaseManager::getSetItemIndexUndoableAction(BaseItem* item
 	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile) return nullptr;
 
 	Array<UndoableAction*> a;
-	//a.add(new MoveItemAction(this, item, this->baseItems.indexOf(item), newIndex));
+	a.add(new MoveItemAction(this, item, this->baseItems.indexOf(item), newIndex));
 	return a;
 }
 
