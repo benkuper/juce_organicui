@@ -244,7 +244,7 @@ template<class M, class T, class U>
 void ManagerViewUI<M, T, U>::mouseDoubleClick(const juce::MouseEvent& e)
 {
 	ManagerUI<M, T, U>::mouseDoubleClick(e);
-	if (manager == nullptr || !addItemOnDoubleClick || !e.mods.isLeftButtonDown()) return;
+	if (this->manager == nullptr || !addItemOnDoubleClick || !e.mods.isLeftButtonDown()) return;
 	addItemFromMenu(false, e.getMouseDownPosition());
 }
 
