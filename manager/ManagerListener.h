@@ -1,9 +1,13 @@
 #pragma once
 
+class BaseItem;
+
 template<typename T>
 class ManagerTListener
 {
 public:
+	static_assert(std::is_base_of<BaseItem, T>::value, "T must be derived from BaseItem");
+
 	/** Destructor. */
 	virtual ~ManagerTListener() {}
 	virtual void itemAdded(T*) {}

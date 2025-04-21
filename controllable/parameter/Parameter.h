@@ -48,7 +48,7 @@ public:
 	juce::var lastValue;
 	juce::var lastUndoValue;
 
-	juce::SpinLock valueSetLock;
+	juce::CriticalSection valueSetLock;
 
 	//Range
 	bool canHaveRange;

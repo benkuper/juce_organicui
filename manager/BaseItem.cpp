@@ -9,10 +9,10 @@
 */
 
 #include "JuceHeader.h"
-#include "BaseItem.h"
 
 BaseItem::BaseItem(const String& name, bool _canBeDisabled, bool _canHaveScripts) :
 	EnablingControllableContainer(name.isEmpty() ? getTypeString() : name, _canBeDisabled),
+	isGroup(false),
 	itemColor(nullptr),
 	useCustomArrowKeysBehaviour(false),
 	canHaveScripts(_canHaveScripts),
@@ -26,6 +26,8 @@ BaseItem::BaseItem(const String& name, bool _canBeDisabled, bool _canHaveScripts
 {
 	//itemDataType = getTypeString();
 
+	isGroup = dynamic_cast<BaseItemGroup*>(this) != nullptr;
+
 	saveAndLoadName = true;
 	nameCanBeChangedByUser = true;
 
@@ -34,7 +36,7 @@ BaseItem::BaseItem(const String& name, bool _canBeDisabled, bool _canHaveScripts
 	if (canHaveScripts)
 	{
 		scriptManager.reset(new ScriptManager(this));
-		scriptManager->addManagerListener(this);
+		//scriptManager->addManagerListener(this);
 		addChildControllableContainer(scriptManager.get());
 	}
 
@@ -351,7 +353,7 @@ void BaseItem::onContainerParameterChanged(Parameter* p)
 	{
 		Array<var> args;
 		args.add(p->getScriptObject());
-		scriptManager->callFunctionOnAllItems("localParamChanged", args);
+		scriptManager->callFunctionOnAllScripts("localParamChanged", args);
 	}
 
 	onContainerParameterChangedInternal(p);
@@ -363,7 +365,7 @@ void BaseItem::onContainerTriggerTriggered(Trigger* t)
 	{
 		Array<var> args;
 		args.add(t->getScriptObject());
-		scriptManager->callFunctionOnAllItems("localParamChanged", args);
+		scriptManager->callFunctionOnAllScripts("localParamChanged", args);
 	}
 }
 
@@ -372,16 +374,16 @@ void BaseItem::onControllableFeedbackUpdate(ControllableContainer* cc, Controlla
 	onControllableFeedbackUpdateInternal(cc, c);
 }
 
-void BaseItem::itemAdded(Script* script)
-{
-	script->warningResolveInspectable = this;
-}
-
-void BaseItem::itemsAdded(Array<Script*> scripts)
-{
-	for (auto& script : scripts) script->warningResolveInspectable = this;
-
-}
+//void BaseItem::itemAdded(Script* script)
+//{
+//	script->warningResolveInspectable = this;
+//}
+//
+//void BaseItem::itemsAdded(Array<Script*> scripts)
+//{
+//	for (auto& script : scripts) script->warningResolveInspectable = this;
+//
+//}
 
 void BaseItem::setHasCustomColor(bool value)
 {

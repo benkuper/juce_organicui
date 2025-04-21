@@ -12,11 +12,9 @@
 
 class GenericControllableManager;
 class ScriptManager;
-class Script;
 
 class BaseItem :
-	public EnablingControllableContainer,
-	public ManagerTListener<Script>
+	public EnablingControllableContainer
 {
 public:
 	BaseItem(const juce::String& name = "", bool canBeDisabled = true, bool canHaveScript = false);
@@ -30,6 +28,7 @@ public:
 	BoolParameter* isUILocked; //lock in UI
 	ColorParameter* itemColor;
 
+	bool isGroup;
 	bool useCustomArrowKeysBehaviour; // to have custom manipulation with arrow keys instead of selection prev/next
 
 	bool canHaveScripts;
@@ -91,8 +90,8 @@ public:
 	void onControllableFeedbackUpdate(ControllableContainer * cc, Controllable * c) override;
 	virtual void onControllableFeedbackUpdateInternal(ControllableContainer * cc, Controllable * c) {};
 
-	void itemAdded(Script* script) override;
-	void itemsAdded(juce::Array<Script*> scripts) override;
+	//void itemAdded(Script* script) override;
+	//void itemsAdded(juce::Array<Script*> scripts) override;
 
 	void setHasCustomColor(bool value);
 

@@ -20,7 +20,8 @@ public:
 
 	bool canNavigate;
 
-	//
+	bool addItemOnDoubleClick;
+
 	bool centerUIAroundPosition;
 	bool updatePositionOnDragMove;
 	bool enableSnapping;
@@ -50,6 +51,7 @@ public:
 	virtual void mouseDown(const juce::MouseEvent& e) override;
 	virtual void mouseDrag(const juce::MouseEvent& e) override;
 	virtual void mouseUp(const juce::MouseEvent& e) override;
+	virtual void mouseDoubleClick(const juce::MouseEvent& e) override;
 	void mouseWheelMove(const juce::MouseEvent& e, const juce::MouseWheelDetails& d) override;
 	void mouseMagnify(const juce::MouseEvent& e, float scaleFactor) override;
 	virtual bool keyPressed(const juce::KeyPress& e) override;
@@ -122,6 +124,7 @@ template<class M, class T, class U>
 ManagerViewUI<M, T, U>::ManagerViewUI(const juce::String& contentName, M* _manager) :
 	ManagerUI<M, T, U>(contentName, _manager, false),
 	canNavigate(true),
+	addItemOnDoubleClick(true),
 	centerUIAroundPosition(false),
 	updatePositionOnDragMove(false),
 	enableSnapping(false),
@@ -235,6 +238,14 @@ void ManagerViewUI<M, T, U>::mouseUp(const juce::MouseEvent& e)
 		juce::Point<float> sizeOffset = ui->item->getItemSize() - ui->item->sizeReference;
 		ui->item->addResizeToUndoManager(true);
 	}
+}
+
+template<class M, class T, class U>
+void ManagerViewUI<M, T, U>::mouseDoubleClick(const juce::MouseEvent& e)
+{
+	ManagerUI<M, T, U>::mouseDoubleClick(e);
+	if (manager == nullptr || !addItemOnDoubleClick || !e.mods.isLeftButtonDown()) return;
+	addItemFromMenu(false, e.getMouseDownPosition());
 }
 
 template<class M, class T, class U>
@@ -498,7 +509,12 @@ void ManagerViewUI<M, T, U>::addItemFromMenu(bool isFromAddButton, juce::Point<i
 template<class M, class T, class U>
 void ManagerViewUI<M, T, U>::addItemFromMenu(T* item, bool isFromAddButton, juce::Point<int> mouseDownPos)
 {
-	this->manager->addItem(item, isFromAddButton ? juce::Point<float>(0, 0) : getViewPos(mouseDownPos).toFloat());
+	if (item == nullptr) item = this->manager->createItem();
+	if (item == nullptr) return;
+
+	juce::Point<float> pos = isFromAddButton ? juce::Point<float>(0, 0) : getViewPos(mouseDownPos).toFloat();
+	item->viewUIPosition->setPoint(pos);
+	this->manager->addItem(item);
 }
 
 template<class M, class T, class U>

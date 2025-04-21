@@ -140,7 +140,7 @@ void DashboardItemManagerUI::itemDropped(const SourceDetails& details)
 			if (bi == manager->parentContainer.get()) return;
 
 			manager->selectItemWhenCreated = false; // remove auto selection to allow multi drag/drop flow
-			manager->addItem(bi->createDashboardItem(), getViewMousePosition().toFloat());
+			addItemFromMenu(bi->createDashboardItem(), false, getMouseXYRelative());
 			manager->selectItemWhenCreated = true;
 		}
 		return;
@@ -150,7 +150,7 @@ void DashboardItemManagerUI::itemDropped(const SourceDetails& details)
 	if (e != nullptr)
 	{
 		manager->selectItemWhenCreated = false; // remove auto selection to allow multi drag/drop flow
-		manager->addItem(e->controllable->createDashboardItem(), getViewMousePosition().toFloat());
+		addItemFromMenu(e->controllable->createDashboardItem(), false, getMouseXYRelative());
 		manager->selectItemWhenCreated = true;
 		return;
 	}
@@ -159,7 +159,7 @@ void DashboardItemManagerUI::itemDropped(const SourceDetails& details)
 	if (ge != nullptr)
 	{
 		manager->selectItemWhenCreated = false; // remove auto selection to allow multi drag/drop flow
-		manager->addItem(ge->container->createDashboardItem(), getViewMousePosition().toFloat());
+		addItemFromMenu(ge->container->createDashboardItem(), false, getMouseXYRelative());
 		manager->selectItemWhenCreated = true;
 		return;
 	}
@@ -197,17 +197,17 @@ void DashboardItemManagerUI::showMenuAndAddItem(bool fromAddButton, Point<int> m
 
 
 
-			Point<float> p = getViewPos(mousePos);
-			if (result == -1) manager->addItem(new DashboardGroupItem(), p);
-			else if (result == -2) manager->addItem(new DashboardCommentItem(), p);
+			Point<int> p = getMouseXYRelative();
+			if (result == -1) this->addItemFromMenu(new DashboardGroupItem(), false, p);
+			else if (result == -2) this->addItemFromMenu(new DashboardCommentItem(), false, p);
 #if ORGANICUI_USE_SHAREDTEXTURE
-			else if (result == -3) manager->addItem(new SharedTextureDashboardItem(), p);
+			else if (result == -3) this->addItemFromMenu(new SharedTextureDashboardItem(), false, p);
 #endif
-			else if (result == -4) manager->addItem(new DashboardLinkItem(), p);
-			else if (result == -5) manager->addItem(new DashboardIFrameItem(), p);
+			else if (result == -4) this->addItemFromMenu(new DashboardLinkItem(), false, p);
+			else if (result == -5) this->addItemFromMenu(new DashboardIFrameItem(), false, p);
 			else if (result == -10) setShowTools(!showTools);
-			else if (result < -1000) customHandleMenuResultFunc(result, -5000, this, p);
-			else manager->addItem(manager->managerFactory->createFromMenuResult(result), p);
+			else if (result < -1000) customHandleMenuResultFunc(result, -5000, this, getViewPos(p));
+			else this->addItemFromMenu(manager->managerFactory->createFromMenuResult(result), false, p);
 
 
 		}
