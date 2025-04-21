@@ -328,7 +328,7 @@ bool Manager<T, G>::canAddItemOfType(const juce::String& typeToCheck)
 template<class T, class G>
 void Manager<T, G>::removeItems(juce::Array<T*> _items, bool addToUndo, bool notify)
 {
-	Array<BaseItem*> itemsToRemove;
+	juce::Array<BaseItem*> itemsToRemove;
 	for (auto& i : _items) itemsToRemove.add(i);
 	BaseManager::removeItems(itemsToRemove, addToUndo, notify);
 }
@@ -442,7 +442,7 @@ T* Manager<T, G>::getFirstSelectedItem()
 template<class T, class G>
 void Manager<T, G>::getRemoteControlDataInternal(juce::var& data)
 {
-	var extType = var();
+	juce::var extType = juce::var();
 	if (managerFactory != nullptr)
 	{
 		for (auto& d : managerFactory->defs) extType.append(d->menuPath + "/" + d->type);
