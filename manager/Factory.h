@@ -308,7 +308,7 @@ public:
 		if (this->canHaveGroups && manager != nullptr)
 		{
 			tmpMenu.addSeparator();
-			tmpMenu.addItem("Group", [&]() { manager->addGroup(); });
+			tmpMenu.addItem("Group", [&]() {});// manager->addItem();
 		}
 
 		tmpMenu.showMenuAsync(juce::PopupMenu::Options(), [this, returnFunc](int result)

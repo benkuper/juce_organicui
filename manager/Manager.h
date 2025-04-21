@@ -32,14 +32,14 @@ public:
 	//Factory
 	Factory<T, G>* managerFactory;
 	juce::String itemDataType;
-	
+
 	void setHasGridOptions(bool hasGridOptions);
 
 	virtual T* createItem(); //to override if special constructor to use
 	virtual G* createGroup(); //to override if special constructor to use
 
 	virtual T* createItemFromData(juce::var data); //to be overriden for specific item creation (from data)
-	
+
 	virtual T* addItemFromData(juce::var data, bool addToUndo = true); //to be overriden for specific item creation (from data)
 	virtual juce::Array<T*> addItemsFromData(juce::var data, bool addToUndo = true); //to be overriden for specific item creation (from data)
 	virtual juce::Array<T*> addItemsFromClipboard(bool showWarning = true);
@@ -52,12 +52,12 @@ public:
 	virtual juce::UndoableAction* getAddItemsUndoableAction(juce::Array<T*> item = nullptr, juce::var data = juce::var());
 
 	T* addItem(T* item = nullptr, juce::var data = juce::var(), bool addToUndo = true, bool notify = true); //if data is not empty, load data
+	void addItemManagerInternal(BaseItem* item, juce::var data = juce::var(), bool notify = true) override;
+
 	T* addItem(const juce::Point<float> initialPosition, bool addToUndo = true, bool notify = true);
 	T* addItem(T* item, const juce::Point<float> initialPosition, bool addToUndo = true, bool notify = true);
+
 	juce::Array<T*> addItems(juce::Array<T*> items, juce::var data = juce::var(), bool addToUndo = true);
-
-	G* addGroup(G* group = nullptr, juce::var data = juce::var(), bool addToUndo = true, bool notify = true);
-
 
 	virtual juce::Array<juce::UndoableAction*> getRemoveItemUndoableAction(T* item);
 	virtual juce::Array<juce::UndoableAction*> getRemoveItemsUndoableAction(juce::Array<T*> items);
@@ -65,18 +65,22 @@ public:
 	void removeItems(juce::Array<T*> items, bool addToUndo = true);
 	T* removeItem(T* item, bool addToUndo = true, bool notify = true, bool returnItem = false);
 
-	virtual void setItemIndex(T* item, int newIndex, bool addToUndo = true);
-	virtual juce::Array<juce::UndoableAction*> getSetItemIndexUndoableAction(T* item, int newIndex);
-
-	virtual void reorderItems(); //to be overriden if needed
-
-
 	//to override for specific handling like adding custom listeners, etc.
 	virtual void addItemInternal(T*, juce::var data) {}
 	virtual void addItemsInternal(juce::Array<T*>, juce::var data) {}
 	virtual void removeItemInternal(T*) {}
 	virtual void removeItemsInternal(juce::Array<T*>) {}
 
+	virtual void addGroupInternal(G*, juce::var data) {}
+	virtual void addGroupsInternal(juce::Array<G*>, juce::var data) {}
+	virtual void removeGroupInternal(G*) {}
+	virtual void removeGroupsInternal(juce::Array<G*>) {}
+
+
+	virtual void setItemIndex(T* item, int newIndex, bool addToUndo = true);
+	virtual juce::Array<juce::UndoableAction*> getSetItemIndexUndoableAction(T* item, int newIndex);
+
+	virtual void reorderItems(); //to be overriden if needed
 
 	T* getItemWithName(const juce::String& itemShortName, bool searchNiceNameToo = false, bool searchWithLowerCaseIfNotFound = true);
 
@@ -405,68 +409,41 @@ T* Manager<T, G>::addItem(T* item, juce::var data, bool addToUndo, bool notify)
 	jassert(items.indexOf(item) == -1); //be sure item is no here already
 	if (item == nullptr) item = createItem();
 	if (item == nullptr) return nullptr; //could not create here
+	BaseManager::addItem(item, data, addToUndo, notify);
+	return item;
+}
 
-	BaseItem* bi = static_cast<BaseItem*>(item);
-
-	if (addToUndo && !UndoMaster::getInstance()->isPerforming)
-	{
-		if (Engine::mainEngine != nullptr && !Engine::mainEngine->isLoadingFile)
-		{
-			UndoMaster::getInstance()->performAction("Add " + bi->niceName, new AddItemAction(this, item, data));
-			return item;
-		}
-	}
-
+template<class T, class G>
+void Manager<T, G>::addItemManagerInternal(BaseItem* item, juce::var data, bool notify)
+{
 	int targetIndex = data.getProperty("index", -1);
 	if (targetIndex != -1)
 	{
 		baseItems.insert(targetIndex, item);
-		items.insert(targetIndex, item);
+
+		if (item->isGroup) groups.add((G*)item);
+		items.add((T*)item);
 	}
 	else
 	{
-		//items.getLock().enter();
+
 		if (autoReorderOnAdd && !isCurrentlyLoadingData && comparator.compareFunc != nullptr)
 		{
+			//GROUP REFACTOR here needs a better way to check that, sorting both baseItems and specific arrays will mess up the order
 			baseItems.addSorted(comparator, item);
-			items.addSorted(comparator, item);
+			if (item->isGroup) groups.add((G*)item);
+			else items.add((T*)item);
 		}
 		else
 		{
 			baseItems.add(item);
-			items.add(item);
+			if (item->isGroup) groups.add((G*)item);
+			else items.add((T*)item);
 		}
-		//items.getLock().exit();
 	}
 
-	bi->addBaseItemListener(this);
-
-	if (!data.isVoid())
-	{
-		bi->loadJSONData(data);
-	}
-
-	//bi->setNiceName(bi->niceName); //force setting a unique name if already taken, after load data so if name is the same as another, will change here
-
-	addChildControllableContainer(bi, false, baseItems.indexOf(item), notify);
-
-	//if(autoReorderOnAdd) reorderItems();
-
-	addItemInternal(item, data);
-
-	if (notify)
-	{
-		managerListeners.call(&ManagerListener::itemAdded, item);
-		managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEM_ADDED, item));
-
-	}
-
-	if (juce::MessageManager::getInstance()->existsAndIsLockedByCurrentThread())
-	{
-		if (selectItemWhenCreated && !isCurrentlyLoadingData && !isManipulatingMultipleItems) bi->selectThis();
-	}
-
-	return item;
+	if (item->isGroup) addGroupInternal((G*)item, data);
+	else addItemInternal((T*)item, data);
 }
 
 template<class T, class G>
@@ -526,30 +503,6 @@ juce::Array<T*> Manager<T, G>::addItems(juce::Array<T*> itemsToAdd, juce::var da
 	addItemsInternal(itemsToAdd, data);
 
 	return itemsToAdd;
-}
-
-template<class T, class G>
-G* Manager<T, G>::addGroup(G* group, juce::var data, bool addToUndo, bool notify)
-{
-	if (group == nullptr) group = createGroup();
-	
-	//if (addToUndo && !UndoMaster::getInstance()->isPerforming)
-	//{
-	//	if (Engine::mainEngine != nullptr && !Engine::mainEngine->isLoadingFile)
-	//	{
-	//		//UndoMaster::getInstance()->performAction("Add " + group->niceName, new AddItemAction(this, group, data));
-	//		return group;
-	//	}
-	//}
-
-	baseItems.add(group);
-	groups.add(group);
-
-	addChildControllableContainer(group);
-
-
-
-	return group;
 }
 
 //if data is not empty, load data

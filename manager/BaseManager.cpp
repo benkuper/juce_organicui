@@ -15,6 +15,38 @@ BaseManager::BaseManager(const juce::String& name, bool canHaveGroups) :
 	canBeCopiedAndPasted = true;
 }
 
+BaseItem* BaseManager::addItem(BaseItem* item, juce::var data, bool addToUndo, bool notify)
+{
+
+	if (item == nullptr) return nullptr; //could not create here
+
+	if (addToUndo && !UndoMaster::getInstance()->isPerforming)
+	{
+		if (Engine::mainEngine != nullptr && !Engine::mainEngine->isLoadingFile)
+		{
+			//UndoMaster::getInstance()->performAction("Add " + item->niceName, new AddItemAction(this, item, data));
+			return item;
+		}
+	}
+	item->addBaseItemListener(this);
+	if (!data.isVoid()) item->loadJSONData(data);
+	addChildControllableContainer(item, false, baseItems.indexOf(item), notify);
+
+	addItemManagerInternal(item, data, notify);
+
+	if (notify) notifyItemAdded(item);
+		//to move to notify
+		//managerListeners.call(&ManagerListener::itemAdded, item);
+		//managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEM_ADDED, item));
+
+	if (juce::MessageManager::getInstance()->existsAndIsLockedByCurrentThread())
+	{
+		if (selectItemWhenCreated && !isCurrentlyLoadingData && !isManipulatingMultipleItems) item->selectThis();
+	}
+
+	return item;
+}
+
 juce::Array<BaseItem*> BaseManager::getBaseItems(bool recursive, bool includeDisabled, bool includeGroups) const
 {
 	juce::Array<BaseItem*> result;
