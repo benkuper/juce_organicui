@@ -280,7 +280,6 @@ template<class T, class G>
 Manager<T, G>::Manager(const juce::String& name, bool canHaveGroups) :
 	BaseManager(name, canHaveGroups),
 	managerFactory(nullptr),
-	customCreateItemFunc(nullptr),
 	managerNotifier(50),
 	comparator(this)
 {
