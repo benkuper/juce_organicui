@@ -43,7 +43,8 @@ public:
 	FactoryDefinition(juce::StringRef menuPath, juce::StringRef type, CreateFunc createFunc) :
 		BaseFactoryDefinition<T>(menuPath, type),
 		createFunc(createFunc)
-	{}
+	{
+	}
 
 	virtual ~FactoryDefinition() {}
 
@@ -130,13 +131,13 @@ public:
 
 };
 
-
 template<class T>
-class Factory
+class BaseFactory
 {
 public:
-	Factory() {}
-	virtual ~Factory() {}
+
+	BaseFactory() {}
+	virtual ~BaseFactory() {}
 
 	juce::OwnedArray<BaseFactoryDefinition<T>> defs;
 	juce::PopupMenu menu;
@@ -146,6 +147,8 @@ public:
 		menu.clear();
 		juce::OwnedArray<juce::PopupMenu> subMenus;
 		juce::Array<juce::String> subMenuNames;
+
+		buildPopupMenuInternal();
 
 		for (auto& d : defs)
 		{
@@ -179,6 +182,8 @@ public:
 
 		for (int i = 0; i < subMenus.size(); ++i) menu.addSubMenu(subMenuNames[i], *subMenus[i]);
 	}
+
+	virtual void buildPopupMenuInternal() {}
 
 	virtual void showCreateMenu(std::function<void(T*)> returnFunc)
 	{
@@ -268,4 +273,50 @@ public:
 	}
 
 	typedef FactorySimpleParametricDefinition<T> Definition;
+};
+
+
+
+template<class T> class ItemBaseGroup;
+template<class T, class G> class Manager;
+template<class T, class G = ItemBaseGroup<T>>
+class Factory : public BaseFactory<T>
+{
+public:
+	static_assert(std::is_base_of<BaseItem, T>::value, "T must be derived from BaseItem");
+	static_assert(std::is_base_of<ItemBaseGroup<T>, G>::value, "G must be derived from ItemGroup<T>");
+
+	Factory() :
+		BaseFactory(),
+		canHaveGroups(canHaveGroups)
+	{
+	}
+
+	virtual ~Factory() {}
+
+	bool canHaveGroups;
+
+	virtual void showCreateMenu(Manager<T, G>* manager, std::function<void(T*)> returnFunc)
+	{
+		if (defs.size() == 1)
+		{
+			if (T* r = this->createFromMenuResult(1)) returnFunc(r);
+			return;
+		}
+
+		PopupMenu tmpMenu = getMenu();
+		if (canHaveGroups && manager != nullptr)
+		{
+			tmpMenu.addSeparator();
+			tmpMenu.addItem("Group", [&]() { manager->addGroup(); });
+		}
+
+		tmpMenu.showMenuAsync(juce::PopupMenu::Options(), [this, returnFunc](int result)
+			{
+				if (T* r = this->createFromMenuResult(result)) returnFunc(r);
+			}
+		);
+
+
+	}
 };

@@ -274,6 +274,8 @@
 
 #include "remotecontrol/OSCRemoteControl.h"
 
+template<class T> class ItemBaseGroup;
+template<class T, class G = ItemBaseGroup<T>> class Manager;
 
 #include "manager/BaseItemListener.h"
 #include "manager/ManagerListener.h"

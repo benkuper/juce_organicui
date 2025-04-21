@@ -32,10 +32,10 @@ public:
 	juce::OwnedArray<BaseItem, juce::CriticalSection> baseItems;
 
 	juce::Array<BaseItem*> getAllItems(bool recursive = true, bool includeGroups = true, bool includeDisabled = true) const;
-
 	void callFunctionOnAllItems(bool recursive, bool includeGroups, bool includeDisabled, std::function<void(BaseItem*)> func);
 };
 
+template<class T> class ItemGroup;
 
 template <class T, class G>
 class Manager :
@@ -45,16 +45,20 @@ public:
 
 	static_assert(std::is_base_of<BaseItem, T>::value, "T must be derived from BaseItem");
 	static_assert(std::is_base_of<ItemGroup<T>, G>::value, "G must be derived from ItemGroup<T>");
+	static_assert(std::is_base_of<BaseItem, G>::value, "G must be derived from BaseItem");
 
-	Manager(const juce::String& name);
+	Manager(const juce::String& name = "Items", bool canHaveGroups = false);
 	virtual ~Manager();
 
+
 	juce::Array<T*, juce::CriticalSection> items;
+	juce::Array<G*, juce::CriticalSection> groups;
 
 	//Factory
-	Factory<T>* managerFactory;
+	Factory<T, G>* managerFactory;
 	juce::String itemDataType;
-
+	
+	bool canHaveGroups;
 	bool userCanAddItemsManually;
 	bool selectItemWhenCreated;
 	bool autoReorderOnAdd;
@@ -79,7 +83,10 @@ public:
 	void setHasGridOptions(bool hasGridOptions);
 
 	virtual T* createItem(); //to override if special constructor to use
+	virtual G* createGroup(); //to override if special constructor to use
+
 	virtual T* createItemFromData(juce::var data); //to be overriden for specific item creation (from data)
+	
 	virtual T* addItemFromData(juce::var data, bool addToUndo = true); //to be overriden for specific item creation (from data)
 	virtual juce::Array<T*> addItemsFromData(juce::var data, bool addToUndo = true); //to be overriden for specific item creation (from data)
 	virtual juce::Array<T*> addItemsFromClipboard(bool showWarning = true);
@@ -95,6 +102,8 @@ public:
 	T* addItem(const juce::Point<float> initialPosition, bool addToUndo = true, bool notify = true);
 	T* addItem(T* item, const juce::Point<float> initialPosition, bool addToUndo = true, bool notify = true);
 	juce::Array<T*> addItems(juce::Array<T*> items, juce::var data = juce::var(), bool addToUndo = true);
+
+	G* addGroup(G* group = nullptr, juce::var data = juce::var(), bool addToUndo = true, bool notify = true);
 
 
 	virtual juce::Array<juce::UndoableAction*> getRemoveItemUndoableAction(T* item);
@@ -315,10 +324,11 @@ private:
 
 
 template<class T, class G>
-Manager<T, G>::Manager(const juce::String& name) :
+Manager<T, G>::Manager(const juce::String& name, bool canHaveGroups) :
 	BaseManager(name),
 	managerFactory(nullptr),
 	itemDataType(""),
+	canHaveGroups(canHaveGroups),
 	userCanAddItemsManually(true),
 	selectItemWhenCreated(true),
 	autoReorderOnAdd(true),
@@ -400,6 +410,12 @@ T* Manager<T, G>::createItem()
 	if (managerFactory != nullptr && managerFactory->defs.size() == 1) return managerFactory->create(managerFactory->defs[0]);
 	if (customCreateItemFunc != nullptr) return customCreateItemFunc();
 	return new T();
+}
+
+template<class T, class G>
+G* Manager<T, G>::createGroup()
+{
+	return new G(new Manager<T, G>());
 }
 
 template<class T, class G>
@@ -570,6 +586,30 @@ juce::Array<T*> Manager<T, G>::addItems(juce::Array<T*> itemsToAdd, juce::var da
 	addItemsInternal(itemsToAdd, data);
 
 	return itemsToAdd;
+}
+
+template<class T, class G>
+G* Manager<T, G>::addGroup(G* group, juce::var data, bool addToUndo, bool notify)
+{
+	if (group == nullptr) group = createGroup();
+	
+	//if (addToUndo && !UndoMaster::getInstance()->isPerforming)
+	//{
+	//	if (Engine::mainEngine != nullptr && !Engine::mainEngine->isLoadingFile)
+	//	{
+	//		//UndoMaster::getInstance()->performAction("Add " + group->niceName, new AddItemAction(this, group, data));
+	//		return group;
+	//	}
+	//}
+
+	baseItems.add(group);
+	groups.add(group);
+
+	addChildControllableContainer(group);
+
+
+
+	return group;
 }
 
 //if data is not empty, load data

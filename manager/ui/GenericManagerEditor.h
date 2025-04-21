@@ -10,8 +10,8 @@
 
 #pragma once
 
-template<class T> class ItemGroup;
-template<class T, class G = ItemGroup<T>> class Manager;
+template<class T> class ItemBaseGroup;
+template<class T, class G> class Manager;
 
 template<class T>
 class GenericManagerEditor :
@@ -235,7 +235,7 @@ void GenericManagerEditor<T>::showMenuAndAddItem(bool isFromAddButton)
 {
 	if (manager->managerFactory != nullptr)
 	{
-		manager->managerFactory->showCreateMenu([this](T* item)
+		manager->managerFactory->showCreateMenu(manager, [this](T* item)
 			{
 				if (item != nullptr)
 				{

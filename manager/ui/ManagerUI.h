@@ -893,7 +893,7 @@ void ManagerUI<M, T, U>::showMenuAndAddItem(bool isFromAddButton, juce::Point<in
 {
 	if (manager->managerFactory != nullptr)
 	{
-		manager->managerFactory->showCreateMenu([this, isFromAddButton, mouseDownPos, callback](T* item)
+		manager->managerFactory->showCreateMenu(manager, [this, isFromAddButton, mouseDownPos, callback](T* item)
 			{
 				this->addItemFromMenu(item, isFromAddButton, mouseDownPos);
 				if (callback != nullptr) callback(item);
