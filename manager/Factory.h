@@ -276,7 +276,7 @@ public:
 };
 
 
-
+class BaseItem;
 template<class T> class ItemBaseGroup;
 template<class T, class G> class Manager;
 template<class T, class G = ItemBaseGroup<T>>
