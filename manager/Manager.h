@@ -220,7 +220,7 @@ T* Manager<T, G>::createItemFromData(juce::var data)
 {
 	if (managerFactory != nullptr)
 	{
-		String extendedType = data.getProperty("extendedType", "");
+		juce::String extendedType = data.getProperty("extendedType", "");
 		if (extendedType != "") {
 			BaseFactoryDefinition<T>* def = managerFactory->getDefFromExtendedType(extendedType);
 			if (def == nullptr)
@@ -230,7 +230,7 @@ T* Manager<T, G>::createItemFromData(juce::var data)
 			}
 			return managerFactory->create(def);
 		}
-		String type = data.getProperty("type", "");
+		juce::String type = data.getProperty("type", "");
 		if (type.isEmpty()) return nullptr;
 		return managerFactory->create(type);
 	}
@@ -258,9 +258,9 @@ T* Manager<T, G>::addItem(T* item, juce::var data, bool addToUndo, bool notify)
 template<class T, class G>
 juce::Array<T*> Manager<T, G>::addItems(juce::Array<T*> items, juce::var data, bool addToUndo, bool notify)
 {
-	Array<BaseItem*> itemsToAdd;
+	juce::Array<BaseItem*> itemsToAdd;
 	for (auto& i : items) if (BaseItem* it = dynamic_cast<BaseItem*>(i)) itemsToAdd.add(it);
-	Array<BaseItem*> newItems = BaseManager::addItems(itemsToAdd, data, addToUndo, notify);
+	juce::Array<BaseItem*> newItems = BaseManager::addItems(itemsToAdd, data, addToUndo, notify);
 	return getArrayAsItems(newItems);
 }
 
@@ -307,7 +307,7 @@ T* Manager<T, G>::addItemFromData(juce::var data, bool addToUndo)
 template<class T, class G>
 juce::Array<T*> Manager<T, G>::addItemsFromData(juce::var data, bool addToUndo)
 {
-	Array<BaseItem*> itemsAdded = BaseManager::addBaseItemsFromData(data, addToUndo);
+	juce::Array<BaseItem*> itemsAdded = BaseManager::addBaseItemsFromData(data, addToUndo);
 	return getArrayAsItems(itemsAdded);
 }
 
