@@ -304,7 +304,7 @@ public:
 			return;
 		}
 
-		juce::PopupMenu tmpMenu = getMenu();
+		juce::PopupMenu tmpMenu = BaseFactory<T>::getMenu();
 		if (canHaveGroups && manager != nullptr)
 		{
 			tmpMenu.addSeparator();
