@@ -298,17 +298,17 @@ public:
 
 	virtual void showCreateMenu(Manager<T, G>* manager, std::function<void(T*)> returnFunc)
 	{
-		if (defs.size() == 1)
+		if (!this->canHaveGroups)
 		{
-			if (T* r = this->createFromMenuResult(1)) returnFunc(r);
+			BaseFactory<T>::showCreateMenu(returnFunc);
 			return;
 		}
 
 		juce::PopupMenu tmpMenu = BaseFactory<T>::getMenu();
-		if (canHaveGroups && manager != nullptr)
+		if (this->canHaveGroups && this->manager != nullptr)
 		{
 			tmpMenu.addSeparator();
-			tmpMenu.addItem("Group", [&]() { manager->addGroup(); });
+			tmpMenu.addItem("Group", [&]() { this->manager->addGroup(); });
 		}
 
 		tmpMenu.showMenuAsync(juce::PopupMenu::Options(), [this, returnFunc](int result)
