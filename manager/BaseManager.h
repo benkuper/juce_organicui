@@ -71,7 +71,7 @@ public:
 
 
 	//Listing items
-	virtual BaseItem* getItemWithName(const juce::String& itemShortName, bool searchNiceNameToo = false, bool searchWithLowerCaseIfNotFound = true);
+	virtual BaseItem* getItemWithName(const juce::String& itemShortName, bool searchNiceNameToo = false, bool searchWithLowerCaseIfNotFound = true, bool recursive = true);
 
 	template<class IType>
 	juce::Array<IType*> getItemsWithType()

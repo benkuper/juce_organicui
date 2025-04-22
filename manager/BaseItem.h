@@ -17,7 +17,7 @@ class BaseItem :
 	public EnablingControllableContainer
 {
 public:
-	BaseItem(const juce::String& name = "", bool canBeDisabled = true, bool canHaveScript = false);
+	BaseItem(const juce::String& name = "", bool canBeDisabled = true, bool canHaveScript = false, bool isGroup = false);
 	virtual ~BaseItem();
 
 	//UI - should move outside data class ? how to save/load if not there 

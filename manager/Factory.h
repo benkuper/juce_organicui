@@ -287,32 +287,30 @@ public:
 	static_assert(std::is_base_of<ItemBaseGroup<T>, G>::value, "G must be derived from ItemGroup<T>");
 
 	Factory() :
-		BaseFactory<T>(),
-		canHaveGroups(canHaveGroups)
+		BaseFactory<T>()
 	{
 	}
 
 	virtual ~Factory() {}
 
-	bool canHaveGroups;
-
 	virtual void showCreateMenu(Manager<T, G>* manager, std::function<void(T*)> returnFunc)
 	{
-		if (!this->canHaveGroups)
+		if (manager == nullptr || !manager->canHaveGroups)
 		{
 			BaseFactory<T>::showCreateMenu(returnFunc);
 			return;
 		}
 
 		juce::PopupMenu tmpMenu = BaseFactory<T>::getMenu();
-		if (this->canHaveGroups && manager != nullptr)
+		if (manager != nullptr && manager->canHaveGroups)
 		{
 			tmpMenu.addSeparator();
-			tmpMenu.addItem("Group", [&]() {});// manager->addItem();
+			tmpMenu.addItem("Group", [manager]() { manager->addGroup(); });// manager->addItem();
 		}
 
 		tmpMenu.showMenuAsync(juce::PopupMenu::Options(), [this, returnFunc](int result)
 			{
+				if (result == -1) return;
 				if (T* r = this->createFromMenuResult(result)) returnFunc(r);
 			}
 		);

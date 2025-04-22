@@ -1,4 +1,5 @@
 #include "JuceHeader.h"
+#include "BaseManager.h"
 
 BaseManager::BaseManager(const String& name, bool canHaveGroups) :
 	EnablingControllableContainer(name, true),
@@ -9,7 +10,10 @@ BaseManager::BaseManager(const String& name, bool canHaveGroups) :
 	clipboardCopyOffset(0, 0),
 	viewOffset(0, 0),
 	viewZoom(1.0f),
-	showItemsInEditor(true)
+	showItemsInEditor(true),
+	snapGridMode(nullptr),
+	showSnapGrid(nullptr),
+	snapGridSize(nullptr)
 {
 	canBeCopiedAndPasted = true;
 	skipLabelInTarget = true; //by default manager label in targetParameter UI are not interesting
@@ -339,14 +343,19 @@ Array<UndoableAction*> BaseManager::getSetItemIndexUndoableAction(BaseItem* item
 	return a;
 }
 
-
-BaseItem* BaseManager::getItemWithName(const String& itemShortName, bool searchItemWithNiceNameToo, bool searchWithLowerCaseIfNotFound)
+BaseItem* BaseManager::getItemWithName(const juce::String& itemShortName, bool searchNiceNameToo, bool searchWithLowerCaseIfNotFound, bool recursive)
 {
 	//const ScopedLock lock(baseItems.getLock());
+
 	for (auto& t : baseItems)
 	{
 		if (((BaseItem*)t)->shortName == itemShortName) return t;
-		else if (searchItemWithNiceNameToo && ((BaseItem*)t)->niceName == itemShortName) return t;
+		else if (searchNiceNameToo && ((BaseItem*)t)->niceName == itemShortName) return t;
+		else if (recursive && ((BaseItem*)t)->isGroup)
+		{
+			auto* group = (BaseItemGroup*)t;
+			if (group) return group->baseManager->getItemWithName(itemShortName, searchNiceNameToo, searchWithLowerCaseIfNotFound, recursive);
+		}
 	}
 
 	if (searchWithLowerCaseIfNotFound)

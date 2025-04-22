@@ -10,9 +10,9 @@
 
 #include "JuceHeader.h"
 
-BaseItem::BaseItem(const String& name, bool _canBeDisabled, bool _canHaveScripts) :
+BaseItem::BaseItem(const String& name, bool _canBeDisabled, bool _canHaveScripts, bool isGroup) :
 	EnablingControllableContainer(name.isEmpty() ? getTypeString() : name, _canBeDisabled),
-	isGroup(false),
+	isGroup(isGroup),
 	itemColor(nullptr),
 	useCustomArrowKeysBehaviour(false),
 	canHaveScripts(_canHaveScripts),
@@ -26,7 +26,6 @@ BaseItem::BaseItem(const String& name, bool _canBeDisabled, bool _canHaveScripts
 {
 	//itemDataType = getTypeString();
 
-	isGroup = dynamic_cast<BaseItemGroup*>(this) != nullptr;
 
 	saveAndLoadName = true;
 	nameCanBeChangedByUser = true;

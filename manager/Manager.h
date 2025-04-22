@@ -40,8 +40,10 @@ public:
 
 	virtual G* createGroup(); //to override if special constructor to use
 
-	
+
 	T* addItem(T* item = nullptr, juce::var data = juce::var(), bool addToUndo = true, bool notify = true); //if data is not empty, load data
+	G* addGroup(G* item = nullptr, juce::var data = juce::var(), bool addToUndo = true, bool notify = true); //if data is not empty, load data
+	
 	juce::Array<T*> addItems(juce::Array<T*> items, juce::var data = juce::var(), bool addToUndo = true, bool notify = true);
 	void addItemManagerInternal(BaseItem* item, juce::var data = juce::var()) override;
 	void addItemsManagerInternal(juce::Array<BaseItem*> item, juce::var data = juce::var()) override;
@@ -75,7 +77,9 @@ public:
 	virtual void reorderItems() override; //to be overriden if needed
 	void notifyItemsReordered();
 
-	virtual T* getItemWithName(const juce::String& itemShortName, bool searchNiceNameToo = false, bool searchWithLowerCaseIfNotFound = true) override;
+	virtual juce::Array<T*> getItems(bool includeDisabled = true, bool recursive = true);
+
+	virtual T* getItemWithName(const juce::String& itemShortName, bool searchNiceNameToo = false, bool searchWithLowerCaseIfNotFound = true, bool recursive = true) override;
 
 	juce::PopupMenu getItemsMenu(int startID);
 	T* getItemForMenuResultID(int id, int startID);
@@ -256,6 +260,17 @@ T* Manager<T, G>::addItem(T* item, juce::var data, bool addToUndo, bool notify)
 }
 
 template<class T, class G>
+G* Manager<T, G>::addGroup(G* group, juce::var data, bool addToUndo, bool notify)
+{
+
+	jassert(groups.indexOf(group) == -1); //be sure item is no here already
+	if (group == nullptr) group = createGroup();
+	if (group == nullptr) return nullptr; //could not create here
+	BaseManager::addItem(group, data, addToUndo, notify);
+	return group;
+}
+
+template<class T, class G>
 juce::Array<T*> Manager<T, G>::addItems(juce::Array<T*> items, juce::var data, bool addToUndo, bool notify)
 {
 	juce::Array<BaseItem*> itemsToAdd;
@@ -408,9 +423,18 @@ void Manager<T, G>::notifyItemsReordered()
 }
 
 template<class T, class G>
-T* Manager<T, G>::getItemWithName(const juce::String& itemShortName, bool searchNiceNameToo, bool searchWithLowerCaseIfNotFound)
+juce::Array<T*> Manager<T, G>::getItems(bool includeDisabled, bool recursive)
 {
-	return (T*)BaseManager::getItemWithName(itemShortName, searchNiceNameToo, searchWithLowerCaseIfNotFound);
+	juce::Array<BaseItem*> itemsRef = BaseManager::getBaseItems(recursive, includeDisabled, false);
+	juce::Array<T*> result;
+	for (auto& i : itemsRef) if (T* it = dynamic_cast<T*>(i)) result.add(it);
+	return result;
+}
+
+template<class T, class G>
+inline T* Manager<T, G>::getItemWithName(const juce::String& itemShortName, bool searchNiceNameToo, bool searchWithLowerCaseIfNotFound, bool recursive)
+{
+	return (T*)BaseManager::getItemWithName(itemShortName, searchNiceNameToo, searchWithLowerCaseIfNotFound, recursive);
 }
 
 template<class T, class G>
