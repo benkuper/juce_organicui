@@ -9,7 +9,7 @@
 */
 
 AutomationKeyUI::AutomationKeyUI(AutomationKey* key) :
-	BaseItemMinimalUI(key),
+	ItemMinimalUI<AutomationKey>(key),
 	handle(key),
 	easingUI(nullptr)
 {
@@ -106,13 +106,13 @@ void AutomationKeyUI::mouseDown(const MouseEvent& e)
 	else
 	{
 		item->setMovePositionReference(true);
-		BaseItemMinimalUI::mouseDown(e);
+		ItemMinimalUI::mouseDown(e);
 	}
 }
 
 void AutomationKeyUI::mouseDoubleClick(const MouseEvent& e)
 {
-	BaseItemMinimalUI::mouseDoubleClick(e);
+	ItemMinimalUI::mouseDoubleClick(e);
 	if (e.eventComponent == this || e.eventComponent == &handle)
 	{
 		std::unique_ptr<Component> editComponent(new KeyEditCalloutComponent(item));
@@ -123,7 +123,7 @@ void AutomationKeyUI::mouseDoubleClick(const MouseEvent& e)
 
 void AutomationKeyUI::mouseUp(const MouseEvent& e)
 {
-	BaseItemMinimalUI::mouseUp(e);
+	ItemMinimalUI::mouseUp(e);
 	item->addMoveToUndoManager(true);
 }
 

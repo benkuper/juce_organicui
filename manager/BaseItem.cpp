@@ -78,6 +78,7 @@ BaseItem::BaseItem(const String& name, bool _canBeDisabled, bool _canHaveScripts
 
 BaseItem::~BaseItem()
 {
+	masterReference.clear();
 }
 
 void BaseItem::clearItem()

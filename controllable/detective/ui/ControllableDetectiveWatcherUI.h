@@ -1,7 +1,7 @@
 #pragma once
 
 class ControllableDetectiveWatcherUI :
-	public BaseItemUI<ControllableDetectiveWatcher>,
+	public ItemUI<ControllableDetectiveWatcher>,
 	public juce::Timer
 {
 public:

@@ -63,7 +63,6 @@ BaseItem* BaseManager::addItem(BaseItem* item, var data, bool addToUndo, bool no
 	if (notify)
 	{
 		notifyItemAdded(item);
-		notifyAsync(BaseManagerEvent::ITEM_ADDED, item);
 	}
 
 	if (MessageManager::getInstance()->existsAndIsLockedByCurrentThread())
@@ -113,7 +112,6 @@ Array<BaseItem*> BaseManager::addItems(Array<BaseItem*> itemsToAdd, var data, bo
 
 	if (notify) {
 		notifyItemsAdded(itemsToAdd);
-		notifyAsync(BaseManagerEvent::ITEMS_ADDED, itemsToAdd);
 	}
 
 	return itemsToAdd;
@@ -231,7 +229,6 @@ BaseItem* BaseManager::removeItem(BaseItem* item, bool addToUndo, bool notify, b
 	if (notify)
 	{
 		notifyItemRemoved(item);
-		notifyAsync(BaseManagerEvent::ITEM_REMOVED, item);
 	}
 
 	if (returnItem) return item; //will need to delete !
@@ -262,7 +259,6 @@ void BaseManager::removeItems(Array<BaseItem*> itemsToRemove, bool addToUndo, bo
 	if (notify)
 	{
 		notifyItemsRemoved(itemsRemoved);
-		notifyAsync(BaseManagerEvent::ITEMS_REMOVED);
 	}
 
 	for (auto& i : itemsRemoved)
@@ -331,7 +327,6 @@ void BaseManager::setItemIndex(BaseItem* item, int newIndex, bool addToUndo)
 	//items.getLock().exit();
 
 	notifyItemsReordered();
-	notifyAsync(BaseManagerEvent::ITEMS_REORDERED);
 }
 
 Array<UndoableAction*> BaseManager::getSetItemIndexUndoableAction(BaseItem* item, int newIndex)
@@ -569,10 +564,8 @@ String BaseManager::getScriptTargetString()
 BaseManager::BaseManagerEvent::BaseManagerEvent(Type t, Array<BaseItem*> iList) :
 	type(t)
 {
-	for (auto& i : iList) if (i != nullptr) itemsRef.add(i);
+	for (auto& i : iList) if (i != nullptr) this->baseItems.add(i);
 }
-
-
 
 
 //ACTIONS
@@ -596,21 +589,20 @@ BaseManager* BaseManager::ManagerBaseAction::getManager() {
 
 BaseManager::ItemBaseAction::ItemBaseAction(BaseManager* m, BaseItem* i, var data) :
 	ManagerBaseAction(m, data),
-	itemRef(i),
+	baseItem(i),
 	itemIndex(0)
 {
-	BaseItem* s = getItem();
-	if (s != nullptr)
+	if (baseItem != nullptr)
 	{
-		this->itemShortName = dynamic_cast<BaseItem*>(s)->shortName;
-		this->itemIndex = data.getProperty("index", m->baseItems.indexOf(s));
+		this->itemShortName = this->baseItem->shortName;
+		this->itemIndex = data.getProperty("index", m->baseItems.indexOf(baseItem));
 
 	}
 }
 
 BaseItem* BaseManager::ItemBaseAction::getItem()
 {
-	if (itemRef != nullptr && !itemRef.wasObjectDeleted()) return dynamic_cast<BaseItem*>(itemRef.get());
+	if (baseItem != nullptr && !baseItem.wasObjectDeleted()) return baseItem.get();
 	else
 	{
 		BaseManager* m = this->getManager();
@@ -655,7 +647,7 @@ bool BaseManager::AddItemAction::undo()
 	this->data.getDynamicObject()->setProperty("index", this->itemIndex);
 
 	this->getManager()->removeItem(s, false);
-	this->itemRef = nullptr;
+	this->baseItem = nullptr;
 	return true;
 }
 
@@ -667,17 +659,15 @@ BaseManager::RemoveItemAction::RemoveItemAction(BaseManager* m, BaseItem* i, var
 bool BaseManager::RemoveItemAction::perform()
 {
 
-	BaseItem* s = this->getItem();
+	if (this->baseItem == nullptr) return false;
 
-	if (s == nullptr) return false;
-
-	this->data = s->getJSONData();
+	this->data = this->baseItem->getJSONData();
 	if (this->data.getDynamicObject() == nullptr) return false;
 
 	this->data.getDynamicObject()->setProperty("index", this->itemIndex);
 
-	this->getManager()->removeItem(s, false);
-	this->itemRef = nullptr;
+	this->getManager()->removeItem(this->baseItem, false);
+	this->baseItem = nullptr;
 	return true;
 }
 
@@ -685,7 +675,7 @@ bool BaseManager::RemoveItemAction::undo()
 {
 	BaseManager* m = this->getManager();
 	if (m == nullptr) return false;
-	this->itemRef = m->addItemFromData(this->data, false);
+	this->baseItem = m->addItemFromData(this->data, false);
 	return true;
 }
 
@@ -734,9 +724,8 @@ BaseManager::ItemsBaseAction::ItemsBaseAction(BaseManager* m, Array<BaseItem*> i
 
 	for (auto& i : iList)
 	{
-		BaseItem* bi = dynamic_cast<BaseItem*>(i);
-		itemsRef.add(bi);
-		itemsShortName.add(bi != nullptr ? bi->shortName : "");
+		baseItems.add(i);
+		itemsShortName.add(i != nullptr ? i->shortName : "");
 	}
 }
 
@@ -744,7 +733,7 @@ Array<BaseItem*> BaseManager::ItemsBaseAction::getItems()
 {
 	Array<BaseItem*> iList;
 	int index = 0;
-	for (auto& i : itemsRef)
+	for (auto& i : baseItems)
 	{
 		if (i != nullptr && !i.wasObjectDeleted())
 		{
@@ -781,8 +770,8 @@ bool BaseManager::AddItemsAction::perform()
 	else if (!this->data.isVoid())
 	{
 		Array<BaseItem*> newList = m->addBaseItemsFromData(this->data, false);
-		this->itemsRef.clear();
-		for (auto& i : newList) this->itemsRef.add(i);
+		this->baseItems.clear();
+		for (auto& i : newList) this->baseItems.add(i);
 	}
 
 
@@ -796,7 +785,7 @@ bool BaseManager::AddItemsAction::undo()
 	BaseManager* m = this->getManager();
 	if (m == nullptr)
 	{
-		this->itemsRef.clear();
+		this->baseItems.clear();
 		return false;
 	}
 
@@ -823,7 +812,7 @@ bool BaseManager::RemoveItemsAction::perform()
 	BaseManager* m = this->getManager();
 	if (m == nullptr)
 	{
-		this->itemsRef.clear();
+		this->baseItems.clear();
 		return false;
 	}
 

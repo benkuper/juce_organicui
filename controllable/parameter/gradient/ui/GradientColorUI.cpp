@@ -10,7 +10,7 @@
 
 
 GradientColorUI::GradientColorUI(GradientColor* item) :
-	BaseItemMinimalUI(item)
+	ItemMinimalUI<GradientColor>(item)
 {
 	dragAndDropEnabled = false;
 
@@ -51,7 +51,7 @@ void GradientColorUI::resized()
 void GradientColorUI::mouseDown(const MouseEvent& e)
 {
 
-	BaseItemMinimalUI::mouseDown(e);
+	ItemMinimalUI::mouseDown(e);
 
 
 

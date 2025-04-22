@@ -43,7 +43,7 @@ public:
 
 	//Creating and adding items
 	virtual BaseItem* createItem() { jassertfalse; return nullptr; }
-	virtual BaseItem* addItem(BaseItem* item, juce::var data, bool addToUndo, bool notify = true);
+	virtual BaseItem* addItem(BaseItem* item, juce::var data = juce::var(), bool addToUndo = true, bool notify = true);
 	juce::Array<BaseItem*> addItems(juce::Array<BaseItem*> items, juce::var data = juce::var(), bool addToUndo = true, bool notify = true);
 
 	virtual BaseItem* createItemFromData(juce::var data) = 0;
@@ -102,13 +102,21 @@ public:
 	class BaseManagerEvent
 	{
 	public:
-		enum Type { ITEM_ADDED, ITEM_REMOVED, ITEMS_REORDERED, ITEMS_ADDED, ITEMS_REMOVED, MANAGER_CLEARED, NEEDS_UI_UPDATE };
+		enum Type {
+			ITEM_ADDED,
+			ITEM_REMOVED,
+			ITEMS_ADDED,
+			ITEMS_REMOVED,
+			ITEMS_REORDERED,
+			MANAGER_CLEARED,
+			NEEDS_UI_UPDATE
+		};
 
 		BaseManagerEvent(Type t, juce::Array<BaseItem*> iList);
 		virtual ~BaseManagerEvent() {}
 
 		Type type;
-		juce::Array<juce::WeakReference<Inspectable>> itemsRef;
+		juce::Array<juce::WeakReference<BaseItem>> baseItems;
 	};
 
 	//UNDO MANAGER
@@ -131,7 +139,7 @@ public:
 	public:
 		ItemBaseAction(BaseManager* m, BaseItem* i, juce::var data = juce::var());
 
-		juce::WeakReference<Inspectable> itemRef;
+		juce::WeakReference<BaseItem> baseItem;
 		juce::String itemShortName;
 		int itemIndex;
 
@@ -178,10 +186,11 @@ public:
 	public:
 		ItemsBaseAction(BaseManager* m, juce::Array<BaseItem*> iList, juce::var data = juce::var());
 
-		juce::Array<juce::WeakReference<Inspectable>> itemsRef;
+		juce::Array<juce::WeakReference<BaseItem>> baseItems;
 		juce::StringArray itemsShortName;
 
 		juce::Array<BaseItem*> getItems();
+
 	};
 
 	class AddItemsAction :
@@ -220,7 +229,7 @@ protected:
 	virtual void loadJSONDataManagerInternal(juce::var data);
 
 	virtual void getRemoteControlDataInternal(juce::var& data) override;
-	
+
 	virtual void addItemManagerInternal(BaseItem* item, juce::var data) {}
 	virtual void addItemsManagerInternal(juce::Array<BaseItem*> items, juce::var data) {}
 	virtual void removeItemManagerInternal(BaseItem* item) {}

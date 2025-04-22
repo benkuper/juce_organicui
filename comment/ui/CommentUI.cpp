@@ -13,7 +13,7 @@
 using namespace juce;
 
 CommentUI::CommentUI(CommentItem* comment) :
-	BaseItemMinimalUI(comment),
+	ItemMinimalUI<CommentItem>(comment),
 	resizer(this, nullptr)
 {
 	bgColor = item->itemColor->getColor().darker().withAlpha(item->bgAlpha->floatValue());
@@ -56,7 +56,7 @@ CommentUI::~CommentUI()
 
 void CommentUI::paint(Graphics& g)
 {
-	BaseItemMinimalUI::paint(g);
+	ItemMinimalUI::paint(g);
 
 
 	//if (inspectable.wasObjectDeleted()) return;
@@ -83,11 +83,11 @@ void CommentUI::resized()
 
 void CommentUI::mouseDown(const MouseEvent& e)
 {
-	BaseItemMinimalUI::mouseDown(e);
+	ItemMinimalUI::mouseDown(e);
 
 	if (e.eventComponent == &resizer)
 	{
-		this->baseItem->setSizeReference(true);
+		this->item->setSizeReference(true);
 	}
 }
 
@@ -99,28 +99,28 @@ void CommentUI::mouseDrag(const MouseEvent& e)
 	}
 	else
 	{
-		BaseItemMinimalUI::mouseDrag(e);
+		ItemMinimalUI::mouseDrag(e);
 
 		if (e.eventComponent == &resizer)
 		{
-			itemMinimalUIListeners.call(&BaseItemMinimalUI<CommentItem>::ItemMinimalUIListener::itemUIResizeDrag, this, e.getOffsetFromDragStart());
+			itemMinimalUIListeners.call(&ItemMinimalUI<CommentItem>::ItemMinimalUIListener::itemUIResizeDrag, this, e.getOffsetFromDragStart());
 		}
 	}
 }
 
 void CommentUI::mouseUp(const MouseEvent& e)
 {
-	BaseItemMinimalUI::mouseDrag(e);
+	ItemMinimalUI::mouseDrag(e);
 
 	if (e.eventComponent == &resizer)
 	{
-		itemMinimalUIListeners.call(&BaseItemMinimalUI<CommentItem>::ItemMinimalUIListener::itemUIResizeEnd, this);
+		itemMinimalUIListeners.call(&ItemMinimalUI<CommentItem>::ItemMinimalUIListener::itemUIResizeEnd, this);
 	}
 }
 
 void CommentUI::mouseDoubleClick(const MouseEvent& e)
 {
-	BaseItemMinimalUI::mouseDoubleClick(e);
+	ItemMinimalUI::mouseDoubleClick(e);
 	textUI.setColour(textUI.backgroundColourId, Colours::black);
 	textUI.setInterceptsMouseClicks(true, true);
 	textUI.setReadOnly(false);
@@ -150,7 +150,7 @@ void CommentUI::textEditorFocusLost(TextEditor&)
 void CommentUI::focusLost(FocusChangeType type)
 {
 	disableTextEditor();
-	BaseItemMinimalUI::focusLost(type);
+	ItemMinimalUI::focusLost(type);
 }
 
 bool CommentUI::canStartDrag(const MouseEvent& e)
@@ -165,7 +165,7 @@ void CommentUI::inspectableSelectionChanged(Inspectable* i)
 		disableTextEditor();
 	}
 
-	BaseItemMinimalUI::inspectableSelectionChanged(i);
+	ItemMinimalUI::inspectableSelectionChanged(i);
 }
 
 void CommentUI::disableTextEditor()
@@ -178,7 +178,7 @@ void CommentUI::disableTextEditor()
 
 void CommentUI::controllableFeedbackUpdateInternal(Controllable* c)
 {
-	BaseItemMinimalUI::controllableFeedbackUpdateInternal(c);
+	ItemMinimalUI::controllableFeedbackUpdateInternal(c);
 
 	if (c == item->size || c == item->text)
 	{

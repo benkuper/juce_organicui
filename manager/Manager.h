@@ -43,7 +43,7 @@ public:
 
 	T* addItem(T* item = nullptr, juce::var data = juce::var(), bool addToUndo = true, bool notify = true); //if data is not empty, load data
 	G* addGroup(G* item = nullptr, juce::var data = juce::var(), bool addToUndo = true, bool notify = true); //if data is not empty, load data
-	
+
 	juce::Array<T*> addItems(juce::Array<T*> items, juce::var data = juce::var(), bool addToUndo = true, bool notify = true);
 	void addItemManagerInternal(BaseItem* item, juce::var data = juce::var()) override;
 	void addItemsManagerInternal(juce::Array<BaseItem*> item, juce::var data = juce::var()) override;
@@ -75,6 +75,11 @@ public:
 	virtual void removeGroupsInternal(juce::Array<G*>) {}
 
 	virtual void reorderItems() override; //to be overriden if needed
+
+	void notifyItemAdded(BaseItem* item);
+	void notifyItemsAdded(juce::Array<BaseItem*> items);
+	void notifyItemRemoved(BaseItem* item);
+	void notifyItemsRemoved(juce::Array<BaseItem*> items);
 	void notifyItemsReordered();
 
 	virtual juce::Array<T*> getItems(bool includeDisabled = true, bool recursive = true);
@@ -90,7 +95,7 @@ public:
 
 	void notifyAsync(BaseManagerEvent::Type type, juce::Array<BaseItem*> _items = juce::Array<BaseItem*>()) override;
 
-	typedef ManagerTListener<T> ManagerListener;
+	typedef ManagerTListener<T, G> ManagerListener;
 
 	juce::ListenerList<ManagerListener> managerListeners;
 	void addManagerListener(ManagerListener* newListener) { managerListeners.add(newListener); }
@@ -107,10 +112,32 @@ public:
 			BaseManagerEvent(type, items)
 		{
 		}
+
 		~ManagerEvent() {}
+
+		bool isGroup() const {
+			if (baseItems.isEmpty()) return false;
+			if (baseItems.getFirst().wasObjectDeleted()) return false;
+			return baseItems.getFirst()->isGroup;
+		}
 
 		juce::Array<T*> getItems() const;
 		T* getItem(int index = 0) const;
+
+		juce::Array<G*> getGroups() const;
+		G* getGroup(int index = 0) const;
+
+		juce::Array<BaseItem*> getBaseItems() const
+		{
+			juce::Array<BaseItem*> items;
+			for (auto& i : baseItems)
+			{
+				if (i == nullptr) continue;
+				if (i.wasObjectDeleted()) continue;
+				items.add(i);
+			}
+			return items;
+		}
 	};
 
 	using BManagerEvent = typename Manager<T, G>::ManagerEvent;
@@ -154,10 +181,10 @@ public:
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Manager);
 
-	juce::Array<T*> getArrayAsItems(juce::Array<BaseItem*> itemsRef) const
+	juce::Array<T*> getArrayAsItems(juce::Array<BaseItem*> baseItems) const
 	{
 		juce::Array<T*> result;
-		for (auto& i : itemsRef) if (T* it = dynamic_cast<T*>(i)) result.add(it);
+		for (auto& i : baseItems) if (T* it = dynamic_cast<T*>(i)) result.add(it);
 		return result;
 	}
 };
@@ -417,17 +444,73 @@ void Manager<T, G>::reorderItems()
 }
 
 template<class T, class G>
+void Manager<T, G>::notifyItemAdded(BaseItem* item)
+{
+	if (item->isGroup) managerListeners.call(&ManagerListener::groupAdded, (G*)item);
+	else managerListeners.call(&ManagerListener::itemAdded, (T*)item);
+
+	notifyAsync(ManagerEvent::ITEM_ADDED, (T*)item);
+}
+
+template<class T, class G>
+void Manager<T, G>::notifyItemsAdded(juce::Array<BaseItem*> items)
+{
+	if (items.isEmpty()) return;
+	juce::Array<T*> itemsToAdd;
+	juce::Array<G*> groupsToAdd;
+	for (auto& i : items)
+	{
+		if (T* it = dynamic_cast<T*>(i)) itemsToAdd.add(it);
+		else if (G* it = dynamic_cast<G*>(i)) groupsToAdd.add(it);
+	}
+	if (!itemsToAdd.isEmpty()) managerListeners.call(&ManagerListener::itemsAdded, itemsToAdd);
+	if (!groupsToAdd.isEmpty()) managerListeners.call(&ManagerListener::groupsAdded, groupsToAdd);
+
+	notifyAsync(ManagerEvent::ITEMS_ADDED, items);
+
+}
+
+
+template<class T, class G>
+void Manager<T, G>::notifyItemRemoved(BaseItem* item)
+{
+	if (item->isGroup) managerListeners.call(&ManagerListener::groupRemoved, (G*)item);
+	else managerListeners.call(&ManagerListener::itemRemoved, (T*)item);
+
+	notifyAsync(ManagerEvent::ITEM_REMOVED, (T*)item);
+}
+
+template<class T, class G>
+void Manager<T, G>::notifyItemsRemoved(juce::Array<BaseItem*> items)
+{
+	if (items.isEmpty()) return;
+	juce::Array<T*> itemsToRemove;
+	juce::Array<G*> groupsToRemove;
+	for (auto& i : items)
+	{
+		if (T* it = dynamic_cast<T*>(i)) itemsToRemove.add(it);
+		else if (G* it = dynamic_cast<G*>(i)) groupsToRemove.add(it);
+	}
+
+	if (!itemsToRemove.isEmpty()) managerListeners.call(&ManagerListener::itemsRemoved, itemsToRemove);
+	if (!groupsToRemove.isEmpty()) managerListeners.call(&ManagerListener::groupsRemoved, groupsToRemove);
+
+	notifyAsync(ManagerEvent::ITEMS_REMOVED, items);
+}
+
+template<class T, class G>
 void Manager<T, G>::notifyItemsReordered()
 {
 	managerListeners.call(&ManagerListener::itemsReordered);
+	notifyAsync(ManagerEvent::ITEMS_REORDERED);
 }
 
 template<class T, class G>
 juce::Array<T*> Manager<T, G>::getItems(bool includeDisabled, bool recursive)
 {
-	juce::Array<BaseItem*> itemsRef = BaseManager::getBaseItems(recursive, includeDisabled, false);
+	juce::Array<BaseItem*> baseItems = BaseManager::getBaseItems(recursive, includeDisabled, false);
 	juce::Array<T*> result;
-	for (auto& i : itemsRef) if (T* it = dynamic_cast<T*>(i)) result.add(it);
+	for (auto& i : baseItems) if (T* it = dynamic_cast<T*>(i)) result.add(it);
 	return result;
 }
 
@@ -479,7 +562,7 @@ void Manager<T, G>::getRemoteControlDataInternal(juce::var& data)
 template<class T, class G>
 void Manager<T, G>::notifyAsync(BaseManagerEvent::Type type, juce::Array<BaseItem*> _items)
 {
-	managerNotifier.addMessage(new ManagerEvent(BaseManagerEvent::ITEMS_REORDERED));
+	managerNotifier.addMessage(new ManagerEvent(type, _items));
 }
 
 
@@ -677,9 +760,9 @@ template<class T, class G>
 juce::Array<T*> Manager<T, G>::ManagerEvent::getItems() const
 {
 	juce::Array<T*> result;
-	for (auto& i : itemsRef)
+	for (auto& i : baseItems)
 	{
-		if (i != nullptr && !i.wasObjectDeleted()) result.add(dynamic_cast<T*>(i.get()));
+		if (i != nullptr && !i.wasObjectDeleted() && !i->isGroup) result.add(dynamic_cast<T*>(i.get()));
 	}
 	return result;
 }
@@ -687,7 +770,25 @@ juce::Array<T*> Manager<T, G>::ManagerEvent::getItems() const
 template<class T, class G>
 T* Manager<T, G>::ManagerEvent::getItem(int index) const
 {
-	if (itemsRef.size() > index && itemsRef[index] != nullptr && !itemsRef[index].wasObjectDeleted()) return static_cast<T*>(itemsRef[index].get());
+	if (baseItems.size() > index && baseItems[index] != nullptr && !baseItems[index].wasObjectDeleted()) return static_cast<T*>(baseItems[index].get());
+	return nullptr;
+}
+
+template<class T, class G>
+juce::Array<G*> Manager<T, G>::ManagerEvent::getGroups() const
+{
+	juce::Array<G*> result;
+	for (auto& i : baseItems)
+	{
+		if (i != nullptr && !i.wasObjectDeleted()) result.add(dynamic_cast<G*>(i.get()));
+	}
+	return result;
+}
+
+template<class T, class G>
+G* Manager<T, G>::ManagerEvent::getGroup(int index) const
+{
+	if (baseItems.size() > index && baseItems[index] != nullptr && !baseItems[index].wasObjectDeleted()) return static_cast<G*>(baseItems[index].get());
 	return nullptr;
 }
 

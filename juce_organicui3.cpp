@@ -39,6 +39,10 @@
 #include "manager/ui/GenericControllableItemEditor.cpp" 
 #include "manager/ui/BaseItemEditor.cpp"
 
+#include "manager/ui/BaseItemMinimalUI.cpp"
+#include "manager/ui/BaseItemUI.cpp"
+#include "manager/ui/BaseManagerUI.cpp"
+
 #include "outliner/Outliner.cpp"
 
 #include "progress/ProgressNotifier.cpp"

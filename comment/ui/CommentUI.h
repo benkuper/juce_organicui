@@ -11,7 +11,7 @@
 #pragma once
 
 class CommentUI :
-	public BaseItemMinimalUI<CommentItem>,
+	public ItemMinimalUI<CommentItem>,
 	public juce::TextEditor::Listener
 {
 public:

@@ -52,7 +52,7 @@ void DashboardCommentItemUI::updateEditModeInternal(bool editMode)
 
 void DashboardCommentItemUI::mouseDown(const MouseEvent& e)
 {
-	BaseItemMinimalUI::mouseDown(e);
+	ItemMinimalUI::mouseDown(e);
 }
 
 void DashboardCommentItemUI::mouseDrag(const MouseEvent& e)
@@ -63,13 +63,13 @@ void DashboardCommentItemUI::mouseDrag(const MouseEvent& e)
 	}
 	else
 	{
-		BaseItemMinimalUI::mouseDrag(e);
+		ItemMinimalUI::mouseDrag(e);
 	}
 }
 
 void DashboardCommentItemUI::mouseDoubleClick(const MouseEvent& e)
 {
-	BaseItemMinimalUI::mouseDoubleClick(e);
+	ItemMinimalUI::mouseDoubleClick(e);
 	textUI.setColour(textUI.backgroundColourId, Colours::black);
 	textUI.setInterceptsMouseClicks(true, true);
 	textUI.setReadOnly(false);
@@ -99,7 +99,7 @@ void DashboardCommentItemUI::textEditorFocusLost(TextEditor&)
 void DashboardCommentItemUI::focusLost(FocusChangeType type)
 {
 	disableTextEditor();
-	BaseItemMinimalUI::focusLost(type);
+	ItemMinimalUI::focusLost(type);
 }
 
 bool DashboardCommentItemUI::canStartDrag(const MouseEvent& e)
@@ -114,7 +114,7 @@ void DashboardCommentItemUI::inspectableSelectionChanged(Inspectable* i)
 		disableTextEditor();
 	}
 
-	BaseItemMinimalUI::inspectableSelectionChanged(i);
+	ItemMinimalUI::inspectableSelectionChanged(i);
 }
 
 void DashboardCommentItemUI::disableTextEditor()
@@ -127,7 +127,7 @@ void DashboardCommentItemUI::disableTextEditor()
 
 void DashboardCommentItemUI::controllableFeedbackUpdateInternal(Controllable* c)
 {
-	BaseItemMinimalUI::controllableFeedbackUpdateInternal(c);
+	ItemMinimalUI::controllableFeedbackUpdateInternal(c);
 
 	if (c == comment->size || c == comment->text)
 	{

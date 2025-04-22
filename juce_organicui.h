@@ -280,12 +280,13 @@ static juce::String getTypeStringStatic() { return type; }
 
 #include "manager/ui/BaseItemMinimalUI.h"
 #include "manager/ui/BaseItemUI.h"
+#include "manager/ui/ItemUI.h"
 #include "manager/ui/BaseItemEditor.h"
 #include "manager/ui/GenericManagerEditor.h"
 
 #include "manager/Manager.h"
 #include "manager/ItemGroup.h"
-
+#include "manager/ui/BaseManagerUI.h"
 #include "manager/ui/ManagerUI.h"
 #include "manager/ui/ManagerViewMiniPane.h"
 #include "manager/ui/ManagerViewUI.h"

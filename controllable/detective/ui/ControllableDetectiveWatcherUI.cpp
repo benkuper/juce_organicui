@@ -1,6 +1,6 @@
 
 ControllableDetectiveWatcherUI::ControllableDetectiveWatcherUI(ControllableDetectiveWatcher* watcher) :
-	BaseItemUI(watcher, Direction::VERTICAL),
+	ItemUI<ControllableDetectiveWatcher>(watcher, Direction::VERTICAL),
 	targetUI(watcher->target),
 	watchTimeUI(watcher->watchTime),
 	snapshotMode(false)
@@ -20,7 +20,7 @@ ControllableDetectiveWatcherUI::~ControllableDetectiveWatcherUI()
 
 void ControllableDetectiveWatcherUI::paint(Graphics& g)
 {
-	BaseItemUI::paint(g);
+	ItemUI::paint(g);
 	if (item->editorIsCollapsed) return;
 	g.setColour(BG_COLOR);
 	g.fillRect(canvasRect);
@@ -49,7 +49,7 @@ void ControllableDetectiveWatcherUI::resizedInternalContent(juce::Rectangle<int>
 
 void ControllableDetectiveWatcherUI::controllableFeedbackUpdateInternal(Controllable* c)
 {
-	BaseItemUI::controllableFeedbackUpdateInternal(c);
+	ItemUI::controllableFeedbackUpdateInternal(c);
 	if (c == item->enabled || c == item->target)
 	{
 		if (item->enabled->boolValue() && (item->controllable != nullptr && !item->controllable.wasObjectDeleted()))
