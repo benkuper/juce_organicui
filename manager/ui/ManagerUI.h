@@ -53,6 +53,8 @@ public:
 
 	U* getUIForItem(T* item, bool directIndexAccess = true);
 
+	virtual void showMenuAndAddItem(bool isFromAddButton, juce::Point<int> mouseDownPos, std::function<void(BaseItem*)> callback) override;
+
 	virtual juce::Component* getSelectableComponentForBaseItemUI(BaseItemMinimalUI* itemUI) override;
 	virtual juce::Component* getSelectableComponentForItemUI(U* itemUI);
 
@@ -162,6 +164,31 @@ template<class M, class T, class U, class G>
 U* ManagerUI<M, T, U, G>::getUIForItem(T* item, bool directIndexAccess)
 {
 	return (U*)getBaseUIForItem(item, directIndexAccess);
+}
+
+template<class M, class T, class U, class G>
+void ManagerUI<M, T, U, G>::showMenuAndAddItem(bool isFromAddButton, juce::Point<int> mouseDownPos, std::function<void(BaseItem*)> callback)
+{
+	if (manager->managerFactory != nullptr)
+	{
+		manager->managerFactory->showCreateMenu(manager, [this, isFromAddButton, mouseDownPos, callback](T* item)
+			{
+				this->addItemFromMenu(item, isFromAddButton, mouseDownPos);
+				if (callback != nullptr) callback(item);
+
+			}
+		);
+		return;
+	}
+
+	if (isFromAddButton)
+	{
+		T* item = manager->Manager<T>::addItem();
+		if (callback != nullptr) callback(item);
+		return;
+	}
+
+	BaseManagerUI::showMenuAndAddItem(item, isFromAddButton, mouseDownPos);
 }
 
 template<class M, class T, class U, class G>
