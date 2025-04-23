@@ -404,13 +404,13 @@ void GenericManagerEditor<T>::itemDropped(const SourceDetails& dragSourceDetails
 				juce::var data = item->getJSONData();
 				if (droppingIndex != -1) data.getDynamicObject()->setProperty("index", droppingIndex);
 
-				if (T* newItem = this->manager->createItemFromData(data))
+				if (BaseItem* newItem = this->manager->createItemFromData(data))
 				{
 					juce::Array<juce::UndoableAction*> actions;
-					actions.add(this->manager->getAddItemUndoableAction(newItem, data));
+					actions.add(this->manager->getAddBaseItemUndoableAction(newItem, data));
 					if (Manager<T>* sourceManager = dynamic_cast<Manager<T> *>(tItem->parentContainer.get()))
 					{
-						actions.addArray(sourceManager->getRemoveItemUndoableAction(tItem));
+						actions.addArray(sourceManager->getRemoveBaseItemUndoableAction(tItem));
 					}
 
 					UndoMaster::getInstance()->performActions("Move " + item->niceName, actions);

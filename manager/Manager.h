@@ -36,10 +36,9 @@ public:
 
 
 	virtual T* createItem(); //to override if special constructor to use
-	virtual T* createItemFromData(juce::var data) override;
-
 	virtual G* createGroup(); //to override if special constructor to use
 
+	virtual BaseItem* createItemFromData(juce::var data) override;
 
 	T* addItem(T* item = nullptr, juce::var data = juce::var(), bool addToUndo = true, bool notify = true); //if data is not empty, load data
 	G* addGroup(G* item = nullptr, juce::var data = juce::var(), bool addToUndo = true, bool notify = true); //if data is not empty, load data
@@ -47,9 +46,9 @@ public:
 	juce::Array<T*> addItems(juce::Array<T*> items, juce::var data = juce::var(), bool addToUndo = true, bool notify = true);
 	void addItemManagerInternal(BaseItem* item, juce::var data = juce::var()) override;
 	void addItemsManagerInternal(juce::Array<BaseItem*> item, juce::var data = juce::var()) override;
-	virtual T* addItemFromData(juce::var data, bool addToUndo = true);
-	virtual juce::Array<T*> addItemsFromData(juce::var data, bool addToUndo = true);
-	virtual juce::Array<T*> addItemsFromClipboard(bool showWarning = true);
+	//virtual T* addItemFromData(juce::var data, bool addToUndo = true);
+	//virtual juce::Array<T*> addItemsFromData(juce::var data, bool addToUndo = true);
+	//virtual juce::Array<T*> addItemsFromClipboard(bool showWarning = true);
 
 	bool canAddItemOfType(const juce::String& typeToCheck) override;
 
@@ -178,15 +177,17 @@ public:
 	static juce::var getItemAfterFromScript(const juce::var::NativeFunctionArgs& args);
 	static juce::var reorderItemsFromScript(const juce::var::NativeFunctionArgs& args);
 
-private:
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Manager);
-
 	juce::Array<T*> getArrayAsItems(juce::Array<BaseItem*> baseItems) const
 	{
 		juce::Array<T*> result;
 		for (auto& i : baseItems) if (T* it = dynamic_cast<T*>(i)) result.add(it);
 		return result;
 	}
+
+private:
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Manager);
+
+	
 };
 
 
@@ -247,8 +248,14 @@ T* Manager<T, G>::createItem()
 }
 
 template<class T, class G>
-T* Manager<T, G>::createItemFromData(juce::var data)
+BaseItem* Manager<T, G>::createItemFromData(juce::var data)
 {
+	if (canHaveGroups)
+	{
+		bool isGroup = data.getProperty("type", "").toString() == "ItemGroup";
+		if (isGroup) return createGroup();
+	}
+
 	if (managerFactory != nullptr)
 	{
 		juce::String extendedType = data.getProperty("extendedType", "");
@@ -265,6 +272,7 @@ T* Manager<T, G>::createItemFromData(juce::var data)
 		if (type.isEmpty()) return nullptr;
 		return managerFactory->create(type);
 	}
+
 
 	return createItem();
 }
@@ -340,25 +348,25 @@ void Manager<T, G>::addItemsManagerInternal(juce::Array<BaseItem*> item, juce::v
 	addItemsInternal(itemsToAdd, data);
 }
 
-template<class T, class G>
-T* Manager<T, G>::addItemFromData(juce::var data, bool addToUndo)
-{
-	return (T*)BaseManager::addItemFromData(data, addToUndo);
-}
-
-template<class T, class G>
-juce::Array<T*> Manager<T, G>::addItemsFromData(juce::var data, bool addToUndo)
-{
-	juce::Array<BaseItem*> itemsAdded = BaseManager::addBaseItemsFromData(data, addToUndo);
-	return getArrayAsItems(itemsAdded);
-}
-
-template<class T, class G>
-juce::Array<T*> Manager<T, G>::addItemsFromClipboard(bool showWarning)
-{
-	juce::Array<BaseItem*> itemsAdded = BaseManager::addBaseItemsFromClipboard(showWarning);
-	return getArrayAsItems(itemsAdded);
-}
+//template<class T, class G>
+//T* Manager<T, G>::addItemFromData(juce::var data, bool addToUndo)
+//{
+//	return (T*)BaseManager::addItemFromData(data, addToUndo);
+//}
+//
+//template<class T, class G>
+//juce::Array<T*> Manager<T, G>::addItemsFromData(juce::var data, bool addToUndo)
+//{
+//	juce::Array<BaseItem*> itemsAdded = BaseManager::addBaseItemsFromData(data, addToUndo);
+//	return getArrayAsItems(itemsAdded);
+//}
+//
+//template<class T, class G>
+//juce::Array<T*> Manager<T, G>::addItemsFromClipboard(bool showWarning)
+//{
+//	juce::Array<BaseItem*> itemsAdded = BaseManager::addBaseItemsFromClipboard(showWarning);
+//	return getArrayAsItems(itemsAdded);
+//}
 
 template<class T, class G>
 bool Manager<T, G>::canAddItemOfType(const juce::String& typeToCheck)
@@ -402,7 +410,7 @@ void Manager<T, G>::removeItemsManagerInternal(juce::Array<BaseItem*> item)
 template<class T, class G>
 juce::UndoableAction* Manager<T, G>::getAddItemUndoableAction(T* item, juce::var data)
 {
-	return BaseManager::getAddItemUndoableAction(item, data);
+	return BaseManager::getAddBaseItemUndoableAction(item, data);
 }
 
 template<class T, class G>
@@ -410,13 +418,13 @@ juce::UndoableAction* Manager<T, G>::getAddItemsUndoableAction(juce::Array<T*> _
 {
 	juce::Array<BaseItem*> itemsToAdd;
 	for (auto& i : _items) if (BaseItem* it = dynamic_cast<BaseItem*>(i)) itemsToAdd.add(it);
-	return BaseManager::getAddItemsUndoableAction(itemsToAdd, data);
+	return BaseManager::getAddBaseItemsUndoableAction(itemsToAdd, data);
 }
 
 template<class T, class G>
 juce::Array<juce::UndoableAction*> Manager<T, G>::getRemoveItemUndoableAction(T* item)
 {
-	return BaseManager::getRemoveItemUndoableAction(item);
+	return BaseManager::getRemoveBaseItemUndoableAction(item);
 }
 
 template<class T, class G>
@@ -424,7 +432,7 @@ juce::Array<juce::UndoableAction*> Manager<T, G>::getRemoveItemsUndoableAction(j
 {
 	juce::Array<BaseItem*> itemsToRemove;
 	for (auto& i : _items) if (BaseItem* it = dynamic_cast<BaseItem*>(i)) itemsToRemove.add(it);
-	return BaseManager::getRemoveItemsUndoableAction(itemsToRemove);
+	return BaseManager::getRemoveBaseItemsUndoableAction(itemsToRemove);
 }
 
 template<class T, class G>

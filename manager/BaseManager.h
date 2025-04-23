@@ -48,8 +48,8 @@ public:
 
 	virtual BaseItem* createItemFromData(juce::var data) = 0;
 	virtual BaseItem* addItemFromData(juce::var data, bool addToUndo = true);
-	virtual juce::Array<BaseItem*> addBaseItemsFromData(juce::var data, bool addToUndo = true);
-	virtual juce::Array<BaseItem*> addBaseItemsFromClipboard(bool showWarning = true);
+	virtual juce::Array<BaseItem*> addItemsFromData(juce::var data, bool addToUndo = true);
+	virtual juce::Array<BaseItem*> addItemsFromClipboard(bool showWarning = true);
 
 	virtual bool canAddItemOfType(const juce::String& typeToCheck);
 	virtual void loadItemsData(juce::var data);
@@ -59,10 +59,10 @@ public:
 	void removeItems(juce::Array<BaseItem*> items, bool addToUndo = true, bool notify = true);
 
 	//Undo
-	virtual juce::UndoableAction* getAddItemUndoableAction(BaseItem* item = nullptr, juce::var data = juce::var());
-	virtual juce::UndoableAction* getAddItemsUndoableAction(juce::Array<BaseItem*> item = nullptr, juce::var data = juce::var());
-	virtual juce::Array<juce::UndoableAction*> getRemoveItemUndoableAction(BaseItem* item);
-	virtual juce::Array<juce::UndoableAction*> getRemoveItemsUndoableAction(juce::Array<BaseItem*> items);
+	virtual juce::UndoableAction* getAddBaseItemUndoableAction(BaseItem* item = nullptr, juce::var data = juce::var());
+	virtual juce::UndoableAction* getAddBaseItemsUndoableAction(juce::Array<BaseItem*> item = nullptr, juce::var data = juce::var());
+	virtual juce::Array<juce::UndoableAction*> getRemoveBaseItemUndoableAction(BaseItem* item);
+	virtual juce::Array<juce::UndoableAction*> getRemoveBaseItemsUndoableAction(juce::Array<BaseItem*> items);
 
 	//Ordering
 	virtual void reorderItems() {}

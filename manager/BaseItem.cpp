@@ -9,6 +9,7 @@
 */
 
 #include "JuceHeader.h"
+#include "BaseItem.h"
 
 BaseItem::BaseItem(const String& name, bool _canBeDisabled, bool _canHaveScripts, bool isGroup) :
 	EnablingControllableContainer(name.isEmpty() ? getTypeString() : name, _canBeDisabled),
@@ -384,6 +385,25 @@ void BaseItem::onControllableFeedbackUpdate(ControllableContainer* cc, Controlla
 //	for (auto& script : scripts) script->warningResolveInspectable = this;
 //
 //}
+
+juce::StringArray BaseItem::getBreadCrumb()
+{
+	StringArray result;
+	result.add(niceName);
+	BaseItemGroup* g = ControllableUtil::findParentAs<BaseItemGroup>(this, 2);
+
+	while (g != nullptr)
+	{
+		if (BaseItem* bi = dynamic_cast<BaseItem*>(g))
+		{
+			result.insert(0, bi->niceName);
+			g = ControllableUtil::findParentAs<BaseItemGroup>(bi, 2);
+		}
+		else break;
+	}
+
+	return result;
+}
 
 void BaseItem::setHasCustomColor(bool value)
 {

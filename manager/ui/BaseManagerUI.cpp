@@ -843,10 +843,10 @@ void BaseManagerUI::itemDropped(const SourceDetails& dragSourceDetails)
 					if (BaseItem* newItem = this->baseManager->createItemFromData(data))
 					{
 						Array<UndoableAction*> actions;
-						actions.add(this->baseManager->getAddItemUndoableAction(newItem, data));
+						actions.add(this->baseManager->getAddBaseItemUndoableAction(newItem, data));
 						if (BaseManager* sourceManager = dynamic_cast<BaseManager*>(item->parentContainer.get()))
 						{
-							actions.addArray(sourceManager->getRemoveItemUndoableAction(item));
+							actions.addArray(sourceManager->getRemoveBaseItemUndoableAction(item));
 						}
 						UndoMaster::getInstance()->performActions("Move " + item->niceName, actions);
 					}

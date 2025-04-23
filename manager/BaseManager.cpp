@@ -125,7 +125,7 @@ BaseItem* BaseManager::addItemFromData(var data, bool addToUndo)
 	return addItem(item, data, addToUndo, true);
 }
 
-Array<BaseItem*> BaseManager::addBaseItemsFromData(var data, bool addToUndo)
+Array<BaseItem*> BaseManager::addItemsFromData(var data, bool addToUndo)
 {
 	Array<BaseItem*> itemsToAdd;
 
@@ -141,7 +141,7 @@ Array<BaseItem*> BaseManager::addBaseItemsFromData(var data, bool addToUndo)
 	return addItems(itemsToAdd, itemsData, addToUndo);
 }
 
-Array<BaseItem*> BaseManager::addBaseItemsFromClipboard(bool showWarning)
+Array<BaseItem*> BaseManager::addItemsFromClipboard(bool showWarning)
 {
 	if (!userCanAddItemsManually) return Array<BaseItem*>();
 	String s = SystemClipboard::getTextFromClipboard();
@@ -173,7 +173,7 @@ Array<BaseItem*> BaseManager::addBaseItemsFromClipboard(bool showWarning)
 		}
 	}
 
-	Array<BaseItem*> copiedItems = addBaseItemsFromData(itemsData);
+	Array<BaseItem*> copiedItems = addItemsFromData(itemsData);
 
 	if (!clipboardCopyOffset.isOrigin())
 	{
@@ -214,7 +214,7 @@ BaseItem* BaseManager::removeItem(BaseItem* item, bool addToUndo, bool notify, b
 	{
 		if (Engine::mainEngine != nullptr && !Engine::mainEngine->isLoadingFile)
 		{
-			UndoMaster::getInstance()->performActions("Remove " + item->getTypeString(), getRemoveItemUndoableAction(item));
+			UndoMaster::getInstance()->performActions("Remove " + item->getTypeString(), getRemoveBaseItemUndoableAction(item));
 			return nullptr;
 		}
 	}
@@ -245,7 +245,7 @@ void BaseManager::removeItems(Array<BaseItem*> itemsToRemove, bool addToUndo, bo
 	isManipulatingMultipleItems = true;
 	if (addToUndo)
 	{
-		Array<UndoableAction*> a = getRemoveItemsUndoableAction(itemsToRemove);
+		Array<UndoableAction*> a = getRemoveBaseItemsUndoableAction(itemsToRemove);
 		UndoMaster::getInstance()->performActions("Remove " + String(itemsToRemove.size()) + " items", a);
 		isManipulatingMultipleItems = false;
 		return;
@@ -270,7 +270,7 @@ void BaseManager::removeItems(Array<BaseItem*> itemsToRemove, bool addToUndo, bo
 	isManipulatingMultipleItems = false;
 }
 
-UndoableAction* BaseManager::getAddItemUndoableAction(BaseItem* item, var data)
+UndoableAction* BaseManager::getAddBaseItemUndoableAction(BaseItem* item, var data)
 {
 	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile) return nullptr;
 	jassert(baseItems.indexOf(item) == -1); //be sure item is no here already
@@ -278,14 +278,14 @@ UndoableAction* BaseManager::getAddItemUndoableAction(BaseItem* item, var data)
 	return new AddItemAction(this, item, data);
 }
 
-UndoableAction* BaseManager::getAddItemsUndoableAction(Array<BaseItem*> _items, var data)
+UndoableAction* BaseManager::getAddBaseItemsUndoableAction(Array<BaseItem*> _items, var data)
 {
 	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile) return nullptr;
 	if (_items.size() == 0) return nullptr;
 	return new AddItemsAction(this, _items, data);
 }
 
-Array<UndoableAction*> BaseManager::getRemoveItemUndoableAction(BaseItem* item)
+Array<UndoableAction*> BaseManager::getRemoveBaseItemUndoableAction(BaseItem* item)
 {
 	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile) return nullptr;
 	Array<UndoableAction*> a;
@@ -293,7 +293,7 @@ Array<UndoableAction*> BaseManager::getRemoveItemUndoableAction(BaseItem* item)
 	return a;
 }
 
-Array<UndoableAction*> BaseManager::getRemoveItemsUndoableAction(Array<BaseItem*> _items)
+Array<UndoableAction*> BaseManager::getRemoveBaseItemsUndoableAction(Array<BaseItem*> _items)
 {
 	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile) return nullptr;
 	Array<UndoableAction*> a;
@@ -348,8 +348,7 @@ BaseItem* BaseManager::getItemWithName(const juce::String& itemShortName, bool s
 		else if (searchNiceNameToo && ((BaseItem*)t)->niceName == itemShortName) return t;
 		else if (recursive && ((BaseItem*)t)->isGroup)
 		{
-			auto* group = (BaseItemGroup*)t;
-			if (group) return group->baseManager->getItemWithName(itemShortName, searchNiceNameToo, searchWithLowerCaseIfNotFound, recursive);
+			if (auto group = dynamic_cast<BaseItemGroup*>(t)) return group->baseManager->getItemWithName(itemShortName, searchNiceNameToo, searchWithLowerCaseIfNotFound, recursive);
 		}
 	}
 
@@ -369,15 +368,15 @@ Array<BaseItem*> BaseManager::getBaseItems(bool recursive, bool includeDisabled,
 	Array<BaseItem*> result;
 	for (auto& i : baseItems)
 	{
-		if (i->canBeDisabled && (i->enabled->boolValue() || includeDisabled)) continue;
+		if (i->canBeDisabled && !i->enabled->boolValue() && !includeDisabled) continue;
 
 		if (i->isGroup)
 		{
 			if (includeGroups) result.add((BaseItem*)i);
 			if (recursive)
 			{
-				auto* group = (BaseItemGroup*)i;
-				if (group) group->baseManager->getBaseItems(recursive, includeGroups);
+				if (auto group = dynamic_cast<BaseItemGroup*>(i)) 
+					result.addArray(group->baseManager->getBaseItems(recursive, includeDisabled, includeGroups));
 			}
 		}
 		else
@@ -433,7 +432,7 @@ void BaseManager::askForDuplicateItem(BaseItem* item)
 }
 void BaseManager::askForPaste()
 {
-	addBaseItemsFromClipboard();
+	addItemsFromClipboard();
 }
 void BaseManager::askForMoveBefore(BaseItem* item)
 {
@@ -541,7 +540,7 @@ void BaseManager::loadJSONDataManagerInternal(var data)
 	var itemsData = data.getProperty("items", var());
 	if (itemsData.isVoid()) return;
 
-	addBaseItemsFromData(itemsData, false);
+	addItemsFromData(itemsData, false);
 }
 
 var BaseManager::getRemoteControlData()
@@ -769,7 +768,7 @@ bool BaseManager::AddItemsAction::perform()
 	if (!iList.isEmpty()) m->addItems(iList, this->data, false);
 	else if (!this->data.isVoid())
 	{
-		Array<BaseItem*> newList = m->addBaseItemsFromData(this->data, false);
+		Array<BaseItem*> newList = m->addItemsFromData(this->data, false);
 		this->baseItems.clear();
 		for (auto& i : newList) this->baseItems.add(i);
 	}
@@ -837,7 +836,7 @@ bool BaseManager::RemoveItemsAction::undo()
 	BaseManager* m = this->getManager();
 	if (m == nullptr) return false;
 
-	Array<BaseItem*> iList = m->addBaseItemsFromData(this->data, false);
+	Array<BaseItem*> iList = m->addItemsFromData(this->data, false);
 
 	this->itemsShortName.clear();
 	for (auto& i : iList) this->itemsShortName.add(i != nullptr ? i->shortName : "");

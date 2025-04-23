@@ -81,8 +81,6 @@ public:
 	void addResizeToUndoManager(bool addOtherSelectedItems = false);
 	virtual void addUndoableResizeAction(juce::Array<juce::UndoableAction*>& arrayToAdd);
 
-
-
 	//listeners
 	virtual void onContainerParameterChanged(Parameter *) override;
 	virtual void onContainerTriggerTriggered(Trigger *) override;
@@ -92,6 +90,8 @@ public:
 
 	//void itemAdded(Script* script) override;
 	//void itemsAdded(juce::Array<Script*> scripts) override;
+
+	juce::StringArray getBreadCrumb();
 
 	void setHasCustomColor(bool value);
 
@@ -105,6 +105,7 @@ public:
 	virtual juce::String getTypeString() const { return "BaseItem"; };
 	static juce::var getTypeStringFromScript(const juce::var::NativeFunctionArgs& a);
 	juce::String getScriptTargetString() override;
+
 
 	DECLARE_INSPECTACLE_SAFE_LISTENER(BaseItem, baseItem)
 

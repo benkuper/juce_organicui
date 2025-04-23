@@ -372,12 +372,13 @@ void Automation::removeItemsInternal(Array<AutomationKey*>)
 	updateNextKeys();
 }
 
-Array<AutomationKey*> Automation::addItemsFromClipboard(bool showWarning)
+Array<BaseItem*> Automation::addItemsFromClipboard(bool showWarning)
 {
-	Array<AutomationKey*> keys = Manager::addItemsFromClipboard(showWarning);
+	Array<BaseItem*> bItems = Manager::addItemsFromClipboard(showWarning);
+	Array<AutomationKey*> keys = getArrayAsItems(bItems);
 
-	if (keys.isEmpty()) return keys;
-	if (keys[0] == nullptr) return Array<AutomationKey*>();
+	if (keys.isEmpty()) return bItems;
+	if (keys[0] == nullptr) return Array<BaseItem*>();
 
 	float minTime = keys[0]->position->floatValue();
 	for (auto& b : keys)
@@ -405,7 +406,7 @@ Array<AutomationKey*> Automation::addItemsFromClipboard(bool showWarning)
 
 	reorderItems();
 
-	return keys;
+	return bItems;
 }
 
 Array<UndoableAction*> Automation::getMoveKeysBy(float start, float offset)

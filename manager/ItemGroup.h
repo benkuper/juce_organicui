@@ -54,8 +54,13 @@ public:
 		ItemGroup<T>(_manager, name),
 		BaseItem(name, true, true, true)
 	{
+		this->saveAndLoadRecursiveData = true;
+		this->setHasCustomColor(true);
 		this->addChildControllableContainer(this->manager, true, 0);
+		this->itemDataType = "ItemGroup";
 	}
+	
+	virtual ~ItemBaseGroup() {}
 
 	virtual void clearItem() override
 	{
@@ -63,5 +68,5 @@ public:
 		this->manager->clear();
 	}
 
-	virtual ~ItemBaseGroup() {}
+	virtual juce::String getTypeString() const override { return "ItemGroup"; }
 };

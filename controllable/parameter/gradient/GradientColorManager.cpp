@@ -222,12 +222,13 @@ void GradientColorManager::removeItemInternal(GradientColor *)
 	updateCurrentColor();
 }
 
-Array<GradientColor*> GradientColorManager::addItemsFromClipboard(bool showWarning)
+Array<BaseItem*> GradientColorManager::addItemsFromClipboard(bool showWarning)
 {
-	Array<GradientColor*> keys = Manager::addItemsFromClipboard(showWarning);
+	Array<BaseItem*> bItems = Manager::addItemsFromClipboard(showWarning);
+	Array<GradientColor*> keys = getArrayAsItems(bItems);
 
-	if (keys.isEmpty()) return keys;
-	if (keys[0] == nullptr) return Array<GradientColor*>();
+	if (keys.isEmpty()) return bItems;
+	if (keys[0] == nullptr) return Array<BaseItem*>();
 
 	float minTime = keys[0]->position->floatValue();
 	for (auto& b : keys)
@@ -255,7 +256,7 @@ Array<GradientColor*> GradientColorManager::addItemsFromClipboard(bool showWarni
 
 	reorderItems();
 
-	return keys;
+	return bItems;
 }
 
 void GradientColorManager::reorderItems()

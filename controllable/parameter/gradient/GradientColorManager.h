@@ -62,7 +62,7 @@ public:
     void addItemInternal(GradientColor * item, juce::var data) override;
 	void removeItemInternal(GradientColor * item) override;
 
-	juce::Array<GradientColor*> addItemsFromClipboard(bool showWarning = false) override;
+	juce::Array<BaseItem*> addItemsFromClipboard(bool showWarning = false) override;
 
 	
 	void reorderItems() override;

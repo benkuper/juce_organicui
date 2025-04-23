@@ -58,7 +58,7 @@ public:
 	void removeItemInternal(AutomationKey* k) override;
 	void removeItemsInternal(juce::Array<AutomationKey*> keys) override;
 
-	juce::Array<AutomationKey*> addItemsFromClipboard(bool showWarning = false) override;
+	juce::Array<BaseItem*> addItemsFromClipboard(bool showWarning = false) override;
 
 	juce::Array<juce::UndoableAction*> getMoveKeysBy(float start, float offset);
 	juce::Array<juce::UndoableAction*> getRemoveTimespan(float start, float end);
