@@ -54,7 +54,7 @@ public:
 		ItemGroup<T>(_manager, name),
 		BaseItem(name, true, true, true)
 	{
-		this->addChildControllableContainer(manager, true, 0);
+		this->addChildControllableContainer(this->manager, true, 0);
 	}
 
 	virtual void clearItem() override
