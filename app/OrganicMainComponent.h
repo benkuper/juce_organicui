@@ -44,7 +44,7 @@ public:
 
 
 	//Override panel create functions
-	virtual Outliner* createOutliner(const juce::String& contentName) { return new Outliner(contentName); }
+	virtual Outliner* createOutliner(const juce::String& _contentName) { return new Outliner(_contentName); }
 
 	// inherited from MenuBarModel , ApplicationCommandTarget
 	ApplicationCommandTarget* getNextCommandTarget() override { return findFirstTargetParentComponent(); }

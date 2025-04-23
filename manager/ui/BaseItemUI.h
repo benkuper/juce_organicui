@@ -10,6 +10,8 @@
 
 #pragma once
 
+class BaseManagerUI;
+
 class BaseItemUI :
 	public BaseItemMinimalUI,
 	public juce::Button::Listener,
@@ -26,7 +28,6 @@ public:
 	//LAYOUT
 	int margin;
 	int minContentHeight;
-
 
 	juce::Point<float> sizeAtMouseDown;
 
@@ -78,7 +79,11 @@ public:
 
 	juce::Array<juce::Component*> contentComponents;
 
+	std::unique_ptr<BaseManagerUI> groupManagerUI; //if it's a group
+	bool showGroupManager;
+
 	void setContentSize(int contentWidth, int contentHeight);
+	void setShowGroupManager(bool value);
 
 	//minimode
 	int getHeightWithoutContent();
@@ -86,13 +91,15 @@ public:
 	virtual void updateMiniModeUI();
 	virtual void updateItemUISize() override;
 
-	//void setGrabber(Grabber * newGrabber);
-
 	virtual void resized() override;
 	virtual void resizedHeader(juce::Rectangle<int>& r);
 	virtual void resizedInternalHeader(juce::Rectangle<int>&) {}
+	virtual void resizedContent(juce::Rectangle<int>&);
 	virtual void resizedInternalContent(juce::Rectangle<int>&) {}
 	virtual void resizedInternalFooter(juce::Rectangle<int>&) {}
+
+	virtual void updateGroupManagerBounds();
+
 	virtual void buttonClicked(juce::Button* b) override;
 
 	virtual void mouseDown(const juce::MouseEvent& e) override;
@@ -109,9 +116,12 @@ public:
 
 	virtual void newMessage(const Parameter::ParameterEvent& e) override;
 
+	void childBoundsChanged(Component* c) override;
 	virtual void visibilityChanged() override;
 
 	virtual void componentVisibilityChanged(juce::Component& c) override;
+
+	virtual BaseManagerUI* createGroupManagerUI();
 
 	class ItemUIListener
 	{

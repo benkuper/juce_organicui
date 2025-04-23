@@ -13,6 +13,7 @@ BaseItemUI::BaseItemUI(BaseItem* _item, Direction _resizeDirection, bool showMin
 	resizerWidth(0),
 	resizerHeight(0),
 	resizer(nullptr),
+	showGroupManager(false),
 	itemLabel("itemLabel", dynamic_cast<BaseItem*>(this->inspectable.get())->niceName)
 {
 
@@ -115,6 +116,29 @@ void BaseItemUI::setContentSize(int contentWidth, int contentHeight)
 	int targetWidth = contentWidth + margin * 2 + resizerWidth + this->getExtraWidth();
 
 	this->setSize(targetWidth, targetHeight);
+}
+
+void BaseItemUI::setShowGroupManager(bool value)
+{
+	if (showGroupManager == value) return;
+	showGroupManager = value;
+	if (showGroupManager && isGroupUI())
+	{
+		groupManagerUI.reset(createGroupManagerUI());
+		this->addAndMakeVisible(groupManagerUI.get());
+		contentComponents.add(groupManagerUI.get());
+
+		updateGroupManagerBounds();
+	}
+	else
+	{
+		if (groupManagerUI != nullptr)
+		{
+			contentComponents.removeAllInstancesOf(groupManagerUI.get());
+			this->removeChildComponent(groupManagerUI.get());
+		}
+		groupManagerUI.reset();
+	}
 }
 
 int BaseItemUI::getHeightWithoutContent()
@@ -241,7 +265,7 @@ void BaseItemUI::resized()
 		if (resizeDirection == NONE)
 		{
 			int top = r.getY();
-			resizedInternalContent(r);
+			resizedContent(r);
 			if (r.getWidth() == 0 || r.getHeight() == 0) return;
 			setContentSize(r.getWidth(), r.getBottom() - top);
 		}
@@ -281,7 +305,8 @@ void BaseItemUI::resized()
 				break;
 
 			}
-			resizedInternalContent(r);
+
+			resizedContent(r);
 		}
 	}
 }
@@ -294,6 +319,28 @@ void BaseItemUI::resizedHeader(juce::Rectangle<int>& r)
 	r.removeFromLeft(2);
 
 	resizedInternalHeader(r);
+}
+
+void BaseItemUI::resizedContent(juce::Rectangle<int>& r)
+{
+	if (showGroupManager && isGroupUI())
+	{
+		r.setHeight(jmax(groupManagerUI->headerSize, groupManagerUI->getHeight()));
+		groupManagerUI->setBounds(r);
+	}
+
+	resizedInternalContent(r);
+}
+
+void BaseItemUI::updateGroupManagerBounds()
+{
+	if (inspectable.wasObjectDeleted() || baseItem->miniMode->boolValue() || !showGroupManager) return;
+	int th = getHeightWithoutContent() + groupManagerUI->getHeight();
+	if (th != getHeight())
+	{
+		baseItem->listUISize->setValue(th);
+		resized();
+	}
 }
 
 void BaseItemUI::buttonClicked(juce::Button* b)
@@ -406,6 +453,11 @@ void BaseItemUI::newMessage(const Parameter::ParameterEvent& e)
 	}
 }
 
+void BaseItemUI::childBoundsChanged(Component* c)
+{
+	updateGroupManagerBounds();
+}
+
 void BaseItemUI::visibilityChanged()
 {
 	resized();
@@ -414,4 +466,12 @@ void BaseItemUI::visibilityChanged()
 void BaseItemUI::componentVisibilityChanged(juce::Component& c)
 {
 	if (&c == warningUI.get()) resized();
+}
+
+
+BaseManagerUI* BaseItemUI::createGroupManagerUI()
+{
+	BaseItemGroup* ig = dynamic_cast<BaseItemGroup*>(this->baseItem);
+	BaseManager* m = ig->baseManager;
+	return new BaseManagerUI(m->niceName, m);
 }

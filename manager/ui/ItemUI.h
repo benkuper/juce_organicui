@@ -48,36 +48,37 @@ public:
 };
 
 template<class T, class G = ItemBaseGroup<T>>
-class ItemGroupBaseMinimalUI :
+class ItemGroupMinimalUI :
 	public BaseItemMinimalUI
 {
 public:
 	static_assert(std::is_base_of<BaseItem, T>::value, "T must be derived from BaseItem");
 	static_assert(std::is_base_of<ItemBaseGroup<T>, G>::value, "G must be derived from ItemBaseGroup<T>");
 
-	ItemGroupBaseMinimalUI(G* _item) :
+	ItemGroupMinimalUI(G* _item) :
 		BaseItemMinimalUI(_item),
 		group(_item)
 	{
 	}
-	virtual ~ItemGroupBaseMinimalUI() {}
+	virtual ~ItemGroupMinimalUI() {}
 	
 	G* group;
 };
 
 template<class T, class G = ItemBaseGroup<T>>
-class ItemGroupBaseUI :
+class ItemGroupUI :
 	public BaseItemUI
 {
 public:
 	static_assert(std::is_base_of<BaseItem, T>::value, "T must be derived from BaseItem");
 	static_assert(std::is_base_of<ItemBaseGroup<T>, G>::value, "G must be derived from ItemBaseGroup<T>");
 
-	ItemGroupBaseUI(G* _item, Direction resizeDirection = NONE, bool showMiniModeBT = false) :
+	ItemGroupUI(G* _item, Direction resizeDirection = NONE, bool showMiniModeBT = false) :
 		BaseItemUI(_item, resizeDirection, showMiniModeBT),
 		group(_item)
 	{
 	}
-	virtual ~ItemGroupBaseUI() {}
+
+	virtual ~ItemGroupUI() {}
 	G* group;
 };

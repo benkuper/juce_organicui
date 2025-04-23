@@ -1,5 +1,4 @@
 #include "JuceHeader.h"
-#include "BaseManagerUI.h"
 
 
 BaseManagerUI::BaseManagerUI(const String& contentName, BaseManager* _manager, bool _useViewport) :
@@ -654,7 +653,6 @@ BaseItemMinimalUI* BaseManagerUI::addItemUI(BaseItem* item, bool animate, bool r
 	BaseItemUI* biui = dynamic_cast<BaseItemUI*>(tui);
 	if (biui != nullptr) biui->addItemUIListener(this);
 
-
 	addItemUIManagerInternal(tui);
 
 	if (animate && !Engine::mainEngine->isLoadingFile)
@@ -753,10 +751,16 @@ void BaseManagerUI::itemsAddedAsync(Array<BaseItem*> items)
 
 void BaseManagerUI::groupAddedAsync(BaseItem* item)
 {
+	addItemUI(item, animateItemOnAdd);
+	if (!animateItemOnAdd) resized();
 }
 
 void BaseManagerUI::groupsAddedAsync(Array<BaseItem*> items)
 {
+	for (auto& i : items) addItemUI(i, false, false);
+
+	resized();
+	repaint();
 }
 
 void BaseManagerUI::itemsReorderedAsync()

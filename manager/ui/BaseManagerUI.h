@@ -229,21 +229,14 @@ public:
 	virtual void groupAddedAsync(BaseItem *item);
 	virtual void groupsAddedAsync(juce::Array<BaseItem*> items);
 
-	//virtual void itemRemoved(BaseItem* item) override; //must keep this one realtime because the async may cause the target item to already be deleted by the time this function is called
-	//virtual void itemsRemoved(juce::Array<BaseItem*> items) override;
-	//virtual void groupRemoved(BaseItemGroup* group) override;
-	//virtual void groupsRemoved(juce::Array<BaseItemGroup*> items) override;
-
 	virtual void itemsReorderedAsync();
 
-	//void newMessage(const typename BaseManager::BaseManagerEvent& e) override;
 
 	virtual void newMessage(const InspectableSelectionManager::SelectionEvent& e) override;
 
 	void buttonClicked(juce::Button* b) override;
 	void textEditorTextChanged(juce::TextEditor& e) override;
 	void textEditorReturnKeyPressed(juce::TextEditor& e) override;
-	//void labelTextChanged(Label* l) override;
 
 	virtual void inspectableDestroyed(Inspectable*) override;
 

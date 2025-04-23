@@ -673,7 +673,7 @@ void ManagerViewUI<M, T, U>::itemDragMove(const juce::DragAndDropTarget::SourceD
 {
 	ManagerUI<M, T, U>::itemDragMove(dragSourceDetails);
 
-	ItemMinimalUI<T>* bui = dynamic_cast<ItemMinimalUI<T>*>(dragSourceDetails.sourceComponent.get());
+	BaseItemMinimalUI* bui = dynamic_cast<BaseItemMinimalUI*>(dragSourceDetails.sourceComponent.get());
 	if (bui == nullptr) return;
 
 	juce::Point<int> relOffset = juce::Point<int>((int)dragSourceDetails.description.getProperty("offsetX", 0), (int)dragSourceDetails.description.getProperty("offsetY", 0));

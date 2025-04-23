@@ -16,7 +16,7 @@ template<class T> class ItemMinimalUI;
 template<class T> class ItemBaseGroup;
 template<class T> class ItemGroup;
 
-template<class M, class T, class U = ItemMinimalUI<T>, class G = ItemBaseGroup<T>>
+template<class M, class T, class U = ItemUI<T>, class G = ItemBaseGroup<T>, class GU= ItemGroupUI<T>>
 class ManagerUI :
 	public BaseManagerUI,
 	public Manager<T>::ManagerListener,
@@ -28,16 +28,18 @@ public:
 	static_assert(std::is_base_of<BaseItem, T>::value, "T must be derived from BaseItem");
 	static_assert(std::is_base_of<BaseItemMinimalUI, U>::value, "U must be derived from BaseItemMinimalUI");
 	static_assert(std::is_base_of<ItemGroup<T>, G>::value, "G must be derived from ItemBaseGroup<T>");
+	static_assert(std::is_base_of<BaseItemMinimalUI, GU>::value, "GU must be derived from BaseItemMinimalUI");
 
 	ManagerUI(const juce::String& contentName, M* _manager, bool _useViewport = true);
 	virtual ~ManagerUI();
 
 	M* manager;
 	juce::Array<U*> itemsUI;
+	juce::Array<GU*> groupsUI;
 
 	BaseItemMinimalUI* createBaseUIForItem(BaseItem* item) override;
 	virtual U* createUIForItem(T* item);
-	//virtual U* createUIForGroup(T* item) = 0;
+	virtual GU* createUIForGroup(G* item);
 
 	virtual void addItemUIManagerInternal(BaseItemMinimalUI* itemUI) override;
 	virtual void addItemUIInternal(U* itemUI) {}
@@ -86,8 +88,8 @@ public:
 };
 
 
-template<class M, class T, class U, class G>
-ManagerUI<M, T, U, G>::ManagerUI(const juce::String& contentName, M* _manager, bool _useViewport) :
+template<class M, class T, class U, class G, class GU>
+ManagerUI<M, T, U, G, GU>::ManagerUI(const juce::String& contentName, M* _manager, bool _useViewport) :
 	BaseManagerUI(contentName, _manager, _useViewport),
 	manager(_manager)
 {
@@ -96,8 +98,8 @@ ManagerUI<M, T, U, G>::ManagerUI(const juce::String& contentName, M* _manager, b
 }
 
 
-template<class M, class T, class U, class G>
-ManagerUI<M, T, U, G>::~ManagerUI()
+template<class M, class T, class U, class G, class GU>
+ManagerUI<M, T, U, G, GU>::~ManagerUI()
 {
 	if (!inspectable.wasObjectDeleted())
 	{
@@ -110,64 +112,73 @@ ManagerUI<M, T, U, G>::~ManagerUI()
 
 }
 
-template<class M, class T, class U, class G>
-BaseItemMinimalUI* ManagerUI<M, T, U, G>::createBaseUIForItem(BaseItem* item)
+template<class M, class T, class U, class G, class GU>
+BaseItemMinimalUI* ManagerUI<M, T, U, G, GU>::createBaseUIForItem(BaseItem* item)
 {
-	if (item->isGroup) return new ItemGroupBaseMinimalUI<T, G>((G*)item);
+	if (item->isGroup) return createUIForGroup((G*)item);
 	return this->createUIForItem((T*)item);
 }
 
-template<class M, class T, class U, class G>
-U* ManagerUI<M, T, U, G>::createUIForItem(T* item)
+template<class M, class T, class U, class G, class GU>
+U* ManagerUI<M, T, U, G, GU>::createUIForItem(T* item)
 {
 	return new U(item);
 }
 
-template<class M, class T, class U, class G>
-void ManagerUI<M, T, U, G>::addItemUIManagerInternal(BaseItemMinimalUI* itemUI)
+template<class M, class T, class U, class G, class GU>
+GU* ManagerUI<M, T, U, G, GU>::createUIForGroup(G* item)
 {
-	itemsUI.add((U*)itemUI);
+	return new GU(item);
+}
+
+template<class M, class T, class U, class G, class GU>
+void ManagerUI<M, T, U, G, GU>::addItemUIManagerInternal(BaseItemMinimalUI* itemUI)
+{
+	if (itemUI->isGroupUI()) itemsUI.add((U*)itemUI);
+	else groupsUI.add((GU*)itemUI);
+
 	addItemUIInternal((U*)itemUI);
 }
 
-template<class M, class T, class U, class G>
-void ManagerUI<M, T, U, G>::removeItemUIManagerInternal(BaseItemMinimalUI* itemUI)
+template<class M, class T, class U, class G, class GU>
+void ManagerUI<M, T, U, G, GU>::removeItemUIManagerInternal(BaseItemMinimalUI* itemUI)
 {
-	itemsUI.removeAllInstancesOf((U*)itemUI);
+	if (itemUI->isGroupUI()) itemsUI.removeAllInstancesOf((U*)itemUI);
+	else groupsUI.removeAllInstancesOf((GU*)itemUI);
 	removeItemUIInternal((U*)itemUI);
 }
 
-template<class M, class T, class U, class G>
-void ManagerUI<M, T, U, G>::addBaseItemFromMenu(BaseItem* item, bool isFromAddButton, juce::Point<int> mouseDownPos)
+template<class M, class T, class U, class G, class GU>
+void ManagerUI<M, T, U, G, GU>::addBaseItemFromMenu(BaseItem* item, bool isFromAddButton, juce::Point<int> mouseDownPos)
 {
 	return addItemFromMenu((T*)item, isFromAddButton, mouseDownPos);
 }
 
-template<class M, class T, class U, class G>
-void ManagerUI<M, T, U, G>::addItemFromMenu(T* item, bool isFromAddButton, juce::Point<int> mouseDownPos)
+template<class M, class T, class U, class G, class GU>
+void ManagerUI<M, T, U, G, GU>::addItemFromMenu(T* item, bool isFromAddButton, juce::Point<int> mouseDownPos)
 {
 	this->manager->addItem(item);
 }
 
-template<class M, class T, class U, class G>
-void ManagerUI<M, T, U, G>::updateItemVisibilityManagerInternal(BaseItemMinimalUI* ui) {
+template<class M, class T, class U, class G, class GU>
+void ManagerUI<M, T, U, G, GU>::updateItemVisibilityManagerInternal(BaseItemMinimalUI* ui) {
 	this->updateItemVisibility((U*)ui);
 }
 
-template<class M, class T, class U, class G>
-void ManagerUI<M, T, U, G>::updateItemVisibility(U* ui)
+template<class M, class T, class U, class G, class GU>
+void ManagerUI<M, T, U, G, GU>::updateItemVisibility(U* ui)
 {
 	this->updateBaseItemVisibility(ui);
 }
 
-template<class M, class T, class U, class G>
-U* ManagerUI<M, T, U, G>::getUIForItem(T* item, bool directIndexAccess)
+template<class M, class T, class U, class G, class GU>
+U* ManagerUI<M, T, U, G, GU>::getUIForItem(T* item, bool directIndexAccess)
 {
 	return (U*)getBaseUIForItem(item, directIndexAccess);
 }
 
-template<class M, class T, class U, class G>
-void ManagerUI<M, T, U, G>::showMenuAndAddItem(bool isFromAddButton, juce::Point<int> mouseDownPos, std::function<void(BaseItem*)> callback)
+template<class M, class T, class U, class G, class GU>
+void ManagerUI<M, T, U, G, GU>::showMenuAndAddItem(bool isFromAddButton, juce::Point<int> mouseDownPos, std::function<void(BaseItem*)> callback)
 {
 	if (manager->managerFactory != nullptr)
 	{
@@ -188,29 +199,29 @@ void ManagerUI<M, T, U, G>::showMenuAndAddItem(bool isFromAddButton, juce::Point
 		return;
 	}
 
-	BaseManagerUI::showMenuAndAddItem(item, isFromAddButton, mouseDownPos);
+	BaseManagerUI::showMenuAndAddItem(isFromAddButton, mouseDownPos, callback);
 }
 
-template<class M, class T, class U, class G>
-juce::Component* ManagerUI<M, T, U, G>::getSelectableComponentForBaseItemUI(BaseItemMinimalUI* itemUI)
+template<class M, class T, class U, class G, class GU>
+juce::Component* ManagerUI<M, T, U, G, GU>::getSelectableComponentForBaseItemUI(BaseItemMinimalUI* itemUI)
 {
 	return getSelectableComponentForItemUI((U*)itemUI);
 }
 
-template<class M, class T, class U, class G>
-juce::Component* ManagerUI<M, T, U, G>::getSelectableComponentForItemUI(U* itemUI)
+template<class M, class T, class U, class G, class GU>
+juce::Component* ManagerUI<M, T, U, G, GU>::getSelectableComponentForItemUI(U* itemUI)
 {
 	return itemUI;
 }
 
-template<class M, class T, class U, class G>
-void ManagerUI<M, T, U, G>::itemRemoved(T* item)
+template<class M, class T, class U, class G, class GU>
+void ManagerUI<M, T, U, G, GU>::itemRemoved(T* item)
 {
 	removeItemUI(item);
 }
 
-template<class M, class T, class U, class G>
-void ManagerUI<M, T, U, G>::itemsRemoved(juce::Array<T*> items)
+template<class M, class T, class U, class G, class GU>
+void ManagerUI<M, T, U, G, GU>::itemsRemoved(juce::Array<T*> items)
 {
 	if (items.size() == 0) return;
 
@@ -224,18 +235,28 @@ void ManagerUI<M, T, U, G>::itemsRemoved(juce::Array<T*> items)
 
 }
 
-template<class M, class T, class U, class G>
-void ManagerUI<M, T, U, G>::groupRemoved(G* group)
+template<class M, class T, class U, class G, class GU>
+void ManagerUI<M, T, U, G, GU>::groupRemoved(G* group)
 {
+	removeItemUI(group);
 }
 
-template<class M, class T, class U, class G>
-void ManagerUI<M, T, U, G>::groupsRemoved(juce::Array<G*> items)
+template<class M, class T, class U, class G, class GU>
+void ManagerUI<M, T, U, G, GU>::groupsRemoved(juce::Array<G*> groups)
 {
+	if (groups.size() == 0) return;
+
+	for (auto& i : groups) removeItemUI(i, false);
+
+	juce::MessageManager::getInstance()->callAsync([this]()
+		{
+			resized();
+			repaint();
+		});
 }
 
-template<class M, class T, class U, class G>
-void ManagerUI<M, T, U, G>::newMessage(const typename Manager<T>::ManagerEvent& e)
+template<class M, class T, class U, class G, class GU>
+void ManagerUI<M, T, U, G, GU>::newMessage(const typename Manager<T>::ManagerEvent& e)
 {
 	switch (e.type)
 	{
@@ -263,21 +284,21 @@ void ManagerUI<M, T, U, G>::newMessage(const typename Manager<T>::ManagerEvent& 
 	}
 }
 
-template<class M, class T, class U, class G>
-void ManagerUI<M, T, U, G>::inspectableDestroyed(Inspectable*)
+template<class M, class T, class U, class G, class GU>
+void ManagerUI<M, T, U, G, GU>::inspectableDestroyed(Inspectable*)
 {
 	if (manager != nullptr && !manager->isClearing)
 		static_cast<Manager<T>*>(manager)->removeManagerListener(this);
 }
 
-template<class M, class T, class U, class G>
-void ManagerUI<M, T, U, G>::notifyItemUIAdded(BaseItemMinimalUI* itemUI)
+template<class M, class T, class U, class G, class GU>
+void ManagerUI<M, T, U, G, GU>::notifyItemUIAdded(BaseItemMinimalUI* itemUI)
 {
 	managerUIListeners.call(&ManagerUIListener::itemUIAdded, (U*)itemUI);
 }
 
-template<class M, class T, class U, class G>
-void ManagerUI<M, T, U, G>::notifyItemUIRemoved(BaseItemMinimalUI* itemUI)
+template<class M, class T, class U, class G, class GU>
+void ManagerUI<M, T, U, G, GU>::notifyItemUIRemoved(BaseItemMinimalUI* itemUI)
 {
 	managerUIListeners.call(&ManagerUIListener::itemUIRemoved, (U*)itemUI);
 }

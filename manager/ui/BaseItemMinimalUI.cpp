@@ -292,3 +292,9 @@ juce::Point<int> BaseItemMinimalUI::getDragOffset()
 {
 	return getMouseXYRelative() * viewZoom;
 }
+
+bool BaseItemMinimalUI::isGroupUI()
+{
+	if (inspectable.wasObjectDeleted()) return false;
+	return baseItem->isGroup;
+}

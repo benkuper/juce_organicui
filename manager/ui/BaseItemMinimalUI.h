@@ -88,6 +88,8 @@ public:
 	virtual void itemDropped(const SourceDetails& dragSourceDetails) override; //to be overriden
 	virtual juce::Point<int> getDragOffset();
 
+	bool isGroupUI();
+
 	class ItemMinimalUIListener
 	{
 	public:
