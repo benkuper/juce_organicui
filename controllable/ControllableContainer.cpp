@@ -579,7 +579,7 @@ ControllableContainer* ControllableContainer::getControllableContainerByName(con
 ControllableContainer* ControllableContainer::getControllableContainerForAddress(const String& address, bool recursive, bool getNotExposed, bool searchNiceNameToo, bool searchLowerCaseToo)
 {
 	StringArray addrArray;
-	addrArray.addTokens(address, StringRef("/"), StringRef("\""));
+	addrArray.addTokens(address.startsWithChar('/') ? address : "/" + address, StringRef("/"), StringRef("\""));
 	addrArray.remove(0);
 
 	return getControllableContainerForAddress(addrArray, recursive, getNotExposed, searchNiceNameToo, searchLowerCaseToo);
@@ -1114,7 +1114,7 @@ var ControllableContainer::getRemoteControlData()
 		GenericScopedLock containersLock(controllableContainers.getLock());
 		for (auto& childCC : controllableContainers)
 		{
-		if (childCC == nullptr || childCC.wasObjectDeleted() || childCC->hideInRemoteControl) continue;
+			if (childCC == nullptr || childCC.wasObjectDeleted() || childCC->hideInRemoteControl) continue;
 			contentData.getDynamicObject()->setProperty(childCC->shortName, childCC->getRemoteControlData());
 		}
 	}
