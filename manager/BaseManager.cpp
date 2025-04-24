@@ -369,7 +369,7 @@ String BaseManager::getItemPath(BaseItem* item)
 
 BaseItem* BaseManager::getItemWithPath(const juce::String& relativePath)
 {
-	if (BaseItem* i = dynamic_cast<BaseItem*>(getControllableForAddress(relativePath))) return i;
+	if (BaseItem* i = dynamic_cast<BaseItem*>(getControllableContainerForAddress(relativePath))) return i;
 	return nullptr;
 }
 
