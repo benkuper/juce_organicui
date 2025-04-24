@@ -338,7 +338,9 @@ Array<UndoableAction*> BaseManager::getSetItemIndexUndoableAction(BaseItem* item
 	return a;
 }
 
-BaseItem* BaseManager::getItemWithName(const juce::String& itemShortName, bool searchNiceNameToo, bool searchWithLowerCaseIfNotFound, bool recursive)
+
+
+BaseItem* BaseManager::getItemWithName(const juce::String& itemShortName, bool searchNiceNameToo, bool searchWithLowerCaseIfNotFound)
 {
 	//const ScopedLock lock(baseItems.getLock());
 
@@ -346,10 +348,7 @@ BaseItem* BaseManager::getItemWithName(const juce::String& itemShortName, bool s
 	{
 		if (((BaseItem*)t)->shortName == itemShortName) return t;
 		else if (searchNiceNameToo && ((BaseItem*)t)->niceName == itemShortName) return t;
-		else if (recursive && ((BaseItem*)t)->isGroup)
-		{
-			if (auto group = dynamic_cast<BaseItemGroup*>(t)) return group->baseManager->getItemWithName(itemShortName, searchNiceNameToo, searchWithLowerCaseIfNotFound, recursive);
-		}
+
 	}
 
 	if (searchWithLowerCaseIfNotFound)
@@ -360,6 +359,17 @@ BaseItem* BaseManager::getItemWithName(const juce::String& itemShortName, bool s
 		}
 	}
 
+	return nullptr;
+}
+
+String BaseManager::getItemPath(BaseItem* item)
+{
+	return item->getControlAddress(this);
+}
+
+BaseItem* BaseManager::getItemWithPath(const juce::String& relativePath)
+{
+	if (BaseItem* i = dynamic_cast<BaseItem*>(getControllableForAddress(relativePath))) return i;
 	return nullptr;
 }
 
@@ -375,7 +385,7 @@ Array<BaseItem*> BaseManager::getBaseItems(bool recursive, bool includeDisabled,
 			if (includeGroups) result.add((BaseItem*)i);
 			if (recursive)
 			{
-				if (auto group = dynamic_cast<BaseItemGroup*>(i)) 
+				if (auto group = dynamic_cast<BaseItemGroup*>(i))
 					result.addArray(group->baseManager->getBaseItems(recursive, includeDisabled, includeGroups));
 			}
 		}
@@ -560,8 +570,9 @@ String BaseManager::getScriptTargetString()
 	return "[" + niceName + " : Manager(" + itemDataType + ")]";
 }
 
-BaseManager::BaseManagerEvent::BaseManagerEvent(Type t, Array<BaseItem*> iList) :
-	type(t)
+BaseManager::BaseManagerEvent::BaseManagerEvent(Type t, Array<BaseItem*> iList, bool fromChildGroup) :
+	type(t),
+	fromChildGroup(fromChildGroup)
 {
 	for (auto& i : iList) if (i != nullptr) this->baseItems.add(i);
 }

@@ -71,13 +71,17 @@ public:
 
 
 	//Listing items
-	virtual BaseItem* getItemWithName(const juce::String& itemShortName, bool searchNiceNameToo = false, bool searchWithLowerCaseIfNotFound = true, bool recursive = true);
+	virtual BaseItem* getItemWithName(const juce::String& itemShortName, bool searchNiceNameToo = false, bool searchWithLowerCaseIfNotFound = true);
+
+	virtual juce::String getItemPath(BaseItem* item);
+	virtual BaseItem* getItemWithPath(const juce::String& relativePath);
 
 	template<class IType>
-	juce::Array<IType*> getItemsWithType()
+	juce::Array<IType*> getItemsWithType(bool recursive = true)
 	{
+		juce::Array<BaseItem*> itemsToSearch = getBaseItems(recursive, true, false);
 		juce::Array<IType*> result;
-		for (auto& i : baseItems)
+		for (auto& i : itemsToSearch)
 		{
 			if (IType* it = dynamic_cast<IType*>(i)) result.add(it);
 		}
@@ -112,11 +116,12 @@ public:
 			NEEDS_UI_UPDATE
 		};
 
-		BaseManagerEvent(Type t, juce::Array<BaseItem*> iList);
+		BaseManagerEvent(Type t, juce::Array<BaseItem*> iList, bool fromChildGroup = false);
 		virtual ~BaseManagerEvent() {}
 
 		Type type;
 		juce::Array<juce::WeakReference<BaseItem>> baseItems;
+		bool fromChildGroup;
 	};
 
 	//UNDO MANAGER
@@ -236,12 +241,12 @@ protected:
 	virtual void removeItemsManagerInternal(juce::Array<BaseItem*> items) {}
 
 	//notify, to override by templated classes
-	virtual void notifyItemAdded(BaseItem* item) {}
-	virtual void notifyItemsAdded(juce::Array<BaseItem*> items) {}
-	virtual void notifyItemRemoved(BaseItem* item) {}
-	virtual void notifyItemsRemoved(juce::Array<BaseItem*> items) {}
-	virtual void notifyItemsReordered() {}
+	virtual void notifyItemAdded(BaseItem* item, bool fromChildGroup = false) {}
+	virtual void notifyItemsAdded(juce::Array<BaseItem*> items, bool fromChildGroup = false) {}
+	virtual void notifyItemRemoved(BaseItem* item, bool fromChildGroup = false) {}
+	virtual void notifyItemsRemoved(juce::Array<BaseItem*> items, bool fromChildGroup = false) {}
+	virtual void notifyItemsReordered(bool fromChildGroup = false) {}
 
-	virtual void notifyAsync(BaseManagerEvent::Type type, juce::Array<BaseItem*> items = juce::Array<BaseItem*>()) {}
+	virtual void notifyAsync(BaseManagerEvent::Type type, juce::Array<BaseItem*> items = juce::Array<BaseItem*>(), bool fromChildGroup = false) {}
 };
 

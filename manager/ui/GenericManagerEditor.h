@@ -100,7 +100,7 @@ GenericManagerEditor<T>::GenericManagerEditor(Manager<T>* _manager, bool isRoot)
 		addItemBT->addListener(this);
 	}
 
-	manager->addAsyncManagerListener(this);
+	manager->addAsyncManagerListener(this, false);
 
 	resetAndBuild();
 }

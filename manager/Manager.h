@@ -17,7 +17,6 @@ class Manager :
 	public BaseManager
 {
 public:
-
 	static_assert(std::is_base_of<BaseItem, T>::value, "T must be derived from BaseItem");
 	static_assert(std::is_base_of<ItemGroup<T>, G>::value, "G must be derived from ItemGroup<T>");
 	static_assert(std::is_base_of<BaseItem, G>::value, "G must be derived from BaseItem");
@@ -75,15 +74,18 @@ public:
 
 	virtual void reorderItems() override; //to be overriden if needed
 
-	void notifyItemAdded(BaseItem* item);
-	void notifyItemsAdded(juce::Array<BaseItem*> items);
-	void notifyItemRemoved(BaseItem* item);
-	void notifyItemsRemoved(juce::Array<BaseItem*> items);
-	void notifyItemsReordered();
+	void notifyItemAdded(BaseItem* item, bool fromChildGroup = false) override;
+	void notifyItemsAdded(juce::Array<BaseItem*> items, bool fromChildGroup = false) override;
+	void notifyItemRemoved(BaseItem* item, bool fromChildGroup = false) override;
+	void notifyItemsRemoved(juce::Array<BaseItem*> items, bool fromChildGroup = false) override;
+	void notifyItemsReordered(bool fromChildGroup = false) override;
 
 	virtual juce::Array<T*> getItems(bool includeDisabled = true, bool recursive = true);
 
-	virtual T* getItemWithName(const juce::String& itemShortName, bool searchNiceNameToo = false, bool searchWithLowerCaseIfNotFound = true, bool recursive = true) override;
+
+	virtual T* getItemWithName(const juce::String& itemShortName, bool searchNiceNameToo = false, bool searchWithLowerCaseIfNotFound = true) override;
+
+	virtual T* getItemWithPath(const juce::String& relativePath);
 
 	juce::PopupMenu getItemsMenu(int startID);
 	T* getItemForMenuResultID(int id, int startID);
@@ -92,23 +94,30 @@ public:
 
 	virtual void getRemoteControlDataInternal(juce::var& data) override;
 
-	void notifyAsync(BaseManagerEvent::Type type, juce::Array<BaseItem*> _items = juce::Array<BaseItem*>()) override;
+	void notifyAsync(BaseManagerEvent::Type type, juce::Array<BaseItem*> _items = juce::Array<BaseItem*>(), bool fromChildGroup = false) override;
 
 	typedef ManagerTListener<T, G> ManagerListener;
 
 	juce::ListenerList<ManagerListener> managerListeners;
-	void addManagerListener(ManagerListener* newListener) { managerListeners.add(newListener); }
+	juce::ListenerList<ManagerListener> recursiveManagerListeners;
+	void addManagerListener(ManagerListener* newListener, bool recursive = true) {
+		if (isBeingDestroyed) return;
+		managerListeners.add(newListener);
+		if (canHaveGroups && recursive) recursiveManagerListeners.add(newListener);
+	}
+
 	void removeManagerListener(ManagerListener* listener) {
 		if (isBeingDestroyed) return;
 		managerListeners.remove(listener);
+		if (canHaveGroups) recursiveManagerListeners.remove(listener);
 	}
 
 	class ManagerEvent :
 		public BaseManagerEvent
 	{
 	public:
-		ManagerEvent(BaseManagerEvent::Type type, juce::Array<BaseItem*> items = juce::Array<BaseItem*>()) :
-			BaseManagerEvent(type, items)
+		ManagerEvent(BaseManagerEvent::Type type, juce::Array<BaseItem*> items = juce::Array<BaseItem*>(), bool fromChildGroup = false) :
+			BaseManagerEvent(type, items, fromChildGroup)
 		{
 		}
 
@@ -142,11 +151,24 @@ public:
 	using BManagerEvent = typename Manager<T, G>::ManagerEvent;
 	using ManagerNotifier = QueuedNotifier<BManagerEvent>;
 	ManagerNotifier managerNotifier;
+	ManagerNotifier recursiveManagerNotifier;
 	typedef typename QueuedNotifier<BManagerEvent>::Listener AsyncListener;
 
-	void addAsyncManagerListener(AsyncListener* newListener) { managerNotifier.addListener(newListener); }
-	void addAsyncCoalescedManagerListener(AsyncListener* newListener) { managerNotifier.addAsyncCoalescedListener(newListener); }
-	void removeAsyncManagerListener(AsyncListener* listener) { managerNotifier.removeListener(listener); }
+	void addAsyncManagerListener(AsyncListener* newListener, bool recursive = true) {
+		managerNotifier.addListener(newListener);
+		if (canHaveGroups && recursive) recursiveManagerNotifier.addListener(newListener);
+	}
+
+	void addAsyncCoalescedManagerListener(AsyncListener* newListener, bool recursive = true)
+	{
+		managerNotifier.addCoalescedListener(newListener);
+		if (canHaveGroups && recursive) recursiveManagerNotifier.addCoalescedListener(newListener);
+	}
+
+	void removeAsyncManagerListener(AsyncListener* listener) {
+		managerNotifier.removeListener(listener);
+		if (canHaveGroups) recursiveManagerNotifier.removeListener(listener);
+	}
 
 
 	InspectableEditor* getEditorInternal(bool isRoot, juce::Array<Inspectable*> inspectables = juce::Array<Inspectable*>()) override;
@@ -187,7 +209,7 @@ public:
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Manager);
 
-	
+
 };
 
 
@@ -196,6 +218,7 @@ Manager<T, G>::Manager(const juce::String& name, bool canHaveGroups) :
 	BaseManager(name, canHaveGroups),
 	managerFactory(nullptr),
 	managerNotifier(50),
+	recursiveManagerNotifier(50),
 	comparator(this)
 {
 
@@ -448,22 +471,33 @@ void Manager<T, G>::reorderItems()
 	}
 
 	notifyItemsReordered();
-	notifyAsync(ManagerEvent::ITEMS_REORDERED);
 }
 
 template<class T, class G>
-void Manager<T, G>::notifyItemAdded(BaseItem* item)
+void Manager<T, G>::notifyItemAdded(BaseItem* item, bool fromChildGroup)
 {
-	if (item->isGroup) managerListeners.call(&ManagerListener::groupAdded, (G*)item);
-	else managerListeners.call(&ManagerListener::itemAdded, (T*)item);
+	if (canHaveGroups)
+	{
+		if (Manager<T, G>* m = getParentAs<Manager<T, G>>(2)) m->notifyItemAdded(item, true);
+	}
 
-	notifyAsync(ManagerEvent::ITEM_ADDED, (T*)item);
+	juce::ListenerList<ManagerListener>* listenersToCall = fromChildGroup ? &recursiveManagerListeners : &managerListeners;
+	if (item->isGroup) listenersToCall->call(&ManagerListener::groupAdded, (G*)item);
+	else listenersToCall->call(&ManagerListener::itemAdded, (T*)item);
+
+	notifyAsync(ManagerEvent::ITEM_ADDED, (T*)item, fromChildGroup);
 }
 
 template<class T, class G>
-void Manager<T, G>::notifyItemsAdded(juce::Array<BaseItem*> items)
+void Manager<T, G>::notifyItemsAdded(juce::Array<BaseItem*> items, bool fromChildGroup)
 {
 	if (items.isEmpty()) return;
+
+	if (canHaveGroups)
+	{
+		if (Manager<T, G>* m = getParentAs<Manager<T, G>>(2)) m->notifyItemsAdded(items, true);
+	}
+
 	juce::Array<T*> itemsToAdd;
 	juce::Array<G*> groupsToAdd;
 	for (auto& i : items)
@@ -471,27 +505,40 @@ void Manager<T, G>::notifyItemsAdded(juce::Array<BaseItem*> items)
 		if (T* it = dynamic_cast<T*>(i)) itemsToAdd.add(it);
 		else if (G* it = dynamic_cast<G*>(i)) groupsToAdd.add(it);
 	}
-	if (!itemsToAdd.isEmpty()) managerListeners.call(&ManagerListener::itemsAdded, itemsToAdd);
-	if (!groupsToAdd.isEmpty()) managerListeners.call(&ManagerListener::groupsAdded, groupsToAdd);
+	juce::ListenerList<ManagerListener>* listenersToCall = fromChildGroup ? &recursiveManagerListeners : &managerListeners;
+	if (!itemsToAdd.isEmpty()) listenersToCall->call(&ManagerListener::itemsAdded, itemsToAdd);
+	if (!groupsToAdd.isEmpty()) listenersToCall->call(&ManagerListener::groupsAdded, groupsToAdd);
 
-	notifyAsync(ManagerEvent::ITEMS_ADDED, items);
+	notifyAsync(ManagerEvent::ITEMS_ADDED, items, fromChildGroup);
 
 }
 
 
 template<class T, class G>
-void Manager<T, G>::notifyItemRemoved(BaseItem* item)
+void Manager<T, G>::notifyItemRemoved(BaseItem* item, bool fromChildGroup)
 {
-	if (item->isGroup) managerListeners.call(&ManagerListener::groupRemoved, (G*)item);
-	else managerListeners.call(&ManagerListener::itemRemoved, (T*)item);
+	if (canHaveGroups)
+	{
+		if (Manager<T, G>* m = getParentAs<Manager<T, G>>(2)) m->notifyItemRemoved(item, true);
+	}
+	
+	juce::ListenerList<ManagerListener>* listenersToCall = fromChildGroup ? &recursiveManagerListeners : &managerListeners;
+	if (item->isGroup) listenersToCall->call(&ManagerListener::groupRemoved, (G*)item);
+	else listenersToCall->call(&ManagerListener::itemRemoved, (T*)item);
 
-	notifyAsync(ManagerEvent::ITEM_REMOVED, (T*)item);
+	notifyAsync(ManagerEvent::ITEM_REMOVED, (T*)item, fromChildGroup);
 }
 
 template<class T, class G>
-void Manager<T, G>::notifyItemsRemoved(juce::Array<BaseItem*> items)
+void Manager<T, G>::notifyItemsRemoved(juce::Array<BaseItem*> items, bool fromChildGroup)
 {
 	if (items.isEmpty()) return;
+
+	if (canHaveGroups)
+	{
+		if (Manager<T, G>* m = getParentAs<Manager<T, G>>(2)) m->notifyItemsRemoved(items, true);
+	}
+	
 	juce::Array<T*> itemsToRemove;
 	juce::Array<G*> groupsToRemove;
 	for (auto& i : items)
@@ -500,17 +547,24 @@ void Manager<T, G>::notifyItemsRemoved(juce::Array<BaseItem*> items)
 		else if (G* it = dynamic_cast<G*>(i)) groupsToRemove.add(it);
 	}
 
-	if (!itemsToRemove.isEmpty()) managerListeners.call(&ManagerListener::itemsRemoved, itemsToRemove);
-	if (!groupsToRemove.isEmpty()) managerListeners.call(&ManagerListener::groupsRemoved, groupsToRemove);
+	juce::ListenerList<ManagerListener>* listenersToCall = fromChildGroup ? &recursiveManagerListeners : &managerListeners;
+	if (!itemsToRemove.isEmpty()) listenersToCall->call(&ManagerListener::itemsRemoved, itemsToRemove);
+	if (!groupsToRemove.isEmpty()) listenersToCall->call(&ManagerListener::groupsRemoved, groupsToRemove);
 
-	notifyAsync(ManagerEvent::ITEMS_REMOVED, items);
+	notifyAsync(ManagerEvent::ITEMS_REMOVED, items, fromChildGroup);
 }
 
 template<class T, class G>
-void Manager<T, G>::notifyItemsReordered()
+void Manager<T, G>::notifyItemsReordered(bool fromChildGroup)
 {
-	managerListeners.call(&ManagerListener::itemsReordered);
-	notifyAsync(ManagerEvent::ITEMS_REORDERED);
+	if (canHaveGroups)
+	{
+		if (Manager<T, G>* m = getParentAs<Manager<T, G>>(2)) m->notifyItemsReordered(true);
+	}
+	
+	juce::ListenerList<ManagerListener>* listenersToCall = fromChildGroup ? &recursiveManagerListeners : &managerListeners;
+	listenersToCall->call(&ManagerListener::itemsReordered);
+	notifyAsync(ManagerEvent::ITEMS_REORDERED, Array<BaseItem*>(), fromChildGroup);
 }
 
 template<class T, class G>
@@ -523,9 +577,15 @@ juce::Array<T*> Manager<T, G>::getItems(bool includeDisabled, bool recursive)
 }
 
 template<class T, class G>
-inline T* Manager<T, G>::getItemWithName(const juce::String& itemShortName, bool searchNiceNameToo, bool searchWithLowerCaseIfNotFound, bool recursive)
+T* Manager<T, G>::getItemWithName(const juce::String& itemShortName, bool searchNiceNameToo, bool searchWithLowerCaseIfNotFound)
 {
-	return (T*)BaseManager::getItemWithName(itemShortName, searchNiceNameToo, searchWithLowerCaseIfNotFound, recursive);
+	return (T*)BaseManager::getItemWithName(itemShortName, searchNiceNameToo, searchWithLowerCaseIfNotFound);
+}
+
+template<class T, class G>
+T* Manager<T, G>::getItemWithPath(const juce::String& relativePath)
+{
+	return (T*)BaseManager::getItemWithPath(relativePath);
 }
 
 template<class T, class G>
@@ -568,9 +628,10 @@ void Manager<T, G>::getRemoteControlDataInternal(juce::var& data)
 }
 
 template<class T, class G>
-void Manager<T, G>::notifyAsync(BaseManagerEvent::Type type, juce::Array<BaseItem*> _items)
+void Manager<T, G>::notifyAsync(BaseManagerEvent::Type type, juce::Array<BaseItem*> _items, bool fromChildGroup)
 {
-	managerNotifier.addMessage(new ManagerEvent(type, _items));
+	ManagerNotifier* notifierToCall = fromChildGroup ? &recursiveManagerNotifier : &this->managerNotifier;
+	notifierToCall->addMessage(new ManagerEvent(type, _items, fromChildGroup));
 }
 
 

@@ -114,10 +114,11 @@ public:
 	ControllableContainer* getControllableContainerByName(const juce::String& name, bool searchNiceNameToo = false, bool searchLowerCaseToo = true);
 	ControllableContainer* getControllableContainerForAddress(const juce::String& address, bool recursive = false, bool getNotExposed = false, bool searchNiceNameToo = false, bool searchLowerCaseToo = true);
 	ControllableContainer* getControllableContainerForAddress(juce::StringArray  addressSplit, bool recursive = false, bool getNotExposed = false, bool searchNiceNameToo = false, bool searchLowerCaseToo = true);
-
+	
 	virtual void setParentContainer(ControllableContainer* container);
 	void updateChildrenControlAddress();
 
+	
 
 	virtual juce::Array<juce::WeakReference<Controllable>> getAllControllables(bool recursive = false);
 	virtual juce::Array<juce::WeakReference<Parameter>> getAllParameters(bool recursive = false);
@@ -127,6 +128,16 @@ public:
 	bool containsControllable(Controllable* c, int maxSearchLevels = -1);
 	juce::String getControlAddress(ControllableContainer* relativeTo = nullptr);
 
+	template<class T>
+	T* getParentAs(int level = 1)
+	{
+		ControllableContainer* cc = parentContainer.get();
+		for (int i = 1; i < level && cc != nullptr; i++)
+		{
+			cc = cc->parentContainer.get();
+		}
+		return dynamic_cast<T*>(cc);
+	}
 
 	//Remote Control
 	virtual void handleAddFromRemoteControl(juce::var data) {}

@@ -93,8 +93,8 @@ ManagerUI<M, T, U, G, GU>::ManagerUI(const juce::String& contentName, M* _manage
 	BaseManagerUI(contentName, _manager, _useViewport),
 	manager(_manager)
 {
-	manager->addManagerListener(this);
-	manager->addAsyncManagerListener(this);
+	manager->addManagerListener(this, false);
+	manager->addAsyncManagerListener(this, false);
 }
 
 
