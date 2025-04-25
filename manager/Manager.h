@@ -638,7 +638,7 @@ void Manager<T, G>::notifyAsync(BaseManagerEvent::Type type, juce::Array<BaseIte
 template<class T, class G>
 InspectableEditor* Manager<T, G>::getEditorInternal(bool isRoot, juce::Array<Inspectable*> inspectables)
 {
-	return new GenericManagerEditor<T>(this, isRoot);
+	return new GenericManagerEditor<T, G>(this, isRoot);
 }
 
 

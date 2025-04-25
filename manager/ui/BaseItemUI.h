@@ -122,6 +122,7 @@ public:
 	virtual void componentVisibilityChanged(juce::Component& c) override;
 
 	virtual BaseManagerUI* createGroupManagerUI();
+	virtual BaseManagerUI* createGroupManagerUIInternal();
 
 	class ItemUIListener
 	{

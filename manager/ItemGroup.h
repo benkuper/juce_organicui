@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    BaseGroup.h
-    Created: 15 Apr 2025 2:07:26pm
-    Author:  bkupe
+	BaseGroup.h
+	Created: 15 Apr 2025 2:07:26pm
+	Author:  bkupe
 
   ==============================================================================
 */
@@ -58,8 +58,9 @@ public:
 		this->setHasCustomColor(true);
 		this->addChildControllableContainer(this->manager, true, 0);
 		this->itemDataType = "ItemGroup";
+		this->listUISize->setValue(100);
 	}
-	
+
 	virtual ~ItemBaseGroup() {}
 
 	virtual void clearItem() override

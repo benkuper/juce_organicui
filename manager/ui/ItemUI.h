@@ -73,12 +73,19 @@ public:
 	static_assert(std::is_base_of<BaseItem, T>::value, "T must be derived from BaseItem");
 	static_assert(std::is_base_of<ItemBaseGroup<T>, G>::value, "G must be derived from ItemBaseGroup<T>");
 
-	ItemGroupUI(G* _item, Direction resizeDirection = NONE, bool showMiniModeBT = false) :
+	ItemGroupUI(G* _item, Direction resizeDirection = VERTICAL, bool showMiniModeBT = false) :
 		BaseItemUI(_item, resizeDirection, showMiniModeBT),
 		group(_item)
 	{
+		this->setSize(100, 150);
 	}
 
 	virtual ~ItemGroupUI() {}
 	G* group;
+
+	void resizedInternalHeader(juce::Rectangle<int>& r) override
+	{
+		if (this->groupManagerUI == nullptr) return;
+		if(this->groupManagerUI->addItemBT != nullptr) this->groupManagerUI->addItemBT->setBounds(r.removeFromRight(r.getHeight()));
+	}
 };

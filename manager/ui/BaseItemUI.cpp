@@ -325,8 +325,12 @@ void BaseItemUI::resizedContent(juce::Rectangle<int>& r)
 {
 	if (showGroupManager && isGroupUI())
 	{
-		r.setHeight(jmax(groupManagerUI->headerSize, groupManagerUI->getHeight()));
-		groupManagerUI->setBounds(r);
+		if (resizeDirection != NONE) groupManagerUI->setBounds(r);
+		else
+		{
+			r.setHeight(jmax(groupManagerUI->headerSize, groupManagerUI->getHeight()));
+			groupManagerUI->setBounds(r);
+		}
 	}
 
 	resizedInternalContent(r);
@@ -335,12 +339,17 @@ void BaseItemUI::resizedContent(juce::Rectangle<int>& r)
 void BaseItemUI::updateGroupManagerBounds()
 {
 	if (inspectable.wasObjectDeleted() || baseItem->miniMode->boolValue() || !showGroupManager) return;
-	int th = getHeightWithoutContent() + groupManagerUI->getHeight();
-	if (th != getHeight())
+
+	if (resizeDirection == NONE)
 	{
-		baseItem->listUISize->setValue(th);
-		resized();
+		int th = getHeightWithoutContent() + groupManagerUI->getHeight();
+		if (th != getHeight())
+		{
+			baseItem->listUISize->setValue(th);
+			resized();
+		}
 	}
+	
 }
 
 void BaseItemUI::buttonClicked(juce::Button* b)
@@ -471,7 +480,21 @@ void BaseItemUI::componentVisibilityChanged(juce::Component& c)
 
 BaseManagerUI* BaseItemUI::createGroupManagerUI()
 {
+	BaseManagerUI* m = createGroupManagerUIInternal();
+
+	if (m == nullptr) return nullptr;
+
+	m->setShowAddButton(false);
+	m->setShowSearchBar(false);
+	m->headerSize = 10;
+	addAndMakeVisible(m->addItemBT.get());
+
+	return m;
+}
+
+BaseManagerUI* BaseItemUI::createGroupManagerUIInternal()
+{
 	BaseItemGroup* ig = dynamic_cast<BaseItemGroup*>(this->baseItem);
-	BaseManager* m = ig->baseManager;
+	BaseManager* m = ig->baseManager; 
 	return new BaseManagerUI(m->niceName, m);
 }

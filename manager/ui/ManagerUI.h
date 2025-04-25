@@ -62,8 +62,8 @@ public:
 
 	virtual void itemRemoved(T* item) override; //must keep this one realtime because the async may cause the target item to already be deleted by the time this function is called
 	virtual void itemsRemoved(juce::Array<T*> items) override;
-	virtual void groupRemoved(G* group) override;
-	virtual void groupsRemoved(juce::Array<G*> items) override;
+	//virtual void groupRemoved(G* group) override;
+	//virtual void groupsRemoved(juce::Array<G*> items) override;
 
 	void newMessage(const typename Manager<T>::ManagerEvent& e) override;
 
@@ -235,25 +235,25 @@ void ManagerUI<M, T, U, G, GU>::itemsRemoved(juce::Array<T*> items)
 
 }
 
-template<class M, class T, class U, class G, class GU>
-void ManagerUI<M, T, U, G, GU>::groupRemoved(G* group)
-{
-	removeItemUI(group);
-}
-
-template<class M, class T, class U, class G, class GU>
-void ManagerUI<M, T, U, G, GU>::groupsRemoved(juce::Array<G*> groups)
-{
-	if (groups.size() == 0) return;
-
-	for (auto& i : groups) removeItemUI(i, false);
-
-	juce::MessageManager::getInstance()->callAsync([this]()
-		{
-			resized();
-			repaint();
-		});
-}
+//template<class M, class T, class U, class G, class GU>
+//void ManagerUI<M, T, U, G, GU>::groupRemoved(G* group)
+//{
+//	removeItemUI(group);
+//}
+//
+//template<class M, class T, class U, class G, class GU>
+//void ManagerUI<M, T, U, G, GU>::groupsRemoved(juce::Array<G*> groups)
+//{
+//	if (groups.size() == 0) return;
+//
+//	for (auto& i : groups) removeItemUI(i, false);
+//
+//	juce::MessageManager::getInstance()->callAsync([this]()
+//		{
+//			resized();
+//			repaint();
+//		});
+//}
 
 template<class M, class T, class U, class G, class GU>
 void ManagerUI<M, T, U, G, GU>::newMessage(const typename Manager<T>::ManagerEvent& e)

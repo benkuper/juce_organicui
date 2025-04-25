@@ -13,13 +13,16 @@
 template<class T> class ItemBaseGroup;
 template<class T, class G> class Manager;
 
-template<class T>
+template<class T, class G = ItemBaseGroup<T>>
 class GenericManagerEditor :
 	public EnablingControllableContainerEditor,
 	public Manager<T>::AsyncListener,
 	public juce::DragAndDropTarget
 {
 public:
+	static_assert(std::is_base_of<BaseItem, T>::value, "T must be derived from BaseItem");
+	static_assert(std::is_base_of<ItemGroup<T>, G>::value, "G must be derived from ItemGroup<T>");
+
 	GenericManagerEditor(Manager<T>* manager, bool isRoot);
 	virtual ~GenericManagerEditor();
 
@@ -81,8 +84,8 @@ public:
 
 
 
-template<class T>
-GenericManagerEditor<T>::GenericManagerEditor(Manager<T>* _manager, bool isRoot) :
+template<class T, class G>
+GenericManagerEditor<T, G>::GenericManagerEditor(Manager<T>* _manager, bool isRoot) :
 	EnablingControllableContainerEditor(_manager, isRoot, false),
 	manager(_manager),
 	isDraggingOver(false),
@@ -105,14 +108,14 @@ GenericManagerEditor<T>::GenericManagerEditor(Manager<T>* _manager, bool isRoot)
 	resetAndBuild();
 }
 
-template<class T>
-GenericManagerEditor<T>::~GenericManagerEditor()
+template<class T, class G>
+GenericManagerEditor<T, G>::~GenericManagerEditor()
 {
 	if (!inspectable.wasObjectDeleted()) manager->removeAsyncManagerListener(this);
 }
 
-template<class T>
-void GenericManagerEditor<T>::resetAndBuild()
+template<class T, class G>
+void GenericManagerEditor<T, G>::resetAndBuild()
 {
 	GenericControllableContainerEditor::resetAndBuild();
 	resized();
@@ -139,14 +142,14 @@ void GenericManagerEditor<T>::resetAndBuild()
 	}
 }
 
-template<class T>
-void GenericManagerEditor<T>::addExistingItems()
+template<class T, class G>
+void GenericManagerEditor<T, G>::addExistingItems()
 {
 	resetAndBuild();
 }
 
-template<class T>
-void GenericManagerEditor<T>::paint(juce::Graphics& g)
+template<class T, class G>
+void GenericManagerEditor<T, G>::paint(juce::Graphics& g)
 {
 	GenericControllableContainerEditor::paint(g);
 
@@ -180,8 +183,8 @@ void GenericManagerEditor<T>::paint(juce::Graphics& g)
 }
 
 
-template<class T>
-void GenericManagerEditor<T>::resizedInternalHeader(juce::Rectangle<int>& r)
+template<class T, class G>
+void GenericManagerEditor<T, G>::resizedInternalHeader(juce::Rectangle<int>& r)
 {
 	if (addItemBT != nullptr)
 	{
@@ -192,8 +195,8 @@ void GenericManagerEditor<T>::resizedInternalHeader(juce::Rectangle<int>& r)
 	EnablingControllableContainerEditor::resizedInternalHeader(r);
 }
 
-template<class T>
-void GenericManagerEditor<T>::addPopupMenuItems(juce::PopupMenu* p)
+template<class T, class G>
+void GenericManagerEditor<T, G>::addPopupMenuItems(juce::PopupMenu* p)
 {
 	p->addItem(1001, "Paste (add)");
 
@@ -202,8 +205,8 @@ void GenericManagerEditor<T>::addPopupMenuItems(juce::PopupMenu* p)
 
 }
 
-template<class T>
-void GenericManagerEditor<T>::handleMenuSelectedID(int id)
+template<class T, class G>
+void GenericManagerEditor<T, G>::handleMenuSelectedID(int id)
 {
 	if (id > 1000 && id < 2000)
 	{
@@ -230,8 +233,8 @@ void GenericManagerEditor<T>::handleMenuSelectedID(int id)
 	}
 }
 
-template<class T>
-void GenericManagerEditor<T>::showMenuAndAddItem(bool isFromAddButton)
+template<class T, class G>
+void GenericManagerEditor<T, G>::showMenuAndAddItem(bool isFromAddButton)
 {
 	if (manager->managerFactory != nullptr)
 	{
@@ -270,15 +273,15 @@ void GenericManagerEditor<T>::showMenuAndAddItem(bool isFromAddButton)
 
 }
 
-template<class T>
-T* GenericManagerEditor<T>::addItemFromMenu(bool /*isFromAddButton*/)
+template<class T, class G>
+T* GenericManagerEditor<T, G>::addItemFromMenu(bool /*isFromAddButton*/)
 {
 	T* item = manager->Manager<T>::addItem();
 	return item;
 }
 
-template<class T>
-void GenericManagerEditor<T>::buttonClicked(juce::Button* b)
+template<class T, class G>
+void GenericManagerEditor<T, G>::buttonClicked(juce::Button* b)
 {
 	GenericControllableContainerEditor::buttonClicked(b);
 
@@ -288,8 +291,8 @@ void GenericManagerEditor<T>::buttonClicked(juce::Button* b)
 	}
 }
 
-template<class T>
-bool GenericManagerEditor<T>::shouldShowContainer(ControllableContainer* cc)
+template<class T, class G>
+bool GenericManagerEditor<T, G>::shouldShowContainer(ControllableContainer* cc)
 {
 	if (!manager->showItemsInEditor)
 	{
@@ -298,24 +301,24 @@ bool GenericManagerEditor<T>::shouldShowContainer(ControllableContainer* cc)
 	return GenericControllableContainerEditor::shouldShowContainer(cc);
 }
 
-template<class T>
-InspectableEditor* GenericManagerEditor<T>::addEditorUI(ControllableContainer* cc, bool resize)
+template<class T, class G>
+InspectableEditor* GenericManagerEditor<T, G>::addEditorUI(ControllableContainer* cc, bool resize)
 {
 	InspectableEditor* ui = EnablingControllableContainerEditor::addEditorUI(cc, resize);
 	if (BaseItemEditor* bui = dynamic_cast<BaseItemEditor*>(ui)) itemEditors.addIfNotAlreadyThere(bui);
 	return ui;
 }
 
-template<class T>
-void GenericManagerEditor<T>::removeEditorUI(InspectableEditor* ui, bool resize)
+template<class T, class G>
+void GenericManagerEditor<T, G>::removeEditorUI(InspectableEditor* ui, bool resize)
 {
 	if (BaseItemEditor* bui = dynamic_cast<BaseItemEditor*>(ui)) itemEditors.removeAllInstancesOf(bui);
 	EnablingControllableContainerEditor::removeEditorUI(ui, resize);
 }
 
 
-template<class T>
-void GenericManagerEditor<T>::newMessage(const typename Manager<T>::ManagerEvent& e)
+template<class T, class G>
+void GenericManagerEditor<T, G>::newMessage(const typename Manager<T>::ManagerEvent& e)
 {
 	switch (e.type)
 	{
@@ -344,8 +347,8 @@ void GenericManagerEditor<T>::newMessage(const typename Manager<T>::ManagerEvent
 }
 
 
-template<class T>
-bool GenericManagerEditor<T>::isInterestedInDragSource(const SourceDetails& dragSourceDetails)
+template<class T, class G>
+bool GenericManagerEditor<T, G>::isInterestedInDragSource(const SourceDetails& dragSourceDetails)
 {
 	juce::String dataType = dragSourceDetails.description.getProperty("dataType", "").toString();
 	juce::String type = dragSourceDetails.description.getProperty("type", "").toString();
@@ -358,16 +361,16 @@ bool GenericManagerEditor<T>::isInterestedInDragSource(const SourceDetails& drag
 }
 
 
-template<class T>
-void GenericManagerEditor<T>::itemDragEnter(const SourceDetails&)
+template<class T, class G>
+void GenericManagerEditor<T, G>::itemDragEnter(const SourceDetails&)
 {
 	isDraggingOver = true;
 	repaint();
 }
 
 
-template<class T>
-void GenericManagerEditor<T>::itemDragMove(const SourceDetails& dragSourceDetails)
+template<class T, class G>
+void GenericManagerEditor<T, G>::itemDragMove(const SourceDetails& dragSourceDetails)
 {
 	currentDropIndex = getDropIndexForPosition(dragSourceDetails.localPosition);
 	repaint();
@@ -375,16 +378,16 @@ void GenericManagerEditor<T>::itemDragMove(const SourceDetails& dragSourceDetail
 
 
 
-template<class T>
-void GenericManagerEditor<T>::itemDragExit(const SourceDetails&)
+template<class T, class G>
+void GenericManagerEditor<T, G>::itemDragExit(const SourceDetails&)
 {
 	isDraggingOver = false;
 	repaint();
 }
 
 
-template<class T>
-void GenericManagerEditor<T>::itemDropped(const SourceDetails& dragSourceDetails)
+template<class T, class G>
+void GenericManagerEditor<T, G>::itemDropped(const SourceDetails& dragSourceDetails)
 {
 	if (BaseItemEditor* bui = dynamic_cast<BaseItemEditor*>(dragSourceDetails.sourceComponent.get()))
 	{
@@ -425,8 +428,8 @@ void GenericManagerEditor<T>::itemDropped(const SourceDetails& dragSourceDetails
 
 
 
-template<class T>
-int GenericManagerEditor<T>::getDropIndexForPosition(juce::Point<int> localPosition)
+template<class T, class G>
+int GenericManagerEditor<T, G>::getDropIndexForPosition(juce::Point<int> localPosition)
 {
 	for (int i = 0; i < itemEditors.size(); ++i)
 	{
