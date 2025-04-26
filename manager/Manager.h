@@ -34,7 +34,7 @@ public:
 	void setHasGridOptions(bool hasGridOptions);
 
 
-	virtual T* createItem(); //to override if special constructor to use
+	virtual T* createItem() override; //to override if special constructor to use
 	virtual G* createGroup(); //to override if special constructor to use
 
 	virtual BaseItem* createItemFromData(juce::var data) override;
@@ -85,7 +85,7 @@ public:
 
 	virtual T* getItemWithName(const juce::String& itemShortName, bool searchNiceNameToo = false, bool searchWithLowerCaseIfNotFound = true) override;
 
-	virtual T* getItemWithPath(const juce::String& relativePath);
+	virtual T* getItemWithPath(const juce::String& relativePath) override;
 
 	juce::PopupMenu getItemsMenu(int startID);
 	T* getItemForMenuResultID(int id, int startID);
