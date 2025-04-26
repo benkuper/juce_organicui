@@ -564,7 +564,7 @@ void Manager<T, G>::notifyItemsReordered(bool fromChildGroup)
 	
 	juce::ListenerList<ManagerListener>* listenersToCall = fromChildGroup ? &recursiveManagerListeners : &managerListeners;
 	listenersToCall->call(&ManagerListener::itemsReordered);
-	notifyAsync(ManagerEvent::ITEMS_REORDERED, Array<BaseItem*>(), fromChildGroup);
+	notifyAsync(ManagerEvent::ITEMS_REORDERED, juce::Array<BaseItem*>(), fromChildGroup);
 }
 
 template<class T, class G>
