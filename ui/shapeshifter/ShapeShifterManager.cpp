@@ -282,8 +282,8 @@ void ShapeShifterManager::loadLayoutFromFile(int fileIndexInLayoutFolder)
 	if (fileIndexInLayoutFolder == -1)
 	{
 		FileChooser* fc(new FileChooser("Load layout", layoutFolder, "*." + appLayoutExtension));
-		auto folderChooserFlags = FileBrowserComponent::openMode | FileBrowserComponent::canSelectDirectories;
-		fc->launchAsync(folderChooserFlags, [this](const FileChooser& fc)
+		auto fileChooserFlags = FileBrowserComponent::FileChooserFlags::openMode | FileBrowserComponent::FileChooserFlags::canSelectFiles;
+		fc->launchAsync(fileChooserFlags, [this](const FileChooser& fc)
 			{
 				File f = fc.getResult();
 				delete& fc;
