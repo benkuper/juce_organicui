@@ -35,7 +35,7 @@ Engine::Engine(const String& fileName, const String& fileExtension) :
 	isClearing(false)
 {
 	//skipControllableNameInAddress = true;
-	isBetaVersion = getAppVersion().endsWith("b");
+	isBetaVersion = getAppVersion().containsChar('b');
 	betaVersion = getBetaVersion(getAppVersion());
 
 	selectionManager.reset(new InspectableSelectionManager(true)); //selectionManager constructor
