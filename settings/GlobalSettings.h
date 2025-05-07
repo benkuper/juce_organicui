@@ -56,6 +56,7 @@ public:
 	BoolParameter* useGLRenderer;
 	IntParameter* uiRefreshRate;
 	IntParameter* loggerRefreshRate;
+	BoolParameter* alwaysOnTop;
 
 	ControllableContainer saveLoadCC;
 	BoolParameter * enableAutoSave;
