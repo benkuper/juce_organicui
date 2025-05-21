@@ -189,11 +189,14 @@ void OrganicApplication::anotherInstanceStarted(const String& commandLine)
 		mainWindow->setMinimised(false);
 	}
 
-	//hack because using toFront doesn't work
-	mainWindow->setAlwaysOnTop(true);
-	mainWindow->grabKeyboardFocus();
-	mainWindow->setAlwaysOnTop(false);
-
+	//hack because using toFront doesn't work (only if we aren't already on top)
+	if (!mainWindow->isAlwaysOnTop()) {
+		mainWindow->setAlwaysOnTop(true);
+		mainWindow->grabKeyboardFocus();
+		mainWindow->setAlwaysOnTop(false);
+	} else {
+		mainWindow->grabKeyboardFocus();
+	}
 }
 
 
@@ -351,6 +354,10 @@ inline OrganicApplication::MainWindow::MainWindow(String name, OrganicMainConten
 	else
 	{
 		setVisible(true);
+	}
+	
+	if (GlobalSettings::getInstance()->alwaysOnTop->boolValue()) {
+		setAlwaysOnTop(true);
 	}
 
 	mainComponent->init();

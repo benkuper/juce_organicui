@@ -126,7 +126,7 @@ public:
 	virtual Controllable* getControllableForAddress(const juce::String& address, bool recursive = true);
 	virtual Controllable* getControllableForAddress(juce::StringArray addressSplit, bool recursive = true);
 	bool containsControllable(Controllable* c, int maxSearchLevels = -1);
-	juce::String getControlAddress(ControllableContainer* relativeTo = nullptr);
+	juce::String getControlAddress(const ControllableContainer* relativeTo = nullptr) const;
 
 	template<class T>
 	T* getParentAs(int level = 1)
