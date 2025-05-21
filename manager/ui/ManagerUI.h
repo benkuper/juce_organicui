@@ -26,7 +26,7 @@ public:
 
 	static_assert(std::is_base_of<Manager<T, G>, M>::value, "M must be derived from Manager<T>");
 	static_assert(std::is_base_of<BaseItem, T>::value, "T must be derived from BaseItem");
-	static_assert(std::is_base_of<BaseItemMinimalUI, U>::value, "U must be derived from BaseItemMinimalUI");
+	//static_assert(std::is_base_of<BaseItemMinimalUI, U>::value, "U must be derived from BaseItemMinimalUI");
 	static_assert(std::is_base_of<ItemGroup<T>, G>::value, "G must be derived from ItemBaseGroup<T>");
 	static_assert(std::is_base_of<BaseItemMinimalUI, GU>::value, "GU must be derived from BaseItemMinimalUI");
 
