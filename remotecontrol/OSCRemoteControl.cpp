@@ -437,7 +437,7 @@ void OSCRemoteControl::run()
 void OSCRemoteControl::setupServer()
 {
 	server.reset(new SimpleWebSocketServer());
-	server->handler = this;
+	server->addHTTPRequestHandler(this);
 	server->addWebSocketListener(this);
 	server->start(localPort->intValue() + portIncrement, "", "", allowAddressReuse->boolValue());
 }
