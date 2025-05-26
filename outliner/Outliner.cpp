@@ -450,7 +450,7 @@ OutlinerItemComponent::OutlinerItemComponent(OutlinerItem* _item) :
 {
 	if (item->isContainer && item->container == nullptr)
 	{
-		jassertfalse;
+	jassertfalse;
 		return;
 	}
 
