@@ -47,9 +47,6 @@ public:
 	BoolParameter* logOutgoing;
 	BoolParameter* sendFeedbackOnListen;
 	BoolParameter* enableSendLogFeedback;
-	BoolParameter* allowAddressReuse;
-	BoolParameter* autoIncrementOnServerFail;
-	int portIncrement;
 
 	EnablingControllableContainer manualSendCC;
 	juce::OSCSender manualSender;
