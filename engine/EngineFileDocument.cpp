@@ -90,6 +90,8 @@ juce::Result Engine::loadDocumentNoCheck(const juce::File& file)
 	updateScriptObject();
 #endif
 
+	handleAsyncUpdate();
+
 	lastFileAbsolutePath = getFile().getFullPathName();
 	return Result::ok();
 }
