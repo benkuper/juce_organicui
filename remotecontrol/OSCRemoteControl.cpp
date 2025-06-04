@@ -36,10 +36,11 @@ OSCRemoteControl::OSCRemoteControl() :
 #endif
 	, manualSendCC("Manual OSC Send")
 	, localPort(nullptr)
-	, portIncrement(0)
 {
 
 	saveAndLoadRecursiveData = true; //can be useful when app include other settings there
+
+	showWarningInUI = true;
 
 	enabled->setValue(false);
 
@@ -56,18 +57,10 @@ OSCRemoteControl::OSCRemoteControl() :
 	manualAddress = manualSendCC.addStringParameter("Address", "Address to send to", "127.0.0.1");
 	manualPort = manualSendCC.addIntParameter("Port", "Port to send to", ORGANIC_REMOTE_CONTROL_PORT + 1, 1, 65535);
 
-	bool defaultAllowAddr = false;
-#if JUCE_LINUX
-	defaultAllowAddr = true;
-#endif
-	allowAddressReuse = addBoolParameter("Allow Address Reuse", "Allow multiple binding on the same port. This can be useful on linux when auto relaunching.", defaultAllowAddr);
-	autoIncrementOnServerFail = addBoolParameter("Auto Increment on Fail Binding", "If the binding of the server port fails, auto increment the port and retry", false);
 
 	manualSendCC.enabled->setDefaultValue(false);
 	addChildControllableContainer(&manualSendCC);
 
-#if ORGANICUI_USE_WEBSERVER
-#endif
 }
 
 OSCRemoteControl::~OSCRemoteControl()
@@ -439,7 +432,7 @@ void OSCRemoteControl::setupServer()
 	server.reset(new SimpleWebSocketServer());
 	server->addHTTPRequestHandler(this);
 	server->addWebSocketListener(this);
-	server->start(localPort->intValue() + portIncrement, "", "", allowAddressReuse->boolValue());
+	server->start(localPort->intValue());
 }
 
 bool OSCRemoteControl::handleHTTPRequest(std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request)
@@ -556,21 +549,15 @@ bool OSCRemoteControl::handleHTTPRequest(std::shared_ptr<HttpServer::Response> r
 void OSCRemoteControl::serverInitSuccess()
 {
 	LOG("Server started on port " << server->port);
+	clearWarning("server");
 }
 
 void OSCRemoteControl::serverInitError(const String& message)
 {
-	bool failed = !autoIncrementOnServerFail->boolValue() || portIncrement >= 50;
-
-	if (failed)
-	{
-		LOGERROR("Error starting server on port " << server->port);
-		return;
-	}
-
-	LOGWARNING("Error starting server on port " << server->port << ", trying next port...");
-	portIncrement++;
-	setupServer();
+	setWarningMessage("Error starting server on port " + String(server->port) + ", trying again every 5 seconds..", "server");
+	Timer::callAfterDelay(5000, [this]() {
+		setupServer();
+		});
 }
 
 void OSCRemoteControl::connectionOpened(const String& id)
@@ -738,7 +725,7 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 							{
 								if (pnv.value.size() >= 1)
 								{
-									actions.addArray(p->setUndoableValue(pnv.value[0], true, false));
+									actions.addArray(p->setUndoableValue(pnv.value[0], pnv.value.size() >= 2 ? (bool)(int)pnv.value[1] : true, false));
 								}
 							}
 						}
