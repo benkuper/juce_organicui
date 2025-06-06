@@ -182,8 +182,13 @@ void CrashDumpUploader::uploadCrash()
 
 	std::unique_ptr<InputStream> stream(URL(url).createInputStream(options));
 
+	bool failed = stream == nullptr;
+
 #if JUCE_WINDOWS
-	if (statusCode != 200)
+	if (statusCode != 200) failed = true;
+#endif
+
+	if (failed)
 	{
 		LOGWARNING("Failed to connect, status code = " + String(statusCode));
 
@@ -194,8 +199,9 @@ void CrashDumpUploader::uploadCrash()
 			w->removeFromDesktop();
 			w.reset();
 		}
+
+		return;
 	}
-#endif
 
 	String convertedData = stream->readEntireStreamAsString();
 
