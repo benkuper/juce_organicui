@@ -26,7 +26,7 @@ public:
 
 	static_assert(std::is_base_of<Manager<T, G>, M>::value, "M must be derived from Manager<T>");
 	static_assert(std::is_base_of<BaseItem, T>::value, "T must be derived from BaseItem");
-	static_assert(std::is_base_of<BaseItemMinimalUI, U>::value, "U must be derived from BaseItemMinimalUI");
+	//static_assert(std::is_base_of<BaseItemMinimalUI, U>::value, "U must be derived from BaseItemMinimalUI");
 	static_assert(std::is_base_of<ItemGroup<T>, G>::value, "G must be derived from ItemBaseGroup<T>");
 	static_assert(std::is_base_of<BaseItemMinimalUI, GU>::value, "GU must be derived from BaseItemMinimalUI");
 
@@ -134,8 +134,8 @@ GU* ManagerUI<M, T, U, G, GU>::createUIForGroup(G* item)
 template<class M, class T, class U, class G, class GU>
 void ManagerUI<M, T, U, G, GU>::addItemUIManagerInternal(BaseItemMinimalUI* itemUI)
 {
-	if (itemUI->isGroupUI()) itemsUI.add((U*)itemUI);
-	else groupsUI.add((GU*)itemUI);
+	if (itemUI->isGroupUI()) groupsUI.add((GU*)itemUI);
+	else itemsUI.add((U*)itemUI);
 
 	addItemUIInternal((U*)itemUI);
 }
@@ -143,8 +143,8 @@ void ManagerUI<M, T, U, G, GU>::addItemUIManagerInternal(BaseItemMinimalUI* item
 template<class M, class T, class U, class G, class GU>
 void ManagerUI<M, T, U, G, GU>::removeItemUIManagerInternal(BaseItemMinimalUI* itemUI)
 {
-	if (itemUI->isGroupUI()) itemsUI.removeAllInstancesOf((U*)itemUI);
-	else groupsUI.removeAllInstancesOf((GU*)itemUI);
+	if (itemUI->isGroupUI()) groupsUI.removeAllInstancesOf((GU*)itemUI);
+	else itemsUI.removeAllInstancesOf((U*)itemUI);
 	removeItemUIInternal((U*)itemUI);
 }
 

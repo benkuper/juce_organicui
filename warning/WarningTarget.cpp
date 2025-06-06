@@ -34,10 +34,18 @@ void WarningTarget::setWarningMessage(const String& message, const String& id, b
 	{
 		if (message.isEmpty()) return;
 	}
-	
+
 	if (warningMessage.size() == 0) WarningReporter::getInstance()->unregisterWarning(this);
 
-	if (log && Engine::mainEngine != nullptr && !Engine::mainEngine->isLoadingFile && !Engine::mainEngine->isClearing) LOGWARNING(message);
+	if (log && Engine::mainEngine != nullptr && !Engine::mainEngine->isLoadingFile && !Engine::mainEngine->isClearing)
+	{
+		String n = "Warning Target";
+		if (ControllableContainer* cc = dynamic_cast<ControllableContainer*>(this))  n = cc->niceName;
+		else if (Controllable* c = dynamic_cast<Controllable*>(this)) n = c->niceName;
+
+		String prefix = id.isNotEmpty() ? "[" + id + "] " : "";
+		NLOGWARNING(n,prefix + message);
+	}
 
 	if (!message.isEmpty())
 	{
@@ -64,9 +72,13 @@ void WarningTarget::unregisterWarningNow()
 {
 	if (warningMessage.size() > 0)
 	{
-		if (!WarningReporter::getInstance()->targets.contains(this)) return;
-		MessageManagerLock mmLock;
-		WarningReporter::getInstance()->unregisterWarning(this);
+		if (WarningReporter::getInstanceWithoutCreating())
+		{
+			if (!WarningReporter::getInstance()->targets.contains(this)) return;
+
+			MessageManagerLock mmLock;
+			WarningReporter::getInstance()->unregisterWarning(this);
+		}
 	}
 
 	if (warningTargetNotifier.isUpdatePending())
