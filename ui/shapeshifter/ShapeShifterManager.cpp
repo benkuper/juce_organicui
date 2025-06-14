@@ -458,6 +458,14 @@ PopupMenu ShapeShifterManager::getPanelsMenu()
 
 	Array<File> layoutFiles = getLayoutFiles();
 
+	std::sort(
+		layoutFiles.begin(),
+		layoutFiles.end(),
+		[](const File& a, const File& b) {
+			return a.getFileNameWithoutExtension() < b.getFileNameWithoutExtension();
+		}
+	);
+
 	//int specialIndex = layoutP.getNumItems() + 2; //+2 to have lockPanels
 	int li = 0;
 	for (auto& f : layoutFiles)
