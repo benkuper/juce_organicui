@@ -457,7 +457,7 @@ void ManagerUI<M, T, U>::mouseDown(const juce::MouseEvent& e)
 				}
 			}
 		}
-		else if (e.mods.isRightButtonDown() && e.eventComponent == this)
+		else if (e.mods.isRightButtonDown())
 		{
 			if (manager->userCanAddItemsManually) showMenuAndAddItem(false, e.getEventRelativeTo(this).getMouseDownPosition());
 		}
