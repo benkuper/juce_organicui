@@ -128,7 +128,7 @@ void GradientColorManagerUI::removeItemUIInternal(GradientColorUI* item)
 
 void GradientColorManagerUI::mouseDown(const MouseEvent& e)
 {
-	ManagerUI::mouseDown(e);
+	if(!e.mods.isRightButtonDown()) ManagerUI::mouseDown(e);
 
 	if (GradientColorUI* handle = dynamic_cast<GradientColorUI*>(e.eventComponent))
 	{
