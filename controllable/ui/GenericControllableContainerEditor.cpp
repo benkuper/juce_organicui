@@ -750,7 +750,8 @@ EnablingControllableContainerEditor::EnablingControllableContainerEditor(Array<E
 
 	if (ioContainer->canBeDisabled)
 	{
-		enabledUI.reset(ioContainer->enabled->createToggle(ImageCache::getFromMemory(OrganicUIBinaryData::power_png, OrganicUIBinaryData::power_pngSize)));
+		enabledUI.reset(ioContainer->enabled->createToggle(ImageCache::getFromMemory(OrganicUIBinaryData::enable_png, OrganicUIBinaryData::enable_pngSize),
+			ImageCache::getFromMemory(OrganicUIBinaryData::disable_png, OrganicUIBinaryData::disable_pngSize)));
 		addAndMakeVisible(enabledUI.get());
 	}
 }

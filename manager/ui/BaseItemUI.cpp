@@ -64,7 +64,7 @@ BaseItemUI::BaseItemUI(BaseItem* _item, Direction _resizeDirection, bool showMin
 
 	if (this->baseItem->canBeDisabled)
 	{
-		enabledBT.reset(this->baseItem->enabled->createToggle(juce::ImageCache::getFromMemory(OrganicUIBinaryData::power_png, OrganicUIBinaryData::power_pngSize)));
+		enabledBT.reset(this->baseItem->enabled->createToggle(juce::ImageCache::getFromMemory(OrganicUIBinaryData::enable_png, OrganicUIBinaryData::enable_pngSize), ImageCache::getFromMemory(OrganicUIBinaryData::disable_png, OrganicUIBinaryData::disable_pngSize)));
 		this->addAndMakeVisible(enabledBT.get());
 	}
 

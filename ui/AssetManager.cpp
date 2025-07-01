@@ -11,6 +11,9 @@ AssetManager::AssetManager()
 	powerOn = ImageCache::getFromMemory(OrganicUIBinaryData::power_png, OrganicUIBinaryData::power_pngSize);
 	powerOff = powerOn.createCopy();
 	powerOff.desaturate();
+	 
+	enable = ImageCache::getFromMemory(OrganicUIBinaryData::enable_png, OrganicUIBinaryData::enable_pngSize);
+	disable = ImageCache::getFromMemory(OrganicUIBinaryData::disable_png, OrganicUIBinaryData::disable_pngSize);
 
 	drag = ImageCache::getFromMemory(OrganicUIBinaryData::drag_png, OrganicUIBinaryData::drag_pngSize);
 	inImage = ImageCache::getFromMemory(OrganicUIBinaryData::in_png, OrganicUIBinaryData::in_pngSize);
@@ -29,7 +32,7 @@ AssetManager::~AssetManager()
 ImageButton* AssetManager::getRemoveBT() { return getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::cancel_png, OrganicUIBinaryData::cancel_pngSize)); }
 ImageButton* AssetManager::getConfigBT() { return getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::settings_png, OrganicUIBinaryData::settings_pngSize)); }
 ImageButton* AssetManager::getTargetBT() { return getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::target_png, OrganicUIBinaryData::target_pngSize)); }
-ImageButton* AssetManager::getPowerBT() { return getToggleBTImage(powerOn); }
+ImageButton* AssetManager::getPowerBT() { return getBTDoubleImage(enable, disable); }
 ImageButton* AssetManager::getAddBT() { return getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::add_png, OrganicUIBinaryData::add_pngSize)); }
 ImageButton* AssetManager::getDuplicateBT() { return getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::duplicate_png, OrganicUIBinaryData::duplicate_pngSize)); }
 ImageButton* AssetManager::getFileBT() { return getSetupBTImage(ImageCache::getFromMemory(OrganicUIBinaryData::file_png, OrganicUIBinaryData::file_pngSize)); }

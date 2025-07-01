@@ -53,6 +53,9 @@ namespace OrganicUIBinaryData
     extern const char*   checkbox_on_readonly_png;
     const int            checkbox_on_readonly_pngSize = 2389;
 
+    extern const char*   disable_png;
+    const int            disable_pngSize = 2235;
+
     extern const char*   distribute_h_png;
     const int            distribute_h_pngSize = 3365;
 
@@ -70,6 +73,9 @@ namespace OrganicUIBinaryData
 
     extern const char*   edit_png;
     const int            edit_pngSize = 16204;
+
+    extern const char*   enable_png;
+    const int            enable_pngSize = 2255;
 
     extern const char*   explorer_png;
     const int            explorer_pngSize = 1460;
@@ -129,7 +135,7 @@ namespace OrganicUIBinaryData
     const int            warning_pngSize = 1153;
 
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 40;
+    const int namedResourceListSize = 42;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];

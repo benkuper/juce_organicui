@@ -22,6 +22,8 @@ public:
 	juce::Image eyeImage;
 	juce::Image powerOn;
 	juce::Image powerOff;
+	juce::Image enable;
+	juce::Image disable;
 	juce::Image drag;
 	juce::Image cancel;
 
