@@ -96,7 +96,7 @@ private:
 
 	juce::Atomic<int> totalLogRow;
 	void updateTotalLogRow();
-	const LogElement * getElementForRow(const int r) const;
+	const juce::WeakReference<LogElement> getElementForRow(const int r) const;
 	const juce::String& getSourceForRow(const int r) const;
 	const bool isPrimaryRow(const int r) const;
 	const juce::String& getContentForRow(const int r) const;

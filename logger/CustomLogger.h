@@ -17,7 +17,7 @@ public:
 
 	struct LogEvent
 	{
-		LogElement* log;
+		juce::WeakReference<LogElement> log;
 	};
 	QueuedNotifier<LogEvent> notifier;
 	typedef QueuedNotifier<LogEvent>::Listener LoggerListener;

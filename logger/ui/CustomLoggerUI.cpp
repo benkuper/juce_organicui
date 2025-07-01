@@ -109,6 +109,7 @@ void CustomLoggerUI::updateTotalLogRow()
 const String& CustomLoggerUI::getSourceForRow(const int r) const
 {
 	if (auto el = getElementForRow(r)) {
+		if (el == nullptr) return EmptyString;
 		return el->source;
 	}
 	return EmptyString;
@@ -126,7 +127,6 @@ const bool CustomLoggerUI::isPrimaryRow(const int r) const
 			return true;
 		}
 		if (logger->logElements.size() <= idx) return false;
-
 		count += logger->logElements[idx]->getNumLines();
 		idx++;
 
@@ -157,7 +157,7 @@ const String& CustomLoggerUI::getContentForRow(const int r) const
 	return EmptyString;
 };
 
-const LogElement* CustomLoggerUI::getElementForRow(const int r) const {
+const WeakReference<LogElement> CustomLoggerUI::getElementForRow(const int r) const {
 	int count = 0;
 	int idx = 0;
 
@@ -184,6 +184,7 @@ const LogElement* CustomLoggerUI::getElementForRow(const int r) const {
 const String  CustomLoggerUI::getTimeStringForRow(const int r) const
 {
 	if (auto el = getElementForRow(r)) {
+		if (el == nullptr) return "";
 		return String(el->time.toString(false, true, true, true) + "." + String::formatted("%03d", el->time.getMilliseconds()));
 	}
 
@@ -195,6 +196,8 @@ const Colour& CustomLoggerUI::getSeverityColourForRow(const int r) const
 
 	if (auto el = getElementForRow(r))
 	{
+		if (el == nullptr) return Colours::pink;
+
 		LogElement::Severity s = el->severity;
 
 		switch (s)
@@ -349,6 +352,7 @@ const Font  getLogFont() {
 String CustomLoggerUI::LogList::getTextAt(int rowNumber, int columnId) {
 	String text;
 
+	if (owner == nullptr) return text;
 
 	switch (columnId)
 	{
