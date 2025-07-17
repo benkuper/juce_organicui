@@ -327,6 +327,7 @@ void ControllableUI::newMessage(const Controllable::ControllableEvent& e)
 	break;
 
 	case Controllable::ControllableEvent::NAME_CHANGED:
+		repaint();
 		break;
 
 	case Controllable::ControllableEvent::STATE_CHANGED:
