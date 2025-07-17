@@ -1663,6 +1663,18 @@ void EnablingControllableContainer::setCanBeDisabled(bool value)
 	}
 }
 
+bool EnablingControllableContainer::isEnabled() const
+{
+	if (canBeDisabled)
+	{
+		return enabled->boolValue();
+	}
+	else
+	{
+		return true;
+	}
+}
+
 InspectableEditor* EnablingControllableContainer::getEditorInternal(bool isRoot, Array<Inspectable*> inspectables)
 {
 	if (customGetEditorFunc != nullptr) return customGetEditorFunc(isRoot, Inspectable::getArrayAs<Inspectable, ControllableContainer>(inspectables));
