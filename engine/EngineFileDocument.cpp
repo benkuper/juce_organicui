@@ -251,7 +251,6 @@ Result Engine::saveBackupDocument(int index)
 
 	if (!getFile().existsAsFile()) return Result::ok();
 
-	isThereChangeToBackup = false;// set to false, until changed() methods is call
 	String curFileName = getFile().getFileNameWithoutExtension();
 	File autoSaveDir = getFile().getParentDirectory().getChildFile(curFileName + "_autosave");
 	autoSaveDir.createDirectory();
@@ -274,6 +273,8 @@ Result Engine::saveBackupDocument(int index)
 
 	lastChangeTime = Time::getCurrentTime(); //needed to avoid detecting latest autosave as more recent than current file
 
+	isThereChangeToBackup = false; // set to false, until changed() methods is call
+	autoSaveIndex = (autoSaveIndex + 1) % GlobalSettings::getInstance()->autoSaveCount->intValue();
 	return Result::ok();
 }
 
