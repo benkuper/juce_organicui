@@ -45,6 +45,7 @@ public:
 
 	int autoSaveIndex;
 	juce::Time lastChangeTime;
+	bool isThereChangeToBackup = false; // true if there is real change to backup ( set to true on changed() methods )
 
 	virtual void changed() override;
 	void createNewGraph();

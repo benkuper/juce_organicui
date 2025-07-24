@@ -28,6 +28,7 @@ void Engine::changed()
 {
 	FileBasedDocument::changed();
 	lastChangeTime = Time::getCurrentTime();
+	isThereChangeToBackup = true;
 	engineListeners.call(&EngineListener::fileChanged);
 	engineNotifier.addMessage(new EngineEvent(EngineEvent::FILE_CHANGED, this));
 }
@@ -245,10 +246,12 @@ juce::Result Engine::saveCopy()
 
 Result Engine::saveBackupDocument(int index)
 {
-	if (GlobalSettings::getInstance()->autoSaveOnChangeOnly->boolValue() && !hasChangedSinceSaved()) return Result::ok();
+
+	if (GlobalSettings::getInstance()->autoSaveOnChangeOnly->boolValue() && !isThereChangeToBackup ) {return Result::ok();}
 
 	if (!getFile().existsAsFile()) return Result::ok();
 
+	isThereChangeToBackup = false;// set to false, until changed() methods is call
 	String curFileName = getFile().getFileNameWithoutExtension();
 	File autoSaveDir = getFile().getParentDirectory().getChildFile(curFileName + "_autosave");
 	autoSaveDir.createDirectory();
