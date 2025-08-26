@@ -25,6 +25,7 @@ public:
 	juce::String type;
 	juce::String menuPath;
 	juce::Image icon;
+	bool isEnabled = true;
 
 	BaseFactoryDefinition* addIcon(juce::Image icon)
 	{
@@ -156,7 +157,7 @@ public:
 
 			if (d->menuPath.isEmpty())
 			{
-				menu.addItem(itemID, d->type, true, false, d->icon);
+				menu.addItem(itemID, d->type, d->isEnabled, false, d->icon);
 				continue;
 			}
 
@@ -177,7 +178,7 @@ public:
 				subMenuIndex = subMenus.size() - 1;
 			}
 
-			subMenus[subMenuIndex]->addItem(itemID, d->type, true, false, d->icon);
+			subMenus[subMenuIndex]->addItem(itemID, d->type, d->isEnabled, false, d->icon);
 		}
 
 		for (int i = 0; i < subMenus.size(); ++i) menu.addSubMenu(subMenuNames[i], *subMenus[i]);

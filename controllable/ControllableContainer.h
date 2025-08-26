@@ -360,5 +360,7 @@ public:
 	bool canBeDisabled;
 	void setCanBeDisabled(bool value);
 
+	bool isEnabled() const;
+
 	virtual InspectableEditor* getEditorInternal(bool isRoot, juce::Array<Inspectable*> inspectables = juce::Array<Inspectable*>()) override;
 };

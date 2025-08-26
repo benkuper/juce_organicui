@@ -219,7 +219,7 @@ void Engine::timerCallback(int timerID)
 		{
 			if (GlobalSettings::getInstance()->autoSaveCurrentFile->boolValue()) if (getFile().existsAsFile()) saveDocument(getFile());
 			saveBackupDocument(autoSaveIndex);
-			autoSaveIndex = (autoSaveIndex + 1) % GlobalSettings::getInstance()->autoSaveCount->intValue();
+
 			startTimer(1, 60000 * GlobalSettings::getInstance()->autoSaveTime->intValue());
 		}
 	}
