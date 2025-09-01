@@ -503,22 +503,30 @@ bool OSCRemoteControl::handleHTTPRequest(std::shared_ptr<HttpServer::Response> r
 	else if (String(request->path) == "/autosaveFiles")
 	{
 		String curFileName = Engine::mainEngine->getFile().getFileNameWithoutExtension();
-		File autoSaveDir = Engine::mainEngine->getFile().getParentDirectory().getChildFile(curFileName + "_autosave");
-		autoSaveDir.createDirectory();
-		Array<File> files = autoSaveDir.findChildFiles(File::findFiles, false, "*" + Engine::mainEngine->fileExtension);
-		std::sort(files.begin(), files.end(), [](const File& a, const File& b) { return a.getLastModificationTime() > b.getLastModificationTime(); });
-
-		data = new DynamicObject();
-		var autoSaveFilesData;
-		for (auto& f : files)
+		if (curFileName.isEmpty())
 		{
-			var fData(new DynamicObject());
-			fData.getDynamicObject()->setProperty("name", f.getFileName());
-			fData.getDynamicObject()->setProperty("path", f.getFullPathName());
-			fData.getDynamicObject()->setProperty("modificationTime", f.getLastModificationTime().toISO8601(true));
-			autoSaveFilesData.append(fData);
+			data = new DynamicObject();
+			data.getDynamicObject()->setProperty("autosaveFiles", var());
 		}
-		data.getDynamicObject()->setProperty("autosaveFiles", autoSaveFilesData);
+		else
+		{
+			File autoSaveDir = Engine::mainEngine->getFile().getParentDirectory().getChildFile(curFileName + "_autosave");
+			autoSaveDir.createDirectory();
+			Array<File> files = autoSaveDir.findChildFiles(File::findFiles, false, "*" + Engine::mainEngine->fileExtension);
+			std::sort(files.begin(), files.end(), [](const File& a, const File& b) { return a.getLastModificationTime() > b.getLastModificationTime(); });
+
+			data = new DynamicObject();
+			var autoSaveFilesData;
+			for (auto& f : files)
+			{
+				var fData(new DynamicObject());
+				fData.getDynamicObject()->setProperty("name", f.getFileName());
+				fData.getDynamicObject()->setProperty("path", f.getFullPathName());
+				fData.getDynamicObject()->setProperty("modificationTime", f.getLastModificationTime().toISO8601(true));
+				autoSaveFilesData.append(fData);
+			}
+			data.getDynamicObject()->setProperty("autosaveFiles", autoSaveFilesData);
+		}
 	}
 	else
 	{
