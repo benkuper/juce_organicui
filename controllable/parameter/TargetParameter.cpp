@@ -333,7 +333,7 @@ void TargetParameter::tryFixBrokenLink()
 	{
 		if (targetContainer == nullptr)
 		{
-			if (ghostValue.isNotEmpty())
+			if (ghostValue.isNotEmpty() && (rootContainer != nullptr && !rootContainer.wasObjectDeleted()))
 			{
 				WeakReference<ControllableContainer> tcc = rootContainer->getControllableContainerForAddress(ghostValue);
 				if (tcc != nullptr) setValueFromTarget(tcc);
