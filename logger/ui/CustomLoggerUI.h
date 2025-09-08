@@ -79,7 +79,6 @@ public:
 
 	void buttonClicked(juce::Button*) override;
 
-
 	void newMessage(const CustomLogger::LogEvent&) override;
 
 	void clearLogger();
