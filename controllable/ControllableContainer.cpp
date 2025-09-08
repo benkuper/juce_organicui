@@ -404,7 +404,7 @@ void ControllableContainer::setNiceName(const String& _niceName)
 	if (OSCRemoteControl::getInstanceWithoutCreating() != nullptr && isAttachedToRoot()) OSCRemoteControl::getInstance()->sendPathNameChangedFeedback(oldControlAddress, getControlAddress());
 #endif
 
-
+	niceNameChanged();
 	onContainerNiceNameChanged();
 }
 
