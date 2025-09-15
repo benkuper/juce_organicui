@@ -277,6 +277,9 @@ template<class T, class G> class NestingManager;
 #define DECLARE_TYPE(type) juce::String getTypeString() const override { return getTypeStringStatic() ; } \
 static juce::String getTypeStringStatic() { return type; }
 
+#define DECLARE_UI_FUNC BaseItemMinimalUI* createUI() override;
+#define IMPLEMENT_UI_FUNC(classname) BaseItemMinimalUI* classname::createUI() { return new classname##UI(this); }
+
 #include "manager/BaseItemListener.h"
 #include "manager/ManagerListener.h"
 #include "manager/BaseItem.h"

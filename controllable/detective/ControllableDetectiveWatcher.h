@@ -34,5 +34,5 @@ public:
 	void addValue(juce::var data);
 	void run() override;
 
-	virtual ControllableDetectiveWatcherUI* getUI();
+	virtual BaseItemMinimalUI* createUI() override;
 };

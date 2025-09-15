@@ -11,7 +11,7 @@
 #pragma once
 
 class Curve2DUI :
-    public ManagerViewUI<Curve2D, Curve2DKey, Curve2DKeyUI>,
+    public ManagerViewUI<Curve2D, Curve2DKey>,
     public Curve2DKey::AsyncListener,
     public Curve2DKeyUI::KeyUIListener,
     public ContainerAsyncListener,
@@ -26,13 +26,13 @@ public:
 
     void paintOverChildren(juce::Graphics& g) override;
 
-    void updateViewUIPosition(Curve2DKeyUI * ui) override;
+    void updateViewUIPosition(BaseItemMinimalUI * ui) override;
     void updateHandlesForUI(Curve2DKeyUI* ui, bool checkSideItems);
 
-    bool checkItemShouldBeVisible(Curve2DKeyUI* ui) override;
+    bool checkItemShouldBeVisible(BaseItemMinimalUI* ui) override;
 
-    void addItemUIInternal(Curve2DKeyUI* ui) override;
-    void removeItemUIInternal(Curve2DKeyUI* ui) override;
+    void addItemUIInternal(BaseItemMinimalUI* ui) override;
+    void removeItemUIInternal(BaseItemMinimalUI* ui) override;
 
     void mouseDown(const juce::MouseEvent& e) override;
     void mouseDrag(const juce::MouseEvent& e) override;
@@ -40,7 +40,7 @@ public:
 
     void mouseDoubleClick(const juce::MouseEvent& e) override;
 
-    Component* getSelectableComponentForItemUI(Curve2DKeyUI* ui) override;
+    juce::Component* getSelectableComponentForItemUI(BaseItemMinimalUI* ui) override;
 
     void newMessage(const Curve2DKey::Curve2DKeyEvent& e) override;
     void newMessage(const ContainerAsyncEvent& e) override;

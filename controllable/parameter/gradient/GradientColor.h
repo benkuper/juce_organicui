@@ -29,4 +29,6 @@ public:
 	int gradientIndex;
 
 	DECLARE_TYPE("GradientColor");
+	DECLARE_UI_FUNC;
+
 };

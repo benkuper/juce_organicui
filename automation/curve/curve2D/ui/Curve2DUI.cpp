@@ -10,6 +10,7 @@
 
 
 #include "JuceHeader.h"
+#include "Curve2DUI.h"
 
 
 Curve2DUI::Curve2DUI(Curve2D* manager) :
@@ -96,21 +97,24 @@ void Curve2DUI::paintOverChildren(Graphics& g)
 	}
 }
 
-void Curve2DUI::updateViewUIPosition(Curve2DKeyUI* ui)
+void Curve2DUI::updateViewUIPosition(BaseItemMinimalUI* ui)
 {
-	Point<int> p = getPosInView(ui->item->viewUIPosition->getPoint());
+	Curve2DKeyUI* cui = dynamic_cast<Curve2DKeyUI*>(ui);
+	Point<int> p = getPosInView(cui->item->viewUIPosition->getPoint());
 	Rectangle<int> pr = Rectangle<int>(0, 0, 20, 20).withCentre(p);
-	if (ui->item->easing != nullptr) pr = pr.getUnion(getBoundsInView(ui->item->easing->getBounds(true)).expanded(5, 5));
-	if (ui->item->nextKey != nullptr && (pr.getWidth() == 20 && pr.getHeight() == 20))
+	if (cui->item->easing != nullptr) pr = pr.getUnion(getBoundsInView(cui->item->easing->getBounds(true)).expanded(5, 5));
+	if (cui->item->nextKey != nullptr && (pr.getWidth() == 20 && pr.getHeight() == 20))
 	{
 		//Rectangle<float> t = ui->item->easing->getBounds(true);
 		//Rectangle<int> vt = getBoundsInView(ui->item->easing->getBounds(true));
 		//DBG("Weird");
 	}
 	pr.expand(5, 5);
-	ui->setBounds(pr);
-	ui->setValueBounds(getViewBounds(pr));
+	cui->setBounds(pr);
+	cui->setValueBounds(getViewBounds(pr));
 }
+
+
 
 void Curve2DUI::updateHandlesForUI(Curve2DKeyUI* ui, bool checkSideItems)
 {
@@ -171,23 +175,25 @@ bool Curve2DUI::checkItemShouldBeVisible(Curve2DKeyUI* ui)
 	return visible;
 }
 
-void Curve2DUI::addItemUIInternal(Curve2DKeyUI* ui)
+void Curve2DUI::addItemUIInternal(BaseItemMinimalUI* ui)
 {
 	ManagerViewUI::addItemUIInternal(ui);
-	ui->addMouseListener(this, true);
-	ui->item->addAsyncKeyListener(this);
-	ui->addKeyUIListener(this);
+	Curve2DKeyUI* cui = dynamic_cast<Curve2DKeyUI*>(ui);
+	cui->addMouseListener(this, true);
+	cui->item->addAsyncKeyListener(this);
+	cui->addKeyUIListener(this);
 }
 
-void Curve2DUI::removeItemUIInternal(Curve2DKeyUI* ui)
+void Curve2DUI::removeItemUIInternal(BaseItemMinimalUI* ui)
 {
 	ManagerViewUI::removeItemUIInternal(ui);
-
-	ui->removeMouseListener(this);
+	
+	Curve2DKeyUI* cui = dynamic_cast<Curve2DKeyUI*>(ui);
+	cui->removeMouseListener(this);
 	if (!ui->inspectable.wasObjectDeleted())
 	{
-		ui->item->removeAsyncKeyListener(this);
-		ui->removeKeyUIListener(this);
+		cui->item->removeAsyncKeyListener(this);
+		cui->removeKeyUIListener(this);
 	}
 }
 
@@ -298,7 +304,7 @@ void Curve2DUI::mouseDoubleClick(const MouseEvent& e)
 	}
 }
 
-Component* Curve2DUI::getSelectableComponentForItemUI(Curve2DKeyUI* ui)
+Component* Curve2DUI::getSelectableComponentForItemUI(BaseItemMinimalUI* ui)
 {
 	return &ui->handle;
 }

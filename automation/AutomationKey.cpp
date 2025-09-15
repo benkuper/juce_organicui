@@ -234,3 +234,6 @@ void AutomationKey::notifyKeyUpdated()
 {
     keyNotifier.addMessage(new AutomationKeyEvent(AutomationKeyEvent::KEY_UPDATED, this));
 }
+
+
+IMPLEMENT_UI_FUNC;

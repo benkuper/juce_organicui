@@ -2,13 +2,11 @@
 
 
 class DetectivePanel :
-	public ManagerShapeShifterUI<Detective,ControllableDetectiveWatcher,ControllableDetectiveWatcherUI>
+	public ManagerShapeShifterUI<Detective,ControllableDetectiveWatcher>
 {
 public:
 	DetectivePanel(const juce::String& name);
 	~DetectivePanel();
-
-	ControllableDetectiveWatcherUI* createUIForItem(ControllableDetectiveWatcher* w) override;
 
 	static DetectivePanel* create(const juce::String& contentName) { return new DetectivePanel(contentName); }
 private:

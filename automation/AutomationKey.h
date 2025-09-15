@@ -60,6 +60,7 @@ public:
 
     juce::String getTypeString() const override { return "Key"; }
 
+    DECLARE_UI_FUNC;
     
 
 

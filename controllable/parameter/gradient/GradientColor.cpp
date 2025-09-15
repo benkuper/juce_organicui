@@ -52,3 +52,6 @@ void GradientColor::addUndoableMoveAction(Array<UndoableAction*>& actions)
 {
 	actions.addArray(position->setUndoableValue(position->floatValue(), true));
 }
+
+
+IMPLEMENT_UI_FUNC(GradientColor)

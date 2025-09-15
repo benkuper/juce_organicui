@@ -14,6 +14,7 @@ class GenericControllableManager;
 class ScriptManager;
 class BaseItemMinimalUI;
 
+
 class BaseItem :
 	public EnablingControllableContainer
 {
@@ -118,14 +119,16 @@ private:
 };
 
 
-template<class M>
+template<typename T> class Manager;
+
+template<class T>
 class ItemGroup :
 	public BaseItem
 {
 public:
 	ItemGroup(const juce::String& name = "") : BaseItem(name, true, false, true) {}
 
-	std::unique_ptr<M> manager;
+	std::unique_ptr<Manager<T>> manager;
 
 	virtual ~ItemGroup() { manager.reset(); }
 
@@ -135,12 +138,7 @@ public:
 		BaseItem::clearItem();
 	}
 
-	juce::Array<BaseItem*> getAllItemsInternal(bool recursive, bool includeDisabled, bool includeGroups) override
-	{
-		juce::Array<BaseItem*> allItems;
-		if (!manager) return allItems;
-		return manager->getAllItems(recursive, includeDisabled, includeGroups);
-	}
+	virtual void createManager() { manager = new Manager<T>(); }
 
 	virtual juce::String getTypeString() const override { return "ItemGroup"; }
 };

@@ -11,7 +11,7 @@
 #pragma once
 
 class GradientColorManagerUI :
-	public ManagerUI<GradientColorManager, GradientColor, GradientColorUI>,
+	public ManagerUI<GradientColorManager, GradientColor>,
 	public ContainerAsyncListener,
 	public UITimerTarget,
 	public juce::Thread
@@ -46,19 +46,19 @@ public:
 
 	void updateItemsVisibility() override;
 
-    void addItemUIInternal(GradientColorUI * item) override;
-    void removeItemUIInternal(GradientColorUI * item) override;
+    void addItemUIInternal(BaseItemMinimalUI * item) override;
+    void removeItemUIInternal(BaseItemMinimalUI * item) override;
 
 	void mouseDown(const juce::MouseEvent& e) override;
 	void mouseDoubleClick(const juce::MouseEvent &e) override;
 	void mouseDrag(const juce::MouseEvent &e) override;
 
-	void placeItemUI(GradientColorUI * tui);
+	void placeItemUI(BaseItemMinimalUI * tui);
 
 	int getXForPos(float time);
 	float getPosForX(int tx, bool offsetStart = true);
 
-	bool isInView(GradientColorUI * tui);
+	bool isInView(BaseItemMinimalUI * tui);
 
 	void newMessage(const ContainerAsyncEvent &e) override;
 

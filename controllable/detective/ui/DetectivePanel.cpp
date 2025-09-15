@@ -1,3 +1,5 @@
+#include "DetectivePanel.h"
+
 DetectivePanel::DetectivePanel(const String& name) :
 	ManagerShapeShifterUI(name, Detective::getInstance())
 {
@@ -8,7 +10,7 @@ DetectivePanel::~DetectivePanel()
 {
 }
 
-ControllableDetectiveWatcherUI* DetectivePanel::createUIForItem(ControllableDetectiveWatcher* w)
+BaseItemMinimalUI* DetectivePanel::createUIForItem(BaseItem* w)
 {
-	return w->getUI();
+	return nullptr;
 }

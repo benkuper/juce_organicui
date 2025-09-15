@@ -115,13 +115,13 @@ void GradientColorManagerUI::updateItemsVisibility()
 	ManagerUI::updateItemsVisibility();
 }
 
-void GradientColorManagerUI::addItemUIInternal(GradientColorUI* item)
+void GradientColorManagerUI::addItemUIInternal(BaseItemMinimalUI* item)
 {
 	item->addMouseListener(this, true);
 	placeItemUI(item);
 }
 
-void GradientColorManagerUI::removeItemUIInternal(GradientColorUI* item)
+void GradientColorManagerUI::removeItemUIInternal(BaseItemMinimalUI* item)
 {
 	item->removeMouseListener(this);
 }
@@ -130,7 +130,7 @@ void GradientColorManagerUI::mouseDown(const MouseEvent& e)
 {
 	if(!e.mods.isRightButtonDown()) ManagerUI::mouseDown(e);
 
-	if (GradientColorUI* handle = dynamic_cast<GradientColorUI*>(e.eventComponent))
+	if (BaseItemMinimalUI* handle = dynamic_cast<BaseItemMinimalUI*>(e.eventComponent))
 	{
 		snapTimes.clear();
 		if (getSnapTimesFunc != nullptr) getSnapTimesFunc(&snapTimes);
@@ -157,8 +157,8 @@ void GradientColorManagerUI::mouseDrag(const MouseEvent& e)
 	}
 	else
 	{
-		GradientColorUI* tui = dynamic_cast<GradientColorUI*>(e.eventComponent);
-		if (tui == nullptr) tui = dynamic_cast<GradientColorUI*>(e.eventComponent->getParentComponent());
+		BaseItemMinimalUI* tui = dynamic_cast<BaseItemMinimalUI*>(e.eventComponent);
+		if (tui == nullptr) tui = dynamic_cast<BaseItemMinimalUI*>(e.eventComponent->getParentComponent());
 
 		if (tui != nullptr)
 		{
@@ -191,7 +191,7 @@ void GradientColorManagerUI::mouseDrag(const MouseEvent& e)
 	}
 }
 
-void GradientColorManagerUI::placeItemUI(GradientColorUI* tui)
+void GradientColorManagerUI::placeItemUI(BaseItemMinimalUI* tui)
 {
 	if (tui == nullptr) return;
 	int tx = getXForPos(tui->item->position->floatValue());
@@ -211,7 +211,7 @@ float GradientColorManagerUI::getPosForX(int tx, bool offsetStart)
 	return jmap<float>((float)tx, 0, (float)getWidth(), mapStart, mapStart + viewRange);
 }
 
-bool GradientColorManagerUI::isInView(GradientColorUI* kui)
+bool GradientColorManagerUI::isInView(BaseItemMinimalUI* kui)
 {
 	return kui->item->position->floatValue() >= viewStartPos && kui->item->position->floatValue() <= viewEndPos;
 }

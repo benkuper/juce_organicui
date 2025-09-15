@@ -59,7 +59,7 @@ public:
 	{
 	}
 	virtual ~ItemGroupMinimalUI() {}
-	
+
 	G* group;
 };
 
@@ -83,6 +83,6 @@ public:
 	void resizedInternalHeader(juce::Rectangle<int>& r) override
 	{
 		if (this->groupManagerUI == nullptr) return;
-		if(this->groupManagerUI->addItemBT != nullptr) this->groupManagerUI->addItemBT->setBounds(r.removeFromRight(r.getHeight()));
+		if (this->groupManagerUI->addItemBT != nullptr) this->groupManagerUI->addItemBT->setBounds(r.removeFromRight(r.getHeight()));
 	}
 };

@@ -20,10 +20,10 @@ class GenericManagerEditor :
 public:
 	static_assert(std::is_base_of<BaseItem, T>::value, "T must be derived from BaseItem");
 
-	GenericManagerEditor(Manager<T>* manager, bool isRoot);
+	GenericManagerEditor(NestingManager<T, G>* manager, bool isRoot);
 	virtual ~GenericManagerEditor();
 
-	Manager<T>* manager;
+	NestingManager<T, G>* manager;
 
 	juce::Array<BaseItemEditor*> itemEditors;
 
@@ -63,7 +63,7 @@ public:
 	virtual InspectableEditor* addEditorUI(ControllableContainer* cc, bool resize = false) override;
 	virtual void removeEditorUI(InspectableEditor* i, bool resize = false) override;
 
-	void newMessage(const typename Manager<T>::ManagerEvent& e) override;
+	void newMessage(const typename NestingManager<T, G>::ManagerEvent& e) override;
 
 	virtual void itemAddedAsync(T* item) {}
 	virtual void itemRemovedAsync(T* item) {}
@@ -82,7 +82,7 @@ public:
 
 
 template<class T, class G>
-GenericManagerEditor<T, G>::GenericManagerEditor(Manager<T>* _manager, bool isRoot) :
+GenericManagerEditor<T, G>::GenericManagerEditor(NestingManager<T, G>* _manager, bool isRoot) :
 	EnablingControllableContainerEditor(_manager, isRoot, false),
 	manager(_manager),
 	isDraggingOver(false),
@@ -273,7 +273,7 @@ void GenericManagerEditor<T, G>::showMenuAndAddItem(bool isFromAddButton)
 template<class T, class G>
 T* GenericManagerEditor<T, G>::addItemFromMenu(bool /*isFromAddButton*/)
 {
-	T* item = manager->Manager<T>::addItem();
+	T* item = manager->NestingManager<T, G>::addItem();
 	return item;
 }
 
@@ -315,26 +315,26 @@ void GenericManagerEditor<T, G>::removeEditorUI(InspectableEditor* ui, bool resi
 
 
 template<class T, class G>
-void GenericManagerEditor<T, G>::newMessage(const typename Manager<T>::ManagerEvent& e)
+void GenericManagerEditor<T, G>::newMessage(const typename NestingManager<T, G>::ManagerEvent& e)
 {
 	switch (e.type)
 	{
-	case Manager<T>::ManagerEvent::ITEM_ADDED:
+	case NestingManager<T, G>::ManagerEvent::ITEM_ADDED:
 		setCollapsed(false, true);
 		itemAddedAsync(e.getItem());
 		if (BaseItemEditor* bui = dynamic_cast<BaseItemEditor*>(getEditorForInspectable(e.getItem()))) itemEditors.addIfNotAlreadyThere(bui);
 		resized();
 		break;
 
-	case Manager<T>::ManagerEvent::ITEM_REMOVED:
+	case NestingManager<T, G>::ManagerEvent::ITEM_REMOVED:
 		itemRemovedAsync(e.getItem());
 		if (BaseItemEditor* bui = dynamic_cast<BaseItemEditor*>(getEditorForInspectable(e.getItem()))) itemEditors.removeAllInstancesOf(bui);
 		resized();
 		break;
 
-	case Manager<T>::ManagerEvent::ITEMS_ADDED:
-	case Manager<T>::ManagerEvent::ITEMS_REMOVED:
-	case Manager<T>::ManagerEvent::ITEMS_REORDERED:
+	case NestingManager<T, G>::ManagerEvent::ITEMS_ADDED:
+	case NestingManager<T, G>::ManagerEvent::ITEMS_REMOVED:
+	case NestingManager<T, G>::ManagerEvent::ITEMS_REORDERED:
 		resetAndBuild();
 		break;
 
@@ -408,7 +408,7 @@ void GenericManagerEditor<T, G>::itemDropped(const SourceDetails& dragSourceDeta
 				{
 					juce::Array<juce::UndoableAction*> actions;
 					actions.add(this->manager->getAddBaseItemUndoableAction(newItem, data));
-					if (Manager<T>* sourceManager = dynamic_cast<Manager<T> *>(tItem->parentContainer.get()))
+					if (NestingManager<T, G>* sourceManager = dynamic_cast<NestingManager<T, G> *>(tItem->parentContainer.get()))
 					{
 						actions.addArray(sourceManager->getRemoveBaseItemUndoableAction(tItem));
 					}
