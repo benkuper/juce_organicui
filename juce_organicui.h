@@ -139,6 +139,8 @@
 
 #include "resources/BinaryData.h"
 
+#define NOMINMAX
+#define NOGDI
 
 #include "ui/Style.h"
 #include "ui/AssetManager.h"

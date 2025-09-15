@@ -1,8 +1,10 @@
 #pragma once
 
 #if JUCE_WINDOWS
+#define _WIN32_WINNT 0x0600
 #include <winsock2.h>
 #include <iphlpapi.h>
+#include <ws2tcpip.h>
 #pragma comment(lib, "iphlpapi.lib")
 #else
 #include <ifaddrs.h>
