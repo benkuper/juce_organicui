@@ -30,3 +30,8 @@ CommentItem::CommentItem() :
 CommentItem::~CommentItem()
 {
 }
+
+BaseItemMinimalUI* CommentItem::createUI()
+{
+	return new CommentUI(this);
+}

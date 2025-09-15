@@ -29,7 +29,7 @@ public:
 
 	void inspectablesSelectionChanged() override;
 
-	void itemRemoved(Dashboard *) override;
+	void itemRemoved(BaseItem *) override;
 
 	static DashboardManagerView * create(const juce::String &contentName) { return new DashboardManagerView(contentName, DashboardManager::getInstance()); }
 

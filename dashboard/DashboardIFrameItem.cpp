@@ -36,7 +36,4 @@ var DashboardIFrameItem::getItemParameterFeedback(Parameter* p)
 }
 
 
-DashboardItemUI* DashboardIFrameItem::createUI()
-{
-	return new DashboardIFrameItemUI(this);
-}
+IMPLEMENT_UI_FUNC(DashboardIFrameItem);

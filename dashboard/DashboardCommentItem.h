@@ -14,9 +14,10 @@ public:
 
 	juce::var getServerData() override;
 	
-	virtual DashboardItemUI* createUI() override;
 	virtual juce::var getItemParameterFeedback(Parameter* p) override;
 
-	juce::String getTypeString() const override { return "DashboardCommentItem"; }
 	static DashboardCommentItem* create(juce::var) { return new DashboardCommentItem(); }
+
+	DECLARE_TYPE("DashboardCommentItem");
+	DECLARE_UI_FUNC;
 };

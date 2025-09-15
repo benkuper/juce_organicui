@@ -7,5 +7,5 @@ public:
 	ScriptManagerEditor(ScriptManager* manager, bool isRoot);
 	~ScriptManagerEditor();
 
-	Script* addItemFromMenu(bool isFromAddButton) override;
+	BaseItem* addItemFromMenu(bool isFromAddButton) override;
 };

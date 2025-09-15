@@ -11,7 +11,7 @@
 #pragma once
 
 class DashboardItemManagerUI :
-	public ManagerViewUI<DashboardItemManager, DashboardItem, ItemMinimalUI<DashboardItem>>,
+	public ManagerViewUI<DashboardItemManager, DashboardItem>,
 	public ContainerAsyncListener,
 	public Parameter::AsyncListener
 {
@@ -30,14 +30,12 @@ public:
 	virtual void paint(juce::Graphics& g) override;
 	virtual void paintOverChildren(juce::Graphics& g) override;
 
-	virtual bool checkItemShouldBeVisible(ItemMinimalUI<DashboardItem>* se) override;
+	virtual bool checkItemShouldBeVisible(BaseItemMinimalUI* se) override;
 
 	bool isInterestedInDragSource(const SourceDetails& dragSourceDetails) override;
 	void itemDropped(const SourceDetails& details) override;
 
-	void showMenuAndAddItem(bool fromAddButton, juce::Point<int> mousePos) override;
-
-	ItemMinimalUI<DashboardItem>* createUIForItem(DashboardItem*) override;
+	void showMenuAndAddItem(bool fromAddButton, juce::Point<int> mousePos, std::function<void(BaseItem*)> callback = nullptr) override;
 
 	void newMessage(const ContainerAsyncEvent& e) override;
 	void newMessage(const Parameter::ParameterEvent& e) override;

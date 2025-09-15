@@ -11,7 +11,7 @@
 #pragma once
 
 class CommentManagerViewUI :
-	public ManagerViewUI<CommentManager, CommentItem, CommentUI>
+	public ManagerViewUI<CommentManager, CommentItem>
 {
 public:
 	CommentManagerViewUI(CommentManager * manager);

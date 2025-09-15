@@ -9,7 +9,6 @@
 */
 
 #include "JuceHeader.h"
-#include "ColorParameterUI.h"
 
 ColorParameterUI::ColorParameterUI(Array<ColorParameter*> parameters) :
 	ParameterUI(Inspectable::getArrayAs<ColorParameter, Parameter>(parameters), ORGANICUI_DEFAULT_TIMER),
@@ -251,68 +250,68 @@ OrganicColorPicker::~OrganicColorPicker()
 	colorParam->removeAsyncParameterListener(this);
 }
 
-void OrganicColorPicker::paint(Graphics& g)
+void OrganicColorPicker::paint(Graphics& _g)
 {
-	g.setColour(Colours::black);
-	g.fillRoundedRectangle(hueSatRect.toFloat(), 2.f);
-	g.setColour(Colours::white.withAlpha(bri.floatValue()));
-	g.drawImageAt(hueSatImage, hueSatRect.getX(), hueSatRect.getY());
-	g.setColour(Colours::white.withAlpha(.5f));
-	g.drawRoundedRectangle(hueSatRect.toFloat(), 2.f, 2.f);
+	_g.setColour(Colours::black);
+	_g.fillRoundedRectangle(hueSatRect.toFloat(), 2.f);
+	_g.setColour(Colours::white.withAlpha(bri.floatValue()));
+	_g.drawImageAt(hueSatImage, hueSatRect.getX(), hueSatRect.getY());
+	_g.setColour(Colours::white.withAlpha(.5f));
+	_g.drawRoundedRectangle(hueSatRect.toFloat(), 2.f, 2.f);
 
 	//draw hue gradient behing the hUi slider
-	Rectangle<int> r = hUI->getBounds().reduced(2);
-	for (int x = r.getX(); x < r.getRight(); ++x)
+	Rectangle<int> rec = hUI->getBounds().reduced(2);
+	for (int x = rec.getX(); x < rec.getRight(); ++x)
 	{
-		float hue = static_cast<float>(x - r.getX()) / r.getWidth();
-		g.setColour(Colour::fromHSV(hue, 1.0f, 1.0f, 1.0f));
-		g.drawLine(x, r.getY(), x, r.getBottom(), 2);
+		float hue = static_cast<float>(x - rec.getX()) / rec.getWidth();
+		_g.setColour(Colour::fromHSV(hue, 1.0f, 1.0f, 1.0f));
+		_g.drawLine(x, rec.getY(), x, rec.getBottom(), 2);
 	}
 
 	//draw saturation gradient behing the sUi slider
-	r = sUI->getBounds().reduced(2);
-	for (int x = r.getX(); x < r.getRight(); ++x)
+	rec = sUI->getBounds().reduced(2);
+	for (int x = rec.getX(); x < rec.getRight(); ++x)
 	{
-		float sat = static_cast<float>(x - r.getX()) / r.getWidth();
-		g.setColour(Colour::fromHSV(h.floatValue(), sat, 1.0f, 1.0f));
-		g.drawLine(x, r.getY(), x, r.getBottom(), 2);
+		float sat = static_cast<float>(x - rec.getX()) / rec.getWidth();
+		_g.setColour(Colour::fromHSV(h.floatValue(), sat, 1.0f, 1.0f));
+		_g.drawLine(x, rec.getY(), x, rec.getBottom(), 2);
 	}
 
 	//draw brightness gradient behing the briUi slider
-	r = briUI->getBounds().reduced(2);
-	for (int x = r.getX(); x < r.getRight(); ++x)
+	rec = briUI->getBounds().reduced(2);
+	for (int x = rec.getX(); x < rec.getRight(); ++x)
 	{
-		float bri = static_cast<float>(x - r.getX()) / r.getWidth();
-		g.setColour(Colour::fromHSV(h.floatValue(), s.floatValue(), bri, 1.0f));
-		g.drawLine(x, r.getY(), x, r.getBottom(), 2);
+		float _bri = static_cast<float>(x - rec.getX()) / rec.getWidth();
+		_g.setColour(Colour::fromHSV(h.floatValue(), s.floatValue(), _bri, 1.0f));
+		_g.drawLine(x, rec.getY(), x, rec.getBottom(), 2);
 	}
 
 }
 
 void OrganicColorPicker::resized()
 {
-	Rectangle<int> r = getLocalBounds().reduced(2);
-	hueSatRect = r.removeFromTop(r.getHeight() / 2);
+	Rectangle<int> rec = getLocalBounds().reduced(2);
+	hueSatRect = rec.removeFromTop(rec.getHeight() / 2);
 
 	const float sliderHeight = 18;
 
-	r.removeFromTop(4);
-	rUI->setBounds(r.removeFromTop(sliderHeight));
-	r.removeFromTop(4);
-	gUI->setBounds(r.removeFromTop(sliderHeight));
-	r.removeFromTop(4);
-	bUI->setBounds(r.removeFromTop(sliderHeight));
+	rec.removeFromTop(4);
+	rUI->setBounds(rec.removeFromTop(sliderHeight));
+	rec.removeFromTop(4);
+	gUI->setBounds(rec.removeFromTop(sliderHeight));
+	rec.removeFromTop(4);
+	bUI->setBounds(rec.removeFromTop(sliderHeight));
 
-	r.removeFromTop(12);
-	hUI->setBounds(r.removeFromTop(sliderHeight));
-	r.removeFromTop(4);
-	sUI->setBounds(r.removeFromTop(sliderHeight));
-	r.removeFromTop(4);
-	briUI->setBounds(r.removeFromTop(sliderHeight));
+	rec.removeFromTop(12);
+	hUI->setBounds(rec.removeFromTop(sliderHeight));
+	rec.removeFromTop(4);
+	sUI->setBounds(rec.removeFromTop(sliderHeight));
+	rec.removeFromTop(4);
+	briUI->setBounds(rec.removeFromTop(sliderHeight));
 
 
-	r.removeFromTop(12);
-	aUI->setBounds(r.removeFromTop(sliderHeight));
+	rec.removeFromTop(12);
+	aUI->setBounds(rec.removeFromTop(sliderHeight));
 
 	hexUI->setBounds(getLocalBounds().removeFromBottom(20));
 
@@ -440,11 +439,11 @@ void OrganicColorPicker::updateFromHSV(float _h, float _s, float _v)
 	setEditingColor(Colour::fromHSV(_h, _s, _v, 1.0f).withAlpha(a.floatValue()), true, false);
 }
 
-void OrganicColorPicker::updateFromHex(String s)
+void OrganicColorPicker::updateFromHex(String _s)
 {
 	if (isUpdatingColor) return;
 
-	setEditingColor(Colour::fromString(s));
+	setEditingColor(Colour::fromString(_s));
 	setUndoableParam();
 }
 
@@ -508,12 +507,12 @@ void OrganicColorPicker::HueSatHandle::paint(Graphics& g)
 {
 	if (picker->paramRef.wasObjectDeleted()) return;
 
-	Rectangle<float> r = getLocalBounds().toFloat().reduced(4);
+	Rectangle<float> rec = getLocalBounds().toFloat().reduced(4);
 	Colour c = picker->colorParam->getColor();
 	g.setColour(c);
-	g.fillEllipse(r);
+	g.fillEllipse(rec);
 	g.setColour(c.darker(.8f).withAlpha(.9f));
-	g.drawEllipse(r, 2);
+	g.drawEllipse(rec, 2);
 }
 
 void OrganicColorPicker::HueSatHandle::resized()

@@ -20,9 +20,10 @@ public:
 	StringParameter* url;
 	juce::var getServerData() override;
 
-	DashboardItemUI* createUI() override;
-
 	virtual juce::var getItemParameterFeedback(Parameter* p) override;
 
 	DECLARE_TYPE("IFrame")
+
+	static DashboardIFrameItem* create(juce::var params) { return new DashboardIFrameItem(params); }
+	DECLARE_UI_FUNC;
 };

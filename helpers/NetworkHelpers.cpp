@@ -3,6 +3,7 @@
 #if JUCE_WINDOWS
 #include <winsock2.h>
 #include <iphlpapi.h>
+#include <ws2tcpip.h>
 #pragma comment(lib, "iphlpapi.lib")
 #else
 #include <ifaddrs.h>

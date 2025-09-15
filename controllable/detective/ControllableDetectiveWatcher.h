@@ -34,5 +34,5 @@ public:
 	void addValue(juce::var data);
 	void run() override;
 
-	virtual BaseItemMinimalUI* createUI() override;
+	DECLARE_UI_FUNC;
 };

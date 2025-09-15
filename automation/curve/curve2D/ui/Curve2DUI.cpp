@@ -44,8 +44,9 @@ Curve2DUI::~Curve2DUI()
 	{
 		if (ui != nullptr && !ui->inspectable.wasObjectDeleted())
 		{
-			ui->item->removeAsyncKeyListener(this);
-			ui->removeKeyUIListener(this);
+			Curve2DKeyUI* cui = dynamic_cast<Curve2DKeyUI*>(ui);
+			cui->item->removeAsyncKeyListener(this);
+			cui->removeKeyUIListener(this);
 		}
 	}
 }
@@ -123,35 +124,37 @@ void Curve2DUI::updateHandlesForUI(Curve2DKeyUI* ui, bool checkSideItems)
 	int index = itemsUI.indexOf(ui);
 	if (checkSideItems)
 	{
-		if (index > 0)  updateHandlesForUI(itemsUI[index - 1], false);
-		if (index < itemsUI.size() - 1)  updateHandlesForUI(itemsUI[index + 1], false);
+		if (index > 0)  updateHandlesForUI((Curve2DKeyUI*)itemsUI[index - 1], false);
+		if (index < itemsUI.size() - 1)  updateHandlesForUI((Curve2DKeyUI*)itemsUI[index + 1], false);
 	}
 
-	bool curSelected = ui->item->isThisOrChildSelected();
+	bool curSelected = ((Curve2DKey*)ui->baseItem)->isThisOrChildSelected();
 	if (curSelected)
 	{
-		ui->setShowEasingHandles(true, !ui->item->isSelected);
+		ui->setShowEasingHandles(true, !((Curve2DKey*)ui->baseItem)->isSelected);
 		return;
 	}
 
 	bool prevSelected = false;
 	if (index > 0 && itemsUI[index - 1] != nullptr)
 	{
-		Curve2DKey* prevItem = itemsUI[index - 1]->item;
+		Curve2DKey* prevItem = (Curve2DKey*)itemsUI[index - 1]->baseItem;
 		prevSelected = prevItem->isThisOrChildSelected() && !prevItem->isSelected; //we only want to show if easing is selected only easing
 	}
-	bool nextSelected = index < itemsUI.size() && itemsUI[index + 1] != nullptr && itemsUI[index + 1]->item->isThisOrChildSelected();
+	bool nextSelected = index < itemsUI.size() && itemsUI[index + 1] != nullptr && ((Curve2DKey*)itemsUI[index + 1]->baseItem)->isThisOrChildSelected();
 
 	ui->setShowEasingHandles(prevSelected, nextSelected);
 
 }
 
-bool Curve2DUI::checkItemShouldBeVisible(Curve2DKeyUI* ui)
+bool Curve2DUI::checkItemShouldBeVisible(BaseItemMinimalUI* ui)
 {
+	Curve2DKeyUI* cui = dynamic_cast<Curve2DKeyUI*>(ui);
+
 	float focus = manager->focusRange->floatValue();
 	if (focus == 0)
 	{
-		ui->setFocus(0, 0);
+		cui->setFocus(0, 0);
 		return true;
 	}
 
@@ -161,15 +164,15 @@ bool Curve2DUI::checkItemShouldBeVisible(Curve2DKeyUI* ui)
 	float minPos = curvePos - focus / 2;
 	float maxPos = curvePos + focus / 2;
 
-	bool visible = (ui->item->nextKey != nullptr && ui->item->nextKey->curvePosition >= minPos) && ui->item->curvePosition <= maxPos;
+	bool visible = (cui->item->nextKey != nullptr && cui->item->nextKey->curvePosition >= minPos) && cui->item->curvePosition <= maxPos;
 
 	if (visible)
 	{
-		ui->setFocus(curvePos - ui->item->curvePosition, focus);
+		cui->setFocus(curvePos - cui->item->curvePosition, focus);
 	}
 	else
 	{
-		ui->setShowEasingHandles(false, false);
+		cui->setShowEasingHandles(false, false);
 	}
 
 	return visible;
@@ -187,7 +190,7 @@ void Curve2DUI::addItemUIInternal(BaseItemMinimalUI* ui)
 void Curve2DUI::removeItemUIInternal(BaseItemMinimalUI* ui)
 {
 	ManagerViewUI::removeItemUIInternal(ui);
-	
+
 	Curve2DKeyUI* cui = dynamic_cast<Curve2DKeyUI*>(ui);
 	cui->removeMouseListener(this);
 	if (!ui->inspectable.wasObjectDeleted())
@@ -306,7 +309,7 @@ void Curve2DUI::mouseDoubleClick(const MouseEvent& e)
 
 Component* Curve2DUI::getSelectableComponentForItemUI(BaseItemMinimalUI* ui)
 {
-	return &ui->handle;
+	return &((Curve2DKeyUI*)ui)->handle;
 }
 
 void Curve2DUI::newMessage(const Curve2DKey::Curve2DKeyEvent& e)
@@ -321,7 +324,7 @@ void Curve2DUI::newMessage(const Curve2DKey::Curve2DKeyEvent& e)
 
 	case Curve2DKey::Curve2DKeyEvent::SELECTION_CHANGED:
 	{
-		updateHandlesForUI(getUIForItem(e.key), true);
+		updateHandlesForUI((Curve2DKeyUI*)getUIForItem(e.key), true);
 	}
 	break;
 	}
@@ -358,9 +361,9 @@ void Curve2DUI::keyEasingHandleMoved(Curve2DKeyUI* ui, bool syncOtherHandle, boo
 		{
 			if (index > 0)
 			{
-				if (itemsUI[index - 1]->item->easingType->getValueDataAsEnum<Easing2D::Type>() == Easing2D::BEZIER)
+				if (((Curve2DKey*)itemsUI[index - 1]->baseItem)->easingType->getValueDataAsEnum<Easing2D::Type>() == Easing2D::BEZIER)
 				{
-					if (CubicEasing2D* ce = dynamic_cast<CubicEasing2D*>(itemsUI[index - 1]->item->easing.get()))
+					if (CubicEasing2D* ce = dynamic_cast<CubicEasing2D*>(((Curve2DKey*)itemsUI[index - 1]->baseItem)->easing.get()))
 					{
 						CubicEasing2D* e = dynamic_cast<CubicEasing2D*>(ui->item->easing.get());
 						ce->anchor2->setPoint(-e->anchor1->getPoint());
@@ -372,9 +375,9 @@ void Curve2DUI::keyEasingHandleMoved(Curve2DKeyUI* ui, bool syncOtherHandle, boo
 		{
 			if (index < itemsUI.size() - 2)
 			{
-				if (itemsUI[index + 1]->item->easingType->getValueDataAsEnum<Easing2D::Type>() == Easing2D::BEZIER)
+				if (((Curve2DKey*)itemsUI[index + 1]->baseItem)->easingType->getValueDataAsEnum<Easing2D::Type>() == Easing2D::BEZIER)
 				{
-					if (CubicEasing2D* ce = dynamic_cast<CubicEasing2D*>(itemsUI[index + 1]->item->easing.get()))
+					if (CubicEasing2D* ce = dynamic_cast<CubicEasing2D*>(((Curve2DKey*)itemsUI[index + 1]->baseItem)->easing.get()))
 					{
 						CubicEasing2D* e = dynamic_cast<CubicEasing2D*>(ui->item->easing.get());
 						ce->anchor1->setPoint(-e->anchor2->getPoint());

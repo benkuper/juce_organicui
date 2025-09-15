@@ -87,10 +87,9 @@ public:
 	void onExternalParameterValueChanged(Parameter* p) override;
 
 	void reorderItems() override;
+	static int compareKeys(BaseItem* k1, BaseItem* k2);
 
 	void afterLoadJSONDataInternal() override;
-
-	static int compareKeys(AutomationKey* k1, AutomationKey* k2);
 
 	static juce::var setLengthFromScript(const juce::var::NativeFunctionArgs& a);
 	static juce::var addKeyFromScript(const juce::var::NativeFunctionArgs& a);

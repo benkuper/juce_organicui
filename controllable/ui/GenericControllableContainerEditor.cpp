@@ -203,7 +203,8 @@ void GenericControllableContainerEditor::showContextMenu()
 		p.addSeparator();
 		PopupMenu dashboardMenu;
 		int index = 0;
-		for (auto& di : DashboardManager::getInstance()->items)
+		Array<Dashboard*> items = DashboardManager::getInstance()->getItems();
+		for (auto& di : items)
 		{
 			dashboardMenu.addItem(index + 10000, di->niceName);
 			index++;
@@ -248,7 +249,7 @@ void GenericControllableContainerEditor::showContextMenu()
 				default:
 					if (result >= 10000)
 					{
-						DashboardManager::getInstance()->items[result - 10000]->itemManager.addItem(this->container->createDashboardItem());
+						((Dashboard*)DashboardManager::getInstance()->getItemAt(result - 10000))->itemManager.addItem(this->container->createDashboardItem());
 					}
 					else
 					{

@@ -43,6 +43,7 @@ bool ScriptManager::callFunctionOnAllScripts(const Identifier & function, var a)
 bool ScriptManager::callFunctionOnAllScripts(const Identifier & function, Array<var> args)
 {
 	bool result = true;
+	Array<Script*> items = getItems();
 	for (auto &i : items)
 	{
 		Result r = Result::ok();

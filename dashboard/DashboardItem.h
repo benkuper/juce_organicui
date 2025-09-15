@@ -23,10 +23,11 @@ public:
 
 	BoolParameter* isVisible;
 
-	virtual DashboardItemUI* createUI();
 
 	virtual juce::var getServerData();
 
 	virtual void onContainerParameterChangedInternal(Parameter*) override;
 	virtual void onControllableStateChanged(Controllable *) override;
+
+	DECLARE_UI_FUNC;
 };

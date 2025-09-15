@@ -1,3 +1,4 @@
+#include "ParameterDetectiveWatcher.h"
 
 ParameterDetectiveWatcher::ParameterDetectiveWatcher() :
 	ControllableDetectiveWatcher(),
@@ -36,7 +37,4 @@ void ParameterDetectiveWatcher::onExternalParameterValueChanged(Parameter* p)
 	ControllableDetectiveWatcher::onExternalParameterValueChanged(p);
 }
 
-ControllableDetectiveWatcherUI* ParameterDetectiveWatcher::getUI()
-{
-	return new ParameterDetectiveWatcherUI(this);
-}
+IMPLEMENT_UI_FUNC(ParameterDetectiveWatcher);

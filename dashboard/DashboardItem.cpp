@@ -29,11 +29,6 @@ DashboardItem::~DashboardItem()
 {
 }
 
-DashboardItemUI* DashboardItem::createUI()
-{
-	return new DashboardItemUI(this);
-}
-
 var DashboardItem::getServerData()
 {
 	var data(new DynamicObject());
@@ -56,3 +51,5 @@ void DashboardItem::onControllableStateChanged(Controllable* c)
 {
 	if (Parameter* p = dynamic_cast<Parameter*>(c)) notifyParameterFeedback(p);
 }
+
+IMPLEMENT_UI_FUNC(DashboardItem);

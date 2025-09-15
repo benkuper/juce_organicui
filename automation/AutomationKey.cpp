@@ -236,4 +236,4 @@ void AutomationKey::notifyKeyUpdated()
 }
 
 
-IMPLEMENT_UI_FUNC;
+IMPLEMENT_UI_FUNC(AutomationKey);

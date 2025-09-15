@@ -35,11 +35,15 @@ public:
 		NEEDS_UI_UPDATE
 	};
 
-	ManagerEvent(Type type, juce::Array<BaseItem*> items = juce::Array<BaseItem*>(), bool fromChildGroup = false) :
+	ManagerEvent(Type type, juce::Array<BaseItem*> _items = juce::Array<BaseItem*>(), bool fromChildGroup = false) :
 		type(type),
 		fromChildGroup(fromChildGroup)
 	{
-		this->items.addArray(items);
+		for(auto & i : _items)
+		{
+			if (i == nullptr) continue;
+			this->items.add(i);
+		}
 	}
 
 	Type type;
@@ -64,4 +68,15 @@ public:
 		}
 		return result;
 	}
+
+	BaseItem* getItem() const
+	{
+		if (items.isEmpty()) return nullptr;
+		if (items.getFirst().wasObjectDeleted()) return nullptr;
+		return items.getFirst();
+	}
+
+private:
+	juce::Array<juce::WeakReference<BaseItem>> items;
+
 };

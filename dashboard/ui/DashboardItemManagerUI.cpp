@@ -108,11 +108,12 @@ void DashboardItemManagerUI::paintOverChildren(Graphics& g)
 }
 
 
-bool DashboardItemManagerUI::checkItemShouldBeVisible(ItemMinimalUI<DashboardItem>* ui)
+bool DashboardItemManagerUI::checkItemShouldBeVisible(BaseItemMinimalUI* ui)
 {
 	if (ui == nullptr) return false;
-	if (ui->item == nullptr) return false;
-	if (!ui->item->isVisible->boolValue()) return false;
+	DashboardItem* di = dynamic_cast<DashboardItem*>(ui->baseItem);
+	if (di == nullptr) return false;
+	if (!di->isVisible->boolValue()) return false;
 
 	return ManagerViewUI::checkItemShouldBeVisible(ui);
 }
@@ -165,7 +166,7 @@ void DashboardItemManagerUI::itemDropped(const SourceDetails& details)
 	}
 }
 
-void DashboardItemManagerUI::showMenuAndAddItem(bool fromAddButton, Point<int> mousePos)
+void DashboardItemManagerUI::showMenuAndAddItem(bool fromAddButton, Point<int> mousePos, std::function<void(BaseItem*)> callback)
 {
 	if (!DashboardManager::getInstance()->editMode->boolValue()) return;
 	//ManagerViewUI::showMenuAndAddItem(fromAddButton, mousePos);
@@ -212,11 +213,6 @@ void DashboardItemManagerUI::showMenuAndAddItem(bool fromAddButton, Point<int> m
 
 		}
 	);
-}
-
-ItemMinimalUI<DashboardItem>* DashboardItemManagerUI::createUIForItem(DashboardItem* item)
-{
-	return item->createUI();
 }
 
 void DashboardItemManagerUI::newMessage(const ContainerAsyncEvent& e)

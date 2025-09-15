@@ -22,4 +22,6 @@ public:
 	FloatParameter * bgAlpha;
 
 	DECLARE_TYPE("Comment");
+
+	DECLARE_UI_FUNC;
 };

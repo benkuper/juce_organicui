@@ -48,8 +48,8 @@ public:
 		if (m[0].isInt32())
 		{
 			int index = m[0].getInt32();
-			if (manager->items.size() <= index) return nullptr;
-			return manager->items[index];
+			if (manager->getNumItems() <= index) return nullptr;
+			return manager->getItemsAt(index);
 		}
 
 		return manager->getItemWithName(getStringArg(m[0]), true, true);

@@ -11,7 +11,7 @@
 #pragma once
 
 class ParrotManagerUI :
-    public ManagerShapeShifterUI<ParrotManager, Parrot, ParrotUI>
+    public ManagerShapeShifterUI<ParrotManager, Parrot>
 {
 public:
     ParrotManagerUI();

@@ -9,8 +9,3 @@ DetectivePanel::DetectivePanel(const String& name) :
 DetectivePanel::~DetectivePanel()
 {
 }
-
-BaseItemMinimalUI* DetectivePanel::createUIForItem(BaseItem* w)
-{
-	return nullptr;
-}

@@ -13,5 +13,5 @@ public:
 
 	void onExternalParameterValueChanged(Parameter* p) override;
 
-    virtual ControllableDetectiveWatcherUI* getUI() override;
+	DECLARE_UI_FUNC;
 };

@@ -164,11 +164,12 @@ void GradientColorManagerUI::mouseDrag(const MouseEvent& e)
 		{
 			if (e.mods.isLeftButtonDown())
 			{
+				GradientColor* gc = dynamic_cast<GradientColor*>(tui->baseItem);
 				float diffTime = getPosForX(e.getOffsetFromDragStart().x, false);
 
 				if (e.mods.isShiftDown())
 				{
-					float targetTime = tui->item->movePositionReference.x + diffTime;
+					float targetTime = gc->movePositionReference.x + diffTime;
 					float diff = INT32_MAX;
 					float tTime = targetTime;
 					for (auto& t : snapTimes)
@@ -181,11 +182,11 @@ void GradientColorManagerUI::mouseDrag(const MouseEvent& e)
 						}
 					}
 
-					diffTime = targetTime - tui->item->movePositionReference.x;
+					diffTime = targetTime - gc->movePositionReference.x;
 				}
 
-				Point<float> p(diffTime, 0.f);
-				tui->item->BaseItem::movePosition(p, true);
+				juce::Point<float> p(diffTime, 0.f);
+				gc->BaseItem::movePosition(p, true);
 			}
 		}
 	}
@@ -194,7 +195,7 @@ void GradientColorManagerUI::mouseDrag(const MouseEvent& e)
 void GradientColorManagerUI::placeItemUI(BaseItemMinimalUI* tui)
 {
 	if (tui == nullptr) return;
-	int tx = getXForPos(tui->item->position->floatValue());
+	int tx = getXForPos(((GradientColor*)tui->baseItem)->position->floatValue());
 	tui->setBounds(tx - 6, getHeight() - 18, 12, 16);
 }
 
@@ -213,7 +214,8 @@ float GradientColorManagerUI::getPosForX(int tx, bool offsetStart)
 
 bool GradientColorManagerUI::isInView(BaseItemMinimalUI* kui)
 {
-	return kui->item->position->floatValue() >= viewStartPos && kui->item->position->floatValue() <= viewEndPos;
+	GradientColor* gc = dynamic_cast<GradientColor*>(kui->baseItem);
+	return (gc != nullptr && gc->position->floatValue() >= viewStartPos && gc->position->floatValue() <= viewEndPos);
 }
 
 void GradientColorManagerUI::newMessage(const ContainerAsyncEvent& e)

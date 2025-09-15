@@ -245,7 +245,7 @@ void ManagerViewUI<M, T>::mouseDoubleClick(const juce::MouseEvent& e)
 {
 	ManagerUI<M, T>::mouseDoubleClick(e);
 	if (this->manager == nullptr || !addItemOnDoubleClick || !e.mods.isLeftButtonDown()) return;
-	addItemFromMenu(false, e.getMouseDownPosition());
+	addItemFromMenu(nullptr, false, e.getMouseDownPosition());
 }
 
 template<class M, class T>
@@ -335,7 +335,7 @@ void ManagerViewUI<M, T>::paint(juce::Graphics& g)
 	if (this->inspectable.wasObjectDeleted()) return;
 
 	if (!this->transparentBG) paintBackground(g);
-	if (this->manager->baseItems.size() == 0 && this->noItemText.isNotEmpty())
+	if (this->manager->hasNoItems() && this->noItemText.isNotEmpty())
 	{
 		g.setColour(juce::Colours::white.withAlpha(.4f));
 		g.setFont(16);
@@ -573,10 +573,11 @@ juce::Rectangle<int> ManagerViewUI<M, T>::getBoundsInView(const juce::Rectangle<
 template<class M, class T>
 juce::Point<float> ManagerViewUI<M, T>::getItemsCenter()
 {
-	if (this->manager->baseItems.size() == 0) return juce::Point<float>(0, 0);
+	juce::Array<BaseItem*> items = this->manager->getAllItems();
+	if (items.isEmpty()) return juce::Point<float>(0, 0);
 
 	juce::Rectangle<float> bounds;
-	for (auto& i : this->manager->baseItems)
+	for (auto& i : items)
 	{
 		juce::Point<float> p1 = i->viewUIPosition->getPoint();
 		juce::Point<float> p2 = p1 + i->viewUISize->getPoint();
@@ -592,7 +593,8 @@ template<class M, class T>
 juce::Rectangle<float> ManagerViewUI<M, T>::getItemsViewBounds()
 {
 	juce::Rectangle<float> bounds;
-	for (auto& i : this->manager->baseItems)
+	juce::Array<BaseItem*> items = this->manager->getAllItems();
+	for (auto& i : items)
 	{
 		juce::Point<float> p1 = i->viewUIPosition->getPoint();
 		juce::Point<float> p2 = p1 + i->viewUISize->getPoint();

@@ -17,7 +17,7 @@ DashboardItemFactory::DashboardItemFactory()
 	defs.add(Factory<DashboardItem>::Definition::createDef<SharedTextureDashboardItem>("", "Shared Texture"));
 #endif
 
-	defs.add(Factory<DashboardItem>::Definition::createDef<DashboardIFrameItem>(""));
+	defs.add(Factory::Definition::createDef("", "DashboardIFrameItem", &DashboardIFrameItem::create));
 }
 
 void DashboardItemFactory::buildPopupMenu(int startOffset)
@@ -38,7 +38,7 @@ void DashboardItemFactory::buildPopupMenu(int startOffset)
 	}
 }
 
-void DashboardItemFactory::showCreateMenu(std::function<void(DashboardItem*)> returnFunc)
+void DashboardItemFactory::showCreateMenu(std::function<void(BaseItem*)> returnFunc)
 {
 	buildPopupMenu(); //force rebuild
 	menu.showMenuAsync(PopupMenu::Options(), [this](int result)
@@ -48,7 +48,7 @@ void DashboardItemFactory::showCreateMenu(std::function<void(DashboardItem*)> re
 	);
 }
 
-DashboardItem* DashboardItemFactory::createFromMenuResult(int result)
+BaseItem* DashboardItemFactory::createFromMenuResult(int result)
 {
 	if (result < 0) return nullptr;
 

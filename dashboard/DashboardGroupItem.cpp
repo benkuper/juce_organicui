@@ -57,7 +57,4 @@ bool DashboardGroupItem::paste()
 	return true;
 }
 
-DashboardItemUI * DashboardGroupItem::createUI()
-{
-	return new DashboardGroupItemUI(this);
-}
+IMPLEMENT_UI_FUNC(DashboardGroupItem);

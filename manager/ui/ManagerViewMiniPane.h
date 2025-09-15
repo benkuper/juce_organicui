@@ -1,16 +1,16 @@
-﻿template<class M, class T, class U>
+﻿template<class M, class T>
 class ManagerViewUI;
 
-template<class M, class T, class U>
+template<class M, class T>
 class ManagerViewMiniPane :
 	public juce::Component,
 	public juce::Timer
 {
 public:
-	ManagerViewMiniPane(ManagerViewUI<M, T, U>* managerUI);
+	ManagerViewMiniPane(ManagerViewUI<M, T>* managerUI);
 	virtual ~ManagerViewMiniPane() {}
 
-	ManagerViewUI<M, T, U>* managerUI;
+	ManagerViewUI<M, T>* managerUI;
 	juce::ComponentAnimator ca;
 
 	juce::Rectangle<float> paneViewBounds;
@@ -20,7 +20,7 @@ public:
 
 	virtual void paint(juce::Graphics& g) override;
 	virtual void paintInternal(juce::Graphics& g) {}
-	virtual void paintItem(juce::Graphics& g, U* ui);
+	virtual void paintItem(juce::Graphics& g, BaseItemMinimalUI* ui);
 
 	virtual void mouseEnter(const juce::MouseEvent& e) override;
 	virtual void mouseExit(const juce::MouseEvent& e) override;
@@ -40,8 +40,8 @@ public:
 
 };
 
-template<class M, class T, class U>
-ManagerViewMiniPane<M, T, U>::ManagerViewMiniPane(ManagerViewUI<M, T, U>* managerUI) :
+template<class M, class T>
+ManagerViewMiniPane<M, T>::ManagerViewMiniPane(ManagerViewUI<M, T>* managerUI) :
 	managerUI(managerUI),
 	showTime(1.5f)
 {
@@ -50,8 +50,8 @@ ManagerViewMiniPane<M, T, U>::ManagerViewMiniPane(ManagerViewUI<M, T, U>* manage
 	setInterceptsMouseClicks(true, true);
 }
 
-template<class M, class T, class U>
-void ManagerViewMiniPane<M, T, U>::paint(juce::Graphics& g)
+template<class M, class T>
+void ManagerViewMiniPane<M, T>::paint(juce::Graphics& g)
 {
 	g.fillAll(juce::Colours::white.withAlpha(.05f));
 	g.setColour(juce::Colours::white.withAlpha(.2f));
@@ -66,10 +66,10 @@ void ManagerViewMiniPane<M, T, U>::paint(juce::Graphics& g)
 
 	for (auto& ui : managerUI->itemsUI)
 	{
-		paneViewBounds.setLeft(juce::jmin<float>(ui->item->viewUIPosition->x, paneViewBounds.getX()));
-		paneViewBounds.setTop(juce::jmin<float>(ui->item->viewUIPosition->y, paneViewBounds.getY()));
-		paneViewBounds.setRight(juce::jmax<float>(ui->item->viewUIPosition->x + ui->item->viewUISize->x, paneViewBounds.getRight()));
-		paneViewBounds.setBottom(juce::jmax<float>(ui->item->viewUIPosition->y + ui->item->viewUISize->y, paneViewBounds.getBottom()));
+		paneViewBounds.setLeft(juce::jmin<float>(ui->baseItem->viewUIPosition->x, paneViewBounds.getX()));
+		paneViewBounds.setTop(juce::jmin<float>(ui->baseItem->viewUIPosition->y, paneViewBounds.getY()));
+		paneViewBounds.setRight(juce::jmax<float>(ui->baseItem->viewUIPosition->x + ui->baseItem->viewUISize->x, paneViewBounds.getRight()));
+		paneViewBounds.setBottom(juce::jmax<float>(ui->baseItem->viewUIPosition->y + ui->baseItem->viewUISize->y, paneViewBounds.getBottom()));
 	}
 
 	juce::Rectangle<int> r = getLocalBounds();
@@ -109,34 +109,34 @@ void ManagerViewMiniPane<M, T, U>::paint(juce::Graphics& g)
 	g.drawRect(focusPaneRect);
 }
 
-template<class M, class T, class U>
-void ManagerViewMiniPane<M, T, U>::mouseEnter(const juce::MouseEvent& e)
+template<class M, class T>
+void ManagerViewMiniPane<M, T>::mouseEnter(const juce::MouseEvent& e)
 {
 	updateContent();
 	stopTimer();
 }
 
-template<class M, class T, class U>
-void ManagerViewMiniPane<M, T, U>::mouseExit(const juce::MouseEvent& e)
+template<class M, class T>
+void ManagerViewMiniPane<M, T>::mouseExit(const juce::MouseEvent& e)
 {
 	startTimer(showTime * 1000);
 }
 
-template<class M, class T, class U>
-void ManagerViewMiniPane<M, T, U>::mouseDown(const juce::MouseEvent& e)
+template<class M, class T>
+void ManagerViewMiniPane<M, T>::mouseDown(const juce::MouseEvent& e)
 {
 	updatePositionFromMouse();
 }
 
 
-template<class M, class T, class U>
-void ManagerViewMiniPane<M, T, U>::mouseDrag(const juce::MouseEvent& e)
+template<class M, class T>
+void ManagerViewMiniPane<M, T>::mouseDrag(const juce::MouseEvent& e)
 {
 	updatePositionFromMouse();
 }
 
-template<class M, class T, class U>
-void ManagerViewMiniPane<M, T, U>::updatePositionFromMouse()
+template<class M, class T>
+void ManagerViewMiniPane<M, T>::updatePositionFromMouse()
 {
 	juce::Point<float> p = this->getViewPosForPanePos(this->getMouseXYRelative().toFloat());
 	juce::Rectangle<float> itemBounds = this->managerUI->getItemsViewBounds();
@@ -148,8 +148,8 @@ void ManagerViewMiniPane<M, T, U>::updatePositionFromMouse()
 
 
 
-template<class M, class T, class U>
-void ManagerViewMiniPane<M, T, U>::paintItem(juce::Graphics& g, U* ui)
+template<class M, class T>
+void ManagerViewMiniPane<M, T>::paintItem(juce::Graphics& g, BaseItemMinimalUI* ui)
 {
 	juce::Rectangle<int> b = ui->getBoundsInParent();
 
@@ -158,15 +158,15 @@ void ManagerViewMiniPane<M, T, U>::paintItem(juce::Graphics& g, U* ui)
 
 	juce::Rectangle<float> uiPaneBounds(bTopLeft, bBottomRight);
 
-	juce::Colour ic = ui->item->itemColor != nullptr ? ui->item->itemColor->getColor() : juce::Colours::white;
+	juce::Colour ic = ui->baseItem->itemColor != nullptr ? ui->baseItem->itemColor->getColor() : juce::Colours::white;
 	g.setColour(ic.brighter(.2f).withAlpha(.6f));
 	g.fillRect(uiPaneBounds);
 	g.setColour(ic.brighter(.5f).withAlpha(.8f));
 	g.drawRect(uiPaneBounds);
 }
 
-template<class M, class T, class U>
-juce::Point<float> ManagerViewMiniPane<M, T, U>::getPanePosForUIPos(juce::Point<int> uiPos)
+template<class M, class T>
+juce::Point<float> ManagerViewMiniPane<M, T>::getPanePosForUIPos(juce::Point<int> uiPos)
 {
 	juce::Rectangle<float> r = getLocalBounds().toFloat();
 
@@ -176,8 +176,8 @@ juce::Point<float> ManagerViewMiniPane<M, T, U>::getPanePosForUIPos(juce::Point<
 	);
 }
 
-template<class M, class T, class U>
-juce::Point<float> ManagerViewMiniPane<M, T, U>::getPanePosForViewPos(juce::Point<float> viewPos)
+template<class M, class T>
+juce::Point<float> ManagerViewMiniPane<M, T>::getPanePosForViewPos(juce::Point<float> viewPos)
 {
 	juce::Rectangle<float> r = getLocalBounds().toFloat();
 
@@ -188,8 +188,8 @@ juce::Point<float> ManagerViewMiniPane<M, T, U>::getPanePosForViewPos(juce::Poin
 
 }
 
-template<class M, class T, class U>
-juce::Point<float> ManagerViewMiniPane<M, T, U>::getViewPosForPanePos(juce::Point<float> panePos)
+template<class M, class T>
+juce::Point<float> ManagerViewMiniPane<M, T>::getViewPosForPanePos(juce::Point<float> panePos)
 {
 	juce::Rectangle<float> r = getLocalBounds().toFloat();
 
@@ -200,14 +200,14 @@ juce::Point<float> ManagerViewMiniPane<M, T, U>::getViewPosForPanePos(juce::Poin
 
 }
 
-template<class M, class T, class U>
-void ManagerViewMiniPane<M, T, U>::resized()
+template<class M, class T>
+void ManagerViewMiniPane<M, T>::resized()
 {
 	updateContent();
 }
 
-template<class M, class T, class U>
-void ManagerViewMiniPane<M, T, U>::updateContent()
+template<class M, class T>
+void ManagerViewMiniPane<M, T>::updateContent()
 {
 	if ((!isVisible() || getAlpha() < 1) && !ca.isAnimating())
 	{
@@ -217,8 +217,8 @@ void ManagerViewMiniPane<M, T, U>::updateContent()
 	if (!isMouseOverOrDragging()) startTimer(showTime * 1000);
 	repaint();
 }
-template<class M, class T, class U>
-void ManagerViewMiniPane<M, T, U>::timerCallback()
+template<class M, class T>
+void ManagerViewMiniPane<M, T>::timerCallback()
 {
 	ca.animateComponent(this, getBounds(), .1f, 200, false, 1, 1);
 	stopTimer();

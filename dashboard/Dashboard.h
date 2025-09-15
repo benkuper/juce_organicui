@@ -52,4 +52,6 @@ public:
 	DECLARE_INSPECTACLE_SAFE_LISTENER(Dashboard, dashboard);
 
 	DECLARE_ASYNC_EVENT(Dashboard, Dashboard, dashboard, { EDITING_UPDATE }, EVENT_ITEM_CHECK);
+
+	DECLARE_UI_FUNC;
 };

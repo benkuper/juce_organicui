@@ -608,7 +608,7 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 					for (auto& i : *it.getValue())
 					{
 						var iData = i->getJSONData();
-						maxIndex = jmax(it.getKey()->items.indexOf(i), maxIndex);
+						maxIndex = juce::jmax(it.getKey()->getItemIndex(i), maxIndex);
 						data.append(iData);
 					}
 

@@ -10,7 +10,6 @@
 
 #pragma once
 
-class BaseManagerUI;
 
 class BaseItemUI :
 	public BaseItemMinimalUI,
@@ -79,7 +78,7 @@ public:
 
 	juce::Array<juce::Component*> contentComponents;
 
-	std::unique_ptr<BaseManagerUI> groupManagerUI; //if it's a group
+	//std::unique_ptr<BaseManager> groupManagerUI; //if it's a group
 	bool showGroupManager;
 
 	void setContentSize(int contentWidth, int contentHeight);
@@ -121,8 +120,8 @@ public:
 
 	virtual void componentVisibilityChanged(juce::Component& c) override;
 
-	virtual BaseManagerUI* createGroupManagerUI();
-	virtual BaseManagerUI* createGroupManagerUIInternal();
+	//virtual BaseManagerUI* createGroupManagerUI();
+	//virtual BaseManagerUI* createGroupManagerUIInternal();
 
 	class ItemUIListener
 	{

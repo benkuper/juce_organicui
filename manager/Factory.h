@@ -42,7 +42,7 @@ class FactoryDefinition :
 {
 public:
 	FactoryDefinition(juce::StringRef menuPath, juce::StringRef type, CreateFunc createFunc) :
-		BaseFactoryDefinition<T>(menuPath, type),
+		BaseFactoryDefinition(menuPath, type),
 		createFunc(createFunc)
 	{
 	}
@@ -119,13 +119,13 @@ public:
 	template<class S>
 	static FactorySimpleParametricDefinition* createDef(juce::StringRef menu)
 	{
-		return createDef(menu, S::getTypeStringStatic(), &FactorySimpleParametricDefinition<T>::createTemplated<S>, new juce::DynamicObject());
+		return createDef(menu, S::getTypeStringStatic(), &FactorySimpleParametricDefinition::createTemplated<S>, new juce::DynamicObject());
 	}
 
 	template<class S>
 	static FactorySimpleParametricDefinition* createDef(juce::StringRef menu, juce::StringRef type, juce::var params = new juce::DynamicObject())
 	{
-		return createDef(menu, type, &FactorySimpleParametricDefinition<T>::createTemplated<S>, params);
+		return createDef(menu, type, &FactorySimpleParametricDefinition::createTemplated<S>, params);
 	}
 
 	template<class S>

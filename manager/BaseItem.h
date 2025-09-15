@@ -112,8 +112,7 @@ public:
 	DECLARE_INSPECTACLE_SAFE_LISTENER(BaseItem, baseItem)
 
 private:
-	friend class juce::WeakReference<BaseItem>;
-	juce::WeakReference<BaseItem>::Master masterReference;
+	JUCE_DECLARE_WEAK_REFERENCEABLE(BaseItem)
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BaseItem)
 };
@@ -138,7 +137,7 @@ public:
 		BaseItem::clearItem();
 	}
 
-	virtual void createManager() { manager = new Manager<T>(); }
+	virtual void createManager() {} //manager = new Manager<T>(); }
 
 	virtual juce::String getTypeString() const override { return "ItemGroup"; }
 };

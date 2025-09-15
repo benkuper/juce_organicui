@@ -78,7 +78,6 @@ BaseItem::BaseItem(const String& name, bool _canBeDisabled, bool _canHaveScripts
 
 BaseItem::~BaseItem()
 {
-	masterReference.clear();
 }
 
 void BaseItem::clearItem()
@@ -389,17 +388,17 @@ juce::StringArray BaseItem::getBreadCrumb()
 {
 	StringArray result;
 	result.add(niceName);
-	BaseItemGroup* g = ControllableUtil::findParentAs<BaseItemGroup>(this, 2);
+	//BaseItemGroup* g = ControllableUtil::findParentAs<BaseItemGroup>(this, 2);
 
-	while (g != nullptr)
-	{
-		if (BaseItem* bi = dynamic_cast<BaseItem*>(g))
-		{
-			result.insert(0, bi->niceName);
-			g = ControllableUtil::findParentAs<BaseItemGroup>(bi, 2);
-		}
-		else break;
-	}
+	//while (g != nullptr)
+	//{
+	//	if (BaseItem* bi = dynamic_cast<BaseItem*>(g))
+	//	{
+	//		result.insert(0, bi->niceName);
+	//		g = ControllableUtil::findParentAs<BaseItemGroup>(bi, 2);
+	//	}
+	//	else break;
+	//}
 
 	return result;
 }

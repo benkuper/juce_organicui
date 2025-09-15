@@ -40,6 +40,7 @@ DashboardManager::DashboardManager() :
 
 DashboardManager::~DashboardManager()
 {
+	Array<Dashboard*> items = getItems();
 	for (auto& i : items) i->removeDashboardListener(this);
 
 #if ORGANICUI_USE_WEBSERVER
@@ -414,13 +415,13 @@ void DashboardManager::finished(URL::DownloadTask* task, bool success)
 
 void DashboardManager::addItemInternal(BaseItem* item, var data)
 {
-	item->addDashboardListener(this);
+	((Dashboard*)item)->addDashboardListener(this);
 	askForRefresh(nullptr);
 }
 
 void DashboardManager::removeItemInternal(BaseItem* item)
 {
-	item->removeDashboardListener(this);
+	((Dashboard*)item)->removeDashboardListener(this);
 	askForRefresh(nullptr);
 }
 

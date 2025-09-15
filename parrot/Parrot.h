@@ -64,10 +64,10 @@ public:
 	void onExternalTriggerTriggered(Trigger* t) override;
 	void onExternalParameterValueChanged(Parameter* p) override;
 
-	void itemAdded(ParrotRecord* r) override;
-	void itemsAdded(juce::Array<ParrotRecord*> records) override;
-	void itemRemoved(ParrotRecord* r) override;
-	void itemsRemoved(juce::Array<ParrotRecord*> records) override;
+	void itemAdded(BaseItem* r) override;
+	void itemsAdded(juce::Array<BaseItem*> records) override;
+	void itemRemoved(BaseItem* r) override;
+	void itemsRemoved(juce::Array<BaseItem*> records) override;
 
 	void startRecording();
 	void stopRecording();
@@ -84,4 +84,6 @@ public:
 	void loadJSONDataItemInternal(juce::var data) override;
 
 	juce::String getTypeString() const override { return "Parrot"; }
+
+	DECLARE_UI_FUNC;
 };

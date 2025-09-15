@@ -20,18 +20,18 @@ GenericControllableManager::GenericControllableManager(const String& name, bool 
 
 	managerFactory = &factory;
 
-	if (canAddTriggers) factory.defs.add(Factory<GenericControllableItem>::Definition::createDef("", "Trigger", &GenericControllableItem::create)->addParam("controllableType", Trigger::getTypeStringStatic()));
-	factory.defs.add(Factory<GenericControllableItem>::Definition::createDef("", "Float Parameter", &GenericControllableItem::create)->addParam("controllableType", FloatParameter::getTypeStringStatic()));
-	factory.defs.add(Factory<GenericControllableItem>::Definition::createDef("", "Int Parameter", &GenericControllableItem::create)->addParam("controllableType", IntParameter::getTypeStringStatic()));
-	factory.defs.add(Factory<GenericControllableItem>::Definition::createDef("", "Bool Parameter", &GenericControllableItem::create)->addParam("controllableType", BoolParameter::getTypeStringStatic()));
-	factory.defs.add(Factory<GenericControllableItem>::Definition::createDef("", "String Parameter", &GenericControllableItem::create)->addParam("controllableType", StringParameter::getTypeStringStatic()));
-	factory.defs.add(Factory<GenericControllableItem>::Definition::createDef("", "Color Parameter", &GenericControllableItem::create)->addParam("controllableType", ColorParameter::getTypeStringStatic()));
-	factory.defs.add(Factory<GenericControllableItem>::Definition::createDef("", "Point2D Parameter", &GenericControllableItem::create)->addParam("controllableType", Point2DParameter::getTypeStringStatic()));
-	factory.defs.add(Factory<GenericControllableItem>::Definition::createDef("", "Point3D Parameter", &GenericControllableItem::create)->addParam("controllableType", Point3DParameter::getTypeStringStatic()));
+	if (canAddTriggers) factory.defs.add(Factory::Definition::createDef<GenericControllableItem>("", "Trigger")->addParam("controllableType", Trigger::getTypeStringStatic()));
+	factory.defs.add(Factory::Definition::createDef<GenericControllableItem>("", "Float Parameter")->addParam("controllableType", FloatParameter::getTypeStringStatic()));
+	factory.defs.add(Factory::Definition::createDef<GenericControllableItem>("", "Int Parameter")->addParam("controllableType", IntParameter::getTypeStringStatic()));
+	factory.defs.add(Factory::Definition::createDef<GenericControllableItem>("", "Bool Parameter")->addParam("controllableType", BoolParameter::getTypeStringStatic()));
+	factory.defs.add(Factory::Definition::createDef<GenericControllableItem>("", "String Parameter")->addParam("controllableType", StringParameter::getTypeStringStatic()));
+	factory.defs.add(Factory::Definition::createDef<GenericControllableItem>("", "Color Parameter")->addParam("controllableType", ColorParameter::getTypeStringStatic()));
+	factory.defs.add(Factory::Definition::createDef<GenericControllableItem>("", "Point2D Parameter")->addParam("controllableType", Point2DParameter::getTypeStringStatic()));
+	factory.defs.add(Factory::Definition::createDef<GenericControllableItem>("", "Point3D Parameter")->addParam("controllableType", Point3DParameter::getTypeStringStatic()));
 
-	if (canAddEnums) factory.defs.add(Factory<GenericControllableItem>::Definition::createDef("", "Enum Parameter", &GenericControllableItem::create)->addParam("controllableType", EnumParameter::getTypeStringStatic()));
+	if (canAddEnums) factory.defs.add(Factory::Definition::createDef<GenericControllableItem>("", "Enum Parameter")->addParam("controllableType", EnumParameter::getTypeStringStatic()));
 
-	if (canAddTargets) factory.defs.add(Factory<GenericControllableItem>::Definition::createDef("", "Target Parameter", &GenericControllableItem::create)->addParam("controllableType", TargetParameter::getTypeStringStatic()));
+	if (canAddTargets) factory.defs.add(Factory::Definition::createDef<GenericControllableItem>("", "Target Parameter")->addParam("controllableType", TargetParameter::getTypeStringStatic()));
 
 }
 
@@ -77,7 +77,7 @@ String GenericControllableManager::getTypeForControllableType(const String& type
 {
 	for (auto& d : factory.defs)
 	{
-		if (Factory<GenericControllableItem>::Definition* fd = dynamic_cast<Factory<GenericControllableItem>::Definition*>(d))
+		if (Factory::Definition* fd = dynamic_cast<Factory::Definition*>(d))
 		{
 			if (fd->params.getProperty("controllableType", "") == type) return fd->type;
 		}

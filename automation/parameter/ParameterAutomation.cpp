@@ -11,16 +11,16 @@
 #include "JuceHeader.h"
 
 ParameterAutomation::ParameterAutomation(Parameter* _parameter) :
-	BaseItem(_parameter->niceName +" automation", false),
+	BaseItem(_parameter->niceName + " automation", false),
 	Thread("ParameterAutomation"),
 	timeParamRef(nullptr),
 	lengthParamRef(nullptr),
-    valueParamRef(nullptr),
-    automationContainer(nullptr),
-    manualMode(true),
-    valueIsNormalized(false),
-    parameter(_parameter),
-    mode(nullptr)
+	valueParamRef(nullptr),
+	automationContainer(nullptr),
+	manualMode(true),
+	valueIsNormalized(false),
+	parameter(_parameter),
+	mode(nullptr)
 {
 	isSelectable = false;
 	parameter->setControllableFeedbackOnly(true);
@@ -160,7 +160,7 @@ ParameterNumberAutomation::ParameterNumberAutomation(Parameter* parameter, bool 
 	lengthParamRef = length;
 	valueParamRef = automation.value;
 	automationContainer = &automation;
-	
+
 	valueIsNormalized = false;
 
 	setup();
@@ -171,9 +171,9 @@ ParameterNumberAutomation::ParameterNumberAutomation(Parameter* parameter, bool 
 
 	if (addDefaultItems)
 	{
-		automation.addItem(0, parameter->floatValue(), false);
-		automation.items[0]->setEasing(Easing::BEZIER);
-		automation.addKey(automation.length->floatValue(), parameter->floatValue() , false);
+		AutomationKey* k = automation.addKey(0, parameter->floatValue(), false);
+		k->setEasing(Easing::BEZIER);
+		automation.addKey(automation.length->floatValue(), parameter->floatValue(), false);
 	}
 
 }
@@ -197,8 +197,8 @@ void ParameterNumberAutomation::onContainerParameterChangedInternal(Parameter* p
 
 ParameterColorAutomation::ParameterColorAutomation(ColorParameter* colorParam, bool addDefaultItems) :
 	ParameterAutomation(colorParam),
-	colorManager(1,addDefaultItems),
-    colorParam(colorParam)
+	colorManager(1, addDefaultItems),
+	colorParam(colorParam)
 {
 	timeParamRef = colorManager.position;
 	lengthParamRef = colorManager.length;
@@ -208,7 +208,7 @@ ParameterColorAutomation::ParameterColorAutomation(ColorParameter* colorParam, b
 	setup();
 }
 
-void ParameterColorAutomation::setLength(float value, bool stretch, bool stickToEnd) 
+void ParameterColorAutomation::setLength(float value, bool stretch, bool stickToEnd)
 {
 	colorManager.setLength(value, stretch, stickToEnd);
 }

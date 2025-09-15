@@ -11,7 +11,7 @@
 #pragma once
 
 class DashboardManagerUI :
-	public ManagerUI<DashboardManager, Dashboard, DashboardUI>
+	public ManagerUI<DashboardManager, Dashboard>
 {
 public:
 	DashboardManagerUI(DashboardManager * manager);

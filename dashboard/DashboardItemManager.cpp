@@ -38,6 +38,7 @@ void DashboardItemManager::clear()
 void DashboardItemManager::fillServerData(var &data)
 {
 	var iData;
+	Array<DashboardItem*> items = getItems();
 	for (auto& i : items) iData.append(i->getServerData());
 	data.getDynamicObject()->setProperty("items", iData);
 }

@@ -160,7 +160,7 @@ public:
 
 	virtual void updateItemsVisibility();
 	virtual void updateItemVisibilityManagerInternal(BaseItemMinimalUI* bui);
-	virtual void updateBaseItemVisibility(BaseItemMinimalUI* bui);
+	virtual void updateItemVisibility(BaseItemMinimalUI* bui);
 
 	virtual bool hasFiltering();
 	virtual juce::Array<BaseItemMinimalUI*> getFilteredItems();
@@ -372,14 +372,6 @@ void ManagerUI<M, T>::showMenuAndAddItem(bool isFromAddButton, juce::Point<int> 
 	this->addItemFromMenu(nullptr, isFromAddButton, mouseDownPos);
 }
 
-
-template<class M, class T>
-juce::Component* ManagerUI<M, T>::getSelectableComponentForItemUI(BaseItemMinimalUI* itemUI)
-{
-	return itemUI;
-}
-
-
 template<class M, class T>
 void ManagerUI<M, T>::setDefaultLayout(Layout l)
 {
@@ -475,7 +467,7 @@ void ManagerUI<M, T>::addControllableTool(ControllableUI* c)
 }
 
 template<class M, class T>
-void ManagerUI<M, T>::mouseDown(const MouseEvent& e)
+void ManagerUI<M, T>::mouseDown(const juce::MouseEvent& e)
 {
 	InspectableContentComponent::mouseDown(e);
 
@@ -554,18 +546,18 @@ void ManagerUI<M, T>::paint(juce::Graphics& g)
 
 	if (drawContour)
 	{
-		Colour contourColor = bgColor.brighter(.2f);
+		juce::Colour contourColor = bgColor.brighter(.2f);
 		g.setColour(contourColor);
 		g.drawRoundedRectangle(r.toFloat(), 4, 2);
 
 		g.setFont(g.getCurrentFont().withHeight(labelHeight));
-		float textWidth = (int)TextLayout::getStringWidth(g.getCurrentFont(), managerUIName);
+		float textWidth = (int)juce::TextLayout::getStringWidth(g.getCurrentFont(), managerUIName);
 		juce::Rectangle<int> tr = r.removeFromTop(labelHeight + 2).reduced((r.getWidth() - textWidth) / 2, 0).expanded(4, 0);
 		g.fillRect(tr);
-		Colour textColor = contourColor.withBrightness(contourColor.getBrightness() > .5f ? .1f : .9f).withAlpha(1.f);
+		juce::Colour textColor = contourColor.withBrightness(contourColor.getBrightness() > .5f ? .1f : .9f).withAlpha(1.f);
 		g.setColour(textColor);
 
-		g.drawText(managerUIName, tr, Justification::centred, 1);
+		g.drawText(managerUIName, tr, juce::Justification::centred, 1);
 	}
 	else
 	{
@@ -611,9 +603,9 @@ void ManagerUI<M, T>::paint(juce::Graphics& g)
 
 	if (!this->inspectable.wasObjectDeleted() && this->manager->hasNoItems() && noItemText.isNotEmpty())
 	{
-		g.setColour(Colours::white.withAlpha(.4f));
-		g.setFont(FontOptions(jmin(getHeight() - 2, 14)));
-		g.drawFittedText(noItemText, getLocalBounds().reduced(5), Justification::centred, 6);
+		g.setColour(juce::Colours::white.withAlpha(.4f));
+		g.setFont(juce::FontOptions(juce::jmin(getHeight() - 2, 14)));
+		g.drawFittedText(noItemText, getLocalBounds().reduced(5), juce::Justification::centred, 6);
 	}
 }
 
@@ -666,7 +658,7 @@ void ManagerUI<M, T>::resizedInternalHeaderTools(juce::Rectangle<int>& r)
 	r.removeFromLeft(4);
 
 	float rSize = 0;
-	for (auto& t : this->tools) rSize += jmax(t->getWidth(), r.getHeight());
+	for (auto& t : this->tools) rSize += juce::jmax(t->getWidth(), r.getHeight());
 
 	r.removeFromLeft((r.getWidth() - rSize) / 2);
 
@@ -678,7 +670,7 @@ void ManagerUI<M, T>::resizedInternalHeaderTools(juce::Rectangle<int>& r)
 
 	for (auto& t : this->tools)
 	{
-		juce::Rectangle<int> tr = toolR.removeFromLeft(jmax(t->getWidth(), r.getHeight()));
+		juce::Rectangle<int> tr = toolR.removeFromLeft(juce::jmax(t->getWidth(), r.getHeight()));
 		tr.reduce(tr.getWidth() == toolR.getHeight() ? 6 : 0, 6);
 		t->setBounds(tr);
 	}
@@ -765,11 +757,11 @@ void ManagerUI<M, T>::alignItems(AlignMode alignMode)
 		if (i == nullptr || !manager->hasItem(i)) continue;
 		switch (alignMode)
 		{
-		case AlignMode::LEFT: target = jmin(i->viewUIPosition->x, target); break;
-		case AlignMode::RIGHT: target = jmax(i->viewUIPosition->x + i->viewUISize->x, target); break;
+		case AlignMode::LEFT: target = juce::jmin(i->viewUIPosition->x, target); break;
+		case AlignMode::RIGHT: target = juce::jmax(i->viewUIPosition->x + i->viewUISize->x, target); break;
 		case AlignMode::CENTER_H: target += i->viewUIPosition->x + i->viewUISize->x / 2; break;
-		case AlignMode::TOP: target = jmin(target, i->viewUIPosition->y); break;
-		case AlignMode::BOTTOM: target = jmax(target, i->viewUIPosition->y + i->viewUISize->y); break;
+		case AlignMode::TOP: target = juce::jmin(target, i->viewUIPosition->y); break;
+		case AlignMode::BOTTOM: target = juce::jmax(target, i->viewUIPosition->y + i->viewUISize->y); break;
 		case AlignMode::CENTER_V: target += i->viewUIPosition->y + i->viewUISize->y / 2; break;
 		}
 		goodInspectables.add(i);
@@ -779,23 +771,23 @@ void ManagerUI<M, T>::alignItems(AlignMode alignMode)
 
 	if (alignMode == CENTER_H || alignMode == CENTER_V) target /= goodInspectables.size();
 
-	juce::Array<UndoableAction*> actions;
+	juce::Array<juce::UndoableAction*> actions;
 	for (auto& i : goodInspectables)
 	{
-		Point<float> targetPoint;
+		juce::Point<float> targetPoint;
 		switch (alignMode)
 		{
-		case AlignMode::LEFT: targetPoint = Point<float>(target, i->viewUIPosition->y); break;
-		case AlignMode::RIGHT: targetPoint = Point<float>(target - i->viewUISize->x, i->viewUIPosition->y); break;
-		case AlignMode::CENTER_H: targetPoint = Point<float>(target - i->viewUISize->x / 2, i->viewUIPosition->y);  break;
-		case AlignMode::TOP: targetPoint = Point<float>(i->viewUIPosition->x, target); break;
-		case AlignMode::BOTTOM:targetPoint = Point<float>(i->viewUIPosition->x, target - i->viewUISize->y); break;
-		case AlignMode::CENTER_V:targetPoint = Point<float>(i->viewUIPosition->x, target - i->viewUISize->y / 2); break;
+		case AlignMode::LEFT: targetPoint = juce::Point<float>(target, i->viewUIPosition->y); break;
+		case AlignMode::RIGHT: targetPoint = juce::Point<float>(target - i->viewUISize->x, i->viewUIPosition->y); break;
+		case AlignMode::CENTER_H: targetPoint = juce::Point<float>(target - i->viewUISize->x / 2, i->viewUIPosition->y);  break;
+		case AlignMode::TOP: targetPoint = juce::Point<float>(i->viewUIPosition->x, target); break;
+		case AlignMode::BOTTOM:targetPoint = juce::Point<float>(i->viewUIPosition->x, target - i->viewUISize->y); break;
+		case AlignMode::CENTER_V:targetPoint = juce::Point<float>(i->viewUIPosition->x, target - i->viewUISize->y / 2); break;
 		}
 		actions.addArray(i->viewUIPosition->setUndoablePoint(targetPoint, true));
 	}
 
-	UndoMaster::getInstance()->performActions("Align " + String(goodInspectables.size()) + " items", actions);
+	UndoMaster::getInstance()->performActions("Align " + juce::String(goodInspectables.size()) + " items", actions);
 
 }
 
@@ -820,22 +812,22 @@ void ManagerUI<M, T>::distributeItems(bool isVertical)
 	PositionComparator comp(isVertical);
 	goodInspectables.sort(comp);
 
-	Point<float> center0 = goodInspectables[0]->viewUIPosition->getPoint() + goodInspectables[0]->viewUISize->getPoint() / 2;
-	Point<float> center1 = goodInspectables[goodInspectables.size() - 1]->viewUIPosition->getPoint() + goodInspectables[goodInspectables.size() - 1]->viewUISize->getPoint() / 2;
+	juce::Point<float> center0 = goodInspectables[0]->viewUIPosition->getPoint() + goodInspectables[0]->viewUISize->getPoint() / 2;
+	juce::Point<float> center1 = goodInspectables[goodInspectables.size() - 1]->viewUIPosition->getPoint() + goodInspectables[goodInspectables.size() - 1]->viewUISize->getPoint() / 2;
 	float tMin = isVertical ? center0.y : center0.x;
 	float tMax = isVertical ? center1.y : center1.x;
 
-	juce::Array<UndoableAction*> actions;
+	juce::Array<juce::UndoableAction*> actions;
 	for (int i = 0; i < goodInspectables.size(); i++)
 	{
 		float rel = i * 1.0f / (goodInspectables.size() - 1);
-		float target = jmap(rel, tMin, tMax);
+		float target = juce::jmap(rel, tMin, tMax);
 		BaseItem* ti = goodInspectables[i];
-		Point<float> targetPoint(isVertical ? ti->viewUIPosition->x : target - ti->viewUISize->x / 2, isVertical ? target - ti->viewUISize->y / 2 : ti->viewUIPosition->y);
+		juce::Point<float> targetPoint(isVertical ? ti->viewUIPosition->x : target - ti->viewUISize->x / 2, isVertical ? target - ti->viewUISize->y / 2 : ti->viewUIPosition->y);
 		actions.addArray(ti->viewUIPosition->setUndoablePoint(targetPoint, true));
 	}
 
-	UndoMaster::getInstance()->performActions("Distribute " + String(goodInspectables.size()) + " items", actions);
+	UndoMaster::getInstance()->performActions("Distribute " + juce::String(goodInspectables.size()) + " items", actions);
 }
 
 
@@ -849,11 +841,11 @@ void ManagerUI<M, T>::updateItemsVisibility()
 template<class M, class T>
 void ManagerUI<M, T>::updateItemVisibilityManagerInternal(BaseItemMinimalUI* bui)
 {
-	updateBaseItemVisibility(bui);
+	updateItemVisibility(bui);
 }
 
 template<class M, class T>
-void ManagerUI<M, T>::updateBaseItemVisibility(BaseItemMinimalUI* bui)
+void ManagerUI<M, T>::updateItemVisibility(BaseItemMinimalUI* bui)
 {
 	if (!checkFilterForItem(bui)) return;
 
@@ -904,12 +896,12 @@ bool ManagerUI<M, T>::hitTest(int x, int y)
 	if (!autoFilterHitTestOnItems) return InspectableContentComponent::hitTest(x, y);
 	if (itemsUI.size() == 0) return validateHitTestOnNoItem;
 
-	Point<int> p(x, y);
+	juce::Point<int> p(x, y);
 	for (auto& i : itemsUI)
 	{
 		if (i->getBounds().contains(p))
 		{
-			Point<int> localP = i->getLocalPoint(this, p);
+			juce::Point<int> localP = i->getLocalPoint(this, p);
 			if (i->hitTest(localP.x, localP.y)) return true;
 		}
 	}
@@ -935,12 +927,12 @@ void ManagerUI<M, T>::addItemFromMenu(BaseItem* item, bool isFromAddButton, juce
 		return;
 	}
 
-	PopupMenu p;
+	juce::PopupMenu p;
 	p.addItem(1, addItemText);
 
 	addMenuExtraItems(p, 2);
 
-	p.showMenuAsync(PopupMenu::Options(), [this, isFromAddButton, mouseDownPos](int result)
+	p.showMenuAsync(juce::PopupMenu::Options(), [this, isFromAddButton, mouseDownPos](int result)
 		{
 			if (result == 0) return;
 
@@ -1007,9 +999,9 @@ template<class M, class T>
 void ManagerUI<M, T>::removeItemUI(BaseItem* item, bool resizeAndRepaint)
 {
 	{
-		if (!MessageManager::getInstance()->isThisTheMessageThread())
+		if (!juce::MessageManager::getInstance()->isThisTheMessageThread())
 		{
-			MessageManager::getInstance()->callAsync([this, item, resizeAndRepaint]()
+			juce::MessageManager::getInstance()->callAsync([this, item, resizeAndRepaint]()
 				{
 					removeItemUI(item, resizeAndRepaint);
 				});
@@ -1103,7 +1095,7 @@ template<class M, class T>
 void ManagerUI<M, T>::itemsReorderedAsync()
 {
 	//Rebuild all UIs
-	Array<T*> items = manager->getItems();
+	juce::Array<T*> items = manager->getItems();
 	for (auto& i : items)
 	{
 		BaseItemMinimalUI* ui = getUIForItem(i, true);
@@ -1182,12 +1174,12 @@ void ManagerUI<M, T>::itemDropped(const SourceDetails& dragSourceDetails)
 				}
 				else
 				{
-					var data = item->getJSONData();
+					juce::var data = item->getJSONData();
 					if (droppingIndex != -1) data.getDynamicObject()->setProperty("index", droppingIndex);
 
 					if (BaseItem* newItem = this->manager->createItemFromData(data))
 					{
-						juce::Array<UndoableAction*> actions;
+						juce::Array<juce::UndoableAction*> actions;
 						actions.add(this->manager->getAddItemUndoableAction(newItem, data));
 						if (M* sourceManager = dynamic_cast<M*>(item->parentContainer.get()))
 						{
@@ -1244,7 +1236,7 @@ void ManagerUI<M, T>::buttonClicked(juce::Button* b)
 {
 	if (b == addItemBT.get())
 	{
-		showMenuAndAddItem(true, Point<int>());
+		showMenuAndAddItem(true, juce::Point<int>());
 	}
 	else if (this->toolFuncMap.contains(b))
 	{
@@ -1268,12 +1260,6 @@ void ManagerUI<M, T>::textEditorReturnKeyPressed(juce::TextEditor& e)
 	{
 		searchBar->unfocusAllComponents();
 	}
-}
-
-template<class M, class T>
-void ManagerUI<M, T>::inspectableDestroyed(Inspectable*)
-{
-	//to be overriden in templated class
 }
 
 template<class M, class T>

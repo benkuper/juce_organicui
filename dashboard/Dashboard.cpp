@@ -119,3 +119,5 @@ var Dashboard::getServerData()
 	itemManager.fillServerData(data);
 	return data;
 }
+
+IMPLEMENT_UI_FUNC(Dashboard);

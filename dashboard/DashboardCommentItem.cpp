@@ -37,11 +37,6 @@ var DashboardCommentItem::getServerData()
 	return data;
 }
 
-DashboardItemUI * DashboardCommentItem::createUI()
-{
-	return new DashboardCommentItemUI(this);
-}
-
 var DashboardCommentItem::getItemParameterFeedback(Parameter* p)
 {
 	var data = DashboardItem::getItemParameterFeedback(p);
@@ -49,3 +44,5 @@ var DashboardCommentItem::getItemParameterFeedback(Parameter* p)
 
 	return data;
 }
+
+IMPLEMENT_UI_FUNC(DashboardCommentItem);

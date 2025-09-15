@@ -1,30 +1,32 @@
 /*
   ==============================================================================
 
-    DashboardManagerView.cpp
-    Created: 19 Apr 2017 10:58:11pm
-    Author:  Ben
+	DashboardManagerView.cpp
+	Created: 19 Apr 2017 10:58:11pm
+	Author:  Ben
 
   ==============================================================================
 */
 
 #include "JuceHeader.h"
+#include "DashboardManagerView.h"
 
-DashboardManagerView::DashboardManagerView(const String &contentName, DashboardManager * manager) :
+DashboardManagerView::DashboardManagerView(const String& contentName, DashboardManager* manager) :
 	ShapeShifterContentComponent(contentName),
 	managerUI(manager),
 	currentItemManagerUI(nullptr),
-    currentDashboard(nullptr)
+	currentDashboard(nullptr)
 {
-	contentIsFlexible = true; 
-	
+	contentIsFlexible = true;
+
 	addAndMakeVisible(&managerUI);
 	InspectableSelectionManager::mainSelectionManager->addSelectionListener(this);
 	DashboardManager::getInstance()->addManagerListener(this);
-	
+
 	helpID = "Dashboard";
-	
-	for (auto& i : manager->items)
+
+	Array<Dashboard*> items = manager->getItems();
+	for (auto& i : items)
 	{
 		if (i->isBeingEdited)
 		{
@@ -33,16 +35,16 @@ DashboardManagerView::DashboardManagerView(const String &contentName, DashboardM
 		}
 	}
 
-	if (currentDashboard == nullptr && manager->items.size() > 0) setCurrentDashboard(manager->items[0]);
+	if (currentDashboard == nullptr && !items.isEmpty()) setCurrentDashboard(items.getFirst());
 }
 
 DashboardManagerView::~DashboardManagerView()
 {
-	if(DashboardManager::getInstanceWithoutCreating() != nullptr) DashboardManager::getInstance()->removeManagerListener(this);
+	if (DashboardManager::getInstanceWithoutCreating() != nullptr) DashboardManager::getInstance()->removeManagerListener(this);
 	if (InspectableSelectionManager::mainSelectionManager != nullptr) InspectableSelectionManager::mainSelectionManager->removeSelectionListener(this);
 }
 
-void DashboardManagerView::setCurrentDashboard(Dashboard * d)
+void DashboardManagerView::setCurrentDashboard(Dashboard* d)
 {
 	if (currentDashboard == d) return;
 
@@ -87,12 +89,12 @@ void DashboardManagerView::resized()
 void DashboardManagerView::inspectablesSelectionChanged()
 {
 	if (InspectableSelectionManager::mainSelectionManager->isEmpty()) return;
-	Dashboard * cc = InspectableSelectionManager::mainSelectionManager->getInspectableAs<Dashboard>();
+	Dashboard* cc = InspectableSelectionManager::mainSelectionManager->getInspectableAs<Dashboard>();
 	if (cc == nullptr) return;
 	setCurrentDashboard(cc);
 }
 
-void DashboardManagerView::itemRemoved(Dashboard * d)
+void DashboardManagerView::itemRemoved(BaseItem* d)
 {
 	if (currentDashboard != nullptr && currentDashboard == d) setCurrentDashboard(nullptr);
 }

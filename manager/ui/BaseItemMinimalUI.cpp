@@ -1,9 +1,9 @@
 #include "JuceHeader.h"
 
-BaseItemMinimalUI::BaseItemMinimalUI(BaseItem* _item) :
-	InspectableContentComponent(_item),
-	baseItem(_item),
-	bgColor(_item != nullptr && _baseItem->itemColor != nullptr ? _baseItem->itemColor->getColor() : BG_COLOR.brighter(.1f)),
+BaseItemMinimalUI::BaseItemMinimalUI(BaseItem* item) :
+	InspectableContentComponent(item),
+	baseItem(item),
+	bgColor(item != nullptr && item->itemColor != nullptr ? item->itemColor->getColor() : BG_COLOR.brighter(.1f)),
 	selectedColor(HIGHLIGHT_COLOR),
 	syncWithItemSize(false),
 	viewZoom(1),

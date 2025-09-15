@@ -66,7 +66,7 @@ public:
 
 	std::unique_ptr<HueSatHandle> hueSatHandle;
 
-	void paint(juce::Graphics& g) override;
+	void paint(juce::Graphics& _g) override;
 	void resized() override;
 
 	void mouseDown(const juce::MouseEvent& e) override;

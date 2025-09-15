@@ -9,10 +9,11 @@ ScriptManagerEditor::~ScriptManagerEditor()
 {
 }
 
-Script* ScriptManagerEditor::addItemFromMenu(bool isFromAddButton)
+BaseItem* ScriptManagerEditor::addItemFromMenu(bool isFromAddButton)
 {
-	Script* s = GenericManagerEditor::addItemFromMenu(isFromAddButton);
-	s->chooseFileScript(true);
+	BaseItem* s = GenericManagerEditor::addItemFromMenu(isFromAddButton);
+
+	((Script*)s)->chooseFileScript(true);
 
 	return s;
 }

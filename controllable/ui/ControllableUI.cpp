@@ -180,7 +180,8 @@ void ControllableUI::showContextMenu()
 	{
 		PopupMenu parrotMenu;
 		int index = 0;
-		for (auto& pa : ParrotManager::getInstance()->items)
+		Array<Parrot*> items = ParrotManager::getInstance()->getItems();
+		for (auto& pa : items)
 		{
 			bool isInParrot = pa->getTargetForControllable(controllable) != nullptr;
 			parrotMenu.addItem(index + 20000, pa->niceName, true, isInParrot);
@@ -198,7 +199,8 @@ void ControllableUI::showContextMenu()
 	{
 		PopupMenu dashboardMenu;
 		int index = 0;
-		for (auto& di : DashboardManager::getInstance()->items)
+		Array<Dashboard*> items = DashboardManager::getInstance()->getItems();
+		for (auto& di : items)
 		{
 			dashboardMenu.addItem(index + 10000, di->niceName);
 			index++;
@@ -270,11 +272,12 @@ void ControllableUI::showContextMenu()
 			default:
 				if (result >= 10000 && result <= 10100)
 				{
-					DashboardManager::getInstance()->items[result - 10000]->itemManager.addItem(controllable->createDashboardItem());
+					Dashboard* d = (Dashboard*)DashboardManager::getInstance()->getItemAt(result - 10000);
+					d->itemManager.addItem(controllable->createDashboardItem());
 				}
 				else if (result >= 20000 && result <= 20100)
 				{
-					Parrot* pa = ParrotManager::getInstance()->items[result - 20000];
+					Parrot* pa = (Parrot*)ParrotManager::getInstance()->getItemAt(result - 20000);
 					bool isInParrot = pa->getTargetForControllable(controllable) != nullptr;
 					if (isInParrot) pa->removeTargetForControllable(controllable);
 					else pa->addTarget(controllable);

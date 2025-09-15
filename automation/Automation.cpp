@@ -9,6 +9,7 @@
 */
 
 #include "JuceHeader.h"
+#include "Automation.h"
 
 using namespace juce;
 
@@ -97,13 +98,14 @@ void Automation::addKeys(const Array<AutomationKey*>& keys, bool addToUndo, bool
 	if (removeExistingKeys)
 	{
 		Array<AutomationKey*> existingKeys = getKeysBetweenPositions(keys[0]->position->floatValue(), keys[keys.size() - 1]->position->floatValue());
-		if (addToUndo) actions.addArray(getRemoveItemsUndoableAction(existingKeys));
-		else removeItems(existingKeys, false);
+		Array<BaseItem*> existingItems = getAsBaseItems(existingKeys);
+		if (addToUndo) actions.addArray(getRemoveItemsUndoableAction(existingItems));
+		else removeItems(existingItems, false);
 	}
 
-	Array<AutomationKey*> keysToAdd;
-	if (addToUndo)  actions.add(getAddItemsUndoableAction(keys));
-	else addItems(keys, var(), false);
+	Array<BaseItem*> items = getAsBaseItems(keys);
+	if (addToUndo) actions.add(getAddItemsUndoableAction(items));
+	else addItems(items, var(), false);
 
 	if (addToUndo) UndoMaster::getInstance()->performActions("Add Keys", actions);
 
@@ -336,6 +338,7 @@ void Automation::setUnitSteps(float unitSteps)
 	if (positionUnitSteps == unitSteps) return;
 	positionUnitSteps = jmax<float>(unitSteps, 0);
 
+	Array<AutomationKey*> items = getItems();
 	for (auto& i : items)
 	{
 		i->position->unitSteps = positionUnitSteps;
@@ -381,7 +384,7 @@ void Automation::removeItemsInternal(Array<BaseItem*>)
 Array<BaseItem*> Automation::addItemsFromClipboard(bool showWarning)
 {
 	Array<BaseItem*> bItems = Manager::addItemsFromClipboard(showWarning);
-	Array<AutomationKey*> keys = getArrayAsItems(bItems);
+	Array<AutomationKey*> keys = getAsItems(bItems);
 
 	if (keys.isEmpty()) return bItems;
 	if (keys[0] == nullptr) return Array<BaseItem*>();
@@ -402,7 +405,7 @@ Array<BaseItem*> Automation::addItemsFromClipboard(bool showWarning)
 		Array<AutomationKey*> keysBetween = getKeysBetweenPositions(keys[0]->position->floatValue() + diffTime, keys[keys.size() - 1]->position->floatValue() + diffTime);
 		if (keysBetween.size() > 0)
 		{
-			Array<AutomationKey*> keysToRemove;
+			Array<BaseItem*> keysToRemove;
 			for (auto& k : keysBetween) if (!keys.contains(k)) keysToRemove.add(k);
 			removeItems(keysToRemove);
 		}
@@ -419,6 +422,7 @@ Array<UndoableAction*> Automation::getMoveKeysBy(float start, float offset)
 {
 	Array<UndoableAction*> actions;
 
+	Array<AutomationKey*> items = getItems();
 	if (items.size() == 0) return actions;
 
 	AutomationKey* k = getKeyForPosition(start);
@@ -439,7 +443,9 @@ Array<UndoableAction*> Automation::getRemoveTimespan(float start, float end)
 	Array<UndoableAction*> actions;
 
 	Array<AutomationKey*> keys = getKeysBetweenPositions(start, end);
-	actions.addArray(getRemoveItemsUndoableAction(keys));
+	Array<BaseItem*> baseKeys;
+	for (auto& k : keys) baseKeys.add(k);
+	actions.addArray(getRemoveItemsUndoableAction(baseKeys));
 	actions.addArray(getMoveKeysBy(end, start - end));
 
 	return actions;
@@ -448,6 +454,9 @@ Array<UndoableAction*> Automation::getRemoveTimespan(float start, float end)
 void Automation::updateNextKeys(int start, int end)
 {
 	if (isCurrentlyLoadingData || Engine::mainEngine->isClearing) return;
+
+	Array<AutomationKey*> items = getItems();
+
 	if (items.size() == 0) return;
 
 	int startIndex = jmax(start, 0);
@@ -478,6 +487,7 @@ void Automation::setLength(float newLength, bool stretch, bool stickToEnd)
 {
 	if (length->floatValue() == newLength) return;
 
+	Array<AutomationKey*> items = getItems();
 	if (stretch && length->floatValue() > 0)
 	{
 		float stretchFactor = newLength / length->floatValue();
@@ -509,6 +519,7 @@ Point<float> Automation::getPosAndValue()
 juce::Rectangle<float> Automation::getBounds()
 {
 	juce::Rectangle<float> bounds;
+	Array<AutomationKey*> items = getItems();
 	for (int i = 0; i < items.size(); ++i)
 	{
 		if (i < items.size() - 1) items[i]->setNextKey(items[i + 1]);
@@ -535,6 +546,7 @@ void Automation::updateRange()
 		if (rangeRemapMode != nullptr)
 		{
 			RangeRemapMode rrm = rangeRemapMode->getValueDataAsEnum<RangeRemapMode>();
+			Array<AutomationKey*> items = getItems();
 			for (auto& k : items) k->setValueRange(valueRange->x, valueRange->y, rrm == PROPORTIONAL);
 		}
 	}
@@ -542,12 +554,14 @@ void Automation::updateRange()
 	{
 		value->clearRange();
 		viewValueRange->clearRange();
+		Array<AutomationKey*> items = getItems();
 		for (auto& k : items) k->clearValueRange();
 	}
 }
 
 AutomationKey* Automation::getKeyForPosition(float pos, bool trueIfEqual)
 {
+	Array<AutomationKey*> items = getItems();
 	if (items.size() == 0) return nullptr;
 	if (pos < items[0]->position->floatValue()) return items[0];
 	if (pos == 0) return items[0];
@@ -563,6 +577,7 @@ AutomationKey* Automation::getKeyForPosition(float pos, bool trueIfEqual)
 
 AutomationKey* Automation::getNextKeyForPosition(float pos, bool trueIfEqual)
 {
+	Array<AutomationKey*> items = getItems();
 	if (items.size() == 0) return nullptr;
 	if (pos < items[0]->position->floatValue()) return items[0];
 	if (pos == 0) return items[0];
@@ -578,6 +593,7 @@ AutomationKey* Automation::getNextKeyForPosition(float pos, bool trueIfEqual)
 
 Array<AutomationKey*> Automation::getKeysBetweenPositions(float startPos, float endPos)
 {
+	Array<AutomationKey*> items = getItems();
 	Array<AutomationKey*> result;
 	if (items.size() == 0) return result;
 	if (startPos > items[items.size() - 1]->position->floatValue() || endPos < items[0]->position->floatValue()) return result;
@@ -605,6 +621,7 @@ float Automation::getValueAtNormalizedPosition(float pos)
 
 float Automation::getValueAtPosition(float pos)
 {
+	Array<AutomationKey*> items = getItems();
 	if (items.size() == 0) return 0;
 	if (items.size() == 1) return items[0]->value->floatValue();
 	if (pos <= items[0]->position->floatValue()) return items[0]->value->floatValue();
@@ -618,6 +635,7 @@ float Automation::getValueAtPosition(float pos)
 
 float Automation::getNormalizedValueAtPosition(float pos)
 {
+	Array<AutomationKey*> items = getItems();
 	if (!viewValueRange->enabled) return 0;
 	if (items.size() == 0) return 0;
 	if (items.size() == 1) return (float)items[0]->value->getNormalizedValue();
@@ -686,13 +704,19 @@ void Automation::reorderItems()
 	updateNextKeys();
 }
 
+
 void Automation::afterLoadJSONDataInternal()
 {
 	reorderItems();
 }
 
-int Automation::compareKeys(AutomationKey* k1, AutomationKey* k2)
+
+int Automation::compareKeys(BaseItem* i1, BaseItem* i2)
 {
+	AutomationKey* k1 = (AutomationKey*)i1;
+	AutomationKey* k2 = (AutomationKey*)i2;
+	if (k1 == nullptr || k2 == nullptr) return 0;
+
 	return k2->position->floatValue() < k1->position->floatValue() ? 1 : k2->position->floatValue() > k1->position->floatValue() ? -1 : 0;
 }
 

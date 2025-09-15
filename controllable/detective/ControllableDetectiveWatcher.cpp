@@ -80,7 +80,7 @@ void ControllableDetectiveWatcher::run()
 		{
 			if (data[i]->time > maxTime)
 			{
-				if(i > 0) oldestVal = data[i-1]->val.clone();
+				if (i > 0) oldestVal = data[i - 1]->val.clone();
 				data.removeRange(0, i);
 				foundInRange = true;
 				break;
@@ -97,7 +97,4 @@ void ControllableDetectiveWatcher::run()
 	}
 }
 
-ControllableDetectiveWatcherUI* ControllableDetectiveWatcher::getUI()
-{
-	return new ControllableDetectiveWatcherUI(this);
-}
+IMPLEMENT_UI_FUNC(ControllableDetectiveWatcher)

@@ -18,9 +18,9 @@ public:
 
 	static_assert(std::is_base_of<BaseItem, T>::value, "T must be derived from BaseItem");
 
-	ItemMinimalUI(T* _item) :
-		BaseItemMinimalUI(_item),
-		item(_item)
+	ItemMinimalUI(T* item) :
+		BaseItemMinimalUI(item),
+		item(item)
 	{
 	}
 
@@ -35,9 +35,9 @@ class ItemUI :
 {
 public:
 	static_assert(std::is_base_of<BaseItem, T>::value, "T must be derived from BaseItem");
-	ItemUI(T* _item, Direction resizeDirection = NONE, bool showMiniModeBT = false) :
-		BaseItemUI(_item, resizeDirection, showMiniModeBT),
-		item(_item)
+	ItemUI(T* item, Direction resizeDirection = NONE, bool showMiniModeBT = false) :
+		BaseItemUI(item, resizeDirection, showMiniModeBT),
+		item(item)
 	{
 	}
 
@@ -53,9 +53,9 @@ class ItemGroupMinimalUI :
 public:
 	static_assert(std::is_base_of<BaseItem, G>::value, "G must be derived from BaseItem");
 
-	ItemGroupMinimalUI(G* _item) :
-		BaseItemMinimalUI(_item),
-		group(_item)
+	ItemGroupMinimalUI(G* item) :
+		BaseItemMinimalUI(item),
+		group(item)
 	{
 	}
 	virtual ~ItemGroupMinimalUI() {}
@@ -70,9 +70,9 @@ class ItemGroupUI :
 public:
 	static_assert(std::is_base_of<BaseItem, G>::value, "G must be derived from BaseItem");
 
-	ItemGroupUI(G* _item, Direction resizeDirection = VERTICAL, bool showMiniModeBT = false) :
-		BaseItemUI(_item, resizeDirection, showMiniModeBT),
-		group(_item)
+	ItemGroupUI(G* item, Direction resizeDirection = VERTICAL, bool showMiniModeBT = false) :
+		BaseItemUI(item, resizeDirection, showMiniModeBT),
+		group(item)
 	{
 		this->setSize(100, 150);
 	}
