@@ -98,7 +98,7 @@ public:
 	virtual juce::var getJSONData(ControllableContainer* relativeTo = nullptr);
 	virtual juce::var getJSONDataInternal() { return juce::var(new juce::DynamicObject()); } // to be overriden
 	virtual void loadJSONData(juce::var data);
-	virtual void loadJSONDataInternal(juce::var data) {} //to be overriden
+	virtual void loadJSONDataInternal(juce::var /*data*/) {} //to be overriden
 
 	virtual void setupFromJSONData(juce::var data);
 

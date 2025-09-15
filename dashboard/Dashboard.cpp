@@ -1,4 +1,3 @@
-#include "Dashboard.h"
 /*
   ==============================================================================
 
@@ -36,35 +35,35 @@ void Dashboard::setIsBeingEdited(bool value)
 	dashboardNotifier.addMessage(new DashboardEvent(DashboardEvent::EDITING_UPDATE, this));
 }
 
-void Dashboard::itemAdded(DashboardItem* item)
+void Dashboard::itemAdded(BaseItem* item)
 {
 	if (Engine::mainEngine->isClearing || isClearing) return;
-	item->addDashboardFeedbackListener(this);
+	((DashboardItem*)item)->addDashboardFeedbackListener(this);
 	dashboardListeners.call(&DashboardListener::askForRefresh, this);
 
 }
 
-void Dashboard::itemsAdded(Array<DashboardItem*> items)
+void Dashboard::itemsAdded(Array<BaseItem*> items)
 {
 	if (Engine::mainEngine->isClearing || isClearing) return;
-	for (auto& i : items) i->addDashboardFeedbackListener(this);
+	for (auto& i : items) ((DashboardItem*)i)->addDashboardFeedbackListener(this);
 	dashboardListeners.call(&DashboardListener::askForRefresh, this);
 }
 
-void Dashboard::itemRemoved(DashboardItem* item)
+void Dashboard::itemRemoved(BaseItem* item)
 {
 	if (Engine::mainEngine->isClearing || isClearing) return;
-	item->removeDashboardFeedbackListener(this);
+	((DashboardItem*)item)->removeDashboardFeedbackListener(this);
 	dashboardListeners.call(&DashboardListener::askForRefresh, this);
 }
 
-void Dashboard::itemsRemoved(Array<DashboardItem*> items)
+void Dashboard::itemsRemoved(Array<BaseItem*> items)
 {
 	if (Engine::mainEngine->isClearing || isClearing) return;
 	for (auto& i : items)
 	{
 		if (i->isClearing || i->isBeingDestroyed) continue;
-		i->removeDashboardFeedbackListener(this);
+		((DashboardItem*)i)->removeDashboardFeedbackListener(this);
 	}
 	dashboardListeners.call(&DashboardListener::askForRefresh, this);
 }

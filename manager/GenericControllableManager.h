@@ -23,11 +23,11 @@ public:
 
 	juce::String getTypeForControllableType(const juce::String& type);
 
-	Factory<GenericControllableItem> factory;
+	Factory factory;
 
 	GenericControllableItem* addItemFrom(Controllable* c, bool copyValue = true);
 
-	void addItemInternal(GenericControllableItem* item, juce::var data) override;
+	void addItemInternal(BaseItem* item, juce::var data) override;
 	virtual InspectableEditor* getEditorInternal(bool isRoot, juce::Array<Inspectable*> inspectables = juce::Array<Inspectable*>()) override;
 
 private:

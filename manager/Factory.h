@@ -9,8 +9,8 @@
 */
 
 #pragma once
+class BaseItem;
 
-template<class T>
 class BaseFactoryDefinition
 {
 public:
@@ -27,18 +27,18 @@ public:
 	juce::Image icon;
 	bool isEnabled = true;
 
-	BaseFactoryDefinition* addIcon(juce::Image icon)
+	BaseFactoryDefinition* addIcon(juce::Image _icon)
 	{
-		this->icon = icon;
+		this->icon = _icon;
 		return this;
 	}
 
-	virtual T* create() { jassertfalse; return new T(); }
+	virtual BaseItem* create() { jassertfalse; return nullptr; }
 };
 
-template<class T, typename CreateFunc>
+template<typename CreateFunc>
 class FactoryDefinition :
-	public BaseFactoryDefinition<T>
+	public BaseFactoryDefinition
 {
 public:
 	FactoryDefinition(juce::StringRef menuPath, juce::StringRef type, CreateFunc createFunc) :
@@ -58,13 +58,15 @@ public:
 	}
 };
 
-template<class T, typename CreateFunc>
+template<typename CreateFunc>
 class FactoryParametricDefinition :
-	public FactoryDefinition<T, CreateFunc>
+	public FactoryDefinition<CreateFunc>
 {
 public:
+
+
 	FactoryParametricDefinition(juce::StringRef menuPath, juce::StringRef type, CreateFunc createFunc, juce::var params = new juce::DynamicObject()) :
-		FactoryDefinition<T, CreateFunc>(menuPath, type, createFunc),
+		FactoryDefinition<CreateFunc>(menuPath, type, createFunc),
 		params(params)
 	{
 		this->params.getDynamicObject()->setProperty("type", juce::String(type));
@@ -81,19 +83,18 @@ public:
 	}
 };
 
-template<class T>
 class FactorySimpleParametricDefinition :
-	public FactoryParametricDefinition<T, std::function<T* (juce::var)>>
+	public FactoryParametricDefinition<std::function<BaseItem* (juce::var)>>
 {
 public:
-	FactorySimpleParametricDefinition(juce::StringRef menuPath, juce::StringRef type, std::function<T* (juce::var)> createFunc, juce::var params = new juce::DynamicObject()) :
-		FactoryParametricDefinition<T, std::function<T* (juce::var)>>(menuPath, type, createFunc, params)
+	FactorySimpleParametricDefinition(juce::StringRef menuPath, juce::StringRef type, std::function<BaseItem* (juce::var)> createFunc, juce::var params = new juce::DynamicObject()) :
+		FactoryParametricDefinition<std::function<BaseItem* (juce::var)>>(menuPath, type, createFunc, params)
 	{
 	}
 
 	virtual ~FactorySimpleParametricDefinition() {}
 
-	virtual T* createWithExtramParams(juce::var extraParams) {
+	virtual BaseItem* createWithExtramParams(juce::var extraParams) {
 
 		if (!extraParams.isObject()) return this->createFunc(this->params);
 
@@ -105,12 +106,12 @@ public:
 		return this->createFunc(mergedParams);
 	}
 
-	virtual T* create() override {
+	virtual BaseItem* create() override {
 		return this->createFunc(this->params);
 	}
 
 
-	static FactorySimpleParametricDefinition* createDef(juce::StringRef menu, juce::StringRef type, std::function<T* (juce::var)> createFunc, juce::var params = new juce::DynamicObject())
+	static FactorySimpleParametricDefinition* createDef(juce::StringRef menu, juce::StringRef type, std::function<BaseItem* (juce::var)> createFunc, juce::var params = new juce::DynamicObject())
 	{
 		return new FactorySimpleParametricDefinition(menu, type, createFunc, params);
 	}
@@ -128,19 +129,18 @@ public:
 	}
 
 	template<class S>
-	static T* createTemplated(juce::var params = new juce::DynamicObject()) { return new S(params); }
+	static BaseItem* createTemplated(juce::var params = new juce::DynamicObject()) { return new S(params); }
 
 };
 
-template<class T>
-class BaseFactory
+class Factory
 {
 public:
 
-	BaseFactory() {}
-	virtual ~BaseFactory() {}
+	Factory() {}
+	virtual ~Factory() {}
 
-	juce::OwnedArray<BaseFactoryDefinition<T>> defs;
+	juce::OwnedArray<BaseFactoryDefinition> defs;
 	juce::PopupMenu menu;
 
 	virtual void buildPopupMenu(int startOffset = 0)
@@ -186,17 +186,17 @@ public:
 
 	virtual void buildPopupMenuInternal() {}
 
-	virtual void showCreateMenu(std::function<void(T*)> returnFunc)
+	virtual void showCreateMenu(std::function<void(BaseItem*)> returnFunc)
 	{
 		if (defs.size() == 1)
 		{
-			if (T* r = this->createFromMenuResult(1)) returnFunc(r);
+			if (BaseItem* r = this->createFromMenuResult(1)) returnFunc(r);
 			return;
 		}
 
 		getMenu().showMenuAsync(juce::PopupMenu::Options(), [this, returnFunc](int result)
 			{
-				if (T* r = this->createFromMenuResult(result)) returnFunc(r);
+				if (BaseItem* r = this->createFromMenuResult(result)) returnFunc(r);
 			}
 		);
 	}
@@ -207,17 +207,17 @@ public:
 		return menu;
 	}
 
-	virtual T* createFromMenuResult(int result)
+	virtual BaseItem* createFromMenuResult(int result)
 	{
 		if (result <= 0 || result > defs.size()) return nullptr;
 		else
 		{
-			BaseFactoryDefinition<T>* d = defs[result - 1];//result 0 is no result
+			BaseFactoryDefinition* d = defs[result - 1];//result 0 is no result
 			return create(d);
 		}
 	}
 
-	virtual T* create(const juce::String& type)
+	virtual BaseItem* create(const juce::String& type)
 	{
 		for (auto& d : defs)
 		{
@@ -228,7 +228,7 @@ public:
 		return nullptr;
 	}
 
-	virtual T* createWithExtraParams(const juce::String& type, juce::var extraParams)
+	virtual BaseItem* createWithExtraParams(const juce::String& type, juce::var extraParams)
 	{
 		for (auto& d : defs)
 		{
@@ -239,7 +239,7 @@ public:
 		return nullptr;
 	}
 
-	virtual BaseFactoryDefinition<T>* getDefFromExtendedType(const juce::String& extendedType)
+	virtual BaseFactoryDefinition* getDefFromExtendedType(const juce::String& extendedType)
 	{
 		if (!extendedType.matchesWildcard("*/*", true)) return nullptr;
 
@@ -253,14 +253,14 @@ public:
 		return nullptr;
 	}
 
-	virtual T* create(BaseFactoryDefinition<T>* def)
+	virtual BaseItem* create(BaseFactoryDefinition* def)
 	{
 		return def->create();
 	}
 
-	virtual T* createWithExtraParams(BaseFactoryDefinition<T>* def, juce::var extraParams)
+	virtual BaseItem* createWithExtraParams(BaseFactoryDefinition* def, juce::var extraParams)
 	{
-		return dynamic_cast<FactorySimpleParametricDefinition<T>*>(def)->createWithExtramParams(extraParams);
+		return dynamic_cast<FactorySimpleParametricDefinition*>(def)->createWithExtramParams(extraParams);
 	}
 
 	bool hasDefinitionWithType(const juce::String& type)
@@ -273,49 +273,5 @@ public:
 		return false;
 	}
 
-	typedef FactorySimpleParametricDefinition<T> Definition;
-};
-
-
-class BaseItem;
-template<class T> class ItemBaseGroup;
-template<class T, class G> class Manager;
-template<class T, class G = ItemBaseGroup<T>>
-class Factory : public BaseFactory<T>
-{
-public:
-	static_assert(std::is_base_of<BaseItem, T>::value, "T must be derived from BaseItem");
-	static_assert(std::is_base_of<ItemBaseGroup<T>, G>::value, "G must be derived from ItemGroup<T>");
-
-	Factory() :
-		BaseFactory<T>()
-	{
-	}
-
-	virtual ~Factory() {}
-
-	virtual void showCreateMenu(Manager<T, G>* manager, std::function<void(T*)> returnFunc)
-	{
-		if (manager == nullptr || !manager->canHaveGroups)
-		{
-			BaseFactory<T>::showCreateMenu(returnFunc);
-			return;
-		}
-
-		juce::PopupMenu tmpMenu = BaseFactory<T>::getMenu();
-		if (manager != nullptr && manager->canHaveGroups)
-		{
-			tmpMenu.addSeparator();
-			tmpMenu.addItem("Group", [manager]() { manager->addGroup(); });// manager->addItem();
-		}
-
-		tmpMenu.showMenuAsync(juce::PopupMenu::Options(), [this, returnFunc](int result)
-			{
-				if (result == -1) return;
-				if (T* r = this->createFromMenuResult(result)) returnFunc(r);
-			}
-		);
-
-
-	}
+	typedef FactorySimpleParametricDefinition Definition;
 };

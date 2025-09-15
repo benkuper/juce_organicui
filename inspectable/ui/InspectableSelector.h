@@ -43,7 +43,7 @@ public:
 	{
 	public:
 		virtual ~SelectorListener() {}
-		virtual void selectionEnded(juce::Array<juce::Component *> selectedComponents) {};
+		virtual void selectionEnded(juce::Array<juce::Component *>) {};
 	};
 
 	juce::ListenerList<SelectorListener> listeners;

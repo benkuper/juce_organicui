@@ -60,23 +60,24 @@ void Curve2D::setControlMode(ControlMode mode)
 	keySyncMode->setEnabled(position->controlMode == Parameter::AUTOMATION);
 }
 
-void Curve2D::addItemInternal(Curve2DKey* k, var)
+void Curve2D::addItemInternal(BaseItem* item, var)
 {
-	k->isFirst = items.size() == 1;
+	Curve2DKey* key = getAsItem(item);
+	key->isFirst = getNumItems() == 1;
 	if (!isManipulatingMultipleItems && !isCurrentlyLoadingData) updateCurve(false);
 }
 
-void Curve2D::addItemsInternal(Array<Curve2DKey*> keys, var)
+void Curve2D::addItemsInternal(Array<BaseItem*> keys, var)
 {
 	if (!isCurrentlyLoadingData) updateCurve();
 }
 
-void Curve2D::removeItemInternal(Curve2DKey*)
+void Curve2D::removeItemInternal(BaseItem*)
 {
 	if (!isManipulatingMultipleItems && !isCurrentlyLoadingData) updateCurve(false);
 }
 
-void Curve2D::removeItemsInternal(Array<Curve2DKey*>)
+void Curve2D::removeItemsInternal(Array<BaseItem*>)
 {
 	if (!isCurrentlyLoadingData) updateCurve(false);
 }
@@ -120,7 +121,7 @@ float Curve2D::addFromPointsAndSimplify(Array<Point<float>> sourcePoints, bool c
 
 	int numPoints = ((int)resultNum);
 
-	Array<Curve2DKey*> keys;
+	Array<BaseItem*> keys;
 
 	CubicEasing2D* prevEasing = nullptr;
 	Point<float> prevRP;
@@ -183,42 +184,44 @@ void Curve2D::updateCurve(bool relativeAutomationKeySyncMode)
 	Array<float> prevCurvePositions;
 	float prevLength = length->floatValue();
 
-	bounds = items.size() > 0 ? items[0]->easing->getBounds() : Rectangle<float>(0, 0, 0, 0);
+	Array<Curve2DKey*> keys = getItems();
+	bounds = keys.size() > 0 ? keys[0]->easing->getBounds() : Rectangle<float>(0, 0, 0, 0);
 
 	float curLength = 0;
-	int numItems = items.size();
+	int numItems = keys.size();
 	for (int i = 0; i < numItems; ++i)
 	{
 
-		if (i < numItems - 1) items[i]->setNextKey(items[i + 1]);
-		else items[i]->setNextKey(nullptr);
-		prevCurvePositions.add(items[i]->curvePosition);
-		items[i]->curvePosition = curLength;
-		if (i < numItems - 1) curLength += items[i]->getLength();
+		if (i < numItems - 1) keys[i]->setNextKey(keys[i + 1]);
+		else keys[i]->setNextKey(nullptr);
+		prevCurvePositions.add(keys[i]->curvePosition);
+		keys[i]->curvePosition = curLength;
+		if (i < numItems - 1) curLength += keys[i]->getLength();
 
-		bounds = bounds.getUnion(items[i]->easing->getBounds());
+		bounds = bounds.getUnion(keys[i]->easing->getBounds());
 	}
 
 	length->setValue(curLength);
 
-	if (items.size() >= 2 && keySyncMode->boolValue() && prevLength > 0 && length->floatValue() > 0)
+	if (keys.size() >= 2 && keySyncMode->boolValue() && prevLength > 0 && length->floatValue() > 0)
 	{
 		Automation* a = (Automation*)position->automation->automationContainer;
-		for (auto& k : a->items)
+		Array<AutomationKey*> aKeys = a->getItems();
+		for (auto& k : aKeys)
 		{
 			float kPrevPos = k->value->floatValue() * prevLength;
 
 			if (relativeAutomationKeySyncMode)
 			{
 				Curve2DKey* prevKey = nullptr;
-				for (int j = items.size() - 2; j >= 0; j--)
+				for (int j = keys.size() - 2; j >= 0; j--)
 				{
 					if (prevCurvePositions[j + 1] == prevCurvePositions[j]) continue;
 					if (prevCurvePositions[j] <= kPrevPos)
 					{
-						prevKey = items[j];
+						prevKey = keys[j];
 						float relP = (kPrevPos - prevCurvePositions[j]) / (prevCurvePositions[j + 1] - prevCurvePositions[j]);
-						float newPos = items[j]->curvePosition + relP * (items[j + 1]->curvePosition - items[j]->curvePosition);
+						float newPos = keys[j]->curvePosition + relP * (keys[j + 1]->curvePosition - keys[j]->curvePosition);
 						float newNormPos = newPos / length->floatValue();
 						//DBG("kValue : " << k->value->floatValue() << ", prevLength : " << prevLength << ", length : " << length->floatValue() << ", prevCurvePos : " << prevCurvePositions[j] << ", nextCurvePos : " << prevCurvePositions[j + 1] << ", Prev Key : " << j << ", relP : " << relP << ", newPos " << newPos << " / normPos : " << newNormPos);
 						k->value->setValue(newNormPos);
@@ -244,12 +247,13 @@ void Curve2D::computeValue()
 
 Curve2DKey* Curve2D::getKeyForPosition(float pos)
 {
-	if (items.size() == 0) return nullptr;
-	if (pos == 0) return items[0];
+	Array<Curve2DKey*> keys = getItems();
+	if (keys.isEmpty()) return nullptr;
+	if (pos == 0) return keys[0];
 
-	for (int i = items.size() - 1; i >= 0; i--)
+	for (int i = keys.size() - 1; i >= 0; i--)
 	{
-		if (items[i]->curvePosition <= pos) return items[i];
+		if (keys[i]->curvePosition <= pos) return keys[i];
 	}
 
 	return nullptr;
@@ -263,9 +267,10 @@ Point<float> Curve2D::getValueAtNormalizedPosition(float pos)
 
 Point<float> Curve2D::getValueAtPosition(float pos)
 {
-	if (items.size() == 0) return Point<float>();
-	if (items.size() == 1) return items[0]->viewUIPosition->getPoint();
-	if (pos == length->floatValue())  return items[items.size() - 1]->viewUIPosition->getPoint();
+	Array<Curve2DKey*> keys = getItems();
+	if (keys.size() == 0) return Point<float>();
+	if (keys.size() == 1) return keys[0]->viewUIPosition->getPoint();
+	if (pos == length->floatValue())  return keys[keys.size() - 1]->viewUIPosition->getPoint();
 
 	Curve2DKey* k = getKeyForPosition(pos);
 	if (k == nullptr || k->easing == nullptr) return Point<float>();

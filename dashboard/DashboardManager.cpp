@@ -412,13 +412,13 @@ void DashboardManager::finished(URL::DownloadTask* task, bool success)
 #endif //ORGANICUI_USE_WEBSERVER
 
 
-void DashboardManager::addItemInternal(Dashboard* item, var data)
+void DashboardManager::addItemInternal(BaseItem* item, var data)
 {
 	item->addDashboardListener(this);
 	askForRefresh(nullptr);
 }
 
-void DashboardManager::removeItemInternal(Dashboard* item)
+void DashboardManager::removeItemInternal(BaseItem* item)
 {
 	item->removeDashboardListener(this);
 	askForRefresh(nullptr);

@@ -19,6 +19,7 @@
 
 //==============================================================================
 
+using namespace juce;
 
 #include "helpers/StringUtil.cpp"
 #include "helpers/OSCHelpers.cpp"

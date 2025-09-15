@@ -9,7 +9,6 @@
 */
 
 #include "JuceHeader.h"
-#include "BaseItem.h"
 
 BaseItem::BaseItem(const String& name, bool _canBeDisabled, bool _canHaveScripts, bool isGroup) :
 	EnablingControllableContainer(name.isEmpty() ? getTypeString() : name, _canBeDisabled),
@@ -449,6 +448,11 @@ void BaseItem::getRemoteControlDataInternal(var& data)
 InspectableEditor* BaseItem::getEditorInternal(bool isRoot, Array<Inspectable*> inspectables)
 {
 	return new BaseItemEditor(this, isRoot);
+}
+
+BaseItemMinimalUI* BaseItem::createUI()
+{
+	return new BaseItemMinimalUI(this);
 }
 
 var BaseItem::getTypeStringFromScript(const juce::var::NativeFunctionArgs& a)

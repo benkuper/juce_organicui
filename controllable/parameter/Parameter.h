@@ -104,7 +104,7 @@ public:
 
 	virtual juce::var getValue(); //may be useful, or testing expression or references (for now, forward update from expression timer)
 	virtual juce::var getLerpValueTo(juce::var targetValue, float weight);
-	virtual void setWeightedValue(juce::Array<juce::var> values, juce::Array<float> weights) {} // to be overriden
+	virtual void setWeightedValue(juce::Array<juce::var> /*values*/, juce::Array<float> /*weights*/) {} // to be overriden
 	virtual juce::var getCroppedValue(juce::var originalValue);
 
 	virtual void setDefaultValue(juce::var val, bool doResetValue = true);

@@ -128,6 +128,9 @@
 #include <juce_cryptography/juce_cryptography.h>
 #include <juce_javascript/juce_javascript.h>
 
+#define NOMINMAX
+#define NOGDI
+
 #if ORGANICUI_USE_SERVUS
 #include "servus/servus.h"
 #endif
@@ -268,15 +271,15 @@
 #include "remotecontrol/OSCRemoteControl.h"
 
 
-template<class T> class ItemBaseGroup;
-template<class T, class G = ItemBaseGroup<T>> class Manager;
+template<class M> class ItemGroup;
+template<class T, class G> class NestingManager;
+
 #define DECLARE_TYPE(type) juce::String getTypeString() const override { return getTypeStringStatic() ; } \
 static juce::String getTypeStringStatic() { return type; }
 
 #include "manager/BaseItemListener.h"
 #include "manager/ManagerListener.h"
 #include "manager/BaseItem.h"
-#include "manager/BaseManager.h"
 
 
 
@@ -284,7 +287,6 @@ static juce::String getTypeStringStatic() { return type; }
 #include "manager/ui/GenericManagerEditor.h"
 
 #include "manager/Manager.h"
-#include "manager/ItemGroup.h"
 
 #include "manager/ui/BaseItemMinimalUI.h"
 #include "manager/ui/BaseItemUI.h"

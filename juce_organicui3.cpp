@@ -2,6 +2,8 @@
 
 //==============================================================================
 
+using namespace juce;
+
 #include "engine/Engine.cpp"
 #include "engine/EngineFileDocument.cpp"
 
@@ -32,7 +34,6 @@
 
 #include "manager/Factory.h"
 #include "manager/BaseItem.cpp"
-#include "manager/BaseManager.cpp"
 
 #include "manager/GenericControllableManager.cpp"
 #include "manager/GenericControllableItem.cpp"

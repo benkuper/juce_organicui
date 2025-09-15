@@ -2,6 +2,8 @@
 
 //==============================================================================
 
+using namespace juce;
+
 #include "parrot/ParrotRecord.cpp"
 #include "parrot/ParrotRecordManager.cpp"
 #include "parrot/Parrot.cpp"

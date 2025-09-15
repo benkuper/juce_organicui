@@ -1,5 +1,7 @@
 #include "juce_organicui.h"
 
+using namespace juce;
+
 #include "comment/Comment.cpp"
 #include "comment/CommentManager.cpp"
 #include "comment/ui/CommentUI.cpp"

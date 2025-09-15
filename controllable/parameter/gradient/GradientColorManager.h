@@ -59,8 +59,8 @@ public:
 	juce::Array<juce::UndoableAction*> getRemoveTimespan(float start, float end);
 
 
-    void addItemInternal(GradientColor * item, juce::var data) override;
-	void removeItemInternal(GradientColor * item) override;
+    void addItemInternal(BaseItem * item, juce::var data) override;
+	void removeItemInternal(BaseItem * item) override;
 
 	juce::Array<BaseItem*> addItemsFromClipboard(bool showWarning = false) override;
 

@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    BaseItem.h
-    Created: 28 Oct 2016 8:04:25pm
-    Author:  bkupe
+	BaseItem.h
+	Created: 28 Oct 2016 8:04:25pm
+	Author:  bkupe
 
   ==============================================================================
 */
@@ -12,6 +12,7 @@
 
 class GenericControllableManager;
 class ScriptManager;
+class BaseItemMinimalUI;
 
 class BaseItem :
 	public EnablingControllableContainer
@@ -70,7 +71,7 @@ public:
 	virtual void setPosition(juce::Point<float> position);
 	virtual juce::Point<float> getPosition();
 	void addMoveToUndoManager(bool addOtherSelectedItems = false);
-	virtual void addUndoableMoveAction(juce::Array<juce::UndoableAction *> &arrayToAdd);
+	virtual void addUndoableMoveAction(juce::Array<juce::UndoableAction*>& arrayToAdd);
 
 	void setSizeReference(bool setOtherSelectedItems = false);
 	virtual void setSizeReferenceInternal();
@@ -82,14 +83,11 @@ public:
 	virtual void addUndoableResizeAction(juce::Array<juce::UndoableAction*>& arrayToAdd);
 
 	//listeners
-	virtual void onContainerParameterChanged(Parameter *) override;
-	virtual void onContainerTriggerTriggered(Trigger *) override;
-	virtual void onContainerParameterChangedInternal(Parameter *) {} //child classes override this function
-	void onControllableFeedbackUpdate(ControllableContainer * cc, Controllable * c) override;
-	virtual void onControllableFeedbackUpdateInternal(ControllableContainer * cc, Controllable * c) {};
-
-	//void itemAdded(Script* script) override;
-	//void itemsAdded(juce::Array<Script*> scripts) override;
+	virtual void onContainerParameterChanged(Parameter*) override;
+	virtual void onContainerTriggerTriggered(Trigger*) override;
+	virtual void onContainerParameterChangedInternal(Parameter*) {} //child classes override this function
+	void onControllableFeedbackUpdate(ControllableContainer* cc, Controllable* c) override;
+	virtual void onControllableFeedbackUpdateInternal(ControllableContainer* cc, Controllable* c) {};
 
 	juce::StringArray getBreadCrumb();
 
@@ -101,8 +99,11 @@ public:
 
 	virtual void getRemoteControlDataInternal(juce::var& data) override;
 
-	InspectableEditor * getEditorInternal(bool isRoot, juce::Array<Inspectable*> inspectables = juce::Array<Inspectable*>()) override;
-	virtual juce::String getTypeString() const { return "BaseItem"; };
+	InspectableEditor* getEditorInternal(bool isRoot, juce::Array<Inspectable*> inspectables = juce::Array<Inspectable*>()) override;
+
+	virtual BaseItemMinimalUI* createUI();
+
+	virtual juce::String getTypeString() const { return "BaseItem"; }
 	static juce::var getTypeStringFromScript(const juce::var::NativeFunctionArgs& a);
 	juce::String getScriptTargetString() override;
 
@@ -114,4 +115,32 @@ private:
 	juce::WeakReference<BaseItem>::Master masterReference;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BaseItem)
+};
+
+
+template<class M>
+class ItemGroup :
+	public BaseItem
+{
+public:
+	ItemGroup(const juce::String& name = "") : BaseItem(name, true, false, true) {}
+
+	std::unique_ptr<M> manager;
+
+	virtual ~ItemGroup() { manager.reset(); }
+
+	void clearItem() override
+	{
+		if (manager) manager->clear();
+		BaseItem::clearItem();
+	}
+
+	juce::Array<BaseItem*> getAllItemsInternal(bool recursive, bool includeDisabled, bool includeGroups) override
+	{
+		juce::Array<BaseItem*> allItems;
+		if (!manager) return allItems;
+		return manager->getAllItems(recursive, includeDisabled, includeGroups);
+	}
+
+	virtual juce::String getTypeString() const override { return "ItemGroup"; }
 };

@@ -209,14 +209,15 @@ Array<UndoableAction*> GradientColorManager::getRemoveTimespan(float start, floa
 
 
 
-void GradientColorManager::addItemInternal(GradientColor * item, var data)
+void GradientColorManager::addItemInternal(BaseItem * item, var data)
 {
+	GradientColor* key = static_cast<GradientColor*>(item);
 	//item->gradientIndex = gradient.addColour(item->position->floatValue() / length->floatValue(), item->itemColor->getColor());
-	if(!allowKeysOutside) item->position->setRange(0, length->floatValue());
+	if(!allowKeysOutside) key->position->setRange(0, length->floatValue());
 	item->selectionManager = selectionManager;
 }
 
-void GradientColorManager::removeItemInternal(GradientColor *)
+void GradientColorManager::removeItemInternal(BaseItem *)
 {
 	//rebuildGradient();
 	updateCurrentColor();
@@ -225,7 +226,7 @@ void GradientColorManager::removeItemInternal(GradientColor *)
 Array<BaseItem*> GradientColorManager::addItemsFromClipboard(bool showWarning)
 {
 	Array<BaseItem*> bItems = Manager::addItemsFromClipboard(showWarning);
-	Array<GradientColor*> keys = getArrayAsItems(bItems);
+	Array<GradientColor*> keys = getAsItems(bItems);
 
 	if (keys.isEmpty()) return bItems;
 	if (keys[0] == nullptr) return Array<BaseItem*>();

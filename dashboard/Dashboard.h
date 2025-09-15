@@ -26,10 +26,10 @@ public:
 
 	void setIsBeingEdited(bool value);
 
-	void itemAdded(DashboardItem*) override;
-	void itemsAdded(juce::Array<DashboardItem*>) override;
-	void itemRemoved(DashboardItem*) override;
-	void itemsRemoved(juce::Array<DashboardItem*>) override;
+	void itemAdded(BaseItem*) override;
+	void itemsAdded(juce::Array<BaseItem*>) override;
+	void itemRemoved(BaseItem*) override;
+	void itemsRemoved(juce::Array<BaseItem*>) override;
 	void parameterFeedback(juce::var data) override; //from DashboardItemListener
 	void dashboardFeedback(juce::var data) override; //from DashboardItemListener
 

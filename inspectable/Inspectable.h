@@ -115,7 +115,7 @@ public:
 	}
 
 	InspectableEditor* getEditor(bool isRoot, juce::Array<Inspectable*> inspectables = juce::Array<Inspectable*>());
-	virtual InspectableEditor* getEditorInternal(bool /*isRoot*/, juce::Array<Inspectable*> inspectables = juce::Array<Inspectable*>()) { jassert(false);  return nullptr; } //to override !
+	virtual InspectableEditor* getEditorInternal(bool /*isRoot*/, juce::Array<Inspectable*> = juce::Array<Inspectable*>()) { jassert(false);  return nullptr; } //to override !
 	//Listener
 	class  InspectableListener
 	{

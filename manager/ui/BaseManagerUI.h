@@ -13,36 +13,8 @@
 
 
 
-class ManagerUIItemComparator
-{
-public:
-	ManagerUIItemComparator(BaseManager* _manager) :manager(_manager) {}
 
-	BaseManager* manager;
-
-	int compareElements(BaseItemMinimalUI* u1, BaseItemMinimalUI* u2)
-	{
-		return (manager->baseItems.indexOf(u1->baseItem) < manager->baseItems.indexOf(u2->baseItem)) ? -1 : 1;
-	}
-};
-
-class BaseManagerUI;
-
-class BaseManagerUIItemContainer :
-	public juce::Component
-{
-public:
-	BaseManagerUIItemContainer(BaseManagerUI* mui) : baseManagerUI(mui) {};
-	~BaseManagerUIItemContainer() {}
-
-	BaseManagerUI* baseManagerUI;
-
-	void childBoundsChanged(juce::Component* c);
-};
-
-
-
-class BaseManagerUI :
+class Nesting :
 	public InspectableContentComponent,
 	//public BaseManager::ManagerListener,
 	//public BaseManager::AsyncListener,
@@ -56,8 +28,8 @@ class BaseManagerUI :
 	public juce::TextEditor::Listener
 {
 public:
-	BaseManagerUI(const juce::String& contentName, BaseManager* _manager, bool _useViewport = true);
-	virtual ~BaseManagerUI();
+	Nesting(const juce::String& contentName, BaseManager* _manager, bool _useViewport = true);
+	virtual ~Nesting();
 
 	enum Layout { HORIZONTAL, VERTICAL, FREE };
 
@@ -65,7 +37,18 @@ public:
 	juce::OwnedArray<BaseItemMinimalUI> baseItemsUI;
 	ManagerUIItemComparator managerComparator;
 
-	BaseManagerUIItemContainer container;
+	class ItemContainer :
+		public juce::Component
+	{
+	public:
+		ItemContainer(* mui) : baseManagerUI(mui) {};
+		~ItemContainer() {}
+
+		Nesting* baseManagerUI;
+
+		void childBoundsChanged(juce::Component* c);
+	};
+	NestingItemContainer container;
 
 	//ui
 	bool useViewport; //TODO, create a ManagerViewportUI

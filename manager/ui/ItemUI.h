@@ -9,7 +9,6 @@
 */
 
 #pragma once
-template<class T> class ItemBaseGroup;
 
 template<class T>
 class ItemMinimalUI :
@@ -47,13 +46,12 @@ public:
 	T* item;
 };
 
-template<class T, class G = ItemBaseGroup<T>>
+template<class G>
 class ItemGroupMinimalUI :
 	public BaseItemMinimalUI
 {
 public:
-	static_assert(std::is_base_of<BaseItem, T>::value, "T must be derived from BaseItem");
-	static_assert(std::is_base_of<ItemBaseGroup<T>, G>::value, "G must be derived from ItemBaseGroup<T>");
+	static_assert(std::is_base_of<BaseItem, G>::value, "G must be derived from BaseItem");
 
 	ItemGroupMinimalUI(G* _item) :
 		BaseItemMinimalUI(_item),
@@ -65,13 +63,12 @@ public:
 	G* group;
 };
 
-template<class T, class G = ItemBaseGroup<T>>
+template<class G>
 class ItemGroupUI :
 	public BaseItemUI
 {
 public:
-	static_assert(std::is_base_of<BaseItem, T>::value, "T must be derived from BaseItem");
-	static_assert(std::is_base_of<ItemBaseGroup<T>, G>::value, "G must be derived from ItemBaseGroup<T>");
+	static_assert(std::is_base_of<BaseItem, G>::value, "G must be derived from BaseItem");
 
 	ItemGroupUI(G* _item, Direction resizeDirection = VERTICAL, bool showMiniModeBT = false) :
 		BaseItemUI(_item, resizeDirection, showMiniModeBT),

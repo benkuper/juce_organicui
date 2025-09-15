@@ -36,10 +36,10 @@ public:
 
     void setControlMode(ControlMode mode);
     
-    void addItemInternal(Curve2DKey* k, juce::var params) override;
-    void addItemsInternal(juce::Array<Curve2DKey*> keys, juce::var) override;
-    void removeItemInternal(Curve2DKey* k) override;
-    void removeItemsInternal(juce::Array<Curve2DKey*> keys) override;
+    void addItemInternal(BaseItem* k, juce::var params) override;
+    void addItemsInternal(juce::Array<BaseItem*> keys, juce::var) override;
+    void removeItemInternal(BaseItem* k) override;
+    void removeItemsInternal(juce::Array<BaseItem *> keys) override;
 
     virtual float addFromPointsAndSimplify(juce::Array<juce::Point<float>> points, bool clearBeforeAdd = false, juce::Array<float> pointTimes = juce::Array<float>());
 

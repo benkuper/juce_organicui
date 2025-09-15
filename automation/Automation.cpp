@@ -77,11 +77,14 @@ AutomationKey* Automation::addKey(const float& _position, const float& _value, b
 	AutomationKey* key = new AutomationKey(_position, _value);
 	var params = new DynamicObject();
 	int index = 0;
+
+	Array<AutomationKey*> items = getItems();
 	if (items.size() > 0 && items[0]->position->floatValue() > _position) index = 0;
 	else if (AutomationKey* k = getKeyForPosition(_position)) index = items.indexOf(k) + 1;
 	params.getDynamicObject()->setProperty("index", index);
 
-	return addItem(key, params, addToUndo);
+	addItem(key, params, addToUndo);
+	return key;
 
 }
 
@@ -340,8 +343,9 @@ void Automation::setUnitSteps(float unitSteps)
 	}
 }
 
-void Automation::addItemInternal(AutomationKey* k, var)
+void Automation::addItemInternal(BaseItem* i, var)
 {
+	AutomationKey* k = getAsItem(i);
 	k->position->unitSteps = positionUnitSteps;
 	if (positionUnitSteps > 0)
 	{
@@ -353,21 +357,23 @@ void Automation::addItemInternal(AutomationKey* k, var)
 
 	if (valueRange->enabled) k->setValueRange(valueRange->x, valueRange->y);
 
-	if (!isManipulatingMultipleItems) updateNextKeys(items.indexOf(k) - 1, items.indexOf(k) + 1);
+	Array<AutomationKey*> keys = getItems();
+	if (!isManipulatingMultipleItems) updateNextKeys(keys.indexOf(k) - 1, keys.indexOf(k) + 1);
 }
 
-void Automation::addItemsInternal(Array<AutomationKey*> keys, var params)
+void Automation::addItemsInternal(Array<BaseItem*> items, var params)
 {
+	Array<AutomationKey*> keys = getAsItems(items);
 	for (auto& k : keys) k->position->unitSteps = positionUnitSteps;
 	updateNextKeys();
 }
 
-void Automation::removeItemInternal(AutomationKey* k)
+void Automation::removeItemInternal(BaseItem* k)
 {
 	if (!isManipulatingMultipleItems) updateNextKeys();
 }
 
-void Automation::removeItemsInternal(Array<AutomationKey*>)
+void Automation::removeItemsInternal(Array<BaseItem*>)
 {
 	updateNextKeys();
 }

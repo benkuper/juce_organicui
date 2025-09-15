@@ -17,7 +17,8 @@ void Detective::watchControllable(Controllable* c)
 	ControllableDetectiveWatcher* w = getItemForControllable(c);
 	if (w == nullptr)
 	{
-		w = addItem(c->getDetectiveWatcher());
+		w = c->getDetectiveWatcher();
+		addItem(w);
 		w->target->setValueFromTarget(c);
 	}
 
@@ -26,6 +27,7 @@ void Detective::watchControllable(Controllable* c)
 
 ControllableDetectiveWatcher * Detective::getItemForControllable(Controllable* c)
 {
+	Array<ControllableDetectiveWatcher*> items = getItems();
 	for (auto& i : items) if (i->controllable == c) return i;
 	return nullptr;
 }

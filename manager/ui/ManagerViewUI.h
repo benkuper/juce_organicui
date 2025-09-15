@@ -10,9 +10,9 @@
 
 #pragma once
 
-template<class M, class T, class U>
+template<class M, class T, class G>
 class ManagerViewUI :
-	public ManagerUI<M, T, U>
+	public ManagerUI<M, T, G>
 {
 public:
 	ManagerViewUI(const juce::String& contentName, M* _manager);
@@ -46,7 +46,7 @@ public:
 
 	juce::Point<int> initViewOffset;
 
-	std::unique_ptr<ManagerViewMiniPane<M, T, U>> viewPane;
+	std::unique_ptr<ManagerViewMiniPane<M, T, G>> viewPane;
 
 	virtual void mouseDown(const juce::MouseEvent& e) override;
 	virtual void mouseDrag(const juce::MouseEvent& e) override;
@@ -62,9 +62,9 @@ public:
 
 	virtual void resized() override;
 
-	virtual void updateViewUIPosition(U* se);
+	virtual void updateViewUIPosition(BaseItemMinimalUI* se);
 	virtual void updateComponentViewPosition(juce::Component* c, juce::Point<float> position, const juce::AffineTransform& af);
-	virtual juce::AffineTransform getUITransform(U* se);
+	virtual juce::AffineTransform getUITransform(BaseItemMinimalUI* se);
 
 	virtual void updateItemsVisibility() override;
 	virtual bool checkItemShouldBeVisible(U* se) { return true; } //to be overriden
@@ -86,11 +86,11 @@ public:
 	juce::Rectangle<float> getItemsViewBounds();
 
 	virtual void homeView();
-	virtual void frameView(U* item = nullptr);
+	virtual void frameView(BaseItemMinimalUI* item = nullptr);
 
 	virtual void setViewZoom(float newZoom);
 	virtual void setShowPane(bool val);
-	virtual ManagerViewMiniPane<M, T, U>* createViewPane();
+	virtual ManagerViewMiniPane<M, T, G>* createViewPane();
 
 	virtual void addItemUIInternal(U* se) override;
 
@@ -120,9 +120,9 @@ public:
 
 };
 
-template<class M, class T, class U>
-ManagerViewUI<M, T, U>::ManagerViewUI(const juce::String& contentName, M* _manager) :
-	ManagerUI<M, T, U>(contentName, _manager, false),
+template<class M, class T, class G>
+ManagerViewUI<M, T, G>::ManagerViewUI(const juce::String& contentName, M* _manager) :
+	ManagerUI<M, T, G>(contentName, _manager, false),
 	canNavigate(true),
 	addItemOnDoubleClick(true),
 	centerUIAroundPosition(false),
@@ -144,13 +144,13 @@ ManagerViewUI<M, T, U>::ManagerViewUI(const juce::String& contentName, M* _manag
 
 	this->headerSize = 28;
 
-	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(juce::ImageCache::getFromMemory(OrganicUIBinaryData::align_left_png, OrganicUIBinaryData::align_left_pngSize)), [this]() { this->alignItems(ManagerUI<M, T, U>::AlignMode::LEFT); });
+	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(juce::ImageCache::getFromMemory(OrganicUIBinaryData::align_left_png, OrganicUIBinaryData::align_left_pngSize)), [this]() { this->alignItems(ManagerUI<M, T, G>::AlignMode::LEFT); });
 
-	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(juce::ImageCache::getFromMemory(OrganicUIBinaryData::align_center_h_png, OrganicUIBinaryData::align_center_h_pngSize)), [this]() { this->alignItems(ManagerUI<M, T, U>::AlignMode::CENTER_H); });
-	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(juce::ImageCache::getFromMemory(OrganicUIBinaryData::align_right_png, OrganicUIBinaryData::align_right_pngSize)), [this]() { this->alignItems(ManagerUI<M, T, U>::AlignMode::RIGHT); });
-	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(juce::ImageCache::getFromMemory(OrganicUIBinaryData::align_top_png, OrganicUIBinaryData::align_top_pngSize)), [this]() { this->alignItems(ManagerUI<M, T, U>::AlignMode::TOP); });
-	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(juce::ImageCache::getFromMemory(OrganicUIBinaryData::align_center_v_png, OrganicUIBinaryData::align_center_v_pngSize)), [this]() { this->alignItems(ManagerUI<M, T, U>::AlignMode::CENTER_V); });
-	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(juce::ImageCache::getFromMemory(OrganicUIBinaryData::align_bottom_png, OrganicUIBinaryData::align_bottom_pngSize)), [this]() { this->alignItems(ManagerUI<M, T, U>::AlignMode::BOTTOM); });
+	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(juce::ImageCache::getFromMemory(OrganicUIBinaryData::align_center_h_png, OrganicUIBinaryData::align_center_h_pngSize)), [this]() { this->alignItems(ManagerUI<M, T, G>::AlignMode::CENTER_H); });
+	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(juce::ImageCache::getFromMemory(OrganicUIBinaryData::align_right_png, OrganicUIBinaryData::align_right_pngSize)), [this]() { this->alignItems(ManagerUI<M, T, G>::AlignMode::RIGHT); });
+	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(juce::ImageCache::getFromMemory(OrganicUIBinaryData::align_top_png, OrganicUIBinaryData::align_top_pngSize)), [this]() { this->alignItems(ManagerUI<M, T, G>::AlignMode::TOP); });
+	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(juce::ImageCache::getFromMemory(OrganicUIBinaryData::align_center_v_png, OrganicUIBinaryData::align_center_v_pngSize)), [this]() { this->alignItems(ManagerUI<M, T, G>::AlignMode::CENTER_V); });
+	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(juce::ImageCache::getFromMemory(OrganicUIBinaryData::align_bottom_png, OrganicUIBinaryData::align_bottom_pngSize)), [this]() { this->alignItems(ManagerUI<M, T, G>::AlignMode::BOTTOM); });
 	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(juce::ImageCache::getFromMemory(OrganicUIBinaryData::distribute_h_png, OrganicUIBinaryData::distribute_h_pngSize)), [this]() { this->distributeItems(false); });
 	this->addButtonTool(AssetManager::getInstance()->getSetupBTImage(juce::ImageCache::getFromMemory(OrganicUIBinaryData::distribute_v_png, OrganicUIBinaryData::distribute_v_pngSize)), [this]() { this->distributeItems(true); });
 
@@ -171,15 +171,15 @@ ManagerViewUI<M, T, U>::ManagerViewUI(const juce::String& contentName, M* _manag
 }
 
 
-template<class M, class T, class U>
-ManagerViewUI<M, T, U>::~ManagerViewUI()
+template<class M, class T, class G>
+ManagerViewUI<M, T, G>::~ManagerViewUI()
 {
 }
 
-template<class M, class T, class U>
-void ManagerViewUI<M, T, U>::mouseDown(const juce::MouseEvent& e)
+template<class M, class T, class G>
+void ManagerViewUI<M, T, G>::mouseDown(const juce::MouseEvent& e)
 {
-	ManagerUI<M, T, U>::mouseDown(e);
+	ManagerUI<M, T, G>::mouseDown(e);
 	if (canNavigate && ((e.mods.isLeftButtonDown() && e.mods.isAltDown()) || e.mods.isMiddleButtonDown()))
 	{
 		this->setMouseCursor(juce::MouseCursor::UpDownLeftRightResizeCursor);
@@ -193,10 +193,10 @@ void ManagerViewUI<M, T, U>::mouseDown(const juce::MouseEvent& e)
 	}
 }
 
-template<class M, class T, class U>
-void ManagerViewUI<M, T, U>::mouseDrag(const juce::MouseEvent& e)
+template<class M, class T, class G>
+void ManagerViewUI<M, T, G>::mouseDrag(const juce::MouseEvent& e)
 {
-	ManagerUI<M, T, U>::mouseDrag(e);
+	ManagerUI<M, T, G>::mouseDrag(e);
 
 	if (canNavigate && ((e.mods.isLeftButtonDown() && e.mods.isAltDown()) || e.mods.isMiddleButtonDown()))
 	{
@@ -221,10 +221,10 @@ void ManagerViewUI<M, T, U>::mouseDrag(const juce::MouseEvent& e)
 	}
 }
 
-template<class M, class T, class U>
-void ManagerViewUI<M, T, U>::mouseUp(const juce::MouseEvent& e)
+template<class M, class T, class G>
+void ManagerViewUI<M, T, G>::mouseUp(const juce::MouseEvent& e)
 {
-	ManagerUI<M, T, U>::mouseUp(e);
+	ManagerUI<M, T, G>::mouseUp(e);
 
 	snapLineX = juce::Line<int>();
 	snapLineY = juce::Line<int>();
@@ -240,16 +240,16 @@ void ManagerViewUI<M, T, U>::mouseUp(const juce::MouseEvent& e)
 	}
 }
 
-template<class M, class T, class U>
-void ManagerViewUI<M, T, U>::mouseDoubleClick(const juce::MouseEvent& e)
+template<class M, class T, class G>
+void ManagerViewUI<M, T, G>::mouseDoubleClick(const juce::MouseEvent& e)
 {
-	ManagerUI<M, T, U>::mouseDoubleClick(e);
+	ManagerUI<M, T, G>::mouseDoubleClick(e);
 	if (this->manager == nullptr || !addItemOnDoubleClick || !e.mods.isLeftButtonDown()) return;
 	addItemFromMenu(false, e.getMouseDownPosition());
 }
 
-template<class M, class T, class U>
-void ManagerViewUI<M, T, U>::mouseWheelMove(const juce::MouseEvent& e, const juce::MouseWheelDetails& d)
+template<class M, class T, class G>
+void ManagerViewUI<M, T, G>::mouseWheelMove(const juce::MouseEvent& e, const juce::MouseWheelDetails& d)
 {
 
 	if (e.mods.isShiftDown())
@@ -295,8 +295,8 @@ void ManagerViewUI<M, T, U>::mouseWheelMove(const juce::MouseEvent& e, const juc
 	}
 }
 
-template<class M, class T, class U>
-void ManagerViewUI<M, T, U>::mouseMagnify(const juce::MouseEvent& e, float scaleFactor)
+template<class M, class T, class G>
+void ManagerViewUI<M, T, G>::mouseMagnify(const juce::MouseEvent& e, float scaleFactor)
 {
 	if (canZoom)
 	{
@@ -310,10 +310,10 @@ void ManagerViewUI<M, T, U>::mouseMagnify(const juce::MouseEvent& e, float scale
 	}
 }
 
-template<class M, class T, class U>
-bool ManagerViewUI<M, T, U>::keyPressed(const juce::KeyPress& e)
+template<class M, class T, class G>
+bool ManagerViewUI<M, T, G>::keyPressed(const juce::KeyPress& e)
 {
-	if (ManagerUI<M, T, U>::keyPressed(e)) return true;
+	if (ManagerUI<M, T, G>::keyPressed(e)) return true;
 
 	if (e.getTextDescription() == juce::KeyPress::createFromDescription("f").getTextDescription())
 	{
@@ -329,8 +329,8 @@ bool ManagerViewUI<M, T, U>::keyPressed(const juce::KeyPress& e)
 	return false;
 }
 
-template<class M, class T, class U>
-void ManagerViewUI<M, T, U>::paint(juce::Graphics& g)
+template<class M, class T, class G>
+void ManagerViewUI<M, T, G>::paint(juce::Graphics& g)
 {
 	if (this->inspectable.wasObjectDeleted()) return;
 
@@ -343,8 +343,8 @@ void ManagerViewUI<M, T, U>::paint(juce::Graphics& g)
 	}
 }
 
-template<class M, class T, class U>
-void ManagerViewUI<M, T, U>::paintBackground(juce::Graphics& g)
+template<class M, class T, class G>
+void ManagerViewUI<M, T, G>::paintBackground(juce::Graphics& g)
 {
 	int zoomedCheckerSize = checkerSize * this->manager->viewZoom;
 
@@ -371,12 +371,12 @@ void ManagerViewUI<M, T, U>::paintBackground(juce::Graphics& g)
 	}
 }
 
-template<class M, class T, class U>
-inline void ManagerViewUI<M, T, U>::paintOverChildren(juce::Graphics& g)
+template<class M, class T, class G>
+inline void ManagerViewUI<M, T, G>::paintOverChildren(juce::Graphics& g)
 {
 	if (this->inspectable.wasObjectDeleted()) return;
 
-	ManagerUI<M, T, U>::paintOverChildren(g);
+	ManagerUI<M, T, G>::paintOverChildren(g);
 
 	if (snapLineX.getLength() > 0)
 	{
@@ -393,8 +393,8 @@ inline void ManagerViewUI<M, T, U>::paintOverChildren(juce::Graphics& g)
 	}
 }
 
-template<class M, class T, class U>
-void ManagerViewUI<M, T, U>::resized()
+template<class M, class T, class G>
+void ManagerViewUI<M, T, G>::resized()
 {
 	if (this->inspectable.wasObjectDeleted()) return;
 
@@ -419,15 +419,15 @@ void ManagerViewUI<M, T, U>::resized()
 	updateItemsVisibility();
 }
 
-template<class M, class T, class U>
-void ManagerViewUI<M, T, U>::updateViewUIPosition(U* itemUI)
+template<class M, class T, class G>
+void ManagerViewUI<M, T, G>::updateViewUIPosition(BaseItemMinimalUI* itemUI)
 {
 	if (itemUI == nullptr) return;
-	updateComponentViewPosition((juce::Component*)itemUI, itemUI->baseItem->viewUIPosition->getPoint(), getUITransform(itemUI));
+	updateComponentViewPosition(itemUI, itemUI->baseItem->viewUIPosition->getPoint(), getUITransform(itemUI));
 }
 
-template<class M, class T, class U>
-void ManagerViewUI<M, T, U>::updateComponentViewPosition(juce::Component* c, juce::Point<float> position, const juce::AffineTransform& af)
+template<class M, class T, class G>
+void ManagerViewUI<M, T, G>::updateComponentViewPosition(juce::Component* c, juce::Point<float> position, const juce::AffineTransform& af)
 {
 	if (c == nullptr) return;
 
@@ -441,17 +441,20 @@ void ManagerViewUI<M, T, U>::updateComponentViewPosition(juce::Component* c, juc
 	{
 		t = af.scaled(this->manager->viewZoom, this->manager->viewZoom, p.x, p.y);
 	}
-	c->setTransform(t);
+
+
+	if (t != c->getTransform())
+		c->setTransform(t);
 }
 
-template<class M, class T, class U>
-inline juce::AffineTransform ManagerViewUI<M, T, U>::getUITransform(U* itemUI)
+template<class M, class T, class G>
+juce::AffineTransform ManagerViewUI<M, T, G>::getUITransform(baseItemMinimalUI* itemUI)
 {
 	return juce::AffineTransform();
 }
 
-template<class M, class T, class U>
-void ManagerViewUI<M, T, U>::updateItemsVisibility()
+template<class M, class T, class G>
+void ManagerViewUI<M, T, G>::updateItemsVisibility()
 {
 	//ManagerUI::updateItemsVisibility();
 
@@ -499,20 +502,20 @@ void ManagerViewUI<M, T, U>::updateItemsVisibility()
 	if (this->toolContainer.isVisible()) this->toolContainer.toFront(false);
 }
 
-template<class M, class T, class U>
-void ManagerViewUI<M, T, U>::parentHierarchyChanged()
+template<class M, class T, class G>
+void ManagerViewUI<M, T, G>::parentHierarchyChanged()
 {
 	updateItemsVisibility();
 }
 
-template<class M, class T, class U>
-void ManagerViewUI<M, T, U>::addItemFromMenu(bool isFromAddButton, juce::Point<int> mouseDownPos)
+template<class M, class T, class G>
+void ManagerViewUI<M, T, G>::addItemFromMenu(bool isFromAddButton, juce::Point<int> mouseDownPos)
 {
 	addItemFromMenu(nullptr, isFromAddButton, mouseDownPos);
 }
 
-template<class M, class T, class U>
-void ManagerViewUI<M, T, U>::addItemFromMenu(T* item, bool isFromAddButton, juce::Point<int> mouseDownPos)
+template<class M, class T, class G>
+void ManagerViewUI<M, T, G>::addItemFromMenu(T* item, bool isFromAddButton, juce::Point<int> mouseDownPos)
 {
 	if (item == nullptr) item = this->manager->createItem();
 	if (item == nullptr) return;
@@ -522,58 +525,58 @@ void ManagerViewUI<M, T, U>::addItemFromMenu(T* item, bool isFromAddButton, juce
 	this->manager->addItem(item);
 }
 
-template<class M, class T, class U>
-juce::Point<int> ManagerViewUI<M, T, U>::getSize()
+template<class M, class T, class G>
+juce::Point<int> ManagerViewUI<M, T, G>::getSize()
 {
 	return juce::Point<int>(this->getWidth(), this->getHeight());
 }
 
-template<class M, class T, class U>
-juce::Point<float> ManagerViewUI<M, T, U>::getViewMousePosition()
+template<class M, class T, class G>
+juce::Point<float> ManagerViewUI<M, T, G>::getViewMousePosition()
 {
 	return getViewPos(this->getMouseXYRelative());
 }
 
-template<class M, class T, class U>
-juce::Point<float> ManagerViewUI<M, T, U>::getViewPos(const juce::Point<int>& originalPos)
+template<class M, class T, class G>
+juce::Point<float> ManagerViewUI<M, T, G>::getViewPos(const juce::Point<int>& originalPos)
 {
 	return (originalPos - getViewCenter()).toFloat() / (this->manager->viewZoom * (float)(useCheckersAsUnits ? checkerSize : 1));
 }
 
-template<class M, class T, class U>
-inline juce::Point<float> ManagerViewUI<M, T, U>::getViewOffset(const juce::Point<int>& offsetInView)
+template<class M, class T, class G>
+inline juce::Point<float> ManagerViewUI<M, T, G>::getViewOffset(const juce::Point<int>& offsetInView)
 {
 	return offsetInView.toFloat() / (this->manager->viewZoom * (useCheckersAsUnits ? checkerSize : 1));
 }
 
-template<class M, class T, class U>
-juce::Rectangle<float> ManagerViewUI<M, T, U>::getViewBounds(const juce::Rectangle<int>& r)
+template<class M, class T, class G>
+juce::Rectangle<float> ManagerViewUI<M, T, G>::getViewBounds(const juce::Rectangle<int>& r)
 {
 	const float checkerMultiplier = useCheckersAsUnits ? checkerSize : 1;
 	return juce::Rectangle<float>().withPosition(getViewPos(r.getPosition())).withSize(r.getWidth() / (this->manager->viewZoom * checkerMultiplier), r.getHeight() / (this->manager->viewZoom * checkerMultiplier));
 }
 
-template<class M, class T, class U>
-juce::Point<int> ManagerViewUI<M, T, U>::getViewCenter()
+template<class M, class T, class G>
+juce::Point<int> ManagerViewUI<M, T, G>::getViewCenter()
 {
 	return this->manager->viewOffset + (getSize() / 2);
 }
 
-template<class M, class T, class U>
-juce::Point<int> ManagerViewUI<M, T, U>::getPosInView(const juce::Point<float>& viewPos)
+template<class M, class T, class G>
+juce::Point<int> ManagerViewUI<M, T, G>::getPosInView(const juce::Point<float>& viewPos)
 {
 	return (viewPos * this->manager->viewZoom * (float)(useCheckersAsUnits ? checkerSize : 1)).toInt() + getViewCenter();
 }
 
-template<class M, class T, class U>
-juce::Rectangle<int> ManagerViewUI<M, T, U>::getBoundsInView(const juce::Rectangle<float>& r)
+template<class M, class T, class G>
+juce::Rectangle<int> ManagerViewUI<M, T, G>::getBoundsInView(const juce::Rectangle<float>& r)
 {
 	const float checkerMultiplier = useCheckersAsUnits ? checkerSize : 1;
 	return juce::Rectangle<int>().withPosition(getPosInView(r.getPosition())).withSize(r.getWidth() * this->manager->viewZoom * checkerMultiplier, r.getHeight() * this->manager->viewZoom * checkerMultiplier);
 }
 
-template<class M, class T, class U>
-juce::Point<float> ManagerViewUI<M, T, U>::getItemsCenter()
+template<class M, class T, class G>
+juce::Point<float> ManagerViewUI<M, T, G>::getItemsCenter()
 {
 	if (this->manager->baseItems.size() == 0) return juce::Point<float>(0, 0);
 
@@ -590,8 +593,8 @@ juce::Point<float> ManagerViewUI<M, T, U>::getItemsCenter()
 	return bounds.getCentre();
 }
 
-template<class M, class T, class U>
-juce::Rectangle<float> ManagerViewUI<M, T, U>::getItemsViewBounds()
+template<class M, class T, class G>
+juce::Rectangle<float> ManagerViewUI<M, T, G>::getItemsViewBounds()
 {
 	juce::Rectangle<float> bounds;
 	for (auto& i : this->manager->baseItems)
@@ -606,8 +609,8 @@ juce::Rectangle<float> ManagerViewUI<M, T, U>::getItemsViewBounds()
 	return bounds;
 }
 
-template<class M, class T, class U>
-void ManagerViewUI<M, T, U>::homeView()
+template<class M, class T, class G>
+void ManagerViewUI<M, T, G>::homeView()
 {
 	this->manager->viewOffset = juce::Point<int>();
 
@@ -617,8 +620,8 @@ void ManagerViewUI<M, T, U>::homeView()
 	updateItemsVisibility();
 }
 
-template<class M, class T, class U>
-void ManagerViewUI<M, T, U>::frameView(U* se)
+template<class M, class T, class G>
+void ManagerViewUI<M, T, G>::frameView(BaseItemMinimalUI* se)
 {
 	if (se == nullptr) this->manager->viewOffset = -getItemsCenter().toInt() * this->manager->viewZoom;
 	else this->manager->viewOffset = -(se->baseItem->viewUIPosition->getPoint() + se->baseItem->viewUISize->getPoint() / 2).toInt() * this->manager->viewZoom;
@@ -630,8 +633,8 @@ void ManagerViewUI<M, T, U>::frameView(U* se)
 
 }
 
-template<class M, class T, class U>
-void ManagerViewUI<M, T, U>::setViewZoom(float value)
+template<class M, class T, class G>
+void ManagerViewUI<M, T, G>::setViewZoom(float value)
 {
 	if (this->manager->viewZoom == value) return;
 	this->manager->viewZoom = juce::jlimit<float>(minZoom, maxZoom, value);
@@ -642,8 +645,8 @@ void ManagerViewUI<M, T, U>::setViewZoom(float value)
 	this->repaint();
 }
 
-template<class M, class T, class U>
-void ManagerViewUI<M, T, U>::setShowPane(bool val)
+template<class M, class T, class G>
+void ManagerViewUI<M, T, G>::setShowPane(bool val)
 {
 	bool showingPane = viewPane != nullptr;
 	if (val == showingPane) return;
@@ -659,24 +662,24 @@ void ManagerViewUI<M, T, U>::setShowPane(bool val)
 	}
 }
 
-template<class M, class T, class U>
-ManagerViewMiniPane<M, T, U>* ManagerViewUI<M, T, U>::createViewPane()
+template<class M, class T, class G>
+ManagerViewMiniPane<M, T, G>* ManagerViewUI<M, T, G>::createViewPane()
 {
-	return new ManagerViewMiniPane<M, T, U>(this);
+	return new ManagerViewMiniPane<M, T, G>(this);
 }
 
-template<class M, class T, class U>
-void ManagerViewUI<M, T, U>::addItemUIInternal(U* se)
+template<class M, class T, class G>
+void ManagerViewUI<M, T, G>::addItemUIInternal(U* se)
 {
 	se->setViewZoom(this->manager->viewZoom);
 	if (useCheckersAsUnits) se->setViewCheckerSize(checkerSize);
 	updateViewUIPosition(se);
 }
 
-template<class M, class T, class U>
-void ManagerViewUI<M, T, U>::itemDragMove(const juce::DragAndDropTarget::SourceDetails& dragSourceDetails)
+template<class M, class T, class G>
+void ManagerViewUI<M, T, G>::itemDragMove(const juce::DragAndDropTarget::SourceDetails& dragSourceDetails)
 {
-	ManagerUI<M, T, U>::itemDragMove(dragSourceDetails);
+	ManagerUI<M, T, G>::itemDragMove(dragSourceDetails);
 
 	BaseItemMinimalUI* bui = dynamic_cast<BaseItemMinimalUI*>(dragSourceDetails.sourceComponent.get());
 	if (bui == nullptr) return;
@@ -785,10 +788,10 @@ void ManagerViewUI<M, T, U>::itemDragMove(const juce::DragAndDropTarget::SourceD
 
 }
 
-template<class M, class T, class U>
-void ManagerViewUI<M, T, U>::itemDropped(const juce::DragAndDropTarget::SourceDetails& dragSourceDetails)
+template<class M, class T, class G>
+void ManagerViewUI<M, T, G>::itemDropped(const juce::DragAndDropTarget::SourceDetails& dragSourceDetails)
 {
-	ManagerUI<M, T, U>::itemDropped(dragSourceDetails);
+	ManagerUI<M, T, G>::itemDropped(dragSourceDetails);
 
 	ItemMinimalUI<T>* bui = dynamic_cast<ItemMinimalUI<T> *>(dragSourceDetails.sourceComponent.get());
 
@@ -805,8 +808,8 @@ void ManagerViewUI<M, T, U>::itemDropped(const juce::DragAndDropTarget::SourceDe
 	this->repaint();
 }
 
-template<class M, class T, class U>
-juce::Point<float> ManagerViewUI<M, T, U>::getPositionFromDrag(juce::Component* c, const juce::DragAndDropTarget::SourceDetails& dragSourceDetails)
+template<class M, class T, class G>
+juce::Point<float> ManagerViewUI<M, T, G>::getPositionFromDrag(juce::Component* c, const juce::DragAndDropTarget::SourceDetails& dragSourceDetails)
 {
 	juce::Point<int> relOffset = juce::Point<int>((int)dragSourceDetails.description.getProperty("offsetX", 0), (int)dragSourceDetails.description.getProperty("offsetY", 0));
 	juce::Point<int> realP = this->getMouseXYRelative() - (this->getLocalPoint(c, relOffset) - c->getPosition()) * 1.0f / this->manager->viewZoom;
@@ -814,8 +817,8 @@ juce::Point<float> ManagerViewUI<M, T, U>::getPositionFromDrag(juce::Component* 
 	return this->getViewPos(realP);
 }
 
-template<class M, class T, class U>
-void ManagerViewUI<M, T, U>::itemUIMiniModeChanged(BaseItemUI* itemUI)
+template<class M, class T, class G>
+void ManagerViewUI<M, T, G>::itemUIMiniModeChanged(BaseItemUI* itemUI)
 {
 	updateViewUIPosition(dynamic_cast<U*>(itemUI));
 }
@@ -823,14 +826,14 @@ void ManagerViewUI<M, T, U>::itemUIMiniModeChanged(BaseItemUI* itemUI)
 
 
 
-template<class M, class T, class U>
-void ManagerViewUI<M, T, U>::itemUIViewPositionChanged(BaseItemMinimalUI* itemUI)
+template<class M, class T, class G>
+void ManagerViewUI<M, T, G>::itemUIViewPositionChanged(BaseItemMinimalUI* itemUI)
 {
 	updateViewUIPosition(dynamic_cast<U*>(itemUI));
 }
 
-template<class M, class T, class U>
-void ManagerViewUI<M, T, U>::askForSyncPosAndSize(BaseItemMinimalUI* itemUI)
+template<class M, class T, class G>
+void ManagerViewUI<M, T, G>::askForSyncPosAndSize(BaseItemMinimalUI* itemUI)
 {
 	juce::Array<juce::UndoableAction*> actions;
 	actions.addArray(itemUI->baseItem->viewUIPosition->setUndoablePoint(getViewPos(itemUI->getPosition()).toFloat(), true));
@@ -839,8 +842,8 @@ void ManagerViewUI<M, T, U>::askForSyncPosAndSize(BaseItemMinimalUI* itemUI)
 }
 
 
-template<class M, class T, class U>
-void ManagerViewUI<M, T, U>::itemUIResizeDrag(BaseItemMinimalUI* itemUI, const juce::Point<int>& dragOffset)
+template<class M, class T, class G>
+void ManagerViewUI<M, T, G>::itemUIResizeDrag(BaseItemMinimalUI* itemUI, const juce::Point<int>& dragOffset)
 {
 	juce::Point<float> pos = itemUI->baseItem->getPosition() + itemUI->baseItem->sizeReference + dragOffset.toFloat() / (useCheckersAsUnits ? checkerSize : 1);// getViewOffset(dragOffset);
 
@@ -885,8 +888,8 @@ void ManagerViewUI<M, T, U>::itemUIResizeDrag(BaseItemMinimalUI* itemUI, const j
 	itemUI->baseItem->resizeItem(offset, true);
 }
 
-template<class M, class T, class U>
-void ManagerViewUI<M, T, U>::itemUIResizeEnd(BaseItemMinimalUI* itemUI)
+template<class M, class T, class G>
+void ManagerViewUI<M, T, G>::itemUIResizeEnd(BaseItemMinimalUI* itemUI)
 {
 	snapLineX = juce::Line<int>();
 	snapLineY = juce::Line<int>();
@@ -904,8 +907,8 @@ void ManagerViewUI<M, T, U>::itemUIResizeEnd(BaseItemMinimalUI* itemUI)
 	this->repaint();
 }
 
-template<class M, class T, class U>
-typename ManagerViewUI<M, T, U>::SnapResult ManagerViewUI<M, T, U>::getClosestSnapUI(juce::Point<float> pos, bool isX, float spacingBefore, float spacingAfter)
+template<class M, class T, class G>
+typename ManagerViewUI<M, T, G>::SnapResult ManagerViewUI<M, T, G>::getClosestSnapUI(juce::Point<float> pos, bool isX, float spacingBefore, float spacingAfter)
 {
 	int dist = snappingThreshold;
 	int target = 0;

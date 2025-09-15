@@ -61,8 +61,8 @@ public:
 	CommentManager commentManager;
 
 
-	void addItemInternal(Dashboard* item, juce::var data) override;
-	void removeItemInternal(Dashboard* item) override;
+	void addItemInternal(BaseItem* item, juce::var data) override;
+	void removeItemInternal(BaseItem* item) override;
 
 	void setCurrentDashboard(Dashboard* d, bool setInClients = false, bool setInNative = false, juce::StringArray excludeIds = juce::StringArray());
 

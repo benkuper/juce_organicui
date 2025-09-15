@@ -1,5 +1,7 @@
 #include "juce_organicui.h"
 
+using namespace juce;
+
 #include "dashboard/ui/DashboardItemManagerUI.cpp"
 #include "dashboard/ui/DashboardItemUI.cpp"
 #include "dashboard/ui/DashboardCommentItemUI.cpp"

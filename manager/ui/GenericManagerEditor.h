@@ -10,18 +10,15 @@
 
 #pragma once
 
-template<class T> class ItemBaseGroup;
-template<class T, class G> class Manager;
 
-template<class T, class G = ItemBaseGroup<T>>
+template<class T, class G>
 class GenericManagerEditor :
 	public EnablingControllableContainerEditor,
-	public Manager<T>::AsyncListener,
+	public NestingManager<T, G>::AsyncListener,
 	public juce::DragAndDropTarget
 {
 public:
 	static_assert(std::is_base_of<BaseItem, T>::value, "T must be derived from BaseItem");
-	static_assert(std::is_base_of<ItemGroup<T>, G>::value, "G must be derived from ItemGroup<T>");
 
 	GenericManagerEditor(Manager<T>* manager, bool isRoot);
 	virtual ~GenericManagerEditor();

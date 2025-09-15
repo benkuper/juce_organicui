@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#include "../manager/ui/GenericManagerEditor.h"
-#include "GenericControllableManager.h"
+#include "JuceHeader.h"
 
 GenericControllableManager::GenericControllableManager(const String& name, bool itemsCanBeDisabled, bool canAddTriggers, bool canAddTargets, bool canAddEnums) :
 	Manager(name),
@@ -43,7 +42,7 @@ GenericControllableManager::~GenericControllableManager()
 void GenericControllableManager::setForceItemsFeedbackOnly(bool value)
 {
 	forceItemsFeedbackOnly = value;
-	for (auto& i : items) i->controllable->setControllableFeedbackOnly(forceItemsFeedbackOnly);
+	callFunctionOnItemsOnly(false, false, true, [this](GenericControllableItem* i) { i->controllable->setControllableFeedbackOnly(forceItemsFeedbackOnly); });
 }
 
 GenericControllableItem* GenericControllableManager::addItemFrom(Controllable* sourceC, bool copyValue)
@@ -62,13 +61,15 @@ GenericControllableItem* GenericControllableManager::addItemFrom(Controllable* s
 	var params = new DynamicObject();
 	String cType = getTypeForControllableType(c->getTypeString());
 	params.getDynamicObject()->setProperty("type", cType);
-	return addItem(new GenericControllableItem(c, params));
+	GenericControllableItem* gci = new GenericControllableItem(c, params);
+	addItem(gci);
+	return gci;
 }
 
-void GenericControllableManager::addItemInternal(GenericControllableItem* item, var)
+void GenericControllableManager::addItemInternal(BaseItem* item, var)
 {
 	item->canBeDisabled = itemsCanBeDisabled;
-	if (forceItemsFeedbackOnly) item->controllable->setControllableFeedbackOnly(true);
+	if (forceItemsFeedbackOnly) getAsItem(item)->controllable->setControllableFeedbackOnly(true);
 }
 
 

@@ -53,10 +53,10 @@ public:
 
 	void setUnitSteps(float unitSteps);
 
-	void addItemInternal(AutomationKey* k, juce::var params) override;
-	void addItemsInternal(juce::Array<AutomationKey*>, juce::var params) override;
-	void removeItemInternal(AutomationKey* k) override;
-	void removeItemsInternal(juce::Array<AutomationKey*> keys) override;
+	void addItemInternal(BaseItem* k, juce::var params) override;
+	void addItemsInternal(juce::Array<BaseItem*>, juce::var params) override;
+	void removeItemInternal(BaseItem* k) override;
+	void removeItemsInternal(juce::Array<BaseItem*> keys) override;
 
 	juce::Array<BaseItem*> addItemsFromClipboard(bool showWarning = false) override;
 
