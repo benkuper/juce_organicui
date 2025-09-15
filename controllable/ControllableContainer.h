@@ -80,6 +80,7 @@ public:
 	void setNiceName(const juce::String& _niceName);
 	void setCustomShortName(const juce::String& _shortName);
 	void setAutoShortName();
+	virtual void niceNameChanged() {}
 
 
 	juce::UndoableAction* addUndoableControllable(Controllable* c, bool onlyReturnAction = false);

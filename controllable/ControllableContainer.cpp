@@ -410,7 +410,7 @@ void ControllableContainer::setNiceName(const String& _niceName)
 	if (OSCRemoteControl::getInstanceWithoutCreating() != nullptr && isAttachedToRoot()) OSCRemoteControl::getInstance()->sendPathNameChangedFeedback(oldControlAddress, getControlAddress());
 #endif
 
-
+	niceNameChanged();
 	onContainerNiceNameChanged();
 }
 
@@ -1093,7 +1093,7 @@ void ControllableContainer::loadJSONData(var data, bool createIfNotThere)
 var ControllableContainer::getRemoteControlData()
 {
 	var data(new DynamicObject());
-	if (isCurrentlyLoadingData || isClearing) return data;
+	if (isCurrentlyLoadingData || isClearing || Engine::mainEngine->isClearing) return data;
 
 	data.getDynamicObject()->setProperty("DESCRIPTION", niceName);
 	data.getDynamicObject()->setProperty("FULL_PATH", getControlAddress());
