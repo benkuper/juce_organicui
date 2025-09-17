@@ -109,6 +109,7 @@ public:
 			severity = LOG_NONE;
 		}
 	}
+
 	juce::Time time;
 	juce::String content;
 	juce::String source;
@@ -128,4 +129,6 @@ public:
 private:
 	std::unique_ptr<juce::StringArray> _arr;
 
+
+	JUCE_DECLARE_WEAK_REFERENCEABLE(LogElement)
 };
