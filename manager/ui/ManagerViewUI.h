@@ -97,13 +97,13 @@ public:
 
 	virtual juce::Point<float> getPositionFromDrag(juce::Component* c, const juce::DragAndDropTarget::SourceDetails& dragSourceDetails);
 
-	virtual void baseItemUIMiniModeChanged(ItemUI<T>* ItemUI) override;
+	virtual void itemUIMiniModeChanged(ItemUI<T>* ItemUI) override;
 
-	virtual void baseItemUIViewPositionChanged(ItemMinimalUI<T>* ItemUI) override;
+	virtual void itemUIViewPositionChanged(ItemMinimalUI<T>* ItemUI) override;
 	virtual void askForSyncPosAndSize(ItemMinimalUI<T>* ItemUI) override;
 
-	virtual void baseItemUIResizeDrag(ItemMinimalUI<T>* ItemUI, const juce::Point<int>& dragOffset) override;
-	virtual void baseItemUIResizeEnd(ItemMinimalUI<T>* ItemUI) override;
+	virtual void itemUIResizeDrag(ItemMinimalUI<T>* ItemUI, const juce::Point<int>& dragOffset) override;
+	virtual void itemUIResizeEnd(ItemMinimalUI<T>* ItemUI) override;
 
 	//snapping
 	class SnapResult
@@ -799,7 +799,7 @@ juce::Point<float> ManagerViewUI<M, T, U>::getPositionFromDrag(juce::Component* 
 }
 
 template<class M, class T, class U>
-void ManagerViewUI<M, T, U>::baseItemUIMiniModeChanged(ItemUI<T>* ItemUI)
+void ManagerViewUI<M, T, U>::itemUIMiniModeChanged(ItemUI<T>* ItemUI)
 {
 	updateViewUIPosition(dynamic_cast<U*>(ItemUI));
 }
@@ -808,7 +808,7 @@ void ManagerViewUI<M, T, U>::baseItemUIMiniModeChanged(ItemUI<T>* ItemUI)
 
 
 template<class M, class T, class U>
-void ManagerViewUI<M, T, U>::baseItemUIViewPositionChanged(ItemMinimalUI<T>* ItemUI)
+void ManagerViewUI<M, T, U>::itemUIViewPositionChanged(ItemMinimalUI<T>* ItemUI)
 {
 	updateViewUIPosition(dynamic_cast<U*>(ItemUI));
 }
@@ -824,7 +824,7 @@ void ManagerViewUI<M, T, U>::askForSyncPosAndSize(ItemMinimalUI<T>* ItemUI)
 
 
 template<class M, class T, class U>
-void ManagerViewUI<M, T, U>::baseItemUIResizeDrag(ItemMinimalUI<T>* ItemUI, const juce::Point<int>& dragOffset)
+void ManagerViewUI<M, T, U>::itemUIResizeDrag(ItemMinimalUI<T>* ItemUI, const juce::Point<int>& dragOffset)
 {
 	juce::Point<float> pos = ItemUI->baseItem->getPosition() + ItemUI->baseItem->sizeReference + dragOffset.toFloat() / (useCheckersAsUnits ? checkerSize : 1);// getViewOffset(dragOffset);
 
@@ -870,7 +870,7 @@ void ManagerViewUI<M, T, U>::baseItemUIResizeDrag(ItemMinimalUI<T>* ItemUI, cons
 }
 
 template<class M, class T, class U>
-void ManagerViewUI<M, T, U>::baseItemUIResizeEnd(ItemMinimalUI<T>* ItemUI)
+void ManagerViewUI<M, T, U>::itemUIResizeEnd(ItemMinimalUI<T>* ItemUI)
 {
 	snapLineX = juce::Line<int>();
 	snapLineY = juce::Line<int>();

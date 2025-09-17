@@ -446,7 +446,7 @@ T* Manager<T>::addItem(T* item, juce::var data, bool addToUndo, bool notify)
 		//items.getLock().exit();
 	}
 
-	bi->addItemUIListener(this);
+	bi->addBaseItemListener(this);
 
 	if (!data.isVoid())
 	{
@@ -700,7 +700,7 @@ T* Manager<T>::removeItem(T* item, bool addToUndo, bool notify, bool returnItem)
 	removeItemInternal(item);
 
 	BaseItem* bi = static_cast<BaseItem*>(item);
-	bi->removeItemListener(this);
+	bi->removeBaseItemListener(this);
 	removeChildControllableContainer(bi);
 
 	if (notify)
@@ -1255,7 +1255,8 @@ Manager<T>::ManagerBaseAction::ManagerBaseAction(Manager* manager, juce::var _da
 	managerControlAddress(manager->getControlAddress()),
 	data(_data),
 	managerRef(manager)
-{}
+{
+}
 
 template<class T>
 Manager<T>* Manager<T>::ManagerBaseAction::getManager() {

@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    Outliner.h
-    Created: 7 Oct 2016 10:31:23am
-    Author:  bkupe
+	Outliner.h
+	Created: 7 Oct 2016 10:31:23am
+	Author:  bkupe
 
   ==============================================================================
 */
@@ -20,8 +20,8 @@ public:
 	virtual void hideRemoteChanged() {}
 };
 
-class OutlinerItemComponent : 
-	public InspectableContentComponent, 
+class OutlinerItemComponent :
+	public InspectableContentComponent,
 	public juce::SettableTooltipClient,
 	public ControllableContainerListener,
 	public OutlinerItemListener,
@@ -29,7 +29,7 @@ class OutlinerItemComponent :
 	public juce::Button::Listener
 {
 public:
-	OutlinerItemComponent(OutlinerItem * item);
+	OutlinerItemComponent(OutlinerItem* item);
 	virtual ~OutlinerItemComponent();
 
 	juce::WeakReference<OutlinerItem> item;
@@ -37,8 +37,8 @@ public:
 	juce::Colour color;
 
 	std::unique_ptr<juce::ImageButton> hideInRemoteBT;
-	
-	virtual void paint(juce::Graphics &g) override;
+
+	virtual void paint(juce::Graphics& g) override;
 	virtual void resized() override;
 	virtual void resizedInternal(juce::Rectangle<int>& r) {}
 
@@ -48,9 +48,9 @@ public:
 	virtual void buttonClicked(juce::Button* b) override;
 
 	void labelTextChanged(juce::Label*) override;
-	virtual void mouseDown(const juce::MouseEvent &e) override;
+	virtual void mouseDown(const juce::MouseEvent& e) override;
 
-	void inspectableSelectionChanged(Inspectable * i) override;
+	void inspectableSelectionChanged(Inspectable* i) override;
 };
 
 class OutlinerItem :
@@ -76,17 +76,17 @@ public:
 	virtual std::unique_ptr<juce::Component> createItemComponent() override;
 
 	juce::String getUniqueName() const override;
-	void inspectableSelectionChanged(Inspectable * inspectable) override;
+	void inspectableSelectionChanged(Inspectable* inspectable) override;
 
 	void setHideInRemote(bool value);
 	void setParentsHaveHideInRemote(bool value);
-	
-	void childAddressChanged(ControllableContainer *) override;
+
+	void childAddressChanged(ControllableContainer*) override;
 
 
 	juce::ListenerList<OutlinerItemListener> itemListeners;
-	void addItemListener(OutlinerItemListener* newListener) { itemListeners.add(newListener); }
-	void removeItemListener(OutlinerItemListener* listener) { itemListeners.remove(listener); }
+	void addOutlinerItemListener(OutlinerItemListener* newListener) { itemListeners.add(newListener); }
+	void removeOutlinerItemListener(OutlinerItemListener* listener) { itemListeners.remove(listener); }
 
 	juce::WeakReference<OutlinerItem>::Master masterReference;
 };
@@ -99,14 +99,14 @@ class Outliner : public ShapeShifterContentComponent,
 	public juce::Timer
 {
 public:
-	juce_DeclareSingleton(Outliner, true)
+	juce_DeclareSingleton(Outliner, true);
 
-	Outliner(const juce::String &contentName = "");
+	Outliner(const juce::String& contentName = "");
 	virtual ~Outliner();
 
 	juce::Label searchBar;
 	bool listIsFiltered;
-	
+
 	std::unique_ptr<juce::ImageButton> remoteHideShowAllBT;
 	bool hideShowState;
 
@@ -117,19 +117,19 @@ public:
 
 	juce::Array<ControllableContainer*> parentsOfFiltered;
 	juce::Array<ControllableContainer*> filteredContainers;
-	juce::Array<Inspectable *> childOfFiltered;
+	juce::Array<Inspectable*> childOfFiltered;
 	juce::Array<Controllable*> filteredControllables;
 
 	void clear();
-	
+
 	void setEnabled(bool value);
 
 	void resized() override;
-	void paint(juce::Graphics &g) override;
+	void paint(juce::Graphics& g) override;
 
 
-	void rebuildTree(ControllableContainer * fromContainer = nullptr);
-	void buildTree(OutlinerItem * parentItem, ControllableContainer * parentContainer, bool parentsHaveHideInRemote);
+	void rebuildTree(ControllableContainer* fromContainer = nullptr);
+	void buildTree(OutlinerItem* parentItem, ControllableContainer* parentContainer, bool parentsHaveHideInRemote);
 	void updateFilteredList();
 
 	virtual OutlinerItem* createItem(juce::WeakReference<ControllableContainer> container, bool parentsHaveHideInRemote, bool isFiltered);
@@ -140,7 +140,7 @@ public:
 
 	OutlinerItem* getItemForContainer(ControllableContainer* cc);
 
-	void childStructureChanged(ControllableContainer *) override;
+	void childStructureChanged(ControllableContainer*) override;
 
 	void timerCallback() override;
 
@@ -148,6 +148,6 @@ public:
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Outliner)
 
-	virtual void labelTextChanged(juce::Label* labelThatHasChanged) override;
+		virtual void labelTextChanged(juce::Label* labelThatHasChanged) override;
 	virtual void buttonClicked(juce::Button* b) override;
 };

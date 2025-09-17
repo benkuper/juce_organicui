@@ -454,7 +454,7 @@ OutlinerItemComponent::OutlinerItemComponent(OutlinerItem* _item) :
 		return;
 	}
 
-	item->addItemListener(this);
+	item->addOutlinerItemListener(this);
 	autoDrawContourWhenSelected = false;
 	setTooltip(item->isContainer ? item->container->getControlAddress() : item->controllable->description + "\nControl Address : " + item->controllable->controlAddress);
 	addAndMakeVisible(&label);
@@ -493,7 +493,7 @@ OutlinerItemComponent::OutlinerItemComponent(OutlinerItem* _item) :
 
 OutlinerItemComponent::~OutlinerItemComponent()
 {
-	if (!item.wasObjectDeleted()) item->removeItemListener(this);
+	if (!item.wasObjectDeleted()) item->removeOutlinerItemListener(this);
 }
 
 void OutlinerItemComponent::paint(Graphics& g)

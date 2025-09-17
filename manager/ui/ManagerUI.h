@@ -220,7 +220,7 @@ public:
 	virtual juce::Component* getSelectableComponentForItemUI(U* ItemUI);
 
 	virtual int getDropIndexForPosition(juce::Point<int> localPosition);
-	virtual void baseItemUIMiniModeChanged(ItemUI<T>* se) override {}
+	virtual void itemUIMiniModeChanged(ItemUI<T>* se) override {}
 
 	//menu
 	U* getUIForItem(T* item, bool directIndexAccess = true);

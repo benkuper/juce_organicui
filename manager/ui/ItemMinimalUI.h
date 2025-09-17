@@ -94,10 +94,10 @@ public:
 	public:
 		virtual ~ItemMinimalUIListener() {}
 
-		virtual void baseItemUIViewPositionChanged(ItemMinimalUI<T>*) {}
+		virtual void itemUIViewPositionChanged(ItemMinimalUI<T>*) {}
 
-		virtual void baseItemUIResizeDrag(ItemMinimalUI<T>*, const juce::Point<int>& dragOffset) {}
-		virtual void baseItemUIResizeEnd(ItemMinimalUI<T>*) {}
+		virtual void itemUIResizeDrag(ItemMinimalUI<T>*, const juce::Point<int>& dragOffset) {}
+		virtual void itemUIResizeEnd(ItemMinimalUI<T>*) {}
 
 		virtual void askForSyncPosAndSize(ItemMinimalUI<T>*) {}
 		virtual void askSelectToThis(ItemMinimalUI<T>*) {}
@@ -307,7 +307,7 @@ void ItemMinimalUI<T>::newMessage(const ContainerAsyncEvent& e)
 		}
 		else if (e.targetControllable == baseItem->viewUIPosition)
 		{
-			ItemMinimalUIListeners.call(&ItemMinimalUIListener::baseItemUIViewPositionChanged, this);
+			ItemMinimalUIListeners.call(&ItemMinimalUIListener::itemUIViewPositionChanged, this);
 		}
 		else if (e.targetControllable == baseItem->viewUISize && syncWithItemSize)
 		{

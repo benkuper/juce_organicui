@@ -95,7 +95,7 @@ void DashboardItemUI::mouseDrag(const MouseEvent& e)
 	
 	if (e.eventComponent == &resizer)
 	{
-		ItemMinimalUIListeners.call(&ItemMinimalUIListener::baseItemUIResizeDrag, this, e.getOffsetFromDragStart());
+		ItemMinimalUIListeners.call(&ItemMinimalUIListener::itemUIResizeDrag, this, e.getOffsetFromDragStart());
 	}
 	else
 	{
@@ -112,7 +112,7 @@ void DashboardItemUI::mouseUp(const MouseEvent& e)
 	
 	if (e.originalComponent == &resizer)
 	{
-		ItemMinimalUIListeners.call(&ItemMinimalUIListener::baseItemUIResizeEnd, this);
+		ItemMinimalUIListeners.call(&ItemMinimalUIListener::itemUIResizeEnd, this);
 		//ItemMinimalUIListeners.call(&ItemMinimalUIListener::askForSyncPosAndSize, this);
 	}
 }

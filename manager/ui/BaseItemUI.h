@@ -118,7 +118,7 @@ public:
 	{
 	public:
 		virtual ~ItemUIListener() {}
-		virtual void baseItemUIMiniModeChanged(ItemUI<T>*) {}
+		virtual void itemUIMiniModeChanged(ItemUI<T>*) {}
 	};
 
 	juce::ListenerList<ItemUIListener> ItemUIListeners;
@@ -265,7 +265,7 @@ void ItemUI<T>::updateMiniModeUI()
 
 	updateItemUISize();
 
-	ItemUIListeners.call(&ItemUIListener::baseItemUIMiniModeChanged, this);
+	ItemUIListeners.call(&ItemUIListener::itemUIMiniModeChanged, this);
 }
 
 template<class T>
@@ -478,7 +478,7 @@ void ItemUI<T>::mouseDrag(const juce::MouseEvent& e)
 {
 	if (e.eventComponent == cornerResizer.get())
 	{
-		this->ItemMinimalUIListeners.call(&ItemMinimalUI<T>::ItemMinimalUIListener::baseItemUIResizeDrag, this, e.getOffsetFromDragStart());
+		this->ItemMinimalUIListeners.call(&ItemMinimalUI<T>::ItemMinimalUIListener::itemUIResizeDrag, this, e.getOffsetFromDragStart());
 	}
 
 	ItemMinimalUI<T>::mouseDrag(e);
@@ -489,7 +489,7 @@ void ItemUI<T>::mouseUp(const juce::MouseEvent& e)
 {
 	if (e.eventComponent == cornerResizer.get())
 	{
-		this->ItemMinimalUIListeners.call(&ItemMinimalUI<T>::ItemMinimalUIListener::baseItemUIResizeEnd, this);
+		this->ItemMinimalUIListeners.call(&ItemMinimalUI<T>::ItemMinimalUIListener::itemUIResizeEnd, this);
 	}
 }
 
