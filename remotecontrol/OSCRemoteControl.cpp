@@ -19,7 +19,7 @@ juce_ImplementSingleton(OSCRemoteControl)
 #define ORGANIC_REMOTE_CONTROL_PORT 42000
 #endif
 
-	using namespace juce;
+using namespace juce;
 
 ApplicationProperties& getAppProperties();
 
@@ -295,20 +295,20 @@ void OSCRemoteControl::processMessage(const OSCMessage& m, const String& sourceI
 	}
 	else if (add == "/toTray")
 	{
-		MessageManager::callAsync([]() { ((OrganicApplication*) OrganicApplication::getInstance())->mainWindow->closeToTray(); });
+		MessageManager::callAsync([]() { ((OrganicApplication*)OrganicApplication::getInstance())->mainWindow->closeToTray(); });
 	}
 	else if (add == "/minimize")
 	{
-		MessageManager::callAsync([]() { ((OrganicApplication*) OrganicApplication::getInstance())->mainWindow->setMinimised(true); });
-		((OrganicApplication*) OrganicApplication::getInstance())->mainWindow->setMinimised(true);
+		MessageManager::callAsync([]() { ((OrganicApplication*)OrganicApplication::getInstance())->mainWindow->setMinimised(true); });
+		((OrganicApplication*)OrganicApplication::getInstance())->mainWindow->setMinimised(true);
 	}
 	else if (add == "/maximize")
 	{
 		MessageManager::callAsync(
 			[]()
 			{
-				((OrganicApplication*) OrganicApplication::getInstance())->mainWindow->setMinimised(false);
-				((OrganicApplication*) OrganicApplication::getInstance())->mainWindow->openFromTray();
+				((OrganicApplication*)OrganicApplication::getInstance())->mainWindow->setMinimised(false);
+				((OrganicApplication*)OrganicApplication::getInstance())->mainWindow->openFromTray();
 			});
 	}
 	else if (add == "/syncAll")
@@ -811,11 +811,11 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 				{
 					if (c->type == Controllable::TRIGGER)
 					{
-						((Trigger*) c)->trigger();
+						((Trigger*)c)->trigger();
 					}
 					else
 					{
-						((Parameter*) c)->setValue(nv.value);
+						((Parameter*)c)->setValue(nv.value);
 					}
 				}
 				else if (nv.name.toString().startsWith("undoable:") && nv.value.size() == 2)
@@ -823,9 +823,9 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 					String cName = nv.name.toString().fromFirstOccurrenceOf(":", false, false);
 					if (Parameter* p = dynamic_cast<Parameter*>(Engine::mainEngine->getControllableForAddress(cName)))
 					{
-						if (nv.value.size() == 2)
+						if (nv.value.size() == 1)
 						{
-							p->setUndoableValue(nv.value[0], nv.value[1]);
+							p->setUndoableValue(nv.value[0]);
 						}
 					}
 				}
@@ -840,9 +840,9 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 						{
 							if (Parameter* p = dynamic_cast<Parameter*>(Engine::mainEngine->getControllableForAddress(pnv.name.toString())))
 							{
-								if (pnv.value.size() == 2)
+								if (pnv.value.size() == 1)
 								{
-									actions.add(p->setUndoableValue(pnv.value[0], pnv.value[1], true));
+									actions.addArray(p->setUndoableValue(pnv.value[0], true));
 								}
 							}
 						}
@@ -977,7 +977,7 @@ void OSCRemoteControl::newMessage(const CustomLogger::LogEvent& e)
 {
 	if (Engine::mainEngine != nullptr && Engine::mainEngine->isClearing) return;
 	if (enableSendLogFeedback != nullptr && !enableSendLogFeedback->boolValue()) return;
-	
+
 	sendLogFeedback(e.severityName, e.source, e.content);
 }
 
@@ -1184,11 +1184,6 @@ void OSCRemoteControl::sendOSCQueryFeedbackTo(const OSCMessage& m, StringArray i
 	{
 		NLOG(niceName, "Sent to OSCQuery : " << OSCHelpers::messageToString(m));
 	}
-}
-
-void OSCRemoteControl::newMessage(const WarningReporter::WarningReporterEvent& e)
-{
-	sendPersistentWarningFeedback(e.target, e.targetAddress, e.type);
 }
 
 void OSCRemoteControl::newMessage(const WarningReporter::WarningReporterEvent& e)
