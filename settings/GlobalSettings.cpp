@@ -58,6 +58,7 @@ GlobalSettings::GlobalSettings() :
 	
 	uiRefreshRate = interfaceCC.addIntParameter("UI Refresh Rate", "The refresh rate of the UI in hz", 30, 1, 100);
 	loggerRefreshRate = interfaceCC.addIntParameter("Logger Refresh Rate", "The refresh rate of the logger in hz", 20, 1, 1000);
+	alwaysOnTop = interfaceCC.addBoolParameter("Always on top", "If checked, the main window will be always on top the others windows", false);
 
 	addChildControllableContainer(&interfaceCC);
 
@@ -150,6 +151,10 @@ void GlobalSettings::onControllableFeedbackUpdate(ControllableContainer* cc, Con
 	else if (c == uiRefreshRate)
 	{
 		OrganicUITimers::getInstance()->setupTimers();
+	}
+	else if (c == alwaysOnTop && getApp().mainWindow != nullptr)
+	{
+		getApp().mainWindow->setAlwaysOnTop(alwaysOnTop->boolValue());
 	}
 
 

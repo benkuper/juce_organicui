@@ -35,7 +35,7 @@ Engine::Engine(const String& fileName, const String& fileExtension) :
 	isClearing(false)
 {
 	//skipControllableNameInAddress = true;
-	isBetaVersion = getAppVersion().endsWith("b");
+	isBetaVersion = getAppVersion().containsChar('b');
 	betaVersion = getBetaVersion(getAppVersion());
 
 	selectionManager.reset(new InspectableSelectionManager(true)); //selectionManager constructor
@@ -219,7 +219,7 @@ void Engine::timerCallback(int timerID)
 		{
 			if (GlobalSettings::getInstance()->autoSaveCurrentFile->boolValue()) if (getFile().existsAsFile()) saveDocument(getFile());
 			saveBackupDocument(autoSaveIndex);
-			autoSaveIndex = (autoSaveIndex + 1) % GlobalSettings::getInstance()->autoSaveCount->intValue();
+
 			startTimer(1, 60000 * GlobalSettings::getInstance()->autoSaveTime->intValue());
 		}
 	}

@@ -28,6 +28,7 @@ void Engine::changed()
 {
 	FileBasedDocument::changed();
 	lastChangeTime = Time::getCurrentTime();
+	isThereChangeToBackup = true;
 	engineListeners.call(&EngineListener::fileChanged);
 	engineNotifier.addMessage(new EngineEvent(EngineEvent::FILE_CHANGED, this));
 }
@@ -89,6 +90,8 @@ juce::Result Engine::loadDocumentNoCheck(const juce::File& file)
 	loadDocumentAsync(file);
 	//updateScriptObject();
 #endif
+
+	handleAsyncUpdate();
 
 	lastFileAbsolutePath = getFile().getFullPathName();
 	return Result::ok();
@@ -243,7 +246,8 @@ juce::Result Engine::saveCopy()
 
 Result Engine::saveBackupDocument(int index)
 {
-	if (GlobalSettings::getInstance()->autoSaveOnChangeOnly->boolValue() && !hasChangedSinceSaved()) return Result::ok();
+
+	if (GlobalSettings::getInstance()->autoSaveOnChangeOnly->boolValue() && !isThereChangeToBackup ) {return Result::ok();}
 
 	if (!getFile().existsAsFile()) return Result::ok();
 
@@ -269,6 +273,8 @@ Result Engine::saveBackupDocument(int index)
 
 	lastChangeTime = Time::getCurrentTime(); //needed to avoid detecting latest autosave as more recent than current file
 
+	isThereChangeToBackup = false; // set to false, until changed() methods is call
+	autoSaveIndex = (autoSaveIndex + 1) % GlobalSettings::getInstance()->autoSaveCount->intValue();
 	return Result::ok();
 }
 

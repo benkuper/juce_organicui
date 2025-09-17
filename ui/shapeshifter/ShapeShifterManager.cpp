@@ -288,8 +288,8 @@ void ShapeShifterManager::loadLayoutFromFile(int fileIndexInLayoutFolder)
 	if (fileIndexInLayoutFolder == -1)
 	{
 		FileChooser* fc(new FileChooser("Load layout", layoutFolder, "*." + appLayoutExtension));
-		auto folderChooserFlags = FileBrowserComponent::openMode | FileBrowserComponent::canSelectDirectories;
-		fc->launchAsync(folderChooserFlags, [this](const FileChooser& fc)
+		auto fileChooserFlags = FileBrowserComponent::FileChooserFlags::openMode | FileBrowserComponent::FileChooserFlags::canSelectFiles;
+		fc->launchAsync(fileChooserFlags, [this](const FileChooser& fc)
 			{
 				File f = fc.getResult();
 				delete& fc;
@@ -457,6 +457,14 @@ PopupMenu ShapeShifterManager::getPanelsMenu()
 	layoutP.addSeparator();
 
 	Array<File> layoutFiles = getLayoutFiles();
+
+	std::sort(
+		layoutFiles.begin(),
+		layoutFiles.end(),
+		[](const File& a, const File& b) {
+			return a.getFileNameWithoutExtension() < b.getFileNameWithoutExtension();
+		}
+	);
 
 	//int specialIndex = layoutP.getNumItems() + 2; //+2 to have lockPanels
 	int li = 0;

@@ -410,7 +410,7 @@ void ControllableContainer::setNiceName(const String& _niceName)
 	if (OSCRemoteControl::getInstanceWithoutCreating() != nullptr && isAttachedToRoot()) OSCRemoteControl::getInstance()->sendPathNameChangedFeedback(oldControlAddress, getControlAddress());
 #endif
 
-
+	niceNameChanged();
 	onContainerNiceNameChanged();
 }
 
@@ -629,10 +629,10 @@ ControllableContainer* ControllableContainer::getControllableContainerForAddress
 
 }
 
-String ControllableContainer::getControlAddress(ControllableContainer* relativeTo) {
+String ControllableContainer::getControlAddress(const ControllableContainer* relativeTo) const {
 
 	StringArray addressArray;
-	ControllableContainer* pc = this;
+	const ControllableContainer* pc = this;
 	while (pc != relativeTo && pc != nullptr && pc != Engine::mainEngine)
 	{
 		addressArray.insert(0, pc->shortName);
@@ -1093,7 +1093,7 @@ void ControllableContainer::loadJSONData(var data, bool createIfNotThere)
 var ControllableContainer::getRemoteControlData()
 {
 	var data(new DynamicObject());
-	if (isCurrentlyLoadingData || isClearing) return data;
+	if (isCurrentlyLoadingData || isClearing || Engine::mainEngine->isClearing) return data;
 
 	data.getDynamicObject()->setProperty("DESCRIPTION", niceName);
 	data.getDynamicObject()->setProperty("FULL_PATH", getControlAddress());
@@ -1753,6 +1753,18 @@ void EnablingControllableContainer::setCanBeDisabled(bool value)
 	{
 		removeControllable(enabled);
 		enabled = nullptr;
+	}
+}
+
+bool EnablingControllableContainer::isEnabled() const
+{
+	if (canBeDisabled)
+	{
+		return enabled->boolValue();
+	}
+	else
+	{
+		return true;
 	}
 }
 

@@ -80,6 +80,7 @@ public:
 	void setNiceName(const juce::String& _niceName);
 	void setCustomShortName(const juce::String& _shortName);
 	void setAutoShortName();
+	virtual void niceNameChanged() {}
 
 
 	juce::UndoableAction* addUndoableControllable(Controllable* c, bool onlyReturnAction = false);
@@ -125,7 +126,7 @@ public:
 	virtual Controllable* getControllableForAddress(const juce::String& address, bool recursive = true);
 	virtual Controllable* getControllableForAddress(juce::StringArray addressSplit, bool recursive = true);
 	bool containsControllable(Controllable* c, int maxSearchLevels = -1);
-	juce::String getControlAddress(ControllableContainer* relativeTo = nullptr);
+	juce::String getControlAddress(const ControllableContainer* relativeTo = nullptr) const;
 
 
 	//Remote Control
@@ -348,6 +349,8 @@ public:
 
 	bool canBeDisabled;
 	void setCanBeDisabled(bool value);
+
+	bool isEnabled() const;
 
 	virtual InspectableEditor* getEditorInternal(bool isRoot, juce::Array<Inspectable*> inspectables = juce::Array<Inspectable*>()) override;
 };

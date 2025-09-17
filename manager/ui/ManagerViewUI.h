@@ -247,7 +247,12 @@ void ManagerViewUI<M, T, U>::mouseWheelMove(const juce::MouseEvent& e, const juc
 		{
 			juce::Point<float> curMousePos = getViewMousePosition();
 
-			setViewZoom(this->manager->viewZoom + d.deltaY);
+			float delta = d.deltaY;
+#if JUCE_MAC
+			delta = d.deltaX;
+#endif
+
+			setViewZoom(this->manager->viewZoom + delta);
 
 			juce::Point<float> newMousePos = getViewMousePosition();
 			this->manager->viewOffset += ((newMousePos - curMousePos) * this->manager->viewZoom * (useCheckersAsUnits ? checkerSize : 1)).toInt();

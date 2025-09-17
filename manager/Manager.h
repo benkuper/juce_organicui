@@ -75,8 +75,8 @@ public:
 	virtual juce::Array<juce::UndoableAction*> getRemoveItemUndoableAction(T* item);
 	virtual juce::Array<juce::UndoableAction*> getRemoveItemsUndoableAction(juce::Array<T*> items);
 
-	void removeItems(juce::Array<T*> items, bool addToUndo = true);
-	T* removeItem(T* item, bool addToUndo = true, bool notify = true, bool returnItem = false);
+	virtual void removeItems(juce::Array<T*> items, bool addToUndo = true);
+	virtual T* removeItem(T* item, bool addToUndo = true, bool notify = true, bool returnItem = false);
 
 	virtual void setItemIndex(T* item, int newIndex, bool addToUndo = true);
 	virtual juce::Array<juce::UndoableAction*> getSetItemIndexUndoableAction(T* item, int newIndex);
@@ -695,9 +695,7 @@ T* Manager<T>::removeItem(T* item, bool addToUndo, bool notify, bool returnItem)
 	}
 
 
-	//items.getLock().enter();
 	items.removeObject(item, false);
-	//items.getLock().exit();
 
 	removeItemInternal(item);
 

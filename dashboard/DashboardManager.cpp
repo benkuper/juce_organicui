@@ -106,8 +106,7 @@ void DashboardManager::setupServer()
 	server.reset(new SimpleWebSocketServer());
 	//}
 
-
-	server->handler = this;
+	server->addHTTPRequestHandler(this);
 
 	File f = Engine::mainEngine->getFile();
 	File serverLocalPath;

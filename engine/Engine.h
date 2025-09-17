@@ -45,6 +45,7 @@ public:
 
 	int autoSaveIndex;
 	juce::Time lastChangeTime;
+	bool isThereChangeToBackup = false; // true if there is real change to backup ( set to true on changed() methods )
 
 	virtual void changed() override;
 	void createNewGraph();
@@ -72,7 +73,7 @@ public:
 	juce::File getLastDocumentOpened() override;
 	void setLastDocumentOpened(const juce::File& file) override;
 
-	bool checkAutoRestoreAutosave(const juce::File& originalFile, std::function<void(const juce::File&)> cancelCallback);
+	virtual bool checkAutoRestoreAutosave(const juce::File& originalFile, std::function<void(const juce::File&)> cancelCallback);
 	void restoreAutosave(const juce::File& originalFile, const juce::File& autosaveFile);
 
 	//    #if JUCE_MODAL_LOOPS_PERMITTED
