@@ -103,7 +103,7 @@ void CommentUI::mouseDrag(const MouseEvent& e)
 
 		if (e.eventComponent == &resizer)
 		{
-			ItemMinimalUIListeners.call(&ItemMinimalUI<CommentItem>::ItemMinimalUIListener::itemUIResizeDrag, this, e.getOffsetFromDragStart());
+			itemMinimalUIListeners.call(&ItemMinimalUI<CommentItem>::ItemMinimalUIListener::itemUIResizeDrag, this, e.getOffsetFromDragStart());
 		}
 	}
 }
@@ -114,7 +114,7 @@ void CommentUI::mouseUp(const MouseEvent& e)
 
 	if (e.eventComponent == &resizer)
 	{
-		ItemMinimalUIListeners.call(&ItemMinimalUI<CommentItem>::ItemMinimalUIListener::itemUIResizeEnd, this);
+		itemMinimalUIListeners.call(&ItemMinimalUI<CommentItem>::ItemMinimalUIListener::itemUIResizeEnd, this);
 	}
 }
 

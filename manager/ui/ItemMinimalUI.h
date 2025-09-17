@@ -103,9 +103,9 @@ public:
 		virtual void askSelectToThis(ItemMinimalUI<T>*) {}
 	};
 
-	juce::ListenerList<ItemMinimalUIListener> ItemMinimalUIListeners;
-	void addItemUIMinimalUIListener(ItemMinimalUIListener* newListener) { ItemMinimalUIListeners.add(newListener); }
-	void removeItemMinimalUIListener(ItemMinimalUIListener* listener) { ItemMinimalUIListeners.remove(listener); }
+	juce::ListenerList<ItemMinimalUIListener> itemMinimalUIListeners;
+	void addItemUIMinimalUIListener(ItemMinimalUIListener* newListener) { itemMinimalUIListeners.add(newListener); }
+	void removeItemMinimalUIListener(ItemMinimalUIListener* listener) { itemMinimalUIListeners.remove(listener); }
 };
 
 
@@ -220,14 +220,14 @@ void ItemMinimalUI<T>::mouseDown(const juce::MouseEvent& e)
 		if (getMainBounds().contains(e.getPosition()))
 		{
 			juce::PopupMenu p;
-				addContextMenuItems(p);
+			addContextMenuItems(p);
 
-				if (p.getNumItems() == 0) return;
+			if (p.getNumItems() == 0) return;
 
-				p.showMenuAsync(juce::PopupMenu::Options(), [this](int result)
-					{
-						if (result > 0) handleContextMenuResult(result);
-					}
+			p.showMenuAsync(juce::PopupMenu::Options(), [this](int result)
+				{
+					if (result > 0) handleContextMenuResult(result);
+				}
 			);
 		}
 	}
@@ -288,7 +288,7 @@ bool ItemMinimalUI<T>::isUsingMouseWheel()
 template<class T>
 void ItemMinimalUI<T>::selectToThis()
 {
-	ItemMinimalUIListeners.call(&ItemMinimalUIListener::askSelectToThis, this);
+	itemMinimalUIListeners.call(&ItemMinimalUIListener::askSelectToThis, this);
 }
 
 template<class T>
@@ -307,7 +307,7 @@ void ItemMinimalUI<T>::newMessage(const ContainerAsyncEvent& e)
 		}
 		else if (e.targetControllable == baseItem->viewUIPosition)
 		{
-			ItemMinimalUIListeners.call(&ItemMinimalUIListener::itemUIViewPositionChanged, this);
+			itemMinimalUIListeners.call(&ItemMinimalUIListener::itemUIViewPositionChanged, this);
 		}
 		else if (e.targetControllable == baseItem->viewUISize && syncWithItemSize)
 		{
