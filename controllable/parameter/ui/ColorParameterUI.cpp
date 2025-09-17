@@ -140,13 +140,13 @@ OrganicColorPicker::OrganicColorPicker(ColorParameter* colorParam) :
 	Component("ColorPicker"),
 	colorParam(colorParam),
 	paramRef(colorParam),
-	r("R", "Red", 0, 0, 1),
-	g("G", "Green", 0, 0, 1),
-	b("B", "Blue", 0, 0, 1),
-	a("A", "Alpha", 0, 0, 1),
-	h("H", "Hue", 0, 0, 1),
-	s("S", "Saturation", 0, 0, 1),
-	bri("V", "Value", 0, 0, 1),
+	rParam("R", "Red", 0, 0, 1),
+	gParam("G", "Green", 0, 0, 1),
+	bParam("B", "Blue", 0, 0, 1),
+	aParam("A", "Alpha", 0, 0, 1),
+	hParam("H", "Hue", 0, 0, 1),
+	sParam("S", "Saturation", 0, 0, 1),
+	briParam("V", "Value", 0, 0, 1),
 	hex("Hex", "Hex", "#"),
 	isUpdatingColor(false),
 	isDraggingHueSat(false)
@@ -156,13 +156,13 @@ OrganicColorPicker::OrganicColorPicker(ColorParameter* colorParam) :
 	hueSatHandle.reset(new HueSatHandle(this));
 	addAndMakeVisible(hueSatHandle.get());
 
-	rUI.reset(r.createSlider());
-	gUI.reset(g.createSlider());
-	bUI.reset(b.createSlider());
-	aUI.reset(a.createSlider());
-	hUI.reset(h.createSlider());
-	sUI.reset(s.createSlider());
-	briUI.reset(bri.createSlider());
+	rUI.reset(rParam.createSlider());
+	gUI.reset(gParam.createSlider());
+	bUI.reset(bParam.createSlider());
+	aUI.reset(aParam.createSlider());
+	hUI.reset(hParam.createSlider());
+	sUI.reset(sParam.createSlider());
+	briUI.reset(briParam.createSlider());
 	hexUI.reset(hex.createStringParameterUI());
 	hueSatHandle.reset(new HueSatHandle(this));
 
@@ -231,13 +231,13 @@ OrganicColorPicker::OrganicColorPicker(ColorParameter* colorParam) :
 	hexUI->addMouseListener(this, false);
 	hueSatHandle->addMouseListener(this, false);
 
-	r.addAsyncParameterListener(this);
-	g.addAsyncParameterListener(this);
-	b.addAsyncParameterListener(this);
-	a.addAsyncParameterListener(this);
-	h.addAsyncParameterListener(this);
-	s.addAsyncParameterListener(this);
-	bri.addAsyncParameterListener(this);
+	rParam.addAsyncParameterListener(this);
+	gParam.addAsyncParameterListener(this);
+	bParam.addAsyncParameterListener(this);
+	aParam.addAsyncParameterListener(this);
+	hParam.addAsyncParameterListener(this);
+	sParam.addAsyncParameterListener(this);
+	briParam.addAsyncParameterListener(this);
 	hex.addAsyncParameterListener(this);
 
 
@@ -255,7 +255,7 @@ void OrganicColorPicker::paint(Graphics& g)
 {
 	g.setColour(Colours::black);
 	g.fillRoundedRectangle(hueSatRect.toFloat(), 2.f);
-	g.setColour(Colours::white.withAlpha(bri.floatValue()));
+	g.setColour(Colours::white.withAlpha(briParam.floatValue()));
 	g.drawImageAt(hueSatImage, hueSatRect.getX(), hueSatRect.getY());
 	g.setColour(Colours::white.withAlpha(.5f));
 	g.drawRoundedRectangle(hueSatRect.toFloat(), 2.f, 2.f);
@@ -274,7 +274,7 @@ void OrganicColorPicker::paint(Graphics& g)
 	for (int x = r.getX(); x < r.getRight(); ++x)
 	{
 		float sat = static_cast<float>(x - r.getX()) / r.getWidth();
-		g.setColour(Colour::fromHSV(h.floatValue(), sat, 1.0f, 1.0f));
+		g.setColour(Colour::fromHSV(hParam.floatValue(), sat, 1.0f, 1.0f));
 		g.drawLine(x, r.getY(), x, r.getBottom(), 2);
 	}
 
@@ -283,7 +283,7 @@ void OrganicColorPicker::paint(Graphics& g)
 	for (int x = r.getX(); x < r.getRight(); ++x)
 	{
 		float bri = static_cast<float>(x - r.getX()) / r.getWidth();
-		g.setColour(Colour::fromHSV(h.floatValue(), s.floatValue(), bri, 1.0f));
+		g.setColour(Colour::fromHSV(hParam.floatValue(), sParam.floatValue(), bri, 1.0f));
 		g.drawLine(x, r.getY(), x, r.getBottom(), 2);
 	}
 
@@ -380,7 +380,7 @@ void OrganicColorPicker::updateHueSat()
 
 	Point<float> relHS = Point<float>(p.getX() - hueSatRect.getX(), p.getY() - hueSatRect.getY()) / Point<float>(hueSatRect.getWidth(), hueSatRect.getHeight());
 
-	updateFromHSV(relHS.x, relHS.y, bri.floatValue());
+	updateFromHSV(relHS.x, relHS.y, briParam.floatValue());
 }
 
 void OrganicColorPicker::setEditingColor(const juce::Colour& c, bool setRGB, bool setHSV, bool setParam)
@@ -389,21 +389,21 @@ void OrganicColorPicker::setEditingColor(const juce::Colour& c, bool setRGB, boo
 	isUpdatingColor = true;
 
 	if (setHSV) {
-		h.setValue(c.getHue());
-		s.setValue(c.getSaturation());
-		bri.setValue(c.getBrightness());
+		hParam.setValue(c.getHue());
+		sParam.setValue(c.getSaturation());
+		briParam.setValue(c.getBrightness());
 	}
 
 	if (setRGB) {
-		r.setValue(c.getFloatRed());
-		g.setValue(c.getFloatGreen());
-		b.setValue(c.getFloatBlue());
+		rParam.setValue(c.getFloatRed());
+		gParam.setValue(c.getFloatGreen());
+		bParam.setValue(c.getFloatBlue());
 	}
 
 
 	updateHueSatHandle();
 	hex.setValue(c.toDisplayString(true));
-	a.setValue(c.getFloatAlpha());
+	aParam.setValue(c.getFloatAlpha());
 
 	if (setParam) colorParam->setColor(c, false, false, true);
 
@@ -420,24 +420,24 @@ void OrganicColorPicker::updateFromRGB(float _r, float _g, float _b)
 {
 	if (isUpdatingColor) return;
 	isUpdatingColor = true;
-	r.setValue(_r);
-	g.setValue(_g);
-	b.setValue(_b);
+	rParam.setValue(_r);
+	gParam.setValue(_g);
+	bParam.setValue(_b);
 	isUpdatingColor = false;
 
-	setEditingColor(Colour::fromFloatRGBA(_r, _g, _b, a.floatValue()), false, true);
+	setEditingColor(Colour::fromFloatRGBA(_r, _g, _b, aParam.floatValue()), false, true);
 }
 
 void OrganicColorPicker::updateFromHSV(float _h, float _s, float _v)
 {
 	if (isUpdatingColor) return;
 	isUpdatingColor = true;
-	h.setValue(_h);
-	s.setValue(_s);
-	bri.setValue(_v);
+	hParam.setValue(_h);
+	sParam.setValue(_s);
+	briParam.setValue(_v);
 	isUpdatingColor = false;
 
-	setEditingColor(Colour::fromHSV(_h, _s, _v, 1.0f).withAlpha(a.floatValue()), true, false);
+	setEditingColor(Colour::fromHSV(_h, _s, _v, 1.0f).withAlpha(aParam.floatValue()), true, false);
 }
 
 void OrganicColorPicker::updateFromHex(String s)
@@ -451,12 +451,12 @@ void OrganicColorPicker::updateFromHex(String s)
 void OrganicColorPicker::updateFromAlpha(float alpha)
 {
 	if (isUpdatingColor) return;
-	setEditingColor(Colour::fromFloatRGBA(r.floatValue(), g.floatValue(), b.floatValue(), alpha));
+	setEditingColor(Colour::fromFloatRGBA(rParam.floatValue(), gParam.floatValue(), bParam.floatValue(), alpha));
 }
 
 void OrganicColorPicker::updateHueSatHandle()
 {
-	Point<int> relPos = hueSatRect.getRelativePoint(h.floatValue(), s.floatValue());
+	Point<int> relPos = hueSatRect.getRelativePoint(hParam.floatValue(), sParam.floatValue());
 	hueSatHandle->setCentrePosition(hueSatRect.getX() + relPos.getX(), hueSatRect.getY() + relPos.getY());
 }
 
@@ -474,17 +474,17 @@ void OrganicColorPicker::newMessage(const Parameter::ParameterEvent& e)
 	{
 		updateFromParameter();
 	}
-	else if (e.parameter == &r || e.parameter == &g || e.parameter == &b)
+	else if (e.parameter == &rParam || e.parameter == &gParam || e.parameter == &bParam)
 	{
-		updateFromRGB(r.floatValue(), g.floatValue(), b.floatValue());
+		updateFromRGB(rParam.floatValue(), gParam.floatValue(), bParam.floatValue());
 	}
-	else if (e.parameter == &a)
+	else if (e.parameter == &aParam)
 	{
-		updateFromAlpha(a.floatValue());
+		updateFromAlpha(aParam.floatValue());
 	}
-	else if (e.parameter == &h || e.parameter == &s || e.parameter == &bri)
+	else if (e.parameter == &hParam || e.parameter == &sParam || e.parameter == &briParam)
 	{
-		updateFromHSV(h.floatValue(), s.floatValue(), bri.floatValue());
+		updateFromHSV(hParam.floatValue(), sParam.floatValue(), briParam.floatValue());
 	}
 
 	else if (e.parameter == &hex)

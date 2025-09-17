@@ -21,21 +21,21 @@ public:
 	ColorParameter* colorParam;
 	juce::WeakReference<Parameter> paramRef;
 
-	FloatParameter r;
+	FloatParameter rParam;
 	std::unique_ptr<FloatSliderUI> rUI;
-	FloatParameter g;
+	FloatParameter gParam;
 	std::unique_ptr<FloatSliderUI> gUI;
-	FloatParameter b;
+	FloatParameter bParam;
 	std::unique_ptr<FloatSliderUI> bUI;
 
-	FloatParameter h;
+	FloatParameter hParam;
 	std::unique_ptr<FloatSliderUI> hUI;
-	FloatParameter s;
+	FloatParameter sParam;
 	std::unique_ptr<FloatSliderUI> sUI;
-	FloatParameter bri;
+	FloatParameter briParam;
 	std::unique_ptr<FloatSliderUI> briUI;
 
-	FloatParameter a;
+	FloatParameter aParam;
 	std::unique_ptr<FloatSliderUI> aUI;
 
 	StringParameter hex;
