@@ -11,7 +11,7 @@
 #pragma once
 
 class ParrotUI :
-    public BaseItemUI<Parrot>
+    public ItemUI<Parrot>
 {
 public:
     ParrotUI(Parrot* p);

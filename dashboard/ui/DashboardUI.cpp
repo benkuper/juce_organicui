@@ -9,7 +9,7 @@
 */
 
 DashboardUI::DashboardUI(Dashboard* item) :
-	BaseItemUI(item)
+	ItemUI(item)
 {
 	setSize(100, 20);
 	item->addAsyncDashboardListener(this);
@@ -24,7 +24,7 @@ void DashboardUI::paint(Graphics& g)
 {
 	if (item == nullptr) return;
 	bgColor = item->isBeingEdited ? DashboardManager::getInstance()->tabsSelectedBGColor->getColor() : NORMAL_COLOR;
-	BaseItemUI::paint(g);
+	ItemUI::paint(g);
 }
 
 void DashboardUI::newMessage(const Dashboard::DashboardEvent& e)

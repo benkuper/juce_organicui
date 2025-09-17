@@ -25,7 +25,7 @@ public:
 };
 
 class AutomationKeyUI :
-    public BaseItemMinimalUI<AutomationKey>
+    public ItemMinimalUI<AutomationKey>
 {
 public:
     AutomationKeyUI(AutomationKey* key);

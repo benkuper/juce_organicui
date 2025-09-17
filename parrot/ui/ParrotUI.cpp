@@ -10,7 +10,7 @@
 
 
 ParrotUI::ParrotUI(Parrot* p) :
-    BaseItemUI(p)
+    ItemUI(p)
 {
     updateBGColor();
 }
@@ -21,7 +21,7 @@ ParrotUI::~ParrotUI()
 
 void ParrotUI::controllableFeedbackUpdateInternal(Controllable* c)
 {
-    BaseItemUI::controllableFeedbackUpdateInternal(c);
+    ItemUI::controllableFeedbackUpdateInternal(c);
     if (c == item->status)
     {
         updateBGColor();
@@ -69,5 +69,5 @@ void ParrotUI::itemDropped(const DragAndDropTarget::SourceDetails& d)
         }
     }
 
-    BaseItemUI::itemDropped(d);
+    ItemUI::itemDropped(d);
 }

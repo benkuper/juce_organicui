@@ -11,7 +11,7 @@
 #pragma once
 
 class GradientColorUI :
-	public BaseItemMinimalUI<GradientColor>
+	public ItemMinimalUI<GradientColor>
 {
 public:
 	GradientColorUI(GradientColor * item);

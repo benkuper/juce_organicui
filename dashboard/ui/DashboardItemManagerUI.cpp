@@ -108,7 +108,7 @@ void DashboardItemManagerUI::paintOverChildren(Graphics& g)
 }
 
 
-bool DashboardItemManagerUI::checkItemShouldBeVisible(BaseItemMinimalUI<DashboardItem>* ui)
+bool DashboardItemManagerUI::checkItemShouldBeVisible(ItemMinimalUI<DashboardItem>* ui)
 {
 	if (ui == nullptr) return false;
 	if (ui->item == nullptr) return false;
@@ -214,7 +214,7 @@ void DashboardItemManagerUI::showMenuAndAddItem(bool fromAddButton, Point<int> m
 	);
 }
 
-BaseItemMinimalUI<DashboardItem>* DashboardItemManagerUI::createUIForItem(DashboardItem* item)
+ItemMinimalUI<DashboardItem>* DashboardItemManagerUI::createUIForItem(DashboardItem* item)
 {
 	return item->createUI();
 }

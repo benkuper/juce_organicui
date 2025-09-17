@@ -12,7 +12,7 @@
 
 
 Curve2DKeyUI::Curve2DKeyUI(Curve2DKey* key) :
-	BaseItemMinimalUI(key),
+	ItemMinimalUI(key),
 	handle(key),
 	easingUI(nullptr)
 {
@@ -90,7 +90,7 @@ void Curve2DKeyUI::updateEasingUI()
 
 void Curve2DKeyUI::mouseDown(const MouseEvent& e)
 {
-	BaseItemMinimalUI::mouseDown(e);
+	ItemMinimalUI::mouseDown(e);
 
 	if (e.eventComponent == easingUI.get())
 	{

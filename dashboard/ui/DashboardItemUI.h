@@ -11,7 +11,7 @@
 #pragma once
 
 class DashboardItemUI :
-	public BaseItemMinimalUI<DashboardItem>,
+	public ItemMinimalUI<DashboardItem>,
 	public Parameter::AsyncListener,
 	public juce::SettableTooltipClient
 {
@@ -33,7 +33,7 @@ public:
 	virtual void updateEditMode();
 	virtual void updateEditModeInternal(bool editMode) {}
 
-	BaseItemUI<DashboardItem>::ItemResizerComponent resizer;
+	ItemUI<DashboardItem>::ItemResizerComponent resizer;
 
 	virtual void newMessage(const Parameter::ParameterEvent& e) override;
 

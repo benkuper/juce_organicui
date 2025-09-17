@@ -1,7 +1,7 @@
 #include "JuceHeader.h"
 
 DashboardItemUI::DashboardItemUI(DashboardItem* item) :
-	BaseItemMinimalUI(item),
+	ItemMinimalUI(item),
 	resizer()
 {
 	bgColor = Colours::transparentBlack;
@@ -33,12 +33,12 @@ DashboardItemUI::~DashboardItemUI()
 
 void DashboardItemUI::paint(Graphics& g)
 {
-	BaseItemMinimalUI::paint(g);
+	ItemMinimalUI::paint(g);
 }
 
 void DashboardItemUI::paintOverChildren(Graphics& g)
 {
-	BaseItemMinimalUI::paintOverChildren(g);
+	ItemMinimalUI::paintOverChildren(g);
 	if (resizer.isVisible() && isMouseOverOrDragging(true))
 	{
 		g.setColour(Colours::white.withAlpha(.05f));
@@ -79,12 +79,12 @@ void DashboardItemUI::mouseDown(const MouseEvent& e)
 		this->baseItem->setSizeReference(true);
 	}
 
-	BaseItemMinimalUI::mouseDown(e);
+	ItemMinimalUI::mouseDown(e);
 }
 
 void DashboardItemUI::mouseEnter(const MouseEvent& e)
 {
-	BaseItemMinimalUI::mouseEnter(e);
+	ItemMinimalUI::mouseEnter(e);
 	repaint();
 }
 
@@ -95,25 +95,25 @@ void DashboardItemUI::mouseDrag(const MouseEvent& e)
 	
 	if (e.eventComponent == &resizer)
 	{
-		itemMinimalUIListeners.call(&ItemMinimalUIListener::itemUIResizeDrag, this, e.getOffsetFromDragStart());
+		ItemMinimalUIListeners.call(&ItemMinimalUIListener::baseItemUIResizeDrag, this, e.getOffsetFromDragStart());
 	}
 	else
 	{
-		BaseItemMinimalUI::mouseDrag(e);
+		ItemMinimalUI::mouseDrag(e);
 	}
 }
 
 void DashboardItemUI::mouseUp(const MouseEvent& e)
 {
-	BaseItemMinimalUI::mouseUp(e);
+	ItemMinimalUI::mouseUp(e);
 	
 	bool editMode = DashboardManager::getInstance()->editMode->boolValue();
 	if (!editMode) return; //avoid dashboard item select when in play mode
 	
 	if (e.originalComponent == &resizer)
 	{
-		itemMinimalUIListeners.call(&ItemMinimalUIListener::itemUIResizeEnd, this);
-		//itemMinimalUIListeners.call(&ItemMinimalUIListener::askForSyncPosAndSize, this);
+		ItemMinimalUIListeners.call(&ItemMinimalUIListener::baseItemUIResizeEnd, this);
+		//ItemMinimalUIListeners.call(&ItemMinimalUIListener::askForSyncPosAndSize, this);
 	}
 }
 
@@ -135,7 +135,7 @@ bool DashboardItemUI::keyPressed(const KeyPress& e)
 		return true;
 	}
 
-	return BaseItemMinimalUI::keyPressed(e);
+	return ItemMinimalUI::keyPressed(e);
 }
 
 void DashboardItemUI::updateEditMode()

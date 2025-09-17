@@ -11,7 +11,7 @@
 #pragma once
 
 class DashboardUI :
-	public BaseItemUI<Dashboard>,
+	public ItemUI<Dashboard>,
 	public Dashboard::AsyncListener
 {
 public:

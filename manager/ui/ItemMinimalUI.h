@@ -1,7 +1,7 @@
 /*
   ==============================================================================
 
-	BaseItemMinimalUI.h
+	ItemMinimalUI.h
 	Created: 20 Nov 2016 2:48:09pm
 	Author:  Ben Kuper
 
@@ -11,15 +11,15 @@
 #pragma once
 
 template<class T>
-class BaseItemMinimalUI :
+class ItemMinimalUI :
 	public InspectableContentComponent,
 	public ContainerAsyncListener,
 	public juce::DragAndDropContainer,
 	public juce::DragAndDropTarget
 {
 public:
-	BaseItemMinimalUI(T* _item);
-	virtual ~BaseItemMinimalUI();
+	ItemMinimalUI(T* _item);
+	virtual ~ItemMinimalUI();
 
 	T* item;
 	BaseItem* baseItem;
@@ -94,23 +94,23 @@ public:
 	public:
 		virtual ~ItemMinimalUIListener() {}
 
-		virtual void itemUIViewPositionChanged(BaseItemMinimalUI<T>*) {}
+		virtual void baseItemUIViewPositionChanged(ItemMinimalUI<T>*) {}
 
-		virtual void itemUIResizeDrag(BaseItemMinimalUI<T>*, const juce::Point<int>& dragOffset) {}
-		virtual void itemUIResizeEnd(BaseItemMinimalUI<T>*) {}
+		virtual void baseItemUIResizeDrag(ItemMinimalUI<T>*, const juce::Point<int>& dragOffset) {}
+		virtual void baseItemUIResizeEnd(ItemMinimalUI<T>*) {}
 
-		virtual void askForSyncPosAndSize(BaseItemMinimalUI<T>*) {}
-		virtual void askSelectToThis(BaseItemMinimalUI<T>*) {}
+		virtual void askForSyncPosAndSize(ItemMinimalUI<T>*) {}
+		virtual void askSelectToThis(ItemMinimalUI<T>*) {}
 	};
 
-	juce::ListenerList<ItemMinimalUIListener> itemMinimalUIListeners;
-	void addItemMinimalUIListener(ItemMinimalUIListener* newListener) { itemMinimalUIListeners.add(newListener); }
-	void removeItemMinimalUIListener(ItemMinimalUIListener* listener) { itemMinimalUIListeners.remove(listener); }
+	juce::ListenerList<ItemMinimalUIListener> ItemMinimalUIListeners;
+	void addItemUIMinimalUIListener(ItemMinimalUIListener* newListener) { ItemMinimalUIListeners.add(newListener); }
+	void removeItemMinimalUIListener(ItemMinimalUIListener* listener) { ItemMinimalUIListeners.remove(listener); }
 };
 
 
 template<class T>
-BaseItemMinimalUI<T>::BaseItemMinimalUI(T* _item) :
+ItemMinimalUI<T>::ItemMinimalUI(T* _item) :
 	InspectableContentComponent(_item),
 	item(_item),
 	bgColor(_item != nullptr && _item->itemColor != nullptr ? _item->itemColor->getColor() : BG_COLOR.brighter(.1f)),
@@ -143,21 +143,21 @@ BaseItemMinimalUI<T>::BaseItemMinimalUI(T* _item) :
 
 
 template<class T>
-BaseItemMinimalUI<T>::~BaseItemMinimalUI()
+ItemMinimalUI<T>::~ItemMinimalUI()
 {
 	if (baseItem != nullptr && !inspectable.wasObjectDeleted()) baseItem->removeAsyncContainerListener(this);
 }
 
 
 template<class T>
-void BaseItemMinimalUI<T>::setHighlightOnMouseOver(bool highlight)
+void ItemMinimalUI<T>::setHighlightOnMouseOver(bool highlight)
 {
 	setRepaintsOnMouseActivity(highlight);
 	highlightOnMouseOver = highlight;
 }
 
 template<class T>
-void BaseItemMinimalUI<T>::paint(juce::Graphics& g)
+void ItemMinimalUI<T>::paint(juce::Graphics& g)
 {
 	if (inspectable.wasObjectDeleted()) return;
 
@@ -178,13 +178,13 @@ void BaseItemMinimalUI<T>::paint(juce::Graphics& g)
 }
 
 template<class T>
-void BaseItemMinimalUI<T>::setViewZoom(float value)
+void ItemMinimalUI<T>::setViewZoom(float value)
 {
 	viewZoom = value;
 }
 
 template<class T>
-void BaseItemMinimalUI<T>::setViewCheckerSize(float value)
+void ItemMinimalUI<T>::setViewCheckerSize(float value)
 {
 	viewCheckerSize = value;
 	if (syncWithItemSize) setViewSize(item->viewUISize->getPoint());
@@ -192,27 +192,27 @@ void BaseItemMinimalUI<T>::setViewCheckerSize(float value)
 
 
 template<class T>
-void BaseItemMinimalUI<T>::setViewSize(float x, float y)
+void ItemMinimalUI<T>::setViewSize(float x, float y)
 {
 	setSize(x * viewCheckerSize, y * viewCheckerSize);
 }
 
 template<class T>
-void BaseItemMinimalUI<T>::setViewSize(juce::Point<float> size)
+void ItemMinimalUI<T>::setViewSize(juce::Point<float> size)
 {
 	setSize(size.x * viewCheckerSize, size.y * viewCheckerSize);
 }
 
 template<class T>
-void BaseItemMinimalUI<T>::updateItemUISize()
+void ItemMinimalUI<T>::updateItemUISize()
 {
 	setViewSize(baseItem->viewUISize->getPoint());
 }
 
 template<class T>
-void BaseItemMinimalUI<T>::mouseDown(const juce::MouseEvent& e)
+void ItemMinimalUI<T>::mouseDown(const juce::MouseEvent& e)
 {
-	//LOG("BaseItemMinimalUI::mouseDown " << e.eventComponent->getName() << " / " << e.originalComponent->getName());
+	//LOG("ItemMinimalUI::mouseDown " << e.eventComponent->getName() << " / " << e.originalComponent->getName());
 	InspectableContentComponent::mouseDown(e);
 
 	if (e.mods.isRightButtonDown())
@@ -240,7 +240,7 @@ void BaseItemMinimalUI<T>::mouseDown(const juce::MouseEvent& e)
 
 
 template<class T>
-void BaseItemMinimalUI<T>::mouseDrag(const juce::MouseEvent& e)
+void ItemMinimalUI<T>::mouseDrag(const juce::MouseEvent& e)
 {
 	InspectableContentComponent::mouseDrag(e);
 
@@ -273,26 +273,26 @@ void BaseItemMinimalUI<T>::mouseDrag(const juce::MouseEvent& e)
 
 
 template<class T>
-void BaseItemMinimalUI<T>::mouseExit(const juce::MouseEvent& e)
+void ItemMinimalUI<T>::mouseExit(const juce::MouseEvent& e)
 {
 	InspectableContentComponent::mouseExit(e);
 	repaint();
 }
 
 template<class T>
-bool BaseItemMinimalUI<T>::isUsingMouseWheel()
+bool ItemMinimalUI<T>::isUsingMouseWheel()
 {
 	return false;
 }
 
 template<class T>
-void BaseItemMinimalUI<T>::selectToThis()
+void ItemMinimalUI<T>::selectToThis()
 {
-	itemMinimalUIListeners.call(&ItemMinimalUIListener::askSelectToThis, this);
+	ItemMinimalUIListeners.call(&ItemMinimalUIListener::askSelectToThis, this);
 }
 
 template<class T>
-void BaseItemMinimalUI<T>::newMessage(const ContainerAsyncEvent& e)
+void ItemMinimalUI<T>::newMessage(const ContainerAsyncEvent& e)
 {
 	switch (e.type)
 	{
@@ -307,7 +307,7 @@ void BaseItemMinimalUI<T>::newMessage(const ContainerAsyncEvent& e)
 		}
 		else if (e.targetControllable == baseItem->viewUIPosition)
 		{
-			itemMinimalUIListeners.call(&ItemMinimalUIListener::itemUIViewPositionChanged, this);
+			ItemMinimalUIListeners.call(&ItemMinimalUIListener::baseItemUIViewPositionChanged, this);
 		}
 		else if (e.targetControllable == baseItem->viewUISize && syncWithItemSize)
 		{
@@ -343,7 +343,7 @@ void BaseItemMinimalUI<T>::newMessage(const ContainerAsyncEvent& e)
 }
 
 template<class T>
-void BaseItemMinimalUI<T>::controllableFeedbackUpdateInternal(Controllable* c)
+void ItemMinimalUI<T>::controllableFeedbackUpdateInternal(Controllable* c)
 {
 	if (c == this->baseItem->viewUISize)
 	{
@@ -352,19 +352,19 @@ void BaseItemMinimalUI<T>::controllableFeedbackUpdateInternal(Controllable* c)
 }
 
 template<class T>
-bool BaseItemMinimalUI<T>::canStartDrag(const juce::MouseEvent& e)
+bool ItemMinimalUI<T>::canStartDrag(const juce::MouseEvent& e)
 {
 	return e.eventComponent == this && !e.mods.isAltDown() && !e.mods.isCommandDown() && !e.mods.isShiftDown();
 }
 
 template<class T>
-void BaseItemMinimalUI<T>::dragOperationStarted(const juce::DragAndDropTarget::SourceDetails&)
+void ItemMinimalUI<T>::dragOperationStarted(const juce::DragAndDropTarget::SourceDetails&)
 {
 	if (autoHideWhenDragging) setVisible(false);
 }
 
 template<class T>
-void BaseItemMinimalUI<T>::dragOperationEnded(const juce::DragAndDropTarget::SourceDetails&)
+void ItemMinimalUI<T>::dragOperationEnded(const juce::DragAndDropTarget::SourceDetails&)
 {
 	if (autoHideWhenDragging) setVisible(true);
 }
@@ -372,35 +372,35 @@ void BaseItemMinimalUI<T>::dragOperationEnded(const juce::DragAndDropTarget::Sou
 
 // Inherited via DragAndDropTarget
 template<class T>
-bool BaseItemMinimalUI<T>::isInterestedInDragSource(const SourceDetails& dragSourceDetails)
+bool ItemMinimalUI<T>::isInterestedInDragSource(const SourceDetails& dragSourceDetails)
 {
 	return acceptedDropTypes.contains(dragSourceDetails.description.getProperty("dataType", "").toString());
 }
 
 
 template<class T>
-void BaseItemMinimalUI<T>::itemDragEnter(const SourceDetails&)
+void ItemMinimalUI<T>::itemDragEnter(const SourceDetails&)
 {
 	isDraggingOver = true;
 	if (highlightOnDragOver) repaint();
 }
 
 template<class T>
-void BaseItemMinimalUI<T>::itemDragExit(const SourceDetails&)
+void ItemMinimalUI<T>::itemDragExit(const SourceDetails&)
 {
 	isDraggingOver = false;
 	if (highlightOnDragOver) repaint();
 }
 
 template<class T>
-void BaseItemMinimalUI<T>::itemDropped(const SourceDetails& dragSourceDetails)
+void ItemMinimalUI<T>::itemDropped(const SourceDetails& dragSourceDetails)
 {
 	isDraggingOver = false;
 	if (highlightOnDragOver) repaint();
 }
 
 template<class T>
-juce::Point<int> BaseItemMinimalUI<T>::getDragOffset()
+juce::Point<int> ItemMinimalUI<T>::getDragOffset()
 {
 	return getMouseXYRelative() * viewZoom;
 }

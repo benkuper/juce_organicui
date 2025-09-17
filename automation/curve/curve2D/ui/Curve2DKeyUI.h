@@ -25,7 +25,7 @@ public:
 };
 
 class Curve2DKeyUI :
-    public BaseItemMinimalUI<Curve2DKey>
+    public ItemMinimalUI<Curve2DKey>
 {
 public:
     Curve2DKeyUI(Curve2DKey* key);

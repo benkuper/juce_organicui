@@ -446,7 +446,7 @@ T* Manager<T>::addItem(T* item, juce::var data, bool addToUndo, bool notify)
 		//items.getLock().exit();
 	}
 
-	bi->addBaseItemListener(this);
+	bi->addItemUIListener(this);
 
 	if (!data.isVoid())
 	{
@@ -700,7 +700,7 @@ T* Manager<T>::removeItem(T* item, bool addToUndo, bool notify, bool returnItem)
 	removeItemInternal(item);
 
 	BaseItem* bi = static_cast<BaseItem*>(item);
-	bi->removeBaseItemListener(this);
+	bi->removeItemListener(this);
 	removeChildControllableContainer(bi);
 
 	if (notify)

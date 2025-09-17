@@ -139,8 +139,13 @@
 
 #include "resources/BinaryData.h"
 
+#ifndef NOMINMAX
 #define NOMINMAX
+#endif
+
+#ifndef NOGDI
 #define NOGDI
+#endif
 
 #include "ui/Style.h"
 #include "ui/AssetManager.h"
@@ -282,8 +287,8 @@
 #include "manager/BaseItem.h"
 #include "manager/ItemGroup.h"
 
-#include "manager/ui/BaseItemMinimalUI.h"
-#include "manager/ui/BaseItemUI.h"
+#include "manager/ui/ItemMinimalUI.h"
+#include "manager/ui/ItemUI.h"
 #include "manager/ui/BaseItemEditor.h"
 #include "manager/ui/GenericManagerEditor.h"
 
