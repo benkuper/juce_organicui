@@ -399,12 +399,12 @@ void ControllableContainer::setNiceName(const String& _niceName)
 
 	String oldControlAddress = getControlAddress();
 
-	String prevShortName = shortName;
+	String prevNiceName = niceName;
 	niceName = _niceName;
 	if (!hasCustomShortName) setAutoShortName();
 	scriptObject.getDynamicObject()->setProperty("niceName", niceName);
 	//scriptObjectIsDirty = true;
-	controllableContainerListeners.call(&ControllableContainerListener::controllableContainerNameChanged, this, prevShortName);
+	controllableContainerListeners.call(&ControllableContainerListener::controllableContainerNameChanged, this, prevNiceName);
 
 #if ORGANICUI_USE_WEBSERVER
 	if (OSCRemoteControl::getInstanceWithoutCreating() != nullptr && isAttachedToRoot()) OSCRemoteControl::getInstance()->sendPathNameChangedFeedback(oldControlAddress, getControlAddress());
