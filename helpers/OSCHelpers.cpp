@@ -321,6 +321,11 @@ void OSCHelpers::handleControllableForOSCMessage(Controllable* c, const OSCMessa
 			else static_cast<EnumParameter*>(p)->setValueWithKey(getStringArg(m[dataOffset]));
 			break;
 
+		case Controllable::TARGET:
+			if (m.size() < dataOffset + 1) LOG("Parameter " << p->niceName << " requires at least 1 argument");
+			else p->setValue(getStringArg(m[dataOffset]));
+			break;
+
 		default:
 			LOG("Type not handled : " << c->getTypeString());
 			break;
