@@ -576,6 +576,7 @@ void OSCQueryHelpers::createOrUpdateControllableFromData(ControllableContainer* 
 	{
 		c->setNiceName(cNiceName);
 		c->setCustomShortName(name);
+		c->isCustomizableByUser = true;
 		if (access == 1) c->setControllableFeedbackOnly(true);
 		if (addToContainer) parentCC->addControllable(c);
 	}
