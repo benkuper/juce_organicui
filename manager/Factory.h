@@ -131,6 +131,93 @@ public:
 
 };
 
+class SubmenuBuilder
+{
+private:
+	struct SubmenuInfo
+	{
+		juce::String name;
+		juce::PopupMenu popupMenu;
+		std::vector<SubmenuInfo> children;
+		
+		juce::PopupMenu* findOrCreateSubmenu(const juce::StringArray& subMenuPath, int depthLevel)
+		{
+			jassert(!subMenuPath.isEmpty());
+
+			SubmenuInfo* foundMenu = nullptr;
+			for (auto& childMenu : children)
+			{
+				if (childMenu.name == subMenuPath[depthLevel])
+				{
+					foundMenu = &childMenu;
+					break;
+				}
+			}
+			
+			if (foundMenu == nullptr)
+			{
+				SubmenuInfo& newMenu = children.emplace_back();
+				newMenu.name = subMenuPath[depthLevel];
+				foundMenu = &newMenu;
+			}
+			
+			if (subMenuPath.size() == depthLevel + 1)
+			{
+				return &foundMenu->popupMenu;
+			}
+
+			return foundMenu->findOrCreateSubmenu(subMenuPath, depthLevel + 1);
+		}
+		
+		void addToPopupMenu(juce::PopupMenu* parentMenu)
+		{
+			for (auto& child : children)
+			{
+				child.addToPopupMenu(&popupMenu);
+			}
+			parentMenu->addSubMenu(name, popupMenu);
+		}
+	};
+
+public:
+	juce::PopupMenu* findOrCreateSubmenu(const juce::StringArray& subMenuPath)
+	{
+		SubmenuInfo* foundSubMenu = nullptr;
+		for (auto& childMenu : rootMenus)
+		{
+			if (childMenu.name == subMenuPath[0])
+			{
+				foundSubMenu = &childMenu;
+				break;
+			}
+		}
+
+		if (foundSubMenu == nullptr)
+		{
+			SubmenuInfo& newSubmenu = rootMenus.emplace_back();
+			newSubmenu.name = subMenuPath[0];
+			foundSubMenu = &newSubmenu;
+		}
+
+		if (subMenuPath.size() <= 1)
+		{
+			return &foundSubMenu->popupMenu;
+		}
+
+		return foundSubMenu->findOrCreateSubmenu(subMenuPath, 1);
+	}
+	
+	void build(juce::PopupMenu* parentMenu)
+	{
+		for (auto& childMenu : rootMenus)
+		{
+			childMenu.addToPopupMenu(parentMenu);
+		}
+	}
+
+private:
+	std::vector<SubmenuInfo> rootMenus;
+};
 
 template<class T>
 class Factory
@@ -145,8 +232,8 @@ public:
 	virtual void buildPopupMenu(int startOffset = 0)
 	{
 		menu.clear();
-		juce::OwnedArray<juce::PopupMenu> subMenus;
-		juce::Array<juce::String> subMenuNames;
+
+		SubmenuBuilder builder;
 
 		for (auto& d : defs)
 		{
@@ -154,31 +241,16 @@ public:
 
 			if (d->menuPath.isEmpty())
 			{
-				menu.addItem(itemID, d->type, d->isEnabled, false, d->icon);
+				menu.addItem(itemID, d->getMenuItem, d->isEnabled, false, d->icon);
 				continue;
 			}
 
-			int subMenuIndex = -1;
-
-			for (int i = 0; i < subMenus.size(); ++i)
-			{
-				if (subMenuNames[i] == d->menuPath)
-				{
-					subMenuIndex = i;
-					break;
-				}
-			}
-			if (subMenuIndex == -1)
-			{
-				subMenuNames.add(d->menuPath);
-				subMenus.add(new juce::PopupMenu());
-				subMenuIndex = subMenus.size() - 1;
-			}
-
-			subMenus[subMenuIndex]->addItem(itemID, d->type, d->isEnabled, false, d->icon);
+			juce::StringArray itemMenuPath = juce::StringArray::fromTokens(d->menuPath, "/", "");
+			auto itemMenu = builder.findOrCreateSubmenu(itemMenuPath);
+			itemMenu->addItem(itemID, d->type, true, false, d->icon);
 		}
 
-		for (int i = 0; i < subMenus.size(); ++i) menu.addSubMenu(subMenuNames[i], *subMenus[i]);
+		builder.build(&menu);
 	}
 
 	virtual void showCreateMenu(std::function<void(T*)> returnFunc)
