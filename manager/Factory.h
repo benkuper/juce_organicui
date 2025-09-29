@@ -32,6 +32,8 @@ public:
 		this->icon = icon;
 		return this;
 	}
+	
+	virtual const juce::String& getMenuItemName() const { return type; }
 
 	virtual T* create() { jassertfalse; return new T(); }
 };
@@ -241,13 +243,13 @@ public:
 
 			if (d->menuPath.isEmpty())
 			{
-				menu.addItem(itemID, d->getMenuItem, d->isEnabled, false, d->icon);
+				menu.addItem(itemID, d->getMenuItemName(), d->isEnabled, false, d->icon);
 				continue;
 			}
 
 			juce::StringArray itemMenuPath = juce::StringArray::fromTokens(d->menuPath, "/", "");
 			auto itemMenu = builder.findOrCreateSubmenu(itemMenuPath);
-			itemMenu->addItem(itemID, d->type, true, false, d->icon);
+			itemMenu->addItem(itemID, d->getMenuItemName(), true, false, d->icon);
 		}
 
 		builder.build(&menu);
