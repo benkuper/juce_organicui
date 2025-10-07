@@ -140,6 +140,7 @@ const String& CustomLoggerUI::getContentForRow(const int r) const
 	int count = 0;
 	int idx = 0;
 
+	GenericScopedLock lock(logger->logElements.getLock());
 	while (idx < logger->logElements.size())
 	{
 
@@ -353,6 +354,8 @@ String CustomLoggerUI::LogList::getTextAt(int rowNumber, int columnId) {
 	String text;
 
 	if (owner == nullptr) return text;
+
+	GenericScopedLock lock(owner->logger->logElements.getLock());
 
 	switch (columnId)
 	{
