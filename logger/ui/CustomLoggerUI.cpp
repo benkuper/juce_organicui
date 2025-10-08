@@ -147,10 +147,8 @@ const String& CustomLoggerUI::getContentForRow(const int r) const
 
 		CustomLogger::LogEvent* e = logEvents[idx];
 		int nl = e->numLines;
-		DBG("Num lines here : " << nl);
 		if (count + nl > r)
 		{
-			jassert(logEvents[idx]->contentLines.size() > r - count);
 			return logEvents[idx]->contentLines[r - count];
 		}
 
@@ -158,7 +156,6 @@ const String& CustomLoggerUI::getContentForRow(const int r) const
 		idx++;
 	}
 	
-	jassertfalse;
 	return EmptyString;
 };
 
@@ -279,8 +276,12 @@ void CustomLoggerUI::newMessage(const CustomLogger::LogEvent& e)
 
 	//coalesce messages
 
-	CustomLogger::LogEvent ev(e.time, e.content, e.source, e.severity, e.severityName);
+	String content = e.content.retainCharacters(" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\n\r\t");
+	CustomLogger::LogEvent ev(e.time, content, e.source, e.severity, e.severityName);
 	logEvents.add(new CustomLogger::LogEvent(ev));
+
+
+
 	if (logEvents.size() > MAX_LOGS) logEvents.remove(0);
 
 	if (!Timer::isTimerRunning())
@@ -367,26 +368,20 @@ String CustomLoggerUI::LogList::getTextAt(int rowNumber, int columnId) {
 	switch (columnId)
 	{
 	case 1:
-		DBG("get time for row " << rowNumber);
 		text = owner->isPrimaryRow(rowNumber) ? owner->getTimeStringForRow(rowNumber) : "";
 		break;
 
 	case 2:
-		DBG("get source for row " << rowNumber);
 		text = owner->isPrimaryRow(rowNumber) ? owner->getSourceForRow(rowNumber) : "";
 		break;
 
 	case 3:
-		DBG("get content for row " << rowNumber);
 		text = owner->getContentForRow(rowNumber);
 		break;
 	}
 
 	//check text is valid ascii text to render
-	text = text.retainCharacters(" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\n\r\t");
 
-
-	DBG("get text for row " << rowNumber << ", column " << columnId << ": " << text);
 
 	return text;
 
