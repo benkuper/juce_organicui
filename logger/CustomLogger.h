@@ -17,12 +17,24 @@ public:
 
 	struct LogEvent
 	{
-		LogEvent(LogElement* l) : time(l->time), content(l->getContent()), source(l->source), severityName(l->getSeverityName()) {}
+		LogEvent(LogElement* l) : time(l->time), content(l->getContent()), source(l->source), severity(l->severity), severityName(l->getSeverityName()) {
+			contentLines = juce::StringArray::fromLines(content);
+			numLines = contentLines.size();
+		}
 		~LogEvent() {}
+		LogEvent(juce::Time time, juce::String content, juce::String source, LogElement::Severity severity, juce::String severityName) :
+			time(time), content(content), source(source), severity(severity), severityName(severityName) {
+			contentLines = juce::StringArray::fromLines(content);
+			numLines = contentLines.size();
+		}
+
 		juce::Time time;
 		juce::String content;
+		juce::StringArray contentLines;
 		juce::String source;
+		LogElement::Severity severity;
 		juce::String severityName;
+		int numLines;
 		juce::String getFullLog() const { return time.toString(false, true, true, true) + " [" + severityName + "] " + source + " : " + content; }
 	};
 

@@ -68,13 +68,14 @@ public:
 		CustomLoggerUI* owner;
 		friend class CustomLoggerUI;
 	};
-
+	
 	CustomLogger* logger;
 
 	void resized()override;
 	LogList logList;
 	juce::TextButton clearB, copyB, autoScrollB;
 	std::unique_ptr<juce::TableListBox> logListComponent;
+	juce::OwnedArray<CustomLogger::LogEvent, juce::CriticalSection> logEvents;
 	int maxNumElement;
 
 	void buttonClicked(juce::Button*) override;
@@ -95,7 +96,7 @@ private:
 
 	juce::Atomic<int> totalLogRow;
 	void updateTotalLogRow();
-	const juce::WeakReference<LogElement> getElementForRow(const int r) const;
+	const CustomLogger::LogEvent* getElementForRow(const int r) const;
 	const juce::String& getSourceForRow(const int r) const;
 	const bool isPrimaryRow(const int r) const;
 	const juce::String& getContentForRow(const int r) const;
