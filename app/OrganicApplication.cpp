@@ -236,7 +236,66 @@ void OrganicApplication::newMessage(const AppUpdateEvent& e)
 #if JUCE_MAC
 			chmod(File::getSpecialLocation(File::currentExecutableFile).getFullPathName().toUTF8(), S_IRWXO | S_IRWXU | S_IRWXG);
 #endif
-	}
+		}
+		else if (e.file.hasFileExtension("AppImage"))
+		{
+#ifdef JUCE_LINUX
+			// Query AppImage env variables
+			auto appImageEnvVar = juce::SystemStats::getEnvironmentVariable("APPIMAGE", "");
+			auto argv0EnvVar = juce::SystemStats::getEnvironmentVariable("ARGV0", "");
+			auto owdEnvVar = juce::SystemStats::getEnvironmentVariable("OWD", "");
+
+			if (appImageEnvVar.isEmpty() || argv0EnvVar.isEmpty() || owdEnvVar.isEmpty())
+			{
+				LOGERROR("It seems we're not running from an AppImage, cannot update.");
+				return;
+			}
+
+			// Copy the downloaded AppImage next to the current one
+			File currentAppImageFile = File(appImageEnvVar);
+			File targetAppImageFile = currentAppImageFile.getParentDirectory().getChildFile(e.file.getFileName());
+			if (!e.file.copyFileTo(targetAppImageFile))
+			{
+				LOGERROR("Could not copy the downloaded file to current directory.");
+				return;
+			}
+
+			if (!targetAppImageFile.setExecutePermission(true))
+			{
+				LOGERROR("Could not give execution permission to the downloaded file.");
+				return;
+			}
+
+			// If running from a symlink, point it to the new version
+			File currentExecutedFile;
+			if (File::isAbsolutePath(argv0EnvVar))
+			{
+				currentExecutedFile = File(argv0EnvVar);
+			}
+			else if (File::isAbsolutePath(owdEnvVar + "/" + argv0EnvVar))
+			{
+				currentExecutedFile = File(owdEnvVar + "/" + argv0EnvVar);
+			}
+			else
+			{
+				LOGWARNING("Could not determine absolute path to executed file");
+				return;
+			}
+
+			if (currentExecutedFile.isSymbolicLink())
+			{
+				if (!targetAppImageFile.createSymbolicLink(currentExecutedFile, true))
+				{
+					LOGERROR("Could not replace symbolic link: " + currentExecutedFile.getFullPathName());
+					return;
+				}
+			}
+
+			JUCEApplication::getInstance()->systemRequestedQuit();
+#else
+			LOGERROR("Downloaded file is an AppImage but we're not running on linux");
+#endif
+		}
 		else
 		{
 			File appFile = File::getSpecialLocation(File::tempDirectory).getChildFile(getApplicationName() + String("_install" + e.file.getFileExtension()));
