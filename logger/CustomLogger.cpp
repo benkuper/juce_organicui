@@ -15,6 +15,7 @@ const String & CustomLogger::getWelcomeMessage() {
 
 void CustomLogger::logMessage(const String& message)
 {
+	GenericScopedLock lock(logElements.getLock());
 	LogElement* el = new LogElement(message);
 	while (logElements.size() >= MAX_LOGS)
 	{

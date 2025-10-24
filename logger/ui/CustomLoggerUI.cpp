@@ -99,10 +99,10 @@ void CustomLoggerUI::updateTotalLogRow()
 {
 	totalLogRow = 0;
 
-	GenericScopedLock lock(logger->logElements.getLock());
-	for (auto& l : logger->logElements)
+	GenericScopedLock lock(logEvents.getLock());
+	for (auto& l : logEvents)
 	{
-		totalLogRow += l->getNumLines();
+		totalLogRow += l->numLines;
 	}
 
 }
@@ -119,15 +119,15 @@ const bool CustomLoggerUI::isPrimaryRow(const int r) const
 	int count = 0;
 	int idx = 0;
 
-	GenericScopedLock lock(logger->logElements.getLock());
-	while (count <= r && idx < logger->logElements.size())
+	GenericScopedLock lock(logEvents.getLock());
+	while (count <= r && idx < logEvents.size())
 	{
 		if (count == r)
 		{
 			return true;
 		}
-		if (logger->logElements.size() <= idx) return false;
-		count += logger->logElements[idx]->getNumLines();
+		if (logEvents.size() <= idx) return false;
+		count += logEvents[idx]->numLines;
 		idx++;
 
 	}
@@ -140,40 +140,42 @@ const String& CustomLoggerUI::getContentForRow(const int r) const
 	int count = 0;
 	int idx = 0;
 
-	while (idx < logger->logElements.size())
+	GenericScopedLock lock(logEvents.getLock());
+	int numEvents = logEvents.size();
+	while (idx < numEvents)
 	{
 
-		int nl = logger->logElements.getUnchecked(idx)->getNumLines();
-
+		CustomLogger::LogEvent* e = logEvents[idx];
+		int nl = e->numLines;
 		if (count + nl > r)
 		{
-			return logger->logElements.getUnchecked(idx)->getLine(r - count);
+			return logEvents[idx]->contentLines[r - count];
 		}
 
 		count += nl;
 		idx++;
 	}
-
+	
 	return EmptyString;
 };
 
-const WeakReference<LogElement> CustomLoggerUI::getElementForRow(const int r) const {
+const CustomLogger::LogEvent* CustomLoggerUI::getElementForRow(const int r) const {
 	int count = 0;
 	int idx = 0;
 
-	GenericScopedLock lock(logger->logElements.getLock());
-	while (idx < logger->logElements.size())
+	GenericScopedLock lock(logEvents.getLock());
+	while (idx < logEvents.size())
 	{
-		auto el = logger->logElements.getUnchecked(idx);
+		auto el = logEvents.getUnchecked(idx);
 
-		int nl = el->getNumLines();
+		//count number of \n in el->content
 
-		if (count + nl > r)
+		if (count + el->numLines > r)
 		{
 			return el;
 		}
 
-		count += nl;
+		count += el->numLines;
 		idx++;
 	}
 
@@ -266,13 +268,22 @@ MouseCursor  CustomLoggerUI::getMouseCursor() {
 	return MouseCursor::IBeamCursor;
 }
 
-void CustomLoggerUI::newMessage(const CustomLogger::LogEvent& message)
+void CustomLoggerUI::newMessage(const CustomLogger::LogEvent& e)
 {
-	//LogElement* el = logger->logElements[logger->logElements.size() - 1];
-	//totalLogRow += el->getNumLines();
+	//LogElement* el = logEvents[logEvents.size() - 1];
+	//totalLogRow += el->numLines;
 	//bool overFlow = false;
 
 	//coalesce messages
+
+	String content = e.content.retainCharacters(" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\n\r\t");
+	CustomLogger::LogEvent ev(e.time, content, e.source, e.severity, e.severityName);
+	logEvents.add(new CustomLogger::LogEvent(ev));
+
+
+
+	if (logEvents.size() > MAX_LOGS) logEvents.remove(0);
+
 	if (!Timer::isTimerRunning())
 	{
 		if (GlobalSettings::getInstanceWithoutCreating() != nullptr)
@@ -286,7 +297,7 @@ void CustomLoggerUI::newMessage(const CustomLogger::LogEvent& message)
 
 void CustomLoggerUI::clearLogger()
 {
-	logger->logElements.clear();
+	logEvents.clear();
 	totalLogRow = 0;
 	logListComponent->updateContent();
 	LOG(juce::translate("Cleared."));
@@ -350,7 +361,7 @@ const Font  getLogFont() {
 }
 
 String CustomLoggerUI::LogList::getTextAt(int rowNumber, int columnId) {
-	String text;
+	String text = "";
 
 	if (owner == nullptr) return text;
 
@@ -368,6 +379,10 @@ String CustomLoggerUI::LogList::getTextAt(int rowNumber, int columnId) {
 		text = owner->getContentForRow(rowNumber);
 		break;
 	}
+
+	//check text is valid ascii text to render
+
+
 	return text;
 
 }
@@ -439,7 +454,7 @@ String CustomLoggerUI::LogList::getCellTooltip(int rowNumber, int /*columnId*/)
 	return
 		(sR.isNotEmpty() ?
 			sR + " (" + el->time.toString(false, true, true, true) + ")" + "\n" : "")
-		+ (el->getNumLines() < 10 ? el->content : owner->getSourceForRow(rowNumber));
+		+ (el->numLines < 10 ? el->content : owner->getSourceForRow(rowNumber));
 
 
 };
@@ -484,12 +499,12 @@ void CustomLoggerUI::buttonClicked(Button* b)
 
 	else if (b == &copyB) {
 		String s;
-		for (auto& el : logger->logElements) {
+		for (auto& el : logEvents) {
 			int leftS = el->source.length() + 3;
 			s += el->time.toString(false, true, true, true) + "\t" + el->source + "\t";
-			for (int i = 0; i < el->getNumLines(); ++i) {
+			for (int i = 0; i < el->numLines; ++i) {
 				if (i != 0)for (int j = 0; j < leftS; j++) s += " ";
-				s += el->getLine(i) + "\n";
+				s += el->contentLines[i] + "\n";
 			}
 		}
 		SystemClipboard::copyTextToClipboard(s);
