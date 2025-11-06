@@ -334,13 +334,21 @@ void Engine::setLastDocumentOpened(const File& file) {
 
 }
 
+File Engine::getAutosavesDirectory(const File& originalFile) const
+{
+	String curFileName = originalFile.getFileNameWithoutExtension();
+	File curFileFolder = originalFile.getParentDirectory();
+	File autoSaveDir = curFileFolder.getChildFile(curFileName + "_autosave");
+	
+	return autoSaveDir;
+}
+
 bool Engine::checkAutoRestoreAutosave(const juce::File& originalFile, std::function<void(const juce::File&)> cancelCallback)
 {
 	if (!GlobalSettings::getInstance()->autoAskRestore->boolValue()) return false;
 	if (getMainWindow() == nullptr) return false; //only ask if there is a window
 
-	String curFileName = originalFile.getFileNameWithoutExtension();
-	File autoSaveDir = originalFile.getParentDirectory().getChildFile(curFileName + "_autosave");
+	File autoSaveDir = getAutosavesDirectory(originalFile);
 	autoSaveDir.createDirectory();
 	Array<File> files = autoSaveDir.findChildFiles(File::findFiles, false, "*" + fileExtension);
 	std::sort(files.begin(), files.end(), [](const File& a, const File& b) { return a.getLastModificationTime() > b.getLastModificationTime(); });
@@ -388,6 +396,20 @@ void Engine::restoreAutosave(const juce::File& originalFile, const juce::File& a
 	loadDocument(originalFile);
 }
 
+void Engine::removeNewerAutosaves() const
+{
+	const File& currentFile = getFile();
+	const File autosavesDir = getAutosavesDirectory(currentFile);
+
+	const Array<File> autosaveFiles = autosavesDir.findChildFiles(File::findFiles, false, "*" + fileExtension);
+	for (const File& autosave : autosaveFiles)
+	{
+		if (autosave.getLastModificationTime() > currentFile.getLastModificationTime())
+		{
+			autosave.deleteFile();
+		}
+	}
+}
 
 var Engine::getJSONData(bool includeNonOverriden)
 {
