@@ -73,8 +73,12 @@ public:
 	juce::File getLastDocumentOpened() override;
 	void setLastDocumentOpened(const juce::File& file) override;
 
+	juce::File getAutosavesDirectory(const juce::File& originalFile) const;
 	virtual bool checkAutoRestoreAutosave(const juce::File& originalFile, std::function<void(const juce::File&)> cancelCallback);
 	void restoreAutosave(const juce::File& originalFile, const juce::File& autosaveFile);
+	
+	/// @brief Remove all existing autosaves newer that the current file
+	void removeNewerAutosaves() const;
 
 	//    #if JUCE_MODAL_LOOPS_PERMITTED
 	//     File getSuggestedSaveAsFile (const File& defaultFile)override;

@@ -158,11 +158,23 @@ void OrganicApplication::systemRequestedQuit()
 {
 	Engine::mainEngine->saveIfNeededAndUserAgreesAsync([](FileBasedDocument::SaveResult result)
 		{
-			if (result == FileBasedDocument::SaveResult::userCancelledSave) return;
-			else if (result == FileBasedDocument::SaveResult::failedToWriteToFile)
+			switch (result)
+			{
+			case FileBasedDocument::SaveResult::userCancelledSave:
+			{
+				return;
+			}
+			case FileBasedDocument::SaveResult::failedToWriteToFile:
 			{
 				LOGERROR("Could not save the document (Failed to write to file)\nCancelled loading of the new document");
 				return;
+			}
+			case FileBasedDocument::SaveResult::savedOk:
+			{
+				// User explicitely requested not to save, clear newer autosaves
+				Engine::mainEngine->removeNewerAutosaves();
+				break;
+			}
 			}
 
 			// This is called when the app is being asked to quit: you can ignore this
@@ -170,7 +182,6 @@ void OrganicApplication::systemRequestedQuit()
 			quit();
 		}
 	);
-
 }
 
 void OrganicApplication::anotherInstanceStarted(const String& commandLine)
