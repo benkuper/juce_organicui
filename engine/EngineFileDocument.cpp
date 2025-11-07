@@ -336,6 +336,7 @@ void Engine::setLastDocumentOpened(const File& file) {
 
 File Engine::getAutosavesDirectory(const File& originalFile) const
 {
+	if (!originalFile.existsAsFile()) return;
 	String curFileName = originalFile.getFileNameWithoutExtension();
 	File curFileFolder = originalFile.getParentDirectory();
 	File autoSaveDir = curFileFolder.getChildFile(curFileName + "_autosave");
