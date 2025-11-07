@@ -52,6 +52,7 @@ public:
 	BoolParameter* closeToSystemTray;
 	BoolParameter* enableTooltips;
 	IntParameter* fontSize;
+	IntParameter* p2dCanvasHandleSize;
 	EnumParameter* helpLanguage;
 	BoolParameter* useGLRenderer;
 	IntParameter* uiRefreshRate;

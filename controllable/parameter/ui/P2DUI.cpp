@@ -51,7 +51,7 @@ void P2DUI::paint(Graphics& g)
 {
 	if (parameter == nullptr || parameter.wasObjectDeleted()) return;
 
-	float radius = 4.5f;
+	float radius = GlobalSettings::getInstance()->p2dCanvasHandleSize->floatValue();
 	Colour bgColor = useCustomBGColor ? customBGColor : BG_COLOR;
 
 	g.setColour(bgColor.darker(.3f));
