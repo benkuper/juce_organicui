@@ -336,7 +336,7 @@ void Engine::setLastDocumentOpened(const File& file) {
 
 File Engine::getAutosavesDirectory(const File& originalFile) const
 {
-	if (!originalFile.existsAsFile()) return;
+	if (!originalFile.existsAsFile()) return File();
 	String curFileName = originalFile.getFileNameWithoutExtension();
 	File curFileFolder = originalFile.getParentDirectory();
 	File autoSaveDir = curFileFolder.getChildFile(curFileName + "_autosave");
@@ -348,6 +348,7 @@ bool Engine::checkAutoRestoreAutosave(const juce::File& originalFile, std::funct
 {
 	if (!GlobalSettings::getInstance()->autoAskRestore->boolValue()) return false;
 	if (getMainWindow() == nullptr) return false; //only ask if there is a window
+	if (!originalFile.existsAsFile()) return false;
 
 	File autoSaveDir = getAutosavesDirectory(originalFile);
 	autoSaveDir.createDirectory();
@@ -400,6 +401,8 @@ void Engine::restoreAutosave(const juce::File& originalFile, const juce::File& a
 void Engine::removeNewerAutosaves() const
 {
 	const File& currentFile = getFile();
+	if (!currentFile.existsAsFile()) return;
+
 	const File autosavesDir = getAutosavesDirectory(currentFile);
 
 	const Array<File> autosaveFiles = autosavesDir.findChildFiles(File::findFiles, false, "*" + fileExtension);
