@@ -40,7 +40,6 @@ Engine::Engine(const String& fileName, const String& fileExtension) :
 
 	selectionManager.reset(new InspectableSelectionManager(true)); //selectionManager constructor
 
-	Logger::setCurrentLogger(CustomLogger::getInstance());
 	addChildControllableContainer(ProjectSettings::getInstance());
 
 	addChildControllableContainer(DashboardManager::getInstance());
@@ -88,9 +87,8 @@ Engine::~Engine() {
 	AssetManager::deleteInstance();
 	ProjectSettings::deleteInstance();
 
-	WarningReporter::deleteInstance();
-
 	OSCRemoteControl::deleteInstance();
+	WarningReporter::deleteInstance();
 
 	Engine::mainEngine = nullptr;
 }

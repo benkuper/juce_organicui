@@ -18,7 +18,6 @@ OpenGLContext* getOpenGLContext() { return getApp().mainComponent->openGLContext
 ApplicationCommandManager& getCommandManager() { return getApp().commandManager; }
 OrganicApplication::MainWindow* getMainWindow() { return getApp().mainWindow.get(); }
 
-
 OrganicApplication::OrganicApplication(const String& appName, bool useWindow, const Image& trayIcon) :
 	appSettings("Other Settings"),
 	engine(nullptr),
@@ -32,6 +31,8 @@ OrganicApplication::OrganicApplication(const String& appName, bool useWindow, co
 	options.osxLibrarySubFolder = "Preferences";
 	appProperties = std::make_unique<ApplicationProperties>();
 	appProperties->setStorageParameters(options);
+
+	Logger::setCurrentLogger(CustomLogger::getInstance());
 }
 
 const String OrganicApplication::getApplicationName() { return ProjectInfo::projectName; }
@@ -57,6 +58,7 @@ bool OrganicApplication::moreThanOneInstanceAllowed()
 
 void OrganicApplication::initialise(const String& commandLine)
 {
+
 	initialiseInternal(commandLine);
 
 	CommandLineElements commands = StringUtil::parseCommandLine(commandLine);

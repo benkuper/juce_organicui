@@ -72,6 +72,7 @@ OSCRemoteControl::~OSCRemoteControl()
 		server->stop();
 		server.reset();
 	}
+
 	if (WarningReporter::getInstanceWithoutCreating() != nullptr)
 	{
 		WarningReporter::getInstance()->removeAsyncWarningReporterListener(this);
@@ -95,6 +96,11 @@ void OSCRemoteControl::setupReceiver()
 #if ORGANICUI_USE_SERVUS
 		setupZeroconf();
 #endif
+
+#if ORGANICUI_USE_WEBSERVER
+		setupServer();
+		updateEngineListener();
+#endif
 		return;
 	}
 
@@ -103,6 +109,8 @@ void OSCRemoteControl::setupReceiver()
 
 	if (receiverIsConnected)
 	{
+		clearWarning("portBind");
+
 #if ORGANICUI_USE_WEBSERVER
 		setupServer();
 		updateEngineListener();
@@ -111,11 +119,15 @@ void OSCRemoteControl::setupReceiver()
 		NLOG(niceName, "Now receiving on port : " + localPort->stringValue());
 #if ORGANICUI_USE_SERVUS
 		setupZeroconf();
+
 #endif
 	}
 	else
 	{
-		NLOGERROR(niceName, "Error binding port " + localPort->stringValue());
+		//NLOGERROR(niceName, "Error binding port " + localPort->stringValue());
+		setWarningMessage("Error binding port " + localPort->stringValue(), "portBind");
+		Timer::callAfterDelay(5000, [this]() { setupReceiver(); });
+		return;
 	}
 
 	Array<IPAddress> ad;
@@ -485,6 +497,14 @@ void OSCRemoteControl::run()
 #if ORGANICUI_USE_WEBSERVER
 void OSCRemoteControl::setupServer()
 {
+	if (server != nullptr)
+	{
+		server->stop();
+		server.reset();
+	}
+	
+	if (!enabled->boolValue()) return;
+
 	server.reset(new SimpleWebSocketServer());
 	server->addHTTPRequestHandler(this);
 	server->addWebSocketListener(this);
