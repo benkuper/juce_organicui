@@ -20,6 +20,7 @@ AssetManager::AssetManager()
 	relativeImage = ImageCache::getFromMemory(OrganicUIBinaryData::relative_png, OrganicUIBinaryData::relative_pngSize);
 	minusImage = ImageCache::getFromMemory(OrganicUIBinaryData::minus_png, OrganicUIBinaryData::minus_pngSize);
 	explorerImage = ImageCache::getFromMemory(OrganicUIBinaryData::explorer_png, OrganicUIBinaryData::explorer_pngSize);
+	padlockImage = ImageCache::getFromMemory(OrganicUIBinaryData::padlock_png, OrganicUIBinaryData::padlock_pngSize);
 }
 
 AssetManager::~AssetManager()

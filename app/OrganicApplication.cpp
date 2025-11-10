@@ -18,7 +18,6 @@ OpenGLContext* getOpenGLContext() { return getApp().mainComponent->openGLContext
 ApplicationCommandManager& getCommandManager() { return getApp().commandManager; }
 OrganicApplication::MainWindow* getMainWindow() { return getApp().mainWindow.get(); }
 
-
 OrganicApplication::OrganicApplication(const String& appName, bool useWindow, const Image& trayIcon) :
 	appSettings("Other Settings"),
 	engine(nullptr),
@@ -32,6 +31,8 @@ OrganicApplication::OrganicApplication(const String& appName, bool useWindow, co
 	options.osxLibrarySubFolder = "Preferences";
 	appProperties = std::make_unique<ApplicationProperties>();
 	appProperties->setStorageParameters(options);
+
+	Logger::setCurrentLogger(CustomLogger::getInstance());
 }
 
 const String OrganicApplication::getApplicationName() { return ProjectInfo::projectName; }
@@ -57,6 +58,7 @@ bool OrganicApplication::moreThanOneInstanceAllowed()
 
 void OrganicApplication::initialise(const String& commandLine)
 {
+
 	initialiseInternal(commandLine);
 
 	CommandLineElements commands = StringUtil::parseCommandLine(commandLine);
@@ -158,11 +160,23 @@ void OrganicApplication::systemRequestedQuit()
 {
 	Engine::mainEngine->saveIfNeededAndUserAgreesAsync([](FileBasedDocument::SaveResult result)
 		{
-			if (result == FileBasedDocument::SaveResult::userCancelledSave) return;
-			else if (result == FileBasedDocument::SaveResult::failedToWriteToFile)
+			switch (result)
+			{
+			case FileBasedDocument::SaveResult::userCancelledSave:
+			{
+				return;
+			}
+			case FileBasedDocument::SaveResult::failedToWriteToFile:
 			{
 				LOGERROR("Could not save the document (Failed to write to file)\nCancelled loading of the new document");
 				return;
+			}
+			case FileBasedDocument::SaveResult::savedOk:
+			{
+				// User explicitely requested not to save, clear newer autosaves
+				Engine::mainEngine->removeNewerAutosaves();
+				break;
+			}
 			}
 
 			// This is called when the app is being asked to quit: you can ignore this
@@ -170,7 +184,6 @@ void OrganicApplication::systemRequestedQuit()
 			quit();
 		}
 	);
-
 }
 
 void OrganicApplication::anotherInstanceStarted(const String& commandLine)
@@ -236,7 +249,66 @@ void OrganicApplication::newMessage(const AppUpdateEvent& e)
 #if JUCE_MAC
 			chmod(File::getSpecialLocation(File::currentExecutableFile).getFullPathName().toUTF8(), S_IRWXO | S_IRWXU | S_IRWXG);
 #endif
-	}
+		}
+		else if (e.file.hasFileExtension("AppImage"))
+		{
+#ifdef JUCE_LINUX
+			// Query AppImage env variables
+			auto appImageEnvVar = juce::SystemStats::getEnvironmentVariable("APPIMAGE", "");
+			auto argv0EnvVar = juce::SystemStats::getEnvironmentVariable("ARGV0", "");
+			auto owdEnvVar = juce::SystemStats::getEnvironmentVariable("OWD", "");
+
+			if (appImageEnvVar.isEmpty() || argv0EnvVar.isEmpty() || owdEnvVar.isEmpty())
+			{
+				LOGERROR("It seems we're not running from an AppImage, cannot update.");
+				return;
+			}
+
+			// Copy the downloaded AppImage next to the current one
+			File currentAppImageFile = File(appImageEnvVar);
+			File targetAppImageFile = currentAppImageFile.getParentDirectory().getChildFile(e.file.getFileName());
+			if (!e.file.copyFileTo(targetAppImageFile))
+			{
+				LOGERROR("Could not copy the downloaded file to current directory.");
+				return;
+			}
+
+			if (!targetAppImageFile.setExecutePermission(true))
+			{
+				LOGERROR("Could not give execution permission to the downloaded file.");
+				return;
+			}
+
+			// If running from a symlink, point it to the new version
+			File currentExecutedFile;
+			if (File::isAbsolutePath(argv0EnvVar))
+			{
+				currentExecutedFile = File(argv0EnvVar);
+			}
+			else if (File::isAbsolutePath(owdEnvVar + "/" + argv0EnvVar))
+			{
+				currentExecutedFile = File(owdEnvVar + "/" + argv0EnvVar);
+			}
+			else
+			{
+				LOGWARNING("Could not determine absolute path to executed file");
+				return;
+			}
+
+			if (currentExecutedFile.isSymbolicLink())
+			{
+				if (!targetAppImageFile.createSymbolicLink(currentExecutedFile, true))
+				{
+					LOGERROR("Could not replace symbolic link: " + currentExecutedFile.getFullPathName());
+					return;
+				}
+			}
+
+			JUCEApplication::getInstance()->systemRequestedQuit();
+#else
+			LOGERROR("Downloaded file is an AppImage but we're not running on linux");
+#endif
+		}
 		else
 		{
 			File appFile = File::getSpecialLocation(File::tempDirectory).getChildFile(getApplicationName() + String("_install" + e.file.getFileExtension()));

@@ -32,6 +32,7 @@ public:
 	juce::Image relativeImage;
 	juce::Image minusImage;
 	juce::Image explorerImage;
+	juce::Image padlockImage;
 
 
 	juce::ImageButton * getRemoveBT();

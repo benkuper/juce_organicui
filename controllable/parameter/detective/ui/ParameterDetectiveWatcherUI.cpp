@@ -1,3 +1,4 @@
+#include "JuceHeader.h"
 
 ParameterDetectiveWatcherUI::ParameterDetectiveWatcherUI(ParameterDetectiveWatcher* watcher) :
 	ControllableDetectiveWatcherUI(watcher),
