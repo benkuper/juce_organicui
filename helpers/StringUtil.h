@@ -59,6 +59,7 @@ class StringUtil
 {
 public:
 	static juce::String toShortName(const juce::String& niceName, bool replaceSlashes = false);
+	static juce::String toNiceName(const juce::String& shortName, bool replaceSlashes = false);
 	static CommandLineElements parseCommandLine(const juce::String& commandLine);
 
 

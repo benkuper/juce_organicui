@@ -75,7 +75,7 @@ void ParameterDetectiveWatcherUI::paintWatcherInternal(Graphics& g, const juce::
 
 	for (int i = 0; i < paths.size(); ++i)
 	{
-		if (numParamValues > 1) g.setColour(Colour::fromHSV(.03f + .3f * i, 1, 1, 1));
+		if (numParamValues > 1) g.setColour(Colour::fromHSV(.03f + .3f * i, 1.f, 1.f, 1.f));
 		else g.setColour(FRONT_COLOR);
 		g.strokePath(*paths[i], PathStrokeType(.5f));
 	}
