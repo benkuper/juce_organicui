@@ -143,6 +143,9 @@ void OrganicApplication::shutdown()
 	CrashDumpUploader::deleteInstance();
 	AppUpdater::deleteInstance();
 
+	Logger::setCurrentLogger(nullptr);
+	CustomLogger::deleteInstance();
+
 	if (mainComponent == nullptr) return;
 
 	saveGlobalSettings();
