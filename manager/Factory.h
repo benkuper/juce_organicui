@@ -312,8 +312,8 @@ public:
 	{
 		if (!extendedType.matchesWildcard("*/*", true)) return nullptr;
 
-		juce::String menuPath = extendedType.substring(0, extendedType.indexOf("/"));
-		juce::String type = extendedType.substring(extendedType.indexOf("/") + 1, extendedType.length());
+		juce::String menuPath = extendedType.substring(0, extendedType.lastIndexOf("/"));
+		juce::String type = extendedType.substring(extendedType.lastIndexOf("/") + 1, extendedType.length());
 
 		for (auto& d : defs)
 		{
