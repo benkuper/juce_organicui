@@ -99,6 +99,7 @@ void OSCRemoteControl::setupReceiver()
 
 #if ORGANICUI_USE_WEBSERVER
 		setupServer();
+		updateEngineListener();
 #endif
 		return;
 	}
