@@ -96,6 +96,10 @@ void OSCRemoteControl::setupReceiver()
 #if ORGANICUI_USE_SERVUS
 		setupZeroconf();
 #endif
+
+#if ORGANICUI_USE_WEBSERVER
+		setupServer();
+#endif
 		return;
 	}
 
@@ -486,6 +490,16 @@ void OSCRemoteControl::run()
 #if ORGANICUI_USE_WEBSERVER
 void OSCRemoteControl::setupServer()
 {
+	if (!enabled->boolValue())
+	{
+		if (server != nullptr)
+		{
+			server->stop();
+			server.reset();
+		}
+		return;
+	}
+
 	server.reset(new SimpleWebSocketServer());
 	server->addHTTPRequestHandler(this);
 	server->addWebSocketListener(this);
@@ -974,14 +988,25 @@ bool OSCRemoteControl::hasClient(const String& id)
 
 void OSCRemoteControl::newMessage(const CustomLogger::LogEvent& e)
 {
-	if (Engine::mainEngine != nullptr && Engine::mainEngine->isClearing) return;
-	if (enableSendLogFeedback != nullptr && !enableSendLogFeedback->boolValue()) return;
-	
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->isClearing)
+	{
+		return;
+	}
+	if (enableSendLogFeedback != nullptr && !enableSendLogFeedback->boolValue())
+	{
+		return;
+	}
+
 	sendLogFeedback(e.severityName, e.source, e.content);
 }
 
 void OSCRemoteControl::sendLogFeedback(const String& type, const String& source, const String& message)
 {
+	if (!enabled->boolValue() || server == nullptr)
+	{
+		return;
+	}
+
 	var msg(new DynamicObject());
 	msg.getDynamicObject()->setProperty("COMMAND", "LOG");
 	var data(new DynamicObject());
