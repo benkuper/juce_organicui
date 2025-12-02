@@ -151,6 +151,9 @@ void OrganicApplication::shutdown()
 	mainComponent->clear();
 	mainWindow = nullptr; // (deletes our window)
 
+
+	Logger::setCurrentLogger(nullptr);
+	CustomLogger::deleteInstance();
 }
 
 

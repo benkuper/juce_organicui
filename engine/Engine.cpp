@@ -75,8 +75,6 @@ Engine::~Engine() {
 	Outliner::deleteInstance();
 
 	//PresetManager::deleteInstance();
-	Logger::setCurrentLogger(nullptr);
-	CustomLogger::deleteInstance();
 
 	ControllableFactory::deleteInstance();
 	ScriptUtil::deleteInstance();
