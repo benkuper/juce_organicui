@@ -997,12 +997,17 @@ void OSCRemoteControl::newMessage(const CustomLogger::LogEvent& e)
 {
 	if (Engine::mainEngine != nullptr && Engine::mainEngine->isClearing) return;
 	if (enableSendLogFeedback != nullptr && !enableSendLogFeedback->boolValue()) return;
-
+	
 	sendLogFeedback(e.severityName, e.source, e.content);
 }
 
 void OSCRemoteControl::sendLogFeedback(const String& type, const String& source, const String& message)
 {
+	if (!enabled->boolValue() || server == nullptr)
+	{
+		return;
+	}
+
 	var msg(new DynamicObject());
 	msg.getDynamicObject()->setProperty("COMMAND", "LOG");
 	var data(new DynamicObject());

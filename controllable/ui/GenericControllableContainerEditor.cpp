@@ -706,7 +706,7 @@ void GenericControllableContainerEditor::resizedInternalContent(juce::Rectangle<
 {
 	for (auto& cui : childEditors)
 	{
-		if (cui->inspectable.wasObjectDeleted()) continue;
+		if (cui->inspectable == nullptr || cui->inspectable.wasObjectDeleted()) continue;
 		if (cui->isVisible() == cui->inspectable->hideInEditor) cui->setVisible(!cui->inspectable->hideInEditor);
 		if (cui->inspectable->hideInEditor) continue;
 

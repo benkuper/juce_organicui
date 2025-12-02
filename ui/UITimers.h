@@ -11,7 +11,7 @@
 class UITimerTarget
 {
 public:
-	UITimerTarget(int timerID = -1, juce::String _name = "", bool safeRepaintCheck = false);
+	UITimerTarget(int timerID = 0, juce::String _name = "", bool safeRepaintCheck = false);
 	virtual ~UITimerTarget();
 
 	int paintTimerID;

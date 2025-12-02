@@ -14,6 +14,7 @@
 #pragma warning(disable:4245)
 
 #include "JuceHeader.h"
+#include "StringUtil.h"
 
 using namespace juce;
 
@@ -63,6 +64,70 @@ String StringUtil::toShortName(const String& niceName, bool replaceSlashes) {
 	}
 
 	return sa.joinIntoString("");
+}
+
+juce::String StringUtil::toNiceName(const juce::String& shortName, bool replaceSlashes)
+{
+	if (shortName.isEmpty()) return "";
+
+	juce::String niceName;
+	niceName.preallocateBytes(shortName.length() * 2);
+
+	for (int i = 0; i < shortName.length(); ++i)
+	{
+		juce::juce_wchar currentChar = shortName[i];
+
+		if (i > 0)
+		{
+			juce::juce_wchar prevChar = shortName[i - 1];
+
+			bool isUpper = juce::CharacterFunctions::isUpperCase(currentChar);
+			bool prevIsUpper = juce::CharacterFunctions::isUpperCase(prevChar);
+			bool isLower = juce::CharacterFunctions::isLowerCase(currentChar);
+			bool prevIsLower = juce::CharacterFunctions::isLowerCase(prevChar);
+			bool isDigit = juce::CharacterFunctions::isDigit(currentChar);
+			bool prevIsDigit = juce::CharacterFunctions::isDigit(prevChar);
+
+			if ((isUpper && prevIsLower) ||
+				(isDigit && !prevIsDigit) ||
+				(isUpper && isLower && prevIsUpper) || // Handles cases like "URL" -> "URL" but "URLValue" -> "URL Value"
+				(currentChar == '_' && prevChar != '_'))
+			{
+				niceName += ' ';
+			}
+		}
+
+		if (currentChar == '_')
+		{
+			if (replaceSlashes)
+			{
+				niceName += '/';
+			}
+			else
+			{
+				// The space is already added, so we just skip the underscore
+			}
+		}
+		else
+		{
+			if (i == 0 || (i > 0 && shortName[i - 1] == ' '))
+			{
+				niceName += juce::CharacterFunctions::toUpperCase(currentChar);
+			}
+			else
+			{
+				niceName += currentChar;
+			}
+		}
+	}
+
+	// Capitalize first letter of the final string
+	if (niceName.isNotEmpty())
+	{
+		niceName = niceName.substring(0, 1).toUpperCase() + niceName.substring(1);
+	}
+
+	return niceName.replace("  ", " ").trim();
 }
 
 #pragma warning(pop)

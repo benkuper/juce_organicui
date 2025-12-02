@@ -555,7 +555,7 @@ void OSCQueryHelpers::createOrUpdateControllableFromData(ControllableContainer* 
 			EnumParameter* ep = (EnumParameter*)c;
 			ep->clearOptions();
 			for (int i = 0; i < options.size(); ++i) ep->addOption(options[i], options[i], false);
-			ep->setValueWithKey(value[0]);
+			if(value.size() > 0) ep->setValueWithKey(value[0]);
 		}
 	}
 	break;
