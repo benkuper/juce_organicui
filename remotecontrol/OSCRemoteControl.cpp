@@ -419,7 +419,7 @@ void OSCRemoteControl::onContainerParameterChanged(Parameter* p)
 {
 	if (p == enabled || p == localPort)
 	{
-		setupReceiver();
+		if(!isCurrentlyLoadingData)	setupReceiver();
 	}
 #if ORGANICUI_USE_WEBSERVER
 	else if (p == enableSendLogFeedback)

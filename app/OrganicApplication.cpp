@@ -135,6 +135,8 @@ void OrganicApplication::initialise(const String& commandLine)
 		}
 	}
 
+	OSCRemoteControl::getInstance()->setupReceiver();
+
 	mainComponent->afterInit();
 }
 
