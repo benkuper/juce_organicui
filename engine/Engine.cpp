@@ -31,8 +31,7 @@ Engine::Engine(const String& fileName, const String& fileExtension) :
 	lastFileAbsolutePath(""),
 	autoSaveIndex(0),
 	engineNotifier(10),
-	isLoadingFile(false),
-	isClearing(false)
+	isLoadingFile(false)
 {
 	//skipControllableNameInAddress = true;
 	isBetaVersion = getAppVersion().containsChar('b');

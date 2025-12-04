@@ -142,7 +142,6 @@ public:
 	DECLARE_ASYNC_EVENT(Engine, Engine, engine, ENUM_LIST(START_LOAD_FILE, FILE_PROGRESS, END_LOAD_FILE, FILE_LOADED, FILE_SAVED, ENGINE_CLEARED, FILE_CHANGED), EVENT_INSPECTABLE_CHECK);
 
 	bool isLoadingFile;
-	bool isClearing;
 	juce::var jsonData;
 
 	virtual void handleAsyncUpdate() override;
