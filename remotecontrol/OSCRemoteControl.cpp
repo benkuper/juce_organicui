@@ -811,6 +811,7 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 					if (sendFeedback)
 					{
 						sendOSCQueryFeedback(c);
+						sendOSCQueryStateFeedback(c);
 					}
 				}
 				else if (command == "IGNORE")
