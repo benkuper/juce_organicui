@@ -35,7 +35,7 @@ OrganicMainContentComponent::~OrganicMainContentComponent()
 	if (Engine::mainEngine != nullptr) Engine::mainEngine->removeEngineListener(this);
 
 	//ShapeShifterManager::getInstance()->toggleTemporaryFullContent(nullptr);
-	if(ShapeShifterManager::getInstanceWithoutCreating() != nullptr) ShapeShifterManager::deleteInstance();
+	if (ShapeShifterManager::getInstanceWithoutCreating() != nullptr) ShapeShifterManager::deleteInstance();
 	OrganicUITimers::deleteInstance();
 
 #if ORGANICUI_USE_SHAREDTEXTURE
@@ -112,23 +112,23 @@ void OrganicMainContentComponent::afterInit()
 void OrganicMainContentComponent::setupOpenGL()
 {
 #if JUCE_OPENGL
-if (GlobalSettings::getInstance()->useGLRenderer->boolValue())
-{
-	if (openGLContext == nullptr)
+	if (GlobalSettings::getInstance()->useGLRenderer->boolValue())
 	{
-		openGLContext.reset(new OpenGLContext());
-		openGLContext->setComponentPaintingEnabled(true);
-		openGLContext->setContinuousRepainting(false);
+		if (openGLContext == nullptr)
+		{
+			openGLContext.reset(new OpenGLContext());
+			openGLContext->setComponentPaintingEnabled(true);
+			openGLContext->setContinuousRepainting(false);
 
-		setupOpenGLInternal();
+			setupOpenGLInternal();
 
 #if ORGANICUI_USE_SHAREDTEXTURE
-		openGLContext->setRenderer(this);
+			openGLContext->setRenderer(this);
 #endif
 
-		openGLContext->attachTo(*this);
+			openGLContext->attachTo(*this);
+		}
 	}
-}
 #endif
 }
 
@@ -162,7 +162,7 @@ void OrganicMainContentComponent::resized()
 void OrganicMainContentComponent::newOpenGLContextCreated()
 {
 #if JUCE_WINDOWS
-    juce::gl::glDisable(juce::gl::GL_DEBUG_OUTPUT);
+	juce::gl::glDisable(juce::gl::GL_DEBUG_OUTPUT);
 #endif
 	if (SharedTextureManager::getInstanceWithoutCreating() != nullptr) SharedTextureManager::getInstance()->initGL();
 }
@@ -249,4 +249,33 @@ void OrganicMainContentComponent::endLoadFile()
 #if JUCE_MAC
 	MenuBarModel::handleAsyncUpdate(); //force refresh menu
 #endif
+}
+
+OrganicMenuBarComponent::OrganicMenuBarComponent(OrganicMainContentComponent* mainComp, Engine* engine) :
+	Component("Organic Menu Bar")
+#if !JUCE_MAC
+	, menuBarComp(mainComp)
+#endif
+{
+#if !JUCE_MAC
+	addAndMakeVisible(menuBarComp);
+#endif
+
+	fileDownloaderUI.reset(new FileDownloaderUI());
+	addAndMakeVisible(fileDownloaderUI.get());
+}
+
+void OrganicMenuBarComponent::paint(Graphics& g)
+{
+	g.fillAll(BG_COLOR);
+
+}
+
+void OrganicMenuBarComponent::resized()
+{
+	Rectangle<int> r = getLocalBounds();
+#if !JUCE_MAC	
+	menuBarComp.setBounds(r);
+#endif
+	fileDownloaderUI->setBounds(r.removeFromRight(300).reduced(2));
 }

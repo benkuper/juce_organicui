@@ -26,6 +26,7 @@
 #include "helpers/crypto/hmac/HMAC_SHA1.cpp"
 #include "helpers/WakeOnLan.cpp"
 #include "helpers/NetworkHelpers.cpp"
+#include "helpers/FileDownloader.cpp"
 
 #include "resources/BinaryData.cpp"
 #include "script/ScriptExpression.cpp"

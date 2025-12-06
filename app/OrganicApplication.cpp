@@ -114,6 +114,10 @@ void OrganicApplication::initialise(const String& commandLine)
 
 	HelpBox::getInstance()->loadHelp();
 
+	if (mainWindow != nullptr)
+	{
+		mainWindow->setMenuBarComponent(getMenuBarComponent());
+	}
 	afterInit();
 
 	bool fileIsLoaded = engine->parseCommandline(commandLine);
@@ -122,7 +126,7 @@ void OrganicApplication::initialise(const String& commandLine)
 	{
 		engine->setChangedFlag(true);
 	}
-	else if(!fileIsLoaded)
+	else if (!fileIsLoaded)
 	{
 		if (!engine->getFile().existsAsFile()) {
 			if (GlobalSettings::getInstance()->openLastDocumentOnStartup->boolValue())  Engine::mainEngine->loadFrom(Engine::mainEngine->getLastDocumentOpened(), true);
@@ -215,7 +219,8 @@ void OrganicApplication::anotherInstanceStarted(const String& commandLine)
 		mainWindow->setAlwaysOnTop(true);
 		mainWindow->grabKeyboardFocus();
 		mainWindow->setAlwaysOnTop(false);
-	} else {
+	}
+	else {
 		mainWindow->grabKeyboardFocus();
 	}
 }
@@ -329,7 +334,7 @@ void OrganicApplication::newMessage(const AppUpdateEvent& e)
 	break;
 
 	default: break;
-}
+	}
 }
 
 void OrganicApplication::clearGlobalSettings()
@@ -378,6 +383,11 @@ void OrganicApplication::saveGlobalSettings()
 void OrganicApplication::updateAppTitle()
 {
 	if (useWindow && mainWindow != nullptr && Engine::mainEngine != nullptr) mainWindow->setName(getApplicationName() + " " + getApplicationVersion() + " - " + Engine::mainEngine->getDocumentTitle() + (Engine::mainEngine->hasChangedSinceSaved() ? " *" : ""));
+}
+
+juce::Component* OrganicApplication::getMenuBarComponent()
+{
+	return new OrganicMenuBarComponent(mainComponent.get(), engine.get());
 }
 
 inline OrganicApplication::MainWindow::MainWindow(String name, OrganicMainContentComponent* mainComponent, const Image& image) :
@@ -435,7 +445,7 @@ inline OrganicApplication::MainWindow::MainWindow(String name, OrganicMainConten
 	{
 		setVisible(true);
 	}
-	
+
 	if (GlobalSettings::getInstance()->alwaysOnTop->boolValue()) {
 		setAlwaysOnTop(true);
 	}

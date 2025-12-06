@@ -257,6 +257,8 @@
 
 #include "warning/ui/WarningReporterPanel.h"
 
+#include "helpers/FileDownloader.h"
+
 #include "engine/Engine.h"
 
 #include "settings/GlobalSettings.h"

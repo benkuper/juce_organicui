@@ -72,6 +72,7 @@ public:
 	virtual void saveGlobalSettings();
 
 	virtual void updateAppTitle();
+	virtual juce::Component* getMenuBarComponent();
 
 	class TrayIcon :
 		public juce::SystemTrayIconComponent

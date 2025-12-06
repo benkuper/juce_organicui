@@ -1,5 +1,24 @@
 #pragma once
 
+class OrganicMainContentComponent;
+
+class OrganicMenuBarComponent :
+	public juce::Component
+{
+public:
+	OrganicMenuBarComponent(OrganicMainContentComponent* mainComp, Engine* engine);
+	virtual ~OrganicMenuBarComponent() {}
+
+#if !JUCE_MAC
+	juce::MenuBarComponent menuBarComp;
+#endif
+
+	std::unique_ptr<FileDownloaderUI> fileDownloaderUI;
+
+	void paint(juce::Graphics& g) override;
+	void resized() override;
+};
+
 class OrganicMainContentComponent   : 
 	public juce::Component, 
 	public juce::ApplicationCommandTarget, 
