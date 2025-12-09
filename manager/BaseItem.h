@@ -62,7 +62,7 @@ public:
 
 	void remove();
 
-	virtual void handleRemoveFromRemoteControl() override;
+	virtual void handleRemoveFromRemoteControl(juce::var data) override;
 
 	void setMovePositionReference(bool setOtherSelectedItems = false);
 	virtual void setMovePositionReferenceInternal();

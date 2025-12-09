@@ -62,7 +62,6 @@ public:
 
 	virtual void loadItemsData(juce::var data);
 
-
 	virtual juce::UndoableAction* getAddItemUndoableAction(T* item = nullptr, juce::var data = juce::var());
 	virtual juce::UndoableAction* getAddItemsUndoableAction(juce::Array<T*> item = nullptr, juce::var data = juce::var());
 
@@ -98,7 +97,8 @@ public:
 
 
 	virtual void handleAddFromRemoteControl(juce::var data) override;
-
+	virtual void handleRemoveFromRemoteControl(juce::var data) override;
+	virtual void handleClearFromRemoteControl() override;
 
 	virtual void clear() override;
 	void askForRemoveBaseItem(BaseItem* item) override;
@@ -798,6 +798,31 @@ void Manager<T>::handleAddFromRemoteControl(juce::var data)
 {
 	if (!userCanAddItemsManually) return;
 	addItemFromData(data);
+}
+
+template<class T>
+void Manager<T>::handleRemoveFromRemoteControl(juce::var data)
+{
+	var itemsData = data.getProperty("items", juce::var());
+	if (!itemsData.isString() && !itemsData.isArray()) return;
+
+	juce::Array<T*> itemsToRemove;
+	if (itemsData.isString()) itemsToRemove.add(getItemWithName(itemsData.toString()));
+	else if (itemsData.isArray())
+	{
+		for (int i = 0; i < itemsData.size(); i++)
+		{
+			itemsToRemove.addIfNotAlreadyThere(getItemWithName(itemsData[i].toString()));
+		}
+	}
+
+	removeItems(itemsToRemove);
+}
+
+template<class T>
+void Manager<T>::handleClearFromRemoteControl()
+{
+	clear();
 }
 
 template<class T>

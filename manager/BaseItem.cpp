@@ -134,7 +134,7 @@ void BaseItem::remove()
 	baseItemListeners.call(&BaseItemListener::askForRemoveBaseItem, this);
 }
 
-void BaseItem::handleRemoveFromRemoteControl()
+void BaseItem::handleRemoveFromRemoteControl(var data)
 {
 	if (userCanRemove) MessageManager::callAsync([this]() {remove(); });
 }

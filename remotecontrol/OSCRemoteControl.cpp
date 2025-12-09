@@ -419,7 +419,7 @@ void OSCRemoteControl::onContainerParameterChanged(Parameter* p)
 {
 	if (p == enabled || p == localPort)
 	{
-		if(!isCurrentlyLoadingData)	setupReceiver();
+		if (!isCurrentlyLoadingData)	setupReceiver();
 	}
 #if ORGANICUI_USE_WEBSERVER
 	else if (p == enableSendLogFeedback)
@@ -502,7 +502,7 @@ void OSCRemoteControl::setupServer()
 		server->stop();
 		server.reset();
 	}
-	
+
 	if (!enabled->boolValue()) return;
 
 	server.reset(new SimpleWebSocketServer());
@@ -691,7 +691,14 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 			{
 				if (ControllableContainer* cc = Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true))
 				{
-					cc->handleRemoveFromRemoteControl();
+					cc->handleRemoveFromRemoteControl(data);
+				}
+			}
+			else if (command == "CLEAR")
+			{
+				if (ControllableContainer* cc = Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true))
+				{
+					cc->handleClearFromRemoteControl();
 				}
 			}
 			else if (command == "RENAME")
@@ -998,7 +1005,7 @@ void OSCRemoteControl::newMessage(const CustomLogger::LogEvent& e)
 {
 	if (Engine::mainEngine != nullptr && Engine::mainEngine->isClearing) return;
 	if (enableSendLogFeedback != nullptr && !enableSendLogFeedback->boolValue()) return;
-	
+
 	sendLogFeedback(e.severityName, e.source, e.content);
 }
 
