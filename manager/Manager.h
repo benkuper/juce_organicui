@@ -803,7 +803,7 @@ void Manager<T>::handleAddFromRemoteControl(juce::var data)
 template<class T>
 void Manager<T>::handleRemoveFromRemoteControl(juce::var data)
 {
-	var itemsData = data.getProperty("items", juce::var());
+	juce::var itemsData = data.getProperty("items", juce::var());
 	if (!itemsData.isString() && !itemsData.isArray()) return;
 
 	juce::Array<T*> itemsToRemove;
