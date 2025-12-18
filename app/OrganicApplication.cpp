@@ -151,6 +151,7 @@ void OrganicApplication::shutdown()
 
 	Logger::setCurrentLogger(nullptr);
 	CustomLogger::deleteInstance();
+	FileDownloader::deleteInstance();
 
 	if (mainComponent == nullptr) return;
 
