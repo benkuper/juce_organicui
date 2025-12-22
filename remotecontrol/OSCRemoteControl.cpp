@@ -366,22 +366,7 @@ void OSCRemoteControl::processMessage(const OSCMessage& m, const String& sourceI
 
 		if (c != nullptr)
 		{
-			if (sourceId.isEmpty())
-			{
-				HashMap<String, Array<Controllable*>, DefaultHashFunctions, CriticalSection>::Iterator it(feedbackMap);
-				while (it.next())
-				{
-					if (it.getKey().contains(m.getSenderIPAddress()))
-					{
-						noFeedbackMap.set(c, it.getKey());
-						break;
-					}
-				}
-			}
-			else
-			{
-				noFeedbackMap.set(c, sourceId);
-			}
+			addControllableToNoFeedbackMap(c, sourceId, m.getSenderIPAddress());
 
 			bool handled = false;
 			if (c->parentContainer != nullptr)
@@ -1125,7 +1110,14 @@ void OSCRemoteControl::controllableStateUpdate(ControllableContainer* cc, Contro
 
 void OSCRemoteControl::addControllableToNoFeedbackMap(Controllable* c, const juce::String& id, const juce::String& fallbackId)
 {
-	if (id.isEmpty())
+	if (id.isNotEmpty())
+	{
+		noFeedbackMap.set(c, id);
+		return;
+
+	}
+
+	if (fallbackId.isNotEmpty())
 	{
 		HashMap<String, Array<Controllable*>, DefaultHashFunctions, CriticalSection>::Iterator it(feedbackMap);
 		while (it.next())
@@ -1137,13 +1129,9 @@ void OSCRemoteControl::addControllableToNoFeedbackMap(Controllable* c, const juc
 			}
 		}
 	}
-	else
-	{
-		noFeedbackMap.set(c, id);
-	}
 }
 
-void OSCRemoteControl::sendOSCQueryFeedback(Controllable* c, const String& excludeId)
+void OSCRemoteControl::sendOSCQueryFeedback(Controllable* c)
 {
 	if (c == nullptr)
 	{
@@ -1151,7 +1139,8 @@ void OSCRemoteControl::sendOSCQueryFeedback(Controllable* c, const String& exclu
 	}
 
 	OSCMessage m = OSCHelpers::getOSCMessageForControllable(c);
-	StringArray ex = excludeId;
+	StringArray ex;
+
 	if (noFeedbackMap.contains(c))
 	{
 		ex.add(noFeedbackMap[c]);
@@ -1159,7 +1148,7 @@ void OSCRemoteControl::sendOSCQueryFeedback(Controllable* c, const String& exclu
 	sendOSCQueryFeedback(m, ex);
 }
 
-void OSCRemoteControl::sendOSCQueryStateFeedback(Controllable* c, const String& excludeId)
+void OSCRemoteControl::sendOSCQueryStateFeedback(Controllable* c)
 {
 	if (c == nullptr)
 	{
@@ -1168,7 +1157,7 @@ void OSCRemoteControl::sendOSCQueryStateFeedback(Controllable* c, const String& 
 
 	OSCMessage m(c->getControlAddress() + "/attributes/enabled");
 	m.addBool(c->enabled);
-	StringArray ex = excludeId;
+	StringArray ex;
 	if (noFeedbackMap.contains(c))
 	{
 		ex.add(noFeedbackMap[c]);

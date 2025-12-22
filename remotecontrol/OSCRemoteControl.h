@@ -99,8 +99,8 @@ public:
 	void connectionError(const juce::String& id, const juce::String& message) override;
 
 
-	void sendOSCQueryFeedback(Controllable* c, const juce::String& excludeId = "");
-	void sendOSCQueryStateFeedback(Controllable* c, const juce::String& excludeId = "");
+	void sendOSCQueryFeedback(Controllable* c);
+	void sendOSCQueryStateFeedback(Controllable* c);
 	void sendOSCQueryFeedback(const juce::OSCMessage& m, juce::StringArray excludes = juce::StringArray());
 	void sendOSCQueryFeedbackTo(const juce::OSCMessage& m, juce::StringArray ids = juce::StringArray());
 
