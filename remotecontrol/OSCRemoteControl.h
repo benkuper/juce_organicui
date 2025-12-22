@@ -32,7 +32,8 @@ class OSCRemoteControl :
 	public CustomLogger::LoggerListener,
 	public WarningReporter::AsyncListener,
 #endif
-	public juce::OSCReceiver::Listener<juce::OSCReceiver::RealtimeCallback>
+	public juce::OSCReceiver::Listener<juce::OSCReceiver::RealtimeCallback>,
+	public EngineListener
 {
 public:
 	juce_DeclareSingleton(OSCRemoteControl, true);
@@ -129,6 +130,8 @@ public:
 
 	void sendAllManualFeedback();
 	void sendManualFeedbackForControllable(Controllable* c);
+
+	void fileLoaded() override;
 
 
 	class RemoteControlListener

@@ -13,6 +13,7 @@ juce_ImplementSingleton(OSCRemoteControl)
 
 #if ORGANICUI_USE_WEBSERVER
 #include "OSCPacketHelper.h"
+#include "OSCRemoteControl.h"
 #endif
 
 #ifndef ORGANIC_REMOTE_CONTROL_PORT
@@ -58,6 +59,8 @@ OSCRemoteControl::OSCRemoteControl()
 
 	manualSendCC.enabled->setDefaultValue(false);
 	addChildControllableContainer(&manualSendCC);
+
+	Engine::mainEngine->addEngineListener(this);
 }
 
 OSCRemoteControl::~OSCRemoteControl()
@@ -71,6 +74,10 @@ OSCRemoteControl::~OSCRemoteControl()
 	{
 		server->stop();
 		server.reset();
+	}
+	if (Engine::mainEngine != nullptr)
+	{
+		Engine::mainEngine->removeEngineListener(this);
 	}
 
 	if (WarningReporter::getInstanceWithoutCreating() != nullptr)
@@ -1247,4 +1254,9 @@ void OSCRemoteControl::sendManualFeedbackForControllable(Controllable* c)
 	{
 		NLOG(niceName, "Sent to manual OSC  : " << OSCHelpers::messageToString(m));
 	}
+}
+
+void OSCRemoteControl::fileLoaded()
+{
+	sendPathChangedFeedback("/");
 }
