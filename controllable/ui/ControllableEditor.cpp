@@ -10,16 +10,16 @@
 
 #include "JuceHeader.h"
 
-ControllableEditor::ControllableEditor(Array<Controllable*> controllables, bool isRoot) :
-	InspectableEditor(Inspectable::getArrayAs<Controllable, Inspectable>(controllables), isRoot),
-	controllables(Inspectable::getWeakArray(controllables)),
-	controllable(controllables[0]),
-	label("Label"),
-	subContentHeight(0),
-	minLabelWidth(160),
-	minControlUIWidth(100),
-	dragAndDropEnabled(true),
-	showLabel(true)
+ControllableEditor::ControllableEditor(Array<Controllable*> controllables, bool isRoot)
+	: InspectableEditor(Inspectable::getArrayAs<Controllable, Inspectable>(controllables), isRoot)
+	, controllables(Inspectable::getWeakArray(controllables))
+	, controllable(controllables[0])
+	, label("Label")
+	, subContentHeight(0)
+	, minLabelWidth(160)
+	, minControlUIWidth(100)
+	, dragAndDropEnabled(true)
+	, showLabel(true)
 {
 	buildControllableUI();
 
@@ -31,9 +31,12 @@ ControllableEditor::ControllableEditor(Array<Controllable*> controllables, bool 
 	label.setTooltip(ui->tooltip);
 	label.setEditable(controllable->userCanChangeName);
 	label.addListener(this);
-	if (!isMultiEditing()) label.addMouseListener(this, false);
+	if (!isMultiEditing())
+	{
+		label.addMouseListener(this, false);
+	}
 
-	bool isAllRemovable = multiHasAllOf([](Inspectable* i) {return ((Controllable*)i)->isRemovableByUser; });
+	bool isAllRemovable = multiHasAllOf([](Inspectable* i) { return ((Controllable*) i)->isRemovableByUser; });
 	if (isAllRemovable)
 	{
 		removeBT.reset(AssetManager::getInstance()->getRemoveBT());
@@ -43,18 +46,18 @@ ControllableEditor::ControllableEditor(Array<Controllable*> controllables, bool 
 		addAndMakeVisible(removeBT.get());
 	}
 
-	bool canAllDisable = multiHasAllOf([](Inspectable* i) {return ((Controllable*)i)->canBeDisabledByUser; });
+	bool canAllDisable = multiHasAllOf([](Inspectable* i) { return ((Controllable*) i)->canBeDisabledByUser; });
 	if (canAllDisable)
 	{
 		enableBT.reset(AssetManager::getInstance()->getPowerBT());
-		enableBT->addListener(this);
+		enableBT->addMouseListener(this, false);
 
-		bool allEnabled = multiHasAllOf([](Inspectable* i) {return ((Controllable*)i)->enabled; });
+		bool allEnabled = multiHasAllOf([](Inspectable* i) { return ((Controllable*) i)->enabled; });
 		enableBT->setToggleState(allEnabled, dontSendNotification);
 		addAndMakeVisible(enableBT.get());
 	}
 
-	bool showAllWarnings = multiHasAllOf([](Inspectable* i) {return ((Controllable*)i)->showWarningInUI; });
+	bool showAllWarnings = multiHasAllOf([](Inspectable* i) { return ((Controllable*) i)->showWarningInUI; });
 	if (showAllWarnings)
 	{
 		warningUI.reset(new WarningTargetUI(controllable));
@@ -63,25 +66,36 @@ ControllableEditor::ControllableEditor(Array<Controllable*> controllables, bool 
 	}
 
 	baseHeight = ui->getHeight();
-	if (baseHeight == 0) baseHeight = GlobalSettings::getInstance()->fontSize->floatValue() + 4;
+	if (baseHeight == 0)
+	{
+		baseHeight = GlobalSettings::getInstance()->fontSize->floatValue() + 4;
+	}
 	setSize(100, baseHeight);
 
-	for (auto& c : controllables) c->addAsyncControllableListener(this);
+	for (auto& c : controllables)
+	{
+		c->addAsyncControllableListener(this);
+	}
 }
 
 ControllableEditor::~ControllableEditor()
 {
 	for (auto& c : controllables)
 	{
-		if (c.wasObjectDeleted()) continue;
+		if (c.wasObjectDeleted())
+		{
+			continue;
+		}
 		c->removeAsyncControllableListener(this);
 	}
-
 }
 
 void ControllableEditor::setShowLabel(bool value)
 {
-	if (showLabel == value) return;
+	if (showLabel == value)
+	{
+		return;
+	}
 	showLabel = value;
 	if (showLabel)
 	{
@@ -91,30 +105,35 @@ void ControllableEditor::setShowLabel(bool value)
 	{
 		removeChildComponent(&label);
 	}
-
 }
 
 void ControllableEditor::buildControllableUI(bool resizeAfter)
 {
-	if (ui != nullptr) removeChildComponent(ui.get());
+	if (ui != nullptr)
+	{
+		removeChildComponent(ui.get());
+	}
 	ui.reset(controllable->createDefaultUI(Inspectable::getArrayFromWeak(controllables)));
 	ui->showLabel = false;
 	ui->setOpaqueBackground(true);
 	addAndMakeVisible(ui.get());
 
-	if (resizeAfter) resized();
+	if (resizeAfter)
+	{
+		resized();
+	}
 }
 
 void ControllableEditor::resized()
 {
 	juce::Rectangle<int> r = getLocalBounds();
-	r.removeFromBottom(subContentHeight);// .withHeight(16);
+	r.removeFromBottom(subContentHeight); // .withHeight(16);
 
 	int buttonSize = jmin(r.getHeight(), 20);
 
 	if (warningUI != nullptr && warningUI->isVisible())
 	{
-		warningUI->setBounds(r.removeFromLeft(buttonSize).withSizeKeepingCentre(buttonSize, buttonSize)); //warning
+		warningUI->setBounds(r.removeFromLeft(buttonSize).withSizeKeepingCentre(buttonSize, buttonSize)); // warning
 		r.removeFromLeft(2);
 	}
 
@@ -125,7 +144,6 @@ void ControllableEditor::resized()
 			removeBT->setBounds(r.removeFromRight(buttonSize).withSizeKeepingCentre(buttonSize, buttonSize));
 			r.removeFromRight(2);
 		}
-
 
 		if (enableBT != nullptr)
 		{
@@ -145,18 +163,45 @@ void ControllableEditor::resized()
 		r.removeFromRight(2);
 		label.setBounds(r);
 	}
-
 }
 
 void ControllableEditor::mouseDown(const MouseEvent& e)
 {
 	InspectableEditor::mouseDown(e);
 
-	if (e.mods.isRightButtonDown())
+	if (e.eventComponent == &label)
 	{
-		if (e.eventComponent == &label)
+		if (e.mods.isRightButtonDown())
 		{
-			if (ui->showMenuOnRightClick) ui->showContextMenu();
+			if (ui->showMenuOnRightClick)
+			{
+				ui->showContextMenu();
+			}
+		}
+	}
+	else if (e.eventComponent == enableBT.get())
+	{
+		if (e.mods.isRightButtonDown())
+		{
+			PopupMenu pm;
+			pm.addItem("Copy Enable OSC Control Address",
+					   [&]
+					   {
+						   if (controllable != nullptr && !controllable.wasObjectDeleted())
+						   {
+							   SystemClipboard::copyTextToClipboard(controllable->getControlAddress() + "/enabled");
+						   }
+					   });
+
+			pm.showMenuAsync(PopupMenu::Options());
+		}
+		else
+		{
+			bool targetEnabled = controllables.size() > 0 ? !controllables[0]->enabled : false;
+			for (auto& c : controllables)
+			{
+				c->setEnabled(targetEnabled);
+			}
 		}
 	}
 }
@@ -170,63 +215,73 @@ void ControllableEditor::mouseDrag(const MouseEvent& e)
 		var desc = var(new DynamicObject());
 		desc.getDynamicObject()->setProperty("type", controllable->getTypeString());
 		desc.getDynamicObject()->setProperty("dataType", "Controllable");
-		//Image dragImage = this->createComponentSnapshot(this->getLocalBounds()).convertedToFormat(Image::ARGB);
-		//dragImage.multiplyAllAlphas(.5f);
+		// Image dragImage = this->createComponentSnapshot(this->getLocalBounds()).convertedToFormat(Image::ARGB);
+		// dragImage.multiplyAllAlphas(.5f);
 		Point<int> offset = -getMouseXYRelative();
-		if (e.getDistanceFromDragStart() > 30) startDragging(desc, this, ScaledImage(), true, &offset);
+		if (e.getDistanceFromDragStart() > 30)
+		{
+			startDragging(desc, this, ScaledImage(), true, &offset);
+		}
 	}
-
 }
-
 
 void ControllableEditor::newMessage(const Controllable::ControllableEvent& e)
 {
 	switch (e.type)
 	{
 	case Controllable::ControllableEvent::NAME_CHANGED:
-		if (!isMultiEditing()) label.setText(controllable->niceName, dontSendNotification);
+		if (!isMultiEditing())
+		{
+			label.setText(controllable->niceName, dontSendNotification);
+		}
 		break;
 
 	case Controllable::ControllableEvent::STATE_CHANGED:
 		if (enableBT != nullptr)
 		{
-			bool allEnabled = multiHasAllOf([](Inspectable* i) {return ((Controllable*)i)->enabled; });
+			bool allEnabled = multiHasAllOf([](Inspectable* i) { return ((Controllable*) i)->enabled; });
 			enableBT->setToggleState(allEnabled, dontSendNotification);
 		}
 		break;
 
 	default:
 		break;
-
 	}
 }
 
 void ControllableEditor::componentVisibilityChanged(Component& c)
 {
 	InspectableEditor::componentVisibilityChanged(c);
-	if (&c == warningUI.get()) resized();
+	if (&c == warningUI.get())
+	{
+		resized();
+	}
 }
 
 void ControllableEditor::buttonClicked(Button* b)
 {
 	if (b == removeBT.get())
 	{
-		for (auto& c : controllables) c->remove(true); //would need proper grouped undo
-	}
-	else if (b == enableBT.get())
-	{
-		bool targetEnabled = controllables.size() > 0 ? !controllables[0]->enabled : false;
-		for (auto& c : controllables) c->setEnabled(targetEnabled);
+		for (auto& c : controllables)
+		{
+			c->remove(true); // would need proper grouped undo
+		}
 	}
 }
 
 void ControllableEditor::labelTextChanged(Label* labelThatHasChanged)
 {
-	if (controllable == nullptr || controllable.wasObjectDeleted()) return;
+	if (controllable == nullptr || controllable.wasObjectDeleted())
+	{
+		return;
+	}
 
 	if (labelThatHasChanged == &label)
 	{
-		if (!controllable->userCanChangeName) return;
+		if (!controllable->userCanChangeName)
+		{
+			return;
+		}
 		controllable->setNiceName(label.getText());
 	}
 }
