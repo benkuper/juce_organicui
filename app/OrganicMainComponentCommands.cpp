@@ -15,45 +15,45 @@ OrganicApplication::MainWindow* getMainWindow();
 
 namespace CommandIDs
 {
-	static const int open = 0x30000;
-	static const int save = 0x30001;
-	static const int saveAs = 0x30002;
-	static const int saveCopy = 0x30008;
-	static const int newFile = 0x30003;
-	static const int openLastDocument = 0x30004;
-	static const int checkForUpdates = 0x30005;
+static const int open = 0x30000;
+static const int save = 0x30001;
+static const int saveAs = 0x30002;
+static const int saveCopy = 0x30008;
+static const int newFile = 0x30003;
+static const int openLastDocument = 0x30004;
+static const int checkForUpdates = 0x30005;
 #if ORGANICUI_USE_WEBSERVER
-	static const int updateDashboardFiles = 0x30006;
+static const int updateDashboardFiles = 0x30006;
 #endif
 
-	//undo
-	static const int undo = 0x40001;
-	static const int redo = 0x40002;
-	static const int duplicateItems = 0x40003;
-	static const int deleteItems = 0x40004;
-	static const int selectAll = 0x40005;
-	static const int switchDashboardEditMode = 0x40006;
+// undo
+static const int undo = 0x40001;
+static const int redo = 0x40002;
+static const int duplicateItems = 0x40003;
+static const int deleteItems = 0x40004;
+static const int selectAll = 0x40005;
+static const int switchDashboardEditMode = 0x40006;
 
-	static const int editProjectSettings = 0x50001;
-	static const int editGlobalSettings = 0x50002;
-	static const int toggleKioskMode = 0x50003;
-	static const int clearGlobalSettings = 0x50004;
+static const int editProjectSettings = 0x50001;
+static const int editGlobalSettings = 0x50002;
+static const int toggleKioskMode = 0x50003;
+static const int clearGlobalSettings = 0x50004;
 
-	static const int showAbout = 0x60000;
+static const int showAbout = 0x60000;
 
-	//navigation
-	static const int selectPreviousItem = 0x70001;
-	static const int selectNextItem = 0x70002;
-	static const int moveToPrevious = 0x70003;
-	static const int moveToNext = 0x70004;
+// navigation
+static const int selectPreviousItem = 0x70001;
+static const int selectNextItem = 0x70002;
+static const int moveToPrevious = 0x70003;
+static const int moveToNext = 0x70004;
 
-	// range ids
-	static const int lastFileStartID = 100; // 100 to 200 max
-}
+// range ids
+static const int lastFileStartID = 100; // 100 to 200 max
+} // namespace CommandIDs
 
-void OrganicMainContentComponent::getCommandInfo(CommandID commandID, ApplicationCommandInfo& result) {
+void OrganicMainContentComponent::getCommandInfo(CommandID commandID, ApplicationCommandInfo& result)
+{
 	const String category("General");
-
 
 	switch (commandID)
 	{
@@ -78,16 +78,12 @@ void OrganicMainContentComponent::getCommandInfo(CommandID commandID, Applicatio
 		break;
 
 	case CommandIDs::saveAs:
-		result.setInfo("Save As...",
-			"Saves a copy of the current graph to a file",
-			category, 0);
+		result.setInfo("Save As...", "Saves a copy of the current graph to a file", category, 0);
 		result.defaultKeypresses.add(KeyPress('s', ModifierKeys::shiftModifier | ModifierKeys::commandModifier, 0));
 		break;
 
 	case CommandIDs::saveCopy:
-		result.setInfo("Save Copy",
-			"Saves a copy of the current graph to a file",
-			category, 0);
+		result.setInfo("Save Copy", "Saves a copy of the current graph to a file", category, 0);
 
 		result.defaultKeypresses.add(KeyPress('s', ModifierKeys::commandModifier | ModifierKeys::altModifier, 0));
 		break;
@@ -95,7 +91,6 @@ void OrganicMainContentComponent::getCommandInfo(CommandID commandID, Applicatio
 	case CommandIDs::checkForUpdates:
 		result.setInfo("Check for updates", "Check if updates are available and download latest software", category, 0);
 		break;
-
 
 	case CommandIDs::editProjectSettings:
 		result.setInfo("Project Settings...", "Edit the settings related to this project", category, 0);
@@ -202,7 +197,6 @@ void OrganicMainContentComponent::getCommandInfo(CommandID commandID, Applicatio
 		InspectableSelectionManager* selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
 		Array<BaseItem*> items = selectionManager == nullptr ? Array<BaseItem*>() : selectionManager->getInspectablesAs<BaseItem>();
 
-
 		result.setActive(items.size() > 0);
 	}
 	break;
@@ -226,7 +220,6 @@ void OrganicMainContentComponent::getCommandInfo(CommandID commandID, Applicatio
 
 		InspectableSelectionManager* selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
 		Array<BaseItem*> items = selectionManager == nullptr ? Array<BaseItem*>() : selectionManager->getInspectablesAs<BaseItem>();
-
 
 		result.setActive(items.size() > 0);
 	}
@@ -269,45 +262,39 @@ void OrganicMainContentComponent::getCommandInfo(CommandID commandID, Applicatio
 		JUCEApplication::getInstance()->getCommandInfo(commandID, result);
 		break;
 	}
-
-
-
-
 }
 
-
-void OrganicMainContentComponent::getAllCommands(Array<CommandID>& commands) {
+void OrganicMainContentComponent::getAllCommands(Array<CommandID>& commands)
+{
 	// this returns the set of all commands that this target can perform..
-	const CommandID ids[] = {
-	  CommandIDs::newFile,
-	  CommandIDs::open,
-	  CommandIDs::openLastDocument,
-	  CommandIDs::save,
-	  CommandIDs::saveAs,
-	  CommandIDs::saveCopy,
-	  CommandIDs::checkForUpdates,
+	const CommandID ids[] = {CommandIDs::newFile,
+							 CommandIDs::open,
+							 CommandIDs::openLastDocument,
+							 CommandIDs::save,
+							 CommandIDs::saveAs,
+							 CommandIDs::saveCopy,
+							 CommandIDs::checkForUpdates,
 #if ORGANICUI_USE_WEBSERVER
-	  CommandIDs::updateDashboardFiles,
+							 CommandIDs::updateDashboardFiles,
 #endif
-	  StandardApplicationCommandIDs::quit,
-	  CommandIDs::selectAll,
-	  StandardApplicationCommandIDs::copy,
-	  StandardApplicationCommandIDs::cut,
-	  StandardApplicationCommandIDs::paste,
-	  CommandIDs::duplicateItems,
-	  CommandIDs::deleteItems,
-	  CommandIDs::switchDashboardEditMode,
-	  CommandIDs::editGlobalSettings,
-	  CommandIDs::clearGlobalSettings,
-	  CommandIDs::editProjectSettings,
-	  CommandIDs::toggleKioskMode,
-	  CommandIDs::selectPreviousItem,
-	  CommandIDs::selectNextItem,
-	  CommandIDs::moveToPrevious,
-	  CommandIDs::moveToNext,
-	  CommandIDs::undo,
-	  CommandIDs::redo
-	};
+							 StandardApplicationCommandIDs::quit,
+							 CommandIDs::selectAll,
+							 StandardApplicationCommandIDs::copy,
+							 StandardApplicationCommandIDs::cut,
+							 StandardApplicationCommandIDs::paste,
+							 CommandIDs::duplicateItems,
+							 CommandIDs::deleteItems,
+							 CommandIDs::switchDashboardEditMode,
+							 CommandIDs::editGlobalSettings,
+							 CommandIDs::clearGlobalSettings,
+							 CommandIDs::editProjectSettings,
+							 CommandIDs::toggleKioskMode,
+							 CommandIDs::selectPreviousItem,
+							 CommandIDs::selectNextItem,
+							 CommandIDs::moveToPrevious,
+							 CommandIDs::moveToNext,
+							 CommandIDs::undo,
+							 CommandIDs::redo};
 
 	commands.addArray(ids, numElementsInArray(ids));
 
@@ -319,9 +306,8 @@ void OrganicMainContentComponent::getAllCommands(Array<CommandID>& commands) {
 #endif
 }
 
-
-PopupMenu OrganicMainContentComponent::getMenuForIndex(int /*topLevelMenuIndex*/, const String& menuName) {
-
+PopupMenu OrganicMainContentComponent::getMenuForIndex(int /*topLevelMenuIndex*/, const String& menuName)
+{
 	PopupMenu menu;
 
 	if (menuName == "File")
@@ -332,8 +318,7 @@ PopupMenu OrganicMainContentComponent::getMenuForIndex(int /*topLevelMenuIndex*/
 		menu.addCommandItem(&getCommandManager(), CommandIDs::openLastDocument);
 
 		RecentlyOpenedFilesList recentFiles;
-		recentFiles.restoreFromString(getAppProperties().getUserSettings()
-			->getValue("recentFiles"));
+		recentFiles.restoreFromString(getAppProperties().getUserSettings()->getValue("recentFiles"));
 
 		PopupMenu recentFilesMenu;
 		recentFiles.createPopupMenuItems(recentFilesMenu, CommandIDs::lastFileStartID, true, true);
@@ -356,8 +341,6 @@ PopupMenu OrganicMainContentComponent::getMenuForIndex(int /*topLevelMenuIndex*/
 #endif
 		menu.addSeparator();
 		menu.addCommandItem(&getCommandManager(), StandardApplicationCommandIDs::quit);
-
-
 	}
 	else if (menuName == "Edit")
 	{
@@ -373,7 +356,6 @@ PopupMenu OrganicMainContentComponent::getMenuForIndex(int /*topLevelMenuIndex*/
 		menu.addCommandItem(&getCommandManager(), CommandIDs::deleteItems);
 		menu.addSeparator();
 		menu.addCommandItem(&getCommandManager(), CommandIDs::switchDashboardEditMode);
-
 	}
 	else if (menuName == "View")
 	{
@@ -389,23 +371,24 @@ PopupMenu OrganicMainContentComponent::getMenuForIndex(int /*topLevelMenuIndex*/
 	return menu;
 }
 
-bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
-
+bool OrganicMainContentComponent::perform(const InvocationInfo& info)
+{
 #if TIMELINE_ADD_MENU_ITEMS
-	if (info.commandID >= 0x80000 && info.commandID < 0x81000) return TimelineAppCommands::perform(info);
+	if (info.commandID >= 0x80000 && info.commandID < 0x81000)
+	{
+		return TimelineAppCommands::perform(info);
+	}
 #endif
 
 	switch (info.commandID)
 	{
-
-
 	case CommandIDs::newFile:
 	{
-		Engine::mainEngine->saveIfNeededAndUserAgreesAsync([](FileBasedDocument::SaveResult result)
+		Engine::mainEngine->saveIfNeededAndUserAgreesAsync(
+			[](FileBasedDocument::SaveResult result)
 			{
 				if (result == FileBasedDocument::SaveResult::userCancelledSave)
 				{
-
 				}
 				else if (result == FileBasedDocument::SaveResult::failedToWriteToFile)
 				{
@@ -415,18 +398,17 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 				{
 					Engine::mainEngine->createNewGraph();
 				}
-			}
-		);
+			});
 	}
 	break;
 
 	case CommandIDs::open:
 	{
-		Engine::mainEngine->saveIfNeededAndUserAgreesAsync([](FileBasedDocument::SaveResult result)
+		Engine::mainEngine->saveIfNeededAndUserAgreesAsync(
+			[](FileBasedDocument::SaveResult result)
 			{
 				if (result == FileBasedDocument::SaveResult::userCancelledSave)
 				{
-
 				}
 				else if (result == FileBasedDocument::SaveResult::failedToWriteToFile)
 				{
@@ -434,20 +416,23 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 				}
 				else
 				{
-					Engine::mainEngine->loadFromUserSpecifiedFileAsync(true, [](Result r)
-						{
-							if (r.failed()) LOGERROR("Load failed :" + r.getErrorMessage());
-						}
-					);
+					Engine::mainEngine->loadFromUserSpecifiedFileAsync(true,
+																	   [](Result r)
+																	   {
+																		   if (r.failed())
+																		   {
+																			   LOGERROR("Load failed :" + r.getErrorMessage());
+																		   }
+																	   });
 				}
-			}
-		);
+			});
 	}
 	break;
 
 	case CommandIDs::openLastDocument:
 	{
-		Engine::mainEngine->saveIfNeededAndUserAgreesAsync([](FileBasedDocument::SaveResult result)
+		Engine::mainEngine->saveIfNeededAndUserAgreesAsync(
+			[](FileBasedDocument::SaveResult result)
 			{
 				if (result == FileBasedDocument::SaveResult::userCancelledSave)
 				{
@@ -460,34 +445,36 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 				{
 					Engine::mainEngine->loadFrom(Engine::mainEngine->getLastDocumentOpened(), true);
 				}
-			}
-		);
+			});
 	}
 	break;
 
 	case CommandIDs::save:
 	case CommandIDs::saveAs:
 	{
-
 		std::function<void(FileBasedDocument::SaveResult)> rFunc = [](FileBasedDocument::SaveResult result)
+		{
+			if (result == FileBasedDocument::SaveResult::userCancelledSave)
 			{
-				if (result == FileBasedDocument::SaveResult::userCancelledSave)
-				{
+			}
+			else if (result == FileBasedDocument::SaveResult::failedToWriteToFile)
+			{
+				LOGERROR("Could not save the document (Failed to write to file)\nCancelled loading of the new document");
+			}
+			else if (result == FileBasedDocument::SaveResult::savedOk)
+			{
+				LOG("File saved.");
+			}
+		};
 
-				}
-				else if (result == FileBasedDocument::SaveResult::failedToWriteToFile)
-				{
-					LOGERROR("Could not save the document (Failed to write to file)\nCancelled loading of the new document");
-				}
-				else if (result == FileBasedDocument::SaveResult::savedOk)
-				{
-					LOG("File saved.");
-				}
-			};
-
-		if (info.commandID == CommandIDs::save) Engine::mainEngine->saveAsync(true, true, rFunc);
-		else Engine::mainEngine->saveAsAsync(File(), true, true, true, rFunc);
-
+		if (info.commandID == CommandIDs::save)
+		{
+			Engine::mainEngine->saveAsync(true, true, rFunc);
+		}
+		else
+		{
+			Engine::mainEngine->saveAsAsync(File(), true, true, true, rFunc);
+		}
 	}
 	break;
 
@@ -507,7 +494,6 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 		UndoMaster::getInstance()->redo();
 		break;
 
-
 	case StandardApplicationCommandIDs::copy:
 	case StandardApplicationCommandIDs::cut:
 	{
@@ -520,10 +506,19 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 			var itemsData = var();
 			for (auto& i : items)
 			{
-				if (i == nullptr) continue;
-				if (!i->userCanDuplicate) continue;
+				if (i == nullptr)
+				{
+					continue;
+				}
+				if (!i->userCanDuplicate)
+				{
+					continue;
+				}
 				itemsData.append(i->getJSONData());
-				if (info.commandID == StandardApplicationCommandIDs::cut) i->remove();
+				if (info.commandID == StandardApplicationCommandIDs::cut)
+				{
+					i->remove();
+				}
 			}
 
 			data.getDynamicObject()->setProperty("items", itemsData);
@@ -535,11 +530,13 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 		Array<ControllableContainer*> containers = InspectableSelectionManager::activeSelectionManager->getInspectablesAs<ControllableContainer>();
 		if (!containers.isEmpty())
 		{
-
 			var ccData = var();
 			for (auto& i : containers)
 			{
-				if (i == nullptr) continue;
+				if (i == nullptr)
+				{
+					continue;
+				}
 				ccData.append(i->getJSONData());
 			}
 
@@ -556,11 +553,17 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 		InspectableSelectionManager* selectionManager = InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 0 ? InspectableSelectionManager::activeSelectionManager : InspectableSelectionManager::mainSelectionManager;
 
 		BaseItem* item = selectionManager->getInspectableAs<BaseItem>();
-		if (item != nullptr) item->paste();
+		if (item != nullptr)
+		{
+			item->paste();
+		}
 		else
 		{
 			BaseItemListener* m = selectionManager->getInspectableAs<BaseItemListener>();
-			if (m != nullptr) m->askForPaste();
+			if (m != nullptr)
+			{
+				m->askForPaste();
+			}
 		}
 	}
 	break;
@@ -573,19 +576,30 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 
 		if (items.size() == 1)
 		{
-			if (items[0] != nullptr && items[0]->userCanDuplicate) items[0]->duplicate();
+			if (items[0] != nullptr && items[0]->userCanDuplicate)
+			{
+				items[0]->duplicate();
+			}
 		}
 		else
 		{
-
 			for (auto& i : items)
 			{
-				if (i == nullptr) continue;
-				if (!i->userCanDuplicate) continue;
+				if (i == nullptr)
+				{
+					continue;
+				}
+				if (!i->userCanDuplicate)
+				{
+					continue;
+				}
 
 				if (Manager<BaseItem>* managerContainer = (Manager<BaseItem>*)(i->parentContainer.get()))
 				{
-					if (!managerItemMap.contains(managerContainer)) managerItemMap.set(managerContainer, new Array<BaseItem*>());
+					if (!managerItemMap.contains(managerContainer))
+					{
+						managerItemMap.set(managerContainer, new Array<BaseItem*>());
+					}
 					managerItemMap[managerContainer]->addIfNotAlreadyThere(i);
 				}
 			}
@@ -595,7 +609,10 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 			{
 				if (it.getKey() == nullptr)
 				{
-					for (auto& i : *it.getValue()) i->duplicate();
+					for (auto& i : *it.getValue())
+					{
+						i->duplicate();
+					}
 				}
 				else if (it.getValue()->size() == 1)
 				{
@@ -618,7 +635,10 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 						data[i].getDynamicObject()->setProperty("index", maxIndex++);
 					}
 
-					if (data.size() > 0) it.getKey()->addItemsFromData(data);
+					if (data.size() > 0)
+					{
+						it.getKey()->addItemsFromData(data);
+					}
 					delete it.getValue();
 				}
 			}
@@ -633,12 +653,42 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 		HashMap<Manager<BaseItem>*, Array<BaseItem*>*> managerItemMap;
 		for (auto& i : items)
 		{
-			if (i == nullptr) continue;
-			if (!i->userCanRemove) continue;
-
-			if (Manager<BaseItem>* managerContainer = (Manager<BaseItem>*)(i->parentContainer.get()))
+			if (i == nullptr)
 			{
-				if (!managerItemMap.contains(managerContainer)) managerItemMap.set(managerContainer, new Array<BaseItem*>());
+				continue;
+			}
+			if (!i->userCanRemove)
+			{
+				continue;
+			}
+
+			// if another item is a parent of this one, skip it
+			bool skip = false;
+			for (auto& j : items)
+			{
+				if (j == nullptr || j == i)
+				{
+					continue;
+				}
+				if (j->containsContainer(i))
+				{
+					skip = true;
+					DBG("Skipping deletion of " + i->getTypeString() + " because its parent " + j->getTypeString() + " is also being deleted");
+					break;
+				}
+			}
+
+			if (skip)
+			{
+				continue;
+			}
+
+			if (Manager<BaseItem>* managerContainer = (Manager<BaseItem>*) (i->parentContainer.get()))
+			{
+				if (!managerItemMap.contains(managerContainer))
+				{
+					managerItemMap.set(managerContainer, new Array<BaseItem*>());
+				}
 				managerItemMap[managerContainer]->addIfNotAlreadyThere(i);
 			}
 		}
@@ -648,7 +698,10 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 		{
 			if (it.getKey() == nullptr)
 			{
-				for (auto& i : *it.getValue()) i->remove();
+				for (auto& i : *it.getValue())
+				{
+					i->remove();
+				}
 			}
 			else
 			{
@@ -665,12 +718,18 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 		Array<BaseItemListener*> itemListeners = selectionManager->getInspectablesAs<BaseItemListener>();
 		if (itemListeners.size() > 0)
 		{
-			for (auto& m : itemListeners) m->askForSelectAllItems(true);
+			for (auto& m : itemListeners)
+			{
+				m->askForSelectAllItems(true);
+			}
 		}
 		else
 		{
 			Array<BaseItem*> items = selectionManager->getInspectablesAs<BaseItem>();
-			for (auto& item : items) item->selectAll(true);
+			for (auto& item : items)
+			{
+				item->selectAll(true);
+			}
 		}
 	}
 	break;
@@ -684,15 +743,26 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 		Array<BaseItem*> items = selectionManager->getInspectablesAs<BaseItem>();
 		for (auto& i : items)
 		{
-			if (i == nullptr) continue;
+			if (i == nullptr)
+			{
+				continue;
+			}
 			if (!i->useCustomArrowKeysBehaviour)
 			{
 				switch (info.commandID)
 				{
-				case CommandIDs::selectPreviousItem: i->selectPrevious(info.keyPress.getModifiers().isShiftDown()); break;
-				case CommandIDs::selectNextItem: i->selectNext(info.keyPress.getModifiers().isShiftDown()); break;
-				case CommandIDs::moveToPrevious: i->moveBefore(); break;
-				case CommandIDs::moveToNext: i->moveAfter(); break;
+				case CommandIDs::selectPreviousItem:
+					i->selectPrevious(info.keyPress.getModifiers().isShiftDown());
+					break;
+				case CommandIDs::selectNextItem:
+					i->selectNext(info.keyPress.getModifiers().isShiftDown());
+					break;
+				case CommandIDs::moveToPrevious:
+					i->moveBefore();
+					break;
+				case CommandIDs::moveToNext:
+					i->moveAfter();
+					break;
 				}
 			}
 		}
@@ -701,10 +771,12 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 
 	case CommandIDs::switchDashboardEditMode:
 	{
-		if (DashboardManager::getInstanceWithoutCreating() != nullptr) DashboardManager::getInstance()->editMode->setValue(!DashboardManager::getInstance()->editMode->boolValue());
+		if (DashboardManager::getInstanceWithoutCreating() != nullptr)
+		{
+			DashboardManager::getInstance()->editMode->setValue(!DashboardManager::getInstance()->editMode->boolValue());
+		}
 	}
 	break;
-
 
 	case CommandIDs::editProjectSettings:
 		ProjectSettings::getInstance()->selectThis();
@@ -715,7 +787,7 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 		break;
 
 	case CommandIDs::clearGlobalSettings:
-		((OrganicApplication*)OrganicApplication::getInstance())->clearGlobalSettings();
+		((OrganicApplication*) OrganicApplication::getInstance())->clearGlobalSettings();
 		break;
 
 	case CommandIDs::toggleKioskMode:
@@ -729,7 +801,10 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info) {
 #endif
 
 	default:
-		if (ShapeShifterManager::getInstance()->handleCommandID(info.commandID)) return true;
+		if (ShapeShifterManager::getInstance()->handleCommandID(info.commandID))
+		{
+			return true;
+		}
 		return JUCEApplication::getInstance()->perform(info);
 	}
 
@@ -743,20 +818,19 @@ void OrganicMainContentComponent::menuItemSelected(int menuItemID, int topLevelM
 	if (menuName == "View" && menuItemID != CommandIDs::toggleKioskMode)
 	{
 		ShapeShifterManager::getInstance()->handleMenuPanelCommand(menuItemID);
-
 	}
-	else if (isPositiveAndBelow(menuItemID - CommandIDs::lastFileStartID, 100)) {
+	else if (isPositiveAndBelow(menuItemID - CommandIDs::lastFileStartID, 100))
+	{
 		RecentlyOpenedFilesList recentFiles;
-		recentFiles.restoreFromString(getAppProperties().getUserSettings()
-			->getValue("recentFiles"));
+		recentFiles.restoreFromString(getAppProperties().getUserSettings()->getValue("recentFiles"));
 		Engine::mainEngine->loadFrom(recentFiles.getFile(menuItemID - CommandIDs::lastFileStartID), true);
 	}
 }
 
-
-StringArray OrganicMainContentComponent::getMenuBarNames() {
+StringArray OrganicMainContentComponent::getMenuBarNames()
+{
 	StringArray names;
-	names.addArray({ "File", "Edit" });
+	names.addArray({"File", "Edit"});
 
 #if TIMELINE_ADD_MENU_ITEMS
 	names.addArray(TimelineAppCommands::getMenuBarNames());
