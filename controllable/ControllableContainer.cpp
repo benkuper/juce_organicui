@@ -774,6 +774,22 @@ bool ControllableContainer::containsControllable(Controllable* c, int maxSearchL
 	return false;
 }
 
+bool ControllableContainer::containsContainer(ControllableContainer* cc, int maxSearchLevels)
+{
+	if (cc == nullptr) return false;
+	ControllableContainer* pc = cc->parentContainer;
+	if (pc == nullptr) return false;
+	int curLevel = 0;
+	while (pc != nullptr)
+	{
+		if (pc == this) return true;
+		curLevel++;
+		if (maxSearchLevels >= 0 && curLevel > maxSearchLevels) return false;
+		pc = pc->parentContainer;
+	}
+	return false;
+}
+
 
 void ControllableContainer::dispatchFeedback(Controllable* c)
 {
