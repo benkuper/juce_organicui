@@ -165,7 +165,7 @@ public:
 	virtual juce::var getRemoteControlData();
 	virtual void getRemoteControlDataInternal(juce::var& /*data*/) {}
 	virtual bool handleRemoteControlData(const juce::OSCMessage&, const juce::String & = juce::String()) { return false; }
-	virtual bool handleRemoteControlData(Controllable*, const juce::OSCMessage& , const juce::String&  = juce::String()) { return false; }
+	virtual bool handleRemoteControlData(Controllable*, const juce::OSCMessage&, const juce::String & = juce::String()) { return false; }
 
 	virtual void controllableContainerNameChanged(ControllableContainer*) override;
 	virtual void childStructureChanged(ControllableContainer*)override;
@@ -231,7 +231,7 @@ protected:
 	virtual void onContainerParameterChangedAsync(Parameter*, const juce::var& /*value*/) {};
 	virtual void onWarningChanged(WarningTarget*) {};
 	virtual void onChildContainerAdded(ControllableContainer*) {};
-  virtual void onChildContainerRemoved(ControllableContainer*) {};
+	virtual void onChildContainerRemoved(ControllableContainer*) {};
 
 public:
 	DECLARE_INSPECTACLE_CRITICAL_LISTENER(ControllableContainer, controllableContainer);
