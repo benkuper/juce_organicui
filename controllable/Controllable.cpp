@@ -396,11 +396,6 @@ StringArray Controllable::getValidAttributes() const
 	return { "enabled", "canBeDisabled", "targetType", "searchLevel", "allowedTypes", "excludedTypes","root", "labelLevel", "saveValueOnly" };
 }
 
-StringArray Controllable::getValidAttributes() const
-{
-	return { "enabled", "canBeDisabled", "targetType", "searchLevel", "allowedTypes", "excludedTypes","root", "labelLevel", "saveValueOnly" };
-}
-
 
 //SCRIPT
 var Controllable::setValueFromScript(const juce::var::NativeFunctionArgs& a) {
