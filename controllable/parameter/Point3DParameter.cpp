@@ -186,6 +186,23 @@ bool Point3DParameter::setAttributeInternal(String name, var val)
 	return true;
 }
 
+juce::var Point3DParameter::getAttributeInternal(juce::String name) const
+{
+	if (name == "ui")
+	{
+		switch (defaultUI)
+		{
+		case FloatParameter::TIME: return "time";
+		case FloatParameter::SLIDER: return "slider";
+		case FloatParameter::STEPPER: return "stepper";
+		case FloatParameter::LABEL: return "label";
+		default: return "none";
+		}
+	}
+	else if (name == "stringDecimals") return stringDecimals;
+	return juce::var();
+}
+
 StringArray Point3DParameter::getValidAttributes() const
 {
 	StringArray att = Parameter::getValidAttributes();

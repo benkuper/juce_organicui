@@ -114,6 +114,8 @@ public:
 
 	virtual void setAttribute(juce::String param, juce::var value);
 	virtual bool setAttributeInternal(juce::String param, juce::var value);
+	virtual juce::var getAttribute(juce::String param) const;
+	virtual juce::var getAttributeInternal(juce::String param) const;
 	virtual juce::StringArray getValidAttributes() const;
 
 	static juce::var setValueFromScript(const juce::var::NativeFunctionArgs& a);
@@ -121,6 +123,7 @@ public:
 	static juce::var getParentFromScript(const juce::var::NativeFunctionArgs& a);
 	static juce::var setNameFromScript(const juce::var::NativeFunctionArgs& a);
 	static juce::var setAttributeFromScript(const juce::var::NativeFunctionArgs& a);
+	static juce::var getAttributeFromScript(const juce::var::NativeFunctionArgs& a);
 
 	static juce::var getControlAddressFromScript(const juce::var::NativeFunctionArgs& a);
 	static juce::var getScriptControlAddressFromScript(const juce::var::NativeFunctionArgs& a);

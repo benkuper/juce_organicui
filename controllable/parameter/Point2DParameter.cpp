@@ -9,7 +9,6 @@
 */
 
 #include "JuceHeader.h"
-#include "Point2DParameter.h"
 
 Point2DParameter::Point2DParameter(const String& niceName, const String& description, bool _enabled) :
 	Parameter(POINT2D, niceName, description, 0, 0, 1, _enabled),
@@ -137,6 +136,26 @@ bool Point2DParameter::setAttributeInternal(String name, var val)
 	}
 
 	return true;
+}
+
+juce::var Point2DParameter::getAttributeInternal(juce::String name) const
+{
+	if (name == "ui")
+	{
+		switch (defaultUI)
+		{
+		case FloatParameter::TIME: return "time";
+		case FloatParameter::SLIDER: return "slider";
+		case FloatParameter::STEPPER: return "stepper";
+		case FloatParameter::LABEL: return "label";
+		default: return "none";
+		}
+	}
+	else if (name == "canvasInvertX") return extendedEditorInvertX;
+	else if (name == "canvasInvertY") return extendedEditorInvertY;
+	else if (name == "canvasStretchMode") return extendedEditorStretchMode;
+	else if (name == "stringDecimals") return stringDecimals;
+	return juce::var();
 }
 
 StringArray Point2DParameter::getValidAttributes() const

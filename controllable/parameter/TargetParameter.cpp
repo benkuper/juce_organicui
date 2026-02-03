@@ -9,6 +9,7 @@
 */
 
 #include "JuceHeader.h"
+#include "TargetParameter.h"
 
 using namespace juce;
 
@@ -439,6 +440,21 @@ bool TargetParameter::setAttributeInternal(String param, var attributeValue)
 	}
 
 	return true;
+}
+
+juce::var TargetParameter::getAttributeInternal(juce::String name) const
+{
+	if (name == "targetType") return (targetType == CONTAINER) ? "container" : "controllable";
+	else if (name == "searchLevel") return maxDefaultSearchLevel;
+	else if (name == "allowedTypes") return typesFilter;
+	else if (name == "excludedTypes") return excludeTypesFilter;
+	else if (name == "root")
+	{
+		if (rootContainer != nullptr && !rootContainer.wasObjectDeleted()) return rootContainer->getScriptObject();
+		else return var();
+	}
+	else if (name == "labelLevel") return defaultParentLabelLevel;
+	else return Parameter::getAttributeInternal(name);
 }
 
 StringArray TargetParameter::getValidAttributes() const

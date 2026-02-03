@@ -9,6 +9,7 @@
 */
 
 #include "JuceHeader.h"
+#include "FileParameter.h"
 
 juce_ImplementSingleton(FileCheckTimer);
 
@@ -36,7 +37,7 @@ FileParameter::FileParameter(const String& niceName, const String& description, 
 
 FileParameter::~FileParameter()
 {
-	if(FileCheckTimer::getInstanceWithoutCreating()) FileCheckTimer::getInstance()->unregisterParam(this);
+	if (FileCheckTimer::getInstanceWithoutCreating()) FileCheckTimer::getInstance()->unregisterParam(this);
 	if (Engine::mainEngine != nullptr) Engine::mainEngine->removeEngineListener(this);
 }
 
@@ -289,6 +290,14 @@ bool FileParameter::setAttributeInternal(String param, var paramVal)
 	}
 
 	return true;
+}
+
+juce::var FileParameter::getAttributeInternal(juce::String param) const
+{
+	if (param == "directoryMode") return directoryMode;
+	else if (param == "saveMode") return saveMode;
+	else if (param == "autoReload") return autoReload;
+	return StringParameter::getAttributeInternal(param);
 }
 
 StringArray FileParameter::getValidAttributes() const

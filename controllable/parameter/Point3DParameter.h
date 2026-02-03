@@ -36,6 +36,7 @@ public:
 	bool checkValueIsTheSame(juce::var newValue, juce::var oldValue) override;
 
 	virtual bool setAttributeInternal(juce::String name, juce::var val) override;
+	virtual juce::var getAttributeInternal(juce::String name) const override;
 	virtual juce::StringArray getValidAttributes() const override;
 
 	virtual juce::StringArray getValuesNames() override;

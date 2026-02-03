@@ -154,6 +154,31 @@ bool FloatParameter::setAttributeInternal(String attribute, var val)
 	return true;
 }
 
+juce::var FloatParameter::getAttributeInternal(juce::String name) const
+{
+	if (name == "ui")
+	{
+		switch (defaultUI)
+		{
+		case TIME: return "time";
+		case SLIDER: return "slider";
+		case STEPPER: return "stepper";
+		case LABEL: return "label";
+		default: return "none";
+		}
+	}
+	else if (name == "unitSteps")
+	{
+		return unitSteps;
+	}
+	else if (name == "stringDecimals")
+	{
+		return stringDecimals;
+	}
+
+	return juce::var();
+}
+
 StringArray FloatParameter::getValidAttributes() const
 {
 	StringArray att = Parameter::getValidAttributes();
@@ -165,7 +190,7 @@ var FloatParameter::getJSONDataInternal()
 {
 	var data = Parameter::getJSONDataInternal();
 	if (customUI != NONE) data.getDynamicObject()->setProperty("customUI", customUI);
- 	if(stringDecimals != DEFAULT_STRING_DECIMALS) data.getDynamicObject()->setProperty("stringDecimals", stringDecimals);
+	if (stringDecimals != DEFAULT_STRING_DECIMALS) data.getDynamicObject()->setProperty("stringDecimals", stringDecimals);
 	return data;
 }
 

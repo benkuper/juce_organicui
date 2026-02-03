@@ -33,6 +33,7 @@ public:
 	void setControlAutomation() override;
 
 	bool setAttributeInternal(juce::String attribute, juce::var val) override;
+	juce::var getAttributeInternal(juce::String name) const override;
 	virtual juce::StringArray getValidAttributes() const override;
 
 	juce::var getJSONDataInternal() override;

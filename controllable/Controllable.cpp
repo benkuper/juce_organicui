@@ -10,7 +10,6 @@
 
 
 #include "JuceHeader.h"
-#include "Controllable.h"
 
 const Array<String> Controllable::typeNames = {
 	"Custom",
@@ -66,16 +65,18 @@ Controllable::Controllable(const Type& type, const String& niceName, const Strin
 	parentContainer(nullptr),
 	controllableNotifier(10)
 {
+	scriptObject.getDynamicObject()->setProperty("type", Controllable::typeNames[type]);
+	scriptObject.getDynamicObject()->setProperty("description", description);
 	scriptObject.getDynamicObject()->setMethod("isParameter", Controllable::checkIsParameterFromScript);
 	scriptObject.getDynamicObject()->setMethod("getParent", Controllable::getParentFromScript);
 	scriptObject.getDynamicObject()->setMethod("setName", Controllable::setNameFromScript);
 	scriptObject.getDynamicObject()->setMethod("setAttribute", Controllable::setAttributeFromScript);
+	scriptObject.getDynamicObject()->setMethod("getAttribute", Controllable::getAttributeFromScript);
 	scriptObject.getDynamicObject()->setMethod("getControlAddress", Controllable::getControlAddressFromScript);
 	scriptObject.getDynamicObject()->setMethod("getScriptControlAdress", Controllable::getScriptControlAddressFromScript);
 
-	scriptObject.getDynamicObject()->setMethod("getJSONData", ControllableContainer::getJSONDataFromScript);
-	scriptObject.getDynamicObject()->setMethod("loadJSONData", ControllableContainer::loadJSONDataFromScript);
-
+	scriptObject.getDynamicObject()->setMethod("getJSONData", Controllable::getJSONDataFromScript);
+	scriptObject.getDynamicObject()->setMethod("loadJSONData", Controllable::loadJSONDataFromScript);
 	setEnabled(enabled);
 	setNiceName(niceName);
 }
@@ -354,9 +355,45 @@ bool Controllable::setAttributeInternal(String param, var value)
 	else if (param == "enabled") setEnabled(value);
 	else if (param == "canBeDisabled") canBeDisabledByUser = (bool)(int)value;
 	else if (param == "saveValueOnly") saveValueOnly = value;
+	else if (param == "labelLevel")
+	{
+		if (value.isInt() || value.isInt64())
+		{
+			dashboardDefaultLabelParentLevel = (int)value;
+			if (dashboardDefaultLabelParentLevel < 0) dashboardDefaultLabelParentLevel = 0;
+		}
+		else if (value.isString())
+		{
+			dashboardDefaultLabelParentLevel = value.toString().getIntValue();
+			if (dashboardDefaultLabelParentLevel < 0) dashboardDefaultLabelParentLevel = 0;
+		}
+	}
 	else return false;
 
 	return true;
+}
+
+juce::var Controllable::getAttribute(juce::String param) const
+{
+	if (param == "description") return description;
+	else if (param == "readonly" || param == "readOnly") return isControllableFeedbackOnly;
+	else if (param == "enabled") return enabled;
+	else if (param == "canBeDisabled") return canBeDisabledByUser;
+	else if (param == "saveValueOnly") return saveValueOnly;
+	else if (param == "labelLevel") return dashboardDefaultLabelParentLevel;
+
+	return getAttributeInternal(param);
+}
+
+juce::var Controllable::getAttributeInternal(juce::String param) const
+{
+	return var();
+}
+
+
+StringArray Controllable::getValidAttributes() const
+{
+	return { "enabled", "canBeDisabled", "targetType", "searchLevel", "allowedTypes", "excludedTypes","root", "labelLevel", "saveValueOnly" };
 }
 
 StringArray Controllable::getValidAttributes() const
@@ -546,6 +583,15 @@ var Controllable::setAttributeFromScript(const juce::var::NativeFunctionArgs& a)
 	if (c == nullptr) return var();
 	c->setAttribute(a.arguments[0].toString(), a.arguments[1]);
 	return var();
+}
+
+juce::var Controllable::getAttributeFromScript(const juce::var::NativeFunctionArgs& a)
+{
+	if (a.numArguments < 1) return var();
+	Controllable* c = getObjectFromJS<Controllable>(a);
+	if (c == nullptr) return var();
+
+	return c->getAttribute(a.arguments[0].toString());
 }
 
 var Controllable::getControlAddressFromScript(const juce::var::NativeFunctionArgs& a)

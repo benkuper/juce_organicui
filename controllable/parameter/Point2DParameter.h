@@ -36,6 +36,7 @@ public:
 	void setBounds(float _minX, float _minY, float _maxX, float _maxY);
 	
 	virtual bool setAttributeInternal(juce::String name, juce::var val) override;
+	virtual juce::var getAttributeInternal(juce::String name) const override;
 	virtual juce::StringArray getValidAttributes() const override;
 
 	virtual juce::StringArray getValuesNames() override;
