@@ -8,6 +8,8 @@
   ==============================================================================
 */
 
+#include "JuceHeader.h"
+
 
 IntParameter::IntParameter(const String& niceName, const String& description, const int& initialValue, const int& minValue, const int& maxValue, bool enabled) :
 	Parameter(Type::INT, niceName, description, initialValue, minValue, maxValue, enabled),
@@ -65,6 +67,15 @@ bool IntParameter::setAttributeInternal(String attribute, var val)
 	}
 
 	return true;
+}
+
+juce::var IntParameter::getAttributeInternal(juce::String name) const
+{
+	if (name == "hexMode")
+	{
+		return hexMode;
+	}
+	return juce::var();
 }
 
 

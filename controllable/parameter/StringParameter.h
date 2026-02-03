@@ -36,6 +36,7 @@ public:
 	virtual bool checkValueIsTheSame(juce::var oldValue, juce::var newValue) override;
 
 	virtual bool setAttributeInternal(juce::String param, juce::var paramVal) override;
+	virtual juce::var getAttributeInternal(juce::String name) const override;
 	virtual juce::StringArray getValidAttributes() const override;
 
 	StringParameterUI* createStringParameterUI(juce::Array<StringParameter*> parameters = {});

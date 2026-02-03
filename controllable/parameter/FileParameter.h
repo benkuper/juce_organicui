@@ -62,6 +62,7 @@ public:
 	static juce::var listFilesFromScript(const juce::var::NativeFunctionArgs& a);
 
 	virtual bool setAttributeInternal(juce::String param, juce::var paramVal) override;
+	virtual juce::var  getAttributeInternal(juce::String param) const override;
 	virtual juce::StringArray getValidAttributes() const override;
 
 	static StringParameter* create() { return new FileParameter("New FileParameter", "", ""); }

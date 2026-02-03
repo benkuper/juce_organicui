@@ -8,6 +8,7 @@
   ==============================================================================
 */
 
+#include "JuceHeader.h"
 
 StringParameter::StringParameter(const String& niceName, const String& description, const String& initialValue, bool enabled) :
 	Parameter(Type::STRING, niceName, description, initialValue, var(), var(), enabled),
@@ -98,6 +99,14 @@ bool StringParameter::setAttributeInternal(String param, var paramVal)
 	}
 
 	return true;
+}
+
+juce::var StringParameter::getAttributeInternal(juce::String name) const
+{
+	if (name == "multiline") return multiline;
+	else if (name == "prefix") return prefix;
+	else if (name == "suffix") return suffix;
+	return juce::var();
 }
 
 StringArray StringParameter::getValidAttributes() const
