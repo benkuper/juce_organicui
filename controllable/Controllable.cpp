@@ -65,6 +65,11 @@ Controllable::Controllable(const Type& type, const String& niceName, const Strin
 	parentContainer(nullptr),
 	controllableNotifier(10)
 {
+	setEnabled(enabled);
+	setNiceName(niceName);
+
+	scriptObject.getDynamicObject()->setProperty("name", shortName);
+	scriptObject.getDynamicObject()->setProperty("niceName", niceName);
 	scriptObject.getDynamicObject()->setProperty("type", Controllable::typeNames[type]);
 	scriptObject.getDynamicObject()->setProperty("description", description);
 	scriptObject.getDynamicObject()->setMethod("isParameter", Controllable::checkIsParameterFromScript);
@@ -77,8 +82,6 @@ Controllable::Controllable(const Type& type, const String& niceName, const Strin
 
 	scriptObject.getDynamicObject()->setMethod("getJSONData", Controllable::getJSONDataFromScript);
 	scriptObject.getDynamicObject()->setMethod("loadJSONData", Controllable::loadJSONDataFromScript);
-	setEnabled(enabled);
-	setNiceName(niceName);
 }
 
 Controllable::~Controllable() {
