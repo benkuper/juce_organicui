@@ -336,10 +336,22 @@ void Engine::setLastDocumentOpened(const File& file) {
 
 File Engine::getAutosavesDirectory(const File& originalFile) const
 {
-	String curFileName = originalFile.getFileNameWithoutExtension();
-	File curFileFolder = originalFile.getParentDirectory();
+	File f = originalFile;
+	String curFileName;
+	File curFileFolder; 
+	if(f.existsAsFile())
+	{
+		curFileName = originalFile.getFileNameWithoutExtension();
+		curFileFolder = originalFile.getParentDirectory();
+	}
+	else
+	{
+		f = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile(ProjectInfo::projectName);
+		curFileFolder = f;
+		curFileName = "unsaved_session";
+	}
+
 	File autoSaveDir = curFileFolder.getChildFile(curFileName + "_autosave");
-	
 	return autoSaveDir;
 }
 

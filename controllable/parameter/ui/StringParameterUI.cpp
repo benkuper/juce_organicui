@@ -125,7 +125,7 @@ void StringParameterUI::labelTextChanged(Label*)
 }
 
 
-File StringParameterFileUI::lastSearchedFolder = File::getSpecialLocation(File::userDocumentsDirectory);
+File StringParameterFileUI::lastSearchedFolder = File();
 
 StringParameterFileUI::StringParameterFileUI(Array<StringParameter*> parameters) :
 	StringParameterUI(parameters),
@@ -194,7 +194,7 @@ void StringParameterFileUI::buttonClicked(Button* b)
 {
 	if (b == &browseBT)
 	{
-		File of = fp->getFile().exists() ? fp->getFile().getParentDirectory() : lastSearchedFolder;
+		File of = fp->getFile().exists() ? fp->getFile().getParentDirectory() : (lastSearchedFolder == File() ? Engine::mainEngine->getFile().getParentDirectory() : lastSearchedFolder);
 
 		FileChooser* chooser(new FileChooser("Select a file", of, fp->fileTypeFilter));
 
