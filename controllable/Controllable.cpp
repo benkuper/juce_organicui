@@ -68,8 +68,6 @@ Controllable::Controllable(const Type& type, const String& niceName, const Strin
 	setEnabled(enabled);
 	setNiceName(niceName);
 
-	scriptObject.getDynamicObject()->setProperty("name", shortName);
-	scriptObject.getDynamicObject()->setProperty("niceName", niceName);
 	scriptObject.getDynamicObject()->setProperty("type", Controllable::typeNames[type]);
 	scriptObject.getDynamicObject()->setProperty("description", description);
 	scriptObject.getDynamicObject()->setMethod("isParameter", Controllable::checkIsParameterFromScript);
