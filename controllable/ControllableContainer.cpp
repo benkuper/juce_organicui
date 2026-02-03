@@ -9,7 +9,6 @@
  */
 
 #include "JuceHeader.h"
-#include "ControllableContainer.h"
 
 ControllableComparator ControllableContainer::comparator;
 
