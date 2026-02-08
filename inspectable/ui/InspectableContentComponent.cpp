@@ -29,6 +29,10 @@ InspectableContentComponent::~InspectableContentComponent()
 	if (inspectable != nullptr && !inspectable.wasObjectDeleted())
 	{
 		inspectable->removeAsyncInspectableListener(this);
+	}
+
+	if (inspectable != nullptr && !inspectable.wasObjectDeleted() && inspectable->isSelected)
+	{
 		inspectable->setSelected(false);
 	}
 }

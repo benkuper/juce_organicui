@@ -252,8 +252,8 @@ public:
 	public:
 		/** Destructor. */
 		virtual ~ManagerUIListener() {}
-		virtual void ItemUIAdded(U*) {}
-		virtual void ItemUIRemoved(U*) {}
+		virtual void itemUIAdded(U*) {}
+		virtual void itemUIRemoved(U*) {}
 	};
 
 	juce::ListenerList<ManagerUIListener> managerUIListeners;
@@ -984,7 +984,7 @@ U* ManagerUI<M, T, U>::addItemUI(T* item, bool animate, bool resizeAndRepaint)
 		//resized();
 	}
 
-	managerUIListeners.call(&ManagerUIListener::ItemUIAdded, tui);
+	managerUIListeners.call(&ManagerUIListener::itemUIAdded, tui);
 
 	repaint();
 
@@ -1028,7 +1028,7 @@ void ManagerUI<M, T, U>::removeItemUI(T* item, bool resizeAndRepaint)
 		itemsUI.removeObject(tui, false);
 		removeItemUIInternal(tui);
 
-		managerUIListeners.call(&ManagerUIListener::ItemUIRemoved, tui);
+		managerUIListeners.call(&ManagerUIListener::itemUIRemoved, tui);
 
 		delete tui;
 
