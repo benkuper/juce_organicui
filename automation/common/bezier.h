@@ -25,6 +25,16 @@
 #include <math.h>
 #include <vector>
 #include <limits>
+#include <algorithm>
+
+#if defined(_WIN32)
+#ifdef min
+#undef min      
+#endif
+#ifdef max
+#undef max
+#endif
+#endif
 
 // Cross platform define for printing size_t variables
 #ifdef __WIN32__
