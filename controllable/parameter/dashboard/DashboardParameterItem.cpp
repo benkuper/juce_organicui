@@ -27,6 +27,10 @@ DashboardParameterItem::DashboardParameterItem(Parameter* parameter) :
 
 DashboardParameterItem::~DashboardParameterItem()
 {
+	if (parameter != nullptr && !parameter.wasObjectDeleted())
+	{
+		parameter->removeParameterListener(this);
+	}
 }
 
 DashboardItemUI* DashboardParameterItem::createUI()
@@ -65,6 +69,8 @@ void DashboardParameterItem::setInspectableInternal(Inspectable* i)
 void DashboardParameterItem::onExternalParameterValueChanged(Parameter* p)
 {
 	DashboardControllableItem::onExternalParameterValueChanged(p);
+		
+	if (isClearing) return;
 
 	if (p == parameter)
 	{
