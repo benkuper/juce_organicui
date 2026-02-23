@@ -82,6 +82,7 @@ Controllable::Controllable(const Type& type, const String& niceName, const Strin
 
 Controllable::~Controllable() {
 	controllableNotifier.cancelPendingUpdate();
+	controllableNotifier.clearQueue();
 	Controllable::masterReference.clear();
 }
 

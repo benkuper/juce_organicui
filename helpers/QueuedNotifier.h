@@ -141,6 +141,13 @@ public:
     void addAsyncCoalescedListener(Listener* newListener) { lastListeners.add(newListener); }
     void removeListener(Listener* listener) { listeners.remove(listener);lastListeners.remove(listener); }
 
+    void clearQueue()
+    {
+        const typename QueueLock::ScopedLockType lock(queueLock);
+        messageQueue.clear();
+        fifo.reset();
+    }
+
 private:
 
     void handleAsyncUpdate() override
