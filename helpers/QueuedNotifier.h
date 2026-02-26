@@ -9,6 +9,8 @@
 */
 #pragma once
 
+#include <atomic>
+
 #define ENUM_LIST(...) {__VA_ARGS__}
 
 #define EVENT_NO_CHECK true
@@ -46,15 +48,18 @@ public:
 
     }
 
-	bool dropMessageOnOverflow;
+    bool dropMessageOnOverflow;
 
     virtual ~QueuedNotifier() {
+        isBeingDestroyed.store(true, std::memory_order_release);
         cancelPendingUpdate();
-		listeners.clear();
-		lastListeners.clear();
-		messageQueue.clear();
-		//cancelPendingUpdate();
-	}
+        const typename QueueLock::ScopedLockType lock(queueLock);
+        listeners.clear();
+        lastListeners.clear();
+        messageQueue.clear();
+        fifo.reset();
+        //cancelPendingUpdate();
+    }
 
 
 
@@ -65,56 +70,70 @@ public:
     };
 
     void addMessage( MessageClass * msg,bool forceSendNow = false){
+        if (msg == nullptr)
+            return;
+
+        if (isBeingDestroyed.load(std::memory_order_acquire))
+        {
+            delete msg;
+            return;
+        }
+
         if(listeners.size()==0 && lastListeners.size()==0){
             delete msg;
             return;
         }
-        forceSendNow |= juce::MessageManager::getInstance()->isThisTheMessageThread();
+
+        if (auto* mm = juce::MessageManager::getInstanceWithoutCreating())
+            forceSendNow |= mm->isThisTheMessageThread();
+
         if(forceSendNow){
             listeners.call(&Listener::newMessage,*msg);
             lastListeners.call(&Listener::newMessage,*msg);
             delete msg;
             return;
         }
-        else{
 
-            // add if we are in a decent array size
-            
-			int start1,size1,start2,size2;
-			fifo.prepareToWrite(1, start1, size1, start2, size2);
-			
-			/*
-			if(size2>0){
-				if(messageQueue.size()<maxSize){messageQueue.add(msg);}
-				else{messageQueue.set(start2,msg);}
-			}
-			*/
-			if (size1 == 0)
-			{
-				if (dropMessageOnOverflow)
-				{
-					delete msg;
-				}
-				else
-				{
-					while (size1 == 0)
-					{
-						fifo.prepareToWrite(1, start1, size1, start2, size2);
-                        juce::Thread::sleep(10);
-					}
-				}
-			}else {
-				if (messageQueue.size()<maxSize) { messageQueue.add(msg); }
-				else { messageQueue.set(start1, msg); }
-			}
+        // add if we are in a decent array size
+        int start1{},size1{},start2{},size2{};
 
-			//jassert(size2 == 0);
+        for (;;)
+        {
+            if (isBeingDestroyed.load(std::memory_order_acquire))
+            {
+                delete msg;
+                return;
+            }
 
+            {
+                const typename QueueLock::ScopedLockType lock(queueLock);
+                fifo.prepareToWrite(1, start1, size1, start2, size2);
 
-			fifo.finishedWrite (size1 + size2);
-            triggerAsyncUpdate();
+                if (size1 > 0)
+                {
+                    if (messageQueue.size() <= start1)
+                    {
+                        while (messageQueue.size() <= start1)
+                            messageQueue.add(nullptr);
+                    }
+
+                    messageQueue.set(start1, msg);
+
+                    fifo.finishedWrite (size1 + size2);
+                    break;
+                }
+            }
+
+            if (dropMessageOnOverflow)
+            {
+                delete msg;
+                return;
+            }
+
+            juce::Thread::sleep(10);
         }
 
+        triggerAsyncUpdate();
     }
 
     // allow to stack all values or get oly last updated value
@@ -126,31 +145,80 @@ private:
 
     void handleAsyncUpdate() override
     {
-            int start1,size1,start2,size2;
+        if (isBeingDestroyed.load(std::memory_order_acquire))
+            return;
+
+        juce::Array<MessageClass*> messagesToDeliver;
+        MessageClass* lastMessage = nullptr;
+
+        {
+            const typename QueueLock::ScopedLockType lock(queueLock);
+
+            int start1{},size1{},start2{},size2{};
             fifo.prepareToRead(fifo.getNumReady(), start1, size1, start2, size2);
 
-                for(int i = start1 ;i <start1+ size1 ; ++i){
-                    listeners.call(&Listener::newMessage,*messageQueue.getUnchecked(i));
+            bool outOfRange = false;
+
+            for(int i = start1 ;i <start1+ size1 ; ++i)
+            {
+                if ((unsigned) i >= (unsigned) messageQueue.size())
+                {
+                    outOfRange = true;
+                    break;
                 }
 
-            for(int i = start2 ;i <start2+ size2 ; ++i){
-                listeners.call(&Listener::newMessage,*messageQueue.getUnchecked(i));
+                if (auto* message = messageQueue.getUnchecked(i))
+                {
+                    messagesToDeliver.add(message);
+                    lastMessage = message;
+                }
             }
 
-            if(size2>0)
-                lastListeners.call(&Listener::newMessage,*messageQueue.getUnchecked(start2+size2-1));
-            else if(size1>0)
-                lastListeners.call(&Listener::newMessage,*messageQueue.getUnchecked(start1+size1-1));
+            if (! outOfRange)
+            {
+                for(int i = start2 ;i <start2+ size2 ; ++i)
+                {
+                    if ((unsigned) i >= (unsigned) messageQueue.size())
+                    {
+                        outOfRange = true;
+                        break;
+                    }
+
+                    if (auto* message = messageQueue.getUnchecked(i))
+                    {
+                        messagesToDeliver.add(message);
+                        lastMessage = message;
+                    }
+                }
+            }
+
+            if (outOfRange)
+            {
+                fifo.reset();
+                return;
+            }
 
             fifo.finishedRead(size1 + size2);
+        }
+
+        for (auto* message : messagesToDeliver)
+            listeners.call(&Listener::newMessage,*message);
+
+        if (lastMessage != nullptr)
+            lastListeners.call(&Listener::newMessage,*lastMessage);
     }
 
 
 
+    using QueueLock = CriticalSectionToUse;
+
     juce::AbstractFifo fifo;
     int maxSize;
     juce::OwnedArray<MessageClass,CriticalSectionToUse> messageQueue;
+    QueueLock queueLock;
+    std::atomic<bool> isBeingDestroyed { false };
 
-    juce::ListenerList<Listener/*, juce::Array<Listener*, juce::CriticalSection>*/> listeners;
-    juce::ListenerList<Listener/*, juce::Array<Listener*, juce::CriticalSection>*/> lastListeners;
+    using ThreadSafeListenerArray = juce::Array<Listener*, CriticalSectionToUse>;
+    juce::ListenerList<Listener, ThreadSafeListenerArray> listeners;
+    juce::ListenerList<Listener, ThreadSafeListenerArray> lastListeners;
 };

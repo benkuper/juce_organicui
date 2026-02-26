@@ -33,7 +33,7 @@ public:
 
 	bool nameCanBeChangedByUser;
 
-	bool isClearing;
+	std::atomic<bool>  isClearing;
 
 	//Editor
 	bool canInspectChildContainers;

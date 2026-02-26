@@ -1055,6 +1055,7 @@ template<class T>
 juce::var Manager<T>::addItemFromScript(const juce::var::NativeFunctionArgs& args)
 {
 	Manager<T>* m = getObjectFromJS<Manager<T>>(args);
+	if (m == nullptr || m->isBeingDestroyed) return juce::var();
 
 	//if (args.numArguments) return juce::var(); 
 	if (m->managerFactory == nullptr || m->managerFactory->defs.size() == 1)

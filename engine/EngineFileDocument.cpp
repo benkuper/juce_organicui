@@ -247,7 +247,7 @@ juce::Result Engine::saveCopy()
 Result Engine::saveBackupDocument(int index)
 {
 
-	if (GlobalSettings::getInstance()->autoSaveOnChangeOnly->boolValue() && !isThereChangeToBackup ) {return Result::ok();}
+	if (GlobalSettings::getInstance()->autoSaveOnChangeOnly->boolValue() && !isThereChangeToBackup) { return Result::ok(); }
 
 	if (!getFile().existsAsFile()) return Result::ok();
 
@@ -336,9 +336,21 @@ void Engine::setLastDocumentOpened(const File& file) {
 
 File Engine::getAutosavesDirectory(const File& originalFile) const
 {
-	if (!originalFile.existsAsFile()) return File();
-	String curFileName = originalFile.getFileNameWithoutExtension();
-	File curFileFolder = originalFile.getParentDirectory();
+	File f = originalFile;
+	String curFileName;
+	File curFileFolder;
+	if (f.existsAsFile())
+	{
+		curFileName = originalFile.getFileNameWithoutExtension();
+		curFileFolder = originalFile.getParentDirectory();
+	}
+	else
+	{
+		f = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile(ProjectInfo::projectName);
+		curFileFolder = f;
+		curFileName = "unsaved_session";
+	}
+
 	File autoSaveDir = curFileFolder.getChildFile(curFileName + "_autosave");
 	
 	return autoSaveDir;
@@ -461,6 +473,12 @@ void Engine::loadJSONData(var data, ProgressTask* loadingTask)
 
 
 	DynamicObject* md = data.getDynamicObject()->getProperty("metaData").getDynamicObject();
+	if (md == nullptr)
+	{
+		LOGERROR("File format error : no metaData found");
+		setFile(File());
+		return;
+	}
 	bool versionChecked = checkFileVersion(md);
 
 	String versionString = md->hasProperty("version") ? md->getProperty("version").toString() : "?";
@@ -615,6 +633,7 @@ void Engine::loadJSONDataEngine(var data, ProgressTask* loadingTask)
 
 bool Engine::checkFileVersion(DynamicObject* metaData, bool checkForNewerVersion)
 {
+	if (metaData == nullptr) return false;
 	if (!metaData->hasProperty("version")) return false;
 	String versionToCheck = checkForNewerVersion ? getAppVersion() : getMinimumRequiredFileVersion();
 	//DBG(metaData->getProperty("version").toString() << " / " << versionToCheck);

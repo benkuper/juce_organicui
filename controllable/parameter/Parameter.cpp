@@ -486,6 +486,22 @@ void Parameter::notifyValueChanged() {
 
 	if (!lock.isLocked()) return;
 
+	if (auto* mm = MessageManager::getInstanceWithoutCreating(); mm != nullptr && !mm->isThisTheMessageThread())
+	{
+		WeakReference<Parameter> safeThis(this);
+		const auto valueCopy = getValue();
+
+		MessageManager::callAsync([safeThis, valueCopy]()
+		{
+			if (safeThis == nullptr || safeThis->isBeingDestroyed) return;
+
+			safeThis->parameterListeners.call(&ParameterListener::parameterValueChanged, safeThis.get());
+			safeThis->queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::VALUE_CHANGED, safeThis.get(), valueCopy));
+		});
+
+		return;
+	}
+
 	parameterListeners.call(&ParameterListener::parameterValueChanged, this);
 	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::VALUE_CHANGED, this, getValue()));
 	//isNotifyingChange = false;

@@ -51,7 +51,7 @@ public:
 
 	//for multiSelection
 	bool isPreselected;
-	bool isBeingDestroyed;
+	std::atomic<bool> isBeingDestroyed;
 
 	bool highlightLinkedInspectableOnSelect;
 	juce::Array<juce::WeakReference<Inspectable>> linkedInspectables;
