@@ -95,7 +95,7 @@ public:
 	void onContainerParameterChanged(Parameter* p) override;
 
 	Bezier::Bezier<3> bezier;
-	juce::Array<float> uniformLUT;
+	juce::Array<float, juce::CriticalSection> uniformLUT;
 
 	juce::Array<juce::Point<float>> getSplitControlPoints(float pos);
 

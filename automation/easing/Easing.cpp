@@ -104,6 +104,7 @@ CubicEasing::CubicEasing() :
 
 void CubicEasing::onContainerParameterChanged(Parameter* p)
 {
+	if (isClearing || isBeingDestroyed) return;
 	if (p == anchor1 || p == anchor2) updateBezier();
 }
 
@@ -209,6 +210,7 @@ void CubicEasing::updateKeysInternal(bool stretch)
 void CubicEasing::updateBezier()
 {
 	if (length == 0) return;
+	if (isClearing || isBeingDestroyed) return;
 
 	Point<float> a1 = start + anchor1->getPoint();
 	Point<float> a2 = end + anchor2->getPoint();
@@ -219,46 +221,55 @@ void CubicEasing::updateBezier()
 
 void CubicEasing::updateUniformLUT(int precision)
 {
-	uniformLUT.clear();
-	Array<float> arcLengths;
-	arcLengths.add(0);
+    if (isClearing || isBeingDestroyed || precision <= 0) return;
 
-	Point<float> prevP = getRawValue(0);
+    uniformLUT.clear();
+    Array<float, CriticalSection> arcLengths;
+    arcLengths.add(0);
 
-	float dist = 0;
-	for (int i = 1; i <= precision; ++i) {
-		float rel = i * 1.0f / precision;
-		Point<float> p = getRawValue(rel);
+    Point<float> prevP = getRawValue(0);
 
-		dist += p.x - prevP.x;
-		arcLengths.add(dist);
-		prevP.setXY(p.x, p.y);
-	}
+    float dist = 0;
+    for (int i = 1; i <= precision; ++i) {
+        float rel = i * 1.0f / precision;
+        Point<float> p = getRawValue(rel);
 
-	for (int i = 0; i <= precision; ++i)
-	{
-		float targetLength = (i * 1.0f / precision) * length;
-		int low = 0;
-		int high = precision;
-		int index = 0;
+        dist += p.x - prevP.x;
+        arcLengths.add(dist);
+        prevP.setXY(p.x, p.y);
+    }
 
-		while (low < high) {
-			index = low + (((high - low) / 2) | 0);
-			if (arcLengths[index] < targetLength) low = index + 1;
-			else  high = index;
-		}
+    for (int i = 0; i <= precision; ++i)
+    {
+        float targetLength = (i * 1.0f / precision) * length;
+        int low = 0;
+        int high = precision;
 
-		if (arcLengths[index] > targetLength) index--;
+        // Ensure binary search stays within bounds
+        while (low < high)
+        {
+            int mid = low + (high - low) / 2;
 
-		float lengthBefore = arcLengths[index];
+            if (arcLengths[mid] < targetLength)
+                low = mid + 1;
+            else
+                high = mid;
+        }
 
-		float pos = 0;
-		if (lengthBefore == targetLength) pos = index / precision;
-		else pos = (index + (targetLength - lengthBefore) / (arcLengths[index + 1] - lengthBefore)) / precision;
+        int index = jmax(0, jmin(low, precision - 1)); // Clamp index to valid range
 
-		Point<float> curPoint = getRawValue(pos);
-		uniformLUT.add(curPoint.y);
-	}
+        float lengthBefore = arcLengths[index];
+        float lengthAfter = arcLengths[jmin(index + 1, precision)];
+
+        float pos = 0;
+        if (lengthBefore == targetLength)
+            pos = index / static_cast<float>(precision);
+        else if (lengthAfter > lengthBefore)
+            pos = (index + (targetLength - lengthBefore) / (lengthAfter - lengthBefore)) / static_cast<float>(precision);
+
+        Point<float> curPoint = getRawValue(pos);
+        uniformLUT.add(curPoint.y);
+    }
 }
 
 

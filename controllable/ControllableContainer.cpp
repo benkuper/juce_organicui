@@ -835,11 +835,13 @@ void ControllableContainer::dispatchState(Controllable* c)
 
 void ControllableContainer::controllableStateChanged(Controllable* c)
 {
+	if (isClearing || isBeingDestroyed) return;
 	if (c->parentContainer == this) dispatchState(c);
 }
 
 void ControllableContainer::parameterValueChanged(Parameter* p)
 {
+	if (isClearing || isBeingDestroyed) return;
 	if (p->parentContainer == this)
 	{
 		onContainerParameterChanged(p);
@@ -855,6 +857,7 @@ void ControllableContainer::parameterValueChanged(Parameter* p)
 
 void ControllableContainer::parameterRangeChanged(Parameter* p)
 {
+	if (isClearing || isBeingDestroyed) return;
 	if (p->parentContainer == this)
 	{
 		dispatchFeedback(p);
@@ -868,6 +871,7 @@ void ControllableContainer::parameterRangeChanged(Parameter* p)
 
 void ControllableContainer::triggerTriggered(Trigger* t)
 {
+	if (isClearing || isBeingDestroyed) return;
 	if (t->parentContainer == this) onContainerTriggerTriggered(t);
 	else onExternalTriggerTriggered(t);
 
@@ -877,11 +881,13 @@ void ControllableContainer::triggerTriggered(Trigger* t)
 
 void ControllableContainer::controllableFeedbackUpdate(ControllableContainer* cc, Controllable* c)
 {
+	if (isClearing || isBeingDestroyed) return;
 	onControllableFeedbackUpdate(cc, c); //This is the function to override from child classes
 }
 
 void ControllableContainer::controllableNameChanged(Controllable* c, const String& prevName)
 {
+	if (isClearing || isBeingDestroyed) return;
 	if (c->parentContainer.get() != this) return;
 
 	if (allowSameChildrenNiceNames)
@@ -903,12 +909,14 @@ void ControllableContainer::controllableNameChanged(Controllable* c, const Strin
 
 void ControllableContainer::askForRemoveControllable(Controllable* c, bool addToUndo)
 {
+	if (isBeingDestroyed) return;
 	if (addToUndo) removeUndoableControllable(c);
 	else removeControllable(c);
 }
 
 void ControllableContainer::warningChanged(WarningTarget* target)
 {
+	if (isBeingDestroyed) return;
 	notifyWarningChanged();
 	onWarningChanged(target);
 	if (parentContainer != nullptr) parentContainer->warningChanged(target);
