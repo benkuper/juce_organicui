@@ -138,6 +138,9 @@ public:
 	bool fixedItemHeight;
 	int gap;
 
+	// reentrancy guards
+	bool isUpdatingVisibility = false;
+
 	void setDefaultLayout(Layout l);
 	void addExistingItems(bool resizeAfter = true);
 
@@ -287,7 +290,8 @@ ManagerUI<M, T, U>::ManagerUI(const juce::String& contentName, M* _manager, bool
 	isDraggingOver(false),
 	highlightOnDragOver(true),
 	fixedItemHeight(true),
-	gap(2)
+	gap(2),
+	isUpdatingVisibility(false)
 {
 
 	selectionContourColor = LIGHTCONTOUR_COLOR;
@@ -684,28 +688,31 @@ void ManagerUI<M, T, U>::resizedInternalContent(juce::Rectangle<int>& r)
 template<class M, class T, class U>
 void ManagerUI<M, T, U>::placeItems(juce::Rectangle<int>& r)
 {
-	int i = 0;
-	for (auto& ui : itemsUI)
-	{
+    int i = 0;
+    juce::Array<U*> snapshot(itemsUI.getRawDataPointer(), itemsUI.size());
+    for (auto* ui : snapshot)
+    {
+        if (ui == nullptr) continue;
 		ItemMinimalUI<T>* bui = static_cast<ItemMinimalUI<T>*>(ui);
-		if (!checkFilterForItem(ui))
-		{
-			bui->setVisible(false);
-			continue;
-		}
-		bui->setVisible(true);
+        if (!checkFilterForItem(ui))
+        {
+            bui->setVisible(false);
+            ++i;
+            continue;
+        }
+        bui->setVisible(true);
 
-		juce::Rectangle<int> tr;
-		if (defaultLayout == VERTICAL) tr = r.withHeight(bui->getHeight());
-		else tr = r.withWidth(bui->getWidth());
+        juce::Rectangle<int> tr;
+        if (defaultLayout == VERTICAL) tr = r.withHeight(bui->getHeight());
+        else tr = r.withWidth(bui->getWidth());
 
-		if (tr != bui->getBounds()) bui->setBounds(tr);
+        if (tr != bui->getBounds()) bui->setBounds(tr);
 
-		if (defaultLayout == VERTICAL) r.translate(0, tr.getHeight() + gap);
-		else r.translate(tr.getWidth() + gap, 0);
+        if (defaultLayout == VERTICAL) r.translate(0, tr.getHeight() + gap);
+        else r.translate(tr.getWidth() + gap, 0);
 
-		++i;
-	}
+        ++i;
+    }
 }
 
 template<class M, class T, class U>
@@ -804,16 +811,33 @@ void ManagerUI<M, T, U>::distributeItems(bool isVertical)
 template<class M, class T, class U>
 void ManagerUI<M, T, U>::updateItemsVisibility()
 {
-	for (auto& bui : itemsUI) updateItemVisibility(bui);
+    if (isUpdatingVisibility) return;
+    isUpdatingVisibility = true;
+
+    // Take a snapshot of the pointers so modifications to `itemsUI` during
+    // iteration (via callbacks/listeners) won't leave us iterating over
+    // a modified container containing null/dangling pointers.
+    juce::Array<U*> snapshot (itemsUI.getRawDataPointer(), itemsUI.size());
+    for (auto* bui : snapshot)
+    {
+        if (bui != nullptr) updateItemVisibility(bui);
+    }
+
+    isUpdatingVisibility = false;
 
 }
 
 template<class M, class T, class U>
 void ManagerUI<M, T, U>::updateItemVisibility(U* bui)
 {
-	if (!checkFilterForItem(bui)) return;
+    // Defensive: skip null pointers which can appear if itemsUI is modified
+    // while we're iterating (re-entrancy / callbacks). The caller should
+    // avoid mutating itemsUI during iteration, but guard here to be safe.
+    if (bui == nullptr) return;
 
-	juce::Rectangle<int> vr = this->getLocalArea(bui, bui->getLocalBounds());
+    if (!checkFilterForItem(bui)) return;
+
+    juce::Rectangle<int> vr = this->getLocalArea(bui, bui->getLocalBounds());
 	if (defaultLayout == VERTICAL)
 	{
 		if (viewport.getHeight() > 0 && (vr.getY() > viewport.getBounds().getBottom() || vr.getBottom() < viewport.getY())) bui->setVisible(false);
@@ -861,14 +885,16 @@ bool ManagerUI<M, T, U>::hitTest(int x, int y)
 	if (itemsUI.size() == 0) return validateHitTestOnNoItem;
 
 	juce::Point<int> p(x, y);
-	for (auto& i : itemsUI)
-	{
-		if (i->getBounds().contains(p))
-		{
-			juce::Point<int> localP = i->getLocalPoint(this, p);
-			if (i->hitTest(localP.x, localP.y)) return true;
-		}
-	}
+    juce::Array<U*> snapshot(itemsUI.getRawDataPointer(), itemsUI.size());
+    for (auto* i : snapshot)
+    {
+        if (i == nullptr) continue;
+        if (i->getBounds().contains(p))
+        {
+            juce::Point<int> localP = i->getLocalPoint(this, p);
+            if (i->hitTest(localP.x, localP.y)) return true;
+        }
+    }
 
 	return false;
 }
@@ -1230,14 +1256,16 @@ void ManagerUI<M, T, U>::itemDropped(const SourceDetails& dragSourceDetails)
 template<class M, class T, class U>
 void ManagerUI<M, T, U>::addSelectableComponentsAndInspectables(juce::Array<juce::Component*>& selectables, juce::Array<Inspectable*>& inspectables)
 {
-	for (auto& i : itemsUI)
-	{
-		if (i->isVisible())
-		{
-			selectables.add(getSelectableComponentForItemUI(i));
-			inspectables.add(i->inspectable);
-		}
-	}
+    juce::Array<U*> snapshot(itemsUI.getRawDataPointer(), itemsUI.size());
+    for (auto* i : snapshot)
+    {
+        if (i == nullptr) continue;
+        if (i->isVisible())
+        {
+            selectables.add(getSelectableComponentForItemUI(i));
+            inspectables.add(i->inspectable);
+        }
+    }
 
 }
 
@@ -1250,14 +1278,17 @@ juce::Component* ManagerUI<M, T, U>::getSelectableComponentForItemUI(U* ItemUI)
 template<class M, class T, class U>
 int ManagerUI<M, T, U>::getDropIndexForPosition(juce::Point<int> localPosition)
 {
-	for (int i = 0; i < itemsUI.size(); ++i)
-	{
+    juce::Array<U*> snapshot(itemsUI.getRawDataPointer(), itemsUI.size());
+    for (int i = 0; i < snapshot.size(); ++i)
+    {
+        U* element = snapshot[i];
+        if (element == nullptr) continue;
 		ItemMinimalUI<T>* iui = dynamic_cast<ItemMinimalUI<T>*>(itemsUI[i]);
-		juce::Point<int> p = getLocalArea(iui, iui->getLocalBounds()).getCentre();
+        juce::Point<int> p = getLocalArea(iui, iui->getLocalBounds()).getCentre();
 
-		if (defaultLayout == HORIZONTAL && localPosition.x < p.x) return i;
-		else if (defaultLayout == VERTICAL && localPosition.y < p.y) return i;
-	}
+        if (defaultLayout == HORIZONTAL && localPosition.x < p.x) return i;
+        else if (defaultLayout == VERTICAL && localPosition.y < p.y) return i;
+    }
 
 	return -1;
 }
