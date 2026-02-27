@@ -129,16 +129,19 @@ void ScriptExpression::buildEnvironment()
 {
 	//clear phase
 	setState(EXPRESSION_CLEAR);
+
 	scriptEngine.reset(new JavascriptEngine());
+	if (Engine::mainEngine == nullptr || Engine::mainEngine->isClearing) return;
 	//while (scriptParamsContainer.controllables.size() > 0) scriptParamsContainer.removeControllable(scriptParamsContainer.controllables[0]);
 	//scriptParamsContainer.clear();
 
 	//scriptEngine->registerNativeObject("script", getScriptObject()); //force "script" for this objet
 	//if (parentTarget != nullptr) scriptEngine->registerNativeObject("local", parentTarget->getScriptObject()); //force "local" for the related object
 
-	if (attachedParam != nullptr)
+	if (attachedParam != nullptr && attachedParam->parentContainer != nullptr)
 	{
-		scriptEngine->registerNativeObject("parent", attachedParam->parentContainer->getScriptObject().getDynamicObject());
+		if (DynamicObject* parentObj = attachedParam->parentContainer->getScriptObject().getDynamicObject())
+			scriptEngine->registerNativeObject("parent", parentObj);
 	}
 
 	if (ScriptUtil::getInstanceWithoutCreating() != nullptr)
