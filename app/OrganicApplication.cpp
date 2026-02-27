@@ -146,20 +146,22 @@ void OrganicApplication::initialise(const String& commandLine)
 
 void OrganicApplication::shutdown()
 {
+	saveGlobalSettings();
+
+	ShapeShifterManager::getInstance()->saveLastSessionLayoutFileIfNeeded();
+
+	// Add your application's shutdown code here..
+	if (mainComponent != nullptr)
+	{
+		mainComponent->clear();
+		mainWindow = nullptr; // (deletes our window)
+	}
 	CrashDumpUploader::deleteInstance();
 	AppUpdater::deleteInstance();
 
 	Logger::setCurrentLogger(nullptr);
 	CustomLogger::deleteInstance();
 	FileDownloader::deleteInstance();
-
-	if (mainComponent == nullptr) return;
-
-	saveGlobalSettings();
-
-	// Add your application's shutdown code here..
-	mainComponent->clear();
-	mainWindow = nullptr; // (deletes our window)
 
 
 	Logger::setCurrentLogger(nullptr);

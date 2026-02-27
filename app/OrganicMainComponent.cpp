@@ -134,6 +134,7 @@ void OrganicMainContentComponent::setupOpenGL()
 
 void OrganicMainContentComponent::clear()
 {
+	ShapeShifterManager::getInstance()->clearAllPanelsAndWindows();
 #if JUCE_OPENGL
 	if (openGLContext)
 	{

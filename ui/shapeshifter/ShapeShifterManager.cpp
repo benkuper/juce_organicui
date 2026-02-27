@@ -29,7 +29,6 @@ ShapeShifterManager::ShapeShifterManager() :
 
 ShapeShifterManager::~ShapeShifterManager()
 {
-	if(layoutFolder.exists() && saveLastLayout) saveCurrentLayoutToFile(layoutFolder.getChildFile(+"_lastSession." + appLayoutExtension));
 	openedWindows.clear();
 	if (GlobalSettings::getInstanceWithoutCreating() != nullptr) GlobalSettings::getInstance()->fontSize->removeAsyncParameterListener(this);
 }
@@ -329,6 +328,11 @@ void ShapeShifterManager::loadLastSessionLayoutFile()
 	lastFile = layoutFolder.getChildFile("_lastSession." + appLayoutExtension);
 	if (lastFile.exists()) loadLayoutFromFile(lastFile);
 	else loadDefaultLayoutFile();
+}
+
+void ShapeShifterManager::saveLastSessionLayoutFileIfNeeded()
+{
+	if (layoutFolder.exists() && saveLastLayout) saveCurrentLayoutToFile(layoutFolder.getChildFile(+"_lastSession." + appLayoutExtension));
 }
 
 void ShapeShifterManager::loadDefaultLayoutFile(bool forceEmbeddedLayout)

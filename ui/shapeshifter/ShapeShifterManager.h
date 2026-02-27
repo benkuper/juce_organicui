@@ -77,6 +77,7 @@ public:
 	void loadLayoutFromFile(int fileIndexInLayoutFolder =-1);
 	void loadLayoutFromFile(const juce::File &fromFile);
 	void loadLastSessionLayoutFile();
+	void saveLastSessionLayoutFileIfNeeded();
 	void loadDefaultLayoutFile(bool forceEmbeddedLayout = false);
 	void saveCurrentLayout();
 	void saveCurrentLayoutToFile(const juce::File &toFile);
