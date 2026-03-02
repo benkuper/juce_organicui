@@ -48,16 +48,15 @@ Parameter::Parameter(const Type& type, const String& niceName, const String& des
 
 Parameter::~Parameter()
 {
+	isBeingDestroyed = true;
+
 	if (referenceTarget != nullptr) referenceTarget->removeParameterListener(this); //avoid reassigning on deletion
 	setReferenceParameter(nullptr);
 
-	if (queuedNotifier.isUpdatePending())
-	{
-		MessageManagerLock mmLock(Thread::getCurrentThread());
-		if (mmLock.lockWasGained()) queuedNotifier.handleUpdateNowIfNeeded();
-		queuedNotifier.cancelPendingUpdate();
-		queuedNotifier.clearQueue();
-	}
+	MessageManagerLock mmLock(Thread::getCurrentThread());
+	if (mmLock.lockWasGained() && queuedNotifier.isUpdatePending()) queuedNotifier.handleUpdateNowIfNeeded();
+	queuedNotifier.cancelPendingUpdate();
+	queuedNotifier.clearQueue();
 
 	Parameter::masterReference.clear();
 }
@@ -71,6 +70,7 @@ void Parameter::setEnabled(bool _value, bool silentSet, bool force)
 void Parameter::setControlMode(ControlMode _mode)
 {
 	if (_mode == controlMode) return;
+	if (isBeingDestroyed) return;
 
 	controlMode = _mode;
 
@@ -106,8 +106,10 @@ void Parameter::setControlMode(ControlMode _mode)
 
 	}
 
+	WeakReference<Parameter> safeThis(this);
 	parameterListeners.call(&ParameterListener::parameterControlModeChanged, this);
-	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::CONTROLMODE_CHANGED, this));
+	if (auto* p = safeThis.get(); p != nullptr && !p->isBeingDestroyed)
+		p->queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::CONTROLMODE_CHANGED, p));
 }
 
 void Parameter::setControlExpression(const String& e)
@@ -213,7 +215,7 @@ StringArray Parameter::getValuesNames()
 
 void Parameter::setRange(var min, var max)
 {
-	if (!canHaveRange) return;
+	if (!canHaveRange || isBeingDestroyed) return;
 	{
 		GenericScopedLock lock(valueSetLock);
 		if (isComplex())
@@ -239,17 +241,24 @@ void Parameter::setRange(var min, var max)
 
 		MessageManager::callAsync([safeThis, safeRange]()
 			{
-				if (safeThis == nullptr || safeThis->isBeingDestroyed) return;
+				auto* p = safeThis.get();
+				if (p == nullptr || p->isBeingDestroyed) return;
 
-				safeThis->parameterListeners.call(&ParameterListener::parameterRangeChanged, safeThis.get());
-				safeThis->queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::BOUNDS_CHANGED, safeThis.get(), safeRange));
+				p->parameterListeners.call(&ParameterListener::parameterRangeChanged, p);
+
+				auto* pAfterListeners = safeThis.get();
+				if (pAfterListeners == nullptr || pAfterListeners->isBeingDestroyed) return;
+
+				pAfterListeners->queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::BOUNDS_CHANGED, pAfterListeners, safeRange));
 			});
 
 	}
 	else
 	{
+		WeakReference<Parameter> safeThis(this);
 		parameterListeners.call(&ParameterListener::parameterRangeChanged, this);
-		queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::BOUNDS_CHANGED, this, arr));
+		if (auto* p = safeThis.get(); p != nullptr && !p->isBeingDestroyed)
+			p->queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::BOUNDS_CHANGED, p, arr));
 	}
 
 	if (isOverriden) setValue(value); //if value is outside range, this will change the value
@@ -260,7 +269,7 @@ void Parameter::setRange(var min, var max)
 
 void Parameter::clearRange()
 {
-	if (!canHaveRange) return;
+	if (!canHaveRange || isBeingDestroyed) return;
 
 	if (isComplex())
 	{
@@ -287,7 +296,7 @@ void Parameter::clearRange()
 
 bool Parameter::hasRange() const
 {
-	if (!canHaveRange) return false;
+	if (!canHaveRange || isBeingDestroyed) return false;
 	{
 		GenericScopedLock lock(valueSetLock);
 		if (isComplex())
@@ -463,17 +472,24 @@ void Parameter::notifyValueChanged() {
 
 		MessageManager::callAsync([safeThis, valueCopy]()
 			{
-				if (safeThis == nullptr || safeThis->isBeingDestroyed) return;
+				auto* p = safeThis.get();
+				if (p == nullptr || p->isBeingDestroyed) return;
 
-				safeThis->parameterListeners.call(&ParameterListener::parameterValueChanged, safeThis.get());
-				safeThis->queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::VALUE_CHANGED, safeThis.get(), valueCopy));
+				p->parameterListeners.call(&ParameterListener::parameterValueChanged, p);
+
+				auto* pAfterListeners = safeThis.get();
+				if (pAfterListeners == nullptr || pAfterListeners->isBeingDestroyed) return;
+
+				pAfterListeners->queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::VALUE_CHANGED, pAfterListeners, valueCopy));
 			});
 
 		return;
 	}
 
+	WeakReference<Parameter> safeThis(this);
 	parameterListeners.call(&ParameterListener::parameterValueChanged, this);
-	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::VALUE_CHANGED, this, getValue()));
+	if (auto* p = safeThis.get(); p != nullptr && !p->isBeingDestroyed)
+		p->queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::VALUE_CHANGED, p, getValue()));
 	//isNotifyingChange = false;
 }
 
@@ -484,7 +500,9 @@ void Parameter::expressionValueChanged(ScriptExpression*)
 
 void Parameter::expressionStateChanged(ScriptExpression*)
 {
-	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::EXPRESSION_STATE_CHANGED, this));
+	WeakReference<Parameter> safeThis(this);
+	if (auto* p = safeThis.get(); p != nullptr && !p->isBeingDestroyed)
+		p->queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::EXPRESSION_STATE_CHANGED, p));
 }
 
 void Parameter::parameterValueChanged(Parameter* p)
