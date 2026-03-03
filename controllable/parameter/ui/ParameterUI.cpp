@@ -384,7 +384,7 @@ void ParameterUI::controlModeChanged(Parameter*)
 void ParameterUI::newMessage(const Parameter::ParameterEvent& e) {
 	switch (e.type)
 	{
-	case Parameter::ParameterEvent::BOUNDS_CHANGED:
+	case Parameter::ParameterEvent::RANGE_CHANGED:
 		rangeChanged(e.parameter);
 		break;
 

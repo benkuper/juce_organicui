@@ -146,7 +146,7 @@ void ParameterEditor::updateUI()
 void ParameterEditor::newMessage(const Parameter::ParameterEvent& e)
 {
 	if (ui->isInteractable()) label.setFont(label.getFont().withStyle(parameter->isOverriden ? Font::FontStyleFlags::bold : Font::FontStyleFlags::plain));
-	if (e.type == Parameter::ParameterEvent::BOUNDS_CHANGED)
+	if (e.type == Parameter::ParameterEvent::RANGE_CHANGED)
 	{
 		if (currentUIHasRange != parameter->hasRange() && parameter->rebuildUIOnRangeChange)
 		{

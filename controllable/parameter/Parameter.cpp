@@ -249,7 +249,7 @@ void Parameter::setRange(var min, var max)
 				auto* pAfterListeners = safeThis.get();
 				if (pAfterListeners == nullptr || pAfterListeners->isBeingDestroyed) return;
 
-				pAfterListeners->queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::BOUNDS_CHANGED, pAfterListeners, safeRange));
+				pAfterListeners->queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::RANGE_CHANGED, pAfterListeners, safeRange));
 			});
 
 	}
@@ -258,7 +258,7 @@ void Parameter::setRange(var min, var max)
 		WeakReference<Parameter> safeThis(this);
 		parameterListeners.call(&ParameterListener::parameterRangeChanged, this);
 		if (auto* p = safeThis.get(); p != nullptr && !p->isBeingDestroyed)
-			p->queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::BOUNDS_CHANGED, p, arr));
+			p->queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::RANGE_CHANGED, p, arr));
 	}
 
 	if (isOverriden) setValue(value); //if value is outside range, this will change the value
