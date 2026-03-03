@@ -140,6 +140,7 @@ public:
 	void sortControllables();
 
 	void dispatchFeedback(Controllable* c);
+	void dispatchRangeFeedback(Controllable* c);
 	void dispatchState(Controllable* c);
 
 	virtual void controllableStateChanged(Controllable* c) override;
@@ -148,6 +149,7 @@ public:
 	virtual void triggerTriggered(Trigger* p) override;
 
 	void controllableFeedbackUpdate(ControllableContainer* cc, Controllable* c) override;
+	void controllableRangeFeedbackUpdate(ControllableContainer* cc, Controllable* c) override;
 
 	virtual void controllableNameChanged(Controllable* c) override;
 	virtual void askForRemoveControllable(Controllable* c, bool addToUndo = false) override;
@@ -224,6 +226,7 @@ protected:
 	virtual void onExternalParameterValueChanged(Parameter*) {}; //When listening to other child controllable than this container's children
 	virtual void onExternalParameterRangeChanged(Parameter*) {};
 	virtual void onControllableFeedbackUpdate(ControllableContainer*, Controllable*) {}
+	virtual void onControllableRangeFeedbackUpdate(ControllableContainer*, Controllable*) {}
 	virtual void onContainerTriggerTriggered(Trigger*) {};
 	virtual void onExternalTriggerTriggered(Trigger*) {}; //When listening to other child controllable than this container's children
 	virtual void onControllableAdded(Controllable*) {};

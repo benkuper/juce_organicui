@@ -41,7 +41,7 @@ EnumParameter::~EnumParameter()
 	}
 }
 
-EnumParameter* EnumParameter::addOption(String key, var data, bool selectIfFirstOption)
+EnumParameter* EnumParameter::addOption(String key, var data, bool selectIfFirstOption, bool silentSet)
 {
 	GenericScopedLock lock(enumValues.getLock());
 	enumValues.add(new EnumValue(key, data));
@@ -53,18 +53,24 @@ EnumParameter* EnumParameter::addOption(String key, var data, bool selectIfFirst
 
 	enumListeners.call(&EnumParameterListener::enumOptionAdded, this, key);
 	enumParameterNotifier.addMessage(new EnumParameterEvent(EnumParameterEvent::ENUM_OPTION_ADDED, this));
+
+	if (!silentSet)
+	{
+		notifyRangeChanged();
+	}
+
 	updateArgDescription();
 	return this;
 }
 
-void EnumParameter::updateOption(int index, String key, var data, bool addIfNotThere)
+void EnumParameter::updateOption(int index, String key, var data, bool addIfNotThere, bool silentSet)
 {
 	GenericScopedLock lock(enumValues.getLock());
 	if (index >= enumValues.size())
 	{
 		if (!addIfNotThere) return;
-		while (index > enumValues.size()) addOption("#" + String(enumValues.size()), var());
-		addOption(key, data);
+		while (index > enumValues.size()) addOption("#" + String(enumValues.size()), var(), false, true);
+		addOption(key, data, false, true);
 		return;
 	}
 
@@ -72,12 +78,19 @@ void EnumParameter::updateOption(int index, String key, var data, bool addIfNotT
 	if (k == key && enumValues[index]->value == data) return;
 
 	enumValues.set(index, new EnumValue(key, data));
+
 	enumListeners.call(&EnumParameterListener::enumOptionUpdated, this, index, k, key);
 	enumParameterNotifier.addMessage(new EnumParameterEvent(EnumParameterEvent::ENUM_OPTION_UPDATED, this));
+
+	if (!silentSet)
+	{
+		notifyRangeChanged();
+	}
+
 	updateArgDescription();
 }
 
-void EnumParameter::removeOption(String key)
+void EnumParameter::removeOption(String key, bool silentSet)
 {
 	GenericScopedLock lock(enumValues.getLock());
 	enumValues.remove(getIndexForKey(key));
@@ -86,25 +99,59 @@ void EnumParameter::removeOption(String key)
 	updateArgDescription();
 
 	if (getValueKey() == key) setValue("");
+
+	if (!silentSet)
+	{
+		notifyRangeChanged();
+	}
 }
 
-void EnumParameter::setOptions(Array<EnumValue> options)
+void EnumParameter::setOptions(Array<EnumValue> options, bool silentSet)
 {
 	GenericScopedLock lock(enumValues.getLock());
 	for (int i = 0; i < options.size(); i++)
 	{
-		updateOption(i, options[i].key, options[i].value, true);
+		updateOption(i, options[i].key, options[i].value, true, true);
 	}
 
-	while (enumValues.size() > options.size()) removeOption(enumValues[enumValues.size() - 1]->key);
+	while (enumValues.size() > options.size())
+	{
+		removeOption(enumValues[enumValues.size() - 1]->key, true);
+	}
+
+	if (!silentSet)
+	{
+		notifyRangeChanged();
+	}
 }
 
-void EnumParameter::clearOptions()
+void EnumParameter::clearOptions(bool silentSet)
 {
 	GenericScopedLock lock(enumValues.getLock());
 	StringArray keysToRemove;
 	for (auto& ev : enumValues) keysToRemove.add(ev->key);
-	for (auto& k : keysToRemove) removeOption(k);
+	for (auto& k : keysToRemove) removeOption(k,true);
+
+	if (!silentSet)
+	{
+		notifyRangeChanged();
+	}
+
+}
+
+
+void EnumParameter::notifyRangeChanged()
+{
+	GenericScopedTryLock lock(notifyLock);
+
+	if (!lock.isLocked())
+	{
+		return;
+	}
+
+	parameterListeners.call(&ParameterListener::parameterRangeChanged, this);
+	var arr;
+	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::RANGE_CHANGED, this, arr));
 }
 
 void EnumParameter::updateArgDescription()

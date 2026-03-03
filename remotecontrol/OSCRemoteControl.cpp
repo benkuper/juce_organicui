@@ -1116,6 +1116,27 @@ void OSCRemoteControl::controllableStateUpdate(ControllableContainer* cc, Contro
 	}
 }
 
+void OSCRemoteControl::controllableRangeFeedbackUpdate(ControllableContainer* cc, Controllable* c)
+{
+	EnablingControllableContainer::controllableRangeFeedbackUpdate(cc, c);
+
+	if (Engine::mainEngine != nullptr && (Engine::mainEngine->isLoadingFile || Engine::mainEngine->isClearing))
+	{
+		return;
+	}
+
+	// OSCQuery
+	HashMap<String, Array<Controllable*>, DefaultHashFunctions, CriticalSection>::Iterator it(feedbackMap);
+	while (it.next())
+	{
+		if (it.getValue().contains(c))
+		{
+			sendOSCQueryRangeFeedback(c);
+		}
+	}
+}
+
+
 void OSCRemoteControl::addControllableToNoFeedbackMap(Controllable* c, const juce::String& id, const juce::String& fallbackId)
 {
 	if (id.isEmpty())
@@ -1161,6 +1182,35 @@ void OSCRemoteControl::sendOSCQueryStateFeedback(Controllable* c, const String& 
 
 	OSCMessage m(c->getControlAddress() + "/attributes/enabled");
 	m.addBool(c->enabled);
+	StringArray ex = excludeId;
+	if (noFeedbackMap.contains(c))
+	{
+		ex.add(noFeedbackMap[c]);
+	}
+	sendOSCQueryFeedback(m, ex);
+}
+
+void OSCRemoteControl::sendOSCQueryRangeFeedback(Controllable* c, const String& excludeId)
+{
+	if (c == nullptr)
+	{
+		return;
+	}
+
+	OSCMessage m(c->getControlAddress() + "/attributes/range");
+
+	EnumParameter* enumParam = dynamic_cast<EnumParameter*>(c);
+
+	if (enumParam == nullptr)
+	{
+		return;
+	}
+
+	for (String& key : enumParam->getAllKeys())
+	{
+		m.addString(key);
+	}
+
 	StringArray ex = excludeId;
 	if (noFeedbackMap.contains(c))
 	{

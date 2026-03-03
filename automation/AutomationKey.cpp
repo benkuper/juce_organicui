@@ -27,7 +27,7 @@ AutomationKey::AutomationKey(const float & _position, const float & _value) :
     value->setValue(_value);
 
     easingType = addEnumParameter("Easing Type", "The type of interpolation to use");
-    for (int i = 0; i < Easing::TYPE_MAX; i++) easingType->addOption(Easing::typeNames[i], (Easing::Type)i, false);
+    for (int i = 0; i < Easing::TYPE_MAX; i++) easingType->addOption(Easing::typeNames[i], (Easing::Type)i, false,true);
     easingType->setValueWithData(GlobalSettings::getInstance()->defaultEasing->getValueDataAsEnum<Easing::Type>());
 
 }

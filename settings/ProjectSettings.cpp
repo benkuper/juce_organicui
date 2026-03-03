@@ -68,14 +68,14 @@ ProjectSettings::ProjectSettings() :
 
 	triggerDefaultSize->setPoint(200, 40);
 	boolDefaultSize->setPoint(200, 40);
-	boolDefaultStyle->addOption("Default", -1)->addOption("Toggle Checkbox", 22)->addOption("Toggle Button", 23)->addOption("Momentary Checkbox", 24)->addOption("Momentary Button", 25)->addOption("Color Circle", 10)->addOption("Color Square", 11);
+	boolDefaultStyle->addOption("Default", -1, false, true)->addOption("Toggle Checkbox", 22, false, true)->addOption("Toggle Button", 23, false, true)->addOption("Momentary Checkbox", 24, false, true)->addOption("Momentary Button", 25, false, true)->addOption("Color Circle", 10, false, true)->addOption("Color Square", 11, false, true);
 	floatDefautSize->setPoint(200, 40);
-	floatDefaultStyle->addOption("Default", -1)->addOption("Horizontal Slider", 0)->addOption("Vertical Slider", 1)->addOption("Rotary Slider", 5)->addOption("Text", 2)->addOption("Time", 3)->addOption("Color Circle", 10)->addOption("Color Square", 11);
+	floatDefaultStyle->addOption("Default", -1, false, true)->addOption("Horizontal Slider", 0, false, true)->addOption("Vertical Slider", 1, false, true)->addOption("Rotary Slider", 5, false, true)->addOption("Text", 2, false, true)->addOption("Time", 3, false, true)->addOption("Color Circle", 10, false, true)->addOption("Color Square", 11, false, true);
 	intDefautSize->setPoint(200, 40);
-	intDefaultStyle->addOption("Default", -1)->addOption("Horizontal Slider", 0)->addOption("Vertical Slider", 1)->addOption("Rotary Slider", 5)->addOption("Text", 2)->addOption("Time", 3);
+	intDefaultStyle->addOption("Default", -1, false, true)->addOption("Horizontal Slider", 0, false, true)->addOption("Vertical Slider", 1, false, true)->addOption("Rotary Slider", 5, false, true)->addOption("Text", 2, false, true)->addOption("Time", 3, false, true);
 	stringDefaultSize->setPoint(200, 40);
 	enumDefaultSize->setPoint(200, 40);
-	enumDefaultStyle->addOption("Default", -1)->addOption("Horizontal Bar", 20)->addOption("Vertical Bar", 21);
+	enumDefaultStyle->addOption("Default", -1, false, true)->addOption("Horizontal Bar", 20, false, true)->addOption("Vertical Bar", 21, false, true);
 	colorDefaultSize->setPoint(200, 40);
 	targetDefaultSize->setPoint(200, 40);
 	p2dDefaultSize->setPoint(200, 40);

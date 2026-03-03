@@ -21,7 +21,7 @@ AutomationRecorder::AutomationRecorder() :
 	autoDisarm = addBoolParameter("Auto Disarm", "If set, the arm parameter will be automatically set to off when a record has been saved", false);
 	
 	simplificationMethod = addEnumParameter("Simplification Method", "This decides which algorithm to use when simplifying the recorded data.\nBezier is using the least square approach and is best suited for natural curves.\nLinear is using the Douglas-Peucker method, and works best for straight lines and linear signal.\nLinear Interactive allows you to change the simplification interactively after the recording, where Linear will apply it automatically (useful for automated recording).");
-	simplificationMethod->addOption("Bezier (Least square)", SIMPL_BEZIER)->addOption("Linear (Douglas-Peucker)", SIMPL_LINEAR)->addOption("Linear Interactive", SIMPL_LINEAR_INTERACTIVE);
+	simplificationMethod->addOption("Bezier (Least square)", SIMPL_BEZIER, false, true)->addOption("Linear (Douglas-Peucker)", SIMPL_LINEAR, false, true)->addOption("Linear Interactive", SIMPL_LINEAR_INTERACTIVE, false, true);
 
 	simplificationTolerance = addFloatParameter("Simplification Tolerance", "This is the tolerance of the simplification to apply to the recorded data. A higher value means more points will remain. Only available for Linear method right now.", .2f, 0, 1, false);
 

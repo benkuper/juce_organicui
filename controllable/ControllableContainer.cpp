@@ -801,6 +801,17 @@ void ControllableContainer::dispatchFeedback(Controllable* c)
 	if (parentContainer != nullptr) { parentContainer->dispatchFeedback(c); }
 }
 
+void ControllableContainer::dispatchRangeFeedback(Controllable* c)
+{
+	controllableContainerListeners.call(&ControllableContainerListener::controllableRangeFeedbackUpdate, this, c);
+	queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableRangeFeedbackUpdate, this, c));
+
+	if (parentContainer != nullptr)
+	{
+		parentContainer->dispatchRangeFeedback(c);
+	}
+}
+
 void ControllableContainer::dispatchState(Controllable* c)
 {
 	if (isClearing || isBeingDestroyed) return;
@@ -841,7 +852,8 @@ void ControllableContainer::parameterRangeChanged(Parameter* p)
 	if (isClearing || isBeingDestroyed) return;
 	if (p->parentContainer == this)
 	{
-		dispatchFeedback(p);
+		onContainerParameterChanged(p);
+		dispatchRangeFeedback(p);
 	}
 	else
 	{
@@ -864,6 +876,11 @@ void ControllableContainer::controllableFeedbackUpdate(ControllableContainer* cc
 {
 	if (isClearing || isBeingDestroyed) return;
 	onControllableFeedbackUpdate(cc, c); //This is the function to override from child classes
+}
+
+void ControllableContainer::controllableRangeFeedbackUpdate(ControllableContainer* cc, Controllable* c)
+{
+	onControllableRangeFeedbackUpdate(cc, c); // This is the function to override from child classes
 }
 
 void ControllableContainer::controllableNameChanged(Controllable* c)

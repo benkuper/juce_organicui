@@ -23,7 +23,7 @@ Curve2DKey::Curve2DKey() :
     showInspectorOnSelect = false;
 
     easingType = addEnumParameter("Easing Type", "The type of interpolation to use");
-    easingType->addOption("Linear", Easing2D::LINEAR, false)->addOption("Bezier", Easing2D::BEZIER);
+	easingType->addOption("Linear", Easing2D::LINEAR, false, true)->addOption("Bezier", Easing2D::BEZIER, false, true);
 
     easingType->setValueWithData(Easing2D::BEZIER);
 

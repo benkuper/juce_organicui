@@ -53,7 +53,7 @@ GlobalSettings::GlobalSettings() :
 	fontSize = interfaceCC.addIntParameter("Font size", "Global font size, may be altered in some cases but this is used as a reference", 14, 0, 30);
 	enableTooltips = interfaceCC.addBoolParameter("Enable Tooltips", "If checked, this will show tooltips when mouse is over a parameter", true);
 	helpLanguage = interfaceCC.addEnumParameter("Help language", "What language to download ? You will need to restart the software to see changes");
-	helpLanguage->addOption("English", "en")->addOption("French", "fr")->addOption("Chinese", "cn");
+	helpLanguage->addOption("English", "en", false, true)->addOption("French", "fr", false, true)->addOption("Chinese", "cn", false, true);
 
 	bool useGL = true;
 #if JUCE_MAC || JUCE_LINUX //OpenGL is not working so well on mac and linux
@@ -78,7 +78,7 @@ GlobalSettings::GlobalSettings() :
 	logAutosave = saveLoadCC.addBoolParameter("Log auto-save", "If checked, the auto-save will be logged in the logger", true);
 
 	actionOnCrash = saveLoadCC.addEnumParameter("Action On Crash", "This determines what to do on a crash. Default shows the crash report window");
-	actionOnCrash->addOption("Report", REPORT)->addOption("Kill", KILL)->addOption("Reopen", REOPEN)->addOption("Recover", RECOVER);
+	actionOnCrash->addOption("Report", REPORT, false, true)->addOption("Kill", KILL, false, true)->addOption("Reopen", REOPEN, false, true)->addOption("Recover", RECOVER, false, true);
 	autoSendCrashLog = saveLoadCC.addBoolParameter("Auto send crash log", "If checked and action on crash is not Report, the crash log will be automatically sent to the developer team", true);
 
 	crashContactEmail = saveLoadCC.addStringParameter("Crash Contact Mail", "A mail address to use if you wish to be contacted by the developer team", "");
@@ -92,7 +92,7 @@ GlobalSettings::GlobalSettings() :
 	altScaleFactor = editingCC.addFloatParameter("Alt Scale factor", "Scale factor for editing sliders with alt", 0.5, 0, 1);
 
 	defaultEasing = editingCC.addEnumParameter("Default Easing", "Easing that is set by default when creating new automation keys");
-	for (int i = 0; i < Easing::TYPE_MAX; i++) defaultEasing->addOption(Easing::typeNames[i], (Easing::Type)i, false);
+	for (int i = 0; i < Easing::TYPE_MAX; i++) defaultEasing->addOption(Easing::typeNames[i], (Easing::Type)i, false, true);
 	defaultEasing->defaultValue = Easing::typeNames[(int)Easing::BEZIER];
 	defaultEasing->resetValue();
 

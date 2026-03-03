@@ -101,6 +101,7 @@ public:
 
 	void sendOSCQueryFeedback(Controllable* c, const juce::String& excludeId = "");
 	void sendOSCQueryStateFeedback(Controllable* c, const juce::String& excludeId = "");
+	void sendOSCQueryRangeFeedback(Controllable* c, const juce::String& excludeId = "");
 	void sendOSCQueryFeedback(const juce::OSCMessage& m, juce::StringArray excludes = juce::StringArray());
 	void sendOSCQueryFeedbackTo(const juce::OSCMessage& m, juce::StringArray ids = juce::StringArray());
 
@@ -113,7 +114,7 @@ public:
 
 	void controllableFeedbackUpdate(ControllableContainer* cc, Controllable* c) override;
 	void controllableStateUpdate(ControllableContainer* cc, Controllable* c) override;
-
+	void controllableRangeFeedbackUpdate(ControllableContainer* cc, Controllable* c) override;
 	void addControllableToNoFeedbackMap(Controllable* c, const juce::String& id, const juce::String& fallbackId);
 
 	//void newMessage(const ContainerAsyncEvent& e) override;

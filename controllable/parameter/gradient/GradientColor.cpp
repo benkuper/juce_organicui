@@ -20,7 +20,7 @@ GradientColor::GradientColor(float _time, const Colour& _color, const String& na
 	itemColor->setDefaultValue(Colours::black);
 	
 	interpolation = addEnumParameter("Interpolation", "Interpolation to the next key");
-	interpolation->addOption("Linear", Interpolation::LINEAR)->addOption("None", Interpolation::NONE);
+	interpolation->addOption("Linear", Interpolation::LINEAR, false, true)->addOption("None", Interpolation::NONE, false,true);
 
 	position->setValue(_time);
 

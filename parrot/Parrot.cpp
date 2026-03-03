@@ -19,7 +19,7 @@ Parrot::Parrot() :
 {
 	currentRecordEnum = addEnumParameter("Current Record", "The record to use for recording/playing");
 	status = addEnumParameter("Status", "The status of this parrot");
-	status->addOption("Idle", IDLE)->addOption("Recording", RECORDING)->addOption("Playing", PLAYING);
+	status->addOption("Idle", IDLE, false, true)->addOption("Recording", RECORDING, false, true)->addOption("Playing", PLAYING, false, true);
 	status->setControllableFeedbackOnly(true);
 
 	startRecordTrigger = addTrigger("Start Record", "");

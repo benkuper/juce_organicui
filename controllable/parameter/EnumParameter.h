@@ -28,11 +28,13 @@ public:
 		juce::var value;
 	};
 
-	EnumParameter* addOption(juce::String key, juce::var data, bool selectIfFirstOption = true); //daisy chain
-	void updateOption(int index, juce::String key, juce::var data, bool addIfNotThere = false);
-	void removeOption(juce::String key);
-	void setOptions(juce::Array<EnumValue> options);
-	void clearOptions();
+	EnumParameter* addOption(juce::String key, juce::var data, bool selectIfFirstOption = true, bool silentSet = false); //daisy chain
+	void updateOption(int index, juce::String key, juce::var data, bool addIfNotThere = false, bool silentSet = false);
+	void removeOption(juce::String key, bool silentSet = false);
+	void setOptions(juce::Array<EnumValue> options, bool silentSet = false);
+	void clearOptions(bool silentSet = false);
+
+	void notifyRangeChanged();
 
 	void updateArgDescription();
 

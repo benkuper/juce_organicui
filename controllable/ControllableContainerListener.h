@@ -15,12 +15,13 @@ public:
 	virtual void controllableContainerRemoved(ControllableContainer *) {}
 	virtual void controllableFeedbackUpdate(ControllableContainer*, Controllable*) {}
 	virtual void controllableStateUpdate(ControllableContainer *, Controllable *) {}
+	virtual void controllableRangeFeedbackUpdate(ControllableContainer*, Controllable*) {}
 	virtual void childStructureChanged(ControllableContainer *) {}
 	virtual void childAddressChanged(ControllableContainer *) {};
 	virtual void controllableContainerNameChanged(ControllableContainer*) {}
 	virtual void controllableContainerReordered(ControllableContainer *) {}
-	virtual void controllableContainerFinishedLoading(ControllableContainer *) {};
-
+	virtual void controllableContainerFinishedLoading(ControllableContainer *) {}
+	
 };
 
 // ASYNC
@@ -39,7 +40,8 @@ public:
 		ControllableContainerReordered,
 		ControllableContainerNeedsRebuild,
 		ControllableContainerCollapsedChanged,
-		ControllableContainerFinishedLoading
+		ControllableContainerFinishedLoading,
+		ControllableRangeFeedbackUpdate
 	};
 
 	ContainerAsyncEvent(EventType _type, ControllableContainer* _source) : type(_type), source(_source) {}
