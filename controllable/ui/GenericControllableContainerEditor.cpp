@@ -106,7 +106,12 @@ GenericControllableContainerEditor::~GenericControllableContainerEditor()
 
 void GenericControllableContainerEditor::clear()
 {
-	for (auto& c : childEditors) removeChildComponent(c);
+	for (auto& c : childEditors)
+	{
+		if (c == nullptr) continue;
+		removeChildComponent(c);
+	}
+
 	childEditors.clear();
 }
 
@@ -307,6 +312,8 @@ void GenericControllableContainerEditor::toggleCollapsedChildren()
 	bool shouldCollapse = false;
 	for (auto& cui : childEditors)
 	{
+		if (cui == nullptr || cui->inspectable == nullptr || cui->inspectable.wasObjectDeleted()) continue;
+
 		if (GenericControllableContainerEditor* ccui = dynamic_cast<GenericControllableContainerEditor*>(cui))
 		{
 			childContainers.add(ccui);
@@ -431,6 +438,8 @@ InspectableEditor* GenericControllableContainerEditor::getEditorForInspectable(I
 {
 	for (auto& cui : childEditors)
 	{
+		if (cui == nullptr || cui->inspectable == nullptr || cui->inspectable.wasObjectDeleted()) continue;
+
 		if (cui->inspectable == i) return cui;
 	}
 
@@ -498,7 +507,7 @@ InspectableEditor* GenericControllableContainerEditor::addControllableUI(Control
 void GenericControllableContainerEditor::removeControllableUI(Controllable* c, bool resize)
 {
 	InspectableEditor* cui = getEditorForInspectable(c);
-	if (cui == nullptr) return;
+	if (cui == nullptr) { resetAndBuild(); return; }
 
 	removeChildComponent(cui);
 	childEditors.removeObject(cui);
@@ -706,7 +715,7 @@ void GenericControllableContainerEditor::resizedInternalContent(juce::Rectangle<
 {
 	for (auto& cui : childEditors)
 	{
-		if (cui->inspectable.wasObjectDeleted()) continue;
+		if (cui->inspectable.wasObjectDeleted()) return;
 		if (cui->isVisible() == cui->inspectable->hideInEditor) cui->setVisible(!cui->inspectable->hideInEditor);
 		if (cui->inspectable->hideInEditor) continue;
 
