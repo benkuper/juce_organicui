@@ -396,6 +396,7 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info)
 				}
 				else
 				{
+					Engine::mainEngine->removeNewerAutosaves();
 					Engine::mainEngine->createNewGraph();
 				}
 			});
@@ -416,6 +417,7 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info)
 				}
 				else
 				{
+					Engine::mainEngine->removeNewerAutosaves();
 					Engine::mainEngine->loadFromUserSpecifiedFileAsync(true,
 																	   [](Result r)
 																	   {
@@ -443,6 +445,7 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info)
 				}
 				else
 				{
+					Engine::mainEngine->removeNewerAutosaves();
 					Engine::mainEngine->loadFrom(Engine::mainEngine->getLastDocumentOpened(), true);
 				}
 			});
