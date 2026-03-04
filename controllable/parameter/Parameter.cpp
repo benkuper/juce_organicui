@@ -230,36 +230,7 @@ void Parameter::setRange(var min, var max)
 	}
 
 
-	var arr;
-	arr.append(minimumValue);
-	arr.append(maximumValue);
-
-	if (auto* mm = MessageManager::getInstanceWithoutCreating(); mm != nullptr && !mm->isThisTheMessageThread())
-	{
-		WeakReference<Parameter> safeThis(this);
-		const auto safeRange = arr.clone();
-
-		MessageManager::callAsync([safeThis, safeRange]()
-			{
-				auto* p = safeThis.get();
-				if (p == nullptr || p->isBeingDestroyed) return;
-
-				p->parameterListeners.call(&ParameterListener::parameterRangeChanged, p);
-
-				auto* pAfterListeners = safeThis.get();
-				if (pAfterListeners == nullptr || pAfterListeners->isBeingDestroyed) return;
-
-				pAfterListeners->queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::BOUNDS_CHANGED, pAfterListeners, safeRange));
-			});
-
-	}
-	else
-	{
-		WeakReference<Parameter> safeThis(this);
-		parameterListeners.call(&ParameterListener::parameterRangeChanged, this);
-		if (auto* p = safeThis.get(); p != nullptr && !p->isBeingDestroyed)
-			p->queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::BOUNDS_CHANGED, p, arr));
-	}
+	notifyRangeChanged();
 
 	if (isOverriden) setValue(value); //if value is outside range, this will change the value
 	else resetValue();
@@ -318,6 +289,14 @@ bool Parameter::hasRange() const
 	}
 
 	return false;
+}
+
+var Parameter::getRange() const
+{
+	var arr;
+	arr.append(minimumValue);
+	arr.append(maximumValue);
+	return arr;
 }
 
 void Parameter::setValueInternal(var& _value) //to override by child classes
@@ -491,6 +470,46 @@ void Parameter::notifyValueChanged() {
 	if (auto* p = safeThis.get(); p != nullptr && !p->isBeingDestroyed)
 		p->queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::VALUE_CHANGED, p, getValue()));
 	//isNotifyingChange = false;
+}
+
+void Parameter::notifyRangeChanged() 
+{
+	const auto arr = getRange();
+
+	if (auto* mm = MessageManager::getInstanceWithoutCreating(); mm != nullptr && !mm->isThisTheMessageThread())
+	{
+		WeakReference<Parameter> safeThis(this);
+		const auto safeRange = arr.clone();
+
+		MessageManager::callAsync(
+			[safeThis, safeRange]()
+			{
+				auto* p = safeThis.get();
+				if (p == nullptr || p->isBeingDestroyed)
+				{
+					return;
+				}
+
+				p->parameterListeners.call(&ParameterListener::parameterRangeChanged, p);
+
+				auto* pAfterListeners = safeThis.get();
+				if (pAfterListeners == nullptr || pAfterListeners->isBeingDestroyed)
+				{
+					return;
+				}
+
+				pAfterListeners->queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::BOUNDS_CHANGED, pAfterListeners, safeRange));
+			});
+	}
+	else
+	{
+		WeakReference<Parameter> safeThis(this);
+		parameterListeners.call(&ParameterListener::parameterRangeChanged, this);
+		if (auto* p = safeThis.get(); p != nullptr && !p->isBeingDestroyed)
+		{
+			p->queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::BOUNDS_CHANGED, p, arr));
+		}
+	}
 }
 
 void Parameter::expressionValueChanged(ScriptExpression*)

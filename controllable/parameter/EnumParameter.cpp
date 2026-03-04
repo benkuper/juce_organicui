@@ -107,6 +107,16 @@ void EnumParameter::clearOptions()
 	for (auto& k : keysToRemove) removeOption(k);
 }
 
+var EnumParameter::getRange() const
+{
+	var result;
+	for (const auto& ev : enumValues)
+	{
+		result.append(ev->key);
+	}
+	return result;
+}
+
 void EnumParameter::updateArgDescription()
 {
 	argumentsDescription = "";

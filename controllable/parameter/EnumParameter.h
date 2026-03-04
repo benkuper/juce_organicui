@@ -33,6 +33,7 @@ public:
 	void removeOption(juce::String key);
 	void setOptions(juce::Array<EnumValue> options);
 	void clearOptions();
+	juce::var getRange() const override;
 
 	void updateArgDescription();
 
