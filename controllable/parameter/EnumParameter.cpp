@@ -48,7 +48,7 @@ EnumParameter* EnumParameter::addOption(String key, var data, bool selectIfFirst
 	if (enumValues.size() == 1 && selectIfFirstOption)
 	{
 		defaultValue = key;
-		setValue(key, true, false, false);
+		setValue(key, silentSet, false, false);
 	}
 
 	enumListeners.call(&EnumParameterListener::enumOptionAdded, this, key);
