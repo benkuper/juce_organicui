@@ -411,6 +411,13 @@ void Engine::restoreAutosave(const juce::File& originalFile, const juce::File& a
 void Engine::removeNewerAutosaves() const
 {
 	const File& currentFile = getFile();
+	
+	if (!currentFile.exists())
+	{
+		// Can happen on a new file before it has been saved
+		return;
+	}
+	
 	const File autosavesDir = getAutosavesDirectory(currentFile);
 
 	const Array<File> autosaveFiles = autosavesDir.findChildFiles(File::findFiles, false, "*" + fileExtension);
