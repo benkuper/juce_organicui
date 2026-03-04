@@ -171,7 +171,7 @@ void OrganicApplication::systemRequestedQuit()
 			}
 			case FileBasedDocument::SaveResult::savedOk:
 			{
-				// User explicitely requested not to save, clear newer autosaves
+				// Current file was saved or user explicitely requested not to save, so we can clear newer autosaves
 				Engine::mainEngine->removeNewerAutosaves();
 				break;
 			}
