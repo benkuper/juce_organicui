@@ -84,6 +84,7 @@ public:
 	virtual void setRange(juce::var min, juce::var max);
 	virtual void clearRange();
 	virtual bool hasRange() const;
+	virtual juce::var getRange() const;
 
 	bool isPresettable;
 	bool isOverriden;
@@ -130,6 +131,7 @@ public:
 	virtual juce::String stringValue();
 
 	void notifyValueChanged();
+	void notifyRangeChanged();
 
 	//From Script Expression
 	virtual void expressionValueChanged(ScriptExpression*) override;
