@@ -842,6 +842,14 @@ void ControllableContainer::parameterRangeChanged(Parameter* p)
 	if (p->parentContainer == this)
 	{
 		dispatchFeedback(p);
+
+#if ORGANICUI_USE_WEBSERVER
+		if (OSCRemoteControl::getInstanceWithoutCreating() != nullptr && isAttachedToRoot())
+		{
+			OSCRemoteControl::getInstance()->sendPathChangedFeedback(p->getControlAddress());
+		}
+#endif
+
 	}
 	else
 	{
