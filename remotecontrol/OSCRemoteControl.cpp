@@ -616,6 +616,15 @@ bool OSCRemoteControl::handleHTTPRequest(std::shared_ptr<HttpServer::Response> r
 		{
 			data = cc->getRemoteControlData();
 		}
+		else
+		{
+			// try to find a controllable with that address, in case it's not a container
+			Controllable* c = Engine::mainEngine->getControllableForAddress(addr, true);
+			if (c != nullptr)
+			{
+				data = c->getRemoteControlData();
+			}
+		}
 	}
 
 	String dataStr = JSON::toString(data);
