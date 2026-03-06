@@ -159,6 +159,8 @@ void Inspector::restoreScrollPosition()
 
 void Inspector::clear()
 {
+	if (getApp().isShuttingDown) return;
+
 	setCurrentInspectables();
 }
 

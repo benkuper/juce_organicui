@@ -146,6 +146,7 @@ void OrganicApplication::initialise(const String& commandLine)
 
 void OrganicApplication::shutdown()
 {
+	isShuttingDown = true;
 	saveGlobalSettings();
 
 	ShapeShifterManager::getInstance()->saveLastSessionLayoutFileIfNeeded();

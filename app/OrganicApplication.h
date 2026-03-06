@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    Main.h
-    Created: 25 Oct 2016 11:16:59pm
-    Author:  bkupe
+	Main.h
+	Created: 25 Oct 2016 11:16:59pm
+	Author:  bkupe
 
   ==============================================================================
 */
@@ -38,6 +38,7 @@ public:
 	//==============================================================================
 	OrganicApplication(const juce::String& appName, bool useWindow = true, const juce::Image& trayIconImage = juce::Image());
 
+	bool isShuttingDown = false;
 	ControllableContainer appSettings;
 
 	juce::ApplicationCommandManager commandManager;
@@ -65,8 +66,8 @@ public:
 
 	virtual void handleCrashed() {}
 
-	virtual void newMessage(const Engine::EngineEvent &e) override;
-	virtual void newMessage(const AppUpdateEvent &e) override;
+	virtual void newMessage(const Engine::EngineEvent& e) override;
+	virtual void newMessage(const AppUpdateEvent& e) override;
 
 	virtual void clearGlobalSettings();
 	virtual void saveGlobalSettings();
@@ -99,12 +100,12 @@ public:
 	class MainWindow :
 		public juce::DocumentWindow,
 		public TrayIcon::TrayIconListener
-	{		
+	{
 	public:
-		MainWindow(juce::String name, OrganicMainContentComponent * mainComponent, const juce::Image &image);
+		MainWindow(juce::String name, OrganicMainContentComponent* mainComponent, const juce::Image& image);
 
 
-		OrganicMainContentComponent * mainComponent;
+		OrganicMainContentComponent* mainComponent;
 		std::unique_ptr<TrayIcon> trayIcon;
 		juce::Image iconImage;
 
