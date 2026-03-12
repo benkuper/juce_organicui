@@ -12,6 +12,8 @@
 #include "JuceHeader.h" //for project infos
 #include "Engine.h"
 
+static const String restoreAutosaveAlertWindowTitle = "Restore autosave ?";
+
 static OrganicApplication& getApp();
 String getAppVersion();
 ApplicationProperties& getAppProperties();
@@ -371,16 +373,19 @@ bool Engine::checkAutoRestoreAutosave(const juce::File& originalFile, std::funct
 	if (lastAutoSave.getLastModificationTime() <= originalFile.getLastModificationTime()) return false;
 
 	AlertWindow::showOkCancelBox(
-		AlertWindow::AlertIconType::QuestionIcon, "Restore autosave ?", "A more recent autosave file has been found, do you want to restore it ?", "Yes", "No", nullptr,
+		AlertWindow::AlertIconType::QuestionIcon, restoreAutosaveAlertWindowTitle, "A more recent autosave file has been found, do you want to restore it ?", "Yes", "No", nullptr,
 		ModalCallbackFunction::create([this, originalFile, lastAutoSave, cancelCallback](int result)
 			{
-				if (result == 1)
+				if (result == 0) // Cancel
+				{
+					if (cancelCallback != nullptr)
+					{
+						cancelCallback(originalFile);
+					}
+				}
+				else if (result == 1) // Ok
 				{
 					this->restoreAutosave(originalFile, lastAutoSave);
-				}
-				else if (cancelCallback != nullptr)
-				{
-					cancelCallback(originalFile);
 				}
 			}));
 
@@ -406,6 +411,19 @@ void Engine::restoreAutosave(const juce::File& originalFile, const juce::File& a
 	}
 	// Reload the document
 	loadDocument(originalFile);
+}
+
+void Engine::dismissRestoreAutosaveAlertWindow()
+{
+	auto count = ModalComponentManager::getInstance()->getNumModalComponents();
+	for (auto i = 0; i < count; ++i)
+	{
+		auto component = ModalComponentManager::getInstance()->getModalComponent(i);
+		if (component->getTitle() == restoreAutosaveAlertWindowTitle)
+		{
+			component->exitModalState(2); // Neither ok or cancel
+		}
+	}
 }
 
 void Engine::removeNewerAutosaves() const

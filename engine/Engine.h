@@ -76,7 +76,8 @@ public:
 	juce::File getAutosavesDirectory(const juce::File& originalFile) const;
 	virtual bool checkAutoRestoreAutosave(const juce::File& originalFile, std::function<void(const juce::File&)> cancelCallback);
 	void restoreAutosave(const juce::File& originalFile, const juce::File& autosaveFile);
-	
+	void dismissRestoreAutosaveAlertWindow();
+
 	/// @brief Remove all existing autosaves newer that the current file
 	void removeNewerAutosaves() const;
 
