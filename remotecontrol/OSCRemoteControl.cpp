@@ -745,10 +745,18 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 			}
 			else if (command == "RESTORE")
 			{
+				const bool declined = data.getProperty("declined", false);
+				if (!declined)
+				{
 				File f = File(data.getProperty("file", ""));
 				if (f.existsAsFile())
 				{
 					MessageManager::callAsync([f]() { Engine::mainEngine->restoreAutosave(Engine::mainEngine->getFile(), f); });
+				}
+			}
+				else
+				{
+					MessageManager::callAsync([]() { Engine::mainEngine->removeNewerAutosaves(); });
 				}
 			}
 			else if (command == "SAVE")
