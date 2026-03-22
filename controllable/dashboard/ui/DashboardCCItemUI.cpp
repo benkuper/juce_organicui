@@ -29,7 +29,7 @@ void DashboardCCItemUI::paint(Graphics& g)
 void DashboardCCItemUI::resizedDashboardItemInternal()
 {
 	vp.setBounds(getLocalBounds());
-	if (itemUI != nullptr) itemUI->setBounds(Rectangle<int>(0,0,getWidth()-10,itemUI->getHeight()));
+	if (itemUI != nullptr) itemUI->setBounds(juce::Rectangle<int>(0,0,getWidth()-10,itemUI->getHeight()));
 }
 
 void DashboardCCItemUI::updateEditModeInternal(bool editMode)

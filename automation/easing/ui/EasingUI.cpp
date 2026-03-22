@@ -62,7 +62,7 @@ void EasingUI::paint(Graphics& g)
 	//{
 	//	float p = i * 1.0f / 100;
 	//	float t = easing->start.x + p * easing->length;
-	//	g.fillEllipse(Rectangle<int>(0, 0, 4, 4).withCentre(getUIPosForValuePos(Point<float>(t, easing->getValue(p)))).toFloat());
+	//	g.fillEllipse(juce::Rectangle<int>(0, 0, 4, 4).withCentre(getUIPosForValuePos(Point<float>(t, easing->getValue(p)))).toFloat());
 	//}
 
 	paintInternal(g);
@@ -205,7 +205,7 @@ void EasingUI::newMessage(const ContainerAsyncEvent& e)
 }
 
 
-void EasingUI::setValueBounds(const Rectangle<float> _valueBounds)
+void EasingUI::setValueBounds(const juce::Rectangle<float> _valueBounds)
 {
 	valueBounds = _valueBounds;
 	resized();
@@ -725,7 +725,7 @@ void GenericEasingUI::resized()
 		h2->setBounds(juce::Rectangle<int>(0, 0, 16, 16).withCentre(b));
 	}
 
-	Rectangle<int> r = getLocalBounds().removeFromTop(20);
+	juce::Rectangle<int> r = getLocalBounds().removeFromTop(20);
 	for (auto& cui : extraParams) cui->setBounds(r.removeFromLeft(100).reduced(2));
 
 	EasingUI::resized();

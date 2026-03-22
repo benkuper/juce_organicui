@@ -59,7 +59,7 @@ void GradientColorManagerUI::paint(Graphics& g)
 {
 	BaseManagerUI::paint(g);
 
-	Rectangle<int> r = getLocalBounds();
+	juce::Rectangle<int> r = getLocalBounds();
 
 	if (!miniMode)
 	{

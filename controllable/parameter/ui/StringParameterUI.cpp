@@ -75,7 +75,7 @@ void StringParameterUI::paint(Graphics& g)
 
 	if (showLabel)
 	{
-		Rectangle<int> r = getLocalBounds();
+		juce::Rectangle<int> r = getLocalBounds();
 		float fontHeight = customTextSize > 0 ? customTextSize : jlimit(12, 40, jmin(r.getHeight() - 2, r.getWidth()) - 16);
 		g.setFont(fontHeight);
 		r = r.removeFromLeft(jmin(g.getCurrentFont().getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, r.getWidth() - 60));

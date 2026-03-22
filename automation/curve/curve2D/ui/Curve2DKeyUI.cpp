@@ -36,7 +36,7 @@ void Curve2DKeyUI::resized()
 {
 	Point<int> hp = getUIPosForValuePos(item->viewUIPosition->getPoint());
 	const int handleSize = 14;
-	handle.setBounds(Rectangle<int>(hp.x - handleSize / 2, hp.y - handleSize / 2, handleSize, handleSize));
+	handle.setBounds(juce::Rectangle<int>(hp.x - handleSize / 2, hp.y - handleSize / 2, handleSize, handleSize));
 	if (easingUI != nullptr) easingUI->setBounds(getLocalBounds());
 }
 
@@ -153,7 +153,7 @@ bool Curve2DKeyUI::hitTest(int x, int y)
 	return false;
 }
 
-void Curve2DKeyUI::setValueBounds(const Rectangle<float> _valueBounds)
+void Curve2DKeyUI::setValueBounds(const juce::Rectangle<float> _valueBounds)
 {
 	valueBounds = _valueBounds;
 	if (easingUI != nullptr) easingUI->setValueBounds(valueBounds);
@@ -201,7 +201,7 @@ void Curve2DKeyHandle::paint(Graphics& g)
 	Colour c = key->isSelected ? HIGHLIGHT_COLOR : key->isPreselected ? PRESELECT_COLOR : bc;
 	if (isMouseOverOrDragging()) c = c.brighter(.2f);
 
-	Rectangle<float> r = getLocalBounds().reduced(3).toFloat();
+	juce::Rectangle<float> r = getLocalBounds().reduced(3).toFloat();
 	g.setColour(c);
 	g.fillEllipse(r);
 	g.setColour(c.darker());

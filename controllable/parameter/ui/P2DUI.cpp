@@ -85,7 +85,7 @@ void P2DUI::paint(Graphics& g)
 			at = at.rotated((float)(-MathConstants<double>::pi / 2.0f));// , sliderBounds.getCentreX(), sliderBounds.getCentreY());
 			at = at.translated(canvasRect.getRight() - 16, canvasRect.getBottom());
 			g.addTransform(at);
-			g.drawFittedText(yt, Rectangle<int>(0, 0, canvasRect.getHeight(), 16), Justification::centred, 3);
+			g.drawFittedText(yt, juce::Rectangle<int>(0, 0, canvasRect.getHeight(), 16), Justification::centred, 3);
 			g.addTransform(at.inverted());
 		}
 	}
@@ -99,7 +99,7 @@ void P2DUI::paint(Graphics& g)
 		g.drawVerticalLine(rp.x, 0, getHeight());
 	}
 
-	Rectangle<float> pr = Rectangle<float>(0, 0, radius * 2, radius * 2).withCentre(rp);
+	juce::Rectangle<float> pr = juce::Rectangle<float>(0, 0, radius * 2, radius * 2).withCentre(rp);
 	Colour fgColor = useCustomFGColor ? customFGColor : (isInteractable() ? GREEN_COLOR : FEEDBACK_COLOR);
 	if (isInteractable())
 	{

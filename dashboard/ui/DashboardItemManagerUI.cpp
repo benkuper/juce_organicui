@@ -55,7 +55,7 @@ DashboardItemManagerUI::~DashboardItemManagerUI()
 void DashboardItemManagerUI::resized()
 {
 	BaseManagerViewUI::resized();
-	addItemBT->setBounds(Rectangle<int>(0, 0, 50, 50));
+	addItemBT->setBounds(juce::Rectangle<int>(0, 0, 50, 50));
 }
 
 void DashboardItemManagerUI::paint(Graphics& g)
@@ -65,7 +65,7 @@ void DashboardItemManagerUI::paint(Graphics& g)
 	if (manager == nullptr || inspectable.wasObjectDeleted()) return;
 
 	Point<float> p = manager->canvasSize->getPoint();
-	Rectangle<int> canvasR = getBoundsInView(Rectangle<float>().withSizeKeepingCentre(p.x, p.y));
+	juce::Rectangle<int> canvasR = getBoundsInView(juce::Rectangle<float>().withSizeKeepingCentre(p.x, p.y));
 	g.setColour(manager->bgColor->getColor());
 	g.fillRect(canvasR);
 
@@ -76,7 +76,7 @@ void DashboardItemManagerUI::paint(Graphics& g)
 	g.setColour(Colours::white.withAlpha(alpha));
 	float scale = manager->bgImageScale->floatValue();
 
-	Rectangle<int> r = getBoundsInView(Rectangle<float>().withSizeKeepingCentre(bgImage.getWidth() * scale, bgImage.getHeight() * scale));
+	juce::Rectangle<int> r = getBoundsInView(juce::Rectangle<float>().withSizeKeepingCentre(bgImage.getWidth() * scale, bgImage.getHeight() * scale));
 	g.drawImage(bgImage, r.toFloat(), RectanglePlacement::stretchToFit, false);
 }
 
@@ -88,7 +88,7 @@ void DashboardItemManagerUI::paintOverChildren(Graphics& g)
 	if (manager->canvasSize->enabled && manager->canvasSize->x > 0 && manager->canvasSize->y > 0)
 	{
 		Point<float> p = manager->canvasSize->getPoint();
-		Rectangle<int> canvasR = getBoundsInView(Rectangle<float>().withSizeKeepingCentre(p.x, p.y));
+		juce::Rectangle<int> canvasR = getBoundsInView(juce::Rectangle<float>().withSizeKeepingCentre(p.x, p.y));
 		Path path;
 		path.addRectangle(getLocalBounds());
 		path.setUsingNonZeroWinding(false);
@@ -98,7 +98,7 @@ void DashboardItemManagerUI::paintOverChildren(Graphics& g)
 		g.fillPath(path);
 
 		int h = 50; // should be exposed
-		Rectangle<int> headerR = getBoundsInView(Rectangle<float>().withSizeKeepingCentre(p.x, p.y).removeFromTop(h));;
+		juce::Rectangle<int> headerR = getBoundsInView(juce::Rectangle<float>().withSizeKeepingCentre(p.x, p.y).removeFromTop(h));;
 		g.setColour(BLUE_COLOR.withAlpha(.1f));
 		g.fillRect(headerR);
 		float dashes[]{ 4, 3 };

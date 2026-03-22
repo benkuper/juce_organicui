@@ -50,7 +50,7 @@ void TriggerBlinkUI::paint(Graphics& g)
 	g.fillRoundedRectangle(getLocalBounds().toFloat(), 2);
 	if (showLabel)
 	{
-		Rectangle<int> tr = getLocalBounds().reduced(2);
+		juce::Rectangle<int> tr = getLocalBounds().reduced(2);
 		g.setFont(jlimit(12, 40, jmin(tr.getHeight(), tr.getWidth()) - 16));
 		g.setColour(useCustomTextColor ? customTextColor : TEXT_COLOR);
 		g.drawFittedText(customLabel.isNotEmpty() ? customLabel : trigger->niceName, tr, Justification::centred, 1);

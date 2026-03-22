@@ -213,7 +213,7 @@ void Easing2DUI::newMessage(const ContainerAsyncEvent& e)
 }
 
 
-void Easing2DUI::setValueBounds(const Rectangle<float> _valueBounds)
+void Easing2DUI::setValueBounds(const juce::Rectangle<float> _valueBounds)
 {
 	valueBounds = _valueBounds;
 	resized();
@@ -309,7 +309,7 @@ void CubicEasing2DUI::paintInternal(Graphics& g)
 	/*	g.setColour(Colours::lightpink);
 		for (int i = 0; i < ce->uniformLUT.size(); ++i)
 		{
-			g.fillEllipse(Rectangle<int>(0, 0, 4, 4).withCentre(getUIPosForValuePos(ce->uniformLUT[i])).toFloat());
+			g.fillEllipse(juce::Rectangle<int>(0, 0, 4, 4).withCentre(getUIPosForValuePos(ce->uniformLUT[i])).toFloat());
 		}
 		*/
 

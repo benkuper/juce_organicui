@@ -70,7 +70,7 @@ void FloatStepperUI::paint(Graphics& g)
 
 	if (showLabel)
 	{
-		Rectangle<int> r = getLocalBounds();
+		juce::Rectangle<int> r = getLocalBounds();
 		g.setFont(customTextSize > 0 ? customTextSize : Font());
 		r = r.removeFromLeft(jmin(g.getCurrentFont().getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, r.getWidth() - 
 		 60));
@@ -81,7 +81,7 @@ void FloatStepperUI::paint(Graphics& g)
 
 void FloatStepperUI::resized()
 {
-	Rectangle<int> r = getLocalBounds();
+	juce::Rectangle<int> r = getLocalBounds();
 
 	if (parameter == nullptr || parameter.wasObjectDeleted()) return;
 

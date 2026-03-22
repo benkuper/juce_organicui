@@ -54,7 +54,7 @@ void Curve2DUI::paintOverChildren(Graphics& g)
 	if (inspectable.wasObjectDeleted()) return;
 
 	g.setColour(GREEN_COLOR);
-	g.drawEllipse(Rectangle<int>(0, 0, 8, 8).withCentre(getPosInView(manager->value->getPoint())).toFloat(), 2);
+	g.drawEllipse(juce::Rectangle<int>(0, 0, 8, 8).withCentre(getPosInView(manager->value->getPoint())).toFloat(), 2);
 
 	if (paintingMode && paintingPoints.size() > 0)
 	{
@@ -64,7 +64,7 @@ void Curve2DUI::paintOverChildren(Graphics& g)
 		for (auto& pp : paintingPoints)
 		{
 			Point<int> vpp = getPosInView(pp);
-			g.fillEllipse(Rectangle<int>(0, 0, 2, 2).withCentre(vpp).toFloat());
+			g.fillEllipse(juce::Rectangle<int>(0, 0, 2, 2).withCentre(vpp).toFloat());
 			p.lineTo(vpp.toFloat());
 		}
 
@@ -99,12 +99,12 @@ void Curve2DUI::paintOverChildren(Graphics& g)
 void Curve2DUI::updateViewUIPosition(Curve2DKeyUI* ui)
 {
 	Point<int> p = getPosInView(ui->item->viewUIPosition->getPoint());
-	Rectangle<int> pr = Rectangle<int>(0, 0, 20, 20).withCentre(p);
+	juce::Rectangle<int> pr = juce::Rectangle<int>(0, 0, 20, 20).withCentre(p);
 	if (ui->item->easing != nullptr) pr = pr.getUnion(getBoundsInView(ui->item->easing->getBounds(true)).expanded(5, 5));
 	if (ui->item->nextKey != nullptr && (pr.getWidth() == 20 && pr.getHeight() == 20))
 	{
-		//Rectangle<float> t = ui->item->easing->getBounds(true);
-		//Rectangle<int> vt = getBoundsInView(ui->item->easing->getBounds(true));
+		//juce::Rectangle<float> t = ui->item->easing->getBounds(true);
+		//juce::Rectangle<int> vt = getBoundsInView(ui->item->easing->getBounds(true));
 		//DBG("Weird");
 	}
 	pr.expand(5, 5);
