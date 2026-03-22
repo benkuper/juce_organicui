@@ -107,7 +107,7 @@ void TripleSliderUI::paint(Graphics& g)
 
 	if (showLabel)
 	{
-		Rectangle<int> r = getLocalBounds();
+		juce::Rectangle<int> r = getLocalBounds();
 		g.setFont(jlimit(12, 40, jmin(r.getHeight(), r.getWidth()) - 16));
 		r = r.removeFromLeft(jmin(g.getCurrentFont().getStringWidth(customLabel.isNotEmpty() ? customLabel : parameter->niceName) + 10, r.getWidth() - 60));
 		g.setColour(useCustomTextColor ? customTextColor : TEXT_COLOR);

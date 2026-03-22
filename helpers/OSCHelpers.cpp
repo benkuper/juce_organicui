@@ -626,7 +626,7 @@ OSCQueryHelpers::OSCQueryValueContainerEditor::~OSCQueryValueContainerEditor()
 {
 }
 
-void OSCQueryHelpers::OSCQueryValueContainerEditor::resizedInternalHeader(Rectangle<int>& r)
+void OSCQueryHelpers::OSCQueryValueContainerEditor::resizedInternalHeader(juce::Rectangle<int>& r)
 {
 	EnablingControllableContainerEditor::resizedInternalHeader(r);
 	if (enableListenUI != nullptr)

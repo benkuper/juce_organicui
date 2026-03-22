@@ -32,9 +32,9 @@ DashboardManagerUI::~DashboardManagerUI()
 
 }
 
-void DashboardManagerUI::resizedInternalContent(Rectangle<int>& r)
+void DashboardManagerUI::resizedInternalContent(juce::Rectangle<int>& r)
 {
-	Rectangle<int> br = r.removeFromRight(100).reduced(4);
+	juce::Rectangle<int> br = r.removeFromRight(100).reduced(4);
 	editModeUI->setBounds(br.removeFromTop(br.getHeight() / 2).reduced(1));
 	snappingUI->setBounds(br.reduced(1));
 	BaseManagerUI::resizedInternalContent(r);

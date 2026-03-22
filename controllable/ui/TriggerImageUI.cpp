@@ -50,7 +50,7 @@ void TriggerImageUI::paint(Graphics & g)
 
 	if (showLabel)
 	{
-		Rectangle<int> tr = getLocalBounds().reduced(2);
+		juce::Rectangle<int> tr = getLocalBounds().reduced(2);
 		float fontSize = customTextSize > 0 ? customTextSize : jlimit(10, 40, jmin(tr.getHeight() - 4, tr.getWidth()) - 16);
 		g.setFont(fontSize);
 		g.setColour(useCustomTextColor ? customTextColor : TEXT_COLOR);

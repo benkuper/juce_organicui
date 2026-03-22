@@ -44,7 +44,7 @@ void DashboardItemUI::paintOverChildren(Graphics& g)
 		g.setColour(Colours::white.withAlpha(.05f));
 		g.fillAll();
 
-		Rectangle<int> r = getLocalBounds();
+		juce::Rectangle<int> r = getLocalBounds();
 		Line<float> l1(r.getX(), r.getY(), r.getRight(), r.getY());
 		Line<float> l2(r.getRight(), r.getY(), r.getRight(), r.getBottom());
 		Line<float> l3(r.getRight(), r.getBottom(), r.getX(), r.getBottom());

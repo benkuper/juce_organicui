@@ -38,7 +38,7 @@ void DashboardGroupItemUI::paint(Graphics& g)
 
 void DashboardGroupItemUI::resizedDashboardItemInternal()
 {
-	Rectangle<int> r = getLocalBounds().reduced(4);
+	juce::Rectangle<int> r = getLocalBounds().reduced(4);
 
 	managerUI->manager->viewOffset = -r.getCentre(); //top left anchor
 	managerUI->setBounds(r);

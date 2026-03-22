@@ -47,9 +47,9 @@ void LinearEasing2D::updateLength()
 	length = end.getDistanceFrom(start);
 }
 
-Rectangle<float> LinearEasing2D::getBounds(bool)
+juce::Rectangle<float> LinearEasing2D::getBounds(bool)
 {
-	return Rectangle<float>(Point<float>(jmin(start.x, end.x), jmin(start.y, end.y)), Point<float>(jmax(start.x, end.x), jmax(start.y, end.y)));
+	return juce::Rectangle<float>(Point<float>(jmin(start.x, end.x), jmin(start.y, end.y)), Point<float>(jmax(start.x, end.x), jmax(start.y, end.y)));
 }
 
 Point<float> LinearEasing2D::getClosestPointForPos(Point<float> pos)
@@ -233,14 +233,14 @@ Array<Point<float>> CubicEasing2D::getSplitControlPoints(const Point<float> &pos
 	return result;
 }
 
-Rectangle<float> CubicEasing2D::getBounds(bool includeHandles)
+juce::Rectangle<float> CubicEasing2D::getBounds(bool includeHandles)
 {
 	Bezier::AxisAlignedBoundingBox  bbox = bezier.aabb();
 	Array<Point<float>> points;
 	points.add(Point<float>(bbox.minX(), bbox.minY()), Point<float>(bbox.maxX(), bbox.maxY()));
 	if(includeHandles) points.add(anchor1->getPoint() + start, anchor2->getPoint() + end);
 
-	return Rectangle<float>::findAreaContainingPoints(points.getRawDataPointer(), points.size());
+	return juce::Rectangle<float>::findAreaContainingPoints(points.getRawDataPointer(), points.size());
 }
 
 Point<float> CubicEasing2D::getClosestPointForPos(Point<float> pos)

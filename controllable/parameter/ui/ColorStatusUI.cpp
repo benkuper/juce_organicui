@@ -157,7 +157,7 @@ void ColorStatusUI::ColorOptionManager::addOptionUI(const var& key)
 
 void ColorStatusUI::ColorOptionManager::paint(Graphics& g)
 {
-	Rectangle<int> hr = getLocalBounds().removeFromTop(20);
+	juce::Rectangle<int> hr = getLocalBounds().removeFromTop(20);
 	g.setColour(TEXT_COLOR);
 	g.drawText("Value", hr.removeFromRight(getWidth() / 2).reduced(2).toFloat(), Justification::centred, false);
 	g.drawText("Key", hr.reduced(2).toFloat(), Justification::centred, false);
@@ -165,7 +165,7 @@ void ColorStatusUI::ColorOptionManager::paint(Graphics& g)
 
 void ColorStatusUI::ColorOptionManager::resized()
 {
-	Rectangle<int> r = getLocalBounds().withHeight(20);
+	juce::Rectangle<int> r = getLocalBounds().withHeight(20);
 	for (int i = 0; i < optionsUI.size(); i++) optionsUI[i]->setBounds(r.translated(0, i * r.getHeight()));
 
 	int th = optionsUI.size() * r.getHeight();
@@ -226,7 +226,7 @@ ColorStatusUI::ColorOptionManager::ColorOptionUI::ColorOptionUI(Parameter* p, co
 
 void ColorStatusUI::ColorOptionManager::ColorOptionUI::resized()
 {
-	Rectangle<int> r = getLocalBounds().reduced(2);
+	juce::Rectangle<int> r = getLocalBounds().reduced(2);
 	keyLabel.setBounds(r.removeFromLeft(getWidth() / 2).reduced(2));
 	cpui->setBounds(r.reduced(2));
 }

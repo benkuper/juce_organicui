@@ -29,11 +29,11 @@ ParameterAutomationEditor::~ParameterAutomationEditor()
 
 void ParameterAutomationEditor::resized()
 {
-	Rectangle<int> r = getLocalBounds();
+	juce::Rectangle<int> r = getLocalBounds();
 	
 	if (modeUI != nullptr)
 	{
-		Rectangle<int> f = r.removeFromBottom(14);
+		juce::Rectangle<int> f = r.removeFromBottom(14);
 		modeUI->setBounds(f.removeFromLeft(80));
 		f.removeFromLeft(2);
 		lengthUI->setBounds(f);

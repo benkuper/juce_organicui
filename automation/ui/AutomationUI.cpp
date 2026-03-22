@@ -266,7 +266,7 @@ void AutomationUIKeys::paintOverlay(juce::Graphics& g)
 		for (auto& pp : paintingPoints)
 		{
 			Point<int> vpp = getPosInView(pp);
-			g.fillEllipse(Rectangle<int>(0, 0, 2, 2).withCentre(vpp).toFloat());
+			g.fillEllipse(juce::Rectangle<int>(0, 0, 2, 2).withCentre(vpp).toFloat());
 			p.lineTo(vpp.toFloat());
 		}
 
@@ -285,7 +285,7 @@ void AutomationUIKeys::resized()
 
 	if (interactiveSimplificationUI != nullptr)
 	{
-		Rectangle<int> r = getLocalBounds().removeFromTop(24).withSizeKeepingCentre(300, 24).reduced(2);
+		juce::Rectangle<int> r = getLocalBounds().removeFromTop(24).withSizeKeepingCentre(300, 24).reduced(2);
 		validInteractiveBT->setBounds(r.removeFromRight(80));
 		r.removeFromRight(8);
 		interactiveSimplificationUI->setBounds(r);
@@ -296,13 +296,13 @@ void AutomationUIKeys::placeKeyUI(AutomationKeyUI* ui)
 {
 	if (ui == nullptr || !ui->isVisible()) return;
 
-	Rectangle<int> r = getLocalBounds();
+	juce::Rectangle<int> r = getLocalBounds();
 
 	Point<int> p = getPosInView(ui->item->getPosAndValue());
-	Rectangle<int> pr = Rectangle<int>(0, 0, 20, 20).withCentre(p);
+	juce::Rectangle<int> pr = juce::Rectangle<int>(0, 0, 20, 20).withCentre(p);
 	if (ui->item->easing != nullptr)
 	{
-		Rectangle<int> er = getBoundsInView(ui->item->easing->getBounds(true));
+		juce::Rectangle<int> er = getBoundsInView(ui->item->easing->getBounds(true));
 		er.setSize(jmax(er.getWidth(), er.getWidth() + 1), jmax(er.getHeight(), er.getHeight() + 1));
 		pr = pr.getUnion(er);
 	}
@@ -608,9 +608,9 @@ Point<float> AutomationUIKeys::getViewPos(Point<int> pos, bool relative)
 	return Point<float>(getPosForX(pos.x, relative), getValueForY(pos.y, relative));
 }
 
-Rectangle<float> AutomationUIKeys::getViewBounds(Rectangle<int> pos, bool relative)
+juce::Rectangle<float> AutomationUIKeys::getViewBounds(juce::Rectangle<int> pos, bool relative)
 {
-	Rectangle<float> r = Rectangle<float>(getViewPos(pos.getBottomLeft()), getViewPos(pos.getTopRight()));
+	juce::Rectangle<float> r = juce::Rectangle<float>(getViewPos(pos.getBottomLeft()), getViewPos(pos.getTopRight()));
 	if (relative) r.setPosition(0, 0);
 	return r;
 }
@@ -620,9 +620,9 @@ Point<int> AutomationUIKeys::getPosInView(Point<float> pos, bool relative)
 	return Point<int>(getXForPos(pos.x, relative), getYForValue(pos.y, relative));
 }
 
-Rectangle<int> AutomationUIKeys::getBoundsInView(Rectangle<float> pos, bool relative)
+juce::Rectangle<int> AutomationUIKeys::getBoundsInView(juce::Rectangle<float> pos, bool relative)
 {
-	Rectangle<int> r = Rectangle<int>(getPosInView(pos.getTopLeft()), getPosInView(pos.getBottomRight()));
+	juce::Rectangle<int> r = juce::Rectangle<int>(getPosInView(pos.getTopLeft()), getPosInView(pos.getBottomRight()));
 	if (relative) r.setPosition(0, 0);
 	return r;
 }
@@ -803,7 +803,7 @@ void AutomationUILayer::paint(juce::Graphics& g)
 	}else{
 		//draw current point
 		g.setColour(BLUE_COLOR);
-		g.fillEllipse(Rectangle<float>(0, 0, 6, 6));
+		g.fillEllipse(juce::Rectangle<float>(0, 0, 6, 6));
 	}
 	//ui->validatePaint();
 }

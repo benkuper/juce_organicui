@@ -164,7 +164,7 @@ EnumOptionManager::~EnumOptionManager()
 
 void EnumOptionManager::paint(Graphics& g)
 {
-	Rectangle<int> hr = getLocalBounds().removeFromTop(20);
+	juce::Rectangle<int> hr = getLocalBounds().removeFromTop(20);
 	g.setColour(TEXT_COLOR);
 	g.drawText("Value", hr.removeFromRight(getWidth() / 2).reduced(2).toFloat(), Justification::centred, false);
 	g.drawText("Key", hr.reduced(2).toFloat(), Justification::centred, false);
@@ -172,7 +172,7 @@ void EnumOptionManager::paint(Graphics& g)
 
 void EnumOptionManager::resized()
 {
-	Rectangle<int> r = getLocalBounds().withHeight(20);
+	juce::Rectangle<int> r = getLocalBounds().withHeight(20);
 	for (int i = 0; i < optionsUI.size(); i++) optionsUI[i]->setBounds(r.translated(0, i * r.getHeight()));
 
 	int th = optionsUI.size() * r.getHeight();
@@ -267,7 +267,7 @@ void EnumParameterButtonBarUI::updateFromParameter()
 
 void EnumParameterButtonBarUI::resized()
 {
-	Rectangle<int> r = getLocalBounds();
+	juce::Rectangle<int> r = getLocalBounds();
 	if (buttons.size() == 0) return;
 
 	int bSize = (isVertical ? r.getHeight() : r.getWidth()) / buttons.size();

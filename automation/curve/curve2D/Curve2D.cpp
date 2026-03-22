@@ -183,7 +183,7 @@ void Curve2D::updateCurve(bool relativeAutomationKeySyncMode)
 	Array<float> prevCurvePositions;
 	float prevLength = length->floatValue();
 
-	bounds = items.size() > 0 ? items[0]->easing->getBounds() : Rectangle<float>(0, 0, 0, 0);
+	bounds = items.size() > 0 ? items[0]->easing->getBounds() : juce::Rectangle<float>(0, 0, 0, 0);
 
 	float curLength = 0;
 	int numItems = items.size();

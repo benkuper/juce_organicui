@@ -111,7 +111,7 @@ void DoubleSliderUI::paint(Graphics& g)
 
 	if (canShowExtendedEditor && p2d->canShowExtendedEditor)
 	{
-		Rectangle<float> rr = canvasSwitchRect.reduced(4);
+		juce::Rectangle<float> rr = canvasSwitchRect.reduced(4);
 		Path p;
 		if (canvasUI == nullptr) p.addTriangle(rr.getTopLeft(), Point<float>(rr.getRight(), rr.getCentreY()), rr.getBottomLeft());
 		else p.addTriangle(rr.getTopLeft(), rr.getTopRight(), Point<float>(rr.getCentreX(), rr.getBottom()));

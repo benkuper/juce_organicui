@@ -76,9 +76,9 @@ float LinearEasing::getValue(const float& weight)
 	return jmap(weight, start.y, end.y);
 }
 
-Rectangle<float> LinearEasing::getBounds(bool includeHandles)
+juce::Rectangle<float> LinearEasing::getBounds(bool includeHandles)
 {
-	return 	Rectangle<float>(Point<float>(jmin(start.x, end.x), jmin(start.y, end.y)), Point<float>(jmax(start.x, end.x), jmax(start.y, end.y)));
+	return 	juce::Rectangle<float>(Point<float>(jmin(start.x, end.x), jmin(start.y, end.y)), Point<float>(jmax(start.x, end.x), jmax(start.y, end.y)));
 }
 
 
@@ -88,9 +88,9 @@ float HoldEasing::getValue(const float& weight)
 	return end.y;
 }
 
-Rectangle<float> HoldEasing::getBounds(bool includeHandles)
+juce::Rectangle<float> HoldEasing::getBounds(bool includeHandles)
 {
-	return 	Rectangle<float>(Point<float>(jmin(start.x, end.x), jmin(start.y, end.y)), Point<float>(jmax(start.x, end.x), jmax(start.y, end.y)));
+	return 	juce::Rectangle<float>(Point<float>(jmin(start.x, end.x), jmin(start.y, end.y)), Point<float>(jmax(start.x, end.x), jmax(start.y, end.y)));
 }
 
 
@@ -130,7 +130,7 @@ Array<Point<float>> CubicEasing::getSplitControlPoints(float pos)
 	return result;
 }
 
-Rectangle<float> CubicEasing::getBounds(bool includeHandles)
+juce::Rectangle<float> CubicEasing::getBounds(bool includeHandles)
 {
 	Bezier::AxisAlignedBoundingBox  bbox = bezier.aabb();
 
@@ -138,7 +138,7 @@ Rectangle<float> CubicEasing::getBounds(bool includeHandles)
 	if (bbox.width() > 0 && bbox.height() > 0) points.add(Point<float>(bbox.minX(), bbox.minY()), Point<float>(bbox.maxX(), bbox.maxY()));
 	if (includeHandles) points.add(anchor1->getPoint() + start, anchor2->getPoint() + end);
 
-	return Rectangle<float>::findAreaContainingPoints(points.getRawDataPointer(), points.size());
+	return juce::Rectangle<float>::findAreaContainingPoints(points.getRawDataPointer(), points.size());
 }
 
 
@@ -296,11 +296,11 @@ float SineEasing::getValue(const float& weight)
 	return  start.y + (end.y - start.y) * weight + sinf(weight * length * MathConstants<float>::pi * 2 / freqAmp->x) * freqAmp->y;
 }
 
-Rectangle<float> SineEasing::getBounds(bool includeHandles)
+juce::Rectangle<float> SineEasing::getBounds(bool includeHandles)
 {
 	Array<Point<float>> points;
 	points.add(Point<float>(start.x, start.y - std::abs(freqAmp->y)), Point<float>(end.x, end.y + std::abs(freqAmp->y)), Point<float>(start.x, start.y + std::abs(freqAmp->y)), Point<float>(end.x, end.y - std::abs(freqAmp->y)));
-	return Rectangle<float>::findAreaContainingPoints(points.getRawDataPointer(), points.size());
+	return juce::Rectangle<float>::findAreaContainingPoints(points.getRawDataPointer(), points.size());
 }
 
 
@@ -336,9 +336,9 @@ float ElasticEasing::getValue(const float& weight)
 	return jmap<float>(p, start.y, end.y);
 }
 
-Rectangle<float> ElasticEasing::getBounds(bool includeHandles)
+juce::Rectangle<float> ElasticEasing::getBounds(bool includeHandles)
 {
-	return Rectangle<float>(Point<float>(start.x, jmin(start.y, end.y + (end.y - start.y))), Point<float>(end.x, jmax(start.y, end.y + (end.y - start.y))));
+	return juce::Rectangle<float>(Point<float>(start.x, jmin(start.y, end.y + (end.y - start.y))), Point<float>(end.x, jmax(start.y, end.y + (end.y - start.y))));
 }
 
 
@@ -377,9 +377,9 @@ float BounceEasing::getValue(const float& weight)
 	return jmap<float>(p, start.y, end.y);
 }
 
-Rectangle<float> BounceEasing::getBounds(bool includeHandles)
+juce::Rectangle<float> BounceEasing::getBounds(bool includeHandles)
 {
-	return Rectangle<float>(Point<float>(start.x, jmin(start.y, end.y)), Point<float>(end.x, jmax(start.y, end.y)));
+	return juce::Rectangle<float>(Point<float>(start.x, jmin(start.y, end.y)), Point<float>(end.x, jmax(start.y, end.y)));
 
 }
 
@@ -423,9 +423,9 @@ float StepEasing::getValue(const float& weight)
 	return jmap<float>(curStep, 0, numSteps, start.y, end.y);
 }
 
-Rectangle<float> StepEasing::getBounds(bool includeHandles)
+juce::Rectangle<float> StepEasing::getBounds(bool includeHandles)
 {
-	return Rectangle<float>(Point<float>(start.x, jmin(start.y, end.y + (end.y - start.y))), Point<float>(end.x, jmax(start.y, end.y + (end.y - start.y))));
+	return juce::Rectangle<float>(Point<float>(start.x, jmin(start.y, end.y + (end.y - start.y))), Point<float>(end.x, jmax(start.y, end.y + (end.y - start.y))));
 }
 
 
@@ -491,9 +491,9 @@ float NoiseEasing::getValue(const float& weight)
 	return baseVal + (n - .5f) * 2 * amplitude;
 }
 
-Rectangle<float> NoiseEasing::getBounds(bool includeHandles)
+juce::Rectangle<float> NoiseEasing::getBounds(bool includeHandles)
 {
-	return Rectangle<float>(Point<float>(start.x, jmin(start.y, end.y + (end.y - start.y))), Point<float>(end.x, jmax(start.y, end.y + (end.y - start.y))));
+	return juce::Rectangle<float>(Point<float>(start.x, jmin(start.y, end.y + (end.y - start.y))), Point<float>(end.x, jmax(start.y, end.y + (end.y - start.y))));
 }
 
 
@@ -564,9 +564,9 @@ float PerlinEasing::getValue(const float& weight)
 	return baseVal + (n - .5f) * 2 * amplitude;
 }
 
-Rectangle<float> PerlinEasing::getBounds(bool includeHandles)
+juce::Rectangle<float> PerlinEasing::getBounds(bool includeHandles)
 {
-	return Rectangle<float>(Point<float>(start.x, jmin(start.y, end.y + taper2->y)), Point<float>(end.x, jmax(start.y, end.y - taper2->y)));
+	return juce::Rectangle<float>(Point<float>(start.x, jmin(start.y, end.y + taper2->y)), Point<float>(end.x, jmax(start.y, end.y - taper2->y)));
 }
 
 
