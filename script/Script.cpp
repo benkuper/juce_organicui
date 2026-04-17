@@ -16,6 +16,9 @@ Script::Script(ScriptTarget* _parentTarget, bool canBeDisabled, bool canBeRemove
 	Thread("Script"),
 	forceDisabled(false),
 	scriptTemplate(nullptr),
+   scriptParamsContainer(nullptr),
+	ownsScriptParamsContainer(false),
+	saveScriptParamsInJSON(true),
 	updateEnabled(false),
 	autoRefreshEnvironment(false),
 	parentTarget(_parentTarget),
@@ -87,28 +90,96 @@ Script::~Script()
 		Engine::mainEngine->removeControllableContainerListener(this);
 	}
 
-	if (scriptEngine != nullptr) scriptEngine->stop();
+  if (scriptEngine != nullptr) scriptEngine->stop();
 
 	stopThread(5000);
 
-	scriptParamsContainer->clear();
+ if (ownsScriptParamsContainer && scriptParamsContainer != nullptr) scriptParamsContainer->clear();
 }
 
-void Script::setParamsContainer(ControllableContainer* cc)
+var Script::getManagedScriptParamsData() const
 {
-	if (scriptParamsContainer != nullptr)
+	if (scriptParamsContainer == nullptr) return var();
+	if (ownsScriptParamsContainer) return scriptParamsContainer->getJSONData();
+
+	var data(new DynamicObject());
+	var paramsData;
+
+	for (auto& c : scriptParamsContainer->controllables)
 	{
-		removeChildControllableContainer(scriptParamsContainer.get());
-		scriptParamsContainer.reset();
+		if (c == nullptr) continue;
+		if (!managedScriptParamNames.contains(c->shortName)) continue;
+		if (c->type == Controllable::TRIGGER && !scriptParamsContainer->includeTriggersInSaveLoad && c->hideInRemoteControl != c->defaultHideInRemoteControl) continue;
+		if (!c->shouldBeSaved()) continue;
+
+		paramsData.append(c->getJSONData(scriptParamsContainer));
 	}
 
-	if (cc == nullptr) cc = new ControllableContainer("Params");
+	if (paramsData.size() > 0) data.getDynamicObject()->setProperty("parameters", paramsData);
+	return data;
+}
 
-	cc->setNiceName("Params");
-	scriptParamsContainer.reset(cc);
-	scriptParamsContainer->hideEditorHeader = true;
-	scriptParamsContainer->saveAndLoadRecursiveData = true;
-	addChildControllableContainer(scriptParamsContainer.get());
+void Script::clearManagedScriptParams()
+{
+	if (scriptParamsContainer == nullptr) return;
+
+	if (ownsScriptParamsContainer)
+	{
+		while (scriptParamsContainer->controllables.size() > 0) scriptParamsContainer->removeControllable(scriptParamsContainer->controllables[0]);
+		scriptParamsContainer->clear();
+		managedScriptParamNames.clear();
+		return;
+	}
+
+	Array<Controllable*> controllablesToRemove;
+	for (auto& c : scriptParamsContainer->controllables)
+	{
+		if (c != nullptr && managedScriptParamNames.contains(c->shortName)) controllablesToRemove.add(c);
+	}
+
+	for (auto* c : controllablesToRemove)
+	{
+		scriptParamsContainer->removeControllable(c);
+	}
+
+	managedScriptParamNames.clear();
+}
+
+void Script::registerManagedScriptParam(Controllable* c)
+{
+	if (c == nullptr) return;
+	managedScriptParamNames.addIfNotAlreadyThere(c->shortName);
+}
+
+void Script::setParamsContainer(ControllableContainer* cc, bool takeOwnership, bool saveParamsInJSON)
+{
+  if (ownsScriptParamsContainer && scriptParamsContainer != nullptr && scriptParamsContainer->parentContainer == this)
+	{
+      removeChildControllableContainer(scriptParamsContainer);
+	}
+
+	ownedScriptParamsContainer.reset();
+	scriptParamsContainer = nullptr;
+	ownsScriptParamsContainer = false;
+	saveScriptParamsInJSON = saveParamsInJSON;
+
+    if (cc == nullptr)
+	{
+		cc = new ControllableContainer("Params");
+		takeOwnership = true;
+	}
+
+  scriptParamsContainer = cc;
+	ownsScriptParamsContainer = takeOwnership;
+
+	if (ownsScriptParamsContainer)
+	{
+		scriptParamsContainer->setNiceName("Params");
+		scriptParamsContainer->hideEditorHeader = true;
+		scriptParamsContainer->saveAndLoadRecursiveData = true;
+		ownedScriptParamsContainer.reset(scriptParamsContainer);
+		addChildControllableContainer(scriptParamsContainer);
+	}
 }
 
 void Script::chooseFileScript(bool openAfter)
@@ -196,7 +267,7 @@ void Script::loadScript()
 	String s = f.loadFileAsString();
 
 
-	if (paramsContainerData.isVoid()) paramsContainerData = scriptParamsContainer->getJSONData();
+   if (paramsContainerData.isVoid()) paramsContainerData = getManagedScriptParamsData();
 
 	buildEnvironment();
 
@@ -263,8 +334,7 @@ void Script::buildEnvironment()
 		//scriptEngine->stop();
 	//}
 
-	while (scriptParamsContainer->controllables.size() > 0) scriptParamsContainer->removeControllable(scriptParamsContainer->controllables[0]);
-	scriptParamsContainer->clear();
+ clearManagedScriptParams();
 
 	refreshVariables();
 }
@@ -348,7 +418,7 @@ void Script::onControllableFeedbackUpdateInternal(ControllableContainer* cc, Con
 {
 	if (Engine::mainEngine->isClearing) return;
 
-	if (cc == scriptParamsContainer.get())
+	if (cc == scriptParamsContainer)
 	{
 		Array<var> args;
 		args.add(c->getScriptObject());
@@ -377,15 +447,26 @@ void Script::childStructureChanged(ControllableContainer* cc)
 var Script::getJSONData(bool includeNonOverriden)
 {
 	var data = BaseItem::getJSONData(includeNonOverriden);
-	var pData = scriptParamsContainer->getJSONData();
-	if (!pData.isVoid()) data.getDynamicObject()->setProperty("scriptParams", pData);
+  var managedParamsData;
+	for (auto& name : managedScriptParamNames) managedParamsData.append(name);
+	if (managedParamsData.size() > 0) data.getDynamicObject()->setProperty("managedScriptParams", managedParamsData);
+   if (saveScriptParamsInJSON)
+	{
+		var pData = scriptParamsContainer->getJSONData();
+		if (!pData.isVoid()) data.getDynamicObject()->setProperty("scriptParams", pData);
+	}
 	return data;
 }
 
 void Script::loadJSONDataInternal(var data)
 {
 	BaseItem::loadJSONDataInternal(data);
-	paramsContainerData = data.getProperty("scriptParams", var());
+   managedScriptParamNames.clear();
+	if (Array<var>* managedParamsData = data.getProperty("managedScriptParams", var()).getArray())
+	{
+		for (auto& managedParam : *managedParamsData) managedScriptParamNames.addIfNotAlreadyThere(managedParam.toString());
+	}
+  paramsContainerData = saveScriptParamsInJSON ? data.getProperty("scriptParams", var()) : var();
 	loadScript();
 }
 
@@ -482,7 +563,9 @@ var Script::addTriggerFromScript(const var::NativeFunctionArgs& args)
 {
 	Script* s = getObjectFromJS<Script>(args);
 	if (!checkNumArgs(s->niceName, args, 2)) return var();
-	return s->scriptParamsContainer->addTrigger(args.arguments[0], args.arguments[1])->getScriptObject();
+   Trigger* t = s->scriptParamsContainer->addTrigger(args.arguments[0], args.arguments[1]);
+	s->registerManagedScriptParam(t);
+	return t->getScriptObject();
 }
 
 var Script::addBoolParameterFromScript(const var::NativeFunctionArgs& args)
@@ -491,6 +574,7 @@ var Script::addBoolParameterFromScript(const var::NativeFunctionArgs& args)
 	if (!checkNumArgs(s->niceName, args, 3)) return var();
 	Parameter* p = s->scriptParamsContainer->addBoolParameter(args.arguments[0], args.arguments[1], (bool)args.arguments[2]);
 	p->isCustomizableByUser = true;
+    s->registerManagedScriptParam(p);
 	return p->getScriptObject();
 }
 
@@ -500,6 +584,7 @@ var Script::addIntParameterFromScript(const var::NativeFunctionArgs& args)
 	if (!checkNumArgs(s->niceName, args, 3)) return var();
 	Parameter* p = s->scriptParamsContainer->addIntParameter(args.arguments[0], args.arguments[1], (int)args.arguments[2], args.numArguments >= 4 ? (int)args.arguments[3] : INT32_MIN, args.numArguments >= 5 ? (int)args.arguments[4] : INT32_MAX);
 	p->isCustomizableByUser = true;
+    s->registerManagedScriptParam(p);
 	return p->getScriptObject();
 }
 
@@ -509,6 +594,7 @@ var Script::addFloatParameterFromScript(const var::NativeFunctionArgs& args)
 	if (!checkNumArgs(s->niceName, args, 3)) return var();
 	Parameter* p = s->scriptParamsContainer->addFloatParameter(args.arguments[0], args.arguments[1], (float)args.arguments[2], args.numArguments >= 4 ? (int)args.arguments[3] : INT32_MIN, args.numArguments >= 5 ? (int)args.arguments[4] : INT32_MAX);
 	p->isCustomizableByUser = true;
+    s->registerManagedScriptParam(p);
 	return p->getScriptObject();
 }
 
@@ -518,6 +604,7 @@ var Script::addStringParameterFromScript(const var::NativeFunctionArgs& args)
 	if (!checkNumArgs(s->niceName, args, 3)) return var();
 	Parameter* p = s->scriptParamsContainer->addStringParameter(args.arguments[0], args.arguments[1], args.arguments[2]);
 	p->isCustomizableByUser = true;
+    s->registerManagedScriptParam(p);
 	return p->getScriptObject();
 }
 
@@ -533,6 +620,7 @@ var Script::addEnumParameterFromScript(const var::NativeFunctionArgs& args)
 		p->addOption(args.arguments[optionIndex].toString(), args.arguments[optionIndex + 1]);
 	}
 	p->isCustomizableByUser = true;
+    s->registerManagedScriptParam(p);
 	return p->getScriptObject();
 }
 
@@ -548,6 +636,7 @@ var Script::addTargetParameterFromScript(const var::NativeFunctionArgs& args)
 		if (isContainer) tp->targetType = TargetParameter::CONTAINER;
 	}
 	tp->isCustomizableByUser = true;
+   s->registerManagedScriptParam(tp);
 	return tp->getScriptObject();
 }
 
@@ -578,6 +667,7 @@ var Script::addColorParameterFromScript(const var::NativeFunctionArgs& args)
 
 	Parameter* p = s->scriptParamsContainer->addColorParameter(args.arguments[0], args.arguments[1], Colour((float)color[0], (float)color[1], (float)color[2], (float)color[3]));
 	p->isCustomizableByUser = true;
+    s->registerManagedScriptParam(p);
 	return p->getScriptObject();
 }
 
@@ -587,6 +677,7 @@ var Script::addPoint2DParameterFromScript(const var::NativeFunctionArgs& args)
 	if (!checkNumArgs(s->niceName, args, 2)) return var();
 	Parameter* p = s->scriptParamsContainer->addPoint2DParameter(args.arguments[0], args.arguments[1]);
 	p->isCustomizableByUser = true;
+    s->registerManagedScriptParam(p);
 	return p->getScriptObject();
 }
 
@@ -596,6 +687,7 @@ var Script::addPoint3DParameterFromScript(const var::NativeFunctionArgs& args)
 	if (!checkNumArgs(s->niceName, args, 2)) return var();
 	Parameter* p = s->scriptParamsContainer->addPoint3DParameter(args.arguments[0], args.arguments[1]);
 	p->isCustomizableByUser = true;
+    s->registerManagedScriptParam(p);
 	return p->getScriptObject();
 }
 
@@ -606,6 +698,7 @@ var Script::addFileParameterFromScript(const var::NativeFunctionArgs& args)
 	FileParameter* fp = s->scriptParamsContainer->addFileParameter(args.arguments[0], args.arguments[1]);
 	fp->directoryMode = args.numArguments > 2 ? ((int)args.arguments[2] > 0) : false;
 	fp->isCustomizableByUser = true;
+   s->registerManagedScriptParam(fp);
 	return fp->getScriptObject();
 }
 

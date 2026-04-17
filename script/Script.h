@@ -35,13 +35,17 @@ public:
 	juce::String fileName;
 	juce::Time fileLastModTime;
 	juce::var paramsContainerData; //for keeping overriden values
+	juce::StringArray managedScriptParamNames;
 
 	juce::CriticalSection scriptCallLock;
 
 	bool updateEnabled; //When loading the script, checks if the update function is present
 	const juce::Identifier updateIdentifier = "update";
 
-	std::unique_ptr<ControllableContainer> scriptParamsContainer;
+   std::unique_ptr<ControllableContainer> ownedScriptParamsContainer;
+	ControllableContainer* scriptParamsContainer;
+	bool ownsScriptParamsContainer;
+	bool saveScriptParamsInJSON;
 
 	ScriptTarget* parentTarget;
 
@@ -52,8 +56,11 @@ public:
 	float executionTimeout;
 	bool autoRefreshEnvironment;
 
+	juce::var getManagedScriptParamsData() const;
+	void clearManagedScriptParams();
+	void registerManagedScriptParam(Controllable* c);
 
-	void setParamsContainer(ControllableContainer* cc);
+ void setParamsContainer(ControllableContainer* cc, bool takeOwnership = true, bool saveParamsInJSON = true);
 	void chooseFileScript(bool openAfter = false);
 
 	void loadScript();
