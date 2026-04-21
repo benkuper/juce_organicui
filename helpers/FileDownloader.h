@@ -30,7 +30,7 @@ public:
 	{
 	public:
 		FileToDownload(juce::URL u, juce::File f, std::function<void(bool)> cb, bool o = true)
-			: url(u), destinationFile(f), onFinished(cb), overwriteExisting(o) {
+			: url(u), destinationFile(f), overwriteExisting(o), onFinished(cb)  {
 		}
 		~FileToDownload() {}
 		juce::URL url;
