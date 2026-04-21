@@ -25,7 +25,7 @@ public:
 	virtual ~Inspector();
 
 	InspectableSelectionManager* selectionManager;
-	juce::Array<Inspectable*> currentInspectables;
+	juce::Array<juce::WeakReference<Inspectable>> currentInspectables;
 	juce::Viewport vp;
 	std::unique_ptr<InspectableEditor> currentEditor;
 

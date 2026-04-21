@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-	Inspector.cpp
-	Created: 9 May 2016 6:41:38pm
-	Author:  bkupe
+    Inspector.cpp
+    Created: 9 May 2016 6:41:38pm
+    Author:  bkupe
 
   ==============================================================================
 */
@@ -15,200 +15,213 @@
 std::function<Inspector* (InspectableSelectionManager*)> InspectorUI::customCreateInspectorFunc = nullptr;
 
 Inspector::Inspector(InspectableSelectionManager* _selectionManager) :
-	selectionManager(nullptr),
-	currentEditor(nullptr),
-	showTextOnEmpty(true),
-	tempScrollPosition(0)
+    selectionManager(nullptr),
+    currentEditor(nullptr),
+    showTextOnEmpty(true),
+    tempScrollPosition(0)
 {
 
-	setSelectionManager(_selectionManager);
+    setSelectionManager(_selectionManager);
 
-	vp.setScrollBarsShown(true, false);
-	vp.setScrollBarThickness(10);
-	vp.setScrollOnDragMode(Viewport::ScrollOnDragMode::never);
+    vp.setScrollBarsShown(true, false);
+    vp.setScrollBarThickness(10);
+    vp.setScrollOnDragMode(Viewport::ScrollOnDragMode::never);
 
-	addAndMakeVisible(vp);
+    addAndMakeVisible(vp);
 
-	setDisableInternalMouseEvents(true);
-	addMouseListener(this, true);
+    setDisableInternalMouseEvents(true);
+    addMouseListener(this, true);
 
-	resized();
+    resized();
 }
 
 
 
 Inspector::~Inspector()
 {
-	if (selectionManager != nullptr) selectionManager->removeAsyncSelectionManagerListener(this);
-	else if (InspectableSelectionManager::mainSelectionManager != nullptr) InspectableSelectionManager::mainSelectionManager->removeAsyncSelectionManagerListener(this);
+    if (selectionManager != nullptr) selectionManager->removeAsyncSelectionManagerListener(this);
+    else if (InspectableSelectionManager::mainSelectionManager != nullptr) InspectableSelectionManager::mainSelectionManager->removeAsyncSelectionManagerListener(this);
 
-	clear();
+    for (auto& i : currentInspectables)
+    {
+        if (i != nullptr && !i.wasObjectDeleted())
+        {
+            i->removeInspectableListener(this);
+        }
+    }
+
+    clear();
 }
 
 
 void Inspector::paint(Graphics& g)
 {
-	if (showTextOnEmpty && currentInspectables.size() == 0 && selectionManager != nullptr)
-	{
-		g.setColour(Colours::white.withAlpha(.4f));
-		g.setFont(jmin(getHeight() - 2, 14));
-		String text = "Select an object to edit its parameters here";
-		if (text.isNotEmpty()) g.drawFittedText(text, getLocalBounds(), Justification::centred, 3);
-	}
+    if (showTextOnEmpty && currentInspectables.size() == 0 && selectionManager != nullptr)
+    {
+        g.setColour(Colours::white.withAlpha(.4f));
+        g.setFont(jmin(getHeight() - 2, 14));
+        String text = "Select an object to edit its parameters here";
+        if (text.isNotEmpty()) g.drawFittedText(text, getLocalBounds(), Justification::centred, 3);
+    }
 }
 
 void Inspector::resized()
 {
-	juce::Rectangle<int> r = getLocalBounds().reduced(3);
-	resizedInternal(r);
+    juce::Rectangle<int> r = getLocalBounds().reduced(3);
+    resizedInternal(r);
 }
 
 void Inspector::resizedInternal(juce::Rectangle<int>& r)
 {
-	vp.setBounds(r);
-	r.removeFromRight(10);
+    vp.setBounds(r);
+    r.removeFromRight(10);
 
-	if (currentEditor != nullptr)
-	{
-		if (!currentEditor->fitToContent) r.setHeight(currentEditor->getHeight());
-		currentEditor->setSize(r.getWidth(), r.getHeight());
-	}
+    if (currentEditor != nullptr)
+    {
+        if (!currentEditor->fitToContent) r.setHeight(currentEditor->getHeight());
+        currentEditor->setSize(r.getWidth(), r.getHeight());
+    }
 }
 
 void Inspector::mouseDrag(const juce::MouseEvent& e)
 {
-	vp.autoScroll(vp.getMouseXYRelative().x, vp.getMouseXYRelative().y, 20, 20);
+    vp.autoScroll(vp.getMouseXYRelative().x, vp.getMouseXYRelative().y, 20, 20);
 }
 
 void Inspector::setSelectionManager(InspectableSelectionManager* newSM)
 {
-	if (selectionManager != nullptr) selectionManager->removeAsyncSelectionManagerListener(this);
+    if (selectionManager != nullptr) selectionManager->removeAsyncSelectionManagerListener(this);
 
-	selectionManager = newSM;
+    selectionManager = newSM;
 
-	if (selectionManager == nullptr) selectionManager = InspectableSelectionManager::mainSelectionManager;
-	if (selectionManager != nullptr) {
-		selectionManager->addAsyncSelectionManagerListener(this);
-		onSelectionChanged();
-	}
+    if (selectionManager == nullptr) selectionManager = InspectableSelectionManager::mainSelectionManager;
+    if (selectionManager != nullptr) {
+        selectionManager->addAsyncSelectionManagerListener(this);
+        onSelectionChanged();
+    }
 }
 
 void Inspector::setCurrentInspectables(Array<Inspectable*> inspectables, bool setInspectableSelection)
 {
-	if (!isEnabled()) return;
+    if (!isEnabled()) return;
 
-	if (inspectables.size() == currentInspectables.size())
-	{
-		bool isSame = true;
-		for (int i = 0; i < inspectables.size(); i++)
-		{
-			if (inspectables[i] != currentInspectables[i])
-			{
-				isSame = false;
-				break;
-			}
-		}
-		if (isSame) return;
-	}
+    if (inspectables.size() == currentInspectables.size())
+    {
+        bool isSame = true;
+        for (int i = 0; i < inspectables.size(); i++)
+        {
+            if (inspectables[i] != currentInspectables[i])
+            {
+                isSame = false;
+                break;
+            }
+        }
+        if (isSame) return;
+    }
 
-	MessageManagerLock mmLock;
+    MessageManagerLock mmLock;
 
-	for (auto& i : currentInspectables)
-	{
-		if (i != nullptr)
-		{
-			i->removeInspectableListener(this);
-			if (setInspectableSelection) i->setSelected(false);
-		}
-	}
-	if (currentEditor != nullptr)
-	{
-		vp.setViewedComponent(nullptr);
-		currentEditor = nullptr;
-	}
+    for (auto& i : currentInspectables)
+    {
+        if (i != nullptr)
+        {
+            i->removeInspectableListener(this);
+            if (setInspectableSelection) i->setSelected(false);
+        }
+    }
+    if (currentEditor != nullptr)
+    {
+        vp.setViewedComponent(nullptr);
+        currentEditor = nullptr;
+    }
 
-	currentInspectables = inspectables;
+    currentInspectables.clear();
+    for(auto & i : inspectables)
+    {
+        currentInspectables.add(i);
+    }
 
-	for (auto& i : currentInspectables)
-	{
-		if (setInspectableSelection) i->setSelected(true);
-		i->addInspectableListener(this);
-	}
+    for (auto& i : currentInspectables)
+    {
+        if (setInspectableSelection) i->setSelected(true);
+        i->addInspectableListener(this);
+    }
 
-	if (currentInspectables.size() > 0)
-	{
-		currentEditor.reset(currentInspectables[0]->getEditor(true, currentInspectables));
+    if (currentInspectables.size() > 0)
+    {
+        
+        currentEditor.reset(currentInspectables[0]->getEditor(true, inspectables));
 
-		vp.setViewedComponent(currentEditor.get(), false);
-	}
-	resized();
+        vp.setViewedComponent(currentEditor.get(), false);
+    }
+    resized();
 
-	listeners.call(&InspectorListener::currentInspectableChanged, this);
+    listeners.call(&InspectorListener::currentInspectableChanged, this);
 }
 
 
 void Inspector::storeScrollPosition()
 {
-	tempScrollPosition = vp.getViewPositionY();
+    tempScrollPosition = vp.getViewPositionY();
 }
 
 void Inspector::restoreScrollPosition()
 {
-	vp.setViewPosition(Point<int>(vp.getViewPositionX(), tempScrollPosition));
+    vp.setViewPosition(Point<int>(vp.getViewPositionX(), tempScrollPosition));
 }
 
 void Inspector::clear()
 {
-	if (getApp().isShuttingDown) return;
+    if (getApp().isShuttingDown) return;
 
-	setCurrentInspectables();
+    setCurrentInspectables();
 }
 
 void Inspector::inspectableDestroyed(Inspectable* i)
 {
-	if (currentInspectables.contains(i))
-	{
-		Array<Inspectable*> newInspectables(currentInspectables.getRawDataPointer(), currentInspectables.size());
-		newInspectables.removeAllInstancesOf(i);
-		setCurrentInspectables(newInspectables);
-	}
+    if (currentInspectables.contains(i))
+    {
+        Array<Inspectable*> newInspectables(currentInspectables.getRawDataPointer(), currentInspectables.size());
+        newInspectables.removeAllInstancesOf(i);
+        setCurrentInspectables(newInspectables);
+    }
 }
 
 void Inspector::newMessage(const InspectableSelectionManager::SelectionEvent& e)
 {
-	if (e.type == InspectableSelectionManager::SelectionEvent::SELECTION_CHANGED)
-	{
-		onSelectionChanged();
-	}
+    if (e.type == InspectableSelectionManager::SelectionEvent::SELECTION_CHANGED)
+    {
+        onSelectionChanged();
+    }
 }
 
 void Inspector::onSelectionChanged()
 {
-	if (selectionManager->isEmpty())
-	{
-		if (curSelectionDoesNotAffectInspector) return;
-		setCurrentInspectables();
-	}
-	else
-	{
-		Inspectable* newI = selectionManager->currentInspectables[0];
-		curSelectionDoesNotAffectInspector = !newI->showInspectorOnSelect;
-		if (curSelectionDoesNotAffectInspector) return;
+    if (selectionManager->isEmpty())
+    {
+        if (curSelectionDoesNotAffectInspector) return;
+        setCurrentInspectables();
+    }
+    else
+    {
+        Inspectable* newI = selectionManager->currentInspectables[0];
+        curSelectionDoesNotAffectInspector = !newI->showInspectorOnSelect;
+        if (curSelectionDoesNotAffectInspector) return;
 
-		Array<Inspectable*> newInspectables = selectionManager->getInspectablesAs<Inspectable>();
-		if (newInspectables.size() > 0 && newInspectables[0] != nullptr && newInspectables[0]->showInspectorOnSelect) setCurrentInspectables(newInspectables);
-	}
+        Array<Inspectable*> newInspectables = selectionManager->getInspectablesAs<Inspectable>();
+        if (newInspectables.size() > 0 && newInspectables[0] != nullptr && newInspectables[0]->showInspectorOnSelect) setCurrentInspectables(newInspectables);
+    }
 
-	repaint();
+    repaint();
 }
 
 InspectorUI::InspectorUI(const String& name, InspectableSelectionManager* selectionManager) :
-	ShapeShifterContentComponent(name)
+    ShapeShifterContentComponent(name)
 {
-	inspector.reset(customCreateInspectorFunc != nullptr ? customCreateInspectorFunc(selectionManager) : new Inspector(selectionManager));
-	addAndMakeVisible(inspector.get());
+    inspector.reset(customCreateInspectorFunc != nullptr ? customCreateInspectorFunc(selectionManager) : new Inspector(selectionManager));
+    addAndMakeVisible(inspector.get());
 
-	helpID = "Inspector";
+    helpID = "Inspector";
 }
 
 InspectorUI::~InspectorUI()
@@ -217,5 +230,5 @@ InspectorUI::~InspectorUI()
 
 void InspectorUI::resized()
 {
-	inspector->setBounds(getLocalBounds());
+    inspector->setBounds(getLocalBounds());
 }
