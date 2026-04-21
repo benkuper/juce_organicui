@@ -1172,14 +1172,27 @@ void ManagerUI<M, T, U>::newMessage(const InspectableSelectionManager::Selection
     {
         if (useViewport)
         {
-            //            if (T* item = InspectableSelectionManager::activeSelectionManager->getInspectableAs<T>())
-            //            {
-            //                if (U* ui = getUIForItem(item))
-            //                {
-            //                    if (defaultLayout == HORIZONTAL) viewport.setViewPosition(ui->getX() + this->getWidth() / 2, 0);
-            //                    else if (defaultLayout == VERTICAL) viewport.setViewPosition(0, ui->getY() + this->getHeight() / 2);
-            //                }
-            //            }
+            if (T* item = InspectableSelectionManager::activeSelectionManager->getInspectableAs<T>())
+            {
+                if (U* ui = getUIForItem(item))
+                {
+                    
+                    if (defaultLayout == HORIZONTAL)
+                    {
+                        if(ui->getBounds().getRight() > viewport.getViewPositionX() + viewport.getWidth() || ui->getBounds().getX() < viewport.getViewPositionX())
+                        {
+                            viewport.setViewPosition(ui->getX() + this->getWidth() / 2, 0);
+                        }
+                        else if (defaultLayout == VERTICAL)
+                        {
+                            if(ui->getBounds().getBottom() > viewport.getViewPositionY() + viewport.getHeight() || ui->getBounds().getY() < viewport.getViewPositionY())
+                            {
+                                viewport.setViewPosition(0, ui->getY() + this->getHeight() / 2);
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
