@@ -16,7 +16,7 @@ ControllableEditor::ControllableEditor(Array<Controllable*> controllables, bool 
 	, controllable(controllables[0])
 	, label("Label")
 	, subContentHeight(0)
-	, minLabelWidth(160)
+	, minLabelWidth(130)
 	, minControlUIWidth(100)
 	, dragAndDropEnabled(true)
 	, showLabel(true)
@@ -151,18 +151,17 @@ void ControllableEditor::resized()
 			r.removeFromLeft(2);
 		}
 	}
+    
+    int labelWidth = jmax(minLabelWidth, r.getWidth()/3);
+
+    if (showLabel)
+    {
+        label.setBounds(r.removeFromLeft(labelWidth));
+    }
 
 	resizedInternal(r);
 
-	int controlSpace = jmax<int>(showLabel ? jmin<int>(getWidth() - minLabelWidth, getWidth() * .75f) : getWidth(), minControlUIWidth);
-
-	ui->setBounds(r.removeFromRight(controlSpace));
-
-	if (showLabel)
-	{
-		r.removeFromRight(2);
-		label.setBounds(r);
-	}
+	ui->setBounds(r.reduced(2,0));
 }
 
 void ControllableEditor::mouseDown(const MouseEvent& e)
