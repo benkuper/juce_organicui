@@ -232,7 +232,8 @@ void StringParameterFileUI::buttonClicked(Button* b)
 StringParameterTextUI::StringParameterTextUI(Array<StringParameter*> parameters) :
 	ParameterUI(Inspectable::getArrayAs<StringParameter, Parameter>(parameters)),
 	stringParams(parameters),
-	stringParam(parameters[0])
+	stringParam(parameters[0]),
+	resizeHandle(this, &resizeConstrainer)
 {
 	editor.setColour(editor.backgroundColourId, Colours::black);
 	editor.setColour(CaretComponent::caretColourId, Colours::orange);
@@ -243,7 +244,16 @@ StringParameterTextUI::StringParameterTextUI(Array<StringParameter*> parameters)
 	editor.addListener(this);
 
 	addAndMakeVisible(&editor);
-	setSize(100, stringParam->multiline ? 60 : 16);
+
+    if (stringParam->multiline && defaultMultilineHeight > 0)
+	{
+		resizeConstrainer.setSizeLimits(1, defaultMultilineHeight, 100000, 100000);
+		resizeHandle.setBorderThickness(BorderSize<int>(0, 0, resizeHandleHeight, 0));
+		resizeHandle.setAlwaysOnTop(true);
+		addAndMakeVisible(&resizeHandle);
+	}
+
+	setSize(100, stringParam->multiline ? defaultMultilineHeight : 16);
 }
 
 void StringParameterTextUI::feedbackStateChanged()
@@ -255,8 +265,36 @@ void StringParameterTextUI::feedbackStateChanged()
 
 void StringParameterTextUI::resized()
 {
-	editor.setBounds(getLocalBounds());
+	juce::Rectangle<int> r = getLocalBounds();
+
+	if (stringParam->multiline)
+	{
+		resizeHandle.setBounds(r);
+		r.removeFromBottom(resizeHandleHeight);
+	}
+
+	editor.setBounds(r);
 }
+
+void StringParameterTextUI::paintOverChildren(Graphics& g)
+{
+	ParameterUI::paintOverChildren(g);
+
+	if (!stringParam->multiline) return;
+
+	juce::Rectangle<int> gripBounds = getLocalBounds().removeFromBottom(resizeHandleHeight).removeFromRight(14);
+	g.setColour(Colours::white.withAlpha(.35f));
+
+	for (int i = 0; i < 3; ++i)
+	{
+		float y = (float)(gripBounds.getBottom() - 2 - i * 2);
+		float x1 = (float)(gripBounds.getRight() - 3 - i * 4);
+		float x2 = (float)(gripBounds.getRight() - 3);
+		g.drawLine(x1, y, x2, y, 1.0f);
+	}
+}
+
+
 
 void StringParameterTextUI::valueChanged(const var& v)
 {

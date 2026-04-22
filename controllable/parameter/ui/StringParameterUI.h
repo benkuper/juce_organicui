@@ -87,10 +87,13 @@ public:
 	StringParameter* stringParam;
 
 	juce::TextEditor editor;
+	juce::ComponentBoundsConstrainer resizeConstrainer;
+	juce::ResizableBorderComponent resizeHandle;
 	virtual void feedbackStateChanged() override;
 
 	//void paint(Graphics &g) override;
 	void resized() override;
+	void paintOverChildren(juce::Graphics& g) override;
 
 protected:
 	void valueChanged(const juce::var& v) override;
@@ -98,5 +101,8 @@ protected:
 	virtual void textEditorFocusLost(juce::TextEditor&) override;
 	virtual void textEditorReturnKeyPressed(juce::TextEditor&) override;
 private:
+	static constexpr int defaultMultilineHeight = 60;
+	static constexpr int resizeHandleHeight = 8;
+
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(StringParameterTextUI)
 };

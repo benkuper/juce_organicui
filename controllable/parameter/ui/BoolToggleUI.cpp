@@ -61,7 +61,6 @@ void BoolToggleUI::paint(Graphics& g)
 	juce::Rectangle<int> r = getLocalBounds();
 	//g.setColour(Colours::white.withAlpha(isMouseOver() ? 1 : .8f));
 
-	juce::Rectangle<int> cr;
 	float labelWidth = 0;
 
 	if (showLabel)
@@ -76,14 +75,14 @@ void BoolToggleUI::paint(Graphics& g)
 		}
 		else*/
 		{
-			cr = r.removeFromRight(getHeight());
+			buttonRect = r.removeFromRight(getHeight()).toFloat();
 		}
 
 		r.removeFromRight(2);
 	}
 	else
 	{
-		cr = r.removeFromLeft(r.getHeight());
+        buttonRect = r.removeFromLeft(r.getHeight()).toFloat();
 	}
 
 	if (showLabel)
@@ -95,7 +94,7 @@ void BoolToggleUI::paint(Graphics& g)
 	if (m.isValid())
 	{
 		g.setOpacity(isMouseOverOrDragging() ? 1.0f : .8f);
-		g.drawImage(m, cr.toFloat(), RectanglePlacement::stretchToFit);
+		g.drawImage(m, buttonRect, RectanglePlacement::stretchToFit);
 	}
 }
 
@@ -135,6 +134,17 @@ void BoolToggleUI::updateUIParamsInternal()
 		}
 	}
 }
+
+
+
+bool BoolToggleUI::hitTest(int x, int y)
+{
+    bool allowClicks, allowChildClicks;
+    getInterceptsMouseClicks(allowClicks, allowChildClicks);
+    if (!allowClicks) return false;
+    return buttonRect.contains(x, y);;
+}
+
 
 
 void BoolToggleUI::valueChanged(const var&)
@@ -190,12 +200,4 @@ void BoolButtonToggleUI::paint(Graphics& g)
 		g.setColour(useCustomTextColor ? customTextColor : TEXT_COLOR);
 		g.drawFittedText(customLabel.isNotEmpty() ? customLabel : parameter->niceName, tr, Justification::centred, 3);
 	}
-}
-
-bool BoolButtonToggleUI::hitTest(int x, int y)
-{
-	bool allowClicks, allowChildClicks;
-	getInterceptsMouseClicks(allowClicks, allowChildClicks);
-	if (!allowClicks) return false;
-	return buttonRect.contains(x, y);;
 }

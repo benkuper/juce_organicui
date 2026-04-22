@@ -19,7 +19,9 @@ public:
 
     juce::Image offImage;
     juce::Image onImage;
-
+    
+    juce::Rectangle<float> buttonRect;
+    
     bool usingCustomImages;
     bool momentaryMode;
 
@@ -29,6 +31,9 @@ public:
     void mouseDownInternal(const juce::MouseEvent &e) override;
     void mouseUpInternal(const juce::MouseEvent &e) override;
 
+    
+    bool hitTest(int x, int y) override;
+    
     virtual void updateUIParamsInternal() override;
 
 protected:
@@ -47,10 +52,9 @@ public:
     virtual ~BoolButtonToggleUI();
     
 
-    juce::Rectangle<float> buttonRect;
+    
 
     void paint(juce::Graphics& g) override;
-    bool hitTest(int x, int y) override;
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BoolButtonToggleUI)
