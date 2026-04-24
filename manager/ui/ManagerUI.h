@@ -148,6 +148,7 @@ public:
 
     // reentrancy guards
     bool isUpdatingVisibility = false;
+    bool isPerformingLayout = false;
 
     void setDefaultLayout(Layout l);
     void addExistingItems(bool resizeAfter = true);
@@ -593,7 +594,9 @@ void ManagerUI<M, T, U>::paint(juce::Graphics& g)
 template<class M, class T, class U>
 void ManagerUI<M, T, U>::resized()
 {
-    if (getWidth() == 0 || getHeight() == 0) return;
+    if (isPerformingLayout || getWidth() == 0 || getHeight() == 0) return;
+
+    juce::ScopedValueSetter<bool> layoutGuard(isPerformingLayout, true);
 
     //bool resizeOnChange = resizeOnChildBoundsChanged;
     //resizeOnChildBoundsChanged = false; //avoir infinite loop if resize actually resizes inner components
@@ -704,11 +707,10 @@ void ManagerUI<M, T, U>::placeItems(juce::Rectangle<int>& r)
         ItemMinimalUI<T>* bui = static_cast<ItemMinimalUI<T>*>(ui);
         if (!checkFilterForItem(ui))
         {
-            bui->setVisible(false);
+            if (bui->isVisible()) bui->setVisible(false);
             ++i;
             continue;
         }
-        bui->setVisible(true);
 
         juce::Rectangle<int> tr;
         if (defaultLayout == VERTICAL) tr = r.withHeight(bui->getHeight());
@@ -883,6 +885,7 @@ bool ManagerUI<M, T, U>::checkFilterForItem(U* ui)
 template<class M, class T, class U>
 void ManagerUI<M, T, U>::childBoundsChanged(juce::Component* c)
 {
+    if (isPerformingLayout) return;
     if (resizeOnChildBoundsChanged && c != &viewport) resized();
 }
 
@@ -910,6 +913,7 @@ bool ManagerUI<M, T, U>::hitTest(int x, int y)
 template<class M, class T, class U>
 void ManagerUI<M, T, U>::componentMovedOrResized(juce::Component& c, bool wasMoved, bool wasResized)
 {
+    if (isPerformingLayout) return;
     if (&c == &container && useViewport && !itemAnimator.isAnimating())
     {
         resized();
@@ -1168,33 +1172,33 @@ void ManagerUI<M, T, U>::newMessage(const typename Manager<T>::ManagerEvent& e)
 template<class M, class T, class U>
 void ManagerUI<M, T, U>::newMessage(const InspectableSelectionManager::SelectionEvent& e)
 {
-    if (e.type == e.SELECTION_CHANGED)
-    {
-        if (useViewport)
-        {
-            if (T* item = InspectableSelectionManager::activeSelectionManager->getInspectableAs<T>())
-            {
-                if (U* ui = getUIForItem(item))
-                {
-                    
-                    if (defaultLayout == HORIZONTAL)
-                    {
-                        if(ui->getBounds().getRight() > viewport.getViewPositionX() + viewport.getWidth() || ui->getBounds().getX() < viewport.getViewPositionX())
-                        {
-                            viewport.setViewPosition(ui->getX() + this->getWidth() / 2, 0);
-                        }
-                        else if (defaultLayout == VERTICAL)
-                        {
-                            if(ui->getBounds().getBottom() > viewport.getViewPositionY() + viewport.getHeight() || ui->getBounds().getY() < viewport.getViewPositionY())
-                            {
-                                viewport.setViewPosition(0, ui->getY() + this->getHeight() / 2);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+//    if (e.type == e.SELECTION_CHANGED)
+//    {
+//        if (useViewport)
+//        {
+//            if (T* item = InspectableSelectionManager::activeSelectionManager->getInspectableAs<T>())
+//            {
+//                if (U* ui = getUIForItem(item))
+//                {
+//                    
+//                    if (defaultLayout == HORIZONTAL)
+//                    {
+//                        if(ui->getBounds().getRight() > viewport.getViewPositionX() + viewport.getWidth() || ui->getBounds().getX() < viewport.getViewPositionX())
+//                        {
+//                            viewport.setViewPosition(ui->getX() + this->getWidth() / 2, 0);
+//                        }
+//                        else if (defaultLayout == VERTICAL)
+//                        {
+//                            if(ui->getBounds().getBottom() > viewport.getViewPositionY() + viewport.getHeight() || ui->getBounds().getY() < viewport.getViewPositionY())
+//                            {
+//                                viewport.setViewPosition(0, ui->getY() + this->getHeight() / 2);
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
 }
 
 template<class M, class T, class U>
