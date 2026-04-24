@@ -108,6 +108,7 @@ public:
 		OrganicMainContentComponent* mainComponent;
 		std::unique_ptr<TrayIcon> trayIcon;
 		juce::Image iconImage;
+		juce::var trayLayout;
 
 
 		void closeToTray();

@@ -208,10 +208,7 @@ void OrganicApplication::anotherInstanceStarted(const String& commandLine)
 
 	if (mainWindow->trayIcon != nullptr)
 	{
-		mainWindow->addToDesktop();
-		mainWindow->setVisible(true);
-		mainComponent->setupOpenGL();
-		mainWindow->setTrayIconVisible(false);
+		mainWindow->openFromTray();
 	}
 	else if (mainWindow->isMinimised())
 	{
@@ -460,6 +457,7 @@ inline OrganicApplication::MainWindow::MainWindow(String name, OrganicMainConten
 
 void OrganicApplication::MainWindow::closeToTray()
 {
+	trayLayout = ShapeShifterManager::getInstance()->getCurrentLayout();
 	setTrayIconVisible(true);
 	removeFromDesktop();
 	mainComponent->clear();
@@ -470,6 +468,12 @@ void OrganicApplication::MainWindow::openFromTray()
 	addToDesktop();
 	setVisible(true);
 	mainComponent->setupOpenGL();
+
+	if (ShapeShifterManager::getInstance()->openedPanels.isEmpty() && trayLayout.isObject())
+	{
+		ShapeShifterManager::getInstance()->loadLayout(trayLayout);
+	}
+
 	setTrayIconVisible(false);
 }
 
