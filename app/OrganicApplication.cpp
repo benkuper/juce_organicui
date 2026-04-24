@@ -206,7 +206,7 @@ void OrganicApplication::anotherInstanceStarted(const String& commandLine)
 {
 	engine->parseCommandline(commandLine);
 
-	if (mainWindow->trayIcon != nullptr)
+	if (!mainWindow->isOnDesktop())
 	{
 		mainWindow->openFromTray();
 	}
@@ -457,7 +457,14 @@ inline OrganicApplication::MainWindow::MainWindow(String name, OrganicMainConten
 
 void OrganicApplication::MainWindow::closeToTray()
 {
+	if (!isOnDesktop())
+	{
+		setTrayIconVisible(true);
+		return;
+	}
+
 	trayLayout = ShapeShifterManager::getInstance()->getCurrentLayout();
+	setVisible(false);
 	setTrayIconVisible(true);
 	removeFromDesktop();
 	mainComponent->clear();
@@ -494,7 +501,11 @@ void OrganicApplication::MainWindow::trayIconMouseDown(const MouseEvent& e)
 	if (e.mods.isRightButtonDown()) showTrayMenu();
 	else
 	{
-		openFromTray();
+		Component::SafePointer<MainWindow> safeThis(this);
+		MessageManager::callAsync([safeThis]()
+		{
+			if (safeThis != nullptr) safeThis->openFromTray();
+		});
 	}
 }
 
@@ -503,12 +514,19 @@ void OrganicApplication::MainWindow::setTrayIconVisible(bool visible)
 {
 	if (visible)
 	{
-		trayIcon.reset(new TrayIcon(iconImage));
-		trayIcon->addTrayIconListener(this);
+		if (trayIcon == nullptr)
+		{
+			trayIcon.reset(new TrayIcon(iconImage));
+			trayIcon->addTrayIconListener(this);
+		}
 	}
 	else
 	{
-		if (trayIcon) trayIcon->removeFromDesktop();
+		if (trayIcon != nullptr)
+		{
+			trayIcon->removeTrayIconListener(this);
+			trayIcon.reset();
+		}
 	}
 }
 
