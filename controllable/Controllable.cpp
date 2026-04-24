@@ -81,6 +81,11 @@ Controllable::Controllable(const Type& type, const String& niceName, const Strin
 }
 
 Controllable::~Controllable() {
+	if (auto* dynamicObject = scriptObject.getDynamicObject())
+	{
+		dynamicObject->setProperty(scriptPtrIdentifier, 0);
+	}
+
 	controllableNotifier.cancelPendingUpdate();
 	controllableNotifier.clearQueue();
 	Controllable::masterReference.clear();

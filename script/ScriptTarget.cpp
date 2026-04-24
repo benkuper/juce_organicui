@@ -1,5 +1,11 @@
 #include "JuceHeader.h"
 
+namespace
+{
+	juce::SpinLock scriptTargetRegistryLock;
+	juce::HashMap<juce::int64, bool> liveScriptTargetPtrs;
+}
+
 ScriptTarget::ScriptTarget(const String& name, void* ptr, const String& targetType) :
 	thisPtr((int64)ptr),
 	scriptTargetName(name)
@@ -8,11 +14,16 @@ ScriptTarget::ScriptTarget(const String& name, void* ptr, const String& targetTy
 	scriptObject.getDynamicObject()->setProperty(scriptPtrIdentifier, thisPtr);
 	scriptObject.getDynamicObject()->setProperty(scriptTargetTypeIdentifier, targetType);
 	scriptObject.getDynamicObject()->setMethod(ptrCompareIdentifier, ScriptTarget::checkTargetsAreTheSameFromScript);
+
+	const juce::SpinLock::ScopedLockType lock(scriptTargetRegistryLock);
+	liveScriptTargetPtrs.set(thisPtr, true);
 	//scriptObjectIsDirty = true;
 }
 
 ScriptTarget::~ScriptTarget()
 {
+	const juce::SpinLock::ScopedLockType lock(scriptTargetRegistryLock);
+	liveScriptTargetPtrs.remove(thisPtr);
 }
 
 var ScriptTarget::getScriptObject()
@@ -31,6 +42,12 @@ var ScriptTarget::getScriptObject()
 	//scriptObjectIsDirty = false;
 	//scriptTargetListeners.call(&ScriptTargetListener::scriptObjectUpdated, this);
 //}
+
+bool ScriptTarget::isScriptPointerAlive(juce::int64 ptr)
+{
+	const juce::SpinLock::ScopedLockType lock(scriptTargetRegistryLock);
+	return ptr != 0 && liveScriptTargetPtrs.contains(ptr);
+}
 
 var ScriptTarget::checkTargetsAreTheSameFromScript(const var::NativeFunctionArgs& args)
 {

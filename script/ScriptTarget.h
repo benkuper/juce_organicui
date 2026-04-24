@@ -53,11 +53,17 @@ public:
 
 	template<class T>
 	static T* getObjectFromJS(const juce::var::NativeFunctionArgs & a);
+
+	static bool isScriptPointerAlive(juce::int64 ptr);
 };
 
 template<class T>
 T * ScriptTarget::getObjectFromJS(const juce::var::NativeFunctionArgs & a) {
 	juce::DynamicObject * d = a.thisObject.getDynamicObject();
 	if (d == nullptr) return nullptr;
-	return dynamic_cast<T*>((T*)(juce::int64)d->getProperty(scriptPtrIdentifier));
+
+	const juce::int64 ptr = (juce::int64)d->getProperty(scriptPtrIdentifier);
+	if (ptr == 0 || !isScriptPointerAlive(ptr)) return nullptr;
+
+	return dynamic_cast<T*>((T*)ptr);
 }
