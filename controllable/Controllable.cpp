@@ -126,7 +126,13 @@ void Controllable::setNiceName(const String& _niceName) {
 #if ORGANICUI_USE_WEBSERVER
 	if (!isFirstSetup)
 	{
-		if (OSCRemoteControl::getInstanceWithoutCreating() != nullptr && isAttachedToRoot()) OSCRemoteControl::getInstance()->sendPathNameChangedFeedback(oldControlAddress, getControlAddress());
+		if (OSCRemoteControl::getInstanceWithoutCreating() != nullptr && isAttachedToRoot())
+		{
+			// FULL_PATH *and* DESCRIPTION changed, so send both PATH_RENAMED then PATH_CHANGED feedback messages
+			const auto newControlAddress = getControlAddress();
+			OSCRemoteControl::getInstance()->sendPathNameChangedFeedback(oldControlAddress, newControlAddress);
+			OSCRemoteControl::getInstance()->sendPathChangedFeedback(newControlAddress); 
+		}
 	}
 #endif
 }
