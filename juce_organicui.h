@@ -66,6 +66,13 @@
 #define ORGANICUI_USE_WEBSERVER 0
 #endif
 
+/** Config: ORGANICUI_USE_WEBBROWSER
+	Mirroring the option from juce_gui_extra, to avoid problems with webkit2gtk
+*/
+#ifndef ORGANICUI_USE_WEBBROWSER
+#define ORGANICUI_USE_WEBBROWSER JUCE_WEB_BROWSER
+#endif
+
 /** Config: ORGANICUI_USE_DASHBOARDPANEL
 	Enables the use of the DashboardPanel
 */
