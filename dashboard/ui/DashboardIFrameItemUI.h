@@ -10,6 +10,7 @@
 
 #pragma once
 
+#if ORGANUI_USE_WEBBROWSER
 class DashboardIFrameItemUI :
     public DashboardItemUI
 {
@@ -33,3 +34,4 @@ public:
 
     void controllableFeedbackUpdateInternal(Controllable*) override;
 };
+#endif

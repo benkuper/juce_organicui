@@ -7,7 +7,7 @@
 
   ==============================================================================
 */
-
+#if ORGANICUI_USE_WEBBROWSER
 #include "JuceHeader.h"
 
 DashboardIFrameItemUI::DashboardIFrameItemUI(DashboardIFrameItem* item) :
@@ -72,3 +72,4 @@ void DashboardIFrameItemUI::controllableFeedbackUpdateInternal(Controllable* c)
 	DashboardItemUI::controllableFeedbackUpdateInternal(c);
 	if (c == iFrameItem->url) web.goToURL(iFrameItem->url->stringValue());
 }
+#endif
