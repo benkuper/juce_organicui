@@ -21,7 +21,11 @@ FloatSliderUI::FloatSliderUI(Array<Parameter*> parameters) :
 	assignOnMousePosDirect = false;
 	changeParamOnMouseUpOnly = false;
 	orientation = HORIZONTAL;
-
+	// set the slider to stringDecimals of the parameter if floatParameter
+	if (auto* floatParam = dynamic_cast<FloatParameter*>(parameter.get()))
+	{
+		fixedDecimals = floatParam->stringDecimals;
+	}
 	setWantsKeyboardFocus(true);
 	ParameterUI::setNextFocusOrder(this);
 
