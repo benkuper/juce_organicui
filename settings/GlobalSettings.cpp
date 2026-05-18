@@ -39,6 +39,12 @@ GlobalSettings::GlobalSettings() :
 	checkUpdatesOnStartup = startupCC.addBoolParameter("Check updates on startup", "If enabled, app will check if any updates are available", true);
 	updateChannel = startupCC.addEnumParameter("Update Channel", "Channel to pull software updates from");
 	updateChannel->addOption("Stable", "stableversion")->addOption("Beta", "betaversion");
+	const String& currentUpdateChannel = Engine::mainEngine->updateChannel;
+	if (currentUpdateChannel != "stableversion" && currentUpdateChannel != "betaversion")
+	{
+		updateChannel->addOption(currentUpdateChannel, currentUpdateChannel);
+	}
+	updateChannel->setValueWithData(currentUpdateChannel);
 
 	updateHelpOnStartup = startupCC.addBoolParameter("Update help on startup", "If enabled, app will try and download the last help file locally", true);
 
