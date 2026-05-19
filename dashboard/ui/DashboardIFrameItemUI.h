@@ -10,7 +10,7 @@
 
 #pragma once
 
-#if ORGANUI_USE_WEBBROWSER
+#if ORGANICUI_USE_WEBBROWSER
 class DashboardIFrameItemUI :
     public DashboardItemUI
 {
