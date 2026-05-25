@@ -21,8 +21,12 @@ public:
 	int stringDecimals;
 
 
-	void setVector(juce::Vector3D<float> value);
-	void setVector(float x, float y, float z);
+	void setVector(juce::Vector3D<float> value, bool silentSet = false, bool force = false, bool forceOverride = true);
+	void setVector(float x, float y, float z, bool silentSet = false, bool force = false, bool forceOverride = true);
+	void setX(float x, bool silentSet = false, bool force = false, bool forceOverride = true);
+	void setY(float y, bool silentSet = false, bool force = false, bool forceOverride = true);
+	void setZ(float x, bool silentSet = false, bool force = false, bool forceOverride = true);
+
 	juce::UndoableAction* setUndoableVector(juce::Vector3D<float> oldVector, juce::Vector3D<float> newVector, bool onlyReturnAction = false);
 	juce::UndoableAction* setUndoableVector(float oldX, float oldY, float oldZ, float newX, float newY, float newZ, bool onlyReturnAction = false);
 	

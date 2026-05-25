@@ -172,14 +172,14 @@ StringArray EnumParameter::getAllKeys()
 	return result;
 }
 
-bool EnumParameter::setValueWithData(var data, bool silentSet)
+bool EnumParameter::setValueWithData(var data, bool silentSet, bool force, bool forceOverride)
 {
 	GenericScopedLock lock(enumValues.getLock());
 	for (auto& ev : enumValues)
 	{
 		if (ev->value == data)
 		{
-			setValueWithKey(ev->key, silentSet);
+			setValueWithKey(ev->key, silentSet, force, forceOverride);
 			return true;
 		}
 	}
@@ -187,17 +187,17 @@ bool EnumParameter::setValueWithData(var data, bool silentSet)
 	return false;
 }
 
-bool EnumParameter::setValueWithKey(String key, bool silentSet)
+bool EnumParameter::setValueWithKey(String key, bool silentSet, bool force, bool forceOverride)
 {
 	if (getEntryForKey(key) == nullptr) return false;
-	setValue(key, silentSet);
+	setValue(key, silentSet, force, forceOverride);
 	return true;
 }
 
-bool EnumParameter::setValueAtIndex(int index, bool silentSet)
+bool EnumParameter::setValueAtIndex(int index, bool silentSet, bool force, bool forceOverride)
 {
 	if (index >= enumValues.size()) return false;
-	setValueWithKey(enumValues[index]->key, silentSet);
+	setValueWithKey(enumValues[index]->key, silentSet, force, forceOverride);
 	return true;
 }
 
