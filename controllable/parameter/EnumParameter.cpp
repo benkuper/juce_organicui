@@ -478,3 +478,15 @@ DashboardItem* EnumParameter::createDashboardItem()
 {
 	return new DashboardEnumParameterItem(this);
 }
+
+void EnumParameter::setValueInternal(juce::var& key) 
+{
+	// If the set value does not exist as an option, reset to default
+	if (getIndexForKey(key.toString()) == -1)
+	{
+		Parameter::setValueInternal(defaultValue);
+		return;
+	}
+
+	Parameter::setValueInternal(key);
+}
