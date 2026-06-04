@@ -96,7 +96,7 @@ public:
 	void messageReceived(const juce::String& id, const juce::String& message) override;
 	void dataReceived(const juce::String& id, const juce::MemoryBlock& data) override;
 	void connectionClosed(const juce::String& id, int status, const juce::String& reason) override;
-	void connectionError(const juce::String& id, const juce::String& message) override;
+	void connectionError(const juce::String& id, int status, const juce::String& message) override;
 
 
 	void sendOSCQueryFeedback(Controllable* c, const juce::String& excludeId = "");

@@ -916,7 +916,7 @@ void OSCRemoteControl::connectionClosed(const String& id, int status, const Stri
 	feedbackMap.remove(id);
 }
 
-void OSCRemoteControl::connectionError(const String& id, const String& message)
+void OSCRemoteControl::connectionError(const String& id, int status, const String& message)
 {
 	remoteControlListeners.call(&RemoteControlListener::clientDisconnected, id, message);
 	NLOGERROR(niceName, "Connection error from " << id << " : " << message);
