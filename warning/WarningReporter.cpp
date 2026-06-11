@@ -27,7 +27,7 @@ void WarningReporter::clear()
 	targets.clear();
 }
 
-void WarningReporter::registerWarning(WeakReference<WarningTarget> target)
+void WarningReporter::registerWarning(WeakReference<WarningTarget> target, const String& warningID, const String& warningMessage)
 {
 	if (Engine::mainEngine->isClearing) return;
 	GenericScopedLock lock(targets.getLock());
@@ -39,10 +39,10 @@ void WarningReporter::registerWarning(WeakReference<WarningTarget> target)
 	else if (ControllableContainer* cc = dynamic_cast<ControllableContainer*>(target.get())) targetAddressMap.set(target, cc->getControlAddress());
 
 	if (Inspectable* i = dynamic_cast<Inspectable*>(target.get())) i->addInspectableListener(this);
-	warningReporterNotifier.addMessage(new WarningReporterEvent(WarningReporterEvent::WARNING_REGISTERED, target, targetAddressMap[target]));
+	warningReporterNotifier.addMessage(new WarningReporterEvent(WarningReporterEvent::WARNING_REGISTERED, target, targetAddressMap[target], warningID, warningMessage));
 }
 
-void WarningReporter::unregisterWarning(WeakReference<WarningTarget> target)
+void WarningReporter::unregisterWarning(WeakReference<WarningTarget> target, const String& warningID)
 {
 	if (Engine::mainEngine->isClearing && target != Engine::mainEngine) return;
 	GenericScopedLock lock(targets.getLock());
@@ -50,10 +50,9 @@ void WarningReporter::unregisterWarning(WeakReference<WarningTarget> target)
 	if (target == nullptr || target.wasObjectDeleted()) return;
 	targets.removeAllInstancesOf(target);
 	String address = targetAddressMap.contains(target) ? targetAddressMap[target] : String();
-	warningReporterNotifier.addMessage(new WarningReporterEvent(WarningReporterEvent::WARNING_UNREGISTERED, target, targetAddressMap[target]));
+	warningReporterNotifier.addMessage(new WarningReporterEvent(WarningReporterEvent::WARNING_UNREGISTERED, target, targetAddressMap[target], warningID, ""));
 
 	targetAddressMap.remove(target);
-
 }
 
 void WarningReporter::fileLoaded()
@@ -66,5 +65,5 @@ void WarningReporter::fileLoaded()
 
 void WarningReporter::inspectableDestroyed(Inspectable* i)
 {
-	unregisterWarning(i);
+	unregisterWarning(i, WarningTarget::warningAllId);
 }
