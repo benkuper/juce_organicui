@@ -671,17 +671,13 @@ void OSCRemoteControl::connectionOpened(const String& id)
 			continue;
 		}
 
-		String message = wt->getWarningMessage();
 		String address = "";
-		String name = "";
 		if (Controllable* c = dynamic_cast<Controllable*>(wt.get()))
 		{
-			name = c->niceName;
 			address = c->getControlAddress();
 		}
 		else if (ControllableContainer* cc = dynamic_cast<ControllableContainer*>(wt.get()))
 		{
-			name = cc->niceName;
 			address = cc->getControlAddress();
 		}
 		else
@@ -689,8 +685,11 @@ void OSCRemoteControl::connectionOpened(const String& id)
 			continue;
 		}
 
-		// TODO: Send each warning (by ID) individually
-		sendPersistentWarningFeedback(address, name, message);
+		HashMap<String, String>::Iterator it(wt->warningMessage);
+		while (it.next())
+		{
+			sendPersistentWarningFeedback(address, it.getKey(), it.getValue());
+		}
 	}
 }
 
