@@ -999,7 +999,7 @@ var ControllableContainer::getJSONData(bool includeNonOverriden)
 		//ownedContainers.getLock().enter();
 		for (auto& cc : controllableContainers)
 		{
-			if (!cc->includeInRecursiveSave) continue;
+			if (cc == nullptr || cc.wasObjectDeleted() || !cc->includeInRecursiveSave) continue;
 
 			var ccData = cc->getJSONData();
 			if (ownedContainers.contains(cc))
