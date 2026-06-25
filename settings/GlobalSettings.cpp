@@ -170,7 +170,7 @@ void GlobalSettings::onControllableFeedbackUpdate(ControllableContainer* cc, Con
 	{
 		getApp().mainWindow->setAlwaysOnTop(alwaysOnTop->boolValue());
 	}
-	else if (c == updateChannel)
+	else if (c == updateChannel && !cc->isCurrentlyLoadingData)
 	{
 		AppUpdater::getInstance()->run();
 	}
