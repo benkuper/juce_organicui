@@ -24,19 +24,22 @@ juce_ImplementSingleton(OSCRemoteControl)
 
 ApplicationProperties& getAppProperties();
 
-OSCRemoteControl::OSCRemoteControl()
-	: EnablingControllableContainer("OSC Remote Control")
+OSCRemoteControl::OSCRemoteControl() :
+	EnablingControllableContainer("OSC Remote Control")
 #if ORGANICUI_USE_SERVUS
-	, Thread("Global Zeroconf")
-	, servus("_osc._udp")
+	,
+	Thread("Global Zeroconf"),
+	servus("_osc._udp")
 
 #if ORGANICUI_USE_WEBSERVER
-	, oscQueryServus("_oscjson._tcp")
+	,
+	oscQueryServus("_oscjson._tcp")
 #endif
 
 #endif
-	, manualSendCC("Manual OSC Send")
-	, localPort(nullptr)
+	,
+	manualSendCC("Manual OSC Send"),
+	localPort(nullptr)
 {
 	saveAndLoadRecursiveData = true; // can be useful when app include other settings there
 
@@ -700,165 +703,173 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 	{
 		if (o.hasProperty("COMMAND"))
 		{
-			String command = o["COMMAND"];
-			var data = o["DATA"];
+			MessageManager::callAsync(
+				[this, id, message, o]()
+				{
+					String command = o["COMMAND"];
+					var data = o["DATA"];
 
-			if (command == "ADD")
-			{
-				if (ControllableContainer* cc = Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true))
-				{
-					cc->handleAddFromRemoteControl(data);
-				}
-			}
-			else if (command == "REMOVE")
-			{
-				if (ControllableContainer* cc = Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true))
-				{
-					cc->handleRemoveFromRemoteControl();
-				}
-			}
-			else if (command == "RENAME")
-			{
-				if (ControllableContainer* cc = Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true))
-				{
-					cc->setUndoableNiceName(data["name"]);
-				}
-			}
-			else if (command == "LOAD")
-			{
-				var fileData = JSON::parse(data["data"]);
+					if (command == "ADD")
+					{
+						if (ControllableContainer* cc = Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true))
+						{
+							cc->handleAddFromRemoteControl(data);
+						}
+					}
+					else if (command == "REMOVE")
+					{
+						if (ControllableContainer* cc = Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true))
+						{
+							cc->handleRemoveFromRemoteControl();
+						}
+					}
+					else if (command == "RENAME")
+					{
+						if (ControllableContainer* cc = Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true))
+						{
+							cc->setUndoableNiceName(data["name"]);
+						}
+					}
+					else if (command == "LOAD")
+					{
+						var fileData = JSON::parse(data["data"]);
 
-				if (fileData.isObject())
-				{
-					String addr = data.getProperty("address", "/");
-					ControllableContainer* cc = addr == "/" ? Engine::mainEngine : Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true);
-					if (cc != nullptr)
-					{
-						MessageManager::callAsync([cc, fileData]() { cc->handleLoadFromRemoteControl(fileData); });
+						if (fileData.isObject())
+						{
+							String addr = data.getProperty("address", "/");
+							ControllableContainer* cc = addr == "/" ? Engine::mainEngine : Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true);
+							if (cc != nullptr)
+							{
+								MessageManager::callAsync([cc, fileData]() { cc->handleLoadFromRemoteControl(fileData); });
+							}
+						}
 					}
-				}
-			}
-			else if (command == "RESTORE")
-			{
-				const bool declined = data.getProperty("declined", false);
-				if (!declined)
-				{
-					File f = File(data.getProperty("file", ""));
-					if (f.existsAsFile())
+					else if (command == "RESTORE")
 					{
-						MessageManager::callAsync([f]() { 
-							Engine::mainEngine->dismissRestoreAutosaveAlertWindow();
-							Engine::mainEngine->restoreAutosave(Engine::mainEngine->getFile(), f); 
-							});
+						const bool declined = data.getProperty("declined", false);
+						if (!declined)
+						{
+							File f = File(data.getProperty("file", ""));
+							if (f.existsAsFile())
+							{
+								MessageManager::callAsync(
+									[f]()
+									{
+										Engine::mainEngine->dismissRestoreAutosaveAlertWindow();
+										Engine::mainEngine->restoreAutosave(Engine::mainEngine->getFile(), f);
+									});
+							}
+						}
+						else
+						{
+							MessageManager::callAsync(
+								[]()
+								{
+									Engine::mainEngine->dismissRestoreAutosaveAlertWindow();
+									Engine::mainEngine->removeNewerAutosaves();
+									Engine::mainEngine->loadDocumentNoCheck(Engine::mainEngine->getFile());
+								});
+						}
 					}
-				}
-				else
-				{
-					MessageManager::callAsync([]() { 
-						Engine::mainEngine->dismissRestoreAutosaveAlertWindow();
-						Engine::mainEngine->removeNewerAutosaves(); 
-						Engine::mainEngine->loadDocumentNoCheck(Engine::mainEngine->getFile());
-						});
-				}
-			}
-			else if (command == "SAVE")
-			{
-				String addr = data.getProperty("address", "/");
-				ControllableContainer* cc = addr == "/" ? Engine::mainEngine : Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true);
-				if (cc != nullptr)
-				{
-					var saveData = cc->handleSaveFromRemoteControl();
-					if (saveData.isObject())
+					else if (command == "SAVE")
 					{
-						var msg(new DynamicObject());
-						msg.getDynamicObject()->setProperty("COMMAND", "SAVE");
-						var datamsg(new DynamicObject());
-						datamsg.getDynamicObject()->setProperty("address", data["address"]);
-						datamsg.getDynamicObject()->setProperty("data", saveData);
-						msg.getDynamicObject()->setProperty("DATA", datamsg);
-						server->sendTo(JSON::toString(msg), id);
+						String addr = data.getProperty("address", "/");
+						ControllableContainer* cc = addr == "/" ? Engine::mainEngine : Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true);
+						if (cc != nullptr)
+						{
+							var saveData = cc->handleSaveFromRemoteControl();
+							if (saveData.isObject())
+							{
+								var msg(new DynamicObject());
+								msg.getDynamicObject()->setProperty("COMMAND", "SAVE");
+								var datamsg(new DynamicObject());
+								datamsg.getDynamicObject()->setProperty("address", data["address"]);
+								datamsg.getDynamicObject()->setProperty("data", saveData);
+								msg.getDynamicObject()->setProperty("DATA", datamsg);
+								server->sendTo(JSON::toString(msg), id);
+							}
+						}
 					}
-				}
-			}
-			else if (command == "UNDO")
-			{
-				UndoMaster::getInstance()->undo();
-			}
-			else if (command == "REDO")
-			{
-				UndoMaster::getInstance()->redo();
-			}
-			else if (command == "LOG")
-			{
-				if (data.hasProperty("type"))
-				{
-					if (data["type"] == "info")
+					else if (command == "UNDO")
 					{
-						NLOG(niceName, data["message"].toString());
+						UndoMaster::getInstance()->undo();
 					}
-					else if (data["type"] == "warning")
+					else if (command == "REDO")
 					{
-						NLOGWARNING(niceName, data["message"].toString());
+						UndoMaster::getInstance()->redo();
 					}
-					else if (data["type"] == "error")
+					else if (command == "LOG")
 					{
-						NLOGERROR(niceName, data["message"].toString());
+						if (data.hasProperty("type"))
+						{
+							if (data["type"] == "info")
+							{
+								NLOG(niceName, data["message"].toString());
+							}
+							else if (data["type"] == "warning")
+							{
+								NLOGWARNING(niceName, data["message"].toString());
+							}
+							else if (data["type"] == "error")
+							{
+								NLOGERROR(niceName, data["message"].toString());
+							}
+							else
+							{
+								NLOG(niceName, data["message"].toString());
+							}
+						}
+						else
+						{
+							NLOG(niceName, data.toString());
+						}
 					}
-					else
+					String cAddress = "";
+					if (data.isString())
 					{
-						NLOG(niceName, data["message"].toString());
+						cAddress = data.toString();
 					}
-				}
-				else
-				{
-					NLOG(niceName, data.toString());
-				}
-			}
-			String cAddress = "";
-			if (data.isString())
-			{
-				cAddress = data.toString();
-			}
-			else if (data.isArray() && data.size() > 0)
-			{
-				cAddress = data[0].toString();
-			}
-			else if (data.isObject() && data.hasProperty("address"))
-			{
-				cAddress = data["address"].toString();
-			}
+					else if (data.isArray() && data.size() > 0)
+					{
+						cAddress = data[0].toString();
+					}
+					else if (data.isObject() && data.hasProperty("address"))
+					{
+						cAddress = data["address"].toString();
+					}
 
-			if (Controllable* c = Engine::mainEngine->getControllableForAddress(cAddress))
-			{
-				if (command == "LISTEN")
-				{
-					if (!feedbackMap.contains(id))
+					if (Controllable* c = Engine::mainEngine->getControllableForAddress(cAddress))
 					{
-						feedbackMap.set(id, Array<Controllable*>());
+						if (command == "LISTEN")
+						{
+							if (!feedbackMap.contains(id))
+							{
+								feedbackMap.set(id, Array<Controllable*>());
+							}
+							(&(feedbackMap.getReference(id)))->addIfNotAlreadyThere(c);
+							bool sendFeedback = sendFeedbackOnListen->boolValue();
+							if (data.isArray() && data.size() > 1)
+							{
+								sendFeedback = data[1];
+							}
+							else if (data.isObject() && data.hasProperty("sendFeedback"))
+							{
+								sendFeedback = data["sendFeedback"];
+							}
+							if (sendFeedback)
+							{
+								sendOSCQueryFeedback(c);
+							}
+						}
+						else if (command == "IGNORE")
+						{
+							if (feedbackMap.contains(id))
+							{
+								(&(feedbackMap.getReference(id)))->removeAllInstancesOf(c);
+							}
+						}
 					}
-					(&(feedbackMap.getReference(id)))->addIfNotAlreadyThere(c);
-					bool sendFeedback = sendFeedbackOnListen->boolValue();
-					if (data.isArray() && data.size() > 1)
-					{
-						sendFeedback = data[1];
-					}
-					else if (data.isObject() && data.hasProperty("sendFeedback"))
-					{
-						sendFeedback = data["sendFeedback"];
-					}
-					if (sendFeedback)
-					{
-						sendOSCQueryFeedback(c);
-					}
-				}
-				else if (command == "IGNORE")
-				{
-					if (feedbackMap.contains(id))
-					{
-						(&(feedbackMap.getReference(id)))->removeAllInstancesOf(c);
-					}
-				}
-			}
+				});
 		}
 		else
 		{
@@ -1081,11 +1092,11 @@ void OSCRemoteControl::sendPersistentWarningFeedback(const String& emitterAddres
 	data.getDynamicObject()->setProperty("id", warningID);
 	data.getDynamicObject()->setProperty("message", warningMessage);
 	// TODO: Send the event type as well so clients can decide how to handle them
-	
+
 	var msg(new DynamicObject());
 	msg.getDynamicObject()->setProperty("COMMAND", "WARNING");
 	msg.getDynamicObject()->setProperty("DATA", data);
-	
+
 	server->send(JSON::toString(msg));
 }
 
