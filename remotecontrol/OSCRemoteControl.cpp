@@ -24,19 +24,22 @@ using namespace juce;
 
 ApplicationProperties& getAppProperties();
 
-OSCRemoteControl::OSCRemoteControl()
-	: EnablingControllableContainer("OSC Remote Control")
+OSCRemoteControl::OSCRemoteControl() :
+	EnablingControllableContainer("OSC Remote Control")
 #if ORGANICUI_USE_SERVUS
-	, Thread("Global Zeroconf")
-	, servus("_osc._udp")
+	,
+	Thread("Global Zeroconf"),
+	servus("_osc._udp")
 
 #if ORGANICUI_USE_WEBSERVER
-	, oscQueryServus("_oscjson._tcp")
+	,
+	oscQueryServus("_oscjson._tcp")
 #endif
 
 #endif
-	, manualSendCC("Manual OSC Send")
-	, localPort(nullptr)
+	,
+	manualSendCC("Manual OSC Send"),
+	localPort(nullptr)
 {
 	saveAndLoadRecursiveData = true; // can be useful when app include other settings there
 
@@ -698,6 +701,9 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 	{
 		if (o.hasProperty("COMMAND"))
 		{
+			MessageManager::callAsync(
+				[this, id, message, o]()
+				{
 			String command = o["COMMAND"];
 			var data = o["DATA"];
 
@@ -751,7 +757,9 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 				File f = File(data.getProperty("file", ""));
 				if (f.existsAsFile())
 				{
-						MessageManager::callAsync([f]() { 
+								MessageManager::callAsync(
+									[f]()
+									{
 							Engine::mainEngine->dismissRestoreAutosaveAlertWindow();
 							Engine::mainEngine->restoreAutosave(Engine::mainEngine->getFile(), f); 
 							});
@@ -759,7 +767,9 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 			}
 				else
 				{
-					MessageManager::callAsync([]() { 
+							MessageManager::callAsync(
+								[]()
+								{
 						Engine::mainEngine->dismissRestoreAutosaveAlertWindow();
 						Engine::mainEngine->removeNewerAutosaves(); 
 						Engine::mainEngine->loadDocumentNoCheck(Engine::mainEngine->getFile());
@@ -864,6 +874,7 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 					}
 				}
 			}
+				});
 		}
 		else
 		{
