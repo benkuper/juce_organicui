@@ -183,9 +183,14 @@ bool AppUpdater::updateTargetChannelLatestVersionAndUpdateAvailable()
 
 	targetChannel = GlobalSettings::getInstance()->updateChannel->getValueData();
 	String currentChannel = Engine::mainEngine->updateChannel;
-	var data = updateData.getProperty(targetChannel, var());
-	latestVersion = data.getProperty("version", "");
-	updateAvailable = currentChannel != targetChannel || Engine::mainEngine->checkFileVersion(data.getDynamicObject(), true);
+
+	// Extract the desired channel's info from the update json file 
+	const var updateDataForTargetChannel = updateData.getProperty(targetChannel, var());
+
+	const AppVersion targetVersion = AppVersion(updateDataForTargetChannel.getProperty("version", ""));
+	const AppVersion currentVersion(getAppVersion());
+	const bool isChangingChannel = currentChannel != targetChannel;
+	updateAvailable = currentVersion < targetVersion || (isChangingChannel && currentVersion <= targetVersion);
 
 	return true;
 }
