@@ -198,34 +198,8 @@ void Engine::handleAsyncUpdate()
 
 Result Engine::saveDocument(const File& file) {
 
-	bool sameFile = lastFileAbsolutePath == file.getFullPathName();
 	var data = getJSONData();
-
-	if (file.exists()) file.deleteFile();
-	file.create();	// recursively create parents create + empty file, beacause next line will not create parent dirs
-	std::unique_ptr<OutputStream> os(file.createOutputStream());
-	if (os == nullptr)
-	{
-		LOGERROR("Error saving document, please try again");
-		AlertWindow::showMessageBoxAsync(AlertWindow::AlertIconType::WarningIcon, "Session save error", "Damned ! Something went wrong when saving the file, you should definitely try to save it again.", "Gotcha");
-		return Result::fail("Could not save the file : output stream is null");
-	}
-
-	JSON::writeToStream(*os, data, GlobalSettings::getInstance()->compressOnSave->boolValue());
-	os->flush();
-
-	setLastDocumentOpened(file);
-	setChangedFlag(false);
-	file.setAsCurrentWorkingDirectory();
-
-	lastChangeTime = Time::getCurrentTime();
-
-	engineListeners.call(&EngineListener::fileSaved, !sameFile);
-	engineNotifier.addMessage(new EngineEvent(EngineEvent::FILE_SAVED, this));
-
-	lastFileAbsolutePath = getFile().getFullPathName();
-
-	return Result::ok();
+	return saveDocumentFromJSON(file, data);
 }
 
 juce::Result Engine::saveCopy()
@@ -321,6 +295,40 @@ void Engine::loadDocumentFromJSON(var data)
 	setChangedFlag(false);
 }
 
+Result Engine::saveDocumentFromJSON(const juce::File& file, const juce::var& data)
+{
+	bool sameFile = lastFileAbsolutePath == file.getFullPathName();
+
+	if (file.exists())
+	{
+		file.deleteFile();
+	}
+	file.create(); // recursively create parents create + empty file, beacause next line will not create parent dirs
+
+	std::unique_ptr<OutputStream> os(file.createOutputStream());
+	if (os == nullptr)
+	{
+		LOGERROR("Error saving document, please try again");
+		AlertWindow::showMessageBoxAsync(AlertWindow::AlertIconType::WarningIcon, "Session save error", "Damned ! Something went wrong when saving the file, you should definitely try to save it again.", "Gotcha");
+		return Result::fail("Could not save the file : output stream is null");
+	}
+
+	JSON::writeToStream(*os, data, GlobalSettings::getInstance()->compressOnSave->boolValue());
+	os->flush();
+
+	setLastDocumentOpened(file);
+	setChangedFlag(false);
+	file.setAsCurrentWorkingDirectory();
+
+	lastChangeTime = Time::getCurrentTime();
+
+	engineListeners.call(&EngineListener::fileSaved, !sameFile);
+	engineNotifier.addMessage(new EngineEvent(EngineEvent::FILE_SAVED, this));
+
+	lastFileAbsolutePath = getFile().getFullPathName();
+
+	return Result::ok();
+}
 
 File Engine::getLastDocumentOpened() {
 

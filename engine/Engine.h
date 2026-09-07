@@ -63,7 +63,7 @@ public:
 	// see EngineFileDocument.cpp
 
 	//  inherited from FileBasedDocument
-	juce::String getDocumentTitle()override;
+	juce::String getDocumentTitle() override;
 	juce::Result loadDocument(const juce::File& file) override;
 	juce::Result loadDocumentNoCheck(const juce::File& file);
 	juce::Result saveDocument(const juce::File& file) override;
@@ -71,6 +71,7 @@ public:
 	juce::Result saveBackupDocument(int index);
 
 	void loadDocumentFromJSON(juce::var data);
+	juce::Result saveDocumentFromJSON(const juce::File& file, const juce::var& data);
 
 	juce::File getLastDocumentOpened() override;
 	void setLastDocumentOpened(const juce::File& file) override;
