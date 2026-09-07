@@ -561,6 +561,7 @@ void Engine::loadJSONData(var data, ProgressTask* loadingTask)
 						{
 							// continue loading with new data
 							loadJSONDataEngine(migratedFileData, loadingTask);
+							saveDocumentFromJSON(f, migratedFileData);
 						}
 						else 
 						{
