@@ -112,6 +112,8 @@ public:
 	/// @return Whether the migration was completed successfuly
 	virtual bool migrateFileToCurrentVersion(const AppVersion& inVersion, const juce::var& inFileData, juce::var* outFileData) const;
 
+	virtual void migrateThenLoadFileIfUserAgrees(const AppVersion& fileVersion, const juce::var& fileData, ProgressTask* loadingTask);
+
 	juce::int64 loadingStartTime;
 
 	void fileLoaderEnded();
