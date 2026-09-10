@@ -21,7 +21,6 @@ TargetParameter::TargetParameter(const String& niceName, const String& descripti
 	showParentNameInEditor(true),
 	maxDefaultSearchLevel(-1),
 	defaultParentLabelLevel(3),
-	isTryingFixingLink(false),
 	manuallySettingNull(false),
 	rootContainer(nullptr),
 	target(nullptr),
@@ -185,7 +184,7 @@ void TargetParameter::setValueInternal(var& newVal)
 	else
 	{
 		if (targetType == CONTAINER) setTarget((ControllableContainer*)nullptr);
-		else setTarget((ControllableContainer*)nullptr);
+		else setTarget((Controllable*)nullptr);
 
 		//setGhostValue("");
 	}
@@ -240,7 +239,7 @@ void TargetParameter::setTarget(WeakReference<Controllable> c)
 		if (value.toString().isNotEmpty()) setGhostValue(value.toString());
 		if (ghostValue.isNotEmpty() && !isBeingDestroyed)
 		{
-			if (Engine::mainEngine->isLoadingFile && !isTryingFixingLink)
+			if (Engine::mainEngine->isLoadingFile)
 			{
 				Engine::mainEngine->addEngineListener(this);
 			}
@@ -290,7 +289,7 @@ void TargetParameter::setTarget(WeakReference<ControllableContainer> cc)
 		if (value.toString().isNotEmpty()) setGhostValue(value.toString());
 		if (ghostValue.isNotEmpty() && !isBeingDestroyed)
 		{
-			if (Engine::mainEngine->isLoadingFile && !isTryingFixingLink)
+			if (Engine::mainEngine->isLoadingFile)
 			{
 				Engine::mainEngine->addEngineListener(this);
 			}
@@ -311,13 +310,11 @@ void TargetParameter::tryFixBrokenLink()
 {
 	if (Engine::mainEngine != nullptr && Engine::mainEngine->isClearing) return;
 
-	isTryingFixingLink = true;
-
 	if (targetType == CONTROLLABLE)
 	{
 		if (target == nullptr)
 		{
-			if (ghostValue.isNotEmpty())
+			if (ghostValue.isNotEmpty() && rootContainer != nullptr && !rootContainer.wasObjectDeleted())
 			{
 				WeakReference<Controllable> c = rootContainer->getControllableForAddress(ghostValue);
 				if (c != nullptr) setValueFromTarget(c);
@@ -341,6 +338,7 @@ void TargetParameter::tryFixBrokenLink()
 			{
 				WeakReference<ControllableContainer> tcc = rootContainer->getControllableContainerForAddress(ghostValue);
 				if (tcc != nullptr) setValueFromTarget(tcc);
+				else setTarget((ControllableContainer*)nullptr);
 			}
 		}
 		else
@@ -348,8 +346,6 @@ void TargetParameter::tryFixBrokenLink()
 			setValueFromTarget(targetContainer);
 		}
 	}
-
-	isTryingFixingLink = false;
 }
 
 void TargetParameter::setRootContainer(WeakReference<ControllableContainer> newRootContainer, bool engineIfNull, bool forceSetValue)
@@ -482,9 +478,18 @@ void TargetParameter::loadJSONDataInternal(var data)
 {
 	ghostValue = data.getProperty("ghostValue", data.getProperty("value", ""));
 	StringParameter::loadJSONDataInternal(data);
+
+	// A broken target is saved only as a ghost value. Parameter's loader assigns
+	// the default value directly when there is no "value" property, so make sure
+	// the broken-link lifecycle is initialized in that case as well.
+	if (stringValue().isEmpty() && ghostValue.isNotEmpty())
+	{
+		if (targetType == CONTAINER) setTarget((ControllableContainer*)nullptr);
+		else setTarget((Controllable*)nullptr);
+	}
 }
 
-void TargetParameter::endLoadFile()
+void TargetParameter::fileLoaded()
 {
 	Engine::mainEngine->removeEngineListener(this);
 	if (target == nullptr && targetContainer == nullptr) tryFixBrokenLink();

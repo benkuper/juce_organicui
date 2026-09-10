@@ -37,7 +37,6 @@ public:
 	bool showParentNameInEditor;
 	int maxDefaultSearchLevel;
 	int defaultParentLabelLevel;
-	bool isTryingFixingLink;
 	bool manuallySettingNull;
 
 	juce::StringArray typesFilter; //leave empty to allow all when not using custom functions
@@ -101,7 +100,7 @@ public:
 	juce::var getJSONDataInternal() override;
 	void loadJSONDataInternal(juce::var data) override;
 
-	void endLoadFile() override;
+	void fileLoaded() override;
 
 	TargetParameterUI* createTargetUI(juce::Array<TargetParameter*> parameters = {});
 	ControllableUI* createDefaultUI(juce::Array<Controllable*> controllables = {}) override;
