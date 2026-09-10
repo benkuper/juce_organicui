@@ -534,52 +534,7 @@ void Engine::loadJSONData(var data, ProgressTask* loadingTask)
 	const bool migrationIsPossible = isFileFormatMigrationSupported(fileVersion);
 	if (appVersionIsNewerThanFileVersion && fileVersionRequiresMigration && migrationIsPossible)
 	{
-		AlertWindow::showAsync(
-			MessageBoxOptions()
-				.withIconType(AlertWindow::QuestionIcon)
-				.withTitle("File compatibility check")
-				.withMessage("Your file has been saved with an older version of " + OrganicApplication::getInstance()->getApplicationName() + " (" + versionString + "), some data may be lost if you load it directly. You can choose to update the file online, load it directly or cancel the operation.\nIn any case, your current file will be backed up with \"_backup\" appended to its name.")
-				.withButton("Update")
-				.withButton("Load directly")
-				.withButton("Cancel"),
-				[this, versionString, data, loadingTask](int result)
-				{
-					File f = getFile();
-					if (f.exists())
-					{
-						File backupF = f.getParentDirectory().getNonexistentChildFile(f.getFileNameWithoutExtension() + "_backup", f.getFileExtension(), true);
-						f.copyFileTo(backupF);
-						LOG("Your original file has been copied to " << backupF.getFullPathName());
-					}
-
-					switch (result)
-					{
-					case 1: // update
-					{
-						var migratedFileData;
-						if (migrateFileToCurrentVersion(versionString, data, &migratedFileData))
-						{
-							// continue loading with new data
-							loadJSONDataEngine(migratedFileData, loadingTask);
-							saveDocumentFromJSON(f, migratedFileData);
-						}
-						else 
-						{
-							setFile(File());
-						}
-
-						break;
-					}
-					case 2: // load directly
-					{
-						// do nothing
-						loadJSONDataEngine(data, loadingTask);
-						break;
-					}
-					}
-				}
-		);
-
+		migrateThenLoadFileIfUserAgrees(fileVersion, data, loadingTask);
 		return;
 	}
 
@@ -616,6 +571,54 @@ bool Engine::migrateFileToCurrentVersion(const AppVersion& inFileVersion, const 
 	}
 
 	return true;
+}
+
+void Engine::migrateThenLoadFileIfUserAgrees(const AppVersion& fileVersion, const var& fileData, ProgressTask* loadingTask)
+{
+	AlertWindow::showAsync(MessageBoxOptions()
+		.withIconType(AlertWindow::QuestionIcon)
+		.withTitle("File compatibility check")
+		.withMessage("Your file has been saved with an older version of " + OrganicApplication::getInstance()->getApplicationName() + " (" + fileVersion.toString() + "), some data may be lost if you load it directly. You can choose to update the file online, load it directly or cancel the operation.\nIn any case, your current file will be backed up with \"_backup\" appended to its name.")
+		.withButton("Update")
+		.withButton("Load directly")
+		.withButton("Cancel"),
+		[this, fileVersion, fileData, loadingTask](int result)
+		{
+			File f = getFile();
+			if (f.exists())
+			{
+				File backupF = f.getParentDirectory().getNonexistentChildFile(f.getFileNameWithoutExtension() + "_backup", f.getFileExtension(), true);
+				f.copyFileTo(backupF);
+				LOG("Your original file has been copied to " << backupF.getFullPathName());
+			}
+
+			switch (result)
+			{
+			case 1: // update
+			{
+				var migratedFileData;
+				if (migrateFileToCurrentVersion(fileVersion, fileData, &migratedFileData))
+				{
+					// continue loading with new data
+					loadJSONDataEngine(migratedFileData, loadingTask);
+					saveDocumentFromJSON(f, migratedFileData);
+				}
+				else 
+				{
+					setFile(File());
+				}
+
+				break;
+			}
+			case 2: // load directly
+			{
+				// do nothing
+				loadJSONDataEngine(fileData, loadingTask);
+				break;
+			}
+			}
+		}
+	);
 }
 
 bool Engine::isFileFormatMigrationSupported(const AppVersion& fromVersion) const 
