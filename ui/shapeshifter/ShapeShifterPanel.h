@@ -32,8 +32,8 @@ public:
 	bool transparentBackground;
 	bool targetMode;
 
-	juce::Point<float> candidateTargetPoint;
 	AttachZone candidateZone;
+	int candidateTabIndex;
 
 
 	ShapeShifterContent * currentContent;
@@ -50,7 +50,7 @@ public:
 
 	void setTransparentBackground(bool value);
 
-	void attachTab(ShapeShifterPanelTab *);
+	void attachTab(ShapeShifterPanelTab *, int index = -1);
 	void detachTab(ShapeShifterPanelTab *, bool createNewPanel);
 	void removeTab(ShapeShifterPanelTab *);
 
@@ -66,16 +66,17 @@ public:
 
 	//Attach helpers
 
-	AttachZone checkAttachZone(ShapeShifterPanel * source);
+	AttachZone checkAttachZone(juce::Point<int> screenPoint);
 	void setCandidateZone(AttachZone zone);
 
 	virtual juce::var getCurrentLayout() override;
 	virtual void loadLayoutInternal(juce::var layout) override;
 
-	virtual void tabDrag(ShapeShifterPanelTab *) override;
+	virtual void tabDrag(ShapeShifterPanelTab *, const juce::MouseEvent&) override;
+	virtual void tabReorder(ShapeShifterPanelTab *, int newIndex) override;
 	virtual void tabSelect(ShapeShifterPanelTab *) override;
 	virtual void askForRemoveTab(ShapeShifterPanelTab *) override;
-	virtual void headerDrag() override;
+	virtual void headerDrag(const juce::MouseEvent&) override;
 
 	//Listener
 	class Listener

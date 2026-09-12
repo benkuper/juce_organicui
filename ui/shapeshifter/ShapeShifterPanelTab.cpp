@@ -56,9 +56,9 @@ void ShapeShifterPanelTab::clear()
 void ShapeShifterPanelTab::paint(Graphics& g)
 {
 	g.setColour(selected ? BG_COLOR : BG_COLOR.brighter(.15f));
-	juce::Rectangle<int> r = getLocalBounds();
-	if (!selected) r.reduce(1, 1);
-	g.fillRect(r);
+	juce::Rectangle<float> r = getLocalBounds().toFloat();
+	if (!selected) r = r.reduced(0.5f);
+	g.fillRoundedRectangle(r, 4.0f);
 }
 
 void ShapeShifterPanelTab::resized()

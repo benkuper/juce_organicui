@@ -27,15 +27,16 @@ public:
 	ShapeShifterPanel* panel;
 	std::unique_ptr<juce::ImageButton> pinBT;
 
-	void paintOverChildren(juce::Graphics& g)override;
 	void resized() override;
 
 	juce::ComponentDragger dragger;
+	void beginDrag(const juce::MouseEvent& e, DragMode mode);
 	void mouseDown(const juce::MouseEvent& e) override;
 	void mouseDrag(const juce::MouseEvent& e) override;
 	void mouseUp(const juce::MouseEvent& e) override;
 
 	DragMode dragMode;
+	bool dragStarted;
 
 	void clear();
 
