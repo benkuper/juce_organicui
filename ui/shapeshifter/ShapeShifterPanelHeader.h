@@ -25,7 +25,7 @@ public:
 
 	void addTab(ShapeShifterContent * content);
 	void removeTab(ShapeShifterPanelTab * tab, bool doRemove = true);
-	void attachTab(ShapeShifterPanelTab * tab);
+	void attachTab(ShapeShifterPanelTab * tab, int index = -1);
 	void clearTabs();
 
 	ShapeShifterPanelTab * getTabForContent(ShapeShifterContent * content);
@@ -45,11 +45,12 @@ public:
 	{
 	public:
         virtual ~Listener(){}
-		virtual void tabDrag(ShapeShifterPanelTab *) = 0;
+		virtual void tabDrag(ShapeShifterPanelTab *, const juce::MouseEvent&) = 0;
+		virtual void tabReorder(ShapeShifterPanelTab *, int newIndex) = 0;
 		virtual void tabSelect(ShapeShifterPanelTab *) = 0;
 
 		virtual void askForRemoveTab(ShapeShifterPanelTab *) = 0;
-		virtual void headerDrag() = 0;
+		virtual void headerDrag(const juce::MouseEvent&) = 0;
 
 
 	};

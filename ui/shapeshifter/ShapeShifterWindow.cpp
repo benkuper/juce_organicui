@@ -13,7 +13,8 @@
 ShapeShifterWindow::ShapeShifterWindow(ShapeShifterPanel* _panel, juce::Rectangle<int> bounds) :
 	ResizableWindow(_panel->currentContent != nullptr ? _panel->currentContent->contentName : "", true),
 	panel(_panel),
-	dragMode(PANEL)
+	dragMode(NONE),
+	dragStarted(false)
 {
 	setTopLeftPosition(bounds.getTopLeft());
 	panel->setBounds(bounds);
@@ -36,7 +37,7 @@ ShapeShifterWindow::ShapeShifterWindow(ShapeShifterPanel* _panel, juce::Rectangl
 	setBackgroundColour(BG_COLOR.darker(.1f).withAlpha(.3f));
 
 	setResizable(true, true);
-	setDraggable(true);
+	setDraggable(false);
 
 	setVisible(true);
 	toFront(true);
@@ -52,12 +53,6 @@ ShapeShifterWindow::~ShapeShifterWindow()
 
 }
 
-void ShapeShifterWindow::paintOverChildren(Graphics & g)
-{
-	g.setColour(BG_COLOR.brighter());
-	g.drawRect(getLocalBounds());
-}
-
 void ShapeShifterWindow::resized()
 {
 	ResizableWindow::resized();
@@ -70,11 +65,23 @@ void ShapeShifterWindow::resized()
 	pinBT->setBounds(panel->getLocalBounds().removeFromTop(20).removeFromRight(20).reduced(2));
 }
 
+void ShapeShifterWindow::beginDrag(const MouseEvent& e, DragMode mode)
+{
+	if (ShapeShifterManager::getInstance()->lockMode) return;
+	dragMode = mode;
+	dragStarted = true;
+	dragger.startDraggingComponent(this, e);
+	mouseDrag(e);
+}
+
 void ShapeShifterWindow::mouseDown(const MouseEvent & e)
 {
-	if (e.eventComponent == &panel->header || dynamic_cast<ShapeShifterPanelTab *>(e.eventComponent) != nullptr)
+	if (!ShapeShifterManager::getInstance()->lockMode &&
+		(e.eventComponent == &panel->header ||
+		 (dynamic_cast<ShapeShifterPanelTab *>(e.eventComponent) != nullptr && panel->contents.size() == 1)))
 	{
 		dragMode = e.eventComponent == &panel->header ? PANEL : TAB;
+		dragStarted = false;
 		dragger.startDraggingComponent(this, e);
 	}else
 	{
@@ -86,15 +93,35 @@ void ShapeShifterWindow::mouseDown(const MouseEvent & e)
 void ShapeShifterWindow::mouseDrag(const MouseEvent & e)
 {
 	if (dragMode == NONE) return;
+	if (!dragStarted && e.getDistanceFromDragStart() < 8) return;
+	dragStarted = true;
 	panel->setTransparentBackground(true);
-	ShapeShifterManager::getInstance()->checkCandidateTargetForPanel(panel);
+	setAlpha(.82f);
 	dragger.dragComponent(this, e, 0);
+	ShapeShifterManager::getInstance()->checkCandidateTargetForPanel(panel, e.getScreenPosition());
 }
 
-void ShapeShifterWindow::mouseUp(const MouseEvent &)
+void ShapeShifterWindow::mouseUp(const MouseEvent & e)
 {
+	if (dragMode == NONE) return;
+	const bool wasDragging = dragStarted;
+	dragMode = NONE;
+	dragStarted = false;
 	panel->setTransparentBackground(false);
-	ShapeShifterManager::getInstance()->checkDropOnCandidateTarget(panel);
+	setAlpha(1.0f);
+	if (!wasDragging) return;
+
+	// Docking can close this floating window, so perform it after the mouse callback returns.
+	juce::WeakReference<ShapeShifterPanel> draggedPanel(panel);
+	const auto screenPoint = e.getScreenPosition();
+	ShapeShifterManager::getInstance()->setCurrentCandidatePanel(nullptr);
+	MessageManager::callAsync([draggedPanel, screenPoint]()
+	{
+		if (draggedPanel.wasObjectDeleted()) return;
+		auto* manager = ShapeShifterManager::getInstance();
+		manager->checkCandidateTargetForPanel(draggedPanel.get(), screenPoint);
+		manager->checkDropOnCandidateTarget(draggedPanel);
+	});
 }
 
 void ShapeShifterWindow::clear()
