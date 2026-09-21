@@ -184,11 +184,25 @@ bool AppUpdater::updateTargetChannelLatestVersionAndUpdateAvailable()
 	targetChannel = GlobalSettings::getInstance()->updateChannel->getValueData();
 	String currentChannel = Engine::mainEngine->updateChannel;
 
-	// Extract the desired channel's info from the update json file 
-	const var updateDataForTargetChannel = updateData.getProperty(targetChannel, var());
-
-	const AppVersion targetVersion = AppVersion(updateDataForTargetChannel.getProperty("version", ""));
 	const AppVersion currentVersion(getAppVersion());
+
+	//Still prefer newer stable version, even if the user is on a beta channel, unless the user is on a custom channel.
+	var updateDataForTargetChannel = updateData.getProperty(targetChannel, var());
+	AppVersion targetVersion(updateDataForTargetChannel.getProperty("version", ""));
+
+	// Beta users should also be notified when a stable release supersedes their version.
+	if (targetChannel == "betaversion")
+	{
+		const var stableUpdateData = updateData.getProperty("stableversion", var());
+		const AppVersion stableVersion(stableUpdateData.getProperty("version", ""));
+		if (targetVersion < stableVersion)
+		{
+			targetChannel = "stableversion";
+			updateDataForTargetChannel = stableUpdateData;
+			targetVersion = stableVersion;
+		}
+	}
+
 	const bool isChangingChannel = currentChannel != targetChannel;
 	updateAvailable = currentVersion < targetVersion || (isChangingChannel && currentVersion <= targetVersion);
 	
