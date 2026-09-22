@@ -111,10 +111,20 @@ void Engine::loadDocumentAsync(const File& file) {
 
 	clearTasks();
 	taskName = "Loading File";
+	loadingStartTime = Time::currentTimeMillis();
 
 	ProgressTask* clearTask = addTask("clearing");
 	ProgressTask* parseTask = addTask("parsing");
 	ProgressTask* loadTask = addTask("loading");
+	std::unique_ptr<InputStream> is(file.createInputStream());
+
+	if (is == nullptr)
+	{
+		LOGERROR("Could not open file for reading: " << file.getFullPathName());
+		AlertWindow::showMessageBoxAsync(AlertWindow::AlertIconType::WarningIcon, "File read error", "The file could not be opened. Check that it still exists and that you have permission to read it.", "OK");
+		setFile(File());
+		return;
+	}
 
 	clearTask->start();
 	clear();
@@ -123,9 +133,6 @@ void Engine::loadDocumentAsync(const File& file) {
 	//  {
 	//    MessageManagerLock ml;
 	//  }
-	std::unique_ptr<InputStream> is(file.createInputStream());
-
-	loadingStartTime = Time::currentTimeMillis();
 	setFile(file);
 	file.getParentDirectory().setAsCurrentWorkingDirectory();
 
