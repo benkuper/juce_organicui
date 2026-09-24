@@ -98,6 +98,7 @@ public:
 
 
 	virtual void handleAddFromRemoteControl(juce::var data) override;
+	virtual bool handleMoveFromRemoteControl(ControllableContainer* source) override;
 
 
 	virtual void clear() override;
@@ -801,6 +802,29 @@ void BaseManager<T>::handleAddFromRemoteControl(juce::var data)
 {
 	if (!userCanAddItemsManually) return;
 	addItemFromData(data);
+}
+
+template<class T>
+bool BaseManager<T>::handleMoveFromRemoteControl(ControllableContainer* source)
+{
+	T* item = dynamic_cast<T*>(source);
+	if (item == nullptr) return false;
+
+	BaseManager<T>* sourceManager = dynamic_cast<BaseManager<T>*>(item->parentContainer.get());
+	if (sourceManager == nullptr || sourceManager == this) return false;
+	if (!canAddItemOfType(static_cast<BaseItem*>(item)->getTypeString())) return false;
+
+	// Refuse to move a container below itself or one of its descendants.
+	ControllableContainer* ancestor = this;
+	while (ancestor != nullptr)
+	{
+		if (ancestor == source) return false;
+		ancestor = ancestor->parentContainer.get();
+	}
+
+	T* detached = sourceManager->removeItem(item, false, true, true);
+	if (detached == nullptr) return false;
+	return addItem(detached, juce::var(), false, true) != nullptr;
 }
 
 template<class T>

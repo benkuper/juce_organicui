@@ -730,6 +730,15 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 							cc->setUndoableNiceName(data["name"]);
 						}
 					}
+					else if (command == "MOVE")
+					{
+						ControllableContainer* source = Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true);
+						ControllableContainer* destination = Engine::mainEngine->getControllableContainerForAddress(data["parent"].toString(), true);
+						if (source != nullptr && destination != nullptr)
+						{
+							destination->handleMoveFromRemoteControl(source);
+						}
+					}
 					else if (command == "LOAD")
 					{
 						var fileData = JSON::parse(data["data"]);

@@ -133,6 +133,7 @@ public:
 	//Remote Control
 	virtual void handleAddFromRemoteControl(juce::var data) {}
 	virtual void handleRemoveFromRemoteControl() {}
+	virtual bool handleMoveFromRemoteControl(ControllableContainer* source) { return false; }
 	virtual void handleLoadFromRemoteControl(juce::var data) { loadJSONData(data); }
 	virtual juce::var handleSaveFromRemoteControl() { return getJSONData(); }
 
