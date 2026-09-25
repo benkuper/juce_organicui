@@ -61,7 +61,9 @@ void TargetParameter::resetValue(bool silentSet)
 	if (targetType == CONTAINER) setTarget((ControllableContainer*)nullptr);
 	else setTarget((Controllable*)nullptr);
 	setGhostValue("");
-	setUndoableValue(value, "");
+	if (UndoMaster::getInstance()->isPerforming || UndoMaster::getInstance()->isPerformingUndoRedo())
+		setValue("", silentSet, true);
+	else setUndoableValue(value, "");
 
 	queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::VALUE_CHANGED, this, getValue()));
 	clearWarning();

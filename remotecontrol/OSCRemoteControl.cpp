@@ -354,7 +354,7 @@ void OSCRemoteControl::processMessage(const OSCMessage& m, const String& sourceI
 					// addControllableToNoFeedbackMap(c, sourceId, m.getSenderIPAddress());
 					if (Parameter* p = dynamic_cast<Parameter*>(c))
 					{
-						p->resetValue();
+						p->resetValueUndoable();
 					}
 					// noFeedbackMap.remove(c);
 				}
@@ -736,7 +736,7 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 						ControllableContainer* destination = Engine::mainEngine->getControllableContainerForAddress(data["parent"].toString(), true);
 						if (source != nullptr && destination != nullptr)
 						{
-							destination->handleMoveFromRemoteControl(source);
+							destination->handleMoveFromRemoteControl(source, true);
 						}
 					}
 					else if (command == "LOAD")
@@ -934,7 +934,7 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 					{
 						if (Controllable* c = Engine::mainEngine->getControllableForAddress(split[0]))
 						{
-							c->setAttribute(split[1], nv.value);
+							c->setUndoableAttribute(split[1], nv.value);
 						}
 					}
 				}

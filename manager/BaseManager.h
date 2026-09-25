@@ -98,7 +98,7 @@ public:
 
 
 	virtual void handleAddFromRemoteControl(juce::var data) override;
-	virtual bool handleMoveFromRemoteControl(ControllableContainer* source) override;
+	virtual bool handleMoveFromRemoteControl(ControllableContainer* source, bool addToUndo = false) override;
 
 
 	virtual void clear() override;
@@ -805,7 +805,7 @@ void BaseManager<T>::handleAddFromRemoteControl(juce::var data)
 }
 
 template<class T>
-bool BaseManager<T>::handleMoveFromRemoteControl(ControllableContainer* source)
+bool BaseManager<T>::handleMoveFromRemoteControl(ControllableContainer* source, bool addToUndo)
 {
 	T* item = dynamic_cast<T*>(source);
 	if (item == nullptr) return false;
@@ -820,6 +820,25 @@ bool BaseManager<T>::handleMoveFromRemoteControl(ControllableContainer* source)
 	{
 		if (ancestor == source) return false;
 		ancestor = ancestor->parentContainer.get();
+	}
+
+	if (addToUndo
+		&& !UndoMaster::getInstance()->isPerforming
+		&& (Engine::mainEngine == nullptr || !Engine::mainEngine->isLoadingFile))
+	{
+		juce::var data = item->getJSONData();
+		if (data.getDynamicObject() == nullptr) return false;
+
+		if (T* newItem = createItemFromData(data))
+		{
+			juce::Array<juce::UndoableAction*> actions;
+			actions.add(getAddItemUndoableAction(newItem, data));
+			actions.addArray(sourceManager->getRemoveItemUndoableAction(item));
+			UndoMaster::getInstance()->performActions("Move " + static_cast<BaseItem*>(item)->niceName, actions);
+			return true;
+		}
+
+		return false;
 	}
 
 	T* detached = sourceManager->removeItem(item, false, true, true);
