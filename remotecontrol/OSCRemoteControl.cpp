@@ -736,7 +736,21 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 						ControllableContainer* destination = Engine::mainEngine->getControllableContainerForAddress(data["parent"].toString(), true);
 						if (source != nullptr && destination != nullptr)
 						{
-							destination->handleMoveFromRemoteControl(source, true);
+							int targetIndex = -1;
+							bool hasValidTarget = true;
+							if (data.hasProperty("before"))
+							{
+								const String beforeAddress = data["before"].toString();
+								targetIndex = destination->controllableContainers.size();
+								if (beforeAddress.isNotEmpty())
+								{
+									ControllableContainer* before = Engine::mainEngine->getControllableContainerForAddress(beforeAddress, true);
+									targetIndex = destination->controllableContainers.indexOf(before);
+									hasValidTarget = targetIndex >= 0;
+								}
+							}
+							if (hasValidTarget)
+								destination->handleMoveFromRemoteControl(source, true, targetIndex);
 						}
 					}
 					else if (command == "LOAD")

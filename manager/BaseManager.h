@@ -98,7 +98,7 @@ public:
 
 
 	virtual void handleAddFromRemoteControl(juce::var data) override;
-	virtual bool handleMoveFromRemoteControl(ControllableContainer* source, bool addToUndo = false) override;
+	virtual bool handleMoveFromRemoteControl(ControllableContainer* source, bool addToUndo = false, int targetIndex = -1) override;
 
 
 	virtual void clear() override;
@@ -748,6 +748,11 @@ void BaseManager<T>::setItemIndex(T* item, int newIndex, bool addToUndo)
 
 	baseManagerListeners.call(&BaseManagerListener<T>::itemsReordered);
 	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_REORDERED));
+
+#if ORGANICUI_USE_WEBSERVER
+	if (!isCurrentlyLoadingData && isAttachedToRoot())
+		OSCRemoteControl::getInstance()->sendPathChangedFeedback(getControlAddress());
+#endif
 }
 
 template<class T>
@@ -805,14 +810,26 @@ void BaseManager<T>::handleAddFromRemoteControl(juce::var data)
 }
 
 template<class T>
-bool BaseManager<T>::handleMoveFromRemoteControl(ControllableContainer* source, bool addToUndo)
+bool BaseManager<T>::handleMoveFromRemoteControl(ControllableContainer* source, bool addToUndo, int targetIndex)
 {
 	T* item = dynamic_cast<T*>(source);
 	if (item == nullptr) return false;
 
 	BaseManager<T>* sourceManager = dynamic_cast<BaseManager<T>*>(item->parentContainer.get());
-	if (sourceManager == nullptr || sourceManager == this) return false;
+	if (sourceManager == nullptr) return false;
 	if (!canAddItemOfType(static_cast<BaseItem*>(item)->getTypeString())) return false;
+
+	if (sourceManager == this)
+	{
+		if (targetIndex < 0) return false;
+		const int currentIndex = items.indexOf(item);
+		if (currentIndex < 0) return false;
+		if (currentIndex < targetIndex) targetIndex--;
+		targetIndex = juce::jlimit(0, items.size() - 1, targetIndex);
+		if (currentIndex == targetIndex) return true;
+		setItemIndex(item, targetIndex, addToUndo);
+		return true;
+	}
 
 	// Refuse to move a container below itself or one of its descendants.
 	ControllableContainer* ancestor = this;
@@ -828,6 +845,8 @@ bool BaseManager<T>::handleMoveFromRemoteControl(ControllableContainer* source, 
 	{
 		juce::var data = item->getJSONData();
 		if (data.getDynamicObject() == nullptr) return false;
+		if (targetIndex >= 0)
+			data.getDynamicObject()->setProperty("index", juce::jlimit(0, items.size(), targetIndex));
 
 		if (T* newItem = createItemFromData(data))
 		{
@@ -843,7 +862,10 @@ bool BaseManager<T>::handleMoveFromRemoteControl(ControllableContainer* source, 
 
 	T* detached = sourceManager->removeItem(item, false, true, true);
 	if (detached == nullptr) return false;
-	return addItem(detached, juce::var(), false, true) != nullptr;
+	T* added = addItem(detached, juce::var(), false, true);
+	if (added != nullptr && targetIndex >= 0)
+		setItemIndex(added, juce::jlimit(0, items.size() - 1, targetIndex), false);
+	return added != nullptr;
 }
 
 template<class T>
