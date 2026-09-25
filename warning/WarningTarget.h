@@ -24,7 +24,13 @@ public:
 	static juce::String warningNoId;
 	static juce::String warningAllId;
 
+	juce::StringPairArray getWarningMessages() const;
+
+private:
+	mutable juce::CriticalSection warningMessageLock;
 	juce::HashMap<juce::String, juce::String> warningMessage;
+
+public:
 
 	void setWarningMessage(const juce::String& message = juce::String(), const juce::String& id = warningNoId, bool log = true);
 	void clearWarning(const juce::String& id = warningNoId);

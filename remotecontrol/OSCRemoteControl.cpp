@@ -688,10 +688,10 @@ void OSCRemoteControl::connectionOpened(const String& id)
 			continue;
 		}
 
-		HashMap<String, String>::Iterator it(wt->warningMessage);
-		while (it.next())
+		const StringPairArray warnings = wt->getWarningMessages();
+		for (int i = 0; i < warnings.size(); ++i)
 		{
-			sendPersistentWarningFeedback(address, it.getKey(), it.getValue());
+			sendPersistentWarningFeedback(address, warnings.getAllKeys()[i], warnings.getAllValues()[i]);
 		}
 	}
 }

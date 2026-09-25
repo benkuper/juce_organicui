@@ -914,7 +914,8 @@ void ControllableContainer::warningChanged(WarningTarget* target)
 String ControllableContainer::getWarningMessage(const String& id) const
 {
 	StringArray s;
-	if (WarningTarget::getWarningMessage(id).isNotEmpty()) s.add(WarningTarget::getWarningMessage());
+	const String ownWarning = WarningTarget::getWarningMessage(id);
+	if (ownWarning.isNotEmpty()) s.add(ownWarning);
 
 	if (controllables.getLock().tryEnter())
 	{
@@ -935,7 +936,7 @@ String ControllableContainer::getWarningMessage(const String& id) const
 	for (auto& cc : controllableContainers)
 	{
 		if (cc.wasObjectDeleted()) continue;
-		String cs = cc->getWarningMessage();
+		String cs = cc->getWarningMessage(id);
 		if (cs.isNotEmpty())
 		{
 			s.add(cs);
