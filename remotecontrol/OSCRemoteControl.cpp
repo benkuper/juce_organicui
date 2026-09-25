@@ -354,7 +354,7 @@ void OSCRemoteControl::processMessage(const OSCMessage& m, const String& sourceI
 					// addControllableToNoFeedbackMap(c, sourceId, m.getSenderIPAddress());
 					if (Parameter* p = dynamic_cast<Parameter*>(c))
 					{
-						p->resetValue();
+						p->resetValueUndoable();
 					}
 					// noFeedbackMap.remove(c);
 				}
@@ -688,10 +688,10 @@ void OSCRemoteControl::connectionOpened(const String& id)
 			continue;
 		}
 
-		HashMap<String, String>::Iterator it(wt->warningMessage);
-		while (it.next())
+		const StringPairArray warnings = wt->getWarningMessages();
+		for (int i = 0; i < warnings.size(); ++i)
 		{
-			sendPersistentWarningFeedback(address, it.getKey(), it.getValue());
+			sendPersistentWarningFeedback(address, warnings.getAllKeys()[i], warnings.getAllValues()[i]);
 		}
 	}
 }
@@ -728,6 +728,33 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 						if (ControllableContainer* cc = Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true))
 						{
 							cc->setUndoableNiceName(data["name"]);
+						}
+					}
+					else if (command == "MOVE")
+					{
+						ControllableContainer* source = Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true);
+						ControllableContainer* destination = Engine::mainEngine->getControllableContainerForAddress(data["parent"].toString(), true);
+						if (source != nullptr && destination != nullptr)
+						{
+							int targetIndex = -1;
+							bool hasValidTarget = true;
+							if (data.hasProperty("before"))
+							{
+								const String beforeAddress = data["before"].toString();
+								targetIndex = destination->controllableContainers.size();
+								if (beforeAddress.isNotEmpty())
+								{
+									ControllableContainer* before = Engine::mainEngine->getControllableContainerForAddress(beforeAddress, true);
+									targetIndex = destination->controllableContainers.indexOf(before);
+									hasValidTarget = targetIndex >= 0;
+								}
+							}
+							if (hasValidTarget
+								&& destination->handleMoveFromRemoteControl(source, true, targetIndex)
+								&& data.hasProperty("before"))
+							{
+								sendPathChangedFeedback(destination->getControlAddress());
+							}
 						}
 					}
 					else if (command == "LOAD")
@@ -858,7 +885,7 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 							}
 							if (sendFeedback)
 							{
-								sendOSCQueryFeedback(c);
+								sendOSCQueryFeedbackTo(OSCHelpers::getOSCMessageForControllable(c), id);
 							}
 						}
 						else if (command == "IGNORE")
@@ -925,7 +952,7 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 					{
 						if (Controllable* c = Engine::mainEngine->getControllableForAddress(split[0]))
 						{
-							c->setAttribute(split[1], nv.value);
+							c->setUndoableAttribute(split[1], nv.value);
 						}
 					}
 				}
@@ -1110,13 +1137,11 @@ void OSCRemoteControl::controllableFeedbackUpdate(ControllableContainer* cc, Con
 	}
 
 	// OSCQuery
-	HashMap<String, Array<Controllable*>, DefaultHashFunctions, CriticalSection>::Iterator it(feedbackMap);
-	while (it.next())
+	const String excludedId = noFeedbackMap.contains(c) ? noFeedbackMap[c] : "";
+	const StringArray clientIds = getOSCQueryFeedbackClientIds(c, excludedId);
+	if (!clientIds.isEmpty())
 	{
-		if (it.getValue().contains(c))
-		{
-			sendOSCQueryFeedback(c);
-		}
+		sendOSCQueryFeedbackTo(OSCHelpers::getOSCMessageForControllable(c), clientIds);
 	}
 
 	// Manual
@@ -1133,13 +1158,13 @@ void OSCRemoteControl::controllableStateUpdate(ControllableContainer* cc, Contro
 	}
 
 	// OSCQuery
-	HashMap<String, Array<Controllable*>, DefaultHashFunctions, CriticalSection>::Iterator it(feedbackMap);
-	while (it.next())
+	const String excludedId = noFeedbackMap.contains(c) ? noFeedbackMap[c] : "";
+	const StringArray clientIds = getOSCQueryFeedbackClientIds(c, excludedId);
+	if (!clientIds.isEmpty())
 	{
-		if (it.getValue().contains(c))
-		{
-			sendOSCQueryStateFeedback(c);
-		}
+		OSCMessage m(c->getControlAddress() + "/attributes/enabled");
+		m.addBool(c->enabled);
+		sendOSCQueryFeedbackTo(m, clientIds);
 	}
 }
 
@@ -1161,6 +1186,25 @@ void OSCRemoteControl::addControllableToNoFeedbackMap(Controllable* c, const juc
 	{
 		noFeedbackMap.set(c, id);
 	}
+}
+
+StringArray OSCRemoteControl::getOSCQueryFeedbackClientIds(Controllable* c, const String& excludeId)
+{
+	StringArray result;
+	if (c == nullptr)
+	{
+		return result;
+	}
+
+	HashMap<String, Array<Controllable*>, DefaultHashFunctions, CriticalSection>::Iterator it(feedbackMap);
+	while (it.next())
+	{
+		if (it.getKey() != excludeId && it.getValue().contains(c))
+		{
+			result.add(it.getKey());
+		}
+	}
+	return result;
 }
 
 void OSCRemoteControl::sendOSCQueryFeedback(Controllable* c, const String& excludeId)

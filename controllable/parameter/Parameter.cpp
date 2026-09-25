@@ -165,6 +165,22 @@ void Parameter::resetValue(bool silentSet)
 	setValue(defaultValue, silentSet, true, false);
 }
 
+UndoableAction* Parameter::resetValueUndoable(bool onlyReturnAction)
+{
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile)
+	{
+		resetValue();
+		return nullptr;
+	}
+	if (!isOverriden && checkValueIsTheSame(value, defaultValue)) return nullptr;
+
+	UndoableAction* action = new ParameterResetValueAction(this);
+	if (onlyReturnAction) return action;
+
+	UndoMaster::getInstance()->performAction("Reset " + niceName + " value", action);
+	return action;
+}
+
 UndoableAction* Parameter::setUndoableValue(var oldValue, var newValue, bool onlyReturnAction)
 {
 	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile)
@@ -802,6 +818,34 @@ bool Parameter::ParameterSetValueAction::undo()
 	}
 
 	p->setValue(oldValue);
+	return true;
+}
+
+bool Parameter::ParameterResetValueAction::perform()
+{
+	Parameter* p = getParameter();
+	if (p == nullptr)
+	{
+		LOGWARNING("Undo reset value : parameter not found " << controlAddress);
+		return false;
+	}
+
+	p->resetValue();
+	return true;
+}
+
+bool Parameter::ParameterResetValueAction::undo()
+{
+	Parameter* p = getParameter();
+	if (p == nullptr)
+	{
+		LOGWARNING("Undo reset value : parameter not found " << controlAddress);
+		return false;
+	}
+
+	p->isOverriden = false;
+	p->setValue(oldValue, false, true, oldIsOverriden);
+	p->isOverriden = oldIsOverriden;
 	return true;
 }
 

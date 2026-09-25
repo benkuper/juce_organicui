@@ -356,6 +356,23 @@ void Controllable::setAttribute(String param, var value)
 	}
 }
 
+UndoableAction* Controllable::setUndoableAttribute(const String& param, var value, bool onlyReturnAction)
+{
+	const var oldValue = getAttribute(param);
+	if (oldValue.isVoid() || oldValue == value) return nullptr;
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile)
+	{
+		setAttribute(param, value);
+		return nullptr;
+	}
+
+	UndoableAction* action = new ControllableSetAttributeAction(this, param, oldValue, value);
+	if (onlyReturnAction) return action;
+
+	UndoMaster::getInstance()->performAction("Set " + niceName + " " + param, action);
+	return action;
+}
+
 bool Controllable::setAttributeInternal(String param, var value)
 {
 	if (param == "description") description = value;
@@ -402,6 +419,22 @@ juce::var Controllable::getAttributeInternal(juce::String param) const
 StringArray Controllable::getValidAttributes() const
 {
 	return { "enabled", "canBeDisabled", "targetType", "searchLevel", "allowedTypes", "excludedTypes","root", "labelLevel", "saveValueOnly" };
+}
+
+bool Controllable::ControllableSetAttributeAction::perform()
+{
+	Controllable* c = getControllable();
+	if (c == nullptr) return false;
+	c->setAttribute(attribute, newValue);
+	return true;
+}
+
+bool Controllable::ControllableSetAttributeAction::undo()
+{
+	Controllable* c = getControllable();
+	if (c == nullptr) return false;
+	c->setAttribute(attribute, oldValue);
+	return true;
 }
 
 

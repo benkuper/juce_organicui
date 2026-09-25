@@ -23,34 +23,39 @@ WarningTarget::~WarningTarget()
 void WarningTarget::setWarningMessage(const String& message, const String& id, bool log)
 {
 	if (Engine::mainEngine != nullptr && Engine::mainEngine->isClearing) return;
-	if (WarningReporter::getInstanceWithoutCreating() == nullptr) return;
+	WarningReporter* reporter = WarningReporter::getInstanceWithoutCreating();
+	if (reporter == nullptr) return;
 
-	if (warningMessage.contains(id))
 	{
-		if (warningMessage[id] == message) return;
-		warningMessage.remove(id);
-	}
-	else
-	{
-		if (message.isEmpty()) return;
-	}
+		const ScopedLock lock(warningMessageLock);
 
-	if (warningMessage.size() == 0) WarningReporter::getInstance()->unregisterWarning(this, id);
+		if (warningMessage.contains(id))
+		{
+			if (warningMessage[id] == message) return;
+			warningMessage.remove(id);
+		}
+		else
+		{
+			if (message.isEmpty()) return;
+		}
 
-	if (log && Engine::mainEngine != nullptr && !Engine::mainEngine->isLoadingFile && !Engine::mainEngine->isClearing)
-	{
-		String n = "Warning Target";
-		if (ControllableContainer* cc = dynamic_cast<ControllableContainer*>(this))  n = cc->niceName;
-		else if (Controllable* c = dynamic_cast<Controllable*>(this)) n = c->niceName;
+		if (warningMessage.size() == 0) reporter->unregisterWarning(this, id);
 
-		String prefix = id.isNotEmpty() ? "[" + id + "] " : "";
-		NLOGWARNING(n,prefix + message);
-	}
+		if (log && Engine::mainEngine != nullptr && !Engine::mainEngine->isLoadingFile && !Engine::mainEngine->isClearing)
+		{
+			String n = "Warning Target";
+			if (ControllableContainer* cc = dynamic_cast<ControllableContainer*>(this))  n = cc->niceName;
+			else if (Controllable* c = dynamic_cast<Controllable*>(this)) n = c->niceName;
 
-	if (!message.isEmpty())
-	{
-		warningMessage.set(id, message);
-		WarningReporter::getInstance()->registerWarning(this, id, message);
+			String prefix = id.isNotEmpty() ? "[" + id + "] " : "";
+			NLOGWARNING(n,prefix + message);
+		}
+
+		if (!message.isEmpty())
+		{
+			warningMessage.set(id, message);
+			reporter->registerWarning(this, id, message);
+		}
 	}
 
 	notifyWarningChanged();
@@ -60,8 +65,9 @@ void WarningTarget::clearWarning(const String& id)
 {
 	if (id == warningAllId)
 	{
-		HashMap<String, String>::Iterator it(warningMessage);
-		while (it.next()) clearWarning(it.getKey());
+		const StringArray warningIds = getWarningMessages().getAllKeys();
+		for (const auto& warningId : warningIds)
+			setWarningMessage(String(), warningId, false);
 		return;
 	}
 
@@ -70,14 +76,21 @@ void WarningTarget::clearWarning(const String& id)
 
 void WarningTarget::unregisterWarningNow()
 {
-	if (warningMessage.size() > 0)
+	bool hasWarnings = false;
+	{
+		const ScopedLock lock(warningMessageLock);
+		hasWarnings = warningMessage.size() > 0;
+	}
+
+	if (hasWarnings)
 	{
 		if (WarningReporter::getInstanceWithoutCreating())
 		{
-			if (!WarningReporter::getInstance()->targets.contains(this)) return;
-
-			MessageManagerLock mmLock;
-			WarningReporter::getInstance()->unregisterWarning(this, warningAllId);
+			if (WarningReporter::getInstance()->targets.contains(this))
+			{
+				MessageManagerLock mmLock;
+				WarningReporter::getInstance()->unregisterWarning(this, warningAllId);
+			}
 		}
 	}
 
@@ -88,6 +101,7 @@ void WarningTarget::unregisterWarningNow()
 		warningTargetNotifier.cancelPendingUpdate();
 	}
 
+	const ScopedLock lock(warningMessageLock);
 	warningMessage.clear();
 }
 
@@ -109,6 +123,7 @@ void WarningTarget::resolveWarning()
 
 String WarningTarget::getWarningMessage(const String& id) const
 {
+	const ScopedLock lock(warningMessageLock);
 	if (warningMessage.size() == 0) return "";
 
 	String result;
@@ -122,6 +137,15 @@ String WarningTarget::getWarningMessage(const String& id) const
 		result = warningMessage[id];
 	}
 
+	return result;
+}
+
+StringPairArray WarningTarget::getWarningMessages() const
+{
+	StringPairArray result(false);
+	const ScopedLock lock(warningMessageLock);
+	HashMap<String, String>::Iterator it(warningMessage);
+	while (it.next()) result.set(it.getKey(), it.getValue());
 	return result;
 }
 

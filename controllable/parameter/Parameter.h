@@ -109,6 +109,7 @@ public:
 
 	virtual void setDefaultValue(juce::var val, bool doResetValue = true);
 	virtual void resetValue(bool silentSet = false);
+	virtual juce::UndoableAction* resetValueUndoable(bool onlyReturnAction = false);
 	virtual juce::UndoableAction* setUndoableValue(juce::var oldValue, juce::var newValue, bool onlyReturnAction = false);
 	virtual void setValue(juce::var _value, bool silentSet = false, bool force = false, bool forceOverride = true);
 	virtual void setValueInternal(juce::var& _value);
@@ -227,6 +228,24 @@ public:
 
 		juce::var oldValue;
 		juce::var newValue;
+
+		bool perform() override;
+		bool undo() override;
+	};
+
+	class ParameterResetValueAction :
+		public ParameterAction
+	{
+	public:
+		ParameterResetValueAction(Parameter* param) :
+			ParameterAction(param),
+			oldValue(param->getValue().clone()),
+			oldIsOverriden(param->isOverriden)
+		{
+		}
+
+		juce::var oldValue;
+		bool oldIsOverriden;
 
 		bool perform() override;
 		bool undo() override;
