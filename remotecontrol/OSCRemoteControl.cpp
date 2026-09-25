@@ -749,8 +749,12 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 									hasValidTarget = targetIndex >= 0;
 								}
 							}
-							if (hasValidTarget)
-								destination->handleMoveFromRemoteControl(source, true, targetIndex);
+							if (hasValidTarget
+								&& destination->handleMoveFromRemoteControl(source, true, targetIndex)
+								&& data.hasProperty("before"))
+							{
+								sendPathChangedFeedback(destination->getControlAddress());
+							}
 						}
 					}
 					else if (command == "LOAD")
