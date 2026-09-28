@@ -76,7 +76,6 @@ public:
 	CubicEasing();
 	Point2DParameter* anchor1;
 	Point2DParameter* anchor2;
-	BoolParameter* realtimeComputation;
 
 	//for generating timeLUT
 	juce::Point<float> a;

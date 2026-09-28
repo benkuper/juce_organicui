@@ -8,6 +8,10 @@
   ==============================================================================
 */
 
+#ifndef ORGANICUI_CUBIC_EASING_USE_REALTIME
+#define ORGANICUI_CUBIC_EASING_USE_REALTIME 1 // Set to 0 to use the lookup table.
+#endif
+
 const String Easing::typeNames[Easing::TYPE_MAX]{ "Linear", "Bezier", "Hold","Sine", "Elastic","Bounce", "Steps", "Noise", "Perlin" };
 
 Easing::Easing(Type type) :
@@ -99,7 +103,6 @@ CubicEasing::CubicEasing() :
 {
 	anchor1 = addPoint2DParameter("Anchor 1", "Anchor 1 of the quadratic curve");
 	anchor2 = addPoint2DParameter("Anchor 2", "Anchor 2 of the quadratic curve");
-	realtimeComputation = addBoolParameter("Realtime Computation", "Compute the exact curve value in realtime. Disable this to use the lookup table.", true);
 }
 
 
@@ -147,7 +150,10 @@ float CubicEasing::getValue(const float& weight)
 {
 	if (length == 0 || weight <= 0) return start.y;
 	if (weight >= 1) return end.y;
-	if (realtimeComputation->boolValue()) return getRealtimeValue(weight);
+
+#if ORGANICUI_CUBIC_EASING_USE_REALTIME
+	return getRealtimeValue(weight);
+#else
 	if (uniformLUT.size() == 0) return start.y;
 
 	float indexF = weight * (uniformLUT.size() - 1);
@@ -158,6 +164,7 @@ float CubicEasing::getValue(const float& weight)
 
 	float p = p1 + (p2 - p1) * rel;
 	return p;
+#endif
 }
 
 Point<float> CubicEasing::getRawValue(const float& weight)
