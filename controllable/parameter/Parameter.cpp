@@ -940,6 +940,7 @@ void Parameter::ValueInterpolator::updateParams(var newTargetValue, float newTim
 void Parameter::ValueInterpolator::Manager::interpolate(WeakReference<Parameter> p, var targetValue, float time, Automation* a)
 {
 	jassert(p->getValue().size() == targetValue.size());
+	GenericScopedLock lock(interpLock);
 
 	WeakReference<ValueInterpolator> interp = getInterpolationWith(p);
 	if (interp != nullptr && !interp.wasObjectDeleted())
@@ -966,9 +967,9 @@ WeakReference<Parameter::ValueInterpolator> Parameter::ValueInterpolator::Manage
 
 void Parameter::ValueInterpolator::Manager::removeInterpolationWith(Parameter* p)
 {
+	GenericScopedLock lock(interpLock);
 	if (interpolatorMap.contains(p))
 	{
-		GenericScopedLock lock(interpLock);
 		WeakReference<ValueInterpolator> interp = interpolatorMap[p];
 		if (interp.wasObjectDeleted()) return;
 		interpolatorMap.remove(p);

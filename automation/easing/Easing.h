@@ -76,6 +76,7 @@ public:
 	CubicEasing();
 	Point2DParameter* anchor1;
 	Point2DParameter* anchor2;
+	BoolParameter* realtimeComputation;
 
 	//for generating timeLUT
 	juce::Point<float> a;
@@ -102,6 +103,25 @@ public:
 	juce::Rectangle<float> getBounds(bool includeHandles) override;
 
 	EasingUI* createUI() override;
+
+private:
+	struct CubicCoefficients
+	{
+		double xA = 0.0;
+		double xB = 0.0;
+		double xC = 1.0;
+		double yA = 0.0;
+		double yB = 0.0;
+		double yC = 0.0;
+		double yD = 0.0;
+	};
+
+	mutable juce::SpinLock coefficientsLock;
+	CubicCoefficients coefficients;
+
+	CubicCoefficients getCoefficients() const;
+	static double solveBezierParameterForX(double normalizedX, const CubicCoefficients& coefficients);
+	float getRealtimeValue(float weight) const;
 };
 
 
@@ -199,4 +219,3 @@ public:
 
 	EasingUI* createUI() override;
 };
-

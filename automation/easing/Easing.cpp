@@ -31,7 +31,7 @@ void Easing::updateKeys(const Point<float>& _start, const Point<float>& _end, bo
 	prevLength = length;
 	length = end.x - start.x;
 
-	updateKeysInternal();
+	updateKeysInternal(stretch);
 }
 
 EasingUI* Easing::createUI()
@@ -99,6 +99,7 @@ CubicEasing::CubicEasing() :
 {
 	anchor1 = addPoint2DParameter("Anchor 1", "Anchor 1 of the quadratic curve");
 	anchor2 = addPoint2DParameter("Anchor 2", "Anchor 2 of the quadratic curve");
+	realtimeComputation = addBoolParameter("Realtime Computation", "Compute the exact curve value in realtime. Disable this to use the lookup table.", true);
 }
 
 
@@ -144,8 +145,10 @@ juce::Rectangle<float> CubicEasing::getBounds(bool includeHandles)
 
 float CubicEasing::getValue(const float& weight)
 {
-	if (length == 0 || weight <= 0 || uniformLUT.size() == 0) return start.y;
+	if (length == 0 || weight <= 0) return start.y;
 	if (weight >= 1) return end.y;
+	if (realtimeComputation->boolValue()) return getRealtimeValue(weight);
+	if (uniformLUT.size() == 0) return start.y;
 
 	float indexF = weight * (uniformLUT.size() - 1);
 	int index = (int)floor(indexF);
@@ -166,23 +169,7 @@ Point<float> CubicEasing::getRawValue(const float& weight)
 float CubicEasing::getBezierWeight(const float& pos)
 {
 	if (length == 0) return 0;
-
-	const int precision = length * 30;
-	float closestT = getWeightForPos(pos);
-	float minDist = INT32_MAX;
-	for (int i = 0; i < precision; ++i)
-	{
-		float t = i * 1.0f / precision;
-		Bezier::Point bp = bezier.valueAt(t);
-		float dist = fabsf(bp.x - pos);
-		if (dist < minDist)
-		{
-			closestT = t;
-			minDist = dist;
-		}
-	}
-
-	return closestT;
+	return (float)solveBezierParameterForX(jlimit(0.0, 1.0, (double)getWeightForPos(pos)), getCoefficients());
 }
 
 void CubicEasing::updateKeysInternal(bool stretch)
@@ -216,7 +203,62 @@ void CubicEasing::updateBezier()
 	Point<float> a2 = end + anchor2->getPoint();
 	bezier = Bezier::Bezier<3>({ {start.x, start.y},{a1.x, a1.y},{a2.x,a2.y},{end.x,end.y} });
 
+	CubicCoefficients nextCoefficients;
+	const double normalizedX1 = anchor1->x / length;
+	const double normalizedX2 = 1.0 + anchor2->x / length;
+	nextCoefficients.xC = 3.0 * normalizedX1;
+	nextCoefficients.xB = 3.0 * (normalizedX2 - normalizedX1) - nextCoefficients.xC;
+	nextCoefficients.xA = 1.0 - nextCoefficients.xC - nextCoefficients.xB;
+	nextCoefficients.yD = start.y;
+	nextCoefficients.yC = 3.0 * (a1.y - start.y);
+	nextCoefficients.yB = 3.0 * (a2.y - a1.y) - nextCoefficients.yC;
+	nextCoefficients.yA = end.y - nextCoefficients.yD - nextCoefficients.yC - nextCoefficients.yB;
+
+	{
+		const SpinLock::ScopedLockType lock(coefficientsLock);
+		coefficients = nextCoefficients;
+	}
+
 	updateUniformLUT(1 + length * 20);
+}
+
+CubicEasing::CubicCoefficients CubicEasing::getCoefficients() const
+{
+	const SpinLock::ScopedLockType lock(coefficientsLock);
+	return coefficients;
+}
+
+double CubicEasing::solveBezierParameterForX(double normalizedX, const CubicCoefficients& c)
+{
+	const double target = jlimit(0.0, 1.0, normalizedX);
+	double low = 0.0;
+	double high = 1.0;
+	double t = target;
+
+	// Newton convergence is normally reached in a few iterations. The maintained
+	// bracket and bisection fallback also handle curves with a flat derivative.
+	for (int i = 0; i < 32; ++i)
+	{
+		const double x = ((c.xA * t + c.xB) * t + c.xC) * t;
+		const double error = x - target;
+		if (std::abs(error) <= 1.0e-15) return t;
+
+		if (error < 0.0) low = t;
+		else high = t;
+
+		const double derivative = (3.0 * c.xA * t + 2.0 * c.xB) * t + c.xC;
+		const double newtonT = derivative > 1.0e-12 ? t - error / derivative : -1.0;
+		t = newtonT > low && newtonT < high ? newtonT : (low + high) * 0.5;
+	}
+
+	return (low + high) * 0.5;
+}
+
+float CubicEasing::getRealtimeValue(float weight) const
+{
+	const CubicCoefficients c = getCoefficients();
+	const double t = solveBezierParameterForX(weight, c);
+	return (float)((((c.yA * t) + c.yB) * t + c.yC) * t + c.yD);
 }
 
 void CubicEasing::updateUniformLUT(int precision)
