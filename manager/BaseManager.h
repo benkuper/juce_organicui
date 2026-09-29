@@ -575,6 +575,9 @@ juce::Array<T*> BaseManager<T>::addItemsFromClipboard(bool showWarning)
 
 	if (!data.hasProperty("itemType"))
 	{
+		juce::var managerItems = data.getProperty("items", juce::var());
+		if (managerItems.isArray()) return addItemsFromData(managerItems);
+
 		juce::Array<T*> result;
 		result.add(this->addItemFromData(data));
 		return result;
