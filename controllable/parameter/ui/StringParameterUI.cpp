@@ -121,7 +121,7 @@ void StringParameterUI::labelTextChanged(Label*)
 {
 	//String  originalString = valueLabel.getText().substring(prefix.length(), valueLabel.getText().length() - suffix.length());
 	if (stringParam->autoTrim) valueLabel.setText(valueLabel.getText().trim(), dontSendNotification);
-	parameter->setUndoableValue(parameter->stringValue(), valueLabel.getText());
+	parameter->setUndoableValueForSelected(parameter->stringValue(), valueLabel.getText());
 }
 
 
@@ -217,7 +217,7 @@ void StringParameterFileUI::buttonClicked(Button* b)
 				if (parameter.wasObjectDeleted()) return;
 				if (parameter != nullptr)
 				{
-					parameter->setUndoableValue(parameter->stringValue(), f.getFullPathName());
+					parameter->setUndoableValueForSelected(parameter->stringValue(), f.getFullPathName());
 				}
 
 			}
@@ -265,14 +265,24 @@ void StringParameterTextUI::valueChanged(const var& v)
 
 void StringParameterTextUI::textEditorTextChanged(TextEditor&)
 {
-	stringParam->setValue(editor.getText());
+	if (valueOnEditorOpen.isVoid()) valueOnEditorOpen = stringParam->getValue().clone();
+	stringParam->setValueForSelected(editor.getText());
 }
 
 void StringParameterTextUI::textEditorFocusLost(TextEditor&)
 {
-
+	commitTextEdit();
 }
 
 void StringParameterTextUI::textEditorReturnKeyPressed(TextEditor&)
 {
+	commitTextEdit();
+}
+
+void StringParameterTextUI::commitTextEdit()
+{
+	if (valueOnEditorOpen.isVoid()) return;
+	const var oldValue = valueOnEditorOpen.clone();
+	valueOnEditorOpen = var();
+	stringParam->setUndoableValueForSelected(oldValue, editor.getText());
 }

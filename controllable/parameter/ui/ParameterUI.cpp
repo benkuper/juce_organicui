@@ -29,17 +29,29 @@ ParameterUI::ParameterUI(Array<Parameter*> parameters, int paintTimerID) :
 	useCustomBGColor(false),
 	useCustomFGColor(false)
 {
-	parameter->addAsyncCoalescedParameterListener(this);
+	for (Parameter* related : parameter->getRelatedSelectedParameters())
+	{
+		if (!this->parameters.contains(related)) this->parameters.add(related);
+	}
+
+	for (auto& related : this->parameters)
+	{
+		if (related != nullptr && !related.wasObjectDeleted()) related->addAsyncCoalescedParameterListener(this);
+	}
 
 	//setSize(100, 16);
 }
 
 ParameterUI::~ParameterUI()
 {
-	if (!parameter.wasObjectDeleted() && parameter != nullptr) {
-		parameter->removeAsyncParameterListener(this);
-		parameter = nullptr;
+	for (auto& related : parameters)
+	{
+		if (related == nullptr || related.wasObjectDeleted()) continue;
+		related->multiEditStartValue = var();
+		related->hasMultiEditStartValue = false;
+		related->removeAsyncParameterListener(this);
 	}
+	parameter = nullptr;
 
 	masterReference.clear();
 }
@@ -105,7 +117,6 @@ void ParameterUI::paintOverChildren(Graphics& g)
 		Colour c = Colours::rebeccapurple.brighter(.2f);
 		g.setColour(c.withAlpha(.2f));
 		g.fillRoundedRectangle(getLocalBounds().toFloat(), 1);
-		return;
 	}
 
 	switch (parameter->controlMode)
@@ -141,6 +152,29 @@ void ParameterUI::paintOverChildren(Graphics& g)
 	}
 	break;
 	}
+
+	if (hasMixedValues())
+	{
+		const Rectangle<float> bounds = getLocalBounds().toFloat().reduced(1.0f);
+		g.setColour(Colours::yellow.withAlpha(0.12f));
+		g.fillRoundedRectangle(bounds, 2.0f);
+		g.setColour(Colours::yellow.withAlpha(0.9f));
+		g.drawRoundedRectangle(bounds, 2.0f, 1.5f);
+	}
+}
+
+bool ParameterUI::hasMixedValues() const
+{
+	if (parameter == nullptr || parameter.wasObjectDeleted() || parameters.size() < 2) return false;
+
+	const var primaryValue = parameter->getValue();
+	for (auto& related : parameters)
+	{
+		if (related == nullptr || related.wasObjectDeleted() || related == parameter) continue;
+		if (!parameter->checkValueIsTheSame(primaryValue, related->getValue())) return true;
+	}
+
+	return false;
 }
 
 void ParameterUI::handlePaintTimer()
@@ -245,7 +279,7 @@ void ParameterUI::handleMenuSelectedID(int id)
 {
 	switch (id)
 	{
-	case 1: parameter->resetValue(); break;
+	case 1: parameter->resetValueUndoableForSelected(); break;
 	case 10: parameter->setControlMode(Parameter::MANUAL); break;
 	case 11: parameter->setControlMode(Parameter::EXPRESSION); break;
 	case 12: parameter->setControlMode(Parameter::REFERENCE); break;
@@ -279,7 +313,7 @@ void ParameterUI::handleMenuSelectedID(int id)
 			}
 		}
 
-		parameter->setValue(v); break;
+		parameter->setUndoableValueForSelected(parameter->getValue(), v); break;
 	}
 	case -50: parameter->setRange(0, 1); break;
 	case -51: parameter->setRange(-1, 1); break;
@@ -382,6 +416,13 @@ void ParameterUI::controlModeChanged(Parameter*)
 }
 
 void ParameterUI::newMessage(const Parameter::ParameterEvent& e) {
+	if (e.parameter != parameter)
+	{
+		shouldRepaint = true;
+		repaint();
+		return;
+	}
+
 	switch (e.type)
 	{
 	case Parameter::ParameterEvent::BOUNDS_CHANGED:
@@ -465,7 +506,7 @@ void ParameterUI::ValueEditCalloutComponent::labelTextChanged(Label* l)
 			else newVal.append(ParameterUI::textToValue(labels[i]->getText().replace(",", ".")));
 		}
 
-		p->setUndoableValue(oldVal, p->isComplex() ? newVal : newVal[0]);
+		p->setUndoableValueForSelected(oldVal, p->isComplex() ? newVal : newVal[0]);
 	}
 	else
 	{

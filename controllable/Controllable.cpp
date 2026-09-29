@@ -201,6 +201,55 @@ void Controllable::updateControlAddress()
 	}
 }
 
+ControllableContainer* Controllable::getSelectedParentInHierarchy()
+{
+	ControllableContainer* current = parentContainer;
+	while (current != nullptr)
+	{
+		if (current->isSelected) return current;
+		current = current->parentContainer;
+	}
+
+	return nullptr;
+}
+
+Array<Controllable*> Controllable::getRelatedSelectedControllables()
+{
+	Array<Controllable*> result;
+	result.add(this);
+
+	InspectableSelectionManager* selectionManager = InspectableSelectionManager::activeSelectionManager;
+	if (selectionManager == nullptr || selectionManager->currentInspectables.size() < 2) return result;
+
+	if (isSelected)
+	{
+		for (Controllable* selectedControllable : selectionManager->getInspectablesAs<Controllable>())
+		{
+			if (selectedControllable != nullptr
+				&& selectedControllable->type == type
+				&& selectedControllable->getTypeString() == getTypeString())
+				result.addIfNotAlreadyThere(selectedControllable);
+		}
+	}
+
+	ControllableContainer* selectedParent = getSelectedParentInHierarchy();
+	if (selectedParent == nullptr) return result;
+
+	const String relativeAddress = getControlAddress(selectedParent);
+	Array<ControllableContainer*> selectedContainers = selectionManager->getInspectablesAs<ControllableContainer>();
+
+	for (ControllableContainer* selectedContainer : selectedContainers)
+	{
+		if (selectedContainer == nullptr || selectedContainer == selectedParent) continue;
+
+		Controllable* related = selectedContainer->getControllableForAddress(relativeAddress);
+		if (related != nullptr && related->type == type && related->getTypeString() == getTypeString())
+			result.addIfNotAlreadyThere(related);
+	}
+
+	return result;
+}
+
 void Controllable::remove(bool addToUndo)
 {
 	controllableListeners.call(&ControllableListener::askForRemoveControllable, this, addToUndo);

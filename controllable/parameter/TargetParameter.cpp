@@ -82,7 +82,7 @@ void TargetParameter::setGhostValue(const String& ghostVal)
 
 }
 
-void TargetParameter::setValueFromTarget(Controllable* c, bool addToUndo)
+void TargetParameter::setValueFromTarget(Controllable* c, bool addToUndo, bool setRelatedSelected)
 {
 	String newValue;
 
@@ -120,13 +120,21 @@ void TargetParameter::setValueFromTarget(Controllable* c, bool addToUndo)
 		manuallySettingNull = true;
 	}
 
-	if (addToUndo) setUndoableValue(stringValue(), newValue);
-	else setValue(newValue, false, true);
+	if (addToUndo)
+	{
+		if (setRelatedSelected) setUndoableValueForSelected(stringValue(), newValue);
+		else setUndoableValue(stringValue(), newValue);
+	}
+	else
+	{
+		if (setRelatedSelected) setValueForSelected(newValue, false, true);
+		else setValue(newValue, false, true);
+	}
 
 	manuallySettingNull = false;
 }
 
-void TargetParameter::setValueFromTarget(ControllableContainer* cc, bool addToUndo)
+void TargetParameter::setValueFromTarget(ControllableContainer* cc, bool addToUndo, bool setRelatedSelected)
 {
 	String newValue;
 
@@ -151,8 +159,16 @@ void TargetParameter::setValueFromTarget(ControllableContainer* cc, bool addToUn
 	}
 	else manuallySettingNull = true;
 
-	if (addToUndo) setUndoableValue(stringValue(), newValue);
-	else setValue(newValue, false, true);
+	if (addToUndo)
+	{
+		if (setRelatedSelected) setUndoableValueForSelected(stringValue(), newValue);
+		else setUndoableValue(stringValue(), newValue);
+	}
+	else
+	{
+		if (setRelatedSelected) setValueForSelected(newValue, false, true);
+		else setValue(newValue, false, true);
+	}
 
 	manuallySettingNull = false;
 }

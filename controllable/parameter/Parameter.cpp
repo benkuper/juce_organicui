@@ -19,6 +19,7 @@ Parameter::Parameter(const Type& type, const String& niceName, const String& des
 	Controllable(type, niceName, description, enabled),
 	defaultValue(initialValue),
 	value(initialValue),
+	hasMultiEditStartValue(false),
 	canHaveRange(false),
 	rebuildUIOnRangeChange(true),
 	minimumValue(minValue),
@@ -213,6 +214,100 @@ void Parameter::setValue(var _value, bool silentSet, bool force, bool forceOverr
 	if (!silentSet) notifyValueChanged();
 }
 
+Array<Parameter*> Parameter::getRelatedSelectedParameters()
+{
+	Array<Parameter*> result;
+	for (Controllable* related : getRelatedSelectedControllables())
+	{
+		if (Parameter* relatedParameter = dynamic_cast<Parameter*>(related))
+			result.addIfNotAlreadyThere(relatedParameter);
+	}
+	return result;
+}
+
+void Parameter::beginMultiEdit()
+{
+	for (Parameter* related : getRelatedSelectedParameters())
+	{
+		if (related == nullptr || related->hasMultiEditStartValue) continue;
+		related->multiEditStartValue = related->getValue().clone();
+		related->hasMultiEditStartValue = true;
+	}
+}
+
+void Parameter::clearMultiEditState()
+{
+	for (Parameter* related : getRelatedSelectedParameters())
+	{
+		if (related == nullptr) continue;
+		related->multiEditStartValue = var();
+		related->hasMultiEditStartValue = false;
+	}
+}
+
+void Parameter::setValueForSelected(var newValue, bool silentSet, bool force, bool forceOverride)
+{
+	beginMultiEdit();
+	for (Parameter* related : getRelatedSelectedParameters())
+	{
+		if (related != nullptr) related->setValue(newValue, silentSet, force, forceOverride);
+	}
+}
+
+void Parameter::setUndoableValueForSelected(var oldValue, var newValue)
+{
+	Array<Parameter*> relatedParameters = getRelatedSelectedParameters();
+	if (relatedParameters.size() <= 1)
+	{
+		clearMultiEditState();
+		setUndoableValue(oldValue, newValue);
+		return;
+	}
+
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile)
+	{
+		for (Parameter* related : relatedParameters)
+			if (related != nullptr) related->setValue(newValue);
+		clearMultiEditState();
+		return;
+	}
+
+	Array<UndoableAction*> actions;
+	for (Parameter* related : relatedParameters)
+	{
+		if (related == nullptr) continue;
+
+		var relatedOldValue = related == this ? oldValue : related->getValue();
+		if (related->hasMultiEditStartValue) relatedOldValue = related->multiEditStartValue.clone();
+
+		if (!related->alwaysNotify && related->checkValueIsTheSame(relatedOldValue, newValue)) continue;
+		if (UndoableAction* action = related->setUndoableValue(relatedOldValue, newValue, true)) actions.add(action);
+	}
+
+	clearMultiEditState();
+	if (!actions.isEmpty()) UndoMaster::getInstance()->performActions("Set " + niceName + " on selected items", actions);
+}
+
+void Parameter::resetValueUndoableForSelected()
+{
+	Array<Parameter*> relatedParameters = getRelatedSelectedParameters();
+	if (relatedParameters.size() <= 1)
+	{
+		resetValueUndoable();
+		return;
+	}
+
+	Array<UndoableAction*> actions;
+	for (Parameter* related : relatedParameters)
+	{
+		if (related == nullptr) continue;
+		if (UndoableAction* action = related->resetValueUndoable(true)) actions.add(action);
+	}
+
+	clearMultiEditState();
+	if (!actions.isEmpty()) UndoMaster::getInstance()->performActions("Reset " + niceName + " on selected items", actions);
+}
+
 
 bool Parameter::isComplex() const
 {
@@ -384,6 +479,39 @@ void Parameter::setNormalizedValue(const var& normalizedValue, bool silentSet, b
 		for (int i = 0; i < value.size(); i++) targetVal.append(jmap<float>(normalizedValue[i], minimumValue[i], maximumValue[i]));
 		setValue(targetVal, silentSet, force);
 	}
+}
+
+void Parameter::setUndoableNormalizedValueForSelected(const var& oldNormalizedValue, const var& newNormalizedValue)
+{
+	if (!isComplex())
+	{
+		setUndoableValueForSelected(jmap<float>(oldNormalizedValue, (float)minimumValue, (float)maximumValue),
+			jmap<float>(newNormalizedValue, (float)minimumValue, (float)maximumValue));
+		return;
+	}
+
+	var oldValue;
+	var newValue;
+	for (int i = 0; i < value.size(); ++i)
+	{
+		oldValue.append(jmap<float>(oldNormalizedValue[i], minimumValue[i], maximumValue[i]));
+		newValue.append(jmap<float>(newNormalizedValue[i], minimumValue[i], maximumValue[i]));
+	}
+	setUndoableValueForSelected(oldValue, newValue);
+}
+
+void Parameter::setNormalizedValueForSelected(const var& normalizedValue, bool silentSet, bool force)
+{
+	if (!isComplex())
+	{
+		setValueForSelected(jmap<float>(normalizedValue, (float)minimumValue, (float)maximumValue), silentSet, force);
+		return;
+	}
+
+	var targetValue;
+	for (int i = 0; i < value.size(); ++i)
+		targetValue.append(jmap<float>(normalizedValue[i], minimumValue[i], maximumValue[i]));
+	setValueForSelected(targetValue, silentSet, force);
 }
 
 var Parameter::getNormalizedValue() const

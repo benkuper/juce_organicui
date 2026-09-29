@@ -20,7 +20,7 @@ IntSliderUI::~IntSliderUI()
 
 void IntSliderUI::setParamNormalizedValue(float value)
 {
-    parameter->setNormalizedValue(value);
+	parameter->setNormalizedValueForSelected(value);
 }
 
 float IntSliderUI::getParamNormalizedValue()

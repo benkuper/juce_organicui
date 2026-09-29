@@ -128,7 +128,7 @@ void ColorParameterUI::componentBeingDeleted(Component& c)
 {
 	if (&c == colorEditor)
 	{
-		colorParam->setUndoableValue(valueOnEditorOpen, colorParam->value);
+		colorParam->setUndoableValueForSelected(valueOnEditorOpen, colorParam->value);
 		colorEditor = nullptr;
 	}
 }
@@ -142,7 +142,13 @@ void ColorParameterUI::changeListenerCallback(ChangeBroadcaster * source)
 {
 	ColourSelector * s = dynamic_cast<ColourSelector *>(source);
 	if (s == nullptr || shouldBailOut()) return;
-	colorParam->setColor(s->getCurrentColour());
+	const Colour colour = s->getCurrentColour();
+	var colourValue;
+	colourValue.append(colour.getFloatRed());
+	colourValue.append(colour.getFloatGreen());
+	colourValue.append(colour.getFloatBlue());
+	colourValue.append(colour.getFloatAlpha());
+	colorParam->setValueForSelected(colourValue);
 
 }
 

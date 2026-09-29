@@ -134,7 +134,7 @@ void EnumParameterUI::valueChanged(const var& value)
 void EnumParameterUI::comboBoxChanged(ComboBox*)
 {
 	if (shouldBailOut()) return;
-	ep->setUndoableValue(prevValue, getSelectedKey());
+	ep->setUndoableValueForSelected(prevValue, getSelectedKey());
 
 }
 
@@ -308,5 +308,5 @@ void EnumParameterButtonBarUI::valueChanged(const var&)
 
 void EnumParameterButtonBarUI::buttonClicked(Button* b)
 {
-	ep->setValueWithKey(b->getButtonText());
+	ep->setUndoableValueForSelected(ep->getValue(), b->getButtonText());
 }

@@ -116,19 +116,20 @@ void FloatStepperUI::valueChanged(const var& value)
 void FloatStepperUI::sliderValueChanged(Slider* _slider)
 {
 	if (parameter.wasObjectDeleted()) return;
-	parameter->setValue(slider->getValue());
+	parameter->setValueForSelected(slider->getValue());
 }
 
 void FloatStepperUI::sliderDragStarted(Slider* _slider)
 {
 	if (parameter.wasObjectDeleted()) return;
 	valueAtDragStart = parameter->floatValue();
+	parameter->beginMultiEdit();
 }
 
 void FloatStepperUI::sliderDragEnded(Slider* _slider)
 {
 	if (parameter.wasObjectDeleted()) return;
-	parameter->setUndoableValue(valueAtDragStart, parameter->floatValue());
+	parameter->setUndoableValueForSelected(valueAtDragStart, parameter->floatValue());
 }
 
 void FloatStepperUI::rangeChanged(Parameter*) {

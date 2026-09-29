@@ -45,6 +45,7 @@ public:
 	virtual void showEditRangeWindowInternal();
 
 	void paintOverChildren(juce::Graphics& g) override;
+	bool hasMixedValues() const;
 
 	virtual void handlePaintTimer() override;
 	virtual void handlePaintTimerInternal() override;

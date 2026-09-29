@@ -96,8 +96,13 @@ void TripleSliderUI::mouseUpInternal(const MouseEvent&)
 			|| (float)mouseDownValue[2] != zParam.floatValue())
 		{
 
-			p3d->setUndoableVector((float)mouseDownValue[0], (float)mouseDownValue[1], (float)mouseDownValue[2], xParam.floatValue(), yParam.floatValue(), zParam.floatValue());
+			var newValue;
+			newValue.append(xParam.floatValue());
+			newValue.append(yParam.floatValue());
+			newValue.append(zParam.floatValue());
+			p3d->setUndoableValueForSelected(mouseDownValue, newValue);
 		}
+		else p3d->clearMultiEditState();
 	}
 }
 
@@ -245,8 +250,12 @@ void TripleSliderUI::newMessage(const Parameter::ParameterEvent& e)
 		{
 			if (xParam.floatValue() != p3d->x || yParam.floatValue() != p3d->y || zParam.floatValue() != p3d->z)
 			{
-				if (!isMouseButtonDown(true) && !UndoMaster::getInstance()->isPerformingUndoRedo()) p3d->setUndoableVector(p3d->x, p3d->y, p3d->z, xParam.floatValue(), yParam.floatValue(), zParam.floatValue());
-				else p3d->setVector(xParam.floatValue(), yParam.floatValue(), zParam.floatValue());
+				var newValue;
+				newValue.append(xParam.floatValue());
+				newValue.append(yParam.floatValue());
+				newValue.append(zParam.floatValue());
+				if (!isMouseButtonDown(true) && !UndoMaster::getInstance()->isPerformingUndoRedo()) p3d->setUndoableValueForSelected(p3d->getValue(), newValue);
+				else p3d->setValueForSelected(newValue);
 			}
 		}
 	}

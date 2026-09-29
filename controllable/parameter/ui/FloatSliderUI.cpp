@@ -159,7 +159,7 @@ void FloatSliderUI::mouseDownInternal(const MouseEvent& e)
 	{
 		if (e.mods.isCommandDown())
 		{
-			parameter->setValue(parameter->defaultValue, false, true, true);
+			parameter->resetValueUndoableForSelected();
 
 		}
 		else
@@ -304,12 +304,12 @@ void FloatSliderUI::drawRotary(Graphics& g, Colour c, float startPos, float endP
 
 void FloatSliderUI::setParamNormalizedValueUndoable(float oldValue, float newValue)
 {
-	parameter->setUndoableNormalizedValue(oldValue, newValue);
+	parameter->setUndoableNormalizedValueForSelected(oldValue, newValue);
 }
 
 void FloatSliderUI::setParamNormalizedValue(float value)
 {
-	parameter->setNormalizedValue(value);
+	parameter->setNormalizedValueForSelected(value);
 }
 
 float FloatSliderUI::getParamNormalizedValue()

@@ -35,12 +35,12 @@ void P2DUI::mouseDrag(const MouseEvent& e)
 	val.append((float)mouseDownNormalizedValue[0] + dx);
 	val.append((float)mouseDownNormalizedValue[1] + dy);
 
-	p2d->setNormalizedValue(val);
+	p2d->setNormalizedValueForSelected(val);
 }
 
 void P2DUI::mouseUpInternal(const MouseEvent&)
 {
-	p2d->setUndoableValue(mouseDownValue, p2d->value);
+	p2d->setUndoableValueForSelected(mouseDownValue, p2d->value);
 	mouseDownValue = var();
 	mouseDownNormalizedValue = var();
 	setMouseCursor(MouseCursor::NormalCursor);
@@ -189,7 +189,10 @@ void P2DUI::showEditWindowInternal()
 			{
 				float newVals[2];
 				for (int i = 0; i < 2; ++i) newVals[i] = nameWindow->getTextEditorContents("val" + String(i)).getFloatValue();
-				p2d->setUndoablePoint(p2d->x, p2d->y, newVals[0], newVals[1]);
+				var newValue;
+				newValue.append(newVals[0]);
+				newValue.append(newVals[1]);
+				p2d->setUndoableValueForSelected(p2d->getValue(), newValue);
 			}
 		}
 	),

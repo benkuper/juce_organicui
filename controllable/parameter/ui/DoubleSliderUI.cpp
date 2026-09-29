@@ -88,7 +88,14 @@ void DoubleSliderUI::mouseUpInternal(const MouseEvent&)
 {
 	if (setUndoableValueOnMouseUp)
 	{
-		if ((float)mouseDownValue[0] != xParam.floatValue() || (float)mouseDownValue[1] != yParam.floatValue()) p2d->setUndoablePoint((float)mouseDownValue[0], (float)mouseDownValue[1], xParam.floatValue(), yParam.floatValue());
+		if ((float)mouseDownValue[0] != xParam.floatValue() || (float)mouseDownValue[1] != yParam.floatValue())
+		{
+			var newValue;
+			newValue.append(xParam.floatValue());
+			newValue.append(yParam.floatValue());
+			p2d->setUndoableValueForSelected(mouseDownValue, newValue);
+		}
+		else p2d->clearMultiEditState();
 	}
 }
 
@@ -281,8 +288,11 @@ void DoubleSliderUI::newMessage(const Parameter::ParameterEvent& e)
 		{
 			if (xParam.floatValue() != p2d->x || yParam.floatValue() != p2d->y)
 			{
-				if (!isMouseButtonDown(true) && !UndoMaster::getInstance()->isPerformingUndoRedo()) p2d->setUndoablePoint(p2d->x, p2d->y, xParam.floatValue(), yParam.floatValue());
-				else p2d->setPoint(xParam.floatValue(), yParam.floatValue());
+				var newValue;
+				newValue.append(xParam.floatValue());
+				newValue.append(yParam.floatValue());
+				if (!isMouseButtonDown(true) && !UndoMaster::getInstance()->isPerformingUndoRedo()) p2d->setUndoableValueForSelected(p2d->getValue(), newValue);
+				else p2d->setValueForSelected(newValue);
 			}
 		}
 	}

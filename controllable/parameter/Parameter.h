@@ -46,6 +46,8 @@ public:
 	juce::var defaultValue;
 	juce::var value;
 	juce::var lastValue;
+	juce::var multiEditStartValue;
+	bool hasMultiEditStartValue;
 
 	juce::SpinLock valueSetLock;
 
@@ -114,11 +116,20 @@ public:
 	virtual void setValue(juce::var _value, bool silentSet = false, bool force = false, bool forceOverride = true);
 	virtual void setValueInternal(juce::var& _value);
 
+	juce::Array<Parameter*> getRelatedSelectedParameters();
+	void beginMultiEdit();
+	void clearMultiEditState();
+	void setValueForSelected(juce::var newValue, bool silentSet = false, bool force = false, bool forceOverride = true);
+	void setUndoableValueForSelected(juce::var oldValue, juce::var newValue);
+	void resetValueUndoableForSelected();
+
 	virtual bool checkValueIsTheSame(juce::var newValue, juce::var oldValue); //can be overriden to modify check behavior
 
 	//For Number type parameters
 	void setUndoableNormalizedValue(const juce::var& oldNormalizedValue, const juce::var& newNormalizedValue);
 	void setNormalizedValue(const juce::var& normalizedValue, bool silentSet = false, bool force = false);
+	void setUndoableNormalizedValueForSelected(const juce::var& oldNormalizedValue, const juce::var& newNormalizedValue);
+	void setNormalizedValueForSelected(const juce::var& normalizedValue, bool silentSet = false, bool force = false);
 	juce::var getNormalizedValue() const;
 
 	virtual bool setAttributeInternal(juce::String param, juce::var value) override;

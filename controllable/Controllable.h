@@ -83,6 +83,8 @@ public:
 		return dynamic_cast<T*>(parentContainer.get());
 	}
 	void updateControlAddress();
+	ControllableContainer* getSelectedParentInHierarchy();
+	juce::Array<Controllable*> getRelatedSelectedControllables();
 
 	void remove(bool addToUndo = false); // called from external to make this object ask for remove
 
