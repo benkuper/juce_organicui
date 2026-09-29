@@ -25,6 +25,7 @@
 #define ACTION_COLOR     juce::Colours::cadetblue
 #define MAPPING_COLOR    juce::Colour(0xff7C343B)
 #define AUDIO_COLOR		 juce::Colours::green
+#define VIDEO_COLOR		 juce::Colours::orange
 
 
 #define YELLOW_COLOR juce::Colours::yellow
