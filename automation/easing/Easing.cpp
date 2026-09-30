@@ -8,6 +8,8 @@
   ==============================================================================
 */
 
+#include "EasingMath.h"
+
 #ifndef ORGANICUI_CUBIC_EASING_USE_REALTIME
 #define ORGANICUI_CUBIC_EASING_USE_REALTIME 1 // Set to 0 to use the lookup table.
 #endif
@@ -25,6 +27,12 @@ Easing::Easing(Type type) :
 Easing::~Easing()
 {
 	masterReference.clear();
+}
+
+double Easing::getPreciseValue(double weight, double, double, double)
+{
+	// Preserve compatibility for easing implementations outside this module.
+	return getValue(static_cast<float>(weight));
 }
 
 void Easing::updateKeys(const Point<float>& _start, const Point<float>& _end, bool stretch)
@@ -80,6 +88,11 @@ float LinearEasing::getValue(const float& weight)
 	return jmap(weight, start.y, end.y);
 }
 
+double LinearEasing::getPreciseValue(double weight, double from, double to, double)
+{
+	return EasingMath::linear(from, to, weight);
+}
+
 juce::Rectangle<float> LinearEasing::getBounds(bool includeHandles)
 {
 	return 	juce::Rectangle<float>(Point<float>(jmin(start.x, end.x), jmin(start.y, end.y)), Point<float>(jmax(start.x, end.x), jmax(start.y, end.y)));
@@ -90,6 +103,11 @@ float HoldEasing::getValue(const float& weight)
 {
 	if (weight < 1) return  start.y;
 	return end.y;
+}
+
+double HoldEasing::getPreciseValue(double weight, double from, double to, double)
+{
+	return weight < 1.0 ? from : to;
 }
 
 juce::Rectangle<float> HoldEasing::getBounds(bool includeHandles)
@@ -167,6 +185,19 @@ float CubicEasing::getValue(const float& weight)
 #endif
 }
 
+double CubicEasing::getPreciseValue(double weight, double from, double to, double)
+{
+	if (weight <= 0.0) return from;
+	if (weight >= 1.0) return to;
+	const CubicCoefficients c = getCoefficients();
+	const double t = solveBezierParameterForX(weight, c);
+	const double oneMinusT = 1.0 - t;
+	return oneMinusT * oneMinusT * oneMinusT * from
+		+ 3.0 * oneMinusT * oneMinusT * t * (from + c.anchorOffsetY1)
+		+ 3.0 * oneMinusT * t * t * (to + c.anchorOffsetY2)
+		+ t * t * t * to;
+}
+
 Point<float> CubicEasing::getRawValue(const float& weight)
 {
 	Bezier::Point p = bezier.valueAt(weight);
@@ -220,6 +251,8 @@ void CubicEasing::updateBezier()
 	nextCoefficients.yC = 3.0 * (a1.y - start.y);
 	nextCoefficients.yB = 3.0 * (a2.y - a1.y) - nextCoefficients.yC;
 	nextCoefficients.yA = end.y - nextCoefficients.yD - nextCoefficients.yC - nextCoefficients.yB;
+	nextCoefficients.anchorOffsetY1 = anchor1->y;
+	nextCoefficients.anchorOffsetY2 = anchor2->y;
 
 	{
 		const SpinLock::ScopedLockType lock(coefficientsLock);
@@ -342,7 +375,12 @@ void SineEasing::updateKeysInternal(bool stretch)
 
 float SineEasing::getValue(const float& weight)
 {
-	return  start.y + (end.y - start.y) * weight + sinf(weight * length * MathConstants<float>::pi * 2 / freqAmp->x) * freqAmp->y;
+	return static_cast<float>(EasingMath::sine(weight, start.y, end.y, length, freqAmp->x, freqAmp->y));
+}
+
+double SineEasing::getPreciseValue(double weight, double from, double to, double duration)
+{
+	return EasingMath::sine(weight, from, to, duration, freqAmp->x, freqAmp->y);
 }
 
 juce::Rectangle<float> SineEasing::getBounds(bool includeHandles)
@@ -380,9 +418,12 @@ void ElasticEasing::updateKeysInternal(bool stretch)
 
 float ElasticEasing::getValue(const float& weight)
 {
-	const float c4 = jmap<float>(param->x / length, 10, 0);
-	float p = pow(2, -10 * weight) * sin((weight * 10 - 0.75) * c4) + 1;
-	return jmap<float>(p, start.y, end.y);
+	return static_cast<float>(EasingMath::elastic(weight, start.y, end.y, length, param->x));
+}
+
+double ElasticEasing::getPreciseValue(double weight, double from, double to, double duration)
+{
+	return EasingMath::elastic(weight, from, to, duration, param->x);
 }
 
 juce::Rectangle<float> ElasticEasing::getBounds(bool includeHandles)
@@ -404,26 +445,12 @@ BounceEasing::BounceEasing() :
 
 float BounceEasing::getValue(const float& weight)
 {
-	const float d1 = 7.5625f;
-	const float n1 = 2.75f;
+	return jmap<float>(EasingMath::bounceOut(weight), start.y, end.y);
+}
 
-	float p = 0;
-	float x = weight;
-
-	if (x < 1 / n1) {
-		p = d1 * x * x;
-	}
-	else if (x < 2 / n1) {
-		p = d1 * (x - 1.5 / n1) * x + 0.75;
-	}
-	else if (x < 2.5 / n1) {
-		p = d1 * (x - 2.25 / n1) * x + 0.9375;
-	}
-	else {
-		p = d1 * (x - 2.625 / n1) * x + 0.984375;
-	}
-
-	return jmap<float>(p, start.y, end.y);
+double BounceEasing::getPreciseValue(double weight, double from, double to, double)
+{
+	return EasingMath::linear(from, to, EasingMath::bounceOut(weight));
 }
 
 juce::Rectangle<float> BounceEasing::getBounds(bool includeHandles)
@@ -470,6 +497,15 @@ float StepEasing::getValue(const float& weight)
 
 	int curStep = floor(weight * numSteps);
 	return jmap<float>(curStep, 0, numSteps, start.y, end.y);
+}
+
+double StepEasing::getPreciseValue(double weight, double from, double to, double duration)
+{
+	if (param->x <= 0.0f || duration <= 0.0 || from == to) return from;
+	const int numSteps = static_cast<int>(std::ceil(duration / param->x));
+	if (numSteps <= 0) return from;
+	const int currentStep = static_cast<int>(std::floor(weight * numSteps));
+	return EasingMath::linear(from, to, static_cast<double>(currentStep) / numSteps);
 }
 
 juce::Rectangle<float> StepEasing::getBounds(bool includeHandles)
@@ -538,6 +574,27 @@ float NoiseEasing::getValue(const float& weight)
 
 	float baseVal = start.y + (end.y - start.y) * weight;
 	return baseVal + (n - .5f) * 2 * amplitude;
+}
+
+double NoiseEasing::getPreciseValue(double weight, double from, double to, double duration)
+{
+	if (duration <= 0.0) return from;
+	const double n = r.nextFloat();
+	const double t1 = taper1->x / duration;
+	const double t2Diff = -taper2->x / duration;
+	const double t2 = 1.0 - t2Diff;
+	double amplitude = taper1->y;
+	if (weight < t1 && t1 > 0.0)
+	{
+		const double w = weight / t1;
+		amplitude *= (1.0 - std::cos(MathConstants<double>::pi * w)) * 0.5;
+	}
+	if (weight > t2 && t2Diff > 0.0)
+	{
+		const double w = (weight - t2) / t2Diff;
+		amplitude *= (1.0 + std::cos(MathConstants<double>::pi * w)) * 0.5;
+	}
+	return EasingMath::linear(from, to, weight) + (n - 0.5) * 2.0 * amplitude;
 }
 
 juce::Rectangle<float> NoiseEasing::getBounds(bool includeHandles)
@@ -611,6 +668,28 @@ float PerlinEasing::getValue(const float& weight)
 
 	float baseVal = start.y + (end.y - start.y) * weight;
 	return baseVal + (n - .5f) * 2 * amplitude;
+}
+
+double PerlinEasing::getPreciseValue(double weight, double from, double to, double duration)
+{
+	if (duration <= 0.0) return from;
+	const double n = perlin.octaveNoise0_1(weight * duration, offset->doubleValue(),
+		1 + static_cast<int32_t>(std::abs(taper2->y) * 10.0));
+	const double t1 = taper1->x / duration;
+	const double t2Diff = -taper2->x / duration;
+	const double t2 = 1.0 - t2Diff;
+	double amplitude = taper1->y;
+	if (weight < t1 && t1 > 0.0)
+	{
+		const double w = weight / t1;
+		amplitude *= (1.0 - std::cos(MathConstants<double>::pi * w)) * 0.5;
+	}
+	if (weight > t2 && t2Diff > 0.0)
+	{
+		const double w = (weight - t2) / t2Diff;
+		amplitude *= (1.0 + std::cos(MathConstants<double>::pi * w)) * 0.5;
+	}
+	return EasingMath::linear(from, to, weight) + (n - 0.5) * 2.0 * amplitude;
 }
 
 juce::Rectangle<float> PerlinEasing::getBounds(bool includeHandles)
