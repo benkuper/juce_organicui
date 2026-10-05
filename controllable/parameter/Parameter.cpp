@@ -179,7 +179,8 @@ UndoableAction* Parameter::resetValueUndoable(bool onlyReturnAction)
 	if (onlyReturnAction) return action;
 
 	UndoMaster::getInstance()->performAction("Reset " + niceName + " value", action);
-	return action;
+	// Ownership transferred to UndoMaster.
+	return nullptr;
 }
 
 UndoableAction* Parameter::setUndoableValue(var oldValue, var newValue, bool onlyReturnAction)
@@ -195,7 +196,8 @@ UndoableAction* Parameter::setUndoableValue(var oldValue, var newValue, bool onl
 	if (onlyReturnAction) return a;
 
 	UndoMaster::getInstance()->performAction("Set " + niceName + " value", a);
-	return a;
+	// Ownership transferred to UndoMaster.
+	return nullptr;
 }
 
 void Parameter::setValue(var _value, bool silentSet, bool force, bool forceOverride)
@@ -928,8 +930,10 @@ bool Parameter::ParameterSetValueAction::perform()
 	Parameter* p = getParameter();
 	if (p == nullptr)
 	{
-		LOGWARNING("Undo set value : parameter not found " << controlAddress);
-		return false;
+		// Returning false makes JUCE wipe the whole undo history; treat a missing
+		// target as a successful no-op so Ctrl+Z cannot heap-corrupt on stale actions.
+		LOGWARNING(\"Undo set value : parameter not found \" << controlAddress);
+		return true;
 	}
 
 	p->setValue(newValue);
@@ -942,7 +946,7 @@ bool Parameter::ParameterSetValueAction::undo()
 	if (p == nullptr)
 	{
 		LOGWARNING("Undo set value : parameter not found " << controlAddress);
-		return false;
+		return true;
 	}
 
 	p->setValue(oldValue);
@@ -955,7 +959,7 @@ bool Parameter::ParameterResetValueAction::perform()
 	if (p == nullptr)
 	{
 		LOGWARNING("Undo reset value : parameter not found " << controlAddress);
-		return false;
+		return true;
 	}
 
 	p->resetValue();
@@ -968,7 +972,7 @@ bool Parameter::ParameterResetValueAction::undo()
 	if (p == nullptr)
 	{
 		LOGWARNING("Undo reset value : parameter not found " << controlAddress);
-		return false;
+		return true;
 	}
 
 	p->isOverriden = false;
