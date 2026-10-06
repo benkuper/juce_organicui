@@ -1258,5 +1258,7 @@ void OSCRemoteControl::sendManualFeedbackForControllable(Controllable* c)
 
 void OSCRemoteControl::fileLoaded()
 {
+#if ORGANICUI_USE_WEBSERVER
 	sendPathChangedFeedback("/");
+#endif
 }
