@@ -19,9 +19,25 @@ UndoMaster::~UndoMaster()
 {
 }
 
+void UndoMaster::clearUndoHistory()
+{
+	if (isClearingHistory) return;
+
+	isClearingHistory = true;
+	UndoManager::clearUndoHistory();
+	isClearingHistory = false;
+}
+
 void UndoMaster::performAction(const String & name, UndoableAction * action)
 {
-	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile) return;
+	if (action == nullptr) return;
+
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile)
+	{
+		delete action;
+		return;
+	}
+
 	isPerforming = true;
 	beginNewTransaction(name);
 	perform(action,name);
@@ -31,7 +47,14 @@ void UndoMaster::performAction(const String & name, UndoableAction * action)
 
 void UndoMaster::performActions(const String & name, Array<UndoableAction*> actions)
 {
-	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile) return;
+	if (actions.isEmpty()) return;
+
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile)
+	{
+		for (auto* a : actions) delete a;
+		return;
+	}
+
 	isPerforming = true;
 	beginNewTransaction(name);
 	for (auto &a : actions) perform(a,name);

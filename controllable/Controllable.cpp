@@ -100,10 +100,8 @@ UndoableAction* Controllable::setUndoableNiceName(const String& newNiceName, boo
 	if (onlyReturnAction) return a;
 
 	UndoMaster::getInstance()->performAction("Rename " + niceName, a);
-	return a;
-
-	//if Main Engine loading, just set the value without undo history
-
+	// Ownership transferred to UndoMaster.
+	return nullptr;
 }
 
 void Controllable::setNiceName(const String& _niceName) {
@@ -419,7 +417,8 @@ UndoableAction* Controllable::setUndoableAttribute(const String& param, var valu
 	if (onlyReturnAction) return action;
 
 	UndoMaster::getInstance()->performAction("Set " + niceName + " " + param, action);
-	return action;
+	// Ownership transferred to UndoMaster.
+	return nullptr;
 }
 
 bool Controllable::setAttributeInternal(String param, var value)
@@ -473,7 +472,8 @@ StringArray Controllable::getValidAttributes() const
 bool Controllable::ControllableSetAttributeAction::perform()
 {
 	Controllable* c = getControllable();
-	if (c == nullptr) return false;
+	// Missing target: no-op success. false would clear the entire undo history.
+	if (c == nullptr) return true;
 	c->setAttribute(attribute, newValue);
 	return true;
 }
@@ -481,7 +481,7 @@ bool Controllable::ControllableSetAttributeAction::perform()
 bool Controllable::ControllableSetAttributeAction::undo()
 {
 	Controllable* c = getControllable();
-	if (c == nullptr) return false;
+	if (c == nullptr) return true;
 	c->setAttribute(attribute, oldValue);
 	return true;
 }
@@ -764,7 +764,9 @@ bool Controllable::ControllableChangeNameAction::perform()
 		c->setNiceName(newName);
 		return true;
 	}
-	return false;
+
+	// Missing target: no-op success. false would clear the entire undo history.
+	return true;
 }
 
 bool Controllable::ControllableChangeNameAction::undo()
@@ -775,5 +777,6 @@ bool Controllable::ControllableChangeNameAction::undo()
 		c->setNiceName(oldName);
 		return true;
 	}
-	return false;
+
+	return true;
 }
