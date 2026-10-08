@@ -149,16 +149,19 @@ void TripleSliderUI::showEditWindowInternal()
 	nameWindow->addButton("OK", 1, KeyPress(KeyPress::returnKey));
 	nameWindow->addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
 
-	Point3DParameter* param = p3d;
+	WeakReference<ParameterUI> ui(this);
+	WeakReference<Parameter> param(p3d);
 
-	nameWindow->enterModalState(true, ModalCallbackFunction::create([param, nameWindow](int result)
+	nameWindow->enterModalState(true, ModalCallbackFunction::create([param, ui, nameWindow](int result)
 		{
 
-			if (result)
+			if (result && param != nullptr && ui != nullptr)
 			{
 				float newVals[3];
 				for (int i = 0; i < 3; ++i) newVals[i] = nameWindow->getTextEditorContents("val" + String(i)).getFloatValue();
-				param->setUndoableVector(param->x, param->y, param->z, newVals[0], newVals[1], newVals[2]);
+				var value;
+				for (float v : newVals) value.append(v);
+				param->setUndoableValueForSelected(param->getValue(), ui->cropUIValue(value));
 			}
 		}
 	), true);
@@ -207,6 +210,12 @@ void TripleSliderUI::rangeChanged(Parameter* p)
 	xParam.setRange(parameter->minimumValue[0], parameter->maximumValue[0]);
 	yParam.setRange(parameter->minimumValue[1], parameter->maximumValue[1]);
 	zParam.setRange(parameter->minimumValue[2], parameter->maximumValue[2]);
+	Array<ParameterUI*> sliders{ xSlider.get(), ySlider.get(), zSlider.get() };
+	for (int axis = 0; axis < sliders.size(); ++axis)
+	{
+		if (useCustomRange) sliders[axis]->setCustomRange(customMinimumValue[axis], customMaximumValue[axis]);
+		else sliders[axis]->clearCustomRange();
+	}
 	isUpdatingFromParam = false;
 }
 

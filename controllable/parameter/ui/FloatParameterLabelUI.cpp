@@ -63,9 +63,9 @@ void FloatParameterLabelUI::updateValueFromLabel()
 {
 	String s = valueLabel.getText().replace(",", ".");
 	double v = ParameterUI::textToValue(s);
-	parameter->setUndoableValueForSelected(parameter->getValue(), v);
+	parameter->setUndoableValueForSelected(parameter->getValue(), cropUIValue(v));
 
-	valueLabel.setText(getValueString(v), dontSendNotification);
+	valueLabel.setText(getValueString(parameter->getValue()), dontSendNotification);
 }
 
 void FloatParameterLabelUI::updateTooltip()
@@ -122,7 +122,7 @@ void FloatParameterLabelUI::mouseDrag(const MouseEvent& e)
 	valueOffsetSinceMouseDown += (e.getPosition().x - lastMouseX) * sensitivity / pixelsPerUnit;
 	lastMouseX = e.getPosition().x;
 
-	parameter->setValueForSelected(valueAtMouseDown + valueOffsetSinceMouseDown);
+	parameter->setValueForSelected(cropUIValue(valueAtMouseDown + valueOffsetSinceMouseDown));
 }
 
 void FloatParameterLabelUI::mouseUpInternal(const MouseEvent& e)
@@ -260,7 +260,7 @@ void TimeLabel::labelTextChanged(Label*)
 	s = s.substring(prefix.length(), s.length() - suffix.length());
 
 	const var newValue = showStepsMode ? s.getDoubleValue() / ((FloatParameter*)parameter.get())->unitSteps : StringUtil::timeStringToValue(s);
-	parameter->setUndoableValueForSelected(parameter->getValue(), newValue);
+	parameter->setUndoableValueForSelected(parameter->getValue(), cropUIValue(newValue));
 	shouldRepaint = true;
 }
 

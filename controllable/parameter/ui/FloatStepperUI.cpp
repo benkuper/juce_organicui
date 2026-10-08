@@ -116,7 +116,7 @@ void FloatStepperUI::valueChanged(const var& value)
 void FloatStepperUI::sliderValueChanged(Slider* _slider)
 {
 	if (parameter.wasObjectDeleted()) return;
-	parameter->setValueForSelected(slider->getValue());
+	parameter->setValueForSelected(cropUIValue(slider->getValue()));
 }
 
 void FloatStepperUI::sliderDragStarted(Slider* _slider)
@@ -133,7 +133,11 @@ void FloatStepperUI::sliderDragEnded(Slider* _slider)
 }
 
 void FloatStepperUI::rangeChanged(Parameter*) {
-	slider->setRange((int)parameter->minimumValue, (int)parameter->maximumValue, 1);
+	double minimum = getUIMinimumValue();
+	double maximum = getUIMaximumValue();
+	// JUCE sliders require a non-empty range; editing remains clamped to the bound.
+	slider->setRange(minimum, maximum > minimum ? maximum : minimum + 1, 1);
+	slider->setValue(parameter->doubleValue(), dontSendNotification);
 }
 
 void FloatStepperUI::handlePaintTimerInternal()

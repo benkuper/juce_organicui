@@ -18,7 +18,7 @@ void IntParameterLabelUI::labelTextChanged(Label*)
 {
 	//String  originalString = valueLabel.getText().substring(prefix.length(), valueLabel.getText().length() - suffix.length());
 	const var newValue = intParam->hexMode ? valueLabel.getText().getHexValue32() : (int)(valueLabel.getText().getFloatValue());
-	parameter->setUndoableValueForSelected(parameter->getValue(), newValue);
+	parameter->setUndoableValueForSelected(parameter->getValue(), cropUIValue(newValue));
 }
 
 void IntParameterLabelUI::valueChanged(const var& v)

@@ -56,6 +56,77 @@ ParameterUI::~ParameterUI()
 	masterReference.clear();
 }
 
+void ParameterUI::setCustomRange(var minimum, var maximum)
+{
+	useCustomRange = true;
+	customMinimumValue = minimum.clone();
+	customMaximumValue = maximum.clone();
+	rangeChanged(parameter);
+	shouldRepaint = true;
+}
+
+void ParameterUI::clearCustomRange()
+{
+	if (!useCustomRange) return;
+	useCustomRange = false;
+	customMinimumValue = var();
+	customMaximumValue = var();
+	rangeChanged(parameter);
+	shouldRepaint = true;
+}
+
+var ParameterUI::getUIMinimumValue() const
+{
+	return useCustomRange ? customMinimumValue : parameter->minimumValue;
+}
+
+var ParameterUI::getUIMaximumValue() const
+{
+	return useCustomRange ? customMaximumValue : parameter->maximumValue;
+}
+
+var ParameterUI::getUINormalizedValue() const
+{
+	if (!useCustomRange) return parameter->getNormalizedValue();
+	var result;
+	int dimensions = parameter->isComplex() ? parameter->value.size() : 1;
+	for (int axis = 0; axis < dimensions; ++axis)
+	{
+		double low = dimensions == 1 ? (double)customMinimumValue : (double)customMinimumValue[axis];
+		double high = dimensions == 1 ? (double)customMaximumValue : (double)customMaximumValue[axis];
+		double value = dimensions == 1 ? parameter->doubleValue() : (double)parameter->value[axis];
+		result.append(high == low ? 0.0 : jlimit(0.0, 1.0, (value - low) / (high - low)));
+	}
+	return dimensions == 1 ? result[0] : result;
+}
+
+var ParameterUI::getUIValueFromNormalized(var normalized) const
+{
+	var minimum = getUIMinimumValue();
+	var maximum = getUIMaximumValue();
+	var result;
+	int dimensions = parameter->isComplex() ? parameter->value.size() : 1;
+	for (int axis = 0; axis < dimensions; ++axis)
+	{
+		double low = dimensions == 1 ? (double)minimum : (double)minimum[axis];
+		double high = dimensions == 1 ? (double)maximum : (double)maximum[axis];
+		double fraction = dimensions == 1 ? (double)normalized : (double)normalized[axis];
+		if (useCustomRange) fraction = jlimit(0.0, 1.0, fraction);
+		result.append(low + fraction * (high - low));
+	}
+	return dimensions == 1 ? result[0] : result;
+}
+
+var ParameterUI::cropUIValue(var value) const
+{
+	if (!useCustomRange) return value;
+	if (!parameter->isComplex()) return jlimit((double)customMinimumValue, (double)customMaximumValue, (double)value);
+	var result;
+	for (int axis = 0; axis < value.size(); ++axis)
+		result.append(jlimit((double)customMinimumValue[axis], (double)customMaximumValue[axis], (double)value[axis]));
+	return result;
+}
+
 void ParameterUI::showEditWindowInternal()
 {
 	//if (parameter->isControllableFeedbackOnly) return;
@@ -67,7 +138,7 @@ void ParameterUI::showEditWindowInternal()
 
 Component* ParameterUI::getEditValueComponent()
 {
-	return new ValueEditCalloutComponent(parameter);
+	return new ValueEditCalloutComponent(parameter, this);
 }
 
 void ParameterUI::showEditRangeWindow()
@@ -443,8 +514,8 @@ void ParameterUI::newMessage(const Parameter::ParameterEvent& e) {
 	}
 }
 
-ParameterUI::ValueEditCalloutComponent::ValueEditCalloutComponent(WeakReference<Parameter> p) :
-	p(p)
+ParameterUI::ValueEditCalloutComponent::ValueEditCalloutComponent(WeakReference<Parameter> p, ParameterUI* ui) :
+	p(p), ui(ui)
 {
 	if (p.wasObjectDeleted()) return;
 
@@ -506,7 +577,8 @@ void ParameterUI::ValueEditCalloutComponent::labelTextChanged(Label* l)
 			else newVal.append(ParameterUI::textToValue(labels[i]->getText().replace(",", ".")));
 		}
 
-		p->setUndoableValueForSelected(oldVal, p->isComplex() ? newVal : newVal[0]);
+		var value = p->isComplex() ? newVal : newVal[0];
+		p->setUndoableValueForSelected(oldVal, ui != nullptr ? ui->cropUIValue(value) : value);
 	}
 	else
 	{

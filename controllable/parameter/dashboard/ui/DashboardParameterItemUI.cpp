@@ -19,6 +19,11 @@ ControllableUI* DashboardParameterItemUI::createControllableUI()
 
 	int s = (int)parameterItem->style->getValueData();
 	Parameter* parameter = parameterItem->parameter.get();
+	if (s == -1 && parameter->type == Controllable::FLOAT && parameterItem->hasCustomRange())
+	{
+		auto* fp = static_cast<FloatParameter*>(parameter);
+		if (fp->defaultUI == FloatParameter::NONE && fp->customUI == FloatParameter::NONE) return fp->createSlider();
+	}
 
 	switch (parameter->type)
 	{
@@ -147,6 +152,8 @@ void DashboardParameterItemUI::updateUIParametersInternal()
 
 	if (ParameterUI* pui = dynamic_cast<ParameterUI*>(itemUI.get()))
 	{
+		if (parameterItem->hasCustomRange()) pui->setCustomRange(parameterItem->getRangeBound(false), parameterItem->getRangeBound(true));
+		else pui->clearCustomRange();
 		pui->showValue = parameterItem->showValue->boolValue();
 
 		if (parameterItem->bgColor != nullptr)
@@ -185,8 +192,15 @@ void DashboardParameterItemUI::updateUIParametersInternal()
 void DashboardParameterItemUI::controllableFeedbackUpdateInternal(Controllable* c)
 {
 	DashboardControllableItemUI::controllableFeedbackUpdateInternal(c);
+	if (c == parameterItem->useCustomRange)
+	{
+		rebuildUI();
+		return;
+	}
 
-	if (c == parameterItem->showValue || c == parameterItem->bgColor || c == parameterItem->fgColor) updateUIParameters();
+	if (c == parameterItem->showValue || c == parameterItem->bgColor || c == parameterItem->fgColor
+		|| c == parameterItem->useCustomRange || c == parameterItem->customRange
+		|| c == parameterItem->customRangeY || c == parameterItem->customRangeZ) updateUIParameters();
 	else if (c == parameterItem->btImage || c == parameterItem->style) rebuildUI();
 	else if (DashboardTargetParameterItem* tpItem = dynamic_cast<DashboardTargetParameterItem*>(parameterItem))
 	{
@@ -198,7 +212,9 @@ void DashboardParameterItemUI::controllableStateUpdateInternal(Controllable* c)
 {
 	DashboardControllableItemUI::controllableStateUpdateInternal(c);
 
-	if (c == parameterItem->showValue || c == parameterItem->bgColor || c == parameterItem->fgColor) updateUIParameters();
+	if (c == parameterItem->showValue || c == parameterItem->bgColor || c == parameterItem->fgColor
+		|| c == parameterItem->useCustomRange || c == parameterItem->customRange
+		|| c == parameterItem->customRangeY || c == parameterItem->customRangeZ) updateUIParameters();
 	else if (c == parameterItem->btImage || c == parameterItem->style) rebuildUI();
 	else if (DashboardTargetParameterItem* tpItem = dynamic_cast<DashboardTargetParameterItem*>(parameterItem))
 	{
