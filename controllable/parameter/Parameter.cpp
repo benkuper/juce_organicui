@@ -602,7 +602,7 @@ void Parameter::notifyValueChanged() {
 				auto* p = safeThis.get();
 				if (p == nullptr || p->isBeingDestroyed) return;
 
-				p->parameterListeners.call(&ParameterListener::parameterValueChanged, p);
+				p->parameterListeners.call(&ParameterListener::parameterValueChangedWithValue, p, valueCopy);
 
 				auto* pAfterListeners = safeThis.get();
 				if (pAfterListeners == nullptr || pAfterListeners->isBeingDestroyed) return;
@@ -614,9 +614,10 @@ void Parameter::notifyValueChanged() {
 	}
 
 	WeakReference<Parameter> safeThis(this);
-	parameterListeners.call(&ParameterListener::parameterValueChanged, this);
+	const auto valueCopy = getValue();
+	parameterListeners.call(&ParameterListener::parameterValueChangedWithValue, this, valueCopy);
 	if (auto* p = safeThis.get(); p != nullptr && !p->isBeingDestroyed)
-		p->queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::VALUE_CHANGED, p, getValue()));
+		p->queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::VALUE_CHANGED, p, valueCopy));
 	//isNotifyingChange = false;
 }
 

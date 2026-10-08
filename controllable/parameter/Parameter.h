@@ -23,6 +23,9 @@ public:
 	/** Destructor. */
 	virtual ~ParameterListener() {}
 	virtual void parameterValueChanged(Parameter*) {};
+	// The value at notification time, which may differ from the current value
+	// when a worker-thread change is delivered on the message thread.
+	virtual void parameterValueChangedWithValue(Parameter* p, const juce::var&) { parameterValueChanged(p); }
 	virtual void parameterRangeChanged(Parameter*) {};
 	virtual void parameterControlModeChanged(Parameter*) {}
 };
