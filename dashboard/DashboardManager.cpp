@@ -23,6 +23,8 @@ DashboardManager::DashboardManager() :
 
 	editMode = addBoolParameter("Edit Mode", "If checked, items are editable. If not, items are normally usable", true);
 	snapping = addBoolParameter("Snapping", "If checked, items are automatically aligned when dragging them closed to other ones", true);
+	connectedClients = addIntParameter("Connected Clients", "Number of clients connected to the web dashboard", 0);
+	connectedClients->setControllableFeedbackOnly(true);
 
 	tabsBGColor = addColorParameter("Tabs BG Color", "Color for the tabs in the web view", NORMAL_COLOR);
 	tabsLabelColor = addColorParameter("Tabs Label Color", "Color for the tabs in the web view", TEXT_COLOR);
@@ -63,6 +65,7 @@ DashboardManager::~DashboardManager()
 void DashboardManager::setupServer()
 {
 	server.reset();
+	connectedClients->setValue(0);
 
 	if (Engine::mainEngine->isClearing) return;
 
@@ -131,6 +134,7 @@ void DashboardManager::setupServer()
 void DashboardManager::connectionOpened(const String& id)
 {
 	LOG("New browser connection to the Dashboard from " << id);
+	connectedClients->setValue(server->getNumActiveConnections());
 	//if (server == nullptr) return;
 	//String s = JSON::toString(data, true);
 	//server->sendTo(s, id);
@@ -194,6 +198,12 @@ void DashboardManager::messageReceived(const String& id, const String& message)
 void DashboardManager::connectionClosed(const String& id, int status, const String& reason)
 {
 	LOG("Connection to the Dashboard closed by " << id);
+	connectedClients->setValue(server->getNumActiveConnections());
+}
+
+void DashboardManager::connectionError(const String& id, int status, const String& errorMessage)
+{
+	connectedClients->setValue(server->getNumActiveConnections());
 }
 
 var DashboardManager::getServerData()

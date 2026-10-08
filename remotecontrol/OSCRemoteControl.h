@@ -103,6 +103,7 @@ public:
 	void sendOSCQueryStateFeedback(Controllable* c, const juce::String& excludeId = "");
 	void sendOSCQueryFeedback(const juce::OSCMessage& m, juce::StringArray excludes = juce::StringArray());
 	void sendOSCQueryFeedbackTo(const juce::OSCMessage& m, juce::StringArray ids = juce::StringArray());
+	juce::StringArray getOSCQueryFeedbackClientIds(Controllable* c, const juce::String& excludeId = "");
 
 	void sendPathAddedFeedback(const juce::String& path);
 	void sendPathRemovedFeedback(const juce::String& path);

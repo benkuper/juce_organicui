@@ -83,6 +83,8 @@ public:
 		return dynamic_cast<T*>(parentContainer.get());
 	}
 	void updateControlAddress();
+	ControllableContainer* getSelectedParentInHierarchy();
+	juce::Array<Controllable*> getRelatedSelectedControllables();
 
 	void remove(bool addToUndo = false); // called from external to make this object ask for remove
 
@@ -113,6 +115,7 @@ public:
 	virtual juce::String getDefaultDashboardLabel() const;
 
 	virtual void setAttribute(juce::String param, juce::var value);
+	juce::UndoableAction* setUndoableAttribute(const juce::String& param, juce::var value, bool onlyReturnAction = false);
 	virtual bool setAttributeInternal(juce::String param, juce::var value);
 	virtual juce::var getAttribute(juce::String param) const;
 	virtual juce::var getAttributeInternal(juce::String param) const;
@@ -194,6 +197,26 @@ public:
 
 		juce::String oldName;
 		juce::String newName;
+
+		bool perform() override;
+		bool undo() override;
+	};
+
+	class ControllableSetAttributeAction :
+		public ControllableAction
+	{
+	public:
+		ControllableSetAttributeAction(Controllable* c, juce::String attribute, juce::var oldValue, juce::var newValue) :
+			ControllableAction(c),
+			attribute(attribute),
+			oldValue(oldValue),
+			newValue(newValue)
+		{
+		}
+
+		juce::String attribute;
+		juce::var oldValue;
+		juce::var newValue;
 
 		bool perform() override;
 		bool undo() override;

@@ -418,14 +418,22 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info)
 				else
 				{
 					Engine::mainEngine->removeNewerAutosaves();
-					Engine::mainEngine->loadFromUserSpecifiedFileAsync(true,
-																	   [](Result r)
-																	   {
-																		   if (r.failed())
-																		   {
-																			   LOGERROR("Load failed :" + r.getErrorMessage());
-																		   }
-																	   });
+
+					// The save prompt's native modal callback has not fully unwound yet.
+					// Opening another native dialog from here makes some platforms report
+					// an immediate cancellation and leaves JUCE's async FileChooser alive.
+					MessageManager::callAsync([]
+						{
+							if (Engine::mainEngine == nullptr)
+								return;
+
+							Engine::mainEngine->loadFromUserSpecifiedFileAsync(true,
+								[](Result r)
+								{
+									if (r.failed() && r.getErrorMessage() != TRANS("User cancelled"))
+										LOGERROR("Load failed :" + r.getErrorMessage());
+								});
+						});
 				}
 			});
 	}

@@ -31,6 +31,18 @@ public:
 	bool useCustomFGColor;
 	juce::Colour customFGColor;
 
+	// Bounds used by this UI only; the source parameter keeps its own range.
+	bool useCustomRange = false;
+	juce::var customMinimumValue;
+	juce::var customMaximumValue;
+	void setCustomRange(juce::var minimum, juce::var maximum);
+	void clearCustomRange();
+	juce::var getUIMinimumValue() const;
+	juce::var getUIMaximumValue() const;
+	juce::var getUINormalizedValue() const;
+	juce::var getUIValueFromNormalized(juce::var normalized) const;
+	juce::var cropUIValue(juce::var value) const;
+
 	//popupMenuFilters
 	static bool showAlwaysNotifyOption;
 	static bool showControlModeOption;
@@ -45,6 +57,7 @@ public:
 	virtual void showEditRangeWindowInternal();
 
 	void paintOverChildren(juce::Graphics& g) override;
+	bool hasMixedValues() const;
 
 	virtual void handlePaintTimer() override;
 	virtual void handlePaintTimerInternal() override;
@@ -65,10 +78,11 @@ public:
 		public juce::Label::Listener
 	{
 	public:
-		ValueEditCalloutComponent(juce::WeakReference<Parameter> pui);
+		ValueEditCalloutComponent(juce::WeakReference<Parameter> p, ParameterUI* ui = nullptr);
 		~ValueEditCalloutComponent();
 
 		juce::WeakReference<Parameter> p;
+		juce::WeakReference<ParameterUI> ui;
 		juce::OwnedArray<juce::Label> labels;
 
 		void resized() override;

@@ -63,7 +63,7 @@ public:
 	// see EngineFileDocument.cpp
 
 	//  inherited from FileBasedDocument
-	juce::String getDocumentTitle()override;
+	juce::String getDocumentTitle() override;
 	juce::Result loadDocument(const juce::File& file) override;
 	juce::Result loadDocumentNoCheck(const juce::File& file);
 	juce::Result saveDocument(const juce::File& file) override;
@@ -71,6 +71,7 @@ public:
 	juce::Result saveBackupDocument(int index);
 
 	void loadDocumentFromJSON(juce::var data);
+	juce::Result saveDocumentFromJSON(const juce::File& file, const juce::var& data);
 
 	juce::File getLastDocumentOpened() override;
 	void setLastDocumentOpened(const juce::File& file) override;
@@ -110,6 +111,8 @@ public:
 	/// @brief Migrate a file to be compatible for the current version
 	/// @return Whether the migration was completed successfuly
 	virtual bool migrateFileToCurrentVersion(const AppVersion& inVersion, const juce::var& inFileData, juce::var* outFileData) const;
+
+	virtual void migrateThenLoadFileIfUserAgrees(const AppVersion& fileVersion, const juce::var& fileData, ProgressTask* loadingTask);
 
 	juce::int64 loadingStartTime;
 

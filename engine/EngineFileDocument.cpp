@@ -111,10 +111,20 @@ void Engine::loadDocumentAsync(const File& file) {
 
 	clearTasks();
 	taskName = "Loading File";
+	loadingStartTime = Time::currentTimeMillis();
 
 	ProgressTask* clearTask = addTask("clearing");
 	ProgressTask* parseTask = addTask("parsing");
 	ProgressTask* loadTask = addTask("loading");
+	std::unique_ptr<InputStream> is(file.createInputStream());
+
+	if (is == nullptr)
+	{
+		LOGERROR("Could not open file for reading: " << file.getFullPathName());
+		AlertWindow::showMessageBoxAsync(AlertWindow::AlertIconType::WarningIcon, "File read error", "The file could not be opened. Check that it still exists and that you have permission to read it.", "OK");
+		setFile(File());
+		return;
+	}
 
 	clearTask->start();
 	clear();
@@ -123,9 +133,6 @@ void Engine::loadDocumentAsync(const File& file) {
 	//  {
 	//    MessageManagerLock ml;
 	//  }
-	std::unique_ptr<InputStream> is(file.createInputStream());
-
-	loadingStartTime = Time::currentTimeMillis();
 	setFile(file);
 	file.getParentDirectory().setAsCurrentWorkingDirectory();
 
@@ -198,34 +205,8 @@ void Engine::handleAsyncUpdate()
 
 Result Engine::saveDocument(const File& file) {
 
-	bool sameFile = lastFileAbsolutePath == file.getFullPathName();
 	var data = getJSONData();
-
-	if (file.exists()) file.deleteFile();
-	file.create();	// recursively create parents create + empty file, beacause next line will not create parent dirs
-	std::unique_ptr<OutputStream> os(file.createOutputStream());
-	if (os == nullptr)
-	{
-		LOGERROR("Error saving document, please try again");
-		AlertWindow::showMessageBoxAsync(AlertWindow::AlertIconType::WarningIcon, "Session save error", "Damned ! Something went wrong when saving the file, you should definitely try to save it again.", "Gotcha");
-		return Result::fail("Could not save the file : output stream is null");
-	}
-
-	JSON::writeToStream(*os, data, GlobalSettings::getInstance()->compressOnSave->boolValue());
-	os->flush();
-
-	setLastDocumentOpened(file);
-	setChangedFlag(false);
-	file.setAsCurrentWorkingDirectory();
-
-	lastChangeTime = Time::getCurrentTime();
-
-	engineListeners.call(&EngineListener::fileSaved, !sameFile);
-	engineNotifier.addMessage(new EngineEvent(EngineEvent::FILE_SAVED, this));
-
-	lastFileAbsolutePath = getFile().getFullPathName();
-
-	return Result::ok();
+	return saveDocumentFromJSON(file, data);
 }
 
 juce::Result Engine::saveCopy()
@@ -321,6 +302,40 @@ void Engine::loadDocumentFromJSON(var data)
 	setChangedFlag(false);
 }
 
+Result Engine::saveDocumentFromJSON(const juce::File& file, const juce::var& data)
+{
+	bool sameFile = lastFileAbsolutePath == file.getFullPathName();
+
+	if (file.exists())
+	{
+		file.deleteFile();
+	}
+	file.create(); // recursively create parents create + empty file, beacause next line will not create parent dirs
+
+	std::unique_ptr<OutputStream> os(file.createOutputStream());
+	if (os == nullptr)
+	{
+		LOGERROR("Error saving document, please try again");
+		AlertWindow::showMessageBoxAsync(AlertWindow::AlertIconType::WarningIcon, "Session save error", "Damned ! Something went wrong when saving the file, you should definitely try to save it again.", "Gotcha");
+		return Result::fail("Could not save the file : output stream is null");
+	}
+
+	JSON::writeToStream(*os, data, GlobalSettings::getInstance()->compressOnSave->boolValue());
+	os->flush();
+
+	setLastDocumentOpened(file);
+	setChangedFlag(false);
+	file.setAsCurrentWorkingDirectory();
+
+	lastChangeTime = Time::getCurrentTime();
+
+	engineListeners.call(&EngineListener::fileSaved, !sameFile);
+	engineNotifier.addMessage(new EngineEvent(EngineEvent::FILE_SAVED, this));
+
+	lastFileAbsolutePath = getFile().getFullPathName();
+
+	return Result::ok();
+}
 
 File Engine::getLastDocumentOpened() {
 
@@ -526,51 +541,7 @@ void Engine::loadJSONData(var data, ProgressTask* loadingTask)
 	const bool migrationIsPossible = isFileFormatMigrationSupported(fileVersion);
 	if (appVersionIsNewerThanFileVersion && fileVersionRequiresMigration && migrationIsPossible)
 	{
-		AlertWindow::showAsync(
-			MessageBoxOptions()
-				.withIconType(AlertWindow::QuestionIcon)
-				.withTitle("File compatibility check")
-				.withMessage("Your file has been saved with an older version of " + OrganicApplication::getInstance()->getApplicationName() + " (" + versionString + "), some data may be lost if you load it directly. You can choose to update the file online, load it directly or cancel the operation.\nIn any case, your current file will be backed up with \"_backup\" appended to its name.")
-				.withButton("Update")
-				.withButton("Load directly")
-				.withButton("Cancel"),
-				[this, versionString, data, loadingTask](int result)
-				{
-					File f = getFile();
-					if (f.exists())
-					{
-						File backupF = f.getParentDirectory().getNonexistentChildFile(f.getFileNameWithoutExtension() + "_backup", f.getFileExtension(), true);
-						f.copyFileTo(backupF);
-						LOG("Your original file has been copied to " << backupF.getFullPathName());
-					}
-
-					switch (result)
-					{
-					case 1: // update
-					{
-						var migratedFileData;
-						if (migrateFileToCurrentVersion(versionString, data, &migratedFileData))
-						{
-							// continue loading with new data
-							loadJSONDataEngine(migratedFileData, loadingTask);
-						}
-						else 
-						{
-							setFile(File());
-						}
-
-						break;
-					}
-					case 2: // load directly
-					{
-						// do nothing
-						loadJSONDataEngine(data, loadingTask);
-						break;
-					}
-					}
-				}
-		);
-
+		migrateThenLoadFileIfUserAgrees(fileVersion, data, loadingTask);
 		return;
 	}
 
@@ -607,6 +578,54 @@ bool Engine::migrateFileToCurrentVersion(const AppVersion& inFileVersion, const 
 	}
 
 	return true;
+}
+
+void Engine::migrateThenLoadFileIfUserAgrees(const AppVersion& fileVersion, const var& fileData, ProgressTask* loadingTask)
+{
+	AlertWindow::showAsync(MessageBoxOptions()
+		.withIconType(AlertWindow::QuestionIcon)
+		.withTitle("File compatibility check")
+		.withMessage("Your file has been saved with an older version of " + OrganicApplication::getInstance()->getApplicationName() + " (" + fileVersion.toString() + "), some data may be lost if you load it directly. You can choose to update the file online, load it directly or cancel the operation.\nIn any case, your current file will be backed up with \"_backup\" appended to its name.")
+		.withButton("Update")
+		.withButton("Load directly")
+		.withButton("Cancel"),
+		[this, fileVersion, fileData, loadingTask](int result)
+		{
+			File f = getFile();
+			if (f.exists())
+			{
+				File backupF = f.getParentDirectory().getNonexistentChildFile(f.getFileNameWithoutExtension() + "_backup", f.getFileExtension(), true);
+				f.copyFileTo(backupF);
+				LOG("Your original file has been copied to " << backupF.getFullPathName());
+			}
+
+			switch (result)
+			{
+			case 1: // update
+			{
+				var migratedFileData;
+				if (migrateFileToCurrentVersion(fileVersion, fileData, &migratedFileData))
+				{
+					// continue loading with new data
+					loadJSONDataEngine(migratedFileData, loadingTask);
+					saveDocumentFromJSON(f, migratedFileData);
+				}
+				else 
+				{
+					setFile(File());
+				}
+
+				break;
+			}
+			case 2: // load directly
+			{
+				// do nothing
+				loadJSONDataEngine(fileData, loadingTask);
+				break;
+			}
+			}
+		}
+	);
 }
 
 bool Engine::isFileFormatMigrationSupported(const AppVersion& fromVersion) const 

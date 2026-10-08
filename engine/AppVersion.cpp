@@ -157,6 +157,11 @@
 		}
 	}
 
+	bool AppVersion::operator<=(const AppVersion& other) const
+	{
+		return *this == other || *this < other;
+	}
+
 	String AppVersion::toString() const 
 	{ 
 		String res = String(major) + "." + String(minor) + "." + String(patch);

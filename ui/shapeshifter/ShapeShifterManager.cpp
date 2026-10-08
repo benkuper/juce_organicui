@@ -98,6 +98,7 @@ ShapeShifterPanel* ShapeShifterManager::createPanel(ShapeShifterContent* content
 
 void ShapeShifterManager::removePanel(ShapeShifterPanel* panel)
 {
+	if (currentCandidatePanel == panel) setCurrentCandidatePanel(nullptr);
 	panel->removeShapeShifterPanelListener(this);
 	openedPanels.removeObject(panel, true);
 }
@@ -186,24 +187,32 @@ ShapeShifterContent* ShapeShifterManager::getContentForName(const String& conten
 	return nullptr;
 }
 
-ShapeShifterPanel* ShapeShifterManager::checkCandidateTargetForPanel(ShapeShifterPanel* panel)
+ShapeShifterPanel* ShapeShifterManager::checkCandidateTargetForPanel(ShapeShifterPanel* panel, Point<int> screenPoint)
 {
 	ShapeShifterPanel* candidate = nullptr;
 
-	for (auto& p : openedPanels)
+	// Floating windows sit above the main layout. Ignore the dragged window itself.
+	for (int i = openedWindows.size() - 1; i >= 0; --i)
 	{
-		if (p == panel) continue;
-
-		if (p->getLocalBounds().contains(p->getLocalPoint(panel, Point<float>()).toInt()))
+		auto* window = openedWindows[i];
+		if (window->panel != panel && window->panel != nullptr && window->panel->getScreenBounds().contains(screenPoint))
 		{
-			candidate = p;
+			candidate = window->panel;
+			break;
 		}
 	}
 
+	if (candidate == nullptr)
+		for (auto& p : openedPanels)
+			if (p != panel && !p->isDetached() && p->getScreenBounds().contains(screenPoint))
+			{
+				candidate = p;
+				break;
+			}
+
+	if (candidate != nullptr && candidate->checkAttachZone(screenPoint) == ShapeShifterPanel::NONE)
+		candidate = nullptr;
 	setCurrentCandidatePanel(candidate);
-
-	if (currentCandidatePanel != nullptr) currentCandidatePanel->checkAttachZone(panel);
-
 
 	return candidate;
 }
@@ -212,7 +221,7 @@ bool ShapeShifterManager::checkDropOnCandidateTarget(WeakReference<ShapeShifterP
 {
 	if (panel.wasObjectDeleted()) return false;
 
-	if (currentCandidatePanel == nullptr) return false;
+	if (currentCandidatePanel == nullptr || currentCandidatePanel == panel.get()) return false;
 
 	bool result = currentCandidatePanel->attachPanel(panel);
 	//if (result) closePanelWindow(getWindowForPanel(panel),false);

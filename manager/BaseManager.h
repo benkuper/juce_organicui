@@ -98,6 +98,7 @@ public:
 
 
 	virtual void handleAddFromRemoteControl(juce::var data) override;
+	virtual bool handleMoveFromRemoteControl(ControllableContainer* source, bool addToUndo = false, int targetIndex = -1) override;
 
 
 	virtual void clear() override;
@@ -574,6 +575,9 @@ juce::Array<T*> BaseManager<T>::addItemsFromClipboard(bool showWarning)
 
 	if (!data.hasProperty("itemType"))
 	{
+		juce::var managerItems = data.getProperty("items", juce::var());
+		if (managerItems.isArray()) return addItemsFromData(managerItems);
+
 		juce::Array<T*> result;
 		result.add(this->addItemFromData(data));
 		return result;
@@ -747,6 +751,11 @@ void BaseManager<T>::setItemIndex(T* item, int newIndex, bool addToUndo)
 
 	baseManagerListeners.call(&BaseManagerListener<T>::itemsReordered);
 	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_REORDERED));
+
+#if ORGANICUI_USE_WEBSERVER
+	if (!isCurrentlyLoadingData && isAttachedToRoot())
+		OSCRemoteControl::getInstance()->sendPathChangedFeedback(getControlAddress());
+#endif
 }
 
 template<class T>
@@ -801,6 +810,65 @@ void BaseManager<T>::handleAddFromRemoteControl(juce::var data)
 {
 	if (!userCanAddItemsManually) return;
 	addItemFromData(data);
+}
+
+template<class T>
+bool BaseManager<T>::handleMoveFromRemoteControl(ControllableContainer* source, bool addToUndo, int targetIndex)
+{
+	T* item = dynamic_cast<T*>(source);
+	if (item == nullptr) return false;
+
+	BaseManager<T>* sourceManager = dynamic_cast<BaseManager<T>*>(item->parentContainer.get());
+	if (sourceManager == nullptr) return false;
+	if (!canAddItemOfType(static_cast<BaseItem*>(item)->getTypeString())) return false;
+
+	if (sourceManager == this)
+	{
+		if (targetIndex < 0) return false;
+		const int currentIndex = items.indexOf(item);
+		if (currentIndex < 0) return false;
+		if (currentIndex < targetIndex) targetIndex--;
+		targetIndex = juce::jlimit(0, items.size() - 1, targetIndex);
+		if (currentIndex == targetIndex) return true;
+		setItemIndex(item, targetIndex, addToUndo);
+		return true;
+	}
+
+	// Refuse to move a container below itself or one of its descendants.
+	ControllableContainer* ancestor = this;
+	while (ancestor != nullptr)
+	{
+		if (ancestor == source) return false;
+		ancestor = ancestor->parentContainer.get();
+	}
+
+	if (addToUndo
+		&& !UndoMaster::getInstance()->isPerforming
+		&& (Engine::mainEngine == nullptr || !Engine::mainEngine->isLoadingFile))
+	{
+		juce::var data = item->getJSONData();
+		if (data.getDynamicObject() == nullptr) return false;
+		if (targetIndex >= 0)
+			data.getDynamicObject()->setProperty("index", juce::jlimit(0, items.size(), targetIndex));
+
+		if (T* newItem = createItemFromData(data))
+		{
+			juce::Array<juce::UndoableAction*> actions;
+			actions.add(getAddItemUndoableAction(newItem, data));
+			actions.addArray(sourceManager->getRemoveItemUndoableAction(item));
+			UndoMaster::getInstance()->performActions("Move " + static_cast<BaseItem*>(item)->niceName, actions);
+			return true;
+		}
+
+		return false;
+	}
+
+	T* detached = sourceManager->removeItem(item, false, true, true);
+	if (detached == nullptr) return false;
+	T* added = addItem(detached, juce::var(), false, true);
+	if (added != nullptr && targetIndex >= 0)
+		setItemIndex(added, juce::jlimit(0, items.size() - 1, targetIndex), false);
+	return added != nullptr;
 }
 
 template<class T>
@@ -1311,7 +1379,8 @@ bool BaseManager<T>::AddItemAction::perform()
 	BaseManager* m = this->getManager();
 	if (m == nullptr)
 	{
-		return false;
+		// Missing manager/item: no-op success. false would clear the entire undo history.
+		return true;
 	}
 
 	T* item = this->getItem();
@@ -1324,7 +1393,7 @@ bool BaseManager<T>::AddItemAction::perform()
 		item = m->addItemFromData(this->data, false);
 	}
 
-	if (item == nullptr) return false;
+	if (item == nullptr) return true;
 
 	this->itemShortName = item->shortName;
 	return true;
@@ -1334,11 +1403,13 @@ template<class T>
 bool BaseManager<T>::AddItemAction::undo()
 {
 	T* s = this->getItem();
-	if (s == nullptr) return false;
+	BaseManager* m = this->getManager();
+	if (s == nullptr || m == nullptr) return true;
+
 	this->data = s->getJSONData();
 	this->data.getDynamicObject()->setProperty("index", this->itemIndex);
 
-	this->getManager()->removeItem(s, false);
+	m->removeItem(s, false);
 	this->itemRef = nullptr;
 	return true;
 }
@@ -1354,15 +1425,16 @@ bool BaseManager<T>::RemoveItemAction::perform()
 {
 
 	T* s = this->getItem();
+	BaseManager* m = this->getManager();
 
-	if (s == nullptr) return false;
+	if (s == nullptr || m == nullptr) return true;
 
 	this->data = s->getJSONData();
-	if (this->data.getDynamicObject() == nullptr) return false;
+	if (this->data.getDynamicObject() == nullptr) return true;
 
 	this->data.getDynamicObject()->setProperty("index", this->itemIndex);
 
-	this->getManager()->removeItem(s, false);
+	m->removeItem(s, false);
 	this->itemRef = nullptr;
 	return true;
 }
@@ -1371,7 +1443,7 @@ template<class T>
 bool BaseManager<T>::RemoveItemAction::undo()
 {
 	BaseManager* m = this->getManager();
-	if (m == nullptr) return false;
+	if (m == nullptr) return true;
 	this->itemRef = m->addItemFromData(this->data, false);
 	return true;
 }
@@ -1390,10 +1462,10 @@ template<class T>
 bool BaseManager<T>::MoveItemAction::perform()
 {
 	BaseManager* m = this->getManager();
-	if (m == nullptr) return false;
+	if (m == nullptr) return true;
 
 	T* item = this->getItem();
-	if (item == nullptr) return false;
+	if (item == nullptr) return true;
 
 	m->setItemIndex(item, newIndex, false);
 	return true;
@@ -1403,10 +1475,10 @@ template<class T>
 bool BaseManager<T>::MoveItemAction::undo()
 {
 	BaseManager* m = this->getManager();
-	if (m == nullptr) return false;
+	if (m == nullptr) return true;
 
 	T* item = this->getItem();
-	if (item == nullptr) return false;
+	if (item == nullptr) return true;
 
 	m->setItemIndex(item, prevIndex, false);
 	return true;
@@ -1467,7 +1539,7 @@ template<class T>
 bool BaseManager<T>::AddItemsAction::perform()
 {
 	BaseManager* m = this->getManager();
-	if (m == nullptr) return false;
+	if (m == nullptr) return true;
 
 	juce::Array<T*> iList = this->getItems();
 	if (!iList.isEmpty()) m->addItems(iList, this->data, false);
@@ -1491,7 +1563,7 @@ bool BaseManager<T>::AddItemsAction::undo()
 	if (m == nullptr)
 	{
 		this->itemsRef.clear();
-		return false;
+		return true;
 	}
 
 	juce::Array<T*> iList = this->getItems();
@@ -1520,7 +1592,7 @@ bool BaseManager<T>::RemoveItemsAction::perform()
 	if (m == nullptr)
 	{
 		this->itemsRef.clear();
-		return false;
+		return true;
 	}
 
 	juce::Array<T*> iList = this->getItems();
@@ -1543,7 +1615,7 @@ template<class T>
 bool BaseManager<T>::RemoveItemsAction::undo()
 {
 	BaseManager* m = this->getManager();
-	if (m == nullptr) return false;
+	if (m == nullptr) return true;
 
 	juce::Array<T*> iList = m->addItemsFromData(this->data, false);
 

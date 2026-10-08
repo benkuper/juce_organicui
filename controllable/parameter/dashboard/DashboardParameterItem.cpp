@@ -4,7 +4,8 @@
 DashboardParameterItem::DashboardParameterItem(Parameter* parameter) :
 	DashboardControllableItem(parameter),
 	parameter(nullptr),
-	bgColor(nullptr), fgColor(nullptr), btImage(nullptr), style(nullptr)
+	bgColor(nullptr), fgColor(nullptr), btImage(nullptr),
+	useCustomRange(nullptr), customRange(nullptr), customRangeY(nullptr), customRangeZ(nullptr), style(nullptr)
 {
 
 	showValue = addBoolParameter("Show Value", "If checked, the value will be shown on the control", true);
@@ -20,6 +21,18 @@ DashboardParameterItem::DashboardParameterItem(Parameter* parameter) :
 	btImage = addFileParameter("Toggle image", "The image of the toggle");
 	btImage->canBeDisabledByUser = true;
 	btImage->setEnabled(false);
+
+	useCustomRange = addBoolParameter("Use Custom Range", "Use bounds specific to this dashboard item", false);
+	customRange = addPoint2DParameter("Custom Range", "Minimum and maximum for this control, or its X axis");
+	customRangeY = addPoint2DParameter("Custom Y Range", "Minimum and maximum for the Y axis");
+	customRangeZ = addPoint2DParameter("Custom Z Range", "Minimum and maximum for the Z axis");
+	for (auto* range : { customRange, customRangeY, customRangeZ })
+	{
+		range->setDefaultPoint(0, 1);
+		range->canShowExtendedEditor = false;
+		range->forceSaveValue = true;
+	}
+	updateRangeOptions();
 
 	setInspectable(parameter);
 	ghostInspectable();
@@ -64,6 +77,75 @@ void DashboardParameterItem::setInspectableInternal(Inspectable* i)
 	}
 
 	updateStyleOptions();
+	updateRangeOptions();
+}
+
+bool DashboardParameterItem::hasCustomRange() const
+{
+	return useCustomRange->boolValue() && parameter != nullptr
+		&& (parameter->type == Controllable::FLOAT || parameter->type == Controllable::INT
+			|| parameter->type == Controllable::POINT2D || parameter->type == Controllable::POINT3D);
+}
+
+var DashboardParameterItem::getRangeBound(bool maximum) const
+{
+	if (!hasCustomRange()) return parameter == nullptr ? var() : (maximum ? parameter->maximumValue : parameter->minimumValue);
+
+	var bound;
+	int dimensions = parameter->type == Controllable::POINT3D ? 3 : (parameter->type == Controllable::POINT2D ? 2 : 1);
+	Point2DParameter* ranges[] = { customRange, customRangeY, customRangeZ };
+	for (int axis = 0; axis < dimensions; ++axis)
+	{
+		double low = jmin((double)ranges[axis]->value[0], (double)ranges[axis]->value[1]);
+		double high = jmax((double)ranges[axis]->value[0], (double)ranges[axis]->value[1]);
+		double value = maximum ? high : low;
+		if (parameter->type == Controllable::INT) bound.append((int)jlimit((double)INT32_MIN, (double)INT32_MAX, value));
+		else bound.append(value);
+	}
+	return dimensions == 1 ? bound[0] : bound;
+}
+
+void DashboardParameterItem::updateRangeOptions()
+{
+	bool supported = parameter != nullptr
+		&& (parameter->type == Controllable::FLOAT || parameter->type == Controllable::INT
+			|| parameter->type == Controllable::POINT2D || parameter->type == Controllable::POINT3D);
+	useCustomRange->hideInEditor = !supported;
+	customRange->hideInEditor = !supported || !useCustomRange->boolValue();
+	customRangeY->hideInEditor = customRange->hideInEditor
+		|| (parameter->type != Controllable::POINT2D && parameter->type != Controllable::POINT3D);
+	customRangeZ->hideInEditor = customRange->hideInEditor || parameter->type != Controllable::POINT3D;
+	if (supported && !useCustomRange->boolValue())
+	{
+		Point2DParameter* ranges[] = { customRange, customRangeY, customRangeZ };
+		int dimensions = parameter->type == Controllable::POINT3D ? 3 : (parameter->type == Controllable::POINT2D ? 2 : 1);
+		for (int axis = 0; axis < dimensions; ++axis)
+		{
+			if (ranges[axis]->isOverriden) continue;
+			double low = dimensions == 1 ? (double)parameter->minimumValue : (double)parameter->minimumValue[axis];
+			double high = dimensions == 1 ? (double)parameter->maximumValue : (double)parameter->maximumValue[axis];
+			if (low <= (double)INT32_MIN) low = high >= (double)INT32_MAX ? 0 : jmin(0.0, high - 1);
+			if (high >= (double)INT32_MAX) high = jmax(1.0, low + 1);
+			ranges[axis]->setDefaultPoint(low, high);
+		}
+	}
+	notifyStructureChanged();
+}
+
+void DashboardParameterItem::onContainerParameterChangedInternal(Parameter* p)
+{
+	DashboardControllableItem::onContainerParameterChangedInternal(p);
+	if (p == useCustomRange) updateRangeOptions();
+	if (p == useCustomRange || p == customRange || p == customRangeY || p == customRangeZ)
+	{
+		if (!isCurrentlyLoadingData && !isClearing)
+		{
+			if (auto* dashboard = ControllableUtil::findParentAs<Dashboard>(this))
+			{
+				if (auto* manager = DashboardManager::getInstanceWithoutCreating()) manager->askForRefresh(dashboard);
+			}
+		}
+	}
 }
 
 void DashboardParameterItem::onExternalParameterValueChanged(Parameter* p)
@@ -143,10 +225,10 @@ var DashboardParameterItem::getServerData()
 
 	data.getDynamicObject()->setProperty("value", parameter->value);
 
-	if (parameter->hasRange())
+	if (hasCustomRange() || parameter->hasRange())
 	{
-		data.getDynamicObject()->setProperty("minVal", parameter->minimumValue);
-		data.getDynamicObject()->setProperty("maxVal", parameter->maximumValue);
+		data.getDynamicObject()->setProperty("minVal", getRangeBound(false));
+		data.getDynamicObject()->setProperty("maxVal", getRangeBound(true));
 	}
 
 	if (bgColor->enabled) data.getDynamicObject()->setProperty("bgColor", bgColor->value);
@@ -265,9 +347,28 @@ DashboardEnumParameterItem::DashboardEnumParameterItem(EnumParameter* parameter)
 
 DashboardEnumParameterItem::~DashboardEnumParameterItem()
 {
-	if (parameter == nullptr || parameter.wasObjectDeleted()) return;
+	if (auto* ep = dynamic_cast<EnumParameter*>(parameter.get()))
+	{
+		ep->removeEnumParameterListener(this);
+	}
 
-	((EnumParameter*)parameter.get())->removeEnumParameterListener(this);
+}
+
+void DashboardEnumParameterItem::setInspectableInternal(Inspectable* i)
+{
+	// clearItem() also clears the target before the destructor runs.
+	// Detach while the previous parameter is still available.
+	if (auto* ep = dynamic_cast<EnumParameter*>(parameter.get()))
+	{
+		ep->removeEnumParameterListener(this);
+	}
+
+	DashboardParameterItem::setInspectableInternal(i);
+
+	if (auto* ep = dynamic_cast<EnumParameter*>(parameter.get()))
+	{
+		ep->addEnumParameterListener(this);
+	}
 
 }
 

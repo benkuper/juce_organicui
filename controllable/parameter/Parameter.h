@@ -23,6 +23,9 @@ public:
 	/** Destructor. */
 	virtual ~ParameterListener() {}
 	virtual void parameterValueChanged(Parameter*) {};
+	// The value at notification time, which may differ from the current value
+	// when a worker-thread change is delivered on the message thread.
+	virtual void parameterValueChangedWithValue(Parameter* p, const juce::var&) { parameterValueChanged(p); }
 	virtual void parameterRangeChanged(Parameter*) {};
 	virtual void parameterControlModeChanged(Parameter*) {}
 };
@@ -46,6 +49,8 @@ public:
 	juce::var defaultValue;
 	juce::var value;
 	juce::var lastValue;
+	juce::var multiEditStartValue;
+	bool hasMultiEditStartValue;
 
 	juce::SpinLock valueSetLock;
 
@@ -109,15 +114,25 @@ public:
 
 	virtual void setDefaultValue(juce::var val, bool doResetValue = true);
 	virtual void resetValue(bool silentSet = false);
+	virtual juce::UndoableAction* resetValueUndoable(bool onlyReturnAction = false);
 	virtual juce::UndoableAction* setUndoableValue(juce::var oldValue, juce::var newValue, bool onlyReturnAction = false);
 	virtual void setValue(juce::var _value, bool silentSet = false, bool force = false, bool forceOverride = true);
 	virtual void setValueInternal(juce::var& _value);
+
+	juce::Array<Parameter*> getRelatedSelectedParameters();
+	void beginMultiEdit();
+	void clearMultiEditState();
+	void setValueForSelected(juce::var newValue, bool silentSet = false, bool force = false, bool forceOverride = true);
+	void setUndoableValueForSelected(juce::var oldValue, juce::var newValue);
+	void resetValueUndoableForSelected();
 
 	virtual bool checkValueIsTheSame(juce::var newValue, juce::var oldValue); //can be overriden to modify check behavior
 
 	//For Number type parameters
 	void setUndoableNormalizedValue(const juce::var& oldNormalizedValue, const juce::var& newNormalizedValue);
 	void setNormalizedValue(const juce::var& normalizedValue, bool silentSet = false, bool force = false);
+	void setUndoableNormalizedValueForSelected(const juce::var& oldNormalizedValue, const juce::var& newNormalizedValue);
+	void setNormalizedValueForSelected(const juce::var& normalizedValue, bool silentSet = false, bool force = false);
 	juce::var getNormalizedValue() const;
 
 	virtual bool setAttributeInternal(juce::String param, juce::var value) override;
@@ -227,6 +242,24 @@ public:
 
 		juce::var oldValue;
 		juce::var newValue;
+
+		bool perform() override;
+		bool undo() override;
+	};
+
+	class ParameterResetValueAction :
+		public ParameterAction
+	{
+	public:
+		ParameterResetValueAction(Parameter* param) :
+			ParameterAction(param),
+			oldValue(param->getValue().clone()),
+			oldIsOverriden(param->isOverriden)
+		{
+		}
+
+		juce::var oldValue;
+		bool oldIsOverriden;
 
 		bool perform() override;
 		bool undo() override;

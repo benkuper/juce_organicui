@@ -100,10 +100,8 @@ UndoableAction* Controllable::setUndoableNiceName(const String& newNiceName, boo
 	if (onlyReturnAction) return a;
 
 	UndoMaster::getInstance()->performAction("Rename " + niceName, a);
-	return a;
-
-	//if Main Engine loading, just set the value without undo history
-
+	// Ownership transferred to UndoMaster.
+	return nullptr;
 }
 
 void Controllable::setNiceName(const String& _niceName) {
@@ -199,6 +197,55 @@ void Controllable::updateControlAddress()
 		controllableListeners.call(&ControllableListener::controllableControlAddressChanged, this);
 		controllableNotifier.addMessage(new ControllableEvent(ControllableEvent::CONTROLADDRESS_CHANGED, this));
 	}
+}
+
+ControllableContainer* Controllable::getSelectedParentInHierarchy()
+{
+	ControllableContainer* current = parentContainer;
+	while (current != nullptr)
+	{
+		if (current->isSelected) return current;
+		current = current->parentContainer;
+	}
+
+	return nullptr;
+}
+
+Array<Controllable*> Controllable::getRelatedSelectedControllables()
+{
+	Array<Controllable*> result;
+	result.add(this);
+
+	InspectableSelectionManager* selectionManager = InspectableSelectionManager::activeSelectionManager;
+	if (selectionManager == nullptr || selectionManager->currentInspectables.size() < 2) return result;
+
+	if (isSelected)
+	{
+		for (Controllable* selectedControllable : selectionManager->getInspectablesAs<Controllable>())
+		{
+			if (selectedControllable != nullptr
+				&& selectedControllable->type == type
+				&& selectedControllable->getTypeString() == getTypeString())
+				result.addIfNotAlreadyThere(selectedControllable);
+		}
+	}
+
+	ControllableContainer* selectedParent = getSelectedParentInHierarchy();
+	if (selectedParent == nullptr) return result;
+
+	const String relativeAddress = getControlAddress(selectedParent);
+	Array<ControllableContainer*> selectedContainers = selectionManager->getInspectablesAs<ControllableContainer>();
+
+	for (ControllableContainer* selectedContainer : selectedContainers)
+	{
+		if (selectedContainer == nullptr || selectedContainer == selectedParent) continue;
+
+		Controllable* related = selectedContainer->getControllableForAddress(relativeAddress);
+		if (related != nullptr && related->type == type && related->getTypeString() == getTypeString())
+			result.addIfNotAlreadyThere(related);
+	}
+
+	return result;
 }
 
 void Controllable::remove(bool addToUndo)
@@ -356,6 +403,24 @@ void Controllable::setAttribute(String param, var value)
 	}
 }
 
+UndoableAction* Controllable::setUndoableAttribute(const String& param, var value, bool onlyReturnAction)
+{
+	const var oldValue = getAttribute(param);
+	if (oldValue.isVoid() || oldValue == value) return nullptr;
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile)
+	{
+		setAttribute(param, value);
+		return nullptr;
+	}
+
+	UndoableAction* action = new ControllableSetAttributeAction(this, param, oldValue, value);
+	if (onlyReturnAction) return action;
+
+	UndoMaster::getInstance()->performAction("Set " + niceName + " " + param, action);
+	// Ownership transferred to UndoMaster.
+	return nullptr;
+}
+
 bool Controllable::setAttributeInternal(String param, var value)
 {
 	if (param == "description") description = value;
@@ -402,6 +467,23 @@ juce::var Controllable::getAttributeInternal(juce::String param) const
 StringArray Controllable::getValidAttributes() const
 {
 	return { "enabled", "canBeDisabled", "targetType", "searchLevel", "allowedTypes", "excludedTypes","root", "labelLevel", "saveValueOnly" };
+}
+
+bool Controllable::ControllableSetAttributeAction::perform()
+{
+	Controllable* c = getControllable();
+	// Missing target: no-op success. false would clear the entire undo history.
+	if (c == nullptr) return true;
+	c->setAttribute(attribute, newValue);
+	return true;
+}
+
+bool Controllable::ControllableSetAttributeAction::undo()
+{
+	Controllable* c = getControllable();
+	if (c == nullptr) return true;
+	c->setAttribute(attribute, oldValue);
+	return true;
 }
 
 
@@ -682,7 +764,9 @@ bool Controllable::ControllableChangeNameAction::perform()
 		c->setNiceName(newName);
 		return true;
 	}
-	return false;
+
+	// Missing target: no-op success. false would clear the entire undo history.
+	return true;
 }
 
 bool Controllable::ControllableChangeNameAction::undo()
@@ -693,5 +777,6 @@ bool Controllable::ControllableChangeNameAction::undo()
 		c->setNiceName(oldName);
 		return true;
 	}
-	return false;
+
+	return true;
 }

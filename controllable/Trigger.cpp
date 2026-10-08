@@ -42,13 +42,22 @@ ControllableUI* Trigger::createDefaultUI(Array<Controllable *> controllables)
 	else return createButtonUI(getArrayAs<Controllable, Trigger>(controllables));
 }
 
-void Trigger::trigger()
+void Trigger::trigger(bool triggerRelatedSelected)
 {
 	if (enabled && !isTriggering) {
 		isTriggering = true;
 		triggerListeners.call(&TriggerListener::triggerTriggered, this);
 		triggerNotifier.addMessage(new TriggerEvent(TriggerEvent::TRIGGER_TRIGGERED, this));
 		isTriggering = false;
+
+		if (triggerRelatedSelected)
+		{
+			for (Controllable* related : getRelatedSelectedControllables())
+			{
+				Trigger* relatedTrigger = dynamic_cast<Trigger*>(related);
+				if (relatedTrigger != nullptr && relatedTrigger != this) relatedTrigger->trigger(false);
+			}
+		}
 	}
 }
 

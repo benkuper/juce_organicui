@@ -37,7 +37,6 @@ public:
 	bool showParentNameInEditor;
 	int maxDefaultSearchLevel;
 	int defaultParentLabelLevel;
-	bool isTryingFixingLink;
 	bool manuallySettingNull;
 
 	juce::StringArray typesFilter; //leave empty to allow all when not using custom functions
@@ -64,8 +63,8 @@ public:
 	void resetValue(bool silentSet = false) override;
 	void setGhostValue(const juce::String& ghostVal);
 
-	void setValueFromTarget(Controllable*, bool addToUndo = false);
-	void setValueFromTarget(ControllableContainer*, bool addToUndo = false);
+	void setValueFromTarget(Controllable*, bool addToUndo = false, bool setRelatedSelected = false);
+	void setValueFromTarget(ControllableContainer*, bool addToUndo = false, bool setRelatedSelected = false);
 
 	void setValueInternal(juce::var&) override;
 
@@ -101,7 +100,7 @@ public:
 	juce::var getJSONDataInternal() override;
 	void loadJSONDataInternal(juce::var data) override;
 
-	void endLoadFile() override;
+	void fileLoaded() override;
 
 	TargetParameterUI* createTargetUI(juce::Array<TargetParameter*> parameters = {});
 	ControllableUI* createDefaultUI(juce::Array<Controllable*> controllables = {}) override;

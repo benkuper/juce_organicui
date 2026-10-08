@@ -19,6 +19,7 @@ Parameter::Parameter(const Type& type, const String& niceName, const String& des
 	Controllable(type, niceName, description, enabled),
 	defaultValue(initialValue),
 	value(initialValue),
+	hasMultiEditStartValue(false),
 	canHaveRange(false),
 	rebuildUIOnRangeChange(true),
 	minimumValue(minValue),
@@ -165,6 +166,23 @@ void Parameter::resetValue(bool silentSet)
 	setValue(defaultValue, silentSet, true, false);
 }
 
+UndoableAction* Parameter::resetValueUndoable(bool onlyReturnAction)
+{
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile)
+	{
+		resetValue();
+		return nullptr;
+	}
+	if (!isOverriden && checkValueIsTheSame(value, defaultValue)) return nullptr;
+
+	UndoableAction* action = new ParameterResetValueAction(this);
+	if (onlyReturnAction) return action;
+
+	UndoMaster::getInstance()->performAction("Reset " + niceName + " value", action);
+	// Ownership transferred to UndoMaster.
+	return nullptr;
+}
+
 UndoableAction* Parameter::setUndoableValue(var oldValue, var newValue, bool onlyReturnAction)
 {
 	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile)
@@ -178,7 +196,8 @@ UndoableAction* Parameter::setUndoableValue(var oldValue, var newValue, bool onl
 	if (onlyReturnAction) return a;
 
 	UndoMaster::getInstance()->performAction("Set " + niceName + " value", a);
-	return a;
+	// Ownership transferred to UndoMaster.
+	return nullptr;
 }
 
 void Parameter::setValue(var _value, bool silentSet, bool force, bool forceOverride)
@@ -195,6 +214,100 @@ void Parameter::setValue(var _value, bool silentSet, bool force, bool forceOverr
 		if (!isOverriden /*&& !isControllableFeedbackOnly*/) isOverriden = croppedValue != defaultValue || forceOverride;
 	}
 	if (!silentSet) notifyValueChanged();
+}
+
+Array<Parameter*> Parameter::getRelatedSelectedParameters()
+{
+	Array<Parameter*> result;
+	for (Controllable* related : getRelatedSelectedControllables())
+	{
+		if (Parameter* relatedParameter = dynamic_cast<Parameter*>(related))
+			result.addIfNotAlreadyThere(relatedParameter);
+	}
+	return result;
+}
+
+void Parameter::beginMultiEdit()
+{
+	for (Parameter* related : getRelatedSelectedParameters())
+	{
+		if (related == nullptr || related->hasMultiEditStartValue) continue;
+		related->multiEditStartValue = related->getValue().clone();
+		related->hasMultiEditStartValue = true;
+	}
+}
+
+void Parameter::clearMultiEditState()
+{
+	for (Parameter* related : getRelatedSelectedParameters())
+	{
+		if (related == nullptr) continue;
+		related->multiEditStartValue = var();
+		related->hasMultiEditStartValue = false;
+	}
+}
+
+void Parameter::setValueForSelected(var newValue, bool silentSet, bool force, bool forceOverride)
+{
+	beginMultiEdit();
+	for (Parameter* related : getRelatedSelectedParameters())
+	{
+		if (related != nullptr) related->setValue(newValue, silentSet, force, forceOverride);
+	}
+}
+
+void Parameter::setUndoableValueForSelected(var oldValue, var newValue)
+{
+	Array<Parameter*> relatedParameters = getRelatedSelectedParameters();
+	if (relatedParameters.size() <= 1)
+	{
+		clearMultiEditState();
+		setUndoableValue(oldValue, newValue);
+		return;
+	}
+
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile)
+	{
+		for (Parameter* related : relatedParameters)
+			if (related != nullptr) related->setValue(newValue);
+		clearMultiEditState();
+		return;
+	}
+
+	Array<UndoableAction*> actions;
+	for (Parameter* related : relatedParameters)
+	{
+		if (related == nullptr) continue;
+
+		var relatedOldValue = related == this ? oldValue : related->getValue();
+		if (related->hasMultiEditStartValue) relatedOldValue = related->multiEditStartValue.clone();
+
+		if (!related->alwaysNotify && related->checkValueIsTheSame(relatedOldValue, newValue)) continue;
+		if (UndoableAction* action = related->setUndoableValue(relatedOldValue, newValue, true)) actions.add(action);
+	}
+
+	clearMultiEditState();
+	if (!actions.isEmpty()) UndoMaster::getInstance()->performActions("Set " + niceName + " on selected items", actions);
+}
+
+void Parameter::resetValueUndoableForSelected()
+{
+	Array<Parameter*> relatedParameters = getRelatedSelectedParameters();
+	if (relatedParameters.size() <= 1)
+	{
+		resetValueUndoable();
+		return;
+	}
+
+	Array<UndoableAction*> actions;
+	for (Parameter* related : relatedParameters)
+	{
+		if (related == nullptr) continue;
+		if (UndoableAction* action = related->resetValueUndoable(true)) actions.add(action);
+	}
+
+	clearMultiEditState();
+	if (!actions.isEmpty()) UndoMaster::getInstance()->performActions("Reset " + niceName + " on selected items", actions);
 }
 
 
@@ -370,6 +483,39 @@ void Parameter::setNormalizedValue(const var& normalizedValue, bool silentSet, b
 	}
 }
 
+void Parameter::setUndoableNormalizedValueForSelected(const var& oldNormalizedValue, const var& newNormalizedValue)
+{
+	if (!isComplex())
+	{
+		setUndoableValueForSelected(jmap<float>(oldNormalizedValue, (float)minimumValue, (float)maximumValue),
+			jmap<float>(newNormalizedValue, (float)minimumValue, (float)maximumValue));
+		return;
+	}
+
+	var oldValue;
+	var newValue;
+	for (int i = 0; i < value.size(); ++i)
+	{
+		oldValue.append(jmap<float>(oldNormalizedValue[i], minimumValue[i], maximumValue[i]));
+		newValue.append(jmap<float>(newNormalizedValue[i], minimumValue[i], maximumValue[i]));
+	}
+	setUndoableValueForSelected(oldValue, newValue);
+}
+
+void Parameter::setNormalizedValueForSelected(const var& normalizedValue, bool silentSet, bool force)
+{
+	if (!isComplex())
+	{
+		setValueForSelected(jmap<float>(normalizedValue, (float)minimumValue, (float)maximumValue), silentSet, force);
+		return;
+	}
+
+	var targetValue;
+	for (int i = 0; i < value.size(); ++i)
+		targetValue.append(jmap<float>(normalizedValue[i], minimumValue[i], maximumValue[i]));
+	setValueForSelected(targetValue, silentSet, force);
+}
+
 var Parameter::getNormalizedValue() const
 {
 	if (type == BOOL) return (float)value;
@@ -458,7 +604,7 @@ void Parameter::notifyValueChanged() {
 				auto* p = safeThis.get();
 				if (p == nullptr || p->isBeingDestroyed) return;
 
-				p->parameterListeners.call(&ParameterListener::parameterValueChanged, p);
+				p->parameterListeners.call(&ParameterListener::parameterValueChangedWithValue, p, valueCopy);
 
 				auto* pAfterListeners = safeThis.get();
 				if (pAfterListeners == nullptr || pAfterListeners->isBeingDestroyed) return;
@@ -470,9 +616,10 @@ void Parameter::notifyValueChanged() {
 	}
 
 	WeakReference<Parameter> safeThis(this);
-	parameterListeners.call(&ParameterListener::parameterValueChanged, this);
+	const auto valueCopy = getValue();
+	parameterListeners.call(&ParameterListener::parameterValueChangedWithValue, this, valueCopy);
 	if (auto* p = safeThis.get(); p != nullptr && !p->isBeingDestroyed)
-		p->queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::VALUE_CHANGED, p, getValue()));
+		p->queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::VALUE_CHANGED, p, valueCopy));
 	//isNotifyingChange = false;
 }
 
@@ -784,8 +931,10 @@ bool Parameter::ParameterSetValueAction::perform()
 	Parameter* p = getParameter();
 	if (p == nullptr)
 	{
+		// Returning false makes JUCE wipe the whole undo history; treat a missing
+		// target as a successful no-op so Ctrl+Z cannot heap-corrupt on stale actions.
 		LOGWARNING("Undo set value : parameter not found " << controlAddress);
-		return false;
+		return true;
 	}
 
 	p->setValue(newValue);
@@ -798,10 +947,38 @@ bool Parameter::ParameterSetValueAction::undo()
 	if (p == nullptr)
 	{
 		LOGWARNING("Undo set value : parameter not found " << controlAddress);
-		return false;
+		return true;
 	}
 
 	p->setValue(oldValue);
+	return true;
+}
+
+bool Parameter::ParameterResetValueAction::perform()
+{
+	Parameter* p = getParameter();
+	if (p == nullptr)
+	{
+		LOGWARNING("Undo reset value : parameter not found " << controlAddress);
+		return true;
+	}
+
+	p->resetValue();
+	return true;
+}
+
+bool Parameter::ParameterResetValueAction::undo()
+{
+	Parameter* p = getParameter();
+	if (p == nullptr)
+	{
+		LOGWARNING("Undo reset value : parameter not found " << controlAddress);
+		return true;
+	}
+
+	p->isOverriden = false;
+	p->setValue(oldValue, false, true, oldIsOverriden);
+	p->isOverriden = oldIsOverriden;
 	return true;
 }
 
@@ -896,6 +1073,7 @@ void Parameter::ValueInterpolator::updateParams(var newTargetValue, float newTim
 void Parameter::ValueInterpolator::Manager::interpolate(WeakReference<Parameter> p, var targetValue, float time, Automation* a)
 {
 	jassert(p->getValue().size() == targetValue.size());
+	GenericScopedLock lock(interpLock);
 
 	WeakReference<ValueInterpolator> interp = getInterpolationWith(p);
 	if (interp != nullptr && !interp.wasObjectDeleted())
@@ -922,9 +1100,9 @@ WeakReference<Parameter::ValueInterpolator> Parameter::ValueInterpolator::Manage
 
 void Parameter::ValueInterpolator::Manager::removeInterpolationWith(Parameter* p)
 {
+	GenericScopedLock lock(interpLock);
 	if (interpolatorMap.contains(p))
 	{
-		GenericScopedLock lock(interpLock);
 		WeakReference<ValueInterpolator> interp = interpolatorMap[p];
 		if (interp.wasObjectDeleted()) return;
 		interpolatorMap.remove(p);

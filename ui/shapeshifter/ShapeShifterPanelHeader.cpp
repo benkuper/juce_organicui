@@ -32,11 +32,12 @@ void ShapeShifterPanelHeader::removeTab(ShapeShifterPanelTab * tab, bool doRemov
 	resized();
 }
 
-void ShapeShifterPanelHeader::attachTab(ShapeShifterPanelTab * tab)
+void ShapeShifterPanelHeader::attachTab(ShapeShifterPanelTab * tab, int index)
 {
 	tab->addShapeShifterTabListener(this);
 	addAndMakeVisible(tab);
-	tabs.add(tab);
+	if (index < 0) tabs.add(tab);
+	else tabs.insert(index, tab);
 	resized();
 }
 
@@ -74,22 +75,32 @@ void ShapeShifterPanelHeader::mouseDrag(const MouseEvent & e)
 {
 	if (ShapeShifterManager::getInstance()->lockMode) return;
 
-	int minDetachDistanceY = 20;
-
 	if (e.eventComponent == this)
 	{
-		if (abs(e.getDistanceFromDragStartY()) > minDetachDistanceY) listeners.call(&Listener::headerDrag);
+		if (e.getDistanceFromDragStart() >= 8) listeners.call(&Listener::headerDrag, e);
 	}else
 	{
 		ShapeShifterPanelTab * tab = dynamic_cast<ShapeShifterPanelTab *>(e.eventComponent);
-		if (abs(e.getDistanceFromDragStartY()) > minDetachDistanceY && tab != nullptr) listeners.call(&Listener::tabDrag,tab);
+		if (tab == nullptr) return;
+
+		if (std::abs(e.getDistanceFromDragStartY()) < 12)
+		{
+			if (std::abs(e.getDistanceFromDragStartX()) < 8) return;
+			const float x = e.getEventRelativeTo(this).position.x;
+			int newIndex = tabs.indexOf(tab);
+			while (newIndex > 0 && x < tabs[newIndex - 1]->getBounds().getCentreX()) --newIndex;
+			while (newIndex < tabs.size() - 1 && x > tabs[newIndex + 1]->getBounds().getCentreX()) ++newIndex;
+			if (newIndex != tabs.indexOf(tab)) listeners.call(&Listener::tabReorder, tab, newIndex);
+		}
+		else listeners.call(&Listener::tabDrag, tab, e);
 	}
 
 }
 
 void ShapeShifterPanelHeader::paint(Graphics & g)
 {
-	g.fillAll(BG_COLOR.brighter(.1f));
+	g.setColour(BG_COLOR.brighter(.1f));
+	g.fillRoundedRectangle(getLocalBounds().toFloat(), 5.0f);
 }
 
 void ShapeShifterPanelHeader::resized()
@@ -100,7 +111,7 @@ void ShapeShifterPanelHeader::resized()
 
 	for (auto &t : tabs)
 	{
-		t->setBounds(r.removeFromLeft(jmin<int>(getWidth(),t->getLabelWidth()+6)));
+		t->setBounds(r.removeFromLeft(jmin<int>(r.getWidth(), t->getLabelWidth() + 8)).reduced(2, 2));
 	}
 }
 
