@@ -22,4 +22,10 @@ public:
 
 	void performAction(const juce::String &name, juce::UndoableAction *action);
 	void performActions(const juce::String &name, juce::Array<juce::UndoableAction *> actions);
+
+	/** Clears history; ignores nested calls (e.g. from listeners during undo). */
+	void clearUndoHistory();
+
+private:
+	bool isClearingHistory = false;
 };

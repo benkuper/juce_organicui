@@ -134,7 +134,7 @@ UndoableAction* ControllableContainer::addUndoableControllable(Controllable* c, 
 	if (onlyReturnAction) return a;
 
 	UndoMaster::getInstance()->performAction("Add " + c->niceName, a);
-	return a;
+	return nullptr;
 }
 
 Controllable* ControllableContainer::addControllable(Controllable* c, int index)
@@ -293,7 +293,7 @@ UndoableAction* ControllableContainer::removeUndoableControllable(Controllable* 
 	if (onlyReturnAction) return a;
 
 	UndoMaster::getInstance()->performAction("Remove " + c->niceName, a);
-	return a;
+	return nullptr;
 }
 
 void ControllableContainer::removeControllable(WeakReference<Controllable> c, bool deleteObject)
@@ -379,7 +379,7 @@ UndoableAction* ControllableContainer::setUndoableNiceName(const String& newNice
 	if (onlyReturnAction) return a;
 
 	UndoMaster::getInstance()->performAction("Rename " + niceName, a);
-	return a;
+	return nullptr;
 }
 void ControllableContainer::setNiceName(const String& _niceName)
 {
@@ -1773,7 +1773,9 @@ bool ControllableContainer::ControllableContainerChangeNameAction::perform()
 		cc->setNiceName(newName);
 		return true;
 	}
-	return false;
+
+	// Missing target: no-op success. false would clear the entire undo history.
+	return true;
 }
 
 bool ControllableContainer::ControllableContainerChangeNameAction::undo()
@@ -1784,7 +1786,8 @@ bool ControllableContainer::ControllableContainerChangeNameAction::undo()
 		cc->setNiceName(oldName);
 		return true;
 	}
-	return false;
+
+	return true;
 }
 
 ControllableContainer::ControllableContainerControllableAction::ControllableContainerControllableAction(ControllableContainer* cc, Controllable* c) :
@@ -1816,7 +1819,7 @@ bool ControllableContainer::AddControllableAction::perform()
 	ControllableContainer* cc = this->getControllableContainer();
 	if (cc == nullptr)
 	{
-		return false;
+		return true;
 	}
 
 	Controllable* c = this->getItem();
@@ -1829,7 +1832,7 @@ bool ControllableContainer::AddControllableAction::perform()
 		c = ControllableFactory::createControllable(cType);
 	}
 
-	if (c == nullptr) return false;
+	if (c == nullptr) return true;
 
 	this->cShortName = c->shortName;
 	return true;
@@ -1838,7 +1841,7 @@ bool ControllableContainer::AddControllableAction::perform()
 bool ControllableContainer::AddControllableAction::undo()
 {
 	Controllable* c = this->getItem();
-	if (c == nullptr) return false;
+	if (c == nullptr) return true;
 	data = c->getJSONData();
 	ControllableContainer* cc = getControllableContainer();
 	if (cc != nullptr)
@@ -1857,9 +1860,10 @@ ControllableContainer::RemoveControllableAction::RemoveControllableAction(Contro
 bool ControllableContainer::RemoveControllableAction::perform()
 {
 	Controllable* c = this->getItem();
+	ControllableContainer* cc = getControllableContainer();
 
-	if (c == nullptr) return false;
-	getControllableContainer()->removeControllable(c);
+	if (c == nullptr || cc == nullptr) return true;
+	cc->removeControllable(c);
 	cRef = nullptr;
 	return true;
 }
@@ -1867,7 +1871,7 @@ bool ControllableContainer::RemoveControllableAction::perform()
 bool ControllableContainer::RemoveControllableAction::undo()
 {
 	ControllableContainer* cc = getControllableContainer();
-	if (cc == nullptr) return false;
+	if (cc == nullptr) return true;
 	Controllable* c = ControllableFactory::createControllable(cType);
 	if (c != nullptr)
 	{
