@@ -56,6 +56,7 @@ class DashboardEnumParameterItem :
 public:
 	DashboardEnumParameterItem(EnumParameter* parameter = nullptr);
 	virtual ~DashboardEnumParameterItem();
+	void setInspectableInternal(Inspectable* i) override;
 
 	// Inherited via Listener
 	virtual void enumOptionAdded(EnumParameter*, const juce::String&) override;
