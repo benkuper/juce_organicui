@@ -821,10 +821,14 @@ AutomationUI::AutomationUI(Automation* manager) :
 	overlay(this, 0),
 	background(this, 1),
 	cursor(this, 2),
-	showNumberLines(true),
-	showMenuOnRightClick(true),
+	shouldRepaintKeys(true),
+	shouldRepaintOverlay(true),
+	shouldResize(false),
+	disableOverlayFill(false),
 	lastRepaintOverlayPoint(-1,-1),
-	overlayStartY(0)
+	overlayStartY(0),
+	showNumberLines(true),
+	showMenuOnRightClick(true)
 {
 	addAndMakeVisible(&background);
 	addAndMakeVisible(&keysUI);
@@ -842,8 +846,11 @@ void AutomationUI::paint(juce::Graphics& g)
 
 void AutomationUI::resized()
 {
-	shouldResize = true;
-	shouldRepaint = true;
+	keysUI.setBounds(getLocalBounds());
+	overlay.setBounds(getLocalBounds());
+	background.setBounds(getLocalBounds());
+	lastRepaintOverlayPoint = Point<int>(0,0);
+	setRepaint(true, true, true);
 }
 
 void AutomationUI::setRepaint(bool _keys, bool _overlay, bool _background)
