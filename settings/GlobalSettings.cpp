@@ -370,7 +370,7 @@ var KeyMappingsContainer::getJSONData(bool includeNonOverriden)
 void KeyMappingsContainer::loadJSONDataInternal(var data)
 {
 	ControllableContainer::loadJSONDataInternal(data);
-	var keyMappingsData = data.getProperty("keyMappings", "");
+	GlobalSettings::getInstance()->keyMappingsData = data.getProperty("keyMappings", "");
 }
 
 InspectableEditor* KeyMappingsContainer::getEditorInternal(bool isRoot, Array<Inspectable*> inspectables)
