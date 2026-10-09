@@ -155,6 +155,7 @@ public:
 
 	//Reference
 	virtual void parameterValueChanged(Parameter* p) override;
+	void parameterValueChangedWithValue(Parameter* p, const juce::var& value) override;
 
 
 	InspectableEditor* getEditorInternal(bool isRoot, juce::Array<Inspectable*> inspectables = juce::Array<Inspectable*>()) override;

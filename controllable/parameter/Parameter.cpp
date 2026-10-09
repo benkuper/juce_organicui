@@ -675,6 +675,14 @@ void Parameter::expressionStateChanged(ScriptExpression*)
 		p->queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::EXPRESSION_STATE_CHANGED, p));
 }
 
+void Parameter::parameterValueChangedWithValue(Parameter* p, const var& value)
+{
+	// References must forward each captured value even when several source
+	// changes have queued before their message-thread callbacks can run.
+	if (p == referenceParameter) setValue(value);
+	else parameterValueChanged(p);
+}
+
 void Parameter::parameterValueChanged(Parameter* p)
 {
 	if (p == referenceTarget.get())
