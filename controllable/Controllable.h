@@ -66,6 +66,9 @@ public:
 	juce::WeakReference<ControllableContainer> parentContainer;
 
 	juce::UndoableAction* setUndoableNiceName(const juce::String& _niceName, bool onlyReturnAction = false);
+	void setUndoableNiceNameForSelected(const juce::String& newName);
+	void setUndoableAttributeForSelected(const juce::String& attribute, juce::var value);
+	void removeForSelected();
 	void setNiceName(const juce::String& _niceName);
 	void setCustomShortName(const juce::String& _shortName);
 	void setAutoShortName();

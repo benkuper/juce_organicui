@@ -184,20 +184,24 @@ void TripleSliderUI::showEditRangeWindowInternal()
 	nameWindow->addButton("OK", 1, KeyPress(KeyPress::returnKey));
 	nameWindow->addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
 
-	nameWindow->enterModalState(true, ModalCallbackFunction::create([this, nameWindow](int result)
+	nameWindow->enterModalState(true, ModalCallbackFunction::create([param = WeakReference<Parameter>(parameter), nameWindow](int result)
 		{
 
-			if (result)
+			if (result != 1 || param == nullptr) return;
+			float newMins[3];
+			float newMaxs[3];
+			for (int i = 0; i < 3; ++i)
 			{
-				float newMins[3];
-				float newMaxs[3];
-				for (int i = 0; i < 3; ++i)
-				{
-					newMins[i] = nameWindow->getTextEditorContents("minVal" + String(i)).getFloatValue();
-					newMaxs[i] = nameWindow->getTextEditorContents("maxVal" + String(i)).getFloatValue();
-				}
-				p3d->setBounds(newMins[0], newMins[1], newMins[2], jmax(newMins[0], newMaxs[0]), jmax(newMins[1], newMaxs[1]), jmax(newMins[2], newMaxs[2]));
+				newMins[i] = nameWindow->getTextEditorContents("minVal" + String(i)).getFloatValue();
+				newMaxs[i] = nameWindow->getTextEditorContents("maxVal" + String(i)).getFloatValue();
 			}
+			var minimum, maximum;
+			for (int axis = 0; axis < 3; ++axis)
+			{
+				minimum.append(newMins[axis]);
+				maximum.append(jmax(newMins[axis], newMaxs[axis]));
+			}
+			param->setUndoableRangeForSelected(minimum, maximum);
 		}
 	), true);
 }

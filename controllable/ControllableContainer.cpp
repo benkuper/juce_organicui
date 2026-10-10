@@ -137,6 +137,30 @@ UndoableAction* ControllableContainer::addUndoableControllable(Controllable* c, 
 	return nullptr;
 }
 
+void ControllableContainer::addUndoableControllableForSelected(Controllable* c)
+{
+	if (c == nullptr) return;
+	const var data = c->getJSONData();
+	Array<UndoableAction*> actions;
+	for (auto* related : getRelatedSelectedContainers())
+	{
+		if (!related->userCanAddControllables) continue;
+		if (!related->userAddControllablesFilters.isEmpty() && !related->userAddControllablesFilters.contains(c->getTypeString())) continue;
+		Controllable* newControl = c;
+		if (related != this)
+		{
+			newControl = ControllableFactory::createControllable(c->getTypeString());
+			if (newControl == nullptr) continue;
+			newControl->loadJSONData(data.clone());
+			newControl->userCanChangeName = c->userCanChangeName;
+			newControl->canBeDisabledByUser = c->canBeDisabledByUser;
+			newControl->userCanSetReadOnly = c->userCanSetReadOnly;
+		}
+		if (auto* action = related->addUndoableControllable(newControl, true)) actions.add(action);
+	}
+	UndoMaster::getInstance()->performActions("Add controls to selected containers", actions);
+}
+
 Controllable* ControllableContainer::addControllable(Controllable* c, int index)
 {
 	if (c == nullptr)
@@ -1693,6 +1717,48 @@ bool ControllableContainer::isAttachedToRoot()
 	return pc == Engine::mainEngine;
 }
 
+Array<ControllableContainer*> ControllableContainer::getRelatedSelectedContainers()
+{
+	Array<ControllableContainer*> result { this };
+	auto* selection = InspectableSelectionManager::activeSelectionManager;
+	if (selection == nullptr || selection->currentInspectables.size() < 2) return result;
+
+	auto isCompatible = [this](ControllableContainer* candidate)
+	{
+		if (candidate == nullptr || typeid(*candidate) != typeid(*this)) return false;
+		auto* item = dynamic_cast<BaseItem*>(this);
+		auto* other = dynamic_cast<BaseItem*>(candidate);
+		return item == nullptr || (other != nullptr && item->getTypeString() == other->getTypeString());
+	};
+
+	auto selected = selection->getInspectablesAs<ControllableContainer>();
+	if (isSelected)
+		for (auto* candidate : selected)
+			if (isCompatible(candidate)) result.addIfNotAlreadyThere(candidate);
+
+	auto* selectedParent = parentContainer.get();
+	while (selectedParent != nullptr && !selectedParent->isSelected) selectedParent = selectedParent->parentContainer.get();
+	if (selectedParent == nullptr) return result;
+
+	const String relativeAddress = getControlAddress(selectedParent);
+	for (auto* candidate : selected)
+	{
+		if (candidate == selectedParent) continue;
+		auto* related = candidate->getControllableContainerForAddress(relativeAddress);
+		if (isCompatible(related)) result.addIfNotAlreadyThere(related);
+	}
+	return result;
+}
+
+void ControllableContainer::setUndoableNiceNameForSelected(const String& newName)
+{
+	Array<UndoableAction*> actions;
+	for (auto* related : getRelatedSelectedContainers())
+		if (related->nameCanBeChangedByUser && related->niceName != newName)
+			if (auto* action = related->setUndoableNiceName(newName, true)) actions.add(action);
+	UndoMaster::getInstance()->performActions("Rename selected items", actions);
+}
+
 InspectableEditor* ControllableContainer::getEditorInternal(bool isRoot, Array<Inspectable*> inspectables)
 {
 	Array<ControllableContainer*> containers = Inspectable::getArrayAs<Inspectable, ControllableContainer>(inspectables);
@@ -1792,7 +1858,11 @@ bool ControllableContainer::ControllableContainerChangeNameAction::undo()
 
 ControllableContainer::ControllableContainerControllableAction::ControllableContainerControllableAction(ControllableContainer* cc, Controllable* c) :
 	ControllableContainerAction(cc),
-	cRef(c)
+	cRef(c),
+	index(cc->controllables.indexOf(c)),
+	userCanChangeName(c != nullptr && c->userCanChangeName),
+	canBeDisabledByUser(c != nullptr && c->canBeDisabledByUser),
+	userCanSetReadOnly(c != nullptr && c->userCanSetReadOnly)
 {
 	if (c != nullptr)
 	{
@@ -1830,6 +1900,15 @@ bool ControllableContainer::AddControllableAction::perform()
 	else
 	{
 		c = ControllableFactory::createControllable(cType);
+		if (c != nullptr)
+		{
+			c->loadJSONData(data.clone());
+			c->userCanChangeName = userCanChangeName;
+			c->canBeDisabledByUser = canBeDisabledByUser;
+			c->userCanSetReadOnly = userCanSetReadOnly;
+			cc->addControllable(c, index);
+			cRef = c;
+		}
 	}
 
 	if (c == nullptr) return true;
@@ -1876,7 +1955,10 @@ bool ControllableContainer::RemoveControllableAction::undo()
 	if (c != nullptr)
 	{
 		c->loadJSONData(data);
-		cc->addControllable(c);
+		c->userCanChangeName = userCanChangeName;
+		c->canBeDisabledByUser = canBeDisabledByUser;
+		c->userCanSetReadOnly = userCanSetReadOnly;
+		cc->addControllable(c, index);
 		cRef = c;
 	}
 	return true;

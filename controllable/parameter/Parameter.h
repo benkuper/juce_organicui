@@ -88,6 +88,8 @@ public:
 
 	virtual void setRange(juce::var min, juce::var max);
 	virtual void clearRange();
+	void setUndoableRangeForSelected(juce::var minimum, juce::var maximum);
+	void clearUndoableRangeForSelected();
 	virtual bool hasRange() const;
 	virtual juce::var getRange() const;
 
@@ -136,6 +138,7 @@ public:
 	juce::var getNormalizedValue() const;
 
 	virtual bool setAttributeInternal(juce::String param, juce::var value) override;
+	juce::var getAttributeInternal(juce::String param) const override;
 	virtual juce::StringArray getValidAttributes() const override;
 
 	//helpers for fast typing
@@ -227,6 +230,16 @@ public:
 		juce::String controlAddress;
 
 		Parameter* getParameter();
+	};
+
+	class ParameterSetRangeAction : public ParameterAction
+	{
+	public:
+		ParameterSetRangeAction(Parameter* parameter, juce::var minimum, juce::var maximum);
+		juce::var oldMinimum, oldMaximum, newMinimum, newMaximum, oldValue;
+		bool oldIsOverriden;
+		bool perform() override;
+		bool undo() override;
 	};
 
 	class ParameterSetValueAction :

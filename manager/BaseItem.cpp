@@ -135,6 +135,29 @@ void BaseItem::remove()
 	baseItemListeners.call(&BaseItemListener::askForRemoveBaseItem, this);
 }
 
+void BaseItem::removeForSelected()
+{
+	Array<UndoableAction*> actions;
+	const auto relatedItems = getRelatedSelectedContainers();
+	Array<ControllableContainer*> parents;
+	for (auto* related : relatedItems)
+	{
+		auto* item = dynamic_cast<BaseItem*>(related);
+		if (item == nullptr || !item->userCanRemove) continue;
+		if (parents.contains(item->parentContainer.get())) continue;
+		parents.add(item->parentContainer.get());
+		Array<BaseItem*> itemsToRemove;
+		for (auto* candidate : relatedItems)
+			if (auto* other = dynamic_cast<BaseItem*>(candidate))
+				if (other->userCanRemove && other->parentContainer == item->parentContainer) itemsToRemove.add(other);
+		item->baseItemListeners.call([&](BaseItemListener& listener)
+		{
+			actions.addArray(listener.getRemoveBaseItemsUndoableActions(itemsToRemove));
+		});
+	}
+	UndoMaster::getInstance()->performActions("Remove selected items", actions);
+}
+
 void BaseItem::handleRemoveFromRemoteControl()
 {
 	if (userCanRemove) MessageManager::callAsync([this]() {remove(); });

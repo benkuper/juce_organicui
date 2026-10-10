@@ -448,13 +448,13 @@ void BaseItemUI<T>::buttonClicked(juce::Button* b)
 				.withMessage("Are you sure you want to delete this ?")
 				.withButton("Delete")
 				.withButton("Cancel"),
-				[this](int result)
+				[itemRef = juce::WeakReference<Inspectable>(this->baseItem)](int result)
 				{
-					if (result != 0) this->baseItem->remove();
+					if (result != 0 && itemRef != nullptr) static_cast<BaseItem*>(itemRef.get())->removeForSelected();
 				}
 			);
 		}
-		else this->baseItem->remove();
+		else this->baseItem->removeForSelected();
 	}
 }
 
@@ -499,7 +499,7 @@ void BaseItemUI<T>::labelTextChanged(juce::Label* l)
 	if (l == &itemLabel)
 	{
 		if (l->getText().isEmpty()) itemLabel.setText(this->baseItem->niceName, juce::dontSendNotification); //avoid setting empty names
-		else this->baseItem->setUndoableNiceName(l->getText());
+		else this->baseItem->setUndoableNiceNameForSelected(l->getText());
 		resized();
 	}
 }

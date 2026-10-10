@@ -160,17 +160,17 @@ void ParameterUI::showEditRangeWindowInternal()
 	nameWindow->addButton("OK", 1, KeyPress(KeyPress::returnKey));
 	nameWindow->addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
 
-	nameWindow->enterModalState(true, ModalCallbackFunction::create([this, nameWindow](int result)
+	nameWindow->enterModalState(true, ModalCallbackFunction::create([param = WeakReference<Parameter>(parameter), nameWindow](int result)
 		{
-			if (result)
+			if (result && param != nullptr)
 			{
-				if (parameter->type == Parameter::FLOAT || parameter->type == Parameter::INT)
+				if (param->type == Parameter::FLOAT || param->type == Parameter::INT)
 				{
 					String minRangeString = nameWindow->getTextEditorContents("minVal");
 					String maxRangeString = nameWindow->getTextEditorContents("maxVal");
 					float newMin = minRangeString.isNotEmpty() ? minRangeString.getFloatValue() : INT32_MIN;
 					float newMax = maxRangeString.isNotEmpty() ? maxRangeString.getFloatValue() : INT32_MAX;
-					parameter->setRange(newMin, jmax(newMin, newMax));
+					param->setUndoableRangeForSelected(newMin, jmax(newMin, newMax));
 				}
 			}
 		}),
@@ -351,19 +351,20 @@ void ParameterUI::handleMenuSelectedID(int id)
 	switch (id)
 	{
 	case 1: parameter->resetValueUndoableForSelected(); break;
-	case 10: parameter->setControlMode(Parameter::MANUAL); break;
-	case 11: parameter->setControlMode(Parameter::EXPRESSION); break;
-	case 12: parameter->setControlMode(Parameter::REFERENCE); break;
-	case 13:
+	case 10: case 11: case 12: case 13:
 	{
-		parameter->setControlMode(Parameter::AUTOMATION);
-		parameter->automation->setManualMode(false); //created from user menu, not manual
+		for (auto* related : parameter->getRelatedSelectedParameters())
+		{
+			if (related->lockManualControlMode || (id == 13 && !related->canBeAutomated)) continue;
+			related->setControlMode(static_cast<Parameter::ControlMode>(id - 10));
+			if (id == 13 && related->automation != nullptr) related->automation->setManualMode(false);
+		}
+		break;
 	}
-	break;
 
 	case -4: showEditRangeWindow(); break;
-	case -5: parameter->clearRange(); break;
-	case -6: parameter->setAttribute("alwaysNotify", !parameter->alwaysNotify); break;
+	case -5: parameter->clearUndoableRangeForSelected(); break;
+	case -6: parameter->setUndoableAttributeForSelected("alwaysNotify", !parameter->alwaysNotify); break;
 	case -20: SystemClipboard::copyTextToClipboard(parameter->stringValue()); break;
 	case -21:
 	{
@@ -386,36 +387,30 @@ void ParameterUI::handleMenuSelectedID(int id)
 
 		parameter->setUndoableValueForSelected(parameter->getValue(), v); break;
 	}
-	case -50: parameter->setRange(0, 1); break;
-	case -51: parameter->setRange(-1, 1); break;
-	case -52: parameter->setRange(-90, 90); break;
-	case -53: parameter->setRange(0, 180); break;
-	case -54: parameter->setRange(-180, 180); break;
-	case -55: parameter->setRange(0, 360); break;
-	case -60: parameter->setRange(0, 100); break;
-	case -61: parameter->setRange(0, 127); break;
-	case -62: parameter->setRange(0, 255); break;
-	case -63: parameter->setRange(0, 65535); break;
+	case -50: parameter->setUndoableRangeForSelected(0, 1); break;
+	case -51: parameter->setUndoableRangeForSelected(-1, 1); break;
+	case -52: parameter->setUndoableRangeForSelected(-90, 90); break;
+	case -53: parameter->setUndoableRangeForSelected(0, 180); break;
+	case -54: parameter->setUndoableRangeForSelected(-180, 180); break;
+	case -55: parameter->setUndoableRangeForSelected(0, 360); break;
+	case -60: parameter->setUndoableRangeForSelected(0, 100); break;
+	case -61: parameter->setUndoableRangeForSelected(0, 127); break;
+	case -62: parameter->setUndoableRangeForSelected(0, 255); break;
+	case -63: parameter->setUndoableRangeForSelected(0, 65535); break;
 
-	case -70:
-		if (parameter->type == Parameter::POINT2D) ((Point2DParameter*)parameter.get())->setBounds(0, 0, 1, 1);
-		else ((Point3DParameter*)parameter.get())->setBounds(0, 0, 0, 1, 1, 1);
+	case -70: case -71: case -72: case -73: case -80:
+	{
+		const double low = id == -71 ? -1 : id == -73 ? -100 : 0;
+		const double high = id == -72 || id == -73 ? 100 : 1;
+		var minimum, maximum;
+		for (int axis = 0; axis < parameter->value.size(); ++axis)
+		{
+			minimum.append(id == -80 && axis == 3 ? 1 : low);
+			maximum.append(high);
+		}
+		parameter->setUndoableRangeForSelected(minimum, maximum);
 		break;
-	case -71:
-		if (parameter->type == Parameter::POINT2D) ((Point2DParameter*)parameter.get())->setBounds(-1, -1, 1, 1);
-		else ((Point3DParameter*)parameter.get())->setBounds(-1, -1, -1, 1, 1, 1);
-		break;
-	case -72:
-		if (parameter->type == Parameter::POINT2D) ((Point2DParameter*)parameter.get())->setBounds(0, 0, 100, 100);
-		else ((Point3DParameter*)parameter.get())->setBounds(0, 0, 0, 100, 100, 100);
-		break;
-	case -73:
-		if (parameter->type == Parameter::POINT2D) ((Point2DParameter*)parameter.get())->setBounds(-100, -100, 100, 100);
-		else ((Point3DParameter*)parameter.get())->setBounds(-100, -100, -100, 100, 100, 100);
-		break;
-	case -80:
-		((ColorParameter*)parameter.get())->setBounds(0.f, 0.f, 0.f, 1.f, 1.f, 1.f, 1.f, 1.f);
-		break;
+	}
 
 	default:
 	{
@@ -426,7 +421,7 @@ void ParameterUI::handleMenuSelectedID(int id)
 			if (cid < numCustomRanges)
 			{
 				Point2DParameter* rp = dynamic_cast<Point2DParameter*>(ProjectSettings::getInstance()->customRangesCC.controllables[cid]);
-				parameter->setRange(rp->x, rp->y);
+				parameter->setUndoableRangeForSelected(rp->x, rp->y);
 			}
 		}
 		break;

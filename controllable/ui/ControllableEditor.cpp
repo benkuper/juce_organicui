@@ -21,6 +21,9 @@ ControllableEditor::ControllableEditor(Array<Controllable*> controllables, bool 
 	, dragAndDropEnabled(true)
 	, showLabel(true)
 {
+	for (auto* related : controllable->getRelatedSelectedControllables()) controllables.addIfNotAlreadyThere(related);
+	this->controllables = Inspectable::getWeakArray(controllables);
+	inspectables = Inspectable::getWeakArray(Inspectable::getArrayAs<Controllable, Inspectable>(controllables));
 	buildControllableUI();
 
 	addAndMakeVisible(&label);
@@ -29,12 +32,9 @@ ControllableEditor::ControllableEditor(Array<Controllable*> controllables, bool 
 	label.setFont(label.getFont().withHeight(GlobalSettings::getInstance()->fontSize->floatValue()));
 	label.setText(controllable->niceName, dontSendNotification);
 	label.setTooltip(ui->tooltip);
-	label.setEditable(controllable->userCanChangeName);
+	label.setEditable(multiHasAllOf([](Inspectable* i) { return ((Controllable*)i)->userCanChangeName; }));
 	label.addListener(this);
-	if (!isMultiEditing())
-	{
-		label.addMouseListener(this, false);
-	}
+	label.addMouseListener(this, false);
 
 	bool isAllRemovable = multiHasAllOf([](Inspectable* i) { return ((Controllable*) i)->isRemovableByUser; });
 	if (isAllRemovable)
@@ -198,10 +198,7 @@ void ControllableEditor::mouseDown(const MouseEvent& e)
 		else
 		{
 			bool targetEnabled = controllables.size() > 0 ? !controllables[0]->enabled : false;
-			for (auto& c : controllables)
-			{
-				c->setEnabled(targetEnabled);
-			}
+			controllable->setUndoableAttributeForSelected("enabled", targetEnabled);
 		}
 	}
 }
@@ -230,10 +227,7 @@ void ControllableEditor::newMessage(const Controllable::ControllableEvent& e)
 	switch (e.type)
 	{
 	case Controllable::ControllableEvent::NAME_CHANGED:
-		if (!isMultiEditing())
-		{
-			label.setText(controllable->niceName, dontSendNotification);
-		}
+		label.setText(controllable->niceName, dontSendNotification);
 		break;
 
 	case Controllable::ControllableEvent::STATE_CHANGED:
@@ -262,10 +256,7 @@ void ControllableEditor::buttonClicked(Button* b)
 {
 	if (b == removeBT.get())
 	{
-		for (auto& c : controllables)
-		{
-			c->remove(true); // would need proper grouped undo
-		}
+		controllable->removeForSelected();
 	}
 }
 
@@ -282,6 +273,6 @@ void ControllableEditor::labelTextChanged(Label* labelThatHasChanged)
 		{
 			return;
 		}
-		controllable->setNiceName(label.getText());
+		controllable->setUndoableNiceNameForSelected(label.getText());
 	}
 }

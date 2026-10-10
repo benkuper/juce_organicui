@@ -222,8 +222,10 @@ void P2DUI::showEditRangeWindowInternal()
 	nameWindow->addButton("OK", 1, KeyPress(KeyPress::returnKey));
 	nameWindow->addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
 
-	nameWindow->enterModalState(true, ModalCallbackFunction::create([this, &nameWindow](int result)
+	nameWindow->enterModalState(true, ModalCallbackFunction::create([param = WeakReference<Parameter>(parameter), nameWindow](int result)
 		{
+
+			if (result != 1 || param == nullptr) return;
 			float newMins[2];
 			float newMaxs[2];
 			for (int i = 0; i < 2; ++i)
@@ -231,7 +233,13 @@ void P2DUI::showEditRangeWindowInternal()
 				newMins[i] = nameWindow->getTextEditorContents("minVal" + String(i)).getFloatValue();
 				newMaxs[i] = nameWindow->getTextEditorContents("maxVal" + String(i)).getFloatValue();
 			}
-			p2d->setBounds(newMins[0], newMins[1], jmax(newMins[0], newMaxs[0]), jmax(newMins[1], newMaxs[1]));
+			var minimum, maximum;
+			for (int axis = 0; axis < 2; ++axis)
+			{
+				minimum.append(newMins[axis]);
+				maximum.append(jmax(newMins[axis], newMaxs[axis]));
+			}
+			param->setUndoableRangeForSelected(minimum, maximum);
 		}
 	), true);
 }

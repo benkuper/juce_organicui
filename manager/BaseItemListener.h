@@ -8,6 +8,7 @@ public:
 	/** Destructor. */
 	virtual ~BaseItemListener() {}
 	virtual void askForRemoveBaseItem(BaseItem*) {}
+	virtual juce::Array<juce::UndoableAction*> getRemoveBaseItemsUndoableActions(juce::Array<BaseItem*>) { return {}; }
 	virtual void askForDuplicateItem(BaseItem*) {}
 	virtual void askForPaste() {}
 	virtual void askForMoveBefore(BaseItem*) {}

@@ -61,6 +61,7 @@ public:
 	virtual void moveAfter(); //list
 
 	void remove();
+	void removeForSelected();
 
 	virtual void handleRemoveFromRemoteControl() override;
 

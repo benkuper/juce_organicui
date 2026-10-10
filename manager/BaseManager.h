@@ -58,6 +58,7 @@ public:
 	virtual T* addItemFromData(juce::var data, bool addToUndo = true); //to be overriden for specific item creation (from data)
 	virtual juce::Array<T*> addItemsFromData(juce::var data, bool addToUndo = true); //to be overriden for specific item creation (from data)
 	virtual juce::Array<T*> addItemsFromClipboard(bool showWarning = true);
+	void addItemsFromClipboardForSelected();
 	virtual bool canAddItemOfType(const juce::String& typeToCheck);
 
 	virtual void loadItemsData(juce::var data);
@@ -67,6 +68,7 @@ public:
 	virtual juce::UndoableAction* getAddItemsUndoableAction(juce::Array<T*> item = nullptr, juce::var data = juce::var());
 
 	T* addItem(T* item = nullptr, juce::var data = juce::var(), bool addToUndo = true, bool notify = true); //if data is not empty, load data
+	T* addItemForSelected(T* item = nullptr, juce::var data = juce::var());
 	T* addItem(const juce::Point<float> initialPosition, bool addToUndo = true, bool notify = true);
 	T* addItem(T* item, const juce::Point<float> initialPosition, bool addToUndo = true, bool notify = true);
 	juce::Array<T*> addItems(juce::Array<T*> items, juce::var data = juce::var(), bool addToUndo = true);
@@ -103,6 +105,10 @@ public:
 
 	virtual void clear() override;
 	void askForRemoveBaseItem(BaseItem* item) override;
+	juce::Array<juce::UndoableAction*> getRemoveBaseItemsUndoableActions(juce::Array<BaseItem*> items) override
+	{
+		return getRemoveItemsUndoableAction(Inspectable::getArrayAs<BaseItem, T>(items));
+	}
 	void askForDuplicateItem(BaseItem* item) override;
 	void askForPaste() override;
 	void askForMoveBefore(BaseItem*) override;
@@ -246,6 +252,7 @@ public:
 		AddItemsAction(BaseManager* m, juce::Array<T*> iList, juce::var data = juce::var());
 
 		int startIndex;
+		bool preserveSelection = false;
 		bool perform() override;
 		bool undo() override;
 	};
@@ -419,6 +426,33 @@ juce::UndoableAction* BaseManager<T>::getAddItemsUndoableAction(juce::Array<T*> 
 	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile) return nullptr;
 	if (_items.size() == 0) return nullptr;
 	return new AddItemsAction(this, _items, data);
+}
+
+template<class T>
+T* BaseManager<T>::addItemForSelected(T* item, juce::var data)
+{
+	if (item == nullptr) item = createItem();
+	if (item == nullptr) return nullptr;
+	const auto related = getRelatedSelectedContainers();
+	if (related.size() <= 1) return addItem(item, data);
+
+	// Resolve and construct every target before any add can change the selection.
+	const juce::var itemData = data.isVoid() ? item->getJSONData() : data;
+	juce::Array<juce::UndoableAction*> actions;
+	for (auto* container : related)
+	{
+		auto* target = dynamic_cast<BaseManager<T>*>(container);
+		if (target == nullptr || !target->userCanAddItemsManually) continue;
+		T* newItem = target == this ? item : target->createItemFromData(itemData);
+		if (newItem == nullptr) continue;
+		juce::var itemsData;
+		itemsData.append(itemData.clone());
+		auto* action = new AddItemsAction(target, juce::Array<T*> { newItem }, itemsData);
+		action->preserveSelection = true;
+		actions.add(action);
+	}
+	UndoMaster::getInstance()->performActions("Add items to selected managers", actions);
+	return item;
 }
 
 template<class T>
@@ -612,6 +646,40 @@ juce::Array<T*> BaseManager<T>::addItemsFromClipboard(bool showWarning)
 	}
 
 	return copiedItems;
+}
+
+template<class T>
+void BaseManager<T>::addItemsFromClipboardForSelected()
+{
+	const auto related = getRelatedSelectedContainers();
+	if (related.size() <= 1) { addItemsFromClipboard(); return; }
+	const juce::var clipboard = juce::JSON::parse(juce::SystemClipboard::getTextFromClipboard());
+	if (!clipboard.isObject()) return;
+	juce::var itemsData = clipboard.getProperty("items", juce::var());
+	if (!itemsData.isArray()) { itemsData = juce::var(); itemsData.append(clipboard); }
+	juce::Array<juce::UndoableAction*> actions;
+	for (auto* container : related)
+	{
+		auto* target = dynamic_cast<BaseManager<T>*>(container);
+		if (target == nullptr || !target->userCanAddItemsManually) continue;
+		if (clipboard.hasProperty("itemType") && !target->canAddItemOfType(clipboard["itemType"].toString())) continue;
+		juce::Array<T*> newItems;
+		juce::var newData;
+		for (int index = 0; index < itemsData.size(); ++index)
+		{
+			juce::var data = itemsData[index].clone();
+			if (T* item = target->createItemFromData(data))
+			{
+				newItems.add(item);
+				newData.append(data);
+			}
+		}
+		if (newItems.isEmpty()) continue;
+		auto* action = new AddItemsAction(target, newItems, newData);
+		action->preserveSelection = true;
+		actions.add(action);
+	}
+	UndoMaster::getInstance()->performActions("Paste items to selected managers", actions);
 }
 
 template<class T>
@@ -1540,6 +1608,7 @@ bool BaseManager<T>::AddItemsAction::perform()
 {
 	BaseManager* m = this->getManager();
 	if (m == nullptr) return true;
+	juce::ScopedValueSetter<bool> selectionScope(m->selectItemWhenCreated, preserveSelection ? false : m->selectItemWhenCreated);
 
 	juce::Array<T*> iList = this->getItems();
 	if (!iList.isEmpty()) m->addItems(iList, this->data, false);
@@ -1619,6 +1688,8 @@ bool BaseManager<T>::RemoveItemsAction::undo()
 
 	juce::Array<T*> iList = m->addItemsFromData(this->data, false);
 
+	this->itemsRef.clear();
+	for (auto* item : iList) this->itemsRef.add(item);
 	this->itemsShortName.clear();
 	for (auto& i : iList) this->itemsShortName.add(i != nullptr ? i->shortName : "");
 	return true;

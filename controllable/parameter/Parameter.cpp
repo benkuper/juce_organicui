@@ -352,6 +352,62 @@ void Parameter::setRange(var min, var max)
 	if (isCustomizableByUser) isOverriden = true;
 }
 
+Parameter::ParameterSetRangeAction::ParameterSetRangeAction(Parameter* parameter, var minimum, var maximum) :
+	ParameterAction(parameter),
+	oldMinimum(parameter->minimumValue.clone()), oldMaximum(parameter->maximumValue.clone()),
+	newMinimum(minimum.clone()), newMaximum(maximum.clone()), oldValue(parameter->getValue().clone()),
+	oldIsOverriden(parameter->isOverriden)
+{
+}
+
+bool Parameter::ParameterSetRangeAction::perform()
+{
+	if (auto* parameter = getParameter()) parameter->setRange(newMinimum.clone(), newMaximum.clone());
+	return true;
+}
+
+bool Parameter::ParameterSetRangeAction::undo()
+{
+	if (auto* parameter = getParameter())
+	{
+		parameter->setRange(oldMinimum.clone(), oldMaximum.clone());
+		parameter->setValue(oldValue.clone());
+		parameter->isOverriden = oldIsOverriden;
+	}
+	return true;
+}
+
+void Parameter::setUndoableRangeForSelected(var minimum, var maximum)
+{
+	Array<UndoableAction*> actions;
+	for (auto* related : getRelatedSelectedParameters())
+	{
+		if (!related->canHaveRange || !related->isCustomizableByUser) continue;
+		if (related->isComplex() && (!minimum.isArray() || !maximum.isArray()
+			|| minimum.size() != related->value.size() || maximum.size() != related->value.size())) continue;
+		if (related->Parameter::checkValueIsTheSame(related->minimumValue, minimum)
+			&& related->Parameter::checkValueIsTheSame(related->maximumValue, maximum)) continue;
+		actions.add(new ParameterSetRangeAction(related, minimum, maximum));
+	}
+	UndoMaster::getInstance()->performActions("Set range on selected controls", actions);
+}
+
+void Parameter::clearUndoableRangeForSelected()
+{
+	var minimum = INT32_MIN, maximum = INT32_MAX;
+	if (isComplex())
+	{
+		minimum = var();
+		maximum = var();
+		for (int axis = 0; axis < value.size(); ++axis)
+		{
+			minimum.append(INT32_MIN);
+			maximum.append(INT32_MAX);
+		}
+	}
+	setUndoableRangeForSelected(minimum, maximum);
+}
+
 void Parameter::clearRange()
 {
 	if (!canHaveRange || isBeingDestroyed) return;
@@ -552,6 +608,12 @@ bool Parameter::setAttributeInternal(String param, var val)
 	}
 
 	return true;
+}
+
+var Parameter::getAttributeInternal(String param) const
+{
+	if (param == "alwaysNotify") return alwaysNotify;
+	return Controllable::getAttributeInternal(param);
 }
 
 StringArray Parameter::getValidAttributes() const

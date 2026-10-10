@@ -241,7 +241,7 @@ void ControllableUI::showContextMenu()
 			case -11:
 			{
 				bool tVal = !controllable->isControllableFeedbackOnly;
-				for (auto& c : controllables) c->setControllableFeedbackOnly(tVal);
+				controllable->setUndoableAttributeForSelected("readOnly", tVal);
 			}
 			break;
 
@@ -249,7 +249,7 @@ void ControllableUI::showContextMenu()
 			{
 
 				bool tVal = !controllable->enabled;
-				for (auto& c : controllables) c->setEnabled(tVal);
+				controllable->setUndoableAttributeForSelected("enabled", tVal);
 			}
 			break;
 

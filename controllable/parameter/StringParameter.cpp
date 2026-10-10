@@ -106,7 +106,7 @@ juce::var StringParameter::getAttributeInternal(juce::String name) const
 	if (name == "multiline") return multiline;
 	else if (name == "prefix") return prefix;
 	else if (name == "suffix") return suffix;
-	return juce::var();
+	return Parameter::getAttributeInternal(name);
 }
 
 StringArray StringParameter::getValidAttributes() const

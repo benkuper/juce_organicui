@@ -177,7 +177,7 @@ juce::var FloatParameter::getAttributeInternal(juce::String name) const
 		return stringDecimals;
 	}
 
-	return juce::var();
+	return Parameter::getAttributeInternal(name);
 }
 
 StringArray FloatParameter::getValidAttributes() const

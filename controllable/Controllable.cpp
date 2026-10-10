@@ -248,6 +248,43 @@ Array<Controllable*> Controllable::getRelatedSelectedControllables()
 	return result;
 }
 
+void Controllable::setUndoableNiceNameForSelected(const String& newName)
+{
+	Array<UndoableAction*> actions;
+	for (auto* related : getRelatedSelectedControllables())
+		if (related->userCanChangeName && related->niceName != newName)
+			if (auto* action = related->setUndoableNiceName(newName, true)) actions.add(action);
+	UndoMaster::getInstance()->performActions("Rename selected controls", actions);
+}
+
+void Controllable::setUndoableAttributeForSelected(const String& attribute, var value)
+{
+	Array<UndoableAction*> actions;
+	for (auto* related : getRelatedSelectedControllables())
+	{
+		if (attribute == "enabled" && !related->canBeDisabledByUser) continue;
+		if ((attribute == "readOnly" || attribute == "readonly") && !related->userCanSetReadOnly) continue;
+		if (auto* action = related->setUndoableAttribute(attribute, value, true)) actions.add(action);
+	}
+	UndoMaster::getInstance()->performActions("Set " + attribute + " on selected controls", actions);
+}
+
+void Controllable::removeForSelected()
+{
+	Array<UndoableAction*> actions;
+	auto relatedControls = getRelatedSelectedControllables();
+	std::sort(relatedControls.begin(), relatedControls.end(), [](Controllable* a, Controllable* b)
+	{
+		if (a->parentContainer != b->parentContainer)
+			return std::less<ControllableContainer*>()(a->parentContainer.get(), b->parentContainer.get());
+		return a->parentContainer != nullptr && a->parentContainer->controllables.indexOf(a) > a->parentContainer->controllables.indexOf(b);
+	});
+	for (auto* related : relatedControls)
+		if (related->isRemovableByUser && related->parentContainer != nullptr)
+			if (auto* action = related->parentContainer->removeUndoableControllable(related, true)) actions.add(action);
+	UndoMaster::getInstance()->performActions("Remove selected controls", actions);
+}
+
 void Controllable::remove(bool addToUndo)
 {
 	controllableListeners.call(&ControllableListener::askForRemoveControllable, this, addToUndo);
