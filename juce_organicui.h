@@ -414,6 +414,7 @@
 #include "mcp/McpCore.h"
 #include "mcp/McpServer.h"
 #include "mcp/OrganicMcpProvider.h"
+#include "mcp/McpConnectionPanel.h"
 #endif
 
 

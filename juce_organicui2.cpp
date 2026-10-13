@@ -4,6 +4,7 @@
 #include "mcp/McpCore.cpp"
 #include "mcp/McpServer.cpp"
 #include "mcp/OrganicMcpProvider.cpp"
+#include "mcp/McpConnectionPanel.cpp"
 #endif
 
 #include "comment/Comment.cpp"

@@ -1,6 +1,12 @@
 #include "McpCore.h"
 #include <cmath>
+#if JUCE_WINDOWS
 #include <filesystem>
+#else
+#include <cerrno>
+#include <cstdlib>
+#include <sys/stat.h>
+#endif
 #include <random>
 
 namespace organic::mcp
@@ -58,22 +64,56 @@ bool Grant::allows(unsigned caps) const
     if (advancedExecution || access == Access::full) available |= advanced;
     return (caps & available) == caps;
 }
+static String canonicalPath(juce::File file)
+{
+    juce::StringArray suffix;
+    for (int depth = 0; depth < 256; ++depth)
+    {
+#if JUCE_WINDOWS
+        auto path = std::filesystem::u8path(file.getFullPathName().toStdString());
+        std::error_code error; auto status = std::filesystem::symlink_status(path, error);
+        if (error && error != std::errc::no_such_file_or_directory) return {};
+        if (std::filesystem::exists(status) || std::filesystem::is_symlink(status))
+        {
+            auto resolved = std::filesystem::canonical(path, error);
+            if (error) return {};
+            auto result = juce::File(String(resolved.u8string()));
+#else
+        struct stat status {};
+        if (::lstat(file.getFullPathName().toRawUTF8(), &status) == 0)
+        {
+            // Resolving an existing symlink must succeed. In particular, never
+            // treat a dangling link as a harmless, not-yet-created file path.
+            char* resolved = ::realpath(file.getFullPathName().toRawUTF8(), nullptr);
+            if (!resolved) return {};
+            auto result = juce::File(String::fromUTF8(resolved)); std::free(resolved);
+#endif
+            for (int i = suffix.size(); --i >= 0;) result = result.getChildFile(suffix[i]);
+            return result.getFullPathName();
+        }
+#if !JUCE_WINDOWS
+        if (errno != ENOENT) return {};
+#endif
+        auto parent = file.getParentDirectory();
+        if (parent == file) return {};
+        suffix.add(file.getFileName()); file = parent;
+    }
+    return {};
+}
 bool Grant::allowsFile(const juce::File& file) const
 {
     if (access == Access::full) return true;
     if (!allows(files)) return false;
-    std::error_code ec;
-    auto target = std::filesystem::weakly_canonical(std::filesystem::u8path(file.getFullPathName().toStdString()), ec);
-    if (ec) return false;
+    auto target = canonicalPath(file); if (target.isEmpty()) return false;
     for (const auto& folder : folders)
     {
-        auto root = std::filesystem::weakly_canonical(std::filesystem::u8path(folder.toStdString()), ec);
-        if (ec) continue;
-        auto relative = target.lexically_relative(root);
-        if (relative.empty()) continue;
-        bool escapes = false;
-        for (const auto& part : relative) if (part == "..") escapes = true;
-        if (!escapes && !relative.is_absolute()) return true;
+        auto root = canonicalPath(juce::File(folder)); if (root.isEmpty()) continue;
+        auto prefix = root.endsWith(juce::File::getSeparatorString()) ? root : root + juce::File::getSeparatorString();
+#if JUCE_WINDOWS
+        if (target.equalsIgnoreCase(root) || target.startsWithIgnoreCase(prefix)) return true;
+#else
+        if (target == root || target.startsWith(prefix)) return true;
+#endif
     }
     return false;
 }
