@@ -19,6 +19,9 @@ template <class T>
 class BaseManager :
 	public EnablingControllableContainer,
 	public BaseItemListener
+#if ORGANICUI_USE_MCP
+    , public organic::mcp::ManagerAdapter
+#endif
 {
 public:
 	BaseManager(const juce::String& name);
@@ -131,6 +134,58 @@ public:
 	T* getItemForMenuResultID(int id, int startID);
 
 	T* getFirstSelectedItem();
+
+#if ORGANICUI_USE_MCP
+    ControllableContainer& mcpContainer() override { return *this; }
+    juce::var mcpTypes() const override
+    {
+        juce::Array<juce::var> result;
+        if (managerFactory != nullptr)
+        {
+            for (const auto* definition : managerFactory->defs)
+            {
+                if (!definition->isEnabled) continue;
+                auto* row = new juce::DynamicObject();
+                row->setProperty("type", definition->type);
+                row->setProperty("menuPath", definition->menuPath);
+                result.add(row);
+            }
+        }
+        else
+        {
+            auto* row = new juce::DynamicObject();
+            row->setProperty("type", ""); row->setProperty("menuPath", "");
+            row->setProperty("description", itemDataType);
+            result.add(row);
+        }
+        return result;
+    }
+    bool mcpAcceptsType(const juce::String& type) override
+    {
+        if (!userCanAddItemsManually) return false;
+        if (managerFactory == nullptr) return type.isEmpty();
+        for (const auto* definition : managerFactory->defs)
+            if (definition->isEnabled && definition->type == type && canAddItemOfType(type)) return true;
+        return false;
+    }
+    BaseItem* mcpCreate(juce::var data) override
+    {
+        if (!mcpAcceptsType(data["type"].toString())) return nullptr;
+        return addItemFromData(data, true);
+    }
+    bool mcpRemove(BaseItem* item) override
+    {
+        auto* typed = dynamic_cast<T*>(item);
+        if (typed == nullptr || !items.contains(typed) || !typed->userCanRemove) return false;
+        removeItem(typed, true); return true;
+    }
+    bool mcpReorder(BaseItem* item, int index) override
+    {
+        auto* typed = dynamic_cast<T*>(item);
+        if (typed == nullptr || !items.contains(typed) || index < 0 || index >= items.size()) return false;
+        setItemIndex(typed, index, true); return true;
+    }
+#endif
 
 	juce::String getScriptTargetString() override;
 

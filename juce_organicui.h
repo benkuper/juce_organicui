@@ -66,6 +66,14 @@
 #define ORGANICUI_USE_WEBSERVER 0
 #endif
 
+/** Config: ORGANICUI_USE_MCP
+    Enables the optional native MCP server and operation registry. Requires the
+    juce_simpleweb and juce_cryptography modules and standalone ASIO headers.
+*/
+#ifndef ORGANICUI_USE_MCP
+#define ORGANICUI_USE_MCP 0
+#endif
+
 /** Config: ORGANICUI_USE_WEBBROWSER
 	Mirroring the option from juce_gui_extra, to avoid problems with webkit2gtk
 */
@@ -290,6 +298,9 @@
 #include "manager/ui/BaseItemEditor.h"
 #include "manager/ui/GenericManagerEditor.h"
 
+#if ORGANICUI_USE_MCP
+#include "mcp/McpManagerAdapter.h"
+#endif
 #include "manager/BaseManager.h"
 
 #include "manager/ui/BaseManagerUI.h"
@@ -398,6 +409,11 @@
 #include "app/CrashHandler.h"
 #include "app/OrganicMainComponent.h"
 #include "app/OrganicApplication.h"
+
+#if ORGANICUI_USE_MCP
+#include "mcp/McpCore.h"
+#include "mcp/McpServer.h"
+#endif
 
 
 

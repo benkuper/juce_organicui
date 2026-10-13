@@ -1,5 +1,10 @@
 #include "juce_organicui.h"
 
+#if ORGANICUI_USE_MCP
+#include "mcp/McpCore.cpp"
+#include "mcp/McpServer.cpp"
+#endif
+
 #include "comment/Comment.cpp"
 #include "comment/CommentManager.cpp"
 #include "comment/ui/CommentUI.cpp"
