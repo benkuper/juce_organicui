@@ -4,7 +4,14 @@
 #include "mcp/McpCore.cpp"
 #include "mcp/McpServer.cpp"
 #include "mcp/OrganicMcpProvider.cpp"
+#include "mcp/McpConnectionSettings.cpp"
 #include "mcp/McpConnectionPanel.cpp"
+#endif
+#if ORGANICUI_USE_ASSISTANT
+#include "assistant/AssistantCore.cpp"
+#include "assistant/AssistantProvider.cpp"
+#include "assistant/AssistantController.cpp"
+#include "assistant/AssistantPanel.cpp"
 #endif
 
 #include "comment/Comment.cpp"
