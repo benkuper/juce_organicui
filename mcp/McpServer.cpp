@@ -62,6 +62,7 @@ juce::Result Server::start(int port)
             stream.job = job; stream.subscription = reply;
             stream.inFlight = std::make_shared<std::atomic<bool>>(false);
             stream.closed = std::make_shared<std::atomic<bool>>(false);
+            stream.close = [response] { response->closeConnection(); };
             response->close_connection_after_response = true;
             *response << "HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\nCache-Control: no-store\r\nX-Accel-Buffering: no\r\nConnection: close\r\n\r\n";
             stream.send = [response, busy = stream.inFlight, closed = stream.closed](const String& data)
@@ -105,7 +106,7 @@ void Server::stop()
 {
     running = false;
     stopTimer();
-    for (auto& stream : streams) { stream.closed->store(true); stream.job->context.cancelled->store(true); }
+    for (auto& stream : streams) { stream.closed->store(true); stream.job->context.cancelled->store(true); stream.close(); }
     streams.clear();
     if (impl)
     {
@@ -116,6 +117,9 @@ void Server::stop()
     std::deque<std::shared_ptr<Job>> pending;
     { std::lock_guard<std::mutex> guard(mutex); pending.swap(queue); }
     for (auto& job : pending) { job->context.cancelled->store(true); job->reply({503, Protocol::error({}, -32000, "Server stopping"), {}}); }
+    // Response deleters retain the listener while scheduling their final write.
+    // Release queued response owners before destroying that listener.
+    pending.clear();
     impl.reset(); protocol.clearSessions();
 }
 void Server::invalidateDocument() { ++generation; }
@@ -183,7 +187,7 @@ void Server::timerCallback()
         auto& stream = *it;
         if (stream.closed->load() || stream.job->context.generation != generation.load()
             || (stream.inFlight->load() && now - stream.lastSent > 5000))
-        { stream.job->context.cancelled->store(true); it = streams.erase(it); continue; }
+        { stream.job->context.cancelled->store(true); stream.close(); it = streams.erase(it); continue; }
         try
         {
             // Reauthenticate every tick so rotation, revocation, and profile edits

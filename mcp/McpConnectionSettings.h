@@ -15,7 +15,7 @@ public:
     EnumParameter *clients, *profile;
     BoolParameter* advanced;
     StringParameter *clientName, *folders, *result, *activity;
-    Trigger *create, *save, *rotate, *revoke, *copyToken, *forgetToken, *copyCodex, *copyClaude, *test, *tunnel;
+    Trigger *create, *save, *rotate, *revoke, *copyToken, *forgetToken, *copyCodex, *copyClaude, *test;
     void refreshClients(const String& selected = {});
     String endpoint() const;
     void onContainerParameterChanged(Parameter*) override;

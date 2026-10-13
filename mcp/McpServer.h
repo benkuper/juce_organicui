@@ -48,6 +48,7 @@ private:
         HttpReply subscription;
         std::map<String, String> hashes;
         std::function<void(const String&)> send;
+        std::function<void()> close;
         std::shared_ptr<std::atomic<bool>> inFlight, closed;
         double lastSent = 0;
     };

@@ -171,6 +171,17 @@ public:
     BaseItem* mcpCreate(juce::var data) override
     {
         if (!userCanAddItemsManually || (managerFactory != nullptr && !mcpAcceptsType(data["type"].toString()))) return nullptr;
+        // Some managers override addItemFromData and construct items directly.
+        // Pass the same factory metadata used by their native creation menu.
+        if (managerFactory != nullptr)
+            for (auto* base : managerFactory->defs) if (base->type == data["type"].toString())
+                if (auto* definition = dynamic_cast<typename Factory<T>::Definition*>(base))
+                    if (definition->params.getDynamicObject() != nullptr)
+                    {
+                        auto merged = definition->params.clone();
+                        if (auto* input = data.getDynamicObject()) for (auto& property : input->getProperties()) merged.getDynamicObject()->setProperty(property.name, property.value);
+                        data = merged; break;
+                    }
         return addItemFromData(data, true);
     }
     bool mcpRemove(BaseItem* item) override

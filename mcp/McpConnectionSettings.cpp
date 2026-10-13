@@ -19,7 +19,6 @@ ConnectionSettings::ConnectionSettings(Permissions& p, Server& s, std::function<
     copyCodex = addTrigger("Copy Codex config", "Copy HTTP configuration using CHATAIGNE_MCP_TOKEN from the client's environment.");
     copyClaude = addTrigger("Copy Claude Code config", "Copy HTTP configuration using CHATAIGNE_MCP_TOKEN from the client's environment.");
     test = addTrigger("Test connection", "Test this instance using the newly created credential.");
-    tunnel = addTrigger("ChatGPT tunnel setup", "Open the official Secure MCP Tunnel setup guide.");
     result = addStringParameter("Connection result", "Result of the last connection action.", "Create a client, then copy its credential.");
     activity = addStringParameter("Activity", "Recent request methods, status and duration. Credentials and payloads are excluded.", ""); activity->multiline = true;
     for (auto* value : {result, activity}) { value->setControllableFeedbackOnly(true); value->isSavable = false; }
@@ -84,7 +83,6 @@ void ConnectionSettings::onContainerTriggerTriggered(Trigger* trigger)
             result->setValue("Claude Code config copied. Set CHATAIGNE_MCP_TOKEN for this client.");
         }
         else if (trigger == test) testConnection();
-        else if (trigger == tunnel) juce::URL("https://developers.openai.com/api/docs/guides/secure-mcp-tunnels").launchInDefaultBrowser();
     }
     catch (const Error& error) { result->setValue(String(error.what())); }
 }

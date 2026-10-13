@@ -127,6 +127,12 @@ var OrganicProvider::describe(const String& id, bool includeData)
         result = object({{"handle", id}, {"kind", "container"}, {"name", cc->niceName}, {"address", cc->getControlAddress()},
             {"generation", documentGeneration}, {"childCount", cc->controllableContainers.size()}, {"parameterCount", cc->controllables.size()}});
         if (auto* item = dynamic_cast<BaseItem*>(cc)) result.getDynamicObject()->setProperty("type", item->getTypeString());
+        juce::Array<var> controllableTypes;
+        if (cc->userCanAddControllables && !cc->customUserCreateControllableFunc)
+            for (auto* definition : ControllableFactory::getInstance()->controllableDefs)
+                if (cc->userAddControllablesFilters.isEmpty() || cc->userAddControllablesFilters.contains(definition->controllableType))
+                    controllableTypes.add(definition->controllableType);
+        result.getDynamicObject()->setProperty("controllableTypes", controllableTypes);
         if (auto* manager = dynamic_cast<ManagerAdapter*>(cc))
         {
             auto types = manager->mcpTypes(); juce::Array<var> page;
@@ -290,6 +296,41 @@ void OrganicProvider::registerOperations()
         [this](const var& args, Context&) { return transaction("Rename object", [&] { auto it = handles.find(args["handle"].toString()); if (it->second.container) it->second.container->setUndoableNiceName(args["name"].toString()); else it->second.controllable->setUndoableNiceName(args["name"].toString()); return describe(args["handle"].toString()); }); },
         [this](const var& args, const Context&) { requireRevision(args); if (args["name"].toString().trim().isEmpty()) throw Error(-32602, "Name must not be empty"); auto& e = handles.at(args["handle"].toString()); if ((e.container && !e.container->nameCanBeChangedByUser) || (e.controllable && !e.controllable->userCanChangeName)) throw Error(-32602, "Object cannot be renamed"); }, true);
     auto createInput = schema(object({{"handle", stringSchema()}, {"revision", integerSchema(1, INT32_MAX)}, {"type", stringSchema()}, {"name", stringSchema()}}), array({"handle", "revision", "type"}));
+    add("organic_add_controllable", "Add a native parameter or trigger to a container that permits user controls. Discover controllableTypes first, then configure the returned handle.", createInput, edit,
+        [this](const var& args, Context&) { return transaction("Add controllable", [&]
+        {
+            auto* parent = container(args["handle"].toString());
+            auto control = std::unique_ptr<Controllable>(ControllableFactory::createControllable(args["type"].toString()));
+            if (!control) throw Error(-32602, "Unsupported controllable type");
+            control->setNiceName(parent->getUniqueNameInContainer(args["name"].toString().isEmpty() ? args["type"].toString() : args["name"].toString()));
+            control->isRemovableByUser = true; control->userCanChangeName = true;
+            auto* added = control.release(); parent->addUndoableControllable(added);
+            return describe(handle(added));
+        }); },
+        [this](const var& args, const Context& c)
+        {
+            requireRevision(args); auto* parent = container(args["handle"].toString()); auto type = args["type"].toString();
+            if (!parent->userCanAddControllables || parent->customUserCreateControllableFunc
+                || (!parent->userAddControllablesFilters.isEmpty() && !parent->userAddControllablesFilters.contains(type))
+                || !ControllableFactory::getTypesWithout({}).contains(type)) throw Error(-32602, "Container does not support this native controllable type");
+            c.require(creationCapabilities(parent, type));
+            for (auto* ancestor = parent; ancestor; ancestor = ancestor->parentContainer.get()) if (hasExecutableBehavior(ancestor)) c.require(advanced);
+            if (validateCreation) validateCreation(parent, type, c);
+        }, true);
+    add("organic_remove_controllable", "Remove a user-removable parameter or trigger in one undo transaction.", editInput, edit,
+        [this](const var& args, Context& c) { return transaction("Remove controllable", [&]
+        {
+            auto* control = controllable(args["handle"].toString());
+            if (auto* file = dynamic_cast<FileParameter*>(control)) if (file->getValue().toString().isNotEmpty()) c.requiredPaths.addIfNotAlreadyThere(file->getFile().getFullPathName());
+            control->parentContainer->removeUndoableControllable(control); return object({{"removed", true}});
+        }); },
+        [this](const var& args, const Context& c)
+        {
+            requireRevision(args); auto* control = controllable(args["handle"].toString());
+            if (!control->isRemovableByUser || !control->parentContainer) throw Error(-32602, "Controllable cannot be removed");
+            c.require(parameterCapabilities(control));
+            for (auto* ancestor = control->parentContainer.get(); ancestor; ancestor = ancestor->parentContainer.get()) if (hasExecutableBehavior(ancestor)) c.require(advanced);
+        }, true);
     add("organic_create", "Create a supported manager item by its discovered type; configure its parameters separately.", createInput, edit,
         [this](const var& args, Context&) { return transaction("Create object", [&] { auto* manager = dynamic_cast<ManagerAdapter*>(container(args["handle"].toString())); auto data = object({{"type", args["type"]}}); if (args.hasProperty("name")) data.getDynamicObject()->setProperty("niceName", args["name"]); auto* item = manager->mcpCreate(data); if (!item) throw Error(-32602, "Manager could not create this type"); return describe(handle(item)); }); },
         [this](const var& args, const Context& c) { requireRevision(args); auto* cc = container(args["handle"].toString()); auto* manager = dynamic_cast<ManagerAdapter*>(cc); if (!manager || !manager->mcpAcceptsType(args["type"].toString())) throw Error(-32602, "Unsupported manager type"); c.require(creationCapabilities(cc, args["type"].toString())); if (validateCreation) validateCreation(cc, args["type"].toString(), c); }, true);

@@ -8,7 +8,8 @@ ConnectionPanel::ConnectionPanel(const String& name, ConnectionSettings& model, 
     settings.activity->hideInEditor = true;
     editor = std::make_unique<GenericControllableContainerEditor>(juce::Array<ControllableContainer*>{&settings}, true);
     viewport.setViewedComponent(editor.get(), false); viewport.setScrollBarsShown(true, false);
-    enabledUI.reset(enabled.createDefaultUI()); portUI.reset(port.createDefaultUI());
+    enabledUI.reset(enabled.createDefaultUI());
+    auto* portControl = port.createLabelUI(); portControl->handlePaintTimerInternal(); portUI.reset(portControl);
     addAndMakeVisible(enabledUI.get()); addAndMakeVisible(portUI.get());
     activityUI.reset(settings.activity->createStringParameterTextUI()); addAndMakeVisible(activityUI.get());
     activityUI->editor.setColour(juce::TextEditor::backgroundColourId, BG_COLOR.darker(.1f));
@@ -30,7 +31,7 @@ void ConnectionPanel::paint(juce::Graphics& g)
 void ConnectionPanel::resized()
 {
     auto area = getLocalBounds(); header = area.removeFromTop(94); auto controls = header.reduced(12, 8).removeFromBottom(24);
-    portUI->setBounds(controls.removeFromRight(110)); controls.removeFromRight(8); enabledUI->setBounds(controls.removeFromLeft(juce::jmin(240, controls.getWidth())));
+    portUI->setBounds(controls.removeFromRight(170)); controls.removeFromRight(8); enabledUI->setBounds(controls.removeFromLeft(juce::jmin(240, controls.getWidth())));
     area.reduce(10, 10);
     if (getWidth() >= 780)
     { activityBounds = area.removeFromRight(juce::jmax(280, area.getWidth() / 3)); area.removeFromRight(16); }

@@ -123,7 +123,7 @@ void Panel::paint(juce::Graphics& g)
     g.setColour(PANEL_COLOR.darker(.3f)); g.fillRect(header);
     auto r = header.reduced(16, 9); g.setColour(TEXT_COLOR); g.setFont(juce::Font(18.f, juce::Font::bold));
     g.drawText("Assistant", r.removeFromTop(24), juce::Justification::left);
-    g.setFont(11.f); g.setColour(TEXTNAME_COLOR); g.drawFittedText(accountLabel, r.withWidth(juce::jmin(280, r.getWidth())), juce::Justification::left, 1);
+    g.setFont(11.f); g.setColour(TEXTNAME_COLOR); g.drawFittedText(accountLabel, r.withHeight(18), juce::Justification::left, 1);
     g.setColour(CONTOUR_COLOR); g.drawHorizontalLine(header.getBottom() - 1, 0.f, (float) getWidth());
     g.setColour(PANEL_COLOR.darker(.2f)); g.fillRoundedRectangle(composerCard.toFloat(), 6.f);
     g.setColour(isBusy ? HIGHLIGHT_COLOR : NORMAL_COLOR); g.fillEllipse((float) footer.getX(), (float) footer.getY() + 5, 5.f, 5.f);
