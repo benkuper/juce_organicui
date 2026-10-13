@@ -96,6 +96,13 @@ struct Resource
     String uri, name, description;
     std::function<var(Context&)> read;
 };
+// RFC 6570 simple expansion with one final path-segment variable. The handler
+// receives its percent-decoded value; application permissions still apply.
+struct ResourceTemplate
+{
+    String uriTemplate, name, description;
+    std::function<var(const String&, Context&)> read;
+};
 struct Prompt
 {
     String name, description, text;
@@ -106,9 +113,11 @@ class Registry
 public:
     void add(Operation);
     void add(Resource);
+    void add(ResourceTemplate);
     void add(Prompt);
     var tools(const String& cursor = {}) const;
     var resources(const String& cursor = {}) const;
+    var resourceTemplates(const String& cursor = {}) const;
     var prompts(const String& cursor = {}) const;
     const Operation& find(const String&) const;
     void prevalidate(const String& name, const var& arguments, const Context&) const;
@@ -119,6 +128,7 @@ public:
 private:
     std::map<String, Operation> operations;
     std::map<String, Resource> resourceMap;
+    std::map<String, ResourceTemplate> templateMap;
     std::map<String, Prompt> promptMap;
 };
 

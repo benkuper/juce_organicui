@@ -306,6 +306,16 @@ void Registry::add(Resource r)
     if (!r.read || resourceMap.count(r.uri)) throw Error(-32603, "Invalid or duplicate resource");
     resourceMap.emplace(r.uri, std::move(r));
 }
+void Registry::add(ResourceTemplate r)
+{
+    auto start = r.uriTemplate.indexOfChar('{');
+    auto variable = r.uriTemplate.substring(start + 1, r.uriTemplate.length() - 1);
+    if (!r.read || start < 1 || !r.uriTemplate.endsWithChar('}') || r.uriTemplate.lastIndexOfChar('{') != start
+        || variable.isEmpty() || !variable.containsOnly("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_")
+        || !r.uriTemplate.substring(0, start).endsWithChar('/') || templateMap.count(r.uriTemplate))
+        throw Error(-32603, "Invalid or duplicate resource template");
+    templateMap.emplace(r.uriTemplate, std::move(r));
+}
 void Registry::add(Prompt p)
 {
     if (promptMap.count(p.name)) throw Error(-32603, "Duplicate prompt");
@@ -326,6 +336,11 @@ var Registry::tools(const String& cursor) const { return page(operations, cursor
 var Registry::resources(const String& cursor) const
 {
     return page(resourceMap, cursor, "resources", [](const auto& r) { return object({{"uri", r.uri}, {"name", r.name}, {"description", r.description}, {"mimeType", "application/json"}}); });
+}
+var Registry::resourceTemplates(const String& cursor) const
+{
+    return page(templateMap, cursor, "resourceTemplates", [](const auto& r)
+    { return object({{"uriTemplate", r.uriTemplate}, {"name", r.name}, {"description", r.description}, {"mimeType", "application/json"}}); });
 }
 var Registry::prompts(const String& cursor) const
 {
@@ -358,8 +373,18 @@ var Registry::call(const String& name, const var& args, Context& context) const
 }
 var Registry::read(const String& uri, Context& c) const
 {
-    c.require(inspect); auto it = resourceMap.find(uri); if (it == resourceMap.end()) throw Error(-32004, "Unknown resource");
-    return object({{"contents", array({object({{"uri", uri}, {"mimeType", "application/json"}, {"text", juce::JSON::toString(it->second.read(c))}})})}});
+    c.require(inspect); var data; bool found = false;
+    if (auto it = resourceMap.find(uri); it != resourceMap.end()) { data = it->second.read(c); found = true; }
+    else for (const auto& entry : templateMap)
+    {
+        auto prefix = entry.first.upToFirstOccurrenceOf("{", false, false);
+        if (!uri.startsWith(prefix)) continue;
+        auto value = uri.substring(prefix.length());
+        if (value.isEmpty() || value.containsAnyOf("/?#")) continue;
+        data = entry.second.read(juce::URL::removeEscapeChars(value), c); found = true; break;
+    }
+    if (!found) throw Error(-32004, "Unknown resource");
+    return object({{"contents", array({object({{"uri", uri}, {"mimeType", "application/json"}, {"text", juce::JSON::toString(data)}})})}});
 }
 var Registry::prompt(const String& name) const
 {
@@ -488,7 +513,7 @@ HttpReply Protocol::dispatch(const HttpRequest& request, Context& context)
         else if (method == "ping") result = object();
         else if (method == "tools/list") result = registry.tools(params["cursor"].toString());
         else if (method == "resources/list") result = registry.resources(params["cursor"].toString());
-        else if (method == "resources/templates/list") result = object({{"resourceTemplates", array({})}});
+        else if (method == "resources/templates/list") result = registry.resourceTemplates(params["cursor"].toString());
         else if (method == "prompts/list") result = registry.prompts(params["cursor"].toString());
         else if (method == "resources/read") result = registry.read(params["uri"].toString(), context);
         else if ((method == "resources/subscribe" || method == "resources/unsubscribe") && !modern)

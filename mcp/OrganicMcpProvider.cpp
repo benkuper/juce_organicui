@@ -141,6 +141,7 @@ var OrganicProvider::describe(const String& id, bool includeData)
         }
     }
     else throw Error(-32005, "Object was deleted");
+    result.getDynamicObject()->setProperty("resourceUri", "organic://object/" + juce::URL::addEscapeChars(id, true));
     auto revisionState = result.clone();
     if (auto* p = dynamic_cast<Parameter*>(entry.controllable.get())) revisionState.getDynamicObject()->setProperty("unredactedValue", p->getValue());
     if (auto* cc = entry.container.get())
@@ -393,6 +394,20 @@ void OrganicProvider::registerOperations()
     registry.add(Resource{"organic://identity", "identity", "Application identity", [](Context&) { return object({{"name", juce::JUCEApplicationBase::getInstance() ? juce::JUCEApplicationBase::getInstance()->getApplicationName() : "OrganicUI"}}); }});
     registry.add(Resource{"organic://project", "project", "Project root summary", [this](Context&) { return describe(handle(root.get())); }});
     registry.add(Resource{"organic://capabilities", "capabilities", "Operation schemas and capabilities", [this](Context&) { return registry.tools(); }});
+    registry.add(ResourceTemplate{"organic://object/{handle}", "object_details", "Current object details, revisions and parameter constraints for a discovered handle", [this](const String& id, Context&) { return describe(id); }});
+    registry.add(Resource{"organic://usage", "usage", "OrganicUI authoring and access guide", [](Context&)
+    {
+        return object({{"workflow", array({"Start with organic_browse and follow scoped handles and nextOffset pages.",
+            "Inspect targets and discover manager types or controllableTypes before creating or configuring objects.",
+            "Use the latest revision with typed edits; report returned undo transaction IDs.",
+            "Preview batches to validate them; inspect completed results and recovery instructions after partial failures.",
+            "Refresh discovery after project replacement. Old handles and transactions belong to the previous generation."})},
+            {"objectDetails", "organic_inspect returns resourceUri; resources/templates/list advertises organic://object/{handle}. Reads use the same redaction and stale-handle checks."},
+            {"permissions", "Authenticated credentials select remembered Inspect, Control, Edit or Full access. Code authoring and direct script/system execution require Advanced. Full includes all supported actions and accessible paths; Advanced is not a filesystem sandbox."},
+            {"files", "Restricted file operations require approved absolute paths. Arbitrary serialized configuration requires Full and may have irreversible external effects."},
+            {"observation", "Use organic_observe to select parameters, then subscribe to organic://observation. Sampling and retained history are bounded."},
+            {"diagnostics", "Inspect observed warnings, targets and values. Sending output or executing a test command is a separate control action."}});
+    }});
     add("organic_observe", "Choose up to 32 parameter handles for this credential's bounded observation history. Subscribe to the returned resource to watch changes.",
         schema(object({{"handles", object({{"type", "array"}, {"items", stringSchema()}, {"maxItems", 32}})}}), array({"handles"})), inspect,
         [this](const var& args, Context& c)
