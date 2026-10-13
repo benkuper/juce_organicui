@@ -52,6 +52,7 @@ var parseBounded(const String& json)
 bool Grant::allows(unsigned caps) const
 {
     unsigned available = inspect;
+    if (!folders.isEmpty()) available |= files;
     if (access >= Access::control) available |= control;
     if (access >= Access::edit) available |= edit | files;
     if (advancedExecution || access == Access::full) available |= advanced;
@@ -83,7 +84,7 @@ Permissions::Permissions(juce::File file) : store(file)
     if (!data.isArray()) throw Error(-32603, "Invalid MCP credential store; access is disabled");
     for (const auto& row : *data.getArray())
     {
-        if (!row.isObject() || !row["id"].isString() || row["digest"].toString().length() != 64
+        if (row.getDynamicObject() == nullptr || !row["id"].isString() || row["digest"].toString().length() != 64
             || !row["access"].isInt() || (int) row["access"] < 0 || (int) row["access"] > 3)
             throw Error(-32603, "Invalid MCP credential store; access is disabled");
         Grant grant;
@@ -168,11 +169,13 @@ void Context::check() const
 }
 void Context::require(unsigned caps) const
 {
+    requiredCapabilities |= caps;
     check(); if (!grant.allows(caps)) throw Error(-32003, "Access profile does not permit this operation");
 }
 void Context::requireFile(const juce::File& file) const
 {
     check(); if (!grant.allowsFile(file)) throw Error(-32003, "Path is outside the approved folders");
+    requiredPaths.addIfNotAlreadyThere(file.getFullPathName());
 }
 var schema(const var& properties, const var& required)
 {
@@ -183,9 +186,12 @@ var integerSchema(int minimum, int maximum)
 {
     return object({{"type", "integer"}, {"minimum", minimum}, {"maximum", maximum}});
 }
+var anySchema() { return object(); }
+var openObjectSchema() { auto s = schema(); s.getDynamicObject()->setProperty("additionalProperties", true); return s; }
 void checkSchema(const var& s, int depth)
 {
-    if (depth > 24 || !s.isObject()) throw Error(-32603, "Invalid operation schema");
+    if (depth > 24 || s.getDynamicObject() == nullptr) throw Error(-32603, "Invalid operation schema");
+    if (s.getDynamicObject()->getProperties().isEmpty()) return;
     static const juce::StringArray supported {"type", "properties", "required", "additionalProperties", "items",
         "enum", "minimum", "maximum", "minItems", "maxItems", "minLength", "maxLength", "description", "title", "default"};
     for (const auto& p : s.getDynamicObject()->getProperties())
@@ -195,7 +201,7 @@ void checkSchema(const var& s, int depth)
         throw Error(-32603, "A schema must declare a supported type");
     if (type == "object")
     {
-        if (!s["properties"].isObject() || !s["required"].isArray() || !s["additionalProperties"].isBool())
+        if (s["properties"].getDynamicObject() == nullptr || !s["required"].isArray() || !s["additionalProperties"].isBool())
             throw Error(-32603, "Object schemas must declare properties, required, and additionalProperties");
         for (const auto& p : s["properties"].getDynamicObject()->getProperties()) checkSchema(p.value, depth + 1);
         for (const auto& r : *s["required"].getArray())
@@ -206,10 +212,12 @@ void checkSchema(const var& s, int depth)
 void validate(const var& s, const var& v, const String& path, int depth)
 {
     if (depth > 24) throw Error(-32602, "Arguments exceed nesting limit");
+    if (s.getDynamicObject() == nullptr) throw Error(-32603, "Invalid operation schema");
+    if (s.getDynamicObject()->getProperties().isEmpty()) return;
     auto fail = [&path](const String& why) { throw Error(-32602, path + ": " + why); };
     const auto type = s["type"].toString();
     bool numeric = v.isInt() || v.isInt64() || v.isDouble();
-    bool matches = (type == "object" && v.isObject()) || (type == "array" && v.isArray())
+    bool matches = (type == "object" && v.getDynamicObject() != nullptr) || (type == "array" && v.isArray())
         || (type == "string" && v.isString()) || (type == "boolean" && v.isBool())
         || (type == "number" && numeric) || (type == "integer" && numeric && std::floor((double) v) == (double) v)
         || (type == "null" && (v.isVoid() || v.isUndefined()));
@@ -230,7 +238,7 @@ void validate(const var& s, const var& v, const String& path, int depth)
             || (s.hasProperty("maxItems") && size > (int) s["maxItems"])) fail("array size outside permitted range");
         for (int i = 0; i < size; ++i) validate(s["items"], v[i], path + "[" + String(i) + "]", depth + 1);
     }
-    if (v.isObject())
+    if (type == "object")
     {
         for (const auto& required : *s["required"].getArray()) if (!v.hasProperty(required.toString())) fail("missing " + required.toString());
         auto properties = s["properties"];
@@ -292,8 +300,16 @@ void Registry::prevalidate(const String& name, const var& args, const Context& c
     const auto& op = find(name); context.require(op.capabilities); validate(op.input, args);
     if (op.prevalidate) op.prevalidate(args, context);
 }
+static thread_local Context* activeContext = nullptr;
+Context* Registry::executingContext() { return activeContext; }
 var Registry::call(const String& name, const var& args, Context& context) const
 {
+    struct Scope
+    {
+        Context*& current; Context* previous;
+        Scope(Context*& slot, Context& next) : current(slot), previous(slot) { if (!previous) { next.requiredCapabilities = 0; next.requiredPaths.clear(); } current = &next; }
+        ~Scope() { current = previous; }
+    } scope(activeContext, context);
     prevalidate(name, args, context);
     auto result = find(name).execute(args, context);
     try { validate(find(name).output, result); }
@@ -363,9 +379,9 @@ HttpReply Protocol::dispatch(const HttpRequest& request, Context& context)
             if (!request.accept.contains("application/json") || !request.accept.contains("text/event-stream")) { reply.status = 406; return reply; }
             message = parseBounded(request.body);
             id = message["id"];
-            if (!message.isObject() || message["jsonrpc"].toString() != "2.0" || !message["method"].isString()
+            if (message.getDynamicObject() == nullptr || message["jsonrpc"].toString() != "2.0" || !message["method"].isString()
                 || (message.hasProperty("id") && !id.isString() && !id.isInt() && !id.isInt64())
-                || (message.hasProperty("params") && !message["params"].isObject())) throw Error(-32600, "Invalid request");
+                || (message.hasProperty("params") && message["params"].getDynamicObject() == nullptr)) throw Error(-32600, "Invalid request");
         }
         auto method = message["method"].toString(); auto params = message.getProperty("params", object());
         auto version = request.version;
@@ -377,8 +393,8 @@ HttpReply Protocol::dispatch(const HttpRequest& request, Context& context)
             if (request.method != "POST") { reply.status = 405; return reply; }
             if (!supported(version)) throw Error(-32022, "Unsupported protocol version", object({{"supported", array({"2026-07-28", "2025-11-25", "2025-06-18"})}, {"requested", version}}));
             if (version != "2026-07-28" || params["_meta"]["io.modelcontextprotocol/protocolVersion"].toString() != version
-                || request.rpcMethod != method || !params["_meta"]["io.modelcontextprotocol/clientInfo"].isObject()
-                || !params["_meta"]["io.modelcontextprotocol/clientCapabilities"].isObject()) throw Error(-32020, "Request metadata headers mismatch");
+                || request.rpcMethod != method || params["_meta"]["io.modelcontextprotocol/clientInfo"].getDynamicObject() == nullptr
+                || params["_meta"]["io.modelcontextprotocol/clientCapabilities"].getDynamicObject() == nullptr) throw Error(-32020, "Request metadata headers mismatch");
             if (method == "tools/call" || method == "resources/read" || method == "prompts/get")
             {
                 auto name = params[method == "resources/read" ? "uri" : "name"].toString();
@@ -450,7 +466,7 @@ HttpReply Protocol::dispatch(const HttpRequest& request, Context& context)
         else if (method == "subscriptions/listen" && modern)
         {
             auto filters = params["notifications"];
-            if (!filters.isObject()) throw Error(-32602, "Missing notification filters");
+            if (filters.getDynamicObject() == nullptr) throw Error(-32602, "Missing notification filters");
             auto uris = filters["resourceSubscriptions"];
             if ((!uris.isVoid() && !uris.isArray()) || uris.size() > 32) throw Error(-32602, "Invalid resource subscriptions");
             if (uris.isArray()) for (const auto& uri : *uris.getArray())

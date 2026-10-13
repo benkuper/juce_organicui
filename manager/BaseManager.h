@@ -170,7 +170,7 @@ public:
     }
     BaseItem* mcpCreate(juce::var data) override
     {
-        if (!mcpAcceptsType(data["type"].toString())) return nullptr;
+        if (!userCanAddItemsManually || (managerFactory != nullptr && !mcpAcceptsType(data["type"].toString()))) return nullptr;
         return addItemFromData(data, true);
     }
     bool mcpRemove(BaseItem* item) override

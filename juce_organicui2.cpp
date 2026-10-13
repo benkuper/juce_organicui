@@ -3,6 +3,7 @@
 #if ORGANICUI_USE_MCP
 #include "mcp/McpCore.cpp"
 #include "mcp/McpServer.cpp"
+#include "mcp/OrganicMcpProvider.cpp"
 #endif
 
 #include "comment/Comment.cpp"

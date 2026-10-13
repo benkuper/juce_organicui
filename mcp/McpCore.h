@@ -63,6 +63,8 @@ struct Context
     std::shared_ptr<std::atomic<bool>> cancelled = std::make_shared<std::atomic<bool>>(false);
     double deadline = juce::Time::getMillisecondCounterHiRes() + 30000;
     juce::int64 generation = 0;
+    mutable unsigned requiredCapabilities = 0;
+    mutable juce::StringArray requiredPaths;
     void check() const;
     void require(unsigned capabilities) const;
     void requireFile(const juce::File&) const;
@@ -75,6 +77,8 @@ void validate(const var& schema, const var& value, const String& path = "$", int
 var schema(const var& properties = object(), const var& required = array({}));
 var stringSchema();
 var integerSchema(int minimum, int maximum);
+var anySchema();
+var openObjectSchema();
 
 struct Operation
 {
@@ -111,6 +115,7 @@ public:
     var call(const String& name, const var& arguments, Context&) const;
     var read(const String& uri, Context&) const;
     var prompt(const String& name) const;
+    static Context* executingContext();
 private:
     std::map<String, Operation> operations;
     std::map<String, Resource> resourceMap;

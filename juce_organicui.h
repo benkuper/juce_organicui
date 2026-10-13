@@ -413,6 +413,7 @@
 #if ORGANICUI_USE_MCP
 #include "mcp/McpCore.h"
 #include "mcp/McpServer.h"
+#include "mcp/OrganicMcpProvider.h"
 #endif
 
 

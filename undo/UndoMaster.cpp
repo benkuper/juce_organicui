@@ -39,8 +39,8 @@ void UndoMaster::performAction(const String & name, UndoableAction * action)
 	}
 
 	isPerforming = true;
-	beginNewTransaction(name);
-	perform(action,name);
+    if (transactionGroupDepth == 0) beginNewTransaction(name);
+    perform(action, transactionGroupDepth == 0 ? name : transactionGroupName);
 	isPerforming = false;
 	if (Engine::mainEngine != nullptr) Engine::mainEngine->changed();
 }
@@ -56,8 +56,19 @@ void UndoMaster::performActions(const String & name, Array<UndoableAction*> acti
 	}
 
 	isPerforming = true;
-	beginNewTransaction(name);
-	for (auto &a : actions) perform(a,name);
+    if (transactionGroupDepth == 0) beginNewTransaction(name);
+    for (auto &a : actions) perform(a, transactionGroupDepth == 0 ? name : transactionGroupName);
 	isPerforming = false;
 	if (Engine::mainEngine != nullptr) Engine::mainEngine->changed();
+}
+
+void UndoMaster::beginGroupedTransaction(const String& name)
+{
+    jassert(MessageManager::getInstance()->isThisTheMessageThread());
+    if (transactionGroupDepth++ == 0) { transactionGroupName = name; beginNewTransaction(name); }
+}
+void UndoMaster::endGroupedTransaction()
+{
+    jassert(transactionGroupDepth > 0);
+    if (transactionGroupDepth > 0 && --transactionGroupDepth == 0) { beginNewTransaction(); transactionGroupName.clear(); }
 }
