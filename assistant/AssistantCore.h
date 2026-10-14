@@ -14,6 +14,8 @@ var verifyIdentity(const String& jwt, const var& jwks, const String& client,
 var renewedAccount(const var& previous, const var& tokenResponse, double nowSeconds);
 String accountKey(const var& verifiedIdentity, const String& issuedClient);
 String usageError(const String& code);
+juce::StringArray reasoningEfforts(const String& model);
+String actionableError(const String& message, int code = 0);
 
 // Windows: DPAPI current-user encryption. Unix: atomically replaced owner-only files.
 // Neither tokens nor history are written to a project or to logs.
@@ -39,6 +41,7 @@ public:
 private:
     std::string pending, eventData;
     size_t total = 0;
+    bool emittedText = false;
     std::map<int, var> completedItems;
     void event(const std::function<void(const String&)>&);
 };

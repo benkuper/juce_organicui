@@ -115,7 +115,36 @@ String usageError(const String& code)
 {
     if (code == "subscription_sharing_usage_limit_exceeded") return "ChatGPT app usage limit reached. Review ChatGPT Settings > Usage or wait for your limit to reset.";
     if (code == "subscription_sharing_usage_unavailable") return "ChatGPT plan usage is unavailable for this account. Review app access in ChatGPT Settings > Usage.";
-    return "ChatGPT request failed (" + code.substring(0, 100).retainCharacters("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-") + "). Retry or sign in again.";
+    return "ChatGPT couldn't complete the request" + (code.isEmpty() ? String(".") : " (" + code + ").");
+}
+juce::StringArray reasoningEfforts(const String& model)
+{
+    // Keep unknown/chat/pro variants on the server default rather than send
+    // an effort they may not accept. These families document this common set.
+    if (model.contains("chat") || model.endsWith("-pro") || model.contains("-pro-")) return {};
+    if (model.startsWith("gpt-6") || model.startsWith("gpt-5.6")) return {"low", "medium", "high", "xhigh", "max"};
+    if (model.startsWith("gpt-5.5") || model.startsWith("gpt-5.4")) return {"low", "medium", "high", "xhigh"};
+    if (model.startsWith("gpt-5") || model == "o3" || model == "o4-mini") return {"low", "medium", "high"};
+    return {};
+}
+String actionableError(const String& message, int code)
+{
+    if (message.contains("What to try:")) return message;
+    String next;
+    auto lower = message.toLowerCase();
+    if (code == -32800) return message;
+    if (lower.contains("usage limit")) next = "Open Usage in the panel to check your allowance and reset time, then continue this conversation after the limit resets.";
+    else if (lower.contains("plan usage")) next = "Open Usage to check this account's app access and plan eligibility, enable access if available, then sign in again from Account and settings.";
+    else if (lower.contains("approved folders")) next = "Open Account and settings, add the needed folder under Approved folders, choose Remember access, then ask me to continue.";
+    else if (code == -32003) next = "Choose the access level needed for this task in the panel (Edit permits creating and configuring objects), then ask me to continue. Script execution also needs Advanced execution in settings.";
+    else if (code == -32001) next = "The assistant's local access was revoked or expired. Use Continue with ChatGPT in Account and settings to reconnect, then review the access level.";
+    else if (code == -32005 || code == -32006) next = "Refresh the affected object's current handle and revision, then retry only the unfinished operation. Inspect completed batch results first to avoid duplicates.";
+    else if (lower.contains("effort")) next = "Set Effort to Auto or choose a supported level for this model, then send the message again.";
+    else if (lower.contains("sign in") || lower.contains("authorize")) next = "Use Continue with ChatGPT in Account and settings. Your saved conversations will still be available.";
+    else if (lower.contains("network") || lower.contains("connect") || lower.contains("unavailable")) next = "Check your internet connection and use Reconnect in the panel (or Refresh models in settings), then retry. Your saved sign-in and conversations are kept.";
+    else if (lower.contains("conversation is full") || lower.contains("conversation request is full")) next = "Start a new conversation from History and describe the work that remains.";
+    else next = "Review the current project before retrying. If the problem continues, use Copy conversation and paste it into Codex with what you were trying to do.";
+    return message + "\n\nWhat to try: " + next;
 }
 ProtectedStore::ProtectedStore(juce::File d) : directory(d)
 {
@@ -188,7 +217,7 @@ void ResponseStream::event(const std::function<void(const String&)>& delta)
     auto type = value["type"].toString();
     if (eventObserved) eventObserved(value);
     if (completed) throw Error(-32030, "Unexpected event after response completion");
-    if (type == "response.output_text.delta") delta(value["delta"].toString());
+    if (type == "response.output_text.delta") { emittedText = true; delta(value["delta"].toString()); }
     else if (type == "response.output_item.done")
     {
         if (!value["item"].getDynamicObject() || !value["output_index"].isInt() || (int) value["output_index"] < 0 || (int) value["output_index"] > 127)
@@ -199,13 +228,28 @@ void ResponseStream::event(const std::function<void(const String&)>& delta)
     {
         if (!value["response"]["output"].isArray()) throw Error(-32030, "Invalid completed response");
         completed = true; output = value["response"]["output"].clone();
-        // This subscription route can omit already-streamed items from the
-        // terminal envelope. Retain output_item.done, including local calls.
-        if (output.getArray()->isEmpty()) for (auto& item : completedItems) output.append(item.second);
+        // The terminal envelope can omit some or all already-streamed items.
+        // Retain missing calls even when a final message is also present.
+        for (auto& entry : completedItems)
+        {
+            auto item = entry.second; bool found = false;
+            for (auto existing : *output.getArray())
+                found |= (!item["id"].toString().isEmpty() && item["id"] == existing["id"])
+                    || (!item["call_id"].toString().isEmpty() && item["call_id"] == existing["call_id"])
+                    || juce::JSON::toString(item, true) == juce::JSON::toString(existing, true);
+            if (!found) output.append(item);
+        }
+        if (!emittedText)
+            for (auto item : *output.getArray()) if (item["type"].toString() == "message")
+                if (auto* content = item["content"].getArray())
+                    for (auto part : *content) if (part["type"].toString() == "output_text") delta(part["text"].toString());
     }
-    else if (type == "response.failed") throw Error(-32030, usageError(value["response"]["error"]["code"].toString()));
-    else if (type == "error") throw Error(-32030, usageError(value["code"].toString()));
-    else if (type == "response.incomplete") throw Error(-32030, "ChatGPT response is incomplete. Review activity before retrying.");
+    else if (type == "response.failed" || type == "error")
+    {
+        auto code = (type == "error" ? value["code"] : value["response"]["error"]["code"]).toString();
+        throw Error(-32030, usageError(code), mcp::object({{"retryable", code == "server_error" || code == "internal_error" || code == "rate_limit_exceeded" || code == "overloaded"}}));
+    }
+    else if (type == "response.incomplete") throw Error(-32030, "ChatGPT response is incomplete. Review activity before retrying.", mcp::object({{"retryable", true}}));
 }
 void ResponseStream::push(const void* bytes, size_t count, const std::function<void(const String&)>& delta)
 {
@@ -225,6 +269,6 @@ void ResponseStream::push(const void* bytes, size_t count, const std::function<v
 }
 void ResponseStream::finish() const
 {
-    if (!completed) throw Error(-32030, "ChatGPT stream interrupted before completion. Review activity before retrying.");
+    if (!completed) throw Error(-32030, "ChatGPT stream interrupted before completion. Review activity before retrying.", mcp::object({{"retryable", true}}));
 }
 }

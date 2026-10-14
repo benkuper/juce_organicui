@@ -354,27 +354,61 @@ void OrganicProvider::registerOperations()
         add(redo ? "organic_redo" : "organic_undo", "Undo or redo the specified MCP transaction; intervening history causes a conflict.", schema(object({{"transaction", stringSchema()}}), array({"transaction"})), edit,
             [this, redo](const var& args, Context&) { auto* undo = UndoMaster::getInstance(); if (!(redo ? undo->redo() : undo->undo())) throw Error(-32006, "Undo history changed"); return object({{"transaction", args["transaction"]}, {"redone", redo}}); },
             [this, redo](const var& args, const Context& c) { ensureReady(); auto it = transactions.find(args["transaction"].toString()); auto* undo = UndoMaster::getInstance(); if (it == transactions.end() || (redo ? undo->getRedoDescription() : undo->getUndoDescription()) != it->second.title) throw Error(-32006, "Requested transaction is not at the current history position"); c.require(it->second.capabilities); for (const auto& path : it->second.paths) c.requireFile(juce::File(path)); }, true);
-    auto itemSchema = schema(object({{"name", stringSchema()}, {"arguments", openObjectSchema()}}), array({"name", "arguments"}));
+    auto itemSchema = schema(object({{"name", stringSchema()}, {"arguments", openObjectSchema()},
+        {"id", stringSchema()}, {"target", stringSchema()}, {"path", stringSchema()}}), array({"name", "arguments"}));
     auto batchSchema = schema(object({{"operations", object({{"type", "array"}, {"items", itemSchema}, {"minItems", 1}, {"maxItems", 64}})}, {"preview", object({{"type", "boolean"}})}}), array({"operations"}));
-    add("organic_batch", "Prevalidate up to 64 operations, optionally preview, then execute as one named undo group. Failures report completed operations and irreversible effects.", batchSchema, inspect,
+    add("organic_batch", "Group up to 64 operations in one call and undo group. Reuse inspected revisions: revisions are advanced between this batch's own edits. Give an operation an id; a later operation can use target=id and optional path (a discovered relative child address) to inject that result's handle and current revision into arguments. Example: create id=step, then set_value target=step path=time arguments={value:1}. Dependent targets are validated just before execution; preview reports deferredValidation. Stops on failure and returns completed results for recovery. Prefer this for repeated creation/configuration, including modules, variables, presets and sequence triggers.", batchSchema, inspect,
         [this](const var& args, Context& c)
         {
-            if ((bool) args["preview"]) return object({{"valid", true}, {"operationCount", args["operations"].size()}, {"preview", true}});
+            int deferred = 0;
+            for (auto operation : *args["operations"].getArray()) if (operation.hasProperty("target")) ++deferred;
+            if ((bool) args["preview"]) return object({{"valid", deferred == 0}, {"operationCount", args["operations"].size()}, {"deferredValidation", deferred}, {"preview", true}});
             return transaction("Batch edit", [&]
             {
                 juce::Array<var> completed; bool irreversible = false;
+                std::map<String, var> results;
                 for (const auto& operation : *args["operations"].getArray())
                 {
                     auto name = operation["name"].toString();
+                    auto index = completed.size();
                     try
                     {
-                        auto result = registry.call(name, operation["arguments"], c);
+                        auto arguments = operation["arguments"].clone();
+                        if (operation.hasProperty("target"))
+                        {
+                            auto id = results.at(operation["target"].toString())["handle"].toString();
+                            auto path = operation["path"].toString();
+                            if (path.isNotEmpty())
+                            {
+                                auto* parent = container(id);
+                                if (auto* child = parent->getControllableForAddress(path)) id = handle(child);
+                                else if (auto* child = parent->getControllableContainerForAddress(path.startsWith("/") ? path : "/" + path)) id = handle(child);
+                                else throw Error(-32602, "Batch target child does not exist: " + path);
+                            }
+                            auto info = describe(id);
+                            arguments.getDynamicObject()->setProperty("handle", info["handle"]);
+                            if (registry.find(name).input["properties"].hasProperty("revision"))
+                                arguments.getDynamicObject()->setProperty("revision", info["revision"]);
+                        }
+                        else
+                        {
+                            // Every explicit revision was checked against the entry
+                            // snapshot before any edit. Only our own intervening edits
+                            // may advance it within this synchronous message-thread call.
+                            if (arguments.hasProperty("revision")) arguments.getDynamicObject()->setProperty("revision", describe(arguments["handle"].toString())["revision"]);
+                            if (arguments.hasProperty("destinationRevision")) arguments.getDynamicObject()->setProperty("destinationRevision", describe(arguments["destination"].toString())["revision"]);
+                        }
                         irreversible |= registry.find(name).externalEffects || (!registry.find(name).reversible && registry.find(name).capabilities != inspect);
-                        completed.add(object({{"name", name}, {"result", result}}));
+                        auto result = registry.call(name, arguments, c);
+                        auto row = object({{"name", name}, {"result", result}});
+                        if (operation.hasProperty("id")) { row.getDynamicObject()->setProperty("id", operation["id"]); results[operation["id"].toString()] = result; }
+                        completed.add(row);
+                        if (result.hasProperty("success") && !(bool) result["success"])
+                            throw Error(-32000, "Batch operation reported failure", result);
                     }
                     catch (const Error& error)
                     {
-                        return object({{"success", false}, {"completed", completed}, {"failedOperation", name}, {"error", String(error.what())},
+                        return object({{"success", false}, {"completed", completed}, {"failedOperation", name}, {"failedIndex", index}, {"error", error.code}, {"message", String(error.what())}, {"details", error.data},
                             {"irreversibleEffects", irreversible}, {"recovery", "Inspect completed results and current revisions before retrying. Undo the returned transaction only if it remains at the current history position."}});
                     }
                 }
@@ -383,12 +417,34 @@ void OrganicProvider::registerOperations()
         },
         [this](const var& args, const Context& c)
         {
+            juce::StringArray ids;
             for (const auto& operation : *args["operations"].getArray())
             {
                 auto name = operation["name"].toString();
                 if (name == "organic_batch" || name == "organic_undo" || name == "organic_redo" || name == "chataigne_new" || name == "chataigne_open")
                     throw Error(-32602, "History and project replacement operations cannot be nested in a batch");
-                registry.prevalidate(name, operation["arguments"], c);
+                if (operation.hasProperty("target"))
+                {
+                    if (!ids.contains(operation["target"].toString())) throw Error(-32602, "Batch target must reference an earlier operation id");
+                    auto arguments = operation["arguments"].clone();
+                    if (arguments.hasProperty("handle") || arguments.hasProperty("revision")) throw Error(-32602, "Batch target supplies handle and revision; omit them from arguments");
+                    const auto& op = registry.find(name); c.require(op.capabilities);
+                    if (!op.input["properties"].hasProperty("handle")) throw Error(-32602, "Operation does not accept a batch target");
+                    arguments.getDynamicObject()->setProperty("handle", "deferred-batch-target");
+                    if (op.input["properties"].hasProperty("revision")) arguments.getDynamicObject()->setProperty("revision", 1);
+                    validate(op.input, arguments); // Dynamic permissions/constraints are checked at execution.
+                }
+                else
+                {
+                    if (operation.hasProperty("path")) throw Error(-32602, "Batch path requires target");
+                    registry.prevalidate(name, operation["arguments"], c);
+                }
+                if (operation.hasProperty("id"))
+                {
+                    auto id = operation["id"].toString();
+                    if (id.isEmpty() || ids.contains(id)) throw Error(-32602, "Batch ids must be nonempty and unique");
+                    ids.add(id);
+                }
             }
         }, true);
     registry.add(Resource{"organic://identity", "identity", "Application identity", [](Context&) { return object({{"name", juce::JUCEApplicationBase::getInstance() ? juce::JUCEApplicationBase::getInstance()->getApplicationName() : "OrganicUI"}}); }});
@@ -399,8 +455,9 @@ void OrganicProvider::registerOperations()
     {
         return object({{"workflow", array({"Start with organic_browse and follow scoped handles and nextOffset pages.",
             "Inspect targets and discover manager types or controllableTypes before creating or configuring objects.",
-            "Use the latest revision with typed edits; report returned undo transaction IDs.",
-            "Preview batches to validate them; inspect completed results and recovery instructions after partial failures.",
+            "Use the latest revision with typed edits; keep undo transaction IDs available for recovery.",
+            "Use organic_batch for repeated creation/configuration. Declare id on results, then target=id with a discovered relative child path for dependent edits or inspection.",
+            "Preview batches before editing when useful; dependent targets report deferredValidation. Inspect completed results and recovery instructions after partial failures.",
             "Refresh discovery after project replacement. Old handles and transactions belong to the previous generation."})},
             {"objectDetails", "organic_inspect returns resourceUri; resources/templates/list advertises organic://object/{handle}. Reads use the same redaction and stale-handle checks."},
             {"permissions", "Authenticated credentials select remembered Inspect, Control, Edit or Full access. Code authoring and direct script/system execution require Advanced. Full includes all supported actions and accessible paths; Advanced is not a filesystem sandbox."},
@@ -441,7 +498,7 @@ void OrganicProvider::registerOperations()
         juce::Array<var> samples; for (const auto& sample : observation.samples) samples.add(sample);
         return object({{"samples", samples}, {"generation", documentGeneration}});
     }});
-    registry.add(Prompt{"organic_build_project", "Author a project", "Browse the project root and available types. Inspect each target and its revision before editing. Use the smallest supported authoring operations, validate references, then save. Report external effects and undo transaction IDs."});
+    registry.add(Prompt{"organic_build_project", "Author a project", "Browse the project root and available types. Inspect each target and its revision before editing. Use the smallest supported authoring operations. Finish configuring all requested objects, inspect dynamic controls after binding inputs, and validate references and final values before saving. Summarize completed changes, unfinished work and relevant external effects in plain language."});
     registry.add(Prompt{"organic_explain_signal_flow", "Explain signal flow", "Inspect the relevant inputs, processing containers, target references, and outputs. Explain the observed connections with object handles and evidence. Keep diagnostics read-only."});
 }
 }

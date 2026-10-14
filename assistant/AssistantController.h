@@ -15,18 +15,21 @@ public:
     ControllableContainer settings {"ChatGPT Assistant"};
     StringParameter *prompt, *transcript, *status;
     BoolParameter* busy;
-    Trigger *send, *cancelRequest, *clearHistory, *openSettings;
+    Trigger *send, *cancelRequest, *clearHistory, *newConversation, *openSettings;
     Trigger *explainProject, *findIssues, *buildWorkflow;
-    EnumParameter *accounts, *models, *access;
+    EnumParameter *accounts, *models, *access, *effort;
     BoolParameter *advanced, *includeProjectContext;
     StringParameter* folders;
     Trigger *signIn, *addAccount, *signOut, *refreshModels, *saveAccess, *usage;
     void refresh();
+    String currentError() const { return localError; }
+    void selectConversation(const String& id) { perform([&] { provider.selectConversation(id); }); }
     void onContainerTriggerTriggered(Trigger*) override;
     void onControllableFeedbackUpdate(ControllableContainer*, Controllable*) override;
 private:
     bool updating = false;
     String selectedAccount, accountSignature, modelSignature, localError;
+    String effortModel;
     void timerCallback() override { refresh(); }
     void action(Trigger*);
     void perform(const std::function<void()>&);

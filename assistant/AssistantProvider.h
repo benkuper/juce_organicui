@@ -8,11 +8,13 @@
 
 namespace organic::assistant
 {
+enum class Activity { idle, connecting, thinking, responding, working, completed, failed, stopped };
 struct View
 {
-    var accounts = mcp::array({}), models = mcp::array({});
-    String active, transcript, status = "Continue with ChatGPT to use your plan. Account integration is in preview.";
-    bool busy = false;
+    var accounts = mcp::array({}), models = mcp::array({}), conversations = mcp::array({});
+    String active, conversation, transcript, status = "Sign in to get started.";
+    Activity activity = Activity::idle;
+    bool busy = false, signedIn = false;
 };
 // Other native providers can implement this interface without changing the docked UI.
 class Provider
@@ -23,10 +25,12 @@ public:
     virtual void signIn(bool newAccount) = 0;
     virtual void select(const String& key) = 0;
     virtual void refreshModels() = 0;
-    virtual void send(const String& text, const String& model) = 0;
+    virtual void send(const String& text, const String& model, const String& effort = {}) = 0;
     virtual void cancel() = 0;
     virtual void signOut() = 0;
     virtual void clearHistory() = 0;
+    virtual void newConversation() = 0;
+    virtual void selectConversation(const String&) = 0;
     virtual mcp::Grant grant() const = 0;
     virtual void setAccess(mcp::Access, bool advanced, juce::StringArray folders) = 0;
 };
@@ -49,10 +53,12 @@ public:
     void signIn(bool newAccount) override;
     void select(const String&) override;
     void refreshModels() override;
-    void send(const String&, const String& model) override;
+    void send(const String&, const String& model, const String& effort = {}) override;
     void cancel() override;
     void signOut() override;
     void clearHistory() override;
+    void newConversation() override;
+    void selectConversation(const String&) override;
     mcp::Grant grant() const override;
     void setAccess(mcp::Access, bool, juce::StringArray) override;
 private:
@@ -75,7 +81,7 @@ private:
     void handleAsyncUpdate() override;
     void start(std::function<void()>);
     void check() const;
-    void status(const String&);
+    void status(const String&, Activity = Activity::idle);
     void append(const String&);
     void loadRecords();
     void saveRecord(const var&);
@@ -85,6 +91,9 @@ private:
                 const String& bearer = {}, bool form = false, ResponseStream* stream = nullptr);
     var onMessageThread(std::function<var()>);
     void models(var record);
+    void loadConversations(const String& account);
+    String historyName(const String& account) const;
+    void saveConversation(const String& account, const var& input, const String& title);
     juce::InterProcessLock accountLock() const;
 };
 }

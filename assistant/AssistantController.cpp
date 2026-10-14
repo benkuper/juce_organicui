@@ -12,13 +12,16 @@ Controller::Controller(Provider& p) : ControllableContainer("Assistant"), provid
     for (auto* value : controllables) value->isSavable = false;
     send = addTrigger("Send", "Send the prompt using the selected ChatGPT model and remembered access.");
     cancelRequest = addTrigger("Cancel", "Cancel pending inference and queued tool operations.");
-    clearHistory = addTrigger("Clear conversation", "Delete this account's local conversation history.");
+    clearHistory = addTrigger("Delete conversation", "Delete only the current local conversation.");
+    newConversation = addTrigger("New conversation", "Start a new conversation and keep previous conversations in History.");
     openSettings = addTrigger("Account & access", "Open ChatGPT Assistant in Global Settings.");
     explainProject = addTrigger("Explain project", "Prepare a prompt to explain the current project.");
     findIssues = addTrigger("Find issues", "Prepare a read-only diagnostics prompt.");
     buildWorkflow = addTrigger("Build workflow", "Prepare a project authoring prompt.");
     accounts = settings.addEnumParameter("Account", "Saved, verified ChatGPT registrations. Credentials are protected in local Global Settings storage.");
     models = settings.addEnumParameter("Model", "Models available to the selected ChatGPT account.");
+    effort = settings.addEnumParameter("Effort", "How much the selected model should think. Auto uses the model's default.");
+    effort->addOption("Auto", "");
     signIn = settings.addTrigger("Continue with ChatGPT", "Sign in through your browser using your ChatGPT plan. Account integration is in preview.");
     addAccount = settings.addTrigger("Add account", "Register another ChatGPT account or workspace.");
     signOut = settings.addTrigger("Sign out", "Revoke the renewable session and remove local tokens; keep its account registration.");
@@ -37,7 +40,8 @@ Controller::~Controller() { stopTimer(); settings.removeControllableContainerLis
 void Controller::perform(const std::function<void()>& task)
 {
     try { localError.clear(); task(); refresh(); }
-    catch (const std::exception& error) { localError = String(error.what()); status->setValue(localError); }
+    catch (const mcp::Error& error) { localError = actionableError(String(error.what()), error.code); status->setValue(localError); }
+    catch (const std::exception& error) { localError = actionableError(String(error.what())); status->setValue(localError); }
 }
 void Controller::onContainerTriggerTriggered(Trigger* trigger) { action(trigger); }
 void Controller::onControllableFeedbackUpdate(ControllableContainer*, Controllable* value)
@@ -50,6 +54,11 @@ void Controller::onControllableFeedbackUpdate(ControllableContainer*, Controllab
         const bool full = (int) access->getValueData() == 3;
         advanced->setEnabled(!full); folders->setEnabled(!full);
         if (full) advanced->setValue(true);
+        perform([this]
+        {
+            auto paths = juce::StringArray::fromLines(folders->stringValue()); paths.trim(); paths.removeEmptyStrings();
+            provider.setAccess((mcp::Access) (int) access->getValueData(), advanced->boolValue(), paths);
+        });
     }
 }
 void Controller::action(Trigger* trigger)
@@ -57,9 +66,10 @@ void Controller::action(Trigger* trigger)
     if (updating) return;
     perform([&]
     {
-        if (trigger == send) { provider.send(prompt->stringValue(), models->getValueData().toString()); prompt->setValue(""); }
+        if (trigger == send) { provider.send(prompt->stringValue(), models->getValueData().toString(), effort->getValueData().toString()); prompt->setValue(""); }
         else if (trigger == cancelRequest) provider.cancel();
         else if (trigger == clearHistory) provider.clearHistory();
+        else if (trigger == newConversation) { provider.newConversation(); prompt->setValue(""); }
         else if (trigger == openSettings) settings.selectThis();
         else if (trigger == signIn) provider.signIn(false);
         else if (trigger == addAccount) provider.signIn(true);
@@ -98,9 +108,20 @@ void Controller::refresh()
         try { auto grant = provider.grant(); access->setValueWithData((int) grant.access); advanced->setValue(grant.advancedExecution || grant.access == mcp::Access::full); folders->setValue(grant.folders.joinIntoString("\n")); }
         catch (...) {}
     }
+    auto selectedModel = models->getValueData().toString();
+    if (effortModel != selectedModel)
+    {
+        effortModel = selectedModel; auto previous = effort->getValueData();
+        juce::Array<EnumParameter::EnumValue> options; options.add({"Auto", ""});
+        for (auto value : reasoningEfforts(selectedModel))
+            options.add({value == "xhigh" ? String("Extra high") : value.substring(0, 1).toUpperCase() + value.substring(1), value});
+        effort->setOptions(options); if (!effort->setValueWithData(previous)) effort->setValueWithData("");
+    }
     send->setEnabled(!view.busy && models->getEntryForKey(models->getValueKey()) != nullptr);
     cancelRequest->setEnabled(view.busy);
-    for (auto* control : std::initializer_list<Controllable*>{signIn, addAccount, signOut, refreshModels, accounts, models}) control->setEnabled(!view.busy);
+    for (auto* control : std::initializer_list<Controllable*>{signIn, addAccount, signOut, refreshModels, accounts, models, access, clearHistory}) control->setEnabled(!view.busy);
+    newConversation->setEnabled(true);
+    effort->setEnabled(!view.busy && !reasoningEfforts(selectedModel).isEmpty());
     saveAccess->setEnabled(!view.active.isEmpty()); updating = false;
 }
 }
