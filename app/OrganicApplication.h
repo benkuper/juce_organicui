@@ -111,8 +111,8 @@ public:
 		juce::var trayLayout;
 
 
-		void closeToTray();
-		void openFromTray();
+		virtual void closeToTray();
+		virtual void openFromTray();
 
 		void closeButtonPressed() override;
 
@@ -120,8 +120,8 @@ public:
 
 		void setTrayIconVisible(bool visible);
 		virtual void showTrayMenu();
-		virtual void addTrayMenuOptions(const juce::PopupMenu& menu) {};
-		virtual void handlTrayMenuResult(int result) {}
+		virtual void addTrayMenuOptions(juce::PopupMenu& menu) {};
+		virtual void handleTrayMenuResult(int result) {}
 
 
 		void visibilityChanged() override;
