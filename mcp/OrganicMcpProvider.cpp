@@ -120,6 +120,20 @@ var OrganicProvider::describe(const String& id, bool includeData)
             result.getDynamicObject()->setProperty("requiredCapabilities", (int) parameterCapabilities(c));
             if (auto* choices = dynamic_cast<EnumParameter*>(c))
             { juce::Array<var> keys; for (const auto& key : choices->getAllKeys()) keys.add(key); result.getDynamicObject()->setProperty("choices", keys); }
+            if (auto* target = dynamic_cast<TargetParameter*>(c))
+            {
+                auto* scope = target->rootContainer.get(); if (!scope) scope = root.get();
+                result.getDynamicObject()->setProperty("targetKind", target->targetType == TargetParameter::CONTAINER ? "container" : "controllable");
+                result.getDynamicObject()->setProperty("targetRoot", handle(scope));
+                result.getDynamicObject()->setProperty("targetRootAddress", scope->getControlAddress());
+                result.getDynamicObject()->setProperty("allowedTypes", target->typesFilter);
+                result.getDynamicObject()->setProperty("excludedTypes", target->excludeTypesFilter);
+                result.getDynamicObject()->setProperty("targetResolved", target->targetType == TargetParameter::CONTAINER ? target->getTargetContainer() != nullptr : target->getTargetControllable() != nullptr);
+                if (auto* cc = target->getTargetContainer())
+                { result.getDynamicObject()->setProperty("targetHandle", handle(cc)); result.getDynamicObject()->setProperty("targetAddress", cc->getControlAddress()); }
+                else if (auto* value = target->getTargetControllable())
+                { result.getDynamicObject()->setProperty("targetHandle", handle(value)); result.getDynamicObject()->setProperty("targetAddress", value->getControlAddress()); }
+            }
         }
     }
     else if (auto* cc = entry.container.get())
@@ -191,6 +205,20 @@ var OrganicProvider::list(const var& args, Context& context)
     if (offset + rows.size() < index) result.getDynamicObject()->setProperty("nextOffset", offset + rows.size());
     return result;
 }
+var OrganicProvider::normalizedParameterValue(Parameter* p, const var& value) const
+{
+    auto* target = dynamic_cast<TargetParameter*>(p);
+    if (!target || !value.isString() || value.toString().isEmpty()) return value;
+    auto path = value.toString();
+    if (!path.startsWith("/")) path = "/" + path;
+    auto* scope = target->rootContainer.get(); if (!scope) scope = root.get();
+    auto prefix = scope->getControlAddress();
+    // Discovery reports project-wide addresses; native TargetParameters store
+    // addresses relative to their own root. Never resolve outside that root.
+    if (prefix.isNotEmpty() && path.startsWith(prefix + "/")) path = path.substring(prefix.length());
+    if (path == "/") throw Error(-32602, "Target address must identify a child of the target root");
+    return path;
+}
 void OrganicProvider::validateParameter(Parameter* p, const var& value, const Context& context) const
 {
     if (p == nullptr || p->isControllableFeedbackOnly || !p->enabled) throw Error(-32602, "Parameter is not writable");
@@ -220,20 +248,22 @@ void OrganicProvider::validateParameter(Parameter* p, const var& value, const Co
     }
     if (auto* target = dynamic_cast<TargetParameter*>(p))
     {
-        auto path = value.toString();
+        auto path = normalizedParameterValue(p, value).toString();
         if (path.isEmpty()) return;
         auto* scope = target->rootContainer.get(); if (scope == nullptr) scope = root.get();
         if (target->targetType == TargetParameter::CONTAINER)
         {
             auto* cc = scope->getControllableContainerForAddress(path, true);
-            if (cc == nullptr || (target->defaultContainerTypeCheckFunc && !target->defaultContainerTypeCheckFunc(cc))) throw Error(-32602, "Incompatible target container");
+            if (cc == nullptr || (target->defaultContainerTypeCheckFunc && !target->defaultContainerTypeCheckFunc(cc)))
+                throw Error(-32602, "Incompatible target container", object({{"targetRootAddress", scope->getControlAddress()}, {"targetKind", "container"}, {"attemptedValue", path}}));
         }
         else
         {
             auto* c = scope->getControllableForAddress(path);
             if (c == nullptr || (target->customTargetFilterFunc && !target->customTargetFilterFunc(c))
                 || (!target->typesFilter.isEmpty() && !target->typesFilter.contains(c->getTypeString()))
-                || target->excludeTypesFilter.contains(c->getTypeString())) throw Error(-32602, "Incompatible target parameter");
+                || target->excludeTypesFilter.contains(c->getTypeString()))
+                throw Error(-32602, "Incompatible target parameter", object({{"targetRootAddress", scope->getControlAddress()}, {"targetKind", "controllable"}, {"attemptedValue", path}}));
         }
     }
     for (auto* cc = p->parentContainer.get(); cc != nullptr; cc = cc->parentContainer.get())
@@ -268,16 +298,30 @@ void OrganicProvider::registerOperations()
         schema(object({{"scope", stringSchema()}, {"query", stringSchema()}, {"offset", integerSchema(0, INT32_MAX)}, {"limit", integerSchema(1, 200)}})), inspect,
         [this](const var& args, Context& c) { return list(args, c); });
     auto inspectInput = handleInput.clone(); inspectInput["properties"].getDynamicObject()->setProperty("includeData", object({{"type", "boolean"}}));
-    add("organic_inspect", "Inspect a handle, its revision, parameter constraints, and available manager types. Optional includeData adds bounded serialized data.", inspectInput, inspect,
-        [this](const var& args, Context&) { return describe(args["handle"].toString(), (bool) args["includeData"]); });
+    inspectInput["properties"].getDynamicObject()->setProperty("path", stringSchema());
+    add("organic_inspect", "Inspect a handle, its revision, parameter constraints, and available manager types. Optional path resolves a discovered relative child address under a container, including dynamic command/comparator controls; reuse paths across similar objects. Target parameters expose their root and resolved binding. Optional includeData adds bounded serialized data.", inspectInput, inspect,
+        [this](const var& args, Context&)
+        {
+            auto id = args["handle"].toString(), path = args["path"].toString();
+            if (path.isNotEmpty())
+            {
+                if (!path.startsWith("/")) path = "/" + path;
+                if (path == "/") throw Error(-32602, "Inspection path must identify a child of the container");
+                auto* parent = container(id);
+                if (auto* child = parent->getControllableForAddress(path)) id = handle(child);
+                else if (auto* child = parent->getControllableContainerForAddress(path)) id = handle(child);
+                else throw Error(-32602, "Inspected child does not exist: " + path);
+            }
+            return describe(id, (bool) args["includeData"]);
+        });
     add("organic_types", "Discover supported factory types on a manager, with pagination.",
         schema(object({{"handle", stringSchema()}, {"offset", integerSchema(0, INT32_MAX)}, {"limit", integerSchema(1, 200)}}), array({"handle"})), inspect,
         [this](const var& args, Context&) { auto* manager = dynamic_cast<ManagerAdapter*>(container(args["handle"].toString())); if (!manager) throw Error(-32602, "Handle is not a manager"); auto types = manager->mcpTypes(); int offset = (int) args.getProperty("offset", 0), limit = (int) args.getProperty("limit", 100); juce::Array<var> rows; for (int i = offset; i < types.size() && rows.size() < limit; ++i) rows.add(types[i]); auto result = object({{"types", rows}, {"total", types.size()}}); if (offset + rows.size() < types.size()) result.getDynamicObject()->setProperty("nextOffset", offset + rows.size()); return result; });
     auto setInput = editInput.clone(); setInput["properties"].getDynamicObject()->setProperty("value", anySchema()); setInput["required"].getArray()->add("value");
     auto validateSet = [this](const var& args, const Context& c)
     { requireRevision(args); validateParameter(dynamic_cast<Parameter*>(controllable(args["handle"].toString())), args["value"], c); };
-    add("organic_set_value", "Set a typed parameter after inspecting its revision. Control permits existing runtime values; configuration requires Edit. Sensitive and file parameters require their grants.", setInput, control,
-        [this](const var& args, Context& c) { return transaction("Set parameter", [&] { auto* p = dynamic_cast<Parameter*>(controllable(args["handle"].toString())); if (auto* file = dynamic_cast<FileParameter*>(p)) if (file->getValue().toString().isNotEmpty()) c.requiredPaths.addIfNotAlreadyThere(file->getFile().getFullPathName()); p->setUndoableValue(p->getValue(), args["value"]); return describe(args["handle"].toString()); }); }, validateSet, true);
+    add("organic_set_value", "Set a typed parameter after inspecting its revision. Target values accept discovered project-wide addresses or paths relative to targetRoot; returned targetResolved/targetHandle verify the binding. Control permits existing runtime values; configuration requires Edit. Sensitive and file parameters require their grants.", setInput, control,
+        [this](const var& args, Context& c) { return transaction("Set parameter", [&] { auto* p = dynamic_cast<Parameter*>(controllable(args["handle"].toString())); if (auto* file = dynamic_cast<FileParameter*>(p)) if (file->getValue().toString().isNotEmpty()) c.requiredPaths.addIfNotAlreadyThere(file->getFile().getFullPathName()); p->setUndoableValue(p->getValue(), normalizedParameterValue(p, args["value"])); return describe(args["handle"].toString()); }); }, validateSet, true);
     add("organic_trigger", "Operate an existing trigger. Authored behavior may emit output or invoke code; effects are irreversible.", handleInput, control,
         [this](const var& args, Context&) { auto* t = dynamic_cast<Trigger*>(controllable(args["handle"].toString())); t->trigger(); return object({{"executed", true}, {"reversible", false}}); },
         [this](const var& args, const Context& c) { auto* t = dynamic_cast<Trigger*>(controllable(args["handle"].toString())); if (t == nullptr || !t->enabled || t->isControllableFeedbackOnly) throw Error(-32602, "Target is not an operable trigger"); c.require(executionCapabilities(t)); for (auto* cc = t->parentContainer.get(); cc != nullptr; cc = cc->parentContainer.get()) if (dynamic_cast<Script*>(cc)) c.require(advanced); }, false, true);

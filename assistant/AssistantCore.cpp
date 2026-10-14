@@ -13,6 +13,93 @@ namespace organic::assistant
 {
 using mcp::object;
 using mcp::Error;
+std::vector<MessageSpan> messageSpans(const String& line)
+{
+    std::vector<MessageSpan> spans; MessageTone tone = MessageTone::normal; bool code = false;
+    auto append = [&](const String& text, MessageTone value)
+    {
+        if (text.isEmpty()) return;
+        if (!spans.empty() && spans.back().tone == value) spans.back().text += text;
+        else spans.push_back({text, value});
+    };
+    for (int i = 0; i < line.length();)
+    {
+        auto rest = line.substring(i);
+        if (line[i] == '`') { code = !code; append("`", tone); ++i; continue; }
+        if (!code)
+        {
+            if (rest.startsWith("<error>")) { tone = MessageTone::error; i += 7; continue; }
+            if (rest.startsWith("<warning>")) { tone = MessageTone::warning; i += 9; continue; }
+            if (rest.startsWith("</error>")) { tone = MessageTone::normal; i += 8; continue; }
+            if (rest.startsWith("</warning>")) { tone = MessageTone::normal; i += 10; continue; }
+            bool boundary = i == 0 || juce::CharacterFunctions::isWhitespace(line[i - 1]);
+            if (tone == MessageTone::normal && boundary)
+            {
+                bool error = rest.startsWithIgnoreCase("Error:") || rest.startsWithIgnoreCase("Failed:");
+                bool warning = rest.startsWithIgnoreCase("Attention:") || rest.startsWithIgnoreCase("Warning:");
+                if (error || warning)
+                {
+                    int end = i;
+                    while (end < line.length() && line[end] != '.' && line[end] != '!' && line[end] != '?' && line[end] != '\n') ++end;
+                    if (end < line.length() && line[end] != '\n') ++end;
+                    append(line.substring(i, end), error ? MessageTone::error : MessageTone::warning); i = end; continue;
+                }
+                String label;
+                for (auto value : {"What to try:", "Next step:", "Needs your input:", "Remaining:"})
+                    if (rest.startsWithIgnoreCase(value)) { label = rest.substring(0, String(value).length()); break; }
+                if (label.isNotEmpty()) { append(label, MessageTone::warning); i += label.length(); continue; }
+            }
+        }
+        append(line.substring(i, i + 1), tone); ++i;
+    }
+    return spans;
+}
+String errorFragment(const String& message)
+{
+    auto end = message.indexOf("\n\n");
+    if (end < 0) end = message.length();
+    return "<error>" + message.substring(0, end) + "</error>" + message.substring(end);
+}
+String activityForTool(const String& name, const var& args)
+{
+    if (name == "organic_batch")
+    {
+        String first;
+        if (auto* operations = args["operations"].getArray()) for (auto operation : *operations)
+        {
+            auto child = operation["name"].toString();
+            if (child == "organic_batch") continue;
+            auto label = activityForTool(child, operation["arguments"]);
+            if (first.isEmpty()) first = label;
+            if (child == "organic_create" || child == "organic_add_controllable" || child.contains("command")) return label;
+        }
+        return first.isEmpty() ? String("Applying grouped changes...") : first;
+    }
+    if (name == "assistant_task") return "Checking requested work...";
+    if (name == "organic_create")
+    {
+        auto type = args["type"].toString().toLowerCase();
+        if (type.contains("preset")) return "Creating presets...";
+        if (type.contains("sequence")) return "Creating sequences...";
+        if (type.contains("trigger")) return "Creating triggers...";
+        if (type.contains("action") || type.contains("consequence")) return "Setting up actions...";
+        if (type.contains("custom") && type.contains("var")) return "Configuring custom variables...";
+        return "Creating project objects...";
+    }
+    if (name == "organic_browse" || name == "organic_search" || name == "organic_types") return "Exploring the project...";
+    if (name == "organic_inspect") return "Inspecting project settings...";
+    if (name == "organic_add_controllable" || name == "organic_set_range") return "Configuring values and ranges...";
+    if (name == "organic_set_value" || name == "organic_rename" || name == "organic_move") return "Configuring project settings...";
+    if (name == "organic_remove") return "Removing project objects...";
+    if (name.contains("command")) return "Setting up actions...";
+    if (name.startsWith("timeline_")) return "Setting up the sequence...";
+    if (name.contains("diagnostic")) return "Checking project health...";
+    if (name.contains("script")) return "Working on scripts...";
+    if (name.contains("save")) return "Saving the project...";
+    if (name == "chataigne_new") return "Starting a new project...";
+    if (name == "chataigne_project") return "Inspecting the project...";
+    return "Working on your project...";
+}
 String base64url(const void* data, size_t size)
 {
     return juce::Base64::toBase64(data, size).replaceCharacter('+', '-').replaceCharacter('/', '_').removeCharacters("=");
@@ -115,6 +202,7 @@ String usageError(const String& code)
 {
     if (code == "subscription_sharing_usage_limit_exceeded") return "ChatGPT app usage limit reached. Review ChatGPT Settings > Usage or wait for your limit to reset.";
     if (code == "subscription_sharing_usage_unavailable") return "ChatGPT plan usage is unavailable for this account. Review app access in ChatGPT Settings > Usage.";
+    if (code == "context_length_exceeded") return "This conversation is full for the selected model. Start a new conversation with the saved progress summary.";
     return "ChatGPT couldn't complete the request" + (code.isEmpty() ? String(".") : " (" + code + ").");
 }
 juce::StringArray reasoningEfforts(const String& model)
@@ -133,17 +221,19 @@ String actionableError(const String& message, int code)
     String next;
     auto lower = message.toLowerCase();
     if (code == -32800) return message;
-    if (lower.contains("usage limit")) next = "Open Usage in the panel to check your allowance and reset time, then continue this conversation after the limit resets.";
-    else if (lower.contains("plan usage")) next = "Open Usage to check this account's app access and plan eligibility, enable access if available, then sign in again from Account and settings.";
-    else if (lower.contains("approved folders")) next = "Open Account and settings, add the needed folder under Approved folders, choose Remember access, then ask me to continue.";
-    else if (code == -32003) next = "Choose the access level needed for this task in the panel (Edit permits creating and configuring objects), then ask me to continue. Script execution also needs Advanced execution in settings.";
-    else if (code == -32001) next = "The assistant's local access was revoked or expired. Use Continue with ChatGPT in Account and settings to reconnect, then review the access level.";
-    else if (code == -32005 || code == -32006) next = "Refresh the affected object's current handle and revision, then retry only the unfinished operation. Inspect completed batch results first to avoid duplicates.";
-    else if (lower.contains("effort")) next = "Set Effort to Auto or choose a supported level for this model, then send the message again.";
-    else if (lower.contains("sign in") || lower.contains("authorize")) next = "Use Continue with ChatGPT in Account and settings. Your saved conversations will still be available.";
+    if (lower.contains("usage limit")) next = "Open Account and settings, then Usage to check your allowance and reset time. Choose Resume unfinished after the limit resets.";
+    else if (lower.contains("plan usage")) next = "Open Account and settings, then Usage to check this account's app access and plan eligibility. Enable access if available, then sign in again.";
+    else if (lower.contains("approved folders")) next = "Open Account and settings, add the needed folder under Approved folders, choose Remember access, then choose Resume unfinished.";
+    else if (code == -32003) next = "Choose the access level needed for this task in the panel (Edit permits creating and configuring objects), then choose Resume unfinished. Script execution also needs Advanced execution in settings.";
+    else if (code == -32001) next = "The assistant's local access was revoked or expired. Reconnect the selected provider in Account and settings, then review the access level.";
+    else if (code == -32005 || code == -32006) next = "The project changed while the assistant was working. Choose Resume unfinished; the assistant will inspect the current objects and retry remaining changes without duplicating completed work.";
+    else if (lower.contains("incompatible target") || lower.contains("target container")) next = "The selected object cannot be used for that connection. Choose Resume unfinished so the assistant can inspect the target setting and find a compatible object. If you intended a specific target, name it in a follow-up message.";
+    else if (lower.contains("effort")) next = "Set Effort to Auto or choose a supported level for this model, then choose Resume unfinished.";
+    else if (lower.contains("sign in") || lower.contains("authorize")) next = "Use the selected provider's sign-in action in Account and settings. Your saved conversations will still be available.";
     else if (lower.contains("network") || lower.contains("connect") || lower.contains("unavailable")) next = "Check your internet connection and use Reconnect in the panel (or Refresh models in settings), then retry. Your saved sign-in and conversations are kept.";
     else if (lower.contains("conversation is full") || lower.contains("conversation request is full")) next = "Start a new conversation from History and describe the work that remains.";
-    else next = "Review the current project before retrying. If the problem continues, use Copy conversation and paste it into Codex with what you were trying to do.";
+    else if (lower.contains("limit before verifying") || lower.contains("stopped making progress")) next = "Read the saved progress summary, then choose Resume unfinished. The assistant will inspect completed changes and continue the remaining checklist. If the same step keeps failing, copy the conversation to Codex with that step.";
+    else next = "Choose Resume unfinished to inspect saved changes and retry the remaining work. If the same problem returns, use Copy conversation and paste it into Codex with the unfinished step from the progress summary.";
     return message + "\n\nWhat to try: " + next;
 }
 ProtectedStore::ProtectedStore(juce::File d) : directory(d)
@@ -246,8 +336,16 @@ void ResponseStream::event(const std::function<void(const String&)>& delta)
     }
     else if (type == "response.failed" || type == "error")
     {
-        auto code = (type == "error" ? value["code"] : value["response"]["error"]["code"]).toString();
-        throw Error(-32030, usageError(code), mcp::object({{"retryable", code == "server_error" || code == "internal_error" || code == "rate_limit_exceeded" || code == "overloaded"}}));
+        auto error = value["response"]["error"];
+        if (!error.isObject()) error = value["error"];
+        if (!error.isObject()) error = value;
+        auto code = error["code"].toString();
+        auto detail = error["message"].toString().replace("\r", " ").replace("\n", " ").trim().substring(0, 1000);
+        auto message = usageError(code);
+        if (detail.isNotEmpty() && !code.startsWith("subscription_sharing_")) message += " " + detail;
+        // An unclassified terminal failure may be transient. Retry the unexecuted
+        // response twice, without replaying any completed project operation.
+        throw Error(-32030, message, mcp::object({{"errorCode", code}, {"retryable", code.isEmpty() || code == "server_error" || code == "internal_error" || code == "rate_limit_exceeded" || code == "overloaded" || code == "service_unavailable"}}));
     }
     else if (type == "response.incomplete") throw Error(-32030, "ChatGPT response is incomplete. Review activity before retrying.", mcp::object({{"retryable", true}}));
 }

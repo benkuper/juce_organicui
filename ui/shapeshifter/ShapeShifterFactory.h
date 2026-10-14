@@ -32,12 +32,14 @@ public:
 	ShapeShifterFactory();
 	~ShapeShifterFactory(){};
 	juce::OwnedArray<ShapeShifterDefinition> defs;
+    juce::StringPairArray aliases;
 
 	static ShapeShifterContent * createContent(const juce::String &contentName)
 	{
+        auto resolved = getInstance()->aliases.getValue(contentName, contentName);
 		for (auto &d : getInstance()->defs)
 		{
-			if (d->contentName == contentName) return d->createFunc(contentName);
+			if (d->contentName == resolved) return d->createFunc(resolved);
 		}
 
 		return nullptr;
