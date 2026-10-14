@@ -95,8 +95,7 @@ void OrganicApplication::initialise(const String& commandLine)
 	{
 		jassert(engine != nullptr);
 		if (mainComponent == nullptr) mainComponent = std::make_unique<OrganicMainContentComponent>();
-
-		mainWindow.reset(new MainWindow(getApplicationName(), mainComponent.get(), trayIconImage));
+		if (mainWindow == nullptr) mainWindow.reset(new MainWindow(getApplicationName(), mainComponent.get(), trayIconImage));
 		updateAppTitle();
 	}
 
@@ -496,7 +495,7 @@ void OrganicApplication::MainWindow::showTrayMenu()
 		{
 			if (!result) return;
 			if (result == -1) OrganicApplication::quit();
-			else this->handlTrayMenuResult(result);
+			else handleTrayMenuResult(result);
 		}
 	);
 
