@@ -93,6 +93,7 @@ public:
 	void onControllableFeedbackUpdate(ControllableContainer *, Controllable * c) override;
 	void loadJSONDataInternal(juce::var data) override;
 	void applyFontSettings(bool clearCache = false);
+    void loadJSONData(juce::var data, bool createIfNotThere = false) override;
 	void scheduleFontRendererReload();
 
 	void loadKeyMappingsFromData();

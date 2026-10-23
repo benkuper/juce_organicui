@@ -77,6 +77,8 @@ public:
 	juce::WeakReference<ControllableContainer> parentContainer;
 
 	juce::UndoableAction* setUndoableNiceName(const juce::String& _niceName, bool onlyReturnAction = false);
+	juce::Array<ControllableContainer*> getRelatedSelectedContainers();
+	void setUndoableNiceNameForSelected(const juce::String& newName);
 	void setNiceName(const juce::String& _niceName);
 	void setCustomShortName(const juce::String& _shortName);
 	void setAutoShortName();
@@ -84,6 +86,7 @@ public:
 
 
 	juce::UndoableAction* addUndoableControllable(Controllable* c, bool onlyReturnAction = false);
+	void addUndoableControllableForSelected(Controllable* c);
 	Controllable* addControllable(Controllable* c, int index = -1);
 	Parameter* addParameter(Parameter* p, int index = -1);
 	FloatParameter* addFloatParameter(const juce::String& niceName, const juce::String& description, const double& initialValue, const double& minValue = INT32_MIN, const double& maxValue = INT32_MAX, const bool& enabled = true);
@@ -305,6 +308,8 @@ public:
 		juce::String cShortName;
 		juce::var data;
 		juce::String cType;
+		int index;
+		bool userCanChangeName, canBeDisabledByUser, userCanSetReadOnly;
 
 		Controllable* getItem();
 	};

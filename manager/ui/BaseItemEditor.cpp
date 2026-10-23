@@ -107,8 +107,6 @@ void BaseItemEditor::resizedInternalHeader(juce::Rectangle<int>& r)
 
 void BaseItemEditor::buttonClicked(Button* b)
 {
-	EnablingControllableContainerEditor::buttonClicked(b);
-
 	if (b == removeBT.get())
 	{
 		if (this->item->askConfirmationBeforeRemove && GlobalSettings::getInstance()->askBeforeRemovingItems->boolValue())
@@ -119,19 +117,20 @@ void BaseItemEditor::buttonClicked(Button* b)
 				.withMessage("Are you sure you want to delete this ?")
 				.withButton("Delete")
 				.withButton("Cancel"),
-				[this](int result)
+				[itemRef = WeakReference<Inspectable>(item)](int result)
 				{
-					if (result != 0) this->item->remove();
+					if (result != 0 && itemRef != nullptr) static_cast<BaseItem*>(itemRef.get())->removeForSelected();
 				}
 			);
 		}
-		else this->item->remove();
+		else this->item->removeForSelected();
 		return;
 	}
 	else if (b == duplicateBT.get())
 	{
 		item->duplicate();
 	}
+	else EnablingControllableContainerEditor::buttonClicked(b);
 	//else if (b == upBT.get())
 	//{
 	//	item->moveBefore();

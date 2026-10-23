@@ -121,7 +121,7 @@ void StringParameterUI::labelTextChanged(Label*)
 {
 	//String  originalString = valueLabel.getText().substring(prefix.length(), valueLabel.getText().length() - suffix.length());
 	if (stringParam->autoTrim) valueLabel.setText(valueLabel.getText().trim(), dontSendNotification);
-	parameter->setUndoableValue(parameter->stringValue(), valueLabel.getText());
+	parameter->setUndoableValueForSelected(parameter->stringValue(), valueLabel.getText());
 }
 
 
@@ -202,23 +202,19 @@ void StringParameterFileUI::buttonClicked(Button* b)
 		if (fp->directoryMode) openFlags = openFlags | FileBrowserComponent::canSelectDirectories;
 		else openFlags = openFlags | FileBrowserComponent::FileChooserFlags::canSelectFiles;
 
-		chooser->launchAsync(openFlags, [this](const FileChooser& fc)
+		Component::SafePointer<StringParameterFileUI> safeThis(this);
+		WeakReference<Parameter> safeParameter(fp);
+		const bool saveMode = fp->saveMode;
+		chooser->launchAsync(openFlags, [safeThis, safeParameter, saveMode](const FileChooser& fc)
 			{
 				File f = fc.getResult();
 				delete& fc;
 
-				if (!f.exists() && !fp->saveMode) return;
+				if (safeThis == nullptr || safeParameter == nullptr || safeParameter->isBeingDestroyed) return;
+				if (f == File() || (!f.exists() && !saveMode)) return;
 
 				lastSearchedFolder = f.getParentDirectory();
-
-				Component::BailOutChecker checker(this);
-				if (checker.shouldBailOut()) return;
-
-				if (parameter.wasObjectDeleted()) return;
-				if (parameter != nullptr)
-				{
-					parameter->setUndoableValue(parameter->stringValue(), f.getFullPathName());
-				}
+				safeParameter->setUndoableValueForSelected(safeParameter->stringValue(), f.getFullPathName());
 
 			}
 		);
@@ -265,14 +261,24 @@ void StringParameterTextUI::valueChanged(const var& v)
 
 void StringParameterTextUI::textEditorTextChanged(TextEditor&)
 {
-	stringParam->setValue(editor.getText());
+	if (valueOnEditorOpen.isVoid()) valueOnEditorOpen = stringParam->getValue().clone();
+	stringParam->setValueForSelected(editor.getText());
 }
 
 void StringParameterTextUI::textEditorFocusLost(TextEditor&)
 {
-
+	commitTextEdit();
 }
 
 void StringParameterTextUI::textEditorReturnKeyPressed(TextEditor&)
 {
+	commitTextEdit();
+}
+
+void StringParameterTextUI::commitTextEdit()
+{
+	if (valueOnEditorOpen.isVoid()) return;
+	const var oldValue = valueOnEditorOpen.clone();
+	valueOnEditorOpen = var();
+	stringParam->setUndoableValueForSelected(oldValue, editor.getText());
 }

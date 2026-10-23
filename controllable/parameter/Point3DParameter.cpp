@@ -233,7 +233,7 @@ juce::var Point3DParameter::getAttributeInternal(juce::String name) const
 		}
 	}
 	else if (name == "stringDecimals") return stringDecimals;
-	return juce::var();
+	return Parameter::getAttributeInternal(name);
 }
 
 StringArray Point3DParameter::getValidAttributes() const

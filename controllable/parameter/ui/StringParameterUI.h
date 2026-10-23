@@ -85,6 +85,7 @@ public:
 
 	juce::Array<StringParameter*> stringParams;
 	StringParameter* stringParam;
+	juce::var valueOnEditorOpen;
 
 	juce::TextEditor editor;
 	virtual void feedbackStateChanged() override;
@@ -97,6 +98,7 @@ protected:
 	virtual void textEditorTextChanged(juce::TextEditor&) override;
 	virtual void textEditorFocusLost(juce::TextEditor&) override;
 	virtual void textEditorReturnKeyPressed(juce::TextEditor&) override;
+	void commitTextEdit();
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(StringParameterTextUI)
 };

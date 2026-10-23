@@ -503,7 +503,10 @@ void BaseManagerViewUI<M, T, U>::addItemFromMenu(bool isFromAddButton, juce::Poi
 template<class M, class T, class U>
 void BaseManagerViewUI<M, T, U>::addItemFromMenu(T* item, bool isFromAddButton, juce::Point<int> mouseDownPos)
 {
-	this->manager->addItem(item, isFromAddButton ? juce::Point<float>(0, 0) : getViewPos(mouseDownPos).toFloat());
+	if (item == nullptr) item = this->manager->createItem();
+	if (item == nullptr) return;
+	item->viewUIPosition->setPoint(isFromAddButton ? juce::Point<float>(0, 0) : getViewPos(mouseDownPos).toFloat());
+	this->manager->addItemForSelected(item);
 }
 
 template<class M, class T, class U>

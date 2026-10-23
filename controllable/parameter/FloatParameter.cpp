@@ -79,7 +79,8 @@ ControllableUI* FloatParameter::createDefaultUI(Array<Controllable*> controllabl
 
 bool FloatParameter::checkValueIsTheSame(var oldValue, var newValue)
 {
-	return jlimit<double>(minimumValue, maximumValue, newValue) == (double)oldValue;
+	const double croppedValue = jlimit<double>(minimumValue, maximumValue, newValue);
+	return (unitSteps > 0 ? getStepSnappedValueFor(croppedValue) : croppedValue) == (double)oldValue;
 }
 
 
@@ -176,7 +177,7 @@ juce::var FloatParameter::getAttributeInternal(juce::String name) const
 		return stringDecimals;
 	}
 
-	return juce::var();
+	return Parameter::getAttributeInternal(name);
 }
 
 StringArray FloatParameter::getValidAttributes() const
@@ -207,4 +208,3 @@ var FloatParameter::getCroppedValue(var originalValue)
 	double v = isnan((double)originalValue) ? 0.0f : (double)originalValue;
 	return jlimit<double>(minimumValue, maximumValue, v);
 }
-

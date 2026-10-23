@@ -105,27 +105,30 @@ void Script::chooseFileScript(bool openAfter)
 {
 	FileChooser* chooser(new FileChooser("Create or load a cacahuete", File::getCurrentWorkingDirectory(), "*.js"));
 
-	chooser->launchAsync(FileBrowserComponent::FileChooserFlags::saveMode | FileBrowserComponent::FileChooserFlags::canSelectFiles, [&](const FileChooser& fc)
+	WeakReference<ControllableContainer> safeThis(this);
+	chooser->launchAsync(FileBrowserComponent::FileChooserFlags::saveMode | FileBrowserComponent::FileChooserFlags::canSelectFiles, [safeThis, openAfter](const FileChooser& fc)
 		{
 			File f = fc.getResult();
 			delete& fc;
+			auto* script = dynamic_cast<Script*>(safeThis.get());
+			if (script == nullptr || script->isClearing || script->isBeingDestroyed || f == File()) return;
 
 			if (!f.exists())
 			{
 				f.create();
 
-				if (scriptTemplate != nullptr && scriptTemplate->isNotEmpty())
+				if (script->scriptTemplate != nullptr && script->scriptTemplate->isNotEmpty())
 				{
 					FileOutputStream fos(f);
 					if (fos.openedOk())
 					{
-						fos.writeText(*scriptTemplate, false, false, "\n");
+						fos.writeText(*script->scriptTemplate, false, false, "\n");
 						fos.flush();
 					}
 				}
 			}
 
-			filePath->setValue(f.getFullPathName());
+			script->filePath->setValue(f.getFullPathName());
 
 			if (f.existsAsFile() && openAfter)
 			{

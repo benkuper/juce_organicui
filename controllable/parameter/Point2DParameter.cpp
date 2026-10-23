@@ -155,7 +155,7 @@ juce::var Point2DParameter::getAttributeInternal(juce::String name) const
 	else if (name == "canvasInvertY") return extendedEditorInvertY;
 	else if (name == "canvasStretchMode") return extendedEditorStretchMode;
 	else if (name == "stringDecimals") return stringDecimals;
-	return juce::var();
+	return Parameter::getAttributeInternal(name);
 }
 
 StringArray Point2DParameter::getValidAttributes() const

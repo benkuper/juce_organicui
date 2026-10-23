@@ -66,6 +66,24 @@
 #define ORGANICUI_USE_WEBSERVER 0
 #endif
 
+/** Config: ORGANICUI_USE_MCP
+    Enables the optional native MCP server and operation registry. Requires the
+    juce_simpleweb and juce_cryptography modules and standalone ASIO headers.
+*/
+#ifndef ORGANICUI_USE_MCP
+#define ORGANICUI_USE_MCP 0
+#endif
+
+/** Config: ORGANICUI_USE_ASSISTANT
+    Enables the optional native assistant provider and docked UI. Requires MCP.
+*/
+#ifndef ORGANICUI_USE_ASSISTANT
+#define ORGANICUI_USE_ASSISTANT 0
+#endif
+#if ORGANICUI_USE_ASSISTANT && !ORGANICUI_USE_MCP
+#error ORGANICUI_USE_ASSISTANT requires ORGANICUI_USE_MCP
+#endif
+
 /** Config: ORGANICUI_USE_WEBBROWSER
 	Mirroring the option from juce_gui_extra, to avoid problems with webkit2gtk
 */
@@ -290,6 +308,9 @@
 #include "manager/ui/BaseItemEditor.h"
 #include "manager/ui/GenericManagerEditor.h"
 
+#if ORGANICUI_USE_MCP
+#include "mcp/McpManagerAdapter.h"
+#endif
 #include "manager/BaseManager.h"
 
 #include "manager/ui/BaseManagerUI.h"
@@ -398,6 +419,21 @@
 #include "app/CrashHandler.h"
 #include "app/OrganicMainComponent.h"
 #include "app/OrganicApplication.h"
+
+#if ORGANICUI_USE_MCP
+#include "mcp/McpCore.h"
+#include "mcp/McpServer.h"
+#include "mcp/OrganicMcpProvider.h"
+#include "mcp/McpConnectionSettings.h"
+#include "mcp/McpConnectionPanel.h"
+#endif
+#if ORGANICUI_USE_ASSISTANT
+#include "assistant/AssistantCore.h"
+#include "assistant/AssistantProvider.h"
+#include "assistant/ClaudeProvider.h"
+#include "assistant/AssistantController.h"
+#include "assistant/AssistantPanel.h"
+#endif
 
 
 

@@ -9,6 +9,7 @@
 */
 
 #include "JuceHeader.h"
+#include "AutomationKeySearch.h"
 
 using namespace juce;
 
@@ -448,7 +449,7 @@ void Automation::updateNextKeys(int start, int end)
 	{
 		if (i < items.size() - 1)
 		{
-			jassert(items[i]->position->floatValue() <= items[i + 1]->position->floatValue());
+			jassert(items[i]->position->doubleValue() <= items[i + 1]->position->doubleValue());
 			items[i]->setNextKey(items[i + 1]);
 		}
 		else
@@ -462,7 +463,7 @@ void Automation::updateNextKeys(int start, int end)
 
 void Automation::computeValue()
 {
-	value->setValue(getValueAtPosition(position->floatValue()));
+	value->setValue(getValueAtPosition(position->doubleValue()));
 }
 
 void Automation::setLength(float newLength, bool stretch, bool stickToEnd)
@@ -537,34 +538,18 @@ void Automation::updateRange()
 	}
 }
 
-AutomationKey* Automation::getKeyForPosition(float pos, bool trueIfEqual)
+AutomationKey* Automation::getKeyForPosition(double pos, bool trueIfEqual)
 {
-	if (items.size() == 0) return nullptr;
-	if (pos < items[0]->position->floatValue()) return items[0];
-	if (pos == 0) return items[0];
-
-	for (int i = items.size() - 1; i >= 0; i--)
-	{
-		float p = items[i]->position->floatValue();
-		if (p < pos || (p == pos && trueIfEqual)) return items[i];
-	}
-
-	return nullptr;
+	const int index = AutomationKeySearch::previous(items.size(), pos, trueIfEqual,
+		[this](int i) { return items[i]->position->doubleValue(); });
+	return index >= 0 ? items[index] : nullptr;
 }
 
-AutomationKey* Automation::getNextKeyForPosition(float pos, bool trueIfEqual)
+AutomationKey* Automation::getNextKeyForPosition(double pos, bool trueIfEqual)
 {
-	if (items.size() == 0) return nullptr;
-	if (pos < items[0]->position->floatValue()) return items[0];
-	if (pos == 0) return items[0];
-
-	for (int i = 0; i < items.size(); i++)
-	{
-		float p = items[i]->position->floatValue();
-		if (p > pos || (p == pos && trueIfEqual)) return items[i];
-	}
-
-	return nullptr;
+	const int index = AutomationKeySearch::next(items.size(), pos, trueIfEqual,
+		[this](int i) { return items[i]->position->doubleValue(); });
+	return index >= 0 ? items[index] : nullptr;
 }
 
 Array<AutomationKey*> Automation::getKeysBetweenPositions(float startPos, float endPos)
@@ -588,36 +573,45 @@ Array<AutomationKey*> Automation::getKeysBetweenPositions(float startPos, float 
 	return result;
 }
 
-float Automation::getValueAtNormalizedPosition(float pos)
+double Automation::getValueAtNormalizedPosition(double pos)
 {
-	return getValueAtPosition(pos * length->floatValue());
+	return getValueAtPosition(pos * length->doubleValue());
 }
 
 
-float Automation::getValueAtPosition(float pos)
+double Automation::getValueAtPosition(double pos)
 {
 	if (items.size() == 0) return 0;
-	if (items.size() == 1) return items[0]->value->floatValue();
-	if (pos <= items[0]->position->floatValue()) return items[0]->value->floatValue();
-	if (pos >= items[items.size() - 1]->position->floatValue())  return items[items.size() - 1]->value->floatValue();
+	if (items.size() == 1) return items[0]->value->doubleValue();
+	if (pos <= items[0]->position->doubleValue()) return items[0]->value->doubleValue();
+	if (pos >= items[items.size() - 1]->position->doubleValue()) return items[items.size() - 1]->value->doubleValue();
 
 	AutomationKey* k = getKeyForPosition(pos);
 	if (k == nullptr || k->easing == nullptr) return 0;
-	float normPos = (pos - k->position->floatValue()) / k->getLength();
-	return k->easing->getValue(normPos);
+	const double segmentLength = k->nextKey != nullptr
+		? k->nextKey->position->doubleValue() - k->position->doubleValue() : 0.0;
+	if (segmentLength <= 0.0) return k->value->doubleValue();
+	const double normPos = (pos - k->position->doubleValue()) / segmentLength;
+	return k->easing->getPreciseValue(normPos, k->value->doubleValue(),
+		k->nextKey->value->doubleValue(), segmentLength);
 }
 
-float Automation::getNormalizedValueAtPosition(float pos)
+double Automation::getNormalizedValueAtPosition(double pos)
 {
 	if (!viewValueRange->enabled) return 0;
 	if (items.size() == 0) return 0;
-	if (items.size() == 1) return (float)items[0]->value->getNormalizedValue();
-	if (pos == length->floatValue())  return (float)items[items.size() - 1]->value->getNormalizedValue();
+	if (items.size() == 1) return (double)items[0]->value->getNormalizedValue();
+	if (pos == length->doubleValue()) return (double)items[items.size() - 1]->value->getNormalizedValue();
 
 	AutomationKey* k = getKeyForPosition(pos);
 	if (k == nullptr || k->easing == nullptr) return 0;
-	float normPos = (pos - k->position->floatValue()) / k->getLength();
-	return jmap<float>(k->easing->getValue(normPos), valueRange->x, valueRange->y, 0, 1);
+	const double segmentLength = k->nextKey != nullptr
+		? k->nextKey->position->doubleValue() - k->position->doubleValue() : 0.0;
+	if (segmentLength <= 0.0) return (double)k->value->getNormalizedValue();
+	const double normPos = (pos - k->position->doubleValue()) / segmentLength;
+	const double curveValue = k->easing->getPreciseValue(normPos, k->value->doubleValue(),
+		k->nextKey->value->doubleValue(), segmentLength);
+	return jmap<double>(curveValue, valueRange->x, valueRange->y, 0.0, 1.0);
 }
 
 void Automation::onContainerParameterChanged(Parameter* p)
@@ -684,7 +678,7 @@ void Automation::afterLoadJSONDataInternal()
 
 int Automation::compareKeys(AutomationKey* k1, AutomationKey* k2)
 {
-	return k2->position->floatValue() < k1->position->floatValue() ? 1 : k2->position->floatValue() > k1->position->floatValue() ? -1 : 0;
+	return k2->position->doubleValue() < k1->position->doubleValue() ? 1 : k2->position->doubleValue() > k1->position->doubleValue() ? -1 : 0;
 }
 
 var Automation::setLengthFromScript(const juce::var::NativeFunctionArgs& a)

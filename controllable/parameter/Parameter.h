@@ -23,6 +23,9 @@ public:
 	/** Destructor. */
 	virtual ~ParameterListener() {}
 	virtual void parameterValueChanged(Parameter*) {};
+	// The value at notification time, which may differ from the current value
+	// when a worker-thread change is delivered on the message thread.
+	virtual void parameterValueChangedWithValue(Parameter* p, const juce::var&) { parameterValueChanged(p); }
 	virtual void parameterRangeChanged(Parameter*) {};
 	virtual void parameterControlModeChanged(Parameter*) {}
 };
@@ -46,6 +49,8 @@ public:
 	juce::var defaultValue;
 	juce::var value;
 	juce::var lastValue;
+	juce::var multiEditStartValue;
+	bool hasMultiEditStartValue;
 
 	juce::SpinLock valueSetLock;
 
@@ -83,6 +88,8 @@ public:
 
 	virtual void setRange(juce::var min, juce::var max);
 	virtual void clearRange();
+	void setUndoableRangeForSelected(juce::var minimum, juce::var maximum);
+	void clearUndoableRangeForSelected();
 	virtual bool hasRange() const;
 	virtual juce::var getRange() const;
 
@@ -93,7 +100,8 @@ public:
 
 	bool isNotifyingChange;
 
-	juce::CriticalSection notifyLock;
+	// A listener may delete this parameter while a notification is in flight.
+	std::shared_ptr<juce::CriticalSection> notifyLock = std::make_shared<juce::CriticalSection>();
 
 	virtual void setEnabled(bool value, bool silentSet = false, bool force = false) override;
 
@@ -114,14 +122,24 @@ public:
 	virtual void setValue(juce::var _value, bool silentSet = false, bool force = false, bool forceOverride = true);
 	virtual void setValueInternal(juce::var& _value);
 
+	juce::Array<Parameter*> getRelatedSelectedParameters();
+	void beginMultiEdit();
+	void clearMultiEditState();
+	void setValueForSelected(juce::var newValue, bool silentSet = false, bool force = false, bool forceOverride = true);
+	void setUndoableValueForSelected(juce::var oldValue, juce::var newValue);
+	void resetValueUndoableForSelected();
+
 	virtual bool checkValueIsTheSame(juce::var newValue, juce::var oldValue); //can be overriden to modify check behavior
 
 	//For Number type parameters
 	void setUndoableNormalizedValue(const juce::var& oldNormalizedValue, const juce::var& newNormalizedValue);
 	void setNormalizedValue(const juce::var& normalizedValue, bool silentSet = false, bool force = false);
+	void setUndoableNormalizedValueForSelected(const juce::var& oldNormalizedValue, const juce::var& newNormalizedValue);
+	void setNormalizedValueForSelected(const juce::var& normalizedValue, bool silentSet = false, bool force = false);
 	juce::var getNormalizedValue() const;
 
 	virtual bool setAttributeInternal(juce::String param, juce::var value) override;
+	juce::var getAttributeInternal(juce::String param) const override;
 	virtual juce::StringArray getValidAttributes() const override;
 
 	//helpers for fast typing
@@ -141,6 +159,7 @@ public:
 
 	//Reference
 	virtual void parameterValueChanged(Parameter* p) override;
+	void parameterValueChangedWithValue(Parameter* p, const juce::var& value) override;
 
 
 	InspectableEditor* getEditorInternal(bool isRoot, juce::Array<Inspectable*> inspectables = juce::Array<Inspectable*>()) override;
@@ -212,6 +231,16 @@ public:
 		juce::String controlAddress;
 
 		Parameter* getParameter();
+	};
+
+	class ParameterSetRangeAction : public ParameterAction
+	{
+	public:
+		ParameterSetRangeAction(Parameter* parameter, juce::var minimum, juce::var maximum);
+		juce::var oldMinimum, oldMaximum, newMinimum, newMaximum, oldValue;
+		bool oldIsOverriden;
+		bool perform() override;
+		bool undo() override;
 	};
 
 	class ParameterSetValueAction :

@@ -63,9 +63,9 @@ void FloatParameterLabelUI::updateValueFromLabel()
 {
 	String s = valueLabel.getText().replace(",", ".");
 	double v = ParameterUI::textToValue(s);
-	parameter->setValue(v);
+	parameter->setUndoableValueForSelected(parameter->getValue(), cropUIValue(v));
 
-	valueLabel.setText(getValueString(v), dontSendNotification);
+	valueLabel.setText(getValueString(parameter->getValue()), dontSendNotification);
 }
 
 void FloatParameterLabelUI::updateTooltip()
@@ -95,7 +95,7 @@ void FloatParameterLabelUI::mouseDownInternal(const MouseEvent& e)
 {
 	if (e.mods.isLeftButtonDown() && e.mods.isCommandDown())
 	{
-		parameter->resetValue();
+		parameter->resetValueUndoableForSelected();
 	}
 
 	valueAtMouseDown = parameter->doubleValue();
@@ -122,7 +122,7 @@ void FloatParameterLabelUI::mouseDrag(const MouseEvent& e)
 	valueOffsetSinceMouseDown += (e.getPosition().x - lastMouseX) * sensitivity / pixelsPerUnit;
 	lastMouseX = e.getPosition().x;
 
-	parameter->setValue(valueAtMouseDown + valueOffsetSinceMouseDown);
+	parameter->setValueForSelected(cropUIValue(valueAtMouseDown + valueOffsetSinceMouseDown));
 }
 
 void FloatParameterLabelUI::mouseUpInternal(const MouseEvent& e)
@@ -135,7 +135,8 @@ void FloatParameterLabelUI::mouseUpInternal(const MouseEvent& e)
 
 	if (setUndoableValueOnMouseUp)
 	{
-		if (valueAtMouseDown != parameter->floatValue()) parameter->setUndoableValue(valueAtMouseDown, parameter->doubleValue());
+		if (valueAtMouseDown != parameter->floatValue()) parameter->setUndoableValueForSelected(valueAtMouseDown, parameter->doubleValue());
+		else parameter->clearMultiEditState();
 	}
 }
 
@@ -258,7 +259,8 @@ void TimeLabel::labelTextChanged(Label*)
 	}
 	s = s.substring(prefix.length(), s.length() - suffix.length());
 
-	parameter->setValue(showStepsMode ? s.getDoubleValue() / ((FloatParameter*)parameter.get())->unitSteps : StringUtil::timeStringToValue(s));
+	const var newValue = showStepsMode ? s.getDoubleValue() / ((FloatParameter*)parameter.get())->unitSteps : StringUtil::timeStringToValue(s);
+	parameter->setUndoableValueForSelected(parameter->getValue(), cropUIValue(newValue));
 	shouldRepaint = true;
 }
 

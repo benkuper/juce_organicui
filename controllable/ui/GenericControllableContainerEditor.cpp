@@ -26,6 +26,9 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(Array<Con
 	jassert(containers.size() > 0);
 
 	container = containers[0];
+	for (auto* related : container->getRelatedSelectedContainers()) containers.addIfNotAlreadyThere(related);
+	this->containers = containers;
+	inspectables = Inspectable::getWeakArray(Inspectable::getArrayAs<ControllableContainer, Inspectable>(containers));
 	container->addAsyncContainerListener(this);
 	addAndMakeVisible(containerLabel);
 
@@ -36,7 +39,7 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(Array<Con
 	containerLabel.setColour(containerLabel.textColourId, contourColor.brighter(1));
 	containerLabel.setColour(CaretComponent::caretColourId, Colours::orange);
 
-	containerLabel.setEditable(false, container->nameCanBeChangedByUser);
+	containerLabel.setEditable(false, multiHasAllOf([](Inspectable* i) { return ((ControllableContainer*)i)->nameCanBeChangedByUser; }));
 	containerLabel.addListener(this);
 
 	if (!container->nameCanBeChangedByUser) containerLabel.setInterceptsMouseClicks(false, false);
@@ -422,12 +425,13 @@ void GenericControllableContainerEditor::showMenuAndAddControllable()
 {
 	ControllableFactory::showFilteredCreateMenu(container->userAddControllablesFilters, [this](Controllable* c)
 		{
+			if (c == nullptr) return;
 			c->userCanChangeName = true;
 			c->isCustomizableByUser = true;
 			c->isRemovableByUser = true;
 			c->isSavable = true;
 			c->saveValueOnly = false;
-			this->container->addControllable(c);
+			this->container->addUndoableControllableForSelected(c);
 		}
 		, true
 	);
@@ -463,7 +467,7 @@ void GenericControllableContainerEditor::buttonClicked(Button* b)
 
 void GenericControllableContainerEditor::labelTextChanged(Label* l)
 {
-	if (l == &containerLabel) container->setUndoableNiceName(l->getText());
+	if (l == &containerLabel) container->setUndoableNiceNameForSelected(l->getText());
 }
 
 void GenericControllableContainerEditor::componentVisibilityChanged(Component& c)

@@ -14,6 +14,15 @@ public:
 	ColorParameter* bgColor;
 	ColorParameter* fgColor;
 	FileParameter* btImage;
+	BoolParameter* useCustomRange;
+	Point2DParameter* customRange;
+	Point2DParameter* customRangeY;
+	Point2DParameter* customRangeZ;
+
+	bool hasCustomRange() const;
+	juce::var getRangeBound(bool maximum) const;
+	void updateRangeOptions();
+	void onContainerParameterChangedInternal(Parameter* p) override;
 
 	EnumParameter* style;
 	virtual DashboardItemUI* createUI() override;
@@ -56,6 +65,7 @@ class DashboardEnumParameterItem :
 public:
 	DashboardEnumParameterItem(EnumParameter* parameter = nullptr);
 	virtual ~DashboardEnumParameterItem();
+	void setInspectableInternal(Inspectable* i) override;
 
 	// Inherited via Listener
 	virtual void enumOptionAdded(EnumParameter*, const juce::String&) override;
@@ -65,7 +75,5 @@ public:
 	static DashboardParameterItem* create(juce::var) { return new DashboardEnumParameterItem(); }
 	virtual juce::String getTypeString() const override { return "DashboardEnumParameterItem"; }
 };
-
-
 
 

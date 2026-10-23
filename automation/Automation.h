@@ -73,13 +73,13 @@ public:
 
 	void updateRange();
 
-	AutomationKey* getKeyForPosition(float pos, bool trueIfEqual = true); //to make binary search instead
-	AutomationKey* getNextKeyForPosition(float pos, bool trueIfEqual = true); //to make binary search instead
+	AutomationKey* getKeyForPosition(double pos, bool trueIfEqual = true); //to make binary search instead
+	AutomationKey* getNextKeyForPosition(double pos, bool trueIfEqual = true); //to make binary search instead
 	juce::Array<AutomationKey*> getKeysBetweenPositions(float startPos, float endPos); //to make binary search instead
 
-	float getValueAtNormalizedPosition(float pos);
-	float getValueAtPosition(float pos);
-	float getNormalizedValueAtPosition(float pos);
+	double getValueAtNormalizedPosition(double pos);
+	double getValueAtPosition(double pos);
+	double getNormalizedValueAtPosition(double pos);
 
 	void onContainerParameterChanged(Parameter* p) override;
 	void onControllableFeedbackUpdate(ControllableContainer* cc, Controllable* c) override;

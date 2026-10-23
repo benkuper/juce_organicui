@@ -1,5 +1,20 @@
 #include "juce_organicui.h"
 
+#if ORGANICUI_USE_MCP
+#include "mcp/McpCore.cpp"
+#include "mcp/McpServer.cpp"
+#include "mcp/OrganicMcpProvider.cpp"
+#include "mcp/McpConnectionSettings.cpp"
+#include "mcp/McpConnectionPanel.cpp"
+#endif
+#if ORGANICUI_USE_ASSISTANT
+#include "assistant/AssistantCore.cpp"
+#include "assistant/AssistantProvider.cpp"
+#include "assistant/ClaudeProvider.cpp"
+#include "assistant/AssistantController.cpp"
+#include "assistant/AssistantPanel.cpp"
+#endif
+
 #include "comment/Comment.cpp"
 #include "comment/CommentManager.cpp"
 #include "comment/ui/CommentUI.cpp"

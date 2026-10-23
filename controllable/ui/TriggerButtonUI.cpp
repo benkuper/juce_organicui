@@ -35,10 +35,11 @@ void TriggerButtonUI::mouseDownInternal(const MouseEvent & e)
 {
 	if (trigger.wasObjectDeleted()) return;
 
+	const bool triggerRelatedSelection = triggers.size() == 1;
 	for (auto& t : triggers)
 	{
 		if (t == nullptr) continue;
-		t->trigger();
+		t->trigger(triggerRelatedSelection);
 	}
 }
 

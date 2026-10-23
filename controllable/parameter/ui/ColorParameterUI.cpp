@@ -104,9 +104,10 @@ void ColorParameterUI::showEditRangeWindowInternal()
 	nameWindow->addButton("OK", 1, KeyPress(KeyPress::returnKey));
 	nameWindow->addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
 
-	nameWindow->enterModalState(true, ModalCallbackFunction::create([this, nameWindow](int result)
+	nameWindow->enterModalState(true, ModalCallbackFunction::create([param = WeakReference<Parameter>(parameter), nameWindow](int result)
 		{
-			if (result != 1) return;
+
+			if (result != 1 || param == nullptr) return;
 
 			float newMins[4];
 			float newMaxs[4];
@@ -115,11 +116,13 @@ void ColorParameterUI::showEditRangeWindowInternal()
 				newMins[i] = nameWindow->getTextEditorContents("minVal" + String(i)).getFloatValue();
 				newMaxs[i] = nameWindow->getTextEditorContents("maxVal" + String(i)).getFloatValue();
 			}
-			colorParam->setBounds(newMins[0], newMins[1], newMins[2], newMins[3],
-								  jmax(newMins[0], newMaxs[0]),
-								  jmax(newMins[1], newMaxs[1]),
-								  jmax(newMins[2], newMaxs[2]),
-								  jmax(newMins[3], newMaxs[3]));
+			var minimum, maximum;
+			for (int axis = 0; axis < 4; ++axis)
+			{
+				minimum.append(newMins[axis]);
+				maximum.append(jmax(newMins[axis], newMaxs[axis]));
+			}
+			param->setUndoableRangeForSelected(minimum, maximum);
 		}
 	), true);
 }
@@ -128,7 +131,7 @@ void ColorParameterUI::componentBeingDeleted(Component& c)
 {
 	if (&c == colorEditor)
 	{
-		colorParam->setUndoableValue(valueOnEditorOpen, colorParam->value);
+		colorParam->setUndoableValueForSelected(valueOnEditorOpen, colorParam->value);
 		colorEditor = nullptr;
 	}
 }
@@ -142,7 +145,13 @@ void ColorParameterUI::changeListenerCallback(ChangeBroadcaster * source)
 {
 	ColourSelector * s = dynamic_cast<ColourSelector *>(source);
 	if (s == nullptr || shouldBailOut()) return;
-	colorParam->setColor(s->getCurrentColour());
+	const Colour colour = s->getCurrentColour();
+	var colourValue;
+	colourValue.append(colour.getFloatRed());
+	colourValue.append(colour.getFloatGreen());
+	colourValue.append(colour.getFloatBlue());
+	colourValue.append(colour.getFloatAlpha());
+	colorParam->setValueForSelected(colourValue);
 
 }
 
