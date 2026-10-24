@@ -188,7 +188,7 @@ const String  CustomLoggerUI::getTimeStringForRow(const int r) const
 	{
 		const int numLines = el->getNumLines();
 		if (count + numLines > r)
-			return el->time.toString(false, true, true, true) + "." + String::formatted("%03d", el->time.getMilliseconds());
+			return getLogTimeString(el->time);
 		count += numLines;
 	}
 
