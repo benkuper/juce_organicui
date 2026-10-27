@@ -635,7 +635,10 @@ bool Engine::isFileFormatMigrationSupported(const AppVersion& fromVersion) const
 
 void Engine::loadJSONDataEngine(var data, ProgressTask* loadingTask)
 {
+	ProgressTask remoteLoadTask("Loading project");
+	if (loadingTask == nullptr) loadingTask = &remoteLoadTask;
 	isLoadingFile = true;
+	prepareJSONDataForLoad(data);
 
 	DynamicObject* d = data.getDynamicObject();
 	var layoutData = d->getProperty("layout");

@@ -92,6 +92,8 @@ public:
 	juce::var getJSONData(bool includeNonOverriden = false) override;
 	void loadJSONData(juce::var data, ProgressTask* loadingTask);
 	void loadJSONDataEngine(juce::var data, ProgressTask* loadingTask);
+	/// Application-owned, local format upgrades, before any saved state is loaded.
+	virtual void prepareJSONDataForLoad(juce::var& data) {}
 	virtual void loadJSONDataInternalEngine(juce::var data, ProgressTask* loadingTask) {}
 
 	/// @brief Read the software version used to save a file
