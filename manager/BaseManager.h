@@ -885,6 +885,7 @@ void BaseManager<T>::setItemIndex(T* item, int newIndex, bool addToUndo)
 
 	baseManagerListeners.call(&BaseManagerListener<T>::itemsReordered);
 	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_REORDERED));
+	notifyStructureChanged();
 
 #if ORGANICUI_USE_WEBSERVER
 	if (!isCurrentlyLoadingData && isAttachedToRoot())
@@ -916,6 +917,7 @@ void BaseManager<T>::reorderItems()
 
 	baseManagerListeners.call(&BaseManagerListener<T>::itemsReordered);
 	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_REORDERED));
+	notifyStructureChanged();
 }
 
 template<class T>
