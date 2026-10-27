@@ -976,33 +976,31 @@ bool BaseManager<T>::handleMoveFromRemoteControl(ControllableContainer* source, 
 		ancestor = ancestor->parentContainer.get();
 	}
 
+	// A different manager can own a different runtime context. Recreate through
+	// its factory, as for cut/paste, instead of reusing bindings to the old owner.
+	juce::var data = item->getJSONData();
+	if (data.getDynamicObject() == nullptr) return false;
+	data.getDynamicObject()->setProperty("index", targetIndex < 0
+		? items.size() : juce::jlimit(0, items.size(), targetIndex));
+
+	T* newItem = createItemFromData(data);
+	if (newItem == nullptr) return false; // Keep the original if the factory rejects it.
+
 	if (addToUndo
 		&& !UndoMaster::getInstance()->isPerforming
 		&& (Engine::mainEngine == nullptr || !Engine::mainEngine->isLoadingFile))
 	{
-		juce::var data = item->getJSONData();
-		if (data.getDynamicObject() == nullptr) return false;
-		if (targetIndex >= 0)
-			data.getDynamicObject()->setProperty("index", juce::jlimit(0, items.size(), targetIndex));
-
-		if (T* newItem = createItemFromData(data))
-		{
-			juce::Array<juce::UndoableAction*> actions;
-			actions.add(getAddItemUndoableAction(newItem, data));
-			actions.addArray(sourceManager->getRemoveItemUndoableAction(item));
-			UndoMaster::getInstance()->performActions("Move " + static_cast<BaseItem*>(item)->niceName, actions);
-			return true;
-		}
-
-		return false;
+		juce::Array<juce::UndoableAction*> actions;
+		actions.addArray(sourceManager->getRemoveItemUndoableAction(item));
+		actions.add(getAddItemUndoableAction(newItem, data));
+		UndoMaster::getInstance()->performActions("Move " + static_cast<BaseItem*>(item)->niceName, actions);
+		return true;
 	}
 
-	T* detached = sourceManager->removeItem(item, false, true, true);
-	if (detached == nullptr) return false;
-	T* added = addItem(detached, juce::var(), false, true);
-	if (added != nullptr && targetIndex >= 0)
-		setItemIndex(added, juce::jlimit(0, items.size() - 1, targetIndex), false);
-	return added != nullptr;
+	// Complete teardown before loading the replacement, so both graphs never run
+	// simultaneously and destination references resolve against the new owner.
+	sourceManager->removeItem(item, false);
+	return addItem(newItem, data, false) != nullptr;
 }
 
 template<class T>
