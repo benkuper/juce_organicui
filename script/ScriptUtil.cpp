@@ -329,7 +329,7 @@ var ScriptUtil::encodeSHA256(const var::NativeFunctionArgs& a)
 {
 	if (a.numArguments < 1) return "";
 	String s = a.arguments[0].toString();
-	return juce::SHA256(s.toStdString().c_str(), s.length()).toHexString();
+	return juce::SHA256(s.toRawUTF8(), s.getNumBytesAsUTF8()).toHexString();
 }
 
 var ScriptUtil::encodeSHA512(const var::NativeFunctionArgs& a)
