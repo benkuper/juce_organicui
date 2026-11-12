@@ -29,6 +29,7 @@ public:
 	std::unique_ptr<FloatSliderUI> progressionUI;
 
 	void resized() override;
+	void lookAndFeelChanged() override;
 
 	void buttonClicked(juce::Button * b) override;
 };

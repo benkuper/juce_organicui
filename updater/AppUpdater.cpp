@@ -396,6 +396,7 @@ UpdateDialogWindow::UpdateDialogWindow(const String& msg, const String& version,
 	changelogLabel.setColour(changelogLabel.textColourId, TEXT_COLOR);
 	changelogLabel.setScrollBarThickness(8);
 	changelogLabel.setReadOnly(true);
+	lookAndFeelChanged();
 	changelogLabel.setText(changelog);
 
 	addAndMakeVisible(&okButton);
@@ -412,6 +413,14 @@ UpdateDialogWindow::UpdateDialogWindow(const String& msg, const String& version,
 	addAndMakeVisible(progressionUI.get());
 
 	setSize(600, 600);
+}
+
+void UpdateDialogWindow::lookAndFeelChanged()
+{
+	// TextEditor caches word widths. Bind the text to the resolved typeface so
+	// cache reloads cannot change its glyphs without updating those widths.
+	const Font font(changelogLabel.getFont().getHeight());
+	changelogLabel.applyFontToAllText(Font(getLookAndFeel().getTypefaceForFont(font)).withHeight(font.getHeight()));
 }
 
 void UpdateDialogWindow::resized()
