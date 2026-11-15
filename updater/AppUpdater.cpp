@@ -204,7 +204,7 @@ bool AppUpdater::updateTargetChannelLatestVersionAndUpdateAvailable()
 	}
 
 	const bool isChangingChannel = currentChannel != targetChannel;
-	updateAvailable = currentVersion < targetVersion || (isChangingChannel && currentVersion <= targetVersion);
+	updateAvailable = isChangingChannel || currentVersion < targetVersion;
 	
 	latestVersion = targetVersion.toString();
 	
