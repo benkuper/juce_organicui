@@ -9,8 +9,71 @@
 */
 
 #include "JuceHeader.h"
+#include <deque>
 
 using namespace juce;
+
+namespace
+{
+struct ParameterBailOutChecker
+{
+	WeakReference<Parameter> parameter;
+	bool shouldBailOut() const { return parameter == nullptr || parameter->isBeingDestroyed; }
+};
+
+// Preserve every captured value and its ordering, but do not post one OS
+// message per animated parameter/tick. Short batches leave time for input,
+// paint and timer messages even while interpolation is producing more values.
+class ParameterValueDispatcher : public std::enable_shared_from_this<ParameterValueDispatcher>
+{
+public:
+	void post(std::function<void()> callback)
+	{
+		{
+			const ScopedLock guard(lock);
+			pending.push_back(std::move(callback));
+			if (deliveryPending) return;
+			deliveryPending = true;
+		}
+		MessageManager::callAsync([self = shared_from_this()] { self->deliver(); });
+	}
+
+private:
+	void deliver()
+	{
+		const auto deadline = Time::getMillisecondCounterHiRes() + 2.0;
+		for (int count = 0; count < 128; ++count)
+		{
+			std::function<void()> callback;
+			{
+				const ScopedLock guard(lock);
+				if (pending.empty()) { deliveryPending = false; return; }
+				callback = std::move(pending.front());
+				pending.pop_front();
+			}
+			callback();
+			if (Time::getMillisecondCounterHiRes() >= deadline) break;
+		}
+		{
+			const ScopedLock guard(lock);
+			if (pending.empty()) { deliveryPending = false; return; }
+		}
+		// Reposting immediately can keep low-priority WM_PAINT/WM_TIMER messages
+		// starved on Windows. A timer allows the message queue to become idle.
+		Timer::callAfterDelay(1, [self = shared_from_this()] { self->deliver(); });
+	}
+
+	CriticalSection lock;
+	std::deque<std::function<void()>> pending;
+	bool deliveryPending = false;
+};
+
+std::shared_ptr<ParameterValueDispatcher> getParameterValueDispatcher()
+{
+	static const auto dispatcher = std::make_shared<ParameterValueDispatcher>();
+	return dispatcher;
+}
+}
 
 juce_ImplementSingleton(Parameter::ValueInterpolator::Manager);
 
@@ -109,7 +172,7 @@ void Parameter::setControlMode(ControlMode _mode)
 	}
 
 	WeakReference<Parameter> safeThis(this);
-	parameterListeners.call(&ParameterListener::parameterControlModeChanged, this);
+	parameterListeners.callChecked(ParameterBailOutChecker{ safeThis }, &ParameterListener::parameterControlModeChanged, this);
 	if (auto* p = safeThis.get(); p != nullptr && !p->isBeingDestroyed)
 		p->queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::CONTROLMODE_CHANGED, p));
 }
@@ -649,7 +712,8 @@ void Parameter::notifyValueChanged() {
 	//if(isNotifyingChange) return; //not sure about this, it may cause unsynced value changes
 	//isNotifyingChange = true;
 
-	GenericScopedTryLock lock(notifyLock);
+	const auto notificationLock = notifyLock;
+	GenericScopedTryLock lock(*notificationLock);
 
 	if (!lock.isLocked()) return;
 
@@ -661,17 +725,17 @@ void Parameter::notifyValueChanged() {
 		WeakReference<Parameter> safeThis(this);
 		const auto valueCopy = getValue();
 
-		MessageManager::callAsync([safeThis, valueCopy]()
+		getParameterValueDispatcher()->post([safeThis, valueCopy]()
 			{
 				auto* p = safeThis.get();
 				if (p == nullptr || p->isBeingDestroyed) return;
 
-				p->parameterListeners.call(&ParameterListener::parameterValueChangedWithValue, p, valueCopy);
+				p->parameterListeners.callChecked(ParameterBailOutChecker{ safeThis }, &ParameterListener::parameterValueChangedWithValue, p, valueCopy);
 
 				auto* pAfterListeners = safeThis.get();
 				if (pAfterListeners == nullptr || pAfterListeners->isBeingDestroyed) return;
 
-				pAfterListeners->queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::VALUE_CHANGED, pAfterListeners, valueCopy));
+				pAfterListeners->queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::VALUE_CHANGED, pAfterListeners, valueCopy), false, true);
 			});
 
 		return;
@@ -679,9 +743,9 @@ void Parameter::notifyValueChanged() {
 
 	WeakReference<Parameter> safeThis(this);
 	const auto valueCopy = getValue();
-	parameterListeners.call(&ParameterListener::parameterValueChangedWithValue, this, valueCopy);
+	parameterListeners.callChecked(ParameterBailOutChecker{ safeThis }, &ParameterListener::parameterValueChangedWithValue, this, valueCopy);
 	if (auto* p = safeThis.get(); p != nullptr && !p->isBeingDestroyed)
-		p->queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::VALUE_CHANGED, p, valueCopy));
+		p->queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::VALUE_CHANGED, p, valueCopy), false, true);
 	//isNotifyingChange = false;
 }
 
@@ -703,7 +767,7 @@ void Parameter::notifyRangeChanged()
 					return;
 				}
 
-				p->parameterListeners.call(&ParameterListener::parameterRangeChanged, p);
+				p->parameterListeners.callChecked(ParameterBailOutChecker{ safeThis }, &ParameterListener::parameterRangeChanged, p);
 
 				auto* pAfterListeners = safeThis.get();
 				if (pAfterListeners == nullptr || pAfterListeners->isBeingDestroyed)
@@ -717,7 +781,7 @@ void Parameter::notifyRangeChanged()
 	else
 	{
 		WeakReference<Parameter> safeThis(this);
-		parameterListeners.call(&ParameterListener::parameterRangeChanged, this);
+		parameterListeners.callChecked(ParameterBailOutChecker{ safeThis }, &ParameterListener::parameterRangeChanged, this);
 		if (auto* p = safeThis.get(); p != nullptr && !p->isBeingDestroyed)
 		{
 			p->queuedNotifier.addMessage(new ParameterEvent(ParameterEvent::BOUNDS_CHANGED, p, arr));

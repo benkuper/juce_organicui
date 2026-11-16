@@ -103,7 +103,7 @@ void AutomationKey::setNextKey(AutomationKey* key)
 
 float AutomationKey::getValueAt(const float& _position)
 {
-    if (easing == nullptr && easing->length > 0) return value->floatValue();
+	if (easing == nullptr || easing->length <= 0) return value->floatValue();
     return easing->getValue(_position / easing->length);
 }
 

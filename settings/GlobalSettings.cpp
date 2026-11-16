@@ -308,6 +308,25 @@ void GlobalSettings::scheduleFontRendererReload()
 		});
 }
 
+void GlobalSettings::loadJSONData(var data, bool createIfNotThere)
+{
+#if ORGANICUI_USE_ASSISTANT
+    // Preserve preferences from the former top-level ChatGPT settings group.
+    if (auto* ai = getControllableContainerByName("AI Assistant", true))
+        if (!data["containers"].hasProperty(ai->shortName))
+            if (auto* containers = data["containers"].getDynamicObject())
+                for (auto property : containers->getProperties())
+                    if (property.name.toString().equalsIgnoreCase("chatGPTAssistant") && property.value.getDynamicObject())
+                    {
+                        data = data.clone(); auto legacy = property.value.clone();
+                        legacy.getDynamicObject()->setProperty("niceName", "ChatGPT"); legacy.getDynamicObject()->setProperty("shortName", "chatgpt");
+                        data["containers"].getDynamicObject()->setProperty(ai->shortName, organic::mcp::object({{"containers", organic::mcp::object({{"chatgpt", legacy}})}}));
+                        data["containers"].getDynamicObject()->removeProperty(property.name);
+                        break;
+                    }
+#endif
+    ControllableContainer::loadJSONData(data, createIfNotThere);
+}
 void GlobalSettings::loadJSONDataInternal(var data)
 {
 	openSpecificFileOnStartup->setEnabled(!openLastDocumentOnStartup->boolValue());

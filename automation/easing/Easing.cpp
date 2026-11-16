@@ -259,7 +259,9 @@ void CubicEasing::updateBezier()
 		coefficients = nextCoefficients;
 	}
 
+#if !ORGANICUI_CUBIC_EASING_USE_REALTIME
 	updateUniformLUT(1 + length * 20);
+#endif
 }
 
 CubicEasing::CubicCoefficients CubicEasing::getCoefficients() const

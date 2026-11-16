@@ -10,6 +10,7 @@
 #if ORGANICUI_USE_ASSISTANT
 #include "assistant/AssistantCore.cpp"
 #include "assistant/AssistantProvider.cpp"
+#include "assistant/ClaudeProvider.cpp"
 #include "assistant/AssistantController.cpp"
 #include "assistant/AssistantPanel.cpp"
 #endif

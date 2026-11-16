@@ -43,6 +43,7 @@ private:
     std::map<String, Observation> observations;
     String registerHandle(ControllableContainer*, Controllable*);
     void requireRevision(const var&);
+    var normalizedParameterValue(Parameter*, const var&) const;
     var list(const var&, Context&);
     void registerOperations();
 };

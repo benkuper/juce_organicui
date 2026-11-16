@@ -1,5 +1,6 @@
 #pragma once
 #include "../mcp/McpCore.h"
+#include <vector>
 
 namespace organic::assistant
 {
@@ -16,6 +17,12 @@ String accountKey(const var& verifiedIdentity, const String& issuedClient);
 String usageError(const String& code);
 juce::StringArray reasoningEfforts(const String& model);
 String actionableError(const String& message, int code = 0);
+String activityForTool(const String& name, const var& arguments);
+enum class MessageTone { normal, warning, error };
+struct MessageSpan { String text; MessageTone tone = MessageTone::normal; };
+// Semantic fragments are independent of JUCE graphics for rendering regressions.
+std::vector<MessageSpan> messageSpans(const String& line);
+String errorFragment(const String& message);
 
 // Windows: DPAPI current-user encryption. Unix: atomically replaced owner-only files.
 // Neither tokens nor history are written to a project or to logs.

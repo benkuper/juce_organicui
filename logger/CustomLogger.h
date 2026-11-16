@@ -23,7 +23,7 @@ public:
 		juce::String content;
 		juce::String source;
 		juce::String severityName;
-		juce::String getFullLog() const { return time.toString(false, true, true, true) + " [" + severityName + "] " + source + " : " + content; }
+		juce::String getFullLog() const { return getLogTimeString(time) + " [" + severityName + "] " + source + " : " + content; }
 	};
 
 	QueuedNotifier<LogEvent> notifier;

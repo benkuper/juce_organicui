@@ -57,6 +57,7 @@ public:
         listeners.clear();
         lastListeners.clear();
         messageQueue.clear();
+        coalescedMessage.reset();
         fifo.reset();
         //cancelPendingUpdate();
     }
@@ -69,7 +70,9 @@ public:
         virtual void newMessage(const MessageClass&) = 0;
     };
 
-    void addMessage( MessageClass * msg,bool forceSendNow = false){
+    // Keep ordinary listeners synchronous when requested, but allow display
+    // listeners to receive only the latest value on the next message-loop turn.
+    void addMessage( MessageClass * msg,bool forceSendNow = false, bool deferCoalesced = false){
         if (msg == nullptr)
             return;
 
@@ -89,6 +92,19 @@ public:
 
         if(forceSendNow){
             listeners.call(&Listener::newMessage,*msg);
+            if (deferCoalesced && lastListeners.size() > 0)
+            {
+                {
+                    const typename QueueLock::ScopedLockType lock(queueLock);
+                    coalescedMessage.reset(msg);
+                }
+                triggerAsyncUpdate();
+                return;
+            }
+            {
+                const typename QueueLock::ScopedLockType lock(queueLock);
+                coalescedMessage.reset();
+            }
             lastListeners.call(&Listener::newMessage,*msg);
             delete msg;
             return;
@@ -166,6 +182,7 @@ public:
     {
         const typename QueueLock::ScopedLockType lock(queueLock);
         messageQueue.clear();
+        coalescedMessage.reset();
         fifo.reset();
     }
 
@@ -181,10 +198,12 @@ private:
         // reuse it; leaving the message owned by messageQueue would let set()
         // delete it while listeners are still reading it.
         juce::OwnedArray<MessageClass> messagesToDeliver;
+        std::unique_ptr<MessageClass> deferredMessage;
         MessageClass* lastMessage = nullptr;
 
         {
             const typename QueueLock::ScopedLockType lock(queueLock);
+            deferredMessage = std::move(coalescedMessage);
 
             int start1{},size1{},start2{},size2{};
             fifo.prepareToRead(fifo.getNumReady(), start1, size1, start2, size2);
@@ -239,7 +258,9 @@ private:
         for (auto* message : messagesToDeliver)
             listeners.call(&Listener::newMessage,*message);
 
-        if (lastMessage != nullptr)
+        if (deferredMessage != nullptr)
+            lastListeners.call(&Listener::newMessage,*deferredMessage);
+        else if (lastMessage != nullptr)
             lastListeners.call(&Listener::newMessage,*lastMessage);
     }
 
@@ -251,6 +272,7 @@ private:
     int maxSize;
     juce::OwnedArray<MessageClass,CriticalSectionToUse> messageQueue;
     QueueLock queueLock;
+    std::unique_ptr<MessageClass> coalescedMessage;
     std::atomic<bool> isBeingDestroyed { false };
 
     using ThreadSafeListenerArray = juce::Array<Listener*, CriticalSectionToUse>;

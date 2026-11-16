@@ -430,6 +430,7 @@
 #if ORGANICUI_USE_ASSISTANT
 #include "assistant/AssistantCore.h"
 #include "assistant/AssistantProvider.h"
+#include "assistant/ClaudeProvider.h"
 #include "assistant/AssistantController.h"
 #include "assistant/AssistantPanel.h"
 #endif

@@ -71,6 +71,10 @@ inline juce::String getLogContent(const juce::String& logString) {
 }
 
 
+inline juce::String getLogTimeString(const juce::Time& time) {
+	return time.formatted("%H:%M:%S") + "." + juce::String::formatted("%03d", time.getMilliseconds());
+}
+
 class LogElement
 {
 public:
@@ -118,7 +122,7 @@ public:
 	juce::String getSeverityName() const { return severityNames[severity + 1]; }
 
 	juce::String getContent() const { return _arr->joinIntoString("\n"); }
-	juce::String getFullLog() const { return "[" + severityNames[severity + 1] + "] " + source + " : " + getContent(); }
+	juce::String getFullLog() const { return getLogTimeString(time) + " [" + severityNames[severity + 1] + "] " + source + " : " + getContent(); }
 
 	int getNumLines() const { return  _arr->size(); }
 	void trimToFit(int num) { if (_arr->size() > num)_arr->removeRange(0, _arr->size() - num); }

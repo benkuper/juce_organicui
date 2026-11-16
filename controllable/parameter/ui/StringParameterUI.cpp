@@ -202,23 +202,19 @@ void StringParameterFileUI::buttonClicked(Button* b)
 		if (fp->directoryMode) openFlags = openFlags | FileBrowserComponent::canSelectDirectories;
 		else openFlags = openFlags | FileBrowserComponent::FileChooserFlags::canSelectFiles;
 
-		chooser->launchAsync(openFlags, [this](const FileChooser& fc)
+		Component::SafePointer<StringParameterFileUI> safeThis(this);
+		WeakReference<Parameter> safeParameter(fp);
+		const bool saveMode = fp->saveMode;
+		chooser->launchAsync(openFlags, [safeThis, safeParameter, saveMode](const FileChooser& fc)
 			{
 				File f = fc.getResult();
 				delete& fc;
 
-				if (!f.exists() && !fp->saveMode) return;
+				if (safeThis == nullptr || safeParameter == nullptr || safeParameter->isBeingDestroyed) return;
+				if (f == File() || (!f.exists() && !saveMode)) return;
 
 				lastSearchedFolder = f.getParentDirectory();
-
-				Component::BailOutChecker checker(this);
-				if (checker.shouldBailOut()) return;
-
-				if (parameter.wasObjectDeleted()) return;
-				if (parameter != nullptr)
-				{
-					parameter->setUndoableValueForSelected(parameter->stringValue(), f.getFullPathName());
-				}
+				safeParameter->setUndoableValueForSelected(safeParameter->stringValue(), f.getFullPathName());
 
 			}
 		);

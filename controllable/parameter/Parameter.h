@@ -100,7 +100,8 @@ public:
 
 	bool isNotifyingChange;
 
-	juce::CriticalSection notifyLock;
+	// A listener may delete this parameter while a notification is in flight.
+	std::shared_ptr<juce::CriticalSection> notifyLock = std::make_shared<juce::CriticalSection>();
 
 	virtual void setEnabled(bool value, bool silentSet = false, bool force = false) override;
 

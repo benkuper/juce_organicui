@@ -174,17 +174,19 @@ StringArray EnumParameter::getAllKeys()
 
 bool EnumParameter::setValueWithData(var data, bool silentSet, bool force, bool forceOverride)
 {
-	GenericScopedLock lock(enumValues.getLock());
-	for (auto& ev : enumValues)
+	String key;
+	bool found = false;
 	{
-		if (ev->value == data)
+		GenericScopedLock lock(enumValues.getLock());
+		for (auto& ev : enumValues)
 		{
-			setValueWithKey(ev->key, silentSet, force, forceOverride);
-			return true;
+			if (ev->value != data) continue;
+			key = ev->key;
+			found = true;
+			break;
 		}
 	}
-
-	return false;
+	return found && setValueWithKey(key, silentSet, force, forceOverride);
 }
 
 bool EnumParameter::setValueWithKey(String key, bool silentSet, bool force, bool forceOverride)
@@ -196,22 +198,29 @@ bool EnumParameter::setValueWithKey(String key, bool silentSet, bool force, bool
 
 bool EnumParameter::setValueAtIndex(int index, bool silentSet, bool force, bool forceOverride)
 {
-	if (index >= enumValues.size()) return false;
-	setValueWithKey(enumValues[index]->key, silentSet, force, forceOverride);
-	return true;
+	String key;
+	{
+		GenericScopedLock lock(enumValues.getLock());
+		if (!isPositiveAndBelow(index, enumValues.size())) return false;
+		key = enumValues[index]->key;
+	}
+	return setValueWithKey(key, silentSet, force, forceOverride);
 }
 
 void EnumParameter::setPrev(bool loop, bool addToUndo)
 {
-	GenericScopedLock lock(enumValues.getLock());
-	int targetIndex = getIndexForKey(value.toString()) - 1;
-	if (targetIndex < 0)
+	String newValue;
 	{
-		if (loop) targetIndex = enumValues.size() - 1;
-		else return;
+		GenericScopedLock lock(enumValues.getLock());
+		if (enumValues.isEmpty()) return;
+		int targetIndex = getIndexForKey(value.toString()) - 1;
+		if (targetIndex < 0)
+		{
+			if (loop) targetIndex = enumValues.size() - 1;
+			else return;
+		}
+		newValue = enumValues[targetIndex]->key;
 	}
-
-	String newValue = enumValues[targetIndex]->key;
 
 	if (addToUndo) setUndoableValue(value, newValue);
 	else setValueWithKey(newValue);
@@ -219,16 +228,18 @@ void EnumParameter::setPrev(bool loop, bool addToUndo)
 
 void EnumParameter::setNext(bool loop, bool addToUndo)
 {
-
-	GenericScopedLock lock(enumValues.getLock());
-	int targetIndex = getIndexForKey(value.toString()) + 1;
-	if (targetIndex >= enumValues.size())
+	String newValue;
 	{
-		if (loop) targetIndex = 0;
-		else return;
+		GenericScopedLock lock(enumValues.getLock());
+		if (enumValues.isEmpty()) return;
+		int targetIndex = getIndexForKey(value.toString()) + 1;
+		if (targetIndex >= enumValues.size())
+		{
+			if (loop) targetIndex = 0;
+			else return;
+		}
+		newValue = enumValues[targetIndex]->key;
 	}
-
-	String newValue = enumValues[targetIndex]->key;
 
 	if (addToUndo) setUndoableValue(value, newValue);
 	else setValueWithKey(newValue);

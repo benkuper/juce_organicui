@@ -12,10 +12,10 @@ public:
     explicit Controller(Provider&);
     ~Controller() override;
     Provider& provider;
-    ControllableContainer settings {"ChatGPT Assistant"};
+    ControllableContainer settings;
     StringParameter *prompt, *transcript, *status;
     BoolParameter* busy;
-    Trigger *send, *cancelRequest, *clearHistory, *newConversation, *openSettings;
+    Trigger *send, *steer, *resumeUnfinished, *runQueue, *cancelRequest, *clearHistory, *newConversation, *openSettings;
     Trigger *explainProject, *findIssues, *buildWorkflow;
     EnumParameter *accounts, *models, *access, *effort;
     BoolParameter *advanced, *includeProjectContext;
@@ -24,6 +24,9 @@ public:
     void refresh();
     String currentError() const { return localError; }
     void selectConversation(const String& id) { perform([&] { provider.selectConversation(id); }); }
+    void removeQueued(const String& id) { perform([&] { provider.removeQueued(id); }); }
+    void steerQueued(const String& id) { perform([&] { provider.steerQueued(id); }); }
+    void editQueued(const String& id);
     void onContainerTriggerTriggered(Trigger*) override;
     void onControllableFeedbackUpdate(ControllableContainer*, Controllable*) override;
 private:
@@ -33,5 +36,20 @@ private:
     void timerCallback() override { refresh(); }
     void action(Trigger*);
     void perform(const std::function<void()>&);
+};
+
+// One application/settings entry, with independent sessions for each provider.
+class Hub final : public ControllableContainer
+{
+public:
+    explicit Hub(juce::Array<Controller*>);
+    ~Hub() override;
+    ControllableContainer settings {"AI Assistant"};
+    EnumParameter* providers;
+    const juce::Array<Controller*> controllers;
+    Controller& active() const { return *selected; }
+    void onControllableFeedbackUpdate(ControllableContainer*, Controllable*) override;
+private:
+    Controller* selected = nullptr;
 };
 }
