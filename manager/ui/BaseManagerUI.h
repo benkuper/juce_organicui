@@ -361,6 +361,7 @@ void BaseManagerUI<M, T, U>::setDefaultLayout(Layout l)
 template<class M, class T, class U>
 void BaseManagerUI<M, T, U>::addExistingItems(bool resizeAfter)
 {
+	ScopedLock lock(manager->items.getLock());
 
 	//add existing items
 	for (auto& t : manager->items) addItemUI(t, false);
