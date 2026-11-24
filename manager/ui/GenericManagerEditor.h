@@ -222,7 +222,7 @@ void GenericManagerEditor<T>::handleMenuSelectedID(int id)
 			}
 			else
 			{
-				if (id == 1100) addItemFromMenu(true);
+				if (id == 1101) addItemFromMenu(true);
 			}
 		}
 		break;

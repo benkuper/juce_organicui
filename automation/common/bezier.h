@@ -29,7 +29,7 @@
 
 #if defined(_WIN32)
 #ifdef min
-#undef min      
+#undef min
 #endif
 #ifdef max
 #undef max

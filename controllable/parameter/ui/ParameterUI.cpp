@@ -364,7 +364,7 @@ void ParameterUI::handleMenuSelectedID(int id)
 			if (vStr.startsWithChar('[') && vStr.endsWithChar(']'))
 			{
 				StringArray vals;
-				vals.addTokens(vStr.substring(1, vStr.length() - 2), ",", "");
+				vals.addTokens(vStr.substring(1, vStr.length() - 1), ",", "");
 
 				if (vals.size() >= parameter->value.size())
 				{
@@ -374,7 +374,10 @@ void ParameterUI::handleMenuSelectedID(int id)
 			}
 		}
 
-		parameter->setValue(v); break;
+		if (parameter->isComplex() && !v.isArray()) break;
+		parameter->resetLastUndoValue();
+		parameter->setUndoableValue(v, false, true);
+		break;
 	}
 	case -50: parameter->setUndoableRangeForSelected(0, 1); break;
 	case -51: parameter->setUndoableRangeForSelected(-1, 1); break;
@@ -387,25 +390,19 @@ void ParameterUI::handleMenuSelectedID(int id)
 	case -62: parameter->setUndoableRangeForSelected(0, 255); break;
 	case -63: parameter->setUndoableRangeForSelected(0, 65535); break;
 
-	case -70:
-		if (parameter->type == Parameter::POINT2D) ((Point2DParameter*)parameter.get())->setBounds(0, 0, 1, 1);
-		else ((Point3DParameter*)parameter.get())->setBounds(0, 0, 0, 1, 1, 1);
+	case -70: case -71: case -72: case -73: case -80:
+	{
+		const double low = id == -71 ? -1 : id == -73 ? -100 : 0;
+		const double high = id == -72 || id == -73 ? 100 : 1;
+		var minimum, maximum;
+		for (int axis = 0; axis < parameter->value.size(); ++axis)
+		{
+			minimum.append(id == -80 && axis == 3 ? 1 : low);
+			maximum.append(high);
+		}
+		parameter->setUndoableRangeForSelected(minimum, maximum);
 		break;
-	case -71:
-		if (parameter->type == Parameter::POINT2D) ((Point2DParameter*)parameter.get())->setBounds(-1, -1, 1, 1);
-		else ((Point3DParameter*)parameter.get())->setBounds(-1, -1, -1, 1, 1, 1);
-		break;
-	case -72:
-		if (parameter->type == Parameter::POINT2D) ((Point2DParameter*)parameter.get())->setBounds(0, 0, 100, 100);
-		else ((Point3DParameter*)parameter.get())->setBounds(0, 0, 0, 100, 100, 100);
-		break;
-	case -73:
-		if (parameter->type == Parameter::POINT2D) ((Point2DParameter*)parameter.get())->setBounds(-100, -100, 100, 100);
-		else ((Point3DParameter*)parameter.get())->setBounds(-100, -100, -100, 100, 100, 100);
-		break;
-	case -80:
-		((ColorParameter*)parameter.get())->setBounds(0.f, 0.f, 0.f, 1.f, 1.f, 1.f, 1.f, 1.f);
-		break;
+	}
 
 	default:
 	{

@@ -34,10 +34,7 @@ ControllableEditor::ControllableEditor(Array<Controllable*> controllables, bool 
 	label.setTooltip(ui->tooltip);
 	label.setEditable(multiHasAllOf([](Inspectable* i) { return static_cast<Controllable*>(i)->userCanChangeName; }));
 	label.addListener(this);
-	if (!isMultiEditing())
-	{
-		label.addMouseListener(this, false);
-	}
+	label.addMouseListener(this, false);
 
 	bool isAllRemovable = multiHasAllOf([](Inspectable* i) { return ((Controllable*) i)->isRemovableByUser; });
 	if (isAllRemovable)
@@ -213,7 +210,7 @@ void ControllableEditor::mouseDrag(const MouseEvent& e)
 {
 	InspectableEditor::mouseDrag(e);
 
-	if (dragAndDropEnabled && e.eventComponent == &label)
+	if (controllable != nullptr && dragAndDropEnabled && !isMultiEditing() && e.eventComponent == &label)
 	{
 		var desc = var(new DynamicObject());
 		desc.getDynamicObject()->setProperty("type", controllable->getTypeString());
@@ -233,10 +230,7 @@ void ControllableEditor::newMessage(const Controllable::ControllableEvent& e)
 	switch (e.type)
 	{
 	case Controllable::ControllableEvent::NAME_CHANGED:
-		if (!isMultiEditing())
-		{
-			label.setText(controllable->niceName, dontSendNotification);
-		}
+		if (controllable != nullptr) label.setText(controllable->niceName, dontSendNotification);
 		break;
 
 	case Controllable::ControllableEvent::STATE_CHANGED:

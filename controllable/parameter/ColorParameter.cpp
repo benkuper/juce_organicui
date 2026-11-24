@@ -57,7 +57,7 @@ Colour ColorParameter::getColor() const
 
 void ColorParameter::setFloatRGBA(const float& r, const float& g, const float& b, const float& a, bool setSimilarSelected)
 {
-	setColor(Colour::fromFloatRGBA(r, g, b, a), setSimilarSelected);
+	setColor(Colour::fromFloatRGBA(r, g, b, a), false, false, setSimilarSelected);
 }
 
 void ColorParameter::setColor(const uint32& _color, bool silentSet, bool force, bool setSimilarSelected)

@@ -26,6 +26,9 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(Array<Con
 	jassert(containers.size() > 0);
 
 	container = containers[0];
+	for (auto* related : container->getRelatedSelectedContainers()) containers.addIfNotAlreadyThere(related);
+	this->containers = containers;
+	inspectables = Inspectable::getWeakArray(Inspectable::getArrayAs<ControllableContainer, Inspectable>(containers));
 	container->addAsyncContainerListener(this);
 	addAndMakeVisible(containerLabel);
 
@@ -36,10 +39,11 @@ GenericControllableContainerEditor::GenericControllableContainerEditor(Array<Con
 	containerLabel.setColour(containerLabel.textColourId, contourColor.brighter(1));
 	containerLabel.setColour(CaretComponent::caretColourId, Colours::orange);
 
-	containerLabel.setEditable(false, container->nameCanBeChangedByUser);
+	const bool canRename = multiHasAllOf([](Inspectable* i) { return static_cast<ControllableContainer*>(i)->nameCanBeChangedByUser; });
+	containerLabel.setEditable(false, canRename);
 	containerLabel.addListener(this);
 
-	if (!container->nameCanBeChangedByUser) containerLabel.setInterceptsMouseClicks(false, false);
+	if (!canRename) containerLabel.setInterceptsMouseClicks(false, false);
 
 	if (container->userCanAddControllables)
 	{
@@ -456,7 +460,7 @@ void GenericControllableContainerEditor::buttonClicked(Button* b)
 
 void GenericControllableContainerEditor::labelTextChanged(Label* l)
 {
-	if (l == &containerLabel) container->setUndoableNiceNameForSelected(l->getText());
+	if (l == &containerLabel && container != nullptr) container->setUndoableNiceNameForSelected(l->getText());
 }
 
 void GenericControllableContainerEditor::componentVisibilityChanged(Component& c)

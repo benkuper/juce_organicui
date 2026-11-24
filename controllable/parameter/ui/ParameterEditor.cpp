@@ -175,6 +175,8 @@ void ParameterEditor::labelTextChanged(Label* labelThatHasChanged)
 {
 	ControllableEditor::labelTextChanged(labelThatHasChanged);
 
-	if (inspectable.wasObjectDeleted()) return;
-	if (labelThatHasChanged == expressionText.get()) parameter->setControlExpression(expressionText->getText());
+	if (inspectable == nullptr || parameter == nullptr || labelThatHasChanged != expressionText.get()) return;
+	const String expression = expressionText->getText();
+	for (const auto& related : Inspectable::getWeakArray(parameter->getRelatedSelectedParameters()))
+		if (related != nullptr && !related->lockManualControlMode) related->setControlExpression(expression);
 }

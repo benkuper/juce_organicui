@@ -600,7 +600,7 @@ void Engine::migrateThenLoadFileIfUserAgrees(const AppVersion& fileVersion, cons
 					loadJSONDataEngine(migratedFileData, loadingTask);
 					saveDocumentFromJSON(f, migratedFileData);
 				}
-				else 
+				else
 				{
 					setFile(File());
 				}
