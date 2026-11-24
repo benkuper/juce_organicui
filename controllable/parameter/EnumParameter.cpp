@@ -43,17 +43,19 @@ EnumParameter::~EnumParameter()
 
 EnumParameter* EnumParameter::addOption(String key, var data, bool selectIfFirstOption)
 {
-	GenericScopedLock lock(enumValues.getLock());
-	enumValues.add(new EnumValue(key, data));
-	if (enumValues.size() == 1 && selectIfFirstOption)
 	{
-		defaultValue = key;
-		setValue(key, true, false, false);
+		GenericScopedLock lock(enumValues.getLock());
+		enumValues.add(new EnumValue(key, data));
+		if (enumValues.size() == 1 && selectIfFirstOption)
+		{
+			defaultValue = key;
+			setValue(key, true, false, false);
+		}
+		updateArgDescription();
 	}
 
 	enumListeners.call(&EnumParameterListener::enumOptionAdded, this, key);
 	enumParameterNotifier.addMessage(new EnumParameterEvent(EnumParameterEvent::ENUM_OPTION_ADDED, this));
-	updateArgDescription();
 	return this;
 }
 
@@ -79,11 +81,14 @@ void EnumParameter::updateOption(int index, String key, var data, bool addIfNotT
 
 void EnumParameter::removeOption(String key)
 {
-	GenericScopedLock lock(enumValues.getLock());
-	enumValues.remove(getIndexForKey(key));
-	enumListeners.call(&EnumParameterListener::enumOptionRemoved, this, key);
+	{
+		GenericScopedLock lock(enumValues.getLock());
+		enumValues.remove(getIndexForKey(key));
+		updateArgDescription();
+	}
+
 	enumParameterNotifier.addMessage(new EnumParameterEvent(EnumParameterEvent::ENUM_OPTION_REMOVED, this));
-	updateArgDescription();
+	enumListeners.call(&EnumParameterListener::enumOptionRemoved, this, key);
 
 	if (getValueKey() == key) setValue("");
 }
@@ -101,10 +106,20 @@ void EnumParameter::setOptions(Array<EnumValue> options)
 
 void EnumParameter::clearOptions()
 {
-	GenericScopedLock lock(enumValues.getLock());
 	StringArray keysToRemove;
-	for (auto& ev : enumValues) keysToRemove.add(ev->key);
+	{
+		GenericScopedLock lock(enumValues.getLock());
+		for (auto& ev : enumValues) keysToRemove.add(ev->key);
+	}
 	for (auto& k : keysToRemove) removeOption(k);
+}
+
+var EnumParameter::getRange() const
+{
+	GenericScopedLock lock(enumValues.getLock());
+	Array<var> keys;
+	for (const auto* option : enumValues) keys.add(option->key);
+	return var(keys);
 }
 
 void EnumParameter::updateArgDescription()
@@ -158,10 +173,9 @@ void EnumParameter::setValueInternal(juce::var& newValue)
 {
 	Parameter::setValueInternal(newValue);
 
-	EnumValue* ev = getEntryForKey(value.toString());
-
 	{
 		GenericScopedLock lock(enumValues.getLock());
+		const auto* ev = getEntryForKey(value.toString());
 		if (ev == nullptr)
 		{
 			curEnumValue.key = "";
@@ -177,17 +191,19 @@ void EnumParameter::setValueInternal(juce::var& newValue)
 
 bool EnumParameter::setValueWithData(var data)
 {
-	GenericScopedLock lock(enumValues.getLock());
-	for (auto& ev : enumValues)
+	String key;
+	bool found = false;
 	{
-		if (ev->value == data)
+		GenericScopedLock lock(enumValues.getLock());
+		for (auto& ev : enumValues)
 		{
-			setValueWithKey(ev->key);
-			return true;
+			if (ev->value != data) continue;
+			key = ev->key;
+			found = true;
+			break;
 		}
 	}
-
-	return false;
+	return found && setValueWithKey(key);
 }
 
 bool EnumParameter::setValueWithKey(String key)
@@ -199,22 +215,29 @@ bool EnumParameter::setValueWithKey(String key)
 
 bool EnumParameter::setValueAtIndex(int index)
 {
-	if (index >= enumValues.size()) return false;
-	setValueWithKey(enumValues[index]->key);
-	return true;
+	String key;
+	{
+		GenericScopedLock lock(enumValues.getLock());
+		if (!isPositiveAndBelow(index, enumValues.size())) return false;
+		key = enumValues[index]->key;
+	}
+	return setValueWithKey(key);
 }
 
 void EnumParameter::setPrev(bool loop, bool addToUndo)
 {
-	GenericScopedLock lock(enumValues.getLock());
-	int targetIndex = getIndexForKey(value.toString()) - 1;
-	if (targetIndex < 0)
+	String newValue;
 	{
-		if (loop) targetIndex = enumValues.size() - 1;
-		else return;
+		GenericScopedLock lock(enumValues.getLock());
+		if (enumValues.isEmpty()) return;
+		int targetIndex = getIndexForKey(value.toString()) - 1;
+		if (targetIndex < 0)
+		{
+			if (loop) targetIndex = enumValues.size() - 1;
+			else return;
+		}
+		newValue = enumValues[targetIndex]->key;
 	}
-
-	String newValue = enumValues[targetIndex]->key;
 
 	if (addToUndo) setUndoableValue(newValue, false, true);
 	else setValueWithKey(newValue);
@@ -222,16 +245,18 @@ void EnumParameter::setPrev(bool loop, bool addToUndo)
 
 void EnumParameter::setNext(bool loop, bool addToUndo)
 {
-
-	GenericScopedLock lock(enumValues.getLock());
-	int targetIndex = getIndexForKey(value.toString()) + 1;
-	if (targetIndex >= enumValues.size())
+	String newValue;
 	{
-		if (loop) targetIndex = 0;
-		else return;
+		GenericScopedLock lock(enumValues.getLock());
+		if (enumValues.isEmpty()) return;
+		int targetIndex = getIndexForKey(value.toString()) + 1;
+		if (targetIndex >= enumValues.size())
+		{
+			if (loop) targetIndex = 0;
+			else return;
+		}
+		newValue = enumValues[targetIndex]->key;
 	}
-
-	String newValue = enumValues[targetIndex]->key;
 
 	if (addToUndo) setUndoableValue(newValue, false, true);
 	else setValueWithKey(newValue);

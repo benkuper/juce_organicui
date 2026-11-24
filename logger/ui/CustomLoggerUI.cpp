@@ -187,7 +187,7 @@ const String  CustomLoggerUI::getTimeStringForRow(const int r) const
 {
 	if (auto el = getElementForRow(r)) {
 		if (el == nullptr) return "";
-		return String(el->time.toString(false, true, true, true) + "." + String::formatted("%03d", el->time.getMilliseconds()));
+		return getLogTimeString(el->time);
 	}
 
 	return "";

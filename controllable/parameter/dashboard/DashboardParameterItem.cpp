@@ -265,9 +265,28 @@ DashboardEnumParameterItem::DashboardEnumParameterItem(EnumParameter* parameter)
 
 DashboardEnumParameterItem::~DashboardEnumParameterItem()
 {
-	if (parameter == nullptr || parameter.wasObjectDeleted()) return;
+	if (auto* ep = dynamic_cast<EnumParameter*>(parameter.get()))
+	{
+		ep->removeEnumParameterListener(this);
+	}
 
-	((EnumParameter*)parameter.get())->removeEnumParameterListener(this);
+}
+
+void DashboardEnumParameterItem::setInspectableInternal(Inspectable* i)
+{
+	// clearItem() also clears the target before the destructor runs.
+	// Detach while the previous parameter is still available.
+	if (auto* ep = dynamic_cast<EnumParameter*>(parameter.get()))
+	{
+		ep->removeEnumParameterListener(this);
+	}
+
+	DashboardParameterItem::setInspectableInternal(i);
+
+	if (auto* ep = dynamic_cast<EnumParameter*>(parameter.get()))
+	{
+		ep->addEnumParameterListener(this);
+	}
 
 }
 

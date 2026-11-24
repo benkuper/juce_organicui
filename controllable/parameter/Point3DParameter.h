@@ -29,6 +29,9 @@ public:
 	void setValueInternal(juce::var& _value) override;
 	void setBounds(float _minX, float _minY, float _minZ, float _maxX, float _maxY, float _maxZ);
 
+	void setDefaultVector(const juce::Vector3D<float>& value, bool doResetValue = true);
+	void setDefaultVector(float x, float y, float z, bool doResetValue = true);
+
 	juce::Vector3D<float> getVector();
 	virtual juce::var getLerpValueTo(juce::var targetValue, float weight) override;
 	virtual void setWeightedValue(juce::Array<juce::var> values, juce::Array<float> weights) override;

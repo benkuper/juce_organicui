@@ -25,8 +25,8 @@ public:
 
 	void clear();
 
-	void registerWarning(juce::WeakReference<WarningTarget>);
-	void unregisterWarning(juce::WeakReference<WarningTarget>);
+	void registerWarning(juce::WeakReference<WarningTarget>, const juce::String& warningID, const juce::String& warningMessage);
+	void unregisterWarning(juce::WeakReference<WarningTarget>, const juce::String& warningID);
 
 	void fileLoaded() override;
 
@@ -39,12 +39,15 @@ public:
 	public:
 		enum Type { WARNING_REGISTERED, WARNING_UNREGISTERED };
 
-		WarningReporterEvent(Type t, juce::WeakReference<WarningTarget> target, const juce::String& address = juce::String()) :
-			type(t), target(target), targetAddress(address) {}
+		WarningReporterEvent(Type t, juce::WeakReference<WarningTarget> target, const juce::String& address, const juce::String& _warningID, const juce::String& _warningMessage) :
+			type(t), target(target), targetAddress(address), warningID(_warningID), message(_warningMessage) {}
 
 		Type type;
-		juce::WeakReference<WarningTarget> target;
+		juce::WeakReference<WarningTarget> target; // TODO: Dangerous, the target might be destroyed before the listeners are notified
+
 		juce::String targetAddress;
+		juce::String warningID;
+		juce::String message;
 	};
 
 	QueuedNotifier<WarningReporterEvent> warningReporterNotifier;

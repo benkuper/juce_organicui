@@ -396,6 +396,7 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info)
 				}
 				else
 				{
+					Engine::mainEngine->removeNewerAutosaves();
 					Engine::mainEngine->createNewGraph();
 				}
 			});
@@ -416,14 +417,23 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info)
 				}
 				else
 				{
-					Engine::mainEngine->loadFromUserSpecifiedFileAsync(true,
-																	   [](Result r)
-																	   {
-																		   if (r.failed())
-																		   {
-																			   LOGERROR("Load failed :" + r.getErrorMessage());
-																		   }
-																	   });
+					Engine::mainEngine->removeNewerAutosaves();
+
+					// The save prompt's native modal callback has not fully unwound yet.
+					// Opening another native dialog from here makes some platforms report
+					// an immediate cancellation and leaves JUCE's async FileChooser alive.
+					MessageManager::callAsync([]
+						{
+							if (Engine::mainEngine == nullptr)
+								return;
+
+							Engine::mainEngine->loadFromUserSpecifiedFileAsync(true,
+								[](Result r)
+								{
+									if (r.failed() && r.getErrorMessage() != TRANS("User cancelled"))
+										LOGERROR("Load failed :" + r.getErrorMessage());
+								});
+						});
 				}
 			});
 	}
@@ -443,6 +453,7 @@ bool OrganicMainContentComponent::perform(const InvocationInfo& info)
 				}
 				else
 				{
+					Engine::mainEngine->removeNewerAutosaves();
 					Engine::mainEngine->loadFrom(Engine::mainEngine->getLastDocumentOpened(), true);
 				}
 			});

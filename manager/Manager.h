@@ -43,7 +43,7 @@ public:
 
 	//editor
 	bool showItemsInEditor;
-	// 
+	//
 	//grid
 	BoolParameter* snapGridMode;
 	BoolParameter* showSnapGrid;
@@ -571,6 +571,9 @@ juce::Array<T*> Manager<T>::addItemsFromClipboard(bool showWarning)
 
 	if (!data.hasProperty("itemType"))
 	{
+		juce::var managerItems = data.getProperty("items", juce::var());
+		if (managerItems.isArray()) return addItemsFromData(managerItems);
+
 		juce::Array<T*> result;
 		result.add(this->addItemFromData(data));
 		return result;
@@ -744,6 +747,7 @@ void Manager<T>::setItemIndex(T* item, int newIndex, bool addToUndo)
 
 	managerListeners.call(&ManagerListener::itemsReordered);
 	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_REORDERED));
+	notifyStructureChanged();
 }
 
 template<class T>
@@ -770,6 +774,7 @@ void Manager<T>::reorderItems()
 
 	managerListeners.call(&ManagerListener::itemsReordered);
 	managerNotifier.addMessage(new ManagerEvent(ManagerEvent::ITEMS_REORDERED));
+	notifyStructureChanged();
 }
 
 template<class T>
@@ -1057,7 +1062,7 @@ juce::var Manager<T>::addItemFromScript(const juce::var::NativeFunctionArgs& arg
 	Manager<T>* m = getObjectFromJS<Manager<T>>(args);
 	if (m == nullptr || m->isBeingDestroyed) return juce::var();
 
-	//if (args.numArguments) return juce::var(); 
+	//if (args.numArguments) return juce::var();
 	if (m->managerFactory == nullptr || m->managerFactory->defs.size() == 1)
 	{
 		T* item = m->addItem(nullptr, args.numArguments > 1 && args.arguments[1].isObject() ? args.arguments[1] : juce::var());

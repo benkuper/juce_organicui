@@ -33,6 +33,7 @@ public:
 	void removeOption(juce::String key);
 	void setOptions(juce::Array<EnumValue> options);
 	void clearOptions();
+	juce::var getRange() const override;
 
 	void updateArgDescription();
 
@@ -112,4 +113,5 @@ public:
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(EnumParameter)
+
 };

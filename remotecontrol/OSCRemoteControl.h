@@ -97,7 +97,8 @@ public:
 	void messageReceived(const juce::String& id, const juce::String& message) override;
 	void dataReceived(const juce::String& id, const juce::MemoryBlock& data) override;
 	void connectionClosed(const juce::String& id, int status, const juce::String& reason) override;
-	void connectionError(const juce::String& id, const juce::String& message) override;
+	void connectionError(const juce::String& id, const juce::String& message);
+	void connectionError(const juce::String& id, int status, const juce::String& message);
 
 
 	void sendOSCQueryFeedback(Controllable* c);
@@ -122,7 +123,7 @@ public:
 
 	void newMessage(const CustomLogger::LogEvent& e) override;
 	void sendLogFeedback(const juce::String& type, const juce::String& source, const juce::String& message);
-	void sendPersistentWarningFeedback(juce::WeakReference<WarningTarget> wt, juce::String address = juce::String(), WarningReporter::WarningReporterEvent::Type type = WarningReporter::WarningReporterEvent::WARNING_REGISTERED);
+	void sendPersistentWarningFeedback(const juce::String& address, const juce::String& warningID, const juce::String& warningMessage);
 	void newMessage(const WarningReporter::WarningReporterEvent& e) override;
 
 #endif

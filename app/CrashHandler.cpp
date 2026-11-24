@@ -73,6 +73,18 @@ void CrashDumpUploader::handleCrash(int e)
 
 	recoveredFile = f.existsAsFile() ? f.getParentDirectory().getChildFile(f.getFileNameWithoutExtension() + "_recovered" + f.getFileExtension()) : File::getSpecialLocation(File::userDocumentsDirectory).getChildFile(getApp().appProperties->getStorageParameters().applicationName + "/recovered_session" + Engine::mainEngine->fileExtension);
 
+	// Capture the original exception before serialising the potentially damaged
+	// engine state. Recovery saving can itself fail during a crash.
+	traceFile = recoveredFile.getParentDirectory().getChildFile("crashlog.txt");
+#if JUCE_WINDOWS
+	dumpFile = recoveredFile.getParentDirectory().getChildFile("crashlog.dmp");
+#else
+	dumpFile = File();
+#endif
+	if (traceFile.existsAsFile()) traceFile.deleteFile();
+	if (dumpFile.existsAsFile()) dumpFile.deleteFile();
+	createDumpAndStrackTrace(e, dumpFile, traceFile);
+
 	if (recoveredFile.existsAsFile()) recoveredFile.deleteFile();
 
 	var data = Engine::mainEngine->getJSONData();
@@ -92,20 +104,6 @@ void CrashDumpUploader::handleCrash(int e)
 
 
 	crashAction = GlobalSettings::getInstance()->actionOnCrash->getValueDataAsEnum<GlobalSettings::CrashAction>();
-
-
-	traceFile = recoveredFile.getParentDirectory().getChildFile("crashlog.txt");
-
-#if JUCE_WINDOWS
-	dumpFile = recoveredFile.getParentDirectory().getChildFile("crashlog.dmp");
-#else
-	dumpFile = File();
-#endif
-
-	if (traceFile.existsAsFile()) traceFile.deleteFile();
-	if (dumpFile.existsAsFile()) dumpFile.deleteFile();
-
-	createDumpAndStrackTrace(e, dumpFile, traceFile);
 
 
 	if (getApp().useWindow && crashAction == GlobalSettings::REPORT)

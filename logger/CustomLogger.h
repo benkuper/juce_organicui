@@ -35,7 +35,7 @@ public:
 		LogElement::Severity severity;
 		juce::String severityName;
 		int numLines;
-		juce::String getFullLog() const { return time.toString(false, true, true, true) + " [" + severityName + "] " + source + " : " + content; }
+		juce::String getFullLog() const { return getLogTimeString(time) + " [" + severityName + "] " + source + " : " + content; }
 	};
 
 	QueuedNotifier<LogEvent> notifier;

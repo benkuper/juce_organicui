@@ -36,7 +36,15 @@ GlobalSettings::GlobalSettings() :
 	launchMinimised = startupCC.addBoolParameter("Launch minimized", "If checked, this app will automatically minimized it self when launched", false);
 	allowMultipleInstances = startupCC.addBoolParameter("Allow Multiple Instances", "If checked, it will be possible to launch multiple instances of this application at the same time (not working on Mac, you would have to actually duplicate the app)", false);
 	checkUpdatesOnStartup = startupCC.addBoolParameter("Check updates on startup", "If enabled, app will check if any updates are available", true);
-	checkBetaUpdates = startupCC.addBoolParameter("Check for beta updates", "If enabled the app will also check for beta versions of the software", false);
+	updateChannel = startupCC.addEnumParameter("Update Channel", "Channel to pull software updates from");
+	updateChannel->addOption("Stable", "stableversion")->addOption("Beta", "betaversion");
+	const String& currentUpdateChannel = Engine::mainEngine->updateChannel;
+	if (currentUpdateChannel != "stableversion" && currentUpdateChannel != "betaversion")
+	{
+		updateChannel->addOption(currentUpdateChannel, currentUpdateChannel);
+	}
+	updateChannel->setValueWithData(currentUpdateChannel);
+
 	updateHelpOnStartup = startupCC.addBoolParameter("Update help on startup", "If enabled, app will try and download the last help file locally", true);
 
 	openLastDocumentOnStartup = startupCC.addBoolParameter("Load last " + (Engine::mainEngine != nullptr ? Engine::mainEngine->fileExtension : "") + " on startup", "If enabled, app will load the last " + Engine::mainEngine->fileExtension + " on startup", false);
@@ -156,6 +164,10 @@ void GlobalSettings::onControllableFeedbackUpdate(ControllableContainer* cc, Con
 	else if (c == alwaysOnTop && getApp().mainWindow != nullptr)
 	{
 		getApp().mainWindow->setAlwaysOnTop(alwaysOnTop->boolValue());
+	}
+	else if (c == updateChannel && !cc->isCurrentlyLoadingData)
+	{
+		AppUpdater::getInstance()->run();
 	}
 
 

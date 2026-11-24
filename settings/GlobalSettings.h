@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    GlobalSettings.h
-    Created: 3 Jan 2018 3:52:13pm
-    Author:  Ben
+	GlobalSettings.h
+	Created: 3 Jan 2018 3:52:13pm
+	Author:  Ben
 
   ==============================================================================
 */
@@ -42,7 +42,7 @@ public:
 	BoolParameter* launchMinimised;
 	BoolParameter* allowMultipleInstances;
 	BoolParameter * checkUpdatesOnStartup;
-	BoolParameter * checkBetaUpdates;
+	EnumParameter* updateChannel;
 	BoolParameter * updateHelpOnStartup;
 	BoolParameter * openLastDocumentOnStartup;
 	BoolParameter * openSpecificFileOnStartup;

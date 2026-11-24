@@ -119,13 +119,19 @@ void AppUpdater::downloadUpdate()
 	queuedNotifier.addMessage(new AppUpdateEvent(AppUpdateEvent::DOWNLOAD_STARTED));
 }
 
-void AppUpdater::run()
+bool AppUpdater::updateTargetChannelLatestVersionAndUpdateAvailable()
 {
-	if (Engine::mainEngine == nullptr) return;
+	if (Engine::mainEngine == nullptr)
+	{
+		return false;
+	}
 
-	//First cleanup update_temp directory
+	// First cleanup update_temp directory
 	targetDir = File::getSpecialLocation(File::currentApplicationFile).getParentDirectory().getChildFile("update_temp");
-	if (targetDir.exists()) targetDir.deleteRecursively();
+	if (targetDir.exists())
+	{
+		targetDir.deleteRecursively();
+	}
 
 	std::function<bool(int, int)> callbackFunc = std::bind(&AppUpdater::openStreamProgressCallback, this, std::placeholders::_1, std::placeholders::_2);
 
@@ -147,119 +153,137 @@ void AppUpdater::run()
 	if (statusCode != 200)
 	{
 		LOGWARNING("Failed to connect, status code = " + String(statusCode));
-		return;
+		return false;
 	}
 #endif
 
 	DBG("AppUpdater:: Status code " << statusCode);
 
-	if (stream != nullptr)
+	if (stream == nullptr)
 	{
-		String content = stream->readEntireStreamAsString();
-		updateData = JSON::parse(content);
+		LOGERROR("Error while trying to access to the update file");
+		return false;
+	}
 
-		if (updateData.isObject())
-		{
+	String content = stream->readEntireStreamAsString();
+	updateData = JSON::parse(content);
+
+	if (!updateData.isObject())
+	{
+		LOGERROR("Error while checking updates, update file is not valid");
+		return false;
+	}
 
 #if !JUCE_DEBUG
-			if (updateData.getProperty("testing", false)) return;
+	if (updateData.getProperty("testing", false))
+	{
+		return false;
+	}
 #endif
 
-			bool shouldCheckForBeta = Engine::mainEngine->isBetaVersion || GlobalSettings::getInstance()->checkBetaUpdates->boolValue();
+	targetChannel = GlobalSettings::getInstance()->updateChannel->getValueData();
+	String currentChannel = Engine::mainEngine->updateChannel;
 
-			var betaData = updateData.getProperty("betaversion", var());
-			var stableData = updateData.getProperty("stableversion", var());
+	const AppVersion currentVersion(getAppVersion());
 
-			String betaVersion = betaData.getProperty("version", "");
-			String stableVersion = stableData.getProperty("version", "");
+	//Still prefer newer stable version, even if the user is on a beta channel, unless the user is on a custom channel.
+	var updateDataForTargetChannel = updateData.getProperty(targetChannel, var());
+	AppVersion targetVersion(updateDataForTargetChannel.getProperty("version", ""));
 
-			var dataToCheck;
-			bool dataIsBeta = false;
-			int dataBetaVersion = 0;
+	// Beta users should also be notified when a stable release supersedes their version.
+	if (targetChannel == "betaversion")
+	{
+		const var stableUpdateData = updateData.getProperty("stableversion", var());
+		const AppVersion stableVersion(stableUpdateData.getProperty("version", ""));
+		if (targetVersion < stableVersion)
+		{
+			targetChannel = "stableversion";
+			updateDataForTargetChannel = stableUpdateData;
+			targetVersion = stableVersion;
+		}
+	}
 
+	const bool isChangingChannel = currentChannel != targetChannel;
+	updateAvailable = isChangingChannel || currentVersion < targetVersion;
 
-			if (shouldCheckForBeta && Engine::mainEngine->versionIsNewerThan(betaVersion, stableVersion))
-			{
-				DBG("Beta is newer : " << betaVersion);
-				dataIsBeta = true;
-				dataToCheck = betaData;
-				dataBetaVersion = Engine::mainEngine->getBetaVersion(betaVersion);
-			}
-			else
-			{
-				DBG("Stable is newer or not checking for beta " << stableVersion);
-				dataIsBeta = false;
-				dataToCheck = stableData;
-			}
+	latestVersion = targetVersion.toString();
+
+	return true;
+}
+
+void AppUpdater::run()
+{
+	if (!updateTargetChannelLatestVersionAndUpdateAvailable())
+	{
+		return;
+	}
+	var data = updateData.getProperty(targetChannel, var());
 
 #if !FORCE_UPDATE
-			if (Engine::mainEngine->checkFileVersion(dataToCheck.getDynamicObject(), true))
-			{
-				String version = dataToCheck.getProperty("version", "");
+	if (updateAvailable.getValue())
+	{
+		updateAvailable = true;
+
+		String version = data.getProperty("version", "");
 #endif
-				String savedSkipVersion = getAppProperties().getUserSettings()->getValue("skipVersion", "");
-				if (version == savedSkipVersion)
-				{
-					NLOG("Updater", "New version available but set to skip : " << version);
-					return;
-				}
+		String savedSkipVersion = getAppProperties().getUserSettings()->getValue("skipVersion", "");
+		if (version == savedSkipVersion)
+		{
+			NLOG("Updater", "New version available but set to skip : " << version);
+			return;
+		}
 
-				String msg = "A new " + String(dataIsBeta ? "BETA " : "") + "version of " + ProjectInfo::projectName + " is available : " + version + ", do you want to update the app ?\nYou can also deactivate updates in the preferences.";
+		bool isBeta = targetChannel == "betaversion";
+		String channelName = "";
+		if (isBeta)
+		{
+			channelName = "BETA ";
+		}
+		String msg = "A new " + channelName + "version of " + ProjectInfo::projectName + " is available : " + version + ", do you want to update the app ?\nYou can also deactivate updates in the preferences.";
 
-				Array<var>* changelog = dataToCheck.getProperty("changelog", var()).getArray();
-				String changelogString = "Changes since your version :\n\n";
-				changelogString += "Version " + version + ":\n";
-				for (auto& c : *changelog) changelogString += c.toString() + "\n";
-				changelogString += "\n\n";
+		Array<var>* changelog = data.getProperty("changelog", var()).getArray();
+		String changelogString = "Changes since your version :\n\n";
+		changelogString += "Version " + version + ":\n";
+		for (auto& c : *changelog) changelogString += c.toString() + "\n";
+		changelogString += "\n\n";
 
-				Array<var>* oldChangelogs = updateData.getProperty("archives", var()).getArray();
-				for (int i = oldChangelogs->size() - 1; i >= 0; i--)
-				{
-					var ch = oldChangelogs->getUnchecked(i);
-					String chVersion = ch.getProperty("version", "1.0.0");
-					if (Engine::mainEngine->versionIsNewerThan(getAppVersion(), chVersion)) break;
+		Array<var>* oldChangelogs = updateData.getProperty("archives", var()).getArray();
+		for (int i = oldChangelogs->size() - 1; i >= 0; i--)
+		{
+			var ch = oldChangelogs->getUnchecked(i);
+			AppVersion chVersion(ch.getProperty("version", "1.0.0"));
+			if (chVersion < AppVersion(getAppVersion())) break;
 
-					changelogString += "Version " + chVersion + ":\n";
-					Array<var>* versionChangelog = ch.getProperty("changelog", var()).getArray();
-					for (auto& c : *versionChangelog) changelogString += c.toString() + "\n";
-					changelogString += "\n\n";
-				}
+			changelogString += "Version " + chVersion.toString() + ":\n";
+			Array<var>* versionChangelog = ch.getProperty("changelog", var()).getArray();
+			for (auto& c : *versionChangelog) changelogString += c.toString() + "\n";
+			changelogString += "\n\n";
+		}
 
 
-				String title = dataIsBeta ? "New BETA version available" : "New version available";
+		String title = "New " + channelName + "version available";
 
-				extension = "zip";
+		extension = "zip";
 
 #if JUCE_WINDOWS
-				extension = updateData.getProperty("winExtension", "zip");
+		extension = updateData.getProperty("winExtension", "zip");
 #elif JUCE_MAC
-				extension = updateData.getProperty("osxExtension", "zip");
+		extension = updateData.getProperty("osxExtension", "zip");
 #elif JUCE_LINUX
-				extension = updateData.getProperty("linuxExtension", "zip");
+		extension = updateData.getProperty("linuxExtension", "zip");
 #endif
 
-				downloadingFileName = getDownloadFileName(version, dataIsBeta, extension);
+		downloadingFileName = getDownloadFileName(version, isBeta, extension);
 
-				queuedNotifier.addMessage(new AppUpdateEvent(AppUpdateEvent::UPDATE_AVAILABLE, version, dataIsBeta, title, msg, changelogString));
+		queuedNotifier.addMessage(new AppUpdateEvent(AppUpdateEvent::UPDATE_AVAILABLE, version, isBeta, title, msg, changelogString));
 
 #if !FORCE_UPDATE
-			}
-			else
-			{
-				LOG("App is up to date :) (Latest version online : " << dataToCheck.getProperty("version", "").toString() << ")");
-			}
-#endif
-		}
-		else
-		{
-			LOGERROR("Error while checking updates, update file is not valid");
-		}
-
 	}
 	else
 	{
-		LOGERROR("Error while trying to access to the update file");
+		LOG("App is up to date :) (Latest version online : " << data.getProperty("version", "").toString() << ")");
 	}
+#endif
 }
 
 void AppUpdater::finished(URL::DownloadTask* task, bool success)
@@ -372,6 +396,7 @@ UpdateDialogWindow::UpdateDialogWindow(const String& msg, const String& version,
 	changelogLabel.setColour(changelogLabel.textColourId, TEXT_COLOR);
 	changelogLabel.setScrollBarThickness(8);
 	changelogLabel.setReadOnly(true);
+	lookAndFeelChanged();
 	changelogLabel.setText(changelog);
 
 	addAndMakeVisible(&okButton);
@@ -388,6 +413,14 @@ UpdateDialogWindow::UpdateDialogWindow(const String& msg, const String& version,
 	addAndMakeVisible(progressionUI.get());
 
 	setSize(600, 600);
+}
+
+void UpdateDialogWindow::lookAndFeelChanged()
+{
+	// TextEditor caches word widths. Bind the text to the resolved typeface so
+	// cache reloads cannot change its glyphs without updating those widths.
+	const Font font(changelogLabel.getFont().getHeight());
+	changelogLabel.applyFontToAllText(Font(getLookAndFeel().getTypefaceForFont(font)).withHeight(font.getHeight()));
 }
 
 void UpdateDialogWindow::resized()

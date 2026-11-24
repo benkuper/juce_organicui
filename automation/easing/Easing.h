@@ -33,6 +33,9 @@ public:
 	virtual void updateKeysInternal(bool stretch = false) {}
 
 	virtual float getValue(const float& weight) = 0;//must be overriden
+	// Playback evaluation keeps key time/value precision independent of the
+	// float geometry used by the editor.
+	virtual double getPreciseValue(double weight, double from, double to, double duration);
 	virtual juce::Rectangle<float> getBounds(bool includeHandles = false) = 0;
 	virtual EasingUI* createUI();
 
@@ -52,6 +55,7 @@ public:
 	LinearEasing();
 
 	float getValue(const float& weight) override;
+	double getPreciseValue(double weight, double from, double to, double duration) override;
 	juce::Rectangle<float> getBounds(bool includeHandles) override;
 
 	EasingUI* createUI() override;
@@ -64,6 +68,7 @@ public:
 	HoldEasing();
 
 	virtual float getValue(const float& weight) override;
+	double getPreciseValue(double weight, double from, double to, double duration) override;
 	juce::Rectangle<float> getBounds(bool includeHandles) override;
 
 	EasingUI* createUI() override;
@@ -83,6 +88,7 @@ public:
 	juce::Point<float> c;
 
 	virtual float getValue(const float& weight) override;
+	double getPreciseValue(double weight, double from, double to, double duration) override;
 	juce::Point<float> getRawValue(const float &weight);
 
 	float getBezierWeight(const float& pos);
@@ -102,6 +108,27 @@ public:
 	juce::Rectangle<float> getBounds(bool includeHandles) override;
 
 	EasingUI* createUI() override;
+
+private:
+	struct CubicCoefficients
+	{
+		double xA = 0.0;
+		double xB = 0.0;
+		double xC = 1.0;
+		double yA = 0.0;
+		double yB = 0.0;
+		double yC = 0.0;
+		double yD = 0.0;
+		double anchorOffsetY1 = 0.0;
+		double anchorOffsetY2 = 0.0;
+	};
+
+	mutable juce::SpinLock coefficientsLock;
+	CubicCoefficients coefficients;
+
+	CubicCoefficients getCoefficients() const;
+	static double solveBezierParameterForX(double normalizedX, const CubicCoefficients& coefficients);
+	float getRealtimeValue(float weight) const;
 };
 
 
@@ -115,6 +142,7 @@ public:
 	void updateKeysInternal(bool stretch = false) override;
 
 	virtual float getValue(const float &weight) override;
+	double getPreciseValue(double weight, double from, double to, double duration) override;
 	juce::Rectangle<float> getBounds(bool includeHandles) override;
 
 	EasingUI * createUI() override;
@@ -130,6 +158,7 @@ public:
 	void updateKeysInternal(bool stretch = false) override;
 
 	virtual float getValue(const float& weight) override;
+	double getPreciseValue(double weight, double from, double to, double duration) override;
 	juce::Rectangle<float> getBounds(bool includeHandles) override;
 
 	EasingUI* createUI() override;
@@ -145,6 +174,7 @@ public:
 	void updateKeysInternal(bool stretch = false) override;
 
 	virtual float getValue(const float& weight) override;
+	double getPreciseValue(double weight, double from, double to, double duration) override;
 	juce::Rectangle<float> getBounds(bool includeHandles) override;
 	EasingUI* createUI() override;
 };
@@ -160,6 +190,7 @@ public:
 	void updateKeysInternal(bool stretch = false) override;
 
 	virtual float getValue(const float& weight) override;
+	double getPreciseValue(double weight, double from, double to, double duration) override;
 	juce::Rectangle<float> getBounds(bool includeHandles) override;
 
 	EasingUI* createUI() override;
@@ -177,6 +208,7 @@ public:
 	void updateKeysInternal(bool stretch = false) override;
 
 	virtual float getValue(const float& weight) override;
+	double getPreciseValue(double weight, double from, double to, double duration) override;
 	juce::Rectangle<float> getBounds(bool includeHandles) override;
 
 	EasingUI* createUI() override;
@@ -195,8 +227,8 @@ public:
 	void updateKeysInternal(bool stretch = false) override;
 
 	virtual float getValue(const float& weight) override;
+	double getPreciseValue(double weight, double from, double to, double duration) override;
 	juce::Rectangle<float> getBounds(bool includeHandles) override;
 
 	EasingUI* createUI() override;
 };
-

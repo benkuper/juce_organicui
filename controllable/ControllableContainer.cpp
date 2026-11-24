@@ -408,7 +408,13 @@ void ControllableContainer::setNiceName(const String& _niceName)
 	controllableContainerListeners.call(&ControllableContainerListener::controllableContainerNameChanged, this, prevNiceName);
 
 #if ORGANICUI_USE_WEBSERVER
-	if (OSCRemoteControl::getInstanceWithoutCreating() != nullptr && isAttachedToRoot()) OSCRemoteControl::getInstance()->sendPathNameChangedFeedback(oldControlAddress, getControlAddress());
+	if (OSCRemoteControl::getInstanceWithoutCreating() != nullptr && isAttachedToRoot())
+	{
+		// FULL_PATH *and* DESCRIPTION changed, so send both PATH_RENAMED then PATH_CHANGED feedback messages
+		const auto newControlAddress = getControlAddress();
+		OSCRemoteControl::getInstance()->sendPathNameChangedFeedback(oldControlAddress, newControlAddress);
+		OSCRemoteControl::getInstance()->sendPathChangedFeedback(newControlAddress);
+	}
 #endif
 
 	niceNameChanged();
@@ -861,6 +867,14 @@ void ControllableContainer::parameterRangeChanged(Parameter* p)
 	if (p->parentContainer == this)
 	{
 		dispatchFeedback(p);
+
+#if ORGANICUI_USE_WEBSERVER
+		if (OSCRemoteControl::getInstanceWithoutCreating() != nullptr && isAttachedToRoot())
+		{
+			OSCRemoteControl::getInstance()->sendPathChangedFeedback(p->getControlAddress());
+		}
+#endif
+
 	}
 	else
 	{
@@ -925,7 +939,8 @@ void ControllableContainer::warningChanged(WarningTarget* target)
 String ControllableContainer::getWarningMessage(const String& id) const
 {
 	StringArray s;
-	if (WarningTarget::getWarningMessage(id).isNotEmpty()) s.add(WarningTarget::getWarningMessage());
+	const String ownWarning = WarningTarget::getWarningMessage(id);
+	if (ownWarning.isNotEmpty()) s.add(ownWarning);
 
 	if (controllables.getLock().tryEnter())
 	{
@@ -946,7 +961,7 @@ String ControllableContainer::getWarningMessage(const String& id) const
 	for (auto& cc : controllableContainers)
 	{
 		if (cc.wasObjectDeleted()) continue;
-		String cs = cc->getWarningMessage();
+		String cs = cc->getWarningMessage(id);
 		if (cs.isNotEmpty())
 		{
 			s.add(cs);
@@ -1010,7 +1025,7 @@ var ControllableContainer::getJSONData(bool includeNonOverriden)
 		//ownedContainers.getLock().enter();
 		for (auto& cc : controllableContainers)
 		{
-			if (!cc->includeInRecursiveSave) continue;
+			if (cc == nullptr || cc.wasObjectDeleted() || !cc->includeInRecursiveSave) continue;
 
 			var ccData = cc->getJSONData();
 			if (ownedContainers.contains(cc))

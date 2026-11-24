@@ -13,7 +13,6 @@
 
 #pragma warning (disable : 4100)
 
-
 class Engine :
 	public ControllableContainer,
 	public juce::FileBasedDocument,
@@ -31,6 +30,9 @@ public:
 	std::unique_ptr<InspectableSelectionManager> selectionManager;
 
 
+	juce::String updateChannel;
+
+	// For compatibility purposes. Please use updateChannel instead of this variables for new features.
 	bool isBetaVersion;
 	int betaVersion;
 
@@ -61,7 +63,7 @@ public:
 	// see EngineFileDocument.cpp
 
 	//  inherited from FileBasedDocument
-	juce::String getDocumentTitle()override;
+	juce::String getDocumentTitle() override;
 	juce::Result loadDocument(const juce::File& file) override;
 	juce::Result loadDocumentNoCheck(const juce::File& file);
 	juce::Result saveDocument(const juce::File& file) override;
@@ -69,6 +71,7 @@ public:
 	juce::Result saveBackupDocument(int index);
 
 	void loadDocumentFromJSON(juce::var data);
+	juce::Result saveDocumentFromJSON(const juce::File& file, const juce::var& data);
 
 	juce::File getLastDocumentOpened() override;
 	void setLastDocumentOpened(const juce::File& file) override;
@@ -88,13 +91,27 @@ public:
 	juce::var getJSONData(bool includeNonOverriden = false) override;
 	void loadJSONData(juce::var data, ProgressTask* loadingTask);
 	void loadJSONDataEngine(juce::var data, ProgressTask* loadingTask);
+	/// Application-owned, local format upgrades, before any saved state is loaded.
+	virtual void prepareJSONDataForLoad(juce::var& data) {}
 	virtual void loadJSONDataInternalEngine(juce::var data, ProgressTask* loadingTask) {}
 
+	/// @brief Read the software version used to save a file
+	/// and returns whether it is newer than the minimum required file version
+	/// @param checkForNewerVersion Compare agains the *current* version instead
 	bool checkFileVersion(juce::DynamicObject* metaData, bool checkForNewerVersion = false);
-	bool versionIsNewerThan(juce::String versionToCheck, juce::String referenceVersion);
-	int getBetaVersion(juce::String version);
-	bool versionNeedsOnlineUpdate(juce::String version);
+
+	/// @brief Returns the version before which migrations are not supported at all
 	virtual juce::String getMinimumRequiredFileVersion();
+
+	/// @brief Returns true if breaking changes have happened between the given version and the current one
+	bool versionNeedsFormatMigration(const AppVersion& fromVersion) const;
+
+	/// @brief Returns true if we can perform the migration from a given version to the current one
+	virtual bool isFileFormatMigrationSupported(const AppVersion& fromVersion) const;
+
+	/// @brief Migrate a file to be compatible for the current version
+	/// @return Whether the migration was completed successfuly
+	virtual bool migrateFileToCurrentVersion(const AppVersion& inVersion, const juce::var& inFileData, juce::var* outFileData) const;
 
 	juce::int64 loadingStartTime;
 

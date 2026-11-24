@@ -48,6 +48,7 @@ public:
 
 	BoolParameter* editMode;
 	BoolParameter* snapping;
+	IntParameter* connectedClients;
 
 	ColorParameter* tabsBGColor;
 	ColorParameter* tabsLabelColor;
@@ -91,6 +92,8 @@ public:
 	void connectionOpened(const juce::String& id) override;
 	void messageReceived(const juce::String& id, const juce::String& message) override;
 	void connectionClosed(const juce::String& id, int status, const juce::String& reason) override;
+	void connectionError(const juce::String& id, const juce::String& errorMessage);
+	void connectionError(const juce::String& id, int status, const juce::String& errorMessage);
 
 	juce::var getServerData();
 

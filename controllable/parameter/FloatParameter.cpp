@@ -79,7 +79,8 @@ ControllableUI* FloatParameter::createDefaultUI(Array<Controllable*> controllabl
 
 bool FloatParameter::checkValueIsTheSame(var oldValue, var newValue)
 {
-	return jlimit<double>(minimumValue, maximumValue, newValue) == (double)oldValue;
+	const double croppedValue = jlimit<double>(minimumValue, maximumValue, newValue);
+	return getStepSnappedValueFor(croppedValue) == (double)oldValue;
 }
 
 

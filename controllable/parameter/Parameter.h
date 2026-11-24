@@ -23,6 +23,7 @@ public:
 	/** Destructor. */
 	virtual ~ParameterListener() {}
 	virtual void parameterValueChanged(Parameter*) {};
+	virtual void parameterValueChangedWithValue(Parameter* p, const juce::var&) { parameterValueChanged(p); }
 	virtual void parameterRangeChanged(Parameter*) {};
 	virtual void parameterControlModeChanged(Parameter*) {}
 };
@@ -85,6 +86,7 @@ public:
 	virtual void setRange(juce::var min, juce::var max);
 	virtual void clearRange();
 	virtual bool hasRange() const;
+	virtual juce::var getRange() const;
 
 	bool isPresettable;
 	bool isOverriden;
@@ -93,7 +95,7 @@ public:
 
 	bool isNotifyingChange;
 
-	juce::CriticalSection notifyLock;
+	std::shared_ptr<juce::CriticalSection> notifyLock = std::make_shared<juce::CriticalSection>();
 
 	virtual void setEnabled(bool value, bool silentSet = false, bool force = false) override;
 
@@ -132,6 +134,7 @@ public:
 	virtual juce::String stringValue();
 
 	void notifyValueChanged();
+	void notifyRangeChanged();
 
 	//From Script Expression
 	virtual void expressionValueChanged(ScriptExpression*) override;
@@ -140,6 +143,7 @@ public:
 
 	//Reference
 	virtual void parameterValueChanged(Parameter* p) override;
+	void parameterValueChangedWithValue(Parameter* p, const juce::var& value) override;
 
 
 	InspectableEditor* getEditorInternal(bool isRoot, juce::Array<Inspectable*> inspectables = juce::Array<Inspectable*>()) override;

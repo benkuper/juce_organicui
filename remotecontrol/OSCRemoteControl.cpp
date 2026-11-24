@@ -612,6 +612,15 @@ bool OSCRemoteControl::handleHTTPRequest(std::shared_ptr<HttpServer::Response> r
 		{
 			data = cc->getRemoteControlData();
 		}
+		else
+		{
+			// try to find a controllable with that address, in case it's not a container
+			Controllable* c = Engine::mainEngine->getControllableForAddress(addr, true);
+			if (c != nullptr)
+			{
+				data = c->getRemoteControlData();
+			}
+		}
 	}
 
 	String dataStr = JSON::toString(data);
@@ -652,13 +661,33 @@ void OSCRemoteControl::connectionOpened(const String& id)
 	remoteControlListeners.call(&RemoteControlListener::clientConnected, id);
 	feedbackMap.set(id, Array<Controllable*>()); // Reset feedbacks
 
+	// Send all existing persistent warnings
 	for (auto& wt : WarningReporter::getInstance()->targets)
 	{
 		if (wt == nullptr || wt.wasObjectDeleted())
 		{
 			continue;
 		}
-		sendPersistentWarningFeedback(wt);
+
+		String address = "";
+		if (Controllable* c = dynamic_cast<Controllable*>(wt.get()))
+		{
+			address = c->getControlAddress();
+		}
+		else if (ControllableContainer* cc = dynamic_cast<ControllableContainer*>(wt.get()))
+		{
+			address = cc->getControlAddress();
+		}
+		else
+		{
+			continue;
+		}
+
+		const StringPairArray warnings = wt->getWarningMessages();
+		for (int i = 0; i < warnings.size(); ++i)
+		{
+			sendPersistentWarningFeedback(address, warnings.getAllKeys()[i], warnings.getAllValues()[i]);
+		}
 	}
 }
 
@@ -898,6 +927,11 @@ void OSCRemoteControl::connectionClosed(const String& id, int status, const Stri
 	feedbackMap.remove(id);
 }
 
+void OSCRemoteControl::connectionError(const String& id, int, const String& message)
+{
+	connectionError(id, message);
+}
+
 void OSCRemoteControl::connectionError(const String& id, const String& message)
 {
 	remoteControlListeners.call(&RemoteControlListener::clientDisconnected, id, message);
@@ -1018,57 +1052,30 @@ void OSCRemoteControl::sendLogFeedback(const String& type, const String& source,
 	server->send(JSON::toString(msg));
 }
 
-void OSCRemoteControl::sendPersistentWarningFeedback(WeakReference<WarningTarget> wt, String address, WarningReporter::WarningReporterEvent::Type type)
+void OSCRemoteControl::sendPersistentWarningFeedback(const String& emitterAddress, const String& warningID, const juce::String& warningMessage)
 {
+	jassert(emitterAddress.isNotEmpty());
+
 	if (server == nullptr)
 	{
 		return;
 	}
-	if (wt == nullptr || wt.wasObjectDeleted())
-	{
-		return;
-	}
+
 	if (Engine::mainEngine != nullptr && Engine::mainEngine->isClearing)
 	{
 		return;
 	}
 
-	String path = address;
-	String name;
-	if (Controllable* c = dynamic_cast<Controllable*>(wt.get()))
-	{
-		name = c->niceName;
-		if (path.isEmpty())
-		{
-			path = c->getControlAddress();
-		}
-	}
-	else if (ControllableContainer* cc = dynamic_cast<ControllableContainer*>(wt.get()))
-	{
-		name = cc->niceName;
-		if (path.isEmpty())
-		{
-			path = cc->getControlAddress();
-		}
-	}
-
-	if (path.isEmpty())
-	{
-		return;
-	}
-
-	String wMessage = type == WarningReporter::WarningReporterEvent::Type::WARNING_REGISTERED ? wt->getWarningMessage() : "";
+	var data(new DynamicObject());
+	data.getDynamicObject()->setProperty("source", emitterAddress);
+	data.getDynamicObject()->setProperty("id", warningID);
+	data.getDynamicObject()->setProperty("message", warningMessage);
+	// TODO: Send the event type as well so clients can decide how to handle them
 
 	var msg(new DynamicObject());
 	msg.getDynamicObject()->setProperty("COMMAND", "WARNING");
-	var data(new DynamicObject());
-	data.getDynamicObject()->setProperty("source", path);
-	if (name.isNotEmpty())
-	{
-		data.getDynamicObject()->setProperty("name", name);
-	}
-	data.getDynamicObject()->setProperty("message", wMessage);
 	msg.getDynamicObject()->setProperty("DATA", data);
+
 	server->send(JSON::toString(msg));
 }
 
@@ -1217,7 +1224,12 @@ void OSCRemoteControl::sendOSCQueryFeedbackTo(const OSCMessage& m, StringArray i
 
 void OSCRemoteControl::newMessage(const WarningReporter::WarningReporterEvent& e)
 {
-	sendPersistentWarningFeedback(e.target, e.targetAddress, e.type);
+	if (e.targetAddress.isEmpty())
+	{
+		return;
+	}
+
+	sendPersistentWarningFeedback(e.targetAddress, e.warningID, e.message);
 }
 
 #endif

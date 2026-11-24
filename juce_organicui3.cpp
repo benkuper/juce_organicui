@@ -2,6 +2,7 @@
 
 //==============================================================================
 
+#include "engine/AppVersion.cpp"
 #include "engine/Engine.cpp"
 #include "engine/EngineFileDocument.cpp"
 

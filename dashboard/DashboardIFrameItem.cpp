@@ -38,5 +38,9 @@ var DashboardIFrameItem::getItemParameterFeedback(Parameter* p)
 
 DashboardItemUI* DashboardIFrameItem::createUI()
 {
+	#if ORGANICUI_USE_WEBBROWSER
 	return new DashboardIFrameItemUI(this);
+	#else
+	return nullptr;
+	#endif
 }

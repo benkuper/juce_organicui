@@ -105,6 +105,24 @@ void Point3DParameter::setBounds(float _minX, float _minY, float _minZ, float _m
 	setRange(minRange, maxRange);
 }
 
+void Point3DParameter::setDefaultVector(const Vector3D<float>& _value, bool doResetValue)
+{
+	var val;
+	val.append(_value.x);
+	val.append(_value.y);
+	val.append(_value.z);
+	setDefaultValue(val, doResetValue);
+}
+
+void Point3DParameter::setDefaultVector(float x, float y, float z, bool doResetValue)
+{
+	var val;
+	val.append(x);
+	val.append(y);
+	val.append(z);
+	setDefaultValue(val, doResetValue);
+}
+
 Vector3D<float> Point3DParameter::getVector() {
 	GenericScopedLock lock(valueSetLock);
 	return Vector3D<float>(x, y, z);

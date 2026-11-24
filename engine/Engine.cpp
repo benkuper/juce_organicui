@@ -34,8 +34,20 @@ Engine::Engine(const String& fileName, const String& fileExtension) :
 	isLoadingFile(false)
 {
 	//skipControllableNameInAddress = true;
-	isBetaVersion = getAppVersion().containsChar('b');
-	betaVersion = getBetaVersion(getAppVersion());
+
+	// Set channel update
+	AppVersion version(getAppVersion());
+	updateChannel = version.getChannel();
+	if (updateChannel.isEmpty())
+	{
+		updateChannel = "stableversion";
+	}
+	if (updateChannel == "b")
+	{
+		isBetaVersion = true;
+		updateChannel = "betaversion";
+		betaVersion = version.getChannelVersion();
+	}
 
 	selectionManager.reset(new InspectableSelectionManager(true)); //selectionManager constructor
 
