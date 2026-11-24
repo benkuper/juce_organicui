@@ -22,4 +22,11 @@ public:
 
 	void performAction(const juce::String &name, juce::UndoableAction *action);
 	void performActions(const juce::String &name, juce::Array<juce::UndoableAction *> actions);
+
+	void beginGroupedTransaction(const juce::String& name);
+	void endGroupedTransaction();
+
+private:
+	int transactionGroupDepth = 0;
+	juce::String transactionGroupName;
 };

@@ -88,6 +88,9 @@ public:
 	Trigger * testCrash;
 
 	void onControllableFeedbackUpdate(ControllableContainer *, Controllable * c) override;
+#if ORGANICUI_USE_ASSISTANT
+	void loadJSONData(juce::var data, bool createIfNotThere = false) override;
+#endif
 	void loadJSONDataInternal(juce::var data) override;
 
 	void loadKeyMappingsFromData();

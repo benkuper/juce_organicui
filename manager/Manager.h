@@ -19,6 +19,9 @@ template <class T>
 class Manager :
 	public EnablingControllableContainer,
 	public BaseItemListener
+#if ORGANICUI_USE_MCP
+	, public organic::mcp::ManagerAdapter
+#endif
 {
 public:
 	Manager(const juce::String& name);
@@ -97,6 +100,9 @@ public:
 
 
 	virtual void handleAddFromRemoteControl(juce::var data) override;
+#if ORGANICUI_USE_MCP
+	bool handleMoveFromRemoteControl(ControllableContainer* source, bool addToUndo = false, int targetIndex = -1) override;
+#endif
 	virtual void handleRemoveFromRemoteControl(juce::var data) override;
 	virtual void handleClearFromRemoteControl() override;
 
@@ -124,6 +130,69 @@ public:
 	T* getItemForMenuResultID(int id, int startID);
 
 	T* getFirstSelectedItem();
+
+#if ORGANICUI_USE_MCP
+    ControllableContainer& mcpContainer() override { return *this; }
+    juce::var mcpTypes() const override
+    {
+        juce::Array<juce::var> result;
+        if (managerFactory != nullptr)
+        {
+            for (const auto* definition : managerFactory->defs)
+            {
+                if (!definition->isEnabled) continue;
+                auto* row = new juce::DynamicObject();
+                row->setProperty("type", definition->type);
+                row->setProperty("menuPath", definition->menuPath);
+                result.add(row);
+            }
+        }
+        else
+        {
+            auto* row = new juce::DynamicObject();
+            row->setProperty("type", ""); row->setProperty("menuPath", "");
+            row->setProperty("description", itemDataType);
+            result.add(row);
+        }
+        return result;
+    }
+    bool mcpAcceptsType(const juce::String& type) override
+    {
+        if (!userCanAddItemsManually) return false;
+        if (managerFactory == nullptr) return type.isEmpty();
+        for (const auto* definition : managerFactory->defs)
+            if (definition->isEnabled && definition->type == type && canAddItemOfType(type)) return true;
+        return false;
+    }
+    BaseItem* mcpCreate(juce::var data) override
+    {
+        if (!userCanAddItemsManually || (managerFactory != nullptr && !mcpAcceptsType(data["type"].toString()))) return nullptr;
+        // Some managers override addItemFromData and construct items directly.
+        // Pass the same factory metadata used by their native creation menu.
+        if (managerFactory != nullptr)
+            for (auto* base : managerFactory->defs) if (base->type == data["type"].toString())
+                if (auto* definition = dynamic_cast<typename Factory<T>::Definition*>(base))
+                    if (definition->params.getDynamicObject() != nullptr)
+                    {
+                        auto merged = definition->params.clone();
+                        if (auto* input = data.getDynamicObject()) for (auto& property : input->getProperties()) merged.getDynamicObject()->setProperty(property.name, property.value);
+                        data = merged; break;
+                    }
+        return addItemFromData(data, true);
+    }
+    bool mcpRemove(BaseItem* item) override
+    {
+        auto* typed = dynamic_cast<T*>(item);
+        if (typed == nullptr || !items.contains(typed) || !typed->userCanRemove) return false;
+        removeItem(typed, true); return true;
+    }
+    bool mcpReorder(BaseItem* item, int index) override
+    {
+        auto* typed = dynamic_cast<T*>(item);
+        if (typed == nullptr || !items.contains(typed) || index < 0 || index >= items.size()) return false;
+        setItemIndex(typed, index, true); return true;
+    }
+#endif
 
 	juce::String getScriptTargetString() override;
 
@@ -829,6 +898,72 @@ void Manager<T>::handleClearFromRemoteControl()
 {
 	clear();
 }
+
+#if ORGANICUI_USE_MCP
+template<class T>
+bool Manager<T>::handleMoveFromRemoteControl(ControllableContainer* source, bool addToUndo, int targetIndex)
+{
+	T* item = dynamic_cast<T*>(source);
+	if (item == nullptr) return false;
+
+	Manager<T>* sourceManager = dynamic_cast<Manager<T>*>(item->parentContainer.get());
+	if (sourceManager == nullptr || !sourceManager->items.contains(item)) return false;
+	if (!canAddItemOfType(static_cast<BaseItem*>(item)->getTypeString())) return false;
+
+	if (sourceManager == this)
+	{
+		if (targetIndex < 0) return false;
+		const int currentIndex = items.indexOf(item);
+		if (currentIndex < 0) return false;
+		if (currentIndex < targetIndex) targetIndex--;
+		targetIndex = juce::jlimit(0, items.size() - 1, targetIndex);
+		if (currentIndex == targetIndex) return true;
+		setItemIndex(item, targetIndex, addToUndo);
+		return true;
+	}
+
+	if (!userCanAddItemsManually || !static_cast<BaseItem*>(item)->userCanRemove) return false;
+
+	// Refuse to move a container below itself or one of its descendants.
+	ControllableContainer* ancestor = this;
+	while (ancestor != nullptr)
+	{
+		if (ancestor == source) return false;
+		ancestor = ancestor->parentContainer.get();
+	}
+
+	if (addToUndo
+		&& !UndoMaster::getInstance()->isPerforming
+		&& (Engine::mainEngine == nullptr || !Engine::mainEngine->isLoadingFile))
+	{
+		juce::var data = item->getJSONData();
+		if (data.getDynamicObject() == nullptr) return false;
+		if (targetIndex >= 0)
+			data.getDynamicObject()->setProperty("index", juce::jlimit(0, items.size(), targetIndex));
+
+		if (T* newItem = createItemFromData(data))
+		{
+			auto* undo = UndoMaster::getInstance();
+			undo->beginGroupedTransaction("Move " + static_cast<BaseItem*>(item)->niceName);
+			const juce::ScopeGuard endGroup { [undo] { undo->endGroupedTransaction(); } };
+			addItem(newItem, data, true);
+			if (!items.contains(newItem)) return false;
+			sourceManager->removeItem(item, true);
+			return !sourceManager->items.contains(item);
+		}
+
+		return false;
+	}
+
+	T* detached = sourceManager->removeItem(item, false, true, true);
+	if (detached == nullptr) return false;
+	T* added = addItem(detached, juce::var(), false, true);
+	if (added != nullptr && targetIndex >= 0)
+		setItemIndex(added, juce::jlimit(0, items.size() - 1, targetIndex), false);
+	return added != nullptr;
+}
+
+#endif
 
 template<class T>
 void Manager<T>::clear()

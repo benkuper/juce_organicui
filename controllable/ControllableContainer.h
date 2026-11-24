@@ -132,6 +132,9 @@ public:
 
 	//Remote Control
 	virtual void handleAddFromRemoteControl(juce::var data) {}
+#if ORGANICUI_USE_MCP
+	virtual bool handleMoveFromRemoteControl(ControllableContainer*, bool = false, int = -1) { return false; }
+#endif
 	virtual void handleRemoveFromRemoteControl(juce::var data) {}
 	virtual void handleClearFromRemoteControl() {}
 	virtual void handleLoadFromRemoteControl(juce::var data) { loadJSONData(data); }
