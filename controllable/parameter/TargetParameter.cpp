@@ -146,8 +146,9 @@ void TargetParameter::setValueFromTarget(ControllableContainer* cc, bool addToUn
 		manuallySettingNull = true;
 	}
 
-	if (addToUndo) setUndoableValue(cc->getControlAddress(rootContainer), false, setSimilarSelected);
-	else setValue(cc->getControlAddress(rootContainer), false, true, true, setSimilarSelected);
+	const String newValue = cc == nullptr ? String() : cc->getControlAddress(rootContainer);
+	if (addToUndo) setUndoableValue(newValue, false, setSimilarSelected);
+	else setValue(newValue, false, true, true, setSimilarSelected);
 
 	manuallySettingNull = false;
 }
@@ -224,7 +225,7 @@ void TargetParameter::setTarget(WeakReference<Controllable> c)
 		target->addControllableListener(this);
 		setGhostValue(target->getControlAddress(rootContainer.get()));
 
-		if (getWarningMessage().isNotEmpty() && !isBeingDestroyed && !Engine::mainEngine->isLoadingFile && !Engine::mainEngine->isClearing)
+		if (getWarningMessage().isNotEmpty() && !isBeingDestroyed && Engine::mainEngine != nullptr && !Engine::mainEngine->isLoadingFile && !Engine::mainEngine->isClearing)
 		{
 			LOG("Link is recovered " + ghostValue);
 		}
@@ -236,13 +237,13 @@ void TargetParameter::setTarget(WeakReference<Controllable> c)
 		if (value.toString().isNotEmpty()) setGhostValue(value.toString());
 		if (ghostValue.isNotEmpty() && !isBeingDestroyed)
 		{
-			if (Engine::mainEngine->isLoadingFile)
+			if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile)
 			{
 				Engine::mainEngine->addEngineListener(this);
 			}
 			else
 			{
-				if (!Engine::mainEngine->isClearing && rootContainer != nullptr && !rootContainer.wasObjectDeleted())
+				if ((Engine::mainEngine == nullptr || !Engine::mainEngine->isClearing) && rootContainer != nullptr && !rootContainer.wasObjectDeleted())
 				{
 					if (!isBeingDestroyed && !manuallySettingNull) setWarningMessage("Link is broken : " + ghostValue);
 					rootContainer->addControllableContainerListener(this);
@@ -286,14 +287,14 @@ void TargetParameter::setTarget(WeakReference<ControllableContainer> cc)
 		if (value.toString().isNotEmpty()) setGhostValue(value.toString());
 		if (ghostValue.isNotEmpty() && !isBeingDestroyed)
 		{
-			if (Engine::mainEngine->isLoadingFile)
+			if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile)
 			{
 				Engine::mainEngine->addEngineListener(this);
 			}
 			else
 			{
 				if (!isBeingDestroyed && !manuallySettingNull) setWarningMessage("Link is broken : " + ghostValue);
-				if (!Engine::mainEngine->isClearing && rootContainer != nullptr && !rootContainer.wasObjectDeleted())
+				if ((Engine::mainEngine == nullptr || !Engine::mainEngine->isClearing) && rootContainer != nullptr && !rootContainer.wasObjectDeleted())
 				{
 					rootContainer->addControllableContainerListener(this);
 				}

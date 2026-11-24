@@ -203,7 +203,8 @@ void OrganicApplication::systemRequestedQuit()
 
 void OrganicApplication::anotherInstanceStarted(const String& commandLine)
 {
-	engine->parseCommandline(commandLine);
+	if (engine != nullptr) engine->parseCommandline(commandLine);
+	if (mainWindow == nullptr) return;
 
 	if (!mainWindow->isOnDesktop())
 	{

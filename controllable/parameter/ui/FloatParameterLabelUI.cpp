@@ -63,7 +63,8 @@ void FloatParameterLabelUI::updateValueFromLabel()
 {
 	String s = valueLabel.getText().replace(",", ".");
 	double v = ParameterUI::textToValue(s);
-	parameter->setValue(v);
+	parameter->resetLastUndoValue();
+	parameter->setUndoableValue(cropUIValue(v), false, true);
 
 	valueLabel.setText(getValueString(v), dontSendNotification);
 }
@@ -122,7 +123,7 @@ void FloatParameterLabelUI::mouseDrag(const MouseEvent& e)
 	valueOffsetSinceMouseDown += (e.getPosition().x - lastMouseX) * sensitivity / pixelsPerUnit;
 	lastMouseX = e.getPosition().x;
 
-	parameter->setValue(valueAtMouseDown + valueOffsetSinceMouseDown);
+	parameter->setValue(cropUIValue(valueAtMouseDown + valueOffsetSinceMouseDown), false, false, true, true);
 }
 
 void FloatParameterLabelUI::mouseUpInternal(const MouseEvent& e)
@@ -135,7 +136,7 @@ void FloatParameterLabelUI::mouseUpInternal(const MouseEvent& e)
 
 	if (setUndoableValueOnMouseUp)
 	{
-		if (valueAtMouseDown != parameter->floatValue()) parameter->setUndoableValue(parameter->doubleValue());
+		if (valueAtMouseDown != parameter->floatValue()) parameter->setUndoableValue(parameter->doubleValue(), false, true);
 	}
 }
 
@@ -258,7 +259,8 @@ void TimeLabel::labelTextChanged(Label*)
 	}
 	s = s.substring(prefix.length(), s.length() - suffix.length());
 
-	parameter->setValue(showStepsMode ? s.getDoubleValue() / ((FloatParameter*)parameter.get())->unitSteps : StringUtil::timeStringToValue(s));
+	parameter->resetLastUndoValue();
+	parameter->setUndoableValue(cropUIValue(showStepsMode ? s.getDoubleValue() / ((FloatParameter*)parameter.get())->unitSteps : StringUtil::timeStringToValue(s)), false, true);
 	shouldRepaint = true;
 }
 

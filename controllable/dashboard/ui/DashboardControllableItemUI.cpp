@@ -24,6 +24,10 @@ void DashboardControllableItemUI::resizedDashboardItemInternal()
 
 ControllableUI* DashboardControllableItemUI::createControllableUI()
 {
+	if (controllableItem == nullptr
+		|| controllableItem->controllable == nullptr
+		|| controllableItem->controllable.wasObjectDeleted()) return nullptr;
+
 	return controllableItem->controllable->createDefaultUI();
 }
 
@@ -48,7 +52,10 @@ void DashboardControllableItemUI::rebuildUI()
 
 void DashboardControllableItemUI::updateUIParameters()
 {
-	if (inspectable.wasObjectDeleted() || controllableItem->inspectable == nullptr || controllableItem->inspectable.wasObjectDeleted()) return;
+	if (itemUI == nullptr || controllableItem == nullptr
+		|| inspectable.wasObjectDeleted()
+		|| controllableItem->inspectable == nullptr
+		|| controllableItem->inspectable.wasObjectDeleted()) return;
 
 	itemUI->showLabel = controllableItem->showLabel->boolValue();
 	itemUI->useCustomTextColor = controllableItem->textColor->enabled;
@@ -80,10 +87,14 @@ void DashboardControllableItemUI::updateEditModeInternal(bool editMode)
 {
 	if (itemUI != nullptr)
 	{
-		setTooltip((editMode && !controllableItem->controllable.wasObjectDeleted())  ? "Target : " + controllableItem->controllable->getControlAddress() : "");
+		setTooltip((editMode
+			&& controllableItem != nullptr
+			&& controllableItem->controllable != nullptr
+			&& !controllableItem->controllable.wasObjectDeleted())
+			? "Target : " + controllableItem->controllable->getControlAddress() : "");
 		itemUI->setInterceptsMouseClicks(!editMode, !editMode);
 	}
-	else setTooltip("### " + controllableItem->inspectableGhostAddress);
+	else setTooltip(controllableItem != nullptr ? "### " + controllableItem->inspectableGhostAddress : "");
 }
 
 void DashboardControllableItemUI::inspectableChanged()

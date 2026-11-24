@@ -156,15 +156,20 @@ void DoubleSliderUI::showEditWindowInternal()
 	nameWindow->addButton("OK", 1, KeyPress(KeyPress::returnKey));
 	nameWindow->addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
 
-	Point2DParameter* param = p2d;
+	WeakReference<ParameterUI> ui(this);
+	WeakReference<Parameter> param(p2d);
 
-	nameWindow->enterModalState(true, ModalCallbackFunction::create([param, nameWindow](int result)
+	nameWindow->enterModalState(true, ModalCallbackFunction::create([param, ui, nameWindow](int result)
 		{
-			if (result)
+			if (result && param != nullptr && ui != nullptr)
 			{
 				float newVals[2];
 				for (int i = 0; i < 2; ++i) newVals[i] = nameWindow->getTextEditorContents("val" + String(i)).getFloatValue();
-				param->setUndoablePoint(newVals[0], newVals[1]);
+				var value;
+				value.append(newVals[0]);
+				value.append(newVals[1]);
+				param->resetLastUndoValue();
+				param->setUndoableValue(ui->cropUIValue(value), false, true);
 			}
 		}),
 		true
@@ -212,6 +217,7 @@ void DoubleSliderUI::updateUseExtendedEditor()
 		if (canvasUI == nullptr)
 		{
 			canvasUI.reset(new P2DUI(p2d));
+			if (useCustomRange) canvasUI->setCustomRange(customMinimumValue, customMaximumValue);
 			addAndMakeVisible(canvasUI.get());
 			setSize(getWidth(), baseHeight + 2 + getWidth());//default size
 		}
@@ -234,6 +240,18 @@ void DoubleSliderUI::rangeChanged(Parameter* p)
 	isUpdatingFromParam = true;
 	xParam.setRange(parameter->minimumValue[0], parameter->maximumValue[0]);
 	yParam.setRange(parameter->minimumValue[1], parameter->maximumValue[1]);
+	if (useCustomRange)
+	{
+		xSlider->setCustomRange(customMinimumValue[0], customMaximumValue[0]);
+		ySlider->setCustomRange(customMinimumValue[1], customMaximumValue[1]);
+		if (canvasUI != nullptr) canvasUI->setCustomRange(customMinimumValue, customMaximumValue);
+	}
+	else
+	{
+		xSlider->clearCustomRange();
+		ySlider->clearCustomRange();
+		if (canvasUI != nullptr) canvasUI->clearCustomRange();
+	}
 	isUpdatingFromParam = false;
 }
 

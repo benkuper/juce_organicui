@@ -25,19 +25,95 @@ ParameterUI::ParameterUI(Array<Parameter*> parameters, int paintTimerID) :
 	useCustomBGColor(false),
 	useCustomFGColor(false)
 {
-	parameter->addAsyncCoalescedParameterListener(this);
+	for (auto* related : parameter->getRelatedSelectedParameters())
+		if (!this->parameters.contains(related)) this->parameters.add(related);
+
+	for (const auto& related : this->parameters)
+		if (related != nullptr) related->addAsyncCoalescedParameterListener(this);
 
 	//setSize(100, 16);
 }
 
 ParameterUI::~ParameterUI()
 {
-	if (!parameter.wasObjectDeleted() && parameter != nullptr) {
-		parameter->removeAsyncParameterListener(this);
-		parameter = nullptr;
-	}
+	if (parameter != nullptr) parameter->clearMultiEditState();
+	for (const auto& related : parameters)
+		if (related != nullptr) related->removeAsyncParameterListener(this);
+	parameter = nullptr;
 
 	masterReference.clear();
+}
+
+void ParameterUI::setCustomRange(var minimum, var maximum)
+{
+	useCustomRange = true;
+	customMinimumValue = minimum.clone();
+	customMaximumValue = maximum.clone();
+	rangeChanged(parameter);
+	shouldRepaint = true;
+}
+
+void ParameterUI::clearCustomRange()
+{
+	if (!useCustomRange) return;
+	useCustomRange = false;
+	customMinimumValue = var();
+	customMaximumValue = var();
+	rangeChanged(parameter);
+	shouldRepaint = true;
+}
+
+var ParameterUI::getUIMinimumValue() const
+{
+	return useCustomRange ? customMinimumValue : parameter->minimumValue;
+}
+
+var ParameterUI::getUIMaximumValue() const
+{
+	return useCustomRange ? customMaximumValue : parameter->maximumValue;
+}
+
+var ParameterUI::getUINormalizedValue(var displayValue) const
+{
+	if (!useCustomRange) return parameter->getNormalizedValue(displayValue);
+	var result;
+	const var actual = displayValue.isVoid() ? parameter->getValue() : displayValue;
+	int dimensions = parameter->isComplex() ? actual.size() : 1;
+	for (int axis = 0; axis < dimensions; ++axis)
+	{
+		double low = dimensions == 1 ? (double)customMinimumValue : (double)customMinimumValue[axis];
+		double high = dimensions == 1 ? (double)customMaximumValue : (double)customMaximumValue[axis];
+		double value = dimensions == 1 ? (double)actual : (double)actual[axis];
+		result.append(high == low ? 0.0 : jlimit(0.0, 1.0, (value - low) / (high - low)));
+	}
+	return dimensions == 1 ? result[0] : result;
+}
+
+var ParameterUI::getUIValueFromNormalized(var normalized) const
+{
+	var minimum = getUIMinimumValue();
+	var maximum = getUIMaximumValue();
+	var result;
+	int dimensions = parameter->isComplex() ? parameter->value.size() : 1;
+	for (int axis = 0; axis < dimensions; ++axis)
+	{
+		double low = dimensions == 1 ? (double)minimum : (double)minimum[axis];
+		double high = dimensions == 1 ? (double)maximum : (double)maximum[axis];
+		double fraction = dimensions == 1 ? (double)normalized : (double)normalized[axis];
+		if (useCustomRange) fraction = jlimit(0.0, 1.0, fraction);
+		result.append(low + fraction * (high - low));
+	}
+	return dimensions == 1 ? result[0] : result;
+}
+
+var ParameterUI::cropUIValue(var value) const
+{
+	if (!useCustomRange) return value;
+	if (!parameter->isComplex()) return jlimit((double)customMinimumValue, (double)customMaximumValue, (double)value);
+	var result;
+	for (int axis = 0; axis < value.size(); ++axis)
+		result.append(jlimit((double)customMinimumValue[axis], (double)customMaximumValue[axis], (double)value[axis]));
+	return result;
 }
 
 void ParameterUI::showEditWindowInternal()
@@ -51,7 +127,7 @@ void ParameterUI::showEditWindowInternal()
 
 Component* ParameterUI::getEditValueComponent()
 {
-	return new ValueEditCalloutComponent(parameter);
+	return new ValueEditCalloutComponent(parameter, this);
 }
 
 void ParameterUI::showEditRangeWindow()
@@ -73,17 +149,19 @@ void ParameterUI::showEditRangeWindowInternal()
 	nameWindow->addButton("OK", 1, KeyPress(KeyPress::returnKey));
 	nameWindow->addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
 
-	nameWindow->enterModalState(true, ModalCallbackFunction::create([this, nameWindow](int result)
+	WeakReference<Parameter> safeParameter(parameter);
+	nameWindow->enterModalState(true, ModalCallbackFunction::create([safeParameter, nameWindow](int result)
 		{
-			if (result)
+			if (result && safeParameter != nullptr)
 			{
+				auto* parameter = safeParameter.get();
 				if (parameter->type == Parameter::FLOAT || parameter->type == Parameter::INT)
 				{
 					String minRangeString = nameWindow->getTextEditorContents("minVal");
 					String maxRangeString = nameWindow->getTextEditorContents("maxVal");
 					float newMin = minRangeString.isNotEmpty() ? minRangeString.getFloatValue() : INT32_MIN;
 					float newMax = maxRangeString.isNotEmpty() ? maxRangeString.getFloatValue() : INT32_MAX;
-					parameter->setRange(newMin, jmax(newMin, newMax));
+					parameter->setUndoableRangeForSelected(newMin, jmax(newMin, newMax));
 				}
 			}
 		}),
@@ -101,7 +179,6 @@ void ParameterUI::paintOverChildren(Graphics& g)
 		Colour c = Colours::rebeccapurple.brighter(.2f);
 		g.setColour(c.withAlpha(.2f));
 		g.fillRoundedRectangle(getLocalBounds().toFloat(), 1);
-		return;
 	}
 
 	switch (parameter->controlMode)
@@ -137,6 +214,28 @@ void ParameterUI::paintOverChildren(Graphics& g)
 	}
 	break;
 	}
+	if (hasMixedValues())
+	{
+		const Rectangle<float> bounds = getLocalBounds().toFloat().reduced(1.0f);
+		g.setColour(Colours::yellow.withAlpha(0.12f));
+		g.fillRoundedRectangle(bounds, 2.0f);
+		g.setColour(Colours::yellow.withAlpha(0.9f));
+		g.drawRoundedRectangle(bounds, 2.0f, 1.5f);
+	}
+}
+
+bool ParameterUI::hasMixedValues() const
+{
+	if (parameter == nullptr || parameter.wasObjectDeleted() || parameters.size() < 2) return false;
+
+	const var primaryValue = parameter->getValue();
+	for (auto& related : parameters)
+	{
+		if (related == nullptr || related.wasObjectDeleted() || related == parameter) continue;
+		if (!parameter->checkValueIsTheSame(primaryValue, related->getValue())) return true;
+	}
+
+	return false;
 }
 
 void ParameterUI::handlePaintTimer()
@@ -241,7 +340,7 @@ void ParameterUI::handleMenuSelectedID(int id)
 {
 	switch (id)
 	{
-	case 1: parameter->resetValue(); break;
+	case 1: parameter->resetValueUndoableForSelected(); break;
 	case 10: parameter->setControlMode(Parameter::MANUAL); break;
 	case 11: parameter->setControlMode(Parameter::EXPRESSION); break;
 	case 12: parameter->setControlMode(Parameter::REFERENCE); break;
@@ -253,8 +352,8 @@ void ParameterUI::handleMenuSelectedID(int id)
 	break;
 
 	case -4: showEditRangeWindow(); break;
-	case -5: parameter->clearRange(); break;
-	case -6: parameter->setAttribute("alwaysNotify", !parameter->alwaysNotify); break;
+	case -5: parameter->clearUndoableRangeForSelected(); break;
+	case -6: parameter->setUndoableAttributeForSelected("alwaysNotify", !parameter->alwaysNotify); break;
 	case -20: SystemClipboard::copyTextToClipboard(parameter->stringValue()); break;
 	case -21:
 	{
@@ -277,16 +376,16 @@ void ParameterUI::handleMenuSelectedID(int id)
 
 		parameter->setValue(v); break;
 	}
-	case -50: parameter->setRange(0, 1); break;
-	case -51: parameter->setRange(-1, 1); break;
-	case -52: parameter->setRange(-90, 90); break;
-	case -53: parameter->setRange(0, 180); break;
-	case -54: parameter->setRange(-180, 180); break;
-	case -55: parameter->setRange(0, 360); break;
-	case -60: parameter->setRange(0, 100); break;
-	case -61: parameter->setRange(0, 127); break;
-	case -62: parameter->setRange(0, 255); break;
-	case -63: parameter->setRange(0, 65535); break;
+	case -50: parameter->setUndoableRangeForSelected(0, 1); break;
+	case -51: parameter->setUndoableRangeForSelected(-1, 1); break;
+	case -52: parameter->setUndoableRangeForSelected(-90, 90); break;
+	case -53: parameter->setUndoableRangeForSelected(0, 180); break;
+	case -54: parameter->setUndoableRangeForSelected(-180, 180); break;
+	case -55: parameter->setUndoableRangeForSelected(0, 360); break;
+	case -60: parameter->setUndoableRangeForSelected(0, 100); break;
+	case -61: parameter->setUndoableRangeForSelected(0, 127); break;
+	case -62: parameter->setUndoableRangeForSelected(0, 255); break;
+	case -63: parameter->setUndoableRangeForSelected(0, 65535); break;
 
 	case -70:
 		if (parameter->type == Parameter::POINT2D) ((Point2DParameter*)parameter.get())->setBounds(0, 0, 1, 1);
@@ -317,7 +416,7 @@ void ParameterUI::handleMenuSelectedID(int id)
 			if (cid < numCustomRanges)
 			{
 				Point2DParameter* rp = dynamic_cast<Point2DParameter*>(ProjectSettings::getInstance()->customRangesCC.controllables[cid]);
-				parameter->setRange(rp->x, rp->y);
+				parameter->setUndoableRangeForSelected(rp->x, rp->y);
 			}
 		}
 		break;
@@ -377,7 +476,16 @@ void ParameterUI::controlModeChanged(Parameter*)
 	updateUIParams();
 }
 
-void ParameterUI::newMessage(const Parameter::ParameterEvent& e) {
+void ParameterUI::newMessage(const Parameter::ParameterEvent& e)
+{
+	if (parameter == nullptr) return;
+	if (e.parameter != parameter)
+	{
+		shouldRepaint = true;
+		repaint();
+		return;
+	}
+
 	switch (e.type)
 	{
 	case Parameter::ParameterEvent::BOUNDS_CHANGED:
@@ -398,8 +506,8 @@ void ParameterUI::newMessage(const Parameter::ParameterEvent& e) {
 	}
 }
 
-ParameterUI::ValueEditCalloutComponent::ValueEditCalloutComponent(WeakReference<Parameter> p) :
-	p(p)
+ParameterUI::ValueEditCalloutComponent::ValueEditCalloutComponent(WeakReference<Parameter> p, ParameterUI* ui) :
+	p(p), ui(ui)
 {
 	if (p.wasObjectDeleted()) return;
 
@@ -451,7 +559,6 @@ void ParameterUI::ValueEditCalloutComponent::labelTextChanged(Label* l)
 	{
 		var labelVal;
 
-		var oldVal = p->getValue();
 
 		var newVal;
 		int numValues = p->isComplex() ? p->value.size() : 1;
@@ -461,7 +568,9 @@ void ParameterUI::ValueEditCalloutComponent::labelTextChanged(Label* l)
 			else newVal.append(ParameterUI::textToValue(labels[i]->getText().replace(",", ".")));
 		}
 
-		p->setUndoableValue(p->isComplex() ? newVal : newVal[0], false, true);
+		var value = p->isComplex() ? newVal : newVal[0];
+		p->resetLastUndoValue();
+		p->setUndoableValue(ui != nullptr ? ui->cropUIValue(value) : value, false, true);
 	}
 	else
 	{

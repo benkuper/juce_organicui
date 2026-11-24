@@ -94,6 +94,7 @@ public:
 	void serverInitSuccess() override;
 	void serverInitError(const juce::String& message) override;
 	void connectionOpened(const juce::String& id) override;
+	void processWebSocketMessage(const juce::String& id, const juce::var& message);
 	void messageReceived(const juce::String& id, const juce::String& message) override;
 	void dataReceived(const juce::String& id, const juce::MemoryBlock& data) override;
 	void connectionClosed(const juce::String& id, int status, const juce::String& reason) override;
@@ -101,6 +102,7 @@ public:
 	void connectionError(const juce::String& id, int status, const juce::String& message);
 
 
+	juce::StringArray getOSCQueryFeedbackClientIds(Controllable* c);
 	void sendOSCQueryFeedback(Controllable* c);
 	void sendOSCQueryStateFeedback(Controllable* c);
 	void sendOSCQueryFeedback(const juce::OSCMessage& m, juce::StringArray excludes = juce::StringArray());

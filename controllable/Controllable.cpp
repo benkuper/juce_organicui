@@ -239,6 +239,80 @@ ControllableContainer* Controllable::getSelectedParentInHierarchy()
 	return nullptr;
 }
 
+Array<Controllable*> Controllable::getRelatedSelectedControllables()
+{
+	Array<Controllable*> result;
+	result.add(this);
+
+	InspectableSelectionManager* selectionManager = InspectableSelectionManager::activeSelectionManager;
+	if (selectionManager == nullptr || selectionManager->currentInspectables.size() < 2) return result;
+
+	if (isSelected)
+	{
+		for (Controllable* selectedControllable : selectionManager->getInspectablesAs<Controllable>())
+		{
+			if (selectedControllable != nullptr
+				&& selectedControllable->type == type
+				&& selectedControllable->getTypeString() == getTypeString())
+				result.addIfNotAlreadyThere(selectedControllable);
+		}
+	}
+
+	ControllableContainer* selectedParent = getSelectedParentInHierarchy();
+	if (selectedParent == nullptr) return result;
+
+	const String relativeAddress = getControlAddress(selectedParent);
+	Array<ControllableContainer*> selectedContainers = selectionManager->getInspectablesAs<ControllableContainer>();
+
+	for (ControllableContainer* selectedContainer : selectedContainers)
+	{
+		if (selectedContainer == nullptr || selectedContainer == selectedParent) continue;
+
+		Controllable* related = selectedContainer->getControllableForAddress(relativeAddress);
+		if (related != nullptr && related->type == type && related->getTypeString() == getTypeString())
+			result.addIfNotAlreadyThere(related);
+	}
+
+	return result;
+}
+
+void Controllable::setUndoableNiceNameForSelected(const String& newName)
+{
+	Array<UndoableAction*> actions;
+	for (auto* related : getRelatedSelectedControllables())
+		if (related->userCanChangeName && related->niceName != newName)
+			if (auto* action = related->setUndoableNiceName(newName, true)) actions.add(action);
+	UndoMaster::getInstance()->performActions("Rename selected controls", actions);
+}
+
+void Controllable::setUndoableAttributeForSelected(const String& attribute, var value)
+{
+	Array<UndoableAction*> actions;
+	for (auto* related : getRelatedSelectedControllables())
+	{
+		if (attribute == "enabled" && !related->canBeDisabledByUser) continue;
+		if ((attribute == "readOnly" || attribute == "readonly") && !related->userCanSetReadOnly) continue;
+		if (auto* action = related->setUndoableAttribute(attribute, value, true)) actions.add(action);
+	}
+	UndoMaster::getInstance()->performActions("Set " + attribute + " on selected controls", actions);
+}
+
+void Controllable::removeForSelected()
+{
+	Array<UndoableAction*> actions;
+	auto relatedControls = getRelatedSelectedControllables();
+	std::sort(relatedControls.begin(), relatedControls.end(), [](Controllable* a, Controllable* b)
+	{
+		if (a->parentContainer != b->parentContainer)
+			return std::less<ControllableContainer*>()(a->parentContainer.get(), b->parentContainer.get());
+		return a->parentContainer != nullptr && a->parentContainer->controllables.indexOf(a) > a->parentContainer->controllables.indexOf(b);
+	});
+	for (auto* related : relatedControls)
+		if (related->isRemovableByUser && related->parentContainer != nullptr)
+			if (auto* action = related->parentContainer->removeUndoableControllable(related, true)) actions.add(action);
+	UndoMaster::getInstance()->performActions("Remove selected controls", actions);
+}
+
 void Controllable::remove(bool addToUndo)
 {
 	controllableListeners.call(&ControllableListener::askForRemoveControllable, this, addToUndo);
@@ -392,6 +466,24 @@ void Controllable::setAttribute(String param, var value)
 		controllableListeners.call(&ControllableListener::controllableAttributeChanged, this, param);
 		controllableNotifier.addMessage(new ControllableEvent(ControllableEvent::ATTRIBUTE_CHANGED, this));
 	}
+}
+
+UndoableAction* Controllable::setUndoableAttribute(const String& param, var value, bool onlyReturnAction)
+{
+	const var oldValue = getAttribute(param);
+	if (oldValue.isVoid() || oldValue == value) return nullptr;
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile)
+	{
+		setAttribute(param, value);
+		return nullptr;
+	}
+
+	UndoableAction* action = new ControllableSetAttributeAction(this, param, oldValue, value);
+	if (onlyReturnAction) return action;
+
+	UndoMaster::getInstance()->performAction("Set " + niceName + " " + param, action);
+	// Ownership transferred to UndoMaster.
+	return nullptr;
 }
 
 bool Controllable::setAttributeInternal(String param, var value)
@@ -717,7 +809,9 @@ bool Controllable::ControllableChangeNameAction::perform()
 		c->setNiceName(newName);
 		return true;
 	}
-	return false;
+
+	// Missing target: no-op success. false would clear the entire undo history.
+	return true;
 }
 
 bool Controllable::ControllableChangeNameAction::undo()
@@ -728,5 +822,23 @@ bool Controllable::ControllableChangeNameAction::undo()
 		c->setNiceName(oldName);
 		return true;
 	}
-	return false;
+
+	return true;
+}
+
+bool Controllable::ControllableSetAttributeAction::perform()
+{
+	Controllable* c = getControllable();
+	// Missing target: no-op success. false would clear the entire undo history.
+	if (c == nullptr) return true;
+	c->setAttribute(attribute, newValue);
+	return true;
+}
+
+bool Controllable::ControllableSetAttributeAction::undo()
+{
+	Controllable* c = getControllable();
+	if (c == nullptr) return true;
+	c->setAttribute(attribute, oldValue);
+	return true;
 }

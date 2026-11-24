@@ -370,6 +370,10 @@ bool OutlinerItem::mightContainSubItems()
 
 std::unique_ptr<Component> OutlinerItem::createItemComponent()
 {
+	if (inspectable == nullptr || inspectable.wasObjectDeleted()
+		|| (isContainer && (container == nullptr || container.wasObjectDeleted()))
+		|| (!isContainer && (controllable == nullptr || controllable.wasObjectDeleted()))) return nullptr;
+
 	return std::unique_ptr<Component>(new OutlinerItemComponent(this));
 }
 
@@ -448,7 +452,12 @@ OutlinerItemComponent::OutlinerItemComponent(OutlinerItem* _item) :
 	item(_item),
 	label("label", _item->itemName)
 {
-	if (item->isContainer && item->container == nullptr)
+	if (item == nullptr || item.wasObjectDeleted()) return;
+
+	ControllableContainer* container = item->isContainer ? item->container.get() : nullptr;
+	Controllable* controllable = item->isContainer ? nullptr : item->controllable.get();
+	if ((item->isContainer && (container == nullptr || item->container.wasObjectDeleted()))
+		|| (!item->isContainer && (controllable == nullptr || item->controllable.wasObjectDeleted())))
 	{
 		jassertfalse;
 		return;
@@ -456,18 +465,18 @@ OutlinerItemComponent::OutlinerItemComponent(OutlinerItem* _item) :
 
 	item->addOutlinerItemListener(this);
 	autoDrawContourWhenSelected = false;
-	setTooltip(item->isContainer ? item->container->getControlAddress() : item->controllable->description + "\nControl Address : " + item->controllable->controlAddress);
+	setTooltip(item->isContainer ? container->getControlAddress() : controllable->description + "\nControl Address : " + controllable->controlAddress);
 	addAndMakeVisible(&label);
 
-	if (item->isContainer) color = item->container->nameCanBeChangedByUser ? HIGHLIGHT_COLOR : TEXT_COLOR;
-	else color = BLUE_COLOR.brighter(item->controllable->type == Controllable::TRIGGER);
+	if (item->isContainer) color = container->nameCanBeChangedByUser ? HIGHLIGHT_COLOR : TEXT_COLOR;
+	else color = BLUE_COLOR.brighter(controllable->type == Controllable::TRIGGER);
 
 	label.setFont(label.getFont().withHeight(12));
 	label.setColour(label.backgroundWhenEditingColourId, Colours::white);
 	label.setColour(Label::textColourId, inspectable->isSelected ? Colours::grey.darker() : color);
 
 
-	if (item->isContainer && item->container->nameCanBeChangedByUser)
+	if (item->isContainer && container->nameCanBeChangedByUser)
 	{
 		label.addListener(this);
 		label.setEditable(false, true);
@@ -493,7 +502,7 @@ OutlinerItemComponent::OutlinerItemComponent(OutlinerItem* _item) :
 
 OutlinerItemComponent::~OutlinerItemComponent()
 {
-	if (!item.wasObjectDeleted()) item->removeOutlinerItemListener(this);
+	if (item != nullptr && !item.wasObjectDeleted()) item->removeOutlinerItemListener(this);
 }
 
 void OutlinerItemComponent::paint(Graphics& g)

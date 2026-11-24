@@ -13,28 +13,37 @@ DashboardParameterItemUI::~DashboardParameterItemUI()
 
 ControllableUI* DashboardParameterItemUI::createControllableUI()
 {
+	if (parameterItem == nullptr
+		|| parameterItem->parameter == nullptr
+		|| parameterItem->parameter.wasObjectDeleted()) return nullptr;
 
 	int s = (int)parameterItem->style->getValueData();
+	Parameter* parameter = parameterItem->parameter.get();
+	if (s == -1 && parameter->type == Controllable::FLOAT && parameterItem->hasCustomRange())
+	{
+		auto* fp = static_cast<FloatParameter*>(parameter);
+		if (fp->defaultUI == FloatParameter::NONE && fp->customUI == FloatParameter::NONE) return fp->createSlider();
+	}
 
-	switch (parameterItem->parameter->type)
+	switch (parameter->type)
 	{
 	case Controllable::BOOL:
 	{
 		switch (s)
 		{
 		case 10:
-			return new ColorStatusUI(parameterItem->parameter.get(), true);
+			return new ColorStatusUI(parameter, true);
 			break;
 
 		case 11:
-			return new ColorStatusUI(parameterItem->parameter.get(), false);
+			return new ColorStatusUI(parameter, false);
 			break;
 
 		case 23:
 		case 25:
 		{
 
-			BoolToggleUI* bp = ((BoolParameter*)parameterItem->parameter.get())->createButtonToggle();
+			BoolToggleUI* bp = ((BoolParameter*)parameter)->createButtonToggle();
 			if (s == 25) bp->momentaryMode = true;
 			return bp;
 		}
@@ -46,7 +55,7 @@ ControllableUI* DashboardParameterItemUI::createControllableUI()
 		default:
 		{
 			File f = parameterItem->btImage->getFile();
-			BoolToggleUI* bp = ((BoolParameter*)parameterItem->parameter.get())->createToggle(ImageCache::getFromFile(f));
+			BoolToggleUI* bp = ((BoolParameter*)parameter)->createToggle(ImageCache::getFromFile(f));
 			if (s == 24) bp->momentaryMode = true;
 			return bp;
 		}
@@ -65,34 +74,34 @@ ControllableUI* DashboardParameterItemUI::createControllableUI()
 		case 1:
 		case 5:
 		{
-			FloatSliderUI* sliderUI = ((FloatParameter*)parameterItem->parameter.get())->createSlider();
+			FloatSliderUI* sliderUI = ((FloatParameter*)parameter)->createSlider();
 			sliderUI->orientation = s == 0 ? FloatSliderUI::HORIZONTAL : (s == 1 ? FloatSliderUI::VERTICAL : FloatSliderUI::ROTARY);
 			return sliderUI;
 		}
 		break;
 
 		case 2:
-			return ((FloatParameter*)parameterItem->parameter.get())->createLabelParameter();
+			return ((FloatParameter*)parameter)->createLabelParameter();
 			break;
 
 		case 3:
-			return ((FloatParameter*)parameterItem->parameter.get())->createTimeLabelParameter();
+			return ((FloatParameter*)parameter)->createTimeLabelParameter();
 			break;
 
 
 
 		case 10:
-			return new ColorStatusUI(parameterItem->parameter.get(), true);
+			return new ColorStatusUI(parameter, true);
 			break;
 
 		case 11:
-			return new ColorStatusUI(parameterItem->parameter.get(), false);
+			return new ColorStatusUI(parameter, false);
 			break;
 
 
 		case 20:
 		{
-			EnumParameterButtonBarUI* ui = ((EnumParameter*)parameterItem->parameter.get())->createButtonBarUI();
+			EnumParameterButtonBarUI* ui = ((EnumParameter*)parameter)->createButtonBarUI();
 			ui->isVertical = false;
 			return ui;
 		}
@@ -101,7 +110,7 @@ ControllableUI* DashboardParameterItemUI::createControllableUI()
 
 		case 21:
 		{
-			EnumParameterButtonBarUI* ui = ((EnumParameter*)parameterItem->parameter.get())->createButtonBarUI();
+			EnumParameterButtonBarUI* ui = ((EnumParameter*)parameter)->createButtonBarUI();
 			ui->isVertical = true;
 			return ui;
 		}
@@ -115,11 +124,11 @@ ControllableUI* DashboardParameterItemUI::createControllableUI()
 		switch (s)
 		{
 		case 12:
-			return new P2DUI((Point2DParameter*)parameterItem->parameter.get());
+			return new P2DUI((Point2DParameter*)parameter);
 			break;
 
 		default:
-			DoubleSliderUI* dbui = new DoubleSliderUI((Point2DParameter*)parameterItem->parameter.get());
+			DoubleSliderUI* dbui = new DoubleSliderUI((Point2DParameter*)parameter);
 			dbui->canShowExtendedEditor = false;
 			return dbui;
 			break;
@@ -136,10 +145,15 @@ ControllableUI* DashboardParameterItemUI::createControllableUI()
 
 void DashboardParameterItemUI::updateUIParametersInternal()
 {
-	if (parameterItem == nullptr || parameterItem->inspectable.wasObjectDeleted()) return;
+	if (itemUI == nullptr || parameterItem == nullptr
+		|| parameterItem->parameter == nullptr
+		|| parameterItem->parameter.wasObjectDeleted()
+		|| parameterItem->inspectable.wasObjectDeleted()) return;
 
 	if (ParameterUI* pui = dynamic_cast<ParameterUI*>(itemUI.get()))
 	{
+		if (parameterItem->hasCustomRange()) pui->setCustomRange(parameterItem->getRangeBound(false), parameterItem->getRangeBound(true));
+		else pui->clearCustomRange();
 		pui->showValue = parameterItem->showValue->boolValue();
 
 		if (parameterItem->bgColor != nullptr)
@@ -178,8 +192,15 @@ void DashboardParameterItemUI::updateUIParametersInternal()
 void DashboardParameterItemUI::controllableFeedbackUpdateInternal(Controllable* c)
 {
 	DashboardControllableItemUI::controllableFeedbackUpdateInternal(c);
+	if (c == parameterItem->useCustomRange)
+	{
+		rebuildUI();
+		return;
+	}
 
-	if (c == parameterItem->showValue || c == parameterItem->bgColor || c == parameterItem->fgColor) updateUIParameters();
+	if (c == parameterItem->showValue || c == parameterItem->bgColor || c == parameterItem->fgColor
+		|| c == parameterItem->useCustomRange || c == parameterItem->customRange
+		|| c == parameterItem->customRangeY || c == parameterItem->customRangeZ) updateUIParameters();
 	else if (c == parameterItem->btImage || c == parameterItem->style) rebuildUI();
 	else if (DashboardTargetParameterItem* tpItem = dynamic_cast<DashboardTargetParameterItem*>(parameterItem))
 	{
@@ -191,7 +212,9 @@ void DashboardParameterItemUI::controllableStateUpdateInternal(Controllable* c)
 {
 	DashboardControllableItemUI::controllableStateUpdateInternal(c);
 
-	if (c == parameterItem->showValue || c == parameterItem->bgColor || c == parameterItem->fgColor) updateUIParameters();
+	if (c == parameterItem->showValue || c == parameterItem->bgColor || c == parameterItem->fgColor
+		|| c == parameterItem->useCustomRange || c == parameterItem->customRange
+		|| c == parameterItem->customRangeY || c == parameterItem->customRangeZ) updateUIParameters();
 	else if (c == parameterItem->btImage || c == parameterItem->style) rebuildUI();
 	else if (DashboardTargetParameterItem* tpItem = dynamic_cast<DashboardTargetParameterItem*>(parameterItem))
 	{

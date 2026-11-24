@@ -15,7 +15,7 @@ P2DUI::~P2DUI()
 void P2DUI::mouseDownInternal(const MouseEvent&)
 {
 	mouseDownValue = parameter->getValue();
-	mouseDownNormalizedValue = parameter->getNormalizedValue();
+	mouseDownNormalizedValue = getUINormalizedValue();
 	setMouseCursor(MouseCursor::NoCursor);
 	repaint();
 }
@@ -35,7 +35,8 @@ void P2DUI::mouseDrag(const MouseEvent& e)
 	val.append((float)mouseDownNormalizedValue[0] + dx);
 	val.append((float)mouseDownNormalizedValue[1] + dy);
 
-	p2d->setNormalizedValue(val);
+	if (useCustomRange) p2d->setValue(getUIValueFromNormalized(val), false, false, true, true);
+	else p2d->setNormalizedValue(val, false, false, true);
 }
 
 void P2DUI::mouseUpInternal(const MouseEvent&)
@@ -65,7 +66,7 @@ void P2DUI::paint(Graphics& g)
 
 	Point<float> p = p2d->getPoint();
 
-	var relVal = p2d->getNormalizedValue();
+	var relVal = getUINormalizedValue();
 	Point<float> relP(relVal[0], relVal[1]);
 	if (p2d->extendedEditorInvertX) relP.setX(1 - relP.x);
 	if (p2d->extendedEditorInvertY) relP.setY(1 - relP.y);
@@ -121,8 +122,9 @@ void P2DUI::resized()
 	if (!p2d->extendedEditorStretchMode)
 	{
 		float rRatio = canvasRect.getAspectRatio();
-		Point<float> range((float)p2d->maximumValue[0] - (float)p2d->minimumValue[0], (float)p2d->maximumValue[1] - (float)p2d->minimumValue[1]);
-		float pRatio = range.x / range.y;
+		const auto minimum = getUIMinimumValue(), maximum = getUIMaximumValue();
+		Point<float> range((float)maximum[0] - (float)minimum[0], (float)maximum[1] - (float)minimum[1]);
+		float pRatio = range.x > 0 && range.y > 0 ? range.x / range.y : 1;
 
 		if (pRatio > rRatio)
 		{
@@ -182,19 +184,25 @@ void P2DUI::showEditWindowInternal()
 	nameWindow->addButton("OK", 1, KeyPress(KeyPress::returnKey));
 	nameWindow->addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
 
-	nameWindow->enterModalState(true, ModalCallbackFunction::create([this, &nameWindow](int result)
+	WeakReference<ParameterUI> ui(this);
+	WeakReference<Parameter> param(p2d);
+	nameWindow->enterModalState(true, ModalCallbackFunction::create([ui, param, nameWindow](int result)
 		{
 
-			if (result)
+			if (result && ui != nullptr && param != nullptr)
 			{
 				float newVals[2];
 				for (int i = 0; i < 2; ++i) newVals[i] = nameWindow->getTextEditorContents("val" + String(i)).getFloatValue();
-				p2d->setUndoablePoint(newVals[0], newVals[1], false, true);
+				var newValue;
+				newValue.append(newVals[0]);
+				newValue.append(newVals[1]);
+				param->resetLastUndoValue();
+				param->setUndoableValue(ui->cropUIValue(newValue), false, true);
 			}
 		}
 	),
 		true
-	);
+			);
 }
 
 void P2DUI::showEditRangeWindowInternal()

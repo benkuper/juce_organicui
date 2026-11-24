@@ -19,9 +19,21 @@ UndoMaster::~UndoMaster()
 {
 }
 
+void UndoMaster::clearUndoHistory()
+{
+	if (isClearingHistory) return;
+	const juce::ScopedValueSetter<bool> clearing(isClearingHistory, true);
+	juce::UndoManager::clearUndoHistory();
+}
+
 void UndoMaster::performAction(const String & name, UndoableAction * action)
 {
-	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile) return;
+	if (action == nullptr) return;
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile)
+	{
+		delete action;
+		return;
+	}
 	{
 		const juce::ScopedValueSetter<bool> performing(isPerforming, true);
 		if (transactionGroupDepth == 0) beginNewTransaction(name);
@@ -32,7 +44,13 @@ void UndoMaster::performAction(const String & name, UndoableAction * action)
 
 void UndoMaster::performActions(const String & name, Array<UndoableAction*> actions)
 {
-	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile) return;
+	actions.removeAllInstancesOf(nullptr);
+	if (actions.isEmpty()) return;
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile)
+	{
+		for (auto* action : actions) delete action;
+		return;
+	}
 	{
 		const juce::ScopedValueSetter<bool> performing(isPerforming, true);
 		if (transactionGroupDepth == 0) beginNewTransaction(name);

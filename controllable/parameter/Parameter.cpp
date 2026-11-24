@@ -223,47 +223,111 @@ void Parameter::resetValue(bool silentSet)
 	setValue(defaultValue, silentSet, false, false);
 }
 
+UndoableAction* Parameter::resetValueUndoable(bool onlyReturnAction)
+{
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile)
+	{
+		resetValue();
+		return nullptr;
+	}
+	if (!isOverriden && checkValueIsTheSame(value, defaultValue)) return nullptr;
+
+	UndoableAction* action = new ParameterResetValueAction(this);
+	if (onlyReturnAction) return action;
+
+	UndoMaster::getInstance()->performAction("Reset " + niceName + " value", action);
+	// Ownership transferred to UndoMaster.
+	return nullptr;
+}
+
+Array<Parameter*> Parameter::getRelatedSelectedParameters()
+{
+	Array<Parameter*> result;
+	for (Controllable* related : getRelatedSelectedControllables())
+	{
+		if (Parameter* relatedParameter = dynamic_cast<Parameter*>(related))
+			result.addIfNotAlreadyThere(relatedParameter);
+	}
+	return result;
+}
+
+void Parameter::resetValueUndoableForSelected()
+{
+	Array<Parameter*> relatedParameters = getRelatedSelectedParameters();
+	if (relatedParameters.size() <= 1)
+	{
+		resetValueUndoable();
+		return;
+	}
+
+	Array<UndoableAction*> actions;
+	for (Parameter* related : relatedParameters)
+	{
+		if (related == nullptr) continue;
+		if (UndoableAction* action = related->resetValueUndoable(true)) actions.add(action);
+	}
+
+	clearMultiEditState();
+	if (!actions.isEmpty()) UndoMaster::getInstance()->performActions("Reset " + niceName + " on selected items", actions);
+}
+
+void Parameter::clearMultiEditState()
+{
+	for (auto* related : getRelatedSelectedParameters())
+	{
+		related->multiEditStartValue = var();
+		related->hasMultiEditStartValue = false;
+	}
+}
+
 Array<UndoableAction*> Parameter::setUndoableValue(var newValue, bool onlyReturnAction, bool setSimilarSelected)
 {
 	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile)
 	{
-		//if Main Engine loading, just set the value without undo history
 		setValue(newValue);
-		return Array<UndoableAction*>();
+		return {};
 	}
 
-	if (lastUndoValue.isVoid()) lastUndoValue = newValue.clone();
+	const auto targets = setSimilarSelected ? getRelatedSelectedParameters() : Array<Parameter*>{ this };
 	Array<UndoableAction*> actions;
-	UndoableAction* a = new ParameterSetValueAction(this, lastUndoValue, newValue);
-	actions.add(a);
-	lastUndoValue = newValue.clone();
-
-	if (setSimilarSelected && InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 1)
+	for (auto* target : targets)
 	{
-		if (ControllableContainer* cc = getSelectedParentInHierarchy())
-		{
-			String relativeAddress = getControlAddress(cc);
-			Array<ControllableContainer*> containers = InspectableSelectionManager::activeSelectionManager->getInspectablesAs<ControllableContainer>();
-			containers.removeAllInstancesOf(cc);
-
-			for (ControllableContainer* c : containers)
-			{
-				if (Parameter* t = dynamic_cast<Parameter*>(c->getControllableForAddress(relativeAddress)))
-				{
-					actions.addArray(t->setUndoableValue(newValue, true, false));
-				}
-			}
-		}
+		var oldValue = target == this ? lastUndoValue : target->getValue();
+		if (target->hasMultiEditStartValue) oldValue = target->multiEditStartValue;
+		if (oldValue.isVoid()) oldValue = target->getValue();
+		target->hasMultiEditStartValue = false;
+		target->multiEditStartValue = var();
+		if (targets.size() > 1 && !target->alwaysNotify && target->checkValueIsTheSame(oldValue, newValue)) continue;
+		actions.add(new ParameterSetValueAction(target, oldValue.clone(), newValue.clone()));
+		target->lastUndoValue = newValue.clone();
 	}
 
-	if (onlyReturnAction) return actions;
-
-	UndoMaster::getInstance()->performActions("Set " + niceName + " value", actions);
+	if (!onlyReturnAction && !actions.isEmpty())
+		UndoMaster::getInstance()->performActions("Set " + niceName + " value", actions);
 	return actions;
 }
 
 void Parameter::setValue(juce::var _value, bool silentSet, bool force, bool forceOverride, bool setSimilarSelected)
 {
+	if (setSimilarSelected)
+	{
+		const auto targets = getRelatedSelectedParameters();
+		if (targets.size() > 1)
+		{
+			for (auto* target : targets)
+			{
+				if (!target->hasMultiEditStartValue)
+				{
+					target->multiEditStartValue = target->getValue().clone();
+					target->hasMultiEditStartValue = true;
+				}
+			}
+			for (const auto& target : getWeakArray(targets))
+				if (target != nullptr) target->setValue(_value, silentSet, force, forceOverride);
+			return;
+		}
+	}
+
 	{
 		GenericScopedLock lock(valueSetLock);
 
@@ -274,24 +338,6 @@ void Parameter::setValue(juce::var _value, bool silentSet, bool force, bool forc
 		if (lastUndoValue.isVoid()) lastUndoValue = _value.clone();
 		setValueInternal(croppedValue);
 		if (!isOverriden /*&& !isControllableFeedbackOnly*/) isOverriden = croppedValue != defaultValue || forceOverride;
-	}
-
-	if (setSimilarSelected && InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 1)
-	{
-		if (ControllableContainer* cc = getSelectedParentInHierarchy())
-		{
-			String relativeAddress = getControlAddress(cc);
-			Array<ControllableContainer*> containers = InspectableSelectionManager::activeSelectionManager->getInspectablesAs<ControllableContainer>();
-			containers.removeAllInstancesOf(cc);
-
-			for (ControllableContainer* c : containers)
-			{
-				if (Parameter* t = dynamic_cast<Parameter*>(c->getControllableForAddress(relativeAddress)))
-				{
-					t->setValue(value, silentSet, force, forceOverride, false);
-				}
-			}
-		}
 	}
 
 	if (!silentSet) notifyValueChanged();
@@ -344,6 +390,62 @@ void Parameter::setRange(var min, var max)
 	else parameter->resetValue();
 
 	if (safeThis != nullptr && safeThis->isCustomizableByUser) safeThis->isOverriden = true;
+}
+
+Parameter::ParameterSetRangeAction::ParameterSetRangeAction(Parameter* parameter, var minimum, var maximum) :
+	ParameterAction(parameter),
+	oldMinimum(parameter->minimumValue.clone()), oldMaximum(parameter->maximumValue.clone()),
+	newMinimum(minimum.clone()), newMaximum(maximum.clone()), oldValue(parameter->getValue().clone()),
+	oldIsOverriden(parameter->isOverriden)
+{
+}
+
+bool Parameter::ParameterSetRangeAction::perform()
+{
+	if (auto* parameter = getParameter()) parameter->setRange(newMinimum.clone(), newMaximum.clone());
+	return true;
+}
+
+bool Parameter::ParameterSetRangeAction::undo()
+{
+	if (auto* parameter = getParameter())
+	{
+		parameter->setRange(oldMinimum.clone(), oldMaximum.clone());
+		parameter->setValue(oldValue.clone());
+		parameter->isOverriden = oldIsOverriden;
+	}
+	return true;
+}
+
+void Parameter::setUndoableRangeForSelected(var minimum, var maximum)
+{
+	Array<UndoableAction*> actions;
+	for (auto* related : getRelatedSelectedParameters())
+	{
+		if (!related->canHaveRange || !related->isCustomizableByUser) continue;
+		if (related->isComplex() && (!minimum.isArray() || !maximum.isArray()
+			|| minimum.size() != related->value.size() || maximum.size() != related->value.size())) continue;
+		if (related->Parameter::checkValueIsTheSame(related->minimumValue, minimum)
+			&& related->Parameter::checkValueIsTheSame(related->maximumValue, maximum)) continue;
+		actions.add(new ParameterSetRangeAction(related, minimum, maximum));
+	}
+	UndoMaster::getInstance()->performActions("Set range on selected controls", actions);
+}
+
+void Parameter::clearUndoableRangeForSelected()
+{
+	var minimum = INT32_MIN, maximum = INT32_MAX;
+	if (isComplex())
+	{
+		minimum = var();
+		maximum = var();
+		for (int axis = 0; axis < value.size(); ++axis)
+		{
+			minimum.append(INT32_MIN);
+			maximum.append(INT32_MAX);
+		}
+	}
+	setUndoableRangeForSelected(minimum, maximum);
 }
 
 void Parameter::clearRange()
@@ -900,9 +1002,10 @@ bool Parameter::ParameterSetValueAction::perform()
 	if (p == nullptr)
 	{
 		LOGWARNING("Undo set value : parameter not found " << controlAddress);
-		return false;
+		return true;
 	}
 
+	p->lastUndoValue = newValue.clone();
 	p->setValue(newValue);
 	return true;
 }
@@ -913,11 +1016,11 @@ bool Parameter::ParameterSetValueAction::undo()
 	if (p == nullptr)
 	{
 		LOGWARNING("Undo set value : parameter not found " << controlAddress);
-		return false;
+		return true;
 	}
 
+	p->lastUndoValue = oldValue.clone();
 	p->setValue(oldValue);
-	p->lastUndoValue = oldValue;
 	return true;
 }
 
@@ -975,6 +1078,34 @@ bool Parameter::ValueInterpolator::update()
 		parameter->setValue(tVal);
 	}
 
+	return true;
+}
+
+bool Parameter::ParameterResetValueAction::perform()
+{
+	Parameter* p = getParameter();
+	if (p == nullptr)
+	{
+		LOGWARNING("Undo reset value : parameter not found " << controlAddress);
+		return true;
+	}
+
+	p->resetValue();
+	return true;
+}
+
+bool Parameter::ParameterResetValueAction::undo()
+{
+	Parameter* p = getParameter();
+	if (p == nullptr)
+	{
+		LOGWARNING("Undo reset value : parameter not found " << controlAddress);
+		return true;
+	}
+
+	p->isOverriden = false;
+	p->setValue(oldValue, false, true, oldIsOverriden);
+	p->isOverriden = oldIsOverriden;
 	return true;
 }
 

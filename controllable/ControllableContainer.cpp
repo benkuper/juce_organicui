@@ -134,7 +134,31 @@ UndoableAction* ControllableContainer::addUndoableControllable(Controllable* c, 
 	if (onlyReturnAction) return a;
 
 	UndoMaster::getInstance()->performAction("Add " + c->niceName, a);
-	return a;
+	return nullptr;
+}
+
+void ControllableContainer::addUndoableControllableForSelected(Controllable* c)
+{
+	if (c == nullptr) return;
+	const var data = c->getJSONData();
+	Array<UndoableAction*> actions;
+	for (auto* related : getRelatedSelectedContainers())
+	{
+		if (!related->userCanAddControllables) continue;
+		if (!related->userAddControllablesFilters.isEmpty() && !related->userAddControllablesFilters.contains(c->getTypeString())) continue;
+		Controllable* newControl = c;
+		if (related != this)
+		{
+			newControl = ControllableFactory::createControllable(c->getTypeString());
+			if (newControl == nullptr) continue;
+			newControl->loadJSONData(data.clone());
+			newControl->userCanChangeName = c->userCanChangeName;
+			newControl->canBeDisabledByUser = c->canBeDisabledByUser;
+			newControl->userCanSetReadOnly = c->userCanSetReadOnly;
+		}
+		if (auto* action = related->addUndoableControllable(newControl, true)) actions.add(action);
+	}
+	UndoMaster::getInstance()->performActions("Add controls to selected containers", actions);
 }
 
 Controllable* ControllableContainer::addControllable(Controllable* c, int index)
@@ -296,7 +320,7 @@ UndoableAction* ControllableContainer::removeUndoableControllable(Controllable* 
 	if (onlyReturnAction) return a;
 
 	UndoMaster::getInstance()->performAction("Remove " + c->niceName, a);
-	return a;
+	return nullptr;
 }
 
 void ControllableContainer::removeControllable(WeakReference<Controllable> c, bool deleteObject)
@@ -383,7 +407,7 @@ UndoableAction* ControllableContainer::setUndoableNiceName(const String& newNice
 	if (onlyReturnAction) return a;
 
 	UndoMaster::getInstance()->performAction("Rename " + niceName, a);
-	return a;
+	return nullptr;
 }
 void ControllableContainer::setNiceName(const String& _niceName)
 {
@@ -1772,6 +1796,48 @@ bool ControllableContainer::isAttachedToRoot()
 	return pc == Engine::mainEngine;
 }
 
+Array<ControllableContainer*> ControllableContainer::getRelatedSelectedContainers()
+{
+	Array<ControllableContainer*> result { this };
+	auto* selection = InspectableSelectionManager::activeSelectionManager;
+	if (selection == nullptr || selection->currentInspectables.size() < 2) return result;
+
+	auto isCompatible = [this](ControllableContainer* candidate)
+	{
+		if (candidate == nullptr || typeid(*candidate) != typeid(*this)) return false;
+		auto* item = dynamic_cast<BaseItem*>(this);
+		auto* other = dynamic_cast<BaseItem*>(candidate);
+		return item == nullptr || (other != nullptr && item->getTypeString() == other->getTypeString());
+	};
+
+	auto selected = selection->getInspectablesAs<ControllableContainer>();
+	if (isSelected)
+		for (auto* candidate : selected)
+			if (isCompatible(candidate)) result.addIfNotAlreadyThere(candidate);
+
+	auto* selectedParent = parentContainer.get();
+	while (selectedParent != nullptr && !selectedParent->isSelected) selectedParent = selectedParent->parentContainer.get();
+	if (selectedParent == nullptr) return result;
+
+	const String relativeAddress = getControlAddress(selectedParent);
+	for (auto* candidate : selected)
+	{
+		if (candidate == selectedParent) continue;
+		auto* related = candidate->getControllableContainerForAddress(relativeAddress);
+		if (isCompatible(related)) result.addIfNotAlreadyThere(related);
+	}
+	return result;
+}
+
+void ControllableContainer::setUndoableNiceNameForSelected(const String& newName)
+{
+	Array<UndoableAction*> actions;
+	for (auto* related : getRelatedSelectedContainers())
+		if (related->nameCanBeChangedByUser && related->niceName != newName)
+			if (auto* action = related->setUndoableNiceName(newName, true)) actions.add(action);
+	UndoMaster::getInstance()->performActions("Rename selected items", actions);
+}
+
 InspectableEditor* ControllableContainer::getEditorInternal(bool isRoot, Array<Inspectable*> inspectables)
 {
 	Array<ControllableContainer*> containers = Inspectable::getArrayAs<Inspectable, ControllableContainer>(inspectables);
@@ -1852,7 +1918,9 @@ bool ControllableContainer::ControllableContainerChangeNameAction::perform()
 		cc->setNiceName(newName);
 		return true;
 	}
-	return false;
+
+	// Missing target: no-op success. false would clear the entire undo history.
+	return true;
 }
 
 bool ControllableContainer::ControllableContainerChangeNameAction::undo()
@@ -1863,12 +1931,17 @@ bool ControllableContainer::ControllableContainerChangeNameAction::undo()
 		cc->setNiceName(oldName);
 		return true;
 	}
-	return false;
+
+	return true;
 }
 
 ControllableContainer::ControllableContainerControllableAction::ControllableContainerControllableAction(ControllableContainer* cc, Controllable* c) :
 	ControllableContainerAction(cc),
-	cRef(c)
+	cRef(c),
+	index(cc->controllables.indexOf(c)),
+	userCanChangeName(c != nullptr && c->userCanChangeName),
+	canBeDisabledByUser(c != nullptr && c->canBeDisabledByUser),
+	userCanSetReadOnly(c != nullptr && c->userCanSetReadOnly)
 {
 	if (c != nullptr)
 	{
@@ -1895,7 +1968,7 @@ bool ControllableContainer::AddControllableAction::perform()
 	ControllableContainer* cc = this->getControllableContainer();
 	if (cc == nullptr)
 	{
-		return false;
+		return true;
 	}
 
 	Controllable* c = this->getItem();
@@ -1906,9 +1979,18 @@ bool ControllableContainer::AddControllableAction::perform()
 	else
 	{
 		c = ControllableFactory::createControllable(cType);
+		if (c != nullptr)
+		{
+			c->loadJSONData(data.clone());
+			c->userCanChangeName = userCanChangeName;
+			c->canBeDisabledByUser = canBeDisabledByUser;
+			c->userCanSetReadOnly = userCanSetReadOnly;
+			cc->addControllable(c, index);
+			cRef = c;
+		}
 	}
 
-	if (c == nullptr) return false;
+	if (c == nullptr) return true;
 
 	this->cShortName = c->shortName;
 	return true;
@@ -1917,7 +1999,7 @@ bool ControllableContainer::AddControllableAction::perform()
 bool ControllableContainer::AddControllableAction::undo()
 {
 	Controllable* c = this->getItem();
-	if (c == nullptr) return false;
+	if (c == nullptr) return true;
 	data = c->getJSONData();
 	ControllableContainer* cc = getControllableContainer();
 	if (cc != nullptr)
@@ -1936,9 +2018,10 @@ ControllableContainer::RemoveControllableAction::RemoveControllableAction(Contro
 bool ControllableContainer::RemoveControllableAction::perform()
 {
 	Controllable* c = this->getItem();
+	ControllableContainer* cc = getControllableContainer();
 
-	if (c == nullptr) return false;
-	getControllableContainer()->removeControllable(c);
+	if (c == nullptr || cc == nullptr) return true;
+	cc->removeControllable(c);
 	cRef = nullptr;
 	return true;
 }
@@ -1946,12 +2029,15 @@ bool ControllableContainer::RemoveControllableAction::perform()
 bool ControllableContainer::RemoveControllableAction::undo()
 {
 	ControllableContainer* cc = getControllableContainer();
-	if (cc == nullptr) return false;
+	if (cc == nullptr) return true;
 	Controllable* c = ControllableFactory::createControllable(cType);
 	if (c != nullptr)
 	{
 		c->loadJSONData(data);
-		cc->addControllable(c);
+		c->userCanChangeName = userCanChangeName;
+		c->canBeDisabledByUser = canBeDisabledByUser;
+		c->userCanSetReadOnly = userCanSetReadOnly;
+		cc->addControllable(c, index);
 		cRef = c;
 	}
 	return true;

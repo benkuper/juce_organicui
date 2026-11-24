@@ -45,30 +45,29 @@ ControllableUI* Trigger::createDefaultUI(Array<Controllable*> controllables)
 
 void Trigger::trigger(bool triggerSimilarSelected)
 {
-	if (enabled && !isTriggering) {
-		isTriggering = true;
-		triggerListeners.call(&TriggerListener::triggerTriggered, this);
-		triggerNotifier.addMessage(new TriggerEvent(TriggerEvent::TRIGGER_TRIGGERED, this));
-		isTriggering = false;
+	if (!enabled || isTriggering) return;
 
-		if (triggerSimilarSelected && InspectableSelectionManager::activeSelectionManager->currentInspectables.size() > 1)
-		{
-			if (ControllableContainer* cc = getSelectedParentInHierarchy())
-			{
-				String relativeAddress = getControlAddress(cc);
-				Array<ControllableContainer*> containers = InspectableSelectionManager::activeSelectionManager->getInspectablesAs<ControllableContainer>();
-				containers.removeAllInstancesOf(cc);
+	Array<WeakReference<Controllable>> relatedTriggers;
+	if (triggerSimilarSelected)
+		for (auto* related : getRelatedSelectedControllables())
+			if (related != this) relatedTriggers.add(related);
 
-				for (ControllableContainer* c : containers)
-				{
-					if (Trigger* t = dynamic_cast<Trigger*>(c->getControllableForAddress(relativeAddress)))
-					{
-						t->trigger(false);
-					}
-				}
-			}
-		}
-	}
+	WeakReference<Controllable> safeThis(this);
+	isTriggering = true;
+	struct BailOutChecker
+	{
+		WeakReference<Controllable> trigger;
+		bool shouldBailOut() const { return trigger == nullptr; }
+	};
+	triggerListeners.callChecked(BailOutChecker{ safeThis },
+		&TriggerListener::triggerTriggered, this);
+	if (safeThis == nullptr) return;
+	triggerNotifier.addMessage(new TriggerEvent(TriggerEvent::TRIGGER_TRIGGERED, this));
+	if (safeThis == nullptr) return;
+	isTriggering = false;
+
+	for (const auto& related : relatedTriggers)
+		if (auto* trigger = dynamic_cast<Trigger*>(related.get())) trigger->trigger(false);
 }
 
 DashboardItem* Trigger::createDashboardItem()

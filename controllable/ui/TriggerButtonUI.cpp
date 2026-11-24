@@ -38,7 +38,7 @@ void TriggerButtonUI::mouseDownInternal(const MouseEvent & e)
 	for (auto& t : triggers)
 	{
 		if (t == nullptr) continue;
-		t->trigger();
+		t->trigger(triggers.size() == 1);
 	}
 }
 

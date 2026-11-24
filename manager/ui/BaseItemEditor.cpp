@@ -119,13 +119,13 @@ void BaseItemEditor::buttonClicked(Button* b)
 				.withMessage("Are you sure you want to delete this ?")
 				.withButton("Delete")
 				.withButton("Cancel"),
-				[this](int result)
+				[itemRef = WeakReference<Inspectable>(item)](int result)
 				{
-					if (result != 0) this->item->remove();
+					if (result != 0 && itemRef != nullptr) static_cast<BaseItem*>(itemRef.get())->removeForSelected();
 				}
 			);
 		}
-		else this->item->remove();
+		else this->item->removeForSelected();
 		return;
 	}
 	else if (b == duplicateBT.get())

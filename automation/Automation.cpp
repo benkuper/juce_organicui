@@ -133,7 +133,9 @@ void Automation::insertKeyAt(const float& pos, bool addToUndo)
 		CubicEasing* ce1 = (CubicEasing*)startKey->easing.get();
 		CubicEasing* ce2 = (CubicEasing*)k->easing.get();
 
-		if (ce1 == nullptr || ce2 == nullptr) return;
+		if (ce1 == nullptr || ce2 == nullptr
+			|| ce1->anchor1 == nullptr || ce1->anchor2 == nullptr
+			|| ce2->anchor1 == nullptr || ce2->anchor2 == nullptr) return;
 
 		ce1->anchor1->setPoint(controlPoints[0] - ce1->start);
 		ce1->anchor2->setPoint(controlPoints[1] - ce1->end);

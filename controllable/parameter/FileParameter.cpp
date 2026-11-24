@@ -100,7 +100,7 @@ String FileParameter::getAbsolutePath() const
 File FileParameter::getBasePath() const
 {
 	if (File(customBasePath).exists()) return File(customBasePath);
-	if (Engine::mainEngine->getFile().exists()) return Engine::mainEngine->getFile().getParentDirectory();
+	if (Engine::mainEngine != nullptr && Engine::mainEngine->getFile().exists()) return Engine::mainEngine->getFile().getParentDirectory();
 	return File::getCurrentWorkingDirectory();
 }
 

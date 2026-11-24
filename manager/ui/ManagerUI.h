@@ -944,7 +944,7 @@ void ManagerUI<M, T, U>::showMenuAndAddItem(bool isFromAddButton, juce::Point<in
     {
         if (isFromAddButton)
         {
-            T* item = manager->Manager<T>::addItem();
+            T* item = manager->addItemForSelected();
             if (callback != nullptr) callback(item);
             return;
         }
@@ -985,7 +985,7 @@ void ManagerUI<M, T, U>::addItemFromMenu(bool fromAddButton, juce::Point<int> po
 template<class M, class T, class U>
 void ManagerUI<M, T, U>::addItemFromMenu(T* item, bool, juce::Point<int>)
 {
-    manager->Manager<T>::addItem(item);
+    manager->addItemForSelected(item);
 }
 
 template<class M, class T, class U>

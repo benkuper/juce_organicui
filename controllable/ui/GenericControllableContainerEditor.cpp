@@ -106,7 +106,8 @@ GenericControllableContainerEditor::~GenericControllableContainerEditor()
 
 void GenericControllableContainerEditor::clear()
 {
-	for (auto& c : childEditors) removeChildComponent(c);
+	for (auto& c : childEditors)
+		if (c != nullptr) removeChildComponent(c);
 	childEditors.clear();
 }
 
@@ -415,12 +416,13 @@ void GenericControllableContainerEditor::showMenuAndAddControllable()
 {
 	ControllableFactory::showFilteredCreateMenu(container->userAddControllablesFilters, [this](Controllable* c)
 		{
+			if (c == nullptr) return;
 			c->userCanChangeName = true;
 			c->isCustomizableByUser = true;
 			c->isRemovableByUser = true;
 			c->isSavable = true;
 			c->saveValueOnly = false;
-			this->container->addControllable(c);
+			this->container->addUndoableControllableForSelected(c);
 		}
 		, true
 	);
@@ -431,7 +433,7 @@ InspectableEditor* GenericControllableContainerEditor::getEditorForInspectable(I
 {
 	for (auto& cui : childEditors)
 	{
-		if (cui->inspectable == i) return cui;
+		if (cui != nullptr && !cui->inspectable.wasObjectDeleted() && cui->inspectable == i) return cui;
 	}
 
 	return nullptr;
@@ -454,7 +456,7 @@ void GenericControllableContainerEditor::buttonClicked(Button* b)
 
 void GenericControllableContainerEditor::labelTextChanged(Label* l)
 {
-	if (l == &containerLabel) container->setUndoableNiceName(l->getText());
+	if (l == &containerLabel) container->setUndoableNiceNameForSelected(l->getText());
 }
 
 void GenericControllableContainerEditor::componentVisibilityChanged(Component& c)

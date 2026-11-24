@@ -21,6 +21,9 @@ ControllableEditor::ControllableEditor(Array<Controllable*> controllables, bool 
 	, dragAndDropEnabled(true)
 	, showLabel(true)
 {
+	for (auto* related : controllable->getRelatedSelectedControllables()) controllables.addIfNotAlreadyThere(related);
+	this->controllables = Inspectable::getWeakArray(controllables);
+	inspectables = Inspectable::getWeakArray(Inspectable::getArrayAs<Controllable, Inspectable>(controllables));
 	buildControllableUI();
 
 	addAndMakeVisible(&label);
@@ -29,7 +32,7 @@ ControllableEditor::ControllableEditor(Array<Controllable*> controllables, bool 
 	label.setFont(label.getFont().withHeight(GlobalSettings::getInstance()->fontSize->floatValue()));
 	label.setText(controllable->niceName, dontSendNotification);
 	label.setTooltip(ui->tooltip);
-	label.setEditable(controllable->userCanChangeName);
+	label.setEditable(multiHasAllOf([](Inspectable* i) { return static_cast<Controllable*>(i)->userCanChangeName; }));
 	label.addListener(this);
 	if (!isMultiEditing())
 	{
@@ -197,10 +200,11 @@ void ControllableEditor::mouseDown(const MouseEvent& e)
 		else
 		{
 			bool targetEnabled = controllables.size() > 0 ? !controllables[0]->enabled : false;
-			for (auto& c : controllables)
-			{
-				c->setEnabled(targetEnabled);
-			}
+			Array<UndoableAction*> actions;
+			for (auto& control : controllables)
+				if (control != nullptr && control->canBeDisabledByUser)
+					if (auto* action = control->setUndoableAttribute("enabled", targetEnabled, true)) actions.add(action);
+			UndoMaster::getInstance()->performActions("Set enabled on selected controls", actions);
 		}
 	}
 }
@@ -261,10 +265,7 @@ void ControllableEditor::buttonClicked(Button* b)
 {
 	if (b == removeBT.get())
 	{
-		for (auto& c : controllables)
-		{
-			c->remove(true); // would need proper grouped undo
-		}
+		if (controllable != nullptr) controllable->removeForSelected();
 	}
 }
 
@@ -281,6 +282,6 @@ void ControllableEditor::labelTextChanged(Label* labelThatHasChanged)
 		{
 			return;
 		}
-		controllable->setNiceName(label.getText());
+		controllable->setUndoableNiceNameForSelected(label.getText());
 	}
 }

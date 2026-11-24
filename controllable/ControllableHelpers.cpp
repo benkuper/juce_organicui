@@ -74,18 +74,26 @@ void ControllableChooserPopupMenu::populateMenu(PopupMenu* subMenu, Controllable
 
 void ControllableChooserPopupMenu::showAndGetControllable(std::function<void(Controllable*)> returnFunc, bool deleteAfter)
 {
-	showMenuAsync(PopupMenu::Options(), [this, returnFunc, deleteAfter](int result)
+	WeakReference<ControllableChooserPopupMenu> safeThis(this);
+	showMenuAsync(PopupMenu::Options(), [safeThis, returnFunc, deleteAfter](int result)
 		{
-			returnFunc(getControllableForResult(result));
-			if (deleteAfter) delete this;
+			auto* menu = safeThis.get();
+			if (menu == nullptr) return;
+
+			if (returnFunc != nullptr) returnFunc(menu->getControllableForResult(result));
+			if (deleteAfter)
+				if (auto* remainingMenu = safeThis.get()) delete remainingMenu;
 		}
 	);
 }
 
 Controllable* ControllableChooserPopupMenu::getControllableForResult(int result)
 {
-	if (result <= indexOffset || (result - 1 - indexOffset) >= controllableList.size()) return nullptr;
-	return controllableList[result - 1 - indexOffset];
+	const int index = result - 1 - indexOffset;
+	if (result <= indexOffset || !isPositiveAndBelow(index, controllableList.size())) return nullptr;
+
+	auto target = controllableList[index];
+	return target == nullptr || target.wasObjectDeleted() ? nullptr : target.get();
 }
 
 //CONTAINER
@@ -169,9 +177,12 @@ void ContainerChooserPopupMenu::populateMenu(PopupMenu* subMenu, ControllableCon
 
 void ContainerChooserPopupMenu::showAndGetContainer(std::function<void(ControllableContainer*)> returnFunc)
 {
-	showMenuAsync(PopupMenu::Options(), [this, returnFunc](int result)
+	WeakReference<ContainerChooserPopupMenu> safeThis(this);
+	showMenuAsync(PopupMenu::Options(), [safeThis, returnFunc](int result)
 		{
-			returnFunc(getContainerForResult(result));
+			auto* menu = safeThis.get();
+			if (menu != nullptr && returnFunc != nullptr)
+				returnFunc(menu->getContainerForResult(result));
 		}
 	);
 
@@ -179,8 +190,11 @@ void ContainerChooserPopupMenu::showAndGetContainer(std::function<void(Controlla
 
 ControllableContainer* ContainerChooserPopupMenu::getContainerForResult(int result)
 {
-	if (result <= indexOffset || (result - 1 - indexOffset) >= containerList.size()) return nullptr;
-	return containerList[result - 1 - indexOffset];
+	const int index = result - 1 - indexOffset;
+	if (result <= indexOffset || !isPositiveAndBelow(index, containerList.size())) return nullptr;
+
+	auto target = containerList[index];
+	return target == nullptr || target.wasObjectDeleted() ? nullptr : target.get();
 }
 
 

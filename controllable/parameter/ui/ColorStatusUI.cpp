@@ -84,8 +84,8 @@ void ColorStatusUI::mouseDownInternal(const MouseEvent& e)
 
 	if (e.mods.isLeftButtonDown())
 	{
-		if (e.mods.isAltDown() || momentaryMode) parameter->setValue(!parameter->boolValue());
-		else parameter->setUndoableValue(!parameter->boolValue()); //only undoable when from left button, real toggle behaviour
+		if (e.mods.isAltDown() || momentaryMode) parameter->setValue(!parameter->boolValue(), false, false, true, true);
+		else parameter->setUndoableValue(!parameter->boolValue(), false, true); //only undoable when from left button, real toggle behaviour
 	}
 }
 
@@ -96,7 +96,12 @@ void ColorStatusUI::mouseUpInternal(const MouseEvent& e)
 
 	if (e.mods.isLeftButtonDown())
 	{
-		if (e.mods.isAltDown() || momentaryMode) parameter->setValue(!parameter->boolValue());
+		if (e.mods.isAltDown() || momentaryMode)
+		{
+			WeakReference<Parameter> safeParameter(parameter);
+			parameter->setValue(!parameter->boolValue(), false, false, true, true);
+			if (safeParameter != nullptr) safeParameter->clearMultiEditState();
+		}
 	}
 }
 

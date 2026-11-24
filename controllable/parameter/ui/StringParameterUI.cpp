@@ -299,14 +299,25 @@ void StringParameterTextUI::valueChanged(const var& v)
 
 void StringParameterTextUI::textEditorTextChanged(TextEditor&)
 {
-	stringParam->setValue(editor.getText());
+	if (shouldBailOut()) return;
+	if (!isEditingText) parameter->resetLastUndoValue();
+	isEditingText = true;
+	parameter->setValue(editor.getText(), false, false, true, true);
 }
 
 void StringParameterTextUI::textEditorFocusLost(TextEditor&)
 {
-
+	commitTextEdit();
 }
 
 void StringParameterTextUI::textEditorReturnKeyPressed(TextEditor&)
 {
+	commitTextEdit();
+}
+
+void StringParameterTextUI::commitTextEdit()
+{
+	if (!isEditingText || shouldBailOut()) return;
+	isEditingText = false;
+	parameter->setUndoableValue(editor.getText(), false, true);
 }

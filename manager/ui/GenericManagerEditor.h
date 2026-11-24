@@ -210,7 +210,7 @@ void GenericManagerEditor<T>::handleMenuSelectedID(int id)
 		switch (id)
 		{
 		case 1001:
-			manager->addItemsFromClipboard();
+			manager->addItemsFromClipboardForSelected();
 			break;
 
 		default:
@@ -218,7 +218,7 @@ void GenericManagerEditor<T>::handleMenuSelectedID(int id)
 			if (manager->managerFactory != nullptr)
 			{
 				T* item = manager->managerFactory->createFromMenuResult(id - 1100);
-				if (item != nullptr) manager->addItem(item);
+				if (item != nullptr) manager->addItemForSelected(item);
 			}
 			else
 			{
@@ -239,7 +239,7 @@ void GenericManagerEditor<T>::showMenuAndAddItem(bool isFromAddButton)
 			{
 				if (item != nullptr)
 				{
-					this->manager->addItem(item);
+					this->manager->addItemForSelected(item);
 				}
 			}
 		);
@@ -273,7 +273,7 @@ void GenericManagerEditor<T>::showMenuAndAddItem(bool isFromAddButton)
 template<class T>
 T* GenericManagerEditor<T>::addItemFromMenu(bool /*isFromAddButton*/)
 {
-	T* item = manager->Manager<T>::addItem();
+	T* item = manager->addItemForSelected();
 	return item;
 }
 

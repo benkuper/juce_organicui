@@ -100,6 +100,10 @@ protected:
 	virtual void textEditorTextChanged(juce::TextEditor&) override;
 	virtual void textEditorFocusLost(juce::TextEditor&) override;
 	virtual void textEditorReturnKeyPressed(juce::TextEditor&) override;
+
+private:
+	void commitTextEdit();
+	bool isEditingText = false;
 private:
 	static constexpr int defaultMultilineHeight = 60;
 	static constexpr int resizeHandleHeight = 8;

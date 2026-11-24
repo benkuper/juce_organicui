@@ -171,10 +171,10 @@ StringArray EnumParameter::getAllKeys()
 
 void EnumParameter::setValueInternal(juce::var& newValue)
 {
-	Parameter::setValueInternal(newValue);
-
 	{
 		GenericScopedLock lock(enumValues.getLock());
+		if (!enumValues.isEmpty() && getEntryForKey(newValue.toString()) == nullptr) newValue = defaultValue;
+		Parameter::setValueInternal(newValue);
 		const auto* ev = getEntryForKey(value.toString());
 		if (ev == nullptr)
 		{
@@ -189,7 +189,7 @@ void EnumParameter::setValueInternal(juce::var& newValue)
 	}
 }
 
-bool EnumParameter::setValueWithData(var data)
+bool EnumParameter::setValueWithData(var data, bool silentSet, bool force, bool forceOverride)
 {
 	String key;
 	bool found = false;
@@ -203,17 +203,17 @@ bool EnumParameter::setValueWithData(var data)
 			break;
 		}
 	}
-	return found && setValueWithKey(key);
+	return found && setValueWithKey(key, silentSet, force, forceOverride);
 }
 
-bool EnumParameter::setValueWithKey(String key)
+bool EnumParameter::setValueWithKey(String key, bool silentSet, bool force, bool forceOverride)
 {
 	if (getEntryForKey(key) == nullptr) return false;
-	setValue(key);
+	setValue(key, silentSet, force, forceOverride);
 	return true;
 }
 
-bool EnumParameter::setValueAtIndex(int index)
+bool EnumParameter::setValueAtIndex(int index, bool silentSet, bool force, bool forceOverride)
 {
 	String key;
 	{
@@ -221,7 +221,7 @@ bool EnumParameter::setValueAtIndex(int index)
 		if (!isPositiveAndBelow(index, enumValues.size())) return false;
 		key = enumValues[index]->key;
 	}
-	return setValueWithKey(key);
+	return setValueWithKey(key, silentSet, force, forceOverride);
 }
 
 void EnumParameter::setPrev(bool loop, bool addToUndo)

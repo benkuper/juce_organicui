@@ -367,7 +367,12 @@ void OSCRemoteControl::processMessage(const OSCMessage& m, const String& sourceI
 					// addControllableToNoFeedbackMap(c, sourceId, m.getSenderIPAddress());
 					if (Parameter* p = dynamic_cast<Parameter*>(c))
 					{
-						p->resetValue();
+						WeakReference<Parameter> safeParameter(p);
+						MessageManager::callAsync([safeParameter]
+						{
+							if (safeParameter != nullptr && !safeParameter->isBeingDestroyed)
+								safeParameter->resetValueUndoable();
+						});
 					}
 					// noFeedbackMap.remove(c);
 				}
@@ -696,14 +701,24 @@ void OSCRemoteControl::connectionOpened(const String& id)
 
 void OSCRemoteControl::messageReceived(const String& id, const String& message)
 {
-	var o = JSON::parse(message);
+	auto data = JSON::parse(message);
+	if (!data.isObject()) return;
+
+	WeakReference<ControllableContainer> safeThis(this);
+	MessageManager::callAsync([safeThis, id, data]
+	{
+		if (auto* remote = dynamic_cast<OSCRemoteControl*>(safeThis.get()))
+			if (remote->server != nullptr && Engine::mainEngine != nullptr && !Engine::mainEngine->isClearing)
+				remote->processWebSocketMessage(id, data);
+	});
+}
+
+void OSCRemoteControl::processWebSocketMessage(const String& id, const var& o)
+{
 	if (o.isObject())
 	{
 		if (o.hasProperty("COMMAND"))
 		{
-			MessageManager::callAsync(
-				[this, id, message, o]()
-				{
 			String command = o["COMMAND"];
 			var data = o["DATA"];
 
@@ -718,7 +733,11 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 			{
 				if (ControllableContainer* cc = Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true))
 				{
-					cc->handleRemoveFromRemoteControl(data);
+					if (auto* item = dynamic_cast<BaseItem*>(cc); item != nullptr && !data.hasProperty("items"))
+					{
+						if (item->userCanRemove) item->remove();
+					}
+					else cc->handleRemoveFromRemoteControl(data);
 				}
 			}
 			else if (command == "CLEAR")
@@ -735,6 +754,33 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 					cc->setUndoableNiceName(data["name"]);
 				}
 			}
+			else if (command == "MOVE")
+			{
+				ControllableContainer* source = Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true);
+				ControllableContainer* destination = Engine::mainEngine->getControllableContainerForAddress(data["parent"].toString(), true);
+				if (source != nullptr && destination != nullptr)
+				{
+					int targetIndex = -1;
+					bool hasValidTarget = true;
+					if (data.hasProperty("before"))
+					{
+						const String beforeAddress = data["before"].toString();
+						targetIndex = destination->controllableContainers.size();
+						if (beforeAddress.isNotEmpty())
+						{
+							ControllableContainer* before = Engine::mainEngine->getControllableContainerForAddress(beforeAddress, true);
+							targetIndex = destination->controllableContainers.indexOf(before);
+							hasValidTarget = targetIndex >= 0;
+						}
+					}
+					if (hasValidTarget
+						&& destination->handleMoveFromRemoteControl(source, true, targetIndex)
+						&& data.hasProperty("before"))
+					{
+						sendPathChangedFeedback(destination->getControlAddress());
+					}
+				}
+			}
 			else if (command == "LOAD")
 			{
 				var fileData = JSON::parse(data["data"]);
@@ -745,35 +791,27 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 					ControllableContainer* cc = addr == "/" ? Engine::mainEngine : Engine::mainEngine->getControllableContainerForAddress(data["address"].toString(), true);
 					if (cc != nullptr)
 					{
-						MessageManager::callAsync([cc, fileData]() { cc->handleLoadFromRemoteControl(fileData); });
+						cc->handleLoadFromRemoteControl(fileData);
 					}
 				}
 			}
 			else if (command == "RESTORE")
 			{
-				const bool declined = data.getProperty("declined", false);
-				if (!declined)
+				auto* engine = Engine::mainEngine;
+				if (static_cast<bool>(data.getProperty("declined", false)))
 				{
-				File f = File(data.getProperty("file", ""));
-				if (f.existsAsFile())
-				{
-								MessageManager::callAsync(
-									[f]()
-									{
-							Engine::mainEngine->dismissRestoreAutosaveAlertWindow();
-							Engine::mainEngine->restoreAutosave(Engine::mainEngine->getFile(), f); 
-							});
+					engine->dismissRestoreAutosaveAlertWindow();
+					engine->removeNewerAutosaves();
+					engine->loadDocumentNoCheck(engine->getFile());
 				}
-			}
 				else
 				{
-							MessageManager::callAsync(
-								[]()
-								{
-						Engine::mainEngine->dismissRestoreAutosaveAlertWindow();
-						Engine::mainEngine->removeNewerAutosaves(); 
-						Engine::mainEngine->loadDocumentNoCheck(Engine::mainEngine->getFile());
-						});
+					const File file(data.getProperty("file", "").toString());
+					if (file.existsAsFile())
+					{
+						engine->dismissRestoreAutosaveAlertWindow();
+						engine->restoreAutosave(engine->getFile(), file);
+					}
 				}
 			}
 			else if (command == "SAVE")
@@ -863,7 +901,7 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 					}
 					if (sendFeedback)
 					{
-						sendOSCQueryFeedback(c);
+						sendOSCQueryFeedbackTo(OSCHelpers::getOSCMessageForControllable(c), { id });
 					}
 				}
 				else if (command == "IGNORE")
@@ -874,7 +912,6 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 					}
 				}
 			}
-				});
 		}
 		else
 		{
@@ -892,14 +929,18 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 						((Parameter*)c)->setValue(nv.value);
 					}
 				}
-				else if (nv.name.toString().startsWith("undoable:") && nv.value.size() == 2)
+				else if (nv.name.toString().startsWith("undoable:") && nv.value.isArray())
 				{
-					String cName = nv.name.toString().fromFirstOccurrenceOf(":", false, false);
-					if (Parameter* p = dynamic_cast<Parameter*>(Engine::mainEngine->getControllableForAddress(cName)))
+					const auto address = nv.name.toString().fromFirstOccurrenceOf(":", false, false);
+					if (auto* parameter = dynamic_cast<Parameter*>(Engine::mainEngine->getControllableForAddress(address)))
 					{
-						if (nv.value.size() == 1)
+						if (nv.value.size() == 2)
+							UndoMaster::getInstance()->performAction("Set " + parameter->niceName + " value",
+								new Parameter::ParameterSetValueAction(parameter, nv.value[0], nv.value[1]));
+						else if (nv.value.size() == 1)
 						{
-							p->setUndoableValue(nv.value[0]);
+							parameter->resetLastUndoValue();
+							parameter->setUndoableValue(nv.value[0]);
 						}
 					}
 				}
@@ -914,8 +955,11 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 						{
 							if (Parameter* p = dynamic_cast<Parameter*>(Engine::mainEngine->getControllableForAddress(pnv.name.toString())))
 							{
-								if (pnv.value.size() == 1)
+								if (pnv.value.isArray() && pnv.value.size() == 2)
+									actions.add(new Parameter::ParameterSetValueAction(p, pnv.value[0], pnv.value[1]));
+								else if (pnv.value.isArray() && pnv.value.size() == 1)
 								{
+									p->resetLastUndoValue();
 									actions.addArray(p->setUndoableValue(pnv.value[0], true));
 								}
 							}
@@ -925,14 +969,11 @@ void OSCRemoteControl::messageReceived(const String& id, const String& message)
 				}
 				else if (nv.name.toString().contains("/attributes/"))
 				{
-					StringArray split = StringArray::fromTokens(nv.name.toString(), "/attributes/", "\"");
-					if (split.size() == 2)
-					{
-						if (Controllable* c = Engine::mainEngine->getControllableForAddress(split[0]))
-						{
-							c->setAttribute(split[1], nv.value);
-						}
-					}
+					const auto key = nv.name.toString();
+					const auto address = key.upToFirstOccurrenceOf("/attributes/", false, false);
+					const auto attribute = key.fromFirstOccurrenceOf("/attributes/", false, false);
+					if (auto* control = Engine::mainEngine->getControllableForAddress(address))
+						control->setUndoableAttribute(attribute, nv.value);
 				}
 			}
 		}
@@ -1114,14 +1155,8 @@ void OSCRemoteControl::controllableFeedbackUpdate(ControllableContainer* cc, Con
 	}
 
 	// OSCQuery
-	HashMap<String, Array<Controllable*>, DefaultHashFunctions, CriticalSection>::Iterator it(feedbackMap);
-	while (it.next())
-	{
-		if (it.getValue().contains(c))
-		{
-			sendOSCQueryFeedback(c);
-		}
-	}
+	const auto clients = getOSCQueryFeedbackClientIds(c);
+	if (!clients.isEmpty()) sendOSCQueryFeedbackTo(OSCHelpers::getOSCMessageForControllable(c), clients);
 
 	// Manual
 	sendManualFeedbackForControllable(c);
@@ -1137,14 +1172,14 @@ void OSCRemoteControl::controllableStateUpdate(ControllableContainer* cc, Contro
 	}
 
 	// OSCQuery
-	HashMap<String, Array<Controllable*>, DefaultHashFunctions, CriticalSection>::Iterator it(feedbackMap);
-	while (it.next())
+	const auto clients = getOSCQueryFeedbackClientIds(c);
+	if (!clients.isEmpty())
 	{
-		if (it.getValue().contains(c))
-		{
-			sendOSCQueryStateFeedback(c);
-		}
+		OSCMessage message(c->getControlAddress() + "/attributes/enabled");
+		message.addBool(c->enabled);
+		sendOSCQueryFeedbackTo(message, clients);
 	}
+
 }
 
 void OSCRemoteControl::addControllableToNoFeedbackMap(Controllable* c, const juce::String& id, const juce::String& fallbackId)
@@ -1168,6 +1203,16 @@ void OSCRemoteControl::addControllableToNoFeedbackMap(Controllable* c, const juc
 			}
 		}
 	}
+}
+
+StringArray OSCRemoteControl::getOSCQueryFeedbackClientIds(Controllable* c)
+{
+	StringArray result;
+	const String excluded = noFeedbackMap[c];
+	HashMap<String, Array<Controllable*>, DefaultHashFunctions, CriticalSection>::Iterator it(feedbackMap);
+	while (it.next())
+		if (it.getKey() != excluded && it.getValue().contains(c)) result.add(it.getKey());
+	return result;
 }
 
 void OSCRemoteControl::sendOSCQueryFeedback(Controllable* c)

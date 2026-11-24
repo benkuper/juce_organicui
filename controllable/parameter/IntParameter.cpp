@@ -75,7 +75,7 @@ juce::var IntParameter::getAttributeInternal(juce::String name) const
 	{
 		return hexMode;
 	}
-	return juce::var();
+	return Parameter::getAttributeInternal(name);
 }
 
 

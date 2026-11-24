@@ -113,7 +113,12 @@ void BoolToggleUI::mouseUpInternal(const MouseEvent& e)
 	if (!isInteractable()) return;
 	if (e.mods.isLeftButtonDown())
 	{
-		if (e.mods.isAltDown() || momentaryMode) parameter->setValue(!parameter->boolValue(), false, false, true, true);
+		if (e.mods.isAltDown() || momentaryMode)
+		{
+			WeakReference<Parameter> safeParameter(parameter);
+			parameter->setValue(!parameter->boolValue(), false, false, true, true);
+			if (safeParameter != nullptr) safeParameter->clearMultiEditState();
+		}
 	}
 }
 

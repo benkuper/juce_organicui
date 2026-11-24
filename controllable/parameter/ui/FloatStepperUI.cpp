@@ -116,7 +116,7 @@ void FloatStepperUI::valueChanged(const var& value)
 void FloatStepperUI::sliderValueChanged(Slider* _slider)
 {
 	if (parameter.wasObjectDeleted()) return;
-	parameter->setValue(slider->getValue(), false, false, true, true);
+	parameter->setValue(cropUIValue(slider->getValue()), false, false, true, true);
 }
 
 void FloatStepperUI::sliderDragStarted(Slider* _slider)
@@ -132,7 +132,10 @@ void FloatStepperUI::sliderDragEnded(Slider* _slider)
 }
 
 void FloatStepperUI::rangeChanged(Parameter*) {
-	slider->setRange((int)parameter->minimumValue, (int)parameter->maximumValue, 1);
+	const double minimum = getUIMinimumValue();
+	const double maximum = getUIMaximumValue();
+	slider->setRange(minimum, maximum > minimum ? maximum : minimum + 1, 1);
+	slider->setValue(parameter->doubleValue(), dontSendNotification);
 }
 
 void FloatStepperUI::handlePaintTimerInternal()

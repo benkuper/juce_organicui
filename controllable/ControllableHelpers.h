@@ -26,11 +26,14 @@ public:
 	std::function<bool(Controllable*)> filterFunc;
 	Controllable* currentSelection;
 
-	juce::Array<Controllable *> controllableList;
+	juce::Array<juce::WeakReference<Controllable>> controllableList;
 	void populateMenu(juce::PopupMenu *subMenu, ControllableContainer * container, int &currentId, int currentLevel = 0);
 
 	void showAndGetControllable(std::function<void(Controllable *)> returnFunc, bool deleteAfter = false);
 	Controllable * getControllableForResult(int result);
+
+private:
+	JUCE_DECLARE_WEAK_REFERENCEABLE(ControllableChooserPopupMenu)
 };
 
 
@@ -60,11 +63,14 @@ public:
 	bool allowSelectAtAnyLevel;
 	ControllableContainer* currentSelection;
 
-	juce::Array<ControllableContainer *> containerList;
+	juce::Array<juce::WeakReference<ControllableContainer>> containerList;
 	void populateMenu(juce::PopupMenu *subMenu, ControllableContainer * container, int &currentId, int currentLevel = 0);
 
 	void showAndGetContainer(std::function<void(ControllableContainer *)> returnFunc);
 	ControllableContainer * getContainerForResult(int result);
+
+private:
+	JUCE_DECLARE_WEAK_REFERENCEABLE(ContainerChooserPopupMenu)
 };
 
 

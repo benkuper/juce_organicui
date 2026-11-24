@@ -61,6 +61,7 @@ public:
 	virtual T* addItemFromData(juce::var data, bool addToUndo = true); //to be overriden for specific item creation (from data)
 	virtual juce::Array<T*> addItemsFromData(juce::var data, bool addToUndo = true); //to be overriden for specific item creation (from data)
 	virtual juce::Array<T*> addItemsFromClipboard(bool showWarning = true);
+	void addItemsFromClipboardForSelected();
 	virtual bool canAddItemOfType(const juce::String& typeToCheck);
 
 	virtual void loadItemsData(juce::var data);
@@ -69,6 +70,7 @@ public:
 	virtual juce::UndoableAction* getAddItemsUndoableAction(juce::Array<T*> item = nullptr, juce::var data = juce::var());
 
 	T* addItem(T* item = nullptr, juce::var data = juce::var(), bool addToUndo = true, bool notify = true); //if data is not empty, load data
+	T* addItemForSelected(T* item = nullptr, juce::var data = juce::var());
 	T* addItem(const juce::Point<float> initialPosition, bool addToUndo = true, bool notify = true);
 	T* addItem(T* item, const juce::Point<float> initialPosition, bool addToUndo = true, bool notify = true);
 	juce::Array<T*> addItems(juce::Array<T*> items, juce::var data = juce::var(), bool addToUndo = true);
@@ -100,14 +102,16 @@ public:
 
 
 	virtual void handleAddFromRemoteControl(juce::var data) override;
-#if ORGANICUI_USE_MCP
 	bool handleMoveFromRemoteControl(ControllableContainer* source, bool addToUndo = false, int targetIndex = -1) override;
-#endif
 	virtual void handleRemoveFromRemoteControl(juce::var data) override;
 	virtual void handleClearFromRemoteControl() override;
 
 	virtual void clear() override;
 	void askForRemoveBaseItem(BaseItem* item) override;
+	juce::Array<juce::UndoableAction*> getRemoveBaseItemsUndoableActions(juce::Array<BaseItem*> items) override
+	{
+		return getRemoveItemsUndoableAction(Inspectable::getArrayAs<BaseItem, T>(items));
+	}
 	void askForDuplicateItem(BaseItem* item) override;
 	void askForPaste() override;
 	void askForMoveBefore(BaseItem*) override;
@@ -311,6 +315,7 @@ public:
 		AddItemsAction(Manager* m, juce::Array<T*> iList, juce::var data = juce::var());
 
 		int startIndex;
+		bool preserveSelection = false;
 		bool perform() override;
 		bool undo() override;
 	};
@@ -484,6 +489,33 @@ juce::UndoableAction* Manager<T>::getAddItemsUndoableAction(juce::Array<T*> _ite
 	if (Engine::mainEngine != nullptr && Engine::mainEngine->isLoadingFile) return nullptr;
 	if (_items.size() == 0) return nullptr;
 	return new AddItemsAction(this, _items, data);
+}
+
+template<class T>
+T* Manager<T>::addItemForSelected(T* item, juce::var data)
+{
+	if (item == nullptr) item = createItem();
+	if (item == nullptr) return nullptr;
+	const auto related = getRelatedSelectedContainers();
+	if (related.size() <= 1) return addItem(item, data);
+
+	// Resolve and construct every target before any add can change the selection.
+	const juce::var itemData = data.isVoid() ? item->getJSONData() : data;
+	juce::Array<juce::UndoableAction*> actions;
+	for (auto* container : related)
+	{
+		auto* target = dynamic_cast<Manager<T>*>(container);
+		if (target == nullptr || !target->userCanAddItemsManually) continue;
+		T* newItem = target == this ? item : target->createItemFromData(itemData);
+		if (newItem == nullptr) continue;
+		juce::var itemsData;
+		itemsData.append(itemData.clone());
+		auto* action = new AddItemsAction(target, juce::Array<T*> { newItem }, itemsData);
+		action->preserveSelection = true;
+		actions.add(action);
+	}
+	UndoMaster::getInstance()->performActions("Add items to selected managers", actions);
+	return item;
 }
 
 template<class T>
@@ -680,6 +712,40 @@ juce::Array<T*> Manager<T>::addItemsFromClipboard(bool showWarning)
 }
 
 template<class T>
+void Manager<T>::addItemsFromClipboardForSelected()
+{
+	const auto related = getRelatedSelectedContainers();
+	if (related.size() <= 1) { addItemsFromClipboard(); return; }
+	const juce::var clipboard = juce::JSON::parse(juce::SystemClipboard::getTextFromClipboard());
+	if (!clipboard.isObject()) return;
+	juce::var itemsData = clipboard.getProperty("items", juce::var());
+	if (!itemsData.isArray()) { itemsData = juce::var(); itemsData.append(clipboard); }
+	juce::Array<juce::UndoableAction*> actions;
+	for (auto* container : related)
+	{
+		auto* target = dynamic_cast<Manager<T>*>(container);
+		if (target == nullptr || !target->userCanAddItemsManually) continue;
+		if (clipboard.hasProperty("itemType") && !target->canAddItemOfType(clipboard["itemType"].toString())) continue;
+		juce::Array<T*> newItems;
+		juce::var newData;
+		for (int index = 0; index < itemsData.size(); ++index)
+		{
+			juce::var data = itemsData[index].clone();
+			if (T* item = target->createItemFromData(data))
+			{
+				newItems.add(item);
+				newData.append(data);
+			}
+		}
+		if (newItems.isEmpty()) continue;
+		auto* action = new AddItemsAction(target, newItems, newData);
+		action->preserveSelection = true;
+		actions.add(action);
+	}
+	UndoMaster::getInstance()->performActions("Paste items to selected managers", actions);
+}
+
+template<class T>
 bool Manager<T>::canAddItemOfType(const juce::String& typeToCheck)
 {
 	if (typeToCheck == itemDataType) return true;
@@ -871,7 +937,7 @@ template<class T>
 void Manager<T>::handleAddFromRemoteControl(juce::var data)
 {
 	if (!userCanAddItemsManually) return;
-	addItemFromData(data);
+	addItemFromData(data, true);
 }
 
 template<class T>
@@ -890,7 +956,8 @@ void Manager<T>::handleRemoveFromRemoteControl(juce::var data)
 		}
 	}
 
-	removeItems(itemsToRemove);
+	itemsToRemove.removeAllInstancesOf(nullptr);
+	removeItems(itemsToRemove, true);
 }
 
 template<class T>
@@ -899,7 +966,6 @@ void Manager<T>::handleClearFromRemoteControl()
 	clear();
 }
 
-#if ORGANICUI_USE_MCP
 template<class T>
 bool Manager<T>::handleMoveFromRemoteControl(ControllableContainer* source, bool addToUndo, int targetIndex)
 {
@@ -962,8 +1028,6 @@ bool Manager<T>::handleMoveFromRemoteControl(ControllableContainer* source, bool
 		setItemIndex(added, juce::jlimit(0, items.size() - 1, targetIndex), false);
 	return added != nullptr;
 }
-
-#endif
 
 template<class T>
 void Manager<T>::clear()
@@ -1474,7 +1538,7 @@ bool Manager<T>::AddItemAction::perform()
 	Manager* m = this->getManager();
 	if (m == nullptr)
 	{
-		return false;
+		return true;
 	}
 
 	T* item = this->getItem();
@@ -1487,7 +1551,7 @@ bool Manager<T>::AddItemAction::perform()
 		item = m->addItemFromData(this->data, false);
 	}
 
-	if (item == nullptr) return false;
+	if (item == nullptr) return true;
 
 	this->itemShortName = item->shortName;
 	return true;
@@ -1497,7 +1561,7 @@ template<class T>
 bool Manager<T>::AddItemAction::undo()
 {
 	T* s = this->getItem();
-	if (s == nullptr) return false;
+	if (s == nullptr || this->getManager() == nullptr) return true;
 	this->data = s->getJSONData();
 	this->data.getDynamicObject()->setProperty("index", this->itemIndex);
 
@@ -1518,10 +1582,10 @@ bool Manager<T>::RemoveItemAction::perform()
 
 	T* s = this->getItem();
 
-	if (s == nullptr) return false;
+	if (s == nullptr || this->getManager() == nullptr) return true;
 
 	this->data = s->getJSONData();
-	if (this->data.getDynamicObject() == nullptr) return false;
+	if (this->data.getDynamicObject() == nullptr) return true;
 
 	this->data.getDynamicObject()->setProperty("index", this->itemIndex);
 
@@ -1534,7 +1598,7 @@ template<class T>
 bool Manager<T>::RemoveItemAction::undo()
 {
 	Manager* m = this->getManager();
-	if (m == nullptr) return false;
+	if (m == nullptr) return true;
 	this->itemRef = m->addItemFromData(this->data, false);
 	return true;
 }
@@ -1553,10 +1617,10 @@ template<class T>
 bool Manager<T>::MoveItemAction::perform()
 {
 	Manager* m = this->getManager();
-	if (m == nullptr) return false;
+	if (m == nullptr) return true;
 
 	T* item = this->getItem();
-	if (item == nullptr) return false;
+	if (item == nullptr) return true;
 
 	m->setItemIndex(item, newIndex, false);
 	return true;
@@ -1566,10 +1630,10 @@ template<class T>
 bool Manager<T>::MoveItemAction::undo()
 {
 	Manager* m = this->getManager();
-	if (m == nullptr) return false;
+	if (m == nullptr) return true;
 
 	T* item = this->getItem();
-	if (item == nullptr) return false;
+	if (item == nullptr) return true;
 
 	m->setItemIndex(item, prevIndex, false);
 	return true;
@@ -1630,7 +1694,9 @@ template<class T>
 bool Manager<T>::AddItemsAction::perform()
 {
 	Manager* m = this->getManager();
-	if (m == nullptr) return false;
+	if (m == nullptr) return true;
+
+	juce::ScopedValueSetter<bool> selectionScope(m->selectItemWhenCreated, preserveSelection ? false : m->selectItemWhenCreated);
 
 	juce::Array<T*> iList = this->getItems();
 	if (!iList.isEmpty()) m->addItems(iList, this->data, false);
@@ -1654,7 +1720,7 @@ bool Manager<T>::AddItemsAction::undo()
 	if (m == nullptr)
 	{
 		this->itemsRef.clear();
-		return false;
+		return true;
 	}
 
 	juce::Array<T*> iList = this->getItems();
@@ -1683,7 +1749,7 @@ bool Manager<T>::RemoveItemsAction::perform()
 	if (m == nullptr)
 	{
 		this->itemsRef.clear();
-		return false;
+		return true;
 	}
 
 	juce::Array<T*> iList = this->getItems();
@@ -1706,10 +1772,12 @@ template<class T>
 bool Manager<T>::RemoveItemsAction::undo()
 {
 	Manager* m = this->getManager();
-	if (m == nullptr) return false;
+	if (m == nullptr) return true;
 
 	juce::Array<T*> iList = m->addItemsFromData(this->data, false);
 
+	this->itemsRef.clear();
+	for (auto* item : iList) this->itemsRef.add(item);
 	this->itemsShortName.clear();
 	for (auto& i : iList) this->itemsShortName.add(i != nullptr ? i->shortName : "");
 	return true;

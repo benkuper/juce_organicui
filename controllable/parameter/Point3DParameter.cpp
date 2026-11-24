@@ -44,18 +44,33 @@ Point3DParameter::Point3DParameter(const String& niceName, const String& descrip
 	argumentsDescription = "float, float, float";
 }
 
-void Point3DParameter::setVector(Vector3D<float> _value)
+void Point3DParameter::setVector(Vector3D<float> _value, bool silentSet, bool force, bool forceOverride)
 {
-	setVector(_value.x, _value.y, _value.z);
+	setVector(_value.x, _value.y, _value.z, silentSet, force, forceOverride);
 }
 
-void Point3DParameter::setVector(float _x, float _y, float _z)
+void Point3DParameter::setVector(float _x, float _y, float _z, bool silentSet, bool force, bool forceOverride)
 {
 	var d;
 	d.append(_x);
 	d.append(_y);
 	d.append(_z);
-	setValue(d);
+	setValue(d, silentSet, force, forceOverride);
+}
+
+void Point3DParameter::setX(float _x, bool silentSet, bool force, bool forceOverride)
+{
+	setVector(_x, y, z, silentSet, force, forceOverride);
+}
+
+void Point3DParameter::setY(float _y, bool silentSet, bool force, bool forceOverride)
+{
+	setVector(x, _y, z, silentSet, force, forceOverride);
+}
+
+void Point3DParameter::setZ(float _z, bool silentSet, bool force, bool forceOverride)
+{
+	setVector(x, y, _z, silentSet, force, forceOverride);
 }
 
 juce::Array<UndoableAction*> Point3DParameter::setUndoableVector(Vector3D<float> newVector, bool onlyReturnAction, bool setSimilarSelected)
@@ -212,7 +227,7 @@ juce::var Point3DParameter::getAttributeInternal(juce::String name) const
 		}
 	}
 	else if (name == "stringDecimals") return stringDecimals;
-	return juce::var();
+	return Parameter::getAttributeInternal(name);
 }
 
 StringArray Point3DParameter::getValidAttributes() const

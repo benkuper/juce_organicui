@@ -63,9 +63,9 @@ void FloatSliderUI::paint(Graphics& g)
 	float drawPos = getDrawPos();
 	if (orientation == HORIZONTAL)
 	{
-		if ((float)parameter->minimumValue < 0 && (float)parameter->maximumValue >= 0)
+		if ((float)getUIMinimumValue() < 0 && (float)getUIMaximumValue() > 0)
 		{
-			float zeroPos = jmap<float>(0, parameter->minimumValue, parameter->maximumValue, 0, getWidth());
+			float zeroPos = jmap<float>(0, getUIMinimumValue(), getUIMaximumValue(), 0, getWidth());
 			g.drawVerticalLine(zeroPos, sliderBounds.getY() + 1, sliderBounds.getBottom() - 1);
 			if (parameter->floatValue() != 0) g.fillRoundedRectangle(sliderBounds.withLeft(jmin<float>(drawPos, zeroPos)).withRight(jmax<float>(drawPos, zeroPos + 1)).reduced(0, 1).toFloat(), 2);
 		}
@@ -81,14 +81,14 @@ void FloatSliderUI::paint(Graphics& g)
 	}
 	else if (orientation == ROTARY)
 	{
-		if ((float)parameter->minimumValue < 0 && (float)parameter->maximumValue >= 0)
+		if ((float)getUIMinimumValue() < 0 && (float)getUIMaximumValue() > 0)
 		{
 			if (parameter->floatValue() != 0) drawRotary(g, c, jmin<float>(valueToShow, 0), jmax<float>(valueToShow, 0), 2);
 			else drawRotary(g, c, -.01f, .01f, 2);
 		}
 		else
 		{
-			drawRotary(g, c, parameter->minimumValue, valueToShow, 2);
+			drawRotary(g, c, getUIMinimumValue(), (float)cropUIValue(valueToShow), 2);
 		}
 	}
 
@@ -152,7 +152,7 @@ void FloatSliderUI::drawBG(Graphics& g)
 	}
 	else if (orientation == ROTARY)
 	{
-		drawRotary(g, bgColor, parameter->minimumValue, parameter->maximumValue);
+		drawRotary(g, bgColor, getUIMinimumValue(), getUIMaximumValue());
 	}
 }
 
@@ -216,7 +216,7 @@ void FloatSliderUI::mouseUpInternal(const MouseEvent& e)
 		}
 		else
 		{
-			if (initNormalizedValue != getNormalizedValueFromMouse()) setParamNormalizedValueUndoable(parameter->getNormalizedValue());
+			if (initValue != parameter->floatValue()) setParamNormalizedValueUndoable(getUINormalizedValue());
 		}
 	}
 
@@ -277,7 +277,10 @@ String FloatSliderUI::getValueText() const
 
 float FloatSliderUI::getAngleForValue(float val, float angleReduction)
 {
-	float relVal = jmap<float>(val, parameter->minimumValue, parameter->maximumValue, 0, 1);
+	const float low = getUIMinimumValue();
+	const float high = getUIMaximumValue();
+	float relVal = high == low ? 0 : jmap<float>(val, low, high, 0, 1);
+	if (useCustomRange) relVal = jlimit(0.f, 1.f, relVal);
 	return degreesToRadians(angleReduction + relVal * (270 - angleReduction));
 }
 
@@ -311,17 +314,19 @@ void FloatSliderUI::drawRotary(Graphics& g, Colour c, float startPos, float endP
 
 void FloatSliderUI::setParamNormalizedValueUndoable(float newValue)
 {
-	parameter->setUndoableNormalizedValue(newValue, true);
+	if (useCustomRange) parameter->setUndoableValue(getUIValueFromNormalized(newValue), false, true);
+	else parameter->setUndoableNormalizedValue(newValue, true);
 }
 
 void FloatSliderUI::setParamNormalizedValue(float value)
 {
-	parameter->setNormalizedValue(value, false, false, true);
+	if (useCustomRange) parameter->setValue(getUIValueFromNormalized(value), false, false, true, true);
+	else parameter->setNormalizedValue(value, false, false, true);
 }
 
 float FloatSliderUI::getParamNormalizedValue()
 {
-	return (float)parameter->getNormalizedValue(parameter->previewValue.isVoid() ? var() : parameter->previewValue);
+	return (float)getUINormalizedValue(parameter->previewValue);
 }
 
 

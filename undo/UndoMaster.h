@@ -25,8 +25,10 @@ public:
 
 	void beginGroupedTransaction(const juce::String& name);
 	void endGroupedTransaction();
+	void clearUndoHistory();
 
 private:
+	bool isClearingHistory = false;
 	int transactionGroupDepth = 0;
 	juce::String transactionGroupName;
 };
