@@ -631,12 +631,11 @@ bool OSCRemoteControl::handleHTTPRequest(std::shared_ptr<HttpServer::Response> r
 		}
 	}
 
-	String dataStr = JSON::toString(data);
+	const String dataStr = JSON::toString(data);
 
 	DBG(dataStr);
 
 	SimpleWeb::CaseInsensitiveMultimap header;
-	header.emplace("Content-Length", String(dataStr.length()).toStdString());
 	header.emplace("Content-Type", downloadMode ? "force-download" : "application/json");
 	if (downloadMode)
 	{
@@ -645,8 +644,7 @@ bool OSCRemoteControl::handleHTTPRequest(std::shared_ptr<HttpServer::Response> r
 	header.emplace("Accept-range", "bytes");
 	header.emplace("Access-Control-Allow-Origin", "*");
 
-	response->write(SimpleWeb::StatusCode::success_ok, header);
-	*response << dataStr;
+	response->write(SimpleWeb::StatusCode::success_ok, dataStr.toRawUTF8(), header);
 
 	return true;
 }

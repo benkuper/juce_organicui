@@ -108,7 +108,7 @@ GlobalSettings::GlobalSettings() :
 	fontNames.sortNatural();
 	for (const auto& fontName : fontNames) fontFamily->addOption(fontName, fontName, false);
 
-	fontSize = interfaceCC.addIntParameter("Font size", "Global font size, may be altered in some cases but this is used as a reference", 14, 0, 30);
+	fontSize = interfaceCC.addIntParameter("Font size", "Global font size, may be altered in some cases but this is used as a reference", 14, 10, 30);
 	p2dCanvasHandleSize = interfaceCC.addIntParameter("2D Canvas Handle Size", "Size of the handles in 2D Canvas", 6, 1, 30);
 	bool reloadFontRendererByDefault = false;
 #if JUCE_WINDOWS
