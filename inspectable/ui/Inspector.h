@@ -39,6 +39,7 @@ public:
 
 	virtual void paint(juce::Graphics& g) override;
 	virtual void resized() override;
+	void lookAndFeelChanged() override;
 	virtual void resizedInternal(juce::Rectangle<int>& r);
 	virtual void mouseDrag(const juce::MouseEvent& e) override;
 

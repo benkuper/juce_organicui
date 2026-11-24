@@ -55,6 +55,7 @@ public:
 
 		juce::String getTextAt(int rowNumber, int columnId);
 
+		void refreshFont();
 		juce::String getCellTooltip(int /*rowNumber*/, int /*columnId*/)    override;
 
 	private:
@@ -65,13 +66,15 @@ public:
 
 
 		int minRow, maxRow;
+		juce::Font logFont { juce::FontOptions(12.0f) };
 		CustomLoggerUI* owner;
 		friend class CustomLoggerUI;
 	};
 	
 	CustomLogger* logger;
 
-	void resized()override;
+	void resized() override;
+	void lookAndFeelChanged() override;
 	LogList logList;
 	juce::TextButton clearB, copyB, autoScrollB;
 	std::unique_ptr<juce::TableListBox> logListComponent;

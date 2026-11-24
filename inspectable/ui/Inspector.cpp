@@ -71,6 +71,25 @@ void Inspector::resized()
     resizedInternal(r);
 }
 
+
+void Inspector::lookAndFeelChanged()
+{
+	if (currentEditor == nullptr) return;
+
+	Array<Inspectable*> inspectables;
+	for (const auto& item : currentInspectables)
+		if (auto* inspectable = item.get()) inspectables.add(inspectable);
+	if (inspectables.isEmpty()) return;
+
+	const auto scrollPosition = vp.getViewPosition();
+	vp.setViewedComponent(nullptr, false);
+	currentEditor.reset(inspectables.getFirst()->getEditor(true, inspectables));
+	vp.setViewedComponent(currentEditor.get(), false);
+	resized();
+	vp.setViewPosition(scrollPosition);
+	repaint();
+}
+
 void Inspector::resizedInternal(juce::Rectangle<int>& r)
 {
     vp.setBounds(r);

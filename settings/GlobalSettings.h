@@ -51,7 +51,11 @@ public:
 	ControllableContainer interfaceCC;
 	BoolParameter* closeToSystemTray;
 	BoolParameter* enableTooltips;
+	EnumParameter* fontFamily;
 	IntParameter* fontSize;
+	BoolParameter* reloadFontRendererOnStartup;
+	IntParameter* fontRendererReloadDelay;
+	Trigger* resetFontCache;
 	IntParameter* p2dCanvasHandleSize;
 	EnumParameter* helpLanguage;
 	BoolParameter* useGLRenderer;
@@ -93,6 +97,8 @@ public:
 #endif
 	void loadJSONDataInternal(juce::var data) override;
 
+	void applyFontSettings(bool clearCache = false);
+	void scheduleFontRendererReload();
 	void loadKeyMappingsFromData();
 	void addLaunchArguments(const juce::String& commandLine, const CommandLineElements& elements);
 };

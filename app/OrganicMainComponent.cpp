@@ -13,6 +13,7 @@ OrganicMainContentComponent::OrganicMainContentComponent()
 
 	lookAndFeelOO.reset(new LookAndFeelOO());
 	LookAndFeel::setDefaultLookAndFeel(lookAndFeelOO.get());
+	GlobalSettings::getInstance()->applyFontSettings(true);
 
 #if JUCE_MAC
 	setMacMainMenu(this, nullptr, "");
@@ -107,6 +108,7 @@ void OrganicMainContentComponent::afterInit()
 
 
 	if (isShowing()) grabKeyboardFocus();
+	GlobalSettings::getInstance()->scheduleFontRendererReload();
 }
 
 void OrganicMainContentComponent::setupOpenGL()
@@ -128,6 +130,13 @@ void OrganicMainContentComponent::setupOpenGL()
 
 			openGLContext->attachTo(*this);
 		}
+	}
+	else if (openGLContext != nullptr)
+	{
+		openGLContext->detach();
+		openGLContext->setRenderer(nullptr);
+		openGLContext.reset();
+		repaint();
 	}
 #endif
 }
