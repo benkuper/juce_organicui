@@ -18,6 +18,7 @@ public:
 	bool operator==(const AppVersion& other) const;
 	bool operator<(const AppVersion& other) const;
 	bool operator<=(const AppVersion& other) const;
+	bool isReleaseOlderThan(const AppVersion& other) const;
 
 	bool isBeta() const { return channelName == "b"; }
 	bool isRelease() const { return channelName.isEmpty(); }

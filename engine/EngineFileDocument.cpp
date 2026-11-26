@@ -533,13 +533,11 @@ void Engine::loadJSONData(var data, ProgressTask* loadingTask)
 		return;
 	}
 
-	const AppVersion currentVersion(getAppVersion()); 
 	const AppVersion fileVersion(versionString);
 
-	const bool appVersionIsNewerThanFileVersion = fileVersion < currentVersion;
 	const bool fileVersionRequiresMigration = versionNeedsFormatMigration(fileVersion);
 	const bool migrationIsPossible = isFileFormatMigrationSupported(fileVersion);
-	if (appVersionIsNewerThanFileVersion && fileVersionRequiresMigration && migrationIsPossible)
+	if (fileVersionRequiresMigration && migrationIsPossible)
 	{
 		migrateThenLoadFileIfUserAgrees(fileVersion, data, loadingTask);
 		return;
@@ -706,23 +704,14 @@ bool Engine::versionNeedsFormatMigration(const AppVersion& fromVersion) const
 {
 	const AppVersion currentAppVersion(getAppVersion());
 
-	int curVersionRange = 0;
-	for (int i = 0; i < breakingChangesVersions.size(); ++i)
+	for (const auto& version : breakingChangesVersions)
 	{
-		if (currentAppVersion < AppVersion(breakingChangesVersions[i])) break;
-		curVersionRange++;
+		const AppVersion breakingVersion(version);
+		if (currentAppVersion.isReleaseOlderThan(breakingVersion)) break;
+		if (fromVersion.isReleaseOlderThan(breakingVersion)) return true;
 	}
 
-	int targetVersionRange = 0;
-	for (int i = 0; i < breakingChangesVersions.size(); ++i)
-	{
-		if (fromVersion < AppVersion(breakingChangesVersions[i])) break;
-		targetVersionRange++;
-	}
-
-	DBG("Cur version range " << curVersionRange << ", target Version range " << targetVersionRange);
-
-	return curVersionRange > targetVersionRange;
+	return false;
 }
 
 String Engine::getMinimumRequiredFileVersion()

@@ -8,6 +8,8 @@
  ==============================================================================
  */
 
+#include <tuple>
+
  using namespace juce;
 
  AppVersion::AppVersion(const String& versionStr)
@@ -160,6 +162,11 @@
 	bool AppVersion::operator<=(const AppVersion& other) const
 	{
 		return *this == other || *this < other;
+	}
+
+	bool AppVersion::isReleaseOlderThan(const AppVersion& other) const
+	{
+		return std::tie(major, minor, patch) < std::tie(other.major, other.minor, other.patch);
 	}
 
 	String AppVersion::toString() const 
